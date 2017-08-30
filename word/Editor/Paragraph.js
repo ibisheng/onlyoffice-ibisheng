@@ -1402,7 +1402,7 @@ Paragraph.prototype.Internal_Draw_1 = function(CurPage, pGraphics, Pr)
 	if (this.bFromDocument && (pGraphics.RENDERER_PDF_FLAG !== true))
 	{
 		// Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-		if (AscCommon.locktype_None != this.Lock.Get_Type())
+		if (AscCommon.locktype_None != this.Lock.Get_Type() && this.LogicDocument && !this.LogicDocument.IsViewModeInReview())
 		{
 			if (( CurPage > 0 || false === this.IsStartFromNewPage() || null === this.Get_DocumentPrev() ))
 			{
@@ -9237,7 +9237,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 		this.DrawingDocument.SetCursorType("default", MMData);
 
 	var Bounds = this.Pages[CurPage].Bounds;
-	if (true === this.Lock.Is_Locked() && X < Bounds.Right && X > Bounds.Left && Y > Bounds.Top && Y < Bounds.Bottom)
+	if (true === this.Lock.Is_Locked() && X < Bounds.Right && X > Bounds.Left && Y > Bounds.Top && Y < Bounds.Bottom && this.LogicDocument && !this.LogicDocument.IsViewModeInReview())
 	{
 		var _X = this.Pages[CurPage].X;
 		var _Y = this.Pages[CurPage].Y;

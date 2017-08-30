@@ -2357,6 +2357,9 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest, isIdle)
 	{
+		if (this.WordControl.m_oLogicDocument.IsViewModeInReview())
+			return false;
+
 		var res = false;
 		this.IsUserSave = !isAutoSave;
 		if (this.saveCheck())
