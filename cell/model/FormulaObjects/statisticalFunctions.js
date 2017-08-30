@@ -4697,6 +4697,11 @@
 
 		argClone[0] = argClone[0].getMatrix();
 
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
 		var pTMat = argClone[0];
 		var pMatY = argClone[1];
 		var pMatX = argClone[2];
