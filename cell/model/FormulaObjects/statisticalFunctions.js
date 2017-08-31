@@ -1449,7 +1449,7 @@
 
 	ScETSForecastCalculation.prototype.PreprocessDataRange = function( rMatX, rMatY,  rSmplInPrd, bDataCompletion, nAggregation, rTMat, eETSType )
 	{
-		this.bEDS = ( rSmplInPrd == 0 );
+		this.bEDS = ( rSmplInPrd === 0 );
 		this.bAdditive = /*( eETSType == etsAdd || eETSType == etsPIAdd || eETSType == etsStatAdd )*/true;
 
 		this.mnCount = rMatX.length;
@@ -1634,11 +1634,11 @@
 			}
 		}
 
-		if ( rSmplInPrd != 1 ){
+		if ( rSmplInPrd !== 1 ){
 			this.mnSmplInPrd = rSmplInPrd;
 		}else {
 			this.mnSmplInPrd = this.CalcPeriodLen();
-			if ( this.mnSmplInPrd == 1 ){
+			if ( this.mnSmplInPrd === 1 ){
 				this.bEDS = true; // period length 1 means no periodic data: EDS suffices
 			}
 		}
@@ -4705,10 +4705,9 @@
 		var pTMat = argClone[0];
 		var pMatY = argClone[1];
 		var pMatX = argClone[2];
-		var nSmplInPrd = argClone[3];
-		var bDataCompletion = argClone[4];
-		var nAggregation = argClone[5];
-
+		var nSmplInPrd = argClone[3].getValue();
+		var bDataCompletion = argClone[4].getValue();
+		var nAggregation = argClone[5].getValue();
 
 
 		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
