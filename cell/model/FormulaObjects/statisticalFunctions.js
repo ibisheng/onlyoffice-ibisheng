@@ -66,16 +66,17 @@
 		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
 		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
-		cFORECAST, cFORECAST_ETS, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV,
-		cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT,
-		cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN,
-		cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST,
-		cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
-		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
-		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
-		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
-		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP,
-		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
+		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_SEASONALITY, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST,
+		cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN,
+		cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST,
+		cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST,
+		cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV,
+		cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC,
+		cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
+		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP,
+		cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND,
+		cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
+		cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -4724,6 +4725,55 @@
 
 
 		return new cNumber(pFcMat[0][0]);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORECAST_ETS_SEASONALITY() {
+		this.name = "FORECAST.ETS.SEASONALITY";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_SEASONALITY.prototype.constructor = cFORECAST_ETS_SEASONALITY;
+	cFORECAST_ETS_SEASONALITY.prototype.argumentsMin = 2;
+	cFORECAST_ETS_SEASONALITY.prototype.argumentsMax = 4;
+	cFORECAST_ETS_SEASONALITY.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(1);
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(1);
+
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var pMatY = argClone[0];
+		var pMatX = argClone[1];
+		var bDataCompletion = argClone[2].getValue();
+		var nAggregation = argClone[3].getValue();
+
+		var nSmplInPrd = 1;
+
+		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
+		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation);
+		if ( !isError) {
+			///*,( eETSType != etsStatAdd && eETSType != etsStatMult ? pTMat : nullptr ),eETSType )
+			return new cError(cErrorType.wrong_value_type);
+		}else if(isError && cElementType.error === isError.type){
+			return isError;
+		}
+
+		var res = aETSCalc.mnSmplInPrd;
+
+		return new cNumber(res);
 	};
 
 	/**
