@@ -2719,8 +2719,9 @@ StyleManager.prototype =
 		var xfs = oItemWithXfs.xfs;
 		var oRes = {newVal: val, oldVal: xfs && xfs.font ? getFunc.call(xfs.font): null};
 		xfs = this._initXf(oItemWithXfs);
+		var hash = val && val.getHash ? val.getHash() : val;
 		var xfsOperationCache = xfs;
-		var newXf = xfs.getOperationCache(prop, val);
+		var newXf = xfs.getOperationCache(prop, hash);
 		if (newXf) {
 			oItemWithXfs.xfs = newXf;
 		} else {
