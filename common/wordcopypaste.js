@@ -7746,8 +7746,8 @@ PasteProcessor.prototype =
                     }
                 }
                 var sSrc = node.getAttribute("src");
-                if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
-                    ||  nWidth === 0 ||  nHeight === 0)
+                if(sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
+                    ||  nWidth === 0 ||  nHeight === 0))
                 {
                     var img_prop = new Asc.asc_CImgProperty();
                     img_prop.asc_putImageUrl(sSrc);
