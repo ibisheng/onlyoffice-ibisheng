@@ -4185,6 +4185,134 @@ $( function () {
 
     } );
 
+	test( "Test: \"FORECAST.ETS\"", function () {
+
+		ws.getRange2( 'A4' ).setValue( '39814' );
+		ws.getRange2( 'A5' ).setValue( '39845' );
+		ws.getRange2( 'A6' ).setValue( '39873' );
+		ws.getRange2( 'A7' ).setValue( '39904' );
+		ws.getRange2( 'A8' ).setValue( '39934' );
+		ws.getRange2( 'A9' ).setValue( '39965' );
+		ws.getRange2( 'A10' ).setValue( '39995' );
+		ws.getRange2( 'A11' ).setValue( '40026' );
+		ws.getRange2( 'A12' ).setValue( '40057' );
+		ws.getRange2( 'A13' ).setValue( '40087' );
+		ws.getRange2( 'A14' ).setValue( '40118' );
+		ws.getRange2( 'A15' ).setValue( '40148' );
+		ws.getRange2( 'A16' ).setValue( '40179' );
+		ws.getRange2( 'A17' ).setValue( '40210' );
+		ws.getRange2( 'A18' ).setValue( '40238' );
+		ws.getRange2( 'A19' ).setValue( '40269' );
+		ws.getRange2( 'A20' ).setValue( '40299' );
+		ws.getRange2( 'A21' ).setValue( '40330' );
+		ws.getRange2( 'A22' ).setValue( '40360' );
+		ws.getRange2( 'A23' ).setValue( '40391' );
+		ws.getRange2( 'A24' ).setValue( '40422' );
+		ws.getRange2( 'A25' ).setValue( '40452' );
+		ws.getRange2( 'A26' ).setValue( '40483' );
+		ws.getRange2( 'A27' ).setValue( '40513' );
+		ws.getRange2( 'A28' ).setValue( '40544' );
+		ws.getRange2( 'A29' ).setValue( '40575' );
+		ws.getRange2( 'A30' ).setValue( '40603' );
+		ws.getRange2( 'A31' ).setValue( '40634' );
+		ws.getRange2( 'A32' ).setValue( '40664' );
+		ws.getRange2( 'A33' ).setValue( '40695' );
+		ws.getRange2( 'A34' ).setValue( '40725' );
+		ws.getRange2( 'A35' ).setValue( '40756' );
+		ws.getRange2( 'A36' ).setValue( '40787' );
+		ws.getRange2( 'A37' ).setValue( '40817' );
+		ws.getRange2( 'A38' ).setValue( '40848' );
+		ws.getRange2( 'A39' ).setValue( '40878' );
+		ws.getRange2( 'A40' ).setValue( '40909' );
+		ws.getRange2( 'A41' ).setValue( '40940' );
+		ws.getRange2( 'A42' ).setValue( '40969' );
+		ws.getRange2( 'A43' ).setValue( '41000' );
+		ws.getRange2( 'A44' ).setValue( '41030' );
+		ws.getRange2( 'A45' ).setValue( '41061' );
+		ws.getRange2( 'A46' ).setValue( '41091' );
+		ws.getRange2( 'A47' ).setValue( '41122' );
+		ws.getRange2( 'A48' ).setValue( '41153' );
+		ws.getRange2( 'A49' ).setValue( '41183' );
+		ws.getRange2( 'A50' ).setValue( '41214' );
+		ws.getRange2( 'A51' ).setValue( '41244' );
+		ws.getRange2( 'A52' ).setValue( '41275' );
+		ws.getRange2( 'A53' ).setValue( '41306' );
+		ws.getRange2( 'A54' ).setValue( '41334' );
+		ws.getRange2( 'A55' ).setValue( '41365' );
+		ws.getRange2( 'A56' ).setValue( '41395' );
+		ws.getRange2( 'A57' ).setValue( '41426' );
+		ws.getRange2( 'A58' ).setValue( '41456' );
+		ws.getRange2( 'A59' ).setValue( '41487' );
+		ws.getRange2( 'A60' ).setValue( '41518' );
+
+		ws.getRange2( 'B4' ).setValue( '2644539' );
+		ws.getRange2( 'B5' ).setValue( '2359800' );
+		ws.getRange2( 'B6' ).setValue( '2925918' );
+		ws.getRange2( 'B7' ).setValue( '3024973' );
+		ws.getRange2( 'B8' ).setValue( '3177100' );
+		ws.getRange2( 'B9' ).setValue( '3419595' );
+		ws.getRange2( 'B10' ).setValue( '3649702' );
+		ws.getRange2( 'B11' ).setValue( '3650668' );
+		ws.getRange2( 'B12' ).setValue( '3191526' );
+		ws.getRange2( 'B13' ).setValue( '3249428' );
+		ws.getRange2( 'B14' ).setValue( '2971484' );
+		ws.getRange2( 'B15' ).setValue( '3074209' );
+		ws.getRange2( 'B16' ).setValue( '2785466' );
+		ws.getRange2( 'B17' ).setValue( '2515361' );
+		ws.getRange2( 'B18' ).setValue( '3105958' );
+		ws.getRange2( 'B19' ).setValue( '3139059' );
+		ws.getRange2( 'B20' ).setValue( '3380355' );
+		ws.getRange2( 'B21' ).setValue( '3612886' );
+		ws.getRange2( 'B22' ).setValue( '3765824' );
+		ws.getRange2( 'B23' ).setValue( '3771842' );
+		ws.getRange2( 'B24' ).setValue( '3356365' );
+		ws.getRange2( 'B25' ).setValue( '3490100' );
+		ws.getRange2( 'B26' ).setValue( '3163659' );
+		ws.getRange2( 'B27' ).setValue( '3167124' );
+		ws.getRange2( 'B28' ).setValue( '2883810' );
+		ws.getRange2( 'B29' ).setValue( '2610667' );
+		ws.getRange2( 'B30' ).setValue( '3129205' );
+		ws.getRange2( 'B31' ).setValue( '3200527' );
+		ws.getRange2( 'B32' ).setValue( '3547804' );
+		ws.getRange2( 'B33' ).setValue( '3766323' );
+		ws.getRange2( 'B34' ).setValue( '3935589' );
+		ws.getRange2( 'B35' ).setValue( '3917884' );
+		ws.getRange2( 'B36' ).setValue( '3564970' );
+		ws.getRange2( 'B37' ).setValue( '3602455' );
+		ws.getRange2( 'B38' ).setValue( '3326859' );
+		ws.getRange2( 'B39' ).setValue( '3441693' );
+		ws.getRange2( 'B40' ).setValue( '3211600' );
+		ws.getRange2( 'B41' ).setValue( '2998119' );
+		ws.getRange2( 'B42' ).setValue( '3472440' );
+		ws.getRange2( 'B43' ).setValue( '3563007' );
+		ws.getRange2( 'B44' ).setValue( '3820570' );
+		ws.getRange2( 'B45' ).setValue( '4107195' );
+		ws.getRange2( 'B46' ).setValue( '4284443' );
+		ws.getRange2( 'B47' ).setValue( '4356216' );
+		ws.getRange2( 'B48' ).setValue( '3819379' );
+		ws.getRange2( 'B49' ).setValue( '3844987' );
+		ws.getRange2( 'B50' ).setValue( '3478890' );
+		ws.getRange2( 'B51' ).setValue( '3443039' );
+		ws.getRange2( 'B52' ).setValue( '3204637' );
+		ws.getRange2( 'B53' ).setValue( '2966477' );
+		ws.getRange2( 'B54' ).setValue( '3593364' );
+		ws.getRange2( 'B55' ).setValue( '3604104' );
+		ws.getRange2( 'B56' ).setValue( '3933016' );
+		ws.getRange2( 'B57' ).setValue( '4146797' );
+		ws.getRange2( 'B58' ).setValue( '4176486' );
+		ws.getRange2( 'B59' ).setValue( '4347059' );
+		ws.getRange2( 'B60' ).setValue( '3781168' );
+
+
+		ws.getRange2( 'A61' ).setValue( '41548' );
+
+
+		oParser = new parserFormula( "FORECAST.ETS(A61,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3868499.49723621);
+
+	} );
+
 	test( "Test: \"FORECAST.LINEAR\"", function () {
 		oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
 		ok( oParser.parse() );
