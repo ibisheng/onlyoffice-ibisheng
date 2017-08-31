@@ -7344,7 +7344,7 @@ PasteProcessor.prototype =
 					
                     var sSrc = node.getAttribute("src");
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
-                        ||  nWidth === 0 ||  nHeight === 0))
+                        ||  nWidth === 0 ||  nHeight === 0) && sSrc)
                     {
                         var img_prop = new Asc.asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
