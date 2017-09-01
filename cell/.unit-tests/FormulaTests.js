@@ -4186,6 +4186,7 @@ $( function () {
     } );
 
 	test( "Test: \"FORECAST.ETS\"", function () {
+		//результаты данного теста соответсвуют результатам LO, но отличаются от MS!!!
 
 		ws.getRange2( 'A4' ).setValue( '39814' );
 		ws.getRange2( 'A5' ).setValue( '39845' );

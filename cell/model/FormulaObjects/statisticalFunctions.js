@@ -1450,6 +1450,15 @@
 
 	ScETSForecastCalculation.prototype.PreprocessDataRange = function( rMatX, rMatY,  rSmplInPrd, bDataCompletion, nAggregation, rTMat, eETSType )
 	{
+		var nColMatX = rMatX.length;
+		var nRowMatX = rMatX[0].length;
+		var nColMatY = rMatY.length;
+		var nRowMatY = rMatY[0].length;
+
+		if(nColMatX !== nColMatY || nRowMatX !== nRowMatY && !checkNumericMatrix(rMatX) || !checkNumericMatrix(rMatY)){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
 		this.bEDS = ( rSmplInPrd === 0 );
 		this.bAdditive = /*( eETSType == etsAdd || eETSType == etsPIAdd || eETSType == etsStatAdd )*/true;
 
@@ -1487,7 +1496,7 @@
 		}
 
 		this.mfStepSize = Number.MAX_VALUE;
-		if (/*mnMonthDay*/true) {
+		if (this.mnMonthDay) {
 			for (var i = 0; i < this.mnCount; i++) {
 				var aDate = Date.prototype.getDateFromExcel(maRange[i].X);
 				maRange[i].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
@@ -1602,13 +1611,13 @@
 		if (bHasGap) {
 			var nMissingXCount = 0;
 			var fOriginalCount = this.mnCount;
-			if (/*mnMonthDay*/true) {
+			if (this.mnMonthDay) {
 				aDate = Date.prototype.getDateFromExcel(maRange[0].X);
 			}
 
 			for (var i = 1; i < this.mnCount; i++) {
 				var fDist;
-				if (/*mnMonthDay*/true) {
+				if (this.mnMonthDay) {
 					var aDate1 = Date.prototype.getDateFromExcel(maRange[i].X);
 					fDist = 12 * ( aDate1.getUTCFullYear() - aDate.getUTCFullYear() ) +
 						( aDate1.getMonth() - aDate.getMonth() );
@@ -2297,7 +2306,21 @@
 		return true;
 	};
 
+	function checkNumericMatrix(matrix){
+		if (!matrix)
+			return false;
 
+		for(var i = 0; i < matrix.length; i++){
+			for(var j = 0; j < matrix[i].length; j++){
+				var type = matrix[i][j].type;
+				if(!(cElementType.number === type || cElementType.bool === type)){
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 
 
 	/**
@@ -4688,6 +4711,7 @@
 	cFORECAST_ETS.prototype.argumentsMax = 6;
 	cFORECAST_ETS.prototype.Calculate = function (arg) {
 
+		//результаты данной фукнции соответсвуют результатам LO, но отличаются от MS!!!
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array, cElementType.array]);
 		var argClone = oArguments.args;
 
@@ -4749,6 +4773,7 @@
 	cFORECAST_ETS_SEASONALITY.prototype.argumentsMax = 4;
 	cFORECAST_ETS_SEASONALITY.prototype.Calculate = function (arg) {
 
+		//результаты данной фукнции соответсвуют результатам LO, но отличаются от MS!!!
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
 		var argClone = oArguments.args;
 
