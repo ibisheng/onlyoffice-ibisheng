@@ -2322,7 +2322,6 @@
 		return true;
 	}
 
-
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
