@@ -1665,20 +1665,18 @@
 	{
 		// give various vectors size and initial value
 		this.mpBase     = [];
-		this.mpBase.length = this.mnCount;
-		this.mpBase.fill(0);
+		fillArray(this.mpBase, 0, this.mnCount);
+
 		this.mpTrend     = [];
-		this.mpTrend.length = this.mnCount;
-		this.mpTrend.fill(0);
+		fillArray(this.mpTrend, 0, this.mnCount);
+
 		if ( !this.bEDS ){
 			this.mpPerIdx     = [];
-			this.mpPerIdx.length = this.mnCount;
-			this.mpPerIdx.fill(0);
+			fillArray(this.mpPerIdx, 0, this.mnCount);
 		}
 
 		this.mpForecast     = [];
-		this.mpForecast.length = this.mnCount;
-		this.mpForecast.fill(0);
+		fillArray(this.mpForecast, 0, this.mnCount);
 		this.mpForecast[ 0 ] = this.maRange[ 0 ].Y;
 
 		if ( this.prefillTrendData() )
@@ -2320,6 +2318,12 @@
 		}
 
 		return true;
+	}
+
+	function fillArray(array, val, length){
+		for(var i = 0; i < length - 1; i++){
+			array[i] = val;
+		}
 	}
 
 	/**
