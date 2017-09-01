@@ -596,7 +596,10 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
     // Делаем проверки, не нужно ли сразу перенести параграф на новую страницу
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculatePageBreak(CurLine, CurPage, PRS,ParaPr))
-        return PRS.RecalcResult;
+	{
+		this.Recalculate_PageEndInfo(null, CurPage);
+		return PRS.RecalcResult;
+	}
 
     // Изначально обнуляем промежутки обтекания и наличие переноса строки
     PRS.Reset_Ranges();
