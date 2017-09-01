@@ -66,10 +66,10 @@
 		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
 		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
-		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_SEASONALITY, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST,
-		cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN,
-		cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST,
-		cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST,
+		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cFREQUENCY, cFTEST,
+		cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH,
+		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
+		cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST,
 		cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV,
 		cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC,
 		cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
@@ -2259,49 +2259,50 @@
 	};
 
 
-	ScETSForecastCalculation.prototype.GetStatisticValue = function( rTypeMat, rStatMat )
-	{
-		if ( !this.initCalc() )
+	ScETSForecastCalculation.prototype.GetStatisticValue = function (rTypeMat) {
+		if (!this.initCalc()) {
 			return false;
+		}
 
 		var nC = rTypeMat.length, nR = rTypeMat[0].length;
-		for ( var i = 0; i < nR; i++ )
-		{
-			for ( var j = 0; j < nC; j++ )
-			{
-				switch ( rTypeMat[j][i] )
-				{
+		var rStatMat = [];
+		for (var i = 0; i < nR; i++) {
+			for (var j = 0; j < nC; j++) {
+				if(!rStatMat[j]){
+					rStatMat[j] = [];
+				}
+				switch (rTypeMat[j][i].getValue()) {
 					case 1 : // alpha
-						rStatMat.push( this.mfAlpha, j, i );
+						rStatMat[j][i] = this.mfAlpha;
 						break;
 					case 2 : // gamma
-						rStatMat.push( this.mfGamma, j, i );
+						rStatMat[j][i] = this.mfGamma;
 						break;
 					case 3 : // beta
-						rStatMat.push( this.mfBeta, j, i );
+						rStatMat[j][i] = this.mfBeta;
 						break;
 					case 4 : // MASE
-						rStatMat.push( this.mfMASE, j, i );
+						rStatMat[j][i] = this.mfMASE;
 						break;
 					case 5 : // SMAPE
-						rStatMat.push(this. mfSMAPE, j, i );
+						rStatMat[j][i] = this.mfSMAPE;
 						break;
 					case 6 : // MAE
-						rStatMat.push( this.mfMAE, j, i );
+						rStatMat[j][i] = this.mfMAE;
 						break;
 					case 7 : // RMSE
-						rStatMat.push( this.mfRMSE, j, i );
+						rStatMat[j][i] = this.mfRMSE;
 						break;
 					case 8 : // step size
-						rStatMat.push( this.mfStepSize, j, i );
+						rStatMat[j][i] = this.mfStepSize;
 						break;
 					case 9 : // samples in period
-						rStatMat.push( this.mnSmplInPrd, j, i );
+						rStatMat[j][i] = this.mnSmplInPrd;
 						break;
 				}
 			}
 		}
-		return true;
+		return rStatMat;
 	};
 
 	function checkNumericMatrix(matrix){
@@ -4813,6 +4814,71 @@
 		var res = aETSCalc.mnSmplInPrd;
 
 		return new cNumber(res);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORECAST_ETS_STAT() {
+		this.name = "FORECAST.ETS.STAT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_STAT.prototype.constructor = cFORECAST_ETS_STAT;
+	cFORECAST_ETS_STAT.prototype.argumentsMin = 3;
+	cFORECAST_ETS_STAT.prototype.argumentsMax = 6;
+	cFORECAST_ETS_STAT.prototype.Calculate = function (arg) {
+
+		//результаты данной фукнции соответсвуют результатам LO, но отличаются от MS!!!
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(1);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
+
+		//TODO сделать функцию convertToMatrix!!!!
+		argClone[2] = argClone[2].getMatrix();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var pMatY = argClone[0];
+		var pMatX = argClone[1];
+		var pTypeMat = argClone[2];
+		var nSmplInPrd = argClone[3].getValue();
+		var bDataCompletion = argClone[4].getValue();
+		var nAggregation = argClone[5].getValue();
+
+		if ( nAggregation < 1 || nAggregation > 7 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+		if ( bDataCompletion !== 1 && bDataCompletion !== 0 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+
+		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
+		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation);
+		if ( !isError) {
+			return new cError(cErrorType.wrong_value_type);
+		}else if(isError && cElementType.error === isError.type){
+			return isError;
+		}
+
+		var pFcMat = aETSCalc.GetStatisticValue( pTypeMat );
+		var res = null;
+		if(!pFcMat){
+			return new cError(cErrorType.wrong_value_type);
+		}else {
+			res = pFcMat[0][0];
+		}
+
+		return null !== res ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 	};
 
 	/**
