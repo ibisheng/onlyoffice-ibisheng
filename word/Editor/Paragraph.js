@@ -1484,11 +1484,11 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 	var DocumentComments = LogicDocument.Comments;
 	var Page_abs         = this.Get_AbsolutePage(CurPage);
 
-	var DrawComm           = ( DocumentComments.Is_Use() && true !== LogicDocument.IsViewMode());
+	var DrawComm           = ( DocumentComments.Is_Use() && true !== LogicDocument.IsViewMode() && true !== this.LogicDocument.IsViewModeInReview());
 	var DrawFind           = LogicDocument.SearchEngine.Selection;
 	var DrawColl           = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
 	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
-	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode());
+	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode() &&  true !== this.LogicDocument.IsViewModeInReview());
 
 	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
 
