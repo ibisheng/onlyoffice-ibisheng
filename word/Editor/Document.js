@@ -15503,15 +15503,12 @@ CDocument.prototype.AddField = function(nType, oPr)
 		if (!oParagraph)
 			return false;
 
-		var oField = new CComplexField();
-		var oRun   = new ParaRun();
-		var oInstr = new ParaInstrText(fieldtype_PAGENUM, oPr);
-
-		oRun.Add_ToContent(0, oField.GetBeginChar());
-		oRun.Add_ToContent(1, oInstr);
-		oRun.Add_ToContent(2, oField.GetSeparateChar());
+		var oRun = new ParaRun();
+		oRun.Add_ToContent(0, new ParaFieldChar(fldchartype_Begin));
+		oRun.Add_ToContent(1, new ParaInstrText(fieldtype_PAGENUM, oPr));
+		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate));
 		oRun.Add_ToContent(3, new ParaText("1"));
-		oRun.Add_ToContent(4, oField.GetEndChar());
+		oRun.Add_ToContent(4, new ParaFieldChar(fldchartype_End));
 		oParagraph.Add(oRun);
 		return true;
 	}
@@ -15533,6 +15530,19 @@ CDocument.prototype.RegroupComplexFields = function()
 		this.Content[nIndex].RegroupComplexFields(oRegroupManager);
 	}
 };
+CDocument.prototype.UpdateComplexField = function(oField)
+{
+
+};
+CDocument.prototype.GetCurrentComplexFields = function()
+{
+	var oParagraph = this.GetCurrentParagraph();
+	if (!oParagraph)
+		return [];
+
+	return oParagraph.GetCurrentComplexFields();
+};
+
 
 
 function TEST_ADDFIELD()

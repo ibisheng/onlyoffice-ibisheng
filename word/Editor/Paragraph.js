@@ -12305,6 +12305,16 @@ Paragraph.prototype.RegroupComplexFields = function(oRegroupManager)
 			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
 	}
 };
+Paragraph.prototype.GetCurrentComplexFields = function()
+{
+	var oParaPos = this.Get_ParaContentPos(this.Selection.Use, false, false);
+	if (!oParaPos)
+		return [];
+
+	var oRun = this.Get_ClassesByPos(oParaPos);
+	if (!oRun || !(oRun instanceof ParaRun))
+		return [];
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

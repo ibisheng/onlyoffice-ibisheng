@@ -41,13 +41,13 @@ var fldchartype_Begin    = 0;
 var fldchartype_Separate = 1;
 var fldchartype_End      = 2;
 
-function ParaFieldChar(Type, ComplexField)
+function ParaFieldChar(Type)
 {
 	CRunElementBase.call(this);
 
 	this.Use          = true;
 	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
-	this.ComplexField = ComplexField;
+	this.ComplexField = null;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
@@ -134,9 +134,9 @@ ParaInstrText.prototype.GetFieldCode = function()
 
 function CComplexField()
 {
-	this.BeginChar    = new ParaFieldChar(fldchartype_Begin, this);
-	this.EndChar      = new ParaFieldChar(fldchartype_End, this);
-	this.SeparateChar = new ParaFieldChar(fldchartype_Separate, this);
+	this.BeginChar    = null;
+	this.EndChar      = null;
+	this.SeparateChar = null;
 	this.Instruction  = "";
 }
 CComplexField.prototype.ResetInstruction = function()

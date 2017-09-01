@@ -1079,6 +1079,25 @@ ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, 
 	}
 };
 
+ParaRun.prototype.GetLogicDocument = function()
+{
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+		return this.Paragraph.LogicDocument;
+
+	return editor.WordControl.m_oLogicDocument;
+};
+ParaRun.prototype.private_CheckNeedRegroupComplexFieldsOnChangeContent = function(arrItems)
+{
+	for (var nIndex = 0, nCount = arrItems.length; nIndex < nCount; ++nIndex)
+	{
+		if (para_FieldChar === arrItems[nIndex].Type)
+		{
+			var oLogicDocument = this.GetLogicDocument();
+			oLogicDocument.FieldsManager.SetNeedRegroupComplexFields(true);
+			return;
+		}
+	}
+};
 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -1088,6 +1107,8 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 
     if (true === UpdatePosition)
         this.private_UpdatePositionsOnAdd(Pos);
+
+	this.private_CheckNeedRegroupComplexFieldsOnChangeContent([Item]);
 
     // Обновляем позиции в NearestPos
     var NearPosLen = this.NearPosArray.length;
@@ -1142,6 +1163,8 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems));
 
     this.Content.splice( Pos, Count );
+
+	this.private_CheckNeedRegroupComplexFieldsOnChangeContent(DeletedItems);
 
     if (true === UpdatePosition)
         this.private_UpdatePositionsOnRemove(Pos, Count);
@@ -1209,6 +1232,8 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
 
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
+
+	this.private_CheckNeedRegroupComplexFieldsOnChangeContent(NewItems);
 };
 
 // Определим строку и отрезок текущей позиции
