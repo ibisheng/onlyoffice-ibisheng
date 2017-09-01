@@ -4710,6 +4710,12 @@
 		var bDataCompletion = argClone[4].getValue();
 		var nAggregation = argClone[5].getValue();
 
+		if ( nAggregation < 1 || nAggregation > 7 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+		if ( bDataCompletion !== 1 && bDataCompletion !== 0 ) {
+			return new cError(cErrorType.not_numeric);
+		}
 
 		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
 		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation, pTMat);
@@ -4760,10 +4766,15 @@
 		var bDataCompletion = argClone[2].getValue();
 		var nAggregation = argClone[3].getValue();
 
-		var nSmplInPrd = 1;
+		if ( nAggregation < 1 || nAggregation > 7 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+		if ( bDataCompletion !== 1 && bDataCompletion !== 0 ) {
+			return new cError(cErrorType.not_numeric);
+		}
 
 		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
-		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation);
+		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, 1, bDataCompletion, nAggregation);
 		if ( !isError) {
 			///*,( eETSType != etsStatAdd && eETSType != etsStatMult ? pTMat : nullptr ),eETSType )
 			return new cError(cErrorType.wrong_value_type);
