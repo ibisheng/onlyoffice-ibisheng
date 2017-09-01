@@ -4305,13 +4305,130 @@ $( function () {
 
 
 		ws.getRange2( 'A61' ).setValue( '41548' );
+		ws.getRange2( 'A62' ).setValue( '41579' );
+		ws.getRange2( 'A63' ).setValue( '41609' );
+		ws.getRange2( 'A64' ).setValue( '41640' );
+		ws.getRange2( 'A65' ).setValue( '41671' );
+		ws.getRange2( 'A66' ).setValue( '41699' );
+		ws.getRange2( 'A67' ).setValue( '41730' );
+		ws.getRange2( 'A68' ).setValue( '41760' );
+		ws.getRange2( 'A69' ).setValue( '41791' );
+		ws.getRange2( 'A70' ).setValue( '41821' );
+		ws.getRange2( 'A71' ).setValue( '41852' );
+		ws.getRange2( 'A72' ).setValue( '41883' );
+		ws.getRange2( 'A73' ).setValue( '41913' );
+		ws.getRange2( 'A74' ).setValue( '41944' );
+		ws.getRange2( 'A75' ).setValue( '41974' );
+		ws.getRange2( 'A76' ).setValue( '42005' );
+		ws.getRange2( 'A77' ).setValue( '42036' );
+		ws.getRange2( 'A78' ).setValue( '42064' );
+		ws.getRange2( 'A79' ).setValue( '42095' );
+		ws.getRange2( 'A80' ).setValue( '42125' );
+		ws.getRange2( 'A81' ).setValue( '42156' );
+		ws.getRange2( 'A82' ).setValue( '42186' );
+		ws.getRange2( 'A83' ).setValue( '42217' );
+		ws.getRange2( 'A84' ).setValue( '42248' );
+
 
 
 		oParser = new parserFormula( "FORECAST.ETS(A61,B4:B60,A4:A60,1,1)", "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3868499.49723621);
 
+		oParser = new parserFormula( "FORECAST.ETS(A62,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3560200.99816396);
+
+		oParser = new parserFormula( "FORECAST.ETS(A63,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3619491.6524986);
+
+		oParser = new parserFormula( "FORECAST.ETS(A64,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3397521.44972895);
+
+		oParser = new parserFormula( "FORECAST.ETS(A65,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3152698.4854144);
+
+		oParser = new parserFormula( "FORECAST.ETS(A66,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3704079.5812005);
+
+		oParser = new parserFormula( "FORECAST.ETS(A67,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3747546.50043675);
+
+		oParser = new parserFormula( "FORECAST.ETS(A68,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4042011.75785885);
+
+		oParser = new parserFormula( "FORECAST.ETS(A69,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4250095.33429725);
+
+		oParser = new parserFormula( "FORECAST.ETS(A70,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4360538.1411926);
+
+		oParser = new parserFormula( "FORECAST.ETS(A71,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4463640.2710391);
+
+		oParser = new parserFormula( "FORECAST.ETS(A72,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3963675.88150212);
+
+		oParser = new parserFormula( "FORECAST.ETS(A73,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4028087.58056954);
+
+		oParser = new parserFormula( "FORECAST.ETS(A74,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3719789.0814973);
+
+		oParser = new parserFormula( "FORECAST.ETS(A75,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3779079.73583193);
+
+		oParser = new parserFormula( "FORECAST.ETS(A76,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3557109.53306228);
+
+		oParser = new parserFormula( "FORECAST.ETS(A77,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3312286.56874774);
+
+		oParser = new parserFormula( "FORECAST.ETS(A78,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3863667.66453383);
+
+		oParser = new parserFormula( "FORECAST.ETS(A79,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 3907134.58377009);
+
+		oParser = new parserFormula( "FORECAST.ETS(A80,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4201599.84119218);
+
+		oParser = new parserFormula( "FORECAST.ETS(A81,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4409683.41763059);
+
+		oParser = new parserFormula( "FORECAST.ETS(A82,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4520126.22452593);
+
+		oParser = new parserFormula( "FORECAST.ETS(A83,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4623228.35437243);
+
+		oParser = new parserFormula( "FORECAST.ETS(A84,B4:B60,A4:A60,1,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4123263.96483545);
+
 	} );
+    
 
 	test( "Test: \"FORECAST.LINEAR\"", function () {
 		oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
