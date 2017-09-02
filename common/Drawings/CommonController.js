@@ -6752,12 +6752,15 @@ DrawingObjectsController.prototype =
 
 
                 sp_tree = cur_group.spTree;
+                var xc, yc;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
                     sp = sp_tree[j];
                     sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
-                    sp.spPr.xfrm.setOffX(sp.spPr.xfrm.offX + cur_group.spPr.xfrm.offX);
-                    sp.spPr.xfrm.setOffY(sp.spPr.xfrm.offY + cur_group.spPr.xfrm.offY);
+                    xc = sp.transform.TransformPointX(sp.extX/2.0, sp.extY/2.0);
+                    yc = sp.transform.TransformPointY(sp.extX/2.0, sp.extY/2.0);
+                    sp.spPr.xfrm.setOffX(xc - sp.extX/2.0);
+                    sp.spPr.xfrm.setOffY(yc - sp.extY/2.0);
                     sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                     sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                     sp.setGroup(null);
