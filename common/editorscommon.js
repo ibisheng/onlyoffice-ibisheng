@@ -1250,38 +1250,60 @@
 	{
 		if (files.length > 0)
 		{
-			var file = files[0];
 			var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
 				url += '/' + jwt;
 			}
+
+			var aFiles = [];
+			for(var i = files.length - 1;  i > - 1; --i){
+                aFiles.push(files[i]);
+			}
+            var file = aFiles.pop();
+            var aResultUrls = [];
+
+            var fOnReadyChnageState = function(){
+                if (4 == this.readyState){
+                    if ((this.status == 200 || this.status == 1223)){
+                        var urls = JSON.parse(this.responseText);
+                        g_oDocumentUrls.addUrls(urls);
+                        for (var i in urls)
+                        {
+                            if (urls.hasOwnProperty(i))
+                            {
+                                aResultUrls.push(urls[i]);
+                                break;
+                            }
+                        }
+                        if(aFiles.length === 0){
+                            callback(Asc.c_oAscError.ID.No, aResultUrls);
+                        }
+                        else{
+                            file = aFiles.pop();
+                            var xhr = new XMLHttpRequest();
+
+                            url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
+                            if (jwt)
+                            {
+                                url += '/' + jwt;
+                            }
+
+                            xhr.open('POST', url, true);
+                            xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+                            xhr.onreadystatechange = fOnReadyChnageState;
+                            xhr.send(file);
+                        }
+                    }
+                    else
+                        callback(Asc.c_oAscError.ID.Unknown);
+                }
+            };
+
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', url, true);
 			xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-			xhr.onreadystatechange = function ()
-			{
-				if (4 == this.readyState)
-				{
-					if ((this.status == 200 || this.status == 1223))
-					{
-						var urls = JSON.parse(this.responseText);
-						g_oDocumentUrls.addUrls(urls);
-						var firstUrl;
-						for (var i in urls)
-						{
-							if (urls.hasOwnProperty(i))
-							{
-								firstUrl = urls[i];
-								break;
-							}
-						}
-						callback(Asc.c_oAscError.ID.No, firstUrl);
-					}
-					else
-						callback(Asc.c_oAscError.ID.Unknown);
-				}
-			};
+			xhr.onreadystatechange = fOnReadyChnageState;
 			xhr.send(file);
 		}
 		else

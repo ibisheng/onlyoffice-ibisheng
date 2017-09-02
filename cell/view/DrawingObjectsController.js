@@ -437,16 +437,13 @@ DrawingObjectsController.prototype.handleDoubleClickOnChart = function(chart)
 
 DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, x, y, extX, extY)
 {
-    History.Create_NewPoint();
     var image = this.createImage(rasterImageId, x, y, extX, extY);
-    this.resetSelection();
     image.setWorksheet(this.drawingObjects.getWorksheetModel());
     image.setDrawingObjects(this.drawingObjects);
     image.addToDrawingObjects();
     image.checkDrawingBaseCoords();
     this.selectObject(image, 0);
     image.addToRecalculate();
-    this.startRecalculate();
 };
 
 DrawingObjectsController.prototype.addOleObjectFromParams = function(fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){

@@ -394,6 +394,10 @@ CBlockLevelSdt.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 	this.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
+CBlockLevelSdt.prototype.AddImages = function(aImages)
+{
+	this.Content.AddImages(aImages);
+};
 CBlockLevelSdt.prototype.AddSignatureLine = function(oSignatureDrawing)
 {
 	this.Content.AddSignatureLine(oSignatureDrawing);

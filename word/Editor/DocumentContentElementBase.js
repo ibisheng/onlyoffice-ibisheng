@@ -385,6 +385,9 @@ CDocumentContentElementBase.prototype.GetNumberingInfo = function(oNumberingEngi
 CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 };
+CDocumentContentElementBase.prototype.AddImages = function(aImages)
+{
+};
 CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 };

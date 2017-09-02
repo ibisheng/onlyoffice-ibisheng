@@ -45,6 +45,10 @@ CDrawingsController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, 
 {
 	return this.DrawingObjects.addInlineImage(nW, nH, oImage, oChart, bFlow);
 };
+CDrawingsController.prototype.AddImages = function(aImages)
+{
+	return this.DrawingObjects.addImages(aImages);
+};
 CDrawingsController.prototype.AddSignatureLine = function(oSignatureDrawing)
 {
 	return this.DrawingObjects.addSignatureLine(oSignatureDrawing);

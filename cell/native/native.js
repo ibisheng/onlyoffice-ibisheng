@@ -4910,9 +4910,11 @@ function OfflineEditor () {
                     if (bLock !== true)
                         return;
                     _this.controller.resetSelection();
+                    History.Create_NewPoint();
                     _this.controller.addImageFromParams(imageUrl,
                         // _image.src,
                         pxToMm(coordsFrom.x) + AscFormat.MOVE_DELTA, pxToMm(coordsFrom.y) + AscFormat.MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
+                    _this.controller.startRecalculate();
                 });
                 //}
 

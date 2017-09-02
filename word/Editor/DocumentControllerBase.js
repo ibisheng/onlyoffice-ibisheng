@@ -293,6 +293,12 @@ CDocumentControllerBase.prototype.AddNewParagraph = function(bRecalculate, bForc
  * @param {boolean} bFlow - инлайн объект или "плавающий"
  */
 CDocumentControllerBase.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow){};
+
+/**
+ * Добавляем несколько изображений
+ * @param {Array} aImages - массив объектов типа CImage
+ * */
+CDocumentControllerBase.prototype.AddImages = function(aImages){};
 /**
  * Добавляем OLE-объект.
  * @param nW

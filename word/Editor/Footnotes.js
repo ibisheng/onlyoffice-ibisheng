@@ -1370,6 +1370,13 @@ CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart,
 
 	return this.CurFootnote.AddInlineImage(nW, nH, oImage, oChart, bFlow);
 };
+CFootnotesController.prototype.AddImages = function(aImages)
+{
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
+
+	return this.CurFootnote.AddImages(aImages);
+};
 CFootnotesController.prototype.AddSignatureLine = function(oSignatureDrawing)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())

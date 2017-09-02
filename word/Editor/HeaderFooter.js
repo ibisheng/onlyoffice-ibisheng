@@ -672,6 +672,10 @@ CHeaderFooter.prototype =
     {
         this.Content.AddInlineImage(W,H,Img, Chart, bFlow);
     },
+	AddImages : function(aImages)
+    {
+        this.Content.AddImages(aImages);
+    },
     AddSignatureLine : function(oSignatureDrawing)
     {
         this.Content.AddSignatureLine(oSignatureDrawing);
@@ -1849,6 +1853,11 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.AddInlineImage(W,H,Img, Chart, bFlow);
+    },
+	AddImages : function(aImages)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.AddImages(aImages);
     },
     AddSignatureLine : function(oSignatureDrawing)
     {

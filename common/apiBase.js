@@ -189,7 +189,7 @@
 			}
 			else
 			{
-				t._addImageUrl(url);
+				t._addImageUrl([url]);
 			}
 
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
@@ -891,7 +891,7 @@
 		else
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, url)
+			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, urls)
 			{
 				if (c_oAscError.ID.No !== error)
 				{
@@ -899,7 +899,7 @@
 				}
 				else
 				{
-					t._addImageUrl(url);
+					t._addImageUrl(urls);
 				}
 				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			});

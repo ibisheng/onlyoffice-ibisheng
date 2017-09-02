@@ -4496,10 +4496,32 @@ background-repeat: no-repeat;\
 		this.AddImageUrl(AscCommon.getFullImageSrc2(url));
 	};
 
-	asc_docs_api.prototype._addImageUrl      = function(url)
+	asc_docs_api.prototype._addImageUrl      = function(urls)
 	{
-		// ToDo пока временная функция для стыковки.
-		this.AddImageUrl(url);
+        if(this.isImageChangeUrl || this.isShapeImageChangeUrl){
+            this.AddImageUrl(urls[0]);
+        }
+        else{
+            if(this.ImageLoader){
+                var oApi = this;
+                this.ImageLoader.LoadImagesWithCallback(urls, function(){
+                    if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content)){
+                        var aImages = [];
+                        for(var i = 0; i < urls.length; ++i){
+                            var _image = oApi.ImageLoader.LoadImage(urls[i], 1);
+                            if(_image){
+                                aImages.push(_image);
+                            }
+                        }
+                        if(aImages.length){
+                        	History.Create_NewPoint();
+                            oApi.WordControl.m_oLogicDocument.AddImages(aImages);
+						}
+
+                    }
+                }, []);
+            }
+        }
 	};
 	asc_docs_api.prototype.AddImageUrl       = function(url, imgProp)
 	{

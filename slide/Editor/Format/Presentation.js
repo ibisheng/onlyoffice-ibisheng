@@ -1873,6 +1873,33 @@ CPresentation.prototype =
         }
     },
 
+    addImages: function(aImages){
+        if(this.Slides[this.CurPage] && aImages.length){
+            editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+            this.FocusOnNotes = false;
+            var oController = this.Slides[this.CurPage].graphicObjects;
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_AddFlowImage);
+            oController.resetSelection();
+            var _w, _h;
+            for(var i = 0; i < aImages.length; ++i){
+                var _image = aImages[i];
+                _w = this.Slides[this.CurPage].Width;
+                _h = this.Slides[this.CurPage].Height;
+                var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+                var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+                _w      = Math.max(5, Math.min(_w, __w));
+                _h      = Math.max(5, Math.min((_w * __h / __w)));
+                var Image = oController.createImage(_image.src, (this.Slides[this.CurPage].Width - _w)/2, (this.Slides[this.CurPage].Height - _h)/2, _w, _h);
+                Image.setParent(this.Slides[this.CurPage]);
+                Image.addToDrawingObjects();
+                oController.selectObject(Image, 0);
+            }
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.CheckEmptyPlaceholderNotes();
+        }
+    },
+
 	AddOleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
         if(this.Slides[this.CurPage]){
             var fPosX = (this.Width - fWidth)/2;

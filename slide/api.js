@@ -3743,10 +3743,26 @@ background-repeat: no-repeat;\
 		return this.WordControl.m_oLogicDocument.canUnGroup();
 	};
 
-	asc_docs_api.prototype._addImageUrl = function(url)
+	asc_docs_api.prototype._addImageUrl = function(urls)
 	{
-		// ToDo пока временная функция для стыковки.
-		this.AddImageUrl(url);
+		if(this.isImageChangeUrl || this.isShapeImageChangeUrl || this.isSlideImageChangeUrl || this.isTextArtChangeUrl){
+            this.AddImageUrl(urls[0]);
+		}
+		else{
+			if(this.ImageLoader){
+				var oApi = this;
+                this.ImageLoader.LoadImagesWithCallback(urls, function(){
+                	var aImages = [];
+                	for(var i = 0; i < urls.length; ++i){
+                        var _image = oApi.ImageLoader.LoadImage(urls[i], 1);
+                      	if(_image){
+                            aImages.push(_image);
+						}
+					}
+                    oApi.WordControl.m_oLogicDocument.addImages(aImages);
+                }, []);
+			}
+		}
 	};
 	asc_docs_api.prototype.AddImageUrl  = function(url)
 	{

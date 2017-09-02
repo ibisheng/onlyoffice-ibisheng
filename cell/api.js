@@ -2425,13 +2425,13 @@ var editor;
     // ToDo заменить на общую функцию для всех
     this.asc_addImage();
   };
-  spreadsheet_api.prototype._addImageUrl = function(url) {
+  spreadsheet_api.prototype._addImageUrl = function(urls) {
     var ws = this.wb.getWorksheet();
     if (ws) {
       if (this.isImageChangeUrl || this.isShapeImageChangeUrl || this.isTextArtChangeUrl) {
-        ws.objectRender.editImageDrawingObject(url);
+        ws.objectRender.editImageDrawingObject(urls[0]);
       } else {
-        ws.objectRender.addImageDrawingObject(url, null);
+        ws.objectRender.addImageDrawingObject(urls, null);
       }
     }
   };
