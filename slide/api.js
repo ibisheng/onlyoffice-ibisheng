@@ -5401,9 +5401,14 @@ background-repeat: no-repeat;\
     {
         if (editor.WordControl.m_oLogicDocument)
         {
-            editor.WordControl.m_oLogicDocument.Spelling.Use = isOn;
-            editor.WordControl.m_oDrawingDocument.ClearCachePages();
-            editor.WordControl.m_oDrawingDocument.FirePaint();
+        	var _presentation = editor.WordControl.m_oLogicDocument;
+            _presentation.Spelling.Use = isOn;
+            var _drawing_document = editor.WordControl.m_oDrawingDocument;
+            _drawing_document.ClearCachePages();
+            _drawing_document.FirePaint();
+            if(_presentation.Slides[_presentation.CurPage] && _presentation.Slides[_presentation.CurPage].notes){
+                _drawing_document.Notes_OnRecalculate(_presentation.CurPage, _presentation.Slides[_presentation.CurPage].NotesWidth, _presentation.Slides[_presentation.CurPage].getNotesHeight());
+            }
         }
     };
 
