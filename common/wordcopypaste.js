@@ -6159,7 +6159,14 @@ PasteProcessor.prototype =
             var color = computedStyle.getPropertyValue( "color" );
             if(color && (color = this._ParseColor(color)))
             {
-                rPr.Color = color;
+                if(PasteElementsId.g_bIsDocumentCopyPaste){
+                    rPr.Color = color;
+                }
+                else{
+                    if(color){
+                        rPr.Unifill =  AscFormat.CreateUnfilFromRGB(color.r, color.g, color.b);
+                    }
+                }
             }
 			
 			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
