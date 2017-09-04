@@ -3806,7 +3806,7 @@ CPresentation.prototype =
 
 	MergeTableCells : function()
     {
-        this.ApplyTableFunction(CTable.prototype.MergeTableCells, true, true);
+        this.ApplyTableFunction(CTable.prototype.MergeTableCells, false, true);
     },
 
 	SplitTableCells : function( Cols, Rows )
