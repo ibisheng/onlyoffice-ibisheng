@@ -1301,6 +1301,19 @@
 		return new cNumber(res);
 	}
 
+	function convertToMatrix(val){
+		var matrix;
+		if(undefined !== val.getMatrix){
+			matrix = val.getMatrix();
+		}else {
+			val = val.tocNumber();
+			if(cElementType.error === val.type){
+				return val;
+			}
+			matrix = [[val]];
+		}
+		return matrix;
+	}
 
 	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
 		this.fp = fp;
@@ -4732,8 +4745,7 @@
 		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
 		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
 
-		//TODO сделать функцию convertToMatrix!!!!
-		argClone[2] = argClone[2].getMatrix();
+		argClone[2] = convertToMatrix(argClone[2]);
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {

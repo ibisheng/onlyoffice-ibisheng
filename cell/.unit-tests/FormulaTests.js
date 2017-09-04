@@ -4442,6 +4442,16 @@ $( function () {
 		strictEqual(oParser.calculate().getValue(), 12);
 	} );
 
+	test( "Test: \"FORECAST.ETS.STAT\"", function () {
+		//результаты данного теста соответсвуют результатам LO, но отличаются от MS!!!
+
+		putDataForForecastEts();
+
+		oParser = new parserFormula("FORECAST.ETS.STAT(B4:B60,A4:A60,1,1)", "A1", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue().toFixed( 8 ) - 0, 0.65234375);
+	} );
+
 	test( "Test: \"FORECAST.LINEAR\"", function () {
 		oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
 		ok( oParser.parse() );
