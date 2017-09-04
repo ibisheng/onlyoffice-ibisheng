@@ -5671,7 +5671,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_CollaborativeChanges = function()
 	{
-		if (true !== AscCommon.CollaborativeEditing.Is_Fast() && true !== this.WordControl.m_oLogicDocument.IsViewModeInReview())
+		if (true !== AscCommon.CollaborativeEditing.Is_Fast() && (true !== this.WordControl.m_oLogicDocument.IsViewModeInReview() || true !== this.WordControl.m_oLogicDocument.IsFastCollaboartionBeforeViewModeInReview()))
 			this.sendEvent("asc_onCollaborativeChanges");
 	};
 

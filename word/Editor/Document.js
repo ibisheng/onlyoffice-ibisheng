@@ -15475,6 +15475,10 @@ CDocument.prototype.IsViewModeInReview = function()
 {
 	return 0 !== this.ViewModeInReview.mode ? true : false;
 };
+CDocument.prototype.IsFastCollaboartionBeforeViewModeInReview = function()
+{
+	return this.ViewModeInReview.isFastCollaboration;
+};
 
 function CDocumentSelectionState()
 {
