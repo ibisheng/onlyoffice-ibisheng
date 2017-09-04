@@ -3194,17 +3194,17 @@ $( function () {
         var res;
         oParser = new parserFormula( "RANDBETWEEN(1,6)", "A1", ws );
         ok( oParser.parse() );
-        res = oParser.calculate().getValue()
+        res = oParser.calculate().getValue();
         ok( res >= 1 && res <= 6 );
 
         oParser = new parserFormula( "RANDBETWEEN(-10,10)", "A1", ws );
         ok( oParser.parse() );
-        res = oParser.calculate().getValue()
+        res = oParser.calculate().getValue();
         ok( res >= -10 && res <= 10 );
 
         oParser = new parserFormula( "RANDBETWEEN(-25,-3)", "A1", ws );
         ok( oParser.parse() );
-        res = oParser.calculate().getValue()
+        res = oParser.calculate().getValue();
         ok( res >= -25 && res <= -3 );
     } );
 
@@ -4185,9 +4185,7 @@ $( function () {
 
     } );
 
-	test( "Test: \"FORECAST.ETS\"", function () {
-		//результаты данного теста соответсвуют результатам LO, но отличаются от MS!!!
-
+	function putDataForForecastEts(){
 		ws.getRange2( 'A4' ).setValue( '39814' );
 		ws.getRange2( 'A5' ).setValue( '39845' );
 		ws.getRange2( 'A6' ).setValue( '39873' );
@@ -4329,8 +4327,12 @@ $( function () {
 		ws.getRange2( 'A82' ).setValue( '42186' );
 		ws.getRange2( 'A83' ).setValue( '42217' );
 		ws.getRange2( 'A84' ).setValue( '42248' );
+	}
 
+	test( "Test: \"FORECAST.ETS\"", function () {
+		//результаты данного теста соответсвуют результатам LO, но отличаются от MS!!!
 
+		putDataForForecastEts();
 
 		oParser = new parserFormula( "FORECAST.ETS(A61,B4:B60,A4:A60,1,1)", "A1", ws );
 		ok( oParser.parse() );
@@ -4429,7 +4431,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed( 8 ) - 0, 4123263.96483545);
 
 	} );
-    
+
+	test( "Test: \"FORECAST.ETS.SEASONALITY\"", function () {
+		//результаты данного теста соответсвуют результатам LO, но отличаются от MS!!!
+
+		putDataForForecastEts();
+
+		oParser = new parserFormula("FORECAST.ETS.SEASONALITY(B4:B60,A4:A60,1,1)", "A1", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 12);
+	} );
 
 	test( "Test: \"FORECAST.LINEAR\"", function () {
 		oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
@@ -4485,7 +4496,7 @@ $( function () {
 
         oParser = new parserFormula( "FREQUENCY(A202:A210,B202:B204)", "A201", ws );
         ok( oParser.parse() );
-        var a = oParser.calculate()
+        var a = oParser.calculate();
         strictEqual( a.getElement( 0 ).getValue(), 1 );
         strictEqual( a.getElement( 1 ).getValue(), 2 );
         strictEqual( a.getElement( 2 ).getValue(), 4 );
@@ -6228,7 +6239,7 @@ $( function () {
 
         function effect(nr,np){
 
-            if( nr <= 0 || np < 1 ) return "#NUM!"
+            if( nr <= 0 || np < 1 ) return "#NUM!";
 
             return Math.pow( ( 1 + nr/np ), np ) - 1;
 
@@ -6852,16 +6863,16 @@ $( function () {
 
         function tbilleq( settlement, maturity, discount ){
 
-            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1)
+            maturity = Date.prototype.getDateFromExcel(maturity.getExcelDate() + 1);
 
             var d1 = settlement, d2 = maturity;
             var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
                 date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
-            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true )
+            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
 
             if( settlement >= maturity || discount <= 0 || nDiff > 360 )
-                return "#NUM!"
+                return "#NUM!";
 
             return ( 365 * discount ) / ( 360 - discount * nDiff );
 
@@ -6885,7 +6896,7 @@ $( function () {
             var fFraction = AscCommonExcel.yearFrac(d1, d2, 0);
 
             if( fFraction - Math.floor( fFraction ) == 0 )
-                return "#NUM!"
+                return "#NUM!";
 
             return 100 * ( 1 - discount * fFraction );
 
@@ -6901,15 +6912,15 @@ $( function () {
 
         function tbillyield( settlement, maturity, pr ){
 
-            var d1 = settlement
-            var d2 = maturity
+            var d1 = settlement;
+            var d2 = maturity;
             var date1 = d1.getDate(), month1 = d1.getMonth(), year1 = d1.getFullYear(),
                 date2 = d2.getDate(), month2 = d2.getMonth(), year2 = d2.getFullYear();
 
-            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true )
+            var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
             nDiff++;
             if( settlement >= maturity || pr <= 0 || nDiff > 360 )
-                return "#NUM!"
+                return "#NUM!";
 
             return ( ( 100 - pr ) / pr) * (360 / nDiff);
 
