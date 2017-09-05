@@ -9262,6 +9262,10 @@ ParaRun.prototype.GetAllContentControls = function(arrContentControls)
 		}
 	}
 };
+/**
+ * Функция для группировки сложных полей (начинается с CDocument.RegroupComplexFields)
+ * @param oRegroupManager
+ */
 ParaRun.prototype.RegroupComplexFields = function(oRegroupManager)
 {
 	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
@@ -9269,8 +9273,59 @@ ParaRun.prototype.RegroupComplexFields = function(oRegroupManager)
 		var Item = this.Content[nPos];
 
 		if (para_FieldChar === Item.Type)
+		{
+			Item.SetRun(this);
 			oRegroupManager.ProcessChar(Item);
+		}
+		else if (para_InstrText === Item.Type)
+		{
+			Item.SetRun(this);
+			oRegroupManager.ProcessInstruction(Item);
+		}
 	}
+};
+/**
+ * Получаем позицию заданного элемента
+ * @param oElement
+ * @returns {number} позиция, либо -1, если заданного элемента нет
+ */
+ParaRun.prototype.GetElementPosition = function(oElement)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		if (oElement === this.Content[nPos])
+			return nPos;
+	}
+
+	return -1;
+};
+/**
+ * Устанавливаем текущее положение позиции курсора в данном ране
+ * @param nPos
+ */
+ParaRun.prototype.SetCursorPosition = function(nPos)
+{
+	this.State.ContentPos = Math.max(0, Math.min(nPos, this.Content.length));
+};
+/**
+ * Получаем номер строки по заданной позиции.
+ * @param nPos
+ */
+ParaRun.prototype.GetLineByPosition = function(nPos)
+{
+	for (var nLineIndex = 0, nLinesCount = this.protected_GetLinesCount(); nLineIndex < nLinesCount; ++nLineIndex)
+	{
+		for (var nRangeIndex = 0, nRangesCount = this.protected_GetRangesCount(nLineIndex); nRangeIndex < nRangesCount; ++nRangeIndex)
+		{
+			var nStartPos = this.protected_GetRangeStartPos(nLineIndex, nRangeIndex);
+			var nEndPos   = this.protected_GetRangeEndPos(nLineIndex, nRangeIndex);
+
+			if (nPos >= nStartPos && nPos < nEndPos)
+				return nLineIndex + this.StartLine;
+		}
+	}
+
+	return this.StartLine;
 };
 
 function CParaRunStartState(Run)

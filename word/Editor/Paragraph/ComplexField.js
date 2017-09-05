@@ -48,6 +48,7 @@ function ParaFieldChar(Type)
 	this.Use          = true;
 	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
 	this.ComplexField = null;
+	this.Run          = null;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
@@ -98,6 +99,14 @@ ParaFieldChar.prototype.Read_FromBinary = function(Reader)
 	// Long : CharType
 	this.CharType = Reader.GetLong();
 };
+ParaFieldChar.prototype.SetRun = function(oRun)
+{
+	this.Run = oRun;
+};
+ParaFieldChar.prototype.GetRun = function()
+{
+	return this.Run;
+};
 
 function ParaInstrText(nType, nFlags)
 {
@@ -105,6 +114,7 @@ function ParaInstrText(nType, nFlags)
 
 	this.FieldCode = nType;
 	this.Flags     = nFlags;
+	this.Run       = null;
 }
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
@@ -131,25 +141,26 @@ ParaInstrText.prototype.GetFieldCode = function()
 {
 	return this.FieldCode;
 };
+ParaInstrText.prototype.SetRun = function(oRun)
+{
+	this.Run = oRun;
+};
+ParaInstrText.prototype.GetRun = function()
+{
+	return this.Run;
+};
 
-function CComplexField()
+function CComplexField(oLogicDocument)
 {
-	this.BeginChar    = null;
-	this.EndChar      = null;
-	this.SeparateChar = null;
-	this.Instruction  = "";
+	this.LogicDocument = oLogicDocument;
+	this.BeginChar     = null;
+	this.EndChar       = null;
+	this.SeparateChar  = null;
+	this.Instruction   = null;
 }
-CComplexField.prototype.ResetInstruction = function()
+CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
-	this.Instruction = "";
-};
-CComplexField.prototype.AddInstruction = function(sInstr)
-{
-	this.Instruction += sInstr;
-};
-CComplexField.prototype.ParseInstruction = function()
-{
-	// TODO:
+	this.Instruction = oParaInstr;
 };
 CComplexField.prototype.GetBeginChar = function()
 {
@@ -178,6 +189,67 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 	this.SeparateChar = oChar;
 	oChar.SetComplexField(this);
 };
+CComplexField.prototype.Update = function()
+{
+	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
+		return;
+
+	this.private_SelectFieldValue();
+
+	var nFieldCode = this.Instruction.GetFieldCode();
+	if (fieldtype_PAGENUM === nFieldCode)
+	{
+		var oRun       = this.BeginChar.GetRun();
+		var oParagraph = oRun.GetParagraph();
+		var nInRunPos = oRun.GetElementPosition(this.BeginChar);
+		var nLine     = oRun.GetLineByPosition(nInRunPos);
+		var nPage     = oParagraph.GetPageByLine(nLine);
+		var nPageAbs  = oParagraph.Get_AbsolutePage(nPage) + 1;
+		// TODO: Тут надо рассчитывать значение исходя из настроек секции
+
+		this.LogicDocument.Create_NewHistoryPoint();
+
+		var sValue = "" + nPageAbs;
+		for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
+		{
+			this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
+		}
+
+		this.LogicDocument.Recalculate();
+	}
+};
+CComplexField.prototype.private_SelectFieldValue = function()
+{
+	var oDocument = this.LogicDocument;
+
+	var oRun = this.SeparateChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar) + 1);
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar));
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
+CComplexField.prototype.private_SelectFieldCode = function()
+{
+	var oDocument = this.LogicDocument;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar) + 1);
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.SeparateChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar));
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)
 {
@@ -201,8 +273,9 @@ CComplexFieldStatePos.prototype.IsFieldCode = function()
  * Данный класс предназаначен для объединения символов начала/конца/разделения в
  * общий класс CComplexField.
  */
-function CComplexFieldsRegroupManager(oFieldsManager)
+function CComplexFieldsRegroupManager(oFieldsManager, oLogicDocument)
 {
+	this.LogicDocument = oLogicDocument;
 	this.FieldsManager = oFieldsManager;
 	this.BeginChar     = [];
 }
@@ -214,7 +287,7 @@ CComplexFieldsRegroupManager.prototype.ProcessChar = function(oChar)
 	oChar.SetUse(true);
 	if (oChar.IsBegin())
 	{
-		var oComplexField = new CComplexField();
+		var oComplexField = new CComplexField(this.LogicDocument);
 		oComplexField.SetBeginChar(oChar);
 		this.BeginChar.push(oChar);
 	}
@@ -248,4 +321,15 @@ CComplexFieldsRegroupManager.prototype.ProcessChar = function(oChar)
 		}
 	}
 
+};
+CComplexFieldsRegroupManager.prototype.ProcessInstruction = function(oParaInstruction)
+{
+	if (!oParaInstruction || !(oParaInstruction instanceof ParaInstrText) || this.BeginChar.length <= 0)
+		return;
+
+	var oComplexField = this.BeginChar[this.BeginChar.length - 1].GetComplexField();
+	if (!oComplexField)
+		return;
+
+	oComplexField.SetInstruction(oParaInstruction);
 };

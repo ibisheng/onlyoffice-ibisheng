@@ -6603,8 +6603,8 @@ Paragraph.prototype.GetSelectionBounds = function()
 		StartLine = Math.min(Math.max(0, StartLine), LinesCount - 1);
 		EndLine   = Math.min(Math.max(0, EndLine), LinesCount - 1);
 
-		StartPage = this.private_GetPageByLine(StartLine);
-		EndPage   = this.private_GetPageByLine(EndLine);
+		StartPage = this.GetPageByLine(StartLine);
+		EndPage   = this.GetPageByLine(EndLine);
 
 		var PagesCount     = this.Pages.length;
 		var DrawSelection  = new CParagraphDrawSelectionRange();
@@ -6615,7 +6615,7 @@ Paragraph.prototype.GetSelectionBounds = function()
 			var Line        = this.Lines[CurLine];
 			var RangesCount = Line.Ranges.length;
 
-			var CurPage = this.private_GetPageByLine(CurLine);
+			var CurPage = this.GetPageByLine(CurLine);
 
 			// Определяем позицию и высоту строки
 			DrawSelection.StartY = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
@@ -11068,7 +11068,7 @@ Paragraph.prototype.private_RecalculateTextMetrics = function(TextMetrics)
             this.Content[Index].Recalculate_Measure2(TextMetrics);
     }
 };
-Paragraph.prototype.private_GetPageByLine = function(CurLine)
+Paragraph.prototype.GetPageByLine = function(CurLine)
 {
     var CurPage = 0;
     var PagesCount = this.Pages.length;

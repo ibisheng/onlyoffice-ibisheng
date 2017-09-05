@@ -10337,6 +10337,16 @@ CDocument.prototype.GetDocumentPositionFromObject = function(PosArray)
 
 	return PosArray;
 };
+CDocument.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
+{
+	this.RemoveSelection();
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.SetContentSelection(StartDocPos, EndDocPos, 0, 0, 0);
+};
 CDocument.prototype.Get_CursorLogicPosition = function()
 {
 	var nDocPosType = this.Get_DocPosType();
@@ -15560,7 +15570,7 @@ CDocument.prototype.RegroupComplexFields = function()
 	this.FieldsManager.SetNeedRegroupComplexFields(false);
 	this.FieldsManager.ResetComplexFields();
 
-	var oRegroupManager = new CComplexFieldsRegroupManager(this.FieldsManager);
+	var oRegroupManager = new CComplexFieldsRegroupManager(this.FieldsManager, this);
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
@@ -15569,7 +15579,10 @@ CDocument.prototype.RegroupComplexFields = function()
 };
 CDocument.prototype.UpdateComplexField = function(oField)
 {
+	if (!oField)
+		return;
 
+	oField.Update();
 };
 CDocument.prototype.GetCurrentComplexFields = function()
 {
