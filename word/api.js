@@ -7088,9 +7088,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_setDrawCollaborationMarks = function(bDraw)
 	{
+		this.tmpCoMarksDraw = bDraw;
 		if (!this.isLoadFullApi)
 		{
-			this.tmpCoMarksDraw = bDraw;
 			return;
 		}
 
