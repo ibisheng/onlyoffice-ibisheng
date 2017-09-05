@@ -1279,14 +1279,14 @@
 						callback(Asc.c_oAscError.ID.No, firstUrl);
 					}
 					else
-						callback(Asc.c_oAscError.ID.Unknown);
+						callback(Asc.c_oAscError.ID.UplImageFileCount);
 				}
 			};
 			xhr.send(file);
 		}
 		else
 		{
-			callback(Asc.c_oAscError.ID.Unknown);
+			callback(Asc.c_oAscError.ID.UplImageFileCount);
 		}
 	}
 
