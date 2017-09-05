@@ -66,17 +66,17 @@
 		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
 		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
-		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cFREQUENCY, cFTEST,
-		cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH,
-		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
-		cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST,
-		cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV,
-		cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC,
-		cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
-		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP,
-		cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND,
-		cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
-		cZ_TEST);
+		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
+		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
+		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
+		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA,
+		cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
+		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
+		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
+		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
+		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP,
+		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -1765,13 +1765,15 @@
 		return true;
 	};
 
+	ScETSForecastCalculation.prototype.randDev = function(){
+		return this.mfRMSE * gaussinv( 0.57426331936068653 );
+	};
 
-	ScETSForecastCalculation.prototype.prefillBaseData = function()
-	{
-		if ( this.bEDS ){
-			this.mpBase[ 0 ] = this.maRange[ 0 ].Y;
-		}else{
-			this.mpBase[ 0 ] = this.maRange[ 0 ].Y / this.mpPerIdx[ 0 ];
+	ScETSForecastCalculation.prototype.prefillBaseData = function () {
+		if (this.bEDS) {
+			this.mpBase[0] = this.maRange[0].Y;
+		} else {
+			this.mpBase[0] = this.maRange[0].Y / this.mpPerIdx[0];
 		}
 
 		return true;
@@ -2208,6 +2210,224 @@
 			}
 		}
 		return rStatMat;
+	};
+
+	ScETSForecastCalculation.prototype.GetETSPredictionIntervals = function( rTMat, fPILevel )
+	{
+		if ( !this.initCalc() ){
+			return false;
+		}
+
+		var rPIMat = null;
+		var nC = rTMat.length, nR = rTMat[0].length;
+
+		// find maximum target value and calculate size of coefficient- array c
+		var fMaxTarget = rTMat[0][0];
+		for (var i = 0; i < nR; i++) {
+			for (var j = 0; j < nC; j++) {
+				if (fMaxTarget < rTMat[j][i]) {
+					fMaxTarget = rTMat[j][i];
+				}
+			}
+		}
+
+		if (this.mnMonthDay) {
+			fMaxTarget = this.convertXtoMonths(fMaxTarget) - this.maRange[this.mnCount - 1].X;
+		} else {
+			fMaxTarget -= this.maRange[this.mnCount - 1].X;
+		}
+
+		var nSize = ( fMaxTarget / this.mfStepSize );
+		if (Math.fmod(fMaxTarget, this.mfStepSize) !== 0.0) {
+			nSize++;
+		}
+
+		var xScenRange = [];
+		var xScenBase = [];
+		var xScenTrend = [];
+		var xScenPerIdx = [];
+		var aPredictions = [];
+
+		// fill scenarios
+		for (var k = 0; k < this.cnScenarios; k++) {
+			// fill array with forecasts, with RandDev() added to xScenRange
+			if (this.bAdditive) {
+				// calculation based on additive model
+				xScenRange[0] = this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] +
+					this.mpPerIdx[this.mnCount - this.mnSmplInPrd] + this.randDev();
+
+				if(!aPredictions[0]){
+					aPredictions[0] = [];
+				}
+				aPredictions[0][k] = xScenRange[0];
+				xScenBase[0] = this.mfAlpha * ( xScenRange[0] - this.mpPerIdx[this.mnCount - this.mnSmplInPrd] ) +
+					( 1 - this.mfAlpha ) * ( this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] );
+				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) +
+					( 1 - this.mfGamma ) * this.mpTrend[this.mnCount - 1];
+				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] - xScenBase[0] ) +
+					( 1 - this.mfBeta ) * this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
+				for (var i = 1; i < nSize; i++) {
+					var fPerIdx;
+					if (i < this.mnSmplInPrd) {
+						fPerIdx = this.mpPerIdx[this.mnCount + i - this.mnSmplInPrd];
+					} else {
+						fPerIdx = xScenPerIdx[i - this.mnSmplInPrd];
+					}
+					xScenRange[i] = xScenBase[i - 1] + xScenTrend[i - 1] + fPerIdx + this.randDev();
+
+					if(!aPredictions[i]){
+						aPredictions[i] = [];
+					}
+					aPredictions[i][k] = xScenRange[i];
+					xScenBase[i] = this.mfAlpha * ( xScenRange[i] - fPerIdx ) +
+						( 1 - this.mfAlpha ) * ( xScenBase[i - 1] + xScenTrend[i - 1] );
+					xScenTrend[i] =
+						this.mfGamma * ( xScenBase[i] - xScenBase[i - 1] ) + ( 1 - this.mfGamma ) * xScenTrend[i - 1];
+					xScenPerIdx[i] = this.mfBeta * ( xScenRange[i] - xScenBase[i] ) + ( 1 - this.mfBeta ) * fPerIdx;
+				}
+			} else {
+				// calculation based on multiplicative model
+				xScenRange[0] = ( this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] ) *
+					this.mpPerIdx[this.mnCount - this.mnSmplInPrd] + this.randDev();
+
+				if(!aPredictions[0]){
+					aPredictions[0] = [];
+				}
+				aPredictions[0][k] = xScenRange[0];
+				xScenBase[0] = this.mfAlpha * ( xScenRange[0] / this.mpPerIdx[this.mnCount - this.mnSmplInPrd] ) +
+					( 1 - this.mfAlpha ) * ( this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] );
+				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) +
+					( 1 - this.mfGamma ) * this.mpTrend[this.mnCount - 1];
+				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] / xScenBase[0] ) +
+					( 1 - this.mfBeta ) * this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
+				for (var i = 1; i < nSize; i++) {
+					var fPerIdx;
+					if (i < this.mnSmplInPrd) {
+						fPerIdx = this.mpPerIdx[this.mnCount + i - this.mnSmplInPrd];
+					} else {
+						fPerIdx = xScenPerIdx[i - this.mnSmplInPrd];
+					}
+					xScenRange[i] = ( xScenBase[i - 1] + xScenTrend[i - 1] ) * fPerIdx + this.randDev();
+
+					if(!aPredictions[i]){
+						aPredictions[i] = [];
+					}
+					aPredictions[i][k] = xScenRange[i];
+					xScenBase[i] = this.mfAlpha * ( xScenRange[i] / fPerIdx ) +
+						( 1 - this.mfAlpha ) * ( xScenBase[i - 1] + xScenTrend[i - 1] );
+					xScenTrend[i] =
+						this.mfGamma * ( xScenBase[i] - xScenBase[i - 1] ) + ( 1 - this.mfGamma ) * xScenTrend[i - 1];
+					xScenPerIdx[i] = this.mfBeta * ( xScenRange[i] / xScenBase[i] ) + ( 1 - this.mfBeta ) * fPerIdx;
+				}
+			}
+		}
+
+		// create array of Percentile values;
+		var xPercentile = [];
+		for (var i = 0; i < nSize; i++) {
+			xPercentile[i] = getPercentile(aPredictions[i], ( 1 + fPILevel ) / 2) - getPercentile(aPredictions[i], 0.5);
+		}
+
+		for (var i = 0; i < nR; i++) {
+			for (var j = 0; j < nC; j++) {
+				var fTarget;
+				if (this.mnMonthDay) {
+					fTarget = this.convertXtoMonths(rTMat[j][i]) - this.maRange[this.mnCount - 1].X;
+				} else {
+					fTarget = rTMat[j][i] - this.maRange[this.mnCount - 1].X;
+				}
+				var nSteps = ( fTarget / this.mfStepSize ) - 1;
+				var fFactor = Math.fmod(fTarget, this.mfStepSize);
+				var fPI = xPercentile[nSteps];
+				if (fFactor != 0.0) {
+					// interpolate
+					var fPI1 = xPercentile[nSteps + 1];
+					fPI = fPI + fFactor * ( fPI1 - fPI );
+				}
+				if (!rPIMat) {
+					rPIMat = [];
+				}
+				if (!rPIMat[j]) {
+					rPIMat[j] = [];
+				}
+
+				rPIMat[j][i] = fPI;
+			}
+		}
+
+		return rPIMat;
+	};
+
+
+	ScETSForecastCalculation.prototype.GetEDSPredictionIntervals = function( rTMat, fPILevel )
+	{
+		if ( !this.initCalc() ){
+			return false;
+		}
+
+		var rPIMat = null;
+		var nC = rTMat.length, nR = rTMat[0].length;
+
+		// find maximum target value and calculate size of coefficient- array c
+		var fMaxTarget = rTMat[0][0];
+		for (var i = 0; i < nR; i++) {
+			for (var j = 0; j < nC; j++) {
+				if (fMaxTarget < rTMat[j][i]) {
+					fMaxTarget = rTMat[j][i];
+				}
+			}
+		}
+
+		if (this.mnMonthDay) {
+			fMaxTarget = this.convertXtoMonths(fMaxTarget) - this.maRange[this.mnCount - 1].X;
+		} else {
+			fMaxTarget -= this.maRange[this.mnCount - 1].X;
+		}
+
+		var nSize = ( fMaxTarget / this.mfStepSize );
+		if (Math.fmod(fMaxTarget, this.mfStepSize) !== 0.0) {
+			nSize++;
+		}
+
+		var z = gaussinv( ( 1.0 + fPILevel ) / 2.0 );
+		var o = 1 - fPILevel;
+		//std::vector< double > c( nSize );
+		for ( var i = 0; i < nSize; i++ ) {
+			c[i] = Math.sqrt(1 + ( fPILevel / Math.pow(1 + o, 3.0) ) *
+				( ( 1 + 4 * o + 5 * o * o ) + 2 *
+				( i ) * fPILevel * ( 1 + 3 * o ) + 2 * ( i * i ) * fPILevel * fPILevel ));
+		}
+
+
+		for (var i = 0; i < nR; i++) {
+			for (var j = 0; j < nC; j++) {
+				var fTarget;
+				if (this.mnMonthDay) {
+					fTarget = this.convertXtoMonths(rTMat[j][i]) - this.maRange[this.mnCount - 1].X;
+				} else {
+					fTarget = rTMat[j][i] - this.maRange[this.mnCount - 1].X;
+				}
+				var nSteps = ( fTarget / this.mfStepSize ) - 1;
+				var fFactor = Math.fmod(fTarget, this.mfStepSize);
+				var fPI = z * this.mfRMSE * c[nSteps] / c[0];
+				if (fFactor !== 0.0) {
+					// interpolate
+					var fPI1 = z * this.mfRMSE * c[nSteps + 1] / c[0];
+					fPI = fPI + fFactor * ( fPI1 - fPI );
+				}
+
+				if(!rPIMat){
+					rPIMat = [];
+				}
+				if(!rPIMat[j]){
+					rPIMat[j] = [];
+				}
+
+				rPIMat[j][i] = fPI;
+			}
+		}
+
+		return rPIMat;
 	};
 
 	function checkNumericMatrix(matrix){
@@ -4664,6 +4884,83 @@
 
 
 		return new cNumber(pFcMat[0][0]);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORECAST_ETS_CONFINT() {
+		this.name = "FORECAST.ETS.CONFINT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS_CONFINT.prototype.constructor = cFORECAST_ETS_CONFINT;
+	cFORECAST_ETS_CONFINT.prototype.argumentsMin = 3;
+	cFORECAST_ETS_CONFINT.prototype.argumentsMax = 7;
+	cFORECAST_ETS_CONFINT.prototype.Calculate = function (arg) {
+
+		//результаты данной фукнции соответсвуют результатам LO, но отличаются от MS!!!
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(0.95);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
+		argClone[6] = argClone[6] ? argClone[6].tocNumber() : new cNumber(1);
+
+
+		argClone[0] = argClone[0].getMatrix();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var pTMat = argClone[0];
+		var pMatY = argClone[1];
+		var pMatX = argClone[2];
+		var fPILevel = argClone[3].getValue() ;
+		var nSmplInPrd = argClone[4].getValue();
+		var bDataCompletion = argClone[5].getValue();
+		var nAggregation = argClone[6].getValue();
+
+		if ( fPILevel < 0 || fPILevel > 1 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+		if ( nAggregation < 1 || nAggregation > 7 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+		if ( bDataCompletion !== 1 && bDataCompletion !== 0 ) {
+			return new cError(cErrorType.not_numeric);
+		}
+
+		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
+		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation, pTMat);
+		if ( !isError) {
+			///*,( eETSType != etsStatAdd && eETSType != etsStatMult ? pTMat : nullptr ),eETSType )
+			return new cError(cErrorType.wrong_value_type);
+		}else if(isError && cElementType.error === isError.type){
+			return isError;
+		}
+
+		/*SCSIZE nC, nR;
+		pTMat->GetDimensions( nC, nR );
+		ScMatrixRef pPIMat = GetNewMat( nC, nR );*/
+		var pPIMat = null;
+		if (nSmplInPrd === 0) {
+			pPIMat = aETSCalc.GetEDSPredictionIntervals(pTMat, fPILevel);
+		} else {
+			pPIMat = aETSCalc.GetETSPredictionIntervals(pTMat, fPILevel);
+		}
+
+		if(null === pPIMat){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		return new cNumber(pPIMat[0][0]);
 	};
 
 	/**
