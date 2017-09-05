@@ -7240,7 +7240,9 @@ PasteProcessor.prototype =
 									if(bIsPreviuosSpace){
 										continue;
 									}
-									bIsPreviuosSpace = true;
+									if(!this.bIsPlainText){
+										bIsPreviuosSpace = true;
+									}
 								}
                                 this._AddToParagraph(Item);
                             }
