@@ -5704,7 +5704,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_CollaborativeChanges = function()
 	{
-		if (true !== AscCommon.CollaborativeEditing.Is_Fast())
+		if (true !== AscCommon.CollaborativeEditing.Is_Fast() && (true !== this.WordControl.m_oLogicDocument.IsViewModeInReview() || true !== this.WordControl.m_oLogicDocument.IsFastCollaboartionBeforeViewModeInReview()))
 			this.sendEvent("asc_onCollaborativeChanges");
 	};
 
@@ -7121,9 +7121,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_setDrawCollaborationMarks = function(bDraw)
 	{
+		this.tmpCoMarksDraw = bDraw;
 		if (!this.isLoadFullApi)
 		{
-			this.tmpCoMarksDraw = bDraw;
 			return;
 		}
 

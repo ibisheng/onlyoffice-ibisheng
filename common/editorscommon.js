@@ -1296,7 +1296,7 @@
                         }
                     }
                     else
-                        callback(Asc.c_oAscError.ID.Unknown);
+                        callback(Asc.c_oAscError.ID.UplImageFileCount);
                 }
             };
 
@@ -1308,7 +1308,7 @@
 		}
 		else
 		{
-			callback(Asc.c_oAscError.ID.Unknown);
+			callback(Asc.c_oAscError.ID.UplImageFileCount);
 		}
 	}
 

@@ -6159,7 +6159,14 @@ PasteProcessor.prototype =
             var color = computedStyle.getPropertyValue( "color" );
             if(color && (color = this._ParseColor(color)))
             {
-                rPr.Color = color;
+                if(PasteElementsId.g_bIsDocumentCopyPaste){
+                    rPr.Color = color;
+                }
+                else{
+                    if(color){
+                        rPr.Unifill =  AscFormat.CreateUnfilFromRGB(color.r, color.g, color.b);
+                    }
+                }
             }
 			
 			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
@@ -7233,7 +7240,9 @@ PasteProcessor.prototype =
 									if(bIsPreviuosSpace){
 										continue;
 									}
-									bIsPreviuosSpace = true;
+									if(!this.bIsPlainText){
+										bIsPreviuosSpace = true;
+									}
 								}
                                 this._AddToParagraph(Item);
                             }
@@ -7344,7 +7353,7 @@ PasteProcessor.prototype =
 					
                     var sSrc = node.getAttribute("src");
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
-                        ||  nWidth === 0 ||  nHeight === 0))
+                        ||  nWidth === 0 ||  nHeight === 0) && sSrc)
                     {
                         var img_prop = new Asc.asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
@@ -7746,8 +7755,8 @@ PasteProcessor.prototype =
                     }
                 }
                 var sSrc = node.getAttribute("src");
-                if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
-                    ||  nWidth === 0 ||  nHeight === 0)
+                if(sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
+                    ||  nWidth === 0 ||  nHeight === 0))
                 {
                     var img_prop = new Asc.asc_CImgProperty();
                     img_prop.asc_putImageUrl(sSrc);

@@ -623,12 +623,12 @@
 			}else if(cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type || cElementType.cell3D === arg0.type){
 				res = new cNumber(1);
 			}else if(cElementType.cellsRange3D === arg0.type){
-				var sheet1 = arg0.wsFrom.nSheetId;
-				var sheet2 = arg0.wsTo.nSheetId;
+				var sheet1 = arg0.wsFrom.index;
+				var sheet2 = arg0.wsTo.index;
 				if(sheet1 === sheet2){
 					res = new cNumber(1);
 				}else{
-					res = new cNumber(Math.abs(sheet2 - sheet1));
+					res = new cNumber(Math.abs(sheet2 - sheet1) + 1);
 				}
 
 			}else{

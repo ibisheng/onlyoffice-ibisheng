@@ -4327,7 +4327,8 @@ function OfflineEditor () {
                          "format"        : "xlsx",
                          "vkey"          : undefined,
                          "url"           : t.initSettings["docURL"],
-                         "title"         : this.documentTitle};
+                         "title"         : this.documentTitle,
+                         "nobase64"      : true};
 
                          _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });

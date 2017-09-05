@@ -379,10 +379,26 @@
 					if (elem instanceof cNumber) {
 						holidays.push(elem);
 					} else if (elem instanceof cString) {
-						var res = g_oFormatParser.parse(elem.getValue());
-						if (res && res.bDateTime && res.value >= 0) {
-							holidays.push(new cNumber(parseInt(res.value)));
-						}else{
+						var res = elem.tocNumber();
+						if (res instanceof cError || res instanceof cEmpty) {
+							var d = new Date(elem.getValue());
+							if (isNaN(d)) {
+								d = g_oFormatParser.parseDate(elem.getValue());
+								if (d === null) {
+									return this.value = new cError(cErrorType.wrong_value_type);
+								}
+								res = d.value;
+							} else {
+								res = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
+									( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) );
+							}
+						} else {
+							res = elem.tocNumber().getValue();
+						}
+						
+						if(res && res > 0){
+							holidays.push(new cNumber(parseInt(res)));
+						} else {
 							return bIsError = new cError(cErrorType.wrong_value_type);
 						}
 					}

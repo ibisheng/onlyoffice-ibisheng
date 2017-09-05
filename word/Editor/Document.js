@@ -15579,6 +15579,10 @@ CDocument.prototype.GetCurrentComplexFields = function()
 
 	return oParagraph.GetCurrentComplexFields();
 };
+CDocument.prototype.IsFastCollaboartionBeforeViewModeInReview = function()
+{
+	return this.ViewModeInReview.isFastCollaboration;
+};
 
 
 

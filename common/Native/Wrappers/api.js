@@ -5909,7 +5909,8 @@ function NativeOpenFile3(_params, documentInfo)
                                       "format"        : "docx",
                                       "vkey"          : undefined,
                                       "url"           : window.documentInfo["docURL"],
-                                      "title"         : this.documentTitle};
+                                      "title"         : this.documentTitle,
+                                      "nobase64"      : true};
 
                                       _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
                                       });
