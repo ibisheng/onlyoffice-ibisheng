@@ -2222,11 +2222,11 @@
 		var nC = rTMat.length, nR = rTMat[0].length;
 
 		// find maximum target value and calculate size of coefficient- array c
-		var fMaxTarget = rTMat[0][0];
+		var fMaxTarget = rTMat[0][0].value;
 		for (var i = 0; i < nR; i++) {
 			for (var j = 0; j < nC; j++) {
-				if (fMaxTarget < rTMat[j][i]) {
-					fMaxTarget = rTMat[j][i];
+				if (fMaxTarget < rTMat[j][i].value) {
+					fMaxTarget = rTMat[j][i].value;
 				}
 			}
 		}
@@ -2332,9 +2332,9 @@
 			for (var j = 0; j < nC; j++) {
 				var fTarget;
 				if (this.mnMonthDay) {
-					fTarget = this.convertXtoMonths(rTMat[j][i]) - this.maRange[this.mnCount - 1].X;
+					fTarget = this.convertXtoMonths(rTMat[j][i].value) - this.maRange[this.mnCount - 1].X;
 				} else {
-					fTarget = rTMat[j][i] - this.maRange[this.mnCount - 1].X;
+					fTarget = rTMat[j][i].value - this.maRange[this.mnCount - 1].X;
 				}
 				var nSteps = ( fTarget / this.mfStepSize ) - 1;
 				var fFactor = Math.fmod(fTarget, this.mfStepSize);
