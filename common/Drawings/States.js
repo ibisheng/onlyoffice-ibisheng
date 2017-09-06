@@ -1093,7 +1093,6 @@ MoveState.prototype =
                 if(isRealObject(snap_obj))
                 {
                     dx = snap_obj.dist;
-                    console.log(dx);
                     if(dx !== null)
                     {
                         if(min_dx === null)
@@ -1125,7 +1124,6 @@ MoveState.prototype =
                     if(isRealObject(snap_obj))
                     {
                         dx = snap_obj.dist;
-                        console.log(dx);
                         if(dx !== null)
                         {
                             if(min_dx === null)
