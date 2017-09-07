@@ -1034,7 +1034,8 @@
 					} else {
 						this.skipKeyPress = false;
 					}
-					return true;
+					stop();
+					return result;
 
 				case 93:
 					stop();
