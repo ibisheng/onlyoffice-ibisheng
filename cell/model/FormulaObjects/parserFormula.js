@@ -5919,8 +5919,9 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMet
 function searchRegExp2( s, mask ) {
     //todo протестировать
     var bRes = true;
-    var s = s.toString().toLowerCase();
-    var mask = mask.toString().toLowerCase();
+    s = s.toString().toLowerCase();
+    mask = mask.toString().toLowerCase();
+	var cCurMask;
     var nSIndex = 0;
     var nMaskIndex = 0;
     var nSLastIndex = 0;
@@ -5929,30 +5930,30 @@ function searchRegExp2( s, mask ) {
     var nMaskLength = mask.length;
     var t = false;
     for ( ; nSIndex < nSLength; nMaskIndex++, nSIndex++, t = false ) {
-        var cCurMask = mask[nMaskIndex];
-        if ( '~' == cCurMask ) {
+        cCurMask = mask[nMaskIndex];
+        if ( '~' === cCurMask ) {
             nMaskIndex++;
             cCurMask = mask[nMaskIndex];
             t = true;
-    } else if ('*' == cCurMask) {
+    } else if ('*' === cCurMask) {
       break;
         }
-        if ( ( cCurMask != s[nSIndex] && '?' != cCurMask ) || ( cCurMask != s[nSIndex] && t) ) {
+        if ( ( cCurMask !== s[nSIndex] && '?' !== cCurMask ) || ( cCurMask !== s[nSIndex] && t) ) {
             bRes = false;
             break;
         }
     }
     if ( bRes ) {
         while ( 1 ) {
-            var cCurMask = mask[nMaskIndex];
+            cCurMask = mask[nMaskIndex];
             if ( nSIndex >= nSLength ) {
-                while ( '*' == cCurMask && nMaskIndex < nMaskLength ) {
+                while ( '*' === cCurMask && nMaskIndex < nMaskLength ) {
                     nMaskIndex++;
                     cCurMask = mask[nMaskIndex];
                 }
                 bRes = nMaskIndex >= nMaskLength;
                 break;
-      } else if ('*' == cCurMask) {
+      } else if ('*' === cCurMask) {
                 nMaskIndex++;
                 if ( nMaskIndex >= nMaskLength ) {
                     bRes = true;
@@ -5960,7 +5961,7 @@ function searchRegExp2( s, mask ) {
                 }
                 nSLastIndex = nSIndex + 1;
                 nMaskLastIndex = nMaskIndex;
-      } else if (cCurMask != s[nSIndex] && '?' != cCurMask) {
+      } else if (cCurMask !== s[nSIndex] && '?' !== cCurMask) {
                 nMaskIndex = nMaskLastIndex;
                 nSIndex = nSLastIndex++;
       } else {
