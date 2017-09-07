@@ -5776,18 +5776,17 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-	var matchingOperators = new RegExp("^ *[<=> ]+ *");
+	var matchingOperators = new RegExp("^(=|<>|<=|>=|<|>).*");
 
 	function matchingValue(oVal) {
-
 		var res;
-		if(cElementType.string === oVal.type){
+		if (cElementType.string === oVal.type) {
 			var search, op;
 			var val = oVal.getValue();
 			var match = val.match(matchingOperators);
 			if (match) {
-				search = val.substr(match[0].length);
-				op = match[0].replace(/\s/g, "");
+				search = val.substr(match[1].length);
+				op = match[1].replace(/\s/g, "");
 			} else {
 				search = val;
 				op = null;
@@ -5801,15 +5800,16 @@ function parseNum( str ) {
 
 		return res;
 	}
-	
+
 	function matching(x, matchingInfo) {
 		var y = matchingInfo.val;
 		var operator = matchingInfo.op;
 		var res = false, rS;
 		if (cElementType.string === y.type) {
-			if (cElementType.number === y.type && ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator)) {
+			if (cElementType.number === y.type &&
+				('<' === operator || '>' === operator || '<=' === operator || '>=' === operator)) {
 				var _funcVal = _func[x.type][y.type](x, y, operator);
-				if(cElementType.error === _funcVal.type){
+				if (cElementType.error === _funcVal.type) {
 					return false;
 				}
 				return _funcVal.toBool();
@@ -5833,7 +5833,7 @@ function parseNum( str ) {
 					res = rS;
 					break;
 			}
-		} else if(cElementType.number === y.type) {
+		} else if (cElementType.number === y.type) {
 			rS = (x.type === y.type);
 			switch (operator) {
 				case "<>":
@@ -5853,18 +5853,14 @@ function parseNum( str ) {
 					break;
 				case "=":
 				default:
-					if(cElementType.string === x.type){
+					if (cElementType.string === x.type) {
 						x = x.tocNumber();
 					}
 					res = (x.value === y.value);
 					break;
 			}
-		} else if(cElementType.bool === y.type) {
-			if(y.type === x.type && x.value === y.value){
-				res = true;
-			}
-		} else if(cElementType.error === y.type) {
-			if(y.type === x.type && x.value === y.value){
+		} else if (cElementType.bool === y.type || cElementType.error === y.type) {
+			if (y.type === x.type && x.value === y.value) {
 				res = true;
 			}
 		}
