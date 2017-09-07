@@ -733,6 +733,17 @@
 			t.VersionHistory = null;
 			t.sendEvent('asc_onExpiredToken');
 		};
+		this.CoAuthoringApi.onHasForgotten = function() {
+			//todo very bad way, need rewrite
+			var isDocumentCanSaveOld = t.isDocumentCanSave;
+			var canSaveOld = t.canSave;
+			t.isDocumentCanSave = true;
+			t.canSave = false;
+			t.sendEvent("asc_onDocumentModifiedChanged");
+			t.isDocumentCanSave = isDocumentCanSaveOld;
+			t.canSave = canSaveOld;
+			t.sendEvent("asc_onDocumentModifiedChanged");
+		};
 		/**
 		 * Event об отсоединении от сервера
 		 * @param {jQuery} e  event об отсоединении с причиной

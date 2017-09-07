@@ -59,6 +59,7 @@
       this.onSession =  options.onSession;
       this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
+      this.onHasForgotten =  options.onHasForgotten;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -105,6 +106,9 @@
       };
       this._CoAuthoringApi.onExpiredToken = function(e) {
         t.callback_OnExpiredToken(e);
+      };
+      this._CoAuthoringApi.onHasForgotten = function(e) {
+        t.callback_OnHasForgotten(e);
       };
 	  this._CoAuthoringApi.onForceSave = function(e) {
         t.callback_OnForceSave(e);
@@ -426,6 +430,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnHasForgotten = function(e) {
+    if (this.onHasForgotten) {
+      this.onHasForgotten(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -543,6 +553,7 @@
       this.onSession =  options.onSession;
       this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
+      this.onHasForgotten =  options.onHasForgotten;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -989,6 +1000,12 @@
     }
   };
 
+  DocsCoApi.prototype._onHasForgotten = function(data) {
+    if (this.onHasForgotten) {
+      this.onHasForgotten();
+    }
+  };
+
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     var t = this;
     if (jwt) {
@@ -1415,6 +1432,9 @@
 
       this._onMessages(data, false);
       this._onGetLock(data);
+      if (data['hasForgotten']) {
+        this._onHasForgotten();
+      }
 
       // Применения изменений пользователя
       if (window['AscApplyChanges'] && window['AscChanges']) {
