@@ -5806,8 +5806,7 @@ function parseNum( str ) {
 		var operator = matchingInfo.op;
 		var res = false, rS;
 		if (cElementType.string === y.type) {
-			if (cElementType.number === y.type &&
-				('<' === operator || '>' === operator || '<=' === operator || '>=' === operator)) {
+			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
 				var _funcVal = _func[x.type][y.type](x, y, operator);
 				if (cElementType.error === _funcVal.type) {
 					return false;
@@ -5821,7 +5820,14 @@ function parseNum( str ) {
 				rS = (cElementType.empty === x.type);
 			} else {
 				// Equal only string values
-				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+				if(cElementType.bool === x.type){
+					x = x.tocString();
+					rS = x.value === y;
+				}else if(cElementType.error === x.type){
+					rS = x.value === y;
+				}else{
+					rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+				}
 			}
 
 			switch (operator) {
