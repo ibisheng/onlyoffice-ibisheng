@@ -5778,26 +5778,36 @@ function parseNum( str ) {
 
 	var matchingOperators = new RegExp("^ *[<=> ]+ *");
 
-	function matchingValue(val) {
-		var search, op;
-		var match = val.match(matchingOperators);
-		if (match) {
-			search = val.substr(match[0].length);
-			op = match[0].replace(/\s/g, "");
+	function matchingValue(oVal) {
+
+		var res;
+		if(cElementType.string === oVal.type){
+			var search, op;
+			var val = oVal.getValue();
+			var match = val.match(matchingOperators);
+			if (match) {
+				search = val.substr(match[0].length);
+				op = match[0].replace(/\s/g, "");
+			} else {
+				search = val;
+				op = null;
+			}
+
+			var parseRes = AscCommon.g_oFormatParser.parse(search);
+			res = {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
 		} else {
-			search = val;
-			op = null;
+			res = {val: oVal, op: null};
 		}
 
-		var parseRes = AscCommon.g_oFormatParser.parse(search);
-		return {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
+		return res;
 	}
+	
 	function matching(x, matchingInfo) {
 		var y = matchingInfo.val;
 		var operator = matchingInfo.op;
 		var res = false, rS;
 		if (cElementType.string === y.type) {
-			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
+			if (cElementType.number === y.type && ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator)) {
 				var _funcVal = _func[x.type][y.type](x, y, operator);
 				if(cElementType.error === _funcVal.type){
 					return false;
@@ -5823,7 +5833,7 @@ function parseNum( str ) {
 					res = rS;
 					break;
 			}
-		} else {
+		} else if(cElementType.number === y.type) {
 			rS = (x.type === y.type);
 			switch (operator) {
 				case "<>":
@@ -5843,8 +5853,19 @@ function parseNum( str ) {
 					break;
 				case "=":
 				default:
+					if(cElementType.string === x.type){
+						x = x.tocNumber();
+					}
 					res = (x.value === y.value);
 					break;
+			}
+		} else if(cElementType.bool === y.type) {
+			if(y.type === x.type && x.value === y.value){
+				res = true;
+			}
+		} else if(cElementType.error === y.type) {
+			if(y.type === x.type && x.value === y.value){
+				res = true;
 			}
 		}
 		return res;

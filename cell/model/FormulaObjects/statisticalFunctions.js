@@ -1597,11 +1597,10 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		arg1 = arg1.toString();
 		var r = arg0.getRange();
 		var r2 = arg2.getRange();
 		ws = arg0.getWS();
-		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
+		matchingInfo = AscCommonExcel.matchingValue(arg1);
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (v, cell) {
 				if (matching(v, matchingInfo)) {
@@ -1678,7 +1677,7 @@
 			if (cElementType.string !== arg2.type) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
-			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
@@ -2686,31 +2685,20 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}*/
 
-		var compareValues = function(val, matchingInfo){
-			var res;
-
-			if(val.type === arg1.type && val.value === arg1.value){
-				return true;
-			}
-
-			res = matching(val, matchingInfo);
-			return res;
-		};
-
 		var val;
-		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
+		matchingInfo = AscCommonExcel.matchingValue(arg1);
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
-				_count += compareValues(_val, matchingInfo);
+				_count += matching(_val, matchingInfo);
 			})
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			val = arg0.getValue();
 			for (var i = 0; i < val.length; i++) {
-				_count += compareValues(val[i], matchingInfo);
+				_count += matching(val[i], matchingInfo);
 			}
 		} else {
 			val = arg0.getValue();
-			_count += compareValues(val, matchingInfo);
+			_count += matching(val, matchingInfo);
 		}
 
 		return this.value = new cNumber(_count);
@@ -2752,7 +2740,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
+			matchingInfo = AscCommonExcel.matchingValue(arg1);
 			arg1Matrix = arg0.getMatrix();
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg1Matrix = arg1Matrix[0];
@@ -5136,7 +5124,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
@@ -5241,7 +5229,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {

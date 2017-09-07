@@ -4464,7 +4464,7 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
+		matchingInfo = AscCommonExcel.matchingValue(arg1);
 		if (cElementType.cellsRange === arg0.type) {
 			var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
 			for (var i = 0; i < arg0Matrix.length; i++) {
@@ -4539,7 +4539,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
-			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
