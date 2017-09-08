@@ -5070,6 +5070,15 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 			} /* Left Parentheses*/ else if (parserHelp.isLeftParentheses.call(this, this.Formula, this.pCurrPos)) {
 				parseLeftParentheses();
+
+				//TODO протестировать
+				//если осталось только закрыть скобки за функции с нулевым количеством аргументов
+				if(this.pCurrPos === this.Formula.length){
+					if(this.elemArr[this.elemArr.length - 2] && 0 === this.elemArr[this.elemArr.length - 2].argumentsMax){
+						this.operand_expected = false;
+					}
+				}
+
 			}/* Right Parentheses */ else if (parserHelp.isRightParentheses.call(this, this.Formula, this.pCurrPos)) {
 				if(!parseRightParentheses()){
 					return false;
