@@ -4941,9 +4941,6 @@
 			for (var i = 0; i < oStyleObject.aBorders.length; ++i) {
 				oStyleObject.aBorders[i] = g_StyleCache.addBorder(oStyleObject.aBorders[i]);
 			}
-			for (var numFmt in oStyleObject.oNumFmts) {
-				oStyleObject.oNumFmts[i] = oStyleObject.oNumFmts[numFmt];
-			}
 			for (var XfIdTmp in oStyleObject.aCellStyleXfs) {
 				var xf = oStyleObject.aCellStyleXfs[XfIdTmp];
 				if (xf.align) {
