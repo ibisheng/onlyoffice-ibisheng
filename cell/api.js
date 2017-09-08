@@ -2385,7 +2385,7 @@ var editor;
           g_oDocumentUrls.addUrls(urls);
           if (firstUrl) {
             var ws = t.wb.getWorksheet();
-            ws.objectRender.addImageDrawingObject(firstUrl, null);
+            ws.objectRender.addImageDrawingObject([firstUrl], null);
           } else {
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }

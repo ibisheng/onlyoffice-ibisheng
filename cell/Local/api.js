@@ -100,7 +100,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (ws) 
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject([AscCommon.g_oDocumentUrls.getImageUrl(_url)], null);
 		}
 	};
 	asc['spreadsheet_api'].prototype.asc_showImageFileDialog = function()
@@ -301,7 +301,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
     if (ws) 
 	{
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-        ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
+        ws.objectRender.addImageDrawingObject([AscCommon.g_oDocumentUrls.getImageUrl(_url)] , null);
     }
 };
 
