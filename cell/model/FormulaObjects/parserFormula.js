@@ -4325,771 +4325,806 @@ parserFormula.prototype.setFormula = function(formula) {
   this.isInDependencies = false;
 };
 
-parserFormula.prototype.parse = function(local, digitDelim) {
-  this.pCurrPos = 0;
-  var needAssemble = false;
-  var cFormulaList;
+	parserFormula.prototype.parse = function (local, digitDelim) {
+		this.pCurrPos = 0;
+		var needAssemble = false;
+		var cFormulaList;
 
-  if (this.isParsed) {
-    return this.isParsed;
-  }
-  /*
-   Парсер формулы реализует алгоритм перевода инфиксной формы записи выражения в постфиксную или Обратную Польскую Нотацию.
-   Что упрощает вычисление результата формулы.
-   При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
-   */
-
-	if (false) {
-		//console.log(this.Formula);
-		cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
-			cFormulaFunction;
-		var aTokens = getTokens(this.Formula);
-		if (null === aTokens) {
-			this.outStack = [];
-			this.error.push(c_oAscError.ID.FrmlWrongOperator);
-			return false;
+		if (this.isParsed) {
+			return this.isParsed;
 		}
+		/*
+		 Парсер формулы реализует алгоритм перевода инфиксной формы записи выражения в постфиксную или Обратную Польскую Нотацию.
+		 Что упрощает вычисление результата формулы.
+		 При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
+		 */
 
-		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false, wsF, wsT;
-		for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
-			found_operand = null;
-			val = aTokens[i].value;
-			switch (aTokens[i].type) {
-				case TOK_TYPE_OPERAND:
-				{
-					if (TOK_SUBTYPE_TEXT === aTokens[i].subtype) {
-						elem = new cString(val);
-					} else {
-						tmp = parseFloat(val);
-						if (isNaN(tmp)) {
-							valUp = val.toUpperCase();
-							if ('TRUE' === valUp || 'FALSE' === valUp) {
-								elem = new cBool(valUp);
-							} else {
-								if (-1 !== val.indexOf('!')) {
-									tmp = AscCommonExcel.g_oRangeCache.getRange3D(val);
-									if (tmp) {
-										this.is3D = true;
-										wsF = this.wb.getWorksheetByName(tmp.sheet);
-										wsT = (null !== tmp.sheet2 && tmp.sheet !== tmp.sheet2) ? this.wb.getWorksheetByName(tmp.sheet2) : wsF;
-										elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) : new cArea3D(tmp.getName(), wsF, wsT);
-									} else {
-										this.error.push(c_oAscError.ID.FrmlWrongOperator);
-										this.outStack = [];
-										return false;
-									}
+		if (false) {
+			//console.log(this.Formula);
+			cFormulaList =
+				(local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
+					cFormulaFunction;
+			var aTokens = getTokens(this.Formula);
+			if (null === aTokens) {
+				this.outStack = [];
+				this.error.push(c_oAscError.ID.FrmlWrongOperator);
+				return false;
+			}
+
+			var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null,
+				bArrElemSign = false, wsF, wsT;
+			for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
+				found_operand = null;
+				val = aTokens[i].value;
+				switch (aTokens[i].type) {
+					case TOK_TYPE_OPERAND: {
+						if (TOK_SUBTYPE_TEXT === aTokens[i].subtype) {
+							elem = new cString(val);
+						} else {
+							tmp = parseFloat(val);
+							if (isNaN(tmp)) {
+								valUp = val.toUpperCase();
+								if ('TRUE' === valUp || 'FALSE' === valUp) {
+									elem = new cBool(valUp);
 								} else {
-									tmp = AscCommonExcel.g_oRangeCache.getAscRange(valUp);
-									if (tmp) {
-										elem = tmp.isOneCell() ? new cRef(valUp, this.ws) : new cArea(valUp, this.ws);
+									if (-1 !== val.indexOf('!')) {
+										tmp = AscCommonExcel.g_oRangeCache.getRange3D(val);
+										if (tmp) {
+											this.is3D = true;
+											wsF = this.wb.getWorksheetByName(tmp.sheet);
+											wsT = (null !== tmp.sheet2 && tmp.sheet !== tmp.sheet2) ?
+												this.wb.getWorksheetByName(tmp.sheet2) : wsF;
+											elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) :
+												new cArea3D(tmp.getName(), wsF, wsT);
+										} else {
+											this.error.push(c_oAscError.ID.FrmlWrongOperator);
+											this.outStack = [];
+											return false;
+										}
 									} else {
-										elem = new cName(aTokens[i].value, this.ws);
+										tmp = AscCommonExcel.g_oRangeCache.getAscRange(valUp);
+										if (tmp) {
+											elem =
+												tmp.isOneCell() ? new cRef(valUp, this.ws) : new cArea(valUp, this.ws);
+										} else {
+											elem = new cName(aTokens[i].value, this.ws);
+										}
 									}
 								}
+							} else {
+								elem = new cNumber(tmp);
 							}
-						} else {
-							elem = new cNumber(tmp);
 						}
-					}
-					if (arr) {
-						if (cElementType.number !== elem.type && cElementType.bool !== elem.type &&
-							cElementType.string !== elem.type) {
-							this.outStack = [];
-							this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-							return false;
-						} else {
-							if (bArrElemSign) {
-								if (cElementType.number !== elem.type) {
-									this.outStack = [];
-									this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-									return false;
-								}
-								elem.value *= -1;
-								bArrElemSign = false;
-							}
-							arr.addElement(elem);
-						}
-					} else {
-						this.outStack.push(elem);
-						this.f.push(elem);
-					}
-					break;
-				}
-				case TOK_TYPE_OP_POST:
-				case TOK_TYPE_OP_IN:
-				{
-					if (TOK_SUBTYPE_UNION === aTokens[i].subtype) {
-						this.outStack = [];
-						this.error.push(c_oAscError.ID.FrmlWrongOperator);
-						return false;
-					}
-
-					prev = aTokens[i - 1];
-					if ('-' === val && (0 === i || (TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
-						(TOK_SUBTYPE_STOP !== prev.subtype ||
-						(TOK_TYPE_FUNCTION !== prev.type && TOK_TYPE_SUBEXPR !== prev.type))))) {
-						elem = new cFormulaOperators['un_minus']();
-					} else {
-						elem = new cFormulaOperators[val]();
-					}
-					if (arr) {
-						if (bArrElemSign || 'un_minus' !== elem.name) {
-							this.outStack = [];
-							this.error.push(c_oAscError.ID.FrmlWrongOperator);
-							return false;
-						} else {
-							bArrElemSign = true;
-							break;
-						}
-					}
-
-					this.f.push(elem);
-
-					len = stack.length;
-					while (0 !== len) {
-						tmp = stack[len - 1];
-						if (elem.isRightAssociative ? (elem.priority < tmp.priority) : ((elem.priority <= tmp.priority))) {
-							this.outStack.push(tmp);
-							--len;
-						} else {
-							break;
-						}
-					}
-					stack.length = len;
-
-					stack.push(elem);
-					break;
-				}
-				case TOK_TYPE_FUNCTION:
-				{
-					if (TOK_SUBTYPE_START === aTokens[i].subtype) {
-						val = val.toUpperCase();
-						if ('ARRAY' === val) {
-							if (arr) {
-								this.outStack = [];
-								this.error.push(c_oAscError.ID.FrmlWrongOperator);
-								return false;
-							}
-							arr = new cArray();
-							break;
-						} else if ('ARRAYROW' === val) {
-							if (!arr) {
-								this.outStack = [];
-								this.error.push(c_oAscError.ID.FrmlWrongOperator);
-								return false;
-							}
-							arr.addRow();
-							break;
-						} else if (val in cFormulaList) {
-							elem = new cFormulaList[val]();
-						} else if (val in cAllFormulaFunction) {
-							elem = new cAllFormulaFunction[val]();
-						} else {
-							elem = new cBaseFunction(val);
-							elem.isXLFN = (0 === val.indexOf("_xlfn."));
-						}
-						if (elem && elem.ca) {
-							this.ca = elem.ca;
-						}
-						stack.push(elem);
-						args[++indentCount] = 1;
-					} else {
 						if (arr) {
-							if ('ARRAY' === val) {
-								if (!arr.isValidArray()) {
-									this.outStack = [];
-									// размер массива не согласован
-									this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-									return false;
-								}
-								this.outStack.push(arr);
-								arr = null;
-							} else if ('ARRAYROW' !== val) {
+							if (cElementType.number !== elem.type && cElementType.bool !== elem.type &&
+								cElementType.string !== elem.type) {
 								this.outStack = [];
 								this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
 								return false;
+							} else {
+								if (bArrElemSign) {
+									if (cElementType.number !== elem.type) {
+										this.outStack = [];
+										this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+										return false;
+									}
+									elem.value *= -1;
+									bArrElemSign = false;
+								}
+								arr.addElement(elem);
 							}
-							break;
+						} else {
+							this.outStack.push(elem);
+							this.f.push(elem);
 						}
+						break;
+					}
+					case TOK_TYPE_OP_POST:
+					case TOK_TYPE_OP_IN: {
+						if (TOK_SUBTYPE_UNION === aTokens[i].subtype) {
+							this.outStack = [];
+							this.error.push(c_oAscError.ID.FrmlWrongOperator);
+							return false;
+						}
+
+						prev = aTokens[i - 1];
+						if ('-' === val && (0 === i ||
+							(TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
+							(TOK_SUBTYPE_STOP !== prev.subtype ||
+							(TOK_TYPE_FUNCTION !== prev.type && TOK_TYPE_SUBEXPR !== prev.type))))) {
+							elem = new cFormulaOperators['un_minus']();
+						} else {
+							elem = new cFormulaOperators[val]();
+						}
+						if (arr) {
+							if (bArrElemSign || 'un_minus' !== elem.name) {
+								this.outStack = [];
+								this.error.push(c_oAscError.ID.FrmlWrongOperator);
+								return false;
+							} else {
+								bArrElemSign = true;
+								break;
+							}
+						}
+
+						this.f.push(elem);
+
 						len = stack.length;
 						while (0 !== len) {
 							tmp = stack[len - 1];
-							--len;
-							this.outStack.push(tmp);
-							if (cElementType.func === tmp.type) {
-								prev = aTokens[i - 1];
-								tmp.setArgumentsCount(args[indentCount] -
-									((prev && TOK_TYPE_FUNCTION === prev.type && TOK_SUBTYPE_START === prev.subtype) ? 1 : 0));
-								if (!tmp.checkArguments()) {
+							if (elem.isRightAssociative ? (elem.priority < tmp.priority) :
+									((elem.priority <= tmp.priority))) {
+								this.outStack.push(tmp);
+								--len;
+							} else {
+								break;
+							}
+						}
+						stack.length = len;
+
+						stack.push(elem);
+						break;
+					}
+					case TOK_TYPE_FUNCTION: {
+						if (TOK_SUBTYPE_START === aTokens[i].subtype) {
+							val = val.toUpperCase();
+							if ('ARRAY' === val) {
+								if (arr) {
 									this.outStack = [];
-									this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
+									this.error.push(c_oAscError.ID.FrmlWrongOperator);
+									return false;
+								}
+								arr = new cArray();
+								break;
+							} else if ('ARRAYROW' === val) {
+								if (!arr) {
+									this.outStack = [];
+									this.error.push(c_oAscError.ID.FrmlWrongOperator);
+									return false;
+								}
+								arr.addRow();
+								break;
+							} else if (val in cFormulaList) {
+								elem = new cFormulaList[val]();
+							} else if (val in cAllFormulaFunction) {
+								elem = new cAllFormulaFunction[val]();
+							} else {
+								elem = new cBaseFunction(val);
+								elem.isXLFN = (0 === val.indexOf("_xlfn."));
+							}
+							if (elem && elem.ca) {
+								this.ca = elem.ca;
+							}
+							stack.push(elem);
+							args[++indentCount] = 1;
+						} else {
+							if (arr) {
+								if ('ARRAY' === val) {
+									if (!arr.isValidArray()) {
+										this.outStack = [];
+										// размер массива не согласован
+										this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+										return false;
+									}
+									this.outStack.push(arr);
+									arr = null;
+								} else if ('ARRAYROW' !== val) {
+									this.outStack = [];
+									this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
 									return false;
 								}
 								break;
 							}
+							len = stack.length;
+							while (0 !== len) {
+								tmp = stack[len - 1];
+								--len;
+								this.outStack.push(tmp);
+								if (cElementType.func === tmp.type) {
+									prev = aTokens[i - 1];
+									tmp.setArgumentsCount(args[indentCount] -
+										((prev && TOK_TYPE_FUNCTION === prev.type &&
+										TOK_SUBTYPE_START === prev.subtype) ? 1 : 0));
+									if (!tmp.checkArguments()) {
+										this.outStack = [];
+										this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
+										return false;
+									}
+									break;
+								}
+							}
+							stack.length = len;
+							--indentCount;
 						}
-						stack.length = len;
-						--indentCount;
-					}
-					break;
-				}
-				case TOK_TYPE_ARGUMENT:
-				{
-					if (arr) {
 						break;
 					}
-					if (-1 === indentCount) {
-						throw 'error!!!!!!!!!!!';
-					}
-					args[indentCount] += 1;
-					len = stack.length;
-					while (0 !== len) {
-						tmp = stack[len - 1];
-						if (cElementType.func === tmp.type) {
+					case TOK_TYPE_ARGUMENT: {
+						if (arr) {
 							break;
 						}
-						this.outStack.push(tmp);
-						--len;
-					}
-					stack.length = len;
-
-					next = aTokens[i + 1];
-					if (next && (TOK_TYPE_ARGUMENT === next.type ||
-						(TOK_TYPE_FUNCTION === next.type && TOK_SUBTYPE_START !== next.subtype))) {
-						this.outStack.push(new cEmpty());
-						break;
-					}
-					break;
-				}
-				case TOK_TYPE_SUBEXPR:
-				{
-					if (TOK_SUBTYPE_START === aTokens[i].subtype) {
-						elem = new parentLeft();
-						stack.push(elem);
-					} else {
-						elem = new parentRight();
+						if (-1 === indentCount) {
+							throw 'error!!!!!!!!!!!';
+						}
+						args[indentCount] += 1;
 						len = stack.length;
 						while (0 !== len) {
 							tmp = stack[len - 1];
-							--len;
-							this.outStack.push(tmp);
-							if (tmp instanceof parentLeft) {
+							if (cElementType.func === tmp.type) {
 								break;
 							}
+							this.outStack.push(tmp);
+							--len;
 						}
 						stack.length = len;
-					}
-					this.f.push(elem);
-					break;
-				}
-				case TOK_TYPE_WSPACE:
-				{
-					if (0 !== i && i !== nLength - 1) {
-						prev = aTokens[i - 1];
+
 						next = aTokens[i + 1];
-						if ((TOK_TYPE_OPERAND === prev.type ||
-							((TOK_TYPE_FUNCTION === prev.type || TOK_TYPE_SUBEXPR === prev.type) &&
-							TOK_SUBTYPE_STOP === prev.subtype)) && ((TOK_TYPE_OPERAND === next.type) ||
-							((TOK_TYPE_FUNCTION === next.type || TOK_TYPE_SUBEXPR === next.type) &&
-							TOK_SUBTYPE_START === next.subtype))) {
-							aTokens[i].type = TOK_TYPE_OP_IN;
-							aTokens[i].value = ' ';
-							--i;
+						if (next && (TOK_TYPE_ARGUMENT === next.type ||
+							(TOK_TYPE_FUNCTION === next.type && TOK_SUBTYPE_START !== next.subtype))) {
+							this.outStack.push(new cEmpty());
+							break;
+						}
+						break;
+					}
+					case TOK_TYPE_SUBEXPR: {
+						if (TOK_SUBTYPE_START === aTokens[i].subtype) {
+							elem = new parentLeft();
+							stack.push(elem);
+						} else {
+							elem = new parentRight();
+							len = stack.length;
+							while (0 !== len) {
+								tmp = stack[len - 1];
+								--len;
+								this.outStack.push(tmp);
+								if (tmp instanceof parentLeft) {
+									break;
+								}
+							}
+							stack.length = len;
+						}
+						this.f.push(elem);
+						break;
+					}
+					case TOK_TYPE_WSPACE: {
+						if (0 !== i && i !== nLength - 1) {
+							prev = aTokens[i - 1];
+							next = aTokens[i + 1];
+							if ((TOK_TYPE_OPERAND === prev.type ||
+								((TOK_TYPE_FUNCTION === prev.type || TOK_TYPE_SUBEXPR === prev.type) &&
+								TOK_SUBTYPE_STOP === prev.subtype)) && ((TOK_TYPE_OPERAND === next.type) ||
+								((TOK_TYPE_FUNCTION === next.type || TOK_TYPE_SUBEXPR === next.type) &&
+								TOK_SUBTYPE_START === next.subtype))) {
+								aTokens[i].type = TOK_TYPE_OP_IN;
+								aTokens[i].value = ' ';
+								--i;
+							}
+						}
+						break;
+					}
+				}
+			}
+			while (stack.length !== 0) {
+				this.outStack.push(stack.pop());
+			}
+
+			if (this.outStack.length != 0) {
+				return this.isParsed = true;
+			} else {
+				return this.isParsed = false;
+			}
+		}
+
+		this.operand_expected = true;
+		var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
+		cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
+
+		var t = this;
+		var parseOperators = function(){
+			wasLeftParentheses = false;
+			wasRigthParentheses = false;
+			var found_operator = null;
+
+			if (t.operand_expected) {
+				if ('-' === t.operand_str) {
+					t.operand_expected = true;
+					found_operator = new cFormulaOperators['un_minus']();
+				} else if ('+' === t.operand_str) {
+					t.operand_expected = true;
+					found_operator = new cFormulaOperators['un_plus']();
+				} else if (' ' === t.operand_str) {
+					return true;
+				} else {
+					t.error.push(c_oAscError.ID.FrmlWrongOperator);
+					t.outStack = [];
+					t.elemArr = [];
+					return false;
+				}
+			} else if (!t.operand_expected) {
+				if ('-' === t.operand_str) {
+					t.operand_expected = true;
+					found_operator = new cFormulaOperators['-']();
+				} else if ('+' === t.operand_str) {
+					t.operand_expected = true;
+					found_operator = new cFormulaOperators['+']();
+				} else if (':' === t.operand_str) {
+					t.operand_expected = true;
+					found_operator = new cFormulaOperators[':']();
+				} else if ('%' === t.operand_str) {
+					t.operand_expected = false;
+					found_operator = new cFormulaOperators['%']();
+				} else if (' ' === t.operand_str && t.pCurrPos === t.Formula.length) {
+					return true;
+				} else {
+					if (t.operand_str in cFormulaOperators) {
+						found_operator = new cFormulaOperators[t.operand_str]();
+						t.operand_expected = true;
+					} else {
+						t.error.push(c_oAscError.ID.FrmlWrongOperator);
+						t.outStack = [];
+						t.elemArr = [];
+						return false;
+					}
+				}
+			}
+
+			while (0 !== t.elemArr.length && (
+				found_operator.isRightAssociative ?
+					( found_operator.priority < t.elemArr[t.elemArr.length - 1].priority ) :
+					( found_operator.priority <= t.elemArr[t.elemArr.length - 1].priority )
+			)) {
+				t.outStack.push(t.elemArr.pop());
+			}
+			t.elemArr.push(found_operator);
+			t.f.push(found_operator);
+			found_operand = null;
+			return true;
+		};
+
+		var parseLeftParentheses = function(){
+			if (wasRigthParentheses || found_operand) {
+				t.elemArr.push(new cMultOperator());
+			}
+			t.operand_expected = true;
+			wasLeftParentheses = true;
+			wasRigthParentheses = false;
+			found_operand = null;
+			t.elemArr.push(new cFormulaOperators[t.operand_str]());
+			t.f.push(new cFormulaOperators[t.operand_str]());
+		};
+
+		var parseRightParentheses = function(){
+
+			t.f.push(new cFormulaOperators[t.operand_str]());
+			wasRigthParentheses = true;
+			var top_elem = null;
+			if (0 !== t.elemArr.length && ( (top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' ) &&
+				t.operand_expected) {
+				if (top_elem.getArguments() > 1) {
+					t.outStack.push(new cEmpty());
+				} else {
+					top_elem.DecrementArguments();
+				}
+			} else {
+				while (0 !== t.elemArr.length &&
+				!((top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' )) {
+					if (top_elem.name in cFormulaOperators && t.operand_expected) {
+						t.error.push(c_oAscError.ID.FrmlOperandExpected);
+						t.outStack = [];
+						t.elemArr = [];
+						return false;
+					}
+					t.outStack.push(t.elemArr.pop());
+				}
+			}
+
+			if (0 === t.elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
+				t.outStack = [];
+				t.elemArr = [];
+				t.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
+				return false;
+			}
+
+			var p = top_elem, func, bError = false;
+			t.elemArr.pop();
+			if (0 !== t.elemArr.length &&
+				( func = t.elemArr[t.elemArr.length - 1] ).type === cElementType.func) {
+				p = t.elemArr.pop();
+				if (top_elem.getArguments() > func.argumentsMax) {
+					t.outStack = [];
+					t.elemArr = [];
+					t.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
+					return false;
+				} else {
+					if (top_elem.getArguments() >= func.argumentsMin) {
+						func.setArgumentsCount(top_elem.getArguments());
+						if (!func.checkArguments()) {
+							bError = true;
+						}
+					} else {
+						bError = true;
+					}
+
+					if (bError) {
+						t.outStack = [];
+						t.elemArr = [];
+						t.error.push(c_oAscError.ID.FrmlWrongCountArgument);
+						return false;
+					}
+				}
+			} else {
+				if (wasLeftParentheses && (!t.elemArr[t.elemArr.length - 1] ||
+					'(' === t.elemArr[t.elemArr.length - 1].name)) {
+					t.outStack = [];
+					t.elemArr = [];
+					t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+					return false;
+				}
+				// for (int i = 0; i < left_p.ParametersNum - 1; ++i)
+				// {
+				// ptgs_list.AddFirst(new PtgUnion()); // чета нужно добавить для Union.....
+				// }
+			}
+			t.outStack.push(p);
+			t.operand_expected = false;
+			wasLeftParentheses = false;
+			return true;
+		};
+
+		var parseCommaAndArgumentsUnion = function(){
+			wasLeftParentheses = false;
+			wasRigthParentheses = false;
+			var stackLength = t.elemArr.length, top_elem = null;
+
+			if (t.elemArr.length != 0 && t.elemArr[stackLength - 1].name == "(" && t.operand_expected) {
+				t.outStack.push(new cEmpty());
+				top_elem = t.elemArr[stackLength - 1];
+				wasLeftParentheses = true;
+				t.operand_expected = false;
+			} else {
+				while (stackLength != 0) {
+					top_elem = t.elemArr[stackLength - 1];
+					if (top_elem.name == "(") {
+						wasLeftParentheses = true;
+						break;
+					} else {
+						t.outStack.push(t.elemArr.pop());
+						stackLength = t.elemArr.length;
+					}
+				}
+			}
+
+			if (t.operand_expected) {
+				t.error.push(c_oAscError.ID.FrmlWrongOperator);
+				t.outStack = [];
+				t.elemArr = [];
+				return false;
+			}
+
+			if (!wasLeftParentheses) {
+				t.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
+				t.outStack = [];
+				t.elemArr = [];
+				return false;
+			}
+			top_elem.IncrementArguments();
+			t.operand_expected = true;
+			return true;
+		};
+
+		var parseArray = function(){
+			wasLeftParentheses = false;
+			wasRigthParentheses = false;
+			var arr = new cArray(), operator = {isOperator: false, operatorName: ""};
+			while (t.pCurrPos < t.Formula.length &&
+			!parserHelp.isRightBrace.call(t, t.Formula, t.pCurrPos)) {
+				if (parserHelp.isArraySeparator.call(t, t.Formula, t.pCurrPos, digitDelim)) {
+					if (t.operand_str == (digitDelim ? FormulaSeparators.arrayRowSeparator :
+							FormulaSeparators.arrayRowSeparatorDef)) {
+						arr.addRow();
+					}
+				} else if (parserHelp.isBoolean.call(t, t.Formula, t.pCurrPos, local)) {
+					arr.addElement(new cBool(t.operand_str));
+				} else if (parserHelp.isString.call(t, t.Formula, t.pCurrPos)) {
+					arr.addElement(new cString(t.operand_str));
+				} else if (parserHelp.isError.call(t, t.Formula, t.pCurrPos)) {
+					arr.addElement(new cError(t.operand_str));
+				} else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {
+					if (operator.isOperator) {
+						if (operator.operatorName == "+" || operator.operatorName == "-") {
+							t.operand_str = operator.operatorName + "" + t.operand_str
+						} else {
+							t.outStack = [];
+							t.elemArr = [];
+							t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+							return false;
 						}
 					}
-					break;
+					arr.addElement(new cNumber(parseFloat(t.operand_str)));
+					operator = {isOperator: false, operatorName: ""};
+				} else if (parserHelp.isOperator.call(t, t.Formula, t.pCurrPos)) {
+					operator.isOperator = true;
+					operator.operatorName = t.operand_str;
+				} else {
+					t.outStack = [];
+					t.elemArr = [];
+					/*в массиве используется недопустимый параметр*/
+					t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+					return false;
+				}
+			}
+			if (!arr.isValidArray()) {
+				t.outStack = [];
+				t.elemArr = [];
+				/*размер массива не согласован*/
+				t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+				return false;
+			}
+			t.outStack.push(arr);
+			t.operand_expected = false;
+			return true;
+		};
+
+		var parseOperands = function(){
+			found_operand = null;
+
+			if (wasRigthParentheses) {
+				t.operand_expected = true;
+			}
+
+			if (!t.operand_expected) {
+				t.error.push(c_oAscError.ID.FrmlWrongOperator);
+				t.outStack = [];
+				t.elemArr = [];
+				return false;
+			}
+
+			/* Booleans */
+			if (parserHelp.isBoolean.call(t, t.Formula, t.pCurrPos, local)) {
+				found_operand = new cBool(t.operand_str);
+			}
+
+			/* Strings */ else if (parserHelp.isString.call(t, t.Formula, t.pCurrPos)) {
+				found_operand = new cString(t.operand_str);
+			}
+
+			/* Errors */ else if (parserHelp.isError.call(t, t.Formula, t.pCurrPos, local)) {
+				found_operand = new cError(t.operand_str);
+			}
+
+			/* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/ else if ((_3DRefTmp =
+					parserHelp.is3DRef.call(t, t.Formula, t.pCurrPos))[0]) {
+
+				t.is3D = true;
+				var pos = {
+					start: t.pCurrPos - t.operand_str.length - 1,
+					end: t.pCurrPos,
+					index: t.outStack.length
+				};
+				var wsF = t.wb.getWorksheetByName(_3DRefTmp[1]);
+				var wsT = (null !== _3DRefTmp[2]) ? t.wb.getWorksheetByName(_3DRefTmp[2]) : wsF;
+
+				if (!(wsF && wsT)) {
+					t.error.push(c_oAscError.ID.FrmlWrongReferences);
+					t.outStack = [];
+					t.elemArr = [];
+					return false;
+				}
+				if (parserHelp.isArea.call(t, t.Formula, t.pCurrPos)) {
+					pos.end = t.pCurrPos;
+					found_operand = new cArea3D(t.operand_str.toUpperCase(), wsF, wsT);
+					pos.oper = found_operand;
+					t.RefPos.push(pos);
+				} else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
+					pos.end = t.pCurrPos;
+					if (wsT !== wsF) {
+						found_operand = new cArea3D(t.operand_str.toUpperCase(), wsF, wsT);
+						pos.oper = found_operand;
+					} else {
+						found_operand = new cRef3D(t.operand_str.toUpperCase(), wsF);
+						pos.oper = found_operand;
+					}
+					t.RefPos.push(pos);
+				} else if (parserHelp.isName.call(t, t.Formula, t.pCurrPos)) {
+					pos.end = t.pCurrPos;
+					found_operand = new cName3D(t.operand_str, wsF);
+					pos.oper = found_operand;
+					t.RefPos.push(pos);
+				}
+				t.countRef++;
+			}
+
+			/* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(t, t.Formula,
+					t.pCurrPos)) {
+				found_operand = new cArea(t.operand_str.toUpperCase(), t.ws);
+				t.RefPos.push({
+					start: t.pCurrPos - t.operand_str.length,
+					end: t.pCurrPos,
+					index: t.outStack.length,
+					oper: found_operand
+				});
+				t.countRef++;
+			}
+			/* Referens to cell A4 */ else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
+				found_operand = new cRef(t.operand_str.toUpperCase(), t.ws);
+				t.RefPos.push({
+					start: t.pCurrPos - t.operand_str.length,
+					end: t.pCurrPos,
+					index: t.outStack.length,
+					oper: found_operand
+				});
+				t.countRef++;
+			}
+
+			else if (_tableTMP = parserHelp.isTable.call(t, t.Formula, t.pCurrPos, local)) {
+				found_operand = cStrucTable.prototype.createFromVal(_tableTMP, t.wb, t.ws);
+
+				//todo undo delete column
+				if (found_operand.type === cElementType.error) {
+					/*используется неверный именованный диапазон или таблица*/
+					t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+					t.outStack = [];
+					t.elemArr = [];
+					return false;
+				}
+
+				if (found_operand.type !== cElementType.error) {
+					t.RefPos.push({
+						start: t.pCurrPos - t.operand_str.length,
+						end: t.pCurrPos,
+						index: t.outStack.length,
+						isName: true,
+						oper: found_operand
+					});
+					t.countRef++;
+				}
+			}
+
+			/* Referens to DefinedNames */ else if (parserHelp.isName.call(t, t.Formula, t.pCurrPos,
+					t.wb, t.ws)[0]) {
+				found_operand = new cName(t.operand_str, t.ws);
+				var defName = found_operand.getDefName();
+				if (defName && defName.isTable && (_tableTMP = parserHelp.isTable(t.operand_str + "[]", 0))) {
+					found_operand = cStrucTable.prototype.createFromVal(_tableTMP, t.wb, t.ws);
+					//need assemble becase source formula wrong
+					needAssemble = true;
+				}
+				t.RefPos.push({
+					start: t.pCurrPos - t.operand_str.length,
+					end: t.pCurrPos,
+					index: t.outStack.length,
+					isName: true,
+					oper: found_operand
+				});
+				t.countRef++;
+			}
+
+			/* Numbers*/ else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {
+				if (t.operand_str !== ".") {
+					found_operand = new cNumber(parseFloat(t.operand_str));
+				} else {
+					t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+					t.outStack = [];
+					t.elemArr = [];
+					return false;
+				}
+			}
+
+			/* Function*/ else if (parserHelp.isFunc.call(t, t.Formula, t.pCurrPos)) {
+
+				if (wasRigthParentheses && t.operand_expected) {
+					t.elemArr.push(new cMultOperator());
+				}
+
+				var found_operator = null, operandStr = t.operand_str.replace(rx_sFuncPref, "").toUpperCase();
+				if (operandStr in cFormulaList) {
+					found_operator = new cFormulaList[operandStr]();
+				} else if (operandStr in cAllFormulaFunction) {
+					found_operator = new cAllFormulaFunction[operandStr]();
+				} else {
+					found_operator = new cBaseFunction(operandStr);
+					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );
+				}
+
+				if (found_operator != null) {
+					if (found_operator.ca) {
+						t.ca = found_operator.ca;
+					}
+					t.elemArr.push(found_operator);
+					t.f.push(found_operator);
+				} else {
+					t.error.push(c_oAscError.ID.FrmlWrongFunctionName);
+					t.outStack = [];
+					t.elemArr = [];
+					return false;
+				}
+				t.operand_expected = false;
+				wasRigthParentheses = false;
+				return true;
+			}
+
+			if (null !== found_operand) {
+				t.outStack.push(found_operand);
+				t.f.push(found_operand);
+				t.operand_expected = false;
+				found_operand = null;
+			} else {
+				t.outStack.push(new cError(cErrorType.wrong_name));
+				t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+				return t.isParsed = false;
+			}
+			if (wasRigthParentheses) {
+				t.elemArr.push(new cMultOperator());
+			}
+			wasLeftParentheses = false;
+			wasRigthParentheses = false;
+			return true;
+		};
+
+		while (this.pCurrPos < this.Formula.length) {
+			this.operand_str = this.Formula[this.pCurrPos];
+
+			/* Operators*/
+			if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) || parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
+				if(!parseOperators()){
+					return false;
+				}
+			} /* Left Parentheses*/ else if (parserHelp.isLeftParentheses.call(this, this.Formula, this.pCurrPos)) {
+				parseLeftParentheses();
+			}/* Right Parentheses */ else if (parserHelp.isRightParentheses.call(this, this.Formula, this.pCurrPos)) {
+				if(!parseRightParentheses()){
+					return false;
+				}
+			}/*Comma & arguments union*/ else if (parserHelp.isComma.call(this, this.Formula, this.pCurrPos)) {
+				if(!parseCommaAndArgumentsUnion()){
+					return false;
+				}
+			}/* Array */ else if (parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos)) {
+				if(!parseArray()){
+					return false;
+				}
+			}/* Operands*/ else {
+				if(!parseOperands()){
+					return false;
 				}
 			}
 		}
-		while (stack.length !== 0) {
-			this.outStack.push(stack.pop());
+
+		if (this.operand_expected) {
+			this.outStack = [];
+			this.elemArr = [];
+			this.error.push(c_oAscError.ID.FrmlOperandExpected);
+			return false;
+		}
+		var operand, parenthesesNotEnough = false;
+		while (0 !== this.elemArr.length) {
+			operand = this.elemArr.pop();
+			if ('(' === operand.name && !this.parenthesesNotEnough) {
+				this.Formula += ")";
+				parenthesesNotEnough = true;
+			} else if ('(' === operand.name || ')' === operand.name) {
+				this.outStack = [];
+				this.elemArr = [];
+				this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
+				return false;
+			} else {
+				this.outStack.push(operand);
+			}
+		}
+		this.parenthesesNotEnough = parenthesesNotEnough;
+		if (this.parenthesesNotEnough) {
+			this.error.push(c_oAscError.ID.FrmlParenthesesCorrectCount);
+			return this.isParsed = false;
 		}
 
-		if (this.outStack.length != 0) {
+		if (0 !== this.outStack.length) {
+			if (needAssemble) {
+				this.Formula = this.assemble();
+			}
 			return this.isParsed = true;
 		} else {
 			return this.isParsed = false;
 		}
-	}
-
-  this.operand_expected = true;
-  var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
-  cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
-  while (this.pCurrPos < this.Formula.length) {
-    this.operand_str = this.Formula[this.pCurrPos];
-    /*if ( parserHelp.isControlSymbols.call( this, this.Formula, this.pCurrPos )){
-     console.log("!");
-     continue;
-     }*/
-
-    /* Operators*/
-    if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) ||
-      parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
-      wasLeftParentheses = false;
-      wasRigthParentheses = false;
-      found_operator = null;
-
-      if (this.operand_expected) {
-        if ('-' === this.operand_str) {
-          this.operand_expected = true;
-          found_operator = new cFormulaOperators['un_minus']();
-        } else if ('+' === this.operand_str) {
-          this.operand_expected = true;
-          found_operator = new cFormulaOperators['un_plus']();
-        } else if (' ' === this.operand_str) {
-          continue;
-        } else {
-          this.error.push(c_oAscError.ID.FrmlWrongOperator);
-          this.outStack = [];
-          this.elemArr = [];
-          return false;
-        }
-      } else if (!this.operand_expected) {
-        if ('-' === this.operand_str) {
-          this.operand_expected = true;
-          found_operator = new cFormulaOperators['-']();
-        } else if ('+' === this.operand_str) {
-          this.operand_expected = true;
-          found_operator = new cFormulaOperators['+']();
-        } else if (':' === this.operand_str) {
-          this.operand_expected = true;
-          found_operator = new cFormulaOperators[':']();
-        } else if ('%' === this.operand_str) {
-          this.operand_expected = false;
-          found_operator = new cFormulaOperators['%']();
-        } else if (' ' === this.operand_str && this.pCurrPos === this.Formula.length) {
-          continue;
-        } else {
-          if (this.operand_str in cFormulaOperators) {
-            found_operator = new cFormulaOperators[this.operand_str]();
-            this.operand_expected = true;
-          } else {
-            this.error.push(c_oAscError.ID.FrmlWrongOperator);
-            this.outStack = [];
-            this.elemArr = [];
-            return false;
-          }
-        }
-      }
-
-      while (0 !== this.elemArr.length && (
-        found_operator.isRightAssociative ?
-          ( found_operator.priority < this.elemArr[this.elemArr.length - 1].priority ) :
-          ( found_operator.priority <= this.elemArr[this.elemArr.length - 1].priority )
-      )) {
-        this.outStack.push(this.elemArr.pop());
-      }
-      this.elemArr.push(found_operator);
-      this.f.push(found_operator);
-      found_operand = null;
-    }
-
-    /* Left & Right Parentheses */ else if (parserHelp.isLeftParentheses.call(this, this.Formula, this.pCurrPos)) {
-      if (wasRigthParentheses || found_operand) {
-        this.elemArr.push(new cMultOperator());
-      }
-      this.operand_expected = true;
-      wasLeftParentheses = true;
-      wasRigthParentheses = false;
-      found_operand = null;
-      this.elemArr.push(new cFormulaOperators[this.operand_str]());
-      this.f.push(new cFormulaOperators[this.operand_str]());
-    }
-
-    else if (parserHelp.isRightParentheses.call(this, this.Formula, this.pCurrPos)) {
-      this.f.push(new cFormulaOperators[this.operand_str]());
-      wasRigthParentheses = true;
-      var top_elem = null;
-      if (0 !== this.elemArr.length && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name === '(' ) &&
-        this.operand_expected) {
-        if (top_elem.getArguments() > 1) {
-          this.outStack.push(new cEmpty());
-        } else {
-          top_elem.DecrementArguments();
-        }
-      } else {
-        while (0 !== this.elemArr.length && !((top_elem = this.elemArr[this.elemArr.length - 1]).name === '(' )) {
-          if (top_elem.name in cFormulaOperators && this.operand_expected) {
-            this.error.push(c_oAscError.ID.FrmlOperandExpected);
-            this.outStack = [];
-            this.elemArr = [];
-            return false;
-          }
-          this.outStack.push(this.elemArr.pop());
-        }
-      }
-
-      if (0 === this.elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
-        this.outStack = [];
-        this.elemArr = [];
-        this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
-        return false;
-      }
-
-      var p = top_elem, func, bError = false;
-      this.elemArr.pop();
-      if (0 !== this.elemArr.length && ( func = this.elemArr[this.elemArr.length - 1] ).type === cElementType.func) {
-        p = this.elemArr.pop();
-        if (top_elem.getArguments() > func.argumentsMax) {
-          this.outStack = [];
-          this.elemArr = [];
-          this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
-          return false;
-        } else {
-          if (top_elem.getArguments() >= func.argumentsMin) {
-            func.setArgumentsCount(top_elem.getArguments());
-            if (!func.checkArguments()) {
-            	bError = true;
-			}
-          } else {
-          	bError = true;
-          }
-
-          if (bError) {
-          	this.outStack = [];
-          	this.elemArr = [];
-          	this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
-          	return false;
-		  }
-        }
-        } else {
-          if (wasLeftParentheses &&
-            (!this.elemArr[this.elemArr.length - 1] || '(' === this.elemArr[this.elemArr.length - 1].name)) {
-          this.outStack = [];
-          this.elemArr = [];
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          return false;
-        }
-        // for (int i = 0; i < left_p.ParametersNum - 1; ++i)
-        // {
-        // ptgs_list.AddFirst(new PtgUnion()); // чета нужно добавить для Union.....
-        // }
-      }
-      this.outStack.push(p);
-      this.operand_expected = false;
-      wasLeftParentheses = false;
-    }
-
-    /*Comma & arguments union*/ else if (parserHelp.isComma.call(this, this.Formula, this.pCurrPos)) {
-      wasLeftParentheses = false;
-      wasRigthParentheses = false;
-      var stackLength = this.elemArr.length, top_elem = null;
-
-      if (this.elemArr.length != 0 && this.elemArr[stackLength - 1].name == "(" && this.operand_expected) {
-        this.outStack.push(new cEmpty());
-        top_elem = this.elemArr[stackLength - 1];
-        wasLeftParentheses = true;
-        this.operand_expected = false;
-      } else {
-        while (stackLength != 0) {
-          top_elem = this.elemArr[stackLength - 1];
-          if (top_elem.name == "(") {
-            wasLeftParentheses = true;
-            break;
-          } else {
-            this.outStack.push(this.elemArr.pop());
-            stackLength = this.elemArr.length;
-          }
-        }
-      }
-
-      if (this.operand_expected) {
-        this.error.push(c_oAscError.ID.FrmlWrongOperator);
-        this.outStack = [];
-        this.elemArr = [];
-        return false;
-      }
-
-      if (!wasLeftParentheses) {
-        this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
-        this.outStack = [];
-        this.elemArr = [];
-        return false;
-      }
-      top_elem.IncrementArguments();
-      this.operand_expected = true;
-    }
-
-    /* Array */ else if (parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos)) {
-      wasLeftParentheses = false;
-      wasRigthParentheses = false;
-      var arr = new cArray(), operator = {isOperator: false, operatorName: ""};
-      while (this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos)) {
-        if (parserHelp.isArraySeparator.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-          if (this.operand_str == (digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef)) {
-            arr.addRow();
-          }
-        } else if (parserHelp.isBoolean.call(this, this.Formula, this.pCurrPos, local)) {
-          arr.addElement(new cBool(this.operand_str));
-        } else if (parserHelp.isString.call(this, this.Formula, this.pCurrPos)) {
-          arr.addElement(new cString(this.operand_str));
-        } else if (parserHelp.isError.call(this, this.Formula, this.pCurrPos)) {
-          arr.addElement(new cError(this.operand_str));
-        } else if (parserHelp.isNumber.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-          if (operator.isOperator) {
-            if (operator.operatorName == "+" || operator.operatorName == "-") {
-              this.operand_str = operator.operatorName + "" + this.operand_str
-            } else {
-              this.outStack = [];
-              this.elemArr = [];
-              this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-              return false;
-            }
-          }
-          arr.addElement(new cNumber(parseFloat(this.operand_str)));
-          operator = {isOperator: false, operatorName: ""};
-        } else if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos)) {
-          operator.isOperator = true;
-          operator.operatorName = this.operand_str;
-        } else {
-          this.outStack = [];
-          this.elemArr = [];
-          /*в массиве используется недопустимый параметр*/
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          return false;
-        }
-      }
-      if (!arr.isValidArray()) {
-        this.outStack = [];
-        this.elemArr = [];
-        /*размер массива не согласован*/
-        this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-        return false;
-      }
-      this.outStack.push(arr);
-      this.operand_expected = false;
-    }
-
-    /* Operands*/ else {
-
-      found_operand = null;
-
-      if (wasRigthParentheses) {
-        this.operand_expected = true;
-      }
-
-      if (!this.operand_expected) {
-        this.error.push(c_oAscError.ID.FrmlWrongOperator);
-        this.outStack = [];
-        this.elemArr = [];
-        return false;
-      }
-
-      /* Booleans */
-      if (parserHelp.isBoolean.call(this, this.Formula, this.pCurrPos, local)) {
-        found_operand = new cBool(this.operand_str);
-      }
-
-      /* Strings */ else if (parserHelp.isString.call(this, this.Formula, this.pCurrPos)) {
-        found_operand = new cString(this.operand_str);
-      }
-
-      /* Errors */ else if (parserHelp.isError.call(this, this.Formula, this.pCurrPos, local)) {
-        found_operand = new cError(this.operand_str);
-      }
-
-      /* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/ else if ((_3DRefTmp =
-          parserHelp.is3DRef.call(this, this.Formula, this.pCurrPos))[0]) {
-
-        this.is3D = true;
-        var pos = {
-          start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length
-        };
-        var wsF = this.wb.getWorksheetByName(_3DRefTmp[1]);
-        var wsT = (null !== _3DRefTmp[2]) ? this.wb.getWorksheetByName(_3DRefTmp[2]) : wsF;
-
-        if (!(wsF && wsT)) {
-          this.error.push(c_oAscError.ID.FrmlWrongReferences);
-          this.outStack = [];
-          this.elemArr = [];
-          return false;
-        }
-        if (parserHelp.isArea.call(this, this.Formula, this.pCurrPos)) {
-          pos.end = this.pCurrPos;
-          found_operand = new cArea3D(this.operand_str.toUpperCase(), wsF, wsT);
-          pos.oper = found_operand;
-          this.RefPos.push(pos);
-        } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
-          pos.end = this.pCurrPos;
-          if (wsT !== wsF) {
-            found_operand = new cArea3D(this.operand_str.toUpperCase(), wsF, wsT);
-            pos.oper = found_operand;
-          } else {
-            found_operand = new cRef3D(this.operand_str.toUpperCase(), wsF);
-            pos.oper = found_operand;
-          }
-          this.RefPos.push(pos);
-        } else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos)) {
-          pos.end = this.pCurrPos;
-          found_operand = new cName3D(this.operand_str, wsF);
-          pos.oper = found_operand;
-          this.RefPos.push(pos);
-        }
-        this.countRef++;
-      }
-
-      /* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(this, this.Formula, this.pCurrPos)) {
-        found_operand = new cArea(this.operand_str.toUpperCase(), this.ws);
-        this.RefPos.push({
-          start: this.pCurrPos - this.operand_str.length,
-          end: this.pCurrPos,
-          index: this.outStack.length,
-          oper: found_operand
-        });
-        this.countRef++;
-      }
-      /* Referens to cell A4 */ else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
-        found_operand = new cRef(this.operand_str.toUpperCase(), this.ws);
-        this.RefPos.push({
-          start: this.pCurrPos - this.operand_str.length,
-          end: this.pCurrPos,
-          index: this.outStack.length,
-          oper: found_operand
-        });
-        this.countRef++;
-      }
-
-      else if (_tableTMP = parserHelp.isTable.call(this, this.Formula, this.pCurrPos, local)) {
-        found_operand = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
-
-		//todo undo delete column
-		if (found_operand.type === cElementType.error) {
-			/*используется неверный именованный диапазон или таблица*/
-			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-			this.outStack = [];
-			this.elemArr = [];
-			return false;
-		}
-
-        if (found_operand.type !== cElementType.error) {
-          this.RefPos.push({
-            start: this.pCurrPos - this.operand_str.length,
-            end: this.pCurrPos,
-            index: this.outStack.length,
-            isName: true,
-            oper: found_operand
-          });
-          this.countRef++;
-        }
-	  }
-
-      /* Referens to DefinedNames */ else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb,
-          this.ws)[0]) {
-		  found_operand = new cName(this.operand_str, this.ws);
-        var defName = found_operand.getDefName();
-        if (defName && defName.isTable && (_tableTMP = parserHelp.isTable(this.operand_str + "[]", 0))) {
-			found_operand = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
-        	//need assemble becase source formula wrong
-			needAssemble = true;
-        }
-        this.RefPos.push({
-            start: this.pCurrPos - this.operand_str.length,
-            end: this.pCurrPos,
-            index: this.outStack.length,
-            isName: true,
-            oper: found_operand
-          });
-        this.countRef++;
-      }
-
-        /* Numbers*/ else if (parserHelp.isNumber.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-        if (this.operand_str !== ".") {
-          found_operand = new cNumber(parseFloat(this.operand_str));
-          } else {
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          this.outStack = [];
-          this.elemArr = [];
-          return false;
-        }
-      }
-
-        /* Function*/ else if (parserHelp.isFunc.call(this, this.Formula, this.pCurrPos)) {
-
-        if (wasRigthParentheses && this.operand_expected) {
-          this.elemArr.push(new cMultOperator());
-        }
-
-        var found_operator = null, operandStr = this.operand_str.replace(rx_sFuncPref, "").toUpperCase();
-          if (operandStr in cFormulaList) {
-          found_operator = new cFormulaList[operandStr]();
-          } else if (operandStr in cAllFormulaFunction) {
-          found_operator = new cAllFormulaFunction[operandStr]();
-          } else {
-          found_operator = new cBaseFunction(operandStr);
-          found_operator.isXLFN = ( this.operand_str.indexOf("_xlfn.") === 0 );
-        }
-
-		if (found_operator != null) {
-			if (found_operator.ca) {
-				this.ca = found_operator.ca;
-			}
-			this.elemArr.push(found_operator);
-			this.f.push(found_operator);
-		} else {
-			this.error.push(c_oAscError.ID.FrmlWrongFunctionName);
-			this.outStack = [];
-			this.elemArr = [];
-			return false;
-		}
-        this.operand_expected = false;
-        wasRigthParentheses = false;
-        continue;
-      }
-
-		if (null !== found_operand) {
-			this.outStack.push(found_operand);
-			this.f.push(found_operand);
-			this.operand_expected = false;
-			found_operand = null;
-		} else {
-			this.outStack.push(new cError(cErrorType.wrong_name));
-			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-			return this.isParsed = false;
-		}
-      if (wasRigthParentheses) {
-        this.elemArr.push(new cMultOperator());
-      }
-      wasLeftParentheses = false;
-      wasRigthParentheses = false;
-    }
-
-  }
-  if (this.operand_expected) {
-    this.outStack = [];
-    this.elemArr = [];
-    this.error.push(c_oAscError.ID.FrmlOperandExpected);
-    return false;
-  }
-  var operand, parenthesesNotEnough = false;
-  while (0 !== this.elemArr.length) {
-    operand = this.elemArr.pop();
-    if ('(' === operand.name && !this.parenthesesNotEnough) {
-      this.Formula += ")";
-      parenthesesNotEnough = true;
-      } else if ('(' === operand.name || ')' === operand.name) {
-      this.outStack = [];
-      this.elemArr = [];
-      this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
-      return false;
-      } else {
-      this.outStack.push(operand);
-    }
-  }
-  this.parenthesesNotEnough = parenthesesNotEnough;
-  if (this.parenthesesNotEnough) {
-    this.error.push(c_oAscError.ID.FrmlParenthesesCorrectCount);
-    return this.isParsed = false;
-  }
-
-  if (0 !== this.outStack.length) {
-    if(needAssemble){
-      this.Formula = this.assemble();
-    }
-    return this.isParsed = true;
-  } else {
-    return this.isParsed = false;
-  }
-};
+	};
 
 	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset) {
 		if (this.isCalculate && (!this.calculateDefName || this.calculateDefName[opt_bbox ? opt_bbox.getName() :
