@@ -2917,7 +2917,9 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 				}
 			}
 
-			if(window['AscCommon'].g_clipboardBase && window['AscCommon'].g_clipboardBase.showButtonIdParagraph && !window['AscCommon'].g_clipboardBase.pasteStart)
+			//TODO функция не должна вызываться здесь! необходимо перенести(DrawingDocument.UpdateTarget)
+			var clipboardBase = window['AscCommon'].g_clipboardBase;
+			if(clipboardBase && clipboardBase.showButtonIdParagraph && !clipboardBase.pasteStart && clipboardBase.showSpecialPasteButton)
 			{
 				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
 			}

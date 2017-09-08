@@ -2871,6 +2871,7 @@
 								format.setItalic(true);
 							}
 							var fontFamily = computedStyle.getPropertyValue("font-family");
+							fontFamily = g_fontApplication.GetFontNameDictionary(fontFamily, true);
 							if(fontFamily){
 								format.setName(fontFamily);
 								res.fonts[fontFamily] = 1;

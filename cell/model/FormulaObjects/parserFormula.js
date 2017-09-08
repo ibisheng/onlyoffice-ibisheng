@@ -5816,22 +5816,31 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-	var matchingOperators = new RegExp("^ *[<=> ]+ *");
+	var matchingOperators = new RegExp("^(=|<>|<=|>=|<|>).*");
 
-	function matchingValue(val) {
-		var search, op;
-		var match = val.match(matchingOperators);
-		if (match) {
-			search = val.substr(match[0].length);
-			op = match[0].replace(/\s/g, "");
+	function matchingValue(oVal) {
+		var res;
+		if (cElementType.string === oVal.type) {
+			var search, op;
+			var val = oVal.getValue();
+			var match = val.match(matchingOperators);
+			if (match) {
+				search = val.substr(match[1].length);
+				op = match[1].replace(/\s/g, "");
+			} else {
+				search = val;
+				op = null;
+			}
+
+			var parseRes = AscCommon.g_oFormatParser.parse(search);
+			res = {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
 		} else {
-			search = val;
-			op = null;
+			res = {val: oVal, op: null};
 		}
 
-		var parseRes = AscCommon.g_oFormatParser.parse(search);
-		return {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
+		return res;
 	}
+
 	function matching(x, matchingInfo) {
 		var y = matchingInfo.val;
 		var operator = matchingInfo.op;
@@ -5839,7 +5848,7 @@ function parseNum( str ) {
 		if (cElementType.string === y.type) {
 			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
 				var _funcVal = _func[x.type][y.type](x, y, operator);
-				if(cElementType.error === _funcVal.type){
+				if (cElementType.error === _funcVal.type) {
 					return false;
 				}
 				return _funcVal.toBool();
@@ -5851,7 +5860,14 @@ function parseNum( str ) {
 				rS = (cElementType.empty === x.type);
 			} else {
 				// Equal only string values
-				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+				if(cElementType.bool === x.type){
+					x = x.tocString();
+					rS = x.value === y;
+				}else if(cElementType.error === x.type){
+					rS = x.value === y;
+				}else{
+					rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+				}
 			}
 
 			switch (operator) {
@@ -5863,7 +5879,7 @@ function parseNum( str ) {
 					res = rS;
 					break;
 			}
-		} else {
+		} else if (cElementType.number === y.type) {
 			rS = (x.type === y.type);
 			switch (operator) {
 				case "<>":
@@ -5883,8 +5899,15 @@ function parseNum( str ) {
 					break;
 				case "=":
 				default:
+					if (cElementType.string === x.type) {
+						x = x.tocNumber();
+					}
 					res = (x.value === y.value);
 					break;
+			}
+		} else if (cElementType.bool === y.type || cElementType.error === y.type) {
+			if (y.type === x.type && x.value === y.value) {
+				res = true;
 			}
 		}
 		return res;
@@ -5936,8 +5959,9 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMet
 function searchRegExp2( s, mask ) {
     //todo протестировать
     var bRes = true;
-    var s = s.toString().toLowerCase();
-    var mask = mask.toString().toLowerCase();
+    s = s.toString().toLowerCase();
+    mask = mask.toString().toLowerCase();
+	var cCurMask;
     var nSIndex = 0;
     var nMaskIndex = 0;
     var nSLastIndex = 0;
@@ -5946,30 +5970,30 @@ function searchRegExp2( s, mask ) {
     var nMaskLength = mask.length;
     var t = false;
     for ( ; nSIndex < nSLength; nMaskIndex++, nSIndex++, t = false ) {
-        var cCurMask = mask[nMaskIndex];
-        if ( '~' == cCurMask ) {
+        cCurMask = mask[nMaskIndex];
+        if ( '~' === cCurMask ) {
             nMaskIndex++;
             cCurMask = mask[nMaskIndex];
             t = true;
-    } else if ('*' == cCurMask) {
+    } else if ('*' === cCurMask) {
       break;
         }
-        if ( ( cCurMask != s[nSIndex] && '?' != cCurMask ) || ( cCurMask != s[nSIndex] && t) ) {
+        if ( ( cCurMask !== s[nSIndex] && '?' !== cCurMask ) || ( cCurMask !== s[nSIndex] && t) ) {
             bRes = false;
             break;
         }
     }
     if ( bRes ) {
         while ( 1 ) {
-            var cCurMask = mask[nMaskIndex];
+            cCurMask = mask[nMaskIndex];
             if ( nSIndex >= nSLength ) {
-                while ( '*' == cCurMask && nMaskIndex < nMaskLength ) {
+                while ( '*' === cCurMask && nMaskIndex < nMaskLength ) {
                     nMaskIndex++;
                     cCurMask = mask[nMaskIndex];
                 }
                 bRes = nMaskIndex >= nMaskLength;
                 break;
-      } else if ('*' == cCurMask) {
+      } else if ('*' === cCurMask) {
                 nMaskIndex++;
                 if ( nMaskIndex >= nMaskLength ) {
                     bRes = true;
@@ -5977,7 +6001,7 @@ function searchRegExp2( s, mask ) {
                 }
                 nSLastIndex = nSIndex + 1;
                 nMaskLastIndex = nMaskIndex;
-      } else if (cCurMask != s[nSIndex] && '?' != cCurMask) {
+      } else if (cCurMask !== s[nSIndex] && '?' !== cCurMask) {
                 nMaskIndex = nMaskLastIndex;
                 nSIndex = nSLastIndex++;
       } else {

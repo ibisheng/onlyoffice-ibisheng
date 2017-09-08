@@ -1031,10 +1031,11 @@
 						this.handlers.trigger('addFunction',
 							AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale['SUM'] :
 								'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
+						stop();
 					} else {
 						this.skipKeyPress = false;
 					}
-					return true;
+					return result;
 
 				case 93:
 					stop();

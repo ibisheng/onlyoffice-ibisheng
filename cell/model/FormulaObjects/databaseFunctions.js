@@ -51,9 +51,9 @@
 			return false;
 		}
 
-		condition  = condition.getValue();
+		//condition  = condition.getValue();
 
-		if("" === condition){
+		if("" === condition.value){
 			res = true;
 		}else{
 			var conditionObj = AscCommonExcel.matchingValue(condition);
