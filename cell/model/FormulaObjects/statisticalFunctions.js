@@ -792,53 +792,44 @@
 	}
 
 	function fTest(pMat1, pMat2){
-		var mfFirst1 = pMat1[0][0].getValue();
-		var mfFirstSqr1 = pMat1[0][0].getValue() * pMat1[0][0].getValue();
-		var mfRest1 = 0;
-		var mfRestSqr1 = 0;
-		var mnCount1 = 0;
-		for (var i = 0; i < pMat1.length; i++) {
-			for (var j = 0; j < pMat1[i].length; j++) {
-				mnCount1++;
-				if (cElementType.number !== pMat1[i][j].type || (i === 0 && j === i)) {
-					continue;
+
+		var getMatrixValues = function(matrix){
+			var mfFirst = matrix[0][0].getValue();
+			var mfFirstSqr = matrix[0][0].getValue() * matrix[0][0].getValue();
+			var mfRest = 0;
+			var mfRestSqr = 0;
+			var mnCount = 0;
+			for (var i = 0; i < matrix.length; i++) {
+				for (var j = 0; j < matrix[i].length; j++) {
+					mnCount++;
+					if (cElementType.number !== matrix[i][j].type || (i === 0 && j === i)) {
+						continue;
+					}
+
+					mfRest += matrix[i][j].getValue();
+					mfRestSqr += matrix[i][j].getValue() * matrix[i][j].getValue();
 				}
-
-				mfRest1 += pMat1[i][j].getValue();
-				mfRestSqr1 += pMat1[i][j].getValue() * pMat1[i][j].getValue();
 			}
-		}
-		var fSum1 = mfFirst1 + mfRest1;
-		var fSumSqr1 = mfFirstSqr1 + mfRestSqr1;
-		var fCount1 = mnCount1;
+			return {mfFirst: mfFirst, mfRest: mfRest, mfRestSqr: mfRestSqr, mnCount: mnCount, mfFirstSqr: mfFirstSqr};
+		};
 
-		var mfFirst2 = pMat2[0][0].getValue();
-		var mfFirstSqr2 = pMat2[0][0].getValue() * pMat2[0][0].getValue();
-		var mfRest2 = 0;
-		var mfRestSqr2 = 0;
-		var mnCount2 = 0;
-		for (var i = 0; i < pMat2.length; i++) {
-			for (var j = 0; j < pMat2[i].length; j++) {
-				mnCount2++;
-				if (cElementType.number !== pMat2[i][j].type || (i === 0 && j === i)) {
-					continue;
-				}
+		var matVals1 = getMatrixValues(pMat1);
+		var fSum1 = matVals1.mfFirst + matVals1.mfRest;
+		var fSumSqr1 = matVals1.mfFirstSqr + matVals1.mfRestSqr;
+		var fCount1 = matVals1.mnCount;
 
-				mfRest2 += pMat2[i][j].getValue();
-				mfRestSqr2 += pMat2[i][j].getValue() * pMat2[i][j].getValue();
-			}
-		}
-		var fSum2 = mfFirst2 + mfRest2;
-		var fSumSqr2 = mfFirstSqr2 + mfRestSqr2;
-		var fCount2 = mnCount2;
+		var matVals2 = getMatrixValues(pMat2);
+		var fSum2 = matVals2.mfFirst + matVals2.mfRest;
+		var fSumSqr2 = matVals2.mfFirstSqr + matVals2.mfRestSqr;
+		var fCount2 = matVals2.mnCount;
 
 		if (fCount1 < 2.0 || fCount2 < 2.0) {
-			return new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.division_by_zero);
 		}
 		var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0);
 		var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0);
 		if (fS1 === 0.0 || fS2 === 0.0) {
-			return new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.division_by_zero);
 		}
 
 		var fF, fF1, fF2;

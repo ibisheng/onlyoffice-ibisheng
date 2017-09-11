@@ -2510,7 +2510,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				} else if (cElementType.cellsRange3D === arg.type) {
 					newArgs[i] = arg.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 				} else {
-					newArgs[i] = new cError(cErrorType.not_numeric);
+					newArgs[i] = new cError(cErrorType.division_by_zero);
 				}
 			}else if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
 				newArgs[i] = arg.cross(arg1);
