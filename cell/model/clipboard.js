@@ -419,7 +419,7 @@
 								});
 
 							}else{
-								var text = data1.innerText;
+								var text = text_data ? text_data : data1.innerText;
 								if(text)
 								{
 									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
