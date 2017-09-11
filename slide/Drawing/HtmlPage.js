@@ -1904,6 +1904,10 @@ function CEditorPage(api)
 			{
 				var _max = oWordControl.Height - parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
 				var _min = oWordControl.Height - parseInt(oWordControl.Splitter2PosMax * g_dKoef_mm_to_pix);
+
+				if (_min < (30 * g_dKoef_mm_to_pix))
+					_min = 30 * g_dKoef_mm_to_pix;
+
 				var _c = parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
 				if (_y > (_max + (_c / 2)))
 					_y = oWordControl.Height;
