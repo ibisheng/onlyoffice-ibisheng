@@ -1086,18 +1086,6 @@ ParaRun.prototype.GetLogicDocument = function()
 
 	return editor.WordControl.m_oLogicDocument;
 };
-ParaRun.prototype.private_CheckNeedRegroupComplexFieldsOnChangeContent = function(arrItems)
-{
-	for (var nIndex = 0, nCount = arrItems.length; nIndex < nCount; ++nIndex)
-	{
-		if (para_FieldChar === arrItems[nIndex].Type)
-		{
-			var oLogicDocument = this.GetLogicDocument();
-			oLogicDocument.FieldsManager.SetNeedRegroupComplexFields(true);
-			return;
-		}
-	}
-};
 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -1107,8 +1095,6 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 
     if (true === UpdatePosition)
         this.private_UpdatePositionsOnAdd(Pos);
-
-	this.private_CheckNeedRegroupComplexFieldsOnChangeContent([Item]);
 
     // Обновляем позиции в NearestPos
     var NearPosLen = this.NearPosArray.length;
@@ -1163,8 +1149,6 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 	History.Add(new CChangesRunRemoveItem(this, Pos, DeletedItems));
 
     this.Content.splice( Pos, Count );
-
-	this.private_CheckNeedRegroupComplexFieldsOnChangeContent(DeletedItems);
 
     if (true === UpdatePosition)
         this.private_UpdatePositionsOnRemove(Pos, Count);
@@ -1232,8 +1216,6 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
 
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
-
-	this.private_CheckNeedRegroupComplexFieldsOnChangeContent(NewItems);
 };
 
 // Определим строку и отрезок текущей позиции
@@ -1576,10 +1558,11 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
             return false;
 
         // Добавление/удаление картинок может изменить размер строки. Добавление/удаление переноса строки/страницы/колонки
-        // нельзя обсчитывать функцией Recalculate_Fast.
+        // нельзя обсчитывать функцией Recalculate_Fast. Добавление и удаление разметок сложных полей тоже нельзя
+		// обсчитывать в быстром пересчете.
         // TODO: Но на самом деле стоило бы сделать нормальную проверку на высоту строки в функции Recalculate_Fast
         var ItemType = Item.Type;
-        if (para_Drawing === ItemType || para_NewLine === ItemType || para_FootnoteRef === ItemType || para_FootnoteReference === ItemType)
+        if (para_Drawing === ItemType || para_NewLine === ItemType || para_FootnoteRef === ItemType || para_FootnoteReference === ItemType || para_FieldChar === ItemType || para_InstrText === ItemType)
             return false;
 
         // Проверяем, что все изменения произошли в одном и том же отрезке
@@ -1598,7 +1581,8 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
 
 /**
  * Проверяем произошло ли простое изменение параграфа, сейчас главное, чтобы это было не добавлениe/удаление картинки
- * или ссылки на сноску. На вход приходит либо массив изменений, либо одно изменение (можно не в массиве).
+ * или ссылки на сноску или разметки сложного поля. На вход приходит либо массив изменений, либо одно изменение
+ * (можно не в массиве).
  */
 ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
 {
@@ -1617,7 +1601,7 @@ ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
             for (var ItemIndex = 0, ItemsCount = Data.Items.length; ItemIndex < ItemsCount; ItemIndex++)
             {
                 var Item = Data.Items[ItemIndex];
-                if (para_Drawing === Item.Type || para_FootnoteReference === Item.Type)
+                if (para_Drawing === Item.Type || para_FootnoteReference === Item.Type || para_FieldChar === Item.Type || para_InstrText === Item.Type)
                     return false;
             }
         }
@@ -3255,6 +3239,66 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     break;
                 }
+				case para_FieldChar:
+				{
+					if (PRS.IsFastRecalculate())
+						break;
+
+					Item.SetRun(this);
+					if (Item.IsBegin())
+					{
+						var oComplexField = Item.GetComplexField();
+						if (!oComplexField)
+						{
+							Item.SetUse(false);
+						}
+						else
+						{
+							Item.SetUse(true);
+							oComplexField.SetBeginChar(Item);
+							PRS.ComplexFields.push(oComplexField);
+						}
+					}
+					else if (Item.IsEnd())
+					{
+						if (PRS.ComplexFields.length > 0)
+						{
+							Item.SetUse(true);
+							var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
+							oComplexField.SetEndChar(Item);
+							PRS.ComplexFields.splice(PRS.ComplexFields.length - 1, 1);
+						}
+						else
+						{
+							Item.SetUse(false);
+						}
+					}
+					else if (Item.IsSeparate())
+					{
+						if (PRS.ComplexFields.length > 0)
+						{
+							Item.SetUse(true);
+							var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
+							oComplexField.SetSeparateChar(Item);
+						}
+						else
+						{
+							Item.SetUse(false);
+						}
+					}
+
+					break;
+				}
+				case para_InstrText:
+				{
+					var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
+					if (oComplexField && null === oComplexField.GetSeparateChar())
+					{
+						oComplexField.SetInstruction(Item);
+					}
+
+					break;
+				}
             }
 
 
@@ -9263,28 +9307,6 @@ ParaRun.prototype.GetAllContentControls = function(arrContentControls)
 	}
 };
 /**
- * Функция для группировки сложных полей (начинается с CDocument.RegroupComplexFields)
- * @param oRegroupManager
- */
-ParaRun.prototype.RegroupComplexFields = function(oRegroupManager)
-{
-	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
-	{
-		var Item = this.Content[nPos];
-
-		if (para_FieldChar === Item.Type)
-		{
-			Item.SetRun(this);
-			oRegroupManager.ProcessChar(Item);
-		}
-		else if (para_InstrText === Item.Type)
-		{
-			Item.SetRun(this);
-			oRegroupManager.ProcessInstruction(Item);
-		}
-	}
-};
-/**
  * Получаем позицию заданного элемента
  * @param oElement
  * @returns {number} позиция, либо -1, если заданного элемента нет
@@ -9326,6 +9348,10 @@ ParaRun.prototype.GetLineByPosition = function(nPos)
 	}
 
 	return this.StartLine;
+};
+
+ParaRun.prototype.PreDelete = function()
+{
 };
 
 function CParaRunStartState(Run)

@@ -708,6 +708,9 @@ Paragraph.prototype.Internal_Content_Remove = function(Pos)
 	this.Content.splice(Pos, 1);
 	this.private_UpdateTrackRevisions();
 
+	if (Item.PreDelete)
+		Item.PreDelete();
+
 	if (this.Selection.StartPos > Pos)
 	{
 		this.Selection.StartPos--;
@@ -807,6 +810,11 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 				CommentsToDelete.push(CommentId);
 			}
 		}
+	}
+
+	for (var nIndex = Pos; nIndex < Pos + Count; ++nIndex)
+	{
+		this.Content[nIndex].PreDelete();
 	}
 
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
@@ -9445,13 +9453,14 @@ Paragraph.prototype.PreDelete = function()
 	// Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
 	// удаляем.
 
-	if (this.LogicDocument && true !== this.LogicDocument.RemoveCommentsOnPreDelete)
-		return;
-
 	for (var Index = 0; Index < this.Content.length; Index++)
 	{
 		var Item = this.Content[Index];
-		if (para_Comment === Item.Type)
+
+		if (Item.PreDelete)
+			Item.PreDelete();
+
+		if (para_Comment === Item.Type && this.LogicDocument && true === this.LogicDocument.RemoveCommentsOnPreDelete)
 		{
 			this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 		}
@@ -12297,14 +12306,6 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 		return oContentControl;
 	}
 };
-Paragraph.prototype.RegroupComplexFields = function(oRegroupManager)
-{
-	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
-	{
-		if (this.Content[nIndex] && this.Content[nIndex].RegroupComplexFields)
-			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
-	}
-};
 Paragraph.prototype.GetCurrentComplexFields = function()
 {
 	var oParaPos = this.Get_ParaContentPos(this.Selection.Use, false, false);
@@ -12463,7 +12464,8 @@ CParagraphPageEndInfo.prototype.Copy = function()
 
 	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 	{
-		oInfo.ComplexFields.push(this.ComplexFields[nIndex].Copy());
+		if (this.ComplexFields[nIndex].ComplexField.IsUse())
+			oInfo.ComplexFields.push(this.ComplexFields[nIndex].Copy());
 	}
 
 	return oInfo;
@@ -12472,6 +12474,15 @@ CParagraphPageEndInfo.prototype.SetFromPRSI = function(PRSI)
 {
 	this.Comments      = PRSI.Comments;
 	this.ComplexFields = PRSI.ComplexFields;
+};
+CParagraphPageEndInfo.prototype.GetComplexFields = function()
+{
+	var arrComplexFields = [];
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		arrComplexFields[nIndex] = this.ComplexFields[nIndex].ComplexField;
+	}
+	return arrComplexFields;
 };
 
 function CParaPos(Range, Line, Page, Pos)

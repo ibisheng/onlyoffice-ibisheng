@@ -47,7 +47,7 @@ function ParaFieldChar(Type)
 
 	this.Use          = true;
 	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
-	this.ComplexField = null;
+	this.ComplexField = (this.CharType === fldchartype_Begin) ? new CComplexField() : null;
 	this.Run          = null;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
@@ -176,18 +176,24 @@ CComplexField.prototype.GetSeparateChar = function()
 };
 CComplexField.prototype.SetBeginChar = function(oChar)
 {
-	this.BeginChar = oChar;
 	oChar.SetComplexField(this);
+
+	this.BeginChar    = oChar;
+	this.SeparateChar = null;
+	this.EndChar      = null;
 };
 CComplexField.prototype.SetEndChar = function(oChar)
 {
-	this.EndChar = oChar;
 	oChar.SetComplexField(this);
+
+	this.EndChar = oChar;
 };
 CComplexField.prototype.SetSeparateChar = function(oChar)
 {
-	this.SeparateChar = oChar;
 	oChar.SetComplexField(this);
+
+	this.SeparateChar = oChar;
+	this.EndChar      = null;
 };
 CComplexField.prototype.Update = function()
 {
@@ -250,6 +256,13 @@ CComplexField.prototype.private_SelectFieldCode = function()
 
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 };
+CComplexField.prototype.IsUse = function()
+{
+	if (!this.BeginChar)
+		return false;
+
+	return this.BeginChar.IsUse();
+};
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)
 {
@@ -267,69 +280,4 @@ CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
 CComplexFieldStatePos.prototype.IsFieldCode = function()
 {
 	return this.FieldCode;
-};
-
-/*
- * Данный класс предназаначен для объединения символов начала/конца/разделения в
- * общий класс CComplexField.
- */
-function CComplexFieldsRegroupManager(oFieldsManager, oLogicDocument)
-{
-	this.LogicDocument = oLogicDocument;
-	this.FieldsManager = oFieldsManager;
-	this.BeginChar     = [];
-}
-CComplexFieldsRegroupManager.prototype.ProcessChar = function(oChar)
-{
-	if (!oChar || !(oChar instanceof ParaFieldChar))
-		return;
-
-	oChar.SetUse(true);
-	if (oChar.IsBegin())
-	{
-		var oComplexField = new CComplexField(this.LogicDocument);
-		oComplexField.SetBeginChar(oChar);
-		this.BeginChar.push(oChar);
-	}
-	else if (oChar.IsSeparate())
-	{
-		if (this.BeginChar.length <= 0)
-		{
-			oChar.SetUse(false);
-		}
-		else
-		{
-			var oBeginChar    = this.BeginChar[this.BeginChar.length - 1];
-			var oComplexField = oBeginChar.GetComplexField();
-			oComplexField.SetSeparateChar(oChar);
-		}
-	}
-	else if (oChar.IsEnd())
-	{
-		if (this.BeginChar.length <= 0)
-		{
-			oChar.SetUse(false);
-		}
-		else
-		{
-			var oBeginChar = this.BeginChar[this.BeginChar.length - 1];
-			var oComplexField = oBeginChar.GetComplexField();
-			oComplexField.SetEndChar(oChar);
-
-			this.BeginChar.splice(this.BeginChar.length - 1, 1);
-			this.FieldsManager.RegisterComplexField(oComplexField);
-		}
-	}
-
-};
-CComplexFieldsRegroupManager.prototype.ProcessInstruction = function(oParaInstruction)
-{
-	if (!oParaInstruction || !(oParaInstruction instanceof ParaInstrText) || this.BeginChar.length <= 0)
-		return;
-
-	var oComplexField = this.BeginChar[this.BeginChar.length - 1].GetComplexField();
-	if (!oComplexField)
-		return;
-
-	oComplexField.SetInstruction(oParaInstruction);
 };

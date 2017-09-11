@@ -2624,7 +2624,9 @@ function CParagraphRecalculateStateWrap(Para)
     this.BreakRealPageLine  = false; // Разрыв страницы документа (не только параграфа) в данной строке
     this.BadLeftTab         = false; // Левый таб правее правой границы
 
-    this.WordLen         = 0;
+	this.ComplexFields = [];
+
+	this.WordLen         = 0;
     this.SpaceLen        = 0;
     this.SpacesCount     = 0;
     this.LastTab         = new CParagraphRecalculateTabInfo();
@@ -2727,6 +2729,12 @@ CParagraphRecalculateStateWrap.prototype =
 		this.Page               = CurPage;
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
+
+		var PageEndInfo = Paragraph.GetEndInfoByPage(CurPage - 1);
+		if (PageEndInfo)
+			this.ComplexFields = PageEndInfo.GetComplexFields();
+		else
+			this.ComplexFields = [];
 	},
 
     // Обнуляем некоторые параметры перед новой строкой
@@ -3203,7 +3211,7 @@ CParagraphRecalculateStateInfo.prototype.RemoveComment = function(Id)
 };
 CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 {
-	if (!oFieldChar)
+	if (!oFieldChar || !oFieldChar.IsUse())
 		return;
 
 	var oComplexField = oFieldChar.GetComplexField();

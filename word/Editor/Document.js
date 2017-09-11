@@ -1096,8 +1096,6 @@ function CDocumentFieldsManager()
 
     this.m_oMailMergeFields = {};
 
-
-    this.m_bNeedRegroupComplexFields = true;
     this.m_aComplexFields            = [];
 }
 
@@ -1242,14 +1240,6 @@ CDocumentFieldsManager.prototype.ResetComplexFields = function()
 CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
 {
 	this.m_aComplexFields.push(oComplexField);
-};
-CDocumentFieldsManager.prototype.IsNeedRegroupComplexFields = function()
-{
-	return this.m_bNeedRegroupComplexFields;
-};
-CDocumentFieldsManager.prototype.SetNeedRegroupComplexFields = function(isNeed)
-{
-	this.m_bNeedRegroupComplexFields = isNeed;
 };
 
 var selected_None              = -1;
@@ -1898,8 +1888,6 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             this.DrawingDocument.FirePaint();
         }
     }
-
-    this.RegroupComplexFields();
 
     // Обновляем позицию курсора
     this.NeedUpdateTarget = true;
@@ -2886,6 +2874,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 		}
 		else
 		{
+			this.private_CheckUnusedFields();
 			this.private_CheckCurPage();
 			this.DrawingDocument.OnEndRecalculate(true);
 			this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
@@ -3538,6 +3527,33 @@ CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
 
 	if (nPageAbs >= nPagesCount)
 		this.DrawingDocument.OnEndRecalculate(false, true);
+};
+CDocument.prototype.private_CheckUnusedFields = function()
+{
+	if (this.Content.length <= 0)
+		return;
+
+	var oLastPara = this.Content[this.Content.length - 1];
+	if (type_Paragraph !== oLastPara.GetType())
+		return;
+
+	var oInfo = oLastPara.GetEndInfoByPage(oLastPara.GetPagesCount() - 1);
+	for (var nIndex = 0, nCount = oInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = oInfo.ComplexFields[nIndex].ComplexField;
+		var oBeginChar    = oComplexField.GetBeginChar();
+		var oEndChar      = oComplexField.GetEndChar();
+		var oSeparateChar = oComplexField.GetSeparateChar();
+
+		if (oBeginChar)
+			oBeginChar.SetUse(false);
+
+		if (oEndChar)
+			oEndChar.SetUse(false);
+
+		if (oSeparateChar)
+			oSeparateChar.SetUse(false);
+	}
 };
 CDocument.prototype.OnColumnBreak_WhileRecalculate           = function()
 {
@@ -15564,21 +15580,6 @@ CDocument.prototype.AddField = function(nType, oPr)
 
 	return false;
 };
-CDocument.prototype.RegroupComplexFields = function()
-{
-	if (!this.FieldsManager.IsNeedRegroupComplexFields())
-		return;
-
-	this.FieldsManager.SetNeedRegroupComplexFields(false);
-	this.FieldsManager.ResetComplexFields();
-
-	var oRegroupManager = new CComplexFieldsRegroupManager(this.FieldsManager, this);
-
-	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
-	{
-		this.Content[nIndex].RegroupComplexFields(oRegroupManager);
-	}
-};
 CDocument.prototype.UpdateComplexField = function(oField)
 {
 	if (!oField)
@@ -15598,7 +15599,14 @@ CDocument.prototype.IsFastCollaboartionBeforeViewModeInReview = function()
 {
 	return this.ViewModeInReview.isFastCollaboration;
 };
+CDocument.prototype.CheckComplexFieldsInSelection = function()
+{
 
+};
+CDocument.prototype.GetFieldsManager = function()
+{
+	return this.FieldsManager;
+};
 
 
 function TEST_ADDFIELD()

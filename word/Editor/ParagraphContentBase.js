@@ -212,6 +212,9 @@ CParagraphContentWithContentBase.prototype.CanSplit = function()
 {
 	return true;
 };
+CParagraphContentWithContentBase.prototype.PreDelete = function()
+{
+};
 /**
  * Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
  * @constructor
@@ -587,6 +590,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 };
 CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
+	for (var nIndex = Pos; nIndex < Pos + Count; ++nIndex)
+	{
+		this.Content[nIndex].PreDelete();
+	}
+
     this.Content.splice(Pos, Count);
     this.private_UpdateTrackRevisions();
 
@@ -2950,12 +2958,12 @@ CParagraphContentWithParagraphLikeContent.prototype.GetElementsCount = function(
 {
 	return this.Content.length;
 };
-CParagraphContentWithParagraphLikeContent.prototype.RegroupComplexFields = function(oRegroupManager)
+CParagraphContentWithParagraphLikeContent.prototype.PreDelete = function()
 {
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		if (this.Content[nIndex] && this.Content[nIndex].RegroupComplexFields)
-			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+		if (this.Content[nIndex] && this.Content[nIndex].PreDelete)
+			this.Content[nIndex].PreDelete();
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
