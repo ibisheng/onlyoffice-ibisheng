@@ -919,8 +919,7 @@
 				case 90:  // undo					Ctrl + z
 				case 192: // set general format 	Ctrl + Shift + ~
 					if (isViewerMode || t.isSelectionDialogMode) {
-						stop();
-						return result;
+						return true;
 					}
 
 				case 65: // select all      Ctrl + a
