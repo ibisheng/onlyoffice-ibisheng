@@ -986,7 +986,8 @@ var editor;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					nextPromise = AscCommon.getJSZip().loadAsync(data).then(function (zip) {
+					var jsZipWrapper = new AscCommon.JSZipWrapper();
+					nextPromise = jsZipWrapper.loadAsync(data).then(function (zip) {
 						return doc.openFromZip(zip);
 					}).then(function () {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1063,6 +1064,8 @@ var editor;
 						if (window.console && window.console.log) {
 							window.console.log(err);
 						}
+					}).then(function () {
+						jsZipWrapper.close();
 					});
 				} else {
 					if (err) {

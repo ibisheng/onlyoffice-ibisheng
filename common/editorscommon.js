@@ -156,6 +156,29 @@
 		return window['JSZip'] || require('jszip');
 	}
 
+	function JSZipWrapper() {
+		this.files = {};
+	}
+
+	JSZipWrapper.prototype.loadAsync = function(data, options) {
+		var t = this;
+		return AscCommon.getJSZip().loadAsync(data, options).then(function(zip){
+			for (var id in zip.files) {
+				t.files[id] = new JSZipObjectWrapper(zip.files[id]);
+			}
+			return t;
+		});
+	};
+	JSZipWrapper.prototype.close = function() {
+	};
+
+	function JSZipObjectWrapper(data) {
+		this.data = data;
+	}
+	JSZipObjectWrapper.prototype.async = function(type) {
+		return this.data.async(type);
+	};
+
 	function getBaseUrl()
 	{
 		var indexHtml = window["location"]["href"];
@@ -3121,6 +3144,7 @@
 	window["AscCommon"].getAltGr = getAltGr;
 	window["AscCommon"].getColorThemeByIndex = getColorThemeByIndex;
 
+	window["AscCommon"].JSZipWrapper = JSZipWrapper;
 	window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
 	window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;
 	window["AscCommon"].cBoolLocal = cBoolLocal;
