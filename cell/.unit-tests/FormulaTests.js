@@ -1238,6 +1238,41 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 15.20686, "F.INV.RT(A2,A3,A4)" );
 	} );
 
+	test( "Test: \"FTEST\"", function () {
+		ws.getRange2( "A2" ).setValue( "6" );
+		ws.getRange2( "A3" ).setValue( "7" );
+		ws.getRange2( "A4" ).setValue( "9" );
+		ws.getRange2( "A5" ).setValue( "15" );
+		ws.getRange2( "A6" ).setValue( "21" );
+
+		ws.getRange2( "B2" ).setValue( "20" );
+		ws.getRange2( "B3" ).setValue( "28" );
+		ws.getRange2( "B4" ).setValue( "31" );
+		ws.getRange2( "B5" ).setValue( "38" );
+		ws.getRange2( "B6" ).setValue( "40" );
+
+		oParser = new parserFormula( "FTEST(A2:A6,B2:B6)", "A1", ws );
+		ok( oParser.parse(), "FTEST(A2:A6,B2:B6)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.64831785, "FTEST(A2:A6,B2:B6)" );
+
+		oParser = new parserFormula( "FTEST(A2,B2:B6)", "A1", ws );
+		ok( oParser.parse(), "FTEST(A2,B2:B6)" );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!", "FTEST(A2,B2:B6)" );
+
+		oParser = new parserFormula( "FTEST(1,B2:B6)", "A1", ws );
+		ok( oParser.parse(), "FTEST(1,B2:B6)" );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!", "FTEST(1,B2:B6)" );
+
+		oParser = new parserFormula( "FTEST({1,2,3},{2,3,4,5})", "A1", ws );
+		ok( oParser.parse(), "FTEST({1,2,3},{2,3,4,5})" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.792636779, "FTEST({1,2,3},{2,3,4,5})" );
+
+		oParser = new parserFormula( "FTEST({1,\"test\",\"test\"},{2,3,4,5})", "A1", ws );
+		ok( oParser.parse(), "FTEST({1,\"test\",\"test\"},{2,3,4,5})" );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!", "FTEST({1,\"test\",\"test\"},{2,3,4,5})" );
+
+	} );
+
 	test( "Test: \"T.INV\"", function () {
 		oParser = new parserFormula( "T.INV(0.75,2)", "A1", ws );
 		ok( oParser.parse(), "T.INV(0.75,2)" );
