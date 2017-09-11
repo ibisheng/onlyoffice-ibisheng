@@ -794,15 +794,22 @@
 	function fTest(pMat1, pMat2){
 
 		var getMatrixValues = function(matrix){
-			var mfFirst = matrix[0][0].getValue();
-			var mfFirstSqr = matrix[0][0].getValue() * matrix[0][0].getValue();
+			var mfFirst = 1;
+			var mfFirstSqr = 1;
 			var mfRest = 0;
 			var mfRestSqr = 0;
 			var mnCount = 0;
+			var bFirst = false;
 			for (var i = 0; i < matrix.length; i++) {
 				for (var j = 0; j < matrix[i].length; j++) {
+					if(cElementType.number !== matrix[i][j].type){
+						continue;
+					}
 					mnCount++;
-					if (cElementType.number !== matrix[i][j].type || (i === 0 && j === i)) {
+					if (!bFirst) {
+						bFirst = true;
+						mfFirst = matrix[i][j].getValue();
+						mfFirstSqr = matrix[i][j].getValue() * matrix[i][j].getValue();
 						continue;
 					}
 
