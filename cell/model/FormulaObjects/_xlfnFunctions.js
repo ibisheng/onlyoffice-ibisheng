@@ -51,7 +51,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
+	cFormulaFunctionGroup['Statistical'].push(cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION);
@@ -59,7 +59,7 @@
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cF_TEST, cFORECAST_ETS,
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
 		cMUNIT);
 
@@ -74,18 +74,6 @@
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
 	cDBCS.prototype.constructor = cDBCS;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cF_TEST() {
-		cBaseFunction.call(this, "F.TEST");
-		this.isXLFN = true;
-	}
-
-	cF_TEST.prototype = Object.create(cBaseFunction.prototype);
-	cF_TEST.prototype.constructor = cF_TEST;
 
 	/**
 	 * @constructor
