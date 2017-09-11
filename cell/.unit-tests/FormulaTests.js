@@ -1238,7 +1238,7 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 15.20686, "F.INV.RT(A2,A3,A4)" );
 	} );
 
-	test( "Test: \"FTEST\"", function () {
+	function fTestFormulaTest(){
 		ws.getRange2( "A2" ).setValue( "6" );
 		ws.getRange2( "A3" ).setValue( "7" );
 		ws.getRange2( "A4" ).setValue( "9" );
@@ -1270,7 +1270,13 @@ $( function () {
 		oParser = new parserFormula( "FTEST({1,\"test\",\"test\"},{2,3,4,5})", "A1", ws );
 		ok( oParser.parse(), "FTEST({1,\"test\",\"test\"},{2,3,4,5})" );
 		strictEqual( oParser.calculate().getValue(), "#DIV/0!", "FTEST({1,\"test\",\"test\"},{2,3,4,5})" );
+    }
+	test( "Test: \"FTEST\"", function () {
+		fTestFormulaTest();
+	} );
 
+	test( "Test: \"F.TEST\"", function () {
+		fTestFormulaTest();
 	} );
 
 	test( "Test: \"T.INV\"", function () {
