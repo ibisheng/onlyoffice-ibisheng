@@ -1092,11 +1092,11 @@ CDocumentRecalcInfo.prototype =
 
 function CDocumentFieldsManager()
 {
-    this.m_aFields = [];
+	this.m_aFields = [];
 
-    this.m_oMailMergeFields = {};
+	this.m_oMailMergeFields = {};
 
-    this.m_aComplexFields            = [];
+	this.m_aComplexFields = [];
 }
 
 CDocumentFieldsManager.prototype.Register_Field = function(oField)
@@ -1232,10 +1232,6 @@ CDocumentFieldsManager.prototype.GetAllFieldsByType = function(nType)
 		}
 	}
 	return arrFields;
-};
-CDocumentFieldsManager.prototype.ResetComplexFields = function()
-{
-	this.m_aComplexFields = [];
 };
 CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
 {
@@ -15601,11 +15597,29 @@ CDocument.prototype.IsFastCollaboartionBeforeViewModeInReview = function()
 };
 CDocument.prototype.CheckComplexFieldsInSelection = function()
 {
-
+	// Смотрим сколько полей открытых в начальной и конечной позициях.
 };
 CDocument.prototype.GetFieldsManager = function()
 {
 	return this.FieldsManager;
+};
+CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
+{
+	if (!oDocPos)
+		return [];
+
+	var oCurrentDocPos = this.GetContentPosition(false);
+	this.SetContentPosition(oDocPos, 0, 0);
+
+	var oCurrentParagraph = this.controller_GetCurrentParagraph();
+	if (!oCurrentParagraph)
+		return [];
+
+	var arrComplexFields = oCurrentParagraph.GetCurrentComplexFields();
+
+	console.log(arrComplexFields);
+
+	this.SetContentPosition(oCurrentDocPos, 0, 0);
 };
 
 

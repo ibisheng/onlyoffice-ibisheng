@@ -12308,13 +12308,24 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 };
 Paragraph.prototype.GetCurrentComplexFields = function()
 {
-	var oParaPos = this.Get_ParaContentPos(this.Selection.Use, false, false);
-	if (!oParaPos)
-		return [];
+	var oInfo = this.GetEndInfoByPage(-1);
 
-	var oRun = this.Get_ClassesByPos(oParaPos);
-	if (!oRun || !(oRun instanceof ParaRun))
-		return [];
+	var arrComplexFields = [];
+	for (var nIndex = 0, nCount = oInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = oInfo.ComplexFields[nIndex].ComplexField;
+		if (oComplexField.IsUse())
+			arrComplexFields.push(oComplexField);
+	}
+
+	var nEndPos = Math.min(this.CurPos.ContentPos, this.Content.length - 1);
+	for (var nIndex = 0; nIndex <= nEndPos; ++nIndex)
+	{
+		if (this.Content[nIndex].GetCurrentComplexFields)
+			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, nIndex === nEndPos);
+	}
+
+	return arrComplexFields;
 };
 
 var pararecalc_0_All  = 0;

@@ -9349,9 +9349,33 @@ ParaRun.prototype.GetLineByPosition = function(nPos)
 
 	return this.StartLine;
 };
-
+/**
+ * Данная функция вызывается перед удалением данного рана из родительского класса.
+ */
 ParaRun.prototype.PreDelete = function()
 {
+};
+ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent)
+{
+	var nEndPos = isCurrent ? this.State.ContentPos : this.Content.length;
+	for (var nPos = 0; nPos < nEndPos; ++nPos)
+	{
+		var oItem = this.Content[nPos];
+		if (oItem.Type !== para_FieldChar)
+			continue;
+
+		if (oItem.IsBegin())
+		{
+			arrComplexFields.push(oItem.GetComplexField());
+		}
+		else if (oItem.IsEnd())
+		{
+			if (arrComplexFields.length > 0)
+			{
+				arrComplexFields.splice(arrComplexFields.length - 1, 1);
+			}
+		}
+	}
 };
 
 function CParaRunStartState(Run)
