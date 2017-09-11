@@ -791,6 +791,73 @@
 		return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 	}
 
+	function fTest(pMat1, pMat2){
+		var mfFirst1 = pMat1[0][0].getValue();
+		var mfFirstSqr1 = pMat1[0][0].getValue() * pMat1[0][0].getValue();
+		var mfRest1 = 0;
+		var mfRestSqr1 = 0;
+		var mnCount1 = 0;
+		for (var i = 0; i < pMat1.length; i++) {
+			for (var j = 0; j < pMat1[i].length; j++) {
+				mnCount1++;
+				if (cElementType.number !== pMat1[i][j].type || (i === 0 && j === i)) {
+					continue;
+				}
+
+				mfRest1 += pMat1[i][j].getValue();
+				mfRestSqr1 += pMat1[i][j].getValue() * pMat1[i][j].getValue();
+			}
+		}
+		var fSum1 = mfFirst1 + mfRest1;
+		var fSumSqr1 = mfFirstSqr1 + mfRestSqr1;
+		var fCount1 = mnCount1;
+
+		var mfFirst2 = pMat2[0][0].getValue();
+		var mfFirstSqr2 = pMat2[0][0].getValue() * pMat2[0][0].getValue();
+		var mfRest2 = 0;
+		var mfRestSqr2 = 0;
+		var mnCount2 = 0;
+		for (var i = 0; i < pMat2.length; i++) {
+			for (var j = 0; j < pMat2[i].length; j++) {
+				mnCount2++;
+				if (cElementType.number !== pMat2[i][j].type || (i === 0 && j === i)) {
+					continue;
+				}
+
+				mfRest2 += pMat2[i][j].getValue();
+				mfRestSqr2 += pMat2[i][j].getValue() * pMat2[i][j].getValue();
+			}
+		}
+		var fSum2 = mfFirst2 + mfRest2;
+		var fSumSqr2 = mfFirstSqr2 + mfRestSqr2;
+		var fCount2 = mnCount2;
+
+		if (fCount1 < 2.0 || fCount2 < 2.0) {
+			return new cError(cErrorType.wrong_value_type);
+		}
+		var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0);
+		var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0);
+		if (fS1 === 0.0 || fS2 === 0.0) {
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		var fF, fF1, fF2;
+		if (fS1 > fS2) {
+			fF = fS1 / fS2;
+			fF1 = fCount1 - 1.0;
+			fF2 = fCount2 - 1.0;
+		} else {
+			fF = fS2 / fS1;
+			fF1 = fCount2 - 1.0;
+			fF2 = fCount1 - 1.0;
+		}
+
+		var fFcdf = getFDist(fF, fF1, fF2);
+		var res = 2.0 * Math.min(fFcdf, 1.0 - fFcdf);
+
+		return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+	}
+
 	function CalculateTest( bTemplin, nC1, nC2, nR1, nR2, pMat1, pMat2 , fT, fF)
 	{
 		var fCount1  = 0.0;
@@ -5172,11 +5239,34 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFTEST() {
-		cBaseFunction.call(this, "FTEST");
+		this.name = "FTEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
 	cFTEST.prototype.constructor = cFTEST;
+	cFTEST.prototype.argumentsMin = 2;
+	cFTEST.prototype.argumentsMax = 2;
+	cFTEST.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFTest = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+
+			return fTest(arg0, arg1);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFTest);
+	};
 
 	/**
 	 * @constructor
