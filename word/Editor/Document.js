@@ -6934,6 +6934,25 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
+	else if (e.KeyCode === 112 && true === e.CtrlKey)
+	{
+		// TODO: Добавлено для теста
+
+		this.Create_NewHistoryPoint();
+		this.AddField(fieldtype_PAGENUM);
+		this.Recalculate();
+
+		bRetValue = keydownresult_PreventAll;
+	}
+    else if (e.KeyCode === 113 && true === e.CtrlKey)
+	{
+		// TODO: Добавлено для теста
+		var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
+		if (arrFields && arrFields.length > 0)
+			this.UpdateComplexField(arrFields[arrFields.length - 1]);
+
+		bRetValue = keydownresult_PreventAll;
+	}
 	else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -15565,11 +15584,11 @@ CDocument.prototype.AddField = function(nType, oPr)
 			return false;
 
 		var oRun = new ParaRun();
-		oRun.Add_ToContent(0, new ParaFieldChar(fldchartype_Begin));
+		oRun.Add_ToContent(0, new ParaFieldChar(fldchartype_Begin, this));
 		oRun.Add_ToContent(1, new ParaInstrText(fieldtype_PAGENUM, oPr));
-		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate));
+		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate, this));
 		oRun.Add_ToContent(3, new ParaText("1"));
-		oRun.Add_ToContent(4, new ParaFieldChar(fldchartype_End));
+		oRun.Add_ToContent(4, new ParaFieldChar(fldchartype_End, this));
 		oParagraph.Add(oRun);
 		return true;
 	}
@@ -15616,21 +15635,10 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 		return [];
 
 	var arrComplexFields = oCurrentParagraph.GetCurrentComplexFields();
-
-	console.log(arrComplexFields);
-
 	this.SetContentPosition(oCurrentDocPos, 0, 0);
+
+	return arrComplexFields;
 };
-
-
-function TEST_ADDFIELD()
-{
-	var oDocument = editor.WordControl.m_oLogicDocument;
-
-	oDocument.Create_NewHistoryPoint();
-	oDocument.AddField(fieldtype_PAGENUM);
-	oDocument.Recalculate();
-}
 
 function CDocumentSelectionState()
 {

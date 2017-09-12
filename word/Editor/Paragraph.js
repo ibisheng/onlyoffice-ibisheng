@@ -12308,14 +12308,17 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 };
 Paragraph.prototype.GetCurrentComplexFields = function()
 {
-	var oInfo = this.GetEndInfoByPage(-1);
-
 	var arrComplexFields = [];
-	for (var nIndex = 0, nCount = oInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
+
+	var oInfo = this.GetEndInfoByPage(-1);
+	if (oInfo)
 	{
-		var oComplexField = oInfo.ComplexFields[nIndex].ComplexField;
-		if (oComplexField.IsUse())
-			arrComplexFields.push(oComplexField);
+		for (var nIndex = 0, nCount = oInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
+		{
+			var oComplexField = oInfo.ComplexFields[nIndex].ComplexField;
+			if (oComplexField.IsUse())
+				arrComplexFields.push(oComplexField);
+		}
 	}
 
 	var nEndPos = Math.min(this.CurPos.ContentPos, this.Content.length - 1);

@@ -41,14 +41,15 @@ var fldchartype_Begin    = 0;
 var fldchartype_Separate = 1;
 var fldchartype_End      = 2;
 
-function ParaFieldChar(Type)
+function ParaFieldChar(Type, LogicDocument)
 {
 	CRunElementBase.call(this);
 
-	this.Use          = true;
-	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
-	this.ComplexField = (this.CharType === fldchartype_Begin) ? new CComplexField() : null;
-	this.Run          = null;
+	this.LogicDocument = LogicDocument;
+	this.Use           = true;
+	this.CharType      = undefined === Type ? fldchartype_Begin : Type;
+	this.ComplexField  = (this.CharType === fldchartype_Begin) ? new CComplexField(LogicDocument) : null;
+	this.Run           = null;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
@@ -98,6 +99,9 @@ ParaFieldChar.prototype.Read_FromBinary = function(Reader)
 {
 	// Long : CharType
 	this.CharType = Reader.GetLong();
+
+	this.LogicDocument = editor.WordControl.m_oLogicDocument;
+	this.ComplexField  = (this.CharType === fldchartype_Begin) ? new CComplexField(this.LogicDocument) : null;
 };
 ParaFieldChar.prototype.SetRun = function(oRun)
 {
