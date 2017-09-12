@@ -174,7 +174,10 @@
 
 				if (null != retFiles)
 				{
-					t.files = retFiles;
+					for (var id in retFiles) {
+						t.files[id] = new JSZipObjectWrapper(retFiles[id]);
+					}
+
 					resolve(t);
 				}
 				else
@@ -182,11 +185,6 @@
 					reject(new Error("Failed archive"));
 				}
 
-			}).then(function(zip) {
-				for (var id in zip.files) {
-					t.files[id] = new JSZipObjectWrapper(zip.files[id]);
-				}
-				return t;
 			});
 		}
 
@@ -199,7 +197,7 @@
 	};
 	JSZipWrapper.prototype.close = function() {
 		if (window["native"])
-			window["native"]["ZipClose"];
+			window["native"]["ZipClose"]();
 	};
 
 	function JSZipObjectWrapper(data) {
