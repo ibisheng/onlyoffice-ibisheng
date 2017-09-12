@@ -1380,6 +1380,303 @@
 		return matrix;
 	}
 
+	/*function forEachMatrixElem(matrix, func){
+		for(var i = 0; i < matrix.length; i++){
+			for(var j = 0; j < matrix[i].length; j++){
+
+			}
+		}
+	}*/
+
+	function GetNewMat(c, r){
+		var matrix = [];
+		for(var i = 0; i < c; i++){
+			for(var j = 0; j < r; j++){
+				if(!matrix[i]){
+					matrix[i] = [];
+				}
+
+				matrix[i][j] = 0;
+			}
+		}
+		return matrix;
+	}
+
+	function matrixClone(matrix){
+		var cloneMatrix = [];
+		for(var i = 0; i < matrix.length; i++){
+			for(var j = 0; j < matrix[i].length; j++){
+				if(!cloneMatrix[i]){
+					cloneMatrix[i] = [];
+				}
+
+				cloneMatrix[i][j] = matrix[i][j];
+			}
+		}
+		return cloneMatrix;
+	}
+
+	function CheckMatrix(_bLOG, pMatX, pMatY) {
+		var nCX = 0;
+		var nCY = 0;
+		var nRX = 0;
+		var nRY = 0;
+		var M = 0;
+		var N = 0;
+		var nCase;
+
+		var nCY = pMatY.length;
+		var nRY = pMatY[0].length;
+		var nCountY = nCY * nRY;
+		for (var i = 0; i < pMatY.length; i++) {
+			for (var j = 0; j < pMatY[i].length; j++) {
+				if (!pMatY[i][j])//!pMatY->IsValue(i)
+				{
+					//PushIllegalArgument();
+					return false;
+				}
+			}
+		}
+
+		if (_bLOG) {
+			var pNewY = matrixClone(pMatY);
+
+			for (var i = 0; i < pMatY.length; i++) {
+				for (var j = 0; j < pMatY[i].length; j++) {
+					var fVal = pNewY[i][j];
+					if (fVal <= 0.0) {
+						//PushIllegalArgument();
+						return false;
+					} else {
+						pNewY[i][j] = new cNumber(Math.log(fVal));
+					}
+				}
+			}
+			pMatY = pNewY;
+		}
+
+		if (pMatX) {
+			nCX = pMatX.length;
+			nRX = pMatX[0].length;
+			var nCountX = nCX * nRX;
+			for (var i = 0; i < pMatX.length; i++) {
+				for (var j = 0; j < pMatX[i].length; j++) {
+					if (!pMatX[i][j])//!pMatX->IsValue(i)
+					{
+						//PushIllegalArgument();
+						return false;
+					}
+				}
+			}
+
+			if (nCX === nCY && nRX === nRY) {
+				nCase = 1;                  // simple regression
+				M = 1;
+				N = nCountY;
+			} else if (nCY !== 1 && nRY !== 1) {
+				//PushIllegalArgument();
+				return false;
+			} else if (nCY === 1) {
+				if (nRX !== nRY) {
+					//PushIllegalArgument();
+					return false;
+				} else {
+					nCase = 2;              // Y is column
+					N = nRY;
+					M = nCX;
+				}
+			} else if (nCX !== nCY) {
+				//PushIllegalArgument();
+				return false;
+			} else {
+				nCase = 3;                  // Y is row
+				N = nCY;
+				M = nRX;
+			}
+		} else {
+			pMatX = GetNewMat(nCY, nRY);
+			nCX = nCY;
+			nRX = nRY;
+			if (!pMatX) {
+				//PushIllegalArgument();
+				return false;
+			}
+			/*for ( SCSIZE i = 1; i <= nCountY; i++ )
+			 pMatX->PutDouble(static_cast<double>(i), i-1);*/
+			nCase = 1;
+			N = nCountY;
+			M = 1;
+		}
+
+		return {nCase: nCase, nCX: nCX, nCY: nCY, nRX: nRX, nRY: nRY, M: M, N: N, pMatX: pMatX, pMatY: pMatY};
+	}
+
+	function lcl_GetMeanOverAll(pMat, nN) {
+		var fSum = 0.0;
+		for (var i = 0; i < pMat.length; i++) {
+			for (var j = 0; j < pMat[i].length; j++) {
+				fSum += pMat[i][j].getValue();
+			}
+		}
+
+		return fSum / nN;
+	}
+
+	function lcl_GetSumProduct(pMatA, pMatB, nM) {
+		var fSum = 0.0;
+		for (var i = 0; i < pMatA.length; i++) {
+			for (var j = 0; j < pMatA[i].length; j++) {
+				fSum += pMatA[i][j] * pMatB[i][j];
+			}
+		}
+		return fSum;
+	}
+
+	function approxSub(a, b) {
+		if (((a < 0.0 && b < 0.0) || (a > 0.0 && b > 0.0)) && Math.abs(a - b) < 2.22045e-016) {
+			return 0.0;
+		}
+		return a - b;
+	}
+
+
+	function lcl_CalculateColumnMeans(pX, pResMat, nC, nR) {
+		for (var i = 0; i < nC; i++) {
+			var fSum = 0.0;
+			for (var k = 0; k < nR; k++) {
+				fSum += pX[i][k].getValue();// GetDouble(Column,Row)
+				pResMat[i][k] = fSum / nR;
+			}
+		}
+	}
+
+	function lcl_CalculateColumnsDelta(pMat, pColumnMeans, nC, nR) {
+		for (var i = 0; i < nC; i++) {
+			for (var k = 0; k < nR; k++) {
+				pMat[i][k] = approxSub(pMat[i][k], pColumnMeans[i]);
+			}
+		}
+	}
+
+	function CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant, _bGrowth) {
+		var getMatrixParams = CheckMatrix(_bGrowth, pMatX, pMatY);
+		if (!getMatrixParams) {
+			return;
+		}
+
+		// 1 = simple; 2 = multiple with Y as column; 3 = multiple with Y as row
+		var nCase = getMatrixParams.nCase;
+		var nCX = getMatrixParams.nCX, nCY = getMatrixParams.nCY; // number of columns
+		var nRX = getMatrixParams.nRX, nRY = getMatrixParams.nRY; //number of rows
+		var K = getMatrixParams.M, N = getMatrixParams.N; // K=number of variables X, N=number of data samples
+		pMatX = getMatrixParams.pMatX, pMatY = getMatrixParams.pMatY;
+
+		// Enough data samples?
+		if ((bConstant && (N < K + 1)) || (!bConstant && (N < K)) || (N < 1) || (K < 1)) {
+			return;
+		}
+
+		// Set default pMatNewX if necessary
+		var nCXN, nRXN;
+		var nCountXN;
+		if (!pMatNewX) {
+			nCXN = nCX;
+			nRXN = nRX;
+			nCountXN = nCXN * nRXN;
+			pMatNewX = matrixClone(pMatX); // pMatX will be changed to X-meanX
+		} else {
+			nCXN = pMatNewX.length;
+			nRXN = pMatNewX[0].length;
+			if ((nCase === 2 && K !== nCXN) || (nCase === 3 && K !== nRXN)) {
+				return;
+			}
+			nCountXN = nCXN * nRXN;
+			for (var i = 0; i < nCountXN; i++) {
+				/*if (!pMatNewX->IsValue(i))
+				 {
+				 PushIllegalArgument();
+				 return;
+				 }*/
+			}
+		}
+
+		var pResMat; // size depends on nCase
+		if (nCase === 1) {
+			pResMat = GetNewMat(nCXN, nRXN);
+		} else {
+			if (nCase === 2) {
+				pResMat = GetNewMat(1, nRXN);
+			} else {
+				pResMat = GetNewMat(nCXN, 1);
+			}
+		}
+		if (!pResMat) {
+			//PushError(FormulaError::CodeOverflow);
+			return;
+		}
+
+		// Uses sum(x-MeanX)^2 and not [sum x^2]-N * MeanX^2 in case bConstant.
+		// Clone constant matrices, so that Mat = Mat - Mean is possible.
+		var fMeanY = 0.0;
+		if (bConstant) {
+			var pCopyX = matrixClone(pMatX);
+			var pCopyY = matrixClone(pMatY);
+			if (!pCopyX || !pCopyY) {
+				//PushError(FormulaError::MatrixSize);
+				return;
+			}
+			pMatX = pCopyX;
+			pMatY = pCopyY;
+			// DeltaY is possible here; DeltaX depends on nCase, so later
+			fMeanY = lcl_GetMeanOverAll(pMatY, N);
+			for (var i = 0; i < pMatY.length; i++) {
+				for (var j = 0; j < pMatY[i].length; j++) {
+					pMatY[i][j] = approxSub(pMatY[i][j].getValue(), fMeanY);
+				}
+			}
+		}
+
+		if (nCase === 1) {
+			// calculate simple regression
+			var fMeanX = 0.0;
+			if (bConstant) {   // Mat = Mat - Mean
+				fMeanX = lcl_GetMeanOverAll(pMatX, N);
+				for (var i = 0; i < pMatX.length; i++) {
+					for (var j = 0; j < pMatX[i].length; j++) {
+						pMatX[i][j] = approxSub(pMatX[i][j].getValue(), fMeanX);
+					}
+				}
+			}
+			var fSumXY = lcl_GetSumProduct(pMatX, pMatY, N);
+			var fSumX2 = lcl_GetSumProduct(pMatX, pMatX, N);
+			if (fSumX2 === 0.0) {
+				//PushNoValue(); // all x-values are identical
+				return;
+			}
+			var fSlope = fSumXY / fSumX2;
+			var fHelp;
+			if (bConstant) {
+				var fIntercept = fMeanY - fSlope * fMeanX;
+				for (var i = 0; i < pResMat.length; i++) {
+					for (var j = 0; j < pResMat[i].length; j++) {
+						fHelp = pMatNewX[i][j] * fSlope + fIntercept;
+						pResMat[i][j] = _bGrowth ? Math.exp(fHelp) : fHelp;
+					}
+				}
+			} else {
+				for (var i = 0; i < pResMat.length; i++) {
+					for (var j = 0; j < pResMat[i].length; j++) {
+						fHelp = pMatNewX[i][j] * fSlope;
+						pResMat[i][j] = _bGrowth ? Math.exp(fHelp) : fHelp;
+					}
+				}
+			}
+		}
+		//TODO ELSE
+
+		return pResMat;
+	}
+
 	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
 		this.fp = fp;
 		this.fAlpha = fAlpha;
@@ -5644,11 +5941,25 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGROWTH() {
-		cBaseFunction.call(this, "GROWTH");
+		this.name = "GROWTH";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cGROWTH.prototype = Object.create(cBaseFunction.prototype);
 	cGROWTH.prototype.constructor = cGROWTH;
+	cGROWTH.prototype.argumentsMin = 1;
+	cGROWTH.prototype.argumentsMax = 4;
+	/*cGROWTH.prototype.Calculate = function (arg) {
+
+		var pMatY = arg[0].getMatrix();
+		var pMatX = arg[1].getMatrix();
+		var pMatNewX = arg[2] ? arg[2] : null;
+		var bConstant = undefined !== arg[3] ? arg[3] : true;
+		var res = CalculateTrendGrowth( pMatY, pMatX, pMatNewX, bConstant, true);
+
+		return new cNumber(res[0][0]);
+	};*/
 
 	/**
 	 * @constructor
