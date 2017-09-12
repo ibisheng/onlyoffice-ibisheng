@@ -167,7 +167,7 @@
 			return new Promise(function(resolve, reject) {
 
 				var retFiles = null;
-				if (options["base64"] === true)
+				if (options && options["base64"] === true)
 					retFiles = window["native"]["ZipOpenBase64"](data);
 				else
 					retFiles = window["native"]["ZipOpen"](data);
