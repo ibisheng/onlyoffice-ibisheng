@@ -206,9 +206,11 @@
 	JSZipObjectWrapper.prototype.async = function(type) {
 
 		if (window["native"]) {
+			var t = this;
+
 			return new Promise(function(resolve, reject) {
 
-				var ret = window["native"]["ZipFileAsString"](type);
+				var ret = window["native"]["ZipFileAsString"](t.data);
 
 				if (null != ret)
 				{
