@@ -878,7 +878,7 @@
 			if (sheetArea) {
 				sheetArea.union3(col, row);
 			} else {
-				this.cleanCellCache[sheetId] = Asc.Range(col, row, col, row);
+				this.cleanCellCache[sheetId] = new Asc.Range(col, row, col, row);
 			}
 		},
 		notifyChanged: function(changedFormulas) {
@@ -10524,8 +10524,30 @@
 		this.hiddenRowsSum = [];
 		this.hiddenColsSum = [];
 		this.dirty = true;
+		this.recalcHiddenRows = [];
+		this.recalcHiddenCols = [];
 	}
 
+	HiddenManager.prototype.addHidden = function (isRow, index) {
+		(isRow ? this.recalcHiddenRows : this.recalcHiddenCols).push(index);
+		this.setDirty(true);
+	};
+	HiddenManager.prototype.getRecalcHidden = function () {
+		var res = [];
+		this.recalcHiddenRows.filter(function (value, index, self) {
+			if (AscCommon.fOnlyUnique(value, index, self)) {
+				res.push(new Asc.Range(0, value, gc_nMaxCol0, value));
+			}
+		});
+		this.recalcHiddenCols.filter(function (value, index, self) {
+			if (AscCommon.fOnlyUnique(value, index, self)) {
+				res.push(new Asc.Range(value, 0, value, gc_nMaxRow0));
+			}
+		});
+		this.recalcHiddenRows = [];
+		this.recalcHiddenCols = [];
+		return res;
+	};
 	HiddenManager.prototype.setDirty = function(val) {
 		this.dirty = val;
 	};

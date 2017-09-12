@@ -10299,6 +10299,8 @@
 			t._cleanCellsTextMetricsCache();
 			t._prepareCellTextMetricsCache();
 
+			arrChangedRanges = arrChangedRanges.concat(t.model.hiddenManager.getRecalcHidden());
+
 			if (t.objectRender) {
 				if (reinitRanges && t.objectRender.drawingArea) {
 					t.objectRender.drawingArea.reinitRanges();
@@ -10341,22 +10343,20 @@
 				break;
 			case "showCols":
 				functionModelAction = function () {
-					t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
+					t.model.setColHidden(false, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
 				};
-				arrChangedRanges.push(new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "hideCols":
 				functionModelAction = function () {
-					t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
+					t.model.setColHidden(true, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
 				};
-				arrChangedRanges.push(new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "rowHeight":
@@ -10373,24 +10373,22 @@
 				return this._isLockedAll(onChangeWorksheetCallback);
 			case "showRows":
 				functionModelAction = function () {
-					t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
+					t.model.setRowHidden(false, arn.r1, arn.r2);
 					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
 				};
-				arrChangedRanges.push(new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "hideRows":
 				functionModelAction = function () {
-					t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
+					t.model.setRowHidden(true, arn.r1, arn.r2);
 					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
 				};
-				arrChangedRanges.push(new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "insCell":
@@ -11762,6 +11760,8 @@
         if (!lockDraw) {
             this._updateSelectionNameAndInfo();
         }
+
+		arrChanged = arrChanged.concat(this.model.hiddenManager.getRecalcHidden());
 
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);

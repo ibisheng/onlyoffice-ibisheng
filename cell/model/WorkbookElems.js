@@ -3390,7 +3390,7 @@ Col.prototype =
 	setHidden: function(val) {
 		this.hd = val;
 		if (this.index >= 0) {
-			this.ws.hiddenManager.setDirty(true);
+			this.ws.hiddenManager.addHidden(false, this.index);
 		}
 	},
 	getHidden: function() {
@@ -3700,7 +3700,7 @@ Row.prototype =
 		}
 		this._hasChanged = true;
 		if (this.index >= 0) {
-			this.ws.hiddenManager.setDirty(true);
+			this.ws.hiddenManager.addHidden(true, this.index);
 		}
 	},
 	getHidden: function() {
