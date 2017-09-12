@@ -267,6 +267,44 @@ CComplexField.prototype.IsUse = function()
 
 	return this.BeginChar.IsUse();
 };
+CComplexField.prototype.GetStartDocumentPosition = function()
+{
+	if (!this.BeginChar)
+		return null;
+
+	var oDocument = this.LogicDocument;
+	var oState    = oDocument.SaveDocumentState();
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oDocPos = oDocument.GetContentPosition(false);
+
+	oDocument.LoadDocumentState(oState);
+
+	return oDocPos;
+};
+CComplexField.prototype.GetEndDocumentPosition = function()
+{
+	if (!this.EndChar)
+		return null;
+
+	var oDocument = this.LogicDocument;
+	var oState    = oDocument.SaveDocumentState();
+
+	var oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+	var oDocPos = oDocument.GetContentPosition(false);
+
+	oDocument.LoadDocumentState(oState);
+
+	return oDocPos;
+};
+CComplexField.prototype.IsValid = function()
+{
+	return this.IsUse() && this.BeginChar && this.SeparateChar && this.EndChar;
+};
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)
 {

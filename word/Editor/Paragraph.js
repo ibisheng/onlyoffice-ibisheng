@@ -7186,7 +7186,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 	var NumPr_old = this.Numbering_Get();
 
 	var SelectionUse       = this.IsSelectionUse();
-	var SelectedOneElement = (this.Parent.GetSelectDirection() === 0 ? true : false );
+	var SelectedOneElement = this.Parent.IsSelectedSingleElement();
 
 	// Когда выделено больше 1 параграфа, нумерация не добавляется к пустым параграфам.
 	if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty())
@@ -9944,7 +9944,7 @@ Paragraph.prototype.Split_DropCap = function(NewParagraph)
 	// конца выделения, кроме этого в буквицу добавляем все табы идущие в начале.
 
 	var DropCapText = new CParagraphGetDropCapText();
-	if (true == this.Selection.Use && 0 === this.Parent.GetSelectDirection())
+	if (true == this.Selection.Use && this.Parent.IsSelectedSingleElement())
 	{
 		var SelSP = this.Get_ParaContentPos(true, true);
 		var SelEP = this.Get_ParaContentPos(true, false);

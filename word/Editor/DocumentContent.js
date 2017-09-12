@@ -525,15 +525,6 @@ CDocumentContent.prototype.Is_DrawingShape = function(bRetShape)
 	else
 		return (bRetShape ? null : false);
 };
-// Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать
-// происходил ли выделение в пределах одного элеменета.
-CDocumentContent.prototype.GetSelectDirection = function()
-{
-	if (true === this.Selection.Use && this.CurPos.Type === docpostype_Content && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
-		return 0;
-
-	return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
-};
 CDocumentContent.prototype.IsMovingTableBorder = function()
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)

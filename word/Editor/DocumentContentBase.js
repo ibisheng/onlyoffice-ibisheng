@@ -872,3 +872,12 @@ CDocumentContentBase.prototype.FindNextFillingForm = function(isNext, isCurrent,
 
 	return null;
 };
+/**
+ * Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать происходил ли выделение в
+ * пределах одного элеменета.
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsSelectedSingleElement = function()
+{
+	return (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
+};

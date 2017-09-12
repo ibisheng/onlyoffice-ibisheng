@@ -5507,16 +5507,26 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
     }
 };
 /**
- * Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать происходил ли выделение в
- * пределах одного элеменета.
- * @returns {number} Возвращается направление селекта. 0 - если выделен 1 элемент.
+ * Получаем направление селекта
+ * @returns {number} Возвращается направление селекта. 1 - нормальное направление, -1 - обратное
  */
 CDocument.prototype.GetSelectDirection = function()
 {
-	if (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
-		return 0;
+	var oStartPos = this.GetContentPosition(true, true);
+	var oEndPos   = this.GetContentPosition(true, false);
 
-	return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
+	for (var nPos = 0, nLen = Math.min(oStartPos.length, oEndPos.length); nPos < nLen; ++nPos)
+	{
+		if (!oEndPos[nPos] || !oStartPos[nPos] || oStartPos[nPos].Class !== oEndPos[nPos].Class)
+			return 1;
+
+		if (oStartPos[nPos].Position < oEndPos[nPos].Position)
+			return 1;
+		else if (oStartPos[nPos].Position > oEndPos[nPos].Position)
+			return -1;
+	}
+
+	return 1;
 };
 CDocument.prototype.IsMovingTableBorder = function()
 {
@@ -7357,6 +7367,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 		this.CurPage         = PageIndex;
 		this.Selection.Start = false;
 		this.Selection_SetEnd(X, Y, e);
+		this.CheckComplexFieldsInSelection();
 		this.Document_UpdateSelectionState();
 
 		if (c_oAscFormatPainterState.kOff !== editor.isPaintFormat)
@@ -10201,6 +10212,14 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 			Table.SelectTable(c_oAscTableSelectionType.Cell);
 		}
 	}
+};
+CDocument.prototype.SaveDocumentState = function()
+{
+	return this.Save_DocumentStateBeforeLoadChanges();
+};
+CDocument.prototype.LoadDocumentState = function(oState)
+{
+	return this.Load_DocumentStateAfterLoadChanges(oState);
 };
 CDocument.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
@@ -15616,7 +15635,73 @@ CDocument.prototype.IsFastCollaboartionBeforeViewModeInReview = function()
 };
 CDocument.prototype.CheckComplexFieldsInSelection = function()
 {
+	if (true !== this.Selection.Use)
+		return;
+
 	// Смотрим сколько полей открытых в начальной и конечной позициях.
+	var oStartPos = this.GetContentPosition(true, true);
+	var oEndPos   = this.GetContentPosition(true, false);
+
+	var arrStartComplexFields = this.GetComplexFieldsByContentPos(oStartPos);
+	var arrEndComplexFields   = this.GetComplexFieldsByContentPos(oEndPos);
+
+	var arrStartFields = [];
+	for (var nIndex = 0, nCount = arrStartComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var bAdd = true;
+		for (var nIndex2 = 0, nCount2 = arrEndComplexFields.length; nIndex2 < nCount2; ++nIndex2)
+		{
+			if (arrStartComplexFields[nIndex] === arrEndComplexFields[nIndex2])
+			{
+				bAdd = false;
+				break;
+			}
+		}
+
+		if (bAdd)
+		{
+			arrStartFields.push(arrStartComplexFields[nIndex]);
+		}
+	}
+
+	var arrEndFields = [];
+	for (var nIndex = 0, nCount = arrEndComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var bAdd = true;
+		for (var nIndex2 = 0, nCount2 = arrStartComplexFields.length; nIndex2 < nCount2; ++nIndex2)
+		{
+			if (arrEndComplexFields[nIndex] === arrStartComplexFields[nIndex2])
+			{
+				bAdd = false;
+				break;
+			}
+		}
+
+		if (bAdd)
+		{
+			arrEndFields.push(arrEndComplexFields[nIndex]);
+		}
+	}
+
+	var nDirection = this.GetSelectDirection();
+	if (nDirection > 0)
+	{
+		if (arrStartFields.length > 0 && arrStartFields[0].IsValid())
+			oStartPos = arrStartFields[0].GetStartDocumentPosition();
+
+		if (arrEndFields.length > 0 && arrEndFields[0].IsValid())
+			oEndPos = arrEndFields[0].GetEndDocumentPosition();
+	}
+	else
+	{
+		if (arrStartFields.length > 0 && arrStartFields[0].IsValid())
+			oStartPos = arrStartFields[0].GetEndDocumentPosition();
+
+		if (arrEndFields.length > 0 && arrEndFields[0].IsValid())
+			oEndPos = arrEndFields[0].GetStartDocumentPosition();
+	}
+
+	this.SetContentSelection(oStartPos, oEndPos, 0, 0, 0);
 };
 CDocument.prototype.GetFieldsManager = function()
 {
