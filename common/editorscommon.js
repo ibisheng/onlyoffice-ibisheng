@@ -162,6 +162,34 @@
 
 	JSZipWrapper.prototype.loadAsync = function(data, options) {
 		var t = this;
+
+		if (window["native"]) {
+			return new Promise(function(resolve, reject) {
+
+				var retFiles = null;
+				if (options["base64"] === true)
+					retFiles = window["native"]["ZipOpenBase64"](data);
+				else
+					retFiles = window["native"]["ZipOpen"](data);
+
+				if (null != retFiles)
+				{
+					t.files = retFiles;
+					resolve(t);
+				}
+				else
+				{
+					reject(new Error("Failed archive"));
+				}
+
+			}).then(function(zip) {
+				for (var id in zip.files) {
+					t.files[id] = new JSZipObjectWrapper(zip.files[id]);
+				}
+				return t;
+			});
+		}
+
 		return AscCommon.getJSZip().loadAsync(data, options).then(function(zip){
 			for (var id in zip.files) {
 				t.files[id] = new JSZipObjectWrapper(zip.files[id]);
@@ -170,12 +198,32 @@
 		});
 	};
 	JSZipWrapper.prototype.close = function() {
+		if (window["native"])
+			window["native"]["ZipClose"];
 	};
 
 	function JSZipObjectWrapper(data) {
 		this.data = data;
 	}
 	JSZipObjectWrapper.prototype.async = function(type) {
+
+		if (window["native"]) {
+			return new Promise(function(resolve, reject) {
+
+				var ret = window["native"]["ZipFileAsString"](type);
+
+				if (null != ret)
+				{
+					resolve(ret);
+				}
+				else
+				{
+					reject(new Error("Failed file in archive"));
+				}
+
+			});
+		}
+
 		return this.data.async(type);
 	};
 
