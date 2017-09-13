@@ -595,7 +595,6 @@ var editor;
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage(),
-			"savexfile": true,
             "nobase64": true
           };
 
@@ -617,7 +616,6 @@ var editor;
             "url": this.documentUrl,
             "title": this.documentTitle,
             "password": option.asc_getPassword(),
-			"savexfile": true,
             "nobase64": true
           };
 
