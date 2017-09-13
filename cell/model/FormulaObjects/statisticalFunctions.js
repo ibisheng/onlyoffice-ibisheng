@@ -1558,6 +1558,199 @@
 		}
 	}
 
+	function lcl_TGetColumnMaximumNorm(pMatA, nR, nC, nN) {
+		var fNorm = 0.0;
+		for (var col = nC; col < nN; col++) {
+			if (fNorm < Math.abs(pMatA[col][nR])) {
+				fNorm = Math.abs(pMatA[col][nR]);
+			}
+		}
+
+		return fNorm;
+	}
+
+	function lcl_TGetColumnEuclideanNorm(pMatA, nR, nC, nN) {
+		var fNorm = 0.0;
+		for (var col = nC; col < nN; col++) {
+			fNorm += (pMatA[col][nR]) * (pMatA[col][nR]);
+		}
+
+		return Math.sqrt(fNorm);
+	}
+
+	function lcl_GetSign(fValue) {
+		return (fValue >= 0.0 ? 1.0 : -1.0 );
+	}
+
+	function lcl_TGetColumnSumProduct(pMatA, nRa, pMatB, nRb, nC, nN) {
+		var fResult = 0.0;
+		for (var col = nC; col < nN; col++) {
+			fResult += pMatA[col][nRa] * pMatB[col][nRb];
+		}
+		return fResult;
+	}
+
+	// same with transposed matrix A, N is count of columns, K count of rows
+	function lcl_TCalculateQRdecomposition(pMatA, pVecR, nK, nN) {
+		var fSum;
+		// ScMatrix matrices are zero based, index access (column,row)
+		for (var row = 0; row < nK; row++) {
+			// calculate vector u of the householder transformation
+			var fScale = lcl_TGetColumnMaximumNorm(pMatA, row, row, nN);
+			if (fScale === 0.0) {
+				// A is singular
+				return false;
+			}
+			for (var col = row; col < nN; col++) {
+				pMatA[col][row] = pMatA[col][row] / fScale;
+
+				var fEuclid = lcl_TGetColumnEuclideanNorm(pMatA, row, row, nN);
+				var fFactor = 1.0 / fEuclid / (fEuclid + Math.abs(pMatA[row][row]));
+				var fSignum = lcl_GetSign(pMatA[row][row]);
+				pMatA[row][row] = pMatA[row][row] + fSignum * fEuclid;
+				pVecR[row] = -fSignum * fScale * fEuclid;
+
+				// apply Householder transformation to A
+				for (var r = row + 1; r < nK; r++) {
+					fSum = lcl_TGetColumnSumProduct(pMatA, row, pMatA, r, row, nN);
+					for (var col = row; col < nN; col++) {
+						pMatA[col][r] = pMatA[col][r] - -fSum * fFactor * pMatA[col][row];
+					}
+				}
+			}
+
+		}
+		return true;
+	}
+
+	function lcl_ApplyHouseholderTransformation(pMatA, nC, pMatY, nN) {
+		// ScMatrix matrices are zero based, index access (column,row)
+		var fDenominator = lcl_GetColumnSumProduct(pMatA, nC, pMatA, nC, nC, nN);
+		var fNumerator = lcl_GetColumnSumProduct(pMatA, nC, pMatY, 0, nC, nN);
+		var fFactor = 2.0 * (fNumerator / fDenominator);
+		for (var row = nC; row < nN; row++) {
+			pMatY[0][row] = pMatY[0][row] - fFactor * pMatA[nC][row];
+		}
+	}
+
+	function lcl_GetColumnSumProduct(pMatA, nCa, pMatB, nCb, nR, nN) {
+		var fResult = 0.0;
+		for (var row = nR; row < nN; row++) {
+			fResult += pMatA[nCa][row] * pMatB[nCb][row];
+		}
+		return fResult;
+	}
+
+	function lcl_SolveWithUpperRightTriangle(pMatA, pVecR, pMatS, nK, bIsTransposed) {
+		// ScMatrix matrices are zero based, index access (column,row)
+		var row;
+		// SCSIZE is never negative, therefore test with rowp1=row+1
+		for (var rowp1 = nK; rowp1 > 0; rowp1--) {
+			row = rowp1 - 1;
+			var fSum = pMatS[row];
+			for (var col = rowp1; col < nK; col++) {
+				if (bIsTransposed) {
+					fSum -= pMatA[row][col] * pMatS[col];
+				} else {
+					fSum -= pMatA[col][row] * pMatS[col];
+				}
+			}
+
+			pMatS[row] = fSum / pVecR[row];
+		}
+	}
+
+	// Multiply n x m Mat A with m x l Mat B to n x l Mat R
+	function lcl_MFastMult(pA, pB, pR, n, m, l) {
+		var sum;
+		for (var row = 0; row < n; row++) {
+			for (var col = 0; col < l; col++) {   // result element(col, row) =sum[ (row of A) * (column of B)]
+				sum = 0.0;
+				for (var k = 0; k < m; k++) {
+					sum += pA[k][row] * pB[col][k];
+				}
+				pR[col][row] = sum;
+			}
+		}
+	}
+
+	function lcl_CalculateRowMeans(pX, pResMat, nC, nR) {
+		for (var k = 0; k < nR; k++) {
+			var fSum = 0.0;
+			for (var i = 0; i < nC; i++) {
+				fSum += pX[i][k];
+			}
+			// GetDouble(Column,Row)
+			pResMat[k] = fSum / nC;
+		}
+	}
+
+	function lcl_CalculateRowsDelta(pMat, pRowMeans, nC, nR) {
+		for (var k = 0; k < nR; k++) {
+			for (var i = 0; i < nC; i++) {
+				pMat[i][k] = approxSub(pMat[i][k], pRowMeans[k]);
+			}
+		}
+	}
+
+	function lcl_TApplyHouseholderTransformation(pMatA, nR, pMatY, nN) {
+		// ScMatrix matrices are zero based, index access (column,row)
+		var fDenominator = lcl_TGetColumnSumProduct(pMatA, nR, pMatA, nR, nR, nN);
+		var fNumerator = lcl_TGetColumnSumProduct(pMatA, nR, pMatY, 0, nR, nN);
+		var fFactor = 2.0 * (fNumerator / fDenominator);
+		for (var col = nR; col < nN; col++) {
+			pMatY[col] = pMatY[col] - fFactor * pMatA[col][nR];
+		}
+	}
+
+	function lcl_GetColumnMaximumNorm(pMatA, nC, nR, nN) {
+		var fNorm = 0.0;
+		for (var row = nR; row < nN; row++) {
+			if (fNorm < Math.abs(pMatA[nC][row])) {
+				fNorm = Math.abs(pMatA[nC][row]);
+			}
+		}
+		return fNorm;
+	}
+
+	function lcl_GetColumnEuclideanNorm(pMatA, nC, nR, nN) {
+		var fNorm = 0.0;
+		for (var row = nR; row < nN; row++) {
+			fNorm += pMatA[nC][row] * pMatA[nC][row];
+		}
+		return Math.sqrt(fNorm);
+	}
+
+	function lcl_CalculateQRdecomposition(pMatA, pVecR, nK, nN) {
+		// ScMatrix matrices are zero based, index access (column,row)
+		for (var col = 0; col < nK; col++) {
+			// calculate vector u of the householder transformation
+			var fScale = lcl_GetColumnMaximumNorm(pMatA, col, col, nN);
+			if (fScale === 0.0) {
+				// A is singular
+				return false;
+			}
+			for (var row = col; row < nN; row++) {
+				pMatA[col][row] = pMatA[col][row] / fScale;
+			}
+
+			var fEuclid = lcl_GetColumnEuclideanNorm(pMatA, col, col, nN);
+			var fFactor = 1.0 / fEuclid / (fEuclid + Math.abs(pMatA[col][col]));
+			var fSignum = lcl_GetSign(pMatA[col][col]);
+			pMatA[col][col] = pMatA[col][col] + fSignum * fEuclid;
+			pVecR[col] = -fSignum * fScale * fEuclid;
+
+			// apply Householder transformation to A
+			for (var c = col + 1; c < nK; c++) {
+				var fSum = lcl_GetColumnSumProduct(pMatA, col, pMatA, c, col, nN);
+				for (var row = col; row < nN; row++) {
+					pMatA[c][row] = pMatA[c][row] - fSum * fFactor * pMatA[col][row];
+				}
+			}
+		}
+		return true;
+	}
+
 	function CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant, _bGrowth) {
 		var getMatrixParams = CheckMatrix(_bGrowth, pMatX, pMatY);
 		if (!getMatrixParams) {
@@ -1671,8 +1864,119 @@
 					}
 				}
 			}
+		} else // calculate multiple regression;
+		{
+			if (nCase === 2) // Y is column
+			{
+				var aVecR; // for QR decomposition
+				// Enough memory for needed matrices?
+				var pMeans = GetNewMat(K, 1); // mean of each column
+				var pSlopes = GetNewMat(1, K); // from b1 to bK
+				if (!pMeans || !pSlopes) {
+					//PushError(FormulaError::CodeOverflow);
+					return;
+				}
+				if (bConstant) {
+					lcl_CalculateColumnMeans(pMatX, pMeans, K, N);
+					lcl_CalculateColumnsDelta(pMatX, pMeans, K, N);
+				}
+				if (!lcl_CalculateQRdecomposition(pMatX, aVecR, K, N)) {
+					//PushNoValue();
+					return;
+				}
+				// Later on we will divide by elements of aVecR, so make sure
+				// that they aren't zero.
+				var bIsSingular = false;
+				for (var row = 0; row < K && !bIsSingular; row++) {
+					bIsSingular = bIsSingular || aVecR[row] === 0.0;
+				}
+
+				if (bIsSingular) {
+					//PushNoValue();
+					return;
+				}
+				// Z := Q' Y; Y is overwritten with result Z
+				for (var col = 0; col < K; col++) {
+					lcl_ApplyHouseholderTransformation(pMatX, col, pMatY, N);
+				}
+				// B = R^(-1) * Q' * Y <=> B = R^(-1) * Z <=> R * B = Z
+				// result Z should have zeros for index>=K; if not, ignore values
+				for (var col = 0; col < K; col++) {
+					pSlopes[col][0] = pMatY[col][0];
+				}
+				lcl_SolveWithUpperRightTriangle(pMatX, aVecR, pSlopes, K, false);
+
+				// Fill result matrix
+				lcl_MFastMult(pMatNewX, pSlopes, pResMat, nRXN, K, 1);
+				if (bConstant) {
+					var fIntercept = fMeanY - lcl_GetSumProduct(pMeans, pSlopes, K);
+					for (var row = 0; row < nRXN; row++) {
+						pResMat[0][row] = pResMat[0][row] + fIntercept;
+					}
+
+				}
+				if (_bGrowth) {
+					for (var i = 0; i < nRXN; i++) {
+						pResMat[i] = Math.exp(pResMat[i]);
+					}
+
+				}
+			} else { // nCase == 3, Y is row, all matrices are transposed
+
+				var aVecR; // for QR decomposition
+				// Enough memory for needed matrices?
+				var pMeans = GetNewMat(1, K); // mean of each row
+				var pSlopes = GetNewMat(K, 1); // row from b1 to bK
+				if (!pMeans || !pSlopes) {
+					//PushError(FormulaError::CodeOverflow);
+					return;
+				}
+				if (bConstant) {
+					lcl_CalculateRowMeans(pMatX, pMeans, N, K);
+					lcl_CalculateRowsDelta(pMatX, pMeans, N, K);
+				}
+				if (!lcl_TCalculateQRdecomposition(pMatX, aVecR, K, N)) {
+					//PushNoValue();
+					return;
+				}
+				// Later on we will divide by elements of aVecR, so make sure
+				// that they aren't zero.
+				var bIsSingular = false;
+				for (var row = 0; row < K && !bIsSingular; row++) {
+					bIsSingular = bIsSingular || aVecR[row] === 0.0;
+				}
+				if (bIsSingular) {
+					//PushNoValue();
+					return;
+				}
+				// Z := Q' Y; Y is overwritten with result Z
+				for (var row = 0; row < K; row++) {
+					lcl_TApplyHouseholderTransformation(pMatX, row, pMatY, N);
+				}
+				// B = R^(-1) * Q' * Y <=> B = R^(-1) * Z <=> R * B = Z
+				// result Z should have zeros for index>=K; if not, ignore values
+				for (var col = 0; col < K; col++) {
+					pSlopes[col] = pMatY[col];
+				}
+				lcl_SolveWithUpperRightTriangle(pMatX, aVecR, pSlopes, K, true);
+
+				// Fill result matrix
+				lcl_MFastMult(pSlopes, pMatNewX, pResMat, 1, K, nCXN);
+				if (bConstant) {
+					var fIntercept = fMeanY - lcl_GetSumProduct(pMeans, pSlopes, K);
+					for (var col = 0; col < nCXN; col++) {
+						pResMat[col] = pResMat[col] + fIntercept;
+					}
+
+				}
+				if (_bGrowth) {
+					for (var i = 0; i < nCXN; i++) {
+						pResMat[i] = Math.exp(pResMat[i]);
+					}
+
+				}
+			}
 		}
-		//TODO ELSE
 
 		return pResMat;
 	}
