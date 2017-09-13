@@ -5149,7 +5149,7 @@ function OfflineEditor () {
 
         // AUTOFILTERS
 
-        var styleThumbnailWidth  = 90.5;
+        var styleThumbnailWidth  = 91.5;
         var styleThumbnailHeight = 46.0;
 
         AscCommonExcel.WorkbookView.prototype.af_getTablePictures  = function(props, bPivotTable) {
