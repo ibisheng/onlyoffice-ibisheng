@@ -8462,9 +8462,18 @@ Paragraph.prototype.Set_Spacing = function(Spacing, bDeleteUndefined)
 
 	if (( undefined != Spacing.Line || true === bDeleteUndefined ) && this.Pr.Spacing.Line !== Spacing.Line)
 	{
+		// TODO: Здесь делается корректировка значения, потому что при работе с буквицей могут возникать значения,
+		//       которые неправильно записываются в файл, т.к. в docx это значение имеет тип Twips. Надо бы такую
+		//       корректировку вынести в отдельную функцию и добавить ко всем параметрам.
+
+		var LineValue = Spacing.Line;
+		if ((undefined !== Spacing.LineRule && Spacing.LineRule !== linerule_Auto)
+			|| (undefined === Spacing.LineRule && (linerule_Exact === this.Pr.Spacing.LineRule || linerule_AtLeast === this.Pr.Spacing.LineRule)))
+			LineValue = ((Spacing.Line / 25.4 * 72 * 20) | 0) * 25.4 / 20 / 72;
+
 		this.private_AddPrChange();
-		History.Add(new CChangesParagraphSpacingLine(this, this.Pr.Spacing.Line, Spacing.Line));
-		this.Pr.Spacing.Line = Spacing.Line;
+		History.Add(new CChangesParagraphSpacingLine(this, this.Pr.Spacing.Line, LineValue));
+		this.Pr.Spacing.Line = LineValue;
 	}
 
 	if (( undefined != Spacing.LineRule || true === bDeleteUndefined ) && this.Pr.Spacing.LineRule !== Spacing.LineRule)
