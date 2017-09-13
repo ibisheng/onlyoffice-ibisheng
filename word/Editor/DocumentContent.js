@@ -1584,19 +1584,19 @@ CDocumentContent.prototype.Is_CurrentElementParagraph = function()
 
 	return true;
 };
-CDocumentContent.prototype.GetCurrentParagraph = function()
+CDocumentContent.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
-		return this.LogicDocument.DrawingObjects.getCurrentParagraph();
+		return this.LogicDocument.DrawingObjects.getCurrentParagraph(bIgnoreSelection);
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
-		var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+		var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
 		if (Pos < 0 || Pos >= this.Content.length)
 			return null;
 
-		return this.Content[Pos].GetCurrentParagraph();
+		return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection);
 	}
 
 	return null;

@@ -7417,15 +7417,23 @@ CTable.prototype.GetDirectParaPr = function()
 
 	return this.CurCell.Content.GetDirectParaPr();
 };
-CTable.prototype.GetCurrentParagraph = function()
+CTable.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
+	if (true === bIgnoreSelection)
+	{
+		if (this.CurCell)
+			return this.CurCell.Content.GetCurrentParagraph(bIgnoreSelection);
+		else
+			null;
+	}
+
 	var SelectionArray = this.Internal_Get_SelectionArray();
 	if (SelectionArray.length > 0)
 	{
 		var CurCell = SelectionArray[0].Cell;
 		var CurRow  = SelectionArray[0].Row;
 
-		return this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph();
+		return this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph(bIgnoreSelection);
 	}
 
 	return null;

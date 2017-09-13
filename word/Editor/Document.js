@@ -8030,9 +8030,9 @@ CDocument.prototype.GetSelectedText = function(bClearText, oPr)
 
 	return this.Controller.GetSelectedText(bClearText, oPr);
 };
-CDocument.prototype.GetCurrentParagraph = function()
+CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
-	return this.Controller.GetCurrentParagraph();
+	return this.Controller.GetCurrentParagraph(bIgnoreSelection);
 };
 CDocument.prototype.GetSelectedElementsInfo = function()
 {
@@ -14662,13 +14662,13 @@ CDocument.prototype.controller_GetSelectedText = function(bClearText, oPr)
 
 	return null;
 };
-CDocument.prototype.controller_GetCurrentParagraph = function()
+CDocument.prototype.controller_GetCurrentParagraph = function(bIgnoreSelection)
 {
-	var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+	var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
 	if (Pos < 0 || Pos >= this.Content.length)
 		return null;
 
-	return this.Content[Pos].GetCurrentParagraph();
+	return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection);
 };
 CDocument.prototype.controller_GetSelectedElementsInfo = function(Info)
 {
@@ -15715,7 +15715,7 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 	var oCurrentDocPos = this.GetContentPosition(false);
 	this.SetContentPosition(oDocPos, 0, 0);
 
-	var oCurrentParagraph = this.controller_GetCurrentParagraph();
+	var oCurrentParagraph = this.controller_GetCurrentParagraph(true);
 	if (!oCurrentParagraph)
 		return [];
 

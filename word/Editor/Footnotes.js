@@ -2670,9 +2670,9 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 		return sResult;
 	}
 };
-CFootnotesController.prototype.GetCurrentParagraph = function()
+CFootnotesController.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
-	return this.CurFootnote.GetCurrentParagraph();
+	return this.CurFootnote.GetCurrentParagraph(bIgnoreSelection);
 };
 CFootnotesController.prototype.GetSelectedElementsInfo = function(oInfo)
 {

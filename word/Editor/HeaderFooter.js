@@ -996,9 +996,9 @@ CHeaderFooter.prototype =
 		return this.Content.SelectAll();
 	},
 
-	GetCurrentParagraph : function()
+	GetCurrentParagraph : function(bIgnoreSelection)
 	{
-		return this.Content.GetCurrentParagraph();
+		return this.Content.GetCurrentParagraph(bIgnoreSelection);
 	},
 
 	StartSelectionFromCurPos : function()
@@ -2335,9 +2335,9 @@ CHeaderFooterController.prototype =
             return { X : -1, Y : -1, Height : -1 };
     },
 
-	GetCurrentParagraph : function()
+	GetCurrentParagraph : function(bIgnoreSelection)
 	{
-		return this.CurHdrFtr.GetCurrentParagraph();
+		return this.CurHdrFtr.GetCurrentParagraph(bIgnoreSelection);
 	},
 
 	StartSelectionFromCurPos : function()

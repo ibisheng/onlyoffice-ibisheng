@@ -500,7 +500,7 @@ CDocumentContentElementBase.prototype.GetSelectedText = function(bClearText, oPr
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
+CDocumentContentElementBase.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
 	return null;
 };

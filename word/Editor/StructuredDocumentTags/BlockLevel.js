@@ -548,9 +548,9 @@ CBlockLevelSdt.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.Content.GetSelectedText(bClearText, oPr);
 };
-CBlockLevelSdt.prototype.GetCurrentParagraph = function()
+CBlockLevelSdt.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
-	return this.Content.GetCurrentParagraph();
+	return this.Content.GetCurrentParagraph(bIgnoreSelection);
 };
 CBlockLevelSdt.prototype.AddTableRow = function(bBefore)
 {

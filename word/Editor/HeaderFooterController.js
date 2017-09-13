@@ -291,9 +291,9 @@ CHdrFtrController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.HdrFtr.GetSelectedText(bClearText, oPr);
 };
-CHdrFtrController.prototype.GetCurrentParagraph = function()
+CHdrFtrController.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
-	return this.HdrFtr.GetCurrentParagraph();
+	return this.HdrFtr.GetCurrentParagraph(bIgnoreSelection);
 };
 CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 {

@@ -606,7 +606,7 @@ CDocumentControllerBase.prototype.GetSelectedText = function(bClearText, oPr){re
  * Получаем текущий параграф.
  * @returns {?Paragraph}
  */
-CDocumentControllerBase.prototype.GetCurrentParagraph = function(){return null};
+CDocumentControllerBase.prototype.GetCurrentParagraph = function(bIgnoreSelection){return null};
 /**
  * Собираем информацию о выделенной части документа.
  * @param oInfo

@@ -12164,7 +12164,7 @@ Paragraph.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.IncDec_FontSize(bIncrease);
 };
-Paragraph.prototype.GetCurrentParagraph = function()
+Paragraph.prototype.GetCurrentParagraph = function(bIgnoreSelection)
 {
 	return this;
 };
