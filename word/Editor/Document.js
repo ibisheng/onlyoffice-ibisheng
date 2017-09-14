@@ -6344,12 +6344,12 @@ CDocument.prototype.OnKeyDown = function(e)
         {
             this.EndHdrFtrEditing(true);
         }
-		
+
 		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 		{
 			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
 		}
-		
+
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 32) // Space
@@ -6504,6 +6504,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
 
 		this.private_CheckCursorPosInFillingFormMode();
+        this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 34) // PgDn
@@ -6614,6 +6615,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
 
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 35) // клавиша End
@@ -6631,6 +6633,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateRulersState();
 
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 36) // клавиша Home
@@ -6648,6 +6651,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateRulersState();
 
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 37) // Left Arrow
@@ -6659,6 +6663,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorLeft(true === e.ShiftKey, true === e.CtrlKey);
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 38) // Top Arrow
@@ -6671,6 +6676,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorUp(true === e.ShiftKey, true === e.CtrlKey);
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6682,6 +6688,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorRight(true === e.ShiftKey, true === e.CtrlKey);
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 40) // Bottom Arrow
@@ -6694,6 +6701,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorDown(true === e.ShiftKey, true === e.CtrlKey);
 		this.private_CheckCursorPosInFillingFormMode();
+		this.CheckComplexFieldsInSelection();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46) // Delete
