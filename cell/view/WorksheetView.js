@@ -11865,7 +11865,6 @@
         }
 
         var t = this;
-		var api = window["Asc"]["editor"];
         var ar = this.model.selectionRange.getLast().clone();
 
         var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
@@ -11921,8 +11920,9 @@
 					History.Create_NewPoint();
 					History.StartTransaction();
 
-					if(null !== styleName)
-						api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+					if(null !== styleName) {
+						t.handlers.trigger("slowOperation", true);
+					}
 
 					//add to model
 					t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
@@ -11933,8 +11933,9 @@
 					}
 					t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
-					if(null !== styleName)
-						api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+					if(null !== styleName) {
+						t.handlers.trigger("slowOperation", false);
+					}
 
 					History.EndTransaction();
 				};
