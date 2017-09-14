@@ -67,3 +67,5 @@ function pointerup(){}
 function MSPointerDown(){}
 function MSPointerMove(){}
 function MSPointerUp(){}
+
+var editor;
