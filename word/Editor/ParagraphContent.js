@@ -254,28 +254,26 @@ ParaText.prototype =
     },
     
     Draw : function(X, Y, Context)
-    {
-        var CharCode = this.Value;
+	{
+		var CharCode = this.Value;
 
-        var FontKoef = 1;
-        if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
-            FontKoef = smallcaps_and_script_koef;
-        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
-            FontKoef = vertalign_Koef_Size;
-        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
-            FontKoef = smallcaps_Koef;
+		var FontKoef = 1;
+		if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS)
+			FontKoef = smallcaps_and_script_koef;
+		else if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT)
+			FontKoef = vertalign_Koef_Size;
+		else if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS)
+			FontKoef = smallcaps_Koef;
 
-        Context.SetFontSlot(((this.Flags >> 8) & 0xFF), FontKoef);
-        
-        var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
+		Context.SetFontSlot(((this.Flags >> 8) & 0xFF), FontKoef);
 
-        if ( true === this.Is_NBSP() && editor && editor.ShowParaMarks )
-        {
-            Context.FillText(X, Y, String.fromCharCode(0x00B0));
-        }
-        else
-            Context.FillTextCode(X, Y, ResultCharCode);
-    },
+		var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
+
+		if (true !== this.Is_NBSP())
+			Context.FillTextCode(X, Y, ResultCharCode);
+		else if (editor && editor.ShowParaMarks)
+			Context.FillText(X, Y, String.fromCharCode(0x00B0));
+	},
 
     Measure : function(Context, TextPr)
     {

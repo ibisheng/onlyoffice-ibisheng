@@ -6767,7 +6767,6 @@
     };
 
     WorksheetView.prototype._getSelectionInfoCell = function () {
-        var c_opt = this.settings.cells;
         var selectionRange = this.model.selectionRange;
         var cell = selectionRange.activeCell;
         var mc = this.model.getMergedByCell(cell.row, cell.col);
@@ -6796,7 +6795,7 @@
         var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        if (-2 === tablePartsOptions) {
+        if (-2 === tablePartsOptions || this.model.inPivotTable(selectionRange.getLast())) {
             cell_info.autoFilterInfo.isAutoFilter = null;
             cell_info.autoFilterInfo.isApplyAutoFilter = false;
         } else {
@@ -7884,8 +7883,26 @@
 
                         t.updateSelection();
                     }
+                } else {
+					// Сбрасываем параметры автозаполнения
+					t.activeFillHandle = null;
+					t.fillHandleDirection = -1;
+					// Перерисовываем
+					t._drawSelection();
                 }
             };
+
+			if (this.model.inPivotTable(changedRange)) {
+				// Сбрасываем параметры автозаполнения
+				this.activeFillHandle = null;
+				this.fillHandleDirection = -1;
+				// Перерисовываем
+				this._drawSelection();
+
+				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+					c_oAscError.Level.NoCritical);
+				return;
+			}
 
             // Можно ли применять автозаполнение ?
             this._isLockedCells(changedRange, /*subType*/null, applyFillHandleCallback);
@@ -8185,6 +8202,11 @@
             this._cleanSelectionMoveRange();
             return;
         }
+		if (this.model.inPivotTable([arnFrom, arnTo])) {
+			this._cleanSelectionMoveRange();
+			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+			return;
+		}
 
         var resmove = this.model._prepareMoveRange(arnFrom, arnTo);
         if (resmove === -2) {
@@ -8192,12 +8214,6 @@
             this._cleanSelectionMoveRange();
         } else if (resmove === -1) {
             var t = this;
-			if (this.model.inPivotTable([arnFrom, arnTo])) {
-				this._cleanSelectionMoveRange();
-				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
-				return;
-			}
-
             this.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange,
               function (can) {
                   if (can) {
@@ -11858,76 +11874,68 @@
         this.arrActiveFormulaRanges = [];
     };
 
-    WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
-        // Проверка глобального лока
-        if (this.collaborativeEditing.getGlobalLock()) {
-            return;
-        }
+	WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
+		// Проверка глобального лока
+		if (this.collaborativeEditing.getGlobalLock()) {
+			return;
+		}
 
-        if (!this.handlers.trigger("getLockDefNameManagerStatus")) {
-            this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-            return;
-        }
+		if (!this.handlers.trigger("getLockDefNameManagerStatus")) {
+			this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+			return;
+		}
 
-        var t = this;
-		var api = window["Asc"]["editor"];
-        var ar = this.model.selectionRange.getLast().clone();
+		var t = this;
+		var ar = this.model.selectionRange.getLast().clone();
 
-        var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
-            var res = false;
-            var worksheet = t.model;
+		var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
+			var res = false;
+			var worksheet = t.model;
 
-            var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
-            if (activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) &&
-              activeRange.r1 === worksheet.AutoFilter.Ref.r1) {
-                res = true;
-            }
+			var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+			if (activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) &&
+				activeRange.r1 === worksheet.AutoFilter.Ref.r1) {
+				res = true;
+			}
 
-            return res;
-        };
+			return res;
+		};
 
-        var onChangeAutoFilterCallback = function (isSuccess) {
-            if (false === isSuccess) {
-                t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
-                  c_oAscError.Level.NoCritical);
-                t.handlers.trigger("selectionChanged");
-                return;
-            }
+		var filterRange, bIsChangeFilterToTable, addNameColumn;
+		var onChangeAutoFilterCallback = function (isSuccess) {
+			if (false === isSuccess) {
+				t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
+					c_oAscError.Level.NoCritical);
+				t.handlers.trigger("selectionChanged");
+				return;
+			}
 
-			var addNameColumn, filterRange;
-            if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
-            {
-				filterRange = t.model.AutoFilter.Ref.clone();
-
-                var addFilterCallBack = function () {
-                    History.Create_NewPoint();
-                    History.StartTransaction();
-
-                    t.model.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
-                    t._onUpdateFormatTable(filterRange, !!(styleName), true);
-
-                    History.EndTransaction();
-                };
-
-                addNameColumn = false;
-                if (addFormatTableOptionsObj === false) {
-                    addNameColumn = true;
-                } else if (typeof addFormatTableOptionsObj == 'object') {
-                    addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
-                }
-                if (addNameColumn) {
-                    filterRange.r2 = filterRange.r2 + 1;
-                }
-
-                t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
-            } else//ADD
+			var addFilterCallBack;
+			if (bIsChangeFilterToTable)//CHANGE FILTER TO TABLEPART
 			{
-				var addFilterCallBack = function () {
+				addFilterCallBack = function () {
 					History.Create_NewPoint();
 					History.StartTransaction();
 
-					if(null !== styleName)
-						api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+					t.model.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+
+					History.EndTransaction();
+				};
+
+				if (addNameColumn) {
+					filterRange.r2 = filterRange.r2 + 1;
+				}
+				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
+			} else//ADD
+			{
+				addFilterCallBack = function () {
+					History.Create_NewPoint();
+					History.StartTransaction();
+
+					if (null !== styleName) {
+						t.handlers.trigger("slowOperation", true);
+					}
 
 					//add to model
 					t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
@@ -11938,32 +11946,52 @@
 					}
 					t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
-					if(null !== styleName)
-						api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+					if (null !== styleName) {
+						t.handlers.trigger("slowOperation", false);
+					}
 
 					History.EndTransaction();
 				};
 
-                if (styleName === null) {
-                    addFilterCallBack();
-                } else {
-                    var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
-                    filterRange = filterInfo.filterRange
-                    addNameColumn = filterInfo.addNameColumn;
+				if (styleName === null) {
+					addFilterCallBack();
+				} else {
+					t._isLockedCells(filterRange, null, addFilterCallBack)
+				}
+			}
+		};
 
-                    t._isLockedCells(filterRange, null, addFilterCallBack)
-                }
-            }
-        };
+		//calculate filter range
+		if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true) {
+			filterRange = t.model.AutoFilter.Ref.clone();
 
-        if (t._checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true) {
-            this._isLockedAll(onChangeAutoFilterCallback);
-            this._isLockedDefNames(null, null);
-        } else//для того, чтобы в случае ошибки кнопка отжималась!
-        {
-            t.handlers.trigger("selectionChanged");
-        }
-    };
+			addNameColumn = false;
+			if (addFormatTableOptionsObj === false) {
+				addNameColumn = true;
+			} else if (typeof addFormatTableOptionsObj == 'object') {
+				addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
+			}
+
+			bIsChangeFilterToTable = true;
+		} else {
+			if (styleName === null) {
+				filterRange = ar;
+			} else {
+				var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj, true);
+				filterRange = filterInfo.filterRange;
+				addNameColumn = filterInfo.addNameColumn;
+			}
+		}
+
+		var checkFilterRange = filterInfo ? filterInfo.rangeWithoutDiff : filterRange;
+		if (t._checkAddAutoFilter(checkFilterRange, styleName, addFormatTableOptionsObj) === true) {
+			this._isLockedAll(onChangeAutoFilterCallback);
+			this._isLockedDefNames(null, null);
+		} else//для того, чтобы в случае ошибки кнопка отжималась!
+		{
+			t.handlers.trigger("selectionChanged");
+		}
+	};
 
     WorksheetView.prototype.changeAutoFilter = function (tableName, optionType, val) {
         // Проверка глобального лока
@@ -12886,40 +12914,43 @@
 		return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 	};
 
-    WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
-        //write error, if not add autoFilter and return false
-        var result = true;
-        var worksheet = this.model;
-        var filter = worksheet.AutoFilter;
+	WorksheetView.prototype._checkAddAutoFilter =
+		function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
+			//write error, if not add autoFilter and return false
+			var result = true;
+			var worksheet = this.model;
+			var filter = worksheet.AutoFilter;
 
-        if (filter && styleName && filter.Ref.isIntersect(activeRange) &&
-          !(filter.Ref.containsRange(activeRange) && (activeRange.isOneCell() || (filter.Ref.isEqual(activeRange))) ||
-          (filter.Ref.r1 === activeRange.r1 && activeRange.containsRange(filter.Ref)))) {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        } else if (!styleName && worksheet.autoFilters._isEmptyRange(activeRange, 1))//add filter to empty range
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        }
-        else if (!styleName && filterByCellContextMenu && false === worksheet.autoFilters._getAdjacentCellsAF(activeRange, this).isIntersect(activeRange))//add filter to empty range
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-                c_oAscError.Level.NoCritical);
-            result = false;
-        }else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
-          worksheet.autoFilters._isEmptyCellsUnderRange(activeRange) == false &&
-          worksheet.autoFilters._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        }
+			if (filter && styleName && filter.Ref.isIntersect(activeRange) && !(filter.Ref.containsRange(activeRange) &&
+					(activeRange.isOneCell() || (filter.Ref.isEqual(activeRange))) ||
+					(filter.Ref.r1 === activeRange.r1 && activeRange.containsRange(filter.Ref)))) {
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (!styleName && worksheet.autoFilters._isEmptyRange(activeRange, 1)) {
+				//add filter to empty range
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (!styleName && filterByCellContextMenu &&
+				false === worksheet.autoFilters._getAdjacentCellsAF(activeRange, this).isIntersect(activeRange)) {
+				//add filter to empty range
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
+				worksheet.autoFilters._isEmptyCellsUnderRange(activeRange) == false &&
+				worksheet.autoFilters._isPartTablePartsUnderRange(activeRange)) {
+				//add format table without title if down another format table
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (this.model.inPivotTable(activeRange)) {
+				result = false;
+            }
 
-        return result;
-    };
+			return result;
+		};
 
     WorksheetView.prototype.af_getSizeButton = function (c, r) {
         var ws = this;

@@ -3953,7 +3953,7 @@ $( function () {
 
     } );
 
-	test( "Test: \"COUNTIFS\"", function () {
+	test( "Test: \"COUNTIF\"", function () {
 
 		ws.getRange2( "A7" ).setValue( "3" );
 		ws.getRange2( "B7" ).setValue( "10" );
@@ -3990,6 +3990,59 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 2 );
 
+
+		wb.dependencyFormulas.unlockRecal();
+
+		ws.getRange2( "CC1" ).setValue( "1" );
+		ws.getRange2( "CC2" ).setValue( "0" );
+		ws.getRange2( "CC3" ).setValue( "1" );
+		ws.getRange2( "CC4" ).setValue( "true" );
+		ws.getRange2( "CC5" ).setValue( "=true" );
+		ws.getRange2( "CC6" ).setValue( "=true()" );
+		ws.getRange2( "CC7" ).setValue( "'true'" );
+
+		oParser = new parserFormula( "COUNTIF(CC1:CC7, TRUE())", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(CC1:CC7, TRUE)", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(CC1:CC7, 1)", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(CC1:CC7, 0)", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		ws.getRange2( "CC8" ).setValue( ">3" );
+		oParser = new parserFormula( "COUNTIF(CC8,\">3\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		ws.getRange2( "CC8" ).setValue( ">3" );
+		oParser = new parserFormula( "COUNTIF(CC8,\"=>3\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		ws.getRange2( "CC9" ).setValue( "=NA()" );
+		ws.getRange2( "CC10" ).setValue( "#N/A" );
+
+		oParser = new parserFormula( "COUNTIF(CC9:CC10,\"#N/A\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(CC9:CC10, NA())", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(CC9:CC10,\"=NA()\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		wb.dependencyFormulas.lockRecal();
 	} );
 
     test( "Test: \"COVAR\"", function () {

@@ -4895,6 +4895,9 @@ CShape.prototype.hitToAdjustment = function (x, y) {
 };
 
 CShape.prototype.hitToHandles = function (x, y) {
+    if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
+        return -1;
+    }
     return hitToHandles(x, y, this);
 
 };

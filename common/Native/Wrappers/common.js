@@ -448,7 +448,7 @@ var native_renderer = null;
 var Api = null;
 var _api = null;
 
-function NativeOpenFileData(data, version)
+function NativeOpenFileData(data, version, xlsx_file_path)
 {
 	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
 
@@ -460,7 +460,7 @@ function NativeOpenFileData(data, version)
 	else
 	{
 		_api = new window["Asc"]["spreadsheet_api"]({});
-		_api.asc_nativeOpenFile(data, version);
+        _api.asc_nativeOpenFile(data, version, undefined, xlsx_file_path);
 	}
 	Api = _api;
 }

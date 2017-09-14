@@ -156,6 +156,77 @@
 		return window['JSZip'] || require('jszip');
 	}
 
+	function JSZipWrapper() {
+		this.files = {};
+	}
+
+	JSZipWrapper.prototype.loadAsync = function(data, options) {
+		var t = this;
+
+		if (window["native"]) {
+			return new Promise(function(resolve, reject) {
+
+				var retFiles = null;
+				if (options && options["base64"] === true)
+					retFiles = window["native"]["ZipOpenBase64"](data);
+				else
+					retFiles = window["native"]["ZipOpen"](data);
+
+				if (null != retFiles)
+				{
+					for (var id in retFiles) {
+						t.files[id] = new JSZipObjectWrapper(retFiles[id]);
+					}
+
+					resolve(t);
+				}
+				else
+				{
+					reject(new Error("Failed archive"));
+				}
+
+			});
+		}
+
+		return AscCommon.getJSZip().loadAsync(data, options).then(function(zip){
+			for (var id in zip.files) {
+				t.files[id] = new JSZipObjectWrapper(zip.files[id]);
+			}
+			return t;
+		});
+	};
+	JSZipWrapper.prototype.close = function() {
+		if (window["native"])
+			window["native"]["ZipClose"]();
+	};
+
+	function JSZipObjectWrapper(data) {
+		this.data = data;
+	}
+	JSZipObjectWrapper.prototype.async = function(type) {
+
+		if (window["native"]) {
+			var t = this;
+
+			return new Promise(function(resolve, reject) {
+
+				var ret = window["native"]["ZipFileAsString"](t.data);
+
+				if (null != ret)
+				{
+					resolve(ret);
+				}
+				else
+				{
+					reject(new Error("Failed file in archive"));
+				}
+
+			});
+		}
+
+		return this.data.async(type);
+	};
+
 	function getBaseUrl()
 	{
 		var indexHtml = window["location"]["href"];
@@ -3143,6 +3214,7 @@
 	window["AscCommon"].getAltGr = getAltGr;
 	window["AscCommon"].getColorThemeByIndex = getColorThemeByIndex;
 
+	window["AscCommon"].JSZipWrapper = JSZipWrapper;
 	window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
 	window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;
 	window["AscCommon"].cBoolLocal = cBoolLocal;
