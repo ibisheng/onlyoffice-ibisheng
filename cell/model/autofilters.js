@@ -4934,7 +4934,7 @@
 								result = true;
 								break;
 							}
-							else if(tableRef.c1 >= range.c1 && tableRef.c1 < range.c2 && tableRef.c2 > range.c2)
+							else if(tableRef.c1 >= range.c1 && tableRef.c1 <= range.c2 && tableRef.c2 > range.c2)
 							{
 								result = true;
 								break;
