@@ -6781,7 +6781,6 @@
     };
 
     WorksheetView.prototype._getSelectionInfoCell = function () {
-        var c_opt = this.settings.cells;
         var selectionRange = this.model.selectionRange;
         var cell = selectionRange.activeCell;
         var mc = this.model.getMergedByCell(cell.row, cell.col);
@@ -6810,7 +6809,7 @@
         var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        if (-2 === tablePartsOptions) {
+        if (-2 === tablePartsOptions || this.model.inPivotTable(selectionRange.getLast())) {
             cell_info.autoFilterInfo.isAutoFilter = null;
             cell_info.autoFilterInfo.isApplyAutoFilter = false;
         } else {
@@ -11888,12 +11887,12 @@
                 return;
             }
 
-			var addNameColumn, filterRange;
+			var addFilterCallBack, addNameColumn, filterRange;
             if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
             {
 				filterRange = t.model.AutoFilter.Ref.clone();
 
-                var addFilterCallBack = function () {
+                addFilterCallBack = function () {
                     History.Create_NewPoint();
                     History.StartTransaction();
 
@@ -11916,7 +11915,7 @@
                 t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
             } else//ADD
 			{
-				var addFilterCallBack = function () {
+				addFilterCallBack = function () {
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -11944,7 +11943,7 @@
                     addFilterCallBack();
                 } else {
                     var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
-                    filterRange = filterInfo.filterRange
+                    filterRange = filterInfo.filterRange;
                     addNameColumn = filterInfo.addNameColumn;
 
                     t._isLockedCells(filterRange, null, addFilterCallBack)
@@ -12879,40 +12878,43 @@
 		return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 	};
 
-    WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
-        //write error, if not add autoFilter and return false
-        var result = true;
-        var worksheet = this.model;
-        var filter = worksheet.AutoFilter;
+	WorksheetView.prototype._checkAddAutoFilter =
+		function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
+			//write error, if not add autoFilter and return false
+			var result = true;
+			var worksheet = this.model;
+			var filter = worksheet.AutoFilter;
 
-        if (filter && styleName && filter.Ref.isIntersect(activeRange) &&
-          !(filter.Ref.containsRange(activeRange) && (activeRange.isOneCell() || (filter.Ref.isEqual(activeRange))) ||
-          (filter.Ref.r1 === activeRange.r1 && activeRange.containsRange(filter.Ref)))) {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        } else if (!styleName && worksheet.autoFilters._isEmptyRange(activeRange, 1))//add filter to empty range
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        }
-        else if (!styleName && filterByCellContextMenu && false === worksheet.autoFilters._getAdjacentCellsAF(activeRange, this).isIntersect(activeRange))//add filter to empty range
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
-                c_oAscError.Level.NoCritical);
-            result = false;
-        }else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
-          worksheet.autoFilters._isEmptyCellsUnderRange(activeRange) == false &&
-          worksheet.autoFilters._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
-        {
-            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
-              c_oAscError.Level.NoCritical);
-            result = false;
-        }
+			if (filter && styleName && filter.Ref.isIntersect(activeRange) && !(filter.Ref.containsRange(activeRange) &&
+					(activeRange.isOneCell() || (filter.Ref.isEqual(activeRange))) ||
+					(filter.Ref.r1 === activeRange.r1 && activeRange.containsRange(filter.Ref)))) {
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (!styleName && worksheet.autoFilters._isEmptyRange(activeRange, 1)) {
+				//add filter to empty range
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (!styleName && filterByCellContextMenu &&
+				false === worksheet.autoFilters._getAdjacentCellsAF(activeRange, this).isIntersect(activeRange)) {
+				//add filter to empty range
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
+				worksheet.autoFilters._isEmptyCellsUnderRange(activeRange) == false &&
+				worksheet.autoFilters._isPartTablePartsUnderRange(activeRange)) {
+				//add format table without title if down another format table
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (this.model.inPivotTable(activeRange)) {
+				result = false;
+            }
 
-        return result;
-    };
+			return result;
+		};
 
     WorksheetView.prototype.af_getSizeButton = function (c, r) {
         var ws = this;
