@@ -11851,74 +11851,66 @@
         this.arrActiveFormulaRanges = [];
     };
 
-    WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
-        // Проверка глобального лока
-        if (this.collaborativeEditing.getGlobalLock()) {
-            return;
-        }
+	WorksheetView.prototype.addAutoFilter = function (styleName, addFormatTableOptionsObj) {
+		// Проверка глобального лока
+		if (this.collaborativeEditing.getGlobalLock()) {
+			return;
+		}
 
-        if (!this.handlers.trigger("getLockDefNameManagerStatus")) {
-            this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-            return;
-        }
+		if (!this.handlers.trigger("getLockDefNameManagerStatus")) {
+			this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+			return;
+		}
 
-        var t = this;
-        var ar = this.model.selectionRange.getLast().clone();
+		var t = this;
+		var ar = this.model.selectionRange.getLast().clone();
 
-        var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
-            var res = false;
-            var worksheet = t.model;
+		var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
+			var res = false;
+			var worksheet = t.model;
 
-            var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
-            if (activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) &&
-              activeRange.r1 === worksheet.AutoFilter.Ref.r1) {
-                res = true;
-            }
+			var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+			if (activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) &&
+				activeRange.r1 === worksheet.AutoFilter.Ref.r1) {
+				res = true;
+			}
 
-            return res;
-        };
+			return res;
+		};
 
-        var onChangeAutoFilterCallback = function (isSuccess) {
-            if (false === isSuccess) {
-                t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
-                  c_oAscError.Level.NoCritical);
-                t.handlers.trigger("selectionChanged");
-                return;
-            }
+		var filterRange, bIsChangeFilterToTable, addNameColumn;
+		var onChangeAutoFilterCallback = function (isSuccess) {
+			if (false === isSuccess) {
+				t.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedAllError,
+					c_oAscError.Level.NoCritical);
+				t.handlers.trigger("selectionChanged");
+				return;
+			}
 
-			var addFilterCallBack, addNameColumn, filterRange;
-            if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true)//CHANGE FILTER TO TABLEPART
-            {
-				filterRange = t.model.AutoFilter.Ref.clone();
-
-                addFilterCallBack = function () {
-                    History.Create_NewPoint();
-                    History.StartTransaction();
-
-                    t.model.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
-                    t._onUpdateFormatTable(filterRange, !!(styleName), true);
-
-                    History.EndTransaction();
-                };
-
-                addNameColumn = false;
-                if (addFormatTableOptionsObj === false) {
-                    addNameColumn = true;
-                } else if (typeof addFormatTableOptionsObj == 'object') {
-                    addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
-                }
-                if (addNameColumn) {
-                    filterRange.r2 = filterRange.r2 + 1;
-                }
-
-                t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
-            } else//ADD
+			var addFilterCallBack;
+			if (bIsChangeFilterToTable)//CHANGE FILTER TO TABLEPART
 			{
 				addFilterCallBack = function () {
 					History.Create_NewPoint();
 					History.StartTransaction();
 
-					if(null !== styleName) {
+					t.model.autoFilters.changeAutoFilterToTablePart(styleName, ar, addFormatTableOptionsObj);
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+
+					History.EndTransaction();
+				};
+
+				if (addNameColumn) {
+					filterRange.r2 = filterRange.r2 + 1;
+				}
+				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
+			} else//ADD
+			{
+				addFilterCallBack = function () {
+					History.Create_NewPoint();
+					History.StartTransaction();
+
+					if (null !== styleName) {
 						t.handlers.trigger("slowOperation", true);
 					}
 
@@ -11931,33 +11923,52 @@
 					}
 					t._onUpdateFormatTable(filterRange, !!(styleName), true);
 
-					if(null !== styleName) {
+					if (null !== styleName) {
 						t.handlers.trigger("slowOperation", false);
 					}
 
 					History.EndTransaction();
 				};
 
-                if (styleName === null) {
-                    addFilterCallBack();
-                } else {
-                    var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
-                    filterRange = filterInfo.filterRange;
-                    addNameColumn = filterInfo.addNameColumn;
+				if (styleName === null) {
+					addFilterCallBack();
+				} else {
+					t._isLockedCells(filterRange, null, addFilterCallBack)
+				}
+			}
+		};
 
-                    t._isLockedCells(filterRange, null, addFilterCallBack)
-                }
-            }
-        };
+		//calculate filter range
+		if (addFormatTableOptionsObj && isChangeAutoFilterToTablePart(addFormatTableOptionsObj) === true) {
+			filterRange = t.model.AutoFilter.Ref.clone();
 
-        if (t._checkAddAutoFilter(ar, styleName, addFormatTableOptionsObj) === true) {
-            this._isLockedAll(onChangeAutoFilterCallback);
-            this._isLockedDefNames(null, null);
-        } else//для того, чтобы в случае ошибки кнопка отжималась!
-        {
-            t.handlers.trigger("selectionChanged");
-        }
-    };
+			addNameColumn = false;
+			if (addFormatTableOptionsObj === false) {
+				addNameColumn = true;
+			} else if (typeof addFormatTableOptionsObj == 'object') {
+				addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
+			}
+
+			bIsChangeFilterToTable = true;
+		} else {
+			if (styleName === null) {
+				filterRange = ar;
+			} else {
+				var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj, true);
+				filterRange = filterInfo.filterRange;
+				addNameColumn = filterInfo.addNameColumn;
+			}
+		}
+
+		var checkFilterRange = filterInfo ? filterInfo.rangeWithoutDiff : filterRange;
+		if (t._checkAddAutoFilter(checkFilterRange, styleName, addFormatTableOptionsObj) === true) {
+			this._isLockedAll(onChangeAutoFilterCallback);
+			this._isLockedDefNames(null, null);
+		} else//для того, чтобы в случае ошибки кнопка отжималась!
+		{
+			t.handlers.trigger("selectionChanged");
+		}
+	};
 
     WorksheetView.prototype.changeAutoFilter = function (tableName, optionType, val) {
         // Проверка глобального лока
