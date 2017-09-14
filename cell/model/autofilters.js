@@ -4929,7 +4929,7 @@
 						var tableRef = worksheet.TableParts[i].Ref;
 						if(tableRef.r1 >= range.r2)
 						{
-							if(tableRef.c1 < range.c1 && tableRef.c2 > range.c1 && tableRef.c2 <= range.c2)
+							if(tableRef.c1 < range.c1 && tableRef.c2 >= range.c1 && tableRef.c2 <= range.c2)
 							{
 								result = true;
 								break;
