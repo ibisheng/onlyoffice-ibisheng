@@ -415,8 +415,8 @@
 					t.newTextFormat = opt.fragments[first.index].format.clone();
 				}
 				t._setFormatProperty(t.newTextFormat, prop, val);
+				t._update();
 			}
-
 		}
 	};
 
@@ -1491,6 +1491,7 @@
 	};
 
 	CellEditor.prototype._moveCursor = function (kind, pos) {
+		this.newTextFormat = null;
 		var t = this;
 		this.sAutoComplete = null;
 		switch (kind) {
@@ -2119,7 +2120,7 @@
 		if ( !tmp ) {
 			return;
 		}
-		tmp = this.options.fragments[tmp.index].format;
+		tmp = this.newTextFormat || this.options.fragments[tmp.index].format;
 		var va = tmp.getVerticalAlign();
 		var fc = tmp.getColor();
 		var result = new AscCommonExcel.asc_CFont();
