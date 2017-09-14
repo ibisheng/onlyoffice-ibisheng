@@ -8198,6 +8198,11 @@
             this._cleanSelectionMoveRange();
             return;
         }
+		if (this.model.inPivotTable([arnFrom, arnTo])) {
+			this._cleanSelectionMoveRange();
+			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+			return;
+		}
 
         var resmove = this.model._prepareMoveRange(arnFrom, arnTo);
         if (resmove === -2) {
@@ -8205,12 +8210,6 @@
             this._cleanSelectionMoveRange();
         } else if (resmove === -1) {
             var t = this;
-			if (this.model.inPivotTable([arnFrom, arnTo])) {
-				this._cleanSelectionMoveRange();
-				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
-				return;
-			}
-
             this.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange,
               function (can) {
                   if (can) {
