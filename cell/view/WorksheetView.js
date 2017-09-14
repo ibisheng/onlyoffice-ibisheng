@@ -7897,8 +7897,26 @@
 
                         t.updateSelection();
                     }
+                } else {
+					// Сбрасываем параметры автозаполнения
+					t.activeFillHandle = null;
+					t.fillHandleDirection = -1;
+					// Перерисовываем
+					t._drawSelection();
                 }
             };
+
+			if (this.model.inPivotTable(changedRange)) {
+				// Сбрасываем параметры автозаполнения
+				this.activeFillHandle = null;
+				this.fillHandleDirection = -1;
+				// Перерисовываем
+				this._drawSelection();
+
+				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+					c_oAscError.Level.NoCritical);
+				return;
+			}
 
             // Можно ли применять автозаполнение ?
             this._isLockedCells(changedRange, /*subType*/null, applyFillHandleCallback);
