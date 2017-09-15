@@ -49,7 +49,7 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentStartLoad = function()
 	AscCommon.History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
-Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
+Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data, _len)
 {
 	AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
@@ -57,20 +57,35 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 		return;
 	}
-    if (AscCommon.c_oSerFormat.Signature !== _data.substring(0, AscCommon.c_oSerFormat.Signature.length))
+
+	var _binary = getBinaryArray(_data, _len);
+	var _sign_len = AscCommon.c_oSerFormat.Signature.length;
+	var _signature = "";
+	if (_binary.length >= _sign_len)
 	{
-		this.OpenDocument(_url, _data);
+		for (var i = 0; i < _sign_len; i++)
+		{
+			_signature += String.fromCharCode(_binary[i]);
+		}
+	}
+
+	if (AscCommon.c_oSerFormat.Signature !== _signature)
+	{
+		this.OpenDocument(_url, _binary);
 	}
     else
 	{
-		this.OpenDocument2(_url, _data);
+		this.OpenDocument2(_url, _binary);
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	}
+
+	this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
+
 	DesktopOfflineUpdateLocalName(this);
 
 	window["DesktopAfterOpen"](this);
 };
-window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
+window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 {
 	AscCommon.g_oDocumentUrls.documentUrl = _url;
 	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
@@ -80,7 +95,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
-    editor._OfflineAppDocumentEndLoad(_url, _data);
+    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 };
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 

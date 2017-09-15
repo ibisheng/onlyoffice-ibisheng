@@ -60,7 +60,7 @@ var c_oAscError = Asc.c_oAscError;
 		window["AscDesktopEditor"]["LocalStartOpen"]();
 	};
 	
-	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data)
+	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data, _len)
 	{
 		AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
@@ -69,7 +69,8 @@ var c_oAscError = Asc.c_oAscError;
 			return;
 		}
 
-		this.openDocument(_data);
+		var _binary = getBinaryArray(_data, _len);
+		this.openDocument(_binary);
 		AscCommon.History.UserSaveMode = true;
 		
 		DesktopOfflineUpdateLocalName(this);
@@ -137,7 +138,7 @@ window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idO
 };
 window["Asc"]['spreadsheet_api'].prototype["asc_setAdvancedOptions"] = window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions;
 
-window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
+window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 {
 	AscCommon.g_oDocumentUrls.documentUrl = _url;
 	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
@@ -147,7 +148,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
-    window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data);
+    window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data, _len);
 };
 
 /////////////////////////////////////////////////////////
