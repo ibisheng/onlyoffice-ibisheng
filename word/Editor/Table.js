@@ -142,11 +142,12 @@ function CTable(DrawingDocument, Parent, Inline, Rows, Cols, TableGrid, bPresent
     this.TableRowsBottom = [];
     this.HeaderInfo =
     {
-        Count     : 0, // Количество строк, входящих в заголовок
-        H         : 0, // Суммарная высота, занимаемая заголовком
-        PageIndex : 0, // Страница, на которой лежит исходный заголовок (либо 0, либо 1)
-        Pages     : []
-    };
+		HeaderRecalculate : false, // В данный момент идет пересчет самих заголовков
+		Count             : 0,     // Количество строк, входящих в заголовок
+		H                 : 0,     // Суммарная высота, занимаемая заголовком
+		PageIndex         : 0,     // Страница, на которой лежит исходный заголовок (либо 0, либо 1)
+		Pages             : []
+	};
 
     this.Selection =
     {
@@ -2170,7 +2171,7 @@ CTable.prototype.Get_PageContentStartPos = function(CurPage, RowIndex, CellIndex
 
 	var bHeader = false;
 	var Y       = Pos.Y;
-	if (-1 != this.HeaderInfo.PageIndex && this.HeaderInfo.Count > 0 && CurPage > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[CurPage].Draw)
+	if (true !== this.HeaderInfo.HeaderRecalculate && -1 != this.HeaderInfo.PageIndex && this.HeaderInfo.Count > 0 && CurPage > this.HeaderInfo.PageIndex && true === this.HeaderInfo.Pages[CurPage].Draw)
 	{
 		Y       = this.HeaderInfo.Pages[CurPage].RowsInfo[this.HeaderInfo.Count - 1].TableRowsBottom;
 		bHeader = true;

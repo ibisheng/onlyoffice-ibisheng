@@ -1704,6 +1704,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     var X_min = -1;
     if ( this.HeaderInfo.Count > 0 && this.HeaderInfo.PageIndex != -1 && CurPage > this.HeaderInfo.PageIndex )
     {
+    	this.HeaderInfo.HeaderRecalculate = true;
         this.HeaderInfo.Pages[CurPage] = {};
         this.HeaderInfo.Pages[CurPage].RowsInfo = [];
         var HeaderPage = this.HeaderInfo.Pages[CurPage];
@@ -2124,6 +2125,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         this.HeaderInfo.Pages[CurPage] = {};
         this.HeaderInfo.Pages[CurPage].Draw = false;
     }
+    this.HeaderInfo.HeaderRecalculate = false;
 
     var bNextPage = false;
 
