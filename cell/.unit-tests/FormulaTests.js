@@ -9081,6 +9081,41 @@ $( function () {
 
 	});
 
+	test( "Test: \"GROWTH\"", function () {
+
+		ws.getRange2( "A102" ).setValue( "11" );
+		ws.getRange2( "A103" ).setValue( "12" );
+		ws.getRange2( "A104" ).setValue( "13" );
+		ws.getRange2( "A105" ).setValue( "14" );
+		ws.getRange2( "A106" ).setValue( "15" );
+		ws.getRange2( "A107" ).setValue( "16" );
+
+		ws.getRange2( "B102" ).setValue( "33100" );
+		ws.getRange2( "B103" ).setValue( "47300" );
+		ws.getRange2( "B104" ).setValue( "69000" );
+		ws.getRange2( "B105" ).setValue( "102000" );
+		ws.getRange2( "B106" ).setValue( "150000" );
+		ws.getRange2( "B107" ).setValue( "220000" );
+
+		ws.getRange2( "C102" ).setValue( "32618" );
+		ws.getRange2( "C103" ).setValue( "47729" );
+		ws.getRange2( "C104" ).setValue( "69841" );
+		ws.getRange2( "C105" ).setValue( "102197" );
+		ws.getRange2( "C106" ).setValue( "149542" );
+		ws.getRange2( "C107" ).setValue( "218822" );
+
+		ws.getRange2( "A109" ).setValue( "17" );
+		ws.getRange2( "A110" ).setValue( "18" );
+
+		oParser = new parserFormula( "GROWTH(B102:B107,A102:A107,A109:A110)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 320196.7184);
+
+		oParser = new parserFormula( "GROWTH(B102:B107,A102:A107)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 32618.20377);
+	} );
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );
