@@ -1503,8 +1503,15 @@
 				//PushIllegalArgument();
 				return false;
 			}
-			/*for ( SCSIZE i = 1; i <= nCountY; i++ )
-			 pMatX->PutDouble(static_cast<double>(i), i-1);*/
+
+			var num = 1;
+			for ( var i = 0; i < nRY; i++ ){
+				for(var j = 1; j <= nCY; j++){
+					pMatX[i][j - 1] = num;
+					num++;
+				}
+			}
+
 			nCase = 1;
 			N = nCountY;
 			M = 1;
@@ -6258,13 +6265,47 @@
 	cGROWTH.prototype.argumentsMax = 4;
 	cGROWTH.prototype.Calculate = function (arg) {
 
-		var pMatY = arg[0].getMatrix();
-		var pMatX = arg[1] ? arg[1].getMatrix() : null;
-		var pMatNewX = arg[2] ? arg[2] : null;
-		var bConstant = undefined !== arg[3] ? arg[3] : true;
+		//если первое значение число
+		var tempNumber;
+		if(cElementType.number === arg[0].type){
+			tempNumber = arg[0];
+			arg[0] = new cArray();
+			arg[0].addElement(tempNumber);
+		}
+
+		//если первое значение число
+		if(arg[1] && cElementType.number === arg[1].type){
+			tempNumber = arg[1];
+			arg[1] = new cArray();
+			arg[1].addElement(tempNumber);
+		}
+
+		//если первое значение число
+		if(arg[2] && cElementType.number === arg[2].type){
+			tempNumber = arg[2];
+			arg[2] = new cArray();
+			arg[2].addElement(tempNumber);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var pMatY = argClone[0];
+		var pMatX = argClone[1];
+		var pMatNewX = argClone[2];
+		var bConstant = undefined !== argClone[3] ? argClone[3] : true;
 		var res = CalculateTrendGrowth( pMatY, pMatX, pMatNewX, bConstant, true);
 
-		return new cNumber(res[0][0]);
+		if(res && res[0] && res[0][0]){
+			return this.value = new cNumber(res[0][0]);
+		}else{
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
 	};
 
 	/**
