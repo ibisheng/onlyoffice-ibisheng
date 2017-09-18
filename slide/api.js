@@ -7403,6 +7403,17 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["DemonstrationToReporterMessages"] 		= asc_docs_api.prototype.DemonstrationToReporterMessages;
 	asc_docs_api.prototype["preloadReporter"]						= asc_docs_api.prototype.preloadReporter;
 
+	// signatures
+	asc_docs_api.prototype["asc_addSignatureLine"] 					= asc_docs_api.prototype.asc_addSignatureLine;
+	asc_docs_api.prototype["asc_getRequestSignatures"] 				= asc_docs_api.prototype.asc_getRequestSignatures;
+	asc_docs_api.prototype["asc_AddSignatureLine2"]             	= asc_docs_api.prototype.asc_AddSignatureLine2;
+	asc_docs_api.prototype["asc_Sign"]             					= asc_docs_api.prototype.asc_Sign;
+	asc_docs_api.prototype["asc_ViewCertificate"] 					= asc_docs_api.prototype.asc_ViewCertificate;
+	asc_docs_api.prototype["asc_SelectCertificate"] 				= asc_docs_api.prototype.asc_SelectCertificate;
+	asc_docs_api.prototype["asc_GetDefaultCertificate"] 			= asc_docs_api.prototype.asc_GetDefaultCertificate;
+	asc_docs_api.prototype["asc_getSignatures"] 					= asc_docs_api.prototype.asc_getSignatures;
+	asc_docs_api.prototype["asc_isSignaturesSupport"] 				= asc_docs_api.prototype.asc_isSignaturesSupport;
+
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 	asc_CCommentData.prototype['asc_getText']         = asc_CCommentData.prototype.asc_getText;

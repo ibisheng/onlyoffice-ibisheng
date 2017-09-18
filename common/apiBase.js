@@ -1489,6 +1489,13 @@
 		return this.signatures;
 	};
 
+	baseEditorsApi.prototype.asc_isSignaturesSupport = function()
+	{
+		if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsSignaturesSupport"])
+			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
+		return false;
+	};
+
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
 
 		var count = this.signatures.length;

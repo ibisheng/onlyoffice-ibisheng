@@ -3854,6 +3854,17 @@ var editor;
   prot["asc_OnHideContextMenu"] = prot.asc_OnHideContextMenu;
   prot["asc_OnShowContextMenu"] = prot.asc_OnShowContextMenu;
 
+	// signatures
+  prot["asc_addSignatureLine"] 		= prot.asc_addSignatureLine;
+  prot["asc_getRequestSignatures"] 	= prot.asc_getRequestSignatures;
+  prot["asc_AddSignatureLine2"]     = prot.asc_AddSignatureLine2;
+  prot["asc_Sign"]             		= prot.asc_Sign;
+  prot["asc_ViewCertificate"] 		= prot.asc_ViewCertificate;
+  prot["asc_SelectCertificate"] 	= prot.asc_SelectCertificate;
+  prot["asc_GetDefaultCertificate"] = prot.asc_GetDefaultCertificate;
+  prot["asc_getSignatures"] 		= prot.asc_getSignatures;
+  prot["asc_isSignaturesSupport"] 	= prot.asc_isSignaturesSupport;
+
   // mobile
   prot["asc_Remove"] = prot.asc_Remove;
 })(window);

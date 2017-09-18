@@ -11088,6 +11088,12 @@
 
 	WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
 		var t = this;
+
+		if (this.model.inPivotTable(aReplaceCells)) {
+			options.error = true;
+			return callback(options);
+        }
+
 		var findFlags = "g"; // Заменяем все вхождения
 		if (true !== options.isMatchCase) {
 			findFlags += "i";
