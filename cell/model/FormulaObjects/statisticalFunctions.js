@@ -1570,8 +1570,8 @@
 	function lcl_TGetColumnMaximumNorm(pMatA, nR, nC, nN) {
 		var fNorm = 0.0;
 		for (var col = nC; col < nN; col++) {
-			if (fNorm < Math.abs(pMatA[col][nR])) {
-				fNorm = Math.abs(pMatA[col][nR]);
+			if (fNorm < Math.abs(pMatA[nR][col])) {
+				fNorm = Math.abs(pMatA[nR][col]);
 			}
 		}
 
@@ -1581,7 +1581,7 @@
 	function lcl_TGetColumnEuclideanNorm(pMatA, nR, nC, nN) {
 		var fNorm = 0.0;
 		for (var col = nC; col < nN; col++) {
-			fNorm += (pMatA[col][nR]) * (pMatA[col][nR]);
+			fNorm += (pMatA[nR][col]) * (pMatA[nR][col]);
 		}
 
 		return Math.sqrt(fNorm);
@@ -1594,7 +1594,7 @@
 	function lcl_TGetColumnSumProduct(pMatA, nRa, pMatB, nRb, nC, nN) {
 		var fResult = 0.0;
 		for (var col = nC; col < nN; col++) {
-			fResult += pMatA[col][nRa] * pMatB[col][nRb];
+			fResult += pMatA[nRa][col] * pMatB[nRb][col];
 		}
 		return fResult;
 	}
@@ -1611,7 +1611,7 @@
 				return false;
 			}
 			for (var col = row; col < nN; col++) {
-				pMatA[col][row] = pMatA[col][row] / fScale;
+				pMatA[row][col] = pMatA[row][col] / fScale;
 
 				var fEuclid = lcl_TGetColumnEuclideanNorm(pMatA, row, row, nN);
 				var fFactor = 1.0 / fEuclid / (fEuclid + Math.abs(pMatA[row][row]));
@@ -1623,7 +1623,7 @@
 				for (var r = row + 1; r < nK; r++) {
 					fSum = lcl_TGetColumnSumProduct(pMatA, row, pMatA, r, row, nN);
 					for (var col = row; col < nN; col++) {
-						pMatA[col][r] = pMatA[col][r] - -fSum * fFactor * pMatA[col][row];
+						pMatA[r][col] = pMatA[r][col] - -fSum * fFactor * pMatA[row][col];
 					}
 				}
 			}
@@ -1676,9 +1676,9 @@
 			for (var col = 0; col < l; col++) {   // result element(col, row) =sum[ (row of A) * (column of B)]
 				sum = 0.0;
 				for (var k = 0; k < m; k++) {
-					sum += pA[k][row] * pB[col][k];
+					sum += pA[k][row] * pB[k][col];
 				}
-				pR[col][row] = sum;
+				pR[row][col] = sum;
 			}
 		}
 	}
@@ -1687,7 +1687,7 @@
 		for (var k = 0; k < nR; k++) {
 			var fSum = 0.0;
 			for (var i = 0; i < nC; i++) {
-				fSum += pX[i][k];
+				fSum += pX[k][i];
 			}
 			// GetDouble(Column,Row)
 			pResMat[k] = fSum / nC;
@@ -1697,7 +1697,7 @@
 	function lcl_CalculateRowsDelta(pMat, pRowMeans, nC, nR) {
 		for (var k = 0; k < nR; k++) {
 			for (var i = 0; i < nC; i++) {
-				pMat[i][k] = approxSub(pMat[i][k], pRowMeans[k]);
+				pMat[k][i] = approxSub(pMat[k][i], pRowMeans[k]);
 			}
 		}
 	}
@@ -1708,7 +1708,7 @@
 		var fNumerator = lcl_TGetColumnSumProduct(pMatA, nR, pMatY, 0, nR, nN);
 		var fFactor = 2.0 * (fNumerator / fDenominator);
 		for (var col = nR; col < nN; col++) {
-			pMatY[col] = pMatY[col] - fFactor * pMatA[col][nR];
+			pMatY[col] = pMatY[col] - fFactor * pMatA[nR][col];
 		}
 	}
 
@@ -1787,8 +1787,8 @@
 			nCountXN = nCXN * nRXN;
 			pMatNewX = matrixClone(pMatX); // pMatX will be changed to X-meanX
 		} else {
-			nCXN = pMatNewX.length;
-			nRXN = pMatNewX[0].length;
+			nRXN = pMatNewX.length;
+			nCXN = pMatNewX[0].length;
 			if ((nCase === 2 && K !== nCXN) || (nCase === 3 && K !== nRXN)) {
 				return;
 			}
@@ -1932,7 +1932,7 @@
 				}
 			} else { // nCase == 3, Y is row, all matrices are transposed
 
-				var aVecR; // for QR decomposition
+				var aVecR = []; // for QR decomposition
 				// Enough memory for needed matrices?
 				var pMeans = GetNewMat(1, K); // mean of each row
 				var pSlopes = GetNewMat(K, 1); // row from b1 to bK
