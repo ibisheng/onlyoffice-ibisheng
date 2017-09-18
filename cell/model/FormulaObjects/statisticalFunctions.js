@@ -1612,19 +1612,19 @@
 			}
 			for (var col = row; col < nN; col++) {
 				pMatA[row][col] = pMatA[row][col] / fScale;
+			}
 
-				var fEuclid = lcl_TGetColumnEuclideanNorm(pMatA, row, row, nN);
-				var fFactor = 1.0 / fEuclid / (fEuclid + Math.abs(pMatA[row][row]));
-				var fSignum = lcl_GetSign(pMatA[row][row]);
-				pMatA[row][row] = pMatA[row][row] + fSignum * fEuclid;
-				pVecR[row] = -fSignum * fScale * fEuclid;
+			var fEuclid = lcl_TGetColumnEuclideanNorm(pMatA, row, row, nN);
+			var fFactor = 1.0 / fEuclid / (fEuclid + Math.abs(pMatA[row][row]));
+			var fSignum = lcl_GetSign(pMatA[row][row]);
+			pMatA[row][row] = pMatA[row][row] + fSignum * fEuclid;
+			pVecR[row] = -fSignum * fScale * fEuclid;
 
-				// apply Householder transformation to A
-				for (var r = row + 1; r < nK; r++) {
-					fSum = lcl_TGetColumnSumProduct(pMatA, row, pMatA, r, row, nN);
-					for (var col = row; col < nN; col++) {
-						pMatA[r][col] = pMatA[r][col] - -fSum * fFactor * pMatA[row][col];
-					}
+			// apply Householder transformation to A
+			for (var r = row + 1; r < nK; r++) {
+				fSum = lcl_TGetColumnSumProduct(pMatA, row, pMatA, r, row, nN);
+				for (var col = row; col < nN; col++) {
+					pMatA[r][col] = pMatA[r][col] - fSum * fFactor * pMatA[row][col];
 				}
 			}
 
@@ -1656,16 +1656,16 @@
 		// SCSIZE is never negative, therefore test with rowp1=row+1
 		for (var rowp1 = nK; rowp1 > 0; rowp1--) {
 			row = rowp1 - 1;
-			var fSum = pMatS[row];
+			var fSum = pMatS[row][0];
 			for (var col = rowp1; col < nK; col++) {
 				if (bIsTransposed) {
-					fSum -= pMatA[row][col] * pMatS[col];
+					fSum -= pMatA[col][row] * pMatS[col][0];
 				} else {
-					fSum -= pMatA[col][row] * pMatS[col];
+					fSum -= pMatA[row][col] * pMatS[col][0];
 				}
 			}
 
-			pMatS[row] = fSum / pVecR[row];
+			pMatS[row][0] = fSum / pVecR[row];
 		}
 	}
 
@@ -1678,7 +1678,7 @@
 				for (var k = 0; k < m; k++) {
 					sum += pA[k][row] * pB[k][col];
 				}
-				pR[row][col] = sum;
+				pR[col][row] = sum;
 			}
 		}
 	}
@@ -1690,14 +1690,14 @@
 				fSum += pX[k][i];
 			}
 			// GetDouble(Column,Row)
-			pResMat[k] = fSum / nC;
+			pResMat[k][0] = fSum / nC;
 		}
 	}
 
 	function lcl_CalculateRowsDelta(pMat, pRowMeans, nC, nR) {
 		for (var k = 0; k < nR; k++) {
 			for (var i = 0; i < nC; i++) {
-				pMat[k][i] = approxSub(pMat[k][i], pRowMeans[k]);
+				pMat[k][i] = approxSub(pMat[k][i], pRowMeans[k][0]);
 			}
 		}
 	}
@@ -1708,7 +1708,7 @@
 		var fNumerator = lcl_TGetColumnSumProduct(pMatA, nR, pMatY, 0, nR, nN);
 		var fFactor = 2.0 * (fNumerator / fDenominator);
 		for (var col = nR; col < nN; col++) {
-			pMatY[col] = pMatY[col] - fFactor * pMatA[nR][col];
+			pMatY[0][col] = pMatY[0][col] - fFactor * pMatA[nR][col];
 		}
 	}
 
@@ -1793,12 +1793,15 @@
 				return;
 			}
 			nCountXN = nCXN * nRXN;
-			for (var i = 0; i < nCountXN; i++) {
-				/*if (!pMatNewX->IsValue(i))
-				 {
-				 PushIllegalArgument();
-				 return;
-				 }*/
+			for (var i = 0; i < pMatNewX.length; i++) {
+				for (var j = 0; j < pMatNewX[i].length; j++) {
+					if (!pMatNewX[i][j]) {
+						//PushIllegalArgument();
+						return false;
+					}else{
+						pMatNewX[i][j] = pMatNewX[i][j].getValue();
+					}
+				}
 			}
 		}
 
@@ -1934,7 +1937,7 @@
 
 				var aVecR = []; // for QR decomposition
 				// Enough memory for needed matrices?
-				var pMeans = GetNewMat(1, K); // mean of each row
+				var pMeans = GetNewMat(K, 1); // mean of each row
 				var pSlopes = GetNewMat(K, 1); // row from b1 to bK
 				if (!pMeans || !pSlopes) {
 					//PushError(FormulaError::CodeOverflow);
@@ -1965,7 +1968,7 @@
 				// B = R^(-1) * Q' * Y <=> B = R^(-1) * Z <=> R * B = Z
 				// result Z should have zeros for index>=K; if not, ignore values
 				for (var col = 0; col < K; col++) {
-					pSlopes[col] = pMatY[col];
+					pSlopes[col][0] = pMatY[0][col];
 				}
 				lcl_SolveWithUpperRightTriangle(pMatX, aVecR, pSlopes, K, true);
 
@@ -1974,13 +1977,13 @@
 				if (bConstant) {
 					var fIntercept = fMeanY - lcl_GetSumProduct(pMeans, pSlopes, K);
 					for (var col = 0; col < nCXN; col++) {
-						pResMat[col] = pResMat[col] + fIntercept;
+						pResMat[col][0] = pResMat[col][0] + fIntercept;
 					}
 
 				}
 				if (_bGrowth) {
 					for (var i = 0; i < nCXN; i++) {
-						pResMat[i] = Math.exp(pResMat[i]);
+						pResMat[i][0] = Math.exp(pResMat[i][0]);
 					}
 
 				}
@@ -4821,7 +4824,7 @@
 	cCRITBINOM.prototype.argumentsMin = 3;
 	cCRITBINOM.prototype.argumentsMax = 3;
 	cCRITBINOM.prototype.Calculate = function (arg) {
-		
+
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
 
@@ -6298,7 +6301,7 @@
 		var pMatY = argClone[0];
 		var pMatX = argClone[1];
 		var pMatNewX = argClone[2];
-		var bConstant = undefined !== argClone[3] ? argClone[3] : true;
+		var bConstant = undefined !== argClone[3] ? argClone[3].getValue() : true;
 		var res = CalculateTrendGrowth( pMatY, pMatX, pMatNewX, bConstant, true);
 
 		if(res && res[0] && res[0][0]){
