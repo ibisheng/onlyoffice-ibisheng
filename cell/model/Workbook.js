@@ -6642,7 +6642,7 @@
 		var sSimpleText = "";
 		for(var i = 0, length = aVal.length; i < length; ++i)
 			sSimpleText += aVal[i].text;
-		this.setValue(sSimpleText);
+		this._setValue(sSimpleText);
 		var nRow = this.nRow;
 		var nCol = this.nCol;
 		if(CellValueType.String == this.type && null == this.ws.hyperlinkManager.getByCell(nRow, nCol))
