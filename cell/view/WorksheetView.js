@@ -1633,7 +1633,7 @@
                     }
 
                     var style = rowCells[c].getStyle();
-                    if (style && (null !== style.fill || (null !== style.border && style.border.notEmpty()))) {
+                    if (style && ((style.fill && style.fill.notEmpty()) || (style.border && style.border.notEmpty()))) {
                         lastC = Math.max(lastC, c);
                         lastR = Math.max(lastR, r);
                     }

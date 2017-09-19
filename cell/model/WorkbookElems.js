@@ -1082,142 +1082,136 @@ var g_oFontProperties = {
 	var g_oFillProperties = {
 		bg: 0
 	};
-/** @constructor */
-function Fill(val)
-{
-	if(null == val)
-		val = g_oDefaultFormat.FillAbs;
-	this.bg = val.bg;
 
-	this._hash;
-	this._index;
-}
-Fill.prototype =
-{
-	Properties: g_oFillProperties,
-	getHash: function() {
+	/** @constructor */
+	function Fill(val) {
+		if (null == val) {
+			val = g_oDefaultFormat.FillAbs;
+		}
+		this.bg = val.bg;
+
+		this._hash;
+		this._index;
+	}
+
+	Fill.prototype.Properties = g_oFillProperties;
+	Fill.prototype.getHash = function () {
 		if (!this._hash) {
 			this._hash = this.bg ? this.bg.getHash() : '';
 		}
 		return this._hash;
-	},
-	getIndexNumber: function() {
+	};
+	Fill.prototype.getIndexNumber = function () {
 		return this._index;
-	},
-	setIndexNumber: function(val) {
+	};
+	Fill.prototype.setIndexNumber = function (val) {
 		return this._index = val;
-	},
-	_mergeProperty : function(first, second, def)
-	{
-		if(def != first)
+	};
+	Fill.prototype._mergeProperty = function (first, second, def) {
+		if (def != first) {
 			return first;
-		else
+		} else {
 			return second;
-	},
-	merge : function(fill)
-	{
+		}
+	};
+	Fill.prototype.merge = function (fill) {
 		var oRes = new Fill();
 		oRes.bg = this._mergeProperty(this.bg, fill.bg, g_oDefaultFormat.Fill.bg);
 		return oRes;
-	},
-	getRgbOrNull : function()
-	{
+	};
+	Fill.prototype.getRgbOrNull = function () {
 		var nRes = null;
-		if(null != this.bg)
+		if (null != this.bg) {
 			nRes = this.bg.getRgb();
+		}
 		return nRes;
-	},
-	getDif : function(val)
-	{
+	};
+	Fill.prototype.getDif = function (val) {
 		var oRes = new Fill(this);
 		var bEmpty = true;
-		if(g_oColorManager.isEqual(this.bg, val.bg))
-			oRes.bg =  null;
-		else
+		if (g_oColorManager.isEqual(this.bg, val.bg)) {
+			oRes.bg = null;
+		} else {
 			bEmpty = false;
-		if(bEmpty)
+		}
+		if (bEmpty) {
 			oRes = null;
+		}
 		return oRes;
-	},
-	isEqual : function(fill)
-	{
+	};
+	Fill.prototype.isEqual = function (fill) {
 		return g_oColorManager.isEqual(this.bg, fill.bg);
-	},
-    clone : function()
-    {
-        return new Fill(this);
-    },
-	getType : function()
-	{
+	};
+	Fill.prototype.clone = function () {
+		return new Fill(this);
+	};
+	Fill.prototype.getType = function () {
 		return UndoRedoDataTypes.StyleFill;
-	},
-	getProperties : function()
-	{
+	};
+	Fill.prototype.getProperties = function () {
 		return this.Properties;
-	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
-			case this.Properties.bg: return this.bg;break;
+	};
+	Fill.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.bg:
+				return this.bg;
+				break;
 		}
-	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
-			case this.Properties.bg: this.bg = value;break;
+	};
+	Fill.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.bg:
+				this.bg = value;
+				break;
 		}
-	},
-	onStartNode : function(elem, attr, uq) {
+	};
+	Fill.prototype.notEmpty = function () {
+		return null !== this.bg;
+	};
+	Fill.prototype.onStartNode = function (elem, attr, uq) {
 		var newContext = this;
-		if("gradientFill" === elem){
+		if ("gradientFill" === elem) {
 			newContext = new CT_GradientFill();
-			if(newContext.readAttributes){
+			if (newContext.readAttributes) {
 				newContext.readAttributes(attr, uq);
 			}
-		}
-		else if("patternFill" === elem){
+		} else if ("patternFill" === elem) {
 			newContext = new CT_PatternFill();
-			if(newContext.readAttributes){
+			if (newContext.readAttributes) {
 				newContext.readAttributes(attr, uq);
 			}
-		}
-		else {
+		} else {
 			newContext = null;
 		}
 		return newContext;
-	},
-	onEndNode : function(prevContext, elem) {
-		if("gradientFill" === elem){
-			if(prevContext.stop.length > 0){
+	};
+	Fill.prototype.onEndNode = function (prevContext, elem) {
+		if ("gradientFill" === elem) {
+			if (prevContext.stop.length > 0) {
 				var stop = prevContext.stop[0];
-				if(stop.color){
+				if (stop.color) {
 					this.bg = stop.color;
 				}
 			}
-		}
-		else if("patternFill" === elem) {
-			if(st_patterntypeNONE !== prevContext.patternType)
-			{
-				if(AscCommon.openXml.SaxParserDataTransfer.priorityBg)
-				{
-					if(prevContext.bgColor)
+		} else if ("patternFill" === elem) {
+			if (st_patterntypeNONE !== prevContext.patternType) {
+				if (AscCommon.openXml.SaxParserDataTransfer.priorityBg) {
+					if (prevContext.bgColor) {
 						this.bg = prevContext.bgColor;
-					else if(prevContext.fgColor)
+					} else if (prevContext.fgColor) {
 						this.bg = prevContext.fgColor;
-				}
-				else
-				{
-					if(prevContext.fgColor)
+					}
+				} else {
+					if (prevContext.fgColor) {
 						this.bg = prevContext.fgColor;
-					else if(prevContext.bgColor)
+					} else if (prevContext.bgColor) {
 						this.bg = prevContext.bgColor;
+					}
 				}
 			}
 		}
-	}
-};
+	};
+
 	function FromXml_ST_BorderStyle(val) {
 		var res = -1;
 		if ("none" === val) {
@@ -1268,7 +1262,7 @@ Fill.prototype =
 			this._hash = this.s + ';' + this.w + ';' + color;
 		}
 		return this._hash;
-	},
+	};
 	BorderProp.prototype.setStyle = function (style) {
 		this.s = style;
 		switch (this.s) {
