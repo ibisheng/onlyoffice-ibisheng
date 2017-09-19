@@ -430,7 +430,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 
 		// Специальный код с обработкой выделения (highlight)
 		// Текст, который пишем до или после выделенного текста делаем без выделения.
-		if (!this.Is_Empty() && (0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
+		if ((0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
 		{
 			var Parent = this.Get_Parent();
 			var RunPos = this.private_GetPosInParent(Parent);
@@ -5519,6 +5519,7 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 		CurPos--;
 
 		var Item = this.Content[CurPos];
+
 		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline() && false === SearchPos.IsCheckAnchors()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
 			break;
 	}
@@ -8782,7 +8783,7 @@ ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
-        this.Paragraph.Set_ParaContentPos(ContentPos, true, -1, -1);
+        this.Paragraph.Set_ParaContentPos(ContentPos, true, -1, -1, false);
         this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
