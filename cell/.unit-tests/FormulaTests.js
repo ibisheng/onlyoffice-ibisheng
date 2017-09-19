@@ -9149,6 +9149,50 @@ $( function () {
 
 	} );
 
+	test( "Test: \"TREND\"", function () {
+
+		ws.getRange2( "A101" ).setValue( "1" );
+		ws.getRange2( "A102" ).setValue( "2" );
+		ws.getRange2( "A103" ).setValue( "3" );
+		ws.getRange2( "A104" ).setValue( "4" );
+		ws.getRange2( "A105" ).setValue( "5" );
+		ws.getRange2( "A106" ).setValue( "6" );
+		ws.getRange2( "A107" ).setValue( "7" );
+		ws.getRange2( "A108" ).setValue( "8" );
+		ws.getRange2( "A109" ).setValue( "9" );
+		ws.getRange2( "A110" ).setValue( "10" );
+		ws.getRange2( "A111" ).setValue( "11" );
+		ws.getRange2( "A112" ).setValue( "12" );
+
+
+		ws.getRange2( "B101" ).setValue( "133890" );
+		ws.getRange2( "B102" ).setValue( "135000" );
+		ws.getRange2( "B103" ).setValue( "135790" );
+		ws.getRange2( "B104" ).setValue( "137300" );
+		ws.getRange2( "B105" ).setValue( "138130" );
+		ws.getRange2( "B106" ).setValue( "139100" );
+		ws.getRange2( "B107" ).setValue( "139900" );
+		ws.getRange2( "B108" ).setValue( "141120" );
+		ws.getRange2( "B109" ).setValue( "141890" );
+		ws.getRange2( "B110" ).setValue( "143230" );
+		ws.getRange2( "B111" ).setValue( "144000" );
+		ws.getRange2( "B112" ).setValue( "145290" );
+
+		ws.getRange2( "A115" ).setValue( "13" );
+		ws.getRange2( "A116" ).setValue( "14" );
+		ws.getRange2( "A117" ).setValue( "15" );
+		ws.getRange2( "A118" ).setValue( "16" );
+		ws.getRange2( "A119" ).setValue( "17" );
+
+		oParser = new parserFormula( "TREND(A101:A112,B101:B112)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.947729865);
+
+		oParser = new parserFormula( "TREND(B101:B112,A101:A112,A115:A119)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 146171.5152);
+	} );
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );
