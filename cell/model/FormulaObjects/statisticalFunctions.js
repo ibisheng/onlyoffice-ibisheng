@@ -10077,11 +10077,59 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTREND() {
-		cBaseFunction.call(this, "TREND");
+		this.name = "TREND";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTREND.prototype = Object.create(cBaseFunction.prototype);
 	cTREND.prototype.constructor = cTREND;
+	cTREND.prototype.argumentsMin = 1;
+	cTREND.prototype.argumentsMax = 4;
+	cTREND.prototype.Calculate = function (arg) {
+
+		//если первое значение число
+		var tempNumber;
+		if(cElementType.number === arg[0].type){
+			tempNumber = arg[0];
+			arg[0] = new cArray();
+			arg[0].addElement(tempNumber);
+		}
+
+		//если первое значение число
+		if(arg[1] && cElementType.number === arg[1].type){
+			tempNumber = arg[1];
+			arg[1] = new cArray();
+			arg[1].addElement(tempNumber);
+		}
+
+		//если первое значение число
+		if(arg[2] && cElementType.number === arg[2].type){
+			tempNumber = arg[2];
+			arg[2] = new cArray();
+			arg[2].addElement(tempNumber);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var pMatY = argClone[0];
+		var pMatX = argClone[1];
+		var pMatNewX = argClone[2];
+		var bConstant = undefined !== argClone[3] ? argClone[3].getValue() : true;
+		var res = CalculateTrendGrowth( pMatY, pMatX, pMatNewX, bConstant);
+
+		if(res && res[0] && res[0][0]){
+			return this.value = new cNumber(res[0][0]);
+		}else{
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+	};
 
 	/**
 	 * @constructor
