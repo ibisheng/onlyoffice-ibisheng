@@ -2704,7 +2704,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
 		// TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
 		// Условие Y + RowHValue < Y_content_end добавлено из-за сносок.
-		if (false === bNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowHValue && Y + RowHValue < Y_content_end)
+		if (false === bNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowHValue && (nFootnotesHeight < 0.001 || Y + RowHValue < Y_content_end))
 		{
 			CellHeight                            = RowHValue;
 			this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
