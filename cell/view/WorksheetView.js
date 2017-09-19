@@ -6671,7 +6671,7 @@
 
         var t = this;
         this.model.selectionRange.ranges.forEach(function (item) {
-            var tmp;
+            var cellValue;
             var range = t.model.getRange3(item.r1, item.c1, item.r2, item.c2);
             range._setPropertyNoEmpty(null, null, function (cell, r) {
                 var idCell = cell.nCol + '-' + cell.nRow;
@@ -6679,18 +6679,15 @@
                     oExistCells[idCell] = true;
                     ++oSelectionMathInfo.count;
                     if (CellValueType.Number === cell.getType()) {
-                        tmp = parseFloat(cell.getValueWithoutFormat());
-                        if (isNaN(tmp)) {
-                            return;
-                        }
+						cellValue = cell.getNumberValue();
                         if (0 === oSelectionMathInfo.countNumbers) {
-                            oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
+                            oSelectionMathInfo.min = oSelectionMathInfo.max = cellValue;
                         } else {
-                            oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
-                            oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
+                            oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, cellValue);
+                            oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, cellValue);
                         }
                         ++oSelectionMathInfo.countNumbers;
-                        sum += tmp;
+                        sum += cellValue;
                     }
                 }
             });
