@@ -432,7 +432,11 @@
         oReader.GetLong();//type of DocumentContent
         CDocumentContent.prototype.Read_FromBinary2.call(this, oReader);
     };
-    CDrawingDocContent.prototype.Is_TableCellContent = function(){
+    CDrawingDocContent.prototype.IsTableCellContent = function(isReturnCell){
+
+    	if (true === isReturnCell)
+    		return null;
+
         return false;
     };
 

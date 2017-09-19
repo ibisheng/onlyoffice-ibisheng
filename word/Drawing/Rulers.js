@@ -626,6 +626,7 @@ function CHorRuler()
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
         var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
+        var isDraw1_4 = (mm_1_4 > 7) ? true : false;
 
         var middleVert = (this.m_nTop + this.m_nBottom) / 2;
         var part1 = 1;
@@ -657,7 +658,7 @@ function CHorRuler()
                 lXPos -= (lWidthText / 2.0);
                 context.fillText(strNum, lXPos, this.m_nBottom - 3);
             }
-            else if (1 == index)
+            else if (1 == index && isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -673,7 +674,7 @@ function CHorRuler()
                 context.lineTo(lXPos, middleVert + part2);
                 context.stroke();
             }
-            else
+            else if (isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -702,7 +703,7 @@ function CHorRuler()
                 lXPos -= (lWidthText / 2.0);
                 context.fillText(strNum, lXPos, this.m_nBottom - 3);
             }
-            else if (1 == index)
+            else if (1 == index && isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -718,7 +719,7 @@ function CHorRuler()
                 context.lineTo(lXPos, middleVert + part2);
                 context.stroke();
             }
-            else
+            else if (isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -1813,6 +1814,13 @@ function CHorRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
+
+        if (true === word_control.m_oApi.isStartAddShape)
+        {
+			word_control.m_oApi.sync_EndAddShape();
+			word_control.m_oApi.sync_StartAddShapeCallback(false);
+        }
+
         AscCommon.check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
@@ -2891,6 +2899,7 @@ function CVerRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
+		var isDraw1_4 = (mm_1_4 > 7) ? true : false;
         var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
 
         var middleHor = (this.m_nLeft + this.m_nRight) / 2;
@@ -2931,7 +2940,7 @@ function CVerRuler()
                 else
                     context.setTransform(2, 0, 0, 2, 0, 10);
             }
-            else if (1 == index)
+            else if (1 == index && isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -2947,7 +2956,7 @@ function CVerRuler()
                 context.lineTo(middleHor + part2, lYPos);
                 context.stroke();
             }
-            else
+            else if (isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -2983,7 +2992,7 @@ function CVerRuler()
                 else
                     context.setTransform(2, 0, 0, 2, 0, 10);
             }
-            else if (1 == index)
+            else if (1 == index && isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -2999,7 +3008,7 @@ function CVerRuler()
                 context.lineTo(middleHor + part2, lYPos);
                 context.stroke();
             }
-            else
+            else if (isDraw1_4)
             {
                 // 1/4
                 context.beginPath();
@@ -3468,6 +3477,13 @@ function CVerRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
+
+		if (true === word_control.m_oApi.isStartAddShape)
+		{
+			word_control.m_oApi.sync_EndAddShape();
+			word_control.m_oApi.sync_StartAddShapeCallback(false);
+		}
+
         AscCommon.check_MouseDownEvent(e);
 
         this.SimpleChanges.Reinit();

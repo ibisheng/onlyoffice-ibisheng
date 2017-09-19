@@ -806,7 +806,8 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 //----------------------------------------------------------------------------------------------------------------------
     CCollaborativeEditingBase.prototype.private_ClearChanges = function()
     {
-        this.m_aChanges = [];
+        this.m_aChanges    = [];
+        this.m_oOwnChanges = [];
     };
     CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
     {
@@ -1339,7 +1340,10 @@ CDocumentPositionsManager.prototype.Update_DocumentPositionsOnAdd = function(Cla
         for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
         {
             var _Pos = DocPos[ClassPos];
-            if (Class === _Pos.Class && _Pos.Position && _Pos.Position >= Pos)
+            if (Class === _Pos.Class
+				&& undefined !== _Pos.Position
+				&& (_Pos.Position > Pos
+				|| (_Pos.Position === Pos && !(Class instanceof AscCommonWord.ParaRun))))
             {
                 _Pos.Position++;
                 break;
@@ -1355,7 +1359,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPositionsOnRemove = function(
         for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
         {
             var _Pos = DocPos[ClassPos];
-            if (Class === _Pos.Class && _Pos.Position)
+            if (Class === _Pos.Class && undefined !== _Pos.Position)
             {
                 if (_Pos.Position > Pos + Count)
                 {
@@ -1363,9 +1367,23 @@ CDocumentPositionsManager.prototype.Update_DocumentPositionsOnRemove = function(
                 }
                 else if (_Pos.Position >= Pos)
                 {
-                    // Элемент, в котором находится наша позиция, удаляется. Ставим специальную отметку об этом.
-                    _Pos.Position = Pos;
-                    _Pos.Deleted = true;
+                	if (Class instanceof AscCommonWord.CTable)
+					{
+						_Pos.Position = Pos;
+						if (DocPos[ClassPos + 1]
+							&& DocPos[ClassPos + 1].Class instanceof AscCommonWord.CTableRow
+							&& undefined !== DocPos[ClassPos + 1].Position
+							&& Class.Content[Pos])
+						{
+							DocPos[ClassPos + 1].Position = Math.max(0, Math.min(DocPos[ClassPos + 1].Position, Class.Content.length - 1));
+						}
+					}
+					else
+					{
+						// Элемент, в котором находится наша позиция, удаляется. Ставим специальную отметку об этом.
+						_Pos.Position = Pos;
+						_Pos.Deleted  = true;
+					}
                 }
 
                 break;

@@ -98,7 +98,7 @@
     };
     this.cells = {
       defaultState: {
-        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212), color: new CColor(0, 0, 0)
+        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
       }, padding: -1, /*px horizontal padding*/
       paddingPlusBorder: -1
     };
@@ -1364,6 +1364,12 @@
     var activeCellRange = ws.getActiveCell(0, 0, false);
     var selectionRange = ws.model.selectionRange.clone();
 
+    var activeWsModel = this.model.getActiveWs();
+    if (activeWsModel.inPivotTable(activeCellRange)) {
+		this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+		return;
+	}
+
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
@@ -1538,10 +1544,6 @@
     if (this.isDocumentPlaceChangedEnabled) {
       this.handlers.trigger("asc_onDocumentPlaceChanged");
     }
-  };
-
-  WorkbookView.prototype.getTablePictures = function(props) {
-      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
   };
 
   WorkbookView.prototype.getCellStyles = function(width, height) {
@@ -1972,104 +1974,110 @@
     }
   };
 
-  // Вставка формулы в редактор
-  WorkbookView.prototype.insertFormulaInEditor = function(name, type, autoComplete) {
-    var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
+	// Вставка формулы в редактор
+	WorkbookView.prototype.insertFormulaInEditor = function (name, type, autoComplete) {
+		var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
 
-    if (c_oAscPopUpSelectorType.None === type) {
-      this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
-      return;
-    }
+		if (c_oAscPopUpSelectorType.None === type) {
+			this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
+			return;
+		}
 
-    isNotFunction = c_oAscPopUpSelectorType.Func !== type;
+		isNotFunction = c_oAscPopUpSelectorType.Func !== type;
 
-    // Проверяем, открыт ли редактор
-    if (ws.getCellEditMode()) {
-      if (isNotFunction) {
-        this.skipHelpSelector = true;
-      }
-      if (-1 !== this.lastFormulaPos) {
-        if (-1 === this.arrExcludeFormulas.indexOf(name) && !isNotFunction) {
-          name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
-        } else {
-          this.skipHelpSelector = true;
-        }
-        tmp = this.cellEditor.skipTLUpdate;
-        this.cellEditor.skipTLUpdate = false;
-        this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaNameLength, name);
-        this.cellEditor.skipTLUpdate = tmp;
-      } else if (false === this.cellEditor.insertFormula(name, isNotFunction)) {
-        // Не смогли вставить формулу, закроем редактор, с сохранением текста
-        this.cellEditor.close(true);
-      }
-      this.skipHelpSelector = false;
-    } else {
-      // Проверка глобального лока
-      if (this.collaborativeEditing.getGlobalLock()) {
-        return false;
-      }
+		// Проверяем, открыт ли редактор
+		if (ws.getCellEditMode()) {
+			if (isNotFunction) {
+				this.skipHelpSelector = true;
+			}
+			if (-1 !== this.lastFormulaPos) {
+				if (-1 === this.arrExcludeFormulas.indexOf(name) && !isNotFunction) {
+					name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
+				} else {
+					this.skipHelpSelector = true;
+				}
+				tmp = this.cellEditor.skipTLUpdate;
+				this.cellEditor.skipTLUpdate = false;
+				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaNameLength, name);
+				this.cellEditor.skipTLUpdate = tmp;
+			} else if (false === this.cellEditor.insertFormula(name, isNotFunction)) {
+				// Не смогли вставить формулу, закроем редактор, с сохранением текста
+				this.cellEditor.close(true);
+			}
+			this.skipHelpSelector = false;
+		} else {
+			// Проверка глобального лока
+			if (this.collaborativeEditing.getGlobalLock()) {
+				return false;
+			}
 
-      // Редактор закрыт
-      var cellRange = null;
-      // Если нужно сделать автозаполнение формулы, то ищем ячейки)
-      if (autoComplete) {
-        cellRange = ws.autoCompleteFormula(name);
-      }
-      if (isNotFunction) {
-        name = "=" + name;
-      } else {
-        if (cellRange) {
-          if (cellRange.notEditCell) {
-            // Мы уже ввели все что нужно, редактор открывать не нужно
-            return;
-          }
-          // Меняем значение ячейки
-          name = "=" + name + "(" + cellRange.text + ")";
-        } else {
-          // Меняем значение ячейки
-          name = "=" + name + "()";
-        }
-        // Вычисляем позицию курсора (он должен быть в функции)
-        cursorPos = name.length - 1;
-      }
+			var activeCellRange = ws.getActiveCell(0, 0, false);
+			var selectionRange = ws.model.selectionRange.clone();
 
-      var selectionRange = ws.model.selectionRange.clone();
+			var activeWsModel = this.model.getActiveWs();
+			if (activeWsModel.inPivotTable(activeCellRange)) {
+				this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+				return false;
+			}
 
-      var openEditor = function(res) {
-        if (res) {
-          // Выставляем переменные, что мы редактируем
-          t.setCellEditMode(true);
-          ws.setCellEditMode(true);
+			// Редактор закрыт
+			var cellRange = null;
+			// Если нужно сделать автозаполнение формулы, то ищем ячейки)
+			if (autoComplete) {
+				cellRange = ws.autoCompleteFormula(name);
+			}
+			if (isNotFunction) {
+				name = "=" + name;
+			} else {
+				if (cellRange) {
+					if (cellRange.notEditCell) {
+						// Мы уже ввели все что нужно, редактор открывать не нужно
+						return;
+					}
+					// Меняем значение ячейки
+					name = "=" + name + "(" + cellRange.text + ")";
+				} else {
+					// Меняем значение ячейки
+					name = "=" + name + "()";
+				}
+				// Вычисляем позицию курсора (он должен быть в функции)
+				cursorPos = name.length - 1;
+			}
 
-          t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
-          if (isNotFunction) {
-            t.skipHelpSelector = true;
-          }
-          // Открываем, с выставлением позиции курсора
-          if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, selectionRange)) {
-            t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
-            t.setCellEditMode(false);
-            t.controller.setStrictClose(false);
-            t.controller.setFormulaEditMode(false);
-            ws.setCellEditMode(false);
-            ws.setFormulaEditMode(false);
-          }
-          if (isNotFunction) {
-            t.skipHelpSelector = false;
-          }
-        } else {
-          t.setCellEditMode(false);
-          t.controller.setStrictClose(false);
-          t.controller.setFormulaEditMode(false);
-          ws.setCellEditMode(false);
-          ws.setFormulaEditMode(false);
-        }
-      };
+			var openEditor = function (res) {
+				if (res) {
+					// Выставляем переменные, что мы редактируем
+					t.setCellEditMode(true);
+					ws.setCellEditMode(true);
 
-      var activeCellRange = ws.getActiveCell(0, 0, false);
-      ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
-    }
-  };
+					t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+					if (isNotFunction) {
+						t.skipHelpSelector = true;
+					}
+					// Открываем, с выставлением позиции курсора
+					if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, selectionRange)) {
+						t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
+						t.setCellEditMode(false);
+						t.controller.setStrictClose(false);
+						t.controller.setFormulaEditMode(false);
+						ws.setCellEditMode(false);
+						ws.setFormulaEditMode(false);
+					}
+					if (isNotFunction) {
+						t.skipHelpSelector = false;
+					}
+				} else {
+					t.setCellEditMode(false);
+					t.controller.setStrictClose(false);
+					t.controller.setFormulaEditMode(false);
+					ws.setCellEditMode(false);
+					ws.setFormulaEditMode(false);
+				}
+			};
+
+			ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
+		}
+	};
 
   WorkbookView.prototype.bIsEmptyClipboard = function() {
     return g_clipboardExcel.bIsEmptyClipboard(this.getCellEditMode());
@@ -2615,7 +2623,7 @@
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }
-    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
+    this.arrExcludeFormulas = [cBoolLocal.t, cBoolLocal.f];
   };
 
   WorkbookView.prototype._setHintsProps = function(bIsHinting, bIsSubpixHinting) {
@@ -2677,87 +2685,177 @@
     this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
-  WorkbookView.prototype.af_getTablePictures = function (wb, fmgrGraphics, oFont, props) {
-    var styleThumbnailWidth = 61;
-    var styleThumbnailHeight = 46;
-    if (AscBrowser.isRetina) {
-      styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
-      styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
-    }
+	WorkbookView.prototype.getPivotMergeStyle = function (sheetMergedStyles, range, style, pivot) {
+		var styleInfo = pivot.asc_getStyleInfo();
+		var i, r, dxf, stripe1, stripe2, emptyStripe = new Asc.CTableStyleElement();
+		if (style) {
+			dxf = style.wholeTable && style.wholeTable.dxf;
+			if (dxf) {
+				sheetMergedStyles.setTablePivotStyle(range, dxf);
+			}
 
-    var canvas = document.createElement('canvas');
-    canvas.width = styleThumbnailWidth;
-    canvas.height = styleThumbnailHeight;
-    var customStyles = wb.TableStyles.CustomStyles;
-    var result = [];
-    var options;
-    var n = 0;
-    if (customStyles) {
-      for (var i in customStyles) {
-        if (customStyles[i].table) {
-          options = {
-            name: i,
-            displayName: customStyles[i].displayName,
-            type: 'custom',
-            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
-          };
-          result[n] = new AscCommonExcel.formatTablePictures(options);
-          n++;
-        }
-      }
-    }
-    var defaultStyles = wb.TableStyles.DefaultStyles;
-    if (defaultStyles) {
-      for (var i in defaultStyles) {
-        if (defaultStyles[i].table) {
-          options = {
-            name: i,
-            displayName: defaultStyles[i].displayName,
-            type: 'default',
-            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
-          };
-          result[n] = new AscCommonExcel.formatTablePictures(options);
-          n++;
-        }
-      }
-    }
-    return result;
-  };
+			if (styleInfo.showColStripes) {
+				stripe1 = style.firstColumnStripe || emptyStripe;
+				stripe2 = style.secondColumnStripe || emptyStripe;
+				if (stripe1.dxf) {
+					sheetMergedStyles.setTablePivotStyle(range, stripe1.dxf,
+						new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
+				}
+				if (stripe2.dxf && range.c1 + stripe1.size <= range.c2) {
+					sheetMergedStyles.setTablePivotStyle(
+						new Asc.Range(range.c1 + stripe1.size, range.r1, range.c2, range.r2), stripe2.dxf,
+						new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
+				}
+			}
+			if (styleInfo.showRowStripes) {
+				stripe1 = style.firstRowStripe || emptyStripe;
+				stripe2 = style.secondRowStripe || emptyStripe;
+				if (stripe1.dxf) {
+					sheetMergedStyles.setTablePivotStyle(range, stripe1.dxf,
+						new Asc.CTableStyleStripe(stripe1.size, stripe2.size, true));
+				}
+				if (stripe2.dxf && range.r1 + stripe1.size <= range.r2) {
+					sheetMergedStyles.setTablePivotStyle(
+						new Asc.Range(range.c1, range.r1 + stripe1.size, range.c2, range.r2), stripe2.dxf,
+						new Asc.CTableStyleStripe(stripe2.size, stripe1.size, true));
+				}
+			}
 
-  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, fmgrGraphics, oFont, props) {
-	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+			dxf = style.firstColumn && style.firstColumn.dxf;
+			if (styleInfo.showRowHeaders && dxf) {
+				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r2), dxf);
+			}
 
-	//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-	var styleInfo;
-	if (props) {
-		styleInfo = {
-			ShowColumnStripes: props.asc_getBandVer(),
-			ShowFirstColumn: props.asc_getFirstCol(),
-			ShowLastColumn: props.asc_getLastCol(),
-			ShowRowStripes: props.asc_getBandHor(),
-			HeaderRowCount: props.asc_getFirstRow(),
-			TotalsRowCount: props.asc_getLastRow()
+			dxf = style.headerRow && style.headerRow.dxf;
+			if (styleInfo.showColHeaders && dxf) {
+				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c2, range.r1), dxf);
+			}
+
+			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
+			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && dxf) {
+				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r1), dxf);
+			}
+
+			if (pivot.asc_getColGrandTotals()) {
+				dxf = style.lastColumn && style.lastColumn.dxf;
+				if (dxf) {
+					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
+				}
+			}
+
+			if (styleInfo.showRowHeaders) {
+				for (i = range.r1 + 1; i < range.r2; ++i) {
+					r = i - (range.r1 + 1);
+					if (0 === r % 3) {
+						dxf = style.firstRowSubheading;
+					}
+					if (dxf = (dxf && dxf.dxf)) {
+						sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, i, range.c2, i), dxf);
+					}
+				}
+			}
+
+			if (pivot.asc_getRowGrandTotals()) {
+				dxf = style.totalRow && style.totalRow.dxf;
+				if (dxf) {
+					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r2, range.c2, range.r2), dxf);
+				}
+			}
+		}
+	};
+
+	WorkbookView.prototype.af_getTablePictures = function (props, bPivotTable) {
+		var wb = this.model;
+		var t = this;
+		
+		var result = [];
+		var canvas = document.createElement('canvas');
+		var styleInfo;
+
+		var defaultStyles, styleThumbnailWidth = 61, styleThumbnailHeight, row, col = 5;
+		if(bPivotTable)
+		{
+			styleThumbnailHeight = 49;
+			row = 8;
+			defaultStyles =  wb.TableStyles.DefaultStylesPivot;
+			styleInfo = props;
+		}
+		else
+		{
+			styleThumbnailHeight = 46;
+			row = 5;
+			defaultStyles = wb.TableStyles.DefaultStyles;
+			styleInfo = new AscCommonExcel.TableStyleInfo();
+			if (props) {
+				styleInfo.ShowColumnStripes = props.asc_getBandVer();
+				styleInfo.ShowFirstColumn = props.asc_getFirstCol();
+				styleInfo.ShowLastColumn = props.asc_getLastCol();
+				styleInfo.ShowRowStripes = props.asc_getBandHor();
+				styleInfo.HeaderRowCount = props.asc_getFirstRow();
+				styleInfo.TotalsRowCount = props.asc_getLastRow();
+			} else {
+				styleInfo.ShowColumnStripes = false;
+				styleInfo.ShowFirstColumn = false;
+				styleInfo.ShowLastColumn = false;
+				styleInfo.ShowRowStripes = true;
+				styleInfo.HeaderRowCount = true;
+				styleInfo.TotalsRowCount = false;
+			}
+		}
+
+		var originSizeW = styleThumbnailWidth;
+		var originSizeH = styleThumbnailHeight;
+
+		if (AscBrowser.isRetina)
+		{
+			styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
+			styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
+		}
+		canvas.width = styleThumbnailWidth;
+		canvas.height = styleThumbnailHeight;
+
+		var addStyles = function(styles, type)
+		{
+			for (var i in styles)
+			{
+				if ((bPivotTable && styles[i].pivot) || (!bPivotTable && styles[i].table))
+				{
+					var options = new AscCommonExcel.formatTablePictures();
+					options.name = i;
+					options.displayName = styles[i].displayName;
+					options.type = type;
+					options.image = t.af_getSmallIconTable(canvas, styles[i], styleInfo, {w: originSizeW, h: originSizeH, row: row, col: col});
+					result.push(options);
+				}
+			}
 		};
-	} else {
-		styleInfo = {
-			ShowColumnStripes: false,
-			ShowFirstColumn: false,
-			ShowLastColumn: false,
-			ShowRowStripes: true,
-			HeaderRowCount: true,
-			TotalsRowCount: false
-		};
-	}
-	
+
+		addStyles(wb.TableStyles.CustomStyles, "custom");
+		addStyles(defaultStyles, "default");
+
+		return result;
+	};
+
+  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, styleInfo, size) {
+
+    var fmgrGraphics = this.fmgrGraphics;
+    var oFont = this.m_oFont;
+  	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
+	var w = size.w;
+	var h = size.h;
+	var row = size.row;
+	var col = size.col;
+
 	var pxToMM = 72 / 96;
 	var startX = 1 * pxToMM;
 	var startY = 1 * pxToMM;
 
-	var ySize = 45 * pxToMM - 2 * startY;
-	var xSize = 61 * pxToMM - 2 * startX;
+	var ySize = (h - 1) * pxToMM - 2 * startY;
+	var xSize = w * pxToMM - 2 * startX;
 	
-	var stepY = (ySize) / 5;
-	var stepX = (xSize) / 5;
+	var stepY = (ySize) / row;
+	var stepX = (xSize) / col;
 	var lineStepX = (xSize - 1 * pxToMM) / 5;
 	
 	var whiteColor = new CColor(255, 255, 255);
@@ -2770,19 +2868,8 @@
 		defaultColor = style.wholeTable.dxf.font.getColor();
 	}
 
-	var headerRowCount = 1;
-	var totalsRowCount = 0;
-	if(null != styleInfo.HeaderRowCount)
-		headerRowCount = styleInfo.HeaderRowCount;
-	if(null != styleInfo.TotalsRowCount)
-		totalsRowCount = styleInfo.TotalsRowCount;
-	
 	ctx.setFillStyle(whiteColor);
 	ctx.fillRect(0, 0, xSize + 2 * startX, ySize + 2 * startY);
-	if (style.wholeTable && style.wholeTable.dxf.fill && null != style.wholeTable.dxf.fill.bg) {
-		ctx.setFillStyle(style.wholeTable.dxf.fill.bg);
-		ctx.fillRect(startX, startY, xSize, ySize);
-	}
 	
 	var calculateLineVer = function(color, x, y1, y2)
 	{
@@ -2813,52 +2900,72 @@
 		ctx.fillRect(x1 + startX, y1 + startY, w, h);
 		ctx.closePath();
 	};
-	
-	var bbox = {c1: 0, r1: 0, c2: 4, r2: 4};
-	for (var i = 0; i < 5; i++) {
-		for (var j = 0; j < 5; j++) {
-			var color = null;
-			var curStyle = style.getStyle(bbox, i, j, styleInfo, headerRowCount, totalsRowCount);
+
+	var bbox = new Asc.Range(0, 0, col - 1, row - 1);
+	var sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
+	var hiddenManager = new AscCommonExcel.HiddenManager(null);
+
+	if(style.pivot)
+	{
+		this.getPivotMergeStyle(sheetMergedStyles, bbox, style, styleInfo);
+	}
+	else
+	{
+		style.initStyle(sheetMergedStyles, bbox, styleInfo,
+			null !== styleInfo.HeaderRowCount ? styleInfo.HeaderRowCount : 1,
+			null !== styleInfo.TotalsRowCount ? styleInfo.TotalsRowCount : 0);
+	}
+
+	var compiledStylesArr = [];
+	for (var i = 0; i < row; i++)
+	{
+		for (var j = 0; j < col; j++) {
+			var color = null, prevStyle;
+			var curStyle = AscCommonExcel.getCompiledStyle(sheetMergedStyles, hiddenManager, i, j);
+
+			if(!compiledStylesArr[i])
+			{
+				compiledStylesArr[i] = [];
+			}
+			compiledStylesArr[i][j] = curStyle;
 			
 			//fill
-			if(curStyle && curStyle.fill && curStyle.fill.bg)
+			color = curStyle && curStyle.fill && curStyle.fill.bg;
+			if(color)
 			{
-				color = curStyle.fill.bg;
 				calculateRect(color, j * stepX, i * stepY, (j + 1) * stepX - j * stepX, (i + 1) * stepY - i * stepY);
 			}
 			
 			//borders
 			//left
-			if(curStyle && curStyle.border && curStyle.border.l && curStyle.border.l.w !== 0)
+			prevStyle = (j - 1 >= 0) ? compiledStylesArr[i][j - 1] : null;
+			color = AscCommonExcel.getMatchingBorder(prevStyle && prevStyle.border && prevStyle.border.r, curStyle && curStyle.border && curStyle.border.l);
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.l.c;
-				calculateLineVer(color, j * lineStepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color.c, j * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//right
-			if(curStyle && curStyle.border && curStyle.border.r && curStyle.border.r.w !== 0)
+			color = curStyle && curStyle.border && curStyle.border.r;
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.r.c;
-				calculateLineVer(color, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color.c, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//top
-			if(curStyle && curStyle.border && curStyle.border.t && curStyle.border.t.w !== 0)
+			prevStyle = (i - 1 >= 0) ? compiledStylesArr[i - 1][j] : null;
+			color = AscCommonExcel.getMatchingBorder(prevStyle && prevStyle.border && prevStyle.border.b, curStyle && curStyle.border && curStyle.border.t);
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.t.c;
-				calculateLineHor(color, j * stepX, i * stepY, (j + 1) * stepX);
+				calculateLineHor(color.c, j * stepX, i * stepY, (j + 1) * stepX);
 			}
 			//bottom
-			if(curStyle && curStyle.border && curStyle.border.b && curStyle.border.b.w !== 0)
+			color = curStyle && curStyle.border && curStyle.border.b;
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.b.c;
-				calculateLineHor(color, j * stepX, (i + 1) * stepY, (j + 1) * stepX);
+				calculateLineHor(color.c, j * stepX, (i + 1) * stepY, (j + 1) * stepX);
 			}
 			
 			//marks
-			var color = defaultColor;
-			if(curStyle && curStyle.font && curStyle.font.c)
-			{
-				color = curStyle.font.c;
-			}
+			color = (curStyle && curStyle.font && curStyle.font.c) || defaultColor;
 			calculateLineHor(color, j * lineStepX + 3 * pxToMM, (i + 1) * stepY - stepY / 2, (j + 1) * lineStepX - 2 * pxToMM);
 		}
 	}

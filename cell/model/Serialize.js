@@ -34,6 +34,8 @@
 (function(window, undefined) {
 
       // Import
+	var openXml = AscCommon.openXml;
+
       var g_memory = AscFonts.g_memory;
       var DecodeBase64Char = AscFonts.DecodeBase64Char;
       var b64_decode = AscFonts.b64_decode;
@@ -53,6 +55,7 @@
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
+	var g_StyleCache = AscCommonExcel.g_StyleCache;
 
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
@@ -234,7 +237,8 @@
         SheetViews: 22,
         SheetView: 23,
         SheetPr: 24,
-        SparklineGroups: 25
+        SparklineGroups: 25,
+		PivotTable: 26
     };
     /** @enum */
     var c_oSerWorksheetPropTypes =
@@ -547,7 +551,8 @@
         Solved : 5,
         Document : 6,
         Replies : 7,
-        Reply : 8
+        Reply : 8,
+        OOTime : 9
     };
     var c_oSer_ConditionalFormatting = {
         Pivot						: 0,
@@ -710,6 +715,14 @@
 	var c_oSer_AltTextTable = {
 		AltText: 0,
 		AltTextSummary: 1
+	};
+	/** @enum */
+	var c_oSer_PivotTypes = {
+		id: 0,
+		cache: 1,
+		record: 2,
+		cacheId: 3,
+		table: 4
 	};
 	/** @enum */
 	var c_oSer_ExternalLinkTypes = {
@@ -1168,7 +1181,7 @@
                 if (this.isCopyPaste)
                     rangeTable = aTables[i].Ref;
 
-                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.containsRange(rangeTable) && !ws.bExcludeHiddenRows))
+                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.isIntersect(rangeTable) && !ws.bExcludeHiddenRows))
                     this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
             }
         };
@@ -1991,6 +2004,12 @@
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(xfs.QuotePrefix);
             }
+			if(null != xfs.PivotButton)
+			{
+				this.memory.WriteByte(c_oSerXfsTypes.PivotButton);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteBool(xfs.PivotButton);
+			}
             if(null != xfs.XfId)
             {
                 this.memory.WriteByte(c_oSerXfsTypes.XfId);
@@ -2252,6 +2271,15 @@
             //DefinedNames
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
+			//PivotCaches
+			var isEmpty = true;
+			for (var id in wb.pivotCaches) {
+				isEmpty = false;
+				break;
+			}
+			if(!isEmpty) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches();});
+			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
 			}
@@ -2325,6 +2353,29 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
+		this.WritePivotCaches = function() {
+			var oThis = this;
+			for (var id in wb.pivotCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, wb.pivotCaches[id]);});
+			}
+		};
+		this.WritePivotCache = function(id, pivotCache) {
+			var oThis = this;
+			var oldId = pivotCache.id;
+			pivotCache.id = null;
+			this.bs.WriteItem(c_oSer_PivotTypes.id, function() {
+				oThis.memory.WriteLong(id - 0);
+			});
+			this.bs.WriteItem(c_oSer_PivotTypes.cache, function() {
+				pivotCache.toXml(oThis.memory);
+			});
+			if (pivotCache.cacheRecords) {
+				this.bs.WriteItem(c_oSer_PivotTypes.record, function() {
+					pivotCache.cacheRecords.toXml(oThis.memory);
+				});
+			}
+			pivotCache.id = oldId;
+		};
 		this.WriteExternalReferences = function() {
 			var oThis = this;
 			for (var i = 0; i < this.wb.externalReferences.length; i++) {
@@ -2533,7 +2584,7 @@
                 sAlign = this._getStringFromObjWithProperty(g_oDefaultFormat.Align);
             }
             this.prepareXfsStyles();
-            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null };
+            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null, PivotButton: null };
             this.oXfsMap["0|0|" + this.nDefaultFillIndex + "|0|" + sAlign] = { index: this.nXfsMapIndex++, val: xfs };
         };
         this.Write = function()
@@ -2616,6 +2667,9 @@
 			for (var i = 0; i < ws.aConditionalFormatting.length; ++i) {
 				this.bs.WriteItem(c_oSerWorksheetsTypes.ConditionalFormatting, function(){oThis.WriteConditionalFormatting(ws.aConditionalFormatting[i]);});
 			}
+			for (var i = 0; i < ws.pivotTables.length; ++i) {
+				this.bs.WriteItem(c_oSerWorksheetsTypes.PivotTable, function(){oThis.WritePivotTable(ws.pivotTables[i])});
+			}
         };
         this.WriteWorksheetProp = function(ws, index)
         {
@@ -2681,7 +2735,7 @@
                 aIndexes.push(i - 0);
             aIndexes.sort(AscCommon.fSortAscending);
             var fInitCol = function(col, nMin, nMax){
-                var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
+                var oRes = {BestFit: col.BestFit, hd: col.getHidden(), Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
                 if(null == oRes.width)
                 {
                     if(null != ws.oSheetFormatPr.dDefaultColWidth)
@@ -2888,13 +2942,13 @@
                     this.memory.WriteByte(c_oSerPropLenType.Double);
                     this.memory.WriteDouble2(oAllRow.h);
                 }
-                if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oAllRow.flags))
+                if(oAllRow.getCustomHeight())
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.CustomHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(true);
                 }
-                if(0 != (AscCommonExcel.g_nRowFlag_hd & oAllRow.flags))
+                if(oAllRow.getHidden())
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.ZeroHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3265,13 +3319,13 @@
                 this.memory.WriteByte(c_oSerPropLenType.Double);
                 this.memory.WriteDouble2(oRow.h);
             }
-            if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oRow.flags))
+            if(oRow.getCustomHeight())
             {
                 this.memory.WriteByte(c_oSerRowTypes.CustomHeight);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(true);
             }
-            if(0 != (AscCommonExcel.g_nRowFlag_hd & oRow.flags))
+            if(oRow.getHidden())
             {
                 this.memory.WriteByte(c_oSerRowTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3307,8 +3361,9 @@
                     var nXfsId;
                     var cellXfs = cell.xfs;
                     if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
-                        nXfsId = this.prepareXfs(cell.compiledXfs);
-                        cellXfs = cell.compiledXfs;
+                        var compiledXfs = cell.getCompiledStyle();
+                        nXfsId = this.prepareXfs(compiledXfs);
+                        cellXfs = compiledXfs;
                     } else {
                         nXfsId = this.prepareXfs(cell.xfs);
                     }
@@ -3332,11 +3387,13 @@
                     var sStyle = this.prepareXfsStyle(xfs);
 					//XfId в CustomStyles писать не нужно, поэтому null
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId, PivotButton: null};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
                         oXfs.QuotePrefix = xfs.QuotePrefix;
+					if(null != xfs.PivotButton)
+						oXfs.PivotButton = xfs.PivotButton;
 
                     this.oXfsStylesMap.push(oXfs);
                 }
@@ -3407,6 +3464,10 @@
                 if (null != xfs.QuotePrefix) {
                   sStyle.val += xfs.QuotePrefix;
                 }
+				sStyle.val += "|";
+				if (null != xfs.PivotButton) {
+					sStyle.val += xfs.PivotButton;
+				}
                 sStyle.val += "|";
                 if (null != xfs.XfId) {
                   sStyle.val += xfs.XfId;
@@ -3450,11 +3511,13 @@
                 {
                     nXfsId = this.nXfsMapIndex;
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId, PivotButton: null};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
                         oXfs.QuotePrefix = xfs.QuotePrefix;
+					if(null != xfs.PivotButton)
+						oXfs.PivotButton = xfs.PivotButton;
                     this.oXfsMap[sStyle.val] = {index: this.nXfsMapIndex++, val: oXfs};
                 }
                 else
@@ -3822,6 +3885,14 @@
                 this.memory.WriteByte(c_oSer_CommentData.Time);
                 this.memory.WriteString2(this.DateToISO8601(oDate));
             }
+            var sOOTime = oCommentData.asc_getOnlyOfficeTime();
+            if(null != sOOTime && "" !== sOOTime)
+            {
+                var oDate = new Date(sOOTime - 0);
+
+                this.memory.WriteByte(c_oSer_CommentData.OOTime);
+                this.memory.WriteString2(this.DateToISO8601(oDate));
+            }
             var sUserId = oCommentData.asc_getUserId();
             if(null != sUserId)
             {
@@ -4106,6 +4177,14 @@
                 this.memory.WriteString2(oSparkline.sqref.getName());
 			}
 		}
+		this.WritePivotTable = function(pivotTable)
+		{
+			var oThis = this;
+			if (null != pivotTable.cacheId) {
+				this.bs.WriteItem(c_oSer_PivotTypes.cacheId, function() {oThis.memory.WriteLong(pivotTable.cacheId);});
+			}
+			this.bs.WriteItem(c_oSer_PivotTypes.table, function() {pivotTable.toXml(oThis.memory);});
+		}
     }
     /** @constructor */
     function BinaryOtherTableWriter(memory, wb)
@@ -4133,24 +4212,24 @@
         this.nLastFilePos = 0;
         this.nRealTableCount = 0;
         this.bs = new BinaryCommonWriter(this.Memory);
-        this.Write = function(idWorksheet)
+        this.Write = function(idWorksheet, noBase64)
         {
             //если idWorksheet не null, то надо серализовать только его.
             pptx_content_writer._Start();
+			if (noBase64) {
+				this.Memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
+			}
             this.WriteMainTable(idWorksheet);
             pptx_content_writer._End();
-            return this.WriteFileHeader(this.Memory.GetCurPosition()) + this.Memory.GetBase64Memory();
+			if (noBase64) {
+				return this.Memory.GetData();
+			} else {
+				return this.WriteFileHeader(this.Memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.Memory.GetBase64Memory();
+			}
         };
-        this.Write2 = function(idWorksheet)
+        this.WriteFileHeader = function(nDataSize, version)
         {
-            //если idWorksheet не null, то надо серализовать только его.
-            pptx_content_writer._Start();
-            this.WriteMainTable(idWorksheet);
-            pptx_content_writer._End();
-        };
-        this.WriteFileHeader = function(nDataSize)
-        {
-            return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
+            return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
         };
         this.WriteMainTable = function(idWorksheet)
         {
@@ -4853,6 +4932,31 @@
         };
         this.InitStyleManager = function (oStyleObject)
         {
+			for (var i = 0; i < oStyleObject.aFonts.length; ++i) {
+				oStyleObject.aFonts[i] = g_StyleCache.addFont(oStyleObject.aFonts[i]);
+			}
+			for (var i = 0; i < oStyleObject.aFills.length; ++i) {
+				oStyleObject.aFills[i] = g_StyleCache.addFill(oStyleObject.aFills[i]);
+			}
+			for (var i = 0; i < oStyleObject.aBorders.length; ++i) {
+				oStyleObject.aBorders[i] = g_StyleCache.addBorder(oStyleObject.aBorders[i]);
+			}
+			for (var XfIdTmp in oStyleObject.aCellStyleXfs) {
+				var xf = oStyleObject.aCellStyleXfs[XfIdTmp];
+				if (xf.align) {
+					xf.align = g_StyleCache.addAlign(xf.align);
+				}
+			}
+			for (var i = 0; i < oStyleObject.aCellXfs.length; ++i) {
+				var xf = oStyleObject.aCellXfs[i];
+				if (xf.align) {
+					xf.align = g_StyleCache.addAlign(xf.align);
+				}
+			}
+			for (var i = 0; i < this.Dxfs.length; ++i) {
+				this.Dxfs[i] = g_StyleCache.addXf(this.Dxfs[i], true);
+			}
+
             // ToDo убрать - это заглушка
             var arrStyleMap = {};
             // Начнем с 1, т.к. 2 зарегистрировано для normal
@@ -4871,7 +4975,7 @@
                 if (null == oCellStyleXfs)
                     continue;
 
-                oCellStyle.xfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
                 // XfId
                 XfIdTmp = oCellStyle.XfId;
                 if (null !== XfIdTmp) {
@@ -4886,34 +4990,37 @@
                 if (null != oCellStyleXfs.borderid) {
                     var borderCellStyle = oStyleObject.aBorders[oCellStyleXfs.borderid];
                     if(null != borderCellStyle)
-                        oCellStyle.xfs.border = borderCellStyle.clone();
+						newXf.border = borderCellStyle;
                 }
                 // Fill
                 if (null != oCellStyleXfs.fillid) {
                     var fillCellStyle = oStyleObject.aFills[oCellStyleXfs.fillid];
                     if(null != fillCellStyle)
-                        oCellStyle.xfs.fill = fillCellStyle.clone();
+						newXf.fill = fillCellStyle;
                 }
                 // Font
                 if(null != oCellStyleXfs.fontid) {
                     var fontCellStyle = oStyleObject.aFonts[oCellStyleXfs.fontid];
                     if(null != fontCellStyle)
-                        oCellStyle.xfs.font = fontCellStyle.clone();
+						newXf.font = fontCellStyle;
                 }
                 // NumFmt
                 if(null != oCellStyleXfs.numid) {
                     var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
                     if(null != oCurNumCellStyle)
-                        oCellStyle.xfs.num = this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts));
                     else
-                        oCellStyle.xfs.num = this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 // QuotePrefix
                 if(null != oCellStyleXfs.QuotePrefix)
-                    oCellStyle.xfs.QuotePrefix = oCellStyleXfs.QuotePrefix;
+					newXf.QuotePrefix = oCellStyleXfs.QuotePrefix;
+				//PivotButton
+				if(null != oCellStyleXfs.PivotButton)
+					newXf.PivotButton = oCellStyleXfs.PivotButton;
                 // align
                 if(null != oCellStyleXfs.align)
-                    oCellStyle.xfs.align = oCellStyleXfs.align.clone();
+					newXf.align = oCellStyleXfs.align;
                 // ApplyBorder (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oCellStyleXfs.ApplyBorder)
                     oCellStyle.ApplyBorder = oCellStyleXfs.ApplyBorder;
@@ -4927,6 +5034,7 @@
                 if (null !== oCellStyleXfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oCellStyleXfs.ApplyNumberFormat;
 
+				oCellStyle.xfs = g_StyleCache.addXf(newXf);
                 // ToDo при отсутствии имени все не очень хорошо будет!
                 this.wb.CellStyles.CustomStyles.push(oCellStyle);
                 if (null !== oCellStyle.Name)
@@ -4949,50 +5057,51 @@
 
             for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
                 var xfs = oStyleObject.aCellXfs[i];
-                var oNewXfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
 
                 if(null != xfs.borderid)
                 {
                     var border = oStyleObject.aBorders[xfs.borderid];
                     if(null != border)
-                        oNewXfs.border = border.clone();
+						newXf.border = border;
                 }
                 if(null != xfs.fillid)
                 {
                     var fill = oStyleObject.aFills[xfs.fillid];
                     if(null != fill)
-                        oNewXfs.fill = fill.clone();
+						newXf.fill = fill;
                 }
                 if(null != xfs.fontid)
                 {
                     var font = oStyleObject.aFonts[xfs.fontid];
                     if(null != font)
-                        oNewXfs.font = font.clone();
+						newXf.font = font;
                 }
                 if(null != xfs.numid)
                 {
                     var oCurNum = oStyleObject.oNumFmts[xfs.numid];
+                    //todo
                     if(null != oCurNum)
-                        oNewXfs.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNum, oStyleObject.oNumFmts));
                     else
-                        oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 if(null != xfs.QuotePrefix)
-                    oNewXfs.QuotePrefix = xfs.QuotePrefix;
+					newXf.QuotePrefix = xfs.QuotePrefix;
+				if(null != xfs.PivotButton)
+					newXf.PivotButton = xfs.PivotButton;
                 if(null != xfs.align)
-                    oNewXfs.align = xfs.align.clone();
+					newXf.align = xfs.align;
                 if (null !== xfs.XfId) {
                     XfIdTmp = arrStyleMap[xfs.XfId];
                     if (null == XfIdTmp)
                         XfIdTmp = 0;
-                    oNewXfs.XfId = XfIdTmp;
+					newXf.XfId = XfIdTmp;
                 }
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
-                    this.oStyleManager.init(oNewXfs, this.wb);
-                // При открытии стиль будет ссылкой
-                oNewXfs.isReference = true;
-                this.aCellXfs.push(oNewXfs);
+                    this.oStyleManager.init(newXf, this.wb);
+                this.aCellXfs.push(g_StyleCache.addXf(newXf));
             }
             for(var i in oStyleObject.oCustomTableStyles)
             {
@@ -5245,7 +5354,7 @@
             var oThis = this;
             if (c_oSerStylesTypes.Xfs === type) {
                 var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, PivotButton: null};
                 res = this.bcr.Read2Spreadsheet(length, function (t, l) {
                     return oThis.ReadXfs(t, l, oNewXfs);
                 });
@@ -5261,7 +5370,7 @@
             if ( c_oSerStylesTypes.Xfs == type )
             {
                 var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null, PivotButton: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadXfs(t,l,oNewXfs);
                 });
@@ -5295,6 +5404,8 @@
                 oXfs.numid = this.stream.GetULongLE();
             else if ( c_oSerXfsTypes.QuotePrefix == type )
                 oXfs.QuotePrefix = this.stream.GetBool();
+			else if ( c_oSerXfsTypes.PivotButton == type )
+				oXfs.PivotButton = this.stream.GetBool();
             else if (c_oSerXfsTypes.XfId === type)
                 oXfs.XfId = this.stream.GetULongLE();
             else if ( c_oSerXfsTypes.Aligment == type )
@@ -5917,7 +6028,7 @@
             {
                 this.aMerged = [];
                 this.aHyperlinks = [];
-                var oNewWorksheet = new AscCommonExcel.Woorksheet(this.wb, wb.aWorksheets.length);
+                var oNewWorksheet = new AscCommonExcel.Worksheet(this.wb, wb.aWorksheets.length);
                 oNewWorksheet.aFormulaExt = [];
 				
 				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!
@@ -5985,8 +6096,7 @@
                 {
                     if(null != oFrom.BestFit)
                         oTo.BestFit = oFrom.BestFit;
-                    if(null != oFrom.hd)
-                        oTo.hd = oFrom.hd;
+                    oTo.setHidden(oFrom.hd);
                     if(null != oFrom.xfs)
                         oTo.xfs = oFrom.xfs.clone();
                     else if(null != oFrom.xfsid)
@@ -6218,14 +6328,14 @@
                 var oAllRow = oWorksheet.getAllRow();
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oAllRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oAllRow.setCustomHeight(true);
             }
             else if ( c_oSerSheetFormatPrTypes.ZeroHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
 				var hd = this.stream.GetBool();
 				if(hd)
-					oAllRow.flags |= AscCommonExcel.g_nRowFlag_hd;
+					oAllRow.setHidden(true);
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -6373,7 +6483,7 @@
             {
                 oRow.h = this.stream.GetDoubleLE();
                 if(AscCommon.CurFileVersion < 2)
-                    oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oRow.setCustomHeight(true);
 				if (oRow.h < 0) {
 					oRow.h = 0;
 				} else if (oRow.h > Asc.c_oAscMaxRowHeight) {
@@ -6384,13 +6494,13 @@
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oRow.setCustomHeight(true);
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.flags |= AscCommonExcel.g_nRowFlag_hd;
+					oRow.setHidden(true);
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
@@ -6823,6 +6933,12 @@
                 var oDate = this.Iso8601ToDate(this.stream.GetString2LE(length));
                 if(null != oDate)
                     oCommentData.asc_putTime(oDate.getTime() + "");
+            }
+            else if ( c_oSer_CommentData.OOTime == type )
+            {
+                var oDate = this.Iso8601ToDate(this.stream.GetString2LE(length));
+                if(null != oDate)
+                    oCommentData.asc_putOnlyOfficeTime(oDate.getTime() + "");
             }
             else if ( c_oSer_CommentData.UserId == type )
                 oCommentData.asc_putUserId(this.stream.GetString2LE(length));
@@ -7469,6 +7585,10 @@
         };
         this.getbase64DecodedData = function(szSrc)
         {
+			var isBase64 = typeof szSrc === 'string';
+			var srcLen = szSrc.length;
+			var nWritten = 0;
+			
             var nType = 0;
             var index = AscCommon.c_oSerFormat.Signature.length;
             var version = "";
@@ -7476,7 +7596,7 @@
             while (true)
             {
                 index++;
-                var _c = szSrc.charCodeAt(index);
+                var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc[index];
                 if (_c == ";".charCodeAt(0))
                 {
 
@@ -7496,20 +7616,91 @@
                 else
                     dst_len += String.fromCharCode(_c);
             }
+			var nVersion = 0;
+			if(version.length > 1)
+			{
+				var nTempVersion = version.substring(1) - 0;
+				if(nTempVersion)
+					AscCommon.CurFileVersion = nVersion = nTempVersion;
+			}
+			var stream;
+			if (Asc.c_nVersionNoBase64 !== nVersion) {
+				var dstLen = parseInt(dst_len);
 
-            var dstLen = dst_len >> 0;
-            var pointer = g_memory.Alloc(dstLen);
-            var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
-            stream.obj = pointer.obj;
+				var pointer = g_memory.Alloc(dstLen);
+				stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
+				stream.obj = pointer.obj;
 
-            this.getbase64DecodedData2(szSrc, index, stream, 0);
+				var dstPx = stream.data;
 
-            if(version.length > 1)
-            {
-                var nTempVersion = version.substring(1) - 0;
-                if(nTempVersion)
-                    AscCommon.CurFileVersion = nTempVersion;
-            }
+				if (window.chrome)
+				{
+					while (index < srcLen)
+					{
+						var dwCurr = 0;
+						var i;
+						var nBits = 0;
+						for (i=0; i<4; i++)
+						{
+							if (index >= srcLen)
+								break;
+							var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]);
+							if (nCh == -1)
+							{
+								i--;
+								continue;
+							}
+							dwCurr <<= 6;
+							dwCurr |= nCh;
+							nBits += 6;
+						}
+
+						dwCurr <<= 24-nBits;
+						for (i=0; i<nBits/8; i++)
+						{
+							dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+							dwCurr <<= 8;
+						}
+					}
+				}
+				else
+				{
+					var p = b64_decode;
+					while (index < srcLen)
+					{
+						var dwCurr = 0;
+						var i;
+						var nBits = 0;
+						for (i=0; i<4; i++)
+						{
+							if (index >= srcLen)
+								break;
+							var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]];
+							if (nCh == undefined)
+							{
+								i--;
+								continue;
+							}
+							dwCurr <<= 6;
+							dwCurr |= nCh;
+							nBits += 6;
+						}
+
+						dwCurr <<= 24-nBits;
+						for (i=0; i<nBits/8; i++)
+						{
+							dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+							dwCurr <<= 8;
+						}
+					}
+				}
+			} else {
+				stream = new AscCommon.FT_Stream2(szSrc, szSrc.length);
+				//skip header
+				stream.EnterFrame(index);
+				stream.Seek(index);
+			}
+
             return stream;
         };
         this.getbase64DecodedData2 = function(szSrc, szSrcOffset, stream, streamOffset)
@@ -7599,26 +7790,13 @@
             if(!this.copyPasteObj.isCopyPaste)
             {
                 ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
-                ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
-                wb.TableStyles.concatStyles();
+                // ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
+                // wb.TableStyles.concatStyles();
             }
 			if(!pasteBinaryFromExcel)
 				History.TurnOn();
 			//чтобы удалялся stream с бинарником
 			pptx_content_loader.Clear(true);
-        };
-        this.ReadData = function(data, wb)
-        {
-            History.TurnOff();
-
-            this.stream = new AscCommon.FT_Stream2(data, data.length);
-            this.ReadFile(wb);
-
-            ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
-            ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
-            wb.TableStyles.concatStyles();
-
-            History.TurnOn();
         };
         this.ReadFile = function(wb)
         {
@@ -7737,6 +7915,7 @@
         this.DefaultPivotStyle = "PivotStyleLight16";
         this.CustomStyles = {};
         this.DefaultStyles = {};
+		this.DefaultStylesPivot = {};
         this.AllStyles = {};
     }
     CTableStyles.prototype =
@@ -7745,18 +7924,51 @@
         {
             for(var i in this.DefaultStyles)
                 this.AllStyles[i] = this.DefaultStyles[i];
+			for(var i in this.DefaultStylesPivot)
+				this.AllStyles[i] = this.DefaultStylesPivot[i];
             for(var i in this.CustomStyles)
                 this.AllStyles[i] = this.CustomStyles[i];
-        }
+        },
+		readAttributes: function(attr, uq) {
+			if (attr()) {
+				var vals = attr();
+				var val;
+				val = vals["defaultTableStyle"];
+				if (undefined !== val) {
+					this.DefaultTableStyle = uq(val);
+				}
+				val = vals["defaultPivotStyle"];
+				if (undefined !== val) {
+					this.DefaultPivotStyle = uq(val);
+				}
+			}
+		},
+		onStartNode: function(elem, attr, uq) {
+			var newContext = this;
+			if ("tableStyle" === elem) {
+				newContext = new CTableStyle();
+				if (newContext.readAttributes) {
+					newContext.readAttributes(attr, uq);
+				}
+				this.CustomStyles[newContext.name] = newContext;
+				openXml.SaxParserDataTransfer.curTableStyle = newContext;
+			} else {
+				newContext = null;
+			}
+			return newContext;
+		}
     };
+	function CTableStyleStripe(size, offset, opt_row){
+		this.size = size;
+		this.offset = offset;
+		this.row = opt_row;
+	}
     function CTableStyle()
     {
         this.name = null;
         this.pivot = true;
         this.table = true;
         this.displayName = null; // Показываемое имя (для дефалтовых оно будет с пробелами, а для пользовательских совпадает с name)
-
-        this.compiled = null;
 
         this.blankRow = null;
         this.firstColumn = null;
@@ -7787,707 +7999,209 @@
         this.totalRow = null;
         this.wholeTable = null;
     }
-    CTableStyle.prototype =
-    {
-        getStyle: function(bbox, rowIndex, colIndex, options, headerRowCount, totalsRowCount)
-        {
-            //todo есть проблемы при малых размерах таблиц
-            var res = null;
-            if(null == this.compiled)
-                this._compile();
-            var styles = this._getOption(options, headerRowCount, totalsRowCount);
-            if(headerRowCount > 0 && rowIndex == bbox.r1)
-            {
-                if(colIndex == bbox.c1)
-                    res = styles.headerLeftTop;
-                else if(colIndex == bbox.c2)
-                    res = styles.headerRightTop;
-                else
-                    res = styles.header;
-            }
-            else if(totalsRowCount > 0 && rowIndex == bbox.r2)
-            {
-                if(colIndex == bbox.c1)
-                    res = styles.totalLeftBottom;
-                else if(colIndex == bbox.c2)
-                    res = styles.totalRightBottom;
-                else
-                    res = styles.total;
-            }
-            else if(options.ShowFirstColumn && colIndex == bbox.c1)
-            {
-                if(rowIndex == bbox.r1 + headerRowCount)
-                    res = styles.leftTopFC;
-                else if(rowIndex == bbox.r2 - totalsRowCount)
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                        res = styles.leftBottomRowBand1FC;
-                    else
-                        res = styles.leftBottomRowBand2FC;
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                        res = styles.leftRowBand1FC;
-                    else
-                        res = styles.leftRowBand2FC;
-                }
-            }
-            else if(options.ShowLastColumn && colIndex == bbox.c2)
-            {
-                if(rowIndex == bbox.r1 + headerRowCount)
-                {
-                    if(0 == colIndex % 2)
-                        res = styles.rightTopColBand1LC;
-                    else
-                        res = styles.rightTopColBand2LC;
-                }
-                else if(rowIndex == bbox.r2 - totalsRowCount)
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightBottomRowBand1ColBand1LC;
-                        else
-                            res = styles.rightBottomRowBand1ColBand2LC;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightBottomRowBand2ColBand1LC;
-                        else
-                            res = styles.rightBottomRowBand2ColBand2LC;
-                    }
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand1ColBand1LC;
-                        else
-                            res = styles.rightRowBand1ColBand2LC;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand2ColBand1LC;
-                        else
-                            res = styles.rightRowBand2ColBand2LC;
-                    }
-                }
-            }
-            else if(options.ShowRowStripes || options.ShowColumnStripes)
-            {
-                if(rowIndex == bbox.r1 + headerRowCount)
-                {
-                    if(colIndex == bbox.c1)
-                        res = styles.leftTop;
-                    else if(colIndex == bbox.c2)
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightTopColBand1;
-                        else
-                            res = styles.rightTopColBand2;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.topColBand1;
-                        else
-                            res = styles.topColBand2;
-                    }
-                }
-                else if(rowIndex == bbox.r2 - totalsRowCount)
-                {
-                    if(colIndex == bbox.c1)
-                    {
-                        if(0 == (rowIndex - headerRowCount) % 2)
-                            res = styles.leftBottomRowBand1;
-                        else
-                            res = styles.leftBottomRowBand2;
-                    }
-                    else if(colIndex == bbox.c2)
-                    {
-                        if(0 == (rowIndex - headerRowCount) % 2)
-                        {
-                            if(0 == colIndex % 2)
-                                res = styles.rightBottomRowBand1ColBand1;
-                            else
-                                res = styles.rightBottomRowBand1ColBand2;
-                        }
-                        else
-                        {
-                            if(0 == colIndex % 2)
-                                res = styles.rightBottomRowBand2ColBand1;
-                            else
-                                res = styles.rightBottomRowBand2ColBand2;
-                        }
-                    }
-                    else
-                    {
-                        if(0 == (rowIndex - headerRowCount) % 2)
-                        {
-                            if(0 == colIndex % 2)
-                                res = styles.bottomRowBand1ColBand1;
-                            else
-                                res = styles.bottomRowBand1ColBand2;
-                        }
-                        else
-                        {
-                            if(0 == colIndex % 2)
-                                res = styles.bottomRowBand2ColBand1;
-                            else
-                                res = styles.bottomRowBand2ColBand2;
-                        }
-                    }
-                }
-                else if(colIndex == bbox.c1)
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                        res = styles.leftRowBand1;
-                    else
-                        res = styles.leftRowBand2;
-                }
-                else if(colIndex == bbox.c2)
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand1ColBand1;
-                        else
-                            res = styles.rightRowBand1ColBand2;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand2ColBand1;
-                        else
-                            res = styles.rightRowBand2ColBand2;
-                    }
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.innerRowBand1ColBand1;
-                        else
-                            res = styles.innerRowBand1ColBand2;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.innerRowBand2ColBand1;
-                        else
-                            res = styles.innerRowBand2ColBand2;
-                    }
-                }
-            }
-            else
-            {
-                if(rowIndex == bbox.r1 + headerRowCount)
-                {
-                    if(colIndex == bbox.c1)
-                        res = styles.leftTop;
-                    else if(colIndex == bbox.c2)
-                        res = styles.rightTopColBand1;
-                    else
-                        res = styles.topColBand1;
-                }
-                else if(rowIndex == bbox.r2 - totalsRowCount)
-                {
-                    if(colIndex == bbox.c1)
-                        res = styles.leftBottomRowBand1;
-                    else if(colIndex == bbox.c2)
-                        res = styles.rightBottomRowBand1ColBand1;
-                    else
-                        res = styles.bottomRowBand1ColBand1;
-                }
-                else if(colIndex == bbox.c1)
-                    res = styles.leftRowBand1;
-                else if(colIndex == bbox.c2)
-                    res = styles.rightRowBand1ColBand1;
-                else
-                    res = styles.innerRowBand1ColBand1;
-            }
-            return res;
-        },
-        _getOption: function(options, headerRowCount, totalsRowCount)
-        {
-            var nBitMask = 0;
-            if(options.ShowFirstColumn)
-                nBitMask += 1;
-            if(options.ShowLastColumn)
-                nBitMask += 1 << 1;
-            if(options.ShowRowStripes)
-                nBitMask += 1 << 2;
-            if(options.ShowColumnStripes)
-                nBitMask += 1 << 3;
-            if(headerRowCount > 0)
-                nBitMask += 1 << 4;
-            if(totalsRowCount > 0)
-                nBitMask += 1 << 5;
-            var styles = this.compiled.options[nBitMask];
-            if(null == styles)
-            {
-                var configs = {
-                    header: {header: true, top: true},
-                    headerLeftTop: {header: true, left: true, top: true},
-                    headerRightTop: {header: true, right: true, top: true},
-                    total: {total: true, bottom: true},
-                    totalLeftBottom: {total: true, left: true, bottom: true},
-                    totalRightBottom: {total: true, right: true, bottom: true},
-                    leftTop: {ShowRowStripes: true, ShowColumnStripes: true, left: true, top: true, RowBand1: true, ColBand1: true},
-                    leftBottomRowBand1: {ShowRowStripes: true, ShowColumnStripes: true, left: true, bottom: true, RowBand1: true, ColBand1: true},
-                    leftBottomRowBand2: {ShowRowStripes: true, ShowColumnStripes: true, left: true, bottom: true, RowBand2: true, ColBand1: true},
-                    leftRowBand1: {ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand1: true, ColBand1: true},
-                    leftRowBand2: {ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand2: true, ColBand1: true},
-                    rightTopColBand1: {ShowRowStripes: true, ShowColumnStripes: true, right: true, top: true, RowBand1: true, ColBand1: true},
-                    rightTopColBand2: {ShowRowStripes: true, ShowColumnStripes: true, right: true, top: true, RowBand1: true, ColBand2: true},
-                    rightRowBand1ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand1: true},
-                    rightRowBand1ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand2: true},
-                    rightRowBand2ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand1: true},
-                    rightRowBand2ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand2: true},
-                    rightBottomRowBand1ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand1: true, ColBand1: true},
-                    rightBottomRowBand1ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand1: true, ColBand2: true},
-                    rightBottomRowBand2ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand2: true, ColBand1: true},
-                    rightBottomRowBand2ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand2: true, ColBand2: true},
-                    topColBand1: {ShowRowStripes: true, ShowColumnStripes: true, top: true, RowBand1: true, ColBand1: true},
-                    topColBand2: {ShowRowStripes: true, ShowColumnStripes: true, top: true, RowBand1: true, ColBand2: true},
-                    bottomRowBand1ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand1: true, ColBand1: true},
-                    bottomRowBand1ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand1: true, ColBand2: true},
-                    bottomRowBand2ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand2: true, ColBand1: true},
-                    bottomRowBand2ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand2: true, ColBand2: true},
-                    innerRowBand1ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, RowBand1: true, ColBand1: true},
-                    innerRowBand1ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, RowBand1: true, ColBand2: true},
-                    innerRowBand2ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, RowBand2: true, ColBand1: true},
-                    innerRowBand2ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, RowBand2: true, ColBand2: true},
-                    leftTopFC: {ShowFirstColumn: true, ShowRowStripes: true, ShowColumnStripes: true, left: true, top: true, RowBand1: true, ColBand1: true},
-                    leftBottomRowBand1FC: {ShowFirstColumn: true, ShowRowStripes: true, ShowColumnStripes: true, left: true, bottom: true, RowBand1: true, ColBand1: true},
-                    leftBottomRowBand2FC: {ShowFirstColumn: true, ShowRowStripes: true, ShowColumnStripes: true, left: true, bottom: true, RowBand2: true, ColBand1: true},
-                    leftRowBand1FC: {ShowFirstColumn: true, ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand1: true, ColBand1: true},
-                    leftRowBand2FC: {ShowFirstColumn: true, ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand2: true, ColBand1: true},
-                    rightTopColBand1LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, top: true, RowBand1: true, ColBand1: true},
-                    rightTopColBand2LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, top: true, RowBand1: true, ColBand2: true},
-                    rightRowBand1ColBand1LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand1: true},
-                    rightRowBand1ColBand2LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand2: true},
-                    rightRowBand2ColBand1LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand1: true},
-                    rightRowBand2ColBand2LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand2: true},
-                    rightBottomRowBand1ColBand1LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand1: true, ColBand1: true},
-                    rightBottomRowBand1ColBand2LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand1: true, ColBand2: true},
-                    rightBottomRowBand2ColBand1LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand2: true, ColBand1: true},
-                    rightBottomRowBand2ColBand2LC: {ShowLastColumn: true, ShowRowStripes: true, ShowColumnStripes: true, right: true, bottom: true, RowBand2: true, ColBand2: true}
-                }
-                var styles = {};
-                for(var i in configs)
-                {
-                    styles[i] = new AscCommonExcel.CellXfs();
-                }
-                this._compileOption(options, headerRowCount, totalsRowCount, styles, configs);
-                this.compiled.options[nBitMask] = styles;
-            }
-            return styles;
-        },
-        _compileSetBorder : function(inputDxf, outputDxf, bLeft, bTop, bRight, bBottom, bInnerHor, bInnerVer)
-        {
-            if(null != inputDxf && null != inputDxf.border)
-            {
-                var oCurBorder = inputDxf.border;
-                var oNewBorder = new AscCommonExcel.Border();
-                if(bLeft)
-                    oNewBorder.l = oCurBorder.l;
-                else if(bInnerVer)
-                    oNewBorder.l = oCurBorder.iv;
-                if(bTop)
-                    oNewBorder.t = oCurBorder.t;
-                else if(bInnerHor)
-                    oNewBorder.t = oCurBorder.ih;
-                if(bRight)
-                    oNewBorder.r = oCurBorder.r;
-                else if(bInnerVer)
-                    oNewBorder.r = oCurBorder.iv;
-                if(bBottom)
-                    oNewBorder.b = oCurBorder.b;
-                else if(bInnerHor)
-                    oNewBorder.b = oCurBorder.ih;
+	CTableStyle.prototype.initStyle = function (sheetMergedStyles, bbox, options, headerRowCount, totalsRowCount) {
+		var r1Data = bbox.r1 + headerRowCount;
+		var r2Data = bbox.r2 - totalsRowCount;
+		var bboxTmp;
+		var offsetStripe;
+		var stripe;
+		if (this.wholeTable) {
+			sheetMergedStyles.setTablePivotStyle(bbox, this.wholeTable.dxf);
+		}
+		if (r1Data <= r2Data) {
+			if (options.ShowColumnStripes) {
+				if (this.firstColumnStripe) {
+					offsetStripe = this.secondColumnStripe ? this.secondColumnStripe.size : 1;
+					stripe = new CTableStyleStripe(this.firstColumnStripe.size, offsetStripe);
+					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstColumnStripe.dxf, stripe);
+				}
+				if (this.secondColumnStripe) {
+					offsetStripe = this.firstColumnStripe ? this.firstColumnStripe.size : 1;
+					stripe = new CTableStyleStripe(this.secondColumnStripe.size, offsetStripe);
+					if (bbox.c1 + offsetStripe <= bbox.c2) {
+						bboxTmp = new Asc.Range(bbox.c1 + offsetStripe, r1Data, bbox.c2, r2Data);
+						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondColumnStripe.dxf, stripe);
+					}
+				}
+			}
+			if (options.ShowRowStripes) {
+				if (this.firstRowStripe) {
+					offsetStripe = this.secondRowStripe ? this.secondRowStripe.size : 1;
+					stripe = new CTableStyleStripe(this.firstRowStripe.size, offsetStripe, true);
+					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstRowStripe.dxf, stripe);
+				}
+				if (this.secondRowStripe) {
+					offsetStripe = this.firstRowStripe ? this.firstRowStripe.size : 1;
+					stripe = new CTableStyleStripe(this.secondRowStripe.size, offsetStripe, true);
+					if (r1Data + offsetStripe <= r2Data) {
+						bboxTmp = new Asc.Range(bbox.c1, r1Data + offsetStripe, bbox.c2, r2Data);
+						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondRowStripe.dxf, stripe);
+					}
+				}
+			}
+		}
+		if (options.ShowLastColumn && this.lastColumn) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r1, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastColumn.dxf);
+		}
+		if (options.ShowFirstColumn && this.firstColumn) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c1, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstColumn.dxf);
+		}
+		if (this.headerRow && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.headerRow.dxf);
+		}
+		if (this.totalRow && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r2, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.totalRow.dxf);
+		}
+		if (this.firstHeaderCell && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c1, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstHeaderCell.dxf);
+		}
+		if (this.lastHeaderCell && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r1, bbox.c2, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastHeaderCell.dxf);
+		}
+		if (this.firstTotalCell && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r2, bbox.c1, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstTotalCell.dxf);
+		}
+		if (this.lastTotalCell && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r2, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastTotalCell.dxf);
+		}
+	};
+	CTableStyle.prototype.readAttributes = function (attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["name"];
+			if (undefined !== val) {
+				this.name = uq(val);
+				this.displayName = this.name;
+			}
+			val = vals["displayName"];
+			if (undefined !== val) {
+				this.displayName = uq(val);
+			}
+			val = vals["pivot"];
+			if (undefined !== val) {
+				this.pivot = getBoolFromXml(val);
+			}
+			val = vals["table"];
+			if (undefined !== val) {
+				this.table = getBoolFromXml(val);
+			}
+		}
+	};
+	CTableStyle.prototype.onStartNode = function (elem, attr, uq) {
+		var newContext = this;
+		if ("tableStyleElement" === elem) {
+			newContext = new CTableStyleElement();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
 
-                if(null == outputDxf.border)
-                    outputDxf.border = oNewBorder;
-                else
-                    outputDxf.border = outputDxf.border.merge(oNewBorder);
-            }
-        },
-        _compileSetHeaderBorder : function(inputDxf, outputDxf, bHeader)
-        {
-            if(null != inputDxf && null != inputDxf.border)
-            {
-                var oCurBorder = inputDxf.border;
-                var oNewBorder = new AscCommonExcel.Border();
-                if(bHeader)
-                    oNewBorder.t = oCurBorder.b;
-                else
-                    oNewBorder.b = oCurBorder.t;
-                if(null == outputDxf.border)
-                    outputDxf.border = oNewBorder;
-                else
-                    outputDxf.border = outputDxf.border.merge(oNewBorder);
-            }
-        },
-        _compileOption : function(options, headerRowCount, totalsRowCount, styles, configs)
-        {
-            for(var i in styles)
-            {
-                var xfs = styles[i];
-                var config = configs[i];
-                //заглушка для бордеров, чтобы при конфликте нижние бордеры не перекрывали бордеры заголовка
-                if(headerRowCount > 0 && config.top && true != config.header)
-                {
-                    if(options.ShowFirstColumn && null != this.firstHeaderCell && config.left)
-                        this._compileSetHeaderBorder(this.firstHeaderCell.dxf, xfs, true);
-                    else if(options.ShowLastColumn && null != this.lastHeaderCell && config.right)
-                        this._compileSetHeaderBorder(this.lastHeaderCell.dxf, xfs, true);
-                    if(null != this.headerRow)
-                        this._compileSetHeaderBorder(this.headerRow.dxf, xfs, true);
-                }
-                if(totalsRowCount > 0 && config.bottom && true != config.total)
-                {
-                    if(options.ShowFirstColumn && null != this.firstTotalCell && config.left)
-                        this._compileSetHeaderBorder(this.firstTotalCell.dxf, xfs, false);
-                    else if(options.ShowLastColumn && null != this.lastTotalCell && config.right)
-                        this._compileSetHeaderBorder(this.lastTotalCell.dxf, xfs, false);
-                    if(null != this.totalRow)
-                        this._compileSetHeaderBorder(this.totalRow.dxf, xfs, false);
-                }
-                if(headerRowCount > 0 && config.header)
-                {
-                    if(options.ShowFirstColumn && null != this.firstHeaderCell && config.left)
-                        xfs = xfs.merge(this.firstHeaderCell.dxf);
-                    if(options.ShowLastColumn && null != this.lastHeaderCell && config.right)
-                        xfs = xfs.merge(this.lastHeaderCell.dxf);
-                    if(null != this.headerRow)
-                    {
-                        xfs = xfs.merge(this.compiled.headerRow.dxf);
-                        //применяем бордер
-                        if(config.left)
-                            this._compileSetBorder(this.headerRow.dxf, xfs, true, true, false, true, false, true);
-                        else if(config.right)
-                            this._compileSetBorder(this.headerRow.dxf, xfs, false, true, true, true, false, true);
-                        else
-                            this._compileSetBorder(this.headerRow.dxf, xfs, false, true, false, true, false, true);
-                    }
-                    if(options.ShowFirstColumn && null != this.firstColumn && config.left)
-                    {
-                        xfs = xfs.merge(this.compiled.firstColumn.dxf);
-                        //применяем бордер
-                        this._compileSetBorder(this.firstColumn.dxf, xfs, true, true, true, false, true, false);
-                    }
-                    if(options.ShowLastColumn && null != this.lastColumn && config.right)
-                    {
-                        xfs = xfs.merge(this.compiled.lastColumn.dxf);
-                        //применяем бордер
-                        this._compileSetBorder(this.lastColumn.dxf, xfs, true, true, true, false, true, false);
-                    }
-                }
-                else if(totalsRowCount > 0 && config.total)
-                {
-                    if(options.ShowFirstColumn && null != this.firstTotalCell && config.left)
-                        xfs = xfs.merge(this.firstTotalCell.dxf);
-                    if(options.ShowLastColumn && null != this.lastTotalCell && config.right)
-                        xfs = xfs.merge(this.lastTotalCell.dxf);
-                    if(null != this.totalRow)
-                    {
-                        xfs = xfs.merge(this.compiled.totalRow.dxf);
-                        //применяем бордер
-                        if(config.left)
-                            this._compileSetBorder(this.totalRow.dxf, xfs, true, true, false, true, false, true);
-                        else if(config.right)
-                            this._compileSetBorder(this.totalRow.dxf, xfs, false, true, true, true, false, true);
-                        else
-                            this._compileSetBorder(this.totalRow.dxf, xfs, false, true, false, true, false, true);
-                    }
-                    if(options.ShowFirstColumn && null != this.firstColumn && config.left)
-                    {
-                        xfs = xfs.merge(this.compiled.firstColumn.dxf);
-                        //применяем бордер
-                        this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, true, true, false);
-                    }
-                    if(options.ShowLastColumn && null != this.lastColumn && config.right)
-                    {
-                        xfs = xfs.merge(this.compiled.lastColumn.dxf);
-                        //применяем бордер
-                        this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, true, true, false);
-                    }
-                }
-                else
-                {
-                    if(options.ShowFirstColumn && null != this.firstColumn && config.ShowFirstColumn)
-                    {
-                        xfs = xfs.merge(this.compiled.firstColumn.dxf);
-                        //применяем бордер
-                        if(config.left && config.top)
-                        {
-                            if(headerRowCount > 0)
-                                this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-                            else
-                                this._compileSetBorder(this.firstColumn.dxf, xfs, true, true, true, false, true, false);
-                        }
-                        else if(config.left && config.bottom)
-                        {
-                            if(totalsRowCount > 0)
-                                this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-                            else
-                                this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, true, true, false);
-                        }
-                        else
-                            this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-                    }
-                    else if(options.ShowLastColumn && null != this.lastColumn && config.ShowLastColumn)
-                    {
-                        xfs = xfs.merge(this.compiled.lastColumn.dxf);
-                        //применяем бордер
-                        if(config.right && config.top)
-                        {
-                            if(headerRowCount > 0)
-                                this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-                            else
-                                this._compileSetBorder(this.lastColumn.dxf, xfs, true, true, true, false, true, false);
-                        }
-                        else if(config.right && config.bottom)
-                        {
-                            if(totalsRowCount > 0)
-                                this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-                            else
-                                this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, true, true, false);
-                        }
-                        else
-                            this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-                    }
-                    if(options.ShowRowStripes && config.ShowRowStripes)
-                    {
-                        if(null != this.firstRowStripe && config.RowBand1)
-                        {
-                            xfs = xfs.merge(this.compiled.firstRowStripe.dxf);
-                            //применяем бордер
-                            if(config.left)
-                                this._compileSetBorder(this.firstRowStripe.dxf, xfs, true, true, false, true, false, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.firstRowStripe.dxf, xfs, false, true, true, true, false, true);
-                            else
-                                this._compileSetBorder(this.firstRowStripe.dxf, xfs, false, true, false, true, false, true);
-                        }
-                        else if(null != this.secondRowStripe && config.RowBand2)
-                        {
-                            xfs = xfs.merge(this.compiled.secondRowStripe.dxf);
-                            //применяем бордер
-                            if(config.left)
-                                this._compileSetBorder(this.secondRowStripe.dxf, xfs, true, true, false, true, false, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.secondRowStripe.dxf, xfs, false, true, true, true, false, true);
-                            else
-                                this._compileSetBorder(this.secondRowStripe.dxf, xfs, false, true, false, true, false, true);
-                        }
-                    }
-                    if(options.ShowColumnStripes && config.ShowRowStripes)
-                    {
-                        if(null != this.firstColumnStripe && config.ColBand1)
-                        {
-                            xfs = xfs.merge(this.compiled.firstColumnStripe.dxf);
-                            //применяем бордер
-                            if(config.top)
-                                this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, true, true, false, true, false);
-                            else if(config.bottom)
-                                this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, false, true, true, true, false);
-                            else
-                                this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, false, true, false, true, false);
-                        }
-                        else if(null != this.secondColumnStripe && config.ColBand2)
-                        {
-                            xfs = xfs.merge(this.compiled.secondColumnStripe.dxf);
-                            //применяем бордер
-                            if(config.top)
-                                this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, true, true, false, true, false);
-                            else if(config.bottom)
-                                this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, false, true, true, true, false);
-                            else
-                                this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, false, true, false, true, false);
-                        }
-                    }
-                }
-                if(null != this.wholeTable)
-                {
-                    xfs = xfs.merge(this.compiled.wholeTable.dxf);
-                    //применяем бордер
-                    if(config.top)
-                    {
-                        if(headerRowCount > 0 && true != config.header)
-                        {
-                            if(config.left)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-                            else
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-                        }
-                        else
-                        {
-                            if(config.left)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, true, true, false, false, true, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, true, false, true, true);
-                            else
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, false, false, true, true);
-                        }
-                    }
-                    else if(config.bottom)
-                    {
-                        if(totalsRowCount > 0 && true != config.total)
-                        {
-                            if(config.left)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-                            else
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-                        }
-                        else
-                        {
-                            if(config.left)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, true, true, true);
-                            else if(config.right)
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, true, true, true);
-                            else
-                                this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, true, true, true);
-                        }
-                    }
-                    else if(config.left)
-                        this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-                    else if(config.right)
-                        this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-                    else
-                        this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-                }
-                styles[i] = xfs;
-            }
-        },
-        _compile : function()
-        {
-            this.compiled = {
-                options: {},
-                blankRow: null,
-                firstColumn: null,
-                firstColumnStripe: null,
-                firstColumnSubheading: null,
-                firstHeaderCell: null,
-                firstRowStripe: null,
-                firstRowSubheading: null,
-                firstSubtotalColumn: null,
-                firstSubtotalRow: null,
-                firstTotalCell: null,
-                headerRow: null,
-                lastColumn: null,
-                lastHeaderCell: null,
-                lastTotalCell: null,
-                pageFieldLabels: null,
-                pageFieldValues: null,
-                secondColumnStripe: null,
-                secondColumnSubheading: null,
-                secondRowStripe: null,
-                secondRowSubheading: null,
-                secondSubtotalColumn: null,
-                secondSubtotalRow: null,
-                thirdColumnSubheading: null,
-                thirdRowSubheading: null,
-                thirdSubtotalColumn: null,
-                thirdSubtotalRow: null,
-                totalRow: null,
-                wholeTable: null
-            }
-            //копируем исходные стили только без border
-            for(var i in this)
-            {
-                var elem = this[i];
-                if(null != elem && elem instanceof CTableStyleElement)
-                {
-                    var oNewElem = new CTableStyleElement();
-                    oNewElem.size = elem.size;
-                    oNewElem.dxf = elem.dxf.clone();
-                    oNewElem.dxf.border = null;
-                    this.compiled[i] = oNewElem;
-                }
-            }
-        }
-    };
     function CTableStyleElement()
     {
         this.size = 1;
         this.dxf = null;
     }
-    function ReadDefTableStyles(wb, oOutput)
+	CTableStyleElement.prototype.readAttributes = function(attr, uq) {
+		if(attr()){
+			var vals = attr();
+			var val;
+			val = vals["type"];
+			if(undefined !== val){
+				var tableStyle = openXml.SaxParserDataTransfer.curTableStyle;
+				if("wholeTable"===val)
+					tableStyle.wholeTable = this;
+				else if("headerRow"===val)
+					tableStyle.headerRow = this;
+				else if("totalRow"===val)
+					tableStyle.totalRow = this;
+				else if("firstColumn"===val)
+					tableStyle.firstColumn = this;
+				else if("lastColumn"===val)
+					tableStyle.lastColumn = this;
+				else if("firstRowStripe"===val)
+					tableStyle.firstRowStripe = this;
+				else if("secondRowStripe"===val)
+					tableStyle.secondRowStripe = this;
+				else if("firstColumnStripe"===val)
+					tableStyle.firstColumnStripe = this;
+				else if("secondColumnStripe"===val)
+					tableStyle.secondColumnStripe = this;
+				else if("firstHeaderCell"===val)
+					tableStyle.firstHeaderCell = this;
+				else if("lastHeaderCell"===val)
+					tableStyle.lastHeaderCell = this;
+				else if("firstTotalCell"===val)
+					tableStyle.firstTotalCell = this;
+				else if("lastTotalCell"===val)
+					tableStyle.lastTotalCell = this;
+				else if("firstSubtotalColumn"===val)
+					tableStyle.firstSubtotalColumn = this;
+				else if("secondSubtotalColumn"===val)
+					tableStyle.secondSubtotalColumn = this;
+				else if("thirdSubtotalColumn"===val)
+					tableStyle.thirdSubtotalColumn = this;
+				else if("firstSubtotalRow"===val)
+					tableStyle.firstSubtotalRow = this;
+				else if("secondSubtotalRow"===val)
+					tableStyle.secondSubtotalRow = this;
+				else if("thirdSubtotalRow"===val)
+					tableStyle.thirdSubtotalRow = this;
+				else if("blankRow"===val)
+					tableStyle.blankRow = this;
+				else if("firstColumnSubheading"===val)
+					tableStyle.firstColumnSubheading = this;
+				else if("secondColumnSubheading"===val)
+					tableStyle.secondColumnSubheading = this;
+				else if("thirdColumnSubheading"===val)
+					tableStyle.thirdColumnSubheading = this;
+				else if("firstRowSubheading"===val)
+					tableStyle.firstRowSubheading = this;
+				else if("secondRowSubheading"===val)
+					tableStyle.secondRowSubheading = this;
+				else if("thirdRowSubheading"===val)
+					tableStyle.thirdRowSubheading = this;
+				else if("pageFieldLabels"===val)
+					tableStyle.pageFieldLabels = this;
+				else if("pageFieldValues"===val)
+					tableStyle.pageFieldValues = this;
+			}
+			val = vals["size"];
+			if(undefined !== val){
+				this.size = val - 0;
+			}
+			val = vals["dxfId"];
+			if (undefined !== val) {
+				this.dxf = openXml.SaxParserDataTransfer.dxfs[tableStyle.pivot ? val - 0 : val - 1] || null;
+			}
+		}
+	};
+    function ReadDefTableStyles(wb)
     {
-        var Types =
-        {
-            Style:  0,
-            Dxf: 1,
-            tableStyles: 2
-        };
-        // Пишем тип и размер (версию не пишем)
-        var sStyles = "XLSY;;37851;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";
-
-        var oBinaryFileReader = new BinaryFileReader();
-        var stream = oBinaryFileReader.getbase64DecodedData(sStyles);
-        var bcr = new Binary_CommonReader(stream);
-        var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
-
-        var fReadStyle = function(type, length, oTableStyles, oOutputName)
-        {
-            var res = c_oSerConstants.ReadOk;
-            if ( Types.Dxf == type )
-            {
-                //потому что в presetTableStyles.xml в отличии от custom стилей, индексы начинаются  с 1
-                oOutputName.dxfs.push(null);
-                res = bcr.Read1(length, function(t,l){
-                    return oBinary_StylesTableReader.ReadDxfs(t,l,oOutputName.dxfs);
-                });
-            }
-            else if ( Types.tableStyles == type )
-            {
-                res = bcr.Read1(length, function(t,l){
-                    return oBinary_StylesTableReader.ReadTableStyles(t,l, oTableStyles, oOutputName.customStyle);
-                });
-            }
-            else
-                res = c_oSerConstants.ReadUnknown;
-            return res;
-        };
-        var fReadStyles = function(type, length, oOutput)
-        {
-            var res = c_oSerConstants.ReadOk;
-            if ( Types.Style == type )
-            {
-                var oTableStyles = new CTableStyles();
-                var oOutputName = {customStyle: {}, dxfs: []};
-                res = bcr.Read1(length, function(t,l){
-                    return fReadStyle(t,l, oTableStyles, oOutputName);
-                });
-                for(var i in oOutputName.customStyle)
-                {
-                    var customStyle = oOutputName.customStyle[i];
-                    var oNewStyle = customStyle.style;
-                    oBinary_StylesTableReader.initTableStyle(oNewStyle, customStyle.elements, oOutputName.dxfs);
-                    oOutput[oNewStyle.name] = oNewStyle;
-                }
-            }
-            else
-                res = c_oSerConstants.ReadUnknown;
-            return res;
-        };
-
-        var length = stream.GetULongLE();
-
-        var res = bcr.Read1(length, function(t,l){
-            return fReadStyles(t, l, oOutput);
-        });
+    	var stylesZip = "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";
+		var jsZipWrapper = new AscCommon.JSZipWrapper();
+		return jsZipWrapper.loadAsync(stylesZip, {"base64": true}).then(function(zip) {
+			return zip.files["presetTableStyles.xml"].async("string");
+		}).then(function(content) {
+			jsZipWrapper.close();
+			var stylesXml = new CT_PresetTableStyles(wb.TableStyles.DefaultStyles, wb.TableStyles.DefaultStylesPivot);
+			new openXml.SaxParserBase().parse(content, stylesXml);
+			wb.TableStyles.concatStyles();
+		});
     }
     function ReadDefCellStyles(wb, oOutput)
     {
@@ -8524,7 +8238,7 @@
                 });
             } else if (Types.Xfs === type) {
                 oStyleObject.xfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null, PivotButton: null};
                 res = bcr.Read2Spreadsheet(length, function (t, l) {
                     return oBinary_StylesTableReader.ReadXfs(t, l, oStyleObject.xfs);
                 });
@@ -8561,33 +8275,36 @@
                     return fReadStyle(t,l, oCellStyle, oStyleObject);
                 });
 
-                oCellStyle.xfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
                 // Border
                 if (null !== oStyleObject.border)
-                    oCellStyle.xfs.border = oStyleObject.border.clone();
+					newXf.border = g_StyleCache.addBorder(oStyleObject.border);
                 // Fill
                 if (null !== oStyleObject.fill)
-                    oCellStyle.xfs.fill = oStyleObject.fill.clone();
+					newXf.fill = g_StyleCache.addFill(oStyleObject.fill);
                 // Font
                 if (null !== oStyleObject.font)
-                    oCellStyle.xfs.font = oStyleObject.font.clone();
+					newXf.font = g_StyleCache.addFont(oStyleObject.font);
                 // NumFmt
                 if (null !== oStyleObject.xfs.numid) {
                     var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
                     if(null != oCurNum)
-                        oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts));
                     else
-                        oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 // QuotePrefix
                 if(null != oStyleObject.xfs.QuotePrefix)
-                    oCellStyle.xfs.QuotePrefix = oStyleObject.xfs.QuotePrefix;
+					newXf.QuotePrefix = oStyleObject.xfs.QuotePrefix;
+				// PivotButton
+				if(null != oStyleObject.xfs.PivotButton)
+					newXf.PivotButton = oStyleObject.xfs.PivotButton;
                 // align
                 if(null != oStyleObject.xfs.align)
-                    oCellStyle.xfs.align = oStyleObject.xfs.align.clone();
+					newXf.align = g_StyleCache.addAlign(oStyleObject.xfs.align);
                 // XfId
                 if (null !== oStyleObject.xfs.XfId)
-                    oCellStyle.xfs.XfId = oStyleObject.xfs.XfId;
+					newXf.XfId = oStyleObject.xfs.XfId;
                 // ApplyBorder (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oStyleObject.xfs.ApplyBorder)
                     oCellStyle.ApplyBorder = oStyleObject.xfs.ApplyBorder;
@@ -8600,6 +8317,7 @@
                 // ApplyNumberFormat (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oStyleObject.xfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oStyleObject.xfs.ApplyNumberFormat;
+                oCellStyle.xfs = g_StyleCache.addXf(newXf);
 
                 oOutput.push(oCellStyle);
             } else
@@ -8621,6 +8339,167 @@
             g_oDefaultFormat.XfId = 0;
         }
     }
+
+	function CT_PresetTableStyles(tableStyles, pivotStyles) {
+		this.tableStyles = tableStyles;
+		this.pivotStyles = pivotStyles;
+	}
+
+	CT_PresetTableStyles.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("presetTableStyles" === elem) {
+		} else if (0 === elem.indexOf("TableStyle") || 0 === elem.indexOf("PivotStyle")) {
+			newContext = new CT_Stylesheet(new Asc.CTableStyles());
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
+	CT_PresetTableStyles.prototype.onEndNode = function(prevContext, elem) {
+		if (0 === elem.indexOf("TableStyle")) {
+			for (var i in prevContext.tableStyles.CustomStyles) {
+				this.tableStyles[i] = prevContext.tableStyles.CustomStyles[i];
+			}
+		} else if (0 === elem.indexOf("PivotStyle")) {
+			for (var i in prevContext.tableStyles.CustomStyles) {
+				this.pivotStyles[i] = prevContext.tableStyles.CustomStyles[i];
+			}
+		}
+	};
+
+	function CT_Stylesheet(tableStyles) {
+		//Members
+		this.numFmts = [];
+		this.fonts = [];
+		this.fills = [];
+		this.borders = [];
+		this.cellStyleXfs = [];
+		this.cellXfs = [];
+		this.cellStyles = [];
+		this.dxfs = [];
+		this.tableStyles = tableStyles;
+	}
+
+	CT_Stylesheet.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("styleSheet" === elem) {
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+		} else if ("numFmts" === elem) {
+			openXml.SaxParserDataTransfer.numFmts = this.numFmts;
+		} else if ("numFmt" === elem) {
+			newContext = new AscCommonExcel.Num();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.numFmts.push(newContext);
+		} else if ("fonts" === elem) {
+			openXml.SaxParserDataTransfer.fonts = this.fonts;
+		} else if ("font" === elem) {
+			newContext = new AscCommonExcel.Font();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.fonts.push(newContext);
+		} else if ("fills" === elem) {
+			openXml.SaxParserDataTransfer.fills = this.fills;
+			openXml.SaxParserDataTransfer.priorityBg = false;
+		} else if ("fill" === elem) {
+			newContext = new AscCommonExcel.Fill();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.fills.push(newContext);
+		} else if ("borders" === elem) {
+			openXml.SaxParserDataTransfer.borders = this.borders;
+		} else if ("border" === elem) {
+			newContext = new AscCommonExcel.Border();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.borders.push(newContext);
+			// } else if("cellStyleXfs" === elem){
+			// 	newContext = new CT_CellStyleXfs();
+			// 	if(newContext.readAttributes){
+			// 		newContext.readAttributes(attr, uq);
+			// 	}
+			// 	this.cellStyleXfs = newContext;
+			// } else if("cellXfs" === elem){
+			// 	newContext = new CT_CellXfs();
+			// 	if(newContext.readAttributes){
+			// 		newContext.readAttributes(attr, uq);
+			// 	}
+			// 	this.cellXfs = newContext;
+			// } else if("cellStyles" === elem){
+			// 	newContext = new CT_CellStyles();
+			// 	if(newContext.readAttributes){
+			// 		newContext.readAttributes(attr, uq);
+			// 	}
+			// 	this.cellStyles = newContext;
+		} else if ("dxfs" === elem) {
+			openXml.SaxParserDataTransfer.dxfs = this.dxfs;
+			openXml.SaxParserDataTransfer.priorityBg = true;
+		} else if ("dxf" === elem) {
+			newContext = new CT_Dxf();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+		} else if ("tableStyles" === elem) {
+			newContext = this.tableStyles;
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
+	CT_Stylesheet.prototype.onEndNode = function(prevContext, elem) {
+		if ("dxf" === elem) {
+			this.dxfs.push(g_StyleCache.addXf(prevContext.xf, true));
+		}
+	};
+
+	function CT_Dxf() {
+		//Members
+		this.xf = new AscCommonExcel.CellXfs();
+	}
+
+	CT_Dxf.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("font" === elem) {
+			newContext = new AscCommonExcel.Font();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.xf.font = newContext;
+		} else if ("numFmt" === elem) {
+			newContext = new AscCommonExcel.Num();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.xf.num = newContext;
+		} else if ("fill" === elem) {
+			newContext = new AscCommonExcel.Fill();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.xf.fill = newContext;
+		} else if ("alignment" === elem) {
+			newContext = new AscCommonExcel.Align();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.xf.align = newContext;
+		} else if ("border" === elem) {
+			newContext = new AscCommonExcel.Border();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.xf.border = newContext;
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
 
     window['Asc'] = window['Asc'] || {};
     window['AscCommonExcel'] = window['AscCommonExcel'] || {};
@@ -8647,6 +8526,7 @@
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
     window["Asc"].CTableStyleElement = CTableStyleElement;
+    window["Asc"].CTableStyleStripe = CTableStyleStripe;
     window["AscCommonExcel"].BinaryFileReader = BinaryFileReader;
     window["AscCommonExcel"].BinaryFileWriter = BinaryFileWriter;
 
@@ -8654,4 +8534,5 @@
     window["AscCommonExcel"].Binary_TableReader = Binary_TableReader;
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
+    window["Asc"].ReadDefTableStyles = ReadDefTableStyles;
 })(window);

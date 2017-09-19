@@ -919,8 +919,7 @@
 				case 90:  // undo					Ctrl + z
 				case 192: // set general format 	Ctrl + Shift + ~
 					if (isViewerMode || t.isSelectionDialogMode) {
-						stop();
-						return result;
+						return true;
 					}
 
 				case 65: // select all      Ctrl + a
@@ -1031,10 +1030,11 @@
 						this.handlers.trigger('addFunction',
 							AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale['SUM'] :
 								'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
+						stop();
 					} else {
 						this.skipKeyPress = false;
 					}
-					return true;
+					return result;
 
 				case 93:
 					stop();

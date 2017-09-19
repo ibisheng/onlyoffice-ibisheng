@@ -404,28 +404,24 @@
 		} else if (cElementType.cellsRange === arg0.type) {
 			var ws = arg0.getWS(), bbox = arg0.getBBox0();
 
-			if (bbox.r1 == bbox.r2) {/*одна строка*/
-				res = ws.getRange3(bbox.r1, bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1).getCells()[0].getName();
-				res = new cRef(res, ws);
+			if (bbox.r1 === bbox.r2) {/*одна строка*/
+				res = new Asc.Range(bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1, bbox.r1);
+				res = new cRef(res.getName(), ws);
 			} else {
-				if (arg1 == 0 && arg2 > 0) {
-					var _a1 = ws.getRange3(bbox.r1, bbox.c1 + arg2 - 1, bbox.r1, bbox.c2 + arg2 - 1)
-						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2,
-						bbox.c2 + arg2 - 1)
-						.getCells()[0].getName();
-					res = new cArea(_a1.toString() + ":" + _a2.toString(), ws);
+				if (0 === arg1 && arg2 > 0) {
+					res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1, bbox.c1 + arg2 - 1, bbox.r2);
+					res = new cArea(res.getName(), ws);
 				} else {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1,
-							bbox.c1 + arg2 - 1)
-							.getCells()[0].getName(), ws);
+						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1)
+						res = new cRef(res.getName(), ws);
 					}
 				}
 			}
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
-			if ((arg1 == 0 || arg1 == 1) && (arg2 == 0 || arg2 == 1)) {
+			if ((0 === arg1 || 1 === arg1) && (0 === arg2 || 1 === arg2)) {
 				res = arg0.getValue();
 			}
 		} else {
@@ -782,14 +778,9 @@
 				bbox.r2 <= gc_nMaxRow0 && 0 <= bbox.c2 && bbox.c2 <= gc_nMaxCol0;
 		}
 
-		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber(), arg3 = new cNumber(-1), arg4 = new cNumber(-1);
-
-		if (this.argumentsCurrent >= 4) {
-			arg3 = arg[3].tocNumber();
-		}
-		if (this.argumentsCurrent == 5) {
-			arg4 = arg[4].tocNumber();
-		}
+		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
+		var arg3 = 3 < this.argumentsCurrent ? arg[3].tocNumber() : new cNumber(-1);
+		var arg4 = 5 === this.argumentsCurrent ? arg[4].tocNumber() : new cNumber(-1);
 
 		if (cElementType.error === arg1.type || cElementType.error === arg2.type || cElementType.error === arg3.type ||
 			arg4.type) {
@@ -809,53 +800,35 @@
 			arg4 = 1;
 		}
 
-		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
+		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
+			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			var box = arg0.getBBox0();
+			if (box) {
+				box = box.clone(true);
 
-			var range = arg0.getRange(), bbox = range.getBBox0(), box = {r1: 0, r2: 0, c1: 0, c2: 0}, ref;
+				box.r2 = box.r1 + arg1 + arg3 - 1;
+				box.c2 = box.c1 + arg2 + arg4 - 1;
+				box.r1 = box.r1 + arg1;
+				box.c1 = box.c1 + arg2;
 
-			box.r1 = bbox.r1 + arg1;
-			box.c1 = bbox.c1 + arg2;
-			box.r2 = bbox.r1 + arg1 + arg3 - 1;
-			box.c2 = bbox.c1 + arg2 + arg4 - 1;
+				if (!validBBOX(box)) {
+					return this.value = new cError(cErrorType.bad_reference);
+				}
 
-			if (!validBBOX(box)) {
-				return this.value = new cError(cErrorType.bad_reference);
+				var name = box.getName();
+				var ws = arg0.getWS();
+				var wsCell = arguments[3];
+				if (box.isOneCell()) {
+					this.value = wsCell === ws ? new cRef(name, ws) : new cRef3D(name, ws);
+				} else {
+					this.value = wsCell === ws ? new cArea(name, ws) : new cArea3D(name, ws, ws);
+				}
 			}
-
-			if (box.r1 == box.r2 && box.c1 == box.c2) {
-				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1);
-				this.value = (cElementType.cell === arg0.type) ? new cRef(ref, arg0.ws) : new cRef3D(ref, arg0.ws);
-			} else {
-				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1) + ":" +
-					g_oCellAddressUtils.colnumToColstrFromWsView(box.c2 + 1) + _getRowTitle(box.r2);
-				this.value =
-					(cElementType.cell === arg0.type) ? new cArea(ref, arg0.ws) : new cArea3D(ref, arg0.ws, arg0.ws);
-			}
-
-		} else if (cElementType.cellsRange === arg0.type) {
-
-			var bbox = arg0.getBBox0(), box = {r1: 0, r2: 0, c1: 0, c2: 0}, ref;
-
-			box.r1 = bbox.r1 + arg1;
-			box.c1 = bbox.c1 + arg2;
-			box.r2 = bbox.r1 + arg1 + arg3 - 1;
-			box.c2 = bbox.c1 + arg2 + arg4 - 1;
-
-			if (!validBBOX(box)) {
-				return this.value = new cError(cErrorType.bad_reference);
-			}
-			if (box.r1 == box.r2 && box.c1 == box.c2) {
-				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1);
-				this.value = new cRef(ref, arg0.ws);
-			} else {
-				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1) + ":" +
-					g_oCellAddressUtils.colnumToColstrFromWsView(box.c2 + 1) + _getRowTitle(box.r2);
-				this.value = new cArea(ref, arg0.ws);
-			}
-		} else {
-			this.value = new cError(cErrorType.wrong_value_type);
 		}
 
+		if (!this.value) {
+			this.value = new cError(cErrorType.wrong_value_type);
+		}
 		return this.value;
 
 	};

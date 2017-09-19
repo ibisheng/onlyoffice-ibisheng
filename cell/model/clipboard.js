@@ -387,6 +387,10 @@
 				var t = this;
 				t.pasteProcessor.clean();
 
+				if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+				{
+					ws.model.workbook.handlers.trigger("hideSpecialPasteOptions");
+				}
 				window['AscCommon'].g_clipboardBase.Paste_Process_Start();
 				
 				if(!bIsSpecialPaste)
@@ -401,11 +405,26 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							var text = data1.innerText;
-							if(text)
-							{
-								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								window['AscCommon'].g_clipboardBase.Paste_Process_End();
+							//fragments = пока только для плагина вставка символов
+							var fragments;
+							if(window['AscCommon'].g_clipboardBase.bSaveFormat){
+								fragments = this.pasteProcessor._getFragmentsFromHtml(data1);
+							}
+							if(fragments){
+								var pasteFragments = fragments.fragments;
+								var newFonts = fragments.fonts;
+								ws._loadFonts(newFonts, function() {
+									window["Asc"]["editor"].wb.cellEditor.paste(pasteFragments);
+									window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								});
+
+							}else{
+								var text = data1.innerText;
+								if(text)
+								{
+									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+									window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								}
 							}
 						}
 						else
@@ -814,16 +833,16 @@
 							} else {
 								td.style.width = worksheet.getColumnWidth(col, 1/*pt*/) + "pt";
 							}
-
-							if (!cell.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";} 
+							var align = cell.getAlign();
+							if (!align.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";}
 							
-							switch (cell.getAlignHorizontal()) {
+							switch (align.getAlignHorizontal()) {
 								case AscCommon.align_Left: td.style.textAlign = "left"; break;
 								case AscCommon.align_Right: td.style.textAlign = "right"; break;
 								case AscCommon.align_Center: td.style.textAlign = "center"; break;
 								case AscCommon.align_Justify: td.style.textAlign = "justify"; break;
 							}
-							switch (cell.getAlignVertical()) {
+							switch (align.getAlignVertical()) {
 								case Asc.c_oAscVAlign.Bottom: td.style.verticalAlign = "bottom"; break;
 								case Asc.c_oAscVAlign.Center:
 								case Asc.c_oAscVAlign.Dist:
@@ -1002,7 +1021,7 @@
 							}
 							
 							var currentRange = worksheet.model.getCell3(row, col);
-							var textRange = currentRange.getValue();
+							var textRange = currentRange.getValueWithFormat();
 							if(textRange == '')
 							{
 								res += '\t';
@@ -1407,6 +1426,11 @@
 				History.EndTransaction();
 				
 				//for special paste
+				this._setShapeSpecialPasteProperties(worksheet, isIntoShape);
+			},
+
+			_setShapeSpecialPasteProperties: function(worksheet, isIntoShape)
+			{
 				//TODO пока выключаю специальную ставку внутри math, позже доработать и включить
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
@@ -1415,30 +1439,30 @@
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
-					
+
 					var asc_getcvt = Asc.getCvtRatio;
 					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
 					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
-					
+
 					var cellsLeft = worksheet.cellsLeft * ptToPx;
 					var cellsTop = worksheet.cellsTop * ptToPx;
-					
-					var cursorPos = target_doc_content.GetCursorPosXY();
+
+					var cursorPos = isIntoShape.GetCursorPosXY();
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
 					var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 					var position = {x: posX, y: posY};
-					
+
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
-					
+
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, position: position};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = cursorPos;
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId = isIntoShape.Id;
 				}
 			},
-			
+
 			_convertBeforeInsertIntoShapeContent: function(worksheet, content, isConvertToPPTX, target_doc_content)
 			{
 				var elements = [], selectedElement, element;
@@ -1699,6 +1723,7 @@
                     });
                 }
 
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			},
 			
@@ -1906,9 +1931,13 @@
 					var callback = function(isSuccess)
 					{
 						if(isSuccess)
+						{
 							t._pasteInShape(worksheet, node, isIntoShape);
-
-						window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						}
+						else
+						{
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						}
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -2368,6 +2397,7 @@
 			
 			_pasteInShape: function(worksheet, node, targetDocContent)
 			{
+				var t = this;
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
 				var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
@@ -2394,6 +2424,7 @@
 				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) 
 				{
 					History.EndTransaction();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					return false;
 				}
 
@@ -2401,12 +2432,26 @@
                 targetContent.Remove(1, true, true);
 					
 				worksheet._loadFonts(newFonts, function () {
+
+					//TODO конвертирую в текст без форматирую. пеесмотреть!
+					var specialPasteProps = window['AscCommon'].g_clipboardBase.specialPasteProps;
+					if(specialPasteProps && !specialPasteProps.format)
+					{
+						for(var i = 0; i < oPasteProcessor.aContent.length; i++)
+						{
+							oPasteProcessor.aContent[i].Clear_TextFormatting();
+						}
+					}
+
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
                     var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
                     oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
 					worksheet.objectRender.controller.startRecalculate();
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
 					History.EndTransaction();
+
+					t._setShapeSpecialPasteProperties(worksheet, targetContent);
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				});
 				
  				return true;
@@ -2634,6 +2679,7 @@
 								isIntoShape.AddToParagraph(new ParaText(_char));
 						}
 
+						window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						
 						//for special paste
@@ -2823,6 +2869,85 @@
 				aResult.props.rowSpanSpCount = 0;
 				
 				return aResult;
+			},
+
+			_getFragmentsFromHtml: function(html){
+				//даная функция рассчитана только на вставку символа из плагина
+				//TODO для вставки полноценной html нужно писать обработку
+
+				var res = null;
+				if(html && html.children){
+					for(var i = 0; i < html.children.length; i++){
+
+						if(!res){
+							res = {fragments: [], fonts: {}};
+						}
+
+						var children = html.children[i];
+						var computedStyle = this._getComputedStyle(children);
+						var fragment = new AscCommonExcel.Fragment();
+						var format = new AscCommonExcel.Font();
+
+						if(computedStyle){
+							var bold = computedStyle.getPropertyValue("font-weight");
+							if("bold" === bold){
+								format.setBold(true);
+							}
+							/*var color = computedStyle.getPropertyValue("color");
+							 if(color){
+							 format.setColor(color);
+							 }*/
+							var italic = computedStyle.getPropertyValue("font-style");
+							if("italic" === italic){
+								format.setItalic(true);
+							}
+							var fontFamily = computedStyle.getPropertyValue("font-family");
+							fontFamily = g_fontApplication.GetFontNameDictionary(fontFamily, true);
+							if(fontFamily){
+								format.setName(fontFamily);
+								res.fonts[fontFamily] = 1;
+							}
+							/*var fontSize = computedStyle.getPropertyValue("font-size");
+							 if(fontSize){
+							 format.setSize(fontSize);
+							 }*/
+							var text_decoration = computedStyle.getPropertyValue("text-decoration");
+							if(text_decoration){
+								var underline, Strikeout;
+								if(-1 !== text_decoration.indexOf("underline")){
+									underline = true;
+								} else if(-1 !== text_decoration.indexOf("none")){
+									underline = false;
+								}
+								if(-1 !== text_decoration.indexOf("line-through")){
+									Strikeout = true;
+								}
+								if(underline){
+									format.setUnderline(true);
+								}
+								if(Strikeout){
+									format.setUnderline(true);
+								}
+							}
+						}
+
+						fragment.text = children.innerText;
+						fragment.format = format;
+
+						res.fragments.push(fragment);
+					}
+				}
+				return res;
+			},
+
+			_getComputedStyle : function(node){
+				var computedStyle = null;
+				if(null != node && Node.ELEMENT_NODE === node.nodeType)
+				{
+					var defaultView = node.ownerDocument.defaultView;
+					computedStyle = defaultView.getComputedStyle( node, null );
+				}
+				return computedStyle;
 			}
 		};
 		
@@ -2960,8 +3085,17 @@
 				var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
 				this._parseChildren(coverDocument);
 				
-				
-				this.aResult.props.fontsNew = this.fontsNew;
+				var newFonts = this.fontsNew;
+				if(pasteData.fonts && pasteData.fonts.length)
+				{
+					newFonts = {};
+					for(var i = 0; i < pasteData.fonts.length; i++)
+					{
+						newFonts[pasteData.fonts[i].name] = 1;
+					}
+				}
+
+				this.aResult.props.fontsNew = newFonts;
 				this.aResult.props.rowSpanSpCount = 0;
 				this.aResult.props.cellCount = coverDocument.width;
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;

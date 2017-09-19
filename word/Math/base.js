@@ -988,6 +988,9 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
     }
     else
     {
+    	if (undefined !== TextPr.Bold)
+    		this.Set_Bold(TextPr.Bold);
+
         if(TextPr.AscFill || TextPr.AscLine || TextPr.AscUnifill)
         {
             var oCompiledPr = this.Get_CompiledCtrPrp();

@@ -91,6 +91,9 @@
 		"../common/Scrolls/mobileTouchManagerBase.js",
 
         "../common/wordcopypaste.js",
+		
+		"../common/easysax.js",
+		"../common/openxml.js",
 
         "../cell/document/empty-workbook.js",
         "../cell/model/UndoRedo.js",
@@ -133,6 +136,7 @@
         "../cell/model/DrawingObjects/Format/ImagePrototype.js",
         "../cell/model/DrawingObjects/Format/GroupPrototype.js",
         "../cell/model/DrawingObjects/Format/ChartSpacePrototype.js",
+		"../cell/model/PivotTables.js",
 		
 		"../word/Editor/DocumentContentElementBase.js",
         "../word/Editor/Comments.js",
@@ -268,9 +272,9 @@
         "../common/externs/global.js",
         "../common/externs/jquery-3.2.js",
         "../common/externs/xregexp-3.0.0.js",
-        "../../web-apps/vendor/sockjs/sockjs.min.js",
-        "../../web-apps/vendor/jszip/jszip.min.js",
-        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js"
+        "../common/externs/sockjs.js",
+        "../common/externs/jszip.min.js",
+        "../common/externs/jszip-utils.js"
       ],
       "map": "sdk-all.js.map",
       "log": "../cell/Build/Log"

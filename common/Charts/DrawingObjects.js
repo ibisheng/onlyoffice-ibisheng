@@ -1028,8 +1028,23 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             this.row = oBBox.r1;
             this.x = worksheetView.getCellLeft(oBBox.c1, 3);
             this.y = worksheetView.getCellTop(oBBox.r1, 3);
-            this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
-            this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
+
+
+            var oMergeInfo = worksheetView.model.getMergedByCell( oBBox.r1, oBBox.c1 );
+            if(oMergeInfo){
+                this.extX = 0;
+                for(i = oMergeInfo.c1; i <= oMergeInfo.c2; ++i){
+                    this.extX += worksheetView.getColumnWidth(i, 3)
+                }
+                this.extY = 0;
+                for(i = oMergeInfo.r1; i <= oMergeInfo.r2; ++i){
+                    this.extY = worksheetView.getRowHeight(i, 3);
+                }
+            }
+            else{
+                this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
+                this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
+            }
             AscFormat.CheckSpPrXfrm(this.chartSpace);
             this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
             this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
@@ -1044,8 +1059,27 @@ CSparklineView.prototype.draw = function(graphics, offX, offY)
 {
     var x = this.ws.getCellLeft(this.col, 3) - offX;
     var y = this.ws.getCellTop(this.row, 3) - offY;
-    var extX = this.ws.getColumnWidth(this.col, 3);
-    var extY = this.ws.getRowHeight(this.row, 3);
+
+    var i;
+
+    var extX;
+    var extY;
+    var oMergeInfo = this.ws.model.getMergedByCell( this.row, this.col );
+    if(oMergeInfo){
+        extX = 0;
+        for(i = oMergeInfo.c1; i <= oMergeInfo.c2; ++i){
+            extX += this.ws.getColumnWidth(i, 3)
+        }
+        extY = 0;
+        for(i = oMergeInfo.r1; i <= oMergeInfo.r2; ++i){
+            extY = this.ws.getRowHeight(i, 3);
+        }
+    }
+    else{
+        extX = this.ws.getColumnWidth(this.col, 3);
+        extY = this.ws.getRowHeight(this.row, 3);
+    }
+
 
     var bExtent = Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01;
     var bPosition = Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y) > 0.01;
@@ -3118,8 +3152,12 @@ function DrawingObjects() {
 
     _this.rebuildChartGraphicObjects = function(data)
     {
-        if(!worksheet)
+        if(!worksheet){
             return;
+        }
+        if(data.length === 0){
+            return;
+        }
         AscFormat.ExecuteNoHistory(function(){
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];

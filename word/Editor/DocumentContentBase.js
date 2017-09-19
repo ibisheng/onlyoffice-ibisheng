@@ -355,7 +355,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 			// Если есть параграфы, которые были добавлены во время рецензирования, тогда мы их удаляем
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				this.Content[Index].Remove(1, true);
+				this.Content[Index].Remove(1, true, bRemoveOnlySelection, bOnTextAdd);
 			}
 
 			this.RemoveSelection();
@@ -724,6 +724,9 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 			{
 				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 
+				var oLogicDocument = this instanceof CDocument ? this : this.LogicDocument;
+				oLogicDocument.RemoveCommentsOnPreDelete = false;
+
 				var nStartPos = this.Selection.StartPos;
 				var nEndPos   = this.Selection.EndPos;
 				if (nEndPos < nStartPos)
@@ -747,6 +750,8 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				this.Selection.StartPos = nStartPos;
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
+
+				oLogicDocument.RemoveCommentsOnPreDelete = false;
 				return oSdt;
 			}
 		}

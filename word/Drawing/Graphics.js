@@ -972,7 +972,7 @@ CGraphics.prototype =
                 this.m_oFullTransform.sy,this.m_oFullTransform.tx,this.m_oFullTransform.ty);
         }
     },
-    t : function(text,x,y)
+    t : function(text,x,y,isBounds)
     {
 		if (this.m_bIsBreak)
 			return;
@@ -991,6 +991,7 @@ CGraphics.prototype =
 		}
 
 	    this.m_oContext.setTransform(1,0,0,1,0,0);
+		var _bounds = isBounds ? {x:100000, y:100000, r:-100000, b:-100000} : null;
         while (true)
         {
             var pGlyph = _font_manager.GetNextChar2();
@@ -999,7 +1000,7 @@ CGraphics.prototype =
 
             if (null != pGlyph.oBitmap)
             {
-                this.private_FillGlyph(pGlyph);
+                this.private_FillGlyph(pGlyph, _bounds);
             }
         }
         if (false === this.m_bIntegerGrid)
@@ -1007,6 +1008,8 @@ CGraphics.prototype =
             this.m_oContext.setTransform(this.m_oFullTransform.sx,this.m_oFullTransform.shy,this.m_oFullTransform.shx,
                 this.m_oFullTransform.sy,this.m_oFullTransform.tx,this.m_oFullTransform.ty);
         }
+
+        return _bounds;
     },
     FillText2 : function(x,y,text,cropX,cropW)
     {
@@ -1172,7 +1175,7 @@ CGraphics.prototype =
     },
 
     // private methods
-    private_FillGlyph : function(pGlyph)
+    private_FillGlyph : function(pGlyph, _bounds)
     {
         // new scheme
         var nW = pGlyph.oBitmap.nWidth;
@@ -1183,8 +1186,8 @@ CGraphics.prototype =
 
         var _font_manager = this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager;
 
-        var nX = (_font_manager.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
-        var nY = (_font_manager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
+		var nX = (_font_manager.m_oGlyphString.m_fX >> 0) + (pGlyph.fX + pGlyph.oBitmap.nX) >> 0;
+		var nY = (_font_manager.m_oGlyphString.m_fY >> 0) + (pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
 
         pGlyph.oBitmap.oGlyphData.checkColor(this.m_oBrush.Color1.R,this.m_oBrush.Color1.G,this.m_oBrush.Color1.B,nW,nH);
 
@@ -1192,6 +1195,20 @@ CGraphics.prototype =
             pGlyph.oBitmap.draw(this.m_oContext, nX, nY, this.TextClipRect);
         else
             pGlyph.oBitmap.drawCropInRect(this.m_oContext, nX, nY, this.TextClipRect);
+
+        if (_bounds)
+        {
+            var _r = nX + pGlyph.oBitmap.nWidth;
+            var _b = nY + pGlyph.oBitmap.nHeight;
+            if (_bounds.x > nX)
+                _bounds.x = nX;
+			if (_bounds.y > nY)
+				_bounds.y = nY;
+			if (_bounds.r < _r)
+				_bounds.r = _r;
+			if (_bounds.b < _b)
+				_bounds.b = _b;
+        }
     },
     private_FillGlyphC : function(pGlyph,cropX,cropW)
     {

@@ -5909,7 +5909,8 @@ function NativeOpenFile3(_params, documentInfo)
                                       "format"        : "docx",
                                       "vkey"          : undefined,
                                       "url"           : window.documentInfo["docURL"],
-                                      "title"         : this.documentTitle};
+                                      "title"         : this.documentTitle,
+                                      "nobase64"      : true};
 
                                       _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
                                       });
@@ -5927,7 +5928,7 @@ function NativeOpenFile3(_params, documentInfo)
 
             if (null != _api.WordControl.m_oLogicDocument)
             {
-			           _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+                _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
             }
 
             if (_api.NativeAfterLoad)
@@ -6005,7 +6006,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
     else
     {
         AscCommon.CurFileVersion = version;
-        if (oBinaryFileReader.ReadData(base64File))
+        if (oBinaryFileReader.Read(base64File))
         {
             AscCommon.g_oIdCounter.Set_Load(false);
             this.LoadedObject = 1;
@@ -6056,6 +6057,33 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
 Asc['asc_docs_api'].prototype.openDocument = function(sData)
 {
     _api.asc_nativeOpenFile2(sData.data);
+    
+    
+    if (!sdkCheck) {
+        
+        console.log("OPEN FILE ONLINE READ MODE");
+       
+        if (_api.NativeAfterLoad)
+            _api.NativeAfterLoad();
+     
+        this.ImageLoader.bIsLoadDocumentFirst = true;
+        
+        this.ParcedDocument = true;
+        if (this.isStartCoAuthoringOnEndLoad)
+        {
+            this.CoAuthoringApi.onStartCoAuthoring(true);
+            this.isStartCoAuthoringOnEndLoad = false;
+        }
+        
+        if (null != _api.WordControl.m_oLogicDocument)
+        {
+            _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+        }
+        
+        window["native"]["onEndLoadingFile"]();
+        
+        return;
+    }
 
     var version;
     if (sData.changes && this.VersionHistory)

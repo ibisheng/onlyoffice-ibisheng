@@ -2700,6 +2700,12 @@ function CDemonstrationManager(htmlpage)
     this.SlideIndexes[0] = -1;
     this.SlideIndexes[1] = -1;
 
+    this.waitReporterObject = null;
+
+    this.PointerDiv = null;
+
+    this.isMouseDown = false;
+
     var oThis = this;
 
     this.CacheSlide = function(slide_num, slide_index)
@@ -2877,6 +2883,38 @@ function CDemonstrationManager(htmlpage)
             this.SlideNum = this.SlidesCount;
     }
 
+    this.StartWaitReporter = function(main_div_id, start_slide_num, is_play_mode)
+    {
+		var _parent = document.getElementById(main_div_id);
+		if (_parent)
+		{
+			var _elem = document.createElement('div');
+			_elem.setAttribute("id", "dem_id_wait_reporter");
+			_elem.setAttribute("style", "line-height:100%;overflow:hidden;position:absolute;margin:0px;padding:25% 0px 0px 0px;left:0px;top:0px;width:100%;height:100%;z-index:20;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
+			_elem.innerHTML = AscCommon.translateManager.getValue("Loading");
+			_parent.appendChild(_elem);
+		}
+
+		this.waitReporterObject = [main_div_id, start_slide_num, is_play_mode];
+    }
+
+    this.EndWaitReporter = function(isNoStart)
+    {
+		var _parent = document.getElementById(this.waitReporterObject[0]);
+		var _elem = document.getElementById("dem_id_wait_reporter");
+		try
+        {
+		    _parent.removeChild(_elem);
+        }
+        catch (err)
+        {
+        }
+
+        if (true !== isNoStart)
+            this.Start(this.waitReporterObject[0], this.waitReporterObject[1], this.waitReporterObject[2]);
+        this.waitReporterObject = null;
+    }
+
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
     {
         this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
@@ -2904,9 +2942,10 @@ function CDemonstrationManager(htmlpage)
 
         this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
 
-        //this.DemonstrationCanvas.onmousedown  = this.onMouseDownDemonstration;
-        //this.DemonstrationCanvas.onmousemove  = this.onMouseMoveDemonstration;
+		this.Canvas.onmousedown  = this.onMouseDown;
+		this.Canvas.onmousemove  = this.onMouseMove;
         this.Canvas.onmouseup    = this.onMouseUp;
+		this.Canvas.onmouseleave = this.onMouseLeave;
 
         this.Canvas.onmousewheel = this.onMouseWhell;
         if (this.Canvas.addEventListener)
@@ -2926,6 +2965,8 @@ function CDemonstrationManager(htmlpage)
 
     this.StartSlide = function(is_transition_use, is_first_play)
     {
+		oThis.HtmlPage.m_oApi.canSave = false;
+
         oThis.StopTransition();
 
         if (oThis.SlideNum == oThis.SlidesCount)
@@ -2935,9 +2976,12 @@ function CDemonstrationManager(htmlpage)
                 oThis.DivEndPresentation = document.createElement('div');
                 oThis.DivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:4;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
                 oThis.DivEndPresentation.innerHTML = oThis.EndShowMessage;
+                if ("" == oThis.EndShowMessage)
+                    oThis.DivEndPresentation.innerHTML = "The end of slide preview. Click to exit.";
 
                 //oThis.DemonstrationDivEndPresentation.onmousedown  = oThis.onMouseDownDemonstration;
                 //oThis.DemonstrationDivEndPresentation.onmousemove  = oThis.onMouseMoveDemonstration;
+				oThis.DivEndPresentation.onmousedown  = oThis.onMouseDown;
                 oThis.DivEndPresentation.onmouseup    = oThis.onMouseUp;
 
                 oThis.DivEndPresentation.onmousewheel = oThis.onMouseWhell;
@@ -3032,9 +3076,10 @@ function CDemonstrationManager(htmlpage)
             oThis.Overlay.width = oThis.Canvas.width;
             oThis.Overlay.height = oThis.Canvas.height;
 
-            //oThis.Overlay.onmousedown  = oThis.onMouseDownDemonstration;
-            //oThis.Overlay.onmousemove  = oThis.onMouseMoveDemonstration;
+            oThis.Overlay.onmousedown  = oThis.onMouseDown;
+            oThis.Overlay.onmousemove  = oThis.onMouseMove;
             oThis.Overlay.onmouseup    = oThis.onMouseUp;
+			oThis.Overlay.onmouseleave = oThis.onMouseLeave;
 
             oThis.Overlay.onmousewheel = oThis.onMouseWhell;
             if (oThis.Overlay.addEventListener)
@@ -3113,6 +3158,16 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.HtmlPage.m_oApi.canSave = true;
+
+		this.PointerRemove();
+        if (this.waitReporterObject)
+        {
+            this.EndWaitReporter(true);
+			this.HtmlPage.m_oApi.sync_endDemonstration();
+        }
+		this.HtmlPage.m_oApi.DemonstrationReporterEnd();
+
         if (this.HtmlPage.m_oApi.isOnlyDemonstration)
             return;
 
@@ -3142,6 +3197,8 @@ function CDemonstrationManager(htmlpage)
         this.DemonstrationDiv.removeChild(this.Canvas);
         this.Canvas = null;
 
+        var _oldSlideNum = this.SlideNum;
+
         this.SlideNum = -1;
         this.DemonstrationDiv = null;
         this.Mode = false;
@@ -3150,12 +3207,27 @@ function CDemonstrationManager(htmlpage)
         ctx1.setTransform(1, 0, 0, 1, 0, 0);
 
         this.HtmlPage.m_oApi.sync_endDemonstration();
+
+        if (true)
+		{
+			if (_oldSlideNum < 0)
+				_oldSlideNum = 0;
+			var _slidesCount = this.HtmlPage.m_oApi.getCountPages();
+			if (_oldSlideNum >= _slidesCount)
+			    _oldSlideNum = _slidesCount - 1;
+
+			if (0 <= _oldSlideNum)
+			    this.HtmlPage.GoToPage(_oldSlideNum);
+		}
     }
 
-    this.NextSlide = function()
+    this.NextSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
+
+        if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"next\" }");
 
         this.CorrectSlideNum();
 
@@ -3180,10 +3252,13 @@ function CDemonstrationManager(htmlpage)
         return (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() || this.HtmlPage.m_oApi.isEmbedVersion);
     }
 
-    this.PrevSlide = function()
+    this.PrevSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
+
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"prev\" }");
 
         if (0 != this.SlideNum)
         {
@@ -3202,10 +3277,13 @@ function CDemonstrationManager(htmlpage)
         }
     }
 
-    this.GoToSlide = function(slideNum)
+    this.GoToSlide = function(slideNum, isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
+
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
 
         this.CorrectSlideNum();
 
@@ -3218,13 +3296,13 @@ function CDemonstrationManager(htmlpage)
         this.StartSlide(true, false);
     }
 
-    this.Play = function()
+    this.Play = function(isNoSendFormReporter)
     {
         this.IsPlayMode = true;
 
         if (-1 == this.CheckSlideDuration)
         {
-            this.NextSlide();
+            this.NextSlide(isNoSendFormReporter);
         }
     }
 
@@ -3234,46 +3312,63 @@ function CDemonstrationManager(htmlpage)
     }
 
     // manipulators
+    this.onKeyDownCode = function(code)
+    {
+		switch (code)
+		{
+			case 13:    // enter
+			case 32:    // space
+			case 34:    // PgDn
+			case 39:    // right arrow
+			case 40:    // bottom arrow
+			{
+				oThis.NextSlide();
+				break;
+			}
+			case 33:
+			case 37:
+			case 38:
+			{
+				oThis.PrevSlide();
+				break;
+			}
+			case 36:    // home
+			{
+				oThis.GoToSlide(0);
+				break;
+			}
+			case 35:    // end
+			{
+				oThis.GoToSlide(this.SlidesCount - 1);
+				break;
+			}
+			case 27:    // escape
+			{
+				oThis.End();
+				break;
+			}
+			default:
+				break;
+		}
+    }
+
     this.onKeyDown = function(e)
     {
         AscCommon.check_KeyboardEvent(e);
 
-        switch (AscCommon.global_keyboardEvent.KeyCode)
+        if (oThis.HtmlPage.m_oApi.reporterWindow)
         {
-            case 13:    // enter
-            case 32:    // space
-            case 34:    // PgDn
-            case 39:    // right arrow
-            case 40:    // bottom arrow
-            {
-                oThis.NextSlide();
-                break;
-            }
-            case 33:
-            case 37:
-            case 38:
-            {
-                oThis.PrevSlide();
-                break;
-            }
-            case 36:    // home
-            {
-                oThis.GoToSlide(0);
-                break;
-            }
-            case 35:    // end
-            {
-                oThis.GoToSlide(this.SlidesCount - 1);
-                break;
-            }
-            case 27:    // escape
-            {
-                oThis.End();
-                break;
-            }
-            default:
-                break;
+			var _msg_ = {
+				"main_command"  : true,
+				"keyCode"       : AscCommon.global_keyboardEvent.KeyCode
+			};
+
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
+			oThis.HtmlPage.IsKeyDownButNoPress = true;
+			return false;
         }
+
+        this.onKeyDownCode(AscCommon.global_keyboardEvent.KeyCode);
 
         oThis.HtmlPage.IsKeyDownButNoPress = true;
         return false;
@@ -3281,18 +3376,85 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseDown = function(e)
     {
+		oThis.isMouseDown = true;
+        e.preventDefault();
+        return false;
+    }
+
+    this.onMouseLeave = function(e)
+    {
+		if (!oThis.HtmlPage.m_oApi.isReporterMode)
+			return;
+		if (!oThis.HtmlPage.reporterPointer)
+			return;
+
+		oThis.PointerRemove();
+
         e.preventDefault();
         return false;
     }
 
     this.onMouseMove = function(e)
     {
+        if (!oThis.HtmlPage.m_oApi.isReporterMode)
+            return;
+		if (!oThis.HtmlPage.reporterPointer)
+			return;
+
+        var _x = 0;
+        var _y = 0;
+		if (e.pageX || e.pageY)
+		{
+			_x = e.pageX;
+			_y = e.pageY;
+		}
+		else if (e.clientX || e.clientY)
+		{
+			_x = e.clientX;
+			_y = e.clientY;
+		}
+
+		_x -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.left);
+		_y -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.top);
+
+		var _rect = oThis.Transition.Rect;
+		_x -= _rect.x;
+		_y -= _rect.y;
+		_x /= _rect.w;
+		_y /= _rect.h;
+
+		oThis.PointerMove(_x, _y);
+
         e.preventDefault();
         return false;
     }
 
-    this.onMouseUp = function(e)
+    this.onMouseUp = function(e, isAttack)
     {
+    	if (!oThis.isMouseDown && true !== isAttack)
+    		return;
+
+		oThis.isMouseDown = false;
+
+		if (oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
+		{
+			AscCommon.stopEvent(e);
+			return false;
+        }
+
+		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"mouseUp"       : true
+			};
+
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
+
+			AscCommon.stopEvent(e);
+			return false;
+		}
+
         // next slide
         oThis.CorrectSlideNum();
 
@@ -3319,8 +3481,20 @@ function CDemonstrationManager(htmlpage)
             }
         }
 
-        e.preventDefault();
+		AscCommon.stopEvent(e);
         return false;
+    }
+
+    this.onMouseWheelDelta = function(delta)
+    {
+		if (delta > 0)
+		{
+			this.NextSlide();
+		}
+		else
+		{
+			this.PrevSlide();
+		}
     }
 
     this.onMouseWhell = function(e)
@@ -3337,29 +3511,54 @@ function CDemonstrationManager(htmlpage)
         else
             delta = (e.detail > 0) ? 1 : -1;
 
-        if (delta > 0)
-        {
-            oThis.NextSlide();
-        }
-        else
-        {
-            oThis.PrevSlide();
-        }
+		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"mouseWhell"    : delta
+			};
 
-        e.preventDefault();
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
+			AscCommon.stopEvent(e);
+			return false;
+		}
+
+        oThis.onMouseWheelDelta(delta);
+
+        AscCommon.stopEvent(e);
         return false;
     }
 
-    this.Resize = function()
+    this.Resize = function(isNoSend)
     {
+		if (isNoSend !== true && oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"resize"        : true
+			};
+
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
+		}
+		else if (isNoSend !== true && oThis.HtmlPage.m_oApi.isReporterMode)
+        {
+			var _msg_ = {
+				"reporter_command"  : "resize"
+			};
+
+			oThis.HtmlPage.m_oApi.sendFromReporter(JSON.stringify(_msg_));
+        }
+
         if (!this.Mode)
             return;
 
         var _width  = this.DemonstrationDiv.clientWidth;
         var _height = this.DemonstrationDiv.clientHeight;
 
-        if (_width == this.DivWidth && _height == this.DivHeight)
+        if (_width == this.DivWidth && _height == this.DivHeight && true !== isNoSend)
             return;
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = true;
 
         this.DivWidth = _width;
         this.DivHeight = _height;
@@ -3380,5 +3579,59 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideNum < this.SlidesCount)
             this.StartSlide(this.Transition.IsPlaying(), false);
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = false;
+    }
+
+    this.PointerMove = function(x, y, w, h)
+    {
+        if (!this.PointerDiv)
+        {
+            this.PointerDiv = document.createElement("div");
+            if (AscCommon.AscBrowser.retinaPixelRatio > 1.5)
+            {
+				this.PointerDiv.setAttribute("style", "position:absolute;z-index:100;pointer-events:none;width:28px;height:28px;margin:0;padding:0;border:none;background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA+dpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSIgeG1wOkNyZWF0ZURhdGU9IjIwMTctMDctMjZUMTU6MTc6MzIrMDM6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDE3LTA3LTI2VDE1OjU1OjQ3KzAzOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDE3LTA3LTI2VDE1OjU1OjQ3KzAzOjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCRTk4RENGNDcyMDExMUU3QjE0ODlFOEJERTU4NTc4NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCRTk4RENGNTcyMDExMUU3QjE0ODlFOEJERTU4NTc4NyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjpp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'); background-size: 28px 28px;");
+            }
+            else
+			{
+				this.PointerDiv.setAttribute("style", "position:absolute;z-index:100;pointer-events:none;width:28px;height:28px;margin:0;padding:0;border:none;background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA+dpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSIgeG1wOkNyZWF0ZURhdGU9IjIwMTctMDctMjZUMTU6MTc6MzIrMDM6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDE3LTA3LTI2VDE1OjU0OjExKzAzOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDE3LTA3LTI2VDE1OjU0OjExKzAzOjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4NTgwNDIyNDcyMDExMUU3OTRGNTgwQjYzODE3QjJFRSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4NTgwNDIyNTcyMDExMUU3OTRGNTgwQjYzODE3QjJFRSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjg1ODA0MjIyNzIwMTExRTc5NEY1ODBCNjM4MTdCMkVFIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjg1ODA0MjIzNzIwMTExRTc5NEY1ODBCNjM4MTdCMkVFIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+dWpcyAAAAsxJREFUeNq8lr+KFEEQxnt6+nZG53Y9jxMzUTAwMDP1CQSRywQjwcjAJxBE8AkMjAQjwUxE8AmMzQQDQTGTO867/ePO7M7O2DVXNXxb2wuzcNjw0b13vfXbqq6q7qiua+NHpGRZeo2iUStVLL1u5RRE5hjmGD7bNUAxvgBVMMse45QXAnEBIRiBCCqVIoDSqLSHYnyL1VOzQBEosLnXDGaMRsl7I6fC6Ng4KWGlPAvUKWAJkMIrXxOJ9gwRJt4Q5BzrPM8pQK2ECGAEmkL4g4nl4OwEmDAg89pmZQxOIbQGQkmwv14TtmPVGcs5WwkPhlOABBp4XeBZoD0FnAGsp7xfqIRahEKasuFthu167QA04b2GjRQMG8LfK8jUOSsWD+0aDzOG7Ag0f/3mRv723fXFj599shpfuzpKH9z/nj56+E39CEkg0UyAke80AwUQr/a8LnldpvXo8ZPbs4+frpjA6N2986v/6uVnvzz0+u11wOsjrxP2nqIw1d0lVplKoc3Is3UwGvQ/2qOSS9duw7Kq8ONA4ScURjGe7N8zu1+/NKK1DN6D9boFJdJyQk1Ze+zkzGhkL56ZaDBoRGsTnZYb7wm1wCVZ85+HDVwxKw2ZslG+MHn63NTDYSNam9PrzfCeUt0WK7ZtAIK106Q3pb4Ai/cfzNHNW41oLYP3FNDA5/ADKg2sAl2/bVdUZ5T6rXXyij2TsuBanPB3cgAveUx12FfdBYt9j9Wl8I+57g6hBo+5BsfyQwiYQXchaB+gFzdsbQL9A7ARw+gmKVzg7HK4iC0YnnZo3kPuLGMI7dJZOri1S+h5ser6YrTL9TRmTSGJBFg7uK9K9VDCrl+wwS4XsIRPgOJhJR5KSENPwAUAN3liFKpEVkKKUP0am/OXN31EBWvRqcIvA41gHjjbrs/ElcJHD/WDRwyc5UO4BUoCRGDEysPnLJ/6/wQYAGSEwicuWovcAAAAAElFTkSuQmCC'); background-size: 28px 28px;");
+			}
+			this.DemonstrationDiv.appendChild(this.PointerDiv);
+        }
+        var _rect = this.Transition.Rect;
+		this.PointerDiv.style.left = ((_rect.x + x * _rect.w - 14) >> 0) + "px";
+		this.PointerDiv.style.top = ((_rect.y + y * _rect.h - 14) >> 0) + "px";
+
+		if (this.HtmlPage.m_oApi.isReporterMode)
+        {
+			this.Canvas.style.cursor = "none";
+			if (this.Overlay)
+				this.Overlay.style.cursor = "none";
+
+            var _msg_ = {
+                "reporter_command" : "pointer_move",
+                "x" : x,
+                "y" : y
+            };
+			this.HtmlPage.m_oApi.sendFromReporter(JSON.stringify(_msg_));
+        }
+    }
+
+    this.PointerRemove = function()
+    {
+        if (!this.PointerDiv)
+            return;
+
+		this.DemonstrationDiv.removeChild(this.PointerDiv);
+		this.PointerDiv = null;
+
+		if (this.HtmlPage.m_oApi.isReporterMode)
+		{
+			this.Canvas.style.cursor = "default";
+			if (this.Overlay)
+				this.Overlay.style.cursor = "default";
+
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"pointer_remove\" }");
+		}
     }
 }

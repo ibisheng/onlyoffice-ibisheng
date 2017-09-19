@@ -310,7 +310,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = (function(){ return originalObject.getGeom();})();
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
 
         if(!originalObject.isChart())
         {
@@ -361,6 +361,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             this.endShapeId = null;
             this.endShapeIdx = null;
             for(var i = aDrawings.length-1; i > -1; --i) {
+                if(aDrawings[i] === this.originalObject){
+                    continue;
+                }
                 oConnectionInfo = aDrawings[i].findConnector(x, y);
                 if (oConnectionInfo) {
                     oNewShape = aDrawings[i];
@@ -370,6 +373,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             }
             if(!this.oNewShape){
                 for(var i = aDrawings.length - 1; i > -1; --i){
+                    if(aDrawings[i] === this.originalObject){
+                        continue;
+                    }
                     var oCs = aDrawings[i].findConnectionShape(x, y);
                     if(oCs ){
                         this.oNewShape = oCs;
@@ -1653,6 +1659,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.updateSize = function(kw, kh)
         {
+            this.bIsTracked = true;
             var _kw, _kh;
             if(this.bSwapCoef)
             {
@@ -1807,7 +1814,8 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = originalObject.getGeom();
+
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);

@@ -853,6 +853,10 @@
     {
         return 1;
     };
+    CGraphicObjectBase.prototype.isEmptyPlaceholder = function()
+    {
+        return false;
+    };
 
     CGraphicObjectBase.prototype.Restart_CheckSpelling = function()
     {
@@ -1036,6 +1040,50 @@
         if(this.parent && this.parent.CheckContentControlEditingLock){
             this.parent.CheckContentControlEditingLock();
         }
+    };
+
+    CGraphicObjectBase.prototype.drawLocks = function(transform, graphics){
+        var bNotes = !!(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES);
+        if(!this.group && !bNotes)
+        {
+            var oLock;
+            if(this.parent instanceof ParaDrawing)
+            {
+                oLock = this.parent.Lock;
+            }
+            else if(this.Lock)
+            {
+                oLock = this.Lock;
+            }
+            if(oLock && AscCommon.locktype_None !== oLock.Get_Type())
+            {
+                var bCoMarksDraw = true;
+                var oApi = editor || Asc['editor'];
+                if(oApi){
+
+                    switch(oApi.getEditorId()){
+                        case AscCommon.c_oEditorId.Word:{
+                            bCoMarksDraw = (true === oApi.isCoMarksDraw || AscCommon.locktype_Mine !== oLock.Get_Type());
+                            break;
+                        }
+                        case AscCommon.c_oEditorId.Presentation:{
+                            bCoMarksDraw = (!AscCommon.CollaborativeEditing.Is_Fast() || AscCommon.locktype_Mine !== oLock.Get_Type());
+                            break;
+                        }
+                        case AscCommon.c_oEditorId.Spreadsheet:{
+                            bCoMarksDraw = (!oApi.collaborativeEditing.getFast() || AscCommon.locktype_Mine !== oLock.Get_Type());
+                            break;
+                        }
+                    }
+                }
+                if(bCoMarksDraw){
+                    graphics.transform3(transform);
+                    graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
+                    return true;
+                }
+            }
+        }
+        return false;
     };
 
 window['AscFormat'] = window['AscFormat'] || {};

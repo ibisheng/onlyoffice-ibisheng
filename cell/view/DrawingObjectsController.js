@@ -362,8 +362,8 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         }
         else
         {
-            w = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartWidth, 0, 3);
-            h = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartHeight, 0, 3);
+            w = this.drawingObjects.convertMetric(AscCommon.AscBrowser.convertToRetinaValue(AscCommon.c_oAscChartDefines.defaultChartWidth, true), 0, 3);
+            h = this.drawingObjects.convertMetric(AscCommon.AscBrowser.convertToRetinaValue(AscCommon.c_oAscChartDefines.defaultChartHeight, true), 0, 3);
         }
 
         var chartLeft, chartTop;
@@ -509,7 +509,11 @@ DrawingObjectsController.prototype.getDrawingDocument = function()
 };
 DrawingObjectsController.prototype.convertPixToMM = function(pix)
 {
-    return this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
+    var _ret = this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
+    if(AscCommon.AscBrowser.isRetina){
+        _ret *= 2;
+    }
+    return _ret;
 };
 
 DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)

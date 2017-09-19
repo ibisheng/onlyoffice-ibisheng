@@ -48,9 +48,10 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	var cElementType = AscCommonExcel.cElementType;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cTRUE, cXOR);
+	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cSWITCH, cTRUE, cXOR);
 
 	/**
 	 * @constructor
@@ -170,17 +171,15 @@
 			arg2 = arg2.getElement(0);
 		}
 
+		arg0 = arg0.tocBool();
 		if (arg0 instanceof cError) {
 			return this.value = arg0;
+		} else if (arg0 instanceof cString) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		} else if (arg0.value) {
+			return this.value = arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
 		} else {
-			arg0 = arg0.tocBool();
-			if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
-			} else if (arg0.value) {
-				return this.value = arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
-			} else {
-				return this.value = arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
-			}
+			return this.value = arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
 		}
 	};
 
@@ -357,6 +356,59 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		return this.value = argResult;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSWITCH() {
+		this.name = "SWITCH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSWITCH.prototype = Object.create(cBaseFunction.prototype);
+	cSWITCH.prototype.constructor = cSWITCH;
+	cSWITCH.prototype.argumentsMin = 3;
+	cSWITCH.prototype.argumentsMax = 126;
+	cSWITCH.prototype.isXLFN = true;
+	cSWITCH.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var arg0 = argClone[0].getValue();
+		if(cElementType.cell === argClone[0].type || cElementType.cell3D === argClone[0].type){
+			arg0 = arg0.getValue()
+		}
+		
+		var res = null;
+		for(var i = 1; i < this.argumentsCurrent; i++){
+			var argN = argClone[i].getValue();
+			if(arg0 === argN){
+				if(!argClone[i + 1]){
+					return this.value = cErrorType.not_available;
+				}else{
+					res = argClone[i + 1];
+					break;
+				}
+			}
+			if(i === this.argumentsCurrent - 1){
+				res = argClone[i];
+			}
+			i++;
+		}
+
+		if(null === res){
+			return this.value = new cError(cErrorType.not_available);
+		}
+
+		return this.value = res;
 	};
 
 	/**

@@ -943,9 +943,13 @@
 		},
 
 		changeType: function (type) {
-        if (this.type === type) {
-            return;
-        }
+			if(null === this.type){
+				this.putType(type);
+				return;
+			}
+			if (this.type === type) {
+				return;
+			}
 
 			var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal ||
 			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer
@@ -3136,6 +3140,383 @@
         return this.Variants;
     };
 
+    function CWatermarkOnDraw(htmlContent)
+	{
+		// example content:
+		/*
+		{
+			"type" : "rect",
+			"width" : 100, // mm
+			"height" : 100, // mm
+			"rotate" : -45, // degrees
+			"margins" : [ 10, 10, 10, 10 ], // text margins
+			"fill" : [255, 0, 0], // [] => none
+			"stroke-width" : 1, // mm
+			"stroke" : [0, 0, 255], // [] => none
+			"align" : 1, // vertical text align (4 - top, 1 - center, 0 - bottom)
+
+			"paragraphs" : [
+				{
+					"align" : 4, // horizontal text align [1 - left, 2 - center, 0 - right, 3 - justify]
+					"fill" : [255, 0, 0], // paragraph highlight. [] => none
+					"linespacing" : 0,
+
+					"runs" : [
+						{
+							"text" : "some text",
+							"fill" : [255, 255, 255], // text highlight. [] => none,
+							"font-family" : "Arial",
+							"font-size" : 24, // pt
+							"bold" : true,
+							"italic" : false,
+							"strikeout" : "false",
+							"underline" : "false"
+						},
+						{
+							"text" : "<%br%>"
+						}
+					]
+				}
+			]
+		}
+		*/
+
+		this.inputContentSrc = htmlContent;
+		this.replaceMap = {};
+
+		this.image = null;
+		this.imageBase64 = undefined;
+		this.width = 0;
+		this.height = 0;
+
+		this.transparent = 0.3;
+		this.zoom = 1;
+		this.calculatezoom = -1;
+
+		this.CheckParams = function(api)
+		{
+			this.replaceMap["%user_name%"] = api.User.userName;
+		};
+
+		this.Generate = function()
+		{
+			if (this.zoom == this.calculatezoom)
+				return;
+
+			this.calculatezoom = this.zoom;
+
+			var content = this.inputContentSrc;
+			for (var key in this.replaceMap)
+			{
+				if (!this.replaceMap.hasOwnProperty(key))
+					continue;
+
+				content = content.replace(new RegExp(key, 'g'), this.replaceMap[key]);
+			}
+
+			var _obj = {};
+			try
+			{
+				var _objTmp = JSON.parse(content);
+				_obj = _objTmp;
+			}
+			catch (err)
+			{
+
+			}
+
+			this.transparent = (undefined == _obj['transparent']) ? 0.3 : _obj['transparent'];
+
+			this.privateGenerateShape(_obj);
+
+			//var _data = this.image.toDataURL("image/png");
+			//console.log(_data);
+		};
+
+		this.Draw = function(context, dw_or_dx, dh_or_dy, dw, dh)
+		{
+			if (!this.image)
+				return;
+
+			var x = 0;
+			var y = 0;
+
+			if (undefined == dw)
+			{
+				x = (dw_or_dx - this.width) >> 1;
+				y = (dh_or_dy - this.height) >> 1;
+			}
+			else
+			{
+				x = (dw_or_dx + ((dw - this.width) / 2)) >> 0;
+				y = (dh_or_dy + ((dh - this.height) / 2)) >> 0;
+			}
+			var oldGlobalAlpha = context.globalAlpha;
+			context.globalAlpha = this.transparent;
+			context.drawImage(this.image, x, y);
+			context.globalAlpha = oldGlobalAlpha;
+		};
+
+		this.StartRenderer = function()
+		{
+			var canvasTransparent = document.createElement("canvas");
+			canvasTransparent.width = this.image.width;
+			canvasTransparent.height = this.image.height;
+			var ctx = canvasTransparent.getContext("2d");
+			ctx.globalAlpha = this.transparent;
+			ctx.drawImage(this.image, 0, 0);
+			this.imageBase64 = canvasTransparent.toDataURL("image/png");
+			canvasTransparent = null;
+		};
+		this.EndRenderer = function()
+		{
+			delete this.imageBase64;
+			this.imageBase64 = undefined;
+		};
+		this.DrawOnRenderer = function(renderer, w, h)
+		{
+			var wMM = this.width * g_dKoef_pix_to_mm / this.zoom;
+			var hMM = this.height * g_dKoef_pix_to_mm / this.zoom;
+			var x = (w - wMM) / 2;
+			var y = (h - hMM) / 2;
+
+			renderer.UseOriginImageUrl = true;
+			renderer.drawImage(this.imageBase64, x, y, wMM, hMM);
+			renderer.UseOriginImageUrl = false;
+		};
+
+		this.privateGenerateShape = function(obj)
+		{
+			AscFormat.ExecuteNoHistory(function(obj) {
+
+                var oShape = new AscFormat.CShape();
+                var bWord = false;
+                var oApi = Asc['editor'] || editor;
+                if(!oApi){
+                    return null;
+                }
+                switch(oApi.getEditorId()){
+                    case AscCommon.c_oEditorId.Word:{
+                        oShape.setWordShape(true);
+                        bWord = true;
+                        break;
+                    }
+                    case AscCommon.c_oEditorId.Presentation:{
+                        oShape.setWordShape(false);
+                        oShape.setParent(oApi.WordControl.m_oLogicDocument.Slides[oApi.WordControl.m_oLogicDocument.CurPage]);
+                        break;
+                    }
+					case AscCommon.c_oEditorId.Spreadsheet:{
+                        oShape.setWordShape(false);
+                        oShape.setWorksheet(oApi.wb.getWorksheet().model);
+						break;
+					}
+				}
+
+                oShape.setBDeleted(false);
+				oShape.spPr = new AscFormat.CSpPr();
+				oShape.spPr.setParent(oShape);
+				oShape.spPr.setXfrm(new AscFormat.CXfrm());
+				oShape.spPr.xfrm.setParent(oShape.spPr);
+				oShape.spPr.xfrm.setOffX(0);
+				oShape.spPr.xfrm.setOffY(0);
+				oShape.spPr.xfrm.setExtX(obj['width']);
+				oShape.spPr.xfrm.setExtY(obj['height']);
+				oShape.spPr.xfrm.setRot(AscFormat.normalizeRotate(obj['rotate'] ? (obj['rotate'] * Math.PI / 180) : 0));
+				oShape.spPr.setGeometry(AscFormat.CreateGeometry(obj['type']));
+				if(obj['fill'] && obj['fill'].length === 3){
+					oShape.spPr.setFill(AscFormat.CreteSolidFillRGB(obj['fill'][0], obj['fill'][1], obj['fill'][2]));
+				}
+				if(AscFormat.isRealNumber(obj['stroke-width']) || Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+					var oUnifill;
+					if(Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+						oUnifill = AscFormat.CreteSolidFillRGB(obj['stroke'][0], obj['stroke'][1], obj['stroke'][2]);
+					}
+					else{
+						oUnifill = AscFormat.CreteSolidFillRGB(0, 0, 0);
+					}
+					oShape.spPr.setLn(AscFormat.CreatePenFromParams(oUnifill, undefined, undefined, undefined, undefined, AscFormat.isRealNumber(obj['stroke-width']) ? obj['stroke-width'] : 12700.0/36000.0))
+				}
+
+				if(bWord){
+					oShape.createTextBoxContent();
+				}
+				else{
+					oShape.createTextBody();
+				}
+				var align = obj['align'];
+				if(undefined != align){
+					oShape.setVerticalAlign(align);
+				}
+
+				if(Array.isArray(obj['margins']) && obj['margins'].length === 4){
+					oShape.setPaddings({Left: obj['margins'][0], Top: obj['margins'][1], Right: obj['margins'][2], Bottom: obj['margins'][3]});
+				}
+				var oContent = oShape.getDocContent();
+				var aParagraphsS = obj['paragraphs'];
+				if(aParagraphsS.length > 0){
+                    oContent.Content.length = 0;
+				}
+				for(var i = 0; i < aParagraphsS.length; ++i){
+					var oCurParS = aParagraphsS[i];
+					var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent, !bWord);
+					if(AscFormat.isRealNumber(oCurParS['align'])){
+						oNewParagraph.Set_Align(oCurParS['align'])
+					}
+					if(Array.isArray(oCurParS['fill']) && oCurParS['fill'].length === 3){
+						var oShd = new CDocumentShd();
+						oShd.Value = Asc.c_oAscShdClear;
+						oShd.Color.r = oCurParS['fill'][0];
+						oShd.Color.g = oCurParS['fill'][1];
+						oShd.Color.b = oCurParS['fill'][2];
+						oNewParagraph.Set_Shd(oShd, true);
+					}
+					if(AscFormat.isRealNumber(oCurParS['linespacing'])){
+						oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Auto}, true);
+					}
+					var aRunsS = oCurParS['runs'];
+					for(var j = 0; j < aRunsS.length; ++j){
+						var oRunS = aRunsS[j];
+						var oRun = new AscCommonWord.ParaRun(oNewParagraph, false);
+						if(Array.isArray(oRunS['fill']) && oRunS['fill'].length === 3){
+							oRun.Set_Unifill(AscFormat.CreteSolidFillRGB(oRunS['fill'][0], oRunS['fill'][1], oRunS['fill'][2]));
+						}
+						if(oRunS['font-family']){
+							oRun.Set_RFonts_Ascii({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_CS({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_EastAsia({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_HAnsi({Name : oRunS['font-family'], Index : -1});
+						}
+						if(oRunS['font-size']){
+							oRun.Set_FontSize(oRunS['font-size']);
+						}
+						oRun.Set_Bold(oRunS['bold'] === true);
+						oRun.Set_Italic(oRunS['italic'] === true);
+						oRun.Set_Strikeout(oRunS['strikeout'] === true);
+						oRun.Set_Underline(oRunS['underline'] === true);
+
+						var sCustomText = oRunS['text'];
+						if(sCustomText === "<%br%>"){
+							oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
+						}
+						else{
+							for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
+							{
+								var nChar = sCustomText.charAt(nIndex);
+								if (" " === nChar)
+									oRun.Add_ToContent(nIndex, new ParaSpace(), true);
+								else
+									oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
+							}
+						}
+
+						oNewParagraph.Internal_Content_Add(i, oRun, false);
+					}
+					oContent.Internal_Content_Add(oContent.Content.length, oNewParagraph);
+				}
+
+				oShape.recalculate();
+				if (oShape.bWordShape)
+				{
+					oShape.recalculateText();
+				}
+
+				var oldShowParaMarks;
+				if (window.editor)
+				{
+					oldShowParaMarks = editor.ShowParaMarks;
+					editor.ShowParaMarks = false;
+				}
+
+				AscCommon.IsShapeToImageConverter = true;
+				var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
+
+				var w_mm = 210;
+				var h_mm = 297;
+				var w_px = AscCommon.AscBrowser.convertToRetinaValue(w_mm * g_dKoef_mm_to_pix * this.zoom, true);
+				var h_px = AscCommon.AscBrowser.convertToRetinaValue(h_mm * g_dKoef_mm_to_pix * this.zoom, true);
+
+				_bounds_cheker.init(w_px, h_px, w_mm, h_mm);
+				_bounds_cheker.transform(1,0,0,1,0,0);
+
+				_bounds_cheker.AutoCheckLineWidth = true;
+				_bounds_cheker.CheckLineWidth(oShape);
+				oShape.draw(_bounds_cheker, 0);
+				_bounds_cheker.CorrectBounds2();
+
+				var _need_pix_width     = _bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1;
+				var _need_pix_height    = _bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1;
+
+				if (_need_pix_width <= 0 || _need_pix_height <= 0)
+					return;
+
+				if (!this.image)
+					this.image = document.createElement("canvas");
+
+				this.image.width = _need_pix_width;
+				this.image.height = _need_pix_height;
+				this.width = _need_pix_width;
+				this.height = _need_pix_height;
+
+				var _ctx = this.image.getContext('2d');
+
+				var g = new AscCommon.CGraphics();
+				g.init(_ctx, w_px, h_px, w_mm, h_mm);
+				g.m_oFontManager = AscCommon.g_fontManager;
+
+				g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
+				g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
+				g.transform(1,0,0,1,0,0);
+
+				oShape.draw(g, 0);
+
+				AscCommon.IsShapeToImageConverter = false;
+
+				if (window.editor)
+				{
+					window.editor.ShowParaMarks = oldShowParaMarks;
+				}
+
+			}, this, [obj]);
+		};
+	}
+	window.TEST_WATERMARK_STRING = "\
+	{\
+		\"transparent\" : 0.3,\
+		\"type\" : \"rect\",\
+		\"width\" : 100,\
+		\"height\" : 100,\
+		\"rotate\" : -45,\
+		\"margins\" : [ 10, 10, 10, 10 ],\
+		\"fill\" : [255, 0, 0],\
+		\"stroke-width\" : 1,\
+		\"stroke\" : [0, 0, 255],\
+		\"align\" : 1,\
+		\
+		\"paragraphs\" : [\
+		{\
+			\"align\" : 2,\
+			\"fill\" : [255, 0, 0],\
+			\"linespacing\" : 1,\
+			\
+			\"runs\" : [\
+				{\
+					\"text\" : \"Do not steal, %user_name%!\",\
+					\"fill\" : [0, 0, 0],\
+					\"font-family\" : \"Arial\",\
+					\"font-size\" : 40,\
+					\"bold\" : true,\
+					\"italic\" : false,\
+					\"strikeout\" : false,\
+					\"underline\" : false\
+				},\
+				{\
+					\"text\" : \"<%br%>\"\
+				}\
+			]\
+		}\
+	]\
+	}";
 
     /*
      * Export
@@ -3870,4 +4251,6 @@
     prot["get_Word"] = prot.get_Word;
     prot["get_Checked"] = prot.get_Checked;
     prot["get_Variants"] = prot.get_Variants;
+
+    window["AscCommon"].CWatermarkOnDraw = CWatermarkOnDraw;
 })(window);

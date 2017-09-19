@@ -568,6 +568,21 @@
 		{
 			return Base64Encode(this.data, nLen, nPos);
 		}
+		this.GetData   = function(nPos, nLen)
+		{
+			var _canvas = document.createElement('canvas');
+			var _ctx    = _canvas.getContext('2d');
+
+			var len = this.GetCurPosition();
+
+			//todo ImData.data.length multiple of 4
+			var ImData = _ctx.createImageData(Math.ceil(len / 4), 1);
+			var res = ImData.data;
+
+			for (var i = 0; i < len; i++)
+				res[i] = this.data[i];
+			return res;
+		}
 		this.GetCurPosition     = function()
 		{
 			return this.pos;
@@ -761,6 +776,181 @@
 				this.data[this.pos++] = data[_pos + i];
 			}
 		}
+
+		this.WriteUtf8Char = function(code)
+		{
+			this.CheckSize(1);
+			if (code < 0x80) {
+				this.data[this.pos++] = code;
+			}
+			else if (code < 0x0800) {
+				this.data[this.pos++] = (0xC0 | (code >> 6));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x10000) {
+				this.data[this.pos++] = (0xE0 | (code >> 12));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x1FFFFF) {
+				this.data[this.pos++] = (0xF0 | (code >> 18));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x3FFFFFF) {
+				this.data[this.pos++] = (0xF8 | (code >> 24));
+				this.data[this.pos++] = (0x80 | ((code >> 18) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x7FFFFFFF) {
+				this.data[this.pos++] = (0xFC | (code >> 30));
+				this.data[this.pos++] = (0x80 | ((code >> 24) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 18) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+		};
+
+		this.WriteXmlString = function(val)
+		{
+			var pCur = 0;
+			var pEnd = val.length;
+			while (pCur < pEnd)
+			{
+				var code = val.charCodeAt(pCur++);
+				if (code >= 0xD800 && code <= 0xDFFF && pCur < pEnd)
+				{
+					code = 0x10000 + (((code & 0x3FF) << 10) | (0x03FF & val.charCodeAt(pCur++)));
+				}
+				this.WriteUtf8Char(code);
+			}
+		};
+		this.WriteXmlStringEncode = function(val)
+		{
+			var pCur = 0;
+			var pEnd = val.length;
+			while (pCur < pEnd)
+			{
+				var code = val.charCodeAt(pCur++);
+				if (code >= 0xD800 && code <= 0xDFFF && pCur < pEnd)
+				{
+					code = 0x10000 + (((code & 0x3FF) << 10) | (0x03FF & val.charCodeAt(pCur++)));
+				}
+				switch (code)
+				{
+					case 0x26:
+						//&
+						this.WriteUtf8Char(0x26);
+						this.WriteUtf8Char(0x61);
+						this.WriteUtf8Char(0x6d);
+						this.WriteUtf8Char(0x70);
+						this.WriteUtf8Char(0x3b);
+						break;
+					case 0x27:
+						//'
+						this.WriteUtf8Char(0x26);
+						this.WriteUtf8Char(0x61);
+						this.WriteUtf8Char(0x70);
+						this.WriteUtf8Char(0x6f);
+						this.WriteUtf8Char(0x73);
+						this.WriteUtf8Char(0x3b);
+						break;
+					case 0x3c:
+						//<
+						this.WriteUtf8Char(0x26);
+						this.WriteUtf8Char(0x6c);
+						this.WriteUtf8Char(0x74);
+						this.WriteUtf8Char(0x3b);
+						break;
+					case 0x3e:
+						//>
+						this.WriteUtf8Char(0x26);
+						this.WriteUtf8Char(0x67);
+						this.WriteUtf8Char(0x74);
+						this.WriteUtf8Char(0x3b);
+						break;
+					case 0x22:
+						//"
+						this.WriteUtf8Char(0x26);
+						this.WriteUtf8Char(0x71);
+						this.WriteUtf8Char(0x75);
+						this.WriteUtf8Char(0x6f);
+						this.WriteUtf8Char(0x74);
+						this.WriteUtf8Char(0x3b);
+						break;
+					default:
+						this.WriteUtf8Char(code);
+						break;
+				}
+			}
+		};
+		this.WriteXmlBool = function(val)
+		{
+			this.WriteXmlString(val ? '1' : '0');
+		};
+		this.WriteXmlNumber = function(val)
+		{
+			this.WriteXmlString(val.toString());
+		};
+		this.WriteXmlNodeStart = function(name, isClose)
+		{
+			this.WriteUtf8Char(0x3c);
+			this.WriteXmlString(name);
+			if(isClose)
+			{
+				this.WriteUtf8Char(0x3e);
+			}
+		};
+		this.WriteXmlNodeEnd = function(name, isEmpty, isEnd)
+		{
+			if (isEmpty)
+			{
+				if (isEnd)
+					this.WriteUtf8Char(0x2f);
+				this.WriteUtf8Char(0x3e);
+			}
+			else
+			{
+				this.WriteUtf8Char(0x3c);
+				this.WriteUtf8Char(0x2f);
+				this.WriteXmlString(name);
+				this.WriteUtf8Char(0x3e);
+			}
+		};
+		this.WriteXmlAttributesEnd = function(name)
+		{
+			this.WriteUtf8Char(0x3e);
+		};
+		this.WriteXmlAttributeString = function(name, val)
+		{
+			this.WriteUtf8Char(0x20);
+			this.WriteXmlString(name);
+			this.WriteUtf8Char(0x3d);
+			this.WriteUtf8Char(0x22);
+			this.WriteXmlString(val);
+			this.WriteUtf8Char(0x22);
+		};
+		this.WriteXmlAttributeStringEncode = function(name, val)
+		{
+			this.WriteUtf8Char(0x20);
+			this.WriteXmlString(name);
+			this.WriteUtf8Char(0x3d);
+			this.WriteUtf8Char(0x22);
+			this.WriteXmlStringEncode(val);
+			this.WriteUtf8Char(0x22);
+		};
+		this.WriteXmlAttributeBool = function(name, val)
+		{
+			this.WriteXmlAttributeString(name, val ? '1' : '0');
+		};
+		this.WriteXmlAttributeNumber = function(name, val)
+		{
+			this.WriteXmlAttributeString(name, val.toString());
+		};
 	}
 
 	function CCommandsType()
@@ -1289,7 +1479,7 @@
 		},
 
 		// images
-		drawImage : function(img, x, y, w, h)
+		drawImage : function(img, x, y, w, h, isUseOriginUrl)
 		{
 			var isLocalUse = true;
 			if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsFilePrinting"])
@@ -1301,7 +1491,7 @@
 				this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
 				var imgLocal = AscCommon.g_oDocumentUrls.getLocal(img);
-				if (imgLocal && isLocalUse)
+				if (imgLocal && isLocalUse && (true !== isUseOriginUrl))
 				{
 					this.Memory.WriteString2(imgLocal);
 				}
@@ -1318,7 +1508,7 @@
 			}
 
 			var _src = "";
-			if (!window["NATIVE_EDITOR_ENJINE"])
+			if (!window["NATIVE_EDITOR_ENJINE"] && (true !== isUseOriginUrl))
 			{
 				var _img = window.editor.ImageLoader.map_image_index[img];
 				if (_img == undefined || _img.Image == null)
@@ -1611,6 +1801,8 @@
 		this._restoreDumpedVectors = null;
 
 		this.m_oBaseTransform = null;
+
+		this.UseOriginImageUrl = false;
 	}
 
 	CDocumentRenderer.prototype =
@@ -1789,7 +1981,7 @@
 			if (0 != this.m_lPagesCount)
 			{
 				if (!srcRect)
-					this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img, x, y, w, h);
+					this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img, x, y, w, h, this.UseOriginImageUrl);
 				else
 				{
 					/*

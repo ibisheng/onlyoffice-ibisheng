@@ -410,29 +410,7 @@ function CGroupShape()
             this.spTree[i].draw(graphics);
 
 
-        if(!this.group)
-        {
-            var oLock;
-            if(this.parent instanceof ParaDrawing)
-            {
-                oLock = this.parent.Lock;
-            }
-            else if(this.Lock)
-            {
-                oLock = this.Lock;
-            }
-            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
-            {
-                var bCoMarksDraw = true;
-                if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
-                    bCoMarksDraw = editor.isCoMarksDraw;
-                }
-                if(bCoMarksDraw){
-                    graphics.transform3(this.transform);
-                    graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
-                }
-            }
-        }
+        this.drawLocks(this.transform, graphics);
         graphics.reset();
         graphics.SetIntegerGrid(true);
     };
@@ -1198,11 +1176,6 @@ function CGroupShape()
         }
                 
         return null;
-    };
-
-    CGroupShape.prototype.isEmptyPlaceholder = function ()
-    {
-        return false;
     };
 
     CGroupShape.prototype.getCompiledFill = function()

@@ -427,6 +427,38 @@ ParaRun.prototype.Add = function(Item, bMath)
 				return;
 			}
 		}
+
+		// Специальный код с обработкой выделения (highlight)
+		// Текст, который пишем до или после выделенного текста делаем без выделения.
+		if (!this.Is_Empty() && (0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
+		{
+			var Parent = this.Get_Parent();
+			var RunPos = this.private_GetPosInParent(Parent);
+			if (null !== Parent && -1 !== RunPos)
+			{
+				if ((0 === this.State.ContentPos
+					&& (0 === RunPos
+					|| Parent.Content[RunPos - 1].Type !== para_Run
+					|| highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
+					|| (this.Content.length === this.State.ContentPos
+					&& (RunPos === Parent.Content.length - 1
+					|| para_Run !== Parent.Content[RunPos + 1].Type
+					|| highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
+					|| (RunPos === Parent.Content.length - 2
+					&& Parent instanceof Paragraph)))
+				{
+					var NewRun = this.private_SplitRunInCurPos();
+					if (NewRun)
+					{
+						NewRun.Set_HighLight(highlight_None);
+						NewRun.MoveCursorToStartPos();
+						NewRun.Add(Item, bMath);
+						NewRun.Make_ThisElementCurrent();
+						return;
+					}
+				}
+			}
+		}
 	}
 
     var TrackRevisions = false;
@@ -1341,7 +1373,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 				var Descender = Math.abs(g_oTextMeasurer.GetDescender());
 				var Ascender  = Height - Descender;
 
-                Para.DrawingDocument.SetTargetSize( Height );
+				Para.DrawingDocument.SetTargetSize(Height, Ascender);
 
                 var RGBA;
                 Para.DrawingDocument.UpdateTargetTransform(Para.Get_ParentTextTransform());
@@ -1433,7 +1465,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y0 = Math.max( __Y0, ___Y0 );
                     __Y1 = Math.min( __Y1, ___Y1 );
 
-                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+					Para.DrawingDocument.SetTargetSize(__Y1 - __Y0, Ascender);
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
                 else if ( undefined != Para.Get_FramePr() )
@@ -1445,7 +1477,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y0 = Math.max( __Y0, ___Y0 );
                     __Y1 = Math.min( __Y1, ___Y1 );
 
-                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+					Para.DrawingDocument.SetTargetSize(__Y1 - __Y0, Ascender);
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
                 else
@@ -2120,7 +2152,7 @@ ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 			{
 				if (oPr && true === oPr.NewLineParagraph)
 				{
-					Str += '\n';
+					Str += '\r\n';
 				}
 
 				break;
@@ -2944,7 +2976,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
                             // если нет, тогда в начале текущей строки.
 
-                            if (null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage)
+                            if (null != Para.Get_DocumentPrev() && true != Para.Parent.IsTableCellContent() && 0 === CurPage)
                             {
                                 Para.Recalculate_Drawing_AddPageBreak(0, 0, true);
                                 PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
@@ -3668,7 +3700,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var X_Right_Margin  = PageLimits.XLimit - PageFields.XLimit;
                 var Y_Bottom_Margin = PageLimits.YLimit - PageFields.YLimit;
 
-                if (true === Para.Parent.Is_TableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
+                if (true === Para.Parent.IsTableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
                 {
                     X_Left_Field   = LD_PageFields.X;
                     Y_Top_Field    = LD_PageFields.Y;
@@ -3692,7 +3724,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var Bottom_Margin = Y_Bottom_Margin;
                 var Page_H        = Page_Height;
 
-                if ( true === Para.Parent.Is_TableCellContent() && true == Item.Use_TextWrap() )
+                if ( true === Para.Parent.IsTableCellContent() && true == Item.Use_TextWrap() )
                 {
                     Top_Margin    = 0;
                     Bottom_Margin = 0;
@@ -3700,7 +3732,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 }
 
                 var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
-                if (true === Para.Parent.Is_TableCellContent() && false === Item.Is_LayoutInCell())
+                if (true === Para.Parent.IsTableCellContent() && false === Item.Is_LayoutInCell())
                 {
                     PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
                     var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
@@ -3795,7 +3827,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                                 LDRecalcInfo.Reset();
                                 Item.Reset_SavedPosition();
                             }
-                            else if ( true === Para.Parent.Is_TableCellContent() )
+                            else if ( true === Para.Parent.IsTableCellContent() )
                             {
                                 // Картинка не на нужной странице, но так как это таблица
                                 // мы пересчитываем заново текущую страницу, а не предыдущую
@@ -4784,7 +4816,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     }
 
                     var bEndCell = false;
-                    if (null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent())
+                    if (null === Para.Get_DocumentNext() && true === Para.Parent.IsTableCellContent())
                         bEndCell = true;
 
                     Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell, reviewtype_Common !== ReviewType ?  true : false);
@@ -4885,13 +4917,25 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     var ReviewColor = this.Get_ReviewColor();
 
     // Выставляем цвет обводки
-    if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
-        CurColor = new CDocumentColor( 128, 0, 151 );
+
+    var bPresentation = this.Paragraph && !this.Paragraph.bFromDocument;
+    if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill || bPresentation) )
+    {
+        AscFormat.G_O_VISITED_HLINK_COLOR.check(Theme, ColorMap);
+        RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
+        CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+    }
     else if ( true === CurTextPr.Color.Auto && !CurTextPr.Unifill)
         CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
     else
     {
-        if(CurTextPr.Unifill)
+        if(bPresentation && PDSL.Hyperlink)
+        {
+            AscFormat.G_O_HLINK_COLOR.check(Theme, ColorMap);
+            RGBA = AscFormat.G_O_HLINK_COLOR.getRGBAColor();
+            CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+        }
+        else if(CurTextPr.Unifill)
         {
             CurTextPr.Unifill.check(Theme, ColorMap);
             RGBA = CurTextPr.Unifill.getRGBAColor();
@@ -7110,7 +7154,7 @@ ParaRun.prototype.Get_Spacing = function()
 
 ParaRun.prototype.Set_DStrikeout = function(Value)
 {
-    if ( Value !== this.Pr.Value )
+    if ( Value !== this.Pr.DStrikeout )
     {
         var OldValue = this.Pr.DStrikeout;
         this.Pr.DStrikeout = Value;

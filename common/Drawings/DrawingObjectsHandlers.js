@@ -121,7 +121,7 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
                 return oRet;
             }
         }
-        if(selected_objects[i].hitInBoundingRect(tx, ty) && (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(tx, ty)))
+        if(selected_objects[i].hitInBoundingRect(tx, ty) /*&& (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(tx, ty))*/)
         {
             if(bWord && selected_objects[i].parent && selected_objects[i].parent.Is_Inline())
                 return handleInlineHitNoText(selected_objects[i], drawingObjectsController, e, tx, ty, pageIndex, true);

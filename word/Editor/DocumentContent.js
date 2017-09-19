@@ -225,7 +225,7 @@ CDocumentContent.prototype.Get_ColorMap = function()
 };
 CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
 {
-	if (true === this.Parent.Is_Cell())
+	if (true === this.Parent.IsCell())
 	{
 		var Margins = this.Parent.GetMargins();
 
@@ -254,7 +254,7 @@ CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
 };
 CDocumentContent.prototype.Get_PageFields = function(PageIndex)
 {
-	if (true === this.Parent.Is_Cell() || (undefined !== AscFormat.CShape && this.Parent instanceof AscFormat.CShape))
+	if (true === this.Parent.IsCell() || (undefined !== AscFormat.CShape && this.Parent instanceof AscFormat.CShape))
 	{
 		if (PageIndex < this.Pages.length && PageIndex >= 0)
 		{
@@ -454,23 +454,23 @@ CDocumentContent.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Dra
 	var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
 
 	// Делаем логику как в ворде
-	if (true != bAnchor && (0 < ContentPos || CurPage > 0) && ContentPos === this.Pages[CurPage].Pos && this.Pages[CurPage].EndPos > this.Pages[CurPage].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage())
+	if (true != bAnchor && (0 < ContentPos || CurPage > 0) && ContentPos === this.Pages[CurPage].Pos && this.Pages[CurPage].EndPos > this.Pages[CurPage].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].IsContentOnFirstPage())
 		ContentPos++;
 
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
 	return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
 };
 // Проверяем, описывает ли данный класс содержимое ячейки
-CDocumentContent.prototype.Is_TableCellContent = function()
+CDocumentContent.prototype.IsTableCellContent = function(isReturnCell)
 {
-	return this.Parent.Is_Cell();
+	return this.Parent.IsCell(isReturnCell);
 };
-CDocumentContent.prototype.Is_TableFirstRowOnNewPage = function()
+CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
-	if (false === this.Parent.Is_Cell())
+	if (false === this.Parent.IsCell())
 		return false;
 
-	return this.Parent.Is_TableFirstRowOnNewPage();
+	return this.Parent.IsTableFirstRowOnNewPage();
 };
 CDocumentContent.prototype.Check_AutoFit = function()
 {
@@ -1043,7 +1043,7 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
             }
 
-            if (Index === Count - 1 && Index > 0 && type_Paragraph === Element.GetType() && type_Table === this.Content[Index - 1].GetType() && true === Element.IsEmpty() && true === this.Is_TableCellContent())
+            if (Index === Count - 1 && Index > 0 && type_Paragraph === Element.GetType() && type_Table === this.Content[Index - 1].GetType() && true === Element.IsEmpty() && true === this.IsTableCellContent())
             {
                 RecalcResult = recalcresult_NextElement;
 
@@ -1610,11 +1610,13 @@ CDocumentContent.prototype.GetCurrentParagraph = function()
 
 	return null;
 };
-// Проверяем есть ли хоть какой-либо контент на первой странице
-CDocumentContent.prototype.Is_ContentOnFirstPage         = function()
+CDocumentContent.prototype.IsContentOnFirstPage = function()
 {
-    var Element = this.Content[0];
-    return Element.Is_ContentOnFirstPage();
+	if (this.Content.length <= 0)
+		return false;
+
+	var Element = this.Content[0];
+	return Element.IsContentOnFirstPage();
 };
 CDocumentContent.prototype.StartFromNewPage = function()
 {
@@ -2170,7 +2172,7 @@ CDocumentContent.prototype.AddNewParagraph = function()
         // Сначала удаляем заселекченую часть
         if (true === this.Selection.Use)
         {
-            this.Remove(1, true);
+            this.Remove(1, true, false, true);
         }
 
         // Добавляем новый параграф
@@ -2534,7 +2536,7 @@ CDocumentContent.prototype.AddInlineTable = function(Cols, Rows)
 		{
 			// Создаем новую таблицу
 			var W = 0;
-			if (true === this.Is_TableCellContent())
+			if (true === this.IsTableCellContent())
 				W = this.XLimit - this.X;
 			else
 				W = ( this.XLimit - this.X + 2 * 1.9 );
@@ -7465,6 +7467,11 @@ CDocumentContent.prototype.GetSelectionState = function()
 			else
 				State = this.Content[this.CurPos.ContentPos].GetSelectionState();
 		}
+	}
+
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)
+	{
+		DocState.Selection.Data = null;
 	}
 
 	State.push(DocState);

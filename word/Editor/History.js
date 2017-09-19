@@ -78,6 +78,8 @@ function CHistory(Document)
     // Параметры для специального сохранения для локальной версии редактора
     this.UserSaveMode   = false;
     this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
+
+	this.StoredData = [];
 }
 
 CHistory.prototype =
@@ -218,7 +220,7 @@ CHistory.prototype =
 
     Undo : function(Options)
     {
-        this.Check_UninonLastPoints();
+        this.CheckUnionLastPoints();
 
         // Проверяем можно ли сделать Undo
         if (true !== this.Can_Undo())
@@ -336,7 +338,7 @@ CHistory.prototype =
 
         this.Clear_Additional();
 
-        this.Check_UninonLastPoints();
+        this.CheckUnionLastPoints();
         
         var State = this.Document.GetSelectionState();
         var Items = [];
@@ -693,7 +695,7 @@ CHistory.prototype =
         this.RecalculateData.Update = true;
     },
 
-    Check_UninonLastPoints : function()
+	CheckUnionLastPoints : function()
     {
         // Не объединяем точки в истории, когда отключается пересчет.
         // TODO: Неправильно изменяется RecalcIndex
@@ -844,17 +846,20 @@ CHistory.prototype =
       }
     },
 
-    Have_Changes : function(IsNotUserSave)
-    {
-      var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
-      if (-1 === this.Index && null === checkIndex && false === this.ForceSave)
-        return false;
+	Have_Changes : function(IsNotUserSave)
+	{
+		if (!this.Document || this.Document.IsViewModeInReview())
+			return false;
 
-      if (this.Index != checkIndex || true === this.ForceSave)
-        return true;
+		var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
+		if (-1 === this.Index && null === checkIndex && false === this.ForceSave)
+			return false;
 
-      return false;
-    },
+		if (this.Index != checkIndex || true === this.ForceSave)
+			return true;
+
+		return false;
+	},
 
     Get_RecalcData : function(RecalcData, arrChanges)
     {
@@ -1220,6 +1225,29 @@ CHistory.prototype.GetRecalculateIndex = function()
 CHistory.prototype.SetRecalculateIndex = function(nIndex)
 {
 	this.RecIndex = Math.min(this.Index, nIndex);
+};
+CHistory.prototype.SaveRedoPoints = function()
+{
+	var arrData = [];
+	this.StoredData.push(arrData);
+	for (var nIndex = this.Index + 1, nCount = this.Points.length; nIndex < nCount; ++nIndex)
+	{
+		arrData.push(this.Points[nIndex]);
+	}
+};
+CHistory.prototype.PopRedoPoints = function()
+{
+	if (this.StoredData.length <= 0)
+		return;
+
+	var arrPoints = this.StoredData[this.StoredData.length - 1];
+	this.Points.length = this.Index + 1;
+	for (var nIndex = 0, nCount = arrPoints.length; nIndex < nCount; ++nIndex)
+	{
+		this.Points[this.Index + nIndex + 1] = arrPoints[nIndex];
+	}
+
+	this.StoredData.length = this.StoredData.length - 1;
 };
 
 function CRC32()

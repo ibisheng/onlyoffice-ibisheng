@@ -541,7 +541,8 @@ var c_oSer_CommentsType = {
 	Text: 6,
 	QuoteText: 7,
 	Solved: 8,
-	Replies: 9
+	Replies: 9,
+	OOData: 10
 };
 
 var c_oSer_StyleType = {
@@ -1014,6 +1015,72 @@ var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
 var g_nErrorParagraphCount = 1000;
 
+	function getCommentAdditionalData (comment) {
+		var AdditionalData = "";
+		if(null != comment.m_sOOTime && "" != comment.m_sOOTime)
+		{
+			AdditionalData += "teamlab_data:";
+			var dateStr = new Date(comment.m_sOOTime - 0).toISOString().slice(0, 19) + 'Z';
+			AdditionalData += "0;" + dateStr.length + ";" + dateStr + ";";
+		}
+		return AdditionalData;
+	};
+	function ReadNextInteger(_parsed)
+	{
+		var _len = _parsed.data.length;
+		var _found = -1;
+
+		var _Found = ";".charCodeAt(0);
+		for (var i = _parsed.pos; i < _len; i++)
+		{
+			if (_Found == _parsed.data.charCodeAt(i))
+			{
+				_found = i;
+				break;
+			}
+		}
+
+		if (-1 == _found)
+			return -1;
+
+		var _ret = parseInt(_parsed.data.substr(_parsed.pos, _found - _parsed.pos));
+		if (isNaN(_ret))
+			return -1;
+
+		_parsed.pos = _found + 1;
+		return _ret;
+	};
+
+	function ParceAdditionalData(AdditionalData, _comment_data)
+	{
+		if (AdditionalData.indexOf("teamlab_data:") != 0)
+			return;
+
+		var _parsed = { data : AdditionalData, pos : "teamlab_data:".length };
+
+		while (true)
+		{
+			var _attr = ReadNextInteger(_parsed);
+			if (-1 == _attr)
+				break;
+
+			var _len = ReadNextInteger(_parsed);
+			if (-1 == _len)
+				break;
+
+			var _value = _parsed.data.substr(_parsed.pos, _len);
+			_parsed.pos += (_len + 1);
+
+			if (0 == _attr){
+				var dateMs = Date.parse(_value);
+				if (isNaN(dateMs)) {
+					dateMs = new Date().getTime();
+				}
+				_comment_data.OODate = dateMs + "";
+			}
+		}
+	}
+
 function CreateThemeUnifill(color, tint, shade){
 	var ret = null;
 	if(null != color){
@@ -1154,26 +1221,27 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 		oUsedStyleMap: null
 	};
 	this.saveParams = new DocSaveParams(bMailMergeDocx, bMailMergeHtml);
-    this.Write = function()
+    this.Write = function(noBase64)
     {
         pptx_content_writer._Start();
+		if (noBase64) {
+			this.memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
+		}
         this.WriteMainTable();
         pptx_content_writer._End();
-        return this.GetResult();
-    }
-    this.Write2 = function()
-    {
-        pptx_content_writer._Start();
-        this.WriteMainTable();
-        pptx_content_writer._End();
+		if (noBase64) {
+			return this.memory.GetData();
+		} else {
+			return this.GetResult();
+		}
     }
 	this.GetResult = function()
 	{
-		return this.WriteFileHeader(this.memory.GetCurPosition()) + this.memory.GetBase64Memory();
+		return this.WriteFileHeader(this.memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.memory.GetBase64Memory();
 	}
-    this.WriteFileHeader = function(nDataSize)
+    this.WriteFileHeader = function(nDataSize, version)
     {
-        return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
+        return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
     }
     this.WriteMainTable = function()
     {
@@ -5556,6 +5624,12 @@ function BinaryCommentsTableWriter(memory, doc, oMapCommentId)
 		{
 			this.bs.WriteItem(c_oSer_CommentsType.Replies, function(){oThis.WriteReplies(comment.m_aReplies);});
 		}
+		var dataStr = getCommentAdditionalData(comment);
+		if (dataStr)
+		{
+			this.memory.WriteByte(c_oSer_CommentsType.OOData);
+			this.memory.WriteString2(dataStr);
+		}
     };
 	this.WriteReplies = function(aComments)
 	{
@@ -5870,7 +5944,8 @@ function BinaryFileReader(doc, openParams)
     
     this.getbase64DecodedData = function(szSrc)
     {
-        var srcLen = szSrc.length;
+		var isBase64 = typeof szSrc === 'string';
+        var srcLen = isBase64 ? szSrc.length : szSrc.length;
         var nWritten = 0;
 
         var nType = 0;
@@ -5880,7 +5955,7 @@ function BinaryFileReader(doc, openParams)
         while (true)
         {
             index++;
-            var _c = szSrc.charCodeAt(index);
+            var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc[index];
             if (_c == ";".charCodeAt(0))
             {
                 
@@ -5900,82 +5975,89 @@ function BinaryFileReader(doc, openParams)
             else
                 dst_len += String.fromCharCode(_c);
         }
-        
-        var dstLen = parseInt(dst_len);
-
-        var pointer = g_memory.Alloc(dstLen);
-        var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
-        stream.obj = pointer.obj;
-
-        var dstPx = stream.data;
-
-        if (window.chrome)
-        {
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
-                    if (nCh == -1)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
-
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        else
-        {
-            var p = b64_decode;
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = p[szSrc.charCodeAt(index++)];
-                    if (nCh == undefined)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
-
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        if(version.length > 1)
+		if(version.length > 1)
         {
             var nTempVersion = version.substring(1) - 0;
             if(nTempVersion)
               AscCommon.CurFileVersion = nTempVersion;
         }
+		var stream;
+		if (Asc.c_nVersionNoBase64 !== AscCommon.CurFileVersion) {
+			var dstLen = parseInt(dst_len);
+
+			var pointer = g_memory.Alloc(dstLen);
+			stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
+			stream.obj = pointer.obj;
+
+			var dstPx = stream.data;
+
+			if (window.chrome)
+			{
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]);
+						if (nCh == -1)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
+
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+			else
+			{
+				var p = b64_decode;
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]];
+						if (nCh == undefined)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
+
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+		} else {
+			stream = new AscCommon.FT_Stream2(szSrc, szSrc.length);
+			//skip header
+			stream.EnterFrame(index);
+			stream.Seek(index);
+		}
         return stream;
     };
     this.Read = function(data)
@@ -5994,23 +6076,6 @@ function BinaryFileReader(doc, openParams)
 				throw e;
 		}
 		return true;
-    };
-    this.ReadData = function(data)
-    {
-        //try{
-        this.stream = new AscCommon.FT_Stream2(data, data.length);        
-        this.PreLoadPrepare();
-        this.ReadMainTable();
-        this.PostLoadPrepare();
-        //}
-        //catch(e)
-        //{
-        //	if(e.message == g_sErrorCharCountMessage)
-        //		return false;
-        //	else
-        //		throw e;
-        //}
-        return true;
     };
 	this.PreLoadPrepare = function()
 	{
@@ -6452,6 +6517,8 @@ function BinaryFileReader(doc, openParams)
 				oCommentObj.m_sUserId = comment.UserId;
 			if(null != comment.Date)
 				oCommentObj.m_sTime = comment.Date;
+			if(null != comment.OODate)
+				oCommentObj.m_sOOTime = comment.OODate;
 			if(null != comment.Text)
 				oCommentObj.m_sText = comment.Text;
 			if(null != comment.Solved)
@@ -8810,9 +8877,6 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				res = this.bcr.Read2(length, function(t, l){
 					return oThis.ReadLevel(t, l, oNewLvl);
 				});
-				//для bullet списков надо выставлять шрифт, для number шрифт возьмется из символа параграфа.
-				if(numbering_numfmt_Bullet == oNewLvl.Format && null == oNewLvl.TextPr.RFonts.Ascii)
-					oNewLvl.TextPr.RFonts.Set_All( "Symbol", -1 );
 				oNewNum.Lvl[nLevelNum] = oNewLvl;
 				this.oReadResult.aPostOpenStyleNumCallbacks.push(function(){
 					oNewNum.Set_Lvl(nLevelNum, oNewLvl);
@@ -13487,6 +13551,10 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 			res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadReplies(t,l,oNewImage.Replies);
                 });
+		}
+		else if ( c_oSer_CommentsType.OOData === type )
+		{
+			ParceAdditionalData(this.stream.GetString2LE(length), oNewImage);
 		}
         else
             res = c_oSerConstants.ReadUnknown;

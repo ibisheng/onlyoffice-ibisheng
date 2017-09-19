@@ -993,6 +993,56 @@ CSectionPr.prototype.private_GetDocumentWideFootnotePr = function()
 {
 	return this.LogicDocument.Footnotes.FootnotePr;
 };
+CSectionPr.prototype.SetColumnProps = function(ColumnsProps)
+{
+	var EqualWidth = ColumnsProps.get_EqualWidth();
+	this.Set_Columns_EqualWidth(ColumnsProps.get_EqualWidth());
+	if (false === EqualWidth)
+	{
+		var X      = this.Get_PageMargin_Left();
+		var XLimit = this.Get_PageWidth() - this.Get_PageMargin_Right();
+
+		var Cols          = [];
+		var SectionColumn = null;
+		var Count         = ColumnsProps.get_ColsCount();
+		for (var Index = 0; Index < Count; ++Index)
+		{
+			var Col             = ColumnsProps.get_Col(Index);
+			SectionColumn       = new CSectionColumn();
+			SectionColumn.W     = Col.get_W();
+			SectionColumn.Space = Col.get_Space();
+
+			if (X + SectionColumn.W > XLimit)
+			{
+				SectionColumn.W = XLimit - X;
+				Cols.push(SectionColumn);
+				X += SectionColumn.W;
+				break;
+			}
+
+			X += SectionColumn.W;
+			if (Index != Count - 1)
+				X += SectionColumn.Space;
+
+			Cols.push(SectionColumn);
+		}
+
+		if (SectionColumn && X < XLimit - 0.001)
+		{
+			SectionColumn.W += XLimit - X;
+		}
+
+		this.Set_Columns_Cols(Cols);
+		this.Set_Columns_Num(Count);
+	}
+	else
+	{
+		this.Set_Columns_Num(ColumnsProps.get_Num());
+		this.Set_Columns_Space(ColumnsProps.get_Space());
+	}
+
+	this.Set_Columns_Sep(ColumnsProps.get_Sep());
+};
 
 function CSectionPageSize()
 {

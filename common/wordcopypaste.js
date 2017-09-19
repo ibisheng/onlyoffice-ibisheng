@@ -1435,6 +1435,11 @@ CopyProcessor.prototype =
 
             //записываем slide
 			this.oPresentationWriter.WriteSlide(slide);
+            var oNotes = slide.notes;
+            this.oPresentationWriter.WriteBool(AscCommon.isRealObject(oNotes));
+            if(AscCommon.isRealObject(oNotes)){
+                this.oPresentationWriter.WriteSlideNote(oNotes);
+            }
 
             //записываем sp_tree параметры
 			this.oPresentationWriter.WriteULong(sp_tree.length);
@@ -2119,8 +2124,10 @@ PasteProcessor.prototype =
 			if(oSelectedContent.Elements.length === 1)
 			{
 				var curDocSelection = this.curDocSelection;
-
-				window['AscCommon'].g_clipboardBase.showButtonIdParagraph =this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+				if(curDocSelection)
+				{
+					window['AscCommon'].g_clipboardBase.showButtonIdParagraph = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+				}
 			}
 			else
 			{
@@ -2272,8 +2279,9 @@ PasteProcessor.prototype =
 			//SpecialPasteButtonById_Show вызываю здесь, если пересчет документа завершился раньше, чем мы попали сюда и сгенерировали параметры вставки
 			//в противном случае вызываю SpecialPasteButtonById_Show в drawingDocument->OnEndRecalculate
 			//TODO пересмотреть проверку на CDrawingDocContent и CShape
-			if(window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent && this.oDocument.Parent instanceof CShape) || (this.oDocument instanceof AscFormat.CDrawingDocContent))
-			{
+			if (window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent &&
+				(this.oDocument.Parent instanceof CShape || this.oDocument.Parent instanceof CHeaderFooter)) ||
+				(this.oDocument instanceof AscFormat.CDrawingDocContent)) {
 				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
 			}
 		}
@@ -2348,26 +2356,9 @@ PasteProcessor.prototype =
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 
-		var curDocSelection = this.curDocSelection;
-
 		//стиль текущего параграфа/рана, в который вставляем
-		var pasteIntoParagraphPr, pasteIntoParaRunPr;
-		if(curDocSelection && curDocSelection[1])
-		{
-			pasteIntoParagraphPr = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Pr;
-
-			var pasteIntoParaRun = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]];
-			if(para_InlineLevelSdt === pasteIntoParaRun.Type)
-			{
-				var selectPos = curDocSelection[0].CurPos.ContentPos.Data[1];
-				if(pasteIntoParaRun.Content && null != selectPos && pasteIntoParaRun.Content[selectPos])
-				{
-					pasteIntoParaRun =  pasteIntoParaRun.Content[selectPos];
-				}
-			}
-
-			pasteIntoParaRunPr = pasteIntoParaRun ? pasteIntoParaRun.Pr : null;
-		}
+		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
+		var pasteIntoParaRunPr = this.oDocument.GetDirectTextPr();
 		
 		switch(props)
 		{
@@ -2411,10 +2402,11 @@ PasteProcessor.prototype =
 
 				if(pasteIntoParagraphPr)
 				{
-					paragraph.Set_Pr(pasteIntoParagraphPr);
-					if(paragraph.TextPr)
+					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
+
+					if(paragraph.TextPr && pasteIntoParaRunPr)
 					{
-						paragraph.TextPr.Value = pasteIntoParaRunPr;
+						paragraph.TextPr.Value = pasteIntoParaRunPr.Copy();
 					}
 				}
 				this._specialPasteParagraphContentConvert(paragraph.Content, pasteIntoParaRunPr);
@@ -2489,7 +2481,7 @@ PasteProcessor.prototype =
 								//проверить, есть ли внутри изображение
 								if(pasteIntoParaRunPr && elem.Set_Pr)
 								{
-									elem.Set_Pr( pasteIntoParaRunPr );
+									elem.Set_Pr( pasteIntoParaRunPr.Copy() );
 								}
 
 								checkInsideDrawings(elem.Content);
@@ -3917,6 +3909,17 @@ PasteProcessor.prototype =
 								table_styles_ids.push(-1);
 						}
 						arr_slides[i] = loader.ReadSlide(0);
+						if(stream.GetBool()){
+						    var oNotes = loader.ReadNote();
+						    oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
+						    arr_slides[i].setNotes(oNotes);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
+                        }
+                        else{
+                            arr_slides[i].setNotes(AscCommonSlide.CreateNotes());
+                            arr_slides[i].notes.setNotesMaster(loader.presentation.notesMasters[0]);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
+                        }
 						var sp_tree = arr_slides[i].cSld.spTree;
 						var t = 0;
 						for(var s = 0; s < sp_tree.length; ++s)
@@ -4215,8 +4218,8 @@ PasteProcessor.prototype =
 				arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
 			var presentation = editor.WordControl.m_oLogicDocument;
-			var slide = presentation.Slides[presentation.CurPage];
-			var targetDocContent = slide.graphicObjects.getTargetDocContent();
+			var oController = presentation.GetCurrentController();
+			var targetDocContent =  oController  && oController.getTargetDocContent();
 			if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
 			{
 				if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
@@ -4320,17 +4323,37 @@ PasteProcessor.prototype =
 		
 		if(onlyBinary)
 		{
-			if(onlyBinary.indexOf("pptData;") > -1)
+			if(typeof onlyBinary === "object")
 			{
-				base64FromPresentation = onlyBinary.split('pptData;')[1];
+				var prefix = String.fromCharCode(onlyBinary[0], onlyBinary[1], onlyBinary[2], onlyBinary[3])
+
+				if("PPTY" === prefix)
+				{
+					base64FromPresentation = onlyBinary;
+				}
+				else if("DOCY" === prefix)
+				{
+					base64FromWord = onlyBinary;
+				}
+				else if("XLSY" === prefix)
+				{
+					base64FromExcel = onlyBinary;
+				}
 			}
-			else if(onlyBinary.indexOf("docData;") > -1)
+			else
 			{
-				base64FromWord = onlyBinary.split('docData;')[1];
-			}
-			else if(onlyBinary.indexOf("xslData;") > -1)
-			{
-				base64FromExcel = onlyBinary.split('xslData;')[1];
+				if(onlyBinary.indexOf("pptData;") > -1)
+				{
+					base64FromPresentation = onlyBinary.split('pptData;')[1];
+				}
+				else if(onlyBinary.indexOf("docData;") > -1)
+				{
+					base64FromWord = onlyBinary.split('docData;')[1];
+				}
+				else if(onlyBinary.indexOf("xslData;") > -1)
+				{
+					base64FromExcel = onlyBinary.split('xslData;')[1];
+				}
 			}
 		}
 		else if(node)
@@ -6024,8 +6047,10 @@ PasteProcessor.prototype =
 			
 			//заглушка для вставки в excel внутрь шейпа
 			var tempRpr;
-			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape)
-			{
+			var bSaveExcelFormat = window['AscCommon'].g_clipboardBase.bSaveFormat;
+			if (this.pasteInExcel === true && !bSaveExcelFormat && this.oDocument && this.oDocument.Parent &&
+				this.oDocument.Parent.parent &&
+				this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape) {
 				tempRpr = new CTextPr();
 				tempRpr.Underline = rPr.Underline;
 				tempRpr.Bold = rPr.Bold;
@@ -6134,7 +6159,14 @@ PasteProcessor.prototype =
             var color = computedStyle.getPropertyValue( "color" );
             if(color && (color = this._ParseColor(color)))
             {
-                rPr.Color = color;
+                if(PasteElementsId.g_bIsDocumentCopyPaste){
+                    rPr.Color = color;
+                }
+                else{
+                    if(color){
+                        rPr.Unifill =  AscFormat.CreateUnfilFromRGB(color.r, color.g, color.b);
+                    }
+                }
             }
 			
 			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
@@ -6743,7 +6775,7 @@ PasteProcessor.prototype =
         if(null != style)
         {
             res = new CDocumentBorder();
-            if("none" === style)
+            if("none" === style || "" === style)
                 res.Value = border_None;
             else
             {
@@ -7208,7 +7240,9 @@ PasteProcessor.prototype =
 									if(bIsPreviuosSpace){
 										continue;
 									}
-									bIsPreviuosSpace = true;
+									if(!this.bIsPlainText){
+										bIsPreviuosSpace = true;
+									}
 								}
                                 this._AddToParagraph(Item);
                             }
@@ -7319,7 +7353,7 @@ PasteProcessor.prototype =
 					
                     var sSrc = node.getAttribute("src");
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
-                        ||  nWidth === 0 ||  nHeight === 0))
+                        ||  nWidth === 0 ||  nHeight === 0) && sSrc)
                     {
                         var img_prop = new Asc.asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
@@ -7721,8 +7755,8 @@ PasteProcessor.prototype =
                     }
                 }
                 var sSrc = node.getAttribute("src");
-                if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
-                    ||  nWidth === 0 ||  nHeight === 0)
+                if(sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
+                    ||  nWidth === 0 ||  nHeight === 0))
                 {
                     var img_prop = new Asc.asc_CImgProperty();
                     img_prop.asc_putImageUrl(sSrc);
@@ -7881,7 +7915,13 @@ PasteProcessor.prototype =
 					}
                 }
             }
-			
+
+			//TODO временная правка. пересмотреть обработку тега math
+			if(!child.style && Node.TEXT_NODE !== child.nodeType)
+			{
+				child.style = {};
+			}
+
 			if(!isPasteHyperlink)
 				bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
 			

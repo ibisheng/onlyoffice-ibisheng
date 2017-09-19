@@ -154,6 +154,18 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
                     "guid": Class.Get_Id()
                 };
             }
+            else if(Class instanceof AscCommon.CComment){
+                if(Class.Parent && Class.Parent.slide){
+                    check_obj =
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Object,
+                            "slideId": Class.Parent.slide.deleteLock.Get_Id(),
+                            "objId": Class.Get_Id(),
+                            "guid": Class.Get_Id()
+                        };
+                    map[Class.Parent.slide.num] = true;
+                }
+            }
             if(check_obj)
                 editor.CoAuthoringApi.releaseLocks( check_obj );
         }
@@ -210,6 +222,10 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     if(num_arr.length > 0)
     {
         editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+    }
+    var oSlide = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+    if(oSlide && oSlide.notesShape){
+        editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(editor.WordControl.m_oLogicDocument.CurPage, oSlide.NotesWidth, oSlide.getNotesHeight());
     }
     editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
@@ -271,6 +287,9 @@ CCollaborativeEditing.prototype.Release_Locks = function()
             if(Class instanceof AscCommon.CComment)
             {
                 editor.sync_UnLockComment(Class.Get_Id());
+                if(Class.Parent && Class.Parent.slide){
+                    map_redraw[Class.Parent.slide.num] = true;
+                }
             }
         }
         else if ( AscCommon.locktype_Other3 === CurLockType )
@@ -507,10 +526,10 @@ CCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
 {
     var DrawingDocument = editor.WordControl.m_oDrawingDocument;
     var oPresentation = editor.WordControl.m_oLogicDocument;
-    var oCurSlide = oPresentation.Slides[oPresentation.CurPage];
     var oTargetDocContentOrTable;
-    if(oCurSlide){
-        oTargetDocContentOrTable = oCurSlide.graphicObjects.getTargetDocContent(undefined, true);
+    var oCurController = oPresentation.GetCurrentController();
+    if(oCurController){
+        oTargetDocContentOrTable = oCurController.getTargetDocContent(undefined, true);
     }
     if(!oTargetDocContentOrTable){
         for (var UserId in this.m_aForeignCursors){

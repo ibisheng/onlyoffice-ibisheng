@@ -2553,6 +2553,9 @@ function CDrawingDocument()
 			context.beginPath();
 		}
 
+		if (this.m_oWordControl.m_oApi.watermarkDraw)
+			this.m_oWordControl.m_oApi.watermarkDraw.Draw(page.drawingPage.cachedImage.image.ctx, w, h);
+
 		//var EndTime = new Date().getTime();
 
 		//alert("" + ((EndTime - StartTime) / 1000));
@@ -2621,12 +2624,17 @@ function CDrawingDocument()
 		//console.log(ret);
 		return ret;
 	}
-	this.ToRendererPart = function ()
+	this.ToRendererPart = function (noBase64)
 	{
+		var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
+
 		var pagescount = Math.min(this.m_lPagesCount, this.m_lCountCalculatePages);
 
 		if (-1 == this.m_lCurrentRendererPage)
 		{
+			if (watermark)
+				watermark.StartRenderer();
+
 			this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
 			this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage = 0;
@@ -2646,6 +2654,10 @@ function CDrawingDocument()
 			var page = this.m_arrPages[i];
 			renderer.BeginPage(page.width_mm, page.height_mm);
 			this.m_oLogicDocument.DrawPage(i, renderer);
+
+			if (watermark)
+				watermark.DrawOnRenderer(renderer, page.width_mm, page.height_mm);
+
 			renderer.EndPage();
 		}
 
@@ -2653,12 +2665,19 @@ function CDrawingDocument()
 
 		if (this.m_lCurrentRendererPage >= pagescount)
 		{
+			if (watermark)
+				watermark.EndRenderer();
+
 			this.m_lCurrentRendererPage = -1;
 			this.m_oDocRenderer = null;
 			this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
 		}
 
-		return renderer.Memory.GetBase64Memory();
+		if (noBase64) {
+			return renderer.Memory.GetData();
+		} else {
+			return renderer.Memory.GetBase64Memory();
+		}
 	}
 
 	this.StopRenderingPage = function (pageIndex)

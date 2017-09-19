@@ -42,12 +42,12 @@ var History = AscCommon.History;
 
 DrawingObjectsController.prototype.getTheme = function()
 {
-    return this.drawingObjects.Layout.Master.Theme;
+    return this.drawingObjects.getTheme();
 };
 
 DrawingObjectsController.prototype.getDrawingArray = function()
 {
-    return this.drawingObjects.cSld.spTree;
+    return this.drawingObjects.getDrawingsForController();
 };
 
 DrawingObjectsController.prototype.recalculateCurPos = function(){
@@ -81,6 +81,13 @@ DrawingObjectsController.prototype.getColorMap = function()
                 }
             }
         }
+        else if(this.drawingObjects.Master )
+        {
+            if(this.drawingObjects.Master.clrMap)
+            {
+                return this.drawingObjects.Master.clrMap;
+            }
+        }
     }
     return AscFormat.G_O_DEFAULT_COLOR_MAP;
 };
@@ -108,7 +115,7 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
     oPresentation.OnMouseUp(e, x, y, pageIndex);
 };
 
-DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
+DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType, aAdditionaObjects)
 {
     var check_type = AscCommon.changestype_Drawing_Props, comment;
     if(this.drawingObjects.slideComments)
@@ -120,7 +127,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
             comment = comment.Get_Id();
         }
     }
-    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment, undefined, aAdditionaObjects) === false)
     {
         var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);
@@ -157,11 +164,6 @@ DrawingObjectsController.prototype.getDrawingDocument = function()
 {
     return editor.WordControl.m_oDrawingDocument;
 };
-DrawingObjectsController.prototype.getTheme = function()
-{
-    return this.drawingObjects.Layout.Master.Theme;
-};
-
 
 DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
@@ -299,6 +301,9 @@ DrawingObjectsController.prototype.editChart = function(binary)
 DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pageIndex)
 {
 
+    if(!this.drawingObjects.slideComments){
+        return;
+    }
     var comments = this.drawingObjects.slideComments.comments, i, index_selected = -1;
     var ret = {result: null, selectedIndex: -1};
     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -428,7 +433,7 @@ MoveCommentState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id()) === false)
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id(), editor.WordControl.m_oLogicDocument.IsEditCommentsMode()) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;
@@ -437,6 +442,7 @@ MoveCommentState.prototype =
                 tracks[i].trackEnd();
             }
             this.drawingObjects.startRecalculate();
+            this.drawingObjects.drawingObjects.showDrawingObjects();
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();

@@ -51,7 +51,7 @@
 
 	var c_oAscFileType = Asc.c_oAscFileType;
 
-	if (typeof String.prototype.startsWith != 'function')
+	if (typeof String.prototype.startsWith !== 'function')
 	{
 		String.prototype.startsWith = function (str)
 		{
@@ -132,9 +132,9 @@
 		return false;
 	};
 
-	if (typeof require === "function" && !window["XRegExp"])
+	if (typeof require === 'function' && !window['XRegExp'])
 	{
-		window["XRegExp"] = require("xregexp");
+		window['XRegExp'] = require('xregexp');
 	}
 
 	var oZipImages = null;
@@ -142,6 +142,90 @@
 	var sUploadServiceLocalUrl = "../../../../upload";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+
+	function getSockJs()
+	{
+		return window['SockJS'] || require('sockjs');
+	}
+	function getJSZipUtils()
+	{
+		return window['JSZipUtils'] || require('jsziputils');
+	}
+	function getJSZip()
+	{
+		return window['JSZip'] || require('jszip');
+	}
+
+	function JSZipWrapper() {
+		this.files = {};
+	}
+
+	JSZipWrapper.prototype.loadAsync = function(data, options) {
+		var t = this;
+
+		if (window["native"]) {
+			return new Promise(function(resolve, reject) {
+
+				var retFiles = null;
+				if (options && options["base64"] === true)
+					retFiles = window["native"]["ZipOpenBase64"](data);
+				else
+					retFiles = window["native"]["ZipOpen"](data);
+
+				if (null != retFiles)
+				{
+					for (var id in retFiles) {
+						t.files[id] = new JSZipObjectWrapper(retFiles[id]);
+					}
+
+					resolve(t);
+				}
+				else
+				{
+					reject(new Error("Failed archive"));
+				}
+
+			});
+		}
+
+		return AscCommon.getJSZip().loadAsync(data, options).then(function(zip){
+			for (var id in zip.files) {
+				t.files[id] = new JSZipObjectWrapper(zip.files[id]);
+			}
+			return t;
+		});
+	};
+	JSZipWrapper.prototype.close = function() {
+		if (window["native"])
+			window["native"]["ZipClose"]();
+	};
+
+	function JSZipObjectWrapper(data) {
+		this.data = data;
+	}
+	JSZipObjectWrapper.prototype.async = function(type) {
+
+		if (window["native"]) {
+			var t = this;
+
+			return new Promise(function(resolve, reject) {
+
+				var ret = window["native"]["ZipFileAsString"](t.data);
+
+				if (null != ret)
+				{
+					resolve(ret);
+				}
+				else
+				{
+					reject(new Error("Failed file in archive"));
+				}
+
+			});
+		}
+
+		return this.data.async(type);
+	};
 
 	function getBaseUrl()
 	{
@@ -290,7 +374,11 @@
 			{
 				oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Complete;
 			}
-			dataContainer.part = dataContainer.data.substring(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			if(typeof dataContainer.data === 'string') {
+				dataContainer.part = dataContainer.data.substring(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			} else {
+				dataContainer.part = dataContainer.data.subarray(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			}
 		}
 		dataContainer.index++;
 		oAdditionalData["saveindex"] = dataContainer.index;
@@ -315,22 +403,18 @@
 		}, oAdditionalData, dataContainer);
 	}
 
-	function loadFileContent(url, callback)
+	function loadFileContent(url, callback, opt_responseType)
 	{
 		asc_ajax({
 			url:      url,
 			dataType: "text",
+			responseType: opt_responseType,
 			success:  callback,
 			error:    function ()
 					  {
 						  callback(null);
 					  }
 		});
-	}
-
-	function getJSZipUtils()
-	{
-		return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
 	}
 
 	function getImageFromChanges(name)
@@ -344,6 +428,40 @@
 		return null;
 	}
 
+	function initStreamFromResponse(httpRequest) {
+		var stream;
+		if (typeof ArrayBuffer !== 'undefined') {
+			stream = new Uint8Array(httpRequest.response);
+		} else if (AscCommon.AscBrowser.isIE) {
+			var _response = new VBArray(httpRequest["responseBody"]).toArray();
+
+			var srcLen = _response.length;
+			var pointer = g_memory.Alloc(srcLen);
+			var tempStream = new AscCommon.FT_Stream2(pointer.data, srcLen);
+			tempStream.obj = pointer.obj;
+
+			stream = tempStream.data;
+			var index = 0;
+
+			while (index < srcLen)
+			{
+				stream[index] = _response[index];
+				index++;
+			}
+		}
+		return stream;
+	}
+	function checkStreamSignature(stream, Signature) {
+		if (stream.length > Signature.length) {
+			for(var i = 0 ; i < Signature.length; ++i){
+				if(stream[i] !== Signature.charCodeAt(i)){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 	function openFileCommand(binUrl, changesUrl, Signature, callback)
 	{
 		var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
@@ -362,18 +480,24 @@
 
 		if (!window['IS_NATIVE_EDITOR'])
 		{
-			asc_ajax({
-				url:      sFileUrl, dataType: "text", success: function (result)
-				{
+			loadFileContent(sFileUrl, function (httpRequest) {
 					//получаем url к папке с файлом
 					var url;
 					var nIndex = sFileUrl.lastIndexOf("/");
 					url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-					if (0 < result.length)
+					if (httpRequest)
 					{
-						oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-						oResult.data = result;
-						oResult.url = url;
+						var stream = initStreamFromResponse(httpRequest);
+						if (stream) {
+							oResult.bSerFormat = checkStreamSignature(stream, Signature);
+							if (oResult.bSerFormat) {
+								oResult.data = stream;
+							} else {
+								oResult.data = stream;
+							}
+						} else {
+							bError = true;
+						}
 					}
 					else
 					{
@@ -381,13 +505,7 @@
 					}
 					bEndLoadFile = true;
 					onEndOpen();
-				}, error: function ()
-						  {
-							  bEndLoadFile = true;
-							  bError = true;
-							  onEndOpen();
-						  }
-			});
+				}, "arraybuffer");
 		}
 
 		if (changesUrl)
@@ -404,7 +522,7 @@
 				}
 
 				oResult.changes = [];
-				require('jszip').loadAsync(data).then(function (zipChanges)
+				getJSZip().loadAsync(data).then(function (zipChanges)
 				{
 					var relativePaths = [];
 					var promises = [];
@@ -441,24 +559,27 @@
 
 		if (window['IS_NATIVE_EDITOR'])
 		{
-			var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+			var stream = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+ 
+            //получаем url к папке с файлом
+            var url;
+            var nIndex = sFileUrl.lastIndexOf("/");
+            url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
 
-			var url;
-			var nIndex = sFileUrl.lastIndexOf("/");
-			url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-			if (0 < result.length)
-			{
-				oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-				oResult.data = result;
-				oResult.url = url;
-			}
-			else
-			{
-				bError = true;
-			}
-
-			bEndLoadFile = true;
-			onEndOpen();
+            if (stream) {
+                oResult.bSerFormat = checkStreamSignature(stream, Signature);
+ 
+                if (oResult.bSerFormat) {
+                    oResult.data = stream;
+                } else {
+                    oResult.data = stream;
+                }
+            } else {
+                bError = true;
+            }
+ 
+            bEndLoadFile = true;
+            onEndOpen();
 		}
 	}
 
@@ -489,11 +610,11 @@
 								 fCallback(null, true);
 							 }
 						 },
-			success:     function (msg)
+			success:     function (httpRequest)
 						 {
 							 if (fCallback)
 							 {
-								 fCallback(JSON.parse(msg), true);
+								 fCallback(JSON.parse(httpRequest.responseText), true);
 							 }
 						 }
 		});
@@ -792,32 +913,27 @@
 		columns: 6
 	};
 
-	var cStrucTableLocalColumns = null,
-		cBoolLocal              = {},
-		cErrorOrigin            = {
-			"nil":     "#NULL!",
-			"div":     "#DIV\/0!",
-			"value":   "#VALUE!",
-			"ref":     "#REF!",
-			"name":    "#NAME?",
-			"num":     "#NUM!",
-			"na":      "#N\/A",
-			"getdata": "#GETTING_DATA",
-			"uf":      "#UNSUPPORTED_FUNCTION!"
-		},
-		cErrorLocal             = {};
+	var cStrucTableLocalColumns = null;
+	var cBoolOrigin = {'t': 'TRUE', 'f': 'FALSE'};
+	var cBoolLocal = {};
+	var cErrorOrigin = {
+		"nil": "#NULL!",
+		"div": "#DIV\/0!",
+		"value": "#VALUE!",
+		"ref": "#REF!",
+		"name": "#NAME?",
+		"num": "#NUM!",
+		"na": "#N\/A",
+		"getdata": "#GETTING_DATA",
+		"uf": "#UNSUPPORTED_FUNCTION!"
+	};
+	var cErrorLocal = {};
 
 	function build_local_rx(data)
 	{
-		build_rx_table_local(data ? data["StructureTables"] : null);
-		build_rx_bool_local(data ? data["CONST_TRUE_FALSE"] : null);
-		build_rx_error_local(data ? data["CONST_ERROR"] : null);
-
-	}
-
-	function build_rx_table_local(local)
-	{
-		rx_table_local = build_rx_table(local);
+		rx_table_local = build_rx_table(data ? data["StructureTables"] : null);
+		rx_bool_local = build_rx_bool((data && data["CONST_TRUE_FALSE"]) || cBoolOrigin);
+		rx_error_local = build_rx_error(data ? data["CONST_ERROR"] : null);
 	}
 
 	function build_rx_table(local)
@@ -862,25 +978,12 @@
 		}, 'i');
 	}
 
-	function build_rx_bool_local(local)
-	{
-		rx_bool_local = build_rx_bool(local);
-	}
-
 	function build_rx_bool(local)
 	{
-		// ToDo переделать на более правильную реализацию. Не особо правильное копирование
-		local = local ? local : {"t": "TRUE", "f": "FALSE"};
-		var t = cBoolLocal['t'] = local['t'];
-		var f = cBoolLocal['f'] = local['f'];
+		var t = cBoolLocal.t = local['t'].toUpperCase();
+		var f = cBoolLocal.f = local['f'].toUpperCase();
 
-		build_rx_array_local(local);
 		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
-	}
-
-	function build_rx_error_local(local)
-	{
-		rx_error_local = build_rx_error(local);
 	}
 
 	function build_rx_error(local)
@@ -916,20 +1019,6 @@
 			cErrorLocal["na"] + "|" +
 			cErrorLocal["getdata"] + "|" +
 			cErrorLocal["uf"] + ")", "i");
-	}
-
-	function build_rx_array_local(localBool, digitSepar, localError)
-	{
-		var localBool = ( localBool ? localBool : {"t": "TRUE", "f": "FALSE"} );
-		rx_array_local = build_rx_array(localBool, digitSepar, localError);
-	}
-
-	function build_rx_array(localBool, digitSepar, localError)
-	{
-		return new RegExp("^\\{(([+-]?\\d*(\\d|\\" + digitSepar + ")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?" +
-			"(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|" +
-			localBool["t"] + "|" + localBool["f"] + ")?[" + FormulaSeparators.arrayRowSeparator + "\\" + FormulaSeparators.arrayColSeparator + "]?)*\\}", "i");
-
 	}
 
 	var PostMessageType = {
@@ -1261,14 +1350,14 @@
 						callback(Asc.c_oAscError.ID.No, firstUrl);
 					}
 					else
-						callback(Asc.c_oAscError.ID.Unknown);
+						callback(Asc.c_oAscError.ID.UplImageFileCount);
 				}
 			};
 			xhr.send(file);
 		}
 		else
 		{
-			callback(Asc.c_oAscError.ID.Unknown);
+			callback(Asc.c_oAscError.ID.UplImageFileCount);
 		}
 	}
 
@@ -1432,8 +1521,8 @@
 		rx_error              = build_rx_error(null),
 		rx_error_local        = build_rx_error(null),
 
-		rx_bool               = build_rx_bool(null),
-		rx_bool_local         = build_rx_bool(null),
+		rx_bool               = build_rx_bool(cBoolOrigin),
+		rx_bool_local         = rx_bool,
 		rx_string             = /^\"((\"\"|[^\"])*)\"/,
 		rx_test_ws_name       = new test_ws_name2(),
 		rx_space_g            = /\s/g,
@@ -1445,9 +1534,6 @@
 		rx_arraySeparatorsDef = /^ *[,;] */,
 		rx_numberDef          = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
 		rx_CommaDef           = /^ *[,;] */,
-
-		rx_array_local        = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
-		rx_array              = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
 
 		rx_ControlSymbols     = /^ *[\u0000-\u001F\u007F-\u009F] */,
 
@@ -1882,7 +1968,7 @@
 		if (match != null)
 		{
 			var name = match["name"];
-			if (name && name.length != 0 && name != cBoolLocal["t"] && name != cBoolLocal["f"]/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/)
+			if (name && 0 !== name.length && name.toUpperCase() !== cBoolLocal.t && name.toUpperCase() !== cBoolLocal.f/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/)
 			{
 				this.pCurrPos += name.length;
 				this.operand_str = name;
@@ -1891,24 +1977,6 @@
 			this.operand_str = name;
 		}
 		return [false];
-	};
-	parserHelper.prototype.isArray = function (formula, start_pos, digitDelim)
-	{
-		if (this instanceof parserHelper)
-		{
-			this._reset();
-		}
-
-		var match = (formula.substring(start_pos)).match(digitDelim ? rx_array_local : rx_array);
-
-		if (match != null)
-		{
-			this.operand_str = match[0].substring(1, match[0].length - 1);
-			this.pCurrPos += match[0].length;
-			return true;
-		}
-
-		return false;
 	};
 	parserHelper.prototype.isLeftBrace = function (formula, start_pos)
 	{
@@ -2156,7 +2224,6 @@
 			FormulaSeparators.functionArgumentSeparator = ";";
 			rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\" + FormulaSeparators.digitSeparator + ")\\d*([eE][+-]?\\d+)?");
 			rx_Comma = new RegExp("^ *[" + FormulaSeparators.functionArgumentSeparator + "] *");
-//		build_rx_array_local( cBoolLocal, digitSeparator, null);
 			rx_arraySeparators = new RegExp("^ *[" + FormulaSeparators.arrayRowSeparator + "\\" + FormulaSeparators.arrayColSeparator + "] *");
 		}
 		else
@@ -2167,7 +2234,6 @@
 			FormulaSeparators.functionArgumentSeparator = FormulaSeparators.functionArgumentSeparatorDef;
 			rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\" + FormulaSeparators.digitSeparatorDef + ")\\d*([eE][+-]?\\d+)?");
 			rx_Comma = new RegExp("^ *[" + FormulaSeparators.functionArgumentSeparatorDef + "] *");
-//		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
 			rx_arraySeparators = new RegExp("^ *[" + FormulaSeparators.arrayRowSeparatorDef + "\\" + FormulaSeparators.arrayColSeparatorDef + "] *");
 		}
 		rx_table_local = build_rx_table_cur();
@@ -2270,6 +2336,7 @@
 			async                                     = true, data                        = null, dataType = "text/xml",
 			error = null, success = null, httpRequest = null,
 			contentType                               = "application/x-www-form-urlencoded",
+			responseType = '',
 
 			init                                      = function (obj)
 			{
@@ -2304,6 +2371,10 @@
 				if (typeof (obj.contentType) !== 'undefined')
 				{
 					contentType = obj.contentType;
+				}
+				if (typeof (obj.responseType) !== 'undefined')
+				{
+					responseType = obj.responseType;
 				}
 
 				if (window.XMLHttpRequest)
@@ -2344,6 +2415,8 @@
 				httpRequest.open(type, url, async);
 				if (type === "POST")
 					httpRequest.setRequestHeader("Content-Type", contentType);
+				if (responseType)
+					httpRequest.responseType = responseType;
 				httpRequest.send(data);
 			},
 
@@ -2367,7 +2440,7 @@
 						if (httpRequest.status === 200 || httpRequest.status === 1223)
 						{
 							if (typeof success === "function")
-								success(httpRequest.responseText);
+								success(httpRequest);
 						}
 						else
 						{
@@ -2446,6 +2519,14 @@
 			oDrawingDocument.ClearCachePages();
 			oDrawingDocument.FirePaint();
 
+			if(oApi.editorId === AscCommon.c_oEditorId.Presentation)
+			{
+				var oCurSlide = oLogicDocument.Slides[oLogicDocument.CurPage];
+				if(oCurSlide && oCurSlide.notesShape && oCurSlide.notesShape.Lock === this)
+				{
+                    oDrawingDocument.Notes_OnRecalculate(oLogicDocument.CurPage, oCurSlide.NotesWidth, oCurSlide.getNotesHeight());
+				}
+			}
 			// TODO: Обновлять интерфейс нужно, потому что мы можем стоять изначально в незалоченном объекте, а тут он
 			//       может быть залочен.
 			var oRevisionsStack = oApi.asc_GetRevisionsChangesStack();
@@ -3065,6 +3146,9 @@
 
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
+	window["AscCommon"].getSockJs = getSockJs;
+	window["AscCommon"].getJSZipUtils = getJSZipUtils;
+	window["AscCommon"].getJSZip = getJSZip;
 	window["AscCommon"].getBaseUrl = getBaseUrl;
 	window["AscCommon"].getEncodingParams = getEncodingParams;
 	window["AscCommon"].saveWithParts = saveWithParts;
@@ -3097,6 +3181,7 @@
 	window["AscCommon"].prepareUrl = prepareUrl;
 	window["AscCommon"].getUserColorById = getUserColorById;
 	window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
+	window["AscCommon"].initStreamFromResponse = initStreamFromResponse;
 
 	window["AscCommon"].DocumentUrls = DocumentUrls;
 	window["AscCommon"].CLock = CLock;
@@ -3107,6 +3192,7 @@
 	window["AscCommon"].getAltGr = getAltGr;
 	window["AscCommon"].getColorThemeByIndex = getColorThemeByIndex;
 
+	window["AscCommon"].JSZipWrapper = JSZipWrapper;
 	window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
 	window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;
 	window["AscCommon"].cBoolLocal = cBoolLocal;

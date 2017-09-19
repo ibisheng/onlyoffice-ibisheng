@@ -392,7 +392,7 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 		{
 			// Если у нас первая сноска не убирается, тогда мы переносим. Есть исключение, когда мы находимся в таблице
 			// и у нас уже есть сноски на странице, а ссылка на данную сноску выше чем те, которые мы уже добавили.
-			if (0 === nIndex && true !== oFootnote.Is_ContentOnFirstPage() && (0 === oColumn.Elements.length || !isLowerY))
+			if (0 === nIndex && true !== oFootnote.IsContentOnFirstPage() && (0 === oColumn.Elements.length || !isLowerY))
 				return false;
 
 			// Начиная с данной сноски мы все оставшиеся сноски заносим в массив ContinuesElements у данной колонки
@@ -557,7 +557,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nCol
 				var oFootnote  = oColumn.Elements[oColumn.Elements.length - 1];
 				var nStartPage = oFootnote.Get_StartPage_Absolute();
 
-				if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.Is_ContentOnFirstPage()))
+				if (nStartPage >= nPageAbs || (nStartPage === nPageAbs - 1 && true !== oFootnote.IsContentOnFirstPage()))
 					return oFootnote.GetNumber() + 1 + nAdditional;
 				else
 					return 1 + nAdditional;

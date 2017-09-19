@@ -230,14 +230,15 @@ function BinaryPPTYLoader()
         this.presentation = presentation;
         this.ImageMapChecker = {};
 
-        var srcLen = base64_ppty.length;
+		var isBase64 = typeof base64_ppty === 'string';
+		var srcLen = isBase64 ? base64_ppty.length : base64_ppty.length;
         var nWritten = 0;
 
         var index = 0;
         var read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -252,7 +253,7 @@ function BinaryPPTYLoader()
         read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -262,11 +263,15 @@ function BinaryPPTYLoader()
         index++;
 
         var _version_num_str = read_main_prop.substring(1);
-
+		var version = 1;
+		if(_version_num_str.length > 0)
+        {
+            version = _version_num_str - 0;
+        }
         read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -275,97 +280,88 @@ function BinaryPPTYLoader()
         }
         index++;
 
-        var dstLen_str = read_main_prop;
+		if (Asc.c_nVersionNoBase64 !== version) {
+			var dstLen_str = read_main_prop;
 
-        var dstLen = parseInt(dstLen_str);
+			var dstLen = parseInt(dstLen_str);
 
-        var pointer = g_memory.Alloc(dstLen);
-        this.stream = new AscCommon.FileStream(pointer.data, dstLen);
-        this.stream.obj = pointer.obj;
+			var pointer = g_memory.Alloc(dstLen);
+			this.stream = new AscCommon.FileStream(pointer.data, dstLen);
+			this.stream.obj = pointer.obj;
 
-        var dstPx = this.stream.data;
+			var dstPx = this.stream.data;
 
-        if (window.chrome)
-        {
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = DecodeBase64Char(base64_ppty.charCodeAt(index++));
-                    if (nCh == -1)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
+			if (window.chrome)
+			{
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = DecodeBase64Char(isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty[index++]);
+						if (nCh == -1)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
 
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        else
-        {
-            var p = b64_decode;
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = p[base64_ppty.charCodeAt(index++)];
-                    if (nCh == undefined)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+			else
+			{
+				var p = b64_decode;
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = p[isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty[index++]];
+						if (nCh == undefined)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
 
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-
-        this.presentation.ImageMap = {};
-        this.presentation.Fonts = [];
-
-        if (presentation.globalTableStyles)
-            this.NextTableStyleId = this.presentation.globalTableStyles.length;
-
-        this.LoadDocument();
-
-        this.ImageMapChecker = null;
-    }
-
-    this.Load2 = function(data, presentation)
-    {
-        this.presentation = presentation;
-        this.ImageMapChecker = {};
-
-        this.stream = new AscCommon.FileStream(data, data.length);
-        this.stream.obj = null;
-
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+		} else {
+			this.stream = new AscCommon.FileStream();
+			this.stream.obj    = null;
+			this.stream.data   = base64_ppty;
+			this.stream.size   = base64_ppty.length;
+			//skip header
+			this.stream.EnterFrame(index);
+			this.stream.Seek2(index);
+		}
+		
         this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
 
@@ -717,16 +713,35 @@ function BinaryPPTYLoader()
                 this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.presentation.themes[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
-            if(this.presentation.slideMasters[0].sldLayoutLst.length === 0){
-
+            if(this.presentation.slideMasters[0].sldLayoutLst.length === 0)
+            {
                 this.presentation.slideMasters[0].sldLayoutLst[0] = AscFormat.GenerateDefaultSlideLayout(this.presentation.slideMasters[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
+            }
+
+            if(this.presentation.notesMasters.length === 0)
+            {
+                this.presentation.notesMasters[0] = AscCommonSlide.CreateNotesMaster();
+                var oNotesTheme = this.presentation.themes[0].createDuplicate();
+                oNotesTheme.presentation = this.presentation;
+                this.presentation.themes.push(oNotesTheme);
+                this.presentation.notesMasters[0].setTheme(oNotesTheme);
             }
             if (this.presentation.Slides.length == 0)
             {
                 this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
             }
-
+            var _slides = this.presentation.Slides;
+            var _slide;
+            for(var i = 0; i < _slides.length; ++i)
+            {
+                _slide = _slides[i];
+                if(!_slide.notes){
+                    _slide.setNotes(AscCommonSlide.CreateNotes());
+                    _slide.notes.setSlide(_slide);
+                    _slide.notes.setNotesMaster(this.presentation.notesMasters[0]);
+                }
+            }
             //var _editor = this.Api;
             //_editor.sync_InitEditorThemes(_editor.ThemeLoader.Themes.EditorThemes, _editor.ThemeLoader.Themes.DocumentThemes);
         }
@@ -5162,11 +5177,12 @@ function BinaryPPTYLoader()
                 _object = this.ReadShape();
                 break;
             }
-            case 6:
-            case 2:
-            case 7:
+            case 2://pic
+            case 6://ole
+            case 7://video
+            case 8://audio
             {
-                _object = this.ReadPic(6 === _type);
+                _object = this.ReadPic(_type);
                 break;
             }
             case 3:
@@ -5362,8 +5378,9 @@ function BinaryPPTYLoader()
                             case 6:
                             case 2:
                             case 7:
+                            case 8:
                             {
-                                _object = this.ReadPic(6 === _type);
+                                _object = this.ReadPic(_type);
                                 if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
@@ -5484,8 +5501,9 @@ function BinaryPPTYLoader()
                             case 6:
                             case 2:
                             case 7:
+                            case 8:
                             {
-                                var _object = this.ReadPic(6 === _type);
+                                var _object = this.ReadPic(_type);
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
@@ -5545,10 +5563,11 @@ function BinaryPPTYLoader()
     }
 
 
-    this.ReadPic = function(isOle)
+    this.ReadPic = function(type)
     {
         var s = this.stream;
 
+        var isOle = (type === 6);
         var pic = isOle ? new AscFormat.COleObject(this.TempMainObject) : new AscFormat.CImageShape(this.TempMainObject);
 
         pic.setBDeleted(false);
@@ -5556,6 +5575,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
+        var sMaskFileName;
         while (s.cur < _end_rec)
         {
             var _at = s.GetUChar();
@@ -5598,6 +5618,30 @@ function BinaryPPTYLoader()
                     }
                     break;
                 }
+                case 5:
+                {
+                    if(type === 7 || type === 8){//video or audio
+                        s.GetLong();
+                        s.GetUChar();//start attributes
+                        while(true)
+                        {
+                            var _at2 = s.GetUChar();
+                            if (_at2 == g_nodeAttributeEnd)
+                                break;
+                            switch (_at2) {
+                                case 0:
+                                {
+                                    sMaskFileName = s.GetString2();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        s.SkipRecord();
+                    }
+                    break;
+                }
                 default:
                 {
                     this.stream.SkipRecord();
@@ -5606,6 +5650,15 @@ function BinaryPPTYLoader()
             }
         }
 
+        if(type === 7 || type === 8){//video or audio
+            if(typeof sMaskFileName === "string" && sMaskFileName.length > 0 &&
+                pic.nvPicPr && pic.nvPicPr.nvPr && pic.nvPicPr.nvPr.unimedia){
+                var oUniMedia = new AscFormat.UniMedia();
+                oUniMedia.type = type;
+                oUniMedia.media = sMaskFileName;
+                pic.nvPicPr.nvPr.setUniMedia(oUniMedia);
+            }
+        }
         s.Seek2(_end_rec);
         return pic;
     }
@@ -6979,6 +7032,13 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     nvPr.setPh(this.ReadPH());
+                    break;
+                }
+                case 1:
+                {
+                    nvPr.setUniMedia(new AscFormat.UniMedia());
+                    var _len = s.GetULong();
+                    s.Skip2(_len);
                     break;
                 }
                 default:
@@ -9003,8 +9063,10 @@ function CPres()
                     }
                     case 6:
                     case 2:
+                    case 7:
+                    case 8:
                     {
-                        GrObject = this.ReadPic(6 == _type);
+                        GrObject = this.ReadPic(_type);
                         break;
                     }
                     case 3:
@@ -9472,10 +9534,11 @@ function CPres()
             s.Seek2(_end_rec);
             return shape;
         }
-        this.ReadPic = function(isOle)
+        this.ReadPic = function(type)
         {
             var s = this.stream;
 
+            var isOle = (type === 6);
             var pic = isOle ? new AscFormat.COleObject() : new AscFormat.CImageShape();
             pic.setBDeleted(false);
             pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
@@ -9483,6 +9546,7 @@ function CPres()
             var _rec_start = s.cur;
             var _end_rec = _rec_start + s.GetULong() + 4;
 
+            var sMaskFileName = "";
             while (s.cur < _end_rec)
             {
                 var _at = s.GetUChar();
@@ -9531,11 +9595,44 @@ function CPres()
                         }
                         break;
                     }
+                    case 5:
+                    {
+                        if(type === 7 || type === 8){//video or audio
+                            s.GetLong();
+                            s.GetUChar();//start attributes
+                            while(true){
+                                var _at2 = s.GetUChar();
+                                if (_at2 == g_nodeAttributeEnd)
+                                    break;
+                                switch (_at2) {
+                                    case 0:
+                                    {
+                                        sMaskFileName = s.GetString2();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            s.SkipRecord();
+                        }
+                        break;
+                    }
                     default:
                     {
                         s.SkipRecord();
                         break;
                     }
+                }
+            }
+
+            if(type === 7 || type === 8){//video or audio
+                if(typeof sMaskFileName === "string" && sMaskFileName.length > 0 &&
+                    pic.nvPicPr && pic.nvPicPr.nvPr && pic.nvPicPr.nvPr.unimedia){
+                    var oUniMedia = new AscFormat.UniMedia();
+                    oUniMedia.type = type;
+                    oUniMedia.media = sMaskFileName;
+                    pic.nvPicPr.nvPr.setUniMedia(oUniMedia);
                 }
             }
 
@@ -9672,8 +9769,9 @@ function CPres()
                                 case 6:
                                 case 2:
                                 case 7:
+                                case 8:
                                 {
-                                    sp = this.ReadPic(6 == _type);
+                                    sp = this.ReadPic(_type);
                                     if(sp.spPr && sp.spPr.xfrm){
                                         sp.setGroup(shape);
                                         shape.addToSpTree(shape.spTree.length, sp);

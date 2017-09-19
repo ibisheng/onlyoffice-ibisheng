@@ -1340,9 +1340,10 @@
 	/**
 	 * Insert an array of elements in the current position of the document.
      * @param {DocumentElement[]} arrContent - An array of elements to insert.
+	 * @param {boolean} [isInline=false] - Inline insert on not (works only when the length of arrContent = 1 and it's a paragraph)
      * @returns {boolean} Success?
      */
-    ApiDocument.prototype.InsertContent = function(arrContent)
+    ApiDocument.prototype.InsertContent = function(arrContent, isInline)
     {
         var oSelectedContent = new CSelectedContent();
         for (var nIndex = 0, nCount = arrContent.length; nIndex < nCount; ++nIndex)
@@ -1350,7 +1351,10 @@
             var oElement = arrContent[nIndex];
             if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
             {
-                oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
+            	if (true === isInline && 1 === nCount && oElement instanceof ApiParagraph)
+					oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), false));
+            	else
+                	oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
             }
         }
 		oSelectedContent.On_EndCollectElements(this.Document, true);
@@ -1504,7 +1508,7 @@
 
     /**
      * Insert watermark on each page of document
-     * @param {?string} } [sText="WATERMARK"]
+     * @param {?string} [sText="WATERMARK"]
      * @param {?boolean} [bIsDiagonal=true]
      */
     ApiDocument.prototype.InsertWatermark = function(sText, bIsDiagonal){

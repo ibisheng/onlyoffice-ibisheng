@@ -33,39 +33,11 @@
 //This file containes definition of object which used in api.js
 //It need to prevent minimize the name of object's method.
 
-var Asc;
-var AscDFH;
-var AscCH;
-var AscFormat;
-var AscFonts;
-var AscCommon;
-var AscCommonWord;
-var AscCommonExcel;
-var AscCommonSlide;
+function JSZipUtils() {}
 
-function jq(){}
-function DE(){}
-function SE(){}
-function SSE(){}
-function PE(){}
-function Ext(){}
-function FB(){}
-function twttr(){}
-function _gaq(){}
-
-function constructor(){}
-
-function touchstart(){}
-function touchmove(){}
-function touchend(){}
-function mousedown(){}
-function mousemove(){}
-function mouseup(){}
-function pointerdown(){}
-function pointermove(){}
-function pointerup(){}
-function MSPointerDown(){}
-function MSPointerMove(){}
-function MSPointerUp(){}
-
-var editor;
+/**
+ * @memberOf JSZipUtils
+ * @param {String} path String URL.
+ * @callback callback
+ */
+JSZipUtils.getBinaryContent = function(path, callback) {};

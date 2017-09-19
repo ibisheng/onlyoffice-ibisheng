@@ -63,6 +63,19 @@ ParaHyperlink.prototype.Get_Id = function()
     return this.Id;
 };
 
+
+ParaHyperlink.prototype.Get_FirstTextPr2 = function()
+{
+    for(var i = 0; i < this.Content.length; ++i)
+    {
+        if(this.Content[i].Type === para_Run && !this.Content[i].Is_Empty())
+        {
+            return this.Content[i].Get_CompiledPr();
+        }
+    }
+    return null;
+};
+
 ParaHyperlink.prototype.Copy = function(Selected)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);

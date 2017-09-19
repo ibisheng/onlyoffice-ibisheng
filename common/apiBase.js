@@ -167,6 +167,10 @@
 
 		this.signatures = [];
 
+		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
+		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
+			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
+
 		return this;
 	}
 
@@ -195,13 +199,8 @@
 		{
 			t.isLoadFullApi = true;
 
-			if (t.DocInfo && t.DocInfo.get_OfflineApp())
-			{
-				t._OfflineAppDocumentStartLoad();
-			}
-
 			t._onEndLoadSdk();
-			t.onEndLoadFile(null);
+			t.onEndLoadDocInfo();
 		});
 
 		var oldOnError = window.onerror;
@@ -248,6 +247,7 @@
 	};
 	baseEditorsApi.prototype.asc_setDocInfo                  = function(oDocInfo)
 	{
+		var oldInfo = this.DocInfo;
 		if (oDocInfo)
 		{
 			this.DocInfo = oDocInfo;
@@ -272,11 +272,18 @@
 
 			//чтобы в versionHistory был один documentId для auth и open
 			this.CoAuthoringApi.setDocId(this.documentId);
+
+			if (this.watermarkDraw)
+				this.watermarkDraw.CheckParams(this);
 		}
 
 		if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl)
 		{
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
+		}
+
+		if (!oldInfo) {
+			this.onEndLoadDocInfo();
 		}
 	};
 	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled, isFromInput)
@@ -430,7 +437,8 @@
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
-				"title"         : this.documentTitle
+				"title"         : this.documentTitle,
+				"nobase64"      : true
 			};
 			if (versionHistory)
 			{
@@ -721,6 +729,17 @@
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 			t.VersionHistory = null;
 			t.sendEvent('asc_onExpiredToken');
+		};
+		this.CoAuthoringApi.onHasForgotten = function() {
+			//todo very bad way, need rewrite
+			var isDocumentCanSaveOld = t.isDocumentCanSave;
+			var canSaveOld = t.canSave;
+			t.isDocumentCanSave = true;
+			t.canSave = false;
+			t.sendEvent("asc_onDocumentModifiedChanged");
+			t.isDocumentCanSave = isDocumentCanSaveOld;
+			t.canSave = canSaveOld;
+			t.sendEvent("asc_onDocumentModifiedChanged");
 		};
 		/**
 		 * Event об отсоединении от сервера
@@ -1030,15 +1049,30 @@
 	baseEditorsApi.prototype.openDocument  = function()
 	{
 	};
+	baseEditorsApi.prototype.openDocumentFromZip  = function()
+	{
+	};
+	baseEditorsApi.prototype.onEndLoadDocInfo = function()
+	{
+		if (this.isLoadFullApi && this.DocInfo)
+		{
+			if (this.DocInfo.get_OfflineApp())
+			{
+				this._OfflineAppDocumentStartLoad();
+			}
+			this.onEndLoadFile(null);
+		}
+	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
 	{
 		if (result)
 		{
 			this.openResult = result;
 		}
-		if (this.isLoadFullApi && this.openResult)
+		if (this.isLoadFullApi && this.DocInfo && this.openResult)
 		{
 			this.openDocument(this.openResult);
+			this.openResult = null;
 		}
 
 	};
@@ -1223,6 +1257,72 @@
 		this.pluginsManager.sendMessage(_pluginData);
 	};
 
+    baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
+    {
+    	return AscFonts.g_fontApplication.g_fontSelections.SerializeList();
+    };
+
+	baseEditorsApi.prototype["pluginMethod_PasteHtml"] = function(htmlText)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		var _elem = document.createElement("div");
+
+		if (this.editorId == c_oEditorId.Word || this.editorId == c_oEditorId.Presentation)
+		{
+			var textPr = this.get_TextProps();
+			if (textPr)
+			{
+				if (undefined !== textPr.TextPr.FontSize)
+					_elem.style.fontSize = textPr.TextPr.FontSize + "pt";
+
+				_elem.style.fontWeight = (true === textPr.TextPr.Bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === textPr.TextPr.Italic) ? "italic" : "normal";
+			}
+		}
+		else if (this.editorId == c_oEditorId.Spreadsheet)
+		{
+			var props = this.asc_getCellInfo();
+
+			if (props && props.font)
+			{
+				if (undefined != props.font.size)
+					_elem.style.fontSize = props.font.size + "pt";
+
+				_elem.style.fontWeight = (true === props.font.bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === props.font.italic) ? "italic" : "normal";
+			}
+		}
+
+		_elem.innerHTML = htmlText;
+		document.body.appendChild(_elem);
+		this.incrementCounterLongAction();
+		var b_old_save_format = AscCommon.g_clipboardBase.bSaveFormat;
+        AscCommon.g_clipboardBase.bSaveFormat = true;
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.decrementCounterLongAction();
+
+		if (true)
+		{
+			var fCallback = function ()
+            {
+                document.body.removeChild(_elem);
+                _elem = null;
+                AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
+            };
+			if(this.checkLongActionCallback(fCallback, null)){
+                fCallback();
+			}
+		}
+		else
+		{
+			document.body.removeChild(_elem);
+			_elem = null;
+            AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
+		}
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
@@ -1389,6 +1489,13 @@
 		return this.signatures;
 	};
 
+	baseEditorsApi.prototype.asc_isSignaturesSupport = function()
+	{
+		if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsSignaturesSupport"])
+			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
+		return false;
+	};
+
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
 
 		var count = this.signatures.length;
@@ -1399,6 +1506,10 @@
 		}
 		return "";
     };
+
+	baseEditorsApi.prototype.asc_getSessionToken = function () {
+		return this.CoAuthoringApi.get_jwt()
+	};
 
 	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
 	{

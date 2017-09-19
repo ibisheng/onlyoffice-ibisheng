@@ -33,39 +33,24 @@
 //This file containes definition of object which used in api.js
 //It need to prevent minimize the name of object's method.
 
-var Asc;
-var AscDFH;
-var AscCH;
-var AscFormat;
-var AscFonts;
-var AscCommon;
-var AscCommonWord;
-var AscCommonExcel;
-var AscCommonSlide;
+/**
+ * @record
+ */
+function SockJS() {};
 
-function jq(){}
-function DE(){}
-function SE(){}
-function SSE(){}
-function PE(){}
-function Ext(){}
-function FB(){}
-function twttr(){}
-function _gaq(){}
+/**
+ * @param code
+ * @param reason
+ */
+SockJS.prototype.close = function(code, reason) {};
 
-function constructor(){}
+/**
+ * @param data
+ */
+SockJS.prototype.send = function(data) {};
 
-function touchstart(){}
-function touchmove(){}
-function touchend(){}
-function mousedown(){}
-function mousemove(){}
-function mouseup(){}
-function pointerdown(){}
-function pointermove(){}
-function pointerup(){}
-function MSPointerDown(){}
-function MSPointerMove(){}
-function MSPointerUp(){}
+SockJS.prototype.open = function() {};
 
-var editor;
+function onopen(){}
+function onmessage(){}
+function onclose(){}

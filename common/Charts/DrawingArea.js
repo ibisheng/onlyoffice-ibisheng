@@ -564,12 +564,17 @@ function FrozenPlace(ws, type) {
 		object.graphicObject.draw(canvas.shapeCtx);
 		
 		// Lock
-		if ( (object.graphicObject.lockType != undefined) && (object.graphicObject.lockType != AscCommon.c_oAscLockTypes.kLockTypeNone) ) {
-			canvas.shapeCtx.SetIntegerGrid(false);
-			canvas.shapeCtx.transform3(object.graphicObject.transform, false);
-			canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
-			canvas.shapeCtx.reset();
-			canvas.shapeCtx.SetIntegerGrid(true);
+		if ( (object.graphicObject.lockType !== undefined) && (object.graphicObject.lockType !== AscCommon.c_oAscLockTypes.kLockTypeNone) ) {
+			var oApi = Asc['editor'];
+			if(oApi){
+				if (!oApi.collaborativeEditing.getFast() || object.graphicObject.lockType !== AscCommon.c_oAscLockTypes.kLockTypeMine){
+					canvas.shapeCtx.SetIntegerGrid(false);
+					canvas.shapeCtx.transform3(object.graphicObject.transform, false);
+					canvas.shapeCtx.DrawLockObjectRect(object.graphicObject.lockType, 0, 0, object.graphicObject.extX, object.graphicObject.extY );
+					canvas.shapeCtx.reset();
+					canvas.shapeCtx.SetIntegerGrid(true);
+				}
+			}
 		}
 					
 		_this.restore(canvas.shapeCtx);

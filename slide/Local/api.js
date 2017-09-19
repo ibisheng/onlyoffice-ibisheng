@@ -49,7 +49,7 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentStartLoad = function()
 	AscCommon.History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
-Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
+Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data, _len)
 {
 	AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
@@ -57,15 +57,16 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 		return;
 	}
-	
-    this.OpenDocument2(_url, _data);
+
+	var _binary = getBinaryArray(_data, _len);
+    this.OpenDocument2(_url, _binary);
 	this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
 	DesktopOfflineUpdateLocalName(this);
 
 	window["DesktopAfterOpen"](this);
 };
-window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
+window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 {
 	AscCommon.g_oDocumentUrls.documentUrl = _url;
 	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
@@ -75,7 +76,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
-    editor._OfflineAppDocumentEndLoad(_url, _data);
+    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 };
 
 /////////////////////////////////////////////////////////

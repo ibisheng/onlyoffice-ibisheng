@@ -87,11 +87,6 @@ CShape.prototype.Is_UseInDocument = function(){
     return false;
 };
 
-CShape.prototype.isEmptyPlaceholder = function()
-{
-    return false;
-};
-
 CShape.prototype.getTextArtPreviewManager = function()
 {
     return Asc["editor"].textArtPreviewManager;
@@ -462,7 +457,8 @@ CShape.prototype.handleUpdateGeometry = function()
 CShape.prototype.convertPixToMM = function(pix)
 {
     var drawingObjects =  getDrawingObjects_Sp(this);
-    return drawingObjects ? drawingObjects.convertMetric(pix, 0, 3) : 0;
+    var _ret = drawingObjects ? drawingObjects.convertMetric(AscCommon.AscBrowser.convertToRetinaValue(pix, true), 0, 3) : 0;
+    return _ret;
 };
 CShape.prototype.getCanvasContext = function()
 {

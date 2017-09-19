@@ -45,6 +45,7 @@
 	var c_oAscMaxRowHeight    = 409;
 	var c_nMaxConversionTime  = 900000;//depends on config
 	var c_nMaxDownloadTitleLen= 255;
+	var c_nVersionNoBase64 = 10;
 
 	//files type for Saving & DownloadAs
 	var c_oAscFileType = {
@@ -167,6 +168,8 @@
 
 			InvalidReferenceOrName : -310,
 			LockCreateDefName      : -311,
+
+			LockedCellPivot				: -312,
 
 			OpenWarning : 500
 		}
@@ -1043,6 +1046,7 @@
 	var changestype_None                      = 0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
 	var changestype_Paragraph_Content         = 1; // Добавление/удаление элементов в параграф
 	var changestype_Paragraph_Properties      = 2; // Изменение свойств параграфа
+	var changestype_Paragraph_AddText         = 3; // Добавление текста
 	var changestype_Document_Content          = 10; // Добавление/удаление элементов в Document или в DocumentContent
 	var changestype_Document_Content_Add      = 11; // Добавление элемента в класс Document или в класс DocumentContent
 	var changestype_Document_SectPr           = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
@@ -1052,6 +1056,7 @@
 	var changestype_Image_Properties          = 23; // Изменения настроек картинки
 	var changestype_ContentControl_Remove     = 24; // Удаление контейнера целиком
 	var changestype_ContentControl_Properties = 25; // Изменение свойств контейнера
+	var changestype_ContentControl_Add        = 26; // Добавление контейнера
 	var changestype_HdrFtr                    = 30; // Изменения в колонтитуле (любые изменения)
 	var changestype_Remove                    = 40; // Удаление, через кнопку backspace (Удаление назад)
 	var changestype_Delete                    = 41; // Удаление, через кнопку delete (Удаление вперед)
@@ -1071,6 +1076,7 @@
 	var changestype_AddShape                  = 72;
 	var changestype_AddShapes                 = 73;
 	var changestype_PresDefaultLang           = 74;
+	var changestype_SlideHide                 = 75;
 
 	var changestype_2_InlineObjectMove       = 1; // Передвигаем объект в заданную позцию (проверяем место, в которое пытаемся передвинуть)
 	var changestype_2_HdrFtr                 = 2; // Изменения с колонтитулом
@@ -1124,6 +1130,7 @@
 	window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
     window['Asc']['c_nMaxConversionTime'] = window['Asc'].c_nMaxConversionTime = c_nMaxConversionTime;
 	window['Asc']['c_nMaxDownloadTitleLen'] = window['Asc'].c_nMaxDownloadTitleLen = c_nMaxDownloadTitleLen;
+	window['Asc']['c_nVersionNoBase64'] = window['Asc'].c_nVersionNoBase64 = c_nVersionNoBase64;
 	window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
 	prot                         = c_oAscFileType;
 	prot['UNKNOWN']              = prot.UNKNOWN;
@@ -1220,6 +1227,7 @@
 	prot['FrmlWrongReferences']              = prot.FrmlWrongReferences;
 	prot['InvalidReferenceOrName']           = prot.InvalidReferenceOrName;
 	prot['LockCreateDefName']                = prot.LockCreateDefName;
+	prot['LockedCellPivot']                  = prot.LockedCellPivot;
 	prot['OpenWarning']                      = prot.OpenWarning;
 	window['Asc']['c_oAscAsyncAction']       = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
 	prot                                     = c_oAscAsyncAction;
@@ -1742,6 +1750,7 @@
 	window["AscCommon"].changestype_None                      = changestype_None;
 	window["AscCommon"].changestype_Paragraph_Content         = changestype_Paragraph_Content;
 	window["AscCommon"].changestype_Paragraph_Properties      = changestype_Paragraph_Properties;
+	window["AscCommon"].changestype_Paragraph_AddText         = changestype_Paragraph_AddText;
 	window["AscCommon"].changestype_Document_Content          = changestype_Document_Content;
 	window["AscCommon"].changestype_Document_Content_Add      = changestype_Document_Content_Add;
 	window["AscCommon"].changestype_Document_SectPr           = changestype_Document_SectPr;
@@ -1751,6 +1760,7 @@
 	window["AscCommon"].changestype_Image_Properties          = changestype_Image_Properties;
 	window["AscCommon"].changestype_ContentControl_Remove     = changestype_ContentControl_Remove;
 	window["AscCommon"].changestype_ContentControl_Properties = changestype_ContentControl_Properties;
+	window["AscCommon"].changestype_ContentControl_Add        = changestype_ContentControl_Add;
 	window["AscCommon"].changestype_HdrFtr                    = changestype_HdrFtr;
 	window["AscCommon"].changestype_Remove                    = changestype_Remove;
 	window["AscCommon"].changestype_Delete                    = changestype_Delete;
@@ -1768,6 +1778,7 @@
 	window["AscCommon"].changestype_AddShape                  = changestype_AddShape;
 	window["AscCommon"].changestype_AddShapes                 = changestype_AddShapes;
 	window["AscCommon"].changestype_PresDefaultLang           = changestype_PresDefaultLang;
+	window["AscCommon"].changestype_SlideHide                 = changestype_SlideHide;
 	window["AscCommon"].changestype_2_InlineObjectMove        = changestype_2_InlineObjectMove;
 	window["AscCommon"].changestype_2_HdrFtr                  = changestype_2_HdrFtr;
 	window["AscCommon"].changestype_2_Comment                 = changestype_2_Comment;

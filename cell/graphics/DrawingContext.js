@@ -635,6 +635,14 @@
 		return this;
 	};
 
+	DrawingContext.prototype.AddClipRect = function (x, y, w, h) {
+		return this.save().beginPath().rect(x, y, w, h).clip();
+	};
+
+	DrawingContext.prototype.RemoveClipRect = function () {
+		return this.restore();
+	};
+
 	DrawingContext.prototype.save = function () {
 		this.ctx.save();
 		return this;
@@ -757,6 +765,9 @@
 	};
 
 	DrawingContext.prototype.setLineDash = function (segments) {
+		if (!this.ctx.setLineDash) {
+			return;
+		}
 		this.ctx.setLineDash(segments);
 		return this;
 	};

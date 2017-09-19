@@ -926,8 +926,8 @@ function UndoRedoData_RowProp(row){
 	if(null != row)
 	{
 		this.h = row.h;
-		this.hd = 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags);
-		this.CustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
+		this.hd = row.getHidden();
+		this.CustomHeight = row.getCustomHeight();
 	}
 	else
 	{
@@ -3041,6 +3041,10 @@ UndoRedoCell.prototype = {
 		{
 			cell.setQuotePrefix(Val);
 		}
+		else if(AscCH.historyitem_Cell_SetPivotButton == Type)
+		{
+			cell.setPivotButton(Val);
+		}
 		else if (AscCH.historyitem_Cell_Style == Type)
 		{
 			cell.setCellStyle(Val);
@@ -3802,6 +3806,30 @@ UndoRedoAutoFilters.prototype = {
 	UndoRedoSparklines.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
 	};
 
+	function UndoRedoPivotTables(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoPivotTables;
+		});
+	}
+
+	UndoRedoPivotTables.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoPivotTables.prototype.Undo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, true);
+	};
+	UndoRedoPivotTables.prototype.Redo = function (Type, Data, nSheetId) {
+		this.UndoRedo(Type, Data, nSheetId, false);
+	};
+	UndoRedoPivotTables.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+		var wb = opt_wb ? opt_wb : this.wb;
+		var ws = wb.getWorksheetById(nSheetId);
+		if (ws) {
+
+		}
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -3830,6 +3858,7 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
 	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
+	window['AscCommonExcel'].UndoRedoPivotTables = UndoRedoPivotTables;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
@@ -3839,4 +3868,5 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].g_oUndoRedoComment = null;
 	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
 	window['AscCommonExcel'].g_oUndoRedoSparklines = null;
+	window['AscCommonExcel'].g_oUndoRedoPivotTables = null;
 })(window);

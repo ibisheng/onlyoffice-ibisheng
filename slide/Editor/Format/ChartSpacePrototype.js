@@ -195,7 +195,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateTransform: true,
         recalculateBounds:    true,
         recalculateChart:     true,
-        recalculateBaseColors: true,
         recalculateSeriesColors: true,
         recalculateMarkers: true,
         recalculateGridLines: true,
@@ -219,7 +218,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateTextPr : true,
         recalculateBBoxRange: true
     };
-    this.baseColors = [];
     this.chartObj = null;
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
@@ -235,10 +233,6 @@ CChartSpace.prototype.recalcBounds = function()
 CChartSpace.prototype.recalcChart = function()
 {
     this.recalcInfo.recalculateChart = true;
-};
-CChartSpace.prototype.recalcBaseColors = function()
-{
-    this.recalcInfo.recalculateBaseColors = true;
 };
 CChartSpace.prototype.recalcSeriesColors = function()
 {
@@ -394,11 +388,6 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculateBBox();
             this.recalcInfo.recalculateBBox = false;
-        }
-        if(this.recalcInfo.recalculateBaseColors)
-        {
-            this.recalculateBaseColors();
-            this.recalcInfo.recalculateBaseColors = false;
         }
         if(this.recalcInfo.recalculateMarkers)
         {
@@ -557,6 +546,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
     var Page    = this.Pages[CurPage];
     var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
+    var H;
     switch (this.Selection.Type)
     {
         case table_Selection_Cell:
@@ -567,8 +557,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 var Row      = this.Content[Pos.Row];
                 var Cell     = Row.Get_Cell(Pos.Cell);
                 var CellInfo = Row.Get_CellInfo(Pos.Cell);
-                var CellMar  = Cell.GetMargins();
-
                 var X_start = Page.X + CellInfo.X_cell_start;
                 var X_end   = Page.X + CellInfo.X_cell_end;
 
@@ -576,9 +564,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
                 if (Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages)
                     continue;
-
-                var Bounds   = Cell.Content_Get_PageBounds(Cell_PageRel);
-                var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
                 if (0 != Cell_PageRel)
                 {
@@ -588,7 +573,23 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 }
                 else
                 {
-                    this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage], X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
+                    H = this.RowsInfo[Pos.Row].H[CurPage];
+                    for(var i = Pos.Row + 1; i < this.Content.length; ++i){
+                        var Row2      = this.Content[i];
+                        var Cell2     = Row2.Get_Cell(Pos.Cell);
+
+                        if(!Cell2){
+                            break;
+                        }
+                        var VMerge = Cell2.Get_VMerge();
+                        if (vmerge_Continue === VMerge){
+                            H += this.RowsInfo[i].H[CurPage];
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage], X_end - X_start, H );
                 }
 
 

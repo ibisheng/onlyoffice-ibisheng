@@ -123,6 +123,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_Style = 22;
 	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
 	window['AscCH'].historyitem_Cell_Num = 24;
+	window['AscCH'].historyitem_Cell_SetPivotButton = 25;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
@@ -590,7 +591,7 @@ CHistory.prototype.Set_Additional_ExtendDocumentToPos = function()
 };
 
 
-CHistory.prototype.Check_UninonLastPoints = function()
+CHistory.prototype.CheckUnionLastPoints = function()
 {
 	// Не объединяем точки истории, если на предыдущей точке произошло сохранение
 	if ( this.Points.length < 2)

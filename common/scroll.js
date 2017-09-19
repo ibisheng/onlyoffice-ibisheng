@@ -3066,6 +3066,11 @@ ScrollObject.prototype = {
     evt_mouseup:function ( e ) {
         var evt = e || window.event;
 
+		// prevent pointer events on all iframes (while only plugin!)
+		var _frame = document.getElementById("plugin_iframe");
+		if (_frame)
+			_frame.style.pointerEvents = "";
+
         if ( evt.preventDefault )
             evt.preventDefault();
         else
@@ -3108,6 +3113,11 @@ ScrollObject.prototype = {
     },
     evt_mousedown:function ( e ) {
         var evt = e || window.event;
+
+        // prevent pointer events on all iframes (while only plugin!)
+        var _frame = document.getElementById("plugin_iframe");
+        if (_frame)
+            _frame.style.pointerEvents = "none";
 
         // если сделать превент дефолт - перестанет приходить mousemove от window
         /*

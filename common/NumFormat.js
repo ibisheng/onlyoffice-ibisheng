@@ -125,6 +125,15 @@ function getNumberParts(x)
     function isNumber(n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
     }
+	function round10(value, exp1, exp2) {
+		//todo use Math.round10
+		// Shift
+		value = value.toString().split('e');
+		value = Math.round(+(value[0] + 'e' + (value[1] ? (+value[1] + exp1) : exp1)));
+		// Shift back
+		value = value.toString().split('e');
+		return +(value[0] + 'e' + (value[1] ? (+value[1] - exp2) : -exp2));
+	}
 
 function FormatObj(type, val)
 {
@@ -965,10 +974,7 @@ NumFormat.prototype =
 				if(false == this.bSlash)
 				{
 					var nOldRealExp = nRealExp;
-					var dTemp = parts.mantissa * Math.pow(10, nFracLen + nRealExp - gc_nMaxDigCount);
-					dTemp = Math.round(dTemp);
-					dTemp /= Math.pow(10, nFracLen);
-					parts = getNumberParts(dTemp);
+					parts = getNumberParts(round10(parts.mantissa, nFracLen + nRealExp - gc_nMaxDigCount, nFracLen));
 					if(SignType.Null != parts.sign)
 					{
 						nRealExp = gc_nMaxDigCount + parts.exponent;
@@ -4142,6 +4148,10 @@ function setCurrentCultureInfo(val) {
 				for (i = 45; i <= 49; ++i) {
 					res.push(AscCommonExcel.aStandartNumFormats[i]);
 				}
+				res.push(AscCommon.getCurrencyFormat(null, 0, true, false));
+				res.push(AscCommon.getCurrencyFormat(null, 0, false, false));
+				res.push(AscCommon.getCurrencyFormat(null, 2, true, false));
+				res.push(AscCommon.getCurrencyFormat(null, 2, false, false));
 				//todo add all used in workbook formats
 			} else {
 				res.push(AscCommon.g_cGeneralFormat);

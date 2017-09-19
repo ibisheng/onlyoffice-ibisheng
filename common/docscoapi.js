@@ -59,6 +59,7 @@
       this.onSession =  options.onSession;
       this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
+      this.onHasForgotten =  options.onHasForgotten;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -105,6 +106,9 @@
       };
       this._CoAuthoringApi.onExpiredToken = function(e) {
         t.callback_OnExpiredToken(e);
+      };
+      this._CoAuthoringApi.onHasForgotten = function(e) {
+        t.callback_OnHasForgotten(e);
       };
 	  this._CoAuthoringApi.onForceSave = function(e) {
         t.callback_OnForceSave(e);
@@ -426,6 +430,12 @@
     }
   };
 
+  CDocsCoApi.prototype.callback_OnHasForgotten = function(e) {
+    if (this.onHasForgotten) {
+      this.onHasForgotten(e);
+    }
+  };
+
   CDocsCoApi.prototype.callback_OnLocksAcquired = function(e) {
     if (this.onLocksAcquired) {
       this.onLocksAcquired(e);
@@ -543,6 +553,7 @@
       this.onSession =  options.onSession;
       this.onExpiredToken =  options.onExpiredToken;
 	  this.onForceSave =  options.onForceSave;
+      this.onHasForgotten =  options.onHasForgotten;
       this.onLocksAcquired = options.onLocksAcquired;
       this.onLocksReleased = options.onLocksReleased;
       this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
@@ -989,6 +1000,12 @@
     }
   };
 
+  DocsCoApi.prototype._onHasForgotten = function(data) {
+    if (this.onHasForgotten) {
+      this.onHasForgotten();
+    }
+  };
+
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     var t = this;
     if (jwt) {
@@ -1415,6 +1432,9 @@
 
       this._onMessages(data, false);
       this._onGetLock(data);
+      if (data['hasForgotten']) {
+        this._onHasForgotten();
+      }
 
       // Применения изменений пользователя
       if (window['AscApplyChanges'] && window['AscChanges']) {
@@ -1524,7 +1544,7 @@
     } else {
         //ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
         //при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-        sockjs = this.sockjs = new (this._getSockJs())(this.sockjs_url, null, {transports: ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+        sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null, {'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
     }
 
     sockjs.onopen = function() {
@@ -1649,10 +1669,6 @@
       t._initSocksJs();
     }, this.reconnectInterval);
 
-  };
-
-  DocsCoApi.prototype._getSockJs = function() {
-    return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
   DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {

@@ -233,7 +233,7 @@ function ParaText(value)
     this.WidthVisible = 0x00000000 | 0;
     this.Flags        = 0x00000000 | 0;
     
-    this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
+    this.Set_SpaceAfter(this.private_IsSpaceAfter());
 }
 
 ParaText.prototype =
@@ -248,32 +248,30 @@ ParaText.prototype =
     Set_CharCode : function(CharCode)
     {
         this.Value = CharCode;
-        this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
+        this.Set_SpaceAfter(this.private_IsSpaceAfter());
     },
     
     Draw : function(X, Y, Context)
-    {
-        var CharCode = this.Value;
+	{
+		var CharCode = this.Value;
 
-        var FontKoef = 1;
-        if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
-            FontKoef = smallcaps_and_script_koef;
-        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
-            FontKoef = vertalign_Koef_Size;
-        else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
-            FontKoef = smallcaps_Koef;
+		var FontKoef = 1;
+		if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS)
+			FontKoef = smallcaps_and_script_koef;
+		else if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT)
+			FontKoef = vertalign_Koef_Size;
+		else if (this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS)
+			FontKoef = smallcaps_Koef;
 
-        Context.SetFontSlot(((this.Flags >> 8) & 0xFF), FontKoef);
-        
-        var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
+		Context.SetFontSlot(((this.Flags >> 8) & 0xFF), FontKoef);
 
-        if ( true === this.Is_NBSP() && editor && editor.ShowParaMarks )
-        {
-            Context.FillText(X, Y, String.fromCharCode(0x00B0));
-        }
-        else
-            Context.FillTextCode(X, Y, ResultCharCode);
-    },
+		var ResultCharCode = (this.Flags & PARATEXT_FLAGS_CAPITALS ? (String.fromCharCode(CharCode).toUpperCase()).charCodeAt(0) : CharCode);
+
+		if (true !== this.Is_NBSP())
+			Context.FillTextCode(X, Y, ResultCharCode);
+		else if (editor && editor.ShowParaMarks)
+			Context.FillText(X, Y, String.fromCharCode(0x00B0));
+	},
 
     Measure : function(Context, TextPr)
     {
@@ -445,8 +443,16 @@ ParaText.prototype =
     Read_FromBinary : function(Reader)
     {
         this.Value = Reader.GetLong();
-        this.Set_SpaceAfter(45 === this.Value);
+        this.Set_SpaceAfter(this.private_IsSpaceAfter());
     }
+};
+ParaText.prototype.private_IsSpaceAfter = function()
+{
+	if (0x002D === this.Value
+		|| 0x2014 === this.Value)
+		return true;
+
+	return false;
 };
 
 // Класс ParaSpace
