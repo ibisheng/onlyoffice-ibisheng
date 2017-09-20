@@ -1216,6 +1216,8 @@ CTable.prototype.Set_Props = function(Props)
 			if (undefined === Props.TablePaddings)
 				this.Set_Distance(3.2, 0, 3.2, 0);
 
+			this.Set_TableInd(0);
+
 			bRecalc_All = true;
 		}
 	}
@@ -2590,6 +2592,10 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 			oTargetTable.PositionV.Value        = Y;
 
 			oTargetTable.PageNum = PageNum;
+
+			var nTableInd = oTargetTable.Get_TableInd();
+			if (Math.abs(nTableInd) > 0.001)
+				oTargetTable.Set_TableInd(0);
 
 			editor.WordControl.m_oLogicDocument.Recalculate();
 			oTargetTable.Start_TrackTable();

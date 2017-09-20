@@ -13129,6 +13129,8 @@ function CParagraphSearchPos()
     this.ForSelection = false;
 
     this.CheckAnchors = false;
+
+    this.CheckComplexFields = false;
 }
 CParagraphSearchPos.prototype.SetCheckAnchors = function(bCheck)
 {
@@ -13137,6 +13139,26 @@ CParagraphSearchPos.prototype.SetCheckAnchors = function(bCheck)
 CParagraphSearchPos.prototype.IsCheckAnchors = function()
 {
 	return this.CheckAnchors;
+};
+CParagraphSearchPos.prototype.SetCheckComplexFields = function(isCheck)
+{
+	this.CheckComplexFields = isCheck;
+};
+CParagraphSearchPos.prototype.IsCheckComplexFields = function()
+{
+	return this.CheckComplexFields;
+};
+CParagraphSearchPos.prototype.ProcessComplexFieldChar = function(nDirection, oChar)
+{
+
+};
+CParagraphSearchPos.prototype.IsComplexFieldCode = function()
+{
+	return false;
+};
+CParagraphSearchPos.prototype.IsComplexFieldValue = function()
+{
+	return false;
 };
 
 function CParagraphSearchPosXY()
