@@ -814,7 +814,8 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 
 	for (var nIndex = Pos; nIndex < Pos + Count; ++nIndex)
 	{
-		this.Content[nIndex].PreDelete();
+		if (this.Content[nIndex].PreDelete)
+			this.Content[nIndex].PreDelete();
 	}
 
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
@@ -5269,12 +5270,10 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 	// 1. Спаренные пустые раны мы удаляем (удаляем 1 ран)
 	// 2. Удаляем пустые гиперссылки, пустые формулы, пустые поля
 	// 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
-	// 4. Удаляем пустые комментарии
 
 	var StartPos = ( undefined === _StartPos || null === _StartPos ? 0 : Math.max(_StartPos - 1, 0) );
 	var EndPos   = ( undefined === _EndPos || null === _EndPos ? this.Content.length - 1 : Math.min(_EndPos + 1, this.Content.length - 1) );
 
-	var CommentsToDelete = [];
 	for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
 	{
 		var CurElement = this.Content[CurPos];
@@ -5282,23 +5281,6 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 		if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type || para_InlineLevelSdt === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
 		{
 			this.Internal_Content_Remove(CurPos);
-		}
-		else if (para_Comment === CurElement.Type && false === CurElement.Start)
-		{
-			var CommentId = CurElement.CommentId;
-			for (var CurPos2 = CurPos - 1; CurPos2 >= 0; CurPos2--)
-			{
-				var CurElement2 = this.Content[CurPos2];
-
-				if (para_Comment === CurElement2.Type && CommentId === CurElement2.CommentId)
-				{
-					CommentsToDelete.push(CommentId);
-					break;
-				}
-				else if (true !== CurElement2.Is_Empty())
-					break;
-			}
-
 		}
 		else if (para_Run !== CurElement.Type)
 		{
@@ -5324,12 +5306,6 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 					this.Internal_Content_Remove(CurPos);
 			}
 		}
-	}
-
-	var CommentsCount = CommentsToDelete.length;
-	for (var CommentIndex = 0; CommentIndex < CommentsCount; CommentIndex++)
-	{
-		this.LogicDocument.RemoveComment(CommentsToDelete[CommentIndex], true, false);
 	}
 
 	// Проверим, чтобы предпоследний элемент был Run
