@@ -5058,15 +5058,6 @@
             return {col: i - dx, row: j - dy};
         }
 
-        function findEnd(col, row) {
-            var nc1, nc2 = col;
-            do {
-                nc1 = nc2;
-                nc2 = findNextCell(nc1, row, +1, 0).col;
-            } while (nc1 !== nc2);
-            return nc2;
-        }
-
         function findEOT() {
             var obr = t.objectRender ? t.objectRender.getMaxColRow() : new AscCommon.CellBase(-1, -1);
             var maxCols = t.model.getColsCount();
@@ -5100,7 +5091,7 @@
                 return findNextCell(c, r, -1, 0).col;
             }  // Ctrl + <-
             if (dc > +2.0001 && dc < +2.9999) {
-                return !eot ? findEnd(c, r) : eot.col;
+                return (eot || findNextCell(c, r, +1, 0)).col;
             }  // End
             if (dc < -2.0001 && dc > -2.9999) {
                 return 0;
