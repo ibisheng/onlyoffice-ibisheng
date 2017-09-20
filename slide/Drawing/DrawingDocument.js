@@ -4129,6 +4129,8 @@ function CThumbnailsManager()
 	// инициализация шрифта
 	this.SetFont = function(font)
 	{
+		font.FontFamily.Name = g_fontApplication.GetFontFileWeb(font.FontFamily.Name, 0).m_wsFontName;
+
 		if (-1 == font.FontFamily.Index)
 			font.FontFamily.Index = AscFonts.g_map_font_index[font.FontFamily.Name];
 
