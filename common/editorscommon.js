@@ -636,6 +636,7 @@
 				nRes = Asc.c_oAscError.ID.DownloadError;
 				break;
 			case c_oAscServerError.ConvertTimeout :
+			case c_oAscServerError.ConvertDeadLetter :
 				nRes = Asc.c_oAscError.ID.ConvertationTimeout;
 				break;
 			case c_oAscServerError.ConvertDRM :
@@ -1054,6 +1055,7 @@
 		ConvertNEED_PARAMS:       -89,
 		ConvertDRM:               -90,
 		ConvertPASSWORD:          -91,
+		ConvertDeadLetter:        -92,
 
 		Upload:              -100,
 		UploadContentLength: -101,
