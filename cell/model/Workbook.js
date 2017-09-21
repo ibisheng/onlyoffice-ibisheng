@@ -40,7 +40,6 @@
 	var CellValueType = AscCommon.CellValueType;
 	var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 	var fSortAscending = AscCommon.fSortAscending;
-	var fSortDescending = AscCommon.fSortDescending;
 	var parserHelp = AscCommon.parserHelp;
 	var oNumFormatCache = AscCommon.oNumFormatCache;
 	var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
