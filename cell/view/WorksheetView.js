@@ -12732,25 +12732,21 @@
 			ctx.stroke();
         };
 
-        var _drawFilterDreieck = function (x, y, height)
+		var _drawFilterDreieck = function (x, y, height)
 		{
-			var r = ctx._calcRect(x, y);
-			x = Math.round(r.x) + 1;
-			y = Math.round(r.y);
-
 			ctx.beginPath();
-			
-			height = Math.round(height * scaleIndex * scaleFactor);
-			var diffY = Math.round(height / 2);
+
+			x = x + 1*width_1px/scaleFactor;
+			var diffY = (height / 2) * scaleFactor;
+			height = height * scaleIndex*scaleFactor;
 			for(var i = 0; i < height; i++)
 			{
-				ctx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
-				ctx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+				ctx.lineHor(x - (i*width_1px/scaleFactor + 1*width_1px/scaleFactor) , y + (height*height_1px - i*height_1px/scaleFactor) - diffY, x + i*width_1px/scaleFactor)
 			}
 
 			ctx.setStrokeStyle(m_oColor);
 			ctx.stroke();
-        };
+		};
 
 		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
 		var _drawButton = function(upLeftXButton, upLeftYButton)
