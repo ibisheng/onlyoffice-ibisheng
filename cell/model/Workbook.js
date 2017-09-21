@@ -2712,7 +2712,7 @@
 		this.contentChanges.Clear();
 	};
 
-	Worksheet.prototype.rebuildColors=function(){;
+	Worksheet.prototype.rebuildColors=function(){
 		this.rebuildTabColor();
 
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
@@ -6837,7 +6837,7 @@
 				break;
 		}
 		return cErrorLocal["nil"];
-	}
+	};
 	Cell.prototype._minimizeMultiText = function(bSetCellFont) {
 		var bRes = false;
 		if(null != this.multiText && this.multiText.length > 0)
