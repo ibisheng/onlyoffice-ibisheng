@@ -1801,6 +1801,9 @@ function CEditorPage(api)
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
+		if (oThis.SplitterType != 0)
+			return;
+
 		var _isCatch = false;
 
 		var downClick = global_mouseEvent.ClickCount;
