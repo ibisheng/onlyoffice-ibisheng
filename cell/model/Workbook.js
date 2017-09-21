@@ -3494,7 +3494,7 @@
 		var offset = {offsetRow: nDif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		var redrawTablesArr = this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
+		var redrawTablesArr = this.autoFilters.insertRows("delCell", oActualRange, c_oAscDeleteOptions.DeleteRows);
 
 		var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
 		this.getRange3(start,0,stop,0)._foreachRowNoEmpty(function(row){
@@ -3527,14 +3527,13 @@
 		oRange.addCellsShiftBottom();
 	};
 	Worksheet.prototype._insertRowsBefore=function(index, count){
-		var t = this;
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
 		History.Create_NewPoint();
 		var offset = {offsetRow: count, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		var redrawTablesArr = this.autoFilters.insertRows( "insCell", new Asc.Range(0, index, gc_nMaxCol0, index + count - 1), c_oAscInsertOptions.InsertColumns );
+		var redrawTablesArr = this.autoFilters.insertRows("insCell", oActualRange, c_oAscInsertOptions.InsertColumns);
 
 		this._updateFormulasParents(index + count, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
 		//insert new row/cell
@@ -3594,14 +3593,14 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		
-		var redrawTablesArr = this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
+		var redrawTablesArr = this.autoFilters.insertColumn("delCell", oActualRange, c_oAscInsertOptions.InsertColumns);
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
 		this.getRange3(start,0,stop,0)._foreachColNoEmpty(function(col){
 			var nIndex = col.getIndex();
 			var oOldProps = col.getWidthProp();
 			if(false === oOldProps.isEqual(oDefColPr))
-				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(nIndex, 0, nIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nIndex, false, oOldProps, oDefColPr));
+				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, t.getId(), new Asc.Range(nIndex, 0, nIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nIndex, false, oOldProps, oDefColPr));
 			col.setStyle(null);
 		}, function(cell){
 			t._removeCell(null, null, cell);
@@ -3630,14 +3629,13 @@
 		oRange.addCellsShiftRight();
 	};
 	Worksheet.prototype._insertColsBefore=function(index, count){
-		var t = this;
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0);
 		History.Create_NewPoint();
 		var offset = {offsetRow: 0, offsetCol: count};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		var redrawTablesArr = this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
+		var redrawTablesArr = this.autoFilters.insertColumn("insCells",  oActualRange, c_oAscInsertOptions.InsertColumns);
 
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
