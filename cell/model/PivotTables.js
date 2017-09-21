@@ -2816,7 +2816,7 @@ CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		if (null !== newVal.rowGrandTotals && t.asc_getRowGrandTotals() !== newVal.rowGrandTotals) {
 			t.asc_setRowGrandTotals(newVal.rowGrandTotals ? null : false);
 		}
@@ -2843,7 +2843,7 @@ CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		t.addPageField(index);
 		ws.updatePivotTable(t);
 	});
@@ -2851,7 +2851,7 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 CT_pivotTableDefinition.prototype.asc_removeField = function (api, index) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		t.removeField(index);
 		ws.updatePivotTable(t);
 	});
@@ -6853,7 +6853,7 @@ CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
 			t.asc_setSubtotal(newVal.subtotal);
 		}
 
-		ws.clearPivotRable(pivot);
+		ws.clearPivotTable(pivot);
 		ws.updatePivotTable(pivot);
 	});
 };

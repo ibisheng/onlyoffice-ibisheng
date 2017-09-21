@@ -4967,7 +4967,7 @@
 			this.pivotTables[i].init();
 		}
 	};
-	Worksheet.prototype.clearPivotRable = function (pivotTable) {
+	Worksheet.prototype.clearPivotTable = function (pivotTable) {
 		var pos, cells;
 		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
