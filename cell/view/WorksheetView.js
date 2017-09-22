@@ -12672,7 +12672,7 @@
 
 			if(isMobileRetina)
 			{
-				ctx.setLineWidth(AscBrowser.retinaPixelRatio);
+				ctx.setLineWidth(AscBrowser.retinaPixelRatio * 2);
 			}
 			else
 			{
@@ -12695,7 +12695,7 @@
 
 			if(isMobileRetina)
 			{
-				ctx.setLineWidth(2 * AscBrowser.retinaPixelRatio);
+				ctx.setLineWidth(4 * AscBrowser.retinaPixelRatio);
 			}
 			else
 			{
@@ -12724,7 +12724,7 @@
 
 			if(isMobileRetina)
 			{
-				ctx.setLineWidth(AscBrowser.retinaPixelRatio);
+				ctx.setLineWidth(AscBrowser.retinaPixelRatio * 2);
 			}
 			else
 			{
@@ -12809,7 +12809,7 @@
 		}
 
 
-		if(window['IS_NATIVE_EDITOR'] && 1.9 <= AscBrowser.retinaPixelRatio)
+		if(window['IS_NATIVE_EDITOR'])
 		{
 			isMobileRetina = true;
 		}
