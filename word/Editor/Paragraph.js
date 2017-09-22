@@ -6986,7 +6986,11 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 				while (true !== this.Content[StartPos].Is_CursorPlaceable() && StartPos > OldStartPos)
 					StartPos--;
 
-				TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+
+				if (bCheckParaEnd && StartPos === EndPos && this.Content[StartPos].IsSelectionEmpty())
+					TextPr = null;
+				else
+					TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
 
 				// Если все-так так сложилось, что мы находимся в элементе без настроек, тогда берем настройки для
 				// символа конца параграфа.
@@ -7499,6 +7503,10 @@ Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
 		return true;
 
 	return false;
+};
+Paragraph.prototype.HaveNumbering = function()
+{
+	return (undefined !== this.Numbering_Get() ? true : false);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с нумерацией параграфов в презентациях
@@ -10278,8 +10286,13 @@ Paragraph.prototype.Continue = function(NewParagraph)
 	// У нового параграфа настройки конца параграфа делаем, как у старого (происходит в функции CopyPr), а у старого
 	// меняем их на настройки текущего рана.
 	this.CopyPr(NewParagraph);
-	this.TextPr.Clear_Style();
-	this.TextPr.Apply_TextPr(TextPr);
+
+	// Если в параграфе есть нумерация, то Word не копирует настройки последнего рана на конец параграфа
+	if (!this.HaveNumbering())
+	{
+		this.TextPr.Clear_Style();
+		this.TextPr.Apply_TextPr(TextPr);
+	}
 
 	NewParagraph.Internal_Content_Add(0, new ParaRun(NewParagraph));
 	NewParagraph.Correct_Content();
