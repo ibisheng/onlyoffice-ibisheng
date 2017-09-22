@@ -3494,6 +3494,7 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("delCell", oActualRange, c_oAscDeleteOptions.DeleteRows);
+		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
 		this.getRange3(start,0,stop,0)._foreachRowNoEmpty(function(row){
@@ -3533,6 +3534,7 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("insCell", oActualRange, c_oAscInsertOptions.InsertColumns);
+		this.updatePivotOffset(oActualRange, offset);
 
 		this._updateFormulasParents(index + count, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
 		//insert new row/cell
@@ -3586,13 +3588,13 @@
 		this.workbook.dependencyFormulas.lockRecal();
 		History.Create_NewPoint();
 		//start, stop 0 based
-		var nDif = -(stop - start + 1), i, j, length, nIndex;
+		var nDif = -(stop - start + 1), i, j, length;
 		var oActualRange = new Asc.Range(start, 0, stop, gc_nMaxRow0);
 		var offset = { offsetRow: 0, offsetCol: nDif };
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, nDif);
+		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
 		this.getRange3(start,0,stop,0)._foreachColNoEmpty(function(col){
@@ -3635,6 +3637,7 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, count);
+		this.updatePivotOffset(oActualRange, offset);
 
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
@@ -4540,7 +4543,7 @@
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		var redrawTablesArr = this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
+		var redrawTablesArr = this.autoFilters.insertRows("delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
@@ -4561,7 +4564,6 @@
 		//todo проверить не уменьшились ли границы таблицы
 	};
 	Worksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
-		var t = this;
 		var nLeft = oBBox.c1;
 		var nRight = oBBox.c2;
 		var dif = nRight - nLeft + 1;
@@ -4610,11 +4612,9 @@
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
 	};
 	Worksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
-		var t = this;
 		var nTop = oBBox.r1;
 		var nBottom = oBBox.r2;
 		var dif = nBottom - nTop + 1;
-		var aIndexes = [];
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0);
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
@@ -5413,9 +5413,30 @@
 			}
 		}
 	};
+	Worksheet.prototype.updatePivotOffset = function (range, offset) {
+		var pivotTable, pivotRange, cells;
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			pivotTable = this.pivotTables[i];
+			pivotRange = pivotTable.getRange();
+
+			if ((0 < offset.offsetCol && range.c1 <= pivotRange.c2) ||
+				(0 < offset.offsetRow && range.r1 <= pivotRange.r2)) {
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+				cells.clearTableStyle();
+				pivotRange.setOffset(offset);
+				pivotTable.init();
+				this.updatePivotTablesStyle(pivotRange);
+			}
+		}
+	};
 	Worksheet.prototype.inPivotTable = function (range) {
 		return this.pivotTables.some(function (element) {
 			return element.intersection(range);
+		});
+	};
+	Worksheet.prototype.checkShiftPivotTable = function (range, offset) {
+		return this.pivotTables.some(function (element) {
+			return AscCommonExcel.c_oAscShiftType.Change === element.isIntersectForShift(range, offset);
 		});
 	};
 	Worksheet.prototype.getPivotTable = function (col, row) {

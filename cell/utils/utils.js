@@ -45,6 +45,12 @@
 
 		var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
+		var c_oAscShiftType = {
+			None  : 0,
+			Move  : 1,
+			Change: 2
+		};
+
 
 		/** @const */
 		var kLeftLim1 = .999999999999999;
@@ -367,29 +373,28 @@
 		};
 
 		Range.prototype.isIntersectForShift = function(range, offset) {
-			var isHor = offset && 0 != offset.offsetCol;
+			var isHor = offset && offset.offsetCol;
 			var toDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
 			if (isHor) {
 				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
-					return true;
+					return (this.c1 < range.c1 || (this.c1 === range.c1 && this.c2 === range.c1)) ?
+						c_oAscShiftType.Move : c_oAscShiftType.Change;
 				} else if (toDelete && this.c1 <= range.c1 && range.c2 <= this.c2) {
 					var topIn = this.r1 <= range.r1 && range.r1 <= this.r2;
 					var bottomIn = this.r1 <= range.r2 && range.r2 <= this.r2;
 					return topIn || bottomIn;
-				} else {
-					return false;
 				}
 			} else {
 				if (this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2) {
-					return true;
+					return (this.r1 < range.r1 || (this.r1 === range.r1 && this.r2 === range.r1)) ?
+						c_oAscShiftType.Move : c_oAscShiftType.Change;
 				} else if (toDelete && this.r1 <= range.r1 && range.r2 <= this.r2) {
 					var leftIn = this.c1 <= range.c1 && range.c1 <= this.c2;
 					var rightIn = this.c1 <= range.c2 && range.c2 <= this.c2;
 					return leftIn || rightIn;
-				} else {
-					return false;
 				}
 			}
+			return c_oAscShiftType.None;
 		};
 
 		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
@@ -2308,6 +2313,7 @@
 		var prot;
 		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].c_oAscShiftType = c_oAscShiftType;
 		window["AscCommonExcel"].recalcType = recalcType;
 		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;

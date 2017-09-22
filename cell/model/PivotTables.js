@@ -2675,6 +2675,10 @@ CT_pivotTableDefinition.prototype.init = function () {
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);
 };
+CT_pivotTableDefinition.prototype.isIntersectForShift = function (range, offset) {
+	var ref = this.location && (this.location.refWithPage || this.location.ref);
+	return (ref && range.isIntersectForShift(ref, offset));
+};
 CT_pivotTableDefinition.prototype.pageFieldsIntersection = function (range) {
 	return this.pageFieldsPositions && this.pageFieldsPositions.some(function (element) {
 			return Array.isArray(range) ? range.some(function (elementRange) {
@@ -4157,6 +4161,8 @@ function CT_Location() {
 	this.firstDataCol = null;
 	this.rowPageCount = null;//0
 	this.colPageCount = null;//0
+// private
+	this.refWithPage = null;
 }
 CT_Location.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -4220,8 +4226,19 @@ CT_Location.prototype.contains = function (col, row) {
 	return this.ref && this.ref.contains(col, row);
 };
 CT_Location.prototype.setPageCount = function (row, col) {
+	var c2;
 	this.rowPageCount = row;
 	this.colPageCount = col;
+	if (this.ref) {
+		this.refWithPage = this.ref.clone();
+		if (this.rowPageCount) {
+			this.refWithPage.setOffsetFirst(new AscCommonExcel.CRangeOffset(0, - (this.rowPageCount + 1)));
+		}
+		c2 = this.colPageCount * 3 - 1 - 1;
+		if (c2 > this.refWithPage.c2) {
+			this.refWithPage.setOffsetLast(new AscCommonExcel.CRangeOffset(c2 - this.refWithPage.c2, 0));
+		}
+	}
 };
 function CT_PivotFields() {
 //Attributes

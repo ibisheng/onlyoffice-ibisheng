@@ -10290,7 +10290,7 @@
 		var arn = this.model.selectionRange.getLast().clone();
 		var checkRange = arn.getAllRange();
 
-		var range;
+		var range, count;
 		var oRecalcType = AscCommonExcel.recalcType.recalc;
 		var reinitRanges = false;
 		var updateDrawingObjectsInfo = null;
@@ -10471,42 +10471,49 @@
 								c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 							return;
 						}
+						lockRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+						count = arn.c2 - arn.c1 + 1;
+						if (this.model.checkShiftPivotTable(lockRange,
+								new AscCommonExcel.CRangeOffset(count, 0))) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 
 						functionModelAction = function () {
 							History.Create_NewPoint();
 							History.StartTransaction();
 							oRecalcType = AscCommonExcel.recalcType.full;
 							reinitRanges = true;
-							t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
+							t.model.insertColsBefore(arn.c1, count);
 							updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
 							t.cellCommentator.updateCommentsDependencies(true, val, arn);
 							History.EndTransaction();
 						};
 
-						arrChangedRanges.push(lockRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
-						if (this.model.inPivotTable(lockRange)) {
-							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
-								c_oAscError.Level.NoCritical);
-							return;
-						}
+						arrChangedRanges.push(lockRange);
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.InsertColumns,
 							onChangeWorksheetCallback);
 						break;
 					case c_oAscInsertOptions.InsertRows:
-						functionModelAction = function () {
-							oRecalcType = AscCommonExcel.recalcType.full;
-							reinitRanges = true;
-							t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
-							updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-							t.cellCommentator.updateCommentsDependencies(true, val, arn);
-						};
-
-						arrChangedRanges.push(lockRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
-						if (this.model.inPivotTable(lockRange)) {
+						lockRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+						count = arn.r2 - arn.r1 + 1;
+						if (this.model.checkShiftPivotTable(lockRange,
+								new AscCommonExcel.CRangeOffset(0, count))) {
 							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 								c_oAscError.Level.NoCritical);
 							return;
 						}
+
+						functionModelAction = function () {
+							oRecalcType = AscCommonExcel.recalcType.full;
+							reinitRanges = true;
+							t.model.insertRowsBefore(arn.r1, count);
+							updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
+							t.cellCommentator.updateCommentsDependencies(true, val, arn);
+						};
+
+						arrChangedRanges.push(lockRange);
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.InsertRows, onChangeWorksheetCallback);
 						break;
 				}
