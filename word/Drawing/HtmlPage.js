@@ -561,8 +561,13 @@ function CEditorPage(api)
 		 window.onkeyup = this.onKeyUp;
 		 */
 
-		this.m_oBody.HtmlElement.oncontextmenu = function()
+		this.m_oBody.HtmlElement.oncontextmenu = function(e)
 		{
+			if (AscCommon.AscBrowser.isVivaldiLinux)
+			{
+				AscCommon.Window_OnMouseUp(e);
+			}
+			AscCommon.stopEvent(e);
 			return false;
 		};
 		//window.oncontextmenu = function() { return false; };

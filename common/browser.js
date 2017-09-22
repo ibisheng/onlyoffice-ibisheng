@@ -54,7 +54,8 @@ var AscBrowser = {
     isMozilla : false,
 	isRetina : false,
     isLinuxOS : false,
-	retinaPixelRatio : 1
+	retinaPixelRatio : 1,
+	isVivaldiLinux : false
 };
 
 // user agent lower case
@@ -108,6 +109,8 @@ AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 AscBrowser.isMozilla = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("firefox") > -1);
 
 AscBrowser.isLinuxOS = (AscBrowser.userAgent.indexOf(" linux ") > -1);
+
+AscBrowser.isVivaldiLinux = AscBrowser.isLinuxOS && (AscBrowser.userAgent.indexOf("vivaldi") > -1);
 
 AscBrowser.zoom = 1;
 
