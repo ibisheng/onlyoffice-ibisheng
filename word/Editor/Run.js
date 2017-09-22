@@ -4991,15 +4991,28 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         fontCoeff   = MatGetKoeffArgSize(CurTextPr.FontSize, ArgSize.value);
     }
 
+	var UnderlineY = Y + UndOff - this.YOffset;
+	var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
+
     switch(CurTextPr.VertAlign)
     {
-        case AscCommon.vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27; break;
-        case AscCommon.vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
-        case AscCommon.vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
+        case AscCommon.vertalign_Baseline   :
+		{
+			StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27;
+			break;
+		}
+        case AscCommon.vertalign_SubScript  :
+		{
+			StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm;
+			UnderlineY -= vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm;
+			break;
+		}
+        case AscCommon.vertalign_SuperScript:
+		{
+			StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm;
+			break;
+		}
     }
-
-    var UnderlineY = Y + UndOff -  this.YOffset;
-    var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
 
 
     var BgColor = PDSL.BgColor;
