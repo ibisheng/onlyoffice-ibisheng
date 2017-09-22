@@ -389,6 +389,11 @@ CWordCollaborativeEditing.prototype.Remove_AllForeignCursors = function()
         this.Remove_ForeignCursor(UserId);
     }
 };
+CWordCollaborativeEditing.prototype.RemoveMyCursorFromOthers = function()
+{
+	// Удаляем свой курсор у других пользователей
+	this.m_oLogicDocument.Api.CoAuthoringApi.sendCursor("");
+};
 CWordCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
 {
     this.m_aDocumentPositions.Update_DocumentPositionsOnAdd(Class, Pos);
