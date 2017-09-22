@@ -5419,8 +5419,7 @@
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 
-			if ((0 < offset.offsetCol && range.c1 <= pivotRange.c2) ||
-				(0 < offset.offsetRow && range.r1 <= pivotRange.r2)) {
+			if ((offset.offsetCol && range.c1 <= pivotRange.c2) || (offset.offsetRow && range.r1 <= pivotRange.r2)) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 				cells.clearTableStyle();
 				pivotRange.setOffset(offset);
