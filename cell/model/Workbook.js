@@ -3592,7 +3592,7 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		
-		var redrawTablesArr = this.autoFilters.insertColumn("delCell", oActualRange, c_oAscInsertOptions.InsertColumns);
+		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, nDif);
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
 		this.getRange3(start,0,stop,0)._foreachColNoEmpty(function(col){
@@ -3634,7 +3634,7 @@
 		var offset = {offsetRow: 0, offsetCol: count};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		var redrawTablesArr = this.autoFilters.insertColumn("insCells",  oActualRange, c_oAscInsertOptions.InsertColumns);
+		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, count);
 
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
@@ -4504,7 +4504,7 @@
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		var redrawTablesArr = this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
+		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif );
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
@@ -4569,7 +4569,7 @@
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		var redrawTablesArr = this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
+		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif, displayNameFormatTable );
 
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var cellsByColLength = this.cellsByCol.length;

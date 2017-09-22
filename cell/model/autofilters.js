@@ -1357,40 +1357,35 @@
 				}
 				return false;
 			},
+
 			_cleanStylesTables: function(redrawTablesArr) {
 				for(var i = 0; i < redrawTablesArr.length; i++) {
 					this._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
 				}
 			},
+
 			_setStylesTables: function(redrawTablesArr) {
 				for(var i = 0; i < redrawTablesArr.length; i++) {
 					this._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
 				}
 			},
+
 			redrawStylesTables: function(redrawTablesArr) {
 				//set styles for tables
 				this._cleanStylesTables(redrawTablesArr);
 				this._setStylesTables(redrawTablesArr);
 			},
-			insertColumn: function(type, activeRange, insertType, displayNameFormatTable, bHistoryStyles)
+
+			insertColumn: function(activeRange, diff, displayNameFormatTable)
 			{
 				var worksheet = this.worksheet;
 				var t  = this;
 				var bUndoChanges = worksheet.workbook.bUndoChanges;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
-				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
+
 				activeRange = activeRange.clone();
-				var diff = activeRange.c2 - activeRange.c1 + 1;
+
 				var redrawTablesArr = [];
-				
-				if(type === "delCell")
-					diff = - diff;
-				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
-				{
-					activeRange.r1 = 0;
-					activeRange.r2 = AscCommon.gc_nMaxRow - 1;
-				}
-				
 				var changeFilter = function(filter, bTablePart)
 				{
 					var ref = filter.Ref;
@@ -1411,40 +1406,46 @@
 							if(diff < 0)
 							{
 								diffColId = ref.c1 - activeRange.c2 - 1;
-								
 								filter.deleteTableColumns(activeRange);
-								
 								filter.changeRef(-diffColId, null, true);
 							}
-								
-							filter.moveRef(diff);								
+
+							filter.moveRef(diff);
 						}
 						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 <= ref.c2 && diff < 0)//parts of after filter
 						{
 							oldFilter = filter.clone(null);
 							diffColId = activeRange.c1 - ref.c2 - 1;
-							
+
 							if(diff < 0)
+							{
 								filter.deleteTableColumns(activeRange);
+							}
 							else
+							{
 								filter.addTableColumns(activeRange, t);
-							
-							filter.changeRef(diffColId);						
+							}
+
+							filter.changeRef(diffColId);
 						}
 						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0) || (activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 > ref.c2 && diff > 0))//inside
 						{
 							oldFilter = filter.clone(null);
-							
+
 							if(diff < 0)
+							{
 								filter.deleteTableColumns(activeRange);
+							}
 							else
-								filter.addTableColumns(activeRange, t);	
-							
+							{
+								filter.addTableColumns(activeRange, t);
+							}
+
 							filter.changeRef(diff);
-							
+
 							diffColId = diff;
 						}
-						
+
 						//change filterColumns
 						if(diffColId !== null)
 						{
@@ -1463,45 +1464,54 @@
 											t._openHiddenRowsAfterDeleteColumn(autoFilter, autoFilter.FilterColumns[j].ColId);
 											autoFilter.FilterColumns.splice(j, 1);
 											j--;
-										}	
+										}
 										else
+										{
 											autoFilter.FilterColumns[j].ColId = newColId;
+										}
 									}
 								}
 							}
 						}
-						
+
 						//History
 						if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
 						{
-							var changeElement = 
+							var changeElement =
 							{
 								oldFilter: oldFilter,
 								newFilterRef: filter.Ref.clone()
 							};
 							t._addHistoryObj(changeElement, AscCH.historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, activeRange);
 						}
-						
+
 						//set style
 						if(oldFilter && bTablePart)
+						{
 							redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
+						}
 					}
 				};
-				
-				
+
+
 				//change autoFilter
 				if(worksheet.AutoFilter)
+				{
 					changeFilter(worksheet.AutoFilter);
-				
+				}
+
 				//change TableParts
 				var tableParts = worksheet.TableParts;
 				for(var i = 0; i < tableParts.length; i++)
+				{
 					changeFilter(tableParts[i], true);
-				
-				if(displayNameFormatTable && type == 'insCells')
+				}
+
+				if(displayNameFormatTable && diff > 0)
 				{
 					redrawTablesArr = redrawTablesArr.concat(this.insertLastTableColumn(displayNameFormatTable, activeRange));
 				}
+
 				return redrawTablesArr;
 			},
 			
