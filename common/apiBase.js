@@ -442,6 +442,7 @@
 			};
 			if (versionHistory)
 			{
+				rData["serverVersion"] = versionHistory.serverVersion;
                 rData["closeonerror"] = versionHistory.isRequested;
 				rData["jwt"] = versionHistory.token;
 				//чтобы результат пришел только этому соединению, а не всем кто в документе
