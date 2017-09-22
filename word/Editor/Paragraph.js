@@ -4101,6 +4101,8 @@ Paragraph.prototype.Get_ParaContentPosByXY = function(X, Y, PageIndex, bYLine, S
 			SearchPos.Pos.Update2(CurPos, 0);
 	}
 
+	SearchPos.InTextX = SearchPos.InText;
+
 	// По Х попали в какой-то элемент, проверяем по Y
 	if (true === SearchPos.InText && Y >= this.Pages[PNum].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent - 0.01 && Y <= this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap + 0.01)
 		SearchPos.InText = true;
@@ -6390,7 +6392,7 @@ Paragraph.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 
 		var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false, false);
 
-		if (true === SearchPosXY.InText)
+		if (true === SearchPosXY.InTextX)
 		{
 			return this.Selection_CheckParaContentPos(SearchPosXY.InTextPos);
 		}
@@ -10288,7 +10290,7 @@ Paragraph.prototype.Continue = function(NewParagraph)
 	this.CopyPr(NewParagraph);
 
 	// Если в параграфе есть нумерация, то Word не копирует настройки последнего рана на конец параграфа
-	if (!this.HaveNumbering())
+	if (!this.HaveNumbering() && !this.Lock.Is_Locked())
 	{
 		this.TextPr.Clear_Style();
 		this.TextPr.Apply_TextPr(TextPr);
@@ -13166,6 +13168,7 @@ function CParagraphSearchPosXY()
     this.Line      = 0;
     this.Range     = 0;
 
+    this.InTextX   = false;
     this.InText    = false;
     this.Numbering = false;
     this.End       = false;
