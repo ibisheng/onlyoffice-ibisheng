@@ -3291,7 +3291,7 @@ var cFormulaOperators = {
 				refItem = refItem.slice(currentWorkbook.length);
 			}
 
-			var _f = new AscCommonExcel.parserFormula(refItem, '', ws);
+			var _f = new AscCommonExcel.parserFormula(refItem, null, ws);
 			if (_f.parse()) {
 				_f.RefPos.forEach(function (item) {
 					var ref;
