@@ -4823,99 +4823,88 @@ function OfflineEditor () {
 
         if (imageUrl && !objectRender.isViewerMode()) {
 
-            var _image = _api.ImageLoader.LoadImage(imageUrl, 1);
+            var _image = new Image();
+            _image.src = imageUrl
+            
             var isOption = true;//options && options.cell;
 
             var calculateObjectMetrics = function (object, width, height) {
                 // Обработка картинок большого разрешения
                 var metricCoeff = 1;
-
+                
                 var coordsFrom = _this.coordsManager.calculateCoords(object.from);
                 var realTopOffset = coordsFrom.y;
                 var realLeftOffset = coordsFrom.x;
-
-                var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0); 	// по ширине
+                
+                var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0);     // по ширине
                 if (areaWidth < width) {
                     metricCoeff = width / areaWidth;
-
+                    
                     width = areaWidth;
                     height /= metricCoeff;
                 }
-
-                var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0); 	// по высоте
+                
+                var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0);     // по высоте
                 if (areaHeight < height) {
                     metricCoeff = height / areaHeight;
-
+                    
                     height = areaHeight;
                     width /= metricCoeff;
                 }
-
+                
                 var findVal = pxToPt(realLeftOffset + width);
                 var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
-                while (toCell.col === null && worksheet.cols.length < AscCommon.gc_nMaxCol) {
+                while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
                     worksheet.expandColsOnScroll(true);
                     toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 }
                 object.to.col = toCell.col;
                 object.to.colOff = ptToMm(toCell.colOff);
-
+                
                 findVal = pxToPt(realTopOffset + height);
                 toCell = worksheet.findCellByXY(0, findVal, true, true, false);
-                while (toCell.row === null && worksheet.rows.length < AscCommon.gc_nMaxRow) {
+                while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
                     worksheet.expandRowsOnScroll(true);
                     toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 }
                 object.to.row = toCell.row;
                 object.to.rowOff = ptToMm(toCell.rowOff);
-
-                // worksheet.handlers.trigger("reinitializeScroll");
             };
 
             var addImageObject = function (_image) {
 
-                //if (!_image.Image) {
-                //    worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
-                //} else {
-
                 var drawingObject = _this.createDrawingObject();
                 drawingObject.worksheet = worksheet;
-
+                
                 var activeCell = worksheet.model.selectionRange.activeCell;
-                drawingObject.from.col = //isOption ? options.cell.col :
-                  activeCell.col;
-                drawingObject.from.row = //isOption ? options.cell.row :
-                  activeCell.row;
-
+                drawingObject.from.col = activeCell.col;
+                drawingObject.from.row = activeCell.row;
+                
                 // Проверяем начальные координаты при вставке
                 while (!worksheet.cols[drawingObject.from.col]) {
                     worksheet.expandColsOnScroll(true);
                 }
-                worksheet.expandColsOnScroll(true); 	// для colOff
-
+                worksheet.expandColsOnScroll(true);     // для colOff
+                
                 while (!worksheet.rows[drawingObject.from.row]) {
                     worksheet.expandRowsOnScroll(true);
                 }
-                worksheet.expandRowsOnScroll(true); 	// для rowOff
-
-                //calculateObjectMetrics(drawingObject, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
+                worksheet.expandRowsOnScroll(true);     // для rowOff
 
                 calculateObjectMetrics(drawingObject, options[1], options[2]);
 
                 var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
                 var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
-
+                
                 // CImage
                 _this.objectLocker.reset();
                 _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
                 _this.objectLocker.checkObjects(function (bLock) {
-                    if (bLock !== true)
-                        return;
-                    _this.controller.resetSelection();
-                    _this.controller.addImageFromParams(imageUrl,
-                        // _image.src,
-                        pxToMm(coordsFrom.x) + AscFormat.MOVE_DELTA, pxToMm(coordsFrom.y) + AscFormat.MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
-                });
-                //}
+                                                if (bLock !== true)
+                                                return;
+                                                _this.controller.resetSelection();
+                                                _this.controller.addImageFromParams(_image.src, pxToMm(coordsFrom.x) + MOVE_DELTA, pxToMm(coordsFrom.y) + MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
+                                                });
 
                 worksheet.setSelectionShape(true);
 
@@ -4924,7 +4913,7 @@ function OfflineEditor () {
                 }
             };
 
-            addImageObject(new Image());
+            addImageObject(_image);
         }
 
         return objectId;
