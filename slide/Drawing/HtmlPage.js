@@ -879,6 +879,16 @@ function CEditorPage(api)
 					window.editor.EndDemonstration();
 				});
 			}
+
+			this.m_oBody.HtmlElement.oncontextmenu = function(e)
+			{
+				if (AscCommon.AscBrowser.isVivaldiLinux)
+				{
+					AscCommon.Window_OnMouseUp(e);
+				}
+				AscCommon.stopEvent(e);
+				return false;
+			};
 		}
 		// --------------------------------------------------------------------------
 
