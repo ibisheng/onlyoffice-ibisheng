@@ -1422,6 +1422,9 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     var Top2    = PRS.LineTop2;
     var Bottom2 = PRS.LineBottom2;
 
+	Top    = (((Top * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
+	Bottom = (((Bottom * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
+
     var Left;
 
     if(true === PRS.MathNotInline)
