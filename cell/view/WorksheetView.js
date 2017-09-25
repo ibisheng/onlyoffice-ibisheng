@@ -11900,6 +11900,10 @@
 			return;
 		}
 
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
+
 		var t = this;
 		var ar = this.model.selectionRange.getLast().clone();
 
@@ -12130,7 +12134,11 @@
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
-        this._isLockedAll(onChangeAutoFilterCallback);
+        if(true === window['AscCommonExcel'].specialFilteringMode){
+			onChangeAutoFilterCallback();
+        }else{
+			this._isLockedAll(onChangeAutoFilterCallback);
+        }
     };
 
     WorksheetView.prototype.reapplyAutoFilter = function (tableName) {
@@ -12195,7 +12203,11 @@
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
-        this._isLockedAll(onChangeAutoFilterCallback);
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			onChangeAutoFilterCallback();
+		}else{
+			this._isLockedAll(onChangeAutoFilterCallback);
+		}
     };
 
     WorksheetView.prototype.applyAutoFilterByType = function (autoFilterObject) {
@@ -12293,9 +12305,16 @@
 
         if (null === isAddAutoFilter)//do not add autoFilter
         {
-            this._isLockedAll(onChangeAutoFilterCallback);
+			if(true === window['AscCommonExcel'].specialFilteringMode){
+				onChangeAutoFilterCallback();
+			}else{
+				this._isLockedAll(onChangeAutoFilterCallback);
+			}
         } else//add autofilter + apply
         {
+			if(true === window['AscCommonExcel'].specialFilteringMode){
+				return;
+			}
             if (t._checkAddAutoFilter(ar, null, autoFilterObject, true) === true) {
                 this._isLockedAll(onChangeAutoFilterCallback);
                 this._isLockedDefNames(null, null);
@@ -13380,6 +13399,10 @@
         if (!tablePart || (tablePart && !tablePart.TableStyleInfo)) {
             return false;
         }
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
 
         var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
         if (isChangeTableInfo !== false) {

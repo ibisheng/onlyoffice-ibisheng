@@ -5258,5 +5258,8 @@
 		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_getImage"]					= prot.asc_getImage;
+
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window['AscCommonExcel'].specialFilteringMode = false;
 	}
 )(window);
