@@ -35,7 +35,7 @@
 (function(window, undefined)
 {
 	window["AscInputMethod"] = {};
-	window["AscInputMethod"]["SogouPinyin"] = true;
+	window["AscInputMethod"]["SogouPinyin"] = false;
 	///
 	// такие методы нужны в апи
 	// baseEditorsApi.prototype.Begin_CompositeInput = function()
