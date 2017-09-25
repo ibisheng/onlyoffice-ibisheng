@@ -5007,7 +5007,16 @@ function CT_WorksheetSource() {
 	this.name = null;
 	this.sheet = null;
 	this.id = null;
+//Private
+	this.formula = null;
 }
+CT_WorksheetSource.prototype.onFormulaEvent = function (type, eventData) {
+	if (AscCommon.c_oNotifyParentType.CanDo === type) {
+		return true;
+	} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+		// ToDo update formula with eventData.assemble;
+	}
+};
 CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
@@ -5027,6 +5036,18 @@ CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 		val = vals["r:id"];
 		if (undefined !== val) {
 			this.id = uq(val);
+		}
+
+		var text;
+		if (this.name) {
+			text = this.name;
+		} else if (this.ref && this.sheet) {
+			text = AscCommon.parserHelp.get3DRef(this.sheet, this.ref);
+		}
+		if (text) {
+			this.formula = new AscCommonExcel.parserFormula(text, this, AscCommonExcel.g_DefNameWorksheet);
+			this.formula.parse();
+			this.formula.buildDependencies();
 		}
 	}
 };
