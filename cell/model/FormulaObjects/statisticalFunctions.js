@@ -1762,41 +1762,12 @@
 
 	function prepeareGrowthTrendCalculation(t, arg){
 		//если первое значение число
-		var tempNumber;
-		if (cElementType.number === arg[0].type) {
-			tempNumber = arg[0];
-			arg[0] = new cArray();
-			arg[0].addElement(tempNumber);
-		} else if (cElementType.cell === arg[0].type || cElementType.cell3D === arg[0].type) {
-			tempNumber = arg[0].getValue();
-			arg[0] = new cArray();
-			arg[0].addElement(tempNumber);
+		arg[0] = tryNumberToArray(arg[0]);
+		if(arg[1]){
+			arg[1] = tryNumberToArray(arg[1]);
 		}
-
-		//если первое значение число
-		if (arg[1]) {
-			if (cElementType.number === arg[1].type) {
-				tempNumber = arg[1];
-				arg[1] = new cArray();
-				arg[1].addElement(tempNumber);
-			} else if (cElementType.cell === arg[1].type || cElementType.cell3D === arg[1].type) {
-				tempNumber = arg[1].getValue();
-				arg[1] = new cArray();
-				arg[1].addElement(tempNumber);
-			}
-		}
-
-		//если первое значение число
-		if (arg[2] && cElementType.number === arg[2].type) {
-			if (cElementType.number === arg[2].type) {
-				tempNumber = arg[2];
-				arg[2] = new cArray();
-				arg[2].addElement(tempNumber);
-			} else if (cElementType.cell === arg[2].type || cElementType.cell3D === arg[2].type) {
-				tempNumber = arg[2].getValue();
-				arg[2] = new cArray();
-				arg[2].addElement(tempNumber);
-			}
+		if(arg[2]){
+			arg[2] = tryNumberToArray(arg[2]);
 		}
 
 		var oArguments = t._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array, cElementType.array]);
@@ -3711,6 +3682,23 @@
 		for(var i = 0; i < length - 1; i++){
 			array[i] = val;
 		}
+	}
+
+	function tryNumberToArray(arg){
+		if(arg){
+			var tempNumber;
+			if (cElementType.number === arg.type) {
+				tempNumber = arg;
+				arg = new cArray();
+				arg.addElement(tempNumber);
+			} else if (cElementType.cell === arg.type || cElementType.cell3D === arg.type) {
+				tempNumber = arg.getValue();
+				arg = new cArray();
+				arg.addElement(tempNumber);
+			}
+		}
+
+		return arg;
 	}
 
 	/**
@@ -7332,31 +7320,11 @@
 	cLINEST.prototype.constructor = cLINEST;
 	cLINEST.prototype.argumentsMin = 1;
 	cLINEST.prototype.argumentsMax = 4;
-	/*cLINEST.prototype.Calculate = function (arg) {
+	cLINEST.prototype.Calculate = function (arg) {
 
-		//если первое значение число
-		var tempNumber;
-		if (cElementType.number === arg[0].type) {
-			tempNumber = arg[0];
-			arg[0] = new cArray();
-			arg[0].addElement(tempNumber);
-		} else if (cElementType.cell === arg[0].type || cElementType.cell3D === arg[0].type) {
-			tempNumber = arg[0].getValue();
-			arg[0] = new cArray();
-			arg[0].addElement(tempNumber);
-		}
-
-		//если первое значение число
-		if (arg[1]) {
-			if (cElementType.number === arg[1].type) {
-				tempNumber = arg[1];
-				arg[1] = new cArray();
-				arg[1].addElement(tempNumber);
-			} else if (cElementType.cell === arg[1].type || cElementType.cell3D === arg[1].type) {
-				tempNumber = arg[1].getValue();
-				arg[1] = new cArray();
-				arg[1].addElement(tempNumber);
-			}
+		arg[0] = tryNumberToArray(arg[0]);
+		if(arg[1]){
+			arg[1] = tryNumberToArray(arg[1]);
 		}
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
@@ -7379,18 +7347,50 @@
 		}else{
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
-	};*/
+	};
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGEST() {
-		cBaseFunction.call(this, "LOGEST");
+		this.name = "LOGEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cLOGEST.prototype = Object.create(cBaseFunction.prototype);
 	cLOGEST.prototype.constructor = cLOGEST;
+	cLOGEST.prototype.argumentsMin = 1;
+	cLOGEST.prototype.argumentsMax = 4;
+	/*cLOGEST.prototype.Calculate = function (arg) {
+
+		arg[0] = tryNumberToArray(arg[0]);
+		if(arg[1]){
+			arg[1] = tryNumberToArray(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return argError;
+		}
+
+		var pMatY = argClone[0];
+		var pMatX = argClone[1];
+		var bConstant = getBoolValue(argClone[2], true);
+		var bStats = getBoolValue(argClone[3], true);
+
+		var res = CalculateRGPRKP( pMatY, pMatX, bConstant, bStats, true);
+
+		if(res && res[0] && res[0][0]){
+			return this.value = new cNumber(res[0][0]);
+		}else{
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+	};*/
 
 	/**
 	 * @constructor
