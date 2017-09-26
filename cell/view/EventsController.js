@@ -1438,15 +1438,17 @@
 
 			// Если нажали правую кнопку мыши, то сменим выделение только если мы не в выделенной области
 			if (2 === event.button) {
-				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+				this.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+				this.handlers.trigger('onContextMenu', event);
 			} else {
-				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
+				if (this.targetInfo && this.targetInfo.target === c_oTargetType.FillHandle &&
+					false === this.settings.isViewerMode) {
 					// В режиме автозаполнения
-					t.isFillHandleMode = true;
-					t._changeFillHandle(event);
+					this.isFillHandleMode = true;
+					this._changeFillHandle(event);
 				} else {
-					t.isSelectMode = true;
-					t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
+					this.isSelectMode = true;
+					this.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
 						/*isSelectMode*/true, ctrlKey);
 				}
 			}
@@ -1455,7 +1457,6 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseUp = function (event) {
 			if (2 === event.button) {
-				this.handlers.trigger('onContextMenu', event);
 				return true;
 			}
 

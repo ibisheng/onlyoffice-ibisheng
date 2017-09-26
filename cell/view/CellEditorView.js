@@ -2641,6 +2641,8 @@
 				this._moveCursor(kPosition, startWord);
 				this._selectChars(kPosition, endWord);
 			}
+		} else if (2 === event.button) {
+			this.handlers.trigger('onContextMenu', event);
 		}
 		return true;
 	};
@@ -2648,7 +2650,6 @@
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseUp = function (event) {
 		if (2 === event.button) {
-			this.handlers.trigger('onContextMenu', event);
 			return true;
 		}
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
