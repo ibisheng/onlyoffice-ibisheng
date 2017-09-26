@@ -53,14 +53,12 @@
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
-	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
-	cFormulaFunctionGroup['Financial'].push(cPDURATION);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cFORECAST_ETS,
-		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
+		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST,
 		cMUNIT);
 
 	/**
@@ -158,18 +156,6 @@
 
 	cMUNIT.prototype = Object.create(cBaseFunction.prototype);
 	cMUNIT.prototype.constructor = cMUNIT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPDURATION() {
-		cBaseFunction.call(this, "PDURATION");
-		this.isXLFN = true;
-	}
-
-	cPDURATION.prototype = Object.create(cBaseFunction.prototype);
-	cPDURATION.prototype.constructor = cPDURATION;
 
 	/**
 	 * @constructor
