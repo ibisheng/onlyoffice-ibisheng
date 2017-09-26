@@ -5961,7 +5961,7 @@ window["native"]["offline_cell_editor_process_input_commands"] = function(sendAr
 
             // PASTE
             case 4: {
-                cellEditor.pasteText(commands[i + 3]);
+                cellEditor.pasteText(sendArguments[i + 3]);
                 break;
             }
 
