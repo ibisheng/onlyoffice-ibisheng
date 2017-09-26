@@ -12018,6 +12018,10 @@
             return;
         }
 
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
+
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
 
@@ -12135,7 +12139,9 @@
             }
         };
         if(true === window['AscCommonExcel'].specialFilteringMode){
+			History.LocalChange = true;
 			onChangeAutoFilterCallback();
+			History.LocalChange = false;
         }else{
 			this._isLockedAll(onChangeAutoFilterCallback);
         }
@@ -12204,7 +12210,9 @@
             }
         };
 		if(true === window['AscCommonExcel'].specialFilteringMode){
+			History.LocalChange = true;
 			onChangeAutoFilterCallback();
+			History.LocalChange = false;
 		}else{
 			this._isLockedAll(onChangeAutoFilterCallback);
 		}
@@ -12306,7 +12314,9 @@
         if (null === isAddAutoFilter)//do not add autoFilter
         {
 			if(true === window['AscCommonExcel'].specialFilteringMode){
+				History.LocalChange = true;
 				onChangeAutoFilterCallback();
+				History.LocalChange = false;
 			}else{
 				this._isLockedAll(onChangeAutoFilterCallback);
 			}
@@ -12326,6 +12336,11 @@
     WorksheetView.prototype.sortRange = function (type, cellId, displayName, color, bIsExpandRange) {
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
+
         var onChangeAutoFilterCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
