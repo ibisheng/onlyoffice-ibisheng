@@ -195,7 +195,9 @@
     var c_oSerWorkbookPrTypes =
     {
         Date1904: 0,
-        DateCompatibility: 1
+        DateCompatibility: 1,
+		HidePivotFieldList: 2,
+		ShowPivotChartFilter: 3
     };
     /** @enum */
     var c_oSerWorkbookViewTypes =
@@ -2288,7 +2290,19 @@
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(oWorkbookPr.DateCompatibility);
                 }
-            }
+				else if (null != oWorkbookPr.HidePivotFieldList)
+				{
+					this.memory.WriteByte(c_oSerWorkbookPrTypes.HidePivotFieldList);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteBool(oWorkbookPr.HidePivotFieldList);
+				}
+				else if (null != oWorkbookPr.ShowPivotChartFilter)
+				{
+					this.memory.WriteByte(c_oSerWorkbookPrTypes.ShowPivotChartFilter);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteBool(oWorkbookPr.ShowPivotChartFilter);
+				}
+			}
         };
         this.WriteBookViews = function()
         {
@@ -5715,7 +5729,11 @@
             }
             else if ( c_oSerWorkbookPrTypes.DateCompatibility == type )
                 WorkbookPr.DateCompatibility = this.stream.GetBool();
-            else
+			else if ( c_oSerWorkbookPrTypes.HidePivotFieldList == type ) {
+				WorkbookPr.HidePivotFieldList = this.stream.GetBool();
+			} else if ( c_oSerWorkbookPrTypes.ShowPivotChartFilter == type ) {
+				WorkbookPr.ShowPivotChartFilter = this.stream.GetBool();
+			} else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
