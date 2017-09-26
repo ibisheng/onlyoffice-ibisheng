@@ -4446,6 +4446,8 @@ Paragraph.prototype.Get_PageStartPos = function(CurPage)
 };
 Paragraph.prototype.Get_LeftPos = function(SearchPos, ContentPos)
 {
+	SearchPos.InitComplexFields(this.GetComplexFieldsByPos(ContentPos, true));
+
 	var Depth  = 0;
 	var CurPos = ContentPos.Get(Depth);
 
@@ -4481,6 +4483,8 @@ Paragraph.prototype.Get_LeftPos = function(SearchPos, ContentPos)
 };
 Paragraph.prototype.Get_RightPos = function(SearchPos, ContentPos, StepEnd)
 {
+	SearchPos.InitComplexFields(this.GetComplexFieldsByPos(ContentPos, true));
+
 	var Depth  = 0;
 	var CurPos = ContentPos.Get(Depth);
 
@@ -4517,6 +4521,8 @@ Paragraph.prototype.Get_RightPos = function(SearchPos, ContentPos, StepEnd)
 };
 Paragraph.prototype.Get_WordStartPos = function(SearchPos, ContentPos)
 {
+	SearchPos.InitComplexFields(this.GetComplexFieldsByPos(ContentPos, true));
+
 	var Depth  = 0;
 	var CurPos = ContentPos.Get(Depth);
 
@@ -4552,6 +4558,8 @@ Paragraph.prototype.Get_WordStartPos = function(SearchPos, ContentPos)
 };
 Paragraph.prototype.Get_WordEndPos = function(SearchPos, ContentPos, StepEnd)
 {
+	SearchPos.InitComplexFields(this.GetComplexFieldsByPos(ContentPos, true));
+
 	var Depth  = 0;
 	var CurPos = ContentPos.Get(Depth);
 
@@ -12306,7 +12314,7 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 		return oContentControl;
 	}
 };
-Paragraph.prototype.GetCurrentComplexFields = function()
+Paragraph.prototype.GetCurrentComplexFields = function(bReturnFieldPos)
 {
 	var arrComplexFields = [];
 
@@ -12317,7 +12325,12 @@ Paragraph.prototype.GetCurrentComplexFields = function()
 		{
 			var oComplexField = oInfo.ComplexFields[nIndex].ComplexField;
 			if (oComplexField.IsUse())
-				arrComplexFields.push(oComplexField);
+			{
+				if (bReturnFieldPos)
+					arrComplexFields.push(oInfo.ComplexFields[nIndex]);
+				else
+					arrComplexFields.push(oComplexField);
+			}
 		}
 	}
 
@@ -12325,9 +12338,17 @@ Paragraph.prototype.GetCurrentComplexFields = function()
 	for (var nIndex = 0; nIndex <= nEndPos; ++nIndex)
 	{
 		if (this.Content[nIndex].GetCurrentComplexFields)
-			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, nIndex === nEndPos);
+			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, nIndex === nEndPos, bReturnFieldPos);
 	}
 
+	return arrComplexFields;
+};
+Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
+{
+	var oCurrentPos = this.Get_ParaContentPos(false);
+	this.Set_ParaContentPos(oParaPos, false, -1, -1, false);
+	var arrComplexFields = this.GetCurrentComplexFields(bReturnFieldPos);
+	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
 	return arrComplexFields;
 };
 
@@ -13121,7 +13142,7 @@ function CParagraphSearchPos()
 
     this.CheckAnchors = false;
 
-    this.CheckComplexFields = false;
+    this.ComplexFields = [];
 }
 CParagraphSearchPos.prototype.SetCheckAnchors = function(bCheck)
 {
@@ -13131,25 +13152,100 @@ CParagraphSearchPos.prototype.IsCheckAnchors = function()
 {
 	return this.CheckAnchors;
 };
-CParagraphSearchPos.prototype.SetCheckComplexFields = function(isCheck)
+CParagraphSearchPos.prototype.ProcessComplexFieldChar = function(nDirection, oFieldChar)
 {
-	this.CheckComplexFields = isCheck;
-};
-CParagraphSearchPos.prototype.IsCheckComplexFields = function()
-{
-	return this.CheckComplexFields;
-};
-CParagraphSearchPos.prototype.ProcessComplexFieldChar = function(nDirection, oChar)
-{
+	if (!oFieldChar || !oFieldChar.IsUse())
+		return;
 
+
+	if (nDirection > 0)
+	{
+		var oComplexField = oFieldChar.GetComplexField();
+		if (oFieldChar.IsBegin())
+		{
+			this.ComplexFields.push(new CComplexFieldStatePos(oComplexField, true));
+		}
+		else if (oFieldChar.IsSeparate())
+		{
+			for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+			{
+				if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+				{
+					this.ComplexFields[nIndex].SetFieldCode(false);
+					break;
+				}
+			}
+		}
+		else if (oFieldChar.IsEnd())
+		{
+			for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+			{
+				if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+				{
+					this.ComplexFields.splice(nIndex, 1);
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		var oComplexField = oFieldChar.GetComplexField();
+		if (oFieldChar.IsEnd())
+		{
+			this.ComplexFields.push(new CComplexFieldStatePos(oComplexField, false));
+		}
+		else if (oFieldChar.IsSeparate())
+		{
+			for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+			{
+				if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+				{
+					this.ComplexFields[nIndex].SetFieldCode(true);
+					break;
+				}
+			}
+		}
+		else if (oFieldChar.IsBegin())
+		{
+			for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+			{
+				if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+				{
+					this.ComplexFields.splice(nIndex, 1);
+					break;
+				}
+			}
+		}
+	}
+};
+CParagraphSearchPos.prototype.InitComplexFields = function(arrComplexFields)
+{
+	this.ComplexFields = arrComplexFields;
+};
+CParagraphSearchPos.prototype.IsComplexField = function()
+{
+	return (this.ComplexFields.length > 0 ? true : false);
 };
 CParagraphSearchPos.prototype.IsComplexFieldCode = function()
 {
+	if (!this.IsComplexField())
+		return false;
+
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.ComplexFields[nIndex].IsFieldCode())
+			return true;
+	}
+
 	return false;
 };
 CParagraphSearchPos.prototype.IsComplexFieldValue = function()
 {
-	return false;
+	if (!this.IsComplexField() || this.IsComplexFieldCode())
+		return false;
+
+	return true;
 };
 
 function CParagraphSearchPosXY()

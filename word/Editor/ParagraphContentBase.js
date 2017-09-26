@@ -2966,13 +2966,13 @@ CParagraphContentWithParagraphLikeContent.prototype.PreDelete = function()
 			this.Content[nIndex].PreDelete();
 	}
 };
-CParagraphContentWithParagraphLikeContent.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent)
+CParagraphContentWithParagraphLikeContent.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent, isFieldPos)
 {
 	var nEndPos = isCurrent ? this.State.ContentPos : this.Content.length - 1;
 	for (var nIndex = 0; nIndex <= nEndPos; ++nIndex)
 	{
 		if (this.Content[nIndex] && this.Content[nIndex].GetCurrentComplexFields)
-			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, isCurrent && nIndex === nEndPos);
+			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, isCurrent && nIndex === nEndPos, isFieldPos);
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------

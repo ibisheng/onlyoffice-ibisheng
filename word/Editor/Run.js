@@ -5527,11 +5527,24 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 {
 	var CurPos = true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length;
 
+	var isFieldCode  = SearchPos.IsComplexFieldCode();
+	var isFieldValue = SearchPos.IsComplexFieldValue();
+
 	while (true)
 	{
 		CurPos--;
 
 		var Item = this.Content[CurPos];
+
+		if (CurPos >= 0 && para_FieldChar === Item.Type)
+		{
+			SearchPos.ProcessComplexFieldChar(-1, Item);
+			isFieldCode  = SearchPos.IsComplexFieldCode();
+			isFieldValue = SearchPos.IsComplexFieldValue();
+		}
+
+		if (CurPos >= 0 && isFieldCode)
+			continue;
 
 		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline() && false === SearchPos.IsCheckAnchors()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
 			break;
@@ -5548,6 +5561,9 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 {
 	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
 
+	var isFieldCode  = SearchPos.IsComplexFieldCode();
+	var isFieldValue = SearchPos.IsComplexFieldValue();
+
 	var Count = this.Content.length;
 	while (true)
 	{
@@ -5563,6 +5579,17 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 
 			var PrevItem     = this.Content[CurPos - 1];
 			var PrevItemType = PrevItem.Type;
+
+			if (para_FieldChar === PrevItem.Type)
+			{
+				SearchPos.ProcessComplexFieldChar(1, PrevItem);
+				isFieldCode  = SearchPos.IsComplexFieldCode();
+				isFieldValue = SearchPos.IsComplexFieldValue();
+			}
+
+			if (isFieldCode)
+				return;
+
 			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline() && false === SearchPos.IsCheckAnchors()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
 				return;
 
@@ -5575,6 +5602,16 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 		// Минимальное значение CurPos = 1, т.к. мы начинаем со значния >= 0 и добавляем 1
 		var Item     = this.Content[CurPos - 1];
 		var ItemType = Item.Type;
+
+		if (para_FieldChar === Item.Type)
+		{
+			SearchPos.ProcessComplexFieldChar(1, Item);
+			isFieldCode  = SearchPos.IsComplexFieldCode();
+			isFieldValue = SearchPos.IsComplexFieldValue();
+		}
+
+		if (isFieldCode)
+			continue;
 
 		if (!(true !== StepEnd && para_End === ItemType)
 			&& !(para_Drawing === Item.Type && false === Item.Is_Inline())
@@ -9369,7 +9406,7 @@ ParaRun.prototype.GetLineByPosition = function(nPos)
 ParaRun.prototype.PreDelete = function()
 {
 };
-ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent)
+ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent, isFieldPos)
 {
 	var nEndPos = isCurrent ? this.State.ContentPos : this.Content.length;
 	for (var nPos = 0; nPos < nEndPos; ++nPos)
@@ -9378,15 +9415,40 @@ ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent
 		if (oItem.Type !== para_FieldChar)
 			continue;
 
-		if (oItem.IsBegin())
+		if (isFieldPos)
 		{
-			arrComplexFields.push(oItem.GetComplexField());
-		}
-		else if (oItem.IsEnd())
-		{
-			if (arrComplexFields.length > 0)
+			var oComplexField = oItem.GetComplexField();
+			if (oItem.IsBegin())
 			{
-				arrComplexFields.splice(arrComplexFields.length - 1, 1);
+				arrComplexFields.push(new CComplexFieldStatePos(oComplexField, true));
+			}
+			else if (oItem.IsSeparate())
+			{
+				if (arrComplexFields.length > 0)
+				{
+					arrComplexFields[arrComplexFields.length - 1].SetFieldCode(false)
+				}
+			}
+			else if (oItem.IsEnd())
+			{
+				if (arrComplexFields.length > 0)
+				{
+					arrComplexFields.splice(arrComplexFields.length - 1, 1);
+				}
+			}
+		}
+		else
+		{
+			if (oItem.IsBegin())
+			{
+				arrComplexFields.push(oItem.GetComplexField());
+			}
+			else if (oItem.IsEnd())
+			{
+				if (arrComplexFields.length > 0)
+				{
+					arrComplexFields.splice(arrComplexFields.length - 1, 1);
+				}
 			}
 		}
 	}
