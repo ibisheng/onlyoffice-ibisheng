@@ -51,7 +51,7 @@
 	var cElementType = AscCommonExcel.cElementType;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cSWITCH, cTRUE, cXOR);
+	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cIFS, cNOT, cOR, cSWITCH, cTRUE, cXOR);
 
 	/**
 	 * @constructor
@@ -248,6 +248,60 @@
 		} else {
 			return this.value = arg[0];
 		}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIFS() {
+		this.name = "IFS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cIFS.prototype = Object.create(cBaseFunction.prototype);
+	cIFS.prototype.constructor = cIFS;
+	cIFS.prototype.argumentsMin = 2;
+	cIFS.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var res = null;
+		for(var i = 0; i < this.argumentsCurrent; i++){
+			var argN = argClone[i];
+			if(cElementType.string === argN.type){
+				res = new cError(cErrorType.wrong_value_type);
+				break;
+			} else if(cElementType.number === argN.type || cElementType.bool === argN.type){
+				if(!argClone[i + 1]){
+					res = new cError(cErrorType.not_available);
+					break;
+				}
+
+				argN = argN.tocBool();
+				if(true === argN.value){
+					res = argClone[i + 1];
+					break;
+				}
+			}
+			if(i === this.argumentsCurrent - 1){
+				res = new cError(cErrorType.not_available);
+				break;
+			}
+			i++;
+		}
+
+		if(null === res){
+			return this.value = new cError(cErrorType.not_available);
+		}
+
+		return this.value = res;
 	};
 
 	/**
