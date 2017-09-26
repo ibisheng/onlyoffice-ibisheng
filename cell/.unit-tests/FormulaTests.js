@@ -9193,6 +9193,41 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 146171.5152);
 	} );
 
+	test( "Test: \"PDURATION\"", function () {
+		oParser = new parserFormula( "PDURATION(2.5%,2000,2200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 3.86);
+
+		oParser = new parserFormula( "PDURATION(0.025/12,1000,1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(1) - 0, 87.6);
+
+		oParser = new parserFormula( "PDURATION(0.025,1000,1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 7.38);
+
+		oParser = new parserFormula( "PDURATION(-0.025,1000,1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+		oParser = new parserFormula( "PDURATION(0.025,-1000,1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+		oParser = new parserFormula( "PDURATION(0.025,1000,-1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!");
+
+		oParser = new parserFormula( "PDURATION({0.025},{1000},{1200})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 7.38);
+
+		oParser = new parserFormula( "PDURATION(\"TEST\",1000,-1200)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!");
+
+
+	});
 
 	wb.dependencyFormulas.unlockRecal();
 } );
