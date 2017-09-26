@@ -458,7 +458,7 @@
 	cFormulaFunctionGroup['Financial'].push(cACCRINT, cACCRINTM, cAMORDEGRC, cAMORLINC, cCOUPDAYBS, cCOUPDAYS,
 		cCOUPDAYSNC, cCOUPNCD, cCOUPNUM, cCOUPPCD, cCUMIPMT, cCUMPRINC, cDB, cDDB, cDISC, cDOLLARDE, cDOLLARFR,
 		cDURATION, cEFFECT, cFV, cFVSCHEDULE, cINTRATE, cIPMT, cIRR, cISPMT, cMDURATION, cMIRR, cNOMINAL, cNPER, cNPV,
-		cODDFPRICE, cODDFYIELD, cODDLPRICE, cODDLYIELD, cPMT, cPPMT, cPRICE, cPRICEDISC, cPRICEMAT, cPV, cRATE,
+		cODDFPRICE, cODDFYIELD, cODDLPRICE, cODDLYIELD, cPDURATION, cPMT, cPPMT, cPRICE, cPRICEDISC, cPRICEMAT, cPV, cRATE,
 		cRECEIVED, cRRI, cSLN, cSYD, cTBILLEQ, cTBILLPRICE, cTBILLYIELD, cVDB, cXIRR, cXNPV, cYIELD, cYIELDDISC, cYIELDMAT);
 
 	/**
@@ -3897,6 +3897,49 @@
 		this.value = new cNumber(res);
 		return this.value;
 
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPDURATION() {
+		this.name = "PDURATION";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPDURATION.prototype = Object.create(cBaseFunction.prototype);
+	cPDURATION.prototype.constructor = cPDURATION;
+	cPDURATION.prototype.argumentsMin = 3;
+	cPDURATION.prototype.argumentsMax = 3;
+	cPDURATION.prototype.isXLFN = true;
+	cPDURATION.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcfunc = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = argArray[2];
+
+			if ( arg0 <= 0.0 || arg1 <= 0.0 || arg2 <= 0.0 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return new cNumber( Math.log( arg2 / arg1 ) / Math.log1p( arg0 ) );
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcfunc);
 	};
 
 	/**
