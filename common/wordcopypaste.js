@@ -2557,7 +2557,7 @@ PasteProcessor.prototype =
 		if(mathText && mathText.str)
 		{
 			var newParaRun = new ParaRun();
-			this._addTextIntoRun(newParaRun, mathText.str);
+			addTextIntoRun(newParaRun, mathText.str);
 
 			res = newParaRun;
 		}
@@ -2613,7 +2613,7 @@ PasteProcessor.prototype =
 							bIsAddTabBefore = true;
 						}
 
-						t._addTextIntoRun(newParaRun, value, bIsAddTabBefore, true);
+						addTextIntoRun(newParaRun, value, bIsAddTabBefore, true);
 
 						newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 					}
@@ -2649,7 +2649,7 @@ PasteProcessor.prototype =
 			var numberingText = this._getNumberingText(lvl, NumInfo, NumTextPr, lvl);
 
 			var newParaRun = new ParaRun();
-			this._addTextIntoRun(newParaRun, numberingText, false, true, true);
+			addTextIntoRun(newParaRun, numberingText, false, true, true);
 			paragraph.Internal_Content_Add(0, newParaRun, false);
 		}
 	},
@@ -2825,53 +2825,6 @@ PasteProcessor.prototype =
 		return Char;
 	},
 
-	_addTextIntoRun: function(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
-	{
-		var diffContentIndex = 0;
-		if(bIsAddTabBefore){
-			diffContentIndex = 1;
-			oCurRun.Add_ToContent(0, new ParaTab(), false);
-		}
-
-		for(var k = 0, length = value.length; k < length; k++)
-		{
-			var nUnicode = null;
-			var nCharCode = value.charCodeAt(k);
-			if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-				if (k + 1 < length) {
-					k++;
-					var nTrailingChar = value.charCodeAt(k);
-					nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-				}
-			}
-			else
-				nUnicode = nCharCode;
-
-			var bIsSpace = true;
-			if (null != nUnicode) {
-				var Item;
-				if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-					Item = new ParaText();
-					Item.Set_CharCode(nUnicode);
-					bIsSpace = false;
-				}
-				else if(0x2009 === nUnicode){
-					Item = new ParaTab();
-				}
-				else
-					Item = new ParaSpace();
-
-				//add text
-				if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
-					oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
-				}
-			}
-		}
-
-		if(bIsAddTabAfter){
-			oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
-		}
-	},
 	//***end special paste***
 
 	InsertInPlacePresentation: function(aNewContent)
@@ -4429,7 +4382,7 @@ PasteProcessor.prototype =
 			var _charCode = text.charCodeAt(Index);
 			if(_charCode === 0x0A ||  Index === Count - 1){
 				var newParaRun = new ParaRun();
-				this._addTextIntoRun(newParaRun, insertText);
+				addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 				this.aContent.push(newParagraph);
 
@@ -8652,6 +8605,54 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         _api.pre_Paste(aPrepeareFonts, _images, _callback);
 }
 
+function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
+{
+	var diffContentIndex = 0;
+	if(bIsAddTabBefore){
+		diffContentIndex = 1;
+		oCurRun.Add_ToContent(0, new ParaTab(), false);
+	}
+
+	for(var k = 0, length = value.length; k < length; k++)
+	{
+		var nUnicode = null;
+		var nCharCode = value.charCodeAt(k);
+		if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+			if (k + 1 < length) {
+				k++;
+				var nTrailingChar = value.charCodeAt(k);
+				nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+			}
+		}
+		else
+			nUnicode = nCharCode;
+
+		var bIsSpace = true;
+		if (null != nUnicode) {
+			var Item;
+			if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+				Item = new ParaText();
+				Item.Set_CharCode(nUnicode);
+				bIsSpace = false;
+			}
+			else if(0x2009 === nUnicode){
+				Item = new ParaTab();
+			}
+			else
+				Item = new ParaSpace();
+
+			//add text
+			if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
+				oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
+			}
+		}
+	}
+
+	if(bIsAddTabAfter){
+		oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
+	}
+}
+
 function SpecialPasteShowOptions()
 {
 	this.options = [];
@@ -8679,6 +8680,8 @@ SpecialPasteShowOptions.prototype = {
   window["AscCommon"].Editor_Paste_Exec = Editor_Paste_Exec;
   window["AscCommon"].sendImgUrls = sendImgUrls;
   window["AscCommon"].PasteProcessor = PasteProcessor;
+
+  window["AscCommon"].addTextIntoRun = addTextIntoRun;
   
   window["AscCommon"].PasteElementsId = PasteElementsId;
   
