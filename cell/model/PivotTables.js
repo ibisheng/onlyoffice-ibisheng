@@ -273,6 +273,12 @@ var c_oAscDateTimeGrouping = {
 	Minute: 4,
 	Second: 5
 };
+var c_oAscAllocationMethod = {
+	EqualAllocation: 0,
+	EqualIncrement: 1,
+	WeightedAllocation: 2,
+	WeightedIncrement: 3
+};
 
 var st_VALUES = -2;
 
@@ -1452,6 +1458,33 @@ function ToXml_ST_DateTimeGrouping(val) {
 	return res;
 }
 
+function FromXml_ST_AllocationMethod(val) {
+	var res = -1;
+	if ("equalAllocation" === val) {
+		res = c_oAscAllocationMethod.EqualAllocation;
+	} else if ("equalIncrement" === val) {
+		res = c_oAscAllocationMethod.EqualIncrement;
+	} else if ("weightedAllocation" === val) {
+		res = c_oAscAllocationMethod.WeightedAllocation;
+	} else if ("weightedIncrement" === val) {
+		res = c_oAscAllocationMethod.WeightedIncrement;
+	}
+	return res;
+}
+function ToXml_ST_AllocationMethod(val) {
+	var res = "";
+	if (c_oAscAllocationMethod.EqualAllocation === val) {
+		res = "equalAllocation";
+	} else if (c_oAscAllocationMethod.EqualIncrement === val) {
+		res = "equalIncrement";
+	} else if (c_oAscAllocationMethod.WeightedAllocation === val) {
+		res = "weightedAllocation";
+	} else if (c_oAscAllocationMethod.WeightedIncrement === val) {
+		res = "weightedIncrement";
+	}
+	return res;
+}
+
 function CT_PivotCacheDefinition() {
 //Attributes
 	this.id = null;
@@ -1828,15 +1861,15 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
-	if ("r" === elem) {
-		if (this._curArray && this._curArray.length > 0) {
-			if (!this.r) {
-				this.r = [];
-			}
-			this.r.push(this._curArray);
-			this._curArray = null;
-		}
-	}
+  if ("r" === elem) {
+    if (this._curArray && this._curArray.length > 0) {
+      if (!this.r) {
+        this.r = [];
+      }
+      this.r.push(this._curArray);
+      this._curArray = null;
+    }
+  }
 };
 CT_PivotCacheRecords.prototype.toXml = function(writer) {
 	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -1964,7 +1997,8 @@ function CT_pivotTableDefinition() {
 	this.filters = null;
 	this.rowHierarchiesUsage = null;
 	this.colHierarchiesUsage = null;
-	this.extLst = null;
+	//ext
+	this.pivotTableDefinitionX14 = null;
 	//editor
 	this.cacheDefinition = null;
 
@@ -2355,11 +2389,20 @@ CT_pivotTableDefinition.prototype.onStartNode = function(elem, attr, uq) {
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
-		this.extLst = newContext;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_pivotTableDefinition.prototype.onEndNode = function(prevContext, elem) {
+	if ("extLst" === elem) {
+		for (var i = 0; i < prevContext.ext.length; ++i) {
+			var ext = prevContext.ext[i];
+			if ('{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}' == ext.uri) {
+				this.pivotTableDefinitionX14 = ext.elem;
+			}
+		}
+	}
 };
 CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -2619,8 +2662,13 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	if (null !== this.colHierarchiesUsage) {
 		this.colHierarchiesUsage.toXml(writer, "colHierarchiesUsage");
 	}
-	if (null !== this.extLst) {
-		this.extLst.toXml(writer, "extLst");
+	if (null !== this.pivotTableDefinitionX14) {
+		var ext = new CT_Extension();
+		ext.uri = "{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}";
+		ext.elem = this.pivotTableDefinitionX14;
+		var extList = new CT_ExtensionList();
+		extList.ext.push(ext);
+		extList.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd("pivotTableDefinition");
 };
@@ -2924,6 +2972,120 @@ CT_pivotTableDefinition.prototype.changeGrandTotals = function (items, newVal) {
 		items.count = i.length;
 	}
 	return res;
+};
+
+function CT_pivotTableDefinitionX14() {
+//Attributes
+	this.fillDownLabelsDefault = null;//false
+	this.visualTotalsForSets = null;//false
+	this.calculatedMembersInFilters = null;//false
+	this.altText = null;
+	this.altTextSummary = null;
+	this.enableEdit = null;//false
+	this.autoApply = null;//false
+	this.allocationMethod = null;//equalAllocation
+	this.weightExpression = null;
+	this.hideValuesRow = null;//false
+//Members
+	//this.pivotEdits = null;
+	//this.pivotChanges = null;
+	//this.conditionalFormats = null;
+}
+
+CT_pivotTableDefinitionX14.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["fillDownLabelsDefault"];
+		if (undefined !== val) {
+			this.fillDownLabelsDefault = getBoolFromXml(val);
+		}
+		val = vals["visualTotalsForSets"];
+		if (undefined !== val) {
+			this.visualTotalsForSets = getBoolFromXml(val);
+		}
+		val = vals["calculatedMembersInFilters"];
+		if (undefined !== val) {
+			this.calculatedMembersInFilters = getBoolFromXml(val);
+		}
+		val = vals["altText"];
+		if (undefined !== val) {
+			this.altText = uq(val);
+		}
+		val = vals["altTextSummary"];
+		if (undefined !== val) {
+			this.altTextSummary = uq(val);
+		}
+		val = vals["enableEdit"];
+		if (undefined !== val) {
+			this.enableEdit = getBoolFromXml(val);
+		}
+		val = vals["autoApply"];
+		if (undefined !== val) {
+			this.autoApply = getBoolFromXml(val);
+		}
+		val = vals["allocationMethod"];
+		if (undefined !== val) {
+			val = FromXml_ST_AllocationMethod(val);
+			if (-1 !== val) {
+				this.allocationMethod = val;
+			}
+		}
+		val = vals["weightExpression"];
+		if (undefined !== val) {
+			this.weightExpression = uq(val);
+		}
+		val = vals["hideValuesRow"];
+		if (undefined !== val) {
+			this.hideValuesRow = getBoolFromXml(val);
+		}
+	}
+};
+CT_pivotTableDefinitionX14.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("pivotTableDefinition" === elem) {
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_pivotTableDefinitionX14.prototype.toXml = function(writer) {
+	writer.WriteXmlNodeStart("x14:pivotTableDefinition");
+	writer.WriteXmlString(" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"");
+	if (null !== this.fillDownLabelsDefault) {
+		writer.WriteXmlAttributeBool("fillDownLabelsDefault", this.fillDownLabelsDefault);
+	}
+	if (null !== this.visualTotalsForSets) {
+		writer.WriteXmlAttributeBool("visualTotalsForSets", this.visualTotalsForSets);
+	}
+	if (null !== this.calculatedMembersInFilters) {
+		writer.WriteXmlAttributeBool("calculatedMembersInFilters", this.calculatedMembersInFilters);
+	}
+	if (null !== this.altText) {
+		writer.WriteXmlAttributeStringEncode("altText", this.altText);
+	}
+	if (null !== this.altTextSummary) {
+		writer.WriteXmlAttributeStringEncode("altTextSummary", this.altTextSummary);
+	}
+	if (null !== this.enableEdit) {
+		writer.WriteXmlAttributeBool("enableEdit", this.enableEdit);
+	}
+	if (null !== this.autoApply) {
+		writer.WriteXmlAttributeBool("autoApply", this.autoApply);
+	}
+	if (null !== this.allocationMethod) {
+		writer.WriteXmlAttributeStringEncode("allocationMethod", ToXml_ST_AllocationMethod(this.allocationMethod));
+	}
+	if (null !== this.weightExpression) {
+		writer.WriteXmlAttributeStringEncode("weightExpression", this.weightExpression);
+	}
+	if (null !== this.hideValuesRow) {
+		writer.WriteXmlAttributeBool("hideValuesRow", this.hideValuesRow);
+	}
+	writer.WriteXmlNodeEnd("pivotTableDefinition", true, true);
 };
 function CT_CacheSource() {
 //Attributes
@@ -6013,9 +6175,7 @@ function CT_Extension() {
 //Attributes
 	this.uri = null;
 //Members
-	this.Any = null;
-//internal
-	this._curElem = null;
+	this.elem = null;
 }
 CT_Extension.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -6029,30 +6189,28 @@ CT_Extension.prototype.readAttributes = function(attr, uq) {
 };
 CT_Extension.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("Any" === elem) {
-		this._curElem = elem;
+	if ("x14:pivotTableDefinition" === elem) {
+		newContext = new CT_pivotTableDefinitionX14();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.elem = newContext;
 	} else {
 		newContext = null;
 	}
 	return newContext;
 };
-CT_Extension.prototype.onTextNode = function(text, uq) {
-	if ("Any" === this._curElem) {
-		this.Any = uq(text);
-	}
-};
 CT_Extension.prototype.toXml = function(writer, name) {
-	writer.WriteXmlNodeStart(name);
-	if (null !== this.uri) {
-		writer.WriteXmlAttributeStringEncode("uri", this.uri);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	if (null !== this.Any) {
-		writer.WriteXmlNodeStart("Any", true);
-		writer.WriteXmlStringEncode(this.Any);
-		writer.WriteXmlNodeEnd("Any");
-	}
-	writer.WriteXmlNodeEnd(name);
+  if ("{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}" === this.uri && this.elem) {
+    writer.WriteXmlNodeStart(name);
+    if (null !== this.uri) {
+      writer.WriteXmlAttributeStringEncode("uri", this.uri);
+      writer.WriteXmlString(" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"");
+    }
+    writer.WriteXmlNodeEnd(name, true);
+    this.elem.toXml(writer, "x14:pivotTableDefinition");
+    writer.WriteXmlNodeEnd(name);
+  }
 };
 function CT_X() {
 //Attributes
