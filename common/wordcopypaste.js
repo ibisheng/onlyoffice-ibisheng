@@ -1796,7 +1796,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
 		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
 		
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, null, text);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
 	}
     else
 	{
@@ -1805,7 +1805,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
 		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
 		onlyBinary = window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary;
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps, text);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
 	}
 }
 function trimString( str ){
