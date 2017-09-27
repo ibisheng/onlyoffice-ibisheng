@@ -5958,11 +5958,13 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
             }
 
             aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
-            oIdMap[aSpTree[i].Id] = oCopy.Id;
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[aSpTree[i].Id] = oCopy.Id;
+            }
         }
         if(bRecursive && aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
         {
-            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive);
+            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive, oIdMap);
         }
     }
 }
