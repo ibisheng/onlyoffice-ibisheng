@@ -2367,19 +2367,19 @@
 			.setStrokeStyle(this.settings.cells.defaultState.border)
 			.setLineWidth(1).beginPath();
 
-		var w, h;
-		for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
-			w = c[i].width;
-			x += w;
-			if (w >= this.width_1px) {
-				ctx.lineVerPrevPx(x, y1, y2);
+		var i, d, l;
+		for (i = range.c1, d = x1; i <= range.c2 && d <= x2; ++i) {
+			l = c[i].width;
+			d += l;
+			if (l >= this.width_1px) {
+				ctx.lineVerPrevPx(d, y1, y2);
 			}
 		}
-		for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
-			h = r[j].height;
-			y += h;
-			if (h >= this.height_1px) {
-				ctx.lineHorPrevPx(x1, y, x2);
+		for (i = range.r1, d = y1; i <= range.r2 && d <= y2; ++i) {
+			l = r[i].height;
+			d += l;
+			if (l >= this.height_1px) {
+				ctx.lineHorPrevPx(x1, d, x2);
 			}
 		}
 
