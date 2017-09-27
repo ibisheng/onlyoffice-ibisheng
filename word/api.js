@@ -2089,6 +2089,9 @@ background-repeat: no-repeat;\
 				case AscCommon.c_oAscClipboardDataFormat.Internal:
 					AscCommon.Editor_Paste_Exec(this, null, null, data1);
 					break;
+				case AscCommon.c_oAscClipboardDataFormat.Text:
+					AscCommon.Editor_Paste_Exec(this, null, null, null, null, data1);
+					break;
 				default:
 					break;
 			}

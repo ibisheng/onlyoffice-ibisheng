@@ -1786,7 +1786,7 @@ function CopyPasteCorrectString(str)
     return res;
 }
 
-function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps, text)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
 	window['AscCommon'].g_clipboardBase.endRecalcDocument = false;
@@ -1796,7 +1796,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
 		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
 		
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, null, text);
 	}
     else
 	{
@@ -1805,7 +1805,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
 		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
 		onlyBinary = window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary;
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps, text);
 	}
 }
 function trimString( str ){
@@ -3050,11 +3050,16 @@ PasteProcessor.prototype =
         }
     },
 
-	Start : function(node, nodeDisplay, bDuplicate, fromBinary)
+	Start : function(node, nodeDisplay, bDuplicate, fromBinary, text)
     {
 		//PASTE
+		if(text){
+			this._pasteText(text);
+			return;
+		}
+
 		var bInsertFromBinary = false;
-		
+
 		if(!node && "" === fromBinary)
 		{
 			return;
@@ -4393,7 +4398,56 @@ PasteProcessor.prototype =
 			
 		return {base64FromExcel: base64FromExcel, base64FromWord: base64FromWord, base64FromPresentation: base64FromPresentation};
 	},
-	
+
+	_pasteText: function(text)
+	{
+		var oThis = this;
+
+		var fPasteTextWordCallback = function()
+		{
+			oThis.aContent = [];
+
+			if(bTurnOffTrackRevisions){
+				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = false;
+			}
+
+			oThis._getContentFromText(text);
+
+			oThis._AddNextPrevToContent(oThis.oDocument);
+			if(false === oThis.bNested)
+			{
+				oThis.InsertInDocument();
+			}
+			if(bTurnOffTrackRevisions){
+				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+			}
+		};
+
+		fPasteTextWordCallback();
+	},
+
+	_getContentFromText: function(text){
+		var Count = text.length;
+
+		var newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+		var insertText = "";
+		for (var Index = 0; Index < Count; Index++) {
+			var _char = text.charAt(Index);
+			var _charCode = text.charCodeAt(Index);
+			if(_charCode === 10 ||  Index === Count - 1){
+				var newParaRun = new ParaRun();
+				this._addTextIntoRun(newParaRun, insertText);
+				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
+				this.aContent.push(newParagraph);
+
+				insertText = "";
+				newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+			} else{
+				insertText += _char;
+			}
+		}
+	},
+
 	_isParagraphContainsOnlyDrawing: function(par)
 	{
 		var res = true;
