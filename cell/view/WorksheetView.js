@@ -2331,60 +2331,60 @@
           this.headersHeight);
     };
 
-    /** Рисует сетку таблицы */
-    WorksheetView.prototype._drawGrid = function ( drawingCtx, range, leftFieldInPt, topFieldInPt, width, height ) {
-        // Возможно сетку не нужно рисовать (при печати свои проверки)
-        if ( null === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines() ) {
-            return;
-        }
+	/** Рисует сетку таблицы */
+	WorksheetView.prototype._drawGrid = function (drawingCtx, range, leftFieldInPt, topFieldInPt, width, height) {
+		// Возможно сетку не нужно рисовать (при печати свои проверки)
+		if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines()) {
+			return;
+		}
 
-        if ( range === undefined ) {
-            range = this.visibleRange;
-        }
-        var ctx = drawingCtx || this.drawingCtx;
-        var c = this.cols;
-        var r = this.rows;
-        var widthCtx = (width) ? width : ctx.getWidth();
-        var heightCtx = (height) ? height : ctx.getHeight();
-        var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
-        var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
-        if ( null === drawingCtx && this.topLeftFrozenCell ) {
-            if ( undefined === leftFieldInPt ) {
-                var cFrozen = this.topLeftFrozenCell.getCol0();
-                offsetX -= c[cFrozen].left - c[0].left;
-            }
-            if ( undefined === topFieldInPt ) {
-                var rFrozen = this.topLeftFrozenCell.getRow0();
-                offsetY -= r[rFrozen].top - r[0].top;
-            }
-        }
-        var x1 = c[range.c1].left - offsetX;
-        var y1 = r[range.r1].top - offsetY;
-        var x2 = Math.min( c[range.c2].left - offsetX + c[range.c2].width, widthCtx );
-        var y2 = Math.min( r[range.r2].top - offsetY + r[range.r2].height, heightCtx );
-        ctx.setFillStyle( this.settings.cells.defaultState.background )
-            .fillRect( x1, y1, x2 - x1, y2 - y1 )
-            .setStrokeStyle( this.settings.cells.defaultState.border )
-            .setLineWidth( 1 ).beginPath();
+		if (range === undefined) {
+			range = this.visibleRange;
+		}
+		var ctx = drawingCtx || this.drawingCtx;
+		var c = this.cols;
+		var r = this.rows;
+		var widthCtx = (width) ? width : ctx.getWidth();
+		var heightCtx = (height) ? height : ctx.getHeight();
+		var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
+		var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
+		if (null === drawingCtx && this.topLeftFrozenCell) {
+			if (undefined === leftFieldInPt) {
+				var cFrozen = this.topLeftFrozenCell.getCol0();
+				offsetX -= c[cFrozen].left - c[0].left;
+			}
+			if (undefined === topFieldInPt) {
+				var rFrozen = this.topLeftFrozenCell.getRow0();
+				offsetY -= r[rFrozen].top - r[0].top;
+			}
+		}
+		var x1 = c[range.c1].left - offsetX;
+		var y1 = r[range.r1].top - offsetY;
+		var x2 = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+		var y2 = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
+		ctx.setFillStyle(this.settings.cells.defaultState.background)
+			.fillRect(x1, y1, x2 - x1, y2 - y1)
+			.setStrokeStyle(this.settings.cells.defaultState.border)
+			.setLineWidth(1).beginPath();
 
-        var w, h;
-        for ( var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i ) {
-            w = c[i].width;
-            x += w;
-            if ( w >= this.width_1px ) {
-                ctx.lineVerPrevPx( x, y1, y2 );
-            }
-        }
-        for ( var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j ) {
-            h = r[j].height;
-            y += h;
-            if ( h >= this.height_1px ) {
-                ctx.lineHorPrevPx( x1, y, x2 );
-            }
-        }
+		var w, h;
+		for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
+			w = c[i].width;
+			x += w;
+			if (w >= this.width_1px) {
+				ctx.lineVerPrevPx(x, y1, y2);
+			}
+		}
+		for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
+			h = r[j].height;
+			y += h;
+			if (h >= this.height_1px) {
+				ctx.lineHorPrevPx(x1, y, x2);
+			}
+		}
 
-        ctx.stroke();
-    };
+		ctx.stroke();
+	};
 
     WorksheetView.prototype._drawCellsAndBorders = function ( drawingCtx, range, offsetXForDraw, offsetYForDraw ) {
         if ( range === undefined ) {
