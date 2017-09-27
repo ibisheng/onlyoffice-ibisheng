@@ -4427,7 +4427,7 @@ PasteProcessor.prototype =
 		for (var Index = 0; Index < Count; Index++) {
 			var _char = text.charAt(Index);
 			var _charCode = text.charCodeAt(Index);
-			if(_charCode === 10 ||  Index === Count - 1){
+			if(_charCode === 0x0A ||  Index === Count - 1){
 				var newParaRun = new ParaRun();
 				this._addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
