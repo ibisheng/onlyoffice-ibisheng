@@ -4407,19 +4407,12 @@ PasteProcessor.prototype =
 		{
 			oThis.aContent = [];
 
-			if(bTurnOffTrackRevisions){
-				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = false;
-			}
-
 			oThis._getContentFromText(text);
 
 			oThis._AddNextPrevToContent(oThis.oDocument);
 			if(false === oThis.bNested)
 			{
 				oThis.InsertInDocument();
-			}
-			if(bTurnOffTrackRevisions){
-				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
 			}
 		};
 
