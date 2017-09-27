@@ -2003,6 +2003,7 @@ function CT_pivotTableDefinition() {
 	this.cacheDefinition = null;
 
 	this.pageFieldsPositions = null;
+	this.clearGrid = false;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -2719,6 +2720,20 @@ CT_pivotTableDefinition.prototype.init = function () {
 	}
 
 	this.location.setPageCount(rowPageCount, colPageCount);
+	this.updatePivotType();
+};
+CT_pivotTableDefinition.prototype.updatePivotType = function () {
+	this.clearGrid = false;
+	var field;
+	var pivotFields = this.asc_getPivotFields();
+	var rowFields = this.asc_getRowFields();
+	for (var i = 0; i < rowFields.length; ++i) {
+		field = pivotFields[rowFields[i].asc_getIndex()];
+		if (false !== field.outline) {
+			this.clearGrid = true;
+			break;
+		}
+	}
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);

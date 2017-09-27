@@ -2384,6 +2384,22 @@
 		}
 
 		ctx.stroke();
+
+		// Clear grid for pivot tables with classic and outline layout
+		var clearRange, pivotRange, clearRanges = this.model.getPivotTablesClearRanges(range);
+		ctx.setFillStyle(this.settings.cells.defaultState.background);
+		for (i = 0; i < clearRanges.length; i += 2) {
+			clearRange = clearRanges[i];
+			pivotRange = clearRanges[i + 1];
+			x1 = c[clearRange.c1].left - offsetX + (clearRange.c1 === pivotRange.c1 ? this.width_1px : 0);
+			y1 = r[clearRange.r1].top - offsetY + (clearRange.r1 === pivotRange.r1 ? this.height_1px : 0);
+			x2 = Math.min(c[clearRange.c2].left - offsetX + c[clearRange.c2].width -
+				(clearRange.c2 === pivotRange.c2 ? this.width_1px : 0), widthCtx);
+			y2 = Math.min(r[clearRange.r2].top - offsetY + r[clearRange.r2].height -
+				(clearRange.r2 === pivotRange.r2 ? this.height_1px : 0), heightCtx);
+
+			ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+        }
 	};
 
     WorksheetView.prototype._drawCellsAndBorders = function ( drawingCtx, range, offsetXForDraw, offsetYForDraw ) {

@@ -5486,6 +5486,21 @@
 		}
 		return res;
 	};
+	Worksheet.prototype.getPivotTablesClearRanges = function (range) {
+		// For outline and compact pivot tables layout we need clear the grid
+		var pivotTable, pivotRange, intersection, res = [];
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			pivotTable = this.pivotTables[i];
+			if (pivotTable.clearGrid) {
+				pivotRange = pivotTable.getRange();
+				if (intersection = pivotRange.intersectionSimple(range)) {
+					res.push(intersection);
+					res.push(pivotRange);
+				}
+			}
+		}
+		return res;
+	};
 	Worksheet.prototype.excludeHiddenRows = function (bExclude) {
 		this.bExcludeHiddenRows = bExclude;
 	};
