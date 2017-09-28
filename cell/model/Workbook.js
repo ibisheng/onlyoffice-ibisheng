@@ -5277,7 +5277,7 @@
 				}
 			}
 			// First Row Stripe, Second Row Stripe
-			if (styleInfo.showRowStripes) {
+			if (styleInfo.showRowStripes && countR && (pivotRange.c1 + countR - 1 !== pivotRange.c2)) {
 				stripe1 = style.firstRowStripe || emptyStripe;
 				stripe2 = style.secondRowStripe || emptyStripe;
 				start = pivotRange.r1 + firstHeaderRow0 + 1;
