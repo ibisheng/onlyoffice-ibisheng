@@ -2727,11 +2727,13 @@ CT_pivotTableDefinition.prototype.updatePivotType = function () {
 	var field;
 	var pivotFields = this.asc_getPivotFields();
 	var rowFields = this.asc_getRowFields();
-	for (var i = 0; i < rowFields.length; ++i) {
-		field = pivotFields[rowFields[i].asc_getIndex()];
-		if (false !== field.outline) {
-			this.clearGrid = true;
-			break;
+	if (rowFields) {
+		for (var i = 0; i < rowFields.length; ++i) {
+			field = pivotFields[rowFields[i].asc_getIndex()];
+			if (false !== field.outline) {
+				this.clearGrid = true;
+				break;
+			}
 		}
 	}
 };
