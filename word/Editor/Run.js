@@ -5637,6 +5637,9 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
 
     var NeedUpdate = false;
 
+	var isFieldCode  = SearchPos.IsComplexFieldCode();
+	var isFieldValue = SearchPos.IsComplexFieldValue();
+
     // На первом этапе ищем позицию первого непробельного элемента
     if ( 0 === SearchPos.Stage )
     {
@@ -5647,10 +5650,17 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
 
             var bSpace = false;
 
+			if (para_FieldChar === Type)
+			{
+				SearchPos.ProcessComplexFieldChar(-1, Item);
+				isFieldCode  = SearchPos.IsComplexFieldCode();
+				isFieldValue = SearchPos.IsComplexFieldValue();
+			}
+
             if ( para_Space === Type || para_Tab === Type || ( para_Text === Type && true === Item.Is_NBSP() ) || ( para_Drawing === Type && true !== Item.Is_Inline() ) )
                 bSpace = true;
 
-            if ( true === bSpace )
+            if ( true === bSpace || isFieldCode )
             {
                 CurPos--;
 
@@ -5692,6 +5702,16 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
         var Item = this.Content[CurPos];
         var TempType = Item.Type;
 
+		if (para_FieldChar === Item.Type)
+		{
+			SearchPos.ProcessComplexFieldChar(-1, Item);
+			isFieldCode  = SearchPos.IsComplexFieldCode();
+			isFieldValue = SearchPos.IsComplexFieldValue();
+		}
+
+		if (isFieldCode)
+			continue;
+
         if ( (para_Text !== TempType && para_Math_Text !== TempType) || true === Item.Is_NBSP() || ( true === SearchPos.Punctuation && true !== Item.Is_Punctuation() ) || ( false === SearchPos.Punctuation && false !== Item.Is_Punctuation() ) )
         {
             SearchPos.Found = true;
@@ -5717,6 +5737,9 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
 
     var NeedUpdate = false;
 
+	var isFieldCode  = SearchPos.IsComplexFieldCode();
+	var isFieldValue = SearchPos.IsComplexFieldValue();
+
     if ( 0 === SearchPos.Stage )
     {
         // На первом этапе ищем первый нетекстовый ( и не таб ) элемент
@@ -5726,21 +5749,31 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
             var Type = Item.Type;
             var bText = false;
 
+			if (para_FieldChar === Type)
+			{
+				SearchPos.ProcessComplexFieldChar(1, Item);
+				isFieldCode  = SearchPos.IsComplexFieldCode();
+				isFieldValue = SearchPos.IsComplexFieldValue();
+			}
+
             if ( (para_Text === Type || para_Math_Text === Type) && true != Item.Is_NBSP() && ( true === SearchPos.First || ( SearchPos.Punctuation === Item.Is_Punctuation() ) ) )
                 bText = true;
 
-            if ( true === bText )
+            if ( true === bText || isFieldCode )
             {
-                if ( true === SearchPos.First )
-                {
-                    SearchPos.First       = false;
-                    SearchPos.Punctuation = Item.Is_Punctuation();
-                }
+            	if (!isFieldCode)
+				{
+					if (true === SearchPos.First)
+					{
+						SearchPos.First       = false;
+						SearchPos.Punctuation = Item.Is_Punctuation();
+					}
+
+					// Отмечаем, что сдвиг уже произошел
+					SearchPos.Shift = true;
+				}
 
                 CurPos++;
-
-                // Отмечаем, что сдвиг уже произошел
-                SearchPos.Shift = true;
 
                 // Выходим из рана
                 if ( CurPos >= ContentLen )
@@ -5797,6 +5830,16 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
             CurPos++;
             var Item = this.Content[CurPos];
             var TempType = Item.Type;
+
+			if (para_FieldChar === Item.Type)
+			{
+				SearchPos.ProcessComplexFieldChar(1, Item);
+				isFieldCode  = SearchPos.IsComplexFieldCode();
+				isFieldValue = SearchPos.IsComplexFieldValue();
+			}
+
+			if (isFieldCode)
+				continue;
 
             if ( (true !== StepEnd && para_End === TempType) || !( para_Space === TempType || ( para_Text === TempType && true === Item.Is_NBSP() ) ) )
             {
