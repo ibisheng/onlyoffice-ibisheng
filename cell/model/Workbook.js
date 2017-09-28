@@ -5326,8 +5326,8 @@
 						dxf = style.lastColumn;
 						grandColumn = 1;
 					} else {
-						if (r + 1 !== countCWValues) {
-							if (countD && item.t) {
+						if (r + 1 !== countC) {
+							if (countD && null !== item.t) {
 								if (0 === r) {
 									dxf = style.firstSubtotalColumn;
 								} else if (1 === r % 2) {
@@ -5360,11 +5360,11 @@
 						r = item.getR();
 						if (r + 1 !== countR) {
 							if (0 === r) {
-								dxf = item.t ? style.firstSubtotalRow : style.firstRowSubheading;
+								dxf = null !== item.t ? style.firstSubtotalRow : style.firstRowSubheading;
 							} else if (1 === r % 2) {
-								dxf = item.t ? style.secondSubtotalRow : style.secondRowSubheading;
+								dxf = null !== item.t ? style.secondSubtotalRow : style.secondRowSubheading;
 							} else {
-								dxf = item.t ? style.thirdSubtotalRow : style.thirdRowSubheading;
+								dxf = null !== item.t ? style.thirdSubtotalRow : style.thirdRowSubheading;
 							}
 							pos = pivotTable.getRowFieldPos(r);
 						}
@@ -5396,9 +5396,10 @@
 						cells.setTableStyle(dxf);
 					}
 				}
+				pos = pivotRange.r1 + 1 + firstHeaderRow0 - (countR ? 1 : 0);
 				for (j = 0; j < items.length; ++j) {
 					item = items[j];
-					if (item.t && AscCommonExcel.c_oAscItemType.Grand !== item.t) {
+					if (null !== item.t && AscCommonExcel.c_oAscItemType.Grand !== item.t) {
 						r = item.getR();
 						if (0 === r) {
 							dxf = style.firstColumnSubheading;
@@ -5410,8 +5411,7 @@
 						dxf = dxf && dxf.dxf;
 						if (dxf) {
 							cells =
-								this.getRange3(pivotRange.r1 + 1 + r, start + j, pivotRange.r1 + 1 + firstHeaderRow0 -
-									(countR ? 1 : 0), start + j);
+								this.getRange3(pivotRange.r1 + 1 + r, start + j, pos, start + j);
 							cells.setTableStyle(dxf);
 						}
 					}
