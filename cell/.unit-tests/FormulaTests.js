@@ -9229,5 +9229,29 @@ $( function () {
 
 	});
 
+	test( "Test: \"IFS\"", function () {
+
+		oParser = new parserFormula( 'IFS(1,"TEST")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "TEST");
+
+		oParser = new parserFormula( 'IFS(0,"TEST",1,"TEST2")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "TEST2");
+
+		oParser = new parserFormula( 'IFS(2<1,">3")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A");
+
+		oParser = new parserFormula( 'IFS(2<1,">3",2>1)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A");
+
+		oParser = new parserFormula( 'IFS(2<1,"TEST",2<1,2,4>3,"TEST2")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "TEST2");
+        
+	});
+
 	wb.dependencyFormulas.unlockRecal();
 } );
