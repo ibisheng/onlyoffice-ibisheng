@@ -9253,5 +9253,27 @@ $( function () {
         
 	});
 
+	test( "Test: \"IF\"", function () {
+
+		oParser = new parserFormula('IF(1,"TEST")', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), "TEST");
+
+		oParser = new parserFormula('IF(0,"TEST")', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), "FALSE");
+
+		ws.getRange2( "A101" ).setValue( "1" );
+
+		oParser = new parserFormula('IF(A101=1,"Yes","No")', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), "Yes");
+
+		oParser = new parserFormula('IF(A101=2,"Yes","No")', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), "No");
+
+	});
+
 	wb.dependencyFormulas.unlockRecal();
 } );
