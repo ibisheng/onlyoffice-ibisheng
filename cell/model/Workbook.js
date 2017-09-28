@@ -5212,7 +5212,7 @@
 	};
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
 		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, firstHeaderRow0, countC,
-			countCWValues, countR, countD, stripe1, stripe2, items, item, start = 0,
+			countCWValues, countR, countD, stripe1, stripe2, items, item, start,
 			emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues, grandColumn;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
@@ -5355,6 +5355,7 @@
 					item = items[j];
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countR) {
 						dxf = style.totalRow;
+						pos = 0;
 					} else if (styleInfo.showRowHeaders) {
 						r = item.getR();
 						if (r + 1 !== countR) {
@@ -5365,12 +5366,12 @@
 							} else {
 								dxf = item.t ? style.thirdSubtotalRow : style.thirdRowSubheading;
 							}
+							pos = pivotTable.getRowFieldPos(r);
 						}
 					}
 					dxf = dxf && dxf.dxf;
 					if (dxf) {
-						cells = this.getRange3(start + j, pivotRange.c1 + pivotTable.getRowFieldPos(r), start + j,
-							pivotRange.c2);
+						cells = this.getRange3(start + j, pivotRange.c1 + pos, start + j, pivotRange.c2);
 						cells.setTableStyle(dxf);
 					}
 				}
