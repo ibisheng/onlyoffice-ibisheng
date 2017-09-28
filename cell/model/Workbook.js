@@ -5211,8 +5211,9 @@
 		}
 	};
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, countC, countR, countD, stripe1,
-			stripe2, items, item, start = 0, emptyStripe = new Asc.CTableStyleElement();
+		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, firstHeaderRow0, countC,
+			countCWValues, countR, countD, stripe1, stripe2, items, item, start = 0,
+			emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues, grandColumn;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			grandColumn = 0;
@@ -5249,11 +5250,14 @@
 
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
-			countD = pivotTable.getDataFieldsCount();
 
 			if (0 === countC + countR) {
 				continue;
 			}
+
+			firstHeaderRow0 = pivotTable.getFirstHeaderRow() + countC - 1;
+			countD = pivotTable.getDataFieldsCount();
+			countCWValues = pivotTable.getColumnFieldsCount(true);
 
 			// Whole Table
 			cells.setTableStyle(wholeStyle);
@@ -5276,7 +5280,7 @@
 			if (styleInfo.showRowStripes) {
 				stripe1 = style.firstRowStripe || emptyStripe;
 				stripe2 = style.secondRowStripe || emptyStripe;
-				start = pivotRange.r1 + countC + 1;
+				start = pivotRange.r1 + firstHeaderRow0 + 1;
 				if (stripe1.dxf) {
 					cells = this.getRange3(start, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 					cells.setTableStyle(stripe1.dxf, new Asc.CTableStyleStripe(stripe1.size, stripe2.size, true));
@@ -5298,14 +5302,14 @@
 			// Header Row
 			dxf = style.headerRow && style.headerRow.dxf;
 			if (styleInfo.showColHeaders && dxf) {
-				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + firstHeaderRow0, pivotRange.c2);
 				cells.setTableStyle(dxf);
 			}
 
 			// First Header Cell
 			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
-			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countC && dxf) {
-				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - (countR ? 1 : 0),
+			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countCWValues && (countR + countD) && dxf) {
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + firstHeaderRow0 - (countR ? 1 : 0),
 					pivotRange.c1 + Math.max(0, countR - 1));
 				cells.setTableStyle(dxf);
 			}
@@ -5318,11 +5322,11 @@
 					dxf = null;
 					item = items[j];
 					r = item.getR();
-					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countC) {
+					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countCWValues) {
 						dxf = style.lastColumn;
 						grandColumn = 1;
 					} else {
-						if (r + 1 !== countC) {
+						if (r + 1 !== countCWValues) {
 							if (countD && item.t) {
 								if (0 === r) {
 									dxf = style.firstSubtotalColumn;
@@ -5345,7 +5349,7 @@
 			items = pivotTable.getRowItems();
 			if (items && countR) {
 				countR = pivotTable.getRowFieldsCount();
-				start = pivotRange.r1 + countC + 1;
+				start = pivotRange.r1 + firstHeaderRow0 + 1;
 				for (j = 0; j < items.length; ++j) {
 					dxf = null;
 					item = items[j];
@@ -5376,7 +5380,7 @@
 			items = pivotTable.getColItems();
 			if (items) {
 				start = pivotRange.c1 + countR;
-				for (j = 0; j < countC; ++j) {
+				for (j = 0; j < countCWValues; ++j) {
 					if (0 === j) {
 						dxf = style.firstColumnSubheading;
 					} else if (1 === j % 2) {
@@ -5404,8 +5408,9 @@
 						}
 						dxf = dxf && dxf.dxf;
 						if (dxf) {
-							cells = this.getRange3(pivotRange.r1 + 1 + r, start + j, pivotRange.r1 + 1 + countC -
-								(countR ? 1 : 0), start + j);
+							cells =
+								this.getRange3(pivotRange.r1 + 1 + r, start + j, pivotRange.r1 + 1 + firstHeaderRow0 -
+									(countR ? 1 : 0), start + j);
 							cells.setTableStyle(dxf);
 						}
 					}
@@ -5450,7 +5455,7 @@
 	};
 	Worksheet.prototype.getPivotTableButtons = function (range) {
 		var res = [];
-		var pivotTable, pivotRange, j, pos, countC, countR, cell;
+		var pivotTable, pivotRange, j, pos, countC, countCWValues, countR, firstHeaderRow0, cell;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
 			if (!pivotTable.intersection(range)) {
@@ -5467,16 +5472,18 @@
 
 			if (false !== pivotTable.showHeaders) {
 				countC = pivotTable.getColumnFieldsCount();
+				countCWValues = pivotTable.getColumnFieldsCount(true);
 				countR = pivotTable.getRowFieldsCount(true);
 				pivotRange = pivotTable.getRange();
+				firstHeaderRow0 = pivotTable.getFirstHeaderRow() + countC - 1;
 
 				if (countR) {
-					cell = new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1);
+					cell = new AscCommon.CellBase(pivotRange.r1 + firstHeaderRow0, pivotRange.c1);
 					if (range.contains2(cell)) {
 						res.push(cell);
 					}
 				}
-				if (countC) {
+				if (countCWValues) {
 					cell = new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + countR);
 					if (range.contains2(cell)) {
 						res.push(cell);

@@ -2759,11 +2759,14 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;
 };
-CT_pivotTableDefinition.prototype.getColumnFieldsCount = function () {
+CT_pivotTableDefinition.prototype.getFirstHeaderRow = function () {
+	return this.location && this.location.firstHeaderRow;
+};
+CT_pivotTableDefinition.prototype.getColumnFieldsCount = function (withoutValues) {
 	var res = 0;
 	if (this.colFields) {
 		res = this.colFields.field.length;
-		if (1 === res && st_VALUES === this.colFields.field[0].x) {
+		if (1 === res && withoutValues && st_VALUES === this.colFields.field[0].x) {
 			res = 0;
 		}
 	}
