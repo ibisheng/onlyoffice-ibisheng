@@ -639,7 +639,7 @@ RotateState.prototype =
                     aCopies.push(copy);
 
                     tracks[i].originalObject = copy;
-                    tracks[i].trackEnd(false, false);
+                    tracks[i].trackEnd(false, true);
                     this.drawingObjects.selectObject(copy, 0);
                     if(!(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld))
                     {
@@ -797,7 +797,7 @@ RotateState.prototype =
                         function () {
 
                             for(i = 0; i < tracks.length; ++i){
-                                tracks[i].trackEnd(false, false);
+                                tracks[i].trackEnd(false, bFlag);
                             }
                             var oGroupMaps = {};
                             for(i = 0; i < aConnectors.length; ++i){
