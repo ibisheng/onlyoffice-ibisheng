@@ -7986,6 +7986,12 @@ background-repeat: no-repeat;\
 		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
 		return oBinaryFileWriter.Write();
 	};
+	window["asc_docs_api"].prototype["asc_nativeGetFile2"] = function()
+	{
+		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
+		return oBinaryFileWriter.Write(false, true);
+
+	};
 
 	window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 	{
