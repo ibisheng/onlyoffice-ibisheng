@@ -7458,9 +7458,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-            delete t.sockjs;
-            t._initSocksJs();
+            _api.CoAuthoringApi._CoAuthoringApi._reconnect();
             break;
         }
 
