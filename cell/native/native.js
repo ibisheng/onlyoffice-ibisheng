@@ -7435,11 +7435,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            t._state = AscCommon.ConnectionState.WaitAuth;
-            t.onFirstConnect();
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerOpen();
             break;
         }
 

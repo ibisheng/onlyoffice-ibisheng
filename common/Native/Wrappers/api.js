@@ -2220,11 +2220,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            t._state = AscCommon.ConnectionState.WaitAuth;
-            t.onFirstConnect();
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerOpen();
             break;
         }
 
