@@ -1865,8 +1865,17 @@ CGraphics.prototype =
     },
     drawVerLine : function(align, x, y, b, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
+            if (_check_transform)
+            {
+                this.SetIntegerGrid(true);
+                this.drawVerLine(align, x, y, b, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             this.p_width(penW * 1000);
             this._s();
             this._m(x, y);
@@ -1933,7 +1942,6 @@ CGraphics.prototype =
             }
         }
     },
-
     // мега крутые функции для таблиц
     drawHorLineExt : function(align, y, x, r, penW, leftMW, rightMW)
     {
