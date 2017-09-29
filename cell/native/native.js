@@ -7451,74 +7451,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            var dataObject = JSON.parse(params);
-
-            // console.log("JS - " + dataObject['type']);
-
-            switch (dataObject['type']) {
-              case 'auth'        :
-                t._onAuth(dataObject);
-                break;
-              case 'message'      :
-                t._onMessages(dataObject, false);
-                break;
-              case 'cursor'       :
-                t._onCursor(dataObject);
-                break;
-              case 'meta' :
-                t._onMeta(dataObject);
-                break;
-              case 'getLock'      :
-                t._onGetLock(dataObject);
-                break;
-              case 'releaseLock'    :
-                t._onReleaseLock(dataObject);
-                break;
-              case 'connectState'    :
-                t._onConnectionStateChanged(dataObject);
-                break;
-              case 'saveChanges'    :
-                t._onSaveChanges(dataObject);
-                break;
-              case 'saveLock'      :
-                t._onSaveLock(dataObject);
-                break;
-              case 'unSaveLock'    :
-                t._onUnSaveLock(dataObject);
-                break;
-              case 'savePartChanges'  :
-                t._onSavePartChanges(dataObject);
-                break;
-              case 'drop'        :
-                t._onDrop(dataObject);
-                break;
-              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                break;
-              case 'error'      : /*Старая версия sdk*/
-                t._onDrop(dataObject);
-                break;
-              case 'documentOpen'    :
-                t._documentOpen(dataObject);
-                break;
-              case 'warning':
-                t._onWarning(dataObject);
-                break;
-              case 'license':
-                t._onLicense(dataObject);
-                break;
-              case 'session' :
-                t._onSession(dataObject);
-                break;
-              case 'refreshToken' :
-                t._onRefreshToken(dataObject["messages"]);
-                break;
-              case 'expiredToken' :
-                t._onExpiredToken();
-                break;
-              }
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerMessage(params);
             break;
         }
 
