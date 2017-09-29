@@ -9243,6 +9243,7 @@ function CParaPr()
     this.NumPr             = undefined; // Нумерация
     this.PStyle            = undefined; // Стиль параграфа
     this.FramePr           = undefined;
+    this.OutlineLvl        = undefined; // Для TableOfContents
 
     this.DefaultRunPr      = undefined;
     this.Bullet            = undefined;
@@ -9325,6 +9326,9 @@ CParaPr.prototype =
             ParaPr.PrChange   = this.PrChange.Copy();
             ParaPr.ReviewInfo = this.ReviewInfo.Copy();
         }
+
+        if (undefined !== this.OutlineLvl)
+        	ParaPr.OutlineLvl = this.OutlineLvl;
 
         return ParaPr;
     },
@@ -9438,6 +9442,8 @@ CParaPr.prototype =
         if(undefined != ParaPr.DefaultTabSize)
             this.DefaultTabSize = ParaPr.DefaultTabSize;
 
+        if (undefined !== ParaPr.OutlineLvl)
+        	this.OutlineLvl = ParaPr.OutlineLvl;
     },
 
     Init_Default : function()
@@ -9471,6 +9477,7 @@ CParaPr.prototype =
         this.NumPr                     = undefined;
         this.PStyle                    = undefined;
         this.FramePr                   = undefined;
+        this.OutlineLvl                = undefined;
 
         this.DefaultRunPr              = undefined;
         this.Bullet                    = undefined;
@@ -9595,6 +9602,9 @@ CParaPr.prototype =
         {
             this.DefaultTabSize = ParaPr.DefaultTabSize;
         }
+
+        if (undefined !== ParaPr.OutlineLvl)
+        	this.OutlineLvl = ParaPr.OutlineLvl;
     },
 
     Compare : function(ParaPr)
@@ -9715,6 +9725,8 @@ CParaPr.prototype =
         if (undefined !== this.Tabs && undefined !== ParaPr.Tabs && this.Tabs.Is_Equal(ParaPr.Tabs))
         	Result_ParaPr.Tabs = this.Tabs.Copy();
 
+        if (this.OutlineLvl === ParaPr.OutlineLvl)
+        	Result_ParaPr.OutlineLvl = this.OutlineLvl;
 
         return Result_ParaPr;
     },
@@ -9857,6 +9869,12 @@ CParaPr.prototype =
             Flags |= 2097152;
         }
 
+        if (undefined !== this.OutlineLvl)
+		{
+			Writer.WriteByte(this.OutlineLvl);
+			Flags |= 4194304;
+		}
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -9975,6 +9993,9 @@ CParaPr.prototype =
         {
             this.DefaultTabSize = Reader.GetDouble();
         }
+
+        if (Flags & 4194304)
+			this.OutlineLvl = Reader.GetByte();
     },
 
     isEqual: function(ParaPrUOld,ParaPrNew)
@@ -10021,7 +10042,8 @@ CParaPr.prototype =
             || true !== IsEqualStyleObjects(this.Tabs, ParaPr.Tabs)
             || true !== IsEqualStyleObjects(this.NumPr, ParaPr.NumPr)
             || this.PStyle !== ParaPr.PStyle
-            || true !== IsEqualStyleObjects(this.FramePr, ParaPr.FramePr))
+            || true !== IsEqualStyleObjects(this.FramePr, ParaPr.FramePr)
+			|| this.OutlineLvl !== ParaPr.OutlineLvl)
             return false;
 
         return true;
@@ -10280,6 +10302,10 @@ CParaPr.prototype.Get_PStyle = function()
 {
     return this.PStyle;
 };
+CParaPr.prototype.Get_OutlineLvl = function()
+{
+	return this.OutlineLvl;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CParaPr Export
 //----------------------------------------------------------------------------------------------------------------------
@@ -10301,6 +10327,7 @@ CParaPr.prototype['Get_WidowControl']             = CParaPr.prototype.Get_WidowC
 CParaPr.prototype['Get_Tabs']                     = CParaPr.prototype.Get_Tabs;
 CParaPr.prototype['Get_NumPr']                    = CParaPr.prototype.Get_NumPr;
 CParaPr.prototype['Get_PStyle']                   = CParaPr.prototype.Get_PStyle;
+CParaPr.prototype['Get_OutlineLvl']               = CParaPr.prototype.Get_OutlineLvl;
 //----------------------------------------------------------------------------------------------------------------------
 
 function Copy_Bounds(Bounds)
