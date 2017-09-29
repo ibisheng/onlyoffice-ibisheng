@@ -1533,129 +1533,131 @@
     });
   };
 
-  DocsCoApi.prototype._initSocksJs = function() {
-    var t = this;
+	DocsCoApi.prototype._initSocksJs = function () {
+		var t = this;
 
-    var sockjs;
-    if (window['IS_NATIVE_EDITOR']) {
-        sockjs = this.sockjs = window['SockJS'];
-        sockjs.open();
-        return sockjs;
-    } else {
-        //ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
-        //при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-        sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null, {'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
-    }
+		var sockjs;
+		if (window['IS_NATIVE_EDITOR']) {
+			sockjs = this.sockjs = window['SockJS'];
+			sockjs.open();
+			return sockjs;
+		} else {
+			//ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
+			//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
+			sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null,
+				{'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+		}
 
-    sockjs.onopen = function() {
-      if (t.reconnectTimeout) {
-        clearTimeout(t.reconnectTimeout);
-        t.reconnectTimeout = null;
-        t.attemptCount = 0;
-      }
+		sockjs.onopen = function () {
+			if (t.reconnectTimeout) {
+				clearTimeout(t.reconnectTimeout);
+				t.reconnectTimeout = null;
+				t.attemptCount = 0;
+			}
 
-      t._state = ConnectionState.WaitAuth;
-        t.onFirstConnect();
-    };
-    sockjs.onmessage = function(e) {
-      //TODO: add checks and error handling
-      //Get data type
-      var dataObject = JSON.parse(e.data);
-      switch (dataObject['type']) {
-        case 'auth'        :
-          t._onAuth(dataObject);
-          break;
-        case 'message'      :
-          t._onMessages(dataObject, false);
-          break;
-        case 'cursor'       :
-          t._onCursor(dataObject);
-          break;
-        case 'meta' :
-          t._onMeta(dataObject);
-          break;
-        case 'getLock'      :
-          t._onGetLock(dataObject);
-          break;
-        case 'releaseLock'    :
-          t._onReleaseLock(dataObject);
-          break;
-        case 'connectState'    :
-          t._onConnectionStateChanged(dataObject);
-          break;
-        case 'saveChanges'    :
-          t._onSaveChanges(dataObject);
-          break;
-        case 'saveLock'      :
-          t._onSaveLock(dataObject);
-          break;
-        case 'unSaveLock'    :
-          t._onUnSaveLock(dataObject);
-          break;
-        case 'savePartChanges'  :
-          t._onSavePartChanges(dataObject);
-          break;
-        case 'drop'        :
-          t._onDrop(dataObject);
-          break;
-        case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-          break;
-        case 'error'      : /*Старая версия sdk*/
-          t._onDrop(dataObject);
-          break;
-        case 'documentOpen'    :
-          t._documentOpen(dataObject);
-          break;
-        case 'warning':
-          t._onWarning(dataObject);
-          break;
-        case 'license':
-          t._onLicense(dataObject);
-          break;
-        case 'session' :
-          t._onSession(dataObject);
-          break;
-        case 'refreshToken' :
-          t._onRefreshToken(dataObject["messages"]);
-          break;
-        case 'expiredToken' :
-          t._onExpiredToken();
-          break;
-		case 'forceSaveStart' :
-			t._onForceSaveStart(dataObject["messages"]);
-			break;
-		case 'forceSave' :
-			t._onForceSave(dataObject["messages"]);
-			break;
-      }
-    };
-    sockjs.onclose = function(evt) {
-      if (ConnectionState.SaveChanges === t._state) {
-        // Мы сохраняли изменения и разорвалось соединение
-        t._isReSaveAfterAuth = true;
-        // Очищаем предыдущий таймер
-        if (null !== t.saveCallbackErrorTimeOutId) {
-          clearTimeout(t.saveCallbackErrorTimeOutId);
-        }
-      }
-      t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.jwtError) || t.attemptCount >= t.maxAttemptCount);
-      var errorCode = null;
-      if (bIsDisconnectAtAll) {
-        t._state = ConnectionState.ClosedAll;
-        errorCode = t._getDisconnectErrorCode(evt.code);
-      }
-      if (t.onDisconnect) {
-        t.onDisconnect(evt.reason, errorCode);
-      }
-      //Try reconect
-      if (!bIsDisconnectAtAll) {
-        t._tryReconnect();
-      }
-    };
+			t._state = ConnectionState.WaitAuth;
+			t.onFirstConnect();
+		};
+		sockjs.onmessage = function (e) {
+			//TODO: add checks and error handling
+			//Get data type
+			var dataObject = JSON.parse(e.data);
+			switch (dataObject['type']) {
+				case 'auth'        :
+					t._onAuth(dataObject);
+					break;
+				case 'message'      :
+					t._onMessages(dataObject, false);
+					break;
+				case 'cursor'       :
+					t._onCursor(dataObject);
+					break;
+				case 'meta' :
+					t._onMeta(dataObject);
+					break;
+				case 'getLock'      :
+					t._onGetLock(dataObject);
+					break;
+				case 'releaseLock'    :
+					t._onReleaseLock(dataObject);
+					break;
+				case 'connectState'    :
+					t._onConnectionStateChanged(dataObject);
+					break;
+				case 'saveChanges'    :
+					t._onSaveChanges(dataObject);
+					break;
+				case 'saveLock'      :
+					t._onSaveLock(dataObject);
+					break;
+				case 'unSaveLock'    :
+					t._onUnSaveLock(dataObject);
+					break;
+				case 'savePartChanges'  :
+					t._onSavePartChanges(dataObject);
+					break;
+				case 'drop'        :
+					t._onDrop(dataObject);
+					break;
+				case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+					break;
+				case 'error'      : /*Старая версия sdk*/
+					t._onDrop(dataObject);
+					break;
+				case 'documentOpen'    :
+					t._documentOpen(dataObject);
+					break;
+				case 'warning':
+					t._onWarning(dataObject);
+					break;
+				case 'license':
+					t._onLicense(dataObject);
+					break;
+				case 'session' :
+					t._onSession(dataObject);
+					break;
+				case 'refreshToken' :
+					t._onRefreshToken(dataObject["messages"]);
+					break;
+				case 'expiredToken' :
+					t._onExpiredToken();
+					break;
+				case 'forceSaveStart' :
+					t._onForceSaveStart(dataObject["messages"]);
+					break;
+				case 'forceSave' :
+					t._onForceSave(dataObject["messages"]);
+					break;
+			}
+		};
+		sockjs.onclose = function (evt) {
+			if (ConnectionState.SaveChanges === t._state) {
+				// Мы сохраняли изменения и разорвалось соединение
+				t._isReSaveAfterAuth = true;
+				// Очищаем предыдущий таймер
+				if (null !== t.saveCallbackErrorTimeOutId) {
+					clearTimeout(t.saveCallbackErrorTimeOutId);
+				}
+			}
+			t._state = ConnectionState.Reconnect;
+			var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.jwtError) ||
+				t.attemptCount >= t.maxAttemptCount);
+			var errorCode = null;
+			if (bIsDisconnectAtAll) {
+				t._state = ConnectionState.ClosedAll;
+				errorCode = t._getDisconnectErrorCode(evt.code);
+			}
+			if (t.onDisconnect) {
+				t.onDisconnect(evt.reason, errorCode);
+			}
+			//Try reconect
+			if (!bIsDisconnectAtAll) {
+				t._tryReconnect();
+			}
+		};
 
-    return sockjs;
-  };
+		return sockjs;
+	};
 
   DocsCoApi.prototype._tryReconnect = function() {
     var t = this;
