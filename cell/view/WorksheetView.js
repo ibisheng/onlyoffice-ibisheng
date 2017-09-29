@@ -8548,10 +8548,12 @@
 						t.model.excludeHiddenRows(false);
 
 						// Если нужно удалить автофильтры - удаляем
-						if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
-							t.model.autoFilters.isEmptyAutoFilters(arn);
-						} else if (val === c_oAscCleanOptions.Format) {
-							t.model.autoFilters.cleanFormat(arn);
+						if(true !== window['AscCommonExcel'].specialFilteringMode){
+							if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
+								t.model.autoFilters.isEmptyAutoFilters(arn);
+							} else if (val === c_oAscCleanOptions.Format) {
+								t.model.autoFilters.cleanFormat(arn);
+							}
 						}
 
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
@@ -10362,6 +10364,12 @@
 			t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 		};
 
+		var checkLocalChange = function(val){
+			if(true === window['AscCommonExcel'].specialFilteringMode) {
+				History.LocalChange = val;
+			}
+		};
+
 		switch (prop) {
 			case "colWidth":
 				functionModelAction = function () {
@@ -10375,19 +10383,23 @@
 				break;
 			case "showCols":
 				functionModelAction = function () {
+					checkLocalChange(true);
 					t.model.setColHidden(false, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
+					checkLocalChange(false);
 				};
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "hideCols":
 				functionModelAction = function () {
+					checkLocalChange(true);
 					t.model.setColHidden(true, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
+					checkLocalChange(false);
 				};
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
@@ -10405,25 +10417,36 @@
 				return this._isLockedAll(onChangeWorksheetCallback);
 			case "showRows":
 				functionModelAction = function () {
+					checkLocalChange(true);
 					t.model.setRowHidden(false, arn.r1, arn.r2);
 					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
+					checkLocalChange(false);
 				};
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "hideRows":
 				functionModelAction = function () {
+					checkLocalChange(true);
 					t.model.setRowHidden(true, arn.r1, arn.r2);
 					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
 					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
+					checkLocalChange(false);
 				};
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "insCell":
+
+				if(true === window['AscCommonExcel'].specialFilteringMode){
+					if(val === c_oAscInsertOptions.InsertCellsAndShiftRight || val === c_oAscInsertOptions.InsertColumns){
+						return;
+					}
+				}
+
 				range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
 				switch (val) {
 					case c_oAscInsertOptions.InsertCellsAndShiftRight:
@@ -10533,6 +10556,13 @@
 				}
 				break;
 			case "delCell":
+
+				if(true === window['AscCommonExcel'].specialFilteringMode){
+					if(val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns){
+						return;
+					}
+				}
+
 				range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
 				switch (val) {
 					case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
@@ -13427,7 +13457,7 @@
         }
 
 		if(true === window['AscCommonExcel'].specialFilteringMode){
-			return;
+			return false;
 		}
 
         var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
@@ -13685,6 +13715,10 @@
 
         var deleteTableCallback = function (ref) {
 
+			if(true === window['AscCommonExcel'].specialFilteringMode){
+				return false;
+			}
+
             var callback = function (isSuccess) {
                 if (false === isSuccess) {
                     return;
@@ -13744,6 +13778,14 @@
     WorksheetView.prototype.af_checkInsDelCells = function (activeRange, val, prop, isFromFormatTable) {
         var ws = this.model;
         var res = true;
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			if(val === c_oAscInsertOptions.InsertCellsAndShiftRight || val === c_oAscInsertOptions.InsertColumns){
+				return false;
+			}else if(val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns){
+				return false;
+			}
+		}
 
         var intersectionTableParts = ws.autoFilters.getTableIntersectionRange(activeRange);
         var isPartTablePartsUnderRange = ws.autoFilters._isPartTablePartsUnderRange(activeRange);
@@ -13909,10 +13951,21 @@
 
         formatTableInfo.isDeleteColumn = true;
         formatTableInfo.isDeleteTable = true;
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			formatTableInfo.isDeleteColumn = false;
+			formatTableInfo.isInsertColumnRight = false;
+			formatTableInfo.isInsertColumnLeft = false;
+
+		}
     };
 
 	WorksheetView.prototype.af_convertTableToRange = function (tableName) {
         var t = this;
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
 
         var callback = function (isSuccess) {
             if (false === isSuccess) {
@@ -13954,6 +14007,10 @@
     WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
         var t = this;
         range = AscCommonExcel.g_oRangeCache.getAscRange(range);
+
+		if(true === window['AscCommonExcel'].specialFilteringMode){
+			return;
+		}
 
         var callback = function (isSuccess) {
             if (false === isSuccess) {
