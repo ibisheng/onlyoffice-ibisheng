@@ -2004,6 +2004,7 @@ function CT_pivotTableDefinition() {
 
 	this.pageFieldsPositions = null;
 	this.clearGrid = false;
+	this.hasCompact = true;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -2724,6 +2725,7 @@ CT_pivotTableDefinition.prototype.init = function () {
 };
 CT_pivotTableDefinition.prototype.updatePivotType = function () {
 	this.clearGrid = false;
+	this.hasCompact = false;
 	var field;
 	var pivotFields = this.asc_getPivotFields();
 	var rowFields = this.asc_getRowFields();
@@ -2732,7 +2734,9 @@ CT_pivotTableDefinition.prototype.updatePivotType = function () {
 			field = pivotFields[rowFields[i].asc_getIndex()];
 			if (false !== field.outline) {
 				this.clearGrid = true;
-				break;
+			}
+			if (false !== field.compact) {
+				this.hasCompact = true;
 			}
 		}
 	}

@@ -5484,9 +5484,12 @@
 				pivotRange = pivotTable.getRange();
 
 				if (countR) {
-					cell = new AscCommon.CellBase(pivotRange.r1 + pivotTable.getFirstHeaderRow0(), pivotRange.c1);
-					if (range.contains2(cell)) {
-						res.push(cell);
+					countR = pivotTable.hasCompact ? 1 : countR;
+					for (j = 0; j < countR; ++j) {
+						cell = new AscCommon.CellBase(pivotRange.r1 + pivotTable.getFirstHeaderRow0(), pivotRange.c1 + j);
+						if (range.contains2(cell)) {
+							res.push(cell);
+						}
 					}
 				}
 				if (countCWValues) {
