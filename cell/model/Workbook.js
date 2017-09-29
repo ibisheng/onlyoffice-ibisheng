@@ -2500,12 +2500,14 @@
 		}
 	};
 	SheetMemory.prototype.insertRange = function(start, insertCount) {
-		this.checkSize(this.count + insertCount);
-		var startOffset = start * this.structSize;
-		var endOffset = (start + insertCount) * this.structSize;
-		var endData = (this.count - insertCount) * this.structSize;
-		this.data.set(this.data.subarray(startOffset, endData), endOffset);
-		this.data.fill(0, startOffset, endOffset);
+		if (start < this.count) {
+			this.checkSize(this.count + insertCount);
+			var startOffset = start * this.structSize;
+			var endOffset = (start + insertCount) * this.structSize;
+			var endData = (this.count - insertCount) * this.structSize;
+			this.data.set(this.data.subarray(startOffset, endData), endOffset);
+			this.data.fill(0, startOffset, endOffset);
+		}
 	};
 	SheetMemory.prototype.copyRange = function(sheetMemory, startFrom, startTo, count) {
 		sheetMemory.checkSize(startFrom + count);
@@ -2517,11 +2519,14 @@
 		this.data.set(sheetMemory.data.subarray(startOffsetFrom, endOffsetFrom), startOffsetTo);
 	};
 	SheetMemory.prototype.copyRangeByChunk = function(from, fromCount, to, toCount) {
-		var fromStartOffset = from * this.structSize;
-		var fromEndOffset = (from + fromCount) * this.structSize;
-		var fromSubArray = this.data.subarray(fromStartOffset, fromEndOffset);
-		for (var i = to; i < to + toCount; i += fromCount) {
-			this.data.set(fromSubArray, i * this.structSize);
+		if (from < this.count) {
+			this.checkSize(to + toCount);
+			var fromStartOffset = from * this.structSize;
+			var fromEndOffset = Math.min((from + fromCount), this.count) * this.structSize;
+			var fromSubArray = this.data.subarray(fromStartOffset, fromEndOffset);
+			for (var i = to; i < to + toCount; i += fromCount) {
+				this.data.set(fromSubArray, i * this.structSize);
+			}
 		}
 	};
 	SheetMemory.prototype.fill = function(value, start, end) {
@@ -4407,7 +4412,7 @@
 			} else {
 				toData = oThis.getColDataNoEmpty(to);
 				if(toData) {
-					toData.copyRange(fromData, r1From, r1To, count);
+					toData.fill(0, r1To, r1To + count);
 				}
 			}
 		};
