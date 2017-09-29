@@ -2759,8 +2759,11 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;
 };
-CT_pivotTableDefinition.prototype.getFirstHeaderRow = function () {
-	return this.location && this.location.firstHeaderRow;
+CT_pivotTableDefinition.prototype.getFirstHeaderRow0 = function () {
+	return this.location && (this.location.firstHeaderRow + this.getColumnFieldsCount() - 1);
+};
+CT_pivotTableDefinition.prototype.getFirstDataCol = function () {
+	return this.location && this.location.firstDataCol;
 };
 CT_pivotTableDefinition.prototype.getColumnFieldsCount = function (withoutValues) {
 	var res = 0;
