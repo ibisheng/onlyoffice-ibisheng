@@ -634,9 +634,34 @@ CImageShape.prototype.draw = function(graphics, transform)
     var oldBrush = this.brush;
     var oldPen = this.pen;
 
-    this.brush = new AscFormat.CUniFill();
-    this.brush.fill = this.blipFill;
-    this.pen = null;
+    if(this.getObjectType() === AscDFH.historyitem_type_OleObject){
+        var sImageId = this.blipFill && this.blipFill.RasterImageId;
+        if(sImageId){
+            var oApi = editor || window['Asc']['editor'];
+            if(oApi){
+                sImageId = AscCommon.getFullImageSrc2(sImageId);
+                var _img = editor.ImageLoader.map_image_index[sImageId];
+                if ((_img && _img.Status === AscFonts.ImageLoadStatus.Loading) || (_img && _img.Image)){
+                    this.brush = new AscFormat.CUniFill();
+                    this.brush.fill = this.blipFill;
+                    this.pen = null;
+                }
+                else{
+                    this.brush = AscFormat.CreateNoFillUniFill();
+                }
+            }
+        }
+        else{
+            this.brush = new AscFormat.CUniFill();
+            this.brush.fill = this.blipFill;
+            this.pen = null;
+        }
+    }
+    else{
+        this.brush = new AscFormat.CUniFill();
+        this.brush.fill = this.blipFill;
+        this.pen = null;
+    }
 
     shape_drawer.fromShape2(this, graphics, this.calcGeometry);
     shape_drawer.draw(this.calcGeometry);
