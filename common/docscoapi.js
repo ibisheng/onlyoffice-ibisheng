@@ -1666,19 +1666,21 @@
 			this._tryReconnect();
 		}
 	};
-  DocsCoApi.prototype._tryReconnect = function() {
-    var t = this;
-    if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout);
-      t.reconnectTimeout = null;
-    }
-    ++this.attemptCount;
-    this.reconnectTimeout = setTimeout(function() {
-      delete t.sockjs;
-      t._initSocksJs();
-    }, this.reconnectInterval);
-
-  };
+	DocsCoApi.prototype._reconnect = function () {
+		delete this.sockjs;
+		this._initSocksJs();
+	};
+	DocsCoApi.prototype._tryReconnect = function () {
+		var t = this;
+		if (this.reconnectTimeout) {
+			clearTimeout(this.reconnectTimeout);
+			t.reconnectTimeout = null;
+		}
+		++this.attemptCount;
+		this.reconnectTimeout = setTimeout(function () {
+			t._reconnect();
+		}, this.reconnectInterval);
+	};
 
   DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
     if (c_oCloseCode.serverShutdown === opt_closeCode) {
