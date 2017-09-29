@@ -3114,6 +3114,19 @@ DrawingObjectsController.prototype =
         if(oPr.isEqual(chartSettings)){
             return;
         }
+
+        //for bug http://bugzilla.onlyoffice.com/show_bug.cgi?id=35570
+        var type = chartSettings.getType();
+        if(oPr.getType() === type){
+            chartSettings.type = null;
+            var testChartSettings = new AscCommon.asc_ChartSettings();
+            if(testChartSettings.isEqual(chartSettings)){
+                chartSettings.type = type;
+                return;
+            }
+            chartSettings.type = type;
+        }
+
         //Title Settings
         chart_space.setChart(chart_space.chart.createDuplicate());
 
@@ -3128,10 +3141,9 @@ DrawingObjectsController.prototype =
 
         var chart = chart_space.chart;
         var plot_area = chart.plotArea;
-        var type = chartSettings.getType();
         if(AscFormat.isRealNumber(style_index)){
             --style_index;
-            var oCurChartSettings = this.getPropsFromChart(chartSpace);
+            var oCurChartSettings = oPr;
             var _cur_type = oCurChartSettings.type;
             if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
 
