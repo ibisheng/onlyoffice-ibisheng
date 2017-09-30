@@ -2273,14 +2273,15 @@ DrawingObjectsController.prototype =
 
     },
 
-    deleteSelectedObjects: function()
-    {
-        var content = this.getTargetDocContent();
-        if(content && !content.Selection.Use)
-        {
+    deleteSelectedObjects: function(){
+        if(Asc["editor"] && Asc["editor"].isChartEditor && (!this.selection.chartSelection)){
             return;
         }
-        this.remove(-1);
+        var oThis = this;
+        this.checkSelectedObjectsAndCallback(function(){
+            oThis.resetTextSelection();
+            oThis.removeCallback(-1);
+        }, [], false, AscDFH.historydescription_Spreadsheet_Remove);
     },
 
 
