@@ -8817,6 +8817,14 @@ Paragraph.prototype.Set_Bullet = function(Bullet)
 	this.CompiledPr.NeedRecalc = true;
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
+Paragraph.prototype.SetOutlineLvl = function(nLvl)
+{
+	this.private_AddPrChange();
+	History.Add(new CChangesParagraphOutlineLvl(this, this.Pr.OutlineLvl, nLvl));
+	this.Pr.OutlineLvl = nLvl;
+	this.CompiledPr.NeedRecalc = true;
+	this.private_UpdateTrackRevisionOnChangeParaPr(true);
+};
 /**
  * Проверяем начинается ли текущий параграф с новой страницы.
  */
@@ -12350,6 +12358,12 @@ Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 	var arrComplexFields = this.GetCurrentComplexFields(bReturnFieldPos);
 	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
 	return arrComplexFields;
+};
+Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
+{
+	var ParaPr = this.Get_CompiledPr2(false);
+	if (undefined !== ParaPr.OutlineLvl)
+		arrOutline.push({Paragraph : this, Lvl : ParaPr.OutlineLvl});
 };
 
 var pararecalc_0_All  = 0;

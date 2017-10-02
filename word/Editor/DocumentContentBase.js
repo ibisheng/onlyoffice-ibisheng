@@ -881,3 +881,15 @@ CDocumentContentBase.prototype.IsSelectedSingleElement = function()
 {
 	return (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
 };
+CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline)
+{
+	if (!arrOutline)
+		arrOutline = [];
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetOutlineParagraphs(arrOutline);
+	}
+
+	return arrOutline;
+};

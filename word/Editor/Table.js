@@ -12094,6 +12094,19 @@ CTable.prototype.GetAllContentControls = function(arrContentControls)
 		}
 	}
 };
+CTable.prototype.GetOutlineParagraphs = function(arrOutline)
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.Content[nCurRow];
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.Get_Cell(nCurCell);
+			if (oCell)
+				oCell.Content.GetOutlineParagraphs(arrOutline);
+		}
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

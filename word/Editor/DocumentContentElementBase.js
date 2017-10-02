@@ -693,6 +693,9 @@ CDocumentContentElementBase.prototype.Get_Index = function()
 
 	return this.Index;
 };
+CDocumentContentElementBase.prototype.GetOutlineParagraphs = function(arrOutline)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
