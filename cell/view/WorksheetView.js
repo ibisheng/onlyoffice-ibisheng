@@ -6641,6 +6641,10 @@
 				{
 					bResult = null;
 				}
+				else if(arn.c1 === expandRange.c1 && arn.c2 === expandRange.c2)
+				{
+					bResult = null;
+				}
 				else
 				{
 					bResult = true;
