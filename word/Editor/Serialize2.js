@@ -236,7 +236,8 @@ var c_oSerProp_pPrType = {
 	FramePr: 30,
 	SectPr: 31,
 	numPr_Ins: 32,
-	pPrChange: 33
+	pPrChange: 33,
+	outlineLvl: 34
 };
 var c_oSerProp_rPrType = {
     Bold:0,
@@ -1736,6 +1737,12 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){WriteTrackRevision(oThis.bs, oThis.saveParams.trackRevisionId++, pPr.ReviewInfo, {bpPrs: bpPrs, pPr: pPr.PrChange});});
         }
+		if(null != pPr.OutlineLvl)
+		{
+			this.memory.WriteByte(c_oSerProp_pPrType.outlineLvl);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(pPr.OutlineLvl);
+		}
     };
     this.WriteInd = function(Ind)
     {
@@ -7321,6 +7328,9 @@ function Binary_pPrReader(doc, oReadResult, stream)
                     res = c_oSerConstants.ReadUnknown;
                 }
                 break;
+			case c_oSerProp_pPrType.outlineLvl:
+				pPr.OutlineLvl = this.stream.GetLongLE();
+				break;
             default:
                 res = c_oSerConstants.ReadUnknown;
                 break;
