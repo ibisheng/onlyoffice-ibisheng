@@ -2678,7 +2678,12 @@
 						for (var Index = 0; Index < Count; Index++) {
 							var _char = text.charAt(Index);
 							var _charCode = text.charCodeAt(Index);
-							if(_charCode === 0x0A ||  Index === Count - 1){
+
+							if(_charCode !== 0x0A){
+								insertText += _char;
+							}
+
+							if(_charCode === 0x0A || Index === Count - 1){
 								var newParaRun = new ParaRun();
 								window['AscCommon'].addTextIntoRun(newParaRun, insertText);
 								newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
@@ -2688,8 +2693,6 @@
 
 								insertText = "";
 								newParagraph = new Paragraph(isIntoShape.DrawingDocument, isIntoShape);
-							} else{
-								insertText += _char;
 							}
 						}
 
