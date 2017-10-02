@@ -40,6 +40,7 @@ var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
 var fieldtype_PAGECOUNT  = 0x0003;
 var fieldtype_FORMTEXT   = 0x0004;
+var fieldtype_TOC        = 0x0005;
 
 /**
  *

@@ -3167,6 +3167,34 @@ CStyle.prototype.CreateFootnoteReference = function()
 	this.Set_UnhideWhenUsed(true);
 	this.Set_TextPr(oTextPr);
 };
+CStyle.prototype.CreateTOC1 = function()
+{
+	var ParaPr = {
+		Spacing : {
+			After  : 5 * g_dKoef_pt_to_mm
+		}
+	};
+
+	this.Set_UiPriority(39);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_ParaPr(ParaPr);
+};
+CStyle.prototype.CreateTOC2 = function()
+{
+	var ParaPr = {
+		Spacing : {
+			After  : 5 * g_dKoef_pt_to_mm
+		},
+
+		Ind : {
+			Left : 11 * g_dKoef_pt_to_mm
+		}
+	};
+
+	this.Set_UiPriority(39);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_ParaPr(ParaPr);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -3199,7 +3227,8 @@ function CStyles(bCreateDefault)
 			Title             : null,
 			Subtitle          : null,
 			Quote             : null,
-			IntenseQuote      : null
+			IntenseQuote      : null,
+			TOC               : []
 		};
 
         // Заполняем значения по умолчанию
@@ -3440,6 +3469,14 @@ function CStyles(bCreateDefault)
 		var StyleFootnoteReference = new CStyle("footnote reference", this.Default.Character, null, styletype_Character);
 		StyleFootnoteReference.CreateFootnoteReference();
 		this.Default.FootnoteReference = this.Add(StyleFootnoteReference);
+
+		var TOC1 = new CStyle("toc 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		TOC1.CreateTOC1();
+		this.Default.TOC[0] = this.Add(TOC1);
+
+		var TOC2 = new CStyle("toc 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		TOC2.CreateTOC2();
+		this.Default.TOC[1] = this.Add(TOC2);
 
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
@@ -4482,6 +4519,11 @@ CStyles.prototype.GetDefaultFootnoteTextChar = function()
 CStyles.prototype.GetDefaultFootnoteReference = function()
 {
 	return this.Default.FootnoteReference;
+};
+CStyles.prototype.GetDefaultTOC = function(nLvl)
+{
+	nLvl = Math.max(Math.min(nLvl, 8), 0);
+	return this.Default.TOC[nLvl];
 };
 
 function CDocumentColor(r,g,b, Auto)

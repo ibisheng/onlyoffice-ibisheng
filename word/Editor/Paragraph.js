@@ -7493,7 +7493,7 @@ Paragraph.prototype.Numbering_Remove = function()
 	// При удалении проверяем стиль. Если данный стиль является стилем по умолчанию
 	// для параграфов с нумерацией, тогда удаляем запись и о стиле.
 	var StyleId    = this.Style_Get();
-	var NumStyleId = this.Parent.Get_Styles().Get_Default_ParaList();
+	var NumStyleId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (StyleId === NumStyleId)
 		this.Style_Remove();
 
@@ -8215,8 +8215,10 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 	if (null === Id)
 		return;
 
+	var oDefParaId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_Paragraph() : null;
+
 	// Если стиль является стилем по умолчанию для параграфа, тогда не надо его записывать.
-	if (Id != this.Parent.Get_Styles().Get_Default_Paragraph())
+	if (Id != oDefParaId)
 	{
 		this.private_AddPrChange();
 		History.Add(new CChangesParagraphPStyle(this, this.Pr.PStyle, Id));
@@ -8234,7 +8236,7 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 	// TODO: По мере добавления элементов в стили параграфа и текста добавить их обработку здесь.
 
 	// Не удаляем форматирование, при добавлении списка к данному параграфу
-	var DefNumId = this.Parent.Get_Styles().Get_Default_ParaList();
+	var DefNumId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (Id !== DefNumId)
 	{
 		this.Numbering_Remove();
@@ -8356,7 +8358,7 @@ Paragraph.prototype.Clear_Formatting = function()
 {
 	if (this.bFromDocument)
 	{
-		var HdrFtr = this.Parent.Is_HdrFtr(true);
+		var HdrFtr = this.Parent ? this.Parent.Is_HdrFtr(true) : null;
 		if (null !== HdrFtr)
 		{
 			var Styles = this.Parent.Get_Styles();
@@ -8824,6 +8826,19 @@ Paragraph.prototype.SetOutlineLvl = function(nLvl)
 	this.Pr.OutlineLvl = nLvl;
 	this.CompiledPr.NeedRecalc = true;
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
+};
+Paragraph.prototype.GetOutlineLvl = function()
+{
+	// TODO: Заглушка со стилями заголовков тут временная
+	var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+	var oStyles = this.LogicDocument.Get_Styles();
+	for (var nIndex = 0; nIndex < 9; ++nIndex)
+	{
+		if (ParaPr.PStyle === oStyles.Get_Default_Heading(nIndex))
+			return nIndex;
+	}
+
+	return ParaPr.OutlineLvl;
 };
 /**
  * Проверяем начинается ли текущий параграф с новой страницы.
@@ -12361,9 +12376,9 @@ Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
 {
-	var ParaPr = this.Get_CompiledPr2(false);
-	if (undefined !== ParaPr.OutlineLvl)
-		arrOutline.push({Paragraph : this, Lvl : ParaPr.OutlineLvl});
+	var nOutlineLvl = this.GetOutlineLvl();
+	if (undefined !== nOutlineLvl)
+		arrOutline.push({Paragraph : this, Lvl : nOutlineLvl});
 };
 
 var pararecalc_0_All  = 0;

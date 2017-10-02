@@ -227,6 +227,39 @@ CComplexField.prototype.Update = function()
 
 		this.LogicDocument.Recalculate();
 	}
+	else if (fieldtype_TOC === nFieldCode)
+	{
+		this.LogicDocument.Create_NewHistoryPoint();
+
+		var oStyles          = this.LogicDocument.Get_Styles();
+		var arrOutline       = this.LogicDocument.GetOutlineParagraphs();
+		var oSelectedContent = new CSelectedContent();
+		for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
+		{
+			var oPara = arrOutline[nIndex].Paragraph.Copy();
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+
+			oSelectedContent.Add(new CSelectedElement(oPara, true));
+		}
+
+		this.LogicDocument.TurnOff_Recalculate();
+		this.LogicDocument.TurnOff_InterfaceEvents();
+		this.LogicDocument.Remove(1, false, false, false);
+		this.LogicDocument.TurnOn_Recalculate(false);
+		this.LogicDocument.TurnOn_InterfaceEvents(false);
+
+		var oRun       = this.BeginChar.GetRun();
+		var oParagraph = oRun.GetParagraph();
+		var oNearPos   = {
+			Paragraph  : oParagraph,
+			ContentPos : oParagraph.Get_ParaContentPos(false, false)
+		};
+		oParagraph.Check_NearestPos(oNearPos);
+
+		this.LogicDocument.Insert_Content(oSelectedContent, oNearPos);
+		this.LogicDocument.Recalculate();
+
+	}
 };
 CComplexField.prototype.private_SelectFieldValue = function()
 {

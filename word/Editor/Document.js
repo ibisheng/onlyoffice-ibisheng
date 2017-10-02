@@ -6957,7 +6957,7 @@ CDocument.prototype.OnKeyDown = function(e)
 		// TODO: Добавлено для теста
 
 		this.Create_NewHistoryPoint();
-		this.AddField(fieldtype_PAGENUM);
+		this.AddField(fieldtype_TOC);
 		this.Recalculate();
 
 		bRetValue = keydownresult_PreventAll;
@@ -15617,6 +15617,37 @@ CDocument.prototype.AddField = function(nType, oPr)
 		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate, this));
 		oRun.Add_ToContent(3, new ParaText("1"));
 		oRun.Add_ToContent(4, new ParaFieldChar(fldchartype_End, this));
+		oParagraph.Add(oRun);
+		return true;
+	}
+	else if (fieldtype_TOC === nType)
+	{
+		var oParagraph = this.GetCurrentParagraph();
+		if (!oParagraph)
+			return false;
+
+		var oRun = new ParaRun();
+		oRun.Add_ToContent(0, new ParaFieldChar(fldchartype_Begin, this));
+		oRun.Add_ToContent(1, new ParaInstrText(fieldtype_TOC, oPr));
+		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate, this));
+		oRun.Add_ToContent(3, new ParaText("T"));
+		oRun.Add_ToContent(4, new ParaText("a"));
+		oRun.Add_ToContent(5, new ParaText("b"));
+		oRun.Add_ToContent(6, new ParaText("l"));
+		oRun.Add_ToContent(7, new ParaText("e"));
+		oRun.Add_ToContent(8, new ParaSpace());
+		oRun.Add_ToContent(9, new ParaText("o"));
+		oRun.Add_ToContent(10, new ParaText("f"));
+		oRun.Add_ToContent(11, new ParaSpace());
+		oRun.Add_ToContent(12, new ParaText("C"));
+		oRun.Add_ToContent(13, new ParaText("o"));
+		oRun.Add_ToContent(14, new ParaText("n"));
+		oRun.Add_ToContent(15, new ParaText("t"));
+		oRun.Add_ToContent(16, new ParaText("e"));
+		oRun.Add_ToContent(17, new ParaText("n"));
+		oRun.Add_ToContent(18, new ParaText("t"));
+		oRun.Add_ToContent(19, new ParaText("s"));
+		oRun.Add_ToContent(20, new ParaFieldChar(fldchartype_End, this));
 		oParagraph.Add(oRun);
 		return true;
 	}
