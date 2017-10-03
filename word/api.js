@@ -7989,7 +7989,7 @@ background-repeat: no-repeat;\
 	window["asc_docs_api"].prototype["asc_nativeGetFile2"] = function()
 	{
 		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
-		return oBinaryFileWriter.Write(false, true);
+		return oBinaryFileWriter.Write(true, true);
 
 	};
 
