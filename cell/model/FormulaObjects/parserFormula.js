@@ -417,7 +417,10 @@ var cElementType = {
 		cell3D      : 12,
 		cellsRange3D: 13,
 		table       : 14,
-		name3D      : 15
+		name3D      : 15,
+		specialFunctionStart: 16,
+		specialFunctionEnd  : 17
+
   };
 /** @enum */
 var cErrorType = {
@@ -3200,7 +3203,29 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1]);
 	};
 
-/* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
+	function cSpecialOperandStart() {
+	}
+
+	cSpecialOperandStart.prototype.constructor = cSpecialOperandStart;
+	cSpecialOperandStart.prototype.type = cElementType.specialFunctionStart;
+
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
+	function cSpecialOperandEnd() {
+	}
+
+	cSpecialOperandEnd.prototype.constructor = cSpecialOperandEnd;
+	cSpecialOperandEnd.prototype.type = cElementType.specialFunctionEnd;
+
+
+
+	/* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 var cFormulaOperators = {
     '('       : parentLeft,
     ')'       : parentRight,
@@ -4330,6 +4355,8 @@ parserFormula.prototype.setFormula = function(formula) {
 		var needAssemble = false;
 		var cFormulaList;
 
+		var startSumproduct = false, counterSumproduct = 0;
+
 		if (this.isParsed) {
 			return this.isParsed;
 		}
@@ -4690,6 +4717,13 @@ parserFormula.prototype.setFormula = function(formula) {
 			found_operand = null;
 			t.elemArr.push(new cFormulaOperators[t.operand_str]());
 			t.f.push(new cFormulaOperators[t.operand_str]());
+
+			if(startSumproduct){
+				counterSumproduct++;
+				if(1 === counterSumproduct){
+					//t.outStack.push(new cSpecialOperandStart());
+				}
+			}
 		};
 
 		var parseRightParentheses = function(){
@@ -4767,6 +4801,15 @@ parserFormula.prototype.setFormula = function(formula) {
 			t.outStack.push(p);
 			t.operand_expected = false;
 			wasLeftParentheses = false;
+
+			if(startSumproduct){
+				counterSumproduct--;
+				if(counterSumproduct < 1){
+					startSumproduct = false;
+					//t.outStack.push(new cSpecialOperandEnd());
+				}
+			}
+
 			return true;
 		};
 
@@ -5031,6 +5074,9 @@ parserFormula.prototype.setFormula = function(formula) {
 					}
 					t.elemArr.push(found_operator);
 					t.f.push(found_operator);
+					if("SUMPRODUCT" === found_operator.name){
+						startSumproduct = true;
+					}
 				} else {
 					t.error.push(c_oAscError.ID.FrmlWrongFunctionName);
 					t.outStack = [];
