@@ -941,11 +941,13 @@
 					formula.calculate();
 				}
 			}
-			for (var i in this.cleanCellCache) {
-				this.wb.handlers.trigger("cleanCellCache", i, {0: this.cleanCellCache[i]},
+			//copy cleanCellCache to prevent recursion in trigger("cleanCellCache")
+			var tmpCellCache = this.cleanCellCache;
+			this.cleanCellCache = {};
+			for (var i in tmpCellCache) {
+				this.wb.handlers.trigger("cleanCellCache", i, {0: tmpCellCache[i]},
 										 AscCommonExcel.c_oAscCanChangeColWidth.none);
 			}
-			this.cleanCellCache = {};
 			AscCommonExcel.g_oVLOOKUPCache.clean();
 			AscCommonExcel.g_oHLOOKUPCache.clean();
 		},

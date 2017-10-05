@@ -237,7 +237,7 @@
 
         var copy = new CNotes();
         if(this.clrMap){
-            copy.setClrMap(this.clrMap.createDuplicate());
+            copy.setClMapOverride(this.clrMap.createDuplicate());
         }
 
         if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
@@ -257,7 +257,7 @@
         }
         if(AscFormat.isRealBool(this.showMasterPhAnim))
         {
-            copy.setShowPhAnim(this.showMasterPhAnim);
+            copy.setShowMasterPhAnim(this.showMasterPhAnim);
         }
         if(AscFormat.isRealBool(this.showMasterSp))
         {

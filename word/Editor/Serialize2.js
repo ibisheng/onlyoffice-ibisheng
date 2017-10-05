@@ -1222,7 +1222,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 		oUsedStyleMap: null
 	};
 	this.saveParams = new DocSaveParams(bMailMergeDocx, bMailMergeHtml);
-    this.Write = function(noBase64)
+    this.Write = function(noBase64, onlySaveBase64)
     {
         pptx_content_writer._Start();
 		if (noBase64) {
@@ -1231,7 +1231,11 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
         this.WriteMainTable();
         pptx_content_writer._End();
 		if (noBase64) {
-			return this.memory.GetData();
+			if (onlySaveBase64) {
+				return this.memory.GetBase64Memory();
+			} else {
+				return this.memory.GetData();
+			}
 		} else {
 			return this.GetResult();
 		}

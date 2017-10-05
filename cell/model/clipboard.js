@@ -2626,6 +2626,7 @@
 			
 			pasteTextOnSheet: function(worksheet, text)
 			{
+				var t = this;
 				if(!text || (text && !text.length))
 				{
 					window['AscCommon'].g_clipboardBase.Paste_Process_End();
@@ -2645,16 +2646,34 @@
 						{
 							return false;
 						}
-						
+
 						var Count = text.length;
-						for ( var Index = 0; Index < Count; Index++ )
-						{
+
+						var newParagraph = new Paragraph(isIntoShape.DrawingDocument, isIntoShape);
+						var selectedElements = new CSelectedContent();
+						var insertText = "";
+						for (var Index = 0; Index < Count; Index++) {
 							var _char = text.charAt(Index);
-							if (" " == _char)
-								isIntoShape.AddToParagraph(new ParaSpace());
-							else
-								isIntoShape.AddToParagraph(new ParaText(_char));
+							var _charCode = text.charCodeAt(Index);
+
+							if(_charCode !== 0x0A){
+								insertText += _char;
+							}
+
+							if(_charCode === 0x0A || Index === Count - 1){
+								var newParaRun = new ParaRun();
+								window['AscCommon'].addTextIntoRun(newParaRun, insertText);
+								newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
+								var selectedElement = new CSelectedElement();
+								selectedElement.Element = newParagraph;
+								selectedElements.Elements.push(selectedElement);
+
+								insertText = "";
+								newParagraph = new Paragraph(isIntoShape.DrawingDocument, isIntoShape);
+							}
 						}
+
+						t._insertSelectedContentIntoShapeContent(worksheet, selectedElements, isIntoShape);
 
 						window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 						window['AscCommon'].g_clipboardBase.Paste_Process_End();
@@ -3037,8 +3056,8 @@
 				var documentContent = pasteData.content;
 				
 				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
-				var cDocument = documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
-				if(cDocument.Content && 1 === cDocument.Content.length)
+				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
+				if(cDocument && cDocument.Content && 1 === cDocument.Content.length)
 				{
 					cDocument.Content = documentContent;
 				}

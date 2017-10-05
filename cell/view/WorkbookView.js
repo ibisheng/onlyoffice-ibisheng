@@ -1977,9 +1977,15 @@
 	// Вставка формулы в редактор
 	WorkbookView.prototype.insertFormulaInEditor = function (name, type, autoComplete) {
 		var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
+		var activeCellRange = ws.getActiveCell(0, 0, false);
+
+		if (ws.model.inPivotTable(activeCellRange)) {
+			this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+			return false;
+		}
 
 		if (c_oAscPopUpSelectorType.None === type) {
-			this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
+			ws.setSelectionInfo("value", name, /*onlyActive*/true);
 			return;
 		}
 
@@ -2011,14 +2017,7 @@
 				return false;
 			}
 
-			var activeCellRange = ws.getActiveCell(0, 0, false);
 			var selectionRange = ws.model.selectionRange.clone();
-
-			var activeWsModel = this.model.getActiveWs();
-			if (activeWsModel.inPivotTable(activeCellRange)) {
-				this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
-				return false;
-			}
 
 			// Редактор закрыт
 			var cellRange = null;

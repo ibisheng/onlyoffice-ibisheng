@@ -245,9 +245,9 @@ Slide.prototype =
         }
     },
 
-    createDuplicate: function()
+    createDuplicate: function(IdMap)
     {
-        var oIdMap = {};
+        var oIdMap = IdMap || {};
         var copy = new Slide(this.presentation, this.Layout, 0), i;
         if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
         {

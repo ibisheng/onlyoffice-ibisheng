@@ -879,6 +879,16 @@ function CEditorPage(api)
 					window.editor.EndDemonstration();
 				});
 			}
+
+			this.m_oBody.HtmlElement.oncontextmenu = function(e)
+			{
+				if (AscCommon.AscBrowser.isVivaldiLinux)
+				{
+					AscCommon.Window_OnMouseUp(e);
+				}
+				AscCommon.stopEvent(e);
+				return false;
+			};
 		}
 		// --------------------------------------------------------------------------
 
@@ -1799,6 +1809,9 @@ function CEditorPage(api)
 			return;
 
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
+			return;
+
+		if (oThis.SplitterType != 0)
 			return;
 
 		var _isCatch = false;

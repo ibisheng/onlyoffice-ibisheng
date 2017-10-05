@@ -47,6 +47,7 @@
     this.changes = null;
 	this.token = null;
 	this.isRequested = null;
+	this.serverVersion = null;
 
     if (newObj) {
       this.update(newObj);
@@ -66,6 +67,7 @@
     this.colors = newObj.colors;
     this.newChangeId = newObj.currentChangeId;
 	this.isRequested = newObj.isRequested;
+	this.serverVersion = newObj.serverVersion;
     return bUpdate;
   };
   asc_CVersionHistory.prototype.applyChanges = function(editor) {
@@ -98,6 +100,9 @@
   asc_CVersionHistory.prototype.asc_setIsRequested = function(val) {
     this.isRequested = val;
   };
+  asc_CVersionHistory.prototype.asc_setServerVersion = function(val) {
+    this.serverVersion = val;
+  };
 
   window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
   prot = asc_CVersionHistory.prototype;
@@ -108,6 +113,7 @@
   prot["asc_setArrColors"] = prot.asc_setArrColors;
   prot["asc_setToken"] = prot.asc_setToken;
   prot["asc_setIsRequested"] = prot.asc_setIsRequested;
+  prot["asc_setServerVersion"] = prot.asc_setServerVersion;
 })(window);
 
 AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {

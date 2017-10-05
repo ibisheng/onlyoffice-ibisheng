@@ -2090,6 +2090,9 @@ background-repeat: no-repeat;\
 				case AscCommon.c_oAscClipboardDataFormat.Internal:
 					AscCommon.Editor_Paste_Exec(this, null, null, data1);
 					break;
+				case AscCommon.c_oAscClipboardDataFormat.Text:
+					AscCommon.Editor_Paste_Exec(this, null, null, null, null, data1);
+					break;
 				default:
 					break;
 			}
@@ -8015,6 +8018,12 @@ background-repeat: no-repeat;\
 	{
 		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
 		return oBinaryFileWriter.Write();
+	};
+	window["asc_docs_api"].prototype["asc_nativeGetFile2"] = function()
+	{
+		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
+		return oBinaryFileWriter.Write(true, true);
+
 	};
 
 	window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()

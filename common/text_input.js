@@ -34,6 +34,8 @@
 
 (function(window, undefined)
 {
+	window["AscInputMethod"] = {};
+	window["AscInputMethod"]["SogouPinyin"] = false;
 	///
 	// такие методы нужны в апи
 	// baseEditorsApi.prototype.Begin_CompositeInput = function()
@@ -666,7 +668,8 @@
 				}
 			}
 
-			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm)
+			var checkInput = (c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm) ? true : false;
+			if (!this.KeyDownFlag && checkInput)
 			{
 				ti_console_log("ti: external input");
 
@@ -1110,7 +1113,24 @@
 			if (_code == 13)
 				this.clear();
 
-			var _ret = this.Api.onKeyDown(e);
+			var isSendToApi = true;
+			if (window["AscInputMethod"]["SogouPinyin"])
+			{
+				if (AscCommon.AscBrowser.isChrome)
+				{
+					if ((e.keyCode == 229) && ((e.code == "space") || (e.code == "Space") || (e.key == "Spacebar")))
+					{
+						isSendToApi = false;
+						// no prevent => input enabled (isChromeKeysNoKeyPressPrevent)
+					}
+				}
+			}
+
+			if (isSendToApi)
+			{
+				var _ret = this.Api.onKeyDown(e);
+			}
+
 			if (!e.defaultPrevented && AscCommon.AscBrowser.isChrome)
 				this.isChromeKeysNoKeyPressPresent = true;
 		},
