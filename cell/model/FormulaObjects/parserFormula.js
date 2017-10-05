@@ -3006,7 +3006,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1]);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1], bIsSpecialFunction);
 	};
 
 	/**
@@ -3950,8 +3950,67 @@ _func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1,
     return _func[cross1.type][cross2.type]( cross1, cross2, what );
 };
 
-_func[cElementType.array][cElementType.array] = function ( arg0, arg1, what ) {
-    if ( arg0.getRowCount() !== arg1.getRowCount() || arg0.getCountElementInRow() !== arg1.getCountElementInRow() ) {
+_func[cElementType.array][cElementType.array] = function ( arg0, arg1, what, bbox, bIsSpecialFunction ) {
+	if (bIsSpecialFunction) {
+		var retArr = new cArray(), _arg0, _arg1;
+		if (arg0.getRowCount() === arg1.getRowCount() && 1 === arg0.getCountElementInRow()) {
+			for ( var iRow = 0; iRow < arg1.getRowCount(); iRow++, iRow < arg1.getRowCount() ? retArr.addRow() : true ) {
+				for ( var iCol = 0; iCol < arg1.getCountElementInRow(); iCol++ ) {
+					_arg0 = arg0.getElementRowCol( iRow, 0 );
+					_arg1 = arg1.getElementRowCol( iRow, iCol );
+					retArr.addElement( _func[_arg0.type][_arg1.type]( _arg0, _arg1, what ) );
+				}
+			}
+			return retArr;
+		} else if (arg0.getRowCount() === arg1.getRowCount() && 1 === arg1.getCountElementInRow()) {
+			for ( var iRow = 0; iRow < arg0.getRowCount(); iRow++, iRow < arg0.getRowCount() ? retArr.addRow() : true ) {
+				for ( var iCol = 0; iCol < arg0.getCountElementInRow(); iCol++ ) {
+					_arg0 = arg0.getElementRowCol( iRow, iCol );
+					_arg1 = arg1.getElementRowCol( iRow, 0 );
+					retArr.addElement( _func[_arg0.type][_arg1.type]( _arg0, _arg1, what ) );
+				}
+			}
+			return retArr;
+		} else if (arg0.getCountElementInRow() === arg1.getCountElementInRow() && 1 === arg0.getRowCount()) {
+			for ( var iRow = 0; iRow < arg1.getRowCount(); iRow++, iRow < arg1.getRowCount() ? retArr.addRow() : true ) {
+				for ( var iCol = 0; iCol < arg1.getCountElementInRow(); iCol++ ) {
+					_arg0 = arg0.getElementRowCol( 0, iCol );
+					_arg1 = arg1.getElementRowCol( iRow, iCol );
+					retArr.addElement( _func[_arg0.type][_arg1.type]( _arg0, _arg1, what ) );
+				}
+			}
+			return retArr;
+		} else if (arg0.getCountElementInRow() === arg1.getCountElementInRow() && 1 === arg1.getRowCount()) {
+			for ( var iRow = 0; iRow < arg0.getRowCount(); iRow++, iRow < arg0.getRowCount() ? retArr.addRow() : true ) {
+				for ( var iCol = 0; iCol < arg0.getCountElementInRow(); iCol++ ) {
+					_arg0 = arg0.getElementRowCol( iRow, iCol );
+					_arg1 = arg1.getElementRowCol( 0, iCol );
+					retArr.addElement( _func[_arg0.type][_arg1.type]( _arg0, _arg1, what ) );
+				}
+			}
+			return retArr;
+		} else if (1 === arg0.getCountElementInRow() && 1 ===  arg1.getRowCount()) {
+			for (var iRow = 0; iRow < arg0.getRowCount(); iRow++, iRow < arg0.getRowCount() ? retArr.addRow() : true) {
+				for (var iCol = 0; iCol < arg1.getCountElementInRow(); iCol++) {
+					_arg0 = arg0.getElementRowCol(iRow, 0);
+					_arg1 = arg1.getElementRowCol(0, iCol);
+					retArr.addElement(_func[_arg0.type][_arg1.type](_arg0, _arg1, what));
+				}
+			}
+			return retArr;
+		} else if (1 === arg1.getCountElementInRow() && 1 ===  arg0.getRowCount()) {
+			for (var iRow = 0; iRow < arg1.getRowCount(); iRow++, iRow < arg1.getRowCount() ? retArr.addRow() : true) {
+				for (var iCol = 0; iCol < arg0.getCountElementInRow(); iCol++) {
+					_arg0 = arg0.getElementRowCol(0, iCol);
+					_arg1 = arg1.getElementRowCol(iRow, 0);
+					retArr.addElement(_func[_arg0.type][_arg1.type](_arg0, _arg1, what));
+				}
+			}
+			return retArr;
+		}
+	}
+
+	if ( arg0.getRowCount() !== arg1.getRowCount() || arg0.getCountElementInRow() !== arg1.getCountElementInRow() ) {
         return new cError( cErrorType.wrong_value_type );
     }
     var retArr = new cArray(), _arg0, _arg1;
