@@ -2129,6 +2129,16 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.countElementInRow[this.rowCount - 1]++;
 		this.countElement++;
 	};
+	cArray.prototype.addElementRowCol = function (element, row, col) {
+		if (!this.array[row]) {
+			this.array[row] = [];
+			this.countElementInRow[this.rowCount++] = 0
+		}
+		var arr = this.array, subArr = arr[row];
+		subArr[col] = element;
+		this.countElementInRow[this.rowCount - 1]++;
+		this.countElement++;
+	};
 	cArray.prototype.getRow = function (rowIndex) {
 		if (rowIndex < 0 || rowIndex > this.array.length - 1) {
 			return null;
@@ -6222,7 +6232,7 @@ function rtl_math_erfc( x ) {
 		for ( var iRow = 0; iRow < area.length; iRow++ ) {
 			for ( var iCol = 0; iCol < area[iRow].length; iCol++ ) {
 				_arg0 = area[iRow][iCol];
-				retArr.addElement( _arg0 );
+				retArr.addElementRowCol(_arg0, iRow, iCol);
 			}
 		}
 		return retArr;
