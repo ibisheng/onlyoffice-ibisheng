@@ -5208,13 +5208,18 @@ parserFormula.prototype.setFormula = function(formula) {
 			opt_bbox = new Asc.Range(0, 0, 0, 0);
 		}
 
-		var elemArr = [], _tmp, numFormat = cNumFormatFirstCell, currentElement = null;
+		var elemArr = [], _tmp, numFormat = cNumFormatFirstCell, currentElement = null, bIsSpecialFunction;
 		for (var i = 0; i < this.outStack.length; i++) {
 			currentElement = this.outStack[i];
 			if (currentElement.name === "(") {
 				continue;
 			}
-			if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
+			if(currentElement.type === cElementType.specialFunctionStart){
+				bIsSpecialFunction = true;
+				continue;
+			}
+			if(currentElement.type === cElementType.specialFunctionEnd){
+				bIsSpecialFunction = false;
 				continue;
 			}
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
@@ -5228,7 +5233,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
 						arg.unshift(elemArr.pop());
 					}
-					_tmp = currentElement.Calculate(arg, opt_bbox, opt_defName, this.ws);
+					_tmp = currentElement.Calculate(arg, opt_bbox, opt_defName, this.ws, bIsSpecialFunction);
 					if (cNumFormatNull !== _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
 					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
