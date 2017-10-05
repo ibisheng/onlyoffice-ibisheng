@@ -5214,6 +5214,9 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (currentElement.name === "(") {
 				continue;
 			}
+			if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
+				continue;
+			}
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
 				if (elemArr.length < currentElement.getArguments()) {
 					elemArr = [];
@@ -5597,6 +5600,11 @@ parserFormula.prototype.setFormula = function(formula) {
 		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
 		for (var i = 0, j = 0; i < _count; i++, j++) {
 			currentElement = this.outStack[i];
+
+			if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
+				continue;
+			}
+
 			if (cElementType.operator === currentElement.type || cElementType.func === currentElement.type) {
 				_count_arg = currentElement.getArguments();
 				res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
@@ -5626,6 +5634,11 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
     var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
   for (var i = 0, j = 0; i < _count; i++, j++) {
     currentElement = this.outStack[i];
+
+	if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
+		continue;
+	}
+
     if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
       _count_arg = currentElement.getArguments();
       res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
