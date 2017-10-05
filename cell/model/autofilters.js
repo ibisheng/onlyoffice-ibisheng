@@ -3427,7 +3427,7 @@
 			},
 			
 			//TODO пока включаю протестированную функцию. позже доработать функцию _getAdjacentCellsAF2, она работает быстрее!
-			_getAdjacentCellsAF: function(ar, ignoreAutoFilter) 
+			_getAdjacentCellsAF: function(ar, ignoreAutoFilter, doNotIncludeMergedCells, ignoreSpaceSymbols)
 			{
 				var ws = this.worksheet;
 				var cloneActiveRange = ar.clone(true); // ToDo слишком много клонирования
@@ -3467,11 +3467,22 @@
 							
 						cell = ws.getRange3(n, k, n, k);
 						isEmptyCell = cell.isEmptyText();
-						
+
+						if(!isEmptyCell && ignoreSpaceSymbols){
+							var tempVal = cell.getValueWithoutFormat().replace(/\s/g, '');
+							if("" === tempVal){
+								isEmptyCell = true;
+							}
+						}
+
+						merged = cell.hasMerged();
+						if(merged && doNotIncludeMergedCells){
+							continue;
+						}
+
 						//если мерженная ячейка
 						if(!(n == ar.r1 && k == ar.c1) && isMergedCells != null && isEmptyCell)
 						{
-							merged = cell.hasMerged();
 							valueMerg = null;
 							if(merged)
 							{

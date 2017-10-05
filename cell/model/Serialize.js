@@ -2291,13 +2291,13 @@
             {
                 if(null != oWorkbookPr.Date1904)
                 {
-                    this.memory.WriteByte(c_oSerBorderPropTypes.Date1904);
+                    this.memory.WriteByte(c_oSerWorkbookPrTypes.Date1904);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(oWorkbookPr.Date1904);
                 }
                 else if (null != oWorkbookPr.DateCompatibility)
                 {
-                    this.memory.WriteByte(c_oSerBorderPropTypes.DateCompatibility);
+                    this.memory.WriteByte(c_oSerWorkbookPrTypes.DateCompatibility);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(oWorkbookPr.DateCompatibility);
                 }

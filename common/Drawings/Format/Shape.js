@@ -4295,7 +4295,8 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 }
                 else
                 {
-                    this.txWarpStruct2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
+                	if (this.txWarpStruct2)
+                		this.txWarpStruct2.draw(graphics, this.transformTextWordArt2, oTheme, oColorMap);
                 }
             }
         }

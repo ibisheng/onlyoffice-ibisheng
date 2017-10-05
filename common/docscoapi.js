@@ -574,6 +574,7 @@
     this._state = ConnectionState.None;
     // Online-пользователи в документе
     this._participants = {};
+    this._participantsTimestamp;
     this._countEditUsers = 0;
     this._countUsers = 0;
 
@@ -1146,12 +1147,16 @@
     }
   };
 
-  DocsCoApi.prototype._onStartCoAuthoring = function(isStartEvent) {
+  DocsCoApi.prototype._onStartCoAuthoring = function(isStartEvent, isWaitAuth) {
     if (false === this.isCoAuthoring) {
       this.isCoAuthoring = true;
       if (this.onStartCoAuthoring) {
         this.onStartCoAuthoring(isStartEvent);
       }
+    } else if (isWaitAuth) {
+      //it is a stub for unexpected situation(no direct reproduce scenery)
+      //isCoAuthoring is true when more then one editor, but isWaitAuth mean than server has one editor
+      this.unLockDocument(false, true);
     }
   };
 
@@ -1285,22 +1290,51 @@
     }
   };
 
+  DocsCoApi.prototype._onParticipantsChanged = function(participants, needChanged) {
+    var participantsNew = {};
+    var countEditUsersNew = 0;
+    var countUsersNew = 0;
+    var tmpUser;
+    var i;
+    var usersStateChanged = [];
+    if (participants) {
+      for (i = 0; i < participants.length; ++i) {
+        tmpUser = new AscCommon.asc_CUser(participants[i]);
+        participantsNew[tmpUser.asc_getId()] = tmpUser;
+        if (!tmpUser.asc_getView()) {
+          ++countEditUsersNew;
+        }
+        ++countUsersNew;
+      }
+    }
+    if (needChanged) {
+      for (i in participantsNew) {
+        if (!this._participants[i]) {
+          tmpUser = participantsNew[i];
+          tmpUser.setState(true);
+          usersStateChanged.push(tmpUser);
+        }
+      }
+      for (i in this._participants) {
+        if (!participantsNew[i]) {
+          tmpUser = this._participants[i];
+          tmpUser.setState(false);
+          usersStateChanged.push(tmpUser);
+        }
+      }
+    }
+    this._participants = participantsNew;
+    this._countEditUsers = countEditUsersNew;
+    this._countUsers = countUsersNew;
+    return usersStateChanged;
+  };
   DocsCoApi.prototype._onAuthParticipantsChanged = function(participants) {
     this._participants = {};
     this._countEditUsers = 0;
     this._countUsers = 0;
 
     if (participants) {
-      var tmpUser;
-      for (var i = 0; i < participants.length; ++i) {
-        tmpUser = new AscCommon.asc_CUser(participants[i]);
-        this._participants[tmpUser.asc_getId()] = tmpUser;
-        // Считаем только число редакторов
-        if (!tmpUser.asc_getView()) {
-          ++this._countEditUsers;
-        }
-        ++this._countUsers;
-      }
+      this._onParticipantsChanged(participants);
 
       if (this.onAuthParticipantsChanged) {
         this.onAuthParticipantsChanged(this._participants, this._countUsers);
@@ -1323,39 +1357,24 @@
       });
       return;
     }
-    var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
-    if (this.onConnectionStateChanged) {
-      userStateChanged = new AscCommon.asc_CUser(data['user']);
-      userStateChanged.setState(data["state"]);
+    var isWaitAuth = data['waitAuth'];
+    var usersStateChanged;
+    if (this.onConnectionStateChanged && (!this._participantsTimestamp || this._participantsTimestamp <= data['participantsTimestamp'])) {
+      this._participantsTimestamp = data['participantsTimestamp'];
+      usersStateChanged = this._onParticipantsChanged(data['participants'], true);
 
-      userId = userStateChanged.asc_getId();
-      isEditUser = !userStateChanged.asc_getView();
-      if (userStateChanged.asc_getState() && !this._participants.hasOwnProperty(userId)) {
-        this._participants[userId] = userStateChanged;
-        ++this._countUsers;
-        if (isEditUser) {
-          ++this._countEditUsers;
-        }
-        stateChanged = true;
-      } else if (!userStateChanged.asc_getState() && this._participants.hasOwnProperty(userId)) {
-        delete this._participants[userId];
-        --this._countUsers;
-        if (isEditUser) {
-          --this._countEditUsers;
-        }
-        stateChanged = true;
-      }
-
-      if (stateChanged) {
+      if (usersStateChanged.length > 0) {
         // Посылаем эвент о совместном редактировании
         if (1 < this._countEditUsers) {
-          this._onStartCoAuthoring(/*isStartEvent*/false);
+          this._onStartCoAuthoring(/*isStartEvent*/false, isWaitAuth);
         } else {
           this._onEndCoAuthoring(/*isStartEvent*/false);
         }
 
         this.onParticipantsChanged(this._participants, this._countUsers);
-        this.onConnectionStateChanged(userStateChanged);
+        for (var i = 0; i < usersStateChanged.length; ++i) {
+          this.onConnectionStateChanged(usersStateChanged[i]);
+        }
       }
     }
   };

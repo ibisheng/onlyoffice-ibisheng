@@ -1786,7 +1786,7 @@ function CopyPasteCorrectString(str)
     return res;
 }
 
-function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps, text)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
 	window['AscCommon'].g_clipboardBase.endRecalcDocument = false;
@@ -1796,7 +1796,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
 		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
 		
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
 	}
     else
 	{
@@ -1805,7 +1805,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
 		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
 		onlyBinary = window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary;
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
 	}
 }
 function trimString( str ){
@@ -2557,7 +2557,7 @@ PasteProcessor.prototype =
 		if(mathText && mathText.str)
 		{
 			var newParaRun = new ParaRun();
-			this._addTextIntoRun(newParaRun, mathText.str);
+			addTextIntoRun(newParaRun, mathText.str);
 
 			res = newParaRun;
 		}
@@ -2613,7 +2613,7 @@ PasteProcessor.prototype =
 							bIsAddTabBefore = true;
 						}
 
-						t._addTextIntoRun(newParaRun, value, bIsAddTabBefore, true);
+						addTextIntoRun(newParaRun, value, bIsAddTabBefore, true);
 
 						newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 					}
@@ -2649,7 +2649,7 @@ PasteProcessor.prototype =
 			var numberingText = this._getNumberingText(lvl, NumInfo, NumTextPr, lvl);
 
 			var newParaRun = new ParaRun();
-			this._addTextIntoRun(newParaRun, numberingText, false, true, true);
+			addTextIntoRun(newParaRun, numberingText, false, true, true);
 			paragraph.Internal_Content_Add(0, newParaRun, false);
 		}
 	},
@@ -2825,53 +2825,6 @@ PasteProcessor.prototype =
 		return Char;
 	},
 
-	_addTextIntoRun: function(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
-	{
-		var diffContentIndex = 0;
-		if(bIsAddTabBefore){
-			diffContentIndex = 1;
-			oCurRun.Add_ToContent(0, new ParaTab(), false);
-		}
-
-		for(var k = 0, length = value.length; k < length; k++)
-		{
-			var nUnicode = null;
-			var nCharCode = value.charCodeAt(k);
-			if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-				if (k + 1 < length) {
-					k++;
-					var nTrailingChar = value.charCodeAt(k);
-					nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-				}
-			}
-			else
-				nUnicode = nCharCode;
-
-			var bIsSpace = true;
-			if (null != nUnicode) {
-				var Item;
-				if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-					Item = new ParaText();
-					Item.Set_CharCode(nUnicode);
-					bIsSpace = false;
-				}
-				else if(0x2009 === nUnicode){
-					Item = new ParaTab();
-				}
-				else
-					Item = new ParaSpace();
-
-				//add text
-				if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
-					oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
-				}
-			}
-		}
-
-		if(bIsAddTabAfter){
-			oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
-		}
-	},
 	//***end special paste***
 
 	InsertInPlacePresentation: function(aNewContent)
@@ -3050,11 +3003,16 @@ PasteProcessor.prototype =
         }
     },
 
-	Start : function(node, nodeDisplay, bDuplicate, fromBinary)
+	Start : function(node, nodeDisplay, bDuplicate, fromBinary, text)
     {
 		//PASTE
+		if(text){
+			this._pasteText(text);
+			return;
+		}
+
 		var bInsertFromBinary = false;
-		
+
 		if(!node && "" === fromBinary)
 		{
 			return;
@@ -4393,7 +4351,49 @@ PasteProcessor.prototype =
 			
 		return {base64FromExcel: base64FromExcel, base64FromWord: base64FromWord, base64FromPresentation: base64FromPresentation};
 	},
-	
+
+	_pasteText: function(text)
+	{
+		var oThis = this;
+
+		var fPasteTextWordCallback = function()
+		{
+			oThis.aContent = [];
+
+			oThis._getContentFromText(text);
+
+			oThis._AddNextPrevToContent(oThis.oDocument);
+			if(false === oThis.bNested)
+			{
+				oThis.InsertInDocument();
+			}
+		};
+
+		fPasteTextWordCallback();
+	},
+
+	_getContentFromText: function(text){
+		var Count = text.length;
+
+		var newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+		var insertText = "";
+		for (var Index = 0; Index < Count; Index++) {
+			var _char = text.charAt(Index);
+			var _charCode = text.charCodeAt(Index);
+			if(_charCode === 0x0A ||  Index === Count - 1){
+				var newParaRun = new ParaRun();
+				addTextIntoRun(newParaRun, insertText);
+				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
+				this.aContent.push(newParagraph);
+
+				insertText = "";
+				newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+			} else{
+				insertText += _char;
+			}
+		}
+	},
+
 	_isParagraphContainsOnlyDrawing: function(par)
 	{
 		var res = true;
@@ -8605,6 +8605,54 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         _api.pre_Paste(aPrepeareFonts, _images, _callback);
 }
 
+function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
+{
+	var diffContentIndex = 0;
+	if(bIsAddTabBefore){
+		diffContentIndex = 1;
+		oCurRun.Add_ToContent(0, new ParaTab(), false);
+	}
+
+	for(var k = 0, length = value.length; k < length; k++)
+	{
+		var nUnicode = null;
+		var nCharCode = value.charCodeAt(k);
+		if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+			if (k + 1 < length) {
+				k++;
+				var nTrailingChar = value.charCodeAt(k);
+				nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+			}
+		}
+		else
+			nUnicode = nCharCode;
+
+		var bIsSpace = true;
+		if (null != nUnicode) {
+			var Item;
+			if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+				Item = new ParaText();
+				Item.Set_CharCode(nUnicode);
+				bIsSpace = false;
+			}
+			else if(0x2009 === nUnicode){
+				Item = new ParaTab();
+			}
+			else
+				Item = new ParaSpace();
+
+			//add text
+			if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
+				oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
+			}
+		}
+	}
+
+	if(bIsAddTabAfter){
+		oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
+	}
+}
+
 function SpecialPasteShowOptions()
 {
 	this.options = [];
@@ -8632,6 +8680,8 @@ SpecialPasteShowOptions.prototype = {
   window["AscCommon"].Editor_Paste_Exec = Editor_Paste_Exec;
   window["AscCommon"].sendImgUrls = sendImgUrls;
   window["AscCommon"].PasteProcessor = PasteProcessor;
+
+  window["AscCommon"].addTextIntoRun = addTextIntoRun;
   
   window["AscCommon"].PasteElementsId = PasteElementsId;
   

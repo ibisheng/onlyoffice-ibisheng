@@ -2264,7 +2264,8 @@ function CHorRuler()
 
             this.m_oTableMarkup.CorrectTo();
             this.m_oTableMarkup.Table.Update_TableMarkupFromRuler(this.m_oTableMarkup, true, this.DragTablePos);
-            this.m_oTableMarkup.CorrectFrom();
+			if (this.m_oTableMarkup)
+			    this.m_oTableMarkup.CorrectFrom();
 
             this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             this.m_oWordControl.m_oLogicDocument.Document_UpdateRulersState();
@@ -3670,7 +3671,8 @@ function CVerRuler()
 
             this.m_oTableMarkup.CorrectTo();
             this.m_oTableMarkup.Table.Update_TableMarkupFromRuler(this.m_oTableMarkup, false, this.DragTablePos);
-            this.m_oTableMarkup.CorrectFrom();
+            if (this.m_oTableMarkup)
+                this.m_oTableMarkup.CorrectFrom();
         }
     }
 }

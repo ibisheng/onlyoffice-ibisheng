@@ -4621,8 +4621,10 @@ CPresentation.prototype =
                         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
                         for(i = 0; i < selected_slides.length; ++i)
                         {
-
-                            ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]].createDuplicate(), this.Slides[selected_slides[i]].getBase64Img()));
+                            oIdMap = {};
+                            var oSlideCopy = this.Slides[selected_slides[i]].createDuplicate(oIdMap);
+                            ret.SlideObjects.push(new SlideCopyObject(oSlideCopy, this.Slides[selected_slides[i]].getBase64Img()));
+                            AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
                         }
                     }
                 }
@@ -5189,7 +5191,10 @@ CPresentation.prototype =
         {
             for(i = array.length -1; i > - 1; --i)
             {
-                deleted.push(this.Slides[array[i]].createDuplicate());
+                var oIdMap = {};
+                var oSlideCopy = this.Slides[array[i]].createDuplicate(oIdMap);
+                AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
+                deleted.push(oSlideCopy);
             }
         }
 
@@ -5958,11 +5963,13 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
             }
 
             aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
-            oIdMap[aSpTree[i].Id] = oCopy.Id;
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[aSpTree[i].Id] = oCopy.Id;
+            }
         }
         if(bRecursive && aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
         {
-            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive);
+            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive, oIdMap);
         }
     }
 }
