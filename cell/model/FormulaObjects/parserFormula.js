@@ -5626,38 +5626,40 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 	};
 
-/* Сборка функции в инфиксную форму */
-parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
-  if (this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
-    return this.Formula;
-  }
-    var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
-  for (var i = 0, j = 0; i < _count; i++, j++) {
-    currentElement = this.outStack[i];
+	/* Сборка функции в инфиксную форму */
+	parserFormula.prototype.assembleLocale = function (locale, digitDelim) {
+		if (this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
+			return this.Formula;
+		}
+		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined,
+			_count_arg;
+		for (var i = 0, j = 0; i < _count; i++, j++) {
+			currentElement = this.outStack[i];
 
-	if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
-		continue;
-	}
+			if (currentElement.type === cElementType.specialFunctionStart ||
+				currentElement.type === cElementType.specialFunctionEnd) {
+				continue;
+			}
 
-    if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
-      _count_arg = currentElement.getArguments();
-      res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
-      j -= _count_arg;
-      elemArr[j] = res;
-      } else {
-      if (currentElement instanceof cString) {
-        currentElement = new cString("\"" + currentElement.toLocaleString(digitDelim) + "\"");
-      }
-      res = currentElement;
-      elemArr[j] = res;
-    }
-  }
-  if (res != undefined && res != null) {
-    return res.toLocaleString(digitDelim);
-    } else {
-    return this.Formula;
-  }
-};
+			if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
+				_count_arg = currentElement.getArguments();
+				res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
+				j -= _count_arg;
+				elemArr[j] = res;
+			} else {
+				if (currentElement instanceof cString) {
+					currentElement = new cString("\"" + currentElement.toLocaleString(digitDelim) + "\"");
+				}
+				res = currentElement;
+				elemArr[j] = res;
+			}
+		}
+		if (res != undefined && res != null) {
+			return res.toLocaleString(digitDelim);
+		} else {
+			return this.Formula;
+		}
+	};
 	parserFormula.prototype.buildDependencies = function() {
 		if (this.isInDependencies) {
 			return;
