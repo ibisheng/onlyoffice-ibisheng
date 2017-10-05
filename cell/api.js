@@ -3202,16 +3202,22 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
 	spreadsheet_api.prototype._autoSave = function () {
 		if (!this.DocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
-			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
-			this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
-			!History.IsEndTransaction() || !this.canSave) {
+				(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
+			this.asc_getIsTrackShape() || this.isOpenedChartFrame || !History.IsEndTransaction() || !this.canSave) {
 			return;
 		}
 
+		// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
 		if (this.canUnlockDocument) {
-			this.asc_Save(true);
+			this.lastSaveTime = new Date();
+			// Close cell edit without errors (isIdle = true)
+			this.asc_Save(true, false, true);
 			return;
 		}
+
+		if (this.asc_getCellEditMode()) {
+		  return;
+        }
 
 		if (!History.Have_Changes(true) && !(this.collaborativeEditing.getCollaborativeEditing() &&
 			0 !== this.collaborativeEditing.getOwnLocksLength())) {
