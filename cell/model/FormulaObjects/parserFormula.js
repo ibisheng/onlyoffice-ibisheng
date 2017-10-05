@@ -2364,6 +2364,22 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return new cString(str);
 	};
+	cBaseOperator.prototype._convertAreaToArray = function (areaArr) {
+		var res = [];
+		for(var i = 0; i < areaArr.length; i++){
+			var elem = areaArr[i];
+			if(elem instanceof cArea || elem instanceof cArea3D){
+				elem = convertAreaToArray(elem);
+			}
+			res.push(elem);
+		}
+
+		if(!res.length){
+			res = areaArr;
+		}
+
+		return res;
+	};
 
 	/** @constructor */
 	function cBaseFunction(name) {
@@ -2817,8 +2833,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
 	cAddOperator.prototype.constructor = cAddOperator;
-	cAddOperator.prototype.Calculate = function (arg) {
+	cAddOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
+
+		if(bIsSpecialFunction){
+			var convertArgs = this._convertAreaToArray([arg0, arg1]);
+			arg0 = convertArgs[0];
+			arg1 = convertArgs[1];
+		}
+
 		if (arg0 instanceof cArea) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArea3D) {
@@ -2952,8 +2975,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
 	cMultOperator.prototype.numFormat = cNumFormatNone;
 	cMultOperator.prototype.constructor = cMultOperator;
-	cMultOperator.prototype.Calculate = function (arg) {
+	cMultOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
+
+		if(bIsSpecialFunction){
+			var convertArgs = this._convertAreaToArray([arg0, arg1]);
+			arg0 = convertArgs[0];
+			arg1 = convertArgs[1];
+		}
+
 		if (arg0 instanceof cArea) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArea3D) {
@@ -3203,20 +3233,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1]);
 	};
 
-	/**
-	 * @constructor
-	 * @extends {cBaseOperator}
-	 */
 	function cSpecialOperandStart() {
 	}
 
 	cSpecialOperandStart.prototype.constructor = cSpecialOperandStart;
 	cSpecialOperandStart.prototype.type = cElementType.specialFunctionStart;
 
-	/**
-	 * @constructor
-	 * @extends {cBaseOperator}
-	 */
 	function cSpecialOperandEnd() {
 	}
 
@@ -4721,7 +4743,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			if(startSumproduct){
 				counterSumproduct++;
 				if(1 === counterSumproduct){
-					//t.outStack.push(new cSpecialOperandStart());
+					t.outStack.push(new cSpecialOperandStart());
 				}
 			}
 		};
@@ -4806,7 +4828,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				counterSumproduct--;
 				if(counterSumproduct < 1){
 					startSumproduct = false;
-					//t.outStack.push(new cSpecialOperandEnd());
+					t.outStack.push(new cSpecialOperandEnd());
 				}
 			}
 
@@ -6193,6 +6215,18 @@ function rtl_math_erfc( x ) {
 
     return fErfc;
 }
+
+	function convertAreaToArray(area){
+		var retArr = new cArray(), _arg0;
+		area = area.getMatrix();
+		for ( var iRow = 0; iRow < area.length; iRow++ ) {
+			for ( var iCol = 0; iCol < area[iRow].length; iCol++ ) {
+				_arg0 = area[iRow][iCol];
+				retArr.addElement( _arg0 );
+			}
+		}
+		return retArr;
+	}
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
