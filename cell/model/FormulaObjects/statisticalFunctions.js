@@ -36,7 +36,7 @@
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function (window, undefined) {
+function (window, undefined) {
 	var fSortAscending = AscCommon.fSortAscending;
 
 	var cElementType = AscCommonExcel.cElementType;
@@ -142,34 +142,34 @@
 		if (Math.abs(q) <= .425) {
 			t = 0.180625 - q * q;
 			z = q * (
+				(
 					(
 						(
 							(
 								(
 									(
-										(
-											t * 2509.0809287301226727 + 33430.575583588128105
-										) * t + 67265.770927008700853
-									) * t + 45921.953931549871457
-								) * t + 13731.693765509461125
-							) * t + 1971.5909503065514427
-						) * t + 133.14166789178437745
-					) * t + 3.387132872796366608
-				) / (
+										t * 2509.0809287301226727 + 33430.575583588128105
+									) * t + 67265.770927008700853
+								) * t + 45921.953931549871457
+							) * t + 13731.693765509461125
+						) * t + 1971.5909503065514427
+					) * t + 133.14166789178437745
+				) * t + 3.387132872796366608
+			) / (
+				(
 					(
 						(
 							(
 								(
 									(
-										(
-											t * 5226.495278852854561 + 28729.085735721942674
-										) * t + 39307.89580009271061
-									) * t + 21213.794301586595867
-								) * t + 5394.1960214247511077
-							) * t + 687.1870074920579083
-						) * t + 42.313330701600911252
-					) * t + 1
-				);
+										t * 5226.495278852854561 + 28729.085735721942674
+									) * t + 39307.89580009271061
+								) * t + 21213.794301586595867
+							) * t + 5394.1960214247511077
+						) * t + 687.1870074920579083
+					) * t + 42.313330701600911252
+				) * t + 1
+			);
 		} else {
 			if (q > 0) {
 				t = 1 - x;
@@ -182,65 +182,65 @@
 			if (t <= 5) {
 				t += -1.6;
 				z = (
+					(
 						(
 							(
 								(
 									(
 										(
-											(
-												t * 7.7454501427834140764e-4 + 0.0227238449892691845833
-											) * t + 0.24178072517745061177
-										) * t + 1.27045825245236838258
-									) * t + 3.64784832476320460504
-								) * t + 5.7694972214606914055
-							) * t + 4.6303378461565452959
-						) * t + 1.42343711074968357734
-					) / (
+											t * 7.7454501427834140764e-4 + 0.0227238449892691845833
+										) * t + 0.24178072517745061177
+									) * t + 1.27045825245236838258
+								) * t + 3.64784832476320460504
+							) * t + 5.7694972214606914055
+						) * t + 4.6303378461565452959
+					) * t + 1.42343711074968357734
+				) / (
+					(
 						(
 							(
 								(
 									(
 										(
-											(
-												t * 1.05075007164441684324e-9 + 5.475938084995344946e-4
-											) * t + 0.0151986665636164571966
-										) * t + 0.14810397642748007459
-									) * t + 0.68976733498510000455
-								) * t + 1.6763848301838038494
-							) * t + 2.05319162663775882187
-						) * t + 1
-					);
+											t * 1.05075007164441684324e-9 + 5.475938084995344946e-4
+										) * t + 0.0151986665636164571966
+									) * t + 0.14810397642748007459
+								) * t + 0.68976733498510000455
+							) * t + 1.6763848301838038494
+						) * t + 2.05319162663775882187
+					) * t + 1
+				);
 			} else {
 				t += -5;
 				z = (
+					(
 						(
 							(
 								(
 									(
 										(
-											(
-												t * 2.01033439929228813265e-7 + 2.71155556874348757815e-5
-											) * t + 0.0012426609473880784386
-										) * t + 0.026532189526576123093
-									) * t + 0.29656057182850489123
-								) * t + 1.7848265399172913358
-							) * t + 5.4637849111641143699
-						) * t + 6.6579046435011037772
-					) / (
+											t * 2.01033439929228813265e-7 + 2.71155556874348757815e-5
+										) * t + 0.0012426609473880784386
+									) * t + 0.026532189526576123093
+								) * t + 0.29656057182850489123
+							) * t + 1.7848265399172913358
+						) * t + 5.4637849111641143699
+					) * t + 6.6579046435011037772
+				) / (
+					(
 						(
 							(
 								(
 									(
 										(
-											(
-												t * 2.04426310338993978564e-15 + 1.4215117583164458887e-7
-											) * t + 1.8463183175100546818e-5
-										) * t + 7.868691311456132591e-4
-									) * t + 0.0148753612908506148525
-								) * t + 0.13692988092273580531
-							) * t + 0.59983220655588793769
-						) * t + 1
-					);
+											t * 2.04426310338993978564e-15 + 1.4215117583164458887e-7
+										) * t + 1.8463183175100546818e-5
+									) * t + 7.868691311456132591e-4
+								) * t + 0.0148753612908506148525
+							) * t + 0.13692988092273580531
+						) * t + 0.59983220655588793769
+					) * t + 1
+				);
 			}
 
 			if (q < 0) {
@@ -2986,10 +2986,10 @@
 					// adjust average value for position within period
 					if (this.bAdditive) {
 						fI += ( this.maRange[i * this.mnSmplInPrd + j].Y -
-						( aPeriodAverage[i] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) * this.mpTrend[0] ) );
+							( aPeriodAverage[i] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) * this.mpTrend[0] ) );
 					} else {
 						fI += ( this.maRange[i * this.mnSmplInPrd + j].Y /
-						( aPeriodAverage[i] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) * this.mpTrend[0] ) );
+							( aPeriodAverage[i] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) * this.mpTrend[0] ) );
 					}
 				}
 				this.mpPerIdx[j] = fI / nPeriods;
@@ -3264,8 +3264,8 @@
 		// forecast 1 step ahead
 		for (var i = 1; i < this.mnCount; i++) {
 			if (this.bEDS) {
-				this.mpBase[i] = this.mfAlpha * this.maRange[i].Y +
-					( 1 - this.mfAlpha ) * ( this.mpBase[i - 1] + this.mpTrend[i - 1] );
+				this.mpBase[i] = this.mfAlpha * this.maRange[i].Y + ( 1 - this.mfAlpha ) *
+					( this.mpBase[i - 1] + this.mpTrend[i - 1] );
 				this.mpTrend[i] =
 					this.mfGamma * ( this.mpBase[i] - this.mpBase[i - 1] ) + ( 1 - this.mfGamma ) * this.mpTrend[i - 1];
 				this.mpForecast[i] = this.mpBase[i - 1] + this.mpTrend[i - 1];
@@ -3273,16 +3273,16 @@
 				var nIdx;
 				if (this.bAdditive) {
 					nIdx = ( i > this.mnSmplInPrd ? i - this.mnSmplInPrd : i );
-					this.mpBase[i] = this.mfAlpha * ( this.maRange[i].Y - this.mpPerIdx[nIdx] ) +
-						( 1 - this.mfAlpha ) * ( this.mpBase[i - 1] + this.mpTrend[i - 1] );
-					this.mpPerIdx[i] = this.mfBeta * ( this.maRange[i].Y - this.mpBase[i] ) +
-						( 1 - this.mfBeta ) * this.mpPerIdx[nIdx];
+					this.mpBase[i] = this.mfAlpha * ( this.maRange[i].Y - this.mpPerIdx[nIdx] ) + ( 1 - this.mfAlpha ) *
+						( this.mpBase[i - 1] + this.mpTrend[i - 1] );
+					this.mpPerIdx[i] = this.mfBeta * ( this.maRange[i].Y - this.mpBase[i] ) + ( 1 - this.mfBeta ) *
+						this.mpPerIdx[nIdx];
 				} else {
 					nIdx = ( i >= this.mnSmplInPrd ? i - this.mnSmplInPrd : i );
-					this.mpBase[i] = this.mfAlpha * ( this.maRange[i].Y / this.mpPerIdx[nIdx] ) +
-						( 1 - this.mfAlpha ) * ( this.mpBase[i - 1] + this.mpTrend[i - 1] );
-					this.mpPerIdx[i] = this.mfBeta * ( this.maRange[i].Y / this.mpBase[i] ) +
-						( 1 - this.mfBeta ) * this.mpPerIdx[this.nIdx];
+					this.mpBase[i] = this.mfAlpha * ( this.maRange[i].Y / this.mpPerIdx[nIdx] ) + ( 1 - this.mfAlpha ) *
+						( this.mpBase[i - 1] + this.mpTrend[i - 1] );
+					this.mpPerIdx[i] = this.mfBeta * ( this.maRange[i].Y / this.mpBase[i] ) + ( 1 - this.mfBeta ) *
+						this.mpPerIdx[this.nIdx];
 				}
 				this.mpTrend[i] =
 					this.mfGamma * ( this.mpBase[i] - this.mpBase[i - 1] ) + ( 1 - this.mfGamma ) * this.mpTrend[i - 1];
@@ -3494,10 +3494,10 @@
 				aPredictions[0][k] = xScenRange[0];
 				xScenBase[0] = this.mfAlpha * ( xScenRange[0] - this.mpPerIdx[this.mnCount - this.mnSmplInPrd] ) +
 					( 1 - this.mfAlpha ) * ( this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] );
-				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) +
-					( 1 - this.mfGamma ) * this.mpTrend[this.mnCount - 1];
-				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] - xScenBase[0] ) +
-					( 1 - this.mfBeta ) * this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
+				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) + ( 1 - this.mfGamma ) *
+					this.mpTrend[this.mnCount - 1];
+				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] - xScenBase[0] ) + ( 1 - this.mfBeta ) *
+					this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
 				for (var i = 1; i < nSize; i++) {
 					var fPerIdx;
 					if (i < this.mnSmplInPrd) {
@@ -3511,8 +3511,8 @@
 						aPredictions[i] = [];
 					}
 					aPredictions[i][k] = xScenRange[i];
-					xScenBase[i] = this.mfAlpha * ( xScenRange[i] - fPerIdx ) +
-						( 1 - this.mfAlpha ) * ( xScenBase[i - 1] + xScenTrend[i - 1] );
+					xScenBase[i] = this.mfAlpha * ( xScenRange[i] - fPerIdx ) + ( 1 - this.mfAlpha ) *
+						( xScenBase[i - 1] + xScenTrend[i - 1] );
 					xScenTrend[i] =
 						this.mfGamma * ( xScenBase[i] - xScenBase[i - 1] ) + ( 1 - this.mfGamma ) * xScenTrend[i - 1];
 					xScenPerIdx[i] = this.mfBeta * ( xScenRange[i] - xScenBase[i] ) + ( 1 - this.mfBeta ) * fPerIdx;
@@ -3528,10 +3528,10 @@
 				aPredictions[0][k] = xScenRange[0];
 				xScenBase[0] = this.mfAlpha * ( xScenRange[0] / this.mpPerIdx[this.mnCount - this.mnSmplInPrd] ) +
 					( 1 - this.mfAlpha ) * ( this.mpBase[this.mnCount - 1] + this.mpTrend[this.mnCount - 1] );
-				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) +
-					( 1 - this.mfGamma ) * this.mpTrend[this.mnCount - 1];
-				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] / xScenBase[0] ) +
-					( 1 - this.mfBeta ) * this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
+				xScenTrend[0] = this.mfGamma * ( xScenBase[0] - this.mpBase[this.mnCount - 1] ) + ( 1 - this.mfGamma ) *
+					this.mpTrend[this.mnCount - 1];
+				xScenPerIdx[0] = this.mfBeta * ( xScenRange[0] / xScenBase[0] ) + ( 1 - this.mfBeta ) *
+					this.mpPerIdx[this.mnCount - this.mnSmplInPrd];
 				for (var i = 1; i < nSize; i++) {
 					var fPerIdx;
 					if (i < this.mnSmplInPrd) {
@@ -3545,8 +3545,8 @@
 						aPredictions[i] = [];
 					}
 					aPredictions[i][k] = xScenRange[i];
-					xScenBase[i] = this.mfAlpha * ( xScenRange[i] / fPerIdx ) +
-						( 1 - this.mfAlpha ) * ( xScenBase[i - 1] + xScenTrend[i - 1] );
+					xScenBase[i] = this.mfAlpha * ( xScenRange[i] / fPerIdx ) + ( 1 - this.mfAlpha ) *
+						( xScenBase[i - 1] + xScenTrend[i - 1] );
 					xScenTrend[i] =
 						this.mfGamma * ( xScenBase[i] - xScenBase[i - 1] ) + ( 1 - this.mfGamma ) * xScenTrend[i - 1];
 					xScenPerIdx[i] = this.mfBeta * ( xScenRange[i] / xScenBase[i] ) + ( 1 - this.mfBeta ) * fPerIdx;
@@ -3625,8 +3625,8 @@
 		//std::vector< double > c( nSize );
 		for (var i = 0; i < nSize; i++) {
 			c[i] = Math.sqrt(1 + ( fPILevel / Math.pow(1 + o, 3.0) ) *
-				( ( 1 + 4 * o + 5 * o * o ) + 2 * ( i ) * fPILevel * ( 1 + 3 * o ) +
-				2 * ( i * i ) * fPILevel * fPILevel ));
+				( ( 1 + 4 * o + 5 * o * o ) + 2 * ( i ) * fPILevel * ( 1 + 3 * o ) + 2 * ( i * i ) * fPILevel *
+					fPILevel ));
 		}
 
 
@@ -3908,10 +3908,10 @@
 	cAVERAGEIF.prototype.argumentsMax = 3;
 	cAVERAGEIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, matchingInfo, ws;
-		if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
-			cElementType.cellsRange !== arg0.type) ||
-			(cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type &&
-			cElementType.cellsRange !== arg2.type)) {
+		if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type && cElementType.cellsRange !==
+				arg0.type) ||
+			(cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type && cElementType.cellsRange !==
+				arg2.type)) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -3998,8 +3998,8 @@
 			arg1 = arg[k];
 			arg2 = arg[k + 1];
 
-			if ((cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
-				cElementType.cellsRange !== arg1.type)) {
+			if ((cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type && cElementType.cellsRange !==
+					arg1.type)) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
@@ -4403,11 +4403,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHIINV() {
-		cBaseFunction.call(this, "CHIINV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
 	cCHIINV.prototype.constructor = cCHIINV;
+	cCHIINV.prototype.name = 'CHIINV';
 	cCHIINV.prototype.argumentsMin = 2;
 	cCHIINV.prototype.argumentsMax = 2;
 	cCHIINV.prototype.Calculate = function (arg) {
@@ -4450,11 +4452,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_DIST() {
-		cBaseFunction.call(this, "CHISQ.DIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cCHISQ_DIST.prototype.constructor = cCHISQ_DIST;
+	cCHISQ_DIST.prototype.name = 'CHISQ.DIST';
 	cCHISQ_DIST.prototype.argumentsMin = 3;
 	cCHISQ_DIST.prototype.argumentsMax = 3;
 	cCHISQ_DIST.prototype.isXLFN = true;
@@ -4515,11 +4519,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV() {
-		cBaseFunction.call(this, "CHISQ.INV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_INV.prototype = Object.create(cBaseFunction.prototype);
 	cCHISQ_INV.prototype.constructor = cCHISQ_INV;
+	cCHISQ_INV.prototype.name = 'CHISQ.INV';
 	cCHISQ_INV.prototype.argumentsMin = 2;
 	cCHISQ_INV.prototype.argumentsMax = 2;
 	cCHISQ_INV.prototype.isXLFN = true;
@@ -4563,12 +4569,14 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV_RT() {
-		cBaseFunction.call(this, "CHISQ.INV.RT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	//TODO check max 64 iterations(from documentaion)
 	cCHISQ_INV_RT.prototype = Object.create(cBaseFunction.prototype);
 	cCHISQ_INV_RT.prototype.constructor = cCHISQ_INV_RT;
+	cCHISQ_INV_RT.prototype.name = 'CHISQ.INV.RT';
 	cCHISQ_INV_RT.prototype.argumentsMin = 2;
 	cCHISQ_INV_RT.prototype.argumentsMax = 2;
 	cCHISQ_INV_RT.prototype.isXLFN = true;
@@ -5766,11 +5774,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_INV() {
-		cBaseFunction.call(this, "F.INV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cF_INV.prototype = Object.create(cBaseFunction.prototype);
 	cF_INV.prototype.constructor = cF_INV;
+	cF_INV.prototype.name = 'F.INV';
 	cF_INV.prototype.argumentsMin = 3;
 	cF_INV.prototype.argumentsMax = 3;
 	cF_INV.prototype.isXLFN = true;
@@ -7020,11 +7030,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPGEOM_DIST() {
-		cBaseFunction.call(this, "HYPGEOM.DIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
+	cHYPGEOM_DIST.prototype.name = 'HYPGEOM.DIST';
 	cHYPGEOM_DIST.prototype.argumentsMin = 5;
 	cHYPGEOM_DIST.prototype.argumentsMax = 5;
 	cHYPGEOM_DIST.prototype.isXLFN = true;
@@ -7208,9 +7220,8 @@
 
 			}
 
-			return new cNumber(
-				xLength * (xLength + 1) / (xLength - 1) / (xLength - 2) / (xLength - 3) * sumSQRDeltaXDivstandDev -
-				3 * (xLength - 1) * (xLength - 1) / (xLength - 2) / (xLength - 3))
+			return new cNumber(xLength * (xLength + 1) / (xLength - 1) / (xLength - 2) / (xLength - 3) *
+				sumSQRDeltaXDivstandDev - 3 * (xLength - 1) * (xLength - 1) / (xLength - 2) / (xLength - 3))
 
 		}
 
@@ -7376,6 +7387,7 @@
 	cLOGEST.prototype.name = 'LOGEST';
 	cLOGEST.prototype.argumentsMin = 1;
 	cLOGEST.prototype.argumentsMax = 4;
+
 	/*cLOGEST.prototype.Calculate = function (arg) {
 
 	 arg[0] = tryNumberToArray(arg[0]);
@@ -7866,8 +7878,8 @@
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
 						//MS считает в данном случае, что значение 0 (из диапазона условий) соответсвует условию = ""
-						if (!(null === matchingInfo.op && "" === matchingInfo.val.value &&
-							0 === arg1Matrix[i][j].value)) {
+						if (!(null === matchingInfo.op && "" === matchingInfo.val.value && 0 ===
+								arg1Matrix[i][j].value)) {
 							arg0Matrix[i][j] = null;
 						}
 					}
@@ -7972,8 +7984,8 @@
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
 						//MS считает в данном случае, что значение 0 (из диапазона условий) соответсвует условию = ""
-						if (!(null === matchingInfo.op && "" === matchingInfo.val.value &&
-							0 === arg1Matrix[i][j].value)) {
+						if (!(null === matchingInfo.op && "" === matchingInfo.val.value && 0 ===
+								arg1Matrix[i][j].value)) {
 							arg0Matrix[i][j] = null;
 						}
 					}
@@ -8366,11 +8378,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOMDIST() {
-		cBaseFunction.call(this, "NEGBINOMDIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cNEGBINOMDIST.prototype.constructor = cNEGBINOMDIST;
+	cNEGBINOMDIST.prototype.name = 'NEGBINOMDIST';
 	cNEGBINOMDIST.prototype.argumentsMin = 3;
 	cNEGBINOMDIST.prototype.argumentsMax = 3;
 	cNEGBINOMDIST.prototype.Calculate = function (arg) {
@@ -8405,11 +8419,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOM_DIST() {
-		cBaseFunction.call(this, "NEGBINOM.DIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
+	cNEGBINOM_DIST.prototype.name = 'NEGBINOM.DIST';
 	cNEGBINOM_DIST.prototype.argumentsMin = 4;
 	cNEGBINOM_DIST.prototype.argumentsMax = 4;
 	cNEGBINOM_DIST.prototype.isXLFN = true;
@@ -9550,11 +9566,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANK_AVG() {
-		cBaseFunction.call(this, "RANK.AVG");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
 	cRANK_AVG.prototype.constructor = cRANK_AVG;
+	cRANK_AVG.prototype.name = 'RANK.AVG';
 	cRANK_AVG.prototype.argumentsMin = 2;
 	cRANK_AVG.prototype.argumentsMax = 3;
 	cRANK_AVG.prototype.isXLFN = true;
@@ -10419,11 +10437,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTDIST() {
-		cBaseFunction.call(this, "TDIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
 	cTDIST.prototype.constructor = cTDIST;
+	cTDIST.prototype.name = 'TDIST';
 	cTDIST.prototype.argumentsMin = 3;
 	cTDIST.prototype.argumentsMax = 3;
 	cTDIST.prototype.Calculate = function (arg) {
@@ -10461,11 +10481,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST() {
-		cBaseFunction.call(this, "T.DIST");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cT_DIST.prototype.constructor = cT_DIST;
+	cT_DIST.prototype.name = 'T.DIST';
 	cT_DIST.prototype.argumentsMin = 3;
 	cT_DIST.prototype.argumentsMax = 3;
 	cT_DIST.prototype.isXLFN = true;
@@ -10503,11 +10525,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_2T() {
-		cBaseFunction.call(this, "T.DIST.2T");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
 	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
+	cT_DIST_2T.prototype.name = 'T.DIST.2T';
 	cT_DIST_2T.prototype.argumentsMin = 2;
 	cT_DIST_2T.prototype.argumentsMax = 2;
 	cT_DIST_2T.prototype.isXLFN = true;
@@ -10543,11 +10567,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_RT() {
-		cBaseFunction.call(this, "T.DIST.RT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
 	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
+	cT_DIST_RT.prototype.name = 'T.DIST.RT';
 	cT_DIST_RT.prototype.argumentsMin = 2;
 	cT_DIST_RT.prototype.argumentsMax = 2;
 	cT_DIST_RT.prototype.isXLFN = true;
@@ -10587,11 +10613,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV() {
-		cBaseFunction.call(this, "T.INV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_INV.prototype = Object.create(cBaseFunction.prototype);
 	cT_INV.prototype.constructor = cT_INV;
+	cT_INV.prototype.name = 'T.INV';
 	cT_INV.prototype.argumentsMin = 2;
 	cT_INV.prototype.argumentsMax = 2;
 	cT_INV.prototype.isXLFN = true;
@@ -10645,11 +10673,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV_2T() {
-		cBaseFunction.call(this, "T.INV.2T");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
 	cT_INV_2T.prototype.constructor = cT_INV_2T;
+	cT_INV_2T.prototype.name = 'T.INV.2T';
 	cT_INV_2T.prototype.argumentsMin = 2;
 	cT_INV_2T.prototype.argumentsMax = 2;
 	cT_INV_2T.prototype.isXLFN = true;

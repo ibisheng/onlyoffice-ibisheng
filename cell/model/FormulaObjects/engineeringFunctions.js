@@ -37,7 +37,7 @@
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function (window, undefined) {
+function (window, undefined) {
 	var cErrorType = AscCommonExcel.cErrorType;
 	var cNumber = AscCommonExcel.cNumber;
 	var cString = AscCommonExcel.cString;
@@ -202,13 +202,13 @@
 		if (fNum <= 2) {
 
 			y = fNum * fNum / 4.0;
-			fRet = (-Math.log(fNum / 2.0) * BesselI(fNum, 0)) + (-0.57721566 + y * (0.42278420 +
-				y * (0.23069756 + y * (0.3488590e-1 + y * (0.262698e-2 + y * (0.10750e-3 + y * 0.74e-5))))));
+			fRet = (-Math.log(fNum / 2.0) * BesselI(fNum, 0)) + (-0.57721566 + y * (0.42278420 + y *
+				(0.23069756 + y * (0.3488590e-1 + y * (0.262698e-2 + y * (0.10750e-3 + y * 0.74e-5))))));
 
 		} else {
 			y = 2 / fNum;
-			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( -0.7832358e-1 + y * ( 0.2189568e-1 +
-				y * ( -0.1062446e-1 + y * ( 0.587872e-2 + y * ( -0.251540e-2 + y * 0.53208e-3 ) ) ) ) ) );
+			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( -0.7832358e-1 + y * ( 0.2189568e-1 + y *
+				( -0.1062446e-1 + y * ( 0.587872e-2 + y * ( -0.251540e-2 + y * 0.53208e-3 ) ) ) ) ) );
 		}
 
 		return new cNumber(fRet);
@@ -219,12 +219,12 @@
 
 		if (fNum <= 2) {
 			y = fNum * fNum / 4.0;
-			fRet = (Math.log(fNum / 2.0) * BesselI(fNum, 1)) + (1.0 / fNum) * (1.0 + y * (0.15443144 +
-				y * (-0.67278579 + y * (-0.18156897 + y * (-0.1919402e-1 + y * (-0.110404e-2 + y * (-0.4686e-4)))))));
+			fRet = (Math.log(fNum / 2.0) * BesselI(fNum, 1)) + (1.0 / fNum) * (1.0 + y * (0.15443144 + y *
+				(-0.67278579 + y * (-0.18156897 + y * (-0.1919402e-1 + y * (-0.110404e-2 + y * (-0.4686e-4)))))));
 		} else {
 			y = 2 / fNum;
-			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( 0.23498619 + y * ( -0.3655620e-1 +
-				y * ( 0.1504268e-1 + y * ( -0.780353e-2 + y * ( 0.325614e-2 + y * ( -0.68245e-3 ) ) ) ) ) ) );
+			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( 0.23498619 + y * ( -0.3655620e-1 + y *
+				( 0.1504268e-1 + y * ( -0.780353e-2 + y * ( 0.325614e-2 + y * ( -0.68245e-3 ) ) ) ) ) ) );
 		}
 
 		return new cNumber(fRet);
@@ -241,8 +241,8 @@
 		} else {
 			y = 3.75 / ax;
 			fRet = (Math.exp(ax) / Math.sqrt(ax)) * (0.39894228 + y * (0.1328592e-1 + y * (0.225319e-2 + y *
-				(-0.157565e-2 + y *
-				(0.916281e-2 + y * (-0.2057706e-1 + y * (0.2635537e-1 + y * (-0.1647633e-1 + y * 0.392377e-2))))))));
+				(-0.157565e-2 + y * (0.916281e-2 + y *
+					(-0.2057706e-1 + y * (0.2635537e-1 + y * (-0.1647633e-1 + y * 0.392377e-2))))))));
 		}
 		return fRet;
 	}
@@ -402,8 +402,8 @@
 
 		if (fNum < 8.0) {
 			var y = (fNum * fNum);
-			var f1 = -2957821389.0 +
-				y * (7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
+			var f1 = -2957821389.0 + y *
+				(7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
 			var f2 = 40076544269.0 + y * (745249964.8 + y * (7189466.438 + y * (47447.26470 + y * (226.1030244 + y))));
 			var fRet = f1 / f2 + 0.636619772 * BesselJ(fNum, 0) * Math.log(fNum);
 		} else {
@@ -411,8 +411,8 @@
 			var y = (z * z);
 			var xx = fNum - 0.785398164;
 			var f1 = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6)));
-			var f2 = -0.1562499995e-1 +
-				y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 + y * (-0.934945152e-7))));
+			var f2 = -0.1562499995e-1 + y *
+				(0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 + y * (-0.934945152e-7))));
 			var fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * f1 + z * Math.cos(xx) * f2);
 		}
 
@@ -424,18 +424,18 @@
 		var z, xx, y, fRet, ans1, ans2;
 		if (fNum < 8.0) {
 			y = fNum * fNum;
-			ans1 = fNum * (-0.4900604943e13 + y * (0.1275274390e13 +
-				y * (-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
-			ans2 = 0.2499580570e14 + y * (0.4244419664e12 +
-				y * (0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
+			ans1 = fNum * (-0.4900604943e13 + y * (0.1275274390e13 + y *
+				(-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
+			ans2 = 0.2499580570e14 + y * (0.4244419664e12 + y *
+				(0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
 			fRet = (ans1 / ans2) + 0.636619772 * (BesselJ(fNum) * Math.log(fNum) - 1.0 / fNum);
 		} else {
 			z = 8.0 / fNum;
 			y = z * z;
 			xx = fNum - 2.356194491;
 			ans1 = 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
-			ans2 = 0.04687499995 +
-				y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+			ans2 = 0.04687499995 + y *
+				(-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
 			fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * ans1 + z * Math.cos(xx) * ans2);
 		}
 
@@ -4342,11 +4342,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELI() {
-		cBaseFunction.call(this, "BESSELI");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBESSELI.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELI.prototype.constructor = cBESSELI;
+	cBESSELI.prototype.name = 'BESSELI';
 	cBESSELI.prototype.argumentsMin = 2;
 	cBESSELI.prototype.argumentsMax = 2;
 	cBESSELI.prototype.Calculate = function (arg) {
@@ -4384,11 +4386,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELJ() {
-		cBaseFunction.call(this, "BESSELJ");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBESSELJ.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELJ.prototype.constructor = cBESSELJ;
+	cBESSELJ.prototype.name = 'BESSELJ';
 	cBESSELJ.prototype.argumentsMin = 2;
 	cBESSELJ.prototype.argumentsMax = 2;
 	cBESSELJ.prototype.Calculate = function (arg) {
@@ -4428,11 +4432,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELK() {
-		cBaseFunction.call(this, "BESSELK");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBESSELK.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELK.prototype.constructor = cBESSELK;
+	cBESSELK.prototype.name = 'BESSELK';
 	cBESSELK.prototype.argumentsMin = 2;
 	cBESSELK.prototype.argumentsMax = 2;
 	cBESSELK.prototype.Calculate = function (arg) {
@@ -4470,11 +4476,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELY() {
-		cBaseFunction.call(this, "BESSELY");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBESSELY.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELY.prototype.constructor = cBESSELY;
+	cBESSELY.prototype.name = 'BESSELY';
 	cBESSELY.prototype.argumentsMin = 2;
 	cBESSELY.prototype.argumentsMax = 2;
 	cBESSELY.prototype.Calculate = function (arg) {
@@ -4512,11 +4520,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2DEC() {
-		cBaseFunction.call(this, "BIN2DEC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBIN2DEC.prototype = Object.create(cBaseFunction.prototype);
 	cBIN2DEC.prototype.constructor = cBIN2DEC;
+	cBIN2DEC.prototype.name = 'BIN2DEC';
 	cBIN2DEC.prototype.argumentsMin = 1;
 	cBIN2DEC.prototype.argumentsMax = 1;
 	cBIN2DEC.prototype.Calculate = function (arg) {
@@ -4560,11 +4570,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2HEX() {
-		cBaseFunction.call(this, "BIN2HEX");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBIN2HEX.prototype = Object.create(cBaseFunction.prototype);
 	cBIN2HEX.prototype.constructor = cBIN2HEX;
+	cBIN2HEX.prototype.name = 'BIN2HEX';
 	cBIN2HEX.prototype.argumentsMin = 1;
 	cBIN2HEX.prototype.argumentsMax = 2;
 	cBIN2HEX.prototype.Calculate = function (arg) {
@@ -4624,11 +4636,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2OCT() {
-		cBaseFunction.call(this, "BIN2OCT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBIN2OCT.prototype = Object.create(cBaseFunction.prototype);
 	cBIN2OCT.prototype.constructor = cBIN2OCT;
+	cBIN2OCT.prototype.name = 'BIN2OCT';
 	cBIN2OCT.prototype.argumentsMin = 1;
 	cBIN2OCT.prototype.argumentsMax = 2;
 	cBIN2OCT.prototype.Calculate = function (arg) {
@@ -4688,11 +4702,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITAND() {
-		cBaseFunction.call(this, "BITAND");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBITAND.prototype = Object.create(cBaseFunction.prototype);
 	cBITAND.prototype.constructor = cBITAND;
+	cBITAND.prototype.name = 'BITAND';
 	cBITAND.prototype.argumentsMin = 2;
 	cBITAND.prototype.argumentsMax = 2;
 	cBITAND.prototype.isXLFN = true;
@@ -4728,11 +4744,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITLSHIFT() {
-		cBaseFunction.call(this, "BITLSHIFT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBITLSHIFT.prototype = Object.create(cBaseFunction.prototype);
 	cBITLSHIFT.prototype.constructor = cBITLSHIFT;
+	cBITLSHIFT.prototype.name = 'BITLSHIFT';
 	cBITLSHIFT.prototype.argumentsMin = 2;
 	cBITLSHIFT.prototype.argumentsMax = 2;
 	cBITLSHIFT.prototype.isXLFN = true;
@@ -4776,11 +4794,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITOR() {
-		cBaseFunction.call(this, "BITOR");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBITOR.prototype = Object.create(cBaseFunction.prototype);
 	cBITOR.prototype.constructor = cBITOR;
+	cBITOR.prototype.name = 'BITOR';
 	cBITOR.prototype.argumentsMin = 2;
 	cBITOR.prototype.argumentsMax = 2;
 	cBITOR.prototype.isXLFN = true;
@@ -4816,11 +4836,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITRSHIFT() {
-		cBaseFunction.call(this, "BITRSHIFT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBITRSHIFT.prototype = Object.create(cBaseFunction.prototype);
 	cBITRSHIFT.prototype.constructor = cBITRSHIFT;
+	cBITRSHIFT.prototype.name = 'BITRSHIFT';
 	cBITRSHIFT.prototype.argumentsMin = 2;
 	cBITRSHIFT.prototype.argumentsMax = 2;
 	cBITRSHIFT.prototype.isXLFN = true;
@@ -4864,11 +4886,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITXOR() {
-		cBaseFunction.call(this, "BITXOR");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
 	cBITXOR.prototype.constructor = cBITXOR;
+	cBITXOR.prototype.name = 'BITXOR';
 	cBITXOR.prototype.argumentsMin = 2;
 	cBITXOR.prototype.argumentsMax = 2;
 	cBITXOR.prototype.isXLFN = true;
@@ -4904,11 +4928,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOMPLEX() {
-		cBaseFunction.call(this, "COMPLEX");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCOMPLEX.prototype = Object.create(cBaseFunction.prototype);
 	cCOMPLEX.prototype.constructor = cCOMPLEX;
+	cCOMPLEX.prototype.name = 'COMPLEX';
 	cCOMPLEX.prototype.argumentsMin = 2;
 	cCOMPLEX.prototype.argumentsMax = 3;
 	cCOMPLEX.prototype.Calculate = function (arg) {
@@ -4968,11 +4994,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONVERT() {
-		cBaseFunction.call(this, "CONVERT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCONVERT.prototype = Object.create(cBaseFunction.prototype);
 	cCONVERT.prototype.constructor = cCONVERT;
+	cCONVERT.prototype.name = 'CONVERT';
 	cCONVERT.prototype.argumentsMin = 3;
 	cCONVERT.prototype.argumentsMax = 3;
 	cCONVERT.prototype.Calculate = function (arg) {
@@ -5085,11 +5113,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2BIN() {
-		cBaseFunction.call(this, "DEC2BIN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDEC2BIN.prototype = Object.create(cBaseFunction.prototype);
 	cDEC2BIN.prototype.constructor = cDEC2BIN;
+	cDEC2BIN.prototype.name = 'DEC2BIN';
 	cDEC2BIN.prototype.argumentsMin = 1;
 	cDEC2BIN.prototype.argumentsMax = 2;
 	cDEC2BIN.prototype.Calculate = function (arg) {
@@ -5144,11 +5174,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2HEX() {
-		cBaseFunction.call(this, "DEC2HEX");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDEC2HEX.prototype = Object.create(cBaseFunction.prototype);
 	cDEC2HEX.prototype.constructor = cDEC2HEX;
+	cDEC2HEX.prototype.name = 'DEC2HEX';
 	cDEC2HEX.prototype.argumentsMin = 1;
 	cDEC2HEX.prototype.argumentsMax = 2;
 	cDEC2HEX.prototype.Calculate = function (arg) {
@@ -5202,11 +5234,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2OCT() {
-		cBaseFunction.call(this, "DEC2OCT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDEC2OCT.prototype = Object.create(cBaseFunction.prototype);
 	cDEC2OCT.prototype.constructor = cDEC2OCT;
+	cDEC2OCT.prototype.name = 'DEC2OCT';
 	cDEC2OCT.prototype.argumentsMin = 1;
 	cDEC2OCT.prototype.argumentsMax = 2;
 	cDEC2OCT.prototype.Calculate = function (arg) {
@@ -5260,11 +5294,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDELTA() {
-		cBaseFunction.call(this, "DELTA");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDELTA.prototype = Object.create(cBaseFunction.prototype);
 	cDELTA.prototype.constructor = cDELTA;
+	cDELTA.prototype.name = 'DELTA';
 	cDELTA.prototype.argumentsMin = 1;
 	cDELTA.prototype.argumentsMax = 2;
 	cDELTA.prototype.Calculate = function (arg) {
@@ -5307,11 +5343,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERF() {
-		cBaseFunction.call(this, "ERF");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cERF.prototype = Object.create(cBaseFunction.prototype);
 	cERF.prototype.constructor = cERF;
+	cERF.prototype.name = 'ERF';
 	cERF.prototype.argumentsMin = 1;
 	cERF.prototype.argumentsMax = 2;
 	cERF.prototype.Calculate = function (arg) {
@@ -5349,11 +5387,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERF_PRECISE() {
-		cBaseFunction.call(this, "ERF.PRECISE");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cERF_PRECISE.prototype = Object.create(cBaseFunction.prototype);
 	cERF_PRECISE.prototype.constructor = cERF_PRECISE;
+	cERF_PRECISE.prototype.name = 'ERF.PRECISE';
 	cERF_PRECISE.prototype.argumentsMin = 1;
 	cERF_PRECISE.prototype.argumentsMax = 1;
 	cERF_PRECISE.prototype.isXLFN = true;
@@ -5382,11 +5422,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERFC() {
-		cBaseFunction.call(this, "ERFC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cERFC.prototype = Object.create(cBaseFunction.prototype);
 	cERFC.prototype.constructor = cERFC;
+	cERFC.prototype.name = 'ERFC';
 	cERFC.prototype.argumentsMin = 1;
 	cERFC.prototype.argumentsMax = 1;
 	cERFC.prototype.Calculate = function (arg) {
@@ -6094,11 +6136,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMDIV() {
-		cBaseFunction.call(this, "IMDIV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMDIV.prototype = Object.create(cBaseFunction.prototype);
 	cIMDIV.prototype.constructor = cIMDIV;
+	cIMDIV.prototype.name = 'IMDIV';
 	cIMDIV.prototype.argumentsMin = 2;
 	cIMDIV.prototype.argumentsMax = 2;
 	cIMDIV.prototype.Calculate = function (arg) {
@@ -6147,11 +6191,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMEXP() {
-		cBaseFunction.call(this, "IMEXP");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMEXP.prototype = Object.create(cBaseFunction.prototype);
 	cIMEXP.prototype.constructor = cIMEXP;
+	cIMEXP.prototype.name = 'IMEXP';
 	cIMEXP.prototype.argumentsMin = 1;
 	cIMEXP.prototype.argumentsMax = 1;
 	cIMEXP.prototype.Calculate = function (arg) {
@@ -6189,11 +6235,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLN() {
-		cBaseFunction.call(this, "IMLN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMLN.prototype = Object.create(cBaseFunction.prototype);
 	cIMLN.prototype.constructor = cIMLN;
+	cIMLN.prototype.name = 'IMLN';
 	cIMLN.prototype.argumentsMin = 1;
 	cIMLN.prototype.argumentsMax = 1;
 	cIMLN.prototype.Calculate = function (arg) {
@@ -6235,11 +6283,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLOG10() {
-		cBaseFunction.call(this, "IMLOG10");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMLOG10.prototype = Object.create(cBaseFunction.prototype);
 	cIMLOG10.prototype.constructor = cIMLOG10;
+	cIMLOG10.prototype.name = 'IMLOG10';
 	cIMLOG10.prototype.argumentsMin = 1;
 	cIMLOG10.prototype.argumentsMax = 1;
 	cIMLOG10.prototype.Calculate = function (arg) {
@@ -6281,11 +6331,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLOG2() {
-		cBaseFunction.call(this, "IMLOG2");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMLOG2.prototype = Object.create(cBaseFunction.prototype);
 	cIMLOG2.prototype.constructor = cIMLOG2;
+	cIMLOG2.prototype.name = 'IMLOG2';
 	cIMLOG2.prototype.argumentsMin = 1;
 	cIMLOG2.prototype.argumentsMax = 1;
 	cIMLOG2.prototype.Calculate = function (arg) {
@@ -6327,11 +6379,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMPOWER() {
-		cBaseFunction.call(this, "IMPOWER");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMPOWER.prototype = Object.create(cBaseFunction.prototype);
 	cIMPOWER.prototype.constructor = cIMPOWER;
+	cIMPOWER.prototype.name = 'IMPOWER';
 	cIMPOWER.prototype.argumentsMin = 2;
 	cIMPOWER.prototype.argumentsMax = 2;
 	cIMPOWER.prototype.Calculate = function (arg) {
@@ -6383,11 +6437,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMPRODUCT() {
-		cBaseFunction.call(this, "IMPRODUCT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMPRODUCT.prototype = Object.create(cBaseFunction.prototype);
 	cIMPRODUCT.prototype.constructor = cIMPRODUCT;
+	cIMPRODUCT.prototype.name = 'IMPRODUCT';
 	cIMPRODUCT.prototype.argumentsMin = 1;
 	cIMPRODUCT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], t = this;
@@ -6480,11 +6536,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMREAL() {
-		cBaseFunction.call(this, "IMREAL");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMREAL.prototype = Object.create(cBaseFunction.prototype);
 	cIMREAL.prototype.constructor = cIMREAL;
+	cIMREAL.prototype.name = 'IMREAL';
 	cIMREAL.prototype.argumentsMin = 1;
 	cIMREAL.prototype.argumentsMax = 1;
 	cIMREAL.prototype.Calculate = function (arg) {
@@ -6520,11 +6578,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSEC() {
-		cBaseFunction.call(this, "IMSEC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
 	cIMSEC.prototype.constructor = cIMSEC;
+	cIMSEC.prototype.name = 'IMSEC';
 	cIMSEC.prototype.argumentsMin = 1;
 	cIMSEC.prototype.argumentsMax = 1;
 	cIMSEC.prototype.isXLFN = true;
@@ -6567,11 +6627,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSECH() {
-		cBaseFunction.call(this, "IMSECH");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
 	cIMSECH.prototype.constructor = cIMSECH;
+	cIMSECH.prototype.name = 'IMSECH';
 	cIMSECH.prototype.argumentsMin = 1;
 	cIMSECH.prototype.argumentsMax = 1;
 	cIMSECH.prototype.isXLFN = true;
@@ -6615,11 +6677,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSIN() {
-		cBaseFunction.call(this, "IMSIN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSIN.prototype = Object.create(cBaseFunction.prototype);
 	cIMSIN.prototype.constructor = cIMSIN;
+	cIMSIN.prototype.name = 'IMSIN';
 	cIMSIN.prototype.argumentsMin = 1;
 	cIMSIN.prototype.argumentsMax = 1;
 	cIMSIN.prototype.Calculate = function (arg) {
@@ -6661,11 +6725,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSINH() {
-		cBaseFunction.call(this, "IMSINH");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSINH.prototype = Object.create(cBaseFunction.prototype);
 	cIMSINH.prototype.constructor = cIMSINH;
+	cIMSINH.prototype.name = 'IMSINH';
 	cIMSINH.prototype.argumentsMin = 1;
 	cIMSINH.prototype.argumentsMax = 1;
 	cIMSINH.prototype.isXLFN = true;
@@ -6708,11 +6774,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSQRT() {
-		cBaseFunction.call(this, "IMSQRT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSQRT.prototype = Object.create(cBaseFunction.prototype);
 	cIMSQRT.prototype.constructor = cIMSQRT;
+	cIMSQRT.prototype.name = 'IMSQRT';
 	cIMSQRT.prototype.argumentsMin = 1;
 	cIMSQRT.prototype.argumentsMax = 1;
 	cIMSQRT.prototype.Calculate = function (arg) {
@@ -6750,11 +6818,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSUB() {
-		cBaseFunction.call(this, "IMSUB");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSUB.prototype = Object.create(cBaseFunction.prototype);
 	cIMSUB.prototype.constructor = cIMSUB;
+	cIMSUB.prototype.name = 'IMSUB';
 	cIMSUB.prototype.argumentsMin = 2;
 	cIMSUB.prototype.argumentsMax = 2;
 	cIMSUB.prototype.Calculate = function (arg) {
@@ -6803,11 +6873,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSUM() {
-		cBaseFunction.call(this, "IMSUM");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMSUM.prototype = Object.create(cBaseFunction.prototype);
 	cIMSUM.prototype.constructor = cIMSUM;
+	cIMSUM.prototype.name = 'IMSUM';
 	cIMSUM.prototype.argumentsMin = 1;
 	cIMSUM.prototype.Calculate = function (arg) {
 
@@ -6901,12 +6973,14 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMTAN() {
-		cBaseFunction.call(this, "IMTAN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	//TODO проверить!!!
 	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
 	cIMTAN.prototype.constructor = cIMTAN;
+	cIMTAN.prototype.name = 'IMTAN';
 	cIMTAN.prototype.argumentsMin = 1;
 	cIMTAN.prototype.argumentsMax = 1;
 	cIMTAN.prototype.isXLFN = true;
@@ -6949,11 +7023,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2BIN() {
-		cBaseFunction.call(this, "OCT2BIN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cOCT2BIN.prototype = Object.create(cBaseFunction.prototype);
 	cOCT2BIN.prototype.constructor = cOCT2BIN;
+	cOCT2BIN.prototype.name = 'OCT2BIN';
 	cOCT2BIN.prototype.argumentsMin = 1;
 	cOCT2BIN.prototype.argumentsMax = 2;
 	cOCT2BIN.prototype.Calculate = function (arg) {
@@ -7020,11 +7096,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2DEC() {
-		cBaseFunction.call(this, "OCT2DEC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cOCT2DEC.prototype = Object.create(cBaseFunction.prototype);
 	cOCT2DEC.prototype.constructor = cOCT2DEC;
+	cOCT2DEC.prototype.name = 'OCT2DEC';
 	cOCT2DEC.prototype.argumentsMin = 1;
 	cOCT2DEC.prototype.argumentsMax = 1;
 	cOCT2DEC.prototype.Calculate = function (arg) {
@@ -7067,11 +7145,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2HEX() {
-		cBaseFunction.call(this, "OCT2HEX");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cOCT2HEX.prototype = Object.create(cBaseFunction.prototype);
 	cOCT2HEX.prototype.constructor = cOCT2HEX;
+	cOCT2HEX.prototype.name = 'OCT2HEX';
 	cOCT2HEX.prototype.argumentsMin = 1;
 	cOCT2HEX.prototype.argumentsMax = 2;
 	cOCT2HEX.prototype.Calculate = function (arg) {

@@ -36,7 +36,7 @@
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function (window, undefined) {
+function (window, undefined) {
 	function _getRowTitle(row) {
 		return "" + (row + 1);
 	}
@@ -217,11 +217,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAREAS() {
-		cBaseFunction.call(this, "AREAS");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cAREAS.prototype = Object.create(cBaseFunction.prototype);
 	cAREAS.prototype.constructor = cAREAS;
+	cAREAS.prototype.name = 'AREAS';
 
 	/**
 	 * @constructor
@@ -353,11 +355,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGETPIVOTDATA() {
-		cBaseFunction.call(this, "GETPIVOTDATA");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cGETPIVOTDATA.prototype = Object.create(cBaseFunction.prototype);
 	cGETPIVOTDATA.prototype.constructor = cGETPIVOTDATA;
+	cGETPIVOTDATA.prototype.name = 'GETPIVOTDATA';
 
 	/**
 	 * @constructor
@@ -382,11 +386,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPERLINK() {
-		cBaseFunction.call(this, "HYPERLINK");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cHYPERLINK.prototype = Object.create(cBaseFunction.prototype);
 	cHYPERLINK.prototype.constructor = cHYPERLINK;
+	cHYPERLINK.prototype.name = 'HYPERLINK';
 
 	/**
 	 * @constructor
@@ -449,8 +455,8 @@
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1,
-							bbox.r1 + arg1 - 1)
+						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 -
+							1)
 						res = new cRef(res.getName(), ws);
 					}
 				}
@@ -581,9 +587,9 @@
 		}
 
 		if (!( (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type ||
-			cElementType.array === arg1.type) &&
-			(cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type ||
-			cElementType.array === arg2.type) )) {
+				cElementType.array === arg1.type) &&
+				(cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type ||
+					cElementType.array === arg2.type) )) {
 			return this.value = new cError(cErrorType.not_available);
 		}
 
@@ -712,7 +718,7 @@
 			var a0Type = a0.type;
 			var a0Value = a0.getValue();
 			if (!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type ||
-				cElementType.error === a0Type || cElementType.empty === a0Type)) {
+					cElementType.error === a0Type || cElementType.empty === a0Type)) {
 				a0Type = a0Value.type;
 				a0Value = a0Value.getValue();
 			}
@@ -932,11 +938,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRTD() {
-		cBaseFunction.call(this, "RTD");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cRTD.prototype = Object.create(cBaseFunction.prototype);
 	cRTD.prototype.constructor = cRTD;
+	cRTD.prototype.name = 'RTD';
 
 	/**
 	 * @constructor

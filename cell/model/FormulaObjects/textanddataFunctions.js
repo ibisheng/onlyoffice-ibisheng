@@ -36,7 +36,7 @@
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function (window, undefined) {
+function (window, undefined) {
 	// Import
 	var cElementType = AscCommonExcel.cElementType;
 	var CellValueType = AscCommon.CellValueType;
@@ -70,22 +70,26 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cASC() {
-		cBaseFunction.call(this, "ASC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cASC.prototype = Object.create(cBaseFunction.prototype);
 	cASC.prototype.constructor = cASC;
+	cASC.prototype.name = 'ASC';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBAHTTEXT() {
-		cBaseFunction.call(this, "BAHTTEXT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBAHTTEXT.prototype = Object.create(cBaseFunction.prototype);
 	cBAHTTEXT.prototype.constructor = cBAHTTEXT;
+	cBAHTTEXT.prototype.name = 'BAHTTEXT';
 
 	/**
 	 * @constructor
@@ -858,11 +862,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cJIS() {
-		cBaseFunction.call(this, "JIS");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cJIS.prototype = Object.create(cBaseFunction.prototype);
 	cJIS.prototype.constructor = cJIS;
+	cJIS.prototype.name = 'JIS';
 
 	/**
 	 * @constructor
@@ -1219,11 +1225,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPHONETIC() {
-		cBaseFunction.call(this, "PHONETIC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cPHONETIC.prototype = Object.create(cBaseFunction.prototype);
 	cPHONETIC.prototype.constructor = cPHONETIC;
+	cPHONETIC.prototype.name = 'PHONETIC';
 
 	/**
 	 * @constructor

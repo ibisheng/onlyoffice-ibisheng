@@ -2382,12 +2382,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 
 	/** @constructor */
-	function cBaseFunction(name) {
-		this.name = name;
+	function cBaseFunction() {
 		this.value = null;
 		this.argumentsCurrent = 0;
-
-//    this.isXLFN = rx_sFuncPref.test(this.name);
 	}
 
 	cBaseFunction.prototype.type = cElementType.func;
