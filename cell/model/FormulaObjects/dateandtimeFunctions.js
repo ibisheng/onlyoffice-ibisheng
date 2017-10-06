@@ -73,16 +73,15 @@
 		d1.truncate();
 		d2.truncate();
 
-		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth() +
-			1, year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(), month2 = d2.getUTCMonth() +
-			1, year2 = d2.getUTCFullYear();
+		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth() + 1, year1 = d1.getUTCFullYear(),
+			date2 = d2.getUTCDate(), month2 = d2.getUTCMonth() + 1, year2 = d2.getUTCFullYear();
 
 		switch (mode) {
 			case DayCountBasis.UsPsa30_360:
 				return new cNumber(Math.abs(GetDiffDate360(date1, month1, year1, date2, month2, year2, true)) / 360);
 			case DayCountBasis.ActualActual:
-				var yc = Math.abs(year2 - year1), sd = year1 > year2 ? new Date(d2) :
-					new Date(d1), yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
+				var yc = Math.abs(year2 - year1), sd = year1 > year2 ? new Date(d2) : new Date(d1),
+					yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = /*Math.abs*/( d2 - d1 );
 				for (var i = 0; i < yc; i++) {
 					sd.addYears(1);
 					yearAverage += sd.isLeapYear() ? 366 : 365;
@@ -106,9 +105,8 @@
 	}
 
 	function diffDate(d1, d2, mode) {
-		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth() +
-			1, year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(), month2 = d2.getUTCMonth() +
-			1, year2 = d2.getUTCFullYear();
+		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth() + 1, year1 = d1.getUTCFullYear(),
+			date2 = d2.getUTCDate(), month2 = d2.getUTCMonth() + 1, year2 = d2.getUTCFullYear();
 
 		switch (mode) {
 			case DayCountBasis.UsPsa30_360:
@@ -131,7 +129,8 @@
 	}
 
 	function diffDate2(d1, d2, mode) {
-		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
+		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(),
+			month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
 		var nDaysInYear, nYears, nDayDiff;
 
@@ -194,7 +193,8 @@
 			d1 = n;
 		}
 
-		var nD1 = d1.getUTCDate(), nM1 = d1.getUTCMonth(), nY1 = d1.getUTCFullYear(), nD2 = d2.getUTCDate(), nM2 = d2.getUTCMonth(), nY2 = d2.getUTCFullYear();
+		var nD1 = d1.getUTCDate(), nM1 = d1.getUTCMonth(), nY1 = d1.getUTCFullYear(), nD2 = d2.getUTCDate(),
+			nM2 = d2.getUTCMonth(), nY2 = d2.getUTCFullYear();
 
 		switch (nMode) {
 			case DayCountBasis.UsPsa30_360:            // 0=USA (NASD) 30/360
@@ -232,9 +232,8 @@
 	function days360(date1, date2, flag) {
 		var sign;
 
-		var nY1 = date1.getUTCFullYear(), nM1 = date1.getUTCMonth() +
-			1, nD1 = date1.getUTCDate(), nY2 = date2.getUTCFullYear(), nM2 = date2.getUTCMonth() +
-			1, nD2 = date2.getUTCDate();
+		var nY1 = date1.getUTCFullYear(), nM1 = date1.getUTCMonth() + 1, nD1 = date1.getUTCDate(),
+			nY2 = date2.getUTCFullYear(), nM2 = date2.getUTCMonth() + 1, nD2 = date2.getUTCDate();
 
 		if (flag && (date2 < date1)) {
 			sign = date1;
@@ -289,7 +288,7 @@
 		}
 	}
 
-	function getCorrectDate(val){
+	function getCorrectDate(val) {
 		if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -304,60 +303,98 @@
 		return val;
 	}
 
-	function getWeekends(val){
+	function getWeekends(val) {
 		var res = [];
 		if (val) {
-			if(cElementType.number === val.type){
+			if (cElementType.number === val.type) {
 				//0 - SUNDAY, 1 - MONDAY, 2 - TUESDAY, 3 - WEDNESDAY, 4 - THURSDAY, 5 - FRIDAY, 6 - SATURDAY
 				var numberVal = val.getValue();
-				switch ( numberVal )
-				{
-					case 1 : res[ 6 ] = true; res[ 0 ] = true; break;
-					case 2 : res[ 0 ] = true; res[ 1 ] = true; break;
-					case 3 : res[ 1 ] = true; res[ 2 ] = true; break;
-					case 4 : res[ 2 ] = true; res[ 3 ] = true; break;
-					case 5 : res[ 3 ] = true; res[ 4 ] = true; break;
-					case 6 : res[ 4 ] = true; res[ 5 ] = true; break;
-					case 7 : res[ 5 ] = true; res[ 6 ] = true; break;
+				switch (numberVal) {
+					case 1 :
+						res[6] = true;
+						res[0] = true;
+						break;
+					case 2 :
+						res[0] = true;
+						res[1] = true;
+						break;
+					case 3 :
+						res[1] = true;
+						res[2] = true;
+						break;
+					case 4 :
+						res[2] = true;
+						res[3] = true;
+						break;
+					case 5 :
+						res[3] = true;
+						res[4] = true;
+						break;
+					case 6 :
+						res[4] = true;
+						res[5] = true;
+						break;
+					case 7 :
+						res[5] = true;
+						res[6] = true;
+						break;
 
-					case 11 : res[ 0 ] = true; break;
-					case 12 : res[ 1 ] = true; break;
-					case 13 : res[ 2 ] = true; break;
-					case 14 : res[ 3 ] = true; break;
-					case 15 : res[ 4 ] = true; break;
-					case 16 : res[ 5 ] = true; break;
-					case 17 : res[ 6 ] = true; break;
+					case 11 :
+						res[0] = true;
+						break;
+					case 12 :
+						res[1] = true;
+						break;
+					case 13 :
+						res[2] = true;
+						break;
+					case 14 :
+						res[3] = true;
+						break;
+					case 15 :
+						res[4] = true;
+						break;
+					case 16 :
+						res[5] = true;
+						break;
+					case 17 :
+						res[6] = true;
+						break;
 
-					default : return new cError(cErrorType.not_numeric);
+					default :
+						return new cError(cErrorType.not_numeric);
 				}
-			}else if(cElementType.string === val.type){
+			} else if (cElementType.string === val.type) {
 				var stringVal = val.getValue();
-				if(stringVal.length !== 7){
+				if (stringVal.length !== 7) {
 					return new cError(cErrorType.wrong_value_type);
 				}
 				//start with monday
-				for ( var i = 0; i < 7; i++ )
-				{
+				for (var i = 0; i < 7; i++) {
 					var num = 6 === i ? 0 : i + 1;
-					switch ( stringVal[ i ] )
-					{
-						case '0' : res[ num ] = false; break;
-						case '1' : res[ num ] = true;  break;
-						default  : return new cError(cErrorType.wrong_value_type);
+					switch (stringVal[i]) {
+						case '0' :
+							res[num] = false;
+							break;
+						case '1' :
+							res[num] = true;
+							break;
+						default  :
+							return new cError(cErrorType.wrong_value_type);
 					}
 				}
-			}else{
+			} else {
 				return new cError(cErrorType.not_numeric);
 			}
-		}else{
-			res[ 6 ] = true;
-			res[ 0 ] = true;
+		} else {
+			res[6] = true;
+			res[0] = true;
 		}
 
 		return res;
 	}
 
-	function getHolidays(val){
+	function getHolidays(val) {
 		var holidays = [];
 		if (val) {
 			if (val instanceof cRef) {
@@ -395,8 +432,8 @@
 						} else {
 							res = elem.tocNumber().getValue();
 						}
-						
-						if(res && res > 0){
+
+						if (res && res > 0) {
 							holidays.push(new cNumber(parseInt(res)));
 						} else {
 							return bIsError = new cError(cErrorType.wrong_value_type);
@@ -427,10 +464,10 @@
 	}
 
 	function weekNumber(dt, iso, type) {
-		if(undefined === iso){
+		if (undefined === iso) {
 			iso = [0, 1, 2, 3, 4, 5, 6];
 		}
-		if(undefined === type){
+		if (undefined === type) {
 			type = 0;
 		}
 
@@ -472,13 +509,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATE() {
-		this.name = "DATE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDATE.prototype = Object.create(cBaseFunction.prototype);
 	cDATE.prototype.constructor = cDATE;
+	cDATE.prototype.name = 'DATE';
 	cDATE.prototype.argumentsMin = 3;
 	cDATE.prototype.argumentsMax = 3;
 	cDATE.prototype.Calculate = function (arg) {
@@ -539,13 +576,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEDIF() {
-		this.name = "DATEDIF";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDATEDIF.prototype = Object.create(cBaseFunction.prototype);
 	cDATEDIF.prototype.constructor = cDATEDIF;
+	cDATEDIF.prototype.name = 'DATEDIF';
 	cDATEDIF.prototype.argumentsMin = 3;
 	cDATEDIF.prototype.argumentsMax = 3;
 	cDATEDIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -655,13 +692,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEVALUE() {
-		this.name = "DATEVALUE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDATEVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cDATEVALUE.prototype.constructor = cDATEVALUE;
+	cDATEVALUE.prototype.name = 'DATEVALUE';
 	cDATEVALUE.prototype.argumentsMin = 1;
 	cDATEVALUE.prototype.argumentsMax = 1;
 	cDATEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -693,13 +730,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAY() {
-		this.name = "DAY";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDAY.prototype = Object.create(cBaseFunction.prototype);
 	cDAY.prototype.constructor = cDAY;
+	cDAY.prototype.name = 'DAY';
 	cDAY.prototype.argumentsMin = 1;
 	cDAY.prototype.argumentsMax = 1;
 	cDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -743,9 +780,8 @@
 				return this.setCalcValue(
 					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()), 0);
 			} else if (val == 60) {
-				return this.setCalcValue(
-					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay) ).getUTCDate() +
-						1), 0);
+				return this.setCalcValue(new cNumber(
+					( new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay) ).getUTCDate() + 1), 0);
 			} else {
 				return this.setCalcValue(
 					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay) ).getUTCDate()),
@@ -762,13 +798,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS() {
-		this.name = "DAYS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDAYS.prototype = Object.create(cBaseFunction.prototype);
 	cDAYS.prototype.constructor = cDAYS;
+	cDAYS.prototype.name = 'DAYS';
 	cDAYS.prototype.argumentsMin = 2;
 	cDAYS.prototype.argumentsMax = 2;
 	cDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -785,12 +821,12 @@
 			return this.value = argError;
 		}
 
-		var calulateDays = function(argArray){
+		var calulateDays = function (argArray) {
 			var val = argArray[0];
 			var val1 = argArray[1];
 			if (val < 0 || val1 < 0) {
 				return new cError(cErrorType.not_numeric);
-			}else{
+			} else {
 				return new cNumber(val - val1);
 			}
 		};
@@ -803,13 +839,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS360() {
-		this.name = "DAYS360";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDAYS360.prototype = Object.create(cBaseFunction.prototype);
 	cDAYS360.prototype.constructor = cDAYS360;
+	cDAYS360.prototype.name = 'DAYS360';
 	cDAYS360.prototype.argumentsMin = 2;
 	cDAYS360.prototype.argumentsMax = 3;
 	cDAYS360.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -855,8 +891,8 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		var date1 = Date.prototype.getDateFromExcel(arg0.getValue()), date2 = Date.prototype.getDateFromExcel(
-			arg1.getValue());
+		var date1 = Date.prototype.getDateFromExcel(arg0.getValue()),
+			date2 = Date.prototype.getDateFromExcel(arg1.getValue());
 
 		return this.value = new cNumber(days360(date1, date2, arg2.toBool()));
 
@@ -867,13 +903,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEDATE() {
-		this.name = "EDATE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cEDATE.prototype = Object.create(cBaseFunction.prototype);
 	cEDATE.prototype.constructor = cEDATE;
+	cEDATE.prototype.name = 'EDATE';
 	cEDATE.prototype.argumentsMin = 2;
 	cEDATE.prototype.argumentsMax = 2;
 	cEDATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -940,13 +976,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEOMONTH() {
-		this.name = "EOMONTH";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cEOMONTH.prototype = Object.create(cBaseFunction.prototype);
 	cEOMONTH.prototype.constructor = cEOMONTH;
+	cEOMONTH.prototype.name = 'EOMONTH';
 	cEOMONTH.prototype.argumentsMin = 2;
 	cEOMONTH.prototype.argumentsMax = 2;
 	cEOMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1004,13 +1040,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHOUR() {
-		this.name = "HOUR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cHOUR.prototype = Object.create(cBaseFunction.prototype);
 	cHOUR.prototype.constructor = cHOUR;
+	cHOUR.prototype.name = 'HOUR';
 	cHOUR.prototype.argumentsMin = 1;
 	cHOUR.prototype.argumentsMax = 1;
 	cHOUR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1057,8 +1093,8 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		} else                             //1		 2 3 4					   4	3		 	 					2 1
 		{
-			return this.setCalcValue(new cNumber(parseInt(( ( val - Math.floor(val) ) * 24 ).toFixed(cExcelDateTimeDigits))),
-				0);
+			return this.setCalcValue(
+				new cNumber(parseInt(( ( val - Math.floor(val) ) * 24 ).toFixed(cExcelDateTimeDigits))), 0);
 		}
 	};
 
@@ -1067,13 +1103,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISOWEEKNUM() {
-		this.name = "ISOWEEKNUM";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
 	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
+	cISOWEEKNUM.prototype.name = 'ISOWEEKNUM';
 	cISOWEEKNUM.prototype.argumentsMin = 1;
 	cISOWEEKNUM.prototype.argumentsMax = 1;
 	cISOWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1103,13 +1139,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINUTE() {
-		this.name = "MINUTE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cMINUTE.prototype = Object.create(cBaseFunction.prototype);
 	cMINUTE.prototype.constructor = cMINUTE;
+	cMINUTE.prototype.name = 'MINUTE';
 	cMINUTE.prototype.argumentsMin = 1;
 	cMINUTE.prototype.argumentsMax = 1;
 	cMINUTE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1165,13 +1201,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMONTH() {
-		this.name = "MONTH";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cMONTH.prototype = Object.create(cBaseFunction.prototype);
 	cMONTH.prototype.constructor = cMONTH;
+	cMONTH.prototype.name = 'MONTH';
 	cMONTH.prototype.argumentsMin = 1;
 	cMONTH.prototype.argumentsMax = 1;
 	cMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1217,13 +1253,14 @@
 			if (val == 60) {
 				return this.setCalcValue(new cNumber(2), 0);
 			} else {
-				return this.setCalcValue(
-					new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) *
-							c_msPerDay) ).getUTCMonth() + 1), 0);
+				return this.setCalcValue(new cNumber(( new Date(
+						( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) * c_msPerDay) ).getUTCMonth() +
+					1), 0);
 			}
 		} else {
-			return this.setCalcValue(new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) *
-					c_msPerDay) ).getUTCMonth() + 1), 0);
+			return this.setCalcValue(new cNumber(
+				( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() +
+				1), 0);
 		}
 	};
 
@@ -1232,13 +1269,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS() {
-		this.name = "NETWORKDAYS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS.prototype = Object.create(cBaseFunction.prototype);
 	cNETWORKDAYS.prototype.constructor = cNETWORKDAYS;
+	cNETWORKDAYS.prototype.name = 'NETWORKDAYS';
 	cNETWORKDAYS.prototype.argumentsMin = 2;
 	cNETWORKDAYS.prototype.argumentsMax = 3;
 	cNETWORKDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1273,12 +1310,12 @@
 			return this.value = holidays;
 		}
 
-		var calcDate = function() {
+		var calcDate = function () {
 			var count = 0;
 			var start = val0;
 			var end = val1;
 			var dif = val1 - val0;
-			if(dif < 0){
+			if (dif < 0) {
 				start = val1;
 				end = val0;
 			}
@@ -1305,13 +1342,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS_INTL() {
-		this.name = "NETWORKDAYS.INTL";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
 	cNETWORKDAYS_INTL.prototype.constructor = cNETWORKDAYS_INTL;
+	cNETWORKDAYS_INTL.prototype.name = 'NETWORKDAYS.INTL';
 	cNETWORKDAYS_INTL.prototype.argumentsMin = 2;
 	cNETWORKDAYS_INTL.prototype.argumentsMax = 4;
 	cNETWORKDAYS_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1353,12 +1390,12 @@
 			return this.value = holidays;
 		}
 
-		var calcDate = function() {
+		var calcDate = function () {
 			var count = 0;
 			var start = val0;
 			var end = val1;
 			var dif = val1 - val0;
-			if(dif < 0){
+			if (dif < 0) {
 				start = val1;
 				end = val0;
 			}
@@ -1385,19 +1422,19 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNOW() {
-		this.name = "NOW";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cNOW.prototype = Object.create(cBaseFunction.prototype);
 	cNOW.prototype.constructor = cNOW;
+	cNOW.prototype.name = 'NOW';
 	cNOW.prototype.argumentsMax = 0;
 	cNOW.prototype.ca = true;
 	cNOW.prototype.Calculate = function () {
 		var d = new Date();
-		this.value = new cNumber(d.getExcelDate() +
-			(d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay);
+		this.value =
+			new cNumber(d.getExcelDate() + (d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay);
 		this.value.numFormat = 22;
 		return this.value;
 	};
@@ -1407,13 +1444,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSECOND() {
-		this.name = "SECOND";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cSECOND.prototype = Object.create(cBaseFunction.prototype);
 	cSECOND.prototype.constructor = cSECOND;
+	cSECOND.prototype.name = 'SECOND';
 	cSECOND.prototype.argumentsMin = 1;
 	cSECOND.prototype.argumentsMax = 1;
 	cSECOND.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1469,13 +1506,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIME() {
-		this.name = "TIME";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTIME.prototype = Object.create(cBaseFunction.prototype);
 	cTIME.prototype.constructor = cTIME;
+	cTIME.prototype.name = 'TIME';
 	cTIME.prototype.argumentsMin = 3;
 	cTIME.prototype.argumentsMax = 3;
 	cTIME.prototype.Calculate = function (arg) {
@@ -1526,13 +1563,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIMEVALUE() {
-		this.name = "TIMEVALUE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTIMEVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cTIMEVALUE.prototype.constructor = cTIMEVALUE;
+	cTIMEVALUE.prototype.name = 'TIMEVALUE';
 	cTIMEVALUE.prototype.argumentsMin = 1;
 	cTIMEVALUE.prototype.argumentsMax = 1;
 	cTIMEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1565,13 +1602,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTODAY() {
-		this.name = "TODAY";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTODAY.prototype = Object.create(cBaseFunction.prototype);
 	cTODAY.prototype.constructor = cTODAY;
+	cTODAY.prototype.name = 'TODAY';
 	cTODAY.prototype.argumentsMax = 0;
 	cTODAY.prototype.ca = true;
 	cTODAY.prototype.Calculate = function () {
@@ -1585,13 +1622,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKDAY() {
-		this.name = "WEEKDAY";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cWEEKDAY.prototype = Object.create(cBaseFunction.prototype);
 	cWEEKDAY.prototype.constructor = cWEEKDAY;
+	cWEEKDAY.prototype.name = 'WEEKDAY';
 	cWEEKDAY.prototype.argumentsMin = 1;
 	cWEEKDAY.prototype.argumentsMax = 2;
 	cWEEKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1657,8 +1694,8 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = new cNumber(weekday[new Date((arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) *
-			c_msPerDay).getUTCDay()]);
+		return this.value = new cNumber(
+			weekday[new Date((arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay).getUTCDay()]);
 	};
 
 	/**
@@ -1666,13 +1703,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKNUM() {
-		this.name = "WEEKNUM";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
 	cWEEKNUM.prototype.constructor = cWEEKNUM;
+	cWEEKNUM.prototype.name = 'WEEKNUM';
 	cWEEKNUM.prototype.argumentsMin = 1;
 	cWEEKNUM.prototype.argumentsMax = 2;
 	cWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1751,13 +1788,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY() {
-		this.name = "WORKDAY";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY.prototype = Object.create(cBaseFunction.prototype);
 	cWORKDAY.prototype.constructor = cWORKDAY;
+	cWORKDAY.prototype.name = 'WORKDAY';
 	cWORKDAY.prototype.argumentsMin = 2;
 	cWORKDAY.prototype.argumentsMax = 3;
 	cWORKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1788,7 +1825,7 @@
 			return this.value = holidays;
 		}
 
-		var calcDate = function(){
+		var calcDate = function () {
 			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 
 			while (Math.abs(dif) > count) {
@@ -1799,10 +1836,10 @@
 				dif >= 0 ? dif1++ : dif1--;
 
 				//если последняя итерация
-				if(!(Math.abs(dif) > count)){
+				if (!(Math.abs(dif) > count)) {
 					//проверяем не оказалось ли следом выходных. если оказались - прибавляем
 					date = new Date(val0.getTime() + dif1 * c_msPerDay);
-					if(date.getUTCDay() === 6){
+					if (date.getUTCDay() === 6) {
 						dif1 += 2;
 					}
 				}
@@ -1812,7 +1849,7 @@
 			val = date.getExcelDate();
 
 			if (val < 0) {
-				return  new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			return t.setCalcValue(new cNumber(val), 14);
@@ -1827,13 +1864,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY_INTL() {
-		this.name = "WORKDAY.INTL";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
 	cWORKDAY_INTL.prototype.constructor = cWORKDAY_INTL;
+	cWORKDAY_INTL.prototype.name = 'WORKDAY.INTL';
 	cWORKDAY_INTL.prototype.argumentsMin = 2;
 	cWORKDAY_INTL.prototype.argumentsMax = 4;
 	cWORKDAY_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1861,7 +1898,7 @@
 		val0 = getCorrectDate(val0);
 
 		//Weekend
-		if(arg2 && "1111111" === arg2.getValue()){
+		if (arg2 && "1111111" === arg2.getValue()) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		var weekends = getWeekends(arg2);
@@ -1875,7 +1912,7 @@
 			return this.value = holidays;
 		}
 
-		var calcDate = function(){
+		var calcDate = function () {
 			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 			while (Math.abs(dif) > count) {
 				date = new Date(val0.getTime() + dif1 * c_msPerDay);
@@ -1885,14 +1922,14 @@
 				dif >= 0 ? dif1++ : dif1--;
 
 				//если последняя итерация
-				if(!(Math.abs(dif) > count)){
+				if (!(Math.abs(dif) > count)) {
 					//проверяем не оказалось ли следом выходных. если оказались - прибавляем
 					date = new Date(val0.getTime() + dif1 * c_msPerDay);
-					for(var i = 0; i < 7; i++){
-						if(weekends[date.getUTCDay()]){
+					for (var i = 0; i < 7; i++) {
+						if (weekends[date.getUTCDay()]) {
 							dif >= 0 ? dif1++ : dif1--;
 							date = new Date(val0.getTime() + (dif1) * c_msPerDay);
-						}else{
+						} else {
 							break;
 						}
 					}
@@ -1902,7 +1939,7 @@
 			val = date.getExcelDate();
 
 			if (val < 0) {
-				return  new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			return t.setCalcValue(new cNumber(val), 14);
@@ -1916,13 +1953,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEAR() {
-		this.name = "YEAR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cYEAR.prototype = Object.create(cBaseFunction.prototype);
 	cYEAR.prototype.constructor = cYEAR;
+	cYEAR.prototype.name = 'YEAR';
 	cYEAR.prototype.argumentsMin = 1;
 	cYEAR.prototype.argumentsMax = 1;
 	cYEAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1977,13 +2014,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEARFRAC() {
-		this.name = "YEARFRAC";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cYEARFRAC.prototype = Object.create(cBaseFunction.prototype);
 	cYEARFRAC.prototype.constructor = cYEARFRAC;
+	cYEARFRAC.prototype.name = 'YEARFRAC';
 	cYEARFRAC.prototype.argumentsMin = 2;
 	cYEARFRAC.prototype.argumentsMax = 3;
 	cYEARFRAC.prototype.numFormat = AscCommonExcel.cNumFormatNone;

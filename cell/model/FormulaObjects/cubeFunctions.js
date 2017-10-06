@@ -53,89 +53,89 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEKPIMEMBER() {
-		this.name = "CUBEKPIMEMBER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBEKPIMEMBER.prototype = Object.create(cBaseFunction.prototype);
 	cCUBEKPIMEMBER.prototype.constructor = cCUBEKPIMEMBER;
+	cCUBEKPIMEMBER.prototype.name = 'CUBEKPIMEMBER';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEMEMBER() {
-		this.name = "CUBEMEMBER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBEMEMBER.prototype = Object.create(cBaseFunction.prototype);
 	cCUBEMEMBER.prototype.constructor = cCUBEMEMBER;
+	cCUBEMEMBER.prototype.name = 'CUBEMEMBER';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEMEMBERPROPERTY() {
-		this.name = "CUBEMEMBERPROPERTY";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBEMEMBERPROPERTY.prototype = Object.create(cBaseFunction.prototype);
 	cCUBEMEMBERPROPERTY.prototype.constructor = cCUBEMEMBERPROPERTY;
+	cCUBEMEMBERPROPERTY.prototype.name = 'CUBEMEMBERPROPERTY';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBERANKEDMEMBER() {
-		this.name = "CUBERANKEDMEMBER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBERANKEDMEMBER.prototype = Object.create(cBaseFunction.prototype);
 	cCUBERANKEDMEMBER.prototype.constructor = cCUBERANKEDMEMBER;
+	cCUBERANKEDMEMBER.prototype.name = 'CUBERANKEDMEMBER';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBESET() {
-		this.name = "CUBESET";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBESET.prototype = Object.create(cBaseFunction.prototype);
 	cCUBESET.prototype.constructor = cCUBESET;
+	cCUBESET.prototype.name = 'CUBESET';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBESETCOUNT() {
-		this.name = "CUBESETCOUNT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBESETCOUNT.prototype = Object.create(cBaseFunction.prototype);
 	cCUBESETCOUNT.prototype.constructor = cCUBESETCOUNT;
+	cCUBESETCOUNT.prototype.name = 'CUBESETCOUNT';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEVALUE() {
-		this.name = "CUBEVALUE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCUBEVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cCUBEVALUE.prototype.constructor = cCUBEVALUE;
+	cCUBEVALUE.prototype.name = 'CUBEVALUE';
 })(window);

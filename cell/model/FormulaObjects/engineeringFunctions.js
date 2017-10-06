@@ -51,7 +51,11 @@
 
 	var rtl_math_erf = AscCommonExcel.rtl_math_erf;
 
-	var rg_validBINNumber = /^[01]{1,10}$/, rg_validDEC2BINNumber = /^-?[0-9]{1,3}$/, rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/, rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/, rg_validHEXNumber = /^[0-9A-F]{1,10}$/i, rg_validOCTNumber = /^[0-7]{1,10}$/, rg_complex_number = new XRegExp("^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g");
+	var rg_validBINNumber = /^[01]{1,10}$/, rg_validDEC2BINNumber = /^-?[0-9]{1,3}$/,
+		rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/, rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
+		rg_validHEXNumber = /^[0-9A-F]{1,10}$/i, rg_validOCTNumber = /^[0-7]{1,10}$/, rg_complex_number = new XRegExp(
+		"^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)",
+		"g");
 
 	var NumberBase = {
 		BIN: 2, OCT: 8, DEC: 10, HEX: 16
@@ -198,9 +202,8 @@
 		if (fNum <= 2) {
 
 			y = fNum * fNum / 4.0;
-			fRet=(-Math.log(fNum / 2.0) * BesselI(fNum, 0)) + (-0.57721566 + y * (0.42278420
-				+y * (0.23069756 + y * (0.3488590e-1 + y * (0.262698e-2
-				+y * (0.10750e-3 + y * 0.74e-5))))));
+			fRet = (-Math.log(fNum / 2.0) * BesselI(fNum, 0)) + (-0.57721566 + y * (0.42278420 +
+				y * (0.23069756 + y * (0.3488590e-1 + y * (0.262698e-2 + y * (0.10750e-3 + y * 0.74e-5))))));
 
 		} else {
 			y = 2 / fNum;
@@ -216,9 +219,8 @@
 
 		if (fNum <= 2) {
 			y = fNum * fNum / 4.0;
-			fRet=(Math.log(fNum / 2.0) * BesselI(fNum, 1))+(1.0 / fNum)*(1.0 + y * (0.15443144
-				+ y * (-0.67278579 + y * (-0.18156897 + y * (-0.1919402e-1
-				+ y * (-0.110404e-2 + y * (-0.4686e-4)))))));
+			fRet = (Math.log(fNum / 2.0) * BesselI(fNum, 1)) + (1.0 / fNum) * (1.0 + y * (0.15443144 +
+				y * (-0.67278579 + y * (-0.18156897 + y * (-0.1919402e-1 + y * (-0.110404e-2 + y * (-0.4686e-4)))))));
 		} else {
 			y = 2 / fNum;
 			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( 0.23498619 + y * ( -0.3655620e-1 +
@@ -228,36 +230,36 @@
 		return new cNumber(fRet);
 	}
 
-	function bessi0(x){
+	function bessi0(x) {
 		var ax = Math.abs(x), fRet, y;
 
 		if (ax < 3.75) {
 			y = x / 3.75;
 			y *= y;
-			fRet = 1.0 + y*(3.5156229 + y*(3.0899424 + y*(1.2067492 + y*(0.2659732 + y*(0.360768e-1 + y*0.45813e-2)))));
+			fRet = 1.0 + y *
+				(3.5156229 + y * (3.0899424 + y * (1.2067492 + y * (0.2659732 + y * (0.360768e-1 + y * 0.45813e-2)))));
 		} else {
 			y = 3.75 / ax;
-			fRet = (Math.exp(ax) / Math.sqrt(ax))*(0.39894228 + y*(0.1328592e-1
-				+ y*(0.225319e-2 + y*(-0.157565e-2 + y*(0.916281e-2
-				+ y*(-0.2057706e-1 + y*(0.2635537e-1 + y*(-0.1647633e-1
-				+ y*0.392377e-2))))))));
+			fRet = (Math.exp(ax) / Math.sqrt(ax)) * (0.39894228 + y * (0.1328592e-1 + y * (0.225319e-2 + y *
+				(-0.157565e-2 + y *
+				(0.916281e-2 + y * (-0.2057706e-1 + y * (0.2635537e-1 + y * (-0.1647633e-1 + y * 0.392377e-2))))))));
 		}
 		return fRet;
 	}
 
-	function bessi(x, n){
+	function bessi(x, n) {
 		var max = 1.0e10;
 		var min = 1.0e-10;
-		var ACC  = 40.0;
+		var ACC = 40.0;
 
 		var bi, bim, bip, tox, res;
-		if (x === 0.0){
+		if (x === 0.0) {
 			return new cNumber(0.0);
 		} else {
 			tox = 2.0 / Math.abs(x);
 			bip = res = 0.0;
 			bi = 1.0;
-			for (var j = 2 * (n + parseInt(Math.sqrt(ACC * n))); j>0; j--) {
+			for (var j = 2 * (n + parseInt(Math.sqrt(ACC * n))); j > 0; j--) {
 				bim = bip + j * tox * bi;
 				bip = bi;
 				bi = bim;
@@ -266,7 +268,7 @@
 					bi *= min;
 					bip *= min;
 				}
-				if (j === n){
+				if (j === n) {
 					res = bip;
 				}
 			}
@@ -359,8 +361,8 @@
 		if (fX > 5e+6) { // iteration is not considerable better then approximation
 			return new cNumber(-Math.sqrt(1 / Math.PI / fX) * (Math.sin(fX) + Math.cos(fX)));
 		}
-		var epsilon = 1.0e-15, EulerGamma = 0.57721566490153286060, alpha = 1 /
-			fX, f_bar = -1, u = alpha, k = 1, m_bar = 0;
+		var epsilon = 1.0e-15, EulerGamma = 0.57721566490153286060, alpha = 1 / fX, f_bar = -1, u = alpha, k = 1,
+			m_bar = 0;
 		alpha = 1 - EulerGamma - Math.log10(fX / 2);
 		var g_bar_delta_u = -alpha, g_bar = -2 / fX, delta_u = g_bar_delta_u / g_bar;
 		u = u + delta_u;
@@ -400,16 +402,17 @@
 
 		if (fNum < 8.0) {
 			var y = (fNum * fNum);
-			var f1 = -2957821389.0 + y * (7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
+			var f1 = -2957821389.0 +
+				y * (7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
 			var f2 = 40076544269.0 + y * (745249964.8 + y * (7189466.438 + y * (47447.26470 + y * (226.1030244 + y))));
 			var fRet = f1 / f2 + 0.636619772 * BesselJ(fNum, 0) * Math.log(fNum);
-		}
-		else {
+		} else {
 			var z = 8.0 / fNum;
 			var y = (z * z);
 			var xx = fNum - 0.785398164;
 			var f1 = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6)));
-			var f2 = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 + y * (-0.934945152e-7))));
+			var f2 = -0.1562499995e-1 +
+				y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 + y * (-0.934945152e-7))));
 			var fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * f1 + z * Math.cos(xx) * f2);
 		}
 
@@ -418,18 +421,21 @@
 
 
 	function _Bessely1(fNum) {
-		var z, xx , y, fRet, ans1, ans2;
+		var z, xx, y, fRet, ans1, ans2;
 		if (fNum < 8.0) {
 			y = fNum * fNum;
-			ans1 = fNum *(-0.4900604943e13 + y * (0.1275274390e13 + y * (-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
-			ans2 = 0.2499580570e14 + y * (0.4244419664e12 + y * (0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
-			fRet=(ans1 / ans2) + 0.636619772 * (BesselJ(fNum) * Math.log(fNum) - 1.0 / fNum);
+			ans1 = fNum * (-0.4900604943e13 + y * (0.1275274390e13 +
+				y * (-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
+			ans2 = 0.2499580570e14 + y * (0.4244419664e12 +
+				y * (0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
+			fRet = (ans1 / ans2) + 0.636619772 * (BesselJ(fNum) * Math.log(fNum) - 1.0 / fNum);
 		} else {
 			z = 8.0 / fNum;
 			y = z * z;
 			xx = fNum - 2.356194491;
 			ans1 = 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
-			ans2 = 0.04687499995 + y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+			ans2 = 0.04687499995 +
+				y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
 			fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * ans1 + z * Math.cos(xx) * ans2);
 		}
 
@@ -593,32 +599,40 @@
 			}
 		}, Csc: function () {
 			if (this.img) {
-				var a = (2 * Math.sin(this.real) * Math.cosh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
-				this.img = (-2 * Math.cos(this.real) * Math.sinh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
+				var a = (2 * Math.sin(this.real) * Math.cosh(this.img)) /
+					(Math.cosh(2 * this.img) - Math.cos(2 * this.real));
+				this.img = (-2 * Math.cos(this.real) * Math.sinh(this.img)) /
+					(Math.cosh(2 * this.img) - Math.cos(2 * this.real));
 				this.real = a;
 			} else {
 				this.real = 1 / Math.sin(this.real);
 			}
 		}, Csch: function () {
 			if (this.img) {
-				var a = (2 * Math.sinh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
-				this.img = (-2 * Math.cosh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
+				var a = (2 * Math.sinh(this.real) * Math.cos(this.img)) /
+					(Math.cosh(2 * this.real) - Math.cos(2 * this.img));
+				this.img = (-2 * Math.cosh(this.real) * Math.sin(this.img)) /
+					(Math.cosh(2 * this.real) - Math.cos(2 * this.img));
 				this.real = a;
 			} else {
 				this.real = 1 / Math.sinh(this.real);
 			}
 		}, Sec: function () {
 			if (this.img) {
-				var a = (2 * Math.cos(this.real) * Math.cosh(this.img)) / (Math.cosh(2 * this.img) + Math.cos(2 *this.real));
-				this.img = (2 * Math.sin(this.real) * Math.sinh(this.img)) / (Math.cosh(2 * this.img) + Math.cos(2 *this.real));
+				var a = (2 * Math.cos(this.real) * Math.cosh(this.img)) /
+					(Math.cosh(2 * this.img) + Math.cos(2 * this.real));
+				this.img = (2 * Math.sin(this.real) * Math.sinh(this.img)) /
+					(Math.cosh(2 * this.img) + Math.cos(2 * this.real));
 				this.real = a;
 			} else {
 				this.real = 1 / Math.cos(this.real);
 			}
 		}, Sech: function () {
 			if (this.img) {
-				var a = (2 * Math.cosh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
-				this.img = (-2 * Math.sinh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
+				var a = (2 * Math.cosh(this.real) * Math.cos(this.img)) /
+					(Math.cosh(2 * this.real) + Math.cos(2 * this.img));
+				this.img = (-2 * Math.sinh(this.real) * Math.sin(this.img)) /
+					(Math.cosh(2 * this.real) + Math.cos(2 * this.img));
 				this.real = a;
 			} else {
 				this.real = 1 / Math.cosh(this.real);
@@ -1028,11 +1042,12 @@
 	var unitConverterArr = null;
 	var availablePrefixMap = null;
 	var prefixValueMap = null;
-	function getUnitConverter(){
-		if(null === unitConverterArr){
+
+	function getUnitConverter() {
+		if (null === unitConverterArr) {
 
 			unitConverterArr = {};
-			var generateWeightAndMass = function(){
+			var generateWeightAndMass = function () {
 				//Вес и масса
 				unitConverterArr["g"] = {};//грамм
 
@@ -1224,7 +1239,7 @@
 				unitConverterArr["LTON"]["brton"] = 0.999999971945867;
 			};
 
-			var generateDistance = function(){
+			var generateDistance = function () {
 
 				//Picapt parameter do not support by LO
 				unitConverterArr["m"] = {};
@@ -1368,7 +1383,7 @@
 
 			};
 
-			var generateTime = function(){
+			var generateTime = function () {
 
 				unitConverterArr["yr"] = {};//Год
 
@@ -1426,7 +1441,7 @@
 				unitConverterArr["sec"]["s"] = 1;
 			};
 
-			var generatePressure = function(){
+			var generatePressure = function () {
 
 				//p parameter do not support by LO(p === Pa in MS DOC)
 				unitConverterArr["Pa"] = {};//Паскаль
@@ -1464,7 +1479,7 @@
 				unitConverterArr["psi"]["Torr"] = 51.7150920071126;
 			};
 
-			var generateForceAndEnergy = function(){
+			var generateForceAndEnergy = function () {
 
 				//Force
 				unitConverterArr["N"] = {};//Newton
@@ -1622,7 +1637,7 @@
 			};
 
 
-			var generatePowerMagnetismTemperature = function(){
+			var generatePowerMagnetismTemperature = function () {
 
 				//Power
 				unitConverterArr["HP"] = {};//Horsepower
@@ -1682,16 +1697,16 @@
 				unitConverterArr["F"] = {};//Degree Fahrenheit
 
 				unitConverterArr["F"]["fah"] = 1;
-				unitConverterArr["F"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
-				unitConverterArr["F"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5 / 9}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5 / 9}, {type: 1, val: 273.15}];
 				unitConverterArr["F"]["Rank"] = [{type: 1, val: 459.67}];
 				unitConverterArr["F"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
 
 				unitConverterArr["fah"] = {};//Degree Fahrenheit
 
-				unitConverterArr["fah"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
-				unitConverterArr["fah"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5 / 9}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5 / 9}, {type: 1, val: 273.15}];
 				unitConverterArr["fah"]["Rank"] = [{type: 1, val: 459.67}];
 				unitConverterArr["fah"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
@@ -1715,7 +1730,7 @@
 			};
 
 
-			var generateVolume = function(){
+			var generateVolume = function () {
 
 				//Picapt3/Picapt^3 do not support by LO
 				unitConverterArr["tsp"] = {};//Teaspoon
@@ -2712,21 +2727,21 @@
 
 				/*unitConverterArr["Picapt3"] = {};
 
-				unitConverterArr["Picapt3"]["Picapt^3"] = ;
-				unitConverterArr["Picapt3"]["Pica3"] = ;
-				unitConverterArr["Picapt3"]["Pica^3"] = ;
-				unitConverterArr["Picapt3"]["GRT"] = ;
-				unitConverterArr["Picapt3"]["regton"] = ;
-				unitConverterArr["Picapt3"]["MTON"] = ;
+				 unitConverterArr["Picapt3"]["Picapt^3"] = ;
+				 unitConverterArr["Picapt3"]["Pica3"] = ;
+				 unitConverterArr["Picapt3"]["Pica^3"] = ;
+				 unitConverterArr["Picapt3"]["GRT"] = ;
+				 unitConverterArr["Picapt3"]["regton"] = ;
+				 unitConverterArr["Picapt3"]["MTON"] = ;
 
 
-				unitConverterArr["Picapt^3"] = {}; ;
+				 unitConverterArr["Picapt^3"] = {}; ;
 
-				unitConverterArr["Picapt^3"]["Pica3"] = ;
-				unitConverterArr["Picapt^3"]["Pica^3"] = ;
-				unitConverterArr["Picapt^3"]["GRT"] = ;
-				unitConverterArr["Picapt^3"]["regton"] = ;
-				unitConverterArr["Picapt^3"]["MTON"] = ;*/
+				 unitConverterArr["Picapt^3"]["Pica3"] = ;
+				 unitConverterArr["Picapt^3"]["Pica^3"] = ;
+				 unitConverterArr["Picapt^3"]["GRT"] = ;
+				 unitConverterArr["Picapt^3"]["regton"] = ;
+				 unitConverterArr["Picapt^3"]["MTON"] = ;*/
 
 
 				unitConverterArr["Pica3"] = {};
@@ -2756,7 +2771,7 @@
 
 			};
 
-			var generateArea = function(){
+			var generateArea = function () {
 
 				unitConverterArr["uk_acre"] = {};//International acre
 
@@ -3122,11 +3137,11 @@
 
 				/*unitConverterArr["Picapt2"] = {};
 
-				unitConverterArr["Picapt2"]["Pica2"] = ;
-				unitConverterArr["Picapt2"]["Pica^2"] = ;
-				unitConverterArr["Picapt2"]["Picapt^2"] = ;
-				unitConverterArr["Picapt2"]["yd2"] = ;
-				unitConverterArr["Picapt2"]["yd^2"] = ;*/
+				 unitConverterArr["Picapt2"]["Pica2"] = ;
+				 unitConverterArr["Picapt2"]["Pica^2"] = ;
+				 unitConverterArr["Picapt2"]["Picapt^2"] = ;
+				 unitConverterArr["Picapt2"]["yd2"] = ;
+				 unitConverterArr["Picapt2"]["yd^2"] = ;*/
 
 
 				unitConverterArr["Pica2"] = {};
@@ -3146,8 +3161,8 @@
 
 				/*unitConverterArr["Picapt^2"] = {};
 
-				unitConverterArr["Picapt^2"]["yd2"] = ;
-				unitConverterArr["Picapt^2"]["yd^2"] = ;*/
+				 unitConverterArr["Picapt^2"]["yd2"] = ;
+				 unitConverterArr["Picapt^2"]["yd^2"] = ;*/
 
 
 				unitConverterArr["yd2"] = {};
@@ -3156,7 +3171,7 @@
 
 			};
 
-			var generateInformationAndSpeed = function(){
+			var generateInformationAndSpeed = function () {
 
 				unitConverterArr["bit"] = {};
 
@@ -3224,9 +3239,9 @@
 		return unitConverterArr;
 	}
 
-	function generatePrefixAvailableMap(){
+	function generatePrefixAvailableMap() {
 
-		if(!availablePrefixMap){
+		if (!availablePrefixMap) {
 			availablePrefixMap = {};
 			availablePrefixMap['Y'] = {};
 			availablePrefixMap['Z'] = {};
@@ -4302,10 +4317,10 @@
 		return availablePrefixMap;
 	}
 
-	function getUnitConverterCoeff(from, to){
+	function getUnitConverterCoeff(from, to) {
 		var uniteArr = getUnitConverter();
 		var res = null;
-		if(uniteArr[from] && undefined !== uniteArr[from][to]){
+		if (uniteArr[from] && undefined !== uniteArr[from][to]) {
 			res = uniteArr[from][to];
 		}
 		return res;
@@ -4334,7 +4349,7 @@
 	cBESSELI.prototype.constructor = cBESSELI;
 	cBESSELI.prototype.argumentsMin = 2;
 	cBESSELI.prototype.argumentsMax = 2;
-	cBESSELI.prototype.Calculate = function ( arg ) {
+	cBESSELI.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
 
@@ -4346,19 +4361,19 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var x = argArray[0];
 			var n = argArray[1];
 
-			if ( n < 0 ){
-				return new cError( cErrorType.not_numeric );
+			if (n < 0) {
+				return new cError(cErrorType.not_numeric);
 			}
-			if(x < 0){
+			if (x < 0) {
 				x = Math.abs(x);
 			}
 			n = Math.floor(n);
 
-			return bessi( x, n );
+			return bessi(x, n);
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
@@ -4376,7 +4391,7 @@
 	cBESSELJ.prototype.constructor = cBESSELJ;
 	cBESSELJ.prototype.argumentsMin = 2;
 	cBESSELJ.prototype.argumentsMax = 2;
-	cBESSELJ.prototype.Calculate = function ( arg ) {
+	cBESSELJ.prototype.Calculate = function (arg) {
 		//результаты вычислений как в LO
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -4389,19 +4404,19 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var x = argArray[0];
 			var n = argArray[1];
 
-			if ( n < 0 ){
-				return new cError( cErrorType.not_numeric );
+			if (n < 0) {
+				return new cError(cErrorType.not_numeric);
 			}
-			if(x < 0){
+			if (x < 0) {
 				x = Math.abs(x);
 			}
 			n = Math.floor(n);
 
-			return BesselJ( x, n );
+			return BesselJ(x, n);
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
@@ -4420,7 +4435,7 @@
 	cBESSELK.prototype.constructor = cBESSELK;
 	cBESSELK.prototype.argumentsMin = 2;
 	cBESSELK.prototype.argumentsMax = 2;
-	cBESSELK.prototype.Calculate = function ( arg ) {
+	cBESSELK.prototype.Calculate = function (arg) {
 		//результаты вычислений как в LO
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -4433,17 +4448,17 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var x = argArray[0];
 			var n = argArray[1];
 
-			if ( n < 0 || x < 0){
-				return new cError( cErrorType.not_numeric );
+			if (n < 0 || x < 0) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			n = Math.floor(n);
 
-			return BesselK( x, n );
+			return BesselK(x, n);
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
@@ -4462,7 +4477,7 @@
 	cBESSELY.prototype.constructor = cBESSELY;
 	cBESSELY.prototype.argumentsMin = 2;
 	cBESSELY.prototype.argumentsMax = 2;
-	cBESSELY.prototype.Calculate = function ( arg ) {
+	cBESSELY.prototype.Calculate = function (arg) {
 		//результаты вычислений как в LO
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -4475,17 +4490,17 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var x = argArray[0];
 			var n = argArray[1];
 
-			if ( n < 0 || x < 0){
-				return new cError( cErrorType.not_numeric );
+			if (n < 0 || x < 0) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			n = Math.floor(n);
 
-			return BesselY( x, n );
+			return BesselY(x, n);
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
@@ -4693,12 +4708,12 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var arg0 = Math.floor(argArray[0]);
 			var arg1 = Math.floor(argArray[1]);
 
-			if ( arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/){
-				return  new cError(cErrorType.not_numeric);
+			if (arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var res = arg0 & arg1;
@@ -4733,21 +4748,21 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var arg0 = Math.floor(argArray[0]);
 			var arg1 = Math.floor(argArray[1]);
 
-			if ( arg0 < 0 /*|| arg0 >= 2^48*/){
-				return  new cError(cErrorType.not_numeric);
+			if (arg0 < 0 /*|| arg0 >= 2^48*/) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var res;
-			if (arg1 < 0){
-				res = Math.floor( arg0 / Math.pow( 2.0, -arg1));
-			}else if (arg1 === 0){
+			if (arg1 < 0) {
+				res = Math.floor(arg0 / Math.pow(2.0, -arg1));
+			} else if (arg1 === 0) {
 				res = arg0;
-			}else{
-				res = arg0 * Math.pow( 2.0, arg1);
+			} else {
+				res = arg0 * Math.pow(2.0, arg1);
 			}
 
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
@@ -4781,12 +4796,12 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var arg0 = Math.floor(argArray[0]);
 			var arg1 = Math.floor(argArray[1]);
 
-			if ( arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/){
-				return  new cError(cErrorType.not_numeric);
+			if (arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var res = arg0 | arg1;
@@ -4821,21 +4836,21 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var arg0 = Math.floor(argArray[0]);
 			var arg1 = Math.floor(argArray[1]);
 
-			if ( arg0 < 0 /*|| arg0 >= 2^48*/){
-				return  new cError(cErrorType.not_numeric);
+			if (arg0 < 0 /*|| arg0 >= 2^48*/) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var res;
-			if (arg1 < 0){
-				res = Math.floor( arg0 * Math.pow( 2.0, -arg1));
-			}else if (arg1 === 0){
+			if (arg1 < 0) {
+				res = Math.floor(arg0 * Math.pow(2.0, -arg1));
+			} else if (arg1 === 0) {
 				res = arg0;
-			}else{
-				res = Math.floor( arg0 / Math.pow( 2.0, arg1));
+			} else {
+				res = Math.floor(arg0 / Math.pow(2.0, arg1));
 			}
 
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
@@ -4869,12 +4884,12 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var arg0 = Math.floor(argArray[0]);
 			var arg1 = Math.floor(argArray[1]);
 
-			if ( arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/){
-				return  new cError(cErrorType.not_numeric);
+			if (arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/) {
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var res = arg0 ^ arg1;
@@ -4898,8 +4913,8 @@
 	cCOMPLEX.prototype.argumentsMax = 3;
 	cCOMPLEX.prototype.Calculate = function (arg) {
 
-		var real = arg[0], img = arg[1], suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString("i") :
-			arg[2];
+		var real = arg[0], img = arg[1],
+			suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString("i") : arg[2];
 		if (real instanceof cArea || img instanceof cArea3D) {
 			real = real.cross(arguments[1]);
 		} else if (real instanceof cArray) {
@@ -4960,7 +4975,7 @@
 	cCONVERT.prototype.constructor = cCONVERT;
 	cCONVERT.prototype.argumentsMin = 3;
 	cCONVERT.prototype.argumentsMax = 3;
-	cCONVERT.prototype.Calculate = function ( arg ) {
+	cCONVERT.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
 
@@ -4973,7 +4988,7 @@
 			return this.value = argError;
 		}
 
-		var calcFunc = function(argArray){
+		var calcFunc = function (argArray) {
 			var num = argArray[0];
 			var from = argArray[1];
 			var to = argArray[2];
@@ -4981,20 +4996,20 @@
 			var prefixTo = null;
 
 
-			var parseFrefix = function(val){
+			var parseFrefix = function (val) {
 				var isPrefix = val.substr(0, 1);
 				var isOperator;
-				if(availablePrefixMap[isPrefix]){
+				if (availablePrefixMap[isPrefix]) {
 					isOperator = val.substring(1, val.length);
-					if(availablePrefixMap[isPrefix][isOperator]){
+					if (availablePrefixMap[isPrefix][isOperator]) {
 						return {prefix: isPrefix, operator: isOperator};
 					}
 				}
 
 				isPrefix = val.substr(0, 2);
-				if(availablePrefixMap[isPrefix]){
+				if (availablePrefixMap[isPrefix]) {
 					isOperator = val.substring(2, val.length);
-					if(availablePrefixMap[isPrefix][isOperator]){
+					if (availablePrefixMap[isPrefix][isOperator]) {
 						return {prefix: isPrefix, operator: isOperator};
 					}
 				}
@@ -5004,14 +5019,14 @@
 			generatePrefixAvailableMap();
 			var getPrefixFrom = parseFrefix(from);
 			var prefixValueFrom = null;
-			if(getPrefixFrom){
+			if (getPrefixFrom) {
 				prefixFrom = getPrefixFrom.prefix;
 				from = getPrefixFrom.operator;
 				prefixValueFrom = prefixValueMap[prefixFrom];
 			}
 			var getPrefixTo = parseFrefix(to);
 			var prefixValueTo = null;
-			if(getPrefixTo){
+			if (getPrefixTo) {
 				prefixTo = getPrefixTo.prefix;
 				to = getPrefixTo.operator;
 				prefixValueTo = prefixValueMap[prefixTo];
@@ -5020,42 +5035,42 @@
 
 			var coeff;
 			var res;
-			if(from === to){
+			if (from === to) {
 				res = num;
-			} else if(null !== (coeff = getUnitConverterCoeff(from, to))){
-				if(coeff.length){
+			} else if (null !== (coeff = getUnitConverterCoeff(from, to))) {
+				if (coeff.length) {
 					res = num;
-					for(var i = 0; i < coeff.length; i++){
-						if(0 === coeff[i].type){
+					for (var i = 0; i < coeff.length; i++) {
+						if (0 === coeff[i].type) {
 							res *= coeff[i].val;
-						}else{
+						} else {
 							res += coeff[i].val;
 						}
 					}
-				}else{
+				} else {
 					res = num * coeff;
 				}
-			}else if(null !== (coeff = getUnitConverterCoeff(to, from))){
-				if(coeff.length){
+			} else if (null !== (coeff = getUnitConverterCoeff(to, from))) {
+				if (coeff.length) {
 					res = num;
-					for(var i = coeff.length - 1; i >= 0; i--){
-						if(0 === coeff[i].type){
+					for (var i = coeff.length - 1; i >= 0; i--) {
+						if (0 === coeff[i].type) {
 							res /= coeff[i].val;
-						}else{
+						} else {
 							res -= coeff[i].val;
 						}
 					}
-				}else{
+				} else {
 					res = num / coeff;
 				}
-			}else{
+			} else {
 				return new cError(cErrorType.not_available);
 			}
 
-			if(null !== prefixValueFrom){
+			if (null !== prefixValueFrom) {
 				res = res * prefixValueFrom;
 			}
-			if(null !== prefixValueTo){
+			if (null !== prefixValueTo) {
 				res = res / prefixValueTo;
 			}
 
@@ -5312,14 +5327,14 @@
 			return this.value = argError;
 		}
 
-		var calcErf = function(argArray) {
+		var calcErf = function (argArray) {
 			var a = argArray[0];
 			var b = argArray[1];
 
 			var res;
-			if(undefined !== b){
+			if (undefined !== b) {
 				res = new cNumber(rtl_math_erf(b) - rtl_math_erf(a));
-			}else{
+			} else {
 				res = new cNumber(rtl_math_erf(a));
 			}
 
@@ -5354,7 +5369,7 @@
 			return this.value = argError;
 		}
 
-		var calcErf = function(argArray) {
+		var calcErf = function (argArray) {
 			var a = argArray[0];
 			return new cNumber(rtl_math_erf(a));
 		};
@@ -5401,12 +5416,13 @@
 	 * @extends {cERFC}
 	 */
 	function cERFC_PRECISE() {
-		cERFC.call(this);
-		this.name = "ERFC.PRECISE";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cERFC_PRECISE.prototype = Object.create(cERFC.prototype);
 	cERFC_PRECISE.prototype.constructor = cERFC_PRECISE;
+	cERFC_PRECISE.prototype.name = 'ERFC.PRECISE';
 	cERFC_PRECISE.prototype.isXLFN = true;
 
 	/**
@@ -5414,11 +5430,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGESTEP() {
-		cBaseFunction.call(this, "GESTEP");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cGESTEP.prototype = Object.create(cBaseFunction.prototype);
 	cGESTEP.prototype.constructor = cGESTEP;
+	cGESTEP.prototype.name = 'GESTEP';
 	cGESTEP.prototype.argumentsMin = 1;
 	cGESTEP.prototype.argumentsMax = 2;
 	cGESTEP.prototype.Calculate = function (arg) {
@@ -5461,11 +5479,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2BIN() {
-		cBaseFunction.call(this, "HEX2BIN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cHEX2BIN.prototype = Object.create(cBaseFunction.prototype);
 	cHEX2BIN.prototype.constructor = cHEX2BIN;
+	cHEX2BIN.prototype.name = 'HEX2BIN';
 	cHEX2BIN.prototype.argumentsMin = 1;
 	cHEX2BIN.prototype.argumentsMax = 2;
 	cHEX2BIN.prototype.Calculate = function (arg) {
@@ -5504,8 +5524,8 @@
 
 		if (validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
-			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === 'F'), arg0DEC = (negative) ?
-				parseInt(arg0, NumberBase.HEX) - 1099511627776 : parseInt(arg0, NumberBase.HEX);
+			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === 'F'),
+				arg0DEC = (negative) ? parseInt(arg0, NumberBase.HEX) - 1099511627776 : parseInt(arg0, NumberBase.HEX);
 
 			if (arg0DEC < -512 || arg0DEC > 511) {
 				this.value = new cError(cErrorType.not_numeric)
@@ -5532,11 +5552,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2DEC() {
-		cBaseFunction.call(this, "HEX2DEC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cHEX2DEC.prototype = Object.create(cBaseFunction.prototype);
 	cHEX2DEC.prototype.constructor = cHEX2DEC;
+	cHEX2DEC.prototype.name = 'HEX2DEC';
 	cHEX2DEC.prototype.argumentsMin = 1;
 	cHEX2DEC.prototype.argumentsMax = 1;
 	cHEX2DEC.prototype.Calculate = function (arg) {
@@ -5579,11 +5601,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2OCT() {
-		cBaseFunction.call(this, "HEX2OCT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cHEX2OCT.prototype = Object.create(cBaseFunction.prototype);
 	cHEX2OCT.prototype.constructor = cHEX2OCT;
+	cHEX2OCT.prototype.name = 'HEX2OCT';
 	cHEX2OCT.prototype.argumentsMin = 1;
 	cHEX2OCT.prototype.argumentsMax = 2;
 	cHEX2OCT.prototype.Calculate = function (arg) {
@@ -5649,11 +5673,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMABS() {
-		cBaseFunction.call(this, "IMABS");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMABS.prototype = Object.create(cBaseFunction.prototype);
 	cIMABS.prototype.constructor = cIMABS;
+	cIMABS.prototype.name = 'IMABS';
 	cIMABS.prototype.argumentsMin = 1;
 	cIMABS.prototype.argumentsMax = 1;
 	cIMABS.prototype.Calculate = function (arg) {
@@ -5689,11 +5715,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMAGINARY() {
-		cBaseFunction.call(this, "IMAGINARY");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMAGINARY.prototype = Object.create(cBaseFunction.prototype);
 	cIMAGINARY.prototype.constructor = cIMAGINARY;
+	cIMAGINARY.prototype.name = 'IMAGINARY';
 	cIMAGINARY.prototype.argumentsMin = 1;
 	cIMAGINARY.prototype.argumentsMax = 1;
 	cIMAGINARY.prototype.Calculate = function (arg) {
@@ -5729,11 +5757,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMARGUMENT() {
-		cBaseFunction.call(this, "IMARGUMENT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMARGUMENT.prototype = Object.create(cBaseFunction.prototype);
 	cIMARGUMENT.prototype.constructor = cIMARGUMENT;
+	cIMARGUMENT.prototype.name = 'IMARGUMENT';
 	cIMARGUMENT.prototype.argumentsMin = 1;
 	cIMARGUMENT.prototype.argumentsMax = 1;
 	cIMARGUMENT.prototype.Calculate = function (arg) {
@@ -5769,11 +5799,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCONJUGATE() {
-		cBaseFunction.call(this, "IMCONJUGATE");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMCONJUGATE.prototype = Object.create(cBaseFunction.prototype);
 	cIMCONJUGATE.prototype.constructor = cIMCONJUGATE;
+	cIMCONJUGATE.prototype.name = 'IMCONJUGATE';
 	cIMCONJUGATE.prototype.argumentsMin = 1;
 	cIMCONJUGATE.prototype.argumentsMax = 1;
 	cIMCONJUGATE.prototype.Calculate = function (arg) {
@@ -5809,11 +5841,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOS() {
-		cBaseFunction.call(this, "IMCOS");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMCOS.prototype = Object.create(cBaseFunction.prototype);
 	cIMCOS.prototype.constructor = cIMCOS;
+	cIMCOS.prototype.name = 'IMCOS';
 	cIMCOS.prototype.argumentsMin = 1;
 	cIMCOS.prototype.argumentsMax = 1;
 	cIMCOS.prototype.Calculate = function (arg) {
@@ -5851,11 +5885,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOSH() {
-		cBaseFunction.call(this, "IMCOSH");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMCOSH.prototype = Object.create(cBaseFunction.prototype);
 	cIMCOSH.prototype.constructor = cIMCOSH;
+	cIMCOSH.prototype.name = 'IMCOSH';
 	cIMCOSH.prototype.argumentsMin = 1;
 	cIMCOSH.prototype.argumentsMax = 1;
 	cIMCOSH.prototype.isXLFN = true;
@@ -5869,7 +5905,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -5898,11 +5934,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOT() {
-		cBaseFunction.call(this, "IMCOT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
 	cIMCOT.prototype.constructor = cIMCOT;
+	cIMCOT.prototype.name = 'IMCOT';
 	cIMCOT.prototype.argumentsMin = 1;
 	cIMCOT.prototype.argumentsMax = 1;
 	cIMCOT.prototype.isXLFN = true;
@@ -5916,7 +5954,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -5924,7 +5962,7 @@
 		if (arg0 instanceof cError) {
 			return this.value = arg0;
 		}
-		if(0 == arg0.value){
+		if (0 == arg0.value) {
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
@@ -5948,11 +5986,14 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCSC() {
-		cBaseFunction.call(this, "IMCSC");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
+
 	//TODO проверить!!!
 	cIMCSC.prototype = Object.create(cBaseFunction.prototype);
 	cIMCSC.prototype.constructor = cIMCSC;
+	cIMCSC.prototype.name = 'IMCSC';
 	cIMCSC.prototype.argumentsMin = 1;
 	cIMCSC.prototype.argumentsMax = 1;
 	cIMCSC.prototype.isXLFN = true;
@@ -5966,7 +6007,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -5975,7 +6016,7 @@
 			return this.value = arg0;
 		}
 
-		if(0 == arg0.value){
+		if (0 == arg0.value) {
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
@@ -5999,11 +6040,14 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCSCH() {
-		cBaseFunction.call(this, "IMCSCH");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
+
 	//TODO проверить!!!
 	cIMCSCH.prototype = Object.create(cBaseFunction.prototype);
 	cIMCSCH.prototype.constructor = cIMCSCH;
+	cIMCSCH.prototype.name = 'IMCSCH';
 	cIMCSCH.prototype.argumentsMin = 1;
 	cIMCSCH.prototype.argumentsMax = 1;
 	cIMCSCH.prototype.isXLFN = true;
@@ -6017,7 +6061,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6026,7 +6070,7 @@
 			return this.value = arg0;
 		}
 
-		if(0 == arg0.value){
+		if (0 == arg0.value) {
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
@@ -6478,6 +6522,7 @@
 	function cIMSEC() {
 		cBaseFunction.call(this, "IMSEC");
 	}
+
 	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
 	cIMSEC.prototype.constructor = cIMSEC;
 	cIMSEC.prototype.argumentsMin = 1;
@@ -6493,7 +6538,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6524,6 +6569,7 @@
 	function cIMSECH() {
 		cBaseFunction.call(this, "IMSECH");
 	}
+
 	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
 	cIMSECH.prototype.constructor = cIMSECH;
 	cIMSECH.prototype.argumentsMin = 1;
@@ -6539,7 +6585,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6564,7 +6610,6 @@
 	};
 
 
-
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -6587,7 +6632,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6634,7 +6679,7 @@
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6858,6 +6903,7 @@
 	function cIMTAN() {
 		cBaseFunction.call(this, "IMTAN");
 	}
+
 	//TODO проверить!!!
 	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
 	cIMTAN.prototype.constructor = cIMTAN;
@@ -6879,7 +6925,7 @@
 			return this.value = arg0;
 		}
 
-		if(arg0.value === true || arg0.value === false){
+		if (arg0.value === true || arg0.value === false) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -6946,8 +6992,8 @@
 
 		if (validOCTNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
-			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === '7'), arg0DEC = (negative) ?
-				parseInt(arg0, NumberBase.OCT) - 1073741824 : parseInt(arg0, NumberBase.OCT);
+			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === '7'),
+				arg0DEC = (negative) ? parseInt(arg0, NumberBase.OCT) - 1073741824 : parseInt(arg0, NumberBase.OCT);
 
 			if (arg0DEC < -512 || arg0DEC > 511) {
 				this.value = new cError(cErrorType.not_numeric)

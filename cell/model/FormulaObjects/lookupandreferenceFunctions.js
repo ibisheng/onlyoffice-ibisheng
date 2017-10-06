@@ -103,18 +103,18 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cADDRESS() {
-		this.name = "ADDRESS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
 	cADDRESS.prototype.constructor = cADDRESS;
+	cADDRESS.prototype.name = 'ADDRESS';
 	cADDRESS.prototype.argumentsMin = 2;
 	cADDRESS.prototype.argumentsMax = 5;
 	cADDRESS.prototype.Calculate = function (arg) {
-		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1), A1RefType = arg[3] ?
-			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
+		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1),
+			A1RefType = arg[3] ? arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
 
 		if (cElementType.cellsRange === rowNumber.type || cElementType.cellsRange3D === rowNumber.type) {
 			rowNumber = rowNumber.cross(arguments[1]);
@@ -201,8 +201,8 @@
 			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber,
 				A1RefType), A1RefType);
 
-		return this.value = new cString((cElementType.empty === sheetName.type) ? strRef :
-			parserHelp.get3DRef(sheetName.toString(), strRef));
+		return this.value = new cString(
+			(cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
@@ -228,13 +228,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHOOSE() {
-		this.name = "CHOOSE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCHOOSE.prototype = Object.create(cBaseFunction.prototype);
 	cCHOOSE.prototype.constructor = cCHOOSE;
+	cCHOOSE.prototype.name = 'CHOOSE';
 	cCHOOSE.prototype.argumentsMin = 2;
 	cCHOOSE.prototype.argumentsMax = 30;
 	cCHOOSE.prototype.Calculate = function (arg) {
@@ -265,13 +265,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOLUMN() {
-		this.name = "COLUMN";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCOLUMN.prototype = Object.create(cBaseFunction.prototype);
 	cCOLUMN.prototype.constructor = cCOLUMN;
+	cCOLUMN.prototype.name = 'COLUMN';
 	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
 		var bbox;
@@ -293,13 +293,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOLUMNS() {
-		this.name = "COLUMNS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCOLUMNS.prototype = Object.create(cBaseFunction.prototype);
 	cCOLUMNS.prototype.constructor = cCOLUMNS;
+	cCOLUMNS.prototype.name = 'COLUMNS';
 	cCOLUMNS.prototype.argumentsMin = 1;
 	cCOLUMNS.prototype.argumentsMax = 1;
 	cCOLUMNS.prototype.Calculate = function (arg) {
@@ -320,13 +320,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORMULATEXT() {
-		this.name = "FORMULATEXT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cFORMULATEXT.prototype = Object.create(cBaseFunction.prototype);
 	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
+	cFORMULATEXT.prototype.name = 'FORMULATEXT';
 	cFORMULATEXT.prototype.argumentsMin = 1;
 	cFORMULATEXT.prototype.argumentsMax = 1;
 	cFORMULATEXT.prototype.isXLFN = true;
@@ -338,9 +338,9 @@
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			var bbox = arg0.getRange();
 			var formula = bbox.getFormula();
-			if("" === formula){
+			if ("" === formula) {
 				return this.value = new cError(cErrorType.not_available);
-			}else{
+			} else {
 				res = new cString("=" + formula);
 			}
 		}
@@ -364,13 +364,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHLOOKUP() {
-		this.name = "HLOOKUP";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cHLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cHLOOKUP.prototype.constructor = cHLOOKUP;
+	cHLOOKUP.prototype.name = 'HLOOKUP';
 	cHLOOKUP.prototype.argumentsMin = 3;
 	cHLOOKUP.prototype.argumentsMax = 4;
 	cHLOOKUP.prototype.Calculate = function (arg) {
@@ -393,20 +393,20 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cINDEX() {
-		this.name = "INDEX";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
 	cINDEX.prototype.constructor = cINDEX;
+	cINDEX.prototype.name = 'INDEX';
 	cINDEX.prototype.argumentsMin = 2;
 	cINDEX.prototype.argumentsMax = 4;
 	cINDEX.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cINDEX.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] :
-			new cNumber(1), arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] :
-			new cNumber(1), arg3 = arg[3] && (cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
+		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] : new cNumber(1),
+			arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] : new cNumber(1),
+			arg3 = arg[3] && (cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
 
 		if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.tocArea();
@@ -449,7 +449,8 @@
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1)
+						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1,
+							bbox.r1 + arg1 - 1)
 						res = new cRef(res.getName(), ws);
 					}
 				}
@@ -470,21 +471,21 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cINDIRECT() {
-		this.name = "INDIRECT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cINDIRECT.prototype = Object.create(cBaseFunction.prototype);
 	cINDIRECT.prototype.constructor = cINDIRECT;
+	cINDIRECT.prototype.name = 'INDIRECT';
 	cINDIRECT.prototype.argumentsMin = 1;
 	cINDIRECT.prototype.argumentsMax = 2;
 	cINDIRECT.prototype.ca = true;
 	cINDIRECT.prototype.Calculate = function (arg) {
-		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
-			new cBool(true), ws = arguments[3], wb = ws.workbook, o = {
-			Formula: "", pCurrPos: 0
-		}, ref, found_operand, ret;
+		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool(true), ws = arguments[3],
+			wb = ws.workbook, o = {
+				Formula: "", pCurrPos: 0
+			}, ref, found_operand, ret;
 
 		function parseReference() {
 			if ((ref = parserHelp.is3DRef.call(o, o.Formula, o.pCurrPos))[0]) {
@@ -530,7 +531,7 @@
 					found_operand = found_operand.toRef(arguments[1]);
 				}
 
-				ret  = found_operand;
+				ret = found_operand;
 			} else {
 				ret = new cError(cErrorType.bad_reference);
 			}
@@ -545,17 +546,18 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOOKUP() {
-		this.name = "LOOKUP";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cLOOKUP.prototype.constructor = cLOOKUP;
+	cLOOKUP.prototype.name = 'LOOKUP';
 	cLOOKUP.prototype.argumentsMin = 2;
 	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1 ,t = this;
+		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1,
+			t = this;
 
 		if (cElementType.error === arg0.type) {
 			return this.value = arg0;
@@ -620,7 +622,7 @@
 			}
 
 			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC, 0);
-			_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0(), function(cell){
+			_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0(), function (cell) {
 				t.value = checkTypeCell(cell);
 			});
 			return this.value;
@@ -693,13 +695,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMATCH() {
-		this.name = "MATCH";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cMATCH.prototype = Object.create(cBaseFunction.prototype);
 	cMATCH.prototype.constructor = cMATCH;
+	cMATCH.prototype.name = 'MATCH';
 	cMATCH.prototype.argumentsMin = 2;
 	cMATCH.prototype.argumentsMax = 3;
 	cMATCH.prototype.Calculate = function (arg) {
@@ -798,13 +800,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOFFSET() {
-		this.name = "OFFSET";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cOFFSET.prototype = Object.create(cBaseFunction.prototype);
 	cOFFSET.prototype.constructor = cOFFSET;
+	cOFFSET.prototype.name = 'OFFSET';
 	cOFFSET.prototype.argumentsMin = 3;
 	cOFFSET.prototype.argumentsMax = 5;
 	cOFFSET.prototype.ca = true;
@@ -875,13 +877,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROW() {
-		this.name = "ROW";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cROW.prototype = Object.create(cBaseFunction.prototype);
 	cROW.prototype.constructor = cROW;
+	cROW.prototype.name = 'ROW';
 	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
 		var bbox;
@@ -903,13 +905,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROWS() {
-		this.name = "ROWS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cROWS.prototype = Object.create(cBaseFunction.prototype);
 	cROWS.prototype.constructor = cROWS;
+	cROWS.prototype.name = 'ROWS';
 	cROWS.prototype.argumentsMin = 1;
 	cROWS.prototype.argumentsMax = 1;
 	cROWS.prototype.Calculate = function (arg) {
@@ -941,13 +943,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRANSPOSE() {
-		this.name = "TRANSPOSE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTRANSPOSE.prototype = Object.create(cBaseFunction.prototype);
 	cTRANSPOSE.prototype.constructor = cTRANSPOSE;
+	cTRANSPOSE.prototype.name = 'TRANSPOSE';
 	cTRANSPOSE.prototype.argumentsMin = 1;
 	cTRANSPOSE.prototype.argumentsMax = 1;
 	cTRANSPOSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1091,14 +1093,14 @@
 		r = this.bHor ? bb.r1 + number : res;
 		c = this.bHor ? res : bb.c1 + number;
 		var resVal;
-		arg1.getWS()._getCellNoEmpty(r, c, function(cell) {
+		arg1.getWS()._getCellNoEmpty(r, c, function (cell) {
 			resVal = checkTypeCell(cell);
 		});
 		return resVal;
 	};
 	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {
-		var res, _this = this, wsId = range.getWorksheet().getId(), sRangeName = wsId + g_cCharDelimiter +
-			range.getName(), cacheElem = this.cacheId[sRangeName];
+		var res, _this = this, wsId = range.getWorksheet().getId(),
+			sRangeName = wsId + g_cCharDelimiter + range.getName(), cacheElem = this.cacheId[sRangeName];
 		if (!cacheElem) {
 			cacheElem = {elements: [], results: {}};
 			range._foreachNoEmpty(function (cell, r, c) {
@@ -1174,13 +1176,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVLOOKUP() {
-		this.name = "VLOOKUP";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cVLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cVLOOKUP.prototype.constructor = cVLOOKUP;
+	cVLOOKUP.prototype.name = 'VLOOKUP';
 	cVLOOKUP.prototype.argumentsMin = 3;
 	cVLOOKUP.prototype.argumentsMax = 4;
 	cVLOOKUP.prototype.numFormat = AscCommonExcel.cNumFormatNone;

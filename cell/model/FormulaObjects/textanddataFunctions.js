@@ -92,13 +92,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHAR() {
-		this.name = "CHAR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCHAR.prototype = Object.create(cBaseFunction.prototype);
 	cCHAR.prototype.constructor = cCHAR;
+	cCHAR.prototype.name = 'CHAR';
 	cCHAR.prototype.argumentsMin = 1;
 	cCHAR.prototype.argumentsMax = 1;
 	cCHAR.prototype.Calculate = function (arg) {
@@ -137,13 +137,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCLEAN() {
-		this.name = "CLEAN";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCLEAN.prototype = Object.create(cBaseFunction.prototype);
 	cCLEAN.prototype.constructor = cCLEAN;
+	cCLEAN.prototype.name = 'CLEAN';
 	cCLEAN.prototype.argumentsMin = 1;
 	cCLEAN.prototype.argumentsMax = 1;
 	cCLEAN.prototype.Calculate = function (arg) {
@@ -174,13 +174,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCODE() {
-		this.name = "CODE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCODE.prototype = Object.create(cBaseFunction.prototype);
 	cCODE.prototype.constructor = cCODE;
+	cCODE.prototype.name = 'CODE';
 	cCODE.prototype.argumentsMin = 1;
 	cCODE.prototype.argumentsMax = 1;
 	cCODE.prototype.Calculate = function (arg) {
@@ -219,7 +219,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONCATENATE() {
-		this.name = "CONCATENATE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
@@ -227,6 +226,7 @@
 	//TODO пересмотреть функцию!!!
 	cCONCATENATE.prototype = Object.create(cBaseFunction.prototype);
 	cCONCATENATE.prototype.constructor = cCONCATENATE;
+	cCONCATENATE.prototype.name = 'CONCATENATE';
 	cCONCATENATE.prototype.argumentsMin = 1;
 	cCONCATENATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCONCATENATE.prototype.Calculate = function (arg) {
@@ -264,13 +264,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONCAT() {
-		this.name = "CONCAT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cCONCAT.prototype = Object.create(cBaseFunction.prototype);
 	cCONCAT.prototype.constructor = cCONCAT;
+	cCONCAT.prototype.name = 'CONCAT';
 	cCONCAT.prototype.argumentsMin = 1;
 	cCONCAT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCONCAT.prototype.Calculate = function (arg) {
@@ -285,11 +285,11 @@
 					var _arrElem = _arrVal[j].tocString();
 					if (cElementType.error === _arrElem.type) {
 						return this.value = arrVal[j];
-					}else {
+					} else {
 						arg0 = new cString(arg0.toString().concat(_arrElem));
 					}
 				}
-			}else{
+			} else {
 				argI = argI.tocString();
 				if (cElementType.error === argI.type) {
 					return this.value = argI;
@@ -319,13 +319,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDOLLAR() {
-		this.name = "DOLLAR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cDOLLAR.prototype = Object.create(cBaseFunction.prototype);
 	cDOLLAR.prototype.constructor = cDOLLAR;
+	cDOLLAR.prototype.name = 'DOLLAR';
 	cDOLLAR.prototype.argumentsMin = 1;
 	cDOLLAR.prototype.argumentsMax = 2;
 	cDOLLAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -518,13 +518,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXACT() {
-		this.name = "EXACT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cEXACT.prototype = Object.create(cBaseFunction.prototype);
 	cEXACT.prototype.constructor = cEXACT;
+	cEXACT.prototype.name = 'EXACT';
 	cEXACT.prototype.argumentsMin = 2;
 	cEXACT.prototype.argumentsMax = 2;
 	cEXACT.prototype.Calculate = function (arg) {
@@ -564,18 +564,18 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFIND() {
-		this.name = "FIND";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cFIND.prototype = Object.create(cBaseFunction.prototype);
 	cFIND.prototype.constructor = cFIND;
+	cFIND.prototype.name = 'FIND';
 	cFIND.prototype.argumentsMin = 2;
 	cFIND.prototype.argumentsMax = 3;
 	cFIND.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] :
-			null, res, str, searchStr, pos = -1;
+		var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr,
+			pos = -1;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
@@ -651,24 +651,24 @@
 	 */
 	function cFINDB() {
 		cFIND.call(this);
-		this.name = "FINDB";
 	}
 
 	cFINDB.prototype = Object.create(cFIND.prototype);
 	cFINDB.prototype.constructor = cFINDB;
+	cFINDB.prototype.name = 'FINDB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFIXED() {
-		this.name = "FIXED";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cFIXED.prototype = Object.create(cBaseFunction.prototype);
 	cFIXED.prototype.constructor = cFIXED;
+	cFIXED.prototype.name = 'FIXED';
 	cFIXED.prototype.argumentsMin = 1;
 	cFIXED.prototype.argumentsMax = 3;
 	cFIXED.prototype.Calculate = function (arg) {
@@ -869,13 +869,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLEFT() {
-		this.name = "LEFT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cLEFT.prototype = Object.create(cBaseFunction.prototype);
 	cLEFT.prototype.constructor = cLEFT;
+	cLEFT.prototype.name = 'LEFT';
 	cLEFT.prototype.argumentsMin = 1;
 	cLEFT.prototype.argumentsMax = 2;
 	cLEFT.prototype.Calculate = function (arg) {
@@ -920,24 +920,24 @@
 	 */
 	function cLEFTB() {
 		cLEFT.call(this);
-		this.name = "LEFTB";
 	}
 
 	cLEFTB.prototype = Object.create(cLEFT.prototype);
 	cLEFTB.prototype.constructor = cLEFTB;
+	cLEFTB.prototype.name = 'LEFTB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLEN() {
-		this.name = "LEN";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cLEN.prototype = Object.create(cBaseFunction.prototype);
 	cLEN.prototype.constructor = cLEN;
+	cLEN.prototype.name = 'LEN';
 	cLEN.prototype.argumentsMin = 1;
 	cLEN.prototype.argumentsMax = 1;
 	cLEN.prototype.Calculate = function (arg) {
@@ -966,24 +966,24 @@
 	 */
 	function cLENB() {
 		cLEN.call(this);
-		this.name = "LENB";
 	}
 
 	cLENB.prototype = Object.create(cLEN.prototype);
 	cLENB.prototype.constructor = cLENB;
+	cLENB.prototype.name = 'LENB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOWER() {
-		this.name = "LOWER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cLOWER.prototype = Object.create(cBaseFunction.prototype);
 	cLOWER.prototype.constructor = cLOWER;
+	cLOWER.prototype.name = 'LOWER';
 	cLOWER.prototype.argumentsMin = 1;
 	cLOWER.prototype.argumentsMax = 1;
 	cLOWER.prototype.Calculate = function (arg) {
@@ -1010,13 +1010,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMID() {
-		this.name = "MID";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cMID.prototype = Object.create(cBaseFunction.prototype);
 	cMID.prototype.constructor = cMID;
+	cMID.prototype.name = 'MID';
 	cMID.prototype.argumentsMin = 3;
 	cMID.prototype.argumentsMax = 3;
 	cMID.prototype.Calculate = function (arg) {
@@ -1081,24 +1081,24 @@
 	 */
 	function cMIDB() {
 		cMID.call(this);
-		this.name = "MIDB";
 	}
 
 	cMIDB.prototype = Object.create(cMID.prototype);
 	cMIDB.prototype.constructor = cMIDB;
+	cMIDB.prototype.name = 'MIDB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNUMBERVALUE() {
-		this.name = "NUMBERVALUE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cNUMBERVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cNUMBERVALUE.prototype.constructor = cNUMBERVALUE;
+	cNUMBERVALUE.prototype.name = 'NUMBERVALUE';
 	cNUMBERVALUE.prototype.argumentsMin = 1;
 	cNUMBERVALUE.prototype.argumentsMax = 3;
 	cNUMBERVALUE.prototype.isXLFN = true;
@@ -1108,57 +1108,59 @@
 		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocString();
-		argClone[1] = argClone[1] ? argClone[1].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
-		argClone[2] = argClone[2] ? argClone[2].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberGroupSeparator);
+		argClone[1] =
+			argClone[1] ? argClone[1].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+		argClone[2] =
+			argClone[2] ? argClone[2].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberGroupSeparator);
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
-		var replaceAt = function(str, index, chr) {
-			if (index > str.length - 1){
+		var replaceAt = function (str, index, chr) {
+			if (index > str.length - 1) {
 				return str;
-			}else{
+			} else {
 				return str.substr(0, index) + chr + str.substr(index + 1);
 			}
 		};
 
-		var calcText = function(argArray){
+		var calcText = function (argArray) {
 			var aInputString = argArray[0];
 			var aDecimalSeparator = argArray[1], aGroupSeparator = argArray[2];
 			var cDecimalSeparator = 0;
 
-			if(aDecimalSeparator){
-				if ( aDecimalSeparator.length === 1 ){
+			if (aDecimalSeparator) {
+				if (aDecimalSeparator.length === 1) {
 					cDecimalSeparator = aDecimalSeparator[0];
-				}else{
+				} else {
 					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
-			if ( cDecimalSeparator && aGroupSeparator && aGroupSeparator.indexOf(cDecimalSeparator) !== -1 ){
+			if (cDecimalSeparator && aGroupSeparator && aGroupSeparator.indexOf(cDecimalSeparator) !== -1) {
 				return new cError(cErrorType.wrong_value_type)
 			}
 
-			if ( aInputString.length === 0 ){
+			if (aInputString.length === 0) {
 				return new cError(cErrorType.wrong_value_type)
 			}
 
 			//считаем количество вхождений cDecimalSeparator в строке
 			var count = 0;
-			for ( var i = 0; i < aInputString.length; i++){
-				if(cDecimalSeparator === aInputString[i]){
+			for (var i = 0; i < aInputString.length; i++) {
+				if (cDecimalSeparator === aInputString[i]) {
 					count++;
 				}
-				if(count > 1){
+				if (count > 1) {
 					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
-			var nDecSep = cDecimalSeparator ? aInputString.indexOf( cDecimalSeparator ) : 0;
-			if ( nDecSep !== 0 ){
-				var aTemporary = nDecSep >= 0 ? aInputString.substr( 0, nDecSep ) : aInputString;
+			var nDecSep = cDecimalSeparator ? aInputString.indexOf(cDecimalSeparator) : 0;
+			if (nDecSep !== 0) {
+				var aTemporary = nDecSep >= 0 ? aInputString.substr(0, nDecSep) : aInputString;
 
 				var nIndex = 0;
 				while (nIndex < aGroupSeparator.length) {
@@ -1168,43 +1170,44 @@
 					nIndex++;
 				}
 
-				if ( nDecSep >= 0 ) {
-					aInputString = aTemporary + aInputString.substr( nDecSep );
+				if (nDecSep >= 0) {
+					aInputString = aTemporary + aInputString.substr(nDecSep);
 				} else {
 					aInputString = aTemporary;
 				}
 			}
 
 			//replace decimal separator
-			aInputString = aInputString.replace(cDecimalSeparator, AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+			aInputString =
+				aInputString.replace(cDecimalSeparator, AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 
 			//delete spaces
 			aInputString = aInputString.replace(/(\s|\r|\t|\n)/g, "");
 			/*for ( var i = aInputString.length; i >= 0; i--){
-				var c = aInputString.charCodeAt(i);
-				if ( c == 0x0020 || c == 0x0009 || c == 0x000A || c == 0x000D ){
-					aInputString = aInputString.replaceAt( i, 1, "" ); // remove spaces etc.
-				}
-			}*/
+			 var c = aInputString.charCodeAt(i);
+			 if ( c == 0x0020 || c == 0x0009 || c == 0x000A || c == 0x000D ){
+			 aInputString = aInputString.replaceAt( i, 1, "" ); // remove spaces etc.
+			 }
+			 }*/
 
 			//remove and count '%'
 			var nPercentCount = 0;
-			for ( var i = aInputString.length - 1; i >= 0 && aInputString.charCodeAt(i) === 0x0025; i-- ){
+			for (var i = aInputString.length - 1; i >= 0 && aInputString.charCodeAt(i) === 0x0025; i--) {
 				aInputString = replaceAt(aInputString, i, "");
 				nPercentCount++;
 			}
 
 			var fVal = AscCommon.g_oFormatParser.parse(aInputString, AscCommon.g_oDefaultCultureInfo);
-			if ( fVal ) {
+			if (fVal) {
 				fVal = fVal.value;
-				if (nPercentCount){
-					 fVal *= Math.pow( 10, -(nPercentCount * 2));
+				if (nPercentCount) {
+					fVal *= Math.pow(10, -(nPercentCount * 2));
 				}
 
 				return new cNumber(fVal);
-			 }
+			}
 
-			 return new cError(cErrorType.wrong_value_type)
+			return new cError(cErrorType.wrong_value_type)
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcText, true);
@@ -1227,13 +1230,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPROPER() {
-		this.name = "PROPER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cPROPER.prototype = Object.create(cBaseFunction.prototype);
 	cPROPER.prototype.constructor = cPROPER;
+	cPROPER.prototype.name = 'PROPER';
 	cPROPER.prototype.argumentsMin = 1;
 	cPROPER.prototype.argumentsMax = 1;
 	cPROPER.prototype.Calculate = function (arg) {
@@ -1293,13 +1296,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cREPLACE() {
-		this.name = "REPLACE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cREPLACE.prototype = Object.create(cBaseFunction.prototype);
 	cREPLACE.prototype.constructor = cREPLACE;
+	cREPLACE.prototype.name = 'REPLACE';
 	cREPLACE.prototype.argumentsMin = 4;
 	cREPLACE.prototype.argumentsMax = 4;
 	cREPLACE.prototype.Calculate = function (arg) {
@@ -1372,24 +1375,24 @@
 	 */
 	function cREPLACEB() {
 		cREPLACE.call(this);
-		this.name = "REPLACEB";
 	}
 
 	cREPLACEB.prototype = Object.create(cREPLACE.prototype);
 	cREPLACEB.prototype.constructor = cREPLACEB;
+	cREPLACEB.prototype.name = 'REPLACEB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cREPT() {
-		this.name = "REPT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cREPT.prototype = Object.create(cBaseFunction.prototype);
 	cREPT.prototype.constructor = cREPT;
+	cREPT.prototype.name = 'REPT';
 	cREPT.prototype.argumentsMin = 2;
 	cREPT.prototype.argumentsMax = 2;
 	cREPT.prototype.Calculate = function (arg) {
@@ -1445,13 +1448,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRIGHT() {
-		this.name = "RIGHT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cRIGHT.prototype = Object.create(cBaseFunction.prototype);
 	cRIGHT.prototype.constructor = cRIGHT;
+	cRIGHT.prototype.name = 'RIGHT';
 	cRIGHT.prototype.argumentsMin = 1;
 	cRIGHT.prototype.argumentsMax = 2;
 	cRIGHT.prototype.Calculate = function (arg) {
@@ -1496,24 +1499,24 @@
 	 */
 	function cRIGHTB() {
 		cRIGHT.call(this);
-		this.name = "RIGHTB";
 	}
 
 	cRIGHTB.prototype = Object.create(cRIGHT.prototype);
 	cRIGHTB.prototype.constructor = cRIGHTB;
+	cRIGHTB.prototype.name = 'RIGHTB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSEARCH() {
-		this.name = "SEARCH";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cSEARCH.prototype = Object.create(cBaseFunction.prototype);
 	cSEARCH.prototype.constructor = cSEARCH;
+	cSEARCH.prototype.name = 'SEARCH';
 	cSEARCH.prototype.argumentsMin = 2;
 	cSEARCH.prototype.argumentsMax = 3;
 	cSEARCH.prototype.Calculate = function (arg) {
@@ -1599,24 +1602,24 @@
 	 */
 	function cSEARCHB() {
 		cSEARCH.call(this);
-		this.name = "SEARCHB";
 	}
 
 	cSEARCHB.prototype = Object.create(cSEARCH.prototype);
 	cSEARCHB.prototype.constructor = cSEARCHB;
+	cSEARCHB.prototype.name = 'SEARCHB';
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUBSTITUTE() {
-		this.name = "SUBSTITUTE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cSUBSTITUTE.prototype = Object.create(cBaseFunction.prototype);
 	cSUBSTITUTE.prototype.constructor = cSUBSTITUTE;
+	cSUBSTITUTE.prototype.name = 'SUBSTITUTE';
 	cSUBSTITUTE.prototype.argumentsMin = 3;
 	cSUBSTITUTE.prototype.argumentsMax = 4;
 	cSUBSTITUTE.prototype.Calculate = function (arg) {
@@ -1671,7 +1674,8 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(), occurence = arg3.getValue(), index = 0, res;
+		var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(),
+			occurence = arg3.getValue(), index = 0, res;
 		res = string.replace(new RegExp(RegExp.escape(old_string), "g"), function (equal, p1, source) {
 			index++;
 			if (occurence == 0 || occurence > source.length) {
@@ -1691,13 +1695,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT() {
-		this.name = "T";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cT.prototype = Object.create(cBaseFunction.prototype);
 	cT.prototype.constructor = cT;
+	cT.prototype.name = 'T';
 	cT.prototype.argumentsMin = 1;
 	cT.prototype.argumentsMax = 1;
 	cT.prototype.Calculate = function (arg) {
@@ -1724,13 +1728,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTEXT() {
-		this.name = "TEXT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTEXT.prototype = Object.create(cBaseFunction.prototype);
 	cTEXT.prototype.constructor = cTEXT;
+	cTEXT.prototype.name = 'TEXT';
 	cTEXT.prototype.argumentsMin = 2;
 	cTEXT.prototype.argumentsMax = 2;
 	cTEXT.prototype.Calculate = function (arg) {
@@ -1795,13 +1799,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTEXTJOIN() {
-		this.name = "TEXTJOIN";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTEXTJOIN.prototype = Object.create(cBaseFunction.prototype);
 	cTEXTJOIN.prototype.constructor = cTEXTJOIN;
+	cTEXTJOIN.prototype.name = 'TEXTJOIN';
 	cTEXTJOIN.prototype.argumentsMin = 3;
 	cTEXTJOIN.prototype.argumentsMax = 255;
 	cTEXTJOIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -1822,26 +1826,26 @@
 		//разделитель может быть в виде массива, где используются все его элементы
 		var delimiterArr = this._getOneDimensionalArray(delimiter);
 		//если хотя бы один элемент ошибка, то возвращаем ошибку
-		if(delimiterArr instanceof cError){
+		if (delimiterArr instanceof cError) {
 			return this.value = delimiterArr;
 		}
 
-		var concatString = function(string1, string2){
+		var concatString = function (string1, string2) {
 			var res = string1;
-			if("" === string2 && ignore_empty){
+			if ("" === string2 && ignore_empty) {
 				return res;
 			}
 			var isStartStr = string1 === "";
 			//выбираем разделитель из массива по порядку
 			var delimiterStr = isStartStr ? "" : delimiterArr[delimiterIter];
-			if(undefined === delimiterStr){
+			if (undefined === delimiterStr) {
 				delimiterIter = 0;
 				delimiterStr = delimiterArr[delimiterIter];
 			}
-			if(!isStartStr){
+			if (!isStartStr) {
 				delimiterIter++;
 			}
-			
+
 			res += delimiterStr + string2;
 			return res;
 		};
@@ -1851,7 +1855,7 @@
 			argI = arg[i];
 
 			var type = argI.type;
-			if(cElementType.cellsRange === type || cElementType.cellsRange3D === type || cElementType.array === type){
+			if (cElementType.cellsRange === type || cElementType.cellsRange3D === type || cElementType.array === type) {
 				//получаем одномерный массив
 				argI = this._getOneDimensionalArray(argI);
 
@@ -1864,7 +1868,7 @@
 					arg0 = new cString(concatString(arg0.toString(), argI[n].toString()));
 				}
 
-			}else{
+			} else {
 				argI = argI.tocString();
 				if (argI instanceof cError) {
 					return this.value = argI;
@@ -1882,13 +1886,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIM() {
-		this.name = "TRIM";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTRIM.prototype = Object.create(cBaseFunction.prototype);
 	cTRIM.prototype.constructor = cTRIM;
+	cTRIM.prototype.name = 'TRIM';
 	cTRIM.prototype.argumentsMin = 1;
 	cTRIM.prototype.argumentsMax = 1;
 	cTRIM.prototype.Calculate = function (arg) {
@@ -1918,13 +1922,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUNICHAR() {
-		this.name = "UNICHAR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
 	cUNICHAR.prototype.constructor = cUNICHAR;
+	cUNICHAR.prototype.name = 'UNICHAR';
 	cUNICHAR.prototype.argumentsMin = 1;
 	cUNICHAR.prototype.argumentsMax = 1;
 	cUNICHAR.prototype.isXLFN = true;
@@ -1941,12 +1945,12 @@
 
 		function _func(argArray) {
 			var num = parseInt(argArray[0]);
-			if(isNaN(num) || num <= 0 || num > 1114111){
+			if (isNaN(num) || num <= 0 || num > 1114111) {
 				return new cError(cErrorType.wrong_value_type);
 			}
 
 			var res = String.fromCharCode(num);
-			if("" === res){
+			if ("" === res) {
 				return new cError(cErrorType.wrong_value_type);
 			}
 
@@ -1962,13 +1966,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUNICODE() {
-		this.name = "UNICODE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
 	cUNICODE.prototype.constructor = cUNICODE;
+	cUNICODE.prototype.name = 'UNICODE';
 	cUNICODE.prototype.argumentsMin = 1;
 	cUNICODE.prototype.argumentsMax = 1;
 	cUNICODE.prototype.isXLFN = true;
@@ -1997,13 +2001,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUPPER() {
-		this.name = "UPPER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cUPPER.prototype = Object.create(cBaseFunction.prototype);
 	cUPPER.prototype.constructor = cUPPER;
+	cUPPER.prototype.name = 'UPPER';
 	cUPPER.prototype.argumentsMin = 1;
 	cUPPER.prototype.argumentsMax = 1;
 	cUPPER.prototype.Calculate = function (arg) {
@@ -2028,13 +2032,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVALUE() {
-		this.name = "VALUE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cVALUE.prototype.constructor = cVALUE;
+	cVALUE.prototype.name = 'VALUE';
 	cVALUE.prototype.argumentsMin = 1;
 	cVALUE.prototype.argumentsMax = 1;
 	cVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;

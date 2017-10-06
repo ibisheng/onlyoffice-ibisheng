@@ -60,13 +60,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERROR_TYPE() {
-		this.name = "ERROR.TYPE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cERROR_TYPE.prototype = Object.create(cBaseFunction.prototype);
 	cERROR_TYPE.prototype.constructor = cERROR_TYPE;
+	cERROR_TYPE.prototype.name = 'ERROR.TYPE';
 	cERROR_TYPE.prototype.argumentsMin = 1;
 	cERROR_TYPE.prototype.argumentsMax = 1;
 	cERROR_TYPE.prototype.Calculate = function (arg) {
@@ -120,13 +120,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISBLANK() {
-		this.name = "ISBLANK";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISBLANK.prototype = Object.create(cBaseFunction.prototype);
 	cISBLANK.prototype.constructor = cISBLANK;
+	cISBLANK.prototype.name = 'ISBLANK';
 	cISBLANK.prototype.argumentsMin = 1;
 	cISBLANK.prototype.argumentsMax = 1;
 	cISBLANK.prototype.Calculate = function (arg) {
@@ -148,13 +148,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERR() {
-		this.name = "ISERR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISERR.prototype = Object.create(cBaseFunction.prototype);
 	cISERR.prototype.constructor = cISERR;
+	cISERR.prototype.name = 'ISERR';
 	cISERR.prototype.argumentsMin = 1;
 	cISERR.prototype.argumentsMax = 1;
 	cISERR.prototype.Calculate = function (arg) {
@@ -179,13 +179,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERROR() {
-		this.name = "ISERROR";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISERROR.prototype = Object.create(cBaseFunction.prototype);
 	cISERROR.prototype.constructor = cISERROR;
+	cISERROR.prototype.name = 'ISERROR';
 	cISERROR.prototype.argumentsMin = 1;
 	cISERROR.prototype.argumentsMax = 1;
 	cISERROR.prototype.Calculate = function (arg) {
@@ -210,13 +210,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISEVEN() {
-		this.name = "ISEVEN";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISEVEN.prototype = Object.create(cBaseFunction.prototype);
 	cISEVEN.prototype.constructor = cISEVEN;
+	cISEVEN.prototype.name = 'ISEVEN';
 	cISEVEN.prototype.argumentsMin = 1;
 	cISEVEN.prototype.argumentsMax = 1;
 	cISEVEN.prototype.Calculate = function (arg) {
@@ -246,13 +246,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISFORMULA() {
-		this.name = "ISFORMULA";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
 	cISFORMULA.prototype.constructor = cISFORMULA;
+	cISFORMULA.prototype.name = 'ISFORMULA';
 	cISFORMULA.prototype.argumentsMin = 1;
 	cISFORMULA.prototype.argumentsMax = 1;
 	cISFORMULA.prototype.isXLFN = true;
@@ -262,7 +262,7 @@
 		var res = false;
 		if ((arg0 instanceof cArea || arg0 instanceof cArea3D) && arg0.range) {
 			res = arg0.range.isFormula();
-		}else if ((arg0 instanceof cRef || arg0 instanceof cRef3D) && arg0.range) {
+		} else if ((arg0 instanceof cRef || arg0 instanceof cRef3D) && arg0.range) {
 			res = arg0.range.isFormula();
 		}
 
@@ -278,13 +278,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISLOGICAL() {
-		this.name = "ISLOGICAL";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISLOGICAL.prototype = Object.create(cBaseFunction.prototype);
 	cISLOGICAL.prototype.constructor = cISLOGICAL;
+	cISLOGICAL.prototype.name = 'ISLOGICAL';
 	cISLOGICAL.prototype.argumentsMin = 1;
 	cISLOGICAL.prototype.argumentsMax = 1;
 	cISLOGICAL.prototype.Calculate = function (arg) {
@@ -309,13 +309,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNA() {
-		this.name = "ISNA";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISNA.prototype = Object.create(cBaseFunction.prototype);
 	cISNA.prototype.constructor = cISNA;
+	cISNA.prototype.name = 'ISNA';
 	cISNA.prototype.argumentsMin = 1;
 	cISNA.prototype.argumentsMax = 1;
 	cISNA.prototype.Calculate = function (arg) {
@@ -340,13 +340,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNONTEXT() {
-		this.name = "ISNONTEXT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISNONTEXT.prototype = Object.create(cBaseFunction.prototype);
 	cISNONTEXT.prototype.constructor = cISNONTEXT;
+	cISNONTEXT.prototype.name = 'ISNONTEXT';
 	cISNONTEXT.prototype.argumentsMin = 1;
 	cISNONTEXT.prototype.argumentsMax = 1;
 	cISNONTEXT.prototype.Calculate = function (arg) {
@@ -370,13 +370,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNUMBER() {
-		this.name = "ISNUMBER";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISNUMBER.prototype = Object.create(cBaseFunction.prototype);
 	cISNUMBER.prototype.constructor = cISNUMBER;
+	cISNUMBER.prototype.name = 'ISNUMBER';
 	cISNUMBER.prototype.argumentsMin = 1;
 	cISNUMBER.prototype.argumentsMax = 1;
 	cISNUMBER.prototype.Calculate = function (arg) {
@@ -401,13 +401,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISODD() {
-		this.name = "ISODD";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISODD.prototype = Object.create(cBaseFunction.prototype);
 	cISODD.prototype.constructor = cISODD;
+	cISODD.prototype.name = 'ISODD';
 	cISODD.prototype.argumentsMin = 1;
 	cISODD.prototype.argumentsMax = 1;
 	cISODD.prototype.Calculate = function (arg) {
@@ -437,13 +437,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISREF() {
-		this.name = "ISREF";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISREF.prototype = Object.create(cBaseFunction.prototype);
 	cISREF.prototype.constructor = cISREF;
+	cISREF.prototype.name = 'ISREF';
 	cISREF.prototype.argumentsMin = 1;
 	cISREF.prototype.argumentsMax = 1;
 	cISREF.prototype.Calculate = function (arg) {
@@ -460,13 +460,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISTEXT() {
-		this.name = "ISTEXT";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cISTEXT.prototype = Object.create(cBaseFunction.prototype);
 	cISTEXT.prototype.constructor = cISTEXT;
+	cISTEXT.prototype.name = 'ISTEXT';
 	cISTEXT.prototype.argumentsMin = 1;
 	cISTEXT.prototype.argumentsMax = 1;
 	cISTEXT.prototype.Calculate = function (arg) {
@@ -491,13 +491,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cN() {
-		this.name = "N";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cN.prototype = Object.create(cBaseFunction.prototype);
 	cN.prototype.constructor = cN;
+	cN.prototype.name = 'N';
 	cN.prototype.argumentsMin = 1;
 	cN.prototype.argumentsMax = 1;
 	cN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
@@ -536,13 +536,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNA() {
-		this.name = "NA";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cNA.prototype = Object.create(cBaseFunction.prototype);
 	cNA.prototype.constructor = cNA;
+	cNA.prototype.name = 'NA';
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
@@ -553,43 +553,43 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEET() {
-		this.name = "SHEET";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cSHEET.prototype = Object.create(cBaseFunction.prototype);
 	cSHEET.prototype.constructor = cSHEET;
+	cSHEET.prototype.name = 'SHEET';
 	cSHEET.prototype.argumentsMin = 0;
 	cSHEET.prototype.argumentsMax = 1;
 	cSHEET.prototype.isXLFN = true;
 	cSHEET.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws) {
 
 		var res = null;
-		if(0 === arg.length){
+		if (0 === arg.length) {
 			res = new cNumber(ws.nSheetId);
-		}else{
+		} else {
 			var arg0 = arg[0];
-			if(cElementType.error === arg0.type){
+			if (cElementType.error === arg0.type) {
 				res = arg0;
-			}else{
-				if(arg0.ws){
+			} else {
+				if (arg0.ws) {
 					res = new cNumber(arg0.ws.nSheetId);
-				}else if(arg0.wsFrom){
+				} else if (arg0.wsFrom) {
 					var sheet1 = arg0.wsFrom.nSheetId;
 					var sheet2 = arg0.wsTo.nSheetId;
 					res = new cNumber(Math.min(sheet1, sheet2));
-				}else if(cElementType.string === arg0.type){
+				} else if (cElementType.string === arg0.type) {
 					var arg0Val = arg0.getValue();
 					var curWorksheet = ws.workbook.getWorksheetByName(arg0Val);
-					if(curWorksheet && undefined !== curWorksheet.nSheetId){
+					if (curWorksheet && undefined !== curWorksheet.nSheetId) {
 						res = new cNumber(curWorksheet.nSheetId);
 					}
 				}
 			}
 		}
 
-		if(null === res){
+		if (null === res) {
 			res = new cError(cErrorType.wrong_value_type);
 		}
 
@@ -601,37 +601,38 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEETS() {
-		this.name = "SHEETS";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
 	cSHEETS.prototype.constructor = cSHEETS;
+	cSHEETS.prototype.name = 'SHEETS';
 	cSHEETS.prototype.argumentsMin = 0;
 	cSHEETS.prototype.argumentsMax = 1;
 	cSHEETS.prototype.isXLFN = true;
 	cSHEETS.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws) {
 
 		var res;
-		if(0 === arg.length){
+		if (0 === arg.length) {
 			res = new cNumber(ws.workbook.aWorksheets.length);
-		}else{
+		} else {
 			var arg0 = arg[0];
-			if(cElementType.error === arg0.type){
+			if (cElementType.error === arg0.type) {
 				res = arg0;
-			}else if(cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type || cElementType.cell3D === arg0.type){
+			} else if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type ||
+				cElementType.cell3D === arg0.type) {
 				res = new cNumber(1);
-			}else if(cElementType.cellsRange3D === arg0.type){
+			} else if (cElementType.cellsRange3D === arg0.type) {
 				var sheet1 = arg0.wsFrom.index;
 				var sheet2 = arg0.wsTo.index;
-				if(sheet1 === sheet2){
+				if (sheet1 === sheet2) {
 					res = new cNumber(1);
-				}else{
+				} else {
 					res = new cNumber(Math.abs(sheet2 - sheet1) + 1);
 				}
 
-			}else{
+			} else {
 				res = new cError(cErrorType.not_available);
 			}
 		}
@@ -644,13 +645,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTYPE() {
-		this.name = "TYPE";
 		this.value = null;
 		this.argumentsCurrent = 0;
 	}
 
 	cTYPE.prototype = Object.create(cBaseFunction.prototype);
 	cTYPE.prototype.constructor = cTYPE;
+	cTYPE.prototype.name = 'TYPE';
 	cTYPE.prototype.argumentsMin = 1;
 	cTYPE.prototype.argumentsMax = 1;
 	cTYPE.prototype.Calculate = function (arg) {

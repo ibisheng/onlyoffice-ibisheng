@@ -207,11 +207,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAVERAGE() {
-		cBaseFunction.call(this, "DAVERAGE");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
 	cDAVERAGE.prototype.constructor = cDAVERAGE;
+	cDAVERAGE.prototype.name = "DAVERAGE";
 	cDAVERAGE.prototype.argumentsMin = 3;
 	cDAVERAGE.prototype.argumentsMax = 3;
 	cDAVERAGE.prototype.Calculate = function (arg) {
@@ -259,11 +261,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDCOUNT() {
-		cBaseFunction.call(this, "DCOUNT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
 	cDCOUNT.prototype.constructor = cDCOUNT;
+	cDCOUNT.prototype.name = "DCOUNT";
 	cDCOUNT.prototype.argumentsMin = 3;
 	cDCOUNT.prototype.argumentsMax = 3;
 	cDCOUNT.prototype.Calculate = function (arg) {
@@ -300,11 +304,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDCOUNTA() {
-		cBaseFunction.call(this, "DCOUNTA");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDCOUNTA.prototype = Object.create(cBaseFunction.prototype);
 	cDCOUNTA.prototype.constructor = cDCOUNTA;
+	cDCOUNTA.prototype.name = "DCOUNTA";
 	cDCOUNTA.prototype.argumentsMin = 3;
 	cDCOUNTA.prototype.argumentsMax = 3;
 	cDCOUNTA.prototype.Calculate = function (arg) {
@@ -339,11 +345,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDGET() {
-		cBaseFunction.call(this, "DGET");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDGET.prototype = Object.create(cBaseFunction.prototype);
 	cDGET.prototype.constructor = cDGET;
+	cDGET.prototype.name = "DGET";
 	cDGET.prototype.argumentsMin = 3;
 	cDGET.prototype.argumentsMax = 3;
 	cDGET.prototype.Calculate = function (arg) {
@@ -379,11 +387,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDMAX() {
-		cBaseFunction.call(this, "DMAX");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDMAX.prototype = Object.create(cBaseFunction.prototype);
 	cDMAX.prototype.constructor = cDMAX;
+	cDMAX.prototype.name = "DMAX";
 	cDMAX.prototype.argumentsMin = 3;
 	cDMAX.prototype.argumentsMax = 3;
 	cDMAX.prototype.Calculate = function (arg) {
@@ -420,11 +430,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDMIN() {
-		cBaseFunction.call(this, "DMIN");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDMIN.prototype = Object.create(cBaseFunction.prototype);
 	cDMIN.prototype.constructor = cDMIN;
+	cDMIN.prototype.name = "DMIN";
 	cDMIN.prototype.argumentsMin = 3;
 	cDMIN.prototype.argumentsMax = 3;
 	cDMIN.prototype.Calculate = function (arg) {
@@ -462,11 +474,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDPRODUCT() {
-		cBaseFunction.call(this, "DPRODUCT");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDPRODUCT.prototype = Object.create(cBaseFunction.prototype);
 	cDPRODUCT.prototype.constructor = cDPRODUCT;
+	cDPRODUCT.prototype.name = "DPRODUCT";
 	cDPRODUCT.prototype.argumentsMin = 3;
 	cDPRODUCT.prototype.argumentsMax = 3;
 	cDPRODUCT.prototype.Calculate = function (arg) {
@@ -511,11 +525,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSTDEV() {
-		cBaseFunction.call(this, "DSTDEV");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
 	cDSTDEV.prototype.constructor = cDSTDEV;
+	cDSTDEV.prototype.name = "DSTDEV";
 	cDSTDEV.prototype.argumentsMin = 3;
 	cDSTDEV.prototype.argumentsMax = 3;
 	cDSTDEV.prototype.Calculate = function (arg) {
@@ -568,11 +584,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSTDEVP() {
-		cBaseFunction.call(this, "DSTDEVP");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
 	cDSTDEVP.prototype.constructor = cDSTDEVP;
+	cDSTDEVP.prototype.name = "DSTDEVP";
 	cDSTDEVP.prototype.argumentsMin = 3;
 	cDSTDEVP.prototype.argumentsMax = 3;
 	cDSTDEVP.prototype.Calculate = function (arg) {
@@ -626,11 +644,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSUM() {
-		cBaseFunction.call(this, "DSUM");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDSUM.prototype = Object.create(cBaseFunction.prototype);
 	cDSUM.prototype.constructor = cDSUM;
+	cDSUM.prototype.name = "DSUM";
 	cDSUM.prototype.argumentsMin = 3;
 	cDSUM.prototype.argumentsMax = 3;
 	cDSUM.prototype.Calculate = function (arg) {
@@ -671,11 +691,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDVAR() {
-		cBaseFunction.call(this, "DVAR");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDVAR.prototype = Object.create(cBaseFunction.prototype);
 	cDVAR.prototype.constructor = cDVAR;
+	cDVAR.prototype.name = "DVAR";
 	cDVAR.prototype.argumentsMin = 3;
 	cDVAR.prototype.argumentsMax = 3;
 	cDVAR.prototype.Calculate = function (arg) {
@@ -735,11 +757,13 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDVARP() {
-		cBaseFunction.call(this, "DVARP");
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cDVARP.prototype = Object.create(cBaseFunction.prototype);
 	cDVARP.prototype.constructor = cDVARP;
+	cDVARP.prototype.name = "DVARP";
 	cDVARP.prototype.argumentsMin = 3;
 	cDVARP.prototype.argumentsMax = 3;
 	cDVARP.prototype.Calculate = function (arg) {
