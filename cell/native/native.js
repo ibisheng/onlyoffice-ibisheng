@@ -7723,25 +7723,15 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                //console.log("JS - openDocument()");
                
                t.wbModel = t._openDocument(sData);
-               t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
+
+               var thenCallback = function() {
+                   t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
                                                       window["_null_object"], window["_null_object"], t,
                                                       t.collaborativeEditing, t.fontRenderingMode);
-               
-               t.openDocumentFromZip(t.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
-                                                                                                      t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
-                                                                                                      
-                                                                                                      // Какая-то непонятная заглушка, чтобы не падало в ipad
-                                                                                                      if (t.isMobileVersion) {
-                                                                                                      AscCommon.AscBrowser.isSafariMacOs = false;
-                                                                                                      AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
-                                                                                                      AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
-                                                                                                      }
-                                                                                                      }).catch(function(err) {
-                                                                                                               if (window.console && window.console.log) {
-                                                                                                               window.console.log(err);
-                                                                                                               }
-                                                                                                               t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-                                                                                                               });
+               };
+
+               t.openDocumentFromZip(t.wbModel, undefined, window["native"]["GetXlsxPath"]()).then(thenCallback, thenCallback);
+
                t.DocumentLoadComplete = true;
                
                if (!sdkCheck) {
