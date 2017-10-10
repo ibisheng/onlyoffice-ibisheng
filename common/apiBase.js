@@ -748,16 +748,16 @@
 		 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
 		 * @param {Bool} isCloseCoAuthoring
 		 */
-		this.CoAuthoringApi.onDisconnect = function(e, errorCode)
+		this.CoAuthoringApi.onDisconnect = function(e, error)
 		{
 			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
 			{
 				t.asyncServerIdEndLoaded();
 			}
-			if (null != errorCode)
+			if (null != error)
 			{
 				t.setViewModeDisconnect();
-				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
+				t.sendEvent('asc_onError', error.code, error.level);
 			}
 		};
 		this.CoAuthoringApi.onDocumentOpen = function (inputWrap) {

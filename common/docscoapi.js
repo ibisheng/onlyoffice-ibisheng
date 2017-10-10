@@ -122,8 +122,8 @@
       this._CoAuthoringApi.onLocksReleasedEnd = function() {
         t.callback_OnLocksReleasedEnd();
       };
-      this._CoAuthoringApi.onDisconnect = function(e, errorCode) {
-        t.callback_OnDisconnect(e, errorCode);
+      this._CoAuthoringApi.onDisconnect = function(e, error) {
+        t.callback_OnDisconnect(e, error);
       };
       this._CoAuthoringApi.onWarning = function(e) {
         t.callback_OnWarning(e);
@@ -457,11 +457,11 @@
   /**
    * Event об отсоединении от сервера
    * @param {jQuery} e  event об отсоединении с причиной
-   * @param {Asc.c_oAscError.ID} errorCode
+   * @param {code: Asc.c_oAscError.ID, level: Asc.c_oAscError.Level} error
    */
-  CDocsCoApi.prototype.callback_OnDisconnect = function(e, errorCode) {
+  CDocsCoApi.prototype.callback_OnDisconnect = function(e, error) {
     if (this.onDisconnect) {
-      this.onDisconnect(e, errorCode);
+      this.onDisconnect(e, error);
     }
   };
 
@@ -1672,13 +1672,13 @@
 		this._state = ConnectionState.Reconnect;
 		var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.jwtError) ||
 			this.attemptCount >= this.maxAttemptCount);
-		var errorCode = null;
+		var error = null;
 		if (bIsDisconnectAtAll) {
 			this._state = ConnectionState.ClosedAll;
-			errorCode = this._getDisconnectErrorCode(evt.code);
+			error = this._getDisconnectErrorCode(evt.code);
 		}
 		if (this.onDisconnect) {
-			this.onDisconnect(evt.reason, errorCode);
+			this.onDisconnect(evt.reason, error);
 		}
 		//Try reconect
 		if (!bIsDisconnectAtAll) {
@@ -1701,26 +1701,30 @@
 		}, this.reconnectInterval);
 	};
 
-  DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
-    if (c_oCloseCode.serverShutdown === opt_closeCode) {
-      return Asc.c_oAscError.ID.CoAuthoringDisconnect;
-    } else if (c_oCloseCode.sessionIdle === opt_closeCode) {
-      return Asc.c_oAscError.ID.SessionIdle;
-    } else if (c_oCloseCode.sessionAbsolute === opt_closeCode) {
-      return Asc.c_oAscError.ID.SessionAbsolute;
-    } else if (c_oCloseCode.accessDeny === opt_closeCode) {
-      return Asc.c_oAscError.ID.AccessDeny;
-    } else if (c_oCloseCode.jwtExpired === opt_closeCode) {
-      if (this.jwtSession) {
-        return Asc.c_oAscError.ID.SessionToken;
-      } else {
-        return Asc.c_oAscError.ID.KeyExpire;
-      }
-    } else if (c_oCloseCode.jwtError === opt_closeCode) {
-      return Asc.c_oAscError.ID.VKeyEncrypt;
-    }
-    return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
-  };
+	DocsCoApi.prototype._getDisconnectErrorCode = function(opt_closeCode) {
+		var code = this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
+		var level = Asc.c_oAscError.Level.NoCritical;
+		if (c_oCloseCode.serverShutdown === opt_closeCode) {
+			code = Asc.c_oAscError.ID.CoAuthoringDisconnect;
+		} else if (c_oCloseCode.sessionIdle === opt_closeCode) {
+			code = Asc.c_oAscError.ID.SessionIdle;
+		} else if (c_oCloseCode.sessionAbsolute === opt_closeCode) {
+			code = Asc.c_oAscError.ID.SessionAbsolute;
+		} else if (c_oCloseCode.accessDeny === opt_closeCode) {
+			code = Asc.c_oAscError.ID.AccessDeny;
+		} else if (c_oCloseCode.jwtExpired === opt_closeCode) {
+			if (this.jwtSession) {
+				code = Asc.c_oAscError.ID.SessionToken;
+			} else {
+				code = Asc.c_oAscError.ID.KeyExpire;
+				level = Asc.c_oAscError.Level.Critical;
+			}
+		} else if (c_oCloseCode.jwtError === opt_closeCode) {
+			code = Asc.c_oAscError.ID.VKeyEncrypt;
+			level = Asc.c_oAscError.Level.Critical;
+		}
+		return {code: code, level: level};
+	};
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
