@@ -5444,7 +5444,7 @@
 
 			// Column Subheading
 			items = pivotTable.getColItems();
-			if (items) {
+			if (items && styleInfo.showColHeaders) {
 				start = pivotRange.c1 + firstDataCol0;
 				end = pivotRange.c2 - grandColumn;
 				for (j = 0; j < countCWValues; ++j) {
