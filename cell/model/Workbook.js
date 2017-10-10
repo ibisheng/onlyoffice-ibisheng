@@ -5297,11 +5297,12 @@
 				stripe2 = style.secondColumnStripe || emptyStripe;
 				start = pivotRange.c1 + firstDataCol0;
 				if (stripe1.dxf) {
-					cells = this.getRange3(pivotRange.r1, start, pivotRange.r2, pivotRange.c2);
+					cells = this.getRange3(pivotRange.r1 + firstHeaderRow0 + 1, start, pivotRange.r2, pivotRange.c2);
 					cells.setTableStyle(stripe1.dxf, new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
 				}
 				if (stripe2.dxf && start + stripe1.size <= pivotRange.c2) {
-					cells = this.getRange3(pivotRange.r1, start + stripe1.size, pivotRange.r2, pivotRange.c2);
+					cells = this.getRange3(pivotRange.r1 + firstHeaderRow0 + 1, start + stripe1.size, pivotRange.r2,
+						pivotRange.c2);
 					cells.setTableStyle(stripe2.dxf, new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
 				}
 			}
