@@ -1850,7 +1850,7 @@ function CEditorPage(api)
 
 		if (_isCatch)
 		{
-			if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+			if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 				oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
 			AscCommon.stopEvent(e);
 		}
@@ -2008,7 +2008,7 @@ function CEditorPage(api)
 		var oWordControl = oThis;
 		oWordControl.m_oDrawingDocument.UnlockCursorType();
 
-		if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+		if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 			oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "";
 
 		if (null != oWordControl.SplitterDiv)
