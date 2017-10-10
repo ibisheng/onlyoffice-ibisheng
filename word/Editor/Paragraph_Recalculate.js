@@ -35,6 +35,11 @@
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
+function CorrectToTwips(Value)
+{
+	return (((Value * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
+}
+
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
 /**
@@ -1355,11 +1360,11 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     this.Lines[CurLine].Top    = Top    - this.Pages[CurPage].Y;
     this.Lines[CurLine].Bottom = Bottom - this.Pages[CurPage].Y;
 
-    PRS.LineTop        = Top;
-    PRS.LineBottom     = Bottom;
-    PRS.LineTop2       = Top2;
-    PRS.LineBottom2    = Bottom2;
-    PRS.LinePrevBottom = PrevBottom
+    PRS.LineTop        = CorrectToTwips(Top);
+    PRS.LineBottom     = CorrectToTwips(Bottom);
+    PRS.LineTop2       = CorrectToTwips(Top2);
+    PRS.LineBottom2    = CorrectToTwips(Bottom2);
+    PRS.LinePrevBottom = CorrectToTwips(PrevBottom);
 };
 
 Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPage, PRS, ParaPr)
@@ -1422,9 +1427,6 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     var Top2    = PRS.LineTop2;
     var Bottom2 = PRS.LineBottom2;
 
-	Top    = (((Top * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
-	Bottom = (((Bottom * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
-
     var Left;
 
     if(true === PRS.MathNotInline)
@@ -1436,6 +1438,11 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
 
     var Ranges = PRS.Ranges;
     var Ranges2;
+
+    for (var nIndex = 0, nCount = Ranges.length; nIndex < nCount; ++nIndex)
+	{
+		Ranges[nIndex].Y1 = CorrectToTwips(Ranges[nIndex].Y1);
+	}
 
     if ( true === this.Use_Wrap() )
         Ranges2 = this.Parent.CheckRange(Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.private_GetRelativePageIndex(CurPage), true, PRS.MathNotInline);
@@ -1529,7 +1536,7 @@ Paragraph.prototype.private_RecalculateLineCheckRangeY = function(CurLine, CurPa
         if (Math.abs(RangesMaxY - PRS.Y) < 0.001)
             PRS.Y = RangesMaxY + 1; // смещаемся по 1мм
         else
-            PRS.Y = RangesMaxY + 0.001; // Добавляем 0.001, чтобы избавиться от погрешности
+            PRS.Y = RangesMaxY + (25.4 / 1440) + 0.001; // Добавляем 0.001, чтобы избавиться от погрешности
 
         // Отмечаем, что данная строка переносится по Y из-за обтекания
         PRS.RangeY = true;
