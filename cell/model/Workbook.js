@@ -151,9 +151,6 @@
 			return c_oRangeType.Range;
 	}
 
-	function getCompiledStyleComponentsWs(ws, row, col) {
-		return ws.sheetMergedStyles.getStyle(ws.hiddenManager, row, col, ws);
-	}
 	function getCompiledStyleFromArray(xf, xfs) {
 		for (var i = 0; i < xfs.length; ++i) {
 			if (null == xf) {
@@ -10818,6 +10815,5 @@
 	window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
 	window['AscCommonExcel'].promoteFromTo = promoteFromTo;
 	window['AscCommonExcel'].getCompiledStyle = getCompiledStyle;
-	window['AscCommonExcel'].getCompiledStyleComponentsWs = getCompiledStyleComponentsWs;
 	window['AscCommonExcel'].getCompiledStyleFromArray = getCompiledStyleFromArray;
 })(window);
