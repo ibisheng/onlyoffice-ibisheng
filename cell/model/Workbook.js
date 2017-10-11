@@ -137,6 +137,7 @@
 			Row:2,
 			All:3
 		};
+	var emptyStyleComponents = {table: [], conditional: []};
 	function getRangeType(oBBox){
 		if(null == oBBox)
 			oBBox = this.bbox;
@@ -8286,7 +8287,7 @@
 			if (cell) {
 				xfs = original ? cell.getStyle() : cell.getCompiledStyle();
 			} else {
-				xfs = original ? null : getCompiledStyleWs(t.worksheet, nRow, nCol);
+				xfs = getCompiledStyleWs(t.worksheet, nRow, nCol, null, original ? emptyStyleComponents : null);
 			}
 			if (xfs && xfs.font) {
 				font = xfs.font;
