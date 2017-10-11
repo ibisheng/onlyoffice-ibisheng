@@ -9447,7 +9447,7 @@
                     {
                         pasteRow = pasteRow - table.Ref.r1;
                         pasteCol = pasteCol - table.Ref.c1;
-                        dxf = AscCommonExcel.getCompiledStyleWs(val, pasteRow, pasteCol);
+                        dxf = val.getCompiledStyle(pasteRow, pasteCol);
                     }
                 });
 			}

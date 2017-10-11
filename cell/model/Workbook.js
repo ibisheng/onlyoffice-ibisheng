@@ -151,9 +151,6 @@
 			return c_oRangeType.Range;
 	}
 
-	function getCompiledStyleWs(ws, row, col, opt_cell, opt_styleComponents) {
-		return getCompiledStyle(ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, ws, opt_styleComponents);
-	}
 	function getCompiledStyleComponentsWs(ws, row, col) {
 		return ws.sheetMergedStyles.getStyle(ws.hiddenManager, row, col, ws);
 	}
@@ -2702,6 +2699,10 @@
 		/*handlers*/
 		this.handlers = null;
 	}
+
+	Worksheet.prototype.getCompiledStyle = function (row, col, opt_cell, opt_styleComponents) {
+		return getCompiledStyle(this.sheetMergedStyles, this.hiddenManager, row, col, opt_cell, this, opt_styleComponents);
+	};
 	Worksheet.prototype.getColData = function(index) {
 		var sheetMemory = this.cellsByCol[index];
 		if(!sheetMemory){
@@ -2728,17 +2729,13 @@
 		}
 		return ws;
 	};
-	Worksheet.prototype.addContentChanges = function(changes)
-	{
+	Worksheet.prototype.addContentChanges = function (changes) {
 		this.contentChanges.Add(changes);
 	};
-
-	Worksheet.prototype.refreshContentChanges = function()
-	{
+	Worksheet.prototype.refreshContentChanges = function () {
 		this.contentChanges.Refresh();
 		this.contentChanges.Clear();
 	};
-
 	Worksheet.prototype.rebuildColors=function(){
 		this.rebuildTabColor();
 
@@ -5715,7 +5712,7 @@
 		return this.xfs;
 	};
 	Cell.prototype.getCompiledStyle = function (opt_styleComponents) {
-		return getCompiledStyleWs(this.ws, this.nRow, this.nCol, this, opt_styleComponents);
+		return this.ws.getCompiledStyle(this.nRow, this.nCol, this, opt_styleComponents);
 	};
 	Cell.prototype.getTableStyle = function () {
 		var hiddenManager = this.ws.hiddenManager;
@@ -8210,7 +8207,7 @@
 				if(null != xfs && null != xfs.XfId)
 					XfId = xfs.XfId;
 			} else {
-				var xfs = getCompiledStyleWs(t.worksheet, nRow, nCol);
+				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
 				if (xfs && null != xfs.XfId) {
 					XfId = xfs.XfId;
 				}
@@ -8248,7 +8245,7 @@
 			}
 			else
 			{
-				var xfs = getCompiledStyleWs(t.worksheet, nRow, nCol);
+				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
 				if (null != xfs && null != xfs.num) {
 					numFormatStr = xfs.num.getFormat();
 				}
@@ -8287,7 +8284,7 @@
 			if (cell) {
 				xfs = original ? cell.getStyle() : cell.getCompiledStyle();
 			} else {
-				xfs = getCompiledStyleWs(t.worksheet, nRow, nCol, null, original ? emptyStyleComponents : null);
+				xfs = t.worksheet.getCompiledStyle(nRow, nCol, null, original ? emptyStyleComponents : null);
 			}
 			if (xfs && xfs.font) {
 				font = xfs.font;
@@ -8345,7 +8342,7 @@
 			}
 			else
 			{
-				var xfs = getCompiledStyleWs(t.worksheet, nRow, nCol);
+				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
 				if (null != xfs && null != xfs.fill) {
 					fill = xfs.fill.bg;
 				}
@@ -8373,7 +8370,7 @@
 			}
 			else
 			{
-				var xfs = getCompiledStyleWs(t.worksheet, nRow, nCol);
+				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
 				if (null != xfs && null != xfs.border) {
 					border = xfs.border;
 				}
@@ -8451,7 +8448,7 @@
 			}
 			else
 			{
-				var xfs = getCompiledStyleWs(t.worksheet, nRow, nCol);
+				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
 				if (null != xfs && null != xfs.align) {
 					align = xfs.align;
 				}
@@ -10821,7 +10818,6 @@
 	window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
 	window['AscCommonExcel'].promoteFromTo = promoteFromTo;
 	window['AscCommonExcel'].getCompiledStyle = getCompiledStyle;
-	window['AscCommonExcel'].getCompiledStyleWs = getCompiledStyleWs;
 	window['AscCommonExcel'].getCompiledStyleComponentsWs = getCompiledStyleComponentsWs;
 	window['AscCommonExcel'].getCompiledStyleFromArray = getCompiledStyleFromArray;
 })(window);
