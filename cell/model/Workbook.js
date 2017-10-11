@@ -546,6 +546,11 @@
 				this.calcTree();
 			}
 		},
+		lockRecalExecute: function(callback) {
+			this.lockRecal();
+			callback();
+			this.unlockRecal();
+		},
 		//defined name
 		getDefNameByName: function(name, sheetId, opt_exact) {
 			var res = null;
@@ -859,6 +864,19 @@
 				}
 			}
 		},
+		addToChangedHiddenRows: function() {
+			//notify hidden rows
+			var tmpRange = new Asc.Range(0, 0, gc_nMaxCol0, 0);
+			for (var i = 0; i < this.wb.aWorksheets.length; ++i) {
+				var ws = this.wb.aWorksheets[i];
+				var hiddenRange = ws.hiddenManager.getHiddenRowsRange();
+				if (hiddenRange) {
+					tmpRange.r1 = hiddenRange.r1;
+					tmpRange.r2 = hiddenRange.r2;
+					this.addToChangedRange(ws.getId(), tmpRange);
+				}
+			}
+		},
 		addToBuildDependencyCell: function(cell) {
 			var sheetId = cell.ws.getId();
 			var unparsedSheet = this.buildCell[sheetId];
@@ -919,6 +937,7 @@
 			}
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			this.buildDependency();
+			this.addToChangedHiddenRows();
 			//broadscast Volatile only if something changed
 			if (this.changedCell || this.changedDefName) {
 				this._broadscastVolatile(notifyData);
@@ -10633,10 +10652,16 @@
 		this.dirty = true;
 		this.recalcHiddenRows = [];
 		this.recalcHiddenCols = [];
+		this.hiddenRowMin = gc_nMaxRow0;
+		this.hiddenRowMax = 0;
 	}
 
 	HiddenManager.prototype.addHidden = function (isRow, index) {
 		(isRow ? this.recalcHiddenRows : this.recalcHiddenCols).push(index);
+		if (isRow) {
+			this.hiddenRowMin = Math.min(this.hiddenRowMin, index);
+			this.hiddenRowMax = Math.max(this.hiddenRowMax, index);
+		}
 		this.setDirty(true);
 	};
 	HiddenManager.prototype.getRecalcHidden = function () {
@@ -10653,6 +10678,15 @@
 		});
 		this.recalcHiddenRows = [];
 		this.recalcHiddenCols = [];
+		return res;
+	};
+	HiddenManager.prototype.getHiddenRowsRange = function() {
+		var res;
+		if (this.hiddenRowMin <= this.hiddenRowMax) {
+			res = {r1: this.hiddenRowMin, r2: this.hiddenRowMax};
+			this.hiddenRowMin = gc_nMaxRow0;
+			this.hiddenRowMax = 0;
+		}
 		return res;
 	};
 	HiddenManager.prototype.setDirty = function(val) {
