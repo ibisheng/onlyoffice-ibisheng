@@ -6781,7 +6781,7 @@
         var c1 = mc ? mc.c1 : cell.col;
         var r1 = mc ? mc.r1 : cell.row;
         var c = this._getVisibleCell(c1, r1);
-		var font = c.getFont();
+		var font = c.getFont(true);
 		var fa = font.getVerticalAlign();
         var bg = c.getFill();
         var align = c.getAlign();

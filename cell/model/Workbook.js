@@ -8276,13 +8276,18 @@
 
 		return (cellFont.getName() !== rowFont.getName() || cellFont.getSize() !== rowFont.getSize());
 	};
-	Range.prototype.getFont = function () {
+	Range.prototype.getFont = function (original) {
 		var t = this;
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		var font = g_oDefaultFormat.Font;
 		this.worksheet._getCellNoEmpty(nRow, nCol, function (cell) {
-			var xfs = cell ? cell.getCompiledStyle() : getCompiledStyleWs(t.worksheet, nRow, nCol);
+			var xfs;
+			if (cell) {
+				xfs = original ? cell.getStyle() : cell.getCompiledStyle();
+			} else {
+				xfs = original ? null : getCompiledStyleWs(t.worksheet, nRow, nCol);
+			}
 			if (xfs && xfs.font) {
 				font = xfs.font;
 			}
