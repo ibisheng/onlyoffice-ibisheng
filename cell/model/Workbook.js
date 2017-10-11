@@ -8193,21 +8193,15 @@
 		});
 		return res;
 	};
-	Range.prototype.getXfId=function(){
+	Range.prototype.getXfId = function () {
 		var t = this;
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		var XfId = g_oDefaultFormat.XfId;
-		this.worksheet._getCellNoEmpty(nRow, nCol, function(cell) {
-			if(null != cell) {
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.XfId)
-					XfId = xfs.XfId;
-			} else {
-				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
-				if (xfs && null != xfs.XfId) {
-					XfId = xfs.XfId;
-				}
+		this.worksheet._getCellNoEmpty(nRow, nCol, function (cell) {
+			var xfs = cell ? cell.getCompiledStyle() : t.worksheet.getCompiledStyle(nRow, nCol);
+			if (xfs && null !== xfs.XfId) {
+				XfId = xfs.XfId;
 			}
 		});
 		return XfId;
@@ -8228,24 +8222,15 @@
 	Range.prototype.getNumFormat=function(){
 		return oNumFormatCache.get(this.getNumFormatStr());
 	};
-	Range.prototype.getNumFormatStr=function(){
+	Range.prototype.getNumFormatStr = function () {
 		var t = this;
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
-		var numFormatStr = g_oDefaultFormat.Num.getFormat();;
-		this.worksheet._getCellNoEmpty(nRow, nCol, function(cell) {
-			if(null != cell)
-			{
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.num)
-					numFormatStr = xfs.num.getFormat();
-			}
-			else
-			{
-				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
-				if (null != xfs && null != xfs.num) {
-					numFormatStr = xfs.num.getFormat();
-				}
+		var numFormatStr = g_oDefaultFormat.Num.getFormat();
+		;this.worksheet._getCellNoEmpty(nRow, nCol, function (cell) {
+			var xfs = cell ? cell.getCompiledStyle() : t.worksheet.getCompiledStyle(nRow, nCol);
+			if (xfs && xfs.num) {
+				numFormatStr = xfs.num.getFormat();
 			}
 		});
 		return numFormatStr;
@@ -8325,68 +8310,46 @@
 		}
 		return align;
 	};
-	Range.prototype.getFill=function(){
+	Range.prototype.getFill = function () {
 		var t = this;
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
 		var fill = g_oDefaultFormat.Fill.bg;
-		this.worksheet._getCellNoEmpty(nRow, nCol, function(cell) {
-			if(null != cell)
-			{
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.fill)
-					fill = xfs.fill.bg;
-			}
-			else
-			{
-				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
-				if (null != xfs && null != xfs.fill) {
-					fill = xfs.fill.bg;
-				}
+		this.worksheet._getCellNoEmpty(nRow, nCol, function (cell) {
+			var xfs = cell ? cell.getCompiledStyle() : t.worksheet.getCompiledStyle(nRow, nCol);
+			if (xfs && xfs.fill) {
+				fill = xfs.fill.bg;
 			}
 		});
 		return fill;
 	};
-	Range.prototype.getBorderSrc=function(opt_row, opt_col){
+	Range.prototype.getBorderSrc = function (opt_row, opt_col) {
 		//Возвращает как записано в файле, не проверяя бордеры соседних ячеек
 		//формат
 		//\{"l": {"s": "solid", "c": 0xff0000}, "t": {} ,"r": {} ,"b": {} ,"d": {},"dd": false ,"du": false }
 		//"s" values: none, thick, thin, medium, dashDot, dashDotDot, dashed, dotted, double, hair, mediumDashDot, mediumDashDotDot, mediumDashed, slantDashDot
 		//"dd" diagonal line, starting at the top left corner of the cell and moving down to the bottom right corner of the cell
 		//"du" diagonal line, starting at the bottom left corner of the cell and moving up to the top right corner of the cell
-		var t =  this;
+		var t = this;
 		var nRow = null != opt_row ? opt_row : this.bbox.r1;
 		var nCol = null != opt_col ? opt_col : this.bbox.c1;
 		var border = g_oDefaultFormat.Border;
-		this.worksheet._getCellNoEmpty(nRow, nCol, function(cell){
-			if(null != cell)
-			{
-				var xfs = cell.getCompiledStyle();
-				if(null != xfs && null != xfs.border)
-					border = xfs.border;
-			}
-			else
-			{
-				var xfs = t.worksheet.getCompiledStyle(nRow, nCol);
-				if (null != xfs && null != xfs.border) {
-					border = xfs.border;
-				}
+		this.worksheet._getCellNoEmpty(nRow, nCol, function (cell) {
+			var xfs = cell ? cell.getCompiledStyle() : t.worksheet.getCompiledStyle(nRow, nCol);
+			if (xfs && xfs.border) {
+				border = xfs.border;
 			}
 		});
-		return border
+		return border;
 	};
-	Range.prototype.getBorder=function(opt_row, opt_col){
+	Range.prototype.getBorder = function (opt_row, opt_col) {
 		//Возвращает как записано в файле, не проверяя бордеры соседних ячеек
 		//формат
 		//\{"l": {"s": "solid", "c": 0xff0000}, "t": {} ,"r": {} ,"b": {} ,"d": {},"dd": false ,"du": false }
 		//"s" values: none, thick, thin, medium, dashDot, dashDotDot, dashed, dotted, double, hair, mediumDashDot, mediumDashDotDot, mediumDashed, slantDashDot
 		//"dd" diagonal line, starting at the top left corner of the cell and moving down to the bottom right corner of the cell
 		//"du" diagonal line, starting at the bottom left corner of the cell and moving up to the top right corner of the cell
-		var oRes = this.getBorderSrc(opt_row, opt_col);
-		if(null != oRes)
-			return oRes;
-		else
-			return g_oDefaultFormat.Border;
+		return this.getBorderSrc(opt_row, opt_col) || g_oDefaultFormat.Border;
 	};
 	Range.prototype.getBorderFull=function(){
 		//Возвращает как excel, т.е. проверяет бордеры соседних ячеек
