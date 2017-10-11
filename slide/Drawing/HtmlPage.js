@@ -1787,7 +1787,7 @@ function CEditorPage(api)
 		else
 		{
 			Splitter.style.left   = parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
-			Splitter.style.top    = this.Height - parseInt((this.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
+			Splitter.style.top    = (this.Height - parseInt((this.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + 1) + "px";
 			Splitter.style.width  = this.Width - parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
 			Splitter.style.height = parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix) + "px";
 			this.SplitterType     = 2;
