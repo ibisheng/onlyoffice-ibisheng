@@ -142,6 +142,8 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeColumnName = 16;
 	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
+	window['AscCH'].historyitem_PivotTable_StyleName = 1;
+
 
 
 function CHistory()

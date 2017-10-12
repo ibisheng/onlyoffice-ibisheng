@@ -5262,7 +5262,7 @@
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 			styleInfo = pivotTable.asc_getStyleInfo();
-			if (!styleInfo || (range && !pivotTable.intersection(range))) {
+			if (!pivotTable.isInit || !styleInfo || (range && !pivotTable.intersection(range))) {
 				continue;
 			}
 			style = this.workbook.TableStyles.AllStyles[styleInfo.asc_getName()];
@@ -5527,6 +5527,16 @@
 		var res = null;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			if (this.pivotTables[i].contains(col, row)) {
+				res = this.pivotTables[i];
+				break;
+			}
+		}
+		return res;
+	};
+	Worksheet.prototype.getPivotTableByName = function (name) {
+		var res = null;
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			if (this.pivotTables[i].asc_getName() === name) {
 				res = this.pivotTables[i];
 				break;
 			}

@@ -2002,6 +2002,7 @@ function CT_pivotTableDefinition() {
 	//editor
 	this.cacheDefinition = null;
 
+	this.isInit = false;
 	this.pageFieldsPositions = null;
 	this.clearGrid = false;
 	this.hasCompact = true;
@@ -2675,6 +2676,7 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlNodeEnd("pivotTableDefinition");
 };
 CT_pivotTableDefinition.prototype.init = function () {
+	this.isInit = true;
 	this.pageFieldsPositions = [];
 
 	var rowPageCount = null, colPageCount = null;
@@ -4975,7 +4977,7 @@ CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
 CT_PivotTableStyle.prototype.asc_setName = function(api, pivot, newVal) {
 	if (newVal !== this.name) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setName(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setName(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
@@ -5002,7 +5004,12 @@ CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal
 		api._changePivotStyle(pivot, function() {t._setShowColStripes(newVal)});
 	}
 };
-CT_PivotTableStyle.prototype._setName = function(newVal) {
+CT_PivotTableStyle.prototype._setName = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.name !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleName,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.name, newVal));
+	}
 	this.name = newVal;
 };
 CT_PivotTableStyle.prototype._setShowRowHeaders = function(newVal) {

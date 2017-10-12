@@ -460,8 +460,7 @@ var UndoRedoDataTypes = new function() {
     this.DynamicFilter = 75;
     this.Top10 = 76;
 
-	this.PropertyChanges = 79;
-	this.SparklineProps = 80;
+	this.PivotTable = 80;
 
     this.Create = function(nType)
 	{
@@ -532,6 +531,8 @@ var UndoRedoDataTypes = new function() {
             case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
 
             case this.DefinedName: return new UndoRedoData_DefinedNames();
+
+			case this.PivotTable: return new UndoRedoData_PivotTable();
         }
 		return null;
 	};
@@ -1082,6 +1083,50 @@ UndoRedoData_SortData.prototype = {
 		}
 	}
 };
+
+	function UndoRedoData_PivotTable(pivot, from, to) {
+		this.pivot = pivot;
+		this.from = from;
+		this.to = to;
+	}
+	UndoRedoData_PivotTable.prototype.Properties = {
+		pivot: 0,
+		from: 1,
+		to: 2
+	};
+	UndoRedoData_PivotTable.prototype.getType = function () {
+		return UndoRedoDataTypes.PivotTable;
+	};
+	UndoRedoData_PivotTable.prototype.getProperties = function () {
+		return this.Properties;
+	};
+	UndoRedoData_PivotTable.prototype.getProperty = function (nType) {
+		switch (nType) {
+			case this.Properties.pivot:
+				return this.pivot;
+				break;
+			case this.Properties.from:
+				return this.from;
+				break;
+			case this.Properties.to:
+				return this.to;
+				break;
+		}
+		return null;
+	};
+	UndoRedoData_PivotTable.prototype.setProperty = function (nType, value) {
+		switch (nType) {
+			case this.Properties.pivot:
+				this.pivot = value;
+				break;
+			case this.Properties.from:
+				this.from = value;
+				break;
+			case this.Properties.to:
+				this.to = value;
+				break;
+		}
+	};
 
 
 function UndoRedoData_GTableIdAdd(object, id)
@@ -2972,11 +3017,7 @@ UndoRedoCell.prototype = {
 			this.wb.aCollaborativeChangeElements.push(oLockInfo);
 		}
 		ws._getCell(nRow, nCol, function(cell) {
-			var Val;
-			if(bUndo)
-				Val = Data.oOldVal;
-			else
-				Val = Data.oNewVal;
+			var Val = bUndo ? Data.oOldVal : Data.oNewVal;
 			if(AscCH.historyitem_Cell_Fontname == Type)
 				cell.setFontname(Val);
 			else if(AscCH.historyitem_Cell_Fontsize == Type)
@@ -3812,10 +3853,28 @@ UndoRedoAutoFilters.prototype = {
 		this.UndoRedo(Type, Data, nSheetId, false);
 	};
 	UndoRedoPivotTables.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
-		var wb = opt_wb ? opt_wb : this.wb;
-		var ws = wb.getWorksheetById(nSheetId);
-		if (ws) {
+		var ws = this.wb.getWorksheetById(nSheetId);
+		if (!ws) {
+			return;
+		}
+		var pivotTable = ws.getPivotTableByName(Data.pivot);
+		if (!pivotTable) {
+			return;
+		}
 
+		var value = bUndo ? Data.from : Data.to;
+		switch (Type) {
+			case AscCH.historyitem_PivotTable_StyleName:
+				pivotTable.asc_getStyleInfo()._setName(value);
+				break;
+		}
+
+		// ToDo not the best way to update
+		if (pivotTable.isInit) {
+			var pivotRange = pivotTable.getRange();
+			ws.updatePivotTablesStyle(pivotRange);
+			var api = window["Asc"]["editor"];
+			api.wb.getWorksheet()._onUpdateFormatTable(pivotRange);
 		}
 	};
 
@@ -3834,6 +3893,7 @@ UndoRedoAutoFilters.prototype = {
 	window['AscCommonExcel'].UndoRedoData_RowProp = UndoRedoData_RowProp;
 	window['AscCommonExcel'].UndoRedoData_BBox = UndoRedoData_BBox;
 	window['AscCommonExcel'].UndoRedoData_SortData = UndoRedoData_SortData;
+	window['AscCommonExcel'].UndoRedoData_PivotTable = UndoRedoData_PivotTable;
 	window['AscCommonExcel'].UndoRedoData_SheetAdd = UndoRedoData_SheetAdd;
 	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
 	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
