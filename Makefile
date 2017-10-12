@@ -4,6 +4,9 @@ GRUNT_FLAGS = --no-color -v
 OUTPUT_DIR = deploy
 OUTPUT = $(OUTPUT_DIR)
 
+COMPANY_NAME ?= onlyoffice
+PRODUCT_NAME ?= documentserver
+
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
