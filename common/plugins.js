@@ -247,6 +247,9 @@
 
 		init                 : function()
 		{
+			if (!this.startData)
+				return;
+
 			switch (this.current.variations[this.currentVariation].initDataType)
 			{
 				case Asc.EPluginDataType.text:
@@ -374,7 +377,7 @@
 
 		onExternalMouseUp : function()
 		{
-		    if (!this.current)
+		    if (!this.current || !this.startData)
 		        return;
 
 		    this.startData.setAttribute("type", "onExternalMouseUp");
