@@ -196,7 +196,7 @@
 				ifr.id             = "plugin_iframe";
 				var _add           = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
 				ifr.src            = _add + this.current.variations[this.currentVariation].url;
-				ifr.style.position = 'absolute';
+				ifr.style.position = AscCommon.AscBrowser.isIE ? 'fixed' : "absolute";
 				ifr.style.top      = '-100px';
 				ifr.style.left     = '0px';
 				ifr.style.width    = '10000px';
