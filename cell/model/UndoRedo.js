@@ -67,7 +67,7 @@ function (window, undefined) {
 		this.LocalChange = LocalChange;
 	}
 
-	UndoRedoItemSerializable.prototypeSerialize = function (oBinaryWriter, collaborativeEditing) {
+	UndoRedoItemSerializable.prototype.Serialize = function (oBinaryWriter, collaborativeEditing) {
 		if ((this.oData && this.oData.getType) || this.oClass.Save_Changes || this.oClass.WriteToBinary) {
 			var oThis = this;
 			var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
@@ -76,7 +76,7 @@ function (window, undefined) {
 			});
 		}
 	};
-	UndoRedoItemSerializable.prototypeSerializeInner = function (oBinaryWriter, collaborativeEditing) {
+	UndoRedoItemSerializable.prototype.SerializeInner = function (oBinaryWriter, collaborativeEditing) {
 		//nClassType
 		if (!this.oClass.WriteToBinary) {
 			oBinaryWriter.WriteBool(true);
@@ -125,7 +125,7 @@ function (window, undefined) {
 			this.oClass.WriteToBinary(oBinaryWriter);
 		}
 	};
-	UndoRedoItemSerializable.prototypeSerializeDataObject =
+	UndoRedoItemSerializable.prototype.SerializeDataObject =
 		function (oBinaryWriter, oData, nSheetId, collaborativeEditing) {
 			var oThis = this;
 			if (oData.getType) {
@@ -150,7 +150,7 @@ function (window, undefined) {
 				oBinaryWriter.WriteLong(0);
 			}
 		};
-	UndoRedoItemSerializable.prototypeSerializeDataInnerObject =
+	UndoRedoItemSerializable.prototype.SerializeDataInnerObject =
 		function (oBinaryWriter, oData, nSheetId, collaborativeEditing) {
 			var oProperties = oData.getProperties();
 			for (var i in oProperties) {
@@ -159,13 +159,13 @@ function (window, undefined) {
 				this.SerializeDataInner(oBinaryWriter, nItemType, oItem, nSheetId, collaborativeEditing);
 			}
 		};
-	UndoRedoItemSerializable.prototypeSerializeDataInnerArray =
+	UndoRedoItemSerializable.prototype.SerializeDataInnerArray =
 		function (oBinaryWriter, oData, nSheetId, collaborativeEditing) {
 			for (var i = 0; i < oData.length; ++i) {
 				this.SerializeDataInner(oBinaryWriter, 0, oData[i], nSheetId, collaborativeEditing);
 			}
 		};
-	UndoRedoItemSerializable.prototypeSerializeDataInner =
+	UndoRedoItemSerializable.prototype.SerializeDataInner =
 		function (oBinaryWriter, nItemType, oItem, nSheetId, collaborativeEditing) {
 			var oThis = this;
 			var sTypeOf;
@@ -237,7 +237,7 @@ function (window, undefined) {
 					break;
 			}
 		};
-	UndoRedoItemSerializable.prototypeDeserialize = function (oBinaryReader) {
+	UndoRedoItemSerializable.prototype.Deserialize = function (oBinaryReader) {
 		var res = AscCommon.c_oSerConstants.ReadOk;
 		res = oBinaryReader.EnterFrame(4);
 		var nLength = oBinaryReader.GetULongLE();
@@ -275,7 +275,7 @@ function (window, undefined) {
 
 		}
 	};
-	UndoRedoItemSerializable.prototypeDeserializeData = function (oBinaryReader) {
+	UndoRedoItemSerializable.prototype.DeserializeData = function (oBinaryReader) {
 		var nDataClassType = oBinaryReader.GetUChar();
 		var nLength = oBinaryReader.GetULongLE();
 		var oDataObject = UndoRedoDataTypes.Create(nDataClassType);
@@ -292,7 +292,7 @@ function (window, undefined) {
 		}
 		return oDataObject;
 	};
-	UndoRedoItemSerializable.prototypeDeserializeDataInner = function (oBinaryReader, oDataObject, nLength, bIsArray) {
+	UndoRedoItemSerializable.prototype.DeserializeDataInner = function (oBinaryReader, oDataObject, nLength, bIsArray) {
 		var nStartPos = oBinaryReader.GetCurPos();
 		var nCurPos = nStartPos;
 		while (nCurPos - nStartPos < nLength && nCurPos < oBinaryReader.GetSize() - 1) {
