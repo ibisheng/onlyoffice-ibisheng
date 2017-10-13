@@ -8292,6 +8292,11 @@ background-repeat: no-repeat;\
 		return this.asc_GetCurrentContentControl();
 	};
 
+	window["asc_docs_api"].prototype["pluginMethod_GetFileHTML"] = function()
+	{
+		return this.ContentToHTML(true);
+	};
+
 	/********************************************************************/
 
 	asc_docs_api.prototype.asc_OnHideContextMenu = function()
