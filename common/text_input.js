@@ -34,8 +34,7 @@
 
 (function(window, undefined)
 {
-	window["AscInputMethod"] = {};
-	window["AscInputMethod"]["SogouPinyin"] = false;
+	window["AscInputMethod"] = window["AscInputMethod"] || {};
 	///
 	// такие методы нужны в апи
 	// baseEditorsApi.prototype.Begin_CompositeInput = function()
@@ -1114,7 +1113,7 @@
 				this.clear();
 
 			var isSendToApi = true;
-			if (window["AscInputMethod"]["SogouPinyin"])
+			if (true === window["AscInputMethod"]["SogouPinyin"])
 			{
 				if (AscCommon.AscBrowser.isChrome)
 				{

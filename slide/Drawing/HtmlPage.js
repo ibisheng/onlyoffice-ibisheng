@@ -675,6 +675,9 @@ function CEditorPage(api)
 			styleContent += ".btn-pointer:active { background-position: -20px -100px; }";
 			styleContent += ".btn-text-default-img2 { background-repeat: no-repeat; position: absolute; background-color: #7d858c; border: none; color: #7d858c; font-size: 11px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; height: 22px; cursor: pointer; }";
 			styleContent += ".btn-text-default-img2:focus { outline: 0; outline-offset: 0; }";
+			styleContent += ".btn-text-default::-moz-focus-inner { border: 0; padding: 0; }";
+			styleContent += ".btn-text-default-img::-moz-focus-inner { border: 0; padding: 0; }";
+			styleContent += ".btn-text-default-img2::-moz-focus-inner { border: 0; padding: 0; }";
 
 
 			var style		 = document.createElement('style');

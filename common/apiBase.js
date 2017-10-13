@@ -1368,6 +1368,15 @@
 	baseEditorsApi.prototype.Input_UpdatePos = function()
 	{
 	};
+	baseEditorsApi.prototype["setInputParams"] = function(_obj)
+	{
+		window["AscInputMethod"] = window["AscInputMethod"] || {};
+
+		for (var _prop in _obj)
+		{
+			window["AscInputMethod"][_prop] = _obj[_prop];
+		}
+	};
 
 	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
 
