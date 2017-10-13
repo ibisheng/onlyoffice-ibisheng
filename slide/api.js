@@ -6150,7 +6150,7 @@ background-repeat: no-repeat;\
 			}
 			else if (undefined !== _obj["mouseUp"])
 			{
-				_this.WordControl.DemonstrationManager.onMouseUp({}, true);
+				_this.WordControl.DemonstrationManager.onMouseUp({}, true, true);
 			}
 			else if (undefined !== _obj["mouseWhell"])
 			{

@@ -245,6 +245,10 @@
 			{
 				this["recordTo"] = obj.recordTo;
 			}
+			if (typeof obj.isJson != 'undefined')
+			{
+				this["isJson"] = obj.isJson;
+			}
 		}
 		else
 		{
@@ -258,6 +262,7 @@
 			this["recordTo"]    = null;
 			this["recordCount"] = null;
 			this["userId"]      = null;
+			this["isJson"]      = null;
 		}
 	}
 
@@ -340,6 +345,14 @@
 	CMailMergeSendData.prototype.put_UserId      = function(v)
 	{
 		this["userId"] = v;
+	};
+	CMailMergeSendData.prototype.get_IsJson      = function()
+	{
+		return this["isJson"]
+	};
+	CMailMergeSendData.prototype.put_IsJson      = function(v)
+	{
+		this["isJson"] = v;
 	};
 
 	function CAscFootnotePr(obj)
@@ -6911,6 +6924,7 @@ background-repeat: no-repeat;\
 		// Меняем тип состояния (на сохранение)
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
 		var isNoBase64 = typeof ArrayBuffer !== 'undefined';
+		var _fCallbackRequest = fCallbackRequest;
 
 		var dataContainer               = {data : null, part : null, index : 0, count : 0};
 		var oAdditionalData             = {};
@@ -7020,7 +7034,19 @@ background-repeat: no-repeat;\
 					aRowOut.push(oRow[j]);
 				aJsonOut.push(aRowOut);
 			}
-			dataContainer.data = dataContainer.data.length + ';' + dataContainer.data + JSON.stringify(aJsonOut);
+			var editorData = dataContainer.data;
+			dataContainer.data = JSON.stringify(aJsonOut);
+			options.oMailMergeSendData.put_IsJson(true);
+			//save Editor.bin after json
+			_fCallbackRequest = function(incomeObject){
+				oAdditionalData["savekey"] = incomeObject["data"];
+				dataContainer = {data : editorData, part : null, index : 0, count : 0};
+				options.oMailMergeSendData.put_IsJson(false);
+
+				AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
+					sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);
+				}, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
+			}
 		}
 		var fCallback = null;
 		if (!options.isNoCallback)
@@ -7070,7 +7096,7 @@ background-repeat: no-repeat;\
 		AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1)
 		{
 			sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);
-		}, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
+		}, fCallback, _fCallbackRequest, oAdditionalData, dataContainer);
 	}
 
 	// Вставка диаграмм

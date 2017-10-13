@@ -3616,10 +3616,7 @@ function CThumbnailsManager()
 		if (oThis.m_oWordControl)
 			oThis.m_oWordControl.m_oApi.checkLastWork();
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
 
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
@@ -4015,19 +4012,23 @@ function CThumbnailsManager()
 		oThis.m_oWordControl.m_oScrollThumbApi.scrollByY(45);
 	}
 
-	this.onMouseUp = function(e)
+	this.onMouseUp = function(e, bIsWindow)
 	{
 		if (oThis.m_oWordControl)
 			oThis.m_oWordControl.m_oApi.checkLastWork();
 
+		var _oldSender = global_mouseEvent.Sender;
 		AscCommon.check_MouseUpEvent(e);
 		global_mouseEvent.UnLockMouse();
 
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.Sender != control)
 		{
-			// такого быть не должно
-			return;
+			if (_oldSender != control || true !== bIsWindow)
+			{
+				// такого быть не должно
+				return;
+			}
 		}
 
 		oThis.CheckNeedAnimateScrolls(-1);
@@ -4081,6 +4082,8 @@ function CThumbnailsManager()
 		oThis.MouseDownTrackX        = -1;
 		oThis.MouseDownTrackY        = -1;
 		oThis.MouseDownTrackPosition = -1;
+
+		oThis.onMouseMove(e);
 	}
 
 	this.onMouseLeave = function(e)

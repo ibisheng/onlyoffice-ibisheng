@@ -3429,12 +3429,17 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
-    this.onMouseUp = function(e, isAttack)
+    this.onMouseUp = function(e, isAttack, isFromMainToReporter)
     {
     	if (!oThis.isMouseDown && true !== isAttack)
     		return;
 
+    	if (AscCommon.global_mouseEvent.IsLocked)
+			AscCommon.global_mouseEvent.IsLocked = false;
+
 		oThis.isMouseDown = false;
+		if (isFromMainToReporter && oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
+		    oThis.PointerRemove();
 
 		if (oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
 		{
