@@ -5946,18 +5946,26 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.reporterWindowCounter = 0;
-		if (!this.reporterWindow)
-			return;
+		try
+		{
+			this.reporterWindowCounter = 0;
+			if (!this.reporterWindow)
+				return;
 
-		if ( this.reporterWindow.attachEvent )
-			this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
-		else
-			this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
+			if (this.reporterWindow.attachEvent)
+				this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
+			else
+				this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
 
-		this.reporterWindow.close();
-		this.reporterWindow = null;
-		this.reporterStartObject = null;
+			this.reporterWindow.close();
+			this.reporterWindow = null;
+			this.reporterStartObject = null;
+		}
+		catch (err)
+		{
+			this.reporterWindow = null;
+			this.reporterStartObject = null;
+		}
 	};
 
 	asc_docs_api.prototype.DemonstrationReporterMessages = function(e)
