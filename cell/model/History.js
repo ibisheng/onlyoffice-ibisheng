@@ -143,6 +143,10 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTotalRow = 17;
 
 	window['AscCH'].historyitem_PivotTable_StyleName = 1;
+	window['AscCH'].historyitem_PivotTable_StyleShowRowHeaders = 2;
+	window['AscCH'].historyitem_PivotTable_StyleShowColHeaders = 3;
+	window['AscCH'].historyitem_PivotTable_StyleShowRowStripes = 4;
+	window['AscCH'].historyitem_PivotTable_StyleShowColStripes = 5;
 
 
 

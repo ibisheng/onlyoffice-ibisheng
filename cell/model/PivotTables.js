@@ -4983,25 +4983,25 @@ CT_PivotTableStyle.prototype.asc_setName = function(api, pivot, newVal) {
 CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showRowHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowHeaders(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowRowHeaders(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showColHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColHeaders(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowColHeaders(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showRowStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowStripes(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowRowStripes(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showColStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColStripes(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowColStripes(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype._setName = function (newVal, pivot, ws) {
@@ -5012,16 +5012,36 @@ CT_PivotTableStyle.prototype._setName = function (newVal, pivot, ws) {
 	}
 	this.name = newVal;
 };
-CT_PivotTableStyle.prototype._setShowRowHeaders = function(newVal) {
+CT_PivotTableStyle.prototype._setShowRowHeaders = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showRowHeaders !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowRowHeaders,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showRowHeaders, newVal));
+	}
 	this.showRowHeaders = newVal;
 };
-CT_PivotTableStyle.prototype._setShowColHeaders = function(newVal) {
+CT_PivotTableStyle.prototype._setShowColHeaders = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showColHeaders !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowColHeaders,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showColHeaders, newVal));
+	}
 	this.showColHeaders = newVal;
 };
-CT_PivotTableStyle.prototype._setShowRowStripes = function(newVal) {
+CT_PivotTableStyle.prototype._setShowRowStripes = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showRowStripes !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowRowStripes,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showRowStripes, newVal));
+	}
 	this.showRowStripes = newVal;
 };
-CT_PivotTableStyle.prototype._setShowColStripes = function(newVal) {
+CT_PivotTableStyle.prototype._setShowColStripes = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showColStripes !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowColStripes,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showColStripes, newVal));
+	}
 	this.showColStripes = newVal;
 };
 function CT_PivotFilters() {
