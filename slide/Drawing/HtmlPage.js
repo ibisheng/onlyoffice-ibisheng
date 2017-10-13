@@ -1787,7 +1787,7 @@ function CEditorPage(api)
 		else
 		{
 			Splitter.style.left   = parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
-			Splitter.style.top    = this.Height - parseInt((this.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
+			Splitter.style.top    = (this.Height - parseInt((this.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + 1) + "px";
 			Splitter.style.width  = this.Width - parseInt((this.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix) + "px";
 			Splitter.style.height = parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix) + "px";
 			this.SplitterType     = 2;
@@ -1850,7 +1850,7 @@ function CEditorPage(api)
 
 		if (_isCatch)
 		{
-			if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+			if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 				oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
 			AscCommon.stopEvent(e);
 		}
@@ -2008,7 +2008,7 @@ function CEditorPage(api)
 		var oWordControl = oThis;
 		oWordControl.m_oDrawingDocument.UnlockCursorType();
 
-		if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+		if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 			oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "";
 
 		if (null != oWordControl.SplitterDiv)
