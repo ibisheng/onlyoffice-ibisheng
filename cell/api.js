@@ -577,6 +577,10 @@ var editor;
     }
   };
 
+	  spreadsheet_api.prototype.asc_setFilteringMode = function (mode) {
+		  window['AscCommonExcel'].specialFilteringMode = !!mode;
+	  };
+
   /*
    idOption идентификатор дополнительного параметра, пока c_oAscAdvancedOptionsID.CSV.
    option - какие свойства применить, пока массив. для CSV объект asc_CCSVAdvancedOptions(codepage, delimiter)
@@ -3592,6 +3596,7 @@ var editor;
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
 	prot["asc_setViewMode"] = prot.asc_setViewMode;
+	prot["asc_setFilteringMode"] = prot.asc_setFilteringMode;
 	prot["asc_setRestriction"] = prot.asc_setRestriction;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
