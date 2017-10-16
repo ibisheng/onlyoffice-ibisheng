@@ -3264,7 +3264,6 @@ ScrollObject.prototype = {
 
         var delta = 1;
         if ( this.that.isHorizontalScroll ) return;
-        var mp = {}, isTop = false, isBottom = false;
         if ( undefined != evt.wheelDelta )
             delta = (evt.wheelDelta > 0) ? -this.that.settings.vscrollStep : this.that.settings.vscrollStep;
         else
@@ -3273,11 +3272,9 @@ ScrollObject.prototype = {
         this.that.scroller.y += delta;
         if ( this.that.scroller.y < 0 ) {
             this.that.scroller.y = 0;
-            isTop = true, isBottom = false;
         }
         else if ( this.that.scroller.y + this.that.scroller.h > this.that.canvasH ) {
             this.that.scroller.y = this.that.canvasH - this.that.arrowPosition - this.that.scroller.h;
-            isTop = false, isBottom = true;
         }
         this.that.scrollByY( delta )
     },
