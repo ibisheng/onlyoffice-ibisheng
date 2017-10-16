@@ -5271,6 +5271,6 @@
 		prot["asc_getImage"]					= prot.asc_getImage;
 
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-		window['AscCommonExcel'].specialFilteringMode = false;
+		window['AscCommonExcel'].filteringMode = true;
 	}
 )(window);

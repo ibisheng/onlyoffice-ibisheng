@@ -2789,7 +2789,7 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 			this.getField(this.rowFields.field, function (element, i) {
 				if (i !== l - 1) {
 					var field = t.pivotFields.pivotField[element.asc_getIndex()];
-					res -= (field && false !== field.compact) ? 1 : 0;
+					res -= (field && false !== field.outline && false !== field.compact) ? 1 : 0;
 				}
 			});
 		}
@@ -2802,7 +2802,7 @@ CT_pivotTableDefinition.prototype.getRowFieldPos = function (index) {
 		var field, fields = this.rowFields.field;
 		for (var i = 0; i < index && i < fields.length; ++i) {
 			field = this.pivotFields.pivotField[fields[i].asc_getIndex()];
-			res += (field && false === field.compact && 1);
+			res += (field && (false === field.outline || false === field.compact) && 1);
 		}
 	}
 
