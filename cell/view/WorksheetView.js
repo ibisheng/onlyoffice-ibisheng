@@ -8540,7 +8540,7 @@
 						t.model.excludeHiddenRows(false);
 
 						// Если нужно удалить автофильтры - удаляем
-						if(true !== window['AscCommonExcel'].specialFilteringMode){
+						if (window['AscCommonExcel'].filteringMode) {
 							if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
 								t.model.autoFilters.isEmptyAutoFilters(arn);
 							} else if (val === c_oAscCleanOptions.Format) {
@@ -10357,7 +10357,7 @@
 		};
 
 		var checkLocalChange = function(val){
-			if(true === window['AscCommonExcel'].specialFilteringMode) {
+			if (!window['AscCommonExcel'].filteringMode) {
 				History.LocalChange = val;
 			}
 		};
@@ -10432,8 +10432,7 @@
 				this._isLockedAll(onChangeWorksheetCallback);
 				break;
 			case "insCell":
-
-				if(true === window['AscCommonExcel'].specialFilteringMode){
+				if (!window['AscCommonExcel'].filteringMode) {
 					if(val === c_oAscInsertOptions.InsertCellsAndShiftRight || val === c_oAscInsertOptions.InsertColumns){
 						return;
 					}
@@ -10548,8 +10547,7 @@
 				}
 				break;
 			case "delCell":
-
-				if(true === window['AscCommonExcel'].specialFilteringMode){
+				if (!window['AscCommonExcel'].filteringMode) {
 					if(val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns){
 						return;
 					}
@@ -11938,7 +11936,7 @@
 			return;
 		}
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			return;
 		}
 
@@ -12056,7 +12054,7 @@
 			return;
 		}
 
-		if (true === window['AscCommonExcel'].specialFilteringMode) {
+		if (!window['AscCommonExcel'].filteringMode) {
 			return;
 		}
 
@@ -12171,11 +12169,11 @@
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
-        if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			History.LocalChange = true;
 			onChangeAutoFilterCallback();
 			History.LocalChange = false;
-        }else{
+        } else {
 			this._isLockedAll(onChangeAutoFilterCallback);
         }
     };
@@ -12242,11 +12240,11 @@
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: minChangeRow});
             }
         };
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			History.LocalChange = true;
 			onChangeAutoFilterCallback();
 			History.LocalChange = false;
-		}else{
+		} else {
 			this._isLockedAll(onChangeAutoFilterCallback);
 		}
     };
@@ -12346,16 +12344,16 @@
 
         if (null === isAddAutoFilter)//do not add autoFilter
         {
-			if(true === window['AscCommonExcel'].specialFilteringMode){
+			if (!window['AscCommonExcel'].filteringMode) {
 				History.LocalChange = true;
 				onChangeAutoFilterCallback();
 				History.LocalChange = false;
-			}else{
+			} else {
 				this._isLockedAll(onChangeAutoFilterCallback);
 			}
         } else//add autofilter + apply
         {
-			if(true === window['AscCommonExcel'].specialFilteringMode){
+			if (!window['AscCommonExcel'].filteringMode) {
 				return;
 			}
             if (t._checkAddAutoFilter(ar, null, autoFilterObject, true) === true) {
@@ -12370,7 +12368,7 @@
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			return;
 		}
 
@@ -13461,7 +13459,7 @@
             return false;
         }
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			return false;
 		}
 
@@ -13720,7 +13718,7 @@
 
         var deleteTableCallback = function (ref) {
 
-			if(true === window['AscCommonExcel'].specialFilteringMode){
+			if (!window['AscCommonExcel'].filteringMode) {
 				return false;
 			}
 
@@ -13784,7 +13782,7 @@
         var ws = this.model;
         var res = true;
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			if(val === c_oAscInsertOptions.InsertCellsAndShiftRight || val === c_oAscInsertOptions.InsertColumns){
 				return false;
 			}else if(val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns){
@@ -13957,7 +13955,7 @@
         formatTableInfo.isDeleteColumn = true;
         formatTableInfo.isDeleteTable = true;
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			formatTableInfo.isDeleteColumn = false;
 			formatTableInfo.isInsertColumnRight = false;
 			formatTableInfo.isInsertColumnLeft = false;
@@ -13968,7 +13966,7 @@
 	WorksheetView.prototype.af_convertTableToRange = function (tableName) {
         var t = this;
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			return;
 		}
 
@@ -14013,7 +14011,7 @@
         var t = this;
         range = AscCommonExcel.g_oRangeCache.getAscRange(range);
 
-		if(true === window['AscCommonExcel'].specialFilteringMode){
+		if (!window['AscCommonExcel'].filteringMode) {
 			return;
 		}
 

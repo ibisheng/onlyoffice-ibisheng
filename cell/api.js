@@ -578,7 +578,7 @@ var editor;
   };
 
 	  spreadsheet_api.prototype.asc_setFilteringMode = function (mode) {
-		  window['AscCommonExcel'].specialFilteringMode = !!mode;
+		  window['AscCommonExcel'].filteringMode = !!mode;
 	  };
 
   /*
