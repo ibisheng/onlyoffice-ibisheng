@@ -5908,7 +5908,7 @@ background-repeat: no-repeat;\
 		var top = ((height / 2) - (h / 2)) + dualScreenTop;
 
 		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
-		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=0,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=yes,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
 
 		if (!this.reporterWindow)
 			return;

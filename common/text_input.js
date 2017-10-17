@@ -1784,7 +1784,7 @@
 			    if (document.activeElement)
 			    {
 			        var _id = document.activeElement.id;
-			        if (_id == "area_id" || _id == "plugin_iframe")
+			        if (_id == "area_id" || (window.g_asc_plugins && window.g_asc_plugins.checkRunnedFrameId(_id)))
 			            return;
 			    }
 

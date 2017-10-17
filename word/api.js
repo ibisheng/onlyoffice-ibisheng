@@ -409,6 +409,7 @@
 		this.documents = _docs;
 		this.returnDocuments = [];
 		this.current = -1;
+		this.guid = "";
 
 		this.start = function()
 		{
@@ -417,14 +418,14 @@
 			this.api.incrementCounterLongAction();
 
 			if (window.g_asc_plugins)
-				window.g_asc_plugins.setPluginMethodReturnAsync();
+				this.guid = window.g_asc_plugins.setPluginMethodReturnAsync();
 
 			this.run();
 		};
 		this.end = function()
 		{
 			if (window.g_asc_plugins)
-				window.g_asc_plugins.onPluginMethodReturn(this.returnDocuments);
+				window.g_asc_plugins.onPluginMethodReturn(this.guid, this.returnDocuments);
 
 			delete this.api.__content_control_worker;
 			this.api.decrementCounterLongAction();
