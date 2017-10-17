@@ -1775,7 +1775,7 @@ CT_PivotCacheDefinition.prototype.getFields = function () {
 	return this.cacheFields && this.cacheFields.cacheField;
 };
 CT_PivotCacheDefinition.prototype.getRecords = function () {
-	return this.cacheRecords && this.cacheRecords.r;
+	return this.cacheRecords && this.cacheRecords;
 };
 CT_PivotCacheDefinition.prototype.isValidCacheSource = function () {
 	return this.cacheSource && this.cacheSource.type === c_oAscSourceType.Worksheet;
@@ -1784,10 +1784,10 @@ function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
 //Members
-	this.r = null;
 	this.extLst = null;
 //internal
-	this._curArray = null;
+	this._cols = [];
+	this._curColIndex = 0;
 }
 CT_PivotCacheRecords.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -1806,70 +1806,27 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 			newContext.readAttributes(attr, uq);
 		}
 	} else if ("r" === elem) {
-		this._curArray = [];
-	} else if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_Index();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("extLst" === elem) {
-		newContext = new CT_ExtensionList();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.extLst = newContext;
+		this._curColIndex = 0;
 	} else {
-		newContext = null;
+		var newContextCandidate = this._getCol(this._curColIndex).onStartNode(elem, attr, uq);
+		if (newContextCandidate) {
+			newContext = newContextCandidate;
+		} else if ("extLst" === elem) {
+			newContext = new CT_ExtensionList();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.extLst = newContext;
+		} else {
+			newContext = null;
+		}
 	}
 	return newContext;
 };
 CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
-  if ("r" === elem) {
-    if (this._curArray && this._curArray.length > 0) {
-      if (!this.r) {
-        this.r = [];
-      }
-      this.r.push(this._curArray);
-      this._curArray = null;
-    }
-  }
+	if (this._getCol(this._curColIndex).onEndNode(prevContext, elem)) {
+		this._curColIndex++;
+	}
 };
 CT_PivotCacheRecords.prototype.toXml = function(writer) {
 	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -1880,27 +1837,12 @@ CT_PivotCacheRecords.prototype.toXml = function(writer) {
 		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	writer.WriteXmlNodeEnd("pivotCacheRecords", true);
-	if (null !== this.r) {
-		for (var i = 0; i < this.r.length; ++i) {
-			var elem = this.r[i];
+	if (null !== this._cols) {
+		var rowsCount = this._cols[0].size;
+		for (var i = 0; i < rowsCount; ++i) {
 			writer.WriteXmlNodeStart("r", true);
-			for (var j = 0; j < elem.length; ++j) {
-				var subelem = elem[j];
-				if (subelem instanceof CT_Boolean) {
-					subelem.toXml(writer, "b");
-				} else if (subelem instanceof CT_DateTime) {
-					subelem.toXml(writer, "d");
-				} else if (subelem instanceof CT_Error) {
-					subelem.toXml(writer, "e");
-				} else if (subelem instanceof CT_Missing) {
-					subelem.toXml(writer, "m");
-				} else if (subelem instanceof CT_Number) {
-					subelem.toXml(writer, "n");
-				} else if (subelem instanceof CT_String) {
-					subelem.toXml(writer, "s");
-				} else if (subelem instanceof CT_Index) {
-					subelem.toXml(writer, "x");
-				}
+			for (var j = 0; j < this._cols.length; ++j) {
+				this._cols[j].toXml(writer, i);
 			}
 			writer.WriteXmlNodeEnd("r");
 		}
@@ -1909,6 +1851,24 @@ CT_PivotCacheRecords.prototype.toXml = function(writer) {
 		this.extLst.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd("pivotCacheRecords");
+};
+CT_PivotCacheRecords.prototype.getRowsCount = function() {
+	return null !== this._cols ? this._cols[0].size : 0;
+};
+CT_PivotCacheRecords.prototype.get = function(row, col) {
+	var col = this._cols[col];
+	if (col) {
+		return col.get(row);
+	}
+};
+CT_PivotCacheRecords.prototype._getCol = function(index, type) {
+	var col = this._cols[index];
+	if(!col){
+		col = new PivotRecords();
+		col.setStartCount(this.count);
+		this._cols[index] = col;
+	}
+	return col;
 };
 function CT_pivotTableDefinition() {
 //Attributes
@@ -2823,37 +2783,55 @@ CT_pivotTableDefinition.prototype.getColItems = function () {
 CT_pivotTableDefinition.prototype.getRecords = function () {
 	return this.cacheDefinition.getRecords();
 };
-CT_pivotTableDefinition.prototype.getValues = function (records, index, value) {
+CT_pivotTableDefinition.prototype.getValues = function (records, rowIndexes, colIndex, value) {
 	var res = [];
-	var elem;
-	for (var i = 0; i < records.length; ++i) {
-		elem = records[i][index];
-		if (elem && elem instanceof CT_Index && value === elem.v) {
-			res.push(records[i]);
+	var i;
+	if (rowIndexes) {
+		for (i = 0; i < rowIndexes.length; ++i) {
+			this._getValues(records, rowIndexes[i], colIndex, value, res);
+		}
+	} else {
+		for (i = 0; i < records.getRowsCount(); ++i) {
+			this._getValues(records, i, colIndex, value, res);
 		}
 	}
 	return res;
 };
-CT_pivotTableDefinition.prototype.getValue = function (records, index, subtotal) {
+CT_pivotTableDefinition.prototype._getValues = function (records, rowIndex, colIndex, value, output) {
+	var elem = records.get(rowIndex, colIndex);
+	if (elem && elem.type === c_oAscPivotRecType.Index && value === elem.val) {
+		output.push(rowIndex);
+	}
+};
+CT_pivotTableDefinition.prototype.getValue = function (records, rowIndexes, index, subtotal) {
 	var cacheFields = this.asc_getCacheFields();
 	if (c_oAscItemType.Default === subtotal || c_oAscItemType.Data === subtotal || c_oAscItemType.Blank === subtotal) {
 		subtotal = c_oAscItemType.Sum;
 	}
 	var arg = [new AscCommonExcel.cNumber(subtotal)];
-	var elem;
-	for (var i = 0; i < records.length; ++i) {
-		elem = records[i][index];
-		if (elem instanceof CT_Index) {
-			elem = cacheFields[index].getSharedItem(elem.v);
+	var i;
+	if(rowIndexes){
+		for (i = 0; i < rowIndexes.length; ++i) {
+			this._getValue(records, rowIndexes[i], index, cacheFields, arg);
 		}
-		if (elem instanceof CT_Number) {
-			arg.push(new AscCommonExcel.cNumber(elem.v));
+	} else {
+		for (i = 0; i < records.getRowsCount(); ++i) {
+			this._getValue(records, i, index, cacheFields, arg);
 		}
 	}
 
 	var res = (new AscCommonExcel.cSUBTOTAL()).Calculate(arg);
 
 	return res ? res.value : null;
+};
+CT_pivotTableDefinition.prototype._getValue = function (records, rowIndex, index, cacheFields, output) {
+	var elem = records.get(rowIndex, index);
+	if (elem.type === c_oAscPivotRecType.Index) {
+		elem = cacheFields[index].getSharedItem(elem.val);
+	}
+	if (elem.type === c_oAscPivotRecType.Number) {
+		output.push(new AscCommonExcel.cNumber(elem.val));
+	}
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
@@ -3656,28 +3634,46 @@ CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Boolean.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Boolean.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeBool("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeBool("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Boolean.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && 0 === this.x.length;
+};
+CT_Boolean.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.x = [];
 };
 function CT_DateTime() {
 //Attributes
@@ -3695,7 +3691,9 @@ CT_DateTime.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			var d = new Date(uq(val));
+			this.v = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(),
+				d.getSeconds(),	d.getMilliseconds())).getExcelDateWithTime();
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -3729,36 +3727,47 @@ CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_DateTime.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_DateTime.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", Date.prototype.getDateFromExcel(val).toISOString().slice(0, 19));
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
-	}
+
 	writer.WriteXmlNodeEnd(name);
 };
-CT_DateTime.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	var d = new Date(this.v);
-	res.number = new Date(Date.UTC(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(),
-		d.getMilliseconds())).getExcelDateWithTime();
-	res.type = AscCommon.CellValueType.Number;
-	return res;
+CT_DateTime.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && 0 === this.x.length;
+};
+CT_DateTime.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.x = [];
 };
 function CT_Error() {
 //Attributes
@@ -3775,7 +3784,7 @@ function CT_Error() {
 	this.st = null;//false
 	this.b = null;//false
 //Members
-	this.tpls = null;
+	this.tpls = [];
 	this.x = [];
 }
 CT_Error.prototype.readAttributes = function(attr, uq) {
@@ -3784,7 +3793,7 @@ CT_Error.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			this.v =  AscCommonExcel.cError.prototype.getErrorTypeFromString(uq(val));
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -3839,7 +3848,7 @@ CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
-		this.tpls = newContext;
+		this.tpls.push(newContext);
 	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
@@ -3852,52 +3861,81 @@ CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Error.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Error.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", AscCommonExcel.cError.prototype.getStringFromErrorType(val));
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	if (null !== this.tpls) {
-		this.tpls.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Error.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && null === 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Error.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Missing() {
 //Attributes
@@ -3986,50 +4024,78 @@ CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Missing.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this);
+};
+CT_Missing.prototype.toXml2 = function(writer, name, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Missing.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Missing.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Number() {
 //Attributes
@@ -4123,59 +4189,81 @@ CT_Number.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Number.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Number.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeNumber("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeNumber("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_Number.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	res.number = this.v;
-	res.type = AscCommon.CellValueType.Number;
-	return res;
+CT_Number.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Number.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_String() {
 //Attributes
@@ -4269,59 +4357,81 @@ CT_String.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_String.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_String.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_String.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	res.text = this.v;
-	res.type = AscCommon.CellValueType.String;
-	return res;
+CT_String.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_String.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Index() {
 //Attributes
@@ -4338,11 +4448,20 @@ CT_Index.prototype.readAttributes = function(attr, uq) {
 	}
 };
 CT_Index.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v);
+};
+CT_Index.prototype.toXml2 = function(writer, name, val) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeNumber("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeNumber("v", val);
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
+};
+CT_Index.prototype.isSimpleValue = function() {
+	return true;
+};
+CT_Index.prototype.clean = function() {
+	this.v = null;
 };
 function CT_Location() {
 //Attributes
@@ -5455,7 +5574,7 @@ CT_CacheField.prototype.asc_getName = function () {
 	return this.name;
 };
 CT_CacheField.prototype.getSharedItem = function (index) {
-	return this.sharedItems && this.sharedItems.Items[index];
+	return this.sharedItems && this.sharedItems.Items.get(index);
 };
 function CT_CacheHierarchy() {
 //Attributes
@@ -7697,7 +7816,7 @@ function CT_SharedItems() {
 	this.count = null;
 	this.longText = null;//false
 //Members
-	this.Items = [];
+	this.Items = new PivotRecords();
 }
 CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -7754,6 +7873,7 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 		val = vals["count"];
 		if (undefined !== val) {
 			this.count = val - 0;
+			this.Items.setStartCount(this.count);
 		}
 		val = vals["longText"];
 		if (undefined !== val) {
@@ -7763,46 +7883,16 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
+	var newContextCandidate = this.Items.onStartNode(elem, attr, uq);
+	if (newContextCandidate) {
+		newContext = newContextCandidate;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_SharedItems.prototype.onEndNode = function(prevContext, elem) {
+	this.Items.onEndNode(prevContext, elem);
 };
 CT_SharedItems.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeStart(name);
@@ -7849,22 +7939,7 @@ CT_SharedItems.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeBool("longText", this.longText);
 	}
 	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.Items.length; ++i) {
-		var elem = this.Items[i];
-		if (elem instanceof CT_Boolean) {
-			elem.toXml(writer, "b");
-		} else if (elem instanceof CT_DateTime) {
-			elem.toXml(writer, "d");
-		} else if (elem instanceof CT_Error) {
-			elem.toXml(writer, "e");
-		} else if (elem instanceof CT_Missing) {
-			elem.toXml(writer, "m");
-		} else if (elem instanceof CT_Number) {
-			elem.toXml(writer, "n");
-		} else if (elem instanceof CT_String) {
-			elem.toXml(writer, "s");
-		}
-	}
+	this.Items.toXml(writer);
 	writer.WriteXmlNodeEnd(name);
 };
 function CT_FieldGroup() {
@@ -8855,7 +8930,7 @@ function CT_GroupItems() {
 //Attributes
 	this.count = null;
 //Members
-	this.Items = [];
+	this.Items = new PivotRecords();
 }
 CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -8864,51 +8939,22 @@ CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 		val = vals["count"];
 		if (undefined !== val) {
 			this.count = val - 0;
+			this.Items.setStartCount(this.count);
 		}
 	}
 };
 CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
+	var newContextCandidate = this.Items.onStartNode(elem, attr, uq);
+	if (newContextCandidate) {
+		newContext = newContextCandidate;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_GroupItems.prototype.onEndNode = function(prevContext, elem) {
+	this.Items.onEndNode(prevContext, elem);
 };
 CT_GroupItems.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeStart(name);
@@ -8916,22 +8962,7 @@ CT_GroupItems.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.Items.length; ++i) {
-		var elem = this.Items[i];
-		if (elem instanceof CT_Boolean) {
-			elem.toXml(writer, "b");
-		} else if (elem instanceof CT_DateTime) {
-			elem.toXml(writer, "d");
-		} else if (elem instanceof CT_Error) {
-			elem.toXml(writer, "e");
-		} else if (elem instanceof CT_Missing) {
-			elem.toXml(writer, "m");
-		} else if (elem instanceof CT_Number) {
-			elem.toXml(writer, "n");
-		} else if (elem instanceof CT_String) {
-			elem.toXml(writer, "s");
-		}
-	}
+	this.Items.toXml(writer);
 	writer.WriteXmlNodeEnd(name);
 };
 function CT_FieldUsage() {
@@ -10316,6 +10347,301 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeBool("group", this.group);
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
+};
+
+var c_oAscPivotRecType = {
+	Boolean: 1,
+	DateTime: 2,
+	Error: 3,
+	Missing: 4,
+	Number: 5,
+	String: 6,
+	Index: 7
+};
+
+function PivotRecordValue() {
+	this.clean();
+};
+PivotRecordValue.prototype.clean = function() {
+	this.type = undefined;
+	this.val = undefined;
+	this.addition = undefined;
+}
+PivotRecordValue.prototype.getCellValue = function() {
+	var res = new AscCommonExcel.CCellValue();
+	switch (this.type) {
+		case c_oAscPivotRecType.Boolean:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val ? 1 : 0;
+			break;
+		case c_oAscPivotRecType.DateTime:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val;
+			break;
+		case c_oAscPivotRecType.Error:
+			res.type = AscCommon.CellValueType.String;
+			res.text = AscCommonExcel.cError.prototype.getStringFromErrorType(this.val);
+			break;
+		case c_oAscPivotRecType.Number:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val;
+			break;
+		case c_oAscPivotRecType.String:
+			res.type = AscCommon.CellValueType.String;
+			res.text = this.val;
+			break;
+		default:
+			var i = 0;
+			break;
+	}
+	return res;
+};
+
+function PivotRecords() {
+	this.chunks = [];
+	this.addition = {};
+	this.size = 0;
+	this.startCount = 0;
+
+//inner
+	this._curBoolean = new CT_Boolean();
+	this._curDateTime = new CT_DateTime();
+	this._curError = new CT_Error();
+	this._curMissing = new CT_Missing();
+	this._curNumber = new CT_Number();
+	this._curString = new CT_String();
+	this._curIndex = new CT_Index();
+	this.output = new PivotRecordValue();
+}
+
+PivotRecords.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = null;
+	if ("b" === elem) {
+		this._curBoolean.clean();
+		newContext = this._curBoolean;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("d" === elem) {
+		this._curDateTime.clean();
+		newContext = this._curDateTime;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("e" === elem) {
+		this._curError.clean();
+		newContext = this._curError;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("m" === elem) {
+		this._curMissing.clean();
+		newContext = this._curMissing;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("n" === elem) {
+		this._curNumber.clean();
+		newContext = this._curNumber;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("s" === elem) {
+		this._curString.clean();
+		newContext = this._curString;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("x" === elem) {
+		this._curIndex.clean();
+		newContext = this._curIndex;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	}
+	return newContext;
+};
+PivotRecords.prototype.onEndNode = function(prevContext, elem) {
+	var res = true;
+	if ("b" === elem) {
+		if (this._curBoolean.isSimpleValue()) {
+			this.addBool(this._curBoolean.v);
+		} else {
+			this.addBool(this._curBoolean.v, this._curBoolean);
+			this._curBoolean = new CT_Boolean();
+		}
+	} else if ("d" === elem) {
+		if (this._curDateTime.isSimpleValue()) {
+			this.addDate(this._curDateTime.v);
+		} else {
+			this.addDate(this._curDateTime.v, this._curDateTime);
+			this._curDateTime = new CT_DateTime();
+		}
+	} else if ("e" === elem) {
+		if (this._curError.isSimpleValue()) {
+			this.addError(this._curError.v);
+		} else {
+			this.addError(this._curError.v, this._curError);
+			this._curError = new CT_Error();
+		}
+	} else if ("m" === elem) {
+		if (this._curMissing.isSimpleValue()) {
+			this.addMissing();
+		} else {
+			this.addMissing(this._curMissing);
+			this._curMissing = new CT_Missing();
+		}
+	} else if ("n" === elem) {
+		if (this._curNumber.isSimpleValue()) {
+			this.addNumber(this._curNumber.v);
+		} else {
+			this.addNumber(this._curNumber.v, this._curNumber);
+			this._curNumber = new CT_Number();
+		}
+	} else if ("s" === elem) {
+		if (this._curString.isSimpleValue()) {
+			this.addString(this._curString.v);
+		} else {
+			this.addString(this._curString.v, this._curString);
+			this._curString = new CT_String();
+		}
+	} else if ("x" === elem) {
+		this.addIndex(this._curIndex.v);
+	} else {
+		res = false;
+	}
+	return res;
+};
+PivotRecords.prototype.toXml = function(writer, opt_index) {
+	if (undefined !== opt_index) {
+		this._toXml(writer, this.get(opt_index));
+	} else {
+		for (var i = 0; i < this.size; ++i) {
+			this._toXml(writer, this.get(i));
+		}
+	}
+};
+PivotRecords.prototype.setStartCount = function(val) {
+	this.startCount = val;
+};
+PivotRecords.prototype.addBool = function(val, addition) {
+	this._add(c_oAscPivotRecType.Boolean, val, addition);
+};
+PivotRecords.prototype.addDate = function(val, addition) {
+	this._add(c_oAscPivotRecType.DateTime, val, addition);
+};
+PivotRecords.prototype.addError = function(val, addition) {
+	this._add(c_oAscPivotRecType.Error, val, addition);
+};
+PivotRecords.prototype.addMissing = function(addition) {
+	this._add(c_oAscPivotRecType.Missing, undefined, addition);
+};
+PivotRecords.prototype.addNumber = function(val, addition) {
+	this._add(c_oAscPivotRecType.Number, val, addition);
+};
+PivotRecords.prototype.addString = function(val, addition) {
+	this._add(c_oAscPivotRecType.String, val, addition);
+};
+PivotRecords.prototype.addIndex = function(val) {
+	this._add(c_oAscPivotRecType.Index, val);
+};
+PivotRecords.prototype.get = function(index) {
+	this.output.clean();
+	for (var i = 0; i < this.chunks.length; ++i) {
+		var chunk = this.chunks[i];
+		if (chunk.from <= index && index < chunk.to) {
+			this.output.type = chunk.type;
+			if (chunk.data) {
+				this.output.val = chunk.data[index - chunk.from];
+				if (chunk.type === c_oAscPivotRecType.Boolean) {
+					this.output.val = !!this.output.val;
+				}
+			}
+			this.output.addition = this.addition[index];
+			break;
+		}
+	}
+	return this.output;
+};
+PivotRecords.prototype._add = function(type, val, addition) {
+	var index = this.size;
+	var prevChunk = this.chunks.length > 0 ? this.chunks[this.chunks.length - 1] : null;
+	var chunk;
+	if (prevChunk && (prevChunk.type === type)) {
+		chunk = prevChunk;
+	} else {
+		//todo shrink prevChunk
+		var from = prevChunk ? prevChunk.to : 0;
+		chunk = {type: type, data: null, capacity: 0, from: from, to: from + 1};
+		this.chunks.push(chunk);
+	}
+	var chunkIndex = index - chunk.from;
+	if (c_oAscPivotRecType.Missing !== chunk.type && chunkIndex >= chunk.capacity) {
+		var oldData = chunk.data;
+		var chunkStartCount = (0 === this.size && this.startCount) ? this.startCount - chunk.from : 0;
+		chunk.capacity = Math.min(Math.max((1.1 * chunk.capacity) >> 0, chunkIndex + 1, chunkStartCount), AscCommon.gc_nMaxRow0 + 1);
+		switch (type) {
+			case c_oAscPivotRecType.Boolean:
+				chunk.data = new Uint8Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.DateTime:
+				chunk.data = new Uint32Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.Error:
+				chunk.data = new Uint8Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.Missing:
+				break;
+			case c_oAscPivotRecType.Number:
+				chunk.data = new Float64Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.String:
+				if (!chunk.data) {
+					chunk.data = new Array(chunk.capacity);
+				}
+				oldData = null;
+				break;
+			case c_oAscPivotRecType.Index:
+				chunk.data = new Uint32Array(chunk.capacity);
+				break;
+		}
+		if (oldData) {
+			chunk.data.set(oldData);
+		}
+	}
+	if (chunk.data) {
+		chunk.data[chunkIndex] = val;
+	}
+	if (addition) {
+		this.addition[index] = addition;
+	}
+	this.size++;
+	chunk.to = this.size;
+};
+PivotRecords.prototype._toXml = function(writer, elem) {
+	switch (elem.type) {
+		case c_oAscPivotRecType.Boolean:
+			CT_Boolean.prototype.toXml2(writer, "b", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.DateTime:
+			CT_DateTime.prototype.toXml2(writer, "d", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Error:
+			CT_Error.prototype.toXml2(writer, "e", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Missing:
+			CT_Missing.prototype.toXml2(writer, "m", elem.addition);
+			break;
+		case c_oAscPivotRecType.Number:
+			CT_Number.prototype.toXml2(writer, "n", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.String:
+			CT_String.prototype.toXml2(writer, "s", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Index:
+			CT_Index.prototype.toXml2(writer, "x", elem.val);
+			break;
+	}
 };
 
 var prot;

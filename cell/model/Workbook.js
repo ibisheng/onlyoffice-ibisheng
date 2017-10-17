@@ -5044,7 +5044,7 @@
 	};
 	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
 		var pos, cells, index, i, j, k, r, c1, r1, field, indexField, cacheIndex, sharedItem, item, items, setName,
-			oCellValue, cacheRecord, last;
+			oCellValue, rowIndexes, last;
 		for (i = 0; i < cleanRanges.length; ++i) {
 			cleanRanges[i].cleanAll();
 		}
@@ -5088,7 +5088,7 @@
 			for (i = 0; i < items.length; ++i) {
 				item = items[i];
 				r = item.getR();
-				cacheRecord = cacheRecords;
+				rowIndexes = undefined;
 				if (countC) {
 					for (j = 0; j < item.x.length; ++j) {
 						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
@@ -5111,7 +5111,7 @@
 							}
 
 							if (countD) {
-								cacheRecord = pivotTable.getValues(cacheRecord, indexField, cacheIndex.x);
+								rowIndexes = pivotTable.getValues(cacheRecords, rowIndexes, indexField, cacheIndex.x);
 							}
 						}
 
@@ -5132,7 +5132,7 @@
 						cacheFields[index].asc_getName());
 				}
 				if (countD) {
-					cacheValuesCol.push(cacheRecord);
+					cacheValuesCol.push(rowIndexes);
 				}
 			}
 		}
@@ -5207,20 +5207,19 @@
 					last = r === countR - 1 || null !== item.t;
 					if (countD && (last || (field && field.asc_getSubtotalTop()))) {
 						for (j = 0; j < cacheValuesCol.length; ++j) {
-							if (cacheRecord = cacheValuesCol[j]) {
-								for (k = 0; k < cacheValuesRow.length && 0 !== cacheRecord.length; k += 2) {
-									cacheRecord =
-										pivotTable.getValues(cacheRecord, cacheValuesRow[k], cacheValuesRow[k + 1]);
-								}
-								if (0 !== cacheRecord.length) {
-									cells = this.getRange4(r1 + i, rowFieldsPos[r] + 1 + j);
-									oCellValue = new AscCommonExcel.CCellValue();
-									oCellValue.number = pivotTable.getValue(cacheRecord, dataFields[0].asc_getIndex(),
-										(null !== item.t && c_oAscItemType.Grand !== item.t) ? item.t :
-											dataFields[0].asc_getSubtotal());
-									oCellValue.type = AscCommon.CellValueType.Number;
-									cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
-								}
+							rowIndexes = cacheValuesCol[j];
+							for (k = 0; k < cacheValuesRow.length && (!rowIndexes || 0 !== rowIndexes.length); k += 2) {
+								rowIndexes =
+									pivotTable.getValues(cacheRecords, rowIndexes, cacheValuesRow[k], cacheValuesRow[k + 1]);
+							}
+							if (0 !== rowIndexes.length) {
+								cells = this.getRange4(r1 + i, rowFieldsPos[r] + 1 + j);
+								oCellValue = new AscCommonExcel.CCellValue();
+								oCellValue.number = pivotTable.getValue(cacheRecords, rowIndexes, dataFields[0].asc_getIndex(),
+																		(null !== item.t && c_oAscItemType.Grand !== item.t) ? item.t :
+																			dataFields[0].asc_getSubtotal());
+								oCellValue.type = AscCommon.CellValueType.Number;
+								cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
 							}
 						}
 						if (last) {

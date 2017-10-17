@@ -943,6 +943,97 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return cErrorLocal["na"];
 	};
+	cError.prototype.getErrorTypeFromString = function(val) {
+		var res;
+		switch (val) {
+			case cErrorOrigin["value"]: {
+				res = cErrorType.wrong_value_type;
+				break;
+			}
+			case cErrorOrigin["nil"]: {
+				res = cErrorType.null_value;
+				break;
+			}
+			case cErrorOrigin["div"]: {
+				res = cErrorType.division_by_zero;
+				break;
+			}
+			case cErrorOrigin["ref"]: {
+				res = cErrorType.bad_reference;
+				break;
+			}
+			case cErrorOrigin["name"]: {
+				res = cErrorType.wrong_name;
+				break;
+			}
+			case cErrorOrigin["num"]: {
+				res = cErrorType.not_numeric;
+				break;
+			}
+			case cErrorOrigin["na"]: {
+				res = cErrorType.not_available;
+				break;
+			}
+			case cErrorOrigin["getdata"]: {
+				res = cErrorType.getting_data;
+				break;
+			}
+			case cErrorOrigin["uf"]: {
+				res = cErrorType.unsupported_function;
+				break;
+			}
+			default: {
+				res = cErrorType.not_available;
+				break;
+			}
+		}
+		return res;
+	};
+	cError.prototype.getStringFromErrorType = function(type) {
+		var res;
+		switch (type) {
+			case cErrorType.wrong_value_type: {
+				res = cErrorOrigin["value"];
+				break;
+			}
+			case cErrorType.null_value: {
+				res = cErrorOrigin["nil"];
+				break;
+			}
+			case cErrorType.division_by_zero: {
+				res = cErrorOrigin["div"];
+				break;
+			}
+			case cErrorType.bad_reference: {
+				res = cErrorOrigin["ref"];
+				break;
+			}
+			case cErrorType.wrong_name: {
+				res = cErrorOrigin["name"];
+				break;
+			}
+			case cErrorType.not_numeric: {
+				res = cErrorOrigin["num"];
+				break;
+			}
+			case cErrorType.not_available: {
+				res = cErrorOrigin["na"];
+				break;
+			}
+			case cErrorType.getting_data: {
+				res = cErrorOrigin["getdata"];
+				break;
+			}
+			case cErrorType.unsupported_function: {
+				res = cErrorOrigin["uf"];
+				break;
+			}
+			default:
+				res = cErrorType.not_available;
+				break;
+		}
+		return res;
+	};
 
 	/**
 	 * @constructor
