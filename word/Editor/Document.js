@@ -1537,6 +1537,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
 
+    // Класс, управляющий закладками
+	this.BookmarksManager = new CBookmarksManager(this);
+
     // Режим рецензирования
     this.TrackRevisions = false;
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
@@ -15763,6 +15766,24 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 	this.SetContentPosition(oCurrentDocPos, 0, 0);
 
 	return arrComplexFields;
+};
+CDocument.prototype.GetBookmarksManager = function()
+{
+	return this.BookmarksManager;
+};
+CDocument.prototype.UpdateBookmarks = function()
+{
+	if (!this.BookmarksManager.IsNeedUpdate())
+		return;
+
+	this.BookmarksManager.BeginCollectingProcess();
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].UpdateBookmarks(this.BookmarksManager);
+	}
+
+	this.BookmarksManager.EndCollectingProcess();
 };
 
 function CDocumentSelectionState()

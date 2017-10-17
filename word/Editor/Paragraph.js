@@ -596,6 +596,7 @@ Paragraph.prototype.Internal_Content_Add = function(Pos, Item, bCorrectPos)
 	History.Add(new CChangesParagraphAddItem(this, Pos, [Item]));
 	this.Content.splice(Pos, 0, Item);
 	this.private_UpdateTrackRevisions();
+	this.private_CheckUpdateBookmarks([Item]);
 
 	if (this.CurPos.ContentPos >= Pos)
 	{
@@ -685,6 +686,7 @@ Paragraph.prototype.Internal_Content_Concat = function(Items)
 
 	History.Add(new CChangesParagraphAddItem(this, StartPos, Items));
 	this.private_UpdateTrackRevisions();
+	this.private_CheckUpdateBookmarks(Items);
 
 	// Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
 	for (var CurPos = StartPos; CurPos < this.Content.length; CurPos++)
@@ -707,6 +709,7 @@ Paragraph.prototype.Internal_Content_Remove = function(Pos)
 	History.Add(new CChangesParagraphRemoveItem(this, Pos, [Item]));
 	this.Content.splice(Pos, 1);
 	this.private_UpdateTrackRevisions();
+	this.private_CheckUpdateBookmarks([Item]);
 
 	if (Item.PreDelete)
 		Item.PreDelete();
@@ -821,6 +824,7 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
 	History.Add(new CChangesParagraphRemoveItem(this, Pos, DeletedItems));
 	this.private_UpdateTrackRevisions();
+	this.private_CheckUpdateBookmarks(DeletedItems);
 
 	if (this.Selection.StartPos > Pos + Count)
 		this.Selection.StartPos -= Count;
@@ -9490,6 +9494,10 @@ Paragraph.prototype.PreDelete = function()
 		{
 			this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 		}
+		else if (para_Bookmark === Item.Type)
+		{
+			this.LogicDocument.GetBookmarksManager().SetNeedUpdate(true);
+		}
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -12379,6 +12387,34 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
 	var nOutlineLvl = this.GetOutlineLvl();
 	if (undefined !== nOutlineLvl)
 		arrOutline.push({Paragraph : this, Lvl : nOutlineLvl});
+};
+Paragraph.prototype.UpdateBookmarks = function(oManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].UpdateBookmarks(oManager);
+	}
+};
+Paragraph.prototype.private_CheckUpdateBookmarks = function(Items)
+{
+	if (!Items)
+		return;
+
+	for (var nIndex = 0, nCount = Items.length; nIndex < nCount; ++nIndex)
+	{
+		if (Items[nIndex] instanceof CParagraphBookmark)
+		{
+			this.LogicDocument.GetBookmarksManager().SetNeedUpdate(true);
+			return;
+		}
+	}
+};
+Paragraph.prototype.AddBookmarkForTOC = function()
+{
+	if (!this.LogicDocument)
+		return;
+
+	var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
 };
 
 var pararecalc_0_All  = 0;

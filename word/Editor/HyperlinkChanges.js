@@ -103,6 +103,7 @@ CChangesHyperlinkAddItem.prototype.Undo = function()
 	var oHyperlink = this.Class;
 	oHyperlink.Content.splice(this.Pos, this.Items.length);
 	oHyperlink.private_UpdateTrackRevisions();
+	oHyperlink.private_CheckUpdateBookmarks(this.Items);
 	oHyperlink.protected_UpdateSpellChecking();
 };
 CChangesHyperlinkAddItem.prototype.Redo = function()
@@ -113,6 +114,7 @@ CChangesHyperlinkAddItem.prototype.Redo = function()
 
 	oHyperlink.Content = Array_start.concat(this.Items, Array_end);
 	oHyperlink.private_UpdateTrackRevisions();
+	oHyperlink.private_CheckUpdateBookmarks(this.Items);
 	oHyperlink.protected_UpdateSpellChecking();
 };
 CChangesHyperlinkAddItem.prototype.private_WriteItem = function(Writer, Item)
@@ -171,6 +173,7 @@ CChangesHyperlinkRemoveItem.prototype.Undo = function()
 
 	oHyperlink.Content = Array_start.concat(this.Items, Array_end);
 	oHyperlink.private_UpdateTrackRevisions();
+	oHyperlink.private_CheckUpdateBookmarks(this.Items);
 	oHyperlink.protected_UpdateSpellChecking();
 };
 CChangesHyperlinkRemoveItem.prototype.Redo = function()
@@ -178,6 +181,7 @@ CChangesHyperlinkRemoveItem.prototype.Redo = function()
 	var oHyperlink  = this.Class;
 	oHyperlink.Content.splice(this.Pos, this.Items.length);
 	oHyperlink.private_UpdateTrackRevisions();
+	oHyperlink.private_CheckUpdateBookmarks(this.Items);
 	oHyperlink.protected_UpdateSpellChecking();
 };
 CChangesHyperlinkRemoveItem.prototype.private_WriteItem = function(Writer, Item)

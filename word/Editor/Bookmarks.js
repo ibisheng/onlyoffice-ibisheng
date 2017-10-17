@@ -47,8 +47,10 @@ function CParagraphBookmark(isStart, sBookmarkId)
 	CParagraphContentBase.call(this);
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
+	this.Type       = para_Bookmark;
 	this.Start      = isStart ? true : false;
 	this.BookmarkId = sBookmarkId;
+	this.Use        = true;
 
 	AscCommon.g_oTableId.Add(this, this.Id);
 }
@@ -63,6 +65,22 @@ CParagraphBookmark.prototype.Get_Id = function()
 CParagraphBookmark.prototype.GetId = function()
 {
 	return this.Id;
+};
+CParagraphBookmark.prototype.GetBookmarkId = function()
+{
+	return this.BookmarkId;
+};
+CParagraphBookmark.prototype.IsUse = function()
+{
+	return this.Use;
+};
+CParagraphBookmark.prototype.SetUse = function(isUse)
+{
+	this.Use = isUse;
+};
+CParagraphBookmark.prototype.UpdateBookmarks = function(oManager)
+{
+	oManager.ProcessBookmarkChar(this);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
@@ -88,6 +106,88 @@ CParagraphBookmark.Read_FromBinary2 = function(Reader)
 	this.BookmarkId = Reader.GetString2();
 	this.Start      = Reader.GetBool();
 };
+
+
+function CBookmarksManager(oLogicDocument)
+{
+	this.LogicDocument = oLogicDocument;
+
+	// Список всех закладок
+	this.Bookmarks = [];
+
+	// Массив с временными элементами
+	this.BookmarksChars = {};
+
+	// Нужно ли обновлять список закладок
+	this.NeedUpdate = true;
+}
+CBookmarksManager.prototype.SetNeedUpdate = function(isNeed)
+{
+	this.NeedUpdate = isNeed;
+};
+CBookmarksManager.prototype.IsNeedUpdate = function()
+{
+	return this.NeedUpdate;
+};
+CBookmarksManager.prototype.BeginCollectingProcess = function()
+{
+	this.Bookmarks      = [];
+	this.BookmarksChars = {};
+};
+CBookmarksManager.prototype.ProcessBookmarkChar = function(oParaBookmark)
+{
+	if (!(oParaBookmark instanceof CParagraphBookmark))
+		return;
+
+	var sBookmarkId = oParaBookmark.GetBookmarkId();
+	if (undefined !== this.BookmarksChars[sBookmarkId])
+	{
+		if (oParaBookmark.IsStart())
+		{
+			oParaBookmark.SetUse(false);
+		}
+		else
+		{
+			this.BookmarksChars[sBookmarkId].SetUse(true);
+			oParaBookmark.SetUse(true);
+			this.Bookmarks.push([this.BookmarksChars[sBookmarkId], oParaBookmark]);
+			delete this.BookmarksChars[sBookmarkId];
+		}
+	}
+	else
+	{
+		if (!oParaBookmark.IsStart())
+			oParaBookmark.SetUse(false);
+		else
+			this.BookmarksChars[sBookmarkId] = oParaBookmark;
+	}
+};
+CBookmarksManager.prototype.EndCollectingProcess = function()
+{
+	for (var sId in this.BookmarksChars)
+	{
+		this.BookmarksChars[sId].SetUse(false);
+	}
+
+	this.BookmarksChars = {};
+
+	this.NeedUpdate = false;
+};
+CBookmarksManager.prototype.GetBookmark = function(Id)
+{
+	if (this.NeedUpdate)
+		this.LogicDocument.UpdateBookmarks();
+
+	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Bookmarks[nIndex].GetBookmarkId() === Id)
+			return this.Bookmarks[nIndex];
+	}
+
+	return null;
+};
+
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};

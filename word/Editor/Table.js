@@ -12107,6 +12107,17 @@ CTable.prototype.GetOutlineParagraphs = function(arrOutline)
 		}
 	}
 };
+CTable.prototype.UpdateBookmarks = function(oManager)
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.Content[nCurRow];
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			oRow.Get_Cell(nCurCell).Content.UpdateBookmarks(oManager);
+		}
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

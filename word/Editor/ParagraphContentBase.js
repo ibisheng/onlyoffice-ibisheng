@@ -152,6 +152,9 @@ CParagraphContentBase.prototype.Get_ParaPosByContentPos = function(ContentPos, D
 {
 	return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
+CParagraphContentBase.prototype.UpdateBookmarks = function(oManager)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -861,6 +864,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 {
     this.Content.splice(Pos, 0, Item);
     this.private_UpdateTrackRevisions();
+    this.private_CheckUpdateBookmarks([Item]);
 
     if (false !== UpdatePosition)
     {
@@ -936,8 +940,10 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
 		this.Content[nIndex].PreDelete();
 	}
 
-    this.Content.splice(Pos, Count);
+	var DeletedItems = this.Content.slice(Pos, Pos + Count);
+	this.Content.splice(Pos, Count);
     this.private_UpdateTrackRevisions();
+	this.private_CheckUpdateBookmarks(DeletedItems);
 
     if (false !== UpdatePosition)
     {
@@ -1562,6 +1568,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Correct_Content = function()
 {
     if (this.Content.length < 0)
         this.Add_ToContent(0, new ParaRun(this.Paragraph, false));
+};
+CParagraphContentWithParagraphLikeContent.prototype.UpdateBookmarks = function(oManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].UpdateBookmarks(oManager);
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
@@ -2983,6 +2996,21 @@ CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
+};
+CParagraphContentWithParagraphLikeContent.prototype.private_CheckUpdateBookmarks = function(Items)
+{
+	if (!Items)
+		return;
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (Item[nIndex] instanceof CParagraphBookmark)
+		{
+			var oLogicDocument = this.Paragraph && this.Paragraph.LogicDocument ? this.Paragraph.LogicDocument : editor.WordControl.m_oLogicDocument;
+			oLogicDocument.GetBookmarksManager().SetNeedUpdate(true);
+			return;
+		}
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_FootnotesList = function(oEngine)
 {

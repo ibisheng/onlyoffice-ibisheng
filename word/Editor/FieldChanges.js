@@ -68,6 +68,7 @@ CChangesParaFieldAddItem.prototype.Undo = function()
 	oField.Content.splice(this.Pos, this.Items.length);
 	oField.protected_UpdateSpellChecking();
 	oField.private_UpdateTrackRevisions();
+	oField.private_CheckUpdateBookmarks(this.Items);
 };
 CChangesParaFieldAddItem.prototype.Redo = function()
 {
@@ -78,6 +79,7 @@ CChangesParaFieldAddItem.prototype.Redo = function()
 
 	oField.Content = Array_start.concat(this.Items, Array_end);
 	oField.private_UpdateTrackRevisions();
+	oField.private_CheckUpdateBookmarks(this.Items);
 	oField.protected_UpdateSpellChecking();
 };
 CChangesParaFieldAddItem.prototype.private_WriteItem = function(Writer, Item)
@@ -137,6 +139,7 @@ CChangesParaFieldRemoveItem.prototype.Undo = function()
 
 	oField.Content = Array_start.concat(this.Items, Array_end);
 	oField.protected_UpdateSpellChecking();
+	oField.private_CheckUpdateBookmarks(this.Items);
 	oField.private_UpdateTrackRevisions();
 };
 CChangesParaFieldRemoveItem.prototype.Redo = function()
@@ -144,6 +147,7 @@ CChangesParaFieldRemoveItem.prototype.Redo = function()
 	var oField = this.Class;
 	oField.Content.splice(this.Pos, this.Items.length);
 	oField.private_UpdateTrackRevisions();
+	oField.private_CheckUpdateBookmarks(this.Items);
 	oField.protected_UpdateSpellChecking();
 };
 CChangesParaFieldRemoveItem.prototype.private_WriteItem = function(Writer, Item)

@@ -319,6 +319,7 @@ CChangesParagraphAddItem.prototype.Undo = function()
 	var oParagraph = this.Class;
 	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphAddItem.prototype.Redo = function()
@@ -329,6 +330,7 @@ CChangesParagraphAddItem.prototype.Redo = function()
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
@@ -418,6 +420,7 @@ CChangesParagraphRemoveItem.prototype.Undo = function()
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
@@ -434,6 +437,7 @@ CChangesParagraphRemoveItem.prototype.Redo = function()
 	var oParagraph  = this.Class;
 	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphRemoveItem.prototype.private_WriteItem = function(Writer, Item)

@@ -161,6 +161,7 @@ function CComplexField(oLogicDocument)
 	this.EndChar       = null;
 	this.SeparateChar  = null;
 	this.Instruction   = null;
+	this.Id            = null;
 }
 CComplexField.prototype.SetInstruction = function(oParaInstr)
 {

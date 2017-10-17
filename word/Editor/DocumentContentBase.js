@@ -893,3 +893,14 @@ CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline)
 
 	return arrOutline;
 };
+/**
+ * Обновляем список закладок
+ * @param oManager
+ */
+CDocumentContentBase.prototype.UpdateBookmarks = function(oManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].UpdateBookmarks(oManager);
+	}
+};

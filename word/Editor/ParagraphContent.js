@@ -108,6 +108,7 @@ var para_PageCount                 = 0x0043; // Количество стран�
 var para_InlineLevelSdt            = 0x0044; // Внутристроковый контейнер
 var para_FieldChar                 = 0x0045;
 var para_InstrText                 = 0x0046;
+var para_Bookmark                  = 0x0047;
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
