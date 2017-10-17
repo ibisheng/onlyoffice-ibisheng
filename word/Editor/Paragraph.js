@@ -12402,7 +12402,7 @@ Paragraph.prototype.private_CheckUpdateBookmarks = function(Items)
 
 	for (var nIndex = 0, nCount = Items.length; nIndex < nCount; ++nIndex)
 	{
-		if (Items[nIndex] instanceof CParagraphBookmark)
+		if (para_Bookmark === Items[nIndex].Type)
 		{
 			this.LogicDocument.GetBookmarksManager().SetNeedUpdate(true);
 			return;
