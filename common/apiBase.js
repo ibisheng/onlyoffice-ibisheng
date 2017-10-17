@@ -1251,11 +1251,7 @@
 		if (!this.pluginsManager)
 			return;
 
-		var _pluginData = new Asc.CPluginData();
-		_pluginData.setAttribute("type", "enableMouseEvent");
-		_pluginData.setAttribute("isEnabled", isEnable);
-
-		this.pluginsManager.sendMessage(_pluginData);
+		this.pluginsManager.onEnableMouseEvents(isEnable);
 	};
 
     baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
