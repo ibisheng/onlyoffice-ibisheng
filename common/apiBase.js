@@ -1568,7 +1568,7 @@
 			return 0;
 
 		// если плагин работает - то и мы тоже
-		if (this.pluginsManager && this.pluginsManager.current != null)
+		if (this.pluginsManager && this.pluginsManager.isWorked())
 			return 0;
 
 		if (this.isEmbedVersion)

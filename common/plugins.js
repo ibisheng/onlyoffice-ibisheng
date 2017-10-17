@@ -201,6 +201,17 @@
 			}
 			return null;
 		},
+		isWorked : function()
+		{
+			for (var i in this.runnedPluginsMap)
+			{
+				if (this.pluginsMap[i] && !this.pluginsMap[i].isSystem)
+				{
+					return true;
+				}
+			}
+			return false;
+		},
 		run : function(guid, variation, data, isNoUse_isNoSystemPluginsOnlyOne)
 		{
 			if (this.runAndCloseData) // run only on close!!!
