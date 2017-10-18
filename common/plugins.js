@@ -227,7 +227,7 @@
 			var isSystem = this.pluginsMap[guid].isSystem;
 			var isRunned = (this.runnedPluginsMap[guid] !== undefined) ? true : false;
 
-			if (isRunned)
+			if (isRunned && ((variation == null) || variation == this.runnedPluginsMap[guid].currentVariation))
 			{
 				// запуск запущенного => закрытие
 				this.close(guid);
