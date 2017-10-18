@@ -209,6 +209,45 @@ window["UpdateInstallPlugins"] = function()
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
+window["UpdateSystemPlugins"] = function()
+{
+	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	_plugins["url"] = _plugins["url"].replace(" ", "%20");
+
+	var _len = _plugins["pluginsData"].length;
+	for (var i = 0; i < _len; i++)
+		_plugins["pluginsData"][i]["baseUrl"] = _plugins["url"] + _plugins["pluginsData"][i]["guid"].substring(4) + "/";
+
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	var _array = [];
+	for (var i = 0; i < _len; i++)
+	{
+		var _plugin = _plugins["pluginsData"][i];
+		for (var j = 0; j < _plugin["variations"].length; j++)
+		{
+			var _variation = _plugin["variations"][j];
+			if (_variation["initDataType"] == "desktop")
+			{
+				_array.push(_plugin);
+				break;
+			}
+		}
+	}
+
+	var _arraySystem = [];
+	for (var i = 0; i < _array.length; i++)
+	{
+		var plugin = new Asc.CPlugin();
+		plugin.deserialize(_array[i]);
+
+		_arraySystem.push(plugin);
+	}
+
+	window.g_asc_plugins.registerSystem("", _arraySystem);
+	window.g_asc_plugins.runAllSystem();
+};
+
 AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {
@@ -232,9 +271,16 @@ AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	}
 }
 
-window["asc_initAdvancedOptions"] = function(_code)
+window["asc_initAdvancedOptions"] = function(_code, _file_hash)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+	{
+		window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "getPasswordByFile", "hash" : _file_hash });
+		return;
+	}
+
 	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
 };
 
@@ -425,6 +471,33 @@ function getBinaryArray(_data, _len)
 
 	return _array;
 }
+
+// OnlyPass ----------------------------------
+Asc['asc_docs_api'].prototype["pluginMethod_OnlyPass"] = function(obj)
+{
+	switch (obj.type)
+	{
+		case "generatePassword":
+		{
+			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
+			break;
+		}
+		case "getPasswordByFile":
+		{
+			if ("" != obj["password"])
+			{
+				var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
+				window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+			}
+			else
+			{
+				this._onNeedParams(undefined, true);
+			}
+			break;
+		}
+	}
+};
+// -------------------------------------------
 
 // меняем среду
 //AscBrowser.isSafari = false;
