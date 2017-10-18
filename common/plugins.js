@@ -726,8 +726,7 @@
 										pluginData.setAttribute("guid", guid);
 										pluginData.setAttribute("type", "onCommandCallback");
 
-										var runObj = window.g_asc_plugins.runnedPluginsMap[guid];
-										var _iframe = document.getElementById(runObj.frameId);
+										var _iframe = document.getElementById(runObject.frameId);
 										if (_iframe)
 											_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 									});
@@ -753,8 +752,7 @@
 										pluginData.setAttribute("guid", guid);
 										pluginData.setAttribute("type", "onCommandCallback");
 
-										var runObj = window.g_asc_plugins.runnedPluginsMap[guid];
-										var _iframe = document.getElementById(runObj.frameId);
+										var _iframe = document.getElementById(runObject.frameId);
 										if (_iframe)
 											_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 									});
