@@ -201,6 +201,17 @@
 			}
 			return null;
 		},
+		isWorked : function()
+		{
+			for (var i in this.runnedPluginsMap)
+			{
+				if (this.pluginsMap[i] && !this.pluginsMap[i].isSystem)
+				{
+					return true;
+				}
+			}
+			return false;
+		},
 		run : function(guid, variation, data, isNoUse_isNoSystemPluginsOnlyOne)
 		{
 			if (this.runAndCloseData) // run only on close!!!
@@ -216,7 +227,7 @@
 			var isSystem = this.pluginsMap[guid].isSystem;
 			var isRunned = (this.runnedPluginsMap[guid] !== undefined) ? true : false;
 
-			if (isRunned)
+			if (isRunned && ((variation == null) || variation == this.runnedPluginsMap[guid].currentVariation))
 			{
 				// запуск запущенного => закрытие
 				this.close(guid);
@@ -715,8 +726,7 @@
 										pluginData.setAttribute("guid", guid);
 										pluginData.setAttribute("type", "onCommandCallback");
 
-										var runObj = window.g_asc_plugins.runnedPluginsMap[guid];
-										var _iframe = document.getElementById(runObj.frameId);
+										var _iframe = document.getElementById(runObject.frameId);
 										if (_iframe)
 											_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 									});
@@ -742,8 +752,7 @@
 										pluginData.setAttribute("guid", guid);
 										pluginData.setAttribute("type", "onCommandCallback");
 
-										var runObj = window.g_asc_plugins.runnedPluginsMap[guid];
-										var _iframe = document.getElementById(runObj.frameId);
+										var _iframe = document.getElementById(runObject.frameId);
 										if (_iframe)
 											_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 									});
