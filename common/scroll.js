@@ -1621,7 +1621,7 @@ function ScrollObject( elemID, settings, dbg ) {
     this.startColorFadeOutStart = _HEXTORGB_(this.settings.scrollerColorOver).R;
     this.startColorFadeInOutStart = -1;
 
-    this.IsRetina = AscCommon.AscBrowser.isRetina;
+    this.IsRetina = AscBrowser.isRetina;
 
     this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
     this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
@@ -1790,8 +1790,8 @@ ScrollObject.prototype = {
         }
 
         // return relative mouse position
-        var mouseX = ((evt.clientX * AscCommon.AscBrowser.zoom) >> 0) - left + window.pageXOffset;
-        var mouseY = ((evt.clientY * AscCommon.AscBrowser.zoom) >> 0) - top + window.pageYOffset;
+        var mouseX = ((evt.clientX * AscBrowser.zoom) >> 0) - left + window.pageXOffset;
+        var mouseY = ((evt.clientY * AscBrowser.zoom) >> 0) - top + window.pageYOffset;
 
         return {
             x:mouseX,
@@ -1852,9 +1852,9 @@ ScrollObject.prototype = {
     },
     Repos:function ( settings, bIsHorAttack, bIsVerAttack )
     {
-		if (this.IsRetina != AscCommon.AscBrowser.isRetina)
+		if (this.IsRetina != AscBrowser.isRetina)
         {
-            this.IsRetina = AscCommon.AscBrowser.isRetina;
+            this.IsRetina = AscBrowser.isRetina;
             this.ArrowDrawer.InitSize(this.settings.arrowSizeH, this.settings.arrowSizeW, this.IsRetina);
         }
 
