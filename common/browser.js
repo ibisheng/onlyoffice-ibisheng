@@ -209,5 +209,5 @@ AscBrowser.convertToRetinaValue = function(value, isScale)
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
-    window['AscCommon'].AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
+    window['AscCommon'].AscBrowser = AscBrowser;
 })(window);
