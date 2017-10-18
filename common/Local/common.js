@@ -473,7 +473,8 @@ function getBinaryArray(_data, _len)
 }
 
 // OnlyPass ----------------------------------
-Asc['asc_docs_api'].prototype["pluginMethod_OnlyPass"] = function(obj)
+var _proto = Asc['asc_docs_api'] ? Asc['asc_docs_api'] : Asc['spreadsheet_api'];
+_proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 {
 	switch (obj.type)
 	{
