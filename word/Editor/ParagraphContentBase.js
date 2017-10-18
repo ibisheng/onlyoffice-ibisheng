@@ -3004,7 +3004,7 @@ CParagraphContentWithParagraphLikeContent.prototype.private_CheckUpdateBookmarks
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		if (Item[nIndex] instanceof CParagraphBookmark)
+		if (para_Bookmark === Items[nIndex].Type)
 		{
 			var oLogicDocument = this.Paragraph && this.Paragraph.LogicDocument ? this.Paragraph.LogicDocument : editor.WordControl.m_oLogicDocument;
 			oLogicDocument.GetBookmarksManager().SetNeedUpdate(true);
