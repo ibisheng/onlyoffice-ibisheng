@@ -122,31 +122,31 @@ function CArrowDrawer( settings ) {
     this.ColorGradStart = [];
     this.ColorGradEnd = [];
 
-    this.ColorGradStart[ScrollOverType.NONE] = HEXTORGB( settings && settings.arrowColor ? settings.arrowColor : "#888888" );
-    this.ColorGradEnd[ScrollOverType.NONE] = HEXTORGB( settings && settings.arrowColor ? settings.arrowColor : "#888888" );
+    this.ColorGradStart[ScrollOverType.NONE] = HEXTORGB( settings.arrowColor );
+    this.ColorGradEnd[ScrollOverType.NONE] = HEXTORGB( settings.arrowColor );
 
-    this.ColorGradStart[ScrollOverType.STABLE] = HEXTORGB( settings && settings.arrowStableColor ? settings.arrowStableColor : "#888888" );
-    this.ColorGradEnd[ScrollOverType.STABLE] = HEXTORGB( settings && settings.arrowStableColor ? settings.arrowStableColor : "#888888" );
+    this.ColorGradStart[ScrollOverType.STABLE] = HEXTORGB( settings.arrowStableColor );
+    this.ColorGradEnd[ScrollOverType.STABLE] = HEXTORGB( settings.arrowStableColor );
 
-    this.ColorGradStart[ScrollOverType.OVER] = HEXTORGB( settings && settings.arrowOverColor ? settings.arrowOverColor : "#f1f1f1" );
-    this.ColorGradEnd[ScrollOverType.OVER] = HEXTORGB( settings && settings.arrowOverColor ? settings.arrowOverColor : "#f1f1f1" );
+    this.ColorGradStart[ScrollOverType.OVER] = HEXTORGB( settings.arrowOverColor );
+    this.ColorGradEnd[ScrollOverType.OVER] = HEXTORGB( settings.arrowOverColor );
 
-    this.ColorGradStart[ScrollOverType.ACTIVE] = HEXTORGB( settings && settings.arrowActiveColor ? settings.arrowActiveColor : "#f1f1f1" );
-    this.ColorGradEnd[ScrollOverType.ACTIVE] = HEXTORGB( settings && settings.arrowActiveColor ? settings.arrowActiveColor : "#f1f1f1" );
+    this.ColorGradStart[ScrollOverType.ACTIVE] = HEXTORGB( settings.arrowActiveColor );
+    this.ColorGradEnd[ScrollOverType.ACTIVE] = HEXTORGB( settings.arrowActiveColor );
 
-    this.ColorBorderNone = settings && settings.arrowBorderColor ? settings.arrowBorderColor : "#cfcfcf";
-    this.ColorBorderStable = settings && settings.arrowStableBorderColor ? settings.arrowStableBorderColor : "#cfcfcf";
-    this.ColorBorderOver = settings && settings.arrowOverBorderColor ? settings.arrowOverBorderColor : "#cfcfcf";
-    this.ColorBorderActive = settings && settings.arrowActiveBorderColor ? settings.arrowActiveBorderColor : "#848484";
+    this.ColorBorderNone = settings.arrowBorderColor;
+    this.ColorBorderStable = settings.arrowStableBorderColor;
+    this.ColorBorderOver = settings.arrowOverBorderColor;
+    this.ColorBorderActive = settings.arrowActiveBorderColor;
 
-    this.ColorBackNone = settings && settings.arrowBackgroundColor ? settings.arrowBackgroundColor : "#F1F1F1";
-    this.ColorBackStable = settings && settings.arrowStableBackgroundColor ? settings.arrowStableBackgroundColor : "#F1F1F1";
-    this.ColorBackOver = settings && settings.arrowOverBackgroundColor ? settings.arrowOverBackgroundColor : "#cfcfcf";
-    this.ColorBackActive = settings && settings.arrowActiveBackgroundColor ? settings.arrowActiveBackgroundColor : "#848484";
+    this.ColorBackNone = settings.arrowBackgroundColor;
+    this.ColorBackStable = settings.arrowStableBackgroundColor;
+    this.ColorBackOver = settings.arrowOverBackgroundColor;
+    this.ColorBackActive = settings.arrowActiveBackgroundColor;
 
     // вот такие мега настройки для кастомизации)
     this.IsDrawBorderInNoneMode = false;
-    this.IsDrawBorders = true
+    this.IsDrawBorders = true;
 
     // имя - направление стрелки
     this.ImageLeft = null;
@@ -154,7 +154,7 @@ function CArrowDrawer( settings ) {
     this.ImageRight = null;
     this.ImageBottom = null;
 
-    this.IsNeedInvertOnActive = settings && settings.isNeedInvertOnActive ? settings.isNeedInvertOnActive : false;
+    this.IsNeedInvertOnActive = settings.isNeedInvertOnActive;
 
     this.lastArrowStatus1 = -1;
     this.lastArrowStatus2 = -1;
@@ -176,7 +176,7 @@ function CArrowDrawer( settings ) {
     this.fadeInActive2 = false;
     this.fadeOutActive2 = false;
 
-    this.fadeInFadeOutDelay = settings.fadeInFadeOutDelay ? settings.fadeInFadeOutDelay : 30;
+    this.fadeInFadeOutDelay = settings.fadeInFadeOutDelay || 30;
 
 }
 CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
@@ -1481,10 +1481,13 @@ function _HEXTORGB_( colorHEX ) {
 	/**
 	 * @constructor
 	 */
-	function scrollSettings() {
-		this.showArrows = false;
+	function ScrollSettings() {
+		this.showArrows = true;
 		this.screenW = -1;
 		this.screenH = -1;
+		this.screenAddH = 0;
+		this.contentH = undefined;
+		this.contentW = undefined;
 		this.scrollerMinHeight = 34;
 		this.scrollerMaxHeight = 99999;
 		this.scrollerMinWidth = 34;
@@ -1528,6 +1531,7 @@ function _HEXTORGB_( colorHEX ) {
 		this.cornerRadius = 0;
 		this.slimScroll = false;
 		this.alwaysVisible = false;
+		this.isNeedInvertOnActive = false;
 	}
 
 /**
@@ -1538,78 +1542,7 @@ function ScrollObject( elemID, settings, dbg ) {
         debug = dbg;
     this.that = this;
 
-    var extendSettings = function ( settings1, settings2 ) {
-        var _st = {};
-        if ( settings1 == null || settings1 == undefined )
-            return settings2;
-        else for ( var _item in settings1 ) {
-            if ( typeof settings1[_item] === "object" )
-                _st[_item] = extendSettings( _st, settings1[_item] );
-            else
-                _st[_item] = settings1[_item];
-        }
-        for ( var _item in settings2 ) {
-            if ( !_st.hasOwnProperty( _item ) ) {
-                if ( typeof settings2[_item] === "object" )
-                    _st[_item] = extendSettings( _st, settings2[_item] );
-                else
-                    _st[_item] = settings2[_item];
-            }
-        }
-        return _st;
-    };
-
-    var scrollSettings = {
-        showArrows:false,
-        screenW:-1,
-        screenH:-1,
-        scrollerMinHeight:34,
-        scrollerMaxHeight:99999,
-        scrollerMinWidth:34,
-        scrollerMaxWidth:99999,
-        initialDelay:300,
-        arrowRepeatFreq:50,
-        trackClickRepeatFreq:70,
-        scrollPagePercent:1. / 8,
-        arrowDim:13,
-        marginScroller:4,
-        scrollerColor:"#f1f1f1",
-        scrollerColorOver:"#cfcfcf",
-        scrollerColorLayerOver:"#cfcfcf",
-        scrollerColorActive:"#ADADAD",
-        scrollBackgroundColor:"#f4f4f4",
-        scrollBackgroundColorHover:"#f4f4f4",
-        scrollBackgroundColorActive:"#f4f4f4",
-        strokeStyleNone:"#cfcfcf",
-        strokeStyleOver:"#cfcfcf",
-        strokeStyleActive:"#ADADAD",
-        vscrollStep:10,
-        hscrollStep:10,
-        wheelScrollLines:1,
-        arrowColor:"#ADADAD",
-        arrowBorderColor:"#cfcfcf",
-        arrowBackgroundColor:"#F1F1F1",
-        arrowStableColor:"#ADADAD",
-        arrowStableBorderColor:"#cfcfcf",
-        arrowStableBackgroundColor:"#F1F1F1",
-        arrowOverColor:"#f1f1f1",
-        arrowOverBorderColor:"#cfcfcf",
-        arrowOverBackgroundColor:"#cfcfcf",
-        arrowActiveColor:"#f1f1f1",
-        arrowActiveBorderColor:"#ADADAD",
-        arrowActiveBackgroundColor:"#ADADAD",
-        fadeInFadeOutDelay:20,
-        piperColor:"#cfcfcf",
-        piperColorHover:"#f1f1f1",
-        arrowSizeW: 13,
-        arrowSizeH: 13,
-        cornerRadius: 0,
-        slimScroll: false,
-        alwaysVisible: false
-    };
-
-    this.settings = extendSettings( settings, scrollSettings );
-
+    this.settings = settings;
     this.ArrowDrawer = new CArrowDrawer( this.settings );
 
     this.mouseUp = false;
@@ -1808,15 +1741,15 @@ ScrollObject.prototype = {
         this.canvas.ontouchstart = function ( e ) {
             _that.evt_mousedown( e.touches[0] );
             return false;
-        }
+        };
         this.canvas.ontouchmove = function ( e ) {
             _that.evt_mousemove( e.touches[0] );
             return false;
-        }
+        };
         this.canvas.ontouchend = function ( e ) {
             _that.evt_mouseup( e.changedTouches[0] );
             return false;
-        }
+        };
 
         if ( this.canvas.addEventListener ){
             this.canvas.addEventListener( 'DOMMouseScroll', this.evt_mousewheel, false );
@@ -1891,7 +1824,7 @@ ScrollObject.prototype = {
             this.scroller.w = Math.ceil( 1 / percentInViewH * this.horizontalTrackWidth );
 
             if ( this.scroller.w < this.settings.scrollerMinWidth )
-                this.scroller.w = this.settings.scrollerMinWidth
+                this.scroller.w = this.settings.scrollerMinWidth;
             else if ( this.scroller.w > this.settings.scrollerMaxWidth )
                 this.scroller.w = this.settings.scrollerMaxWidth;
             this.scrollCoeff = this.maxScrollX / Math.max( 1, this.paneWidth - this.scroller.w );
@@ -1913,7 +1846,7 @@ ScrollObject.prototype = {
         if (bIsVerAttack)
         {
             var _canvasH = settings.screenH;
-            if (undefined !== _canvasH && undefined !== settings.screenAddH)
+            if (undefined !== _canvasH && settings.screenAddH)
                 _canvasH += settings.screenAddH;
 
             if (_canvasH == this.canvasH && undefined !== settings.contentH)
@@ -2301,7 +2234,7 @@ ScrollObject.prototype = {
                     }
                 }
 
-                ctx_piperImg.putImageData( _data, 0, 0 )
+                ctx_piperImg.putImageData( _data, 0, 0 );
 
                 img = that.piperImgHor[0];
             }
@@ -2528,11 +2461,11 @@ ScrollObject.prototype = {
             that.context.beginPath();
 
             if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
-                var _y = that.scroller.y >> 0, arrow = that.settings.showArrows ? that.arrowPosition : 0
+                var _y = that.scroller.y >> 0, arrow = that.settings.showArrows ? that.arrowPosition : 0;
                 if ( _y < arrow ) {
                     _y = arrow;
                 }
-                var _b = Math.round(that.scroller.y + that.scroller.h)// >> 0;
+                var _b = Math.round(that.scroller.y + that.scroller.h);// >> 0;
                 if ( _b > (that.canvasH - arrow - 1) ) {
                     _b = that.canvasH - arrow - 1;
                 }
@@ -2542,7 +2475,7 @@ ScrollObject.prototype = {
                 }
             }
             else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
-                var _x = that.scroller.x >> 0, arrow = that.settings.showArrows ? that.arrowPosition : 0
+                var _x = that.scroller.x >> 0, arrow = that.settings.showArrows ? that.arrowPosition : 0;
                 if ( _x < arrow ) {
                     _x = arrow;
                 }
@@ -3435,6 +3368,6 @@ ScrollObject.prototype = {
 };
 
     //---------------------------------------------------------export---------------------------------------------------
-	window["AscCommon"].scrollSettings = scrollSettings;
+	window["AscCommon"].ScrollSettings = ScrollSettings;
     window["AscCommon"].ScrollObject = ScrollObject;
 })(window);

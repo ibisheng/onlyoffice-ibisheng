@@ -2747,23 +2747,15 @@ function CEditorPage(api)
 		}
 	};
 
-	this.UpdateScrolls = function()
+	this.CreateScrollSettings = function()
 	{
-		if (window["NATIVE_EDITOR_ENJINE"])
-			return;
-
-		var settings = {
-			showArrows    : true,
-			animateScroll : false,
-			screenW       : this.m_oEditor.HtmlElement.width,
-			screenH       : this.m_oEditor.HtmlElement.height,
-			screenAddW    : 0,
-			screenAddH    : 0,
-			vsscrollStep  : 45,
-			hsscrollStep  : 45,
-			contentH      : this.m_dDocumentHeight,
-			contentW      : this.m_dDocumentWidth
-		};
+		var settings = new AscCommon.ScrollSettings();
+		settings.screenW = this.m_oEditor.HtmlElement.width;
+		settings.screenH = this.m_oEditor.HtmlElement.height;
+		settings.vscrollStep = 45;
+		settings.hscrollStep = 45;
+		settings.contentH = this.m_dDocumentHeight;
+		settings.contentW = this.m_dDocumentWidth;
 
 		if (this.m_bIsRuler)
 		{
@@ -2774,13 +2766,21 @@ function CEditorPage(api)
 		{
 			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
 			settings.screenH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenH);
-
 			settings.screenAddH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenAddH);
 		}
+		return settings;
+	};
 
+	this.UpdateScrolls = function()
+	{
+		var settings;
+		if (window["NATIVE_EDITOR_ENJINE"])
+			return;
+
+		settings = this.CreateScrollSettings();
+		settings.alwaysVisible = true;
 		if (this.m_bIsHorScrollVisible)
 		{
-			settings.alwaysVisible = true;
 			if (this.m_oScrollHor_)
 				this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
 			else
@@ -2803,9 +2803,9 @@ function CEditorPage(api)
 
 				this.m_oScrollHorApi = this.m_oScrollHor_;
 			}
-			settings.alwaysVisible = undefined;
 		}
 
+		settings = this.CreateScrollSettings();
 		if (this.m_oScrollVer_)
 		{
 			this.m_oScrollVer_.Repos(settings, undefined, true);//unbind("scrollvertical")
@@ -2813,9 +2813,7 @@ function CEditorPage(api)
 		else
 		{
 
-			this.m_oScrollVer_ = new AscCommon.ScrollObject("id_vertical_scroll",
-				settings
-			);
+			this.m_oScrollVer_ = new AscCommon.ScrollObject("id_vertical_scroll", settings);
 
 			this.m_oScrollVer_.onLockMouse  = function(evt)
 			{
