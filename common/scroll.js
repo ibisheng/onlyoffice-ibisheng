@@ -1478,6 +1478,58 @@ function _HEXTORGB_( colorHEX ) {
     }
 }
 
+	/**
+	 * @constructor
+	 */
+	function scrollSettings() {
+		this.showArrows = false;
+		this.screenW = -1;
+		this.screenH = -1;
+		this.scrollerMinHeight = 34;
+		this.scrollerMaxHeight = 99999;
+		this.scrollerMinWidth = 34;
+		this.scrollerMaxWidth = 99999;
+		this.initialDelay = 300;
+		this.arrowRepeatFreq = 50;
+		this.trackClickRepeatFreq = 70;
+		this.scrollPagePercent = 1. / 8;
+		this.arrowDim = 13;
+		this.marginScroller = 4;
+		this.scrollerColor = "#f1f1f1";
+		this.scrollerColorOver = "#cfcfcf";
+		this.scrollerColorLayerOver = "#cfcfcf";
+		this.scrollerColorActive = "#ADADAD";
+		this.scrollBackgroundColor = "#f4f4f4";
+		this.scrollBackgroundColorHover = "#f4f4f4";
+		this.scrollBackgroundColorActive = "#f4f4f4";
+		this.strokeStyleNone = "#cfcfcf";
+		this.strokeStyleOver = "#cfcfcf";
+		this.strokeStyleActive = "#ADADAD";
+		this.vscrollStep = 10;
+		this.hscrollStep = 10;
+		this.wheelScrollLines = 1;
+		this.arrowColor = "#ADADAD";
+		this.arrowBorderColor = "#cfcfcf";
+		this.arrowBackgroundColor = "#F1F1F1";
+		this.arrowStableColor = "#ADADAD";
+		this.arrowStableBorderColor = "#cfcfcf";
+		this.arrowStableBackgroundColor = "#F1F1F1";
+		this.arrowOverColor = "#f1f1f1";
+		this.arrowOverBorderColor = "#cfcfcf";
+		this.arrowOverBackgroundColor = "#cfcfcf";
+		this.arrowActiveColor = "#f1f1f1";
+		this.arrowActiveBorderColor = "#ADADAD";
+		this.arrowActiveBackgroundColor = "#ADADAD";
+		this.fadeInFadeOutDelay = 20;
+		this.piperColor = "#cfcfcf";
+		this.piperColorHover = "#f1f1f1";
+		this.arrowSizeW = 13;
+		this.arrowSizeH = 13;
+		this.cornerRadius = 0;
+		this.slimScroll = false;
+		this.alwaysVisible = false;
+	}
+
 /**
  * @constructor
  */
@@ -3383,5 +3435,6 @@ ScrollObject.prototype = {
 };
 
     //---------------------------------------------------------export---------------------------------------------------
+	window["AscCommon"].scrollSettings = scrollSettings;
     window["AscCommon"].ScrollObject = ScrollObject;
 })(window);
