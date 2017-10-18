@@ -38,8 +38,7 @@
 */
 function (window, undefined) {
 
-    window['AscCommon'] = window['AscCommon'] || {};
-    var AscCommon = window['AscCommon'];
+    var AscBrowser = window['AscCommon'].AscBrowser;
 
 var debug = false;
 
