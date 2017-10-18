@@ -1485,7 +1485,6 @@ function _HEXTORGB_( colorHEX ) {
 function ScrollObject( elemID, settings, dbg ) {
     if ( dbg )
         debug = dbg;
-    var that = this;
     this.that = this;
 
     var extendSettings = function ( settings1, settings2 ) {
