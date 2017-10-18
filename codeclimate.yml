@@ -1,0 +1,17 @@
+engines:
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - javascript:
+exclude_paths:
+- build/
+- cell/document
+- cell/documentation
+- cell/.unit-tests
+- side/
+- word/
