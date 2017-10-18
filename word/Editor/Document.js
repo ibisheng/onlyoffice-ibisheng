@@ -5515,6 +5515,8 @@ CDocument.prototype.SelectAll = function()
 
 	// Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
 	this.Document_UpdateCopyCutState();
+
+	this.private_UpdateCursorXY(true, true);
 };
 CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
 {

@@ -150,6 +150,13 @@
 				this.pluginsMap[guid] = { isSystem : true };
 			}
 		},
+		runAllSystem : function()
+		{
+			for (var i = 0; i < this.systemPlugins.length; i++)
+			{
+				this.run(this.systemPlugins[i].guid, 0, "");
+			}
+		},
 		// pointer events methods -------------------
 		enablePointerEvents : function()
 		{
@@ -211,6 +218,10 @@
 				}
 			}
 			return false;
+		},
+		isRunned : function(guid)
+		{
+			return (undefined !== this.runnedPluginsMap[guid]);
 		},
 		run : function(guid, variation, data, isNoUse_isNoSystemPluginsOnlyOne)
 		{
@@ -422,7 +433,7 @@
 			}
 		},
 
-		init : function(guid)
+		init : function(guid, raw_data)
 		{
 			var plugin = this.getPluginByGuid(guid);
 			var runObject = this.runnedPluginsMap[guid];
@@ -430,45 +441,52 @@
 			if (!plugin || !runObject || !runObject.startData)
 				return;
 
-			switch (plugin.variations[runObject.currentVariation].initDataType)
+			if (undefined === raw_data)
 			{
-				case Asc.EPluginDataType.text:
+				switch (plugin.variations[runObject.currentVariation].initDataType)
 				{
-					var text_data = {
-						data     : "",
-						pushData : function(format, value)
-						{
-							this.data = value;
-						}
-					};
+					case Asc.EPluginDataType.text:
+					{
+						var text_data = {
+							data:     "",
+							pushData: function (format, value)
+									  {
+										  this.data = value;
+									  }
+						};
 
-					this.api.asc_CheckCopy(text_data, 1);
-					if (text_data.data == null)
-					    text_data.data = "";
-					runObject.startData.setAttribute("data", text_data.data);
-					break;
-				}
-				case Asc.EPluginDataType.html:
-				{
-					var text_data = {
-						data     : "",
-						pushData : function(format, value)
-						{
-							this.data = value;
-						}
-					};
+						this.api.asc_CheckCopy(text_data, 1);
+						if (text_data.data == null)
+							text_data.data = "";
+						runObject.startData.setAttribute("data", text_data.data);
+						break;
+					}
+					case Asc.EPluginDataType.html:
+					{
+						var text_data = {
+							data:     "",
+							pushData: function (format, value)
+									  {
+										  this.data = value;
+									  }
+						};
 
-					this.api.asc_CheckCopy(text_data, 2);
-					if (text_data.data == null)
-                        text_data.data = "";
-					runObject.startData.setAttribute("data", text_data.data);
-					break;
+						this.api.asc_CheckCopy(text_data, 2);
+						if (text_data.data == null)
+							text_data.data = "";
+						runObject.startData.setAttribute("data", text_data.data);
+						break;
+					}
+					case Asc.EPluginDataType.ole:
+					{
+						// теперь выше задается
+						break;
+					}
 				}
-				case Asc.EPluginDataType.ole:
-				{
-					// теперь выше задается
-					break;
-				}
+			}
+			else
+			{
+				runObject.startData.setAttribute("data", raw_data);
 			}
 
 			var _iframe = document.getElementById(runObject.frameId);
@@ -864,6 +882,9 @@
 			}, 10);
 
 		});
+
+		if (window["AscDesktopEditor"] && window["UpdateSystemPlugins"])
+			window["UpdateSystemPlugins"]();
 
 		return window.g_asc_plugins;
 	};
