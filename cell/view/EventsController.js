@@ -52,12 +52,8 @@
 		 * @memberOf Asc
 		 */
 		function asc_CEventsController() {
-			if ( !(this instanceof asc_CEventsController) ) {
-				return new asc_CEventsController();
-			}
-
 			//----- declaration -----
-			this.defaults = {
+			this.settings = {
 				vscrollStep: 10,
 				hscrollStep: 10,
 				scrollTimeout: 20,
@@ -73,7 +69,6 @@
 			this.widget   = undefined;
 			this.element  = undefined;
 			this.handlers = undefined;
-			this.settings = $.extend(true, {}, this.defaults);
 			this.vsb	= undefined;
 			this.vsbHSt	= undefined;
 			this.vsbApi	= undefined;
