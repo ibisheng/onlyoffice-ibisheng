@@ -882,11 +882,6 @@ var editor;
     this.handlers.remove(name, callback);
   };
 
-  spreadsheet_api.prototype.asc_getController = function() {
-    return this.controller;
-//				return null;
-  };
-
   spreadsheet_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(val) {
     this.wb.setDocumentPlaceChangedEnabled(val);
   };
@@ -3605,7 +3600,6 @@ var editor;
   prot["asc_registerCallback"] = prot.asc_registerCallback;
   prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
 
-  prot["asc_getController"] = prot.asc_getController;
   prot["asc_changeArtImageFromFile"] = prot.asc_changeArtImageFromFile;
 
   prot["asc_SetDocumentPlaceChangedEnabled"] = prot.asc_SetDocumentPlaceChangedEnabled;
