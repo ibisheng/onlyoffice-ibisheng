@@ -1,4 +1,8 @@
-engines:
+checks:
+  file-lines:
+    config:
+      threshold: 15000
+plugins:
   eslint:
     enabled: true
   csslint:
@@ -9,17 +13,17 @@ engines:
       languages:
         - javascript:
 exclude_paths:
-- build/
-- cell/.unit-tests/qunit
-- cell/document
-- cell/documentation
-- cell/model/FormulaObjects/Ebnf-Visualizer
-- cell/model/FormulaObjects/PegJs
-- cell/native/underscore-min.js
-- cell/native/xregexp-all-min.js
-- common/FontsFreeType/Private
-- common/externs
-- slide/themes
-- slide/document
-- word/document
-- word/Documents
+  - build/
+  - cell/.unit-tests/qunit
+  - cell/document
+  - cell/documentation
+  - cell/model/FormulaObjects/Ebnf-Visualizer
+  - cell/model/FormulaObjects/PegJs
+  - cell/native/underscore-min.js
+  - cell/native/xregexp-all-min.js
+  - common/FontsFreeType/Private
+  - common/externs
+  - slide/themes
+  - slide/document
+  - word/document
+  - word/Documents
