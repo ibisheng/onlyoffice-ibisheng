@@ -201,9 +201,28 @@ window["UpdateInstallPlugins"] = function()
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
 	_plugins["url"] = _plugins["url"].replace(" ", "%20");
 
-	var _len = _plugins["pluginsData"].length;
-	for (var i = 0; i < _len; i++)
-		_plugins["pluginsData"][i]["baseUrl"] = _plugins["url"] + _plugins["pluginsData"][i]["guid"].substring(4) + "/";
+	for (var i = 0; i < _plugins["pluginsData"].length; i++)
+	{
+		var _plugin = _plugins["pluginsData"][i];
+		_plugin["baseUrl"] = _plugins["url"] + _plugin["guid"].substring(4) + "/";
+
+		var isSystem = false;
+		for (var j = 0; j < _plugin["variations"].length; j++)
+		{
+			var _variation = _plugin["variations"][j];
+			if (_variation["initDataType"] == "desktop")
+			{
+				isSystem = true;
+				break;
+			}
+		}
+
+		if (isSystem)
+		{
+			_plugins["pluginsData"].splice(i, 1);
+			--i;
+		}
+	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
@@ -239,7 +258,7 @@ window["UpdateSystemPlugins"] = function()
 	for (var i = 0; i < _array.length; i++)
 	{
 		var plugin = new Asc.CPlugin();
-		plugin.deserialize(_array[i]);
+		plugin["deserialize"](_array[i]);
 
 		_arraySystem.push(plugin);
 	}
