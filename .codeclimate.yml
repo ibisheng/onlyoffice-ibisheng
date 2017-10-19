@@ -1,7 +1,7 @@
 checks:
   file-lines:
     config:
-      threshold: 15000
+      threshold: 5000
 plugins:
   eslint:
     enabled: true
@@ -12,6 +12,9 @@ plugins:
     config:
       languages:
         - javascript:
+ratings:
+  paths:
+    - "**.js"
 exclude_paths:
   - build/
   - cell/.unit-tests/qunit
