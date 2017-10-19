@@ -57,12 +57,8 @@
 				vscrollStep: 10,
 				hscrollStep: 10,
 				scrollTimeout: 20,
-				showArrows: true,//показывать или нет стрелки у скролла
-				//scrollBackgroundColor:"#DDDDDD",//цвет фона скролла
-				//scrollerColor:"#EDEDED",//цвет ползунка скрола
 				isViewerMode: false,
-				wheelScrollLines: 3,
-                isNeedInvertOnActive: false
+				wheelScrollLinesV: 3
 			};
 
 			this.view     = undefined;
@@ -352,7 +348,7 @@
 		};
 
 		asc_CEventsController.prototype._createScrollBars = function () {
-			var self = this, opt = this.settings;
+			var self = this, settings, opt = this.settings;
 
 			// vertical scroll bar
 			this.vsb = document.createElement('div');
@@ -362,9 +358,14 @@
 			this.vsbHSt = document.getElementById("ws-v-scroll-helper").style;
 
 			if (!this.vsbApi) {
-				this.vsbApi = new AscCommon.ScrollObject(this.vsb.id, opt);
+				settings = new AscCommon.ScrollSettings();
+				settings.vscrollStep = opt.vscrollStep;
+				settings.hscrollStep = opt.hscrollStep;
+				settings.wheelScrollLines = opt.wheelScrollLinesV;
+
+				this.vsbApi = new AscCommon.ScrollObject(this.vsb.id, settings);
 				this.vsbApi.bind("scrollvertical", function(evt) {
-					self.handlers.trigger("scrollY", evt.scrollPositionY / opt.vscrollStep);
+					self.handlers.trigger("scrollY", evt.scrollPositionY / self.settings.vscrollStep);
 				});
 				this.vsbApi.bind("scrollVEnd", function(evt) {
 					self.handlers.trigger("addRow");
@@ -385,9 +386,13 @@
 			this.hsbHSt = document.getElementById("ws-h-scroll-helper").style;
 
 			if (!this.hsbApi) {
-				this.hsbApi = new AscCommon.ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
+				settings = new AscCommon.ScrollSettings();
+				settings.vscrollStep = opt.vscrollStep;
+				settings.hscrollStep = opt.hscrollStep;
+
+				this.hsbApi = new AscCommon.ScrollObject(this.hsb.id, settings);
 				this.hsbApi.bind("scrollhorizontal",function(evt) {
-					self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
+					self.handlers.trigger("scrollX", evt.scrollPositionX / self.settings.hscrollStep);
 				});
 				this.hsbApi.bind("scrollHEnd",function(evt) {
 						self.handlers.trigger("addColumn");
@@ -1641,7 +1646,7 @@
 						self.scrollHorizontal(deltaX, event);
 					}
 					if (deltaY) {
-						deltaY = Math.sign(deltaY) * Math.ceil(Math.abs(deltaY * self.settings.wheelScrollLines / 3));
+						deltaY = Math.sign(deltaY) * Math.ceil(Math.abs(deltaY * self.settings.wheelScrollLinesV / 3));
 						self.scrollVertical(deltaY, event);
 					}
 					self._onMouseMove(event);

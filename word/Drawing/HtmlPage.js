@@ -830,7 +830,7 @@ function CEditorPage(api)
 				};
 			}
 		}
-	}
+	};
 
 	this.onButtonRulersClick       = function()
 	{
@@ -2450,7 +2450,7 @@ function CEditorPage(api)
 		global_keyboardEvent.CtrlKey  = false;
 		global_keyboardEvent.ShiftKey = false;
 		global_keyboardEvent.AltGr    = false;
-	}
+	};
 	this.onKeyPress = function(e)
 	{
 		if (AscCommon.g_clipboardBase.IsWorking())
@@ -2576,29 +2576,30 @@ function CEditorPage(api)
 		}
 	};
 
-	this.UpdateScrolls = function()
+	this.CreateScrollSettings = function()
 	{
-		if (window["NATIVE_EDITOR_ENJINE"])
-			return;
-
-		var settings = {
-			showArrows           : true,
-			animateScroll        : false,
-			//                scrollBackgroundColor: GlobalSkin.BackgroundScroll,
-			//                scrollerColor:"#EDEDED",
-			screenW              : this.m_oEditor.HtmlElement.width,
-			screenH              : this.m_oEditor.HtmlElement.height,
-			vscrollStep          : 45,
-			hscrollStep          : 45,
-			isNeedInvertOnActive : GlobalSkin.isNeedInvertOnActive
-		};
+		var settings = new AscCommon.ScrollSettings();
+		settings.screenW = this.m_oEditor.HtmlElement.width;
+		settings.screenH = this.m_oEditor.HtmlElement.height;
+		settings.vscrollStep = 45;
+		settings.hscrollStep = 45;
+		settings.isNeedInvertOnActive = GlobalSkin.isNeedInvertOnActive;
 
 		if (this.bIsRetinaSupport)
 		{
 			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
 			settings.screenH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenH);
 		}
+		return settings;
+	};
 
+	this.UpdateScrolls = function()
+	{
+		var settings;
+		if (window["NATIVE_EDITOR_ENJINE"])
+			return;
+
+		settings = this.CreateScrollSettings();
 		if (this.m_oScrollHor_)
 			this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
 		else
@@ -2609,18 +2610,19 @@ function CEditorPage(api)
 			{
 				AscCommon.check_MouseDownEvent(evt, true);
 				global_mouseEvent.LockMouse();
-			}
+			};
 			this.m_oScrollHor_.offLockMouse = function(evt)
 			{
 				AscCommon.check_MouseUpEvent(evt);
-			}
+			};
 			this.m_oScrollHor_.bind("scrollhorizontal", function(evt)
 			{
 				oThis.horizontalScroll(this, evt.scrollD, evt.maxScrollX);
-			})
+			});
 			this.m_oScrollHorApi = this.m_oScrollHor_;
 		}
 
+		settings = this.CreateScrollSettings();
 		if (this.m_oScrollVer_)
 		{
 			this.m_oScrollVer_.Repos(settings, undefined, true);
@@ -2633,11 +2635,11 @@ function CEditorPage(api)
 			{
 				AscCommon.check_MouseDownEvent(evt, true);
 				global_mouseEvent.LockMouse();
-			}
+			};
 			this.m_oScrollVer_.offLockMouse = function(evt)
 			{
 				AscCommon.check_MouseUpEvent(evt);
-			}
+			};
 			this.m_oScrollVer_.bind("scrollvertical", function(evt)
 			{
 				oThis.verticalScroll(this, evt.scrollD, evt.maxScrollY);
