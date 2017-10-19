@@ -10,8 +10,15 @@ engines:
         - javascript:
 exclude_paths:
 - build/
+- cell/.unit-tests/qunit
 - cell/document
 - cell/documentation
-- cell/.unit-tests
-- side/
-- word/
+- cell/model/FormulaObjects/Ebnf-Visualizer
+- cell/native/underscore-min.js
+- cell/native/xregexp-all-min.js
+- common/FontsFreeType/Private
+- common/externs
+- slide/themes
+- slide/document
+- word/document
+- word/Documents
