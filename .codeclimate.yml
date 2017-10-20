@@ -2,13 +2,13 @@ checks:
   file-lines:
     config:
       threshold: 5000
-plugins:
+engines:
   eslint:
     enabled: true
   csslint:
     enabled: true
   duplication:
-    enabled: true
+    enabled: false
     config:
       languages:
         - javascript:
