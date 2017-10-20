@@ -1828,19 +1828,29 @@
 		var calcDate = function () {
 			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 
-			while (Math.abs(dif) > count) {
+			if (1 === dif) {
+				//если данный день выходной
+				//если далее выходные
 				date = new Date(val0.getTime() + dif1 * c_msPerDay);
-				if (date.getUTCDay() !== 6 && date.getUTCDay() !== 0 && _includeInHolidays(date, holidays)) {
-					count++;
-				}
-				dif >= 0 ? dif1++ : dif1--;
-
-				//если последняя итерация
-				if (!(Math.abs(dif) > count)) {
-					//проверяем не оказалось ли следом выходных. если оказались - прибавляем
+				while(date.getUTCDay() === 6 || date.getUTCDay() === 0 || !_includeInHolidays(date, holidays)){
+					dif >= 0 ? dif1++ : dif1--;
 					date = new Date(val0.getTime() + dif1 * c_msPerDay);
-					if (date.getUTCDay() === 6) {
-						dif1 += 2;
+				}
+			}else{
+				while (Math.abs(dif) > count) {
+					date = new Date(val0.getTime() + dif1 * c_msPerDay);
+					if (date.getUTCDay() !== 6 && date.getUTCDay() !== 0 && _includeInHolidays(date, holidays)) {
+						count++;
+					}
+					dif >= 0 ? dif1++ : dif1--;
+
+					//если последняя итерация
+					if (!(Math.abs(dif) > count)) {
+						//проверяем не оказалось ли следом выходных. если оказались - прибавляем
+						date = new Date(val0.getTime() + dif1 * c_msPerDay);
+						if (date.getUTCDay() === 6) {
+							dif1 += 2;
+						}
 					}
 				}
 			}
