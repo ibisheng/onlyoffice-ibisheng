@@ -57,6 +57,10 @@ CParagraphContentBase.prototype.SetParagraph = function(Paragraph)
 {
 	this.Paragraph = Paragraph;
 };
+CParagraphContentBase.prototype.GetParagraph = function()
+{
+	return this.Paragraph;
+};
 CParagraphContentBase.prototype.Is_Empty = function()
 {
 	return true;
@@ -153,6 +157,9 @@ CParagraphContentBase.prototype.Get_ParaPosByContentPos = function(ContentPos, D
 	return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
 CParagraphContentBase.prototype.UpdateBookmarks = function(oManager)
+{
+};
+CParagraphContentBase.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -655,10 +662,6 @@ CParagraphContentWithParagraphLikeContent.prototype.CopyContent = function(Selec
     }
 
     return CopyContent;
-};
-CParagraphContentWithParagraphLikeContent.prototype.GetParagraph = function()
-{
-	return this.Paragraph;
 };
 CParagraphContentWithParagraphLikeContent.prototype.Clear_ContentChanges = function()
 {

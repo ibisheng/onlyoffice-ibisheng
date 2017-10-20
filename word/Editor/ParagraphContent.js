@@ -2000,6 +2000,7 @@ function ParagraphContent_Read_FromBinary(Reader)
 		case para_Drawing:
 		case para_HyperlinkStart:
 		case para_InlineLevelSdt:
+		case para_Bookmark:
 		{
 			var ElementId = Reader.GetString2();
 			Element       = g_oTableId.Get_ById(ElementId);

@@ -343,9 +343,9 @@ CDrawingsController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.DrawingObjects.getSelectedText(bClearText, oPr);
 };
-CDrawingsController.prototype.GetCurrentParagraph = function(bIgnoreSelection)
+CDrawingsController.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	return this.DrawingObjects.getCurrentParagraph(bIgnoreSelection);
+	return this.DrawingObjects.getCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 };
 CDrawingsController.prototype.GetSelectedElementsInfo = function(oInfo)
 {

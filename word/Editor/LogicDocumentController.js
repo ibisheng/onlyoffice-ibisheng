@@ -264,9 +264,9 @@ CLogicDocumentController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.LogicDocument.controller_GetSelectedText(bClearText, oPr);
 };
-CLogicDocumentController.prototype.GetCurrentParagraph = function(bIgnoreSelection)
+CLogicDocumentController.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	return this.LogicDocument.controller_GetCurrentParagraph(bIgnoreSelection);
+	return this.LogicDocument.controller_GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 };
 CLogicDocumentController.prototype.GetSelectedElementsInfo = function(oInfo)
 {

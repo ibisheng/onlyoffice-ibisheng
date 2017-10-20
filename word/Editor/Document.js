@@ -8043,9 +8043,25 @@ CDocument.prototype.GetSelectedText = function(bClearText, oPr)
 
 	return this.Controller.GetSelectedText(bClearText, oPr);
 };
-CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection)
+/**
+ * Получаем текущий параграф (или граничные параграфы селекта)
+ * @param bIgnoreSelection Если true, тогда используется текущая позиция, даже если есть селект
+ * @param bReturnSelectedArray (Используется, только если bIgnoreSelection==false) Если true, тогда возвращаем массив из
+ * из параграфов, которые попали в выделение.
+ * @returns {Paragraph | [Paragraph]}
+ */
+CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection, bReturnSelectedArray)
 {
-	return this.Controller.GetCurrentParagraph(bIgnoreSelection);
+	if (true !== bIgnoreSelection && true === bReturnSelectedArray)
+	{
+		var arrSelectedParagraphs = [];
+		this.Controller.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
+		return arrSelectedParagraphs;
+	}
+	else
+	{
+		return this.Controller.GetCurrentParagraph(bIgnoreSelection, null);
+	}
 };
 CDocument.prototype.GetSelectedElementsInfo = function()
 {
@@ -14676,13 +14692,25 @@ CDocument.prototype.controller_GetSelectedText = function(bClearText, oPr)
 
 	return null;
 };
-CDocument.prototype.controller_GetCurrentParagraph = function(bIgnoreSelection)
+CDocument.prototype.controller_GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
-	if (Pos < 0 || Pos >= this.Content.length)
-		return null;
+	if (null !== arrSelectedParagraphs && true === this.Selection.Use)
+	{
+		var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+		var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+		for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+		{
+			this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+		}
+	}
+	else
+	{
+		var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
+		if (Pos < 0 || Pos >= this.Content.length)
+			return null;
 
-	return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection);
+		return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection, null);
+	}
 };
 CDocument.prototype.controller_GetSelectedElementsInfo = function(Info)
 {
@@ -15760,7 +15788,7 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 	var oCurrentDocPos = this.GetContentPosition(false);
 	this.SetContentPosition(oDocPos, 0, 0);
 
-	var oCurrentParagraph = this.controller_GetCurrentParagraph(true);
+	var oCurrentParagraph = this.controller_GetCurrentParagraph(true, false);
 	if (!oCurrentParagraph)
 		return [];
 
@@ -15786,6 +15814,99 @@ CDocument.prototype.UpdateBookmarks = function()
 	}
 
 	this.BookmarksManager.EndCollectingProcess();
+};
+CDocument.prototype.AddBookmark = function(sName)
+{
+	var arrBookmarkChars = this.BookmarksManager.GetBookmarkByName(sName);
+
+	var oStartPara = null,
+		oEndPara   = null;
+	var arrParagraphs = [];
+	if (true === this.IsSelectionUse())
+	{
+		var arrSelectedParagraphs = this.GetCurrentParagraph(false, true);
+		if (arrSelectedParagraphs.length > 1)
+		{
+			arrParagraphs.push(arrSelectedParagraphs[0]);
+			arrParagraphs.push(arrSelectedParagraphs[arrSelectedParagraphs.length - 1]);
+
+			oStartPara = arrSelectedParagraphs[0];
+			oEndPara   = arrSelectedParagraphs[arrSelectedParagraphs.length - 1];
+		}
+		else if (arrSelectedParagraphs.length === 1)
+		{
+			arrParagraphs.push(arrSelectedParagraphs[0]);
+
+			oStartPara = arrSelectedParagraphs[0];
+			oEndPara   = arrSelectedParagraphs[0];
+		}
+	}
+	else
+	{
+		var oCurrentParagraph = this.GetCurrentParagraph(true);
+		if (oCurrentParagraph)
+		{
+			arrParagraphs.push(oCurrentParagraph);
+			oStartPara = oCurrentParagraph;
+		}
+	}
+
+	if (arrParagraphs.length <= 0)
+		return;
+
+	if (arrBookmarkChars)
+	{
+		var oStartPara = arrBookmarkChars[0].GetParagraph();
+		var oEndPara   = arrBookmarkChars[1].GetParagraph();
+
+		if (oStartPara)
+			arrParagraphs.push(oStartPara);
+
+		if (oEndPara)
+			arrParagraphs.push(oEndPara);
+	}
+
+	if (false === this.Document_Is_SelectionLocked(changestype_None, {Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : arrParagraphs, CheckType : changestype_Paragraph_Content}, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddBookmark);
+
+		if (this.BookmarksManager.HaveBookmark(sName))
+			this.private_RemoveBookmark(sName);
+
+		var sBookmarkId = this.BookmarksManager.GetNewBookmarkId();
+
+		if (true === this.IsSelectionUse())
+		{
+			var nDirection = this.GetSelectDirection();
+			if (nDirection > 0)
+			{
+				oEndPara.AddBookmarkChar(new CParagraphBookmark(false, sBookmarkId, sName), true, false);
+				oStartPara.AddBookmarkChar(new CParagraphBookmark(true, sBookmarkId, sName), true, true);
+			}
+			else
+			{
+				oEndPara.AddBookmarkChar(new CParagraphBookmark(false, sBookmarkId, sName), true, true);
+				oStartPara.AddBookmarkChar(new CParagraphBookmark(true, sBookmarkId, sName), true, false);
+			}
+		}
+		else
+		{
+			oStartPara.AddBookmarkChar(new CParagraphBookmark(false, sBookmarkId, sName), false);
+			oStartPara.AddBookmarkChar(new CParagraphBookmark(true, sBookmarkId, sName), false);
+		}
+
+		// TODO: Здесь добавляются просто метки закладок, нужно сделать упрощенный пересчет
+		this.Recalculate();
+	}
+
+};
+CDocument.prototype.RemoveBookmark = function(sName)
+{
+
+};
+CDocument.prototype.private_RemoveBookmark = function(sName)
+{
+
 };
 
 function CDocumentSelectionState()

@@ -2101,12 +2101,12 @@ CGraphicObjects.prototype =
     selectNextObject: DrawingObjectsController.prototype.selectNextObject,
 
 
-    getCurrentParagraph: function(bIgnoreSelection)
+    getCurrentParagraph: function(bIgnoreSelection, arrSelectedParagraphs)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.GetCurrentParagraph(bIgnoreSelection);
+            return content.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
         }
         else
         {

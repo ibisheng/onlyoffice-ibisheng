@@ -1688,10 +1688,10 @@ ParaDrawing.prototype.tableAddRow = function(bBefore)
 	if (isRealObject(this.GraphicObj) && typeof  this.GraphicObj.tableAddRow === "function")
 		return this.GraphicObj.tableAddRow(bBefore);
 };
-ParaDrawing.prototype.getCurrentParagraph = function()
+ParaDrawing.prototype.getCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.getCurrentParagraph === "function")
-		return this.GraphicObj.getCurrentParagraph();
+		return this.GraphicObj.getCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 
 	if (this.Parent instanceof Paragraph)
 		return this.Parent;

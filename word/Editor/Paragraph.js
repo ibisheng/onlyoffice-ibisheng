@@ -12203,8 +12203,11 @@ Paragraph.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.IncDec_FontSize(bIncrease);
 };
-Paragraph.prototype.GetCurrentParagraph = function(bIgnoreSelection)
+Paragraph.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
+	if (arrSelectedParagraphs)
+		arrSelectedParagraphs.push(this);
+
 	return this;
 };
 Paragraph.prototype.Get_FirstParagraph = function()
@@ -12415,6 +12418,33 @@ Paragraph.prototype.AddBookmarkForTOC = function()
 		return;
 
 	var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+};
+Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, isStartSelection)
+{
+	var oParaPos   = this.Get_ParaContentPos(isUseSelection, isStartSelection, false);
+	var arrClasses = this.Get_ClassesByPos(oParaPos);
+
+	var oRun, oParent;
+	if (1 === arrClasses.length && arrClasses[arrClasses.length - 1].Type === para_Run)
+	{
+		oRun    = arrClasses[arrClasses.length - 1];
+		oParent = this;
+	}
+	else if (arrClasses.length >= 2 && arrClasses[arrClasses.length - 1].Type === para_Run)
+	{
+		oRun    = arrClasses[arrClasses.length - 1];
+		oParent = arrClasses[arrClasses.length - 2];
+	}
+	else
+	{
+		return false;
+	}
+
+	var oRunPos = oParaPos.Get(oParaPos.Get_Depth() - 1);
+	oRun.Split2(oParaPos.Get(oParaPos.Get_Depth()), oParent, oRunPos);
+	oParent.Add_ToContent(oRunPos + 1, oBookmarkChar);
+
+	return true;
 };
 
 var pararecalc_0_All  = 0;

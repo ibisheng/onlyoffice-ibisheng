@@ -1584,19 +1584,31 @@ CDocumentContent.prototype.Is_CurrentElementParagraph = function()
 
 	return true;
 };
-CDocumentContent.prototype.GetCurrentParagraph = function(bIgnoreSelection)
+CDocumentContent.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
-		return this.LogicDocument.DrawingObjects.getCurrentParagraph(bIgnoreSelection);
+		return this.LogicDocument.DrawingObjects.getCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
-		var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
-		if (Pos < 0 || Pos >= this.Content.length)
-			return null;
+		if (arrSelectedParagraphs)
+		{
+			var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+			var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+			for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+			{
+				this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+			}
+		}
+		else
+		{
+			var Pos = true === this.Selection.Use && true !== bIgnoreSelection ? this.Selection.StartPos : this.CurPos.ContentPos;
+			if (Pos < 0 || Pos >= this.Content.length)
+				return null;
 
-		return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection);
+			return this.Content[Pos].GetCurrentParagraph(bIgnoreSelection, null);
+		}
 	}
 
 	return null;
