@@ -13,10 +13,11 @@ rules:
   no-duplicate-case: error
   no-empty-character-class: error
   no-ex-assign: error
-
-  # Strict Mode
-  # http://eslint.org/docs/rules/#strict-mode
-  strict: [error, global]
+  no-extra-semi: error
+  no-func-assign: error
+  no-invalid-regexp: error
+  no-irregular-whitespace: error
+  no-obj-calls: error
 
   # Stylistic Issues
   # http://eslint.org/docs/rules/#stylistic-issues
