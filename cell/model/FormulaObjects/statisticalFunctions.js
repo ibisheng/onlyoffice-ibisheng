@@ -4293,7 +4293,8 @@ function (window, undefined) {
 	 * @extends {cBINOMDIST}
 	 */
 	function cBINOM_DIST() {
-		cBINOMDIST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
@@ -4506,7 +4507,8 @@ function (window, undefined) {
 	 * @extends {cCHIDIST}
 	 */
 	function cCHISQ_DIST_RT() {
-		cCHIDIST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST_RT.prototype = Object.create(cCHIDIST.prototype);
@@ -4673,7 +4675,8 @@ function (window, undefined) {
 	 * @extends {cCHITEST}
 	 */
 	function cCHISQ_TEST() {
-		cCHITEST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_TEST.prototype = Object.create(cCHITEST.prototype);
@@ -4729,7 +4732,8 @@ function (window, undefined) {
 	 * @extends {cCONFIDENCE}
 	 */
 	function cCONFIDENCE_NORM() {
-		cCONFIDENCE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE_NORM.prototype = Object.create(cCONFIDENCE.prototype);
@@ -5463,7 +5467,8 @@ function (window, undefined) {
 	 * @extends {cCRITBINOM}
 	 */
 	function cBINOM_INV() {
-		cCRITBINOM.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_INV.prototype = Object.create(cCRITBINOM.prototype);
@@ -5761,7 +5766,8 @@ function (window, undefined) {
 	 * @extends {cF_DIST_RT}
 	 */
 	function cFDIST() {
-		cF_DIST_RT.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cFDIST.prototype = Object.create(cF_DIST_RT.prototype);
@@ -5885,7 +5891,8 @@ function (window, undefined) {
 	 * @extends {cFINV}
 	 */
 	function cF_INV_RT() {
-		cFINV.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cF_INV_RT.prototype = Object.create(cFINV.prototype);
@@ -6344,7 +6351,8 @@ function (window, undefined) {
 	 * @extends {cFORECAST}
 	 */
 	function cFORECAST_LINEAR() {
-		cFORECAST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_LINEAR.prototype = Object.create(cFORECAST.prototype);
@@ -6476,7 +6484,8 @@ function (window, undefined) {
 	 * @extends {cFTEST}
 	 */
 	function cF_TEST() {
-		cFTEST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cF_TEST.prototype = Object.create(cFTEST.prototype);
@@ -6577,7 +6586,8 @@ function (window, undefined) {
 	 * @extends {cGAMMA_DIST}
 	 */
 	function cGAMMADIST() {
-		cGAMMA_DIST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cGAMMADIST.prototype = Object.create(cGAMMA_DIST.prototype);
@@ -6648,7 +6658,8 @@ function (window, undefined) {
 	 * @extends {cGAMMA_INV}
 	 */
 	function cGAMMAINV() {
-		cGAMMA_INV.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cGAMMAINV.prototype = Object.create(cGAMMA_INV.prototype);
@@ -8352,7 +8363,8 @@ function (window, undefined) {
 	 */
 	//TODO разницы в работе функций cMODE_MULT и cMODE не нашёл, но в LO обработки немного разные. проверить!
 	function cMODE_MULT() {
-		cMODE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cMODE_MULT.prototype = Object.create(cMODE.prototype);
@@ -8365,7 +8377,8 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cMODE_SNGL() {
-		cMODE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cMODE_SNGL.prototype = Object.create(cMODE.prototype);
@@ -8549,7 +8562,8 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cNORM_DIST() {
-		cNORMDIST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNORM_DIST.prototype = Object.create(cNORMDIST.prototype);
@@ -8623,7 +8637,8 @@ function (window, undefined) {
 	 * @extends {cNORMINV}
 	 */
 	function cNORM_INV() {
-		cNORMINV.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNORM_INV.prototype = Object.create(cNORMINV.prototype);
@@ -8765,7 +8780,8 @@ function (window, undefined) {
 	 * @extends {cNORMSINV}
 	 */
 	function cNORM_S_INV() {
-		cNORMSINV.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNORM_S_INV.prototype = Object.create(cNORMSINV.prototype);
@@ -8957,7 +8973,8 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cPERCENTILE_INC() {
-		cPERCENTILE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE_INC.prototype = Object.create(cPERCENTILE.prototype);
@@ -9069,7 +9086,8 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPERCENTRANK_INC() {
-		cPERCENTRANK.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK_INC.prototype = Object.create(cPERCENTRANK.prototype);
@@ -9253,7 +9271,8 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPOISSON_DIST() {
-		cPOISSON.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cPOISSON_DIST.prototype = Object.create(cPOISSON.prototype);
@@ -9497,7 +9516,8 @@ function (window, undefined) {
 	 * @extends {cQUARTILE}
 	 */
 	function cQUARTILE_INC() {
-		cQUARTILE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE_INC.prototype = Object.create(cQUARTILE.prototype);
@@ -9623,7 +9643,8 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cRANK_EQ() {
-		cRANK.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cRANK_EQ.prototype = Object.create(cRANK.prototype);
@@ -10104,7 +10125,8 @@ function (window, undefined) {
 	 * @extends {cSTDEV}
 	 */
 	function cSTDEV_S() {
-		cSTDEV.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
@@ -10252,7 +10274,8 @@ function (window, undefined) {
 	 * @extends {cSTDEVP}
 	 */
 	function cSTDEV_P() {
-		cSTDEVP.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_P.prototype = Object.create(cSTDEVP.prototype);
@@ -10724,7 +10747,8 @@ function (window, undefined) {
 	 * @extends {cT_INV_2T}
 	 */
 	function cTINV() {
-		cT_INV_2T.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTINV.prototype = Object.create(cT_INV_2T.prototype);
@@ -10908,7 +10932,8 @@ function (window, undefined) {
 	 * @extends {cTTEST}
 	 */
 	function cT_TEST() {
-		cTTEST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cT_TEST.prototype = Object.create(cTTEST.prototype);
@@ -11171,7 +11196,8 @@ function (window, undefined) {
 	 * @extends {cVARP}
 	 */
 	function cVAR_P() {
-		cVARP.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cVAR_P.prototype = Object.create(cVARP.prototype);
@@ -11418,7 +11444,8 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cWEIBULL_DIST() {
-		cWEIBULL.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL_DIST.prototype = Object.create(cWEIBULL.prototype);
@@ -11519,7 +11546,8 @@ function (window, undefined) {
 	 * @extends {cZTEST}
 	 */
 	function cZ_TEST() {
-		cZTEST.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cZ_TEST.prototype = Object.create(cZTEST.prototype);

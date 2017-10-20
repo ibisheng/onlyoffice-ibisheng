@@ -1537,7 +1537,8 @@
 	 */
 	//TODO нигде нет отписания к этой функции! работает так же как и cCEILING на всех примерах.
 	function cECMA_CEILING() {
-		cCEILING.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cECMA_CEILING.prototype = Object.create(cCEILING.prototype);

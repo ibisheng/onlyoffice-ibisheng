@@ -654,7 +654,8 @@ function (window, undefined) {
 	 * @extends {cFIND}
 	 */
 	function cFINDB() {
-		cFIND.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cFINDB.prototype = Object.create(cFIND.prototype);
@@ -925,7 +926,8 @@ function (window, undefined) {
 	 * @extends {cLEFT}
 	 */
 	function cLEFTB() {
-		cLEFT.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cLEFTB.prototype = Object.create(cLEFT.prototype);
@@ -971,7 +973,8 @@ function (window, undefined) {
 	 * @extends {cLEN}
 	 */
 	function cLENB() {
-		cLEN.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cLENB.prototype = Object.create(cLEN.prototype);
@@ -1086,7 +1089,8 @@ function (window, undefined) {
 	 * @extends {cMID}
 	 */
 	function cMIDB() {
-		cMID.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cMIDB.prototype = Object.create(cMID.prototype);
@@ -1382,7 +1386,8 @@ function (window, undefined) {
 	 * @extends {cREPLACE}
 	 */
 	function cREPLACEB() {
-		cREPLACE.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cREPLACEB.prototype = Object.create(cREPLACE.prototype);
@@ -1506,7 +1511,8 @@ function (window, undefined) {
 	 * @extends {cRIGHT}
 	 */
 	function cRIGHTB() {
-		cRIGHT.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cRIGHTB.prototype = Object.create(cRIGHT.prototype);
@@ -1609,7 +1615,8 @@ function (window, undefined) {
 	 * @extends {cRIGHT}
 	 */
 	function cSEARCHB() {
-		cSEARCH.call(this);
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cSEARCHB.prototype = Object.create(cSEARCH.prototype);
