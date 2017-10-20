@@ -4,6 +4,16 @@ env:
   browser: true
 
 rules:
+  # Possible Errors
+  # http://eslint.org/docs/rules/#possible-errors
+  for-direction: error
+  no-debugger: error
+  no-dupe-args: error
+  no-dupe-keys: error
+  no-duplicate-case: error
+  no-empty-character-class: error
+  no-ex-assign: error
+
   # Strict Mode
   # http://eslint.org/docs/rules/#strict-mode
   strict: [error, global]
