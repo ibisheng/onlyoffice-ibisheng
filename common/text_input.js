@@ -517,9 +517,9 @@
 			}
 		},
 
-		unshow : function()
+		unshow : function(isAttack)
 		{
-			if (this.isDebug || this.isSystem)
+			if (this.isDebug || this.isSystem || (true == isAttack))
 			{
 				ti_console_log("ti: unshow");
 
@@ -935,7 +935,10 @@
 
 			this.putAreaValue("");
 			if (this.isShow)
-				this.unshow();
+				this.unshow(true);
+
+			if (this.Api.WordControl && this.Api.WordControl.m_oLogicDocument && this.Api.WordControl.m_oLogicDocument.Document_UpdateSelectionState)
+				this.Api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		},
 
 		systemConfirmText : function()
