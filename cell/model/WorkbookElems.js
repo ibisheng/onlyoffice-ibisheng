@@ -7001,6 +7001,7 @@ ColorFilter.prototype.clone = function() {
 ColorFilter.prototype.isHideValue = function(cell) {
 	
 	var res = true;
+	var t = this;
 	
 	var isEqualColors = function(filterColor, cellColor)
 	{
@@ -7029,7 +7030,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 	{
 		var filterColor = this.dxf.fill.bg;
 		cell.getLeftTopCellNoEmpty(function(cell) {
-			if(false === this.CellColor)//font color
+			if(false === t.CellColor)//font color
 			{
 				var multiText;
 				if(cell && (multiText = cell.getValueMultiText()) !== null)
