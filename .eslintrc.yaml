@@ -18,6 +18,20 @@ rules:
   no-invalid-regexp: error
   no-irregular-whitespace: error
   no-obj-calls: error
+  no-unreachable: error
+  no-unsafe-negation: error
+
+  # Best Practices
+  # http://eslint.org/docs/rules/#best-practices
+  no-proto: error
+  no-redeclare: error
+  no-self-assign: error
+  no-unused-labels: error
+  no-useless-return: error
+
+  # Variables
+  # http://eslint.org/docs/rules/#variables
+  no-delete-var: error
 
   # Stylistic Issues
   # http://eslint.org/docs/rules/#stylistic-issues
