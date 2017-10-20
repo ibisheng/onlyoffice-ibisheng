@@ -444,6 +444,13 @@
 				if (bIsError) {
 					return bIsError;
 				}
+			} else {
+				val = val.tocNumber();
+				if (val instanceof cError) {
+					return bIsError = new cError(val);
+				} else if (val instanceof cNumber) {
+					holidays.push(val);
+				}
 			}
 		}
 
