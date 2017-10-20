@@ -4112,6 +4112,7 @@ function OfflineEditor () {
         docInfo.put_Format("xlsx");
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(this.initSettings["token"]);
+        docInfo.put_Permissions(JSON.parse(this.initSettings["permissions"]));
 
         _api.asc_setDocInfo(docInfo);
 

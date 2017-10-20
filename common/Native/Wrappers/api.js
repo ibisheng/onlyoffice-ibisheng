@@ -5859,6 +5859,7 @@ function NativeOpenFile3(_params, documentInfo)
         docInfo.put_Format("docx");
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(window.documentInfo["token"]);
+        docInfo.put_Permissions(JSON.parse(window.documentInfo["permissions"]));
         
         _api.asc_setDocInfo(docInfo);
 
