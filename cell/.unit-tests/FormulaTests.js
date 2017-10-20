@@ -2702,26 +2702,33 @@ $( function () {
 	} );
 
 
+	test("Test: \"WORKDAY\"", function () {
 
-    test( "Test: \"WORKDAY\"", function () {
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),0)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 38718);
 
-        oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),0)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 38718 );
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),10)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 38730);
 
-        oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),10)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 38730 );
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),-10)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 38705);
 
-        oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),-10)", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 38705 );
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),20,{\"1-2-2006\",\"1-16-2006\"})", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 38748);
 
-        oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),20,{\"1-2-2006\",\"1-16-2006\"})", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 38748 );
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,6),1,DATE(2017,10,9))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43018);
 
-    } );
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,7),1,DATE(2017,10,9))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43018);
+
+	});
 
 	test( "Test: \"WORKDAY.INTL\"", function () {
 
