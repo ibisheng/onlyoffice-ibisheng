@@ -3828,7 +3828,7 @@ function asc_menu_WriteAscFill_grad(_type, _fill, _stream)
                 if (_fill.Positions[i] !== undefined && _fill.Positions[i] !== null)
                 {
                     _stream["WriteByte"](1);
-                    _stream["WriteDouble2"](_fill.Positions[i]);
+                    _stream["WriteLong"](_fill.Positions[i]);
                 }
 
                 _stream["WriteByte"](255);
@@ -3988,17 +3988,17 @@ function asc_menu_WriteAscFill(_type, _fill, _stream)
             }
             case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
-                _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_patt(1, _fill.fill, _stream);
                 break;
             }
             case Asc.c_oAscFill.FILL_TYPE_GRAD:
             {
-                _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_grad(1, _fill.fill, _stream);
                 break;
             }
             case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
-                _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_blip(1, _fill.fill, _stream);
                 break;
             }
             default:
