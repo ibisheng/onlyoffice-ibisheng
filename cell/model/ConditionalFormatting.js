@@ -282,42 +282,46 @@
 			res.aColors.push(this.aColors[i].clone());
 		return res;
 	};
-	CColorScale.prototype.getMin = function(min, max, values) {
+	CColorScale.prototype.getMin = function(values) {
 		var oCFVO = (0 < this.aCFVOs.length) ? this.aCFVOs[0] : null;
-		return this.getValue(min, max, values, oCFVO);
+		return this.getValue(values, oCFVO);
 	};
-	CColorScale.prototype.getMid = function(min, max, values) {
+	CColorScale.prototype.getMid = function(values) {
 		var oCFVO = (2 < this.aCFVOs.length ? this.aCFVOs[1] : null);
-		return this.getValue(min, max, values, oCFVO);
+		return this.getValue(values, oCFVO);
 	};
-	CColorScale.prototype.getMax = function(min, max, values) {
+	CColorScale.prototype.getMax = function(values) {
 		var oCFVO = (2 === this.aCFVOs.length) ? this.aCFVOs[1] : (2 < this.aCFVOs.length ? this.aCFVOs[2] : null);
-		return this.getValue(min, max, values, oCFVO);
+		return this.getValue(values, oCFVO);
 	};
-	CColorScale.prototype.getValue = function(min, max, values, oCFVO) {
-		var res = min;
+	CColorScale.prototype.getValue = function(values, oCFVO) {
+		var res, min;
 		if (oCFVO) {
 			// ToDo Formula
 			switch (oCFVO.Type) {
 				case AscCommonExcel.ECfvoType.Minimum:
-					res = min;
+					res = AscCommonExcel.getArrayMin(values);
 					break;
 				case AscCommonExcel.ECfvoType.Maximum:
-					res = max;
+					res = AscCommonExcel.getArrayMax(values);
 					break;
 				case AscCommonExcel.ECfvoType.Number:
 					res = parseFloat(oCFVO.Val);
 					break;
 				case AscCommonExcel.ECfvoType.Percent:
-					res = min + Math.floor((max - min) * parseFloat(oCFVO.Val) / 100);
+					min = AscCommonExcel.getArrayMin(values);
+					res = min + Math.floor((AscCommonExcel.getArrayMax(values) - min) * parseFloat(oCFVO.Val) / 100);
 					break;
 				case AscCommonExcel.ECfvoType.Percentile:
 					res = AscCommonExcel.getPercentile(values, parseFloat(oCFVO.Val) / 100.0);
 					if (AscCommonExcel.cElementType.number === res.type) {
 						res = res.getValue();
 					} else {
-						res = min;
+						res = AscCommonExcel.getArrayMin(values);
 					}
+					break;
+				default:
+					res = -Number.MAX_VALUE;
 					break;
 			}
 		}
