@@ -773,15 +773,15 @@
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				var minChangeRow;
 
-				worksheet.workbook.dependencyFormulas.lockRecal();
-
 				//**get filter**
 				var filter = this._getFilterByDisplayName(displayName);
 				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
 				
 				if(filter === null)
 					return false;
-				
+
+				worksheet.workbook.dependencyFormulas.lockRecal();
+
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
@@ -2093,8 +2093,6 @@
 
                 var bUndoChanges = worksheet.workbook.bUndoChanges;
                 var bRedoChanges = worksheet.workbook.bRedoChanges;
-
-				worksheet.workbook.dependencyFormulas.lockRecal();
 				
 				if(arnTo == null && arnFrom == null && data)
 				{
@@ -2104,7 +2102,9 @@
 					if(arnTo == null || arnFrom == null)
 						return;
 				}
-				
+
+				worksheet.workbook.dependencyFormulas.lockRecal();
+
 				var cloneFilterColumns = function(filterColumns)
 				{
 					var cloneFilterColumns = [];
