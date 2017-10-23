@@ -3970,6 +3970,8 @@
 		{
 			this.getRange3(start,0,stop, 0)._foreachRow(fProcessRow);
 		}
+		//todo возможно стоит вызывать эту функцию только в случае открытия строк
+		this.autoFilters.recalFormulasAfterTableRowHidden(start, stop);
 	};
 	Worksheet.prototype.getRowHidden=function(index){
 		var res;
@@ -4024,6 +4026,7 @@
 				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowHide, oThis.getId(),updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
 			}
 		}
+		this.autoFilters.recalFormulasAfterTableRowHidden(start, stop);
 	};
 	Worksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 		//start, stop 0 based

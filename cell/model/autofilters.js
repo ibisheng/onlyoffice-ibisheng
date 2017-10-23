@@ -370,6 +370,9 @@
 			this.worksheet = currentSheet;
 			this.changeFilters = null;
 
+			this.needRecalcFormulas = false;
+			this.doNotRecalcFormulas = false;
+
 			this.m_oColor = new AscCommon.CColor(120, 120, 120);
 			return this;
 		}
@@ -592,12 +595,14 @@
                 var rangeOldFilter = null;
 				
 				//**get filter**
-				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId)
+				var filterObj = this._getPressedFilter(ar, autoFiltersObject.cellId);
 				var currentFilter = filterObj.filter;
 				
 				if(filterObj.filter === null)
 					return;
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(true);
+
 				//if apply a/f from context menu
 				if(autoFiltersObject && null === autoFiltersObject.automaticRowCount && currentFilter.isAutoFilter() && currentFilter.isApplyAutoFilter() === false)
 				{
@@ -759,7 +764,8 @@
 				{
 					this._resetTablePartStyle();
 				}
-				
+				this._waitRecalFormulasAfterTableRowHidden(false);
+
 				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount, nAllRowsCount: nAllRowsCount};
 			},
 			
@@ -769,7 +775,9 @@
 				var bUndoChanges = worksheet.workbook.bUndoChanges;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				var minChangeRow;
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(true);
+
 				//**get filter**
 				var filter = this._getFilterByDisplayName(displayName);
 				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
@@ -810,7 +818,8 @@
 				}
 				
 				History.EndTransaction();
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(false);
 				return {minChangeRow: minChangeRow, updateRange: filter.Ref, filter: filter};
 			},
 			
@@ -1284,7 +1293,9 @@
 					}
 					return bRes;
 				};
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(true);
+
 				if(worksheet.AutoFilter && !bNotDeleteAutoFilter)
 				{
 					changeFilter(worksheet.AutoFilter);
@@ -1297,7 +1308,8 @@
 						changeFilter(tablePart, true, i);
 					}
 				}
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(false);
 				t._setStyleTablePartsAfterOpenRows(activeCells);
 				
 				History.EndTransaction();
@@ -1356,6 +1368,40 @@
 						return true;
 				}
 				return false;
+			},
+
+			recalFormulasAfterTableRowHidden: function (start, stop) {
+				var worksheet = this.worksheet;
+
+				var tableParts = worksheet.TableParts;
+				var tablePart;
+				for (var i = 0; i < tableParts.length; i++) {
+					tablePart = tableParts[i];
+					if (tablePart && tablePart.isTotalsRow() && start >= tablePart.Ref.r1 && stop <= tablePart.Ref.r2) {
+						if(this.doNotRecalcFormulas){
+							this.needRecalcFormulas = true;
+						}else{
+							this._recalcFormulas();
+						}
+						break;
+					}
+				}
+			},
+
+			_waitRecalFormulasAfterTableRowHidden: function(bWait){
+				if(bWait){
+					this.doNotRecalcFormulas = true;
+				} else {
+					if(this.needRecalcFormulas){
+						this._recalcFormulas();
+					}
+					this.needRecalcFormulas = false;
+					this.doNotRecalcFormulas = false;
+				}
+			},
+
+			_recalcFormulas: function(){
+				this.worksheet.workbook.dependencyFormulas.calcTree();
 			},
 
 			_cleanStylesTables: function(redrawTablesArr) {
@@ -2084,6 +2130,8 @@
 
                 var bUndoChanges = worksheet.workbook.bUndoChanges;
                 var bRedoChanges = worksheet.workbook.bRedoChanges;
+
+				this._waitRecalFormulasAfterTableRowHidden(true);
 				
 				if(arnTo == null && arnFrom == null && data)
 				{
@@ -2184,7 +2232,8 @@
 						worksheet.getRange3(tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).unmerge();
 					}
 				}
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(false);
 				return isUpdate ? range : null;
 			},
 			
@@ -4014,7 +4063,12 @@
 					else*/
 						values[count] = tempResult;
 				};
-				
+
+				if(isOpenHiddenRows)
+				{
+					this._waitRecalFormulasAfterTableRowHidden(true);
+				}
+
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
 				
@@ -4113,6 +4167,10 @@
 					individualCount++;
 				}
 
+				if(isOpenHiddenRows)
+				{
+					this._waitRecalFormulasAfterTableRowHidden(false);
+				}
 				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
 			},
 			
@@ -4214,7 +4272,8 @@
 				
 				if(colId === null)
 					return;
-				
+
+				this._waitRecalFormulasAfterTableRowHidden(true);
 				for(var i = ref.r1 + 1; i <= ref.r2; i++)
 				{
 					if(worksheet.getRowHidden(i) === false)
@@ -4225,6 +4284,7 @@
 						worksheet.setRowHidden(false, i, i);
 					}
 				}
+				this._waitRecalFormulasAfterTableRowHidden(false);
 			},
 			
 			_openAllHiddenRowsByFilter: function(filter)
@@ -4386,8 +4446,7 @@
 					headerRowCount = options.HeaderRowCount;
 				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
-				
-				worksheet.workbook.dependencyFormulas.lockRecal();
+
 				if(style && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles)
 				{
 					//заполняем названия столбцов
@@ -4436,14 +4495,12 @@
 
 					styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
 					if (!styleForCurTable) {
-						worksheet.workbook.dependencyFormulas.unlockRecal();
 						return;
 					}
 					
 					//заполняем стили
 					styleForCurTable.initStyle(worksheet.sheetMergedStyles, bbox, style, headerRowCount, totalsRowCount);
 				}
-				worksheet.workbook.dependencyFormulas.unlockRecal();
 			},
 
 			_getFormatTableColumnRange: function(table, columnName)
