@@ -1278,38 +1278,6 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.getResizeCoefficients = function(numHandle, x, y)
-    {
-        var cx, cy;
-        cx= this.extX > 0 ? this.extX : 0.01;
-        cy= this.extY > 0 ? this.extY : 0.01;
-
-        var invert_transform = this.getInvertTransform();
-        var t_x = invert_transform.TransformPointX(x, y);
-        var t_y = invert_transform.TransformPointY(x, y);
-
-        switch(numHandle)
-        {
-            case 0:
-                return {kd1: (cx-t_x)/cx, kd2: (cy-t_y)/cy};
-            case 1:
-                return {kd1: (cy-t_y)/cy, kd2: 0};
-            case 2:
-                return {kd1: (cy-t_y)/cy, kd2: t_x/cx};
-            case 3:
-                return {kd1: t_x/cx, kd2: 0};
-            case 4:
-                return {kd1: t_x/cx, kd2: t_y/cy};
-            case 5:
-                return {kd1: t_y/cy, kd2: 0};
-            case 6:
-                return {kd1: t_y/cy, kd2:(cx-t_x)/cx};
-            case 7:
-                return {kd1:(cx-t_x)/cx, kd2: 0};
-        }
-        return {kd1: 1, kd2: 1};
-    };
-
     CGroupShape.prototype.changePresetGeom = function(preset)
     {
         for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
@@ -1514,18 +1482,6 @@ function CGroupShape()
         return parents;
     };
 
-    CGroupShape.prototype.getCardDirectionByNum = function(num)
-    {
-        var num_north = this.getNumByCardDirection(AscFormat.CARD_DIRECTION_N);
-        var full_flip_h = this.getFullFlipH();
-        var full_flip_v = this.getFullFlipV();
-        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
-        if(same_flip)
-            return ((num - num_north) + AscFormat.CARD_DIRECTION_N + 8)%8;
-
-        return (AscFormat.CARD_DIRECTION_N - (num - num_north)+ 8)%8;
-    };
-
     CGroupShape.prototype.applyTextArtForm = function(sPreset)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -1537,77 +1493,6 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.getNumByCardDirection = function(cardDirection)
-    {
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
-        var transform = this.getTransformMatrix();
-        var y1, y3, y5, y7;
-        y1 = transform.TransformPointY(hc, 0);
-        y3 = transform.TransformPointY(this.extX, vc);
-        y5 = transform.TransformPointY(hc, this.extY);
-        y7 = transform.TransformPointY(0, vc);
-
-        var north_number;
-        var full_flip_h = this.getFullFlipH();
-        var full_flip_v = this.getFullFlipV();
-        switch(Math.min(y1, y3, y5, y7))
-        {
-            case y1:
-            {
-                north_number = !full_flip_v ? 1 : 5;
-                break;
-            }
-            case y3:
-            {
-                north_number = !full_flip_h ? 3 : 7;
-                break;
-            }
-            case y5:
-            {
-                north_number = !full_flip_v ? 5 : 1;
-                break;
-            }
-            default:
-            {
-                north_number = !full_flip_h ? 7 : 3;
-                break;
-            }
-        }
-        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
-
-        if(same_flip)
-            return (north_number + cardDirection)%8;
-        return (north_number - cardDirection + 8)%8;
-    };
-
-    CGroupShape.prototype.getAspect = function(num)
-    {
-        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
-        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
-        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
-    };
-
-    CGroupShape.prototype.getFullFlipH = function()
-    {
-        if(!isRealObject(this.group))
-            return this.flipH;
-        else
-            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
-    };
-
-    CGroupShape.prototype.getFullFlipV = function()
-    {
-        if(!isRealObject(this.group))
-            return this.flipV;
-        else
-            return this.group.getFullFlipV() ? !this.flipV : this.flipV;
-    };
-
-    CGroupShape.prototype.getFullRotate = function()
-    {
-        return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
-    };
 
     CGroupShape.prototype.createRotateTrack = function()
     {

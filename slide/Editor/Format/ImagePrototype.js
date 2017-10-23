@@ -199,7 +199,4 @@ CImageShape.prototype.hitInInnerArea = CShape.prototype.hitInInnerArea;
 CImageShape.prototype.hitInPath = CShape.prototype.hitInPath;
 CImageShape.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CImageShape.prototype.hitInBoundingRect = CShape.prototype.hitInBoundingRect;
-CImageShape.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirection;
-CImageShape.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
-CImageShape.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CImageShape.prototype.check_bounds = CShape.prototype.check_bounds;
