@@ -2904,6 +2904,17 @@ function CEditorPage(api)
 				if (this.Splitter2Pos < this.Splitter2PosMin)
 					this.Splitter2Pos = 1;
 
+				if (this.Splitter2Pos <= 1)
+				{
+					this.m_oNotes.HtmlElement.style.display = "none";
+					this.m_oNotes_scroll.HtmlElement.style.display = "none";
+				}
+				else
+				{
+					this.m_oNotes.HtmlElement.style.display = "block";
+					this.m_oNotes_scroll.HtmlElement.style.display = "block";
+				}
+
 				this.m_oMainContent.Bounds.B = this.Splitter2Pos + GlobalSkin.SplitterWidthMM;
 				this.m_oMainContent.Bounds.isAbsB = true;
 				this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
