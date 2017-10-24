@@ -259,7 +259,14 @@ CComplexField.prototype.Update = function()
 
 		this.LogicDocument.Insert_Content(oSelectedContent, oNearPos);
 		this.LogicDocument.Recalculate();
+	}
+	else if (fieldtype_PAGEREF === nFieldCode)
+	{
+		this.LogicDocument.Create_NewHistoryPoint();
 
+		this.LogicDocument.GetBookmarksManager();
+
+		this.LogicDocument.Recalculate();
 	}
 };
 CComplexField.prototype.private_SelectFieldValue = function()
