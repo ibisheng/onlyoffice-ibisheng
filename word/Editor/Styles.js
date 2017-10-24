@@ -9460,7 +9460,29 @@ CParaPr.prototype =
         {
             if(ParaPr.Bullet.isBullet())
             {
-                this.Bullet = ParaPr.Bullet.createDuplicate();
+                if(!this.Bullet)
+                {
+                    this.Bullet = new AscFormat.CBullet();
+                }
+                var PrBullet = ParaPr.Bullet;
+                if(PrBullet.bulletColor)
+                {
+                    this.Bullet.bulletColor = PrBullet.bulletColor.createDuplicate();
+                }
+                if(PrBullet.bulletSize)
+                {
+                    this.Bullet.bulletSize = PrBullet.bulletSize.createDuplicate();
+                }
+                if(PrBullet.bulletTypeface)
+                {
+                    this.Bullet.bulletTypeface = PrBullet.bulletTypeface.createDuplicate();
+                }
+                if(PrBullet.bulletType)
+                {
+                    this.Bullet.bulletType = PrBullet.bulletType.createDuplicate();
+                }
+                this.Bullet.Bullet = PrBullet.Bullet;
+
             }
             else
             {
