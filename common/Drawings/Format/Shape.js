@@ -2390,7 +2390,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
                 master_ppt_styles = parent_objects.master.txStyles;
             }
             else{
-                if (this.isPlaceholder()) {
+                if (this.isPlaceholder() && !(this instanceof AscFormat.CGraphicFrame)) {
                     switch (this.getPlaceholderType()) {
                         case AscFormat.phType_ctrTitle:
                         case AscFormat.phType_title:
