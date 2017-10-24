@@ -4374,7 +4374,6 @@ function parserFormula( formula, parent, _ws ) {
 
 	this.listenerId = lastListenerId++;
 	this.ca = false;
-	this.isDirty = false;
 	this.isCalculate = false;
 	this.calculateDefName = null;
 	this.isTable = false;
@@ -4388,31 +4387,12 @@ function parserFormula( formula, parent, _ws ) {
   parserFormula.prototype.getListenerId = function() {
     return this.listenerId;
   };
-  parserFormula.prototype.getIsDirty = function() {
-    return this.isDirty;
-  };
-  parserFormula.prototype.setIsDirty = function(isDirty) {
-    this.isDirty = isDirty;
-  };
 	parserFormula.prototype.setIsTable = function(isTable){
 		this.isTable = isTable;
 	};
 	parserFormula.prototype.notify = function(data) {
 		var eventData = {notifyData: data, assemble: null, formula: this};
-		if (this.parent && this.parent.onFormulaEvent) {
-			var checkCanDo = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.CanDo, eventData);
-			if(!checkCanDo){
-				return;
-			}
-		}
 		if (AscCommon.c_oNotifyType.Dirty === data.type) {
-			if (!this.isDirty) {
-				this.isDirty = true;
-				if (this.parent && this.parent.onFormulaEvent) {
-					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
-				}
-			}
-		} else if (AscCommon.c_oNotifyType.Changed === data.type) {
 			if (this.parent && this.parent.onFormulaEvent) {
 				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
 			}
@@ -4518,7 +4498,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.f = [];
   this.countRef = 0;
   this.ca = false;
-  this.isDirty = false;
   this.isCalculate = false;
   this.calculateDefName = null;
   //this.isTable = false;
@@ -5445,7 +5424,6 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 		this.isCalculate = false;
 		this.calculateDefName = null;
-		this.isDirty = false;
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */

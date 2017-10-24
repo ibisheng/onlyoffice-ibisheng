@@ -91,9 +91,7 @@
 		this.cf = cf;
 	}
 	CConditionalFormattingFormulaWrapper.prototype.onFormulaEvent = function(type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+		if (AscCommon.c_oNotifyParentType.IsDefName === type) {
 			return {bbox: this.cf.getBBox(), ranges: this.cf.ranges};
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(this.cf.ranges));

@@ -274,22 +274,22 @@
 			}
 		},
 		onFormulaEvent: function(type, eventData) {
-			if (AscCommon.c_oNotifyParentType.CanDo === type) {
-				var notifyType = eventData.notifyData.type;
-				return !(this.isTable &&
-				(AscCommon.c_oNotifyType.Shift === notifyType || AscCommon.c_oNotifyType.Move === notifyType ||
-				AscCommon.c_oNotifyType.Delete === notifyType));
-			} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+			if (AscCommon.c_oNotifyParentType.IsDefName === type) {
 				return null;
 			} else if (AscCommon.c_oNotifyParentType.Change === type) {
 				this.wb.dependencyFormulas.addToChangedDefName(this);
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
-				var oldUndoName = this.getUndoDefName();
-				this.ref = this.parsedRef.Formula = eventData.assemble;
-				this.wb.dependencyFormulas.addToChangedDefName(this);
-				var newUndoName = this.getUndoDefName();
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeUndo, null,
-							null, new UndoRedoData_FromTo(oldUndoName, newUndoName), true);
+				var notifyType = eventData.notifyData.type;
+				if (!(this.isTable &&
+					(AscCommon.c_oNotifyType.Shift === notifyType || AscCommon.c_oNotifyType.Move === notifyType ||
+					AscCommon.c_oNotifyType.Delete === notifyType))) {
+					var oldUndoName = this.getUndoDefName();
+					this.ref = this.parsedRef.Formula = eventData.assemble;
+					this.wb.dependencyFormulas.addToChangedDefName(this);
+					var newUndoName = this.getUndoDefName();
+					History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeUndo,
+						null, null, new UndoRedoData_FromTo(oldUndoName, newUndoName), true);
+				}
 			}
 		}
 	};
@@ -318,8 +318,12 @@
 		this.defNameListeners = {};
 		this.tempGetByCells = [];
 		//set dirty
+		this.isInCalc = false;
 		this.changedCell = null;
+		this.changedCellRepeated = null;
 		this.changedDefName = null;
+		this.changedDefNameRepeated = null;
+		this.dirtyCells = {};
 		this.buildCell = {};
 		this.buildDefName = {};
 		this.cleanCellCache = {};
@@ -827,16 +831,35 @@
 				changedSheet = {};
 				this.changedCell[sheetId] = changedSheet;
 			}
-			changedSheet[getCellIndex(cell.nRow, cell.nCol)] = 1;
+			var cellIndex = getCellIndex(cell.nRow, cell.nCol);
+			if (this.isInCalc && !changedSheet[cellIndex]) {
+				if (!this.changedCellRepeated) {
+					this.changedCellRepeated = {};
+				}
+				var changedSheetRepeated = this.changedCellRepeated[sheetId];
+				if (!changedSheetRepeated) {
+					changedSheetRepeated = {};
+					this.changedCellRepeated[sheetId] = changedSheetRepeated;
+				}
+				changedSheetRepeated[cellIndex] = 1;
+			}
+			changedSheet[cellIndex] = 1;
 		},
 		addToChangedDefName: function(defName) {
 			if (!this.changedDefName) {
 				this.changedDefName = {};
 			}
-			this.changedDefName[defName.getNodeId()] = 1;
+			var nodeId = defName.getNodeId();
+			if (this.isInCalc && !this.changedDefName[nodeId]) {
+				if (!this.changedDefNameRepeated) {
+					this.changedDefNameRepeated = {};
+				}
+				this.changedDefNameRepeated[nodeId] = 1;
+			}
+			this.changedDefName[nodeId] = 1;
 		},
 		addToChangedRange: function(sheetId, bbox) {
-			var notifyData = {type: AscCommon.c_oNotifyType.Changed};
+			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				for (var cellIndex in sheetContainer.cellMap) {
@@ -894,7 +917,7 @@
 			}
 		},
 		notifyChanged: function(changedFormulas) {
-			var notifyData = {type: AscCommon.c_oNotifyType.Changed};
+			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			for (var listenerId in changedFormulas) {
 				changedFormulas[listenerId].notify(notifyData);
 			}
@@ -937,24 +960,14 @@
 			if (this.changedCell || this.changedDefName) {
 				this._broadscastVolatile(notifyData);
 			}
+			this._broadcastCellsStart();
 			var calcTrack = [];
-			var noCalcTrack = [];
-			while (this.changedCell || this.changedDefName) {
-				this._broadcastDefNames(notifyData, noCalcTrack);
+			while (this.changedCellRepeated || this.changedDefNameRepeated) {
+				this._broadcastDefNames(notifyData);
 				this._broadcastCells(notifyData, calcTrack);
 			}
 			this._broadcastCellsEnd();
-			for (var i = 0; i < noCalcTrack.length; ++i) {
-				var formula = noCalcTrack[i];
-				//defName recalc when calc formula containing it. no need calc it
-				formula.setIsDirty(false);
-			}
-			for (var i = 0; i < calcTrack.length; ++i) {
-				var formula = calcTrack[i];
-				if (formula.getIsDirty()) {
-					formula.calculate();
-				}
-			}
+			this._calculateDirty();
 			//copy cleanCellCache to prevent recursion in trigger("cleanCellCache")
 			var tmpCellCache = this.cleanCellCache;
 			this.cleanCellCache = {};
@@ -1095,25 +1108,20 @@
 				}
 			}
 		},
-		_broadcastDefNames: function(notifyData, noCalcTrack) {
-			if (this.changedDefName) {
-				var changedDefName = this.changedDefName;
-				this.changedDefName = null;
+		_broadcastDefNames: function(notifyData) {
+			if (this.changedDefNameRepeated) {
+				var changedDefName = this.changedDefNameRepeated;
+				this.changedDefNameRepeated = null;
 				for (var nodeId in changedDefName) {
-					var defName = this.getDefNameByNodeId(nodeId);
-					if (defName && defName.parsedRef) {
-						defName.parsedRef.setIsDirty(true);
-						noCalcTrack.push(defName.parsedRef);
-					}
 					getFromDefNameId(nodeId);
 					this._broadcastDefName(g_FDNI.name, notifyData);
 				}
 			}
 		},
 		_broadcastCells: function(notifyData, calcTrack) {
-			if (this.changedCell) {
-				var changedCell = this.changedCell;
-				this.changedCell = null;
+			if (this.changedCellRepeated) {
+				var changedCell = this.changedCellRepeated;
+				this.changedCellRepeated = null;
 				for (var sheetId in changedCell) {
 					var changedSheet = changedCell[sheetId];
 					var sheetContainer = this.sheetListeners[sheetId];
@@ -1130,12 +1138,12 @@
 							}
 							if (ws) {
 								getFromCellIndex(cellIndex);
-								ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
-									if (cell && cell.formulaParsed) {
-										cell.formulaParsed.setIsDirty(true);
-										calcTrack.push(cell.formulaParsed);
-									}
-								});
+								var dirtyCellsSheet = this.dirtyCells[sheetId];
+								if (!dirtyCellsSheet) {
+									dirtyCellsSheet = {};
+									this.dirtyCells[sheetId] = dirtyCellsSheet;
+								}
+								dirtyCellsSheet[cellIndex] = 1;
 							}
 						}
 						if (sheetContainer) {
@@ -1152,12 +1160,53 @@
 				}
 			}
 		},
+		_broadcastCellsStart: function() {
+			this.isInCalc = true;
+			this.changedCellRepeated = this.changedCell;
+			this.changedDefNameRepeated = this.changedDefName;
+		},
 		_broadcastCellsEnd: function() {
+			this.isInCalc = false;
+			this.changedCell = null;
+			this.changedDefName = null;
 			for (var i = 0; i < this.tempGetByCells.length; ++i) {
 				var temp = this.tempGetByCells[i];
 				temp.areaTree.getByCellsEnd(temp.areas);
 			}
 			this.tempGetByCells = [];
+		},
+		_calculateDirty: function() {
+			for (var sheetId in this.dirtyCells) {
+				if (this.dirtyCells.hasOwnProperty(sheetId)) {
+					var dirtyCellsSheet = this.dirtyCells[sheetId];
+					var ws = this.wb.getWorksheetById(sheetId);
+					if (dirtyCellsSheet && ws) {
+						for (var cellIndex in dirtyCellsSheet) {
+							if (dirtyCellsSheet.hasOwnProperty(cellIndex)) {
+								getFromCellIndex(cellIndex - 0);
+								ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
+									if (cell && cell.formulaParsed) {
+										cell.formulaParsed.calculate();
+									}
+								});
+							}
+						}
+					}
+				}
+			}
+			this.dirtyCells = {};
+		},
+		_calculateDirtyCell: function(cell) {
+			if (cell.formulaParsed) {
+				var dirtyCellsSheet = this.dirtyCells[cell.ws.getId()];
+				if (dirtyCellsSheet) {
+					var cellIndex = getCellIndex(cell.nRow, cell.nCol);
+					if (dirtyCellsSheet[cellIndex]) {
+						dirtyCellsSheet[cellIndex] = 0;
+						cell.formulaParsed.calculate();
+					}
+				}
+			}
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
 			var listeners = {};
@@ -1356,11 +1405,7 @@
 	}
 	ForwardTransformationFormula.prototype = {
 		onFormulaEvent: function(type, eventData) {
-			if (AscCommon.c_oNotifyParentType.CanDo === type) {
-				return true;
-			} else if (AscCommon.c_oNotifyParentType.Change === type) {
-				this.parsed.setIsDirty(false);
-			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+			if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 				this.formula = eventData.assemble;
 			}
 		}
@@ -6416,10 +6461,8 @@
 		else
 			this.setValue("");
 	};
-	Cell.prototype._checkDirty = function(){
-		if(this.formulaParsed && this.formulaParsed.getIsDirty()) {
-			this.formulaParsed.calculate();
-		}
+	Cell.prototype._checkDirty = function() {
+		this.ws.workbook.dependencyFormulas._calculateDirtyCell(this);
 	};
 	Cell.prototype.getFont=function(){
 		var xfs = this.getCompiledStyle();
@@ -7035,9 +7078,7 @@
 	}
 	CCellWithFormula.prototype.onFormulaEvent = function(type, eventData) {
 		var t = this;
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
+		if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
 			return new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow);
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);

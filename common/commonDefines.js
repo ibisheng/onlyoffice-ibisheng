@@ -839,19 +839,17 @@
 		Move: 2,
 		Delete: 3,
 		RenameTableColumn: 4,
-		Changed: 5,
-		ChangeDefName: 6,
-		ChangeSheet: 7,
-		DelColumnTable: 8
+		ChangeDefName: 5,
+		ChangeSheet: 6,
+		DelColumnTable: 7
 	};
 
 	var c_oNotifyParentType = {
-		CanDo: 0,
-		Change: 1,
-		ChangeFormula: 2,
-		EndCalculate: 3,
-		GetRangeCell: 4,
-		IsDefName: 5
+		Change: 0,
+		ChangeFormula: 1,
+		EndCalculate: 2,
+		GetRangeCell: 3,
+		IsDefName: 4
 	};
 
 	var c_oDashType = {

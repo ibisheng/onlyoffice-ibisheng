@@ -6022,11 +6022,6 @@ function TableColumn() {
 	this.CalculatedColumnFormula = null;
 }
 	TableColumn.prototype.onFormulaEvent = function(type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			this.TotalsRowFormula.setIsDirty(false);
-		}
 	};
 	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
 		if (this.TotalsRowFormula) {

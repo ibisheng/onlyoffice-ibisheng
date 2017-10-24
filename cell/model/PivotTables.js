@@ -5346,9 +5346,7 @@ function CT_WorksheetSource() {
 	this.formula = null;
 }
 CT_WorksheetSource.prototype.onFormulaEvent = function (type, eventData) {
-	if (AscCommon.c_oNotifyParentType.CanDo === type) {
-		return true;
-	} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+	if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 		// ToDo update formula with eventData.assemble;
 	}
 };
