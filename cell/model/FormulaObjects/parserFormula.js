@@ -5774,33 +5774,8 @@ parserFormula.prototype.setFormula = function(formula) {
 		if (!rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
 			return this.Formula;
 		}
-		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
-		for (var i = 0, j = 0; i < _count; i++, j++) {
-			currentElement = this.outStack[i];
 
-			if(currentElement.type === cElementType.specialFunctionStart || currentElement.type === cElementType.specialFunctionEnd){
-				continue;
-			}
-
-			if (cElementType.operator === currentElement.type || cElementType.func === currentElement.type) {
-				_count_arg = currentElement.getArguments();
-				res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
-				j -= _count_arg;
-				elemArr[j] = res;
-			} else {
-				if (cElementType.string === currentElement.type) {
-					currentElement = new cString("\"" + currentElement.toString() + "\"");
-				}
-				res = currentElement;
-				elemArr[j] = res;
-			}
-		}
-
-		if (res != undefined && res != null) {
-			return res.toString();
-		} else {
-			return this.Formula;
-		}
+		return this._assembleExec();
 	};
 
 	/* Сборка функции в инфиксную форму */
@@ -5808,8 +5783,14 @@ parserFormula.prototype.setFormula = function(formula) {
 		if (this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
 			return this.Formula;
 		}
+
+		return this._assembleExec(locale, digitDelim, true);
+	};
+
+	parserFormula.prototype._assembleExec = function (locale, digitDelim, bLocale) {
 		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined,
 			_count_arg;
+
 		for (var i = 0, j = 0; i < _count; i++, j++) {
 			currentElement = this.outStack[i];
 
@@ -5818,25 +5799,36 @@ parserFormula.prototype.setFormula = function(formula) {
 				continue;
 			}
 
-			if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
+			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
 				_count_arg = currentElement.getArguments();
-				res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
+				if (bLocale) {
+					res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
+				} else {
+					res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
+				}
 				j -= _count_arg;
 				elemArr[j] = res;
 			} else {
-				if (currentElement instanceof cString) {
-					currentElement = new cString("\"" + currentElement.toLocaleString(digitDelim) + "\"");
+				if (cElementType.string === currentElement.type) {
+					if (bLocale) {
+						currentElement = new cString("\"" + currentElement.toLocaleString(digitDelim) + "\"");
+					} else {
+						currentElement = new cString("\"" + currentElement.toString() + "\"");
+					}
+
 				}
 				res = currentElement;
 				elemArr[j] = res;
 			}
 		}
+
 		if (res != undefined && res != null) {
-			return res.toLocaleString(digitDelim);
+			return bLocale ? res.toLocaleString(digitDelim) : res.toString();
 		} else {
 			return this.Formula;
 		}
 	};
+
 	parserFormula.prototype.buildDependencies = function() {
 		if (this.isInDependencies) {
 			return;
