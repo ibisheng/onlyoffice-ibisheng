@@ -2496,9 +2496,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.setArgumentsCount = function (count) {
 		this.argumentsCurrent = count;
 	};
-	cBaseFunction.prototype.getArguments = function () {
+	/*cBaseFunction.prototype.getArguments = function () {
 		return this.argumentsCurrent;
-	};
+	};*/
 	cBaseFunction.prototype.Assemble = function (arg) {
 		var str = "";
 		for (var i = 0; i < arg.length; i++) {
@@ -2549,8 +2549,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return this.value;
 	};
-	cBaseFunction.prototype.checkArguments = function () {
-		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
+	cBaseFunction.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return this.argumentsMin <= countArguments && countArguments <= this.argumentsMax;
 	};
 	cBaseFunction.prototype._findArrayInNumberArguments = function (oArguments, calculateFunc, dNotCheckNumberType){
 		var argsArray = [];
@@ -4942,8 +4945,8 @@ parserFormula.prototype.setFormula = function(formula) {
 					return false;
 				} else {
 					if (top_elem.getArguments() >= func.argumentsMin) {
-						func.setArgumentsCount(top_elem.getArguments());
-						if (!func.checkArguments()) {
+						t.outStack.push(top_elem.getArguments());
+						if (!func.checkArguments(top_elem.getArguments())) {
 							bError = true;
 						}
 					} else {
@@ -5380,7 +5383,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			opt_bbox = new Asc.Range(0, 0, 0, 0);
 		}
 
-		var elemArr = [], _tmp, numFormat = cNumFormatFirstCell, currentElement = null, bIsSpecialFunction;
+		var elemArr = [], _tmp, numFormat = cNumFormatFirstCell, currentElement = null, bIsSpecialFunction, argumentsCount;
 		for (var i = 0; i < this.outStack.length; i++) {
 			currentElement = this.outStack[i];
 			if (currentElement.name === "(") {
@@ -5394,15 +5397,22 @@ parserFormula.prototype.setFormula = function(formula) {
 				bIsSpecialFunction = false;
 				continue;
 			}
+			if("number" === typeof(currentElement)){
+				continue;
+			}
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
-				if (elemArr.length < currentElement.getArguments()) {
+				argumentsCount = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : currentElement.argumentsCurrent;
+				if (elemArr.length < argumentsCount) {
 					elemArr = [];
 					this.value = new cError(cErrorType.unsupported_function);
 					this._endCalculate();
 					return this.value;
 				} else {
 					var arg = [];
-					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
+					for (var ind = 0; ind < argumentsCount; ind++) {
+						if("number" === typeof(elemArr[elemArr.length - 1])){
+							elemArr.pop();
+						}
 						arg.unshift(elemArr.pop());
 					}
 					_tmp = currentElement.Calculate(arg, opt_bbox, opt_defName, this.ws, bIsSpecialFunction);
@@ -5788,25 +5798,29 @@ parserFormula.prototype.setFormula = function(formula) {
 	};
 
 	parserFormula.prototype._assembleExec = function (locale, digitDelim, bLocale) {
+		//_numberPrevArg - количество аргументов функции в стеке
 		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined,
-			_count_arg;
+			_count_arg, _numberPrevArg, _argDiff;
 
 		for (var i = 0, j = 0; i < _count; i++, j++) {
 			currentElement = this.outStack[i];
 
 			if (currentElement.type === cElementType.specialFunctionStart ||
-				currentElement.type === cElementType.specialFunctionEnd) {
+				currentElement.type === cElementType.specialFunctionEnd || "number" === typeof(currentElement)) {
 				continue;
 			}
 
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
-				_count_arg = currentElement.getArguments();
+				_numberPrevArg = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : null;
+				_count_arg = null !== _numberPrevArg ? _numberPrevArg : currentElement.argumentsCurrent;
+				_argDiff = null !== _numberPrevArg ? 1 : 0;
+
 				if (bLocale) {
-					res = currentElement.Assemble2Locale(elemArr, j - _count_arg, _count_arg, locale, digitDelim);
+					res = currentElement.Assemble2Locale(elemArr, j - _count_arg - _argDiff, _count_arg, locale, digitDelim);
 				} else {
-					res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
+					res = currentElement.Assemble2(elemArr, j - _count_arg - _argDiff, _count_arg);
 				}
-				j -= _count_arg;
+				j -= _count_arg + _argDiff;
 				elemArr[j] = res;
 			} else {
 				if (cElementType.string === currentElement.type) {

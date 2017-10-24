@@ -4585,8 +4585,11 @@
 		}
 		return this.value = new cNumber(_sum);
 	};
-	cSUMIFS.prototype.checkArguments = function () {
-		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	cSUMIFS.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**

@@ -4050,8 +4050,11 @@ function (window, undefined) {
 			return this.value = new cNumber(_sum / _count);
 		}
 	};
-	cAVERAGEIFS.prototype.checkArguments = function () {
-		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	cAVERAGEIFS.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**
@@ -5122,8 +5125,11 @@ function (window, undefined) {
 		}
 		return this.value = new cNumber(_count);
 	};
-	cCOUNTIFS.prototype.checkArguments = function () {
-		return 0 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	cCOUNTIFS.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return 0 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**
@@ -7918,8 +7924,11 @@ function (window, undefined) {
 
 		return this.value = new cNumber(resArr[0]);
 	};
-	cMAXIFS.prototype.checkArguments = function () {
-		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	cMAXIFS.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**
@@ -8024,8 +8033,11 @@ function (window, undefined) {
 
 		return this.value = new cNumber(resArr[0]);
 	};
-	cMINIFS.prototype.checkArguments = function () {
-		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	cMINIFS.prototype.checkArguments = function (countArguments) {
+		if(undefined === countArguments){
+			countArguments = this.argumentsCurrent;
+		}
+		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**
