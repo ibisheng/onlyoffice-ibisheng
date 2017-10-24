@@ -15,7 +15,7 @@ GRUNT_ENV += BUILD_NUMBER=$(BUILD_NUMBER)
 
 WEBAPPS_DIR = web-apps
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-integration documentserver-enterprise))
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
 WEBAPPS_DIR = web-apps-pro
 endif
 
