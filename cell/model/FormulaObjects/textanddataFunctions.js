@@ -235,7 +235,7 @@ function (window, undefined) {
 	cCONCATENATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCONCATENATE.prototype.Calculate = function (arg) {
 		var arg0 = new cString(""), argI;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			argI = arg[i];
 			if (argI instanceof cArea || argI instanceof cArea3D) {
 				argI = argI.cross(arguments[1]);
@@ -280,7 +280,7 @@ function (window, undefined) {
 	cCONCAT.prototype.Calculate = function (arg) {
 		var arg0 = new cString(""), argI;
 
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			argI = arg[i];
 
 			if (cElementType.cellsRange === argI.type || cElementType.cellsRange3D === argI.type) {
@@ -578,7 +578,7 @@ function (window, undefined) {
 	cFIND.prototype.argumentsMin = 2;
 	cFIND.prototype.argumentsMax = 3;
 	cFIND.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr,
+		var arg0 = arg[0], arg1 = arg[1], arg2 = arg.length == 3 ? arg[2] : null, res, str, searchStr,
 			pos = -1;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -1866,7 +1866,7 @@ function (window, undefined) {
 		};
 
 		var arg0 = new cString(""), argI;
-		for (var i = 2; i < this.argumentsCurrent; i++) {
+		for (var i = 2; i < arg.length; i++) {
 			argI = arg[i];
 
 			var type = argI.type;

@@ -6466,7 +6466,7 @@ function (window, undefined) {
 			return this.value = c;
 		}
 
-		for (var i = 1; i < this.getArguments(); i++) {
+		for (var i = 1; i < arg.length; i++) {
 
 			var argI = arg[i];
 			if (argI instanceof cArea || argI instanceof cArea3D) {
@@ -6903,7 +6903,7 @@ function (window, undefined) {
 			return this.value = c;
 		}
 
-		for (var i = 1; i < this.getArguments(); i++) {
+		for (var i = 1; i < arg.length; i++) {
 
 			var argI = arg[i];
 			if (argI instanceof cArea || argI instanceof cArea3D) {

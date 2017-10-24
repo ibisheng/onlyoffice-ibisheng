@@ -5518,7 +5518,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -6820,7 +6820,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -6931,7 +6931,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -7238,7 +7238,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -7670,7 +7670,7 @@ function (window, undefined) {
 	cMAX.prototype.argumentsMin = 1;
 	cMAX.prototype.Calculate = function (arg) {
 		var v, element, argIVal, max = Number.NEGATIVE_INFINITY;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			element = arg[i];
 			argIVal = element.getValue();
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
@@ -7750,7 +7750,7 @@ function (window, undefined) {
 	cMAXA.prototype.argumentsMin = 1;
 	cMAXA.prototype.Calculate = function (arg) {
 		var argI, argIVal, max = Number.NEGATIVE_INFINITY, v;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			argI = arg[i];
 			argIVal = argI.getValue();
 			if (argI instanceof cRef || argI instanceof cRef3D) {
@@ -8069,7 +8069,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -8116,7 +8116,7 @@ function (window, undefined) {
 	cMIN.prototype.argumentsMin = 1;
 	cMIN.prototype.Calculate = function (arg) {
 		var v, element, argIVal, min = Number.POSITIVE_INFINITY;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			element = arg[i];
 			argIVal = element.getValue();
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
@@ -8197,7 +8197,7 @@ function (window, undefined) {
 	cMINA.prototype.argumentsMin = 1;
 	cMINA.prototype.Calculate = function (arg) {
 		var argI, argIVal, min = Number.POSITIVE_INFINITY, v;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			argI = arg[i];
 			argIVal = argI.getValue();
 			if (argI instanceof cRef || argI instanceof cRef3D) {
@@ -8325,7 +8325,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -9752,7 +9752,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -9801,7 +9801,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -10327,7 +10327,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -11069,7 +11069,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {
@@ -11347,7 +11347,7 @@ function (window, undefined) {
 
 		var arr0 = [];
 
-		for (var j = 0; j < this.getArguments(); j++) {
+		for (var j = 0; j < arg.length; j++) {
 
 			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
 				arg[j].foreach2(function (elem) {

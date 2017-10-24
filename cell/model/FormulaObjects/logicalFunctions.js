@@ -273,7 +273,7 @@
 		}
 
 		var res = null;
-		for (var i = 0; i < this.argumentsCurrent; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			var argN = argClone[i];
 			if (cElementType.string === argN.type) {
 				res = new cError(cErrorType.wrong_value_type);
@@ -442,7 +442,7 @@
 		}
 
 		var res = null;
-		for (var i = 1; i < this.argumentsCurrent; i++) {
+		for (var i = 1; i < argClone.length; i++) {
 			var argN = argClone[i].getValue();
 			if (arg0 === argN) {
 				if (!argClone[i + 1]) {
@@ -452,7 +452,7 @@
 					break;
 				}
 			}
-			if (i === this.argumentsCurrent - 1) {
+			if (i === argClone.length - 1) {
 				res = argClone[i];
 			}
 			i++;

@@ -252,7 +252,7 @@ function (window, undefined) {
 		}
 
 		if (cElementType.number === arg0.type) {
-			if (arg0.getValue() < 1 || arg0.getValue() > this.getArguments() - 1) {
+			if (arg0.getValue() < 1 || arg0.getValue() > arg.length - 1) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
@@ -824,8 +824,8 @@ function (window, undefined) {
 		}
 
 		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
-		var arg3 = 3 < this.argumentsCurrent ? arg[3].tocNumber() : new cNumber(-1);
-		var arg4 = 5 === this.argumentsCurrent ? arg[4].tocNumber() : new cNumber(-1);
+		var arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
+		var arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
 
 		if (cElementType.error === arg1.type || cElementType.error === arg2.type || cElementType.error === arg3.type ||
 			arg4.type) {

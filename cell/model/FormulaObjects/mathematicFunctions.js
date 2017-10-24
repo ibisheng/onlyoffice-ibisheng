@@ -1973,7 +1973,7 @@
 			return _a;
 		}
 
-		for (var i = 0; i < this.getArguments(); i++) {
+		for (var i = 0; i < arg.length; i++) {
 			var argI = arg[i];
 
 			if (argI instanceof cArea || argI instanceof cArea3D) {
@@ -2157,7 +2157,7 @@
 			return Math.abs(parseInt(a) * parseInt(b)) / gcd(a, b);
 		}
 
-		for (var i = 0; i < this.getArguments(); i++) {
+		for (var i = 0; i < arg.length; i++) {
 			var argI = arg[i];
 
 			if (argI instanceof cArea || argI instanceof cArea3D) {
