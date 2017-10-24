@@ -1855,6 +1855,8 @@ function CEditorPage(api)
 		{
 			if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 				oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
+			if (oWordControl.m_oThumbnailsContainer && oWordControl.m_oThumbnailsContainer.HtmlElement)
+				oWordControl.m_oThumbnailsContainer.HtmlElement.style.pointerEvents = "none";
 			AscCommon.stopEvent(e);
 		}
 	};
@@ -2013,6 +2015,8 @@ function CEditorPage(api)
 
 		if (oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
 			oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "";
+		if (oWordControl.m_oThumbnailsContainer && oWordControl.m_oThumbnailsContainer.HtmlElement)
+			oWordControl.m_oThumbnailsContainer.HtmlElement.style.pointerEvents = "";
 
 		if (null != oWordControl.SplitterDiv)
 		{
@@ -2889,6 +2893,34 @@ function CEditorPage(api)
 
 		//console.log("resize");
 		this.CheckRetinaDisplay();
+
+		if (GlobalSkin.SupportNotes)
+		{
+			var _pos = this.Height - ((this.Splitter2Pos * g_dKoef_mm_to_pix) >> 0);
+			var _min = 30 * g_dKoef_mm_to_pix;
+			if (_pos < _min)
+			{
+				this.Splitter2Pos = (this.Height - _min) / g_dKoef_mm_to_pix;
+				if (this.Splitter2Pos < this.Splitter2PosMin)
+					this.Splitter2Pos = 1;
+
+				if (this.Splitter2Pos <= 1)
+				{
+					this.m_oNotes.HtmlElement.style.display = "none";
+					this.m_oNotes_scroll.HtmlElement.style.display = "none";
+				}
+				else
+				{
+					this.m_oNotes.HtmlElement.style.display = "block";
+					this.m_oNotes_scroll.HtmlElement.style.display = "block";
+				}
+
+				this.m_oMainContent.Bounds.B = this.Splitter2Pos + GlobalSkin.SplitterWidthMM;
+				this.m_oMainContent.Bounds.isAbsB = true;
+				this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
+			}
+		}
+
 		this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
 		if (this.m_oApi.isReporterMode)
 			this.OnResizeReporter();
