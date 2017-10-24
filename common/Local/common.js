@@ -136,6 +136,9 @@ prot.getUrl = function(strPath){
 	if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
 		return null;
 
+	if (strPath == "Editor.xlsx")
+		return this.documentUrl + "/" + strPath;
+
 	return this.documentUrl + "/media/" + strPath;
 };
 prot.getLocal = function(url){
