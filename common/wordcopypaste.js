@@ -2119,9 +2119,52 @@ PasteProcessor.prototype =
                 return;
             }
 
-            paragraph.Parent.Insert_Content(oSelectedContent, NearPos);
+            var bPasteMath = false;
+            if(this.pasteInExcel)
+            {
+                var Para        = NearPos.Paragraph;
+                var ParaNearPos = Para.Get_ParaNearestPos(NearPos);
+                var LastClass   = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                if (para_Math_Run === LastClass.Type)
+                {
+                    var MathRun        = LastClass;
+                    var NewMathRun     = MathRun.Split(ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1);
+                    var MathContent    = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
+                    var MathContentPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+                    var Element        = oSelectedContent.Elements[0].Element;
 
-			if(oSelectedContent.Elements.length === 1)
+                    var InsertMathContent = null;
+                    for (var nPos = 0, nParaLen = Element.Content.length; nPos < nParaLen; nPos++)
+                    {
+                        if (para_Math === Element.Content[nPos].Type)
+                        {
+                            InsertMathContent = Element.Content[nPos];
+                            break;
+                        }
+                    }
+
+                    if(null === InsertMathContent)
+                    {
+                        //try to convert content to ParaMath in simple cases.
+                        InsertMathContent = oSelectedContent.ConvertToMath();
+                    }
+
+                    if (null !== InsertMathContent)
+                    {
+                        MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
+                        MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
+                        bPasteMath = true;
+                    }
+                }
+            }
+
+            if(!bPasteMath)
+            {
+                paragraph.Parent.Insert_Content(oSelectedContent, NearPos);
+            }
+
+
+            if(oSelectedContent.Elements.length === 1)
 			{
 				var curDocSelection = this.curDocSelection;
 				if(curDocSelection)

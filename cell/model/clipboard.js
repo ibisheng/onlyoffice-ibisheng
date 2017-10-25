@@ -1504,6 +1504,7 @@
 				{
 					var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
 
+                    selectedContent.On_EndCollectElements(target_doc_content, false);
 
                     NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                     paragraph.Check_NearestPos(NearPos);
@@ -1520,15 +1521,16 @@
                         if (1 !== selectedContent.Elements.length || type_Paragraph !== Element.Get_Type() || null === LastClass.Parent)
                             return;
 
-                        var Math  = null;
-                        var Count = Element.Content.length;
-                        for (var Index = 0; Index < Count; Index++)
-                        {
-                            var Item = Element.Content[Index];
-                            if (para_Math === Item.Type && null === Math)
-                                Math = Element.Content[Index];
-                            else if (true !== Item.Is_Empty({SkipEnd : true}))
-                                return;
+                        if(!selectedContent.CanConvertToMath) {
+                            var Math = null;
+                            var Count = Element.Content.length;
+                            for (var Index = 0; Index < Count; Index++) {
+                                var Item = Element.Content[Index];
+                                if (para_Math === Item.Type && null === Math)
+                                    Math = Element.Content[Index];
+                                else if (true !== Item.Is_Empty({SkipEnd: true}))
+                                    return;
+                            }
                         }
                     }
                     else if (para_Run !== LastClass.Type)
@@ -1537,8 +1539,45 @@
                     if (null === paragraph.Parent || undefined === paragraph.Parent)
                         return;
 
-                    paragraph.Check_NearestPos(NearPos);
-					target_doc_content.Insert_Content(selectedContent, NearPos);
+                    var Para        = NearPos.Paragraph;
+                    var ParaNearPos = Para.Get_ParaNearestPos(NearPos);
+                    var LastClass   = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+                    var bInsertMath = false;
+                    if (para_Math_Run === LastClass.Type)
+                    {
+                        var MathRun        = LastClass;
+                        var NewMathRun     = MathRun.Split(ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1);
+                        var MathContent    = ParaNearPos.Classes[ParaNearPos.Classes.length - 2];
+                        var MathContentPos = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
+                        var Element        = selectedContent.Elements[0].Element;
+
+                        var InsertMathContent = null;
+                        for (var nPos = 0, nParaLen = Element.Content.length; nPos < nParaLen; nPos++)
+                        {
+                            if (para_Math === Element.Content[nPos].Type)
+                            {
+                                InsertMathContent = Element.Content[nPos];
+                                break;
+                            }
+                        }
+
+                        if(null === InsertMathContent)
+                        {
+                            //try to convert content to ParaMath in simple cases.
+                            InsertMathContent = selectedContent.ConvertToMath();
+                        }
+
+                        if (null !== InsertMathContent)
+                        {
+                            MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
+                            MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
+                            bInsertMath = true;
+                        }
+                    }
+                    if(!bInsertMath){
+                        paragraph.Check_NearestPos(NearPos);
+                        target_doc_content.Insert_Content(selectedContent, NearPos);
+                    }
 					
 					worksheet.objectRender.controller.cursorMoveRight(false, false);
 					
