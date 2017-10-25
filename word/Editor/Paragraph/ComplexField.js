@@ -112,13 +112,14 @@ ParaFieldChar.prototype.GetRun = function()
 	return this.Run;
 };
 
-function ParaInstrText(nType, nFlags)
+function ParaInstrText(value)
 {
 	CRunElementBase.call(this);
 
-	this.FieldCode = nType;
-	this.Flags     = nFlags;
-	this.Run       = null;
+	this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);
+	this.Width        = 0x00000000 | 0;
+	this.WidthVisible = 0x00000000 | 0;
+	this.Run          = null;
 }
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
@@ -132,18 +133,14 @@ ParaInstrText.prototype.Draw = function(X, Y, Context)
 ParaInstrText.prototype.Write_ToBinary = function(Writer)
 {
 	// Long : Type
-	// Long : FieldCode
+	// Long : Value
 	Writer.WriteLong(this.Type);
-	Writer.WriteLong(this.FieldCode);
+	Writer.WriteLong(this.Value);
 };
 ParaInstrText.prototype.Read_FromBinary = function(Reader)
 {
-	// Long : FieldCode
-	this.FieldCode = Reader.GetLong();
-};
-ParaInstrText.prototype.GetFieldCode = function()
-{
-	return this.FieldCode;
+	// Long : Value
+	this.Value = Reader.GetLong();
 };
 ParaInstrText.prototype.SetRun = function(oRun)
 {
@@ -153,19 +150,24 @@ ParaInstrText.prototype.GetRun = function()
 {
 	return this.Run;
 };
+ParaInstrText.prototype.GetValue = function()
+{
+	return String.fromCharCode(this.Value);
+};
 
 function CComplexField(oLogicDocument)
 {
-	this.LogicDocument = oLogicDocument;
-	this.BeginChar     = null;
-	this.EndChar       = null;
-	this.SeparateChar  = null;
-	this.Instruction   = null;
-	this.Id            = null;
+	this.LogicDocument   = oLogicDocument;
+	this.BeginChar       = null;
+	this.EndChar         = null;
+	this.SeparateChar    = null;
+	this.InstructionLine = "";
+	this.Instruction     = null;
+	this.Id              = null;
 }
 CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
-	this.Instruction = oParaInstr;
+	this.InstructionLine += oParaInstr.GetValue();
 };
 CComplexField.prototype.GetBeginChar = function()
 {
@@ -183,9 +185,10 @@ CComplexField.prototype.SetBeginChar = function(oChar)
 {
 	oChar.SetComplexField(this);
 
-	this.BeginChar    = oChar;
-	this.SeparateChar = null;
-	this.EndChar      = null;
+	this.BeginChar       = oChar;
+	this.SeparateChar    = null;
+	this.EndChar         = null;
+	this.InstructionLine = "";
 };
 CComplexField.prototype.SetEndChar = function(oChar)
 {
@@ -202,6 +205,12 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 };
 CComplexField.prototype.Update = function()
 {
+	if (!this.Instruction)
+	{
+		var oParser = new CFieldInstructionParser();
+		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
+	}
+
 	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
 		return;
 

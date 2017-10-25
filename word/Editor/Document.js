@@ -15652,12 +15652,16 @@ CDocument.prototype.AddField = function(nType, oPr)
 		if (!oParagraph)
 			return false;
 
+		var nIndex = -1;
 		var oRun = new ParaRun();
-		oRun.Add_ToContent(0, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(1, new ParaInstrText(fieldtype_PAGENUM, oPr));
-		oRun.Add_ToContent(2, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(3, new ParaText("1"));
-		oRun.Add_ToContent(4, new ParaFieldChar(fldchartype_End, this));
+		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
+		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
+		oRun.Add_ToContent(++nIndex, new ParaText("1"));
+		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
 		oParagraph.Add(oRun);
 		return true;
 	}
@@ -15670,7 +15674,9 @@ CDocument.prototype.AddField = function(nType, oPr)
 		var nIndex = -1;
 		var oRun = new ParaRun();
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(fieldtype_TOC, oPr));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("O"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("C"));
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
 		oRun.Add_ToContent(++nIndex, new ParaText("T"));
 		oRun.Add_ToContent(++nIndex, new ParaText("a"));
@@ -15703,7 +15709,13 @@ CDocument.prototype.AddField = function(nType, oPr)
 
 		var oRun = new ParaRun();
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(fieldtype_PAGEREF, oPr));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("R"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("F"));
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
 		oRun.Add_ToContent(++nIndex, new ParaText("1"));
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
