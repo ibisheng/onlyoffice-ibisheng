@@ -121,6 +121,12 @@
 		View    : 4
 	};
 
+	var c_oLicenseMode = {
+		None: 0,
+		Trial: 1,
+		Developer: 2
+	};
+
 	/** @constructor */
 	function asc_CSignatureLine()
 	{
@@ -163,8 +169,8 @@
 	 */
 	function asc_CAscEditorPermissions() {
 		this.licenseType = c_oLicenseResult.Error;
+		this.licenseMode = c_oLicenseMode.None;
 		this.isLight = false;
-		this.trial = false;
 		this.rights = c_oRights.None;
 
 		this.canCoAuthoring = true;
@@ -202,8 +208,8 @@
 	asc_CAscEditorPermissions.prototype.asc_getIsLight = function () {
 		return this.isLight;
 	};
-	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
-		return this.trial;
+	asc_CAscEditorPermissions.prototype.asc_getLicenseMode = function () {
+		return this.licenseMode;
 	};
 	asc_CAscEditorPermissions.prototype.asc_getRights = function () {
 		return this.rights;
@@ -224,8 +230,8 @@
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
 	};
-	asc_CAscEditorPermissions.prototype.setTrial = function (v) {
-		this.trial = v;
+	asc_CAscEditorPermissions.prototype.setLicenseMode = function (v) {
+		this.licenseMode = v;
 	};
 	asc_CAscEditorPermissions.prototype.setRights = function (v) {
 		this.rights = v;
@@ -3548,6 +3554,12 @@
 	prot['Comment'] = prot.Comment;
 	prot['View'] = prot.View;
 
+	window['Asc']['c_oLicenseMode'] = window['Asc'].c_oLicenseMode = c_oLicenseMode;
+	prot = c_oLicenseMode;
+	prot['None'] = prot.None;
+	prot['Trial'] = prot.Trial;
+	prot['Developer'] = prot.Developer;
+
 	window["AscCommon"]["asc_CSignatureLine"] = window["AscCommon"].asc_CSignatureLine = asc_CSignatureLine;
 	prot = asc_CSignatureLine.prototype;
 	prot["asc_getId"] = prot.asc_getId;
@@ -3577,7 +3589,7 @@
 	prot["asc_getAutosaveMinInterval"] = prot.asc_getAutosaveMinInterval;
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
-	prot["asc_getTrial"] = prot.asc_getTrial;
+	prot["asc_getLicenseMode"] = prot.asc_getLicenseMode;
 	prot["asc_getRights"] = prot.asc_getRights;
 	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
 	prot["asc_getBuildNumber"] = prot.asc_getBuildNumber;
