@@ -9282,5 +9282,37 @@ $( function () {
 
 	});
 
+	test( "Test: \"COLUMN\"", function () {
+
+		oParser = new parserFormula('COLUMN(B6)', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 2);
+
+		oParser = new parserFormula('COLUMN(C16)', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 3);
+
+		oParser = new parserFormula('COLUMN()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 1);
+
+	});
+
+	test( "Test: \"ROW\"", function () {
+
+		oParser = new parserFormula('ROW(B6)', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 6);
+
+		oParser = new parserFormula('ROW(C16)', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 16);
+
+		oParser = new parserFormula('ROW()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 1);
+
+	});
+
 	wb.dependencyFormulas.unlockRecal();
 } );
