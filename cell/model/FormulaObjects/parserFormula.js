@@ -2687,11 +2687,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function parentLeft() {
-		this.name = "(";
 		this.argumentsCurrent = 1;
 	}
 
 	parentLeft.prototype.type = cElementType.operator;
+	parentLeft.prototype.name = "(";
 	parentLeft.prototype.DecrementArguments = function () {
 		--this.argumentsCurrent;
 	};
@@ -2716,10 +2716,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function parentRight() {
-		this.name = ")";
 	}
 
 	parentRight.prototype.type = cElementType.operator;
+	parentRight.prototype.name =  ")";
 	parentRight.prototype.toString = function () {
 		return this.name;
 	};
@@ -5235,9 +5235,9 @@ parserFormula.prototype.setFormula = function(formula) {
 
 				var found_operator = null, operandStr = t.operand_str.replace(rx_sFuncPref, "").toUpperCase();
 				if (operandStr in cFormulaList) {
-					found_operator = new cFormulaList[operandStr]();
+					found_operator = cFormulaList[operandStr].prototype;
 				} else if (operandStr in cAllFormulaFunction) {
-					found_operator = new cAllFormulaFunction[operandStr]();
+					found_operator = cAllFormulaFunction[operandStr].prototype;
 				} else {
 					found_operator = new cBaseFunction(operandStr);
 					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );

@@ -108,9 +108,9 @@
 				}
 				ret.addElement(found_operand);
 			});
-			return this.value = ret;
+			return ret;
 		}
-		return this.value = typeError(arg0);
+		return typeError(arg0);
 	};
 
 	/**
@@ -133,9 +133,9 @@
 			arg0 = arg0.getValue();
 		}
 		if (arg0 instanceof AscCommonExcel.cEmpty) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -162,9 +162,9 @@
 		}
 
 		if (arg0 instanceof cError && arg0.errorType != cErrorType.not_available) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -191,9 +191,9 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -220,14 +220,14 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cBool((arg0.getValue() & 1) == 0);
+			return new cBool((arg0.getValue() & 1) == 0);
 		}
 	};
 
@@ -255,10 +255,10 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
-		return this.value = new cBool(res);
+		return new cBool(res);
 	};
 
 	/**
@@ -284,9 +284,9 @@
 		}
 
 		if (arg0 instanceof cBool) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -313,9 +313,9 @@
 		}
 
 		if (arg0 instanceof cError && arg0.errorType == cErrorType.not_available) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -341,9 +341,9 @@
 			arg0 = arg0.getValue();
 		}
 		if (!(arg0 instanceof cString)) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -370,9 +370,9 @@
 		}
 
 		if (arg0 instanceof cNumber) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -399,14 +399,14 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cBool((arg0.getValue() & 1) == 1);
+			return new cBool((arg0.getValue() & 1) == 1);
 		}
 	};
 
@@ -425,9 +425,9 @@
 	cISREF.prototype.Calculate = function (arg) {
 		if ((arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D ||
 			arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid()) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -454,9 +454,9 @@
 		}
 
 		if (arg0 instanceof cString) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -486,7 +486,7 @@
 					arr.array[r][c] = new cNumber(0);
 				}
 			});
-			return this.value = arr;
+			return arr;
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -494,11 +494,11 @@
 		}
 
 		if (arg0 instanceof cNumber || arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cBool) {
-			return this.value = arg0.tocNumber();
+			return arg0.tocNumber();
 		} else {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 	};
@@ -515,7 +515,7 @@
 	cNA.prototype.name = 'NA';
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
-		return this.value = new cError(cErrorType.not_available);
+		return new cError(cErrorType.not_available);
 	};
 
 	/**
@@ -561,7 +561,7 @@
 			res = new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = res;
+		return res;
 	};
 
 	/**
@@ -602,7 +602,7 @@
 				res = new cError(cErrorType.not_available);
 			}
 		}
-		return this.value = res;
+		return res;
 
 	};
 
@@ -627,15 +627,15 @@
 		}
 
 		if (arg0 instanceof cNumber) {
-			return this.value = new cNumber(1);
+			return new cNumber(1);
 		} else if (arg0 instanceof cString) {
-			return this.value = new cNumber(2);
+			return new cNumber(2);
 		} else if (arg0 instanceof cBool) {
-			return this.value = new cNumber(4);
+			return new cNumber(4);
 		} else if (arg0 instanceof cError) {
-			return this.value = new cNumber(16);
+			return new cNumber(16);
 		} else {
-			return this.value = new cNumber(64);
+			return new cNumber(64);
 		}
 	};
 })(window);

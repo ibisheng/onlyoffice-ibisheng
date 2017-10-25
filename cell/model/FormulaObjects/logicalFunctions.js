@@ -71,7 +71,7 @@
 				var argArr = arg[i].getValue();
 				for (var j = 0; j < argArr.length; j++) {
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					} else if (!(argArr[j] instanceof cString || argArr[j] instanceof cEmpty)) {
 						if (argResult === null) {
 							argResult = argArr[j].tocBool();
@@ -79,15 +79,15 @@
 							argResult = new cBool(argResult.value && argArr[j].tocBool().value);
 						}
 						if (argResult.value === false) {
-							return this.value = new cBool(false);
+							return new cBool(false);
 						}
 					}
 				}
 			} else {
 				if (arg[i] instanceof cString) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else if (arg[i] instanceof cError) {
-					return this.value = arg[i];
+					return arg[i];
 				} else if (arg[i] instanceof cArray) {
 					arg[i].foreach(function (elem) {
 						if (elem instanceof cError) {
@@ -113,15 +113,15 @@
 						argResult = new cBool(argResult.value && arg[i].tocBool().value);
 					}
 					if (argResult.value === false) {
-						return this.value = new cBool(false);
+						return new cBool(false);
 					}
 				}
 			}
 		}
 		if (argResult === null) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
-		return this.value = argResult;
+		return argResult;
 	};
 
 	/**
@@ -136,7 +136,7 @@
 	cFALSE.prototype.name = 'FALSE';
 	cFALSE.prototype.argumentsMax = 0;
 	cFALSE.prototype.Calculate = function () {
-		return this.value = new cBool(false);
+		return new cBool(false);
 	};
 
 	/**
@@ -167,13 +167,13 @@
 
 		arg0 = arg0.tocBool();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		} else if (arg0.value) {
-			return this.value = arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
+			return arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
 		} else {
-			return this.value = arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
+			return arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
 		}
 	};
 
@@ -202,9 +202,9 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
+			return arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
 		} else {
-			return this.value = arg[0];
+			return arg[0];
 		}
 	};
 
@@ -234,9 +234,9 @@
 		}
 
 		if (arg0 instanceof cError && cErrorType.not_available === arg0.errorType) {
-			return this.value = arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
+			return arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
 		} else {
-			return this.value = arg[0];
+			return arg[0];
 		}
 	};
 
@@ -257,7 +257,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var res = null;
@@ -286,10 +286,10 @@
 		}
 
 		if (null === res) {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
-		return this.value = res;
+		return res;
 	};
 
 	/**
@@ -317,14 +317,14 @@
 		if (arg0 instanceof cString) {
 			var res = arg0.tocBool();
 			if (res instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
-				return this.value = new cBool(!res.value);
+				return new cBool(!res.value);
 			}
 		} else if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cBool(!arg0.tocBool().value);
+			return new cBool(!arg0.tocBool().value);
 		}
 	};
 
@@ -346,7 +346,7 @@
 				var argArr = arg[i].getValue();
 				for (var j = 0; j < argArr.length; j++) {
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					} else if (argArr[j] instanceof cString || argArr[j] instanceof cEmpty) {
 						if (argResult === null) {
 							argResult = argArr[j].tocBool();
@@ -354,15 +354,15 @@
 							argResult = new cBool(argResult.value || argArr[j].tocBool().value);
 						}
 						if (argResult.value === true) {
-							return this.value = new cBool(true);
+							return new cBool(true);
 						}
 					}
 				}
 			} else {
 				if (arg[i] instanceof cString) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else if (arg[i] instanceof cError) {
-					return this.value = arg[i];
+					return arg[i];
 				} else if (arg[i] instanceof cArray) {
 					arg[i].foreach(function (elem) {
 						if (elem instanceof cError) {
@@ -385,15 +385,15 @@
 						argResult = new cBool(argResult.value || arg[i].tocBool().value);
 					}
 					if (argResult.value === true) {
-						return this.value = new cBool(true);
+						return new cBool(true);
 					}
 				}
 			}
 		}
 		if (argResult == null) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
-		return this.value = argResult;
+		return argResult;
 	};
 
 	/**
@@ -415,7 +415,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0].getValue();
@@ -428,7 +428,7 @@
 			var argN = argClone[i].getValue();
 			if (arg0 === argN) {
 				if (!argClone[i + 1]) {
-					return this.value = cErrorType.not_available;
+					return cErrorType.not_available;
 				} else {
 					res = argClone[i + 1];
 					break;
@@ -441,10 +441,10 @@
 		}
 
 		if (null === res) {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
-		return this.value = res;
+		return res;
 	};
 
 	/**
@@ -459,7 +459,7 @@
 	cTRUE.prototype.name = 'TRUE';
 	cTRUE.prototype.argumentsMax = 0;
 	cTRUE.prototype.Calculate = function () {
-		return this.value = new cBool(true);
+		return new cBool(true);
 	};
 
 	/**
@@ -483,7 +483,7 @@
 				var argArr = arg[i].getValue();
 				for (var j = 0; j < argArr.length; j++) {
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					} else if (argArr[j] instanceof cString || argArr[j] instanceof cEmpty) {
 						if (argResult === null) {
 							argResult = argArr[j].tocBool();
@@ -497,9 +497,9 @@
 				}
 			} else {
 				if (arg[i] instanceof cString) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else if (arg[i] instanceof cError) {
-					return this.value = arg[i];
+					return arg[i];
 				} else if (arg[i] instanceof cArray) {
 					arg[i].foreach(function (elem) {
 						if (elem instanceof cError) {
@@ -533,7 +533,7 @@
 			}
 		}
 		if (argResult == null) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		} else {
 			if (nTrueValues % 2) {
 				argResult = new cBool(true);
@@ -542,6 +542,6 @@
 			}
 		}
 
-		return this.value = argResult;
+		return argResult;
 	};
 })(window);

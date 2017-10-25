@@ -227,7 +227,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -250,7 +250,7 @@
 		}
 
 		 var res = new cNumber(summ / count);
-		 return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		 return cElementType.error === res.type ? new cNumber(0) : res;
 	 };
 
 
@@ -275,7 +275,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -291,7 +291,7 @@
 			}
 		}
 
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 
@@ -316,7 +316,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
@@ -331,7 +331,7 @@
 			}
 		}
 
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 	/**
@@ -359,7 +359,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -367,11 +367,11 @@
 			return resArr;
 		}
 		if(1 !== resArr.length){
-			return this.value =  new cError(cErrorType.not_numeric);
+			return  new cError(cErrorType.not_numeric);
 		}
 
 		var res = new cNumber(resArr[0]);
-		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		return cElementType.error === res.type ? new cNumber(0) : res;
 	};
 
 	/**
@@ -399,7 +399,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -412,7 +412,7 @@
 		});
 
 		var res = new cNumber(resArr[0]);
-		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		return cElementType.error === res.type ? new cNumber(0) : res;
 	};
 
 	/**
@@ -440,7 +440,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -453,7 +453,7 @@
 		});
 
 		var res = new cNumber(resArr[0]);
-		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		return cElementType.error === res.type ? new cNumber(0) : res;
 	};
 
 
@@ -482,7 +482,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -503,7 +503,7 @@
 		}
 
 		res = new cNumber(res);
-		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		return cElementType.error === res.type ? new cNumber(0) : res;
 	};
 
 	/**
@@ -531,7 +531,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -560,7 +560,7 @@
 			av = member[i] - average;
 			res += av * av;
 		}
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+		return new cNumber(Math.sqrt(res / (count - 1)));
 	 };
 
 	/**
@@ -588,7 +588,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
@@ -617,7 +617,7 @@
 			return new cNumber(isNaN(_x) ? new cError(cErrorType.division_by_zero) : Math.sqrt(sumSQRDeltaX / xLength));
 		}
 
-		return this.value = _var(resArr);
+		return _var(resArr);
 	};
 
 
@@ -646,7 +646,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
@@ -663,7 +663,7 @@
 		}
 
 		var res = new cNumber(summ);
-		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+		return cElementType.error === res.type ? new cNumber(0) : res;
 	};
 
 	/**
@@ -691,7 +691,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
@@ -727,7 +727,7 @@
 		}
 
 		var res = _var(resArr);
-		return this.value = /*cElementType.error === res.type ? new cNumber(0) :*/ res;
+		return /*cElementType.error === res.type ? new cNumber(0) :*/ res;
 	};
 
 	/**
@@ -755,7 +755,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
@@ -792,7 +792,7 @@
 		}
 
 		var res = _var(resArr);
-		return this.value = /*cElementType.error === res.type ? new cNumber(0) :*/ res;
+		return /*cElementType.error === res.type ? new cNumber(0) :*/ res;
 	};
 
 })(window);

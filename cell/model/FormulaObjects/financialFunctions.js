@@ -544,28 +544,28 @@
 		calcMethod = calcMethod.tocBool();
 
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (firstInterest instanceof cError) {
-			return this.value = firstInterest;
+			return firstInterest;
 		}
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (par instanceof cError) {
-			return this.value = par;
+			return par;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 		if (calcMethod instanceof cError) {
-			return this.value = calcMethod;
+			return calcMethod;
 		}
 
 		issue = Math.floor(issue.getValue());
@@ -580,7 +580,7 @@
 		if (issue < startRangeCurrentDateSystem || firstInterest < startRangeCurrentDateSystem ||
 			settlement < startRangeCurrentDateSystem || issue >= settlement || rate <= 0 || par <= 0 || basis < 0 ||
 			basis > 4 || (frequency != 1 && frequency != 2 && frequency != 4)) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		function addMonth(orgDate, numMonths, returnLastDay) {
@@ -632,7 +632,7 @@
 			res += (iss <= startDate) ? calcMethod : days / coupDays;
 		}
 		res *= par * rate / frequency;
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -690,19 +690,19 @@
 		basis = basis.tocNumber();
 
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (par instanceof cError) {
-			return this.value = par;
+			return par;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		issue = Math.floor(issue.getValue());
@@ -713,7 +713,7 @@
 
 		if (settlement < startRangeCurrentDateSystem || issue < startRangeCurrentDateSystem || issue >= settlement ||
 			rate <= 0 || par <= 0 || basis < 0 || basis > 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res = AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(issue),
@@ -721,7 +721,7 @@
 
 		res *= rate * par;
 
-		return this.value = new cNumber(res)
+		return new cNumber(res)
 	};
 
 	/**
@@ -792,25 +792,25 @@
 		basis = basis.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (datePurch instanceof cError) {
-			return this.value = datePurch;
+			return datePurch;
 		}
 		if (firstPer instanceof cError) {
-			return this.value = firstPer;
+			return firstPer;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (period instanceof cError) {
-			return this.value = period;
+			return period;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		rate = rate.getValue();
@@ -823,11 +823,11 @@
 
 		if (cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ||
 			firstPer < 0 || datePurch < 0 || datePurch > firstPer || cost < salvage) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		if (cost == salvage /*|| period > per*/) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		datePurch = Date.prototype.getDateFromExcel(datePurch);
@@ -883,11 +883,11 @@
 			}
 		}
 
-		var per = 1 / rate, coeff;
+		var per = 1 / rate, coeff, res;
 		/*Math.ceil(*/
 
 		if (cost == salvage || period > per) {
-			this.value = new cNumber(0);
+			res = new cNumber(0);
 		} else {
 
 			if (per >= 3 && per <= 4) {
@@ -897,7 +897,7 @@
 			} else if (per > 6) {
 				coeff = 2.5;
 			} else {
-				this.value = new cError(cErrorType.not_numeric);
+				res = new cError(cErrorType.not_numeric);
 			}
 
 			var deprR = rate * coeff, o = firstDeprLinc(cost, datePurch, firstPer, salvage, deprR, per, basis);
@@ -905,13 +905,13 @@
 			var firstDeprLinc = o[0], assetLife = o[1], firstDepr = Math.round(firstDeprLinc);
 
 			if (period == 0) {
-				this.value = new cNumber(firstDepr);
+				res = new cNumber(firstDepr);
 			} else {
-				this.value = findDepr(1, 0, deprR, (cost - firstDepr));
+				res = findDepr(1, 0, deprR, (cost - firstDepr));
 			}
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -983,25 +983,25 @@
 		basis = basis.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (datePurch instanceof cError) {
-			return this.value = datePurch;
+			return datePurch;
 		}
 		if (firstPer instanceof cError) {
-			return this.value = firstPer;
+			return firstPer;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (period instanceof cError) {
-			return this.value = period;
+			return period;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		cost = cost.getValue();
@@ -1014,7 +1014,7 @@
 		var val0 = Date.prototype.getDateFromExcel(datePurch), val1 = Date.prototype.getDateFromExcel(firstPer);
 		if (cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ||
 			datePurch < 0 || firstPer < 0 || datePurch > firstPer || cost < salvage) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var fDepTime = AscCommonExcel.yearFrac(val0, val1, basis).getValue() * rate * cost, fDep, depr = rate * cost,
@@ -1091,16 +1091,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1112,12 +1112,12 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		return this.value = new cNumber(getcoupdaybs(settl, matur, frequency, basis));
+		return new cNumber(getcoupdaybs(settl, matur, frequency, basis));
 
 	};
 
@@ -1168,16 +1168,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1188,12 +1188,12 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		return this.value = new cNumber(getcoupdays(settl, matur, frequency, basis));
+		return new cNumber(getcoupdays(settl, matur, frequency, basis));
 
 	};
 
@@ -1244,16 +1244,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1264,12 +1264,12 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		return this.value = new cNumber(getcoupdaysnc(new Date(settl), new Date(matur), frequency, basis));
+		return new cNumber(getcoupdaysnc(new Date(settl), new Date(matur), frequency, basis));
 
 	};
 
@@ -1320,16 +1320,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1340,14 +1340,14 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		this.value = new cNumber(getcoupncd(settl, matur, frequency).getExcelDate());
-		this.value.numFormat = 14;
-		return this.value;
+		var res = new cNumber(getcoupncd(settl, matur, frequency).getExcelDate());
+		res.numFormat = 14;
+		return res;
 
 	};
 
@@ -1398,16 +1398,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1418,14 +1418,14 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
 		var res = getcoupnum(settl, matur, frequency);
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -1476,16 +1476,16 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -1496,16 +1496,16 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
 		var n = lcl_GetCouppcd(settl, matur, frequency);
 
-		this.value = new cNumber(n.getExcelDate());
-		this.value.numFormat = 14;
-		return this.value;
+		var res = new cNumber(n.getExcelDate());
+		res.numFormat = 14;
+		return res;
 
 	};
 
@@ -1569,22 +1569,22 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (startPeriod instanceof cError) {
-			return this.value = startPeriod;
+			return startPeriod;
 		}
 		if (endPeriod instanceof cError) {
-			return this.value = endPeriod;
+			return endPeriod;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		rate = rate.getValue();
@@ -1598,7 +1598,7 @@
 
 		if (startPeriod < 1 || endPeriod < startPeriod || rate <= 0 || endPeriod > nper || nper <= 0 || pv <= 0 ||
 			( type != 0 && type != 1 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		fv = getPMT(rate, nper, pv, 0, type);
@@ -1620,7 +1620,7 @@
 
 		ipmt *= rate;
 
-		return this.value = new cNumber(ipmt);
+		return new cNumber(ipmt);
 
 	};
 
@@ -1686,22 +1686,22 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (startPeriod instanceof cError) {
-			return this.value = startPeriod;
+			return startPeriod;
 		}
 		if (endPeriod instanceof cError) {
-			return this.value = endPeriod;
+			return endPeriod;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		rate = rate.getValue();
@@ -1715,7 +1715,7 @@
 
 		if (startPeriod < 1 || endPeriod < startPeriod || endPeriod < 1 || rate <= 0 || nper <= 0 || pv <= 0 ||
 			( type != 0 && type != 1 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		fv = getPMT(rate, nper, pv, 0, type);
@@ -1737,7 +1737,7 @@
 			}
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -1795,19 +1795,19 @@
 		month = month.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (life instanceof cError) {
-			return this.value = life;
+			return life;
 		}
 		if (period instanceof cError) {
-			return this.value = period;
+			return period;
 		}
 		if (month instanceof cError) {
-			return this.value = month;
+			return month;
 		}
 
 		cost = cost.getValue();
@@ -1817,11 +1817,11 @@
 		month = Math.floor(month.getValue());
 
 		if (salvage >= cost) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		if (month < 1 || month > 12 || salvage < 0 || life < 0 || period < 0 || life + 1 < period || cost < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var rate = 1 - Math.pow(salvage / cost, 1 / life);
@@ -1846,8 +1846,7 @@
 			}
 		}
 
-		this.value = new cNumber(res);
-		return this.value;
+		return new cNumber(res);
 
 	};
 
@@ -1905,19 +1904,19 @@
 		factor = factor.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (life instanceof cError) {
-			return this.value = life;
+			return life;
 		}
 		if (period instanceof cError) {
-			return this.value = period;
+			return period;
 		}
 		if (factor instanceof cError) {
-			return this.value = factor;
+			return factor;
 		}
 
 		cost = cost.getValue();
@@ -1927,15 +1926,14 @@
 		factor = factor.getValue();
 
 		if (cost == 0 || salvage == 0) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		if (cost < salvage || cost <= 0 || salvage < 0 || factor <= 0 || life <= 0 || period <= 0 || life < period) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		this.value = new cNumber(getDDB(cost, salvage, life, period, factor));
-		return this.value;
+		return new cNumber(getDDB(cost, salvage, life, period, factor));
 
 	};
 
@@ -1993,19 +1991,19 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -2016,15 +2014,14 @@
 
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || pr <= 0 || redemption <= 0 || basis < 0 || basis > 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res = ( 1 - pr / redemption ) / AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
 				Date.prototype.getDateFromExcel(maturity), basis);
 
-		this.value = new cNumber(res);
 //    this.value.numFormat = 9;
-		return this.value;
+		return new cNumber(res);
 
 	};
 
@@ -2060,19 +2057,19 @@
 		fraction = fraction.tocNumber();
 
 		if (fractionalDollar instanceof cError) {
-			return this.value = fractionalDollar;
+			return fractionalDollar;
 		}
 		if (fraction instanceof cError) {
-			return this.value = fraction;
+			return fraction;
 		}
 
 		fractionalDollar = fractionalDollar.getValue();
 		fraction = fraction.getValue();
 
 		if (fraction < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else if (fraction == 0) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
 		fraction = Math.floor(fraction);
@@ -2085,7 +2082,7 @@
 
 		res += fInt;
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -2121,19 +2118,19 @@
 		fraction = fraction.tocNumber();
 
 		if (decimalDollar instanceof cError) {
-			return this.value = decimalDollar;
+			return decimalDollar;
 		}
 		if (fraction instanceof cError) {
-			return this.value = fraction;
+			return fraction;
 		}
 
 		decimalDollar = decimalDollar.getValue();
 		fraction = fraction.getValue();
 
 		if (fraction < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else if (fraction == 0) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
 		fraction = Math.floor(fraction);
@@ -2146,7 +2143,7 @@
 
 		res += fInt;
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -2211,22 +2208,22 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (coupon instanceof cError) {
-			return this.value = coupon;
+			return coupon;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -2239,12 +2236,12 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		return this.value = new cNumber(getduration(settl, matur, coupon, yld, frequency, basis));
+		return new cNumber(getduration(settl, matur, coupon, yld, frequency, basis));
 
 	};
 
@@ -2280,20 +2277,20 @@
 		npery = npery.tocNumber();
 
 		if (nominalRate instanceof cError) {
-			return this.value = nominalRate;
+			return nominalRate;
 		}
 		if (npery instanceof cError) {
-			return this.value = npery;
+			return npery;
 		}
 
 		nominalRate = nominalRate.getValue();
 		npery = Math.floor(npery.getValue());
 
 		if (nominalRate <= 0 || npery < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(Math.pow((1 + nominalRate / npery), npery) - 1);
+		return new cNumber(Math.pow((1 + nominalRate / npery), npery) - 1);
 	};
 
 	/**
@@ -2350,23 +2347,23 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pmt instanceof cError) {
-			return this.value = pmt;
+			return pmt;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		if (type.getValue() != 1 && type.getValue() != 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res;
@@ -2378,7 +2375,7 @@
 			res = -1 * ( pv.getValue() + pmt.getValue() * nper.getValue() );
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -2418,20 +2415,20 @@
 		principal = principal.tocNumber();
 
 		if (principal instanceof cError) {
-			return this.value = principal;
+			return principal;
 		}
 
 		var princ = principal.getValue();
 
 		for (var i = 0; i < shedList.length; i++) {
 			if (shedList[i] instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				princ *= 1 + shedList[i].getValue();
 			}
 		}
 
-		return this.value = new cNumber(princ);
+		return new cNumber(princ);
 
 	};
 
@@ -2489,19 +2486,19 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (investment instanceof cError) {
-			return this.value = investment;
+			return investment;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -2512,16 +2509,16 @@
 
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res = ( ( redemption / investment ) - 1 ) /
 			AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
 				Date.prototype.getDateFromExcel(maturity), basis);
 
-		this.value = new cNumber(res);
-		this.value.numFormat = 10;
-		return this.value;
+		var res = new cNumber(res);
+		res.numFormat = 10;
+		return res;
 
 	};
 
@@ -2586,22 +2583,22 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (per instanceof cError) {
-			return this.value = per;
+			return per;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		rate = rate.getValue();
@@ -2614,14 +2611,13 @@
 		var res;
 
 		if (per < 1 || per > nper || type != 0 && type != 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		res = getPMT(rate, nper, pv, fv, type);
 
-		this.value = new cNumber(getIPMT(rate, per, pv, type, res));
 //    this.value.numFormat = 9;
-		return this.value;
+		return new cNumber(getIPMT(rate, per, pv, type, res));
 	};
 
 	/**
@@ -2730,7 +2726,7 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg1 instanceof cError) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var wasNeg = false, wasPos = false;
@@ -2744,12 +2740,12 @@
 		}
 
 		if (!(wasNeg && wasPos)) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		this.value = irr2(arg1.getValue(), arr);
-		this.value.numFormat = 9;
-		return this.value;
+		var res = irr2(arg1.getValue(), arr);
+		res.numFormat = 9;
+		return res;
 
 	};
 
@@ -2799,23 +2795,23 @@
 		pv = pv.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (per instanceof cError) {
-			return this.value = per;
+			return per;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 
 		if (nper.getValue() == 0) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
-		return this.value = new cNumber(pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1));
+		return new cNumber(pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1));
 	};
 
 	/**
@@ -2879,22 +2875,22 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (coupon instanceof cError) {
-			return this.value = coupon;
+			return coupon;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -2907,7 +2903,7 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
@@ -2916,7 +2912,7 @@
 
 		duration /= 1 + yld / frequency;
 
-		return this.value = new cNumber(duration);
+		return new cNumber(duration);
 
 	};
 
@@ -2954,12 +2950,12 @@
 			if (arg0.isSingleSheet()) {
 				valueArray = arg0.getMatrix()[0];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else {
 
 			if (arg0 instanceof cError) {
-				return this.value = new cError(cErrorType.not_numeric)
+				return new cError(cErrorType.not_numeric)
 			} else if (arg0 instanceof cNumber) {
 				valueArray.push(arg0);
 			}
@@ -2981,10 +2977,10 @@
 		reinvest = reinvest.tocNumber();
 
 		if (invest instanceof cError) {
-			return this.value = invest;
+			return invest;
 		}
 		if (reinvest instanceof cError) {
-			return this.value = reinvest;
+			return reinvest;
 		}
 
 		invest = invest.getValue() + 1;
@@ -2997,7 +2993,7 @@
 			cellValue = valueArray[i];
 
 			if (cellValue instanceof cError) {
-				return this.value = cellValue;
+				return cellValue;
 			}
 
 			cellValue = valueArray[i].getValue();
@@ -3015,16 +3011,16 @@
 		}
 
 		if (!( wasNegative && wasPositive )) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
 		var res = -NPVreinvest / NPVinvest;
 		res *= Math.pow(reinvest, valueArray.length - 1);
 		res = Math.pow(res, 1 / (valueArray.length - 1));
 
-		this.value = new cNumber(res - 1);
-		this.value.numFormat = 9;
-		return this.value;
+		var res = new cNumber(res - 1);
+		res.numFormat = 9;
+		return res;
 
 	};
 
@@ -3060,10 +3056,10 @@
 		npery = npery.tocNumber();
 
 		if (effectRate instanceof cError) {
-			return this.value = effectRate;
+			return effectRate;
 		}
 		if (npery instanceof cError) {
-			return this.value = npery;
+			return npery;
 		}
 
 		effectRate = effectRate.getValue();
@@ -3072,11 +3068,10 @@
 		npery = Math.floor(npery);
 
 		if (effectRate <= 0 || npery < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
-		this.value = new cNumber(( Math.pow(effectRate + 1, 1 / npery) - 1 ) * npery);
 //    this.value.numFormat = 9;
-		return this.value;
+		return new cNumber(( Math.pow(effectRate + 1, 1 / npery) - 1 ) * npery);
 
 	};
 
@@ -3134,23 +3129,23 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (pmt instanceof cError) {
-			return this.value = pmt;
+			return pmt;
 		}
 		if (pmt instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		if (type.getValue() != 1 && type.getValue() != 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res;
@@ -3166,7 +3161,7 @@
 			res = -pv.getValue() - fv.getValue() / pmt.getValue();
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -3197,13 +3192,13 @@
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		rate = arg0.getValue();
 
 		if (rate == -1) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
 
@@ -3236,7 +3231,7 @@
 
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -3323,31 +3318,31 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (first_coupon instanceof cError) {
-			return this.value = first_coupon;
+			return first_coupon;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -3364,14 +3359,13 @@
 			first_coupon < startRangeCurrentDateSystem || issue < startRangeCurrentDateSystem ||
 			maturity <= first_coupon || first_coupon <= settlement || settlement <= issue || basis < 0 || basis > 4 ||
 			yld < 0 || rate < 0 || redemption < 0 || frequency != 1 && frequency != 2 && frequency != 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
 			iss = Date.prototype.getDateFromExcel(issue), firstCoup = Date.prototype.getDateFromExcel(first_coupon);
 
-		this.value = new cNumber(oddFPrice(settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis));
-		return this.value;
+		return new cNumber(oddFPrice(settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis))
 
 	};
 
@@ -3458,31 +3452,31 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (first_coupon instanceof cError) {
-			return this.value = first_coupon;
+			return first_coupon;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -3499,7 +3493,7 @@
 			issue < startRangeCurrentDateSystem || first_coupon < startRangeCurrentDateSystem ||
 			maturity <= first_coupon || first_coupon <= settlement || settlement <= issue || basis < 0 || basis > 4 ||
 			pr < 0 || rate < 0 || redemption < 0 || frequency != 1 && frequency != 2 && frequency != 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
@@ -3525,7 +3519,7 @@
 				high = guess + 0.01 >= max ? max - g_Eps : guess + 0.01, i, xBegin, xEnd, x, y, currentIter = 0;
 
 			if (guess <= min || guess >= max) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			for (i = 0; i < nIM; i++) {
@@ -3539,21 +3533,21 @@
 					low = (xBegin + step * (xBegin - xEnd));
 					high = (xEnd + step * (xEnd - xBegin));
 				} else {
-					return this.value = new cError(cErrorType.not_numeric);
+					return new cError(cErrorType.not_numeric);
 				}
 			}
 
 			if (i == nIM) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var fXbegin = iterF(xBegin), fXend = iterF(xEnd), fXi, xI;
 
 			if (Math.abs(fXbegin) < g_Eps) {
-				return this.value = new cNumber(fXbegin);
+				return new cNumber(fXbegin);
 			}
 			if (Math.abs(fXend) < g_Eps) {
-				return this.value = new cNumber(fXend);
+				return new cNumber(fXend);
 			}
 			do {
 				xI = xBegin + (xEnd - xBegin) / 2;
@@ -3567,13 +3561,10 @@
 				currentIter++;
 			} while (Math.abs(fXi) > g_Eps && currentIter < nIM);
 
-			this.value = new cNumber(xI);
+			return new cNumber(xI);
 		} else {
-			this.value = new cNumber(x);
+			return new cNumber(x);
 		}
-
-		return this.value;
-
 	};
 
 	/**
@@ -3652,28 +3643,28 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (last_interest instanceof cError) {
-			return this.value = last_interest;
+			return last_interest;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -3689,7 +3680,7 @@
 			last_interest < startRangeCurrentDateSystem || maturity <= settlement || settlement <= last_interest ||
 			basis < 0 || basis > 4 || yld < 0 || rate < 0 || frequency != 1 && frequency != 2 && frequency != 4 ||
 			redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
@@ -3703,8 +3694,7 @@
 		res /= fDSCi * yld / frequency + 1;
 		res -= fAi * 100 * rate / frequency;
 
-		this.value = new cNumber(res);
-		return this.value;
+		return new cNumber(res);
 
 	};
 
@@ -3784,28 +3774,28 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (last_interest instanceof cError) {
-			return this.value = last_interest;
+			return last_interest;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -3821,7 +3811,7 @@
 			last_interest < startRangeCurrentDateSystem || maturity <= settlement || settlement <= last_interest ||
 			basis < 0 || basis > 4 || pr < 0 || rate < 0 || frequency != 1 && frequency != 2 && frequency != 4 ||
 			redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
@@ -3836,8 +3826,7 @@
 		res--;
 		res *= frequency / fDSCi;
 
-		this.value = new cNumber(res);
-		return this.value;
+		return new cNumber(res);
 
 	};
 
@@ -3864,7 +3853,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcfunc = function (argArray) {
@@ -3879,7 +3868,7 @@
 			return new cNumber(Math.log(arg2 / arg1) / Math.log1p(arg0));
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcfunc);
+		return this._findArrayInNumberArguments(oArguments, calcfunc);
 	};
 
 	/**
@@ -3936,19 +3925,19 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		rate = rate.getValue();
@@ -3958,7 +3947,7 @@
 		pv = pv.getValue();
 
 		if (type != 1 && type != 0 || nper == 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res;
@@ -3969,7 +3958,7 @@
 			res = -1 * ( pv + fv ) / nper;
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -4033,22 +4022,22 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (per instanceof cError) {
-			return this.value = per;
+			return per;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		rate = rate.getValue();
@@ -4061,16 +4050,15 @@
 		var res;
 
 		if (per < 1 || per > nper || type != 0 && type != 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var fRmz = getPMT(rate, nper, pv, fv, type);
 
 		res = fRmz - getIPMT(rate, per, pv, type, fRmz);
 
-		this.value = new cNumber(res);
 //    this.value.numFormat = 9;
-		return this.value;
+		return new cNumber(res);
 	};
 
 	/**
@@ -4141,25 +4129,25 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -4173,12 +4161,12 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 ) || rate < 0 || yld < 0 || redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		return this.value = new cNumber(getprice(settl, matur, rate, yld, redemption, frequency, basis));
+		return new cNumber(getprice(settl, matur, rate, yld, redemption, frequency, basis));
 
 	};
 
@@ -4236,19 +4224,19 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (discount instanceof cError) {
-			return this.value = discount;
+			return discount;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -4259,14 +4247,14 @@
 
 		if (settlement >= maturity || settlement < startRangeCurrentDateSystem ||
 			maturity < startRangeCurrentDateSystem || basis < 0 || basis > 4 || discount <= 0 || redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
 		var res = redemption * ( 1 - discount * AscCommonExcel.yearFrac(settl, matur, basis) );
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -4331,22 +4319,22 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (yld instanceof cError) {
-			return this.value = yld;
+			return yld;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -4359,7 +4347,7 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			issue < startRangeCurrentDateSystem || settlement >= maturity || basis < 0 || basis > 4 || rate < 0 ||
 			yld < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
@@ -4374,7 +4362,7 @@
 		res -= fIssSet * rate;
 		res *= 100;
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 
 	};
 
@@ -4432,23 +4420,23 @@
 		type = type.tocNumber();
 
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pmt instanceof cError) {
-			return this.value = pmt;
+			return pmt;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 
 		if (type.getValue() != 1 && type.getValue() != 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res;
@@ -4460,7 +4448,7 @@
 			res = -1 * ( fv.getValue() + pmt.getValue() * nper.getValue() );
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -4525,22 +4513,22 @@
 		quess = quess.tocNumber();
 
 		if (nper instanceof cError) {
-			return this.value = nper;
+			return nper;
 		}
 		if (pmt instanceof cError) {
-			return this.value = pmt;
+			return pmt;
 		}
 		if (pv instanceof cError) {
-			return this.value = pv;
+			return pv;
 		}
 		if (fv instanceof cError) {
-			return this.value = fv;
+			return fv;
 		}
 		if (type instanceof cError) {
-			return this.value = type;
+			return type;
 		}
 		if (quess instanceof cError) {
-			return this.value = quess;
+			return quess;
 		}
 
 		nper = nper.getValue();
@@ -4551,12 +4539,12 @@
 		quess = quess.getValue();
 
 		if (type != 1 && type != 0 || nper <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		this.value = new cNumber(RateIteration(nper, pmt, pv, fv, type, quess));
-		this.value.numFormat = 9;
-		return this.value;
+		var res = new cNumber(RateIteration(nper, pmt, pv, fv, type, quess));
+		res.numFormat = 9;
+		return res;
 	};
 
 	/**
@@ -4613,19 +4601,19 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (investment instanceof cError) {
-			return this.value = investment;
+			return investment;
 		}
 		if (discount instanceof cError) {
-			return this.value = discount;
+			return discount;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -4636,15 +4624,14 @@
 
 		if (settlement >= maturity || investment <= 0 || discount <= 0 || settlement < startRangeCurrentDateSystem ||
 			maturity < startRangeCurrentDateSystem || basis < 0 || basis > 4) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res = investment / ( 1 - ( discount * AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
 				Date.prototype.getDateFromExcel(maturity), basis) ) );
 
-		this.value = res >= 0 ? new cNumber(res) : new cError(cErrorType.not_numeric);
 //    this.value.numFormat = 9;
-		return this.value;
+		return res >= 0 ? new cNumber(res) : new cError(cErrorType.not_numeric);
 
 	};
 
@@ -4671,7 +4658,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcrpi = function (argArray) {
@@ -4686,7 +4673,7 @@
 			return new cNumber(Math.pow(arg2 / arg1, 1.0 / arg0) - 1.0);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcrpi);
+		return this._findArrayInNumberArguments(oArguments, calcrpi);
 	};
 
 	/**
@@ -4728,13 +4715,13 @@
 		life = life.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (life instanceof cError) {
-			return this.value = life;
+			return life;
 		}
 
 		cost = cost.getValue();
@@ -4742,11 +4729,10 @@
 		life = life.getValue();
 
 		if (life == 0) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
-		this.value = new cNumber(( cost - salvage ) / life);
-		return this.value;
+		return new cNumber(( cost - salvage ) / life)
 
 	};
 
@@ -4796,16 +4782,16 @@
 		per = per.tocNumber();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (life instanceof cError) {
-			return this.value = life;
+			return life;
 		}
 		if (per instanceof cError) {
-			return this.value = per;
+			return per;
 		}
 
 		cost = cost.getValue();
@@ -4814,7 +4800,7 @@
 		per = per.getValue();
 
 		if (life == 1 || life <= 0 || salvage < 0 || per < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var res = 2;
@@ -4822,7 +4808,7 @@
 		res *= life + 1 - per;
 		res /= (life + 1) * life;
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -4864,13 +4850,13 @@
 		discount = discount.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (discount instanceof cError) {
-			return this.value = discount;
+			return discount;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -4879,7 +4865,7 @@
 
 		if (settlement >= maturity || settlement < startRangeCurrentDateSystem ||
 			maturity < startRangeCurrentDateSystem || discount <= 0 || nDiff > 360) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		var nMat = maturity + 1;
 
@@ -4892,13 +4878,13 @@
 		var nDiff = AscCommonExcel.GetDiffDate360(date1, month1, year1, date2, month2, year2, true);
 
 		if (nDiff > 360) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		this.value = new cNumber(( 365 * discount ) / ( 360 - ( discount * nDiff ) ));
+		var res = new cNumber(( 365 * discount ) / ( 360 - ( discount * nDiff ) ));
 
-		this.value.numFormat = 9;
-		return this.value;
+		res.numFormat = 9;
+		return res;
 
 	};
 
@@ -4941,13 +4927,13 @@
 		discount = discount.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (discount instanceof cError) {
-			return this.value = discount;
+			return discount;
 		}
 
 		settlement = Math.floor(Math.floor(settlement.getValue()));
@@ -4956,7 +4942,7 @@
 
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || discount <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var d1 = Date.prototype.getDateFromExcel(settlement), d2 = Date.prototype.getDateFromExcel(maturity),
@@ -4964,13 +4950,12 @@
 
 		d3.addYears(1);
 		if (d2 > d3) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		discount *= AscCommonExcel.diffDate(d1, d2, AscCommonExcel.DayCountBasis.ActualActual);
 
-		this.value = new cNumber(100 * ( 1 - discount / 360 ));
-		return this.value;
+		return new cNumber(100 * ( 1 - discount / 360 ));
 
 	};
 
@@ -5013,13 +4998,13 @@
 		pr = pr.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -5028,7 +5013,7 @@
 
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || pr <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var d1 = Date.prototype.getDateFromExcel(settlement), d2 = Date.prototype.getDateFromExcel(maturity),
@@ -5039,12 +5024,12 @@
 		nDiff++;
 
 		if (nDiff > 360) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		this.value = new cNumber(( ( 100 - pr ) / pr) * (360 / nDiff));
-		this.value.numFormat = 9;
-		return this.value;
+		var res = new cNumber(( ( 100 - pr ) / pr) * (360 / nDiff));
+		res.numFormat = 9;
+		return res;
 
 	};
 
@@ -5148,25 +5133,25 @@
 		flag = flag.tocBool();
 
 		if (cost instanceof cError) {
-			return this.value = cost;
+			return cost;
 		}
 		if (salvage instanceof cError) {
-			return this.value = salvage;
+			return salvage;
 		}
 		if (life instanceof cError) {
-			return this.value = life;
+			return life;
 		}
 		if (startPeriod instanceof cError) {
-			return this.value = startPeriod;
+			return startPeriod;
 		}
 		if (endPeriod instanceof cError) {
-			return this.value = endPeriod;
+			return endPeriod;
 		}
 		if (factor instanceof cError) {
-			return this.value = factor;
+			return factor;
 		}
 		if (flag instanceof cError) {
-			return this.value = flag;
+			return flag;
 		}
 
 		cost = cost.getValue();
@@ -5179,7 +5164,7 @@
 
 		if (cost < salvage || life < 0 || startPeriod < 0 || life < startPeriod || startPeriod > endPeriod ||
 			life < endPeriod || factor < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var start = Math.floor(startPeriod), end = Math.ceil(endPeriod);
@@ -5216,7 +5201,7 @@
 			res = getVDB(cost, salvage, life, life - startPeriod, endPeriod - startPeriod, factor);
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -5394,11 +5379,11 @@
 			if (arg0.isSingleSheet()) {
 				_values = arg0.getMatrix()[0];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else {
 			if (!(arg0 instanceof cNumber)) {
-				return this.value = new cError(cErrorType.wrong_value_type)
+				return new cError(cErrorType.wrong_value_type)
 			} else {
 				_values[0] = arg0;
 			}
@@ -5428,11 +5413,11 @@
 			if (arg1.isSingleSheet()) {
 				_dates = arg1.getMatrix()[0];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else {
 			if (!(arg1 instanceof cNumber)) {
-				return this.value = new cError(cErrorType.wrong_value_type)
+				return new cError(cErrorType.wrong_value_type)
 			} else {
 				_dates[0] = arg1;
 			}
@@ -5441,29 +5426,29 @@
 		if (arg2 instanceof AscCommonExcel.cRef || arg2 instanceof AscCommonExcel.cRef3D) {
 			arg2 = arg2.getValue();
 			if (!(arg2 instanceof cNumber)) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
 			arg2 = arg2.cross(arguments[1]);
 			if (!(arg2 instanceof cNumber)) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 			if (!(arg2 instanceof cNumber)) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
 		arg2 = arg2.tocNumber();
 
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		this.value = xirr2(_values, _dates, arg2);
-		this.value.numFormat = 9;
-		return this.value;
+		var res = xirr2(_values, _dates, arg2);
+		res.numFormat = 9;
+		return res;
 
 	};
 
@@ -5519,7 +5504,7 @@
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var dateArray = [], valueArray = [];
@@ -5545,12 +5530,12 @@
 			if (arg1.isSingleSheet()) {
 				valueArray = arg1.getMatrix()[0];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.not_numeric)
+				return new cError(cErrorType.not_numeric)
 			} else {
 				valueArray[0] = arg1;
 			}
@@ -5578,18 +5563,18 @@
 			if (arg2.isSingleSheet()) {
 				dateArray = arg2.getMatrix()[0];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else {
 			arg2 = arg2.tocNumber();
 			if (arg2 instanceof cError) {
-				return this.value = new cError(cErrorType.not_numeric)
+				return new cError(cErrorType.not_numeric)
 			} else {
 				dateArray[0] = arg2;
 			}
 		}
 
-		return this.value = xnpv(arg0, valueArray, dateArray);
+		return xnpv(arg0, valueArray, dateArray);
 
 	};
 
@@ -5661,25 +5646,25 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (frequency instanceof cError) {
-			return this.value = frequency;
+			return frequency;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -5693,14 +5678,13 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 ||
 			( frequency != 1 && frequency != 2 && frequency != 4 ) || rate < 0 || pr <= 0 || redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
 
-		this.value = new cNumber(getYield(settl, matur, rate, pr, redemption, frequency, basis));
 //    this.value.numFormat = 9;
-		return this.value;
+		return new cNumber(getYield(settl, matur, rate, pr, redemption, frequency, basis));
 
 	};
 
@@ -5758,19 +5742,19 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (redemption instanceof cError) {
-			return this.value = redemption;
+			return redemption;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -5781,7 +5765,7 @@
 
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			settlement >= maturity || basis < 0 || basis > 4 || pr <= 0 || redemption <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
@@ -5789,9 +5773,9 @@
 		var fRet = ( redemption / pr ) - 1;
 		fRet /= AscCommonExcel.yearFrac(settl, matur, basis);
 
-		this.value = new cNumber(fRet);
-		this.value.numFormat = 10;
-		return this.value;
+		var res = new cNumber(fRet);
+		res.numFormat = 10;
+		return res;
 
 	};
 
@@ -5856,22 +5840,22 @@
 		basis = basis.tocNumber();
 
 		if (settlement instanceof cError) {
-			return this.value = settlement;
+			return settlement;
 		}
 		if (maturity instanceof cError) {
-			return this.value = maturity;
+			return maturity;
 		}
 		if (issue instanceof cError) {
-			return this.value = issue;
+			return issue;
 		}
 		if (rate instanceof cError) {
-			return this.value = rate;
+			return rate;
 		}
 		if (pr instanceof cError) {
-			return this.value = pr;
+			return pr;
 		}
 		if (basis instanceof cError) {
-			return this.value = basis;
+			return basis;
 		}
 
 		settlement = Math.floor(settlement.getValue());
@@ -5884,15 +5868,15 @@
 		if (settlement < startRangeCurrentDateSystem || maturity < startRangeCurrentDateSystem ||
 			issue < startRangeCurrentDateSystem || settlement >= maturity || basis < 0 || basis > 4 || pr <= 0 ||
 			rate <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
 			iss = Date.prototype.getDateFromExcel(issue), res = getyieldmat(settl, matur, iss, rate, pr, basis);
 
-		this.value = new cNumber(res);
-		this.value.numFormat = 10;
-		return this.value;
+		var res = new cNumber(res);
+		res.numFormat = 10;
+		return res;
 
 	};
 

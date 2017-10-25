@@ -3757,7 +3757,7 @@ function (window, undefined) {
 			a += Math.abs(_func[sum.type][arrX[i].type](sum, arrX[i], "-").getValue());
 		}
 
-		return this.value = new cNumber(a / count);
+		return new cNumber(a / count);
 	};
 
 	/**
@@ -3785,7 +3785,7 @@ function (window, undefined) {
 						sum = _func[sum.type][_argV.type](sum, _argV, "+");
 						count++;
 					} else if (cElementType.error === _argV.type) {
-						return this.value = _argV;
+						return _argV;
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
@@ -3800,7 +3800,7 @@ function (window, undefined) {
 						sum = _func[sum.type][__arg.type](sum, __arg, "+");
 						count++;
 					} else if (cElementType.error === __arg.type) {
-						return this.value = __arg;
+						return __arg;
 					}
 				}
 			} else if (cElementType.array === _arg.type) {
@@ -3818,13 +3818,13 @@ function (window, undefined) {
 			} else {
 				_arg = _arg.tocNumber();
 				if (cElementType.error === _arg.type) {
-					return this.value = _arg;
+					return _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
 				count++;
 			}
 		}
-		return this.value = new cNumber(sum.getValue() / count);
+		return new cNumber(sum.getValue() / count);
 	};
 
 	/**
@@ -3877,13 +3877,13 @@ function (window, undefined) {
 			} else {
 				_arg = _arg.tocNumber();
 				if (cElementType.error === _arg.type) {
-					return this.value = _arg;
+					return _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
 				count++;
 			}
 		}
-		return this.value = new cNumber(sum.getValue() / count);
+		return new cNumber(sum.getValue() / count);
 	};
 
 	/**
@@ -3904,7 +3904,7 @@ function (window, undefined) {
 				arg0.type) ||
 			(cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type && cElementType.cellsRange !==
 				arg2.type)) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -3916,7 +3916,7 @@ function (window, undefined) {
 		arg1 = arg1.tocString();
 
 		if (cElementType.string !== arg1.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var r = arg0.getRange();
@@ -3960,7 +3960,7 @@ function (window, undefined) {
 		if (0 === _count) {
 			return new cError(cErrorType.division_by_zero);
 		} else {
-			return this.value = new cNumber(_sum / _count);
+			return new cNumber(_sum / _count);
 		}
 	};
 
@@ -3979,7 +3979,7 @@ function (window, undefined) {
 		var arg0 = arg[0];
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var arg0Matrix = arg0.getMatrix();
@@ -3990,7 +3990,7 @@ function (window, undefined) {
 
 			if ((cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type && cElementType.cellsRange !==
 					arg1.type)) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
@@ -4001,18 +4001,18 @@ function (window, undefined) {
 
 			arg2 = arg2.tocString();
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -4037,7 +4037,7 @@ function (window, undefined) {
 		if (0 === _count) {
 			return new cError(cErrorType.division_by_zero);
 		} else {
-			return this.value = new cNumber(_sum / _count);
+			return new cNumber(_sum / _count);
 		}
 	};
 	cAVERAGEIFS.prototype.checkArguments = function (countArguments) {
@@ -4072,7 +4072,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcBeta = function (argArray) {
@@ -4100,7 +4100,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
+		return this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
 
 	/**
@@ -4130,7 +4130,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcBeta = function (argArray) {
@@ -4156,7 +4156,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
+		return this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
 
 	/**
@@ -4185,7 +4185,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -4212,7 +4212,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -4238,7 +4238,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function binomdist(x, n, p) {
@@ -4270,7 +4270,7 @@ function (window, undefined) {
 			}
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+		return this._findArrayInNumberArguments(oArguments, calcBinom);
 	};
 
 	/**
@@ -4309,7 +4309,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function binomdist(x, n, p) {
@@ -4335,7 +4335,7 @@ function (window, undefined) {
 			return new cNumber(summ);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+		return this._findArrayInNumberArguments(oArguments, calcBinom);
 	};
 
 
@@ -4360,7 +4360,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4375,7 +4375,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4399,7 +4399,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4422,7 +4422,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4448,7 +4448,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4471,10 +4471,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4511,7 +4511,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4534,7 +4534,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4560,7 +4560,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4583,7 +4583,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4603,10 +4603,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -4623,7 +4623,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcChitest(argArray) {
@@ -4634,7 +4634,7 @@ function (window, undefined) {
 			return chiTest(arg1, arg2);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcChitest);
+		return this._findArrayInNumberArguments(oArguments, calcChitest);
 	};
 
 	/**
@@ -4672,7 +4672,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcConfidence = function (argArray) {
@@ -4687,7 +4687,7 @@ function (window, undefined) {
 			return new cNumber(gaussinv(1 - alpha / 2) * stdev_sigma / Math.sqrt(size));
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
+		return this._findArrayInNumberArguments(oArguments, calcConfidence);
 	};
 
 	/**
@@ -4726,7 +4726,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcConfidence = function (argArray) {
@@ -4750,7 +4750,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
+		return this._findArrayInNumberArguments(oArguments, calcConfidence);
 	};
 
 	/**
@@ -4815,7 +4815,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -4825,10 +4825,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = correl(arr0, arr1);
+		return correl(arr0, arr1);
 
 	};
 
@@ -4878,7 +4878,7 @@ function (window, undefined) {
 				})
 			}
 		}
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 	/**
@@ -4922,7 +4922,7 @@ function (window, undefined) {
 				count++;
 			}
 		}
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 	/**
@@ -4941,11 +4941,11 @@ function (window, undefined) {
 	cCOUNTBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			return this.value = arg0.countCells();
+			return arg0.countCells();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			return this.value = new cNumber(1);
+			return new cNumber(1);
 		} else {
-			return this.value = new cError(cErrorType.bad_reference);
+			return new cError(cErrorType.bad_reference);
 		}
 	};
 
@@ -4966,7 +4966,7 @@ function (window, undefined) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -4980,7 +4980,7 @@ function (window, undefined) {
 		/*arg1 = arg1.tocString();
 
 		 if (cElementType.string !== arg1.type) {
-		 return this.value = new cError(cErrorType.wrong_value_type);
+		 return new cError(cErrorType.wrong_value_type);
 		 }*/
 
 		var val;
@@ -4999,7 +4999,7 @@ function (window, undefined) {
 			_count += matching(val, matchingInfo);
 		}
 
-		return this.value = new cNumber(_count);
+		return new cNumber(_count);
 	};
 
 	/**
@@ -5023,7 +5023,7 @@ function (window, undefined) {
 			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 				cElementType.cellsRange !== arg0.type &&
 				!(cElementType.cellsRange3D === arg0.type && arg0.isSingleSheet())) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -5034,7 +5034,7 @@ function (window, undefined) {
 
 			arg1 = arg1.tocString();
 			if (cElementType.string !== arg1.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg1);
@@ -5046,11 +5046,11 @@ function (window, undefined) {
 				arg0Matrix = arg1Matrix;
 			}
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !matching(arg1Matrix[i][j], matchingInfo)) {
@@ -5067,7 +5067,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = new cNumber(_count);
+		return new cNumber(_count);
 	};
 	cCOUNTIFS.prototype.checkArguments = function (countArguments) {
 		if(undefined === countArguments){
@@ -5132,7 +5132,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -5142,10 +5142,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = covar(arr0, arr1);
+		return covar(arr0, arr1);
 
 	};
 
@@ -5167,10 +5167,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -5187,7 +5187,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function pearson(argArray) {
@@ -5239,7 +5239,7 @@ function (window, undefined) {
 			return new cNumber(sumXDeltaYDelta / xLength);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
+		return this._findArrayInNumberArguments(oArguments, pearson);
 	};
 
 	/**
@@ -5260,10 +5260,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -5280,7 +5280,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function pearson(argArray) {
@@ -5336,7 +5336,7 @@ function (window, undefined) {
 			return new cNumber(sumXDeltaYDelta / (xLength - 1));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
+		return this._findArrayInNumberArguments(oArguments, pearson);
 	};
 
 	/**
@@ -5362,7 +5362,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function critbinom(argArray) {
@@ -5401,7 +5401,7 @@ function (window, undefined) {
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, critbinom);
+		return this._findArrayInNumberArguments(oArguments, critbinom);
 	};
 
 	/**
@@ -5480,11 +5480,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = devsq(arr0);
+		return devsq(arr0);
 
 	};
 
@@ -5511,7 +5511,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5532,7 +5532,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5573,23 +5573,23 @@ function (window, undefined) {
 		arg2 = arg2.tocBool();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		if (arg0.getValue() < 0 || arg2.getValue() <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		if (arg2.toBool()) {
-			return this.value = new cNumber(1 - Math.exp(-arg1.getValue() * arg0.getValue()));
+			return new cNumber(1 - Math.exp(-arg1.getValue() * arg0.getValue()));
 		} else {
-			return this.value = new cNumber(arg1.getValue() * Math.exp(-arg1.getValue() * arg0.getValue()));
+			return new cNumber(arg1.getValue() * Math.exp(-arg1.getValue() * arg0.getValue()));
 		}
 	};
 
@@ -5618,7 +5618,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5642,7 +5642,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5668,7 +5668,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5685,10 +5685,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5726,7 +5726,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5751,10 +5751,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5779,7 +5779,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5804,10 +5804,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5846,7 +5846,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -5858,9 +5858,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = fisher(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -5888,7 +5888,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -5900,9 +5900,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = fisherInv(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -5974,7 +5974,7 @@ function (window, undefined) {
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 
@@ -5985,7 +5985,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg2 instanceof cArea) {
@@ -5995,10 +5995,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = forecast(arg0, arr0, arr1);
+		return forecast(arg0, arr0, arr1);
 
 	};
 
@@ -6030,7 +6030,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pTMat = argClone[0];
@@ -6092,7 +6092,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pTMat = argClone[0];
@@ -6163,7 +6163,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pMatY = argClone[0];
@@ -6218,7 +6218,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pMatY = argClone[0];
@@ -6333,7 +6333,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray) {
@@ -6341,10 +6341,10 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
-		return this.value = frequency(arg0, arg1);
+		return frequency(arg0, arg1);
 
 	};
 
@@ -6367,7 +6367,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFTest = function (argArray) {
@@ -6377,7 +6377,7 @@ function (window, undefined) {
 			return fTest(arg0, arg1);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFTest);
+		return this._findArrayInNumberArguments(oArguments, calcFTest);
 	};
 
 
@@ -6413,7 +6413,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6424,7 +6424,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6451,7 +6451,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6474,7 +6474,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6511,7 +6511,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6542,7 +6542,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6583,7 +6583,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -6595,9 +6595,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = getLogGamma(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -6621,7 +6621,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6629,7 +6629,7 @@ function (window, undefined) {
 			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6653,7 +6653,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGauss = function (argArray) {
@@ -6661,7 +6661,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGauss);
+		return this._findArrayInNumberArguments(oArguments, calcGauss);
 	};
 
 	/**
@@ -6726,11 +6726,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber) {
 				arr0.push(arg[j].tocNumber());
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = geommean(arr0);
+		return geommean(arr0);
 
 	};
 
@@ -6750,7 +6750,7 @@ function (window, undefined) {
 
 		var prepeareArgs = prepeareGrowthTrendCalculation(this, arg);
 		if (cElementType.error === prepeareArgs.type) {
-			return this.value = prepeareArgs;
+			return prepeareArgs;
 		}
 		var pMatY = prepeareArgs.pMatY;
 		var pMatX = prepeareArgs.pMatX;
@@ -6759,9 +6759,9 @@ function (window, undefined) {
 		var res = CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant, true);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -6833,11 +6833,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber) {
 				arr0.push(arg[j].tocNumber());
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = harmmean(arr0);
+		return harmmean(arr0);
 
 	};
 
@@ -6886,16 +6886,16 @@ function (window, undefined) {
 		arg3 = arg3.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
 
@@ -6903,10 +6903,10 @@ function (window, undefined) {
 			arg0.getValue() < Math.max(0, arg1.getValue() - arg3.getValue() + arg2.getValue()) ||
 			arg1.getValue() <= 0 || arg1.getValue() > arg3.getValue() || arg2.getValue() <= 0 ||
 			arg2.getValue() > arg3.getValue() || arg3.getValue() <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(Math.binomCoeff(arg2.getValue(), arg0.getValue()) *
+		return new cNumber(Math.binomCoeff(arg2.getValue(), arg0.getValue()) *
 			Math.binomCoeff(arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue()) /
 			Math.binomCoeff(arg3.getValue(), arg1.getValue()));
 
@@ -6937,7 +6937,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function hypgeomdist(argArray) {
@@ -6974,7 +6974,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, hypgeomdist);
+		return this._findArrayInNumberArguments(oArguments, hypgeomdist);
 	};
 
 	/**
@@ -7039,7 +7039,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -7049,10 +7049,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = intercept(arr0, arr1);
+		return intercept(arr0, arr1);
 
 	};
 
@@ -7132,11 +7132,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = kurt(arr0);
+		return kurt(arr0);
 
 	};
 
@@ -7195,7 +7195,7 @@ function (window, undefined) {
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 
@@ -7206,7 +7206,7 @@ function (window, undefined) {
 		}
 
 		arg1 = arg1.tocNumber();
-		return this.value = this._getValue(arg0, arg1);
+		return this._getValue(arg0, arg1);
 	};
 
 	/**
@@ -7244,9 +7244,9 @@ function (window, undefined) {
 		var res = CalculateRGPRKP(pMatY, pMatX, bConstant, bStats);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -7286,9 +7286,9 @@ function (window, undefined) {
 	 var res = CalculateRGPRKP( pMatY, pMatX, bConstant, bStats, true);
 
 	 if(res && res[0] && res[0][0]){
-	 return this.value = new cNumber(res[0][0]);
+	 return new cNumber(res[0][0]);
 	 }else{
-	 return this.value = new cError(cErrorType.wrong_value_type);
+	 return new cError(cErrorType.wrong_value_type);
 	 }
 	 };*/
 
@@ -7339,16 +7339,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = loginv(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return loginv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -7375,7 +7375,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var normdist = function (argArray) {
@@ -7405,7 +7405,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
+		return this._findArrayInNumberArguments(oArguments, normdist);
 	};
 
 	/**
@@ -7431,7 +7431,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var normdist = function (argArray) {
@@ -7449,7 +7449,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
+		return this._findArrayInNumberArguments(oArguments, normdist);
 	};
 
 	/**
@@ -7499,16 +7499,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return normdist(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -7530,7 +7530,7 @@ function (window, undefined) {
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 				if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
+						return argIVal;
 					}
 					if (cElementType.number === argIVal.type) {
 						v = argIVal.tocNumber();
@@ -7549,11 +7549,11 @@ function (window, undefined) {
 							max = v.getValue();
 						}
 					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 				}
 			} else if (cElementType.error === element.type) {
-				return this.value = element;
+				return element;
 			} else if (cElementType.string === element.type) {
 				v = element.tocNumber();
 				if (cElementType.number === v.type) {
@@ -7578,7 +7578,7 @@ function (window, undefined) {
 					}
 				});
 				if (cElementType.error === max.type) {
-					return this.value = max;
+					return max;
 				}
 			} else {
 				if (element.getValue() > max) {
@@ -7586,7 +7586,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
+		return (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
 	};
 
 	/**
@@ -7608,7 +7608,7 @@ function (window, undefined) {
 			if (argI instanceof cRef || argI instanceof cRef3D) {
 
 				if (argIVal instanceof cError) {
-					return this.value = argIVal;
+					return argIVal;
 				}
 
 				v = argIVal.tocNumber();
@@ -7621,7 +7621,7 @@ function (window, undefined) {
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					v = argArr[j].tocNumber();
@@ -7631,7 +7631,7 @@ function (window, undefined) {
 					}
 				}
 			} else if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			} else if (argI instanceof cString) {
 				v = argI.tocNumber();
 				if (v instanceof cNumber) {
@@ -7657,7 +7657,7 @@ function (window, undefined) {
 					}
 				});
 				if (max instanceof cError) {
-					return this.value = max;
+					return max;
 				}
 			} else {
 				if (argI.getValue() > max) {
@@ -7665,7 +7665,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
+		return ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
 	};
 
 	/**
@@ -7687,10 +7687,10 @@ function (window, undefined) {
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -7705,10 +7705,10 @@ function (window, undefined) {
 				if (cElementType.cellsRange3D === arg1.type) {
 					arg1 = arg1.tocArea();
 					if (!arg1) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
@@ -7721,20 +7721,20 @@ function (window, undefined) {
 			arg2 = arg2.tocString();
 
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			//compare
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -7759,14 +7759,14 @@ function (window, undefined) {
 		}
 
 		if (0 === resArr.length) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		resArr.sort(function (a, b) {
 			return b - a;
 		});
 
-		return this.value = new cNumber(resArr[0]);
+		return new cNumber(resArr[0]);
 	};
 	cMAXIFS.prototype.checkArguments = function (countArguments) {
 		if(undefined === countArguments){
@@ -7794,10 +7794,10 @@ function (window, undefined) {
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -7812,10 +7812,10 @@ function (window, undefined) {
 				if (cElementType.cellsRange3D === arg1.type) {
 					arg1 = arg1.tocArea();
 					if (!arg1) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
@@ -7828,20 +7828,20 @@ function (window, undefined) {
 			arg2 = arg2.tocString();
 
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			//compare
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -7866,14 +7866,14 @@ function (window, undefined) {
 		}
 
 		if (0 === resArr.length) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		resArr.sort(function (a, b) {
 			return a - b;
 		});
 
-		return this.value = new cNumber(resArr[0]);
+		return new cNumber(resArr[0]);
 	};
 	cMINIFS.prototype.checkArguments = function (countArguments) {
 		if(undefined === countArguments){
@@ -7945,11 +7945,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = median(arr0);
+		return median(arr0);
 
 	};
 
@@ -7972,7 +7972,7 @@ function (window, undefined) {
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 				if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
+						return argIVal;
 					}
 					if (cElementType.number === argIVal.type) {
 						v = argIVal.tocNumber();
@@ -7992,11 +7992,11 @@ function (window, undefined) {
 						}
 						continue;
 					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 				}
 			} else if (cElementType.error === element.type) {
-				return this.value = element;
+				return element;
 			} else if (cElementType.string === element.type) {
 				v = element.tocNumber();
 				if (cElementType.number === v.type) {
@@ -8021,7 +8021,7 @@ function (window, undefined) {
 					}
 				});
 				if (cElementType.error === min.type) {
-					return this.value = min;
+					return min;
 				}
 			} else {
 				if (element.getValue() < min) {
@@ -8029,7 +8029,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
+		return ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
 	};
 
 	/**
@@ -8051,7 +8051,7 @@ function (window, undefined) {
 			if (argI instanceof cRef || argI instanceof cRef3D) {
 
 				if (argIVal instanceof cError) {
-					return this.value = argIVal;
+					return argIVal;
 				}
 
 				v = argIVal.tocNumber();
@@ -8064,7 +8064,7 @@ function (window, undefined) {
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					v = argArr[j].tocNumber();
@@ -8074,7 +8074,7 @@ function (window, undefined) {
 					}
 				}
 			} else if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			} else if (argI instanceof cString) {
 				v = argI.tocNumber();
 				if (v instanceof cNumber) {
@@ -8101,7 +8101,7 @@ function (window, undefined) {
 					}
 				});
 				if (min instanceof cError) {
-					return this.value = min;
+					return min;
 				}
 			} else {
 				if (argI.getValue() < min) {
@@ -8109,7 +8109,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
+		return ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
 	};
 
 	/**
@@ -8195,11 +8195,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = mode(arr0);
+		return mode(arr0);
 
 	};
 
@@ -8250,7 +8250,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function negbinomdist(argArray) {
@@ -8264,7 +8264,7 @@ function (window, undefined) {
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
+		return this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**
@@ -8291,7 +8291,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function negbinomdist(argArray) {
@@ -8314,7 +8314,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
+		return this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**
@@ -8376,20 +8376,20 @@ function (window, undefined) {
 		arg3 = arg3.tocBool();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
 
-		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
+		return normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
 	};
 
 
@@ -8452,16 +8452,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = norminv(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return norminv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -8495,7 +8495,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -8507,9 +8507,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = 0.5 + gauss(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -8548,10 +8548,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normDistCalc);
+		return this._findArrayInNumberArguments(oArguments, normDistCalc);
 	};
 
 	/**
@@ -8582,7 +8582,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -8594,9 +8594,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = normsinv(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_available) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_available) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -8674,7 +8674,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -8684,10 +8684,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = pearson(arr0, arr1);
+		return pearson(arr0, arr1);
 
 	};
 
@@ -8731,10 +8731,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
+		return this._findArrayInNumberArguments(oArguments, percentile);
 	};
 
 	/**
@@ -8778,10 +8778,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
+		return this._findArrayInNumberArguments(oArguments, percentile);
 	};
 
 	/**
@@ -8818,7 +8818,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPercenTrank(argArray) {
@@ -8840,7 +8840,7 @@ function (window, undefined) {
 			return percentrank(tA, fNum, k, true);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPercenTrank);
+		return this._findArrayInNumberArguments(oArguments, calcPercenTrank);
 	};
 
 	/**
@@ -8866,7 +8866,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPercenTrank(argArray) {
@@ -8888,7 +8888,7 @@ function (window, undefined) {
 			return percentrank(tA, fNum, k);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPercenTrank);
+		return this._findArrayInNumberArguments(oArguments, calcPercenTrank);
 	};
 
 	/**
@@ -8925,7 +8925,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function permut(argArray) {
@@ -8938,7 +8938,7 @@ function (window, undefined) {
 			return new cNumber(Math.permut(n, k));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, permut);
+		return this._findArrayInNumberArguments(oArguments, permut);
 	};
 
 	/**
@@ -8964,7 +8964,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function permutationa(argArray) {
@@ -8977,7 +8977,7 @@ function (window, undefined) {
 			return new cNumber(Math.pow(n, k));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, permutationa);
+		return this._findArrayInNumberArguments(oArguments, permutationa);
 	};
 
 	/**
@@ -9002,7 +9002,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPhi(argArray) {
@@ -9011,7 +9011,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_available) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPhi);
+		return this._findArrayInNumberArguments(oArguments, calcPhi);
 	};
 
 
@@ -9038,7 +9038,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function poisson(argArray) {
@@ -9063,7 +9063,7 @@ function (window, undefined) {
 
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, poisson);
+		return this._findArrayInNumberArguments(oArguments, poisson);
 	};
 
 	/**
@@ -9146,7 +9146,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray) {
@@ -9154,7 +9154,7 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 
@@ -9176,13 +9176,13 @@ function (window, undefined) {
 		}
 
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
-		return this.value = prob(arg0, arg1, arg2, arg3);
+		return prob(arg0, arg1, arg2, arg3);
 
 	};
 
@@ -9208,7 +9208,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function quartile(argArray) {
@@ -9241,7 +9241,7 @@ function (window, undefined) {
 			return fFlag === 2 ? getMedian(tA) : getPercentile(tA, 0.25 * fFlag);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
+		return this._findArrayInNumberArguments(oArguments, quartile);
 	};
 
 	/**
@@ -9267,7 +9267,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function quartile(argArray) {
@@ -9300,7 +9300,7 @@ function (window, undefined) {
 			return fFlag === 2 ? getMedian(tA) : getPercentileExclusive(tA, 0.25 * fFlag);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
+		return this._findArrayInNumberArguments(oArguments, quartile);
 	};
 
 	/**
@@ -9337,7 +9337,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcRank = function (argArray) {
@@ -9366,7 +9366,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcRank);
+		return this._findArrayInNumberArguments(oArguments, calcRank);
 	};
 
 	/**
@@ -9392,7 +9392,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcRank = function (argArray) {
@@ -9421,7 +9421,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcRank);
+		return this._findArrayInNumberArguments(oArguments, calcRank);
 	};
 
 	/**
@@ -9500,7 +9500,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -9510,10 +9510,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = rsq(arr0, arr1);
+		return rsq(arr0, arr1);
 
 	};
 
@@ -9556,11 +9556,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = skew(arr0);
+		return skew(arr0);
 	};
 
 	/**
@@ -9603,11 +9603,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = skew(arr0, true);
+		return skew(arr0, true);
 	};
 
 	/**
@@ -9673,7 +9673,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -9683,10 +9683,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = slope(arr0, arr1);
+		return slope(arr0, arr1);
 
 	};
 
@@ -9748,7 +9748,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 		} else {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 
@@ -9757,10 +9757,10 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArray) {
 //        arg1 = arg1.getElement( 0 );
 			arg1.foreach(actionArray);
-			return this.value = retArr;
+			return retArr;
 		}
 
-		return this.value = frequency(arg0, arg1);
+		return frequency(arg0, arg1);
 
 	};
 
@@ -9811,16 +9811,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = standardize(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return standardize(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -9887,7 +9887,7 @@ function (window, undefined) {
 			return new cError(cErrorType.division_by_zero);
 		}
 
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+		return new cNumber(Math.sqrt(res / (count - 1)));
 	};
 
 	/**
@@ -9958,7 +9958,7 @@ function (window, undefined) {
 			av = member[i] - average;
 			res += av * av;
 		}
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+		return new cNumber(Math.sqrt(res / (count - 1)));
 	};
 
 	/**
@@ -10026,11 +10026,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -10123,11 +10123,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -10196,7 +10196,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -10206,10 +10206,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = steyx(arr0, arr1);
+		return steyx(arr0, arr1);
 
 	};
 
@@ -10235,7 +10235,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10249,10 +10249,10 @@ function (window, undefined) {
 
 		if (argClone[1].getValue() < 1 || argClone[0].getValue() < 0 ||
 			(argClone[2].getValue() !== 1 && argClone[2].getValue() !== 2)) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10278,7 +10278,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10291,10 +10291,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10319,7 +10319,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10334,7 +10334,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10359,7 +10359,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10378,7 +10378,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10403,7 +10403,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10436,7 +10436,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10461,7 +10461,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10485,7 +10485,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10515,7 +10515,7 @@ function (window, undefined) {
 
 		var prepeareArgs = prepeareGrowthTrendCalculation(this, arg);
 		if (cElementType.error === prepeareArgs.type) {
-			return this.value = prepeareArgs;
+			return prepeareArgs;
 		}
 		var pMatY = prepeareArgs.pMatY;
 		var pMatX = prepeareArgs.pMatX;
@@ -10524,9 +10524,9 @@ function (window, undefined) {
 		var res = CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -10547,7 +10547,7 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое значение число
 		if (cElementType.number === arg[0].type) {
@@ -10562,7 +10562,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTrimMean = function (argArray) {
@@ -10603,7 +10603,7 @@ function (window, undefined) {
 			}
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTrimMean);
+		return this._findArrayInNumberArguments(oArguments, calcTrimMean);
 	};
 
 	/**
@@ -10623,10 +10623,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1], arg[2], arg[3]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -10646,7 +10646,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTTest = function (argArray) {
@@ -10662,7 +10662,7 @@ function (window, undefined) {
 			return tTest(arg0, arg1, arg2, arg3);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTTest);
+		return this._findArrayInNumberArguments(oArguments, calcTTest);
 	};
 
 	/**
@@ -10747,11 +10747,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 
 	};
 
@@ -10837,11 +10837,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else if (arg[j] instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -10914,11 +10914,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11003,11 +11003,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11105,11 +11105,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else if (elem instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11135,7 +11135,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcWeibull = function (argArray) {
@@ -11156,7 +11156,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcWeibull);
+		return this._findArrayInNumberArguments(oArguments, calcWeibull);
 	};
 
 	/**
@@ -11188,7 +11188,7 @@ function (window, undefined) {
 		var arg2 = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -11204,7 +11204,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcZTest(argArray) {
@@ -11254,7 +11254,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcZTest);
+		return this._findArrayInNumberArguments(oArguments, calcZTest);
 	};
 
 	/**
