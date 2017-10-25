@@ -4374,8 +4374,6 @@ function parserFormula( formula, parent, _ws ) {
 
 	this.listenerId = lastListenerId++;
 	this.ca = false;
-	this.isCalculate = false;
-	this.calculateDefName = null;
 	this.isTable = false;
 	this.isInDependencies = false;
 	this.parent = parent;
@@ -4498,8 +4496,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.f = [];
   this.countRef = 0;
   this.ca = false;
-  this.isCalculate = false;
-  this.calculateDefName = null;
   //this.isTable = false;
   this.isInDependencies = false;
 };
@@ -5334,22 +5330,12 @@ parserFormula.prototype.setFormula = function(formula) {
 			return this.isParsed = false;
 		}
 	};
-
+	parserFormula.prototype.calculateCycleError = function () {
+		this.value = new cError(cErrorType.bad_reference);
+		this._endCalculate();
+		return this.value;
+	};
 	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset) {
-		if (this.isCalculate && (!this.calculateDefName || this.calculateDefName[opt_bbox ? opt_bbox.getName() :
-		 opt_bbox])) {
-			//cycle
-			this.value = new cError(cErrorType.bad_reference);
-			this._endCalculate();
-			return this.value;
-		}
-		this.isCalculate = true;
-		if (opt_defName) {
-			if (!this.calculateDefName) {
-				this.calculateDefName = {};
-			}
-			this.calculateDefName[opt_bbox ? opt_bbox.getName() : opt_bbox] = 1;
-		}
 		if (this.outStack.length < 1) {
 			this.value = new cError(cErrorType.wrong_name);
 			this._endCalculate();
@@ -5422,8 +5408,6 @@ parserFormula.prototype.setFormula = function(formula) {
 		if (this.parent && this.parent.onFormulaEvent) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
 		}
-		this.isCalculate = false;
-		this.calculateDefName = null;
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */

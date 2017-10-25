@@ -1176,6 +1176,7 @@
 			this.tempGetByCells = [];
 		},
 		_calculateDirty: function() {
+			var t = this;
 			for (var sheetId in this.dirtyCells) {
 				if (this.dirtyCells.hasOwnProperty(sheetId)) {
 					var dirtyCellsSheet = this.dirtyCells[sheetId];
@@ -1183,12 +1184,14 @@
 					if (dirtyCellsSheet && ws) {
 						for (var cellIndex in dirtyCellsSheet) {
 							if (dirtyCellsSheet.hasOwnProperty(cellIndex)) {
-								getFromCellIndex(cellIndex - 0);
-								ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
-									if (cell && cell.formulaParsed) {
-										cell.formulaParsed.calculate();
-									}
-								});
+								if(0 !== dirtyCellsSheet[cellIndex]){
+									getFromCellIndex(cellIndex - 0);
+									ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
+										if (cell && cell.formulaParsed) {
+											t._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell.formulaParsed);
+										}
+									});
+								}
 							}
 						}
 					}
@@ -1201,11 +1204,18 @@
 				var dirtyCellsSheet = this.dirtyCells[cell.ws.getId()];
 				if (dirtyCellsSheet) {
 					var cellIndex = getCellIndex(cell.nRow, cell.nCol);
-					if (dirtyCellsSheet[cellIndex]) {
-						dirtyCellsSheet[cellIndex] = 0;
-						cell.formulaParsed.calculate();
-					}
+					this._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell.formulaParsed);
 				}
+			}
+		},
+		_calculateDirtyFormula: function(dirtyCellsSheet, cellIndex, formula) {
+			var dirtyCellVal = dirtyCellsSheet[cellIndex];
+			if (1 === dirtyCellVal) {
+				dirtyCellsSheet[cellIndex] = 2;
+				formula.calculate();
+				dirtyCellsSheet[cellIndex] = 0;
+			} else if (2 === dirtyCellVal) {
+				formula.calculateCycleError();
 			}
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
