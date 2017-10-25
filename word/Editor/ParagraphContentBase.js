@@ -3005,7 +3005,7 @@ CParagraphContentWithParagraphLikeContent.prototype.private_CheckUpdateBookmarks
 	if (!Items)
 		return;
 
-	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	for (var nIndex = 0, nCount = Items.length; nIndex < nCount; ++nIndex)
 	{
 		if (para_Bookmark === Items[nIndex].Type)
 		{
