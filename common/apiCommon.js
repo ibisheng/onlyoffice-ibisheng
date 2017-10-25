@@ -2918,6 +2918,7 @@
 		this.Mode = null;
 		this.Permissions = null;
 		this.Lang = null;
+		this.OfflineApp = false;
 	}
 
 	prot = asc_CDocInfo.prototype;
@@ -2957,10 +2958,10 @@
 	prot.put_Token = prot.asc_putToken = function (v) {
 		this.Token = v;
 	};
-	prot.get_OfflineApp = prot.asc_getOfflineApp = function () {
+	prot.get_OfflineApp = function () {
 		return this.OfflineApp;
 	};
-	prot.put_OfflineApp = prot.asc_putOfflineApp = function (v) {
+	prot.put_OfflineApp = function (v) {
 		this.OfflineApp = v;
 	};
 	prot.get_UserId = prot.asc_getUserId = function () {
@@ -4195,8 +4196,6 @@
 	prot["put_Format"] = prot["asc_putFormat"] = prot.asc_putFormat;
 	prot["get_VKey"] = prot["asc_getVKey"] = prot.asc_getVKey;
 	prot["put_VKey"] = prot["asc_putVKey"] = prot.asc_putVKey;
-	prot["get_OfflineApp"] = prot["asc_getOfflineApp"] = prot.asc_getOfflineApp;
-	prot["put_OfflineApp"] = prot["asc_putOfflineApp"] = prot.asc_putOfflineApp;
 	prot["get_UserId"] = prot["asc_getUserId"] = prot.asc_getUserId;
 	prot["get_UserName"] = prot["asc_getUserName"] = prot.asc_getUserName;
 	prot["get_Options"] = prot["asc_getOptions"] = prot.asc_getOptions;
