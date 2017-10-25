@@ -269,7 +269,7 @@ function (window, undefined) {
 	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
 		var bbox;
-		if (0 === this.argumentsCurrent) {
+		if (0 === arg.length) {
 			bbox = arguments[1];
 		} else {
 			var arg0 = arg[0];
@@ -538,7 +538,7 @@ function (window, undefined) {
 	cLOOKUP.prototype.argumentsMin = 2;
 	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1,
+		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === arg.length ? arg1 : arg[2], resC = -1, resR = -1,
 			t = this;
 
 		if (cElementType.error === arg0.type) {
@@ -657,7 +657,7 @@ function (window, undefined) {
 			}
 
 			var b = arg2.getBBox0();
-			if (2 === this.argumentsCurrent) {
+			if (2 === arg.length) {
 				if (arg1Range[0].length >= 2) {
 					return new cRef(ws.getCell3(b.r1 + index, b.c2 + 0).getName(), ws);
 				} else {
@@ -865,7 +865,7 @@ function (window, undefined) {
 	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
 		var bbox;
-		if (0 === this.argumentsCurrent) {
+		if (0 === arg.length) {
 			bbox = arguments[1];
 		} else {
 			var arg0 = arg[0];

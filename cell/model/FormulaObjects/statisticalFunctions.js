@@ -4041,9 +4041,6 @@ function (window, undefined) {
 		}
 	};
 	cAVERAGEIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -5070,9 +5067,6 @@ function (window, undefined) {
 		return new cNumber(_count);
 	};
 	cCOUNTIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 0 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -7769,9 +7763,6 @@ function (window, undefined) {
 		return new cNumber(resArr[0]);
 	};
 	cMAXIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -7876,9 +7867,6 @@ function (window, undefined) {
 		return new cNumber(resArr[0]);
 	};
 	cMINIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 

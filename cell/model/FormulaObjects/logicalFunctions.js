@@ -278,7 +278,7 @@
 					break;
 				}
 			}
-			if (i === this.argumentsCurrent - 1) {
+			if (i === arg.length - 1) {
 				res = new cError(cErrorType.not_available);
 				break;
 			}

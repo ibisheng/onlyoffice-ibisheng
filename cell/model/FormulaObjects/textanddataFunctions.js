@@ -858,7 +858,7 @@ function (window, undefined) {
 	cLEFT.prototype.argumentsMin = 1;
 	cLEFT.prototype.argumentsMax = 2;
 	cLEFT.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
+		var arg0 = arg[0], arg1 = arg.length == 1 ? new cNumber(1) : arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		}
@@ -1417,7 +1417,7 @@ function (window, undefined) {
 	cRIGHT.prototype.argumentsMin = 1;
 	cRIGHT.prototype.argumentsMax = 2;
 	cRIGHT.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
+		var arg0 = arg[0], arg1 = arg.length === 1 ? new cNumber(1) : arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		}
