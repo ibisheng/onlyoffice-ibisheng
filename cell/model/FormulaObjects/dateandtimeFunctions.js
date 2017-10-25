@@ -516,8 +516,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATE.prototype = Object.create(cBaseFunction.prototype);
@@ -583,8 +581,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEDIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATEDIF.prototype = Object.create(cBaseFunction.prototype);
@@ -699,8 +695,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATEVALUE.prototype = Object.create(cBaseFunction.prototype);
@@ -737,8 +731,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -805,8 +797,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAYS.prototype = Object.create(cBaseFunction.prototype);
@@ -846,8 +836,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS360() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAYS360.prototype = Object.create(cBaseFunction.prototype);
@@ -910,8 +898,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEDATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEDATE.prototype = Object.create(cBaseFunction.prototype);
@@ -983,8 +969,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEOMONTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEOMONTH.prototype = Object.create(cBaseFunction.prototype);
@@ -1047,8 +1031,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHOUR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHOUR.prototype = Object.create(cBaseFunction.prototype);
@@ -1110,8 +1092,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISOWEEKNUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
@@ -1146,8 +1126,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINUTE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINUTE.prototype = Object.create(cBaseFunction.prototype);
@@ -1208,8 +1186,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMONTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMONTH.prototype = Object.create(cBaseFunction.prototype);
@@ -1276,8 +1252,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS.prototype = Object.create(cBaseFunction.prototype);
@@ -1349,8 +1323,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS_INTL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
@@ -1429,8 +1401,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNOW() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNOW.prototype = Object.create(cBaseFunction.prototype);
@@ -1451,8 +1421,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSECOND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSECOND.prototype = Object.create(cBaseFunction.prototype);
@@ -1513,8 +1481,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIME() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTIME.prototype = Object.create(cBaseFunction.prototype);
@@ -1570,8 +1536,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIMEVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTIMEVALUE.prototype = Object.create(cBaseFunction.prototype);
@@ -1609,8 +1573,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTODAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTODAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1629,8 +1591,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEEKDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1710,8 +1670,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKNUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
@@ -1795,8 +1753,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1881,8 +1837,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY_INTL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
@@ -1970,8 +1924,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cYEAR.prototype = Object.create(cBaseFunction.prototype);
@@ -2031,8 +1983,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEARFRAC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cYEARFRAC.prototype = Object.create(cBaseFunction.prototype);

@@ -207,8 +207,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAVERAGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
@@ -261,8 +259,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDCOUNT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
@@ -304,8 +300,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDCOUNTA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDCOUNTA.prototype = Object.create(cBaseFunction.prototype);
@@ -345,8 +339,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDGET() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDGET.prototype = Object.create(cBaseFunction.prototype);
@@ -387,8 +379,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDMAX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDMAX.prototype = Object.create(cBaseFunction.prototype);
@@ -430,8 +420,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDMIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDMIN.prototype = Object.create(cBaseFunction.prototype);
@@ -474,8 +462,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDPRODUCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDPRODUCT.prototype = Object.create(cBaseFunction.prototype);
@@ -525,8 +511,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSTDEV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
@@ -584,8 +568,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSTDEVP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
@@ -644,8 +626,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDSUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDSUM.prototype = Object.create(cBaseFunction.prototype);
@@ -691,8 +671,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDVAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDVAR.prototype = Object.create(cBaseFunction.prototype);
@@ -757,8 +735,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDVARP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDVARP.prototype = Object.create(cBaseFunction.prototype);

@@ -70,8 +70,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cASC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cASC.prototype = Object.create(cBaseFunction.prototype);
@@ -83,8 +81,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBAHTTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBAHTTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -96,8 +92,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHAR.prototype = Object.create(cBaseFunction.prototype);
@@ -141,8 +135,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCLEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCLEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -178,8 +170,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCODE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCODE.prototype = Object.create(cBaseFunction.prototype);
@@ -223,8 +213,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONCATENATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO пересмотреть функцию!!!
@@ -268,8 +256,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONCAT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONCAT.prototype = Object.create(cBaseFunction.prototype);
@@ -323,8 +309,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDOLLAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDOLLAR.prototype = Object.create(cBaseFunction.prototype);
@@ -522,8 +506,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXACT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXACT.prototype = Object.create(cBaseFunction.prototype);
@@ -568,8 +550,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFIND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFIND.prototype = Object.create(cBaseFunction.prototype);
@@ -654,8 +634,6 @@ function (window, undefined) {
 	 * @extends {cFIND}
 	 */
 	function cFINDB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFINDB.prototype = Object.create(cFIND.prototype);
@@ -667,8 +645,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFIXED() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFIXED.prototype = Object.create(cBaseFunction.prototype);
@@ -863,8 +839,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cJIS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cJIS.prototype = Object.create(cBaseFunction.prototype);
@@ -876,8 +850,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLEFT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLEFT.prototype = Object.create(cBaseFunction.prototype);
@@ -926,8 +898,6 @@ function (window, undefined) {
 	 * @extends {cLEFT}
 	 */
 	function cLEFTB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLEFTB.prototype = Object.create(cLEFT.prototype);
@@ -939,8 +909,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLEN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLEN.prototype = Object.create(cBaseFunction.prototype);
@@ -973,8 +941,6 @@ function (window, undefined) {
 	 * @extends {cLEN}
 	 */
 	function cLENB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLENB.prototype = Object.create(cLEN.prototype);
@@ -986,8 +952,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOWER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOWER.prototype = Object.create(cBaseFunction.prototype);
@@ -1019,8 +983,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMID() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMID.prototype = Object.create(cBaseFunction.prototype);
@@ -1089,8 +1051,6 @@ function (window, undefined) {
 	 * @extends {cMID}
 	 */
 	function cMIDB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMIDB.prototype = Object.create(cMID.prototype);
@@ -1102,8 +1062,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNUMBERVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNUMBERVALUE.prototype = Object.create(cBaseFunction.prototype);
@@ -1229,8 +1187,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPHONETIC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPHONETIC.prototype = Object.create(cBaseFunction.prototype);
@@ -1242,8 +1198,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPROPER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPROPER.prototype = Object.create(cBaseFunction.prototype);
@@ -1308,8 +1262,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cREPLACE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cREPLACE.prototype = Object.create(cBaseFunction.prototype);
@@ -1386,8 +1338,6 @@ function (window, undefined) {
 	 * @extends {cREPLACE}
 	 */
 	function cREPLACEB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cREPLACEB.prototype = Object.create(cREPLACE.prototype);
@@ -1399,8 +1349,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cREPT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cREPT.prototype = Object.create(cBaseFunction.prototype);
@@ -1461,8 +1409,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRIGHT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRIGHT.prototype = Object.create(cBaseFunction.prototype);
@@ -1511,8 +1457,6 @@ function (window, undefined) {
 	 * @extends {cRIGHT}
 	 */
 	function cRIGHTB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRIGHTB.prototype = Object.create(cRIGHT.prototype);
@@ -1524,8 +1468,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSEARCH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSEARCH.prototype = Object.create(cBaseFunction.prototype);
@@ -1615,8 +1557,6 @@ function (window, undefined) {
 	 * @extends {cRIGHT}
 	 */
 	function cSEARCHB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSEARCHB.prototype = Object.create(cSEARCH.prototype);
@@ -1628,8 +1568,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUBSTITUTE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUBSTITUTE.prototype = Object.create(cBaseFunction.prototype);
@@ -1710,8 +1648,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT.prototype = Object.create(cBaseFunction.prototype);
@@ -1743,8 +1679,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -1814,8 +1748,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTEXTJOIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTEXTJOIN.prototype = Object.create(cBaseFunction.prototype);
@@ -1901,8 +1833,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTRIM.prototype = Object.create(cBaseFunction.prototype);
@@ -1937,8 +1867,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUNICHAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
@@ -1981,8 +1909,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUNICODE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
@@ -2016,8 +1942,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cUPPER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cUPPER.prototype = Object.create(cBaseFunction.prototype);
@@ -2047,8 +1971,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVALUE.prototype = Object.create(cBaseFunction.prototype);

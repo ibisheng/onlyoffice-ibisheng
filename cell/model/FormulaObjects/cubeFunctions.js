@@ -53,8 +53,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEKPIMEMBER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBEKPIMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -66,8 +64,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEMEMBER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBEMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -79,8 +75,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEMEMBERPROPERTY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBEMEMBERPROPERTY.prototype = Object.create(cBaseFunction.prototype);
@@ -92,8 +86,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBERANKEDMEMBER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBERANKEDMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -105,8 +97,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBESET() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBESET.prototype = Object.create(cBaseFunction.prototype);
@@ -118,8 +108,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBESETCOUNT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBESETCOUNT.prototype = Object.create(cBaseFunction.prototype);
@@ -131,8 +119,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCUBEVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCUBEVALUE.prototype = Object.create(cBaseFunction.prototype);

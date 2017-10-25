@@ -58,8 +58,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAND.prototype = Object.create(cBaseFunction.prototype);
@@ -131,8 +129,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFALSE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFALSE.prototype = Object.create(cBaseFunction.prototype);
@@ -148,8 +144,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIF.prototype = Object.create(cBaseFunction.prototype);
@@ -188,8 +182,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIFERROR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIFERROR.prototype = Object.create(cBaseFunction.prototype);
@@ -221,8 +213,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIFNA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIFNA.prototype = Object.create(cBaseFunction.prototype);
@@ -255,8 +245,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -309,8 +297,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNOT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNOT.prototype = Object.create(cBaseFunction.prototype);
@@ -347,8 +333,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cOR.prototype = Object.create(cBaseFunction.prototype);
@@ -417,8 +401,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSWITCH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSWITCH.prototype = Object.create(cBaseFunction.prototype);
@@ -470,8 +452,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTRUE.prototype = Object.create(cBaseFunction.prototype);
@@ -487,8 +467,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cXOR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cXOR.prototype = Object.create(cBaseFunction.prototype);

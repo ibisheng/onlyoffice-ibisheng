@@ -60,8 +60,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERROR_TYPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERROR_TYPE.prototype = Object.create(cBaseFunction.prototype);
@@ -120,8 +118,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISBLANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISBLANK.prototype = Object.create(cBaseFunction.prototype);
@@ -148,8 +144,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISERR.prototype = Object.create(cBaseFunction.prototype);
@@ -179,8 +173,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERROR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISERROR.prototype = Object.create(cBaseFunction.prototype);
@@ -210,8 +202,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISEVEN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISEVEN.prototype = Object.create(cBaseFunction.prototype);
@@ -246,8 +236,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISFORMULA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
@@ -278,8 +266,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISLOGICAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISLOGICAL.prototype = Object.create(cBaseFunction.prototype);
@@ -309,8 +295,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNA.prototype = Object.create(cBaseFunction.prototype);
@@ -340,8 +324,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNONTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNONTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -370,8 +352,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNUMBER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNUMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -401,8 +381,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISODD() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISODD.prototype = Object.create(cBaseFunction.prototype);
@@ -437,8 +415,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISREF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISREF.prototype = Object.create(cBaseFunction.prototype);
@@ -460,8 +436,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -491,8 +465,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cN.prototype = Object.create(cBaseFunction.prototype);
@@ -536,8 +508,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNA.prototype = Object.create(cBaseFunction.prototype);
@@ -553,8 +523,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEET() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSHEET.prototype = Object.create(cBaseFunction.prototype);
@@ -601,8 +569,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEETS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
@@ -645,8 +611,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTYPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTYPE.prototype = Object.create(cBaseFunction.prototype);

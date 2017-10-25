@@ -3706,8 +3706,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVEDEV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVEDEV.prototype = Object.create(cBaseFunction.prototype);
@@ -3767,8 +3765,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGE.prototype = Object.create(cBaseFunction.prototype);
@@ -3836,8 +3832,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEA.prototype = Object.create(cBaseFunction.prototype);
@@ -3897,8 +3891,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
@@ -3977,8 +3969,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -4062,8 +4052,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETADIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4120,8 +4108,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETA_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETA_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4178,8 +4164,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETA_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -4236,8 +4220,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBINOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4296,8 +4278,6 @@ function (window, undefined) {
 	 * @extends {cBINOMDIST}
 	 */
 	function cBINOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
@@ -4310,8 +4290,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBINOM_DIST_RANGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
@@ -4366,8 +4344,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHIDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHIDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4407,8 +4383,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHIINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
@@ -4456,8 +4430,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4510,8 +4482,6 @@ function (window, undefined) {
 	 * @extends {cCHIDIST}
 	 */
 	function cCHISQ_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST_RT.prototype = Object.create(cCHIDIST.prototype);
@@ -4524,8 +4494,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -4574,8 +4542,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO check max 64 iterations(from documentaion)
@@ -4625,8 +4591,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHITEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
@@ -4678,8 +4642,6 @@ function (window, undefined) {
 	 * @extends {cCHITEST}
 	 */
 	function cCHISQ_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_TEST.prototype = Object.create(cCHITEST.prototype);
@@ -4692,8 +4654,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONFIDENCE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE.prototype = Object.create(cBaseFunction.prototype);
@@ -4735,8 +4695,6 @@ function (window, undefined) {
 	 * @extends {cCONFIDENCE}
 	 */
 	function cCONFIDENCE_NORM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE_NORM.prototype = Object.create(cCONFIDENCE.prototype);
@@ -4749,8 +4707,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONFIDENCE_T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE_T.prototype = Object.create(cBaseFunction.prototype);
@@ -4802,8 +4758,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCORREL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCORREL.prototype = Object.create(cBaseFunction.prototype);
@@ -4883,8 +4837,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNT.prototype = Object.create(cBaseFunction.prototype);
@@ -4934,8 +4886,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
@@ -4980,8 +4930,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTBLANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
@@ -5006,8 +4954,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
@@ -5061,8 +5007,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -5137,8 +5081,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVAR.prototype = Object.create(cBaseFunction.prototype);
@@ -5212,8 +5154,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVARIANCE_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVARIANCE_P.prototype = Object.create(cBaseFunction.prototype);
@@ -5307,8 +5247,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVARIANCE_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVARIANCE_S.prototype = Object.create(cBaseFunction.prototype);
@@ -5406,8 +5344,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCRITBINOM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCRITBINOM.prototype = Object.create(cBaseFunction.prototype);
@@ -5473,8 +5409,6 @@ function (window, undefined) {
 	 * @extends {cCRITBINOM}
 	 */
 	function cBINOM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_INV.prototype = Object.create(cCRITBINOM.prototype);
@@ -5487,8 +5421,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEVSQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEVSQ.prototype = Object.create(cBaseFunction.prototype);
@@ -5561,8 +5493,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXPON_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXPON_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5610,8 +5540,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXPONDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXPONDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5670,8 +5598,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5724,8 +5650,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
@@ -5772,8 +5696,6 @@ function (window, undefined) {
 	 * @extends {cF_DIST_RT}
 	 */
 	function cFDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFDIST.prototype = Object.create(cF_DIST_RT.prototype);
@@ -5786,8 +5708,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -5842,8 +5762,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFINV.prototype = Object.create(cBaseFunction.prototype);
@@ -5897,8 +5815,6 @@ function (window, undefined) {
 	 * @extends {cFINV}
 	 */
 	function cF_INV_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_INV_RT.prototype = Object.create(cFINV.prototype);
@@ -5911,8 +5827,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFISHER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFISHER.prototype = Object.create(cBaseFunction.prototype);
@@ -5955,8 +5869,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFISHERINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFISHERINV.prototype = Object.create(cBaseFunction.prototype);
@@ -5999,8 +5911,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST.prototype = Object.create(cBaseFunction.prototype);
@@ -6097,8 +6007,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
@@ -6160,8 +6068,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_CONFINT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
@@ -6238,8 +6144,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_SEASONALITY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
@@ -6293,8 +6197,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_STAT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
@@ -6357,8 +6259,6 @@ function (window, undefined) {
 	 * @extends {cFORECAST}
 	 */
 	function cFORECAST_LINEAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_LINEAR.prototype = Object.create(cFORECAST.prototype);
@@ -6371,8 +6271,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFREQUENCY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFREQUENCY.prototype = Object.create(cBaseFunction.prototype);
@@ -6455,8 +6353,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -6490,8 +6386,6 @@ function (window, undefined) {
 	 * @extends {cFTEST}
 	 */
 	function cF_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_TEST.prototype = Object.create(cFTEST.prototype);
@@ -6503,8 +6397,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
@@ -6540,8 +6432,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -6592,8 +6482,6 @@ function (window, undefined) {
 	 * @extends {cGAMMA_DIST}
 	 */
 	function cGAMMADIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMADIST.prototype = Object.create(cGAMMA_DIST.prototype);
@@ -6605,8 +6493,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -6664,8 +6550,6 @@ function (window, undefined) {
 	 * @extends {cGAMMA_INV}
 	 */
 	function cGAMMAINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMAINV.prototype = Object.create(cGAMMA_INV.prototype);
@@ -6677,8 +6561,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMALN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMALN.prototype = Object.create(cBaseFunction.prototype);
@@ -6723,8 +6605,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMALN_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMALN_PRECISE.prototype = Object.create(cBaseFunction.prototype);
@@ -6757,8 +6637,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAUSS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAUSS.prototype = Object.create(cBaseFunction.prototype);
@@ -6791,8 +6669,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGEOMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGEOMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -6863,8 +6739,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGROWTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGROWTH.prototype = Object.create(cBaseFunction.prototype);
@@ -6896,8 +6770,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHARMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHARMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -6974,8 +6846,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPGEOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHYPGEOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7047,8 +6917,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPGEOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7114,8 +6982,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cINTERCEPT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cINTERCEPT.prototype = Object.create(cBaseFunction.prototype);
@@ -7195,8 +7061,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cKURT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cKURT.prototype = Object.create(cBaseFunction.prototype);
@@ -7281,8 +7145,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLARGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLARGE.prototype = Object.create(cBaseFunction.prototype);
@@ -7352,8 +7214,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLINEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLINEST.prototype = Object.create(cBaseFunction.prototype);
@@ -7395,8 +7255,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGEST.prototype = Object.create(cBaseFunction.prototype);
@@ -7439,8 +7297,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGINV.prototype = Object.create(cBaseFunction.prototype);
@@ -7500,8 +7356,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7559,8 +7413,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORM_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -7605,8 +7457,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7666,8 +7516,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAX.prototype = Object.create(cBaseFunction.prototype);
@@ -7746,8 +7594,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAXA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAXA.prototype = Object.create(cBaseFunction.prototype);
@@ -7827,8 +7673,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAXIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAXIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -7936,8 +7780,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -8045,8 +7887,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMEDIAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMEDIAN.prototype = Object.create(cBaseFunction.prototype);
@@ -8118,8 +7958,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMIN.prototype = Object.create(cBaseFunction.prototype);
@@ -8199,8 +8037,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINA.prototype = Object.create(cBaseFunction.prototype);
@@ -8281,8 +8117,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMODE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE.prototype = Object.create(cBaseFunction.prototype);
@@ -8375,8 +8209,6 @@ function (window, undefined) {
 	 */
 	//TODO разницы в работе функций cMODE_MULT и cMODE не нашёл, но в LO обработки немного разные. проверить!
 	function cMODE_MULT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE_MULT.prototype = Object.create(cMODE.prototype);
@@ -8389,8 +8221,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cMODE_SNGL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE_SNGL.prototype = Object.create(cMODE.prototype);
@@ -8403,8 +8233,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8444,8 +8272,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8496,8 +8322,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8574,8 +8398,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cNORM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_DIST.prototype = Object.create(cNORMDIST.prototype);
@@ -8588,8 +8410,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMINV.prototype = Object.create(cBaseFunction.prototype);
@@ -8649,8 +8469,6 @@ function (window, undefined) {
 	 * @extends {cNORMINV}
 	 */
 	function cNORM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_INV.prototype = Object.create(cNORMINV.prototype);
@@ -8663,8 +8481,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMSDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMSDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8701,8 +8517,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORM_S_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8745,8 +8559,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMSINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMSINV.prototype = Object.create(cBaseFunction.prototype);
@@ -8792,8 +8604,6 @@ function (window, undefined) {
 	 * @extends {cNORMSINV}
 	 */
 	function cNORM_S_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_S_INV.prototype = Object.create(cNORMSINV.prototype);
@@ -8806,8 +8616,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPEARSON() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPEARSON.prototype = Object.create(cBaseFunction.prototype);
@@ -8888,8 +8696,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTILE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE.prototype = Object.create(cBaseFunction.prototype);
@@ -8936,8 +8742,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTILE_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -8985,8 +8789,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cPERCENTILE_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE_INC.prototype = Object.create(cPERCENTILE.prototype);
@@ -8999,8 +8801,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTRANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK.prototype = Object.create(cBaseFunction.prototype);
@@ -9048,8 +8848,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTRANK_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -9098,8 +8896,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPERCENTRANK_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK_INC.prototype = Object.create(cPERCENTRANK.prototype);
@@ -9112,8 +8908,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERMUT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERMUT.prototype = Object.create(cBaseFunction.prototype);
@@ -9152,8 +8946,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERMUTATIONA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
@@ -9193,8 +8985,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPHI() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPHI.prototype = Object.create(cBaseFunction.prototype);
@@ -9230,8 +9020,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPOISSON() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPOISSON.prototype = Object.create(cBaseFunction.prototype);
@@ -9283,8 +9071,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPOISSON_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPOISSON_DIST.prototype = Object.create(cPOISSON.prototype);
@@ -9297,8 +9083,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPROB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPROB.prototype = Object.create(cBaseFunction.prototype);
@@ -9407,8 +9191,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cQUARTILE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE.prototype = Object.create(cBaseFunction.prototype);
@@ -9467,8 +9249,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cQUARTILE_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -9528,8 +9308,6 @@ function (window, undefined) {
 	 * @extends {cQUARTILE}
 	 */
 	function cQUARTILE_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE_INC.prototype = Object.create(cQUARTILE.prototype);
@@ -9542,8 +9320,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
@@ -9598,8 +9374,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANK_AVG() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
@@ -9655,8 +9429,6 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cRANK_EQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK_EQ.prototype = Object.create(cRANK.prototype);
@@ -9669,8 +9441,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRSQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRSQ.prototype = Object.create(cBaseFunction.prototype);
@@ -9752,8 +9522,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSKEW() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSKEW.prototype = Object.create(cBaseFunction.prototype);
@@ -9800,8 +9568,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSKEW_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSKEW_P.prototype = Object.create(cBaseFunction.prototype);
@@ -9849,8 +9615,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSLOPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSLOPE.prototype = Object.create(cBaseFunction.prototype);
@@ -9931,8 +9695,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSMALL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSMALL.prototype = Object.create(cBaseFunction.prototype);
@@ -10007,8 +9769,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTANDARDIZE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTANDARDIZE.prototype = Object.create(cBaseFunction.prototype);
@@ -10068,8 +9828,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
@@ -10137,8 +9895,6 @@ function (window, undefined) {
 	 * @extends {cSTDEV}
 	 */
 	function cSTDEV_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
@@ -10152,8 +9908,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVA.prototype = Object.create(cBaseFunction.prototype);
@@ -10212,8 +9966,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVP.prototype = Object.create(cBaseFunction.prototype);
@@ -10286,8 +10038,6 @@ function (window, undefined) {
 	 * @extends {cSTDEVP}
 	 */
 	function cSTDEV_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_P.prototype = Object.create(cSTDEVP.prototype);
@@ -10300,8 +10050,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVPA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVPA.prototype = Object.create(cBaseFunction.prototype);
@@ -10387,8 +10135,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTEYX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTEYX.prototype = Object.create(cBaseFunction.prototype);
@@ -10472,8 +10218,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -10516,8 +10260,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -10560,8 +10302,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_2T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
@@ -10602,8 +10342,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
@@ -10648,8 +10386,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -10708,8 +10444,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV_2T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
@@ -10759,8 +10493,6 @@ function (window, undefined) {
 	 * @extends {cT_INV_2T}
 	 */
 	function cTINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTINV.prototype = Object.create(cT_INV_2T.prototype);
@@ -10772,8 +10504,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTREND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTREND.prototype = Object.create(cBaseFunction.prototype);
@@ -10805,8 +10535,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIMMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -10883,8 +10611,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -10944,8 +10670,6 @@ function (window, undefined) {
 	 * @extends {cTTEST}
 	 */
 	function cT_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_TEST.prototype = Object.create(cTTEST.prototype);
@@ -10958,8 +10682,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR.prototype = Object.create(cBaseFunction.prototype);
@@ -11038,8 +10760,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARA.prototype = Object.create(cBaseFunction.prototype);
@@ -11129,8 +10849,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARP.prototype = Object.create(cBaseFunction.prototype);
@@ -11208,8 +10926,6 @@ function (window, undefined) {
 	 * @extends {cVARP}
 	 */
 	function cVAR_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR_P.prototype = Object.create(cVARP.prototype);
@@ -11222,8 +10938,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVAR_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR_S.prototype = Object.create(cBaseFunction.prototype);
@@ -11301,8 +11015,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARdotP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARdotP.prototype = Object.create(cBaseFunction.prototype);
@@ -11316,8 +11028,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARPA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARPA.prototype = Object.create(cBaseFunction.prototype);
@@ -11407,8 +11117,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEIBULL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
@@ -11456,8 +11164,6 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cWEIBULL_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL_DIST.prototype = Object.create(cWEIBULL.prototype);
@@ -11470,8 +11176,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cZTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cZTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -11558,8 +11262,6 @@ function (window, undefined) {
 	 * @extends {cZTEST}
 	 */
 	function cZ_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cZ_TEST.prototype = Object.create(cZTEST.prototype);
