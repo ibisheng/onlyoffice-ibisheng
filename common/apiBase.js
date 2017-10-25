@@ -35,7 +35,6 @@
 (function(window, undefined)
 {
 	// Import
-	var offlineMode = AscCommon.offlineMode;
 	var c_oEditorId = AscCommon.c_oEditorId;
 	var c_oCloseCode = AscCommon.c_oCloseCode;
 
@@ -274,15 +273,24 @@
 			this.CoAuthoringApi.setDocId(this.documentId);
 
 			if (this.watermarkDraw)
+			{
 				this.watermarkDraw.CheckParams(this);
+			}
 		}
 
-		if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl)
+		if (AscCommon.offlineMode === this.documentUrl)
+		{
+			this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
+			this.DocInfo.put_OfflineApp(true);
+		}
+
+		if (undefined !== window["AscDesktopEditor"] && !(this.DocInfo && this.DocInfo.get_OfflineApp()))
 		{
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 
-		if (!oldInfo) {
+		if (!oldInfo)
+		{
 			this.onEndLoadDocInfo();
 		}
 	};
@@ -429,7 +437,7 @@
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
 		var rData                  = null;
-		if (offlineMode !== this.documentUrl)
+		if (!(this.DocInfo && this.DocInfo.get_OfflineApp()))
 		{
 			rData = {
 				"c"             : 'open',
@@ -457,12 +465,6 @@
 
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-		}
-
-		if (offlineMode === this.documentUrl)
-		{
-			this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
-			this.DocInfo.asc_putOfflineApp(true);
 		}
 	};
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
@@ -574,7 +576,7 @@
 		}
 		//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 		//todo надо использовать проверку get_OfflineApp
-		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl) || window['IS_NATIVE_EDITOR'])
+		if (!(window['NATIVE_EDITOR_ENJINE'] || (this.DocInfo && this.DocInfo.get_OfflineApp())) || window['IS_NATIVE_EDITOR'])
 		{
 			this.CoAuthoringApi.set_url(null);
 		}
