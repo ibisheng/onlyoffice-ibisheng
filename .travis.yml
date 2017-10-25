@@ -17,10 +17,11 @@ jobs:
         - npm install -g grunt-cli
         - npm install --prefix build
         - grunt --level=WHITESPACE_ONLY --base build --gruntfile build/Gruntfile.js
-        - docker run -v $PWD/word:/opt/onlyoffice/documentbuilder/sdkjs/word
-                     -v $PWD/cell:/opt/onlyoffice/documentbuilder/sdkjs/cell
-                     -v $PWD/slide:/opt/onlyoffice/documentbuilder/sdkjs/slide
-                     onlyofficetestingrobot/doc-builder-testing:develop-latest
+        - docker pull onlyofficetestingrobot/doc-builder-testing:develop-latest
+        - travis_wait docker run -v $PWD/word:/opt/onlyoffice/documentbuilder/sdkjs/word
+                                 -v $PWD/cell:/opt/onlyoffice/documentbuilder/sdkjs/cell
+                                 -v $PWD/slide:/opt/onlyoffice/documentbuilder/sdkjs/slide
+                                 onlyofficetestingrobot/doc-builder-testing:develop-latest
 notifications:
   email:
     recipients:
