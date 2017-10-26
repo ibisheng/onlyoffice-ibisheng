@@ -1506,20 +1506,20 @@ CGraphics.prototype =
         }
         this.ds();
 
-        var _header_text = "Header"
+        var _header_text = AscCommon.translateManager.getValue("Header");
         if (-1 != sectionNum)
-            _header_text += (" -Section " + (sectionNum + 1) + "-");
+            _header_text += (AscCommon.translateManager.getValue(" -Section ") + (sectionNum + 1) + "-");
 
         if (type)
         {
             if (type.bFirst)
-                _header_text = "First Page " + _header_text;
+                _header_text = AscCommon.translateManager.getValue("First Page ") + _header_text;
             else if (EvenAndOddHeaders)
             {
                 if (type.bEven)
-                    _header_text = "Even Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Even Page ") + _header_text;
                 else
-                    _header_text = "Odd Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Odd Page ") + _header_text;
             }
         }
 
@@ -1527,7 +1527,7 @@ CGraphics.prototype =
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, true);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, AscCommon.translateManager.getValue("Same as Previous"), 2, yPos, true);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -1609,20 +1609,20 @@ CGraphics.prototype =
         }
         this.ds();
 
-        var _header_text = "Footer"
+        var _header_text = AscCommon.translateManager.getValue("Footer");
         if (-1 != sectionNum)
-            _header_text += (" -Section " + (sectionNum + 1) + "-");
+            _header_text += (AscCommon.translateManager.getValue(" -Section ") + (sectionNum + 1) + "-");
 
         if (type)
         {
             if (type.bFirst)
-                _header_text = "First Page " + _header_text;
+                _header_text = AscCommon.translateManager.getValue("First Page ") + _header_text;
             else if (EvenAndOddHeaders)
             {
                 if (type.bEven)
-                    _header_text = "Even Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Even Page ") + _header_text;
                 else
-                    _header_text = "Odd Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Odd Page ") + _header_text;
             }
         }
 
@@ -1630,7 +1630,7 @@ CGraphics.prototype =
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, false);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, AscCommon.translateManager.getValue("Same as Previous"), 2, yPos, false);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);

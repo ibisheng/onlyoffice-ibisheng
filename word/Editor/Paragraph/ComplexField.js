@@ -296,7 +296,7 @@ CComplexField.prototype.Update = function()
 		var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
 		var oBookmark = oBookmarksManager.GetBookmarkByName(this.Instruction.GetBookmarkName());
 
-		var sValue = "Error! Bookmark not defined.";
+		var sValue = AscCommon.translateManager.getValue("Error! Bookmark not defined.");
 		if (oBookmark)
 		{
 			var oStartBookmark = oBookmark[0];
@@ -309,15 +309,15 @@ CComplexField.prototype.Update = function()
 					var oFieldXY    = this.SeparateChar.GetXY();
 
 					if (Math.abs(oBookmarkXY.Y - oFieldXY.Y) < 0.001)
-						sValue = oBookmarkXY.X < oFieldXY.X ? "above" : "below";
+						sValue = oBookmarkXY.X < oFieldXY.X ? AscCommon.translateManager.getValue("above") : AscCommon.translateManager.getValue("below");
 					else if (oBookmarkXY.Y < oFieldXY.Y)
-						sValue = "above";
+						sValue = AscCommon.translateManager.getValue("above");
 					else
-						sValue = "below";
+						sValue = AscCommon.translateManager.getValue("below");
 				}
 				else
 				{
-					sValue = "on page " + nBookmarkPage;
+					sValue = AscCommon.translateManager.getValue("on page ") + nBookmarkPage;
 				}
 			}
 			else
