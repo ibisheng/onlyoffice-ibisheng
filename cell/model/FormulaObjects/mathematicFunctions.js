@@ -313,72 +313,72 @@
 		var f = null;
 		switch (nFunc) {
 			case AGGREGATE_FUNC_AVE:
-				f = new AscCommonExcel.cAVERAGE();
+				f = AscCommonExcel.cAVERAGE.prototype;
 				break;
 			case AGGREGATE_FUNC_CNT:
-				f = new AscCommonExcel.cCOUNT();
+				f = AscCommonExcel.cCOUNT.prototype;
 				break;
 			case AGGREGATE_FUNC_CNTA:
-				f = new AscCommonExcel.cCOUNTA();
+				f = AscCommonExcel.cCOUNTA.prototype;
 				break;
 			case AGGREGATE_FUNC_MAX:
-				f = new AscCommonExcel.cMAX();
+				f = AscCommonExcel.cMAX.prototype;
 				break;
 			case AGGREGATE_FUNC_MIN:
-				f = new AscCommonExcel.cMIN();
+				f = AscCommonExcel.cMIN.prototype;
 				break;
 			case AGGREGATE_FUNC_PROD:
-				f = new AscCommonExcel.cPRODUCT();
+				f = AscCommonExcel.cPRODUCT.prototype;
 				break;
 			case AGGREGATE_FUNC_STD:
-				f = new AscCommonExcel.cSTDEV_S();
+				f = AscCommonExcel.cSTDEV_S.prototype;
 				break;
 			case AGGREGATE_FUNC_STDP:
-				f = new AscCommonExcel.cSTDEV_P();
+				f = AscCommonExcel.cSTDEV_P.prototype;
 				break;
 			case AGGREGATE_FUNC_SUM:
-				f = new AscCommonExcel.cSUM();
+				f = AscCommonExcel.cSUM.prototype;
 				break;
 			case AGGREGATE_FUNC_VAR:
-				f = new AscCommonExcel.cVAR_S();
+				f = AscCommonExcel.cVAR_S.prototype;
 				break;
 			case AGGREGATE_FUNC_VARP:
-				f = new AscCommonExcel.cVAR_P();
+				f = AscCommonExcel.cVAR_P.prototype;
 				break;
 			case AGGREGATE_FUNC_MEDIAN:
-				f = new AscCommonExcel.cMEDIAN();
+				f = AscCommonExcel.cMEDIAN.prototype;
 				break;
 			case AGGREGATE_FUNC_MODSNGL:
-				f = new AscCommonExcel.cMODE_SNGL();
+				f = AscCommonExcel.cMODE_SNGL.prototype;
 				break;
 			case AGGREGATE_FUNC_LARGE:
 				if (arg[3]) {
-					f = new AscCommonExcel.cLARGE();
+					f = AscCommonExcel.cLARGE.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_SMALL:
 				if (arg[3]) {
-					f = new AscCommonExcel.cSMALL();
+					f = AscCommonExcel.cSMALL.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_PERCINC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cPERCENTILE_INC();
+					f = AscCommonExcel.cPERCENTILE_INC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_QRTINC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cQUARTILE_INC();
+					f = AscCommonExcel.cQUARTILE_INC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_PERCEXC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cPERCENTILE_EXC();
+					f = AscCommonExcel.cPERCENTILE_EXC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_QRTEXC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cQUARTILE_EXC();
+					f = AscCommonExcel.cQUARTILE_EXC.prototype;
 				}
 				break;
 			default:
@@ -441,7 +441,6 @@
 				return new cError(cErrorType.wrong_value_type);
 			}
 
-			f.setArgumentsCount(newArgs.length);
 			res = f.Calculate(newArgs);
 		}
 
@@ -4174,59 +4173,57 @@
 			case cSubTotalFunctionType.excludes.AVERAGE:
 				exclude = true;
 			case cSubTotalFunctionType.includes.AVERAGE:
-				f = new AscCommonExcel.cAVERAGE();
+				f = AscCommonExcel.cAVERAGE.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.COUNT:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNT:
-				f = new AscCommonExcel.cCOUNT();
+				f = AscCommonExcel.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.COUNTA:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNTA:
-				f = new AscCommonExcel.cCOUNTA();
+				f = AscCommonExcel.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MAX:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MAX:
-				f = new AscCommonExcel.cMAX();
-				f.setArgumentsCount(arg.length - 1);
+				f = AscCommonExcel.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MIN:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MIN:
-				f = new AscCommonExcel.cMIN();
-				f.setArgumentsCount(arg.length - 1);
+				f = AscCommonExcel.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.PRODUCT:
 				exclude = true;
 			case cSubTotalFunctionType.includes.PRODUCT:
-				f = new cPRODUCT();
+				f = cPRODUCT.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.STDEV:
 				exclude = true;
 			case cSubTotalFunctionType.includes.STDEV:
-				f = new AscCommonExcel.cSTDEV();
+				f = AscCommonExcel.cSTDEV.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.STDEVP:
 				exclude = true;
 			case cSubTotalFunctionType.includes.STDEVP:
-				f = new AscCommonExcel.cSTDEVP();
+				f = AscCommonExcel.cSTDEVP.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.SUM:
 				exclude = true;
 			case cSubTotalFunctionType.includes.SUM:
-				f = new cSUM();
+				f = cSUM.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.VAR:
 				exclude = true;
 			case cSubTotalFunctionType.includes.VAR:
-				f = new AscCommonExcel.cVAR();
+				f = AscCommonExcel.cVAR.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.VARP:
 				exclude = true;
 			case cSubTotalFunctionType.includes.VARP:
-				f = new AscCommonExcel.cVARP();
+				f = AscCommonExcel.cVARP.prototype;
 				break;
 		}
 		var res;
