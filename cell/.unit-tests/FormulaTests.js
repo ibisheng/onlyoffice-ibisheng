@@ -424,9 +424,7 @@ $( function () {
     var fSortAscending = AscCommon.fSortAscending;
     var g_oIdCounter = AscCommon.g_oIdCounter;
 
-    var oParser, wb, ws, dif = 1e-9,
-        data = getTestWorkbook(),
-        sData = data + "", tmp;
+    var oParser, wb, ws, dif = 1e-9, sData = AscCommonExcel.getEmptyWorkbook(), tmp;
     if ( AscCommon.c_oSerFormat.Signature === sData.substring( 0, AscCommon.c_oSerFormat.Signature.length ) ) {
         wb = new AscCommonExcel.Workbook( new AscCommonExcel.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
         AscCommon.History.init(wb);
@@ -443,7 +441,6 @@ $( function () {
         AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wb);
         AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wb);
 		AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wb, -1);
-//        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
         var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
@@ -2057,15 +2054,10 @@ $( function () {
 
     test( "Test: rename sheet #1", function () {
 		wb.dependencyFormulas.unlockRecal();
-        ws = wb.getWorksheet( 0 );
-        ws.getRange2( "S95" ).setValue( "2" );
-        ws = wb.getWorksheet( 1 );
-        ws.getRange2( "S100" ).setValue( "=" + wb.getWorksheet( 0 ).getName() + "!S95" );
-        strictEqual( ws.getCell2( "S100" ).getValueWithFormat(), "2" );
-
-        wb.getWorksheet( 0 ).setName( "ЛистTEMP" );
-
-        strictEqual( ws.getCell2( "S100" ).getFormula(), wb.getWorksheet( 0 ).getName() + "!S95" );
+		ws.getRange2( "S95" ).setValue( "2" );
+		ws.getRange2( "S100" ).setValue( "=" + wb.getWorksheet( 0 ).getName() + "!S95" );
+		ws.setName( "SheetTmp" );
+        strictEqual( ws.getCell2( "S100" ).getFormula(), ws.getName() + "!S95" );
 		wb.dependencyFormulas.lockRecal();
     } );
 
@@ -2212,7 +2204,7 @@ $( function () {
 
 		oParser = new parserFormula( "SHEETS()", "A2", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 3 );
+		strictEqual( oParser.calculate().getValue(), 1 );
 	} );
 
     test( "Test: \"TRIM\"", function () {
@@ -4167,12 +4159,9 @@ $( function () {
 	});
 
     test( "Test: \"DEVSQ\"", function () {
-
-        var ws1 = wb.getWorksheet( 1 );
-
-        ws1.getRange2( "A1" ).setValue( "5.6" );
-        ws1.getRange2( "A2" ).setValue( "8.2" );
-        ws1.getRange2( "A3" ).setValue( "9.2" );
+        ws.getRange2( "A1" ).setValue( "5.6" );
+        ws.getRange2( "A2" ).setValue( "8.2" );
+        ws.getRange2( "A3" ).setValue( "9.2" );
 
         oParser = new parserFormula( "DEVSQ(5.6,8.2,9.2)", "A1", ws );
         ok( oParser.parse() );
@@ -4186,7 +4175,7 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( difBetween( oParser.calculate().getValue(), 3.379999999999999 ), true );
 
-        oParser = new parserFormula( "DEVSQ(Лист2!A1:A3)", "A1", ws );
+        oParser = new parserFormula( "DEVSQ(" + ws.getName() + "!A1:A3)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( difBetween( oParser.calculate().getValue(), 6.906666666666665 ), true );
 
