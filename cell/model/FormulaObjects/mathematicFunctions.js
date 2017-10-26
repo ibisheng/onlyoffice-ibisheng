@@ -4178,22 +4178,22 @@
 			case cSubTotalFunctionType.excludes.COUNT:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNT:
-				f = AscCommonExcel.prototype;
+				f = AscCommonExcel.cCOUNT.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.COUNTA:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNTA:
-				f = AscCommonExcel.prototype;
+				f = AscCommonExcel.cCOUNTA.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MAX:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MAX:
-				f = AscCommonExcel.prototype;
+				f = AscCommonExcel.cMAX.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MIN:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MIN:
-				f = AscCommonExcel.prototype;
+				f = AscCommonExcel.cMIN.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.PRODUCT:
 				exclude = true;

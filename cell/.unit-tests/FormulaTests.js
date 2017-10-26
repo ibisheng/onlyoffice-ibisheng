@@ -9314,5 +9314,48 @@ $( function () {
 
 	});
 
+	test( "Test: \"SUBTOTAL\"", function () {
+		ws.getRange2( "A102" ).setValue( "120" );
+		ws.getRange2( "A103" ).setValue( "10" );
+		ws.getRange2( "A104" ).setValue( "150" );
+		ws.getRange2( "A105" ).setValue( "23" );
+
+		oParser = new parserFormula( "SUBTOTAL(1,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(1,A102:A105)" );
+		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 75.75, "SUBTOTAL(1,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(2,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(2,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 4, "SUBTOTAL(2,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(3,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(3,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 4, "SUBTOTAL(3,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(4,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(4,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 150, "SUBTOTAL(4,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(5,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(5,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 10, "SUBTOTAL(5,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(6,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(6,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 4140000, "SUBTOTAL(6,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(7,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(7,A102:A105)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 69.70592992, "SUBTOTAL(7,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(8,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(8,A102:A105)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 60.36710611, "SUBTOTAL(8,A102:A105)");
+
+		oParser = new parserFormula( "SUBTOTAL(9,A102:A105)", "A2", ws );
+		ok( oParser.parse(), "SUBTOTAL(9,A102:A105)" );
+		strictEqual( oParser.calculate().getValue(), 303, "SUBTOTAL(9,A102:A105)");
+	} );
+
 	wb.dependencyFormulas.unlockRecal();
 } );
