@@ -284,11 +284,6 @@ var editor;
 		return AscCommon.g_oDefaultCultureInfo.LCID;
 	};
 
-  spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
-    this.CoAuthoringApi.auth(this.getViewMode());
-    this.onEndLoadFile(true);
-  };
-
   spreadsheet_api.prototype._openDocument = function(data) {
     var wb = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
@@ -676,11 +671,8 @@ var editor;
   };
 
   spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function() {
-    var data = getTestWorkbook();
-    var sData = data + "";
-    if (AscCommon.c_oSerFormat.Signature === sData.substring(0, AscCommon.c_oSerFormat.Signature.length)) {
-      this.openDocument(sData);
-    }
+    this.isChartEditor = true;
+    this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
   };
 
   spreadsheet_api.prototype._asc_save2 = function () {
@@ -942,15 +934,6 @@ var editor;
 
   spreadsheet_api.prototype.openDocument = function(sData) {
     var t = this;
-    if (true === sData) {
-      // Empty Document
-      sData = AscCommonExcel.getEmptyWorkbook() + "";
-      if (sData.length && (AscCommon.c_oSerFormat.Signature === sData.substring(0, AscCommon.c_oSerFormat.Signature.length))) {
-        this.isChartEditor = true;
-      } else {
-        return;
-      }
-    }
 	this.wbModel = this._openDocument(sData);
 	this.openDocumentFromZip(this.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
 		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
@@ -3561,7 +3544,6 @@ var editor;
   prot["asc_getLocale"] = prot.asc_getLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
   prot["asc_LoadDocument"] = prot.asc_LoadDocument;
-  prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
   prot["asc_DownloadAs"] = prot.asc_DownloadAs;
   prot["asc_Save"] = prot.asc_Save;
   prot["forceSave"] = prot.forceSave;
