@@ -37,6 +37,9 @@ function CParagraphContentBase()
 
 	this.StartLine  = -1;
 	this.StartRange = -1;
+
+	this.Lines       = [];
+	this.LinesLength = 0;
 }
 CParagraphContentBase.prototype.CanSplit = function()
 {

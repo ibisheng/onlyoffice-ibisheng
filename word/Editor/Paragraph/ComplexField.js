@@ -50,6 +50,9 @@ function ParaFieldChar(Type, LogicDocument)
 	this.CharType      = undefined === Type ? fldchartype_Begin : Type;
 	this.ComplexField  = (this.CharType === fldchartype_Begin) ? new CComplexField(LogicDocument) : null;
 	this.Run           = null;
+	this.X             = 0;
+	this.Y             = 0;
+	this.PageAbs       = 0;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
@@ -110,6 +113,23 @@ ParaFieldChar.prototype.SetRun = function(oRun)
 ParaFieldChar.prototype.GetRun = function()
 {
 	return this.Run;
+};
+ParaFieldChar.prototype.SetXY = function(X, Y)
+{
+	this.X = X;
+	this.Y = Y;
+};
+ParaFieldChar.prototype.GetXY = function()
+{
+	return {X : this.X, Y : this.Y};
+};
+ParaFieldChar.prototype.SetPage = function(nPage)
+{
+	this.PageAbs = nPage;
+};
+ParaFieldChar.prototype.GetPage = function()
+{
+	return this.PageAbs;
 };
 
 function ParaInstrText(value)
@@ -273,7 +293,43 @@ CComplexField.prototype.Update = function()
 	{
 		this.LogicDocument.Create_NewHistoryPoint();
 
-		this.LogicDocument.GetBookmarksManager();
+		var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+		var oBookmark = oBookmarksManager.GetBookmarkByName(this.Instruction.GetBookmarkName());
+
+		var sValue = "Error! Bookmark not defined.";
+		if (oBookmark)
+		{
+			var oStartBookmark = oBookmark[0];
+			var nBookmarkPage  = oStartBookmark.GetPage() + 1;
+			if (this.Instruction.IsPositionRelative())
+			{
+				if (oStartBookmark.GetPage() === this.SeparateChar.GetPage())
+				{
+					var oBookmarkXY = oStartBookmark.GetXY();
+					var oFieldXY    = this.SeparateChar.GetXY();
+
+					if (Math.abs(oBookmarkXY.Y - oFieldXY.Y) < 0.001)
+						sValue = oBookmarkXY.X < oFieldXY.X ? "above" : "below";
+					else if (oBookmarkXY.Y < oFieldXY.Y)
+						sValue = "above";
+					else
+						sValue = "below";
+				}
+				else
+				{
+					sValue = "on page " + nBookmarkPage;
+				}
+			}
+			else
+			{
+				sValue = (oStartBookmark.GetPage() + 1) + "";
+			}
+		}
+
+		for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
+		{
+			this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
+		}
 
 		this.LogicDocument.Recalculate();
 	}
