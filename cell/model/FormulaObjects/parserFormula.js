@@ -4819,6 +4819,7 @@ parserFormula.prototype.setFormula = function(formula) {
 		this.operand_expected = true;
 		var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
 		cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
+		var leftParentArgumentsCurrentArr = [];
 
 		var t = this;
 		var parseOperators = function(){
@@ -4892,6 +4893,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			found_operand = null;
 			t.elemArr.push(new cFormulaOperators[t.operand_str]());
 			t.f.push(new cFormulaOperators[t.operand_str]());
+			leftParentArgumentsCurrentArr[t.elemArr.length - 1] = 1;
 
 			if(startSumproduct){
 				counterSumproduct++;
@@ -4906,12 +4908,15 @@ parserFormula.prototype.setFormula = function(formula) {
 			t.f.push(new cFormulaOperators[t.operand_str]());
 			wasRigthParentheses = true;
 			var top_elem = null;
+			var top_elem_arg_count = null;
 			if (0 !== t.elemArr.length && ( (top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' ) &&
 				t.operand_expected) {
-				if (top_elem.getArguments() > 1) {
+				top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
+				if (top_elem_arg_count > 1) {
 					t.outStack.push(new cEmpty());
 				} else {
-					top_elem.DecrementArguments();
+					leftParentArgumentsCurrentArr[t.elemArr.length - 1]--;
+					top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
 				}
 			} else {
 				while (0 !== t.elemArr.length &&
@@ -4924,6 +4929,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					}
 					t.outStack.push(t.elemArr.pop());
 				}
+				top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
 			}
 
 			if (0 === t.elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
@@ -4938,15 +4944,15 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (0 !== t.elemArr.length &&
 				( func = t.elemArr[t.elemArr.length - 1] ).type === cElementType.func) {
 				p = t.elemArr.pop();
-				if (top_elem.getArguments() > func.argumentsMax) {
+				if (top_elem_arg_count > func.argumentsMax) {
 					t.outStack = [];
 					t.elemArr = [];
 					t.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
 					return false;
 				} else {
-					if (top_elem.getArguments() >= func.argumentsMin) {
-						t.outStack.push(top_elem.getArguments());
-						if (!func.checkArguments(top_elem.getArguments())) {
+					if (top_elem_arg_count >= func.argumentsMin) {
+						t.outStack.push(top_elem_arg_count);
+						if (!func.checkArguments(top_elem_arg_count)) {
 							bError = true;
 						}
 					} else {
@@ -4991,16 +4997,18 @@ parserFormula.prototype.setFormula = function(formula) {
 		var parseCommaAndArgumentsUnion = function(){
 			wasLeftParentheses = false;
 			wasRigthParentheses = false;
-			var stackLength = t.elemArr.length, top_elem = null;
+			var stackLength = t.elemArr.length, top_elem = null, top_elem_arg_pos;
 
 			if (t.elemArr.length != 0 && t.elemArr[stackLength - 1].name == "(" && t.operand_expected) {
 				t.outStack.push(new cEmpty());
 				top_elem = t.elemArr[stackLength - 1];
+				top_elem_arg_pos = stackLength - 1;
 				wasLeftParentheses = true;
 				t.operand_expected = false;
 			} else {
 				while (stackLength != 0) {
 					top_elem = t.elemArr[stackLength - 1];
+					top_elem_arg_pos = stackLength - 1;
 					if (top_elem.name == "(") {
 						wasLeftParentheses = true;
 						break;
@@ -5024,7 +5032,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				t.elemArr = [];
 				return false;
 			}
-			top_elem.IncrementArguments();
+			leftParentArgumentsCurrentArr[top_elem_arg_pos]++;
 			t.operand_expected = true;
 			return true;
 		};
