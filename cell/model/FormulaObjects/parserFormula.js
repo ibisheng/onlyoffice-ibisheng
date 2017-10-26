@@ -4809,7 +4809,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				this.outStack.push(stack.pop());
 			}
 
-			if (this.outStack.length != 0) {
+			if (this.outStack.length !== 0) {
 				return this.isParsed = true;
 			} else {
 				return this.isParsed = false;
@@ -4999,17 +4999,17 @@ parserFormula.prototype.setFormula = function(formula) {
 			wasRigthParentheses = false;
 			var stackLength = t.elemArr.length, top_elem = null, top_elem_arg_pos;
 
-			if (t.elemArr.length != 0 && t.elemArr[stackLength - 1].name == "(" && t.operand_expected) {
+			if (t.elemArr.length !== 0 && t.elemArr[stackLength - 1].name === "(" && t.operand_expected) {
 				t.outStack.push(new cEmpty());
 				top_elem = t.elemArr[stackLength - 1];
 				top_elem_arg_pos = stackLength - 1;
 				wasLeftParentheses = true;
 				t.operand_expected = false;
 			} else {
-				while (stackLength != 0) {
+				while (stackLength !== 0) {
 					top_elem = t.elemArr[stackLength - 1];
 					top_elem_arg_pos = stackLength - 1;
-					if (top_elem.name == "(") {
+					if (top_elem.name === "(") {
 						wasLeftParentheses = true;
 						break;
 					} else {
@@ -5044,7 +5044,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			while (t.pCurrPos < t.Formula.length &&
 			!parserHelp.isRightBrace.call(t, t.Formula, t.pCurrPos)) {
 				if (parserHelp.isArraySeparator.call(t, t.Formula, t.pCurrPos, digitDelim)) {
-					if (t.operand_str == (digitDelim ? FormulaSeparators.arrayRowSeparator :
+					if (t.operand_str === (digitDelim ? FormulaSeparators.arrayRowSeparator :
 							FormulaSeparators.arrayRowSeparatorDef)) {
 						arr.addRow();
 					}
@@ -5056,7 +5056,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					arr.addElement(new cError(t.operand_str));
 				} else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {
 					if (operator.isOperator) {
-						if (operator.operatorName == "+" || operator.operatorName == "-") {
+						if (operator.operatorName === "+" || operator.operatorName === "-") {
 							t.operand_str = operator.operatorName + "" + t.operand_str
 						} else {
 							t.outStack = [];
@@ -5251,7 +5251,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );
 				}
 
-				if (found_operator != null) {
+				if (found_operator !== null) {
 					if (found_operator.ca) {
 						t.ca = found_operator.ca;
 					}
