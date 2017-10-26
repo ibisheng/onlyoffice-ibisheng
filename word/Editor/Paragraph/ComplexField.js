@@ -50,6 +50,9 @@ function ParaFieldChar(Type, LogicDocument)
 	this.CharType      = undefined === Type ? fldchartype_Begin : Type;
 	this.ComplexField  = (this.CharType === fldchartype_Begin) ? new CComplexField(LogicDocument) : null;
 	this.Run           = null;
+	this.X             = 0;
+	this.Y             = 0;
+	this.PageAbs       = 0;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
@@ -111,14 +114,32 @@ ParaFieldChar.prototype.GetRun = function()
 {
 	return this.Run;
 };
+ParaFieldChar.prototype.SetXY = function(X, Y)
+{
+	this.X = X;
+	this.Y = Y;
+};
+ParaFieldChar.prototype.GetXY = function()
+{
+	return {X : this.X, Y : this.Y};
+};
+ParaFieldChar.prototype.SetPage = function(nPage)
+{
+	this.PageAbs = nPage;
+};
+ParaFieldChar.prototype.GetPage = function()
+{
+	return this.PageAbs;
+};
 
-function ParaInstrText(nType, nFlags)
+function ParaInstrText(value)
 {
 	CRunElementBase.call(this);
 
-	this.FieldCode = nType;
-	this.Flags     = nFlags;
-	this.Run       = null;
+	this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);
+	this.Width        = 0x00000000 | 0;
+	this.WidthVisible = 0x00000000 | 0;
+	this.Run          = null;
 }
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
@@ -132,18 +153,14 @@ ParaInstrText.prototype.Draw = function(X, Y, Context)
 ParaInstrText.prototype.Write_ToBinary = function(Writer)
 {
 	// Long : Type
-	// Long : FieldCode
+	// Long : Value
 	Writer.WriteLong(this.Type);
-	Writer.WriteLong(this.FieldCode);
+	Writer.WriteLong(this.Value);
 };
 ParaInstrText.prototype.Read_FromBinary = function(Reader)
 {
-	// Long : FieldCode
-	this.FieldCode = Reader.GetLong();
-};
-ParaInstrText.prototype.GetFieldCode = function()
-{
-	return this.FieldCode;
+	// Long : Value
+	this.Value = Reader.GetLong();
 };
 ParaInstrText.prototype.SetRun = function(oRun)
 {
@@ -153,19 +170,24 @@ ParaInstrText.prototype.GetRun = function()
 {
 	return this.Run;
 };
+ParaInstrText.prototype.GetValue = function()
+{
+	return String.fromCharCode(this.Value);
+};
 
 function CComplexField(oLogicDocument)
 {
-	this.LogicDocument = oLogicDocument;
-	this.BeginChar     = null;
-	this.EndChar       = null;
-	this.SeparateChar  = null;
-	this.Instruction   = null;
-	this.Id            = null;
+	this.LogicDocument   = oLogicDocument;
+	this.BeginChar       = null;
+	this.EndChar         = null;
+	this.SeparateChar    = null;
+	this.InstructionLine = "";
+	this.Instruction     = null;
+	this.Id              = null;
 }
 CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
-	this.Instruction = oParaInstr;
+	this.InstructionLine += oParaInstr.GetValue();
 };
 CComplexField.prototype.GetBeginChar = function()
 {
@@ -183,9 +205,10 @@ CComplexField.prototype.SetBeginChar = function(oChar)
 {
 	oChar.SetComplexField(this);
 
-	this.BeginChar    = oChar;
-	this.SeparateChar = null;
-	this.EndChar      = null;
+	this.BeginChar       = oChar;
+	this.SeparateChar    = null;
+	this.EndChar         = null;
+	this.InstructionLine = "";
 };
 CComplexField.prototype.SetEndChar = function(oChar)
 {
@@ -202,6 +225,12 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 };
 CComplexField.prototype.Update = function()
 {
+	if (!this.Instruction)
+	{
+		var oParser = new CFieldInstructionParser();
+		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
+	}
+
 	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
 		return;
 
@@ -264,7 +293,43 @@ CComplexField.prototype.Update = function()
 	{
 		this.LogicDocument.Create_NewHistoryPoint();
 
-		this.LogicDocument.GetBookmarksManager();
+		var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+		var oBookmark = oBookmarksManager.GetBookmarkByName(this.Instruction.GetBookmarkName());
+
+		var sValue = AscCommon.translateManager.getValue("Error! Bookmark not defined.");
+		if (oBookmark)
+		{
+			var oStartBookmark = oBookmark[0];
+			var nBookmarkPage  = oStartBookmark.GetPage() + 1;
+			if (this.Instruction.IsPositionRelative())
+			{
+				if (oStartBookmark.GetPage() === this.SeparateChar.GetPage())
+				{
+					var oBookmarkXY = oStartBookmark.GetXY();
+					var oFieldXY    = this.SeparateChar.GetXY();
+
+					if (Math.abs(oBookmarkXY.Y - oFieldXY.Y) < 0.001)
+						sValue = oBookmarkXY.X < oFieldXY.X ? AscCommon.translateManager.getValue("above") : AscCommon.translateManager.getValue("below");
+					else if (oBookmarkXY.Y < oFieldXY.Y)
+						sValue = AscCommon.translateManager.getValue("above");
+					else
+						sValue = AscCommon.translateManager.getValue("below");
+				}
+				else
+				{
+					sValue = AscCommon.translateManager.getValue("on page ") + nBookmarkPage;
+				}
+			}
+			else
+			{
+				sValue = (oStartBookmark.GetPage() + 1) + "";
+			}
+		}
+
+		for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
+		{
+			this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
+		}
 
 		this.LogicDocument.Recalculate();
 	}

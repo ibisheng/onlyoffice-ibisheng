@@ -4342,8 +4342,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELI() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBESSELI.prototype = Object.create(cBaseFunction.prototype);
@@ -4360,7 +4358,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4378,7 +4376,7 @@ function (window, undefined) {
 			return bessi(x, n);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4386,8 +4384,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELJ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBESSELJ.prototype = Object.create(cBaseFunction.prototype);
@@ -4405,7 +4401,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4423,7 +4419,7 @@ function (window, undefined) {
 			return BesselJ(x, n);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 
@@ -4432,8 +4428,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBESSELK.prototype = Object.create(cBaseFunction.prototype);
@@ -4451,7 +4445,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4467,7 +4461,7 @@ function (window, undefined) {
 			return BesselK(x, n);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 
@@ -4476,8 +4470,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBESSELY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBESSELY.prototype = Object.create(cBaseFunction.prototype);
@@ -4495,7 +4487,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4511,7 +4503,7 @@ function (window, undefined) {
 			return BesselY(x, n);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 
@@ -4520,8 +4512,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2DEC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBIN2DEC.prototype = Object.create(cBaseFunction.prototype);
@@ -4541,7 +4531,7 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.getValue();
@@ -4550,18 +4540,19 @@ function (window, undefined) {
 			arg0 = 0;
 		}
 
+		var res;
 		if (validBINNumber(arg0)) {
 			var substr = arg0.toString();
 			if (substr.length == 10 && substr.substring(0, 1) == "1") {
-				this.value = new cNumber(parseInt(substr.substring(1), NumberBase.BIN) - 512);
+				res = new cNumber(parseInt(substr.substring(1), NumberBase.BIN) - 512);
 			} else {
-				this.value = new cNumber(parseInt(arg0, NumberBase.BIN));
+				res = new cNumber(parseInt(arg0, NumberBase.BIN));
 			}
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -4570,8 +4561,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2HEX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBIN2HEX.prototype = Object.create(cBaseFunction.prototype);
@@ -4597,7 +4586,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		arg0 = arg0.getValue();
 
@@ -4608,26 +4597,27 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validBINNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			var substr = arg0.toString();
 			if (substr.length === 10 && substr.substring(0, 1) === '1') {
-				this.value =
+				res =
 					new cString((1099511627264 + parseInt(substr.substring(1), NumberBase.BIN)).toString(NumberBase.HEX)
 						.toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.BIN, NumberBase.HEX, arg1);
+				res = convertFromTo(arg0, NumberBase.BIN, NumberBase.HEX, arg1);
 			}
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -4636,8 +4626,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBIN2OCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBIN2OCT.prototype = Object.create(cBaseFunction.prototype);
@@ -4663,7 +4651,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		arg0 = arg0.getValue();
 
@@ -4674,26 +4662,27 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validBINNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			var substr = arg0.toString();
 			if (substr.length === 10 && substr.substring(0, 1) === '1') {
-				this.value =
+				res =
 					new cString((1073741312 + parseInt(substr.substring(1), NumberBase.BIN)).toString(NumberBase.OCT)
 						.toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.BIN, NumberBase.OCT, arg1);
+				res = convertFromTo(arg0, NumberBase.BIN, NumberBase.OCT, arg1);
 			}
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -4702,8 +4691,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITAND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBITAND.prototype = Object.create(cBaseFunction.prototype);
@@ -4721,7 +4708,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4736,7 +4723,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4744,8 +4731,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITLSHIFT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBITLSHIFT.prototype = Object.create(cBaseFunction.prototype);
@@ -4763,7 +4748,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4786,7 +4771,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4794,8 +4779,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITOR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBITOR.prototype = Object.create(cBaseFunction.prototype);
@@ -4813,7 +4796,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4828,7 +4811,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4836,8 +4819,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITRSHIFT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBITRSHIFT.prototype = Object.create(cBaseFunction.prototype);
@@ -4855,7 +4836,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4878,7 +4859,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4886,8 +4867,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBITXOR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
@@ -4905,7 +4884,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -4920,7 +4899,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+		return this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 	/**
@@ -4928,8 +4907,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOMPLEX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOMPLEX.prototype = Object.create(cBaseFunction.prototype);
@@ -4964,13 +4941,13 @@ function (window, undefined) {
 		suf = suf.tocString();
 
 		if (real instanceof cError) {
-			return this.value = real;
+			return real;
 		}
 		if (img instanceof cError) {
-			return this.value = img;
+			return img;
 		}
 		if (suf instanceof cError) {
-			return this.value = suf;
+			return suf;
 		}
 
 		real = real.getValue();
@@ -4978,14 +4955,12 @@ function (window, undefined) {
 		suf = suf.getValue();
 
 		if (suf != "i" && suf != "j") {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var c = new Complex(real, img, suf);
 
-		this.value = new cString(c.toString());
-
-		return this.value;
+		return new cString(c.toString());
 
 	};
 
@@ -4994,8 +4969,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONVERT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONVERT.prototype = Object.create(cBaseFunction.prototype);
@@ -5013,7 +4986,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFunc = function (argArray) {
@@ -5105,7 +5078,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc, true);
+		return this._findArrayInNumberArguments(oArguments, calcFunc, true);
 	};
 
 	/**
@@ -5113,8 +5086,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2BIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEC2BIN.prototype = Object.create(cBaseFunction.prototype);
@@ -5139,33 +5110,34 @@ function (window, undefined) {
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = Math.floor(arg0.getValue());
 
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validDEC2BINNumber(arg0) && arg0 >= -512 && arg0 <= 511 &&
 			( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			if (arg0 < 0) {
-				this.value = new cString('1' + '0'.repeat(9 - (512 + arg0).toString(NumberBase.BIN).length) +
+				res = new cString('1' + '0'.repeat(9 - (512 + arg0).toString(NumberBase.BIN).length) +
 					(512 + arg0).toString(NumberBase.BIN).toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.DEC, NumberBase.BIN, arg1);
+				res = convertFromTo(arg0, NumberBase.DEC, NumberBase.BIN, arg1);
 			}
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5174,8 +5146,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2HEX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEC2HEX.prototype = Object.create(cBaseFunction.prototype);
@@ -5200,32 +5170,33 @@ function (window, undefined) {
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = Math.floor(arg0.getValue());
 
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validDEC2HEXNumber(arg0) && arg0 >= -549755813888 && arg0 <= 549755813887 &&
 			( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			if (arg0 < 0) {
-				this.value = new cString((1099511627776 + arg0).toString(NumberBase.HEX).toUpperCase());
+				res = new cString((1099511627776 + arg0).toString(NumberBase.HEX).toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.DEC, NumberBase.HEX, arg1);
+				res = convertFromTo(arg0, NumberBase.DEC, NumberBase.HEX, arg1);
 			}
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5234,8 +5205,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEC2OCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEC2OCT.prototype = Object.create(cBaseFunction.prototype);
@@ -5260,32 +5229,33 @@ function (window, undefined) {
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = Math.floor(arg0.getValue());
 
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validDEC2OCTNumber(arg0) && arg0 >= -536870912 && arg0 <= 536870911 &&
 			( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			if (arg0 < 0) {
-				this.value = new cString((1073741824 + arg0).toString(NumberBase.OCT).toUpperCase());
+				res = new cString((1073741824 + arg0).toString(NumberBase.OCT).toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.DEC, NumberBase.OCT, arg1);
+				res = convertFromTo(arg0, NumberBase.DEC, NumberBase.OCT, arg1);
 			}
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5294,8 +5264,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDELTA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDELTA.prototype = Object.create(cBaseFunction.prototype);
@@ -5323,19 +5291,16 @@ function (window, undefined) {
 		number2 = number2.tocNumber();
 
 		if (number1 instanceof cError) {
-			return this.value = number1;
+			return number1;
 		}
 		if (number2 instanceof cError) {
-			return this.value = number2;
+			return number2;
 		}
 
 		number1 = number1.getValue();
 		number2 = number2.getValue();
 
-		this.value = new cNumber(number1 == number2 ? 1 : 0);
-
-		return this.value;
-
+		return new cNumber(number1 == number2 ? 1 : 0);
 	};
 
 	/**
@@ -5343,8 +5308,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERF.prototype = Object.create(cBaseFunction.prototype);
@@ -5362,7 +5325,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcErf = function (argArray) {
@@ -5379,7 +5342,7 @@ function (window, undefined) {
 			return res;
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcErf);
+		return this._findArrayInNumberArguments(oArguments, calcErf);
 	};
 
 	/**
@@ -5387,8 +5350,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERF_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERF_PRECISE.prototype = Object.create(cBaseFunction.prototype);
@@ -5406,7 +5367,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcErf = function (argArray) {
@@ -5414,7 +5375,7 @@ function (window, undefined) {
 			return new cNumber(rtl_math_erf(a));
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcErf);
+		return this._findArrayInNumberArguments(oArguments, calcErf);
 	};
 
 	/**
@@ -5422,8 +5383,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERFC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERFC.prototype = Object.create(cBaseFunction.prototype);
@@ -5442,15 +5401,12 @@ function (window, undefined) {
 
 		a = a.tocNumber();
 		if (a instanceof cError) {
-			return this.value = a;
+			return a;
 		}
 
 		a = a.getValue();
 
-		this.value = new cNumber(AscCommonExcel.rtl_math_erfc(a));
-
-		return this.value;
-
+		return new cNumber(AscCommonExcel.rtl_math_erfc(a));
 	};
 
 	/**
@@ -5458,8 +5414,6 @@ function (window, undefined) {
 	 * @extends {cERFC}
 	 */
 	function cERFC_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERFC_PRECISE.prototype = Object.create(cERFC.prototype);
@@ -5472,8 +5426,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGESTEP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGESTEP.prototype = Object.create(cBaseFunction.prototype);
@@ -5501,19 +5453,16 @@ function (window, undefined) {
 		number2 = number2.tocNumber();
 
 		if (number1 instanceof cError) {
-			return this.value = number1;
+			return number1;
 		}
 		if (number2 instanceof cError) {
-			return this.value = number2;
+			return number2;
 		}
 
 		number1 = number1.getValue();
 		number2 = number2.getValue();
 
-		this.value = new cNumber(number1 >= number2 ? 1 : 0);
-
-		return this.value;
-
+		return new cNumber(number1 >= number2 ? 1 : 0);
 	};
 
 	/**
@@ -5521,8 +5470,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2BIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHEX2BIN.prototype = Object.create(cBaseFunction.prototype);
@@ -5548,7 +5495,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.getValue();
 
@@ -5559,33 +5506,34 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === 'F'),
 				arg0DEC = (negative) ? parseInt(arg0, NumberBase.HEX) - 1099511627776 : parseInt(arg0, NumberBase.HEX);
 
 			if (arg0DEC < -512 || arg0DEC > 511) {
-				this.value = new cError(cErrorType.not_numeric)
+				res = new cError(cErrorType.not_numeric)
 			} else {
 
 				if (negative) {
 					var str = (512 + arg0DEC).toString(NumberBase.BIN);
-					this.value = new cString('1' + '0'.repeat(9 - str.length) + str);
+					res = new cString('1' + '0'.repeat(9 - str.length) + str);
 				} else {
-					this.value = convertFromTo(arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1);
+					res = convertFromTo(arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1);
 				}
 
 			}
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5594,8 +5542,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2DEC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHEX2DEC.prototype = Object.create(cBaseFunction.prototype);
@@ -5616,7 +5562,7 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.getValue();
@@ -5625,16 +5571,17 @@ function (window, undefined) {
 			arg0 = 0;
 		}
 
+		var res;
 		if (validHEXNumber(arg0)) {
 
 			arg0 = parseInt(arg0, NumberBase.HEX);
-			this.value = new cNumber((arg0 >= 549755813888) ? arg0 - 1099511627776 : arg0);
+			res = new cNumber((arg0 >= 549755813888) ? arg0 - 1099511627776 : arg0);
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5643,8 +5590,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHEX2OCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHEX2OCT.prototype = Object.create(cBaseFunction.prototype);
@@ -5670,7 +5615,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.getValue();
 
@@ -5681,32 +5626,33 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			arg0 = parseInt(arg0, NumberBase.HEX);
 
 			if (arg0 > 536870911 && arg0 < 1098974756864) {
-				this.value = new cError(cErrorType.not_numeric);
+				res = new cError(cErrorType.not_numeric);
 			} else {
 
 				if (arg0 >= 1098974756864) {
-					this.value = new cString((arg0 - 1098437885952).toString(NumberBase.OCT).toUpperCase());
+					res = new cString((arg0 - 1098437885952).toString(NumberBase.OCT).toUpperCase());
 				} else {
-					this.value = convertFromTo(arg0, NumberBase.DEC, NumberBase.OCT, arg1);
+					res = convertFromTo(arg0, NumberBase.DEC, NumberBase.OCT, arg1);
 				}
 
 			}
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5715,8 +5661,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMABS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMABS.prototype = Object.create(cBaseFunction.prototype);
@@ -5736,19 +5680,19 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
-		this.value = new cNumber(c.Abs());
-		this.value.numFormat = 0;
+		var res = new cNumber(c.Abs());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5757,8 +5701,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMAGINARY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMAGINARY.prototype = Object.create(cBaseFunction.prototype);
@@ -5778,19 +5720,19 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
-		this.value = new cNumber(c.Imag());
-		this.value.numFormat = 0;
+		var res = new cNumber(c.Imag());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5799,8 +5741,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMARGUMENT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMARGUMENT.prototype = Object.create(cBaseFunction.prototype);
@@ -5820,19 +5760,19 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
-		this.value = new cNumber(c.Arg());
-		this.value.numFormat = 0;
+		var res = new cNumber(c.Arg());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5841,8 +5781,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCONJUGATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMCONJUGATE.prototype = Object.create(cBaseFunction.prototype);
@@ -5862,19 +5800,19 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
-		this.value = new cString(c.Conj());
-		this.value.numFormat = 0;
+		var res = new cString(c.Conj());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5883,8 +5821,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMCOS.prototype = Object.create(cBaseFunction.prototype);
@@ -5904,21 +5840,21 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Cos();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5927,8 +5863,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOSH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMCOSH.prototype = Object.create(cBaseFunction.prototype);
@@ -5948,26 +5882,26 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Cosh();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -5976,8 +5910,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCOT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
@@ -5997,29 +5929,29 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (0 == arg0.value) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Cot();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6028,8 +5960,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCSC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO проверить!!!
@@ -6050,30 +5980,30 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (0 == arg0.value) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Csc();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6082,8 +6012,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMCSCH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO проверить!!!
@@ -6104,30 +6032,30 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (0 == arg0.value) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Csch();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6136,8 +6064,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMDIV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMDIV.prototype = Object.create(cBaseFunction.prototype);
@@ -6165,24 +6091,24 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 		arg1 = arg1.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var c1 = new Complex(arg0.toString()), c2 = new Complex(arg1.toString()), c3;
 
 		if (c1 instanceof cError || c2 instanceof cError) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		c3 = c1.Div(c2);
 
-		this.value = new cString(c3.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c3.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6191,8 +6117,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMEXP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMEXP.prototype = Object.create(cBaseFunction.prototype);
@@ -6212,21 +6136,21 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Exp();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6235,8 +6159,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMLN.prototype = Object.create(cBaseFunction.prototype);
@@ -6256,13 +6178,13 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		var r = c.Ln();
@@ -6271,10 +6193,10 @@ function (window, undefined) {
 			return r;
 		}
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6283,8 +6205,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLOG10() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMLOG10.prototype = Object.create(cBaseFunction.prototype);
@@ -6304,13 +6224,13 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		var r = c.Log10();
@@ -6319,10 +6239,10 @@ function (window, undefined) {
 			return r;
 		}
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6331,8 +6251,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMLOG2() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMLOG2.prototype = Object.create(cBaseFunction.prototype);
@@ -6352,13 +6270,13 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		var r = c.Log2();
@@ -6367,10 +6285,10 @@ function (window, undefined) {
 			return r;
 		}
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6379,8 +6297,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMPOWER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMPOWER.prototype = Object.create(cBaseFunction.prototype);
@@ -6408,27 +6324,28 @@ function (window, undefined) {
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
+		var res;
 		if (c.Power(arg1.getValue())) {
-			this.value = new cString(c.toString());
+			res = new cString(c.toString());
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		this.value.numFormat = 0;
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6437,8 +6354,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMPRODUCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMPRODUCT.prototype = Object.create(cBaseFunction.prototype);
@@ -6457,13 +6372,13 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString()), c1;
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		for (var i = 1; i < arg.length; i++) {
@@ -6475,13 +6390,13 @@ function (window, undefined) {
 					_arg = argIArr[i].tocString();
 
 					if (_arg instanceof cError) {
-						return this.value = _arg;
+						return _arg;
 					}
 
 					c1 = new Complex(_arg.toString());
 
 					if (c1 instanceof cError) {
-						return this.value = c1;
+						return c1;
 					}
 
 					c.Product(c1);
@@ -6492,13 +6407,13 @@ function (window, undefined) {
 				argI.foreach(function (elem) {
 					var e = elem.tocString();
 					if (e instanceof cError) {
-						return t.value = e;
+						return e;
 					}
 
 					c1 = new Complex(e.toString());
 
 					if (c1 instanceof cError) {
-						return t.value = c1;
+						return c1;
 					}
 
 					c.Product(c1);
@@ -6510,7 +6425,7 @@ function (window, undefined) {
 			argI = argI.tocString();
 
 			if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			}
 
 			c1 = new Complex(argI.toString());
@@ -6519,15 +6434,16 @@ function (window, undefined) {
 
 		}
 
+		var res;
 		if (c instanceof cError) {
-			this.value = c;
+			res = c;
 		} else {
-			this.value = new cString(c.toString());
+			res = new cString(c.toString());
 		}
 
-		this.value.numFormat = 0;
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6536,8 +6452,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMREAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMREAL.prototype = Object.create(cBaseFunction.prototype);
@@ -6557,19 +6471,19 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
-		this.value = new cNumber(c.real);
-		this.value.numFormat = 0;
+		var res = new cNumber(c.real);
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6578,8 +6492,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSEC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
@@ -6599,26 +6511,26 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Sec();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6627,8 +6539,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSECH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
@@ -6648,26 +6558,26 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Sech();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6677,8 +6587,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSIN.prototype = Object.create(cBaseFunction.prototype);
@@ -6697,26 +6605,26 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Sin();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6725,8 +6633,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSINH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSINH.prototype = Object.create(cBaseFunction.prototype);
@@ -6746,26 +6652,26 @@ function (window, undefined) {
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Sinh();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6774,8 +6680,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSQRT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSQRT.prototype = Object.create(cBaseFunction.prototype);
@@ -6795,21 +6699,21 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.SQRT();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6818,8 +6722,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSUB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSUB.prototype = Object.create(cBaseFunction.prototype);
@@ -6847,24 +6749,24 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 		arg1 = arg1.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var c1 = new Complex(arg0.toString()), c2 = new Complex(arg1.toString());
 
 		if (c1 instanceof cError || c2 instanceof cError) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		c1.Sub(c2);
 
-		this.value = new cString(c1.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c1.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6873,8 +6775,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMSUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cIMSUM.prototype = Object.create(cBaseFunction.prototype);
@@ -6894,13 +6794,13 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var c = new Complex(arg0.toString()), c1;
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		for (var i = 1; i < arg.length; i++) {
@@ -6912,13 +6812,13 @@ function (window, undefined) {
 					_arg = argIArr[i].tocString();
 
 					if (_arg instanceof cError) {
-						return this.value = _arg;
+						return _arg;
 					}
 
 					c1 = new Complex(_arg.toString());
 
 					if (c1 instanceof cError) {
-						return this.value = c1;
+						return c1;
 					}
 
 					c.Sum(c1);
@@ -6929,13 +6829,13 @@ function (window, undefined) {
 				argI.foreach(function (elem) {
 					var e = elem.tocString();
 					if (e instanceof cError) {
-						return t.value = e;
+						return e;
 					}
 
 					c1 = new Complex(e.toString());
 
 					if (c1 instanceof cError) {
-						return t.value = c1;
+						return c1;
 					}
 
 					c.Sum(c1);
@@ -6947,7 +6847,7 @@ function (window, undefined) {
 			argI = argI.tocString();
 
 			if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			}
 
 			c1 = new Complex(argI.toString());
@@ -6956,15 +6856,16 @@ function (window, undefined) {
 
 		}
 
+		var res;
 		if (c instanceof cError) {
-			this.value = c;
+			res = c;
 		} else {
-			this.value = new cString(c.toString());
+			res = new cString(c.toString());
 		}
 
-		this.value.numFormat = 0;
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -6973,8 +6874,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cIMTAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO проверить!!!
@@ -6996,25 +6895,25 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (arg0.value === true || arg0.value === false) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var c = new Complex(arg0.toString());
 
 		if (c instanceof cError) {
-			return this.value = c;
+			return c;
 		}
 
 		c.Tan();
 
-		this.value = new cString(c.toString());
-		this.value.numFormat = 0;
+		var res = new cString(c.toString());
+		res.numFormat = 0;
 
-		return this.value;
+		return res;
 
 	};
 
@@ -7023,8 +6922,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2BIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cOCT2BIN.prototype = Object.create(cBaseFunction.prototype);
@@ -7050,7 +6947,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.getValue();
 
@@ -7061,33 +6958,34 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validOCTNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			var negative = (arg0.length === 10 && arg0.substring(0, 1).toUpperCase() === '7'),
 				arg0DEC = (negative) ? parseInt(arg0, NumberBase.OCT) - 1073741824 : parseInt(arg0, NumberBase.OCT);
 
 			if (arg0DEC < -512 || arg0DEC > 511) {
-				this.value = new cError(cErrorType.not_numeric)
+				res = new cError(cErrorType.not_numeric)
 			} else {
 
 				if (negative) {
 					var str = (512 + arg0DEC).toString(NumberBase.BIN);
-					this.value = new cString(('1' + '0'.repeat(9 - str.length) + str).toUpperCase());
+					res = new cString(('1' + '0'.repeat(9 - str.length) + str).toUpperCase());
 				} else {
-					this.value = convertFromTo(arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1);
+					res = convertFromTo(arg0DEC, NumberBase.DEC, NumberBase.BIN, arg1);
 				}
 
 			}
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -7096,8 +6994,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2DEC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cOCT2DEC.prototype = Object.create(cBaseFunction.prototype);
@@ -7118,7 +7014,7 @@ function (window, undefined) {
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.getValue();
@@ -7127,16 +7023,17 @@ function (window, undefined) {
 			arg0 = 0;
 		}
 
+		var res;
 		if (validOCTNumber(arg0)) {
 
 			arg0 = parseInt(arg0, NumberBase.OCT);
-			this.value = new cNumber((arg0 >= 536870912) ? arg0 - 1073741824 : arg0);
+			res = new cNumber((arg0 >= 536870912) ? arg0 - 1073741824 : arg0);
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 
@@ -7145,8 +7042,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cOCT2HEX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cOCT2HEX.prototype = Object.create(cBaseFunction.prototype);
@@ -7172,7 +7067,7 @@ function (window, undefined) {
 
 		arg0 = arg0.tocString();
 		if (arg0 instanceof cError) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.getValue();
 
@@ -7183,26 +7078,27 @@ function (window, undefined) {
 		if (!(arg1 instanceof cUndefined)) {
 			arg1 = arg1.tocNumber();
 			if (arg1 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 		arg1 = arg1.getValue();
 
+		var res;
 		if (validHEXNumber(arg0) && ( arg1 > 0 && arg1 <= 10 || arg1 == undefined )) {
 
 			arg0 = parseInt(arg0, NumberBase.OCT);
 
 			if (arg0 >= 536870912) {
-				this.value = new cString(('ff' + (arg0 + 3221225472).toString(NumberBase.HEX)).toUpperCase());
+				res = new cString(('ff' + (arg0 + 3221225472).toString(NumberBase.HEX)).toUpperCase());
 			} else {
-				this.value = convertFromTo(arg0, NumberBase.DEC, NumberBase.HEX, arg1);
+				res = convertFromTo(arg0, NumberBase.DEC, NumberBase.HEX, arg1);
 			}
 
 		} else {
-			this.value = new cError(cErrorType.not_numeric);
+			res = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value;
+		return res;
 
 	};
 })(window);

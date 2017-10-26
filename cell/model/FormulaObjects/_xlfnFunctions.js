@@ -65,9 +65,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cDBCS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cDBCS() {	
 	}
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
@@ -79,9 +77,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFILTERXML() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cFILTERXML() {	
 	}
 
 	cFILTERXML.prototype = Object.create(cBaseFunction.prototype);
@@ -93,9 +89,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cFORECAST_ETS() {	
 	}
 
 	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
@@ -107,9 +101,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_CONFINT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cFORECAST_ETS_CONFINT() {	
 	}
 
 	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
@@ -121,9 +113,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_SEASONALITY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cFORECAST_ETS_SEASONALITY() {	
 	}
 
 	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
@@ -135,9 +125,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_STAT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cFORECAST_ETS_STAT() {	
 	}
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
@@ -149,9 +137,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cHYPGEOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cHYPGEOM_DIST() {	
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -163,9 +149,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cMUNIT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cMUNIT() {	
 	}
 
 	cMUNIT.prototype = Object.create(cBaseFunction.prototype);
@@ -177,9 +161,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cQUERYSTRING() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cQUERYSTRING() {	
 	}
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
@@ -191,9 +173,7 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cWEBSERVICE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
+	function cWEBSERVICE() {	
 	}
 
 	cWEBSERVICE.prototype = Object.create(cBaseFunction.prototype);

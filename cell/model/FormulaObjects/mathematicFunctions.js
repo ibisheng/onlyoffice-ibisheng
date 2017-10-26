@@ -107,8 +107,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cABS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cABS.prototype = Object.create(cBaseFunction.prototype);
@@ -123,7 +121,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -133,9 +131,9 @@
 				}
 			})
 		} else {
-			return this.value = new cNumber(Math.abs(arg0.getValue()));
+			return new cNumber(Math.abs(arg0.getValue()));
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -143,8 +141,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cACOS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cACOS.prototype = Object.create(cBaseFunction.prototype);
@@ -159,7 +155,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -171,9 +167,9 @@
 			})
 		} else {
 			var a = Math.acos(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -181,8 +177,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cACOSH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cACOSH.prototype = Object.create(cBaseFunction.prototype);
@@ -197,7 +191,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -209,9 +203,9 @@
 			})
 		} else {
 			var a = Math.acosh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -219,8 +213,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cACOT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cACOT.prototype = Object.create(cBaseFunction.prototype);
@@ -237,7 +229,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -247,10 +239,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			var a = Math.PI / 2 - Math.atan(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -259,8 +251,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cACOTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cACOTH.prototype = Object.create(cBaseFunction.prototype);
@@ -277,7 +267,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -287,10 +277,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			var a = Math.atanh(1 / arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -299,8 +289,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAGGREGATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
@@ -318,87 +306,87 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var nFunc = argClone[0].getValue();
 		var f = null;
 		switch (nFunc) {
 			case AGGREGATE_FUNC_AVE:
-				f = new AscCommonExcel.cAVERAGE();
+				f = AscCommonExcel.cAVERAGE.prototype;
 				break;
 			case AGGREGATE_FUNC_CNT:
-				f = new AscCommonExcel.cCOUNT();
+				f = AscCommonExcel.cCOUNT.prototype;
 				break;
 			case AGGREGATE_FUNC_CNTA:
-				f = new AscCommonExcel.cCOUNTA();
+				f = AscCommonExcel.cCOUNTA.prototype;
 				break;
 			case AGGREGATE_FUNC_MAX:
-				f = new AscCommonExcel.cMAX();
+				f = AscCommonExcel.cMAX.prototype;
 				break;
 			case AGGREGATE_FUNC_MIN:
-				f = new AscCommonExcel.cMIN();
+				f = AscCommonExcel.cMIN.prototype;
 				break;
 			case AGGREGATE_FUNC_PROD:
-				f = new AscCommonExcel.cPRODUCT();
+				f = AscCommonExcel.cPRODUCT.prototype;
 				break;
 			case AGGREGATE_FUNC_STD:
-				f = new AscCommonExcel.cSTDEV_S();
+				f = AscCommonExcel.cSTDEV_S.prototype;
 				break;
 			case AGGREGATE_FUNC_STDP:
-				f = new AscCommonExcel.cSTDEV_P();
+				f = AscCommonExcel.cSTDEV_P.prototype;
 				break;
 			case AGGREGATE_FUNC_SUM:
-				f = new AscCommonExcel.cSUM();
+				f = AscCommonExcel.cSUM.prototype;
 				break;
 			case AGGREGATE_FUNC_VAR:
-				f = new AscCommonExcel.cVAR_S();
+				f = AscCommonExcel.cVAR_S.prototype;
 				break;
 			case AGGREGATE_FUNC_VARP:
-				f = new AscCommonExcel.cVAR_P();
+				f = AscCommonExcel.cVAR_P.prototype;
 				break;
 			case AGGREGATE_FUNC_MEDIAN:
-				f = new AscCommonExcel.cMEDIAN();
+				f = AscCommonExcel.cMEDIAN.prototype;
 				break;
 			case AGGREGATE_FUNC_MODSNGL:
-				f = new AscCommonExcel.cMODE_SNGL();
+				f = AscCommonExcel.cMODE_SNGL.prototype;
 				break;
 			case AGGREGATE_FUNC_LARGE:
 				if (arg[3]) {
-					f = new AscCommonExcel.cLARGE();
+					f = AscCommonExcel.cLARGE.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_SMALL:
 				if (arg[3]) {
-					f = new AscCommonExcel.cSMALL();
+					f = AscCommonExcel.cSMALL.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_PERCINC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cPERCENTILE_INC();
+					f = AscCommonExcel.cPERCENTILE_INC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_QRTINC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cQUARTILE_INC();
+					f = AscCommonExcel.cQUARTILE_INC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_PERCEXC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cPERCENTILE_EXC();
+					f = AscCommonExcel.cPERCENTILE_EXC.prototype;
 				}
 				break;
 			case AGGREGATE_FUNC_QRTEXC:
 				if (arg[3]) {
-					f = new AscCommonExcel.cQUARTILE_EXC();
+					f = AscCommonExcel.cQUARTILE_EXC.prototype;
 				}
 				break;
 			default:
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 		}
 
 		if (null === f) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var nOption = argClone[1].getValue();
@@ -435,9 +423,10 @@
 				ignoreErrorsVal = true;
 				break;
 			default :
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 		}
 
+		var res;
 		if (f) {
 			f.excludeHiddenRows = ignoreHiddenRows;
 			f.excludeErrorsVal = ignoreErrorsVal;
@@ -449,14 +438,13 @@
 			}
 
 			if (f.argumentsMax && newArgs.length > f.argumentsMax) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
-			f.setArgumentsCount(newArgs.length);
-			this.value = f.Calculate(newArgs);
+			res = f.Calculate(newArgs);
 		}
 
-		return this.value;
+		return res;
 	};
 
 
@@ -465,8 +453,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cARABIC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cARABIC.prototype = Object.create(cBaseFunction.prototype);
@@ -509,12 +495,12 @@
 
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.tocString();
 
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (cElementType.array === arg0.type) {
@@ -527,12 +513,12 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		}
 
 		//TODO проверить возвращение ошибок!
 		var res = to_arabic(arg0.getValue());
-		return this.value = isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
+		return isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
 	};
 
 	/**
@@ -540,8 +526,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cASIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cASIN.prototype = Object.create(cBaseFunction.prototype);
@@ -556,7 +540,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -568,9 +552,9 @@
 			})
 		} else {
 			var a = Math.asin(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -578,8 +562,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cASINH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cASINH.prototype = Object.create(cBaseFunction.prototype);
@@ -594,7 +576,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -606,9 +588,9 @@
 			})
 		} else {
 			var a = Math.asinh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -616,8 +598,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cATAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cATAN.prototype = Object.create(cBaseFunction.prototype);
@@ -632,7 +612,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -642,10 +622,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			var a = Math.atan(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -654,8 +634,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cATAN2() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cATAN2.prototype = Object.create(cBaseFunction.prototype);
@@ -675,7 +653,7 @@
 		arg1 = arg1.tocNumber();
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem, b = arg1.getElementRowCol(r, c);
@@ -687,7 +665,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -700,7 +678,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -712,10 +690,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
-		return this.value = (    arg0 instanceof cError ? arg0 : arg1 instanceof cError ? arg1 :
+		return (    arg0 instanceof cError ? arg0 : arg1 instanceof cError ? arg1 :
 				arg1.getValue() == 0 && arg0.getValue() == 0 ? new cError(cErrorType.division_by_zero) :
 					new cNumber(Math.atan2(arg1.getValue(), arg0.getValue()))
 		)
@@ -726,8 +704,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cATANH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cATANH.prototype = Object.create(cBaseFunction.prototype);
@@ -742,7 +718,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -754,9 +730,9 @@
 			})
 		} else {
 			var a = Math.atanh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -764,8 +740,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBASE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBASE.prototype = Object.create(cBaseFunction.prototype);
@@ -784,7 +758,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function base_math(argArray) {
@@ -809,7 +783,7 @@
 			return new cString(str);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, base_math);
+		return this._findArrayInNumberArguments(oArguments, base_math);
 	};
 
 	/**
@@ -817,8 +791,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCEILING() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCEILING.prototype = Object.create(cBaseFunction.prototype);
@@ -837,10 +809,10 @@
 		arg0 = arg[0].tocNumber();
 		arg1 = arg[1].tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		function ceilingHelper(number, significance) {
@@ -870,7 +842,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem, b = arg1.getElementRowCol(r, c);
@@ -880,7 +852,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -891,7 +863,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -901,10 +873,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
-		return this.value = ceilingHelper(arg0.getValue(), arg1.getValue());
+		return ceilingHelper(arg0.getValue(), arg1.getValue());
 
 	};
 
@@ -913,8 +885,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCEILING_MATH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
@@ -935,7 +905,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function floor_math(argArray) {
@@ -958,7 +928,7 @@
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
+		return this._findArrayInNumberArguments(oArguments, floor_math);
 	};
 
 	/**
@@ -966,8 +936,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCEILING_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCEILING_PRECISE.prototype = Object.create(cBaseFunction.prototype);
@@ -985,7 +953,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function floorHelper(argArray) {
@@ -1000,7 +968,7 @@
 			return new cNumber(Math.ceil(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
+		return this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 
 	/**
@@ -1008,8 +976,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOMBIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOMBIN.prototype = Object.create(cBaseFunction.prototype);
@@ -1030,15 +996,15 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem, b = arg1.getElementRowCol(r, c);
@@ -1048,7 +1014,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -1064,7 +1030,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -1079,14 +1045,14 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0.getValue() <= 0 || arg1.getValue() <= 0 || arg0.getValue() < arg1.getValue()) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(Math.binomCoeff(arg0.getValue(), arg1.getValue()));
+		return new cNumber(Math.binomCoeff(arg0.getValue(), arg1.getValue()));
 	};
 
 	/**
@@ -1094,8 +1060,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOMBINA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOMBINA.prototype = Object.create(cBaseFunction.prototype);
@@ -1113,7 +1077,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function combinaCalculate(argArray) {
@@ -1129,7 +1093,7 @@
 			return new cNumber(Math.binomCoeff(a + b - 1, b));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, combinaCalculate);
+		return this._findArrayInNumberArguments(oArguments, combinaCalculate);
 	};
 
 	/**
@@ -1137,8 +1101,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOS.prototype = Object.create(cBaseFunction.prototype);
@@ -1153,7 +1115,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1165,9 +1127,9 @@
 			})
 		} else {
 			var a = Math.cos(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -1175,8 +1137,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOSH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOSH.prototype = Object.create(cBaseFunction.prototype);
@@ -1191,7 +1151,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1203,9 +1163,9 @@
 			})
 		} else {
 			var a = Math.cosh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -1213,8 +1173,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOT.prototype = Object.create(cBaseFunction.prototype);
@@ -1232,7 +1190,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -1248,16 +1206,16 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			if (0 === arg0.getValue()) {
-				return this.value = new cError(cErrorType.division_by_zero);
+				return new cError(cErrorType.division_by_zero);
 			} else if (Math.abs(arg0.getValue()) >= maxVal) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var a = 1 / Math.tan(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -1266,8 +1224,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOTH.prototype = Object.create(cBaseFunction.prototype);
@@ -1287,7 +1243,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -1301,14 +1257,14 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			if (0 === arg0.getValue()) {
-				return this.value = new cError(cErrorType.division_by_zero);
+				return new cError(cErrorType.division_by_zero);
 			}
 
 			var a = 1 / Math.tanh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -1317,8 +1273,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCSC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCSC.prototype = Object.create(cBaseFunction.prototype);
@@ -1336,7 +1290,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -1352,16 +1306,16 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			if (0 === arg0.getValue()) {
-				return this.value = new cError(cErrorType.division_by_zero);
+				return new cError(cErrorType.division_by_zero);
 			} else if (Math.abs(arg0.getValue()) >= maxVal) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var a = 1 / Math.sin(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -1370,8 +1324,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCSCH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCSCH.prototype = Object.create(cBaseFunction.prototype);
@@ -1391,7 +1343,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -1405,14 +1357,14 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			if (0 === arg0.getValue()) {
-				return this.value = new cError(cErrorType.division_by_zero);
+				return new cError(cErrorType.division_by_zero);
 			}
 
 			var a = 1 / Math.sinh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -1421,8 +1373,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDECIMAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDECIMAL.prototype = Object.create(cBaseFunction.prototype);
@@ -1440,7 +1390,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function decimal_calculate(argArray) {
@@ -1489,7 +1439,7 @@
 			return isNaN(fVal) ? new cError(cErrorType.not_numeric) : new cNumber(fVal);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, decimal_calculate, true);
+		return this._findArrayInNumberArguments(oArguments, decimal_calculate, true);
 	};
 
 	/**
@@ -1497,8 +1447,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEGREES() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEGREES.prototype = Object.create(cBaseFunction.prototype);
@@ -1513,7 +1461,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1525,9 +1473,9 @@
 			})
 		} else {
 			var a = arg0.getValue();
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a * 180 / Math.PI);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a * 180 / Math.PI);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -1537,8 +1485,6 @@
 	 */
 	//TODO нигде нет отписания к этой функции! работает так же как и cCEILING на всех примерах.
 	function cECMA_CEILING() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cECMA_CEILING.prototype = Object.create(cCEILING.prototype);
@@ -1550,8 +1496,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEVEN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEVEN.prototype = Object.create(cBaseFunction.prototype);
@@ -1588,7 +1532,7 @@
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (arg0 instanceof cArray) {
@@ -1599,11 +1543,11 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber) {
-			return this.value = evenHelper(arg0);
+			return evenHelper(arg0);
 		}
-		return this.value = new cError(cErrorType.wrong_value_type);
+		return new cError(cErrorType.wrong_value_type);
 	};
 
 	/**
@@ -1611,8 +1555,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXP.prototype = Object.create(cBaseFunction.prototype);
@@ -1627,7 +1569,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1639,10 +1581,10 @@
 			})
 		}
 		if (!(arg0 instanceof cNumber)) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else {
 			var a = Math.exp(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -1651,8 +1593,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFACT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFACT.prototype = Object.create(cBaseFunction.prototype);
@@ -1667,7 +1607,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1683,12 +1623,12 @@
 			})
 		} else {
 			if (arg0.getValue() < 0) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 			var a = Math.fact(arg0.getValue());
-			return this.value = isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -1696,8 +1636,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFACTDOUBLE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFACTDOUBLE.prototype = Object.create(cBaseFunction.prototype);
@@ -1731,7 +1669,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -1747,12 +1685,12 @@
 			})
 		} else {
 			if (arg0.getValue() < 0) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 			var a = factDouble(arg0.getValue());
-			return this.value = isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -1760,8 +1698,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFLOOR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFLOOR.prototype = Object.create(cBaseFunction.prototype);
@@ -1781,10 +1717,10 @@
 		arg0 = arg[0].tocNumber();
 		arg1 = arg[1].tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		function floorHelper(number, significance) {
@@ -1810,7 +1746,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -1821,7 +1757,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -1833,7 +1769,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0;
@@ -1844,14 +1780,14 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cString || arg1 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = floorHelper(arg0.getValue(), arg1.getValue());
+		return floorHelper(arg0.getValue(), arg1.getValue());
 	};
 
 	/**
@@ -1859,8 +1795,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFLOOR_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFLOOR_PRECISE.prototype = Object.create(cBaseFunction.prototype);
@@ -1878,7 +1812,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function floorHelper(argArray) {
@@ -1893,7 +1827,7 @@
 			return new cNumber(Math.floor(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
+		return this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 
 	/**
@@ -1901,8 +1835,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFLOOR_MATH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
@@ -1923,7 +1855,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function floor_math(argArray) {
@@ -1946,7 +1878,7 @@
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
+		return this._findArrayInNumberArguments(oArguments, floor_math);
 	};
 
 	/**
@@ -1954,8 +1886,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGCD() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGCD.prototype = Object.create(cBaseFunction.prototype);
@@ -1981,7 +1911,7 @@
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					if (argArr[j] instanceof cString) {
@@ -1993,7 +1923,7 @@
 					}
 
 					if (argArr[j].getValue() < 0) {
-						return this.value = new cError(cErrorType.not_numeric);
+						return new cError(cErrorType.not_numeric);
 					}
 
 					_gcd = gcd(_gcd, argArr[j].getValue());
@@ -2023,24 +1953,24 @@
 						_gcd = gcd(_gcd, arrElem.getValue());
 
 					})) {
-					return this.value = _gcd;
+					return _gcd;
 				}
 			} else {
 				argI = argI.tocNumber();
 
 				if (argI.getValue() < 0) {
-					return this.value = new cError(cErrorType.not_numeric);
+					return new cError(cErrorType.not_numeric);
 				}
 
 				if (argI instanceof cError) {
-					return this.value = argI;
+					return argI;
 				}
 
 				_gcd = gcd(_gcd, argI.getValue())
 			}
 		}
 
-		return this.value = new cNumber(_gcd);
+		return new cNumber(_gcd);
 
 	};
 
@@ -2049,8 +1979,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cINT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cINT.prototype = Object.create(cBaseFunction.prototype);
@@ -2065,10 +1993,10 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg0 instanceof cString) {
-			this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg0 instanceof cArray) {
@@ -2080,10 +2008,10 @@
 				}
 			})
 		} else {
-			return this.value = new cNumber(Math.floor(arg0.getValue()))
+			return new cNumber(Math.floor(arg0.getValue()))
 		}
 
-		return this.value = new cNumber(Math.floor(arg0.getValue()));
+		return new cNumber(Math.floor(arg0.getValue()));
 	};
 
 	/**
@@ -2092,8 +2020,6 @@
 	 */
 	//TODO точная копия функции CEILING.PRECISE. зачем excel две одинаковые функции?
 	function cISO_CEILING() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISO_CEILING.prototype = Object.create(cBaseFunction.prototype);
@@ -2111,7 +2037,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function floorHelper(argArray) {
@@ -2126,7 +2052,7 @@
 			return new cNumber(Math.ceil(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
+		return this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 
 	/**
@@ -2134,8 +2060,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLCM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLCM.prototype = Object.create(cBaseFunction.prototype);
@@ -2165,7 +2089,7 @@
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					if (argArr[j] instanceof cString) {
@@ -2177,7 +2101,7 @@
 					}
 
 					if (argArr[j].getValue() <= 0) {
-						return this.value = new cError(cErrorType.not_numeric);
+						return new cError(cErrorType.not_numeric);
 					}
 
 					_lcm = lcm(_lcm, argArr[j].getValue());
@@ -2207,24 +2131,24 @@
 						_lcm = lcm(_lcm, arrElem.getValue());
 
 					})) {
-					return this.value = _lcm;
+					return _lcm;
 				}
 			} else {
 				argI = argI.tocNumber();
 
 				if (argI.getValue() <= 0) {
-					return this.value = new cError(cErrorType.not_numeric);
+					return new cError(cErrorType.not_numeric);
 				}
 
 				if (argI instanceof cError) {
-					return this.value = argI;
+					return argI;
 				}
 
 				_lcm = lcm(_lcm, argI.getValue())
 			}
 		}
 
-		return this.value = new cNumber(_lcm);
+		return new cNumber(_lcm);
 
 	};
 
@@ -2233,8 +2157,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLN.prototype = Object.create(cBaseFunction.prototype);
@@ -2249,10 +2171,10 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg0 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -2267,9 +2189,9 @@
 			})
 		} else {
 			if (arg0.getValue() <= 0) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			} else {
-				return this.value = new cNumber(Math.log(arg0.getValue()));
+				return new cNumber(Math.log(arg0.getValue()));
 			}
 		}
 	};
@@ -2279,8 +2201,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOG() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOG.prototype = Object.create(cBaseFunction.prototype);
@@ -2301,15 +2221,15 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -2320,7 +2240,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -2336,7 +2256,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -2351,18 +2271,18 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (!(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) )) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg0.getValue() <= 0 || ( arg1 && arg1.getValue() <= 0 )) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(Math.log(arg0.getValue()) / Math.log(arg1.getValue()));
+		return new cNumber(Math.log(arg0.getValue()) / Math.log(arg1.getValue()));
 	};
 
 	/**
@@ -2370,8 +2290,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOG10() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOG10.prototype = Object.create(cBaseFunction.prototype);
@@ -2386,10 +2304,10 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg0 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -2404,9 +2322,9 @@
 			})
 		} else {
 			if (arg0.getValue() <= 0) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			} else {
-				return this.value = new cNumber(Math.log10(arg0.getValue()));
+				return new cNumber(Math.log10(arg0.getValue()));
 			}
 		}
 	};
@@ -2416,8 +2334,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMDETERM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMDETERM.prototype = Object.create(cBaseFunction.prototype);
@@ -2480,19 +2396,19 @@
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg0[0].length != arg0.length) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = determ(arg0);
 
 		if (!isNaN(arg0)) {
-			return this.value = new cNumber(arg0);
+			return new cNumber(arg0);
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 	};
 
@@ -2501,8 +2417,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINVERSE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINVERSE.prototype = Object.create(cBaseFunction.prototype);
@@ -2630,14 +2544,14 @@
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg0[0].length != arg0.length) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = InverseMatrix(arg0);
+		return InverseMatrix(arg0);
 	};
 
 	/**
@@ -2645,8 +2559,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMMULT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMMULT.prototype = Object.create(cBaseFunction.prototype);
@@ -2697,15 +2609,15 @@
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArray) {
 			arg1 = arg1.getMatrix();
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
-		return this.value = mult(arg0, arg1);
+		return mult(arg0, arg1);
 
 	};
 
@@ -2714,8 +2626,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMOD() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMOD.prototype = Object.create(cBaseFunction.prototype);
@@ -2735,15 +2645,15 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -2755,7 +2665,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -2768,7 +2678,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -2779,19 +2689,18 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (!(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) )) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1.getValue() == 0) {
-			return this.value = new cError(cErrorType.division_by_zero);
+			return new cError(cErrorType.division_by_zero);
 		}
 
-		return this.value =
-			new cNumber((arg1.getValue() < 0 ? -1 : 1) * ( Math.abs(arg0.getValue()) % Math.abs(arg1.getValue()) ));
+		return new cNumber((arg1.getValue() < 0 ? -1 : 1) * ( Math.abs(arg0.getValue()) % Math.abs(arg1.getValue()) ));
 
 	};
 
@@ -2800,8 +2709,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMROUND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMROUND.prototype = Object.create(cBaseFunction.prototype);
@@ -2856,46 +2763,46 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg0 instanceof cString || arg1 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					f.call(this, elem, arg1.getElementRowCol(r, c), r, c)
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				f.call(this, elem, arg1, r, c);
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				f.call(this, arg0, elem, r, c)
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg1.getValue() == 0) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		if (arg0.getValue() < 0 && arg1.getValue() > 0 || arg0.getValue() > 0 && arg1.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		multiple = arg1.getValue();
-		return this.value = new cNumber(mroundHelper(arg0.getValue() + arg1.getValue() / 2));
+		return new cNumber(mroundHelper(arg0.getValue() + arg1.getValue() / 2));
 	};
 
 	/**
@@ -2903,8 +2810,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMULTINOMIAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMULTINOMIAL.prototype = Object.create(cBaseFunction.prototype);
@@ -2920,14 +2825,14 @@
 				for (var j = 0; j < _arrVal.length; j++) {
 					if (_arrVal[j] instanceof cNumber) {
 						if (_arrVal[j].getValue() < 0) {
-							return this.value = new cError(cError.not_numeric);
+							return new cError(cError.not_numeric);
 						}
 						arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "+");
 						fact *= Math.fact(_arrVal[j].getValue());
 					} else if (_arrVal[j] instanceof cError) {
-						return this.value = _arrVal[j];
+						return _arrVal[j];
 					} else {
-						return this.value = new cError(cError.wrong_value_type);
+						return new cError(cError.wrong_value_type);
 					}
 				}
 			} else if (arg[i] instanceof cArray) {
@@ -2943,50 +2848,50 @@
 							return true;
 						}
 					})) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
 				var _arg = arg[i].getValue();
 
 				if (_arg.getValue() < 0) {
-					return this.value = new cError(cErrorType.not_numeric);
+					return new cError(cErrorType.not_numeric);
 				}
 
 				if (_arg instanceof cNumber) {
 					if (_arg.getValue() < 0) {
-						return this.value = new cError(cError.not_numeric);
+						return new cError(cError.not_numeric);
 					}
 					arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
 					fact *= Math.fact(_arg.getValue());
 				} else if (_arg instanceof cError) {
-					return this.value = _arg;
+					return _arg;
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else if (arg[i] instanceof cNumber) {
 
 				if (arg[i].getValue() < 0) {
-					return this.value = new cError(cErrorType.not_numeric);
+					return new cError(cErrorType.not_numeric);
 				}
 
 				arg0 = _func[arg0.type][arg[i].type](arg0, arg[i], "+");
 				fact *= Math.fact(arg[i].getValue());
 			} else if (arg[i] instanceof cError) {
-				return this.value = arg[i];
+				return arg[i];
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			if (arg0 instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
 		if (arg0.getValue() > 170) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = new cNumber(Math.fact(arg0.getValue()) / fact);
+		return new cNumber(Math.fact(arg0.getValue()) / fact);
 	};
 
 	/**
@@ -2994,8 +2899,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cODD() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cODD.prototype = Object.create(cBaseFunction.prototype);
@@ -3031,7 +2934,7 @@
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (arg0 instanceof cArray) {
@@ -3042,11 +2945,11 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber) {
-			return this.value = oddHelper(arg0);
+			return oddHelper(arg0);
 		}
-		return this.value = new cError(cErrorType.wrong_value_type);
+		return new cError(cErrorType.wrong_value_type);
 
 	};
 
@@ -3055,8 +2958,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPI() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPI.prototype = Object.create(cBaseFunction.prototype);
@@ -3072,8 +2973,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPOWER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPOWER.prototype = Object.create(cBaseFunction.prototype);
@@ -3113,38 +3012,38 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					f.call(this, elem, arg1.getElementRowCol(r, c), r, c);
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				f.call(this, elem, arg1, r, c)
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				f.call(this, arg0, elem, r, c);
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (!(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) )) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = powerHelper(arg0.getValue(), arg1.getValue());
+		return powerHelper(arg0.getValue(), arg1.getValue());
 
 	};
 
@@ -3153,8 +3052,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPRODUCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPRODUCT.prototype = Object.create(cBaseFunction.prototype);
@@ -3171,7 +3068,7 @@
 				for (var j = 0; j < _arrVal.length; j++) {
 					arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "*");
 					if (cElementType.error === arg0.type) {
-						return this.value = arg0;
+						return arg0;
 					}
 				}
 			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
@@ -3192,11 +3089,11 @@
 				arg0 = _func[arg0.type][element.type](arg0, element, "*");
 			}
 			if (cElementType.error === arg0.type) {
-				return this.value = arg0;
+				return arg0;
 			}
 
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -3204,8 +3101,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cQUOTIENT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUOTIENT.prototype = Object.create(cBaseFunction.prototype);
@@ -3242,39 +3137,39 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					f.call(this, elem, arg1.getElementRowCol(r, c), r, c);
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				f.call(this, elem, arg1, r, c)
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				f.call(this, arg0, elem, r, c);
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (!(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) )) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 
-		return this.value = quotient(arg0, arg1);
+		return quotient(arg0, arg1);
 	};
 
 	/**
@@ -3282,8 +3177,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRADIANS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRADIANS.prototype = Object.create(cBaseFunction.prototype);
@@ -3312,10 +3205,10 @@
 				}
 			})
 		} else {
-			return this.value = ( arg0 instanceof cError ? arg0 : new cNumber(radiansHelper(arg0.getValue())) );
+			return ( arg0 instanceof cError ? arg0 : new cNumber(radiansHelper(arg0.getValue())) );
 		}
 
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -3324,8 +3217,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRAND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRAND.prototype = Object.create(cBaseFunction.prototype);
@@ -3334,7 +3225,7 @@
 	cRAND.prototype.argumentsMax = 0;
 	cRAND.prototype.ca = true;
 	cRAND.prototype.Calculate = function () {
-		return this.value = new cNumber(Math.random());
+		return new cNumber(Math.random());
 	};
 
 	/**
@@ -3342,8 +3233,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANDBETWEEN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANDBETWEEN.prototype = Object.create(cBaseFunction.prototype);
@@ -3377,39 +3266,39 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					f.call(this, elem, arg1.getElementRowCol(r, c), r, c);
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				f.call(this, elem, arg1, r, c)
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				f.call(this, arg0, elem, r, c);
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (!(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) )) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 
-		return this.value = new cNumber(randBetween(arg0.getValue(), arg1.getValue()));
+		return new cNumber(randBetween(arg0.getValue(), arg1.getValue()));
 	};
 
 	/**
@@ -3417,8 +3306,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROMAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cROMAN.prototype = Object.create(cBaseFunction.prototype);
@@ -3468,21 +3355,21 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D || arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -3493,7 +3380,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -3504,7 +3391,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0, b = elem;
@@ -3514,10 +3401,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
-		return this.value = roman(arg0.getValue(), arg1.getValue());
+		return roman(arg0.getValue(), arg1.getValue());
 
 	};
 
@@ -3526,8 +3413,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROUND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cROUND.prototype = Object.create(cBaseFunction.prototype);
@@ -3591,18 +3476,18 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 			if (arg0 instanceof cError) {
-				return this.value = arg0;
+				return arg0;
 			} else if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg0 = arg0.tocNumber();
 			}
@@ -3613,9 +3498,9 @@
 		if (arg1 instanceof cRef || arg1 instanceof cRef3D) {
 			arg1 = arg1.getValue();
 			if (arg1 instanceof cError) {
-				return this.value = arg1;
+				return arg1;
 			} else if (arg1 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg1 = arg1.tocNumber();
 			}
@@ -3625,7 +3510,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -3636,7 +3521,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -3648,7 +3533,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0;
@@ -3659,12 +3544,12 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var number = arg0.getValue(), num_digits = arg1.getValue();
 
-		return this.value = roundHelper(number, num_digits);
+		return roundHelper(number, num_digits);
 
 	};
 
@@ -3673,8 +3558,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROUNDDOWN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cROUNDDOWN.prototype = Object.create(cBaseFunction.prototype);
@@ -3715,18 +3598,18 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 			if (arg0 instanceof cError) {
-				return this.value = arg0;
+				return arg0;
 			} else if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg0 = arg0.tocNumber();
 			}
@@ -3737,9 +3620,9 @@
 		if (arg1 instanceof cRef || arg1 instanceof cRef3D) {
 			arg1 = arg1.getValue();
 			if (arg1 instanceof cError) {
-				return this.value = arg1;
+				return arg1;
 			} else if (arg1 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg1 = arg1.tocNumber();
 			}
@@ -3749,7 +3632,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -3760,7 +3643,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -3772,7 +3655,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0;
@@ -3783,11 +3666,11 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var number = arg0.getValue(), num_digits = arg1.getValue();
-		return this.value = rounddownHelper(number, num_digits);
+		return rounddownHelper(number, num_digits);
 
 	};
 
@@ -3796,8 +3679,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cROUNDUP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cROUNDUP.prototype = Object.create(cBaseFunction.prototype);
@@ -3838,18 +3719,18 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 			if (arg0 instanceof cError) {
-				return this.value = arg0;
+				return arg0;
 			} else if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg0 = arg0.tocNumber();
 			}
@@ -3860,9 +3741,9 @@
 		if (arg1 instanceof cRef || arg1 instanceof cRef3D) {
 			arg1 = arg1.getValue();
 			if (arg1 instanceof cError) {
-				return this.value = arg1;
+				return arg1;
 			} else if (arg1 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg1 = arg1.tocNumber();
 			}
@@ -3872,7 +3753,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -3883,7 +3764,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -3895,7 +3776,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0;
@@ -3906,11 +3787,11 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var number = arg0.getValue(), num_digits = arg1.getValue();
-		return this.value = roundupHelper(number, num_digits);
+		return roundupHelper(number, num_digits);
 
 	};
 
@@ -3919,8 +3800,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSEC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSEC.prototype = Object.create(cBaseFunction.prototype);
@@ -3938,7 +3817,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -3952,14 +3831,14 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			if (Math.abs(arg0.getValue()) >= maxVal) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			var a = 1 / Math.cos(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -3968,8 +3847,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSECH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSECH.prototype = Object.create(cBaseFunction.prototype);
@@ -3989,7 +3866,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				if (cElementType.number === elem.type) {
@@ -3999,10 +3876,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else {
 			var a = 1 / Math.cosh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
 
@@ -4011,8 +3888,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSERIESSUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSERIESSUM.prototype = Object.create(cBaseFunction.prototype);
@@ -4050,19 +3925,19 @@
 		if (arg0 instanceof cNumber || arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.tocNumber();
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cNumber || arg1 instanceof cRef || arg1 instanceof cRef3D) {
 			arg1 = arg1.tocNumber();
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg2 instanceof cNumber || arg2 instanceof cRef || arg2 instanceof cRef3D) {
 			arg2 = arg2.tocNumber();
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg3 instanceof cNumber || arg3 instanceof cRef || arg3 instanceof cRef3D) {
@@ -4070,10 +3945,10 @@
 		} else if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
 			arg3 = arg3.getValue();
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = SERIESSUM(arg0, arg1, arg2, arg3);
+		return SERIESSUM(arg0, arg1, arg2, arg3);
 
 	};
 
@@ -4082,8 +3957,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSIGN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSIGN.prototype = Object.create(cBaseFunction.prototype);
@@ -4110,7 +3983,7 @@
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4122,9 +3995,9 @@
 			})
 		} else {
 			var a = arg0.getValue();
-			return this.value = signHelper(a);
+			return signHelper(a);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -4133,8 +4006,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSIN.prototype = Object.create(cBaseFunction.prototype);
@@ -4149,7 +4020,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4161,9 +4032,9 @@
 			})
 		} else {
 			var a = Math.sin(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4171,8 +4042,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSINH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSINH.prototype = Object.create(cBaseFunction.prototype);
@@ -4187,7 +4056,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4199,9 +4068,9 @@
 			})
 		} else {
 			var a = Math.sinh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4209,8 +4078,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSQRT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSQRT.prototype = Object.create(cBaseFunction.prototype);
@@ -4225,7 +4092,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4237,9 +4104,9 @@
 			})
 		} else {
 			var a = Math.sqrt(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4247,8 +4114,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSQRTPI() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSQRTPI.prototype = Object.create(cBaseFunction.prototype);
@@ -4263,7 +4128,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4275,9 +4140,9 @@
 			})
 		} else {
 			var a = Math.sqrt(arg0.getValue() * Math.PI);
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4285,8 +4150,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUBTOTAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUBTOTAL.prototype = Object.create(cBaseFunction.prototype);
@@ -4301,7 +4164,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.number !== arg0.type) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.getValue();
@@ -4310,68 +4173,67 @@
 			case cSubTotalFunctionType.excludes.AVERAGE:
 				exclude = true;
 			case cSubTotalFunctionType.includes.AVERAGE:
-				f = new AscCommonExcel.cAVERAGE();
+				f = AscCommonExcel.cAVERAGE.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.COUNT:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNT:
-				f = new AscCommonExcel.cCOUNT();
+				f = AscCommonExcel.cCOUNT.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.COUNTA:
 				exclude = true;
 			case cSubTotalFunctionType.includes.COUNTA:
-				f = new AscCommonExcel.cCOUNTA();
+				f = AscCommonExcel.cCOUNTA.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MAX:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MAX:
-				f = new AscCommonExcel.cMAX();
-				f.setArgumentsCount(arg.length - 1);
+				f = AscCommonExcel.cMAX.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.MIN:
 				exclude = true;
 			case cSubTotalFunctionType.includes.MIN:
-				f = new AscCommonExcel.cMIN();
-				f.setArgumentsCount(arg.length - 1);
+				f = AscCommonExcel.cMIN.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.PRODUCT:
 				exclude = true;
 			case cSubTotalFunctionType.includes.PRODUCT:
-				f = new cPRODUCT();
+				f = cPRODUCT.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.STDEV:
 				exclude = true;
 			case cSubTotalFunctionType.includes.STDEV:
-				f = new AscCommonExcel.cSTDEV();
+				f = AscCommonExcel.cSTDEV.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.STDEVP:
 				exclude = true;
 			case cSubTotalFunctionType.includes.STDEVP:
-				f = new AscCommonExcel.cSTDEVP();
+				f = AscCommonExcel.cSTDEVP.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.SUM:
 				exclude = true;
 			case cSubTotalFunctionType.includes.SUM:
-				f = new cSUM();
+				f = cSUM.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.VAR:
 				exclude = true;
 			case cSubTotalFunctionType.includes.VAR:
-				f = new AscCommonExcel.cVAR();
+				f = AscCommonExcel.cVAR.prototype;
 				break;
 			case cSubTotalFunctionType.excludes.VARP:
 				exclude = true;
 			case cSubTotalFunctionType.includes.VARP:
-				f = new AscCommonExcel.cVARP();
+				f = AscCommonExcel.cVARP.prototype;
 				break;
 		}
+		var res;
 		if (f) {
 			f.checkExclude = true;
 			f.excludeHiddenRows = exclude;
-			this.value = f.Calculate(arg.slice(1));
+			res = f.Calculate(arg.slice(1));
 		}
 
-		return this.value;
+		return res;
 	};
 
 	/**
@@ -4379,8 +4241,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUM.prototype = Object.create(cBaseFunction.prototype);
@@ -4399,7 +4259,7 @@
 						arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "+");
 					}
 					if (cElementType.error === arg0.type) {
-						return this.value = arg0;
+						return arg0;
 					}
 				}
 			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
@@ -4421,12 +4281,12 @@
 				arg0 = _func[arg0.type][_arg.type](arg0, _arg, "+");
 			}
 			if (cElementType.error === arg0.type) {
-				return this.value = arg0;
+				return arg0;
 			}
 
 		}
 
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4434,8 +4294,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMIF.prototype = Object.create(cBaseFunction.prototype);
@@ -4450,10 +4308,10 @@
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -4462,10 +4320,10 @@
 			if (cElementType.cellsRange3D === arg2.type) {
 				arg2 = arg2.tocArea();
 				if (!arg2) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -4478,7 +4336,7 @@
 		arg1 = arg1.tocString();
 
 		if (cElementType.string !== arg1.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		matchingInfo = AscCommonExcel.matchingValue(arg1);
@@ -4493,10 +4351,10 @@
 				}
 			}
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = new cNumber(_sum);
+		return new cNumber(_sum);
 	};
 
 	/**
@@ -4504,8 +4362,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -4519,10 +4375,10 @@
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -4537,10 +4393,10 @@
 				if (cElementType.cellsRange3D === arg1.type) {
 					arg1 = arg1.tocArea();
 					if (!arg1) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
@@ -4553,18 +4409,18 @@
 			arg2 = arg2.tocString();
 
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -4583,12 +4439,9 @@
 				}
 			}
 		}
-		return this.value = new cNumber(_sum);
+		return new cNumber(_sum);
 	};
 	cSUMIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -4597,8 +4450,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMPRODUCT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMPRODUCT.prototype = Object.create(cBaseFunction.prototype);
@@ -4611,7 +4462,7 @@
 		for (i = 0; i < arg.length; i++) {
 
 			if (arg[i] instanceof cArea3D) {
-				return this.value = new cError(cErrorType.bad_reference);
+				return new cError(cErrorType.bad_reference);
 			}
 
 			if (arg[i] instanceof cArea || arg[i] instanceof cArray) {
@@ -4626,11 +4477,11 @@
 			col = Math.max(resArr[0][0].length, col);
 
 			if (row != resArr[i].length || col != resArr[i][0].length) {
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 			}
 
 			if (arg[i] instanceof cError) {
-				return this.value = arg[i];
+				return arg[i];
 			}
 		}
 
@@ -4640,7 +4491,7 @@
 				for (var iRes = 0; iRes < resArr.length; iRes++) {
 					arg0 = resArr[iRes][iRow][iCol];
 					if (arg0 instanceof cError) {
-						return this.value = arg0;
+						return arg0;
 					} else if (arg0 instanceof cString) {
 						if (arg0.tocNumber() instanceof cError) {
 							res *= 0;
@@ -4659,7 +4510,7 @@
 			res += _res[i]
 		}
 
-		return this.value = new cNumber(res);
+		return new cNumber(res);
 	};
 
 	/**
@@ -4667,8 +4518,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMSQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMSQ.prototype = Object.create(cBaseFunction.prototype);
@@ -4690,7 +4539,7 @@
 					if (_arrVal[j] instanceof cNumber) {
 						arg0 = sumsqHelper(arg0, _arrVal[j]);
 					} else if (_arrVal[j] instanceof cError) {
-						return this.value = _arrVal[j];
+						return _arrVal[j];
 					}
 				}
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
@@ -4709,12 +4558,12 @@
 				arg0 = sumsqHelper(arg0, _arg);
 			}
 			if (arg0 instanceof cError) {
-				return this.value = arg0;
+				return arg0;
 			}
 
 		}
 
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -4722,8 +4571,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMX2MY2() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMX2MY2.prototype = Object.create(cBaseFunction.prototype);
@@ -4778,26 +4625,26 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea3D && arg1 instanceof cArea3D) {
-			return this.value = sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
+			return sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray || arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix();
 		} else if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = sumX2MY2(arg0, arg1, false);
+		return sumX2MY2(arg0, arg1, false);
 	};
 
 	/**
@@ -4805,8 +4652,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMX2PY2() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMX2PY2.prototype = Object.create(cBaseFunction.prototype);
@@ -4861,26 +4706,26 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea3D && arg1 instanceof cArea3D) {
-			return this.value = sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
+			return sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray || arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix();
 		} else if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = sumX2MY2(arg0, arg1, false);
+		return sumX2MY2(arg0, arg1, false);
 	};
 
 	/**
@@ -4888,8 +4733,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSUMXMY2() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSUMXMY2.prototype = Object.create(cBaseFunction.prototype);
@@ -4944,26 +4787,26 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea3D && arg1 instanceof cArea3D) {
-			return this.value = sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
+			return sumX2MY2(arg0.getMatrix(), arg1.getMatrix(), true);
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
 			arg0 = arg0.getMatrix();
 		} else if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray || arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix();
 		} else if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = sumX2MY2(arg0, arg1, false);
+		return sumX2MY2(arg0, arg1, false);
 	};
 
 	/**
@@ -4971,8 +4814,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTAN.prototype = Object.create(cBaseFunction.prototype);
@@ -4987,7 +4828,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -4999,9 +4840,9 @@
 			})
 		} else {
 			var a = Math.tan(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -5009,8 +4850,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTANH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTANH.prototype = Object.create(cBaseFunction.prototype);
@@ -5025,7 +4864,7 @@
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -5037,9 +4876,9 @@
 			})
 		} else {
 			var a = Math.tanh(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -5047,8 +4886,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRUNC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTRUNC.prototype = Object.create(cBaseFunction.prototype);
@@ -5078,18 +4915,18 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 			if (arg0 instanceof cError) {
-				return this.value = arg0;
+				return arg0;
 			} else if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg0 = arg0.tocNumber();
 			}
@@ -5100,9 +4937,9 @@
 		if (arg1 instanceof cRef || arg1 instanceof cRef3D) {
 			arg1 = arg1.getValue();
 			if (arg1 instanceof cError) {
-				return this.value = arg1;
+				return arg1;
 			} else if (arg1 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			} else {
 				arg1 = arg1.tocNumber();
 			}
@@ -5112,7 +4949,7 @@
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
 			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
+				return new cError(cErrorType.not_available);
 			} else {
 				arg0.foreach(function (elem, r, c) {
 					var a = elem;
@@ -5123,7 +4960,7 @@
 						this.array[r][c] = new cError(cErrorType.wrong_value_type);
 					}
 				});
-				return this.value = arg0;
+				return arg0;
 			}
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
@@ -5135,7 +4972,7 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg0;
+			return arg0;
 		} else if (arg1 instanceof cArray) {
 			arg1.foreach(function (elem, r, c) {
 				var a = arg0;
@@ -5146,10 +4983,10 @@
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
 			});
-			return this.value = arg1;
+			return arg1;
 		}
 
-		return this.value = truncHelper(arg0.getValue(), arg1.getValue());
+		return truncHelper(arg0.getValue(), arg1.getValue());
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

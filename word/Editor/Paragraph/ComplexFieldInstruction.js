@@ -56,7 +56,7 @@ function CFieldInstructionBase()
 CFieldInstructionBase.prototype.Type = fieldtype_UNKNOWN;
 CFieldInstructionBase.prototype.GetFieldCode = function()
 {
-	return this.FieldCode;
+	return this.Type;
 };
 
 /**
@@ -120,7 +120,7 @@ function CFieldInstructionTOC()
 
 CFieldInstructionTOC.prototype = Object.create(CFieldInstructionBase.prototype);
 CFieldInstructionTOC.prototype.constructor = CFieldInstructionTOC;
-CFieldInstructionTOC.prototype.Type = fieldtype_PAGEREF;
+CFieldInstructionTOC.prototype.Type = fieldtype_TOC;
 
 
 /**

@@ -3706,8 +3706,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVEDEV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVEDEV.prototype = Object.create(cBaseFunction.prototype);
@@ -3759,7 +3757,7 @@ function (window, undefined) {
 			a += Math.abs(_func[sum.type][arrX[i].type](sum, arrX[i], "-").getValue());
 		}
 
-		return this.value = new cNumber(a / count);
+		return new cNumber(a / count);
 	};
 
 	/**
@@ -3767,8 +3765,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGE.prototype = Object.create(cBaseFunction.prototype);
@@ -3789,7 +3785,7 @@ function (window, undefined) {
 						sum = _func[sum.type][_argV.type](sum, _argV, "+");
 						count++;
 					} else if (cElementType.error === _argV.type) {
-						return this.value = _argV;
+						return _argV;
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
@@ -3804,7 +3800,7 @@ function (window, undefined) {
 						sum = _func[sum.type][__arg.type](sum, __arg, "+");
 						count++;
 					} else if (cElementType.error === __arg.type) {
-						return this.value = __arg;
+						return __arg;
 					}
 				}
 			} else if (cElementType.array === _arg.type) {
@@ -3822,13 +3818,13 @@ function (window, undefined) {
 			} else {
 				_arg = _arg.tocNumber();
 				if (cElementType.error === _arg.type) {
-					return this.value = _arg;
+					return _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
 				count++;
 			}
 		}
-		return this.value = new cNumber(sum.getValue() / count);
+		return new cNumber(sum.getValue() / count);
 	};
 
 	/**
@@ -3836,8 +3832,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEA.prototype = Object.create(cBaseFunction.prototype);
@@ -3883,13 +3877,13 @@ function (window, undefined) {
 			} else {
 				_arg = _arg.tocNumber();
 				if (cElementType.error === _arg.type) {
-					return this.value = _arg;
+					return _arg;
 				}
 				sum = _func[sum.type][_arg.type](sum, _arg, "+");
 				count++;
 			}
 		}
-		return this.value = new cNumber(sum.getValue() / count);
+		return new cNumber(sum.getValue() / count);
 	};
 
 	/**
@@ -3897,8 +3891,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
@@ -3912,7 +3904,7 @@ function (window, undefined) {
 				arg0.type) ||
 			(cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type && cElementType.cellsRange !==
 				arg2.type)) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -3924,7 +3916,7 @@ function (window, undefined) {
 		arg1 = arg1.tocString();
 
 		if (cElementType.string !== arg1.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var r = arg0.getRange();
@@ -3968,7 +3960,7 @@ function (window, undefined) {
 		if (0 === _count) {
 			return new cError(cErrorType.division_by_zero);
 		} else {
-			return this.value = new cNumber(_sum / _count);
+			return new cNumber(_sum / _count);
 		}
 	};
 
@@ -3977,8 +3969,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cAVERAGEIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -3989,7 +3979,7 @@ function (window, undefined) {
 		var arg0 = arg[0];
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var arg0Matrix = arg0.getMatrix();
@@ -4000,7 +3990,7 @@ function (window, undefined) {
 
 			if ((cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type && cElementType.cellsRange !==
 					arg1.type)) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
@@ -4011,18 +4001,18 @@ function (window, undefined) {
 
 			arg2 = arg2.tocString();
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -4047,13 +4037,10 @@ function (window, undefined) {
 		if (0 === _count) {
 			return new cError(cErrorType.division_by_zero);
 		} else {
-			return this.value = new cNumber(_sum / _count);
+			return new cNumber(_sum / _count);
 		}
 	};
 	cAVERAGEIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -4062,8 +4049,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETADIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4084,7 +4069,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcBeta = function (argArray) {
@@ -4112,7 +4097,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
+		return this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
 
 	/**
@@ -4120,8 +4105,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETA_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETA_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4144,7 +4127,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcBeta = function (argArray) {
@@ -4170,7 +4153,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
+		return this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
 
 	/**
@@ -4178,8 +4161,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBETA_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -4201,7 +4182,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -4228,7 +4209,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -4236,8 +4217,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBINOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4256,7 +4235,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function binomdist(x, n, p) {
@@ -4288,7 +4267,7 @@ function (window, undefined) {
 			}
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+		return this._findArrayInNumberArguments(oArguments, calcBinom);
 	};
 
 	/**
@@ -4296,8 +4275,6 @@ function (window, undefined) {
 	 * @extends {cBINOMDIST}
 	 */
 	function cBINOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
@@ -4310,8 +4287,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cBINOM_DIST_RANGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
@@ -4331,7 +4306,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function binomdist(x, n, p) {
@@ -4357,7 +4332,7 @@ function (window, undefined) {
 			return new cNumber(summ);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+		return this._findArrayInNumberArguments(oArguments, calcBinom);
 	};
 
 
@@ -4366,8 +4341,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHIDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHIDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4384,7 +4357,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4399,7 +4372,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4407,8 +4380,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHIINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
@@ -4425,7 +4396,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4448,7 +4419,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4456,8 +4427,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -4476,7 +4445,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4499,10 +4468,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4510,8 +4479,6 @@ function (window, undefined) {
 	 * @extends {cCHIDIST}
 	 */
 	function cCHISQ_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_DIST_RT.prototype = Object.create(cCHIDIST.prototype);
@@ -4524,8 +4491,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -4543,7 +4508,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4566,7 +4531,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4574,8 +4539,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHISQ_INV_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	//TODO check max 64 iterations(from documentaion)
@@ -4594,7 +4557,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -4617,7 +4580,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -4625,8 +4588,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHITEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
@@ -4639,10 +4600,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -4659,7 +4620,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcChitest(argArray) {
@@ -4670,7 +4631,7 @@ function (window, undefined) {
 			return chiTest(arg1, arg2);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcChitest);
+		return this._findArrayInNumberArguments(oArguments, calcChitest);
 	};
 
 	/**
@@ -4678,8 +4639,6 @@ function (window, undefined) {
 	 * @extends {cCHITEST}
 	 */
 	function cCHISQ_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCHISQ_TEST.prototype = Object.create(cCHITEST.prototype);
@@ -4692,8 +4651,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONFIDENCE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE.prototype = Object.create(cBaseFunction.prototype);
@@ -4712,7 +4669,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcConfidence = function (argArray) {
@@ -4727,7 +4684,7 @@ function (window, undefined) {
 			return new cNumber(gaussinv(1 - alpha / 2) * stdev_sigma / Math.sqrt(size));
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
+		return this._findArrayInNumberArguments(oArguments, calcConfidence);
 	};
 
 	/**
@@ -4735,8 +4692,6 @@ function (window, undefined) {
 	 * @extends {cCONFIDENCE}
 	 */
 	function cCONFIDENCE_NORM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE_NORM.prototype = Object.create(cCONFIDENCE.prototype);
@@ -4749,8 +4704,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCONFIDENCE_T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCONFIDENCE_T.prototype = Object.create(cBaseFunction.prototype);
@@ -4770,7 +4723,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcConfidence = function (argArray) {
@@ -4794,7 +4747,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
+		return this._findArrayInNumberArguments(oArguments, calcConfidence);
 	};
 
 	/**
@@ -4802,8 +4755,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCORREL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCORREL.prototype = Object.create(cBaseFunction.prototype);
@@ -4861,7 +4812,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -4871,10 +4822,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = correl(arr0, arr1);
+		return correl(arr0, arr1);
 
 	};
 
@@ -4883,8 +4834,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNT.prototype = Object.create(cBaseFunction.prototype);
@@ -4926,7 +4875,7 @@ function (window, undefined) {
 				})
 			}
 		}
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 	/**
@@ -4934,8 +4883,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
@@ -4972,7 +4919,7 @@ function (window, undefined) {
 				count++;
 			}
 		}
-		return this.value = new cNumber(count);
+		return new cNumber(count);
 	};
 
 	/**
@@ -4980,8 +4927,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTBLANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
@@ -4993,11 +4938,11 @@ function (window, undefined) {
 	cCOUNTBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			return this.value = arg0.countCells();
+			return arg0.countCells();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			return this.value = new cNumber(1);
+			return new cNumber(1);
 		} else {
-			return this.value = new cError(cErrorType.bad_reference);
+			return new cError(cErrorType.bad_reference);
 		}
 	};
 
@@ -5006,8 +4951,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
@@ -5020,7 +4963,7 @@ function (window, undefined) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -5034,7 +4977,7 @@ function (window, undefined) {
 		/*arg1 = arg1.tocString();
 
 		 if (cElementType.string !== arg1.type) {
-		 return this.value = new cError(cErrorType.wrong_value_type);
+		 return new cError(cErrorType.wrong_value_type);
 		 }*/
 
 		var val;
@@ -5053,7 +4996,7 @@ function (window, undefined) {
 			_count += matching(val, matchingInfo);
 		}
 
-		return this.value = new cNumber(_count);
+		return new cNumber(_count);
 	};
 
 	/**
@@ -5061,8 +5004,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOUNTIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -5079,7 +5020,7 @@ function (window, undefined) {
 			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 				cElementType.cellsRange !== arg0.type &&
 				!(cElementType.cellsRange3D === arg0.type && arg0.isSingleSheet())) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
@@ -5090,7 +5031,7 @@ function (window, undefined) {
 
 			arg1 = arg1.tocString();
 			if (cElementType.string !== arg1.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg1);
@@ -5102,11 +5043,11 @@ function (window, undefined) {
 				arg0Matrix = arg1Matrix;
 			}
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !matching(arg1Matrix[i][j], matchingInfo)) {
@@ -5123,12 +5064,9 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = new cNumber(_count);
+		return new cNumber(_count);
 	};
 	cCOUNTIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 0 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -5137,8 +5075,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVAR.prototype = Object.create(cBaseFunction.prototype);
@@ -5190,7 +5126,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -5200,10 +5136,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = covar(arr0, arr1);
+		return covar(arr0, arr1);
 
 	};
 
@@ -5212,8 +5148,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVARIANCE_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVARIANCE_P.prototype = Object.create(cBaseFunction.prototype);
@@ -5227,10 +5161,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -5247,7 +5181,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function pearson(argArray) {
@@ -5299,7 +5233,7 @@ function (window, undefined) {
 			return new cNumber(sumXDeltaYDelta / xLength);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
+		return this._findArrayInNumberArguments(oArguments, pearson);
 	};
 
 	/**
@@ -5307,8 +5241,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCOVARIANCE_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCOVARIANCE_S.prototype = Object.create(cBaseFunction.prototype);
@@ -5322,10 +5254,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -5342,7 +5274,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function pearson(argArray) {
@@ -5398,7 +5330,7 @@ function (window, undefined) {
 			return new cNumber(sumXDeltaYDelta / (xLength - 1));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
+		return this._findArrayInNumberArguments(oArguments, pearson);
 	};
 
 	/**
@@ -5406,8 +5338,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCRITBINOM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cCRITBINOM.prototype = Object.create(cBaseFunction.prototype);
@@ -5426,7 +5356,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function critbinom(argArray) {
@@ -5465,7 +5395,7 @@ function (window, undefined) {
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, critbinom);
+		return this._findArrayInNumberArguments(oArguments, critbinom);
 	};
 
 	/**
@@ -5473,8 +5403,6 @@ function (window, undefined) {
 	 * @extends {cCRITBINOM}
 	 */
 	function cBINOM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cBINOM_INV.prototype = Object.create(cCRITBINOM.prototype);
@@ -5487,8 +5415,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDEVSQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDEVSQ.prototype = Object.create(cBaseFunction.prototype);
@@ -5548,11 +5474,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = devsq(arr0);
+		return devsq(arr0);
 
 	};
 
@@ -5561,8 +5487,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXPON_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXPON_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5581,7 +5505,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5602,7 +5526,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5610,8 +5534,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEXPONDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEXPONDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5645,23 +5567,23 @@ function (window, undefined) {
 		arg2 = arg2.tocBool();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		if (arg0.getValue() < 0 || arg2.getValue() <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		if (arg2.toBool()) {
-			return this.value = new cNumber(1 - Math.exp(-arg1.getValue() * arg0.getValue()));
+			return new cNumber(1 - Math.exp(-arg1.getValue() * arg0.getValue()));
 		} else {
-			return this.value = new cNumber(arg1.getValue() * Math.exp(-arg1.getValue() * arg0.getValue()));
+			return new cNumber(arg1.getValue() * Math.exp(-arg1.getValue() * arg0.getValue()));
 		}
 	};
 
@@ -5670,8 +5592,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5692,7 +5612,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5716,7 +5636,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5724,8 +5644,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
@@ -5744,7 +5662,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5761,10 +5679,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5772,8 +5690,6 @@ function (window, undefined) {
 	 * @extends {cF_DIST_RT}
 	 */
 	function cFDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFDIST.prototype = Object.create(cF_DIST_RT.prototype);
@@ -5786,8 +5702,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cF_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -5806,7 +5720,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5831,10 +5745,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5842,8 +5756,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFINV.prototype = Object.create(cBaseFunction.prototype);
@@ -5861,7 +5773,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFDist = function (argArray) {
@@ -5886,10 +5798,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+		return this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
 
 	/**
@@ -5897,8 +5809,6 @@ function (window, undefined) {
 	 * @extends {cFINV}
 	 */
 	function cF_INV_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_INV_RT.prototype = Object.create(cFINV.prototype);
@@ -5911,8 +5821,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFISHER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFISHER.prototype = Object.create(cBaseFunction.prototype);
@@ -5932,7 +5840,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -5944,9 +5852,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = fisher(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -5955,8 +5863,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFISHERINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFISHERINV.prototype = Object.create(cBaseFunction.prototype);
@@ -5976,7 +5882,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -5988,9 +5894,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = fisherInv(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 
 	};
 
@@ -5999,8 +5905,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST.prototype = Object.create(cBaseFunction.prototype);
@@ -6064,7 +5968,7 @@ function (window, undefined) {
 		arg0 = arg0.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 
@@ -6075,7 +5979,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg2 instanceof cArea) {
@@ -6085,10 +5989,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = forecast(arg0, arr0, arr1);
+		return forecast(arg0, arr0, arr1);
 
 	};
 
@@ -6097,8 +6001,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
@@ -6122,7 +6024,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pTMat = argClone[0];
@@ -6160,8 +6062,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_CONFINT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
@@ -6186,7 +6086,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pTMat = argClone[0];
@@ -6238,8 +6138,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_SEASONALITY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
@@ -6259,7 +6157,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pMatY = argClone[0];
@@ -6293,8 +6191,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFORECAST_ETS_STAT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
@@ -6316,7 +6212,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var pMatY = argClone[0];
@@ -6357,8 +6253,6 @@ function (window, undefined) {
 	 * @extends {cFORECAST}
 	 */
 	function cFORECAST_LINEAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFORECAST_LINEAR.prototype = Object.create(cFORECAST.prototype);
@@ -6371,8 +6265,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFREQUENCY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFREQUENCY.prototype = Object.create(cBaseFunction.prototype);
@@ -6435,7 +6327,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray) {
@@ -6443,10 +6335,10 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
-		return this.value = frequency(arg0, arg1);
+		return frequency(arg0, arg1);
 
 	};
 
@@ -6455,8 +6347,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cFTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -6471,7 +6361,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcFTest = function (argArray) {
@@ -6481,7 +6371,7 @@ function (window, undefined) {
 			return fTest(arg0, arg1);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFTest);
+		return this._findArrayInNumberArguments(oArguments, calcFTest);
 	};
 
 
@@ -6490,8 +6380,6 @@ function (window, undefined) {
 	 * @extends {cFTEST}
 	 */
 	function cF_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cF_TEST.prototype = Object.create(cFTEST.prototype);
@@ -6503,8 +6391,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
@@ -6521,7 +6407,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6532,7 +6418,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6540,8 +6426,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -6561,7 +6445,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6584,7 +6468,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6592,8 +6476,6 @@ function (window, undefined) {
 	 * @extends {cGAMMA_DIST}
 	 */
 	function cGAMMADIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMADIST.prototype = Object.create(cGAMMA_DIST.prototype);
@@ -6605,8 +6487,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -6625,7 +6505,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6656,7 +6536,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6664,8 +6544,6 @@ function (window, undefined) {
 	 * @extends {cGAMMA_INV}
 	 */
 	function cGAMMAINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMAINV.prototype = Object.create(cGAMMA_INV.prototype);
@@ -6677,8 +6555,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMALN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMALN.prototype = Object.create(cBaseFunction.prototype);
@@ -6701,7 +6577,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -6713,9 +6589,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = getLogGamma(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -6723,8 +6599,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMALN_PRECISE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAMMALN_PRECISE.prototype = Object.create(cBaseFunction.prototype);
@@ -6741,7 +6615,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGamma = function (argArray) {
@@ -6749,7 +6623,7 @@ function (window, undefined) {
 			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
 
 	/**
@@ -6757,8 +6631,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAUSS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGAUSS.prototype = Object.create(cBaseFunction.prototype);
@@ -6775,7 +6647,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcGauss = function (argArray) {
@@ -6783,7 +6655,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGauss);
+		return this._findArrayInNumberArguments(oArguments, calcGauss);
 	};
 
 	/**
@@ -6791,8 +6663,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGEOMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGEOMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -6850,11 +6720,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber) {
 				arr0.push(arg[j].tocNumber());
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = geommean(arr0);
+		return geommean(arr0);
 
 	};
 
@@ -6863,8 +6733,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGROWTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cGROWTH.prototype = Object.create(cBaseFunction.prototype);
@@ -6876,7 +6744,7 @@ function (window, undefined) {
 
 		var prepeareArgs = prepeareGrowthTrendCalculation(this, arg);
 		if (cElementType.error === prepeareArgs.type) {
-			return this.value = prepeareArgs;
+			return prepeareArgs;
 		}
 		var pMatY = prepeareArgs.pMatY;
 		var pMatX = prepeareArgs.pMatX;
@@ -6885,9 +6753,9 @@ function (window, undefined) {
 		var res = CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant, true);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -6896,8 +6764,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHARMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHARMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -6961,11 +6827,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString && arg[j].tocNumber() instanceof cNumber) {
 				arr0.push(arg[j].tocNumber());
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = harmmean(arr0);
+		return harmmean(arr0);
 
 	};
 
@@ -6974,8 +6840,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPGEOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHYPGEOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7016,16 +6880,16 @@ function (window, undefined) {
 		arg3 = arg3.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
 
@@ -7033,10 +6897,10 @@ function (window, undefined) {
 			arg0.getValue() < Math.max(0, arg1.getValue() - arg3.getValue() + arg2.getValue()) ||
 			arg1.getValue() <= 0 || arg1.getValue() > arg3.getValue() || arg2.getValue() <= 0 ||
 			arg2.getValue() > arg3.getValue() || arg3.getValue() <= 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(Math.binomCoeff(arg2.getValue(), arg0.getValue()) *
+		return new cNumber(Math.binomCoeff(arg2.getValue(), arg0.getValue()) *
 			Math.binomCoeff(arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue()) /
 			Math.binomCoeff(arg3.getValue(), arg1.getValue()));
 
@@ -7047,8 +6911,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHYPGEOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7069,7 +6931,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function hypgeomdist(argArray) {
@@ -7106,7 +6968,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, hypgeomdist);
+		return this._findArrayInNumberArguments(oArguments, hypgeomdist);
 	};
 
 	/**
@@ -7114,8 +6976,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cINTERCEPT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cINTERCEPT.prototype = Object.create(cBaseFunction.prototype);
@@ -7173,7 +7033,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -7183,10 +7043,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = intercept(arr0, arr1);
+		return intercept(arr0, arr1);
 
 	};
 
@@ -7195,8 +7055,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cKURT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cKURT.prototype = Object.create(cBaseFunction.prototype);
@@ -7268,11 +7126,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = kurt(arr0);
+		return kurt(arr0);
 
 	};
 
@@ -7281,8 +7139,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLARGE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLARGE.prototype = Object.create(cBaseFunction.prototype);
@@ -7333,7 +7189,7 @@ function (window, undefined) {
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 
@@ -7344,7 +7200,7 @@ function (window, undefined) {
 		}
 
 		arg1 = arg1.tocNumber();
-		return this.value = this._getValue(arg0, arg1);
+		return this._getValue(arg0, arg1);
 	};
 
 	/**
@@ -7352,8 +7208,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLINEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLINEST.prototype = Object.create(cBaseFunction.prototype);
@@ -7384,9 +7238,9 @@ function (window, undefined) {
 		var res = CalculateRGPRKP(pMatY, pMatX, bConstant, bStats);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -7395,8 +7249,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGEST.prototype = Object.create(cBaseFunction.prototype);
@@ -7428,9 +7280,9 @@ function (window, undefined) {
 	 var res = CalculateRGPRKP( pMatY, pMatX, bConstant, bStats, true);
 
 	 if(res && res[0] && res[0][0]){
-	 return this.value = new cNumber(res[0][0]);
+	 return new cNumber(res[0][0]);
 	 }else{
-	 return this.value = new cError(cErrorType.wrong_value_type);
+	 return new cError(cErrorType.wrong_value_type);
 	 }
 	 };*/
 
@@ -7439,8 +7291,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGINV.prototype = Object.create(cBaseFunction.prototype);
@@ -7483,16 +7333,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = loginv(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return loginv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -7500,8 +7350,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7521,7 +7369,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var normdist = function (argArray) {
@@ -7551,7 +7399,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
+		return this._findArrayInNumberArguments(oArguments, normdist);
 	};
 
 	/**
@@ -7559,8 +7407,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORM_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -7579,7 +7425,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var normdist = function (argArray) {
@@ -7597,7 +7443,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
+		return this._findArrayInNumberArguments(oArguments, normdist);
 	};
 
 	/**
@@ -7605,8 +7451,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cLOGNORMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cLOGNORMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -7649,16 +7493,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return normdist(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -7666,8 +7510,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAX.prototype = Object.create(cBaseFunction.prototype);
@@ -7682,7 +7524,7 @@ function (window, undefined) {
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 				if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
+						return argIVal;
 					}
 					if (cElementType.number === argIVal.type) {
 						v = argIVal.tocNumber();
@@ -7701,11 +7543,11 @@ function (window, undefined) {
 							max = v.getValue();
 						}
 					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 				}
 			} else if (cElementType.error === element.type) {
-				return this.value = element;
+				return element;
 			} else if (cElementType.string === element.type) {
 				v = element.tocNumber();
 				if (cElementType.number === v.type) {
@@ -7730,7 +7572,7 @@ function (window, undefined) {
 					}
 				});
 				if (cElementType.error === max.type) {
-					return this.value = max;
+					return max;
 				}
 			} else {
 				if (element.getValue() > max) {
@@ -7738,7 +7580,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
+		return (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
 	};
 
 	/**
@@ -7746,8 +7588,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAXA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAXA.prototype = Object.create(cBaseFunction.prototype);
@@ -7762,7 +7602,7 @@ function (window, undefined) {
 			if (argI instanceof cRef || argI instanceof cRef3D) {
 
 				if (argIVal instanceof cError) {
-					return this.value = argIVal;
+					return argIVal;
 				}
 
 				v = argIVal.tocNumber();
@@ -7775,7 +7615,7 @@ function (window, undefined) {
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					v = argArr[j].tocNumber();
@@ -7785,7 +7625,7 @@ function (window, undefined) {
 					}
 				}
 			} else if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			} else if (argI instanceof cString) {
 				v = argI.tocNumber();
 				if (v instanceof cNumber) {
@@ -7811,7 +7651,7 @@ function (window, undefined) {
 					}
 				});
 				if (max instanceof cError) {
-					return this.value = max;
+					return max;
 				}
 			} else {
 				if (argI.getValue() > max) {
@@ -7819,7 +7659,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
+		return ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
 	};
 
 	/**
@@ -7827,8 +7667,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMAXIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMAXIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -7843,10 +7681,10 @@ function (window, undefined) {
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -7861,10 +7699,10 @@ function (window, undefined) {
 				if (cElementType.cellsRange3D === arg1.type) {
 					arg1 = arg1.tocArea();
 					if (!arg1) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
@@ -7877,20 +7715,20 @@ function (window, undefined) {
 			arg2 = arg2.tocString();
 
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			//compare
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -7915,19 +7753,16 @@ function (window, undefined) {
 		}
 
 		if (0 === resArr.length) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		resArr.sort(function (a, b) {
 			return b - a;
 		});
 
-		return this.value = new cNumber(resArr[0]);
+		return new cNumber(resArr[0]);
 	};
 	cMAXIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -7936,8 +7771,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINIFS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINIFS.prototype = Object.create(cBaseFunction.prototype);
@@ -7952,10 +7785,10 @@ function (window, undefined) {
 			if (cElementType.cellsRange3D === arg0.type) {
 				arg0 = arg0.tocArea();
 				if (!arg0) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		}
 
@@ -7970,10 +7803,10 @@ function (window, undefined) {
 				if (cElementType.cellsRange3D === arg1.type) {
 					arg1 = arg1.tocArea();
 					if (!arg1) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 				} else {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 
@@ -7986,20 +7819,20 @@ function (window, undefined) {
 			arg2 = arg2.tocString();
 
 			if (cElementType.string !== arg2.type) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
 			if (arg0Matrix.length !== arg1Matrix.length) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 			//compare
 			for (i = 0; i < arg1Matrix.length; ++i) {
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				}
 				for (j = 0; j < arg1Matrix[i].length; ++j) {
 					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
@@ -8024,19 +7857,16 @@ function (window, undefined) {
 		}
 
 		if (0 === resArr.length) {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 		resArr.sort(function (a, b) {
 			return a - b;
 		});
 
-		return this.value = new cNumber(resArr[0]);
+		return new cNumber(resArr[0]);
 	};
 	cMINIFS.prototype.checkArguments = function (countArguments) {
-		if(undefined === countArguments){
-			countArguments = this.argumentsCurrent;
-		}
 		return 1 === countArguments % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
@@ -8045,8 +7875,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMEDIAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMEDIAN.prototype = Object.create(cBaseFunction.prototype);
@@ -8105,11 +7933,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = median(arr0);
+		return median(arr0);
 
 	};
 
@@ -8118,8 +7946,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMIN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMIN.prototype = Object.create(cBaseFunction.prototype);
@@ -8134,7 +7960,7 @@ function (window, undefined) {
 			if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
 				if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
 					if (cElementType.error === argIVal.type) {
-						return this.value = argIVal;
+						return argIVal;
 					}
 					if (cElementType.number === argIVal.type) {
 						v = argIVal.tocNumber();
@@ -8154,11 +7980,11 @@ function (window, undefined) {
 						}
 						continue;
 					} else if (cElementType.error === argArr[j].type) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 				}
 			} else if (cElementType.error === element.type) {
-				return this.value = element;
+				return element;
 			} else if (cElementType.string === element.type) {
 				v = element.tocNumber();
 				if (cElementType.number === v.type) {
@@ -8183,7 +8009,7 @@ function (window, undefined) {
 					}
 				});
 				if (cElementType.error === min.type) {
-					return this.value = min;
+					return min;
 				}
 			} else {
 				if (element.getValue() < min) {
@@ -8191,7 +8017,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
+		return ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
 	};
 
 	/**
@@ -8199,8 +8025,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINA.prototype = Object.create(cBaseFunction.prototype);
@@ -8215,7 +8039,7 @@ function (window, undefined) {
 			if (argI instanceof cRef || argI instanceof cRef3D) {
 
 				if (argIVal instanceof cError) {
-					return this.value = argIVal;
+					return argIVal;
 				}
 
 				v = argIVal.tocNumber();
@@ -8228,7 +8052,7 @@ function (window, undefined) {
 				for (var j = 0; j < argArr.length; j++) {
 
 					if (argArr[j] instanceof cError) {
-						return this.value = argArr[j];
+						return argArr[j];
 					}
 
 					v = argArr[j].tocNumber();
@@ -8238,7 +8062,7 @@ function (window, undefined) {
 					}
 				}
 			} else if (argI instanceof cError) {
-				return this.value = argI;
+				return argI;
 			} else if (argI instanceof cString) {
 				v = argI.tocNumber();
 				if (v instanceof cNumber) {
@@ -8265,7 +8089,7 @@ function (window, undefined) {
 					}
 				});
 				if (min instanceof cError) {
-					return this.value = min;
+					return min;
 				}
 			} else {
 				if (argI.getValue() < min) {
@@ -8273,7 +8097,7 @@ function (window, undefined) {
 				}
 			}
 		}
-		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
+		return ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
 	};
 
 	/**
@@ -8281,8 +8105,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMODE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE.prototype = Object.create(cBaseFunction.prototype);
@@ -8361,11 +8183,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = mode(arr0);
+		return mode(arr0);
 
 	};
 
@@ -8375,8 +8197,6 @@ function (window, undefined) {
 	 */
 	//TODO разницы в работе функций cMODE_MULT и cMODE не нашёл, но в LO обработки немного разные. проверить!
 	function cMODE_MULT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE_MULT.prototype = Object.create(cMODE.prototype);
@@ -8389,8 +8209,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cMODE_SNGL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMODE_SNGL.prototype = Object.create(cMODE.prototype);
@@ -8403,8 +8221,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8422,7 +8238,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function negbinomdist(argArray) {
@@ -8436,7 +8252,7 @@ function (window, undefined) {
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
+		return this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**
@@ -8444,8 +8260,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8465,7 +8279,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function negbinomdist(argArray) {
@@ -8488,7 +8302,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
+		return this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**
@@ -8496,8 +8310,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8552,20 +8364,20 @@ function (window, undefined) {
 		arg3 = arg3.tocBool();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
 
-		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
+		return normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
 	};
 
 
@@ -8574,8 +8386,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cNORM_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_DIST.prototype = Object.create(cNORMDIST.prototype);
@@ -8588,8 +8398,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMINV.prototype = Object.create(cBaseFunction.prototype);
@@ -8632,16 +8440,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = norminv(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return norminv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -8649,8 +8457,6 @@ function (window, undefined) {
 	 * @extends {cNORMINV}
 	 */
 	function cNORM_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_INV.prototype = Object.create(cNORMINV.prototype);
@@ -8663,8 +8469,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMSDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMSDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8679,7 +8483,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -8691,9 +8495,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = 0.5 + gauss(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -8701,8 +8505,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORM_S_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -8734,10 +8536,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, normDistCalc);
+		return this._findArrayInNumberArguments(oArguments, normDistCalc);
 	};
 
 	/**
@@ -8745,8 +8547,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMSINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORMSINV.prototype = Object.create(cBaseFunction.prototype);
@@ -8770,7 +8570,7 @@ function (window, undefined) {
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber) {
@@ -8782,9 +8582,9 @@ function (window, undefined) {
 			})
 		} else {
 			var a = normsinv(arg0.getValue());
-			return this.value = isNaN(a) ? new cError(cErrorType.not_available) : new cNumber(a);
+			return isNaN(a) ? new cError(cErrorType.not_available) : new cNumber(a);
 		}
-		return this.value = arg0;
+		return arg0;
 	};
 
 	/**
@@ -8792,8 +8592,6 @@ function (window, undefined) {
 	 * @extends {cNORMSINV}
 	 */
 	function cNORM_S_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNORM_S_INV.prototype = Object.create(cNORMSINV.prototype);
@@ -8806,8 +8604,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPEARSON() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPEARSON.prototype = Object.create(cBaseFunction.prototype);
@@ -8866,7 +8662,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -8876,10 +8672,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = pearson(arr0, arr1);
+		return pearson(arr0, arr1);
 
 	};
 
@@ -8888,8 +8684,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTILE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE.prototype = Object.create(cBaseFunction.prototype);
@@ -8925,10 +8719,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
+		return this._findArrayInNumberArguments(oArguments, percentile);
 	};
 
 	/**
@@ -8936,8 +8730,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTILE_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -8974,10 +8766,10 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
+		return this._findArrayInNumberArguments(oArguments, percentile);
 	};
 
 	/**
@@ -8985,8 +8777,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTILE}
 	 */
 	function cPERCENTILE_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTILE_INC.prototype = Object.create(cPERCENTILE.prototype);
@@ -8999,8 +8789,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTRANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK.prototype = Object.create(cBaseFunction.prototype);
@@ -9018,7 +8806,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPercenTrank(argArray) {
@@ -9040,7 +8828,7 @@ function (window, undefined) {
 			return percentrank(tA, fNum, k, true);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPercenTrank);
+		return this._findArrayInNumberArguments(oArguments, calcPercenTrank);
 	};
 
 	/**
@@ -9048,8 +8836,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERCENTRANK_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -9068,7 +8854,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPercenTrank(argArray) {
@@ -9090,7 +8876,7 @@ function (window, undefined) {
 			return percentrank(tA, fNum, k);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPercenTrank);
+		return this._findArrayInNumberArguments(oArguments, calcPercenTrank);
 	};
 
 	/**
@@ -9098,8 +8884,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPERCENTRANK_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERCENTRANK_INC.prototype = Object.create(cPERCENTRANK.prototype);
@@ -9112,8 +8896,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERMUT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERMUT.prototype = Object.create(cBaseFunction.prototype);
@@ -9131,7 +8913,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function permut(argArray) {
@@ -9144,7 +8926,7 @@ function (window, undefined) {
 			return new cNumber(Math.permut(n, k));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, permut);
+		return this._findArrayInNumberArguments(oArguments, permut);
 	};
 
 	/**
@@ -9152,8 +8934,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPERMUTATIONA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
@@ -9172,7 +8952,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function permutationa(argArray) {
@@ -9185,7 +8965,7 @@ function (window, undefined) {
 			return new cNumber(Math.pow(n, k));
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, permutationa);
+		return this._findArrayInNumberArguments(oArguments, permutationa);
 	};
 
 	/**
@@ -9193,8 +8973,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPHI() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPHI.prototype = Object.create(cBaseFunction.prototype);
@@ -9212,7 +8990,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcPhi(argArray) {
@@ -9221,7 +8999,7 @@ function (window, undefined) {
 			return isNaN(res) ? new cError(cErrorType.not_available) : new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcPhi);
+		return this._findArrayInNumberArguments(oArguments, calcPhi);
 	};
 
 
@@ -9230,8 +9008,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPOISSON() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPOISSON.prototype = Object.create(cBaseFunction.prototype);
@@ -9250,7 +9026,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function poisson(argArray) {
@@ -9275,7 +9051,7 @@ function (window, undefined) {
 
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, poisson);
+		return this._findArrayInNumberArguments(oArguments, poisson);
 	};
 
 	/**
@@ -9283,8 +9059,6 @@ function (window, undefined) {
 	 * @extends {cPERCENTRANK}
 	 */
 	function cPOISSON_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPOISSON_DIST.prototype = Object.create(cPOISSON.prototype);
@@ -9297,8 +9071,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cPROB() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cPROB.prototype = Object.create(cBaseFunction.prototype);
@@ -9362,7 +9134,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArray) {
@@ -9370,7 +9142,7 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArea3D) {
 			arg1 = arg1.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return new cError(cErrorType.not_available);
 		}
 
 
@@ -9392,13 +9164,13 @@ function (window, undefined) {
 		}
 
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 		if (arg3 instanceof cError) {
-			return this.value = arg3;
+			return arg3;
 		}
 
-		return this.value = prob(arg0, arg1, arg2, arg3);
+		return prob(arg0, arg1, arg2, arg3);
 
 	};
 
@@ -9407,8 +9179,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cQUARTILE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE.prototype = Object.create(cBaseFunction.prototype);
@@ -9426,7 +9196,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function quartile(argArray) {
@@ -9459,7 +9229,7 @@ function (window, undefined) {
 			return fFlag === 2 ? getMedian(tA) : getPercentile(tA, 0.25 * fFlag);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
+		return this._findArrayInNumberArguments(oArguments, quartile);
 	};
 
 	/**
@@ -9467,8 +9237,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cQUARTILE_EXC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
@@ -9487,7 +9255,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function quartile(argArray) {
@@ -9520,7 +9288,7 @@ function (window, undefined) {
 			return fFlag === 2 ? getMedian(tA) : getPercentileExclusive(tA, 0.25 * fFlag);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
+		return this._findArrayInNumberArguments(oArguments, quartile);
 	};
 
 	/**
@@ -9528,8 +9296,6 @@ function (window, undefined) {
 	 * @extends {cQUARTILE}
 	 */
 	function cQUARTILE_INC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cQUARTILE_INC.prototype = Object.create(cQUARTILE.prototype);
@@ -9542,8 +9308,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
@@ -9561,7 +9325,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcRank = function (argArray) {
@@ -9590,7 +9354,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcRank);
+		return this._findArrayInNumberArguments(oArguments, calcRank);
 	};
 
 	/**
@@ -9598,8 +9362,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRANK_AVG() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
@@ -9618,7 +9380,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcRank = function (argArray) {
@@ -9647,7 +9409,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcRank);
+		return this._findArrayInNumberArguments(oArguments, calcRank);
 	};
 
 	/**
@@ -9655,8 +9417,6 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cRANK_EQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRANK_EQ.prototype = Object.create(cRANK.prototype);
@@ -9669,8 +9429,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cRSQ() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cRSQ.prototype = Object.create(cBaseFunction.prototype);
@@ -9730,7 +9488,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -9740,10 +9498,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = rsq(arr0, arr1);
+		return rsq(arr0, arr1);
 
 	};
 
@@ -9752,8 +9510,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSKEW() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSKEW.prototype = Object.create(cBaseFunction.prototype);
@@ -9788,11 +9544,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = skew(arr0);
+		return skew(arr0);
 	};
 
 	/**
@@ -9800,8 +9556,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSKEW_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSKEW_P.prototype = Object.create(cBaseFunction.prototype);
@@ -9837,11 +9591,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = skew(arr0, true);
+		return skew(arr0, true);
 	};
 
 	/**
@@ -9849,8 +9603,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSLOPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSLOPE.prototype = Object.create(cBaseFunction.prototype);
@@ -9909,7 +9661,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -9919,10 +9671,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = slope(arr0, arr1);
+		return slope(arr0, arr1);
 
 	};
 
@@ -9931,8 +9683,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSMALL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSMALL.prototype = Object.create(cBaseFunction.prototype);
@@ -9986,7 +9736,7 @@ function (window, undefined) {
 		} else if (arg0 instanceof cArea3D) {
 			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 		} else {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 
@@ -9995,10 +9745,10 @@ function (window, undefined) {
 		} else if (arg1 instanceof cArray) {
 //        arg1 = arg1.getElement( 0 );
 			arg1.foreach(actionArray);
-			return this.value = retArr;
+			return retArr;
 		}
 
-		return this.value = frequency(arg0, arg1);
+		return frequency(arg0, arg1);
 
 	};
 
@@ -10007,8 +9757,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTANDARDIZE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTANDARDIZE.prototype = Object.create(cBaseFunction.prototype);
@@ -10051,16 +9799,16 @@ function (window, undefined) {
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
-		return this.value = standardize(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return standardize(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
 
 	/**
@@ -10068,8 +9816,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
@@ -10129,7 +9875,7 @@ function (window, undefined) {
 			return new cError(cErrorType.division_by_zero);
 		}
 
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+		return new cNumber(Math.sqrt(res / (count - 1)));
 	};
 
 	/**
@@ -10137,8 +9883,6 @@ function (window, undefined) {
 	 * @extends {cSTDEV}
 	 */
 	function cSTDEV_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
@@ -10152,8 +9896,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVA.prototype = Object.create(cBaseFunction.prototype);
@@ -10204,7 +9946,7 @@ function (window, undefined) {
 			av = member[i] - average;
 			res += av * av;
 		}
-		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+		return new cNumber(Math.sqrt(res / (count - 1)));
 	};
 
 	/**
@@ -10212,8 +9954,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVP.prototype = Object.create(cBaseFunction.prototype);
@@ -10274,11 +10014,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -10286,8 +10026,6 @@ function (window, undefined) {
 	 * @extends {cSTDEVP}
 	 */
 	function cSTDEV_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEV_P.prototype = Object.create(cSTDEVP.prototype);
@@ -10300,8 +10038,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVPA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTDEVPA.prototype = Object.create(cBaseFunction.prototype);
@@ -10375,11 +10111,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -10387,8 +10123,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTEYX() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSTEYX.prototype = Object.create(cBaseFunction.prototype);
@@ -10450,7 +10184,7 @@ function (window, undefined) {
 				arr0.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		if (arg1 instanceof cArea) {
@@ -10460,10 +10194,10 @@ function (window, undefined) {
 				arr1.push(elem);
 			});
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = steyx(arr0, arr1);
+		return steyx(arr0, arr1);
 
 	};
 
@@ -10472,8 +10206,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTDIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -10491,7 +10223,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10505,10 +10237,10 @@ function (window, undefined) {
 
 		if (argClone[1].getValue() < 1 || argClone[0].getValue() < 0 ||
 			(argClone[2].getValue() !== 1 && argClone[2].getValue() !== 2)) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10516,8 +10248,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
@@ -10536,7 +10266,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10549,10 +10279,10 @@ function (window, undefined) {
 		};
 
 		if (argClone[1].getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10560,8 +10290,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_2T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
@@ -10579,7 +10307,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10594,7 +10322,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10602,8 +10330,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_DIST_RT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
@@ -10621,7 +10347,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10640,7 +10366,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10648,8 +10374,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_INV.prototype = Object.create(cBaseFunction.prototype);
@@ -10667,7 +10391,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10700,7 +10424,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10708,8 +10432,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cT_INV_2T() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
@@ -10727,7 +10449,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTDist = function (argArray) {
@@ -10751,7 +10473,7 @@ function (window, undefined) {
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+		return this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 
 	/**
@@ -10759,8 +10481,6 @@ function (window, undefined) {
 	 * @extends {cT_INV_2T}
 	 */
 	function cTINV() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTINV.prototype = Object.create(cT_INV_2T.prototype);
@@ -10772,8 +10492,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTREND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTREND.prototype = Object.create(cBaseFunction.prototype);
@@ -10785,7 +10503,7 @@ function (window, undefined) {
 
 		var prepeareArgs = prepeareGrowthTrendCalculation(this, arg);
 		if (cElementType.error === prepeareArgs.type) {
-			return this.value = prepeareArgs;
+			return prepeareArgs;
 		}
 		var pMatY = prepeareArgs.pMatY;
 		var pMatX = prepeareArgs.pMatX;
@@ -10794,9 +10512,9 @@ function (window, undefined) {
 		var res = CalculateTrendGrowth(pMatY, pMatX, pMatNewX, bConstant);
 
 		if (res && res[0] && res[0][0]) {
-			return this.value = new cNumber(res[0][0]);
+			return new cNumber(res[0][0]);
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -10805,8 +10523,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIMMEAN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
@@ -10819,7 +10535,7 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1]];
 		//если первое значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое значение число
 		if (cElementType.number === arg[0].type) {
@@ -10834,7 +10550,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTrimMean = function (argArray) {
@@ -10875,7 +10591,7 @@ function (window, undefined) {
 			}
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTrimMean);
+		return this._findArrayInNumberArguments(oArguments, calcTrimMean);
 	};
 
 	/**
@@ -10883,8 +10599,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -10897,10 +10611,10 @@ function (window, undefined) {
 		var arg2 = [arg[0], arg[1], arg[2], arg[3]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		if (cElementType.string === arg[1].type || cElementType.bool === arg[1].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -10920,7 +10634,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcTTest = function (argArray) {
@@ -10936,7 +10650,7 @@ function (window, undefined) {
 			return tTest(arg0, arg1, arg2, arg3);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTTest);
+		return this._findArrayInNumberArguments(oArguments, calcTTest);
 	};
 
 	/**
@@ -10944,8 +10658,6 @@ function (window, undefined) {
 	 * @extends {cTTEST}
 	 */
 	function cT_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cT_TEST.prototype = Object.create(cTTEST.prototype);
@@ -10958,8 +10670,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR.prototype = Object.create(cBaseFunction.prototype);
@@ -11025,11 +10735,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				continue;
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 
 	};
 
@@ -11038,8 +10748,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARA.prototype = Object.create(cBaseFunction.prototype);
@@ -11117,11 +10825,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else if (arg[j] instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11129,8 +10837,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARP.prototype = Object.create(cBaseFunction.prototype);
@@ -11196,11 +10902,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11208,8 +10914,6 @@ function (window, undefined) {
 	 * @extends {cVARP}
 	 */
 	function cVAR_P() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR_P.prototype = Object.create(cVARP.prototype);
@@ -11222,8 +10926,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVAR_S() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVAR_S.prototype = Object.create(cBaseFunction.prototype);
@@ -11289,11 +10991,11 @@ function (window, undefined) {
 			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
 				arr0.push(new cNumber(0));
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11301,8 +11003,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARdotP() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARdotP.prototype = Object.create(cBaseFunction.prototype);
@@ -11316,8 +11016,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cVARPA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cVARPA.prototype = Object.create(cBaseFunction.prototype);
@@ -11395,11 +11093,11 @@ function (window, undefined) {
 			} else if (arg[j] instanceof cString) {
 				arr0.push(new cNumber(0));
 			} else if (elem instanceof cError) {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 
 		}
-		return this.value = _var(arr0);
+		return _var(arr0);
 	};
 
 	/**
@@ -11407,8 +11105,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEIBULL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
@@ -11427,7 +11123,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calcWeibull = function (argArray) {
@@ -11448,7 +11144,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcWeibull);
+		return this._findArrayInNumberArguments(oArguments, calcWeibull);
 	};
 
 	/**
@@ -11456,8 +11152,6 @@ function (window, undefined) {
 	 * @extends {cRANK}
 	 */
 	function cWEIBULL_DIST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL_DIST.prototype = Object.create(cWEIBULL.prototype);
@@ -11470,8 +11164,6 @@ function (window, undefined) {
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cZTEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cZTEST.prototype = Object.create(cBaseFunction.prototype);
@@ -11484,7 +11176,7 @@ function (window, undefined) {
 		var arg2 = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
 		//если первое или второе значение строка
 		if (cElementType.string === arg[0].type || cElementType.bool === arg[0].type) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		//если первое или второе значение число
 		if (cElementType.number === arg[0].type) {
@@ -11500,7 +11192,7 @@ function (window, undefined) {
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		function calcZTest(argArray) {
@@ -11550,7 +11242,7 @@ function (window, undefined) {
 			return new cNumber(res);
 		}
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcZTest);
+		return this._findArrayInNumberArguments(oArguments, calcZTest);
 	};
 
 	/**
@@ -11558,8 +11250,6 @@ function (window, undefined) {
 	 * @extends {cZTEST}
 	 */
 	function cZ_TEST() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cZ_TEST.prototype = Object.create(cZTEST.prototype);

@@ -422,7 +422,7 @@
 							if (isNaN(d)) {
 								d = g_oFormatParser.parseDate(elem.getValue());
 								if (d === null) {
-									return this.value = new cError(cErrorType.wrong_value_type);
+									return new cError(cErrorType.wrong_value_type);
 								}
 								res = d.value;
 							} else {
@@ -516,8 +516,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATE.prototype = Object.create(cBaseFunction.prototype);
@@ -549,13 +547,13 @@
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		year = arg0.getValue();
@@ -566,16 +564,17 @@
 			year += 1900;
 		}
 		if (month == 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
+		var res;
 		if (year == 1900 && month == 2 && day == 29) {
-			this.value = new cNumber(60);
+			res = new cNumber(60);
 		} else {
-			this.value = new cNumber(Math.round(new Date(Date.UTC(year, month - 1, day)).getExcelDate()));
+			res = new cNumber(Math.round(new Date(Date.UTC(year, month - 1, day)).getExcelDate()));
 		}
-		this.value.numFormat = 14;
-		return this.value;
+		res.numFormat = 14;
+		return res;
 	};
 
 	/**
@@ -583,8 +582,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEDIF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATEDIF.prototype = Object.create(cBaseFunction.prototype);
@@ -618,19 +615,19 @@
 		arg2 = arg2.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0 || val1 < 0 || val0 >= val1) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		val0 = Date.prototype.getDateFromExcel(val0);
@@ -651,45 +648,43 @@
 
 		switch (arg2.getValue().toUpperCase()) {
 			case "Y":
-				return this.value = new cNumber(dateDiff(val0, val1)[0]);
+				return new cNumber(dateDiff(val0, val1)[0]);
 				break;
 			case "M":
-				return this.value = new cNumber(dateDiff(val0, val1)[1]);
+				return new cNumber(dateDiff(val0, val1)[1]);
 				break;
 			case "D":
-				return this.value = new cNumber(parseInt((val1 - val0) / c_msPerDay));
+				return new cNumber(parseInt((val1 - val0) / c_msPerDay));
 				break;
 			case "MD":
 				if (val0.getUTCDate() > val1.getUTCDate()) {
-					this.value = new cNumber(Math.abs(
+					return new cNumber(Math.abs(
 							new Date(Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate())) -
 							new Date(Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth() + 1, val1.getUTCDate()))) /
 						c_msPerDay);
 				} else {
-					this.value = new cNumber(val1.getUTCDate() - val0.getUTCDate());
+					return new cNumber(val1.getUTCDate() - val0.getUTCDate());
 				}
-				return this.value;
 				break;
 			case "YM":
 				var d = dateDiff(val0, val1);
-				return this.value = new cNumber(d[1] - d[0] * 12);
+				return new cNumber(d[1] - d[0] * 12);
 				break;
 			case "YD":
 				if (val0.getUTCMonth() > val1.getUTCMonth()) {
-					this.value = new cNumber(Math.abs(
+					return new cNumber(Math.abs(
 							new Date(Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate())) -
 							new Date(Date.UTC(val0.getUTCFullYear() + 1, val1.getUTCMonth(), val1.getUTCDate()))) /
 						c_msPerDay);
 				} else {
-					this.value = new cNumber(Math.abs(
+					return new cNumber(Math.abs(
 							new Date(Date.UTC(val0.getUTCFullYear(), val0.getUTCMonth(), val0.getUTCDate())) -
 							new Date(Date.UTC(val0.getUTCFullYear(), val1.getUTCMonth(), val1.getUTCDate()))) /
 						c_msPerDay);
 				}
-				return this.value;
 				break;
 			default:
-				return this.value = new cError(cErrorType.not_numeric)
+				return new cError(cErrorType.not_numeric)
 		}
 
 	};
@@ -699,8 +694,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDATEVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDATEVALUE.prototype = Object.create(cBaseFunction.prototype);
@@ -721,14 +714,14 @@
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var res = g_oFormatParser.parse(arg0.getValue());
 		if (res && res.bDateTime) {
-			return this.value = new cNumber(parseInt(res.value));
+			return new cNumber(parseInt(res.value));
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -737,8 +730,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -756,7 +747,7 @@
 			val = arg0.tocNumber().getValue();
 		}
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -764,14 +755,14 @@
 			if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -781,7 +772,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				return this.setCalcValue(
@@ -805,8 +796,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAYS.prototype = Object.create(cBaseFunction.prototype);
@@ -825,7 +814,7 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var calulateDays = function (argArray) {
@@ -838,7 +827,7 @@
 			}
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calulateDays);
+		return this._findArrayInNumberArguments(oArguments, calulateDays);
 	};
 
 	/**
@@ -846,8 +835,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cDAYS360() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cDAYS360.prototype = Object.create(cBaseFunction.prototype);
@@ -882,26 +869,26 @@
 		arg2 = arg2.tocBool();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		if (arg0.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		if (arg1.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var date1 = Date.prototype.getDateFromExcel(arg0.getValue()),
 			date2 = Date.prototype.getDateFromExcel(arg1.getValue());
 
-		return this.value = new cNumber(days360(date1, date2, arg2.toBool()));
+		return new cNumber(days360(date1, date2, arg2.toBool()));
 
 	};
 
@@ -910,8 +897,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEDATE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEDATE.prototype = Object.create(cBaseFunction.prototype);
@@ -939,16 +924,16 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var val = arg0.getValue(), date, _date;
 
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -974,7 +959,7 @@
 			val = new Date(val.setUTCMonth(val.getUTCMonth() + arg1.getValue()));
 		}
 
-		return this.value = new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
+		return new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
 			(AscCommonExcel.c_DateCorrectConst + 1)))
 	};
 
@@ -983,8 +968,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cEOMONTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cEOMONTH.prototype = Object.create(cBaseFunction.prototype);
@@ -1012,16 +995,16 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var val = arg0.getValue();
 
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -1038,7 +1021,7 @@
 		val.setUTCMonth(val.getUTCMonth() + arg1.getValue());
 		val.setUTCDate(val.getDaysInMonth());
 
-		return this.value = new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
+		return new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
 			(AscCommonExcel.c_DateCorrectConst + 1)));
 	};
 
@@ -1047,8 +1030,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cHOUR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cHOUR.prototype = Object.create(cBaseFunction.prototype);
@@ -1066,17 +1047,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.value = val;
+				return val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -1085,7 +1066,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -1097,7 +1078,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else                             //1		 2 3 4					   4	3		 	 					2 1
 		{
 			return this.setCalcValue(
@@ -1110,8 +1091,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISOWEEKNUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
@@ -1130,15 +1109,15 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0];
 		if (arg0.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value = new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
+		return new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
 	};
 
 	/**
@@ -1146,8 +1125,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMINUTE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMINUTE.prototype = Object.create(cBaseFunction.prototype);
@@ -1165,17 +1142,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.value = val;
+				return val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -1184,7 +1161,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -1196,7 +1173,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else {
 			val = parseInt(( ( val * 24 - Math.floor(val * 24) ) * 60 ).toFixed(cExcelDateTimeDigits)) % 60;
 			return this.setCalcValue(new cNumber(val), 0);
@@ -1208,8 +1185,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cMONTH() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cMONTH.prototype = Object.create(cBaseFunction.prototype);
@@ -1227,24 +1202,24 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.value = val;
+				return val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -1254,7 +1229,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		if (!AscCommon.bDate1904) {
 			if (val == 60) {
@@ -1276,8 +1251,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS.prototype = Object.create(cBaseFunction.prototype);
@@ -1295,17 +1268,17 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = arg[2];
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		if (val1 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		val0 = getCorrectDate(val0);
@@ -1314,7 +1287,7 @@
 		//Holidays
 		var holidays = getHolidays(arg2);
 		if (holidays instanceof cError) {
-			return this.value = holidays;
+			return holidays;
 		}
 
 		var calcDate = function () {
@@ -1341,7 +1314,7 @@
 			return new cNumber((dif < 0 ? -1 : 1) * count);
 		};
 
-		return this.value = calcDate();
+		return calcDate();
 	};
 
 	/**
@@ -1349,8 +1322,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS_INTL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
@@ -1369,17 +1340,17 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = argClone[2], arg3 = arg[3];
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		if (val1 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		val0 = getCorrectDate(val0);
@@ -1388,13 +1359,13 @@
 		//Weekend
 		var weekends = getWeekends(arg2);
 		if (weekends instanceof cError) {
-			return this.value = weekends;
+			return weekends;
 		}
 
 		//Holidays
 		var holidays = getHolidays(arg3);
 		if (holidays instanceof cError) {
-			return this.value = holidays;
+			return holidays;
 		}
 
 		var calcDate = function () {
@@ -1421,7 +1392,7 @@
 			return new cNumber((dif < 0 ? -1 : 1) * count);
 		};
 
-		return this.value = calcDate();
+		return calcDate();
 	};
 
 	/**
@@ -1429,8 +1400,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNOW() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNOW.prototype = Object.create(cBaseFunction.prototype);
@@ -1440,10 +1409,10 @@
 	cNOW.prototype.ca = true;
 	cNOW.prototype.Calculate = function () {
 		var d = new Date();
-		this.value =
+		var res =
 			new cNumber(d.getExcelDate() + (d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay);
-		this.value.numFormat = 22;
-		return this.value;
+		res.numFormat = 22;
+		return res;
 	};
 
 	/**
@@ -1451,8 +1420,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSECOND() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSECOND.prototype = Object.create(cBaseFunction.prototype);
@@ -1470,17 +1437,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.value = val;
+				return val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -1489,7 +1456,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.value = new cError(cErrorType.wrong_value_type);
+						return new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -1501,7 +1468,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		} else {
 			val = parseInt((( val * 24 * 60 - Math.floor(val * 24 * 60) ) * 60).toFixed(cExcelDateTimeDigits)) % 60;
 			return this.setCalcValue(new cNumber(val), 0);
@@ -1513,8 +1480,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIME() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTIME.prototype = Object.create(cBaseFunction.prototype);
@@ -1546,13 +1511,13 @@
 		second = second.tocNumber();
 
 		if (hour instanceof cError) {
-			return this.value = hour;
+			return hour;
 		}
 		if (minute instanceof cError) {
-			return this.value = minute;
+			return minute;
 		}
 		if (second instanceof cError) {
-			return this.value = second;
+			return second;
 		}
 
 		hour = hour.getValue();
@@ -1560,9 +1525,9 @@
 		second = second.getValue();
 
 		var v = (hour * 60 * 60 + minute * 60 + second) / c_sPerDay;
-		this.value = new cNumber(v - Math.floor(v));
-		this.value.numFormat = 18;
-		return this.value;
+		var res = new cNumber(v - Math.floor(v));
+		res.numFormat = 18;
+		return res;
 	};
 
 	/**
@@ -1570,8 +1535,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTIMEVALUE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTIMEVALUE.prototype = Object.create(cBaseFunction.prototype);
@@ -1592,15 +1555,15 @@
 		arg0 = arg0.tocString();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		var res = g_oFormatParser.parse(arg0.getValue());
 
 		if (res && res.bDateTime) {
-			return this.value = new cNumber(res.value - parseInt(res.value));
+			return new cNumber(res.value - parseInt(res.value));
 		} else {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 	};
 
@@ -1609,8 +1572,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTODAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTODAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1619,9 +1580,9 @@
 	cTODAY.prototype.argumentsMax = 0;
 	cTODAY.prototype.ca = true;
 	cTODAY.prototype.Calculate = function () {
-		this.value = new cNumber(new Date().getExcelDate());
-		this.value.numFormat = 14;
-		return this.value;
+		var res = new cNumber(new Date().getExcelDate());
+		res.numFormat = 14;
+		return res;
 	};
 
 	/**
@@ -1629,8 +1590,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEEKDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1658,11 +1617,11 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		var weekday;
@@ -1695,13 +1654,13 @@
 				weekday = [2, 3, 4, 5, 6, 7, 1];
 				break;
 			default:
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 		}
 		if (arg0.getValue() < 0) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = new cNumber(
+		return new cNumber(
 			weekday[new Date((arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay).getUTCDay()]);
 	};
 
@@ -1710,8 +1669,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEEKNUM() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
@@ -1739,15 +1696,15 @@
 		arg1 = arg1.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 
 		if (arg0.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		var weekdayStartDay;
@@ -1782,11 +1739,10 @@
 				type = 1;
 				break;
 			default:
-				return this.value = new cError(cErrorType.not_numeric);
+				return new cError(cErrorType.not_numeric);
 		}
 
-		return this.value =
-			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
+		return new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 
 	};
 
@@ -1795,8 +1751,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY.prototype = Object.create(cBaseFunction.prototype);
@@ -1815,21 +1769,21 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = arg[2];
 
 		var val0 = arg0.getValue();
 		if (val0 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		val0 = getCorrectDate(val0);
 
 		//Holidays
 		var holidays = getHolidays(arg2);
 		if (holidays instanceof cError) {
-			return this.value = holidays;
+			return holidays;
 		}
 
 		var calcDate = function () {
@@ -1873,7 +1827,7 @@
 		};
 
 
-		return this.value = calcDate();
+		return calcDate();
 	};
 
 	/**
@@ -1881,8 +1835,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWORKDAY_INTL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
@@ -1903,30 +1855,30 @@
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
+			return argError;
 		}
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = argClone[2], arg3 = arg[3];
 
 		var val0 = arg0.getValue();
 		if (val0 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 		val0 = getCorrectDate(val0);
 
 		//Weekend
 		if (arg2 && "1111111" === arg2.getValue()) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		}
 		var weekends = getWeekends(arg2);
 		if (weekends instanceof cError) {
-			return this.value = weekends;
+			return weekends;
 		}
 
 		//Holidays
 		var holidays = getHolidays(arg3);
 		if (holidays instanceof cError) {
-			return this.value = holidays;
+			return holidays;
 		}
 
 		var calcDate = function () {
@@ -1962,7 +1914,7 @@
 			return t.setCalcValue(new cNumber(val), 14);
 		};
 
-		return this.value = calcDate();
+		return calcDate();
 	};
 
 	/**
@@ -1970,8 +1922,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEAR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cYEAR.prototype = Object.create(cBaseFunction.prototype);
@@ -1989,26 +1939,26 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			return this.value = new cError(cErrorType.wrong_value_type);
+			return new cError(cErrorType.wrong_value_type);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.value = val;
+				return val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.value = new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.value = new cError(cErrorType.wrong_value_type);
+					return new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -2031,8 +1981,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cYEARFRAC() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cYEARFRAC.prototype = Object.create(cBaseFunction.prototype);
@@ -2066,26 +2014,26 @@
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.value = arg1;
+			return arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.value = arg2;
+			return arg2;
 		}
 
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0 || val1 < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
+			return new cError(cErrorType.not_numeric);
 		}
 
 		val0 = Date.prototype.getDateFromExcel(val0);
 		val1 = Date.prototype.getDateFromExcel(val1);
 
-		return this.value = yearFrac(val0, val1, arg2.getValue());
-//    return this.value = diffDate2( val0, val1, arg2.getValue() );
+		return yearFrac(val0, val1, arg2.getValue());
+//    return diffDate2( val0, val1, arg2.getValue() );
 
 	};
 

@@ -3244,6 +3244,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					if (PRS.IsFastRecalculate())
 						break;
 
+					Item.SetXY(X + SpaceLen + WordLen, PRS.Y);
+					Item.SetPage(Para.Get_AbsolutePage(CurPage));
+
 					Item.SetRun(this);
 					if (Item.IsBegin())
 					{

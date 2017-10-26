@@ -52,6 +52,9 @@ function CParagraphBookmark(isStart, sBookmarkId, sBookmarkName)
 	this.BookmarkId   = sBookmarkId;
 	this.BookmarkName = sBookmarkName;
 	this.Use          = true;
+	this.PageAbs      = 1;
+	this.X            = 0;
+	this.Y            = 0;
 
 	AscCommon.g_oTableId.Add(this, this.Id);
 }
@@ -66,6 +69,10 @@ CParagraphBookmark.prototype.Get_Id = function()
 CParagraphBookmark.prototype.GetId = function()
 {
 	return this.Id;
+};
+CParagraphBookmark.prototype.Copy = function()
+{
+	return new CParagraphBookmark(this.Start, this.BookmarkId, this.BookmarkName);
 };
 CParagraphBookmark.prototype.GetBookmarkId = function()
 {
@@ -90,6 +97,21 @@ CParagraphBookmark.prototype.UpdateBookmarks = function(oManager)
 CParagraphBookmark.prototype.IsStart = function()
 {
 	return this.Start;
+};
+CParagraphBookmark.prototype.Recalculate_Range = function(PRS, ParaPr)
+{
+	this.PageAbs = PRS.Paragraph.Get_AbsolutePage(PRS.Page);
+
+	this.X = PRS.X;
+	this.Y = PRS.Y;
+};
+CParagraphBookmark.prototype.GetPage = function()
+{
+	return this.PageAbs;
+};
+CParagraphBookmark.prototype.GetXY = function()
+{
+	return {X : this.X, Y : this.Y};
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

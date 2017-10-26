@@ -60,8 +60,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cERROR_TYPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cERROR_TYPE.prototype = Object.create(cBaseFunction.prototype);
@@ -110,9 +108,9 @@
 				}
 				ret.addElement(found_operand);
 			});
-			return this.value = ret;
+			return ret;
 		}
-		return this.value = typeError(arg0);
+		return typeError(arg0);
 	};
 
 	/**
@@ -120,8 +118,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISBLANK() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISBLANK.prototype = Object.create(cBaseFunction.prototype);
@@ -137,9 +133,9 @@
 			arg0 = arg0.getValue();
 		}
 		if (arg0 instanceof AscCommonExcel.cEmpty) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -148,8 +144,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISERR.prototype = Object.create(cBaseFunction.prototype);
@@ -168,9 +162,9 @@
 		}
 
 		if (arg0 instanceof cError && arg0.errorType != cErrorType.not_available) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -179,8 +173,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISERROR() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISERROR.prototype = Object.create(cBaseFunction.prototype);
@@ -199,9 +191,9 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -210,8 +202,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISEVEN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISEVEN.prototype = Object.create(cBaseFunction.prototype);
@@ -230,14 +220,14 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cBool((arg0.getValue() & 1) == 0);
+			return new cBool((arg0.getValue() & 1) == 0);
 		}
 	};
 
@@ -246,8 +236,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISFORMULA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
@@ -267,10 +255,10 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
-		return this.value = new cBool(res);
+		return new cBool(res);
 	};
 
 	/**
@@ -278,8 +266,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISLOGICAL() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISLOGICAL.prototype = Object.create(cBaseFunction.prototype);
@@ -298,9 +284,9 @@
 		}
 
 		if (arg0 instanceof cBool) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -309,8 +295,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNA.prototype = Object.create(cBaseFunction.prototype);
@@ -329,9 +313,9 @@
 		}
 
 		if (arg0 instanceof cError && arg0.errorType == cErrorType.not_available) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -340,8 +324,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNONTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNONTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -359,9 +341,9 @@
 			arg0 = arg0.getValue();
 		}
 		if (!(arg0 instanceof cString)) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -370,8 +352,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISNUMBER() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISNUMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -390,9 +370,9 @@
 		}
 
 		if (arg0 instanceof cNumber) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -401,8 +381,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISODD() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISODD.prototype = Object.create(cBaseFunction.prototype);
@@ -421,14 +399,14 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		}
 
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else {
-			return this.value = new cBool((arg0.getValue() & 1) == 1);
+			return new cBool((arg0.getValue() & 1) == 1);
 		}
 	};
 
@@ -437,8 +415,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISREF() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISREF.prototype = Object.create(cBaseFunction.prototype);
@@ -449,9 +425,9 @@
 	cISREF.prototype.Calculate = function (arg) {
 		if ((arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D ||
 			arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid()) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -460,8 +436,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cISTEXT() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cISTEXT.prototype = Object.create(cBaseFunction.prototype);
@@ -480,9 +454,9 @@
 		}
 
 		if (arg0 instanceof cString) {
-			return this.value = new cBool(true);
+			return new cBool(true);
 		} else {
-			return this.value = new cBool(false);
+			return new cBool(false);
 		}
 	};
 
@@ -491,8 +465,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cN() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cN.prototype = Object.create(cBaseFunction.prototype);
@@ -514,7 +486,7 @@
 					arr.array[r][c] = new cNumber(0);
 				}
 			});
-			return this.value = arr;
+			return arr;
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -522,11 +494,11 @@
 		}
 
 		if (arg0 instanceof cNumber || arg0 instanceof cError) {
-			return this.value = arg0;
+			return arg0;
 		} else if (arg0 instanceof cBool) {
-			return this.value = arg0.tocNumber();
+			return arg0.tocNumber();
 		} else {
-			return this.value = new cNumber(0);
+			return new cNumber(0);
 		}
 
 	};
@@ -536,8 +508,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNA() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cNA.prototype = Object.create(cBaseFunction.prototype);
@@ -545,7 +515,7 @@
 	cNA.prototype.name = 'NA';
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
-		return this.value = new cError(cErrorType.not_available);
+		return new cError(cErrorType.not_available);
 	};
 
 	/**
@@ -553,8 +523,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEET() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSHEET.prototype = Object.create(cBaseFunction.prototype);
@@ -593,7 +561,7 @@
 			res = new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value = res;
+		return res;
 	};
 
 	/**
@@ -601,8 +569,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSHEETS() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
@@ -636,7 +602,7 @@
 				res = new cError(cErrorType.not_available);
 			}
 		}
-		return this.value = res;
+		return res;
 
 	};
 
@@ -645,8 +611,6 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTYPE() {
-		this.value = null;
-		this.argumentsCurrent = 0;
 	}
 
 	cTYPE.prototype = Object.create(cBaseFunction.prototype);
@@ -663,15 +627,15 @@
 		}
 
 		if (arg0 instanceof cNumber) {
-			return this.value = new cNumber(1);
+			return new cNumber(1);
 		} else if (arg0 instanceof cString) {
-			return this.value = new cNumber(2);
+			return new cNumber(2);
 		} else if (arg0 instanceof cBool) {
-			return this.value = new cNumber(4);
+			return new cNumber(4);
 		} else if (arg0 instanceof cError) {
-			return this.value = new cNumber(16);
+			return new cNumber(16);
 		} else {
-			return this.value = new cNumber(64);
+			return new cNumber(64);
 		}
 	};
 })(window);
