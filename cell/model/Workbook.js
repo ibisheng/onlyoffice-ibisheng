@@ -2964,6 +2964,7 @@
 			}
 		}
 		//this.setTableFormulaAfterOpen();
+		this.hiddenManager.initPostOpen();
 
 		this.handlers = handlers;
 		this._setHandlersTablePart();
@@ -10621,7 +10622,10 @@
 		this.hiddenRowMin = gc_nMaxRow0;
 		this.hiddenRowMax = 0;
 	}
-
+	HiddenManager.prototype.initPostOpen = function () {
+		this.hiddenRowMin = gc_nMaxRow0;
+		this.hiddenRowMax = 0;
+	};
 	HiddenManager.prototype.addHidden = function (isRow, index) {
 		(isRow ? this.recalcHiddenRows : this.recalcHiddenCols).push(index);
 		if (isRow) {
