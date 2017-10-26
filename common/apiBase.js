@@ -280,7 +280,6 @@
 
 		if (AscCommon.offlineMode === this.documentUrl)
 		{
-			this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
 			this.DocInfo.put_OfflineApp(true);
 		}
 
@@ -469,16 +468,7 @@
 	};
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
-		var t             = this;
-		var scriptElem    = document.createElement('script');
-		scriptElem.onload = scriptElem.onerror = function()
-		{
-			t._OfflineAppDocumentEndLoad();
-		};
-
-		scriptElem.setAttribute('src', this.documentUrl + 'editor.js');
-		scriptElem.setAttribute('type', 'text/javascript');
-		document.getElementsByTagName('head')[0].appendChild(scriptElem);
+		this._OfflineAppDocumentEndLoad();
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
