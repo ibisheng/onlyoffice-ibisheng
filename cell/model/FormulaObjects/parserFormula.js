@@ -2687,11 +2687,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function parentLeft() {
-		this.argumentsCurrent = 1;
 	}
 
 	parentLeft.prototype.type = cElementType.operator;
 	parentLeft.prototype.name = "(";
+	parentLeft.prototype.argumentsCurrent = 1;
 	parentLeft.prototype.DecrementArguments = function () {
 		--this.argumentsCurrent;
 	};
@@ -4891,8 +4891,8 @@ parserFormula.prototype.setFormula = function(formula) {
 			wasLeftParentheses = true;
 			wasRigthParentheses = false;
 			found_operand = null;
-			t.elemArr.push(new cFormulaOperators[t.operand_str]());
-			t.f.push(new cFormulaOperators[t.operand_str]());
+			t.elemArr.push(cFormulaOperators[t.operand_str].prototype);
+			t.f.push(cFormulaOperators[t.operand_str].prototype);
 			leftParentArgumentsCurrentArr[t.elemArr.length - 1] = 1;
 
 			if(startSumproduct){
@@ -4905,7 +4905,7 @@ parserFormula.prototype.setFormula = function(formula) {
 
 		var parseRightParentheses = function(){
 
-			t.f.push(new cFormulaOperators[t.operand_str]());
+			t.f.push(cFormulaOperators[t.operand_str].prototype);
 			wasRigthParentheses = true;
 			var top_elem = null;
 			var top_elem_arg_count = null;
