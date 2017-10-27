@@ -1243,7 +1243,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
             var Mark = this.SearchMarks[SPos];
             var MarkPos = Mark.SearchResult.StartPos.Get(Mark.Depth);
 
-            if ( MarkPos >= StartPos && MarkPos < NearPos )
+            if (Mark.SearchResult.ClassesS.length > 0 && this === Mark.SearchResult.ClassesS[Mark.SearchResult.ClassesS.length - 1] && MarkPos >= StartPos && MarkPos < NearPos)
             {
                 NearElementId = Mark.SearchResult.Id;
                 NearPos       = MarkPos;
@@ -1271,7 +1271,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
             var Mark = this.SearchMarks[SPos];
             var MarkPos = Mark.SearchResult.StartPos.Get(Mark.Depth);
 
-            if ( MarkPos < StartPos && MarkPos > NearPos )
+            if (Mark.SearchResult.ClassesS.length > 0 && this === Mark.SearchResult.ClassesS[Mark.SearchResult.ClassesS.length - 1] && MarkPos < StartPos && MarkPos > NearPos)
             {
                 NearElementId = Mark.SearchResult.Id;
                 NearPos       = MarkPos;
