@@ -1753,6 +1753,22 @@ background-repeat: no-repeat;\
 			return AscCommon.g_clipboardBase.Button_Paste();
 		}
 	};
+
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+
+	asc_docs_api.prototype.asc_HideSpecialPasteButton = function()
+	{
+		this.sendEvent("asc_onHideSpecialPasteOptions");
+	};
+
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function(props)
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+
 	asc_docs_api.prototype.Share          = function()
 	{
 
