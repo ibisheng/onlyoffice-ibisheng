@@ -116,6 +116,8 @@ function CGraphics()
 
     this.ClearMode          = false;
     this.IsRetina           = false;
+
+    this.dash_no_smart = null;
 }
 
 CGraphics.prototype =
@@ -245,6 +247,7 @@ CGraphics.prototype =
         if (!this.m_oContext.setLineDash)
             return;
 
+	    this.dash_no_smart = params ? params.slice() : null;
         this.m_oContext.setLineDash(params ? params : []);
     },
 
@@ -2575,6 +2578,15 @@ CGraphics.prototype =
             {
                 this.SetIntegerGrid(true);
                 bIsSmartAttack = true;
+
+                if (this.dash_no_smart)
+                {
+                    for (var index = 0; index < this.dash_no_smart.length; index++)
+                        this.dash_no_smart[index] = (this.m_oCoordTransform.sx * this.dash_no_smart[index] + 0.5) >> 0;
+
+                    this.m_oContext.setLineDash(this.dash_no_smart);
+                    this.dash_no_smart = null;
+                }
             }
 
             var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
@@ -2617,6 +2629,15 @@ CGraphics.prototype =
         {
             this.SetIntegerGrid(true);
             bIsSmartAttack = true;
+
+			if (this.dash_no_smart)
+			{
+				for (var index = 0; index < this.dash_no_smart.length; index++)
+					this.dash_no_smart[index] = (this.m_oCoordTransform.sx * this.dash_no_smart[index] + 0.5) >> 0;
+
+				this.m_oContext.setLineDash(this.dash_no_smart);
+				this.dash_no_smart = null;
+			}
         }
 
         var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
