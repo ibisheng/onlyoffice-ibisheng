@@ -2193,6 +2193,14 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();
     },
 
+    GetSelectedBounds: function(){
+        var oController = this.GetCurrentController();
+        if(oController.selectedObjects.length > 0){
+            return oController.getBoundsForGroup([oController.selectedObjects[0]]);
+        }
+        return null;
+    },
+
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)
     {
         if(editor.WordControl.Thumbnails.FocusObjType === FOCUS_OBJECT_THUMBNAILS)
