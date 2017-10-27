@@ -174,6 +174,10 @@ ParaInstrText.prototype.GetValue = function()
 {
 	return String.fromCharCode(this.Value);
 };
+ParaInstrText.prototype.Set_CharCode = function(CharCode)
+{
+	this.Value = CharCode;
+};
 
 function CComplexField(oLogicDocument)
 {
@@ -235,6 +239,9 @@ CComplexField.prototype.Update = function()
 		return;
 
 	this.private_SelectFieldValue();
+
+	if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		return;
 
 	var nFieldCode = this.Instruction.GetFieldCode();
 	if (fieldtype_PAGENUM === nFieldCode)
