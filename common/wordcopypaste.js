@@ -3826,15 +3826,23 @@ PasteProcessor.prototype =
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 
-							//***TEST***
 							var stateSelection = presentation.GetSelectionState();
-							var pos = presentation.GetTargetPosition();
 							var curPage = stateSelection.CurPage;
-							var posObj = stateSelection.slideSelection[0].textObject;
-							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.X, pos.Y, curPage);
+							var pos = presentation.GetTargetPosition();
+							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+							var x, y;
+							if (null === pos) {
+								pos = presentation.GetSelectedBounds();
+								x = pos.x + pos.w;
+								y = pos.y + pos.h;
+								props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+							} else {
+								x = pos.X;
+								y = pos.Y;
+							}
+							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
 
 							var specialPasteShowOptions = new SpecialPasteShowOptions();
-							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
 							specialPasteShowOptions.asc_setOptions(props);
 							window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 
@@ -3876,7 +3884,21 @@ PasteProcessor.prototype =
 							
 							presentation.Recalculate();
 							presentation.Document_UpdateInterfaceState();
-							
+
+
+							var stateSelection = presentation.GetSelectionState();
+							var pos = presentation.GetSelectedBounds();
+							var curPage = stateSelection.CurPage;
+							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.x + pos.w, pos.y + pos.h, curPage);
+
+							var specialPasteShowOptions = new SpecialPasteShowOptions();
+							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+							specialPasteShowOptions.asc_setOptions(props);
+							window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+
+							var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
+							specialPasteShowOptions.asc_setCellCoord(curCoord);
+
 							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
 					};
