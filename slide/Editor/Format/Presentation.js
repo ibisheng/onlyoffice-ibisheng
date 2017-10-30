@@ -1468,6 +1468,35 @@ CPresentation.prototype =
     },
 
 
+    GetTargetPosition: function(){
+        var oController = this.GetCurrentController();
+        var oPosition = null;
+        if(oController){
+            var oTargetDocContent = oController.getTargetDocContent(false, false);
+            if(oTargetDocContent){
+                var oElem = oTargetDocContent.Content[oTargetDocContent.CurPos.ContentPos];
+                if(oElem){
+                    var oPos = oElem.GetTargetPos();
+                    if(oPos){
+
+                    }
+                    var x, y;
+                    if(oPos.Transform){
+                        x = oPos.Transform.TransformPointX(oPos.X, oPos.Y);
+                        y = oPos.Transform.TransformPointY(oPos.X, oPos.Y);
+                    }
+                    else{
+                        x = oPos.X;
+                        y = oPos.Y;
+                    }
+                    oPosition = {X: x, Y: y};
+                }
+            }
+        }
+        return oPosition;
+    },
+
+
 
 // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics){
