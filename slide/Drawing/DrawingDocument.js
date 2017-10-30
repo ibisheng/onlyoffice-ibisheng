@@ -3657,7 +3657,7 @@ function CThumbnailsManager()
 			return false;
 		}
 
-		if (global_keyboardEvent.CtrlKey)
+		if (global_keyboardEvent.CtrlKey && !oThis.m_oWordControl.m_oApi.isReporterMode)
 		{
 			if (oThis.m_arrPages[pos.Page].IsSelected === true)
 			{
