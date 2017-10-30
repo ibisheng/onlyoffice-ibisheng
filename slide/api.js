@@ -1844,6 +1844,37 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_SpecialPaste = function(props)
+	{
+		return AscCommon.g_clipboardBase.Special_Paste(props);
+	};
+
+	asc_docs_api.prototype.asc_SpecialPasteData = function(props)
+	{
+		if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return;
+
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+
+		//TODO пересмотреть проверку лока и добавление новой точки(AscDFH.historydescription_Document_PasteHotKey)
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
+		{
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+
+			//undo previous action
+			this.WordControl.m_oLogicDocument.Document_Undo();
+
+			//if (!useCurrentPoint) {
+			_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			//}
+
+			AscCommon.Editor_Paste_Exec(this, null, null, null, props);
+		}
+	};
+
 	asc_docs_api.prototype.asc_IsFocus = function(bIsNaturalFocus)
 	{
 		var _ret = false;

@@ -3794,6 +3794,13 @@ PasteProcessor.prototype =
 					if(docContent.length === 0){
 						return;
 					}
+
+					for (var i = 0; i < docContent.length; ++i) {
+						if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+							docContent[i].Element = this._specialPasteItemConvert(docContent[i].Element);
+						}
+					}
+
 					var presentationSelectedContent = new PresentationSelectedContent();
 					presentationSelectedContent.DocContent = new CSelectedContent();
 					presentationSelectedContent.DocContent.Elements = docContent;
