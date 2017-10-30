@@ -2402,13 +2402,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	function cBaseOperator(name, priority, argumentCount) {
 		this.name = name ? name : '';
 		this.priority = (priority !== undefined) ? priority : 10;
-		this.isRightAssociative = false;
 		this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
 		this.value = null;
 	}
 
 	cBaseOperator.prototype.type = cElementType.operator;
 	cBaseOperator.prototype.numFormat = cNumFormatFirstCell;
+	cBaseOperator.prototype.rightAssociative = false;
 	cBaseOperator.prototype.toString = function () {
 		return this.name;
 	};
@@ -2812,11 +2812,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 */
 	function cUnarMinusOperator() {
 		cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
-		this.isRightAssociative = true;
 	}
 
 	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
 	cUnarMinusOperator.prototype.constructor = cUnarMinusOperator;
+	cUnarMinusOperator.prototype.rightAssociative = true;
 	cUnarMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
@@ -2852,11 +2852,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 */
 	function cUnarPlusOperator() {
 		cBaseOperator.apply(this, ['un_plus', 49, 1]);
-		this.isRightAssociative = true;
 	}
 
 	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
 	cUnarPlusOperator.prototype.constructor = cUnarPlusOperator;
+	cUnarPlusOperator.prototype.rightAssociative = true;
 	cUnarPlusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type) {
@@ -2955,11 +2955,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 */
 	function cPercentOperator() {
 		cBaseOperator.apply(this, ['%', 45, 1]);
-		this.isRightAssociative = true;
 	}
 
 	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
 	cPercentOperator.prototype.constructor = cPercentOperator;
+	cPercentOperator.prototype.rightAssociative = true;
 	cPercentOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
@@ -4619,7 +4619,7 @@ parserFormula.prototype.setFormula = function(formula) {
 						len = stack.length;
 						while (0 !== len) {
 							tmp = stack[len - 1];
-							if (elem.isRightAssociative ? (elem.priority < tmp.priority) :
+							if (elem.rightAssociative ? (elem.priority < tmp.priority) :
 									((elem.priority <= tmp.priority))) {
 								this.outStack.push(tmp);
 								--len;
@@ -4837,7 +4837,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 
 			while (0 !== t.elemArr.length && (
-				found_operator.isRightAssociative ?
+				found_operator.rightAssociative ?
 					( found_operator.priority < t.elemArr[t.elemArr.length - 1].priority ) :
 					( found_operator.priority <= t.elemArr[t.elemArr.length - 1].priority )
 			)) {
