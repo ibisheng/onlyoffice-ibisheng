@@ -2915,6 +2915,8 @@ function CDemonstrationManager(htmlpage)
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
     {
 		this.StartSlideNum = start_slide_num;
+		if (-1 == start_slide_num)
+			start_slide_num = 0;
 
 		this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
         this.DemonstrationDiv = document.getElementById(main_div_id);
