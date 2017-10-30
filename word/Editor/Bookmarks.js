@@ -113,6 +113,24 @@ CParagraphBookmark.prototype.GetXY = function()
 {
 	return {X : this.X, Y : this.Y};
 };
+CParagraphBookmark.prototype.GoToBookmark = function()
+{
+	var oParagraph = this.Paragraph;
+	if (!oParagraph)
+		return;
+
+	var oLogicDocument = oParagraph.LogicDocument;
+	if (!oLogicDocument)
+		return;
+
+	var oCurPos = oParagraph.Get_PosByElement(this);
+	if (!oCurPos)
+		return;
+
+	oLogicDocument.RemoveSelection();
+	oParagraph.Set_ParaContentPos(oCurPos, false, -1, -1, true); // Корректировать позицию нужно обязательно
+	oParagraph.Document_SetThisElementCurrent(true);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
