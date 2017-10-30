@@ -892,53 +892,44 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			case cErrorOrigin["value"]:
 			case cErrorType.wrong_value_type: {
 				return cErrorLocal["value"];
-				break;
 			}
 			case cErrorOrigin["nil"]:
 			case cErrorType.null_value: {
 				return cErrorLocal["nil"];
-				break;
 			}
 			case cErrorOrigin["div"]:
 			case cErrorType.division_by_zero: {
 				return cErrorLocal["div"];
-				break;
 			}
 
 			case cErrorOrigin["ref"]:
 			case cErrorType.bad_reference: {
 				return cErrorLocal["ref"];
-				break;
 			}
 
 			case cErrorOrigin["name"]:
 			case cErrorType.wrong_name: {
 				return cErrorLocal["name"];
-				break;
 			}
 
 			case cErrorOrigin["num"]:
 			case cErrorType.not_numeric: {
 				return cErrorLocal["num"];
-				break;
 			}
 
 			case cErrorOrigin["na"]:
 			case cErrorType.not_available: {
 				return cErrorLocal["na"];
-				break;
 			}
 
 			case cErrorOrigin["getdata"]:
 			case cErrorType.getting_data: {
 				return cErrorLocal["getdata"];
-				break;
 			}
 
 			case cErrorOrigin["uf"]:
 			case cErrorType.unsupported_function: {
 				return cErrorLocal["uf"];
-				break;
 			}
 		}
 		return cErrorLocal["na"];
