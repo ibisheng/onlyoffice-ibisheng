@@ -4337,7 +4337,6 @@ function parserFormula( formula, parent, _ws ) {
     this.outStack = [];
     this.error = [];
     this.Formula = formula;
-    this.FormulaLocale = null;
     this.isParsed = false;
     //для функции parse и parseDiagramRef
     this.pCurrPos = 0;
@@ -4483,7 +4482,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.value = null;
   this.outStack = [];
   this.error = [];
-  this.FormulaLocale = null;
   this.isParsed = false;
   //для функции parse
   this.pCurrPos = 0;
