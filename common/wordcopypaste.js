@@ -3775,6 +3775,32 @@ PasteProcessor.prototype =
 			var presentation = editor.WordControl.m_oLogicDocument;
 			pptx_content_loader.Clear();
 
+			//set special paste options
+			var setSpecialPasteShowOptionsPresentation = function(){
+				var stateSelection = presentation.GetSelectionState();
+				var curPage = stateSelection.CurPage;
+				var pos = presentation.GetTargetPosition();
+				var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+				var x, y;
+				if (null === pos) {
+					pos = presentation.GetSelectedBounds();
+					x = pos.x + pos.w;
+					y = pos.y + pos.h;
+					props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+				} else {
+					x = pos.X;
+					y = pos.Y;
+				}
+				var screenPos = window["editor"].WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
+
+				var specialPasteShowOptions = new SpecialPasteShowOptions();
+				specialPasteShowOptions.asc_setOptions(props);
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+
+				var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
+				specialPasteShowOptions.asc_setCellCoord(curCoord);
+			};
+
 			var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 			var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 			var p_url = stream.GetString2();
@@ -3826,28 +3852,7 @@ PasteProcessor.prototype =
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 
-							var stateSelection = presentation.GetSelectionState();
-							var curPage = stateSelection.CurPage;
-							var pos = presentation.GetTargetPosition();
-							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
-							var x, y;
-							if (null === pos) {
-								pos = presentation.GetSelectedBounds();
-								x = pos.x + pos.w;
-								y = pos.y + pos.h;
-								props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
-							} else {
-								x = pos.X;
-								y = pos.Y;
-							}
-							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
-
-							var specialPasteShowOptions = new SpecialPasteShowOptions();
-							specialPasteShowOptions.asc_setOptions(props);
-							window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
-
-							var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
-							specialPasteShowOptions.asc_setCellCoord(curCoord);
+							setSpecialPasteShowOptionsPresentation();
 
 							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
@@ -3885,19 +3890,7 @@ PasteProcessor.prototype =
 							presentation.Recalculate();
 							presentation.Document_UpdateInterfaceState();
 
-
-							var stateSelection = presentation.GetSelectionState();
-							var pos = presentation.GetSelectedBounds();
-							var curPage = stateSelection.CurPage;
-							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.x + pos.w, pos.y + pos.h, curPage);
-
-							var specialPasteShowOptions = new SpecialPasteShowOptions();
-							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
-							specialPasteShowOptions.asc_setOptions(props);
-							window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
-
-							var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
-							specialPasteShowOptions.asc_setCellCoord(curCoord);
+							setSpecialPasteShowOptionsPresentation();
 
 							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
