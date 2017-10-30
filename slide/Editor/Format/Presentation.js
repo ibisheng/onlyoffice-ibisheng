@@ -1482,12 +1482,12 @@ CPresentation.prototype =
                     }
                     var x, y;
                     if(oPos.Transform){
-                        x = oPos.Transform.TransformPointX(oPos.X, oPos.Y);
-                        y = oPos.Transform.TransformPointY(oPos.X, oPos.Y);
+                        x = oPos.Transform.TransformPointX(oPos.X, oPos.Y + oPos.Height);
+                        y = oPos.Transform.TransformPointY(oPos.X, oPos.Y + oPos.Height);
                     }
                     else{
                         x = oPos.X;
-                        y = oPos.Y;
+                        y = oPos.Y + oPos.Height;
                     }
                     oPosition = {X: x, Y: y};
                 }

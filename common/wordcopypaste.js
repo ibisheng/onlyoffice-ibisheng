@@ -3821,10 +3821,10 @@ PasteProcessor.prototype =
 
 							//***TEST***
 							var stateSelection = presentation.GetSelectionState();
-							var pos = stateSelection.slideSelection[0].textSelection[0].CurPos;
+							var pos = presentation.GetTargetPosition();
 							var curPage = stateSelection.CurPage;
 							var posObj = stateSelection.slideSelection[0].textObject;
-							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.X + posObj.x, pos.Y + posObj.y, curPage);
+							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.X, pos.Y, curPage);
 
 							var specialPasteShowOptions = new SpecialPasteShowOptions();
 							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
