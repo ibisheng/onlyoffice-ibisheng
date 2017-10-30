@@ -2418,9 +2418,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	cBaseOperator.prototype.type = cElementType.operator;
 	cBaseOperator.prototype.numFormat = cNumFormatFirstCell;
-	cBaseOperator.prototype.getArguments = function () {
-		return this.argumentsCurrent;
-	};
 	cBaseOperator.prototype.toString = function () {
 		return this.name;
 	};
@@ -2487,18 +2484,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.value = new cError(cErrorType.wrong_name);
 		return this.value;
 	};
-	cBaseFunction.prototype.DecrementArguments = function () {
-		--this.argumentsCurrent;
-	};
-	cBaseFunction.prototype.IncrementArguments = function () {
-		++this.argumentsCurrent;
-	};
-	cBaseFunction.prototype.setArgumentsCount = function (count) {
-		this.argumentsCurrent = count;
-	};
-	/*cBaseFunction.prototype.getArguments = function () {
-		return this.argumentsCurrent;
-	};*/
 	cBaseFunction.prototype.Assemble = function (arg) {
 		var str = "";
 		for (var i = 0; i < arg.length; i++) {
@@ -4545,7 +4530,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 
 			var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null,
-				bArrElemSign = false, wsF, wsT;
+				bArrElemSign = false, wsF, wsT, arg_count;
 			for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
 				found_operand = null;
 				val = aTokens[i].value;
@@ -4715,10 +4700,11 @@ parserFormula.prototype.setFormula = function(formula) {
 								this.outStack.push(tmp);
 								if (cElementType.func === tmp.type) {
 									prev = aTokens[i - 1];
-									tmp.setArgumentsCount(args[indentCount] -
-										((prev && TOK_TYPE_FUNCTION === prev.type &&
-										TOK_SUBTYPE_START === prev.subtype) ? 1 : 0));
-									if (!tmp.checkArguments()) {
+									arg_count = args[indentCount] -
+										((prev && TOK_TYPE_FUNCTION === prev.type && TOK_SUBTYPE_START ===
+											prev.subtype) ? 1 : 0);
+									this.outStack.push(arg_count);
+									if (!tmp.checkArguments(arg_count)) {
 										this.outStack = [];
 										this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
 										return false;
@@ -4899,7 +4885,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			t.f.push(cFormulaOperators[t.operand_str].prototype);
 			wasRigthParentheses = true;
 			var top_elem = null;
-			var top_elem_arg_count = null;
+			var top_elem_arg_count = 0;
 			if (0 !== t.elemArr.length && ( (top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' ) &&
 				t.operand_expected) {
 				top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
