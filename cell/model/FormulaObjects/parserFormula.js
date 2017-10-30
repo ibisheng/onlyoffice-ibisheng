@@ -2692,17 +2692,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	parentLeft.prototype.type = cElementType.operator;
 	parentLeft.prototype.name = "(";
 	parentLeft.prototype.argumentsCurrent = 1;
-	parentLeft.prototype.DecrementArguments = function () {
-		--this.argumentsCurrent;
-	};
-	parentLeft.prototype.IncrementArguments = function () {
-		++this.argumentsCurrent;
-	};
 	parentLeft.prototype.toString = function () {
 		return this.name;
-	};
-	parentLeft.prototype.getArguments = function () {
-		return this.argumentsCurrent;
 	};
 	parentLeft.prototype.Assemble = function (arg) {
 		return new cString("(" + arg + ")");
