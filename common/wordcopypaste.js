@@ -3818,7 +3818,22 @@ PasteProcessor.prototype =
 							presentation.Recalculate();
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
-							
+
+							//***TEST***
+							var stateSelection = presentation.GetSelectionState();
+							var pos = stateSelection.slideSelection[0].textSelection[0].CurPos;
+							var curPage = stateSelection.CurPage;
+							var posObj = stateSelection.slideSelection[0].textObject;
+							var screenPos = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(pos.X + posObj.x, pos.Y + posObj.y, curPage);
+
+							var specialPasteShowOptions = new SpecialPasteShowOptions();
+							var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+							specialPasteShowOptions.asc_setOptions(props);
+							window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+
+							var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
+							specialPasteShowOptions.asc_setCellCoord(curCoord);
+
 							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
 					};
