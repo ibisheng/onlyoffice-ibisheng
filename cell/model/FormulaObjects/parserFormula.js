@@ -2415,15 +2415,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseOperator.prototype.Calculate = function () {
 		return null;
 	};
-	cBaseOperator.prototype.Assemble = function (arg) {
-		var str = "";
-		if (this.argumentsCurrent === 2) {
-			str = arg[0] + "" + this.name + "" + arg[1];
-		} else {
-			str = this.name + "" + arg[0];
-		}
-		return new cString(str);
-	};
 	cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
 		var str = "";
 		if (this.argumentsCurrent === 2) {
@@ -2471,19 +2462,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.ca = false;
 	cBaseFunction.prototype.Calculate = function () {
 		return new cError(cErrorType.wrong_name);
-	};
-	cBaseFunction.prototype.Assemble = function (arg) {
-		var str = "";
-		for (var i = 0; i < arg.length; i++) {
-			str += arg[i].toString();
-			if (i !== arg.length - 1) {
-				str += ",";
-			}
-		}
-		if (this.isXLFN) {
-			return new cString("_xlfn." + this.name + "(" + str + ")");
-		}
-		return new cString(this.toString() + "(" + str + ")");
 	};
 	cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
 
@@ -2664,9 +2642,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	parentLeft.prototype.toString = function () {
 		return this.name;
 	};
-	parentLeft.prototype.Assemble = function (arg) {
-		return new cString("(" + arg + ")");
-	};
 	parentLeft.prototype.Assemble2 = function (arg, start, count) {
 		return new cString("(" + arg[start + count - 1] + ")");
 	};
@@ -2819,9 +2794,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cUnarMinusOperator.prototype.toString = function () {        // toString function
 		return '-';
 	};
-	cUnarMinusOperator.prototype.Assemble = function (arg) {
-		return new cString("-" + arg[0]);
-	};
 	cUnarMinusOperator.prototype.Assemble2 = function (arg, start, count) {
 		return new cString("-" + arg[start + count - 1]);
 	};
@@ -2853,9 +2825,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cUnarPlusOperator.prototype.toString = function () {
 		return '+';
-	};
-	cUnarPlusOperator.prototype.Assemble = function (arg) {
-		return new cString("+" + arg[0]);
 	};
 	cUnarPlusOperator.prototype.Assemble2 = function (arg, start, count) {
 		return new cString("+" + arg[start + count - 1]);
@@ -2960,9 +2929,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		res = arg0 instanceof cError ? arg0 : new cNumber(arg0.getValue() / 100);
 		res.numFormat = 9;
 		return res;
-	};
-	cPercentOperator.prototype.Assemble = function (arg) {
-		return new cString(arg[0] + this.name);
 	};
 	cPercentOperator.prototype.Assemble2 = function (arg, start, count) {
 		return new cString(arg[start + count - 1] + this.name);
