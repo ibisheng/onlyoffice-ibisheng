@@ -4813,7 +4813,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			if(startSumproduct){
 				counterSumproduct++;
 				if(1 === counterSumproduct){
-					t.outStack.push(new cSpecialOperandStart());
+					t.outStack.push(cSpecialOperandStart.prototype);
 				}
 			}
 		};
@@ -4902,7 +4902,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				counterSumproduct--;
 				if(counterSumproduct < 1){
 					startSumproduct = false;
-					t.outStack.push(new cSpecialOperandEnd());
+					t.outStack.push(cSpecialOperandEnd.prototype);
 				}
 			}
 
@@ -5196,6 +5196,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
 				return t.isParsed = false;
 			}
+
 			if (wasRigthParentheses) {
 				t.elemArr.push(new cMultOperator());
 			}
