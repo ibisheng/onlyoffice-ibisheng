@@ -323,7 +323,7 @@
 		this.changedCellRepeated = null;
 		this.changedDefName = null;
 		this.changedDefNameRepeated = null;
-		this.dirtyCells = {};
+		this.dirtyCells = {};//===changedCell
 		this.buildCell = {};
 		this.buildDefName = {};
 		this.cleanCellCache = {};
@@ -337,7 +337,7 @@
 
 	DependencyGraph.prototype = {
 		//listening
-		startListeningRange: function(sheetId, bbox, listener) {
+		startListeningRange: function(sheetId, bbox, listener, opt_fragment) {
 			//todo bbox clone or bbox immutable
 			var listenerId = listener.getListenerId();
 			var sheetContainer = this.sheetListeners[sheetId];
@@ -360,12 +360,15 @@
 				var vertexIndex = getVertexIndex(bbox);
 				var areaSheetElem = sheetContainer.areaMap[vertexIndex];
 				if (!areaSheetElem) {
-					areaSheetElem = {id: null, bbox: bbox, count: 0, listeners: {}};
+					areaSheetElem = {id: null, bbox: bbox, count: 0, listeners: {}, fragments: {}};
 					sheetContainer.areaMap[vertexIndex] = areaSheetElem;
 					sheetContainer.areaTree.add(bbox, areaSheetElem);
 				}
 				if (!areaSheetElem.listeners[listenerId]) {
 					areaSheetElem.listeners[listenerId] = listener;
+					if (opt_fragment) {
+						areaSheetElem.fragments[listenerId] = opt_fragment;
+					}
 					areaSheetElem.count++;
 				}
 			}
@@ -390,6 +393,7 @@
 						var areaSheetElem = sheetContainer.areaMap[vertexIndex];
 						if (areaSheetElem && areaSheetElem.listeners[listenerId]) {
 							delete areaSheetElem.listeners[listenerId];
+							delete areaSheetElem.fragments[listenerId];
 							areaSheetElem.count--;
 							if (areaSheetElem.count <= 0) {
 								delete sheetContainer.areaMap[vertexIndex];
@@ -953,7 +957,7 @@
 			if (this.lockCounter > 0) {
 				return;
 			}
-			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
+			var notifyData = {type: AscCommon.c_oNotifyType.Dirty, areaData: undefined, areaFragment: undefined};
 			this.buildDependency();
 			this.addToChangedHiddenRows();
 			//broadscast Volatile only if something changed
@@ -961,10 +965,9 @@
 				this._broadscastVolatile(notifyData);
 			}
 			this._broadcastCellsStart();
-			var calcTrack = [];
 			while (this.changedCellRepeated || this.changedDefNameRepeated) {
 				this._broadcastDefNames(notifyData);
-				this._broadcastCells(notifyData, calcTrack);
+				this._broadcastCells(notifyData);
 			}
 			this._broadcastCellsEnd();
 			this._calculateDirty();
@@ -1118,7 +1121,7 @@
 				}
 			}
 		},
-		_broadcastCells: function(notifyData, calcTrack) {
+		_broadcastCells: function(notifyData) {
 			if (this.changedCellRepeated) {
 				var changedCell = this.changedCellRepeated;
 				this.changedCellRepeated = null;
@@ -1151,10 +1154,14 @@
 							this.tempGetByCells.push({areaTree: sheetContainer.areaTree, areas: areas});
 							for (var i = 0; i < areas.length; ++i) {
 								var area = areas[i];
+								notifyData.areaData = area;
 								for (var listenerId in area.data.listeners) {
+									notifyData.areaFragment = area.data.fragments[listenerId];
 									area.data.listeners[listenerId].notify(notifyData);
 								}
 							}
+							notifyData.areaData = undefined;
+							notifyData.areaFragment = undefined;
 						}
 					}
 				}
@@ -1287,7 +1294,7 @@
 		add: function(bbox, data) {
 			data.id = this.id++;
 			var startFlag = bbox.r1 !== bbox.r2 ? 1 : 3;
-			var dataWrap = {bbox: bbox, data: data, isOutput: false};
+			var dataWrap = {bbox: bbox, data: data, isOutput: false, cellsInArea: []};
 			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
 			top.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
 			top.storedValue.count++;
@@ -1343,7 +1350,7 @@
 						curY = curNodeY.key;
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
-							if (0 !== (1 & elem.startFlag) && !elem.dataWrap.isOutput) {
+							if (0 !== (1 & elem.startFlag)) {
 								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
 									var curNodesElem = curNodes[i];
 									if (!curNodesElem) {
@@ -1365,14 +1372,12 @@
 						var curNodesElemX = curNodes[curCellX];
 						for (var id in curNodesElemX) {
 							var elem = curNodesElemX[id];
-							if (!elem.dataWrap.isOutput && elem.dataWrap.bbox.r1 <= curCellY) {
-								elem.dataWrap.isOutput = true;
-								res.push(elem.dataWrap);
-								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
-									var curNodesElem = curNodes[i];
-									if (curNodesElem) {
-										delete curNodesElem[id];
-									}
+							if (elem.dataWrap.bbox.r1 <= curCellY) {
+								elem.dataWrap.cellsInArea.push(curCellY);
+								elem.dataWrap.cellsInArea.push(curCellX);
+								if(!elem.dataWrap.isOutput){
+									elem.dataWrap.isOutput = true;
+									res.push(elem.dataWrap);
 								}
 							}
 						}
@@ -1382,7 +1387,7 @@
 					} else {
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
-							if (0 !== (2 & elem.startFlag) && !elem.dataWrap.isOutput) {
+							if (0 !== (2 & elem.startFlag)) {
 								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
 									var curNodesElem = curNodes[i];
 									if (curNodesElem) {
@@ -1403,6 +1408,7 @@
 		},
 		getByCellsEnd: function(areas) {
 			for (var i = 0; i < areas.length; ++i) {
+				areas[i].cellsInArea = [];
 				areas[i].isOutput = false;
 			}
 		}
