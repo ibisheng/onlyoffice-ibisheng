@@ -2878,16 +2878,49 @@ PasteProcessor.prototype =
 		presentationSelectedContent.DocContent = new CSelectedContent();
 		for (var i = 0, length = aNewContent.length; i < length; ++i) {
 			var oSelectedElement = new CSelectedElement();
+
+			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+				aNewContent[i]= this._specialPasteItemConvert(aNewContent[i]);
+			}
+
 			oSelectedElement.Element = aNewContent[i];
 			presentationSelectedContent.DocContent.Elements[i] = oSelectedElement;
 		}
-		
+
 		presentation.Insert_Content(presentationSelectedContent);
 		presentation.Recalculate();
         presentation.Check_CursorMoveRight();
 		presentation.Document_UpdateInterfaceState();
+
+		this._setSpecialPasteShowOptionsPresentation();
+		window['AscCommon'].g_clipboardBase.Paste_Process_End();
 	},
 
+	_setSpecialPasteShowOptionsPresentation: function(){
+		var presentation = editor.WordControl.m_oLogicDocument;
+		var stateSelection = presentation.GetSelectionState();
+		var curPage = stateSelection.CurPage;
+		var pos = presentation.GetTargetPosition();
+		var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+		var x, y;
+		if (null === pos) {
+			pos = presentation.GetSelectedBounds();
+			x = pos.x + pos.w;
+			y = pos.y + pos.h;
+			props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+		} else {
+			x = pos.X;
+			y = pos.Y;
+		}
+		var screenPos = window["editor"].WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
+
+		var specialPasteShowOptions = new SpecialPasteShowOptions();
+		specialPasteShowOptions.asc_setOptions(props);
+		window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+
+		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
+		specialPasteShowOptions.asc_setCellCoord(curCoord);
+	},
 
     insertInPlace2: function(oDoc, aNewContent)
     {
@@ -3775,32 +3808,6 @@ PasteProcessor.prototype =
 			var presentation = editor.WordControl.m_oLogicDocument;
 			pptx_content_loader.Clear();
 
-			//set special paste options
-			var setSpecialPasteShowOptionsPresentation = function(){
-				var stateSelection = presentation.GetSelectionState();
-				var curPage = stateSelection.CurPage;
-				var pos = presentation.GetTargetPosition();
-				var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
-				var x, y;
-				if (null === pos) {
-					pos = presentation.GetSelectedBounds();
-					x = pos.x + pos.w;
-					y = pos.y + pos.h;
-					props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
-				} else {
-					x = pos.X;
-					y = pos.Y;
-				}
-				var screenPos = window["editor"].WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
-
-				var specialPasteShowOptions = new SpecialPasteShowOptions();
-				specialPasteShowOptions.asc_setOptions(props);
-				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
-
-				var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
-				specialPasteShowOptions.asc_setCellCoord(curCoord);
-			};
-
 			var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 			var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 			var p_url = stream.GetString2();
@@ -3852,7 +3859,7 @@ PasteProcessor.prototype =
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 
-							setSpecialPasteShowOptionsPresentation();
+							oThis._setSpecialPasteShowOptionsPresentation();
 
 							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
@@ -4177,8 +4184,8 @@ PasteProcessor.prototype =
 		var fPasteHtmlPresentationCallback = function()
 		{
 			oThis.aContent = [];
-			 //�� ����� ���������� �������� ��� ������� ��������� �������
-			 var arrShapes = [], arrImages = [], arrTables = [];
+
+			var arrShapes = [], arrImages = [], arrTables = [];
 			var presentation = editor.WordControl.m_oLogicDocument;
 			if(presentation.Slides.length === 0)
 			{
