@@ -2805,7 +2805,7 @@ StyleManager.prototype =
 		return this.xfs.list.length;
 	};
 	StyleCache.prototype._add = function(container, newVal) {
-		if (undefined === newVal.getIndexNumber()) {
+		if (newVal && undefined === newVal.getIndexNumber()) {
 			var hash = newVal.getHash();
 			var res = container.vals[hash];
 			if (!res) {
