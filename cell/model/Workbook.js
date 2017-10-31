@@ -6192,7 +6192,7 @@
 		}
 	};
 	Cell.prototype.setStyleInternal = function(xfs) {
-		this.xfs = xfs;
+		this.xfs = g_StyleCache.addXf(xfs);
 		this._hasChanged = true;
 	};
 	Cell.prototype.getFormula=function(){
