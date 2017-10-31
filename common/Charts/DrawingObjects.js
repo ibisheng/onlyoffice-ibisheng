@@ -1931,7 +1931,7 @@ function DrawingObjects() {
         for(i = 0; i < aImagesSync.length; ++i)
         {
 			var localUrl = aImagesSync[i];
-			if(api.DocInfo && api.DocInfo.asc_getOfflineApp()) {
+			if(api.DocInfo && api.DocInfo.get_OfflineApp()) {
           AscCommon.g_oDocumentUrls.addImageUrl(localUrl, "/sdkjs/cell/document/media/" + localUrl);
 			}
             aImagesSync[i] = AscCommon.getFullImageSrc2(localUrl);
