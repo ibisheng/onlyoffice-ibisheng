@@ -236,27 +236,23 @@
 		 * @param [endScroll] {Boolean}  Scroll in the end of document
 		 * */
 		asc_CEventsController.prototype.reinitializeScroll = function (whichSB, endScroll) {
-		    if (window["NATIVE_EDITOR_ENJINE"])
-		        return;
+			if (window["NATIVE_EDITOR_ENJINE"]) {
+				return;
+			}
 
-			var self = this,
-			    opt = this.settings,
-			    ws = self.view.getWorksheet(),
-			    isVert = !whichSB || whichSB === 1,
-			    isHoriz = !whichSB || whichSB === 2;
+			var self = this, opt = this.settings, ws = self.view.getWorksheet(), isVert = !whichSB || whichSB === 1,
+				isHoriz = !whichSB || whichSB === 2;
 
 			if (isVert || isHoriz) {
 				this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 					if (isVert) {
-						vSize = self.vsb.offsetHeight + Math.max( vSize * opt.vscrollStep, 1 );
-//                        this.m_dScrollY_max = vSize;
-    					self.vsbHSt.height = vSize + "px";
+						vSize = self.vsb.offsetHeight + Math.max(vSize * opt.vscrollStep, 1);
+						self.vsbHSt.height = vSize + "px";
 						self.vsbApi.endByY = !!endScroll;
 						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 					}
 					if (isHoriz) {
-						hSize = self.hsb.offsetWidth + Math.max( hSize* opt.hscrollStep, 1 );
-//                        this.m_dScrollX_max = hSize ;
+						hSize = self.hsb.offsetWidth + Math.max(hSize * opt.hscrollStep, 1);
 						self.hsbApi.endByX = !!endScroll;
 						self.hsbHSt.width = hSize + "px";
 						self.hsbApi.Reinit(opt, opt.hscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));

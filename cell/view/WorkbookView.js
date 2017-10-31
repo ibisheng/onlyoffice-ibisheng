@@ -923,22 +923,23 @@
   };
 
 
-  WorkbookView.prototype._onScrollReinitialize = function(whichSB, callback) {
-    var ws = this.getWorksheet(), vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined, hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
+	WorkbookView.prototype._onScrollReinitialize = function (whichSB, callback) {
+		var ws = this.getWorksheet(), vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined,
+			hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
 
-    if (vsize != undefined) {
-      this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
-    }
-    if (hsize != undefined) {
-      this.m_dScrollX_max = Math.max(this.controller.settings.hscrollStep * (hsize + 1), 1);
-    }
+		if (vsize != undefined) {
+			this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
+		}
+		if (hsize != undefined) {
+			this.m_dScrollX_max = Math.max(this.controller.settings.hscrollStep * (hsize + 1), 1);
+		}
 
-    asc_applyFunction(callback, vsize, hsize);
+		asc_applyFunction(callback, vsize, hsize);
 
-	if (this.Api.isMobileVersion) {
-	  this.MobileTouchManager.Resize();
-	}
-  };
+		if (this.Api.isMobileVersion) {
+			this.MobileTouchManager.Resize();
+		}
+	};
 
   WorkbookView.prototype._onScrollY = function(pos) {
     var ws = this.getWorksheet();
