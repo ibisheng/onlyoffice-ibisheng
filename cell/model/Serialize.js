@@ -6127,10 +6127,12 @@
             }
             else if ( c_oSerWorksheetsTypes.SheetData == type )
             {
-				var tempRow = new AscCommonExcel.Row(oWorksheet);
-				var cellStremPos = {pos: null, len: null};
+				var tmp = {
+					pos: null, len: null, ws: oWorksheet, row: new AscCommonExcel.Row(oWorksheet),
+					cell: new AscCommonExcel.Cell(oWorksheet)
+				};
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadSheetData(t,l, oWorksheet, tempRow, cellStremPos);
+                    return oThis.ReadSheetData(t,l, tmp);
                 });
             }
             else if ( c_oSerWorksheetsTypes.Drawings == type )
@@ -6373,27 +6375,26 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadSheetData = function(type, length, ws, tempRow, cellStremPos)
+        this.ReadSheetData = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Row == type )
+            if ( c_oSerWorksheetsTypes.Row === type )
             {
-				cellStremPos.pos =  null;
-				cellStremPos.len = null;
-				tempRow.clear();
+				tmp.pos =  null;
+				tmp.len = null;
+				tmp.row.clear();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadRow(t,l, tempRow, ws, cellStremPos);
+                    return oThis.ReadRow(t,l, tmp);
                 });
-                if(null != tempRow.index){
-					tempRow.saveContent();
+                if(null !== tmp.row.index){
+					tmp.row.saveContent();
 					//читаем ячейки
-					if(null != cellStremPos.pos && null != cellStremPos.len){
+					if(null !== tmp.pos && null !== tmp.len){
 						var nOldPos = this.stream.GetCurPos();
-						this.stream.Seek2(cellStremPos.pos);
-						var tempCell = new AscCommonExcel.Cell(ws);
-						res = this.bcr.Read1(cellStremPos.len, function(t,l){
-							return oThis.ReadCells(t,l, ws, tempRow.index, tempCell);
+						this.stream.Seek2(tmp.pos);
+						res = this.bcr.Read1(tmp.len, function(t,l){
+							return oThis.ReadCells(t,l, tmp, tmp.row.index);
 						});
 						this.stream.Seek2(nOldPos);
 					}
@@ -6403,86 +6404,86 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadRow = function(type, length, oRow, ws, cellStremPos)
+        this.ReadRow = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSerRowTypes.Row == type )
             {
             	var index = this.stream.GetULongLE() - 1;
-                oRow.setIndex(index);
-                if(index >= ws.nRowsCount)
-                    ws.nRowsCount = index + 1;
+				tmp.row.setIndex(index);
+                if(index >= tmp.ws.nRowsCount)
+					tmp.ws.nRowsCount = index + 1;
             }
             else if ( c_oSerRowTypes.Style == type )
             {
                 var xfs = this.aCellXfs[this.stream.GetULongLE()];
                 if(xfs)
-                    oRow.setStyle(xfs);
+					tmp.row.setStyle(xfs);
             }
             else if ( c_oSerRowTypes.Height == type )
             {
             	var h = this.stream.GetDoubleLE();
-                oRow.setHeight(h);
+				tmp.row.setHeight(h);
                 if(AscCommon.CurFileVersion < 2)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.setHidden(true);
+					tmp.row.setHidden(true);
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
 				//запоминам место чтобы читать Cells в конце, когда уже зачитан oRow.index
-				cellStremPos.pos = this.stream.GetCurPos();
-				cellStremPos.len = length;
+				tmp.pos = this.stream.GetCurPos();
+				tmp.len = length;
 				res = c_oSerConstants.ReadUnknown;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCells = function(type, length, ws, index, tempCell)
+        this.ReadCells = function(type, length, tmp, index)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerRowTypes.Cell == type )
+            if ( c_oSerRowTypes.Cell === type )
             {
-				tempCell.clear();
+				tmp.cell.clear();
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, ws, tempCell, index);
+                    return oThis.ReadCell(t,l, tmp, tmp.cell, index);
                 });
-				tempCell.saveContent();
+				tmp.cell.saveContent();
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCell = function(type, length, ws, oCell, nRowIndex)
+        this.ReadCell = function(type, length, tmp, oCell, nRowIndex)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerCellTypes.Ref == type ){
+            if ( c_oSerCellTypes.Ref === type ){
 				var oCellAddress = AscCommon.g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 				oCell.setRowCol(nRowIndex, oCellAddress.getCol0());
-				if(oCell.nCol >= ws.nColsCount)
-					ws.nColsCount = oCell.nCol + 1;
+				if(oCell.nCol >= tmp.ws.nColsCount)
+					tmp.ws.nColsCount = oCell.nCol + 1;
 			}
-            else if ( c_oSerCellTypes.RefRowCol == type ){
+            else if ( c_oSerCellTypes.RefRowCol === type ){
 				var nRow = this.stream.GetULongLE();//todo не используем можно убрать
 				oCell.setRowCol(nRowIndex, this.stream.GetULongLE());
-				if(oCell.nCol >= ws.nColsCount)
-					ws.nColsCount = oCell.nCol + 1;
+				if(oCell.nCol >= tmp.ws.nColsCount)
+					tmp.ws.nColsCount = oCell.nCol + 1;
 			}
-            else if( c_oSerCellTypes.Style == type )
+            else if( c_oSerCellTypes.Style === type )
             {
                 var nStyleIndex = this.stream.GetULongLE();
                 if(0 != nStyleIndex)
@@ -6492,7 +6493,7 @@
                         oCell.setStyle(xfs);
                 }
             }
-            else if( c_oSerCellTypes.Type == type )
+            else if( c_oSerCellTypes.Type === type )
             {
                 switch(this.stream.GetUChar())
                 {
@@ -6502,18 +6503,18 @@
                     case ECellTypeType.celltypeSharedString: oCell.setTypeInternal(CellValueType.String);break;
                 }
             }
-            else if( c_oSerCellTypes.Formula == type )
+            else if( c_oSerCellTypes.Formula === type )
             {
-                var cellWithFormula = new AscCommonExcel.CCellWithFormula(ws, oCell.nRow, oCell.nCol);
+                var cellWithFormula = new AscCommonExcel.CCellWithFormula(tmp.ws, oCell.nRow, oCell.nCol);
 				var oFormulaExt = {cell: cellWithFormula, aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadFormula(t,l, oFormulaExt);
                 });
-				ws.aFormulaExt.push(oFormulaExt);
+				tmp.ws.aFormulaExt.push(oFormulaExt);
             }
-			else if (c_oSerCellTypes.Value == type) {
+			else if (c_oSerCellTypes.Value === type) {
 				var val = this.stream.GetDoubleLE();
-				if (CellValueType.String == oCell.getType() || CellValueType.Error == oCell.getType()) {
+				if (CellValueType.String === oCell.getType() || CellValueType.Error === oCell.getType()) {
 					var ss = this.aSharedStrings[val];
                     if (typeof ss === 'string') {
                         oCell.setValueTextInternal(ss);
@@ -6531,31 +6532,31 @@
         this.ReadFormula = function(type, length, oFormula)
         {
             var res = c_oSerConstants.ReadOk;
-            if ( c_oSerFormulaTypes.Aca == type )
+            if ( c_oSerFormulaTypes.Aca === type )
                 oFormula.aca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Bx == type )
+            else if ( c_oSerFormulaTypes.Bx === type )
                 oFormula.bx = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Ca == type )
+            else if ( c_oSerFormulaTypes.Ca === type )
                 oFormula.ca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del1 == type )
+            else if ( c_oSerFormulaTypes.Del1 === type )
                 oFormula.del1 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del2 == type )
+            else if ( c_oSerFormulaTypes.Del2 === type )
                 oFormula.del2 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dt2D == type )
+            else if ( c_oSerFormulaTypes.Dt2D === type )
                 oFormula.dt2d = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dtr == type )
+            else if ( c_oSerFormulaTypes.Dtr === type )
                 oFormula.dtr = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.R1 == type )
+            else if ( c_oSerFormulaTypes.R1 === type )
                 oFormula.r1 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.R2 == type )
+            else if ( c_oSerFormulaTypes.R2 === type )
                 oFormula.r2 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Ref == type )
+            else if ( c_oSerFormulaTypes.Ref === type )
                 oFormula.ref = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Si == type )
+            else if ( c_oSerFormulaTypes.Si === type )
                 oFormula.si = this.stream.GetULongLE();
-            else if ( c_oSerFormulaTypes.T == type )
+            else if ( c_oSerFormulaTypes.T === type )
                 oFormula.t = this.stream.GetUChar();
-            else if ( c_oSerFormulaTypes.Text == type )
+            else if ( c_oSerFormulaTypes.Text === type )
                 oFormula.v = this.stream.GetString2LE(length);
             else
                 res = c_oSerConstants.ReadUnknown;
