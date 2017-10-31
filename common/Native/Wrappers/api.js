@@ -3828,7 +3828,7 @@ function asc_menu_WriteAscFill_grad(_type, _fill, _stream)
                 if (_fill.Positions[i] !== undefined && _fill.Positions[i] !== null)
                 {
                     _stream["WriteByte"](1);
-                    _stream["WriteDouble2"](_fill.Positions[i]);
+                    _stream["WriteLong"](_fill.Positions[i]);
                 }
 
                 _stream["WriteByte"](255);
@@ -3988,17 +3988,17 @@ function asc_menu_WriteAscFill(_type, _fill, _stream)
             }
             case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
-                _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_patt(1, _fill.fill, _stream);
                 break;
             }
             case Asc.c_oAscFill.FILL_TYPE_GRAD:
             {
-                _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_grad(1, _fill.fill, _stream);
                 break;
             }
             case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
-                _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
+                _fill.fill = asc_menu_WriteAscFill_blip(1, _fill.fill, _stream);
                 break;
             }
             default:
@@ -5859,7 +5859,12 @@ function NativeOpenFile3(_params, documentInfo)
         docInfo.put_Format("docx");
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(window.documentInfo["token"]);
-        
+
+        var permissions = window.documentInfo["permissions"];
+        if (undefined != permissions && null != permissions && permissions.length > 0) {
+            docInfo.put_Permissions(permissions);
+        }   
+
         _api.asc_setDocInfo(docInfo);
 
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {

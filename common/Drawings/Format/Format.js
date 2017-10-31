@@ -213,7 +213,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetFill] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetLn] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ClrMap_SetClr] = CChangesDrawingsContentLongMap;
-    AscDFH.changesFactory[AscDFH.historyitem_ExtraClrScheme_SetClrScheme] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ExtraClrScheme_SetClrScheme] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ExtraClrScheme_SetClrMap] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetColorScheme] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetFontScheme] = CChangesDrawingsObjectNoId;
@@ -6197,7 +6197,7 @@ ExtraClrScheme.prototype =
 
     setClrScheme: function(pr)
     {
-        History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_ExtraClrScheme_SetClrScheme, this.clrScheme,  pr));
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ExtraClrScheme_SetClrScheme, this.clrScheme,  pr));
         this.clrScheme = pr;
     },
 

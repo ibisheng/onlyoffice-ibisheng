@@ -106,9 +106,8 @@
 				if (window.captureEvents)
 					window.captureEvents(Event.MOUSEDOWN | Event.MOUSEUP);
 
-				var _frame = document.getElementById("plugin_iframe");
-				if (_frame)
-					_frame.style.pointerEvents = "none";
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.disablePointerEvents();
 
 				/*
 				 var parent = window;
@@ -140,9 +139,8 @@
 				if (window.releaseEvents)
 					window.releaseEvents(Event.MOUSEMOVE);
 
-				var _frame = document.getElementById("plugin_iframe");
-				if (_frame)
-					_frame.style.pointerEvents = "";
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.enablePointerEvents();
 
 				/*
 				 var parent = window;
