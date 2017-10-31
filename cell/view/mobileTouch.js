@@ -38,7 +38,6 @@
 function (window, undefined)
 {
 	// Import
-	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
 	var global_mouseEvent = AscCommon.global_mouseEvent;
 	var AscBrowser = AscCommon.AscBrowser;
 
@@ -129,8 +128,8 @@ function (window, undefined)
 	CMobileDelegateEditorCell.prototype.GetScrollerSize = function()
 	{
 		return {
-			W : this.WB.element.clientWidth + this.WB.m_dScrollX_max,
-			H : this.WB.element.clientHeight + this.WB.m_dScrollY_max
+			W : this.WB.element.clientWidth + this.WB.controller.hsbMax,
+			H : this.WB.element.clientHeight + this.WB.controller.vsbMax
 		};
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionTransform = function()
