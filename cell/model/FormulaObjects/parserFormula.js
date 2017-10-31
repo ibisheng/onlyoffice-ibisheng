@@ -2664,11 +2664,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cRangeUnionOperator() {
-		cBaseOperator.apply(this, [':', 50, 2]);
+		//cBaseOperator.apply(this, [':', 50, 2]);
 	}
 
 	cRangeUnionOperator.prototype = Object.create(cBaseOperator.prototype);
 	cRangeUnionOperator.prototype.constructor = cRangeUnionOperator;
+	cRangeUnionOperator.prototype.name = ':';
+	cRangeUnionOperator.prototype.priority = 50;
+	cRangeUnionOperator.prototype.argumentsCurrent = 2;
 	cRangeUnionOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws, res;
 		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
@@ -2714,11 +2717,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cRangeIntersectionOperator() {
-		cBaseOperator.apply(this, [' ', 50, 2]);
+		//cBaseOperator.apply(this, [' ', 50, 2]);
 	}
 
 	cRangeIntersectionOperator.prototype = Object.create(cBaseOperator.prototype);
 	cRangeIntersectionOperator.prototype.constructor = cRangeIntersectionOperator;
+	cRangeIntersectionOperator.prototype.name = ' ';
+	cRangeIntersectionOperator.prototype.priority = 50;
+	cRangeIntersectionOperator.prototype.argumentsCurrent = 2;
 	cRangeIntersectionOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws, res;
 		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
@@ -2769,11 +2775,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cUnarMinusOperator() {
-		cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
+		//cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
 	}
 
 	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
 	cUnarMinusOperator.prototype.constructor = cUnarMinusOperator;
+	cUnarMinusOperator.prototype.name = 'un_minus';
+	cUnarMinusOperator.prototype.priority = 49;
+	cUnarMinusOperator.prototype.argumentsCurrent = 1;
 	cUnarMinusOperator.prototype.rightAssociative = true;
 	cUnarMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -2806,11 +2815,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cUnarPlusOperator() {
-		cBaseOperator.apply(this, ['un_plus', 49, 1]);
+		//cBaseOperator.apply(this, ['un_plus', 49, 1]);
 	}
 
 	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
 	cUnarPlusOperator.prototype.constructor = cUnarPlusOperator;
+	cUnarPlusOperator.prototype.name = 'un_plus';
+	cUnarPlusOperator.prototype.priority = 49;
+	cUnarPlusOperator.prototype.argumentsCurrent = 1;
 	cUnarPlusOperator.prototype.rightAssociative = true;
 	cUnarPlusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -2838,11 +2850,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cAddOperator() {
-		cBaseOperator.apply(this, ['+', 20]);
+		//cBaseOperator.apply(this, ['+', 20]);
 	}
 
 	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
 	cAddOperator.prototype.constructor = cAddOperator;
+	cAddOperator.prototype.name = '+';
+	cAddOperator.prototype.priority = 20;
+	cAddOperator.prototype.argumentsCurrent = 2;
 	cAddOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -2872,11 +2887,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cMinusOperator() {
-		cBaseOperator.apply(this, ['-', 20]);
+		//cBaseOperator.apply(this, ['-', 20]);
 	}
 
 	cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
 	cMinusOperator.prototype.constructor = cMinusOperator;
+	cMinusOperator.prototype.name = '-';
+	cMinusOperator.prototype.priority = 20;
+	cMinusOperator.prototype.argumentsCurrent = 2;
 	cMinusOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -2906,11 +2924,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cPercentOperator() {
-		cBaseOperator.apply(this, ['%', 45, 1]);
+		//cBaseOperator.apply(this, ['%', 45, 1]);
 	}
 
 	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
 	cPercentOperator.prototype.constructor = cPercentOperator;
+	cPercentOperator.prototype.name = '%';
+	cPercentOperator.prototype.priority = 45;
+	cPercentOperator.prototype.argumentsCurrent = 1;
 	cPercentOperator.prototype.rightAssociative = true;
 	cPercentOperator.prototype.Calculate = function (arg) {
 		var res, arg0 = arg[0];
@@ -2942,12 +2963,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cPowOperator() {
-		cBaseOperator.apply(this, ['^', 40]);
+		//cBaseOperator.apply(this, ['^', 40]);
 	}
 
 	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
 	cPowOperator.prototype.numFormat = cNumFormatNone;
 	cPowOperator.prototype.constructor = cPowOperator;
+	cPowOperator.prototype.name = '^';
+	cPowOperator.prototype.priority = 40;
+	cPowOperator.prototype.argumentsCurrent = 2;
 	cPowOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -2983,12 +3007,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cMultOperator() {
-		cBaseOperator.apply(this, ['*', 30]);
+		//cBaseOperator.apply(this, ['*', 30]);
 	}
 
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
 	cMultOperator.prototype.numFormat = cNumFormatNone;
 	cMultOperator.prototype.constructor = cMultOperator;
+	cMultOperator.prototype.name = '*';
+	cMultOperator.prototype.priority = 30;
+	cMultOperator.prototype.argumentsCurrent = 2;
 	cMultOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3018,12 +3045,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cDivOperator() {
-		cBaseOperator.apply(this, ['/', 30]);
+		//cBaseOperator.apply(this, ['/', 30]);
 	}
 
 	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
 	cDivOperator.prototype.numFormat = cNumFormatNone;
 	cDivOperator.prototype.constructor = cDivOperator;
+	cDivOperator.prototype.name = '/';
+	cDivOperator.prototype.priority = 30;
+	cDivOperator.prototype.argumentsCurrent = 2;
 	cDivOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3053,11 +3083,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cConcatSTROperator() {
-		cBaseOperator.apply(this, ['&', 15]);
+		//cBaseOperator.apply(this, ['&', 15]);
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
 	cConcatSTROperator.prototype.constructor = cConcatSTROperator;
+	cConcatSTROperator.prototype.name = '&';
+	cConcatSTROperator.prototype.priority = 15;
+	cConcatSTROperator.prototype.argumentsCurrent = 2;
 	cConcatSTROperator.prototype.numFormat = cNumFormatNone;
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -3083,11 +3116,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cEqualsOperator() {
-		cBaseOperator.apply(this, ['=', 10]);
+		//cBaseOperator.apply(this, ['=', 10]);
 	}
 
 	cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
 	cEqualsOperator.prototype.constructor = cEqualsOperator;
+	cEqualsOperator.prototype.name = '=';
+	cEqualsOperator.prototype.priority = 10;
+	cEqualsOperator.prototype.argumentsCurrent = 2;
 	cEqualsOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3119,11 +3155,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cNotEqualsOperator() {
-		cBaseOperator.apply(this, ['<>', 10]);
+		//cBaseOperator.apply(this, ['<>', 10]);
 	}
 
 	cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
 	cNotEqualsOperator.prototype.constructor = cNotEqualsOperator;
+	cNotEqualsOperator.prototype.name = '<>';
+	cNotEqualsOperator.prototype.priority = 10;
+	cNotEqualsOperator.prototype.argumentsCurrent = 2;
 	cNotEqualsOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3156,11 +3195,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cLessOperator() {
-		cBaseOperator.apply(this, ['<', 10]);
+		//cBaseOperator.apply(this, ['<', 10]);
 	}
 
 	cLessOperator.prototype = Object.create(cBaseOperator.prototype);
 	cLessOperator.prototype.constructor = cLessOperator;
+	cLessOperator.prototype.name = '<';
+	cLessOperator.prototype.priority = 10;
+	cLessOperator.prototype.argumentsCurrent = 2;
 	cLessOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3193,11 +3235,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cLessOrEqualOperator() {
-		cBaseOperator.apply(this, ['<=', 10]);
+		//cBaseOperator.apply(this, ['<=', 10]);
 	}
 
 	cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
 	cLessOrEqualOperator.prototype.constructor = cLessOrEqualOperator;
+	cLessOrEqualOperator.prototype.name = '<=';
+	cLessOrEqualOperator.prototype.priority = 10;
+	cLessOrEqualOperator.prototype.argumentsCurrent = 2;
 	cLessOrEqualOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3229,11 +3274,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cGreaterOperator() {
-		cBaseOperator.apply(this, ['>', 10]);
+		//cBaseOperator.apply(this, ['>', 10]);
 	}
 
 	cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
 	cGreaterOperator.prototype.constructor = cGreaterOperator;
+	cGreaterOperator.prototype.name = '>';
+	cGreaterOperator.prototype.priority = 10;
+	cGreaterOperator.prototype.argumentsCurrent = 2;
 	cGreaterOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 
@@ -3265,11 +3313,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cGreaterOrEqualOperator() {
-		cBaseOperator.apply(this, ['>=', 10]);
+		//cBaseOperator.apply(this, ['>=', 10]);
 	}
 
 	cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
 	cGreaterOrEqualOperator.prototype.constructor = cGreaterOrEqualOperator;
+	cGreaterOrEqualOperator.prototype.name = '>=';
+	cGreaterOrEqualOperator.prototype.priority = 10;
+	cGreaterOrEqualOperator.prototype.argumentsCurrent = 2;
 	cGreaterOrEqualOperator.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws, bIsSpecialFunction) {
 		var arg0 = arg[0], arg1 = arg[1];
 

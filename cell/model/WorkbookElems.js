@@ -2805,7 +2805,7 @@ StyleManager.prototype =
 		return this.xfs.list.length;
 	};
 	StyleCache.prototype._add = function(container, newVal) {
-		if (undefined === newVal.getIndexNumber()) {
+		if (newVal && undefined === newVal.getIndexNumber()) {
 			var hash = newVal.getHash();
 			var res = container.vals[hash];
 			if (!res) {
@@ -3211,25 +3211,14 @@ Col.prototype =
 	setStyle : function(xfs)
 	{
 		var oldVal = this.xfs;
-		var newVal = null;
-		this.xfs = null;
-		if(null != xfs)
-		{
-			this.xfs = xfs.clone();
-			newVal = xfs;
-		}
-		if(History.Is_On() && false == ((null == oldVal && null == newVal) || (null != oldVal && null != newVal && true == oldVal.isEqual(newVal))))
-		{
-			if(null != oldVal)
-				oldVal = oldVal.clone();
-			if(null != newVal)
-				newVal = newVal.clone();
-			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+		this.setStyleInternal(xfs);
+		if (History.Is_On() && oldVal !== this.xfs) {
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, this.xfs));
 		}
 	},
 	setStyleInternal : function(xfs)
 	{
-		this.xfs = xfs;
+		this.xfs = g_StyleCache.addXf(xfs);
 	},
 	setCellStyle : function(val)
 	{
@@ -3524,15 +3513,14 @@ Row.prototype =
 	setStyle : function(xfs)
 	{
 		var oldVal = this.xfs;
-		this.xfs = xfs;
-		this._hasChanged = true;
-		if (History.Is_On() && oldVal != this.xfs) {
+		this.setStyleInternal(xfs);
+		if (History.Is_On() && oldVal !== this.xfs) {
 			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, this.xfs));
 		}
 	},
 	setStyleInternal : function(xfs)
 	{
-		this.xfs = xfs;
+		this.xfs = g_StyleCache.addXf(xfs);
 		this._hasChanged = true;
 	},
 	setCellStyle : function(val)

@@ -6034,14 +6034,14 @@
                         oTo.BestFit = oFrom.BestFit;
                     oTo.setHidden(oFrom.hd);
                     if(null != oFrom.xfs)
-                        oTo.xfs = oFrom.xfs.clone();
+                        oTo.setStyle(oFrom.xfs);
                     else if(null != oFrom.xfsid)
                     {
                         var xfs = oThis.aCellXfs[oFrom.xfsid];
                         if(null != xfs)
                         {
                             oFrom.xfs = xfs;
-                            oTo.xfs = xfs.clone();
+                            oTo.setStyle(xfs);
                         }
                     }
                     if(null != oFrom.width)
