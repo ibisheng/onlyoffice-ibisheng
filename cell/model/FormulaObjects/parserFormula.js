@@ -2664,7 +2664,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cRangeUnionOperator() {
-		//cBaseOperator.apply(this, [':', 50, 2]);
 	}
 
 	cRangeUnionOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2717,7 +2716,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cRangeIntersectionOperator() {
-		//cBaseOperator.apply(this, [' ', 50, 2]);
 	}
 
 	cRangeIntersectionOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2775,7 +2773,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cUnarMinusOperator() {
-		//cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
 	}
 
 	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2815,7 +2812,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cUnarPlusOperator() {
-		//cBaseOperator.apply(this, ['un_plus', 49, 1]);
 	}
 
 	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2850,7 +2846,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cAddOperator() {
-		//cBaseOperator.apply(this, ['+', 20]);
 	}
 
 	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2887,7 +2882,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cMinusOperator() {
-		//cBaseOperator.apply(this, ['-', 20]);
 	}
 
 	cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2924,7 +2918,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cPercentOperator() {
-		//cBaseOperator.apply(this, ['%', 45, 1]);
 	}
 
 	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -2963,7 +2956,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cPowOperator() {
-		//cBaseOperator.apply(this, ['^', 40]);
 	}
 
 	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3007,7 +2999,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cMultOperator() {
-		//cBaseOperator.apply(this, ['*', 30]);
 	}
 
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3045,7 +3036,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cDivOperator() {
-		//cBaseOperator.apply(this, ['/', 30]);
 	}
 
 	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3083,7 +3073,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cConcatSTROperator() {
-		//cBaseOperator.apply(this, ['&', 15]);
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3116,7 +3105,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cEqualsOperator() {
-		//cBaseOperator.apply(this, ['=', 10]);
 	}
 
 	cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3155,7 +3143,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cNotEqualsOperator() {
-		//cBaseOperator.apply(this, ['<>', 10]);
 	}
 
 	cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3195,7 +3182,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cLessOperator() {
-		//cBaseOperator.apply(this, ['<', 10]);
 	}
 
 	cLessOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3235,7 +3221,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cLessOrEqualOperator() {
-		//cBaseOperator.apply(this, ['<=', 10]);
 	}
 
 	cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3274,7 +3259,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cGreaterOperator() {
-		//cBaseOperator.apply(this, ['>', 10]);
 	}
 
 	cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3313,7 +3297,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	 * @extends {cBaseOperator}
 	 */
 	function cGreaterOrEqualOperator() {
-		//cBaseOperator.apply(this, ['>=', 10]);
 	}
 
 	cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
@@ -3360,55 +3343,54 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cSpecialOperandEnd.prototype.type = cElementType.specialFunctionEnd;
 
 
-
 	/* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
-var cFormulaOperators = {
-    '('       : parentLeft,
-    ')'       : parentRight,
-    '{'       : function () {
-        var r = {};
-        r.name = '{';
-        r.toString = function () {
-            return this.name;
-        };
-        return r;
-    },
-    '}'       : function () {
-        var r = {};
-        r.name = '}';
-        r.toString = function () {
-            return this.name;
-        };
-        return r;
-  }, /* 50 is highest priority */
-    ':'       : cRangeUnionOperator,
-    ' '       : cRangeIntersectionOperator,
-    'un_minus': cUnarMinusOperator,
-    'un_plus' : cUnarPlusOperator,
-    '%'       : cPercentOperator,
-    '^'       : cPowOperator,
-    '*'       : cMultOperator,
-    '/'       : cDivOperator,
-    '+'       : cAddOperator,
-    '-'       : cMinusOperator,
-    '&'       : cConcatSTROperator /*concat str*/,
-    '='       : cEqualsOperator/*equals*/,
-    '<>'      : cNotEqualsOperator,
-    '<'       : cLessOperator,
-    '<='      : cLessOrEqualOperator,
-    '>'       : cGreaterOperator,
-    '>='      : cGreaterOrEqualOperator
-    /* 10 is lowest priopity */
-};
+	var cFormulaOperators = {
+		'(': parentLeft,
+		')': parentRight,
+		'{': function () {
+			var r = {};
+			r.name = '{';
+			r.toString = function () {
+				return this.name;
+			};
+			return r;
+		},
+		'}': function () {
+			var r = {};
+			r.name = '}';
+			r.toString = function () {
+				return this.name;
+			};
+			return r;
+		}, /* 50 is highest priority */
+		':': cRangeUnionOperator,
+		' ': cRangeIntersectionOperator,
+		'un_minus': cUnarMinusOperator,
+		'un_plus': cUnarPlusOperator,
+		'%': cPercentOperator,
+		'^': cPowOperator,
+		'*': cMultOperator,
+		'/': cDivOperator,
+		'+': cAddOperator,
+		'-': cMinusOperator,
+		'&': cConcatSTROperator /*concat str*/,
+		'=': cEqualsOperator/*equals*/,
+		'<>': cNotEqualsOperator,
+		'<': cLessOperator,
+		'<=': cLessOrEqualOperator,
+		'>': cGreaterOperator,
+		'>=': cGreaterOrEqualOperator
+		/* 10 is lowest priopity */
+	};
 
-/* cFormulaFunctionGroup is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
-/*
- Каждая формула представляет собой копию функции cBaseFunction.
- Для реализации очередной функции необходимо указать количество (минимальное и максимальное) принимаемых аргументов. Берем в спецификации.
- Также необходино написать реализацию методов Calculate и getInfo(возвращает название функции и вид/количетво аргументов).
- В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
- Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
- */
+	/* cFormulaFunctionGroup is container for holding all ECMA-376 function, see chapter $18.17.7 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
+	/*
+	 Каждая формула представляет собой копию функции cBaseFunction.
+	 Для реализации очередной функции необходимо указать количество (минимальное и максимальное) принимаемых аргументов. Берем в спецификации.
+	 Также необходино написать реализацию методов Calculate и getInfo(возвращает название функции и вид/количетво аргументов).
+	 В методе Calculate необходимо отслеживать тип принимаемых аргументов. Для примера, если мы обращаемся к ячейке A1, в которой лежит 123, то этот аргумент будет числом. Если же там лежит "123", то это уже строка. Для более подробной информации смотреть спецификацию.
+	 Метод getInfo является обязательным, ибо через этот метод в интерфейс передается информация о реализованных функциях.
+	 */
 	var cFormulaFunctionGroup = {};
 	var cFormulaFunction = {};
 	var cAllFormulaFunction = {};
@@ -4796,10 +4778,10 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (t.operand_expected) {
 				if ('-' === t.operand_str) {
 					t.operand_expected = true;
-					found_operator = new cFormulaOperators['un_minus']();
+					found_operator = cFormulaOperators['un_minus'].prototype;
 				} else if ('+' === t.operand_str) {
 					t.operand_expected = true;
-					found_operator = new cFormulaOperators['un_plus']();
+					found_operator = cFormulaOperators['un_plus'].prototype;
 				} else if (' ' === t.operand_str) {
 					return true;
 				} else {
@@ -4811,21 +4793,21 @@ parserFormula.prototype.setFormula = function(formula) {
 			} else if (!t.operand_expected) {
 				if ('-' === t.operand_str) {
 					t.operand_expected = true;
-					found_operator = new cFormulaOperators['-']();
+					found_operator = cFormulaOperators['-'].prototype;
 				} else if ('+' === t.operand_str) {
 					t.operand_expected = true;
-					found_operator = new cFormulaOperators['+']();
+					found_operator = cFormulaOperators['+'].prototype;
 				} else if (':' === t.operand_str) {
 					t.operand_expected = true;
-					found_operator = new cFormulaOperators[':']();
+					found_operator = cFormulaOperators[':'].prototype;
 				} else if ('%' === t.operand_str) {
 					t.operand_expected = false;
-					found_operator = new cFormulaOperators['%']();
+					found_operator = cFormulaOperators['%'].prototype;
 				} else if (' ' === t.operand_str && t.pCurrPos === t.Formula.length) {
 					return true;
 				} else {
 					if (t.operand_str in cFormulaOperators) {
-						found_operator = new cFormulaOperators[t.operand_str]();
+						found_operator = cFormulaOperators[t.operand_str].prototype;
 						t.operand_expected = true;
 					} else {
 						t.error.push(c_oAscError.ID.FrmlWrongOperator);
