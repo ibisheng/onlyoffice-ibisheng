@@ -1097,7 +1097,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cArea.prototype.getRange = function () {
 		if (!this.range) {
-			this.range = this.ws.getRange2(this._cells);
+			this.range = this.ws.getRange2(this.value);
 		}
 		return this.range;
 	};
@@ -1612,7 +1612,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if (this.range) {
 				return this.range;
 			}
-			return this.range = this.ws.getRange2(this._cells);
+			return this.range = this.ws.getRange2(this.value);
 		} else {
 			return this.range = null;
 		}
