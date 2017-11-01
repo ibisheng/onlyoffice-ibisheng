@@ -3133,7 +3133,15 @@ PasteProcessor.prototype =
 			}
 			else if(base64FromPresentation)//вставка из редактора презентаций
 			{
-				this._pasteBinaryFromPresentation(base64FromPresentation, bDuplicate);
+				if(PasteElementsId.g_bIsDocumentCopyPaste)
+				{
+					this._pasteBinaryFromPresentationToDocument(base64FromPresentation, bDuplicate);
+				}
+				else
+				{
+					this._pasteBinaryFromPresentationToPresentation(base64FromPresentation);
+				}
+
 				bInsertFromBinary = true;
 			}
 			
@@ -3576,605 +3584,575 @@ PasteProcessor.prototype =
 			}
 		}
 	},
-	
-	_pasteBinaryFromPresentation: function(base64, bDuplicate)
+
+	_pasteBinaryFromPresentationToDocument: function(base64)
 	{
 		var oThis = this;
-		
-		if(PasteElementsId.g_bIsDocumentCopyPaste)
-		{
-			var fPrepasteCallback = function(){
-				if(false === oThis.bNested)
-				{
-					oThis.InsertInDocument();
-					if(aContent.bAddNewStyles)
-						oThis.api.GenerateStyles();
-				}
-			};
-			
-			
-			pptx_content_loader.Clear();
 
-			var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-			var stream = new AscCommon.FileStream(_stream.data, _stream.size);
-			var p_url = stream.GetString2();
-			var p_width = stream.GetULong()/100000;
-			var p_height = stream.GetULong()/100000;
-			//var kw = presentation.Width/p_width;
-			//var kh = presentation.Height/p_height;
-			var fonts = [];
-			
-			var first_string = stream.GetString2();
-			
-			switch(first_string)
+		var fPrepasteCallback = function(){
+			if(false === oThis.bNested)
 			{
-				case "Content":
-				{
-					var docContent = this.ReadPresentationText(stream);
-					for(var i in this.oFonts)
-					{
-						fonts.push(new CFont(i, 0, "", 0));
-					}
-					
-					var aContent = [];
-					for(var i = 0; i < docContent.length; i++)
-					{
-						aContent[i] = AscFormat.ConvertParagraphToWord(docContent[i].Element, this.oDocument);
-					}						
-					this.aContent = aContent;
-
-					oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
-					return;
-				}
-				case "Drawings":
-				{
-					//TODO пересмотреть отключение истории!!!
-					History.TurnOff();
-					var objects = this.ReadPresentationShapes(stream);
-					History.TurnOn();
-					
-					var font_map = {};
-					
-					var arr_shapes = objects.arrShapes;
-					//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
-					if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
-					{
-						var drawing = objects.arrShapes[0].Drawing;
-						
-						if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
-						{
-							var aContent = [];
-							var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
-							table.Document_Get_AllFontNames(font_map);
-							
-							//перебираем шрифты
-							for(var i in font_map)
-							{
-								fonts.push(new CFont(i, 0, "", 0));
-							}
-							
-							//TODO стиль не прокидывается. в будущем нужно реализовать
-							table.TableStyle = null;
-							aContent.push(table);
-							
-							this.aContent = aContent;
-							oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
-							
-							return;
-						}
-					}
-					
-						
-					var aImagesToDownload = [];
-					for(var i = 0; i < objects.arrImages.length; i++)
-					{
-						aImagesToDownload.push(objects.arrImages[i].Url);
-					}
-					
-					//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
-					if(objects.arrShapes.length > 1)
-					{
-						for(var i = 0; i < objects.arrShapes.length; i++)
-						{
-							if(typeof CGraphicFrame !== "undefined" && objects.arrShapes[i].Drawing instanceof CGraphicFrame)
-							{
-								aImagesToDownload.push(objects.arrShapes[i].base64);
-								objects.arrImages.push(objects.arrShapes[i]);
-							}
-						}
-					}
-					
-					//get fonts from shapes
-					var images = [];
-					for(var i = 0; i < objects.arrShapes.length; ++i)
-					{
-						if(objects.arrShapes[i].Drawing.getAllFonts)
-						{
-							objects.arrShapes[i].Drawing.getAllFonts(font_map);
-						}	
-						/*if(objects.arrShapes[i].Drawing.getAllImages)
-							objects.arrShapes[i].Drawing.getAllImages(images);*/
-					}
-					//перебираем шрифты
-					for(var i in font_map)
-					{
-						fonts.push(new CFont(i, 0, "", 0));
-					}
-					
-					//в конце добавляем ссылки на wmf, ole
-					for(var i = 0; i < objects.arrImages.length; ++i)
-					{
-						var oBuilderImage = objects.arrImages[i];
-						if (oBuilderImage.AdditionalUrls) 
-						{
-							for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) 
-							{
-								aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
-							}
-						}
-					}
-					
-					AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-						var image_map = {};
-						for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) 
-						{
-							var elem = data[i];
-							if (null != elem.url) 
-							{
-								var name = g_oDocumentUrls.imagePath2Local(elem.path);
-								var imageElem = objects.arrImages[i];
-								if (null != imageElem) 
-								{
-									//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
-									if (imageElem.base64) 
-									{
-										imageElem.base64 = name;
-									} 
-									else 
-									{
-										imageElem.SetUrl(name);
-									}
-								}
-								image_map[i] = name;
-							} 
-							else 
-							{
-								image_map[i] = aImagesToDownload[i];
-							}
-						}
-						
-						aContent = oThis._convertExcelBinary(null, arr_shapes);
-						oThis.aContent = aContent.content;
-						oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
-					});
-					
-					return;
-				}
-				case "SlideObjects":
-				{
-					History.TurnOff();
-					
-					var loader = new AscCommon.BinaryPPTYLoader();
-					loader.Start_UseFullUrl();
-					
-					pptx_content_loader.Reader.Start_UseFullUrl();
-					
-					loader.stream = stream;
-					loader.presentation = editor.WordControl.m_oLogicDocument;
-					var imageUrl = stream.GetString2();
-					
-					History.TurnOn();
-					
-					var aImagesToDownload = [];
-					aImagesToDownload.push(imageUrl);
-					
-					//load image(slide base64)
-					AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-						var image_map = {};
-						var elem = data[0];
-						if (null != elem.url) 
-						{
-							imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
-							image_map[0] = imageUrl;
-						} 
-						
-						//create paragraph, pararun and paradrawing
-						var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
-						var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);	
-						
-						var tempParaRun = new ParaRun();
-						tempParaRun.Paragraph = null;
-						tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
-
-						tempParaRun.Content[0].Set_GraphicObject(graphicObj);
-						tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
-						tempParaRun.Content[0].CheckWH();
-						
-						tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
-						
-						aContent = [];
-						aContent.push(tempParagraph);
-						oThis.aContent = aContent;
-						
-						oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
-					});
-					
-					return;
-				}
+				oThis.InsertInDocument();
+				if(aContent.bAddNewStyles)
+					oThis.api.GenerateStyles();
 			}
-		}
-		else
-		{
-			var presentation = editor.WordControl.m_oLogicDocument;
-			pptx_content_loader.Clear();
+		};
 
-			var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-			var stream = new AscCommon.FileStream(_stream.data, _stream.size);
-			var p_url = stream.GetString2();
-			var p_width = stream.GetULong()/100000;
-			var p_height = stream.GetULong()/100000;
-			var kw = presentation.Width/p_width;
-			var kh = presentation.Height/p_height;
-			var fonts = [];
-			
-			var first_string = stream.GetString2();
-			
-			switch(first_string)
+
+		pptx_content_loader.Clear();
+
+		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
+		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
+		var p_url = stream.GetString2();
+		var p_width = stream.GetULong()/100000;
+		var p_height = stream.GetULong()/100000;
+		//var kw = presentation.Width/p_width;
+		//var kh = presentation.Height/p_height;
+		var fonts = [];
+
+		var first_string = stream.GetString2();
+
+		switch(first_string)
+		{
+			case "Content":
 			{
-				case "Content":
+				var docContent = this.ReadPresentationText(stream);
+				for(var i in this.oFonts)
 				{
-					var docContent = this.ReadPresentationText(stream);
-					if(docContent.length === 0){
+					fonts.push(new CFont(i, 0, "", 0));
+				}
+
+				var aContent = [];
+				for(var i = 0; i < docContent.length; i++)
+				{
+					aContent[i] = AscFormat.ConvertParagraphToWord(docContent[i].Element, this.oDocument);
+				}
+				this.aContent = aContent;
+
+				oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
+				return;
+			}
+			case "Drawings":
+			{
+				//TODO пересмотреть отключение истории!!!
+				History.TurnOff();
+				var objects = this.ReadPresentationShapes(stream);
+				History.TurnOn();
+
+				var font_map = {};
+
+				var arr_shapes = objects.arrShapes;
+				//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
+				if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
+				{
+					var drawing = objects.arrShapes[0].Drawing;
+
+					if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+					{
+						var aContent = [];
+						var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
+						table.Document_Get_AllFontNames(font_map);
+
+						//перебираем шрифты
+						for(var i in font_map)
+						{
+							fonts.push(new CFont(i, 0, "", 0));
+						}
+
+						//TODO стиль не прокидывается. в будущем нужно реализовать
+						table.TableStyle = null;
+						aContent.push(table);
+
+						this.aContent = aContent;
+						oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
+
 						return;
 					}
-
-					for (var i = 0; i < docContent.length; ++i) {
-						if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
-							docContent[i].Element = this._specialPasteItemConvert(docContent[i].Element);
-						}
-					}
-
-					var presentationSelectedContent = new PresentationSelectedContent();
-					presentationSelectedContent.DocContent = new CSelectedContent();
-					presentationSelectedContent.DocContent.Elements = docContent;
-
-					
-					var font_map = {};
-					var images = [];
-					//shape.getAllFonts(font_map);
-					
-					//перебираем шрифты
-					for(var i in this.oFonts)
-					{
-						fonts.push(new CFont(i, 0, "", 0));
-					}
-					
-					//вставка
-					var paste_callback = function()
-					{
-						if(false === oThis.bNested)
-						{
-							presentation.Insert_Content(presentationSelectedContent);
-							presentation.Recalculate();
-							presentation.Check_CursorMoveRight();
-							presentation.Document_UpdateInterfaceState();
-
-							oThis._setSpecialPasteShowOptionsPresentation();
-
-							window['AscCommon'].g_clipboardBase.Paste_Process_End();
-						}
-					};
-
-					var oPrepeareImages = {};
-					this.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
-					return;
 				}
-				case "Drawings":
+
+
+				var aImagesToDownload = [];
+				for(var i = 0; i < objects.arrImages.length; i++)
 				{
-					var objects = this.ReadPresentationShapes(stream);
-					
-					var arr_shapes = objects.arrShapes;
-					
-					var font_map = {};
-					var images = [];
-					for(var i = 0; i < arr_shapes.length; ++i)
-					{
-						if(arr_shapes[i].Drawing.getAllFonts)
-							arr_shapes[i].Drawing.getAllFonts(font_map);
-						if(arr_shapes[i].Drawing.getAllImages)
-							arr_shapes[i].Drawing.getAllImages(images);
-					}
-				   
-					var paste_callback = function()
-					{
-						if(false === oThis.bNested)
-						{
-							var presentationSelectedContent = new PresentationSelectedContent();
-							presentationSelectedContent.Drawings = arr_shapes;
-					
-							presentation.Insert_Content(presentationSelectedContent);
-							
-							presentation.Recalculate();
-							presentation.Document_UpdateInterfaceState();
-
-							setSpecialPasteShowOptionsPresentation();
-
-							window['AscCommon'].g_clipboardBase.Paste_Process_End();
-						}
-					};
-
-					//грузим картинки и фонты
-					for(var i in font_map)
-						fonts.push(new CFont(i, 0, "", 0));
-
-					var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
-					if(oObjectsForDownload.aUrls.length > 0)
-					{
-					  AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
-						var oImageMap = {};
-						ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-						oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-					  });
-					}
-					else
-					{
-						var im_arr = [];
-						for(var key  in images)
-							im_arr.push(key);
-
-						this.SetShortImageId(objects.arrImages);
-						this.api.pre_Paste(fonts, im_arr, paste_callback);
-					}
-					return;
+					aImagesToDownload.push(objects.arrImages[i].Url);
 				}
-				case "SlideObjects":
+
+				//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
+				if(objects.arrShapes.length > 1)
 				{
-					var arr_layouts_id = [];
-					var arr_slides = [];
-					var loader = new AscCommon.BinaryPPTYLoader();
-					if(!(bDuplicate === true))
-						loader.Start_UseFullUrl();
-					loader.stream = stream;
-					loader.presentation = editor.WordControl.m_oLogicDocument;
-					
-					//read slides
-					var imageUrl = stream.GetString2();
-					var slide_count = stream.GetULong();
-					var arr_arrTransforms = [];
-					for(var i = 0; i < slide_count; ++i)
+					for(var i = 0; i < objects.arrShapes.length; i++)
 					{
-						arr_layouts_id[i] = stream.GetString2();
-						var table_styles_ids_len = stream.GetULong();
-						var table_styles_ids = [];
-						for(var j = 0; j < table_styles_ids_len; ++j)
+						if(typeof CGraphicFrame !== "undefined" && objects.arrShapes[i].Drawing instanceof CGraphicFrame)
 						{
-							if(stream.GetBool())
-								table_styles_ids.push(stream.GetString2());
-							else
-								table_styles_ids.push(-1);
+							aImagesToDownload.push(objects.arrShapes[i].base64);
+							objects.arrImages.push(objects.arrShapes[i]);
 						}
-						arr_slides[i] = loader.ReadSlide(0);
-						if(stream.GetBool()){
-						    var oNotes = loader.ReadNote();
-						    oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
-						    arr_slides[i].setNotes(oNotes);
-                            arr_slides[i].notes.setSlide(arr_slides[i]);
-                        }
-                        else{
-                            arr_slides[i].setNotes(AscCommonSlide.CreateNotes());
-                            arr_slides[i].notes.setNotesMaster(loader.presentation.notesMasters[0]);
-                            arr_slides[i].notes.setSlide(arr_slides[i]);
-                        }
-						var sp_tree = arr_slides[i].cSld.spTree;
-						var t = 0;
-						for(var s = 0; s < sp_tree.length; ++s)
+					}
+				}
+
+				//get fonts from shapes
+				var images = [];
+				for(var i = 0; i < objects.arrShapes.length; ++i)
+				{
+					if(objects.arrShapes[i].Drawing.getAllFonts)
+					{
+						objects.arrShapes[i].Drawing.getAllFonts(font_map);
+					}
+					/*if(objects.arrShapes[i].Drawing.getAllImages)
+					 objects.arrShapes[i].Drawing.getAllImages(images);*/
+				}
+				//перебираем шрифты
+				for(var i in font_map)
+				{
+					fonts.push(new CFont(i, 0, "", 0));
+				}
+
+				//в конце добавляем ссылки на wmf, ole
+				for(var i = 0; i < objects.arrImages.length; ++i)
+				{
+					var oBuilderImage = objects.arrImages[i];
+					if (oBuilderImage.AdditionalUrls)
+					{
+						for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j)
 						{
-							if(sp_tree[s] instanceof CGraphicFrame)
+							aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
+						}
+					}
+				}
+
+				AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+					var image_map = {};
+					for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i)
+					{
+						var elem = data[i];
+						if (null != elem.url)
+						{
+							var name = g_oDocumentUrls.imagePath2Local(elem.path);
+							var imageElem = objects.arrImages[i];
+							if (null != imageElem)
 							{
-								sp_tree[s].graphicObject.Set_TableStyle(table_styles_ids[t], true);
-								++t;
+								//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
+								if (imageElem.base64)
+								{
+									imageElem.base64 = name;
+								}
+								else
+								{
+									imageElem.SetUrl(name);
+								}
+							}
+							image_map[i] = name;
+						}
+						else
+						{
+							image_map[i] = aImagesToDownload[i];
+						}
+					}
+
+					aContent = oThis._convertExcelBinary(null, arr_shapes);
+					oThis.aContent = aContent.content;
+					oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
+				});
+
+				return;
+			}
+			case "SlideObjects":
+			{
+				History.TurnOff();
+
+				var loader = new AscCommon.BinaryPPTYLoader();
+				loader.Start_UseFullUrl();
+
+				pptx_content_loader.Reader.Start_UseFullUrl();
+
+				loader.stream = stream;
+				loader.presentation = editor.WordControl.m_oLogicDocument;
+				var imageUrl = stream.GetString2();
+
+				History.TurnOn();
+
+				var aImagesToDownload = [];
+				aImagesToDownload.push(imageUrl);
+
+				//load image(slide base64)
+				AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+					var image_map = {};
+					var elem = data[0];
+					if (null != elem.url)
+					{
+						imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
+						image_map[0] = imageUrl;
+					}
+
+					//create paragraph, pararun and paradrawing
+					var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
+					var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);
+
+					var tempParaRun = new ParaRun();
+					tempParaRun.Paragraph = null;
+					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
+
+					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+					tempParaRun.Content[0].CheckWH();
+
+					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+
+					aContent = [];
+					aContent.push(tempParagraph);
+					oThis.aContent = aContent;
+
+					oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
+				});
+
+			}
+		}
+	},
+
+	_pasteBinaryFromPresentationToPresentation: function (base64, bDuplicate) {
+		var oThis = this;
+		var presentation = editor.WordControl.m_oLogicDocument;
+		pptx_content_loader.Clear();
+
+		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
+		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
+		var p_url = stream.GetString2();
+		var p_width = stream.GetULong() / 100000;
+		var p_height = stream.GetULong() / 100000;
+		var fonts = [];
+
+		var pasteContent = function () {
+			var docContent = oThis.ReadPresentationText(stream);
+			if (docContent.length === 0) {
+				return;
+			}
+
+			for (var i = 0; i < docContent.length; ++i) {
+				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+					docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
+				}
+			}
+
+			var presentationSelectedContent = new PresentationSelectedContent();
+			presentationSelectedContent.DocContent = new CSelectedContent();
+			presentationSelectedContent.DocContent.Elements = docContent;
+
+
+			var font_map = {};
+			var images = [];
+			//shape.getAllFonts(font_map);
+
+			//перебираем шрифты
+			for (var i in oThis.oFonts) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
+
+			//вставка
+			var paste_callback = function () {
+				if (false === oThis.bNested) {
+					presentation.Insert_Content(presentationSelectedContent);
+					presentation.Recalculate();
+					presentation.Check_CursorMoveRight();
+					presentation.Document_UpdateInterfaceState();
+
+					oThis._setSpecialPasteShowOptionsPresentation();
+
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				}
+			};
+
+			var oPrepeareImages = {};
+			oThis.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
+		};
+
+		var pasteDrawings = function () {
+
+			var objects = oThis.ReadPresentationShapes(stream);
+			var arr_shapes = objects.arrShapes;
+
+			var font_map = {};
+			var images = [];
+			for (var i = 0; i < arr_shapes.length; ++i) {
+				if (arr_shapes[i].Drawing.getAllFonts) {
+					arr_shapes[i].Drawing.getAllFonts(font_map);
+				}
+				if (arr_shapes[i].Drawing.getAllImages) {
+					arr_shapes[i].Drawing.getAllImages(images);
+				}
+			}
+
+			var paste_callback = function () {
+				if (false === oThis.bNested) {
+					var presentationSelectedContent = new PresentationSelectedContent();
+					presentationSelectedContent.Drawings = arr_shapes;
+
+					presentation.Insert_Content(presentationSelectedContent);
+
+					presentation.Recalculate();
+					presentation.Document_UpdateInterfaceState();
+
+					oThis._setSpecialPasteShowOptionsPresentation();
+
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				}
+			};
+
+			//грузим картинки и фонты
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
+
+			var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
+			if (oObjectsForDownload.aUrls.length > 0) {
+				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+					var oImageMap = {};
+					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
+				});
+			} else {
+				var im_arr = [];
+				for (var key  in images) {
+					im_arr.push(key);
+				}
+
+				oThis.SetShortImageId(objects.arrImages);
+				oThis.api.pre_Paste(fonts, im_arr, paste_callback);
+			}
+		};
+
+		var pasteSlideObjects = function () {
+			var arr_layouts_id = [];
+			var arr_slides = [];
+			var loader = new AscCommon.BinaryPPTYLoader();
+			if (!(bDuplicate === true)) {
+				loader.Start_UseFullUrl();
+			}
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			//read slides
+			var imageUrl = stream.GetString2();
+			var slide_count = stream.GetULong();
+			var arr_arrTransforms = [];
+			for (var i = 0; i < slide_count; ++i) {
+				arr_layouts_id[i] = stream.GetString2();
+				var table_styles_ids_len = stream.GetULong();
+				var table_styles_ids = [];
+				for (var j = 0; j < table_styles_ids_len; ++j) {
+					if (stream.GetBool()) {
+						table_styles_ids.push(stream.GetString2());
+					} else {
+						table_styles_ids.push(-1);
+					}
+				}
+				arr_slides[i] = loader.ReadSlide(0);
+				if (stream.GetBool()) {
+					var oNotes = loader.ReadNote();
+					oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
+					arr_slides[i].setNotes(oNotes);
+					arr_slides[i].notes.setSlide(arr_slides[i]);
+				} else {
+					arr_slides[i].setNotes(AscCommonSlide.CreateNotes());
+					arr_slides[i].notes.setNotesMaster(loader.presentation.notesMasters[0]);
+					arr_slides[i].notes.setSlide(arr_slides[i]);
+				}
+				var sp_tree = arr_slides[i].cSld.spTree;
+				var t = 0;
+				for (var s = 0; s < sp_tree.length; ++s) {
+					if (sp_tree[s] instanceof CGraphicFrame) {
+						sp_tree[s].graphicObject.Set_TableStyle(table_styles_ids[t], true);
+						++t;
+					}
+				}
+				var arrTransforms = [];
+				var sp_tree_length = stream.GetULong();
+				for (s = 0; s < sp_tree_length; ++s) {
+					var transform_object = {};
+					transform_object.x = stream.GetULong() / 100000;
+					transform_object.y = stream.GetULong() / 100000;
+					transform_object.extX = stream.GetULong() / 100000;
+					transform_object.extY = stream.GetULong() / 100000;
+					arrTransforms.push(transform_object);
+				}
+				arr_arrTransforms.push(arrTransforms);
+			}
+
+			//read layout
+			var arr_layouts = [];
+			var master;
+			if (presentation.Slides[presentation.CurPage]) {
+				master = presentation.Slides[presentation.CurPage].Layout.Master;
+			} else {
+				master = presentation.slideMasters[0];
+			}
+
+			if (oThis.api.documentId !== p_url) {
+				var layouts_count = stream.GetULong();
+				for (var i = 0; i < layouts_count; ++i) {
+					arr_layouts[i] = loader.ReadSlideLayout();
+					arr_layouts[i].Width = p_width;
+					arr_layouts[i].Height = p_height;
+				}
+				var arr_indexes = [];
+				for (var i = 0; i < slide_count; ++i) {
+					arr_indexes.push(stream.GetULong());
+				}
+
+				for (var i = 0; i < layouts_count; ++i) {
+					arr_layouts[i].setMaster(master);
+					arr_layouts[i].changeSize(presentation.Width, presentation.Height);
+					master.addLayout(arr_layouts[i]);
+				}
+				for (var i = 0; i < slide_count; ++i) {
+					arr_slides[i].changeSize(presentation.Width, presentation.Height);
+					arr_slides[i].setLayout(arr_layouts[arr_indexes[i]]);
+					arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
+				}
+			} else {
+				var arr_matched_layout = [];
+				var b_read_layouts = false;
+				for (var i = 0; i < arr_layouts_id.length; ++i) {
+					var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
+					if (!tempLayout || !tempLayout.Master) {
+						b_read_layouts = true;
+						break;
+					} else {
+						for (var j = 0; j < presentation.slideMasters.length; ++j) {
+							if (presentation.slideMasters[j] === tempLayout.Master) {
+								break;
 							}
 						}
-						var arrTransforms = [];
-						var sp_tree_length = stream.GetULong();
-						for(s = 0; s < sp_tree_length; ++s)
-						{
-							var transform_object = {};
-							transform_object.x = stream.GetULong()/100000;
-							transform_object.y = stream.GetULong()/100000;
-							transform_object.extX = stream.GetULong()/100000;
-							transform_object.extY = stream.GetULong()/100000;
-							arrTransforms.push(transform_object);
+						if (j === presentation.slideMasters.length) {
+							b_read_layouts = true;
+							break;
 						}
-						arr_arrTransforms.push(arrTransforms);
 					}
+				}
+				if (b_read_layouts) {
+					var layouts_count = stream.GetULong();
 
-					//read layout
-					var arr_layouts = [];
-					var master;
-					if(presentation.Slides[presentation.CurPage])
-						master = presentation.Slides[presentation.CurPage].Layout.Master;
-					else
-						master = presentation.slideMasters[0];
-						
-					if(this.api.documentId !== p_url)
-					{
-						var layouts_count = stream.GetULong();
-						for(var i = 0; i < layouts_count; ++i)
-						{
+					AscFormat.ExecuteNoHistory(function () {
+						for (var i = 0; i < layouts_count; ++i) {
 							arr_layouts[i] = loader.ReadSlideLayout();
 							arr_layouts[i].Width = p_width;
 							arr_layouts[i].Height = p_height;
 						}
-						var arr_indexes = [];
-						for(var i = 0; i < slide_count; ++i)
-						{
-							arr_indexes.push(stream.GetULong());
-						}
+					}, oThis, []);
 
-						for(var i = 0; i < layouts_count; ++i)
-						{
-							arr_layouts[i].setMaster(master);
-							arr_layouts[i].changeSize(presentation.Width, presentation.Height);
-							master.addLayout(arr_layouts[i]);
-						}
-						for(var i =0; i < slide_count; ++i)
-						{
+					var arr_indexes = [];
+					for (var i = 0; i < slide_count; ++i) {
+						arr_indexes.push(stream.GetULong());
+					}
+
+					var addedLayouts = [];
+					for (var i = 0; i < slide_count; ++i) {
+						var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
+						if (tempLayout && tempLayout.Master) {
 							arr_slides[i].changeSize(presentation.Width, presentation.Height);
-							arr_slides[i].setLayout(arr_layouts[arr_indexes[i]]);
 							arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
+							arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
+						} else {
+							arr_slides[i].changeSize(presentation.Width, presentation.Height);
+							arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
+
+							//в данном случае применяем дефолтоый layout(как это делает MS)
+							var tempLayout = master.getMatchingLayout(arr_layouts[arr_indexes[i]].type,
+								arr_layouts[arr_indexes[i]].matchingName, arr_layouts[arr_indexes[i]].cSld.name, true);
+							arr_slides[i].setLayout(tempLayout);
 						}
 					}
-					else
-					{
-						var arr_matched_layout = [];
-						var b_read_layouts = false;
-						for(var i = 0; i < arr_layouts_id.length; ++i)
-						{
-							var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
-							if(!tempLayout || !tempLayout.Master)
-							{
-								b_read_layouts = true;
-								break;
-							}
-							else
-							{
-								for(var j = 0; j < presentation.slideMasters.length; ++j)
-								{
-									if(presentation.slideMasters[j] === tempLayout.Master)
-									{
-										break;
-									}
-								}
-								if(j === presentation.slideMasters.length)
-								{
-									b_read_layouts = true;
-									break;
-								}
-							}
-						}
-						if(b_read_layouts)
-						{
-							var layouts_count = stream.GetULong();
-							
-							AscFormat.ExecuteNoHistory(function(){
-								for(var i = 0; i < layouts_count; ++i)
-								{
-									arr_layouts[i] = loader.ReadSlideLayout();
-									arr_layouts[i].Width = p_width;
-									arr_layouts[i].Height = p_height;
-								}
-							}, this, []);
-							
-							var arr_indexes = [];
-							for(var i = 0; i < slide_count; ++i)
-							{
-								arr_indexes.push(stream.GetULong());
-							}
-
-							var addedLayouts = [];
-							for(var i = 0; i < slide_count; ++i)
-							{
-								var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
-								if(tempLayout && tempLayout.Master)
-								{
-									arr_slides[i].changeSize(presentation.Width, presentation.Height);
-									arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-									arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
-								}
-								else
-								{
-									arr_slides[i].changeSize(presentation.Width, presentation.Height);
-									arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-									
-									//в данном случае применяем дефолтоый layout(как это делает MS)
-									var tempLayout = master.getMatchingLayout(arr_layouts[arr_indexes[i]].type, arr_layouts[arr_indexes[i]].matchingName, arr_layouts[arr_indexes[i]].cSld.name, true);
-									arr_slides[i].setLayout(tempLayout);
-								}
-							}
-						}
-						else
-						{
-							for(var i =0; i < slide_count; ++i)
-							{
-								arr_slides[i].changeSize(presentation.Width, presentation.Height);
-								arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-								arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
-								//arr_slides[i].Layout.setMaster(master);
-								arr_slides[i].Width = presentation.Width;
-								arr_slides[i].Height = presentation.Height;
-							}
-						}
+				} else {
+					for (var i = 0; i < slide_count; ++i) {
+						arr_slides[i].changeSize(presentation.Width, presentation.Height);
+						arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
+						arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
+						//arr_slides[i].Layout.setMaster(master);
+						arr_slides[i].Width = presentation.Width;
+						arr_slides[i].Height = presentation.Height;
 					}
-
-
-					//images and fonts
-					oThis = this;
-					var font_map = {};
-					var images = [];
-					var slideCopyObjects = [];
-					for(var i = 0; i < arr_slides.length; ++i)
-					{
-						if(arr_slides[i].getAllFonts)
-							arr_slides[i].getAllFonts(font_map);
-						if(arr_slides[i].getAllImages)
-							arr_slides[i].getAllImages(images);
-							
-						slideCopyObjects[i] = new SlideCopyObject();
-						slideCopyObjects[i].Slide = arr_slides[i];
-					}
-
-					for(var i = 0; i < arr_layouts.length; ++i)
-					{
-						if(arr_layouts[i].getAllFonts)
-							arr_layouts[i].getAllFonts(font_map);
-						if(arr_layouts[i].getAllImages)
-							arr_layouts[i].getAllImages(images);
-					}
-					for(var i in font_map)
-						fonts.push(new CFont(i, 0, "", 0));
-						
-						
-					//вставка	
-					var paste_callback = function()
-					{
-						
-						var presentationSelectedContent = new PresentationSelectedContent();
-						presentationSelectedContent.SlideObjects = slideCopyObjects;
-						presentation.Insert_Content(presentationSelectedContent);
-						presentation.Recalculate();
-						presentation.Document_UpdateInterfaceState();
-						
-						window['AscCommon'].g_clipboardBase.Paste_Process_End();
-					};
-
-					var image_objects = loader.End_UseFullUrl();
-					var objects = {arrImages:image_objects};
-					//load images
-
-					var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
-					if(oObjectsForDownload.aUrls.length > 0)
-					{
-						AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
-							var oImageMap = {};
-							ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-							oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-						});
-					}
-					else
-					{
-						var im_arr = [];
-						for(var key  in images)
-							im_arr.push(key);
-
-						this.SetShortImageId(objects.arrImages);
-						this.api.pre_Paste(fonts, im_arr, paste_callback);
-					}
-					return;
 				}
 			}
+
+
+			//images and fonts
+			var font_map = {};
+			var images = [];
+			var slideCopyObjects = [];
+			for (var i = 0; i < arr_slides.length; ++i) {
+				if (arr_slides[i].getAllFonts) {
+					arr_slides[i].getAllFonts(font_map);
+				}
+				if (arr_slides[i].getAllImages) {
+					arr_slides[i].getAllImages(images);
+				}
+
+				slideCopyObjects[i] = new SlideCopyObject();
+				slideCopyObjects[i].Slide = arr_slides[i];
+			}
+
+			for (var i = 0; i < arr_layouts.length; ++i) {
+				if (arr_layouts[i].getAllFonts) {
+					arr_layouts[i].getAllFonts(font_map);
+				}
+				if (arr_layouts[i].getAllImages) {
+					arr_layouts[i].getAllImages(images);
+				}
+			}
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
+
+
+			//вставка
+			var paste_callback = function () {
+
+				var presentationSelectedContent = new PresentationSelectedContent();
+				presentationSelectedContent.SlideObjects = slideCopyObjects;
+				presentation.Insert_Content(presentationSelectedContent);
+				presentation.Recalculate();
+				presentation.Document_UpdateInterfaceState();
+
+				window['AscCommon'].g_clipboardBase.Paste_Process_End();
+			};
+
+			var image_objects = loader.End_UseFullUrl();
+			var objects = {arrImages: image_objects};
+			//load images
+
+			var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
+			if (oObjectsForDownload.aUrls.length > 0) {
+				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+					var oImageMap = {};
+					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
+				});
+			} else {
+				var im_arr = [];
+				for (var key  in images) {
+					im_arr.push(key);
+				}
+
+				oThis.SetShortImageId(objects.arrImages);
+				oThis.api.pre_Paste(fonts, im_arr, paste_callback);
+			}
+		};
+
+		var first_string = stream.GetString2();
+		switch (first_string) {
+			case "Content": {
+				pasteContent();
+				break;
+			}
+			case "Drawings": {
+				pasteDrawings();
+				break;
+			}
+			case "SlideObjects": {
+				pasteSlideObjects();
+				break;
+			}
 		}
-		
+
 	},
 	
 	_pasteFromHtml: function(node, bTurnOffTrackRevisions)
