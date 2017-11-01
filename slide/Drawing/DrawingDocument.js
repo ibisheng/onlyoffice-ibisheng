@@ -5746,6 +5746,7 @@ function CNotesDrawer(page)
 
 	this.OnRecalculateNote = function (slideNum, width, height)
 	{
+		var isChangedSlide = (this.Slide != slideNum) ? true : false;
 		this.Slide = slideNum;
 		this.Width = width;
 		this.Height = height;
@@ -5786,6 +5787,9 @@ function CNotesDrawer(page)
 		if (this.HtmlPage.m_oScrollNotes_)
 		{
 			this.HtmlPage.m_oScrollNotes_.Repos(settings, undefined, true);
+
+			if (isChangedSlide)
+				this.HtmlPage.m_oScrollNotes_.scrollToY(0);
 		}
 		else
 		{
