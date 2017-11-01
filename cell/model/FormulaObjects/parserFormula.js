@@ -1570,7 +1570,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		if (!excludeHiddenRows) {
 			excludeHiddenRows = this.ws.isApplyFilterBySheet();
 		}
-		return excludeHiddenRows && this._valid && this.ws.getRowHidden(this.getRange().r1);
+		return excludeHiddenRows && this.isValid() && this.ws.getRowHidden(this.getRange().r1);
 	};
 
 	/**
