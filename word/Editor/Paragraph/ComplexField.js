@@ -264,14 +264,48 @@ CComplexField.prototype.Update = function()
 	{
 		this.LogicDocument.Create_NewHistoryPoint();
 
+		this.LogicDocument.GetBookmarksManager().RemoveTOCBookmarks();
+
 		var oStyles          = this.LogicDocument.Get_Styles();
 		var arrOutline       = this.LogicDocument.GetOutlineParagraphs();
 		var oSelectedContent = new CSelectedContent();
 		for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
 		{
-			var oPara = arrOutline[nIndex].Paragraph.Copy();
-			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
+			var oPara = oSrcParagraph.Copy();
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
+
+			// Значение таба зависит от текущей секции
+			var oTabs = new CParaTabs();
+			oTabs.Add(new CParaTab(tab_Right, 9345 / 20 / 72 * 25.4));
+			oPara.Set_Tabs(oTabs);
+
+			var oTabRun = new ParaRun(oPara, false);
+			oTabRun.Add_ToContent(0, new ParaTab());
+
+			// TODO: ParaEnd
+			oPara.Add_ToContent(oPara.Content.length - 1, oTabRun);
+
+			var oPageRefRun = new ParaRun(oPara, false);
+
+			var nTempIndex = -1;
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this));
+			var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
+			for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
+			{
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
+			}
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this));
+			var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
+			for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
+			{
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
+			}
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this));
+
+			oPara.Add_ToContent(oPara.Content.length - 1, oPageRefRun);
 			oSelectedContent.Add(new CSelectedElement(oPara, true));
 		}
 

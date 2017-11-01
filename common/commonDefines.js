@@ -1710,10 +1710,6 @@
 	window["AscCommon"].c_oAscChartDefines          = c_oAscChartDefines;
 	window["AscCommon"].c_oAscStyleImage            = c_oAscStyleImage;
 	window["AscCommon"].c_oAscLineDrawingRule       = c_oAscLineDrawingRule;
-	window["AscCommon"].align_Right                 = align_Right;
-	window["AscCommon"].align_Left                  = align_Left;
-	window["AscCommon"].align_Center                = align_Center;
-	window["AscCommon"].align_Justify               = align_Justify;
 	window["AscCommon"].vertalign_Baseline          = vertalign_Baseline;
 	window["AscCommon"].vertalign_SuperScript       = vertalign_SuperScript;
 	window["AscCommon"].vertalign_SubScript         = vertalign_SubScript;
@@ -1789,6 +1785,11 @@
 	window["AscCommon"].contentchanges_Remove                 = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
+
+	window['AscCommon']['align_Right'] = window['AscCommon'].align_Right = align_Right;
+	window['AscCommon']['align_Left'] = window['AscCommon'].align_Left = align_Left;
+	window['AscCommon']['align_Center'] = window['AscCommon'].align_Center = align_Center;
+	window['AscCommon']['align_Justify'] = window['AscCommon'].align_Justify = align_Justify;
 	
 	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
 	prot = c_oSpecialPasteProps;
