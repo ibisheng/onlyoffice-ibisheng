@@ -165,6 +165,32 @@ CParagraphContentBase.prototype.UpdateBookmarks = function(oManager)
 CParagraphContentBase.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
 {
 };
+CParagraphContentBase.prototype.GetParent = function()
+{
+	if (!this.Paragraph)
+		return null;
+
+	var oContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!oContentPos || oContentPos.Get_Depth() < 0)
+		return null;
+
+	oContentPos.Decrease_Depth(1);
+	return this.Paragraph.Get_ElementByPos(oContentPos);
+};
+CParagraphContentBase.prototype.GetPosInParent = function(_oParent)
+{
+	var oParent = (_oParent? _oParent : this.GetParent());
+	if (!oParent || !oParent.Content)
+		return -1;
+
+	for (var nPos = 0, nCount = oParent.Content.length; nPos < nCount; ++nPos)
+	{
+		if (this === oParent.Content[nPos])
+			return nPos;
+	}
+
+	return -1;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------

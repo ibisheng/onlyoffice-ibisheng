@@ -8844,34 +8844,11 @@ ParaRun.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 };
 ParaRun.prototype.Get_Parent = function()
 {
-    if (!this.Paragraph)
-        return null;
-
-    var ContentPos = this.Paragraph.Get_PosByElement(this);
-    if (null == ContentPos || undefined == ContentPos || ContentPos.Get_Depth() < 0)
-        return null;
-
-    ContentPos.Decrease_Depth(1);
-    return this.Paragraph.Get_ElementByPos(ContentPos);
+	return this.GetParent();
 };
 ParaRun.prototype.private_GetPosInParent = function(_Parent)
 {
-    var Parent = (_Parent? _Parent : this.Get_Parent());
-    if (!Parent)
-        return -1;
-
-    // Ищем данный элемент в родительском классе
-    var RunPos = -1;
-    for (var Pos = 0, Count = Parent.Content.length; Pos < Count; Pos++)
-    {
-        if (this === Parent.Content[Pos])
-        {
-            RunPos = Pos;
-            break;
-        }
-    }
-
-    return RunPos;
+	return this.GetPosInParent(_Parent);
 };
 ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
 {

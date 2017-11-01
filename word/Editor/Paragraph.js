@@ -12436,6 +12436,14 @@ Paragraph.prototype.AddBookmarkForTOC = function()
 		return;
 
 	var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+
+	var sId   = oBookmarksManager.GetNewBookmarkId();
+	var sName = oBookmarksManager.GetNewBookmarkNameTOC();
+
+	this.Add_ToContent(0, new CParagraphBookmark(true, sId, sName));
+	this.Add_ToContent(this.Content.length - 1, new CParagraphBookmark(false, sId, sName));
+
+	return sName;
 };
 Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, isStartSelection)
 {
@@ -12483,6 +12491,25 @@ Paragraph.prototype.CheckPageRefLink = function(X, Y, CurPage)
 	}
 
 	return null;
+};
+/**
+ * Получаем абсолютное значение первой не пустой страницы
+ * @returns {number}
+ */
+Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
+{
+	var nPagesCount = this.Pages.length;
+	var nCurPage    = 0;
+
+	while (this.Is_EmptyPage(nCurPage))
+	{
+		if (nCurPage >= nPagesCount - 1)
+			break;
+
+		nCurPage++;
+	}
+
+	return this.Get_AbsolutePage(nCurPage);
 };
 
 var pararecalc_0_All  = 0;
