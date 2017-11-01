@@ -4113,6 +4113,11 @@ function OfflineEditor () {
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(this.initSettings["token"]);
 
+        var permissions = this.initSettings["permissions"];
+        if (undefined != permissions && null != permissions && permissions.length > 0) {    
+            docInfo.put_Permissions(JSON.parse(permissions));
+        }
+
         _api.asc_setDocInfo(docInfo);
 
         this.offline_beforeInit();

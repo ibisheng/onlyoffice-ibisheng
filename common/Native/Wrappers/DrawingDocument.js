@@ -2880,34 +2880,6 @@ CDrawingDocument.prototype =
         }
     },
 
-    IsCursorInTableCur : function(x, y, page)
-    {
-        var _table = this.TableOutlineDr.TableOutline;
-        if (_table == null)
-            return false;
-
-        if (page != _table.PageNum)
-            return false;
-
-        var _dist = this.TableOutlineDr.image.width / this.GetDotsPerMM();
-
-        var _x = _table.X;
-        var _y = _table.Y;
-        var _r = _x + _table.W;
-        var _b = _y + _table.H;
-
-        if ((x > (_x - _dist)) && (x < _r) && (y > (_y - _dist)) && (y < _b))
-        {
-            if ((x < _x) || (y < _y))
-            {
-                this.TableOutlineDr.Counter = 0;
-                this.TableOutlineDr.bIsNoTable = false;
-                return true;
-            }
-        }
-        return false;
-    },
-
     DrawTableTrack : function()
     {
         if (null == this.TableOutlineDr.TableOutline)

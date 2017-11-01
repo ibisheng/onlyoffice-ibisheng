@@ -1227,9 +1227,8 @@
 						}
 						else if (data.type === "onExternalPluginMessage")
 						{
-							var _iframe = document.getElementById("plugin_iframe");
-							if (_iframe)
-								_iframe.contentWindow.postMessage(event.data, "*");
+							if (window.g_asc_plugins)
+								window.g_asc_plugins.sendToAllPlugins(event.data);
 						}
 					} catch (err)
 					{

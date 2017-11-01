@@ -9254,6 +9254,19 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	var oInfo = new CSelectedElementsInfo();
 	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
 
+	var bPageRefLink = false;
+	var arrComplexFields = this.GetComplexFieldsByXY(X, Y, CurPage);
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = arrComplexFields[nIndex];
+		var oInstruction  = oComplexField.GetInstruction();
+		if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType() && oInstruction.IsHyperlink())
+		{
+			bPageRefLink = true;
+			break;
+		}
+	}
+
 	var oContentControl = oInfo.GetInlineLevelSdt();
 	var oHyperlink      = oInfo.Get_Hyperlink();
 	if (oContentControl)
@@ -9275,7 +9288,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	else
 		MMData.Type = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-	if (null != oHyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
+	if ((null != oHyperlink || bPageRefLink) && true === AscCommon.global_keyboardEvent.CtrlKey)
 		this.DrawingDocument.SetCursorType("pointer", MMData);
 	else
 		this.DrawingDocument.SetCursorType("default", MMData);
@@ -12385,6 +12398,11 @@ Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
 	return arrComplexFields;
 };
+Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldPos)
+{
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
+	return this.GetComplexFieldsByPos(SearchPosXY.Pos, bReturnFieldPos);
+};
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
 {
 	var nOutlineLvl = this.GetOutlineLvl();
@@ -12445,6 +12463,26 @@ Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, is
 	oParent.Add_ToContent(oRunPos + 1, oBookmarkChar);
 
 	return true;
+};
+/**
+ * Проверяем есть ли у нас в заданной точке сложное поле типа PAGEREF с флагом hyperlink = true
+ * @param X
+ * @param Y
+ * @param CurPage
+ * @returns {CComplexField?}
+ */
+Paragraph.prototype.CheckPageRefLink = function(X, Y, CurPage)
+{
+	var arrComplexFields = this.GetComplexFieldsByXY(X, Y, CurPage);
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = arrComplexFields[nIndex];
+		var oInstruction  = oComplexField.GetInstruction();
+		if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType() && oInstruction.IsHyperlink())
+			return oComplexField;
+	}
+
+	return null;
 };
 
 var pararecalc_0_All  = 0;

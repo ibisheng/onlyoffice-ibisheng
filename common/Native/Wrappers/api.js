@@ -5786,7 +5786,12 @@ function NativeOpenFile3(_params, documentInfo)
         docInfo.put_Format("docx");
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(window.documentInfo["token"]);
-        
+
+        var permissions = window.documentInfo["permissions"];
+        if (undefined != permissions && null != permissions && permissions.length > 0) {
+            docInfo.put_Permissions(permissions);
+        }   
+
         _api.asc_setDocInfo(docInfo);
 
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {

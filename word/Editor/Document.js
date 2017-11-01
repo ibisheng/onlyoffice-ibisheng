@@ -5312,12 +5312,18 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 
 				if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
 				{
-					var Hyperlink = Item.CheckHyperlink(X, Y, ElementPageIndex);
-					if (null != Hyperlink)
+					var oHyperlink   = Item.CheckHyperlink(X, Y, ElementPageIndex);
+					var oPageRefLink = Item.CheckPageRefLink(X, Y, ElementPageIndex);
+					if (null != oHyperlink)
 					{
 						this.Selection.Data = {
-							Hyperlink : true,
-							Value     : Hyperlink
+							Hyperlink : oHyperlink
+						};
+					}
+					else if (null !== oPageRefLink)
+					{
+						this.Selection.Data = {
+							PageRef : oPageRefLink
 						};
 					}
 				}
@@ -5471,16 +5477,26 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
         {
             this.Selection.Use = false;
 
-            if (null != this.Selection.Data && true === this.Selection.Data.Hyperlink)
+            if (null != this.Selection.Data && this.Selection.Data.Hyperlink)
             {
-                editor.sync_HyperlinkClickCallback(this.Selection.Data.Value.Get_Value());
-                this.Selection.Data.Value.Set_Visited(true);
+                editor.sync_HyperlinkClickCallback(this.Selection.Data.Hyperlink.Get_Value());
+                this.Selection.Data.Hyperlink.Set_Visited(true);
 
                 for (var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++)
                     this.DrawingDocument.OnRecalculatePage(PageIdx, this.Pages[PageIdx]);
 
                 this.DrawingDocument.OnEndRecalculate(false, true);
             }
+            else if (null !== this.Selection.Data && this.Selection.Data.PageRef)
+			{
+				var oInstruction  = this.Selection.Data.PageRef.GetInstruction();
+				if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType())
+				{
+					var oBookmark = this.BookmarksManager.GetBookmarkByName(oInstruction.GetBookmarkName());
+					if (oBookmark)
+						oBookmark[0].GoToBookmark();
+				}
+			}
         }
         else
         {
@@ -15769,6 +15785,14 @@ CDocument.prototype.AddField = function(nType, oPr)
 		oRun.Add_ToContent(++nIndex, new ParaInstrText("R"));
 		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
 		oRun.Add_ToContent(++nIndex, new ParaInstrText("F"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("e"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("s"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("t"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("\\"));
+		oRun.Add_ToContent(++nIndex, new ParaInstrText("p"));
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
 		oRun.Add_ToContent(++nIndex, new ParaText("1"));
 		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));

@@ -229,11 +229,7 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 };
 CComplexField.prototype.Update = function()
 {
-	if (!this.Instruction)
-	{
-		var oParser = new CFieldInstructionParser();
-		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
-	}
+	this.private_UpdateInstruction();
 
 	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
 		return;
@@ -243,7 +239,7 @@ CComplexField.prototype.Update = function()
 	if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		return;
 
-	var nFieldCode = this.Instruction.GetFieldCode();
+	var nFieldCode = this.Instruction.GetType();
 	if (fieldtype_PAGENUM === nFieldCode)
 	{
 		var oRun       = this.BeginChar.GetRun();
@@ -417,6 +413,19 @@ CComplexField.prototype.GetEndDocumentPosition = function()
 CComplexField.prototype.IsValid = function()
 {
 	return this.IsUse() && this.BeginChar && this.SeparateChar && this.EndChar;
+};
+CComplexField.prototype.GetInstruction = function()
+{
+	this.private_UpdateInstruction();
+	return this.Instruction;
+};
+CComplexField.prototype.private_UpdateInstruction = function()
+{
+	if (!this.Instruction && this.InstructionLine)
+	{
+		var oParser = new CFieldInstructionParser();
+		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
+	}
 };
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)

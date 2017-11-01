@@ -54,7 +54,7 @@ function CFieldInstructionBase()
 {
 }
 CFieldInstructionBase.prototype.Type = fieldtype_UNKNOWN;
-CFieldInstructionBase.prototype.GetFieldCode = function()
+CFieldInstructionBase.prototype.GetType = function()
 {
 	return this.Type;
 };

@@ -1666,7 +1666,7 @@ CPresentation.prototype =
                         }
                     }
                 }
-                for(i = 0; i < this.CurPage; ++i)
+                for(i = 0; i <= this.CurPage; ++i)
                 {
                     Id = this.Slides[i].Search_GetId(isNext, 0);
                     if(Id !== null)
@@ -1772,7 +1772,7 @@ CPresentation.prototype =
                         return Id;
                     }
                 }
-                for(i = this.Slides.length - 1; i > this.CurPage; --i)
+                for(i = this.Slides.length - 1; i >= this.CurPage; --i)
                 {
                     if(this.Slides[i].notesShape){
                         Id = this.Slides[i].notesShape.Search_GetId(isNext, false);

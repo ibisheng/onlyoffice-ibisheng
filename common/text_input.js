@@ -34,8 +34,7 @@
 
 (function(window, undefined)
 {
-	window["AscInputMethod"] = {};
-	window["AscInputMethod"]["SogouPinyin"] = false;
+	window["AscInputMethod"] = window["AscInputMethod"] || {};
 	///
 	// такие методы нужны в апи
 	// baseEditorsApi.prototype.Begin_CompositeInput = function()
@@ -518,9 +517,9 @@
 			}
 		},
 
-		unshow : function()
+		unshow : function(isAttack)
 		{
-			if (this.isDebug || this.isSystem)
+			if (this.isDebug || this.isSystem || (true == isAttack))
 			{
 				ti_console_log("ti: unshow");
 
@@ -936,7 +935,10 @@
 
 			this.putAreaValue("");
 			if (this.isShow)
-				this.unshow();
+				this.unshow(true);
+
+			if (this.Api.WordControl && this.Api.WordControl.m_oLogicDocument && this.Api.WordControl.m_oLogicDocument.Document_UpdateSelectionState)
+				this.Api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		},
 
 		systemConfirmText : function()
@@ -1114,7 +1116,7 @@
 				this.clear();
 
 			var isSendToApi = true;
-			if (window["AscInputMethod"]["SogouPinyin"])
+			if (true === window["AscInputMethod"]["SogouPinyin"])
 			{
 				if (AscCommon.AscBrowser.isChrome)
 				{
@@ -1785,7 +1787,7 @@
 			    if (document.activeElement)
 			    {
 			        var _id = document.activeElement.id;
-			        if (_id == "area_id" || _id == "plugin_iframe")
+			        if (_id == "area_id" || (window.g_asc_plugins && window.g_asc_plugins.checkRunnedFrameId(_id)))
 			            return;
 			    }
 
