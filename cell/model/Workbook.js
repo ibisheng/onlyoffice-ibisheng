@@ -3519,7 +3519,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
-		this.getRange3(start,0,stop,0)._foreachRowNoEmpty(function(row){
+		this.getRange3(start,0,stop,gc_nMaxCol0)._foreachRowNoEmpty(function(row){
 			var oOldProps = row.getHeightProp();
 			if (false === oOldProps.isEqual(oDefRowPr))
 				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowProp, t.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.getIndex(), true, oOldProps, oDefRowPr));
@@ -3619,7 +3619,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
-		this.getRange3(start,0,stop,0)._foreachColNoEmpty(function(col){
+		this.getRange3(0, start, gc_nMaxRow0,stop)._foreachColNoEmpty(function(col){
 			var nIndex = col.getIndex();
 			var oOldProps = col.getWidthProp();
 			if(false === oOldProps.isEqual(oDefColPr))
