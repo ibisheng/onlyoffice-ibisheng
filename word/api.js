@@ -7346,6 +7346,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
+		if (!this.WordControl || !this.WordControl.m_oLogicDocument)
+			return;
 		if (AscCommon.CollaborativeEditing){
 			AscCommon.CollaborativeEditing.Set_Fast(isOn);
 			if(window['AscCommon'].g_clipboardBase && isOn && !AscCommon.CollaborativeEditing.Is_SingleUser()){
