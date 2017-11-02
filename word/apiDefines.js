@@ -206,14 +206,6 @@ var c_oAscNumberingFormat = {
 	DecimalZero : 0x2007  // numbering_numfmt_DecimalZero
 };
 
-var c_oAscTabLeader = {
-	Dot        : 0x00,
-	Hyphen     : 0x01,
-	MiddleDot  : 0x02,
-	None       : 0x03,
-	Underscore : 0x04
-};
-
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -311,14 +303,6 @@ prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
 prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
 prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
 prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
-
-prot = window['Asc']['c_oAscTabLeader'] = c_oAscTabLeader;
-prot["None"]       = c_oAscTabLeader.None;
-prot["Dot"]        = c_oAscTabLeader.Dot;
-prot["Hyphen"]     = c_oAscTabLeader.Hyphen;
-prot["MiddleDot"]  = c_oAscTabLeader.MiddleDot;
-prot["Underscore"] = c_oAscTabLeader.Underscore;
-
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
