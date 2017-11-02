@@ -3704,7 +3704,7 @@ function OfflineEditor () {
 
             var isChangeSelectionShape = false;
             if (isCoord) {
-                isChangeSelectionShape = this._checkSelectionShape();
+                isChangeSelectionShape = this._endSelectionShape();
             }
 
             var isMoveActiveCellToLeftTop = false;

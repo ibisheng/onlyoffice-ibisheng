@@ -5879,10 +5879,9 @@ DrawingObjectsController.prototype =
             {
                 if(!this.checkEndAddShape())
                 {
-
                     this.resetSelection();
                     var ws = drawingObjectsController.drawingObjects.getWorksheet();
-                    var isChangeSelectionShape = ws._checkSelectionShape();
+                    var isChangeSelectionShape = ws._endSelectionShape();
                     if (isChangeSelectionShape) {
                         ws._drawSelection();
                         ws._updateSelectionNameAndInfo();

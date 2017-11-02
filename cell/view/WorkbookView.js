@@ -958,7 +958,7 @@
 
   WorkbookView.prototype._onSetSelection = function(range, validRange) {
     var ws = this.getWorksheet();
-    ws._checkSelectionShape();
+    ws._endSelectionShape();
     var d = ws.setSelection(range, validRange);
     this.controller.scroll(d);
   };
