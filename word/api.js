@@ -5813,8 +5813,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 	{
 		this.ServerIdWaitComplete = true;
-		if (true == this.ServerImagesWaitComplete)
-			this.OpenDocumentEndCallback();
+		this.OpenDocumentEndCallback();
 	};
 
 	// работа с шрифтами
@@ -6089,8 +6088,7 @@ background-repeat: no-repeat;\
 		if (false === this.isPasteFonts_Images && false === this.isSaveFonts_Images && false === this.isLoadImagesCustom)
 		{
 			this.ServerImagesWaitComplete = true;
-			if (true == this.ServerIdWaitComplete)
-				this.OpenDocumentEndCallback();
+			this.OpenDocumentEndCallback();
 		}
 		else
 		{
@@ -6127,7 +6125,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
-		if (null == this.WordControl.m_oLogicDocument)
+		if (!this.WordControl.m_oLogicDocument || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete)
 			return;
 
 		if (0 == this.DocumentType)

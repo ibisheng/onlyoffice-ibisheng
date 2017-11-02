@@ -1137,8 +1137,7 @@
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 	{
 		this.ServerIdWaitComplete = true;
-		if (true == this.ServerImagesWaitComplete)
-			this.OpenDocumentEndCallback();
+		this.OpenDocumentEndCallback();
 	};
 
 	// Эвент о пришедщих изменениях
@@ -4667,8 +4666,7 @@ background-repeat: no-repeat;\
 		else
 		{
 			this.ServerImagesWaitComplete = true;
-			if (true == this.ServerIdWaitComplete)
-				this.OpenDocumentEndCallback();
+			this.OpenDocumentEndCallback();
 		}
 	};
 
@@ -4698,6 +4696,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
+		if (!this.WordControl.m_oLogicDocument || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete)
+			return;
+
 		var bIsScroll = false;
 
 		if (0 == this.DocumentType)
