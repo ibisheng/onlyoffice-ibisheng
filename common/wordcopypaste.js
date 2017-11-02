@@ -1356,8 +1356,14 @@ CopyProcessor.prototype =
 			
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
-			if(selectedContent.specialContents[0] && selectedContent.specialContents[0].data){
-				this.oPresentationWriter.WriteString2(selectedContent.specialContents[0].data);
+			if(selectedContent.specialContents[0] && Asc.c_oSpecialPasteProps.picture === selectedContent.specialContents[0].type){
+				var imgUrl = selectedContent.specialContents[0].data.imgUrl;
+				var extX = selectedContent.specialContents[0].data.extX;
+				var extY = selectedContent.specialContents[0].data.extY;
+
+				this.oPresentationWriter.WriteString2(imgUrl);
+				this.oPresentationWriter.WriteDouble(extX);
+				this.oPresentationWriter.WriteDouble(extY);
 			}
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
@@ -3834,14 +3840,15 @@ PasteProcessor.prototype =
 			var arr_shapes = objects.arrShapes;
 			var arr_Images = objects.arrImages;
 
+			//SPECIAL PASTE CONVERT
 			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
 				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				switch (props) {
 					case Asc.c_oSpecialPasteProps.picture: {
 						if(objects.imgUrl){
 							var sImageUrl = objects.imgUrl;
-							var w = 100;
-							var h = 200;
+							var w = objects.extX / 100000;
+							var h = objects.extY / 100000;
 							var _image = AscFormat.DrawingObjectsController.prototype.createImage(sImageUrl, 0, 0, w, h);
 							arr_shapes = [];
 							arr_shapes.push(new DrawingCopyObject(_image, 0, 0, w, h));
@@ -5144,12 +5151,15 @@ PasteProcessor.prototype =
         }
 
 		var imgUrl = loader.stream.GetString2();
+        var extX = loader.stream.GetULong();
+        var extY = loader.stream.GetULong();
+
 		var chartImages = pptx_content_loader.Reader.End_UseFullUrl();
 		var images = loader.End_UseFullUrl();
         loader.AssignConnectorsId();
 		var allImages = chartImages.concat(images);
 		
-        return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms, imgUrl: imgUrl};
+        return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms, imgUrl: imgUrl, extX: extX, extY: extY};
     },
 
     ReadPresentationSlides: function(stream)

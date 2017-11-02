@@ -4630,7 +4630,7 @@ CPresentation.prototype =
         return AscFormat.ExecuteNoHistory(function()
         {
             var oIdMap;
-            var ret = new PresentationSelectedContent(), i, imgUrl, curImgUrl;
+            var ret = new PresentationSelectedContent(), i, imgUrl, curImgUrl, extX, extY;
             if(this.Slides.length > 0)
             {
                 switch(editor.WordControl.Thumbnails.FocusObjType)
@@ -4655,6 +4655,8 @@ CPresentation.prototype =
 									curImgUrl = target_text_object.getBase64Img();
 									if(!imgUrl){
 										imgUrl = curImgUrl;
+										extX = target_text_object.ExtX;
+										extY = target_text_object.ExtY;
                                     }
                                     ret.Drawings.push(new DrawingCopyObject(GraphicFrame, target_text_object.x, target_text_object.y, target_text_object.extX, target_text_object.extY, curImgUrl) );
                                 }
@@ -4695,6 +4697,8 @@ CPresentation.prototype =
                                 AscFormat.fResetConnectorsIds(ret.Drawings, oIdMap);
 								if(!imgUrl && ret.Drawings.length){
 									imgUrl = ret.Drawings[0].ImageUrl;
+									extX = ret.Drawings[0].ExtX;
+									extY = ret.Drawings[0].ExtY;
 								}
                             }
                         }
@@ -4710,6 +4714,8 @@ CPresentation.prototype =
 							curImgUrl = this.Slides[selected_slides[i]].getBase64Img();
 							if(!imgUrl){
 								imgUrl = curImgUrl;
+								extX = this.Slides[selected_slides[i]].Width;
+								extY = this.Slides[selected_slides[i]].Height;
 							}
                             ret.SlideObjects.push(new SlideCopyObject(oSlideCopy, curImgUrl));
                             AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
@@ -4717,7 +4723,7 @@ CPresentation.prototype =
                     }
                 }
                 if(imgUrl){
-					ret.specialContents.push({type: Asc.c_oSpecialPasteProps.picture,data: imgUrl});
+					ret.specialContents.push({type: Asc.c_oSpecialPasteProps.picture,data: {imgUrl: imgUrl, extX: extX, extY: extY}});
                 }
             }
             return ret;
