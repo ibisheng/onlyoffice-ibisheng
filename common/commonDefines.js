@@ -954,6 +954,14 @@
 		Bottom : 1
 	};
 
+	var c_oAscTabLeader = {
+		Dot        : 0x00,
+		Hyphen     : 0x01,
+		MiddleDot  : 0x02,
+		None       : 0x03,
+		Underscore : 0x04
+	};
+
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
 		[1, 720, "DOS-720", "Arabic (OEM 720)"],
@@ -1693,6 +1701,13 @@
 	prot['None']   = c_oAscMathInterfaceGroupCharPos.None;
 	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
 	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
+
+	prot = window['Asc']['c_oAscTabLeader'] = window['Asc'].c_oAscTabLeader = c_oAscTabLeader;
+	prot["None"]       = c_oAscTabLeader.None;
+	prot["Dot"]        = c_oAscTabLeader.Dot;
+	prot["Hyphen"]     = c_oAscTabLeader.Hyphen;
+	prot["MiddleDot"]  = c_oAscTabLeader.MiddleDot;
+	prot["Underscore"] = c_oAscTabLeader.Underscore;
 
 	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
 	prot['None'] = c_oAscRestrictionType.None;
