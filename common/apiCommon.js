@@ -1418,21 +1418,35 @@
 	};
 
 	/** @constructor */
-	function asc_CParagraphTab(Pos, Value) {
-		this.Pos = Pos;
-		this.Value = Value;
+	function asc_CParagraphTab(Pos, Value, Leader)
+	{
+		this.Pos    = Pos;
+		this.Value  = Value;
+		this.Leader = Leader;
 	}
-
-	asc_CParagraphTab.prototype = {
-		asc_getValue: function () {
-			return this.Value;
-		}, asc_putValue: function (v) {
-			this.Value = v;
-		}, asc_getPos: function () {
-			return this.Pos;
-		}, asc_putPos: function (v) {
-			this.Pos = v;
-		}
+	asc_CParagraphTab.prototype.asc_getValue = function()
+	{
+		return this.Value;
+	};
+	asc_CParagraphTab.prototype.asc_putValue = function(v)
+	{
+		this.Value = v;
+	};
+	asc_CParagraphTab.prototype.asc_getPos = function()
+	{
+		return this.Pos;
+	};
+	asc_CParagraphTab.prototype.asc_putPos = function(v)
+	{
+		this.Pos = v;
+	};
+	asc_CParagraphTab.prototype.asc_getLeader = function()
+	{
+		return this.Leader;
+	};
+	asc_CParagraphTab.prototype.asc_putLeader = function(v)
+	{
+		this.Leader = v;
 	};
 
 	/** @constructor */
@@ -1442,7 +1456,7 @@
 		if (undefined != obj) {
 			var Count = obj.Tabs.length;
 			for (var Index = 0; Index < Count; Index++) {
-				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value));
+				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value, obj.Tabs[Index].Leader));
 			}
 		}
 	}
@@ -3800,6 +3814,8 @@
 	prot["put_Value"] = prot["asc_putValue"] = prot.asc_putValue;
 	prot["get_Pos"] = prot["asc_getPos"] = prot.asc_getPos;
 	prot["put_Pos"] = prot["asc_putPos"] = prot.asc_putPos;
+	prot["get_Leader"] = prot["asc_getPos"] = prot.asc_getLeader;
+	prot["put_Leader"] = prot["asc_putPos"] = prot.asc_putLeader;
 
 	window["Asc"]["asc_CParagraphTabs"] = window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
 	prot = asc_CParagraphTabs.prototype;

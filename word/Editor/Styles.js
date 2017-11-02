@@ -8418,184 +8418,184 @@ CTextPr.prototype['Get_Lang']       = CTextPr.prototype.Get_Lang;
 CTextPr.prototype['Get_Shd']        = CTextPr.prototype.Get_Shd;
 //----------------------------------------------------------------------------------------------------------------------
 
-function CParaTab(Value, Pos)
+function CParaTab(Value, Pos, Leader)
 {
-    this.Value = Value;
-    this.Pos   = Pos;
+	this.Value  = Value;
+	this.Pos    = Pos;
+	this.Leader = Leader ? Leader : c_oAscTabLeader.None;
 }
-
-CParaTab.prototype =
+CParaTab.prototype.Copy = function()
 {
-    Copy : function()
-    {
-        return new CParaTab(this.Value, this.Pos);
-    },
+	return new CParaTab(this.Value, this.Pos, this.Leader);
+};
+CParaTab.prototype.Is_Equal = function(Tab)
+{
+	return this.IsEqual(Tab);
+};
+CParaTab.prototype.IsEqual = function(Tab)
+{
+	// TODO: Если таб точно такого же типа и в той же позиции, то неясно нужно ли проверять совпадение Tab.Leader
+	if (this.Value !== Tab.Value
+		|| this.Pos !== Tab.Pos)
+		return false;
 
-    Is_Equal : function(Tab)
-    {
-        if (this.Value !== Tab.Value
-            || this.Pos !== Tab.Pos)
-            return false;
-
-        return true;
-    }
+	return true;
 };
 
 function CParaTabs()
 {
-    this.Tabs = [];
+	this.Tabs = [];
 }
-
-CParaTabs.prototype =
+CParaTabs.prototype.Add = function(_Tab)
 {
-    Add : function(_Tab)
-    {
-        var Index = 0;
-        for (Index = 0; Index < this.Tabs.length; Index++ )
-        {
-            var Tab = this.Tabs[Index];
+	var Index = 0;
+	for (Index = 0; Index < this.Tabs.length; Index++)
+	{
+		var Tab = this.Tabs[Index];
 
-            if ( Math.abs( Tab.Pos - _Tab.Pos ) < 0.001 )
-            {
-                this.Tabs.splice( Index, 1, _Tab );
-                break;
-            }
+		if (Math.abs(Tab.Pos - _Tab.Pos) < 0.001)
+		{
+			this.Tabs.splice(Index, 1, _Tab);
+			break;
+		}
 
-            if ( Tab.Pos > _Tab.Pos )
-                break;
-        }
+		if (Tab.Pos > _Tab.Pos)
+			break;
+	}
 
-        if ( -1 != Index )
-            this.Tabs.splice( Index, 0, _Tab );
-    },
+	if (-1 != Index)
+		this.Tabs.splice(Index, 0, _Tab);
+};
+CParaTabs.prototype.Merge = function(Tabs)
+{
+	var _Tabs = Tabs.Tabs;
 
-    Merge : function(Tabs)
-    {
-        var _Tabs = Tabs.Tabs;
+	for (var Index = 0; Index < _Tabs.length; Index++)
+	{
+		var _Tab = _Tabs[Index];
 
-        for ( var Index = 0; Index < _Tabs.length; Index++ )
-        {
-            var _Tab = _Tabs[Index];
+		var Index2 = 0;
+		var Flag   = 0;
+		for (Index2 = 0; Index2 < this.Tabs.length; Index2++)
+		{
+			var Tab = this.Tabs[Index2];
 
-            var Index2 = 0;
-            var Flag   = 0;
-            for (Index2 = 0; Index2 < this.Tabs.length; Index2++ )
-            {
-                var Tab = this.Tabs[Index2];
+			if (Math.abs(Tab.Pos - _Tab.Pos) < 0.001)
+			{
+				if (tab_Clear === _Tab.Value)
+					Flag = -2; // таб нужно удалить
+				else
+					Flag = -1; // табы совпали, не надо новый добавлять
 
-                if ( Math.abs(  Tab.Pos - _Tab.Pos ) < 0.001 )
-                {
-                    if ( tab_Clear === _Tab.Value )
-                        Flag = -2; // таб нужно удалить
-                    else
-                        Flag = -1; // табы совпали, не надо новый добавлять
+				break;
+			}
 
-                    break;
-                }
+			if (Tab.Pos > _Tab.Pos)
+				break;
+		}
 
-                if ( Tab.Pos > _Tab.Pos )
-                    break;
-            }
+		if (-2 === Flag)
+			this.Tabs.splice(Index2, 1);
+		else if (-1 != Flag)
+			this.Tabs.splice(Index2, 0, _Tab);
+	}
+};
+CParaTabs.prototype.IsEqual = function(Tabs)
+{
+	if (this.Tabs.length !== Tabs.Tabs.length)
+		return false;
 
-            if ( -2 === Flag )
-                this.Tabs.splice( Index2, 1 );
-            else if ( -1 != Flag )
-                this.Tabs.splice( Index2, 0, _Tab );
-        }
-    },
+	for (var CurTab = 0, TabsCount = this.Tabs.length; CurTab < TabsCount; CurTab++)
+	{
+		if (true !== this.Tabs[CurTab].IsEqual(Tabs.Tabs[CurTab]))
+			return false;
+	}
 
-    Is_Equal : function(Tabs)
-    {
-        if (this.Tabs.length !== Tabs.Tabs.length)
-            return false;
+	return true;
+};
+CParaTabs.prototype.Is_Equal = function(Tabs)
+{
+	return this.IsEqual(Tabs);
+};
+CParaTabs.prototype.Copy = function()
+{
+	var Tabs  = new CParaTabs();
+	var Count = this.Tabs.length;
 
-        for(var CurTab = 0, TabsCount = this.Tabs.length; CurTab < TabsCount; CurTab++)
-        {
-            if (true !== this.Tabs[CurTab].Is_Equal(Tabs.Tabs[CurTab]))
-                return false;
-        }
+	for (var Index = 0; Index < Count; Index++)
+		Tabs.Add(this.Tabs[Index].Copy());
 
-        return true;
-    },
+	return Tabs;
+};
+CParaTabs.prototype.Set_FromObject = function(Tabs)
+{
+	if (Tabs instanceof Array)
+	{
+		var Count = Tabs.length;
+		for (var Index = 0; Index < Count; Index++)
+			this.Add(new CParaTab(Tabs[Index].Value, Tabs[Index].Pos, Tabs[nIndex].Leader));
+	}
+};
+CParaTabs.prototype.GetCount = function()
+{
+	return this.Tabs.length;
+};
+CParaTabs.prototype.Get_Count = function()
+{
+	return this.GetCount();
+};
+CParaTabs.prototype.Get = function(Index)
+{
+	return this.Tabs[Index];
+};
+CParaTabs.prototype.Get_Value = function(Pos)
+{
+	var Count = this.Tabs.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Tab = this.Tabs[Index];
+		if (Math.abs(Tab.Pos - Pos) < 0.001)
+			return Tab.Value;
+	}
 
-    Copy : function()
-    {
-        var Tabs = new CParaTabs();
-        var Count = this.Tabs.length;
+	return -1;
+};
+CParaTabs.prototype.Write_ToBinary = function(Writer)
+{
+	// Long : количество (если 0, удаляем элемент)
+	// Массив
+	// Byte   : Value
+	// Double : Pos
+	// Long   : Leader
 
-        for ( var Index = 0; Index < Count; Index++ )
-            Tabs.Add( this.Tabs[Index].Copy() );
+	var Count = this.Tabs.length;
+	Writer.WriteLong(Count);
 
-        return Tabs;
-    },
+	for (var Index = 0; Index < Count; Index++)
+	{
+		Writer.WriteByte(this.Tabs[Index].Value);
+		Writer.WriteDouble(this.Tabs[Index].Pos);
+		Writer.WriteLong(this.Tabs[Index].Leader);
+	}
+};
+CParaTabs.prototype.Read_FromBinary = function(Reader)
+{
+	// Long : количество (если 0, удаляем элемент)
+	// Массив
+	// Byte   : Value
+	// Double : Pos
+	// Long   : Leader
 
-    Set_FromObject : function(Tabs)
-    {
-        if ( Tabs instanceof Array )
-        {
-            var Count = Tabs.length;
-            for ( var Index = 0; Index < Count; Index++ )
-                this.Add( new CParaTab( Tabs[Index].Value, Tabs[Index].Pos ) );
-        }
-    },
+	var Count = Reader.GetLong();
+	this.Tabs = [];
 
-    Get_Count : function()
-    {
-        return this.Tabs.length;
-    },
-
-    Get : function(Index)
-    {
-        return this.Tabs[Index];
-    },
-
-    Get_Value : function(Pos)
-    {
-        var Count = this.Tabs.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Tab = this.Tabs[Index];
-            if ( Math.abs(Tab.Pos - Pos) < 0.001 )
-                return Tab.Value;
-        }
-
-        return -1;
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long : количество (если 0, удаляем элемент)
-        // Массив
-        // Byte   : Value
-        // Double : Pos
-
-        var Count = this.Tabs.length;
-        Writer.WriteLong( Count );
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            Writer.WriteByte( this.Tabs[Index].Value );
-            Writer.WriteDouble( this.Tabs[Index].Pos );
-        }
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        // Long : количество (если 0, удаляем элемент)
-        // Массив
-        // Byte   : Value
-        // Double : Pos
-
-        var Count = Reader.GetLong();
-        this.Tabs = [];
-
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Value = Reader.GetByte();
-            var Pos   = Reader.GetDouble();
-            this.Add( new CParaTab( Value, Pos ) );
-        }
-    }
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Value  = Reader.GetByte();
+		var Pos    = Reader.GetDouble();
+		var Leader = Reader.GetLong();
+		this.Add(new CParaTab(Value, Pos, Leader));
+	}
 };
 
 function CParaInd()
