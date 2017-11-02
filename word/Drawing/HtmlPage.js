@@ -3568,23 +3568,6 @@ function CEditorPage(api)
 		this.IsInitControl = true;
 	};
 
-	this.OpenDocument = function(info)
-	{
-		this.m_oDrawingDocument.m_oWordControl   = this;
-		this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
-
-		this.m_oLogicDocument.fromJfdoc(info);
-
-		this.CalculateDocumentSize();
-		//setInterval(this.onTimerScroll, 40);
-		this.StartMainTimer();
-
-		this.m_oHorRuler.CreateBackground(this.m_oDrawingDocument.m_arrPages[0]);
-		this.m_oVerRuler.CreateBackground(this.m_oDrawingDocument.m_arrPages[0]);
-		this.UpdateHorRuler();
-		this.UpdateVerRuler();
-	};
-
 	this.AnimationFrame = function()
 	{
 		var now = Date.now();

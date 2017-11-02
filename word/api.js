@@ -6140,68 +6140,59 @@ background-repeat: no-repeat;\
 		{
 			if (this.LoadedObject)
 			{
-				if (1 != this.LoadedObject)
+				var Document = this.WordControl.m_oLogicDocument;
+
+				if (this.isApplyChangesOnOpenEnabled)
 				{
-					this.WordControl.m_oLogicDocument.fromJfdoc(this.LoadedObject);
+					this.isApplyChangesOnOpenEnabled = false;
+					AscCommon.CollaborativeEditing.Apply_Changes();
+					AscCommon.CollaborativeEditing.Release_Locks();
+
+					this.isApplyChangesOnOpen = true;
+
+					// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+					for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
+					{
+						this.arrPreOpenLocksObjects[i]();
+					}
+					this.arrPreOpenLocksObjects = [];
+				}
+
+				//                History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
+
+				//Recalculate для Document
+				Document.CurPos.ContentPos = 0;
+				//                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
+
+				var RecalculateData =
+					{
+						Inline   : {Pos : 0, PageNum : 0},
+						Flow     : [],
+						HdrFtr   : [],
+						Drawings : {
+							All : true,
+							Map : {}
+						}
+					};
+
+				if (!this.isOnlyReaderMode)
+				{
+					if (false === this.isSaveFonts_Images)
+						Document.Recalculate(false, false, RecalculateData);
+
 					this.WordControl.m_oDrawingDocument.TargetStart();
-					this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 				}
 				else
 				{
-					var Document = this.WordControl.m_oLogicDocument;
+					Document.RecalculateAllTables();
+					var data = {All : true};
+					Document.DrawingObjects.recalculate_(data);
+					Document.DrawingObjects.recalculateText_(data);
 
-					if (this.isApplyChangesOnOpenEnabled)
-					{
-						this.isApplyChangesOnOpenEnabled = false;
-						AscCommon.CollaborativeEditing.Apply_Changes();
-						AscCommon.CollaborativeEditing.Release_Locks();
-
-						this.isApplyChangesOnOpen = true;
-
-						// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-						for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
-						{
-							this.arrPreOpenLocksObjects[i]();
-						}
-						this.arrPreOpenLocksObjects = [];
-					}
-
-					//                History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
-
-					//Recalculate для Document
-					Document.CurPos.ContentPos = 0;
-					//                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
-
-					var RecalculateData =
-						{
-							Inline   : {Pos : 0, PageNum : 0},
-							Flow     : [],
-							HdrFtr   : [],
-							Drawings : {
-								All : true,
-								Map : {}
-							}
-						};
-
-					if (!this.isOnlyReaderMode)
-					{
-						if (false === this.isSaveFonts_Images)
-							Document.Recalculate(false, false, RecalculateData);
-
-						this.WordControl.m_oDrawingDocument.TargetStart();
-					}
+					if (!this.WordControl.IsReaderMode())
+						this.ChangeReaderMode();
 					else
-					{
-						Document.RecalculateAllTables();
-						var data = {All : true};
-						Document.DrawingObjects.recalculate_(data);
-						Document.DrawingObjects.recalculateText_(data);
-
-						if (!this.WordControl.IsReaderMode())
-							this.ChangeReaderMode();
-						else
-							this.WordControl.UpdateReaderContent();
-					}
+						this.WordControl.UpdateReaderContent();
 				}
 			}
 		}
