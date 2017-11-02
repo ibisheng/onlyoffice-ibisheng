@@ -3816,7 +3816,7 @@ function DrawingObjects() {
         }
 
         /*if ( bRedraw ) {
-         worksheet._checkSelectionShape();
+         worksheet._endSelectionShape();
          _this.sendGraphicObjectProps();
          _this.showDrawingObjects(true);
          }*/

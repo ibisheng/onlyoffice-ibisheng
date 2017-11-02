@@ -68,20 +68,13 @@ function CDrawingDocument()
 }
 
 
-CDrawingDocument.prototype.AfterLoad = function()
-{
-    this.m_oWordControl = this;
-    this.Api = window.editor;
-    this.m_oApi = this.Api;
-    this.m_oApi.DocumentUrl = "";
-    this.LogicDocument = window.editor.WordControl.m_oLogicDocument;
-    this.LogicDocument.DrawingDocument = this;
-
-    this.selectionMatrix = null;
-};
-
 
 CDrawingDocument.prototype.Notes_GetWidth = function()
+{
+    return 100;
+};
+
+CDrawingDocument.prototype.Notes_OnRecalculate = function()
 {
     return 100;
 };
@@ -92,9 +85,8 @@ CDrawingDocument.prototype.RenderPage = function(nPageIndex)
     this.m_oWordControl.m_oLogicDocument.DrawPage(nPageIndex, _graphics);
 };
 
-CDrawingDocument.prototypeAfterLoad = function()
+CDrawingDocument.prototype.AfterLoad = function()
 {
-    this.m_oWordControl = this;
     this.Api = window.editor;
     this.m_oApi = this.Api;
     this.m_oApi.DocumentUrl = "";

@@ -408,7 +408,7 @@ function (window, undefined) {
 							var fFract = ( fNum - tA[nOldCount - 1] ) / ( tA[nOldCount] - tA[nOldCount - 1] );
 
 							if (bInclusive) {
-								fRes = fRes = ( nOldCount - 1 + fFract ) / (nSize - 1);
+								fRes = ( nOldCount - 1 + fFract ) / (nSize - 1);
 							} else {
 								fRes = (nOldCount + fFract ) / ( nSize + 1 );
 							}

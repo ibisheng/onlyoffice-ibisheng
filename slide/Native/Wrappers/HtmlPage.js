@@ -139,10 +139,6 @@ CEditorPage.prototype.Init = function()
 
 };
 
-CEditorPage.prototype.CheckLayouts = function(){
-
-};
-
 CEditorPage.prototype.CheckRetinaDisplay = function()
 {
 

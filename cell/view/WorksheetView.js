@@ -7107,7 +7107,7 @@
         return new AscCommon.asc_CRect( xL, yL, width, height );
     };
 
-    WorksheetView.prototype._checkSelectionShape = function () {
+    WorksheetView.prototype._endSelectionShape = function () {
         var isSelectOnShape = this.isSelectOnShape;
         if (this.isSelectOnShape) {
             this.isSelectOnShape = false;
@@ -7183,7 +7183,7 @@
         if (isCoord) {
             // move active range to coordinates x,y
             this._moveActiveCellToXY(x, y);
-            isChangeSelectionShape = this._checkSelectionShape();
+            isChangeSelectionShape = this._endSelectionShape();
         } else {
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
@@ -7220,7 +7220,7 @@
 
     // Смена селекта по нажатию правой кнопки мыши
     WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
-        var isChangeSelectionShape = this._checkSelectionShape();
+        var isSelectOnShape = this._endSelectionShape();
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
         var _x = x * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
@@ -7242,13 +7242,7 @@
             r2 = gc_nMaxRow0;
         }
 
-        if (isChangeSelectionShape) {
-            // Попали в выделение, но были в объекте
-            this.cleanSelection();
-            this._drawSelection();
-
-            this._updateSelectionNameAndInfo();
-        } else if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
+        if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
             // Не попали в выделение (меняем первую точку)
             this.cleanSelection();
             this.model.selectionRange.clean();
@@ -7256,10 +7250,9 @@
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
-            return false;
+        } else if (isSelectOnShape) {
+			this._updateSelectionNameAndInfo();
         }
-
-        return true;
     };
 
     /**
@@ -7271,10 +7264,7 @@
      * @returns {*}
      */
     WorksheetView.prototype.changeSelectionEndPoint = function (x, y, isCoord, isSelectMode) {
-        var isChangeSelectionShape = false;
-        if (isCoord) {
-            isChangeSelectionShape = this._checkSelectionShape();
-        }
+        var isChangeSelectionShape = isCoord ? this._endSelectionShape() : false;
         var ar = this._getSelection().getLast();
 
         var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);

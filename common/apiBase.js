@@ -167,8 +167,8 @@
 		this.signatures = [];
 
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
-		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
-			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
+		this.watermarkDraw =
+			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
 
 		return this;
 	}
