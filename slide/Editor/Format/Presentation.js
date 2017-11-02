@@ -64,6 +64,7 @@ function PresentationSelectedContent()
     this.SlideObjects = [];
     this.Drawings = [];
     this.DocContent = null;
+    this.specialContents = [];
 }
 
 function CreatePresentationTableStyles(Styles, IdMap)
@@ -4629,7 +4630,7 @@ CPresentation.prototype =
         return AscFormat.ExecuteNoHistory(function()
         {
             var oIdMap;
-            var ret = new PresentationSelectedContent(), i;
+            var ret = new PresentationSelectedContent(), i, imgUrl, curImgUrl;
             if(this.Slides.length > 0)
             {
                 switch(editor.WordControl.Thumbnails.FocusObjType)
@@ -4651,7 +4652,11 @@ CPresentation.prototype =
                                     var Table = SelectedContent.Elements[0].Element;
                                     GraphicFrame.setGraphicObject(Table);
                                     Table.Set_Parent(GraphicFrame);
-                                    ret.Drawings.push(new DrawingCopyObject(GraphicFrame, target_text_object.x, target_text_object.y, target_text_object.extX, target_text_object.extY, target_text_object.getBase64Img()) );
+									curImgUrl = target_text_object.getBase64Img();
+									if(!imgUrl){
+										imgUrl = curImgUrl;
+                                    }
+                                    ret.Drawings.push(new DrawingCopyObject(GraphicFrame, target_text_object.x, target_text_object.y, target_text_object.extX, target_text_object.extY, curImgUrl) );
                                 }
                             }
                             else
@@ -4688,6 +4693,9 @@ CPresentation.prototype =
                                 oIdMap = {};
                                 collectSelectedObjects(aSpTree, ret.Drawings, bRecursive, oIdMap);
                                 AscFormat.fResetConnectorsIds(ret.Drawings, oIdMap);
+								if(!imgUrl && ret.Drawings.length){
+									imgUrl = ret.Drawings[0].ImageUrl;
+								}
                             }
                         }
                         break;
@@ -4699,10 +4707,17 @@ CPresentation.prototype =
                         {
                             oIdMap = {};
                             var oSlideCopy = this.Slides[selected_slides[i]].createDuplicate(oIdMap);
-                            ret.SlideObjects.push(new SlideCopyObject(oSlideCopy, this.Slides[selected_slides[i]].getBase64Img()));
+							curImgUrl = this.Slides[selected_slides[i]].getBase64Img();
+							if(!imgUrl){
+								imgUrl = curImgUrl;
+							}
+                            ret.SlideObjects.push(new SlideCopyObject(oSlideCopy, curImgUrl));
                             AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
                         }
                     }
+                }
+                if(imgUrl){
+					ret.specialContents.push({type: Asc.c_oSpecialPasteProps.picture,data: imgUrl});
                 }
             }
             return ret;

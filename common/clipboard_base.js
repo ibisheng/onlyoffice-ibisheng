@@ -1013,10 +1013,10 @@
 			if(props)
 			{
 				this.showSpecialPasteButton = true;
-				if(window["Asc"] && window["Asc"]["editor"])
-				{
+				//if(window["Asc"] && window["Asc"]["editor"])
+				//{
 					this.Api.asc_ShowSpecialPasteButton(props);
-				}
+				//}
 			}
 		},
 

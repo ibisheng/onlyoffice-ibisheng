@@ -1325,10 +1325,7 @@ CopyProcessor.prototype =
 		}
         else
         {
-			var presentation = editor.WordControl.m_oLogicDocument;
-			
 			var selectedContent = oDocument.GetSelectedContent();
-			
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
 			
@@ -1358,6 +1355,10 @@ CopyProcessor.prototype =
 			}
 			
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
+
+			if(selectedContent.specialContents[0] && selectedContent.specialContents[0].data){
+				this.oPresentationWriter.WriteString2(selectedContent.specialContents[0].data);
+			}
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
             sBase64 = "pptData;" + this.oPresentationWriter.pos + ";" + sBase64;
@@ -2896,18 +2897,17 @@ PasteProcessor.prototype =
 		window['AscCommon'].g_clipboardBase.Paste_Process_End();
 	},
 
-	_setSpecialPasteShowOptionsPresentation: function(){
+	_setSpecialPasteShowOptionsPresentation: function(props){
 		var presentation = editor.WordControl.m_oLogicDocument;
 		var stateSelection = presentation.GetSelectionState();
 		var curPage = stateSelection.CurPage;
 		var pos = presentation.GetTargetPosition();
-		var props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
+		props = !props ? [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly] : props;
 		var x, y;
 		if (null === pos) {
 			pos = presentation.GetSelectedBounds();
 			x = pos.x + pos.w;
 			y = pos.y + pos.h;
-			props = [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly];
 		} else {
 			x = pos.X;
 			y = pos.Y;
@@ -3832,6 +3832,27 @@ PasteProcessor.prototype =
 
 			var objects = oThis.ReadPresentationShapes(stream);
 			var arr_shapes = objects.arrShapes;
+			var arr_Images = objects.arrImages;
+
+			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+				switch (props) {
+					case Asc.c_oSpecialPasteProps.picture: {
+						if(objects.imgUrl){
+							var sImageUrl = objects.imgUrl;
+							var w = 100;
+							var h = 200;
+							var _image = AscFormat.DrawingObjectsController.prototype.createImage(sImageUrl, 0, 0, w, h);
+							arr_shapes = [];
+							arr_shapes.push(new DrawingCopyObject(_image, 0, 0, w, h));
+							arr_Images = [];
+							arr_Images.push(new AscCommon.CBuilderImages(_image.blipFill, sImageUrl, _image, null, null));
+						}
+
+						break;
+					}
+				}
+			}
 
 			var font_map = {};
 			var images = [];
@@ -3854,7 +3875,7 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Document_UpdateInterfaceState();
 
-					oThis._setSpecialPasteShowOptionsPresentation();
+					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.picture]);
 
 					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
@@ -3865,7 +3886,7 @@ PasteProcessor.prototype =
 				fonts.push(new CFont(i, 0, "", 0));
 			}
 
-			var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
+			var oObjectsForDownload = GetObjectsForImageDownload(arr_Images);
 			if (oObjectsForDownload.aUrls.length > 0) {
 				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
 					var oImageMap = {};
@@ -3878,7 +3899,7 @@ PasteProcessor.prototype =
 					im_arr.push(key);
 				}
 
-				oThis.SetShortImageId(objects.arrImages);
+				oThis.SetShortImageId(arr_Images);
 				oThis.api.pre_Paste(fonts, im_arr, paste_callback);
 			}
 		};
@@ -5121,13 +5142,14 @@ PasteProcessor.prototype =
 				}
 			}
         }
-		
+
+		var imgUrl = loader.stream.GetString2();
 		var chartImages = pptx_content_loader.Reader.End_UseFullUrl();
 		var images = loader.End_UseFullUrl();
         loader.AssignConnectorsId();
 		var allImages = chartImages.concat(images);
 		
-        return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms};
+        return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms, imgUrl: imgUrl};
     },
 
     ReadPresentationSlides: function(stream)
