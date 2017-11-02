@@ -207,10 +207,10 @@ var c_oAscNumberingFormat = {
 };
 
 var c_oAscTabLeader = {
-	None       : 0x00,
-	Dot        : 0x01,
-	Hyphen     : 0x02,
-	MiddleDot  : 0x03,
+	Dot        : 0x00,
+	Hyphen     : 0x01,
+	MiddleDot  : 0x02,
+	None       : 0x03,
 	Underscore : 0x04
 };
 
