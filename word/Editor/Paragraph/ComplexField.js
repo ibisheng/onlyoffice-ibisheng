@@ -279,7 +279,7 @@ CComplexField.prototype.Update = function()
 
 			// Значение таба зависит от текущей секции
 			var oTabs = new CParaTabs();
-			oTabs.Add(new CParaTab(tab_Right, 9345 / 20 / 72 * 25.4, c_oAscTabLeader.Dot));
+			oTabs.Add(new CParaTab(tab_Right, 9345 / 20 / 72 * 25.4, Asc.c_oAscTabLeader.Dot));
 			oPara.Set_Tabs(oTabs);
 
 			var oTabRun = new ParaRun(oPara, false);
