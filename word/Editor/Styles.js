@@ -3167,29 +3167,36 @@ CStyle.prototype.CreateFootnoteReference = function()
 	this.Set_UnhideWhenUsed(true);
 	this.Set_TextPr(oTextPr);
 };
-CStyle.prototype.CreateTOC1 = function()
+CStyle.prototype.CreateTOC = function(nLvl)
 {
 	var ParaPr = {
 		Spacing : {
-			After  : 5 * g_dKoef_pt_to_mm
-		}
-	};
-
-	this.Set_UiPriority(39);
-	this.Set_UnhideWhenUsed(true);
-	this.Set_ParaPr(ParaPr);
-};
-CStyle.prototype.CreateTOC2 = function()
-{
-	var ParaPr = {
-		Spacing : {
-			After  : 5 * g_dKoef_pt_to_mm
+			After  : 57 / 20 * g_dKoef_pt_to_mm
 		},
 
 		Ind : {
-			Left : 11 * g_dKoef_pt_to_mm
+			Left      : 0,
+			Right     : 0,
+			FirstLine : 0
 		}
 	};
+
+	if (1 === nLvl)
+		ParaPr.Ind.Left = 283 / 20 * g_dKoef_pt_to_mm;
+	else if (2 === nLvl)
+		ParaPr.Ind.Left = 567 / 20 * g_dKoef_pt_to_mm;
+	else if (3 === nLvl)
+		ParaPr.Ind.Left = 850 / 20 * g_dKoef_pt_to_mm;
+	else if (4 === nLvl)
+		ParaPr.Ind.Left = 1134 / 20 * g_dKoef_pt_to_mm;
+	else if (5 === nLvl)
+		ParaPr.Ind.Left = 1417 / 20 * g_dKoef_pt_to_mm;
+	else if (6 === nLvl)
+		ParaPr.Ind.Left = 1701 / 20 * g_dKoef_pt_to_mm;
+	else if (7 === nLvl)
+		ParaPr.Ind.Left = 1984 / 20 * g_dKoef_pt_to_mm;
+	else if (8 === nLvl)
+		ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
 
 	this.Set_UiPriority(39);
 	this.Set_UnhideWhenUsed(true);
@@ -3470,13 +3477,12 @@ function CStyles(bCreateDefault)
 		StyleFootnoteReference.CreateFootnoteReference();
 		this.Default.FootnoteReference = this.Add(StyleFootnoteReference);
 
-		var TOC1 = new CStyle("toc 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		TOC1.CreateTOC1();
-		this.Default.TOC[0] = this.Add(TOC1);
-
-		var TOC2 = new CStyle("toc 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-		TOC2.CreateTOC2();
-		this.Default.TOC[1] = this.Add(TOC2);
+		for (var nLvl = 0; nLvl <= 8; ++nLvl)
+		{
+			var oStyleTOC = new CStyle("toc " + (nLvl + 1), this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+			oStyleTOC.CreateTOC(nLvl);
+			this.Default.TOC[nLvl] = this.Add(oStyleTOC);
+		}
 
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
