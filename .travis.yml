@@ -6,8 +6,18 @@ node_js:
   - '6'
 before_script:
   - git clone -b develop https://github.com/ONLYOFFICE/web-apps.git ../web-apps
+addons:
+  sonarcloud:
+    organization: "onlyoffice"
+    token:
+      secure: "v/VxlPNCV70ugPc873YY5AETeMiHHcln5QUUP3WikYoZWHQQuUkAfUwvRIwRS+hgtopxjUJzywDkIZhX2w0VjCP0UxYjSXM84X3FzYsJx0H/cyOo2eDxMDfiZMQ2fQ7WACD6MPpwDMQLnGqZGtBj5IxjF3ah9APARBH2OwUJSYHlrH1Mb038xAFcs6Qyo3M+P80OgyuNbjpJ6PaKm5tsnAMXIYNuAg934DdlwIR05Jrt59LulYsPD7nFP/Zb10Vs4aY6UYhf+TQRyi/wHVnmL2b93KjBCrVqh2AC5oKU5n0Yqxshf5lcYebddtVJjNdKmEFxvKL4Z9f3GZIa5RNM0EkbN3eH3VP2+2kK/HQXurpuBk+uRxOL/ZXpwbVcAA5BG3NPlBVNFjE3Sg3GpOXNOVALjZZI1l/GlwCUERYeuPVaK8PxuE2DJBYoQLx6D2JiRLGlKGyBUOEmrGU13drdeQR6HNsulYYTz4woPMoF55tUT1JMNat53BP4evQvwnaTZvbMYGKjvGwu9c1Q85St6ozhVL2jAHFeL5FAriSTsGKHWMEHqYUL01ofFjTVwSLj9zlO4LyXzUpOnuJ/QLW7wLBtK9dJiJcqVJVdnZAcxo8H47As07+utVim3k33TTfJTTNY0Q1ZaOyYWzXvIEB7cDiYOunxXfMpInyTQ6XYxKQ="
+    branches:
+          - develop
 jobs:
   include:
+    - stage: SonarQube Scanner
+      script:
+        - sonar-scanner
     - stage: Formulas tests
       script:
         - npm install -g node-qunit-phantomjs
