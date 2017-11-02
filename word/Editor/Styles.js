@@ -8531,9 +8531,8 @@ CParaTabs.prototype.Set_FromObject = function(Tabs)
 {
 	if (Tabs instanceof Array)
 	{
-		var Count = Tabs.length;
-		for (var Index = 0; Index < Count; Index++)
-			this.Add(new CParaTab(Tabs[Index].Value, Tabs[Index].Pos, Tabs[nIndex].Leader));
+		for (var nIndex = 0, nCount = Tabs.length; nIndex < nCount; ++nIndex)
+			this.Add(new CParaTab(Tabs[nIndex].Value, Tabs[nIndex].Pos, Tabs[nIndex].Leader));
 	}
 };
 CParaTabs.prototype.GetCount = function()
