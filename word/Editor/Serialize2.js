@@ -237,7 +237,8 @@ var c_oSerProp_pPrType = {
 	SectPr: 31,
 	numPr_Ins: 32,
 	pPrChange: 33,
-	outlineLvl: 34
+	outlineLvl: 34,
+	Tab_Item_Leader: 35
 };
 var c_oSerProp_rPrType = {
     Bold:0,
@@ -1849,6 +1850,10 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
         this.memory.WriteByte(c_oSerProp_pPrType.Tab_Item_Pos);
         this.memory.WriteByte(c_oSerPropLenType.Double);
         this.memory.WriteDouble(TabItem.Pos);
+
+		this.memory.WriteByte(c_oSerProp_pPrType.Tab_Item_Leader);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(TabItem.Leader);
     };
     this.WriteNumPr = function(id, lvl)
     {
@@ -6356,6 +6361,14 @@ function BinaryFileReader(doc, openParams)
 			if(null != oNewId)
 				stDefault.Headings[i] = oNewId.id;
         }
+		//TOC
+		for(var i = 0, length = stDefault.TOC.length; i < length; ++i)
+		{
+			var sTOC = stDefault.TOC[i];
+			var oNewId = oIdRenameMap[sTOC];
+			if(null != oNewId)
+				stDefault.TOC[i] = oNewId.id;
+		}
 		//меняем старые id
 		for(var sOldId in oIdRenameMap)
 		{
@@ -7536,7 +7549,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
     this.ReadTabItem = function(type, length, tab)
     {
         var res = c_oSerConstants.ReadOk;
-        if(c_oSerProp_pPrType.Tab_Item_Val == type)
+        if(c_oSerProp_pPrType.Tab_Item_Val === type)
 		{
 			switch(this.stream.GetUChar())
 			{
@@ -7546,8 +7559,10 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				default : tab.Value = tab_Left;
 			}
 		}
-        else if(c_oSerProp_pPrType.Tab_Item_Pos == type)
-            tab.Pos = this.bcr.ReadDouble();    
+        else if(c_oSerProp_pPrType.Tab_Item_Pos === type)
+            tab.Pos = this.bcr.ReadDouble();
+		else if(c_oSerProp_pPrType.Tab_Item_Leader === type)
+			tab.Leader = this.bcr.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;

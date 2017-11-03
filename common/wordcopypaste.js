@@ -314,7 +314,7 @@ CopyProcessor.prototype =
                     apPr.push("mso-line-height-rule:exactly");
             }
 			//TODO при вставке в EXCEL(внутрь ячейки) появляются лишние пустые строки из-за того, что в HTML пишутся отступы - BUG #14663
-            //��� ������� � word ����� ����� ��� �������� ������������ ������
+			//При вставке в word лучше чтобы эти значения выставлялись всегда
             //if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
             apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
             //if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
@@ -370,7 +370,7 @@ CopyProcessor.prototype =
         }
         if (null != Value.FontSize) {
             if (!this.api.DocumentReaderMode)
-                aProp.push("font-size:" + Value.FontSize + "pt");//font-size � pt ��� ��������� ������� � mm
+                aProp.push("font-size:" + Value.FontSize + "pt");//font-size в pt все остальные метрики в mm
             else
                 aProp.push("font-size:" + this.api.DocumentReaderMode.CorrectFontSize(Value.FontSize));
         }
@@ -413,7 +413,7 @@ CopyProcessor.prototype =
         switch ( ParaItem.Type )
         {
             case para_Text:
-                //���������� �����������
+				//экранируем спецсимволы
                 var sValue = AscCommon.encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
@@ -443,7 +443,7 @@ CopyProcessor.prototype =
                 else
 					oBr.oAttributes["style"] = "mso-special-character:line-break;";
 				oTarget.addChild(oBr);
-				//todo ��������� ���� �������� � ������ �����
+				//todo закончить этот параграф и начать новый
 				//добавил неразрвной пробел для того, чтобы информация попадала в буфер обмена
 				var oSpan = new CopyElement("span");
 				oSpan.addChild(new CopyElement("&nbsp;", true));
@@ -545,12 +545,12 @@ CopyProcessor.prototype =
     {
         var oDocument = this.oDocument;
 		var Para = null;
-        //��� heading ����� � h1
+		//Для heading пишем в h1
         var styleId = Item.Style_Get();
         if(styleId)
         {
             var styleName = oDocument.Styles.Get_Name( styleId ).toLowerCase();
-            //������ "heading n" (n=1:6)
+			//шаблон "heading n" (n=1:6)
             if(0 === styleName.indexOf("heading"))
             {
                 var nLevel = parseInt(styleName.substring("heading".length));
@@ -782,7 +782,7 @@ CopyProcessor.prototype =
 		if(null != cell.CompiledPr && null != cell.CompiledPr.Pr)
         {
             cellPr = cell.CompiledPr.Pr;
-            //��� ������ � �������� ����� ������������ margin � �� colspan
+			//Для первых и послених ячеек выставляются margin а не colspan
             if(null != cellPr.GridSpan && cellPr.GridSpan > 1)
 				tc.oAttributes["colspan"] = cellPr.GridSpan;
         }
@@ -854,9 +854,9 @@ CopyProcessor.prototype =
             {
                 nGridBefore = elems.before;
                 var nWBefore = gridSum[elems.gridStart - 1] - gridSum[elems.gridStart - nGridBefore - 1];
-                //���������� margin
+				//Записываем margin
                 trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt;";
-                //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+				//добавляем td для тех кто не понимает mso-row-margin-left
                 var oNewTd = new CopyElement("td");
                 oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
                 oNewTd.oAttributes["width"] = Math.round(nWBefore * g_dKoef_mm_to_pix);
@@ -883,7 +883,7 @@ CopyProcessor.prototype =
 				var StartGridCol = cell.Metrics.StartGridCol;
 				var GridSpan = cell.Get_GridSpan();
 				var width = gridSum[StartGridCol + GridSpan - 1] - gridSum[StartGridCol - 1];
-				//��������� rowspan
+				//вычисляем rowspan
 				var nRowSpan = table.Internal_GetVertMergeCount(nCurRow, StartGridCol, GridSpan);
 				if(nCurRow + nRowSpan - 1 > nMaxRow)
 				{
@@ -901,9 +901,9 @@ CopyProcessor.prototype =
             {
                 var nGridAfter = elems.after;
                 var nWAfter = gridSum[elems.gridEnd + nGridAfter] - gridSum[elems.gridEnd];
-                //���������� margin
+				//Записываем margin
                 trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt;";
-                //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+				//добавляем td для тех кто не понимает mso-row-margin-left
                 var oNewTd = new CopyElement("td");
                 oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
 				oNewTd.oAttributes["width"] = Math.round(nWAfter * g_dKoef_mm_to_pix);
@@ -983,7 +983,7 @@ CopyProcessor.prototype =
             if(null != Pr.TableBorders)
                 tblStyle += this._BordersToStyle(Pr.TableBorders, true, false);
         }
-        //���� cellSpacing
+		//ищем cellSpacing
         var bAddSpacing = false;
         if(table.Content.length > 0)
         {
@@ -1057,7 +1057,7 @@ CopyProcessor.prototype =
 				else if ( type_Paragraph === Item.GetType() )
 				{
 					var SelectedAll = Index === elementsContent.length - 1 ? elementsContent[Index].SelectedAll : true;
-					//todo ����� ������ ��� �������� ������ ���� Index == End
+					//todo может только для верхнего уровня надо Index == End
 					if(!bFromPresentation)
 						this.oBinaryFileWriter.CopyParagraph(Item, SelectedAll);
 						
@@ -1883,7 +1883,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.map_font_index = api.FontLoader.map_font_index;
     this.bUploadImage = bUploadImage;
     this.bUploadFonts = bUploadFonts;
-    this.bNested = bNested;//��� ���������� � ��������
+    this.bNested = bNested;//для параграфов в таблицах
     this.oFonts = {};
     this.oImages = {};
 	this.aContent = [];
@@ -1892,8 +1892,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	this.pasteInPresentationShape = null;
 	
 	this.maxTableCell = null;
-	
-    //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
+
+	//для вставки текста в ячейку, при копировании из word в chrome появляются лишние пробелы вне <p>
     this.bIgnoreNoBlockText = false;
 
     this.oCurRun = null;
@@ -1904,15 +1904,15 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.oCurHyperlinkContentPos = 0;
     this.oCur_rPr = new CTextPr();
 
-    //Br ������� ������ ��� ���� ������ ����� �� ���� �������� br, ���� �� � ������������.
+	//Br копятся потомы что есть случаи когда не надо вывобить br, хотя он и присутствует.
     this.nBrCount = 0;
-    //bInBlock ��������� ������� �� �������(��������������� ������ �������� �������� �� child)
-    //���� ����� ��������� ������� true != this.bInBlock ������ ��������� ������� �� �������� � �� ���� ��������� ����� ��������
+	//bInBlock указывает блочный ли элемент(рассматриваются только элементы дочерние от child)
+	//Если после окончания вставки true != this.bInBlock значит последний элемент не параграф и не надо добавлять новый параграф
     this.bInBlock = null;
 
-    //������ �������� � ������� ��������� �������� ��� ������
+	//ширина элемента в который вставляем страница или ячейка
     this.dMaxWidth = Page_Width - X_Left_Margin - X_Right_Margin;
-    //���������� ������(�������� ��� ������� ������� �������, ������ ��� ������� ����������� ������ � ��������� � ������� ����� �������� ���� �����������)
+	//коэфициент сжатия(например при вставке таблица сжалась, значит при вставке содержимого ячейки к картинкам и таблице будет применен этот коэффициент)
     this.dScaleKoef = 1;
     this.bUseScaleKoef = false;
 	this.bIsPlainText = false;
@@ -2931,7 +2931,7 @@ PasteProcessor.prototype =
     insertInPlace2: function(oDoc, aNewContent)
     {
         var nNewContentLength = aNewContent.length;
-        //����� ���� �� Document.AddNewParagraph
+		//Часть кода из Document.Add_NewParagraph
 
         for(var i = 0; i < aNewContent.length; ++i)
         {
@@ -2944,7 +2944,7 @@ PasteProcessor.prototype =
         {
             if(/*true != this.bInBlock &&*/ 1 === nNewContentLength && type_Paragraph === aNewContent[0].GetType() && Item.CurPos.ContentPos !== 1)
             {
-                //������� ������ � ��������
+				//Вставка строки в параграф
                 var oInsertPar = aNewContent[0];
                 var nContentLength = oInsertPar.Content.length;
                 if(nContentLength > 2)
@@ -2956,7 +2956,7 @@ PasteProcessor.prototype =
 					else
 						TextPr = new ParaTextPr();
                     var nContentPos = Item.CurPos.ContentPos;
-                    for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
+                    for(var i = 0; i < nContentLength - 2; ++i)// -2 на спецсимволы конца параграфа
                     {
                         var oCurInsItem = oInsertPar.Content[i];
                         if(para_Numbering !== oCurInsItem.Type)
@@ -2974,7 +2974,7 @@ PasteProcessor.prototype =
             {
                 var LastPos = this.oRecalcDocument.CurPos.ContentPos;
                 var LastPosCurDoc = oDoc.CurPos.ContentPos;
-                //����� ��������� ��������
+				//Нужно разрывать параграф
                 var oSourceFirstPar = Item;
                 var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc);
                 if(true !== oSourceFirstPar.IsCursorAtEnd() || oSourceFirstPar.IsEmpty())
@@ -2989,32 +2989,32 @@ PasteProcessor.prototype =
 
                 if(type_Paragraph === oInsFirstPar.GetType())
                 {
-                    //�������� �������� ������� ������������ ��������� � ������ �������� ��������
-                    //CopyPr_Open - ������� � �������, �.�. ���� �������� ��� � ���������
+					//копируем свойства первого вставляемого параграфа в первый исходный параграф
+					//CopyPr_Open - заносим в историю, т.к. этот параграф уже в документе
                     oInsFirstPar.CopyPr_Open( oSourceFirstPar );
-                    //�������� ���������� ������������ ���������
+					//Копируем содержимое вставляемого параграфа
                     oSourceFirstPar.Concat(oInsFirstPar);
                     if(AscCommon.isRealObject(oInsFirstPar.bullet))
                     {
                         oSourceFirstPar.setPresentationBullet(oInsFirstPar.bullet.createDuplicate());
                     }
-                    //�������� ��������� ������ ����� ������ �� ��������� ���� ��������
+					//Сдвигаем стартовый индекс чтобы больше не учитывать этот параграф
                     nStartIndex++;
                 }
                 else if(type_Table === oInsFirstPar.GetType())
                 {
-                    //���� ��������� ������� � ������ ��������, �� �� ��������� ���
+					//если вставляем таблицу в пустой параграф, то не разрываем его
                     if(oSourceFirstPar.IsEmpty())
                     {
                         oSourceFirstPar = null;
                     }
                 }
-                //���� �� ���������� ������ ����� ���������, �� ��������� ���������� ���������� ��������� � ������ ������ �������� ��������� ���������
+				//Если не скопирован символ конца параграфа, то добавляем содержимое последнего параграфа в начело второй половины разбитого параграфа
                 if(null != oInsLastPar && type_Paragraph == oInsLastPar.GetType() && true != this.bInBlock)
                 {
                     var nNewContentPos = oInsLastPar.Content.length - 2;
-                    //�������� �������� ���������� ��������� ��������� � ���������  ����������� ��������
-                    //CopyPr - �� ������� � �������, �.�. � ������� ��������� ������� ����� ��������� � ��������
+					//копируем свойства последнего исходного параграфа в последний  вставляемый параграф
+					//CopyPr - не заносим в историю, т.к. в историю добавится вставка этого параграфа в документ
                     var ind = oInsLastPar.Pr.Ind;
                     if(null != oInsLastPar)
                         oSourceLastPar.CopyPr( oInsLastPar );
@@ -3027,7 +3027,7 @@ PasteProcessor.prototype =
                     oSourceLastPar = oInsLastPar;
                     nEndIndex--;
                 }
-                //���������
+				//вставляем
                 for(var i = nStartIndex; i <= nEndIndex; ++i )
                 {
                     var oElemToAdd = aNewContent[i];
@@ -3036,13 +3036,13 @@ PasteProcessor.prototype =
                 }
                 if(null != oSourceLastPar)
                 {
-                    //��������� ��������� ��������
+					//вставляем последний параграф
                     LastPosCurDoc++;
                     oDoc.Internal_Content_Add(LastPosCurDoc, oSourceLastPar);
                 }
                 if(null == oSourceFirstPar)
                 {
-                    //������� ������ ��������, ������ ��� ����� ������ ���� � ��������� �� ����� �� ������ ���������
+					//Удаляем первый параграф, потому что будут ошибки если в документе не будет ни одного параграфа
                     oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
                     LastPosCurDoc--;
                 }
@@ -4159,8 +4159,8 @@ PasteProcessor.prototype =
 		var fPasteHtmlPresentationCallback = function()
 		{
 			oThis.aContent = [];
-
-			var arrShapes = [], arrImages = [], arrTables = [];
+			//на время заполнения контента для вставки отключаем историю
+			 var arrShapes = [], arrImages = [], arrTables = [];
 			var presentation = editor.WordControl.m_oLogicDocument;
 			if(presentation.Slides.length === 0)
 			{
@@ -4298,7 +4298,7 @@ PasteProcessor.prototype =
 			if(bTurnOffTrackRevisions){
 				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = false;
 			}
-			//�� ����� ���������� �������� ��� ������� ��������� �������
+			//на время заполнения контента для вставки отключаем историю
 			oThis._Execute(node, {}, true, true, false);
 				
 			oThis._AddNextPrevToContent(oThis.oDocument);
@@ -5206,7 +5206,7 @@ PasteProcessor.prototype =
 		var oThis = this;
         if(true === this.bUploadImage || true === this.bUploadFonts)
         {
-            //����������� �� ��������� �������� ������ ������� � ��������.
+			//Пробегаемся по документу собираем список шрифтов и картинок.
             var aPrepeareFonts = this._Prepeare_recursive(node, true, true);
      
 			var aImagesToDownload = [];
@@ -5272,7 +5272,7 @@ PasteProcessor.prototype =
     },
     _Prepeare_recursive : function(node, bIgnoreStyle, isCheckFonts)
     {
-        //����������� �� ����� ������, �������� ��� ������ � ��������
+		//пробегаемся по всему дереву, собираем все шрифты и картинки
         var nodeName = node.nodeName.toLowerCase();
         var nodeType = node.nodeType;
         if(!bIgnoreStyle)
@@ -5299,7 +5299,7 @@ PasteProcessor.prototype =
             var child_nodeType = child.nodeType;
             if(!(Node.ELEMENT_NODE === child_nodeType || Node.TEXT_NODE === child_nodeType))
                 continue;
-            //�������� ������� ��������� ������ �� \t,\n,\r
+			//попускам элеметы состоящие только из \t,\n,\r
             if( Node.TEXT_NODE === child.nodeType)
             {
                 var value = child.nodeValue;
@@ -5317,9 +5317,9 @@ PasteProcessor.prototype =
 			var aPrepeareFonts = [];
             for(var font_family in this.oFonts)
             {
-                //todo ��������� �����, ������ �� ��������
+				//todo подбирать шрифт, хотябы по регистру
                 var oFontItem = this.oFonts[font_family];
-                //���� ����� ����� �������
+				//Ищем среди наших шрифтов
                 this.oFonts[font_family].Index = -1;
                 aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
             }
@@ -5468,7 +5468,7 @@ PasteProcessor.prototype =
                         if(aParems.length >= 4)
                         {
                             var oA = this._ValueToMmType(aParems[3]);
-                            if(0 == oA .val)//��������� ����������
+                            if(0 == oA .val)//полностью прозрачный
                                 return null;
                         }
                         var oR = this._ValueToMmType(aParems[0]);
@@ -5509,7 +5509,7 @@ PasteProcessor.prototype =
     },
     _set_pPr : function(node, Para,  pNoHtmlPr)
     {
-        //����������� ����� �� ������ � ������� �������� ��������
+		//Пробегаемся вверх по дереву в поисках блочного элемента
 		var t = this;
 		var sNodeName = node.nodeName.toLowerCase();
         if(node !== this.oRootNode)
@@ -5610,11 +5610,11 @@ PasteProcessor.prototype =
 				if(obj && "%" !== obj.type && "none" !== obj.type)
 				{
 					font_size = obj.val;
-					//���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
+					//Если браузер не поддерживает нецелые пикселы отсекаем половинные шрифты, они появляются при вставке 8, 11, 14, 20, 26pt
 					if("px" === obj.type && false === this.bIsDoublePx)
 						font_size = Math.round(font_size * g_dKoef_mm_to_pt);
 					else
-						font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+						font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//половинные значения допустимы.
 					
 					//TODO use constant
 					if(font_size > 300)
@@ -5656,10 +5656,10 @@ PasteProcessor.prototype =
             // pPr.Ind.Left = pPr.Ind.Left * this.dScaleKoef;
             // if(null != pPr.Ind.Right && true == this.bUseScaleKoef)
             // pPr.Ind.Right = pPr.Ind.Right * this.dScaleKoef;
-            //�������� ����� ������ margin �� ������� �� ����� ��� �� ����������� ����� ��� �� �������
+			//Проверка чтобы правый margin не заходил за левый или не приближался ближе чем на линейке
             if(null != Ind.Left && null != Ind.Right)
             {
-                //30 ����������� ��� � �� �������
+				//30 ограничение как и на линейке
                 var dif = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - Ind.Right;
                 if(dif < 30)
                     Ind.Right = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - 30;
@@ -5675,7 +5675,7 @@ PasteProcessor.prototype =
             var text_align = computedStyle.getPropertyValue( "text-align" );
             if(text_align)
             {
-                //����� ��������� -webkit-right
+				//Может приходить -webkit-right
                 var Jc = null;
                 if(-1 !== text_align.indexOf('center'))
                     Jc = align_Center;
@@ -5713,7 +5713,7 @@ PasteProcessor.prototype =
             if(false === this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);
             //Shd
-            //background-color �� ����������� ��������� ��������, ���� �������� ������������ ��������
+			//background-color не наследуется остальные свойства, надо смотреть родительские элементы
             var background_color = null;
             var oTempNode = node;
             while(true)
@@ -5798,7 +5798,7 @@ PasteProcessor.prototype =
             {
                 var setListTextPr = function(AbstractNum)
 				{
-					//��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
+					//текстовые настройки списка берем по настройкам первого текстового элемента
 					var oFirstTextChild = node;
 					while(true)
 					{
@@ -5810,7 +5810,7 @@ PasteProcessor.prototype =
 
 							if(!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType))
 								continue;
-							//�������� ������� ��������� ������ �� \t,\n,\r
+							//попускам элеметы состоящие только из \t,\n,\r
 							if( Node.TEXT_NODE === child.nodeType)
 							{
 								var value = child.nodeValue;
@@ -5843,8 +5843,8 @@ PasteProcessor.prototype =
 							oTextPr.Bold = oTextPr.Underline = oTextPr.Italic = undefined;
 							if(oFirstTextChild.nodeName.toLowerCase() === "a" && oTextPr.Color)
 								oTextPr.Color.Set(0, 0, 0);
-							
-							//�������� ��������� �� node
+
+							//получаем настройки из node
 							AbstractNum.Apply_TextPr(0, oTextPr);
 						}
 					}
@@ -5984,9 +5984,9 @@ PasteProcessor.prototype =
 							case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
 						}
 					}
-					//����� ���� ����������� �� Document.SetParagraphNumbering
-					
-					//������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
+					//Часть кода скопирована из Document.Set_ParagraphNumbering
+
+					//Смотрим передыдущий параграф, если тип списка совпадает, то берем тип списка из предыдущего параграфа
 					if(this.aContent.length > 1)
 					{
 						var prevElem = this.aContent[this.aContent.length - 2];
@@ -6093,7 +6093,7 @@ PasteProcessor.prototype =
                 _bullet.m_nType = num;
                 if(num === numbering_presentationnumfrmt_Char)
                 {
-                    _bullet.m_sChar = "�";
+                    _bullet.m_sChar = "•";
                 }
                 _bullet.m_nStartAt = 1;
                 Para.Add_PresentationNumbering2(_bullet );
@@ -6124,8 +6124,8 @@ PasteProcessor.prototype =
 				
 				rPr = tempRpr;
 			}
-			
-			//���� ��������� ��������� ���������� ��������� �������
+
+			//Если текстовые настройки поменялись добавляем элемент
 			if(!this.oCur_rPr.Is_Equal(rPr))
 			{
 			    this._Set_Run_Pr(rPr);
@@ -6198,11 +6198,11 @@ PasteProcessor.prototype =
                 if(obj && "%" !== obj.type && "none" !== obj.type)
                 {
                     font_size = obj.val;
-                    //���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
+					//Если браузер не поддерживает нецелые пикселы отсекаем половинные шрифты, они появляются при вставке 8, 11, 14, 20, 26pt
                     if("px" === obj.type && false === this.bIsDoublePx)
                         font_size = Math.round(font_size * g_dKoef_mm_to_pt);
                     else
-                        font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+                        font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//половинные значения допустимы.
 					
 					//TODO use constant
 					if(font_size > 300)
@@ -6238,8 +6238,8 @@ PasteProcessor.prototype =
 			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
             if(spacing && null != (spacing = this._ValueToMm(spacing)))
                 rPr.Spacing = spacing;
-			
-            //������� �� ��������, ������� �� �����������, ���� �������� ������������ ��������
+
+			//Провяем те свойства, которые не наследуется, надо смотреть родительские элементы
             var background_color = null;
             var underline = null;
             var Strikeout = null;
@@ -6324,7 +6324,7 @@ PasteProcessor.prototype =
     },
     _PrepareContent : function()
     {
-        //�� �������� ����� ������� ������������ �� �������, ����� ������ �������� �������� �����
+		//Не допускам чтобы контент заканчивался на таблицу, иначе тяжело вставить параграф после
         if(this.aContent.length > 0)
         {
             var last = this.aContent[this.aContent.length - 1];
@@ -6589,22 +6589,22 @@ PasteProcessor.prototype =
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;
         this.aContent.push(this.oCurPar);
-        //���������� ��������� �����
+		//сбрасываем настройки теста
         this.oCur_rPr = new CTextPr();
     },
     _Execute_AddParagraph : function(node, pPr)
     {
         this._Add_NewParagraph();
-        //������������� ����� ���������
+		//Устанавливаем стили параграфа
         this._set_pPr(node, this.oCurPar, pPr);
     },
     _Decide_AddParagraph : function(node, pPr, bParagraphAdded, bCommitBr)
     {
-        //���������� ������ ���������(��� ��������, ��� MS), ��������� �������� ������ ����� ������ �����
+		//Игнорируем пустые параграфы(как браузеры, как MS), добавляем параграф только когда придет текст
         if(true == bParagraphAdded)
         {
             if(false != bCommitBr)
-                this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+                this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
             this._Execute_AddParagraph(node, pPr);
         }
         else if(false != bCommitBr)
@@ -6631,7 +6631,7 @@ PasteProcessor.prototype =
         var oDocument = this.oDocument;
         var tableNode = node;
 		var newNode;
-        //���� ���� ���� tbody
+		//Ищем если есть tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             if("tbody" === node.childNodes[i].nodeName.toLowerCase())
@@ -6654,8 +6654,8 @@ PasteProcessor.prototype =
 			node = newNode;
 			tableNode = newNode;
 		}
-		
-        //��������� �����. � ������� �� ����� ���� ����� ��������� �� ����������� ���������� �����.
+
+		//валидация талиц. В таблице не может быть строк состоящих из вертикально замерженых ячеек.
         var nRowCount = 0;
         var nMinColCount = 0;
         var nMaxColCount = 0;
@@ -6686,7 +6686,7 @@ PasteProcessor.prototype =
             {
                 nCurSum = 0;
                 nCurColWidth = 0;
-                var nMinRowSpanCount = null;//����������� rowspan ����� ������
+                var nMinRowSpanCount = null;//минимальный rowspan ячеек строки
                 for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
                 {
                     var tc = tr.childNodes[j];
@@ -6733,7 +6733,7 @@ PasteProcessor.prototype =
                 }
 				nAllSum += nCurSum;
                 fParseSpans();
-                //������� ������ rowspan
+				//Удаляем лишние rowspan
                 if(nMinRowSpanCount > 1)
                 {
                     for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
@@ -6750,7 +6750,7 @@ PasteProcessor.prototype =
                 }
                 if(dMaxSum < nCurSum)
                     dMaxSum = nCurSum;
-                //������� ������ tr
+				//удаляем пустые tr
                 if(0 == nCurColWidth)
 				{
                     node.removeChild(tr);
@@ -6782,7 +6782,7 @@ PasteProcessor.prototype =
                 dScaleKoef = dScaleKoef * this.dMaxWidth / dMaxSum;
                 bUseScaleKoef = true;
             }
-            //������ Grid
+			//строим Grid
             var aGrid = [];
             var nPrevIndex = null;
             var nPrevVal = 0;
@@ -6828,7 +6828,7 @@ PasteProcessor.prototype =
 				nSum += aGrid[i];
 				aSumGrid[i] = nSum;
 			}
-            //�������� content
+			//набиваем content
             this._ExecuteTable(tableNode, node, table, aSumGrid, nMaxColCount !== nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
             table.MoveCursorToStartPos();
             this.aContent.push(table);
@@ -6876,8 +6876,8 @@ PasteProcessor.prototype =
             return res.Copy();
         else
         {
-            //������� ����� dom ����� �� ������ ������� ������� ������� ������
-            //todo ������� ��� dom, ���������� �����.
+			//сделано через dom чтобы не писать большую функцию разбора строки
+			//todo сделать без dom, анализируя текст.
             res = new CDocumentBorder();;
             var oTestDiv = document.createElement("div");
             oTestDiv.setAttribute("style", "border-left:"+border);
@@ -6898,7 +6898,7 @@ PasteProcessor.prototype =
 		table.Set_TableLayout(tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
-        //align ������� � parent tableNode
+		//align смотрим у parent tableNode
 		var sTableAlign = null;
 		if(null != tableNode.align)
 			sTableAlign = tableNode.align
@@ -6907,7 +6907,7 @@ PasteProcessor.prototype =
             var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
-                //����� ��������� -webkit-right
+				//Может приходить -webkit-right
                 sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
             }
         }
@@ -7084,7 +7084,7 @@ PasteProcessor.prototype =
 		}
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
-            //����� ����� ���� ��� ��� ����� ����������� td, ������ ��� ����������� ���������� ������ ����������� � dom
+			//важно чтобы этот код был после определения td, потому что вертикально замерженые ячейки отсутствуют в dom
             fParseSpans();
 
             var tc = node.childNodes[i];
@@ -7185,13 +7185,13 @@ PasteProcessor.prototype =
         {
             var oDocContent = cell.Content;
             var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent);
-            //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
+			//выставляем единичные настройки - важно для копирования из таблиц и других мест где встречаются пустые ячейки
 			var oNewSpacing = new CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
             oNewPar.Set_Spacing(oNewSpacing);
             oPasteProcessor.aContent.push(oNewPar);
         }
-        //��������� ����� ���������
+		//добавляем новый параграфы
         for(var i = 0, length = oPasteProcessor.aContent.length; i < length; ++i)
 		{
 			if(i === length - 1)
@@ -7199,7 +7199,7 @@ PasteProcessor.prototype =
 			else
 				cell.Content.Internal_Content_Add(i + 1, oPasteProcessor.aContent[i], false);
 		}
-        //������� ��������, ������� ��������� � ������� �� ���������
+		//Удаляем параграф, который создается в таблице по умолчанию
         cell.Content.Internal_Content_Remove(0, 1);
     },
 	_CheckIsPlainText : function(node)
@@ -7231,14 +7231,14 @@ PasteProcessor.prototype =
 	},
     _Execute : function(node, pPr, bRoot, bAddParagraph, bInBlock)
     {
-        //bAddParagraph ���� �������� �� ������� _Decide_AddParagraph, ��������� �������� ��� ���.
-        //bAddParagraph ������������ � true, ����� ���������� ������� ������� � �� ��������� �������� ��������
+		//bAddParagraph флаг влияющий на функцию _Decide_AddParagraph, добавлять параграф или нет.
+		//bAddParagraph выставляется в true, когда встретился блочный элемент и по окончанию блочного элемента
         var oDocument = this.oDocument;
-        var bRootHasBlock = false;//���� root ���� ������� �������, �� ���� ��� child ������� �����������
-        //��� Root node �� ������� ����� � �� ��������� �����
+        var bRootHasBlock = false;//Если root есть блочный элемент, то надо все child считать параграфами
+		//Для Root node не смотрим стили и не добавляем текст
         if(true == bRoot)
         {
-            //���� ������� ��������� ���, �� �������� ����
+			//Если блочных элементов нет, то отменяем флаг
             var bExist = false;
             for(var i = 0, length = node.childNodes.length; i < length; i++)
             {
@@ -7263,8 +7263,8 @@ PasteProcessor.prototype =
                     var value = node.nodeValue;
                     if(!value)
                         value = "";
-                    //������� � ����� �������� \r|\t|\n, � �������� ������ �������� �� �� �������
-                    //������ ���(�������� ������ chrome ��� ������� ��������� ������ � ������� \n)
+					//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
+					//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
                     value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
                     value = value.replace(/(\r|\t|\n)/g, ' ');
                     if(value.length > 0)
@@ -7275,7 +7275,7 @@ PasteProcessor.prototype =
                             bUseOnlyInherit = true;
                         bAddParagraph = this._Decide_AddParagraph(oTargetNode, pPr, bAddParagraph);
 
-                        //��������� ������� ����� ���� �� ���������
+						//Добавляет элемени стиля если он поменялся
                         this._commit_rPr(oTargetNode, bUseOnlyInherit);
 
                         //TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
@@ -7329,7 +7329,7 @@ PasteProcessor.prototype =
                     return false;
             }
 
-            //�������� �� html �������� ���������(�� ��� ������ �������� �� getComputedStyle)
+			//собираем не html свойства параграфа(те что нельзя получить из getComputedStyle)
             var style = node.getAttribute("style");
             if(style)
                 this._parseCss(style, pPr);
@@ -7444,7 +7444,7 @@ PasteProcessor.prototype =
                         {
                             nWidth = nWidth * g_dKoef_pix_to_mm;
                             nHeight = nHeight * g_dKoef_pix_to_mm;
-                            //��������� � this.dMaxWidth
+							//вписываем в this.dMaxWidth
                             var bUseScaleKoef = this.bUseScaleKoef;
                             var dScaleKoef = this.dScaleKoef;
                             if(nWidth * dScaleKoef > this.dMaxWidth)
@@ -7490,7 +7490,7 @@ PasteProcessor.prototype =
                     return false;
             }
 
-            //��������� linebreak, ���� �� �� ��������� ������� �������� � �� ����� ��� ������� �������
+			//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
             var bPageBreakBefore = "always" === node.style.pageBreakBefore || "left" === node.style.pageBreakBefore || "right" === node.style.pageBreakBefore;
             if ("br" == sNodeName || bPageBreakBefore)
             {
@@ -7511,7 +7511,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            //�������� �� tab
+			//Проверка на tab
             if("span" === sNodeName)
             {
                 var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
@@ -7525,13 +7525,13 @@ PasteProcessor.prototype =
                 }
             }
         }
-        //���������� �������� ��� childNodes
+		//рекурсивно вызываем для childNodes
         for(var i = 0, length = node.childNodes.length; i < length; i++)
         {
             var child = node.childNodes[i];
             var nodeType = child.nodeType;
-            //��� ����������� �� word ����� ����������� ����������� �� �������
-            //����������� ����������, ������ ������ ������
+			//При копировании из word может встретиться комментарий со списком
+			//Комментарии пропускаем, списки делаем своими
             if(Node.COMMENT_NODE === nodeType)
             {
                 var value = child.nodeValue;
@@ -7540,7 +7540,7 @@ PasteProcessor.prototype =
                 {
                     if(-1 !== value.indexOf("supportLists"))
                     {
-                        //todo ���������� ��� ������
+						//todo распознать тип списка
                         pPr.bNum = true;
                         bSkip = true;
                     }
@@ -7549,7 +7549,7 @@ PasteProcessor.prototype =
                 }
                 if(true === bSkip)
                 {
-                    //���������� ��� �� �������������� �����������
+					//пропускаем все до закрывающегося комментария
                     var j = i + 1;
                     for(; j < length; j++)
                     {
@@ -7570,7 +7570,7 @@ PasteProcessor.prototype =
 			var sChildNodeName = child.nodeName.toLowerCase();
             if(!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType) || sChildNodeName === "style" || sChildNodeName === "#comment" || sChildNodeName === "script")
                 continue;
-            //�������� ������� ��������� ������ �� \t,\n,\r
+			//попускам элеметы состоящие только из \t,\n,\r
             if( Node.TEXT_NODE === child.nodeType)
             {
                 var value = child.nodeValue;
@@ -7597,7 +7597,7 @@ PasteProcessor.prototype =
                 if(null != href)
                 {
                     var sDecoded;
-                    //decodeURI ����� �������� malformed exception, ������ ��� ��� ���� � utf8, � ��������� ����� ����� ���������� url � ����� ���������(�������� windows-1251)
+					//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
                     try
                     {
                         sDecoded = decodeURI(href);
@@ -7664,21 +7664,21 @@ PasteProcessor.prototype =
         }
         if(bRoot)
         {
-            this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+            this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
         }
         return bAddParagraph;
     },
 
     _ExecutePresentation : function(node, pPr, bRoot, bAddParagraph, bInBlock, arrShapes, arrImages, arrTables)
     {
-        //bAddParagraph ���� �������� �� ������� _Decide_AddParagraph, ��������� �������� ��� ���.
-        //bAddParagraph ������������ � true, ����� ���������� ������� ������� � �� ��������� �������� ��������
+		//bAddParagraph флаг влияющий на функцию _Decide_AddParagraph, добавлять параграф или нет.
+		//bAddParagraph выставляется в true, когда встретился блочный элемент и по окончанию блочного элемента
         var arr_shapes = [];
         var arr_images = [];
         var arr_tables = [];
         var oDocument = this.oDocument;
-        var bRootHasBlock = false;//���� root ���� ������� �������, �� ���� ��� child ������� �����������
-        //��� Root node �� ������� ����� � �� ��������� �����
+        var bRootHasBlock = false;//Если root есть блочный элемент, то надо все child считать параграфами
+		//Для Root node не смотрим стили и не добавляем текст
         var presentation = editor.WordControl.m_oLogicDocument;
 
         var shape = arrShapes[arrShapes.length - 1];
@@ -7686,7 +7686,7 @@ PasteProcessor.prototype =
         this.aContent = shape.txBody.content.Content;
         if(true === bRoot)
         {
-            //���� ������� ��������� ���, �� �������� ����
+			//Если блочных элементов нет, то отменяем флаг
             var bExist = false;
             for(var i = 0, length = node.childNodes.length; i < length; i++)
             {
@@ -7711,8 +7711,8 @@ PasteProcessor.prototype =
                     var value = node.nodeValue;
                     if(!value)
                         value = "";
-                    //������� � ����� �������� \r|\t|\n, � �������� ������ �������� �� �� �������
-                    //������ ���(�������� ������ chrome ��� ������� ��������� ������ � ������� \n)
+					//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
+					//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
                     value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
                     value = value.replace(/(\r|\t|\n)/g, ' ');
                     if(value.length > 0)
@@ -7722,7 +7722,7 @@ PasteProcessor.prototype =
 							shape.txBody.content.AddNewParagraph();
                        // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
-                        //��������� ������� ����� ���� �� ���������
+						//Добавляет элемени стиля если он поменялся
                         //this._commit_rPr(node.parentNode);
 
 						if(!this.bIsPlainText)
@@ -7767,7 +7767,7 @@ PasteProcessor.prototype =
                 return;
             }
 
-            //�������� �� html �������� ���������(�� ��� ������ �������� �� getComputedStyle)
+			//собираем не html свойства параграфа(те что нельзя получить из getComputedStyle)
             var style = node.getAttribute("style");
             if(style)
                 this._parseCss(style, pPr);
@@ -7848,7 +7848,7 @@ PasteProcessor.prototype =
 
             }
 
-            //��������� linebreak, ���� �� �� ��������� ������� �������� � �� ����� ��� ������� �������
+			//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
             if("br" === sNodeName || "always" === node.style.pageBreakBefore)
             {
                 if("always" === node.style.pageBreakBefore)
@@ -7861,7 +7861,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            //�������� �� tab
+			//Проверка на tab
             if("span" === sNodeName)
             {
                 var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
@@ -7879,13 +7879,13 @@ PasteProcessor.prototype =
                 }
             }
         }
-        //���������� �������� ��� childNodes
+		//рекурсивно вызываем для childNodes
         for(var i = 0, length = node.childNodes.length; i < length; i++)
         {
             var child = node.childNodes[i];
             var nodeType = child.nodeType;
-            //��� ����������� �� word ����� ����������� ����������� �� �������
-            //����������� ����������, ������ ������ ������
+			//При копировании из word может встретиться комментарий со списком
+			//Комментарии пропускаем, списки делаем своими
             if(Node.COMMENT_NODE === nodeType)
             {
                 var value = child.nodeValue;
@@ -7894,7 +7894,7 @@ PasteProcessor.prototype =
                 {
                     if(-1 !== value.indexOf("supportLists"))
                     {
-                        //todo ���������� ��� ������
+						//todo распознать тип списка
                         pPr.bNum = true;
                         bSkip = true;
                     }
@@ -7903,7 +7903,7 @@ PasteProcessor.prototype =
                 }
                 if(true === bSkip)
                 {
-                    //���������� ��� �� �������������� �����������
+					//пропускаем все до закрывающегося комментария
                     var j = i + 1;
                     for(; j < length; j++)
                     {
@@ -7923,7 +7923,7 @@ PasteProcessor.prototype =
 
             if(!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType))
                 continue;
-            //�������� ������� ��������� ������ �� \t,\n,\r
+			//попускам элеметы состоящие только из \t,\n,\r
             if( Node.TEXT_NODE === child.nodeType)
             {
                 var value = child.nodeValue;
@@ -7951,7 +7951,7 @@ PasteProcessor.prototype =
                 if(null != href)
                 {
                     var sDecoded;
-                    //decodeURI ����� �������� malformed exception, ������ ��� ��� ���� � utf8, � ��������� ����� ����� ���������� url � ����� ���������(�������� windows-1251)
+					//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
                     try
                     {
                         sDecoded = decodeURI(href);
@@ -7996,7 +7996,7 @@ PasteProcessor.prototype =
         }
         if(bRoot)
         {
-            //this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+            //this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
         }
         return bAddParagraph;
     },
@@ -8005,7 +8005,7 @@ PasteProcessor.prototype =
     {
         var oDocument = this.oDocument;
         var tableNode = node;
-        //���� ���� ���� tbody
+		//Ищем если есть tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             if("tbody" === node.childNodes[i].nodeName.toLowerCase())
@@ -8014,7 +8014,7 @@ PasteProcessor.prototype =
                 break;
             }
         }
-        //��������� �����. � ������� �� ����� ���� ����� ��������� �� ����������� ���������� �����.
+		//валидация талиц. В таблице не может быть строк состоящих из вертикально замерженых ячеек.
         var nRowCount = 0;
         var nMinColCount = 0;
         var nMaxColCount = 0;
@@ -8043,7 +8043,7 @@ PasteProcessor.prototype =
             {
                 nCurSum = 0;
                 nCurColWidth = 0;
-                var nMinRowSpanCount = null;//����������� rowspan ����� ������
+                var nMinRowSpanCount = null;//минимальный rowspan ячеек строки
                 for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
                 {
                     var tc = tr.childNodes[j];
@@ -8089,7 +8089,7 @@ PasteProcessor.prototype =
                     }
                 }
                 fParseSpans();
-                //������� ������ rowspan
+				//Удаляем лишние rowspan
                 if(nMinRowSpanCount > 1)
                 {
                     for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
@@ -8106,7 +8106,7 @@ PasteProcessor.prototype =
                 }
                 if(dMaxSum < nCurSum)
                     dMaxSum = nCurSum;
-                //������� ������ tr
+				//удаляем пустые tr
                 if(0 === nCurColWidth)
                 {
                     node.removeChild(tr);
@@ -8138,7 +8138,7 @@ PasteProcessor.prototype =
                 dScaleKoef = dScaleKoef * this.dMaxWidth / dMaxSum;
                 bUseScaleKoef = true;
             }
-            //������ Grid
+			//строим Grid
             var aGrid = [];
             var nPrevIndex = null;
             var nPrevVal = 0;
@@ -8187,7 +8187,7 @@ PasteProcessor.prototype =
                 nSum += aGrid[i];
                 aSumGrid[i] = nSum;
             }
-            //�������� content
+			//набиваем content
              this._ExecuteTablePresentation(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
             table.MoveCursorToStartPos();
             return;
@@ -8200,7 +8200,7 @@ PasteProcessor.prototype =
         table.Set_TableLayout(tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
-        //align ������� � parent tableNode
+		//align смотрим у parent tableNode
         var sTableAlign = null;
         if(null != tableNode.align)
             sTableAlign = tableNode.align
@@ -8209,7 +8209,7 @@ PasteProcessor.prototype =
 			var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
-                //����� ��������� -webkit-right
+				//Может приходить -webkit-right
                 sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
             }
         }
@@ -8384,7 +8384,7 @@ PasteProcessor.prototype =
         }
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
-            //����� ����� ���� ��� ��� ����� ����������� td, ������ ��� ����������� ���������� ������ ����������� � dom
+			//важно чтобы этот код был после определения td, потому что вертикально замерженые ячейки отсутствуют в dom
             fParseSpans();
 
             var tc = node.childNodes[i];
@@ -8478,7 +8478,7 @@ PasteProcessor.prototype =
             var first_shape = arrShapes2[0];
             var content = first_shape.txBody.content;
 
-            //��������� ����� ���������
+			//добавляем новый параграфы
             for(var i = 0, length = content.Content.length; i < length; ++i)
 			{
 				if(i === length - 1)
@@ -8486,7 +8486,7 @@ PasteProcessor.prototype =
 				else
 					cell.Content.Internal_Content_Add(i + 1, content.Content[i], false);
 			}
-            //������� ��������, ������� ��������� � ������� �� ���������
+			//Удаляем параграф, который создается в таблице по умолчанию
             cell.Content.Internal_Content_Remove(0, 1);
             arrShapes2.splice(0, 1);
         }

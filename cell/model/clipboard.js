@@ -4201,7 +4201,7 @@
 						if(Asc.linerule_Exact === Item_pPr.Spacing.LineRule)
 							apPr.push("mso-line-height-rule:exactly");
 					}
-					//��� ������� � word ����� ����� ��� �������� ������������ ������
+					//При вставке в word лучше чтобы эти значения выставлялись всегда
 					//if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
 					apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
 					//if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
@@ -4261,7 +4261,7 @@
 				}
 				if (null != Value.FontSize) {
 					//if (!this.api.DocumentReaderMode)
-						aProp.push("font-size:" + Value.FontSize + "pt");//font-size � pt ��� ��������� ������� � mm
+						aProp.push("font-size:" + Value.FontSize + "pt");//font-size в pt все остальные метрики в mm
 					/*else
 						aProp.push("font-size:" + this.api.DocumentReaderMode.CorrectFontSize(Value.FontSize));*/
 				}
@@ -4317,7 +4317,7 @@
 				switch ( ParaItem.Type )
 				{
 					case para_Text:
-						//���������� �����������
+						//экранируем спецсимволы
 						var sValue = String.fromCharCode(ParaItem.Value);
 						if(sValue)
 							sRes += CopyPasteCorrectString(sValue);
@@ -4327,13 +4327,13 @@
 					case para_NewLine:
 						if( break_Page === ParaItem.BreakType)
 						{
-							//todo ��������� ���� �������� � ������ �����
+							//todo закончить этот параграф и начать новый
 							sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" />";
 						}
 						else
 							sRes += "<br style=\"mso-special-character:line-break;\" />";
 						break;
-					//������� ������� ����� ��������� ������ �� ���������� ��������
+					//добавил неразрвной пробел для того, чтобы информация попадала в буфер обмена
 					case para_End:        this.bOccurEndPar = true; break;
 					case para_Drawing:
 						var oGraphicObj = ParaItem.GraphicObj;
@@ -4433,12 +4433,12 @@
 			{
 				var oDocument = this.oDocument;
 				this.Para = null;
-				//��� heading ����� � h1
+				//Для heading пишем в h1
 				var styleId = Item.Style_Get();
 				if(styleId)
 				{
 					var styleName = oDocument.Styles.Get_Name( styleId ).toLowerCase();
-					//������ "heading n" (n=1:6)
+					//шаблон "heading n" (n=1:6)
 					if(0 === styleName.indexOf("heading"))
 					{
 						var nLevel = parseInt(styleName.substring("heading".length));
@@ -4503,7 +4503,7 @@
 				{
 					if(false === bIsNullNumPr)
 					{
-						//������ �������� � ������. ������� ������� �� ������. ���������� ����� ��� span
+						//Значит параграф в списке. Удаляем элемент из списка. Записываем текст как span
 						var li = this.Para.parentNode;
 						var ul = li.parentNode;
 						ul.removeChild(li);
@@ -4514,7 +4514,7 @@
 				}
 				else
 				{
-					//����� ��������� ������ ���������
+					//Иначе пропадают пустые параграфы
 					if(this.Para.childNodes.length === 0)
 						this.Para.appendChild( document.createTextNode( '\xa0' ) );
 					if(bIsNullNumPr)
@@ -4563,7 +4563,7 @@
 
 					if ( type_Paragraph === Item.GetType() )
 					{
-						//todo ����� ������ ��� �������� ������ ���� Index == End
+						//todo может только для верхнего уровня надо Index == End
 						this.oBinaryFileWriter.WriteParagraph(Item);
 						this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
 					}

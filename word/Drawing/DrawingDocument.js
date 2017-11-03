@@ -722,7 +722,7 @@ function CCacheManager()
 
 		_cache_image.image_locked = 0;
 		_cache_image.image_unusedCount = 0;
-		// ����� ����� �������� ������ � ���� (_cache_image = null) <- ��� ����������� !!!!!!!
+		// затем нужно сбросить ссылку в ноль (_cache_image = null) <- это обязательно !!!!!!!
 	}
 
 	this.Lock = function (_w, _h)
@@ -1204,6 +1204,7 @@ function CPage()
 				context.beginPath();
 			}
 
+			// потом посмотреть на кусочную отрисовку
 			context.drawImage(this.drawingPage.cachedImage.image, xDst, yDst, wDst, hDst);
 		}
 		else
@@ -2327,7 +2328,7 @@ function CDrawingDocument()
 
 		page.drawingPage.SetRepaint(this.m_oCacheManager);
 
-		// ������ ���� ��� �������� �� ������ - �� ����� ������� ���������
+		// теперь если эта страница на экране - то нужно вызвать отрисовку
 		if (index >= this.m_lDrawingFirst && index <= this.m_lDrawingEnd)
 		{
 			this.m_oWordControl.OnScroll();
@@ -2524,7 +2525,7 @@ function CDrawingDocument()
 
 		//var StartTime = new Date().getTime();
 
-		// ������ ����� �������
+		// теперь берем графикс
 		var g = new AscCommon.CGraphics();
 		g.init(page.drawingPage.cachedImage.image.ctx, w, h, page.width_mm, page.height_mm);
 		g.m_oFontManager = AscCommon.g_fontManager;
@@ -3381,7 +3382,7 @@ function CDrawingDocument()
 		if (true == pos.Error && (false == bIsPageChanged))
 			return;
 
-		// �������, ����� �� ������ �� ������
+		// смотрим, виден ли курсор на экране
 
 		var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
@@ -3508,7 +3509,7 @@ function CDrawingDocument()
 			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
-		// �������, ����� �� ������ �� ������
+		// смотрим, виден ли курсор на экране
 		var boxX = 0;
 		var boxY = 0;
 		var boxR = _ww;
@@ -3599,7 +3600,7 @@ function CDrawingDocument()
 		if (true === pos.Error && (false === bIsPageChanged))
 			return;
 
-		// �������, ����� �� ������ �� ������
+		// смотрим, виден ли курсор на экране
 		var boxX = 0;
 		var boxY = 0;
 		var boxR = oWordControl.m_oEditor.HtmlElement.width - 2;
@@ -5694,15 +5695,15 @@ function CDrawingDocument()
 		for (var i = 0; i < _len; i++)
 		{
 			if (__tabs[i].Value == tab_Left)
-				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
+				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left, __tabs[i].Leader);
 			else if (__tabs[i].Value == tab_Center)
-				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center);
+				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center, __tabs[i].Leader);
 			else if (__tabs[i].Value == tab_Right)
-				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right);
+				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right, __tabs[i].Leader);
 			else
 			{
 				// не должно такого быть. но приходит
-				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
+				_ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left, __tabs[i].Leader);
 			}
 		}
 

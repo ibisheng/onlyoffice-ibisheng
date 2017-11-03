@@ -266,6 +266,12 @@ CComplexField.prototype.Update = function()
 
 		this.LogicDocument.GetBookmarksManager().RemoveTOCBookmarks();
 
+		var nTabPos = 9345 / 20 / 72 * 25.4; // Стандартное значение для A4 и обычных полей 3см и 2см
+		var oSectPr = this.LogicDocument.GetCurrentSectionPr();
+
+		if (oSectPr)
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+
 		var oStyles          = this.LogicDocument.Get_Styles();
 		var arrOutline       = this.LogicDocument.GetOutlineParagraphs();
 		var oSelectedContent = new CSelectedContent();
@@ -277,9 +283,8 @@ CComplexField.prototype.Update = function()
 			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
 
-			// Значение таба зависит от текущей секции
 			var oTabs = new CParaTabs();
-			oTabs.Add(new CParaTab(tab_Right, 9345 / 20 / 72 * 25.4, Asc.c_oAscTabLeader.Dot));
+			oTabs.Add(new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot));
 			oPara.Set_Tabs(oTabs);
 
 			var oTabRun = new ParaRun(oPara, false);

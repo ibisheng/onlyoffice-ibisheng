@@ -38,10 +38,11 @@ var global_mouseEvent = AscCommon.global_mouseEvent;
 var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
 var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
-function CTab(pos,type)
+function CTab(pos, type, leader)
 {
-    this.pos   = pos;
-    this.type  = type;
+	this.pos    = pos;
+	this.type   = type;
+	this.leader = leader;
 }
 
 var g_array_objects_length = 1;
@@ -531,6 +532,7 @@ function CHorRuler()
         context.fillStyle = GlobalSkin.BackgroundColor;
         context.fillRect(0, 0, this.m_oCanvas.width, this.m_oCanvas.height);
 
+		// промежуток между маргинами
         var left_margin  = 0;
         var right_margin = 0;
 
@@ -604,6 +606,7 @@ function CHorRuler()
             context.beginPath();
         }
 
+		// рамка
         //context.shadowBlur = 0;
         //context.shadowColor = "#81878F";
 
@@ -1094,6 +1097,7 @@ function CHorRuler()
 
         this.SimpleChanges.CheckMove();
 
+		// теперь определяем позицию относительно самой линейки. Все в миллиметрах
         var hor_ruler = word_control.m_oTopRuler_horRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
@@ -1572,6 +1576,8 @@ function CHorRuler()
 
     this.CheckMouseType = function(x, y, isMouseDown)
     {
+		// проверяем где находимся
+
         var _top = 1.8;
         var _bottom = 5.2;
 
@@ -1663,7 +1669,7 @@ function CHorRuler()
         {
             if (y >= _top && y <= _bottom)
             {
-                // ������ �������
+				// внутри линейки
                 if (Math.abs(x - this.m_dMarginLeft) < 1)
                 {
                     return 1;
@@ -2214,26 +2220,26 @@ function CHorRuler()
     }
 
     this.SetTabsProperties = function()
-    {
-        // потом заменить на объекты CTab (когда Илюха реализует не только левые табы)
-        var _arr = new CParaTabs();
-        var _c = this.m_arrTabs.length;
-        for (var i = 0; i < _c; i++)
-        {
-            if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
-                _arr.Add( new CParaTab( tab_Left, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
-                _arr.Add( new CParaTab( tab_Right, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
-                _arr.Add( new CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
-        }
-        
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-        {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
-            this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
-        }
-    }
+	{
+		// потом заменить на объекты CTab (когда Илюха реализует не только левые табы)
+		var _arr = new CParaTabs();
+		var _c   = this.m_arrTabs.length;
+		for (var i = 0; i < _c; i++)
+		{
+			if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
+				_arr.Add(new CParaTab(tab_Left, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+			else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
+				_arr.Add(new CParaTab(tab_Right, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+			else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
+				_arr.Add(new CParaTab(tab_Center, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+		}
+
+		if (false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
+		{
+			this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
+			this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
+		}
+	}
 
     this.SetPrProperties = function()
     {
@@ -2653,9 +2659,9 @@ function CVerRuler()
 {
     this.m_oPage        = null;
 
-    this.m_nLeft         = 0;        // �������� � �������� - �������� �� ����� �������
-    this.m_nRight      = 0;          // �������� � �������� - �������� �� ����� �������
-    // (�.�. ������ ������� � �������� = (this.m_nRight - this.m_nLeft))
+    this.m_nLeft         = 0;        // значения в пикселах - смещение до самой линейки
+    this.m_nRight      = 0;          // значения в пикселах - смещение до самой линейки
+                                     // (т.е. ширина линейки в пикселах = (this.m_nRight - this.m_nLeft))
 
     this.m_dMarginTop           = 20;
     this.m_dMarginBottom        = 250;
@@ -2881,7 +2887,7 @@ function CVerRuler()
             context.beginPath();
         }
 
-        // �����
+		// рамка
         context.strokeStyle = GlobalSkin.RulerOutline;
 
         context.lineWidth = 1;
@@ -3232,7 +3238,7 @@ function CVerRuler()
         var ver_ruler = word_control.m_oLeftRuler_vertRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
-        // ������ ���������� ������� ������������ ����� �������. ��� � �����������
+		// теперь определяем позицию относительно самой линейки. Все в миллиметрах
         var _y = global_mouseEvent.Y - 7 * g_dKoef_mm_to_pix - top - word_control.Y;
         _y *= dKoefPxToMM;
         var _x = left * g_dKoef_pix_to_mm;
@@ -3405,11 +3411,14 @@ function CVerRuler()
 
     this.CheckMouseType = function(x, y)
     {
+		// проверяем где находимся
+
         if (this.IsCanMoveMargins === false)
             return 0;
 
         if (x >= 0.8 && x <= 4.2)
         {
+			// внутри линейки
             if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
             {
                 if (Math.abs(y - this.m_dMarginTop) < 1)

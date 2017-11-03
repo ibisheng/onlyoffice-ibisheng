@@ -2056,7 +2056,12 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         NewX = Tab.Pos + PageStart.X;
     }
 
-    return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
+	return {
+		NewX       : NewX,
+		TabValue   : Tab ? Tab.Value : tab_Left,
+		DefaultTab : Tab ? false : true,
+		TabLeader  : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None
+	};
 };
 
 Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage)

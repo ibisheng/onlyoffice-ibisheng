@@ -611,7 +611,7 @@ function CCacheManager()
 
 		_cache_image.image_locked      = 0;
 		_cache_image.image_unusedCount = 0;
-		// ����� ����� �������� ������ � ���� (_cache_image = null) <- ��� ����������� !!!!!!!
+		// затем нужно сбросить ссылку в ноль (_cache_image = null) <- это обязательно !!!!!!!
 	}
 
 	this.Lock = function(_w, _h)
@@ -3388,6 +3388,7 @@ function CThPage()
 
 		if (null != this.cachedImage)
 		{
+			// потом посмотреть на кусочную отрисовку
 			context.drawImage(this.cachedImage.image, xDst, yDst, wDst, hDst);
 		}
 		else
