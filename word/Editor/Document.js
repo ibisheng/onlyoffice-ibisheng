@@ -15903,7 +15903,7 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 	var oCurrentDocPos = this.GetContentPosition(false);
 	this.SetContentPosition(oDocPos, 0, 0);
 
-	var oCurrentParagraph = this.controller_GetCurrentParagraph(true, false);
+	var oCurrentParagraph = this.controller_GetCurrentParagraph(true, null);
 	if (!oCurrentParagraph)
 		return [];
 
