@@ -307,9 +307,7 @@ function CTransitionAnimation(htmlpage)
             }
             else
             {
-                _currentSlide = this.DemonstrationObject.SlideNum;
-                if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
-                    _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+                _currentSlide = this.GetPrevVisibleSlide(true);
             }
 
             this.DrawImage1(_currentSlide, false);
@@ -2705,6 +2703,8 @@ function CDemonstrationManager(htmlpage)
     this.PointerDiv = null;
 
     this.isMouseDown = false;
+    this.StartSlideNum = -1;
+    this.TmpSlideVisible = -1;
 
     var oThis = this;
 
@@ -2747,16 +2747,13 @@ function CDemonstrationManager(htmlpage)
         }
         else if (!is_backward)
         {
-            if (this.SlideNum > 0)
-            {
-                _slide1 = this.SlideNum - 1;
-            }
+            _slide1 = this.GetPrevVisibleSlide(true);
             _slide2 = this.SlideNum;
         }
         else
         {
             this.Transition.IsBackward = true;
-            _slide1 = this.SlideNum - 1;
+            _slide1 = this.GetPrevVisibleSlide(true);
             _slide2 = this.SlideNum;
         }
 
@@ -2917,7 +2914,11 @@ function CDemonstrationManager(htmlpage)
 
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
     {
-        this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
+		this.StartSlideNum = start_slide_num;
+		if (-1 == start_slide_num)
+			start_slide_num = 0;
+
+		this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
         this.DemonstrationDiv = document.getElementById(main_div_id);
         if (this.DemonstrationDiv == null || start_slide_num < 0 || start_slide_num >= this.SlidesCount)
             return;
@@ -3021,7 +3022,7 @@ function CDemonstrationManager(htmlpage)
 
         if (oThis.SlideNum == oThis.SlidesCount)
         {
-            oThis.SlideNum--;
+            oThis.SlideNum = this.GetPrevVisibleSlide(true);
             oThis.OnPaintSlide(false);
 
             if (null != oThis.DivEndPresentation)
@@ -3035,7 +3036,7 @@ function CDemonstrationManager(htmlpage)
 
         if (0 >= this.SlideNum)
         {
-            this.SlideNum = 0;
+            this.SlideNum = this.GetFirstVisibleSlide();
             return;
         }
 
@@ -3049,7 +3050,7 @@ function CDemonstrationManager(htmlpage)
         }
 
         if (!_is_transition)
-            oThis.SlideNum--;
+            oThis.SlideNum = this.GetPrevVisibleSlide(true);
 
         oThis.OnPaintSlide(false);
     }
@@ -3100,7 +3101,7 @@ function CDemonstrationManager(htmlpage)
     {
         if (oThis.Transition.IsBackward)
         {
-            oThis.SlideNum--;
+            oThis.SlideNum = oThis.GetPrevVisibleSlide(true);
             oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
         }
 
@@ -3134,7 +3135,9 @@ function CDemonstrationManager(htmlpage)
         // теперь запустим функцию
 
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
-        var _timing = _slides[oThis.SlideNum].timing;
+        var _timing = _slides[oThis.SlideNum] ? _slides[oThis.SlideNum].timing : null;
+        if (!_timing)
+            return;
 
         if (_timing.SlideAdvanceAfter === true)
         {
@@ -3143,13 +3146,15 @@ function CDemonstrationManager(htmlpage)
                 oThis.CheckSlideDuration = -1;
                 if (oThis.IsPlayMode)
                 {
-                    oThis.SlideNum++;
+					oThis.TmpSlideVisible = oThis.SlideNum;
+					oThis.GoToNextVisibleSlide();
                     if(oThis.SlideNum === oThis.SlidesCount && oThis.isLoop())
                     {
-                        oThis.SlideNum = 0;
+                        oThis.SlideNum = oThis.GetFirstVisibleSlide();
                     }
                     oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
                     oThis.StartSlide(true, false);
+					oThis.TmpSlideVisible = -1;
                 }
             },
             _timing.SlideAdvanceDuration);
@@ -3219,12 +3224,130 @@ function CDemonstrationManager(htmlpage)
 			if (0 <= _oldSlideNum)
 			    this.HtmlPage.GoToPage(_oldSlideNum);
 		}
+
+		this.StartSlideNum = -1;
     }
+
+    this.IsVisibleSlide = function(slideNum)
+    {
+		if (slideNum == this.StartSlideNum)
+		    return true;
+
+		if (-1 != this.TmpSlideVisible)
+        {
+            if (slideNum == this.TmpSlideVisible)
+                return true;
+        }
+
+		return this.HtmlPage.m_oLogicDocument.IsVisibleSlide(slideNum);
+    };
+
+    this.GoToNextVisibleSlide = function()
+    {
+		this.SlideNum++;
+		while (this.SlideNum < this.SlidesCount)
+        {
+            if (this.IsVisibleSlide(this.SlideNum))
+                break;
+
+            this.SlideNum++;
+        }
+    };
+
+	this.GoToPrevVisibleSlide = function()
+	{
+		this.SlideNum--;
+		while (this.SlideNum >= 0)
+		{
+			if (this.IsVisibleSlide(this.SlideNum))
+				break;
+
+			this.SlideNum--;
+		}
+	};
+
+	this.GetPrevVisibleSlide = function(isNoUseLoop)
+    {
+        var _slide = this.SlideNum - 1;
+        while (_slide >= 0)
+        {
+            if (this.IsVisibleSlide(_slide))
+                return _slide;
+
+            --_slide;
+        }
+
+        if ((true === isNoUseLoop) || !this.isLoop())
+            return -1;
+
+        _slide = this.SlidesCount - 1;
+        while (_slide > this.SlideNum)
+        {
+			if (this.IsVisibleSlide(_slide))
+				return _slide;
+
+            --_slide;
+        }
+
+        return this.SlidesCount;
+    };
+
+	this.GetNextVisibleSlide = function()
+    {
+		var _slide = this.SlideNum + 1;
+		while (_slide < this.SlidesCount)
+		{
+			if (this.IsVisibleSlide(_slide))
+				return _slide;
+
+			++_slide;
+		}
+
+		if (!this.isLoop())
+			return this.SlidesCount;
+
+		_slide = 0;
+		while (_slide < this.SlideNum)
+		{
+			if (this.IsVisibleSlide(_slide))
+				return _slide;
+
+			++_slide;
+		}
+
+		return -1;
+    };
+
+	this.GetFirstVisibleSlide = function()
+	{
+	    var _slide = 0;
+		while (_slide < this.SlidesCount)
+		{
+			if (this.IsVisibleSlide(_slide))
+				return _slide;
+			++_slide;
+		}
+		return 0;
+	};
+
+	this.GetLastVisibleSlide = function()
+	{
+		var _slide = this.SlidesCount - 1;
+		while (_slide >= 0)
+		{
+			if (this.IsVisibleSlide(_slide))
+				return _slide;
+			--_slide;
+		}
+		return this.SlidesCount - 1;
+	};
 
     this.NextSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
+
+		this.TmpSlideVisible = this.SlideNum;
 
         if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"next\" }");
@@ -3232,11 +3355,15 @@ function CDemonstrationManager(htmlpage)
         this.CorrectSlideNum();
 
         var _is_transition = this.Transition.IsPlaying();
+        var _is_transition = this.Transition.IsPlaying();
         if (!_is_transition)
-            this.SlideNum++;
+        {
+            //this.SlideNum++;
+            this.GoToNextVisibleSlide();
+		}
 
         if (this.isLoop() && (this.SlideNum >= this.SlidesCount))
-            this.SlideNum = 0;
+            this.SlideNum = this.GetFirstVisibleSlide();
 
         if (this.SlideNum > this.SlidesCount)
             this.End();
@@ -3245,7 +3372,9 @@ function CDemonstrationManager(htmlpage)
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
             this.StartSlide(!_is_transition, false);
         }
-    }
+
+        this.TmpSlideVisible = -1;
+	}
 
     this.isLoop = function()
     {
@@ -3257,10 +3386,12 @@ function CDemonstrationManager(htmlpage)
         if (!this.Mode)
             return;
 
+		this.TmpSlideVisible = this.SlideNum;
+
 		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"prev\" }");
 
-        if (0 != this.SlideNum)
+        if (this.GetFirstVisibleSlide() != this.SlideNum)
         {
             this.CorrectSlideNum();
 
@@ -3275,6 +3406,8 @@ function CDemonstrationManager(htmlpage)
             this.StartSlideBackward();
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
         }
+
+		this.TmpSlideVisible = -1;
     }
 
     this.GoToSlide = function(slideNum, isNoSendFormReporter)
@@ -3334,12 +3467,12 @@ function CDemonstrationManager(htmlpage)
 			}
 			case 36:    // home
 			{
-				oThis.GoToSlide(0);
+			    oThis.GoToSlide(oThis.GetFirstVisibleSlide());
 				break;
 			}
 			case 35:    // end
 			{
-				oThis.GoToSlide(this.SlidesCount - 1);
+				oThis.GoToSlide(oThis.GetLastVisibleSlide());
 				break;
 			}
 			case 27:    // escape

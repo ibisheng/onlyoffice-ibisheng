@@ -5868,6 +5868,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
+		if (window.g_asc_plugins)
+			window.g_asc_plugins.stopWorked();
+
 		var is_reporter = (reporterStartObject && !this.isReporterMode);
 		if (is_reporter)
 			this.DemonstrationReporterStart(reporterStartObject);
