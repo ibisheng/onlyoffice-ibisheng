@@ -1041,8 +1041,7 @@ function (window, undefined) {
 		/* if( arg1.getValue() < l )
 		 return arg0; */
 
-		return
-			new cString(arg0.getValue().substr(arg1.getValue() == 0 ? 0 : arg1.getValue() - 1, arg2.getValue()))
+		return new cString(arg0.getValue().substr(arg1.getValue() == 0 ? 0 : arg1.getValue() - 1, arg2.getValue()));
 
 	};
 
