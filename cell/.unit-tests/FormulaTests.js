@@ -9378,5 +9378,38 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "", "MIDB(A101,20,5))");
 	} );
 
+	test( "Test: \"FIND\"", function () {
+		ws.getRange2( "A101" ).setValue( "Miriam McGovern" );
+
+		oParser = new parserFormula( 'FIND("M",A101)', "A2", ws );
+		ok( oParser.parse(), 'FIND("M",A101)' );
+		strictEqual( oParser.calculate().getValue(), 1, 'FIND("M",A101)');
+
+		oParser = new parserFormula( 'FIND("m",A101)', "A2", ws );
+		ok( oParser.parse(), 'FIND("m",A101)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'FIND("m",A101)');
+
+		oParser = new parserFormula( 'FIND("M",A101,3)', "A2", ws );
+		ok( oParser.parse(), 'FIND("M",A101,3)' );
+		strictEqual( oParser.calculate().getValue(), 8, 'FIND("M",A101,3)');
+	} );
+
+	test( "Test: \"FINDB\"", function () {
+		ws.getRange2( "A101" ).setValue( "Miriam McGovern" );
+
+		oParser = new parserFormula( 'FINDB("M",A101)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("M",A101)' );
+		strictEqual( oParser.calculate().getValue(), 1, 'FINDB("M",A101)');
+
+		oParser = new parserFormula( 'FINDB("m",A101)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("m",A101)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'FINDB("m",A101)');
+
+		oParser = new parserFormula( 'FINDB("M",A101,3)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("M",A101,3)' );
+		strictEqual( oParser.calculate().getValue(), 8, 'FINDB("M",A101,3)');
+	} );
+
+
 	wb.dependencyFormulas.unlockRecal();
 } );
