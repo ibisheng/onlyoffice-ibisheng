@@ -3849,9 +3849,13 @@ PasteProcessor.prototype =
 							var sImageUrl = objects.imgUrl;
 							var w = objects.extX / 100000;
 							var h = objects.extY / 100000;
-							var _image = AscFormat.DrawingObjectsController.prototype.createImage(sImageUrl, 0, 0, w, h);
+
+							var centerX = presentation.Width/2 - w/2;
+							var centerY = presentation.Height/2 - h/2;
+
+							var _image = AscFormat.DrawingObjectsController.prototype.createImage(sImageUrl, centerX, centerY, w, h);
 							arr_shapes = [];
-							arr_shapes.push(new DrawingCopyObject(_image, 0, 0, w, h));
+							arr_shapes.push(new DrawingCopyObject(_image, centerX, centerY, w, h));
 							arr_Images = [];
 							arr_Images.push(new AscCommon.CBuilderImages(_image.blipFill, sImageUrl, _image, null, null));
 						}
@@ -4102,6 +4106,8 @@ PasteProcessor.prototype =
 				presentation.Insert_Content(presentationSelectedContent);
 				presentation.Recalculate();
 				presentation.Document_UpdateInterfaceState();
+
+				oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.picture]);
 
 				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			};
@@ -5024,7 +5030,7 @@ PasteProcessor.prototype =
 			paragraph = loader.ReadParagraph(newDocContent);
 			
 			//FONTS
-			paragraph.Document_Get_AllFontNames(this.oFonts)
+			paragraph.Document_Get_AllFontNames(this.oFonts);
 			
 			selectedElement = new CSelectedElement();
 			selectedElement.Element = paragraph;

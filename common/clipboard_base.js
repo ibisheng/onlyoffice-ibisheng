@@ -981,6 +981,11 @@
 			if(this.specialPasteStart)
 			{
 				this.Special_Paste_End();
+				//TODO только для презентаций! проверить на остальных редакторах!
+				if(this.specialPasteButtonProps.props){
+					this.specialPasteButtonProps.props.options = [];
+					this.Api.asc_ShowSpecialPasteButton(this.specialPasteButtonProps.props);
+				}
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
 			{
