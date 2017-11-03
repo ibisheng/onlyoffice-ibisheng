@@ -2555,7 +2555,7 @@
 			this.tx  = 0.0;
 			this.ty  = 0.0;
 		},
-		// ���������
+		// трансформ
 		Multiply        : function(matrix, order)
 		{
 			if (MATRIX_ORDER_PREPEND == order)
@@ -2589,7 +2589,7 @@
 			}
 			return this;
 		},
-		// � ������ ������� ������ ���������� (��� �������� �����������)
+		// а теперь частные случаи трансформа (для удобного пользования)
 		Translate       : function(x, y, order)
 		{
 			var m = new CMatrix();
@@ -2690,7 +2690,7 @@
 				a += 360;
 			return a;
 		},
-		// ������� ���������
+		// сделать дубликата
 		CreateDublicate : function()
 		{
 			var m = new CMatrix();
