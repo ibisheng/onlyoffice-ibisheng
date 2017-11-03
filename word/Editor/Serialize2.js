@@ -7562,7 +7562,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         else if(c_oSerProp_pPrType.Tab_Item_Pos === type)
             tab.Pos = this.bcr.ReadDouble();
 		else if(c_oSerProp_pPrType.Tab_Item_Leader === type)
-			tab.Leader = this.bcr.GetUChar();
+			tab.Leader = this.stream.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
