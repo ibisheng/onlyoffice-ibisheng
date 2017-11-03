@@ -10037,20 +10037,42 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
 		{
 			disableCoords();
+			cellCoord = [cellCoord];
 		}
 		else
 		{
-			var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
-			var offset = 3;
-			var widthIcon = 30 + offset;
-			var heightIcon = 22 + offset;
-			
-			if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
+			if (!isVisible)
 			{
-				disableCoords();
+				var visibleRange = this.getVisibleRange();
+				var intersectionVisibleRange = visibleRange.intersection(range);
+
+				if(intersectionVisibleRange)
+				{
+					cellCoord = [];
+					cellCoord[0] = this.getCellCoord(intersectionVisibleRange.c2, intersectionVisibleRange.r2);
+					cellCoord[1] = this.getCellCoord(range.c1, range.r1);
+				}
+				else
+				{
+					disableCoords();
+					cellCoord = [cellCoord];
+				}
+			}
+			else
+			{
+				var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
+				var offset = 3;
+				var widthIcon = 30 + offset;
+				var heightIcon = 22 + offset;
+
+				if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
+				{
+					disableCoords();
+				}
+				cellCoord = [cellCoord];
 			}
 		}
 		
