@@ -3097,9 +3097,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     SpaceLen = 0;
                     WordLen = 0;
 
-                    var TabPos = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page, false);
-                    var NewX = TabPos.NewX;
+                    var TabPos   = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page, false);
+                    var NewX     = TabPos.NewX;
                     var TabValue = TabPos.TabValue;
+
+                    Item.SetLeader(TabPos.TabLeader);
 
                     // Если таб не левый, значит он не может быть сразу рассчитан, а если левый, тогда
                     // рассчитываем его сразу здесь

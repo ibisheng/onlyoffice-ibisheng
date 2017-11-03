@@ -8422,7 +8422,7 @@ function CParaTab(Value, Pos, Leader)
 {
 	this.Value  = Value;
 	this.Pos    = Pos;
-	this.Leader = Leader ? Leader : Asc.c_oAscTabLeader.None;
+	this.Leader = undefined !== Leader ? Leader : Asc.c_oAscTabLeader.None;
 }
 CParaTab.prototype.Copy = function()
 {

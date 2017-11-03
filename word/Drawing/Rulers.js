@@ -38,10 +38,11 @@ var global_mouseEvent = AscCommon.global_mouseEvent;
 var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
 var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
-function CTab(pos,type)
+function CTab(pos, type, leader)
 {
-    this.pos   = pos;
-    this.type  = type;
+	this.pos    = pos;
+	this.type   = type;
+	this.leader = leader;
 }
 
 var g_array_objects_length = 1;
@@ -2214,26 +2215,26 @@ function CHorRuler()
     }
 
     this.SetTabsProperties = function()
-    {
-        // потом заменить на объекты CTab (когда Илюха реализует не только левые табы)
-        var _arr = new CParaTabs();
-        var _c = this.m_arrTabs.length;
-        for (var i = 0; i < _c; i++)
-        {
-            if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
-                _arr.Add( new CParaTab( tab_Left, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
-                _arr.Add( new CParaTab( tab_Right, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
-                _arr.Add( new CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
-        }
-        
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-        {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
-            this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
-        }
-    }
+	{
+		// потом заменить на объекты CTab (когда Илюха реализует не только левые табы)
+		var _arr = new CParaTabs();
+		var _c   = this.m_arrTabs.length;
+		for (var i = 0; i < _c; i++)
+		{
+			if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
+				_arr.Add(new CParaTab(tab_Left, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+			else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
+				_arr.Add(new CParaTab(tab_Right, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+			else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
+				_arr.Add(new CParaTab(tab_Center, this.m_arrTabs[i].pos, this.m_arrTabs[i].leader));
+		}
+
+		if (false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
+		{
+			this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
+			this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
+		}
+	}
 
     this.SetPrProperties = function()
     {
