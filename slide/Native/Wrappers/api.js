@@ -166,3 +166,19 @@ Asc['asc_docs_api'].prototype["GetNativePageMeta"] = function(pageIndex)
 {
     this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
 };
+
+if(!window.native){
+	if(_private_NativeObject){
+		window.native = _private_NativeObject();
+	}	
+}
+
+if(window.native){
+	window.native.Call_CheckSlideBounds = function(nIndex){
+		return editor.CheckSlideBounds(nIndex);
+	}
+	
+	window.native.Call_GetPageMeta = function(nIndex){
+		return editor.GetNativePageMeta(nIndex);
+	}
+}
