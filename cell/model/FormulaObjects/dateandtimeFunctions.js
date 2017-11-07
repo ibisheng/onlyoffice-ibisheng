@@ -1789,7 +1789,7 @@
 		var calcDate = function () {
 			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 
-			if (1 === dif) {
+			if (1 === Math.abs(dif)) {
 				//если данный день выходной
 				//если далее выходные
 				date = new Date(val0.getTime() + dif1 * c_msPerDay);
