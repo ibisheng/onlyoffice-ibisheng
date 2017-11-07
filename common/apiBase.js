@@ -670,7 +670,7 @@
                     } else {
                         clearInterval(t.forceSaveButtonTimeout);
                     }
-                    t.forceSaveButtonTimeout = setInterval(function() {
+                    t.forceSaveButtonTimeout = setTimeout(function() {
                         t.forceSaveButtonTimeout = null;
                         if (t.forceSaveButtonContinue) {
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
@@ -704,7 +704,7 @@
                         } else {
                             clearInterval(t.forceSaveTimeoutTimeout);
                         }
-                        t.forceSaveTimeoutTimeout = setInterval(function() {
+                        t.forceSaveTimeoutTimeout = setTimeout(function() {
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
                         }, Asc.c_nMaxConversionTime);
