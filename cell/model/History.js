@@ -270,7 +270,7 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 			}
 		}
 	}
-	if (window["NATIVE_EDITOR_ENJINE"] || !this.workbook.oApi.IsSendDocumentLoadCompleate) {
+	if (window["NATIVE_EDITOR_ENJINE"] || !this.workbook.oApi.isDocumentLoadComplete) {
 		oRedoObjectParam.bChangeActive = true;
 	}
 };

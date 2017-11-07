@@ -135,6 +135,11 @@
 		this.isOnFirstConnectEnd = false;
 		// Получили ли лицензию
 		this.isOnLoadLicense     = false;
+		// Переменная, которая отвечает, послали ли мы окончание открытия документа
+		this.isDocumentLoadComplete = false;
+		// Переменная, которая отвечает, послали ли мы окончание открытия документа
+		this.isPreOpenLocks = true;
+		this.isApplyChangesOnOpenEnabled = true;
 
 		this.canSave    = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
@@ -493,6 +498,12 @@
 		// евент о заморозке не нужен... оно и так заморожено
 		// просто нужно вывести информацию в статус бар (что началась загрузка картинок)
 	};
+	baseEditorsApi.prototype.onDocumentContentReady              = function()
+	{
+		this.isDocumentLoadComplete = true;
+		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+		this.sendEvent('asc_onDocumentContentReady');
+	};
 	// Save
 	baseEditorsApi.prototype.processSavedFile                    = function(url, downloadType)
 	{
@@ -803,12 +814,70 @@
 				}
 			}
 		};
+		this.CoAuthoringApi.onStartCoAuthoring = function (isStartEvent) {
+			if (t.isViewMode) {
+				return;
+			}
+			// На старте не нужно ничего делать
+			if (isStartEvent) {
+				t.startCollaborationEditing();
+			} else {
+				// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+				if (!t.isDocumentLoadComplete) {
+					t.startCollaborationEditing();
+					t.CoAuthoringApi.unLockDocument(false, true);
+				} else {
+					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
+					t.canUnlockDocument = true;
+					t.canStartCoAuthoring = true;
+				}
+			}
+		};
+		this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
+			if (t.canUnlockDocument) {
+				t.canStartCoAuthoring = false;
+			} else {
+				t.endCollaborationEditing();
+			}
+		};
 
 		this._coAuthoringInitEnd();
 		this.CoAuthoringApi.init(this.User, this.documentId, this.documentCallbackUrl, 'fghhfgsjdgfjs', this.editorId, this.documentFormatSave, this.DocInfo);
 	};
 	baseEditorsApi.prototype._coAuthoringInitEnd                 = function()
 	{
+	};
+	baseEditorsApi.prototype.startCollaborationEditing           = function()
+	{
+	};
+	baseEditorsApi.prototype.endCollaborationEditing             = function()
+	{
+	};
+	baseEditorsApi.prototype._coAuthoringCheckEndOpenDocument    = function(f)
+	{
+		if (this.isPreOpenLocks)
+		{
+			var context = this.CoAuthoringApi;
+			var args = Array.prototype.slice.call(arguments, 1);
+
+			// Пока документ еще не загружен, будем сохранять функцию и аргументы
+			this.arrPreOpenLocksObjects.push(function()
+			{
+				f.apply(context, args);
+			});
+			return true;
+		}
+		return false;
+	};
+	baseEditorsApi.prototype._applyPreOpenLocks                  = function()
+	{
+		this.isPreOpenLocks = false;
+		// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+		for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
+		{
+			this.arrPreOpenLocksObjects[i]();
+		}
+		this.arrPreOpenLocksObjects = [];
 	};
 	// server disconnect
 	baseEditorsApi.prototype.asc_coAuthoringDisconnect           = function()

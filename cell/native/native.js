@@ -7737,8 +7737,6 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                t.openDocumentFromZip(t.wbModel, undefined, window["native"]["GetXlsxPath"]()).then(thenCallback, thenCallback);
 
-               t.DocumentLoadComplete = true;
-               
                if (!sdkCheck) {
                
                //console.log("OPEN FILE ONLINE");
@@ -7761,16 +7759,14 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                //console.log("JS - applyFirstLoadChanges() before");
 
+               t._applyPreOpenLocks();
                // Применяем пришедшие при открытии изменения
                t._applyFirstLoadChanges();
-               // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-               for (var i = 0; i < t.arrPreOpenLocksObjects.length; ++i) {
-                    t.arrPreOpenLocksObjects[i]();
-               }
-               t.arrPreOpenLocksObjects = [];
+
+               t.isDocumentLoadComplete = true;
 
                // Меняем тип состояния (на никакое)
-               t.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None
+               t.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
 
                // Были ошибки при открытии, посылаем предупреждение
                if (0 < t.wbModel.openErrors.length) {
