@@ -5354,6 +5354,19 @@ CShape.prototype.getColumnNumber = function(){
         }
     };
 
+    CShape.prototype.getCopyWithSourceFormatting = function(){
+        var oCopy = this.copy();
+        if(oCopy.spPr){
+            if(this.brush){
+                oCopy.spPr.setFill(this.brush.createDuplicate());
+            }
+            if(this.pen){
+                oCopy.spPr.setLn(this.pen.createDuplicate());
+            }
+        }
+        return oCopy;
+    };
+
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {

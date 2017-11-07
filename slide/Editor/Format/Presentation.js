@@ -62,6 +62,15 @@ function DrawingCopyObject(Drawing, X, Y, ExtX, ExtY, ImageUrl)
 function PresentationSelectedContent()
 {
     this.SlideObjects = [];
+    this.Notes = [];
+    this.NotesMasters = [];
+    this.NotesThemes = [];
+    this.LayoutsIndexes = [];
+    this.Layouts = [];
+    this.MastersIndexes = [];
+    this.Masters = [];
+    this.ThemesIndexes = [];
+    this.Themes = [];
     this.Drawings = [];
     this.DocContent = null;
     this.specialContents = [];
@@ -4629,8 +4638,8 @@ CPresentation.prototype =
     {
         return AscFormat.ExecuteNoHistory(function()
         {
-            var oIdMap;
-            var ret = new PresentationSelectedContent(), i, imgUrl, curImgUrl, extX, extY;
+            var oIdMap, imgUrl, extX, extY, curImgUrl;
+            var ret = new PresentationSelectedContent(), i;
             if(this.Slides.length > 0)
             {
                 switch(editor.WordControl.Thumbnails.FocusObjType)
@@ -4730,6 +4739,205 @@ CPresentation.prototype =
         }, this, []);
     },
 
+    /**Returns array of PresentationSelectedContent for special paste
+     * @returns {Array}
+    **/
+    GetSelectedContent2: function(){
+        return AscFormat.ExecuteNoHistory(function(){
+            var aRet = [], oIdMap;
+            var oSourceFormattingContent = new PresentationSelectedContent();
+            var oEndFormattingContent = new PresentationSelectedContent();
+            var oImagesSelectedContent = new PresentationSelectedContent();
+            var oSelectedContent, oDocContent, oController, oTargetTextObject, oGraphicFrame, oTable, oImage, dImageWidth, dImageHeight, bNeedSelectAll,
+                oDocContentForDraw, oParagraph, oNearPos, bOldVal, aParagraphs, dMaxWidth, oCanvas, oContext, oGraphics, dContentHeight, dContentIndents = 20, bOldShowParaMarks, oSelector;
+            var i, j;
+            if(this.Slides.length > 0){
+                switch(this.Api.WordControl.Thumbnails.FocusObjType){
+                    case FOCUS_OBJECT_MAIN:{
+                        oController = this.GetCurrentController();
+                        oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
+                        oTargetTextObject = AscFormat.getTargetTextObject(oController);
+                        bNeedSelectAll = false;
+                        if(!oTargetTextObject){
+                            if(oSelector.selection.chartSelection && oSelector.selection.chartSelection.selection.title){
+                                oDocContent = oSelector.selection.chartSelection.selection.title.getDocContent();
+                                if(oDocContent){
+                                    bNeedSelectAll = true;
+                                }
+                            }
+                        }
+                        if(oTargetTextObject){
+                            if(!oDocContent){
+                                oDocContent = oController.getTargetDocContent();
+                            }
+                            if(oTargetTextObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame && !oDocContent){
+                                if(oTargetTextObject.graphicObject){
+                                    oGraphicFrame = oTargetTextObject.copy();
+                                    oSelectedContent = new CSelectedContent();
+                                    oTargetTextObject.graphicObject.GetSelectedContent(oSelectedContent);
+                                    oTable = oSelectedContent.Elements[0].Element;
+                                    oGraphicFrame.setGraphicObject(oTable);
+                                    oTable.Set_Parent(oGraphicFrame);
+                                    oEndFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame, oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
+                                    oSourceFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame, oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
+                                    oGraphicFrame.parent = this.Slides[this.CurPage];
+                                    oGraphicFrame.bDeleted = false;
+                                    oGraphicFrame.recalculate();
+                                    oImage = oController.createImage(oGraphicFrame.getBase64Img(), 0, 0, oTargetTextObject.extX, oTargetTextObject,extY);
+                                    oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
+                                    oGraphicFrame.parent = null;
+                                    oGraphicFrame.bDeleted = true;
+                                }
+                            }
+                            else{
+                                if(oDocContent){
+                                    if(bNeedSelectAll){
+                                        oDocContent.Set_ApplyToAll(true);
+                                    }
+                                    oSelectedContent = new CSelectedContent();
+                                    oDocContent.GetSelectedContent(oSelectedContent);
+                                    oEndFormattingContent.DocContent = oSelectedContent;
+                                    oSelectedContent = new CSelectedContent();
+                                    oDocContent.GetSelectedContent(oSelectedContent);
+                                    oSourceFormattingContent.DocContent = oSelectedContent;
+                                    if(bNeedSelectAll){
+                                        oDocContent.Set_ApplyToAll(false);
+                                    }
+                                    oDocContentForDraw = new AscFormat.CDrawingDocContent(oDocContent.Parent, oDocContent.DrawingDocument, 0, 0, 20000, 20000);
+                                    oParagraph = oDocContentForDraw.Content[0];
+                                    oNearPos = { Paragraph: oParagraph, ContentPos: oParagraph.Get_ParaContentPos(false, false) };
+                                    oParagraph.Check_NearestPos(oNearPos);
+                                    bOldVal = oDocContentForDraw.MoveDrawing;
+                                    oDocContentForDraw.MoveDrawing = true;
+                                    oDocContentForDraw.Insert_Content(oSelectedContent, oNearPos);
+                                    oDocContentForDraw.MoveDrawing = bOldVal;
+
+
+                                    oDocContentForDraw.Reset(0, 0, 20000, 20000);
+                                    oDocContentForDraw.Recalculate_Page(0, true);
+                                    aParagraphs = oDocContentForDraw.Content;
+                                    dMaxWidth = 0;
+                                    for(i = 0; i < aParagraphs.length; ++i){
+                                        oParagraph = aParagraphs[i];
+                                        for(j = 0; j < oParagraph.Lines.length; ++j){
+                                            if(oParagraph.Lines[j].Ranges[0].W > dMaxWidth){
+                                                dMaxWidth = oParagraph.Lines[j].Ranges[0].W;
+                                            }
+                                        }
+                                    }
+                                    dMaxWidth += 1;
+                                    oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
+                                    oDocContentForDraw.Recalculate_Page(0, true);
+                                    dContentHeight = oDocContentForDraw.Get_SummaryHeight();
+
+                                    oCanvas = document.createElement('canvas');
+                                    dImageWidth = dMaxWidth + 2.0*dContentIndents;
+                                    dImageHeight = dContentHeight + 2.0*dContentIndents;
+                                    oCanvas.width = this.DrawingDocument.GetDotsPerMM(dImageWidth);
+                                    oCanvas.height = this.DrawingDocument.GetDotsPerMM(dImageHeight);
+                                    //if (AscCommon.AscBrowser.isRetina) {
+                                    //    oCanvas.width <<= 1;
+                                    //    oCanvas.height <<= 1;
+                                    //}
+                                    oContext = oCanvas.getContext('2d');
+                                    oGraphics = new AscCommon.CGraphics();
+
+                                    oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth, dImageHeight);
+                                    oGraphics.m_oFontManager = AscCommon.g_fontManager;
+                                    oGraphics.m_oCoordTransform.tx = +dContentIndents;
+                                    oGraphics.m_oCoordTransform.ty = +dContentIndents;
+                                    oGraphics.transform(1,0,0,1,0,0);
+
+                                    bOldShowParaMarks = this.Api.ShowParaMarks;
+                                    this.Api.ShowParaMarks = false;
+                                    oDocContentForDraw.Draw(0, oGraphics);
+                                    this.Api.ShowParaMarks = bOldShowParaMarks;
+                                    var sImageUrl = oCanvas.toDataURL("image/png");
+                                    oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth, dImageHeight);
+                                    oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
+                                }
+                            }
+                        }
+                        else{
+                            var bRecursive = isRealObject(oController.selection.groupSelection);
+                            var aSpTree = bRecursive ? oController.selection.groupSelection.spTree : this.Slides[this.CurPage].cSld.spTree;
+                            oIdMap = {};
+                            collectSelectedObjects(aSpTree, oEndFormattingContent.Drawings, bRecursive, oIdMap);
+                            AscFormat.fResetConnectorsIds(oEndFormattingContent.Drawings, oIdMap);
+                            oIdMap = {};
+                            collectSelectedObjects(aSpTree, oSourceFormattingContent.Drawings, bRecursive, oIdMap, true);
+                            AscFormat.fResetConnectorsIds(oEndFormattingContent.Drawings, oIdMap);
+                            if(oController.selectedObjects[0]){
+                                oImage = oController.createImage(oController.selectedObjects[0].getBase64Img(), 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY);
+                                oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY, oController.selectedObjects[0].getBase64Img()));
+                            }
+                        }
+                        break;
+                    }
+                    case FOCUS_OBJECT_THUMBNAILS :
+                    {
+                        var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+                        var oLayoutsMap = {}, oMastersMap = {}, oThemesMap = {}, oSlide, oSlideCopy, oLayout, oMaster, oTheme;
+                        for(i = 0; i < selected_slides.length; ++i){
+                            oIdMap = {};
+                            oSlide = this.Slides[selected_slides[i]];
+                            oSlideCopy = oSlide.createDuplicate(oIdMap);
+                            oLayout = oSlide.Layout;
+                            if(!oLayoutsMap[oLayout.Get_Id()]){
+                                oLayoutsMap[oLayout.Get_Id()] = oLayout;
+                                oSourceFormattingContent.LayoutsIndexes.push(oSourceFormattingContent.Layouts.length);
+                                oSourceFormattingContent.Layouts.push(oLayout);
+                                oMaster = oLayout.Master;
+                                if(!oMastersMap[oMaster.Get_Id()]){
+                                    oSourceFormattingContent.MastersIndexes.push(oSourceFormattingContent.Masters.length);
+                                    oSourceFormattingContent.Masters.push(oMaster);
+                                    oTheme = oMaster.Theme;
+                                    if(!oThemesMap[oTheme.Get_Id()]){
+                                        oSourceFormattingContent.ThemesIndexes.push(oSourceFormattingContent.Themes.length);
+                                        oSourceFormattingContent.Themes.push(oTheme);
+                                    }
+                                    else{
+                                        for(j = 0; j < oSourceFormattingContent.Themes.length; ++j){
+                                            if(oSourceFormattingContent.Themes[j] === oTheme){
+                                                oSourceFormattingContent.ThemesIndexes.push(j);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                else{
+                                    for(j = 0; j < oSourceFormattingContent.Masters.length; ++j){
+                                        if(oSourceFormattingContent.Masters[j] === oMaster){
+                                            oSourceFormattingContent.MastersIndexes.push(j);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                for(j = 0; j < oSourceFormattingContent.Layouts.length; ++j){
+                                    if(oSourceFormattingContent.Layouts[j] === oLayout){
+                                        oSourceFormattingContent.LayoutsIndexes.push(j);
+                                        break;
+                                    }
+                                }
+                            }
+                            oSourceFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, oSlide.getBase64Img()));
+                            oEndFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, oSlide.getBase64Img()));
+                            AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
+
+                            oImage = AscFormat.DrawingObjectsController.prototype.createImage(oSlide.getBase64Img(), 0, 0, this.Width/2.0, this.Height/2.0);
+                            oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, this.Width/2.0, this.Height/2.0, oSlide.getBase64Img()));
+                        }
+                    }
+                }
+            }
+            aRet.push(oEndFormattingContent);
+            aRet.push(oSourceFormattingContent);
+            aRet.push(oImagesSelectedContent);
+            return aRet;
+        }, this, []);
+    },
 
     CreateAndAddShapeFromSelectedContent : function(oDocContent)
     {
@@ -6081,7 +6289,7 @@ CPresentation.prototype.IsViewModeInReview = function()
 };
 
 
-function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
+function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap, bSourceFormatting)
 {
     for(var i = 0; i < aSpTree.length; ++i)
     {
@@ -6089,10 +6297,16 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
         {
             var oCopy;
             if(aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
-                oCopy = aSpTree[i].copy(oIdMap);
+                oCopy = aSpTree[i].copy(oIdMap, bSourceFormatting);
             }
             else{
-                oCopy = aSpTree[i].copy();
+                if(!bSourceFormatting){
+                    oCopy = aSpTree[i].copy();
+                }
+                else{
+                    oCopy = aSpTree[i].getCopyWithSourceFormatting();
+                }
+
             }
 
             aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
@@ -6102,7 +6316,7 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
         }
         if(bRecursive && aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
         {
-            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive, oIdMap);
+            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive, oIdMap, bSourceFormatting);
         }
     }
 }

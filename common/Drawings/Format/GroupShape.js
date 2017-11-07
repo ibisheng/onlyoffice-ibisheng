@@ -263,7 +263,7 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.copy = function(oIdMap)
+    CGroupShape.prototype.copy = function(oIdMap, bSourceFormatting)
     {
         var copy = new CGroupShape();
         if(this.nvGrpSpPr)
@@ -279,10 +279,16 @@ function CGroupShape()
         {
             var _copy;
             if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
-                _copy = this.spTree[i].copy(oIdMap);
+                _copy = this.spTree[i].copy(oIdMap, bSourceFormatting);
             }
             else{
-                _copy = this.spTree[i].copy();
+                if(bSourceFormatting){
+                    _copy = this.spTree[i].getCopyWithSourceFormatting();
+                }
+                else{
+                    _copy = this.spTree[i].copy();
+                }
+
             }
             if(AscCommon.isRealObject(oIdMap)){
                 oIdMap[this.spTree[i].Id] = _copy.Id;
@@ -1718,6 +1724,10 @@ function CGroupShape()
         }
     };
 
+
+    CGroupShape.prototype.getCopyWithSourceFormatting = function(oIdMap){
+        return this.copy(oIdMap, true);
+    };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGroupShape = CGroupShape;

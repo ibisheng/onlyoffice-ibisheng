@@ -1184,6 +1184,10 @@
         return false;
     };
 
+    CGraphicObjectBase.prototype.getCopyWithSourceFormatting = function(oIdMap){
+        return this.copy(oIdMap);
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;
