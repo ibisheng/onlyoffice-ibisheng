@@ -3024,19 +3024,19 @@
 								compareFunction = (function(rule, text) {
 									return function(row, col) {
 										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
+										var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
 										return (-1 !== val.indexOf(text)) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text);
+								})(oRule, oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.notContainsText:
 								compareFunction = (function(rule, text) {
 									return function(row, col) {
 										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
+										var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
 										return (-1 === val.indexOf(text)) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text);
+								})(oRule, oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.beginsWith:
 								compareFunction = (function(rule, text) {
