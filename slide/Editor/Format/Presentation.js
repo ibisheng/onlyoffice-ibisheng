@@ -3748,11 +3748,11 @@ CPresentation.prototype =
     },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-	GetSelectedText : function(bClearText)
+	GetSelectedText : function(bClearText, oPr)
     {
         var oController = this.GetCurrentController();
         if(oController){
-            return oController.GetSelectedText(bClearText);
+            return oController.GetSelectedText(bClearText, oPr);
         }
         return "";
     },
