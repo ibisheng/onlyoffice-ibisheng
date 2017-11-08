@@ -1809,8 +1809,14 @@
 					if (!(Math.abs(dif) > count)) {
 						//проверяем не оказалось ли следом выходных. если оказались - прибавляем
 						date = new Date(val0.getTime() + dif1 * c_msPerDay);
-						if (date.getUTCDay() === 6) {
+						if (date.getUTCDay() === 6 && dif > 0) {
 							dif1 += 2;
+						} else if (date.getUTCDay() === 0 && dif > 0) {
+							dif1 += 1;
+						} else if (date.getUTCDay() === 6 && dif < 0) {
+							dif1 -= 1;
+						} else if (date.getUTCDay() === 0 && dif < 0) {
+							dif1 -= 2;
 						}
 					}
 				}
