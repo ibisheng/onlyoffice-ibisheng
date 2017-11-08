@@ -9278,6 +9278,9 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	{
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
 		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
+
+		if (oHyperlink.GetAnchor())
+			MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
@@ -12160,6 +12163,10 @@ Paragraph.prototype.SetParagraphSpacing = function(Spacing)
 Paragraph.prototype.SetParagraphTabs = function(Tabs)
 {
 	this.Set_Tabs(Tabs);
+};
+Paragraph.prototype.GetParagraphTabs = function()
+{
+	return this.Get_CompiledPr2(false).ParaPr.Tabs;
 };
 Paragraph.prototype.SetParagraphIndent = function(Ind)
 {
