@@ -4500,13 +4500,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var oThis = this;
         var sLink = oHyperlink.Get_Value();
         var sTooltip = oHyperlink.Get_ToolTip();
-        var sAnchor = null;
-        var nAnchorIndex = sLink.indexOf("#");
-        if(-1 != nAnchorIndex)
-        {
-			sAnchor = sLink.substring(nAnchorIndex + 1);
-            sLink = sLink.substring(0, nAnchorIndex);
-        }
+		var sAnchor = oHyperlink.GetAnchor();
         //Link
         this.memory.WriteByte(c_oSer_HyperlinkType.Link);
         this.memory.WriteString2(sLink);
@@ -9410,11 +9404,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		    });
 		    if (null != oHyperlinkObj.Link && "" != oHyperlinkObj.Link) {
 		        var sValue = oHyperlinkObj.Link;
-		        if (null != oHyperlinkObj.Anchor)
-		            sValue += "#" + oHyperlinkObj.Anchor;
 		        oNewHyperlink.Set_Value(sValue);
 		        if (null != oHyperlinkObj.Tooltip)
 		            oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
+				if (null != oHyperlinkObj.Anchor)
+					oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
 		        oParStruct.addToContent(oNewHyperlink);
 		    }            
             oNewHyperlink.Check_Content();
