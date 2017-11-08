@@ -64,6 +64,7 @@ function PresentationSelectedContent()
     this.SlideObjects = [];
     this.Notes = [];
     this.NotesMasters = [];
+    this.NotesMastersIndexes = [];
     this.NotesThemes = [];
     this.LayoutsIndexes = [];
     this.Layouts = [];
@@ -4877,7 +4878,7 @@ CPresentation.prototype =
                     case FOCUS_OBJECT_THUMBNAILS :
                     {
                         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
-                        var oLayoutsMap = {}, oMastersMap = {}, oThemesMap = {}, oSlide, oSlideCopy, oLayout, oMaster, oTheme;
+                        var oLayoutsMap = {}, oMastersMap = {}, oThemesMap = {}, oSlide, oSlideCopy, oLayout, oMaster, oTheme, oNotesCopy, oNotes;
                         for(i = 0; i < selected_slides.length; ++i){
                             oIdMap = {};
                             oSlide = this.Slides[selected_slides[i]];
@@ -4928,6 +4929,27 @@ CPresentation.prototype =
 
                             oImage = AscFormat.DrawingObjectsController.prototype.createImage(oSlide.getBase64Img(), 0, 0, this.Width/2.0, this.Height/2.0);
                             oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, this.Width/2.0, this.Height/2.0, oSlide.getBase64Img()));
+                            oNotes = null;
+                            if(oSlide.notes){
+                                oNotes = oSlide.notes;
+                                oNotesCopy = oNotes.createDuplicate();
+                                oSourceFormattingContent.Notes.push(oNotesCopy);
+                                for(i = 0; i < oSourceFormattingContent.NotesMasters.length; ++i){
+                                    if(oSourceFormattingContent.NotesMasters[i] === oNotes.Master){
+                                        oSourceFormattingContent.NotesMastersIndexes.push(i);
+                                        break;
+                                    }
+                                }
+                                if(i === oSourceFormattingContent.NotesMasters.length){
+                                    oSourceFormattingContent.NotesMastersIndexes.push(i);
+                                    oSourceFormattingContent.NotesMasters.push(oNotes.Master);
+                                    oSourceFormattingContent.NotesThemes.push(oNotes.Master.Theme);
+                                }
+                            }
+                            else{
+                                oSourceFormattingContent.Notes.push(null);
+                                oSourceFormattingContent.NotesMastersIndexes.push(-1);
+                            }
                         }
                     }
                 }
