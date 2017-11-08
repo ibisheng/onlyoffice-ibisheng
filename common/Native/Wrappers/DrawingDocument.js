@@ -1465,7 +1465,7 @@ CDrawingDocument.prototype =
     {
         this.InlineTextTrackEnabled = false;
 
-        this.LogicDocument.On_DragTextEnd(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
+        this.LogicDocument.OnEndTextDrag(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
         this.InlineTextTrackPage = -1;
         this.Native["DD_EndTrackText"]();

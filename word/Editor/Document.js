@@ -5643,7 +5643,7 @@ CDocument.prototype.SelectAll = function()
 
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
+CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
 {
     if (true === this.Comments.Is_Use())
     {
@@ -5703,7 +5703,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
             {
                 this.TurnOff_Recalculate();
                 this.TurnOff_InterfaceEvents();
-                this.Remove(1, false, false, false);
+                this.Remove(1, false, false, true);
                 this.TurnOn_Recalculate(false);
                 this.TurnOn_InterfaceEvents(false);
 
@@ -15535,7 +15535,7 @@ CDocument.prototype.SelectContentControl = function(Id)
 };
 CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 {
-	return this.On_DragTextEnd(NearestPos, isCopy);
+	return this.OnEndTextDrag(NearestPos, isCopy);
 };
 CDocument.prototype.AddContentControl = function(nContentControlType)
 {
