@@ -7642,7 +7642,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
                 oSectPr.Set_PageSize(oSize.W, oSize.H);
             }
             if(null != oSize.Orientation)
-                oSectPr.Set_Orientation(oSize.Orientation);
+                oSectPr.Set_Orientation(oSize.Orientation, false);
         }
         else if( c_oSerProp_secPrType.pgMar === type )
         {
