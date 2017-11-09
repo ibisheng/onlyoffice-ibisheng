@@ -2829,8 +2829,8 @@
 		var aRules, oRule;
 		var oRuleElement = null;
 		var o;
-		var i, j, l, cf, cell, ranges, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
-		for (var i = 0; i < range.ranges.length; ++i) {
+		var i, j, l, cf, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
+		for (i = 0; i < range.ranges.length; ++i) {
 			var rangeElem = range.ranges[i];
 			this.getRange3(rangeElem.r1, rangeElem.c1, rangeElem.r2, rangeElem.c2).cleanCache();
 		}
