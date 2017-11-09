@@ -2496,7 +2496,7 @@
 		this.hyperlinkManager.setDependenceManager(this.mergeManager);
 		this.DrawingDocument = new AscCommon.CDrawingDocument();
 		this.sheetViews = [];
-		this.aConditionalFormatting = [];
+		this.aConditionalFormattingRules = [];
 		this.updateConditionalFormattingRange = null;
 		this.sheetPr = null;
 		this.aFormulaExt = null;
@@ -2666,8 +2666,8 @@
 		for (i = 0; i < wsFrom.sheetViews.length; ++i) {
 			this.sheetViews.push(wsFrom.sheetViews[i].clone());
 		}
-		for (i = 0; i < wsFrom.aConditionalFormatting.length; ++i) {
-			this.aConditionalFormatting.push(wsFrom.aConditionalFormatting[i].clone());
+		for (i = 0; i < wsFrom.aConditionalFormattingRules.length; ++i) {
+			this.aConditionalFormattingRules.push(wsFrom.aConditionalFormattingRules[i].clone());
 		}
 		if (wsFrom.sheetPr)
 			this.sheetPr = wsFrom.sheetPr.clone();
@@ -2824,12 +2824,11 @@
 		var range = this.updateConditionalFormattingRange;
 		this.updateConditionalFormattingRange = null;
 		var t = this;
-		var oGradient1, oGradient2;
-		var aCFs = this.aConditionalFormatting;
-		var aRules, oRule;
-		var oRuleElement = null;
-		var o;
-		var i, j, l, cf, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
+		var aRules = this.aConditionalFormattingRules.sort(function(v1, v2) {
+			return v2.priority - v1.priority;
+		});
+		var oGradient1, oGradient2, oRule, multiplyRange, oRuleElement = null;
+		var o, i, l, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
 		for (i = 0; i < range.ranges.length; ++i) {
 			var rangeElem = range.ranges[i];
 			this.getRange3(rangeElem.r1, rangeElem.c1, rangeElem.r2, rangeElem.c2).cleanCache();
@@ -2865,281 +2864,272 @@
 				return cache.get(row, col);
 			};
 		};
-		for (i = 0; i < aCFs.length; ++i) {
-			cf = aCFs[i];
-			if (!cf.isValid()) {
-				continue;
-			}
-			ranges = cf.ranges;
+		for (i = 0; i < aRules.length; ++i) {
+			oRule = aRules[i];
+			ranges = oRule.ranges;
 			if (this._isConditionalFormattingIntersect(range, ranges)) {
-				var multiplyRange = new AscCommonExcel.MultiplyRange(ranges);
-				aRules = cf.aRules.sort(function(v1, v2) {
-					return v2.priority - v1.priority;
-				});
-				for (j = 0; j < aRules.length; ++j) {
-					oRule = aRules[j];
-					// ToDo dataBar, expression, iconSet (page 2679)
-					if (AscCommonExcel.ECfType.colorScale === oRule.type) {
-						if (1 !== oRule.aRuleElements.length) {
-							break;
+				multiplyRange = new AscCommonExcel.MultiplyRange(ranges);
+				// ToDo dataBar, expression, iconSet (page 2679)
+				if (AscCommonExcel.ECfType.colorScale === oRule.type) {
+					if (1 !== oRule.aRuleElements.length) {
+						break;
+					}
+					oRuleElement = oRule.aRuleElements[0];
+					if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
+						break;
+					}
+					nc = 0;
+					min = Number.MAX_VALUE;
+					max = -Number.MAX_VALUE;
+					values = this._getValuesForConditionalFormatting(ranges, false);
+					for (cell = 0; cell < values.length; ++cell) {
+						value = values[cell];
+						if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+							value.v = tmp;
+							min = Math.min(min, tmp);
+							max = Math.max(max, tmp);
+							++nc;
+						} else {
+							value.v = null;
 						}
-						oRuleElement = oRule.aRuleElements[0];
-						if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
-							break;
+					}
+
+					// ToDo CFVO Type formula (page 2681)
+					l = oRuleElement.aColors.length;
+					if (0 < values.length && 2 <= l) {
+						oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+						min = oRuleElement.getMin(min, max, values);
+						max = oRuleElement.getMax(min, max, values);
+						oGradient2 = null;
+						if (2 < l) {
+							oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
+							mid = oRuleElement.getMid(min, max, values);
+
+							oGradient1.init(min, mid);
+							oGradient2.init(mid, max);
+						} else {
+							oGradient1.init(min, max);
 						}
+
+						compareFunction = (function(oGradient1, oGradient2) {
+							return function(row, col) {
+								var cell = t._getCellNoEmpty(row, col);
+								var val = cell ? cell.getNumberValue() : null;
+								dxf = null;
+								if (null !== val) {
+									dxf = new AscCommonExcel.CellXfs();
+									tmp = (oGradient2 && val > oGradient1.max) ? oGradient2 : oGradient1;
+									dxf.fill = new AscCommonExcel.Fill({bg: tmp.calculateColor(val)});
+									dxf = g_StyleCache.addXf(dxf, true);
+								}
+								return dxf;
+							};
+						})(oGradient1, oGradient2);
+					}
+				} else if (AscCommonExcel.ECfType.top10 === oRule.type) {
+					if (oRule.rank > 0 && oRule.dxf) {
 						nc = 0;
-						min = Number.MAX_VALUE;
-						max = -Number.MAX_VALUE;
 						values = this._getValuesForConditionalFormatting(ranges, false);
+						o = oRule.bottom ? Number.MAX_VALUE : -Number.MAX_VALUE;
 						for (cell = 0; cell < values.length; ++cell) {
 							value = values[cell];
 							if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
-								value.v = tmp;
-								min = Math.min(min, tmp);
-								max = Math.max(max, tmp);
 								++nc;
+								value.v = tmp;
+							} else {
+								value.v = o;
+							}
+						}
+						values.sort((function(condition) {
+							return function(v1, v2) {
+								return condition * (v2.v - v1.v);
+							}
+						})(oRule.bottom ? -1 : 1));
+
+						nc = Math.max(1, oRule.percent ? Math.floor(nc * oRule.rank / 100) : oRule.rank);
+						var threshold = values.length >= nc ? values[nc - 1].v : o;
+						compareFunction = (function(rule, threshold) {
+							return function(row, col) {
+								var cell = t._getCellNoEmpty(row, col);
+								var val = cell ? cell.getNumberValue() : null;
+								return (null !== val && (rule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
+							};
+						})(oRule, threshold);
+					}
+				} else if (AscCommonExcel.ECfType.aboveAverage === oRule.type) {
+					if (!oRule.dxf) {
+						continue;
+					}
+					values = this._getValuesForConditionalFormatting(ranges, false);
+					sum = 0;
+					nc = 0;
+					for (cell = 0; cell < values.length; ++cell) {
+						value = values[cell];
+						if (!value.c.isEmptyTextString(value.v)) {
+							++nc;
+							if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+								value.v = tmp;
+								sum += tmp;
 							} else {
 								value.v = null;
 							}
 						}
+					}
 
-						// ToDo CFVO Type formula (page 2681)
-						l = oRuleElement.aColors.length;
-						if (0 < values.length && 2 <= l) {
-							oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-							min = oRuleElement.getMin(min, max, values);
-							max = oRuleElement.getMax(min, max, values);
-							oGradient2 = null;
-							if (2 < l) {
-								oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
-								mid = oRuleElement.getMid(min, max, values);
-
-								oGradient1.init(min, mid);
-								oGradient2.init(mid, max);
+					tmp = sum / nc;
+					/*if (oRule.hasStdDev()) {
+					 sum = 0;
+					 for (cell = 0; cell < values.length; ++cell) {
+					 value = values[cell];
+					 if (null !== value.v) {
+					 sum += (value.v - tmp) * (value.v - tmp);
+					 }
+					 }
+					 sum = Math.sqrt(sum / (nc - 1));
+					 }*/
+					compareFunction = (function(rule, average, stdDev) {
+						return function(row, col) {
+							var cell = t._getCellNoEmpty(row, col);
+							var val = cell ? cell.getNumberValue() : null;
+							return (null !== val && rule.getAverage(val, average, stdDev)) ? rule.dxf : null;
+						};
+					})(oRule, tmp, sum);
+				} else {
+					if (!oRule.dxf) {
+						continue;
+					}
+					switch (oRule.type) {
+						case AscCommonExcel.ECfType.duplicateValues:
+						case AscCommonExcel.ECfType.uniqueValues:
+							o = getUniqueKeys(this._getValuesForConditionalFormatting(ranges, false));
+							compareFunction = (function(rule, obj, condition) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat() : "";
+									return (val.length > 0 ? condition === obj[val] : false) ? rule.dxf : null;
+								};
+							})(oRule, o, oRule.type === AscCommonExcel.ECfType.duplicateValues);
+							break;
+						case AscCommonExcel.ECfType.containsText:
+							compareFunction = (function(rule, text) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
+									return (-1 !== val.indexOf(text)) ? rule.dxf : null;
+								};
+							})(oRule, oRule.text.toLowerCase());
+							break;
+						case AscCommonExcel.ECfType.notContainsText:
+							compareFunction = (function(rule, text) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
+									return (-1 === val.indexOf(text)) ? rule.dxf : null;
+								};
+							})(oRule, oRule.text.toLowerCase());
+							break;
+						case AscCommonExcel.ECfType.beginsWith:
+							compareFunction = (function(rule, text) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat() : "";
+									return val.startsWith(text) ? rule.dxf : null;
+								};
+							})(oRule, oRule.text);
+							break;
+						case AscCommonExcel.ECfType.endsWith:
+							compareFunction = (function(rule, text) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat() : "";
+									return val.endsWith(text) ? rule.dxf : null;
+								};
+							})(oRule, oRule.text);
+							break;
+						case AscCommonExcel.ECfType.containsErrors:
+							compareFunction = (function(rule) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									return (cell ? CellValueType.Error === cell.getType() : false) ? rule.dxf : null;
+								};
+							})(oRule);
+							break;
+						case AscCommonExcel.ECfType.notContainsErrors:
+							compareFunction = (function(rule) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									return (cell ? CellValueType.Error !== cell.getType() : true) ? rule.dxf : null;
+								};
+							})(oRule);
+							break;
+						case AscCommonExcel.ECfType.containsBlanks:
+							compareFunction = (function(rule) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									return (cell ? cell.isEmptyTextString() : true) ? rule.dxf : null;
+								};
+							})(oRule);
+							break;
+						case AscCommonExcel.ECfType.notContainsBlanks:
+							compareFunction = (function(rule) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									return (cell ? !cell.isEmptyTextString() : false) ? rule.dxf : null;
+								};
+							})(oRule);
+							break;
+						case AscCommonExcel.ECfType.timePeriod:
+							if (oRule.timePeriod) {
+								compareFunction = (function(rule, period) {
+									return function(row, col) {
+										var cell = t._getCellNoEmpty(row, col);
+										var val = cell ? cell.getValueWithoutFormat() : "";
+										var n = parseFloat(val);
+										return (period.start <= n && n < period.end) ? rule.dxf : null;
+									};
+								})(oRule, oRule.getTimePeriod());
 							} else {
-								oGradient1.init(min, max);
-							}
-
-							compareFunction = (function(oGradient1, oGradient2) {
-								return function(row, col) {
-									var cell = t._getCellNoEmpty(row, col);
-									var val = cell ? cell.getNumberValue() : null;
-									dxf = null;
-									if (null !== val) {
-										dxf = new AscCommonExcel.CellXfs();
-										tmp = (oGradient2 && val > oGradient1.max) ? oGradient2 : oGradient1;
-										dxf.fill = new AscCommonExcel.Fill({bg: tmp.calculateColor(val)});
-										dxf = g_StyleCache.addXf(dxf, true);
-									}
-									return dxf;
-								};
-							})(oGradient1, oGradient2);
-						}
-					} else if (AscCommonExcel.ECfType.top10 === oRule.type) {
-						if (oRule.rank > 0 && oRule.dxf) {
-							nc = 0;
-							values = this._getValuesForConditionalFormatting(ranges, false);
-							o = oRule.bottom ? Number.MAX_VALUE : -Number.MAX_VALUE;
-							for (cell = 0; cell < values.length; ++cell) {
-								value = values[cell];
-								if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
-									++nc;
-									value.v = tmp;
-								} else {
-									value.v = o;
-								}
-							}
-							values.sort((function(condition) {
-								return function(v1, v2) {
-									return condition * (v2.v - v1.v);
-								}
-							})(oRule.bottom ? -1 : 1));
-
-							nc = Math.max(1, oRule.percent ? Math.floor(nc * oRule.rank / 100) : oRule.rank);
-							var threshold = values.length >= nc ? values[nc - 1].v : o;
-							compareFunction = (function(rule, threshold) {
-								return function(row, col) {
-									var cell = t._getCellNoEmpty(row, col);
-									var val = cell ? cell.getNumberValue() : null;
-									return (null !== val && (rule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
-								};
-							})(oRule, threshold);
-						}
-					} else if (AscCommonExcel.ECfType.aboveAverage === oRule.type) {
-						if (!oRule.dxf) {
-							continue;
-						}
-						values = this._getValuesForConditionalFormatting(ranges, false);
-						sum = 0;
-						nc = 0;
-						for (cell = 0; cell < values.length; ++cell) {
-							value = values[cell];
-							if (!value.c.isEmptyTextString(value.v)) {
-								++nc;
-								if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
-									value.v = tmp;
-									sum += tmp;
-								} else {
-									value.v = null;
-								}
-							}
-						}
-
-						tmp = sum / nc;
-						/*if (oRule.hasStdDev()) {
-						 sum = 0;
-						 for (cell = 0; cell < values.length; ++cell) {
-						 value = values[cell];
-						 if (null !== value.v) {
-						 sum += (value.v - tmp) * (value.v - tmp);
-						 }
-						 }
-						 sum = Math.sqrt(sum / (nc - 1));
-						 }*/
-						compareFunction = (function(rule, average, stdDev) {
-							return function(row, col) {
-								var cell = t._getCellNoEmpty(row, col);
-								var val = cell ? cell.getNumberValue() : null;
-								return (null !== val && rule.getAverage(val, average, stdDev)) ? rule.dxf : null;
-							};
-						})(oRule, tmp, sum);
-					} else {
-						if (!oRule.dxf) {
-							continue;
-						}
-						switch (oRule.type) {
-							case AscCommonExcel.ECfType.duplicateValues:
-							case AscCommonExcel.ECfType.uniqueValues:
-								o = getUniqueKeys(this._getValuesForConditionalFormatting(ranges, false));
-								compareFunction = (function(rule, obj, condition) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
-										return (val.length > 0 ? condition === obj[val] : false) ? rule.dxf : null;
-									};
-								})(oRule, o, oRule.type === AscCommonExcel.ECfType.duplicateValues);
-								break;
-							case AscCommonExcel.ECfType.containsText:
-								compareFunction = (function(rule, text) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
-										return (-1 !== val.indexOf(text)) ? rule.dxf : null;
-									};
-								})(oRule, oRule.text.toLowerCase());
-								break;
-							case AscCommonExcel.ECfType.notContainsText:
-								compareFunction = (function(rule, text) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
-										return (-1 === val.indexOf(text)) ? rule.dxf : null;
-									};
-								})(oRule, oRule.text.toLowerCase());
-								break;
-							case AscCommonExcel.ECfType.beginsWith:
-								compareFunction = (function(rule, text) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
-										return val.startsWith(text) ? rule.dxf : null;
-									};
-								})(oRule, oRule.text);
-								break;
-							case AscCommonExcel.ECfType.endsWith:
-								compareFunction = (function(rule, text) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
-										return val.endsWith(text) ? rule.dxf : null;
-									};
-								})(oRule, oRule.text);
-								break;
-							case AscCommonExcel.ECfType.containsErrors:
-								compareFunction = (function(rule) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										return (cell ? CellValueType.Error === cell.getType() : false) ? rule.dxf : null;
-									};
-								})(oRule);
-								break;
-							case AscCommonExcel.ECfType.notContainsErrors:
-								compareFunction = (function(rule) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										return (cell ? CellValueType.Error !== cell.getType() : true) ? rule.dxf : null;
-									};
-								})(oRule);
-								break;
-							case AscCommonExcel.ECfType.containsBlanks:
-								compareFunction = (function(rule) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										return (cell ? cell.isEmptyTextString() : true) ? rule.dxf : null;
-									};
-								})(oRule);
-								break;
-							case AscCommonExcel.ECfType.notContainsBlanks:
-								compareFunction = (function(rule) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										return (cell ? !cell.isEmptyTextString() : false) ? rule.dxf : null;
-									};
-								})(oRule);
-								break;
-							case AscCommonExcel.ECfType.timePeriod:
-								if (oRule.timePeriod) {
-									compareFunction = (function(rule, period) {
-										return function(row, col) {
-											var cell = t._getCellNoEmpty(row, col);
-											var val = cell ? cell.getValueWithoutFormat() : "";
-											var n = parseFloat(val);
-											return (period.start <= n && n < period.end) ? rule.dxf : null;
-										};
-									})(oRule, oRule.getTimePeriod());
-								} else {
-									continue;
-								}
-								break;
-							case AscCommonExcel.ECfType.cellIs:
-								compareFunction = (function(rule, v1, v2) {
-									return function(row, col) {
-										var cell = t._getCellNoEmpty(row, col);
-										var val = cell ? cell.getValueWithoutFormat() : "";
-										return rule.cellIs(val, v1, v2) ? rule.dxf : null;
-									};
-								})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
-								break;
-							case AscCommonExcel.ECfType.expression:
-								var offset = {offsetRow: 0, offsetCol: 0};
-								var bboxCf = cf.getBBox();
-								var rowLT = bboxCf ? bboxCf.r1 : 0;
-								var colLT = bboxCf ? bboxCf.c1 : 0;
-								var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, cf);
-								compareFunction = getCacheFunction(oRule, (function(rule, formulaCF, rowLT, colLT) {
-									return function(row, col) {
-										offset.offsetRow = row - rowLT;
-										offset.offsetCol = col - colLT;
-										var bboxCell = new Asc.Range(col, row, col, row);
-										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, bboxCell, offset);
-										if (res && res.tocBool) {
-											res = res.tocBool();
-											if (res && res.toBool) {
-												return res.toBool();
-											}
-										}
-										return false;
-									};
-								})(oRule, oRule.aRuleElements[0], rowLT, colLT));
-								break;
-							default:
 								continue;
-								break;
-						}
+							}
+							break;
+						case AscCommonExcel.ECfType.cellIs:
+							compareFunction = (function(rule, v1, v2) {
+								return function(row, col) {
+									var cell = t._getCellNoEmpty(row, col);
+									var val = cell ? cell.getValueWithoutFormat() : "";
+									return rule.cellIs(val, v1, v2) ? rule.dxf : null;
+								};
+							})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
+							break;
+						case AscCommonExcel.ECfType.expression:
+							var offset = {offsetRow: 0, offsetCol: 0};
+							var bboxCf = oRule.getBBox();
+							var rowLT = bboxCf ? bboxCf.r1 : 0;
+							var colLT = bboxCf ? bboxCf.c1 : 0;
+							var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, oRule);
+							compareFunction = getCacheFunction(oRule, (function(rule, formulaCF, rowLT, colLT) {
+								return function(row, col) {
+									offset.offsetRow = row - rowLT;
+									offset.offsetCol = col - colLT;
+									var bboxCell = new Asc.Range(col, row, col, row);
+									var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, bboxCell, offset);
+									if (res && res.tocBool) {
+										res = res.tocBool();
+										if (res && res.toBool) {
+											return res.toBool();
+										}
+									}
+									return false;
+								};
+							})(oRule, oRule.aRuleElements[0], rowLT, colLT));
+							break;
+						default:
+							continue;
+							break;
 					}
-					if (compareFunction) {
-						this.sheetMergedStyles.setConditionalStyle(multiplyRange, compareFunction);
-					}
+				}
+				if (compareFunction) {
+					this.sheetMergedStyles.setConditionalStyle(multiplyRange, compareFunction);
 				}
 			}
 		}
