@@ -60,7 +60,7 @@ var isRealObject = AscCommon.isRealObject;
             {
                 if(value && (typeof value.RasterImageId === "string") && value.RasterImageId.length > 0)
                 {
-                    AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(value.RasterImageId));
+                    AscCommon.CollaborativeEditing.Add_NewImage(value.RasterImageId);
                 }
             }
         }

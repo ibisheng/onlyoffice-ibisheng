@@ -688,7 +688,7 @@ CGraphics.prototype =
 
 		var editor = window["Asc"]["editor"];
         var _img = editor.ImageLoader.map_image_index[img];
-        if (_img != undefined && _img.Status == AscFonts.ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Status == AscFonts.ImageLoadStatus.Loading || (AscCommon.CollaborativeEditing.WaitImages && AscCommon.CollaborativeEditing.WaitImages[img]))
         {
             // TODO: IMAGE_LOADING
         }

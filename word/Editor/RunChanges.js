@@ -1550,7 +1550,7 @@ CChangesRunTextPr.prototype.Load = function(Color)
 		&& typeof Unifill.fill.RasterImageId === "string"
 		&& Unifill.fill.RasterImageId.length > 0)
 	{
-		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+		AscCommon.CollaborativeEditing.Add_NewImage(Unifill.fill.RasterImageId);
 	}
 
 	if (this.Color && Color)
@@ -1783,7 +1783,7 @@ CChangesRunUnifill.prototype.Load = function(Color)
 		&& typeof Unifill.fill.RasterImageId === "string"
 		&& Unifill.fill.RasterImageId.length > 0)
 	{
-		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+		AscCommon.CollaborativeEditing.Add_NewImage(Unifill.fill.RasterImageId);
 	}
 
 	if (this.Color && Color)
@@ -1825,7 +1825,7 @@ CChangesRunShd.prototype.Load = function(Color)
 		&& typeof Unifill.fill.RasterImageId === "string"
 		&& Unifill.fill.RasterImageId.length > 0)
 	{
-		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+		AscCommon.CollaborativeEditing.Add_NewImage(Unifill.fill.RasterImageId);
 	}
 
 	if (this.Color && Color)

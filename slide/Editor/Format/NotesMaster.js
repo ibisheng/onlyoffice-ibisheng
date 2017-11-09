@@ -29,7 +29,7 @@
             {
                 if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                 {
-                    AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
+                    AscCommon.CollaborativeEditing.Add_NewImage(Fill.fill.RasterImageId);
                 }
             }
         }
