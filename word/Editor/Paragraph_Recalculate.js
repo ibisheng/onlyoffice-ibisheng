@@ -1206,7 +1206,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     {
         BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
 
-        if (0 === CurLine)
+        if (this.Check_FirstPage(CurPage, true))
         {
 			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
@@ -1239,7 +1239,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         Top  = PRS.Y;
         Top2 = PRS.Y;
 
-        if ( 0 === CurLine )
+        if (CurLine === this.Pages[CurPage].FirstLine && this.Check_FirstPage(CurPage, true))
         {
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
@@ -1276,7 +1276,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     }
     else
     {
-        if ( 0 !== CurLine )
+        if (CurLine !== this.Pages[CurPage].FirstLine || !this.Check_FirstPage(CurPage, true))
         {
             if ( CurLine !== this.Pages[CurPage].FirstLine )
             {
@@ -2175,7 +2175,13 @@ Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS, Para
 		return true;
 
 	if (!this.Check_FirstPage(CurPage))
-		return false;
+	{
+		// Если на предыдущих страницах были только разрывы страниц и колонок, тогда добавляем расстояние
+		if (this.Check_FirstPage(CurPage, true))
+			return true;
+		else
+			return false;
+	}
 
 	if (true === ParaPr.PageBreakBefore)
 		return true;

@@ -4238,10 +4238,11 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.FirstItemOnLine = false;
             PRS.X += PRS.SpaceLen + PRS.WordLen;
 
-            PRS.Word = false;
-            PRS.EmptyLine = false;
-            PRS.SpaceLen = 0;
-            PRS.WordLen = 0;
+			PRS.Word               = false;
+			PRS.EmptyLine          = false;
+			PRS.EmptyLineWithBreak = false;
+			PRS.SpaceLen           = 0;
+			PRS.WordLen            = 0;
 
             PRS.XRange = PRS.X;
         }
