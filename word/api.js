@@ -7247,6 +7247,7 @@ background-repeat: no-repeat;\
 		g_oTableId.Clear();
 		AscCommon.CollaborativeEditing.Clear();
 		this.isApplyChangesOnOpenEnabled = true;
+		this.isDocumentLoadComplete = false;
 
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		oLogicDocument.Stop_Recalculate();
