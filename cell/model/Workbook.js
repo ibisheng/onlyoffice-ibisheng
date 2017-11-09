@@ -2497,7 +2497,7 @@
 		this.DrawingDocument = new AscCommon.CDrawingDocument();
 		this.sheetViews = [];
 		this.aConditionalFormatting = [];
-		this.updateConditionalFormatting = null;
+		this.updateConditionalFormattingRange = null;
 		this.sheetPr = null;
 		this.aFormulaExt = null;
 
@@ -2811,18 +2811,18 @@
 		if (!range) {
 			range = new AscCommonExcel.MultiplyRange([new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0)]);
 		}
-		if (this.updateConditionalFormatting) {
-			this.updateConditionalFormatting.union2(range);
+		if (this.updateConditionalFormattingRange) {
+			this.updateConditionalFormattingRange.union2(range);
 		} else {
-			this.updateConditionalFormatting = range.clone();
+			this.updateConditionalFormattingRange = range.clone();
 		}
 	};
 	Worksheet.prototype._updateConditionalFormatting = function() {
-		if (!this.updateConditionalFormatting) {
+		if (!this.updateConditionalFormattingRange) {
 			return;
 		}
-		var range = this.updateConditionalFormatting;
-		this.updateConditionalFormatting = null;
+		var range = this.updateConditionalFormattingRange;
+		this.updateConditionalFormattingRange = null;
 		var t = this;
 		var oGradient1, oGradient2;
 		var aCFs = this.aConditionalFormatting;
@@ -2867,11 +2867,10 @@
 		};
 		for (i = 0; i < aCFs.length; ++i) {
 			cf = aCFs[i];
-			ranges = cf.ranges;
-			// ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
 			if (!cf.isValid()) {
 				continue;
 			}
+			ranges = cf.ranges;
 			if (this._isConditionalFormattingIntersect(range, ranges)) {
 				var multiplyRange = new AscCommonExcel.MultiplyRange(ranges);
 				aRules = cf.aRules.sort(function(v1, v2) {

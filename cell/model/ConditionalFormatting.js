@@ -73,7 +73,7 @@
 	CConditionalFormatting.prototype.isValid = function() {
 		//todo more checks
 		return this.ranges && this.ranges.length > 0;
-	}
+	};
 	CConditionalFormatting.prototype.getBBox = function() {
 		var bbox = null;
 		if (this.ranges && this.ranges.length > 0) {
