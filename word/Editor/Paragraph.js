@@ -13052,7 +13052,11 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 
 	if (null !== PageEndInfo)
 	{
-		this.Comments      = PageEndInfo.Comments;
+		for (var nIndex = 0, nCount = PageEndInfo.Comments.length; nIndex < nCount; ++nIndex)
+		{
+			this.AddComment(PageEndInfo.Comments[nIndex]);
+		}
+
 		this.ComplexFields = PageEndInfo.ComplexFields;
 	}
 	else
