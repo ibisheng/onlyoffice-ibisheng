@@ -6520,6 +6520,8 @@ CDocument.prototype.OnKeyDown = function(e)
 
                 var TempXY = this.GetCursorPosXY();
 
+                this.Controller = this.LogicDocumentController;
+
                 var X = TempXY.X;
                 var Y = TempXY.Y;
 
@@ -6630,6 +6632,8 @@ CDocument.prototype.OnKeyDown = function(e)
                 if (this.Pages.length > 0)
                 {
                     var TempXY = this.GetCursorPosXY();
+
+					this.Controller = this.LogicDocumentController;
 
                     var X = TempXY.X;
                     var Y = TempXY.Y;
