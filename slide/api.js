@@ -1110,7 +1110,6 @@
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 	{
 		this.ServerIdWaitComplete = true;
-		var t = this;
 		this.OpenDocumentEndCallback();
 	};
 
@@ -4632,7 +4631,6 @@ background-repeat: no-repeat;\
 		else
 		{
 			this.ServerImagesWaitComplete = true;
-			var t = this;
 			this.OpenDocumentEndCallback();
 		}
 	};
