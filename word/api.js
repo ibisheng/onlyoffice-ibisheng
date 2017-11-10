@@ -6085,8 +6085,8 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
-		if (this.isDocumentLoadComplete || !this.WordControl.m_oLogicDocument || !this.ServerImagesWaitComplete ||
-			!this.ServerIdWaitComplete)
+		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete ||
+			!this.WordControl || !this.WordControl.m_oLogicDocument)
 			return;
 
 		if (0 == this.DocumentType)
