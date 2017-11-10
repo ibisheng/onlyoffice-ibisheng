@@ -1247,15 +1247,15 @@ ParaTab.prototype.Draw = function(X, Y, Context)
 				sChar      = '.';
 				nCharWidth = this.DotWidth;
 				break;
-			case Asc.c_oAscTabLeader.Hyphen:
+			case Asc.c_oAscTabLeader.Underscore:
 				sChar      = '_';
 				nCharWidth = this.UnderscoreWidth;
 				break;
-			case Asc.c_oAscTabLeader.MiddleDot:
+			case Asc.c_oAscTabLeader.Hyphen:
 				sChar      = '-';
 				nCharWidth = this.HyphenWidth;
 				break;
-			case Asc.c_oAscTabLeader.Underscore:
+			case Asc.c_oAscTabLeader.MiddleDot:
 				sChar      = '·';
 				nCharWidth = this.MiddleDotWidth;
 				break;

@@ -1211,7 +1211,11 @@ CTable.prototype.Set_Props = function(Props)
 				this.Set_PositionH(c_oAscHAnchor.Page, false, this.AnchorPosition.Calculate_X_Value(c_oAscHAnchor.Page));
 
 			if (undefined === Props.PositionV)
-				this.Set_PositionV(c_oAscVAnchor.Page, false, this.AnchorPosition.Calculate_Y_Value(c_oAscVAnchor.Page));
+			{
+				// Сдвигаемся на 1 twips вниз, чтобы не было пересечения с предыдущей строкой
+				var ValueY = AscCommon.CorrectMMToTwips(this.AnchorPosition.Calculate_Y_Value(c_oAscVAnchor.Page)) + AscCommon.TwipsToMM(1);
+				this.Set_PositionV(c_oAscVAnchor.Page, false, ValueY);
+			}
 
 			if (undefined === Props.TablePaddings)
 				this.Set_Distance(3.2, 0, 3.2, 0);

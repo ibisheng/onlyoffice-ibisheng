@@ -318,7 +318,8 @@ CSectionPr.prototype =
 
 	Set_Orientation : function(Orient, ApplySize)
 	{
-		if (this.PageSize.Orient !== Orient)
+		var _Orient = this.Get_Orientation();
+		if (_Orient !== Orient)
 		{
 			History.Add(new CChangesSectionPageOrient(this, this.PageSize.Orient, Orient));
 			this.PageSize.Orient = Orient;
@@ -347,7 +348,10 @@ CSectionPr.prototype =
 
     Get_Orientation : function()
     {
-        return this.PageSize.Orient;
+    	if (this.PageSize.W > this.PageSize.H)
+    		return Asc.c_oAscPageOrientation.PageLandscape;
+
+    	return Asc.c_oAscPageOrientation.PagePortrait;
     },
 
 	Set_Borders_Left : function(Border)

@@ -50,6 +50,7 @@ function ParaHyperlink()
     this.Value   = "";
     this.Visited = false;
     this.ToolTip = "";
+    this.Anchor  = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -229,12 +230,15 @@ ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 //-----------------------------------------------------------------------------------
 ParaHyperlink.prototype.Set_Visited = function(Value)
 {
-    this.Visited = Value;
+	this.SetVisited(Value);
 };
-
 ParaHyperlink.prototype.Get_Visited = function()
 {
     return this.Visited;
+};
+ParaHyperlink.prototype.SetVisited = function(isVisited)
+{
+	this.Visited = isVisited;
 };
 
 ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
@@ -242,9 +246,11 @@ ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
     History.Add(new CChangesHyperlinkToolTip(this, this.ToolTip, ToolTip));
     this.ToolTip = ToolTip;
 };
-
 ParaHyperlink.prototype.Get_ToolTip = function()
 {
+	if (this.Anchor)
+		return AscCommon.translateManager.getValue("Current Document");
+
     if ( null === this.ToolTip )
     {
         if ( "string" === typeof(this.Value) )
@@ -255,16 +261,35 @@ ParaHyperlink.prototype.Get_ToolTip = function()
     else
         return this.ToolTip;
 };
-
+ParaHyperlink.prototype.GetToolTip = function()
+{
+	return this.Get_ToolTip();
+};
 ParaHyperlink.prototype.Get_Value = function()
 {
     return this.Value;
 };
-
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
     History.Add(new CChangesHyperlinkValue(this, this.Value, Value));
     this.Value = Value;
+};
+ParaHyperlink.prototype.GetAnchor = function()
+{
+	return this.Anchor;
+};
+ParaHyperlink.prototype.SetAnchor = function(sBookmarkName)
+{
+	History.Add(new CChangesHyperlinkAnchor(this, this.Anchor, sBookmarkName));
+	this.Anchor = sBookmarkName;
+};
+ParaHyperlink.prototype.GetValue = function()
+{
+	return this.Get_Value();
+};
+ParaHyperlink.prototype.SetValue = function(sValue)
+{
+	this.Set_Value(sValue);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
@@ -278,6 +303,7 @@ ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
     // String : ToolTip
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
+	// String : Anchor
 
     Writer.WriteString2( this.Id );
     if(!(editor && editor.isDocumentEditor))
@@ -296,6 +322,8 @@ ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
     {
         Writer.WriteString2( this.Content[Index].Get_Id() );
     }
+
+	Writer.WriteString2(this.Anchor);
 };
 
 ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
@@ -305,6 +333,7 @@ ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
     // String : ToolTip
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
+	// String : Anchor
 
     this.Id      = Reader.GetString2();
     this.Value   = Reader.GetString2();
@@ -319,6 +348,8 @@ ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
         if ( null !== Element )
             this.Content.push( Element );
     }
+
+    this.Anchor = Reader.GetString2();
 };
 
 ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)

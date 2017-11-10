@@ -7291,7 +7291,7 @@ function CDrawingDocument()
 	{
 		this.InlineTextTrackEnabled = false;
 
-		this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
+		this.m_oWordControl.m_oLogicDocument.OnEndTextDrag(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
 		this.InlineTextTrack = null;
 		this.InlineTextTrackPage = -1;
 	}

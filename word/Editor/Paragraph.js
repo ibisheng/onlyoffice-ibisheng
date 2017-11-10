@@ -9278,6 +9278,9 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	{
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
 		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
+
+		if (oHyperlink.GetAnchor())
+			MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
@@ -11807,25 +11810,32 @@ Paragraph.prototype.Get_PagesCount = function()
 {
     return this.Pages.length;
 };
-Paragraph.prototype.Is_EmptyPage = function(CurPage)
+Paragraph.prototype.Is_EmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
     if (!this.Pages[CurPage] || this.Pages[CurPage].EndLine < this.Pages[CurPage].StartLine)
         return true;
 
+    if (true === bSkipEmptyLinesWithBreak
+		&& this.Pages[CurPage].EndLine === this.Pages[CurPage].StartLine
+		&& this.Lines[this.Pages[CurPage].EndLine]
+		&& this.Lines[this.Pages[CurPage].EndLine].Info & paralineinfo_Empty
+		&& this.Lines[this.Pages[CurPage].EndLine].Info & paralineinfo_BreakRealPage)
+    	return true;
+
     return false;
 };
-Paragraph.prototype.Check_FirstPage = function(CurPage)
+Paragraph.prototype.Check_FirstPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
-    if (true === this.Is_EmptyPage(CurPage))
+    if (true === this.Is_EmptyPage(CurPage, bSkipEmptyLinesWithBreak))
         return false;
 
-    return this.Check_EmptyPages(CurPage - 1);
+    return this.Check_EmptyPages(CurPage - 1, bSkipEmptyLinesWithBreak);
 };
-Paragraph.prototype.Check_EmptyPages = function(CurPage)
+Paragraph.prototype.Check_EmptyPages = function(CurPage, bSkipEmptyLinesWithBreak)
 {
     for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        if (true !== this.Is_EmptyPage(_CurPage))
+        if (true !== this.Is_EmptyPage(_CurPage, bSkipEmptyLinesWithBreak))
             return false;
     }
 
@@ -12160,6 +12170,10 @@ Paragraph.prototype.SetParagraphSpacing = function(Spacing)
 Paragraph.prototype.SetParagraphTabs = function(Tabs)
 {
 	this.Set_Tabs(Tabs);
+};
+Paragraph.prototype.GetParagraphTabs = function()
+{
+	return this.Get_CompiledPr2(false).ParaPr.Tabs;
 };
 Paragraph.prototype.SetParagraphIndent = function(Ind)
 {
@@ -13045,7 +13059,11 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 
 	if (null !== PageEndInfo)
 	{
-		this.Comments      = PageEndInfo.Comments;
+		for (var nIndex = 0, nCount = PageEndInfo.Comments.length; nIndex < nCount; ++nIndex)
+		{
+			this.AddComment(PageEndInfo.Comments[nIndex]);
+		}
+
 		this.ComplexFields = PageEndInfo.ComplexFields;
 	}
 	else

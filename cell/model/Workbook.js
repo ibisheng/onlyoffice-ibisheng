@@ -4138,7 +4138,7 @@
 		var targetCell = null;
 		for (var k = 0; k < wb.loadCells.length; ++k) {
 			var elem = wb.loadCells[k];
-			if (elem.nRow == row && elem.nCol == col) {
+			if (elem.nRow == row && elem.nCol == col && this === elem.ws) {
 				targetCell = elem;
 				break;
 			}
@@ -4187,7 +4187,7 @@
 		var targetCell = null;
 		for (var k = 0; k < wb.loadCells.length; ++k) {
 			var elem = wb.loadCells[k];
-			if (elem.nRow == row && elem.nCol == col) {
+			if (elem.nRow == row && elem.nCol == col && this === elem.ws) {
 				targetCell = elem;
 				break;
 			}
@@ -7102,7 +7102,7 @@
 					var targetCell = null;
 					for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 						var elem = wb.loadCells[k];
-						if (elem.nRow == i && elem.nCol == j) {
+						if (elem.nRow == i && elem.nCol == j && this.worksheet === elem.ws) {
 							targetCell = elem;
 							break;
 						}
@@ -7137,7 +7137,7 @@
 					var targetCell = null;
 					for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 						var elem = wb.loadCells[k];
-						if (elem.nRow == i && elem.nCol == j) {
+						if (elem.nRow == i && elem.nCol == j && this.worksheet === elem.ws) {
 							targetCell = elem;
 							break;
 						}
@@ -7217,7 +7217,7 @@
 						var targetCell = null;
 						for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 							var elem = wb.loadCells[k];
-							if (elem.nRow == i && elem.nCol == nCol) {
+							if (elem.nRow == i && elem.nCol == nCol && this.worksheet === elem.ws) {
 								targetCell = elem;
 								break;
 							}

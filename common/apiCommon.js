@@ -3814,8 +3814,8 @@
 	prot["put_Value"] = prot["asc_putValue"] = prot.asc_putValue;
 	prot["get_Pos"] = prot["asc_getPos"] = prot.asc_getPos;
 	prot["put_Pos"] = prot["asc_putPos"] = prot.asc_putPos;
-	prot["get_Leader"] = prot["asc_getPos"] = prot.asc_getLeader;
-	prot["put_Leader"] = prot["asc_putPos"] = prot.asc_putLeader;
+	prot["get_Leader"] = prot["asc_getLeader"] = prot.asc_getLeader;
+	prot["put_Leader"] = prot["asc_putLeader"] = prot.asc_putLeader;
 
 	window["Asc"]["asc_CParagraphTabs"] = window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
 	prot = asc_CParagraphTabs.prototype;

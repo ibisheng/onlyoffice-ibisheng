@@ -8173,12 +8173,12 @@ DrawingObjectsController.prototype =
         return oShape;
     },
 
-	GetSelectedText: function(bCleartText)
+	GetSelectedText: function(bCleartText, oPr)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.GetSelectedText(bCleartText);
+            return content.GetSelectedText(bCleartText, oPr);
         }
         else
         {

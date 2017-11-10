@@ -9962,7 +9962,7 @@
 		else
 		{
 			//var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
-			cellCoord = new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 );
+			cellCoord = [new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 )];
 		}
 		
 		
@@ -10002,7 +10002,7 @@
 				var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 				
 				
-				cellCoord = new AscCommon.asc_CRect( posX, posY, 0, 0 );
+				cellCoord = [new AscCommon.asc_CRect( posX, posY, 0, 0 )];
 				
 				specialPasteShowOptions.asc_setCellCoord(cellCoord);
 				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
@@ -10028,36 +10028,6 @@
 	};
 
 	WorksheetView.prototype.getSpecialPasteCoords = function(range, isVisible)
-	{
-		var disableCoords = function()
-		{
-			cellCoord._x = -1;
-			cellCoord._y = -1;
-		};
-
-		//TODO пересмотреть когда иконка вылезает за пределы области видимости
-		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
-		{
-			disableCoords();
-		}
-		else
-		{
-			var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
-			var offset = 3;
-			var widthIcon = 30 + offset;
-			var heightIcon = 22 + offset;
-
-			if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
-			{
-				disableCoords();
-			}
-		}
-
-		return cellCoord;
-	};
-
-	/*WorksheetView.prototype.getSpecialPasteCoords = function(range, isVisible)
 	{	
 		var disableCoords = function()
 		{
@@ -10074,40 +10044,24 @@
 		}
 		else
 		{
-			if (!isVisible)
-			{
-				var visibleRange = this.getVisibleRange();
-				var intersectionVisibleRange = visibleRange.intersection(range);
+			var visibleRange = this.getVisibleRange();
+			var intersectionVisibleRange = visibleRange.intersection(range);
 
-				if(intersectionVisibleRange)
-				{
-					cellCoord = [];
-					cellCoord[0] = this.getCellCoord(intersectionVisibleRange.c2, intersectionVisibleRange.r2);
-					cellCoord[1] = this.getCellCoord(range.c1, range.r1);
-				}
-				else
-				{
-					disableCoords();
-					cellCoord = [cellCoord];
-				}
+			if(intersectionVisibleRange)
+			{
+				cellCoord = [];
+				cellCoord[0] = this.getCellCoord(intersectionVisibleRange.c2, intersectionVisibleRange.r2);
+				cellCoord[1] = this.getCellCoord(range.c1, range.r1);
 			}
 			else
 			{
-				var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
-				var offset = 3;
-				var widthIcon = 30 + offset;
-				var heightIcon = 22 + offset;
-
-				if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
-				{
-					disableCoords();
-				}
+				disableCoords();
 				cellCoord = [cellCoord];
 			}
 		}
 		
 		return cellCoord;
-	};*/
+	};
 
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {

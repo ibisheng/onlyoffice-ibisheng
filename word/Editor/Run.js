@@ -2157,6 +2157,14 @@ ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
             }
             case para_Space:
             case para_Tab  : Str += " "; break;
+			case para_NewLine:
+			{
+				if (oPr && true === oPr.NewLine)
+				{
+					Str += '\r';
+				}
+				break;
+			}
 			case para_End:
 			{
 				if (oPr && true === oPr.NewLineParagraph)

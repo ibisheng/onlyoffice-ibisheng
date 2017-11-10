@@ -2720,6 +2720,34 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 43018);
 
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,25),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43000);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,25),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43000);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,20),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 42997);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,2),-1)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43007);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,2),-1)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43007);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,3),-3)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43006);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,4),-2)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43010);
+
 	});
 
 	test( "Test: \"WORKDAY.INTL\"", function () {

@@ -5479,13 +5479,25 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 
             if (null != this.Selection.Data && this.Selection.Data.Hyperlink)
             {
-                editor.sync_HyperlinkClickCallback(this.Selection.Data.Hyperlink.Get_Value());
-                this.Selection.Data.Hyperlink.Set_Visited(true);
+            	var oHyperlink = this.Selection.Data.Hyperlink;
+            	var sBookmarkName = oHyperlink.GetAnchor();
+            	var sValue        = oHyperlink.GetValue();
+            	if (sBookmarkName)
+				{
+					var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
+					if (oBookmark)
+						oBookmark[0].GoToBookmark();
+				}
+				else if (sValue)
+				{
+					editor.sync_HyperlinkClickCallback(sValue);
 
-                for (var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++)
-                    this.DrawingDocument.OnRecalculatePage(PageIdx, this.Pages[PageIdx]);
+					this.Selection.Data.Hyperlink.SetVisited(true);
+					for (var PageIdx = Item.Get_AbsolutePage(0); PageIdx < Item.Get_AbsolutePage(0) + Item.Get_PagesCount(); PageIdx++)
+						this.DrawingDocument.OnRecalculatePage(PageIdx, this.Pages[PageIdx]);
 
-                this.DrawingDocument.OnEndRecalculate(false, true);
+					this.DrawingDocument.OnEndRecalculate(false, true);
+				}
             }
             else if (null !== this.Selection.Data && this.Selection.Data.PageRef)
 			{
@@ -5631,7 +5643,7 @@ CDocument.prototype.SelectAll = function()
 
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
+CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
 {
     if (true === this.Comments.Is_Use())
     {
@@ -5691,7 +5703,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
             {
                 this.TurnOff_Recalculate();
                 this.TurnOff_InterfaceEvents();
-                this.Remove(1, false, false, false);
+                this.Remove(1, false, false, true);
                 this.TurnOn_Recalculate(false);
                 this.TurnOn_InterfaceEvents(false);
 
@@ -6508,6 +6520,8 @@ CDocument.prototype.OnKeyDown = function(e)
 
                 var TempXY = this.GetCursorPosXY();
 
+                this.Controller = this.LogicDocumentController;
+
                 var X = TempXY.X;
                 var Y = TempXY.Y;
 
@@ -6618,6 +6632,8 @@ CDocument.prototype.OnKeyDown = function(e)
                 if (this.Pages.length > 0)
                 {
                     var TempXY = this.GetCursorPosXY();
+
+					this.Controller = this.LogicDocumentController;
 
                     var X = TempXY.X;
                     var Y = TempXY.Y;
@@ -15523,7 +15539,7 @@ CDocument.prototype.SelectContentControl = function(Id)
 };
 CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 {
-	return this.On_DragTextEnd(NearestPos, isCopy);
+	return this.OnEndTextDrag(NearestPos, isCopy);
 };
 CDocument.prototype.AddContentControl = function(nContentControlType)
 {

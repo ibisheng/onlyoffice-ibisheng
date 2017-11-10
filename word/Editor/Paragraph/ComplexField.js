@@ -283,7 +283,7 @@ CComplexField.prototype.Update = function()
 			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
 
-			var oTabs = new CParaTabs();
+			var oTabs = oSrcParagraph.GetParagraphTabs().Copy();
 			oTabs.Add(new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot));
 			oPara.Set_Tabs(oTabs);
 
@@ -291,7 +291,19 @@ CComplexField.prototype.Update = function()
 			oTabRun.Add_ToContent(0, new ParaTab());
 
 			// TODO: ParaEnd
-			oPara.Add_ToContent(oPara.Content.length - 1, oTabRun);
+
+			var oHyperlink = new ParaHyperlink();
+			for (var nParaPos = 0, nParaCount = oPara.Content.length - 1; nParaPos < nParaCount; ++nParaPos)
+			{
+				oHyperlink.Add_ToContent(nParaPos, oPara.Content[0]);
+				oPara.Remove_FromContent(0, 1);
+			}
+			oHyperlink.SetAnchor(sBookmarkName);
+
+			// TODO: ParaEnd
+			//oPara.Add_ToContent(oPara.Content.length - 1, oTabRun);
+
+			oHyperlink.Add_ToContent(oHyperlink.Content.length, oTabRun);
 
 			var oPageRefRun = new ParaRun(oPara, false);
 
@@ -310,7 +322,9 @@ CComplexField.prototype.Update = function()
 			}
 			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this));
 
-			oPara.Add_ToContent(oPara.Content.length - 1, oPageRefRun);
+			//oPara.Add_ToContent(oPara.Content.length - 1, oPageRefRun);
+			oHyperlink.Add_ToContent(oHyperlink.Content.length, oPageRefRun);
+			oPara.Add_ToContent(oPara.Content.length - 1, oHyperlink);
 			oSelectedContent.Add(new CSelectedElement(oPara, true));
 		}
 

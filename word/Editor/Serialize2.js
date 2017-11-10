@@ -4500,13 +4500,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var oThis = this;
         var sLink = oHyperlink.Get_Value();
         var sTooltip = oHyperlink.Get_ToolTip();
-        var sAnchor = null;
-        var nAnchorIndex = sLink.indexOf("#");
-        if(-1 != nAnchorIndex)
-        {
-			sAnchor = sLink.substring(nAnchorIndex + 1);
-            sLink = sLink.substring(0, nAnchorIndex);
-        }
+		var sAnchor = oHyperlink.GetAnchor();
         //Link
         this.memory.WriteByte(c_oSer_HyperlinkType.Link);
         this.memory.WriteString2(sLink);
@@ -7562,7 +7556,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         else if(c_oSerProp_pPrType.Tab_Item_Pos === type)
             tab.Pos = this.bcr.ReadDouble();
 		else if(c_oSerProp_pPrType.Tab_Item_Leader === type)
-			tab.Leader = this.bcr.GetUChar();
+			tab.Leader = this.stream.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -7648,7 +7642,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
                 oSectPr.Set_PageSize(oSize.W, oSize.H);
             }
             if(null != oSize.Orientation)
-                oSectPr.Set_Orientation(oSize.Orientation);
+                oSectPr.Set_Orientation(oSize.Orientation, false);
         }
         else if( c_oSerProp_secPrType.pgMar === type )
         {
@@ -9410,11 +9404,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		    });
 		    if (null != oHyperlinkObj.Link && "" != oHyperlinkObj.Link) {
 		        var sValue = oHyperlinkObj.Link;
-		        if (null != oHyperlinkObj.Anchor)
-		            sValue += "#" + oHyperlinkObj.Anchor;
 		        oNewHyperlink.Set_Value(sValue);
 		        if (null != oHyperlinkObj.Tooltip)
 		            oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
+				if (null != oHyperlinkObj.Anchor)
+					oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
 		        oParStruct.addToContent(oNewHyperlink);
 		    }            
             oNewHyperlink.Check_Content();
