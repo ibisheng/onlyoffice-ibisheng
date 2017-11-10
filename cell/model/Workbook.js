@@ -6876,36 +6876,23 @@
 		var aResult = [];
 		if(null == sText && null == aText)
 			sText = "";
-		var color;
-		var cellfont;
+		var oNewItem, cellfont;
 		var xfs = this.getCompiledStyle();
 		if(null != xfs && null != xfs.font)
 			cellfont = xfs.font;
 		else
 			cellfont = g_oDefaultFormat.Font;
 		if(null != sText){
-			var oNewItem = new AscCommonExcel.Fragment();
+			oNewItem = new AscCommonExcel.Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.getColor();
-			if(color instanceof AscCommonExcel.ThemeColor)
-			{
-				//для посещенных гиперссылок
-				if(AscCommonExcel.g_nColorHyperlink == color.theme && null == color.tint)
-				{
-					var hyperlink = this.ws.hyperlinkManager.getByCell(this.nRow, this.nCol);
-					if(null != hyperlink && hyperlink.data.getVisited())
-					{
-						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-					}
-				}
-			}
+			oNewItem.checkVisitedHyperlink(this.nRow, this.nCol, this.ws.hyperlinkManager);
 			oNewItem.format.setSkip(false);
 			oNewItem.format.setRepeat(false);
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
-				var oNewItem = new AscCommonExcel.Fragment();
+				oNewItem = new AscCommonExcel.Fragment();
 				var oCurtext = aText[i];
 				if(null != oCurtext.text)
 				{
@@ -6924,19 +6911,7 @@
 						}
 					}
 					oNewItem.format = oCurFormat;
-					color = oNewItem.format.getColor();
-					if(color instanceof AscCommonExcel.ThemeColor)
-					{
-						//для посещенных гиперссылок
-						if(AscCommonExcel.g_nColorHyperlink == color.theme && null == color.tint)
-						{
-							var hyperlink = this.ws.hyperlinkManager.getByCell(this.nRow, this.nCol);
-							if(null != hyperlink && hyperlink.data.getVisited())
-							{
-								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-							}
-						}
-					}
+					oNewItem.checkVisitedHyperlink(this.nRow, this.nCol, this.ws.hyperlinkManager);
 					aResult.push(oNewItem);
 				}
 			}
