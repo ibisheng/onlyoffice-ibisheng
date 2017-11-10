@@ -1834,7 +1834,7 @@ CDLbl.prototype =
         if(this.txBody)
         {
             var bodyPr = this.getBodyPr();
-            var max_box_width = this.getMaxWidth(bodyPr);/*�������� ����������������� ����� ����� ��������*/
+            var max_box_width = this.getMaxWidth(bodyPr);/*получено экспериментальным путем нужно уточнить*/
             var max_content_width = max_box_width - 2*SCALE_INSET_COEFF;
 
             var content = this.txBody.content;

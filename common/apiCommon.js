@@ -121,6 +121,12 @@
 		View    : 4
 	};
 
+	var c_oLicenseMode = {
+		None: 0,
+		Trial: 1,
+		Developer: 2
+	};
+
 	/** @constructor */
 	function asc_CSignatureLine()
 	{
@@ -163,8 +169,8 @@
 	 */
 	function asc_CAscEditorPermissions() {
 		this.licenseType = c_oLicenseResult.Error;
+		this.licenseMode = c_oLicenseMode.None;
 		this.isLight = false;
-		this.trial = false;
 		this.rights = c_oRights.None;
 
 		this.canCoAuthoring = true;
@@ -202,8 +208,8 @@
 	asc_CAscEditorPermissions.prototype.asc_getIsLight = function () {
 		return this.isLight;
 	};
-	asc_CAscEditorPermissions.prototype.asc_getTrial = function () {
-		return this.trial;
+	asc_CAscEditorPermissions.prototype.asc_getLicenseMode = function () {
+		return this.licenseMode;
 	};
 	asc_CAscEditorPermissions.prototype.asc_getRights = function () {
 		return this.rights;
@@ -224,8 +230,8 @@
 	asc_CAscEditorPermissions.prototype.setIsLight = function (v) {
 		this.isLight = v;
 	};
-	asc_CAscEditorPermissions.prototype.setTrial = function (v) {
-		this.trial = v;
+	asc_CAscEditorPermissions.prototype.setLicenseMode = function (v) {
+		this.licenseMode = v;
 	};
 	asc_CAscEditorPermissions.prototype.setRights = function (v) {
 		this.rights = v;
@@ -1412,21 +1418,35 @@
 	};
 
 	/** @constructor */
-	function asc_CParagraphTab(Pos, Value) {
-		this.Pos = Pos;
-		this.Value = Value;
+	function asc_CParagraphTab(Pos, Value, Leader)
+	{
+		this.Pos    = Pos;
+		this.Value  = Value;
+		this.Leader = Leader;
 	}
-
-	asc_CParagraphTab.prototype = {
-		asc_getValue: function () {
-			return this.Value;
-		}, asc_putValue: function (v) {
-			this.Value = v;
-		}, asc_getPos: function () {
-			return this.Pos;
-		}, asc_putPos: function (v) {
-			this.Pos = v;
-		}
+	asc_CParagraphTab.prototype.asc_getValue = function()
+	{
+		return this.Value;
+	};
+	asc_CParagraphTab.prototype.asc_putValue = function(v)
+	{
+		this.Value = v;
+	};
+	asc_CParagraphTab.prototype.asc_getPos = function()
+	{
+		return this.Pos;
+	};
+	asc_CParagraphTab.prototype.asc_putPos = function(v)
+	{
+		this.Pos = v;
+	};
+	asc_CParagraphTab.prototype.asc_getLeader = function()
+	{
+		return this.Leader;
+	};
+	asc_CParagraphTab.prototype.asc_putLeader = function(v)
+	{
+		this.Leader = v;
 	};
 
 	/** @constructor */
@@ -1436,7 +1456,7 @@
 		if (undefined != obj) {
 			var Count = obj.Tabs.length;
 			for (var Index = 0; Index < Count; Index++) {
-				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value));
+				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value, obj.Tabs[Index].Leader));
 			}
 		}
 	}
@@ -2918,6 +2938,7 @@
 		this.Mode = null;
 		this.Permissions = null;
 		this.Lang = null;
+		this.OfflineApp = false;
 	}
 
 	prot = asc_CDocInfo.prototype;
@@ -2957,10 +2978,10 @@
 	prot.put_Token = prot.asc_putToken = function (v) {
 		this.Token = v;
 	};
-	prot.get_OfflineApp = prot.asc_getOfflineApp = function () {
+	prot.get_OfflineApp = function () {
 		return this.OfflineApp;
 	};
-	prot.put_OfflineApp = prot.asc_putOfflineApp = function (v) {
+	prot.put_OfflineApp = function (v) {
 		this.OfflineApp = v;
 	};
 	prot.get_UserId = prot.asc_getUserId = function () {
@@ -3548,6 +3569,12 @@
 	prot['Comment'] = prot.Comment;
 	prot['View'] = prot.View;
 
+	window['Asc']['c_oLicenseMode'] = window['Asc'].c_oLicenseMode = c_oLicenseMode;
+	prot = c_oLicenseMode;
+	prot['None'] = prot.None;
+	prot['Trial'] = prot.Trial;
+	prot['Developer'] = prot.Developer;
+
 	window["AscCommon"]["asc_CSignatureLine"] = window["AscCommon"].asc_CSignatureLine = asc_CSignatureLine;
 	prot = asc_CSignatureLine.prototype;
 	prot["asc_getId"] = prot.asc_getId;
@@ -3577,7 +3604,7 @@
 	prot["asc_getAutosaveMinInterval"] = prot.asc_getAutosaveMinInterval;
 	prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
 	prot["asc_getIsLight"] = prot.asc_getIsLight;
-	prot["asc_getTrial"] = prot.asc_getTrial;
+	prot["asc_getLicenseMode"] = prot.asc_getLicenseMode;
 	prot["asc_getRights"] = prot.asc_getRights;
 	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
 	prot["asc_getBuildNumber"] = prot.asc_getBuildNumber;
@@ -3787,6 +3814,8 @@
 	prot["put_Value"] = prot["asc_putValue"] = prot.asc_putValue;
 	prot["get_Pos"] = prot["asc_getPos"] = prot.asc_getPos;
 	prot["put_Pos"] = prot["asc_putPos"] = prot.asc_putPos;
+	prot["get_Leader"] = prot["asc_getLeader"] = prot.asc_getLeader;
+	prot["put_Leader"] = prot["asc_putLeader"] = prot.asc_putLeader;
 
 	window["Asc"]["asc_CParagraphTabs"] = window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
 	prot = asc_CParagraphTabs.prototype;
@@ -4195,8 +4224,6 @@
 	prot["put_Format"] = prot["asc_putFormat"] = prot.asc_putFormat;
 	prot["get_VKey"] = prot["asc_getVKey"] = prot.asc_getVKey;
 	prot["put_VKey"] = prot["asc_putVKey"] = prot.asc_putVKey;
-	prot["get_OfflineApp"] = prot["asc_getOfflineApp"] = prot.asc_getOfflineApp;
-	prot["put_OfflineApp"] = prot["asc_putOfflineApp"] = prot.asc_putOfflineApp;
 	prot["get_UserId"] = prot["asc_getUserId"] = prot.asc_getUserId;
 	prot["get_UserName"] = prot["asc_getUserName"] = prot.asc_getUserName;
 	prot["get_Options"] = prot["asc_getOptions"] = prot.asc_getOptions;

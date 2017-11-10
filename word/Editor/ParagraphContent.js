@@ -181,7 +181,7 @@ function CRunElementBase()
 CRunElementBase.prototype.Type             = para_RunBase;
 CRunElementBase.prototype.Get_Type         = function()
 {
-	return para_RunBase;
+	return this.Type;
 };
 CRunElementBase.prototype.Draw             = function(X, Y, Context, PDSE)
 {
@@ -1214,90 +1214,108 @@ var tab_Center = 0x03;
 
 var tab_Symbol = 0x0022;//0x2192;
 
-// Класс ParaTab
+/**
+ * Класс представляющий элемент табуляции.
+ * @constructor
+ * @extends {CRunElementBase}
+ */
 function ParaTab()
 {
-    this.TabType = tab_Left;
+	CRunElementBase.call(this);
 
-    this.Width        = 0;
-    this.WidthVisible = 0;
-    this.RealWidth    = 0;
+	this.Width        = 0;
+	this.WidthVisible = 0;
+	this.RealWidth    = 0;
+
+	this.DotWidth        = 0;
+	this.UnderscoreWidth = 0;
+	this.HyphenWidth     = 0;
+	this.Leader          = Asc.c_oAscTabLeader.None;
 }
 
-ParaTab.prototype =
+ParaTab.prototype = Object.create(CRunElementBase.prototype);
+ParaTab.prototype.constructor = ParaTab;
+ParaTab.prototype.Type = para_Tab;
+ParaTab.prototype.Draw = function(X, Y, Context)
 {
-    Type : para_Tab,
+	if (this.WidthVisible > 0.01)
+	{
+		var sChar = null, nCharWidth = 0;
+		switch (this.Leader)
+		{
+			case Asc.c_oAscTabLeader.Dot:
+				sChar      = '.';
+				nCharWidth = this.DotWidth;
+				break;
+			case Asc.c_oAscTabLeader.Underscore:
+				sChar      = '_';
+				nCharWidth = this.UnderscoreWidth;
+				break;
+			case Asc.c_oAscTabLeader.Hyphen:
+				sChar      = '-';
+				nCharWidth = this.HyphenWidth;
+				break;
+			case Asc.c_oAscTabLeader.MiddleDot:
+				sChar      = '·';
+				nCharWidth = this.MiddleDotWidth;
+				break;
+		}
 
-    Get_Type : function()
-    {
-        return para_Tab;
-    },
-    
-    Draw : function(X,Y,Context)
-    {
-        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
-        {
-            var X0 = this.Width / 2 - this.RealWidth / 2;
+		if (null !== sChar && nCharWidth > 0.001)
+		{
+			Context.SetFontSlot(fontslot_ASCII, 1);
+			var nCharsCount = Math.floor(this.WidthVisible / nCharWidth);
 
-            Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+			var _X = X + (this.WidthVisible - nCharsCount * nCharWidth) / 2;
+			for (var nIndex = 0; nIndex < nCharsCount; ++nIndex, _X += nCharWidth)
+				Context.FillText(_X, Y, sChar);
+		}
+	}
 
-            if ( X0 > 0 )
-                Context.FillText2( X + X0, Y, String.fromCharCode( tab_Symbol ), 0, this.Width );
-            else
-                Context.FillText2( X, Y, String.fromCharCode( tab_Symbol ), this.RealWidth - this.Width, this.Width );
+	if (editor && editor.ShowParaMarks)
+	{
+		var X0 = this.Width / 2 - this.RealWidth / 2;
 
-        }
-    },
+		Context.SetFont({FontFamily : {Name : "ASCW3", Index : -1}, FontSize : 10, Italic : false, Bold : false});
 
-    Measure : function (Context)
-    {
-        Context.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-        this.RealWidth = Context.Measure( String.fromCharCode( tab_Symbol ) ).Width;
-    },
-
-    Get_Width : function()
-    {
-        return this.Width;
-    },
-
-    Get_WidthVisible : function()
-    {
-        return this.WidthVisible;
-    },
-
-    Set_WidthVisible : function(WidthVisible)
-    {
-        this.WidthVisible = WidthVisible;
-    },
-
-    Is_RealContent : function()
-    {
-        return true;
-    },
-
-    Can_AddNumbering : function()
-    {
-        return true;
-    },
-
-    Copy : function()
-    {
-        return new ParaTab();
-    },
-
-    Write_ToBinary : function(Writer)
-    {
-        // Long   : Type
-        // Long   : TabType
-        Writer.WriteLong( para_Tab );
-        Writer.WriteLong( this.TabType );
-    },
-
-    Read_FromBinary : function(Reader)
-    {
-        this.TabType = Reader.GetLong();
-    }
+		if (X0 > 0)
+			Context.FillText2(X + X0, Y, String.fromCharCode(tab_Symbol), 0, this.Width);
+		else
+			Context.FillText2(X, Y, String.fromCharCode(tab_Symbol), this.RealWidth - this.Width, this.Width);
+	}
 };
+ParaTab.prototype.Measure = function(Context)
+{
+	this.DotWidth        = Context.Measure(".").Width;
+	this.UnderscoreWidth = Context.Measure("_").Width;
+	this.HyphenWidth     = Context.Measure("-").Width * 1.5;
+	this.MiddleDotWidth  = Context.Measure("·").Width;
+
+	Context.SetFont({FontFamily : {Name : "ASCW3", Index : -1}, FontSize : 10, Italic : false, Bold : false});
+	this.RealWidth = Context.Measure(String.fromCharCode(tab_Symbol)).Width;
+};
+ParaTab.prototype.SetLeader = function(nLeaderType)
+{
+	this.Leader = nLeaderType;
+};
+ParaTab.prototype.Get_Width = function()
+{
+	return this.Width;
+};
+ParaTab.prototype.Get_WidthVisible = function()
+{
+	return this.WidthVisible;
+};
+ParaTab.prototype.Set_WidthVisible = function(WidthVisible)
+{
+	this.WidthVisible = WidthVisible;
+};
+ParaTab.prototype.Copy = function()
+{
+	return new ParaTab();
+};
+
+
 
 // Класс ParaPageNum
 function ParaPageNum()

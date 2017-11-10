@@ -1227,9 +1227,8 @@
 						}
 						else if (data.type === "onExternalPluginMessage")
 						{
-							var _iframe = document.getElementById("plugin_iframe");
-							if (_iframe)
-								_iframe.contentWindow.postMessage(event.data, "*");
+							if (window.g_asc_plugins)
+								window.g_asc_plugins.sendToAllPlugins(event.data);
 						}
 					} catch (err)
 					{
@@ -2767,6 +2766,27 @@
 
 		return Positions;
 	};
+
+
+	/**
+	 * Корректируем заданное значение в миллиметрах к ближайшему целому значению в твипсах
+	 * @param mm - заданное значение в миллиметрах
+	 * @returns {number} - получаем новое значение в миллиметрах, являющееся целым значением в твипсах
+	 */
+	function CorrectMMToTwips(mm)
+	{
+		return (((mm * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
+	}
+	/**
+	 * Получаем значение в миллиметрах заданного количества твипсов
+	 * @param nTwips[=1] - значение в твипсах
+	 * @returns {number}
+	 */
+	function TwipsToMM(nTwips)
+	{
+		return (null !== nTwips && undefined !== nTwips ? nTwips : 1) * 25.4 / 20 / 72;
+	}
+
 	var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 
 	function getUserColorById(userId, userName, isDark, isNumericValue)
@@ -3211,6 +3231,9 @@
 	window["AscCommon"].CLock = CLock;
 	window["AscCommon"].CContentChanges = CContentChanges;
 	window["AscCommon"].CContentChangesElement = CContentChangesElement;
+
+	window["AscCommon"].CorrectMMToTwips = CorrectMMToTwips;
+	window["AscCommon"].TwipsToMM = TwipsToMM;
 
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;

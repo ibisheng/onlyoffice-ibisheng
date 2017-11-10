@@ -952,6 +952,14 @@
 		Bottom : 1
 	};
 
+	var c_oAscTabLeader = {
+		Dot        : 0x00,
+		Hyphen     : 0x01,
+		MiddleDot  : 0x02,
+		None       : 0x03,
+		Underscore : 0x04
+	};
+
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
 		[1, 720, "DOS-720", "Arabic (OEM 720)"],
@@ -1692,6 +1700,13 @@
 	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
 	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
 
+	prot = window['Asc']['c_oAscTabLeader'] = window['Asc'].c_oAscTabLeader = c_oAscTabLeader;
+	prot["None"]       = c_oAscTabLeader.None;
+	prot["Dot"]        = c_oAscTabLeader.Dot;
+	prot["Hyphen"]     = c_oAscTabLeader.Hyphen;
+	prot["MiddleDot"]  = c_oAscTabLeader.MiddleDot;
+	prot["Underscore"] = c_oAscTabLeader.Underscore;
+
 	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
 	prot['None'] = c_oAscRestrictionType.None;
 	prot['OnlyForms'] = c_oAscRestrictionType.OnlyForms;
@@ -1708,10 +1723,6 @@
 	window["AscCommon"].c_oAscChartDefines          = c_oAscChartDefines;
 	window["AscCommon"].c_oAscStyleImage            = c_oAscStyleImage;
 	window["AscCommon"].c_oAscLineDrawingRule       = c_oAscLineDrawingRule;
-	window["AscCommon"].align_Right                 = align_Right;
-	window["AscCommon"].align_Left                  = align_Left;
-	window["AscCommon"].align_Center                = align_Center;
-	window["AscCommon"].align_Justify               = align_Justify;
 	window["AscCommon"].vertalign_Baseline          = vertalign_Baseline;
 	window["AscCommon"].vertalign_SuperScript       = vertalign_SuperScript;
 	window["AscCommon"].vertalign_SubScript         = vertalign_SubScript;
@@ -1787,6 +1798,11 @@
 	window["AscCommon"].contentchanges_Remove                 = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
+
+	window['AscCommon']['align_Right'] = window['AscCommon'].align_Right = align_Right;
+	window['AscCommon']['align_Left'] = window['AscCommon'].align_Left = align_Left;
+	window['AscCommon']['align_Center'] = window['AscCommon'].align_Center = align_Center;
+	window['AscCommon']['align_Justify'] = window['AscCommon'].align_Justify = align_Justify;
 	
 	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
 	prot = c_oSpecialPasteProps;

@@ -8462,14 +8462,17 @@ Paragraph.prototype.Set_Spacing = function(Spacing, bDeleteUndefined)
 
 	if (( undefined != Spacing.Line || true === bDeleteUndefined ) && this.Pr.Spacing.Line !== Spacing.Line)
 	{
-		// TODO: Здесь делается корректировка значения, потому что при работе с буквицей могут возникать значения,
-		//       которые неправильно записываются в файл, т.к. в docx это значение имеет тип Twips. Надо бы такую
-		//       корректировку вынести в отдельную функцию и добавить ко всем параметрам.
-
 		var LineValue = Spacing.Line;
-		if ((undefined !== Spacing.LineRule && Spacing.LineRule !== linerule_Auto)
-			|| (undefined === Spacing.LineRule && (linerule_Exact === this.Pr.Spacing.LineRule || linerule_AtLeast === this.Pr.Spacing.LineRule)))
-			LineValue = ((Spacing.Line / 25.4 * 72 * 20) | 0) * 25.4 / 20 / 72;
+
+		if (undefined !== Spacing.Line)
+		{
+			// TODO: Здесь делается корректировка значения, потому что при работе с буквицей могут возникать значения,
+			//       которые неправильно записываются в файл, т.к. в docx это значение имеет тип Twips. Надо бы такую
+			//       корректировку вынести в отдельную функцию и добавить ко всем параметрам.
+			if ((undefined !== Spacing.LineRule && Spacing.LineRule !== linerule_Auto)
+				|| (undefined === Spacing.LineRule && (linerule_Exact === this.Pr.Spacing.LineRule || linerule_AtLeast === this.Pr.Spacing.LineRule)))
+				LineValue = AscCommon.CorrectMMToTwips(((Spacing.Line / 25.4 * 72 * 20) | 0) * 25.4 / 20 / 72);
+		}
 
 		this.private_AddPrChange();
 		History.Add(new CChangesParagraphSpacingLine(this, this.Pr.Spacing.Line, LineValue));
@@ -9254,6 +9257,19 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	var oInfo = new CSelectedElementsInfo();
 	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
 
+	var bPageRefLink = false;
+	var arrComplexFields = this.GetComplexFieldsByXY(X, Y, CurPage);
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = arrComplexFields[nIndex];
+		var oInstruction  = oComplexField.GetInstruction();
+		if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType() && oInstruction.IsHyperlink())
+		{
+			bPageRefLink = true;
+			break;
+		}
+	}
+
 	var oContentControl = oInfo.GetInlineLevelSdt();
 	var oHyperlink      = oInfo.Get_Hyperlink();
 	if (oContentControl)
@@ -9265,6 +9281,9 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	{
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
 		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
+
+		if (oHyperlink.GetAnchor())
+			MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
@@ -9275,7 +9294,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	else
 		MMData.Type = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-	if (null != oHyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
+	if ((null != oHyperlink || bPageRefLink) && true === AscCommon.global_keyboardEvent.CtrlKey)
 		this.DrawingDocument.SetCursorType("pointer", MMData);
 	else
 		this.DrawingDocument.SetCursorType("default", MMData);
@@ -11794,25 +11813,32 @@ Paragraph.prototype.Get_PagesCount = function()
 {
     return this.Pages.length;
 };
-Paragraph.prototype.Is_EmptyPage = function(CurPage)
+Paragraph.prototype.Is_EmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
     if (!this.Pages[CurPage] || this.Pages[CurPage].EndLine < this.Pages[CurPage].StartLine)
         return true;
 
+    if (true === bSkipEmptyLinesWithBreak
+		&& this.Pages[CurPage].EndLine === this.Pages[CurPage].StartLine
+		&& this.Lines[this.Pages[CurPage].EndLine]
+		&& this.Lines[this.Pages[CurPage].EndLine].Info & paralineinfo_Empty
+		&& this.Lines[this.Pages[CurPage].EndLine].Info & paralineinfo_BreakRealPage)
+    	return true;
+
     return false;
 };
-Paragraph.prototype.Check_FirstPage = function(CurPage)
+Paragraph.prototype.Check_FirstPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
-    if (true === this.Is_EmptyPage(CurPage))
+    if (true === this.Is_EmptyPage(CurPage, bSkipEmptyLinesWithBreak))
         return false;
 
-    return this.Check_EmptyPages(CurPage - 1);
+    return this.Check_EmptyPages(CurPage - 1, bSkipEmptyLinesWithBreak);
 };
-Paragraph.prototype.Check_EmptyPages = function(CurPage)
+Paragraph.prototype.Check_EmptyPages = function(CurPage, bSkipEmptyLinesWithBreak)
 {
     for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        if (true !== this.Is_EmptyPage(_CurPage))
+        if (true !== this.Is_EmptyPage(_CurPage, bSkipEmptyLinesWithBreak))
             return false;
     }
 
@@ -12148,6 +12174,10 @@ Paragraph.prototype.SetParagraphTabs = function(Tabs)
 {
 	this.Set_Tabs(Tabs);
 };
+Paragraph.prototype.GetParagraphTabs = function()
+{
+	return this.Get_CompiledPr2(false).ParaPr.Tabs;
+};
 Paragraph.prototype.SetParagraphIndent = function(Ind)
 {
 	var NumPr = this.Numbering_Get();
@@ -12385,6 +12415,11 @@ Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
 	return arrComplexFields;
 };
+Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldPos)
+{
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
+	return this.GetComplexFieldsByPos(SearchPosXY.Pos, bReturnFieldPos);
+};
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
 {
 	var nOutlineLvl = this.GetOutlineLvl();
@@ -12418,6 +12453,14 @@ Paragraph.prototype.AddBookmarkForTOC = function()
 		return;
 
 	var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+
+	var sId   = oBookmarksManager.GetNewBookmarkId();
+	var sName = oBookmarksManager.GetNewBookmarkNameTOC();
+
+	this.Add_ToContent(0, new CParagraphBookmark(true, sId, sName));
+	this.Add_ToContent(this.Content.length - 1, new CParagraphBookmark(false, sId, sName));
+
+	return sName;
 };
 Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, isStartSelection)
 {
@@ -12445,6 +12488,45 @@ Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, is
 	oParent.Add_ToContent(oRunPos + 1, oBookmarkChar);
 
 	return true;
+};
+/**
+ * Проверяем есть ли у нас в заданной точке сложное поле типа PAGEREF с флагом hyperlink = true
+ * @param X
+ * @param Y
+ * @param CurPage
+ * @returns {CComplexField?}
+ */
+Paragraph.prototype.CheckPageRefLink = function(X, Y, CurPage)
+{
+	var arrComplexFields = this.GetComplexFieldsByXY(X, Y, CurPage);
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oComplexField = arrComplexFields[nIndex];
+		var oInstruction  = oComplexField.GetInstruction();
+		if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType() && oInstruction.IsHyperlink())
+			return oComplexField;
+	}
+
+	return null;
+};
+/**
+ * Получаем абсолютное значение первой не пустой страницы
+ * @returns {number}
+ */
+Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
+{
+	var nPagesCount = this.Pages.length;
+	var nCurPage    = 0;
+
+	while (this.Is_EmptyPage(nCurPage))
+	{
+		if (nCurPage >= nPagesCount - 1)
+			break;
+
+		nCurPage++;
+	}
+
+	return this.Get_AbsolutePage(nCurPage);
 };
 
 var pararecalc_0_All  = 0;
@@ -12980,7 +13062,11 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 
 	if (null !== PageEndInfo)
 	{
-		this.Comments      = PageEndInfo.Comments;
+		for (var nIndex = 0, nCount = PageEndInfo.Comments.length; nIndex < nCount; ++nIndex)
+		{
+			this.AddComment(PageEndInfo.Comments[nIndex]);
+		}
+
 		this.ComplexFields = PageEndInfo.ComplexFields;
 	}
 	else

@@ -1520,6 +1520,26 @@
 		}
 		return oResult;
 	};
+	/**
+	 * Find and replace text.
+	 * @param {Object} oProperties The properties for find and replace.
+	 * @param {string} oProperties.searchString Search string.
+	 * @param {string} oProperties.replaceString Replacement string.
+	 * @param {string} [oProperties.matchCase=true]
+	 *
+	 */
+	ApiDocument.prototype.SearchAndReplace = function(oProperties)
+	{
+		var sSearch     = oProperties["searchString"];
+		var sReplace    = oProperties["replaceString"];
+		var isMatchCase = undefined !== oProperties["matchCase"] ? oProperties.matchCase : true;
+
+		var oSearchEngine = this.Document.Search(sSearch, {MatchCase : isMatchCase});
+		if (!oSearchEngine)
+			return;
+
+		this.Document.Search_Replace(sReplace, true, null, false);
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -4669,6 +4689,7 @@
 	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
 	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
 	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
+	ApiDocument.prototype["SearchAndReplace"]        = ApiDocument.prototype.SearchAndReplace;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;

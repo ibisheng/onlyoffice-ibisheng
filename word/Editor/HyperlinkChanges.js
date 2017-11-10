@@ -41,6 +41,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_Value]      = CChangesHyperli
 AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_ToolTip]    = CChangesHyperlinkToolTip;
 AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_AddItem]    = CChangesHyperlinkAddItem;
 AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_RemoveItem] = CChangesHyperlinkRemoveItem;
+AscDFH.changesFactory[AscDFH.historyitem_Hyperlink_Anchor]     = CChangesHyperlinkAnchor;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -55,6 +56,7 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Hyperlink_RemoveItem] = [
 	AscDFH.historyitem_Hyperlink_AddItem,
 	AscDFH.historyitem_Hyperlink_RemoveItem
 ];
+AscDFH.changesRelationMap[AscDFH.historyitem_Hyperlink_Anchor]     = [AscDFH.historyitem_Hyperlink_Anchor];
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -218,4 +220,19 @@ CChangesHyperlinkRemoveItem.prototype.IsRelated = function(oChanges)
 CChangesHyperlinkRemoveItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesHyperlinkAddItem);
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringValue}
+ */
+function CChangesHyperlinkAnchor(Class, Old, New, Color)
+{
+	AscDFH.CChangesBaseStringValue.call(this, Class, Old, New, Color);
+}
+CChangesHyperlinkAnchor.prototype = Object.create(AscDFH.CChangesBaseStringValue.prototype);
+CChangesHyperlinkAnchor.prototype.constructor = CChangesHyperlinkAnchor;
+CChangesHyperlinkAnchor.prototype.Type = AscDFH.historyitem_Hyperlink_Anchor;
+CChangesHyperlinkAnchor.prototype.private_SetValue = function(Value)
+{
+	this.Class.Anchor = Value;
 };

@@ -2157,6 +2157,14 @@ ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
             }
             case para_Space:
             case para_Tab  : Str += " "; break;
+			case para_NewLine:
+			{
+				if (oPr && true === oPr.NewLine)
+				{
+					Str += '\r';
+				}
+				break;
+			}
 			case para_End:
 			{
 				if (oPr && true === oPr.NewLineParagraph)
@@ -3097,9 +3105,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     SpaceLen = 0;
                     WordLen = 0;
 
-                    var TabPos = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page, false);
-                    var NewX = TabPos.NewX;
+                    var TabPos   = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page, false);
+                    var NewX     = TabPos.NewX;
                     var TabValue = TabPos.TabValue;
+
+                    Item.SetLeader(TabPos.TabLeader);
 
                     // Если таб не левый, значит он не может быть сразу рассчитан, а если левый, тогда
                     // рассчитываем его сразу здесь
@@ -8844,34 +8854,11 @@ ParaRun.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 };
 ParaRun.prototype.Get_Parent = function()
 {
-    if (!this.Paragraph)
-        return null;
-
-    var ContentPos = this.Paragraph.Get_PosByElement(this);
-    if (null == ContentPos || undefined == ContentPos || ContentPos.Get_Depth() < 0)
-        return null;
-
-    ContentPos.Decrease_Depth(1);
-    return this.Paragraph.Get_ElementByPos(ContentPos);
+	return this.GetParent();
 };
 ParaRun.prototype.private_GetPosInParent = function(_Parent)
 {
-    var Parent = (_Parent? _Parent : this.Get_Parent());
-    if (!Parent)
-        return -1;
-
-    // Ищем данный элемент в родительском классе
-    var RunPos = -1;
-    for (var Pos = 0, Count = Parent.Content.length; Pos < Count; Pos++)
-    {
-        if (this === Parent.Content[Pos])
-        {
-            RunPos = Pos;
-            break;
-        }
-    }
-
-    return RunPos;
+	return this.GetPosInParent(_Parent);
 };
 ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
 {

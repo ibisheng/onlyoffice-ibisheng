@@ -1315,9 +1315,9 @@
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
 				return;
-			} else {
-				t.isShapeAction = false;
 			}
+
+			this.isShapeAction = false;
 
 			if (2 === event.detail) {
 				// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
@@ -1457,6 +1457,9 @@
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseUp = function (event) {
 			if (2 === event.button) {
+				if (this.isShapeAction) {
+					this.handlers.trigger('onContextMenu', event);
+				}
 				return true;
 			}
 

@@ -42,12 +42,6 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var Y_Default_Header = 12.5; // 1.25 cm
-var Y_Default_Footer = 12.5; // 1.25 cm
-
-var X_Right_Field  = Page_Width  - X_Right_Margin;
-var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-
 var GlobalSkinTeamlab = {
     Name : "classic",
     RulersButton : true,
@@ -124,401 +118,422 @@ function CEditorPage(api)
     this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
     this.m_oApi = api;
     this.Native = window["native"];
-
-
-    this.MainScrollLock = function()
-    {
-    }
-    this.MainScrollUnLock = function()
-    {
-    }
-
-    this.checkBodySize = function()
-    {
-    }
-
-    this.Init = function()
-    {
-
-    }
-
-    this.CheckLayouts = function(){
-
-    }
-
-    this.CheckRetinaDisplay = function()
-    {
-
-    }
-
-    this.CheckRetinaElement = function(htmlElem)
-    {
-
-    }
-
-    this.ShowOverlay = function()
-    {
-    }
-    this.UnShowOverlay = function()
-    {
-    }
-    this.CheckUnShowOverlay = function()
-    {
-    }
-    this.CheckShowOverlay = function()
-    {
-    }
-
-    this.initEvents = function()
-    {
-
-    }
-
-    this.initEvents2MobileAdvances = function()
-    {
-    }
-    this.onButtonRulersClick = function()
-    {
-    }
-
-    this.HideRulers = function()
-    {
-    }
-
-    this.zoom_FitToWidth = function()
-    {
-    }
-    this.zoom_FitToPage = function()
-    {
-    }
-
-    this.zoom_Fire = function(type)
-    {
-    }
-
-    this.zoom_Out = function()
-    {
-    }
-
-    this.zoom_In = function()
-    {
-    }
-
-    this.DisableRulerMarkers = function()
-    {
-    }
-
-    this.EnableRulerMarkers = function()
-    {
-    }
-
-    this.ToSearchResult = function()
-    {
-    }
-
-    this.onButtonTabsClick = function()
-    {
-    }
-
-    this.onButtonTabsDraw = function()
-    {
-    }
-
-    this.onPrevPage = function()
-    {
-    }
-    this.onNextPage = function()
-    {
-    }
-
-    this.horRulerMouseDown = function(e)
-    {
-    }
-    this.horRulerMouseUp = function(e)
-    {
-    }
-    this.horRulerMouseMove = function(e)
-    {
-    }
-
-    this.verRulerMouseDown = function(e)
-    {
-    }
-    this.verRulerMouseUp = function(e)
-    {
-    }
-    this.verRulerMouseMove = function(e)
-    {
-    }
-
-    this.SelectWheel = function()
-    {
-    }
-
-    this.createSplitterDiv = function(bIsVert)
-    {
-    }
-
-    this.onBodyMouseDown = function(e)
-    {
-    }
-
-    this.onBodyMouseMove = function(e)
-    {
-    }
-
-    this.OnResizeSplitter = function()
-    {
-    }
-
-    this.onBodyMouseUp = function(e)
-    {
-    }
-
-    this.onMouseDown = function(e)
-    {
-    }
-
-    this.onMouseMove = function(e)
-    {
-    }
-    this.onMouseMove2 = function()
-    {
-    }
-    this.onMouseUp = function(e, bIsWindow)
-    {
-    }
-
-    this.onMouseUpExternal = function(x, y)
-    {
-    }
-
-    this.onMouseWhell = function(e)
-    {
-    }
-
-    this.onKeyUp = function(e)
-    {
-    }
-
-    this.onKeyDown = function(e)
-    {
-    }
-
-    this.onKeyDownNoActiveControl = function(e)
-    {
-    }
-
-    this.onKeyDownTBIM = function(e)
-    {
-    }
-
-    this.DisableTextEATextboxAttack = function()
-    {
-    }
-
-    this.onKeyPress = function(e)
-    {
-    }
-
-    // -------------------------------------------------------- //
-    // -----------------end demonstration---------------------- //
-    // -------------------------------------------------------- //
-
-    this.verticalScroll = function(sender,scrollPositionY,maxY,isAtTop,isAtBottom)
-    {
-    }
-    this.verticalScrollMouseUp = function(sender, e)
-    {
-    }
-    this.CorrectSpeedVerticalScroll = function(newScrollPos)
-    {
-    }
-    this.CorrectVerticalScrollByYDelta = function(delta)
-    {
-    }
-
-    this.horizontalScroll = function(sender,scrollPositionX,maxX,isAtLeft,isAtRight)
-    {
-    }
-
-    this.UpdateScrolls = function()
-    {
-    }
-
-    this.OnRePaintAttack = function()
-    {
-    }
-
-    this.DeleteVerticalScroll = function()
-    {
-
-    }
-
-    this.OnResize = function(isAttack)
-    {
-    }
-
-    this.OnResize2 = function(isAttack)
-    {
-
-    }
-
-    this.checkNeedRules = function()
-    {
-
-    }
-    this.checkNeedHorScroll = function()
-    {
-    }
-
-    this.StartUpdateOverlay = function()
-    {
-    }
-    this.EndUpdateOverlay = function()
-    {
-    }
-
-    this.OnUpdateOverlay = function()
-    {
-    }
-
-    this.GetDrawingPageInfo = function(nPageIndex)
-    {
-    }
-
-    this.OnCalculatePagesPlace = function()
-    {
-    }
-
-    this.OnPaint = function()
-    {
-    }
-
-    this.CheckFontCache = function()
-    {
-    }
-    this.OnScroll = function()
-    {
-    }
-
-    this.CheckZoom = function()
-    {
-    }
-
-    this.CalculateDocumentSize = function(bIsAttack)
-    {
-    }
-
-    this.CheckCalculateDocumentSize = function(_bounds)
-    {
-    }
-
-    this.InitDocument = function(bIsEmpty)
-    {
-    }
-
-    this.InitControl = function()
-    {
-    }
-
-    this.StartMainTimer = function()
-    {
-    }
-
-    this.onTimerScroll = function(isThUpdateSync)
-    {
-    }
-
-    this.onTimerScroll_sync = function(isThUpdateSync)
-    {
-    }
-
-    this.UpdateHorRuler = function()
-    {
-    }
-    this.UpdateVerRuler = function()
-    {
-    }
-
-    this.SetCurrentPage = function()
-    {
-    }
-
-    this.UpdateHorRulerBack = function()
-    {
-    }
-    this.UpdateVerRulerBack = function()
-    {
-    }
-
-    this.CreateBackgroundHorRuler = function(margins)
-    {
-    }
-    this.CreateBackgroundVerRuler = function(margins)
-    {
-    }
-
-    this.ThemeGenerateThumbnails = function(_master)
-    {
-    }
-
-    this.CheckLayouts = function(bIsAttack)
-    {
-    }
-
-    this.GoToPage = function(lPageNum)
-    {
-        this.Native["WC_GoToPage"](lPageNum);
-    }
-
-    this.GetVerticalScrollTo = function(y)
-    {
-    }
-
-    this.GetHorizontalScrollTo = function(x)
-    {
-    }
-
-    // -------------------------------------------------------- //
-    // -------------------- east asian fonts ------------------ //
-    // -------------------------------------------------------- //
-
-    this.ReinitTB = function()
-    {
-    }
-
-    this.SetTextBoxMode = function(isEA)
-    {
-    }
-
-    this.TextBoxFocus = function()
-    {
-    }
-
-    this.OnTextBoxInput = function()
-    {
-    }
-
-    this.CheckTextBoxSize = function()
-    {
-    }
-
-    this.TextBoxOnKeyDown = function(e)
-    {
-    }
-
-    this.onChangeTB = function()
-    {
-    }
-    this.CheckTextBoxInputPos = function()
-    {
-    }
-
-    this.SaveDocument = function()
-    {
-    }
 }
+
+
+CEditorPage.prototype.MainScrollLock = function()
+{
+};
+
+
+CEditorPage.prototype.MainScrollUnLock = function()
+{
+};
+
+CEditorPage.prototype.checkBodySize = function()
+{
+};
+
+CEditorPage.prototype.Init = function()
+{
+
+};
+
+CEditorPage.prototype.CheckRetinaDisplay = function()
+{
+
+};
+
+CEditorPage.prototype.CheckRetinaElement = function(htmlElem)
+{
+
+};
+
+CEditorPage.prototype.ShowOverlay = function()
+{
+};
+
+CEditorPage.prototype.UnShowOverlay = function()
+{
+};
+
+CEditorPage.prototype.CheckUnShowOverlay = function()
+{
+};
+
+CEditorPage.prototype.CheckShowOverlay = function()
+{
+};
+
+CEditorPage.prototype.initEvents = function()
+{
+
+};
+
+CEditorPage.prototype.initEvents2MobileAdvances = function()
+{
+};
+
+CEditorPage.prototype.onButtonRulersClick = function()
+{
+};
+
+CEditorPage.prototype.HideRulers = function()
+{
+};
+
+CEditorPage.prototype.zoom_FitToWidth = function()
+{
+};
+
+CEditorPage.prototype.zoom_FitToPage = function()
+{
+};
+
+CEditorPage.prototype.zoom_Fire = function(type)
+{
+};
+
+CEditorPage.prototype.zoom_Out = function()
+{
+};
+
+CEditorPage.prototype.zoom_In = function()
+{
+};
+
+CEditorPage.prototype.DisableRulerMarkers = function()
+{
+};
+
+CEditorPage.prototype.EnableRulerMarkers = function()
+{
+};
+
+CEditorPage.prototype.ToSearchResult = function()
+{
+};
+
+CEditorPage.prototype.onButtonTabsClick = function()
+{
+};
+
+CEditorPage.prototype.onButtonTabsDraw = function()
+{
+};
+
+CEditorPage.prototype.onPrevPage = function()
+{
+};
+
+CEditorPage.prototype.onNextPage = function()
+{
+};
+
+CEditorPage.prototype.horRulerMouseDown = function(e)
+{
+};
+
+CEditorPage.prototype.horRulerMouseUp = function(e)
+{
+};
+
+CEditorPage.prototype.horRulerMouseMove = function(e)
+{
+};
+
+CEditorPage.prototype.verRulerMouseDown = function(e)
+{
+};
+
+CEditorPage.prototype.verRulerMouseUp = function(e)
+{
+};
+
+CEditorPage.prototype.verRulerMouseMove = function(e)
+{
+};
+
+CEditorPage.prototype.SelectWheel = function()
+{
+};
+
+CEditorPage.prototype.createSplitterDiv = function(bIsVert)
+{
+};
+
+CEditorPage.prototype.onBodyMouseDown = function(e)
+{
+};
+
+CEditorPage.prototype.onBodyMouseMove = function(e)
+{
+};
+
+CEditorPage.prototype.OnResizeSplitter = function()
+{
+};
+
+CEditorPage.prototype.onBodyMouseUp = function(e)
+{
+};
+
+CEditorPage.prototype.onMouseDown = function(e)
+{
+};
+
+CEditorPage.prototype.onMouseMove = function(e)
+{
+};
+CEditorPage.prototype.onMouseMove2 = function()
+{
+};
+CEditorPage.prototype.onMouseUp = function(e, bIsWindow)
+{
+};
+
+CEditorPage.prototype.onMouseUpExternal = function(x, y)
+{
+};
+
+CEditorPage.prototype.onMouseWhell = function(e)
+{
+};
+
+CEditorPage.prototype.onKeyUp = function(e)
+{
+};
+
+CEditorPage.prototype.onKeyDown = function(e)
+{
+};
+
+CEditorPage.prototype.onKeyDownNoActiveControl = function(e)
+{
+};
+
+CEditorPage.prototype.onKeyDownTBIM = function(e)
+{
+};
+
+CEditorPage.prototype.DisableTextEATextboxAttack = function()
+{
+};
+
+CEditorPage.prototype.onKeyPress = function(e)
+{
+};
+
+// -------------------------------------------------------- //
+// -----------------end demonstration---------------------- //
+// -------------------------------------------------------- //
+
+CEditorPage.prototype.verticalScroll = function(sender,scrollPositionY,maxY,isAtTop,isAtBottom)
+{
+};
+
+CEditorPage.prototype.verticalScrollMouseUp = function(sender, e)
+{
+};
+
+CEditorPage.prototype.CorrectSpeedVerticalScroll = function(newScrollPos)
+{
+};
+
+CEditorPage.prototype.CorrectVerticalScrollByYDelta = function(delta)
+{
+};
+
+CEditorPage.prototype.horizontalScroll = function(sender,scrollPositionX,maxX,isAtLeft,isAtRight)
+{
+};
+
+CEditorPage.prototype.UpdateScrolls = function()
+{
+};
+
+CEditorPage.prototype.OnRePaintAttack = function()
+{
+};
+
+CEditorPage.prototype.DeleteVerticalScroll = function()
+{
+
+};
+
+CEditorPage.prototype.OnResize = function(isAttack)
+{
+};
+
+CEditorPage.prototype.OnResize2 = function(isAttack)
+{
+
+};
+
+CEditorPage.prototype.checkNeedRules = function()
+{
+
+};
+
+CEditorPage.prototype.checkNeedHorScroll = function()
+{
+};
+
+CEditorPage.prototype.StartUpdateOverlay = function()
+{
+};
+
+CEditorPage.prototype.EndUpdateOverlay = function()
+{
+};
+
+CEditorPage.prototype.OnUpdateOverlay = function()
+{
+};
+
+CEditorPage.prototype.GetDrawingPageInfo = function(nPageIndex)
+{
+};
+
+CEditorPage.prototype.OnCalculatePagesPlace = function()
+{
+};
+
+CEditorPage.prototype.OnPaint = function()
+{
+};
+
+CEditorPage.prototype.CheckFontCache = function()
+{
+};
+
+CEditorPage.prototype.OnScroll = function()
+{
+};
+
+CEditorPage.prototype.CheckZoom = function()
+{
+};
+
+CEditorPage.prototype.CalculateDocumentSize = function(bIsAttack)
+{
+};
+
+CEditorPage.prototype.CheckCalculateDocumentSize = function(_bounds)
+{
+};
+
+CEditorPage.prototype.InitDocument = function(bIsEmpty)
+{
+};
+
+CEditorPage.prototype.InitControl = function()
+{
+};
+
+CEditorPage.prototype.StartMainTimer = function()
+{
+};
+
+CEditorPage.prototype.onTimerScroll = function(isThUpdateSync)
+{
+};
+
+CEditorPage.prototype.onTimerScroll_sync = function(isThUpdateSync)
+{
+};
+
+CEditorPage.prototype.UpdateHorRuler = function()
+{
+};
+
+CEditorPage.prototype.UpdateVerRuler = function()
+{
+};
+
+CEditorPage.prototype.SetCurrentPage = function()
+{
+};
+
+CEditorPage.prototype.UpdateHorRulerBack = function()
+{
+};
+
+CEditorPage.prototype.UpdateVerRulerBack = function()
+{
+};
+
+CEditorPage.prototype.CreateBackgroundHorRuler = function(margins)
+{
+};
+
+CEditorPage.prototype.CreateBackgroundVerRuler = function(margins)
+{
+};
+
+CEditorPage.prototype.ThemeGenerateThumbnails = function(_master)
+{
+};
+
+CEditorPage.prototype.CheckLayouts = function(bIsAttack)
+{
+};
+
+CEditorPage.prototype.GoToPage = function(lPageNum)
+{
+    this.Native["WC_GoToPage"](lPageNum);
+};
+
+CEditorPage.prototype.GetVerticalScrollTo = function(y)
+{
+};
+
+CEditorPage.prototype.GetHorizontalScrollTo = function(x)
+{
+};
+
+// -------------------------------------------------------- //
+// -------------------- east asian fonts ------------------ //
+// -------------------------------------------------------- //
+
+CEditorPage.prototype.ReinitTB = function()
+{
+};
+
+CEditorPage.prototype.SetTextBoxMode = function(isEA)
+{
+};
+
+CEditorPage.prototype.TextBoxFocus = function()
+{
+};
+
+CEditorPage.prototype.OnTextBoxInput = function()
+{
+};
+
+CEditorPage.prototype.CheckTextBoxSize = function()
+{
+};
+
+CEditorPage.prototype.TextBoxOnKeyDown = function(e)
+{
+};
+
+CEditorPage.prototype.onChangeTB = function()
+{
+};
+
+CEditorPage.prototype.setNodesEnable = function()
+{};
+
+CEditorPage.prototype.CheckTextBoxInputPos = function()
+{
+};
+
+CEditorPage.prototype.SaveDocument = function()
+{
+};
 
 //------------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};

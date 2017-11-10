@@ -35,7 +35,6 @@
 (function(window, undefined)
 {
 	// Import
-	var offlineMode = AscCommon.offlineMode;
 	var c_oEditorId = AscCommon.c_oEditorId;
 	var c_oCloseCode = AscCommon.c_oCloseCode;
 
@@ -168,8 +167,8 @@
 		this.signatures = [];
 
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
-		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
-			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
+		this.watermarkDraw =
+			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
 
 		return this;
 	}
@@ -274,15 +273,23 @@
 			this.CoAuthoringApi.setDocId(this.documentId);
 
 			if (this.watermarkDraw)
+			{
 				this.watermarkDraw.CheckParams(this);
+			}
 		}
 
-		if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl)
+		if (AscCommon.offlineMode === this.documentUrl)
+		{
+			this.DocInfo.put_OfflineApp(true);
+		}
+
+		if (undefined !== window["AscDesktopEditor"] && !(this.DocInfo && this.DocInfo.get_OfflineApp()))
 		{
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 
-		if (!oldInfo) {
+		if (!oldInfo)
+		{
 			this.onEndLoadDocInfo();
 		}
 	};
@@ -429,7 +436,7 @@
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
 		var rData                  = null;
-		if (offlineMode !== this.documentUrl)
+		if (!(this.DocInfo && this.DocInfo.get_OfflineApp()))
 		{
 			rData = {
 				"c"             : 'open',
@@ -458,25 +465,10 @@
 		if (!isRepeat) {
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		}
-
-		if (offlineMode === this.documentUrl)
-		{
-			this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
-			this.DocInfo.asc_putOfflineApp(true);
-		}
 	};
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
-		var t             = this;
-		var scriptElem    = document.createElement('script');
-		scriptElem.onload = scriptElem.onerror = function()
-		{
-			t._OfflineAppDocumentEndLoad();
-		};
-
-		scriptElem.setAttribute('src', this.documentUrl + 'editor.js');
-		scriptElem.setAttribute('type', 'text/javascript');
-		document.getElementsByTagName('head')[0].appendChild(scriptElem);
+		this._OfflineAppDocumentEndLoad();
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
@@ -574,7 +566,7 @@
 		}
 		//в обычном серверном режиме портим ссылку, потому что CoAuthoring теперь имеет встроенный адрес
 		//todo надо использовать проверку get_OfflineApp
-		if (!(window['NATIVE_EDITOR_ENJINE'] || offlineMode === this.documentUrl) || window['IS_NATIVE_EDITOR'])
+		if (!(window['NATIVE_EDITOR_ENJINE'] || (this.DocInfo && this.DocInfo.get_OfflineApp())) || window['IS_NATIVE_EDITOR'])
 		{
 			this.CoAuthoringApi.set_url(null);
 		}
@@ -678,7 +670,7 @@
                     } else {
                         clearInterval(t.forceSaveButtonTimeout);
                     }
-                    t.forceSaveButtonTimeout = setInterval(function() {
+                    t.forceSaveButtonTimeout = setTimeout(function() {
                         t.forceSaveButtonTimeout = null;
                         if (t.forceSaveButtonContinue) {
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
@@ -712,7 +704,7 @@
                         } else {
                             clearInterval(t.forceSaveTimeoutTimeout);
                         }
-                        t.forceSaveTimeoutTimeout = setInterval(function() {
+                        t.forceSaveTimeoutTimeout = setTimeout(function() {
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
                         }, Asc.c_nMaxConversionTime);
@@ -1251,11 +1243,7 @@
 		if (!this.pluginsManager)
 			return;
 
-		var _pluginData = new Asc.CPluginData();
-		_pluginData.setAttribute("type", "enableMouseEvent");
-		_pluginData.setAttribute("isEnabled", isEnable);
-
-		this.pluginsManager.sendMessage(_pluginData);
+		this.pluginsManager.onEnableMouseEvents(isEnable);
 	};
 
     baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
@@ -1367,6 +1355,15 @@
 	};
 	baseEditorsApi.prototype.Input_UpdatePos = function()
 	{
+	};
+	baseEditorsApi.prototype["setInputParams"] = function(_obj)
+	{
+		window["AscInputMethod"] = window["AscInputMethod"] || {};
+
+		for (var _prop in _obj)
+		{
+			window["AscInputMethod"][_prop] = _obj[_prop];
+		}
 	};
 
 	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
@@ -1563,7 +1560,7 @@
 			return 0;
 
 		// если плагин работает - то и мы тоже
-		if (this.pluginsManager && this.pluginsManager.current != null)
+		if (this.pluginsManager && this.pluginsManager.isWorked())
 			return 0;
 
 		if (this.isEmbedVersion)

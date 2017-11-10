@@ -6520,12 +6520,18 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
 				if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
 				{
-					var Hyperlink = Item.CheckHyperlink(X, Y, ElementPageIndex);
-					if (null != Hyperlink)
+					var oHyperlink   = Item.CheckHyperlink(X, Y, ElementPageIndex);
+					var oPageRefLink = Item.CheckPageRefLink(X, Y, ElementPageIndex);
+					if (null != oHyperlink)
 					{
 						this.Selection.Data = {
-							Hyperlink : true,
-							Value     : Hyperlink
+							Hyperlink : oHyperlink
+						};
+					}
+					else if (null !== oPageRefLink)
+					{
+						this.Selection.Data = {
+							PageRef : oPageRefLink
 						};
 					}
 				}
@@ -6652,23 +6658,46 @@ CDocumentContent.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent
 		{
 			this.Selection.Use = false;
 
-			if (null != this.Selection.Data && true === this.Selection.Data.Hyperlink)
+			if (null != this.Selection.Data && this.Selection.Data.Hyperlink)
 			{
-				editor && editor.sync_HyperlinkClickCallback(this.Selection.Data.Value.Get_Value());
-				this.Selection.Data.Value.Set_Visited(true);
-
-				if (this.DrawingDocument.m_oLogicDocument)
+				var oHyperlink    = this.Selection.Data.Hyperlink;
+				var sBookmarkName = oHyperlink.GetAnchor();
+				var sValue        = oHyperlink.GetValue();
+				if (sBookmarkName)
 				{
-					if (editor.isDocumentEditor)
+					var oBookmarksManagers = this.LogicDocument && this.LogicDocument.GetBookmarksManager ? this.LogicDocument.GetBookmarksManager() : null;
+					var oBookmark = oBookmarksManagers ? oBookmarksManagers.GetBookmarkByName(sBookmarkName) : null;
+					if (oBookmark)
+						oBookmark[0].GoToBookmark();
+				}
+				else if (sValue)
+				{
+					editor && editor.sync_HyperlinkClickCallback(sValue);
+					this.Selection.Data.Hyperlink.SetVisited(true);
+					if (this.DrawingDocument.m_oLogicDocument)
 					{
-						for (var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++)
-							this.DrawingDocument.OnRecalculatePage(PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx]);
+						if (editor.isDocumentEditor)
+						{
+							for (var PageIdx = Item.Get_AbsolutePage(0); PageIdx < Item.Get_AbsolutePage(0) + Item.Get_PagesCount(); PageIdx++)
+								this.DrawingDocument.OnRecalculatePage(PageIdx, this.DrawingDocument.m_oLogicDocument.Pages[PageIdx]);
+						}
+						else
+						{
+							this.DrawingDocument.OnRecalculatePage(PageIdx, this.DrawingDocument.m_oLogicDocument.Slides[PageIdx]);
+						}
+						this.DrawingDocument.OnEndRecalculate(false, true);
 					}
-					else
-					{
-						this.DrawingDocument.OnRecalculatePage(PageIdx, this.DrawingDocument.m_oLogicDocument.Slides[PageIdx]);
-					}
-					this.DrawingDocument.OnEndRecalculate(false, true);
+				}
+			}
+			else if (null !== this.Selection.Data && this.Selection.Data.PageRef)
+			{
+				var oInstruction  = this.Selection.Data.PageRef.GetInstruction();
+				if (oInstruction && fieldtype_PAGEREF === oInstruction.GetType())
+				{
+					var oBookmarksManagers = this.LogicDocument && this.LogicDocument.GetBookmarksManager ? this.LogicDocument.GetBookmarksManager() : null;
+					var oBookmark = oBookmarksManagers ? oBookmarksManagers.GetBookmarkByName(oInstruction.GetBookmarkName()) : null;
+					if (oBookmark)
+						oBookmark[0].GoToBookmark();
 				}
 			}
 		}

@@ -220,8 +220,15 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 			window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 	}
 };
-window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
+window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
 {
+	window.doadssIsSaveAs = isSaveAs;
+	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+	{
+		window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
+		return;
+	}
+
     editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
@@ -230,9 +237,9 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, password);
 };
-window["DesktopOfflineAppDocumentEndSave"] = function(error)
+window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {
 	editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (error == 0)
@@ -253,6 +260,14 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 			var _obj = window.SaveQuestionObjectBeforeSign;
 			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
 			window.SaveQuestionObjectBeforeSign = null;
+		}
+	}
+
+	if (hash !== null && hash !== undefined && hash != "")
+	{
+		if (window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+		{
+			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
 };

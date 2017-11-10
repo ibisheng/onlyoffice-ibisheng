@@ -1783,7 +1783,7 @@ background-repeat: no-repeat;\
 		//TEXT
 		if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 		{
-			_data = this.WordControl.m_oLogicDocument.GetSelectedText(false);
+			_data = this.WordControl.m_oLogicDocument.GetSelectedText(false, {NewLineParagraph : true, NewLine : true});
 			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 		}
 		//HTML
@@ -5940,7 +5940,7 @@ background-repeat: no-repeat;\
 		var top = ((height / 2) - (h / 2)) + dualScreenTop;
 
 		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
-		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=0,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=yes,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
 
 		if (!this.reporterWindow)
 			return;
@@ -5978,18 +5978,26 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.reporterWindowCounter = 0;
-		if (!this.reporterWindow)
-			return;
+		try
+		{
+			this.reporterWindowCounter = 0;
+			if (!this.reporterWindow)
+				return;
 
-		if ( this.reporterWindow.attachEvent )
-			this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
-		else
-			this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
+			if (this.reporterWindow.attachEvent)
+				this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
+			else
+				this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
 
-		this.reporterWindow.close();
-		this.reporterWindow = null;
-		this.reporterStartObject = null;
+			this.reporterWindow.close();
+			this.reporterWindow = null;
+			this.reporterStartObject = null;
+		}
+		catch (err)
+		{
+			this.reporterWindow = null;
+			this.reporterStartObject = null;
+		}
 	};
 
 	asc_docs_api.prototype.DemonstrationReporterMessages = function(e)
@@ -7255,7 +7263,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['get_PresentationWidth']               = asc_docs_api.prototype.get_PresentationWidth;
 	asc_docs_api.prototype['get_PresentationHeight']              = asc_docs_api.prototype.get_PresentationHeight;
 	asc_docs_api.prototype['pre_Paste']                           = asc_docs_api.prototype.pre_Paste;
-	asc_docs_api.prototype['pre_SaveCallback']                    = asc_docs_api.prototype.pre_SaveCallback;
 	asc_docs_api.prototype['initEvents2MobileAdvances']           = asc_docs_api.prototype.initEvents2MobileAdvances;
 	asc_docs_api.prototype['ViewScrollToX']                       = asc_docs_api.prototype.ViewScrollToX;
 	asc_docs_api.prototype['ViewScrollToY']                       = asc_docs_api.prototype.ViewScrollToY;

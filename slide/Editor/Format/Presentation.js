@@ -1468,6 +1468,35 @@ CPresentation.prototype =
     },
 
 
+    GetTargetPosition: function(){
+        var oController = this.GetCurrentController();
+        var oPosition = null;
+        if(oController){
+            var oTargetDocContent = oController.getTargetDocContent(false, false);
+            if(oTargetDocContent){
+                var oElem = oTargetDocContent.Content[oTargetDocContent.CurPos.ContentPos];
+                if(oElem){
+                    var oPos = oElem.GetTargetPos();
+                    if(oPos){
+
+                    }
+                    var x, y;
+                    if(oPos.Transform){
+                        x = oPos.Transform.TransformPointX(oPos.X, oPos.Y);
+                        y = oPos.Transform.TransformPointY(oPos.X, oPos.Y);
+                    }
+                    else{
+                        x = oPos.X;
+                        y = oPos.Y;
+                    }
+                    oPosition = {X: x, Y: y};
+                }
+            }
+        }
+        return oPosition;
+    },
+
+
 
 // Отрисовка содержимого Документа
     Draw : function(nPageIndex, pGraphics){
@@ -1637,7 +1666,7 @@ CPresentation.prototype =
                         }
                     }
                 }
-                for(i = 0; i < this.CurPage; ++i)
+                for(i = 0; i <= this.CurPage; ++i)
                 {
                     Id = this.Slides[i].Search_GetId(isNext, 0);
                     if(Id !== null)
@@ -1743,7 +1772,7 @@ CPresentation.prototype =
                         return Id;
                     }
                 }
-                for(i = this.Slides.length - 1; i > this.CurPage; --i)
+                for(i = this.Slides.length - 1; i >= this.CurPage; --i)
                 {
                     if(this.Slides[i].notesShape){
                         Id = this.Slides[i].notesShape.Search_GetId(isNext, false);
@@ -2191,6 +2220,14 @@ CPresentation.prototype =
         var oController = this.GetCurrentController();
         oController && oController.checkSelectedObjectsAndCallback(oController.paragraphClearFormatting, [], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
         this.Document_UpdateInterfaceState();
+    },
+
+    GetSelectedBounds: function(){
+        var oController = this.GetCurrentController();
+        if(oController.selectedObjects.length > 0){
+            return oController.getBoundsForGroup([oController.selectedObjects[0]]);
+        }
+        return null;
     },
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)
@@ -3711,11 +3748,11 @@ CPresentation.prototype =
     },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-	GetSelectedText : function(bClearText)
+	GetSelectedText : function(bClearText, oPr)
     {
         var oController = this.GetCurrentController();
         if(oController){
-            return oController.GetSelectedText(bClearText);
+            return oController.GetSelectedText(bClearText, oPr);
         }
         return "";
     },

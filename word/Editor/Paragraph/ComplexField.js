@@ -174,6 +174,10 @@ ParaInstrText.prototype.GetValue = function()
 {
 	return String.fromCharCode(this.Value);
 };
+ParaInstrText.prototype.Set_CharCode = function(CharCode)
+{
+	this.Value = CharCode;
+};
 
 function CComplexField(oLogicDocument)
 {
@@ -225,18 +229,17 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 };
 CComplexField.prototype.Update = function()
 {
-	if (!this.Instruction)
-	{
-		var oParser = new CFieldInstructionParser();
-		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
-	}
+	this.private_UpdateInstruction();
 
 	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
 		return;
 
 	this.private_SelectFieldValue();
 
-	var nFieldCode = this.Instruction.GetFieldCode();
+	if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		return;
+
+	var nFieldCode = this.Instruction.GetType();
 	if (fieldtype_PAGENUM === nFieldCode)
 	{
 		var oRun       = this.BeginChar.GetRun();
@@ -261,14 +264,67 @@ CComplexField.prototype.Update = function()
 	{
 		this.LogicDocument.Create_NewHistoryPoint();
 
+		this.LogicDocument.GetBookmarksManager().RemoveTOCBookmarks();
+
+		var nTabPos = 9345 / 20 / 72 * 25.4; // Стандартное значение для A4 и обычных полей 3см и 2см
+		var oSectPr = this.LogicDocument.GetCurrentSectionPr();
+
+		if (oSectPr)
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+
 		var oStyles          = this.LogicDocument.Get_Styles();
 		var arrOutline       = this.LogicDocument.GetOutlineParagraphs();
 		var oSelectedContent = new CSelectedContent();
 		for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
 		{
-			var oPara = arrOutline[nIndex].Paragraph.Copy();
-			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
+			var oPara = oSrcParagraph.Copy();
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
+
+			var oTabs = oSrcParagraph.GetParagraphTabs().Copy();
+			oTabs.Add(new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot));
+			oPara.Set_Tabs(oTabs);
+
+			var oTabRun = new ParaRun(oPara, false);
+			oTabRun.Add_ToContent(0, new ParaTab());
+
+			// TODO: ParaEnd
+
+			var oHyperlink = new ParaHyperlink();
+			for (var nParaPos = 0, nParaCount = oPara.Content.length - 1; nParaPos < nParaCount; ++nParaPos)
+			{
+				oHyperlink.Add_ToContent(nParaPos, oPara.Content[0]);
+				oPara.Remove_FromContent(0, 1);
+			}
+			oHyperlink.SetAnchor(sBookmarkName);
+
+			// TODO: ParaEnd
+			//oPara.Add_ToContent(oPara.Content.length - 1, oTabRun);
+
+			oHyperlink.Add_ToContent(oHyperlink.Content.length, oTabRun);
+
+			var oPageRefRun = new ParaRun(oPara, false);
+
+			var nTempIndex = -1;
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this));
+			var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
+			for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
+			{
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
+			}
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this));
+			var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
+			for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
+			{
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
+			}
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this));
+
+			//oPara.Add_ToContent(oPara.Content.length - 1, oPageRefRun);
+			oHyperlink.Add_ToContent(oHyperlink.Content.length, oPageRefRun);
+			oPara.Add_ToContent(oPara.Content.length - 1, oHyperlink);
 			oSelectedContent.Add(new CSelectedElement(oPara, true));
 		}
 
@@ -410,6 +466,19 @@ CComplexField.prototype.GetEndDocumentPosition = function()
 CComplexField.prototype.IsValid = function()
 {
 	return this.IsUse() && this.BeginChar && this.SeparateChar && this.EndChar;
+};
+CComplexField.prototype.GetInstruction = function()
+{
+	this.private_UpdateInstruction();
+	return this.Instruction;
+};
+CComplexField.prototype.private_UpdateInstruction = function()
+{
+	if (!this.Instruction && this.InstructionLine)
+	{
+		var oParser = new CFieldInstructionParser();
+		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
+	}
 };
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)

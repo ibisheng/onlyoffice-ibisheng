@@ -113,6 +113,42 @@ CParagraphBookmark.prototype.GetXY = function()
 {
 	return {X : this.X, Y : this.Y};
 };
+CParagraphBookmark.prototype.GoToBookmark = function()
+{
+	var oParagraph = this.Paragraph;
+	if (!oParagraph)
+		return;
+
+	var oLogicDocument = oParagraph.LogicDocument;
+	if (!oLogicDocument)
+		return;
+
+	var oCurPos = oParagraph.Get_PosByElement(this);
+	if (!oCurPos)
+		return;
+
+	oLogicDocument.RemoveSelection();
+	oParagraph.Set_ParaContentPos(oCurPos, false, -1, -1, true); // Корректировать позицию нужно обязательно
+	oParagraph.Document_SetThisElementCurrent(true);
+};
+CParagraphBookmark.prototype.RemoveBookmark = function()
+{
+	var oParagraph = this.Paragraph;
+	if (!oParagraph)
+		return;
+
+	var oCurPos = oParagraph.Get_PosByElement(this);
+	if (!oCurPos)
+		return;
+
+	var oParent      = this.GetParent();
+	var nPosInParent = this.GetPosInParent(oParent);
+
+	if (!oParent || -1 === nPosInParent)
+		return;
+
+	oParent.Remove_FromContent(nPosInParent, 1);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,19 +238,17 @@ CBookmarksManager.prototype.ProcessBookmarkChar = function(oParaBookmark)
 			this.BookmarksChars[sBookmarkId] = oParaBookmark;
 	}
 
-	var sBookmarkId = oParaBookmark.GetBookmarkId();
-	if (0 === sBookmarkId.indexOf("_Toc"))
+	var sBookmarkName = oParaBookmark.GetBookmarkName();
+	if (0 === sBookmarkName.indexOf("_Toc"))
 	{
-		var nId = parseInt(sBookmarkId.substring(4));
+		var nId = parseInt(sBookmarkName.substring(4));
 		if (!isNaN(nId))
 			this.IdCounterTOC = Math.max(this.IdCounterTOC, nId);
 	}
-	else
-	{
-		var nId = parseInt(sBookmarkId);
-		if (!isNaN(nId))
-			this.IdCounter = Math.max(this.IdCounter, nId);
-	}
+
+	var nId = parseInt(sBookmarkId);
+	if (!isNaN(nId))
+		this.IdCounter = Math.max(this.IdCounter, nId);
 };
 CBookmarksManager.prototype.EndCollectingProcess = function()
 {
@@ -276,11 +310,27 @@ CBookmarksManager.prototype.GetNewBookmarkId = function()
 
 	return ("" + ++this.IdCounter);
 };
-CBookmarksManager.prototype.GetNewBookmarkIdTOC = function()
+CBookmarksManager.prototype.GetNewBookmarkNameTOC = function()
 {
 	this.private_CheckValidate();
 
 	return ("_Toc" + ++this.IdCounterTOC);
+};
+CBookmarksManager.prototype.RemoveTOCBookmarks = function()
+{
+	this.private_CheckValidate();
+
+	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
+	{
+		var oStart = this.Bookmarks[nIndex][0];
+		var oEnd   = this.Bookmarks[nIndex][1];
+
+		if (0 === oStart.GetBookmarkName().toLowerCase().indexOf("_toc"))
+		{
+			oStart.RemoveBookmark();
+			oEnd.RemoveBookmark();
+		}
+	}
 };
 
 

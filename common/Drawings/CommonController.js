@@ -5879,10 +5879,9 @@ DrawingObjectsController.prototype =
             {
                 if(!this.checkEndAddShape())
                 {
-
                     this.resetSelection();
                     var ws = drawingObjectsController.drawingObjects.getWorksheet();
-                    var isChangeSelectionShape = ws._checkSelectionShape();
+                    var isChangeSelectionShape = ws._endSelectionShape();
                     if (isChangeSelectionShape) {
                         ws._drawSelection();
                         ws._updateSelectionNameAndInfo();
@@ -8174,12 +8173,12 @@ DrawingObjectsController.prototype =
         return oShape;
     },
 
-	GetSelectedText: function(bCleartText)
+	GetSelectedText: function(bCleartText, oPr)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.GetSelectedText(bCleartText);
+            return content.GetSelectedText(bCleartText, oPr);
         }
         else
         {

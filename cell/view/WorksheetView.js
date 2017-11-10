@@ -7107,7 +7107,7 @@
         return new AscCommon.asc_CRect( xL, yL, width, height );
     };
 
-    WorksheetView.prototype._checkSelectionShape = function () {
+    WorksheetView.prototype._endSelectionShape = function () {
         var isSelectOnShape = this.isSelectOnShape;
         if (this.isSelectOnShape) {
             this.isSelectOnShape = false;
@@ -7183,7 +7183,7 @@
         if (isCoord) {
             // move active range to coordinates x,y
             this._moveActiveCellToXY(x, y);
-            isChangeSelectionShape = this._checkSelectionShape();
+            isChangeSelectionShape = this._endSelectionShape();
         } else {
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
@@ -7220,7 +7220,7 @@
 
     // Смена селекта по нажатию правой кнопки мыши
     WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
-        var isChangeSelectionShape = this._checkSelectionShape();
+        var isSelectOnShape = this._endSelectionShape();
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
         var _x = x * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
@@ -7242,13 +7242,7 @@
             r2 = gc_nMaxRow0;
         }
 
-        if (isChangeSelectionShape) {
-            // Попали в выделение, но были в объекте
-            this.cleanSelection();
-            this._drawSelection();
-
-            this._updateSelectionNameAndInfo();
-        } else if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
+        if (!this.model.selectionRange.containsRange(new asc_Range(c1, r1, c2, r2))) {
             // Не попали в выделение (меняем первую точку)
             this.cleanSelection();
             this.model.selectionRange.clean();
@@ -7256,10 +7250,9 @@
             this._drawSelection();
 
             this._updateSelectionNameAndInfo();
-            return false;
+        } else if (isSelectOnShape) {
+			this._updateSelectionNameAndInfo();
         }
-
-        return true;
     };
 
     /**
@@ -7271,10 +7264,7 @@
      * @returns {*}
      */
     WorksheetView.prototype.changeSelectionEndPoint = function (x, y, isCoord, isSelectMode) {
-        var isChangeSelectionShape = false;
-        if (isCoord) {
-            isChangeSelectionShape = this._checkSelectionShape();
-        }
+        var isChangeSelectionShape = isCoord ? this._endSelectionShape() : false;
         var ar = this._getSelection().getLast();
 
         var newRange = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
@@ -9972,7 +9962,7 @@
 		else
 		{
 			//var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
-			cellCoord = new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 );
+			cellCoord = [new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 )];
 		}
 		
 		
@@ -10012,7 +10002,7 @@
 				var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 				
 				
-				cellCoord = new AscCommon.asc_CRect( posX, posY, 0, 0 );
+				cellCoord = [new AscCommon.asc_CRect( posX, posY, 0, 0 )];
 				
 				specialPasteShowOptions.asc_setCellCoord(cellCoord);
 				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
@@ -10036,7 +10026,7 @@
 			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 		}
 	};
-	
+
 	WorksheetView.prototype.getSpecialPasteCoords = function(range, isVisible)
 	{	
 		var disableCoords = function()
@@ -10047,20 +10037,26 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
 		{
 			disableCoords();
+			cellCoord = [cellCoord];
 		}
 		else
 		{
-			var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
-			var offset = 3;
-			var widthIcon = 30 + offset;
-			var heightIcon = 22 + offset;
-			
-			if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
+			var visibleRange = this.getVisibleRange();
+			var intersectionVisibleRange = visibleRange.intersection(range);
+
+			if(intersectionVisibleRange)
+			{
+				cellCoord = [];
+				cellCoord[0] = this.getCellCoord(intersectionVisibleRange.c2, intersectionVisibleRange.r2);
+				cellCoord[1] = this.getCellCoord(range.c1, range.r1);
+			}
+			else
 			{
 				disableCoords();
+				cellCoord = [cellCoord];
 			}
 		}
 		

@@ -201,7 +201,7 @@ function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oCommen
     this.pen = pen;
     this.brush = brush;
 
-    /*������� �������*/
+	/*позиция символа*/
     this.x = x;
     this.y = y;
 }

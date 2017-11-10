@@ -1460,6 +1460,7 @@
 	window['AscDFH'].historyitem_Hyperlink_ToolTip    = window['AscDFH'].historyitem_type_Hyperlink | 2;
 	window['AscDFH'].historyitem_Hyperlink_AddItem    = window['AscDFH'].historyitem_type_Hyperlink | 3;
 	window['AscDFH'].historyitem_Hyperlink_RemoveItem = window['AscDFH'].historyitem_type_Hyperlink | 4;
+	window['AscDFH'].historyitem_Hyperlink_Anchor     = window['AscDFH'].historyitem_type_Hyperlink | 5;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CStyle
 	//------------------------------------------------------------------------------------------------------------------

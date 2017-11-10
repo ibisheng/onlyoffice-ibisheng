@@ -33,6 +33,7 @@
 var global_memory_stream_menu = CreateNativeMemoryStream();
 // endsectionPr -----------------------------------------------------------------------------------------
 
+
 // font engine -------------------------------------
 var FontStyle =
 {
@@ -49,6 +50,25 @@ window["use_native_fonts_only"] = true;
 
 // declarate unused methods and objects
 window["ftm"] = FT_Memory;
+
+
+function NativeOpenFileP(_params){
+
+    console.log("NativeOpenFileP");
+    window["CreateMainTextMeasurerWrapper"]();
+    window.g_file_path = "native_open_file";
+    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+    var doc_bin = window.native.GetFileString(window.g_file_path);
+    if ("presentation" !== window.NATIVE_DOCUMENT_TYPE){
+        return;
+    }
+    _api = new window["Asc"]["asc_docs_api"]("");
+    _api.Native_Editor_Initialize_Settings(_params);
+    _api.asc_nativeOpenFile(doc_bin);
+    _api.WordControl.m_oDrawingDocument.AfterLoad();
+    Api = _api;
+}
+
 
 
 Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_params)
@@ -146,3 +166,19 @@ Asc['asc_docs_api'].prototype["GetNativePageMeta"] = function(pageIndex)
 {
     this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
 };
+
+if(!window.native){
+	if(_private_NativeObject){
+		window.native = _private_NativeObject();
+	}	
+}
+
+if(window.native){
+	window.native.Call_CheckSlideBounds = function(nIndex){
+		return editor.CheckSlideBounds(nIndex);
+	}
+	
+	window.native.Call_GetPageMeta = function(nIndex){
+		return editor.GetNativePageMeta(nIndex);
+	}
+}

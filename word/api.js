@@ -409,6 +409,7 @@
 		this.documents = _docs;
 		this.returnDocuments = [];
 		this.current = -1;
+		this.guid = "";
 
 		this.start = function()
 		{
@@ -417,14 +418,14 @@
 			this.api.incrementCounterLongAction();
 
 			if (window.g_asc_plugins)
-				window.g_asc_plugins.setPluginMethodReturnAsync();
+				this.guid = window.g_asc_plugins.setPluginMethodReturnAsync();
 
 			this.run();
 		};
 		this.end = function()
 		{
 			if (window.g_asc_plugins)
-				window.g_asc_plugins.onPluginMethodReturn(this.returnDocuments);
+				window.g_asc_plugins.onPluginMethodReturn(this.guid, this.returnDocuments);
 
 			delete this.api.__content_control_worker;
 			this.api.decrementCounterLongAction();
@@ -7345,6 +7346,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
+		if (!this.WordControl || !this.WordControl.m_oLogicDocument)
+			return;
 		if (AscCommon.CollaborativeEditing){
 			AscCommon.CollaborativeEditing.Set_Fast(isOn);
 			if(window['AscCommon'].g_clipboardBase && isOn && !AscCommon.CollaborativeEditing.Is_SingleUser()){
@@ -8345,6 +8348,11 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.Search_Replace(sReplace, true, null, false);
 	};
 
+	window["asc_docs_api"].prototype["pluginMethod_GetFileHTML"] = function()
+	{
+		return this.ContentToHTML(true);
+	};
+
 	/********************************************************************/
 
 	asc_docs_api.prototype.asc_OnHideContextMenu = function()
@@ -8760,7 +8768,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['pre_Save']                                  = asc_docs_api.prototype.pre_Save;
 	asc_docs_api.prototype['SyncLoadImages']                            = asc_docs_api.prototype.SyncLoadImages;
 	asc_docs_api.prototype['SyncLoadImages_callback']                   = asc_docs_api.prototype.SyncLoadImages_callback;
-	asc_docs_api.prototype['pre_SaveCallback']                          = asc_docs_api.prototype.pre_SaveCallback;
 	asc_docs_api.prototype['initEvents2MobileAdvances']                 = asc_docs_api.prototype.initEvents2MobileAdvances;
 	asc_docs_api.prototype['ViewScrollToX']                             = asc_docs_api.prototype.ViewScrollToX;
 	asc_docs_api.prototype['ViewScrollToY']                             = asc_docs_api.prototype.ViewScrollToY;

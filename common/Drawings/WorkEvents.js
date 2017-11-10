@@ -40,7 +40,7 @@
 	// Import
 	var AscBrowser               = AscCommon.AscBrowser;
 
-	// ��������� ��� ����
+	// константы для мыши
 	var g_mouse_event_type_down  = 0;
 	var g_mouse_event_type_move  = 1;
 	var g_mouse_event_type_up    = 2;
@@ -66,25 +66,25 @@
 
 	function CMouseEventHandler()
 	{
-		this.X = 0;                            // ������� ������� X
-		this.Y = 0;                            // ������� ������� Y
+		this.X = 0;                            // позиция курсора X
+		this.Y = 0;                            // позиция курсора Y
 
-		this.Button = g_mouse_button_left;          // ������ ����
-		this.Type   = g_mouse_event_type_move;      // ��� ������
+		this.Button = g_mouse_button_left;          // кнопка мыши
+		this.Type   = g_mouse_event_type_move;      // тип евента
 
-		this.AltKey   = false;                        // ������ �� ������ alt
-		this.CtrlKey  = false;                        // ������ �� ������ ctrl
-		this.ShiftKey = false;                        // ������ �� ������ shift
+		this.AltKey   = false;                        // нажата ли кнопка alt
+		this.CtrlKey  = false;                        // нажата ли кнопка ctrl
+		this.ShiftKey = false;                        // нажата ли кнопка shift
 
-		this.Sender = null;                         // �� ������ html �������� ������ �����
+		this.Sender = null;                         // от какого html элемента пришел евент
 
-		this.LastClickTime = -1;                       // ����� ���������� mousedown
-		this.ClickCount    = 0;                        // ���������� ������
+		this.LastClickTime = -1;                       // время последнего mousedown
+		this.ClickCount    = 0;                        // количество кликов
 
 		this.WheelDelta = 0;
 
-		// ���������� ����� ��� ���������� mousedown (��� mousemove)
-		this.IsPressed = false;                        // ���� �� ������ ������
+		// координаты мышки при предыдущем mousedown (для mousemove)
+		this.IsPressed = false;                        // была ли зажата кнопка
 		this.LastX     = 0;
 		this.LastY     = 0;
 
@@ -106,9 +106,8 @@
 				if (window.captureEvents)
 					window.captureEvents(Event.MOUSEDOWN | Event.MOUSEUP);
 
-				var _frame = document.getElementById("plugin_iframe");
-				if (_frame)
-					_frame.style.pointerEvents = "none";
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.disablePointerEvents();
 
 				/*
 				 var parent = window;
@@ -140,9 +139,8 @@
 				if (window.releaseEvents)
 					window.releaseEvents(Event.MOUSEMOVE);
 
-				var _frame = document.getElementById("plugin_iframe");
-				if (_frame)
-					_frame.style.pointerEvents = "";
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.enablePointerEvents();
 
 				/*
 				 var parent = window;
@@ -169,12 +167,12 @@
 
 	function CKeyboardEvent()
 	{
-		this.AltKey   = false;                        // ������ �� ������ alt
-		this.CtrlKey  = false;                        // ������ �� ������ ctrl
-		this.ShiftKey = false;                        // ������ �� ������ shift
+		this.AltKey   = false;                        // нажата ли кнопка alt
+		this.CtrlKey  = false;                        // нажата ли кнопка ctrl
+		this.ShiftKey = false;                        // нажата ли кнопка shift
 		this.AltGr    = false;
 
-		this.Sender = null;                         // �� ������ html �������� ������ �����
+		this.Sender = null;                         // от какого html элемента пришел евент
 
 		this.CharCode = 0;
 		this.KeyCode  = 0;
@@ -222,7 +220,7 @@
 
 	function check_MouseMoveEvent(e)
 	{
-		// ���� ���� ��������, �� ����� ������ �� ����.
+		// если мышь залочена, то евент придет от окна.
 		if (e.IsLocked && !e.IsLockedEvent)
 			return;
 
@@ -521,10 +519,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_down;
 				return;
 			}
@@ -538,10 +536,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_over;
 				return;
 			}
@@ -559,10 +557,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_down;
 				return;
 			}

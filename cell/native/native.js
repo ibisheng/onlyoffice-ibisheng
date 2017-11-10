@@ -3704,7 +3704,7 @@ function OfflineEditor () {
 
             var isChangeSelectionShape = false;
             if (isCoord) {
-                isChangeSelectionShape = this._checkSelectionShape();
+                isChangeSelectionShape = this._endSelectionShape();
             }
 
             var isMoveActiveCellToLeftTop = false;
@@ -4112,6 +4112,11 @@ function OfflineEditor () {
         docInfo.put_Format("xlsx");
         docInfo.put_UserInfo(userInfo);
         docInfo.put_Token(this.initSettings["token"]);
+
+        var permissions = this.initSettings["permissions"];
+        if (undefined != permissions && null != permissions && permissions.length > 0) {    
+            docInfo.put_Permissions(JSON.parse(permissions));
+        }
 
         _api.asc_setDocInfo(docInfo);
 

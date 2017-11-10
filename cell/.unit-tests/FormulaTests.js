@@ -2720,6 +2720,34 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 43018);
 
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,25),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43000);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,25),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43000);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,9,20),-1,DATE(2017,9,10))", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 42997);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,2),-1)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43007);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,2),-1)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43007);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,3),-3)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43006);
+
+		oParser = new parserFormula("WORKDAY(DATE(2017,10,4),-2)", "A2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 43010);
+
 	});
 
 	test( "Test: \"WORKDAY.INTL\"", function () {
@@ -9345,6 +9373,71 @@ $( function () {
 		ok( oParser.parse(), "SUBTOTAL(9,A102:A105)" );
 		strictEqual( oParser.calculate().getValue(), 303, "SUBTOTAL(9,A102:A105)");
 	} );
+
+	test( "Test: \"MID\"", function () {
+		ws.getRange2( "A101" ).setValue( "Fluid Flow" );
+
+		oParser = new parserFormula( "MID(A101,1,5)", "A2", ws );
+		ok( oParser.parse(), "MID(A101,1,5)" );
+		strictEqual( oParser.calculate().getValue(), "Fluid", "MID(A101,1,5)");
+
+		oParser = new parserFormula( "MID(A101,7,20)", "A2", ws );
+		ok( oParser.parse(), "MID(A101,7,20)" );
+		strictEqual( oParser.calculate().getValue(), "Flow", "MID(A101,7,20)");
+
+		oParser = new parserFormula( "MID(A101,20,5)", "A2", ws );
+		ok( oParser.parse(), "MID(A101,20,5)" );
+		strictEqual( oParser.calculate().getValue(), "", "MID(A101,20,5))");
+	} );
+
+	test( "Test: \"MIDB\"", function () {
+		ws.getRange2( "A101" ).setValue( "Fluid Flow" );
+
+		oParser = new parserFormula( "MIDB(A101,1,5)", "A2", ws );
+		ok( oParser.parse(), "MIDB(A101,1,5)" );
+		strictEqual( oParser.calculate().getValue(), "Fluid", "MIDB(A101,1,5)");
+
+		oParser = new parserFormula( "MIDB(A101,7,20)", "A2", ws );
+		ok( oParser.parse(), "MIDB(A101,7,20)" );
+		strictEqual( oParser.calculate().getValue(), "Flow", "MIDB(A101,7,20)");
+
+		oParser = new parserFormula( "MIDB(A101,20,5)", "A2", ws );
+		ok( oParser.parse(), "MIDB(A101,20,5)" );
+		strictEqual( oParser.calculate().getValue(), "", "MIDB(A101,20,5))");
+	} );
+
+	test( "Test: \"FIND\"", function () {
+		ws.getRange2( "A101" ).setValue( "Miriam McGovern" );
+
+		oParser = new parserFormula( 'FIND("M",A101)', "A2", ws );
+		ok( oParser.parse(), 'FIND("M",A101)' );
+		strictEqual( oParser.calculate().getValue(), 1, 'FIND("M",A101)');
+
+		oParser = new parserFormula( 'FIND("m",A101)', "A2", ws );
+		ok( oParser.parse(), 'FIND("m",A101)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'FIND("m",A101)');
+
+		oParser = new parserFormula( 'FIND("M",A101,3)', "A2", ws );
+		ok( oParser.parse(), 'FIND("M",A101,3)' );
+		strictEqual( oParser.calculate().getValue(), 8, 'FIND("M",A101,3)');
+	} );
+
+	test( "Test: \"FINDB\"", function () {
+		ws.getRange2( "A101" ).setValue( "Miriam McGovern" );
+
+		oParser = new parserFormula( 'FINDB("M",A101)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("M",A101)' );
+		strictEqual( oParser.calculate().getValue(), 1, 'FINDB("M",A101)');
+
+		oParser = new parserFormula( 'FINDB("m",A101)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("m",A101)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'FINDB("m",A101)');
+
+		oParser = new parserFormula( 'FINDB("M",A101,3)', "A2", ws );
+		ok( oParser.parse(), 'FINDB("M",A101,3)' );
+		strictEqual( oParser.calculate().getValue(), 8, 'FINDB("M",A101,3)');
+	} );
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );

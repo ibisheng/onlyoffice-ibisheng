@@ -3580,7 +3580,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
-		this.getRange3(start,0,stop,0)._foreachRowNoEmpty(function(row){
+		this.getRange3(start,0,stop,gc_nMaxCol0)._foreachRowNoEmpty(function(row){
 			var oOldProps = row.getHeightProp();
 			if (false === oOldProps.isEqual(oDefRowPr))
 				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowProp, t.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.getIndex(), true, oOldProps, oDefRowPr));
@@ -3680,7 +3680,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
-		this.getRange3(start,0,stop,0)._foreachColNoEmpty(function(col){
+		this.getRange3(0, start, gc_nMaxRow0,stop)._foreachColNoEmpty(function(col){
 			var nIndex = col.getIndex();
 			var oOldProps = col.getWidthProp();
 			if(false === oOldProps.isEqual(oDefColPr))
@@ -4199,7 +4199,7 @@
 		var targetCell = null;
 		for (var k = 0; k < wb.loadCells.length; ++k) {
 			var elem = wb.loadCells[k];
-			if (elem.nRow == row && elem.nCol == col) {
+			if (elem.nRow == row && elem.nCol == col && this === elem.ws) {
 				targetCell = elem;
 				break;
 			}
@@ -4248,7 +4248,7 @@
 		var targetCell = null;
 		for (var k = 0; k < wb.loadCells.length; ++k) {
 			var elem = wb.loadCells[k];
-			if (elem.nRow == row && elem.nCol == col) {
+			if (elem.nRow == row && elem.nCol == col && this === elem.ws) {
 				targetCell = elem;
 				break;
 			}
@@ -6253,7 +6253,7 @@
 		}
 	};
 	Cell.prototype.setStyleInternal = function(xfs) {
-		this.xfs = xfs;
+		this.xfs = g_StyleCache.addXf(xfs);
 		this._hasChanged = true;
 	};
 	Cell.prototype.getFormula=function(){
@@ -6935,36 +6935,23 @@
 		var aResult = [];
 		if(null == sText && null == aText)
 			sText = "";
-		var color;
-		var cellfont;
+		var oNewItem, cellfont;
 		var xfs = this.getCompiledStyle();
 		if(null != xfs && null != xfs.font)
 			cellfont = xfs.font;
 		else
 			cellfont = g_oDefaultFormat.Font;
 		if(null != sText){
-			var oNewItem = new AscCommonExcel.Fragment();
+			oNewItem = new AscCommonExcel.Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.getColor();
-			if(color instanceof AscCommonExcel.ThemeColor)
-			{
-				//для посещенных гиперссылок
-				if(AscCommonExcel.g_nColorHyperlink == color.theme && null == color.tint)
-				{
-					var hyperlink = this.ws.hyperlinkManager.getByCell(this.nRow, this.nCol);
-					if(null != hyperlink && hyperlink.data.getVisited())
-					{
-						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-					}
-				}
-			}
+			oNewItem.checkVisitedHyperlink(this.nRow, this.nCol, this.ws.hyperlinkManager);
 			oNewItem.format.setSkip(false);
 			oNewItem.format.setRepeat(false);
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
-				var oNewItem = new AscCommonExcel.Fragment();
+				oNewItem = new AscCommonExcel.Fragment();
 				var oCurtext = aText[i];
 				if(null != oCurtext.text)
 				{
@@ -6983,19 +6970,7 @@
 						}
 					}
 					oNewItem.format = oCurFormat;
-					color = oNewItem.format.getColor();
-					if(color instanceof AscCommonExcel.ThemeColor)
-					{
-						//для посещенных гиперссылок
-						if(AscCommonExcel.g_nColorHyperlink == color.theme && null == color.tint)
-						{
-							var hyperlink = this.ws.hyperlinkManager.getByCell(this.nRow, this.nCol);
-							if(null != hyperlink && hyperlink.data.getVisited())
-							{
-								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-							}
-						}
-					}
+					oNewItem.checkVisitedHyperlink(this.nRow, this.nCol, this.ws.hyperlinkManager);
 					aResult.push(oNewItem);
 				}
 			}
@@ -7159,7 +7134,7 @@
 					var targetCell = null;
 					for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 						var elem = wb.loadCells[k];
-						if (elem.nRow == i && elem.nCol == j) {
+						if (elem.nRow == i && elem.nCol == j && this.worksheet === elem.ws) {
 							targetCell = elem;
 							break;
 						}
@@ -7194,7 +7169,7 @@
 					var targetCell = null;
 					for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 						var elem = wb.loadCells[k];
-						if (elem.nRow == i && elem.nCol == j) {
+						if (elem.nRow == i && elem.nCol == j && this.worksheet === elem.ws) {
 							targetCell = elem;
 							break;
 						}
@@ -7274,7 +7249,7 @@
 						var targetCell = null;
 						for (var k = 0; k < wb.loadCells.length - 1; ++k) {
 							var elem = wb.loadCells[k];
-							if (elem.nRow == i && elem.nCol == nCol) {
+							if (elem.nRow == i && elem.nCol == nCol && this.worksheet === elem.ws) {
 								targetCell = elem;
 								break;
 							}

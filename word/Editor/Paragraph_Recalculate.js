@@ -35,11 +35,6 @@
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
-function CorrectToTwips(Value)
-{
-	return (((Value * 20 * 72 / 25.4) + 0.5) | 0) * 25.4 / 20 / 72;
-}
-
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
 /**
@@ -1206,7 +1201,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     {
         BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
 
-        if (0 === CurLine)
+        if (this.Check_FirstPage(CurPage, true))
         {
 			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
@@ -1239,7 +1234,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         Top  = PRS.Y;
         Top2 = PRS.Y;
 
-        if ( 0 === CurLine )
+        if (CurLine === this.Pages[CurPage].FirstLine && this.Check_FirstPage(CurPage, true))
         {
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
@@ -1276,7 +1271,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     }
     else
     {
-        if ( 0 !== CurLine )
+        if (CurLine !== this.Pages[CurPage].FirstLine || !this.Check_FirstPage(CurPage, true))
         {
             if ( CurLine !== this.Pages[CurPage].FirstLine )
             {
@@ -1360,11 +1355,11 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
     this.Lines[CurLine].Top    = Top    - this.Pages[CurPage].Y;
     this.Lines[CurLine].Bottom = Bottom - this.Pages[CurPage].Y;
 
-    PRS.LineTop        = CorrectToTwips(Top);
-    PRS.LineBottom     = CorrectToTwips(Bottom);
-    PRS.LineTop2       = CorrectToTwips(Top2);
-    PRS.LineBottom2    = CorrectToTwips(Bottom2);
-    PRS.LinePrevBottom = CorrectToTwips(PrevBottom);
+    PRS.LineTop        = AscCommon.CorrectMMToTwips(Top);
+    PRS.LineBottom     = AscCommon.CorrectMMToTwips(Bottom);
+    PRS.LineTop2       = AscCommon.CorrectMMToTwips(Top2);
+    PRS.LineBottom2    = AscCommon.CorrectMMToTwips(Bottom2);
+    PRS.LinePrevBottom = AscCommon.CorrectMMToTwips(PrevBottom);
 };
 
 Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPage, PRS, ParaPr)
@@ -1441,7 +1436,7 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
 
     for (var nIndex = 0, nCount = Ranges.length; nIndex < nCount; ++nIndex)
 	{
-		Ranges[nIndex].Y1 = CorrectToTwips(Ranges[nIndex].Y1);
+		Ranges[nIndex].Y1 = AscCommon.CorrectMMToTwips(Ranges[nIndex].Y1);
 	}
 
     if ( true === this.Use_Wrap() )
@@ -2056,7 +2051,12 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         NewX = Tab.Pos + PageStart.X;
     }
 
-    return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
+	return {
+		NewX       : NewX,
+		TabValue   : Tab ? Tab.Value : tab_Left,
+		DefaultTab : Tab ? false : true,
+		TabLeader  : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None
+	};
 };
 
 Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage)
@@ -2170,7 +2170,13 @@ Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS, Para
 		return true;
 
 	if (!this.Check_FirstPage(CurPage))
-		return false;
+	{
+		// Если на предыдущих страницах были только разрывы страниц и колонок, тогда добавляем расстояние
+		if (this.Check_FirstPage(CurPage, true))
+			return true;
+		else
+			return false;
+	}
 
 	if (true === ParaPr.PageBreakBefore)
 		return true;

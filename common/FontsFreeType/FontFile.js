@@ -879,7 +879,7 @@
 				this.m_nMaxY = parseInt((1.2 * dSize));
 			}
 
-			// �������� ������� �������������� (FontMatrix)
+			// Вычислим матрицу преобразования (FontMatrix)
 			var fm = this.m_oFontMatrix;
 			fm.xx = Math.floor((m[0] * 65536));
 			fm.yx = Math.floor((m[1] * 65536));
@@ -946,7 +946,7 @@
 
 				this.m_dUnitsKoef = this.m_unHorDpi / 72.0 * this.m_fSize;
 
-				// ���������� ������ ������ (dSize) � DPI
+				// Выставляем размер шрифта (dSize) и DPI
 				this.m_nError = FT_Set_Char_Size(this.m_pFace, 0, parseInt(fNewSize * 64), unHorDpi, unVerDpi);
 
 				this.ClearCache();
@@ -1208,7 +1208,7 @@
 					var fX = pString.m_fX + fPenX;
 					var fY = pString.m_fY + fPenY;
 
-					// ��������� ����� ������������ ����� ������ �� ���������� �������
+					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
 					var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
 					var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
 
@@ -1482,7 +1482,7 @@
 					var fX = pString.m_fX + fPenX;
 					var fY = pString.m_fY + fPenY;
 
-					// ��������� ����� ������������ ����� ������ �� ���������� �������
+					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
 					var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
 					var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
 
@@ -1591,7 +1591,7 @@
 
 					var _m = pString.m_arrCTM;
 
-					// ��������� ����� ������������ ����� ������ �� ���������� �������
+					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
 					pCurGlyph.fX = (_m[4] + fX * _m[0] + fY * _m[2] - pString.m_fX);
 					pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
 				}
@@ -1764,7 +1764,7 @@
 
 					var _m = pString.m_arrCTM;
 
-					// ��������� ����� ������������ ����� ������ �� ���������� �������
+					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
 					pCurGlyph.fX = (_m[4] + fX * _m[0] + fY * _m[2] - pString.m_fX);
 					pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
 				}

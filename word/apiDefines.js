@@ -304,7 +304,6 @@ prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
 prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
 prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
 
-
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
 window['AscCommon'].CurFileVersion = c_oSerFormat.Version;

@@ -2848,13 +2848,17 @@ ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 	// Если мы попадаем четко в формулу, тогда ищем внутри нее, если нет, тогда не заходим внутрь
 	if ((SearchPos.X > MathX && SearchPos.X < MathX + MathW) || SearchPos.DiffX > 1000000 - 1)
 	{
+		var bFirstItem = SearchPos.DiffX > 1000000 - 1 ? true : false;
+
 		Result = this.Root.Get_ParaContentPosByXY(SearchPos, Depth, _CurLine, _CurRange, StepEnd);
 
 		if (SearchPos.InText)
 			SearchPos.DiffX = 0.001; // чтобы всегда встать в формулу, если попали в текст
 
-		// Если мы попадаем в формулу, тогда не ищем позицию вне ее
-		if (Result)
+		// TODO: Пересмотреть данную проверку. Надо выяснить насколько сильно она вообще нужна
+		// Если мы попадаем в формулу, тогда не ищем позицию вне ее. За исключением, случая когда формула идет в начале
+		// строки. Потому что в последнем случае из формулы 100% придет true, а позиция, возможно, находится за формулой.
+		if (Result && !bFirstItem)
 			SearchPos.DiffX = 0;
 	}
 
