@@ -3547,6 +3547,9 @@ function CDemonstrationManager(htmlpage)
 			_y = e.clientY;
 		}
 
+		_x = (_x * AscCommon.AscBrowser.zoom) >> 0;
+		_y = (_y * AscCommon.AscBrowser.zoom) >> 0;
+
 		_x -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.left);
 		_y -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.top);
 
