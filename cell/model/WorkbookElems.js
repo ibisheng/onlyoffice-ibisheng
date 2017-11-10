@@ -495,6 +495,16 @@ g_oColorManager = new ColorManager();
 			this.sId = oVal.sId;
 		}
 	};
+	Fragment.prototype.checkVisitedHyperlink = function (row, col, hyperlinkManager) {
+		var color = this.format.getColor();
+		if (color instanceof AscCommonExcel.ThemeColor && g_nColorHyperlink === color.theme && null === color.tint) {
+			//для посещенных гиперссылок
+			var hyperlink = hyperlinkManager.getByCell(row, col);
+			if (hyperlink && hyperlink.data.getVisited()) {
+				this.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
+			}
+		}
+	};
 
 	function readValAttr(attr){
 		if(attr()){
