@@ -1658,7 +1658,7 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.jwtError) || t.attemptCount >= t.maxAttemptCount);
+      var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) || t.attemptCount >= t.maxAttemptCount);
       var errorCode = null;
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
@@ -1707,6 +1707,8 @@
       }
     } else if (c_oCloseCode.jwtError === opt_closeCode) {
       return Asc.c_oAscError.ID.VKeyEncrypt;
+    } else if (c_oCloseCode.drop === opt_closeCode) {
+        return Asc.c_oAscError.ID.UserDrop;
     }
     return this.isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect;
   };
