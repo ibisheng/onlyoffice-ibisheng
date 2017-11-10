@@ -37,10 +37,6 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
-	function _getRowTitle(row) {
-		return "" + (row + 1);
-	}
-
 	var g_cCharDelimiter = AscCommon.g_cCharDelimiter;
 	var parserHelp = AscCommon.parserHelp;
 	var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
