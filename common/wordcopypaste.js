@@ -1310,10 +1310,10 @@ CopyProcessor.prototype =
 
 
 		var copyNotes = function(){
-			var selected_notes = elementsContent.Masters;
+			var selected_notes = elementsContent.Notes;
 
-			oThis.oPresentationWriter.WriteString2("Masters");
-			oThis.oPresentationWriter.WriteULong(selected_layouts.length);
+			oThis.oPresentationWriter.WriteString2("Notes");
+			oThis.oPresentationWriter.WriteULong(selected_notes.length);
 
 			for (var i = 0; i < selected_notes.length; ++i) {
 				oThis.CopySlide(null, selected_notes[i]);
@@ -1331,7 +1331,7 @@ CopyProcessor.prototype =
 			}
 		};
 
-		var copyNoteMaster = function(){
+		var copyNoteMasters = function(){
 			var selected_note_master = elementsContent.NotesMasters;
 
 			oThis.oPresentationWriter.WriteString2("NotesMasters");
@@ -1342,45 +1342,8 @@ CopyProcessor.prototype =
 			}
 		};
 
-		var copyLayoutsIndexes = function(){
-			var selected_indexes = elementsContent.LayoutsIndexes;
-
-			oThis.oPresentationWriter.WriteString2("LayoutsIndexes");
+		var copyIndexes = function(selected_indexes){
 			oThis.oPresentationWriter.WriteULong(selected_indexes.length);
-
-			for (var i = 0; i < selected_indexes.length; ++i) {
-				oThis.oPresentationWriter.WriteULong(selected_indexes[i]);
-			}
-		};
-
-		var copyNotesMastersIndexes = function(){
-			var selected_indexes = elementsContent.NotesMastersIndexes;
-
-			oThis.oPresentationWriter.WriteString2("NotesMastersIndexes");
-			oThis.oPresentationWriter.WriteULong(selected_indexes.length);
-
-			for (var i = 0; i < selected_indexes.length; ++i) {
-				oThis.oPresentationWriter.WriteULong(selected_indexes[i]);
-			}
-		};
-
-		var copyMastersIndexes = function(){
-			var selected_indexes = elementsContent.MastersIndexes;
-
-			oThis.oPresentationWriter.WriteString2("MastersIndexes");
-			oThis.oPresentationWriter.WriteULong(selected_indexes.length);
-
-			for (var i = 0; i < selected_indexes.length; ++i) {
-				oThis.oPresentationWriter.WriteULong(selected_indexes[i]);
-			}
-		};
-
-		var copyThemeIndexes = function(){
-			var selected_indexes = elementsContent.ThemeIndexes;
-
-			oThis.oPresentationWriter.WriteString2("ThemeIndexes");
-			oThis.oPresentationWriter.WriteULong(selected_indexes.length);
-
 			for (var i = 0; i < selected_indexes.length; ++i) {
 				oThis.oPresentationWriter.WriteULong(selected_indexes[i]);
 			}
@@ -1417,7 +1380,8 @@ CopyProcessor.prototype =
 		}
 		//LayoutsIndexes
 		if (elementsContent.LayoutsIndexes && elementsContent.LayoutsIndexes.length) {
-			copyLayoutsIndexes();
+			oThis.oPresentationWriter.WriteString2("LayoutsIndexes");
+			copyIndexes(elementsContent.LayoutsIndexes);
 		}
 		//Masters
 		if (elementsContent.Masters && elementsContent.Masters.length) {
@@ -1425,7 +1389,8 @@ CopyProcessor.prototype =
 		}
 		//MastersIndexes
 		if (elementsContent.MastersIndexes && elementsContent.MastersIndexes.length) {
-			copyMastersIndexes();
+			oThis.oPresentationWriter.WriteString2("MastersIndexes");
+			copyIndexes(elementsContent.MastersIndexes);
 		}
 		//Notes
 		if (elementsContent.Notes && elementsContent.Notes.length) {
@@ -1433,11 +1398,12 @@ CopyProcessor.prototype =
 		}
 		//NotesMasters
 		if (elementsContent.NotesMasters && elementsContent.NotesMasters.length) {
-			copyNoteMaster();
+			copyNoteMasters();
 		}
 		//NotesMastersIndexes
 		if (elementsContent.NotesMastersIndexes && elementsContent.NotesMastersIndexes.length) {
-			copyNotesMastersIndexes();
+			oThis.oPresentationWriter.WriteString2("NotesMastersIndexes");
+			copyIndexes(elementsContent.NotesMastersIndexes);
 		}
 		//NotesThemes
 		if (elementsContent.NotesThemes && elementsContent.NotesThemes.length) {
@@ -1449,7 +1415,8 @@ CopyProcessor.prototype =
 		}
 		//ThemesIndexes
 		if (elementsContent.ThemesIndexes && elementsContent.ThemesIndexes.length) {
-			copyThemeIndexes();
+			oThis.oPresentationWriter.WriteString2("ThemeIndexes");
+			copyIndexes(elementsContent.ThemesIndexes);
 		}
 	},
 
@@ -4363,7 +4330,6 @@ PasteProcessor.prototype =
 		};
 
 		var bIsMultipleContent = stream.GetBool();
-		//
 		if (true === bIsMultipleContent) {
 			var multipleParamsCount = stream.GetULong();
 			var selectedContent2 = [];
@@ -4765,6 +4731,77 @@ PasteProcessor.prototype =
 			}
 		};
 
+		var readLayouts = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var selected_layouts = stream.GetULong();
+
+			var layouts = [];
+			for (var i = 0; i < selected_layouts; ++i) {
+				layouts.push(loader.ReadSlideLayout());
+			}
+
+			presentationSelectedContent.Layouts = layouts;
+		};
+
+		var readMasters = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(loader.ReadSlideMaster());
+			}
+
+			presentationSelectedContent.Layouts = array;
+		};
+
+		var readIndexes = function(){
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(stream.GetULong());
+			}
+
+			return array;
+		};
+
+		var readThemes = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(loader.ReadTheme());
+			}
+
+			presentationSelectedContent.Themes = array;
+		};
+
+		var readNotesMasters = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(loader.ReadNoteMaster());
+			}
+
+			presentationSelectedContent.NotesMasters = array;
+		};
+
 
 		var first_content = stream.GetString2();
 		if(first_content === "SelectedContent"){
@@ -4785,6 +4822,50 @@ PasteProcessor.prototype =
 					}
 					case "SlideObjects": {
 						readSlideObjects();
+						break;
+					}
+					case "Layouts": {
+						History.TurnOff();
+						readLayouts();
+						History.TurnOn();
+						break;
+					}
+					case "LayoutsIndexes": {
+						presentationSelectedContent.LayoutsIndexes = readIndexes();
+						break;
+					}
+					case "Masters": {
+						readMasters();
+						break;
+					}
+					case "MastersIndexes": {
+						presentationSelectedContent.MastersIndexes = readIndexes();
+						break;
+					}
+					case "Notes": {
+						//copyNotes();
+						break;
+					}
+					case "NotesMasters": {
+						History.TurnOff();
+						readNotesMasters();
+						History.TurnOn();
+						break;
+					}
+					case "NotesMastersIndexes": {
+						presentationSelectedContent.NotesMastersIndexes = readIndexes();
+						break;
+					}
+					case "NotesThemes": {
+						//copyNotesThemes();
+						break;
+					}
+					case "Themes": {
+						readThemes();
+						break;
+					}
+					case "ThemeIndexes": {
+						presentationSelectedContent.ThemeIndexes = readIndexes();
 						break;
 					}
 				}
