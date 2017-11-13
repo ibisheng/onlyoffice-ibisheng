@@ -4444,24 +4444,7 @@ PasteProcessor.prototype =
 				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
 					docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
 				}
-			}
-
-			//вставка
-			var paste_callback = function () {
-				if (false === oThis.bNested) {
-					presentation.Insert_Content(presentationSelectedContent);
-					presentation.Recalculate();
-					presentation.Check_CursorMoveRight();
-					presentation.Document_UpdateInterfaceState();
-
-					oThis._setSpecialPasteShowOptionsPresentation();
-
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
-				}
-			};
-
-			var oPrepeareImages = {};
-			oThis.api.pre_Paste(fonts, oPrepeareImages, paste_callback);*/
+			}*/
 		};
 
 		var readDrawings = function () {
@@ -4485,68 +4468,6 @@ PasteProcessor.prototype =
 			}
 
 			arr_Images = objects.arrImages;
-
-			/*var arr_shapes = objects.arrShapes;
-			var arr_Images = objects.arrImages;
-
-			//SPECIAL PASTE CONVERT
-			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
-				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
-				switch (props) {
-					case Asc.c_oSpecialPasteProps.picture: {
-						break;
-					}
-				}
-			}
-
-			var font_map = {};
-			var images = [];
-			for (var i = 0; i < arr_shapes.length; ++i) {
-				if (arr_shapes[i].Drawing.getAllFonts) {
-					arr_shapes[i].Drawing.getAllFonts(font_map);
-				}
-				if (arr_shapes[i].Drawing.getAllImages) {
-					arr_shapes[i].Drawing.getAllImages(images);
-				}
-			}
-
-			var paste_callback = function () {
-				if (false === oThis.bNested) {
-					var presentationSelectedContent = new PresentationSelectedContent();
-					presentationSelectedContent.Drawings = arr_shapes;
-
-					presentation.Insert_Content(presentationSelectedContent);
-
-					presentation.Recalculate();
-					presentation.Document_UpdateInterfaceState();
-
-					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.picture]);
-
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
-				}
-			};
-
-			//грузим картинки и фонты
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}
-
-			var oObjectsForDownload = GetObjectsForImageDownload(arr_Images);
-			if (oObjectsForDownload.aUrls.length > 0) {
-				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
-					var oImageMap = {};
-					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-				});
-			} else {
-				var im_arr = [];
-				for (var key  in images) {
-					im_arr.push(key);
-				}
-
-				oThis.SetShortImageId(arr_Images);
-				oThis.api.pre_Paste(fonts, im_arr, paste_callback);
-			}*/
 		};
 
 		var readSlideObjects = function () {
@@ -4588,79 +4509,6 @@ PasteProcessor.prototype =
 			var arr_Images = loader.End_UseFullUrl();
 
 			presentationSelectedContent.SlideObjects = slideCopyObjects;
-			return;
-
-
-
-
-
-
-
-
-
-			//images and fonts
-			var font_map = {};
-			var images = [];
-			var slideCopyObjects = [];
-			for (var i = 0; i < arr_slides.length; ++i) {
-				if (arr_slides[i].getAllFonts) {
-					arr_slides[i].getAllFonts(font_map);
-				}
-				if (arr_slides[i].getAllImages) {
-					arr_slides[i].getAllImages(images);
-				}
-
-				slideCopyObjects[i] = new SlideCopyObject();
-				slideCopyObjects[i].Slide = arr_slides[i];
-			}
-
-			for (var i = 0; i < arr_layouts.length; ++i) {
-				if (arr_layouts[i].getAllFonts) {
-					arr_layouts[i].getAllFonts(font_map);
-				}
-				if (arr_layouts[i].getAllImages) {
-					arr_layouts[i].getAllImages(images);
-				}
-			}
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}
-
-			arr_Images = loader.End_UseFullUrl();
-			/*var objects = {arrImages: image_objects};
-			//load images
-
-			var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
-			if (oObjectsForDownload.aUrls.length > 0) {
-				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
-					var oImageMap = {};
-					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-				});
-			} else {
-				var im_arr = [];
-				for (var key  in images) {
-					im_arr.push(key);
-				}
-
-				oThis.SetShortImageId(objects.arrImages);
-				oThis.api.pre_Paste(fonts, im_arr, paste_callback);
-			}*/
-
-
-			//вставка
-			/*var paste_callback = function () {
-
-				var presentationSelectedContent = new PresentationSelectedContent();
-				presentationSelectedContent.SlideObjects = slideCopyObjects;
-				presentation.Insert_Content(presentationSelectedContent);
-				presentation.Recalculate();
-				presentation.Document_UpdateInterfaceState();
-
-				oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.picture]);
-
-				window['AscCommon'].g_clipboardBase.Paste_Process_End();
-			};*/
 		};
 
 
