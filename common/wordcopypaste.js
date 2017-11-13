@@ -4363,7 +4363,7 @@ PasteProcessor.prototype =
 					}
 				}*/
 			}else{
-				presentation.Insert_Content(selectedContent2[0]);
+				presentation.Insert_Content(selectedContent2[0].content);
 				presentation.Recalculate();
 				presentation.Document_UpdateInterfaceState();
 			}
@@ -4391,6 +4391,8 @@ PasteProcessor.prototype =
 	_readPresentationSelectedContent: function(stream, bDuplicate){
 
 		var presentationSelectedContent = null;
+		var fonts = [];
+		var images = {};
 		var oThis = this;
 
 		var readContent = function () {
@@ -4400,6 +4402,11 @@ PasteProcessor.prototype =
 			}
 			presentationSelectedContent.DocContent = new CSelectedContent();
 			presentationSelectedContent.DocContent.Elements = docContent;
+
+			//перебираем шрифты
+			for (var i in oThis.oFonts) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
 
 			/*for (var i = 0; i < docContent.length; ++i) {
 				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
@@ -4443,6 +4450,21 @@ PasteProcessor.prototype =
 
 			var objects = oThis.ReadPresentationShapes(stream);
 			presentationSelectedContent.Drawings = objects.arrShapes;
+
+			var arr_shapes = objects.arrShapes;
+			var font_map = {};
+			for (var i = 0; i < arr_shapes.length; ++i) {
+				if (arr_shapes[i].Drawing.getAllFonts) {
+					arr_shapes[i].Drawing.getAllFonts(font_map);
+				}
+				if (arr_shapes[i].Drawing.getAllImages) {
+					arr_shapes[i].Drawing.getAllImages(images);
+				}
+			}
+
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
 
 			/*var arr_shapes = objects.arrShapes;
 			var arr_Images = objects.arrImages;
@@ -4568,6 +4590,27 @@ PasteProcessor.prototype =
 				}
 				arr_arrTransforms.push(arrTransforms);*/
 			}
+
+			//images and fonts
+			var font_map = {};
+			var slideCopyObjects = [];
+			for (var i = 0; i < arr_slides.length; ++i) {
+				if (arr_slides[i].getAllFonts) {
+					arr_slides[i].getAllFonts(font_map);
+				}
+				if (arr_slides[i].getAllImages) {
+					arr_slides[i].getAllImages(images);
+				}
+
+				slideCopyObjects[i] = new SlideCopyObject();
+				slideCopyObjects[i].Slide = arr_slides[i];
+			}
+
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}
+
+			var image_objects = loader.End_UseFullUrl();
 
 			presentationSelectedContent.SlideObjects = slideCopyObjects;
 			return;
@@ -4739,6 +4782,7 @@ PasteProcessor.prototype =
 			}
 		};
 
+
 		var readLayouts = function(){
 			var loader = new AscCommon.BinaryPPTYLoader();
 			loader.stream = stream;
@@ -4749,6 +4793,19 @@ PasteProcessor.prototype =
 			var layouts = [];
 			for (var i = 0; i < selected_layouts; ++i) {
 				layouts.push(loader.ReadSlideLayout());
+			}
+
+			var font_map = {};
+			for (var i = 0; i < layouts.length; ++i) {
+				if (layouts[i].getAllFonts) {
+					layouts[i].getAllFonts(font_map);
+				}
+				if (layouts[i].getAllImages) {
+					layouts[i].getAllImages(images);
+				}
+			}
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
 			}
 
 			presentationSelectedContent.Layouts = layouts;
@@ -4829,7 +4886,6 @@ PasteProcessor.prototype =
 			presentationSelectedContent.NotesThemes = array;
 		};
 
-
 		var readIndexes = function(){
 			var count = stream.GetULong();
 
@@ -4851,7 +4907,7 @@ PasteProcessor.prototype =
 				}
 				var first_string = stream.GetString2();
 				switch (first_string) {
-					case "Content": {
+					case "DocContent": {
 						readContent();
 						break;
 					}
@@ -4911,7 +4967,7 @@ PasteProcessor.prototype =
 			}
 		}
 
-		return presentationSelectedContent;
+		return {content: presentationSelectedContent, fonts: fonts, images: images};
 	},
 	
 	_pasteFromHtml: function(node, bTurnOffTrackRevisions)
