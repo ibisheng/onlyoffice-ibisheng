@@ -427,6 +427,9 @@ CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImage
     var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
     this.CheckWaitingImages(aImagesToLoad);
     AscCommon.CollaborativeEditing.m_aNewImages.length = 0;
+    if(false === oApi.isSaveFonts_Images){
+        oApi.isSaveFonts_Images = true;
+    }
     oApi.fCurCallback = function (oRes) {
         var aData, i, oUrls;
         if(oRes['status'] === 'ok')
@@ -460,6 +463,10 @@ CCollaborativeEditingBase.prototype.CollectImagesFromChanges = function () {
         if(sImageFromChanges.indexOf('theme') === 0 && oApi.ThemeLoader)
         {
             oThemeUrls[sImageFromChanges] = oApi.ThemeLoader.ThemesUrlAbs + sImageFromChanges;
+        }
+        else if (0 === sImageFromChanges.indexOf('http:') || 0 === sImageFromChanges.indexOf('data:') || 0 === sImageFromChanges.indexOf('https:') ||
+            0 === sImageFromChanges.indexOf('file:') || 0 === sImageFromChanges.indexOf('ftp:'))
+        {
         }
         else
         {
