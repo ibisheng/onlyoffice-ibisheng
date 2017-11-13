@@ -321,6 +321,14 @@
 		Range.prototype.isEqualAll = function (range) {
 			return this.isEqual(range) && this.refType1 === range.refType1 && this.refType2 === range.refType2;
 		};
+		Range.prototype.isEqualWithOffsetRow = function (range, offsetRow) {
+			return this.c1 === range.c1 && this.c2 === range.c2 &&
+				this.isAbsC1() === range.isAbsC1() && this.isAbsC2() === range.isAbsC2() &&
+				this.isAbsR1() === range.isAbsR1() && this.isAbsR2() === range.isAbsR2() &&
+				(((this.r1 + offsetRow === range.r1 || (this.isAbsR1() && this.r1 === range.r1)) &&
+				(this.r2 + offsetRow === range.r2 || (this.isAbsR2()  && this.r2 === range.r2))) ||
+				(this.r1 === 0 && this.r2 === gc_nMaxRow0 && this.r1 === range.r1 && this.r2 === range.r2));
+		};
 
 		Range.prototype.contains = function (c, r) {
 			return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;

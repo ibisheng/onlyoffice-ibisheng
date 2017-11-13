@@ -1146,6 +1146,43 @@
           this.tint = null;
       }
 
+	function OpenFormula() {
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	}
+	OpenFormula.prototype.clean = function(){
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	};
+	function OpenColumnFormula(nRow, formula, parsed, refPos) {
+		this.nRow = nRow;
+		this.formula = formula;
+		this.parsed = parsed;
+		this.refPos = refPos;
+	}
+
 	function ReadColorSpreadsheet2(bcr, length) {
 		var output = null;
 		var color = new OpenColor();
@@ -5956,6 +5993,46 @@
                 return oThis.ReadWorksheetsContent(t,l);
             });
         };
+		this.ReadSheetDataExternal = function(bNoBuildDep)
+		{
+			//console.profile('ReadSheetDataExternal');
+			var oThis = this;
+			var res = c_oSerConstants.ReadOk;
+			var oldPos = this.stream.GetCurPos();
+			for (var i = 0; i < this.oReadResult.sheetData.length; ++i) {
+				var sheetDataElem = this.oReadResult.sheetData[i];
+				var ws = sheetDataElem.ws;
+				this.stream.Seek2(sheetDataElem.pos);
+				var tmp = {
+					pos: null, len: null, bNoBuildDep: bNoBuildDep, ws: ws, row: new AscCommonExcel.Row(ws),
+					cell: new AscCommonExcel.Cell(ws), formula: new OpenFormula(), sharedFormulas: {},
+					prevFormulas: {}, siFormulas: {}
+				};
+				res = this.bcr.Read1(sheetDataElem.len, function(t, l) {
+					return oThis.ReadSheetData(t, l, tmp);
+				});
+				if (!bNoBuildDep) {
+					for (var nCol in tmp.prevFormulas) {
+						if (tmp.prevFormulas.hasOwnProperty(nCol)) {
+							var prevFormula = tmp.prevFormulas[nCol];
+							if (!tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+								prevFormula.parsed.buildDependencies();
+							}
+						}
+					}
+					for (var listenerId in tmp.siFormulas) {
+						if (tmp.siFormulas.hasOwnProperty(listenerId)) {
+							tmp.siFormulas[listenerId].buildDependencies();
+						}
+					}
+				}
+				if(c_oSerConstants.ReadOk !== res)
+					break;
+			}
+			this.stream.Seek2(oldPos);
+			//console.profileEnd();
+			return res;
+		};
         this.ReadWorksheetsContent = function(type, length)
         {
             var res = c_oSerConstants.ReadOk;
@@ -6127,13 +6204,8 @@
             }
             else if ( c_oSerWorksheetsTypes.SheetData == type )
             {
-				var tmp = {
-					pos: null, len: null, ws: oWorksheet, row: new AscCommonExcel.Row(oWorksheet),
-					cell: new AscCommonExcel.Cell(oWorksheet)
-				};
-                res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadSheetData(t,l, tmp);
-                });
+				this.oReadResult.sheetData.push({ws: oWorksheet, pos: this.stream.GetCurPos(), len: length});
+				res = c_oSerConstants.ReadUnknown;
             }
             else if ( c_oSerWorksheetsTypes.Drawings == type )
             {
@@ -6458,15 +6530,74 @@
             if ( c_oSerRowTypes.Cell === type )
             {
 				tmp.cell.clear();
+                tmp.formula.clean();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCell(t,l, tmp, tmp.cell, index);
                 });
+                this.setFormulaOpen(tmp);
 				tmp.cell.saveContent();
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+		this.setFormulaOpen = function(tmp) {
+			var cell = tmp.cell;
+			var formula = tmp.formula;
+			var curFormula;
+			var prevFormula = tmp.prevFormulas[cell.nCol];
+			if (formula.v && formula.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+				var offsetRow;
+				if (prevFormula && prevFormula.parsed.sharedRef) {
+					offsetRow = cell.nRow - prevFormula.parsed.sharedRef.r1;
+				} else {
+					offsetRow = 1;
+				}
+				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
+					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
+					if (!prevFormula.parsed.sharedRef) {
+						prevFormula.parsed.sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
+					} else {
+						prevFormula.parsed.sharedRef.union3(cell.nCol, cell.nRow);
+					}
+					curFormula = prevFormula;
+				} else {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
+					var formulaParsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
+					formulaParsed.ca = formula.ca;
+					var refPos = formulaParsed.parse();
+					if (null !== formula.ref) {
+						formulaParsed.sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
+					}
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, formulaParsed, refPos);
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+				if (null !== formula.si) {
+					tmp.sharedFormulas[formula.si] = curFormula;
+					tmp.siFormulas[curFormula.parsed.getListenerId()] = curFormula.parsed;
+				}
+			} else if (null !== formula.si) {
+				curFormula = tmp.sharedFormulas[formula.si];
+				if (curFormula) {
+					curFormula.parsed.sharedRef.union3(cell.nCol, cell.nRow);
+				}
+				if (prevFormula !== curFormula) {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+			}
+			if (curFormula) {
+				cell.setFormulaInternal(curFormula.parsed);
+				if (curFormula.parsed.ca || cell.isNullText()) {
+					tmp.ws.workbook.dependencyFormulas.addToChangedCell(cell);
+				}
+			}
+		};
         this.ReadCell = function(type, length, tmp, oCell, nRowIndex)
         {
             var res = c_oSerConstants.ReadOk;
@@ -6505,12 +6636,9 @@
             }
             else if( c_oSerCellTypes.Formula === type )
             {
-                var cellWithFormula = new AscCommonExcel.CCellWithFormula(tmp.ws, oCell.nRow, oCell.nCol);
-				var oFormulaExt = {cell: cellWithFormula, aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadFormula(t,l, oFormulaExt);
+                    return oThis.ReadFormula(t,l, tmp.formula);
                 });
-				tmp.ws.aFormulaExt.push(oFormulaExt);
             }
 			else if (c_oSerCellTypes.Value === type) {
 				var val = this.stream.GetDoubleLE();
@@ -7516,7 +7644,8 @@
             activeRange: null
         };
         this.oReadResult = {
-            tableCustomFunc: []
+            tableCustomFunc: [],
+            sheetData: []
         };
         this.getbase64DecodedData = function(szSrc)
         {
@@ -7792,6 +7921,7 @@
                 if(c_oSerConstants.ReadOk == res)
                     res = (new Binary_StylesTableReader(this.stream, wb, aCellXfs, aDxfs, this.copyPasteObj.isCopyPaste)).Read();
             }
+			var bwtr = new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
             if(c_oSerConstants.ReadOk == res)
             {
                 for(var i = 0; i < aSeekTable.length; ++i)
@@ -7814,7 +7944,7 @@
                         // res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                         // break;
                         case c_oSerTableTypes.Worksheets:
-                            res = (new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
+                            res = bwtr.Read();
                             break;
                         // case c_oSerTableTypes.CalcChain:
                         //     res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
@@ -7837,8 +7967,10 @@
                     if(c_oSerConstants.ReadOk == res)
                         res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                 }
+				bwtr.ReadSheetDataExternal(false);
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
             } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
+				bwtr.ReadSheetDataExternal(true);
                 wb.init(this.oReadResult.tableCustomFunc, true);
             }
             return res;

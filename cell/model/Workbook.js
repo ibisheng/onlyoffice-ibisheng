@@ -825,17 +825,19 @@
 		},
 		//set dirty
 		addToChangedCell: function(cell) {
+			this.addToChangedPosition(cell.ws.getId(), cell.nRow, cell.nCol);
+		},
+		addToChangedPosition: function(sheetId, row, col) {
 			if (!this.changedCell) {
 				this.changedCell = {};
 			}
-			var sheetId = cell.ws.getId();
 			var changedSheet = this.changedCell[sheetId];
 			if (!changedSheet) {
 				//{}, а не [], потому что при сборке может придти сразу много одинаковых ячеек
 				changedSheet = {};
 				this.changedCell[sheetId] = changedSheet;
 			}
-			var cellIndex = getCellIndex(cell.nRow, cell.nCol);
+			var cellIndex = getCellIndex(row, col);
 			if (this.isInCalc && !changedSheet[cellIndex]) {
 				if (!this.changedCellRepeated) {
 					this.changedCellRepeated = {};
@@ -1195,7 +1197,7 @@
 									getFromCellIndex(cellIndex - 0);
 									ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
 										if (cell && cell.formulaParsed) {
-											t._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell.formulaParsed);
+											t._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell);
 										}
 									});
 								}
@@ -1211,18 +1213,22 @@
 				var dirtyCellsSheet = this.dirtyCells[cell.ws.getId()];
 				if (dirtyCellsSheet) {
 					var cellIndex = getCellIndex(cell.nRow, cell.nCol);
-					this._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell.formulaParsed);
+					this._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell);
 				}
 			}
 		},
-		_calculateDirtyFormula: function(dirtyCellsSheet, cellIndex, formula) {
+		_calculateDirtyFormula: function(dirtyCellsSheet, cellIndex, cell) {
 			var dirtyCellVal = dirtyCellsSheet[cellIndex];
-			if (1 === dirtyCellVal) {
-				dirtyCellsSheet[cellIndex] = 2;
-				formula.calculate();
-				dirtyCellsSheet[cellIndex] = 0;
-			} else if (2 === dirtyCellVal) {
-				formula.calculateCycleError();
+			if (1 === dirtyCellVal || 2 === dirtyCellVal) {
+				cell.processFormula(function(formulaParsed) {
+					if (1 === dirtyCellVal) {
+						dirtyCellsSheet[cellIndex] = 2;
+						formulaParsed.calculate();
+						dirtyCellsSheet[cellIndex] = 0;
+					} else if (2 === dirtyCellVal) {
+						formulaParsed.calculateCycleError();
+					}
+				});
 			}
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
@@ -2944,68 +2950,6 @@
 	};
 	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		var t = this;
-		if (this.aFormulaExt) {
-			var formulaShared = {};
-			for (var i = 0; i < this.aFormulaExt.length; ++i) {
-				var elem = this.aFormulaExt[i];
-				var cellWithFormula = elem.cell;
-				var oFormulaExt = elem;
-				this._getCell(cellWithFormula.nRow, cellWithFormula.nCol, function(cell) {
-					var formulaParsed;
-					var isShared = oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si;
-					if (isShared) {
-						if (null !== oFormulaExt.ref) {
-							if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-								formulaParsed = new parserFormula(oFormulaExt.v, cellWithFormula, t);
-								formulaParsed.ca = oFormulaExt.ca;
-								formulaParsed.parse();
-								cell.setFormulaInternal(formulaParsed);
-								formulaShared[oFormulaExt.si] = {
-									fVal: formulaParsed,
-									fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref),
-									fCell: cellWithFormula
-								};
-								if (!bNoBuildDep) {
-									cell._BuildDependencies(false);
-								}
-							}
-						} else {
-							var fs = formulaShared[oFormulaExt.si];
-							if (fs && fs.fRef.contains(cell.nCol, cell.nRow)) {
-								if (fs.fVal.isParsed) {
-									var off = cell.getOffset(fs.fCell);
-
-									formulaParsed = fs.fVal.clone(null, cellWithFormula, t);
-									formulaParsed.ca = oFormulaExt.ca;
-									formulaParsed.changeOffset(off);
-									formulaParsed.Formula = formulaParsed.assemble(true);
-									oFormulaExt.v = formulaParsed.Formula;
-									cell.setFormulaInternal(formulaParsed);
-									if (!bNoBuildDep) {
-										cell._BuildDependencies(false);
-									}
-								}
-							}
-						}
-					}
-					if (oFormulaExt.v) {
-						if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-							if (!cell.formulaParsed) {
-								formulaParsed = new parserFormula(oFormulaExt.v, cellWithFormula, t);
-								formulaParsed.ca = oFormulaExt.ca;
-								cell.setFormulaInternal(formulaParsed);
-								if (!bNoBuildDep) {
-									cell._BuildDependencies(true);
-								}
-							}
-						} else {
-							t.workbook.openErrors.push(cell.getName());
-						}
-					}
-				});
-			}
-			this.aFormulaExt = null;
-		}
 
 		if (!this.PagePrintOptions) {
 			// Даже если не было, создадим
@@ -5776,6 +5720,20 @@
 		}
 		return res;
 	};
+	Cell.prototype.processFormula = function(callback) {
+		if (this.formulaParsed) {
+			var sharedRef = this.formulaParsed.getShared();
+			if (sharedRef) {
+				var offsetRow = this.nRow - sharedRef.r1;
+				var offsetCol = this.nCol - sharedRef.c1;
+				AscCommonExcel.g_cellFormulaState.fill(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
+				callback(this.formulaParsed);
+				AscCommonExcel.g_cellFormulaState.clear();
+			} else {
+				callback(this.formulaParsed);
+			}
+		}
+	};
 	Cell.prototype.setChanged = function(val) {
 		this._hasChanged = val;
 	};
@@ -5847,6 +5805,10 @@
 		if(null != this.multiText && "" != AscCommonExcel.getStringFromMultiText(this.multiText))
 			return false;
 		return true;
+	};
+	Cell.prototype.isNullText = function() {
+		this._checkDirty();
+		return null === this.number && null === this.text && null === this.multiText;
 	};
 	Cell.prototype.isEmpty=function(){
 		if(false == this.isEmptyText())
@@ -6281,10 +6243,12 @@
 		var oValueText = null;
 		var oValueArray = null;
 		var xfs = this.getCompiledStyle();
-		if(this.formulaParsed)
-			oValueText = "="+this.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
-		else
-		{
+		if (this.formulaParsed) {
+			this.processFormula(function(formulaParsed) {
+				// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
+				oValueText = "=" + formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale, true);
+			});
+		} else {
 			if(null != this.text || null != this.number)
 			{
 				if (CellValueType.Bool === this.type && null != this.number)
@@ -6582,7 +6546,7 @@
 				this.formulaParsed.parse();
 			}
 			this.formulaParsed.buildDependencies();
-			if (opt_dirty || this.formulaParsed.ca || !this.getValueWithoutFormat()) {
+			if (opt_dirty || this.formulaParsed.ca || this.isNullText()) {
 				this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 			}
 		}
@@ -7073,7 +7037,27 @@
 		if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
 			return new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow);
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
+			var areaData = eventData.notifyData.areaData;
+			var areaFragment = eventData.notifyData.areaFragment;
+			if (eventData.formula.getShared() && areaData && areaFragment) {
+				var bbox = areaData.bbox;
+				var dependencyFormulas = this.ws.workbook.dependencyFormulas;
+				for (var i = 0; i < areaData.cellsInArea.length; i += 2) {
+					var row = areaData.cellsInArea[i] - bbox.r1;
+					var col = areaData.cellsInArea[i + 1] - bbox.c1;
+					var r1 = Math.max(row - areaFragment.offsetRow + 1, 0);
+					var c1 = Math.max(col - areaFragment.offsetCol + 1, 0);
+					var r2 = Math.min(row + areaFragment.offsetRow - 1, bbox.r2 - bbox.r1) - areaFragment.offsetRow + 1;
+					var c2 = Math.min(col + areaFragment.offsetCol - 1, bbox.c2 - bbox.c1) - areaFragment.offsetCol + 1;
+					for (var j = r1; j <= r2; ++j) {
+						for (var k = c1; k <= c2; ++k) {
+							dependencyFormulas.addToChangedPosition(this.ws.getId(), this.nRow + j, this.nCol + k);
+						}
+					}
+				}
+			} else {
+				this.ws.workbook.dependencyFormulas.addToChangedCell(this);
+			}
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 			this.ws._getCell(this.nRow, this.nCol, function(cell) {
 				if (cell.formulaParsed) {
@@ -7089,7 +7073,16 @@
 				}
 			});
 		} else if (AscCommon.c_oNotifyParentType.EndCalculate === type) {
-			this.ws._getCell(this.nRow, this.nCol, function(cell) {
+			var nRow = this.nRow;
+			var nCol = this.nCol;
+			var ws = this.ws;
+			var state = AscCommonExcel.g_cellFormulaState;
+			if (state.isInit()) {
+				nRow = state.nRow;
+				nCol = state.nCol;
+				ws = state.ws;
+			}
+			ws._getCell(nRow, nCol, function(cell) {
 				cell._updateCellValue();
 			});
 		}
@@ -9172,18 +9165,7 @@
 		return true;
 	};
 	Range.prototype.setOffset=function(offset){//offset = AscCommonExcel.CRangeOffset
-		this.bbox.c1 += offset.offsetCol;
-		if( this.bbox.c1 < 0 )
-			this.bbox.c1 = 0;
-		this.bbox.r1 += offset.offsetRow;
-		if( this.bbox.r1 < 0 )
-			this.bbox.r1 = 0;
-		this.bbox.c2 += offset.offsetCol;
-		if( this.bbox.c2 < 0 )
-			this.bbox.c2 = 0;
-		this.bbox.r2 += offset.offsetRow;
-		if( this.bbox.r2 < 0 )
-			this.bbox.r2 = 0;
+		this.bbox.setOffset(offset);
 	};
 	Range.prototype.setOffsetFirst=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
 		this.bbox.c1 += offset.offsetCol;
