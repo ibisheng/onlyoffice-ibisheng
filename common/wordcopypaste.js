@@ -1296,7 +1296,6 @@ CopyProcessor.prototype =
 
 		};
 
-
 		var copyMasters = function(){
 			var selected_masters = elementsContent.Masters;
 
@@ -1308,7 +1307,6 @@ CopyProcessor.prototype =
 			}
 		};
 
-
 		var copyNotes = function(){
 			var selected_notes = elementsContent.Notes;
 
@@ -1316,18 +1314,7 @@ CopyProcessor.prototype =
 			oThis.oPresentationWriter.WriteULong(selected_notes.length);
 
 			for (var i = 0; i < selected_notes.length; ++i) {
-				oThis.CopySlide(null, selected_notes[i]);
-			}
-		};
-
-		var copyTheme = function(){
-			var selected_themes = elementsContent.Themes;
-
-			oThis.oPresentationWriter.WriteString2("Themes");
-			oThis.oPresentationWriter.WriteULong(selected_themes.length);
-
-			for (var i = 0; i < selected_themes.length; ++i) {
-				oThis.oPresentationWriter.WriteTheme(selected_themes[i]);
+				oThis.oPresentationWriter.WriteSlideNote(selected_notes[i]);
 			}
 		};
 
@@ -1339,6 +1326,28 @@ CopyProcessor.prototype =
 
 			for (var i = 0; i < selected_note_master.length; ++i) {
 				oThis.oPresentationWriter.WriteNoteMaster(selected_note_master[i]);
+			}
+		};
+
+		var copyNoteTheme = function(){
+			var selected_themes = elementsContent.NotesThemes;
+
+			oThis.oPresentationWriter.WriteString2("NotesThemes");
+			oThis.oPresentationWriter.WriteULong(selected_themes.length);
+
+			for (var i = 0; i < selected_themes.length; ++i) {
+				oThis.oPresentationWriter.WriteTheme(selected_themes[i]);
+			}
+		};
+
+		var copyTheme = function(){
+			var selected_themes = elementsContent.Themes;
+
+			oThis.oPresentationWriter.WriteString2("Themes");
+			oThis.oPresentationWriter.WriteULong(selected_themes.length);
+
+			for (var i = 0; i < selected_themes.length; ++i) {
+				oThis.oPresentationWriter.WriteTheme(selected_themes[i]);
 			}
 		};
 
@@ -1394,7 +1403,7 @@ CopyProcessor.prototype =
 		}
 		//Notes
 		if (elementsContent.Notes && elementsContent.Notes.length) {
-			//copyNotes();
+			copyNotes();
 		}
 		//NotesMasters
 		if (elementsContent.NotesMasters && elementsContent.NotesMasters.length) {
@@ -1407,7 +1416,7 @@ CopyProcessor.prototype =
 		}
 		//NotesThemes
 		if (elementsContent.NotesThemes && elementsContent.NotesThemes.length) {
-
+			copyNoteTheme();
 		}
 		//Themes
 		if (elementsContent.Themes && elementsContent.Themes.length) {
@@ -4379,7 +4388,6 @@ PasteProcessor.prototype =
 	},
 
 
-	//TEST
 	_readPresentationSelectedContent: function(stream, bDuplicate){
 
 		var presentationSelectedContent = null;
@@ -4761,30 +4769,19 @@ PasteProcessor.prototype =
 			presentationSelectedContent.Layouts = array;
 		};
 
-		var readIndexes = function(){
-			var count = stream.GetULong();
-
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				array.push(stream.GetULong());
-			}
-
-			return array;
-		};
-
-		var readThemes = function(){
+		var readNotes = function(){
 			var loader = new AscCommon.BinaryPPTYLoader();
 			loader.stream = stream;
 			loader.presentation = editor.WordControl.m_oLogicDocument;
 
-			var count = stream.GetULong();
+			var selected_notes = stream.GetULong();
 
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				array.push(loader.ReadTheme());
+			var notes = [];
+			for (var i = 0; i < selected_notes; ++i) {
+				notes.push(loader.ReadNote());
 			}
 
-			presentationSelectedContent.Themes = array;
+			presentationSelectedContent.Notes = notes;
 		};
 
 		var readNotesMasters = function(){
@@ -4800,6 +4797,48 @@ PasteProcessor.prototype =
 			}
 
 			presentationSelectedContent.NotesMasters = array;
+		};
+
+		var readNotesThemes = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(loader.ReadTheme());
+			}
+
+			presentationSelectedContent.Themes = array;
+		};
+
+		var readThemes = function(){
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(loader.ReadTheme());
+			}
+
+			presentationSelectedContent.NotesThemes = array;
+		};
+
+
+		var readIndexes = function(){
+			var count = stream.GetULong();
+
+			var array = [];
+			for (var i = 0; i < count; ++i) {
+				array.push(stream.GetULong());
+			}
+
+			return array;
 		};
 
 
@@ -4843,7 +4882,7 @@ PasteProcessor.prototype =
 						break;
 					}
 					case "Notes": {
-						//copyNotes();
+						readNotes();
 						break;
 					}
 					case "NotesMasters": {
@@ -4857,7 +4896,7 @@ PasteProcessor.prototype =
 						break;
 					}
 					case "NotesThemes": {
-						//copyNotesThemes();
+						readNotesThemes();
 						break;
 					}
 					case "Themes": {
