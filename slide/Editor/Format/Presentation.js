@@ -4863,7 +4863,7 @@ CPresentation.prototype =
                         for(i = 0; i < selected_slides.length; ++i){
                             oIdMap = {};
                             oSlide = this.Slides[selected_slides[i]];
-                            oSlideCopy = oSlide.createDuplicate(oIdMap);
+                            oSlideCopy = oSlide;//.createDuplicate(oIdMap);
                             oLayout = oSlide.Layout;
                             if(!oLayoutsMap[oLayout.Get_Id()]){
                                 oLayoutsMap[oLayout.Get_Id()] = oLayout;
@@ -4904,16 +4904,19 @@ CPresentation.prototype =
                                     }
                                 }
                             }
-                            oSourceFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, oSlide.getBase64Img()));
-                            oEndFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, oSlide.getBase64Img()));
+                            oSourceFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, /*oSlide.getBase64Img()*/ ""));
+                            oEndFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, /*oSlide.getBase64Img()*/ ""));
                             AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
 
-                            oImage = AscFormat.DrawingObjectsController.prototype.createImage(oSlide.getBase64Img(), 0, 0, this.Width/2.0, this.Height/2.0);
-                            oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, this.Width/2.0, this.Height/2.0, oSlide.getBase64Img()));
+                            if(i === 0){
+                                var sRasterImageId = oSlide.getBase64Img();
+                                oImage = AscFormat.DrawingObjectsController.prototype.createImage(sRasterImageId, 0, 0, this.Width/2.0, this.Height/2.0);
+                                oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, this.Width/2.0, this.Height/2.0, sRasterImageId));
+                            }
                             oNotes = null;
                             if(oSlide.notes){
                                 oNotes = oSlide.notes;
-                                oNotesCopy = oNotes.createDuplicate();
+                                oNotesCopy = oNotes;//.createDuplicate();
                                 oSourceFormattingContent.Notes.push(oNotesCopy);
                                 for(j = 0; j < oSourceFormattingContent.NotesMasters.length; ++j){
                                     if(oSourceFormattingContent.NotesMasters[j] === oNotes.Master){
