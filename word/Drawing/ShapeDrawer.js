@@ -1063,7 +1063,9 @@ CShapeDrawer.prototype =
             // трансформируем точки в окончательные.
             // и отправляем на отрисовку (с матрицей)
 
-            var trans = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oFullTransform : this.Graphics.m_oFullTransform;
+			var _graphicsCtx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics : this.Graphics;
+
+			var trans = _graphicsCtx.m_oFullTransform;
             var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var x1 = trans.TransformPointX(0, 0);
@@ -1072,6 +1074,9 @@ CShapeDrawer.prototype =
             var y2 = trans.TransformPointY(1, 1);
             var dKoef = Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
             var _pen_w = (this.Graphics.IsTrack === true) ? (this.Graphics.Graphics.m_oContext.lineWidth * dKoef) : (this.Graphics.m_oContext.lineWidth * dKoef);
+			var _max_w = undefined;
+			if (_graphicsCtx.IsThumbnail === true)
+			    _max_w = 2;
 
             var _max_delta_eps2 = 0.001;
 
@@ -1096,18 +1101,9 @@ CShapeDrawer.prototype =
 
                 if (_max_delta > _max_delta_eps2)
                 {
-                    if (this.Graphics.IsTrack)
-                    {
-                        this.Graphics.Graphics.ArrayPoints = null;
-                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
-                        this.Graphics.Graphics.ArrayPoints = arr;
-                    }
-                    else
-                    {
-                        this.Graphics.ArrayPoints = null;
-                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
-                        this.Graphics.ArrayPoints = arr;
-                    }
+					_graphicsCtx.ArrayPoints = null;
+					DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w, _max_w), this.Ln.headEnd.GetLen(_pen_w, _max_w), this, trans1);
+					_graphicsCtx.ArrayPoints = arr;
                 }
             }
             if (this.Ln.tailEnd != null)
@@ -1133,18 +1129,9 @@ CShapeDrawer.prototype =
 
                 if (_max_delta > _max_delta_eps2)
                 {
-                    if (this.Graphics.IsTrack)
-                    {
-                        this.Graphics.Graphics.ArrayPoints = null;
-                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
-                        this.Graphics.Graphics.ArrayPoints = arr;
-                    }
-                    else
-                    {
-                        this.Graphics.ArrayPoints = null;
-                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
-                        this.Graphics.ArrayPoints = arr;
-                    }
+					_graphicsCtx.ArrayPoints = null;
+					DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w, _max_w), this.Ln.tailEnd.GetLen(_pen_w, _max_w), this, trans1);
+					_graphicsCtx.ArrayPoints = arr;
                 }
             }
             this.IsArrowsDrawing = false;

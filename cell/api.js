@@ -101,10 +101,6 @@ var editor;
 
     // Переменная отвечает, загрузились ли фонты
     this.FontLoadWaitComplete = false;
-    // Переменная отвечает, отрисовали ли мы все (иначе при рестарте, получится переинициализация)
-    this.DocumentLoadComplete = false;
-    // Переменная, которая отвечает, послали ли мы окончание открытия документа
-    this.IsSendDocumentLoadCompleate = false;
     //текущий обьект куда записываются информация для update, когда принимаются изменения в native редакторе
     this.oRedoObjectParamNative = null;
 
@@ -274,7 +270,7 @@ var editor;
         AscCommon.oGeneralEditFormatCache.cleanCache();
         AscCommon.oNumFormatCache.cleanCache();
         this.wbModel.rebuildColors();
-        if (this.IsSendDocumentLoadCompleate) {
+        if (this.isDocumentLoadComplete) {
           this._onUpdateAfterApplyChanges();
         }
       }
@@ -910,9 +906,7 @@ var editor;
     } else {
       // Шрифты загрузились, возможно стоит подождать совместное редактирование
       this.FontLoadWaitComplete = true;
-      if (this.ServerIdWaitComplete) {
-        this._openDocumentEndCallback();
-      }
+      this._openDocumentEndCallback();
     }
   };
 
@@ -1074,9 +1068,7 @@ var editor;
   spreadsheet_api.prototype.asyncServerIdEndLoaded = function() {
     // С сервером соединились, возможно стоит подождать загрузку шрифтов
     this.ServerIdWaitComplete = true;
-    if (this.FontLoadWaitComplete) {
-      this._openDocumentEndCallback();
-    }
+    this._openDocumentEndCallback();
   };
 
   // Эвент о пришедщих изменениях
@@ -1091,15 +1083,15 @@ var editor;
   // Их нужно применять после того, как мы создали WorkbookView
   // т.к. автофильтры, диаграммы, изображения и комментарии завязаны на WorksheetView (ToDo переделать)
   spreadsheet_api.prototype._applyFirstLoadChanges = function() {
-    if (this.IsSendDocumentLoadCompleate) {
+    if (this.isDocumentLoadComplete) {
       return;
     }
     if (this.collaborativeEditing.applyChanges()) {
       // Изменений не было
-      this.IsSendDocumentLoadCompleate = true;
-      this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-      this.handlers.trigger('asc_onDocumentContentReady');
+      this.onDocumentContentReady();
     }
+    // Пересылаем свои изменения (просто стираем чужие lock-и, т.к. своих изменений нет)
+    this.collaborativeEditing.sendChanges();
   };
 
   /////////////////////////////////////////////////////////////////////////
@@ -1159,9 +1151,7 @@ var editor;
       t.handlers.trigger("asc_onConnectionStateChanged", e);
     };
     this.CoAuthoringApi.onLocksAcquired = function(e) {
-      if (!t.IsSendDocumentLoadCompleate) {
-        // Пока документ еще не загружен, будем сохранять функцию и аргументы
-        t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksAcquired(e);});
+      if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksAcquired, e)) {
         return;
       }
 
@@ -1223,9 +1213,7 @@ var editor;
       }
     };
     this.CoAuthoringApi.onLocksReleased = function(e, bChanges) {
-      if (!t.IsSendDocumentLoadCompleate) {
-        // Пока документ еще не загружен, будем сохранять функцию и аргументы
-        t.arrPreOpenLocksObjects.push(function(){t.CoAuthoringApi.onLocksReleased(e, bChanges);});
+      if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksReleased, e, bChanges)) {
         return;
       }
 
@@ -1276,7 +1264,7 @@ var editor;
       }
     };
     this.CoAuthoringApi.onLocksReleasedEnd = function() {
-      if (!t.IsSendDocumentLoadCompleate) {
+      if (!t.isDocumentLoadComplete) {
         // Пока документ еще не загружен ничего не делаем
         return;
       }
@@ -1296,7 +1284,7 @@ var editor;
     };
     this.CoAuthoringApi.onSaveChanges = function(e, userId, bFirstLoad) {
       t.collaborativeEditing.addChanges(e);
-      if (!bFirstLoad && t.IsSendDocumentLoadCompleate) {
+      if (!bFirstLoad && t.isDocumentLoadComplete) {
         t.syncCollaborativeChanges();
       }
     };
@@ -1316,36 +1304,10 @@ var editor;
         t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
       }
     };
-	  this.CoAuthoringApi.onStartCoAuthoring = function (isStartEvent) {
-		  if (t.isViewMode) {
-			  return;
-		  }
-		  // На старте не нужно ничего делать
-		  if (isStartEvent) {
-			  t.startCollaborationEditing();
-		  } else {
-			  // Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
-			  if (!t.IsSendDocumentLoadCompleate) {
-				  t.startCollaborationEditing();
-				  t.CoAuthoringApi.unLockDocument(false, true);
-			  } else {
-				  // Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-				  t.canUnlockDocument = true;
-				  t.canStartCoAuthoring = true;
-			  }
-		  }
-	  };
-	  this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
-		  if (t.canUnlockDocument) {
-			  t.canStartCoAuthoring = false;
-		  } else {
-			  t.endCollaborationEditing();
-		  }
-	  };
   };
 
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {
-    if (this.IsSendDocumentLoadCompleate) {
+    if (this.isDocumentLoadComplete) {
       var arrChanges = this.wbModel.SerializeHistory();
       var deleteIndex = History.Get_DeleteIndex();
       var excelAdditionalInfo = null;
@@ -1370,12 +1332,10 @@ var editor;
   };
 
   spreadsheet_api.prototype._onUpdateAfterApplyChanges = function() {
-    if (!this.IsSendDocumentLoadCompleate) {
+    if (!this.isDocumentLoadComplete) {
       // При открытии после принятия изменений мы должны сбросить пересчетные индексы
       this.collaborativeEditing.clearRecalcIndex();
-      this.IsSendDocumentLoadCompleate = true;
-      this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-      this.handlers.trigger('asc_onDocumentContentReady');
+      this.onDocumentContentReady();
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
@@ -1479,7 +1439,7 @@ var editor;
 	// End Load document
 	spreadsheet_api.prototype._openDocumentEndCallback = function () {
 		// Не инициализируем дважды
-		if (this.DocumentLoadComplete) {
+		if (this.isDocumentLoadComplete || !this.ServerIdWaitComplete || !this.FontLoadWaitComplete) {
 			return;
 		}
 
@@ -1504,8 +1464,6 @@ var editor;
 			this.wb.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
 		}
 
-		this.DocumentLoadComplete = true;
-
 		this.asc_CheckGuiControlColors();
 		this.sendColorThemes(this.wbModel.theme);
 		this.asc_ApplyColorScheme(false);
@@ -1513,13 +1471,9 @@ var editor;
 		this.sendStandartTextures();
 		this.sendMathToMenu();
 
+		this._applyPreOpenLocks();
 		// Применяем пришедшие при открытии изменения
 		this._applyFirstLoadChanges();
-		// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-		for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
-			this.arrPreOpenLocksObjects[i]();
-		}
-		this.arrPreOpenLocksObjects = [];
 
 		// Меняем тип состояния (на никакое)
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -3182,7 +3136,7 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 	spreadsheet_api.prototype._autoSave = function () {
-		if (!this.DocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
+		if (!this.isDocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
 			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
 			this.asc_getCellEditMode() || this.asc_getIsTrackShape() || this.isOpenedChartFrame ||
 			!History.IsEndTransaction() || !this.canSave) {

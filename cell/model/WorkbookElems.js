@@ -1917,6 +1917,10 @@ CellXfs.prototype =
 	merge : function(xfs, isTable)
 	{
 		var xfIndexNumber = xfs.getIndexNumber();
+		if (undefined === xfIndexNumber) {
+			xfs = g_StyleCache.addXf(xfs, true);
+			xfIndexNumber = xfs.getIndexNumber();
+		}
 		var cache = this.getOperationCache("merge", xfIndexNumber);
 		if (!cache) {
 			cache = new CellXfs();
@@ -2778,22 +2782,20 @@ StyleManager.prototype =
 		return this._add(this.aligns, newAlign);
 	};
 	StyleCache.prototype.addXf = function(newXf, recursively) {
-		if (recursively) {
-			if(newXf.font){
-				newXf.font = this.addFont(newXf.font);
-			}
-			if(newXf.fill){
-				newXf.fill = this.addFill(newXf.fill);
-			}
-			if(newXf.border){
-				newXf.border = this.addBorder(newXf.border);
-			}
-			if(newXf.num){
-				newXf.num = this.addNum(newXf.num);
-			}
-			if(newXf.align){
-				newXf.align = this.addAlign(newXf.align);
-			}
+		if (newXf.font) {
+			newXf.font = this.addFont(newXf.font);
+		}
+		if (newXf.fill) {
+			newXf.fill = this.addFill(newXf.fill);
+		}
+		if (newXf.border) {
+			newXf.border = this.addBorder(newXf.border);
+		}
+		if (newXf.num) {
+			newXf.num = this.addNum(newXf.num);
+		}
+		if (newXf.align) {
+			newXf.align = this.addAlign(newXf.align);
 		}
 		return this._add(this.xfs, newXf);
 	};

@@ -56,47 +56,28 @@
 	CConditionalFormatting.prototype.setSqref = function(sqref) {
 		this.ranges = AscCommonExcel.g_oRangeCache.getActiveRangesFromSqRef(sqref);
 	};
-	CConditionalFormatting.prototype.clone = function() {
-		var i, res = new CConditionalFormatting();
-		res.pivot = this.pivot;
-		if (this.ranges) {
-			res.ranges = [];
-			for (i = 0; i < this.ranges.length; ++i) {
-				res.ranges.push(this.ranges[i].clone());
-			}
-		}
-		for (i = 0; i < this.aRules.length; ++i)
-			res.aRules.push(this.aRules[i].clone());
-
-		return res;
-	};
 	CConditionalFormatting.prototype.isValid = function() {
 		//todo more checks
 		return this.ranges && this.ranges.length > 0;
-	}
-	CConditionalFormatting.prototype.getBBox = function() {
-		var bbox = null;
-		if (this.ranges && this.ranges.length > 0) {
-			bbox = this.ranges[0].clone();
-			for(var i = 1 ; i < this.ranges.length; ++i){
-				bbox.union2(this.ranges[i]);
-			}
+	};
+	CConditionalFormatting.prototype.initRules = function() {
+		for (var i = 0; i < this.aRules.length; ++i) {
+			this.aRules[i].updateConditionalFormatting(this);
 		}
-		return bbox;
 	};
 
 	//todo need another approach
-	function CConditionalFormattingFormulaWrapper (ws, cf) {
+	function CConditionalFormattingFormulaWrapper (ws, rule) {
 		this.ws = ws;
-		this.cf = cf;
+		this.rule = rule;
 	}
 	CConditionalFormattingFormulaWrapper.prototype.onFormulaEvent = function(type, eventData) {
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
-			return {bbox: this.cf.getBBox(), ranges: this.cf.ranges};
+			return {bbox: this.rule.getBBox(), ranges: this.rule.ranges};
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			this.ws.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(this.cf.ranges));
+			this.ws.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(this.rule.ranges));
 		}
 	};
 
@@ -119,6 +100,12 @@
 
 		this.aRuleElements = [];
 
+		// from CConditionalFormatting
+		// Combined all the rules into one array to sort the priorities,
+		// so they transferred these properties to the rule
+		this.pivot = false;
+		this.ranges = null;
+
 		return this;
 	}
 	CConditionalFormattingRule.prototype.clone = function() {
@@ -137,6 +124,8 @@
 		res.text = this.text;
 		res.timePeriod = this.timePeriod;
 		res.type = this.type;
+
+		res.updateConditionalFormatting(this);
 
 		for (i = 0; i < this.aRuleElements.length; ++i)
 			res.aRuleElements.push(this.aRuleElements[i].clone());
@@ -266,6 +255,26 @@
 	};
 	CConditionalFormattingRule.prototype.hasStdDev = function() {
 		return null !== this.stdDev;
+	};
+	CConditionalFormattingRule.prototype.updateConditionalFormatting = function (cf) {
+		var i;
+		this.pivot = cf.pivot;
+		if (cf.ranges) {
+			this.ranges = [];
+			for (i = 0; i < cf.ranges.length; ++i) {
+				this.ranges.push(cf.ranges[i].clone());
+			}
+		}
+	};
+	CConditionalFormattingRule.prototype.getBBox = function() {
+		var bbox = null;
+		if (this.ranges && this.ranges.length > 0) {
+			bbox = this.ranges[0].clone();
+			for(var i = 1 ; i < this.ranges.length; ++i){
+				bbox.union2(this.ranges[i]);
+			}
+		}
+		return bbox;
 	};
 
 	function CColorScale () {

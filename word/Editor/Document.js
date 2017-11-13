@@ -344,9 +344,10 @@ function CSelectedContent()
     this.Comments       = [];
     this.Maths          = [];
 
-    this.HaveShape   = false;
-    this.MoveDrawing = false; // Только для переноса автофигур
-    this.HaveMath    = false;
+    this.HaveShape        = false;
+    this.MoveDrawing      = false; // Только для переноса автофигур
+    this.HaveMath         = false;
+    this.CanConvertToMath = false;
 }
 
 CSelectedContent.prototype =
@@ -391,6 +392,20 @@ CSelectedContent.prototype =
         }
 
         this.HaveMath = (this.Maths.length > 0 ? true : false);
+
+        // Проверка возможности конвертации имеющегося контента в контент для вставки в формулу.
+        // Если формулы уже имеются, то ничего не конвертируем.
+        if(!this.HaveMath)
+        {
+            if(1 === Count)
+            {
+                Element = this.Elements[0];
+                if(type_Paragraph === Element.Element.GetType() && !Element.Element.Is_Empty({SkipEnd : true, SkipAnchor : true, SkipNewLine: true, SkipPlcHldr: true}) && !Element.SelectedAll )
+                {
+                    this.CanConvertToMath = true;
+                }
+            }
+        }
 
         // Относительно картинок нас интересует только наличие автофигур с текстом.
         Count = this.DrawingObjects.length;
@@ -479,6 +494,36 @@ CSelectedContent.prototype =
                 }
             }
         }
+    },
+
+    /**
+     * Converts current content to ParaMath if it possible. Doesn't change current SelectedContent.
+     * @returns {?AscCommonWord.ParaMath}
+     * */
+    ConvertToMath : function()
+    {
+        if(!this.CanConvertToMath)
+        {
+            return null;
+        }
+
+        var oParagraph = this.Elements[0].Element;
+        var aContent = oParagraph.Content, aRunContent;
+        var oParaMath = new AscCommonWord.ParaMath();
+        oParaMath.Root.Load_FromMenu(c_oAscMathType.Default_Text, oParagraph);
+        oParaMath.Root.Correct_Content(true);
+        for(var i = 0; i < aContent.length; ++i)
+        {
+            if(aContent[i].Get_Type() === para_Run)
+            {
+                aRunContent = aContent[i].Content;
+                for(var j = 0; j < aRunContent.length; ++j)
+                {
+                    oParaMath.Add(aRunContent[j]);
+                }
+            }
+        }
+        return oParaMath;
     }
 };
 
@@ -1562,6 +1607,15 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 	this.Controller = this.LogicDocumentController;
 
     this.StartTime = 0;
+
+	//------------------------------------------------------------------------------------------------------------------
+	//  Check StartCollaborationEditing
+	//------------------------------------------------------------------------------------------------------------------
+	if (this.CollaborativeEditing && !this.CollaborativeEditing.Is_SingleUser())
+	{
+		this.StartCollaborationEditing();
+	}
+	//__________________________________________________________________________________________________________________
 }
 CDocument.prototype = Object.create(CDocumentContentBase.prototype);
 CDocument.prototype.constructor = CDocument;
@@ -5677,16 +5731,18 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 		if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.GetType() || null === LastClass.Parent)
 			return false;
 
-		var Math  = null;
-		var Count = Element.Content.length;
-		for (var Index = 0; Index < Count; Index++)
-		{
-			var Item = Element.Content[Index];
-			if (para_Math === Item.Type && null === Math)
-				Math = Element.Content[Index];
-			else if (true !== Item.Is_Empty({SkipEnd : true}))
-				return false;
-		}
+        if(!SelectedContent.CanConvertToMath)
+        {
+            var Math = null;
+            var Count = Element.Content.length;
+            for (var Index = 0; Index < Count; Index++) {
+                var Item = Element.Content[Index];
+                if (para_Math === Item.Type && null === Math)
+                    Math = Element.Content[Index];
+                else if (true !== Item.Is_Empty({SkipEnd: true}))
+                    return false;
+            }
+        }
 	}
 	else if (para_Run !== LastClass.Type)
 		return false;
@@ -5719,7 +5775,13 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			}
 		}
 
-		if (null !== InsertMathContent)
+        if(null === InsertMathContent)
+        {
+            //try to convert content to ParaMath in simple cases.
+            InsertMathContent = SelectedContent.ConvertToMath();
+        }
+
+        if (null !== InsertMathContent)
 		{
 			MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
 			MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
@@ -15467,13 +15529,8 @@ CDocument.prototype.EndViewModeInReview = function()
 };
 CDocument.prototype.StartCollaborationEditing = function()
 {
-	this.CollaborativeEditing.Start_CollaborationEditing();
 	this.DrawingDocument.Start_CollaborationEditing();
 	this.EndViewModeInReview();
-};
-CDocument.prototype.EndCollaborationEditing = function()
-{
-	this.CollaborativeEditing.End_CollaborationEditing();
 };
 CDocument.prototype.IsViewModeInReview = function()
 {
