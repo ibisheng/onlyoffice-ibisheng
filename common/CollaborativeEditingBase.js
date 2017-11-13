@@ -409,12 +409,90 @@ CCollaborativeEditingBase.prototype.Send_Changes = function()
 CCollaborativeEditingBase.prototype.Release_Locks = function()
 {
 };
+
+
+CCollaborativeEditingBase.prototype.CheckWaitingImages = function (aImages) {
+
+};
+
+CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImages) {
+    var rData = {}, oApi = editor || Asc['editor'], i;
+    if(!oApi){
+        return;
+    }
+    rData['id'] = oApi.documentId;
+    rData['c'] = 'pathurls';
+    rData['data'] = [];
+    for(i = 0; i < aImages.length; ++i)
+    {
+        rData['data'].push(aImages);
+    }
+    var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
+    this.CheckWaitingImages(aImagesToLoad);
+    AscCommon.CollaborativeEditing.m_aNewImages.length = 0;
+    oApi.fCurCallback = function (oRes) {
+        var aData, i, oUrls;
+        if(oRes['status'] === 'ok')
+        {
+            aData = oRes['data'];
+            oUrls= {};
+            for(i = 0; i < aData.length; ++i)
+            {
+                oUrls[aImages[i]] = aData[i];
+            }
+            AscCommon.g_oDocumentUrls.addUrls(oUrls);
+        }
+        AscCommon.CollaborativeEditing.SendImagesCallback(aImagesToLoad);
+    };
+    AscCommon.sendCommand(oApi, null, rData);
+};
+
+CCollaborativeEditingBase.prototype.SendImagesCallback = function (aImages) {
+    var oApi = editor || Asc['editor'];
+    oApi.pre_Save(aImages);
+};
+
+
+CCollaborativeEditingBase.prototype.CollectImagesFromChanges = function () {
+    var oApi = editor || Asc['editor'];
+    var aImages = [], sImagePath, i, sImageFromChanges, oThemeUrls = {};
+    var aNewImages = this.m_aNewImages;
+    for(i = 0; i < aNewImages.length; ++i)
+    {
+        sImageFromChanges = aNewImages[i];
+        if(sImageFromChanges.indexOf('theme') === 0 && oApi.ThemeLoader)
+        {
+            oThemeUrls[sImageFromChanges] = oApi.ThemeLoader.ThemesUrlAbs + sImageFromChanges;
+        }
+        else
+        {
+            sImagePath = AscCommon.g_oDocumentUrls.mediaPrefix + sImageFromChanges;
+            if(!AscCommon.g_oDocumentUrls.getUrl(sImagePath))
+            {
+                aImages.push(sImagePath);
+            }
+        }
+    }
+    AscCommon.g_oDocumentUrls.addUrls(oThemeUrls);
+    return aImages;
+};
+
+
 CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
 {
-    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
-    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(true);
+    this.Set_GlobalLock(true);
+    this.Set_GlobalLockSelection(true);
     // Вызываем функцию для загрузки необходимых элементов (новые картинки и шрифты)
-    editor.pre_Save(AscCommon.CollaborativeEditing.m_aNewImages);
+    var aImages = this.CollectImagesFromChanges();
+    if(aImages.length > 0)
+    {
+        this.SendImagesUrlsFromChanges(aImages);
+    }
+    else
+    {
+        this.SendImagesCallback(this.m_aNewImages);
+        this.m_aNewImages.length = 0;
+    }
 };
 CCollaborativeEditingBase.prototype.OnEnd_Load_Objects = function()
 {

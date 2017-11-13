@@ -7706,7 +7706,7 @@ PasteProcessor.prototype =
 						{
 							var rPr = this._read_rPr(node.parentNode);
 							var Item = new ParaTextPr( rPr);
-							shape.paragraphAdd(Item);
+							shape.paragraphAdd(Item, false);
 						}
                         for(var i = 0, length = value.length; i < length; i++)
                         {
@@ -7729,7 +7729,7 @@ PasteProcessor.prototype =
                                 }
                                 else
                                     Item = new ParaSpace();
-                                shape.paragraphAdd(Item);
+                                shape.paragraphAdd(Item, false);
                             }
                         }
 
@@ -7830,11 +7830,11 @@ PasteProcessor.prototype =
             {
                 if("always" === node.style.pageBreakBefore)
                 {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ));
+                    shape.paragraphAdd(new ParaNewLine( break_Line ), false);
                 }
                 else
                 {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ));
+                    shape.paragraphAdd(new ParaNewLine( break_Line ), false);
                 }
             }
 
@@ -7848,10 +7848,10 @@ PasteProcessor.prototype =
 					{
 						var rPr = this._read_rPr(node);
 						var Item = new ParaTextPr( rPr);
-						shape.paragraphAdd(Item);
+						shape.paragraphAdd(Item, false);
 					}
                     for(var i = 0; i < nTabCount; i++)
-                        shape.paragraphAdd( new ParaTab() );
+                        shape.paragraphAdd( new ParaTab(), false );
                     return;
                 }
             }

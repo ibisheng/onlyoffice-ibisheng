@@ -3658,7 +3658,7 @@ function CThumbnailsManager()
 			return false;
 		}
 
-		if (global_keyboardEvent.CtrlKey)
+		if (global_keyboardEvent.CtrlKey && !oThis.m_oWordControl.m_oApi.isReporterMode)
 		{
 			if (oThis.m_arrPages[pos.Page].IsSelected === true)
 			{
@@ -5745,6 +5745,7 @@ function CNotesDrawer(page)
 
 	this.OnRecalculateNote = function (slideNum, width, height)
 	{
+		var isChangedSlide = (this.Slide != slideNum) ? true : false;
 		this.Slide = slideNum;
 		this.Width = width;
 		this.Height = height;
@@ -5778,6 +5779,9 @@ function CNotesDrawer(page)
 		if (this.HtmlPage.m_oScrollNotes_)
 		{
 			this.HtmlPage.m_oScrollNotes_.Repos(settings, undefined, true);
+
+			if (isChangedSlide)
+				this.HtmlPage.m_oScrollNotes_.scrollToY(0);
 		}
 		else
 		{
