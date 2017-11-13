@@ -39,23 +39,16 @@ var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 var FormulaTablePartInfo = AscCommon.FormulaTablePartInfo;
-var cBoolLocal = AscCommon.cBoolLocal;
-var cErrorOrigin = AscCommon.cErrorOrigin;
-var cErrorLocal = AscCommon.cErrorLocal;
 var parserHelp = AscCommon.parserHelp;
-var oNumFormatCache = AscCommon.oNumFormatCache;
-var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
 var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 	var History = AscCommon.History;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
-var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
 var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
-var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
 	
@@ -493,6 +486,16 @@ g_oColorManager = new ColorManager();
 		}
 		if (null != oVal.sId) {
 			this.sId = oVal.sId;
+		}
+	};
+	Fragment.prototype.checkVisitedHyperlink = function (row, col, hyperlinkManager) {
+		var color = this.format.getColor();
+		if (color instanceof AscCommonExcel.ThemeColor && g_nColorHyperlink === color.theme && null === color.tint) {
+			//для посещенных гиперссылок
+			var hyperlink = hyperlinkManager.getByCell(row, col);
+			if (hyperlink && hyperlink.data.getVisited()) {
+				this.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
+			}
 		}
 	};
 
