@@ -4915,14 +4915,14 @@ CPresentation.prototype =
                                 oNotes = oSlide.notes;
                                 oNotesCopy = oNotes.createDuplicate();
                                 oSourceFormattingContent.Notes.push(oNotesCopy);
-                                for(i = 0; i < oSourceFormattingContent.NotesMasters.length; ++i){
-                                    if(oSourceFormattingContent.NotesMasters[i] === oNotes.Master){
-                                        oSourceFormattingContent.NotesMastersIndexes.push(i);
+                                for(j = 0; j < oSourceFormattingContent.NotesMasters.length; ++j){
+                                    if(oSourceFormattingContent.NotesMasters[j] === oNotes.Master){
+                                        oSourceFormattingContent.NotesMastersIndexes.push(j);
                                         break;
                                     }
                                 }
-                                if(i === oSourceFormattingContent.NotesMasters.length){
-                                    oSourceFormattingContent.NotesMastersIndexes.push(i);
+                                if(j === oSourceFormattingContent.NotesMasters.length){
+                                    oSourceFormattingContent.NotesMastersIndexes.push(j);
                                     oSourceFormattingContent.NotesMasters.push(oNotes.Master);
                                     oSourceFormattingContent.NotesThemes.push(oNotes.Master.Theme);
                                 }
