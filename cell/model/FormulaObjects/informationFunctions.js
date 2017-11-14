@@ -504,17 +504,16 @@
 	cN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
-			var arr = new cArray();
-			arg.foreach(function (elem, r, c) {
+			arg0.foreach(function (elem, r, c) {
 				if (elem instanceof cNumber || elem instanceof cError) {
-					arr.array[r][c] = elem;
+					this.array[r][c] = elem;
 				} else if (elem instanceof cBool) {
-					arr.array[r][c] = elem.tocNumber();
+					this.array[r][c] = elem.tocNumber();
 				} else {
-					arr.array[r][c] = new cNumber(0);
+					this.array[r][c] = new cNumber(0);
 				}
 			});
-			return this.value = arr;
+			return this.value = arg0;
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
