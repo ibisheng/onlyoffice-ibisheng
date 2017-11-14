@@ -926,6 +926,26 @@ CDrawingDocument.prototype =
             this.Native["DD_RemoveTargetTransform"]();
         }
     },
+    MultiplyTargetTransform: function (matrix)
+    {
+        if (!this.TextMatrix) {
+               
+            if (null == this.TextMatrix) {
+                this.TextMatrix = new AscCommon.CMatrix();
+            }
+            
+            this.TextMatrix.sx = matrix.sx;
+            this.TextMatrix.shy = matrix.shy;
+            this.TextMatrix.shx = matrix.shx;
+            this.TextMatrix.sy = matrix.sy;
+            this.TextMatrix.tx = matrix.tx;
+            this.TextMatrix.ty = matrix.ty;
+            
+            this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty); 
+        } else if (matrix) {
+            this.TextMatrix.Multiply(matrix, AscCommon.MATRIX_ORDER_PREPEND);
+        }
+    },
     UpdateTarget : function(x, y, pageIndex)
     {
         this.TargetPos.X = x;

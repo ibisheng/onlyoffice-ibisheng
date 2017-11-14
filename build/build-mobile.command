@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PRODUCT_VERSION="5.0.3"
-BUILD_NUMBER="12"
+BUILD_NUMBER="41"
 
 echo "----------------------------------------"
 echo "Building for mobile"
@@ -26,6 +26,8 @@ rm -f -r "banners.js"
 cat "../../web-apps/vendor/xregexp/xregexp-all-min.js" "temp.txt" "../../web-apps/vendor/underscore/underscore-min.js" "temp.txt" "../cell/native/common.js" "temp.txt" "../common/native/jquery_native.js" "temp.txt" > "banners.js"
 
 cat "banners.js" "../cell/sdk-all-min.js" "../cell/sdk-all.js" > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/spreadsheets/script.bin"
+
+rm -f -r "banners.js"
 
 cat "../../web-apps/vendor/xregexp/xregexp-all-min.js" "temp.txt" "../../web-apps/vendor/underscore/underscore-min.js" "temp.txt" "../common/native/wrappers/common.js" "temp.txt" "../common/native/jquery_native.js" "temp.txt" > "banners.js"
 
