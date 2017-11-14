@@ -3799,6 +3799,10 @@ var editor;
   prot["asc_getSignatures"] 		= prot.asc_getSignatures;
   prot["asc_isSignaturesSupport"] 	= prot.asc_isSignaturesSupport;
 
+  // password
+  prot["asc_setCurrentPassword"]    = prot.asc_setCurrentPassword;
+  prot["asc_resetPassword"] 		= prot.asc_resetPassword;
+
   // mobile
   prot["asc_Remove"] = prot.asc_Remove;
 })(window);

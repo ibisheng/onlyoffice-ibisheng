@@ -196,7 +196,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isFo
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param, password);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {
@@ -295,6 +295,7 @@ Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option
 	if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
         var _param = "";
         _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+		this.currentPassword = option.asc_getPassword();
         window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
     }
 };

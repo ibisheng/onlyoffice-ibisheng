@@ -171,6 +171,8 @@
 
 		this.signatures = [];
 
+		this.currentPassword = "";
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
 			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -1657,6 +1659,17 @@
 	baseEditorsApi.prototype.saveCheck = function()
 	{
 		return false;
+	};
+
+	baseEditorsApi.prototype.asc_setCurrentPassword = function(password)
+	{
+		this.currentPassword = password;
+		this.asc_Save(false);
+	};
+	baseEditorsApi.prototype.asc_resetPassword = function()
+	{
+		this.currentPassword = "";
+		this.asc_Save(false);
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

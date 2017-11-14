@@ -510,6 +510,10 @@ _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 			if ("" != obj["password"])
 			{
 				var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
+
+				var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+				_editor.currentPassword = obj["password"];
+
 				window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 			}
 			else
