@@ -1030,8 +1030,8 @@ CopyProcessor.prototype =
     },
 	
 	CopyDocument2 : function(oDomTarget, oDocument, elementsContent, bFromPresentation)
-    {	
-        if(PasteElementsId.g_bIsDocumentCopyPaste)
+	{
+		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			if(!elementsContent && oDocument && oDocument.Content)
 				elementsContent = oDocument.Content;
@@ -1068,15 +1068,15 @@ CopyProcessor.prototype =
 		}
 		else//presentation
 		{
-			this.copyPresentation2(elementsContent, oDomTarget);
+			this.copyPresentation2(oDomTarget, oDocument, elementsContent);
 		}
     },
 
-	copyPresentation2: function(elementsContent, oDomTarget){
+	copyPresentation2: function(oDomTarget, oDocument, elementsContent){
 		//DocContent/ Drawings/ SlideObjects
 		var presentation = this.oDocument;
 
-		if(elementsContent.length){
+		if(elementsContent && elementsContent.length){
 			if(elementsContent[0].DocContent || (elementsContent[0].Drawings && elementsContent[0].Drawings.length) || (elementsContent[0].SlideObjects && elementsContent[0].SlideObjects.length))
 			{
 				this.oPresentationWriter.WriteString2(this.api.documentId);
@@ -1102,24 +1102,21 @@ CopyProcessor.prototype =
 				}
 			}
 		}
-		else
+		/*else if(elementsContent)
 		{
-			//DocContent/ Drawings/ SlideObjects
-			var presentation = this.oDocument;
-
-			if(!elementsContent && oDocument && oDocument.Content)
-				elementsContent = oDocument.Content;
-
+			//эту ветку оставляю для записи едиственного варианта контента, который используется функцией getSelectedBinary
 			if(elementsContent.DocContent || (elementsContent.Drawings && elementsContent.Drawings.length) || (elementsContent.SlideObjects && elementsContent.SlideObjects.length))
 			{
 				this.oPresentationWriter.WriteString2(this.api.documentId);
 				this.oPresentationWriter.WriteDouble(presentation.Width);
 				this.oPresentationWriter.WriteDouble(presentation.Height);
-				//флаг о том, что отсутсвует множественный контент в буфере
-				this.oPresentationWriter.WriteBool(false);
 			}
-
 			this.copyPresentationContent(elementsContent, oDomTarget);
+		}*/
+		else
+		{
+			//для записи внутреннего контента таблицы
+			this.copyPresentationContent(oDocument, oDomTarget);
 		}
 	},
 
@@ -1131,7 +1128,7 @@ CopyProcessor.prototype =
 		else
 		{
 			//inner recursive call CopyDocument2 function
-			/*if (elementsContent && elementsContent.Content && elementsContent.Content.length) {//пишем таблицу в html
+			if (elementsContent && elementsContent.Content && elementsContent.Content.length) {//пишем таблицу в html
 
 				for (var Index = 0; Index < elementsContent.Content.length; Index++) {
 					var Item = elementsContent.Content[Index];
@@ -1143,19 +1140,7 @@ CopyProcessor.prototype =
 					}
 				}
 
-			} else if (elementsContent && elementsContent.length) {
-
-				for (var Index = 0; Index < elementsContent.length; Index++) {
-					var Item = elementsContent[Index];
-
-					if (type_Table === Item.GetType()) {
-						this.CopyTable(oDomTarget, Item, null);
-					} else if (type_Paragraph === Item.GetType()) {
-						this.CopyParagraph(oDomTarget, Item, true);
-					}
-				}
-
-			}*/
+			}
 		}
 	},
 
@@ -1219,9 +1204,7 @@ CopyProcessor.prototype =
 				} else {
 					var isOnlyTable = elements.length === 1;
 
-					if (oDomTarget) {
-						oThis.CopyPresentationTableFull(oDomTarget, elements[i].Drawing, isOnlyTable);
-					}
+					oThis.CopyPresentationTableFull(oDomTarget, elements[i].Drawing, isOnlyTable);
 
 					oThis.oPresentationWriter.WriteDouble(elements[i].X);
 					oThis.oPresentationWriter.WriteDouble(elements[i].Y);
@@ -1250,38 +1233,12 @@ CopyProcessor.prototype =
 			var slide;
 			for (var i = 0; i < selected_slides.length; ++i) {
 				slide = selected_slides[i].Slide;
-
-				oThis.CopySlide(oDomTarget, slide);
-
-				/*if (!layouts_map[slide.Layout.Get_Id()]) {
-					++layout_count;
-				}
-				layouts_map[slide.Layout.Get_Id()] = slide.Layout;*/
-			}
-
-			//пишем layout
-			/*this.oPresentationWriter.WriteULong(layout_count);
-			var arr_layouts_id = [];
-			var t = 0;
-			for (var key in layouts_map) {
-				this.CopyLayout(layouts_map[key]);
-				arr_layouts_id[t] = layouts_map[key];
-				++t;
-			}
-
-			var arr_ind = [];
-			for (var i = 0; i < selected_slides.length; ++i) {
-				for (t = 0; t < arr_layouts_id.length; ++t) {
-					if (selected_slides[i].Slide.Layout === arr_layouts_id[t]) {
-						arr_ind[i] = t;
-						break;
-					}
+				if(i === 0){
+					oThis.CopySlide(oDomTarget, slide);
+				} else{
+					oThis.CopySlide(null, slide);
 				}
 			}
-			for (var i = 0; i < arr_ind.length; ++i) {
-				oThis.oPresentationWriter.WriteULong(arr_ind[i]);
-			}*/
-
 		};
 
 		var copyLayouts = function(){
@@ -1516,31 +1473,6 @@ CopyProcessor.prototype =
 			var selectedContent = oDocument.GetSelectedContent2();
 			if(!selectedContent[0].DocContent && (!selectedContent[0].Drawings || (selectedContent[0].Drawings && !selectedContent[0].Drawings.length)) && (!selectedContent[0].SlideObjects || (selectedContent[0].SlideObjects && !selectedContent[0].SlideObjects.length)))
 				return false;
-			
-			//set size, if oDrawingCopyObject is placeholder
-			/*for(var i = 0; i < selectedContent.Drawings.length; ++i)
-			{
-				var oDrawingCopyObject = selectedContent.Drawings[i];
-				
-				var sp = oDrawingCopyObject.Drawing;
-                AscFormat.ExecuteNoHistory(function(){
-                    if(!sp.spPr)
-                    {
-                        sp.setSpPr(new AscFormat.CSpPr());
-                    }
-                    if(!sp.spPr.xfrm)
-                    {
-                        sp.spPr.setXfrm(new AscFormat.CXfrm());
-                    }
-                    if(!sp.spPr.xfrm.isNotNull())
-                    {
-                        sp.spPr.xfrm.setOffX(oDrawingCopyObject.X);
-                        sp.spPr.xfrm.setOffY(oDrawingCopyObject.Y);
-                        sp.spPr.xfrm.setExtX(oDrawingCopyObject.ExtX);
-                        sp.spPr.xfrm.setExtY(oDrawingCopyObject.ExtY);
-                    }
-                }, this, []);
-			}*/
 
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
@@ -1583,64 +1515,21 @@ CopyProcessor.prototype =
 
     CopySlide: function(oDomTarget, slide)
     {
-        var sSrc = slide.getBase64Img();
-        //if(sSrc.length > 0)
-        {
-            if(oDomTarget)
-            {
-				var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
-				slide.draw(_bounds_cheker, 0);
-				var oImg = new CopyElement("img");
-				oImg.oAttributes["width"] = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
-				oImg.oAttributes["height"] = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);
-				oImg.oAttributes["src"] = sSrc;
-				oDomTarget.addChild(oImg);
-			}
+		if(oDomTarget)
+		{
+			var sSrc = slide.getBase64Img();
+			var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
+			slide.draw(_bounds_cheker, 0);
+			var oImg = new CopyElement("img");
+			oImg.oAttributes["width"] = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
+			oImg.oAttributes["height"] = Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix);
+			oImg.oAttributes["src"] = sSrc;
+			oDomTarget.addChild(oImg);
+		}
 
-            /*this.oPresentationWriter.WriteString2(slide.Layout.Get_Id());
-            
-			var table_styles_ids = [];
-            var sp_tree = slide.cSld.spTree;
-			
+		//записываем slide
+		this.oPresentationWriter.WriteSlide(slide);
 
-			for(var i = 0; i < sp_tree.length; i++)
-			{
-				if(sp_tree[i] instanceof CGraphicFrame && sp_tree[i].graphicObject)
-				{
-					table_styles_ids[table_styles_ids.length] = sp_tree[i].graphicObject.Get_TableStyle();
-				}
-			}
-			
-            //записываем table_styles_ids
-			this.oPresentationWriter.WriteULong(table_styles_ids.length);
-            for(var i = 0; i < table_styles_ids.length; ++i)
-            {
-                this.oPresentationWriter.WriteBool(table_styles_ids[i] !== null);
-                if(table_styles_ids[i] !== null)
-                {
-                    this.oPresentationWriter.WriteString2(table_styles_ids[i]);
-                }
-            }*/
-
-            //записываем slide
-			this.oPresentationWriter.WriteSlide(slide);
-            /*var oNotes = slide.notes;
-            this.oPresentationWriter.WriteBool(AscCommon.isRealObject(oNotes));
-            if(AscCommon.isRealObject(oNotes)){
-                this.oPresentationWriter.WriteSlideNote(oNotes);
-            }
-
-            //записываем sp_tree параметры
-			this.oPresentationWriter.WriteULong(sp_tree.length);
-            for(var i = 0; i < sp_tree.length; ++i)
-            {
-                var sp = sp_tree[i];
-                this.oPresentationWriter.WriteDouble(sp.x);
-                this.oPresentationWriter.WriteDouble(sp.y);
-                this.oPresentationWriter.WriteDouble(sp.extX);
-                this.oPresentationWriter.WriteDouble(sp.extY);
-            }*/
-        }
     },
 
     CopyLayout: function(layout)
@@ -1840,7 +1729,10 @@ CopyProcessor.prototype =
 		}
 		History.TurnOn();
 
-		this.CopyTable(oDomTarget, Item, null);   
+		if(oDomTarget)
+		{
+			this.CopyTable(oDomTarget, Item, null);
+		}
     },
 
 	convertToCompileStylesTable: function(table)
