@@ -3007,11 +3007,7 @@
 			return v2.priority - v1.priority;
 		});
 		var oGradient1, oGradient2, oRule, multiplyRange, oRuleElement = null;
-		var o, i, l, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
-		for (i = 0; i < range.ranges.length; ++i) {
-			var rangeElem = range.ranges[i];
-			this.getRange3(rangeElem.r1, rangeElem.c1, rangeElem.r2, rangeElem.c2).cleanCache();
-		}
+		var o, l, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
 		this.sheetMergedStyles.clearConditionalStyle(range);
 		var getCacheFunction = function(rule, setFunc) {
 			var cache = {
@@ -3043,7 +3039,7 @@
 				return cache.get(row, col);
 			};
 		};
-		for (i = 0; i < aRules.length; ++i) {
+		for (var i = 0; i < aRules.length; ++i) {
 			oRule = aRules[i];
 			ranges = oRule.ranges;
 			if (this._isConditionalFormattingIntersect(range, ranges)) {
