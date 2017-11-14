@@ -4243,6 +4243,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 			PRS.EmptyLineWithBreak = false;
 			PRS.SpaceLen           = 0;
 			PRS.WordLen            = 0;
+			PRS.TextOnLine         = true;
 
             PRS.XRange = PRS.X;
         }

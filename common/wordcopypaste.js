@@ -7221,7 +7221,8 @@ PasteProcessor.prototype =
             {
                 var child = node.childNodes[i];
                 var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
-                if(true === bIsBlockChild)
+                var isEmptyChild = 0 === child.childNodes.length && !child.nodeValue;
+                if(true === bIsBlockChild && false === isEmptyChild)
                 {
                     bRootHasBlock = true;
                     bExist = true;
