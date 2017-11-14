@@ -301,6 +301,10 @@
 		{
 			var guid = data.getAttribute("guid");
 			var plugin = this.getPluginByGuid(guid);
+
+			if (!plugin)
+				return;
+
 			if (true !== plugin.variations[0].isUpdateOleOnResize)
 				return;
 
