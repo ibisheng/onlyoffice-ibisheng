@@ -54,6 +54,11 @@ function CWordCollaborativeEditing()
 CWordCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
 CWordCollaborativeEditing.prototype.constructor = CWordCollaborativeEditing;
 
+CWordCollaborativeEditing.prototype.Clear = function()
+{
+	AscCommon.CCollaborativeEditingBase.prototype.Clear.apply(this, arguments);
+	this.Remove_AllForeignCursors();
+};
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
     // Пересчитываем позиции

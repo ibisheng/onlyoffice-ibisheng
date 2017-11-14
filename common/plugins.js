@@ -219,6 +219,16 @@
 			}
 			return false;
 		},
+		stopWorked : function()
+		{
+		   for (var i in this.runnedPluginsMap)
+		   {
+			   if (this.pluginsMap[i] && !this.pluginsMap[i].isSystem)
+			   {
+					this.close(i);
+			   }
+		   }
+		},
 		isRunned : function(guid)
 		{
 			return (undefined !== this.runnedPluginsMap[guid]);

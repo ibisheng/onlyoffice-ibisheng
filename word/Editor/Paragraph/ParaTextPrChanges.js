@@ -1342,7 +1342,7 @@ CChangesParaTextPrUnifill.prototype.Load = function(Color)
 		&& typeof Unifill.fill.RasterImageId === "string"
 		&& Unifill.fill.RasterImageId.length > 0)
 	{
-		AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Unifill.fill.RasterImageId));
+		AscCommon.CollaborativeEditing.Add_NewImage(Unifill.fill.RasterImageId);
 	}
 };
 CChangesParaTextPrUnifill.prototype.Merge = private_ParaTextPrChangesOnMergeValue;

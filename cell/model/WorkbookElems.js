@@ -1920,6 +1920,10 @@ CellXfs.prototype =
 	merge : function(xfs, isTable)
 	{
 		var xfIndexNumber = xfs.getIndexNumber();
+		if (undefined === xfIndexNumber) {
+			xfs = g_StyleCache.addXf(xfs, true);
+			xfIndexNumber = xfs.getIndexNumber();
+		}
 		var cache = this.getOperationCache("merge", xfIndexNumber);
 		if (!cache) {
 			cache = new CellXfs();
@@ -2782,7 +2786,7 @@ StyleManager.prototype =
 		return this._add(this.aligns, newAlign);
 	};
 	StyleCache.prototype.addXf = function(newXf, recursively) {
-		if (recursively) {
+		if (newXf) {
 			if(newXf.font){
 				newXf.font = this.addFont(newXf.font);
 			}

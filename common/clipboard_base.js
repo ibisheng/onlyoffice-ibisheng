@@ -520,6 +520,9 @@
 					if (!g_clipboardBase.Api.asc_IsFocus(true) || g_clipboardBase.Api.isLongAction())
 						return;
 
+					var isAltGr = AscCommon.getAltGr(e);
+					if (isAltGr)
+						return;
 
 					var isCtrl  = (e.ctrlKey === true || e.metaKey === true);
 					var isShift = e.shiftKey;

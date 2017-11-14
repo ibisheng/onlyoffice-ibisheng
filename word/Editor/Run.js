@@ -1108,17 +1108,17 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
             ContentPos.Data[Depth]++;
     }
 
-    // Обновляем позиции в поиске
-    var SearchMarksCount = this.SearchMarks.length;
-    for ( var Index = 0; Index < SearchMarksCount; Index++ )
-    {
-        var Mark       = this.SearchMarks[Index];
-        var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
-        var Depth      = Mark.Depth;
+	// Обновляем позиции в поиске
+	var SearchMarksCount = this.SearchMarks.length;
+	for (var Index = 0; Index < SearchMarksCount; Index++)
+	{
+		var Mark       = this.SearchMarks[Index];
+		var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+		var Depth      = Mark.Depth;
 
-        if ( ContentPos.Data[Depth] >= Pos )
-            ContentPos.Data[Depth]++;
-    }
+		if (ContentPos.Data[Depth] > Pos || (ContentPos.Data[Depth] === Pos && true === Mark.Start))
+			ContentPos.Data[Depth]++;
+	}
 
     // Обновляем позиции для орфографии
     var SpellingMarksCount = this.SpellingMarks.length;

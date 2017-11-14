@@ -2610,6 +2610,7 @@
         };
         this.WriteWorksheet = function(ws, index)
         {
+            var i;
             var oThis = this;
             this.bs.WriteItem(c_oSerWorksheetsTypes.WorksheetProp, function(){oThis.WriteWorksheetProp(ws, index);});
 
@@ -2665,10 +2666,11 @@
 			if (ws.aSparklineGroups.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.aSparklineGroups);});
             }
-			for (var i = 0; i < ws.aConditionalFormatting.length; ++i) {
-				this.bs.WriteItem(c_oSerWorksheetsTypes.ConditionalFormatting, function(){oThis.WriteConditionalFormatting(ws.aConditionalFormatting[i]);});
+            // ToDo combine rules for matching ranges
+			for (i = 0; i < ws.aConditionalFormattingRules.length; ++i) {
+				this.bs.WriteItem(c_oSerWorksheetsTypes.ConditionalFormatting, function(){oThis.WriteConditionalFormatting(ws.aConditionalFormattingRules[i]);});
 			}
-			for (var i = 0; i < ws.pivotTables.length; ++i) {
+			for (i = 0; i < ws.pivotTables.length; ++i) {
 				this.bs.WriteItem(c_oSerWorksheetsTypes.PivotTable, function(){oThis.WritePivotTable(ws.pivotTables[i])});
 			}
         };
@@ -3859,19 +3861,17 @@
             for(var i = 0, length = aReplies.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
         };
-		this.WriteConditionalFormatting = function(oCf)
+		this.WriteConditionalFormatting = function(oRule)
 		{
 			var oThis = this;
-			if (null != oCf.pivot) {
-				this.bs.WriteItem(c_oSer_ConditionalFormatting.Pivot, function() {oThis.memory.WriteBool(oCf.pivot);});
+			if (null != oRule.pivot) {
+				this.bs.WriteItem(c_oSer_ConditionalFormatting.Pivot, function() {oThis.memory.WriteBool(oRule.pivot);});
 			}
-			if (null != oCf.ranges) {
-				var sqref = getSqRefString(oCf.ranges);
+			if (null != oRule.ranges) {
+				var sqref = getSqRefString(oRule.ranges);
 				this.bs.WriteItem(c_oSer_ConditionalFormatting.SqRef, function() {oThis.memory.WriteString3(sqref);});
 			}
-			for (var i = 0; i < oCf.aRules.length; ++i) {
-				this.bs.WriteItem(c_oSer_ConditionalFormatting.ConditionalFormattingRule, function() {oThis.WriteConditionalFormattingRule(oCf.aRules[i]);});
-			}
+			this.bs.WriteItem(c_oSer_ConditionalFormatting.ConditionalFormattingRule, function() {oThis.WriteConditionalFormattingRule(oRule);});
 		};
 		this.WriteConditionalFormattingRule = function(rule) {
 			var oThis = this;
@@ -6011,7 +6011,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            var oBinary_TableReader;
+            var oBinary_TableReader, oConditionalFormatting;
             if ( c_oSerWorksheetsTypes.WorksheetProp == type )
             {
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
@@ -6020,7 +6020,6 @@
             }
             else if ( c_oSerWorksheetsTypes.Cols == type )
             {
-                var oConditionalFormatting = null;
                 if(null == oWorksheet.Cols)
                     oWorksheet.aCols = [];
                 var aTempCols = [];
@@ -6162,7 +6161,9 @@
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
                 });
 				if (oConditionalFormatting.isValid()) {
-					oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+					oConditionalFormatting.initRules();
+					oWorksheet.aConditionalFormattingRules =
+						oWorksheet.aConditionalFormattingRules.concat(oConditionalFormatting.aRules);
 				}
             } else if (c_oSerWorksheetsTypes.SheetViews === type) {
                 res = this.bcr.Read1(length, function (t, l) {
