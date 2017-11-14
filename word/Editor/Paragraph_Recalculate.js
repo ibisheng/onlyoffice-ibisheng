@@ -1114,6 +1114,9 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
 
     if (PRS.GetFootnoteReferencesCount(null, true) > 0)
     	this.Lines[CurLine].Info |= paralineinfo_Notes;
+
+    if (true === PRS.TextOnLine)
+    	this.Lines[CurLine].Info |= paralineinfo_TextOnLine;
 };
 
 Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPage, PRS, ParaPr)
@@ -1136,7 +1139,7 @@ Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPa
 
     // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
     // текста, на котором закончилась данная строка.
-    if ( true === PRS.EmptyLine || PRS.LineAscent < 0.001 )
+    if ( true === PRS.EmptyLine || PRS.LineAscent < 0.001 || (true === PRS.End && true !== PRS.TextOnLine))
     {
         var LastItem = (true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].EndPos]);
 
@@ -2241,6 +2244,7 @@ var paralineinfo_RangeY        = 0x0008; // Строка начинается п
 var paralineinfo_BreakRealPage = 0x0010; // В строке есть PageBreak
 var paralineinfo_BadLeftTab    = 0x0020; // В строке есть левый таб, который правее правой границы
 var paralineinfo_Notes         = 0x0040; // В строке есть сноски
+var paralineinfo_TextOnLine    = 0x0080; // Есть ли в строке текст
 
 function CParaLine()
 {
@@ -2633,6 +2637,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.StartWord       = false;
     this.Word            = false;
     this.AddNumbering    = true;
+    this.TextOnLine      = false;
 
     this.BreakPageLine      = false; // Разрыв страницы (параграфа) в данной строке
     this.UseFirstLine       = false;
@@ -2763,7 +2768,8 @@ CParagraphRecalculateStateWrap.prototype =
         this.End                 = false;
         this.UseFirstLine        = false;
         this.BreakRealPageLine   = false;
-        this.BadLeftTab          = false;
+        this.BadLeftTab          = false
+		this.TextOnLine          = false;
 
         this.LineTextAscent      = 0;
         this.LineTextAscent2     = 0;
