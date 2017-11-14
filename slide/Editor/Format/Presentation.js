@@ -43,12 +43,6 @@ var History = AscCommon.History;
 
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
-function SlideCopyObject(Slide, ImageUrl)
-{
-    this.Slide = Slide;
-    this.ImageUrl = ImageUrl;
-}
-
 function DrawingCopyObject(Drawing, X, Y, ExtX, ExtY, ImageUrl)
 {
     this.Drawing = Drawing;
@@ -4426,7 +4420,7 @@ CPresentation.prototype =
 
 
     Notes_GetHeight: function(){
-        if(!this.Slide[this.CurPage]){
+        if(!this.Slides[this.CurPage]){
             return 0;
         }
         return this.Slides[this.CurPage].getNotesHeight();
@@ -4710,8 +4704,7 @@ CPresentation.prototype =
                         {
                             oIdMap = {};
                             var oSlideCopy = this.Slides[selected_slides[i]].createDuplicate(oIdMap);
-							curImgUrl = this.Slides[selected_slides[i]].getBase64Img();
-                            ret.SlideObjects.push(new SlideCopyObject(oSlideCopy, curImgUrl));
+                            ret.SlideObjects.push(oSlideCopy);
                             AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
                         }
                     }
@@ -4904,9 +4897,8 @@ CPresentation.prototype =
                                     }
                                 }
                             }
-                            oSourceFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, /*oSlide.getBase64Img()*/ ""));
-                            oEndFormattingContent.SlideObjects.push(new SlideCopyObject(oSlideCopy, /*oSlide.getBase64Img()*/ ""));
-                            AscFormat.fResetConnectorsIds(oSlideCopy.cSld.spTree, oIdMap);
+                            oSourceFormattingContent.SlideObjects.push(oSlideCopy);
+                            oEndFormattingContent.SlideObjects.push(oSlideCopy);
 
                             if(i === 0){
                                 var sRasterImageId = oSlide.getBase64Img();
@@ -4970,6 +4962,112 @@ CPresentation.prototype =
         return shape;
     },
 
+    /** insert content from aContents, aContents[0] - end formatting, aContents[1] - source formatting, aContents[2] - image
+    * @param {Array} aContents
+    * @param {number} nIndex
+    * */
+    Insert_Content2: function(aContents, nIndex)
+    {
+        var oContent = aContents[nIndex], oSlide, i, bEndFormatting = (nIndex === 0), oSourceContent;
+        var nLayoutIndex, nMasterIndex, nNotesMasterIndex;
+        var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster;
+        if(!oContent)
+        {
+            return;
+        }
+        if(oContent.SlideObjects.length > 0)
+        {
+            oCurrentMaster = this.Slides[this.CurPage] && this.Slides[this.CurPage].Layout && this.Slides[this.CurPage].Layout.Master;
+            if(!oCurrentMaster)
+            {
+                oCurrentMaster = this.slideMasters[0];
+            }
+            for(i = 0; i < oContent.SlideObjects.length; ++i)
+            {
+                oSlide = oContent.SlideObjects[i];
+                oSourceContent = aContents[1];
+                nLayoutIndex = oSourceContent.LayoutsIndexes[i];
+                oLayout = oSourceContent.Layouts[nLayoutIndex];
+                nMasterIndex = oContent.MastersIndexes[nLayoutIndex];
+                oMaster = oContent.Masters[nMasterIndex];
+                oTheme = oContent.Themes[nMasterIndex];
+                oNotes = oContent.Notes[i];
+                nNotesMasterIndex = oContent.NotesMastersIndexes[i];
+                oNotesMaster = oContent.NotesMastersIndexes[nNotesMasterIndex];
+                oNotesTheme = oContent.NotesThemes[nNotesMasterIndex];
+                if(bEndFormatting || !oLayout || !oMaster || !oTheme)
+                {
+                    if(!oSlide.Layout)
+                    {
+                        if(oLayout)
+                        {
+                            oSlide.setLayout(oCurrentMaster.getMatchingLayout(oLayout.type, oLayout.matchingName, oLayout.cSld.name, true));
+                        }
+                        else
+                        {
+                            oSlide.setLayout(oCurrentMaster.sldLayoutLst[0]);
+                        }
+                    }
+                    if(!oSlide.notes)
+                    {
+                        if(oNotes)
+                        {
+                            if(!oNotes.Master)
+                            {
+                                oNotes.setNotesMaster(this.notesMasters[0]);
+                            }
+                            oSlide.setNotes(oNotes);
+                            oNotes.setSlide(oSlide);
+                        }
+                        else
+                        {
+                            oSlide.setNotes(AscCommonSlide.CreateNotes());
+                            oSlide.notes.setNotesMaster(this.notesMasters[0]);
+                            oSlide.notes.setSlide(oSlide);
+                        }
+                    }
+                }
+                else
+                {
+                    if(!oMaster.Theme)
+                    {
+                        oMaster.setTheme(oTheme);
+                    }
+                    if(!oLayout.Master)
+                    {
+                        oLayout.setMaster(oMaster);
+                    }
+                    if(!oSlide.Layout)
+                    {
+                        oSlide.setLayout(oLayout);
+                    }
+                    if(!oNotes || !oNotesMaster || !oNotesTheme)
+                    {
+                        oSlide.setNotes(AscCommonSlide.CreateNotes());
+                        oSlide.notes.setNotesMaster(this.notesMasters[0]);
+                        oSlide.notes.setSlide(oSlide);
+                    }
+                    else
+                    {
+                        if(!oNotesMaster.Themes)
+                        {
+                            oNotesMaster.setTheme(oNotesTheme);
+                        }
+                        if(!oNotes.Master)
+                        {
+                            oNotes.setNotes(oNotesMaster);
+                        }
+                        if(!oSlide.notes)
+                        {
+                            oSlide.setNotes(oNotes);
+                        }
+                    }
+                }
+            }
+        }
+        this.Insert_Content(oContent);
+    },
+
     Insert_Content : function(Content)
     {
         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray(), i;
@@ -4980,7 +5078,7 @@ CPresentation.prototype =
             this.needSelectPages.length = 0;
             for(i = 0; i < Content.SlideObjects.length; ++i)
             {
-                this.insertSlide(las_slide_index + i + 1, Content.SlideObjects[i].Slide);
+                this.insertSlide(las_slide_index + i + 1, Content.SlideObjects[i]);
                 this.needSelectPages.push(las_slide_index + i + 1);
             }
             this.CurPage = las_slide_index + 1;

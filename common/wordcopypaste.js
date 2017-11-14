@@ -1222,7 +1222,7 @@ CopyProcessor.prototype =
 			var selected_slides = elementsContent.SlideObjects;
 
 			oThis.oPresentationWriter.WriteString2("SlideObjects");
-			oThis.oPresentationWriter.WriteString2(selected_slides[0].ImageUrl);
+			oThis.oPresentationWriter.WriteString2("");
 			oThis.oPresentationWriter.WriteULong(selected_slides.length);
 
 			var layouts_map = {};
@@ -1232,7 +1232,7 @@ CopyProcessor.prototype =
 			//пишем слайд
 			var slide;
 			for (var i = 0; i < selected_slides.length; ++i) {
-				slide = selected_slides[i].Slide;
+				slide = selected_slides[i];
 				if(i === 0){
 					oThis.CopySlide(oDomTarget, slide);
 				} else{
@@ -4158,9 +4158,7 @@ PasteProcessor.prototype =
 				if (arr_slides[i].getAllImages) {
 					arr_slides[i].getAllImages(images);
 				}
-
-				slideCopyObjects[i] = new SlideCopyObject();
-				slideCopyObjects[i].Slide = arr_slides[i];
+				slideCopyObjects[i] = arr_slides[i];
 			}
 
 			for (var i = 0; i < arr_layouts.length; ++i) {
@@ -4378,8 +4376,7 @@ PasteProcessor.prototype =
 			var slideCopyObjects = [];
 			for (var i = 0; i < slide_count; ++i) {
 				arr_slides[i] = loader.ReadSlide(0);
-				slideCopyObjects[i] = new SlideCopyObject();
-				slideCopyObjects[i].Slide = arr_slides[i];
+				slideCopyObjects[i] = arr_slides[i];
 			}
 
 			//images and fonts
@@ -4390,8 +4387,7 @@ PasteProcessor.prototype =
 					arr_slides[i].getAllFonts(font_map);
 				}
 
-				slideCopyObjects[i] = new SlideCopyObject();
-				slideCopyObjects[i].Slide = arr_slides[i];
+				slideCopyObjects[i] = arr_slides[i];
 			}
 
 			for (var i in font_map) {
@@ -5615,10 +5611,8 @@ PasteProcessor.prototype =
 		var slide;
         for(var i = 0; i < count; ++i)
         {
-            slide = new SlideCopyObject();
-
             loader.ClearConnectorsMaps();
-			slide.Slide = loader.ReadSlide(0);
+			slide = loader.ReadSlide(0);
             loader.AssignConnectorsId();
 			arr_slides.push(slide);
         }
