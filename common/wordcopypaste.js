@@ -3677,11 +3677,130 @@ PasteProcessor.prototype =
 		var p_url = stream.GetString2();
 		var p_width = stream.GetULong() / 100000;
 		var p_height = stream.GetULong() / 100000;
-		//var kw = presentation.Width/p_width;
-		//var kh = presentation.Height/p_height;
-		var fonts = [];
 
-		var first_string = stream.GetString2();
+
+		var bIsMultipleContent = stream.GetBool();
+		if (true === bIsMultipleContent) {
+			var multipleParamsCount = stream.GetULong();
+			var selectedContent2 = [];
+			for(var i = 0; i < multipleParamsCount; i++){
+				selectedContent2.push(this._readPresentationSelectedContent(stream));
+			}
+		}
+
+		var pasteObj = selectedContent2[0];
+		var arr_Images = pasteObj.images;
+		var fonts = pasteObj.fonts;
+		var content = pasteObj.content;
+
+
+		if(content.DocContent){
+			var elements = content.DocContent.Elements;
+			var aContent = [];
+			for (var i = 0; i < elements.length; i++) {
+				aContent[i] = AscFormat.ConvertParagraphToWord(elements[i].Element, this.oDocument);
+			}
+			this.aContent = aContent;
+
+			oThis.api.pre_Paste(fonts, arr_Images, fPrepasteCallback);
+		} else if(content.Drawings) {
+
+			var arr_shapes = content.Drawings;
+			var arrImages = pasteObj.images;
+			//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
+			if (!arrImages.length && arr_shapes.length === 1 && arr_shapes[0] &&
+				arr_shapes[0].Drawing && arr_shapes[0].Drawing.graphicObject) {
+				var drawing = arr_shapes[0].Drawing;
+
+				if (typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame) {
+					var aContent = [];
+					var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
+					table.Document_Get_AllFontNames(font_map);
+
+					//перебираем шрифты
+					for (var i in font_map) {
+						fonts.push(new CFont(i, 0, "", 0));
+					}
+
+					//TODO стиль не прокидывается. в будущем нужно реализовать
+					table.TableStyle = null;
+					aContent.push(table);
+
+					this.aContent = aContent;
+					oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
+
+					return;
+				}
+			}
+
+
+			var aImagesToDownload = [];
+			for (var i = 0; i < arrImages.length; i++) {
+				aImagesToDownload.push(arrImages[i].Url);
+			}
+
+			//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
+			if (arr_shapes.length > 1) {
+				for (var i = 0; i <arr_shapes.length; i++) {
+					if (typeof CGraphicFrame !== "undefined" &&
+						arr_shapes[i].Drawing instanceof CGraphicFrame) {
+						aImagesToDownload.push(arr_shapes[i].base64);
+						arrImages.push(arr_shapes[i]);
+					}
+				}
+			}
+
+			//get fonts from shapes
+			/*var images = [];
+			for (var i = 0; i < arr_shapes.length; ++i) {
+				if (arr_shapes[i].Drawing.getAllFonts) {
+					arr_shapes[i].Drawing.getAllFonts(font_map);
+				}
+			}
+			//перебираем шрифты
+			for (var i in font_map) {
+				fonts.push(new CFont(i, 0, "", 0));
+			}*/
+
+			//в конце добавляем ссылки на wmf, ole
+			for (var i = 0; i < arrImages.length; ++i) {
+				var oBuilderImage = arrImages[i];
+				if (oBuilderImage.AdditionalUrls) {
+					for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+						aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
+					}
+				}
+			}
+
+			AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+				var image_map = {};
+				for (var i = 0, length = Math.min(data.length, arrImages.length); i < length; ++i) {
+					var elem = data[i];
+					if (null != elem.url) {
+						var name = g_oDocumentUrls.imagePath2Local(elem.path);
+						var imageElem = arrImages[i];
+						if (null != imageElem) {
+							//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
+							if (imageElem.base64) {
+								imageElem.base64 = name;
+							} else {
+								imageElem.SetUrl(name);
+							}
+						}
+						image_map[i] = name;
+					} else {
+						image_map[i] = aImagesToDownload[i];
+					}
+				}
+
+				aContent = oThis._convertExcelBinary(null, arr_shapes);
+				oThis.aContent = aContent.content;
+				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
+			});
+		}
+
+
+
 
 		switch (first_string) {
 			case "Content": {
@@ -4520,7 +4639,7 @@ PasteProcessor.prototype =
 			var countContent = stream.GetULong();
 			for(var i = 0; i < countContent; i++){
 				if(null === presentationSelectedContent){
-					presentationSelectedContent = new PresentationSelectedContent();
+					presentationSelectedContent = typeof PresentationSelectedContent !== "undefined" ? new PresentationSelectedContent() : {};
 				}
 				var first_string = stream.GetString2();
 				switch (first_string) {
@@ -6837,7 +6956,7 @@ PasteProcessor.prototype =
 			"ivxlcdm",
 			"IVXLCDM",
 			"abcdefghijklmnopqrstuvwxyz", 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		];
 		
 		//TODO пересмотреть функцию перевода из римских чисел
@@ -7063,8 +7182,7 @@ PasteProcessor.prototype =
 		//Ищем если есть tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
-			var nodeName = node.childNodes[i].nodeName.toLowerCase();
-			if("tbody" === nodeName || "thead" === nodeName)
+            if("tbody" === node.childNodes[i].nodeName.toLowerCase())
             {
                 if(!newNode)
 					newNode = node.childNodes[i];
@@ -7674,8 +7792,7 @@ PasteProcessor.prototype =
             {
                 var child = node.childNodes[i];
                 var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
-                var isEmptyChild = 0 === child.childNodes.length && !child.nodeValue;
-                if(true === bIsBlockChild && false === isEmptyChild)
+                if(true === bIsBlockChild)
                 {
                     bRootHasBlock = true;
                     bExist = true;
@@ -8160,7 +8277,7 @@ PasteProcessor.prototype =
 						{
 							var rPr = this._read_rPr(node.parentNode);
 							var Item = new ParaTextPr( rPr);
-							shape.paragraphAdd(Item, false);
+							shape.paragraphAdd(Item);
 						}
                         for(var i = 0, length = value.length; i < length; i++)
                         {
@@ -8183,7 +8300,7 @@ PasteProcessor.prototype =
                                 }
                                 else
                                     Item = new ParaSpace();
-                                shape.paragraphAdd(Item, false);
+                                shape.paragraphAdd(Item);
                             }
                         }
 
@@ -8284,11 +8401,11 @@ PasteProcessor.prototype =
             {
                 if("always" === node.style.pageBreakBefore)
                 {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ), false);
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
                 }
                 else
                 {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ), false);
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
                 }
             }
 
@@ -8302,10 +8419,10 @@ PasteProcessor.prototype =
 					{
 						var rPr = this._read_rPr(node);
 						var Item = new ParaTextPr( rPr);
-						shape.paragraphAdd(Item, false);
+						shape.paragraphAdd(Item);
 					}
                     for(var i = 0; i < nTabCount; i++)
-                        shape.paragraphAdd( new ParaTab(), false );
+                        shape.paragraphAdd( new ParaTab() );
                     return;
                 }
             }
