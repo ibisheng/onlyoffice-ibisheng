@@ -6611,7 +6611,8 @@ PasteProcessor.prototype =
 		//Ищем если есть tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
-            if("tbody" === node.childNodes[i].nodeName.toLowerCase())
+			var nodeName = node.childNodes[i].nodeName.toLowerCase();
+			if("tbody" === nodeName || "thead" === nodeName)
             {
                 if(!newNode)
 					newNode = node.childNodes[i];
