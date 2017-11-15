@@ -4350,6 +4350,11 @@
 					}
 				}
 			}
+		} else if(cElementType.cell === arg0.type){
+			var val = arg0.getValue();
+			if (val && cElementType.number === val.type && AscCommonExcel.matching(val, matchingInfo)) {
+				_sum += val.getValue();
+			}
 		} else {
 			return new cError(cErrorType.wrong_value_type);
 		}
