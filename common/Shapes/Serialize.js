@@ -7313,7 +7313,9 @@ function BinaryPPTYLoader()
                 case 6:
                 {
                     //sym
-                    rPr.RFonts.HAnsi = { Name: this.ReadTextFontTypeface(), Index : -1 };
+
+                    s.SkipRecord();
+                    //rPr.RFonts.HAnsi = { Name: this.ReadTextFontTypeface(), Index : -1 };
                     break;
                 }
                 case 7:
@@ -7326,6 +7328,7 @@ function BinaryPPTYLoader()
                 case 8:
                 {
                     s.SkipRecord();
+                    break;
                 }
                 default:
                 {
