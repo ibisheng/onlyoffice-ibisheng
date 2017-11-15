@@ -69,7 +69,7 @@ CInlineLevelSdt.prototype.GetId = function()
 {
 	return this.Get_Id();
 };
-CInlineLevelSdt.prototype.Copy = function(Selected)
+CInlineLevelSdt.prototype.Copy = function(Selected, oPr)
 {
 	var ContentControl = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 

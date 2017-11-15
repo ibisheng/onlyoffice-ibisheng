@@ -1123,6 +1123,10 @@ ParaNewLine.prototype.IsColumnBreak = function()
 {
 	return (break_Column === this.BreakType);
 };
+ParaNewLine.prototype.IsLineBreak = function()
+{
+	return (break_Line === this.BreakType);
+};
 
 
 // Класс ParaNumbering

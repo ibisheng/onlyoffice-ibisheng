@@ -434,6 +434,8 @@ CFieldInstructionParser.prototype.private_ReadPAGEREF = function()
 };
 CFieldInstructionParser.prototype.private_ReadTOC = function()
 {
+	// TODO: \a, \b, \c, \d, \f, \l, \s, \z, \u
+
 	this.Result = new CFieldInstructionTOC();
 
 	while (this.private_ReadNext())

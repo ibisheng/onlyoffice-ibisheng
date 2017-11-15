@@ -623,7 +623,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_Type = function()
 {
     return this.Type;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected)
+CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected, oPr)
 {
     var NewElement = new this.constructor();
 
@@ -647,9 +647,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Copy = function(Selected)
         var Item = this.Content[CurPos];
 
         if ( StartPos === CurPos || EndPos === CurPos )
-            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(Selected) );
+            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(Selected, oPr) );
         else
-            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(false) );
+            NewElement.Add_ToContent( CurPos - StartPos, Item.Copy(false, oPr) );
     }
 
     return NewElement;
