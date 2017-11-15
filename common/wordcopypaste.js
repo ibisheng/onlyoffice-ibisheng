@@ -3694,7 +3694,8 @@ PasteProcessor.prototype =
 		var content = pasteObj.content;
 
 
-		if(content.DocContent){
+		if(content.DocContent) {
+
 			var elements = content.DocContent.Elements;
 			var aContent = [];
 			for (var i = 0; i < elements.length; i++) {
@@ -3703,6 +3704,7 @@ PasteProcessor.prototype =
 			this.aContent = aContent;
 
 			oThis.api.pre_Paste(fonts, arr_Images, fPrepasteCallback);
+
 		} else if(content.Drawings) {
 
 			var arr_shapes = content.Drawings;
@@ -3797,181 +3799,57 @@ PasteProcessor.prototype =
 				oThis.aContent = aContent.content;
 				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
 			});
+
+		} else if(content.SlideObjects) {
+
+			History.TurnOff();
+
+			var loader = new AscCommon.BinaryPPTYLoader();
+			loader.Start_UseFullUrl();
+
+			pptx_content_loader.Reader.Start_UseFullUrl();
+
+			loader.stream = stream;
+			loader.presentation = editor.WordControl.m_oLogicDocument;
+			var imageUrl = stream.GetString2();
+
+			History.TurnOn();
+
+			var aImagesToDownload = [];
+			aImagesToDownload.push(imageUrl);
+
+			//load image(slide base64)
+			AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+				var image_map = {};
+				var elem = data[0];
+				if (null != elem.url) {
+					imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
+					image_map[0] = imageUrl;
+				}
+
+				//create paragraph, pararun and paradrawing
+				var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
+				var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width,
+					p_height);
+
+				var tempParaRun = new ParaRun();
+				tempParaRun.Paragraph = null;
+				tempParaRun.Add_ToContent(0, new ParaDrawing(), false);
+
+				tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+				tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+				tempParaRun.Content[0].CheckWH();
+
+				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+
+				aContent = [];
+				aContent.push(tempParagraph);
+				oThis.aContent = aContent;
+
+				oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
+			});
 		}
 
-
-
-
-		switch (first_string) {
-			case "Content": {
-				var docContent = this.ReadPresentationText(stream);
-				for (var i in this.oFonts) {
-					fonts.push(new CFont(i, 0, "", 0));
-				}
-
-				var aContent = [];
-				for (var i = 0; i < docContent.length; i++) {
-					aContent[i] = AscFormat.ConvertParagraphToWord(docContent[i].Element, this.oDocument);
-				}
-				this.aContent = aContent;
-
-				oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
-				return;
-			}
-			case "Drawings": {
-				//TODO пересмотреть отключение истории!!!
-				History.TurnOff();
-				var objects = this.ReadPresentationShapes(stream);
-				History.TurnOn();
-
-				var font_map = {};
-
-				var arr_shapes = objects.arrShapes;
-				//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
-				if (!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] &&
-					objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject) {
-					var drawing = objects.arrShapes[0].Drawing;
-
-					if (typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame) {
-						var aContent = [];
-						var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
-						table.Document_Get_AllFontNames(font_map);
-
-						//перебираем шрифты
-						for (var i in font_map) {
-							fonts.push(new CFont(i, 0, "", 0));
-						}
-
-						//TODO стиль не прокидывается. в будущем нужно реализовать
-						table.TableStyle = null;
-						aContent.push(table);
-
-						this.aContent = aContent;
-						oThis.api.pre_Paste(fonts, aContent.images, fPrepasteCallback);
-
-						return;
-					}
-				}
-
-
-				var aImagesToDownload = [];
-				for (var i = 0; i < objects.arrImages.length; i++) {
-					aImagesToDownload.push(objects.arrImages[i].Url);
-				}
-
-				//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
-				if (objects.arrShapes.length > 1) {
-					for (var i = 0; i < objects.arrShapes.length; i++) {
-						if (typeof CGraphicFrame !== "undefined" &&
-							objects.arrShapes[i].Drawing instanceof CGraphicFrame) {
-							aImagesToDownload.push(objects.arrShapes[i].base64);
-							objects.arrImages.push(objects.arrShapes[i]);
-						}
-					}
-				}
-
-				//get fonts from shapes
-				var images = [];
-				for (var i = 0; i < objects.arrShapes.length; ++i) {
-					if (objects.arrShapes[i].Drawing.getAllFonts) {
-						objects.arrShapes[i].Drawing.getAllFonts(font_map);
-					}
-					/*if(objects.arrShapes[i].Drawing.getAllImages)
-					 objects.arrShapes[i].Drawing.getAllImages(images);*/
-				}
-				//перебираем шрифты
-				for (var i in font_map) {
-					fonts.push(new CFont(i, 0, "", 0));
-				}
-
-				//в конце добавляем ссылки на wmf, ole
-				for (var i = 0; i < objects.arrImages.length; ++i) {
-					var oBuilderImage = objects.arrImages[i];
-					if (oBuilderImage.AdditionalUrls) {
-						for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
-							aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
-						}
-					}
-				}
-
-				AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-					var image_map = {};
-					for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) {
-						var elem = data[i];
-						if (null != elem.url) {
-							var name = g_oDocumentUrls.imagePath2Local(elem.path);
-							var imageElem = objects.arrImages[i];
-							if (null != imageElem) {
-								//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
-								if (imageElem.base64) {
-									imageElem.base64 = name;
-								} else {
-									imageElem.SetUrl(name);
-								}
-							}
-							image_map[i] = name;
-						} else {
-							image_map[i] = aImagesToDownload[i];
-						}
-					}
-
-					aContent = oThis._convertExcelBinary(null, arr_shapes);
-					oThis.aContent = aContent.content;
-					oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
-				});
-
-				return;
-			}
-			case "SlideObjects": {
-				History.TurnOff();
-
-				var loader = new AscCommon.BinaryPPTYLoader();
-				loader.Start_UseFullUrl();
-
-				pptx_content_loader.Reader.Start_UseFullUrl();
-
-				loader.stream = stream;
-				loader.presentation = editor.WordControl.m_oLogicDocument;
-				var imageUrl = stream.GetString2();
-
-				History.TurnOn();
-
-				var aImagesToDownload = [];
-				aImagesToDownload.push(imageUrl);
-
-				//load image(slide base64)
-				AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-					var image_map = {};
-					var elem = data[0];
-					if (null != elem.url) {
-						imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
-						image_map[0] = imageUrl;
-					}
-
-					//create paragraph, pararun and paradrawing
-					var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
-					var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width,
-						p_height);
-
-					var tempParaRun = new ParaRun();
-					tempParaRun.Paragraph = null;
-					tempParaRun.Add_ToContent(0, new ParaDrawing(), false);
-
-					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
-					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
-					tempParaRun.Content[0].CheckWH();
-
-					tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
-
-					aContent = [];
-					aContent.push(tempParagraph);
-					oThis.aContent = aContent;
-
-					oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
-				});
-
-			}
-		}
 	},
 
 	//from PRESENTATION to PRESENTATION
@@ -4458,7 +4336,14 @@ PasteProcessor.prototype =
 
 		var readDrawings = function () {
 
+			if(PasteElementsId.g_bIsDocumentCopyPaste){
+				History.TurnOff();
+			}
 			var objects = oThis.ReadPresentationShapes(stream);
+			if(PasteElementsId.g_bIsDocumentCopyPaste){
+				History.TurnOn();
+			}
+
 			presentationSelectedContent.Drawings = objects.arrShapes;
 
 			var arr_shapes = objects.arrShapes;
@@ -4494,7 +4379,8 @@ PasteProcessor.prototype =
 			//var arr_arrTransforms = [];
 			var slideCopyObjects = [];
 			for (var i = 0; i < slide_count; ++i) {
-				arr_slides[i] = loader.ReadSlide(0);
+				//loader.stream.SkipRecord();
+				//arr_slides[i] = loader.ReadSlide(0);
 				slideCopyObjects[i] = arr_slides[i];
 			}
 
