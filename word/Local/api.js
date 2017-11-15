@@ -96,6 +96,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 	}
 	
     editor._OfflineAppDocumentEndLoad(_url, _data, _len);
+
+	editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
@@ -271,6 +273,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
+
+	if (0 == error)
+		editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 Asc['asc_docs_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
