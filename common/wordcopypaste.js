@@ -3688,13 +3688,12 @@ PasteProcessor.prototype =
 			}
 		}
 
-		var pasteObj = selectedContent2[0];
+		var pasteObj = selectedContent2[0].content.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : selectedContent2[0];
 		var arr_Images = pasteObj.images;
 		var fonts = pasteObj.fonts;
 		var content = pasteObj.content;
 
-
-		if(content.DocContent) {
+		if (content.DocContent) {
 
 			var elements = content.DocContent.Elements;
 			var aContent = [];
@@ -3705,13 +3704,13 @@ PasteProcessor.prototype =
 
 			oThis.api.pre_Paste(fonts, arr_Images, fPrepasteCallback);
 
-		} else if(content.Drawings) {
+		} else if (content.Drawings) {
 
 			var arr_shapes = content.Drawings;
 			var arrImages = pasteObj.images;
 			//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
-			if (!arrImages.length && arr_shapes.length === 1 && arr_shapes[0] &&
-				arr_shapes[0].Drawing && arr_shapes[0].Drawing.graphicObject) {
+			if (!arrImages.length && arr_shapes.length === 1 && arr_shapes[0] && arr_shapes[0].Drawing &&
+				arr_shapes[0].Drawing.graphicObject) {
 				var drawing = arr_shapes[0].Drawing;
 
 				if (typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame) {
@@ -3743,9 +3742,8 @@ PasteProcessor.prototype =
 
 			//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
 			if (arr_shapes.length > 1) {
-				for (var i = 0; i <arr_shapes.length; i++) {
-					if (typeof CGraphicFrame !== "undefined" &&
-						arr_shapes[i].Drawing instanceof CGraphicFrame) {
+				for (var i = 0; i < arr_shapes.length; i++) {
+					if (typeof CGraphicFrame !== "undefined" && arr_shapes[i].Drawing instanceof CGraphicFrame) {
 						aImagesToDownload.push(arr_shapes[i].base64);
 						arrImages.push(arr_shapes[i]);
 					}
@@ -3800,54 +3798,6 @@ PasteProcessor.prototype =
 				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
 			});
 
-		} else if(content.SlideObjects) {
-
-			History.TurnOff();
-
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.Start_UseFullUrl();
-
-			pptx_content_loader.Reader.Start_UseFullUrl();
-
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-			var imageUrl = stream.GetString2();
-
-			History.TurnOn();
-
-			var aImagesToDownload = [];
-			aImagesToDownload.push(imageUrl);
-
-			//load image(slide base64)
-			AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-				var image_map = {};
-				var elem = data[0];
-				if (null != elem.url) {
-					imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
-					image_map[0] = imageUrl;
-				}
-
-				//create paragraph, pararun and paradrawing
-				var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
-				var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width,
-					p_height);
-
-				var tempParaRun = new ParaRun();
-				tempParaRun.Paragraph = null;
-				tempParaRun.Add_ToContent(0, new ParaDrawing(), false);
-
-				tempParaRun.Content[0].Set_GraphicObject(graphicObj);
-				tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
-				tempParaRun.Content[0].CheckWH();
-
-				tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
-
-				aContent = [];
-				aContent.push(tempParagraph);
-				oThis.aContent = aContent;
-
-				oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
-			});
 		}
 
 	},
@@ -4377,18 +4327,22 @@ PasteProcessor.prototype =
 			var imageUrl = stream.GetString2();
 			var slide_count = stream.GetULong();
 			//var arr_arrTransforms = [];
-			var slideCopyObjects = [];
+
 			for (var i = 0; i < slide_count; ++i) {
-				//loader.stream.SkipRecord();
-				//arr_slides[i] = loader.ReadSlide(0);
-				slideCopyObjects[i] = arr_slides[i];
+				if(PasteElementsId.g_bIsDocumentCopyPaste){
+					loader.stream.GetUChar();
+					loader.stream.SkipRecord();
+					arr_slides[i] = null;
+				}else{
+					arr_slides[i] = loader.ReadSlide(0);
+				}
 			}
 
 			//images and fonts
 			var font_map = {};
 			var slideCopyObjects = [];
 			for (var i = 0; i < arr_slides.length; ++i) {
-				if (arr_slides[i].getAllFonts) {
+				if (arr_slides[i] && arr_slides[i].getAllFonts) {
 					arr_slides[i].getAllFonts(font_map);
 				}
 
@@ -4414,7 +4368,12 @@ PasteProcessor.prototype =
 
 			var layouts = [];
 			for (var i = 0; i < selected_layouts; ++i) {
-				layouts.push(loader.ReadSlideLayout());
+				if (PasteElementsId.g_bIsDocumentCopyPaste) {
+					loader.stream.GetUChar();
+					loader.stream.SkipRecord();
+				} else {
+					layouts.push(loader.ReadSlideLayout());
+				}
 			}
 
 			/*var font_map = {};
@@ -4442,7 +4401,12 @@ PasteProcessor.prototype =
 
 			var array = [];
 			for (var i = 0; i < count; ++i) {
-				array.push(loader.ReadSlideMaster());
+				if (PasteElementsId.g_bIsDocumentCopyPaste) {
+					loader.stream.GetUChar();
+					loader.stream.SkipRecord();
+				} else {
+					array.push(loader.ReadSlideMaster());
+				}
 			}
 
 			presentationSelectedContent.Layouts = array;
@@ -4457,7 +4421,12 @@ PasteProcessor.prototype =
 
 			var notes = [];
 			for (var i = 0; i < selected_notes; ++i) {
-				notes.push(loader.ReadNote());
+				if (PasteElementsId.g_bIsDocumentCopyPaste) {
+					loader.stream.GetUChar();
+					loader.stream.SkipRecord();
+				} else {
+					notes.push(loader.ReadNote());
+				}
 			}
 
 			presentationSelectedContent.Notes = notes;
@@ -4472,7 +4441,12 @@ PasteProcessor.prototype =
 
 			var array = [];
 			for (var i = 0; i < count; ++i) {
-				array.push(loader.ReadNoteMaster());
+				if (PasteElementsId.g_bIsDocumentCopyPaste) {
+					loader.stream.GetUChar();
+					loader.stream.SkipRecord();
+				} else {
+					array.push(loader.ReadNoteMaster());
+				}
 			}
 
 			presentationSelectedContent.NotesMasters = array;
@@ -4485,6 +4459,7 @@ PasteProcessor.prototype =
 
 			var count = stream.GetULong();
 
+			//TODO возможно стоит пропустить при чтении в документах
 			var array = [];
 			for (var i = 0; i < count; ++i) {
 				array.push(loader.ReadTheme());
@@ -4500,6 +4475,7 @@ PasteProcessor.prototype =
 
 			var count = stream.GetULong();
 
+			//TODO возможно стоит пропустить при чтении в документах
 			var array = [];
 			for (var i = 0; i < count; ++i) {
 				array.push(loader.ReadTheme());
