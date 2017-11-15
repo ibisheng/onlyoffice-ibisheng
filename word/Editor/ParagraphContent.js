@@ -1247,6 +1247,7 @@ ParaTab.prototype.Draw = function(X, Y, Context)
 				sChar      = '.';
 				nCharWidth = this.DotWidth;
 				break;
+			case Asc.c_oAscTabLeader.Heavy:
 			case Asc.c_oAscTabLeader.Underscore:
 				sChar      = '_';
 				nCharWidth = this.UnderscoreWidth;

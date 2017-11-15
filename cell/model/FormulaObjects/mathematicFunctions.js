@@ -4340,7 +4340,7 @@
 		}
 
 		matchingInfo = AscCommonExcel.matchingValue(arg1);
-		if (cElementType.cellsRange === arg0.type) {
+		if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type) {
 			var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
 			for (var i = 0; i < arg0Matrix.length; i++) {
 				for (var j = 0; j < arg0Matrix[i].length; j++) {
