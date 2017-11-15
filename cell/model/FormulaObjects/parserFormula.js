@@ -5920,9 +5920,12 @@ parserFormula.prototype.setFormula = function(formula) {
 			var rangeOffset;
 			if (this.sharedRef) {
 				rangeOffset = new AscCommonExcel.CRangeOffset(bbox.c2 - bbox.c1 + 1, bbox.r2 - bbox.r1 + 1);
-				bbox = bbox.clone();
-				bbox.r2 += this.sharedRef.r2 - this.sharedRef.r1;
-				bbox.c2 += this.sharedRef.c2 - this.sharedRef.c1;
+				var bboxNew = bbox.clone();
+				var offsetRow = this.sharedRef.r2 - this.sharedRef.r1;
+				var offsetCol = this.sharedRef.c2 - this.sharedRef.c1;
+				bboxNew.setOffsetWithAbs(new AscCommonExcel.CRangeOffset(offsetCol, offsetRow), false, false);
+				bboxNew.union2(bbox);
+				bbox = bboxNew;
 			}
 			if (isStart) {
 				this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this, rangeOffset);
@@ -6467,19 +6470,20 @@ function rtl_math_erfc( x ) {
 		return undefined !== this.ws;
 	};
 	CellFormulaState.prototype.processRange = function(range, callback) {
-		range.setOffset(this.offset);
-		callback();
+		range.setOffsetWithAbs(this.offset, false, false);
+		callback(range);
 		this.offset.offsetCol = -this.offset.offsetCol;
 		this.offset.offsetRow = -this.offset.offsetRow;
-		range.setOffset(this.offset);
+		range.setOffsetWithAbs(this.offset, false, false);
 		this.offset.offsetCol = -this.offset.offsetCol;
 		this.offset.offsetRow = -this.offset.offsetRow;
 	};
 	CellFormulaState.prototype.getRange = function(range) {
 		var res;
 		if (range) {
-			res = range.clone();
-			res.setOffset(this.offset);
+			this.processRange(range, function(range) {
+				res = range.clone();
+			});
 		} else {
 			res = range;
 		}
@@ -6488,8 +6492,9 @@ function rtl_math_erfc( x ) {
 	CellFormulaState.prototype.getBBox = function(bbox) {
 		var res;
 		if (bbox) {
-			res = bbox.clone();
-			res.setOffset(this.offset);
+			this.processRange(bbox, function(range) {
+				res = range.clone();
+			});
 		} else {
 			res = bbox;
 		}

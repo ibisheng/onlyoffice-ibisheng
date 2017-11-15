@@ -7039,19 +7039,17 @@
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			var areaData = eventData.notifyData.areaData;
 			var areaFragment = eventData.notifyData.areaFragment;
-			if (eventData.formula.getShared() && areaData && areaFragment) {
+			var sharedRef = eventData.formula.getShared();
+			if (sharedRef && areaData && areaFragment) {
 				var bbox = areaData.bbox;
 				var dependencyFormulas = this.ws.workbook.dependencyFormulas;
 				for (var i = 0; i < areaData.cellsInArea.length; i += 2) {
-					var row = areaData.cellsInArea[i] - bbox.r1;
-					var col = areaData.cellsInArea[i + 1] - bbox.c1;
-					var r1 = Math.max(row - areaFragment.offsetRow + 1, 0);
-					var c1 = Math.max(col - areaFragment.offsetCol + 1, 0);
-					var r2 = Math.min(row + areaFragment.offsetRow - 1, bbox.r2 - bbox.r1) - areaFragment.offsetRow + 1;
-					var c2 = Math.min(col + areaFragment.offsetCol - 1, bbox.c2 - bbox.c1) - areaFragment.offsetCol + 1;
-					for (var j = r1; j <= r2; ++j) {
-						for (var k = c1; k <= c2; ++k) {
-							dependencyFormulas.addToChangedPosition(this.ws.getId(), this.nRow + j, this.nCol + k);
+					var row = areaData.cellsInArea[i];
+					var col = areaData.cellsInArea[i + 1];
+					var changedRange = bbox.getSharedRange(sharedRef, col, row);
+					for (var j = changedRange.r1; j <= changedRange.r2; ++j) {
+						for (var k = changedRange.c1; k <= changedRange.c2; ++k) {
+							dependencyFormulas.addToChangedPosition(this.ws.getId(), j, k);
 						}
 					}
 				}
@@ -9182,6 +9180,9 @@
 		this.bbox.r2 += offset.offsetRow;
 		if( this.bbox.r2 < 0 )
 			this.bbox.r2 = 0;
+	};
+	Range.prototype.setOffsetWithAbs = function() {
+		this.bbox.setOffsetWithAbs.apply(this.bbox, arguments);
 	};
 	Range.prototype.intersect=function(range){
 		var oBBox1 = this.bbox;

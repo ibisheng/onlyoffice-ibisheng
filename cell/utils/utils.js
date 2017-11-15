@@ -822,6 +822,24 @@
 			return result;
 		};
 
+		Range.prototype.getSharedRange = function (sharedRef, c, r) {
+			var isAbsR1 = this.isAbsR1();
+			var isAbsC1 = this.isAbsC1();
+			var isAbsR2 = this.isAbsR2();
+			var isAbsC2 = this.isAbsC2();
+			if(this.r1 === 0 && this.r2 === gc_nMaxRow0){
+				isAbsR1 = isAbsR2 = true;
+			}
+			if(this.c1 === 0 && this.c2 === gc_nMaxCol0){
+				isAbsC1 = isAbsC2 = true;
+			}
+			var r1 = isAbsR2 ? sharedRef.r1 : Math.max(sharedRef.r2 + (r - this.r2), sharedRef.r1);
+			var c1 = isAbsC2 ? sharedRef.c1 : Math.max(sharedRef.c2 + (c - this.c2), sharedRef.c1);
+			var r2 = isAbsR1 ? sharedRef.r2 : Math.min(sharedRef.r1 + (r - this.r1), sharedRef.r2);
+			var c2 = isAbsC1 ? sharedRef.c2 : Math.min(sharedRef.c1 + (c - this.c1), sharedRef.c2);
+			return new Range(c1, r1, c2, r2);
+		};
+
 		Range.prototype.setAbs = function (absRow1, absCol1, absRow2, absCol2) {
 			this.refType1 = (absRow1 ? 0 : 2) + (absCol1 ? 0 : 1);
 			this.refType2 = (absRow2 ? 0 : 2) + (absCol2 ? 0 : 1);
