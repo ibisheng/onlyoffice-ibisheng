@@ -4340,7 +4340,7 @@
 		}
 
 		matchingInfo = AscCommonExcel.matchingValue(arg1);
-		if (cElementType.cellsRange === arg0.type) {
+		if (cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type) {
 			var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix2;
 			for (var i = 0; i < arg0Matrix.length; i++) {
 				for (var j = 0; j < arg0Matrix[i].length; j++) {
@@ -4349,11 +4349,6 @@
 						_sum += valMatrix2.getValue();
 					}
 				}
-			}
-		} else if(cElementType.cell === arg0.type){
-			var val = arg0.getValue();
-			if (val && cElementType.number === val.type && AscCommonExcel.matching(val, matchingInfo)) {
-				_sum += val.getValue();
 			}
 		} else {
 			return new cError(cErrorType.wrong_value_type);
