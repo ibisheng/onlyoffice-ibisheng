@@ -15464,9 +15464,21 @@ CDocument.prototype.IsViewMode = function()
 {
 	return this.Api.isViewMode;
 };
+CDocument.prototype.IsEditSignaturesMode = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+};
+CDocument.prototype.IsViewModeInEditor = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+};
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsFillingFormMode())
+	if (this.IsViewMode()
+		|| this.IsEditCommentsMode()
+		|| this.IsFillingFormMode()
+		|| this.IsEditSignaturesMode()
+		|| this.IsViewModeInEditor())
 		return false;
 
 	return true;
