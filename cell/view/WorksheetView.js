@@ -9328,8 +9328,12 @@
 			trueActiveRange.r2 = arn.r2;
 			trueActiveRange.c2 = arn.c2;
         }
-		
-		
+
+		//необходимо проверить, пересекаемся ли мы с фоматированной таблицей
+		//если да, то подхватывать dxf при вставке не нужно
+		var intersectionAllRangeWithTables = t.model.autoFilters._intersectionRangeWithTableParts(trueActiveRange);
+
+
 		var addComments = function(pasteRow, pasteCol, comments)
 		{
 			var comment;
@@ -9400,6 +9404,10 @@
 		var getTableDxf = function (pasteRow, pasteCol, newVal)
 		{
 			var dxf = null;
+
+			if(false !== intersectionAllRangeWithTables){
+				return {dxf: null};
+			}
 
 			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
 			var blocalArea = true;
