@@ -2371,7 +2371,29 @@ var editor;
       }
     }
   };
-  spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
+    // signatures
+    spreadsheet_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
+      var ws = this.wb.getWorksheet();
+      if(ws && ws.objectRender){
+          ws.objectRender.addSignatureLine(sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl);
+      }
+    };
+
+    spreadsheet_api.prototype.asc_getAllSignatures = function(){
+      var ret = [], oWorksheet;
+      var aSpTree = [];
+      for(var i = 0; i < this.wbModel.aWorksheets.length; ++i){
+        oWorksheet = this.wbModel.aWorksheets[i];
+        for(var j = 0; j < oWorksheet.Drawings.length; ++j){
+            aSpTree.push(oWorksheet.Drawings[j].graphicObject);
+        }
+      }
+      AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
+      return ret;
+    };
+    //-------------------------------------------------------
+
+    spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
     var ws = this.wb.getWorksheet();
     return ws.objectRender.setGraphicObjectLayer(layerType);
   };

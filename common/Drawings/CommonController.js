@@ -722,6 +722,24 @@ function CanStartEditText(oController)
 
 DrawingObjectsController.prototype =
 {
+
+    getAllSignatures: function(){
+        var _ret = [];
+        this.getAllSignatures2(_ret, this.getDrawingArray());
+        return _ret;
+    },
+
+    getAllSignatures2: function(aRet, spTree){
+        for(var i = 0; i < spTree.length; ++i){
+            if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                this.getAllSignatures2(aRet, spTree[i].spTree);
+            }
+            else if(spTree[i].signatureLine){
+                aRet.push(spTree[i].signatureLine);
+            }
+        }
+    },
+
     getDefaultText: function(){
         return  AscCommon.translateManager.getValue('Your text here');
     },

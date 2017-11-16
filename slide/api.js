@@ -3684,6 +3684,19 @@ background-repeat: no-repeat;\
             this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].graphicObjects.startEditCurrentOleObject();
     };
 
+
+    // signatures
+    asc_docs_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
+        if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false){
+            this.WordControl.m_oLogicDocument.AddSignatureLine(sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl);
+        }
+    };
+
+    asc_docs_api.prototype.asc_getAllSignatures = function(){
+        return this.WordControl.m_oLogicDocument.GetAllSignatures();
+    };
+    //-------------------------------------------------------
+
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
 	{
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)

@@ -664,9 +664,18 @@ CPresentation.prototype =
         return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
     },
 
+    IsEditSignaturesMode: function()
+    {
+        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+    },
+    IsViewModeInEditor: function()
+    {
+        return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+    },
+
     CanEdit: function()
     {
-        if (this.IsViewMode() || this.IsEditCommentsMode())
+        if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsEditSignaturesMode() || this.IsViewModeInEditor())
             return false;
 
         return true;
@@ -1895,6 +1904,7 @@ CPresentation.prototype =
         oOleObject.setBlipFill(_blipFill);
         oOleObject.setPixSizes(nPixWidth, nPixHeight);
     },
+
 
     Get_AbsolutePage: function()
     {
@@ -5887,6 +5897,39 @@ CPresentation.prototype =
             this.Recalculate();
             this.Document_UpdateInterfaceState();
         }
+    },
+
+
+    AddSignatureLine: function(sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl)
+    {
+        if(this.Slides[this.CurPage])
+        {
+            History.Create_NewPoint(AscDFH.historydescription_Document_InsertSignatureLine);
+            var fPosX = (this.Width - Width)/2;
+            var fPosY = (this.Height - Height)/2;
+            var oController = this.Slides[this.CurPage].graphicObjects;
+            var Image = AscFormat.fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, false, null, Width, Height, sImgUrl);
+            Image.spPr.xfrm.setOffX(fPosX);
+            Image.spPr.xfrm.setOffY(fPosY);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            oController.resetSelection();
+            oController.selectObject(Image, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+            this.Api.sendEvent("asc_onAddSignature", sGuid);
+        }
+    },
+
+    GetAllSignatures: function()
+    {
+        var ret = [];
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            var oController = this.Slides[i].graphicObjects;
+            oController.getAllSignatures2(ret, oController.getDrawingArray());
+        }
+        return ret;
     },
 
     CalculateComments : function()
