@@ -275,16 +275,36 @@ CComplexField.prototype.Update = function()
 		var oStyles          = this.LogicDocument.Get_Styles();
 		var arrOutline       = this.LogicDocument.GetOutlineParagraphs();
 		var oSelectedContent = new CSelectedContent();
+
+		var isRemoveTabs     = this.Instruction.IsRemoveTabs();
+		var sSeparator       = this.Instruction.GetSeparator();
+
+		var oTab             = new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot);
+		if ((!sSeparator || "" === sSeparator) && arrOutline.length > 0)
+		{
+			var oPara = arrOutline[0].Paragraph;
+			var oTabs = oPara.GetParagraphTabs();
+
+			if (oTabs.Tabs.length > 0)
+				oTab = oTabs.Tabs[oTabs.Tabs.length - 1];
+		}
+
 		for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
 		{
 			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
-			var oPara = oSrcParagraph.Copy();
+			var oPara = oSrcParagraph.Copy(null, null, {
+				SkipPageBreak   : true,
+				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
+				SkipColumnBreak : true
+			});
 			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+
+
 			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
 
 			var oTabs = oSrcParagraph.GetParagraphTabs().Copy();
-			oTabs.Add(new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot));
+			oTabs.Add(oTab.Copy());
 			oPara.Set_Tabs(oTabs);
 
 			var oTabRun = new ParaRun(oPara, false);

@@ -237,7 +237,7 @@ Paragraph.prototype.Set_Pr = function(oNewPr)
 	this.Recalc_CompiledPr();
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
-Paragraph.prototype.Copy = function(Parent, DrawingDocument)
+Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
 	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, !this.bFromDocument);
 
@@ -261,7 +261,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Item = this.Content[Index];
-		Para.Internal_Content_Add(Para.Content.length, Item.Copy(false), false);
+		Para.Internal_Content_Add(Para.Content.length, Item.Copy(false, oPr), false);
 	}
 
 	// TODO: Как только переделаем para_End, переделать тут

@@ -5793,6 +5793,33 @@
 		this.type = val;
 		this._hasChanged = true;
 	};
+	Cell.prototype.correctValueByType = function() {
+		//todo implemented only Number->String. other is stub
+		switch (this.type) {
+			case CellValueType.Number:
+				if (null !== this.text) {
+					this.setValueNumberInternal(parseInt(this.text) || 0);
+				} else if (null !== this.multiText) {
+					this.setValueNumberInternal(0);
+				}
+				break;
+			case CellValueType.Bool:
+				if (null !== this.text || null !== this.multiText) {
+					this.setValueNumberInternal(0);
+				}
+				break;
+			case CellValueType.String:
+				if (null !== this.number) {
+					this.setValueTextInternal(this.number.toString());
+				}
+				break;
+			case CellValueType.Error:
+				if (null !== this.number) {
+					this.setValueTextInternal(cErrorOrigin["nil"]);
+				}
+				break;
+		}
+	};
 	Cell.prototype.setValueNumberInternal=function(val) {
 		this.number = val;
 		this.text = null;
@@ -5973,6 +6000,7 @@
 		if(type != this.type){
 			var DataOld = this.getValueData();
 			this.setTypeInternal(type);
+			this.correctValueByType();
 			this._hasChanged = true;
 			var DataNew = this.getValueData();
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));

@@ -73,7 +73,7 @@ ParaField.prototype.Get_Id = function()
 {
     return this.Id;
 };
-ParaField.prototype.Copy = function(Selected)
+ParaField.prototype.Copy = function(Selected, oPr)
 {
     var NewField = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 

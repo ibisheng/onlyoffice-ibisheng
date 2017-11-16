@@ -157,7 +157,7 @@ ParaRun.prototype.Save_StartState = function()
 //-----------------------------------------------------------------------------------
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Copy = function(Selected)
+ParaRun.prototype.Copy = function(Selected, oPr)
 {
     var bMath = this.Type == para_Math_Run ? true : false;
 
@@ -188,14 +188,23 @@ ParaRun.prototype.Copy = function(Selected)
     else if (true === Selected && true !== this.State.Selection.Use)
         EndPos = -1;
 
-    for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
-    {
-        var Item = this.Content[CurPos];
+	for (var CurPos = StartPos, AddedPos = 0; CurPos < EndPos; CurPos++)
+	{
+		var Item = this.Content[CurPos];
 
-        // TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
-        if ( para_End !== Item.Type )
-            NewRun.Add_ToContent( CurPos - StartPos, Item.Copy(), false );
-    }
+		if (para_NewLine === Item.Type
+			&& ((oPr.SkipLineBreak && Item.IsLineBreak())
+			|| (oPr.SkipPageBreak && Item.IsPageBreak())
+			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
+			continue;
+
+		// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
+		if (para_End !== Item.Type)
+		{
+			NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
+			AddedPos++;
+		}
+	}
 
     return NewRun;
 };

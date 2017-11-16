@@ -1111,6 +1111,7 @@ CPresentation.prototype =
 
     Recalculate : function(RecalcData)
     {
+        this.DrawingDocument.OnStartRecalculate( this.Slides.length );
         ++this.RecalcId;
         if (undefined === RecalcData)
         {
