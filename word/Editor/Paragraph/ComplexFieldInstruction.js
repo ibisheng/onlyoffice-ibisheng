@@ -238,7 +238,7 @@ CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 	if (-1 === this.SkipPageRefStart || -1 === this.SkipPageRefEnd)
 		return true;
 
-	return  (nLvl >= this.SkipPageRefStart && nLvl <= this.SkipPageRefEnd);
+	return  (nLvl >= this.SkipPageRefStart - 1 && nLvl <= this.SkipPageRefEnd - 1);
 };
 
 

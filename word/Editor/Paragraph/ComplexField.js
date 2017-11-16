@@ -342,18 +342,18 @@ CComplexField.prototype.Update = function()
 				oHyperlink.SetAnchor(sBookmarkName);
 				oPara.Add_ToContent(0, oHyperlink);
 
-				oContainer    = oPara;
+				oContainer    = oHyperlink;
 				nContainerPos = oHyperlink.Content.length;
 			}
 			else
 			{
 				// TODO: ParaEnd
+				oContainer    = oPara;
 				nContainerPos = oPara.Content.length - 1;
 			}
 
 			if (!(this.Instruction.IsSkipPageRefLvl(arrOutline[nIndex].Lvl)))
 			{
-				var oTabs         = null;
 				var oSeparatorRun = new ParaRun(oPara, false);
 				if (!sSeparator || "" === sSeparator)
 				{
