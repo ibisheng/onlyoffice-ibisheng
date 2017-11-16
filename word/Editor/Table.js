@@ -12110,7 +12110,7 @@ CTable.prototype.GetAllContentControls = function(arrContentControls)
 		}
 	}
 };
-CTable.prototype.GetOutlineParagraphs = function(arrOutline)
+CTable.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
 	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
 	{
@@ -12119,7 +12119,7 @@ CTable.prototype.GetOutlineParagraphs = function(arrOutline)
 		{
 			var oCell = oRow.Get_Cell(nCurCell);
 			if (oCell)
-				oCell.Content.GetOutlineParagraphs(arrOutline);
+				oCell.Content.GetOutlineParagraphs(arrOutline, oPr);
 		}
 	}
 };
