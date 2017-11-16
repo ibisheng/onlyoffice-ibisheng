@@ -3820,6 +3820,8 @@ var editor;
   prot["asc_GetDefaultCertificate"] = prot.asc_GetDefaultCertificate;
   prot["asc_getSignatures"] 		= prot.asc_getSignatures;
   prot["asc_isSignaturesSupport"] 	= prot.asc_isSignaturesSupport;
+  prot["asc_RemoveSignature"] 		= prot.asc_RemoveSignature;
+  prot["asc_RemoveAllSignatures"] 	= prot.asc_RemoveAllSignatures;
 
   // password
   prot["asc_setCurrentPassword"]    = prot.asc_setCurrentPassword;

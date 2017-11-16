@@ -365,6 +365,23 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
 
 		});
+		_editor.asc_registerCallback("asc_onUpdateSignatures", function (signatures, requested)
+		{
+
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			if (_api.editorId == AscCommon.c_oEditorId.Word || _api.editorId == AscCommon.c_oEditorId.Presentation)
+			{
+				if (0 == signatures.length)
+					_api.asc_setRestriction(Asc.c_oAscRestrictionType.None);
+				else
+					_api.asc_setRestriction(Asc.c_oAscRestrictionType.OnlySignatures);
+			}
+			else
+			{
+				// TODO:
+			}
+
+		});
 	}
 	window.FirstSignaturesCall = true;
 

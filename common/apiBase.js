@@ -1558,6 +1558,18 @@
 		return this.signatures;
 	};
 
+	baseEditorsApi.prototype.asc_RemoveSignature = function(guid)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["RemoveSignature"](guid);
+	};
+
+	baseEditorsApi.prototype.asc_RemoveAllSignatures = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["RemoveAllSignatures"]();
+	};
+
 	baseEditorsApi.prototype.asc_isSignaturesSupport = function()
 	{
 		if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsSignaturesSupport"])
