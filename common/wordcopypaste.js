@@ -3826,10 +3826,10 @@ PasteProcessor.prototype =
 			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
 				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				switch (props) {
-					case Asc.c_oSpecialPasteProps.destinationFormatting: {
+					case Asc.c_oSpecialPasteProps.useDestinationTheme: {
 						break;
 					}
-					case Asc.c_oSpecialPasteProps.sourceformatting: {
+					case Asc.c_oSpecialPasteProps.keepSourceFormatting: {
 						pasteObj = selectedContent2[1];
 						break;
 					}
@@ -3851,7 +3851,7 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Document_UpdateInterfaceState();
 
-					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture]);
+					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.useDestinationTheme, Asc.c_oSpecialPasteProps.keepSourceFormatting, Asc.c_oSpecialPasteProps.picture]);
 
 					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}

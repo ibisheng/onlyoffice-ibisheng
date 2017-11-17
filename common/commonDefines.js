@@ -1128,7 +1128,10 @@
 		insertAsNestedTable: 20,
 		uniteIntoTable: 21,
 		insertAsNewRows: 22,
-		keepTextOnly: 23
+		keepTextOnly: 23,
+
+		useDestinationTheme: 24,
+		keepSourceFormatting: 25
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
