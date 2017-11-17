@@ -11325,14 +11325,12 @@
         var row, value, valueLowCase;
         for (row = range.r1; row <= range.r2; ++row) {
 			this.model._getCellNoEmpty(row, col, function(cell) {
-				if (cell) {
+				if (cell && CellValueType.String === cell.getType()) {
 					value = cell.getValue();
-					if (!AscCommon.isNumber(value)) {
-						valueLowCase = value.toLowerCase();
-						if (!objValues.hasOwnProperty(valueLowCase)) {
-							arrValues.push(value);
-							objValues[valueLowCase] = 1;
-						}
+					valueLowCase = value.toLowerCase();
+					if (!objValues.hasOwnProperty(valueLowCase)) {
+						arrValues.push(value);
+						objValues[valueLowCase] = 1;
 					}
 				}
 			});
