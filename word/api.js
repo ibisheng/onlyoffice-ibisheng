@@ -3715,6 +3715,10 @@ background-repeat: no-repeat;\
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
 	};
 
+
+    asc_docs_api.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
+        return this.WordControl.m_oLogicDocument.CallSignatureDblClickEvent(sGuid);
+    };
     //////////////////////////////////////////////////////////////////////////
 
 	asc_docs_api.prototype.IncreaseIndent         = function()
@@ -8782,6 +8786,7 @@ background-repeat: no-repeat;\
 
 	// signatures
 	asc_docs_api.prototype["asc_addSignatureLine"] 						= asc_docs_api.prototype.asc_addSignatureLine;
+	asc_docs_api.prototype["asc_CallSignatureDblClickEvent"]			= asc_docs_api.prototype.asc_CallSignatureDblClickEvent;
 	asc_docs_api.prototype["asc_getRequestSignatures"] 					= asc_docs_api.prototype.asc_getRequestSignatures;
 	asc_docs_api.prototype["asc_AddSignatureLine2"]             		= asc_docs_api.prototype.asc_AddSignatureLine2;
 	asc_docs_api.prototype["asc_Sign"]             						= asc_docs_api.prototype.asc_Sign;

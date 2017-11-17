@@ -5932,6 +5932,21 @@ CPresentation.prototype =
         return ret;
     },
 
+    CallSignatureDblClickEvent: function(sGuid)
+    {
+        var ret = [], allSpr = [];
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            var oController = this.Slides[i].graphicObjects;
+            allSpr = allSpr.concat(oController.getAllSignatures2(ret, oController.getDrawingArray()));
+        }
+        for(i = 0; i < allSpr.length; ++i){
+            if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+                this.Api.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+            }
+        }
+    },
+
     CalculateComments : function()
     {
         this.CommentAuthors = {};

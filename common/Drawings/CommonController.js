@@ -730,14 +730,17 @@ DrawingObjectsController.prototype =
     },
 
     getAllSignatures2: function(aRet, spTree){
+        var aSp = [];
         for(var i = 0; i < spTree.length; ++i){
             if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
                 this.getAllSignatures2(aRet, spTree[i].spTree);
             }
             else if(spTree[i].signatureLine){
                 aRet.push(spTree[i].signatureLine);
+                aSp.push(spTree[i]);
             }
         }
+        return aSp;
     },
 
     getDefaultText: function(){
@@ -963,6 +966,13 @@ DrawingObjectsController.prototype =
         else
         {
             return {result: false, selectedIndex: -1};
+        }
+    },
+
+    handleSignatureDblClick: function(sGuid, width, height){
+        var oApi = editor || Asc['editor'];
+        if(oApi){
+            oApi.sendEvent("asc_onSignatureDblClick", sGuid, width, height);
         }
     },
 

@@ -1444,6 +1444,10 @@
 		return [];
 	};
 
+	baseEditorsApi.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
+
+	};
+
 	// signatures
 	baseEditorsApi.prototype.asc_AddSignatureLine2 = function(_obj)
 	{

@@ -2391,6 +2391,23 @@ var editor;
       AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
       return ret;
     };
+
+    spreadsheet_api.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
+        var ret = [], oWorksheet;
+        var aSpTree = [];
+        for(var i = 0; i < this.wbModel.aWorksheets.length; ++i){
+            oWorksheet = this.wbModel.aWorksheets[i];
+            for(var j = 0; j < oWorksheet.Drawings.length; ++j){
+                aSpTree.push(oWorksheet.Drawings[j].graphicObject);
+            }
+        }
+        var allSpr = AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
+        for(i = 0; i < allSpr.length; ++i){
+          if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+              this.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+          }
+        }
+    };
     //-------------------------------------------------------
 
     spreadsheet_api.prototype.asc_setSelectedDrawingObjectLayer = function(layerType) {
@@ -3811,15 +3828,16 @@ var editor;
   prot["asc_OnShowContextMenu"] = prot.asc_OnShowContextMenu;
 
 	// signatures
-  prot["asc_addSignatureLine"] 		= prot.asc_addSignatureLine;
-  prot["asc_getRequestSignatures"] 	= prot.asc_getRequestSignatures;
-  prot["asc_AddSignatureLine2"]     = prot.asc_AddSignatureLine2;
-  prot["asc_Sign"]             		= prot.asc_Sign;
-  prot["asc_ViewCertificate"] 		= prot.asc_ViewCertificate;
-  prot["asc_SelectCertificate"] 	= prot.asc_SelectCertificate;
-  prot["asc_GetDefaultCertificate"] = prot.asc_GetDefaultCertificate;
-  prot["asc_getSignatures"] 		= prot.asc_getSignatures;
-  prot["asc_isSignaturesSupport"] 	= prot.asc_isSignaturesSupport;
+  prot["asc_addSignatureLine"] 		     = prot.asc_addSignatureLine;
+  prot["asc_CallSignatureDblClickEvent"] = prot.asc_CallSignatureDblClickEvent;
+  prot["asc_getRequestSignatures"] 	     = prot.asc_getRequestSignatures;
+  prot["asc_AddSignatureLine2"]          = prot.asc_AddSignatureLine2;
+  prot["asc_Sign"]             		     = prot.asc_Sign;
+  prot["asc_ViewCertificate"] 		     = prot.asc_ViewCertificate;
+  prot["asc_SelectCertificate"] 	     = prot.asc_SelectCertificate;
+  prot["asc_GetDefaultCertificate"]      = prot.asc_GetDefaultCertificate;
+  prot["asc_getSignatures"] 		     = prot.asc_getSignatures;
+  prot["asc_isSignaturesSupport"] 	     = prot.asc_isSignaturesSupport;
   prot["asc_RemoveSignature"] 		= prot.asc_RemoveSignature;
   prot["asc_RemoveAllSignatures"] 	= prot.asc_RemoveAllSignatures;
 

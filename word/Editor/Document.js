@@ -15448,6 +15448,16 @@ CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();
 };
+CDocument.prototype.CallSignatureDblClickEvent = function(sGuid)
+{
+    var ret = [], allSpr = [];
+    allSpr = allSpr.concat(allSpr.concat(this.DrawingObjects.getAllSignatures2(ret, this.DrawingObjects.getDrawingArray())));
+    for(var i = 0; i < allSpr.length; ++i){
+        if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+            this.Api.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+        }
+    }
+};
 CDocument.prototype.SetCheckContentControlsLock = function(isLocked)
 {
 	this.CheckContentControlsLock = isLocked;
