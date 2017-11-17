@@ -39,23 +39,16 @@ var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 var FormulaTablePartInfo = AscCommon.FormulaTablePartInfo;
-var cBoolLocal = AscCommon.cBoolLocal;
-var cErrorOrigin = AscCommon.cErrorOrigin;
-var cErrorLocal = AscCommon.cErrorLocal;
 var parserHelp = AscCommon.parserHelp;
-var oNumFormatCache = AscCommon.oNumFormatCache;
-var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
 var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 	var History = AscCommon.History;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
-var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
 var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
-var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
 	
@@ -159,7 +152,7 @@ RgbColor.prototype =
 
     isEqual: function(oColor)
     {
-        if(!oColor){
+        if(!oColor || !(oColor instanceof RgbColor)){
             return false;
         }
         if(this.rgb !== oColor.rgb){
@@ -1927,6 +1920,10 @@ CellXfs.prototype =
 	merge : function(xfs, isTable)
 	{
 		var xfIndexNumber = xfs.getIndexNumber();
+		if (undefined === xfIndexNumber) {
+			xfs = g_StyleCache.addXf(xfs, true);
+			xfIndexNumber = xfs.getIndexNumber();
+		}
 		var cache = this.getOperationCache("merge", xfIndexNumber);
 		if (!cache) {
 			cache = new CellXfs();
@@ -2789,7 +2786,7 @@ StyleManager.prototype =
 		return this._add(this.aligns, newAlign);
 	};
 	StyleCache.prototype.addXf = function(newXf, recursively) {
-		if (recursively) {
+		if (newXf) {
 			if(newXf.font){
 				newXf.font = this.addFont(newXf.font);
 			}
@@ -3381,10 +3378,10 @@ Col.prototype =
             History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setHidden: function(val) {
-		this.hd = val;
-		if (this.index >= 0) {
+		if (this.index >= 0 && (!this.hd !== !val)) {
 			this.ws.hiddenManager.addHidden(false, this.index);
 		}
+		this.hd = val;
 	},
 	getHidden: function() {
 		return this.hd;
@@ -3685,18 +3682,18 @@ Row.prototype =
 	},
 
 	setHidden: function(val) {
+		if (this.index >= 0 && (!this.getHidden() !== !val)) {
+			this.ws.hiddenManager.addHidden(true, this.index);
+		}
 		if (true === val) {
 			this.flags |= g_nRowFlag_hd;
 		} else {
 			this.flags &= ~g_nRowFlag_hd;
 		}
 		this._hasChanged = true;
-		if (this.index >= 0) {
-			this.ws.hiddenManager.addHidden(true, this.index);
-		}
 	},
 	getHidden: function() {
-		return 0 != (g_nRowFlag_hd & this.flags);
+		return 0 !== (g_nRowFlag_hd & this.flags);
 	},
 	setCustomHeight: function(val) {
 		if (true === val) {

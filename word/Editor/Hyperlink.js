@@ -77,7 +77,7 @@ ParaHyperlink.prototype.Get_FirstTextPr2 = function()
     return null;
 };
 
-ParaHyperlink.prototype.Copy = function(Selected)
+ParaHyperlink.prototype.Copy = function(Selected, oPr)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);

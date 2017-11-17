@@ -9324,8 +9324,12 @@
 			trueActiveRange.r2 = arn.r2;
 			trueActiveRange.c2 = arn.c2;
         }
-		
-		
+
+		//необходимо проверить, пересекаемся ли мы с фоматированной таблицей
+		//если да, то подхватывать dxf при вставке не нужно
+		var intersectionAllRangeWithTables = t.model.autoFilters._intersectionRangeWithTableParts(trueActiveRange);
+
+
 		var addComments = function(pasteRow, pasteCol, comments)
 		{
 			var comment;
@@ -9396,6 +9400,10 @@
 		var getTableDxf = function (pasteRow, pasteCol, newVal)
 		{
 			var dxf = null;
+
+			if(false !== intersectionAllRangeWithTables){
+				return {dxf: null};
+			}
 
 			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
 			var blocalArea = true;
@@ -11317,14 +11325,12 @@
         var row, value, valueLowCase;
         for (row = range.r1; row <= range.r2; ++row) {
 			this.model._getCellNoEmpty(row, col, function(cell) {
-				if (cell) {
+				if (cell && CellValueType.String === cell.getType()) {
 					value = cell.getValue();
-					if (!AscCommon.isNumber(value)) {
-						valueLowCase = value.toLowerCase();
-						if (!objValues.hasOwnProperty(valueLowCase)) {
-							arrValues.push(value);
-							objValues[valueLowCase] = 1;
-						}
+					valueLowCase = value.toLowerCase();
+					if (!objValues.hasOwnProperty(valueLowCase)) {
+						arrValues.push(value);
+						objValues[valueLowCase] = 1;
 					}
 				}
 			});

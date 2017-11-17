@@ -157,7 +157,7 @@ ParaRun.prototype.Save_StartState = function()
 //-----------------------------------------------------------------------------------
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
-ParaRun.prototype.Copy = function(Selected)
+ParaRun.prototype.Copy = function(Selected, oPr)
 {
     var bMath = this.Type == para_Math_Run ? true : false;
 
@@ -188,14 +188,28 @@ ParaRun.prototype.Copy = function(Selected)
     else if (true === Selected && true !== this.State.Selection.Use)
         EndPos = -1;
 
-    for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
-    {
-        var Item = this.Content[CurPos];
+	for (var CurPos = StartPos, AddedPos = 0; CurPos < EndPos; CurPos++)
+	{
+		var Item = this.Content[CurPos];
 
-        // TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
-        if ( para_End !== Item.Type )
-            NewRun.Add_ToContent( CurPos - StartPos, Item.Copy(), false );
-    }
+		if (para_NewLine === Item.Type
+			&& ((oPr.SkipLineBreak && Item.IsLineBreak())
+			|| (oPr.SkipPageBreak && Item.IsPageBreak())
+			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
+		{
+			NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
+			AddedPos++;
+		}
+		else
+		{
+			// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
+			if (para_End !== Item.Type)
+			{
+				NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
+				AddedPos++;
+			}
+		}
+	}
 
     return NewRun;
 };
@@ -1108,17 +1122,17 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
             ContentPos.Data[Depth]++;
     }
 
-    // Обновляем позиции в поиске
-    var SearchMarksCount = this.SearchMarks.length;
-    for ( var Index = 0; Index < SearchMarksCount; Index++ )
-    {
-        var Mark       = this.SearchMarks[Index];
-        var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
-        var Depth      = Mark.Depth;
+	// Обновляем позиции в поиске
+	var SearchMarksCount = this.SearchMarks.length;
+	for (var Index = 0; Index < SearchMarksCount; Index++)
+	{
+		var Mark       = this.SearchMarks[Index];
+		var ContentPos = ( true === Mark.Start ? Mark.SearchResult.StartPos : Mark.SearchResult.EndPos );
+		var Depth      = Mark.Depth;
 
-        if ( ContentPos.Data[Depth] >= Pos )
-            ContentPos.Data[Depth]++;
-    }
+		if (ContentPos.Data[Depth] > Pos || (ContentPos.Data[Depth] === Pos && true === Mark.Start))
+			ContentPos.Data[Depth]++;
+	}
 
     // Обновляем позиции для орфографии
     var SpellingMarksCount = this.SpellingMarks.length;
@@ -2451,6 +2465,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var StartWord           = PRS.StartWord;
     var FirstItemOnLine     = PRS.FirstItemOnLine;
     var EmptyLine           = PRS.EmptyLine;
+    var TextOnLine          = PRS.TextOnLine;
 
     var RangesCount         = PRS.RangesCount;
 
@@ -2556,6 +2571,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 Word = false;
                                 FirstItemOnLine = false;
                                 EmptyLine = false;
+								TextOnLine = true;
                                 SpaceLen = 0;
                                 WordLen = 0;
                             }
@@ -2593,6 +2609,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 else
                                 {
                                     EmptyLine = false;
+									TextOnLine = true;
                                     X += WordLen;
 
                                     // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
@@ -2623,6 +2640,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 Word = false;
                                 FirstItemOnLine = false;
                                 EmptyLine = false;
+								TextOnLine = true;
                                 SpaceLen = 0;
                                 WordLen = 0;
                             }
@@ -2710,6 +2728,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         Word = false;
                         EmptyLine = false;
+						TextOnLine = true;
                         SpaceLen = 0;
                         WordLen = 0;
                     }
@@ -2835,6 +2854,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                     NewRange = true;
                                     EmptyLine = false;
+									TextOnLine = true;
                                 }
                             }
                             else
@@ -2855,6 +2875,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     X += SpaceLen + WordLen;
                                     PRS.Set_LineBreakPos(Pos);
                                     EmptyLine = false;
+									TextOnLine = true;
                                     WordLen = BrkLen;
                                     SpaceLen = 0;
 
@@ -2896,6 +2917,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 X += BrkLen + WordLen;
 
                                 EmptyLine = false;
+								TextOnLine = true;
                                 SpaceLen = 0;
                                 WordLen = 0;
 
@@ -2953,6 +2975,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                             Word = false;
                             EmptyLine = false;
+							TextOnLine = true;
                             SpaceLen = 0;
                             WordLen = 0;
                         }
@@ -3063,6 +3086,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         Word = false;
                         EmptyLine = false;
+						TextOnLine = true;
                         SpaceLen = 0;
                         WordLen = 0;
                     }
@@ -3085,6 +3109,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         FirstItemOnLine = false;
                         EmptyLine = false;
+						TextOnLine = true;
                     }
 
                     SpaceLen = 0;
@@ -3158,6 +3183,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         {
                             FirstItemOnLine = false;
                             EmptyLine = false;
+							TextOnLine = true;
                         }
                     }
 
@@ -3180,6 +3206,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (true === Word)
                     {
                         EmptyLine = false;
+						TextOnLine = true;
                         Word = false;
                         X += SpaceLen;
                         SpaceLen = 0;
@@ -3213,6 +3240,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         NewRange = true;
                         EmptyLine = false;
+						TextOnLine = true;
 
                         // здесь оставляем проверку, т.к. в случае, если после неинлайновой формулы нах-ся инлайновая необходимо в любом случае сделать перенос (проверка в private_RecalculateRange(), где выставляется PRS.ForceNewLine = true не пройдет)
                         if (true === PRS.MathNotInline)
@@ -3229,6 +3257,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     {
                         FirstItemOnLine = false;
                         EmptyLine       = false;
+						TextOnLine      = true;
                     }
 
                     X += WordLen;
@@ -3331,6 +3360,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     PRS.StartWord       = StartWord;
     PRS.FirstItemOnLine = FirstItemOnLine;
     PRS.EmptyLine       = EmptyLine;
+    PRS.TextOnLine      = TextOnLine;
 
     PRS.SpaceLen        = SpaceLen;
     PRS.WordLen         = WordLen;
@@ -3406,116 +3436,115 @@ ParaRun.prototype.Recalculate_Set_RangeEndPos = function(PRS, PRP, Depth)
 
 ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _CurRange, ContentMetrics)
 {
-    var Para = PRS.Paragraph;
+	var Para = PRS.Paragraph;
 
-    // Если заданный отрезок пустой, тогда мы не должны учитывать метрики данного рана.
+	// Если заданный отрезок пустой, тогда мы не должны учитывать метрики данного рана.
 
-    var CurLine  = _CurLine - this.StartLine;
-    var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    var UpdateLineMetricsText = false;
-    var LineRule = ParaPr.Spacing.LineRule;
+	var UpdateLineMetricsText = false;
+	var LineRule              = ParaPr.Spacing.LineRule;
 
-    for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
-    {
-        var Item = this.Content[CurPos];
+	for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
+	{
+		var Item = this.Content[CurPos];
 
-        if (Item === Para.Numbering.Item)
-        {
-            PRS.LineAscent = Para.Numbering.LineAscent;
-        }
+		if (Item === Para.Numbering.Item)
+		{
+			PRS.LineAscent = Para.Numbering.LineAscent;
+		}
 
-        switch (Item.Type)
-        {
-            case para_Sym:
-            case para_Text:
-            case para_PageNum:
-            case para_PageCount:
-            case para_FootnoteReference:
-            case para_FootnoteRef:
-            case para_Separator:
-            case para_ContinuationSeparator:
-            {
-                UpdateLineMetricsText = true;
-                break;
-            }
-            case para_Math_Text:
-            case para_Math_Ampersand:
-            case para_Math_Placeholder:
-            case para_Math_BreakOperator:
-            {
-                ContentMetrics.UpdateMetrics(Item.size);
-                
-                break;
-            }
-            case para_Space:
-            {
-                break;
-            }
-            case para_Drawing:
-            {
-                if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
-                {
-                    // Обновим метрики строки
-                    if (Asc.linerule_Exact === LineRule)
-                    {
-                        if (PRS.LineAscent < Item.Height)
-                            PRS.LineAscent = Item.Height;
-                    }
-                    else
-                    {
-                        if (PRS.LineAscent < Item.Height + this.YOffset)
-                            PRS.LineAscent = Item.Height + this.YOffset;
+		switch (Item.Type)
+		{
+			case para_Sym:
+			case para_Text:
+			case para_PageNum:
+			case para_PageCount:
+			case para_FootnoteReference:
+			case para_FootnoteRef:
+			case para_Separator:
+			case para_ContinuationSeparator:
+			{
+				UpdateLineMetricsText = true;
+				break;
+			}
+			case para_Math_Text:
+			case para_Math_Ampersand:
+			case para_Math_Placeholder:
+			case para_Math_BreakOperator:
+			{
+				ContentMetrics.UpdateMetrics(Item.size);
 
-                        if (PRS.LineDescent < -this.YOffset)
-                            PRS.LineDescent = -this.YOffset;
-                    }
-                }
+				break;
+			}
+			case para_Space:
+			{
+				break;
+			}
+			case para_Drawing:
+			{
+				if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
+				{
+					// Обновим метрики строки
+					if (Asc.linerule_Exact === LineRule)
+					{
+						if (PRS.LineAscent < Item.Height)
+							PRS.LineAscent = Item.Height;
+					}
+					else
+					{
+						if (PRS.LineAscent < Item.Height + this.YOffset)
+							PRS.LineAscent = Item.Height + this.YOffset;
 
-                break;
-            }
+						if (PRS.LineDescent < -this.YOffset)
+							PRS.LineDescent = -this.YOffset;
+					}
+				}
 
-            case para_End:
-            {
-                // TODO: Тут можно сделать проверку на пустую строку.
-                break;
-            }
-        }
-    }
+				break;
+			}
 
-    if ( true === UpdateLineMetricsText)
-    {
-        // Пересчитаем метрику строки относительно размера данного текста
-        if ( PRS.LineTextAscent < this.TextAscent )
-            PRS.LineTextAscent = this.TextAscent;
+			case para_End:
+			{
+				break;
+			}
+		}
+	}
 
-        if ( PRS.LineTextAscent2 < this.TextAscent2 )
-            PRS.LineTextAscent2 = this.TextAscent2;
+	if (true === UpdateLineMetricsText)
+	{
+		// Пересчитаем метрику строки относительно размера данного текста
+		if (PRS.LineTextAscent < this.TextAscent)
+			PRS.LineTextAscent = this.TextAscent;
 
-        if ( PRS.LineTextDescent < this.TextDescent )
-            PRS.LineTextDescent = this.TextDescent;
+		if (PRS.LineTextAscent2 < this.TextAscent2)
+			PRS.LineTextAscent2 = this.TextAscent2;
 
-        if ( Asc.linerule_Exact === LineRule )
-        {
-            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-            if ( PRS.LineAscent < this.TextAscent )
-                PRS.LineAscent = this.TextAscent;
+		if (PRS.LineTextDescent < this.TextDescent)
+			PRS.LineTextDescent = this.TextDescent;
 
-            if ( PRS.LineDescent < this.TextDescent )
-                PRS.LineDescent = this.TextDescent;
-        }
-        else
-        {
-            if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
-                PRS.LineAscent = this.TextAscent + this.YOffset;
+		if (Asc.linerule_Exact === LineRule)
+		{
+			// Смещение не учитывается в метриках строки, когда расстояние между строк точное
+			if (PRS.LineAscent < this.TextAscent)
+				PRS.LineAscent = this.TextAscent;
 
-            if ( PRS.LineDescent < this.TextDescent - this.YOffset )
-                PRS.LineDescent = this.TextDescent - this.YOffset;
-        }
-    }
+			if (PRS.LineDescent < this.TextDescent)
+				PRS.LineDescent = this.TextDescent;
+		}
+		else
+		{
+			if (PRS.LineAscent < this.TextAscent + this.YOffset)
+				PRS.LineAscent = this.TextAscent + this.YOffset;
+
+			if (PRS.LineDescent < this.TextDescent - this.YOffset)
+				PRS.LineDescent = this.TextDescent - this.YOffset;
+		}
+	}
 };
 
 ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
@@ -9485,6 +9514,27 @@ ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent
 			}
 		}
 	}
+};
+ParaRun.prototype.RemoveTabsForTOC = function(_isTab)
+{
+	var isTab = _isTab;
+	for (var nPos = 0; nPos < this.Content.length; ++nPos)
+	{
+		if (para_Tab === this.Content[nPos].Type)
+		{
+			if (!isTab)
+			{
+				// Первый таб в параграфе оставляем
+				isTab = true;
+			}
+			else
+			{
+				this.Remove_FromContent(nPos, 1);
+			}
+		}
+	}
+
+	return isTab;
 };
 
 function CParaRunStartState(Run)

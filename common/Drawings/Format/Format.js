@@ -124,7 +124,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
                 {
                     if(oClass.Fill && oClass.Fill.fill && oClass.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof oClass.Fill.fill.RasterImageId === "string" && oClass.Fill.fill.RasterImageId.length > 0)
                     {
-                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(oClass.Fill.fill.RasterImageId));
+                        AscCommon.CollaborativeEditing.Add_NewImage(oClass.Fill.fill.RasterImageId);
                     }
                 }
             }
@@ -2153,7 +2153,6 @@ function CBlipFill()
     this.type = c_oAscFill.FILL_TYPE_BLIP;
 
     this.RasterImageId = "";
-    this.VectorImageBin = null;
 
     this.srcRect = null;
 
@@ -2173,9 +2172,6 @@ CBlipFill.prototype =
     Write_ToBinary: function(w)
     {
         writeString(w, this.RasterImageId);
-        var srcUrl = AscCommon.g_oDocumentUrls.getImageUrl(this.RasterImageId) || "";
-        writeString(w, srcUrl);
-        writeString(w, this.VectorImageBin);
         if(this.srcRect)
         {
             writeBool(w, true);
@@ -2209,11 +2205,10 @@ CBlipFill.prototype =
         if (null != _correct_id)
             this.RasterImageId = _correct_id;
 
-        var srcUrl = readString(r);
-        if(srcUrl) {
-            AscCommon.g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);
-        }
-        this.VectorImageBin = readString(r);
+        //var srcUrl = readString(r);
+        //if(srcUrl) {
+        //    AscCommon.g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);
+        //}
 
         if(readBool(r))
         {
@@ -2278,10 +2273,6 @@ CBlipFill.prototype =
         this.RasterImageId = checkRasterImageId(rasterImageId);
     },
 
-    setVectorImageBin: function(vectorImageBin)
-    {
-        this.VectorImageBin = vectorImageBin;
-    },
 
     setSrcRect: function(srcRect)
     {
@@ -2308,7 +2299,6 @@ CBlipFill.prototype =
     {
         var duplicate = new CBlipFill();
         duplicate.RasterImageId = this.RasterImageId;
-        duplicate.VectorImageBin = this.VectorImageBin;
 
         duplicate.stretch = this.stretch;
         if(isRealObject(this.tile))
@@ -3770,8 +3760,6 @@ function CompareUnifillBool(u1, u2)
                 && AscCommon.getFullImageSrc2(u1.fill.RasterImageId) !== AscCommon.getFullImageSrc2(u2.fill.RasterImageId))
                 return false;
 
-            if(u1.fill.VectorImageBin !== u2.fill.VectorImageBin)
-                return false;
 
             if(u1.fill.srcRect && !u2.fill.srcRect || !u1.fill.srcRect && u2.fill.srcRect)
                 return false;

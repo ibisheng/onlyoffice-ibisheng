@@ -2489,8 +2489,24 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 49000 );
 
+		oParser = new parserFormula( "SUMIF(A2,\">160000\",B2:B5)", "A7", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 
-        ws.getRange2( "A12" ).setValue( "Vegetables" );
+		oParser = new parserFormula( "SUMIF(A3,\">160000\",B2:B5)", "A7", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 7000 );
+
+		oParser = new parserFormula( "SUMIF(A4,\">160000\",B4:B5)", "A7", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 21000 );
+
+		oParser = new parserFormula( "SUMIF(A4,\">160000\")", "A7", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 300000);
+
+
+		ws.getRange2( "A12" ).setValue( "Vegetables" );
         ws.getRange2( "A13" ).setValue( "Vegetables" );
         ws.getRange2( "A14" ).setValue( "Fruits" );
         ws.getRange2( "A15" ).setValue( "" );

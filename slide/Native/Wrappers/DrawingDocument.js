@@ -142,8 +142,7 @@ CDrawingDocument.prototype.UnlockCursorType = function()
 
 CDrawingDocument.prototype.OnStartRecalculate = function(pageCount)
 {
-
-    this.Native["DD_OnStartRecalculate"](pageCount);
+    this.Native["DD_OnStartRecalculate"](pageCount, this.LogicDocument.Width, this.LogicDocument.Height);
 };
 
 CDrawingDocument.prototype.SetTargetColor = function(r, g, b)
@@ -156,7 +155,11 @@ CDrawingDocument.prototype.StartTrackTable = function()
 
 CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
 {
-    this.Native["DD_OnRecalculatePage"](index, pageObject.Width, pageObject.Height);
+    var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
+    pageObject.draw(oBoundsChecker);
+    var dWidth = oBoundsChecker.Bounds.max_x - oBoundsChecker.Bounds.min_x;
+    var dHeight = oBoundsChecker.Bounds.max_y - oBoundsChecker.Bounds.min_y;
+    this.Native["DD_OnRecalculatePage"](index, dWidth, dHeight);
 };
 
 CDrawingDocument.prototype.OnEndRecalculate = function()

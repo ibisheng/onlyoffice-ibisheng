@@ -582,7 +582,6 @@
 		this.bNoSendComments = false;
 
 		this.isApplyChangesOnOpen        = false;
-		this.isApplyChangesOnOpenEnabled = true;
 
         this.IsSpellCheckCurrentWord = false;
 
@@ -621,9 +620,6 @@
 		this.saveImageMap       = null;
 
 		this.ServerImagesWaitComplete = false;
-
-		this.ParcedDocument              = false;
-		this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
 		this.DocumentOrientation = false;
 
@@ -742,13 +738,8 @@
 		};
 		this.CoAuthoringApi.onLocksAcquired          = function(e)
 		{
-			if (t.isApplyChangesOnOpenEnabled)
+			if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksAcquired, e))
 			{
-				// Пока документ еще не загружен, будем сохранять функцию и аргументы
-				t.arrPreOpenLocksObjects.push(function()
-				{
-					t.CoAuthoringApi.onLocksAcquired(e);
-				});
 				return;
 			}
 
@@ -866,13 +857,8 @@
 		};
 		this.CoAuthoringApi.onLocksReleased          = function(e, bChanges)
 		{
-			if (t.isApplyChangesOnOpenEnabled)
+			if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksReleased, e, bChanges))
 			{
-				// Пока документ еще не загружен, будем сохранять функцию и аргументы
-				t.arrPreOpenLocksObjects.push(function()
-				{
-					t.CoAuthoringApi.onLocksReleased(e, bChanges);
-				});
 				return;
 			}
 
@@ -1005,40 +991,27 @@
 				AscCommon.CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
 			}
 		};
-		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
+	};
+
+	asc_docs_api.prototype.startCollaborationEditing = function()
 		{
-			if (t.isViewMode) {
-				return;
-			}
-			if (t.ParcedDocument) {
-				if (isStartEvent) {
 					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-					t.asc_setDrawCollaborationMarks(true);
-					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-				} else {
-					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-					t.canUnlockDocument = true;
-					t.canStartCoAuthoring = true;
+		this.asc_setDrawCollaborationMarks(true);
+		if (this.WordControl && this.WordControl.m_oLogicDocument)
+		{
+			this.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 				}
-			} else {
-				t.isStartCoAuthoringOnEndLoad = true;
-				if (!isStartEvent) {
-					// Документ еще не подгрузился, но нужно сбросить lock
-					t.CoAuthoringApi.unLockDocument(false, true);
-				}
-			}
 		};
-		this.CoAuthoringApi.onEndCoAuthoring         = function(isStartEvent)
+	asc_docs_api.prototype.endCollaborationEditing = function()
 		{
 			AscCommon.CollaborativeEditing.End_CollaborationEditing();
-
-			if (false != t.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable)
+		if (this.WordControl && this.WordControl.m_oLogicDocument &&
+			false !== this.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable)
 			{
-				t.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable = false;
-				t.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+			this.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable = false;
+			this.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
 			}
 		};
-	};
 
 
     /////////////////////////////////////////////////////////////////////////
@@ -1138,7 +1111,6 @@
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 	{
 		this.ServerIdWaitComplete = true;
-		if (true == this.ServerImagesWaitComplete)
 			this.OpenDocumentEndCallback();
 	};
 
@@ -1468,18 +1440,10 @@ background-repeat: no-repeat;\
 		this.LoadedObject = 1;
 		g_oIdCounter.Set_Load(false);
 
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
-		this.ParcedDocument = true;
 		g_oIdCounter.Set_Load(false);
-		if (this.isStartCoAuthoringOnEndLoad)
-		{
-			this.CoAuthoringApi.onStartCoAuthoring(true);
-			this.isStartCoAuthoringOnEndLoad = false;
-		}
 
 		if (this.isMobileVersion)
 		{
@@ -4699,7 +4663,6 @@ background-repeat: no-repeat;\
 		else
 		{
 			this.ServerImagesWaitComplete = true;
-			if (true == this.ServerIdWaitComplete)
 				this.OpenDocumentEndCallback();
 		}
 	};
@@ -4730,6 +4693,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
+		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete ||
+			!this.WordControl || !this.WordControl.m_oLogicDocument)
+			return;
+
 		var bIsScroll = false;
 
 		if (0 == this.DocumentType)
@@ -4745,16 +4712,11 @@ background-repeat: no-repeat;\
 						this.isApplyChangesOnOpenEnabled = false;
 						this.bNoSendComments             = true;
 						var OtherChanges                 = AscCommon.CollaborativeEditing.m_aChanges.length > 0;
+						this._applyPreOpenLocks();
 						AscCommon.CollaborativeEditing.Apply_Changes();
 						AscCommon.CollaborativeEditing.Release_Locks();
 						this.bNoSendComments      = false;
 						this.isApplyChangesOnOpen = true;
-						// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-						for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
-						{
-							this.arrPreOpenLocksObjects[i]();
-						}
-						this.arrPreOpenLocksObjects = [];
 						if(OtherChanges && this.isSaveFonts_Images){
 							return;
 						}
@@ -4836,7 +4798,7 @@ background-repeat: no-repeat;\
 				}
 			}
 		}
-		this.sendEvent("asc_onDocumentContentReady");
+		this.onDocumentContentReady();
 		this.isApplyChangesOnOpen = false;
 
 		this.WordControl.InitControl();
@@ -5899,6 +5861,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
+		if (window.g_asc_plugins)
+			window.g_asc_plugins.stopWorked();
+
 		var is_reporter = (reporterStartObject && !this.isReporterMode);
 		if (is_reporter)
 			this.DemonstrationReporterStart(reporterStartObject);
@@ -7257,7 +7222,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asyncFontsDocumentEndLoaded']         = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 	asc_docs_api.prototype['asyncImagesDocumentEndLoaded']        = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
 	asc_docs_api.prototype['asc_getComments']                     = asc_docs_api.prototype.asc_getComments;
-	asc_docs_api.prototype['OpenDocumentEndCallback']             = asc_docs_api.prototype.OpenDocumentEndCallback;
 	asc_docs_api.prototype['asyncFontEndLoaded']                  = asc_docs_api.prototype.asyncFontEndLoaded;
 	asc_docs_api.prototype['asyncImageEndLoaded']                 = asc_docs_api.prototype.asyncImageEndLoaded;
 	asc_docs_api.prototype['get_PresentationWidth']               = asc_docs_api.prototype.get_PresentationWidth;

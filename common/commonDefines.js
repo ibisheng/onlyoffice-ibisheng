@@ -954,10 +954,11 @@
 
 	var c_oAscTabLeader = {
 		Dot        : 0x00,
-		Hyphen     : 0x01,
-		MiddleDot  : 0x02,
-		None       : 0x03,
-		Underscore : 0x04
+		Heavy      : 0x01,
+		Hyphen     : 0x02,
+		MiddleDot  : 0x03,
+		None       : 0x04,
+		Underscore : 0x05
 	};
 
 	var c_oAscEncodings    = [
@@ -1702,6 +1703,7 @@
 
 	prot = window['Asc']['c_oAscTabLeader'] = window['Asc'].c_oAscTabLeader = c_oAscTabLeader;
 	prot["None"]       = c_oAscTabLeader.None;
+	prot["Heavy"]      = c_oAscTabLeader.Heavy;
 	prot["Dot"]        = c_oAscTabLeader.Dot;
 	prot["Hyphen"]     = c_oAscTabLeader.Hyphen;
 	prot["MiddleDot"]  = c_oAscTabLeader.MiddleDot;

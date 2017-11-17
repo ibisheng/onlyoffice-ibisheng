@@ -2744,8 +2744,8 @@
 		this.hyperlinkManager.setDependenceManager(this.mergeManager);
 		this.DrawingDocument = new AscCommon.CDrawingDocument();
 		this.sheetViews = [];
-		this.aConditionalFormatting = [];
-		this.updateConditionalFormatting = null;
+		this.aConditionalFormattingRules = [];
+		this.updateConditionalFormattingRange = null;
 		this.sheetPr = null;
 		this.aFormulaExt = null;
 
@@ -2891,8 +2891,8 @@
 		for (i = 0; i < wsFrom.sheetViews.length; ++i) {
 			this.sheetViews.push(wsFrom.sheetViews[i].clone());
 		}
-		for (i = 0; i < wsFrom.aConditionalFormatting.length; ++i) {
-			this.aConditionalFormatting.push(wsFrom.aConditionalFormatting[i].clone());
+		for (i = 0; i < wsFrom.aConditionalFormattingRules.length; ++i) {
+			this.aConditionalFormattingRules.push(wsFrom.aConditionalFormattingRules[i].clone());
 		}
 		if (wsFrom.sheetPr)
 			this.sheetPr = wsFrom.sheetPr.clone();
@@ -2995,25 +2995,24 @@
 		if (!range) {
 			range = new AscCommonExcel.MultiplyRange([new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0)]);
 		}
-		if (this.updateConditionalFormatting) {
-			this.updateConditionalFormatting.union2(range);
+		if (this.updateConditionalFormattingRange) {
+			this.updateConditionalFormattingRange.union2(range);
 		} else {
-			this.updateConditionalFormatting = range.clone();
+			this.updateConditionalFormattingRange = range.clone();
 		}
 	};
 	Worksheet.prototype._updateConditionalFormatting = function() {
-		if (!this.updateConditionalFormatting) {
+		if (!this.updateConditionalFormattingRange) {
 			return;
 		}
-		var range = this.updateConditionalFormatting;
-		this.updateConditionalFormatting = null;
+		var range = this.updateConditionalFormattingRange;
+		this.updateConditionalFormattingRange = null;
 		var t = this;
-		var oGradient1, oGradient2;
-		var aCFs = this.aConditionalFormatting;
-		var aRules, oRule;
-		var oRuleElement = null;
-		var o;
-		var i, j, l, cf, cell, ranges, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
+		var aRules = this.aConditionalFormattingRules.sort(function(v1, v2) {
+			return v2.priority - v1.priority;
+		});
+		var oGradient1, oGradient2, oRule, multiplyRange, oRuleElement = null;
+		var o, l, cell, ranges, values, value, tmp, min, mid, max, dxf, compareFunction, nc, sum;
 		this.sheetMergedStyles.clearConditionalStyle(range);
 		var getCacheFunction = function(rule, setFunc) {
 			var cache = {
@@ -3045,20 +3044,11 @@
 				return cache.get(row, col);
 			};
 		};
-		for (i = 0; i < aCFs.length; ++i) {
-			cf = aCFs[i];
-			ranges = cf.ranges;
-			// ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
-			if (!cf.isValid()) {
-				continue;
-			}
+		for (var i = 0; i < aRules.length; ++i) {
+			oRule = aRules[i];
+			ranges = oRule.ranges;
 			if (this._isConditionalFormattingIntersect(range, ranges)) {
-				var multiplyRange = new AscCommonExcel.MultiplyRange(ranges);
-				aRules = cf.aRules.sort(function(v1, v2) {
-					return v2.priority - v1.priority;
-				});
-				for (j = 0; j < aRules.length; ++j) {
-					oRule = aRules[j];
+				multiplyRange = new AscCommonExcel.MultiplyRange(ranges);
 					// ToDo dataBar, expression, iconSet (page 2679)
 					if (AscCommonExcel.ECfType.colorScale === oRule.type) {
 						if (1 !== oRule.aRuleElements.length) {
@@ -3209,22 +3199,22 @@
 									return function(row, col) {
 										var val;
 										t._getCellNoEmpty(row, col, function(cell) {
-											val = cell ? cell.getValueWithoutFormat() : "";
+											val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
 										});
 										return (-1 !== val.indexOf(text)) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text);
+							})(oRule, oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.notContainsText:
 								compareFunction = (function(rule, text) {
 									return function(row, col) {
 										var val;
 										t._getCellNoEmpty(row, col, function(cell) {
-											val = cell ? cell.getValueWithoutFormat() : "";
+											val = cell ? cell.getValueWithoutFormat().toLowerCase() : "";
 										});
 										return (-1 === val.indexOf(text)) ? rule.dxf : null;
 									};
-								})(oRule, oRule.text);
+							})(oRule, oRule.text.toLowerCase());
 								break;
 							case AscCommonExcel.ECfType.beginsWith:
 								compareFunction = (function(rule, text) {
@@ -3321,10 +3311,10 @@
 								break;
 							case AscCommonExcel.ECfType.expression:
 								var offset = {offsetRow: 0, offsetCol: 0};
-								var bboxCf = cf.getBBox();
+							var bboxCf = oRule.getBBox();
 								var rowLT = bboxCf ? bboxCf.r1 : 0;
 								var colLT = bboxCf ? bboxCf.c1 : 0;
-								var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, cf);
+							var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, oRule);
 								compareFunction = getCacheFunction(oRule, (function(rule, formulaCF, rowLT, colLT) {
 									return function(row, col) {
 										offset.offsetRow = row - rowLT;
@@ -3351,7 +3341,6 @@
 					}
 				}
 			}
-		}
 	};
 	Worksheet.prototype._forEachRow = function(fAction) {
 		this.getRange3(0, 0, gc_nMaxRow0, 0)._foreachRowNoEmpty(fAction);
@@ -5827,6 +5816,33 @@
 		this.type = val;
 		this._hasChanged = true;
 	};
+	Cell.prototype.correctValueByType = function() {
+		//todo implemented only Number->String. other is stub
+		switch (this.type) {
+			case CellValueType.Number:
+				if (null !== this.text) {
+					this.setValueNumberInternal(parseInt(this.text) || 0);
+				} else if (null !== this.multiText) {
+					this.setValueNumberInternal(0);
+				}
+				break;
+			case CellValueType.Bool:
+				if (null !== this.text || null !== this.multiText) {
+					this.setValueNumberInternal(0);
+				}
+				break;
+			case CellValueType.String:
+				if (null !== this.number) {
+					this.setValueTextInternal(this.number.toString());
+				}
+				break;
+			case CellValueType.Error:
+				if (null !== this.number) {
+					this.setValueTextInternal(cErrorOrigin["nil"]);
+				}
+				break;
+		}
+	};
 	Cell.prototype.setValueNumberInternal=function(val) {
 		this.number = val;
 		this.text = null;
@@ -6007,6 +6023,7 @@
 		if(type != this.type){
 			var DataOld = this.getValueData();
 			this.setTypeInternal(type);
+			this.correctValueByType();
 			this._hasChanged = true;
 			var DataNew = this.getValueData();
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));

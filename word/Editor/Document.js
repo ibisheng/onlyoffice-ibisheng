@@ -1616,6 +1616,15 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 	this.Controller = this.LogicDocumentController;
 
     this.StartTime = 0;
+
+	//------------------------------------------------------------------------------------------------------------------
+	//  Check StartCollaborationEditing
+	//------------------------------------------------------------------------------------------------------------------
+	if (this.CollaborativeEditing && !this.CollaborativeEditing.Is_SingleUser())
+	{
+		this.StartCollaborationEditing();
+}
+	//__________________________________________________________________________________________________________________
 }
 CDocument.prototype = Object.create(CDocumentContentBase.prototype);
 CDocument.prototype.constructor = CDocument;
@@ -4008,7 +4017,9 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
 CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
-	this.Recalculate();
+
+	if (false !== bRecalculate)
+		this.Recalculate();
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
@@ -15717,13 +15728,8 @@ CDocument.prototype.EndViewModeInReview = function()
 };
 CDocument.prototype.StartCollaborationEditing = function()
 {
-	this.CollaborativeEditing.Start_CollaborationEditing();
 	this.DrawingDocument.Start_CollaborationEditing();
 	this.EndViewModeInReview();
-};
-CDocument.prototype.EndCollaborationEditing = function()
-{
-	this.CollaborativeEditing.End_CollaborationEditing();
 };
 CDocument.prototype.IsViewModeInReview = function()
 {
@@ -15817,6 +15823,33 @@ CDocument.prototype.AddField = function(nType, oPr)
 	}
 
 	return false;
+};
+CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
+{
+	var oParagraph = this.GetCurrentParagraph();
+	if (!oParagraph)
+		return false;
+
+	var nIndex = -1;
+
+	var oStartChar = new ParaFieldChar(fldchartype_Begin, this);
+
+	var oRun = new ParaRun();
+	oRun.Add_ToContent(++nIndex, oStartChar);
+	for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
+	{
+		oRun.Add_ToContent(++nIndex, new ParaInstrText(sInstruction.charAt(nPos)));
+	}
+	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
+	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
+	oParagraph.Add(oRun);
+
+	oRun.Make_ThisElementCurrent(false);
+
+	this.Recalculate();
+	oStartChar.GetComplexField().Update();
+
+	return true;
 };
 CDocument.prototype.UpdateComplexField = function(oField)
 {
@@ -16038,6 +16071,32 @@ CDocument.prototype.RemoveBookmark = function(sName)
 CDocument.prototype.private_RemoveBookmark = function(sName)
 {
 
+};
+CDocument.prototype.AddTableOfContents = function(sHeading)
+{
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTableOfContents);
+
+		this.Remove(1, true, true, true);
+		var oSdt = this.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+
+		var oParagraph = oSdt.GetCurrentParagraph();
+		oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+		for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+		{
+			oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+		}
+
+		oSdt.AddNewParagraph(false, true);
+		oSdt.SetThisElementCurrent();
+
+		this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
+
+		// TODO: oSdt нужно заполнить свойствами
+
+		this.Recalculate();
+	}
 };
 
 function CDocumentSelectionState()

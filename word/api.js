@@ -748,7 +748,6 @@
 		this.isShowTableEmptyLineAttack = false;
 
 		this.isApplyChangesOnOpen        = false;
-		this.isApplyChangesOnOpenEnabled = true;
 
 		this.IsSpellCheckCurrentWord = false;
 
@@ -809,9 +808,6 @@
 		this._gui_control_colors = null;
 
 		this.DocumentReaderMode = null;
-
-		this.ParcedDocument              = false;
-		this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
 		if (window.editor == undefined)
 		{
@@ -1161,8 +1157,6 @@ background-repeat: no-repeat;\
 		this.DocumentType         = 1;
 		this.ServerIdWaitComplete = true;
 
-		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
 		this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Load(url, gObject);
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Fonts, true);
 	};
@@ -1185,8 +1179,6 @@ background-repeat: no-repeat;\
 			g_oIdCounter.Set_Load(false);
 			this.LoadedObject = 1;
 
-			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
 			// проверяем какие шрифты нужны
 			this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 			AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
@@ -1205,13 +1197,6 @@ background-repeat: no-repeat;\
 			sizeMM = DocumentPageSize.getSize(AscCommon.Page_Height, AscCommon.Page_Width);
 		editor.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
 		editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
-
-		this.ParcedDocument = true;
-		if (this.isStartCoAuthoringOnEndLoad)
-		{
-			this.CoAuthoringApi.onStartCoAuthoring(true);
-			this.isStartCoAuthoringOnEndLoad = false;
-		}
 
 		if (this.isMobileVersion)
 		{
@@ -1315,13 +1300,8 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onLocksAcquired          = function(e)
 		{
-			if (t.isApplyChangesOnOpenEnabled)
+			if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksAcquired, e))
 			{
-				// Пока документ еще не загружен, будем сохранять функцию и аргументы
-				t.arrPreOpenLocksObjects.push(function()
-				{
-					t.CoAuthoringApi.onLocksAcquired(e);
-				});
 				return;
 			}
 
@@ -1374,13 +1354,8 @@ background-repeat: no-repeat;\
 		};
 		this.CoAuthoringApi.onLocksReleased          = function(e, bChanges)
 		{
-			if (t.isApplyChangesOnOpenEnabled)
+			if (t._coAuthoringCheckEndOpenDocument(t.CoAuthoringApi.onLocksReleased, e, bChanges))
 			{
-				// Пока документ еще не загружен, будем сохранять функцию и аргументы
-				t.arrPreOpenLocksObjects.push(function()
-				{
-					t.CoAuthoringApi.onLocksReleased(e, bChanges);
-				});
 				return;
 			}
 
@@ -1502,41 +1477,26 @@ background-repeat: no-repeat;\
 				AscCommon.CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
 			}
 		};
-		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
+	};
+
+	asc_docs_api.prototype.startCollaborationEditing = function()
 		{
-			if (t.isViewMode) {
-				return;
+		AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+		if (this.WordControl && this.WordControl.m_oLogicDocument)
+		{
+			this.WordControl.m_oLogicDocument.StartCollaborationEditing();
 			}
-			if (t.ParcedDocument) {
-				if (isStartEvent) {
-					t.WordControl.m_oLogicDocument.StartCollaborationEditing();
-					t.asc_setDrawCollaborationMarks(true);
-					if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast){
+		this.asc_setDrawCollaborationMarks(true);
+		if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast)
+		{
 						window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
 					}
-				} else {
-					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-					t.canUnlockDocument = true;
-					t.canStartCoAuthoring = true;
-				}
-			} else {
-				t.isStartCoAuthoringOnEndLoad = true;
-				if (!isStartEvent) {
-					// Документ еще не подгрузился, но нужно сбросить lock
-					t.CoAuthoringApi.unLockDocument(false, true);
-				}
-			}
 		};
-		this.CoAuthoringApi.onEndCoAuthoring         = function(isStartEvent)
+	asc_docs_api.prototype.endCollaborationEditing = function()
 		{
-			if (t.canUnlockDocument) {
-				t.canStartCoAuthoring = false;
-			} else {
-				t.WordControl.m_oLogicDocument.EndCollaborationEditing();
-				t.asc_setDrawCollaborationMarks(false);
-			}
+		AscCommon.CollaborativeEditing.End_CollaborationEditing();
+		this.asc_setDrawCollaborationMarks(false);
 		};
-	};
 
 	/////////////////////////////////////////////////////////////////////////
 	//////////////////////////SpellChecking api//////////////////////////////
@@ -5846,7 +5806,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
 	{
 		this.ServerIdWaitComplete = true;
-		if (true == this.ServerImagesWaitComplete)
 			this.OpenDocumentEndCallback();
 	};
 
@@ -6095,7 +6054,7 @@ background-repeat: no-repeat;\
 			this.bInit_word_control = true;
 
 			if (false === this.isPasteFonts_Images)
-				this.sendEvent("asc_onDocumentContentReady");
+				this.onDocumentContentReady();
 
 			this.WordControl.InitControl();
 
@@ -6122,7 +6081,6 @@ background-repeat: no-repeat;\
 		if (false === this.isPasteFonts_Images && false === this.isSaveFonts_Images && false === this.isLoadImagesCustom)
 		{
 			this.ServerImagesWaitComplete = true;
-			if (true == this.ServerIdWaitComplete)
 				this.OpenDocumentEndCallback();
 		}
 		else
@@ -6144,7 +6102,7 @@ background-repeat: no-repeat;\
 				if (this.bInit_word_control === false)
 				{
 					this.bInit_word_control = true;
-					this.sendEvent("asc_onDocumentContentReady");
+					this.onDocumentContentReady();
 				}
 			}
 			else if (this.isLoadImagesCustom)
@@ -6160,7 +6118,8 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
-		if (null == this.WordControl.m_oLogicDocument)
+		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete ||
+			!this.WordControl || !this.WordControl.m_oLogicDocument)
 			return;
 
 		if (0 == this.DocumentType)
@@ -6173,31 +6132,17 @@ background-repeat: no-repeat;\
 		{
 			if (this.LoadedObject)
 			{
-				if (1 != this.LoadedObject)
-				{
-					this.WordControl.m_oLogicDocument.fromJfdoc(this.LoadedObject);
-					this.WordControl.m_oDrawingDocument.TargetStart();
-					this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-				}
-				else
-				{
 					var Document = this.WordControl.m_oLogicDocument;
 
 					if (this.isApplyChangesOnOpenEnabled)
 					{
 						this.isApplyChangesOnOpenEnabled = false;
+					this._applyPreOpenLocks();
 						AscCommon.CollaborativeEditing.Apply_Changes();
 						AscCommon.CollaborativeEditing.Release_Locks();
 
 						this.isApplyChangesOnOpen = true;
-
-						// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-						for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
-						{
-							this.arrPreOpenLocksObjects[i]();
 						}
-						this.arrPreOpenLocksObjects = [];
-					}
 
 					//                History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
 
@@ -6237,12 +6182,11 @@ background-repeat: no-repeat;\
 					}
 				}
 			}
-		}
 
 		if (false === this.isSaveFonts_Images)
 		{
 			this.bInit_word_control = true;
-			this.sendEvent("asc_onDocumentContentReady");
+			this.onDocumentContentReady();
 		}
 
 		this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
@@ -7336,6 +7280,7 @@ background-repeat: no-repeat;\
 		g_oTableId.Clear();
 		AscCommon.CollaborativeEditing.Clear();
 		this.isApplyChangesOnOpenEnabled = true;
+		this.isDocumentLoadComplete = false;
 
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		oLogicDocument.Stop_Recalculate();
@@ -7863,8 +7808,6 @@ background-repeat: no-repeat;\
 		{
 			g_oIdCounter.Set_Load(false);
 			this.LoadedObject = 1;
-
-			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		}
 		else
 			this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
@@ -8758,7 +8701,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_SendThemeColors']                      = asc_docs_api.prototype.sync_SendThemeColors;
 	asc_docs_api.prototype['ChangeColorScheme']                         = asc_docs_api.prototype.ChangeColorScheme;
 	asc_docs_api.prototype['asyncImagesDocumentEndLoaded']              = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
-	asc_docs_api.prototype['OpenDocumentEndCallback']                   = asc_docs_api.prototype.OpenDocumentEndCallback;
 	asc_docs_api.prototype['UpdateInterfaceState']                      = asc_docs_api.prototype.UpdateInterfaceState;
 	asc_docs_api.prototype['asyncFontEndLoaded']                        = asc_docs_api.prototype.asyncFontEndLoaded;
 	asc_docs_api.prototype['asyncImageEndLoaded']                       = asc_docs_api.prototype.asyncImageEndLoaded;

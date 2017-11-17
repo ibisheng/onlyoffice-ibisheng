@@ -128,7 +128,8 @@
     sessionAbsolute: 4003,
 	accessDeny: 4004,
 	jwtExpired: 4005,
-	jwtError: 4006
+	jwtError: 4006,
+	drop: 4007
   };
   
 	var c_oAscServerCommandErrors = {

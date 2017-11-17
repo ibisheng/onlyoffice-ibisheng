@@ -237,7 +237,7 @@ Paragraph.prototype.Set_Pr = function(oNewPr)
 	this.Recalc_CompiledPr();
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
-Paragraph.prototype.Copy = function(Parent, DrawingDocument)
+Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
 	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, !this.bFromDocument);
 
@@ -261,7 +261,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Item = this.Content[Index];
-		Para.Internal_Content_Add(Para.Content.length, Item.Copy(false), false);
+		Para.Internal_Content_Add(Para.Content.length, Item.Copy(false, oPr), false);
 	}
 
 	// TODO: Как только переделаем para_End, переделать тут
@@ -7457,7 +7457,7 @@ Paragraph.prototype.Numbering_Remove = function()
 
 		if (undefined === this.Pr.Ind.FirstLine || Math.abs(this.Pr.Ind.FirstLine) < 0.001)
 		{
-			if (undefined != OldNumPr && undefined != OldNumPr.NumId)
+			if (undefined != OldNumPr && undefined != OldNumPr.NumId && this.Parent)
 			{
 				var Num = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId);
 				if (Num)
@@ -12420,11 +12420,31 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
 	return this.GetComplexFieldsByPos(SearchPosXY.Pos, bReturnFieldPos);
 };
-Paragraph.prototype.GetOutlineParagraphs = function(arrOutline)
+Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
 	var nOutlineLvl = this.GetOutlineLvl();
-	if (undefined !== nOutlineLvl)
+	if (undefined !== nOutlineLvl
+		&& (!oPr
+		|| -1 === oPr.OutlineStart
+		|| -1 === oPr.OutlineEnd
+		|| (nOutlineLvl >= oPr.OutlineStart - 1 && nOutlineLvl <= oPr.OutlineEnd - 1)))
+	{
 		arrOutline.push({Paragraph : this, Lvl : nOutlineLvl});
+	}
+	else if (oPr && oPr.Styles && oPr.Styles.length > 0)
+	{
+		var oStyle = this.LogicDocument.Get_Styles().Get(this.Style_Get());
+		if (!oStyle)
+			return;
+
+		var sStyleName = oStyle.Get_Name();
+
+		for (var nIndex = 0, nCount = oPr.Styles.length; nIndex < nCount; ++nIndex)
+		{
+			if (oPr.Styles[nIndex].Name === sStyleName)
+				return arrOutline.push({Paragraph : this, Lvl : oPr.Styles[nIndex].Lvl - 1});
+		}
+	}
 };
 Paragraph.prototype.UpdateBookmarks = function(oManager)
 {
@@ -12527,6 +12547,21 @@ Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
 	}
 
 	return this.Get_AbsolutePage(nCurPage);
+};
+/**
+ * Удаляем все кроме первого таба в параграфе.
+ * @returns {boolean} Был ли хоть один таб
+ */
+Paragraph.prototype.RemoveTabsForTOC = function()
+{
+	var isTab = false;
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].RemoveTabsForTOC(isTab))
+			isTab = true;
+	}
+
+	return isTab;
 };
 
 var pararecalc_0_All  = 0;

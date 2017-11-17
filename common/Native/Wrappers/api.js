@@ -5789,7 +5789,7 @@ function NativeOpenFile3(_params, documentInfo)
 
         var permissions = window.documentInfo["permissions"];
         if (undefined != permissions && null != permissions && permissions.length > 0) {
-            docInfo.put_Permissions(permissions);
+            docInfo.put_Permissions(JSON.parse(permissions));
         }   
 
         _api.asc_setDocInfo(docInfo);
@@ -6000,13 +6000,6 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
      
         this.ImageLoader.bIsLoadDocumentFirst = true;
         
-        this.ParcedDocument = true;
-        if (this.isStartCoAuthoringOnEndLoad)
-        {
-            this.CoAuthoringApi.onStartCoAuthoring(true);
-            this.isStartCoAuthoringOnEndLoad = false;
-        }
-        
         if (null != _api.WordControl.m_oLogicDocument)
         {
             _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
@@ -6035,13 +6028,6 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
     this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
 
     //this.asyncFontsDocumentEndLoaded();
-
-    this.ParcedDocument = true;
-    if (this.isStartCoAuthoringOnEndLoad)
-    {
-        this.CoAuthoringApi.onStartCoAuthoring(true);
-        this.isStartCoAuthoringOnEndLoad = false;
-    }
 
     if (null != _api.WordControl.m_oLogicDocument)
     {

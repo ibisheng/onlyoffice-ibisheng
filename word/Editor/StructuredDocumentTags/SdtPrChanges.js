@@ -38,10 +38,11 @@
  */
 
 AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Alias] = CChangesSdtPrAlias;
-AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Id]    = CChangesSdtPrId;
-AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Tag]   = CChangesSdtPrTag;
-AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Label] = CChangesSdtPrLabel;
-AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Lock]  = CChangesSdtPrLock;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Id]         = CChangesSdtPrId;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Tag]        = CChangesSdtPrTag;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Label]      = CChangesSdtPrLabel;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_Lock]       = CChangesSdtPrLock;
+AscDFH.changesFactory[AscDFH.historyitem_SdtPr_DocPartObj] = CChangesSdtPrDocPartObj;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -60,6 +61,9 @@ AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_Label] = [
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_Lock]  = [
 	AscDFH.historyitem_SdtPr_Lock
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_SdtPr_DocPartObj] = [
+	AscDFH.historyitem_SdtPr_DocPartObj
 ];
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -137,4 +141,19 @@ CChangesSdtPrLock.prototype.Type = AscDFH.historyitem_SdtPr_Lock;
 CChangesSdtPrLock.prototype.private_SetValue = function(Value)
 {
 	this.Class.Pr.Lock = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseProperty}
+ */
+function CChangesSdtPrDocPartObj(Class, Old, New)
+{
+	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
+}
+CChangesSdtPrDocPartObj.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
+CChangesSdtPrDocPartObj.prototype.constructor = CChangesSdtPrDocPartObj;
+CChangesSdtPrDocPartObj.prototype.Type = AscDFH.historyitem_SdtPr_DocPartObj;
+CChangesSdtPrDocPartObj.prototype.private_SetValue = function(Value)
+{
+	this.Class.Pr.Tag = Value;
 };

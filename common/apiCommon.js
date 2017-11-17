@@ -1442,6 +1442,9 @@
 	};
 	asc_CParagraphTab.prototype.asc_getLeader = function()
 	{
+		if (Asc.c_oAscTabLeader.Heavy === this.Leader)
+			return Asc.c_oAscTabLeader.Underscore;
+
 		return this.Leader;
 	};
 	asc_CParagraphTab.prototype.asc_putLeader = function(v)
