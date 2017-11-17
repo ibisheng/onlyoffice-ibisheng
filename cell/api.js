@@ -3833,6 +3833,7 @@ var editor;
   prot["asc_getRequestSignatures"] 	     = prot.asc_getRequestSignatures;
   prot["asc_AddSignatureLine2"]          = prot.asc_AddSignatureLine2;
   prot["asc_Sign"]             		     = prot.asc_Sign;
+  prot["asc_RequestSign"]             	 = prot.asc_RequestSign;
   prot["asc_ViewCertificate"] 		     = prot.asc_ViewCertificate;
   prot["asc_SelectCertificate"] 	     = prot.asc_SelectCertificate;
   prot["asc_GetDefaultCertificate"]      = prot.asc_GetDefaultCertificate;

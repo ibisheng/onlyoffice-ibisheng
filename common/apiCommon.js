@@ -103,6 +103,15 @@
 		return ret;
 	}
 
+	function CreateGUID()
+	{
+		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
+
+		var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
+		val = val.toUpperCase();
+		return val;
+	}
+
 	var c_oLicenseResult = {
 		Error       : 1,
 		Expired     : 2,
@@ -4262,6 +4271,8 @@
     prot["get_Word"] = prot.get_Word;
     prot["get_Checked"] = prot.get_Checked;
     prot["get_Variants"] = prot.get_Variants;
+
+    window["AscCommon"].CreateGUID = CreateGUID;
 
     window["AscCommon"].CWatermarkOnDraw = CWatermarkOnDraw;
 })(window);

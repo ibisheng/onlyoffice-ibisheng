@@ -261,7 +261,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 		if (window.SaveQuestionObjectBeforeSign)
 		{
 			var _obj = window.SaveQuestionObjectBeforeSign;
-			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height, window["asc_IsVisibleSign"](_obj.guid));
 			window.SaveQuestionObjectBeforeSign = null;
 		}
 	}

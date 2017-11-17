@@ -312,19 +312,18 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 	_editor.signatures = [];
 
-	var _signatures = null;
-
-	try
+	var _signatures = [];
+	if ("" != _json)
 	{
-		_signatures = JSON.parse(_json);
+		try
+		{
+			_signatures = JSON.parse(_json);
+		}
+		catch (err)
+		{
+			_signatures = [];
+		}
 	}
-	catch (err)
-	{
-		return;
-	}
-
-	if (!_signatures)
-		return;
 
 	var _count = _signatures["count"];
 	var _data = _signatures["data"];
@@ -414,28 +413,62 @@ window["OnNativeOpenFilenameDialog"] = function(file)
 	delete window.on_native_open_filename_dialog;
 };
 
+window["asc_IsVisibleSign"] = function(guid)
+{
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	var isVisible = false;
+	// detect visible/unvisible
+	var _req = _editor.asc_getRequestSignatures();
+	for (var i = 0; i < _req.length; i++)
+	{
+		if (_req[i].asc_getGuid() == guid)
+		{
+			isVisible = true;
+			break;
+		}
+	}
+
+	return isVisible;
+};
+
+window["asc_LocalRequestSign"] = function(guid, width, height, isView)
+{
+	if (isView !== true && width === undefined)
+	{
+		width = 100;
+		height = 100;
+	}
+
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	var _length = _editor.signatures.length;
+	for (var i = 0; i < _length; i++)
+	{
+		if (_editor.signatures[i].guid == guid)
+		{
+			if (isView === true)
+			{
+				window["AscDesktopEditor"]["ViewCertificate"](_editor.signatures[i].id);
+			}
+			return;
+		}
+	}
+
+	if (!_editor.isDocumentModify)
+	{
+		_editor.sendEvent("asc_onSignatureClick", guid, width, height, window["asc_IsVisibleSign"](guid));
+		return;
+	}
+
+	window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
+	window["AscDesktopEditor"]["SaveQuestion"]();
+};
+
 window["DesktopAfterOpen"] = function(_api)
 {
 	_api.asc_registerCallback("asc_onSignatureDblClick", function (guid, width, height)
 	{
-		var _length = _api.signatures.length;
-		for (var i = 0; i < _length; i++)
-		{
-			if (_api.signatures[i].guid == guid)
-			{
-				window["AscDesktopEditor"]["ViewCertificate"](_api.signatures[i].id);
-				return;
-			}
-		}
-
-		if (!_api.isDocumentModify)
-		{
-			_api.sendEvent("asc_onSignatureClick", guid, width, height);
-			return;
-		}
-
-		window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
-		window["AscDesktopEditor"]["SaveQuestion"]();
+		window["asc_LocalRequestSign"](guid, width, height, true);
 	});
 
 	_api.sendEvent('asc_onSpellCheckInit', [

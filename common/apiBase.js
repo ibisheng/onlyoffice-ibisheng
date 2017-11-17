@@ -1486,14 +1486,7 @@
 		var _url = _canvas.toDataURL("image/png");
 		_canvas = null;
 
-		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
-		function guid() {
-			var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
-			val = val.toUpperCase();
-			return val;
-		}
-
-		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
+		var _args = [AscCommon.CreateGUID(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
 
 		this.ImageLoader.LoadImagesWithCallback([_url], function(_args) {
 			this.asc_addSignatureLine(_args[0], _args[1], _args[2], _args[3], _args[4], _args[5], _args[6]);
@@ -1513,7 +1506,7 @@
 
 			for (var j = this.signatures.length - 1; j >= 0; j--)
 			{
-				if (this.signatures[j].guid == _sig.guid)
+				if (this.signatures[j].guid == _sig.id)
 				{
 					_found = true;
 					break;
@@ -1523,10 +1516,12 @@
 			if (!_found)
 			{
 				var _add_sig = new AscCommon.asc_CSignatureLine();
-				_add_sig.guid = _sig.guid;
+				_add_sig.guid = _sig.id;
 				_add_sig.signer1 = _sig.signer1;
 				_add_sig.signer2 = _sig.signer2;
 				_add_sig.email = _sig.email;
+
+				_sigs_ret.push(_add_sig);
 			}
 		}
 
@@ -1537,6 +1532,13 @@
 	{
 		if (window["AscDesktopEditor"])
 			window["AscDesktopEditor"]["Sign"](id, guid, url1, url2);
+	};
+	baseEditorsApi.prototype.asc_RequestSign = function(guid)
+	{
+		var signGuid = (guid == "unvisibleAdd") ? AscCommon.CreateGUID() : guid;
+
+		if (window["asc_LocalRequestSign"])
+			window["asc_LocalRequestSign"](signGuid);
 	};
 
 	baseEditorsApi.prototype.asc_ViewCertificate = function(id)
