@@ -1245,153 +1245,227 @@
 				var p_height = stream.GetULong()/100000;
 				var fonts = [];
 				var t = this;
-				
-				var first_string = stream.GetString2();
-				
-				switch(first_string)
-				{
-					case "Content":
-					{
-						var docContent = this.ReadPresentationText(stream, worksheet, isIntoShape);
-						
-						if(isCellEditMode)
-						{
-							var text = this._getTextFromWord(docContent);
-							window['AscCommon'].g_clipboardBase.Paste_Process_End();
-							return text;
-						}
-						else if(isIntoShape)
-						{
-							var callback = function(isSuccess)
-							{
-								if(isSuccess)
-								{
-									t._insertBinaryIntoShapeContent(worksheet, docContent);
-								}
-								window['AscCommon'].g_clipboardBase.Paste_Process_End();
-							};
-									
-							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
-							return true;
-						}
-						else
-						{
-							History.TurnOff();
-							var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
-							
-							var oTempDrawingDocument = worksheet.model.DrawingDocument;
-							var newCDocument = new CDocument(oTempDrawingDocument, false);
-							newCDocument.bFromDocument = true;
-							newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
-							
-							var newContent = [];
-							for(var i = 0; i < docContent.length; i++)
-							{
-								if(type_Paragraph === docContent[i].GetType())//paragraph
-								{
-									docContent[i] = AscFormat.ConvertParagraphToWord(docContent[i], newCDocument);
-									docContent[i].bFromDocument = true;
-									newContent.push(docContent[i]);
-								}
-								else if(type_Table === docContent[i].GetType())//table
-								{
-									//TODO вырезать из таблицы параграфы
-								}
-							}
-							docContent = newContent;
-							
-							History.TurnOn();
-							
-							oPasteFromBinaryWord._paste(worksheet, {content: docContent});
-						}
-						
-						return true;
-					}
-					case "Drawings":
-					{
-						if(isCellEditMode)
-						{
-							return "";
-						}
-						
-						var objects = this.ReadPresentationShapes(stream, worksheet);
-						var arr_shapes = objects.arrShapes;
-						
-						if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
-						{
-							var newFonts = {};
-							for(var i = 0; i < arr_shapes.length; i++)
-							{
-								arr_shapes[i].graphicObject.getAllFonts(newFonts);
-							}
-							
-							var aPastedImages = objects.arrImages;
-							worksheet._loadFonts(newFonts, function() {
-								if(aPastedImages && aPastedImages.length)
-								{
-									t._loadImagesOnServer(aPastedImages, function() {
-										t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
-									});
-								}
-								else
-								{
-									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
-								}
-							});
-						}
-						
-						return true;
-					}
-					case "SlideObjects":
-					{
-						if(isCellEditMode)
-						{
-							return "";
-						}
-						else
-						{
-							//для слайда читаем только запись бинарника, где хранится base64
-							History.TurnOff();
-							
-							var arrBase64Img = [];
-							
-							var loader = new AscCommon.BinaryPPTYLoader();
-							loader.presentation = worksheet.model;
-							loader.Start_UseFullUrl();
-							loader.stream = stream;
-							
-							//read base64(first slide)
-							var imageUrl = stream.GetString2();
-							loader.End_UseFullUrl();
-							
-							var drawing = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);
-							arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, imageUrl, drawing, drawing.spPr, null));
 
-							var arr_shapes = [];
-							arr_shapes[0] = worksheet.objectRender.createDrawingObject();
-							arr_shapes[0].graphicObject = drawing;
-							
-							History.TurnOn();
-							
-							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
-							{	
-								var aPastedImages = arrBase64Img;
-								if(aPastedImages && aPastedImages.length)
-								{
-									t._loadImagesOnServer(aPastedImages, function() {
-										t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
-									});
-								}
-							}
-						}
-						
-						return true;
+				var bIsMultipleContent = stream.GetBool();
+
+				if (true === bIsMultipleContent) {
+					var multipleParamsCount = stream.GetULong();
+					var selectedContent2 = [];
+					for(var i = 0; i < multipleParamsCount; i++){
+						selectedContent2.push(this._readPresentationSelectedContent(stream, worksheet));
 					}
 				}
-				
-				return false;
+
+				var pasteObj = selectedContent2[0].content.SlideObjects ? selectedContent2[2] : selectedContent2[0];
+				var arr_Images = pasteObj.images;
+				var fonts = pasteObj.fonts;
+				var content = pasteObj.content;
+
+				if (content.DocContent) {
+					var docContent = content.DocContent.Elements;
+
+					if(isCellEditMode)
+					{
+						var text = this._getTextFromWord(docContent);
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						return text;
+					}
+					else if(isIntoShape)
+					{
+						var callback = function(isSuccess)
+						{
+							if(isSuccess)
+							{
+								t._insertBinaryIntoShapeContent(worksheet, docContent);
+							}
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						};
+
+						worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+						return true;
+					}
+					else
+					{
+						History.TurnOff();
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+
+						var oTempDrawingDocument = worksheet.model.DrawingDocument;
+						var newCDocument = new CDocument(oTempDrawingDocument, false);
+						newCDocument.bFromDocument = true;
+						newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
+
+						var newContent = [];
+						for(var i = 0; i < docContent.length; i++)
+						{
+							if(type_Paragraph === docContent[i].GetType())//paragraph
+							{
+								docContent[i] = AscFormat.ConvertParagraphToWord(docContent[i], newCDocument);
+								docContent[i].bFromDocument = true;
+								newContent.push(docContent[i]);
+							}
+							else if(type_Table === docContent[i].GetType())//table
+							{
+								//TODO вырезать из таблицы параграфы
+							}
+						}
+						docContent = newContent;
+
+						History.TurnOn();
+
+						oPasteFromBinaryWord._paste(worksheet, {content: docContent});
+					}
+				} else if (content.Drawings) {
+
+					if(isCellEditMode)
+					{
+						return "";
+					}
+
+					var arr_shapes = content.Drawings;
+					var arrImages = pasteObj.images;
+
+					//var objects = this.ReadPresentationShapes(stream, worksheet);
+					//var arr_shapes = objects.arrShapes;
+
+					if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+					{
+						var newFonts = {};
+						for(var i = 0; i < arr_shapes.length; i++)
+						{
+							arr_shapes[i].graphicObject.getAllFonts(newFonts);
+						}
+
+						var aPastedImages = arrImages;
+						worksheet._loadFonts(newFonts, function() {
+							if(aPastedImages && aPastedImages.length)
+							{
+								t._loadImagesOnServer(aPastedImages, function() {
+									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+								});
+							}
+							else
+							{
+								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+							}
+						});
+					}
+
+					return true;
+				}
+
 			},
-			
+
+			_readPresentationSelectedContent: function(stream, worksheet){
+
+				var presentationSelectedContent = null;
+				var fonts = [];
+				var arr_Images = {};
+				var oThis = this;
+
+				var loader = new AscCommon.BinaryPPTYLoader();
+				loader.stream = stream;
+				loader.presentation = worksheet.model;
+
+				var readContent = function () {
+					var docContent = oThis.ReadPresentationText(stream, worksheet);
+					if (docContent.length === 0) {
+						return;
+					}
+					presentationSelectedContent.DocContent = new CSelectedContent();
+					presentationSelectedContent.DocContent.Elements = docContent;
+
+					//перебираем шрифты
+					for (var i in oThis.oFonts) {
+						fonts.push(new CFont(i, 0, "", 0));
+					}
+				};
+
+				var readDrawings = function () {
+
+					var objects = oThis.ReadPresentationShapes(stream, worksheet);
+					presentationSelectedContent.Drawings = objects.arrShapes;
+
+					var arr_shapes = objects.arrShapes;
+					var font_map = {};
+					for (var i = 0; i < arr_shapes.length; ++i) {
+						if (arr_shapes[i].graphicObject.getAllFonts) {
+							arr_shapes[i].graphicObject.getAllFonts(font_map);
+						}
+					}
+
+					for (var i in font_map) {
+						fonts.push(new CFont(i, 0, "", 0));
+					}
+
+					arr_Images = objects.arrImages;
+				};
+
+				var skipIndexes = function(){
+					var count = stream.GetULong();
+
+					var array = [];
+					for (var i = 0; i < count; ++i) {
+						stream.GetULong();
+					}
+				};
+
+				var skip1 = function(){
+					var selected_objs = loader.stream.GetULong();
+
+					for (var i = 0; i < selected_objs; ++i) {
+						loader.stream.GetUChar();
+						loader.stream.SkipRecord();
+					}
+				};
+
+				var first_content = stream.GetString2();
+				if(first_content === "SelectedContent"){
+					var countContent = stream.GetULong();
+					for(var i = 0; i < countContent; i++){
+						if(null === presentationSelectedContent){
+							presentationSelectedContent = typeof PresentationSelectedContent !== "undefined" ? new PresentationSelectedContent() : {};
+						}
+						var first_string = stream.GetString2();
+						switch (first_string) {
+							case "DocContent": {
+								readContent(stream, worksheet);
+								break;
+							}
+							case "Drawings": {
+								readDrawings();
+								break;
+							}
+							case "SlideObjects": {
+								presentationSelectedContent.SlideObjects = [null];
+								skip1();
+								break;
+							}
+							case "LayoutsIndexes": {
+								skipIndexes();
+								break;
+							}
+							case "MastersIndexes": {
+								skipIndexes();
+								break;
+							}
+							case "NotesMastersIndexes": {
+								skipIndexes();
+								break;
+							}
+							case "ThemeIndexes": {
+								skipIndexes();
+								break;
+							}
+							default: {
+								skip1();
+							}
+						}
+					}
+				}
+
+				return {content: presentationSelectedContent, fonts: fonts, images: arr_Images};
+			},
+
 			_insertBinaryIntoShapeContent: function(worksheet, content, isConvertToPPTX)
 			{
 				if(!content || !content.length)

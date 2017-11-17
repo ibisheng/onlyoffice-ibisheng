@@ -1222,7 +1222,6 @@ CopyProcessor.prototype =
 			var selected_slides = elementsContent.SlideObjects;
 
 			oThis.oPresentationWriter.WriteString2("SlideObjects");
-			oThis.oPresentationWriter.WriteString2("");
 			oThis.oPresentationWriter.WriteULong(selected_slides.length);
 
 			var layouts_map = {};
@@ -3949,7 +3948,6 @@ PasteProcessor.prototype =
 			loader.presentation = editor.WordControl.m_oLogicDocument;
 
 			//read slides
-			var imageUrl = stream.GetString2();
 			var slide_count = stream.GetULong();
 			//var arr_arrTransforms = [];
 
