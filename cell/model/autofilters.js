@@ -2793,7 +2793,7 @@
 
 				if(worksheet.TableParts && worksheet.TableParts.length) {
 					for (var i = 0; i < worksheet.TableParts.length; i++) {
-						var tablePart = worksheet.TablePart[i];
+						var tablePart = worksheet.TableParts[i];
 						if(tablePart.isHeaderRow()){
 							var headerRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r1);
 							if(headerRange.contains(col, row)){
