@@ -2786,9 +2786,9 @@
 				History.EndTransaction();
 			},
 			
-			bIsCellLieIntoHeaderTable: function(col, row)
+			headerContains: function(col, row)
 			{
-				var res = null;
+				var res = false;
 				var worksheet = this.worksheet;
 
 				if(worksheet.TableParts && worksheet.TableParts.length) {
