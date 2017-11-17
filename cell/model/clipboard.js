@@ -1322,11 +1322,6 @@
 					}
 
 					var arr_shapes = content.Drawings;
-					var arrImages = pasteObj.images;
-
-					//var objects = this.ReadPresentationShapes(stream, worksheet);
-					//var arr_shapes = objects.arrShapes;
-
 					if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 					{
 						var newFonts = {};
@@ -1335,7 +1330,7 @@
 							arr_shapes[i].graphicObject.getAllFonts(newFonts);
 						}
 
-						var aPastedImages = arrImages;
+						var aPastedImages = arr_Images;
 						worksheet._loadFonts(newFonts, function() {
 							if(aPastedImages && aPastedImages.length)
 							{

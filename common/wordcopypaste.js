@@ -3822,58 +3822,56 @@ PasteProcessor.prototype =
 				selectedContent2.push(this._readPresentationSelectedContent(stream, bDuplicate));
 			}
 
+			var pasteObj = selectedContent2[0];
 			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
-				/*var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				switch (props) {
-					case Asc.c_oSpecialPasteProps.paste:{
-						pasteCurContent();
+					case Asc.c_oSpecialPasteProps.destinationFormatting: {
 						break;
 					}
-					case Asc.c_oSpecialPasteProps.picture:{
-						while("picture" !== multipleParams){
-							multipleParams = stream.GetString2();
-						}
-
-						pasteCurContent();
+					case Asc.c_oSpecialPasteProps.sourceformatting: {
+						pasteObj = selectedContent2[1];
 						break;
 					}
-				}*/
-			}else{
-
-				var pasteObj = selectedContent2[0];
-				var arr_Images = pasteObj.images;
-				var fonts = pasteObj.fonts;
-				var presentationSelectedContent = pasteObj.content;
-
-				var paste_callback = function(){
-					if (false === oThis.bNested) {
-						presentation.Insert_Content(presentationSelectedContent);
-
-						presentation.Recalculate();
-						presentation.Document_UpdateInterfaceState();
-
-						//oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.picture]);
-
-						window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					case Asc.c_oSpecialPasteProps.picture: {
+						pasteObj = selectedContent2[2];
+						break;
 					}
-				};
-
-				var oObjectsForDownload = GetObjectsForImageDownload(arr_Images);
-				if (oObjectsForDownload.aUrls.length > 0) {
-					AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
-						var oImageMap = {};
-						ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
-						oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-					});
-				} else {
-					/*var im_arr = [];
-					for (var key  in images) {
-						im_arr.push(key);
-					}
-					oThis.SetShortImageId(arr_Images);*/
-
-					oThis.api.pre_Paste(fonts, {}, paste_callback);
 				}
+			}
+
+			var arr_Images = pasteObj.images;
+			var fonts = pasteObj.fonts;
+			var presentationSelectedContent = pasteObj.content;
+
+			var paste_callback = function(){
+				if (false === oThis.bNested) {
+					presentation.Insert_Content(presentationSelectedContent);
+
+					presentation.Recalculate();
+					presentation.Document_UpdateInterfaceState();
+
+					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture]);
+
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				}
+			};
+
+			var oObjectsForDownload = GetObjectsForImageDownload(arr_Images);
+			if (oObjectsForDownload.aUrls.length > 0) {
+				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+					var oImageMap = {};
+					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
+				});
+			} else {
+				/*var im_arr = [];
+				for (var key  in images) {
+					im_arr.push(key);
+				}
+				oThis.SetShortImageId(arr_Images);*/
+
+				oThis.api.pre_Paste(fonts, {}, paste_callback);
 			}
 		} else {
 
