@@ -191,6 +191,10 @@ CParagraphContentBase.prototype.GetPosInParent = function(_oParent)
 
 	return -1;
 };
+CParagraphContentBase.prototype.RemoveTabsForTOC = function(isTab)
+{
+	return isTab;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -1608,6 +1612,18 @@ CParagraphContentWithParagraphLikeContent.prototype.UpdateBookmarks = function(o
 		this.Content[nIndex].UpdateBookmarks(oManager);
 	}
 };
+CParagraphContentWithParagraphLikeContent.prototype.RemoveTabsForTOC = function(_isTab)
+{
+	var isTab = _isTab;
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].RemoveTabsForTOC(isTab))
+			isTab = true;
+	}
+
+	return isTab;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------

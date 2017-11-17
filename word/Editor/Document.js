@@ -15822,6 +15822,33 @@ CDocument.prototype.AddField = function(nType, oPr)
 
 	return false;
 };
+CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
+{
+	var oParagraph = this.GetCurrentParagraph();
+	if (!oParagraph)
+		return false;
+
+	var nIndex = -1;
+
+	var oStartChar = new ParaFieldChar(fldchartype_Begin, this);
+
+	var oRun = new ParaRun();
+	oRun.Add_ToContent(++nIndex, oStartChar);
+	for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
+	{
+		oRun.Add_ToContent(++nIndex, new ParaInstrText(sInstruction.charAt(nPos)));
+	}
+	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
+	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
+	oParagraph.Add(oRun);
+
+	oRun.Make_ThisElementCurrent(false);
+
+	this.Recalculate();
+	oStartChar.GetComplexField().Update();
+
+	return true;
+};
 CDocument.prototype.UpdateComplexField = function(oField)
 {
 	if (!oField)

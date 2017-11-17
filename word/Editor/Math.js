@@ -3365,6 +3365,10 @@ ParaMath.prototype.IsStopCursorOnEntryExit = function()
 {
 	return true;
 };
+ParaMath.prototype.RemoveTabsForTOC = function(isTab)
+{
+	return isTab;
+};
 
 function MatGetKoeffArgSize(FontSize, ArgSize)
 {

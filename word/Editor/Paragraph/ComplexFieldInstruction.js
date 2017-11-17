@@ -117,7 +117,7 @@ function CFieldInstructionTOC()
 {
 	CFieldInstructionBase.call(this);
 
-	this.RemoveTabs       = false;
+	this.PreserveTabs     = false;
 	this.RemoveBreaks     = true;
 	this.Hyperlinks       = false;
 	this.Separator        = "";
@@ -132,13 +132,13 @@ function CFieldInstructionTOC()
 CFieldInstructionTOC.prototype = Object.create(CFieldInstructionBase.prototype);
 CFieldInstructionTOC.prototype.constructor = CFieldInstructionTOC;
 CFieldInstructionTOC.prototype.Type = fieldtype_TOC;
-CFieldInstructionTOC.prototype.IsRemoveTabs = function()
+CFieldInstructionTOC.prototype.IsPreserveTabs = function()
 {
-	return this.RemoveTabs;
+	return this.PreserveTabs;
 };
-CFieldInstructionTOC.prototype.SetRemoveTabs = function(isRemove)
+CFieldInstructionTOC.prototype.SetPreserveTabs = function(isPreserve)
 {
-	this.RemoveTabs = isRemove;
+	this.PreserveTabs = isPreserve;
 };
 CFieldInstructionTOC.prototype.IsRemoveBreaks = function()
 {
@@ -160,7 +160,7 @@ CFieldInstructionTOC.prototype.SetSeparator = function(sSeparator)
 {
 	this.Separator = sSeparator;
 };
-CFieldInstructionTOC.prototype.GetSeperator = function()
+CFieldInstructionTOC.prototype.GetSeparator = function()
 {
 	return this.Separator;
 };
@@ -238,7 +238,7 @@ CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 	if (-1 === this.SkipPageRefStart || -1 === this.SkipPageRefEnd)
 		return true;
 
-	return  (nLvl >= this.SkipPageRefStart && nLvl <= this.SkipPageRefEnd);
+	return  (nLvl >= this.SkipPageRefStart - 1 && nLvl <= this.SkipPageRefEnd - 1);
 };
 
 
@@ -445,7 +445,7 @@ CFieldInstructionParser.prototype.private_ReadTOC = function()
 			var sType = this.private_GetSwitchLetter();
 			if ('w' === sType)
 			{
-				this.Result.SetRemoveTabs(false);
+				this.Result.SetPreserveTabs(true);
 			}
 			else if ('x' === sType)
 			{

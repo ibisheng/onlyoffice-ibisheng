@@ -196,13 +196,18 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 			&& ((oPr.SkipLineBreak && Item.IsLineBreak())
 			|| (oPr.SkipPageBreak && Item.IsPageBreak())
 			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
-			continue;
-
-		// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
-		if (para_End !== Item.Type)
 		{
-			NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
+			NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
 			AddedPos++;
+		}
+		else
+		{
+			// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
+			if (para_End !== Item.Type)
+			{
+				NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
+				AddedPos++;
+			}
 		}
 	}
 
@@ -9509,6 +9514,27 @@ ParaRun.prototype.GetCurrentComplexFields = function(arrComplexFields, isCurrent
 			}
 		}
 	}
+};
+ParaRun.prototype.RemoveTabsForTOC = function(_isTab)
+{
+	var isTab = _isTab;
+	for (var nPos = 0; nPos < this.Content.length; ++nPos)
+	{
+		if (para_Tab === this.Content[nPos].Type)
+		{
+			if (!isTab)
+			{
+				// Первый таб в параграфе оставляем
+				isTab = true;
+			}
+			else
+			{
+				this.Remove_FromContent(nPos, 1);
+			}
+		}
+	}
+
+	return isTab;
 };
 
 function CParaRunStartState(Run)
