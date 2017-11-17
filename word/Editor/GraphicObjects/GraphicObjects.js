@@ -1431,9 +1431,11 @@ CGraphicObjects.prototype =
     getDrawingArray: function()
     {
         var ret = [];
-        for(var i = 0; i < this.drawingObjects.length; ++i) {
-            if(this.drawingObjects[i] && this.drawingObjects[i].GraphicObj && !this.drawingObjects[i].GraphicObj.bDeleted){
-                ret.push(this.drawingObjects[i].GraphicObj);
+        var arrDrawings = [].concat(this.drawingObjects);
+        this.checkUseDrawings(arrDrawings);
+        for(var i = 0; i < arrDrawings.length; ++i) {
+            if(arrDrawings[i] && arrDrawings[i].GraphicObj && !arrDrawings[i].GraphicObj.bDeleted){
+                ret.push(arrDrawings[i].GraphicObj);
             }
         }
         return ret;
