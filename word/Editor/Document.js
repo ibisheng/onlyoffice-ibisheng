@@ -4017,7 +4017,9 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
 CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
-	this.Recalculate();
+
+	if (false !== bRecalculate)
+		this.Recalculate();
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
@@ -16069,6 +16071,32 @@ CDocument.prototype.RemoveBookmark = function(sName)
 CDocument.prototype.private_RemoveBookmark = function(sName)
 {
 
+};
+CDocument.prototype.AddTableOfContents = function(sHeading)
+{
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTableOfContents);
+
+		this.Remove(1, true, true, true);
+		var oSdt = this.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+
+		var oParagraph = oSdt.GetCurrentParagraph();
+		oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+		for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+		{
+			oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+		}
+
+		oSdt.AddNewParagraph(false, true);
+		oSdt.SetThisElementCurrent();
+
+		this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
+
+		// TODO: oSdt нужно заполнить свойствами
+
+		this.Recalculate();
+	}
 };
 
 function CDocumentSelectionState()

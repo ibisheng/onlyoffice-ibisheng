@@ -54,6 +54,12 @@ function CSdtPr()
 	this.Tag   = undefined;
 	this.Label = undefined;
 	this.Lock  = undefined;
+
+	this.DocPartObj = {
+		Gallery  : undefined,
+		Category : undefined,
+		Unique   : undefined
+	};
 }
 
 CSdtPr.prototype.Copy = function()
@@ -104,6 +110,25 @@ CSdtPr.prototype.Write_ToBinary = function(Writer)
 		Flags |= 16;
 	}
 
+	if (undefined !== this.DocPartObj.Unique)
+	{
+		Writer.WriteBool(this.DocPartObj.Unique);
+		Flags |= 32;
+	}
+
+	if (undefined !== this.DocPartObj.Gallery)
+	{
+		Writer.WriteString2(this.DocPartObj.Gallery);
+		Flags |= 64;
+	}
+
+	if (undefined !== this.DocPartObj.Category)
+	{
+		Writer.WriteString2(this.DocPartObj.Category);
+		Flags |= 128;
+	}
+
+
 	var EndPos = Writer.GetCurPosition();
 	Writer.Seek( StartPos );
 	Writer.WriteLong( Flags );
@@ -127,6 +152,15 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 
 	if (Flags & 16)
 		this.Lock = Reader.GetLong();
+
+	if (Flags & 32)
+		this.DocPartObj.Unique = Reader.GetBool();
+
+	if (Flags & 64)
+		this.DocPartObj.Gallery = Reader.GetString2();
+
+	if (Flags & 128)
+		this.DocPartObj.Category = Reader.GetString2();
 };
 
 function CContentControlPr()

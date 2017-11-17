@@ -1031,6 +1031,9 @@
 			case AscDFH.historydescription_Document_AddBookmark:
 				sString = "Document_AddBookmark";
 				break;
+			case AscDFH.historydescription_Document_AddTableOfContents:
+				sString = "Document_AddTableOfContents";
+				break;
 		}
 		return sString;
 	}
@@ -1681,11 +1684,12 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CSdtPr
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_SdtPr_Alias = window['AscDFH'].historyitem_type_SdtPr | 1;
-	window['AscDFH'].historyitem_SdtPr_Id    = window['AscDFH'].historyitem_type_SdtPr | 2;
-	window['AscDFH'].historyitem_SdtPr_Tag   = window['AscDFH'].historyitem_type_SdtPr | 3;
-	window['AscDFH'].historyitem_SdtPr_Label = window['AscDFH'].historyitem_type_SdtPr | 4;
-	window['AscDFH'].historyitem_SdtPr_Lock  = window['AscDFH'].historyitem_type_SdtPr | 5;
+	window['AscDFH'].historyitem_SdtPr_Alias      = window['AscDFH'].historyitem_type_SdtPr | 1;
+	window['AscDFH'].historyitem_SdtPr_Id         = window['AscDFH'].historyitem_type_SdtPr | 2;
+	window['AscDFH'].historyitem_SdtPr_Tag        = window['AscDFH'].historyitem_type_SdtPr | 3;
+	window['AscDFH'].historyitem_SdtPr_Label      = window['AscDFH'].historyitem_type_SdtPr | 4;
+	window['AscDFH'].historyitem_SdtPr_Lock       = window['AscDFH'].historyitem_type_SdtPr | 5;
+	window['AscDFH'].historyitem_SdtPr_DocPartObj = window['AscDFH'].historyitem_type_SdtPr | 6;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
@@ -2940,6 +2944,7 @@
 	window['AscDFH'].historydescription_Document_ChangeContentControlProperties     = 0x0145;
     window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
     window['AscDFH'].historydescription_Document_AddBookmark                        = 0x0147;
+	window['AscDFH'].historydescription_Document_AddTableOfContents                 = 0x0148;
 
 
 

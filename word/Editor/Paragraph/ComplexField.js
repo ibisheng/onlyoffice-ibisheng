@@ -403,7 +403,7 @@ CComplexField.prototype.Update = function()
 		};
 		oParagraph.Check_NearestPos(oNearPos);
 
-		this.LogicDocument.Insert_Content(oSelectedContent, oNearPos);
+		oParagraph.Parent.Insert_Content(oSelectedContent, oNearPos);
 		this.LogicDocument.Recalculate();
 	}
 	else if (fieldtype_PAGEREF === nFieldCode)

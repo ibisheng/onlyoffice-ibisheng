@@ -1058,6 +1058,11 @@ CBlockLevelSdt.prototype.GetLabel = function()
 {
 	return (undefined !== this.Pr.Label ? this.Pr.Label : "");
 };
+CBlockLevelSdt.prototype.SetDocPartObj = function(sCategory, sGallery, isUnique)
+{
+	History.Add(new CChangesSdtPrDocPartObj(this, this.Pr.DocPartObj.Gallery, sValue));
+	this.Pr.DocPartObj.Gallery = sValue;
+};
 CBlockLevelSdt.prototype.SetContentControlLock = function(nLockType)
 {
 	if (this.Pr.Lock !== nLockType)
