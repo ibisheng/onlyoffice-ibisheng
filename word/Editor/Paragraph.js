@@ -3598,10 +3598,13 @@ Paragraph.prototype.Can_IncreaseLevel = function(bIncrease)
 		{
 			for (j = 0; j < this.Content[i].Content.length; ++j)
 			{
-				RunPr = this.Content[i].Content[j].Get_CompiledPr();
-				if (RunPr.FontSize + DeltaFontSize < 1)
+				if (this.Content[i].Content[j].Type === para_Run)
 				{
-					return false;
+					RunPr = this.Content[i].Content[j].Get_CompiledPr();
+					if (RunPr.FontSize + DeltaFontSize < 1)
+					{
+						return false;
+					}
 				}
 			}
 		}
@@ -3655,9 +3658,12 @@ Paragraph.prototype.Increase_Level = function(bIncrease)
 			{
 				for (j = 0; j < this.Content[i].Content.length; ++j)
 				{
-					if (AscFormat.isRealNumber(this.Content[i].Content[j].Pr.FontSize))
+					if (this.Content[i].Content[j].Type === para_Run)
 					{
-						this.Content[i].Content[j].Set_FontSize(this.Content[i].Content[j].Pr.FontSize + DeltaFontSize);
+						if (AscFormat.isRealNumber(this.Content[i].Content[j].Pr.FontSize))
+						{
+							this.Content[i].Content[j].Set_FontSize(this.Content[i].Content[j].Pr.FontSize + DeltaFontSize);
+						}
 					}
 				}
 			}
