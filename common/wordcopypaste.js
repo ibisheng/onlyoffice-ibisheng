@@ -3837,6 +3837,11 @@ PasteProcessor.prototype =
 						pasteObj = selectedContent2[2];
 						break;
 					}
+					case Asc.c_oSpecialPasteProps.keepTextOnly: {
+						//в идеале у этом случае нужно использовать данные plain text из буфера обмена
+						//pasteObj = selectedContent2[2];
+						break;
+					}
 				}
 			}
 
@@ -3851,7 +3856,12 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Document_UpdateInterfaceState();
 
-					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture]);
+					var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
+					if(presentationSelectedContent){
+						props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
+					}
+
+					oThis._setSpecialPasteShowOptionsPresentation(props);
 
 					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
