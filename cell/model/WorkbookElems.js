@@ -3378,10 +3378,10 @@ Col.prototype =
             History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setHidden: function(val) {
-		this.hd = val;
-		if (this.index >= 0) {
+		if (this.index >= 0 && (!this.hd !== !val)) {
 			this.ws.hiddenManager.addHidden(false, this.index);
 		}
+		this.hd = val;
 	},
 	getHidden: function() {
 		return this.hd;
@@ -3682,18 +3682,18 @@ Row.prototype =
 	},
 
 	setHidden: function(val) {
+		if (this.index >= 0 && (!this.getHidden() !== !val)) {
+			this.ws.hiddenManager.addHidden(true, this.index);
+		}
 		if (true === val) {
 			this.flags |= g_nRowFlag_hd;
 		} else {
 			this.flags &= ~g_nRowFlag_hd;
 		}
 		this._hasChanged = true;
-		if (this.index >= 0) {
-			this.ws.hiddenManager.addHidden(true, this.index);
-		}
 	},
 	getHidden: function() {
-		return 0 != (g_nRowFlag_hd & this.flags);
+		return 0 !== (g_nRowFlag_hd & this.flags);
 	},
 	setCustomHeight: function(val) {
 		if (true === val) {

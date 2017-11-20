@@ -3202,6 +3202,14 @@ CStyle.prototype.CreateTOC = function(nLvl)
 	this.Set_UnhideWhenUsed(true);
 	this.Set_ParaPr(ParaPr);
 };
+CStyle.prototype.CreateTOCHeading = function()
+{
+	var ParaPr = {};
+
+	this.Set_UiPriority(39);
+	this.Set_UnhideWhenUsed(true);
+	this.Set_ParaPr(ParaPr);
+};
 
 function CStyles(bCreateDefault)
 {
@@ -3235,7 +3243,8 @@ function CStyles(bCreateDefault)
 			Subtitle          : null,
 			Quote             : null,
 			IntenseQuote      : null,
-			TOC               : []
+			TOC               : [],
+			TOCHeading        : null
 		};
 
         // Заполняем значения по умолчанию
@@ -3484,6 +3493,10 @@ function CStyles(bCreateDefault)
 			this.Default.TOC[nLvl] = this.Add(oStyleTOC);
 		}
 
+		var oStyleTOCHeading = new CStyle("TOC Heading", this.Default.TOCHeading);
+		oStyleTOCHeading.CreateTOCHeading();
+		this.Default.TOCHeading = this.Add(oStyleTOCHeading);
+
         // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
         g_oTableId.Add( this, this.Id );
     }
@@ -3508,7 +3521,10 @@ function CStyles(bCreateDefault)
 			Hyperlink         : null,
 			FootnoteText      : null,
 			FootnoteTextChar  : null,
-			FootnoteReference : null
+			FootnoteReference : null,
+
+			TOC               : [],
+			TOCHeading        : null
 		};
 
 		// Заполняем значения по умолчанию
@@ -4530,6 +4546,10 @@ CStyles.prototype.GetDefaultTOC = function(nLvl)
 {
 	nLvl = Math.max(Math.min(nLvl, 8), 0);
 	return this.Default.TOC[nLvl];
+};
+CStyles.prototype.GetDefaultTOCHeading = function()
+{
+	return this.Default.TOCHeading;
 };
 
 function CDocumentColor(r,g,b, Auto)

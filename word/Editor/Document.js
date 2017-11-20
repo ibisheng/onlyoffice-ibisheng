@@ -4017,7 +4017,9 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
 CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
-	this.Recalculate();
+
+	if (false !== bRecalculate)
+		this.Recalculate();
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
@@ -7574,6 +7576,10 @@ CDocument.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
 	return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
 };
 CDocument.prototype.Get_Styles = function()
+{
+	return this.Styles;
+};
+CDocument.prototype.GetStyles = function()
 {
 	return this.Styles;
 };
@@ -15737,87 +15743,15 @@ CDocument.prototype.AddField = function(nType, oPr)
 {
 	if (fieldtype_PAGENUM === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("1"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("PAGE");
 	}
 	else if (fieldtype_TOC === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("O"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("C"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaText("a"));
-		oRun.Add_ToContent(++nIndex, new ParaText("b"));
-		oRun.Add_ToContent(++nIndex, new ParaText("l"));
-		oRun.Add_ToContent(++nIndex, new ParaText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaSpace());
-		oRun.Add_ToContent(++nIndex, new ParaText("o"));
-		oRun.Add_ToContent(++nIndex, new ParaText("f"));
-		oRun.Add_ToContent(++nIndex, new ParaSpace());
-		oRun.Add_ToContent(++nIndex, new ParaText("C"));
-		oRun.Add_ToContent(++nIndex, new ParaText("o"));
-		oRun.Add_ToContent(++nIndex, new ParaText("n"));
-		oRun.Add_ToContent(++nIndex, new ParaText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaText("n"));
-		oRun.Add_ToContent(++nIndex, new ParaText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaText("s"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("TOC");
 	}
 	else if (fieldtype_PAGEREF === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("R"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("F"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("s"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("\\"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("p"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("1"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("PAGEREF Test \\p");
 	}
 
 	return false;
@@ -15826,28 +15760,36 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 {
 	var oParagraph = this.GetCurrentParagraph();
 	if (!oParagraph)
-		return false;
+		return null;
 
 	var nIndex = -1;
 
-	var oStartChar = new ParaFieldChar(fldchartype_Begin, this);
+	var oBeginChar    = new ParaFieldChar(fldchartype_Begin, this),
+		oSeparateChar = new ParaFieldChar(fldchartype_Separate, this),
+		oEndChar      = new ParaFieldChar(fldchartype_End, this);
 
 	var oRun = new ParaRun();
-	oRun.Add_ToContent(++nIndex, oStartChar);
+	oRun.Add_ToContent(++nIndex, oBeginChar);
 	for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
 	{
 		oRun.Add_ToContent(++nIndex, new ParaInstrText(sInstruction.charAt(nPos)));
 	}
-	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
+	oRun.Add_ToContent(++nIndex, oSeparateChar);
+	oRun.Add_ToContent(++nIndex, oEndChar);
 	oParagraph.Add(oRun);
 
-	oRun.Make_ThisElementCurrent(false);
+	oBeginChar.SetRun(oRun);
+	oSeparateChar.SetRun(oRun);
+	oEndChar.SetRun(oRun);
 
-	this.Recalculate();
-	oStartChar.GetComplexField().Update();
+	var oComplexField = oBeginChar.GetComplexField();
+	oComplexField.SetBeginChar(oBeginChar);
+	oComplexField.SetInstructionLine(sInstruction);
+	oComplexField.SetSeparateChar(oSeparateChar);
+	oComplexField.SetEndChar(oEndChar);
+	oComplexField.Update();
 
-	return true;
+	return oComplexField;
 };
 CDocument.prototype.UpdateComplexField = function(oField)
 {
@@ -16069,6 +16011,32 @@ CDocument.prototype.RemoveBookmark = function(sName)
 CDocument.prototype.private_RemoveBookmark = function(sName)
 {
 
+};
+CDocument.prototype.AddTableOfContents = function(sHeading)
+{
+	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTableOfContents);
+
+		this.Remove(1, true, true, true);
+		var oSdt = this.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+
+		var oParagraph = oSdt.GetCurrentParagraph();
+		oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+		for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+		{
+			oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+		}
+
+		oSdt.AddNewParagraph(false, true);
+		oSdt.SetThisElementCurrent();
+
+		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
+
+		// TODO: oSdt нужно заполнить свойствами
+
+		this.Recalculate();
+	}
 };
 
 function CDocumentSelectionState()
