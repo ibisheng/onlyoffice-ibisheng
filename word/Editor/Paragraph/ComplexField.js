@@ -193,6 +193,10 @@ CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
 	this.InstructionLine += oParaInstr.GetValue();
 };
+CComplexField.prototype.SetInstructionLine = function(sLine)
+{
+	this.InstructionLine = sLine;
+};
 CComplexField.prototype.GetBeginChar = function()
 {
 	return this.BeginChar;
