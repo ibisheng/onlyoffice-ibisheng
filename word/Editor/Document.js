@@ -1583,7 +1583,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.FieldsManager = new CDocumentFieldsManager();
 
     // Класс, управляющий закладками
-	this.BookmarksManager = new CBookmarksManager(this);
+	if (typeof CBookmarksManager !== "undefined")
+		this.BookmarksManager = new CBookmarksManager(this);
 
     // Режим рецензирования
     this.TrackRevisions = false;
