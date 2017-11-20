@@ -11248,6 +11248,10 @@
 
     /* Ищет дополнение для ячейки */
     WorksheetView.prototype.getCellAutoCompleteValues = function (cell, maxCount) {
+		var merged = this._getVisibleCell(cell.col, cell.row).hasMerged();
+		if (merged) {
+			cell = new AscCommon.CellBase(merged.r1, merged.c1);
+        }
         var arrValues = [], objValues = {};
         var range = this.findCellAutoComplete(cell, 1, maxCount);
         this.getColValues(range, cell.col, arrValues, objValues);
