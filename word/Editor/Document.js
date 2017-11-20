@@ -7579,6 +7579,10 @@ CDocument.prototype.Get_Styles = function()
 {
 	return this.Styles;
 };
+CDocument.prototype.GetStyles = function()
+{
+	return this.Styles;
+};
 CDocument.prototype.CopyStyle = function()
 {
 	return this.Styles.CopyStyle();
@@ -15756,7 +15760,7 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 {
 	var oParagraph = this.GetCurrentParagraph();
 	if (!oParagraph)
-		return false;
+		return null;
 
 	var nIndex = -1;
 
@@ -15785,7 +15789,7 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 	oComplexField.SetEndChar(oEndChar);
 	oComplexField.Update();
 
-	return true;
+	return oComplexField;
 };
 CDocument.prototype.UpdateComplexField = function(oField)
 {
@@ -16027,7 +16031,7 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		oSdt.AddNewParagraph(false, true);
 		oSdt.SetThisElementCurrent();
 
-		this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
+		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
 
 		// TODO: oSdt нужно заполнить свойствами
 
