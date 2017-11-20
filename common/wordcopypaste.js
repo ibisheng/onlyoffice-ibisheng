@@ -4297,6 +4297,19 @@ PasteProcessor.prototype =
 			}
 			else
 			{
+				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+					for (var i = 0; i < arrShapes.length; ++i) {
+						shape = arrShapes[i].Drawing;
+
+						var txBobyContent = shape.txBody.content.Content;
+						for (var j = 0, length = txBobyContent.length; j < length; ++j) {
+							if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+								txBobyContent[j] = oThis._specialPasteItemConvert(txBobyContent[j]);
+							}
+						}
+					}
+				}
+
 				var presentationSelectedContent = new PresentationSelectedContent();
 				presentationSelectedContent.Drawings = arrShapes;
 
@@ -4304,6 +4317,9 @@ PasteProcessor.prototype =
 				presentation.Recalculate();
 				presentation.Check_CursorMoveRight();
 				presentation.Document_UpdateInterfaceState();
+
+				oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly]);
+				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			}
 		};
 		
