@@ -155,6 +155,31 @@
 		this.date = "";
 		this.isvisible = false;
 	}
+	asc_CSignatureLine.prototype.correct = function()
+	{
+		if (this.id == null)
+			this.id = "0";
+		if (this.guid == null)
+			this.guid = "";
+		if (this.signer1 == null)
+			this.signer1 = "";
+		if (this.signer2 == null)
+			this.signer2 = "";
+		if (this.email == null)
+			this.email = "";
+		if (this.instructions == null)
+			this.instructions = "";
+		if (this.showDate == null)
+			this.showDate = false;
+		if (this.valid == null)
+			this.valid = 0;
+		if (this.image == null)
+			this.image = "";
+		if (this.date == null)
+			this.date = "";
+		if (this.isvisible == null)
+			this.isvisible = false;
+	};
 	asc_CSignatureLine.prototype.asc_getId = function(){ return this.id; };
 	asc_CSignatureLine.prototype.asc_setId = function(v){ this.id = v; };
 	asc_CSignatureLine.prototype.asc_getGuid = function(){ return this.guid; };
