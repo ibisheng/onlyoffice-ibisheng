@@ -342,6 +342,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 		_add_sign.image = "data:image/png;base64," + _add_sign.image;
 		_add_sign.signer1 = _sign["name"];
 		_add_sign.id = i;
+		_add_sign.date = _sign["date"];
+		_add_sign.isvisible = window["asc_IsVisibleSign"](_add_sign.guid);
 
 		_editor.signatures.push(_add_sign);
 

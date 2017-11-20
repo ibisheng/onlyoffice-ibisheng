@@ -151,6 +151,9 @@
 		this.valid = 0;
 
 		this.image = "";
+
+		this.date = "";
+		this.isvisible = false;
 	}
 	asc_CSignatureLine.prototype.asc_getId = function(){ return this.id; };
 	asc_CSignatureLine.prototype.asc_setId = function(v){ this.id = v; };
@@ -168,6 +171,10 @@
 	asc_CSignatureLine.prototype.asc_setShowDate = function(v){ this.showDate = v; };
 	asc_CSignatureLine.prototype.asc_getValid = function(){ return this.valid; };
 	asc_CSignatureLine.prototype.asc_setValid = function(v){ this.valid = v; };
+	asc_CSignatureLine.prototype.asc_getDate = function(){ return this.date; };
+	asc_CSignatureLine.prototype.asc_setDate = function(v){ this.date = v; };
+	asc_CSignatureLine.prototype.asc_getVisible = function(){ return this.isvisible; };
+	asc_CSignatureLine.prototype.asc_setVisible = function(v){ this.isvisible = v; };
 
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
@@ -3588,6 +3595,10 @@
 	prot["asc_setShowDate"] = prot.asc_setShowDate;
 	prot["asc_getValid"] = prot.asc_getValid;
 	prot["asc_setValid"] = prot.asc_setValid;
+	prot["asc_getDate"] = prot.asc_getDate;
+	prot["asc_setDate"] = prot.asc_setDate;
+	prot["asc_getVisible"] = prot.asc_getVisible;
+	prot["asc_setVisible"] = prot.asc_setVisible;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
