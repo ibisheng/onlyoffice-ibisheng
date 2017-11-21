@@ -11474,6 +11474,11 @@
 
 		if(oAutoExpansionTable){
 			this.af_changeTableRange(oAutoExpansionTable.name, oAutoExpansionTable.range);
+			var props = new Asc.asc_CAutoCorrectOptions();
+			props.asc_setOptions([Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion]);
+			props.asc_setCellCoord(this.getCellCoord(oCellEdit.c1, oCellEdit.r1));
+
+			this.handlers.trigger("showAutoCorrectOptions", props);
 		}
 
 		// если вернуть false, то редактор не закроется

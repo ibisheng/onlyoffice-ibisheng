@@ -723,6 +723,8 @@
 			  }
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
+		  }, "showAutoCorrectOptions": function (val) {
+			  self.handlers.trigger("asc_onShowAutoCorrectOptions", val);
 		  }
 	  });
 

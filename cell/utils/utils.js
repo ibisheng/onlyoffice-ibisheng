@@ -2306,6 +2306,18 @@
 		asc_CSelectionRangeValue.prototype.asc_getType = function () {return this.type;};
 		asc_CSelectionRangeValue.prototype.asc_getName = function () {return this.name;};
 
+		function asc_CAutoCorrectOptions(){
+			this.type = null;
+			this.options = [];
+			this.cellCoord = null;
+		}
+		asc_CAutoCorrectOptions.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CAutoCorrectOptions.prototype.asc_setOptions = function (val) {this.options = val;};
+		asc_CAutoCorrectOptions.prototype.asc_setCellCoord = function(val) { this.cellCoord = val; };
+		asc_CAutoCorrectOptions.prototype.asc_getType = function () {return this.type;};
+		asc_CAutoCorrectOptions.prototype.asc_getOptions = function () {return this.options;};
+		asc_CAutoCorrectOptions.prototype.asc_getCellCoord = function () {return this.cellCoord;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -2489,5 +2501,11 @@
 		prot = asc_CSelectionRangeValue.prototype;
 		prot["asc_getType"] = prot.asc_getType;
 		prot["asc_getName"] = prot.asc_getName;
+
+		window["Asc"]["asc_CAutoCorrectOptions"] = window["Asc"].asc_CAutoCorrectOptions = asc_CAutoCorrectOptions;
+		prot = asc_CAutoCorrectOptions.prototype;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getOptions"] = prot.asc_getOptions;
+		prot["asc_getCellCoord"] = prot.asc_getCellCoord;
 
 })(window);
