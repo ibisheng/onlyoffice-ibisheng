@@ -422,10 +422,10 @@ window["asc_IsVisibleSign"] = function(guid)
 
 	var isVisible = false;
 	// detect visible/unvisible
-	var _req = _editor.asc_getRequestSignatures();
+	var _req = _editor.asc_getAllSignatures();
 	for (var i = 0; i < _req.length; i++)
 	{
-		if (_req[i].asc_getGuid() == guid)
+		if (_req[i].id == guid)
 		{
 			isVisible = true;
 			break;
