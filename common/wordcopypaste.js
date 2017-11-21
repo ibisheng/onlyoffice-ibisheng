@@ -4218,7 +4218,7 @@ PasteProcessor.prototype =
 			shape.setTxBody(AscFormat.CreateTextBodyFromString("", presentation.DrawingDocument, shape));
 			arrShapes.push(shape);
 			
-			oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
+			oThis._Execute(node, {}, true, true, false, arrShapes, arrImages, arrTables);
 			
 			//если не добавили даные внутрь arrShapes - удаляем пустой CShape
 			if(arrShapes.length === 1 && arrShapes[0].txBody && arrShapes[0].txBody.content && arrShapes[0].txBody.content.Content && arrShapes[0].txBody.content.Content.length === 1)
@@ -4396,7 +4396,14 @@ PasteProcessor.prototype =
 		else
 		{
 			this.oRootNode = node;
-            this._Prepeare(node, fPasteHtmlPresentationCallback);
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			{
+				fPasteHtmlPresentationCallback();
+			}
+			else
+			{
+				this._Prepeare(node, fPasteHtmlPresentationCallback);
+			}
 		}
 	},
 	
@@ -7286,777 +7293,670 @@ PasteProcessor.prototype =
 		}
 		return bIsPlainText;
 	},
-    _Execute : function(node, pPr, bRoot, bAddParagraph, bInBlock)
-    {
+
+	_Execute: function (node, pPr, bRoot, bAddParagraph, bInBlock, arrShapes, arrImages, arrTables) {
+
 		//bAddParagraph флаг влияющий на функцию _Decide_AddParagraph, добавлять параграф или нет.
 		//bAddParagraph выставляется в true, когда встретился блочный элемент и по окончанию блочного элемента
-        var oDocument = this.oDocument;
-        var bRootHasBlock = false;//Если root есть блочный элемент, то надо все child считать параграфами
+
+		var oThis = this;
+		var bRootHasBlock = false;//Если root есть блочный элемент, то надо все child считать параграфами
 		//Для Root node не смотрим стили и не добавляем текст
-        if(true == bRoot)
-        {
-			//Если блочных элементов нет, то отменяем флаг
-            var bExist = false;
-            for(var i = 0, length = node.childNodes.length; i < length; i++)
-            {
-                var child = node.childNodes[i];
-                var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
-                if(true === bIsBlockChild)
-                {
-                    bRootHasBlock = true;
-                    bExist = true;
-                    break;
-                }
-            }
-            if(false === bExist && true === this.bIgnoreNoBlockText)
-                this.bIgnoreNoBlockText = false;
-        }
-        else
-        {
-            if(Node.TEXT_NODE === node.nodeType)
-            {
-                if(false === this.bIgnoreNoBlockText || true === bInBlock)
-                {
-                    var value = node.nodeValue;
-                    if(!value)
-                        value = "";
-					//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
-					//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
-                    value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
-                    value = value.replace(/(\r|\t|\n)/g, ' ');
-                    if(value.length > 0)
-                    {
-                        var oTargetNode = node.parentNode;
-                        var bUseOnlyInherit = false;
-                        if (this._IsBlockElem(oTargetNode.nodeName.toLowerCase()))
-                            bUseOnlyInherit = true;
-                        bAddParagraph = this._Decide_AddParagraph(oTargetNode, pPr, bAddParagraph);
+		//var presentation = editor.WordControl.m_oLogicDocument;
 
-						//Добавляет элемени стиля если он поменялся
-                        this._commit_rPr(oTargetNode, bUseOnlyInherit);
+		var parseTextNode = function () {
+			var value = node.nodeValue;
+			if (!value) {
+				value = "";
+			}
+			//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
+			//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
+			value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '');
+			value = value.replace(/(\r|\t|\n)/g, ' ');
+			if (value.length > 0) {
+				if (bPresentation) {
+					oThis.oDocument = shape.txBody.content;
+					if (bAddParagraph) {
+						shape.txBody.content.AddNewParagraph();
+					}
+					// bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
-                        //TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
-						//bIsPreviuosSpace - игнорируем несколько пробелов подряд
-						var bIsPreviuosSpace = false;
-                        for(var i = 0, length = value.length; i < length; i++)
-                        {
-                            var nUnicode = null;
-                            var nCharCode = value.charCodeAt(i);
-                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-                                if (i + 1 < length) {
-                                    i++;
-                                    var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-                                }
-                            }
-                            else
-                                nUnicode = nCharCode;
-                            if (null != nUnicode) {
-                                var Item;
-                                if (0x20 !== nUnicode && 0x2009 !== nUnicode) {
-                                    Item = new ParaText();
-                                    Item.Set_CharCode(nUnicode);
-									bIsPreviuosSpace = false;
-                                }
-								else{
-                                    Item = new ParaSpace();
-									if(bIsPreviuosSpace){
-										continue;
-									}
-									if(!this.bIsPlainText){
-										bIsPreviuosSpace = true;
-									}
-								}
-                                this._AddToParagraph(Item);
-                            }
-                        }
-                    }
-                }
-                return bAddParagraph;
-            }
-            var sNodeName = node.nodeName.toLowerCase();
-            if("table" === sNodeName && this.pasteInExcel !== true && this.pasteInPresentationShape !== true)
-            {
-                if(PasteElementsId.g_bIsDocumentCopyPaste)
-                {
-                    this._StartExecuteTable(node, pPr);
-                    return bAddParagraph;
-                }
-                else
-                    return false;
-            }
+					//Добавляет элемени стиля если он поменялся
+					//this._commit_rPr(node.parentNode);
 
-			//собираем не html свойства параграфа(те что нельзя получить из getComputedStyle)
-            var style = node.getAttribute("style");
-            if(style)
-                this._parseCss(style, pPr);
+					if (!oThis.bIsPlainText) {
+						var rPr = oThis._read_rPr(node.parentNode);
+						var Item = new ParaTextPr(rPr);
+						shape.paragraphAdd(Item);
+					}
+				} else {
+					var oTargetNode = node.parentNode;
+					var bUseOnlyInherit = false;
+					if (oThis._IsBlockElem(oTargetNode.nodeName.toLowerCase())) {
+						bUseOnlyInherit = true;
+					}
+					bAddParagraph = oThis._Decide_AddParagraph(oTargetNode, pPr, bAddParagraph);
 
-            if("h1" === sNodeName)
-                pPr.hLevel = 0;
-            else if("h2" === sNodeName)
-                pPr.hLevel = 1;
-            else if("h3" === sNodeName)
-                pPr.hLevel = 2;
-            else if("h4" === sNodeName)
-                pPr.hLevel = 3;
-            else if("h5" === sNodeName)
-                pPr.hLevel = 4;
-            else if("h6" === sNodeName)
-                pPr.hLevel = 5;
+					//Добавляет элемени стиля если он поменялся
+					oThis._commit_rPr(oTargetNode, bUseOnlyInherit);
 
-            if("ul" === sNodeName || "ol" === sNodeName || "li" === sNodeName)
-            {
-                //в данном случае если нет тега li, то списоком не считаем
-				if("li" === sNodeName)
-				{
-					pPr.bNum = true;
+					//TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
+					//bIsPreviuosSpace - игнорируем несколько пробелов подряд
+					var bIsPreviuosSpace = false;
 				}
-				
-                if(PasteElementsId.g_bIsDocumentCopyPaste)
-                {
-                    if("ul" === sNodeName)
-                        pPr.numType = numbering_numfmt_Bullet;
-                    else if("ol" === sNodeName)
-                        pPr.numType = numbering_numfmt_Decimal;
-                }
-                else
-                {
-                    if("ul" === sNodeName)
-                        pPr.numType = numbering_presentationnumfrmt_Char;
-                    else if("ol" === sNodeName)
-                        pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
-                }
-            }
-			else if(pPr["mso-list"])
-			{
-				if("p" === sNodeName)
-				{
+
+				for (var i = 0, length = value.length; i < length; i++) {
+					var nUnicode = null;
+					var nCharCode = value.charCodeAt(i);
+					if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+						if (i + 1 < length) {
+							i++;
+							var nTrailingChar = value.charCodeAt(i);
+							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+						}
+					} else {
+						nUnicode = nCharCode;
+					}
+
+					if (bPresentation) {
+						if (null !== nUnicode) {
+							var Item;
+							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+								Item = new ParaText();
+								Item.Value = nUnicode;
+							} else {
+								Item = new ParaSpace();
+							}
+							shape.paragraphAdd(Item);
+						}
+					} else {
+						if (null != nUnicode) {
+							var Item;
+							if (0x20 !== nUnicode && 0x2009 !== nUnicode) {
+								Item = new ParaText();
+								Item.Set_CharCode(nUnicode);
+								bIsPreviuosSpace = false;
+							} else {
+								Item = new ParaSpace();
+								if (bIsPreviuosSpace) {
+									continue;
+								}
+								if (!oThis.bIsPlainText) {
+									bIsPreviuosSpace = true;
+								}
+							}
+							oThis._AddToParagraph(Item);
+						}
+					}
+
+				}
+
+			}
+		};
+
+		var parseNumbering = function () {
+			if ("ul" === sNodeName || "ol" === sNodeName || "li" === sNodeName) {
+				if (bPresentation) {
+					pPr.bNum = true;
+					if (PasteElementsId.g_bIsDocumentCopyPaste) {
+						if ("ul" === sNodeName) {
+							pPr.numType = numbering_numfmt_Bullet;
+						} else if ("ol" ===
+							sNodeName) {
+							pPr.numType = numbering_numfmt_Decimal;
+						}
+					} else {
+						if ("ul" === sNodeName) {
+							pPr.numType = numbering_presentationnumfrmt_Char;
+						} else if ("ol" ===
+							sNodeName) {
+							pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
+						}
+					}
+				} else {
+					//в данном случае если нет тега li, то списоком не считаем
+					if ("li" === sNodeName) {
+						pPr.bNum = true;
+					}
+
+					if (PasteElementsId.g_bIsDocumentCopyPaste) {
+						if ("ul" === sNodeName) {
+							pPr.numType = numbering_numfmt_Bullet;
+						} else if ("ol" ===
+							sNodeName) {
+							pPr.numType = numbering_numfmt_Decimal;
+						}
+					} else {
+						if ("ul" === sNodeName) {
+							pPr.numType = numbering_presentationnumfrmt_Char;
+						} else if ("ol" ===
+							sNodeName) {
+							pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
+						}
+					}
+				}
+			} else if (pPr["mso-list"] && !bPresentation) {
+				if ("p" === sNodeName) {
 					pPr.bNum = true;
 				}
 			}
-			
-            if("img" === sNodeName && this.pasteInExcel !== true)
-            {
-                if(PasteElementsId.g_bIsDocumentCopyPaste)
-                {
-                    bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
-                    
-                    var nWidth = parseInt(node.getAttribute("width"));
-                    var nHeight = parseInt(node.getAttribute("height"));
-                    if(!nWidth || !nHeight)
-                    {
-						var computedStyle = this._getComputedStyle(node);
-                        if ( computedStyle )
-                        {
-                            nWidth = parseInt(computedStyle.getPropertyValue("width"));
-                            nHeight = parseInt(computedStyle.getPropertyValue("height"));
-                        }
-                    }
-					
+		};
+
+		var parseStyle = function () {
+			//собираем не html свойства параграфа(те что нельзя получить из getComputedStyle)
+			var style = node.getAttribute("style");
+			if (style) {
+				oThis._parseCss(style, pPr);
+			}
+
+			if ("h1" === sNodeName) {
+				pPr.hLevel = 0;
+			} else if ("h2" === sNodeName) {
+				pPr.hLevel = 1;
+			} else if ("h3" ===
+				sNodeName) {
+				pPr.hLevel = 2;
+			} else if ("h4" === sNodeName) {
+				pPr.hLevel = 3;
+			} else if ("h5" ===
+				sNodeName) {
+				pPr.hLevel = 4;
+			} else if ("h6" === sNodeName) {
+				pPr.hLevel = 5;
+			}
+		};
+
+		var parseImage = function () {
+			if (bPresentation) {
+				//bAddParagraph = oThis._Decide_AddParagraph(node, pPr, bAddParagraph);
+
+				var nWidth = parseInt(node.getAttribute("width"));
+				var nHeight = parseInt(node.getAttribute("height"));
+				if (!nWidth || !nHeight) {
+					var computedStyle = oThis._getComputedStyle(node);
+					if (computedStyle) {
+						nWidth = parseInt(computedStyle.getPropertyValue("width"));
+						nHeight = parseInt(computedStyle.getPropertyValue("height"));
+					}
+				}
+				var sSrc = node.getAttribute("src");
+				if (sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") ||
+					!(typeof nHeight === "number") || nWidth === 0 || nHeight === 0)) {
+					var img_prop = new Asc.asc_CImgProperty();
+					img_prop.asc_putImageUrl(sSrc);
+					var or_sz = img_prop.asc_getOriginSize(editor);
+					nWidth = or_sz.Width / g_dKoef_pix_to_mm;
+					nHeight = or_sz.Height / g_dKoef_pix_to_mm;
+				} else {
+					nWidth *= g_dKoef_pix_to_mm;
+					nHeight *= g_dKoef_pix_to_mm;
+				}
+				if (nWidth && nHeight && sSrc) {
+					var sSrc = oThis.oImages[sSrc];
+					if (sSrc) {
+						var image = AscFormat.DrawingObjectsController.prototype.createImage(sSrc, 0, 0, nWidth,
+							nHeight);
+						arrImages.push(image);
+					}
+				}
+				return bAddParagraph;
+			} else {
+				if (PasteElementsId.g_bIsDocumentCopyPaste) {
+					bAddParagraph = oThis._Decide_AddParagraph(node, pPr, bAddParagraph);
+
+					var nWidth = parseInt(node.getAttribute("width"));
+					var nHeight = parseInt(node.getAttribute("height"));
+					if (!nWidth || !nHeight) {
+						var computedStyle = oThis._getComputedStyle(node);
+						if (computedStyle) {
+							nWidth = parseInt(computedStyle.getPropertyValue("width"));
+							nHeight = parseInt(computedStyle.getPropertyValue("height"));
+						}
+					}
+
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
-					if((!nWidth || !nHeight))
-					{
-						if(AscBrowser.isMozilla || AscBrowser.isIE)
-						{
+					if ((!nWidth || !nHeight)) {
+						if (AscBrowser.isMozilla || AscBrowser.isIE) {
 							nWidth = parseInt(node.width);
 							nHeight = parseInt(node.height);
-						}
-						else if(AscBrowser.isChrome)
-						{
-							if(nWidth && !nHeight)
-							{
+						} else if (AscBrowser.isChrome) {
+							if (nWidth && !nHeight) {
 								nHeight = nWidth;
-							}
-							else if(!nWidth && nHeight)
-							{
+							} else if (!nWidth && nHeight) {
 								nWidth = nHeight;
 							}
 						}
 					}
-					
-                    var sSrc = node.getAttribute("src");
-                    if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
-                        ||  nWidth === 0 ||  nHeight === 0) && sSrc)
-                    {
-                        var img_prop = new Asc.asc_CImgProperty();
-                        img_prop.asc_putImageUrl(sSrc);
-                        var or_sz = img_prop.asc_getOriginSize(editor);
-                        nWidth = or_sz.Width / g_dKoef_pix_to_mm;
-                        nHeight = or_sz.Height / g_dKoef_pix_to_mm;
-                    }
-					
-					if(!nWidth)
-					{
-						nWidth = this.defaultImgWidth / g_dKoef_pix_to_mm;
+
+					var sSrc = node.getAttribute("src");
+					if ((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) &&
+						(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") ||
+						!(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
+						|| nWidth === 0 || nHeight === 0) && sSrc) {
+						var img_prop = new Asc.asc_CImgProperty();
+						img_prop.asc_putImageUrl(sSrc);
+						var or_sz = img_prop.asc_getOriginSize(editor);
+						nWidth = or_sz.Width / g_dKoef_pix_to_mm;
+						nHeight = or_sz.Height / g_dKoef_pix_to_mm;
 					}
-					if(!nHeight)
-					{
-						nHeight = this.defaultImgHeight / g_dKoef_pix_to_mm;
+
+					if (!nWidth) {
+						nWidth = oThis.defaultImgWidth / g_dKoef_pix_to_mm;
 					}
-					
-                    if(nWidth && nHeight && sSrc)
-                    {
-                        var sSrc = this.oImages[sSrc];
-                        if(sSrc)
-                        {
-                            nWidth = nWidth * g_dKoef_pix_to_mm;
-                            nHeight = nHeight * g_dKoef_pix_to_mm;
-							//вписываем в this.dMaxWidth
-                            var bUseScaleKoef = this.bUseScaleKoef;
-                            var dScaleKoef = this.dScaleKoef;
-                            if(nWidth * dScaleKoef > this.dMaxWidth)
-                            {
-                                dScaleKoef = dScaleKoef * this.dMaxWidth / nWidth;
-                                bUseScaleKoef = true;
-                            }
-                            //закомментировал, потому что при вставке получаем изображения измененного размера
+					if (!nHeight) {
+						nHeight = oThis.defaultImgHeight / g_dKoef_pix_to_mm;
+					}
+
+					if (nWidth && nHeight && sSrc) {
+						var sSrc = oThis.oImages[sSrc];
+						if (sSrc) {
+							nWidth = nWidth * g_dKoef_pix_to_mm;
+							nHeight = nHeight * g_dKoef_pix_to_mm;
+							//вписываем в oThis.dMaxWidth
+							var bUseScaleKoef = oThis.bUseScaleKoef;
+							var dScaleKoef = oThis.dScaleKoef;
+							if (nWidth * dScaleKoef > oThis.dMaxWidth) {
+								dScaleKoef = dScaleKoef * oThis.dMaxWidth / nWidth;
+								bUseScaleKoef = true;
+							}
+							//закомментировал, потому что при вставке получаем изображения измененного размера
 							/*if(bUseScaleKoef)
-                            {
-                                var dTemp = nWidth;
-                                nWidth *= dScaleKoef;
-                                nHeight *= dScaleKoef;
-                            }*/
-                            var oTargetDocument = this.oDocument;
-                            var oDrawingDocument = this.oDocument.DrawingDocument;
-                            if(oTargetDocument && oDrawingDocument)
-                            {
+							 {
+							 var dTemp = nWidth;
+							 nWidth *= dScaleKoef;
+							 nHeight *= dScaleKoef;
+							 }*/
+							var oTargetDocument = oThis.oDocument;
+							var oDrawingDocument = oThis.oDocument.DrawingDocument;
+							if (oTargetDocument && oDrawingDocument) {
 								//если добавляем изображение в гиперссылку, то кладём его в отдельный ран и делаем не подчёркнутым
-								if(this.oCurHyperlink)
-								{
-									this._CommitElemToParagraph(this.oCurRun);
-									this.oCurRun = new ParaRun(this.oCurPar);
-									this.oCurRun.Pr.Underline = false;
+								if (oThis.oCurHyperlink) {
+									oThis._CommitElemToParagraph(oThis.oCurRun);
+									oThis.oCurRun = new ParaRun(oThis.oCurPar);
+									oThis.oCurRun.Pr.Underline = false;
 								}
-										
+
 								var Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
 								// oTargetDocument.DrawingObjects.Add( Drawing );
 
-                                this._AddToParagraph( Drawing );
-								
-								if(this.oCurHyperlink)
-									this.oCurRun = new ParaRun(this.oCurPar);
+								oThis._AddToParagraph(Drawing);
 
-                                    //oDocument.AddInlineImage(nWidth, nHeight, img);
-                            }
-                        }
-                    }
+								if (oThis.oCurHyperlink) {
+									oThis.oCurRun = new ParaRun(oThis.oCurPar);
+								}
 
-                    return bAddParagraph;
-                }
-                else
-                    return false;
-            }
-
-			//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
-            var bPageBreakBefore = "always" === node.style.pageBreakBefore || "left" === node.style.pageBreakBefore || "right" === node.style.pageBreakBefore;
-            if ("br" == sNodeName || bPageBreakBefore)
-            {
-                if (bPageBreakBefore)
-                {
-                    bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
-                    bAddParagraph = true;
-                    this._Commit_Br(0, node, pPr);
-                    this._AddToParagraph( new ParaNewLine( break_Page ) );
-                }
-                else
-                {
-                    bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph, false);
-                    this.nBrCount++;//this._AddToParagraph( new ParaNewLine( break_Line ) );
-                    if("line-break" === pPr["mso-special-character"] || "always" === pPr["mso-column-break-before"])
-                        this._Commit_Br(0, node, pPr);
-					return bAddParagraph;
-                }
-            }
-
-			//Проверка на tab
-            if("span" === sNodeName)
-            {
-                var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
-                if(nTabCount > 0)
-                {
-                    bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
-                    this._commit_rPr(node);
-                    for(var i = 0; i < nTabCount; i++)
-                        this._AddToParagraph( new ParaTab() );
-                    return bAddParagraph;
-                }
-            }
-        }
-		//рекурсивно вызываем для childNodes
-        for(var i = 0, length = node.childNodes.length; i < length; i++)
-        {
-            var child = node.childNodes[i];
-            var nodeType = child.nodeType;
-			//При копировании из word может встретиться комментарий со списком
-			//Комментарии пропускаем, списки делаем своими
-            if(Node.COMMENT_NODE === nodeType)
-            {
-                var value = child.nodeValue;
-                var bSkip = false;
-                if(value)
-                {
-                    if(-1 !== value.indexOf("supportLists"))
-                    {
-						//todo распознать тип списка
-                        pPr.bNum = true;
-                        bSkip = true;
-                    }
-                    if(-1 !== value.indexOf("supportLineBreakNewLine"))
-                        bSkip = true;
-                }
-                if(true === bSkip)
-                {
-					//пропускаем все до закрывающегося комментария
-                    var j = i + 1;
-                    for(; j < length; j++)
-                    {
-                        var tempNode = node.childNodes[j];
-                        var tempNodeType = tempNode.nodeType;
-                        if(Node.COMMENT_NODE === tempNodeType)
-                        {
-                            var tempvalue = tempNode.nodeValue;
-                            if(tempvalue && -1 !== tempvalue.indexOf("endif"))
-                                break;
-                        }
-                    }
-                    i = j;
-                    continue;
-                }
-            }
-
-			var sChildNodeName = child.nodeName.toLowerCase();
-            if(!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType) || sChildNodeName === "style" || sChildNodeName === "#comment" || sChildNodeName === "script")
-                continue;
-			//попускам элеметы состоящие только из \t,\n,\r
-            if( Node.TEXT_NODE === child.nodeType)
-            {
-                var value = child.nodeValue;
-                if(!value)
-                    continue;
-                value = value.replace(/(\r|\t|\n)/g, '');
-                if("" == value)
-                    continue;
-            }
-            var bIsBlockChild = this._IsBlockElem(sChildNodeName);
-            if(bRoot)
-                this.bInBlock = false;
-            if(bIsBlockChild)
-            {
-                bAddParagraph = true;
-                this.bInBlock = true;
-            }
-            var oOldHyperlink = null;
-            var oOldHyperlinkContentPos = null;
-            var oHyperlink = null;
-            if("a" === sChildNodeName)
-            {
-                var href = child.href;
-                if(null != href)
-                {
-                    var sDecoded;
-					//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
-                    try
-                    {
-                        sDecoded = decodeURI(href);
-                    }
-                    catch(e) { sDecoded = href; }
-                    href = sDecoded;
-					if(href && href.length > 0){
-						var title = child.getAttribute("title");
-
-						bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
-						oHyperlink = new ParaHyperlink();
-						oHyperlink.SetParagraph(this.oCurPar);
-						oHyperlink.Set_Value( href );
-						if(null != title)
-							oHyperlink.Set_ToolTip(title);
-						oOldHyperlink = this.oCurHyperlink;
-						oOldHyperlinkContentPos = this.oCurHyperlinkContentPos;
-						this.oCurHyperlink = oHyperlink;
-						this.oCurHyperlinkContentPos = 0;
-					}
-                }
-            }
-			
-			//TODO временная правка. пересмотреть обработку тега math
-			if(!child.style && Node.TEXT_NODE !== child.nodeType)
-			{
-				child.style = {};
-			}
-			
-            bAddParagraph = this._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock);
-            if(bIsBlockChild)
-                bAddParagraph = true;
-            if ("a" === sChildNodeName && null != oHyperlink) {
-                this.oCurHyperlink = oOldHyperlink;
-                this.oCurHyperlinkContentPos = oOldHyperlinkContentPos;
-                if(oHyperlink.Content.length > 0)
-                {
-                    if(this.pasteInExcel)
-                    {
-                        var TextPr = new CTextPr();
-                        TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
-                        TextPr.Underline = true;
-                        oHyperlink.Apply_TextPr( TextPr, undefined, true );
-                    }
-					
-					//проставляем rStyle
-					if(oHyperlink.Content && oHyperlink.Content.length && oHyperlink.Paragraph.bFromDocument)
-					{
-						if(this.oLogicDocument && this.oLogicDocument.Styles && this.oLogicDocument.Styles.Default && this.oLogicDocument.Styles.Default.Hyperlink && this.oLogicDocument.Styles.Style)
-						{
-							var hyperLinkStyle = this.oLogicDocument.Styles.Default.Hyperlink;
-							
-							for(var k = 0; k < oHyperlink.Content.length; k++)
-							{
-								if(oHyperlink.Content[k].Type === para_Run)
-									oHyperlink.Content[k].Set_RStyle(hyperLinkStyle);
+								//oDocument.AddInlineImage(nWidth, nHeight, img);
 							}
 						}
 					}
-					
-                    this._AddToParagraph(oHyperlink);
-                }
-            }
-        }
-        if(bRoot)
-        {
-            this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
-        }
-        return bAddParagraph;
-    },
 
-    _ExecutePresentation : function(node, pPr, bRoot, bAddParagraph, bInBlock, arrShapes, arrImages, arrTables)
-    {
-		//bAddParagraph флаг влияющий на функцию _Decide_AddParagraph, добавлять параграф или нет.
-		//bAddParagraph выставляется в true, когда встретился блочный элемент и по окончанию блочного элемента
-        var arr_shapes = [];
-        var arr_images = [];
-        var arr_tables = [];
-        var oDocument = this.oDocument;
-        var bRootHasBlock = false;//Если root есть блочный элемент, то надо все child считать параграфами
-		//Для Root node не смотрим стили и не добавляем текст
-        var presentation = editor.WordControl.m_oLogicDocument;
+					return bAddParagraph;
+				} else {
+					return false;
+				}
+			}
+		};
 
-        var shape = arrShapes[arrShapes.length - 1];
-
-        this.aContent = shape.txBody.content.Content;
-        if(true === bRoot)
-        {
-			//Если блочных элементов нет, то отменяем флаг
-            var bExist = false;
-            for(var i = 0, length = node.childNodes.length; i < length; i++)
-            {
-                var child = node.childNodes[i];
-                var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
-                if(true === bIsBlockChild)
-                {
-                    bRootHasBlock = true;
-                    bExist = true;
-                    break;
-                }
-            }
-            if(false === bExist && true === this.bIgnoreNoBlockText)
-                this.bIgnoreNoBlockText = false;
-        }
-        else
-        {
-            if(Node.TEXT_NODE === node.nodeType)
-            {
-                if(false === this.bIgnoreNoBlockText || true === bInBlock)
-                {
-                    var value = node.nodeValue;
-                    if(!value)
-                        value = "";
-					//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
-					//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
-                    value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
-                    value = value.replace(/(\r|\t|\n)/g, ' ');
-                    if(value.length > 0)
-                    {
-                        this.oDocument = shape.txBody.content;
-						if(bAddParagraph)
-							shape.txBody.content.AddNewParagraph();
-                       // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
-
-						//Добавляет элемени стиля если он поменялся
-                        //this._commit_rPr(node.parentNode);
-
-						if(!this.bIsPlainText)
-						{
-							var rPr = this._read_rPr(node.parentNode);
-							var Item = new ParaTextPr( rPr);
-							shape.paragraphAdd(Item);
+		var parseLineBreak = function () {
+			if (bPresentation) {
+				//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
+				if ("br" === sNodeName || "always" === node.style.pageBreakBefore) {
+					if ("always" === node.style.pageBreakBefore) {
+						shape.paragraphAdd(new ParaNewLine(break_Line));
+					} else {
+						shape.paragraphAdd(new ParaNewLine(break_Line));
+					}
+				}
+			} else {
+				//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
+				var bPageBreakBefore = "always" === node.style.pageBreakBefore ||
+					"left" === node.style.pageBreakBefore || "right" === node.style.pageBreakBefore;
+				if ("br" == sNodeName || bPageBreakBefore) {
+					if (bPageBreakBefore) {
+						bAddParagraph = oThis._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
+						bAddParagraph = true;
+						oThis._Commit_Br(0, node, pPr);
+						oThis._AddToParagraph(new ParaNewLine(break_Page));
+					} else {
+						bAddParagraph = oThis._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph, false);
+						oThis.nBrCount++;//oThis._AddToParagraph( new ParaNewLine( break_Line ) );
+						if ("line-break" === pPr["mso-special-character"] ||
+							"always" === pPr["mso-column-break-before"]) {
+							oThis._Commit_Br(0, node, pPr);
 						}
-                        for(var i = 0, length = value.length; i < length; i++)
-                        {
-                            var nUnicode = null;
-                            var nCharCode = value.charCodeAt(i);
-                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-                                if (i + 1 < length) {
-                                    i++;
-                                    var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-                                }
-                            }
-                            else
-                                nUnicode = nCharCode;
-                            if (null !== nUnicode) {
-                                var Item;
-                                if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-                                    Item = new ParaText();
-                                    Item.Value = nUnicode;
-                                }
-                                else
-                                    Item = new ParaSpace();
-                                shape.paragraphAdd(Item);
-                            }
-                        }
+						return bAddParagraph;
+					}
+				}
+			}
+			return null;
+		};
 
-                    }
-                }
-                return;
-            }
-            var sNodeName = node.nodeName.toLowerCase();
-            if("table" === sNodeName)
-            {
-                this._StartExecuteTablePresentation(node, pPr, arrShapes, arrImages, arrTables);
-                return;
-            }
-
-			//собираем не html свойства параграфа(те что нельзя получить из getComputedStyle)
-            var style = node.getAttribute("style");
-            if(style)
-                this._parseCss(style, pPr);
-
-            if("h1" === sNodeName)
-                pPr.hLevel = 0;
-            else if("h2" === sNodeName)
-                pPr.hLevel = 1;
-            else if("h3" === sNodeName)
-                pPr.hLevel = 2;
-            else if("h4" === sNodeName)
-                pPr.hLevel = 3;
-            else if("h5" === sNodeName)
-                pPr.hLevel = 4;
-            else if("h6" === sNodeName)
-                pPr.hLevel = 5;
-
-            if("ul" === sNodeName || "ol" === sNodeName || "li" === sNodeName)
-            {
-                pPr.bNum = true;
-                if(PasteElementsId.g_bIsDocumentCopyPaste)
-                {
-                    if("ul" === sNodeName)
-                        pPr.numType = numbering_numfmt_Bullet;
-                    else if("ol" === sNodeName)
-                        pPr.numType = numbering_numfmt_Decimal;
-                }
-                else
-                {
-                    if("ul" === sNodeName)
-                        pPr.numType = numbering_presentationnumfrmt_Char;
-                    else if("ol" === sNodeName)
-                        pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
-                }
-            }
-
-            if("img" === sNodeName)
-            {
-
-                //bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
-
-                var nWidth = parseInt(node.getAttribute("width"));
-                var nHeight = parseInt(node.getAttribute("height"));
-                if(!nWidth || !nHeight)
-                {
-					var computedStyle = this._getComputedStyle(node);
-                    if ( computedStyle )
-                    {
-                        nWidth = parseInt(computedStyle.getPropertyValue("width"));
-                        nHeight = parseInt(computedStyle.getPropertyValue("height"));
-                    }
-                }
-                var sSrc = node.getAttribute("src");
-                if(sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
-                    ||  nWidth === 0 ||  nHeight === 0))
-                {
-                    var img_prop = new Asc.asc_CImgProperty();
-                    img_prop.asc_putImageUrl(sSrc);
-                    var or_sz = img_prop.asc_getOriginSize(editor);
-                    nWidth = or_sz.Width / g_dKoef_pix_to_mm;
-                    nHeight = or_sz.Height / g_dKoef_pix_to_mm;
-                }
-                else
-                {
-                    nWidth *= g_dKoef_pix_to_mm;
-                    nHeight *= g_dKoef_pix_to_mm;
-                }
-                if(nWidth && nHeight && sSrc)
-                {
-                    var sSrc = this.oImages[sSrc];
-                    if(sSrc)
-                    {
-						var image = AscFormat.DrawingObjectsController.prototype.createImage(sSrc, 0, 0, nWidth, nHeight);	
-                        arrImages.push(image);
-                    }
-                }
-                return bAddParagraph;
-
-            }
-
-			//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
-            if("br" === sNodeName || "always" === node.style.pageBreakBefore)
-            {
-                if("always" === node.style.pageBreakBefore)
-                {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ));
-                }
-                else
-                {
-                    shape.paragraphAdd(new ParaNewLine( break_Line ));
-                }
-            }
-
-			//Проверка на tab
-            if("span" === sNodeName)
-            {
-                var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
-                if(nTabCount > 0)
-                {
-					if(!this.bIsPlainText)
-					{
-						var rPr = this._read_rPr(node);
-						var Item = new ParaTextPr( rPr);
+		var parseTab = function () {
+			var nTabCount;
+			if (bPresentation) {
+				nTabCount = parseInt(pPr["mso-tab-count"] || 0);
+				if (nTabCount > 0) {
+					if (!oThis.bIsPlainText) {
+						var rPr = oThis._read_rPr(node);
+						var Item = new ParaTextPr(rPr);
 						shape.paragraphAdd(Item);
 					}
-                    for(var i = 0; i < nTabCount; i++)
-                        shape.paragraphAdd( new ParaTab() );
-                    return;
-                }
-            }
-        }
-		//рекурсивно вызываем для childNodes
-        for(var i = 0, length = node.childNodes.length; i < length; i++)
-        {
-            var child = node.childNodes[i];
-            var nodeType = child.nodeType;
-			//При копировании из word может встретиться комментарий со списком
-			//Комментарии пропускаем, списки делаем своими
-            if(Node.COMMENT_NODE === nodeType)
-            {
-                var value = child.nodeValue;
-                var bSkip = false;
-                if(value)
-                {
-                    if(-1 !== value.indexOf("supportLists"))
-                    {
-						//todo распознать тип списка
-                        pPr.bNum = true;
-                        bSkip = true;
-                    }
-                    if(-1 !== value.indexOf("supportLineBreakNewLine"))
-                        bSkip = true;
-                }
-                if(true === bSkip)
-                {
-					//пропускаем все до закрывающегося комментария
-                    var j = i + 1;
-                    for(; j < length; j++)
-                    {
-                        var tempNode = node.childNodes[j];
-                        var tempNodeType = tempNode.nodeType;
-                        if(Node.COMMENT_NODE === tempNodeType)
-                        {
-                            var tempvalue = tempNode.nodeValue;
-                            if(tempvalue && -1 !== tempvalue.indexOf("endif"))
-                                break;
-                        }
-                    }
-                    i = j;
-                    continue;
-                }
-            }
-
-            if(!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType))
-                continue;
-			//попускам элеметы состоящие только из \t,\n,\r
-            if( Node.TEXT_NODE === child.nodeType)
-            {
-                var value = child.nodeValue;
-                if(!value)
-                    continue;
-                value = value.replace(/(\r|\t|\n)/g, '');
-                if("" == value)
-                    continue;
-            }
-            var sChildNodeName = child.nodeName.toLowerCase();
-            var bIsBlockChild = this._IsBlockElem(sChildNodeName);
-            if(bRoot)
-                this.bInBlock = false;
-            if(bIsBlockChild)
-            {
-                bAddParagraph = true;
-                this.bInBlock = true;
-            }
-
-            var bHyperlink = false;
-			var isPasteHyperlink = null;
-            if("a" === sChildNodeName)
-            {
-                var href = child.href;
-                if(null != href)
-                {
-                    var sDecoded;
-					//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
-                    try
-                    {
-                        sDecoded = decodeURI(href);
-                    }
-                    catch(e) { sDecoded = href; }
-                    href = sDecoded;
-                    bHyperlink = true;
-                    var title = child.getAttribute("title");
-
-                    this.oDocument = shape.txBody.content;
-
-					var Pos = ( true === this.oDocument.Selection.Use ? this.oDocument.Selection.StartPos : this.oDocument.CurPos.ContentPos );
-					isPasteHyperlink = node.getElementsByTagName('img');
-					
-					var text = null;
-					if(isPasteHyperlink && isPasteHyperlink.length)
-						isPasteHyperlink = null;
-					else
-					{
-						text = child.innerText ? child.innerText : child.textContent;
+					for (var i = 0; i < nTabCount; i++) {
+						shape.paragraphAdd(new ParaTab());
 					}
-					
-					if(isPasteHyperlink)
-					{
-						var HyperProps = new Asc.CHyperlinkProperty({ Text: text, Value: href, ToolTip: title});
-						this.oDocument.Content[Pos].AddHyperlink( HyperProps );
+					return;
+				}
+			} else {
+				nTabCount = parseInt(pPr["mso-tab-count"] || 0);
+				if (nTabCount > 0) {
+					bAddParagraph = oThis._Decide_AddParagraph(node, pPr, bAddParagraph);
+					oThis._commit_rPr(node);
+					for (var i = 0; i < nTabCount; i++) {
+						oThis._AddToParagraph(new ParaTab());
 					}
-                }
-            }
-
-			//TODO временная правка. пересмотреть обработку тега math
-			if(!child.style && Node.TEXT_NODE !== child.nodeType)
-			{
-				child.style = {};
+					return bAddParagraph;
+				}
 			}
 
-			if(!isPasteHyperlink)
-				bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
-			
-            if(bIsBlockChild)
-                bAddParagraph = true;
-        }
-        if(bRoot)
-        {
-            //this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
-        }
-        return bAddParagraph;
-    },
+			return null;
+		};
+
+		var parseChildNodes = function(){
+			if (bPresentation) {
+				if (!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType)) {
+					return;
+				}
+				//попускам элеметы состоящие только из \t,\n,\r
+				if (Node.TEXT_NODE === child.nodeType) {
+					var value = child.nodeValue;
+					if (!value) {
+						return;
+					}
+					value = value.replace(/(\r|\t|\n)/g, '');
+					if ("" == value) {
+						return;
+					}
+				}
+				var sChildNodeName = child.nodeName.toLowerCase();
+				var bIsBlockChild = oThis._IsBlockElem(sChildNodeName);
+				if (bRoot) {
+					oThis.bInBlock = false;
+				}
+				if (bIsBlockChild) {
+					bAddParagraph = true;
+					oThis.bInBlock = true;
+				}
+
+				var bHyperlink = false;
+				var isPasteHyperlink = null;
+				if ("a" === sChildNodeName) {
+					var href = child.href;
+					if (null != href) {
+						var sDecoded;
+						//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
+						try {
+							sDecoded = decodeURI(href);
+						} catch (e) {
+							sDecoded = href;
+						}
+						href = sDecoded;
+						bHyperlink = true;
+						var title = child.getAttribute("title");
+
+						oThis.oDocument = shape.txBody.content;
+
+						var Pos = ( true === oThis.oDocument.Selection.Use ? oThis.oDocument.Selection.StartPos :
+							oThis.oDocument.CurPos.ContentPos );
+						isPasteHyperlink = node.getElementsByTagName('img');
+
+						var text = null;
+						if (isPasteHyperlink && isPasteHyperlink.length) {
+							isPasteHyperlink = null;
+						} else {
+							text = child.innerText ? child.innerText : child.textContent;
+						}
+
+						if (isPasteHyperlink) {
+							var HyperProps = new Asc.CHyperlinkProperty({Text: text, Value: href, ToolTip: title});
+							oThis.oDocument.Content[Pos].AddHyperlink(HyperProps);
+						}
+					}
+				}
+
+				//TODO временная правка. пересмотреть обработку тега math
+				if (!child.style && Node.TEXT_NODE !== child.nodeType) {
+					child.style = {};
+				}
+
+				if (!isPasteHyperlink) {
+					bAddParagraph =
+						oThis._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock,
+							arrShapes, arrImages, arrTables);
+				}
+
+				if (bIsBlockChild) {
+					bAddParagraph = true;
+				}
+			} else {
+				var sChildNodeName = child.nodeName.toLowerCase();
+				if (!(Node.ELEMENT_NODE === nodeType || Node.TEXT_NODE === nodeType) || sChildNodeName === "style" ||
+					sChildNodeName === "#comment" || sChildNodeName === "script") {
+					return;
+				}
+				//попускам элеметы состоящие только из \t,\n,\r
+				if (Node.TEXT_NODE === child.nodeType) {
+					var value = child.nodeValue;
+					if (!value) {
+						return;
+					}
+					value = value.replace(/(\r|\t|\n)/g, '');
+					if ("" == value) {
+						return;
+					}
+				}
+				var bIsBlockChild = oThis._IsBlockElem(sChildNodeName);
+				if (bRoot) {
+					oThis.bInBlock = false;
+				}
+				if (bIsBlockChild) {
+					bAddParagraph = true;
+					oThis.bInBlock = true;
+				}
+				var oOldHyperlink = null;
+				var oOldHyperlinkContentPos = null;
+				var oHyperlink = null;
+				if ("a" === sChildNodeName) {
+					var href = child.href;
+					if (null != href) {
+						var sDecoded;
+						//decodeURI может выдавать malformed exception, потому что наш сайт в utf8, а некоторые сайты могут кодировать url в своей кодировке(например windows-1251)
+						try {
+							sDecoded = decodeURI(href);
+						} catch (e) {
+							sDecoded = href;
+						}
+						href = sDecoded;
+						if (href && href.length > 0) {
+							var title = child.getAttribute("title");
+
+							bAddParagraph = oThis._Decide_AddParagraph(child, pPr, bAddParagraph);
+							oHyperlink = new ParaHyperlink();
+							oHyperlink.SetParagraph(oThis.oCurPar);
+							oHyperlink.Set_Value(href);
+							if (null != title) {
+								oHyperlink.Set_ToolTip(title);
+							}
+							oOldHyperlink = oThis.oCurHyperlink;
+							oOldHyperlinkContentPos = oThis.oCurHyperlinkContentPos;
+							oThis.oCurHyperlink = oHyperlink;
+							oThis.oCurHyperlinkContentPos = 0;
+						}
+					}
+				}
+
+				//TODO временная правка. пересмотреть обработку тега math
+				if (!child.style && Node.TEXT_NODE !== child.nodeType) {
+					child.style = {};
+				}
+
+				bAddParagraph =
+					oThis._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock);
+				if (bIsBlockChild) {
+					bAddParagraph = true;
+				}
+				if ("a" === sChildNodeName && null != oHyperlink) {
+					oThis.oCurHyperlink = oOldHyperlink;
+					oThis.oCurHyperlinkContentPos = oOldHyperlinkContentPos;
+					if (oHyperlink.Content.length > 0) {
+						if (oThis.pasteInExcel) {
+							var TextPr = new CTextPr();
+							TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
+							TextPr.Underline = true;
+							oHyperlink.Apply_TextPr(TextPr, undefined, true);
+						}
+
+						//проставляем rStyle
+						if (oHyperlink.Content && oHyperlink.Content.length && oHyperlink.Paragraph.bFromDocument) {
+							if (oThis.oLogicDocument && oThis.oLogicDocument.Styles &&
+								oThis.oLogicDocument.Styles.Default && oThis.oLogicDocument.Styles.Default.Hyperlink &&
+								oThis.oLogicDocument.Styles.Style) {
+								var hyperLinkStyle = oThis.oLogicDocument.Styles.Default.Hyperlink;
+
+								for (var k = 0; k < oHyperlink.Content.length; k++) {
+									if (oHyperlink.Content[k].Type === para_Run) {
+										oHyperlink.Content[k].Set_RStyle(hyperLinkStyle);
+									}
+								}
+							}
+						}
+
+						oThis._AddToParagraph(oHyperlink);
+					}
+				}
+			}
+		};
+
+		var bPresentation = !PasteElementsId.g_bIsDocumentCopyPaste;
+		if (bPresentation) {
+			var shape = arrShapes[arrShapes.length - 1];
+			this.aContent = shape.txBody.content.Content;
+		}
+
+
+		if (true === bRoot) {
+			//Если блочных элементов нет, то отменяем флаг
+			var bExist = false;
+			for (var i = 0, length = node.childNodes.length; i < length; i++) {
+				var child = node.childNodes[i];
+				var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
+				if (true === bIsBlockChild) {
+					bRootHasBlock = true;
+					bExist = true;
+					break;
+				}
+			}
+			if (false === bExist && true === this.bIgnoreNoBlockText) {
+				this.bIgnoreNoBlockText = false;
+			}
+		} else {
+			//TEXT NODE
+			if (Node.TEXT_NODE === node.nodeType) {
+				if (false === this.bIgnoreNoBlockText || true === bInBlock) {
+					parseTextNode();
+				}
+				return bPresentation ? false : bAddParagraph;
+			}
+
+			//TABLE
+			var sNodeName = node.nodeName.toLowerCase();
+			if (bPresentation) {
+				if ("table" === sNodeName) {
+					this._StartExecuteTablePresentation(node, pPr, arrShapes, arrImages, arrTables);
+					return;
+				}
+			} else {
+				if ("table" === sNodeName && this.pasteInExcel !== true && this.pasteInPresentationShape !== true) {
+					if (PasteElementsId.g_bIsDocumentCopyPaste) {
+						this._StartExecuteTable(node, pPr);
+						return bAddParagraph;
+					} else {
+						return false;
+					}
+				}
+			}
+
+			//STYLE
+			parseStyle();
+
+			//NUMBERING
+			parseNumbering();
+
+			//IMAGE
+			if ("img" === sNodeName && (bPresentation || (!bPresentation && this.pasteInExcel !== true))) {
+				return parseImage();
+			}
+
+			//LINEBREAK
+			var lineBreak = parseLineBreak();
+			if (null !== lineBreak) {
+				return lineBreak;
+			}
+
+			//TAB
+			if ("span" === sNodeName) {
+				var tab = parseTab();
+				if (null !== tab) {
+					return tab;
+				}
+			}
+		}
+
+
+		//рекурсивно вызываем для childNodes
+		for (var i = 0, length = node.childNodes.length; i < length; i++) {
+			var child = node.childNodes[i];
+			var nodeType = child.nodeType;
+			//При копировании из word может встретиться комментарий со списком
+			//Комментарии пропускаем, списки делаем своими
+			if (Node.COMMENT_NODE === nodeType) {
+				var value = child.nodeValue;
+				var bSkip = false;
+				if (value) {
+					if (-1 !== value.indexOf("supportLists")) {
+						//todo распознать тип списка
+						pPr.bNum = true;
+						bSkip = true;
+					}
+					if (-1 !== value.indexOf("supportLineBreakNewLine")) {
+						bSkip = true;
+					}
+				}
+				if (true === bSkip) {
+					//пропускаем все до закрывающегося комментария
+					var j = i + 1;
+					for (; j < length; j++) {
+						var tempNode = node.childNodes[j];
+						var tempNodeType = tempNode.nodeType;
+						if (Node.COMMENT_NODE === tempNodeType) {
+							var tempvalue = tempNode.nodeValue;
+							if (tempvalue && -1 !== tempvalue.indexOf("endif")) {
+								break;
+							}
+						}
+					}
+					i = j;
+					continue;
+				}
+			}
+
+			parseChildNodes();
+		}
+
+		if (bRoot && bPresentation) {
+			this._Commit_Br(2, node, pPr);//word игнорируем 2 последних br
+		}
+		return bAddParagraph;
+	},
 
     _StartExecuteTablePresentation : function(node, pPr, arrShapes, arrImages, arrTables)
     {
@@ -8529,7 +8429,7 @@ PasteProcessor.prototype =
         shape.setParent(presentation.Slides[presentation.CurPage]);
         shape.setTxBody(AscFormat.CreateTextBodyFromString("", presentation.DrawingDocument, shape));
         arrShapes2.push(shape);
-        this._ExecutePresentation(node, {}, true, true, false, arrShapes2, arrImages2, arrTables);
+        this._Execute(node, {}, true, true, false, arrShapes2, arrImages2, arrTables);
         if(arrShapes2.length > 0)
         {
             var first_shape = arrShapes2[0];
