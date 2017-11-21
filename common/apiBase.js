@@ -1583,6 +1583,16 @@
 		return false;
 	};
 
+	baseEditorsApi.prototype.asc_gotoSignature = function(guid)
+	{
+		if (window["AscDesktopEditor"] && window["asc_IsVisibleSign"] && window["asc_IsVisibleSign"](guid))
+		{
+			if (this.asc_MoveCursorToSignature)
+				this.asc_MoveCursorToSignature(guid);
+		}
+	};
+
+
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
 
 		var count = this.signatures.length;

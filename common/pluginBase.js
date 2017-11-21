@@ -57,12 +57,13 @@
                         window.plugin_sendMessage(_message);
                     };
 
-					window.Asc.plugin.executeMethod = function(name, params)
+					window.Asc.plugin.executeMethod = function(name, params, callback)
 					{
 					    if (window.Asc.plugin.isWaitMethod === true)
 					        return false;
 
 					    window.Asc.plugin.isWaitMethod = true;
+					    window.Asc.plugin.methodCallback = callback;
 
 						window.Asc.plugin.info.type = "method";
 						window.Asc.plugin.info.methodName = name;
@@ -165,8 +166,16 @@
                 case "onMethodReturn":
                 {
 					window.Asc.plugin.isWaitMethod = false;
-                    if (window.Asc.plugin.onMethodReturn)
-                        window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
+
+					if (window.Asc.plugin.methodCallback)
+					{
+						window.Asc.plugin.methodCallback(pluginData.methodReturnData);
+						window.Asc.plugin.methodCallback = null;
+					}
+					else if (window.Asc.plugin.onMethodReturn)
+					{
+						window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
+					}
                     break;
                 }
 				case "onCommandCallback":
