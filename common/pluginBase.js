@@ -111,7 +111,7 @@
 
                     window.Asc.plugin.callCommand = function(func, isClose, isCalc)
 					{
-						var _txtFunc = "(" + func.toString() + ")();";
+						var _txtFunc = "(" + apply_scope(func.toString()) + ")();";
 						var _type = (isClose === true) ? "close" : "command";
 						window.Asc.plugin.info.recalculate = (false === isCalc) ? false : true;
 						window.Asc.plugin.executeCommand(_type, _txtFunc);
