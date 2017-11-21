@@ -1583,8 +1583,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.FieldsManager = new CDocumentFieldsManager();
 
     // Класс, управляющий закладками
-	if (typeof CBookmarksManager !== "undefined")
-		this.BookmarksManager = new CBookmarksManager(this);
+	this.BookmarksManager = new CBookmarksManager(this);
 
     // Режим рецензирования
     this.TrackRevisions = false;
@@ -16033,9 +16032,7 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		oSdt.SetThisElementCurrent();
 
 		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
-
-		// TODO: oSdt нужно заполнить свойствами
-
+		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
 		this.Recalculate();
 	}
 };

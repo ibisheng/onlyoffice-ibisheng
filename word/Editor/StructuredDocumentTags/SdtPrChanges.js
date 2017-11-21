@@ -149,11 +149,129 @@ CChangesSdtPrLock.prototype.private_SetValue = function(Value)
 function CChangesSdtPrDocPartObj(Class, Old, New)
 {
 	AscDFH.CChangesBaseProperty.call(this, Class, Old, New);
+
+	this.Old = {
+		Category : Old ? Old.Category : undefined,
+		Gallery  : Old ? Old.Gallery : undefined,
+		Unique   : Old ? Old.Unique : undefined
+	};
+
+	this.New = {
+		Category : New.Category,
+		Gallery  : New.Gallery,
+		Unique   : New.Unique
+	};
 }
 CChangesSdtPrDocPartObj.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
 CChangesSdtPrDocPartObj.prototype.constructor = CChangesSdtPrDocPartObj;
 CChangesSdtPrDocPartObj.prototype.Type = AscDFH.historyitem_SdtPr_DocPartObj;
 CChangesSdtPrDocPartObj.prototype.private_SetValue = function(Value)
 {
-	this.Class.Pr.Tag = Value;
+	this.Class.Pr.DocPartObj.Category = Value.Category;
+	this.Class.Pr.DocPartObj.Gallery  = Value.Gallery;
+	this.Class.Pr.DocPartObj.Unique   = Value.Unique;
+};
+CChangesSdtPrDocPartObj.prototype.WriteToBinary = function(Writer)
+{
+	// Long  : Flag
+	// 1-bit : Old.Category is undefined
+	// 2-bit : Old.Gallery is undefined
+	// 3-bit : Old.Unique is undefined
+	// 4-bit : New.Category is undefined
+	// 5-bit : New.Gallery is undefined
+	// 6-bit : New.Unique is undefined
+	// String : Old.Category
+	// String : Old.Gallery
+	// Bool   : Old.Unique
+	// String : New.Category
+	// String : New.Gallery
+	// Bool   : New.Unique
+
+	var nFlags = 0;
+
+	if (undefined === this.Old.Category)
+		nFlags |= 1;
+
+	if (undefined === this.Old.Gallery)
+		nFlags |= 2;
+
+	if (undefined === this.Old.Unique)
+		nFlags |= 4;
+
+	if (undefined === this.New.Category)
+		nFlags |= 8;
+
+	if (undefined === this.New.Gallery)
+		nFlags |= 16;
+
+	if (undefined === this.New.Unique)
+		nFlags |= 32;
+
+	Writer.WriteLong(nFlags);
+
+	if (undefined !== this.Old.Category)
+		Writer.WriteString2(this.Old.Category);
+
+	if (undefined !== this.Old.Gallery)
+		Writer.WriteString2(this.Old.Gallery);
+
+	if (undefined !== this.Old.Unique)
+		Writer.WriteBool(this.Old.Unique);
+
+	if (undefined !== this.Old.Category)
+		Writer.WriteString2(this.Old.Category);
+
+	if (undefined !== this.Old.Gallery)
+		Writer.WriteString2(this.Old.Gallery);
+
+	if (undefined !== this.Old.Unique)
+		Writer.WriteBool(this.Old.Unique);
+};
+CChangesSdtPrDocPartObj.prototype.ReadFromBinary = function(Reader)
+{
+	// Long  : Flag
+	// 1-bit : Old.Category is undefined
+	// 2-bit : Old.Gallery is undefined
+	// 3-bit : Old.Unique is undefined
+	// 4-bit : New.Category is undefined
+	// 5-bit : New.Gallery is undefined
+	// 6-bit : New.Unique is undefined
+	// String : Old.Category
+	// String : Old.Gallery
+	// Bool   : Old.Unique
+	// String : New.Category
+	// String : New.Gallery
+	// Bool   : New.Unique
+
+	var nFlags = Reader.GetLong();
+
+	this.Old = {
+		Category : undefined,
+		Gallery  : undefined,
+		Unique   : undefined
+	};
+
+	this.New = {
+		Category : undefined,
+		Gallery  : undefined,
+		Unique   : undefined
+	};
+
+	if (nFlags & 1)
+		this.Old.Category = Reader.GetString2();
+
+	if (nFlags & 2)
+		this.Old.Gallery = Reader.GetString2();
+
+	if (nFlags & 4)
+		this.Old.Unique = Reader.GetBool();
+
+	if (nFlags & 8)
+		this.New.Category = Reader.GetString2();
+
+	if (Flags & 16)
+		this.New.Gallery = Reader.GetString2();
+
+	if (Flags & 32)
+		this.New.Unique = Reader.GetBool();
 };
