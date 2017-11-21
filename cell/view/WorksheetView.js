@@ -11431,6 +11431,7 @@
 			History.StartTransaction();
 		}
 
+		var oAutoExpansionTable;
 		var isFormula = this._isFormula(val);
 		if (isFormula) {
 			var ftext = val.reduce(function (pv, cv) {
@@ -11452,6 +11453,7 @@
 			c.setValue2(val);
 			// Вызываем функцию пересчета для заголовков форматированной таблицы
 			this.model.autoFilters.renameTableColumn(oCellEdit);
+			oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(oCellEdit);
 		}
 
 		if (!isFormula) {
@@ -11468,6 +11470,10 @@
 
 		if (!isNotHistory) {
 			History.EndTransaction();
+		}
+
+		if(oAutoExpansionTable){
+			this.af_changeTableRange(oAutoExpansionTable.name, oAutoExpansionTable.range);
 		}
 
 		// если вернуть false, то редактор не закроется
@@ -14015,7 +14021,9 @@
 
     WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
         var t = this;
-        range = AscCommonExcel.g_oRangeCache.getAscRange(range);
+        if(typeof range === "string"){
+			range = AscCommonExcel.g_oRangeCache.getAscRange(range);
+		}
 
 		if (!window['AscCommonExcel'].filteringMode) {
 			return;
