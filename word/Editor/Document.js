@@ -4502,6 +4502,10 @@ CDocument.prototype.MoveCursorToCell = function(bNext)
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
 };
+CDocument.prototype.MoveCursorToSignature = function(sGuid)
+{
+    this.DrawingObjects.moveCursorToSignature(sGuid);
+};
 CDocument.prototype.SetParagraphAlign = function(Align)
 {
 	var SelectedInfo = this.GetSelectedElementsInfo();

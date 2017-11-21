@@ -733,7 +733,7 @@ DrawingObjectsController.prototype =
         var aSp = [];
         for(var i = 0; i < spTree.length; ++i){
             if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
-                this.getAllSignatures2(aRet, spTree[i].spTree);
+                aSp = aSp.concat(this.getAllSignatures2(aRet, spTree[i].spTree));
             }
             else if(spTree[i].signatureLine){
                 aRet.push(spTree[i].signatureLine);

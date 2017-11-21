@@ -2837,6 +2837,37 @@ CGraphicObjects.prototype =
         }
     },
 
+    moveCursorToSignature: function(sGuid)
+    {
+        var aSignatureShapes = this.getAllSignatures2([], this.getDrawingArray());
+        var oShape, oMainGroup;
+        for(var i = 0; i < aSignatureShapes.length; ++i)
+        {
+            oShape = aSignatureShapes[i];
+            if(oShape && oShape.signatureLine && oShape.signatureLine.id === sGuid)
+            {
+                oMainGroup = oShape.getMainGroup();
+                if(oMainGroup)
+                {
+                    if(oMainGroup.parent)
+                    {
+                        this.resetSelection();
+                        oMainGroup.parent.GoTo_Text(true, true);
+                    }
+                }
+                else
+                {
+                    if(oShape.parent)
+                    {
+                        this.resetSelection();
+                        oShape.parent.GoTo_Text(true, true);
+                    }
+                }
+                return;
+            }
+        }
+    },
+
     recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
