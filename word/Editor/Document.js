@@ -5958,7 +5958,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
 
-			if (true === Para.IsCursorAtEnd())
+			if (true === Para.IsCursorAtEnd() && true !== SelectedContent.ForceSplit)
 			{
 				bConcatE = false;
 
@@ -5976,7 +5976,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
 					bAddEmptyPara = true;
 			}
-			else if (true === Para.IsCursorAtBegin())
+			else if (true === Para.IsCursorAtBegin() && true !== SelectedContent.ForceSplit)
 			{
 				bConcatS = false;
 			}
