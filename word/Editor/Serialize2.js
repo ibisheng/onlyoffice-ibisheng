@@ -6363,6 +6363,12 @@ function BinaryFileReader(doc, openParams)
 			if(null != oNewId)
 				stDefault.TOC[i] = oNewId.id;
 		}
+		//TOCHeading
+		var sTOCHeading = stDefault.TOCHeading;
+		var oNewId = oIdRenameMap[sTOCHeading];
+		if(null != oNewId)
+			stDefault.TOCHeading = oNewId.id;
+
 		//меняем старые id
 		for(var sOldId in oIdRenameMap)
 		{

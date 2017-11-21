@@ -157,9 +157,9 @@ function CChangesSdtPrDocPartObj(Class, Old, New)
 	};
 
 	this.New = {
-		Category : New.Category,
-		Gallery  : New.Gallery,
-		Unique   : New.Unique
+		Category : New ? New.Category : undefined,
+		Gallery  : New ? New.Gallery : undefined,
+		Unique   : New ? New.Unique : undefined
 	};
 }
 CChangesSdtPrDocPartObj.prototype = Object.create(AscDFH.CChangesBaseProperty.prototype);
@@ -269,9 +269,9 @@ CChangesSdtPrDocPartObj.prototype.ReadFromBinary = function(Reader)
 	if (nFlags & 8)
 		this.New.Category = Reader.GetString2();
 
-	if (Flags & 16)
+	if (nFlags & 16)
 		this.New.Gallery = Reader.GetString2();
 
-	if (Flags & 32)
+	if (nFlags & 32)
 		this.New.Unique = Reader.GetBool();
 };

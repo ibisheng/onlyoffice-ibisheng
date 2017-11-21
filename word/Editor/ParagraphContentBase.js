@@ -152,6 +152,9 @@ CParagraphContentBase.prototype.Split = function()
 {
 	return new ParaRun();
 };
+CParagraphContentBase.prototype.Get_Text = function(Text)
+{
+};
 CParagraphContentBase.prototype.Apply_TextPr = function()
 {
 };
