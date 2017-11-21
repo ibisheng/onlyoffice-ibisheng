@@ -457,9 +457,15 @@ CCollaborativeEditingBase.prototype.CollectImagesFromChanges = function () {
     var oApi = editor || Asc['editor'];
     var aImages = [], sImagePath, i, sImageFromChanges, oThemeUrls = {};
     var aNewImages = this.m_aNewImages;
+    var oMap = {};
     for(i = 0; i < aNewImages.length; ++i)
     {
         sImageFromChanges = aNewImages[i];
+        if(oMap[sImageFromChanges])
+        {
+            continue;
+        }
+        oMap[sImageFromChanges] = 1;
         if(sImageFromChanges.indexOf('theme') === 0 && oApi.ThemeLoader)
         {
             oThemeUrls[sImageFromChanges] = oApi.ThemeLoader.ThemesUrlAbs + sImageFromChanges;
