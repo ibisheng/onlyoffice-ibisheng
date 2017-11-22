@@ -83,11 +83,11 @@
   CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
     if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
       var t = this;
-      this._CoAuthoringApi.onAuthParticipantsChanged = function(e, count) {
-        t.callback_OnAuthParticipantsChanged(e, count);
+      this._CoAuthoringApi.onAuthParticipantsChanged = function(e) {
+        t.callback_OnAuthParticipantsChanged(e);
       };
-      this._CoAuthoringApi.onParticipantsChanged = function(e, count) {
-        t.callback_OnParticipantsChanged(e, count);
+      this._CoAuthoringApi.onParticipantsChanged = function(e) {
+        t.callback_OnParticipantsChanged(e);
       };
       this._CoAuthoringApi.onMessage = function(e, clear) {
         t.callback_OnMessage(e, clear);
@@ -376,15 +376,15 @@
 		return false;
 	};
 
-  CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, count) {
+  CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e) {
     if (this.onAuthParticipantsChanged) {
-      this.onAuthParticipantsChanged(e, count);
+      this.onAuthParticipantsChanged(e);
     }
   };
 
-  CDocsCoApi.prototype.callback_OnParticipantsChanged = function(e, count) {
+  CDocsCoApi.prototype.callback_OnParticipantsChanged = function(e) {
     if (this.onParticipantsChanged) {
-      this.onParticipantsChanged(e, count);
+      this.onParticipantsChanged(e);
     }
   };
 
@@ -868,7 +868,7 @@
   DocsCoApi.prototype.getUsers = function() {
     // Специально для возможности получения после прохождения авторизации (Стоит переделать)
     if (this.onAuthParticipantsChanged) {
-      this.onAuthParticipantsChanged(this._participants, this._countUsers);
+      this.onAuthParticipantsChanged(this._participants);
     }
   };
 
@@ -1337,7 +1337,7 @@
       this._onParticipantsChanged(participants);
 
       if (this.onAuthParticipantsChanged) {
-        this.onAuthParticipantsChanged(this._participants, this._countUsers);
+        this.onAuthParticipantsChanged(this._participants);
       }
 
       // Посылаем эвент о совместном редактировании
@@ -1371,7 +1371,7 @@
           this._onEndCoAuthoring(/*isStartEvent*/false);
         }
 
-        this.onParticipantsChanged(this._participants, this._countUsers);
+        this.onParticipantsChanged(this._participants);
         for (var i = 0; i < usersStateChanged.length; ++i) {
           this.onConnectionStateChanged(usersStateChanged[i]);
         }
