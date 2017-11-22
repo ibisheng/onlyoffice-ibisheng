@@ -393,19 +393,19 @@ CComplexField.prototype.private_UpdateTOC = function()
 			var oPageRefRun = new ParaRun(oPara, false);
 
 			var nTempIndex = -1;
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
 			var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
 			for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
 			{
 				oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
 			var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
 			for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
 			{
 				oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this.LogicDocument));
 			oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
 		}
 
@@ -427,6 +427,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 	};
 	oParagraph.Check_NearestPos(oNearPos);
 
+	oSelectedContent.ForceSplit = true;
 	oParagraph.Parent.Insert_Content(oSelectedContent, oNearPos);
 };
 CComplexField.prototype.private_UpdatePAGEREF = function()

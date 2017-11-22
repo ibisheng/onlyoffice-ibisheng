@@ -9454,6 +9454,74 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 8, 'FINDB("M",A101,3)');
 	} );
 
+	test( "Test: \">\"", function () {
+		oParser = new parserFormula( '1.123>1.5', "A2", ws );
+		ok( oParser.parse(), '1.123>1.5' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.123>1.5');
+
+		oParser = new parserFormula( '1.555>1.5', "A2", ws );
+		ok( oParser.parse(), '1.555>1.5' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.555>1.5');
+	} );
+
+	test( "Test: \"<\"", function () {
+		oParser = new parserFormula( '1.123<1.5', "A2", ws );
+		ok( oParser.parse(), '1.123<1.5' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.123<1.5');
+
+		oParser = new parserFormula( '1.555<1.5', "A2", ws );
+		ok( oParser.parse(), '1.555<1.5' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.555<1.5');
+	} );
+
+	test( "Test: \"=\"", function () {
+		oParser = new parserFormula( '1.123=1.5', "A2", ws );
+		ok( oParser.parse(), '1.123=1.5' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.123=1.5');
+
+		oParser = new parserFormula( '1.555=1.555', "A2", ws );
+		ok( oParser.parse(), '1.555=1.555' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.555=1.555');
+	} );
+
+	test( "Test: \"<>\"", function () {
+		oParser = new parserFormula( '1.123<>1.5', "A2", ws );
+		ok( oParser.parse(), '1.123<>1.5' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.123<>1.5');
+
+		oParser = new parserFormula( '1.555<>1.555', "A2", ws );
+		ok( oParser.parse(), '1.555<>1.555' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.555<>1.555');
+	} );
+
+	test( "Test: \">=\"", function () {
+		oParser = new parserFormula( '1.123>=1.5', "A2", ws );
+		ok( oParser.parse(), '1.123>=1.5' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.123>=1.5');
+
+		oParser = new parserFormula( '1.555>=1.555', "A2", ws );
+		ok( oParser.parse(), '1.555>=1.555' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.555>=1.555');
+
+		oParser = new parserFormula( '1.557>=1.555', "A2", ws );
+		ok( oParser.parse(), '1.557>=1.555' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.557>=1.555');
+	} );
+
+	test( "Test: \"<=\"", function () {
+		oParser = new parserFormula( '1.123<=1.5', "A2", ws );
+		ok( oParser.parse(), '1.123<=1.5' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.123<=1.5');
+
+		oParser = new parserFormula( '1.555<=1.555', "A2", ws );
+		ok( oParser.parse(), '1.555<=1.555' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", '1.555<=1.555');
+
+		oParser = new parserFormula( '1.557<=1.555', "A2", ws );
+		ok( oParser.parse(), '1.557<=1.555' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", '1.557<=1.555');
+	} );
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );

@@ -6363,6 +6363,12 @@ function BinaryFileReader(doc, openParams)
 			if(null != oNewId)
 				stDefault.TOC[i] = oNewId.id;
 		}
+		//TOCHeading
+		var sTOCHeading = stDefault.TOCHeading;
+		var oNewId = oIdRenameMap[sTOCHeading];
+		if(null != oNewId)
+			stDefault.TOCHeading = oNewId.id;
+
 		//меняем старые id
 		for(var sOldId in oIdRenameMap)
 		{
@@ -9493,7 +9499,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
 		if (c_oSer_FldSimpleType.CharType === type) {
-			oPos.run.Add_ToContent(oPos.pos, new ParaFieldChar(this.stream.GetUChar()), false);
+			oPos.run.Add_ToContent(oPos.pos, new ParaFieldChar(this.stream.GetUChar(), this.oReadResult.logicDocument), false);
 			oPos.pos++;
 		} else
 			res = c_oSerConstants.ReadUnknown;

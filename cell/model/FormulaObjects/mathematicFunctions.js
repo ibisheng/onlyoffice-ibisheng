@@ -129,7 +129,7 @@
 				} else {
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
-			})
+			});
 		} else {
 			return new cNumber(Math.abs(arg0.getValue()));
 		}
@@ -428,6 +428,10 @@
 
 		var res;
 		if (f) {
+			var oldExcludeHiddenRows = f.excludeHiddenRows;
+			var oldExcludeErrorsVal = f.excludeErrorsVal;
+			var oldIgnoreNestedStAg = f.excludeNestedStAg;
+
 			f.excludeHiddenRows = ignoreHiddenRows;
 			f.excludeErrorsVal = ignoreErrorsVal;
 			f.excludeNestedStAg = ignoreNestedStAg;
@@ -442,6 +446,10 @@
 			}
 
 			res = f.Calculate(newArgs);
+
+			f.excludeHiddenRows = oldExcludeHiddenRows;
+			f.excludeErrorsVal = oldExcludeErrorsVal;
+			f.excludeNestedStAg = oldIgnoreNestedStAg;
 		}
 
 		return res;
