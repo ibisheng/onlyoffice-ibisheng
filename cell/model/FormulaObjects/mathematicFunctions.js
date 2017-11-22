@@ -129,7 +129,7 @@
 				} else {
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
-			})
+			});
 		} else {
 			return new cNumber(Math.abs(arg0.getValue()));
 		}
