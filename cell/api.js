@@ -3842,6 +3842,7 @@ var editor;
   prot["asc_RemoveSignature"] 		= prot.asc_RemoveSignature;
   prot["asc_RemoveAllSignatures"] 	= prot.asc_RemoveAllSignatures;
   prot["asc_gotoSignature"] 	    = prot.asc_gotoSignature;
+  prot["asc_getSignatureSetup"] 	= prot.asc_getSignatureSetup;
 
   // password
   prot["asc_setCurrentPassword"]    = prot.asc_setCurrentPassword;

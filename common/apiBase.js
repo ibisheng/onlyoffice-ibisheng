@@ -1517,7 +1517,7 @@
 			{
 				var _add_sig = new AscCommon.asc_CSignatureLine();
 				_add_sig.guid = _sig.id;
-				_add_sig.signer1 = _sig.signer1;
+				_add_sig.signer1 = _sig.signer;
 				_add_sig.signer2 = _sig.signer2;
 				_add_sig.email = _sig.email;
 
@@ -1592,6 +1592,26 @@
 		}
 	};
 
+	baseEditorsApi.prototype.asc_getSignatureSetup = function(guid)
+	{
+		var _sigs = this.asc_getAllSignatures();
+
+		for (var i = _sigs.length - 1; i >= 0; i--)
+		{
+			var _sig = _sigs[i];
+			if (_sig.id == guid)
+			{
+				var _add_sig = new AscCommon.asc_CSignatureLine();
+				_add_sig.guid = _sig.id;
+				_add_sig.signer1 = _sig.signer;
+				_add_sig.signer2 = _sig.signer2;
+				_add_sig.email = _sig.email;
+				return _add_sig;
+			}
+		}
+
+		return null;
+	};
 
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
 
