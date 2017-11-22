@@ -3495,7 +3495,7 @@ _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) 
 		return AscCommon.compareNumbers(arg0.getValue(), arg1.getValue());
 	};
 	if ( what === ">" ) {
-		return new cBool( compareNumbers() < 0 );
+		return new cBool( compareNumbers() > 0 );
   } else if (what === ">=") {
 		return new cBool( !(compareNumbers() < 0) );
   } else if (what === "<") {
