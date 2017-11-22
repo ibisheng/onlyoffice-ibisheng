@@ -304,7 +304,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 	}
 
 	if (0 == error)
-		window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
+		window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != window["Asc"]["editor"].currentPassword) ? true : false);
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;
