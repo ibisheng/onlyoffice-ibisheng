@@ -4044,7 +4044,7 @@ PasteProcessor.prototype =
 				}
 			}
 
-			presentationSelectedContent.Layouts = array;
+			presentationSelectedContent.Masters = array;
 		};
 
 		var readNotes = function(){
