@@ -2460,6 +2460,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.argumentsMax = 255;
 	cBaseFunction.prototype.numFormat = cNumFormatFirstCell;
 	cBaseFunction.prototype.ca = false;
+	cBaseFunction.prototype.excludeHiddenRows = false;
+	cBaseFunction.prototype.excludeErrorsVal = false;
+	cBaseFunction.prototype.excludeNestedStAg = false;
 	cBaseFunction.prototype.Calculate = function () {
 		return new cError(cErrorType.wrong_name);
 	};

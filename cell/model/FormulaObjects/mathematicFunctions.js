@@ -428,6 +428,10 @@
 
 		var res;
 		if (f) {
+			var oldExcludeHiddenRows = f.excludeHiddenRows;
+			var oldExcludeErrorsVal = f.excludeErrorsVal;
+			var oldIgnoreNestedStAg = f.excludeNestedStAg;
+
 			f.excludeHiddenRows = ignoreHiddenRows;
 			f.excludeErrorsVal = ignoreErrorsVal;
 			f.excludeNestedStAg = ignoreNestedStAg;
@@ -442,6 +446,10 @@
 			}
 
 			res = f.Calculate(newArgs);
+
+			f.excludeHiddenRows = oldExcludeHiddenRows;
+			f.excludeErrorsVal = oldExcludeErrorsVal;
+			f.excludeNestedStAg = oldIgnoreNestedStAg;
 		}
 
 		return res;
