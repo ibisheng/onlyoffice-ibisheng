@@ -2232,7 +2232,7 @@ CPresentation.prototype =
         if(oController.selectedObjects.length > 0){
             return oController.getBoundsForGroup([oController.selectedObjects[0]]);
         }
-        return null;
+        return new AscFormat.CGraphicBounds(0, 0, 0, 0);
     },
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)

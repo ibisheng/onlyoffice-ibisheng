@@ -3823,6 +3823,7 @@ PasteProcessor.prototype =
 			}
 
 			var pasteObj = selectedContent2[0];
+            var nIndex = 0;
 			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
 				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 				switch (props) {
@@ -3831,10 +3832,12 @@ PasteProcessor.prototype =
 					}
 					case Asc.c_oSpecialPasteProps.sourceformatting: {
 						pasteObj = selectedContent2[1];
+                        nIndex = 1;
 						break;
 					}
 					case Asc.c_oSpecialPasteProps.picture: {
 						pasteObj = selectedContent2[2];
+                        nIndex = 2;
 						break;
 					}
 					case Asc.c_oSpecialPasteProps.keepTextOnly: {
@@ -3849,9 +3852,10 @@ PasteProcessor.prototype =
 			var fonts = pasteObj.fonts;
 			var presentationSelectedContent = pasteObj.content;
 
+			var aContents = [selectedContent2[0].content, selectedContent2[1].content, selectedContent2[2].content];
 			var paste_callback = function(){
 				if (false === oThis.bNested) {
-					presentation.Insert_Content(presentationSelectedContent);
+					presentation.Insert_Content2(aContents, nIndex);
 
 					presentation.Recalculate();
 					presentation.Document_UpdateInterfaceState();
