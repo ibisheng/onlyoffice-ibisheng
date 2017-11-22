@@ -3491,18 +3491,21 @@ _func[cElementType.cell] = [];
 
 
 _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) {
-    if ( what === ">" ) {
-        return new cBool( arg0.getValue() > arg1.getValue() );
+	var compareNumbers = function(){
+		return AscCommon.compareNumbers(arg0.getValue(), arg1.getValue());
+	};
+	if ( what === ">" ) {
+		return new cBool( compareNumbers() < 0 );
   } else if (what === ">=") {
-        return new cBool( arg0.getValue() >= arg1.getValue() );
+		return new cBool( !(compareNumbers() < 0) );
   } else if (what === "<") {
-        return new cBool( arg0.getValue() < arg1.getValue() );
+		return new cBool( compareNumbers() < 0 );
   } else if (what === "<=") {
-        return new cBool( arg0.getValue() <= arg1.getValue() );
+		return new cBool( !(compareNumbers() > 0) );
   } else if (what === "=") {
-        return new cBool( arg0.getValue() === arg1.getValue() );
+		return new cBool( compareNumbers() === 0 );
   } else if (what === "<>") {
-        return new cBool( arg0.getValue() !== arg1.getValue() );
+		return new cBool( compareNumbers() !== 0 );
   } else if (what === "-") {
         return new cNumber( arg0.getValue() - arg1.getValue() );
   } else if (what === "+") {
