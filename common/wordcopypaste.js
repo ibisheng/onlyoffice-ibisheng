@@ -3860,12 +3860,15 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Document_UpdateInterfaceState();
 
-					var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-					if(presentationSelectedContent){
-						props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
-					}
+					//пока не показываю значок специальной вставки после copy/paste слайдов
+					if(!(aContents[nIndex].SlideObjects && aContents[nIndex].SlideObjects.length)){
+						var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
+						if(presentationSelectedContent){
+							props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
+						}
 
-					oThis._setSpecialPasteShowOptionsPresentation(props);
+						oThis._setSpecialPasteShowOptionsPresentation(props);
+					}
 
 					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
