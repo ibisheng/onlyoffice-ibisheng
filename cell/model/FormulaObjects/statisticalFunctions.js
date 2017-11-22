@@ -2701,7 +2701,7 @@ function (window, undefined) {
 
 			if (nColMatX !== nColMatY || nRowMatX !== nRowMatY && !checkNumericMatrix(rMatX) ||
 				!checkNumericMatrix(rMatY)) {
-				return new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.not_available);
 			}
 
 			this.bEDS = ( rSmplInPrd === 0 );
