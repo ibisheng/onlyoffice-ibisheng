@@ -74,7 +74,7 @@ var numFormat_Percent = 102;
 var numFormat_General = 103;
 
 var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4, SlashFrac: 5};
-var SignType = {Positive: 1, Negative: 2, Null:3};
+var SignType = {Negative: 1, Null:2, Positive: 3};
 
 var gc_nMaxDigCount = 15;//Максимальное число знаков точности
 var gc_nMaxDigCountView = 11;//Максимальное число знаков в ячейке
@@ -121,6 +121,24 @@ function getNumberParts(x)
 	}
     return {mantissa: man, exponent: exp, sign: sig};//для 0,123 exponent == - gc_nMaxDigCount
 }
+
+	function compareNumbers(val1, val2) {
+		var res = 0;
+		var parts1 = getNumberParts(val1);
+		var parts2 = getNumberParts(val2);
+		if (parts1.sign === parts2.sign) {
+			if (parts1.exponent === parts2.exponent) {
+				if (parts1.mantissa !== parts2.mantissa) {
+					res = parts1.mantissa - parts2.mantissa;
+				}
+			} else {
+				res = parts1.exponent - parts2.exponent;
+			}
+		} else {
+			res = parts1.sign - parts2.sign;
+		}
+		return res;
+	}
 
     function isNumber(n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
@@ -4375,6 +4393,7 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
 	window['AscCommon'].getCurrencyFormat = getCurrencyFormat;
 	window['AscCommon'].getFormatCells = getFormatCells;
 	window['AscCommon'].getFormatByStandardId = getFormatByStandardId;
+	window['AscCommon'].compareNumbers = compareNumbers;
 
     window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
     window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;
