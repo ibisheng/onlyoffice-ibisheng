@@ -4519,7 +4519,10 @@ PasteProcessor.prototype =
 		for (var Index = 0; Index < Count; Index++) {
 			var _char = text.charAt(Index);
 			var _charCode = text.charCodeAt(Index);
-			if(_charCode === 0x0A ||  Index === Count - 1){
+			if(0x0A === _charCode ||  Index === Count - 1){
+				if(Index === Count - 1){
+					insertText += _char;
+				}
 				var newParaRun = new ParaRun();
 				addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
@@ -4527,7 +4530,9 @@ PasteProcessor.prototype =
 
 				insertText = "";
 				newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
-			} else{
+			} else if(13 === _charCode){
+				continue;
+			} else {
 				insertText += _char;
 			}
 		}
