@@ -7269,7 +7269,8 @@ DrawingObjectsController.prototype =
                         title: drawing.getTitle(),
                         description: drawing.getDescription(),
                         columnNumber: drawing.getColumnNumber(),
-                        columnSpace: drawing.getColumnSpace()
+                        columnSpace: drawing.getColumnSpace(),
+                        signatureId: drawing.getSignatureLineGuid()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -7445,7 +7446,8 @@ DrawingObjectsController.prototype =
                         textArtProperties: null,
                         lockAspect: lockAspect,
                         title: drawing.getTitle(),
-                        description: drawing.getDescription()
+                        description: drawing.getDescription(),
+                        signatureId: drawing.getSignatureLineGuid()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;

@@ -1995,6 +1995,7 @@
 
         this.columnNumber = null;
         this.columnSpace = null;
+        this.signatureId = null;
 	}
 
 	asc_CShapeProperty.prototype = {
@@ -2081,6 +2082,14 @@
 
 		asc_putColumnSpace: function(v){
 			this.columnSpace = v;
+		},
+
+		asc_getSignatureId: function(){
+			return this.signatureId;
+		},
+
+		asc_putSignatureId: function(v){
+			this.signatureId = v;
 		}
 	};
 
@@ -4021,6 +4030,8 @@
 	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
 	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
+	prot["get_SignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
+	prot["put_SignatureId"] = prot["asc_putSignatureId"] = prot.asc_putSignatureId;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
