@@ -11914,7 +11914,11 @@
 			var addFilterCallBack;
 			if (bIsChangeFilterToTable)//CHANGE FILTER TO TABLEPART
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -11930,7 +11934,11 @@
 				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
 			} else//ADD
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -11955,7 +11963,7 @@
 				};
 
 				if (styleName === null) {
-					addFilterCallBack();
+					addFilterCallBack(true);
 				} else {
 					t._isLockedCells(filterRange, null, addFilterCallBack)
 				}
