@@ -154,6 +154,7 @@
 
 		this.date = "";
 		this.isvisible = false;
+		this.isrequested = false;
 	}
 	asc_CSignatureLine.prototype.correct = function()
 	{
@@ -200,6 +201,8 @@
 	asc_CSignatureLine.prototype.asc_setDate = function(v){ this.date = v; };
 	asc_CSignatureLine.prototype.asc_getVisible = function(){ return this.isvisible; };
 	asc_CSignatureLine.prototype.asc_setVisible = function(v){ this.isvisible = v; };
+	asc_CSignatureLine.prototype.asc_getRequested = function(){ return this.isrequested; };
+	asc_CSignatureLine.prototype.asc_setRequested = function(v){ this.isrequested = v; };
 
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
@@ -3633,6 +3636,8 @@
 	prot["asc_setDate"] = prot.asc_setDate;
 	prot["asc_getVisible"] = prot.asc_getVisible;
 	prot["asc_setVisible"] = prot.asc_setVisible;
+	prot["asc_getRequested"] = prot.asc_getRequested;
+	prot["asc_setRequested"] = prot.asc_setRequested;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;

@@ -1606,6 +1606,19 @@
 				_add_sig.signer1 = _sig.signer;
 				_add_sig.signer2 = _sig.signer2;
 				_add_sig.email = _sig.email;
+
+				_add_sig.isrequested = true;
+				for (var j = 0; j < this.signatures.length; j++)
+				{
+					var signDoc = this.signatures[j];
+					if (signDoc.guid == _add_sig.guid)
+					{
+						_add_sig.valid = signDoc.valid;
+						_add_sig.isrequested = false;
+						break;
+					}
+				}
+
 				return _add_sig;
 			}
 		}
