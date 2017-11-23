@@ -429,14 +429,7 @@
 						}
 						else
 						{
-							if(text_data)
-							{
-								t.pasteProcessor.pasteTextOnSheet(ws, text_data);
-							}
-							else
-							{
-								t.pasteProcessor.editorPasteExec(ws, data1);
-							}
+							t.pasteProcessor.editorPasteExec(ws, data1);
 						}
 
 						break;

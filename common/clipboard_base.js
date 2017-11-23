@@ -213,10 +213,11 @@
 				if (!_clipboard || !_clipboard.getData)
 					return false;
 
+				var _text_format = this.ClosureParams.getData("text/plain");
 				var _internal = this.ClosureParams.getData("text/x-custom");
 				if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
 				{
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length));
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length), null, null, _text_format);
 					g_clipboardBase.Paste_End();
 					return false;
 				}
@@ -228,71 +229,14 @@
 					if (-1 != nIndex)
 						_html_format = _html_format.substring(0, nIndex + "</html>".length);
 
-					this.CommonIframe_PasteStart(_html_format);
+					this.CommonIframe_PasteStart(_html_format, _text_format);
 					return false;
 				}
 
-				var _text_format = this.ClosureParams.getData("text/plain");
 				if (_text_format && _text_format != "")
 				{
-					var sHtml     = "<html><body>";
-					var sCurPar   = "";
-					var nParCount = 0;
-					for (var i = 0, length = _text_format.length; i < length; i++)
-					{
-						var Char = _text_format.charAt(i);
-						var Code = _text_format.charCodeAt(i);
-						var Item = null;
-
-						if ('\n' === Char)
-						{
-							if ("" == sCurPar)
-								sHtml += "<p><span>&nbsp;</span></p>";
-							else
-							{
-								sHtml += "<p><span>" + sCurPar + "</span></p>";
-								sCurPar = "";
-							}
-							nParCount++;
-						}
-						else if (13 === Code)
-						{
-							continue;
-						}
-						else
-						{
-							if (32 == Code || 160 == Code) //160 - nbsp
-								sCurPar += " ";
-							else if (9 === Code)
-								sCurPar += "<span style='mso-tab-count:1'>    </span>";
-							else
-							{
-								if (Char == '&')
-									sCurPar += "&amp;";
-								else if (Char == '<')
-									sCurPar += "&lt;";
-								else if (Char == '>')
-									sCurPar += "&gt;";
-								else if (Char == '\'')
-									sCurPar += "&apos;";
-								else if (Char == '\"')
-									sCurPar += "&quot;";
-								else
-									sCurPar += Char;
-							}
-						}
-					}
-					if ("" != sCurPar)
-					{
-						if (0 == nParCount)
-							sHtml += ("<span>" + sCurPar + "</span>");
-						else
-							sHtml += ("<p><span>" + sCurPar + "</span></p>");
-						sCurPar = "";
-					}
-					sHtml += "</body></html>";
-
-					this.CommonIframe_PasteStart(sHtml, _text_format);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, _text_format);
+					g_clipboardBase.Paste_End();
 					return false;
 				}
 
