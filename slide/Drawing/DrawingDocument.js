@@ -4103,6 +4103,9 @@ function CThumbnailsManager()
 		if (false === this.m_bIsScrollVisible || !oThis.m_oWordControl.m_oScrollThumbApi)
 			return;
 
+		if (global_keyboardEvent.CtrlKey)
+			return;
+
 		if (undefined !== window["AscDesktopEditor"])
 		{
 			if (false === window["AscDesktopEditor"]["CheckNeedWheel"]())
