@@ -131,131 +131,105 @@ function MasterSlide(presentation, theme)
 }
 
 MasterSlide.prototype =
-{
-    addLayout: function(layout)
     {
-        this.addToSldLayoutLstToPos(this.sldLayoutLst.length, layout);
-    },
+        addLayout: function (layout) {
+            this.addToSldLayoutLstToPos(this.sldLayoutLst.length, layout);
+        },
 
-    getObjectType: function()
-    {
-        return AscDFH.historyitem_type_SlideMaster;
-    },
+        getObjectType: function () {
+            return AscDFH.historyitem_type_SlideMaster;
+        },
 
-    setThemeIndex: function(index)
-    {
-        History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_SlideMasterSetThemeIndex, this.ThemeIndex, index));
-        this.ThemeIndex = index;
-    },
+        setThemeIndex: function (index) {
+            History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_SlideMasterSetThemeIndex, this.ThemeIndex, index));
+            this.ThemeIndex = index;
+        },
 
-    Write_ToBinary2: function(w)
-    {
-        w.WriteLong(AscDFH.historyitem_type_SlideMaster);
-        w.WriteString2(this.Id);
-        AscFormat.writeObject(w, this.theme);
-    },
+        Write_ToBinary2: function (w) {
+            w.WriteLong(AscDFH.historyitem_type_SlideMaster);
+            w.WriteString2(this.Id);
+            AscFormat.writeObject(w, this.theme);
+        },
 
-    Read_FromBinary2: function(r)
-    {
-        this.Id = r.GetString2();
-        this.theme = AscFormat.readObject(r);
-    },
+        Read_FromBinary2: function (r) {
+            this.Id = r.GetString2();
+            this.theme = AscFormat.readObject(r);
+        },
 
-    draw: function(graphics)
-    {
-        for(var i=0; i < this.cSld.spTree.length; ++i)
-        {
-            if(this.cSld.spTree[i].isPlaceholder && !this.cSld.spTree[i].isPlaceholder())
-                this.cSld.spTree[i].draw(graphics);
-        }
-    },
+        draw: function (graphics) {
+            for (var i = 0; i < this.cSld.spTree.length; ++i) {
+                if (this.cSld.spTree[i].isPlaceholder && !this.cSld.spTree[i].isPlaceholder())
+                    this.cSld.spTree[i].draw(graphics);
+            }
+        },
 
-    getMatchingLayout: function(type, matchingName, cSldName, themeFlag)
-    {
-        var layoutType = type;
+        getMatchingLayout: function (type, matchingName, cSldName, themeFlag) {
+            var layoutType = type;
 
-        var _layoutName = null, _layout_index, _layout;
+            var _layoutName = null, _layout_index, _layout;
 
-        if(type === AscFormat.nSldLtTTitle && !(themeFlag === true))
-        {
-            layoutType = AscFormat.nSldLtTObj;
-        }
-        if(layoutType != null)
-        {
-            for(var i = 0; i < this.sldLayoutLst.length; ++i)
-            {
-                if(this.sldLayoutLst[i].type == layoutType)
-                {
-                    return this.sldLayoutLst[i];
+            if (type === AscFormat.nSldLtTTitle && !(themeFlag === true)) {
+                layoutType = AscFormat.nSldLtTObj;
+            }
+            if (layoutType != null) {
+                for (var i = 0; i < this.sldLayoutLst.length; ++i) {
+                    if (this.sldLayoutLst[i].type == layoutType) {
+                        return this.sldLayoutLst[i];
+                    }
                 }
             }
-        }
 
-        if(type === AscFormat.nSldLtTTitle && !(themeFlag === true))
-        {
-            layoutType = AscFormat.nSldLtTTx;
-            for(i = 0; i < this.sldLayoutLst.length; ++i)
-            {
-                if(this.sldLayoutLst[i].type == layoutType)
-                {
-                    return this.sldLayoutLst[i];
+            if (type === AscFormat.nSldLtTTitle && !(themeFlag === true)) {
+                layoutType = AscFormat.nSldLtTTx;
+                for (i = 0; i < this.sldLayoutLst.length; ++i) {
+                    if (this.sldLayoutLst[i].type == layoutType) {
+                        return this.sldLayoutLst[i];
+                    }
                 }
             }
-        }
 
 
-        if(matchingName != "" && matchingName != null)
-        {
-            _layoutName = matchingName;
-        }
-        else
-        {
-            if(cSldName != "" && cSldName != null)
-            {
-                _layoutName = cSldName;
+            if (matchingName != "" && matchingName != null) {
+                _layoutName = matchingName;
             }
-        }
-        if(_layoutName != null)
-        {
-            var _layout_name;
-            for(_layout_index = 0; _layout_index < this.sldLayoutLst.length; ++_layout_index)
-            {
+            else {
+                if (cSldName != "" && cSldName != null) {
+                    _layoutName = cSldName;
+                }
+            }
+            if (_layoutName != null) {
+                var _layout_name;
+                for (_layout_index = 0; _layout_index < this.sldLayoutLst.length; ++_layout_index) {
+                    _layout = this.sldLayoutLst[_layout_index];
+                    _layout_name = null;
+
+                    if (_layout.matchingName != null && _layout.matchingName != "") {
+                        _layout_name = _layout.matchingName;
+                    }
+                    else {
+                        if (_layout.cSld.name != null && _layout.cSld.name != "") {
+                            _layout_name = _layout.cSld.name;
+                        }
+                    }
+                    if (_layout_name == _layoutName) {
+                        return _layout;
+                    }
+                }
+            }
+            for (_layout_index = 0; _layout_index < this.sldLayoutLst.length; ++_layout_index) {
                 _layout = this.sldLayoutLst[_layout_index];
                 _layout_name = null;
 
-                if(_layout.matchingName != null && _layout.matchingName != "")
-                {
-                    _layout_name = _layout.matchingName;
-                }
-                else
-                {
-                    if(_layout.cSld.name != null && _layout.cSld.name != "")
-                    {
-                        _layout_name = _layout.cSld.name;
-                    }
-                }
-                if(_layout_name == _layoutName)
-                {
+                if (_layout.type != AscFormat.nSldLtTTitle) {
                     return _layout;
                 }
-            }
-        }
-        for(_layout_index = 0; _layout_index < this.sldLayoutLst.length; ++_layout_index)
-        {
-            _layout = this.sldLayoutLst[_layout_index];
-            _layout_name = null;
 
-            if(_layout.type != AscFormat.nSldLtTTitle)
-            {
-                return _layout;
             }
 
-        }
+            return this.sldLayoutLst[0];
+        },
 
-        return this.sldLayoutLst[0];
-    },
-
-    getMatchingShape:  Slide.prototype.getMatchingShape,/*function(type, idx, bSingleBody)
+        getMatchingShape: Slide.prototype.getMatchingShape, /*function(type, idx, bSingleBody)
     {
         var _input_reduced_type;
         if(type == null)
@@ -389,153 +363,186 @@ MasterSlide.prototype =
         return null;
     },        */
 
-    recalculate: function()
-    {
+        recalculate: function () {
             var _shapes = this.cSld.spTree;
             var _shape_index;
             var _shape_count = _shapes.length;
             var bRecalculateBounds = this.recalcInfo.recalculateBounds;
-            if(bRecalculateBounds){
+            if (bRecalculateBounds) {
                 this.bounds.reset(this.Width + 100.0, this.Height + 100.0, -100.0, -100.0);
             }
             var bChecked = false;
-            for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
-            {
-                if(!_shapes[_shape_index].isPlaceholder()){
+            for (_shape_index = 0; _shape_index < _shape_count; ++_shape_index) {
+                if (!_shapes[_shape_index].isPlaceholder()) {
                     _shapes[_shape_index].recalculate();
-                    if(bRecalculateBounds){
+                    if (bRecalculateBounds) {
                         this.bounds.checkByOther(_shapes[_shape_index].bounds);
                     }
                     bChecked = true;
                 }
             }
-            if(bRecalculateBounds){
-                if(bChecked){
+            if (bRecalculateBounds) {
+                if (bChecked) {
                     this.bounds.checkWH();
                 }
-                else{
+                else {
                     this.bounds.reset(0.0, 0.0, 0.0, 0.0);
                 }
                 this.recalcInfo.recalculateBounds = false;
             }
 
 
-    },
+        },
 
-    checkSlideSize:  Slide.prototype.checkSlideSize,
-    checkDrawingUniNvPr:  Slide.prototype.checkDrawingUniNvPr,
-    checkSlideColorScheme: function()
-    {
-        this.recalcInfo.recalculateSpTree = true;
-        this.recalcInfo.recalculateBackground = true;
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            if(!this.cSld.spTree[i].isPlaceholder())
+        checkSlideSize: Slide.prototype.checkSlideSize,
+        checkDrawingUniNvPr: Slide.prototype.checkDrawingUniNvPr,
+        checkSlideColorScheme: function () {
+            this.recalcInfo.recalculateSpTree = true;
+            this.recalcInfo.recalculateBackground = true;
+            for (var i = 0; i < this.cSld.spTree.length; ++i) {
+                if (!this.cSld.spTree[i].isPlaceholder()) {
+                    this.cSld.spTree[i].handleUpdateFill();
+                    this.cSld.spTree[i].handleUpdateLn();
+                }
+            }
+        },
+
+        setSlideSize: function (w, h) {
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetSize, new AscFormat.CDrawingBaseCoordsWritable(this.Width, this.Height), new AscFormat.CDrawingBaseCoordsWritable(w, h)));
+            this.Width = w;
+            this.Height = h;
+        },
+
+        changeSize: Slide.prototype.changeSize,
+
+        setTheme: function (theme) {
+            History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetTheme, this.Theme, theme));
+            this.Theme = theme;
+        },
+
+        shapeAdd: function (pos, item) {
+            this.checkDrawingUniNvPr(item);
+            History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddToSpTree, pos, [item], true));
+            this.cSld.spTree.splice(pos, 0, item);
+        },
+
+        changeBackground: function (bg) {
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetBg, this.cSld.Bg, bg));
+            this.cSld.Bg = bg;
+        },
+
+        setTxStyles: function (txStyles) {
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetTxStyles, this.txStyles, txStyles));
+            this.txStyles = txStyles;
+        },
+
+        setCSldName: function (name) {
+            History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_SlideMasterSetCSldName, this.cSld.name, name));
+            this.cSld.name = name;
+        },
+        setClMapOverride: function (clrMap) {
+            History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetClrMapOverride, this.clrMap, clrMap));
+            this.clrMap = clrMap;
+        },
+
+        addToSldLayoutLstToPos: function (pos, obj) {
+            History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddLayout, pos, [obj], true));
+            this.sldLayoutLst.splice(pos, 0, obj);
+        },
+
+        getAllImages: function (images) {
+            if (this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string") {
+                images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
+            }
+            for (var i = 0; i < this.cSld.spTree.length; ++i) {
+                if (typeof this.cSld.spTree[i].getAllImages === "function") {
+                    this.cSld.spTree[i].getAllImages(images);
+                }
+            }
+        },
+
+        Get_Id: function () {
+            return this.Id;
+        },
+
+
+        Refresh_RecalcData: function () {
+        },
+
+
+        getAllFonts: function (fonts) {
+            var i;
+            if (this.Theme) {
+                this.Theme.Document_Get_AllFontNames(fonts);
+            }
+
+            if (this.txStyles) {
+                this.txStyles.Document_Get_AllFontNames(fonts);
+            }
+
+            for (i = 0; i < this.sldLayoutLst.length; ++i) {
+                this.sldLayoutLst[i].getAllFonts(fonts);
+            }
+
+            for (i = 0; i < this.cSld.spTree.length; ++i) {
+                if (typeof  this.cSld.spTree[i].getAllFonts === "function")
+                    this.cSld.spTree[i].getAllFonts(fonts);
+            }
+        },
+
+        createDuplicate: function (IdMap) {
+            var copy = new MasterSlide(null, null);
+            var oIdMap = IdMap || {};
+            var i;
+
+            if (this.clrMap) {
+                this.setClMapOverride(this.clrMap.createDuplicate());
+            }
+            if (typeof this.cSld.name === "string" && this.cSld.name.length > 0) {
+                copy.setCSldName(this.cSld.name);
+            }
+            if (this.cSld.Bg) {
+                copy.changeBackground(this.cSld.Bg.createFullCopy());
+            }
+            for (i = 0; i < this.cSld.spTree.length; ++i) {
+                var _copy;
+
+                if (this.cSld.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape) {
+                    _copy = this.cSld.spTree[i].copy(oIdMap);
+                }
+                else {
+                    _copy = this.cSld.spTree[i].copy();
+                }
+                if (AscCommon.isRealObject(oIdMap)) {
+                    oIdMap[this.cSld.spTree[i].Id] = _copy.Id;
+                }
+                copy.shapeAdd(copy.cSld.spTree.length, _copy);
+                copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
+            }
+            if (this.txStyles) {
+                copy.setTxStyles(this.txStyles.createDuplicate());
+            }
+            return copy;
+        },
+
+
+        Clear_ContentChanges: function () {
+        },
+
+        Add_ContentChanges: function (Changes) {
+        },
+
+        Refresh_ContentChanges: function () {
+        },
+
+        scale: function (kw, kh) {
+            for(var i = 0; i < this.cSld.spTree.length; ++i)
             {
-                this.cSld.spTree[i].handleUpdateFill();
-                this.cSld.spTree[i].handleUpdateLn();
+                this.cSld.spTree[i].changeSize(kw, kh);
             }
         }
-    },
+    };
 
-    setSlideSize: function(w, h)
-    {
-        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetSize, new AscFormat.CDrawingBaseCoordsWritable(this.Width, this.Height), new AscFormat.CDrawingBaseCoordsWritable(w, h)));
-        this.Width = w;
-        this.Height = h;
-    },
-
-    changeSize: Slide.prototype.changeSize,
-
-    setTheme: function(theme)
-    {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetTheme, this.Theme, theme));
-        this.Theme = theme;
-    },
-
-    shapeAdd: function(pos, item)
-    {
-        this.checkDrawingUniNvPr(item);
-        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddToSpTree, pos, [item], true));
-        this.cSld.spTree.splice(pos, 0, item);
-    },
-
-    changeBackground: function(bg)
-    {
-        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetBg, this.cSld.Bg , bg));
-        this.cSld.Bg = bg;
-    },
-
-    setTxStyles: function(txStyles)
-    {
-        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetTxStyles, this.txStyles, txStyles));
-        this.txStyles = txStyles;
-    },
-
-    setCSldName: function(name)
-    {
-        History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_SlideMasterSetCSldName, this.cSld.name, name));
-        this.cSld.name = name;
-    },
-    setClMapOverride: function(clrMap)
-    {
-        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetClrMapOverride, this.clrMap, clrMap));
-        this.clrMap = clrMap;
-    },
-
-    addToSldLayoutLstToPos: function(pos, obj)
-    {
-        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddLayout, pos, [obj], true));
-        this.sldLayoutLst.splice(pos, 0, obj);
-    },
-
-    getAllImages: function(images)
-    {
-        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
-        {
-            images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
-        }
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            if(typeof this.cSld.spTree[i].getAllImages === "function")
-            {
-                this.cSld.spTree[i].getAllImages(images);
-            }
-        }
-    },
-
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-
-    Refresh_RecalcData: function()
-    {},
-
-
-    getAllFonts: function(fonts)
-    {
-        var i;
-        if(this.Theme){
-            this.Theme.Document_Get_AllFontNames(fonts);
-        }
-
-        if(this.txStyles){
-            this.txStyles.Document_Get_AllFontNames(fonts);
-        }
-
-        for(i = 0; i < this.sldLayoutLst.length; ++i){
-            this.sldLayoutLst[i].getAllFonts(fonts);
-        }
-
-        for(i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
-                this.cSld.spTree[i].getAllFonts(fonts);
-        }
-    }
-};
 
 function CMasterThumbnailDrawer()
 {

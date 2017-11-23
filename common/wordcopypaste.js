@@ -1325,6 +1325,8 @@ CopyProcessor.prototype =
 			}
 		}
 		oThis.oPresentationWriter.WriteString2("SelectedContent");
+        oThis.oPresentationWriter.WriteULong((elementsContent.PresentationWidth * 100000) >> 0);
+        oThis.oPresentationWriter.WriteULong((elementsContent.PresentationHeight * 100000) >> 0);
 		oThis.oPresentationWriter.WriteULong(contentCount);
 
 		//DocContent
@@ -1781,7 +1783,7 @@ CopyProcessor.prototype =
 	
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
-        var sSrc = oGraphicObj.getBase64Img();
+        var sSrc = drawingCopyObject.ImageUrl;
         if(sSrc.length > 0)
         {
             if(oDomTarget)
@@ -4136,10 +4138,14 @@ PasteProcessor.prototype =
 
 		var first_content = stream.GetString2();
 		if(first_content === "SelectedContent"){
+		    var PresentationWidth = stream.GetULong()/100000.0;
+		    var PresentationHeight = stream.GetULong()/100000.0;
 			var countContent = stream.GetULong();
 			for(var i = 0; i < countContent; i++){
 				if(null === presentationSelectedContent){
 					presentationSelectedContent = typeof PresentationSelectedContent !== "undefined" ? new PresentationSelectedContent() : {};
+                    presentationSelectedContent.PresentationWidth = PresentationWidth;
+                    presentationSelectedContent.PresentationHeight = PresentationHeight;
 				}
 				var first_string = stream.GetString2();
 				switch (first_string) {

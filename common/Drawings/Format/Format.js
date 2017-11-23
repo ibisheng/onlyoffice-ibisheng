@@ -6117,7 +6117,7 @@ ClrMap.prototype =
         var _copy = new ClrMap();
         for(var _color_index = g_clr_MIN; _color_index <= this.color_map.length; ++_color_index)
         {
-            _copy.color_map[_color_index] = this.color_map[_color_index];
+            _copy.setClr(_color_index, this.color_map[_color_index]);
         }
         return _copy;
     },
@@ -6743,6 +6743,24 @@ HF.prototype =
         return AscDFH.historyitem_type_HF;
     },
 
+    createDuplicate: function()
+    {
+        var ret = new HF();
+        if(ret.dt !== this.dt){
+            ret.setDt(this.dt);
+        }
+        if(ret.ftr !== this.ftr){
+            ret.setFtr(this.ftr);
+        }
+        if(ret.hdr !== this.hdr){
+            ret.setHdr(this.hdr);
+        }
+        if(ret.sldNum !== this.sldNum){
+            ret.setSldNum(this.sldNum);
+        }
+        return ret;
+    },
+
     setDt: function(pr)
     {
         History.Add(new CChangesDrawingsBool(this, AscDFH.historyitem_HF_SetDt, this.dt,  pr));
@@ -6989,6 +7007,26 @@ CTextStyles.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    createDuplicate: function()
+    {
+        var ret = new CTextStyles();
+        if(isRealObject(this.titleStyle))
+        {
+            ret.titleStyle = this.titleStyle.createDuplicate();
+        }
+
+        if(isRealObject(this.bodyStyle))
+        {
+            ret.bodyStyle = this.bodyStyle.createDuplicate();
+        }
+
+        if(isRealObject(this.otherStyle))
+        {
+            ret.otherStyle = this.otherStyle.createDuplicate();
+        }
+        return ret;
     },
 
     Refresh_RecalcData: function()

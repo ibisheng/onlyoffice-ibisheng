@@ -154,6 +154,65 @@
         }
     };
 
+    CNotesMaster.prototype.createDuplicate = function(IdMap){
+        var oIdMap = IdMap || {};
+        var i;
+        var copy = new CNotesMaster();
+       // if(this.clrMap){
+       //     this.setClrMap(this.clrMap.createDuplicate());
+       // }
+        if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
+        {
+            copy.setCSldName(this.cSld.name);
+        }
+        if(this.cSld.Bg)
+        {
+            copy.changeBackground(this.cSld.Bg.createFullCopy());
+        }
+        for(i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            var _copy;
+
+            if(this.cSld.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.cSld.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.cSld.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.cSld.spTree[i].Id] = _copy.Id;
+            }
+            copy.addToSpTreeToPos(copy.cSld.spTree.length, _copy);
+            copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
+        }
+        if(this.hf)
+        {
+            copy.setHF(this.hf.createDuplicate());
+        }
+        if(this.txStyles)
+        {
+            copy.setNotesStyle(this.txStyles.createDuplicate());
+        }
+        return copy;
+    };
+
+
+    CNotesMaster.prototype.Clear_ContentChanges = function()
+    {
+    };
+
+    CNotesMaster.prototype.Add_ContentChanges = function(Changes)
+    {
+    };
+
+    CNotesMaster.prototype.Refresh_ContentChanges = function()
+    {
+    };
+    CNotesMaster.prototype.Refresh_RecalcData = function()
+    {
+    };
+
+
     function CreateNotesMaster(){
         var oNM = new CNotesMaster();
         var oBG = new AscFormat.CBg();

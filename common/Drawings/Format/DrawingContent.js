@@ -600,7 +600,7 @@
         var Count = this.Content.length;
         for (var Index = 0; Index < Count; Index++)
         {
-            DC.Internal_Content_Add(Index, this.Content[Index].Copy(DC, DrawingDocument), false);
+            DC.Internal_Content_Add(Index, this.Content[Index].Copy(DC, DrawingDocument, {}), false);
         }
 
         return DC;

@@ -3900,7 +3900,8 @@ CShape.prototype.getBase64Img = function ()
     {
         return this.cachedImage;
     }
-    if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY))
+    if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY)
+    || (AscFormat.fApproxEqual(this.extX, 0) && AscFormat.fApproxEqual(this.extY, 0)))
         return "";
     var img_object = AscCommon.ShapeToImageConverter(this, this.pageIndex);
     if(img_object)

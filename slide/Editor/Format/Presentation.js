@@ -53,6 +53,10 @@ function DrawingCopyObject(Drawing, X, Y, ExtX, ExtY, ImageUrl)
     this.ImageUrl = ImageUrl;
 }
 
+DrawingCopyObject.prototype.copy = function(){
+    return new DrawingCopyObject(this.Drawing ? this.Drawing.copy() : this.Drawing, this.X, this.Y, this.ExtX, this.ExtY, this.ImageUrl);
+};
+
 function PresentationSelectedContent()
 {
     this.SlideObjects = [];
@@ -68,7 +72,98 @@ function PresentationSelectedContent()
     this.Themes = [];
     this.Drawings = [];
     this.DocContent = null;
+    this.PresentationWidth = null;
+    this.PresentationHeight = null;
 }
+
+PresentationSelectedContent.prototype.copy = function()
+{
+    var ret = new PresentationSelectedContent(), i, oIdMap, oSlide, oNotes, oNotesMaster, oLayout, aElements, oSelectedElement, oElement, oParagraph;
+    for(i = 0; i < this.SlideObjects.length; ++i)
+    {
+        oIdMap = {};
+        oSlide = this.SlideObjects[i].createDuplicate(oIdMap);
+        AscFormat.fResetConnectorsIds(oSlide.cSld.spTree, oIdMap);
+        ret.SlideObjects.push(oSlide);
+    }
+    for(i = 0; i < this.Notes.length; ++i)
+    {
+        oIdMap = {};
+        oNotes = this.Notes[i].createDuplicate(oIdMap);
+        AscFormat.fResetConnectorsIds(oNotes.cSld.spTree, oIdMap);
+        ret.Notes.push(oNotes);
+    }
+    for(i = 0; i < this.NotesMasters.length; ++i)
+    {
+        oIdMap = {};
+        oNotesMaster = this.NotesMasters[i].createDuplicate(oIdMap);
+        AscFormat.fResetConnectorsIds(oNotesMaster.cSld.spTree, oIdMap);
+        ret.NotesMasters.push(oNotesMaster);
+    }
+    for(i = 0; i < this.NotesMastersIndexes.length; ++i)
+    {
+        ret.NotesMastersIndexes.push(this.NotesMastersIndexes[i]);
+    }
+    for(i = 0; i < this.NotesThemes.length; ++i)
+    {
+        ret.NotesThemes.push(this.NotesThemes[i].createDuplicate());
+    }
+    for(i = 0; i < this.LayoutsIndexes.length; ++i)
+    {
+        ret.LayoutsIndexes.push(this.LayoutsIndexes[i]);
+    }
+    for(i = 0; i < this.Layouts.length; ++i)
+    {
+        oIdMap = {};
+        oLayout = this.Layouts[i].createDuplicate(oIdMap);
+        AscFormat.fResetConnectorsIds(oLayout.cSld.spTree, oIdMap);
+        ret.Layouts.push(oLayout);
+    }
+    for(i = 0; i < this.MastersIndexes.length; ++i)
+    {
+        ret.MastersIndexes.push(this.MastersIndexes[i]);
+    }
+
+    for(i = 0; i < this.Masters.length; ++i)
+    {
+        oIdMap = {};
+        oNotesMaster = this.Masters[i].createDuplicate(oIdMap);
+        AscFormat.fResetConnectorsIds(oNotesMaster.cSld.spTree, oIdMap);
+        ret.Masters.push(oNotesMaster);
+    }
+
+    for(i = 0; i < this.ThemesIndexes.length; ++i)
+    {
+        ret.ThemesIndexes.push(this.ThemesIndexes[i]);
+    }
+    for(i = 0; i < this.Themes.length; ++i)
+    {
+        ret.Themes.push(this.Themes[i].createDuplicate());
+    }
+    for(i = 0; i < this.Drawings.length; ++i)
+    {
+        ret.Drawings.push(this.Drawings[i].copy());
+    }
+    if(this.DocContent)
+    {
+        //TODO: перенести копирование в CSelectedContent;
+        ret.DocContent = new CSelectedContent();
+        aElements = this.DocContent.Elements;
+        for (i = 0; i < aElements.length; ++i) {
+            oSelectedElement = new CSelectedElement();
+            oElement = aElements[i];
+            oParagraph = aElements[i].Element;
+            oSelectedElement.SelectedAll = oElement.SelectedAll;
+
+            oSelectedElement.Element = oParagraph.Copy(oParagraph.Parent, oParagraph.DrawingDocument, {});
+            ret.DocContent.Elements[i] = oSelectedElement;
+        }
+    }
+    ret.PresentationWidth = this.PresentationWidth;
+    ret.PresentationHeight = this.PresentationHeight;
+    return ret;
+};
+
 
 function CreatePresentationTableStyles(Styles, IdMap)
 {
@@ -4635,6 +4730,8 @@ CPresentation.prototype =
         {
             var oIdMap, curImgUrl;
             var ret = new PresentationSelectedContent(), i;
+            ret.PresentationWidth = this.Width;
+            ret.PresentationHeight = this.Height;
             if(this.Slides.length > 0)
             {
                 switch(editor.WordControl.Thumbnails.FocusObjType)
@@ -4724,6 +4821,13 @@ CPresentation.prototype =
             var oSourceFormattingContent = new PresentationSelectedContent();
             var oEndFormattingContent = new PresentationSelectedContent();
             var oImagesSelectedContent = new PresentationSelectedContent();
+
+            oSourceFormattingContent.PresentationWidth = this.Width;
+            oSourceFormattingContent.PresentationHeight = this.Height;
+            oEndFormattingContent.PresentationWidth = this.Width;
+            oEndFormattingContent.PresentationHeight = this.Height;
+            oImagesSelectedContent.PresentationWidth = this.Width;
+            oImagesSelectedContent.PresentationHeight = this.Height;
             var oSelectedContent, oDocContent, oController, oTargetTextObject, oGraphicFrame, oTable, oImage, dImageWidth, dImageHeight, bNeedSelectAll,
                 oDocContentForDraw, oParagraph, oNearPos, bOldVal, aParagraphs, dMaxWidth, oCanvas, oContext, oGraphics, dContentHeight, dContentIndents = 20, bOldShowParaMarks, oSelector;
             var i, j;
@@ -4969,67 +5073,102 @@ CPresentation.prototype =
     * */
     Insert_Content2: function(aContents, nIndex)
     {
-        var oContent = aContents[nIndex], oSlide, i, bEndFormatting = (nIndex === 0), oSourceContent;
+        var oContent, oSlide, i, bEndFormatting = (nIndex === 0), oSourceContent, kw, kh;
         var nLayoutIndex, nMasterIndex, nNotesMasterIndex;
-        var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster;
-        if(!oContent)
+        var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster, bChangeSize = false;
+        if(!aContents[nIndex])
         {
             return;
         }
-        if(oContent.SlideObjects.length > 0)
+        if(this.Slides[this.CurPage] && this.Slides[this.CurPage].Layout && this.Slides[this.CurPage].Layout.Master)
         {
             oCurrentMaster = this.Slides[this.CurPage] && this.Slides[this.CurPage].Layout && this.Slides[this.CurPage].Layout.Master;
-            if(!oCurrentMaster)
+        }
+        else
+        {
+            oCurrentMaster = this.slideMasters[0];
+        }
+        if(!oCurrentMaster)
+        {
+            return;
+        }
+        oContent = aContents[nIndex].copy();
+        if(oContent.SlideObjects.length > 0)
+        {
+            if(oContent.PresentationWidth !== null && oContent.PresentationHeight !== null)
             {
-                oCurrentMaster = this.slideMasters[0];
-            }
-            for(i = 0; i < oContent.SlideObjects.length; ++i)
-            {
-                oSlide = oContent.SlideObjects[i];
-                oSourceContent = aContents[1];
-                nLayoutIndex = oSourceContent.LayoutsIndexes[i];
-                oLayout = oSourceContent.Layouts[nLayoutIndex];
-                nMasterIndex = oContent.MastersIndexes[nLayoutIndex];
-                oMaster = oContent.Masters[nMasterIndex];
-                oTheme = oContent.Themes[nMasterIndex];
-                oNotes = oContent.Notes[i];
-                nNotesMasterIndex = oContent.NotesMastersIndexes[i];
-                oNotesMaster = oContent.NotesMastersIndexes[nNotesMasterIndex];
-                oNotesTheme = oContent.NotesThemes[nNotesMasterIndex];
-                if(bEndFormatting || !oLayout || !oMaster || !oTheme)
+                if(Math.abs(this.Width - oContent.PresentationWidth) > 1e-4 || Math.abs(this.Height - oContent.PresentationHeight) > 1e-4)
                 {
-                    if(!oSlide.Layout)
+                    bChangeSize = true;
+                    kw = this.Width/oContent.PresentationWidth;
+                    kh = this.Height/oContent.PresentationHeight;
+                }
+            }
+            if(bEndFormatting)
+            {
+                oSourceContent = aContents[1];
+
+                for(i = 0;  i < oContent.Masters.length; ++i)
+                {
+                    oContent.Masters[i].scale(kw, kh)
+                }
+                for(i = 0;  i < oContent.Layouts.length; ++i)
+                {
+                    oContent.Layouts[i].scale(kw, kh)
+                }
+                for(i = 0; i < oContent.SlideObjects.length; ++i)
+                {
+                    oSlide = oContent.SlideObjects[i];
+                    if(bChangeSize)
                     {
-                        if(oLayout)
-                        {
-                            oSlide.setLayout(oCurrentMaster.getMatchingLayout(oLayout.type, oLayout.matchingName, oLayout.cSld.name, true));
-                        }
-                        else
-                        {
-                            oSlide.setLayout(oCurrentMaster.sldLayoutLst[0]);
-                        }
+                        oSlide.Width = oContent.PresentationWidth;
+                        oSlide.Height = oContent.PresentationHeight;
+                        oSlide.changeSize(this.Width, this.Height);
                     }
-                    if(!oSlide.notes)
+                    nLayoutIndex = oSourceContent.LayoutsIndexes[i];
+                    oLayout = oSourceContent.Layouts[nLayoutIndex];
+                    if(oLayout)
                     {
-                        if(oNotes)
-                        {
-                            if(!oNotes.Master)
-                            {
-                                oNotes.setNotesMaster(this.notesMasters[0]);
-                            }
-                            oSlide.setNotes(oNotes);
-                            oNotes.setSlide(oSlide);
-                        }
-                        else
-                        {
-                            oSlide.setNotes(AscCommonSlide.CreateNotes());
-                            oSlide.notes.setNotesMaster(this.notesMasters[0]);
-                            oSlide.notes.setSlide(oSlide);
-                        }
+                        oSlide.setLayout(oCurrentMaster.getMatchingLayout(oLayout.type, oLayout.matchingName, oLayout.cSld.name, true));
+                    }
+                    else
+                    {
+                        oSlide.setLayout(oCurrentMaster.sldLayoutLst[0]);
                     }
                 }
-                else
+            }
+            else
+            {
+                for(i = 0;  i < oContent.Masters.length; ++i)
                 {
+                    oContent.Masters[i].scale(kw, kh)
+                }
+                for(i = 0;  i < oContent.Layouts.length; ++i)
+                {
+                    oContent.Layouts[i].scale(kw, kh)
+                }
+                for(i = 0; i < oContent.SlideObjects.length; ++i)
+                {
+                    oSlide = oContent.SlideObjects[i];
+                    if(bChangeSize)
+                    {
+                        oSlide.Width = oContent.PresentationWidth;
+                        oSlide.Height = oContent.PresentationHeight;
+                        oSlide.changeSize(this.Width, this.Height);
+                    }
+                    nLayoutIndex = oContent.LayoutsIndexes[i];
+                    oLayout = oContent.Layouts[nLayoutIndex];
+                    oSlide.setLayout(oLayout);
+
+                    nLayoutIndex = oContent.LayoutsIndexes[i];
+                    oLayout = oContent.Layouts[nLayoutIndex];
+                    nMasterIndex = oContent.MastersIndexes[nLayoutIndex];
+                    oMaster = oContent.Masters[nMasterIndex];
+                    oTheme = oContent.Themes[nMasterIndex];
+                    oNotes = oContent.Notes[i];
+                    nNotesMasterIndex = oContent.NotesMastersIndexes[i];
+                    oNotesMaster = oContent.NotesMastersIndexes[nNotesMasterIndex];
+                    oNotesTheme = oContent.NotesThemes[nNotesMasterIndex];
                     if(!oMaster.Theme)
                     {
                         oMaster.setTheme(oTheme);
@@ -5037,10 +5176,6 @@ CPresentation.prototype =
                     if(!oLayout.Master)
                     {
                         oLayout.setMaster(oMaster);
-                    }
-                    if(!oSlide.Layout)
-                    {
-                        oSlide.setLayout(oLayout);
                     }
                     if(!oNotes || !oNotesMaster || !oNotesTheme)
                     {
