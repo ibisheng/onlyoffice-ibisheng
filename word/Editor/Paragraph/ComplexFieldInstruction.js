@@ -46,6 +46,9 @@ var fieldtype_FORMTEXT   = 0x0004;
 var fieldtype_TOC        = 0x0005;
 var fieldtype_PAGEREF    = 0x0006;
 
+var fieldtype_ASK        = 0x0007;
+var fieldtype_REF        = 0x0008;
+
 /**
  * Базовый класс для инструкции сложного поля.
  * @constructor
@@ -241,7 +244,57 @@ CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 	return  (nLvl >= this.SkipPageRefStart - 1 && nLvl <= this.SkipPageRefEnd - 1);
 };
 
+/**
+ * ASK field
+ * @constructor
+ */
+function CFieldInstructionASK()
+{
+	CFieldInstructionBase.call(this);
 
+	this.BookmarkName = "";
+	this.PromptText   = "";
+}
+CFieldInstructionASK.prototype = Object.create(CFieldInstructionBase.prototype);
+CFieldInstructionASK.prototype.constructor = CFieldInstructionASK;
+CFieldInstructionASK.prototype.Type = fieldtype_ASK;
+CFieldInstructionASK.prototype.SetBookmarkName = function(sBookmarkName)
+{
+	this.BookmarkName = sBookmarkName;
+};
+CFieldInstructionASK.prototype.GetBookmarkName = function()
+{
+	return this.BookmarkName;
+};
+CFieldInstructionASK.prototype.SetPromptText = function(sText)
+{
+	this.PromptText = sText;
+};
+CFieldInstructionASK.prototype.GetPromptText = function()
+{
+	if (!this.PromptText)
+		return this.BookmarkName;
+
+	return this.PromptText;
+};
+
+function CFieldInstructionREF()
+{
+	CFieldInstructionBase.call(this);
+
+	this.BookmarkName = "";
+}
+CFieldInstructionREF.prototype = Object.create(CFieldInstructionBase.prototype);
+CFieldInstructionREF.prototype.constructor = CFieldInstructionREF;
+CFieldInstructionREF.prototype.Type = fieldtype_REF;
+CFieldInstructionREF.prototype.SetBookmarkName = function(sBookmarkName)
+{
+	this.BookmarkName = sBookmarkName;
+};
+CFieldInstructionREF.prototype.GetBookmarkName = function()
+{
+	return this.BookmarkName;
+};
 
 /**
  * Класс для разбора строки с инструкцией
@@ -277,6 +330,11 @@ CFieldInstructionParser.prototype.private_Parse = function()
 		case "PAGE": this.private_ReadPAGE(); break;
 		case "PAGEREF": this.private_ReadPAGEREF(); break;
 		case "TOC": this.private_ReadTOC(); break;
+		case "ASK": this.private_ReadASK(); break;
+		case "REF": this.private_ReadREF(); break;
+
+
+		default: this.private_ReadREF(this.Buffer); break;
 	}
 };
 CFieldInstructionParser.prototype.private_ReadNext = function()
@@ -498,6 +556,39 @@ CFieldInstructionParser.prototype.private_ReadTOC = function()
 
 	}
 
+};
+CFieldInstructionParser.prototype.private_ReadASK = function()
+{
+	this.Result = new CFieldInstructionASK();
+
+	var arrArguments = this.private_ReadArguments();
+
+	if (arrArguments.length >= 2)
+		this.Result.SetPromptText(arrArguments[1]);
+
+	if (arrArguments.length >= 1)
+		this.Result.SetBookmarkName(arrArguments[0]);
+
+	// TODO: Switches
+};
+CFieldInstructionParser.prototype.private_ReadREF = function(sBookmarkName)
+{
+	this.Result = new CFieldInstructionREF();
+
+	if (undefined !== sBookmarkName)
+	{
+		this.Result.SetBookmarkName(sBookmarkName);
+	}
+	else
+	{
+		var arrArguments = this.private_ReadArguments();
+		if (arrArguments.length > 0)
+		{
+			this.Result.SetBookmarkName(arrArguments[0]);
+		}
+	}
+
+	// TODO: Switches
 };
 CFieldInstructionParser.prototype.private_ParseIntegerRange = function(sValue)
 {
