@@ -613,9 +613,7 @@ function CPresentation(DrawingDocument)
 
 
     this.Slides = [];
-    this.themes       = [];
     this.slideMasters = [];
-    this.slideLayouts = [];
     this.notesMasters = [];
     this.notes        = [];
     this.globalTableStyles = null;
@@ -1444,18 +1442,17 @@ CPresentation.prototype =
     {
         var _masters = this.slideMasters;
         var _len = _masters.length;
-        for (var i = 0; i < _len; i++)
+        var aLayouts, i, j;
+        for (i = 0; i < _len; i++)
         {
             _masters[i].ImageBase64 = _drawerThemes.GetThumbnail(_masters[i]);
-        }
-
-        var _layouts = this.slideLayouts;
-        _len = _layouts.length;
-        for (var i = 0; i < _len; i++)
-        {
-            _layouts[i].ImageBase64 = _drawerLayouts.GetThumbnail(_layouts[i]);
-            _layouts[i].Width64 = _drawerLayouts.WidthPx;
-            _layouts[i].Height64 = _drawerLayouts.HeightPx;
+            aLayouts = _masters[i].sldLayoutLst;
+            for(j = 0; j < aLayouts.length; ++ j)
+            {
+                aLayouts[j].ImageBase64 = _drawerLayouts.GetThumbnail(aLayouts[j]);
+                aLayouts[j].Width64 = _drawerLayouts.WidthPx;
+                aLayouts[j].Height64 = _drawerLayouts.HeightPx;
+            }
         }
     },
 
@@ -2573,7 +2570,7 @@ CPresentation.prototype =
 
     Get_Theme: function()
     {
-        return this.themes[0];
+        return this.slideMasters[0].Theme;
     },
 
     Get_ColorMap: function()
@@ -5073,6 +5070,7 @@ CPresentation.prototype =
     * */
     Insert_Content2: function(aContents, nIndex)
     {
+        nIndex = 1;
         var oContent, oSlide, i, bEndFormatting = (nIndex === 0), oSourceContent, kw, kh;
         var nLayoutIndex, nMasterIndex, nNotesMasterIndex;
         var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster, bChangeSize = false;

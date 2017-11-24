@@ -5078,8 +5078,8 @@ PasteProcessor.prototype =
 		var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 		var tempWorkbook = new AscCommonExcel.Workbook();
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
-		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
-			tempWorkbook.theme = this.oLogicDocument.themes[0];
+		if(!tempWorkbook.theme && this.oLogicDocument.Get_Theme)
+			tempWorkbook.theme = this.oLogicDocument.Get_Theme();
 
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		
