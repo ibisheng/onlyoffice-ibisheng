@@ -589,9 +589,9 @@
 		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
 			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
 		};
-		this.CoAuthoringApi.onAuthParticipantsChanged = function(users)
+		this.CoAuthoringApi.onAuthParticipantsChanged = function(users, userId)
 		{
-			t.sendEvent("asc_onAuthParticipantsChanged", users);
+			t.sendEvent("asc_onAuthParticipantsChanged", users, userId);
 		};
 		this.CoAuthoringApi.onParticipantsChanged     = function(users)
 		{

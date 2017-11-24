@@ -1142,6 +1142,7 @@ function CDocumentFieldsManager()
 	this.m_oMailMergeFields = {};
 
 	this.m_aComplexFields = [];
+	this.m_oCurrentComplexField = null;
 }
 
 CDocumentFieldsManager.prototype.Register_Field = function(oField)
@@ -1282,6 +1283,25 @@ CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
 {
 	this.m_aComplexFields.push(oComplexField);
 };
+CDocumentFieldsManager.prototype.GetCurrentComplexField = function()
+{
+	return this.m_oCurrentComplexField;
+};
+CDocumentFieldsManager.prototype.SetCurrentComplexField = function(oComplexField)
+{
+	if (this.m_oCurrentComplexField === oComplexField)
+		return false;
+
+	if (this.m_oCurrentComplexField)
+		this.m_oCurrentComplexField.SetCurrent(false);
+
+	this.m_oCurrentComplexField = oComplexField;
+
+	if (this.m_oCurrentComplexField)
+		this.m_oCurrentComplexField.SetCurrent(true);
+
+	return true;
+};
 
 var selected_None              = -1;
 var selected_DrawingObject     = 0;
@@ -1289,16 +1309,17 @@ var selected_DrawingObjectText = 1;
 
 function CSelectedElementsInfo()
 {
-    this.m_bTable          = false; // Находится курсор или выделение целиком в какой-нибудь таблице
-    this.m_bMixedSelection = false; // Попадает ли в выделение одновременно несколько элементов
-    this.m_nDrawing        = selected_None;
-    this.m_pParagraph      = null;  // Параграф, в котором находится выделение
-    this.m_oMath           = null;  // Формула, в которой находится выделение
-    this.m_oHyperlink      = null;  // Гиперссылка, в которой находится выделение
-    this.m_oField          = null;  // Поле, в котором находится выделение
-    this.m_oCell           = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
-	this.m_oBlockLevelSdt  = null;  // Если мы находимся в классе CBlockLevelSdt
-	this.m_oInlineLevelSdt = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_bTable           = false; // Находится курсор или выделение целиком в какой-нибудь таблице
+	this.m_bMixedSelection  = false; // Попадает ли в выделение одновременно несколько элементов
+	this.m_nDrawing         = selected_None;
+	this.m_pParagraph       = null;  // Параграф, в котором находится выделение
+	this.m_oMath            = null;  // Формула, в которой находится выделение
+	this.m_oHyperlink       = null;  // Гиперссылка, в которой находится выделение
+	this.m_oField           = null;  // Поле, в котором находится выделение
+	this.m_oCell            = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
+	this.m_oBlockLevelSdt   = null;  // Если мы находимся в классе CBlockLevelSdt
+	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_arrComplexFields = [];
 
     this.Reset = function()
     {
@@ -1401,6 +1422,14 @@ CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
 CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
 {
 	return this.m_oInlineLevelSdt;
+};
+CSelectedElementsInfo.prototype.SetComplexFields = function(arrComplexFields)
+{
+	this.m_arrComplexFields = arrComplexFields;
+};
+CSelectedElementsInfo.prototype.GetComplexFields = function(arrComplexFields)
+{
+	return this.m_arrComplexFields;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -8419,6 +8448,14 @@ CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 	else
 	{
 		this.DrawingDocument.Update_FieldTrack(false);
+
+		var arrComplexFields = oSelectedInfo.GetComplexFields();
+		if ((arrComplexFields.length > 0 && this.FieldsManager.SetCurrentComplexField(arrComplexFields[arrComplexFields.length - 1]))
+			|| (arrComplexFields.length <= 0 && this.FieldsManager.SetCurrentComplexField(null)))
+		{
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+		}
 	}
 };
 CDocument.prototype.Document_UpdateUndoRedoState = function()

@@ -1752,6 +1752,9 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				Element = aMMFields.Get_Next();
 			}
 
+			//----------------------------------------------------------------------------------------------------------
+			// Заливка сложных полей
+			//----------------------------------------------------------------------------------------------------------
 			var aCFields = PDSH.CFields;
 			var Element   = (pGraphics.RENDERER_PDF_FLAG === true ? null : aCFields.Get_Next());
 			while (null != Element)
@@ -1759,7 +1762,6 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
 				Element = aCFields.Get_Next();
 			}
-
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем комментарии
 			//----------------------------------------------------------------------------------------------------------
@@ -6882,6 +6884,10 @@ Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 		else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
 			this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
 	}
+
+	var arrComplexFields = this.GetComplexFieldsByPos(ContentPos ? ContentPos : (this.Selection.Use === true ? this.Get_ParaContentPos(false, false) : this.Get_ParaContentPos(false)), false);
+	if (arrComplexFields.length > 0)
+		Info.SetComplexFields(arrComplexFields);
 };
 Paragraph.prototype.GetElementsInfoByXY = function(oInfo, X, Y, CurPage)
 {

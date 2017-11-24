@@ -182,6 +182,7 @@ ParaInstrText.prototype.Set_CharCode = function(CharCode)
 function CComplexField(oLogicDocument)
 {
 	this.LogicDocument   = oLogicDocument;
+	this.Current         = false;
 	this.BeginChar       = null;
 	this.EndChar         = null;
 	this.SeparateChar    = null;
@@ -189,6 +190,14 @@ function CComplexField(oLogicDocument)
 	this.Instruction     = null;
 	this.Id              = null;
 }
+CComplexField.prototype.SetCurrent = function(isCurrent)
+{
+	this.Current = isCurrent;
+};
+CComplexField.prototype.IsCurrent = function()
+{
+	return this.Current;
+};
 CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
 	this.InstructionLine += oParaInstr.GetValue();

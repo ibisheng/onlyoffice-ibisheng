@@ -83,8 +83,8 @@
   CDocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
     if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
       var t = this;
-      this._CoAuthoringApi.onAuthParticipantsChanged = function(e) {
-        t.callback_OnAuthParticipantsChanged(e);
+      this._CoAuthoringApi.onAuthParticipantsChanged = function(e, id) {
+        t.callback_OnAuthParticipantsChanged(e, id);
       };
       this._CoAuthoringApi.onParticipantsChanged = function(e) {
         t.callback_OnParticipantsChanged(e);
@@ -376,9 +376,9 @@
 		return false;
 	};
 
-  CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e) {
+  CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, id) {
     if (this.onAuthParticipantsChanged) {
-      this.onAuthParticipantsChanged(e);
+      this.onAuthParticipantsChanged(e, id);
     }
   };
 
@@ -868,7 +868,7 @@
   DocsCoApi.prototype.getUsers = function() {
     // Специально для возможности получения после прохождения авторизации (Стоит переделать)
     if (this.onAuthParticipantsChanged) {
-      this.onAuthParticipantsChanged(this._participants);
+      this.onAuthParticipantsChanged(this._participants, this._userId);
     }
   };
 
@@ -1337,7 +1337,7 @@
       this._onParticipantsChanged(participants);
 
       if (this.onAuthParticipantsChanged) {
-        this.onAuthParticipantsChanged(this._participants);
+        this.onAuthParticipantsChanged(this._participants, this._userId);
       }
 
       // Посылаем эвент о совместном редактировании
@@ -1441,13 +1441,14 @@
       //TODO: add checks
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
+      this._indexUser = data['indexUser'];
+      this._userId = this._user.asc_getId() + this._indexUser;
       this._sessionTimeConnect = data['sessionTimeConnect'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
       this._onSpellCheckInit(data['g_cAscSpellCheckUrl']);
-      this._onSetIndexUser(this._indexUser = data['indexUser']);
-      this._userId = this._user.asc_getId() + this._indexUser;
+      this._onSetIndexUser(this._indexUser);
 
       this._onMessages(data, false);
       this._onGetLock(data);

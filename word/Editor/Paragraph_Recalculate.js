@@ -1140,61 +1140,64 @@ Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPa
     // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
     // текста, на котором закончилась данная строка.
     if ( true === PRS.EmptyLine || PRS.LineAscent < 0.001 || (true === PRS.End && true !== PRS.TextOnLine))
-    {
-        var LastItem = (true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].EndPos]);
+	{
+		var LastItem = (true === PRS.End ? this.Content[this.Content.length - 1] : this.Content[this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].EndPos]);
 
-        if ( true === PRS.End )
-        {
-            // TODO: Как только переделаем para_End переделать тут
+		if (true === PRS.End)
+		{
+			// TODO: Как только переделаем para_End переделать тут
 
-            // Выставляем настройки для символа параграфа
-            var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-            EndTextPr.Merge(this.TextPr.Value);
+			// Выставляем настройки для символа параграфа
+			var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+			EndTextPr.Merge(this.TextPr.Value);
 
-            g_oTextMeasurer.SetTextPr( EndTextPr, this.Get_Theme());
-            g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+			g_oTextMeasurer.SetTextPr(EndTextPr, this.Get_Theme());
+			g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
 
-            // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
-            var EndTextHeight  = g_oTextMeasurer.GetHeight();
-            var EndTextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-            var EndTextAscent  = EndTextHeight - EndTextDescent;
-            var EndTextAscent2 = g_oTextMeasurer.GetAscender();
+			// Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
+			var EndTextHeight  = g_oTextMeasurer.GetHeight();
+			var EndTextDescent = Math.abs(g_oTextMeasurer.GetDescender());
+			var EndTextAscent  = EndTextHeight - EndTextDescent;
+			var EndTextAscent2 = g_oTextMeasurer.GetAscender();
 
-            PRS.LineTextAscent  = EndTextAscent;
-            PRS.LineTextAscent2 = EndTextAscent2;
-            PRS.LineTextDescent = EndTextDescent;
+			PRS.LineTextAscent  = EndTextAscent;
+			PRS.LineTextAscent2 = EndTextAscent2;
+			PRS.LineTextDescent = EndTextDescent;
 
-            if ( PRS.LineAscent < EndTextAscent )
-                PRS.LineAscent = EndTextAscent;
+			if (PRS.LineAscent < EndTextAscent)
+				PRS.LineAscent = EndTextAscent;
 
-            if ( PRS.LineDescent < EndTextDescent )
-                PRS.LineDescent = EndTextDescent;
-        }
-        else if ( undefined !== LastItem )
-        {
-            var LastRun = LastItem.Get_LastRunInRange(PRS.Line, PRS.Range);
-            if ( undefined !== LastRun && null !== LastRun )
-            {
-                if ( PRS.LineTextAscent < LastRun.TextAscent )
-                    PRS.LineTextAscent = LastRun.TextAscent;
+			if (PRS.LineDescent < EndTextDescent)
+				PRS.LineDescent = EndTextDescent;
+		}
+		else if (undefined !== LastItem)
+		{
+			var LastRun = LastItem.Get_LastRunInRange(PRS.Line, PRS.Range);
+			if (undefined !== LastRun && null !== LastRun)
+			{
+				if (PRS.LineTextAscent < LastRun.TextAscent)
+					PRS.LineTextAscent = LastRun.TextAscent;
 
-                if ( PRS.LineTextAscent2 < LastRun.TextAscent2 )
-                    PRS.LineTextAscent2 = LastRun.TextAscent2;
+				if (PRS.LineTextAscent2 < LastRun.TextAscent2)
+					PRS.LineTextAscent2 = LastRun.TextAscent2;
 
-                if ( PRS.LineTextDescent < LastRun.TextDescent )
-                    PRS.LineTextDescent = LastRun.TextDescent;
+				if (PRS.LineTextDescent < LastRun.TextDescent)
+					PRS.LineTextDescent = LastRun.TextDescent;
 
-                if ( PRS.LineAscent < LastRun.TextAscent )
-                    PRS.LineAscent = LastRun.TextAscent;
+				if (PRS.LineAscent < LastRun.TextAscent)
+					PRS.LineAscent = LastRun.TextAscent;
 
-                if ( PRS.LineDescent < LastRun.TextDescent )
-                    PRS.LineDescent = LastRun.TextDescent;
-            }
-        }
-    }
+				if (PRS.LineDescent < LastRun.TextDescent)
+					PRS.LineDescent = LastRun.TextDescent;
+			}
+		}
+	}
 
     // Рассчитаем метрики строки
     this.Lines[CurLine].Metrics.Update( PRS.LineTextAscent, PRS.LineTextAscent2, PRS.LineTextDescent, PRS.LineAscent, PRS.LineDescent, ParaPr );
+
+	if (true === PRS.End && true !== PRS.EmptyLine && true !== PRS.TextOnLine && Math.abs(this.Lines[CurLine].Metrics.Descent - this.Lines[CurLine].Metrics.TextDescent) < 0.001)
+		this.Lines[CurLine].Metrics.Descent = 0;
 };
 
 Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPage, PRS, ParaPr)
@@ -3284,8 +3287,17 @@ CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode = function()
 };
 
 CParagraphDrawStateHightlights.prototype.ProcessFieldChar   = CParagraphRecalculateStateInfo.prototype.ProcessFieldChar;
-CParagraphDrawStateHightlights.prototype.IsComplexField     = CParagraphRecalculateStateInfo.prototype.IsComplexField;
 CParagraphDrawStateHightlights.prototype.IsComplexFieldCode = CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode;
+CParagraphDrawStateHightlights.prototype.IsComplexField = function()
+{
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.ComplexFields[nIndex].ComplexField.IsCurrent())
+			return true;
+	}
+
+	return false;
+};
 
 
 function CParagraphRecalculateObject()
