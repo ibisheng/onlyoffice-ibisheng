@@ -6044,6 +6044,9 @@ parserFormula.prototype.getElementByPos = function(pos) {
 	parserFormula.prototype.setIndexNumber = function(val) {
 		this._index = val;
 	};
+	parserFormula.prototype.canSaveShared = function() {
+		return true;
+	};
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.

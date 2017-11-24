@@ -2576,6 +2576,8 @@
         this.idWorksheet = idWorksheet;
         this.oAllColXfsId = null;
         this.isCopyPaste = isCopyPaste;
+        this.sharedFormulas = {};
+		this.sharedFormulasIndex = 0;
         this._getCrc32FromObjWithProperty = function(val)
         {
             return Asc.crc32(this._getStringFromObjWithProperty(val));
@@ -3566,8 +3568,9 @@
 					if(ECellTypeType.celltypeNumber != nType)
 						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
 				}
-				if(null != cell.formulaParsed)
-					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.formulaParsed);});
+				if (cell.formulaParsed) {
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
+				}
 				if(!cell.isEmptyTextString())
 				{
 					var dValue = 0;
@@ -3591,8 +3594,36 @@
 				}
 			}
         };
-        this.WriteFormula = function(formulaParsed)
+        this.WriteFormula = function(cell)
         {
+			var parsed = cell.formulaParsed;
+			var formula;
+			var si;
+			var ref;
+			var type;
+			var sharedRef = parsed.getShared();
+			if (sharedRef) {
+				var shared = this.sharedFormulas[parsed.getIndexNumber()];
+				var saveShared = shared ? shared.saveShared : parsed.canSaveShared();
+				if (saveShared) {
+					type = ECellFormulaType.cellformulatypeShared;
+					if (shared) {
+						si = shared.si;
+					} else {
+						formula = parsed.getFormula();
+						si = this.sharedFormulasIndex++;
+						ref = sharedRef;
+						this.sharedFormulas[parsed.getIndexNumber()] = {saveShared: saveShared, si: si};
+					}
+				} else {
+					cell.processFormula(function(parsed) {
+						formula = parsed.getFormula();
+					});
+				}
+			} else {
+				formula = parsed.getFormula();
+			}
+
             // if(null != oFormula.aca)
             // {
             // this.memory.WriteByte(c_oSerFormulaTypes.Aca);
@@ -3605,11 +3636,11 @@
             // this.memory.WriteByte(c_oSerPropLenType.Byte);
             // this.memory.WriteBool(oFormula.bx);
             // }
-            if(true === formulaParsed.ca)
+            if(true === parsed.ca)
             {
                 this.memory.WriteByte(c_oSerFormulaTypes.Ca);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(formulaParsed.ca);
+                this.memory.WriteBool(parsed.ca);
             }
             // if(null != oFormula.del1)
             // {
@@ -3647,33 +3678,26 @@
             // this.memory.WriteByte(c_oSerPropLenType.Variable);
             // this.memory.WriteString2(oFormula.r2);
             // }
-            // if(null != oFormula.ref)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Ref);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.ref);
-            // }
-            // if(null != oFormula.si)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Si);
-            // this.memory.WriteByte(c_oSerPropLenType.Long);
-            // this.memory.WriteLong(oFormula.si);
-            // }
-            // if(null != oFormula.t)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.T);
-            // this.memory.WriteByte(c_oSerPropLenType.Byte);
-            // this.memory.WriteByte(oFormula.t);
-            // }
-            // if(null != oFormula.v)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.v);
-            // }
-            this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(formulaParsed.getFormula());
+			if (undefined !== ref) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Ref);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(ref.getName());
+			}
+			if (undefined !== si) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Si);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(si);
+			}
+			if (undefined !== type) {
+				this.memory.WriteByte(c_oSerFormulaTypes.T);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(type);
+			}
+			if (undefined !== formula) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Text);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(formula);
+			}
         };
         this.WriteComments = function(aComments, aCommentsCoords, ws)
         {
