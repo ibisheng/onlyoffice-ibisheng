@@ -1872,26 +1872,53 @@ function CopyPasteCorrectString(str)
     return res;
 }
 
-function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps, text)
+function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
 	window['AscCommon'].g_clipboardBase.endRecalcDocument = false;
+
 	if(undefined === specialPasteProps)
 	{
-		window['AscCommon'].g_clipboardBase.specialPasteData.pastebin = pastebin;
-		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
-		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
-		
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
+		window['AscCommon'].g_clipboardBase.specialPasteData._format = _format;
+		window['AscCommon'].g_clipboardBase.specialPasteData.data1 = data1;
+		window['AscCommon'].g_clipboardBase.specialPasteData.data2 = data2;
+		window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
 	}
-    else
+	else
 	{
-		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
-		
-		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
-		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
-		onlyBinary = window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary;
-		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, text);
+		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly)
+		{
+			_format = AscCommon.c_oAscClipboardDataFormat.Text;
+			data1 = text_data;
+		}
+		else
+		{
+			window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
+
+			_format = window['AscCommon'].g_clipboardBase.specialPasteData._format;
+			data1 = window['AscCommon'].g_clipboardBase.specialPasteData.data1;
+			data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
+			text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
+		}
+	}
+
+	switch (_format)
+	{
+		case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
+		{
+			oPasteProcessor.Start(data1, data2);
+			break;
+		}
+		case AscCommon.c_oAscClipboardDataFormat.Internal:
+		{
+			oPasteProcessor.Start(null, null, null, data1);
+			break;
+		}
+		case AscCommon.c_oAscClipboardDataFormat.Text:
+		{
+			oPasteProcessor.Start(null, null, null, null, data1);
+			break;
+		}
 	}
 }
 function trimString( str ){
@@ -4514,7 +4541,70 @@ PasteProcessor.prototype =
 			}
 		};
 
-		fPasteTextWordCallback();
+		var fPasteTextPresentationCallback = function()
+		{
+			var presentation = editor.WordControl.m_oLogicDocument;
+			if(presentation.Slides.length === 0)
+			{
+				presentation.addNextSlide();
+			}
+			var shape = new CShape();
+			shape.setParent(presentation.Slides[presentation.CurPage]);
+			shape.setTxBody(AscFormat.CreateTextBodyFromString("", presentation.DrawingDocument, shape));
+			oThis.aContent = shape.txBody.content.Content;
+
+			text = text.replace(/^(\r|\t)+|(\r|\t)+$/g, '');
+			text = text.replace(/(\r|\t)/g, ' ');
+			if (text.length > 0) {
+
+				oThis.oDocument = shape.txBody.content;
+
+				var bAddParagraph = false;
+				for (var i = 0, length = text.length; i < length; i++) {
+					if (bAddParagraph) {
+						shape.txBody.content.AddNewParagraph();
+						bAddParagraph = false;
+					}
+
+					var nUnicode = null;
+					var nCharCode = text.charCodeAt(i);
+					if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+						if (i + 1 < length) {
+							i++;
+							var nTrailingChar = text.charCodeAt(i);
+							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+						}
+					} else {
+						nUnicode = nCharCode;
+					}
+
+					if (null !== nUnicode) {
+						var Item;
+						if(0x0A === nUnicode) {
+							bAddParagraph = true;
+						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+							Item = new ParaText();
+							Item.Value = nUnicode;
+							shape.paragraphAdd(Item);
+						} else {
+							Item = new ParaSpace();
+							shape.paragraphAdd(Item);
+						}
+					}
+				}
+			}
+
+			oThis.InsertInPlacePresentation(oThis.aContent);
+		};
+
+		if(PasteElementsId.g_bIsDocumentCopyPaste)
+		{
+			fPasteTextWordCallback();
+		}
+		else
+		{
+			fPasteTextPresentationCallback();
+		}
 	},
 
 	_getContentFromText: function(text){

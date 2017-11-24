@@ -1795,17 +1795,7 @@ background-repeat: no-repeat;\
     	    return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		switch (_format)
-		{
-			case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
-				AscCommon.Editor_Paste_Exec(this, data1, data2);
-				break;
-			case AscCommon.c_oAscClipboardDataFormat.Internal:
-				AscCommon.Editor_Paste_Exec(this, null, null, data1);
-				break;
-			default:
-				break;
-		}
+		AscCommon.Editor_Paste_Exec(api, _format, data1, data2, text_data);
 	};
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)
@@ -1835,7 +1825,7 @@ background-repeat: no-repeat;\
 			_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			//}
 
-			AscCommon.Editor_Paste_Exec(this, null, null, null, props);
+			AscCommon.Editor_Paste_Exec(this, null, null, null, null, props);
 		}
 	};
 
