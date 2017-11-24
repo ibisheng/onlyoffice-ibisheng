@@ -2463,6 +2463,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.excludeHiddenRows = false;
 	cBaseFunction.prototype.excludeErrorsVal = false;
 	cBaseFunction.prototype.excludeNestedStAg = false;
+	cBaseFunction.prototype.name = null;
 	cBaseFunction.prototype.Calculate = function () {
 		return new cError(cErrorType.wrong_name);
 	};
@@ -2634,6 +2635,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		return res;
 	};
+
+	/** @constructor */
+	function cUnknownFunction(name) {
+		this.name = name;
+	}
+	cUnknownFunction.prototype = Object.create(cBaseFunction.prototype);
+	cUnknownFunction.prototype.constructor = cUnknownFunction;
+
 
 	/** @constructor */
 	function parentLeft() {
@@ -4644,7 +4653,7 @@ parserFormula.prototype.setFormula = function(formula) {
 							} else if (val in cAllFormulaFunction) {
 								elem = new cAllFormulaFunction[val]();
 							} else {
-								elem = new cBaseFunction(val);
+								elem = new cUnknownFunction(val);
 								elem.isXLFN = (0 === val.indexOf("_xlfn."));
 							}
 							if (elem && elem.ca) {
@@ -5201,7 +5210,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				} else if (operandStr in cAllFormulaFunction) {
 					found_operator = cAllFormulaFunction[operandStr].prototype;
 				} else {
-					found_operator = new cBaseFunction(operandStr);
+					found_operator = new cUnknownFunction(operandStr);
 					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );
 				}
 
