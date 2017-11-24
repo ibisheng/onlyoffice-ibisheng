@@ -500,7 +500,7 @@ CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
     }
     else
     {
-        this.SendImagesCallback(this.m_aNewImages);
+        this.SendImagesCallback([].concat(this.m_aNewImages));
         this.m_aNewImages.length = 0;
     }
 };
