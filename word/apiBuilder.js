@@ -4591,7 +4591,7 @@
 	 */
 	ApiInlineLvlSdt.prototype.GetElement = function(nPos)
 	{
-		if (nPos < 0 || nPos >= this.Paragraph.Content.length)
+		if (nPos < 0 || nPos >= this.Sdt.Content.length)
 			return null;
 
 		return private_GetSupportedParaElement(this.Sdt.Content[nPos]);

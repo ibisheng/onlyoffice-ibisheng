@@ -89,8 +89,6 @@
 
 		// Очищаем индексы пересчета (при открытии это необходимо)
 		CCollaborativeEditing.prototype.clearRecalcIndex = function () {
-			delete this.m_oRecalcIndexColumns;
-			delete this.m_oRecalcIndexRows;
 			this.m_oRecalcIndexColumns = {};
 			this.m_oRecalcIndexRows = {};
 		};

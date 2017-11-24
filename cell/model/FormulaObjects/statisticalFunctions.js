@@ -2701,7 +2701,7 @@ function (window, undefined) {
 
 			if (nColMatX !== nColMatY || nRowMatX !== nRowMatY && !checkNumericMatrix(rMatX) ||
 				!checkNumericMatrix(rMatY)) {
-				return new cError(cErrorType.wrong_value_type);
+				return new cError(cErrorType.not_available);
 			}
 
 			this.bEDS = ( rSmplInPrd === 0 );
@@ -6054,7 +6054,7 @@ function (window, undefined) {
 		var pFcMat = aETSCalc.GetForecastRange(pTMat);
 
 
-		return new cNumber(pFcMat[0][0]);
+		return pFcMat && pFcMat[0] ? new cNumber(pFcMat[0][0]) : new cError(cErrorType.wrong_value_type);
 	};
 
 	/**

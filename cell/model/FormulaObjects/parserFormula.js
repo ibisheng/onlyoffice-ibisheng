@@ -2500,6 +2500,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.argumentsMax = 255;
 	cBaseFunction.prototype.numFormat = cNumFormatFirstCell;
 	cBaseFunction.prototype.ca = false;
+	cBaseFunction.prototype.excludeHiddenRows = false;
+	cBaseFunction.prototype.excludeErrorsVal = false;
+	cBaseFunction.prototype.excludeNestedStAg = false;
+	cBaseFunction.prototype.name = null;
 	cBaseFunction.prototype.Calculate = function () {
 		return new cError(cErrorType.wrong_name);
 	};
@@ -2671,6 +2675,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		return res;
 	};
+
+	/** @constructor */
+	function cUnknownFunction(name) {
+		this.name = name;
+	}
+	cUnknownFunction.prototype = Object.create(cBaseFunction.prototype);
+	cUnknownFunction.prototype.constructor = cUnknownFunction;
+
 
 	/** @constructor */
 	function parentLeft() {
@@ -3475,8 +3487,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 
 			var _f = new AscCommonExcel.parserFormula(refItem, null, ws);
-			var refPos = _f.parse();
-			if (refPos) {
+			var refPos = [];
+			if (_f.parse(null, null, refPos)) {
 				refPos.forEach(function (item) {
 					var ref;
 					switch (item.oper.type) {
@@ -3528,18 +3540,21 @@ _func[cElementType.cell] = [];
 
 
 _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) {
-    if ( what === ">" ) {
-        return new cBool( arg0.getValue() > arg1.getValue() );
+	var compareNumbers = function(){
+		return AscCommon.compareNumbers(arg0.getValue(), arg1.getValue());
+	};
+	if ( what === ">" ) {
+		return new cBool( compareNumbers() > 0 );
   } else if (what === ">=") {
-        return new cBool( arg0.getValue() >= arg1.getValue() );
+		return new cBool( !(compareNumbers() < 0) );
   } else if (what === "<") {
-        return new cBool( arg0.getValue() < arg1.getValue() );
+		return new cBool( compareNumbers() < 0 );
   } else if (what === "<=") {
-        return new cBool( arg0.getValue() <= arg1.getValue() );
+		return new cBool( !(compareNumbers() > 0) );
   } else if (what === "=") {
-        return new cBool( arg0.getValue() === arg1.getValue() );
+		return new cBool( compareNumbers() === 0 );
   } else if (what === "<>") {
-        return new cBool( arg0.getValue() !== arg1.getValue() );
+		return new cBool( compareNumbers() !== 0 );
   } else if (what === "-") {
         return new cNumber( arg0.getValue() - arg1.getValue() );
   } else if (what === "+") {
@@ -4492,16 +4507,19 @@ parserFormula.prototype.setFormula = function(formula) {
   this.isInDependencies = false;
 };
 
-	parserFormula.prototype.parse = function (local, digitDelim) {
+	parserFormula.prototype.parse = function (local, digitDelim, refPos) {
 		this.pCurrPos = 0;
 		var needAssemble = false;
 		var cFormulaList;
-		var refPos = [];
 
 		var startSumproduct = false, counterSumproduct = 0;
 
 		if (this.isParsed) {
 			return this.isParsed;
+		}
+
+		if(!refPos){
+			refPos = [];
 		}
 		/*
 		 Парсер формулы реализует алгоритм перевода инфиксной формы записи выражения в постфиксную или Обратную Польскую Нотацию.
@@ -4659,7 +4677,7 @@ parserFormula.prototype.setFormula = function(formula) {
 							} else if (val in cAllFormulaFunction) {
 								elem = new cAllFormulaFunction[val]();
 							} else {
-								elem = new cBaseFunction(val);
+								elem = new cUnknownFunction(val);
 								elem.isXLFN = (0 === val.indexOf("_xlfn."));
 							}
 							if (elem && elem.ca) {
@@ -5217,7 +5235,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				} else if (operandStr in cAllFormulaFunction) {
 					found_operator = cAllFormulaFunction[operandStr].prototype;
 				} else {
-					found_operator = new cBaseFunction(operandStr);
+					found_operator = new cUnknownFunction(operandStr);
 					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );
 				}
 
@@ -5329,8 +5347,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (needAssemble) {
 				this.Formula = this.assemble();
 			}
-			this.isParsed = true;
-			return refPos;
+			return this.isParsed = true;
 		} else {
 			return this.isParsed = false;
 		}

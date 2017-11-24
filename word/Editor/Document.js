@@ -1142,6 +1142,7 @@ function CDocumentFieldsManager()
 	this.m_oMailMergeFields = {};
 
 	this.m_aComplexFields = [];
+	this.m_oCurrentComplexField = null;
 }
 
 CDocumentFieldsManager.prototype.Register_Field = function(oField)
@@ -1282,6 +1283,25 @@ CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
 {
 	this.m_aComplexFields.push(oComplexField);
 };
+CDocumentFieldsManager.prototype.GetCurrentComplexField = function()
+{
+	return this.m_oCurrentComplexField;
+};
+CDocumentFieldsManager.prototype.SetCurrentComplexField = function(oComplexField)
+{
+	if (this.m_oCurrentComplexField === oComplexField)
+		return false;
+
+	if (this.m_oCurrentComplexField)
+		this.m_oCurrentComplexField.SetCurrent(false);
+
+	this.m_oCurrentComplexField = oComplexField;
+
+	if (this.m_oCurrentComplexField)
+		this.m_oCurrentComplexField.SetCurrent(true);
+
+	return true;
+};
 
 var selected_None              = -1;
 var selected_DrawingObject     = 0;
@@ -1289,16 +1309,17 @@ var selected_DrawingObjectText = 1;
 
 function CSelectedElementsInfo()
 {
-    this.m_bTable          = false; // Находится курсор или выделение целиком в какой-нибудь таблице
-    this.m_bMixedSelection = false; // Попадает ли в выделение одновременно несколько элементов
-    this.m_nDrawing        = selected_None;
-    this.m_pParagraph      = null;  // Параграф, в котором находится выделение
-    this.m_oMath           = null;  // Формула, в которой находится выделение
-    this.m_oHyperlink      = null;  // Гиперссылка, в которой находится выделение
-    this.m_oField          = null;  // Поле, в котором находится выделение
-    this.m_oCell           = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
-	this.m_oBlockLevelSdt  = null;  // Если мы находимся в классе CBlockLevelSdt
-	this.m_oInlineLevelSdt = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_bTable           = false; // Находится курсор или выделение целиком в какой-нибудь таблице
+	this.m_bMixedSelection  = false; // Попадает ли в выделение одновременно несколько элементов
+	this.m_nDrawing         = selected_None;
+	this.m_pParagraph       = null;  // Параграф, в котором находится выделение
+	this.m_oMath            = null;  // Формула, в которой находится выделение
+	this.m_oHyperlink       = null;  // Гиперссылка, в которой находится выделение
+	this.m_oField           = null;  // Поле, в котором находится выделение
+	this.m_oCell            = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
+	this.m_oBlockLevelSdt   = null;  // Если мы находимся в классе CBlockLevelSdt
+	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_arrComplexFields = [];
 
     this.Reset = function()
     {
@@ -1401,6 +1422,14 @@ CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
 CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
 {
 	return this.m_oInlineLevelSdt;
+};
+CSelectedElementsInfo.prototype.SetComplexFields = function(arrComplexFields)
+{
+	this.m_arrComplexFields = arrComplexFields;
+};
+CSelectedElementsInfo.prototype.GetComplexFields = function(arrComplexFields)
+{
+	return this.m_arrComplexFields;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -5958,7 +5987,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
 
-			if (true === Para.IsCursorAtEnd())
+			if (true === Para.IsCursorAtEnd() && true !== SelectedContent.ForceSplit)
 			{
 				bConcatE = false;
 
@@ -5976,7 +6005,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
 					bAddEmptyPara = true;
 			}
-			else if (true === Para.IsCursorAtBegin())
+			else if (true === Para.IsCursorAtBegin() && true !== SelectedContent.ForceSplit)
 			{
 				bConcatS = false;
 			}
@@ -7579,6 +7608,10 @@ CDocument.prototype.Get_Styles = function()
 {
 	return this.Styles;
 };
+CDocument.prototype.GetStyles = function()
+{
+	return this.Styles;
+};
 CDocument.prototype.CopyStyle = function()
 {
 	return this.Styles.CopyStyle();
@@ -8415,6 +8448,14 @@ CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 	else
 	{
 		this.DrawingDocument.Update_FieldTrack(false);
+
+		var arrComplexFields = oSelectedInfo.GetComplexFields();
+		if ((arrComplexFields.length > 0 && this.FieldsManager.SetCurrentComplexField(arrComplexFields[arrComplexFields.length - 1]))
+			|| (arrComplexFields.length <= 0 && this.FieldsManager.SetCurrentComplexField(null)))
+		{
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+		}
 	}
 };
 CDocument.prototype.Document_UpdateUndoRedoState = function()
@@ -15739,87 +15780,15 @@ CDocument.prototype.AddField = function(nType, oPr)
 {
 	if (fieldtype_PAGENUM === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("1"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("PAGE");
 	}
 	else if (fieldtype_TOC === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("O"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("C"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaText("a"));
-		oRun.Add_ToContent(++nIndex, new ParaText("b"));
-		oRun.Add_ToContent(++nIndex, new ParaText("l"));
-		oRun.Add_ToContent(++nIndex, new ParaText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaSpace());
-		oRun.Add_ToContent(++nIndex, new ParaText("o"));
-		oRun.Add_ToContent(++nIndex, new ParaText("f"));
-		oRun.Add_ToContent(++nIndex, new ParaSpace());
-		oRun.Add_ToContent(++nIndex, new ParaText("C"));
-		oRun.Add_ToContent(++nIndex, new ParaText("o"));
-		oRun.Add_ToContent(++nIndex, new ParaText("n"));
-		oRun.Add_ToContent(++nIndex, new ParaText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaText("n"));
-		oRun.Add_ToContent(++nIndex, new ParaText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaText("s"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("TOC");
 	}
 	else if (fieldtype_PAGEREF === nType)
 	{
-		var oParagraph = this.GetCurrentParagraph();
-		if (!oParagraph)
-			return false;
-
-		var nIndex = -1;
-
-		var oRun = new ParaRun();
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Begin, this));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("P"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("A"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("G"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("R"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("E"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("F"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("T"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("e"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("s"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("t"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(" "));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("\\"));
-		oRun.Add_ToContent(++nIndex, new ParaInstrText("p"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-		oRun.Add_ToContent(++nIndex, new ParaText("1"));
-		oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
-		oParagraph.Add(oRun);
-		return true;
+		return this.AddFieldWithInstruction("PAGEREF Test \\p");
 	}
 
 	return false;
@@ -15828,28 +15797,36 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 {
 	var oParagraph = this.GetCurrentParagraph();
 	if (!oParagraph)
-		return false;
+		return null;
 
 	var nIndex = -1;
 
-	var oStartChar = new ParaFieldChar(fldchartype_Begin, this);
+	var oBeginChar    = new ParaFieldChar(fldchartype_Begin, this),
+		oSeparateChar = new ParaFieldChar(fldchartype_Separate, this),
+		oEndChar      = new ParaFieldChar(fldchartype_End, this);
 
 	var oRun = new ParaRun();
-	oRun.Add_ToContent(++nIndex, oStartChar);
+	oRun.Add_ToContent(++nIndex, oBeginChar);
 	for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
 	{
 		oRun.Add_ToContent(++nIndex, new ParaInstrText(sInstruction.charAt(nPos)));
 	}
-	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_Separate, this));
-	oRun.Add_ToContent(++nIndex, new ParaFieldChar(fldchartype_End, this));
+	oRun.Add_ToContent(++nIndex, oSeparateChar);
+	oRun.Add_ToContent(++nIndex, oEndChar);
 	oParagraph.Add(oRun);
 
-	oRun.Make_ThisElementCurrent(false);
+	oBeginChar.SetRun(oRun);
+	oSeparateChar.SetRun(oRun);
+	oEndChar.SetRun(oRun);
 
-	this.Recalculate();
-	oStartChar.GetComplexField().Update();
+	var oComplexField = oBeginChar.GetComplexField();
+	oComplexField.SetBeginChar(oBeginChar);
+	oComplexField.SetInstructionLine(sInstruction);
+	oComplexField.SetSeparateChar(oSeparateChar);
+	oComplexField.SetEndChar(oEndChar);
+	oComplexField.Update();
 
-	return true;
+	return oComplexField;
 };
 CDocument.prototype.UpdateComplexField = function(oField)
 {
@@ -16091,10 +16068,8 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		oSdt.AddNewParagraph(false, true);
 		oSdt.SetThisElementCurrent();
 
-		this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
-
-		// TODO: oSdt нужно заполнить свойствами
-
+		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
+		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
 		this.Recalculate();
 	}
 };

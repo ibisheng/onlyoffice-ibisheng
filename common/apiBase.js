@@ -589,13 +589,13 @@
 		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
 			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
 		};
-		this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count)
+		this.CoAuthoringApi.onAuthParticipantsChanged = function(users, userId)
 		{
-			t.sendEvent("asc_onAuthParticipantsChanged", e, count);
+			t.sendEvent("asc_onAuthParticipantsChanged", users, userId);
 		};
-		this.CoAuthoringApi.onParticipantsChanged     = function(e, CountEditUsers)
+		this.CoAuthoringApi.onParticipantsChanged     = function(users)
 		{
-			t.sendEvent("asc_onParticipantsChanged", e, CountEditUsers);
+			t.sendEvent("asc_onParticipantsChanged", users);
 		};
 		this.CoAuthoringApi.onSpellCheckInit          = function(e)
 		{

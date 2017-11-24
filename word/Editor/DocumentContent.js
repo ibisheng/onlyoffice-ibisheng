@@ -4001,7 +4001,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
 
             var bAddEmptyPara = false;
 
-            if (true === Para.IsCursorAtEnd())
+            if (true === Para.IsCursorAtEnd() && true !== SelectedContent.ForceSplit)
             {
                 bConcatE = false;
 
@@ -4015,7 +4015,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                     bAddEmptyPara = true;
             }
-            else if (true === Para.IsCursorAtBegin())
+            else if (true === Para.IsCursorAtBegin() && true !== SelectedContent.ForceSplit)
             {
                 bConcatS = false;
             }
