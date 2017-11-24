@@ -1441,13 +1441,14 @@
       //TODO: add checks
       this._state = ConnectionState.Authorized;
       this._id = data['sessionId'];
+      this._indexUser = data['indexUser'];
       this._userId = this._user.asc_getId() + this._indexUser;
       this._sessionTimeConnect = data['sessionTimeConnect'];
 
       this._onAuthParticipantsChanged(data['participants']);
 
       this._onSpellCheckInit(data['g_cAscSpellCheckUrl']);
-      this._onSetIndexUser(this._indexUser = data['indexUser']);
+      this._onSetIndexUser(this._indexUser);
 
       this._onMessages(data, false);
       this._onGetLock(data);
