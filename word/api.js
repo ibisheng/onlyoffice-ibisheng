@@ -2057,7 +2057,7 @@ background-repeat: no-repeat;\
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			}
 
-			AscCommon.Editor_Paste_Exec(api, _format, data1, data2, text_data);
+			AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
 		}
 	};
 	

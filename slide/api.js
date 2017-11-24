@@ -1795,7 +1795,7 @@ background-repeat: no-repeat;\
     	    return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		AscCommon.Editor_Paste_Exec(api, _format, data1, data2, text_data);
+		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
 	};
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)

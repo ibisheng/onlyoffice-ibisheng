@@ -1886,19 +1886,17 @@ function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPastePr
 	}
 	else
 	{
+		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
+
+		_format = window['AscCommon'].g_clipboardBase.specialPasteData._format;
+		data1 = window['AscCommon'].g_clipboardBase.specialPasteData.data1;
+		data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
+		text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
+
 		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly)
 		{
 			_format = AscCommon.c_oAscClipboardDataFormat.Text;
 			data1 = text_data;
-		}
-		else
-		{
-			window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
-
-			_format = window['AscCommon'].g_clipboardBase.specialPasteData._format;
-			data1 = window['AscCommon'].g_clipboardBase.specialPasteData.data1;
-			data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
-			text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
 		}
 	}
 
