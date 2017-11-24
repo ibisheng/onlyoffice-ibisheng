@@ -1893,7 +1893,7 @@ function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPastePr
 		data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
 		text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
 
-		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly)
+		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly && _format !== AscCommon.c_oAscClipboardDataFormat.Text)
 		{
 			_format = AscCommon.c_oAscClipboardDataFormat.Text;
 			data1 = text_data;
@@ -2981,7 +2981,7 @@ PasteProcessor.prototype =
 
 	//***end special paste***
 
-	InsertInPlacePresentation: function(aNewContent)
+	InsertInPlacePresentation: function(aNewContent, isText)
 	{
 		var presentation = editor.WordControl.m_oLogicDocument;
 		
@@ -2990,7 +2990,7 @@ PasteProcessor.prototype =
 		for (var i = 0, length = aNewContent.length; i < length; ++i) {
 			var oSelectedElement = new CSelectedElement();
 
-			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+			if (window['AscCommon'].g_clipboardBase.specialPasteStart && !isText) {
 				aNewContent[i]= this._specialPasteItemConvert(aNewContent[i]);
 			}
 
@@ -3890,7 +3890,7 @@ PasteProcessor.prototype =
 					//пока не показываю значок специальной вставки после copy/paste слайдов
 					if(!(aContents[nIndex].SlideObjects && aContents[nIndex].SlideObjects.length)){
 						var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						if(presentationSelectedContent){
+						if(presentationSelectedContent.DocContent){
 							props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
 						}
 
@@ -4592,7 +4592,7 @@ PasteProcessor.prototype =
 				}
 			}
 
-			oThis.InsertInPlacePresentation(oThis.aContent);
+			oThis.InsertInPlacePresentation(oThis.aContent, true);
 		};
 
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
@@ -4614,7 +4614,7 @@ PasteProcessor.prototype =
 			var _char = text.charAt(Index);
 			var _charCode = text.charCodeAt(Index);
 			if(0x0A === _charCode ||  Index === Count - 1){
-				if(Index === Count - 1){
+				if(Index === Count - 1 && 0x0A !== _charCode){
 					insertText += _char;
 				}
 				var newParaRun = new ParaRun();

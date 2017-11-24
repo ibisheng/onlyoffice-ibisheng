@@ -217,7 +217,7 @@
 				var _internal = this.ClosureParams.getData("text/x-custom");
 				if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
 				{
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length), null, null, _text_format);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length), null, _text_format);
 					g_clipboardBase.Paste_End();
 					return false;
 				}
