@@ -405,15 +405,6 @@
 			return c_oAscShiftType.None;
 		};
 
-		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
-			var isHor = offset && 0 != offset.offsetCol;
-			if (isHor) {
-				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
-			} else {
-				return this.c1 <= col && col <= this.c2 && this.r1 <= row;
-			}
-		};
-
 		Range.prototype.forShift = function(bbox, offset, bUndo) {
 			var isNoDelete = true;
 			var isHor = 0 != offset.offsetCol;
@@ -839,7 +830,19 @@
 			var c2 = isAbsC1 ? sharedRef.c2 : Math.min(sharedRef.c1 + (c - this.c1), sharedRef.c2);
 			return new Range(c1, r1, c2, r2);
 		};
-
+		Range.prototype.getSharedRangeBbox = function(sharedRef) {
+			var res = this.clone();
+			var offsetRow = sharedRef.r2 - sharedRef.r1;
+			var offsetCol = sharedRef.c2 - sharedRef.c1;
+			res.setOffsetWithAbs(new AscCommonExcel.CRangeOffset(offsetCol, offsetRow), false, false);
+			res.union2(this);
+			return res;
+		};
+		Range.prototype.getSharedIntersect = function(sharedRef, bbox) {
+			var leftTop = this.getSharedRange(sharedRef, bbox.c1, bbox.r1);
+			var rightBottom = this.getSharedRange(sharedRef, bbox.c2, bbox.r2);
+			return leftTop.union(rightBottom);
+		};
 		Range.prototype.setAbs = function (absRow1, absCol1, absRow2, absCol2) {
 			this.refType1 = (absRow1 ? 0 : 2) + (absCol1 ? 0 : 1);
 			this.refType2 = (absRow2 ? 0 : 2) + (absCol2 ? 0 : 1);

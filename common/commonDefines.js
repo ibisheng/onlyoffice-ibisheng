@@ -849,7 +849,8 @@
 		ChangeFormula: 1,
 		EndCalculate: 2,
 		GetRangeCell: 3,
-		IsDefName: 4
+		IsDefName: 4,
+		Shared: 5
 	};
 
 	var c_oDashType = {

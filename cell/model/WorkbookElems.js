@@ -6048,7 +6048,7 @@ TableColumn.prototype.clone = function() {
 	res.TotalsRowFunction = this.TotalsRowFunction;
 
 	if (this.TotalsRowFormula) {
-		res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		res.applyTotalRowFormula(this.TotalsRowFormula.getFormula(), this.TotalsRowFormula.ws, false);
 	}
 	if (this.dxf)
 		res.dxf = this.dxf.clone;

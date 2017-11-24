@@ -1558,7 +1558,7 @@
             if(null != tableColumn.TotalsRowFormula)
             {
                 this.memory.WriteByte(c_oSer_TableColumns.TotalsRowFormula);
-                this.memory.WriteString2(tableColumn.TotalsRowFormula.Formula);
+                this.memory.WriteString2(tableColumn.TotalsRowFormula.getFormula());
             }
             if(null != tableColumn.dxf)
             {
@@ -3673,7 +3673,7 @@
             // }
             this.memory.WriteByte(c_oSerFormulaTypes.Text);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(formulaParsed.Formula);
+            this.memory.WriteString2(formulaParsed.getFormula());
         };
         this.WriteComments = function(aComments, aCommentsCoords, ws)
         {
@@ -6549,17 +6549,18 @@
 			var prevFormula = tmp.prevFormulas[cell.nCol];
 			if (formula.v && formula.v.length <= AscCommon.c_oAscMaxFormulaLength) {
 				var offsetRow;
-				if (prevFormula && prevFormula.parsed.sharedRef) {
-					offsetRow = cell.nRow - prevFormula.parsed.sharedRef.r1;
+				var sharedRef;
+				if (prevFormula && (sharedRef = prevFormula.parsed.getShared())) {
+					offsetRow = cell.nRow - sharedRef.r1;
 				} else {
 					offsetRow = 1;
 				}
 				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
 					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
-					if (!prevFormula.parsed.sharedRef) {
-						prevFormula.parsed.sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
+					if (!sharedRef) {
+						prevFormula.parsed.setShared(new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow));
 					} else {
-						prevFormula.parsed.sharedRef.union3(cell.nCol, cell.nRow);
+						sharedRef.union3(cell.nCol, cell.nRow);
 					}
 					curFormula = prevFormula;
 				} else {
@@ -6571,7 +6572,7 @@
 					formulaParsed.ca = formula.ca;
 					var refPos = formulaParsed.parse();
 					if (null !== formula.ref) {
-						formulaParsed.sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
+						formulaParsed.setShared(AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone());
 					}
 					curFormula = new OpenColumnFormula(cell.nRow, formula.v, formulaParsed, refPos);
 					tmp.prevFormulas[cell.nCol] = curFormula;
@@ -6583,7 +6584,7 @@
 			} else if (null !== formula.si) {
 				curFormula = tmp.sharedFormulas[formula.si];
 				if (curFormula) {
-					curFormula.parsed.sharedRef.union3(cell.nCol, cell.nRow);
+					curFormula.parsed.getShared().union3(cell.nCol, cell.nRow);
 				}
 				if (prevFormula !== curFormula) {
 					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
