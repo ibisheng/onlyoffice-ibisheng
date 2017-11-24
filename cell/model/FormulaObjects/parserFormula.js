@@ -3438,9 +3438,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 
 			var _f = new AscCommonExcel.parserFormula(refItem, null, ws);
-			var refPos = _f.parse();
-			if (refPos) {
-				refPos.forEach(function (item) {
+			if (_f.parse()) {
+				_f.RefPos.forEach(function (item) {
 					var ref;
 					switch (item.oper.type) {
 						case cElementType.table:
@@ -4321,6 +4320,7 @@ function parserFormula( formula, parent, _ws ) {
     //для функции parse и parseDiagramRef
     this.pCurrPos = 0;
     this.elemArr = [];
+	this.RefPos = [];
     this.operand_str = null;
     this.parenthesesNotEnough = false;
     this.f = [];
@@ -4443,6 +4443,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
       oRes.outStack.push(oCurElem);
     }
     }
+    oRes.RefPos = [];
   oRes.operand_str = this.operand_str;
   oRes.error = this.error.concat();
   oRes.isParsed = this.isParsed;
@@ -4464,6 +4465,7 @@ parserFormula.prototype.setFormula = function(formula) {
   //для функции parse
   this.pCurrPos = 0;
   this.elemArr = [];
+  this.RefPos = [];
   this.operand_str = null;
   this.parenthesesNotEnough = false;
   this.f = [];
@@ -4480,7 +4482,6 @@ parserFormula.prototype.setFormula = function(formula) {
 		this.pCurrPos = 0;
 		var needAssemble = false;
 		var cFormulaList;
-		var refPos = [];
 
 		var startSumproduct = false, counterSumproduct = 0;
 
@@ -5092,7 +5093,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					pos.end = t.pCurrPos;
 					found_operand = new cArea3D(t.operand_str.toUpperCase(), wsF, wsT);
 					pos.oper = found_operand;
-					refPos.push(pos);
+					t.RefPos.push(pos);
 				} else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
 					pos.end = t.pCurrPos;
 					if (wsT !== wsF) {
@@ -5102,12 +5103,12 @@ parserFormula.prototype.setFormula = function(formula) {
 						found_operand = new cRef3D(t.operand_str.toUpperCase(), wsF);
 						pos.oper = found_operand;
 					}
-					refPos.push(pos);
+					t.RefPos.push(pos);
 				} else if (parserHelp.isName.call(t, t.Formula, t.pCurrPos)) {
 					pos.end = t.pCurrPos;
 					found_operand = new cName3D(t.operand_str, wsF);
 					pos.oper = found_operand;
-					refPos.push(pos);
+					t.RefPos.push(pos);
 				}
 				t.countRef++;
 			}
@@ -5115,7 +5116,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			/* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(t, t.Formula,
 					t.pCurrPos)) {
 				found_operand = new cArea(t.operand_str.toUpperCase(), t.ws);
-				refPos.push({
+				t.RefPos.push({
 					start: t.pCurrPos - t.operand_str.length,
 					end: t.pCurrPos,
 					index: t.outStack.length,
@@ -5125,7 +5126,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 			/* Referens to cell A4 */ else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
 				found_operand = new cRef(t.operand_str.toUpperCase(), t.ws);
-				refPos.push({
+				t.RefPos.push({
 					start: t.pCurrPos - t.operand_str.length,
 					end: t.pCurrPos,
 					index: t.outStack.length,
@@ -5147,7 +5148,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 
 				if (found_operand.type !== cElementType.error) {
-					refPos.push({
+					t.RefPos.push({
 						start: t.pCurrPos - t.operand_str.length,
 						end: t.pCurrPos,
 						index: t.outStack.length,
@@ -5167,7 +5168,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					//need assemble becase source formula wrong
 					needAssemble = true;
 				}
-				refPos.push({
+				t.RefPos.push({
 					start: t.pCurrPos - t.operand_str.length,
 					end: t.pCurrPos,
 					index: t.outStack.length,
@@ -5312,8 +5313,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (needAssemble) {
 				this.Formula = this.assemble();
 			}
-			this.isParsed = true;
-			return refPos;
+			return this.isParsed = true;
 		} else {
 			return this.isParsed = false;
 		}

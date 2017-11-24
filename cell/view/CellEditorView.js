@@ -809,15 +809,15 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = this._formula.parse(true, true);
+		this._formula.parse(true, true);
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
+			for (var index = 0; index < this._formula.RefPos.length; index++) {
 				wsName = null;
 				isName = false;
-				r = refPos[index];
+				r = this._formula.RefPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -935,12 +935,12 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = this._formula.parse(true, true);
+		this._formula.parse(true, true);
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
+			for (var index = 0; index < this._formula.RefPos.length; index++) {
 				wsName = null;
-				r = refPos[index];
+				r = this._formula.RefPos[index];
 
 				offset = r.end;
 				_e = r.end;
