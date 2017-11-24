@@ -2729,13 +2729,14 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Selection.Use      = true;
 				this.Selection.Start    = false;
 				this.Selection.Flag     = selectionflag_Common;
-				this.Selection.StartPos = ContentPos;
-				this.Selection.EndPos   = ContentPos;
 
-				this.Correct_Content(ContentPos, ContentPos);
+				// TODO: Это плохой код, внутри классов должен выставляться селект целиком
+				//       надо посмотреть для чего это было сделано
 
-				this.Document_SetThisElementCurrent(false);
-
+				//this.Selection.StartPos = ContentPos;
+				//this.Selection.EndPos   = ContentPos;
+				//this.Correct_Content(ContentPos, ContentPos);
+				//this.Document_SetThisElementCurrent(false);
 				return true;
 			}
 

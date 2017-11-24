@@ -892,6 +892,21 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 {
                     return this.Paragraph.Parent.Select_DrawingObject(this.Content[CurPos - 1].Get_Id());
                 }
+                else if (para_FieldChar === this.Content[CurPos - 1].Type)
+				{
+					var oComplexField = this.Content[CurPos - 1].GetComplexField();
+					if (oComplexField)
+					{
+						oComplexField.SelectField();
+						var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+						if (oLogicDocument)
+						{
+							oLogicDocument.Document_UpdateInterfaceState();
+							oLogicDocument.Document_UpdateSelectionState();
+						}
+					}
+					return true;
+				}
 
                 this.Remove_FromContent(CurPos - 1, 1, true);
 
@@ -910,6 +925,21 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 {
                     return this.Paragraph.Parent.Select_DrawingObject(this.Content[CurPos].Get_Id());
                 }
+				else if (para_FieldChar === this.Content[CurPos].Type)
+				{
+					var oComplexField = this.Content[CurPos].GetComplexField();
+					if (oComplexField)
+					{
+						oComplexField.SelectField();
+						var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+						if (oLogicDocument)
+						{
+							oLogicDocument.Document_UpdateInterfaceState();
+							oLogicDocument.Document_UpdateSelectionState();
+						}
+					}
+					return true;
+				}
 
                 this.Remove_FromContent(CurPos, 1, true);
 

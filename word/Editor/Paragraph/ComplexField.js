@@ -57,6 +57,10 @@ function ParaFieldChar(Type, LogicDocument)
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
 ParaFieldChar.prototype.Type = para_FieldChar;
+ParaFieldChar.prototype.Copy = function()
+{
+	return new ParaFieldChar(this.CharType, this.LogicDocument);
+};
 ParaFieldChar.prototype.Measure = function(Context, TextPr)
 {
 };
@@ -509,6 +513,23 @@ CComplexField.prototype.private_SelectFieldCode = function()
 	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar));
 	var oEndPos = oDocument.GetContentPosition(false);
 
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
+CComplexField.prototype.SelectField = function()
+{
+	var oDocument = this.LogicDocument;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.RemoveSelection();
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 };
 CComplexField.prototype.IsUse = function()
