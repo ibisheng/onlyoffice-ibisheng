@@ -569,23 +569,14 @@ CComplexField.prototype.private_UpdateInstruction = function()
 		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
 	}
 };
+CComplexField.prototype.IsHidden = function()
+{
+	if (!this.BeginChar || !this.SeparateChar)
+		return false;
 
-function CComplexFieldStatePos(oComplexField, isFieldCode)
-{
-	this.FieldCode    = undefined !== isFieldCode ? isFieldCode : true;
-	this.ComplexField = oComplexField ? oComplexField : null;
-}
-CComplexFieldStatePos.prototype.Copy = function()
-{
-	return new CComplexFieldStatePos(this.ComplexField, this.FieldCode);
-};
-CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
-{
-	this.FieldCode = isFieldCode;
-};
-CComplexFieldStatePos.prototype.IsFieldCode = function()
-{
-	return this.FieldCode;
+	var oInstruction = this.GetInstruction();
+
+	return (oInstruction && fieldtype_ASK === oInstruction.GetType()) ? true : false;
 };
 
 function TEST_ADDFIELD(sInstruction)
