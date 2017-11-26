@@ -8024,7 +8024,8 @@ DrawingObjectsController.prototype =
             nFontSize = 54;
             oShape.createTextBody();
         }
-		if(typeof sStartString === "string")
+        var bUseStartString = (typeof sStartString === "string");
+		if(bUseStartString)
 		{
 			nFontSize = undefined;
 		}
@@ -8042,28 +8043,36 @@ DrawingObjectsController.prototype =
         oShape.setSpPr(oSpPr);
         oSpPr.setParent(oShape);
         var oContent = oShape.getDocContent();
-        var sText, oSelectedContent, oNearestPos;
+        var sText, oSelectedContent, oNearestPos, sSelectedText;
         if(this.document)
         {
+            sSelectedText = this.document.GetSelectedText(true, {});
             oSelectedContent = this.document.GetSelectedContent(true);
             oContent.Recalculate_Page(0, true);
             oContent.MoveCursorToStartPos(false);
             oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
             oNearestPos.Paragraph.Check_NearestPos( oNearestPos );
-            if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
+            if(typeof sSelectedText === "string" && sSelectedText.length > 0)
             {
-
-                oSelectedContent.MoveDrawing = true;
-                oContent.Insert_Content(oSelectedContent, oNearestPos);
-                oContent.Selection.Start    = false;
-                oContent.Selection.Use      = false;
-                oContent.Selection.StartPos = 0;
-                oContent.Selection.EndPos   = 0;
-                oContent.Selection.Flag     = selectionflag_Common;
-
-                oContent.Set_DocPosType(docpostype_Content);
-                oContent.CurPos.ContentPos = 0;
-                oShape.bSelectedText = true;
+                if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
+                {
+                    oSelectedContent.MoveDrawing = true;
+                    oContent.Insert_Content(oSelectedContent, oNearestPos);
+                    oContent.Selection.Start    = false;
+                    oContent.Selection.Use      = false;
+                    oContent.Selection.StartPos = 0;
+                    oContent.Selection.EndPos   = 0;
+                    oContent.Selection.Flag     = selectionflag_Common;
+                    oContent.Set_DocPosType(docpostype_Content);
+                    oContent.CurPos.ContentPos = 0;
+                    oShape.bSelectedText = true;
+                }
+                else
+                {
+                    sText = this.getDefaultText();
+                    AscFormat.AddToContentFromString(oContent, sText);
+                    oShape.bSelectedText = false;
+                }
             }
             else
             {
@@ -8076,7 +8085,7 @@ DrawingObjectsController.prototype =
         {
             oShape.setParent(this.drawingObjects);
             var oTargetDocContent = this.getTargetDocContent();
-            if(oTargetDocContent && oTargetDocContent.Selection.Use)
+            if(oTargetDocContent && oTargetDocContent.Selection.Use && oTargetDocContent.GetSelectedText(true, {}).length > 0)
             {
                 oSelectedContent = new CSelectedContent();
                 oTargetDocContent.GetSelectedContent(oSelectedContent);
@@ -8102,17 +8111,17 @@ DrawingObjectsController.prototype =
             else
             {
                 oShape.bSelectedText = false;
-                sText = (typeof sStartString === "string") ? sStartString : this.getDefaultText();
+                sText = bUseStartString ? sStartString : this.getDefaultText();
                 AscFormat.AddToContentFromString(oContent, sText);
             }
         }
         else
         {
-            sText = (typeof sStartString === "string") ? sStartString : this.getDefaultText();
+            sText = bUseStartString ? sStartString : this.getDefaultText();
             AscFormat.AddToContentFromString(oContent, sText);
         }
         var oTextPr;
-        if(!(typeof sStartString === "string"))
+        if(!bUseStartString)
         {
             oTextPr = oShape.getTextArtPreviewManager().getStylesToApply()[nStyle].Copy();
             oTextPr.FontSize = nFontSize;
