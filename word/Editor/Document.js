@@ -16073,6 +16073,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		this.Recalculate();
 	}
 };
+CDocument.prototype.GetPagesCount = function()
+{
+	return this.Pages.length;
+};
 
 function CDocumentSelectionState()
 {
