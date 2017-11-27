@@ -133,6 +133,7 @@ window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idO
 	else if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
         var _param = "";
         _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+		this.currentPassword = option.asc_getPassword();
         window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
     }
 };
@@ -149,6 +150,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 	}
 	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data, _len);
+
+	window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 
 /////////////////////////////////////////////////////////
@@ -266,7 +269,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isFo
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param, password);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? window["Asc"]["editor"].currentPassword : password);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {
@@ -287,7 +290,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 		if (window.SaveQuestionObjectBeforeSign)
 		{
 			var _obj = window.SaveQuestionObjectBeforeSign;
-			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height, window["asc_IsVisibleSign"](_obj.guid));
 			window.SaveQuestionObjectBeforeSign = null;
 		}
 	}
@@ -299,6 +302,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
+
+	if (0 == error)
+		window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != window["Asc"]["editor"].currentPassword) ? true : false);
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

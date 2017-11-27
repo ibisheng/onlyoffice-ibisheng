@@ -1183,6 +1183,9 @@
         }
         return false;
     };
+    CGraphicObjectBase.prototype.getSignatureLineGuid = function(){
+        return null;
+    };
 
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;

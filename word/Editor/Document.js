@@ -4575,6 +4575,10 @@ CDocument.prototype.MoveCursorToCell = function(bNext)
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
 };
+CDocument.prototype.MoveCursorToSignature = function(sGuid)
+{
+    this.DrawingObjects.moveCursorToSignature(sGuid);
+};
 CDocument.prototype.SetParagraphAlign = function(Align)
 {
 	var SelectedInfo = this.GetSelectedElementsInfo();
@@ -15688,6 +15692,16 @@ CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();
 };
+CDocument.prototype.CallSignatureDblClickEvent = function(sGuid)
+{
+    var ret = [], allSpr = [];
+    allSpr = allSpr.concat(allSpr.concat(this.DrawingObjects.getAllSignatures2(ret, this.DrawingObjects.getDrawingArray())));
+    for(var i = 0; i < allSpr.length; ++i){
+        if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+            this.Api.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+        }
+    }
+};
 CDocument.prototype.SetCheckContentControlsLock = function(isLocked)
 {
 	this.CheckContentControlsLock = isLocked;
@@ -15704,9 +15718,21 @@ CDocument.prototype.IsViewMode = function()
 {
 	return this.Api.isViewMode;
 };
+CDocument.prototype.IsEditSignaturesMode = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+};
+CDocument.prototype.IsViewModeInEditor = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+};
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsFillingFormMode())
+	if (this.IsViewMode()
+		|| this.IsEditCommentsMode()
+		|| this.IsFillingFormMode()
+		|| this.IsEditSignaturesMode()
+		|| this.IsViewModeInEditor())
 		return false;
 
 	return true;

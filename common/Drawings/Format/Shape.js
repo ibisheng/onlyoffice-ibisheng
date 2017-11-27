@@ -5354,6 +5354,14 @@ CShape.prototype.getColumnNumber = function(){
         }
     };
 
+    CShape.prototype.getSignatureLineGuid = function()
+    {
+        if(this.signatureLine){
+            return this.signatureLine.id;
+        }
+        return null;
+    };
+
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {
