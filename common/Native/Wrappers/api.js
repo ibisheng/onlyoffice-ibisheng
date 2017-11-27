@@ -5862,7 +5862,7 @@ function NativeOpenFile3(_params, documentInfo)
 
         var permissions = window.documentInfo["permissions"];
         if (undefined != permissions && null != permissions && permissions.length > 0) {
-            docInfo.put_Permissions(permissions);
+            docInfo.put_Permissions(JSON.parse(permissions));
         }   
 
         _api.asc_setDocInfo(docInfo);

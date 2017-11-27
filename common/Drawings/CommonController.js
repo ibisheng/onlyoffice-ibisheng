@@ -722,6 +722,27 @@ function CanStartEditText(oController)
 
 DrawingObjectsController.prototype =
 {
+
+    getAllSignatures: function(){
+        var _ret = [];
+        this.getAllSignatures2(_ret, this.getDrawingArray());
+        return _ret;
+    },
+
+    getAllSignatures2: function(aRet, spTree){
+        var aSp = [];
+        for(var i = 0; i < spTree.length; ++i){
+            if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                aSp = aSp.concat(this.getAllSignatures2(aRet, spTree[i].spTree));
+            }
+            else if(spTree[i].signatureLine){
+                aRet.push(spTree[i].signatureLine);
+                aSp.push(spTree[i]);
+            }
+        }
+        return aSp;
+    },
+
     getDefaultText: function(){
         return  AscCommon.translateManager.getValue('Your text here');
     },
@@ -945,6 +966,13 @@ DrawingObjectsController.prototype =
         else
         {
             return {result: false, selectedIndex: -1};
+        }
+    },
+
+    handleSignatureDblClick: function(sGuid, width, height){
+        var oApi = editor || Asc['editor'];
+        if(oApi){
+            oApi.sendEvent("asc_onSignatureDblClick", sGuid, width, height);
         }
     },
 
@@ -7241,7 +7269,8 @@ DrawingObjectsController.prototype =
                         title: drawing.getTitle(),
                         description: drawing.getDescription(),
                         columnNumber: drawing.getColumnNumber(),
-                        columnSpace: drawing.getColumnSpace()
+                        columnSpace: drawing.getColumnSpace(),
+                        signatureId: drawing.getSignatureLineGuid()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -7417,7 +7446,8 @@ DrawingObjectsController.prototype =
                         textArtProperties: null,
                         lockAspect: lockAspect,
                         title: drawing.getTitle(),
-                        description: drawing.getDescription()
+                        description: drawing.getDescription(),
+                        signatureId: drawing.getSignatureLineGuid()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;

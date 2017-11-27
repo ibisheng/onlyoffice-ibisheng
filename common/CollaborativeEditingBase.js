@@ -427,6 +427,9 @@ CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImage
     var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
     this.CheckWaitingImages(aImagesToLoad);
     AscCommon.CollaborativeEditing.m_aNewImages.length = 0;
+    if(false === oApi.isSaveFonts_Images){
+        oApi.isSaveFonts_Images = true;
+    }
     oApi.fCurCallback = function (oRes) {
         var aData, i, oUrls;
         if(oRes['status'] === 'ok')
@@ -454,12 +457,22 @@ CCollaborativeEditingBase.prototype.CollectImagesFromChanges = function () {
     var oApi = editor || Asc['editor'];
     var aImages = [], sImagePath, i, sImageFromChanges, oThemeUrls = {};
     var aNewImages = this.m_aNewImages;
+    var oMap = {};
     for(i = 0; i < aNewImages.length; ++i)
     {
         sImageFromChanges = aNewImages[i];
+        if(oMap[sImageFromChanges])
+        {
+            continue;
+        }
+        oMap[sImageFromChanges] = 1;
         if(sImageFromChanges.indexOf('theme') === 0 && oApi.ThemeLoader)
         {
             oThemeUrls[sImageFromChanges] = oApi.ThemeLoader.ThemesUrlAbs + sImageFromChanges;
+        }
+        else if (0 === sImageFromChanges.indexOf('http:') || 0 === sImageFromChanges.indexOf('data:') || 0 === sImageFromChanges.indexOf('https:') ||
+            0 === sImageFromChanges.indexOf('file:') || 0 === sImageFromChanges.indexOf('ftp:'))
+        {
         }
         else
         {
@@ -487,7 +500,7 @@ CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
     }
     else
     {
-        this.SendImagesCallback(this.m_aNewImages);
+        this.SendImagesCallback([].concat(this.m_aNewImages));
         this.m_aNewImages.length = 0;
     }
 };

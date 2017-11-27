@@ -13,14 +13,14 @@ copy ..\cell\sdk-all-min.js ..\..\core\build\jsdesktop\sdkjs\cell\sdk-all-min.js
 
 copy ..\common\Native\native.js ..\..\core\build\jsdesktop\sdkjs\common\Native\native.js
 
-copy ..\word\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all.js
-copy ..\slide\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all.js
-copy ..\cell\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all.js
+copy ..\word\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\word\sdk-all.js
+copy ..\slide\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\slide\sdk-all.js
+copy ..\cell\sdk-all.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\cell\sdk-all.js
 
-copy ..\word\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\word\sdk-all-min.js
-copy ..\slide\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\slide\sdk-all-min.js
-copy ..\cell\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\cell\sdk-all-min.js
+copy ..\word\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\word\sdk-all-min.js
+copy ..\slide\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\slide\sdk-all-min.js
+copy ..\cell\sdk-all-min.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\cell\sdk-all-min.js
 
-copy ..\common\Native\native.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\Local\editors\sdkjs\common\Native\native.js
+copy ..\common\Native\native.js ..\..\core-ext\desktop-sdk-wrapper\test\build\win_64\Debug\editors\sdkjs\common\Native\native.js
 
 pause

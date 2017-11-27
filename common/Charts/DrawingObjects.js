@@ -2563,6 +2563,27 @@ function DrawingObjects() {
 
     };
 
+    _this.addSignatureLine = function(sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl)
+    {
+        _this.objectLocker.reset();
+        _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
+        _this.objectLocker.checkObjects(function (bLock) {
+            if (bLock !== true)
+                return;
+            _this.controller.resetSelection();
+            var dLeft = worksheet.getCellLeft(worksheet.model.selectionRange.activeCell.col, 3);
+            var dTop = worksheet.getCellTop(worksheet.model.selectionRange.activeCell.row, 3);
+            var oSignatureLine = AscFormat.fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, false, worksheet.model, Width, Height, sImgUrl);
+            oSignatureLine.spPr.xfrm.setOffX(dLeft);
+            oSignatureLine.spPr.xfrm.setOffY(dTop);
+            oSignatureLine.addToDrawingObjects();
+            oSignatureLine.checkDrawingBaseCoords();
+            _this.controller.selectObject(oSignatureLine, 0);
+            _this.controller.startRecalculate();
+            worksheet.setSelectionShape(true);
+        });
+    };
+
     _this.addMath = function(Type){
         if (!_this.isViewerMode() && _this.controller) {
 

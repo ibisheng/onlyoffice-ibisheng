@@ -3362,13 +3362,13 @@
                 if (!oThis.isCopyPaste || (oThis.isCopyPaste && cell)) {
                     var nXfsId;
                     var cellXfs = cell.xfs;
-                    if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
+                    /*if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
                         var compiledXfs = cell.getCompiledStyle();
                         nXfsId = this.prepareXfs(compiledXfs);
                         cellXfs = compiledXfs;
-                    } else {
+                    } else {*/
                         nXfsId = this.prepareXfs(cell.xfs);
-                    }
+                    //}
 
                     //сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
                     if (null != cellXfs || false == cell.isEmptyText()) {

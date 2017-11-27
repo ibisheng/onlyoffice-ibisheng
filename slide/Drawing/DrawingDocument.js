@@ -2054,7 +2054,8 @@ function CDrawingDocument()
 				if (0 > nValueScrollHor)
 					nValueScrollHor = 0;
 
-				this.m_oWordControl.m_oScrollHorApi.scrollToX(nValueScrollHor, false);
+				if (this.m_oWordControl.m_oTimerScrollSelect == -1)
+					this.m_oWordControl.m_oScrollHorApi.scrollToX(nValueScrollHor, false);
 			}
 			if (0 != nValueScrollVer)
 			{
@@ -2066,7 +2067,8 @@ function CDrawingDocument()
 				if (this.m_oWordControl.SlideScrollMIN > nValueScrollVer)
 					nValueScrollVer = this.m_oWordControl.SlideScrollMIN;
 
-				this.m_oWordControl.m_oScrollVerApi.scrollToY(nValueScrollVer, false);
+				if (this.m_oWordControl.m_oTimerScrollSelect == -1)
+					this.m_oWordControl.m_oScrollVerApi.scrollToY(nValueScrollVer, false);
 			}
 
 			if (true == isNeedScroll)
@@ -4099,6 +4101,9 @@ function CThumbnailsManager()
 	this.onMouseWhell = function(e)
 	{
 		if (false === this.m_bIsScrollVisible || !oThis.m_oWordControl.m_oScrollThumbApi)
+			return;
+
+		if (global_keyboardEvent.CtrlKey)
 			return;
 
 		if (undefined !== window["AscDesktopEditor"])

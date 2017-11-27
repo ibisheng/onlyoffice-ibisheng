@@ -57,12 +57,13 @@
                         window.plugin_sendMessage(_message);
                     };
 
-					window.Asc.plugin.executeMethod = function(name, params)
+					window.Asc.plugin.executeMethod = function(name, params, callback)
 					{
 					    if (window.Asc.plugin.isWaitMethod === true)
 					        return false;
 
 					    window.Asc.plugin.isWaitMethod = true;
+					    window.Asc.plugin.methodCallback = callback;
 
 						window.Asc.plugin.info.type = "method";
 						window.Asc.plugin.info.methodName = name;
@@ -109,6 +110,34 @@
                         window.plugin_sendMessage(_message);
                     };
 
+                    window.Asc.plugin.callCommand = function(func, isClose, isCalc)
+					{
+						var _txtFunc = "var Asc = {}; Asc.scope = " + JSON.stringify(window.Asc.scope) + "; var scope = Asc.scope; (" + func.toString() + ")();";
+						var _type = (isClose === true) ? "close" : "command";
+						window.Asc.plugin.info.recalculate = (false === isCalc) ? false : true;
+						window.Asc.plugin.executeCommand(_type, _txtFunc);
+					};
+
+                    window.Asc.plugin.callModule = function(url, callback, isClose)
+					{
+						var _isClose = isClose;
+						var _client = new XMLHttpRequest();
+						_client.open("GET", url);
+
+
+						_client.onreadystatechange = function() {
+							if (_client.readyState == 4 && (_client.status == 200 || location.href.indexOf("file:") == 0))
+							{
+								var _type = (_isClose === true) ? "close" : "command"
+								window.Asc.plugin.info.recalculate = true;
+								window.Asc.plugin.executeCommand(_type, _client.responseText);
+								if (callback)
+									callback(_client.responseText);
+							}
+						};
+						_client.send();
+					};
+
                     window.Asc.plugin.init(window.Asc.plugin.info.data);
                     break;
                 }
@@ -137,8 +166,16 @@
                 case "onMethodReturn":
                 {
 					window.Asc.plugin.isWaitMethod = false;
-                    if (window.Asc.plugin.onMethodReturn)
-                        window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
+
+					if (window.Asc.plugin.methodCallback)
+					{
+						window.Asc.plugin.methodCallback(pluginData.methodReturnData);
+						window.Asc.plugin.methodCallback = null;
+					}
+					else if (window.Asc.plugin.onMethodReturn)
+					{
+						window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
+					}
                     break;
                 }
 				case "onCommandCallback":

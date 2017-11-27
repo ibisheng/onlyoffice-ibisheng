@@ -312,19 +312,18 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 	_editor.signatures = [];
 
-	var _signatures = null;
-
-	try
+	var _signatures = [];
+	if ("" != _json)
 	{
-		_signatures = JSON.parse(_json);
+		try
+		{
+			_signatures = JSON.parse(_json);
+		}
+		catch (err)
+		{
+			_signatures = [];
+		}
 	}
-	catch (err)
-	{
-		return;
-	}
-
-	if (!_signatures)
-		return;
 
 	var _count = _signatures["count"];
 	var _data = _signatures["data"];
@@ -343,6 +342,9 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 		_add_sign.image = "data:image/png;base64," + _add_sign.image;
 		_add_sign.signer1 = _sign["name"];
 		_add_sign.id = i;
+		_add_sign.date = _sign["date"];
+		_add_sign.isvisible = window["asc_IsVisibleSign"](_add_sign.guid);
+		_add_sign.correct();
 
 		_editor.signatures.push(_add_sign);
 
@@ -363,6 +365,23 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+
+		});
+		_editor.asc_registerCallback("asc_onUpdateSignatures", function (signatures, requested)
+		{
+
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			if (_api.editorId == AscCommon.c_oEditorId.Word || _api.editorId == AscCommon.c_oEditorId.Presentation)
+			{
+				if (0 == signatures.length)
+					_api.asc_setRestriction(Asc.c_oAscRestrictionType.None);
+				else
+					_api.asc_setRestriction(Asc.c_oAscRestrictionType.OnlySignatures);
+			}
+			else
+			{
+				// TODO:
+			}
 
 		});
 	}
@@ -397,28 +416,62 @@ window["OnNativeOpenFilenameDialog"] = function(file)
 	delete window.on_native_open_filename_dialog;
 };
 
+window["asc_IsVisibleSign"] = function(guid)
+{
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	var isVisible = false;
+	// detect visible/unvisible
+	var _req = _editor.asc_getAllSignatures();
+	for (var i = 0; i < _req.length; i++)
+	{
+		if (_req[i].id == guid)
+		{
+			isVisible = true;
+			break;
+		}
+	}
+
+	return isVisible;
+};
+
+window["asc_LocalRequestSign"] = function(guid, width, height, isView)
+{
+	if (isView !== true && width === undefined)
+	{
+		width = 100;
+		height = 100;
+	}
+
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	var _length = _editor.signatures.length;
+	for (var i = 0; i < _length; i++)
+	{
+		if (_editor.signatures[i].guid == guid)
+		{
+			if (isView === true)
+			{
+				window["AscDesktopEditor"]["ViewCertificate"](_editor.signatures[i].id);
+			}
+			return;
+		}
+	}
+
+	if (!_editor.isDocumentModify)
+	{
+		_editor.sendEvent("asc_onSignatureClick", guid, width, height, window["asc_IsVisibleSign"](guid));
+		return;
+	}
+
+	window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
+	window["AscDesktopEditor"]["SaveQuestion"]();
+};
+
 window["DesktopAfterOpen"] = function(_api)
 {
 	_api.asc_registerCallback("asc_onSignatureDblClick", function (guid, width, height)
 	{
-		var _length = _api.signatures.length;
-		for (var i = 0; i < _length; i++)
-		{
-			if (_api.signatures[i].guid == guid)
-			{
-				window["AscDesktopEditor"]["ViewCertificate"](_api.signatures[i].id);
-				return;
-			}
-		}
-
-		if (!_api.isDocumentModify)
-		{
-			_api.sendEvent("asc_onSignatureClick", guid, width, height);
-			return;
-		}
-
-		window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
-		window["AscDesktopEditor"]["SaveQuestion"]();
+		window["asc_LocalRequestSign"](guid, width, height, true);
 	});
 
 	_api.sendEvent('asc_onSpellCheckInit', [
@@ -510,6 +563,10 @@ _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 			if ("" != obj["password"])
 			{
 				var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
+
+				var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+				_editor.currentPassword = obj["password"];
+
 				window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 			}
 			else

@@ -1372,7 +1372,7 @@ CFontSelect.prototype =
         if (_res1 == _res2)
             return 1500;
 
-        if (_res1.replace(/\s+/g, '') == _res2.replace(/\s+/g, ''))
+        if (_res1.replace(/[\s-]/g, '') == _res2.replace(/[\s-]/g, ''))
             return 3000;
 
         return 10000;

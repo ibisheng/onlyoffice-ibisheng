@@ -9328,8 +9328,12 @@
 			trueActiveRange.r2 = arn.r2;
 			trueActiveRange.c2 = arn.c2;
         }
-		
-		
+
+		//необходимо проверить, пересекаемся ли мы с фоматированной таблицей
+		//если да, то подхватывать dxf при вставке не нужно
+		var intersectionAllRangeWithTables = t.model.autoFilters._intersectionRangeWithTableParts(trueActiveRange);
+
+
 		var addComments = function(pasteRow, pasteCol, comments)
 		{
 			var comment;
@@ -9400,6 +9404,10 @@
 		var getTableDxf = function (pasteRow, pasteCol, newVal)
 		{
 			var dxf = null;
+
+			if(false !== intersectionAllRangeWithTables){
+				return {dxf: null};
+			}
 
 			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
 			var blocalArea = true;
@@ -11906,7 +11914,11 @@
 			var addFilterCallBack;
 			if (bIsChangeFilterToTable)//CHANGE FILTER TO TABLEPART
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -11922,7 +11934,11 @@
 				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
 			} else//ADD
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -11947,7 +11963,7 @@
 				};
 
 				if (styleName === null) {
-					addFilterCallBack();
+					addFilterCallBack(true);
 				} else {
 					t._isLockedCells(filterRange, null, addFilterCallBack)
 				}

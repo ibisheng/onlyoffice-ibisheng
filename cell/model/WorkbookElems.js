@@ -159,7 +159,7 @@ RgbColor.prototype =
 
     isEqual: function(oColor)
     {
-        if(!oColor){
+        if(!oColor || !(oColor instanceof RgbColor)){
             return false;
         }
         if(this.rgb !== oColor.rgb){

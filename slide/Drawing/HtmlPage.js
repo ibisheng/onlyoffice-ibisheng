@@ -3112,6 +3112,9 @@ function CEditorPage(api)
 	this.OnResize2 = function(isAttack)
 	{
 		this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
+		if (this.m_oApi.isReporterMode)
+			this.OnResizeReporter();
+
 		this.onButtonTabsDraw();
 		this.DemonstrationManager.Resize();
 
