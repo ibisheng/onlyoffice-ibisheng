@@ -5585,7 +5585,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.WordControl.setNodesEnable(((this.isViewMode || this.isMobileVersion) && !this.isReporterMode) ? false : true);
+		this.WordControl.setNodesEnable((this.isMobileVersion && !this.isReporterMode) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;
