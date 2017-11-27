@@ -3473,12 +3473,12 @@
 			var parsed = cell.getFormulaParsed();
 			if (parsed) {
 				var cellWithFormula;
-				var sharedRef = parsed.getShared();
-				if (sharedRef) {
-					var offsetShared = new CRangeOffset(cell.nCol - sharedRef.c1, cell.nRow - sharedRef.r1);
+				var shared = parsed.getShared();
+				if (shared) {
+					var offsetShared = new CRangeOffset(cell.nCol - shared.base.nCol, cell.nRow - shared.base.nRow);
 					cellWithFormula = new AscCommonExcel.CCellWithFormula(cell.ws, newNRow, newNCol);
 					var newFormula = parsed.clone(undefined, cellWithFormula);
-					newFormula.setShared(undefined);
+					newFormula.removeShared();
 					newFormula.changeOffset(offsetShared, false);
 					newFormula.Formula = newFormula.assemble(true);
 					cell.setFormulaInternal(newFormula);
@@ -5709,10 +5709,10 @@
 	};
 	Cell.prototype.processFormula = function(callback) {
 		if (this.formulaParsed) {
-			var sharedRef = this.formulaParsed.getShared();
-			if (sharedRef) {
-				var offsetRow = this.nRow - sharedRef.r1;
-				var offsetCol = this.nCol - sharedRef.c1;
+			var shared = this.formulaParsed.getShared();
+			if (shared) {
+				var offsetRow = this.nRow - shared.base.nRow;
+				var offsetCol = this.nCol - shared.base.nCol;
 				AscCommonExcel.g_cellFormulaState.fill(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
 				callback(this.formulaParsed);
 				AscCommonExcel.g_cellFormulaState.clear();
@@ -7060,14 +7060,14 @@
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			var areaData = eventData.notifyData.areaData;
 			var areaFragment = eventData.notifyData.areaFragment;
-			var sharedRef = eventData.formula.getShared();
-			if (sharedRef && areaData && areaFragment) {
+			var shared = eventData.formula.getShared();
+			if (shared && areaData && areaFragment) {
 				var bbox = areaData.bbox;
 				var dependencyFormulas = this.ws.workbook.dependencyFormulas;
 				for (var i = 0; i < areaData.cellsInArea.length; i += 2) {
 					var row = areaData.cellsInArea[i];
 					var col = areaData.cellsInArea[i + 1];
-					var changedRange = bbox.getSharedRange(sharedRef, col, row);
+					var changedRange = bbox.getSharedRange(shared.ref, col, row);
 					for (var j = changedRange.r1; j <= changedRange.r2; ++j) {
 						for (var k = changedRange.c1; k <= changedRange.c2; ++k) {
 							dependencyFormulas.addToChangedPosition(this.ws.getId(), j, k);
@@ -7099,9 +7099,9 @@
 	CCellWithFormula.prototype._onChangeFormula = function(eventData) {
 		var t = this;
 		var parsed = eventData.formula;
-		var sharedRef = parsed.getShared();
-		if (sharedRef) {
-			var ref = sharedRef;
+		var shared = parsed.getShared();
+		if (shared.ref) {
+			var ref = shared.ref;
 			var first = true;
 			this.ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
 				if (parsed === cell.formulaParsed) {
@@ -7129,19 +7129,19 @@
 		var res = false;
 		var data = eventData.notifyData;
 		var parsed = eventData.formula;
-		var sharedRef = parsed.getShared();
+		var shared = parsed.getShared();
 		if ((AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
-				AscCommon.c_oNotifyType.Delete === data.type) && sharedRef) {
-			var sharedShift = parsed.shiftCellsSharedPrepare(sharedRef, data.sheetId, data.bbox, data.offset);
-			//todo !sharedShift.isEqual(sharedRef)
+				AscCommon.c_oNotifyType.Delete === data.type) && shared) {
+			var sharedShift = parsed.shiftCellsSharedPrepare(data.sheetId, data.bbox, data.offset);
+			//todo !sharedShift.isEqual(shared.ref)
 			if (sharedShift) {
-				this._shiftCellsShared(sharedRef, sharedShift, data, parsed);
+				this._shiftCellsShared(shared, sharedShift, data, parsed);
 				res = true;
 			}
 		}
 		return res;
 	};
-	CCellWithFormula.prototype._shiftCellsShared = function(sharedRef, ref, data, parsed) {
+	CCellWithFormula.prototype._shiftCellsShared = function(shared, ref, data, parsed) {
 		var t = this;
 		var cellWithFormula;
 		var cellOffset = new AscCommonExcel.CRangeOffset();
@@ -7151,9 +7151,9 @@
 				if (!cellWithFormula) {
 					cellWithFormula = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
 					newFormula = parsed.clone(undefined, cellWithFormula);
-					newFormula.setShared(undefined);
-					cellOffset.offsetRow = cell.nRow - sharedRef.r1;
-					cellOffset.offsetCol = cell.nCol - sharedRef.c1;
+					newFormula.removeShared();
+					cellOffset.offsetRow = cell.nRow - shared.base.nRow;
+					cellOffset.offsetCol = cell.nCol - shared.base.nCol;
 				} else {
 					cellOffset.offsetRow = cell.nRow - cellWithFormula.nRow;
 					cellOffset.offsetCol = cell.nCol - cellWithFormula.nCol;

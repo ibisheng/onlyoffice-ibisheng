@@ -1176,11 +1176,12 @@
 		this.t = null;
 		this.v = null;
 	};
-	function OpenColumnFormula(nRow, formula, parsed, refPos) {
+	function OpenColumnFormula(nRow, formula, parsed, refPos, base) {
 		this.nRow = nRow;
 		this.formula = formula;
 		this.parsed = parsed;
 		this.refPos = refPos;
+		this.base = base;
 	}
 
 	function ReadColorSpreadsheet2(bcr, length) {
@@ -3601,8 +3602,8 @@
 			var si;
 			var ref;
 			var type;
-			var sharedRef = parsed.getShared();
-			if (sharedRef) {
+			var shared = parsed.getShared();
+			if (shared) {
 				var shared = this.sharedFormulas[parsed.getIndexNumber()];
 				var saveShared = shared ? shared.saveShared : parsed.canSaveShared();
 				if (saveShared) {
@@ -3612,7 +3613,7 @@
 					} else {
 						formula = parsed.getFormula();
 						si = this.sharedFormulasIndex++;
-						ref = sharedRef;
+						ref = shared.ref;
 						this.sharedFormulas[parsed.getIndexNumber()] = {saveShared: saveShared, si: si};
 					}
 				} else {
@@ -6573,18 +6574,20 @@
 			var prevFormula = tmp.prevFormulas[cell.nCol];
 			if (formula.v && formula.v.length <= AscCommon.c_oAscMaxFormulaLength) {
 				var offsetRow;
+				var shared;
 				var sharedRef;
-				if (prevFormula && (sharedRef = prevFormula.parsed.getShared())) {
-					offsetRow = cell.nRow - sharedRef.r1;
+				if (prevFormula && (shared = prevFormula.parsed.getShared())) {
+					offsetRow = cell.nRow - shared.ref.r1;
 				} else {
 					offsetRow = 1;
 				}
 				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
 					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
-					if (!sharedRef) {
-						prevFormula.parsed.setShared(new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow));
+					if (!shared.ref) {
+					    sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
+						prevFormula.parsed.setShared(sharedRef, prevFormula.base);
 					} else {
-						sharedRef.union3(cell.nCol, cell.nRow);
+						shared.ref.union3(cell.nCol, cell.nRow);
 					}
 					curFormula = prevFormula;
 				} else {
@@ -6596,9 +6599,10 @@
 					formulaParsed.ca = formula.ca;
 					var refPos = formulaParsed.parse();
 					if (null !== formula.ref) {
-						formulaParsed.setShared(AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone());
+						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
+						formulaParsed.setShared(sharedRef, newFormulaParent);
 					}
-					curFormula = new OpenColumnFormula(cell.nRow, formula.v, formulaParsed, refPos);
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, formulaParsed, refPos, newFormulaParent);
 					tmp.prevFormulas[cell.nCol] = curFormula;
 				}
 				if (null !== formula.si) {
@@ -6608,7 +6612,7 @@
 			} else if (null !== formula.si) {
 				curFormula = tmp.sharedFormulas[formula.si];
 				if (curFormula) {
-					curFormula.parsed.getShared().union3(cell.nCol, cell.nRow);
+					curFormula.parsed.getShared().ref.union3(cell.nCol, cell.nRow);
 				}
 				if (prevFormula !== curFormula) {
 					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {

@@ -243,6 +243,9 @@
 			this.offsetCol = offsetCol;
 			this.offsetRow = offsetRow;
 		}
+		CRangeOffset.prototype.isEmpty = function () {
+			return 0 === this.offsetRow && 0 === this.offsetCol;
+		};
 
 		/**
 		 * Rectangle region of cells
@@ -830,12 +833,18 @@
 			var c2 = isAbsC1 ? sharedRef.c2 : Math.min(sharedRef.c1 + (c - this.c1), sharedRef.c2);
 			return new Range(c1, r1, c2, r2);
 		};
-		Range.prototype.getSharedRangeBbox = function(sharedRef) {
+		Range.prototype.getSharedRangeBbox = function(ref, base) {
 			var res = this.clone();
-			var offsetRow = sharedRef.r2 - sharedRef.r1;
-			var offsetCol = sharedRef.c2 - sharedRef.c1;
-			res.setOffsetWithAbs(new AscCommonExcel.CRangeOffset(offsetCol, offsetRow), false, false);
-			res.union2(this);
+			var shiftBase;
+			var offset = new AscCommonExcel.CRangeOffset(ref.c1 - base.nCol, ref.r1 - base.nRow);
+			if (!offset.isEmpty()) {
+				shiftBase = this.clone();
+				shiftBase.setOffsetWithAbs(offset, false, false);
+			}
+			offset.offsetRow = ref.r2 - base.nRow;
+			offset.offsetCol = ref.c2 - base.nCol;
+			res.setOffsetWithAbs(offset, false, false);
+			res.union2(shiftBase ? shiftBase : this);
 			return res;
 		};
 		Range.prototype.getSharedIntersect = function(sharedRef, bbox) {

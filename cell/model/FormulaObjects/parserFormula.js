@@ -4374,7 +4374,7 @@ function parserFormula( formula, parent, _ws ) {
     this.parenthesesNotEnough = false;
     this.f = [];
     this.countRef = 0;
-    this.sharedRef = null;
+    this.shared = null;
 
 	this.listenerId = lastListenerId++;
 	this.ca = false;
@@ -4390,10 +4390,13 @@ function parserFormula( formula, parent, _ws ) {
 		this.isTable = isTable;
 	};
 	parserFormula.prototype.getShared = function() {
-		return this.sharedRef;
+		return this.shared;
 	};
-	parserFormula.prototype.setShared = function(val) {
-		this.sharedRef = val;
+	parserFormula.prototype.setShared = function(ref, cellWithFormula) {
+		this.shared = {ref: ref, base: cellWithFormula};
+	};
+	parserFormula.prototype.removeShared = function() {
+		this.shared = null;
 	};
 	parserFormula.prototype.notify = function(data) {
 		var eventData = {notifyData: data, assemble: null, formula: this};
@@ -4401,7 +4404,7 @@ function parserFormula( formula, parent, _ws ) {
 			if (this.parent && this.parent.onFormulaEvent) {
 				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
 			}
-		} else if (this.sharedRef && this.parent && this.parent.onFormulaEvent &&
+		} else if (this.shared && this.parent && this.parent.onFormulaEvent &&
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Shared, eventData)) {
 			;
 		} else {
@@ -5644,7 +5647,7 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 		return res;
 	};
-	parserFormula.prototype.shiftCellsSharedPrepare = function(sharedRef, sheetId, bbox, offset) {
+	parserFormula.prototype.shiftCellsSharedPrepare = function(sheetId, bbox, offset) {
 		var ref;
 		var elem;
 		var bboxElem;
@@ -5662,11 +5665,11 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 			}
 			if (bboxElem) {
-				var sharedBBox = bboxElem.getSharedRangeBbox(sharedRef);
+				var sharedBBox = bboxElem.getSharedRangeBbox(this.shared.ref, this.shared.base);
 				var bboxShift = AscCommonExcel.shiftGetBBox(bbox, 0 !== offset.offsetCol);
 				var intersection = bboxShift.intersection(sharedBBox);
 				if (intersection) {
-					var bboxSharedRef = sharedBBox.getSharedIntersect(this.sharedRef, intersection);
+					var bboxSharedRef = sharedBBox.getSharedIntersect(this.shared.ref, intersection);
 					ref = ref ? bboxSharedRef.union(ref) : bboxSharedRef;
 				}
 			}
@@ -5969,9 +5972,9 @@ parserFormula.prototype.setFormula = function(formula) {
 		} else {
 			bbox = this.extendBBoxDefName(isDefName, bbox);
 			var rangeOffset;
-			if (this.sharedRef) {
+			if (this.shared) {
 				rangeOffset = new AscCommonExcel.CRangeOffset(bbox.c2 - bbox.c1 + 1, bbox.r2 - bbox.r1 + 1);
-				bbox = bbox.getSharedRangeBbox(this.sharedRef);
+				bbox = bbox.getSharedRangeBbox(this.shared.ref, this.shared.base);
 			}
 			if (isStart) {
 				this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this, rangeOffset);
