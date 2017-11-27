@@ -2639,6 +2639,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	/** @constructor */
 	function cUnknownFunction(name) {
 		this.name = name;
+		this.isXLFN = null;
 	}
 	cUnknownFunction.prototype = Object.create(cBaseFunction.prototype);
 	cUnknownFunction.prototype.constructor = cUnknownFunction;
