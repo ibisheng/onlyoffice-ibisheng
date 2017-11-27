@@ -724,6 +724,8 @@
 			  self.Api.checkLastWork();
 		  }, "showAutoCorrectOptions": function (val) {
 			  self.handlers.trigger("asc_onShowAutoCorrectOptions", val);
+		  }, "hideAutoCorrectOptions": function () {
+			  self.handlers.trigger("asc_onHideAutoCorrectOptions");
 		  }
 	  });
 

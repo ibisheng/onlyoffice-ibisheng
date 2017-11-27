@@ -12381,6 +12381,22 @@
 
     };
 
+    WorksheetView.prototype.applyAutoCorrectOptions = function (val) {
+
+    	switch (val) {
+			case Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion:
+            {
+				api.asc_Undo();
+            }
+			case Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion:
+			{
+				api.asc_Redo();
+			}
+		}
+
+		return true;
+    };
+
     WorksheetView.prototype.sortRange = function (type, cellId, displayName, color, bIsExpandRange) {
         var t = this;
         var ar = this.model.selectionRange.getLast().clone();
