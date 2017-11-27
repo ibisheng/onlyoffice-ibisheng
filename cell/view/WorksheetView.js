@@ -402,6 +402,8 @@
         this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
+        this.autoCorrectStore = null;//объект для хранения параметров иконки авторазвертывания таблиц
+
         this._init();
 
         return this;

@@ -2306,6 +2306,7 @@
 		asc_CSelectionRangeValue.prototype.asc_getType = function () {return this.type;};
 		asc_CSelectionRangeValue.prototype.asc_getName = function () {return this.name;};
 
+		//передаём в меню для того, чтобы показать иконку опций авторавертывания таблиц
 		function asc_CAutoCorrectOptions(){
 			this.type = null;
 			this.options = [];
