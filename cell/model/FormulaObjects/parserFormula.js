@@ -6511,14 +6511,24 @@ function rtl_math_erfc( x ) {
 		this.nRow = undefined;
 		this.nCol = undefined;
 		this.offset = new AscCommonExcel.CRangeOffset();
+		this.stack = [];
 	}
 
-	CellFormulaState.prototype.clear = function() {
-		this.ws = undefined;
-		this.nRow = undefined;
-		this.nCol = undefined;
-		this.offset.offsetCol = 0;
-		this.offset.offsetRow = 0;
+	CellFormulaState.prototype.pop = function() {
+		var elem = this.stack.pop();
+		if (elem) {
+			this.ws = elem[0];
+			this.nRow = elem[1];
+			this.nCol = elem[2];
+			this.offset.offsetRow = elem[3];
+			this.offset.offsetCol = elem[4];
+		} else {
+			this.ws = undefined;
+			this.nRow = undefined;
+			this.nCol = undefined;
+			this.offset.offsetRow = 0;
+			this.offset.offsetCol = 0;
+		}
 	};
 	CellFormulaState.prototype.isInit = function() {
 		return undefined !== this.ws;
@@ -6554,7 +6564,10 @@ function rtl_math_erfc( x ) {
 		}
 		return res;
 	};
-	CellFormulaState.prototype.fill = function(ws, nRow, nCol, offsetRow, offsetCol) {
+	CellFormulaState.prototype.push = function(ws, nRow, nCol, offsetRow, offsetCol) {
+		if (this.isInit()) {
+			this.stack.push([this.ws, this.nRow, this.nCol, this.offset.offsetRow, this.offset.offsetCol]);
+		}
 		this.ws = ws;
 		this.nRow = nRow;
 		this.nCol = nCol;

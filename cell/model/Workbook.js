@@ -5713,9 +5713,9 @@
 			if (shared) {
 				var offsetRow = this.nRow - shared.base.nRow;
 				var offsetCol = this.nCol - shared.base.nCol;
-				AscCommonExcel.g_cellFormulaState.fill(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
+				AscCommonExcel.g_cellFormulaState.push(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
 				callback(this.formulaParsed);
-				AscCommonExcel.g_cellFormulaState.clear();
+				AscCommonExcel.g_cellFormulaState.pop();
 			} else {
 				callback(this.formulaParsed);
 			}
