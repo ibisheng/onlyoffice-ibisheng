@@ -1060,7 +1060,7 @@ CBlockLevelSdt.prototype.GetLabel = function()
 };
 CBlockLevelSdt.prototype.SetDocPartObj = function(sCategory, sGallery, isUnique)
 {
-	History.Add(new CChangesSdtPrDocPartObj(this, this.Pr.DocPartObj.Category, this.Pr.DocPartObj.Gallery, this.Pr.DocPartObj.Unique, sCategory, sGallery, isUnique));
+	History.Add(new CChangesSdtPrDocPartObj(this, this.Pr.DocPartObj, {Category : sCategory, Gallery : sGallery, Unique : isUnique}));
 	this.Pr.DocPartObj.Category = sCategory;
 	this.Pr.DocPartObj.Gallery  = sGallery;
 	this.Pr.DocPartObj.Unique   = isUnique;

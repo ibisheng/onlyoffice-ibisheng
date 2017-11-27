@@ -832,6 +832,23 @@ CShape.prototype.OnContentReDraw = function(){
     }
 };
 
+    CShape.prototype.Is_ThisElementCurrent = function()
+    {
+        if(this.parent && this.parent.graphicObjects)
+        {
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                return main_group.selection.textSelection === this;
+            }
+            else
+            {
+                return this.parent.graphicObjects.selection.textSelection === this;
+            }
+        }
+        return false;
+    };
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].G_O_DEFAULT_COLOR_MAP = G_O_DEFAULT_COLOR_MAP;

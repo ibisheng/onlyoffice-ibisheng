@@ -1490,6 +1490,8 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 
 	var PDSH = g_oPDSH;
 
+	PDSH.ComplexFields.ResetPage(this, CurPage);
+
 	var _Page = this.Pages[CurPage];
 
 	var DocumentComments = LogicDocument.Comments;
@@ -1752,6 +1754,9 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				Element = aMMFields.Get_Next();
 			}
 
+			//----------------------------------------------------------------------------------------------------------
+			// Заливка сложных полей
+			//----------------------------------------------------------------------------------------------------------
 			var aCFields = PDSH.CFields;
 			var Element   = (pGraphics.RENDERER_PDF_FLAG === true ? null : aCFields.Get_Next());
 			while (null != Element)
@@ -1759,7 +1764,6 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
 				Element = aCFields.Get_Next();
 			}
-
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем комментарии
 			//----------------------------------------------------------------------------------------------------------
@@ -1890,6 +1894,7 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 {
 	var PDSE = this.m_oPDSE;
 	PDSE.Reset(this, pGraphics, BgColor, Theme, ColorMap);
+	PDSE.ComplexFields.ResetPage(this, CurPage);
 
 	var StartLine = this.Pages[CurPage].StartLine;
 	var EndLine   = this.Pages[CurPage].EndLine;
@@ -2077,6 +2082,7 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 {
 	var PDSL = g_oPDSL;
 	PDSL.Reset(this, pGraphics, BgColor);
+	PDSL.ComplexFields.ResetPage(this, CurPage);
 
 	var Page = this.Pages[CurPage];
 
@@ -2723,13 +2729,14 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Selection.Use      = true;
 				this.Selection.Start    = false;
 				this.Selection.Flag     = selectionflag_Common;
-				this.Selection.StartPos = ContentPos;
-				this.Selection.EndPos   = ContentPos;
 
-				this.Correct_Content(ContentPos, ContentPos);
+				// TODO: Это плохой код, внутри классов должен выставляться селект целиком
+				//       надо посмотреть для чего это было сделано
 
-				this.Document_SetThisElementCurrent(false);
-
+				//this.Selection.StartPos = ContentPos;
+				//this.Selection.EndPos   = ContentPos;
+				//this.Correct_Content(ContentPos, ContentPos);
+				//this.Document_SetThisElementCurrent(false);
 				return true;
 			}
 
@@ -6882,6 +6889,10 @@ Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 		else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
 			this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
 	}
+
+	var arrComplexFields = this.GetComplexFieldsByPos(ContentPos ? ContentPos : (this.Selection.Use === true ? this.Get_ParaContentPos(false, false) : this.Get_ParaContentPos(false)), false);
+	if (arrComplexFields.length > 0)
+		Info.SetComplexFields(arrComplexFields);
 };
 Paragraph.prototype.GetElementsInfoByXY = function(oInfo, X, Y, CurPage)
 {
@@ -12428,6 +12439,9 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
+	if (this.IsEmpty())
+		return;
+
 	var nOutlineLvl = this.GetOutlineLvl();
 	if (undefined !== nOutlineLvl
 		&& (!oPr
@@ -12733,7 +12747,7 @@ CParagraphPageEndInfo.prototype.GetComplexFields = function()
 	var arrComplexFields = [];
 	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 	{
-		arrComplexFields[nIndex] = this.ComplexFields[nIndex].ComplexField;
+		arrComplexFields[nIndex] = this.ComplexFields[nIndex].Copy();
 	}
 	return arrComplexFields;
 };
@@ -12905,7 +12919,6 @@ CParaDrawingRangeLines.prototype =
             }
         }
     }
-
 };
 
 function CParagraphSelection()
@@ -13048,6 +13061,194 @@ CParagraphContentPos.prototype =
     }
 };
 
+function CComplexFieldStatePos(oComplexField, isFieldCode)
+{
+	this.FieldCode    = undefined !== isFieldCode ? isFieldCode : true;
+	this.ComplexField = oComplexField ? oComplexField : null;
+}
+CComplexFieldStatePos.prototype.Copy = function()
+{
+	return new CComplexFieldStatePos(this.ComplexField, this.FieldCode);
+};
+CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
+{
+	this.FieldCode = isFieldCode;
+};
+CComplexFieldStatePos.prototype.IsFieldCode = function()
+{
+	return this.FieldCode;
+};
+
+function CParagraphaComplexFieldsInfo()
+{
+	// Массив CComplexFieldStatePos
+	this.CF = [];
+
+	this.isHidden = null;
+}
+CParagraphaComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
+{
+	this.isHidden = null;
+
+	var PageEndInfo = Paragraph.GetEndInfoByPage(CurPage - 1);
+
+	if (PageEndInfo)
+		this.CF = PageEndInfo.GetComplexFields();
+	else
+		this.CF = [];
+};
+/**
+ * Находимся ли мы внутри содержимого скрытого поля
+ * @returns {boolean}
+ */
+CParagraphaComplexFieldsInfo.prototype.IsHiddenFieldContent = function()
+{
+	if (null === this.isHidden)
+		this.isHidden = this.private_IsHiddenFieldContent();
+
+	return this.isHidden;
+};
+CParagraphaComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
+{
+	if (this.CF.length > 0)
+	{
+		for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+		{
+			if (this.CF[nIndex].ComplexField.IsHidden())
+				return true;
+		}
+	}
+
+	return false;
+};
+/**
+ * Данная функция используется при пересчете, когда мы собираем сложное поле.
+ * @param oChar
+ */
+CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = function(oChar)
+{
+	this.isHidden = null;
+
+	if (oChar.IsBegin())
+	{
+		var oComplexField = oChar.GetComplexField();
+		if (!oComplexField)
+		{
+			oChar.SetUse(false);
+		}
+		else
+		{
+			oChar.SetUse(true);
+			oComplexField.SetBeginChar(oChar);
+			this.CF.push(new CComplexFieldStatePos(oComplexField, false));
+		}
+	}
+	else if (oChar.IsEnd())
+	{
+		if (this.CF.length > 0)
+		{
+			oChar.SetUse(true);
+			var oComplexField = this.CF[this.CF.length - 1].ComplexField;
+			oComplexField.SetEndChar(oChar);
+			this.CF.splice(this.CF.length - 1, 1);
+		}
+		else
+		{
+			oChar.SetUse(false);
+		}
+	}
+	else if (oChar.IsSeparate())
+	{
+		if (this.CF.length > 0)
+		{
+			oChar.SetUse(true);
+			var oComplexField = this.CF[this.CF.length - 1].ComplexField;
+			oComplexField.SetSeparateChar(oChar);
+			this.CF[this.CF.length - 1].SetFieldCode(false);
+		}
+		else
+		{
+			oChar.SetUse(false);
+		}
+	}
+};
+/**
+ * Данная функция используется, когда мы просто хотим отследить где мы находимся, относительно сложных полей
+ * @param oChar
+ */
+CParagraphaComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
+{
+	this.isHidden = null;
+
+	if (!oChar || !oChar.IsUse())
+		return;
+
+	var oComplexField = oChar.GetComplexField();
+
+	if (oChar.IsBegin())
+	{
+		this.CF.push(new CComplexFieldStatePos(oComplexField, true));
+	}
+	else if (oChar.IsSeparate())
+	{
+		for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.CF[nIndex].ComplexField)
+			{
+				this.CF[nIndex].SetFieldCode(false);
+				break;
+			}
+		}
+	}
+	else if (oChar.IsEnd())
+	{
+		for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.CF[nIndex].ComplexField)
+			{
+				this.CF.splice(nIndex, 1);
+				break;
+			}
+		}
+	}
+};
+CParagraphaComplexFieldsInfo.prototype.ProcessInstruction = function(oInstruction)
+{
+	if (this.CF.length <= 0)
+		return;
+
+	var oComplexField = this.CF[this.CF.length - 1].ComplexField;
+	if (oComplexField && null === oComplexField.GetSeparateChar())
+		oComplexField.SetInstruction(oInstruction);
+};
+CParagraphaComplexFieldsInfo.prototype.IsComplexField = function()
+{
+	return (this.CF.length > 0 ? true : false);
+};
+CParagraphaComplexFieldsInfo.prototype.IsComplexFieldCode = function()
+{
+	if (!this.IsComplexField())
+		return false;
+
+	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.CF[nIndex].IsFieldCode())
+			return true;
+	}
+
+	return false;
+};
+CParagraphaComplexFieldsInfo.prototype.IsCurrentComplexField = function()
+{
+	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.CF[nIndex].ComplexField.IsCurrent())
+			return true;
+	}
+
+	return false;
+};
+
 function CParagraphDrawStateHightlights()
 {
     this.Page   = 0;
@@ -13072,8 +13273,6 @@ function CParagraphDrawStateHightlights()
 	this.Comments           = [];
 	this.CommentsFlag       = comments_NoComment;
 
-	this.ComplexFields = [];
-
     this.SearchCounter = 0;
 
     this.Paragraph = undefined;
@@ -13084,6 +13283,8 @@ function CParagraphDrawStateHightlights()
     this.Y1 = 0;
 
     this.Spaces = 0;
+
+    this.ComplexFields = new CParagraphaComplexFieldsInfo();
 }
 CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
@@ -13107,13 +13308,10 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 		{
 			this.AddComment(PageEndInfo.Comments[nIndex]);
 		}
-
-		this.ComplexFields = PageEndInfo.ComplexFields;
 	}
 	else
 	{
-		this.Comments      = [];
-		this.ComplexFields = [];
+		this.Comments = [];
 	}
 
 	this.Check_CommentsFlag();
@@ -13233,6 +13431,8 @@ function CParagraphDrawStateElements()
     this.LineTop    = 0;
     this.LineBottom = 0;
     this.BaseLine   = 0;
+
+    this.ComplexFields = new CParagraphaComplexFieldsInfo();
 }
 
 CParagraphDrawStateElements.prototype =
@@ -13297,6 +13497,8 @@ function CParagraphDrawStateLines()
     this.BaseLine        = 0;
     this.UnderlineOffset = 0;
     this.Spaces          = 0;
+
+    this.ComplexFields = new CParagraphaComplexFieldsInfo();
 }
 
 CParagraphDrawStateLines.prototype =
@@ -13468,6 +13670,16 @@ CParagraphSearchPos.prototype.IsComplexFieldValue = function()
 		return false;
 
 	return true;
+};
+CParagraphSearchPos.prototype.IsHiddenComplexField = function()
+{
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.ComplexFields[nIndex].ComplexField.IsHidden())
+			return true;
+	}
+
+	return false;
 };
 
 function CParagraphSearchPosXY()

@@ -412,7 +412,7 @@
 			} else if (val instanceof cArray) {
 				var bIsError = false;
 
-				val.foreach(function (elem, r, c) {
+				val.foreach(function (elem) {
 					if (elem instanceof cNumber) {
 						holidays.push(elem);
 					} else if (elem instanceof cString) {

@@ -57,6 +57,10 @@ function ParaFieldChar(Type, LogicDocument)
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
 ParaFieldChar.prototype.Type = para_FieldChar;
+ParaFieldChar.prototype.Copy = function()
+{
+	return new ParaFieldChar(this.CharType, this.LogicDocument);
+};
 ParaFieldChar.prototype.Measure = function(Context, TextPr)
 {
 };
@@ -182,6 +186,7 @@ ParaInstrText.prototype.Set_CharCode = function(CharCode)
 function CComplexField(oLogicDocument)
 {
 	this.LogicDocument   = oLogicDocument;
+	this.Current         = false;
 	this.BeginChar       = null;
 	this.EndChar         = null;
 	this.SeparateChar    = null;
@@ -189,6 +194,14 @@ function CComplexField(oLogicDocument)
 	this.Instruction     = null;
 	this.Id              = null;
 }
+CComplexField.prototype.SetCurrent = function(isCurrent)
+{
+	this.Current = isCurrent;
+};
+CComplexField.prototype.IsCurrent = function()
+{
+	return this.Current;
+};
 CComplexField.prototype.SetInstruction = function(oParaInstr)
 {
 	this.InstructionLine += oParaInstr.GetValue();
@@ -393,19 +406,19 @@ CComplexField.prototype.private_UpdateTOC = function()
 			var oPageRefRun = new ParaRun(oPara, false);
 
 			var nTempIndex = -1;
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
 			var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
 			for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
 			{
 				oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
 			var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
 			for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
 			{
 				oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this));
+			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this.LogicDocument));
 			oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
 		}
 
@@ -427,6 +440,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 	};
 	oParagraph.Check_NearestPos(oNearPos);
 
+	oSelectedContent.ForceSplit = true;
 	oParagraph.Parent.Insert_Content(oSelectedContent, oNearPos);
 };
 CComplexField.prototype.private_UpdatePAGEREF = function()
@@ -501,6 +515,23 @@ CComplexField.prototype.private_SelectFieldCode = function()
 
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 };
+CComplexField.prototype.SelectField = function()
+{
+	var oDocument = this.LogicDocument;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.RemoveSelection();
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
 CComplexField.prototype.IsUse = function()
 {
 	if (!this.BeginChar)
@@ -559,23 +590,14 @@ CComplexField.prototype.private_UpdateInstruction = function()
 		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
 	}
 };
+CComplexField.prototype.IsHidden = function()
+{
+	if (!this.BeginChar || !this.SeparateChar)
+		return false;
 
-function CComplexFieldStatePos(oComplexField, isFieldCode)
-{
-	this.FieldCode    = undefined !== isFieldCode ? isFieldCode : true;
-	this.ComplexField = oComplexField ? oComplexField : null;
-}
-CComplexFieldStatePos.prototype.Copy = function()
-{
-	return new CComplexFieldStatePos(this.ComplexField, this.FieldCode);
-};
-CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
-{
-	this.FieldCode = isFieldCode;
-};
-CComplexFieldStatePos.prototype.IsFieldCode = function()
-{
-	return this.FieldCode;
+	var oInstruction = this.GetInstruction();
+
+	return (oInstruction && fieldtype_ASK === oInstruction.GetType()) ? true : false;
 };
 
 function TEST_ADDFIELD(sInstruction)

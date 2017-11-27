@@ -1752,8 +1752,8 @@ function DrawingObjects() {
                     oShape.setWorksheet(worksheet.model);
                     oShape.addToDrawingObjects();
                     oShape.select(_this.controller, 0);
-                    worksheet.setSelectionShape(true);
                     _this.controller.startRecalculate();
+                    worksheet.setSelectionShape(true);
                 });
             }
         }
@@ -2534,8 +2534,8 @@ function DrawingObjects() {
                             break;
                         }
                     }
-                    worksheet.setSelectionShape(true);
                     _this.controller.startRecalculate();
+                    worksheet.setSelectionShape(true);
                 });
             }, []);
 
