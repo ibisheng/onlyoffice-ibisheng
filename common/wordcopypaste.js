@@ -1893,7 +1893,7 @@ function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPastePr
 		data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
 		text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
 
-		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly && _format !== AscCommon.c_oAscClipboardDataFormat.Text)
+		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly && _format !== AscCommon.c_oAscClipboardDataFormat.Text && text_data)
 		{
 			_format = AscCommon.c_oAscClipboardDataFormat.Text;
 			data1 = text_data;
@@ -4335,7 +4335,7 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+				/*if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
 					for (var i = 0; i < arrShapes.length; ++i) {
 						shape = arrShapes[i].Drawing;
 
@@ -4346,7 +4346,7 @@ PasteProcessor.prototype =
 							}
 						}
 					}
-				}
+				}*/
 
 				var presentationSelectedContent = new PresentationSelectedContent();
 				presentationSelectedContent.Drawings = arrShapes;
