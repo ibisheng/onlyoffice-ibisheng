@@ -577,6 +577,10 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
     var PRS = this.m_oPRSW;
 	PRS.Reset_Page(this, CurPage);
 
+	this.m_oPRSW.ComplexFields.ResetPage(this, CurPage);
+	this.m_oPRSC.ComplexFields.ResetPage(this, CurPage);
+	this.m_oPRSA.ComplexFields.ResetPage(this, CurPage);
+
     var Pr     = this.Get_CompiledPr();
     var ParaPr = Pr.ParaPr;
 
@@ -2648,7 +2652,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.BreakRealPageLine  = false; // Разрыв страницы документа (не только параграфа) в данной строке
     this.BadLeftTab         = false; // Левый таб правее правой границы
 
-	this.ComplexFields = [];
+	this.ComplexFields = new CParagraphaComplexFieldsInfo();
 
 	this.WordLen         = 0;
     this.SpaceLen        = 0;
@@ -2753,12 +2757,6 @@ CParagraphRecalculateStateWrap.prototype =
 		this.Page               = CurPage;
 		this.RunRecalcInfoLast  = (0 === CurPage ? null : Paragraph.Pages[CurPage - 1].EndInfo.RunRecalcInfo);
 		this.RunRecalcInfoBreak = this.RunRecalcInfoLast;
-
-		var PageEndInfo = Paragraph.GetEndInfoByPage(CurPage - 1);
-		if (PageEndInfo)
-			this.ComplexFields = PageEndInfo.GetComplexFields();
-		else
-			this.ComplexFields = [];
 	},
 
     // Обнуляем некоторые параметры перед новой строкой
@@ -3147,6 +3145,8 @@ function CParagraphRecalculateStateCounter()
     this.Letters     = 0;
     this.SpacesSkip  = 0;
     this.LettersSkip = 0;
+
+    this.ComplexFields = new CParagraphaComplexFieldsInfo();
 }
 
 CParagraphRecalculateStateCounter.prototype =
@@ -3190,6 +3190,8 @@ function CParagraphRecalculateStateAlign()
 
     this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
     this.RecalcFast2   = false; // Второй вариант быстрого пересчета
+
+	this.ComplexFields = new CParagraphaComplexFieldsInfo();
 }
 
 function CParagraphRecalculateStateInfo()
@@ -3280,19 +3282,6 @@ CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode = function()
 	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 	{
 		if (this.ComplexFields[nIndex].IsFieldCode())
-			return true;
-	}
-
-	return false;
-};
-
-CParagraphDrawStateHightlights.prototype.ProcessFieldChar   = CParagraphRecalculateStateInfo.prototype.ProcessFieldChar;
-CParagraphDrawStateHightlights.prototype.IsComplexFieldCode = CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode;
-CParagraphDrawStateHightlights.prototype.IsComplexField = function()
-{
-	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
-	{
-		if (this.ComplexFields[nIndex].ComplexField.IsCurrent())
 			return true;
 	}
 

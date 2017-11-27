@@ -57,6 +57,10 @@ function ParaFieldChar(Type, LogicDocument)
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
 ParaFieldChar.prototype.Type = para_FieldChar;
+ParaFieldChar.prototype.Copy = function()
+{
+	return new ParaFieldChar(this.CharType, this.LogicDocument);
+};
 ParaFieldChar.prototype.Measure = function(Context, TextPr)
 {
 };
@@ -511,6 +515,23 @@ CComplexField.prototype.private_SelectFieldCode = function()
 
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 };
+CComplexField.prototype.SelectField = function()
+{
+	var oDocument = this.LogicDocument;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.RemoveSelection();
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
 CComplexField.prototype.IsUse = function()
 {
 	if (!this.BeginChar)
@@ -569,23 +590,14 @@ CComplexField.prototype.private_UpdateInstruction = function()
 		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
 	}
 };
+CComplexField.prototype.IsHidden = function()
+{
+	if (!this.BeginChar || !this.SeparateChar)
+		return false;
 
-function CComplexFieldStatePos(oComplexField, isFieldCode)
-{
-	this.FieldCode    = undefined !== isFieldCode ? isFieldCode : true;
-	this.ComplexField = oComplexField ? oComplexField : null;
-}
-CComplexFieldStatePos.prototype.Copy = function()
-{
-	return new CComplexFieldStatePos(this.ComplexField, this.FieldCode);
-};
-CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
-{
-	this.FieldCode = isFieldCode;
-};
-CComplexFieldStatePos.prototype.IsFieldCode = function()
-{
-	return this.FieldCode;
+	var oInstruction = this.GetInstruction();
+
+	return (oInstruction && fieldtype_ASK === oInstruction.GetType()) ? true : false;
 };
 
 function TEST_ADDFIELD(sInstruction)

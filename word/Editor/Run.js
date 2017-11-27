@@ -892,6 +892,21 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 {
                     return this.Paragraph.Parent.Select_DrawingObject(this.Content[CurPos - 1].Get_Id());
                 }
+                else if (para_FieldChar === this.Content[CurPos - 1].Type)
+				{
+					var oComplexField = this.Content[CurPos - 1].GetComplexField();
+					if (oComplexField)
+					{
+						oComplexField.SelectField();
+						var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+						if (oLogicDocument)
+						{
+							oLogicDocument.Document_UpdateInterfaceState();
+							oLogicDocument.Document_UpdateSelectionState();
+						}
+					}
+					return true;
+				}
 
                 this.Remove_FromContent(CurPos - 1, 1, true);
 
@@ -910,6 +925,21 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 {
                     return this.Paragraph.Parent.Select_DrawingObject(this.Content[CurPos].Get_Id());
                 }
+				else if (para_FieldChar === this.Content[CurPos].Type)
+				{
+					var oComplexField = this.Content[CurPos].GetComplexField();
+					if (oComplexField)
+					{
+						oComplexField.SelectField();
+						var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+						if (oLogicDocument)
+						{
+							oLogicDocument.Document_UpdateInterfaceState();
+							oLogicDocument.Document_UpdateSelectionState();
+						}
+					}
+					return true;
+				}
 
                 this.Remove_FromContent(CurPos, 1, true);
 
@@ -2505,6 +2535,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var Item = this.Content[Pos];
             var ItemType = Item.Type;
 
+            if (PRS.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+            	continue;
+
             // Проверяем, не нужно ли добавить нумерацию к данному элементу
             if (true === this.RecalcInfo.NumberingAdd && true === Item.Can_AddNumbering())
                 X = this.private_RecalculateNumbering(PRS, Item, ParaPr, X);
@@ -3287,58 +3320,15 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					Item.SetPage(Para.Get_AbsolutePage(CurPage));
 
 					Item.SetRun(this);
-					if (Item.IsBegin())
-					{
-						var oComplexField = Item.GetComplexField();
-						if (!oComplexField)
-						{
-							Item.SetUse(false);
-						}
-						else
-						{
-							Item.SetUse(true);
-							oComplexField.SetBeginChar(Item);
-							PRS.ComplexFields.push(oComplexField);
-						}
-					}
-					else if (Item.IsEnd())
-					{
-						if (PRS.ComplexFields.length > 0)
-						{
-							Item.SetUse(true);
-							var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
-							oComplexField.SetEndChar(Item);
-							PRS.ComplexFields.splice(PRS.ComplexFields.length - 1, 1);
-						}
-						else
-						{
-							Item.SetUse(false);
-						}
-					}
-					else if (Item.IsSeparate())
-					{
-						if (PRS.ComplexFields.length > 0)
-						{
-							Item.SetUse(true);
-							var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
-							oComplexField.SetSeparateChar(Item);
-						}
-						else
-						{
-							Item.SetUse(false);
-						}
-					}
-
+					PRS.ComplexFields.ProcessFieldCharAndCollectComplexField(Item);
 					break;
 				}
 				case para_InstrText:
 				{
-					var oComplexField = PRS.ComplexFields[PRS.ComplexFields.length - 1];
-					if (oComplexField && null === oComplexField.GetSeparateChar())
-					{
-						oComplexField.SetInstruction(Item);
-					}
+					if (PRS.IsFastRecalculate())
+						break;
 
+					PRS.ComplexFields.ProcessInstruction(Item);
 					break;
 				}
             }
@@ -3560,7 +3550,10 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
         var Item = this.Content[Pos];
         var ItemType = Item.Type;
 
-        switch( ItemType )
+		if (PRSC.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+			continue;
+
+		switch( ItemType )
         {
             case para_Sym:
             case para_Text:
@@ -3700,6 +3693,11 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
                 break;
             }
+			case para_FieldChar:
+			{
+				PRSC.ComplexFields.ProcessFieldChar(Item);
+				break;
+			}
         }
     }
 };
@@ -3717,7 +3715,14 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
         var Item = this.Content[Pos];
         var ItemType = Item.Type;
 
-        switch( ItemType )
+		if (PRSA.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+		{
+			// Чтобы правильно позиционировался курсор и селект
+			Item.WidthVisible = 0;
+			continue;
+		}
+
+		switch( ItemType )
         {
             case para_Sym:
             case para_Text:
@@ -4023,6 +4028,12 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
                 break;
             }
+			case para_FieldChar:
+			{
+				PRSA.ComplexFields.ProcessFieldChar(Item);
+				break;
+			}
+
         }
     }
 };
@@ -4631,6 +4642,9 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         var ItemType         = Item.Type;
         var ItemWidthVisible = Item.Get_WidthVisible();
 
+        if (PDSH.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+        	continue;
+
         // Определим попадание в поиск и совместное редактирование. Попадание в комментарий определять не надо,
         // т.к. класс CParaRun попадает или не попадает в комментарий целиком.
 
@@ -4650,7 +4664,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         if ( true === bDrawShd )
             aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
 
-		if (PDSH.IsComplexField() && !PDSH.IsComplexFieldCode())
+		if (PDSH.ComplexFields.IsComplexField() && !PDSH.ComplexFields.IsComplexFieldCode() && PDSH.ComplexFields.IsCurrentComplexField())
 			PDSH.CFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
 
         switch( ItemType )
@@ -4725,7 +4739,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             }
 			case para_FieldChar:
 			{
-				PDSH.ProcessFieldChar(Item);
+				PDSH.ComplexFields.ProcessFieldChar(Item);
 				break;
 			}
         }
@@ -4842,6 +4856,9 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     {
         var Item = this.Content[Pos];
         var ItemType = Item.Type;
+
+		if (PDSE.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+			continue;
 
         var TempY = Y;
 
@@ -4996,6 +5013,11 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                 }
                 break;
             }
+			case para_FieldChar:
+			{
+				PDSE.ComplexFields.ProcessFieldChar(Item);
+				break;
+			}
         }
 
         Y = TempY;
@@ -5136,6 +5158,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         var ItemType         = Item.Type;
         var ItemWidthVisible = Item.Get_WidthVisible();
 
+		if (PDSL.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
+			continue;
+
         if ( 1 === SpellingMarksArray[Pos] || 3 === SpellingMarksArray[Pos] )
             PDSL.SpellingCounter++;
 
@@ -5251,6 +5276,11 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                 X += ItemWidthVisible;
                 break;
             }
+			case para_FieldChar:
+			{
+				PDSL.ComplexFields.ProcessFieldChar(Item);
+				break;
+			}
         }
 
         if ( 2 === SpellingMarksArray[Pos + 1] || 3 === SpellingMarksArray[Pos + 1] )
@@ -5571,6 +5601,7 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 
 	var isFieldCode  = SearchPos.IsComplexFieldCode();
 	var isFieldValue = SearchPos.IsComplexFieldValue();
+	var isHiddenCF   = SearchPos.IsHiddenComplexField();
 
 	while (true)
 	{
@@ -5583,9 +5614,10 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 			SearchPos.ProcessComplexFieldChar(-1, Item);
 			isFieldCode  = SearchPos.IsComplexFieldCode();
 			isFieldValue = SearchPos.IsComplexFieldValue();
+			isHiddenCF   = SearchPos.IsHiddenComplexField();
 		}
 
-		if (CurPos >= 0 && isFieldCode)
+		if (CurPos >= 0 && (isFieldCode || isHiddenCF))
 			continue;
 
 		if (CurPos < 0 || (!(para_Drawing === Item.Type && false === Item.Is_Inline() && false === SearchPos.IsCheckAnchors()) && !(para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows())))
@@ -5605,6 +5637,7 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 
 	var isFieldCode  = SearchPos.IsComplexFieldCode();
 	var isFieldValue = SearchPos.IsComplexFieldValue();
+	var isHiddenCF   = SearchPos.IsHiddenComplexField();
 
 	var Count = this.Content.length;
 	while (true)
@@ -5627,9 +5660,10 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 				SearchPos.ProcessComplexFieldChar(1, PrevItem);
 				isFieldCode  = SearchPos.IsComplexFieldCode();
 				isFieldValue = SearchPos.IsComplexFieldValue();
+				isHiddenCF   = SearchPos.IsHiddenComplexField();
 			}
 
-			if (isFieldCode)
+			if (isFieldCode || isHiddenCF)
 				return;
 
 			if ((true !== StepEnd && para_End === PrevItemType) || (para_Drawing === PrevItemType && false === PrevItem.Is_Inline() && false === SearchPos.IsCheckAnchors()) || (para_FootnoteReference === PrevItemType && true === PrevItem.IsCustomMarkFollows()))
@@ -5650,9 +5684,10 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 			SearchPos.ProcessComplexFieldChar(1, Item);
 			isFieldCode  = SearchPos.IsComplexFieldCode();
 			isFieldValue = SearchPos.IsComplexFieldValue();
+			isHiddenCF   = SearchPos.IsHiddenComplexField();
 		}
 
-		if (isFieldCode)
+		if (isFieldCode || isHiddenCF)
 			continue;
 
 		if (!(true !== StepEnd && para_End === ItemType)
@@ -5681,6 +5716,7 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
 
 	var isFieldCode  = SearchPos.IsComplexFieldCode();
 	var isFieldValue = SearchPos.IsComplexFieldValue();
+	var isHiddenCF   = SearchPos.IsHiddenComplexField();
 
     // На первом этапе ищем позицию первого непробельного элемента
     if ( 0 === SearchPos.Stage )
@@ -5697,12 +5733,13 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
 				SearchPos.ProcessComplexFieldChar(-1, Item);
 				isFieldCode  = SearchPos.IsComplexFieldCode();
 				isFieldValue = SearchPos.IsComplexFieldValue();
+				isHiddenCF   = SearchPos.IsHiddenComplexField();
 			}
 
             if ( para_Space === Type || para_Tab === Type || ( para_Text === Type && true === Item.Is_NBSP() ) || ( para_Drawing === Type && true !== Item.Is_Inline() ) )
                 bSpace = true;
 
-            if ( true === bSpace || isFieldCode )
+            if (true === bSpace || isFieldCode || isHiddenCF)
             {
                 CurPos--;
 
@@ -5749,9 +5786,10 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
 			SearchPos.ProcessComplexFieldChar(-1, Item);
 			isFieldCode  = SearchPos.IsComplexFieldCode();
 			isFieldValue = SearchPos.IsComplexFieldValue();
+			isHiddenCF   = SearchPos.IsHiddenComplexField();
 		}
 
-		if (isFieldCode)
+		if (isFieldCode || isHiddenCF)
 			continue;
 
         if ( (para_Text !== TempType && para_Math_Text !== TempType) || true === Item.Is_NBSP() || ( true === SearchPos.Punctuation && true !== Item.Is_Punctuation() ) || ( false === SearchPos.Punctuation && false !== Item.Is_Punctuation() ) )
@@ -5781,6 +5819,7 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
 
 	var isFieldCode  = SearchPos.IsComplexFieldCode();
 	var isFieldValue = SearchPos.IsComplexFieldValue();
+	var isHiddenCF   = SearchPos.IsHiddenComplexField();
 
     if ( 0 === SearchPos.Stage )
     {
@@ -5796,14 +5835,15 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
 				SearchPos.ProcessComplexFieldChar(1, Item);
 				isFieldCode  = SearchPos.IsComplexFieldCode();
 				isFieldValue = SearchPos.IsComplexFieldValue();
+				isHiddenCF   = SearchPos.IsHiddenComplexField();
 			}
 
             if ( (para_Text === Type || para_Math_Text === Type) && true != Item.Is_NBSP() && ( true === SearchPos.First || ( SearchPos.Punctuation === Item.Is_Punctuation() ) ) )
                 bText = true;
 
-            if ( true === bText || isFieldCode )
+            if (true === bText || isFieldCode || isHiddenCF)
             {
-            	if (!isFieldCode)
+            	if (!isFieldCode && !isHiddenCF)
 				{
 					if (true === SearchPos.First)
 					{
@@ -5878,9 +5918,10 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
 				SearchPos.ProcessComplexFieldChar(1, Item);
 				isFieldCode  = SearchPos.IsComplexFieldCode();
 				isFieldValue = SearchPos.IsComplexFieldValue();
+				isHiddenCF   = SearchPos.IsHiddenComplexField();
 			}
 
-			if (isFieldCode)
+			if (isFieldCode || isHiddenCF)
 				continue;
 
             if ( (true !== StepEnd && para_End === TempType) || !( para_Space === TempType || ( para_Text === TempType && true === Item.Is_NBSP() ) ) )
