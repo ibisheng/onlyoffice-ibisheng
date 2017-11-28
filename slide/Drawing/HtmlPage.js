@@ -2271,6 +2271,30 @@ function CEditorPage(api)
 		oWordControl.EndUpdateOverlay();
 	};
 
+	this.onMouseUpMainSimple = function()
+	{
+		if (false === oThis.m_oApi.bInit_word_control)
+			return;
+
+		var oWordControl = oThis;
+
+		global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
+
+		AscCommon.MouseUpLock.MouseUpLockedSend = true;
+
+		global_mouseEvent.Sender = null;
+
+		global_mouseEvent.UnLockMouse();
+
+		global_mouseEvent.IsPressed = false;
+
+		if (-1 != oWordControl.m_oTimerScrollSelect)
+		{
+			clearInterval(oWordControl.m_oTimerScrollSelect);
+			oWordControl.m_oTimerScrollSelect = -1;
+		}
+	};
+
 	this.setNodesEnable = function(bEnabled)
 	{
 		if (bEnabled == this.IsSupportNotes)

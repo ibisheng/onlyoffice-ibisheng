@@ -982,6 +982,8 @@ function CDrawingDocument()
 
 	this.isDrawingNotes = false;
 
+	this.isTabButtonShow = true;
+
 	this.MoveTargetInInputContext = function()
 	{
 		if (AscCommon.g_inputContext)
@@ -2353,8 +2355,22 @@ function CDrawingDocument()
 		this.m_oWordControl.OnUpdateOverlay();
 	}
 
+	this.TabButtonEnable = function(isEnabled)
+	{
+		if (this.isTabButtonShow == isEnabled)
+			return;
+
+		this.isTabButtonShow = isEnabled;
+		if (this.m_oWordControl && this.m_oWordControl.m_oLeftRuler_buttonsTabs)
+		{
+			this.m_oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.display = this.isTabButtonShow ? "block" : "none";
+		}
+	}
+
 	this.Set_RulerState_Table = function(markup, transform)
 	{
+		this.TabButtonEnable(true);
+
 		var hor_ruler = this.m_oWordControl.m_oHorRuler;
 		var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -2407,6 +2423,8 @@ function CDrawingDocument()
 
 	this.Set_RulerState_Paragraph = function(obj, margins)
 	{
+		this.TabButtonEnable((margins !== undefined) ? true : false);
+
 		var hor_ruler = this.m_oWordControl.m_oHorRuler;
 		var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -2441,6 +2459,8 @@ function CDrawingDocument()
 
 	this.Set_RulerState_HdrFtr = function(bHeader, Y0, Y1)
 	{
+		this.TabButtonEnable(true);
+
 		var hor_ruler = this.m_oWordControl.m_oHorRuler;
 		var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -2467,6 +2487,8 @@ function CDrawingDocument()
 
 	this.Set_RulerState_Columns = function (markup)
 	{
+		this.TabButtonEnable(true);
+		
 		var hor_ruler = this.m_oWordControl.m_oHorRuler;
 		var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
