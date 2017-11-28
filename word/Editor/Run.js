@@ -3321,6 +3321,32 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					Item.SetRun(this);
 					PRS.ComplexFields.ProcessFieldCharAndCollectComplexField(Item);
+
+					if (Item.IsSeparate())
+					{
+						// Специальная ветка, для полей PAGE NUMPAGES, находящихся в колонтитуле
+
+						var oComplexField = Item.GetComplexField();
+						var oHdrFtr       = Para.Parent.Is_HdrFtr(true);
+						if (oHdrFtr && oComplexField)
+						{
+							var oInstruction = oComplexField.GetInstruction();
+							if (oInstruction && (fieldtype_NUMPAGES === oInstruction.GetType() || fieldtype_PAGE === oInstruction.GetType()))
+							{
+								if (fieldtype_PAGE === oInstruction.GetType())
+								{
+									//oHdrFtr.Add_PageCountElement(Item);
+								}
+								else
+								{
+									//var LogicDocument = Para.LogicDocument;
+									//var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
+									//Item.Set_Page(SectionPage);
+								}
+							}
+						}
+					}
+
 					break;
 				}
 				case para_InstrText:
@@ -3329,6 +3355,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						break;
 
 					PRS.ComplexFields.ProcessInstruction(Item);
+
 					break;
 				}
             }
