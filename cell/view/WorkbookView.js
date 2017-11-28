@@ -361,8 +361,10 @@
 				  return ret;
 			  }, "enterCellRange": function () {
 				  self.lockDraw = true;
+				  self.skipHelpSelector = true;
 				  self.cellEditor.setFocus(false);
 				  self.getWorksheet().enterCellRange(self.cellEditor);
+				  self.skipHelpSelector = false;
 				  self.lockDraw = false;
 			  }, "undo": function () {
 				  self.undo.apply(self, arguments);
