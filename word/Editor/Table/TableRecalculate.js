@@ -186,7 +186,12 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
     var PrevElement = this.Get_DocumentPrev();
 
     if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
-        PrevElement = PrevElement.Get_DocumentPrev();
+	{
+		var PrevSectPr = PrevElement.Get_SectionPr();
+		var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
+		if (c_oAscSectionBreakType.Continuous === CurSectPr.Get_Type() && true === CurSectPr.Compare_PageSize(PrevSectPr))
+			PrevElement = PrevElement.Get_DocumentPrev();
+	}
 
     if ((0 === CurPage || true === this.Check_EmptyPages(CurPage - 1)) && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
     {

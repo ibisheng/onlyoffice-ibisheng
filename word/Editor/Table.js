@@ -11280,13 +11280,16 @@ CTable.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 };
 CTable.prototype.StartSelectionFromCurPos = function()
 {
-	this.Selection.Use    = true;
-	this.Selection.Type   = table_Selection_Text;
-	this.Selection.CurRow = this.CurCell.Row.Index;
+	this.Selection.Use = true;
 
 	this.Selection.StartPos.Pos = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
 	this.Selection.EndPos.Pos   = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
 	this.Internal_Selection_UpdateCells();
+
+	// В функции Internal_Selection_UpdateCells выставляется тип по ячеейкам, но нам нужен внутри ячейки изначальный селект
+	this.Selection.Type   = table_Selection_Text;
+	this.Selection.CurRow = this.CurCell.Row.Index;
+
 
 	this.CurCell.Content.StartSelectionFromCurPos();
 };
