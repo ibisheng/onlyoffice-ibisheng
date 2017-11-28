@@ -369,7 +369,7 @@ var c_oAscPopUpSelectorType = {
   };
   var c_oAscAutoCorrectOptions = {
 	UndoTableAutoExpansion: 0,
-	RedoTableAutoExpansion: 0
+	RedoTableAutoExpansion: 1
   };
   
   var c_kMaxPrintPages = 1500;
