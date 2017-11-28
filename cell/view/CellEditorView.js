@@ -170,8 +170,6 @@
 			cursorShape: "text"
 		};
 
-		this.dontUpdateText = false;
-
 		this._formula = null;
 
 		// Обработчик кликов
@@ -1179,7 +1177,7 @@
 
 		this._updateUndoRedoChanged();
 
-		if (window['IS_NATIVE_EDITOR'] && !this.dontUpdateText) {
+		if (window['IS_NATIVE_EDITOR']) {
 			window['native']['onCellEditorChangeText'](this._getFragmentsText(this.options.fragments));
 		}
 	};
@@ -1661,14 +1659,17 @@
 	};
 
 	CellEditor.prototype._addChars = function (str, pos, isRange) {
-		var opt = this.options, f, l, s, length = str.length;
-
+		var length = str.length;
 		if (!this._checkMaxCellLength(length)) {
 			return false;
 		}
 
+		var opt = this.options, f, l, s;
+
+		var noUpdateMode = this.noUpdateMode;
+		this.noUpdateMode = true;
+
 		this.sAutoComplete = null;
-		this.dontUpdateText = true;
 
 		if (this.selectionBegin !== this.selectionEnd) {
 			var copyFragment = this._findFragmentToInsertInto(Math.min(this.selectionBegin, this.selectionEnd) + 1);
@@ -1678,8 +1679,6 @@
 
 			this._removeChars(undefined, undefined, isRange);
 		}
-
-		this.dontUpdateText = false;
 
 		if (pos === undefined) {
 			pos = this.cursorPos;
@@ -1705,6 +1704,8 @@
 		}
 
 		this.cursorPos = pos + str.length;
+
+		this.noUpdateMode = noUpdateMode;
 		if (!this.noUpdateMode) {
 			this._update();
 		}
