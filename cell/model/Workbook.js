@@ -2969,12 +2969,12 @@
 		this.handlers = handlers;
 		this._setHandlersTablePart();
 	};
-	Worksheet.prototype._getValuesForConditionalFormatting = function(ranges, withEmpty) {
+	Worksheet.prototype._getValuesForConditionalFormatting = function(ranges, numbers) {
 		var res = [];
 		for (var i = 0; i < ranges.length; ++i) {
 			var elem = ranges[i];
 			var range = this.getRange3(elem.r1, elem.c1, elem.r2, elem.c2);
-			res = res.concat(range._getValues(withEmpty));
+			res = res.concat(range._getValues(numbers));
 		}
 		return res;
 	};
@@ -3053,30 +3053,17 @@
 						if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
 							break;
 						}
-						min = Number.MAX_VALUE;
-						max = -Number.MAX_VALUE;
-						values = this._getValuesForConditionalFormatting(ranges, false);
-						for (cell = 0; cell < values.length; ++cell) {
-							value = values[cell];
-							if (CellValueType.Number === value.type && !isNaN(tmp = parseFloat(value.v))) {
-								value.v = tmp;
-								min = Math.min(min, tmp);
-								max = Math.max(max, tmp);
-							} else {
-								value.v = null;
-							}
-						}
-
+						values = this._getValuesForConditionalFormatting(ranges, true);
 						// ToDo CFVO Type formula (page 2681)
 						l = oRuleElement.aColors.length;
 						if (0 < values.length && 2 <= l) {
 							oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-							min = oRuleElement.getMin(min, max, values);
-							max = oRuleElement.getMax(min, max, values);
+							min = oRuleElement.getMin(values);
+							max = oRuleElement.getMax(values);
 							oGradient2 = null;
 							if (2 < l) {
 								oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
-								mid = oRuleElement.getMid(min, max, values);
+								mid = oRuleElement.getMid(values);
 
 								oGradient1.init(min, mid);
 								oGradient2.init(mid, max);
@@ -3088,7 +3075,7 @@
 								return function(row, col) {
 									var val;
 									t._getCellNoEmpty(row, col, function(cell) {
-										val = cell ? cell.getNumberValue() : null;
+										val = cell && cell.getNumberValue();
 									});
 									dxf = null;
 									if (null !== val) {
@@ -7302,16 +7289,17 @@
 			oBBox = this.bbox;
 		return getRangeType(oBBox);
 	};
-	Range.prototype._getValues = function (withEmpty) {
+	Range.prototype._getValues = function (numbers) {
 		var res = [];
-		var fAction = function(c) {
+		var fAction = numbers ? function (c) {
+			var v = c.getNumberValue();
+			if (null !== v) {
+				res.push(v);
+			}
+		} : function (c) {
 			res.push(new CellTypeAndValue(c.getType(), c.getValueWithoutFormat()));
 		};
-		if (withEmpty) {
-			this._setProperty(null, null, fAction);
-		} else {
-			this._setPropertyNoEmpty(null, null, fAction);
-		}
+		this._setPropertyNoEmpty(null, null, fAction);
 		return res;
 	};
 	Range.prototype._getValuesAndMap = function (withEmpty) {
