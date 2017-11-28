@@ -10368,6 +10368,49 @@
 			}
 		};
 
+		var checkDeleteCellsFilteringMode = function () {
+			if (!window['AscCommonExcel'].filteringMode) {
+				if (val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns) {
+					//запрещаем в этом режиме удалять столбцы
+					return false;
+				} else if (val === c_oAscDeleteOptions.DeleteCellsAndShiftTop ||
+					val === c_oAscDeleteOptions.DeleteRows) {
+
+					var tempRange = arn;
+					if (val === c_oAscDeleteOptions.DeleteRows) {
+						tempRange = new asc_Range(0, checkRange.r1, gc_nMaxCol0, checkRange.r2);
+					}
+
+					//запрещаем удалять последнюю строку фильтра и его заголовок + запрещаем удалять ф/т
+					var autoFilter = t.model.AutoFilter;
+					if (autoFilter && autoFilter.Ref) {
+						var ref = autoFilter.Ref;
+						//нельзя удалять целиком а/ф
+						if (tempRange.containsRange(ref)) {
+							return false;
+						} else if (tempRange.containsRange(new asc_Range(ref.c1, ref.r1, ref.c2, ref.r1))) {
+							//нельзя удалять первую строку а/ф
+							return false;
+						} else if (ref.r2 === ref.r1 + 1) {
+							//нельзя удалять последнюю строку тела а/ф
+							if (tempRange.containsRange(new asc_Range(ref.c1, ref.r1 + 1, ref.c2, ref.r1 + 1))) {
+								return false;
+							}
+						}
+					}
+					//нельзя целиком удалять ф/т
+					var tableParts = t.model.TableParts;
+					for (var i = 0; i < tableParts.length; i++) {
+						if (tempRange.containsRange(tableParts[i].Ref)) {
+							return false;
+						}
+					}
+				}
+			}
+
+			return true;
+		};
+
 		switch (prop) {
 			case "colWidth":
 				functionModelAction = function () {
@@ -10553,10 +10596,8 @@
 				}
 				break;
 			case "delCell":
-				if (!window['AscCommonExcel'].filteringMode) {
-					if(val === c_oAscDeleteOptions.DeleteCellsAndShiftLeft || val === c_oAscDeleteOptions.DeleteColumns){
-						return;
-					}
+				if (!checkDeleteCellsFilteringMode()) {
+					return;
 				}
 
 				range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
@@ -11987,7 +12028,11 @@
 			var addFilterCallBack;
 			if (bIsChangeFilterToTable)//CHANGE FILTER TO TABLEPART
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -12003,7 +12048,11 @@
 				t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
 			} else//ADD
 			{
-				addFilterCallBack = function () {
+				addFilterCallBack = function (isSuccess) {
+					if (false === isSuccess) {
+						return;
+					}
+
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -12028,7 +12077,7 @@
 				};
 
 				if (styleName === null) {
-					addFilterCallBack();
+					addFilterCallBack(true);
 				} else {
 					t._isLockedCells(filterRange, null, addFilterCallBack)
 				}

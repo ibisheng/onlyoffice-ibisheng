@@ -230,11 +230,6 @@
     this.defaultFont = new asc.FontProperties(this.model.getDefaultFont(), this.model.getDefaultSize());
     //-----------------------
 
-    this.m_dScrollY = 0;
-    this.m_dScrollX = 0;
-    this.m_dScrollY_max = 1;
-    this.m_dScrollX_max = 1;
-
     this.MobileTouchManager = null;
 
     this.defNameAllowCreate = true;
@@ -321,8 +316,6 @@
 		  this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
 			  "resize": function () {
 				  self.resize.apply(self, arguments);
-			  }, "reinitializeScroll": function () {
-				  self._onScrollReinitialize.apply(self, arguments);
 			  }, "scrollY": function () {
 				  self._onScrollY.apply(self, arguments);
 			  }, "scrollX": function () {
@@ -668,11 +661,11 @@
 		  "getViewerMode": function () {
 			  return self.controller.getViewerMode ? self.controller.getViewerMode() : true;
 		  }, "reinitializeScroll": function () {
-			  self.controller.reinitializeScroll(/*All*/);
+			  self._onScrollReinitialize(/*All*/);
 		  }, "reinitializeScrollY": function () {
-			  self.controller.reinitializeScroll(/*vertical*/1);
+			  self._onScrollReinitialize(/*vertical*/1);
 		  }, "reinitializeScrollX": function () {
-			  self.controller.reinitializeScroll(/*horizontal*/2);
+			  self._onScrollReinitialize(/*horizontal*/2);
 		  }, "selectionChanged": function () {
 			  self._onWSSelectionChanged();
 		  }, "selectionNameChanged": function () {
@@ -926,22 +919,23 @@
   };
 
 
-  WorkbookView.prototype._onScrollReinitialize = function(whichSB, callback) {
-    var ws = this.getWorksheet(), vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined, hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
+	WorkbookView.prototype._onScrollReinitialize = function (whichSB, endScroll) {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			return;
+		}
 
-    if (vsize != undefined) {
-      this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
-    }
-    if (hsize != undefined) {
-      this.m_dScrollX_max = Math.max(this.controller.settings.hscrollStep * (hsize + 1), 1);
-    }
+		var ws = this.getWorksheet();
+		if (!whichSB || 2 === whichSB) {
+			this.controller.reinitScrollX(ws.getFirstVisibleCol(true), ws.getHorizontalScrollRange(), endScroll);
+		}
+		if (!whichSB || 1 === whichSB) {
+			this.controller.reinitScrollY(ws.getFirstVisibleRow(true), ws.getVerticalScrollRange(), endScroll);
+		}
 
-    asc_applyFunction(callback, vsize, hsize);
-
-	if (this.Api.isMobileVersion) {
-	  this.MobileTouchManager.Resize();
-	}
-  };
+		if (this.Api.isMobileVersion) {
+			this.MobileTouchManager.Resize();
+		}
+	};
 
   WorkbookView.prototype._onScrollY = function(pos) {
     var ws = this.getWorksheet();
@@ -1465,12 +1459,12 @@
 
   WorkbookView.prototype._onAddColumn = function() {
     var res = this.getWorksheet().expandColsOnScroll(true);
-    this.controller.reinitializeScroll(/*horizontal*/2, !res);
+    this._onScrollReinitialize(/*horizontal*/2, !res);
   };
 
   WorkbookView.prototype._onAddRow = function() {
     var res = this.getWorksheet().expandRowsOnScroll(true);
-    this.controller.reinitializeScroll(/*vertical*/1, !res);
+    this._onScrollReinitialize(/*vertical*/1, !res);
   };
 
   WorkbookView.prototype._onShowNextPrevWorksheet = function(direction) {
@@ -1688,10 +1682,7 @@
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }
-    this.controller.reinitializeScroll();
-    if (this.Api.isMobileVersion) {
-      this.MobileTouchManager.Resize();
-    }
+    this._onScrollReinitialize();
     // Zoom теперь на каждом листе одинаковый, не отправляем смену
 
     // Нужно очистить поиск
@@ -1902,7 +1893,7 @@
       }
     }
 
-    this.controller.reinitializeScroll();
+    this._onScrollReinitialize();
     this.handlers.trigger("asc_onZoomChanged", this.getZoom());
   };
 

@@ -40,11 +40,12 @@
 var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
-var fieldtype_PAGE       = fieldtype_PAGENUM;
 var fieldtype_PAGECOUNT  = 0x0003;
 var fieldtype_FORMTEXT   = 0x0004;
 var fieldtype_TOC        = 0x0005;
 var fieldtype_PAGEREF    = 0x0006;
+var fieldtype_PAGE       = fieldtype_PAGENUM;
+var fieldtype_NUMPAGES   = fieldtype_PAGECOUNT;
 
 var fieldtype_ASK        = 0x0007;
 var fieldtype_REF        = 0x0008;
@@ -278,6 +279,10 @@ CFieldInstructionASK.prototype.GetPromptText = function()
 	return this.PromptText;
 };
 
+/**
+ * REF field
+ * @constructor
+ */
 function CFieldInstructionREF()
 {
 	CFieldInstructionBase.call(this);
@@ -295,6 +300,20 @@ CFieldInstructionREF.prototype.GetBookmarkName = function()
 {
 	return this.BookmarkName;
 };
+
+/**
+ * NUMPAGES field
+ * @constructor
+ */
+function CFieldInstructionNUMPAGES()
+{
+	CFieldInstructionBase.call(this);
+
+}
+CFieldInstructionNUMPAGES.prototype = Object.create(CFieldInstructionBase.prototype);
+CFieldInstructionNUMPAGES.prototype.constructor = CFieldInstructionNUMPAGES;
+CFieldInstructionNUMPAGES.prototype.Type = fieldtype_NUMPAGES;
+
 
 /**
  * Класс для разбора строки с инструкцией
@@ -332,7 +351,7 @@ CFieldInstructionParser.prototype.private_Parse = function()
 		case "TOC": this.private_ReadTOC(); break;
 		case "ASK": this.private_ReadASK(); break;
 		case "REF": this.private_ReadREF(); break;
-
+		case "NUMPAGES": this.private_ReadNUMPAGES(); break;
 
 		default: this.private_ReadREF(this.Buffer); break;
 	}
@@ -587,6 +606,12 @@ CFieldInstructionParser.prototype.private_ReadREF = function(sBookmarkName)
 			this.Result.SetBookmarkName(arrArguments[0]);
 		}
 	}
+
+	// TODO: Switches
+};
+CFieldInstructionParser.prototype.private_ReadNUMPAGES = function()
+{
+	this.Result = new CFieldInstructionNUMPAGES();
 
 	// TODO: Switches
 };

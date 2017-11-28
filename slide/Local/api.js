@@ -77,6 +77,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 	}
 	
     editor._OfflineAppDocumentEndLoad(_url, _data, _len);
+
+	editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 
 /////////////////////////////////////////////////////////
@@ -196,7 +198,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isFo
 	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
-	window["AscDesktopEditor"]["LocalFileSave"](_param, password);
+	window["AscDesktopEditor"]["LocalFileSave"](_param, (password === undefined) ? editor.currentPassword : password);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 {
@@ -217,7 +219,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 		if (window.SaveQuestionObjectBeforeSign)
 		{
 			var _obj = window.SaveQuestionObjectBeforeSign;
-			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height, window["asc_IsVisibleSign"](_obj.guid));
 			window.SaveQuestionObjectBeforeSign = null;
 		}
 	}
@@ -229,6 +231,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
+
+	if (0 == error)
+		editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
 };
 Asc['asc_docs_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
@@ -295,6 +300,7 @@ Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option
 	if (window["Asc"].c_oAscAdvancedOptionsID.DRM === idOption) {
         var _param = "";
         _param += ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(option.asc_getPassword()) + "</m_sPassword>");
+		this.currentPassword = option.asc_getPassword();
         window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
     }
 };

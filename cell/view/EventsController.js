@@ -68,9 +68,12 @@
 			this.vsb	= undefined;
 			this.vsbHSt	= undefined;
 			this.vsbApi	= undefined;
+			this.vsbMax	= undefined;
 			this.hsb	= undefined;
 			this.hsbHSt	= undefined;
 			this.hsbApi = undefined;
+			this.hsbMax	= undefined;
+
 			this.resizeTimerId = undefined;
 			this.scrollTimerId = undefined;
 			this.moveRangeTimerId = undefined;
@@ -123,7 +126,7 @@
 		 * @param {AscCommonExcel.WorkbookView} view
 		 * @param {Element} widgetElem
 		 * @param {Element} canvasElem
-		 * @param {Object} handlers  Event handlers (resize, reinitializeScroll, scrollY, scrollX, changeSelection, ...)
+		 * @param {Object} handlers  Event handlers (resize, scrollY, scrollX, changeSelection, ...)
 		 */
 		asc_CEventsController.prototype.init = function (view, widgetElem, canvasElem, handlers) {
 			var self = this;
@@ -231,40 +234,19 @@
 			this.isSelectionDialogMode = isSelectionDialogMode;
 		};
 
-		/**
-		 * @param [whichSB] {Number}  Scroll bar to reinit (1=vertical, 2=horizontal)
-		 * @param [endScroll] {Boolean}  Scroll in the end of document
-		 * */
-		asc_CEventsController.prototype.reinitializeScroll = function (whichSB, endScroll) {
-		    if (window["NATIVE_EDITOR_ENJINE"])
-		        return;
-
-			var self = this,
-			    opt = this.settings,
-			    ws = self.view.getWorksheet(),
-			    isVert = !whichSB || whichSB === 1,
-			    isHoriz = !whichSB || whichSB === 2;
-
-			if (isVert || isHoriz) {
-				this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
-					if (isVert) {
-						vSize = self.vsb.offsetHeight + Math.max( vSize * opt.vscrollStep, 1 );
-//                        this.m_dScrollY_max = vSize;
-    					self.vsbHSt.height = vSize + "px";
-						self.vsbApi.endByY = !!endScroll;
-						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
-					}
-					if (isHoriz) {
-						hSize = self.hsb.offsetWidth + Math.max( hSize* opt.hscrollStep, 1 );
-//                        this.m_dScrollX_max = hSize ;
-						self.hsbApi.endByX = !!endScroll;
-						self.hsbHSt.width = hSize + "px";
-						self.hsbApi.Reinit(opt, opt.hscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
-					}
-				});
-			}
-
-			return this;
+		asc_CEventsController.prototype.reinitScrollX = function (pos, max, endScroll) {
+			var step = this.settings.hscrollStep;
+			this.hsbMax = Math.max(max * step, 1);
+			this.hsbHSt.width = (this.hsb.offsetWidth + this.hsbMax) + "px";
+			this.hsbApi.endByX = !!endScroll;
+			this.hsbApi.Reinit(this.settings, pos * step);
+		};
+		asc_CEventsController.prototype.reinitScrollY = function (pos, max, endScroll) {
+			var step = this.settings.vscrollStep;
+			this.vsbMax = Math.max(max * step, 1);
+			this.vsbHSt.height = (this.vsb.offsetHeight + this.vsbMax) + "px";
+			this.vsbApi.endByY = !!endScroll;
+			this.vsbApi.Reinit(this.settings, pos * step);
 		};
 
 		/**

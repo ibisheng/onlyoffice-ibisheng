@@ -38,7 +38,6 @@
 function (window, undefined)
 {
 	// Import
-	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
 	var global_mouseEvent = AscCommon.global_mouseEvent;
 	var AscBrowser = AscCommon.AscBrowser;
 
@@ -129,8 +128,8 @@ function (window, undefined)
 	CMobileDelegateEditorCell.prototype.GetScrollerSize = function()
 	{
 		return {
-			W : this.WB.element.clientWidth + this.WB.m_dScrollX_max,
-			H : this.WB.element.clientHeight + this.WB.m_dScrollY_max
+			W : this.WB.element.clientWidth + this.WB.controller.hsbMax,
+			H : this.WB.element.clientHeight + this.WB.controller.vsbMax
 		};
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionTransform = function()
@@ -197,32 +196,34 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ScrollTo = function(_scroll)
 	{
+		var pos;
 		var _api = this.WB;
 
-		if (_scroll.directionLocked == "v")
+		if ('v' === _scroll.directionLocked)
 		{
-			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y == _scroll.maxScrollY)
-				_deltaY += 1;
-			_api._onScrollY(_deltaY);
+			pos = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y >= _scroll.maxScrollY)
+				pos += 1;
+			_api._onScrollY(pos);
 		}
-		else if (_scroll.directionLocked == "h")
+		else if ('h' === _scroll.directionLocked)
 		{
-			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x == _scroll.maxScrollX)
-				_deltaX += 1;
-			_api._onScrollX(_deltaX);
+			pos = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x >= _scroll.maxScrollX)
+				pos += 1;
+			_api._onScrollX(pos);
 		}
-		else if (_scroll.directionLocked == "n")
+		else if ('n' === _scroll.directionLocked)
 		{
-			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y == _scroll.maxScrollY)
-				_deltaY += 1;
-			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x == _scroll.maxScrollX)
-				_deltaX += 1;
-			_api._onScrollX(_deltaX);
-			_api._onScrollY(_deltaY);
+			pos = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y >= _scroll.maxScrollY)
+				pos += 1;
+			_api._onScrollY(pos);
+
+			pos = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x >= _scroll.maxScrollX)
+				pos += 1;
+			_api._onScrollX(pos);
 		}
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuType = function()
