@@ -119,7 +119,8 @@
 		UnknownUser : 4,
 		Connections : 5,
 		ExpiredTrial: 6,
-		SuccessLimit: 7
+		SuccessLimit: 7,
+		UsersCount  : 8
 	};
 
 	var c_oRights = {
@@ -3599,6 +3600,7 @@
 	prot['Connections'] = prot.Connections;
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 	prot['SuccessLimit'] = prot.SuccessLimit;
+	prot['UsersCount'] = prot.UsersCount;
 
 	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
 	prot = c_oRights;
