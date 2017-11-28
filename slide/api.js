@@ -4713,6 +4713,13 @@ background-repeat: no-repeat;\
 
 				presentation.DrawingDocument.OnEndRecalculate();
 
+				this.asc_registerCallback('asc_doubleClickOnChart', function(){
+					// next tick
+					setTimeout(function() {
+						window.editor.WordControl.onMouseUpMainSimple();
+					}, 0);
+				});
+
 				this.WordControl.m_oLayoutDrawer.IsRetina = this.WordControl.bIsRetinaSupport;
 
 				this.WordControl.m_oLayoutDrawer.WidthMM  = presentation.Width;
