@@ -402,6 +402,10 @@ window["DesktopSaveQuestionReturn"] = function(isNeedSaved)
 		var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 		_editor.asc_Save(false);
 	}
+	else
+	{
+		window.SaveQuestionObjectBeforeSign = null;
+	}
 };
 
 window["OnNativeReturnCallback"] = function(name, obj)

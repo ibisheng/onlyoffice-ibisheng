@@ -2584,6 +2584,12 @@
 
 		asc_putColumnSpace: function(v){
 			this.columnSpace = v;
+		},
+
+		asc_getSignatureId : function() {
+			if (this.ShapeProperties)
+				return this.ShapeProperties.asc_getSignatureId();
+			return undefined;
 		}
 	};
 
@@ -4150,6 +4156,7 @@
 	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
 	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
+	prot["asc_getSignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
 
 
 
