@@ -2917,6 +2917,9 @@ ScrollObject.prototype = {
     /*events*/
     evt_mousemove:function ( e ) {
 
+        if (this.style)
+            this.style.cursor = "default";
+
         var arrowStat = ArrowStatus.arrowHover;
         var evt = e || window.event;
 
