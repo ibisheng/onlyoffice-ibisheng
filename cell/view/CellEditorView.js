@@ -1183,30 +1183,28 @@
 	};
 
 	CellEditor.prototype._fireUpdated = function () {
-		var t = this;
-		var s = t._getFragmentsText( t.options.fragments );
-		var isFormula = s.charAt( 0 ) === "=";
+		var s = this._getFragmentsText(this.options.fragments);
+		var isFormula = s.charAt(0) === "=";
 		var funcPos, funcName, match;
 
-		if ( !t.isTopLineActive || !t.skipTLUpdate || t.undoMode ) {
-			t.input.value = s;
+		if (!this.isTopLineActive || !this.skipTLUpdate || this.undoMode) {
+			this.input.value = s;
 		}
 
-		if ( isFormula ) {
-			funcPos = asc_lastidx( s, t.reNotFormula, t.cursorPos ) + 1;
-			if ( funcPos > 0 ) {
-				match = s.slice( funcPos, t.cursorPos ).match( t.reFormula );
+		if (isFormula) {
+			funcPos = asc_lastidx(s, this.reNotFormula, this.cursorPos) + 1;
+			if (funcPos > 0) {
+				match = s.slice(funcPos, this.cursorPos).match(this.reFormula);
 			}
-			if ( match ) {
+			if (match) {
 				funcName = match[1];
-			}
-			else {
+			} else {
 				funcPos = undefined;
 				funcName = undefined;
 			}
 		}
 
-		t.handlers.trigger( "updated", s, t.cursorPos, isFormula, funcPos, funcName );
+		this.handlers.trigger("updated", s, this.cursorPos, isFormula, funcPos, funcName);
 	};
 
 	CellEditor.prototype._expandWidth = function () {
