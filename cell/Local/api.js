@@ -151,7 +151,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data, _len);
 
-	window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
+	window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != window["Asc"]["editor"].currentPassword) ? true : false);
 };
 
 /////////////////////////////////////////////////////////
