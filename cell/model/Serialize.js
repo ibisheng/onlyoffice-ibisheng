@@ -3569,7 +3569,7 @@
 					if(ECellTypeType.celltypeNumber != nType)
 						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
 				}
-				if (cell.formulaParsed) {
+				if (cell.hasFormula()) {
 					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
 				}
 				if(!cell.isEmptyTextString())
@@ -6595,14 +6595,14 @@
 						prevFormula.parsed.buildDependencies();
 					}
 					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
-					var formulaParsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
-					formulaParsed.ca = formula.ca;
-					var refPos = formulaParsed.parse();
+					var parsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
+					parsed.ca = formula.ca;
+					var refPos = parsed.parse();
 					if (null !== formula.ref) {
 						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
-						formulaParsed.setShared(sharedRef, newFormulaParent);
+						parsed.setShared(sharedRef, newFormulaParent);
 					}
-					curFormula = new OpenColumnFormula(cell.nRow, formula.v, formulaParsed, refPos, newFormulaParent);
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, parsed, refPos, newFormulaParent);
 					tmp.prevFormulas[cell.nCol] = curFormula;
 				}
 				if (null !== formula.si) {

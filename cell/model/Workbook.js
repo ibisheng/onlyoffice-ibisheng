@@ -285,7 +285,7 @@
 					(AscCommon.c_oNotifyType.Shift === notifyType || AscCommon.c_oNotifyType.Move === notifyType ||
 					AscCommon.c_oNotifyType.Delete === notifyType))) {
 					var oldUndoName = this.getUndoDefName();
-					this.ref = this.parsedRef.Formula = eventData.assemble;
+					this.parsedRef.setFormulaString(this.ref = eventData.assemble);
 					this.wb.dependencyFormulas.addToChangedDefName(this);
 					var newUndoName = this.getUndoDefName();
 					History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeUndo,
@@ -3510,7 +3510,7 @@
 					var newFormula = parsed.clone(undefined, cellWithFormula);
 					newFormula.removeShared();
 					newFormula.changeOffset(offsetShared, false);
-					newFormula.Formula = newFormula.assemble(true);
+					newFormula.setFormulaString(newFormula.assemble(true));
 					cell.setFormulaInternal(newFormula);
 					newFormula.buildDependencies();
 					if (shared.ref.isOnTheEdge(cell.nCol, cell.nRow)) {
@@ -4485,7 +4485,7 @@
 					History.TurnOff();
 					var newFormula = formula.clone(null, cellWithFormula, oThis);
 					newFormula.changeOffset(offset, false, true);
-					newFormula.Formula = newFormula.assemble(true);
+					newFormula.setFormulaString(newFormula.assemble(true));
 					cell.setFormulaInternal(newFormula);
 					History.TurnOn();
 				}
@@ -5955,7 +5955,7 @@
 						}
 					}
 				} else {
-					newFP.Formula = newFP.assemble();
+					newFP.setFormulaString(newFP.assemble());
 				}
 			}
 		}
@@ -6051,7 +6051,7 @@
 	Cell.prototype.changeOffset = function(offset, canResize, bHistoryUndo) {
 		this.setFormulaTemplate(bHistoryUndo, function(cell){
 			cell.formulaParsed.changeOffset(offset, canResize);
-			cell.formulaParsed.Formula = cell.formulaParsed.assemble(true);
+			cell.formulaParsed.setFormulaString(cell.formulaParsed.assemble(true));
 			cell.formulaParsed.buildDependencies();
 		});
 	};
@@ -7150,7 +7150,7 @@
 					if (first) {
 						first = false;
 						cell.setFormulaTemplate(true, function(cell) {
-							cell.formulaParsed.Formula = eventData.assemble;
+							cell.formulaParsed.setFormulaString(eventData.assemble);
 						});
 					}
 					t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
@@ -7160,7 +7160,7 @@
 			this.ws._getCell(this.nRow, this.nCol, function(cell) {
 				if (parsed === cell.formulaParsed) {
 					cell.setFormulaTemplate(true, function(cell) {
-						cell.formulaParsed.Formula = eventData.assemble;
+						cell.formulaParsed.setFormulaString(eventData.assemble);
 						t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
 					});
 				}
@@ -7206,7 +7206,7 @@
 				newFormula.changeOffset(cellOffset, false);
 				if (newFormula.shiftCells(data.type, data.sheetId, data.bbox, data.offset)) {
 					cellWithFormula = undefined;
-					newFormula.Formula = newFormula.assemble(true);
+					newFormula.setFormulaString(newFormula.assemble(true));
 					cell.setFormulaTemplate(true, function(cell) {
 						cell.setFormulaInternal(newFormula);
 						newFormula.buildDependencies();

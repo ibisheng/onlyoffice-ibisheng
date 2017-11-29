@@ -4499,6 +4499,9 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 	parserFormula.prototype.getFormula = function() {
 		return this.Formula;
 	};
+	parserFormula.prototype.setFormulaString = function(formula) {
+		this.Formula = formula;
+	};
 parserFormula.prototype.setFormula = function(formula) {
   this.Formula = formula;
   this.is3D = false;
@@ -5583,14 +5586,14 @@ parserFormula.prototype.setFormula = function(formula) {
 			var _cellsRange = null;
 			var _cellsBbox = null;
 			if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange) {
-				if (sheetId === elem.ws.getId() && elem.isValid()) {
+				if (sheetId === elem.getWsId() && elem.isValid()) {
 					_cellsRange = elem.getRange();
 					if (_cellsRange) {
 						_cellsBbox = _cellsRange.getBBox0();
 					}
 				}
 			} else if (elem.type === cElementType.cell3D) {
-				if (sheetId === elem.ws.getId() && elem.isValid()) {
+				if (sheetId === elem.getWsId() && elem.isValid()) {
 					_cellsRange = elem.getRange();
 					if (_cellsRange) {
 						_cellsBbox = _cellsRange.getBBox0();
