@@ -324,6 +324,7 @@
 		this.changedCellRepeated = null;
 		this.changedDefName = null;
 		this.changedDefNameRepeated = null;
+		this.changedShared = {};
 		this.dirtyCells = {};//===changedCell
 		this.buildCell = {};
 		this.buildDefName = {};
@@ -923,6 +924,9 @@
 				this.cleanCellCache[sheetId] = new Asc.Range(col, row, col, row);
 			}
 		},
+		addToChangedShared: function(parsed) {
+			this.changedShared[parsed.getIndexNumber()] = parsed;
+		},
 		notifyChanged: function(listenersContainer) {
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			listenersContainer.forEach(function(listeners) {
@@ -1007,6 +1011,32 @@
 					formulas.push(defName.parsedRef);
 				}
 			});
+		},
+		updateSharedFormulas: function() {
+			for (var indexNumber in this.changedShared) {
+				var parsed = this.changedShared[indexNumber];
+				var shared = parsed.getShared();
+				if (shared) {
+					var ws = parsed.getWs();
+					var ref = shared.ref;
+					var r1 = gc_nMaxRow0;
+					var c1 = gc_nMaxCol0;
+					var r2 = 0;
+					var c2 = 0;
+					ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
+						if (parsed === cell.formulaParsed) {
+							r1 = Math.min(r1, cell.nRow);
+							c1 = Math.min(c1, cell.nCol);
+							r2 = Math.max(r2, cell.nRow);
+							c2 = Math.max(c2, cell.nCol);
+						}
+					});
+					if (r1 <= r2 && c1 <= c2) {
+						parsed.setSharedRef(new Asc.Range(c1, r1, c2, r2));
+					}
+				}
+			}
+			this.changedShared = {};
 		},
 		//internal
 		_addDefName: function(defName) {
@@ -3482,6 +3512,10 @@
 					newFormula.changeOffset(offsetShared, false);
 					newFormula.Formula = newFormula.assemble(true);
 					cell.setFormulaInternal(newFormula);
+					newFormula.buildDependencies();
+					if (shared.ref.isOnTheEdge(cell.nCol, cell.nRow)) {
+						t.workbook.dependencyFormulas.addToChangedShared(parsed);
+					}
 				} else {
 					cellWithFormula = parsed.getParent();
 					cellWithFormula.nRow = newNRow;
@@ -3526,6 +3560,7 @@
 		this._forEachColData(function(sheetMemory) {
 			sheetMemory.deleteRange(start, (-nDif));
 		});
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
@@ -3570,6 +3605,7 @@
 				cell.clearAfterInsert();
 			});
 		}
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
@@ -3629,6 +3665,7 @@
 			if(null != elem)
 				elem.moveHor(nDif);
 		}
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
@@ -3663,6 +3700,7 @@
 		this.getRange3(0, index, gc_nMaxRow0, index + count - 1)._foreachNoEmpty(function(cell) {
 			cell.clearAfterInsert();
 		});
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
@@ -4544,6 +4582,7 @@
 			}
 		}
 		
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4573,6 +4612,7 @@
 			}
 		}
 		
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4621,6 +4661,7 @@
 			}
 		}
 		
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4661,6 +4702,7 @@
 			});
 		}
 		
+		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -7100,7 +7142,7 @@
 		var t = this;
 		var parsed = eventData.formula;
 		var shared = parsed.getShared();
-		if (shared.ref) {
+		if (shared) {
 			var ref = shared.ref;
 			var first = true;
 			this.ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
@@ -7146,6 +7188,7 @@
 		var cellWithFormula;
 		var cellOffset = new AscCommonExcel.CRangeOffset();
 		var newFormula;
+		var shared = parsed.getShared();
 		this.ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
 			if (parsed === cell.getFormulaParsed()) {
 				if (!cellWithFormula) {
@@ -7168,6 +7211,9 @@
 						cell.setFormulaInternal(newFormula);
 						newFormula.buildDependencies();
 					});
+					if (shared.ref.isOnTheEdge(cell.nCol, cell.nRow)) {
+						t.ws.workbook.dependencyFormulas.addToChangedShared(parsed);
+					}
 				}
 				t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
 			}

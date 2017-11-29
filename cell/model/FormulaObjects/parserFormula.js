@@ -4383,6 +4383,9 @@ function parserFormula( formula, parent, _ws ) {
 	this.parent = parent;
 	this._index = undefined;
 }
+  parserFormula.prototype.getWs = function() {
+    return this.ws;
+  };
   parserFormula.prototype.getListenerId = function() {
     return this.listenerId;
   };
@@ -4394,6 +4397,11 @@ function parserFormula( formula, parent, _ws ) {
 	};
 	parserFormula.prototype.setShared = function(ref, cellWithFormula) {
 		this.shared = {ref: ref, base: cellWithFormula};
+	};
+	parserFormula.prototype.setSharedRef = function(ref) {
+		this.removeDependencies();
+		this.shared.ref = ref;
+		this.buildDependencies();
 	};
 	parserFormula.prototype.removeShared = function() {
 		this.shared = null;

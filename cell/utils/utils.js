@@ -491,6 +491,10 @@
 			return this.r1 === this.r2 && this.c1 === this.c2;
 		};
 
+		Range.prototype.isOnTheEdge = function (c, r) {
+			return this.r1 === r || this.r2 === r || this.c1 === c || this.c2 === c;
+		};
+
 		Range.prototype.union = function (range) {
 			var s1 = this.clone(true), s2 = range instanceof Range ? range.clone(true) :
 				new Range(range.c1, range.r1, range.c2, range.r2, true);

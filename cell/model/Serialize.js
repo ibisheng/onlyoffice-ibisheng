@@ -3604,12 +3604,12 @@
 			var type;
 			var shared = parsed.getShared();
 			if (shared) {
-				var shared = this.sharedFormulas[parsed.getIndexNumber()];
-				var saveShared = shared ? shared.saveShared : parsed.canSaveShared();
+				var sharedToWrite = this.sharedFormulas[parsed.getIndexNumber()];
+				var saveShared = sharedToWrite ? sharedToWrite.saveShared : parsed.canSaveShared();
 				if (saveShared) {
 					type = ECellFormulaType.cellformulatypeShared;
-					if (shared) {
-						si = shared.si;
+					if (sharedToWrite) {
+						si = sharedToWrite.si;
 					} else {
 						formula = parsed.getFormula();
 						si = this.sharedFormulasIndex++;
