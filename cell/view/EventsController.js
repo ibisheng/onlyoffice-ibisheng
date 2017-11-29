@@ -800,12 +800,10 @@
 					// Отключим стандартную обработку браузера нажатия
 					// Ctrl+Shift+Spacebar, Ctrl+Spacebar, Shift+Spacebar
 					stop();
-					// Обработать как спец селект
-					if (ctrlKey && shiftKey) {
-						t.handlers.trigger("changeSelection", /*isStartPoint*/true, 0, 0, /*isCoord*/true, /*isSelectMode*/false, false);
-					} else if (ctrlKey) {
+					if (ctrlKey) {
 						t.handlers.trigger("selectColumnsByRange");
-					} else {
+					}
+					if (shiftKey) {
 						t.handlers.trigger("selectRowsByRange");
 					}
 					return result;
@@ -955,8 +953,8 @@
 							}
 							break;
 						case 65:
-							t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
-								false, false);
+							t.handlers.trigger("selectColumnsByRange");
+							t.handlers.trigger("selectRowsByRange");
 							action = true;
 							break;
 						case 66:
