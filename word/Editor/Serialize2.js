@@ -6890,10 +6890,10 @@ function BinaryFileReader(doc, openParams)
 			{
 				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document);
 				this.Document.Content.push(oNewParagraph);
-			};
+			}
 			
 			this.Document.On_EndLoad();
-		};
+		}
 		
 		//add comments
 		var setting = this.oReadResult.setting;        
@@ -6918,7 +6918,7 @@ function BinaryFileReader(doc, openParams)
 					oCommentObj.Add_Reply(fInitCommentData(comment.Replies[i]));
 			}
 			return oCommentObj;
-		}
+		};
 		
 		var oCommentsNewId = {};
 		//меняем CDocumentContent на Document для возможности вставки комментариев в колонтитул и таблицу
