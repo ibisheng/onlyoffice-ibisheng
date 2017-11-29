@@ -390,6 +390,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
 		if (this.WordControl)
 			this.WordControl.OnRePaintAttack();
+		else if (this._onShowDrawingObjects)
+			this._onShowDrawingObjects();
 	}, null);
 
 	_editor.sendEvent("asc_onUpdateSignatures", _editor.asc_getSignatures(), _editor.asc_getRequestSignatures());
