@@ -52,6 +52,8 @@
         this.kind = AscFormat.TYPE_KIND.NOTES_MASTER;
         this.notesLst = [];
 
+
+        this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add(this, this.Id);
     }
@@ -197,17 +199,22 @@
     };
 
 
+ 
     CNotesMaster.prototype.Clear_ContentChanges = function()
     {
+        this.m_oContentChanges.Clear();
     };
 
     CNotesMaster.prototype.Add_ContentChanges = function(Changes)
     {
+        this.m_oContentChanges.Add( Changes );
     };
 
     CNotesMaster.prototype.Refresh_ContentChanges = function()
     {
+        this.m_oContentChanges.Refresh();
     };
+
     CNotesMaster.prototype.Refresh_RecalcData = function()
     {
     };

@@ -68,6 +68,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     var CChangesDrawingsContentNoId = AscDFH.CChangesDrawingsContentNoId;
     var CChangesDrawingsContentLong = AscDFH.CChangesDrawingsContentLong;
     var CChangesDrawingsContentLongMap = AscDFH.CChangesDrawingsContentLongMap;
+    var CChangesDrawingsContent = AscDFH.CChangesDrawingsContent;
 
 
     var drawingsChangesMap = window['AscDFH'].drawingsChangesMap;
@@ -143,6 +144,11 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         };
         drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
         drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetName ] = function (oClass, value){oClass.name   = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetIsThemeOverride ] = function (oClass, value){oClass.isThemeOverride   = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetSpDef ]     = function (oClass, value){oClass.spDef   = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetLnDef ]     = function (oClass, value){oClass.lnDef   = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetTxDef ]     = function (oClass, value){oClass.txDef   = value;};
         drawingsChangesMap[AscDFH.historyitem_HF_SetDt          ] = function (oClass, value){oClass.dt     = value;};
         drawingsChangesMap[AscDFH.historyitem_HF_SetFtr         ] = function (oClass, value){oClass.ftr    = value;};
         drawingsChangesMap[AscDFH.historyitem_HF_SetHdr         ] = function (oClass, value){oClass.hdr    = value;};
@@ -151,6 +157,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetUniMedia] = function (oClass, value){oClass.unimedia = value;};
 
     drawingContentChanges[AscDFH.historyitem_ClrMap_SetClr] = function(oClass){return oClass.color_map};
+    drawingContentChanges[AscDFH.historyitem_ThemeAddExtraClrScheme] =  function(oClass){return oClass.extraClrSchemeLst;};
 
 
     drawingConstructorsMap[AscDFH.historyitem_ClrMap_SetClr] =  CUniColor;
@@ -218,6 +225,12 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetColorScheme] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetFontScheme] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ThemeSetFmtScheme] = CChangesDrawingsObjectNoId;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeSetName] = CChangesDrawingsString;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeSetIsThemeOverride] = CChangesDrawingsBool;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeSetSpDef] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeSetLnDef] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeSetTxDef] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_ThemeAddExtraClrScheme] = CChangesDrawingsContent;
     AscDFH.changesFactory[AscDFH.historyitem_HF_SetDt] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_HF_SetFtr] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_HF_SetHdr] = CChangesDrawingsBool;
@@ -4574,6 +4587,28 @@ DefaultShapeDefinition.prototype=
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_DefaultShapeDefinition_SetStyle, this.style, style));
         this.style = style;
+    },
+
+    createDuplicate: function()
+    {
+        var ret = new DefaultShapeDefinition();
+        if(this.spPr)
+        {
+            ret.setSpPr(this.spPr.createDuplicate());
+        }
+        if(this.bodyPr)
+        {
+            ret.setBodyPr(this.bodyPr.createDuplicate());
+        }
+        if(this.lstStyle)
+        {
+            ret.setLstStyle(this.lstStyle.createDuplicate());
+        }
+        if(this.style)
+        {
+            ret.setStyle(this.style.createDuplicate());
+        }
+        return ret;
     }
 };
 
@@ -6195,6 +6230,20 @@ ExtraClrScheme.prototype =
         this.clrMap = pr;
     },
 
+    createDuplicate: function()
+    {
+        var ret = new ExtraClrScheme();
+        if(this.clrScheme)
+        {
+            ret.setClrScheme(this.clrScheme.createDuplicate())
+        }
+        if(this.clrMap)
+        {
+            ret.setClrMap(this.clrMap.createDuplicate());
+        }
+        return ret;
+    },
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());
@@ -6309,13 +6358,13 @@ FontScheme.prototype =
     createDuplicate: function()
     {
         var oCopy = new FontScheme();
-        oCopy.majorFont.latin = this.majorFont.latin;
-        oCopy.majorFont.ea = this.majorFont.ea;
-        oCopy.majorFont.cs = this.majorFont.cs;
+        oCopy.majorFont.setLatin(this.majorFont.latin);
+        oCopy.majorFont.setEA(this.majorFont.ea);
+        oCopy.majorFont.setCS(this.majorFont.cs);
 
-        oCopy.minorFont.latin = this.minorFont.latin;
-        oCopy.minorFont.ea = this.minorFont.ea;
-        oCopy.minorFont.cs = this.minorFont.cs;
+        oCopy.minorFont.setLatin(this.minorFont.latin);
+        oCopy.minorFont.setEA(this.minorFont.ea);
+        oCopy.minorFont.setCS(this.minorFont.cs);
         return oCopy;
     },
 
@@ -6584,9 +6633,25 @@ CTheme.prototype =
     createDuplicate: function()
     {
         var oTheme = new CTheme();
+        oTheme.setName(this.name);
         oTheme.changeColorScheme(this.themeElements.clrScheme.createDuplicate());
         oTheme.setFontScheme(this.themeElements.fontScheme.createDuplicate());
         oTheme.setFormatScheme(this.themeElements.fmtScheme.createDuplicate());
+        if(this.spDef){
+            oTheme.setSpDef(this.spDef.createDuplicate());
+        }
+        if(this.lnDef)
+        {
+            oTheme.setLnDef(this.lnDef.createDuplicate());
+        }
+        if(this.txDef)
+        {
+            oTheme.setTxDef(this.txDef.createDuplicate());
+        }
+        for(var i = 0; i < this.extraClrSchemeLst.length; ++i)
+        {
+            oTheme.addExtraClrSceme(this.extraClrSchemeLst[i].createDuplicate());
+        }
         return oTheme;
     },
 
@@ -6668,6 +6733,45 @@ CTheme.prototype =
         History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ThemeSetFmtScheme, this.themeElements.fmtScheme,  fmtScheme));
         this.themeElements.fmtScheme = fmtScheme;
     },
+
+    setName: function(pr)
+    {
+        History.Add(new CChangesDrawingsString(this, AscDFH.historyitem_ThemeSetName, this.name,  pr));
+        this.name = pr;
+    },
+
+    setIsThemeOverride: function(pr)
+    {
+        History.Add(new CChangesDrawingsBool(this, AscDFH.historyitem_ThemeSetIsThemeOverride, this.isThemeOverride,  pr));
+        this.isThemeOverride = pr;
+    },
+
+
+    setSpDef: function(pr){
+        History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_ThemeSetSpDef, this.spDef, pr));
+        this.spDef = pr;
+    },
+    setLnDef: function(pr){
+        History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_ThemeSetLnDef, this.spDef, pr));
+        this.lnDef = pr;
+    },
+    setTxDef: function(pr){
+        History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_ThemeSetTxDef, this.spDef, pr));
+        this.txDef = pr;
+    },
+
+
+    addExtraClrSceme: function(pr, idx)
+    {
+        var pos;
+        if(AscFormat.isRealNumber(idx))
+            pos = idx;
+        else
+            pos = this.extraClrSchemeLst.length;
+        History.Add(new CChangesDrawingsContent(this, AscDFH.historyitem_ThemeAddExtraClrScheme, pos, [pr], true));
+        this.extraClrSchemeLst.splice(pos, 0, pr);
+    },
+
 
     GetWordDrawingObjects: function(){
         var oRet = typeof editor !== "undefined" &&

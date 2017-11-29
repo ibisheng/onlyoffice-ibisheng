@@ -276,7 +276,6 @@
 			this.m_oFactoryClass[AscDFH.historyitem_type_NotesMaster]         = AscCommonSlide.CNotesMaster;
 			this.m_oFactoryClass[AscDFH.historyitem_type_Notes]               = AscCommonSlide.CNotes;
 			this.m_oFactoryClass[AscDFH.historyitem_type_PresentationSection] = AscCommonSlide.CPrSection;
-			this.m_oFactoryClass[AscDFH.historyitem_type_NotesMaster]         = AscCommonSlide.PropLocker;
 		}
 
 		this.m_oFactoryClass[AscDFH.historyitem_type_Theme]                  = AscFormat.CTheme;

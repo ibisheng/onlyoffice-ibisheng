@@ -4955,6 +4955,7 @@ CPresentation.prototype =
                                 oSourceFormattingContent.Layouts.push(oLayout);
                                 oMaster = oLayout.Master;
                                 if(!oMastersMap[oMaster.Get_Id()]){
+                                    oMastersMap[oMaster.Get_Id()] = oMaster;
                                     oSourceFormattingContent.MastersIndexes.push(oSourceFormattingContent.Masters.length);
                                     oSourceFormattingContent.Masters.push(oMaster);
                                     oTheme = oMaster.Theme;
@@ -5060,9 +5061,10 @@ CPresentation.prototype =
     Insert_Content2: function(aContents, nIndex)
     {
         nIndex = 1;
-        var oContent, oSlide, i, bEndFormatting = (nIndex === 0), oSourceContent, kw, kh;
+        var oContent, oSlide, i, j, bEndFormatting = (nIndex === 0), oSourceContent, kw = 1.0, kh = 1.0;
         var nLayoutIndex, nMasterIndex, nNotesMasterIndex;
         var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster, bChangeSize = false;
+        var bNeedGenerateThumbnails = false;
         if(!aContents[nIndex])
         {
             return;
@@ -5094,15 +5096,6 @@ CPresentation.prototype =
             if(bEndFormatting)
             {
                 oSourceContent = aContents[1];
-
-                for(i = 0;  i < oContent.Masters.length; ++i)
-                {
-                    oContent.Masters[i].scale(kw, kh)
-                }
-                for(i = 0;  i < oContent.Layouts.length; ++i)
-                {
-                    oContent.Layouts[i].scale(kw, kh)
-                }
                 for(i = 0; i < oContent.SlideObjects.length; ++i)
                 {
                     oSlide = oContent.SlideObjects[i];
@@ -5126,13 +5119,29 @@ CPresentation.prototype =
             }
             else
             {
+                bNeedGenerateThumbnails = true;
                 for(i = 0;  i < oContent.Masters.length; ++i)
                 {
-                    oContent.Masters[i].scale(kw, kh)
+                    if(bChangeSize)
+                    {
+                        oContent.Masters[i].scale(kw, kh);
+                    }
+                    this.addSlideMaster(this.slideMasters.length, oContent.Masters[i]);
                 }
                 for(i = 0;  i < oContent.Layouts.length; ++i)
                 {
-                    oContent.Layouts[i].scale(kw, kh)
+                    oLayout = oContent.Layouts[i];
+                    if(bChangeSize)
+                    {
+                        oLayout.scale(kw, kh);
+                    }
+                    nMasterIndex = oContent.MastersIndexes[i];
+                    oMaster = oContent.Masters[nMasterIndex];
+                    if(oMaster)
+                    {
+                        oMaster.addLayout(oLayout);
+                    }
+
                 }
                 for(i = 0; i < oContent.SlideObjects.length; ++i)
                 {
@@ -5189,6 +5198,14 @@ CPresentation.prototype =
             }
         }
         this.Insert_Content(oContent);
+        if(bNeedGenerateThumbnails)
+        {
+            for(i = 0; i < this.slideMasters.length; ++i)
+            {
+                this.slideMasters[i].setThemeIndex(-i - 1);
+            }
+            this.SendThemesThumbnails();
+        }
     },
 
     Insert_Content : function(Content)
@@ -5377,6 +5394,43 @@ CPresentation.prototype =
                 }
             }
         }
+    },
+
+    SendThemesThumbnails: function()
+    {
+
+        if(!window['native'])
+        {
+            this.GenerateThumbnails(this.Api.WordControl.m_oMasterDrawer, this.Api.WordControl.m_oLayoutDrawer);
+        }
+        var _masters = this.slideMasters;
+        var aDocumentThemes = this.Api.ThemeLoader.Themes.DocumentThemes;
+        var aThemeInfo = this.Api.ThemeLoader.themes_info_document;
+        aDocumentThemes.length = 0;
+        aThemeInfo.length = 0;
+        for (var i = 0; i < _masters.length; i++)
+        {
+            if (_masters[i].ThemeIndex < 0)//только темы презентации
+            {
+                var theme_load_info    = new AscCommonSlide.CThemeLoadInfo();
+                theme_load_info.Master = _masters[i];
+                theme_load_info.Theme  = _masters[i].Theme;
+                var _lay_cnt = _masters[i].sldLayoutLst.length;
+                for (var j = 0; j < _lay_cnt; j++)
+                {
+                    theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
+                }
+                var th_info       = {};
+                th_info.Name      = "Doc Theme " + i;
+                th_info.Url       = "";
+                th_info.Thumbnail = _masters[i].ImageBase64;
+                var th = new AscCommonSlide.CAscThemeInfo(th_info);
+                aDocumentThemes[aDocumentThemes.length] = th;
+                th.Index = -this.Api.ThemeLoader.Themes.DocumentThemes.length;
+                aThemeInfo[aDocumentThemes.length - 1] = theme_load_info;
+            }
+        }
+        this.Api.sync_InitEditorThemes(this.Api.ThemeLoader.Themes.EditorThemes, aDocumentThemes);
     },
 
     Check_CursorMoveRight : function()

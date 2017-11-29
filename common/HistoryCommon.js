@@ -2539,9 +2539,15 @@
 
 	window['AscDFH'].historyitem_PropLockerSetId = window['AscDFH'].historyitem_type_PropLocker | 1;
 
-	window['AscDFH'].historyitem_ThemeSetColorScheme = window['AscDFH'].historyitem_type_Theme | 1;
-	window['AscDFH'].historyitem_ThemeSetFontScheme  = window['AscDFH'].historyitem_type_Theme | 2;
-	window['AscDFH'].historyitem_ThemeSetFmtScheme   = window['AscDFH'].historyitem_type_Theme | 3;
+	window['AscDFH'].historyitem_ThemeSetColorScheme     = window['AscDFH'].historyitem_type_Theme | 1;
+	window['AscDFH'].historyitem_ThemeSetFontScheme      = window['AscDFH'].historyitem_type_Theme | 2;
+	window['AscDFH'].historyitem_ThemeSetFmtScheme       = window['AscDFH'].historyitem_type_Theme | 3;
+	window['AscDFH'].historyitem_ThemeSetName            = window['AscDFH'].historyitem_type_Theme | 4;
+	window['AscDFH'].historyitem_ThemeSetIsThemeOverride = window['AscDFH'].historyitem_type_Theme | 5;
+	window['AscDFH'].historyitem_ThemeSetSpDef           = window['AscDFH'].historyitem_type_Theme | 6;
+	window['AscDFH'].historyitem_ThemeSetLnDef           = window['AscDFH'].historyitem_type_Theme | 7;
+	window['AscDFH'].historyitem_ThemeSetTxDef           = window['AscDFH'].historyitem_type_Theme | 8;
+	window['AscDFH'].historyitem_ThemeAddExtraClrScheme  = window['AscDFH'].historyitem_type_Theme | 9;
 
 	window['AscDFH'].historyitem_GraphicFrameSetSpPr          = window['AscDFH'].historyitem_type_GraphicFrame | 1;
 	window['AscDFH'].historyitem_GraphicFrameSetGraphicObject = window['AscDFH'].historyitem_type_GraphicFrame | 2;

@@ -3899,9 +3899,9 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                theme.name = s.GetString2();
+                theme.setName(s.GetString2());
             else if (1 == _at)
-                theme.isThemeOverride = s.GetBool();
+                theme.setIsThemeOverride(s.GetBool());
             else
                 break;
         }
@@ -3924,17 +3924,17 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    theme.spDef = this.ReadDefaultShapeProperties();
+                    theme.setSpDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 2:
                 {
-                    theme.lnDef = this.ReadDefaultShapeProperties();
+                    theme.setLnDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 3:
                 {
-                    theme.txDef = this.ReadDefaultShapeProperties();
+                    theme.setTxDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 4:

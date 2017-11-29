@@ -109,6 +109,7 @@ function MasterSlide(presentation, theme)
     this.recalcInfo = {};
     this.DrawingDocument = editor.WordControl.m_oDrawingDocument;
     this.maxId = 1000;
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.bounds = new AscFormat.CGraphicBounds(0, 0, this.Width, this.Height);
 
@@ -496,7 +497,7 @@ MasterSlide.prototype =
             var i;
 
             if (this.clrMap) {
-                this.setClMapOverride(this.clrMap.createDuplicate());
+                copy.setClMapOverride(this.clrMap.createDuplicate());
             }
             if (typeof this.cSld.name === "string" && this.cSld.name.length > 0) {
                 copy.setCSldName(this.cSld.name);
@@ -524,15 +525,17 @@ MasterSlide.prototype =
             }
             return copy;
         },
-
-
-        Clear_ContentChanges: function () {
+      
+        Clear_ContentChanges : function()
+        {
         },
 
-        Add_ContentChanges: function (Changes) {
+        Add_ContentChanges : function(Changes)
+        {
         },
 
-        Refresh_ContentChanges: function () {
+        Refresh_ContentChanges : function()
+        {
         },
 
         scale: function (kw, kh) {

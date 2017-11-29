@@ -3924,317 +3924,318 @@ PasteProcessor.prototype =
 
 
 	_readPresentationSelectedContent: function(stream, bDuplicate){
+	    return AscFormat.ExecuteNoHistory(function(){
+            var presentationSelectedContent = null;
+            var fonts = [];
+            var arr_Images = {};
+            var oThis = this;
 
-		var presentationSelectedContent = null;
-		var fonts = [];
-		var arr_Images = {};
-		var oThis = this;
+            var readContent = function () {
+                var docContent = oThis.ReadPresentationText(stream);
+                if (docContent.length === 0) {
+                    return;
+                }
+                presentationSelectedContent.DocContent = new CSelectedContent();
+                presentationSelectedContent.DocContent.Elements = docContent;
 
-		var readContent = function () {
-			var docContent = oThis.ReadPresentationText(stream);
-			if (docContent.length === 0) {
-				return;
-			}
-			presentationSelectedContent.DocContent = new CSelectedContent();
-			presentationSelectedContent.DocContent.Elements = docContent;
+                //перебираем шрифты
+                for (var i in oThis.oFonts) {
+                    fonts.push(new CFont(i, 0, "", 0));
+                }
 
-			//перебираем шрифты
-			for (var i in oThis.oFonts) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}
+                /*for (var i = 0; i < docContent.length; ++i) {
+                    if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+                        docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
+                    }
+                }*/
+            };
 
-			/*for (var i = 0; i < docContent.length; ++i) {
-				if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
-					docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
-				}
-			}*/
-		};
+            var readDrawings = function () {
 
-		var readDrawings = function () {
+                if(PasteElementsId.g_bIsDocumentCopyPaste){
+                    History.TurnOff();
+                }
+                var objects = oThis.ReadPresentationShapes(stream);
+                if(PasteElementsId.g_bIsDocumentCopyPaste){
+                    History.TurnOn();
+                }
 
-			if(PasteElementsId.g_bIsDocumentCopyPaste){
-				History.TurnOff();
-			}
-			var objects = oThis.ReadPresentationShapes(stream);
-			if(PasteElementsId.g_bIsDocumentCopyPaste){
-				History.TurnOn();
-			}
+                presentationSelectedContent.Drawings = objects.arrShapes;
 
-			presentationSelectedContent.Drawings = objects.arrShapes;
+                var arr_shapes = objects.arrShapes;
+                var font_map = {};
+                for (var i = 0; i < arr_shapes.length; ++i) {
+                    if (arr_shapes[i].Drawing.getAllFonts) {
+                        arr_shapes[i].Drawing.getAllFonts(font_map);
+                    }
+                    /*if (arr_shapes[i].Drawing.getAllImages) {
+                        arr_shapes[i].Drawing.getAllImages(images);
+                    }*/
+                }
 
-			var arr_shapes = objects.arrShapes;
-			var font_map = {};
-			for (var i = 0; i < arr_shapes.length; ++i) {
-				if (arr_shapes[i].Drawing.getAllFonts) {
-					arr_shapes[i].Drawing.getAllFonts(font_map);
-				}
-				/*if (arr_shapes[i].Drawing.getAllImages) {
-					arr_shapes[i].Drawing.getAllImages(images);
-				}*/
-			}
+                for (var i in font_map) {
+                    fonts.push(new CFont(i, 0, "", 0));
+                }
 
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}
+                arr_Images = objects.arrImages;
+            };
 
-			arr_Images = objects.arrImages;
-		};
+            var readSlideObjects = function () {
+                var arr_slides = [];
+                var loader = new AscCommon.BinaryPPTYLoader();
+                if (!(bDuplicate === true)) {
+                    loader.Start_UseFullUrl();
+                }
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
 
-		var readSlideObjects = function () {
-			var arr_slides = [];
-			var loader = new AscCommon.BinaryPPTYLoader();
-			if (!(bDuplicate === true)) {
-				loader.Start_UseFullUrl();
-			}
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
+                //read slides
+                var slide_count = stream.GetULong();
+                //var arr_arrTransforms = [];
 
-			//read slides
-			var slide_count = stream.GetULong();
-			//var arr_arrTransforms = [];
+                for (var i = 0; i < slide_count; ++i) {
+                    if(PasteElementsId.g_bIsDocumentCopyPaste){
+                        loader.stream.GetUChar();
+                        loader.stream.SkipRecord();
+                        arr_slides[i] = null;
+                    }else{
+                        arr_slides[i] = loader.ReadSlide(0);
+                    }
+                }
 
-			for (var i = 0; i < slide_count; ++i) {
-				if(PasteElementsId.g_bIsDocumentCopyPaste){
-					loader.stream.GetUChar();
-					loader.stream.SkipRecord();
-					arr_slides[i] = null;
-				}else{
-					arr_slides[i] = loader.ReadSlide(0);
-				}
-			}
+                //images and fonts
+                var font_map = {};
+                var slideCopyObjects = [];
+                for (var i = 0; i < arr_slides.length; ++i) {
+                    if (arr_slides[i] && arr_slides[i].getAllFonts) {
+                        arr_slides[i].getAllFonts(font_map);
+                    }
 
-			//images and fonts
-			var font_map = {};
-			var slideCopyObjects = [];
-			for (var i = 0; i < arr_slides.length; ++i) {
-				if (arr_slides[i] && arr_slides[i].getAllFonts) {
-					arr_slides[i].getAllFonts(font_map);
-				}
+                    slideCopyObjects[i] = arr_slides[i];
+                }
 
-				slideCopyObjects[i] = arr_slides[i];
-			}
+                for (var i in font_map) {
+                    fonts.push(new CFont(i, 0, "", 0));
+                }
 
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}
+                var arr_Images = loader.End_UseFullUrl();
 
-			var arr_Images = loader.End_UseFullUrl();
-
-			presentationSelectedContent.SlideObjects = slideCopyObjects;
-		};
-
-
-		var readLayouts = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var selected_layouts = stream.GetULong();
-
-			var layouts = [];
-			for (var i = 0; i < selected_layouts; ++i) {
-				if (PasteElementsId.g_bIsDocumentCopyPaste) {
-					loader.stream.GetUChar();
-					loader.stream.SkipRecord();
-				} else {
-					layouts.push(loader.ReadSlideLayout());
-				}
-			}
-
-			/*var font_map = {};
-			for (var i = 0; i < layouts.length; ++i) {
-				if (layouts[i].getAllFonts) {
-					layouts[i].getAllFonts(font_map);
-				}
-				if (layouts[i].getAllImages) {
-					layouts[i].getAllImages(images);
-				}
-			}
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}*/
-
-			presentationSelectedContent.Layouts = layouts;
-		};
-
-		var readMasters = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var count = stream.GetULong();
-
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				if (PasteElementsId.g_bIsDocumentCopyPaste) {
-					loader.stream.GetUChar();
-					loader.stream.SkipRecord();
-				} else {
-					array.push(loader.ReadSlideMaster());
-				}
-			}
-
-			presentationSelectedContent.Masters = array;
-		};
-
-		var readNotes = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var selected_notes = stream.GetULong();
-
-			var notes = [];
-			for (var i = 0; i < selected_notes; ++i) {
-				if (PasteElementsId.g_bIsDocumentCopyPaste) {
-					loader.stream.GetUChar();
-					loader.stream.SkipRecord();
-				} else {
-					notes.push(loader.ReadNote());
-				}
-			}
-
-			presentationSelectedContent.Notes = notes;
-		};
-
-		var readNotesMasters = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var count = stream.GetULong();
-
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				if (PasteElementsId.g_bIsDocumentCopyPaste) {
-					loader.stream.GetUChar();
-					loader.stream.SkipRecord();
-				} else {
-					array.push(loader.ReadNoteMaster());
-				}
-			}
-
-			presentationSelectedContent.NotesMasters = array;
-		};
-
-		var readNotesThemes = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var count = stream.GetULong();
-
-			//TODO возможно стоит пропустить при чтении в документах
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				array.push(loader.ReadTheme());
-			}
-
-			presentationSelectedContent.Themes = array;
-		};
-
-		var readThemes = function(){
-			var loader = new AscCommon.BinaryPPTYLoader();
-			loader.stream = stream;
-			loader.presentation = editor.WordControl.m_oLogicDocument;
-
-			var count = stream.GetULong();
-
-			//TODO возможно стоит пропустить при чтении в документах
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				array.push(loader.ReadTheme());
-			}
-
-			presentationSelectedContent.NotesThemes = array;
-		};
-
-		var readIndexes = function(){
-			var count = stream.GetULong();
-
-			var array = [];
-			for (var i = 0; i < count; ++i) {
-				array.push(stream.GetULong());
-			}
-
-			return array;
-		};
+                presentationSelectedContent.SlideObjects = slideCopyObjects;
+            };
 
 
-		var first_content = stream.GetString2();
-		if(first_content === "SelectedContent"){
-		    var PresentationWidth = stream.GetULong()/100000.0;
-		    var PresentationHeight = stream.GetULong()/100000.0;
-			var countContent = stream.GetULong();
-			for(var i = 0; i < countContent; i++){
-				if(null === presentationSelectedContent){
-					presentationSelectedContent = typeof PresentationSelectedContent !== "undefined" ? new PresentationSelectedContent() : {};
-                    presentationSelectedContent.PresentationWidth = PresentationWidth;
-                    presentationSelectedContent.PresentationHeight = PresentationHeight;
-				}
-				var first_string = stream.GetString2();
-				switch (first_string) {
-					case "DocContent": {
-						readContent();
-						break;
-					}
-					case "Drawings": {
-						readDrawings();
-						break;
-					}
-					case "SlideObjects": {
-						readSlideObjects();
-						break;
-					}
-					case "Layouts": {
-						History.TurnOff();
-						readLayouts();
-						History.TurnOn();
-						break;
-					}
-					case "LayoutsIndexes": {
-						presentationSelectedContent.LayoutsIndexes = readIndexes();
-						break;
-					}
-					case "Masters": {
-						readMasters();
-						break;
-					}
-					case "MastersIndexes": {
-						presentationSelectedContent.MastersIndexes = readIndexes();
-						break;
-					}
-					case "Notes": {
-						readNotes();
-						break;
-					}
-					case "NotesMasters": {
-						History.TurnOff();
-						readNotesMasters();
-						History.TurnOn();
-						break;
-					}
-					case "NotesMastersIndexes": {
-						presentationSelectedContent.NotesMastersIndexes = readIndexes();
-						break;
-					}
-					case "NotesThemes": {
-						readNotesThemes();
-						break;
-					}
-					case "Themes": {
-						readThemes();
-						break;
-					}
-					case "ThemeIndexes": {
-						presentationSelectedContent.ThemeIndexes = readIndexes();
-						break;
-					}
-				}
-			}
-		}
+            var readLayouts = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
 
-		return {content: presentationSelectedContent, fonts: fonts, images: arr_Images};
+                var selected_layouts = stream.GetULong();
+
+                var layouts = [];
+                for (var i = 0; i < selected_layouts; ++i) {
+                    if (PasteElementsId.g_bIsDocumentCopyPaste) {
+                        loader.stream.GetUChar();
+                        loader.stream.SkipRecord();
+                    } else {
+                        layouts.push(loader.ReadSlideLayout());
+                    }
+                }
+
+                /*var font_map = {};
+                for (var i = 0; i < layouts.length; ++i) {
+                    if (layouts[i].getAllFonts) {
+                        layouts[i].getAllFonts(font_map);
+                    }
+                    if (layouts[i].getAllImages) {
+                        layouts[i].getAllImages(images);
+                    }
+                }
+                for (var i in font_map) {
+                    fonts.push(new CFont(i, 0, "", 0));
+                }*/
+
+                presentationSelectedContent.Layouts = layouts;
+            };
+
+            var readMasters = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
+
+                var count = stream.GetULong();
+
+                var array = [];
+                for (var i = 0; i < count; ++i) {
+                    if (PasteElementsId.g_bIsDocumentCopyPaste) {
+                        loader.stream.GetUChar();
+                        loader.stream.SkipRecord();
+                    } else {
+                        array.push(loader.ReadSlideMaster());
+                    }
+                }
+
+                presentationSelectedContent.Masters = array;
+            };
+
+            var readNotes = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
+
+                var selected_notes = stream.GetULong();
+
+                var notes = [];
+                for (var i = 0; i < selected_notes; ++i) {
+                    if (PasteElementsId.g_bIsDocumentCopyPaste) {
+                        loader.stream.GetUChar();
+                        loader.stream.SkipRecord();
+                    } else {
+                        notes.push(loader.ReadNote());
+                    }
+                }
+
+                presentationSelectedContent.Notes = notes;
+            };
+
+            var readNotesMasters = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
+
+                var count = stream.GetULong();
+
+                var array = [];
+                for (var i = 0; i < count; ++i) {
+                    if (PasteElementsId.g_bIsDocumentCopyPaste) {
+                        loader.stream.GetUChar();
+                        loader.stream.SkipRecord();
+                    } else {
+                        array.push(loader.ReadNoteMaster());
+                    }
+                }
+
+                presentationSelectedContent.NotesMasters = array;
+            };
+
+            var readNotesThemes = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
+
+                var count = stream.GetULong();
+
+                //TODO возможно стоит пропустить при чтении в документах
+                var array = [];
+                for (var i = 0; i < count; ++i) {
+                    array.push(loader.ReadTheme());
+                }
+
+                presentationSelectedContent.NotesThemes = array;
+            };
+
+            var readThemes = function(){
+                var loader = new AscCommon.BinaryPPTYLoader();
+                loader.stream = stream;
+                loader.presentation = editor.WordControl.m_oLogicDocument;
+
+                var count = stream.GetULong();
+
+                //TODO возможно стоит пропустить при чтении в документах
+                var array = [];
+                for (var i = 0; i < count; ++i) {
+                    array.push(loader.ReadTheme());
+                }
+
+                presentationSelectedContent.Themes = array;
+            };
+
+            var readIndexes = function(){
+                var count = stream.GetULong();
+
+                var array = [];
+                for (var i = 0; i < count; ++i) {
+                    array.push(stream.GetULong());
+                }
+
+                return array;
+            };
+
+
+            var first_content = stream.GetString2();
+            if(first_content === "SelectedContent"){
+                var PresentationWidth = stream.GetULong()/100000.0;
+                var PresentationHeight = stream.GetULong()/100000.0;
+                var countContent = stream.GetULong();
+                for(var i = 0; i < countContent; i++){
+                    if(null === presentationSelectedContent){
+                        presentationSelectedContent = typeof PresentationSelectedContent !== "undefined" ? new PresentationSelectedContent() : {};
+                        presentationSelectedContent.PresentationWidth = PresentationWidth;
+                        presentationSelectedContent.PresentationHeight = PresentationHeight;
+                    }
+                    var first_string = stream.GetString2();
+                    switch (first_string) {
+                        case "DocContent": {
+                            readContent();
+                            break;
+                        }
+                        case "Drawings": {
+                            readDrawings();
+                            break;
+                        }
+                        case "SlideObjects": {
+                            readSlideObjects();
+                            break;
+                        }
+                        case "Layouts": {
+                            History.TurnOff();
+                            readLayouts();
+                            History.TurnOn();
+                            break;
+                        }
+                        case "LayoutsIndexes": {
+                            presentationSelectedContent.LayoutsIndexes = readIndexes();
+                            break;
+                        }
+                        case "Masters": {
+                            readMasters();
+                            break;
+                        }
+                        case "MastersIndexes": {
+                            presentationSelectedContent.MastersIndexes = readIndexes();
+                            break;
+                        }
+                        case "Notes": {
+                            readNotes();
+                            break;
+                        }
+                        case "NotesMasters": {
+                            History.TurnOff();
+                            readNotesMasters();
+                            History.TurnOn();
+                            break;
+                        }
+                        case "NotesMastersIndexes": {
+                            presentationSelectedContent.NotesMastersIndexes = readIndexes();
+                            break;
+                        }
+                        case "NotesThemes": {
+                            readNotesThemes();
+                            break;
+                        }
+                        case "Themes": {
+                            readThemes();
+                            break;
+                        }
+                        case "ThemeIndexes": {
+                            presentationSelectedContent.ThemeIndexes = readIndexes();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return {content: presentationSelectedContent, fonts: fonts, images: arr_Images};
+        }, this, []);
 	},
 	
 	_pasteFromHtml: function(node, bTurnOffTrackRevisions)
