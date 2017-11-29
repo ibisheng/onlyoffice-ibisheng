@@ -5429,6 +5429,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
+		this.showAutoCorrectOptions();
         return this;
     };
 
@@ -5589,6 +5590,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
+		this.showAutoCorrectOptions();
         return this;
     };
 
@@ -12453,6 +12455,9 @@
 
 		var options = new Asc.asc_CAutoCorrectOptions();
 		if (!props) {
+			if(!this.autoCorrectStore){
+				return;
+			}
 			props = this.autoCorrectStore.props;
 			cell = this.autoCorrectStore.cell;
 		} else {

@@ -717,8 +717,6 @@
 			  self.Api.checkLastWork();
 		  }, "showAutoCorrectOptions": function (val) {
 			  self.handlers.trigger("asc_onShowAutoCorrectOptions", val);
-		  }, "hideAutoCorrectOptions": function () {
-			  self.handlers.trigger("asc_onHideAutoCorrectOptions");
 		  }
 	  });
 
@@ -842,7 +840,9 @@
 		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
 	  }
     });
-
+	this.model.handlers.add("hideAutoCorrectOptions", function() {
+	  self.handlers.trigger("asc_onHideAutoCorrectOptions");
+	});
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
       collaborativeEditing: this.collaborativeEditing,
@@ -1688,6 +1688,7 @@
     // Нужно очистить поиск
     this._cleanFindResults();
 	this.handlers.trigger("hideSpecialPasteOptions");
+	//this.handlers.trigger("hideAutoCorrectOptions");
     return this;
   };
 
