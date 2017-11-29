@@ -5060,7 +5060,7 @@ CPresentation.prototype =
     * */
     Insert_Content2: function(aContents, nIndex)
     {
-        nIndex = 1;
+        //nIndex = 1;
         var oContent, oSlide, i, j, bEndFormatting = (nIndex === 0), oSourceContent, kw = 1.0, kh = 1.0;
         var nLayoutIndex, nMasterIndex, nNotesMasterIndex;
         var oLayout, oMaster, oTheme, oNotes, oNotesMaster, oNotesTheme, oCurrentMaster, bChangeSize = false;
