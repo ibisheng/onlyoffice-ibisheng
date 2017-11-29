@@ -161,6 +161,7 @@
     this.lastSendInfoRange = null;
     this.oSelectionInfo = null;
     this.canUpdateAfterShiftUp = false;	// Нужно ли обновлять информацию после отпускания Shift
+    this.keepType = false;
 
     //----- declaration -----
     this.canvas = undefined;
@@ -983,19 +984,21 @@
     }
   };
 
-  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isSelectMode, isCtrl, callback) {
+  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isCtrl, callback) {
     var ws = this.getWorksheet();
-    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isSelectMode, isCtrl) :
-      ws.changeSelectionEndPoint(dc, dr, isCoord, isSelectMode);
-    if (!isCoord && !isStartPoint && !isSelectMode) {
+    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isCtrl) :
+      ws.changeSelectionEndPoint(dc, dr, isCoord, isCoord && this.keepType);
+    if (!isCoord && !isStartPoint) {
       // Выделение с зажатым shift
       this.canUpdateAfterShiftUp = true;
     }
+    this.keepType = isCoord;
     asc_applyFunction(callback, d);
   };
 
   // Окончание выделения
   WorkbookView.prototype._onChangeSelectionDone = function(x, y) {
+  	this.keepType = false;
     if (c_oAscSelectionDialogType.None !== this.selectionDialogType) {
       return;
     }
@@ -2985,7 +2988,7 @@
 
 		var ws = this.getWorksheet();
 		var range = ws.model.selectionRange.getLast();
-		var type = range.type;
+		var type = range.getType();
 		var l = ws.getCellLeft(range.c1, 3);
 		var t = ws.getCellTop(range.r1, 3);
 

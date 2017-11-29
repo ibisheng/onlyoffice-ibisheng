@@ -407,10 +407,9 @@
 
 		/**
 		 * @param event {MouseEvent}
-		 * @param isSelectMode {Boolean}
 		 * @param callback {Function}
 		 */
-		asc_CEventsController.prototype._changeSelection = function (event, isSelectMode, callback) {
+		asc_CEventsController.prototype._changeSelection = function (event, callback) {
 			var t = this;
 			var coord = this._getCoordinates(event);
 
@@ -421,15 +420,17 @@
 				}
 			}
 
-			this.handlers.trigger("changeSelection", /*isStartPoint*/false, coord.x, coord.y,
-				/*isCoord*/true, /*isSelectMode*/isSelectMode, false,
+			this.handlers.trigger("changeSelection", /*isStartPoint*/false, coord.x, coord.y, /*isCoord*/true, false,
 				function (d) {
 					t.scroll(d);
 
-					if (t.isFormulaEditMode)
+					if (t.isFormulaEditMode) {
 						t.handlers.trigger("enterCellRange");
-					else if (t.handlers.trigger("getCellEditMode"))
-						if (!t.handlers.trigger("stopCellEditing")) {return;}
+					} else if (t.handlers.trigger("getCellEditMode")) {
+						if (!t.handlers.trigger("stopCellEditing")) {
+							return;
+						}
+					}
 
 					asc_applyFunction(callback);
 				});
@@ -449,7 +450,7 @@
 			window.clearTimeout(t.scrollTimerId);
 			t.scrollTimerId = window.setTimeout(function () {
 				if (t.isSelectMode && !t.hasCursor) {
-					t._changeSelection(event, /*isSelectMode*/true, callback);
+					t._changeSelection(event, callback);
 				}
 			}, 0);
 		};
@@ -1050,8 +1051,8 @@
 						}
 					}
 
-					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr, /*isCoord*/false, /*isSelectMode*/
-						false, false, function (d) {
+					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr, /*isCoord*/false, false,
+						function (d) {
 							t.scroll(d);
 
 							if (t.isFormulaEditMode) {
@@ -1338,7 +1339,7 @@
 			if (!t.handlers.trigger("getCellEditMode")) {
 				if (event.shiftKey) {
 					t.isSelectMode = true;
-					t._changeSelection(event, /*isSelectMode*/true);
+					t._changeSelection(event);
 					return;
 				}
 				if (t.targetInfo) {
@@ -1381,7 +1382,7 @@
 				} else {
 					if (event.shiftKey) {
 						t.isSelectMode = true;
-						t._changeSelection(event, /*isSelectMode*/true);
+						t._changeSelection(event);
 						return;
 					} else {
 						if (t.isFormulaEditMode) {
@@ -1400,7 +1401,7 @@
 						}
 						t.isSelectMode = true;
 						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
-							/*isSelectMode*/true, ctrlKey, function (d) {
+							ctrlKey, function (d) {
 								t.scroll(d);
 
 								if (t.isFormulaEditMode) {
@@ -1429,7 +1430,7 @@
 				} else {
 					this.isSelectMode = true;
 					this.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
-						/*isSelectMode*/true, ctrlKey);
+						ctrlKey);
 				}
 			}
 		};
@@ -1514,7 +1515,7 @@
 				this.clickCounter.mouseMoveEvent(coord.x, coord.y);
 
 			if (t.isSelectMode) {
-				t._changeSelection(event, /*isSelectMode*/true);
+				t._changeSelection(event);
 				return true;
 			}
 
