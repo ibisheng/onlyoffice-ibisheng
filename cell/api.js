@@ -1872,6 +1872,7 @@ var editor;
         if (res) {
           t.wbModel.getWorksheet(index).setHidden(false);
           t.wb.showWorksheet(index);
+          t.wb.handlers.trigger("hideAutoCorrectOptions");
           if (isHidden) {
             // Посылаем callback об изменении списка листов
             t.sheetsChanged();

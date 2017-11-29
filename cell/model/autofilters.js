@@ -2822,13 +2822,13 @@
 
 						if(ref.c2 + 1 === range.c1 && range.r1 >= ref.r1 && range.r1 <= ref.r2){
 							//вводим значение в ячейку справа от форматированной таблицы
-							if(this._isEmptyCellsRightRange(ref, range)){
+							if(this._isEmptyCellsRightRange(ref, range, true)){
 								res = {name: table.DisplayName, range: new Asc.Range(ref.c1, ref.r1, ref.c2 + 1, ref.r2)};
 							}
 							break;
 						} else if(!table.isTotalsRow() && ref.r2 + 1 === range.r1 && range.c1 >= ref.c1 && range.c1 <= ref.c2){
 							//вводим значение в ячейку снизу от форматированной таблицы
-							if(this._isEmptyCellsUnderRange(ref, range)){
+							if(this._isEmptyCellsUnderRange(ref, range, true)){
 								res = {name: table.DisplayName, range: new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r2 + 1)};
 							}
 							break;
@@ -4979,7 +4979,7 @@
 				return res;
 			},
 			
-			_isEmptyCellsUnderRange: function(range, exception)
+			_isEmptyCellsUnderRange: function(range, exception, checkFilter)
 			{
 				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
 				var cell, isEmptyCell, result = true;
@@ -4999,12 +4999,17 @@
 						result = false;
 						break;
 					}
+					if(checkFilter && worksheet.AutoFilter && worksheet.AutoFilter.Ref.contains(i, range.r2 + 1))
+					{
+						result = false;
+						break;
+					}
 				}
 				
 				return result;
 			},
 
-			_isEmptyCellsRightRange: function(range, exception)
+			_isEmptyCellsRightRange: function(range, exception, checkFilter)
 			{
 				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
 				var cell, isEmptyCell, result = true;
@@ -5020,6 +5025,11 @@
 					cell = worksheet.getRange3(i, range.c2 + 1, i, range.c2 + 1);
 					isEmptyCell = cell.isEmptyText();
 					if(!isEmptyCell)
+					{
+						result = false;
+						break;
+					}
+					if(checkFilter && worksheet.AutoFilter && worksheet.AutoFilter.Ref.contains(range.c2 + 1, i))
 					{
 						result = false;
 						break;

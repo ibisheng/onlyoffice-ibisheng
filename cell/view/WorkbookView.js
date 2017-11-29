@@ -1688,7 +1688,6 @@
     // Нужно очистить поиск
     this._cleanFindResults();
 	this.handlers.trigger("hideSpecialPasteOptions");
-	//this.handlers.trigger("hideAutoCorrectOptions");
     return this;
   };
 
