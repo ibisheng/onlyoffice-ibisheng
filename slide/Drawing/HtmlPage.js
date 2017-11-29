@@ -2123,7 +2123,7 @@ function CEditorPage(api)
 			global_mouseEvent.Button    = 0;
 			oWordControl.m_bIsMouseLock = true;
 
-			if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+			if (oWordControl.m_oDrawingDocument.IsEmptyPresentation && oWordControl.m_oLogicDocument.CanEdit())
 			{
 				oWordControl.m_oLogicDocument.addNextSlide();
 				return;
@@ -4125,7 +4125,13 @@ function CEditorPage(api)
 
 		this.ZoomFreePageNum = lPageNum;
 		drDoc.SlideCurrent   = lPageNum;
-		this.m_oLogicDocument.Set_CurPage(lPageNum);
+		var isRecalculateNote = this.m_oLogicDocument.Set_CurPage(lPageNum);
+		if (bIsAttack && !isRecalculateNote)
+		{
+			var _curPage = this.m_oLogicDocument.CurPage;
+			if (_curPage >= 0)
+				this.m_oNotesApi.OnRecalculateNote(_curPage, this.m_oLogicDocument.Slides[_curPage].NotesWidth, this.m_oLogicDocument.Slides[_curPage].getNotesHeight());
+		}
 
 		// теперь пошлем все шаблоны первой темы
 		this.CheckLayouts();

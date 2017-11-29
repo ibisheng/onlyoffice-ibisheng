@@ -4286,7 +4286,7 @@ CPresentation.prototype =
         {
             this.CurPage = -1;
             this.Document_UpdateInterfaceState();
-            return;
+            return false;
         }
 
         var nNewCurrentPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
@@ -4302,7 +4302,10 @@ CPresentation.prototype =
             this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
             editor.asc_hideComments();
             this.Document_UpdateInterfaceState();
+            return true;
         }
+
+        return false;
     },
 
     Get_CurPage : function()

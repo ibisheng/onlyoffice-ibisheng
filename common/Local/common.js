@@ -380,7 +380,7 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 			}
 			else
 			{
-				// TODO:
+				_api.asc_setViewMode((0 == signatures.length) ? false : true);
 			}
 
 		});
@@ -461,7 +461,13 @@ window["asc_LocalRequestSign"] = function(guid, width, height, isView)
 		}
 	}
 
-	if (!_editor.isDocumentModify)
+	var isModify = false;
+	if (_editor.asc_isDocumentModified)
+		isModify = _editor.asc_isDocumentModified();
+	else
+		isModify = _editor.isDocumentModified();
+
+	if (!isModify)
 	{
 		_editor.sendEvent("asc_onSignatureClick", guid, width, height, window["asc_IsVisibleSign"](guid));
 		return;
