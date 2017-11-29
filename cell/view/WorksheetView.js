@@ -6184,8 +6184,8 @@
 	};
 
     WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
-        var tmpSelection;
-        var ar = fixedRange ? fixedRange : ((tmpSelection = this._getSelection()) ? tmpSelection.getLast() : null);
+        var selection;
+        var ar = fixedRange ? fixedRange : ((selection = this._getSelection()) ? selection.getLast() : null);
         if (!ar || c_oAscSelectionType.RangeCells !== ar.getType()) {
             return;
         }
@@ -6203,7 +6203,7 @@
         ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
         ar.normalize();
         if (!fixedRange) {
-            tmpSelection.update();
+			selection.update();
         }
     };
 
@@ -6310,10 +6310,11 @@
     };
 
     WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
-        var ar = this._getSelection().getLast();
+        var selection = this._getSelection();
+        var ar = selection.getLast();
         var range = this._getCellByXY(x, y);
 		ar.assign(range.c1, range.r1, range.c2, range.r2);
-		this.model.selectionRange.setCell(range.r1, range.c1);
+		selection.setCell(range.r1, range.c1);
 		if (c_oAscSelectionType.RangeCells !== ar.getType()) {
 			this._fixSelectionOfHiddenCells();
         }
@@ -6321,9 +6322,9 @@
     };
 
     WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
-        var tmpSelection = this._getSelection();
-        var ar = tmpSelection.getLast();
-        var activeCell = tmpSelection.activeCell;
+        var selection = this._getSelection();
+        var ar = selection.getLast();
+        var activeCell = selection.activeCell;
         var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
         var c = mc ? (dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : activeCell.col) :
           activeCell.col;
@@ -6369,13 +6370,13 @@
 	};
 
     WorksheetView.prototype._calcSelectionEndPointByOffset = function (dc, dr) {
-        var tmpSelection = this._getSelection();
-        var ar = tmpSelection.getLast();
+        var selection = this._getSelection();
+        var ar = selection.getLast();
         var c1, r1, c2, r2, tmp;
-        tmp = asc.getEndValueRange(dc, tmpSelection.activeCell.col, ar.c1, ar.c2);
+        tmp = asc.getEndValueRange(dc, selection.activeCell.col, ar.c1, ar.c2);
         c1 = tmp.x1;
         c2 = tmp.x2;
-        tmp = asc.getEndValueRange(dr, tmpSelection.activeCell.row, ar.r1, ar.r2);
+        tmp = asc.getEndValueRange(dr, selection.activeCell.row, ar.r1, ar.r2);
         r1 = tmp.x1;
         r2 = tmp.x2;
 
