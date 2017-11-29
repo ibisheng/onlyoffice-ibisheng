@@ -4941,7 +4941,7 @@ function CThumbnailsManager()
 		{
 			case 13:    // enter
 			{
-				if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+				if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 				{
 					var _selected_thumbnails = this.GetSelectedArray();
 					if (_selected_thumbnails.length > 0)
@@ -5158,7 +5158,7 @@ function CThumbnailsManager()
 			{
 				if (global_keyboardEvent.CtrlKey)
 				{
-					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
+					if (this.m_oWordControl.m_oLogicDocument.CanEdit())
 					{
 						var _selected_thumbnails = this.GetSelectedArray();
 						if (_selected_thumbnails.length > 0)
