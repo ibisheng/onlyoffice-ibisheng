@@ -2664,12 +2664,12 @@ CPresentation.prototype =
 
 
         var oController = this.GetCurrentController();
-        if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
+        if ( e.KeyCode == 8  && this.CanEdit() ) // BackSpace
         {
             this.Remove( -1, true );
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 9 && false === editor.isViewMode ) // Tab
+        else if ( e.KeyCode == 9  && this.CanEdit() ) // Tab
         {
             if(oController)
             {
@@ -2709,7 +2709,7 @@ CPresentation.prototype =
             }
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
+        else if ( e.KeyCode == 13) // Enter
         {
             var Hyperlink = this.IsCursorInHyperlink(false);
             if ( null != Hyperlink && false === e.ShiftKey )
@@ -3204,7 +3204,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
-            if ( true === e.ShiftKey && false === editor.isViewMode ) // Ctrl + Shift + P - добавляем номер страницы в текущую позицию
+            if ( true === e.ShiftKey  && this.CanEdit() ) // Ctrl + Shift + P - добавляем номер страницы в текущую позицию
             {
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3214,7 +3214,7 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 82 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
+        else if ( e.KeyCode == 82  && this.CanEdit() && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
             var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
@@ -3223,12 +3223,12 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
+        else if ( e.KeyCode == 83 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + S - save
         {
 			this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
+        else if ( e.KeyCode == 85 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
         {
             var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
@@ -3240,7 +3240,7 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 53 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + 5 - делаем текст зачеркнутым
+        else if ( e.KeyCode == 53 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + 5 - делаем текст зачеркнутым
         {
             var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
@@ -3252,7 +3252,7 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
+        else if ( e.KeyCode == 86 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + V - paste
         {
             if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
             {
@@ -3300,7 +3300,7 @@ CPresentation.prototype =
             // Ничего не делаем
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 187 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
+        else if ( e.KeyCode == 187 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
             var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
@@ -3327,7 +3327,7 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 189 && false === editor.isViewMode ) // Клавиша Num-
+        else if ( e.KeyCode == 189 && this.CanEdit() ) // Клавиша Num-
         {
             if ((true === e.CtrlKey && true === e.ShiftKey) && (AscCommon.CollaborativeEditing.Is_Fast() ||
                 editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
@@ -3356,13 +3356,13 @@ CPresentation.prototype =
                 bRetValue = keydownresult_PreventAll;
             }
         }
-        else if ( e.KeyCode == 219 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + [
+        else if ( e.KeyCode == 219 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + [
         {
             editor.FontSizeOut();
             this.Document_UpdateInterfaceState();
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 221 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + ]
+        else if ( e.KeyCode == 221 && this.CanEdit() && true === e.CtrlKey ) // Ctrl + ]
         {
             editor.FontSizeIn();
             this.Document_UpdateInterfaceState();
