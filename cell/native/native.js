@@ -4142,7 +4142,7 @@ function OfflineEditor () {
 
             var ws = _api.wb.getWorksheet();
 
-            _api.wb.showWorksheet(undefined, false, true);
+            _api.wb.showWorksheet(undefined, true);
             ws._fixSelectionOfMergedCells();
 
             if (ws.topLeftFrozenCell) {
@@ -7669,7 +7669,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                //console.log("OPEN FILE ONLINE");
                
-               t.wb.showWorksheet(undefined, false, true);
+               t.wb.showWorksheet(undefined, true);
                
                     var ws = t.wb.getWorksheet();
                     window["native"]["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
@@ -7705,7 +7705,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                setTimeout(function() {
 
-                          t.wb.showWorksheet(undefined, false, true);
+                          t.wb.showWorksheet(undefined, true);
                           //console.log("JS - showWorksheet()");
 
                           var ws = t.wb.getWorksheet();
