@@ -490,7 +490,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}
-	this.workbook.handlers.trigger("hideAutoCorrectOptions");
+	this.workbook.handlers.trigger("showAutoCorrectOptions", null, true);
 };
 CHistory.prototype.Redo = function()
 {
@@ -735,8 +735,6 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		curPoint.UndoSheetId = sheetid;
 	if(1 == curPoint.Items.length)
 		this._sendCanUndoRedo();
-
-	this.workbook.handlers.trigger("hideAutoCorrectOptions");
 };
 
 CHistory.prototype._sendCanUndoRedo = function()

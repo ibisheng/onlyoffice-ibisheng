@@ -525,8 +525,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_applyAutoCorrectOptions = function(val) {
-      var ws = this.wb.getWorksheet();
-      ws.applyAutoCorrectOptions(val);
+      this.wb.applyAutoCorrectOptions(val);
   };
 
   spreadsheet_api.prototype.asc_insertCellsInTable = function(tableName, optionType) {
@@ -1872,7 +1871,6 @@ var editor;
         if (res) {
           t.wbModel.getWorksheet(index).setHidden(false);
           t.wb.showWorksheet(index);
-          t.wb.handlers.trigger("hideAutoCorrectOptions");
           if (isHidden) {
             // Посылаем callback об изменении списка листов
             t.sheetsChanged();
