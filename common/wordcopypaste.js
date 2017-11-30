@@ -3457,6 +3457,11 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
+
+					var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.keepTextOnly];
+					oThis._setSpecialPasteShowOptionsPresentation(props);
+
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			};
 
@@ -3623,6 +3628,9 @@ PasteProcessor.prototype =
 				presentation.Recalculate();
 				presentation.Check_CursorMoveRight();
 				presentation.Document_UpdateInterfaceState();
+
+				var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.keepTextOnly];
+				oThis._setSpecialPasteShowOptionsPresentation(props);
 
 				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			}
