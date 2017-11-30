@@ -3728,7 +3728,6 @@
 		{
 			oSelection = oSelection.clone();
 			oSelection.assign(start, 0, stop, gc_nMaxRow0);
-			oSelection.type = Asc.c_oAscSelectionType.RangeCol;
 			History.SetSelection(oSelection);
 			History.SetSelectionRedo(oSelection);
 		}
@@ -3919,7 +3918,6 @@
 		{
 			oSelection = oSelection.clone();
 			oSelection.assign(0, start, gc_nMaxCol0, stop);
-			oSelection.type = Asc.c_oAscSelectionType.RangeRow;
 			History.SetSelection(oSelection);
 			History.SetSelectionRedo(oSelection);
 		}
