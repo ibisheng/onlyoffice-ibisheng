@@ -14526,7 +14526,7 @@ function DocReadResult(doc) {
 	this.aTableCorrect = [];
 	this.footnotes = {};
 	this.footnoteRefs = [],
-	this.bookmarkForRead = new CParagraphBookmark();
+	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : null;
 	this.bookmarksStarted = {};
 };
 //---------------------------------------------------------export---------------------------------------------------

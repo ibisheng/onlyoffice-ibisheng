@@ -771,7 +771,6 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function (s) {
-		//var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
 		var range = AscCommonExcel.g_oRangeCache.getAscRange(s);
 		return range ? range.clone() : null;
 	};
