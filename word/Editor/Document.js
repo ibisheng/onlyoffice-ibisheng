@@ -4575,6 +4575,10 @@ CDocument.prototype.MoveCursorToCell = function(bNext)
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
 };
+CDocument.prototype.MoveCursorToSignature = function(sGuid)
+{
+    this.DrawingObjects.moveCursorToSignature(sGuid);
+};
 CDocument.prototype.SetParagraphAlign = function(Align)
 {
 	var SelectedInfo = this.GetSelectedElementsInfo();
@@ -9804,37 +9808,6 @@ CDocument.prototype.GetTopElement = function()
 {
 	return null;
 };
-CDocument.prototype.private_StartSelectionFromCurPos = function()
-{
-	this.private_UpdateCursorXY(true, true);
-	var CurPara = this.GetCurrentParagraph();
-
-	if (null !== CurPara)
-	{
-		var MouseEvent = new AscCommon.CMouseEventHandler();
-
-		MouseEvent.ClickCount = 1;
-		MouseEvent.Type       = AscCommon.g_mouse_event_type_down;
-
-		var X = CurPara.CurPos.RealX;
-		var Y = CurPara.CurPos.RealY;
-
-		var DrawMatrix = CurPara.Get_ParentTextTransform();
-		if (DrawMatrix)
-		{
-			var _X = DrawMatrix.TransformPointX(X, Y);
-			var _Y = DrawMatrix.TransformPointY(X, Y);
-
-			X = _X;
-			Y = _Y;
-		}
-
-		this.CurPage = CurPara.Get_CurrentPage_Absolute();
-		this.Selection_SetStart(X, Y, MouseEvent);
-		MouseEvent.Type = AscCommon.g_mouse_event_type_move;
-		this.Selection_SetEnd(X, Y, MouseEvent);
-	}
-};
 CDocument.prototype.private_StopSelection = function()
 {
 	this.Selection.Start = false;
@@ -10041,6 +10014,24 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 					{
 						this.CurPage = NewPage;
 						StartY -= 0.1;
+
+						if (StartY < 0)
+						{
+							// Защита от полностью пустой страницы
+							if (0 === this.CurPage)
+							{
+								Result = false;
+								bBreak = true;
+								break;
+							}
+							else
+							{
+								this.CurPage--;
+								StartY = this.Pages[this.CurPage].Height;
+
+								NewPage = this.CurPage;
+							}
+						}
 					}
 					else
 					{
@@ -12629,7 +12620,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
-		this.private_StartSelectionFromCurPos();
+		this.StartSelectionFromCurPos();
 	}
 
 	this.private_UpdateCursorXY(false, true);
@@ -12651,7 +12642,7 @@ CDocument.prototype.controller_MoveCursorDown = function(AddToSelect)
 	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
-		this.private_StartSelectionFromCurPos();
+		this.StartSelectionFromCurPos();
 	}
 
 	this.private_UpdateCursorXY(false, true);
@@ -15688,6 +15679,16 @@ CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();
 };
+CDocument.prototype.CallSignatureDblClickEvent = function(sGuid)
+{
+    var ret = [], allSpr = [];
+    allSpr = allSpr.concat(allSpr.concat(this.DrawingObjects.getAllSignatures2(ret, this.DrawingObjects.getDrawingArray())));
+    for(var i = 0; i < allSpr.length; ++i){
+        if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+            this.Api.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+        }
+    }
+};
 CDocument.prototype.SetCheckContentControlsLock = function(isLocked)
 {
 	this.CheckContentControlsLock = isLocked;
@@ -15704,9 +15705,21 @@ CDocument.prototype.IsViewMode = function()
 {
 	return this.Api.isViewMode;
 };
+CDocument.prototype.IsEditSignaturesMode = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+};
+CDocument.prototype.IsViewModeInEditor = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+};
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsFillingFormMode())
+	if (this.IsViewMode()
+		|| this.IsEditCommentsMode()
+		|| this.IsFillingFormMode()
+		|| this.IsEditSignaturesMode()
+		|| this.IsViewModeInEditor())
 		return false;
 
 	return true;
@@ -16072,6 +16085,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
 		this.Recalculate();
 	}
+};
+CDocument.prototype.GetPagesCount = function()
+{
+	return this.Pages.length;
 };
 
 function CDocumentSelectionState()

@@ -171,6 +171,8 @@
 
 		this.signatures = [];
 
+		this.currentPassword = "";
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -1442,6 +1444,10 @@
 		return [];
 	};
 
+	baseEditorsApi.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
+
+	};
+
 	// signatures
 	baseEditorsApi.prototype.asc_AddSignatureLine2 = function(_obj)
 	{
@@ -1480,14 +1486,7 @@
 		var _url = _canvas.toDataURL("image/png");
 		_canvas = null;
 
-		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
-		function guid() {
-			var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
-			val = val.toUpperCase();
-			return val;
-		}
-
-		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
+		var _args = [AscCommon.CreateGUID(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
 
 		this.ImageLoader.LoadImagesWithCallback([_url], function(_args) {
 			this.asc_addSignatureLine(_args[0], _args[1], _args[2], _args[3], _args[4], _args[5], _args[6]);
@@ -1507,7 +1506,7 @@
 
 			for (var j = this.signatures.length - 1; j >= 0; j--)
 			{
-				if (this.signatures[j].guid == _sig.guid)
+				if (this.signatures[j].guid == _sig.id)
 				{
 					_found = true;
 					break;
@@ -1517,10 +1516,12 @@
 			if (!_found)
 			{
 				var _add_sig = new AscCommon.asc_CSignatureLine();
-				_add_sig.guid = _sig.guid;
-				_add_sig.signer1 = _sig.signer1;
+				_add_sig.guid = _sig.id;
+				_add_sig.signer1 = _sig.signer;
 				_add_sig.signer2 = _sig.signer2;
 				_add_sig.email = _sig.email;
+
+				_sigs_ret.push(_add_sig);
 			}
 		}
 
@@ -1531,6 +1532,13 @@
 	{
 		if (window["AscDesktopEditor"])
 			window["AscDesktopEditor"]["Sign"](id, guid, url1, url2);
+	};
+	baseEditorsApi.prototype.asc_RequestSign = function(guid)
+	{
+		var signGuid = (guid == "unvisibleAdd") ? AscCommon.CreateGUID() : guid;
+
+		if (window["asc_LocalRequestSign"])
+			window["asc_LocalRequestSign"](signGuid);
 	};
 
 	baseEditorsApi.prototype.asc_ViewCertificate = function(id)
@@ -1556,11 +1564,66 @@
 		return this.signatures;
 	};
 
+	baseEditorsApi.prototype.asc_RemoveSignature = function(guid)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["RemoveSignature"](guid);
+	};
+
+	baseEditorsApi.prototype.asc_RemoveAllSignatures = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["RemoveAllSignatures"]();
+	};
+
 	baseEditorsApi.prototype.asc_isSignaturesSupport = function()
 	{
 		if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsSignaturesSupport"])
 			return window["AscDesktopEditor"]["IsSignaturesSupport"]();
 		return false;
+	};
+
+	baseEditorsApi.prototype.asc_gotoSignature = function(guid)
+	{
+		if (window["AscDesktopEditor"] && window["asc_IsVisibleSign"] && window["asc_IsVisibleSign"](guid))
+		{
+			if (this.asc_MoveCursorToSignature)
+				this.asc_MoveCursorToSignature(guid);
+		}
+	};
+
+	baseEditorsApi.prototype.asc_getSignatureSetup = function(guid)
+	{
+		var _sigs = this.asc_getAllSignatures();
+
+		for (var i = _sigs.length - 1; i >= 0; i--)
+		{
+			var _sig = _sigs[i];
+			if (_sig.id == guid)
+			{
+				var _add_sig = new AscCommon.asc_CSignatureLine();
+				_add_sig.guid = _sig.id;
+				_add_sig.signer1 = _sig.signer;
+				_add_sig.signer2 = _sig.signer2;
+				_add_sig.email = _sig.email;
+
+				_add_sig.isrequested = true;
+				for (var j = 0; j < this.signatures.length; j++)
+				{
+					var signDoc = this.signatures[j];
+					if (signDoc.guid == _add_sig.guid)
+					{
+						_add_sig.valid = signDoc.valid;
+						_add_sig.isrequested = false;
+						break;
+					}
+				}
+
+				return _add_sig;
+			}
+		}
+
+		return null;
 	};
 
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
@@ -1657,6 +1720,17 @@
 	baseEditorsApi.prototype.saveCheck = function()
 	{
 		return false;
+	};
+
+	baseEditorsApi.prototype.asc_setCurrentPassword = function(password)
+	{
+		this.currentPassword = password;
+		this.asc_Save(false);
+	};
+	baseEditorsApi.prototype.asc_resetPassword = function()
+	{
+		this.currentPassword = "";
+		this.asc_Save(false);
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

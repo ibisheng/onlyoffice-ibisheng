@@ -1183,6 +1183,9 @@
         }
         return false;
     };
+    CGraphicObjectBase.prototype.getSignatureLineGuid = function(){
+        return null;
+    };
 
     CGraphicObjectBase.prototype.getCopyWithSourceFormatting = function(oIdMap){
         return this.copy(oIdMap);

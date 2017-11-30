@@ -1912,14 +1912,14 @@ function _HEXTORGB_( colorHEX ) {
 		this._draw();
 	};
 	ScrollObject.prototype.Reinit = function ( settings, pos ) {
+	    var size;
 		this._setDimension( this.canvas.parentNode.clientHeight, this.canvas.parentNode.clientWidth );
-		this.maxScrollY = this.canvas.parentNode.firstElementChild.clientHeight - (settings.screenH || this.canvas.parentNode.offsetHeight) > 0 ?
-			this.canvas.parentNode.firstElementChild.clientHeight - (settings.screenH || this.canvas.parentNode.offsetHeight) :
-			0;
 
-		this.maxScrollX = this.canvas.parentNode.firstElementChild.clientWidth - (settings.screenH || this.canvas.parentNode.offsetWidth) > 0 ?
-			this.canvas.parentNode.firstElementChild.clientWidth - (settings.screenH || this.canvas.parentNode.offsetWidth) :
-			0;
+		size = this.canvas.parentNode.firstElementChild.clientHeight - (settings.screenH || this.canvas.parentNode.offsetHeight);
+		this.maxScrollY = 0 < size ? size : 0;
+
+		size = this.canvas.parentNode.firstElementChild.clientWidth - (settings.screenH || this.canvas.parentNode.offsetWidth);
+		this.maxScrollX = 0 < size ? size : 0;
 
 		this.isVerticalScroll = this.canvas.parentNode.firstElementChild.clientHeight / Math.max( this.canvasH, 1 ) > 1 || this.isVerticalScroll;
 		this.isHorizontalScroll = this.canvas.parentNode.firstElementChild.clientWidth / Math.max( this.canvasW, 1 ) > 1 || this.isHorizontalScroll;

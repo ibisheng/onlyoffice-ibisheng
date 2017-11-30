@@ -1093,9 +1093,9 @@ function (window, undefined) {
 	};
 	VHLOOKUPCache.prototype._calculate = function (cacheArray, valueForSearching, lookup) {
 		var res = -1, i = 0, j, length = cacheArray.length, k, elem, val;
-		if ('' === valueForSearching && 0 !== length) {
+		/*if ('' === valueForSearching && 0 !== length) {
 			return cacheArray[0].i;
-		}
+		}*/
 
 		if (lookup) {
 			j = length - 1;

@@ -5367,8 +5367,13 @@ CShape.prototype.getColumnNumber = function(){
         }
         return oCopy;
     };
-
-
+    CShape.prototype.getSignatureLineGuid = function()
+    {
+        if(this.signatureLine){
+            return this.signatureLine.id;
+        }
+        return null;
+    };
 function CreateBinaryReader(szSrc, offset, srcLen)
 {
     var nWritten = 0;

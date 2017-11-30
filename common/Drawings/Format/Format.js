@@ -9806,6 +9806,10 @@ function CreateAscShapePropFromProp(shapeProp)
     obj.description = shapeProp.description;
     obj.columnNumber = shapeProp.columnNumber;
     obj.columnSpace = shapeProp.columnSpace;
+    if(shapeProp.signatureId)
+    {
+        obj.signatureId = shapeProp.signatureId;
+    }
     return obj;
 }
 

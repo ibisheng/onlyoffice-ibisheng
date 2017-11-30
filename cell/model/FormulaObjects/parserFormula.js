@@ -2639,6 +2639,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	/** @constructor */
 	function cUnknownFunction(name) {
 		this.name = name;
+		this.isXLFN = null;
 	}
 	cUnknownFunction.prototype = Object.create(cBaseFunction.prototype);
 	cUnknownFunction.prototype.constructor = cUnknownFunction;
@@ -6346,6 +6347,15 @@ function rtl_math_erfc( x ) {
     return fErfc;
 }
 
+	// ToDo use Array.prototype.max, but some like to use for..in without hasOwnProperty
+	function getArrayMax (array) {
+		return Math.max.apply(null, array);
+	}
+	// ToDo use Array.prototype.min, but some like to use for..in without hasOwnProperty
+	function getArrayMin (array) {
+		return Math.min.apply(null, array);
+	}
+
 	function convertAreaToArray(area){
 		var retArr = new cArray(), _arg0;
 		area = area.getMatrix();
@@ -6470,4 +6480,6 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
 	window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
 	window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
+	window['AscCommonExcel'].getArrayMax = getArrayMax;
+	window['AscCommonExcel'].getArrayMin = getArrayMin;
 })(window);

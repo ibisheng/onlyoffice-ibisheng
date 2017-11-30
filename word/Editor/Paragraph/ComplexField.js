@@ -148,6 +148,10 @@ function ParaInstrText(value)
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
 ParaInstrText.prototype.Type = para_InstrText;
+ParaInstrText.prototype.Copy = function()
+{
+	return new ParaInstrText(String.fromCharCode(this.Value));
+};
 ParaInstrText.prototype.Measure = function(Context, TextPr)
 {
 };
@@ -260,6 +264,7 @@ CComplexField.prototype.Update = function()
 
 	switch (this.Instruction.GetType())
 	{
+		case fieldtype_PAGE:
 		case fieldtype_PAGENUM:
 			this.private_UpdatePAGE();
 			break;
@@ -269,6 +274,11 @@ CComplexField.prototype.Update = function()
 		case fieldtype_PAGEREF:
 			this.private_UpdatePAGEREF();
 			break;
+		case fieldtype_NUMPAGES:
+		case fieldtype_PAGECOUNT:
+			this.private_UpdateNUMPAGES();
+			break;
+
 	}
 
 	this.LogicDocument.Recalculate();
@@ -282,8 +292,6 @@ CComplexField.prototype.private_UpdatePAGE = function()
 	var nPage     = oParagraph.GetPageByLine(nLine);
 	var nPageAbs  = oParagraph.Get_AbsolutePage(nPage) + 1;
 	// TODO: Тут надо рассчитывать значение исходя из настроек секции
-
-	this.LogicDocument.Create_NewHistoryPoint();
 
 	var sValue = "" + nPageAbs;
 	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
@@ -478,6 +486,14 @@ CComplexField.prototype.private_UpdatePAGEREF = function()
 		}
 	}
 
+	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
+	{
+		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
+	}
+};
+CComplexField.prototype.private_UpdateNUMPAGES = function()
+{
+	var sValue = "" + this.LogicDocument.GetPagesCount();
 	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
 	{
 		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));

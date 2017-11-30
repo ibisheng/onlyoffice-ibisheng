@@ -3637,19 +3637,20 @@ function OfflineEditor () {
             selection.push(0);
 
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
-            var range, selectionLineType;
+            var range, selectionLineType, type;
             for (var i = 0, l = ranges.length; i < l; ++i) {
                 range = ranges[i];
-                if (Asc.c_oAscSelectionType.RangeMax === range.type) {
+				type = range.getType();
+                if (Asc.c_oAscSelectionType.RangeMax === type) {
                     range.c2 = this.cols.length - 1;
                     range.r2 = this.rows.length - 1;
-                } else if (Asc.c_oAscSelectionType.RangeCol === range.type) {
+                } else if (Asc.c_oAscSelectionType.RangeCol === type) {
                     range.r2 = this.rows.length - 1;
-                } else if (Asc.c_oAscSelectionType.RangeRow === range.type) {
+                } else if (Asc.c_oAscSelectionType.RangeRow === type) {
                     range.c2 = this.cols.length - 1;
                 }
 
-                selection.push(range.type);
+                selection.push(type);
 
                 selection.push(range.c1);
                 selection.push(range.c2);
@@ -3806,13 +3807,12 @@ function OfflineEditor () {
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
-                    ranges.push(undefined !== rangetype ? rangetype : arrRanges[i].type);
+					type = arrRanges[i].getType();
+                    ranges.push(undefined !== rangetype ? rangetype : type);
                     ranges.push(arrRanges[i].c1);
                     ranges.push(arrRanges[i].c2);
                     ranges.push(arrRanges[i].r1);
                     ranges.push(arrRanges[i].r2);
-
-                    type = arrRanges[i].type;
 
                     addl = Math.max(arrRanges[i].c1 - colsCount,0);
                     addt = Math.max(arrRanges[i].r1 - rowsCount,0);
@@ -3937,13 +3937,12 @@ function OfflineEditor () {
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
-                ranges.push(undefined !== rangetype ? rangetype : arrRanges[i].type);
+				type = arrRanges[i].getType();
+                ranges.push(undefined !== rangetype ? rangetype : type);
                 ranges.push(arrRanges[i].c1);
                 ranges.push(arrRanges[i].c2);
                 ranges.push(arrRanges[i].r1);
                 ranges.push(arrRanges[i].r2);
-
-                type = arrRanges[i].type;
 
                 addl = Math.max(arrRanges[i].c1 - colsCount,0);
                 addt = Math.max(arrRanges[i].r1 - rowsCount,0);
@@ -5565,7 +5564,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
                 return {'action':'closeCellEditor'};
             }
 
-            ws.changeSelectionStartPoint(x, y, true, true);
+            ws.changeSelectionStartPoint(x, y, true);
 
             if (isFormulaEditMode) {
                 if (ret) {
@@ -5631,7 +5630,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                     return {'action':'closeCellEditor'};
                 }
 
-                ws.changeSelectionEndPoint(x, y, true, true);
+                ws.changeSelectionEndPoint(x, y, true);
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
@@ -5639,7 +5638,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                 else if (1 === _s.cellPin)
                     ws.__changeSelectionPoint(x, y, true, true, false);
                 else {
-                    ws.changeSelectionEndPoint(x, y, true, true);
+                    ws.changeSelectionEndPoint(x, y, true);
                 }
             }
         }
@@ -5791,17 +5790,17 @@ window["native"]["offline_keyboard_down"] = function(inputKeys) {
             }
         }
         else if (37 === codeKey)      // LEFT
-            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+            wb._onChangeSelection(true, -1, 0, false);
         else if (39 === codeKey)     // RIGHT
-            wb._onChangeSelection(true, 1, 0, false, false, undefined);
+            wb._onChangeSelection(true, 1, 0, false);
         if (38 === codeKey)          // UP
-            wb._onChangeSelection(true, 0, -1, false, false, undefined);
+            wb._onChangeSelection(true, 0, -1, false);
         else if (40 === codeKey)     // DOWN
-            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+            wb._onChangeSelection(true, 0, 1, false);
         else if (9 === codeKey)     // TAB
-            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+            wb._onChangeSelection(true, -1, 0, false);
         else if (13 === codeKey)     // ENTER
-            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+            wb._onChangeSelection(true, 0, 1, false);
     }
 
     ws.isFormulaEditMode = isFormulaEditMode;

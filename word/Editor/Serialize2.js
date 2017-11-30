@@ -366,7 +366,13 @@ var c_oSerParType = {
 	Background: 14,
 	Sdt: 15,
 	MoveFrom: 16,
-	MoveTo: 17
+	MoveTo: 17,
+	MoveFromRangeStart: 18,
+	MoveFromRangeEnd: 19,
+	MoveToRangeStart: 20,
+	MoveToRangeEnd: 21,
+	BookmarkStart: 22,
+	BookmarkEnd: 23
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -380,7 +386,9 @@ var c_oSerDocTableType = {
     Cell_Pr: 7,
     Cell_Content: 8,
     tblGridChange: 9,
-	Sdt: 10
+	Sdt: 10,
+	BookmarkStart: 11,
+	BookmarkEnd: 12
 };
 var c_oSerRunType = {
     run:0,
@@ -744,7 +752,9 @@ var c_oSer_OMathContentType = {
     Ins: 62,
 	Del: 63,
 	columnbreak: 64,
-	ARPr: 65
+	ARPr: 65,
+	BookmarkStart: 66,
+	BookmarkEnd: 67
 };
 var c_oSer_HyperlinkType = {
     Content: 0,
@@ -893,6 +903,13 @@ var c_oSerFFData = {
 	TIFormat: 22,
 	TIMaxLength: 23,
 	TIType: 24,
+};
+var c_oSerBookmark = {
+	Id: 0,
+	Name: 1,
+	DisplacedByCustomXml: 2,
+	ColFirst: 3,
+	ColLast: 4
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -4486,6 +4503,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 						oThis.WriteSdt(item, 1);
 					});
 					break;
+				case para_Bookmark:
+					var typeBookmark = item.IsStart() ? c_oSerParType.BookmarkStart : c_oSerParType.BookmarkEnd;
+					this.bs.WriteItem(typeBookmark, function () {
+						oThis.bs.WriteBookmark(item);
+					});
+					break;
             }
         }
         if ((bLastRun && bUseSelection && !par.Selection_CheckParaEnd()) || (selectedAll != undefined && selectedAll === false) )
@@ -6585,9 +6608,9 @@ function BinaryFileReader(doc, openParams)
 			this.Document.Comments.Add(oNewComment);
 			oCommentsNewId[oOldComment.Id] = oNewComment;
 		}
-		for(var i in this.oReadResult.oCommentsPlaces)
+		for(var commentIndex in this.oReadResult.oCommentsPlaces)
 		{
-			var item = this.oReadResult.oCommentsPlaces[i];
+			var item = this.oReadResult.oCommentsPlaces[commentIndex];
 			var bToDelete = true;
 			if(null != item.Start && null != item.End){
 				var oCommentObj = oCommentsNewId[item.Start.Id];
@@ -6632,6 +6655,18 @@ function BinaryFileReader(doc, openParams)
 		{
 			var oNewComment = oCommentsNewId[i];
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
+		}
+		//remove bookmarks without end
+		for(var bookmarkIndex in this.oReadResult.bookmarksStarted)
+		{
+			var elem = this.oReadResult.bookmarksStarted[bookmarkIndex];
+			for (var i = 0; i < OpenParStruct.prototype._GetContentLength(elem.parent); ++i)
+			{
+				if (elem.bookmark === OpenParStruct.prototype._GetFromContent(elem.parent, i)){
+					OpenParStruct.prototype._removeFromContent(elem.parent, i, 1);
+					break;
+				}
+			}
 		}
 		this.Document.Content = this.oReadResult.DocumentContent;
 		if(this.Document.Content.length == 0)
@@ -6855,10 +6890,10 @@ function BinaryFileReader(doc, openParams)
 			{
 				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document);
 				this.Document.Content.push(oNewParagraph);
-			};
+			}
 			
 			this.Document.On_EndLoad();
-		};
+		}
 		
 		//add comments
 		var setting = this.oReadResult.setting;        
@@ -6883,7 +6918,7 @@ function BinaryFileReader(doc, openParams)
 					oCommentObj.Add_Reply(fInitCommentData(comment.Replies[i]));
 			}
 			return oCommentObj;
-		}
+		};
 		
 		var oCommentsNewId = {};
 		//меняем CDocumentContent на Document для возможности вставки комментариев в колонтитул и таблицу
@@ -6905,9 +6940,9 @@ function BinaryFileReader(doc, openParams)
 				oCommentsNewId[oOldComment.Id] = oNewComment;
 			}
 		}
-		for(var i in this.oReadResult.oCommentsPlaces)
+		for(var commentIndex in this.oReadResult.oCommentsPlaces)
 		{
-			var item = this.oReadResult.oCommentsPlaces[i];
+			var item = this.oReadResult.oCommentsPlaces[commentIndex];
 			var bToDelete = true;
 			if(null != item.Start && null != item.End){
 				var oCommentObj = oCommentsNewId[item.Start.Id];
@@ -6952,6 +6987,18 @@ function BinaryFileReader(doc, openParams)
 			{
 				var oNewComment = oCommentsNewId[i];
 				api.sync_AddComment( oNewComment.Id, oNewComment.Data );
+			}
+		}
+		//remove bookmarks without end
+		for(var bookmarkIndex in this.oReadResult.bookmarksStarted)
+		{
+			var elem = this.oReadResult.bookmarksStarted[bookmarkIndex];
+			for (var i = 0; i < OpenParStruct.prototype._GetContentLength(elem.parent); ++i)
+			{
+				if (elem.bookmark === OpenParStruct.prototype._GetFromContent(elem.parent, i)){
+					OpenParStruct.prototype._removeFromContent(elem.parent, i, 1);
+					break;
+				}
 			}
 		}
 		for (var i = 0, length = this.oReadResult.aTableCorrect.length; i < length; ++i) {
@@ -9490,6 +9537,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			});
 			oSdtStruct.commitAll();
 			oParStruct.addToContent(oSdt);
+		} else if ( c_oSerParType.BookmarkStart === type) {
+			var bookmark = this.oReadResult.bookmarkForRead;
+			bookmark.BookmarkId = undefined;
+			bookmark.BookmarkName = undefined;
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.bcr.ReadBookmark(t,l, bookmark);
+			});
+			var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
+			this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
+			oParStruct.addToContent(newBookmark);
+		} else if ( c_oSerParType.BookmarkEnd === type) {
+			var bookmark = this.oReadResult.bookmarkForRead;
+			bookmark.BookmarkId = undefined;
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.bcr.ReadBookmark(t,l, bookmark);
+			});
+			if (this.oReadResult.bookmarksStarted[bookmark.BookmarkId]) {
+				delete this.oReadResult.bookmarksStarted[bookmark.BookmarkId];
+				oParStruct.addToContent(new CParagraphBookmark(false, bookmark.BookmarkId));
+			}
 		} else
 		    res = c_oSerConstants.ReadUnknown;
         return res;
@@ -14458,7 +14525,9 @@ function DocReadResult(doc) {
 	this.drawingToMath = [];
 	this.aTableCorrect = [];
 	this.footnotes = {};
-	this.footnoteRefs = []
+	this.footnoteRefs = [],
+	this.bookmarkForRead = new CParagraphBookmark();
+	this.bookmarksStarted = {};
 };
 //---------------------------------------------------------export---------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

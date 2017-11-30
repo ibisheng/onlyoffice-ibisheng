@@ -358,6 +358,18 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 		}
 	}
 };
+BinaryCommonWriter.prototype.WriteBookmark = function(bookmark) {
+	var oThis = this;
+	if (null !== bookmark.BookmarkId) {
+		this.WriteItem(c_oSerBookmark.Id, function() {
+			oThis.memory.WriteLong(bookmark.BookmarkId);
+		});
+	}
+	if (bookmark.IsStart() && null !== bookmark.BookmarkName) {
+		this.memory.WriteByte(c_oSerBookmark.Name);
+		this.memory.WriteString2(bookmark.BookmarkName);
+	}
+};
 function Binary_CommonReader(stream)
 {
     this.stream = stream;
@@ -543,6 +555,17 @@ Binary_CommonReader.prototype.ReadColorTheme = function(type, length, color)
     else
         res = c_oSerConstants.ReadUnknown;
     return res;
+};
+Binary_CommonReader.prototype.ReadBookmark = function(type, length, bookmark) {
+	var res = c_oSerConstants.ReadOk;
+	if (c_oSerBookmark.Id === type) {
+		bookmark.BookmarkId = this.stream.GetULongLE();
+	} else if (c_oSerBookmark.Name === type) {
+		bookmark.BookmarkName = this.stream.GetString2LE(length);
+	} else {
+		res = c_oSerConstants.ReadUnknown;
+	}
+	return res;
 };
 /** @constructor */
 function FT_Stream2(data, size) {
