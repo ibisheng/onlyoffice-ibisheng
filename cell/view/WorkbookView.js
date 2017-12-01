@@ -741,7 +741,7 @@
       var wsModel = self.model.getWorksheetById(wsId), index;
       if (wsModel) {
         index = wsModel.getIndex();
-        self.showWorksheet(index, false, true);
+        self.showWorksheet(index, true);
         self.handlers.trigger("asc_onActiveSheetChanged", index);
       }
     });
@@ -1581,23 +1581,38 @@
     return ws;
   };
 
+	WorkbookView.prototype.drawWorksheet = function () {
+		if (-1 === this.wsActive) {
+			return this.showWorksheet();
+		}
+		var ws = this.getWorksheet();
+		ws.draw();
+		ws.objectRender.controller.updateSelectionState();
+		ws.objectRender.controller.updateOverlay();
+		this._onScrollReinitialize();
+	};
+
   /**
    *
    * @param index
-   * @param [isResized]
    * @param [bLockDraw]
    * @returns {WorkbookView}
    */
-  WorkbookView.prototype.showWorksheet = function (index, isResized, bLockDraw) {
+  WorkbookView.prototype.showWorksheet = function (index, bLockDraw) {
     // ToDo disable method for assembly
+	var ws, wb = this.model;
+	if (asc_typeof(index) !== "number" || 0 > index) {
+      index = wb.getActive();
+	}
     if (index === this.wsActive) {
+      this.drawWorksheet();
       return this;
     }
 
-    var isSendInfo = (-1 === this.wsActive) || !isResized, tmpWorksheet, selectionRange = null;
+    var tmpWorksheet, selectionRange = null;
     // Только если есть активный
     if (-1 !== this.wsActive) {
-      var ws = this.getWorksheet();
+      ws = this.getWorksheet();
       // Останавливаем ввод данных в редакторе ввода. Если в режиме ввода формул, то продолжаем работать с cellEditor'ом, чтобы можно было
       // выбирать ячейки для формулы
       if (ws.getCellEditMode()) {
@@ -1610,9 +1625,7 @@
             ws.setFormulaEditMode(false);
           }
         } else {
-          if (!isResized) {
-            this._onStopCellEditing();
-          }
+          this._onStopCellEditing();
         }
       }
       // Делаем очистку селекта
@@ -1632,13 +1645,8 @@
       this.getWorksheet().formatPainter(c_oAscFormatPainterState.kOff);
     }
 
-    var wb = this.model;
-    if (asc_typeof(index) === "number" && index >= 0) {
-      if (index !== wb.getActive()) {
-        wb.setActive(index);
-      }
-    } else {
-      index = wb.getActive();
+    if (index !== wb.getActive()) {
+      wb.setActive(index);
     }
     this.wsActive = index;
     this.wsMustDraw = bLockDraw;
@@ -1684,7 +1692,7 @@
       ws.objectRender.controller.updateOverlay();
     }
 
-    if (isSendInfo && !window["NATIVE_EDITOR_ENJINE"]) {
+    if (!window["NATIVE_EDITOR_ENJINE"]) {
       this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
@@ -1782,7 +1790,7 @@
     if (undefined === newActiveWs || oldActiveWs !== newActiveWs) {
       // Если сменили, то покажем
       this.wsActive = -1;
-      this.showWorksheet(undefined, false, true);
+      this.showWorksheet(wsActive, true);
     } else {
       this.wsActive = wsActive;
     }
@@ -1835,11 +1843,11 @@
         // Делаем resize (для не активных сменим как только сделаем его активным)
         item.resize(/*isDraw*/i == activeIndex);
       }
-      this.showWorksheet(undefined, true);
+      this.drawWorksheet();
     } else {
       // ToDo не должно происходить ничего, но нам приходит resize сверху, поэтому проверим отрисовывали ли мы
       if (-1 === this.wsActive || this.wsMustDraw) {
-        this.showWorksheet(undefined, true);
+        this.drawWorksheet();
       }
     }
     this.wsMustDraw = false;
