@@ -4999,10 +4999,14 @@
 						result = false;
 						break;
 					}
-					if(checkFilter && worksheet.AutoFilter && worksheet.AutoFilter.Ref.contains(i, range.r2 + 1))
+					if(checkFilter)
 					{
-						result = false;
-						break;
+						var autoFilter = worksheet.AutoFilter;
+						if((autoFilter && autoFilter.Ref.containsRange(cell.bbox)) || this._isTablePartsContainsRange(cell.bbox))
+						{
+							result = false;
+							break;
+						}
 					}
 				}
 				
@@ -5029,10 +5033,14 @@
 						result = false;
 						break;
 					}
-					if(checkFilter && worksheet.AutoFilter && worksheet.AutoFilter.Ref.contains(range.c2 + 1, i))
+					if(checkFilter)
 					{
-						result = false;
-						break;
+						var autoFilter = worksheet.AutoFilter;
+						if((autoFilter && autoFilter.Ref.containsRange(cell.bbox)) || this._isTablePartsContainsRange(cell.bbox))
+						{
+							result = false;
+							break;
+						}
 					}
 				}
 
