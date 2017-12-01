@@ -904,13 +904,6 @@ var c_oSerFFData = {
 	TIMaxLength: 23,
 	TIType: 24,
 };
-var c_oSerBookmark = {
-	Id: 0,
-	Name: 1,
-	DisplacedByCustomXml: 2,
-	ColFirst: 3,
-	ColLast: 4
-};
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
 	tblstyleoverridetypeBand1Vert:  1,
