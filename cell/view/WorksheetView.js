@@ -10388,12 +10388,12 @@
 						} else if (tempRange.containsRange(new asc_Range(ref.c1, ref.r1, ref.c2, ref.r1))) {
 							//нельзя удалять первую строку а/ф
 							return false;
-						} else if (ref.r2 === ref.r1 + 1) {
+						} /*else if (ref.r2 === ref.r1 + 1) {
 							//нельзя удалять последнюю строку тела а/ф
 							if (tempRange.containsRange(new asc_Range(ref.c1, ref.r1 + 1, ref.c2, ref.r1 + 1))) {
 								return false;
 							}
-						}
+						}*/
 					}
 					//нельзя целиком удалять ф/т
 					var tableParts = t.model.TableParts;
