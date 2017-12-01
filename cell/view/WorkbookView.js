@@ -720,7 +720,7 @@
 			  }
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
-		  }, "showAutoCorrectOptions": function (bIsShow, val) {
+		  }, "toggleAutoCorrectOptions": function (bIsShow, val) {
 		      self.toggleAutoCorrectOptions(bIsShow, val);
 		  }
 	  });
@@ -845,7 +845,7 @@
 		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
 	  }
     });
-	this.model.handlers.add("showAutoCorrectOptions", function(bIsShow, val) {
+	this.model.handlers.add("toggleAutoCorrectOptions", function(bIsShow, val) {
 		self.toggleAutoCorrectOptions(bIsShow, val);
 	});
     this.cellCommentator = new AscCommonExcel.CCellCommentator({

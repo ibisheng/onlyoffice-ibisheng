@@ -671,7 +671,7 @@
             this._prepareCellTextMetricsCache();
             this.cellCommentator.updateCommentPosition();
             this.updateSpecialPasteOptionsPosition();
-            this.handlers.trigger("showAutoCorrectOptions", null, true);
+            this.handlers.trigger("toggleAutoCorrectOptions", null, true);
             this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
             this.updateZoom = false;
@@ -5425,7 +5425,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
-        this.handlers.trigger("showAutoCorrectOptions", true);
+        this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
 
@@ -5586,7 +5586,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
-        this.handlers.trigger("showAutoCorrectOptions", true);
+        this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
 
@@ -11513,7 +11513,7 @@
 		if(oAutoExpansionTable){
 			this.af_changeTableRange(oAutoExpansionTable.name, oAutoExpansionTable.range);
 			var options = {props: [Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion], cell: oCellEdit, wsId: this.model.getId()};
-			this.handlers.trigger("showAutoCorrectOptions", true, options);
+			this.handlers.trigger("toggleAutoCorrectOptions", true, options);
 		}
 
 		// если вернуть false, то редактор не закроется
