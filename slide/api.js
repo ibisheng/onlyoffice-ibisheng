@@ -1800,7 +1800,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)
 	{
-		return AscCommon.g_clipboardBase.Special_Paste(props);
+		return AscCommon.g_specialPasteHelper.Special_Paste(props);
 	};
 
 	asc_docs_api.prototype.asc_SpecialPasteData = function(props)
@@ -1815,8 +1815,8 @@ background-repeat: no-repeat;\
 		//TODO пересмотреть проверку лока и добавление новой точки(AscDFH.historydescription_Document_PasteHotKey)
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
-			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
-			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+			window['AscCommon'].g_specialPasteHelper.Special_Paste_Start();
 
 			//undo previous action
 			this.WordControl.m_oLogicDocument.Document_Undo();

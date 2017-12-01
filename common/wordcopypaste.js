@@ -1442,7 +1442,7 @@ CopyProcessor.prototype =
 		var oDocument = this.oDocument;
 		var bFromPresentation;
 
-		window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
@@ -1875,23 +1875,23 @@ function CopyPasteCorrectString(str)
 function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-	window['AscCommon'].g_clipboardBase.endRecalcDocument = false;
+	window['AscCommon'].g_specialPasteHelper.endRecalcDocument = false;
 
 	if(undefined === specialPasteProps)
 	{
-		window['AscCommon'].g_clipboardBase.specialPasteData._format = _format;
-		window['AscCommon'].g_clipboardBase.specialPasteData.data1 = data1;
-		window['AscCommon'].g_clipboardBase.specialPasteData.data2 = data2;
-		window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
+		window['AscCommon'].g_specialPasteHelper.specialPasteData._format = _format;
+		window['AscCommon'].g_specialPasteHelper.specialPasteData.data1 = data1;
+		window['AscCommon'].g_specialPasteHelper.specialPasteData.data2 = data2;
+		window['AscCommon'].g_specialPasteHelper.specialPasteData.text_data = text_data;
 	}
 	else
 	{
-		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
+		window['AscCommon'].g_specialPasteHelper.specialPasteProps = specialPasteProps;
 
-		_format = window['AscCommon'].g_clipboardBase.specialPasteData._format;
-		data1 = window['AscCommon'].g_clipboardBase.specialPasteData.data1;
-		data2 = window['AscCommon'].g_clipboardBase.specialPasteData.data2;
-		text_data = window['AscCommon'].g_clipboardBase.specialPasteData.text_data;
+		_format = window['AscCommon'].g_specialPasteHelper.specialPasteData._format;
+		data1 = window['AscCommon'].g_specialPasteHelper.specialPasteData.data1;
+		data2 = window['AscCommon'].g_specialPasteHelper.specialPasteData.data2;
+		text_data = window['AscCommon'].g_specialPasteHelper.specialPasteData.text_data;
 
 		if(specialPasteProps === Asc.c_oSpecialPasteProps.keepTextOnly && _format !== AscCommon.c_oAscClipboardDataFormat.Text && text_data)
 		{
@@ -2160,7 +2160,7 @@ PasteProcessor.prototype =
 		//for special paste
 		this._specialPasteSetShowOptions();
 		
-		window['AscCommon'].g_clipboardBase.Paste_Process_End();
+		window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
@@ -2178,7 +2178,7 @@ PasteProcessor.prototype =
 			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
             for (var i = 0; i < aNewContent.length; ++i) {
-				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
+				if(window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 				{
 					var parseItem = this._specialPasteItemConvert(aNewContent[i]);
 					if(parseItem && parseItem.length)
@@ -2280,12 +2280,12 @@ PasteProcessor.prototype =
 				var curDocSelection = this.curDocSelection;
 				if(curDocSelection)
 				{
-					window['AscCommon'].g_clipboardBase.showButtonIdParagraph = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+					window['AscCommon'].g_specialPasteHelper.showButtonIdParagraph = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
 				}
 			}
 			else
 			{
-				window['AscCommon'].g_clipboardBase.showButtonIdParagraph = oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.Id;
+				window['AscCommon'].g_specialPasteHelper.showButtonIdParagraph = oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.Id;
 			}
 
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
@@ -2373,19 +2373,19 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_clipboardBase.specialPasteButtonProps ? window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props : null;
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps ? window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
-			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
-			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps)
+			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
+			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps)
 			{
-				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = null;
+				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = null;
 			}
 			return;
 		}
 
-		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
 			specialPasteShowOptions = new SpecialPasteShowOptions();
 
@@ -2425,7 +2425,7 @@ PasteProcessor.prototype =
 				specialPasteShowOptions = null;
 			}
 
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -2433,10 +2433,10 @@ PasteProcessor.prototype =
 			//SpecialPasteButtonById_Show вызываю здесь, если пересчет документа завершился раньше, чем мы попали сюда и сгенерировали параметры вставки
 			//в противном случае вызываю SpecialPasteButtonById_Show в drawingDocument->OnEndRecalculate
 			//TODO пересмотреть проверку на CDrawingDocContent и CShape
-			if (window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent &&
+			if (window['AscCommon'].g_specialPasteHelper.endRecalcDocument || (this.oDocument.Parent &&
 				(this.oDocument.Parent instanceof CShape || this.oDocument.Parent instanceof CHeaderFooter)) ||
 				(this.oDocument instanceof AscFormat.CDrawingDocContent)) {
-				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
+				window['AscCommon'].g_specialPasteHelper.SpecialPasteButtonById_Show();
 			}
 		}
 	},
@@ -2475,7 +2475,7 @@ PasteProcessor.prototype =
 		//TODO временная функция
 		var res = table;
 
-		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 		if(props === Asc.c_oSpecialPasteProps.keepTextOnly)
 		{
 			res = this._convertTableToText(table);
@@ -2508,7 +2508,7 @@ PasteProcessor.prototype =
 	_specialPasteParagraphConvert: function(paragraph)
 	{
 		var res = paragraph;
-		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 
 		//стиль текущего параграфа/рана, в который вставляем
 		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
@@ -2589,7 +2589,7 @@ PasteProcessor.prototype =
 
 	_specialPasteParagraphContentConvert: function(paragraphContent, pasteIntoParaRunPr)
 	{
-		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 
 		var checkInsideDrawings = function(runContent)
 		{
@@ -2990,7 +2990,7 @@ PasteProcessor.prototype =
 		for (var i = 0, length = aNewContent.length; i < length; ++i) {
 			var oSelectedElement = new CSelectedElement();
 
-			if (window['AscCommon'].g_clipboardBase.specialPasteStart && !isText) {
+			if (window['AscCommon'].g_specialPasteHelper.specialPasteStart && !isText) {
 				aNewContent[i]= this._specialPasteItemConvert(aNewContent[i]);
 			}
 
@@ -3004,7 +3004,7 @@ PasteProcessor.prototype =
 		presentation.Document_UpdateInterfaceState();
 
 		this._setSpecialPasteShowOptionsPresentation();
-		window['AscCommon'].g_clipboardBase.Paste_Process_End();
+		window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 	},
 
 	_setSpecialPasteShowOptionsPresentation: function(props){
@@ -3026,7 +3026,7 @@ PasteProcessor.prototype =
 
 		var specialPasteShowOptions = new SpecialPasteShowOptions();
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+		window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -3304,8 +3304,8 @@ PasteProcessor.prototype =
 		var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 		History.TurnOn();
 
-		if (window['AscCommon'].g_clipboardBase.specialPasteStart &&
-			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_clipboardBase.specialPasteProps) {
+		if (window['AscCommon'].g_specialPasteHelper.specialPasteStart &&
+			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps) {
 			var aContent = oThis._convertExcelBinary(aContentExcel);
 			oThis.aContent = aContent.content;
 			fPrepasteCallback();
@@ -3362,7 +3362,7 @@ PasteProcessor.prototype =
 					presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
 
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
 
@@ -3461,7 +3461,7 @@ PasteProcessor.prototype =
 					var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.keepTextOnly];
 					oThis._setSpecialPasteShowOptionsPresentation(props);
 
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
 
@@ -3506,8 +3506,8 @@ PasteProcessor.prototype =
 		aContent.fonts = oThis._checkFontsOnLoad(aContent.fonts);
 
 		var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
-		if (window['AscCommon'].g_clipboardBase.specialPasteStart &&
-			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_clipboardBase.specialPasteProps) {
+		if (window['AscCommon'].g_specialPasteHelper.specialPasteStart &&
+			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps) {
 			fPrepasteCallback();
 		} else if (oObjectsForDownload.aUrls.length > 0) {
 			if (bIsOnlyFromBinary && window["NativeCorrectImageUrlOnPaste"]) {
@@ -3632,7 +3632,7 @@ PasteProcessor.prototype =
 				var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.keepTextOnly];
 				oThis._setSpecialPasteShowOptionsPresentation(props);
 
-				window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			}
 		};
 
@@ -3859,8 +3859,8 @@ PasteProcessor.prototype =
 
 			var pasteObj = selectedContent2[0];
             var nIndex = 0;
-			if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
-				var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+			if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
+				var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 				switch (props) {
 					case Asc.c_oSpecialPasteProps.destinationFormatting: {
 						break;
@@ -3905,7 +3905,7 @@ PasteProcessor.prototype =
 						oThis._setSpecialPasteShowOptionsPresentation(props);
 					}
 
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
 
@@ -3952,7 +3952,7 @@ PasteProcessor.prototype =
                 }
 
                 /*for (var i = 0; i < docContent.length; ++i) {
-                    if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+                    if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
                         docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
                     }
                 }*/
@@ -4344,13 +4344,13 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				/*if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+				/*if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
 					for (var i = 0; i < arrShapes.length; ++i) {
 						shape = arrShapes[i].Drawing;
 
 						var txBobyContent = shape.txBody.content.Content;
 						for (var j = 0, length = txBobyContent.length; j < length; ++j) {
-							if (window['AscCommon'].g_clipboardBase.specialPasteStart) {
+							if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
 								txBobyContent[j] = oThis._specialPasteItemConvert(txBobyContent[j]);
 							}
 						}
@@ -4366,7 +4366,7 @@ PasteProcessor.prototype =
 				presentation.Document_UpdateInterfaceState();
 
 				oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly]);
-				window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			}
 		};
 		
@@ -4427,7 +4427,7 @@ PasteProcessor.prototype =
 		{
 			this.bIsPlainText = this._CheckIsPlainText(node);
 
-			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			if(window['AscCommon'].g_specialPasteHelper.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps)
 			{
 				fPasteHtmlWordCallback();
 			}
@@ -4443,7 +4443,7 @@ PasteProcessor.prototype =
 		else
 		{
 			this.oRootNode = node;
-			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			if(window['AscCommon'].g_specialPasteHelper.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps)
 			{
 				fPasteHtmlPresentationCallback();
 			}
@@ -6292,7 +6292,7 @@ PasteProcessor.prototype =
 			
 			//заглушка для вставки в excel внутрь шейпа
 			var tempRpr;
-			var bSaveExcelFormat = window['AscCommon'].g_clipboardBase.bSaveFormat;
+			var bSaveExcelFormat = window['AscCommon'].g_specialPasteHelper.bSaveFormat;
 			if (this.pasteInExcel === true && !bSaveExcelFormat && this.oDocument && this.oDocument.Parent &&
 				this.oDocument.Parent.parent &&
 				this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape) {

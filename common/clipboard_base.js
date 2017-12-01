@@ -93,23 +93,6 @@
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
 		this.PasteImagesBody = "";
-		
-		//special paste
-		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
-		
-		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
-		this.specialPasteProps = null;
-		
-		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
-		
-		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
-		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
-
-		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
-
-		this.showButtonIdParagraph = null;
-		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
 
 		this.bSaveFormat = false; //для вставки, допустим, из плагина необходимо чтобы при добавлении текста в шейп сохранялось форматирование
 	}
@@ -362,6 +345,8 @@
 		Init : function(_api)
 		{
 			this.Api = _api;
+
+			window['AscCommon'].g_specialPasteHelper.Init(_api);
 
 			this.ClosureParams.getData = function(type)
 			{
@@ -892,7 +877,42 @@
 			}
 			return _ret;
 		},
-		
+
+		isCopyOutEnabled : function()
+		{
+			if (this.Api && this.Api.isCopyOutEnabled)
+				return this.Api.isCopyOutEnabled();
+			return true;
+		}
+	};
+
+	function CSpecialPasteHelper()
+	{
+		this.Api = null;
+
+		//special paste
+		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
+
+		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
+		this.specialPasteProps = null;
+
+		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
+		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+
+		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
+		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
+
+		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
+
+		this.showButtonIdParagraph = null;
+		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
+	}
+
+	CSpecialPasteHelper.prototype = {
+		Init : function(_api) {
+			this.Api = _api;
+		},
+
 		Special_Paste : function(props)
 		{
 			this.Api.asc_SpecialPasteData(props);
@@ -967,7 +987,7 @@
 				this.showSpecialPasteButton = true;
 				//if(window["Asc"] && window["Asc"]["editor"])
 				//{
-					this.Api.asc_ShowSpecialPasteButton(props);
+				this.Api.asc_ShowSpecialPasteButton(props);
 				//}
 			}
 		},
@@ -1047,19 +1067,15 @@
 			}
 
 			return res;
-		},
-
-		isCopyOutEnabled : function()
-		{
-			if (this.Api && this.Api.isCopyOutEnabled)
-				return this.Api.isCopyOutEnabled();
-			return true;
 		}
 	};
 
 	var g_clipboardBase = new CClipboardBase();
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].g_clipboardBase = g_clipboardBase;
+
+	var g_specialPasteHelper = new CSpecialPasteHelper();
+	window['AscCommon'].g_specialPasteHelper = g_specialPasteHelper;
 })(window);
 
 // copy/paste focus error!!!

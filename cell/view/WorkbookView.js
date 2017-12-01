@@ -713,8 +713,8 @@
 			  }
 		  }, "showSpecialPasteOptions": function (val) {
 			  self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
-			  if (!window['AscCommon'].g_clipboardBase.showSpecialPasteButton) {
-				  window['AscCommon'].g_clipboardBase.showSpecialPasteButton = true;
+			  if (!window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton) {
+				  window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton = true;
 			  }
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
@@ -835,10 +835,10 @@
 		  return self.isShowSolved;
 	  });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
-      if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+      if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 	  {
 		self.handlers.trigger("asc_onHideSpecialPasteOptions");
-		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
+		window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton = false;
 	  }
     });
 

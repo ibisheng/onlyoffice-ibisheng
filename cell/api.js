@@ -402,7 +402,7 @@ var editor;
   };
   
   spreadsheet_api.prototype.asc_SpecialPaste = function(props) {
-    return AscCommon.g_clipboardBase.Special_Paste(props);
+    return AscCommon.g_specialPasteHelper.Special_Paste(props);
   };
   
   spreadsheet_api.prototype.asc_SpecialPasteData = function(props) {
