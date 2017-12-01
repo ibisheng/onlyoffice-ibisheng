@@ -89,11 +89,13 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 {
 	var nResult = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 
-	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
-	{
-		this.LogicDocument.RemoveSelection();
-		this.LogicDocument.Selection.Use = false;
-	}
+	// TODO: Проверить зачем была добавлена эта заглушка. При удалении могут быть
+
+	// if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
+	// {
+	// 	this.LogicDocument.RemoveSelection();
+	// 	this.LogicDocument.Selection.Use = false;
+	// }
 
 	return nResult;
 };

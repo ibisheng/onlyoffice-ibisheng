@@ -353,7 +353,7 @@ CDocumentContent.prototype.Get_Numbering = function()
 };
 CDocumentContent.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
 {
-	var TopDocument = this.Get_TopDocumentContent();
+	var TopDocument = this.GetTopDocumentContent();
 	if (TopDocument instanceof CFootEndnote)
 		return TopDocument.Parent.GetNumberingInfo(ParaId, NumPr, TopDocument);
 
@@ -8489,11 +8489,11 @@ CDocumentContent.prototype.private_GetElementPageIndexByXY = function(ElementPos
 {
     return this.private_GetElementPageIndex(ElementPos, PageIndex, 0, 1);
 };
-CDocumentContent.prototype.Get_TopDocumentContent = function()
+CDocumentContent.prototype.GetTopDocumentContent = function()
 {
     var TopDocument = null;
-    if (this.Parent && this.Parent.Get_TopDocumentContent)
-        TopDocument = this.Parent.Get_TopDocumentContent();
+    if (this.Parent && this.Parent.GetTopDocumentContent)
+        TopDocument = this.Parent.GetTopDocumentContent();
 
     if (null !== TopDocument && undefined !== TopDocument)
         return TopDocument;

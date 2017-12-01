@@ -894,9 +894,9 @@ CBlockLevelSdt.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X
 		return this.Content.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, CurPage, Inner, bMathWrap);
 	}
 };
-CBlockLevelSdt.prototype.Get_TopDocumentContent = function()
+CBlockLevelSdt.prototype.GetTopDocumentContent = function()
 {
-	return this.Parent.Get_TopDocumentContent();
+	return this.Parent.GetTopDocumentContent();
 };
 CBlockLevelSdt.prototype.GetAllDrawingObjects = function(AllDrawingObjects)
 {
