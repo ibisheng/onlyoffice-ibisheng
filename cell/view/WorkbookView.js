@@ -721,7 +721,7 @@
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
 		  }, "showAutoCorrectOptions": function (bIsShow, val) {
-		      self.switchAutoCorrectOptions(bIsShow, val);
+		      self.toggleAutoCorrectOptions(bIsShow, val);
 		  }
 	  });
 
@@ -846,7 +846,7 @@
 	  }
     });
 	this.model.handlers.add("showAutoCorrectOptions", function(bIsShow, val) {
-		self.switchAutoCorrectOptions(bIsShow, val);
+		self.toggleAutoCorrectOptions(bIsShow, val);
 	});
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
@@ -1704,7 +1704,7 @@
     this._cleanFindResults();
 
     //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
-    this.switchAutoCorrectOptions(true);
+    this.toggleAutoCorrectOptions(null, true);
     return this;
   };
 
@@ -3050,7 +3050,7 @@
 				api.asc_Undo();
 				this.autoCorrectStore = prevProps;
 				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion;
-				this.switchAutoCorrectOptions(true);
+				this.toggleAutoCorrectOptions(true);
 				break;
 			}
 			case Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion: {
@@ -3062,7 +3062,7 @@
 				api.asc_Redo();
 				this.autoCorrectStore = prevProps;
 				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion;
-				this.switchAutoCorrectOptions(true);
+				this.toggleAutoCorrectOptions(true);
 				break;
 			}
 		}
@@ -3070,7 +3070,7 @@
 		return true;
 	};
 
-	WorkbookView.prototype.switchAutoCorrectOptions = function (isSwitch, val) {
+	WorkbookView.prototype.toggleAutoCorrectOptions = function (isSwitch, val) {
 		if (isSwitch) {
 			if (val) {
 				this.autoCorrectStore = val;
@@ -3079,7 +3079,7 @@
 				options.asc_setCellCoord(
 					this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
 
-				this.handlers.trigger("asc_onShowAutoCorrectOptions", options);
+				this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
 			} else if (this.autoCorrectStore) {
 				if (this.autoCorrectStore.wsId === this.model.getActiveWs().getId()) {
 					var options = new Asc.asc_CAutoCorrectOptions();
@@ -3087,16 +3087,16 @@
 					options.asc_setCellCoord(
 						this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
 
-					this.handlers.trigger("asc_onShowAutoCorrectOptions", options);
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
 				} else {
-					this.handlers.trigger("asc_onHideAutoCorrectOptions");
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions");
 				}
 			}
 		} else {
 			if (val) {
 				this.autoCorrectStore = null;
 			}
-			this.handlers.trigger("asc_onHideAutoCorrectOptions");
+			this.handlers.trigger("asc_onToggleAutoCorrectOptions");
 		}
 	};
 
