@@ -237,6 +237,8 @@
 
     this._init(fontRenderingMode);
 
+    this.autoCorrectStore = null;//объект для хранения параметров иконки авторазвертывания таблиц
+
     return this;
   }
 
@@ -718,6 +720,8 @@
 			  }
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
+		  }, "toggleAutoCorrectOptions": function (bIsShow, val) {
+		      self.toggleAutoCorrectOptions(bIsShow, val);
 		  }
 	  });
 
@@ -841,7 +845,9 @@
 		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
 	  }
     });
-
+	this.model.handlers.add("toggleAutoCorrectOptions", function(bIsShow, val) {
+		self.toggleAutoCorrectOptions(bIsShow, val);
+	});
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
       collaborativeEditing: this.collaborativeEditing,
@@ -1696,7 +1702,9 @@
 
     // Нужно очистить поиск
     this._cleanFindResults();
-	this.handlers.trigger("hideSpecialPasteOptions");
+
+    //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
+    this.toggleAutoCorrectOptions(null, true);
     return this;
   };
 
@@ -3026,6 +3034,70 @@
 	};
 	WorkbookView.prototype.ConvertLogicToXY = function (xL, yL) {
 		return this.getWorksheet().ConvertLogicToXY(xL, yL);
+	};
+
+	WorkbookView.prototype.applyAutoCorrectOptions = function (val) {
+
+		var api = window["Asc"]["editor"];
+		var prevProps;
+		switch (val) {
+			case Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion: {
+				prevProps = {
+					props: this.autoCorrectStore.props,
+					cell: this.autoCorrectStore.cell,
+					wsId: this.autoCorrectStore.wsId
+				};
+				api.asc_Undo();
+				this.autoCorrectStore = prevProps;
+				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion;
+				this.toggleAutoCorrectOptions(true);
+				break;
+			}
+			case Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion: {
+				prevProps = {
+					props: this.autoCorrectStore.props,
+					cell: this.autoCorrectStore.cell,
+					wsId: this.autoCorrectStore.wsId
+				};
+				api.asc_Redo();
+				this.autoCorrectStore = prevProps;
+				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion;
+				this.toggleAutoCorrectOptions(true);
+				break;
+			}
+		}
+
+		return true;
+	};
+
+	WorkbookView.prototype.toggleAutoCorrectOptions = function (isSwitch, val) {
+		if (isSwitch) {
+			if (val) {
+				this.autoCorrectStore = val;
+				var options = new Asc.asc_CAutoCorrectOptions();
+				options.asc_setOptions(this.autoCorrectStore.props);
+				options.asc_setCellCoord(
+					this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
+
+				this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
+			} else if (this.autoCorrectStore) {
+				if (this.autoCorrectStore.wsId === this.model.getActiveWs().getId()) {
+					var options = new Asc.asc_CAutoCorrectOptions();
+					options.asc_setOptions(this.autoCorrectStore.props);
+					options.asc_setCellCoord(
+						this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
+
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
+				} else {
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions");
+				}
+			}
+		} else {
+			if (val) {
+				this.autoCorrectStore = null;
+			}
+			this.handlers.trigger("asc_onToggleAutoCorrectOptions");
+		}
 	};
 
   //------------------------------------------------------------export---------------------------------------------------

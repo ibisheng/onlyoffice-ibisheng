@@ -367,6 +367,10 @@ var c_oAscPopUpSelectorType = {
     Group: 1,
     Custom: 2
   };
+  var c_oAscAutoCorrectOptions = {
+	UndoTableAutoExpansion: 0,
+	RedoTableAutoExpansion: 1
+  };
   
   var c_kMaxPrintPages = 1500;
 
@@ -560,4 +564,8 @@ var c_oAscPopUpSelectorType = {
   prot['Individual'] = prot.Individual;
   prot['Group'] = prot.Group;
   prot['Custom'] = prot.Custom;
+  window['Asc']['c_oAscAutoCorrectOptions'] = window['Asc'].c_oAscAutoCorrectOptions = c_oAscAutoCorrectOptions;
+  prot = c_oAscAutoCorrectOptions;
+  prot['UndoTableAutoExpansion'] = prot.UndoTableAutoExpansion;
+  prot['RedoTableAutoExpansion'] = prot.RedoTableAutoExpansion;
 })(window);

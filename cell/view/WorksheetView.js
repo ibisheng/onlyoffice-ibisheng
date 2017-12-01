@@ -671,6 +671,7 @@
             this._prepareCellTextMetricsCache();
             this.cellCommentator.updateCommentPosition();
             this.updateSpecialPasteOptionsPosition();
+            this.handlers.trigger("toggleAutoCorrectOptions", null, true);
             this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
             this.updateZoom = false;
@@ -5424,6 +5425,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
+        this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
 
@@ -5584,6 +5586,7 @@
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
         this.updateSpecialPasteOptionsPosition();
+        this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
 
@@ -11466,6 +11469,7 @@
 			History.StartTransaction();
 		}
 
+		var oAutoExpansionTable;
 		var isFormula = this._isFormula(val);
 		if (isFormula) {
 			var ftext = val.reduce(function (pv, cv) {
@@ -11487,6 +11491,13 @@
 			c.setValue2(val);
 			// Вызываем функцию пересчета для заголовков форматированной таблицы
 			this.model.autoFilters.renameTableColumn(oCellEdit);
+
+			var api = window["Asc"]["editor"];
+			var bFast = api.collaborativeEditing.m_bFast;
+			var bIsSingleUser = !api.collaborativeEditing.getCollaborativeEditing();
+			if (!(bFast && !bIsSingleUser)) {
+				oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(oCellEdit);
+			}
 		}
 
 		if (!isFormula) {
@@ -11503,6 +11514,20 @@
 
 		if (!isNotHistory) {
 			History.EndTransaction();
+		}
+
+		if (oAutoExpansionTable) {
+			var callback = function () {
+				var options = {
+					props: [Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion],
+					cell: oCellEdit,
+					wsId: t.model.getId()
+				};
+				t.handlers.trigger("toggleAutoCorrectOptions", true, options);
+			};
+			t.af_changeTableRange(oAutoExpansionTable.name, oAutoExpansionTable.range, callback);
+		} else {
+			t.handlers.trigger("toggleAutoCorrectOptions");
 		}
 
 		// если вернуть false, то редактор не закроется
@@ -14056,9 +14081,11 @@
         t._isLockedDefNames(callBackLockedDefNames, defNameId);
     };
 
-    WorksheetView.prototype.af_changeTableRange = function (tableName, range) {
+    WorksheetView.prototype.af_changeTableRange = function (tableName, range, callbackAfterChange) {
         var t = this;
-        range = AscCommonExcel.g_oRangeCache.getAscRange(range);
+        if(typeof range === "string"){
+			range = AscCommonExcel.g_oRangeCache.getAscRange(range);
+		}
 
 		if (!window['AscCommonExcel'].filteringMode) {
 			return;
@@ -14077,6 +14104,7 @@
             t._onUpdateFormatTable(range, false, true);
             //TODO добавить перерисовку таблицы и перерисовку шаблонов
             History.EndTransaction();
+			callbackAfterChange();
         };
 
         //TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т

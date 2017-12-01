@@ -490,6 +490,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}
+	this.workbook.handlers.trigger("toggleAutoCorrectOptions", null, true);
 };
 CHistory.prototype.Redo = function()
 {
