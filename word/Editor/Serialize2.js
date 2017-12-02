@@ -9452,7 +9452,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				oNewHyperlink.Set_Value(oHyperlinkObj.Link);
 			if (null != oHyperlinkObj.Tooltip)
 				 oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
-			i (null != oHyperlinkObj.Anchor)
+			if (null != oHyperlinkObj.Anchor)
 				oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
 			oParStruct.addToContent(oNewHyperlink);
             oNewHyperlink.Check_Content();
