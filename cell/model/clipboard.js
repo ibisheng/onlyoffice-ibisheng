@@ -1408,6 +1408,8 @@
 
 				var first_content = stream.GetString2();
 				if(first_content === "SelectedContent"){
+					var PresentationWidth = stream.GetULong()/100000.0;
+					var PresentationHeight = stream.GetULong()/100000.0;
 					var countContent = stream.GetULong();
 					for(var i = 0; i < countContent; i++){
 						if(null === presentationSelectedContent){
