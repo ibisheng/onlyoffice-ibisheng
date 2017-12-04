@@ -193,6 +193,7 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 		var Item = this.Content[CurPos];
 
 		if (para_NewLine === Item.Type
+			&& oPr
 			&& ((oPr.SkipLineBreak && Item.IsLineBreak())
 			|| (oPr.SkipPageBreak && Item.IsPageBreak())
 			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
