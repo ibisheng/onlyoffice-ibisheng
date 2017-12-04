@@ -138,6 +138,8 @@ function (window, undefined) {
 			sheetName = sheetName.cross(arguments[1]);
 		} else if (cElementType.array === sheetName.type) {
 			sheetName = sheetName.getElementRowCol(0, 0);
+		} else if (cElementType.cell === sheetName.type || cElementType.cell3D === sheetName.type) {
+			sheetName = sheetName.getValue();
 		}
 
 		rowNumber = rowNumber.tocNumber();
@@ -196,7 +198,7 @@ function (window, undefined) {
 				A1RefType), A1RefType);
 
 		return new cString(
-			(cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+			(cElementType.empty === sheetName.type) ? "!" + strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
