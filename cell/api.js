@@ -523,7 +523,11 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_changeFormatTableInfo(tableName, optionType, val);
   };
-  
+
+  spreadsheet_api.prototype.asc_applyAutoCorrectOptions = function(val) {
+      this.wb.applyAutoCorrectOptions(val);
+  };
+
   spreadsheet_api.prototype.asc_insertCellsInTable = function(tableName, optionType) {
     var ws = this.wb.getWorksheet();
     return ws.af_insertCellsInTable(tableName, optionType);

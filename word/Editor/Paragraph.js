@@ -13853,8 +13853,8 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                this.Content[Index2++] = Item.SaveRecalculateObject(Copy);
+			if (para_PageNum === Item.Type || para_Drawing === Item.Type || para_FieldChar === Item.Type)
+				this.Content[Index2++] = Item.SaveRecalculateObject(Copy);
         }
     },
 
@@ -13865,8 +13865,8 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                Item.LoadRecalculateObject( this.Content[Index2++] );
+			if (para_PageNum === Item.Type || para_Drawing === Item.Type || para_FieldChar === Item.Type)
+				Item.LoadRecalculateObject(this.Content[Index2++]);
         }
     },
 

@@ -2002,9 +2002,9 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
 
-                if (Para.Parent && Para.Parent.Get_TopDocumentContent)
+                if (Para.Parent && Para.Parent.GetTopDocumentContent)
 				{
-					var oTopDocument = Para.Parent.Get_TopDocumentContent();
+					var oTopDocument = Para.Parent.GetTopDocumentContent();
 					if (oTopDocument instanceof CFootEndnote)
 						oTopDocument.OnFastRecalculate();
 				}
@@ -2050,9 +2050,9 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
 
-                if (SimplePara.Parent && SimplePara.Parent.Get_TopDocumentContent)
+                if (SimplePara.Parent && SimplePara.Parent.GetTopDocumentContent)
 				{
-					var oTopDocument = SimplePara.Parent.Get_TopDocumentContent();
+					var oTopDocument = SimplePara.Parent.GetTopDocumentContent();
 					if (oTopDocument instanceof CFootEndnote)
 						oTopDocument.OnFastRecalculate();
 				}
@@ -7606,7 +7606,7 @@ CDocument.prototype.Get_Numbering = function()
 };
 CDocument.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
 {
-	var TopDocument = this.Get_TopDocumentContent();
+	var TopDocument = this.GetTopDocumentContent();
 	return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
 };
 CDocument.prototype.Get_Styles = function()
@@ -10555,16 +10555,6 @@ CDocument.prototype.GetDocumentPositionFromObject = function(PosArray)
 
 	return PosArray;
 };
-CDocument.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
-{
-	this.RemoveSelection();
-
-	this.Selection.Use   = true;
-	this.Selection.Start = false;
-	this.Selection.Flag  = selectionflag_Common;
-
-	this.SetContentSelection(StartDocPos, EndDocPos, 0, 0, 0);
-};
 CDocument.prototype.Get_CursorLogicPosition = function()
 {
 	var nDocPosType = this.Get_DocPosType();
@@ -11050,7 +11040,7 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
 		}
 	}
 };
-CDocument.prototype.Get_TopDocumentContent = function()
+CDocument.prototype.GetTopDocumentContent = function()
 {
 	return this;
 };

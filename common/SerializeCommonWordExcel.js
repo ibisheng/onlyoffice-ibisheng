@@ -112,6 +112,13 @@ var c_oSerShdType = {
     Tint: 2,
     Shade: 3
   };
+	var c_oSerBookmark = {
+		Id: 0,
+		Name: 1,
+		DisplacedByCustomXml: 2,
+		ColFirst: 3,
+		ColLast: 4
+	};
 
 function BinaryCommonWriter(memory)
 {

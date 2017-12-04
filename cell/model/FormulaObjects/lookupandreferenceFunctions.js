@@ -1066,6 +1066,10 @@ function (window, undefined) {
 		arg1.getWS()._getCellNoEmpty(r, c, function (cell) {
 			resVal = checkTypeCell(cell);
 		});
+		if(cElementType.empty === resVal.type){
+			resVal = new cNumber(0);
+		}
+
 		return resVal;
 	};
 	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {

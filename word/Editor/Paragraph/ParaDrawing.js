@@ -360,7 +360,7 @@ ParaDrawing.prototype.Get_Props = function(OtherProps)
 	if (ParentParagraph && undefined !== ParentParagraph.Parent)
 	{
 		var DocContent = ParentParagraph.Parent;
-		if (true === DocContent.Is_DrawingShape() || (DocContent.Get_TopDocumentContent() instanceof CFootEndnote))
+		if (true === DocContent.Is_DrawingShape() || (DocContent.GetTopDocumentContent() instanceof CFootEndnote))
 			Props.CanBeFlow = false;
 	}
 

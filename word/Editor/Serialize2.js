@@ -904,13 +904,6 @@ var c_oSerFFData = {
 	TIMaxLength: 23,
 	TIType: 24,
 };
-var c_oSerBookmark = {
-	Id: 0,
-	Name: 1,
-	DisplacedByCustomXml: 2,
-	ColFirst: 3,
-	ColLast: 4
-};
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
 	tblstyleoverridetypeBand1Vert:  1,
@@ -9455,15 +9448,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		    res = this.bcr.Read1(length, function (t, l) {
 		        return oThis.ReadHyperlink(t, l, oHyperlinkObj, oNewHyperlink, oParStruct);
 		    });
-		    if (null != oHyperlinkObj.Link && "" != oHyperlinkObj.Link) {
-		        var sValue = oHyperlinkObj.Link;
-		        oNewHyperlink.Set_Value(sValue);
-		        if (null != oHyperlinkObj.Tooltip)
-		            oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
-				if (null != oHyperlinkObj.Anchor)
-					oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
-		        oParStruct.addToContent(oNewHyperlink);
-		    }            
+			if (null != oHyperlinkObj.Link)
+				oNewHyperlink.Set_Value(oHyperlinkObj.Link);
+			if (null != oHyperlinkObj.Tooltip)
+				 oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
+			if (null != oHyperlinkObj.Anchor)
+				oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
+			oParStruct.addToContent(oNewHyperlink);
             oNewHyperlink.Check_Content();
 		}
 		else if (c_oSerParType.FldSimple == type) {
@@ -9544,9 +9535,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			res = this.bcr.Read1(length, function(t, l){
 				return oThis.bcr.ReadBookmark(t,l, bookmark);
 			});
-			var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
-			this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
-			oParStruct.addToContent(newBookmark);
+			if (undefined !== bookmark.BookmarkId && undefined !== bookmark.BookmarkName) {
+				var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
+				this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
+				oParStruct.addToContent(newBookmark);
+			}
 		} else if ( c_oSerParType.BookmarkEnd === type) {
 			var bookmark = this.oReadResult.bookmarkForRead;
 			bookmark.BookmarkId = undefined;

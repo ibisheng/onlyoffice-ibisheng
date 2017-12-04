@@ -2753,7 +2753,7 @@ CParagraphRecalculateStateWrap.prototype =
     {
 		this.Paragraph   = Paragraph;
 		this.Parent      = Paragraph.Parent;
-		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
+		this.TopDocument = Paragraph.Parent.GetTopDocumentContent();
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
 		this.InTable     = Paragraph.Parent.IsTableCellContent();

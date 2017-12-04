@@ -238,17 +238,20 @@ CBookmarksManager.prototype.ProcessBookmarkChar = function(oParaBookmark)
 			this.BookmarksChars[sBookmarkId] = oParaBookmark;
 	}
 
-	var sBookmarkName = oParaBookmark.GetBookmarkName();
-	if (0 === sBookmarkName.indexOf("_Toc"))
+	if (oParaBookmark.IsStart())
 	{
-		var nId = parseInt(sBookmarkName.substring(4));
-		if (!isNaN(nId))
-			this.IdCounterTOC = Math.max(this.IdCounterTOC, nId);
-	}
+		var sBookmarkName = oParaBookmark.GetBookmarkName();
+		if (sBookmarkName && 0 === sBookmarkName.indexOf("_Toc"))
+		{
+			var nId = parseInt(sBookmarkName.substring(4));
+			if (!isNaN(nId))
+				this.IdCounterTOC = Math.max(this.IdCounterTOC, nId);
+		}
 
-	var nId = parseInt(sBookmarkId);
-	if (!isNaN(nId))
-		this.IdCounter = Math.max(this.IdCounter, nId);
+		var nId = parseInt(sBookmarkId);
+		if (!isNaN(nId))
+			this.IdCounter = Math.max(this.IdCounter, nId);
+	}
 };
 CBookmarksManager.prototype.EndCollectingProcess = function()
 {

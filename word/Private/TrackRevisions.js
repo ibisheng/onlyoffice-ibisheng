@@ -219,7 +219,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
             return SearchEngine;
     }
 
-    var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.Get_TopDocumentContent() : null;
+    var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.GetTopDocumentContent() : null;
     if (!(oFootnote instanceof CFootEndnote))
     	oFootnote = null;
 

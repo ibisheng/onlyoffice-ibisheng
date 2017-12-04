@@ -3324,8 +3324,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					if (Item.IsSeparate())
 					{
-						// Специальная ветка, для полей PAGE NUMPAGES, находящихся в колонтитуле
-
+						// Специальная ветка, для полей PAGE и NUMPAGES, находящихся в колонтитуле
 						var oComplexField = Item.GetComplexField();
 						var oHdrFtr       = Para.Parent.Is_HdrFtr(true);
 						if (oHdrFtr && oComplexField)
@@ -3333,17 +3332,60 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 							var oInstruction = oComplexField.GetInstruction();
 							if (oInstruction && (fieldtype_NUMPAGES === oInstruction.GetType() || fieldtype_PAGE === oInstruction.GetType()))
 							{
-								if (fieldtype_PAGE === oInstruction.GetType())
+								if (fieldtype_NUMPAGES === oInstruction.GetType())
 								{
-									//oHdrFtr.Add_PageCountElement(Item);
+									oHdrFtr.Add_PageCountElement(Item);
 								}
 								else
 								{
-									//var LogicDocument = Para.LogicDocument;
-									//var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
-									//Item.Set_Page(SectionPage);
+									var LogicDocument = Para.LogicDocument;
+									var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
+									Item.SetNumValue(SectionPage);
 								}
 							}
+
+							// Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
+							// тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
+							// данный элемент убирается
+							if (true === Word || WordLen > 0)
+							{
+								// Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+								// убирается ли слово, мы это проверяем при добавленнии букв.
+								X += SpaceLen + WordLen;
+
+								Word = false;
+								EmptyLine = false;
+								TextOnLine = true;
+								SpaceLen = 0;
+								WordLen = 0;
+							}
+
+							// Если на строке начиналось какое-то слово, тогда данная строка уже не пустая
+							if (true === StartWord)
+								FirstItemOnLine = false;
+
+							var PageNumWidth = Item.Get_Width();
+							if (X + SpaceLen + PageNumWidth > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
+							{
+								// Данный элемент не убирается, ставим перенос перед ним
+								NewRange = true;
+								RangeEndPos = Pos;
+							}
+							else
+							{
+								// Добавляем длину пробелов до слова и ширину данного элемента
+								X += SpaceLen + PageNumWidth;
+
+								FirstItemOnLine = false;
+								EmptyLine = false;
+								TextOnLine = true;
+							}
+
+							SpaceLen = 0;
+						}
+						else
+						{
+							Item.SetNumValue(null);
 						}
 					}
 
@@ -3527,6 +3569,13 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
 
 			case para_End:
 			{
+				break;
+			}
+			case para_FieldChar:
+			{
+				if (Item.IsNumValue())
+					UpdateLineMetricsText = true;
+
 				break;
 			}
 		}
@@ -3723,6 +3772,24 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 			case para_FieldChar:
 			{
 				PRSC.ComplexFields.ProcessFieldChar(Item);
+
+				if (Item.IsNumValue())
+				{
+					PRSC.Words++;
+					PRSC.Range.W += PRSC.SpaceLen;
+
+					if (PRSC.Words > 1)
+						PRSC.Spaces += PRSC.SpacesCount;
+					else
+						PRSC.SpacesSkip += PRSC.SpacesCount;
+
+					PRSC.Word        = false;
+					PRSC.SpacesCount = 0;
+					PRSC.SpaceLen    = 0;
+
+					PRSC.Range.W += Item.Get_Width();
+				}
+
 				break;
 			}
         }
@@ -4058,6 +4125,13 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 			case para_FieldChar:
 			{
 				PRSA.ComplexFields.ProcessFieldChar(Item);
+
+				if (Item.IsNumValue())
+				{
+					PRSA.X    += Item.WidthVisible;
+					PRSA.LastW = Item.WidthVisible;
+				}
+
 				break;
 			}
 
@@ -4767,6 +4841,22 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 			case para_FieldChar:
 			{
 				PDSH.ComplexFields.ProcessFieldChar(Item);
+
+				if (Item.IsNumValue())
+				{
+					if ( CommentsFlag != comments_NoComment )
+						aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
+					else if ( highlight_None != HighLight )
+						aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
+
+					if ( true === DrawSearch )
+						aFind.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0  );
+					else if ( null !== DrawColl )
+						aColl.Add( Y0, Y1, X, X + ItemWidthVisible, 0, DrawColl.r, DrawColl.g, DrawColl.b );
+
+						X += ItemWidthVisible;
+				}
+
 				break;
 			}
         }
@@ -5043,6 +5133,13 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 			case para_FieldChar:
 			{
 				PDSE.ComplexFields.ProcessFieldChar(Item);
+
+				if (Item.IsNumValue())
+				{
+					Item.Draw(X, Y - this.YOffset, pGraphics, PDSE);
+					X += Item.Get_WidthVisible();
+				}
+
 				break;
 			}
         }
@@ -5306,6 +5403,27 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 			case para_FieldChar:
 			{
 				PDSL.ComplexFields.ProcessFieldChar(Item);
+
+				if (Item.IsNumValue())
+				{
+					if (true === bRemReview)
+						aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
+					else if (true === CurTextPr.DStrikeout)
+						aDStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
+					else if (true === CurTextPr.Strikeout)
+						aStrikeout.Add(StrikeoutY, StrikeoutY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
+
+					if (true === bAddReview)
+						aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, ReviewColor.r, ReviewColor.g, ReviewColor.b);
+					else if (true === CurTextPr.Underline)
+						aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
+
+					if (PDSL.SpellingCounter > 0)
+						aSpelling.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0);
+
+					X += ItemWidthVisible;
+				}
+
 				break;
 			}
         }

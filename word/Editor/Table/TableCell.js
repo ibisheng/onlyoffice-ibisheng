@@ -1855,10 +1855,10 @@ CTableCell.prototype.Get_Table = function()
 
     return Table;
 };
-CTableCell.prototype.Get_TopDocumentContent = function()
+CTableCell.prototype.GetTopDocumentContent = function()
 {
     if (this.Row && this.Row.Table && this.Row.Table.Parent)
-        return this.Row.Table.Parent.Get_TopDocumentContent();
+        return this.Row.Table.Parent.GetTopDocumentContent();
 
     return null;
 };
