@@ -1361,7 +1361,10 @@ CopyProcessor.prototype =
 		}
 		//Notes
 		if (elementsContent.Notes && elementsContent.Notes.length) {
-			copyNotes();
+			//TODO если нет Notes, то Notes должен быть равен null. вместо этого приходится проверять 1 элемент массива
+			if(!(elementsContent.Notes.length === 1 && null === elementsContent.Notes[0])){
+				copyNotes();
+			}
 		}
 		//NotesMasters
 		if (elementsContent.NotesMasters && elementsContent.NotesMasters.length) {
