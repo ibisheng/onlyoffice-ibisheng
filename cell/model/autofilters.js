@@ -3529,7 +3529,7 @@
 							continue;
 							
 						cell = ws.getRange3(n, k, n, k);
-						isEmptyCell = cell.isEmptyText();
+						isEmptyCell = cell.isNullText();
 
 						if(!isEmptyCell && ignoreSpaceSymbols){
 							var tempVal = cell.getValueWithoutFormat().replace(/\s/g, '');
@@ -4896,7 +4896,7 @@
 			{
 				var worksheet = this.worksheet;
 				var cell = worksheet.getRange3(n, k, n, k);
-				var isEmptyCell = cell.isEmptyText();
+				var isEmptyCell = cell.isNullText();
 				var isEnd = true, merged, valueMerg;
 				
 				//если мерженная ячейка
@@ -4993,7 +4993,7 @@
 					}
 
 					cell = worksheet.getRange3(range.r2 + 1, i, range.r2 + 1, i);
-					isEmptyCell = cell.isEmptyText();
+					isEmptyCell = cell.isNullText();
 					if(!isEmptyCell)
 					{
 						result = false;
@@ -5027,7 +5027,7 @@
 					}
 
 					cell = worksheet.getRange3(i, range.c2 + 1, i, range.c2 + 1);
-					isEmptyCell = cell.isEmptyText();
+					isEmptyCell = cell.isNullText();
 					if(!isEmptyCell)
 					{
 						result = false;
@@ -5179,7 +5179,7 @@
 				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - addDelta), Math.max(0, ar.c1 - addDelta), ar.r2 + addDelta, ar.c2 + addDelta);
 				var res = true;
 				range._foreachNoEmpty(function (cell) {
-					if (!cell.isEmptyText()) {
+					if (!cell.isNullText()) {
 						res = false;
 						return true;
 					}
