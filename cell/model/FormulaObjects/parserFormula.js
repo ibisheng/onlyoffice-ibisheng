@@ -2379,7 +2379,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cUndefined.prototype.constructor = cUndefined;
 
 	function checkTypeCell(cell) {
-		if (cell && !cell.isEmptyText()) {
+		if (cell && !cell.isNullText()) {
 			var val = cell.getValueWithoutFormat();
 			var type = cell.getType();
 			if (CellValueType.Number === type) {

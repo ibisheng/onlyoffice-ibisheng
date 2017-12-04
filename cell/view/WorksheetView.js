@@ -4695,6 +4695,10 @@
         var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isEmptyText();
     };
+    WorksheetView.prototype._isCellNullText = function (col, row) {
+        var c = row !== undefined ? this._getCell(col, row) : col;
+        return null === c || c.isNullText();
+    };
     WorksheetView.prototype._isCellEmptyTextString = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isEmptyTextString();
@@ -5033,11 +5037,11 @@
         var vr = t.visibleRange;
 
         function findNextCell(col, row, dx, dy) {
-            var state = t._isCellEmptyText(col, row);
+            var state = t._isCellNullText(col, row);
             var i = col + dx;
             var j = row + dy;
             while (i >= 0 && i < t.cols.length && j >= 0 && j < t.rows.length) {
-                var newState = t._isCellEmptyText(i, j);
+                var newState = t._isCellNullText(i, j);
                 if (newState !== state) {
                     var ret = {};
                     ret.col = state ? i : i - dx;
@@ -5066,7 +5070,7 @@
 
             for (var col = 0; col < maxCols; ++col) {
                 for (var row = 0; row < maxRows; ++row) {
-                    if (!t._isCellEmptyText(col, row)) {
+                    if (!t._isCellNullText(col, row)) {
                         lastC = Math.max(lastC, col);
                         lastR = Math.max(lastR, row);
                     }
@@ -6580,7 +6584,7 @@
             case c_oAscMergeOptions.MergeCenter:
                 for (r = arn.r1; r <= arn.r2; ++r) {
                     for (c = arn.c1; c <= arn.c2; ++c) {
-                        if (false === this._isCellEmptyText(c, r)) {
+                        if (false === this._isCellNullText(c, r)) {
                             if (notEmpty) {
                                 return true;
                             }
@@ -6593,7 +6597,7 @@
                 for (r = arn.r1; r <= arn.r2; ++r) {
                     notEmpty = false;
                     for (c = arn.c1; c <= arn.c2; ++c) {
-                        if (false === this._isCellEmptyText(c, r)) {
+                        if (false === this._isCellNullText(c, r)) {
                             if (notEmpty) {
                                 return true;
                             }
@@ -6670,7 +6674,7 @@
             var range = t.model.getRange3(item.r1, item.c1, item.r2, item.c2);
             range._setPropertyNoEmpty(null, null, function (cell, r) {
                 var idCell = cell.nCol + '-' + cell.nRow;
-                if (!oExistCells[idCell] && !cell.isEmptyTextString() && t.height_1px <= t.rows[r].height) {
+                if (!oExistCells[idCell] && !cell.isNullTextString() && t.height_1px <= t.rows[r].height) {
                     oExistCells[idCell] = true;
                     ++oSelectionMathInfo.count;
                     if (CellValueType.Number === cell.getType()) {
@@ -11075,7 +11079,7 @@
 					return undefined;
 				}
 				self.model._getCellNoEmpty(r, c, function(cell){
-					if (cell && !cell.isEmptyTextString()) {
+					if (cell && !cell.isNullTextString()) {
 						ct = true;
 					}
 				});
@@ -11313,7 +11317,7 @@
         for (; row * step <= end && count < maxCount; row += step, isEnd = true, ++count) {
             for (col = range.c1; col <= range.c2; ++col) {
 				this.model._getCellNoEmpty(row, col, function(cell) {
-					if (cell && false === cell.isEmptyText()) {
+					if (cell && false === cell.isNullText()) {
 						isEnd = false;
 						isBreak = true;
 					}
@@ -11326,7 +11330,7 @@
             // Идем влево по колонкам
             for (col = range.c1 - 1; col >= 0; --col) {
 				this.model._getCellNoEmpty(row, col, function(cell) {
-					isBreak = (null === cell || cell.isEmptyText());
+					isBreak = (null === cell || cell.isNullText());
 				});
 				if (isBreak) {
 					isBreak = false;
@@ -11338,7 +11342,7 @@
             // Идем вправо по колонкам
             for (col = range.c2 + 1; col < colsCount; ++col) {
 				this.model._getCellNoEmpty(row, col, function(cell) {
-					isBreak = (null === cell || cell.isEmptyText());
+					isBreak = (null === cell || cell.isNullText());
 				});
 				if (isBreak) {
 					isBreak = false;
@@ -13339,7 +13343,7 @@
 				return;
 			}
 
-			if (false === cell.isEmptyText()) {
+			if (false === cell.isNullText()) {
 				var type = cell.getType();
 
 				if (type === 0) {

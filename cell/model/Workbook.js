@@ -3247,7 +3247,12 @@
 									return function(row, col) {
 										var val;
 										t._getCellNoEmpty(row, col, function(cell) {
-											val = (cell ? cell.isEmptyTextString() : true);
+											if (cell) {
+												//todo LEN(TRIM(A1))=0
+												val = "" === cell.getValueWithoutFormat().replace(/^ +| +$/g, '');
+											} else {
+												val = true;
+											}
 										});
 										return val ? rule.dxf : null;
 									};
@@ -3258,7 +3263,12 @@
 									return function(row, col) {
 										var val;
 										t._getCellNoEmpty(row, col, function(cell) {
-											val = (cell ? !cell.isEmptyTextString() : false);
+											if (cell) {
+												//todo LEN(TRIM(A1))=0
+												val = "" !== cell.getValueWithoutFormat().replace(/^ +| +$/g, '');
+											} else {
+												val = false;
+											}
 										});
 										return val ? rule.dxf : null;
 									};
@@ -4300,7 +4310,7 @@
 			range = aRangesToCheck[i];
 			range._foreachNoEmpty(
 				function(cell){
-					if(!cell.isEmptyTextString())
+					if(!cell.isNullTextString())
 					{
 						res = -1;
 						return res;
@@ -4994,7 +5004,7 @@
 			pivotTable.init();
 			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 			cells._foreachNoEmpty(function (cell) {
-				return (bWarning = !cell.isEmptyText()) ? null : cell;
+				return (bWarning = !cell.isNullText()) ? null : cell;
 			});
 			cleanRanges.push(cells);
 		}
@@ -5003,7 +5013,7 @@
 			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col + 1);
 			if (!bWarning) {
 				cells._foreachNoEmpty(function (cell) {
-					return (bWarning = !cell.isEmptyText()) ? null : cell;
+					return (bWarning = !cell.isNullText()) ? null : cell;
 				});
 			}
 			cleanRanges.push(cells);
@@ -5754,6 +5764,9 @@
 	Cell.prototype.isEmptyText=function(){
 		return this.isEmptyTextString() && !this.formulaParsed;
 	};
+	Cell.prototype.isNullText=function(){
+		return this.isNullTextString() && !this.formulaParsed;
+	};
 	Cell.prototype.isEmptyTextString = function() {
 		this._checkDirty();
 		if(null != this.number || (null != this.text && "" != this.text))
@@ -5762,8 +5775,12 @@
 			return false;
 		return true;
 	};
+	Cell.prototype.isNullTextString = function() {
+		this._checkDirty();
+		return null === this.number && null === this.text && null === this.multiText;
+	};
 	Cell.prototype.isEmpty=function(){
-		if(false == this.isEmptyText())
+		if(false == this.isNullText())
 			return false;
 		if(null != this.xfs)
 			return false;
@@ -5910,7 +5927,7 @@
 		}
 
 		//todo не должны удаляться ссылки, если сделать merge ее части.
-		if (this.isEmptyTextString()) {
+		if (this.isNullTextString()) {
 			var cell = this.ws.getCell3(this.nRow, this.nCol);
 			cell.removeHyperlink();
 		}
@@ -5931,7 +5948,7 @@
 		if(History.Is_On() && false == DataOld.isEqual(DataNew))
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 		//todo не должны удаляться ссылки, если сделать merge ее части.
-		if(this.isEmptyTextString())
+		if(this.isNullTextString())
 		{
 			var cell = this.ws.getCell3(this.nRow, this.nCol);
 			cell.removeHyperlink();
@@ -8057,12 +8074,26 @@
 		});
 		return isEmptyText;
 	};
+	Range.prototype.isNullText=function(){
+		var isNullText;
+		this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1, function(cell) {
+			isNullText = (null != cell) ? cell.isNullText() : true;
+		});
+		return isNullText;
+	};
 	Range.prototype.isEmptyTextString=function(){
 		var isEmptyTextString;
 		this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1, function(cell) {
 			isEmptyTextString = (null != cell) ? cell.isEmptyTextString() : true;
 		});
 		return isEmptyTextString;
+	};
+	Range.prototype.isNullTextString=function(){
+		var isNullTextString;
+		this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1, function(cell) {
+			isNullTextString = (null != cell) ? cell.isNullTextString() : true;
+		});
+		return isNullTextString;
 	};
 	Range.prototype.isFormula=function(){
 		var isFormula;
@@ -8528,7 +8559,7 @@
 		var oFirstCellHyperlink = null;
 		this._setPropertyNoEmpty(null,null,
 								 function(cell, nRow0, nCol0, nRowStart, nColStart){
-									 if(bFirst && false == cell.isEmptyText())
+									 if(bFirst && false == cell.isNullText())
 									 {
 										 bFirst = false;
 										 oFirstCellStyle = cell.getStyle();
@@ -8923,7 +8954,7 @@
 				if(null != cell){
 					if(null != cell.xfs && null != cell.xfs.fill && null != cell.xfs.fill.getRgbOrNull())
 						return true;
-					if(!cell.isEmptyText())
+					if(!cell.isNullText())
 						return true;
 					aCellsToDelete.push(cell.nRow, cell.nCol);
 				}
@@ -9034,7 +9065,7 @@
 				if(null != cell){
 					if(null != cell.xfs && null != cell.xfs.fill && null != cell.xfs.fill.getRgbOrNull())
 						return true;
-					if(!cell.isEmptyText())
+					if(!cell.isNullText())
 						return true;
 					aCellsToDelete.push(cell.nRow, cell.nCol);
 				}
@@ -9232,12 +9263,12 @@
 			var typesFirst = [];
 			var typesSecond = [];
 			rowFirst._setPropertyNoEmpty(null, null, function(cell, row, col) {
-				if (cell && !cell.isEmptyTextString()) {
+				if (cell && !cell.isNullTextString()) {
 					typesFirst.push({col: col, type: cell.getType()});
 				}
 			});
 			rowSecond._setPropertyNoEmpty(null, null, function(cell, row, col) {
-				if (cell && !cell.isEmptyTextString()) {
+				if (cell && !cell.isNullTextString()) {
 					typesSecond.push({col: col, type: cell.getType()});
 				}
 			});
