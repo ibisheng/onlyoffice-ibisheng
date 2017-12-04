@@ -3903,6 +3903,8 @@ PasteProcessor.prototype =
 						}
 
 						oThis._setSpecialPasteShowOptionsPresentation(props);
+					} else {
+						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
 					}
 
 					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
