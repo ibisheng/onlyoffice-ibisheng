@@ -6369,6 +6369,7 @@
 			res.assign(activeCell.col, activeCell.row, range.c1, range.r1, true);
 		}
 
+		this._fixSelectionOfMergedCells(res);
 		return res;
 	};
 
