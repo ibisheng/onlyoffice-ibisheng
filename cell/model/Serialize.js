@@ -3569,7 +3569,7 @@
 					if(ECellTypeType.celltypeNumber != nType)
 						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
 				}
-				if (cell.hasFormula()) {
+				if (cell.isFormula()) {
 					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
 				}
 				if(!cell.isEmptyTextString())

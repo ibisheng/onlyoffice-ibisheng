@@ -1024,7 +1024,7 @@
 					var r2 = 0;
 					var c2 = 0;
 					ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
-						if (parsed === cell.formulaParsed) {
+						if (parsed === cell.getFormulaParsed()) {
 							r1 = Math.min(r1, cell.nRow);
 							c1 = Math.min(c1, cell.nCol);
 							r2 = Math.max(r2, cell.nRow);
@@ -1229,7 +1229,7 @@
 								if(0 !== dirtyCellsSheet[cellIndex]){
 									getFromCellIndex(cellIndex - 0);
 									ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
-										if (cell && cell.hasFormula()) {
+										if (cell && cell.isFormula()) {
 											t._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell);
 										}
 									});
@@ -1242,7 +1242,7 @@
 			this.dirtyCells = {};
 		},
 		_calculateDirtyCell: function(cell) {
-			if (cell.hasFormula()) {
+			if (cell.isFormula()) {
 				var dirtyCellsSheet = this.dirtyCells[cell.ws.getId()];
 				if (dirtyCellsSheet) {
 					var cellIndex = getCellIndex(cell.nRow, cell.nCol);
@@ -1316,7 +1316,7 @@
 		add: function(bbox, data) {
 			data.id = this.id++;
 			var startFlag = bbox.r1 !== bbox.r2 ? 1 : 3;
-			var dataWrap = {bbox: bbox, data: data, isOutput: false, cellsInArea: []};
+			var dataWrap = {bbox: bbox, data: data, cellsInArea: {}};
 			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
 			top.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
 			top.storedValue.count++;
@@ -1395,10 +1395,9 @@
 						for (var id in curNodesElemX) {
 							var elem = curNodesElemX[id];
 							if (elem.dataWrap.bbox.r1 <= curCellY) {
-								elem.dataWrap.cellsInArea.push(curCellY);
-								elem.dataWrap.cellsInArea.push(curCellX);
-								if(!elem.dataWrap.isOutput){
-									elem.dataWrap.isOutput = true;
+								var cellIndex = getCellIndex(curCellY, curCellX);
+								if(!elem.dataWrap.cellsInArea[cellIndex]){
+									elem.dataWrap.cellsInArea[cellIndex] = 1;
 									res.push(elem.dataWrap);
 								}
 							}
@@ -1423,15 +1422,11 @@
 					}
 				}
 			}
-			//for(var i = 0 ; i < res.length; ++i){
-			//	res[i].isOutput = false;
-			//}
 			return res;
 		},
 		getByCellsEnd: function(areas) {
 			for (var i = 0; i < areas.length; ++i) {
-				areas[i].cellsInArea = [];
-				areas[i].isOutput = false;
+				areas[i].cellsInArea = {};
 			}
 		}
 	};
@@ -4945,7 +4940,7 @@
 		var cwf = {};
 		var range = this.getRange3(0,0, gc_nMaxRow0, gc_nMaxCol0);
 		range._setPropertyNoEmpty(null, null, function(cell){
-			if(cell.hasFormula()){
+			if(cell.isFormula()){
 				var name = cell.getName();
 				cwf[name] = name;
 			}
@@ -4955,8 +4950,8 @@
 	Worksheet.prototype.getAllFormulas = function(formulas) {
 		var range = this.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
 		range._setPropertyNoEmpty(null, null, function(cell) {
-			if (cell.formulaParsed) {
-				formulas.push(cell.formulaParsed);
+			if (cell.isFormula()) {
+				formulas.push(cell.getFormulaParsed());
 			}
 		});
 		for (var i = 0; i < this.TableParts.length; ++i) {
@@ -6287,9 +6282,6 @@
 	Cell.prototype.getFormulaParsed=function(){
 		return this.formulaParsed;
 	};
-	Cell.prototype.hasFormula=function(){
-		return !!this.formulaParsed;
-	};
 	Cell.prototype.getValueForEdit = function() {
 		this._checkDirty();
 		//todo
@@ -7106,10 +7098,9 @@
 			if (shared && areaData && areaFragment) {
 				var bbox = areaData.bbox;
 				var dependencyFormulas = this.ws.workbook.dependencyFormulas;
-				for (var i = 0; i < areaData.cellsInArea.length; i += 2) {
-					var row = areaData.cellsInArea[i];
-					var col = areaData.cellsInArea[i + 1];
-					var changedRange = bbox.getSharedRange(shared.ref, col, row);
+				for (var cellIndex in areaData.cellsInArea) {
+					getFromCellIndex(cellIndex - 0);
+					var changedRange = bbox.getSharedRange(shared.ref, g_FCI.col, g_FCI.row);
 					for (var j = changedRange.r1; j <= changedRange.r2; ++j) {
 						for (var k = changedRange.c1; k <= changedRange.c2; ++k) {
 							dependencyFormulas.addToChangedPosition(this.ws.getId(), j, k);
@@ -10164,7 +10155,7 @@
 					var bDate = false;
 					if(bIsPromote)
 					{
-						if (!oCell.formulaParsed)
+						if (!oCell.isFormula())
 						{
 							var sValue = oCell.getValueWithoutFormat();
 							if("" != sValue)
@@ -10285,7 +10276,7 @@
 								else if(null != oFromCell)
 								{
 									//копируем полностью
-									if(!oFromCell.formulaParsed){
+									if(!oFromCell.isFormula()){
 										oCopyCell.setValueData(oFromCell.getValueData());
 										//todo
 										// if(oCopyCell.isEmptyTextString())
