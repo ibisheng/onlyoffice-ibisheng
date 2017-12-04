@@ -198,7 +198,7 @@ function (window, undefined) {
 				A1RefType), A1RefType);
 
 		return new cString(
-			(cElementType.empty === sheetName.type) ? "!" + strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+			(cElementType.empty === sheetName.type) ? /*"!" +*/ strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
