@@ -3856,8 +3856,11 @@ PasteProcessor.prototype =
 		if (true === bIsMultipleContent) {
 			var multipleParamsCount = stream.GetULong();
 			var selectedContent2 = [];
+			var aContents = [];
 			for(var i = 0; i < multipleParamsCount; i++){
-				selectedContent2.push(this._readPresentationSelectedContent(stream, bDuplicate));
+				var curContent = this._readPresentationSelectedContent(stream, bDuplicate);
+				selectedContent2.push(curContent);
+				aContents.push(curContent.content);
 			}
 
 			var pasteObj = selectedContent2[0];
@@ -3869,13 +3872,17 @@ PasteProcessor.prototype =
 						break;
 					}
 					case Asc.c_oSpecialPasteProps.sourceformatting: {
-						pasteObj = selectedContent2[1];
-                        nIndex = 1;
+						if(selectedContent2[1]){
+							pasteObj = selectedContent2[1];
+							nIndex = 1;
+						}
 						break;
 					}
 					case Asc.c_oSpecialPasteProps.picture: {
-						pasteObj = selectedContent2[2];
-                        nIndex = 2;
+						if(selectedContent2[2]){
+							pasteObj = selectedContent2[2];
+							nIndex = 2;
+						}
 						break;
 					}
 					case Asc.c_oSpecialPasteProps.keepTextOnly: {
@@ -3890,7 +3897,6 @@ PasteProcessor.prototype =
 			var fonts = pasteObj.fonts;
 			var presentationSelectedContent = pasteObj.content;
 
-			var aContents = [selectedContent2[0].content, selectedContent2[1].content, selectedContent2[2].content];
 			var paste_callback = function(){
 				if (false === oThis.bNested) {
 					presentation.Insert_Content2(aContents, nIndex);

@@ -565,7 +565,10 @@
 				oPresentationWriter.WriteString2("");
 				oPresentationWriter.WriteDouble(1);
 				oPresentationWriter.WriteDouble(1);
-				
+
+				oPresentationWriter.WriteBool(true);
+				oPresentationWriter.WriteULong(1);
+
 				if(selectedContent)//пишем контент
 				{
 					var docContent = selectedContent;
@@ -575,8 +578,12 @@
 						var elements = docContent.Elements;
 						
 						//пишем метку и длины
-						oPresentationWriter.WriteString2("Content");
-						oPresentationWriter.WriteDouble(elements.length);
+						oPresentationWriter.WriteString2("SelectedContent");
+						oPresentationWriter.WriteULong(1);
+						oPresentationWriter.WriteULong(1);
+						oPresentationWriter.WriteDouble(1);
+						oPresentationWriter.WriteString2("DocContent");
+						oPresentationWriter.WriteULong(elements.length);
 						
 						//пишем контент
 						for ( var Index = 0; Index < elements.length; Index++ )
