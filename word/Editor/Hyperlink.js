@@ -82,6 +82,7 @@ ParaHyperlink.prototype.Copy = function(Selected, oPr)
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
+    NewHyperlink.SetAnchor(this.Anchor);
     NewHyperlink.Visited = this.Visited;
     return NewHyperlink;
 };
