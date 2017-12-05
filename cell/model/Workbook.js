@@ -2029,7 +2029,6 @@
 			formulas = this.getAllFormulas();
 			for (var i = 0; i < formulas.length; ++i) {
 				var formula = formulas[i];
-				formula.removeDependencies();
 				formula.setFormula(formula.getFormula());
 				formula.parse();
 				formula.buildDependencies();
@@ -3597,7 +3596,7 @@
 			this.getRange3(index, 0, index + count - 1, gc_nMaxCol0)._foreachRowNoEmpty(function(row) {
 				row.setHidden(false);
 			},function(cell) {
-				cell.clearAfterInsert();
+				cell.clearDataKeepXf();
 			});
 		}
 		this.workbook.dependencyFormulas.updateSharedFormulas();
@@ -3693,7 +3692,7 @@
 		}
 		//show rows and remain only cell xf property
 		this.getRange3(0, index, gc_nMaxRow0, index + count - 1)._foreachNoEmpty(function(cell) {
-			cell.clearAfterInsert();
+			cell.clearDataKeepXf();
 		});
 		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
@@ -4142,11 +4141,10 @@
 						oUndoRedoData_CellData.style = cell.xfs.clone();
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 				}
-				cell.removeDependencies();
 				t.workbook.dependencyFormulas.addToChangedCell(cell);
 
-				cell.clear(true);
-				cell.saveContent();
+				cell.clearData();
+				cell.saveContent(true);
 			}
 		};
 		if(null != cell)
@@ -4651,7 +4649,7 @@
 				}
 				//show rows and remain only cell xf property
 				this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
-					cell.clearAfterInsert();
+					cell.clearDataKeepXf();
 				});
 			}
 		}
@@ -4693,7 +4691,7 @@
 		{
 			//show rows and remain only cell xf property
 			this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
-				cell.clearAfterInsert();
+				cell.clearDataKeepXf();
 			});
 		}
 		
@@ -5665,12 +5663,15 @@
 		this._hasChanged = false;
 	}
 	Cell.prototype.clear = function(keepIndex) {
-		if (!keepIndex) {
-			this.nRow = -1;
-			this.nCol = -1;
-		}
+		this.nRow = -1;
+		this.nCol = -1;
+		this.clearData();
+
+		this._hasChanged = false;
+	};
+	Cell.prototype.clearData = function() {
 		this.xfs = null;
-		this.formulaParsed = null;
+		this.setFormulaInternal(null);
 
 		this.type = CellValueType.Number;
 		this.number = null;
@@ -5678,13 +5679,12 @@
 		this.multiText = null;
 		this.textIndex = null;
 
-		this._hasChanged = false;
-	};
-	Cell.prototype.clearAfterInsert = function() {
-		var xfs = this.xfs;
-		this.clear(true);
-		this.xfs = xfs;
 		this._hasChanged = true;
+	};
+	Cell.prototype.clearDataKeepXf = function() {
+		var xfs = this.xfs;
+		this.clearData();
+		this.xfs = xfs;
 	};
 	Cell.prototype.saveContent = function(opt_inCaseOfChange) {
 		if (this.nRow >= 0 && this.nCol >= 0 && (!opt_inCaseOfChange || this._hasChanged)) {
@@ -5823,7 +5823,7 @@
 		this.nCol = nCol;
 	};
 	Cell.prototype.isEmptyText=function(){
-		return this.isEmptyTextString() && !this.formulaParsed;
+		return this.isEmptyTextString() && !this.isFormula();
 	};
 	Cell.prototype.isEmptyTextString = function() {
 		this._checkDirty();
@@ -5956,8 +5956,7 @@
 		}
 		//удаляем старые значения
 		this.cleanText();
-		var sheetId = this.ws.getId();
-		this.removeDependencies();
+		this.setFormulaInternal(null);
 
 		if (newFP) {
 			this.setFormulaInternal(newFP);
@@ -5995,7 +5994,7 @@
 		if(History.Is_On())
 			DataOld = this.getValueData();
 		//[{text:"",format:TextFormat},{}...]
-		this.removeDependencies();
+		this.setFormulaInternal(null);
 		this.cleanText();
 		this._setValue2(array);
 		this.ws.workbook.dependencyFormulas.addToChangedCell(this);
@@ -6019,9 +6018,6 @@
 			DataOld = this.getValueData();
 
 		this.cleanText();
-		if (this.formulaParsed) {
-			this.formulaParsed.removeDependencies();
-		}
 		action(this);
 
 		if (History.Is_On()) {
@@ -6029,7 +6025,6 @@
 			if (false == DataOld.isEqual(DataNew)){
 				var typeHistory = bHistoryUndo ? AscCH.historyitem_Cell_ChangeValueUndo : AscCH.historyitem_Cell_ChangeValue;
 				History.Add(AscCommonExcel.g_oUndoRedoCell, typeHistory, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew), bHistoryUndo);}
-
 		}
 	};
 	Cell.prototype.setFormula = function(formula, bHistoryUndo) {
@@ -6040,6 +6035,16 @@
 		});
 	};
 	Cell.prototype.setFormulaInternal = function(formula) {
+		if (this.formulaParsed) {
+			var shared = this.formulaParsed.getShared();
+			if (shared) {
+				if (shared.ref.isOnTheEdge(this.nCol, this.nRow)) {
+					t.ws.workbook.dependencyFormulas.addToChangedShared(parsed);
+				}
+			} else {
+				this.formulaParsed.removeDependencies();
+			}
+		}
 		this.formulaParsed = formula;
 		this._hasChanged = true;
 	};
@@ -6049,13 +6054,6 @@
 			cell.formulaParsed.setFormulaString(cell.formulaParsed.assemble(true));
 			cell.formulaParsed.buildDependencies();
 		});
-	};
-	Cell.prototype.removeDependencies = function() {
-		//удаляем сторое значение
-		if (this.formulaParsed) {
-			this.formulaParsed.removeDependencies();
-			this.setFormulaInternal(null);
-		}
 	};
 	Cell.prototype.setType=function(type){
 		if(type != this.type){
@@ -6298,7 +6296,7 @@
 		var oValueText = null;
 		var oValueArray = null;
 		var xfs = this.getCompiledStyle();
-		if (this.formulaParsed) {
+		if (this.isFormula()) {
 			this.processFormula(function(formulaParsed) {
 				// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 				oValueText = "=" + formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale, true);
@@ -6484,7 +6482,7 @@
 			var DataNew = null;
 			if (History.Is_On())
 				DataOld = this.getValueData();
-			this.removeDependencies();
+			this.setFormulaInternal(null);
 			this._setValueData(Val.value);
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 			this.ws.workbook.sortDependency();

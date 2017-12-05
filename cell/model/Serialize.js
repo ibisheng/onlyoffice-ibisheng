@@ -3597,7 +3597,7 @@
         };
         this.WriteFormula = function(cell)
         {
-			var parsed = cell.formulaParsed;
+			var parsed = cell.getFormulaParsed();
 			var formula;
 			var si;
 			var ref;
