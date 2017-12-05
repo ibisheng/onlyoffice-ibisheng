@@ -6706,10 +6706,10 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
 ParaRun.prototype.IsStyleHyperlink = function()
 {
-	if (!this.Paragraph || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles())
+	if (!this.Paragraph || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles() || !this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink)
 		return false;
 
-	return (this.Pr.RStyle === this.Paragraph.LogicDocument.Get_Styles().Get_Default_Hyperlink() ? true : false);
+	return (this.Pr.RStyle === this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink() ? true : false);
 };
 ParaRun.prototype.IsInHyperlinkInTOC = function()
 {
