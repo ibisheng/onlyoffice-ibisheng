@@ -12558,7 +12558,7 @@ Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
 	var nPagesCount = this.Pages.length;
 	var nCurPage    = 0;
 
-	while (this.Is_EmptyPage(nCurPage))
+	while (this.Is_EmptyPage(nCurPage, true))
 	{
 		if (nCurPage >= nPagesCount - 1)
 			break;
