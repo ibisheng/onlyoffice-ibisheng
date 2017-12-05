@@ -9523,5 +9523,45 @@ $( function () {
 	} );
 
 
+	test( "Test: \"ADDRESS\"", function () {
+
+		oParser = new parserFormula( "ADDRESS(2,3,2)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2)" );
+		strictEqual( oParser.calculate().getValue(), "C$2", "ADDRESS(2,3,2)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,FALSE)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,FALSE)" );
+		strictEqual( oParser.calculate().getValue(), "R2C[3]", "ADDRESS(2,3,2,FALSE)");
+
+		oParser = new parserFormula( 'ADDRESS(2,3,1,FALSE,"[Book1]Sheet1")', "A2", ws );
+		ok( oParser.parse(), 'ADDRESS(2,3,1,FALSE,"[Book1]Sheet1")' );
+		strictEqual( oParser.calculate().getValue(), "'[Book1]Sheet1'!R2C3", 'ADDRESS(2,3,1,FALSE,"[Book1]Sheet1")');
+
+		oParser = new parserFormula( 'ADDRESS(2,3,1,FALSE,"EXCEL SHEET")', "A2", ws );
+		ok( oParser.parse(), 'ADDRESS(2,3,1,FALSE,"EXCEL SHEET")' );
+		strictEqual( oParser.calculate().getValue(), "'EXCEL SHEET'!R2C3", 'ADDRESS(2,3,1,FALSE,"EXCEL SHEET")');
+
+		ws.getRange2( "A101" ).setValue( "" );
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,1,A101)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,1,A101" );
+		strictEqual( oParser.calculate().getValue(), "!C$2", "ADDRESS(2,3,2,1,A101");
+
+		ws.getRange2( "A101" ).setValue( "'" );
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,1,A101)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,1,A101" );
+		strictEqual( oParser.calculate().getValue(), "!C$2", "ADDRESS(2,3,2,1,A101");
+
+		oParser = new parserFormula( 'ADDRESS(2,3,2,1,"")', "A2", ws );
+		ok( oParser.parse(), 'ADDRESS(2,3,2,1,"")' );
+		strictEqual( oParser.calculate().getValue(), "!C$2", 'ADDRESS(2,3,2,1,"")');
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,1,\"'\")", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,1,\"'\")" );
+		strictEqual( oParser.calculate().getValue(), "''''!C$2", "ADDRESS(2,3,2,1,\"'\")");
+
+	} );
+
 	wb.dependencyFormulas.unlockRecal();
 } );

@@ -156,7 +156,7 @@ ParaHyperlink.prototype.Clear_TextPr = function()
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
     {
         var Styles = this.Paragraph.Parent.Get_Styles();
-        HyperlinkStyle = Styles.Get_Default_Hyperlink();
+        HyperlinkStyle = Styles.GetDefaultHyperlink();
     }
 
     var Count = this.Content.length;

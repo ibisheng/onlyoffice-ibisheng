@@ -5672,7 +5672,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		var TextPr       = new CTextPr();
 		TextPr.Color     = null;
 		TextPr.Underline = null;
-		TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
+		TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().GetDefaultHyperlink() : null;
 		if (!this.bFromDocument)
 		{
 			TextPr.Unifill   = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
@@ -5717,7 +5717,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 			HyperRun.Set_Pr(TextPr.Copy());
 			HyperRun.Set_Color(undefined);
 			HyperRun.Set_Underline(undefined);
-			HyperRun.Set_RStyle(Styles.Get_Default_Hyperlink());
+			HyperRun.Set_RStyle(Styles.GetDefaultHyperlink());
 		}
 		else
 		{
@@ -5822,7 +5822,7 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 				HyperRun.Set_Pr(TextPr.Copy());
 				HyperRun.Set_Color(undefined);
 				HyperRun.Set_Underline(undefined);
-				HyperRun.Set_RStyle(Styles.Get_Default_Hyperlink());
+				HyperRun.Set_RStyle(Styles.GetDefaultHyperlink());
 			}
 			else
 			{
@@ -8429,7 +8429,7 @@ Paragraph.prototype.Clear_TextFormatting = function()
 	if (this.bFromDocument)
 	{
 		Styles   = this.Parent.Get_Styles();
-		DefHyper = Styles.Get_Default_Hyperlink();
+		DefHyper = Styles.GetDefaultHyperlink();
 	}
 
 	// TODO: Сделать, чтобы данная функция работала по выделению

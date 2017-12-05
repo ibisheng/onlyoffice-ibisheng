@@ -193,6 +193,7 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 		var Item = this.Content[CurPos];
 
 		if (para_NewLine === Item.Type
+			&& oPr
 			&& ((oPr.SkipLineBreak && Item.IsLineBreak())
 			|| (oPr.SkipPageBreak && Item.IsPageBreak())
 			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
@@ -6581,6 +6582,9 @@ ParaRun.prototype.Recalc_RunsCompiledPr = function()
 
 ParaRun.prototype.Get_CompiledPr = function(bCopy)
 {
+	if (this.IsStyleHyperlink() && this.IsInHyperlinkInTOC())
+		this.RecalcInfo.TextPr = true;
+
     if ( true === this.RecalcInfo.TextPr )
     {
         this.RecalcInfo.TextPr = false;
@@ -6609,12 +6613,13 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
     var TextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
     // Если в прямых настройках задан стиль, тогда смержим настройки стиля
-    if ( undefined != this.Pr.RStyle )
-    {
-        var Styles = this.Paragraph.Parent.Get_Styles();
-        var StyleTextPr = Styles.Get_Pr( this.Pr.RStyle, styletype_Character ).TextPr;
-        TextPr.Merge( StyleTextPr );
-    }
+	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC
+	if (undefined != this.Pr.RStyle && (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC()))
+	{
+		var Styles      = this.Paragraph.Parent.Get_Styles();
+		var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
+		TextPr.Merge(StyleTextPr);
+	}
 
     if(this.Type == para_Math_Run)
     {
@@ -6697,6 +6702,48 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
     TextPr.FontFamily.Index = TextPr.RFonts.Ascii.Index;
 
     return TextPr;
+};
+
+ParaRun.prototype.IsStyleHyperlink = function()
+{
+	if (!this.Paragraph || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles() || !this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink)
+		return false;
+
+	return (this.Pr.RStyle === this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink() ? true : false);
+};
+ParaRun.prototype.IsInHyperlinkInTOC = function()
+{
+	var oParagraph = this.GetParagraph();
+	if (!oParagraph)
+		return false;
+
+	var oPos = oParagraph.Get_PosByElement(this);
+	if (!oPos)
+		return false;
+
+	var isHyperlink = false;
+	var arrClasses = oParagraph.Get_ClassesByPos(oPos);
+	for (var nIndex = 0, nCount = arrClasses.length; nIndex < nCount; ++nIndex)
+	{
+		if (arrClasses[nIndex] instanceof ParaHyperlink)
+		{
+			isHyperlink = true;
+			break;
+		}
+	}
+
+	if (!isHyperlink)
+		return false;
+
+	var arrComplexFields = oParagraph.GetComplexFieldsByPos(oPos);
+
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (fieldtype_TOC === arrComplexFields[nIndex].GetInstruction().GetType())
+			return true;
+	}
+
+	return false;
 };
 
 // В данной функции мы жестко меняем настройки на те, которые пришли (т.е. полностью удаляем старые)

@@ -2379,7 +2379,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cUndefined.prototype.constructor = cUndefined;
 
 	function checkTypeCell(cell) {
-		if (cell && !cell.isEmptyText()) {
+		if (cell && !cell.isNullText()) {
 			var val = cell.getValueWithoutFormat();
 			var type = cell.getType();
 			if (CellValueType.Number === type) {
@@ -6074,19 +6074,17 @@ function parseNum( str ) {
 			}
 
 			y = y.toString();
-			if ('' === y) {
-				// Empty compare string
-				rS = (cElementType.empty === x.type);
-			} else {
-				// Equal only string values
-				if(cElementType.bool === x.type){
-					x = x.tocString();
-					rS = x.value === y;
-				}else if(cElementType.error === x.type){
-					rS = x.value === y;
-				}else{
-					rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
-				}
+
+			// Equal only string values
+			if(cElementType.empty === x.type && '' === y){
+				rS = true;
+			} else if(cElementType.bool === x.type){
+				x = x.tocString();
+				rS = x.value === y;
+			}else if(cElementType.error === x.type){
+				rS = x.value === y;
+			}else{
+				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
 			}
 
 			switch (operator) {

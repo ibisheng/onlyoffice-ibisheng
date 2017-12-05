@@ -1978,6 +1978,10 @@ ParaPageCount.prototype.Update_PageCount = function(nPageCount)
 	this.PageCount = nPageCount;
 	this.private_UpdateWidth();
 };
+ParaPageCount.prototype.SetNumValue = function(nValue)
+{
+	this.Update_PageCount(nValue);
+};
 ParaPageCount.prototype.private_UpdateWidth = function()
 {
 	this.String = "" + this.PageCount;

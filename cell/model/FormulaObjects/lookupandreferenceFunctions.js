@@ -108,7 +108,7 @@ function (window, undefined) {
 	cADDRESS.prototype.argumentsMax = 5;
 	cADDRESS.prototype.Calculate = function (arg) {
 		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1),
-			A1RefType = arg[3] ? arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
+			A1RefType = arg[3] ? arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : null;
 
 		if (cElementType.cellsRange === rowNumber.type || cElementType.cellsRange3D === rowNumber.type) {
 			rowNumber = rowNumber.cross(arguments[1]);
@@ -134,10 +134,14 @@ function (window, undefined) {
 			A1RefType = A1RefType.getElementRowCol(0, 0);
 		}
 
-		if (cElementType.cellsRange === sheetName.type || cElementType.cellsRange3D === sheetName.type) {
-			sheetName = sheetName.cross(arguments[1]);
-		} else if (cElementType.array === sheetName.type) {
-			sheetName = sheetName.getElementRowCol(0, 0);
+		if(sheetName){
+			if (cElementType.cellsRange === sheetName.type || cElementType.cellsRange3D === sheetName.type) {
+				sheetName = sheetName.cross(arguments[1]);
+			} else if (cElementType.array === sheetName.type) {
+				sheetName = sheetName.getElementRowCol(0, 0);
+			} else if (cElementType.cell === sheetName.type || cElementType.cell3D === sheetName.type) {
+				sheetName = sheetName.getValue();
+			}
 		}
 
 		rowNumber = rowNumber.tocNumber();
@@ -157,7 +161,7 @@ function (window, undefined) {
 		if (cElementType.error === A1RefType.type) {
 			return A1RefType;
 		}
-		if (cElementType.error === sheetName.type) {
+		if (sheetName && cElementType.error === sheetName.type) {
 			return sheetName;
 		}
 
@@ -195,8 +199,16 @@ function (window, undefined) {
 			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber,
 				A1RefType), A1RefType);
 
-		return new cString(
-			(cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+		var res = strRef;
+		if(sheetName){
+			if("" === sheetName.getValue()){
+				res = "!" + strRef;
+			} else {
+				res = parserHelp.get3DRef(sheetName.toString(), strRef);
+			}
+		}
+
+		return new cString(res);
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
