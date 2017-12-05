@@ -6739,7 +6739,8 @@ ParaRun.prototype.IsInHyperlinkInTOC = function()
 
 	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
 	{
-		if (fieldtype_TOC === arrComplexFields[nIndex].GetInstruction().GetType())
+		var oInstruction = arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_TOC === oInstruction.GetType())
 			return true;
 	}
 

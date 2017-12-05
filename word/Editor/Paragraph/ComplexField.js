@@ -473,9 +473,15 @@ CComplexField.prototype.private_UpdateTOC = function()
 
 		if (this.Instruction.IsHyperlinks())
 		{
+			var sHyperlinkStyleId = oStyles.GetDefaultHyperlink();
+
 			var oHyperlink = new ParaHyperlink();
 			for (var nParaPos = 0, nParaCount = oPara.Content.length - 1; nParaPos < nParaCount; ++nParaPos)
 			{
+				// TODO: Проверить, нужно ли проставлять этот стиль во внутренние раны
+				if (oPara.Content[0] instanceof ParaRun)
+					oPara.Content[0].Set_RStyle(sHyperlinkStyleId);
+
 				oHyperlink.Add_ToContent(nParaPos, oPara.Content[0]);
 				oPara.Remove_FromContent(0, 1);
 			}
