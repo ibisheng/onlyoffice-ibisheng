@@ -1855,8 +1855,7 @@ function (window, undefined) {
 		}
 
 		return new cString(arg0.getValue().replace(AscCommon.rx_space_g, function ($0, $1, $2) {
-			var res;
-			AscCommon.rx_space.test($2[$1 + 1]) ? res = "" : res = $2[$1];
+			var res = " " === $2[$1 + 1] ? "" : $2[$1];
 			return res;
 		}).replace(/^\s|\s$/g, ""))
 	};
