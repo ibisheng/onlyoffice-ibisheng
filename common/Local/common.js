@@ -380,7 +380,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 			}
 			else
 			{
-				_api.asc_setViewMode((0 == signatures.length) ? false : true);
+				//_api.asc_setViewMode((0 == signatures.length) ? false : true);
+				_api.collaborativeEditing.m_bGlobalLock = (0 == signatures.length) ? false : true;
 			}
 
 		});

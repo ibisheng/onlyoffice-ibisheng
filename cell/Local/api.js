@@ -49,8 +49,14 @@ var c_oAscError = Asc.c_oAscError;
 	var asc = window["Asc"];
 	var prot;
 
+	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoadChart = asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad;
+	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoadChart = asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad;
+
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentStartLoad = function()
 	{
+		if (location.href.indexOf("id-diagram-editor-placeholder") > 0)
+			return this._OfflineAppDocumentStartLoadChart();
+
 		this.asc_registerCallback('asc_onDocumentContentReady', function(){
 			DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 
@@ -62,6 +68,9 @@ var c_oAscError = Asc.c_oAscError;
 	
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data, _len)
 	{
+		if (location.href.indexOf("id-diagram-editor-placeholder") > 0)
+			return this._OfflineAppDocumentEndLoadChart();
+
 		AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{

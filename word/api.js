@@ -3712,6 +3712,8 @@ background-repeat: no-repeat;\
     };
 
     asc_docs_api.prototype.asc_getAllSignatures = function(){
+    	if (!this.WordControl.m_oLogicDocument)
+    		return [];
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
 	};
 
