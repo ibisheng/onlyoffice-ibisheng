@@ -6706,7 +6706,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
 ParaRun.prototype.IsStyleHyperlink = function()
 {
-	if (!this.Paragraph || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles() || !this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink)
+	if (!this.Paragraph || !this.Paragraph.bFromDocument || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles() || !this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink)
 		return false;
 
 	return (this.Pr.RStyle === this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink() ? true : false);
@@ -6714,7 +6714,7 @@ ParaRun.prototype.IsStyleHyperlink = function()
 ParaRun.prototype.IsInHyperlinkInTOC = function()
 {
 	var oParagraph = this.GetParagraph();
-	if (!oParagraph)
+	if (!oParagraph || !oParagraph.bFromDocument)
 		return false;
 
 	var oPos = oParagraph.Get_PosByElement(this);
