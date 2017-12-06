@@ -201,13 +201,27 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 
 window["UpdateInstallPlugins"] = function()
 {
-	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins["url"] = _plugins["url"].replace(" ", "%20");
+	var _pluginsTmp = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	_pluginsTmp[0]["url"] = _pluginsTmp[0]["url"].replace(" ", "%20");
+	_pluginsTmp[1]["url"] = _pluginsTmp[1]["url"].replace(" ", "%20");
+
+	var _plugins = { "url" : _pluginsTmp[0]["url"], "pluginsData" : [] };
+	for (var k = 0; k < 2; k++)
+	{
+		var _pluginsCur = _pluginsTmp[k];
+
+		var _len = _pluginsCur["pluginsData"].length;
+		for (var i = 0; i < _len; i++)
+		{
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+			_plugins["pluginsData"].push(_pluginsCur["pluginsData"][i]);
+		}
+	}
 
 	for (var i = 0; i < _plugins["pluginsData"].length; i++)
 	{
 		var _plugin = _plugins["pluginsData"][i];
-		_plugin["baseUrl"] = _plugins["url"] + _plugin["guid"].substring(4) + "/";
+		//_plugin["baseUrl"] = _plugins["url"] + _plugin["guid"].substring(4) + "/";
 
 		var isSystem = false;
 		for (var j = 0; j < _plugin["variations"].length; j++)
@@ -234,25 +248,38 @@ window["UpdateInstallPlugins"] = function()
 window["UpdateSystemPlugins"] = function()
 {
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins["url"] = _plugins["url"].replace(" ", "%20");
+	_plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
+	_plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
 
-	var _len = _plugins["pluginsData"].length;
-	for (var i = 0; i < _len; i++)
-		_plugins["pluginsData"][i]["baseUrl"] = _plugins["url"] + _plugins["pluginsData"][i]["guid"].substring(4) + "/";
+	for (var k = 0; k < 2; k++)
+	{
+		var _pluginsCur = _plugins[k];
+
+		var _len = _pluginsCur["pluginsData"].length;
+		for (var i = 0; i < _len; i++)
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
 	var _array = [];
-	for (var i = 0; i < _len; i++)
+
+	for (var k = 0; k < 2; k++)
 	{
-		var _plugin = _plugins["pluginsData"][i];
-		for (var j = 0; j < _plugin["variations"].length; j++)
+		var _pluginsCur = _plugins[k];
+		var _len = _pluginsCur["pluginsData"].length;
+
+		for (var i = 0; i < _len; i++)
 		{
-			var _variation = _plugin["variations"][j];
-			if (_variation["initDataType"] == "desktop")
+			var _plugin = _pluginsCur["pluginsData"][i];
+			for (var j = 0; j < _plugin["variations"].length; j++)
 			{
-				_array.push(_plugin);
-				break;
+				var _variation = _plugin["variations"][j];
+				if (_variation["initDataType"] == "desktop")
+				{
+					_array.push(_plugin);
+					break;
+				}
 			}
 		}
 	}
