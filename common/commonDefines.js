@@ -1094,6 +1094,7 @@
 
 
 	var offlineMode = '_offline_';
+	var chartMode = '_chart_';
 	
 	var c_oSpecialPasteProps = {
 		paste: 0,
@@ -1795,6 +1796,7 @@
 	window["AscCommon"].contentchanges_Remove                 = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
+	window["AscCommon"].chartMode = chartMode;
 	
 	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
 	prot = c_oSpecialPasteProps;

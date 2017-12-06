@@ -285,7 +285,12 @@
 			}
 		}
 
-		if (AscCommon.offlineMode === this.documentUrl)
+		if (AscCommon.chartMode === this.documentUrl)
+		{
+			this.isChartEditor = true;
+			this.DocInfo.put_OfflineApp(true);
+		}
+		else if (AscCommon.offlineMode === this.documentUrl)
 		{
 			this.DocInfo.put_OfflineApp(true);
 		}
@@ -476,6 +481,9 @@
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
 		this._OfflineAppDocumentEndLoad();
+	};
+	baseEditorsApi.prototype._OfflineAppDocumentEndLoad        = function()
+	{
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
@@ -1130,7 +1138,14 @@
 		{
 			if (this.DocInfo.get_OfflineApp())
 			{
-				this._OfflineAppDocumentStartLoad();
+				if (this.editorId === c_oEditorId.Spreadsheet && this.isChartEditor)
+				{
+					this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
+				}
+				else
+				{
+					this._OfflineAppDocumentStartLoad();
+				}
 			}
 			this.onEndLoadFile(null);
 		}
