@@ -198,8 +198,11 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 			|| (oPr.SkipPageBreak && Item.IsPageBreak())
 			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
 		{
-			NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
-			AddedPos++;
+			if (oPr.Paragraph && true !== oPr.Paragraph.IsEmpty())
+			{
+				NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
+				AddedPos++;
+			}
 		}
 		else
 		{
