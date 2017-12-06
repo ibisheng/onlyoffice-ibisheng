@@ -4942,7 +4942,7 @@ CPresentation.prototype =
                             AscFormat.fResetConnectorsIds(oEndFormattingContent.Drawings, oIdMap);
                             oIdMap = {};
                             collectSelectedObjects(aSpTree, oSourceFormattingContent.Drawings, bRecursive, oIdMap, true);
-                            AscFormat.fResetConnectorsIds(oEndFormattingContent.Drawings, oIdMap);
+                            AscFormat.fResetConnectorsIds(oSourceFormattingContent.Drawings, oIdMap);
                             if(oController.selectedObjects[0]){
                                 oImage = oController.createImage(oController.selectedObjects[0].getBase64Img(), 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY);
                                 oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY, oController.selectedObjects[0].getBase64Img()));
@@ -5202,6 +5202,50 @@ CPresentation.prototype =
                         if(!oSlide.notes)
                         {
                             oSlide.setNotes(oNotes);
+                        }
+                    }
+                }
+            }
+        }
+        if(oContent.Drawings.length > 0)
+        {
+            if(bEndFormatting)
+            {
+                var oCurSlide = this.Slides[this.CurPage];
+                oSourceContent = aContents[1];
+                if(oCurSlide && !this.FocusOnNotes && oSourceContent)
+                {
+                    for(i = 0; i < oContent.Drawings.length; ++i)
+                    {
+                        var shape = oContent.Drawings[i].Drawing;
+                        if(shape.isPlaceholder && shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+                        {
+                            var oOldParent = shape.parent;
+                            shape.parent = oCurSlide;
+                            var hierarchy = shape.getHierarchy();
+                            for(j = 0; j < hierarchy.length; ++j)
+                            {
+                                if(hierarchy[j] && hierarchy[j].spPr && hierarchy[j].spPr.xfrm && hierarchy[j].spPr.xfrm.isNotNull())
+                                {
+                                    break;
+                                }
+                            }
+                            if(j === hierarchy.length)
+                            {
+                                if(oSourceContent.Drawings[i] && oSourceContent.Drawings[i].Drawing)
+                                {
+                                    var oSourceShape = oSourceContent.Drawings[i].Drawing;
+                                    if(oSourceShape && oSourceShape.spPr && oSourceShape.spPr.xfrm && oSourceShape.spPr.xfrm.isNotNull())
+                                    {
+                                        shape.x = oSourceShape.spPr.xfrm.offX;
+                                        shape.y = oSourceShape.spPr.xfrm.offY;
+                                        shape.extX = oSourceShape.spPr.xfrm.extX;
+                                        shape.extY = oSourceShape.spPr.xfrm.extY;
+                                        AscFormat.CheckSpPrXfrm(shape);
+                                    }
+                                }
+                            }
+                            shape.parent = oOldParent;
                         }
                     }
                 }
@@ -6630,32 +6674,38 @@ CPresentation.prototype.IsViewModeInReview = function()
 
 function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap, bSourceFormatting)
 {
+    var oSp;
     for(var i = 0; i < aSpTree.length; ++i)
     {
-        if(aSpTree[i].selected)
+        oSp = aSpTree[i];
+       // if(oSp.isEmptyPlaceholder())
+       // {
+       //     continue;
+       // }
+        if(oSp.selected)
         {
             var oCopy;
-            if(aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
-                oCopy = aSpTree[i].copy(oIdMap, bSourceFormatting);
+            if(oSp.getObjectType() === AscDFH.historyitem_type_GroupShape){
+                oCopy = oSp.copy(oIdMap, bSourceFormatting);
             }
             else{
                 if(!bSourceFormatting){
-                    oCopy = aSpTree[i].copy();
+                    oCopy = oSp.copy();
                 }
                 else{
-                    oCopy = aSpTree[i].getCopyWithSourceFormatting();
+                    oCopy = oSp.getCopyWithSourceFormatting();
                 }
 
             }
 
-            aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
+            aCollectArray.push(new DrawingCopyObject(oCopy, oSp.x, oSp.y, oSp.extX, oSp.extY, oSp.getBase64Img()));
             if(AscCommon.isRealObject(oIdMap)){
-                oIdMap[aSpTree[i].Id] = oCopy.Id;
+                oIdMap[oSp.Id] = oCopy.Id;
             }
         }
-        if(bRecursive && aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
+        if(bRecursive && oSp.getObjectType() === AscDFH.historyitem_type_GroupShape)
         {
-            collectSelectedObjects(aSpTree[i].spTree, aCollectArray, bRecursive, oIdMap, bSourceFormatting);
+            collectSelectedObjects(oSp.spTree, aCollectArray, bRecursive, oIdMap, bSourceFormatting);
         }
     }
 }

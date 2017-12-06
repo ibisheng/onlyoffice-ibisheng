@@ -4066,7 +4066,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
     }
-    if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true)
+    if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true  && !AscCommon.IsShapeToImageConverter)
     {
         var drawingObjects = this.getDrawingObjectsController();
         if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
@@ -4143,7 +4143,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics.SaveGrState();
             graphics.SetIntegerGrid(false);
             var transform_text;
-            if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
+            if ((!this.txBody.content || this.txBody.content.Is_Empty()) && !AscCommon.IsShapeToImageConverter && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
             {
                 transform_text = this.transformText2;
             }
@@ -4202,7 +4202,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     {
         var oTheme = this.getParentObjects().theme;
         var oColorMap = this.Get_ColorMap();
-        if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
+        if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && !AscCommon.IsShapeToImageConverter && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
         {
             if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true)
             {
@@ -5364,6 +5364,17 @@ CShape.prototype.getColumnNumber = function(){
             if(this.pen){
                 oCopy.spPr.setLn(this.pen.createDuplicate());
             }
+        }
+        if(oCopy.isPlaceholder() && !this.recalcInfo.recalculateTransform){
+            var oXfrm = oCopy.spPr.xfrm;
+            if(!oXfrm || !oXfrm.isNotNull()){
+                oCopy.x = this.x;
+                oCopy.y = this.y;
+                oCopy.extX = this.extX;
+                oCopy.extY = this.extY;
+                AscFormat.CheckSpPrXfrm(oCopy, true);
+            }
+
         }
         return oCopy;
     };
