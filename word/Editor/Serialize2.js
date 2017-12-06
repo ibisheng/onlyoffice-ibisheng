@@ -9536,9 +9536,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				return oThis.bcr.ReadBookmark(t,l, bookmark);
 			});
 			if (undefined !== bookmark.BookmarkId && undefined !== bookmark.BookmarkName) {
-				var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
-				this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
-				oParStruct.addToContent(newBookmark);
+				var isCopyPaste = this.openParams && this.openParams.bCopyPaste;
+				var bookmarksManager = this.Document.BookmarksManager;
+				if(!isCopyPaste || (isCopyPaste && bookmarksManager && null === bookmarksManager.GetBookmarkByName(bookmark.BookmarkName))){
+					var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
+					this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
+					oParStruct.addToContent(newBookmark);
+				}
 			}
 		} else if ( c_oSerParType.BookmarkEnd === type) {
 			var bookmark = this.oReadResult.bookmarkForRead;
