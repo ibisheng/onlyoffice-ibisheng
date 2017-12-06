@@ -6583,7 +6583,7 @@
 				}
 				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
 					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
-					if (!shared.ref) {
+					if (!(shared && shared.ref)) {
 					    sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
 						prevFormula.parsed.setShared(sharedRef, prevFormula.base);
 					} else {
@@ -6597,7 +6597,8 @@
 					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
 					var parsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
 					parsed.ca = formula.ca;
-					var refPos = parsed.parse();
+					var refPos = [];
+					parsed.parse(undefined, undefined, refPos);
 					if (null !== formula.ref) {
 						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
 						parsed.setShared(sharedRef, newFormulaParent);

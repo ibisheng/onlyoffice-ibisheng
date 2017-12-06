@@ -4399,9 +4399,13 @@ function parserFormula( formula, parent, _ws ) {
 		this.shared = {ref: ref, base: cellWithFormula};
 	};
 	parserFormula.prototype.setSharedRef = function(ref) {
-		this.removeDependencies();
-		this.shared.ref = ref;
-		this.buildDependencies();
+		if (this.isInDependencies && !this.shared.ref.isEqual(ref)) {
+			this.removeDependencies();
+			this.shared.ref = ref;
+			this.buildDependencies();
+		} else {
+			this.shared.ref = ref;
+		}
 	};
 	parserFormula.prototype.removeShared = function() {
 		this.shared = null;
@@ -5982,13 +5986,11 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		} else {
 			bbox = this.extendBBoxDefName(isDefName, bbox);
-			var rangeOffset;
 			if (this.shared) {
-				rangeOffset = new AscCommonExcel.CRangeOffset(bbox.c2 - bbox.c1 + 1, bbox.r2 - bbox.r1 + 1);
 				bbox = bbox.getSharedRangeBbox(this.shared.ref, this.shared.base);
 			}
 			if (isStart) {
-				this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this, rangeOffset);
+				this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this);
 			} else {
 				this.wb.dependencyFormulas.endListeningRange(wsId, bbox, this);
 			}
@@ -6052,6 +6054,18 @@ parserFormula.prototype.getElementByPos = function(pos) {
   }
   return null;
 };
+	parserFormula.prototype.getFirstRange = function() {
+		var res;
+		for (var i = 0; i < this.outStack.length; i++) {
+			var elem = this.outStack[i];
+			if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
+				cElementType.cellsRange === elem.type || cElementType.cellsRange3D === elem.type) {
+				res = elem.getRange();
+				break;
+			}
+		}
+		return res;
+	};
 	parserFormula.prototype.getIndexNumber = function() {
 		return this._index;
 	};
