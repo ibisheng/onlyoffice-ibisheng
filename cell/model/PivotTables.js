@@ -1965,7 +1965,7 @@ function CT_pivotTableDefinition() {
 	this.isInit = false;
 	this.pageFieldsPositions = null;
 	this.clearGrid = false;
-	this.hasCompact = true;
+	this.hasCompactField = true;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -2687,21 +2687,27 @@ CT_pivotTableDefinition.prototype.init = function () {
 };
 CT_pivotTableDefinition.prototype.updatePivotType = function () {
 	this.clearGrid = false;
-	this.hasCompact = false;
-	var field;
+	this.hasCompactField = false;
 	var pivotFields = this.asc_getPivotFields();
 	var rowFields = this.asc_getRowFields();
 	if (rowFields) {
-		for (var i = 0; i < rowFields.length; ++i) {
-			field = pivotFields[rowFields[i].asc_getIndex()];
-			if (false !== field.outline) {
+		var i;
+		for (i = 0; i < rowFields.length; ++i) {
+			if (false !== pivotFields[rowFields[i].asc_getIndex()].outline) {
 				this.clearGrid = true;
+				break;
 			}
-			if (false !== field.compact) {
-				this.hasCompact = true;
+		}
+		for (i = 0; i < pivotFields.length; ++i) {
+			if (false !== pivotFields[i].compact) {
+				this.hasCompactField = true;
+				break;
 			}
 		}
 	}
+};
+CT_pivotTableDefinition.prototype.hasCompact = function () {
+	return false !== this.compactData || this.hasCompactField;
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);
