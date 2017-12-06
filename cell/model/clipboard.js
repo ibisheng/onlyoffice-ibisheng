@@ -542,6 +542,11 @@
 
 					// ToDo multiselect ?
 					var selectionRange = activeRange ? activeRange : worksheet.model.selectionRange.getLast();
+					var maxRowCol = this._getRangeMaxRowCol(worksheet, selectionRange);
+					if(null !== maxRowCol){
+						selectionRange = new Asc.Range(selectionRange.c1, selectionRange.r1, maxRowCol.col, maxRowCol.row);
+					}
+
 					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, selectionRange);
 					sBase64 = "xslData;" + oBinaryFileWriter.Write();
                     pptx_content_writer.BinaryFileWriter.ClearIdMap();
@@ -550,7 +555,37 @@
 				
 				return sBase64;
 			},
-			
+
+			_getRangeMaxRowCol: function (worksheet, selectionRange, range3) {
+				var res = null;
+
+				//при выделенных столбцах ищем последнюю непустую ячейку
+				//ограничиваемся последней пустой строкой/столбцом
+				var type = selectionRange.getType();
+				if (type === Asc.c_oAscSelectionType.RangeCol || type === Asc.c_oAscSelectionType.RangeRow) {
+					if (!range3) {
+						range3 = worksheet.model.getRange3(selectionRange.r1, selectionRange.c1, selectionRange.r2,
+							selectionRange.c2);
+					}
+
+					//нужно вычислить последнюю ячейку в столбце, где есть данные
+					var maxRow = 0;
+					var maxCol = 0;
+					range3._foreachNoEmpty(function (cell) {
+						if (cell.nCol > maxCol) {
+							maxCol = cell.nCol;
+						}
+						if (cell.nRow > maxRow) {
+							maxRow = cell.nRow;
+						}
+					});
+
+					res = {col: maxCol, row: maxRow};
+				}
+
+				return res;
+			},
+
 			_getBinaryShapeContent : function(worksheet, isIntoShape)
 			{	
 				var sBase64;
@@ -805,7 +840,16 @@
 				}
 				else
 				{	
-					for (row = bbox.r1; row <= bbox.r2; ++row) 
+					var maxRow = bbox.r2;
+					var maxCol = bbox.c2;
+					var maxRowCol = this._getRangeMaxRowCol(worksheet, bbox, range);
+					if(null !== maxRowCol)
+					{
+						maxRow = maxRowCol.row;
+						maxCol = maxRowCol.col;
+					}
+
+					for (row = bbox.r1; row <= maxRow; ++row)
 					{
 						if(worksheet.model.bExcludeHiddenRows && worksheet.model.getRowHidden(row))
 						{
@@ -816,12 +860,14 @@
 						h = worksheet.model.getRowHeight(row);
 						if (h > 0) {tr.style.height = h + "pt";}
 
-						for (col = bbox.c1; col <= bbox.c2; ++col) 
+						for (col = bbox.c1; col <= maxCol; ++col)
 						{
 							if (skipMerged()) {continue;}
 
 							cell = worksheet.model.getCell3(row, col);
 							td = doc.createElement("TD");
+
+							//TODO добавить проверку null !== cell.getType() для пустых ячеек(после того как бранч солью)
 
 							mbbox = cell.hasMerged();
 							if (mbbox) {
