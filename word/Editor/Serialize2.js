@@ -14523,7 +14523,7 @@ function DocReadResult(doc) {
 	this.aTableCorrect = [];
 	this.footnotes = {};
 	this.footnoteRefs = [],
-	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : null;
+	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : {};
 	this.bookmarksStarted = {};
 };
 //---------------------------------------------------------export---------------------------------------------------
