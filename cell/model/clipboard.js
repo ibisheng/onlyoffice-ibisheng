@@ -567,7 +567,7 @@
 				var res = null;
 
 				//при выделенных столбцах ищем последнюю непустую ячейку
-				//при выделенных строках ищем последнюю непустую строку
+				//ограничиваемся последней пустой строкой/столбцом
 				var type = selectionRange.getType();
 				if (type === Asc.c_oAscSelectionType.RangeCol || type === Asc.c_oAscSelectionType.RangeRow) {
 					if (!range3) {
@@ -577,12 +577,9 @@
 
 					//нужно вычислить последнюю ячейку в столбце, где есть данные
 					var maxRow = 0;
-					var maxCol = selectionRange.c2;
-					if (type !== Asc.c_oAscSelectionType.RangeRow) {
-						maxCol = 0;
-					}
+					var maxCol = 0;
 					range3._foreachNoEmpty(function (cell) {
-						if (type !== Asc.c_oAscSelectionType.RangeRow && cell.nCol > maxCol) {
+						if (cell.nCol > maxCol) {
 							maxCol = cell.nCol;
 						}
 						if (cell.nRow > maxRow) {
