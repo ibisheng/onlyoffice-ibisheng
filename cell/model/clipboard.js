@@ -1047,7 +1047,16 @@
 				if(range)
 				{
 					var bbox = range.bbox;
-					
+
+					var maxRow = bbox.r2;
+					var maxCol = bbox.c2;
+					var maxRowCol = this._getRangeMaxRowCol(worksheet, bbox, range);
+					if(null !== maxRowCol)
+					{
+						maxRow = maxRowCol.row;
+						maxCol = maxRowCol.col;
+					}
+
 					var res = '';	
 					for (var row = bbox.r1; row <= bbox.r2; ++row) 
 					{
