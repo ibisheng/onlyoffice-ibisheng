@@ -3078,7 +3078,7 @@
 			_drawer.ImageHtml.src = _drawer.Image;
 			_drawer = null;
 		};
-		window["AscDesktopEditor"]["OpenFilenameDialog"]("filter");
+		window["AscDesktopEditor"]["OpenFilenameDialog"]("images");
 	};
 
 	CSignatureDrawer.prototype.isValid = function()

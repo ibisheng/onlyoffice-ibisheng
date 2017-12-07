@@ -242,6 +242,7 @@ window["UpdateInstallPlugins"] = function()
 	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	_editor.sendEvent("asc_onPluginsReset");
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
