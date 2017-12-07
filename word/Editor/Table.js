@@ -6741,7 +6741,7 @@ CTable.prototype.GetSelectedContent = function(SelectedContent)
 			TableGrid.splice(0, MinBefore);
 
 		// Формируем новую таблицу, по выделенно части.
-		var Table = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, TableGrid);
+		var Table = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, TableGrid, this.bPresentation);
 
 		// Копируем настройки
 		Table.Set_TableStyle(this.TableStyle);

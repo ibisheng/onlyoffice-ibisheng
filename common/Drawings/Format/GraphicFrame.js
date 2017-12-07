@@ -1121,6 +1121,104 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
            this.graphicObject.GetAllContentControls(arrContentControls);
        }
     };
+
+    CGraphicFrame.prototype.getCopyWithSourceFormatting = function(){
+        var ret = this.copy();
+        var oCopyTable = ret.graphicObject;
+        var oSourceTable = this.graphicObject;
+        var oTheme = this.Get_Theme();
+        var oColorMap = this.Get_ColorMap();
+        var RGBA;
+        if(oCopyTable && oSourceTable){
+            if(oSourceTable.CompiledPr.Pr && oSourceTable.CompiledPr.Pr.TablePr){
+                oCopyTable.Set_Pr(oSourceTable.CompiledPr.Pr.TablePr.Copy());
+                var oPr = oCopyTable.Pr;
+                if(oPr.TableBorders){
+                    if(oPr.TableBorders){
+                        if(oPr.TableBorders.Bottom && oPr.TableBorders.Bottom.Unifill){
+                            oPr.TableBorders.Bottom.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.Bottom.Unifill.getRGBAColor();
+                            oPr.TableBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr.TableBorders.Left && oPr.TableBorders.Left.Unifill){
+                            oPr.TableBorders.Left.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.Left.Unifill.getRGBAColor();
+                            oPr.TableBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr.TableBorders.Right && oPr.TableBorders.Right.Unifill){
+                            oPr.TableBorders.Right.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.Right.Unifill.getRGBAColor();
+                            oPr.TableBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr.TableBorders.Top && oPr.TableBorders.Top.Unifill){
+                            oPr.TableBorders.Top.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.Top.Unifill.getRGBAColor();
+                            oPr.TableBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr.TableBorders.InsideH && oPr.TableBorders.InsideH.Unifill){
+                            oPr.TableBorders.InsideH.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.InsideH.Unifill.getRGBAColor();
+                            oPr.TableBorders.InsideH.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr.TableBorders.InsideV && oPr.TableBorders.InsideV.Unifill){
+                            oPr.TableBorders.InsideV.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr.TableBorders.InsideV.Unifill.getRGBAColor();
+                            oPr.TableBorders.InsideV.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                    }
+                }
+            }
+            if(oCopyTable.Content.length === oSourceTable.Content.length){
+                for(var i = 0;  i < oCopyTable.Content.length; ++i){
+                    var aSourceCells = oSourceTable.Content[i].Content;
+                    var aCopyCells = oCopyTable.Content[i].Content;
+                    if(aSourceCells.length === aCopyCells.length){
+                        for(var j = 0; j < aSourceCells.length; ++j){
+                            var aSourceContent = aSourceCells[j].Content.Content;
+                            var aCopyContent = aCopyCells[j].Content.Content;
+                            AscFormat.SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap);
+                            if(aSourceCells[j].CompiledPr.Pr){
+                                aCopyCells[j].Set_Pr(aSourceCells[j].CompiledPr.Pr.Copy());
+                                var oPr = aCopyCells[j].Pr;
+                                if(oPr.Shd && oPr.Shd.Unifill){
+                                    if(oPr.Shd.Unifill){
+                                        oPr.Shd.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.Shd.Unifill.getRGBAColor();
+                                        oPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                }
+                                if(oPr.TableCellBorders){
+                                    if(oPr.TableCellBorders.Bottom && oPr.TableCellBorders.Bottom.Unifill){
+                                        oPr.TableCellBorders.Bottom.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Bottom.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+
+                                    if(oPr.TableCellBorders.Left && oPr.TableCellBorders.Left.Unifill){
+                                        oPr.TableCellBorders.Left.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Left.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                    if(oPr.TableCellBorders.Right && oPr.TableCellBorders.Right.Unifill){
+                                        oPr.TableCellBorders.Right.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Right.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                    if(oPr.TableCellBorders.Top && oPr.TableCellBorders.Top.Unifill){
+                                        oPr.TableCellBorders.Top.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Top.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return ret;
+    };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicFrame = CGraphicFrame;

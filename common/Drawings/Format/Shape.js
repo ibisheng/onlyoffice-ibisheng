@@ -5369,20 +5369,7 @@ CShape.prototype.getColumnNumber = function(){
             var oTheme = this.Get_Theme();
             var oColorMap = this.Get_ColorMap();
             if(this.txBody && this.txBody.content){
-                var aCopyContent = oCopy.txBody.content.Content;
-                var aSourceContent = this.txBody.content.Content;
-                if(aCopyContent.length === aSourceContent.length){
-                    for(var i = 0; i< aSourceContent.length; ++i){
-                        var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
-                        oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
-                        aCopyContent[i].Set_Pr(oPr);
-                        for(var j = 0; j < aCopyContent[i].Content.length; ++j){
-                            if(aCopyContent[i].Content[j] instanceof ParaRun && aCopyContent[i].Content[j].Pr){
-                                aCopyContent[i].Content[j].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap))
-                            }
-                        }
-                    }
-                }
+                SaveContentSourceFormatting(this.txBody.content.Content, oCopy.txBody.content.Content, oTheme, oColorMap)
             }
         }
         if(oCopy.isPlaceholder() && !this.recalcInfo.recalculateTransform){
@@ -5394,7 +5381,6 @@ CShape.prototype.getColumnNumber = function(){
                 oCopy.extY = this.extY;
                 AscFormat.CheckSpPrXfrm(oCopy, true);
             }
-
         }
         return oCopy;
     };
@@ -5580,6 +5566,30 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
     }
     return oTextPr;
 }
+
+function SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap) {
+    if(aCopyContent.length === aSourceContent.length){
+        var bMergeRunPr = (aCopyContent === aSourceContent);
+        for(var i = 0; i< aSourceContent.length; ++i){
+            var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
+            oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
+            aCopyContent[i].Set_Pr(oPr);
+            for(var j = 0; j < aCopyContent[i].Content.length; ++j){
+                if(aCopyContent[i].Content[j] instanceof ParaRun && aCopyContent[i].Content[j].Pr){
+                    if(bMergeRunPr){
+                        var oCoprPr = oPr.DefaultRunPr.Copy();
+                        oCoprPr.Merge(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
+                        aCopyContent[i].Content[j].Set_Pr(oCoprPr)
+                    }
+                    else {
+                        aCopyContent[i].Content[j].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
+                    }
+
+                }
+            }
+        }
+    }
+}
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;
@@ -5595,5 +5605,6 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
     window['AscFormat'].ConvertTableToGraphicFrame = ConvertTableToGraphicFrame;
     window['AscFormat'].CSignatureLine = CSignatureLine;
     window['AscFormat'].checkDrawingsTransformBeforePaste = checkDrawingsTransformBeforePaste;
+    window['AscFormat'].SaveContentSourceFormatting = SaveContentSourceFormatting;
 
 })(window);

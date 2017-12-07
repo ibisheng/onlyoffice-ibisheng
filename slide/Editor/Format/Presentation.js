@@ -1048,7 +1048,7 @@ CPresentation.prototype =
     createDefaultTableStyles: function()
     {
         //AscFormat.ExecuteNoHistory(function(){
-            this.globalTableStyles = new CStyles();
+            this.globalTableStyles = new CStyles(false);
             this.DefaultTableStyleId = CreatePresentationTableStyles(this.globalTableStyles, this.TableStylesIdMap);
         //}, this, []);
     },
@@ -4855,11 +4855,11 @@ CPresentation.prototype =
                                     oGraphicFrame.setGraphicObject(oTable);
                                     oTable.Set_Parent(oGraphicFrame);
                                     oEndFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame, oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
-                                    oSourceFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame, oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
-                                    oGraphicFrame.parent = this.Slides[this.CurPage];
+                                    oGraphicFrame.parent = oTargetTextObject.parent;
                                     oGraphicFrame.bDeleted = false;
                                     oGraphicFrame.recalculate();
-                                    oImage = oController.createImage(oGraphicFrame.getBase64Img(), 0, 0, oTargetTextObject.extX, oTargetTextObject,extY);
+                                    oSourceFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame.getCopyWithSourceFormatting(), oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
+                                    oImage = oController.createImage(oGraphicFrame.getBase64Img(), 0, 0, oTargetTextObject.extX, oTargetTextObject.extY);
                                     oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
                                     oGraphicFrame.parent = null;
                                     oGraphicFrame.bDeleted = true;
@@ -4875,6 +4875,14 @@ CPresentation.prototype =
                                     oEndFormattingContent.DocContent = oSelectedContent;
                                     oSelectedContent = new CSelectedContent();
                                     oDocContent.GetSelectedContent(oSelectedContent);
+                                    var aContent = [];
+                                    for(i = 0; i < oSelectedContent.Elements.length; ++i){
+                                        var oParagraph = oSelectedContent.Elements[i].Element;
+                                        oParagraph.Parent = oDocContent;
+                                        oParagraph.Internal_CompileParaPr();
+                                        aContent.push(oParagraph);
+                                    }
+                                    AscFormat.SaveContentSourceFormatting(aContent, aContent, oDocContent.Get_Theme(), oDocContent.Get_ColorMap());
                                     oSourceFormattingContent.DocContent = oSelectedContent;
                                     if(bNeedSelectAll){
                                         oDocContent.Set_ApplyToAll(false);
