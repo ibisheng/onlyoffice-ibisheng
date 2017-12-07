@@ -4944,7 +4944,7 @@ CPresentation.prototype =
                             collectSelectedObjects(aSpTree, oSourceFormattingContent.Drawings, bRecursive, oIdMap, true);
                             AscFormat.fResetConnectorsIds(oSourceFormattingContent.Drawings, oIdMap);
                             if(oController.selectedObjects[0]){
-                                oImage = oController.createImage(oController.selectedObjects[0].getBase64Img(), 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY);
+                                oImage = oController.createImage(oController.selectedObjects[0].getBase64Img(), oController.selectedObjects[0].bounds.x, oController.selectedObjects[0].bounds.y, oController.selectedObjects[0].bounds.w, oController.selectedObjects[0].bounds.h);
                                 oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oController.selectedObjects[0].extX, oController.selectedObjects[0].extY, oController.selectedObjects[0].getBase64Img()));
                             }
                         }
