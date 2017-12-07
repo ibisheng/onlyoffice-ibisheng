@@ -1593,7 +1593,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		if (!excludeHiddenRows) {
 			excludeHiddenRows = ws.isApplyFilterBySheet();
 		}
-		return excludeHiddenRows && this.isValid() && ws.getRowHidden(this.getRange().r1);
+		var _r = this.getRange();
+		return excludeHiddenRows && _r && ws.getRowHidden(_r.r1);
 	};
 
 	/**
@@ -1702,7 +1703,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		if (!excludeHiddenRows) {
 			excludeHiddenRows = ws.isApplyFilterBySheet();
 		}
-		return excludeHiddenRows && this.isValid() && ws.getRowHidden(_r.r1);
+		var _r = this.getRange();
+		return excludeHiddenRows && _r && ws.getRowHidden(_r.r1);
 	};
 
 	/**
@@ -4502,7 +4504,11 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 		return this.parent;
 	};
 	parserFormula.prototype.getFormula = function() {
-		return this.Formula;
+		if (g_cellFormulaState.isInit()) {
+			return this.assemble(true);
+		} else {
+			return this.Formula;
+		}
 	};
 	parserFormula.prototype.setFormulaString = function(formula) {
 		this.Formula = formula;
@@ -5663,7 +5669,7 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 		return res;
 	};
-	parserFormula.prototype.shiftCellsSharedPrepare = function(sheetId, bbox, offset) {
+	parserFormula.prototype.getSharedIntersect = function(sheetId, bbox) {
 		var ref;
 		var elem;
 		var bboxElem;
@@ -5682,8 +5688,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 			if (bboxElem) {
 				var sharedBBox = bboxElem.getSharedRangeBbox(this.shared.ref, this.shared.base);
-				var bboxShift = AscCommonExcel.shiftGetBBox(bbox, 0 !== offset.offsetCol);
-				var intersection = bboxShift.intersection(sharedBBox);
+				var intersection = bbox.intersection(sharedBBox);
 				if (intersection) {
 					var bboxSharedRef = sharedBBox.getSharedIntersect(this.shared.ref, intersection);
 					ref = ref ? bboxSharedRef.union(ref) : bboxSharedRef;

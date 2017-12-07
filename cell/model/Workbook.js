@@ -923,13 +923,11 @@
 		addToChangedShared: function(parsed) {
 			this.changedShared[parsed.getIndexNumber()] = parsed;
 		},
-		notifyChanged: function(listenersContainer) {
+		notifyChanged: function(changedFormulas) {
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
-			listenersContainer.forEach(function(listeners) {
-				for (var listenerId in listeners) {
-					listeners[listenerId].notify(notifyData);
-				}
-			});
+			for (var listenerId in changedFormulas) {
+				changedFormulas[listenerId].notify(notifyData);
+			}
 		},
 		//build, calc
 		buildDependency: function() {
@@ -976,6 +974,7 @@
 			}
 			this._broadcastCellsEnd();
 			this._calculateDirty();
+			this.updateSharedFormulas();
 			//copy cleanCellCache to prevent recursion in trigger("cleanCellCache")
 			var tmpCellCache = this.cleanCellCache;
 			this.cleanCellCache = {};
@@ -1029,6 +1028,8 @@
 					});
 					if (r1 <= r2 && c1 <= c2) {
 						parsed.setSharedRef(new Asc.Range(c1, r1, c2, r2));
+					} else {
+						parsed.removeDependencies();
 					}
 				}
 			}
@@ -1259,7 +1260,7 @@
 			}
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
-			var listenersContainer = [];
+			var listeners = {};
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				var bboxShift;
@@ -1276,7 +1277,10 @@
 						isIntersect = bbox.contains(g_FCI.col, g_FCI.row);
 					}
 					if (isIntersect) {
-						listenersContainer.push(sheetContainer.cellMap[cellIndex].listeners);
+						var cellMapElem = sheetContainer.cellMap[cellIndex];
+						for (var listenerId in cellMapElem.listeners) {
+							listeners[listenerId] = cellMapElem.listeners[listenerId];
+						}
 					}
 				}
 				for (var areaIndex in sheetContainer.areaMap) {
@@ -1287,17 +1291,17 @@
 						isIntersect = bbox.isIntersect(areaMapElem.bbox);
 					}
 					if (isIntersect) {
-						listenersContainer.push(areaMapElem.listeners);
+						for (var listenerId in areaMapElem.listeners) {
+							listeners[listenerId] = areaMapElem.listeners[listenerId];
+						}
 					}
 				}
 				var notifyData = {type: notifyType, sheetId: sheetId, bbox: bbox, offset: offset};
-				listenersContainer.forEach(function(listeners) {
-					for (var listenerId in listeners) {
-						listeners[listenerId].notify(notifyData);
-					}
-				});
+				for (var listenerId in listeners) {
+					listeners[listenerId].notify(notifyData);
+				}
 			}
-			return listenersContainer;
+			return listeners;
 		}
 	};
 
@@ -2034,7 +2038,7 @@
 		} else {
 			formulas = this.getAllFormulas();
 		}
-		this.dependencyFormulas.notifyChanged([formulas]);
+		this.dependencyFormulas.notifyChanged(formulas);
 		this.dependencyFormulas.calcTree();
 	};
 	Workbook.prototype.checkDefName = function (checkName, scope) {
@@ -3535,7 +3539,6 @@
 		this._forEachColData(function(sheetMemory) {
 			sheetMemory.deleteRange(start, (-nDif));
 		});
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
@@ -3580,7 +3583,6 @@
 				cell.clearDataKeepXf();
 			});
 		}
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
@@ -3640,7 +3642,6 @@
 			if(null != elem)
 				elem.moveHor(nDif);
 		}
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
@@ -3675,7 +3676,6 @@
 		this.getRange3(0, index, gc_nMaxRow0, index + count - 1)._foreachNoEmpty(function(cell) {
 			cell.clearDataKeepXf();
 		});
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
@@ -4554,8 +4554,6 @@
 				sheetMemoryTo.fill(0, oBBox.r1, oBBox.r2 + 1);
 			}
 		}
-		
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4584,8 +4582,6 @@
 				sheetMemory.deleteRange(nTop, -dif);
 			}
 		}
-		
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4633,8 +4629,6 @@
 				});
 			}
 		}
-		
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -4674,8 +4668,6 @@
 				cell.clearDataKeepXf();
 			});
 		}
-		
-		this.workbook.dependencyFormulas.updateSharedFormulas();
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
@@ -5764,13 +5756,11 @@
 		oNewCell.number = this.number;
 		oNewCell.text = this.text;
 		oNewCell.multiText = this.multiText;
-		if (null != this.formulaParsed) {
+		this.processFormula(function(parsed) {
 			//todo without parse
-			this.processFormula(function(parsed){
-				oNewCell.formulaParsed = new parserFormula(parsed.getFormula(), oNewCell, t.ws);
-				oNewCell.formulaParsed.parse();
-			});
-		}
+			oNewCell.formulaParsed = new parserFormula(parsed.getFormula(), oNewCell, t.ws);
+			oNewCell.formulaParsed.parse();
+		});
 		return oNewCell;
 	};
 	Cell.prototype.clone=function(oNewWs, renameParams){
@@ -5785,18 +5775,18 @@
 		oNewCell.number = this.number;
 		oNewCell.text = this.text;
 		oNewCell.multiText = this.multiText;
-		if (null != this.formulaParsed) {
+		this.processFormula(function(parsed) {
 			var newFormula;
 			if (oNewWs != this.ws && renameParams) {
-				var formula = this.formulaParsed.clone(null, null, this.ws);
+				var formula = parsed.clone(null, null, this.ws);
 				formula.renameSheetCopy(renameParams);
 				newFormula = formula.assemble(true);
 			} else {
-				newFormula = this.formulaParsed.getFormula();
+				newFormula = parsed.getFormula();
 			}
 			oNewCell.formulaParsed = new parserFormula(newFormula, oNewCell, oNewWs);
 			oNewWs.workbook.dependencyFormulas.addToBuildDependencyCell(oNewCell);
-		}
+		});
 		return oNewCell;
 	};
 	Cell.prototype.setRowCol=function(nRow, nCol){
@@ -7174,7 +7164,13 @@
 		var shared = parsed.getShared();
 		if ((AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
 				AscCommon.c_oNotifyType.Delete === data.type) && shared) {
-			var sharedShift = parsed.shiftCellsSharedPrepare(data.sheetId, data.bbox, data.offset);
+			var bboxShift;
+			if (AscCommon.c_oNotifyType.Shift === data.type) {
+				bboxShift = AscCommonExcel.shiftGetBBox(data.bbox, 0 !== data.offset.offsetCol);
+			} else {
+				bboxShift = data.bbox;
+			}
+			var sharedShift = parsed.getSharedIntersect(data.sheetId, bboxShift);
 			//todo !sharedShift.isEqual(shared.ref)
 			if (sharedShift) {
 				this._shiftCellsShared(shared, sharedShift, data, parsed);
@@ -7188,7 +7184,6 @@
 		var cellWithFormula;
 		var cellOffset = new AscCommonExcel.CRangeOffset();
 		var newFormula;
-		var shared = parsed.getShared();
 		this.ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
 			if (parsed === cell.getFormulaParsed()) {
 				if (!cellWithFormula) {
