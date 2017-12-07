@@ -3909,6 +3909,7 @@ PasteProcessor.prototype =
 					presentation.Insert_Content2(aContents, nIndex);
 
 					presentation.Recalculate();
+                    presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
 
 					//пока не показываю значок специальной вставки после copy/paste слайдов
