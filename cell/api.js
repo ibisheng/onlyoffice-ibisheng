@@ -3526,6 +3526,9 @@ var editor;
 		this._isLockedPivot(pivot.asc_getName(), changePivotStyle);
 	};
 
+	spreadsheet_api.prototype._selectSearchingResults = function () {
+	};
+
   /*
    * Export
    * -----------------------------------------------------------------------------
