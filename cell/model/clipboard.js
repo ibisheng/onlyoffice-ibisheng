@@ -1311,7 +1311,8 @@
 					}
 				}
 
-				var pasteObj = selectedContent2[0].content.SlideObjects ? selectedContent2[2] : selectedContent2[0];
+				var bSlideObjects = selectedContent2[0].content.SlideObjects && selectedContent2[0].content.SlideObjects.length > 0;
+				var pasteObj = bSlideObjects ? selectedContent2[2] : selectedContent2[0];
 				var arr_Images = pasteObj.images;
 				var fonts = pasteObj.fonts;
 				var content = pasteObj.content;
@@ -1379,6 +1380,21 @@
 					var arr_shapes = content.Drawings;
 					if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 					{
+						if(!bSlideObjects && content.Drawings.length === selectedContent2[1].content.Drawings.length)
+						{
+							var oEndContent = {
+                                Drawings: []
+                            };
+							var oSourceContent = {
+                                Drawings: []
+                            };
+							for(var i = 0; i < content.Drawings.length; ++i)
+							{
+								oEndContent.Drawings.push({Drawing: content.Drawings[i].graphicObject});
+                                oSourceContent.Drawings.push({Drawing: selectedContent2[1].content.Drawings[i].graphicObject});
+							}
+                            AscFormat.checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, null);
+						}
 						var newFonts = {};
 						for(var i = 0; i < arr_shapes.length; i++)
 						{

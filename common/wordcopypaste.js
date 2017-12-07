@@ -3726,6 +3726,7 @@ PasteProcessor.prototype =
 		}
 
 		var pasteObj = selectedContent2[0].content.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : selectedContent2[0];
+        var bSlideObjects = selectedContent2[0].content.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste && selectedContent2[0].content.SlideObjects.length > 0;
 		var arr_Images = pasteObj.images;
 		var fonts = pasteObj.fonts;
 		var content = pasteObj.content;
@@ -3745,9 +3746,14 @@ PasteProcessor.prototype =
 
 			var arr_shapes = content.Drawings;
 			var arrImages = pasteObj.images;
+            if(!bSlideObjects && content.Drawings.length === selectedContent2[1].content.Drawings.length)
+            {
+                AscFormat.checkDrawingsTransformBeforePaste(content, selectedContent2[1].content, null);
+            }
 			//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
 			if (!arrImages.length && arr_shapes.length === 1 && arr_shapes[0] && arr_shapes[0].Drawing &&
 				arr_shapes[0].Drawing.graphicObject) {
+
 				var drawing = arr_shapes[0].Drawing;
 
 				if (typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame) {

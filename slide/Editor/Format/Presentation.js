@@ -5215,39 +5215,7 @@ CPresentation.prototype =
                 oSourceContent = aContents[1];
                 if(oCurSlide && !this.FocusOnNotes && oSourceContent)
                 {
-                    for(i = 0; i < oContent.Drawings.length; ++i)
-                    {
-                        var shape = oContent.Drawings[i].Drawing;
-                        if(shape.isPlaceholder && shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
-                        {
-                            var oOldParent = shape.parent;
-                            shape.parent = oCurSlide;
-                            var hierarchy = shape.getHierarchy();
-                            for(j = 0; j < hierarchy.length; ++j)
-                            {
-                                if(hierarchy[j] && hierarchy[j].spPr && hierarchy[j].spPr.xfrm && hierarchy[j].spPr.xfrm.isNotNull())
-                                {
-                                    break;
-                                }
-                            }
-                            if(j === hierarchy.length)
-                            {
-                                if(oSourceContent.Drawings[i] && oSourceContent.Drawings[i].Drawing)
-                                {
-                                    var oSourceShape = oSourceContent.Drawings[i].Drawing;
-                                    if(oSourceShape && oSourceShape.spPr && oSourceShape.spPr.xfrm && oSourceShape.spPr.xfrm.isNotNull())
-                                    {
-                                        shape.x = oSourceShape.spPr.xfrm.offX;
-                                        shape.y = oSourceShape.spPr.xfrm.offY;
-                                        shape.extX = oSourceShape.spPr.xfrm.extX;
-                                        shape.extY = oSourceShape.spPr.xfrm.extY;
-                                        AscFormat.CheckSpPrXfrm(shape);
-                                    }
-                                }
-                            }
-                            shape.parent = oOldParent;
-                        }
-                    }
+                    AscFormat.checkDrawingsTransformBeforePaste(oContent, oSourceContent, oCurSlide);
                 }
             }
         }

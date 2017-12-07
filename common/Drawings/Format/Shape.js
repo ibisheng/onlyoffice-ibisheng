@@ -4069,7 +4069,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true  && !AscCommon.IsShapeToImageConverter)
     {
         var drawingObjects = this.getDrawingObjectsController();
-        if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
+        if (typeof editor !== "undefined" && editor && graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
         {
             if (global_MatrixTransformer.IsIdentity2(_transform))
             {
@@ -5493,6 +5493,44 @@ function getParaDrawing(oDrawing)
     return null;
 }
 
+function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempParent)
+{
+    var i, j;
+    for(i = 0; i < oEndContent.Drawings.length; ++i)
+    {
+        var shape = oEndContent.Drawings[i].Drawing;
+        if(shape.isPlaceholder && shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+        {
+            var oOldParent = shape.parent;
+            shape.parent = oTempParent;
+            var hierarchy = shape.getHierarchy();
+            for(j = 0; j < hierarchy.length; ++j)
+            {
+                if(hierarchy[j] && hierarchy[j].spPr && hierarchy[j].spPr.xfrm && hierarchy[j].spPr.xfrm.isNotNull())
+                {
+                    break;
+                }
+            }
+            if(j === hierarchy.length)
+            {
+                if(oSourceContent.Drawings[i] && oSourceContent.Drawings[i].Drawing)
+                {
+                    var oSourceShape = oSourceContent.Drawings[i].Drawing;
+                    if(oSourceShape && oSourceShape.spPr && oSourceShape.spPr.xfrm && oSourceShape.spPr.xfrm.isNotNull())
+                    {
+                        shape.x = oSourceShape.spPr.xfrm.offX;
+                        shape.y = oSourceShape.spPr.xfrm.offY;
+                        shape.extX = oSourceShape.spPr.xfrm.extX;
+                        shape.extY = oSourceShape.spPr.xfrm.extY;
+                        AscFormat.CheckSpPrXfrm(shape);
+                    }
+                }
+            }
+            shape.parent = oOldParent;
+        }
+    }
+}
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;
@@ -5507,4 +5545,6 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].ConvertGraphicFrameToWordTable = ConvertGraphicFrameToWordTable;
     window['AscFormat'].ConvertTableToGraphicFrame = ConvertTableToGraphicFrame;
     window['AscFormat'].CSignatureLine = CSignatureLine;
+    window['AscFormat'].checkDrawingsTransformBeforePaste = checkDrawingsTransformBeforePaste;
+
 })(window);
