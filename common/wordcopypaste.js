@@ -3730,6 +3730,7 @@ PasteProcessor.prototype =
 		var arr_Images = pasteObj.images;
 		var fonts = pasteObj.fonts;
 		var content = pasteObj.content;
+		var font_map = {};
 
 		if (content.DocContent) {
 
