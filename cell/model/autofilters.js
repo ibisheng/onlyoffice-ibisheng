@@ -2807,6 +2807,38 @@
 				return res;
 			},
 
+			checkTableAutoExpansion: function(range){
+				var worksheet = this.worksheet;
+				var res = false;
+
+				/*if(StopAutoExpandTables){
+					return;
+				}*/
+
+				if(worksheet.TableParts && worksheet.TableParts.length) {
+					for (var i = 0; i < worksheet.TableParts.length; i++) {
+						var table = worksheet.TableParts[i];
+						var ref = table.Ref;
+
+						if(ref.c2 + 1 === range.c1 && range.r1 >= ref.r1 && range.r1 <= ref.r2){
+							//вводим значение в ячейку справа от форматированной таблицы
+							if(this._isEmptyCellsRightRange(ref, range, true)){
+								res = {name: table.DisplayName, range: new Asc.Range(ref.c1, ref.r1, ref.c2 + 1, ref.r2)};
+							}
+							break;
+						} else if(!table.isTotalsRow() && ref.r2 + 1 === range.r1 && range.c1 >= ref.c1 && range.c1 <= ref.c2){
+							//вводим значение в ячейку снизу от форматированной таблицы
+							if(this._isEmptyCellsUnderRange(ref, range, true)){
+								res = {name: table.DisplayName, range: new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r2 + 1)};
+							}
+							break;
+						}
+					}
+				}
+
+				return res;
+			},
+
 			_convertTableStyleToStyle: function(table)
 			{
 				if(!table)
@@ -4947,7 +4979,7 @@
 				return res;
 			},
 			
-			_isEmptyCellsUnderRange: function(range)
+			_isEmptyCellsUnderRange: function(range, exception, checkFilter)
 			{
 				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
 				var cell, isEmptyCell, result = true;
@@ -4955,6 +4987,11 @@
 				
 				for(var i = range.c1; i <= range.c2; i++)
 				{
+					if(exception && exception.c1 === i && exception.r1 === range.r2 + 1)
+					{
+						continue;
+					}
+
 					cell = worksheet.getRange3(range.r2 + 1, i, range.r2 + 1, i);
 					isEmptyCell = cell.isEmptyText();
 					if(!isEmptyCell)
@@ -4962,8 +4999,51 @@
 						result = false;
 						break;
 					}
+					if(checkFilter)
+					{
+						var autoFilter = worksheet.AutoFilter;
+						if((autoFilter && autoFilter.Ref.containsRange(cell.bbox)) || this._isTablePartsContainsRange(cell.bbox))
+						{
+							result = false;
+							break;
+						}
+					}
 				}
 				
+				return result;
+			},
+
+			_isEmptyCellsRightRange: function(range, exception, checkFilter)
+			{
+				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
+				var cell, isEmptyCell, result = true;
+				var worksheet = this.worksheet;
+
+				for(var i = range.r1; i <= range.r2; i++)
+				{
+					if(exception && exception.r1 === i && exception.c1 === range.c2 + 1)
+					{
+						continue;
+					}
+
+					cell = worksheet.getRange3(i, range.c2 + 1, i, range.c2 + 1);
+					isEmptyCell = cell.isEmptyText();
+					if(!isEmptyCell)
+					{
+						result = false;
+						break;
+					}
+					if(checkFilter)
+					{
+						var autoFilter = worksheet.AutoFilter;
+						if((autoFilter && autoFilter.Ref.containsRange(cell.bbox)) || this._isTablePartsContainsRange(cell.bbox))
+						{
+							result = false;
+							break;
+						}
+					}
+				}
+
 				return result;
 			},
 			

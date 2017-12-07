@@ -273,7 +273,6 @@
 			this.r2 = r2;
 			this.refType1 = referenceType.R;
 			this.refType2 = referenceType.R;
-			this.type = c_oAscSelectionType.RangeCells;
 
 			return normalize ? this.normalize() : this;
 		}
@@ -298,7 +297,6 @@
 			var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
 			oRes.refType1 = this.refType1;
 			oRes.refType2 = this.refType2;
-			oRes.type = this.type;
 			return oRes;
 		};
 
@@ -806,18 +804,34 @@
 		};
 
 		Range.prototype.getAllRange = function () {
-			var result;
-			if (c_oAscSelectionType.RangeMax === this.type) {
+			var result, type = this.getType();
+			if (c_oAscSelectionType.RangeMax === type) {
 				result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-			} else if (c_oAscSelectionType.RangeCol === this.type) {
+			} else if (c_oAscSelectionType.RangeCol === type) {
 				result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
-			} else if (c_oAscSelectionType.RangeRow === this.type) {
+			} else if (c_oAscSelectionType.RangeRow === type) {
 				result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
 			} else {
 				result = this.clone();
 			}
 
 			return result;
+		};
+
+		Range.prototype.getType = function () {
+			var bRow = 0 === this.c1 && gc_nMaxCol0 === this.c2;
+			var bCol = 0 === this.r1 && gc_nMaxRow0 === this.r2;
+			var res;
+			if (bCol && bRow) {
+				res = c_oAscSelectionType.RangeMax;
+			} else if (bCol) {
+				res = c_oAscSelectionType.RangeCol;
+			} else if (bRow) {
+				res = c_oAscSelectionType.RangeRow;
+			} else {
+				res = c_oAscSelectionType.RangeCells;
+			}
+			return res;
 		};
 
 		Range.prototype.getSharedRange = function (sharedRef, c, r) {
@@ -1202,7 +1216,6 @@
 				Range.apply(this, arguments);
 			else
 				Range.call(this, 0, 0, 0, 0);
-			this.type = c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
@@ -1222,7 +1235,6 @@
 		};
 		ActiveRange.prototype.clone = function(){
 			var oRes = new ActiveRange(Range.prototype.clone.apply(this, arguments));
-			oRes.type = this.type;
 			oRes.startCol = this.startCol;
 			oRes.startRow = this.startRow;
 			return oRes;
@@ -1237,7 +1249,7 @@
 			if(bRes && arguments.length > 0)
 			{
 				var range = arguments[0];
-				bRes = this.type == range.type && this.startCol == range.startCol && this.startRow == range.startRow;
+				bRes = this.startCol == range.startCol && this.startRow == range.startRow;
 			}
 			return bRes;
 		};
@@ -1305,19 +1317,6 @@
 				this.startCol = this.c1;
 				this.startRow = this.r1;
 			}
-			//не меняем тип выделения, если это не выделение ячееек
-			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
-				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)
-			// {
-				// if(0 == this.r1 && 0 == this.c1 && gc_nMaxRow0 == this.r2 && gc_nMaxCol0 == this.c2)
-					// this.type = c_oAscSelectionType.RangeMax;
-				// else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
-					// this.type = c_oAscSelectionType.RangeCol;
-				// else if(0 == this.c1 && gc_nMaxCol0 == this.c2)
-					// this.type = c_oAscSelectionType.RangeRow;
-				// else
-					// this.type = c_oAscSelectionType.RangeCells;
-			// }
 		};
 
     /**
@@ -1543,18 +1542,6 @@
 					if (null == oCacheVal.activeRange) {
 						var oActiveRange = new ActiveRange(c1, r1, c2, r2);
 						oActiveRange.setAbs(r1Abs, c1Abs, r2Abs, c2Abs);
-
-						var bCol = 0 == r1 && gc_nMaxRow0 == r2;
-						var bRow = 0 == c1 && gc_nMaxCol0 == c2;
-						if (bCol && bRow) {
-							oActiveRange.type = c_oAscSelectionType.RangeMax;
-						} else if (bCol) {
-							oActiveRange.type = c_oAscSelectionType.RangeCol;
-						} else if (bRow) {
-							oActiveRange.type = c_oAscSelectionType.RangeRow;
-						} else {
-							oActiveRange.type = c_oAscSelectionType.RangeCells;
-						}
 						oActiveRange.startCol = oActiveRange.c1;
 						oActiveRange.startRow = oActiveRange.r1;
 						oCacheVal.activeRange = oActiveRange;
@@ -2348,6 +2335,19 @@
 		asc_CSelectionRangeValue.prototype.asc_getType = function () {return this.type;};
 		asc_CSelectionRangeValue.prototype.asc_getName = function () {return this.name;};
 
+		//передаём в меню для того, чтобы показать иконку опций авторавертывания таблиц
+		function asc_CAutoCorrectOptions(){
+			this.type = null;
+			this.options = [];
+			this.cellCoord = null;
+		}
+		asc_CAutoCorrectOptions.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CAutoCorrectOptions.prototype.asc_setOptions = function (val) {this.options = val;};
+		asc_CAutoCorrectOptions.prototype.asc_setCellCoord = function(val) { this.cellCoord = val; };
+		asc_CAutoCorrectOptions.prototype.asc_getType = function () {return this.type;};
+		asc_CAutoCorrectOptions.prototype.asc_getOptions = function () {return this.options;};
+		asc_CAutoCorrectOptions.prototype.asc_getCellCoord = function () {return this.cellCoord;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -2531,5 +2531,11 @@
 		prot = asc_CSelectionRangeValue.prototype;
 		prot["asc_getType"] = prot.asc_getType;
 		prot["asc_getName"] = prot.asc_getName;
+
+		window["Asc"]["asc_CAutoCorrectOptions"] = window["Asc"].asc_CAutoCorrectOptions = asc_CAutoCorrectOptions;
+		prot = asc_CAutoCorrectOptions.prototype;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getOptions"] = prot.asc_getOptions;
+		prot["asc_getCellCoord"] = prot.asc_getCellCoord;
 
 })(window);

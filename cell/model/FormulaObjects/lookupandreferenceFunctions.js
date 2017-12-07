@@ -138,6 +138,8 @@ function (window, undefined) {
 			sheetName = sheetName.cross(arguments[1]);
 		} else if (cElementType.array === sheetName.type) {
 			sheetName = sheetName.getElementRowCol(0, 0);
+		} else if (cElementType.cell === sheetName.type || cElementType.cell3D === sheetName.type) {
+			sheetName = sheetName.getValue();
 		}
 
 		rowNumber = rowNumber.tocNumber();
@@ -196,7 +198,7 @@ function (window, undefined) {
 				A1RefType), A1RefType);
 
 		return new cString(
-			(cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+			(cElementType.empty === sheetName.type) ? /*"!" +*/ strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
@@ -1066,6 +1068,10 @@ function (window, undefined) {
 		arg1.getWS()._getCellNoEmpty(r, c, function (cell) {
 			resVal = checkTypeCell(cell);
 		});
+		if(cElementType.empty === resVal.type){
+			resVal = new cNumber(0);
+		}
+
 		return resVal;
 	};
 	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {
@@ -1093,9 +1099,9 @@ function (window, undefined) {
 	};
 	VHLOOKUPCache.prototype._calculate = function (cacheArray, valueForSearching, lookup) {
 		var res = -1, i = 0, j, length = cacheArray.length, k, elem, val;
-		if ('' === valueForSearching && 0 !== length) {
+		/*if ('' === valueForSearching && 0 !== length) {
 			return cacheArray[0].i;
-		}
+		}*/
 
 		if (lookup) {
 			j = length - 1;

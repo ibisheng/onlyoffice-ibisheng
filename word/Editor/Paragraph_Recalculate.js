@@ -837,32 +837,37 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             var PrevElement = this.Get_DocumentPrev();
 
             if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
-                PrevElement = PrevElement.Get_DocumentPrev();
+			{
+				var PrevSectPr = PrevElement.Get_SectionPr();
+				var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
+				if (c_oAscSectionBreakType.Continuous === CurSectPr.Get_Type() && true === CurSectPr.Compare_PageSize(PrevSectPr))
+					PrevElement = PrevElement.Get_DocumentPrev();
+			}
 
-            if (0 !== CurPage && true !== this.Check_EmptyPages(CurPage - 1))
-            {
-                var EndLine = this.Pages[CurPage - 1].EndLine;
-                if (-1 !== EndLine && this.Lines[EndLine].Info & paralineinfo_BreakRealPage)
-                    isPageBreakOnPrevLine = true;
-            }
-            else if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
-            {
-                var bNeedPageBreak = true;
-                if (type_Paragraph === PrevElement.GetType() && undefined !== PrevElement.Get_SectionPr())
-                {
-                    var PrevSectPr = PrevElement.Get_SectionPr();
-                    var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-                    if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
-                        bNeedPageBreak = false;
-                }
+			if (0 !== CurPage && true !== this.Check_EmptyPages(CurPage - 1))
+			{
+				var EndLine = this.Pages[CurPage - 1].EndLine;
+				if (-1 !== EndLine && this.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+					isPageBreakOnPrevLine = true;
+			}
+			else if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
+			{
+				var bNeedPageBreak = true;
+				if (type_Paragraph === PrevElement.GetType() && undefined !== PrevElement.Get_SectionPr())
+				{
+					var PrevSectPr = PrevElement.Get_SectionPr();
+					var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
+					if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+						bNeedPageBreak = false;
+				}
 
-                if (true === bNeedPageBreak)
-                {
-                    var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
-                    if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
-                        isPageBreakOnPrevLine = true;
-                }
-            }
+				if (true === bNeedPageBreak)
+				{
+					var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
+					if (-1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+						isPageBreakOnPrevLine = true;
+				}
+			}
 
             // ColumnBreak для случая CurPage > 0 не разбираем здесь, т.к. он срабатывает автоматически
             if (0 === CurPage && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
@@ -2748,7 +2753,7 @@ CParagraphRecalculateStateWrap.prototype =
     {
 		this.Paragraph   = Paragraph;
 		this.Parent      = Paragraph.Parent;
-		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
+		this.TopDocument = Paragraph.Parent.GetTopDocumentContent();
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
 		this.InTable     = Paragraph.Parent.IsTableCellContent();

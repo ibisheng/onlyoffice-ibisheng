@@ -298,7 +298,8 @@
         Type: 2,
         Value: 3,
         Formula: 4,
-        RefRowCol: 5
+        RefRowCol: 5,
+        ValueText: 6
     };
     /** @enum */
     var c_oSerFormulaTypes =
@@ -3344,7 +3345,7 @@
 				//}
 
 				//сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
-				if (null != cellXfs || false == cell.isEmptyText()) {
+				if (null != cellXfs || false == cell.isNullText()) {
 					oThis.bs.WriteItem(c_oSerRowTypes.Cell, function () {
 						oThis.WriteCell(cell, nXfsId, nRow0 - excludedCount);
 					});
@@ -3555,43 +3556,48 @@
 				{
 					this.bs.WriteItem(c_oSerCellTypes.Style, function(){oThis.memory.WriteLong(nXfsId);});
 				}
-				var nCellType = cell.getType();
-				if(null != nCellType)
-				{
-					var nType = ECellTypeType.celltypeNumber;
-					switch(nCellType)
-					{
-						case CellValueType.Bool: nType = ECellTypeType.celltypeBool; break;
-						case CellValueType.Error: nType = ECellTypeType.celltypeError; break;
-						case CellValueType.Number: nType = ECellTypeType.celltypeNumber; break;
-						case CellValueType.String: nType = ECellTypeType.celltypeSharedString; break;
-					}
-					if(ECellTypeType.celltypeNumber != nType)
-						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
-				}
 				if (cell.isFormula()) {
 					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
 				}
-				if(!cell.isEmptyTextString())
+				if(!cell.isNullTextString())
 				{
-					var dValue = 0;
-					if(CellValueType.Error == nCellType || CellValueType.String == nCellType)
-					{
-						var textIndex = cell.getTextIndex();
-						if (null !== textIndex) {
-							dValue = this.oSharedStrings.strings[textIndex];
-							if (undefined === dValue) {
-								dValue = this.oSharedStrings.index++;
-								this.oSharedStrings.strings[textIndex] = dValue;
-							}
-						}
-					}
-					else
-					{
-						if(null != cell.number)
-							dValue = cell.number;
-					}
-					this.bs.WriteItem(c_oSerCellTypes.Value, function(){oThis.memory.WriteDouble2(dValue);});
+                    if (null != cell.formulaParsed && cell.isEmptyTextString()) {
+                        this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(ECellTypeType.celltypeStr);});
+                        this.bs.WriteItem(c_oSerCellTypes.ValueText, function(){oThis.memory.WriteString3("");});
+                    } else {
+                        var nCellType = cell.getType();
+                        if(null != nCellType)
+                        {
+                            var nType = ECellTypeType.celltypeNumber;
+                            switch(nCellType)
+                            {
+                                case CellValueType.Bool: nType = ECellTypeType.celltypeBool; break;
+                                case CellValueType.Error: nType = ECellTypeType.celltypeError; break;
+                                case CellValueType.Number: nType = ECellTypeType.celltypeNumber; break;
+                                case CellValueType.String: nType = ECellTypeType.celltypeSharedString; break;
+                            }
+                            if(ECellTypeType.celltypeNumber != nType)
+                                this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
+                        }
+                        var dValue = 0;
+                        if(CellValueType.Error == nCellType || CellValueType.String == nCellType)
+                        {
+                            var textIndex = cell.getTextIndex();
+                            if (null !== textIndex) {
+                                dValue = this.oSharedStrings.strings[textIndex];
+                                if (undefined === dValue) {
+                                    dValue = this.oSharedStrings.index++;
+                                    this.oSharedStrings.strings[textIndex] = dValue;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(null != cell.number)
+                                dValue = cell.number;
+                        }
+                        this.bs.WriteItem(c_oSerCellTypes.Value, function(){oThis.memory.WriteDouble2(dValue);});
+                    }
 				}
 			}
         };

@@ -210,9 +210,13 @@
 	};
 
 	var c_oAscRestrictionType = {
-		None : 0,
-		OnlyForms : 1,
-		OnlyComments : 2
+		None           : 0,
+		OnlyForms      : 1,
+		OnlyComments   : 2,
+		OnlySignatures : 3,
+		View           : 0xFF // Отличие данного ограничения от обычного ViewMode в том, что редактор открывается
+		                      // как полноценный редактор, просто мы запрещаем ЛЮБОЕ редактирование. А во ViewMode
+		                      // открывается именно просмотрщик.
 	};
 
 	// Режимы отрисовки
@@ -1711,9 +1715,11 @@
 	prot["Underscore"] = c_oAscTabLeader.Underscore;
 
 	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
-	prot['None'] = c_oAscRestrictionType.None;
-	prot['OnlyForms'] = c_oAscRestrictionType.OnlyForms;
-	prot['OnlyComments'] = c_oAscRestrictionType.OnlyComments;
+	prot['None']           = c_oAscRestrictionType.None;
+	prot['OnlyForms']      = c_oAscRestrictionType.OnlyForms;
+	prot['OnlyComments']   = c_oAscRestrictionType.OnlyComments;
+	prot['OnlySignatures'] = c_oAscRestrictionType.OnlySignatures;
+	prot['View']           = c_oAscRestrictionType.View;
 
     window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;

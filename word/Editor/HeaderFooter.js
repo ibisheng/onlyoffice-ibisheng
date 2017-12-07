@@ -1274,7 +1274,7 @@ CHeaderFooter.prototype.Update_PageCountElements = function(nPageCount)
 {
 	for (var nIndex = 0, nCount = this.PageCountElements.length; nIndex < nCount; ++nIndex)
 	{
-		this.PageCountElements[nIndex].Update_PageCount(nPageCount);
+		this.PageCountElements[nIndex].SetNumValue(nPageCount);
 	}
 };
 CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)

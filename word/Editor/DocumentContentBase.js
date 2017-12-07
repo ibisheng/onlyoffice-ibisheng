@@ -904,3 +904,25 @@ CDocumentContentBase.prototype.UpdateBookmarks = function(oManager)
 		this.Content[nIndex].UpdateBookmarks(oManager);
 	}
 };
+/**
+ * @param StartDocPos
+ * @param EndDocPos
+ * @constructor
+ */
+CDocumentContentBase.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
+{
+	this.RemoveSelection();
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.SetContentSelection(StartDocPos, EndDocPos, 0, 0, 0);
+
+	if (this.Parent && this.LogicDocument)
+	{
+		this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
+		this.LogicDocument.Selection.Use   = true;
+		this.LogicDocument.Selection.Start = false;
+	}
+};

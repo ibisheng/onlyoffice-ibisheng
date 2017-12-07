@@ -1612,7 +1612,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.FieldsManager = new CDocumentFieldsManager();
 
     // Класс, управляющий закладками
-	this.BookmarksManager = new CBookmarksManager(this);
+	if (typeof CBookmarksManager !== "undefined")
+		this.BookmarksManager = new CBookmarksManager(this);
 
     // Режим рецензирования
     this.TrackRevisions = false;
@@ -2001,9 +2002,9 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
 
-                if (Para.Parent && Para.Parent.Get_TopDocumentContent)
+                if (Para.Parent && Para.Parent.GetTopDocumentContent)
 				{
-					var oTopDocument = Para.Parent.Get_TopDocumentContent();
+					var oTopDocument = Para.Parent.GetTopDocumentContent();
 					if (oTopDocument instanceof CFootEndnote)
 						oTopDocument.OnFastRecalculate();
 				}
@@ -2049,9 +2050,9 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
                 History.Reset_RecalcIndex();
                 this.private_UpdateCursorXY(true, true);
 
-                if (SimplePara.Parent && SimplePara.Parent.Get_TopDocumentContent)
+                if (SimplePara.Parent && SimplePara.Parent.GetTopDocumentContent)
 				{
-					var oTopDocument = SimplePara.Parent.Get_TopDocumentContent();
+					var oTopDocument = SimplePara.Parent.GetTopDocumentContent();
 					if (oTopDocument instanceof CFootEndnote)
 						oTopDocument.OnFastRecalculate();
 				}
@@ -4574,6 +4575,10 @@ CDocument.prototype.MoveCursorToCell = function(bNext)
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
+};
+CDocument.prototype.MoveCursorToSignature = function(sGuid)
+{
+    this.DrawingObjects.moveCursorToSignature(sGuid);
 };
 CDocument.prototype.SetParagraphAlign = function(Align)
 {
@@ -7601,7 +7606,7 @@ CDocument.prototype.Get_Numbering = function()
 };
 CDocument.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
 {
-	var TopDocument = this.Get_TopDocumentContent();
+	var TopDocument = this.GetTopDocumentContent();
 	return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
 };
 CDocument.prototype.Get_Styles = function()
@@ -9520,7 +9525,7 @@ CDocument.prototype.Get_SectionPageNumInfo2 = function(Page_abs)
 		Page_abs = FP;
 
 	var _FP = PageNumStart;
-	var _CP = PageNumStart + Page_abs - FP;
+	var _CP = PageNumStart + (Page_abs + 1) - FP; // + 1 потому что FP начинает считать от 1, а Page_abs от 0
 
 	return {FirstPage : _FP, CurPage : _CP, SectIndex : StartSectIndex};
 };
@@ -9804,37 +9809,6 @@ CDocument.prototype.GetTopElement = function()
 {
 	return null;
 };
-CDocument.prototype.private_StartSelectionFromCurPos = function()
-{
-	this.private_UpdateCursorXY(true, true);
-	var CurPara = this.GetCurrentParagraph();
-
-	if (null !== CurPara)
-	{
-		var MouseEvent = new AscCommon.CMouseEventHandler();
-
-		MouseEvent.ClickCount = 1;
-		MouseEvent.Type       = AscCommon.g_mouse_event_type_down;
-
-		var X = CurPara.CurPos.RealX;
-		var Y = CurPara.CurPos.RealY;
-
-		var DrawMatrix = CurPara.Get_ParentTextTransform();
-		if (DrawMatrix)
-		{
-			var _X = DrawMatrix.TransformPointX(X, Y);
-			var _Y = DrawMatrix.TransformPointY(X, Y);
-
-			X = _X;
-			Y = _Y;
-		}
-
-		this.CurPage = CurPara.Get_CurrentPage_Absolute();
-		this.Selection_SetStart(X, Y, MouseEvent);
-		MouseEvent.Type = AscCommon.g_mouse_event_type_move;
-		this.Selection_SetEnd(X, Y, MouseEvent);
-	}
-};
 CDocument.prototype.private_StopSelection = function()
 {
 	this.Selection.Start = false;
@@ -10041,6 +10015,24 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 					{
 						this.CurPage = NewPage;
 						StartY -= 0.1;
+
+						if (StartY < 0)
+						{
+							// Защита от полностью пустой страницы
+							if (0 === this.CurPage)
+							{
+								Result = false;
+								bBreak = true;
+								break;
+							}
+							else
+							{
+								this.CurPage--;
+								StartY = this.Pages[this.CurPage].Height;
+
+								NewPage = this.CurPage;
+							}
+						}
 					}
 					else
 					{
@@ -10563,16 +10555,6 @@ CDocument.prototype.GetDocumentPositionFromObject = function(PosArray)
 
 	return PosArray;
 };
-CDocument.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
-{
-	this.RemoveSelection();
-
-	this.Selection.Use   = true;
-	this.Selection.Start = false;
-	this.Selection.Flag  = selectionflag_Common;
-
-	this.SetContentSelection(StartDocPos, EndDocPos, 0, 0, 0);
-};
 CDocument.prototype.Get_CursorLogicPosition = function()
 {
 	var nDocPosType = this.Get_DocPosType();
@@ -11058,7 +11040,7 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
 		}
 	}
 };
-CDocument.prototype.Get_TopDocumentContent = function()
+CDocument.prototype.GetTopDocumentContent = function()
 {
 	return this;
 };
@@ -12629,7 +12611,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
-		this.private_StartSelectionFromCurPos();
+		this.StartSelectionFromCurPos();
 	}
 
 	this.private_UpdateCursorXY(false, true);
@@ -12651,7 +12633,7 @@ CDocument.prototype.controller_MoveCursorDown = function(AddToSelect)
 	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
-		this.private_StartSelectionFromCurPos();
+		this.StartSelectionFromCurPos();
 	}
 
 	this.private_UpdateCursorXY(false, true);
@@ -15688,6 +15670,16 @@ CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();
 };
+CDocument.prototype.CallSignatureDblClickEvent = function(sGuid)
+{
+    var ret = [], allSpr = [];
+    allSpr = allSpr.concat(allSpr.concat(this.DrawingObjects.getAllSignatures2(ret, this.DrawingObjects.getDrawingArray())));
+    for(var i = 0; i < allSpr.length; ++i){
+        if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
+            this.Api.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
+        }
+    }
+};
 CDocument.prototype.SetCheckContentControlsLock = function(isLocked)
 {
 	this.CheckContentControlsLock = isLocked;
@@ -15704,9 +15696,21 @@ CDocument.prototype.IsViewMode = function()
 {
 	return this.Api.isViewMode;
 };
+CDocument.prototype.IsEditSignaturesMode = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+};
+CDocument.prototype.IsViewModeInEditor = function()
+{
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+};
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsFillingFormMode())
+	if (this.IsViewMode()
+		|| this.IsEditCommentsMode()
+		|| this.IsFillingFormMode()
+		|| this.IsEditSignaturesMode()
+		|| this.IsViewModeInEditor())
 		return false;
 
 	return true;
@@ -16072,6 +16076,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
 		this.Recalculate();
 	}
+};
+CDocument.prototype.GetPagesCount = function()
+{
+	return this.Pages.length;
 };
 
 function CDocumentSelectionState()

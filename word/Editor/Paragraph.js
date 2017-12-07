@@ -2729,13 +2729,14 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Selection.Use      = true;
 				this.Selection.Start    = false;
 				this.Selection.Flag     = selectionflag_Common;
-				this.Selection.StartPos = ContentPos;
-				this.Selection.EndPos   = ContentPos;
 
-				this.Correct_Content(ContentPos, ContentPos);
+				// TODO: Это плохой код, внутри классов должен выставляться селект целиком
+				//       надо посмотреть для чего это было сделано
 
-				this.Document_SetThisElementCurrent(false);
-
+				//this.Selection.StartPos = ContentPos;
+				//this.Selection.EndPos   = ContentPos;
+				//this.Correct_Content(ContentPos, ContentPos);
+				//this.Document_SetThisElementCurrent(false);
 				return true;
 			}
 
@@ -13852,8 +13853,8 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                this.Content[Index2++] = Item.SaveRecalculateObject(Copy);
+			if (para_PageNum === Item.Type || para_Drawing === Item.Type || para_FieldChar === Item.Type)
+				this.Content[Index2++] = Item.SaveRecalculateObject(Copy);
         }
     },
 
@@ -13864,8 +13865,8 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                Item.LoadRecalculateObject( this.Content[Index2++] );
+			if (para_PageNum === Item.Type || para_Drawing === Item.Type || para_FieldChar === Item.Type)
+				Item.LoadRecalculateObject(this.Content[Index2++]);
         }
     },
 

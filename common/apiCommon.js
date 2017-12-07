@@ -103,6 +103,15 @@
 		return ret;
 	}
 
+	function CreateGUID()
+	{
+		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
+
+		var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
+		val = val.toUpperCase();
+		return val;
+	}
+
 	var c_oLicenseResult = {
 		Error       : 1,
 		Expired     : 2,
@@ -142,7 +151,36 @@
 		this.valid = 0;
 
 		this.image = "";
+
+		this.date = "";
+		this.isvisible = false;
+		this.isrequested = false;
 	}
+	asc_CSignatureLine.prototype.correct = function()
+	{
+		if (this.id == null)
+			this.id = "0";
+		if (this.guid == null)
+			this.guid = "";
+		if (this.signer1 == null)
+			this.signer1 = "";
+		if (this.signer2 == null)
+			this.signer2 = "";
+		if (this.email == null)
+			this.email = "";
+		if (this.instructions == null)
+			this.instructions = "";
+		if (this.showDate == null)
+			this.showDate = false;
+		if (this.valid == null)
+			this.valid = 0;
+		if (this.image == null)
+			this.image = "";
+		if (this.date == null)
+			this.date = "";
+		if (this.isvisible == null)
+			this.isvisible = false;
+	};
 	asc_CSignatureLine.prototype.asc_getId = function(){ return this.id; };
 	asc_CSignatureLine.prototype.asc_setId = function(v){ this.id = v; };
 	asc_CSignatureLine.prototype.asc_getGuid = function(){ return this.guid; };
@@ -159,6 +197,12 @@
 	asc_CSignatureLine.prototype.asc_setShowDate = function(v){ this.showDate = v; };
 	asc_CSignatureLine.prototype.asc_getValid = function(){ return this.valid; };
 	asc_CSignatureLine.prototype.asc_setValid = function(v){ this.valid = v; };
+	asc_CSignatureLine.prototype.asc_getDate = function(){ return this.date; };
+	asc_CSignatureLine.prototype.asc_setDate = function(v){ this.date = v; };
+	asc_CSignatureLine.prototype.asc_getVisible = function(){ return this.isvisible; };
+	asc_CSignatureLine.prototype.asc_setVisible = function(v){ this.isvisible = v; };
+	asc_CSignatureLine.prototype.asc_getRequested = function(){ return this.isrequested; };
+	asc_CSignatureLine.prototype.asc_setRequested = function(v){ this.isrequested = v; };
 
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
@@ -1971,6 +2015,7 @@
 
         this.columnNumber = null;
         this.columnSpace = null;
+        this.signatureId = null;
 	}
 
 	asc_CShapeProperty.prototype = {
@@ -2057,6 +2102,14 @@
 
 		asc_putColumnSpace: function(v){
 			this.columnSpace = v;
+		},
+
+		asc_getSignatureId: function(){
+			return this.signatureId;
+		},
+
+		asc_putSignatureId: function(v){
+			this.signatureId = v;
 		}
 	};
 
@@ -3596,6 +3649,12 @@
 	prot["asc_setShowDate"] = prot.asc_setShowDate;
 	prot["asc_getValid"] = prot.asc_getValid;
 	prot["asc_setValid"] = prot.asc_setValid;
+	prot["asc_getDate"] = prot.asc_getDate;
+	prot["asc_setDate"] = prot.asc_setDate;
+	prot["asc_getVisible"] = prot.asc_getVisible;
+	prot["asc_setVisible"] = prot.asc_setVisible;
+	prot["asc_getRequested"] = prot.asc_getRequested;
+	prot["asc_setRequested"] = prot.asc_setRequested;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
@@ -3995,6 +4054,8 @@
 	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
 	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
+	prot["get_SignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
+	prot["put_SignatureId"] = prot["asc_putSignatureId"] = prot.asc_putSignatureId;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
@@ -4281,6 +4342,8 @@
     prot["get_Word"] = prot.get_Word;
     prot["get_Checked"] = prot.get_Checked;
     prot["get_Variants"] = prot.get_Variants;
+
+    window["AscCommon"].CreateGUID = CreateGUID;
 
     window["AscCommon"].CWatermarkOnDraw = CWatermarkOnDraw;
 })(window);

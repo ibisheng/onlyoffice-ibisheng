@@ -53,15 +53,52 @@ function ParaFieldChar(Type, LogicDocument)
 	this.X             = 0;
 	this.Y             = 0;
 	this.PageAbs       = 0;
+
+	this.FontKoef      = 1;
+	this.NumWidths     = [];
+	this.Widths        = [];
+	this.String        = "";
+	this.NumValue      = null;
 }
 ParaFieldChar.prototype = Object.create(CRunElementBase.prototype);
 ParaFieldChar.prototype.constructor = ParaFieldChar;
 ParaFieldChar.prototype.Type = para_FieldChar;
+ParaFieldChar.prototype.Copy = function()
+{
+	return new ParaFieldChar(this.CharType, this.LogicDocument);
+};
 ParaFieldChar.prototype.Measure = function(Context, TextPr)
 {
+	if (this.IsSeparate())
+	{
+		this.FontKoef = TextPr.Get_FontKoef();
+		Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+
+		for (var Index = 0; Index < 10; Index++)
+		{
+			this.NumWidths[Index] = Context.Measure("" + Index).Width;
+		}
+
+		this.private_UpdateWidth();
+	}
 };
 ParaFieldChar.prototype.Draw = function(X, Y, Context)
 {
+	if (this.IsSeparate() && null !== this.NumValue)
+	{
+		var Len = this.String.length;
+
+		var _X = X;
+		var _Y = Y;
+
+		Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+		for (var Index = 0; Index < Len; Index++)
+		{
+			var Char = this.String.charAt(Index);
+			Context.FillText(_X, _Y, Char);
+			_X += this.Widths[Index];
+		}
+	}
 };
 ParaFieldChar.prototype.IsBegin = function()
 {
@@ -131,6 +168,68 @@ ParaFieldChar.prototype.GetPage = function()
 {
 	return this.PageAbs;
 };
+ParaFieldChar.prototype.GetTopDocumentContent = function()
+{
+	if (!this.Run)
+		return null;
+
+	var oParagraph = this.Run.GetParagraph();
+	if (!oParagraph)
+		return null;
+
+	return oParagraph.Parent.GetTopDocumentContent();
+};
+/**
+ * Специальная функция для работы с полями PAGE NUMPAGES в колонтитулах
+ * @param nValue
+ */
+ParaFieldChar.prototype.SetNumValue = function(nValue)
+{
+	this.NumValue = nValue;
+	this.private_UpdateWidth();
+};
+ParaFieldChar.prototype.private_UpdateWidth = function()
+{
+	if (null === this.NumValue)
+		return;
+
+	this.String = "" + this.NumValue;
+
+	var RealWidth = 0;
+	for (var Index = 0, Len = this.String.length; Index < Len; Index++)
+	{
+		var Char = parseInt(this.String.charAt(Index));
+
+		this.Widths[Index] = this.NumWidths[Char];
+		RealWidth += this.NumWidths[Char];
+	}
+
+	RealWidth = (RealWidth * TEXTWIDTH_DIVIDER) | 0;
+
+	this.Width        = RealWidth;
+	this.WidthVisible = RealWidth;
+};
+ParaFieldChar.prototype.IsNumValue = function()
+{
+	return (this.IsSeparate() && null !== this.NumValue ? true : false);
+};
+ParaFieldChar.prototype.SaveRecalculateObject = function(Copy)
+{
+	return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
+};
+ParaFieldChar.prototype.LoadRecalculateObject = function(RecalcObj)
+{
+	this.Widths = RecalcObj.Widths;
+	this.String = RecalcObj.String;
+
+	this.Width        = RecalcObj.Width;
+	this.WidthVisible = this.Width;
+};
+ParaFieldChar.prototype.PrepareRecalculateObject = function()
+{
+	this.Widths = [];
+	this.String = "";
+};
 
 function ParaInstrText(value)
 {
@@ -144,6 +243,10 @@ function ParaInstrText(value)
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
 ParaInstrText.prototype.Type = para_InstrText;
+ParaInstrText.prototype.Copy = function()
+{
+	return new ParaInstrText(String.fromCharCode(this.Value));
+};
 ParaInstrText.prototype.Measure = function(Context, TextPr)
 {
 };
@@ -256,6 +359,7 @@ CComplexField.prototype.Update = function()
 
 	switch (this.Instruction.GetType())
 	{
+		case fieldtype_PAGE:
 		case fieldtype_PAGENUM:
 			this.private_UpdatePAGE();
 			break;
@@ -265,6 +369,11 @@ CComplexField.prototype.Update = function()
 		case fieldtype_PAGEREF:
 			this.private_UpdatePAGEREF();
 			break;
+		case fieldtype_NUMPAGES:
+		case fieldtype_PAGECOUNT:
+			this.private_UpdateNUMPAGES();
+			break;
+
 	}
 
 	this.LogicDocument.Recalculate();
@@ -278,8 +387,6 @@ CComplexField.prototype.private_UpdatePAGE = function()
 	var nPage     = oParagraph.GetPageByLine(nLine);
 	var nPageAbs  = oParagraph.Get_AbsolutePage(nPage) + 1;
 	// TODO: Тут надо рассчитывать значение исходя из настроек секции
-
-	this.LogicDocument.Create_NewHistoryPoint();
 
 	var sValue = "" + nPageAbs;
 	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
@@ -479,9 +586,19 @@ CComplexField.prototype.private_UpdatePAGEREF = function()
 		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
 	}
 };
+CComplexField.prototype.private_UpdateNUMPAGES = function()
+{
+	var sValue = "" + this.LogicDocument.GetPagesCount();
+	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
+	{
+		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
+	}
+};
 CComplexField.prototype.private_SelectFieldValue = function()
 {
-	var oDocument = this.LogicDocument;
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
 
 	var oRun = this.SeparateChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
@@ -497,7 +614,9 @@ CComplexField.prototype.private_SelectFieldValue = function()
 };
 CComplexField.prototype.private_SelectFieldCode = function()
 {
-	var oDocument = this.LogicDocument;
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
 
 	var oRun = this.BeginChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
@@ -510,6 +629,37 @@ CComplexField.prototype.private_SelectFieldCode = function()
 	var oEndPos = oDocument.GetContentPosition(false);
 
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
+CComplexField.prototype.SelectField = function()
+{
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.EndChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.RemoveSelection();
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+};
+CComplexField.prototype.GetTopDocumentContent = function()
+{
+	if (!this.BeginChar || !this.SeparateChar || !this.EndChar)
+		return;
+
+	var oTopDocument = this.BeginChar.GetTopDocumentContent();
+
+	if (oTopDocument !== this.EndChar.GetTopDocumentContent() || oTopDocument !== this.SeparateChar.GetTopDocumentContent())
+		return null;
+
+	return oTopDocument;
 };
 CComplexField.prototype.IsUse = function()
 {
@@ -576,7 +726,7 @@ CComplexField.prototype.IsHidden = function()
 
 	var oInstruction = this.GetInstruction();
 
-	return (oInstruction && fieldtype_ASK === oInstruction.GetType()) ? true : false;
+	return (oInstruction && (fieldtype_ASK === oInstruction.GetType() || (this.SeparateChar.IsNumValue() && (fieldtype_NUMPAGES === oInstruction.GetType() || fieldtype_PAGE === oInstruction.GetType())))) ? true : false;
 };
 
 function TEST_ADDFIELD(sInstruction)

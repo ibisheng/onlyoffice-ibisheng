@@ -161,6 +161,7 @@
     this.lastSendInfoRange = null;
     this.oSelectionInfo = null;
     this.canUpdateAfterShiftUp = false;	// Нужно ли обновлять информацию после отпускания Shift
+    this.keepType = false;
 
     //----- declaration -----
     this.canvas = undefined;
@@ -230,16 +231,13 @@
     this.defaultFont = new asc.FontProperties(this.model.getDefaultFont(), this.model.getDefaultSize());
     //-----------------------
 
-    this.m_dScrollY = 0;
-    this.m_dScrollX = 0;
-    this.m_dScrollY_max = 1;
-    this.m_dScrollX_max = 1;
-
     this.MobileTouchManager = null;
 
     this.defNameAllowCreate = true;
 
     this._init(fontRenderingMode);
+
+    this.autoCorrectStore = null;//объект для хранения параметров иконки авторазвертывания таблиц
 
     return this;
   }
@@ -321,8 +319,6 @@
 		  this.controller.init(this, this.element, /*this.canvasOverlay*/ this.canvasGraphicOverlay, /*handlers*/{
 			  "resize": function () {
 				  self.resize.apply(self, arguments);
-			  }, "reinitializeScroll": function () {
-				  self._onScrollReinitialize.apply(self, arguments);
 			  }, "scrollY": function () {
 				  self._onScrollY.apply(self, arguments);
 			  }, "scrollX": function () {
@@ -368,8 +364,10 @@
 				  return ret;
 			  }, "enterCellRange": function () {
 				  self.lockDraw = true;
+				  self.skipHelpSelector = true;
 				  self.cellEditor.setFocus(false);
 				  self.getWorksheet().enterCellRange(self.cellEditor);
+				  self.skipHelpSelector = false;
 				  self.lockDraw = false;
 			  }, "undo": function () {
 				  self.undo.apply(self, arguments);
@@ -668,11 +666,11 @@
 		  "getViewerMode": function () {
 			  return self.controller.getViewerMode ? self.controller.getViewerMode() : true;
 		  }, "reinitializeScroll": function () {
-			  self.controller.reinitializeScroll(/*All*/);
+			  self._onScrollReinitialize(/*All*/);
 		  }, "reinitializeScrollY": function () {
-			  self.controller.reinitializeScroll(/*vertical*/1);
+			  self._onScrollReinitialize(/*vertical*/1);
 		  }, "reinitializeScrollX": function () {
-			  self.controller.reinitializeScroll(/*horizontal*/2);
+			  self._onScrollReinitialize(/*horizontal*/2);
 		  }, "selectionChanged": function () {
 			  self._onWSSelectionChanged();
 		  }, "selectionNameChanged": function () {
@@ -722,6 +720,8 @@
 			  }
 		  }, 'checkLastWork': function () {
 			  self.Api.checkLastWork();
+		  }, "toggleAutoCorrectOptions": function (bIsShow, val) {
+		      self.toggleAutoCorrectOptions(bIsShow, val);
 		  }
 	  });
 
@@ -741,7 +741,7 @@
       var wsModel = self.model.getWorksheetById(wsId), index;
       if (wsModel) {
         index = wsModel.getIndex();
-        self.showWorksheet(index, false, true);
+        self.showWorksheet(index, true);
         self.handlers.trigger("asc_onActiveSheetChanged", index);
       }
     });
@@ -845,7 +845,9 @@
 		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
 	  }
     });
-
+	this.model.handlers.add("toggleAutoCorrectOptions", function(bIsShow, val) {
+		self.toggleAutoCorrectOptions(bIsShow, val);
+	});
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
       collaborativeEditing: this.collaborativeEditing,
@@ -922,22 +924,23 @@
   };
 
 
-  WorkbookView.prototype._onScrollReinitialize = function(whichSB, callback) {
-    var ws = this.getWorksheet(), vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined, hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
+	WorkbookView.prototype._onScrollReinitialize = function (whichSB, endScroll) {
+		if (window["NATIVE_EDITOR_ENJINE"]) {
+			return;
+		}
 
-    if (vsize != undefined) {
-      this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
-    }
-    if (hsize != undefined) {
-      this.m_dScrollX_max = Math.max(this.controller.settings.hscrollStep * (hsize + 1), 1);
-    }
+		var ws = this.getWorksheet();
+		if (!whichSB || 2 === whichSB) {
+			this.controller.reinitScrollX(ws.getFirstVisibleCol(true), ws.getHorizontalScrollRange(), endScroll);
+		}
+		if (!whichSB || 1 === whichSB) {
+			this.controller.reinitScrollY(ws.getFirstVisibleRow(true), ws.getVerticalScrollRange(), endScroll);
+		}
 
-    asc_applyFunction(callback, vsize, hsize);
-
-	if (this.Api.isMobileVersion) {
-	  this.MobileTouchManager.Resize();
-	}
-  };
+		if (this.Api.isMobileVersion) {
+			this.MobileTouchManager.Resize();
+		}
+	};
 
   WorkbookView.prototype._onScrollY = function(pos) {
     var ws = this.getWorksheet();
@@ -987,19 +990,21 @@
     }
   };
 
-  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isSelectMode, isCtrl, callback) {
+  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isCtrl, callback) {
     var ws = this.getWorksheet();
-    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isSelectMode, isCtrl) :
-      ws.changeSelectionEndPoint(dc, dr, isCoord, isSelectMode);
-    if (!isCoord && !isStartPoint && !isSelectMode) {
+    var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isCtrl) :
+      ws.changeSelectionEndPoint(dc, dr, isCoord, isCoord && this.keepType);
+    if (!isCoord && !isStartPoint) {
       // Выделение с зажатым shift
       this.canUpdateAfterShiftUp = true;
     }
+    this.keepType = isCoord;
     asc_applyFunction(callback, d);
   };
 
   // Окончание выделения
   WorkbookView.prototype._onChangeSelectionDone = function(x, y) {
+  	this.keepType = false;
     if (c_oAscSelectionDialogType.None !== this.selectionDialogType) {
       return;
     }
@@ -1461,12 +1466,12 @@
 
   WorkbookView.prototype._onAddColumn = function() {
     var res = this.getWorksheet().expandColsOnScroll(true);
-    this.controller.reinitializeScroll(/*horizontal*/2, !res);
+    this._onScrollReinitialize(/*horizontal*/2, !res);
   };
 
   WorkbookView.prototype._onAddRow = function() {
     var res = this.getWorksheet().expandRowsOnScroll(true);
-    this.controller.reinitializeScroll(/*vertical*/1, !res);
+    this._onScrollReinitialize(/*vertical*/1, !res);
   };
 
   WorkbookView.prototype._onShowNextPrevWorksheet = function(direction) {
@@ -1576,23 +1581,38 @@
     return ws;
   };
 
+	WorkbookView.prototype.drawWorksheet = function () {
+		if (-1 === this.wsActive) {
+			return this.showWorksheet();
+		}
+		var ws = this.getWorksheet();
+		ws.draw();
+		ws.objectRender.controller.updateSelectionState();
+		ws.objectRender.controller.updateOverlay();
+		this._onScrollReinitialize();
+	};
+
   /**
    *
    * @param index
-   * @param [isResized]
    * @param [bLockDraw]
    * @returns {WorkbookView}
    */
-  WorkbookView.prototype.showWorksheet = function (index, isResized, bLockDraw) {
+  WorkbookView.prototype.showWorksheet = function (index, bLockDraw) {
     // ToDo disable method for assembly
+	var ws, wb = this.model;
+	if (asc_typeof(index) !== "number" || 0 > index) {
+      index = wb.getActive();
+	}
     if (index === this.wsActive) {
+      this.drawWorksheet();
       return this;
     }
 
-    var isSendInfo = (-1 === this.wsActive) || !isResized, tmpWorksheet, selectionRange = null;
+    var tmpWorksheet, selectionRange = null;
     // Только если есть активный
     if (-1 !== this.wsActive) {
-      var ws = this.getWorksheet();
+      ws = this.getWorksheet();
       // Останавливаем ввод данных в редакторе ввода. Если в режиме ввода формул, то продолжаем работать с cellEditor'ом, чтобы можно было
       // выбирать ячейки для формулы
       if (ws.getCellEditMode()) {
@@ -1605,9 +1625,7 @@
             ws.setFormulaEditMode(false);
           }
         } else {
-          if (!isResized) {
-            this._onStopCellEditing();
-          }
+          this._onStopCellEditing();
         }
       }
       // Делаем очистку селекта
@@ -1627,13 +1645,8 @@
       this.getWorksheet().formatPainter(c_oAscFormatPainterState.kOff);
     }
 
-    var wb = this.model;
-    if (asc_typeof(index) === "number" && index >= 0) {
-      if (index !== wb.getActive()) {
-        wb.setActive(index);
-      }
-    } else {
-      index = wb.getActive();
+    if (index !== wb.getActive()) {
+      wb.setActive(index);
     }
     this.wsActive = index;
     this.wsMustDraw = bLockDraw;
@@ -1679,20 +1692,19 @@
       ws.objectRender.controller.updateOverlay();
     }
 
-    if (isSendInfo && !window["NATIVE_EDITOR_ENJINE"]) {
+    if (!window["NATIVE_EDITOR_ENJINE"]) {
       this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }
-    this.controller.reinitializeScroll();
-    if (this.Api.isMobileVersion) {
-      this.MobileTouchManager.Resize();
-    }
+    this._onScrollReinitialize();
     // Zoom теперь на каждом листе одинаковый, не отправляем смену
 
     // Нужно очистить поиск
     this._cleanFindResults();
-	this.handlers.trigger("hideSpecialPasteOptions");
+
+    //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
+    this.toggleAutoCorrectOptions(null, true);
     return this;
   };
 
@@ -1778,7 +1790,7 @@
     if (undefined === newActiveWs || oldActiveWs !== newActiveWs) {
       // Если сменили, то покажем
       this.wsActive = -1;
-      this.showWorksheet(undefined, false, true);
+      this.showWorksheet(wsActive, true);
     } else {
       this.wsActive = wsActive;
     }
@@ -1831,11 +1843,11 @@
         // Делаем resize (для не активных сменим как только сделаем его активным)
         item.resize(/*isDraw*/i == activeIndex);
       }
-      this.showWorksheet(undefined, true);
+      this.drawWorksheet();
     } else {
       // ToDo не должно происходить ничего, но нам приходит resize сверху, поэтому проверим отрисовывали ли мы
       if (-1 === this.wsActive || this.wsMustDraw) {
-        this.showWorksheet(undefined, true);
+        this.drawWorksheet();
       }
     }
     this.wsMustDraw = false;
@@ -1898,7 +1910,7 @@
       }
     }
 
-    this.controller.reinitializeScroll();
+    this._onScrollReinitialize();
     this.handlers.trigger("asc_onZoomChanged", this.getZoom());
   };
 
@@ -2992,7 +3004,7 @@
 
 		var ws = this.getWorksheet();
 		var range = ws.model.selectionRange.getLast();
-		var type = range.type;
+		var type = range.getType();
 		var l = ws.getCellLeft(range.c1, 3);
 		var t = ws.getCellTop(range.r1, 3);
 
@@ -3022,6 +3034,70 @@
 	};
 	WorkbookView.prototype.ConvertLogicToXY = function (xL, yL) {
 		return this.getWorksheet().ConvertLogicToXY(xL, yL);
+	};
+
+	WorkbookView.prototype.applyAutoCorrectOptions = function (val) {
+
+		var api = window["Asc"]["editor"];
+		var prevProps;
+		switch (val) {
+			case Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion: {
+				prevProps = {
+					props: this.autoCorrectStore.props,
+					cell: this.autoCorrectStore.cell,
+					wsId: this.autoCorrectStore.wsId
+				};
+				api.asc_Undo();
+				this.autoCorrectStore = prevProps;
+				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion;
+				this.toggleAutoCorrectOptions(true);
+				break;
+			}
+			case Asc.c_oAscAutoCorrectOptions.RedoTableAutoExpansion: {
+				prevProps = {
+					props: this.autoCorrectStore.props,
+					cell: this.autoCorrectStore.cell,
+					wsId: this.autoCorrectStore.wsId
+				};
+				api.asc_Redo();
+				this.autoCorrectStore = prevProps;
+				this.autoCorrectStore.props[0] = Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion;
+				this.toggleAutoCorrectOptions(true);
+				break;
+			}
+		}
+
+		return true;
+	};
+
+	WorkbookView.prototype.toggleAutoCorrectOptions = function (isSwitch, val) {
+		if (isSwitch) {
+			if (val) {
+				this.autoCorrectStore = val;
+				var options = new Asc.asc_CAutoCorrectOptions();
+				options.asc_setOptions(this.autoCorrectStore.props);
+				options.asc_setCellCoord(
+					this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
+
+				this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
+			} else if (this.autoCorrectStore) {
+				if (this.autoCorrectStore.wsId === this.model.getActiveWs().getId()) {
+					var options = new Asc.asc_CAutoCorrectOptions();
+					options.asc_setOptions(this.autoCorrectStore.props);
+					options.asc_setCellCoord(
+						this.getWorksheet().getCellCoord(this.autoCorrectStore.cell.c1, this.autoCorrectStore.cell.r1));
+
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions", options);
+				} else {
+					this.handlers.trigger("asc_onToggleAutoCorrectOptions");
+				}
+			}
+		} else {
+			if (val) {
+				this.autoCorrectStore = null;
+			}
+			this.handlers.trigger("asc_onToggleAutoCorrectOptions");
+		}
 	};
 
   //------------------------------------------------------------export---------------------------------------------------
