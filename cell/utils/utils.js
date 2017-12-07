@@ -2188,6 +2188,8 @@
 			// внутренние переменные
 			this.findInSelection = false;
 			this.selectionRange = null;
+			this.findRange = null;
+			this.findResults = null;
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
@@ -2211,6 +2213,7 @@
 
 			result.findInSelection = this.findInSelection;
 			result.selectionRange = this.selectionRange ? this.selectionRange.clone() : null;
+			result.findRange = this.findRange ? this.findRange.clone() : null;
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;
@@ -2221,9 +2224,12 @@
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
+			return obj && this.isEqual2(obj) && this.scanForward === obj.scanForward &&
+				this.scanOnOnlySheet === obj.scanOnOnlySheet;
+		};
+		asc_CFindOptions.prototype.isEqual2 = function (obj) {
 			return obj && this.findWhat === obj.findWhat && this.scanByRows === obj.scanByRows &&
-				this.scanForward === obj.scanForward && this.isMatchCase === obj.isMatchCase &&
-				this.isWholeCell === obj.isWholeCell && this.scanOnOnlySheet === obj.scanOnOnlySheet &&
+				this.isMatchCase === obj.isMatchCase && this.isWholeCell === obj.isWholeCell &&
 				this.lookIn === obj.lookIn;
 		};
 		asc_CFindOptions.prototype.clearFindAll = function () {
@@ -2245,6 +2251,81 @@
 		asc_CFindOptions.prototype.asc_setLookIn = function (val) {this.lookIn = val;};
 		asc_CFindOptions.prototype.asc_setReplaceWith = function (val) {this.replaceWith = val;};
 		asc_CFindOptions.prototype.asc_setIsReplaceAll = function (val) {this.isReplaceAll = val;};
+
+		/** @constructor */
+		function findResults() {
+			this.values = {};
+
+			this.currentKey1 = -1;
+			this.currentKey2 = -1;
+			this.currentKeys1 = null;
+			this.currentKeys2 = null;
+		}
+
+		findResults.prototype.isNotEmpty = function () {
+			return 0 !== Object.keys(this.values).length;
+		};
+		findResults.prototype.contains = function (key1, key2) {
+			return this.values[key1] && this.values[key1][key2];
+		};
+		findResults.prototype.add = function (key1, key2, cell) {
+			if (!this.values[key1]) {
+				this.values[key1] = {};
+			}
+			this.values[key1][key2] = cell;
+		};
+		findResults.prototype._init = function (key1, key2) {
+			this.currentKey1 = key1;
+			this.currentKey2 = key2;
+			this.currentKeyIndex1 = -1;
+			this.currentKeyIndex2 = -1;
+
+			this.currentKeys2 = null;
+			this.currentKeys1 = Object.keys(this.values).sort(AscCommon.fSortAscending);
+			this.currentKeyIndex1 = this._findKey(this.currentKey1, this.currentKeys1);
+			if (0 === this.currentKeys1[this.currentKeyIndex1] - this.currentKey1) {
+				this.currentKeys2 = Object.keys(this.values[this.currentKey1]).sort(AscCommon.fSortAscending);
+				this.currentKeyIndex2 = this._findKey(this.currentKey2, this.currentKeys2);
+			}
+		};
+		findResults.prototype.find = function (key1, key2, forward) {
+			this.forward = forward;
+
+			if (this.currentKey1 !== key1 || this.currentKey2 !== key2) {
+				this._init(key1, key2);
+			}
+
+			if (0 === this.currentKeys1.length) {
+				return false;
+			}
+
+			var step = this.forward ? +1 : -1;
+			this.currentKeyIndex2 += step;
+			if (!this.currentKeys2 || !this.currentKeys2[this.currentKeyIndex2]) {
+				this.currentKeyIndex1 += step;
+				if (!this.currentKeys1[this.currentKeyIndex1]) {
+					this.currentKeyIndex1 = this.forward ? 0 : this.currentKeys1.length - 1;
+				}
+				this.currentKey1 = this.currentKeys1[this.currentKeyIndex1] >> 0;
+				this.currentKeys2 = Object.keys(this.values[this.currentKey1]).sort(AscCommon.fSortAscending);
+				this.currentKeyIndex2 = this.forward ? 0 : this.currentKeys2.length - 1;
+			}
+			this.currentKey2 = this.currentKeys2[this.currentKeyIndex2] >> 0;
+			return true;
+		};
+		findResults.prototype._findKey = function (key, arrayKeys) {
+			var i = this.forward ? 0 : arrayKeys.length - 1;
+			var step = this.forward ? +1 : -1;
+			var _key;
+			while (_key = arrayKeys[i]) {
+				_key = step * ((_key >> 0) - key);
+				if (_key >= 0) {
+					return 0 === _key ? i : (i - step);
+				}
+				i += step;
+			}
+			return -2;
+		};
 
 		/** @constructor */
 		function asc_CCompleteMenu(name, type) {
@@ -2466,6 +2547,8 @@
 		prot["asc_setLookIn"] = prot.asc_setLookIn;
 		prot["asc_setReplaceWith"] = prot.asc_setReplaceWith;
 		prot["asc_setIsReplaceAll"] = prot.asc_setIsReplaceAll;
+
+		window["AscCommonExcel"].findResults = findResults;
 
 		window["AscCommonExcel"].asc_CCompleteMenu = asc_CCompleteMenu;
 		prot = asc_CCompleteMenu.prototype;
