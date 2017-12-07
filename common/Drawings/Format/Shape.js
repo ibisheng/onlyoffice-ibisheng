@@ -5365,6 +5365,26 @@ CShape.prototype.getColumnNumber = function(){
                 oCopy.spPr.setLn(this.pen.createDuplicate());
             }
         }
+        if(oCopy.txBody && oCopy.txBody.content){
+            var oTheme = this.Get_Theme();
+            var oColorMap = this.Get_ColorMap();
+            if(this.txBody && this.txBody.content){
+                var aCopyContent = oCopy.txBody.content.Content;
+                var aSourceContent = this.txBody.content.Content;
+                if(aCopyContent.length === aSourceContent.length){
+                    for(var i = 0; i< aSourceContent.length; ++i){
+                        var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
+                        oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
+                        aCopyContent[i].Set_Pr(oPr);
+                        for(var j = 0; j < aCopyContent[i].Content.length; ++j){
+                            if(aCopyContent[i].Content[j] instanceof ParaRun && aCopyContent[i].Content[j].Pr){
+                                aCopyContent[i].Content[j].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap))
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if(oCopy.isPlaceholder() && !this.recalcInfo.recalculateTransform){
             var oXfrm = oCopy.spPr.xfrm;
             if(!oXfrm || !oXfrm.isNotNull()){
@@ -5531,6 +5551,34 @@ function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempPar
     }
 }
 
+
+function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
+    if(oTextPr.RFonts){
+        if(oTextPr.RFonts.Ascii){
+            oTextPr.RFonts.Ascii.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.Ascii.Name);
+        }
+        if(oTextPr.RFonts.EastAsia){
+            oTextPr.RFonts.EastAsia.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.EastAsia.Name);
+        }
+        if(oTextPr.RFonts.HAnsi){
+            oTextPr.RFonts.HAnsi.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.HAnsi.Name);
+        }
+        if(oTextPr.RFonts.CS){
+            oTextPr.RFonts.CS.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.CS.Name);
+        }
+    }
+    var RGBA;
+    if(oTextPr.Unifill){
+        oTextPr.Unifill.check(oTheme, oColorMap);
+        RGBA = oTextPr.Unifill.getRGBAColor();
+        oTextPr.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+    }
+    if(oTextPr.TextOutline && oTextPr.TextOutline.Fill){
+        RGBA = oTextPr.TextOutline.Fill.getRGBAColor();
+        oTextPr.TextOutline.Fill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+    }
+    return oTextPr;
+}
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;

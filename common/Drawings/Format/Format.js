@@ -2043,6 +2043,8 @@ function CreateSolidFillRGBA(r, g, b, a)
     ret.setFill(new CSolidFill());
     ret.fill.setColor(new CUniColor());
     var _uni_color = ret.fill.color;
+    _uni_color.setColor(new CRGBColor());
+    _uni_color.color.setColor(r, g, b);
 	_uni_color.RGBA.R = r;
 	_uni_color.RGBA.G = g;
 	_uni_color.RGBA.B = b;
