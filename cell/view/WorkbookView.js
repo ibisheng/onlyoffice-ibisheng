@@ -187,8 +187,6 @@
     // Константы для подстановке формулы (что не нужно добавлять скобки)
     this.arrExcludeFormulas = [];
 
-    this.lastFindOptions = null;	// Последний поиск (параметры)
-    this.lastFindResults = {};		// Результаты поиска (для поиска по всей книге, чтобы перейти на другой лист)
     this.fReplaceCallback = null;	// Callback для замены текста
 
     // Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
@@ -1020,7 +1018,7 @@
     }
 
     // Нужно очистить поиск
-    this._cleanFindResults();
+    this.model.cleanFindResults();
 
     var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
@@ -1700,9 +1698,6 @@
     this._onScrollReinitialize();
     // Zoom теперь на каждом листе одинаковый, не отправляем смену
 
-    // Нужно очистить поиск
-    this._cleanFindResults();
-
     //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
     this.toggleAutoCorrectOptions(null, true);
     return this;
@@ -2238,11 +2233,6 @@
     }
   };
 
-  WorkbookView.prototype._cleanFindResults = function() {
-    this.lastFindOptions = null;
-    this.lastFindResults = {};
-  };
-
   // Поиск текста в листе
   WorkbookView.prototype.findCellText = function(options) {
     // Для поиска эта переменная не нужна (но она может остаться от replace)
@@ -2253,66 +2243,14 @@
     if (ws.getCellEditMode()) {
       this._onStopCellEditing();
     }
-    var result = ws.findCellText(options);
-    if (false === options.scanOnOnlySheet) {
-      // Поиск по всей книге
-      var key = result ? (result.c1 + "-" + result.r1) : null;
-      if (null === key || options.isEqual(this.lastFindOptions)) {
-        if (null === key || this.lastFindResults[key]) {
-          // Мы уже находили данную ячейку, попробуем на другом листе
-          var i, active = this.model.getActive(), start = 0, end = this.model.getWorksheetCount();
-          var inc = options.scanForward ? +1 : -1;
-          var tmpWs, tmpResult = null;
-          for (i = active + inc; i < end && i >= start; i += inc) {
-            tmpWs = this.getWorksheet(i);
-            tmpResult = tmpWs.findCellText(options);
-            if (tmpResult) {
-              break;
-            }
-          }
-          if (!tmpResult) {
-            // Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
-            if (options.scanForward) {
-              i = 0;
-              end = active;
-            } else {
-              i = end - 1;
-              start = active + 1;
-            }
-            inc *= -1;
-            for (; i < end && i >= start; i += inc) {
-              tmpWs = this.getWorksheet(i);
-              tmpResult = tmpWs.findCellText(options);
-              if (tmpResult) {
-                break;
-              }
-            }
-          }
 
-          if (tmpResult) {
-            ws = tmpWs;
-            result = tmpResult;
-            this.showWorksheet(i);
-            // Посылаем эвент о смене активного листа
-            this.handlers.trigger("asc_onActiveSheetChanged", i);
-            key = result.c1 + "-" + result.r1;
-          }
-
-          this.lastFindResults = {};
-        }
-      }
-      if (null !== key) {
-        this.lastFindOptions = options.clone();
-        this.lastFindResults[key] = true;
-      }
-    }
-
+    var result = this.model.findCellText(options);
     if (result) {
-      var ac = ws.model.selectionRange.activeCell;
-      return options.findInSelection ? ws.changeSelectionActivePoint(result.c1 - ac.col, result.r1 - ac.row) :
-        ws.setSelection(result);
+		ws = this.getWorksheet();
+    	var ac = ws.model.selectionRange.activeCell;
+    	var dc = result.col - ac.col, dr = result.row - ac.row;
+    	return options.findInSelection ? ws.changeSelectionActivePoint(dc, dr) : ws.changeSelectionStartPoint(dc, dr);
     }
-    this._cleanFindResults();
     return null;
   };
 

@@ -1503,6 +1503,9 @@
 
 		this.maxDigitWidth = 0;
 		this.paddingPlusBorder = 0;
+
+		this.lastFindOptions = null;
+		this.lastFindCells = {};
 	}
 	Workbook.prototype.init=function(tableCustomFunc, bNoBuildDep, bSnapshot){
 		if(this.nActive < 0)
@@ -1569,6 +1572,8 @@
 	Workbook.prototype.setActive=function(index){
 		if(index >= 0 && index < this.aWorksheets.length){
 			this.nActive = index;
+			// Must clean find
+			this.cleanFindResults();
 			return true;
 		}
 		return false;
@@ -2471,6 +2476,64 @@
 		this.rebuildColors();
 		return true;
 	};
+	//
+	Workbook.prototype.cleanFindResults = function () {
+		this.lastFindOptions = null;
+		this.lastFindCells = {};
+	};
+	Workbook.prototype.findCellText = function (options) {
+		var ws = this.getActiveWs();
+		var result = ws.findCellText(options);
+		if (!options.scanOnOnlySheet) {
+			// Search on workbook
+			var key = result && (result.col + "-" + result.row);
+			if (!key || (options.isEqual(this.lastFindOptions) && this.lastFindCells[key])) {
+				// Мы уже находили данную ячейку, попробуем на другом листе
+				var i, active = this.getActive(), start = 0, end = this.getWorksheetCount();
+				var inc = options.scanForward ? +1 : -1;
+				result = null;
+				for (i = active + inc; i < end && i >= start; i += inc) {
+					ws = this.getWorksheet(i);
+					result = ws.findCellText(options);
+					if (result) {
+						break;
+					}
+				}
+				if (!result) {
+					// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
+					if (options.scanForward) {
+						i = 0;
+						end = active;
+					} else {
+						i = end - 1;
+						start = active + 1;
+					}
+					inc *= -1;
+					for (; i < end && i >= start; i += inc) {
+						ws = this.getWorksheet(i);
+						result = ws.findCellText(options);
+						if (result) {
+							break;
+						}
+					}
+				}
+
+				if (result) {
+					this.handlers.trigger('undoRedoHideSheet', i);
+					key = result.col + "-" + result.row;
+				}
+			}
+
+			if (key) {
+				this.lastFindOptions = options.clone();
+				this.lastFindCells[key] = true;
+			}
+		}
+		if (!result) {
+			this.cleanFindResults();
+		}
+		return result;
+	};
 //-------------------------------------------------------------------------------------------------
 	var tempHelp = new ArrayBuffer(8);
 	var tempHelpUnit = new Uint8Array(tempHelp);
@@ -2692,6 +2755,8 @@
 		this.selectionRange = new AscCommonExcel.SelectionRange(this);
 		this.sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 		this.pivotTables = [];
+
+		this.lastFindOptions = null;
 
 		/*handlers*/
 		this.handlers = null;
@@ -4851,6 +4916,7 @@
 		// ToDo do not update conditional formatting on hidden sheet
 		this.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 		this.workbook.handlers.trigger("toggleAutoCorrectOptions", null,true);
+		this.clearFindResults();
 	};
 	Worksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
@@ -5588,6 +5654,71 @@
 		}
 		return res;
 	};
+	// ----- Search -----
+	Worksheet.prototype.clearFindResults = function () {
+		this.lastFindOptions = null;
+	};
+	Worksheet.prototype._findAllCells = function (options) {
+		if (true !== options.isMatchCase) {
+			options.findWhat = options.findWhat.toLowerCase();
+		}
+		var selectionRange = options.selectionRange || this.selectionRange;
+		var lastRange = selectionRange.getLast();
+		var activeCell = selectionRange.activeCell;
+		var merge = this.getMergedByCell(activeCell.row, activeCell.col);
+		options.findInSelection = options.scanOnOnlySheet &&
+			!(selectionRange.isSingleRange() && (lastRange.isOneCell() || lastRange.isEqual(merge)));
+		var findRange = options.findInSelection ? this.getRange3(lastRange.r1, lastRange.c1, lastRange.r2, lastRange.c2) :
+			this.getRange3(0, 0, this.getRowsCount(), this.getColsCount());
+
+		if (this.lastFindOptions && this.lastFindOptions.findResults && options.isEqual2(this.lastFindOptions) &&
+			findRange.getBBox0().isEqual(this.lastFindOptions.findRange)) {
+			return;
+		}
+
+		var result = new AscCommonExcel.findResults(), tmp;
+		findRange._foreachNoEmpty(function (cell, r, c) {
+			if (!cell.isNullText() && cell.isEqual(options)) {
+				if (!options.scanByRows) {
+					tmp = r;
+					r = c;
+					c = tmp;
+				}
+				result.add(r, c, cell);
+			}
+		});
+		this.lastFindOptions = options.clone();
+		// ToDo support multiselect
+		this.lastFindOptions.findRange = findRange.getBBox0().clone();
+		this.lastFindOptions.findResults = result;
+	};
+	Worksheet.prototype.findCellText = function (options) {
+		this._findAllCells(options);
+
+		var selectionRange = options.selectionRange || this.selectionRange;
+		var activeCell = selectionRange.activeCell;
+
+		var tmp, key1 = activeCell.row, key2 = activeCell.col;
+		if (!options.scanByRows) {
+			tmp = key1;
+			key1 = key2;
+			key2 = tmp;
+		}
+
+		var result = null;
+		var findResults = this.lastFindOptions.findResults;
+		if (findResults.find(key1, key2, options.scanForward)) {
+			key1 = findResults.currentKey1;
+			key2 = findResults.currentKey2;
+			if (!options.scanByRows) {
+				tmp = key1;
+				key1 = key2;
+				key2 = tmp;
+			}
+			result = new AscCommon.CellBase(key1, key2);
+		}
+		return result;
+	};
 	Worksheet.prototype.excludeHiddenRows = function (bExclude) {
 		this.bExcludeHiddenRows = bExclude;
 	};
@@ -5760,6 +5891,15 @@
 	Cell.prototype.setRowCol=function(nRow, nCol){
 		this.nRow = nRow;
 		this.nCol = nCol;
+	};
+	Cell.prototype.isEqual = function (options) {
+		var cellText;
+		cellText = (options.lookIn === Asc.c_oAscFindLookIn.Formulas) ? this.getValueForEdit() : this.getValue();
+		if (true !== options.isMatchCase) {
+			cellText = cellText.toLowerCase();
+		}
+		return (0 <= cellText.indexOf(options.findWhat)) &&
+			(true !== options.isWholeCell || options.findWhat.length === cellText.length);
 	};
 	Cell.prototype.isEmptyText=function(){
 		return this.isEmptyTextString() && !this.formulaParsed;

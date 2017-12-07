@@ -7313,6 +7313,9 @@
     // Обработка движения в выделенной области
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
         var ret;
+        if (0 === dc && 0 === dr) {
+            return this._calcActiveCellOffset();
+        }
         if (!this._moveActivePointInSelection(dc, dr)) {
             return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, false);
         }
