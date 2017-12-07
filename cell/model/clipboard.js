@@ -1047,9 +1047,18 @@
 				if(range)
 				{
 					var bbox = range.bbox;
-					
+
+					var maxRow = bbox.r2;
+					var maxCol = bbox.c2;
+					var maxRowCol = this._getRangeMaxRowCol(worksheet, bbox, range);
+					if(null !== maxRowCol)
+					{
+						maxRow = maxRowCol.row;
+						maxCol = maxRowCol.col;
+					}
+
 					var res = '';	
-					for (var row = bbox.r1; row <= bbox.r2; ++row) 
+					for (var row = bbox.r1; row <= maxRow; ++row)
 					{
 						if(worksheet.model.bExcludeHiddenRows && worksheet.model.getRowHidden(row))
 						{
@@ -1059,7 +1068,7 @@
 						if(row !== bbox.r1)
 							res += '\n';
 						
-						for (var col = bbox.c1; col <= bbox.c2; ++col) 
+						for (var col = bbox.c1; col <= maxCol; ++col)
 						{
 							if(col !== bbox.c1)
 							{

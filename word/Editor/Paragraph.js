@@ -241,6 +241,11 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
 	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, !this.bFromDocument);
 
+	if (!oPr)
+		oPr = {};
+
+	oPr.Paragraph = Para;
+
 	// Копируем настройки
 	Para.Set_Pr(this.Pr.Copy());
 
