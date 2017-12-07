@@ -2262,6 +2262,12 @@
 			this.currentKeys2 = null;
 		}
 
+		findResults.prototype.isNotEmpty = function () {
+			return 0 !== Object.keys(this.values).length;
+		};
+		findResults.prototype.contains = function (key1, key2) {
+			return this.values[key1] && this.values[key1][key2];
+		};
 		findResults.prototype.add = function (key1, key2, cell) {
 			if (!this.values[key1]) {
 				this.values[key1] = {};

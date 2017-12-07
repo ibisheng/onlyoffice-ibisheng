@@ -104,6 +104,7 @@
     };
     this.activeCellBorderColor = new CColor(72, 121, 92);
     this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
+    this.findFillColor = new CColor(255, 220, 0, 200 / 255);
 
     // Цвет закрепленных областей
     this.frozenColor = new CColor(105, 119, 62, 1);
@@ -720,6 +721,8 @@
 			  self.Api.checkLastWork();
 		  }, "toggleAutoCorrectOptions": function (bIsShow, val) {
 		      self.toggleAutoCorrectOptions(bIsShow, val);
+		  }, "selectSearchingResults": function () {
+			  return self.Api.selectSearchingResults;
 		  }
 	  });
 

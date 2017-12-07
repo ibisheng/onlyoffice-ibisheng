@@ -2476,7 +2476,7 @@
 		this.rebuildColors();
 		return true;
 	};
-	//
+	// ----- Search -----
 	Workbook.prototype.cleanFindResults = function () {
 		this.lastFindOptions = null;
 		this.lastFindCells = {};
@@ -5676,6 +5676,7 @@
 			return;
 		}
 
+		var oldResults = this.lastFindOptions && this.lastFindOptions.findResults.isNotEmpty();
 		var result = new AscCommonExcel.findResults(), tmp;
 		findRange._foreachNoEmpty(function (cell, r, c) {
 			if (!cell.isNullText() && cell.isEqual(options)) {
@@ -5691,6 +5692,11 @@
 		// ToDo support multiselect
 		this.lastFindOptions.findRange = findRange.getBBox0().clone();
 		this.lastFindOptions.findResults = result;
+
+		if (this.workbook.oApi.selectSearchingResults && (oldResults || result.isNotEmpty()) &&
+			this === this.workbook.getActiveWs()) {
+			this.workbook.handlers.trigger("drawWS");
+		}
 	};
 	Worksheet.prototype.findCellText = function (options) {
 		this._findAllCells(options);
@@ -5718,6 +5724,19 @@
 			result = new AscCommon.CellBase(key1, key2);
 		}
 		return result;
+	};
+	Worksheet.prototype.inFindResults = function (row, col) {
+		var tmp, res = false;
+		var findResults = this.lastFindOptions && this.lastFindOptions.findResults;
+		if (findResults) {
+			if (!this.lastFindOptions.scanByRows) {
+				tmp = col;
+				col = row;
+				row = tmp;
+			}
+			res = findResults.contains(row, col);
+		}
+		return res;
 	};
 	Worksheet.prototype.excludeHiddenRows = function (bExclude) {
 		this.bExcludeHiddenRows = bExclude;

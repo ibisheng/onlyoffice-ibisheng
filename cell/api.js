@@ -3527,6 +3527,7 @@ var editor;
 	};
 
 	spreadsheet_api.prototype._selectSearchingResults = function () {
+	  this.wb.drawWS();
 	};
 
   /*
