@@ -5574,6 +5574,7 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
         oTextPr.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
     }
     if(oTextPr.TextOutline && oTextPr.TextOutline.Fill){
+        oTextPr.TextOutline.Fill.check(oTheme, oColorMap);
         RGBA = oTextPr.TextOutline.Fill.getRGBAColor();
         oTextPr.TextOutline.Fill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
     }
