@@ -1298,7 +1298,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         else
                             RightMW = -Max_r;//X1 -= Max_r;
 
-                        if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
+                        if ( border_Single === BorderInfo_Right[0].Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
                             RightMW = -BorderInfo_Right[0].Size / 2;
                     }
 
@@ -1365,7 +1365,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         //X0 -= Max_l;
                         LeftMW = -Max_l;
 
-                        if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
+                        if ( border_Single === BorderInfo_Left[0].Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
                             LeftMW = BorderInfo_Left[0].Size / 2;
 
                         LastBorderTop.L = Max_l;
