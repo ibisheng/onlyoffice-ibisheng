@@ -1862,6 +1862,34 @@ CTableCell.prototype.GetTopDocumentContent = function()
 
     return null;
 };
+/**
+ * Специальная вставка таблицы в таблицу. Данная функция вызывается из CDocumentContent
+ * @param oTable
+ */
+CTableCell.prototype.InsertTableContent = function(oTable)
+{
+	if (!this.Row || !this.Row.Table)
+		return;
+
+	this.Row.Table.InsertTableContent(this.Index, this.Row.Index, oTable);
+};
+/**
+ * Получаем ширину ячейки исходя из таблицы TableGrid
+ * @returns {number}
+ */
+CTableCell.prototype.GetCalculatedW = function()
+{
+	var oRow   = this.Row,
+		oTable = oRow.Table;
+
+	var nCurGridStart = oRow.GetCellInfo(this.Index).StartGridCol;
+	var nCurGridEnd   = nCurGridStart + this.Get_GridSpan() - 1;
+
+	if (oTable.TableSumGrid.length > nCurGridEnd)
+		return oTable.TableSumGrid[nCurGridEnd] - oTable.TableSumGrid[nCurGridStart - 1];
+
+	return 3.8; // 1.9 + 1.9 стандартные отступы справа и слева
+};
 
 function CTableCellRecalculateObject()
 {

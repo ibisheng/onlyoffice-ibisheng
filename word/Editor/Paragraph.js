@@ -12588,6 +12588,14 @@ Paragraph.prototype.RemoveTabsForTOC = function()
 
 	return isTab;
 };
+/**
+ * Проверяем лежит ли данный параграф в таблице
+ * @returns {boolean}
+ */
+Paragraph.prototype.IsTableCellContent = function()
+{
+	return (this.Parent && this.Parent.IsTableCellContent() ? true : false);
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

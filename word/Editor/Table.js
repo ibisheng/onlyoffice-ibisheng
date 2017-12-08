@@ -6470,6 +6470,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 				{
 					History.Create_NewPoint(AscDFH.historydescription_Document_TableAddNewRowByTab);
 					this.AddTableRow(false);
+					this.LogicDocument.Recalculate();
 				}
 				else
 					return;
@@ -8966,7 +8967,6 @@ CTable.prototype.AddTableRow = function(bBefore)
 	}
 
 	this.Recalc_CompiledPr2();
-	this.Internal_Recalculate_1();
 };
 /**
  * Удаление строки либо по номеру Ind, либо по выделению Selection, либо по текущей ячейке.
@@ -10240,6 +10240,10 @@ CTable.prototype.ReIndexing = function(StartIndex)
  * На выходе мы отдаем новую сетку TableGrid и массив RowsInfo, в
  * котором для каждой ячейки(пропуска) указан GridSpan.
  */
+CTable.prototype.private_CreateNewGrid = function(arrRowsInfo)
+{
+	return this.Internal_CreateNewGrid(arrRowsInfo);
+};
 CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 {
 	var CurPos = [];
@@ -10355,6 +10359,68 @@ CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 	}
 	this.SetTableGrid(TableGrid);
 	return TableGrid;
+};
+/**
+ * Получаем информацию о всех строках, используемую для генерации ширин колонок
+ * @returns {Array}
+ */
+CTable.prototype.private_GetRowsInfo = function()
+{
+	var arrRowsInfo = [];
+
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		arrRowsInfo[nCurRow] = [];
+
+		var oRow = this.Content[nCurRow];
+
+		var oBeforeInfo = oRow.Get_Before();
+		if (oBeforeInfo.GridBefore > 0)
+			arrRowsInfo[nCurRow].push({W : this.TableSumGrid[oBeforeInfo.GridBefore - 1], Type : -1, GridSpan : 1});
+
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell         = oRow.GetCell(nCurCell);
+			var nCurGridStart = oRow.GetCellInfo(nCurCell).StartGridCol;
+			var nCurGridEnd   = nCurGridStart + oCell.Get_GridSpan() - 1;
+
+			arrRowsInfo[nCurRow].push({
+				W        : this.TableSumGrid[nCurGridEnd] - this.TableSumGrid[nCurGridStart - 1],
+				Type     : 0,
+				GridSpan : 1
+			});
+		}
+	}
+
+	return arrRowsInfo;
+};
+/**
+ * Добавляем в массив информации о строках новую ячейку в заданной строке
+ * @param arrRowsInfo
+ * @param nRowIndex
+ * @param nCellIndex
+ * @param {number} nW - заданная ширина ячейка
+ * @returns {boolean} Удалось ли добавить информацию
+ */
+CTable.prototype.private_AddCellToRowsInfo = function(arrRowsInfo, nRowIndex, nCellIndex, nW)
+{
+	if (!arrRowsInfo || !arrRowsInfo[nRowIndex])
+		return false;
+
+	var nPos = nCellIndex;
+	if (-1 === arrRowsInfo[nRowIndex][0].Type)
+		nPos++;
+
+	if (nPos > arrRowsInfo[nRowIndex].length)
+		return false;
+
+	arrRowsInfo[nRowIndex].splice(nPos, 0, {
+		W        : nW,
+		Type     : 0,
+		GridSpan : 1
+	});
+
+	return true;
 };
 CTable.prototype.Internal_UpdateCellW = function(Col)
 {
@@ -10617,6 +10683,10 @@ CTable.prototype.private_GetCellsPosArrayByCellsArray = function(CellsArray)
 /**
  * Получаем левую верхнюю ячейку в текущем объединении
  */
+CTable.prototype.GetStartMergedCell = function(nCellIndex, nRowIndex)
+{
+	return this.Internal_Get_StartMergedCell2(nCellIndex, nRowIndex);
+};
 CTable.prototype.Internal_Get_StartMergedCell2 = function(CellIndex, RowIndex)
 {
 	var Row      = this.Content[RowIndex];
@@ -11262,6 +11332,14 @@ CTable.prototype.Get_RowsCount = function()
 CTable.prototype.Get_Row = function(Index)
 {
     return this.Content[Index];
+};
+CTable.prototype.GetRowsCount = function()
+{
+	return this.Get_RowsCount();
+};
+CTable.prototype.GetRow = function(nIndex)
+{
+	return this.Get_Row(nIndex);
 };
 CTable.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
@@ -12136,6 +12214,110 @@ CTable.prototype.UpdateBookmarks = function(oManager)
 			oRow.Get_Cell(nCurCell).Content.UpdateBookmarks(oManager);
 		}
 	}
+};
+/**
+ * Вставляем содержимое заданной таблицы в текущую (специальная вставка)
+ * @param _nRowIndex - Номер
+ * @param _nCellIndex
+ * @param oTable
+ */
+CTable.prototype.InsertTableContent = function(_nCellIndex, _nRowIndex, oTable)
+{
+	// Нужно пересчитать сетку, чтобы если придется добавлять новые ячейки сетка была рассчитана
+	oTable.private_RecalculateGrid();
+	oTable.private_RecalculateGridCols();
+
+	var oCell = this.GetStartMergedCell(_nCellIndex, _nRowIndex);
+	if (!oCell)
+		return;
+
+	var nCellIndex = oCell.Index;
+	var nRowIndex  = oCell.Row.Index;
+
+	if (nRowIndex >= this.GetRowsCount())
+		return;
+
+	// Добавляем новые строки, если необходимо
+	var nAddRows = oTable.GetRowsCount() + nRowIndex - this.GetRowsCount();
+	while (nAddRows > 0)
+	{
+		this.RemoveSelection();
+		this.CurCell = this.GetRow(this.GetRowsCount() - 1).GetCell(0);
+		this.AddTableRow(false);
+		nAddRows--;
+
+		this.private_RecalculateGridCols();
+	}
+
+	var arrClearedCells = [];
+	function private_IsProcessedCell(oCell)
+	{
+		for (var nIndex = 0, nCount = arrClearedCells.length; nIndex < nCount; ++nIndex)
+		{
+			if (arrClearedCells[nIndex] === oCell)
+				return true;
+		}
+
+		return false;
+	}
+
+	var isNeedRebuildGrid = false,
+		arrRowsInfo       = this.private_GetRowsInfo();
+
+	var oFirstCell = null;
+	for (var nCurRow = 0, nRowsCount = oTable.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oInsertedRow = oTable.GetRow(nCurRow);
+		var oCurRow = this.GetRow(nRowIndex + nCurRow);
+		for (var nCurCell = 0, nCellsCount = oInsertedRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oCurRow.GetCell(nCellIndex + nCurCell);
+			var oInsertedCell = oInsertedRow.GetCell(nCurCell);
+
+			if (!oFirstCell)
+				oFirstCell = oCell;
+
+			if (!oCell)
+			{
+				var nCellPos = oCurRow.GetCellsCount();
+				oCell = oInsertedCell.Copy(oCurRow);
+				oCurRow.AddCell(nCellPos, oCurRow, oCell, true);
+				isNeedRebuildGrid = true;
+				this.private_AddCellToRowsInfo(arrRowsInfo, oCurRow.Index, nCellPos, oInsertedCell.GetCalculatedW());
+			}
+			else if (oCell)
+			{
+				var oTopCell = this.GetStartMergedCell(oCell.Index, oCell.Row.Index);
+				if (oTopCell === oCell)
+				{
+					oCell.Content.ClearContent(false);
+					oCell.Content.AddContent(oInsertedCell.Content.Content);
+					arrClearedCells.push(oCell);
+				}
+				else
+				{
+					if (private_IsProcessedCell(oTopCell))
+						oTopCell.Content.AddContent(oInsertedCell.Content.Content);
+				}
+			}
+		}
+	}
+
+	if (true === isNeedRebuildGrid)
+		this.private_CreateNewGrid(arrRowsInfo);
+
+
+	this.RemoveSelection();
+	if (oFirstCell)
+	{
+		this.CurCell = oFirstCell;
+		this.SelectTable(c_oAscTableSelectionType.Cell);
+	}
+	else
+	{
+		this.MoveCursorToStartPos(false);
+	}
+	this.Document_SetThisElementCurrent(false);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

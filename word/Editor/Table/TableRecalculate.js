@@ -3117,6 +3117,23 @@ CTable.prototype.private_RecalculatePercentWidth = function()
 {
     return this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
 };
+CTable.prototype.private_RecalculateGridCols = function()
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow        = this.Content[nCurRow];
+		var oBeforeInfo = oRow.Get_Before();
+		var nCurGridCol = oBeforeInfo.GridBefore;
+
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.GetCell(nCurCell);
+			oRow.Set_CellInfo(nCurCell, nCurGridCol, 0, 0, 0, 0, 0, 0);
+			oCell.Set_Metrics(nCurGridCol, 0, 0, 0, 0, 0, 0);
+			nCurGridCol += oCell.Get_GridSpan();
+		}
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CTablePage
 //----------------------------------------------------------------------------------------------------------------------

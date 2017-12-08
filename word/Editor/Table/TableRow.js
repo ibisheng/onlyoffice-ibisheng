@@ -759,6 +759,26 @@ CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
+CTableRow.prototype.GetCell = function(nCellIndex)
+{
+	return this.Get_Cell(nCellIndex);
+};
+CTableRow.prototype.GetCellsCount = function()
+{
+	return this.Get_CellsCount()
+};
+CTableRow.prototype.AddCell = function(nIndex, oRow, oCell, isReIndexing)
+{
+	this.Add_Cell(nIndex, oRow, oCell, isReIndexing);
+};
+CTableRow.prototype.RemoveCell = function(nIndex)
+{
+	this.Remove_Cell(nIndex);
+};
+CTableRow.prototype.GetCellInfo = function(nIndex)
+{
+	return this.Get_CellInfo(nIndex);
+};
 
 function CTableRowRecalculateObject()
 {
