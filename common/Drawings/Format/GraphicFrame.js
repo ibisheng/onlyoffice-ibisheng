@@ -1130,40 +1130,41 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
         var oColorMap = this.Get_ColorMap();
         var RGBA;
         if(oCopyTable && oSourceTable){
+            var oPr2 = oCopyTable.Pr;
             if(oSourceTable.CompiledPr.Pr && oSourceTable.CompiledPr.Pr.TablePr){
                 oCopyTable.Set_Pr(oSourceTable.CompiledPr.Pr.TablePr.Copy());
-                var oPr = oCopyTable.Pr;
-                if(oPr.TableBorders){
-                    if(oPr.TableBorders){
-                        if(oPr.TableBorders.Bottom && oPr.TableBorders.Bottom.Unifill){
-                            oPr.TableBorders.Bottom.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.Bottom.Unifill.getRGBAColor();
-                            oPr.TableBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                oPr2 = oCopyTable.Pr;
+                if(oPr2.TableBorders){
+                    if(oPr2.TableBorders){
+                        if(oPr2.TableBorders.Bottom && oPr2.TableBorders.Bottom.Unifill){
+                            oPr2.TableBorders.Bottom.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Bottom.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                        if(oPr.TableBorders.Left && oPr.TableBorders.Left.Unifill){
-                            oPr.TableBorders.Left.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.Left.Unifill.getRGBAColor();
-                            oPr.TableBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        if(oPr2.TableBorders.Left && oPr2.TableBorders.Left.Unifill){
+                            oPr2.TableBorders.Left.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Left.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                        if(oPr.TableBorders.Right && oPr.TableBorders.Right.Unifill){
-                            oPr.TableBorders.Right.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.Right.Unifill.getRGBAColor();
-                            oPr.TableBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        if(oPr2.TableBorders.Right && oPr2.TableBorders.Right.Unifill){
+                            oPr2.TableBorders.Right.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Right.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                        if(oPr.TableBorders.Top && oPr.TableBorders.Top.Unifill){
-                            oPr.TableBorders.Top.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.Top.Unifill.getRGBAColor();
-                            oPr.TableBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        if(oPr2.TableBorders.Top && oPr2.TableBorders.Top.Unifill){
+                            oPr2.TableBorders.Top.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Top.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                        if(oPr.TableBorders.InsideH && oPr.TableBorders.InsideH.Unifill){
-                            oPr.TableBorders.InsideH.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.InsideH.Unifill.getRGBAColor();
-                            oPr.TableBorders.InsideH.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        if(oPr2.TableBorders.InsideH && oPr2.TableBorders.InsideH.Unifill){
+                            oPr2.TableBorders.InsideH.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.InsideH.Unifill.getRGBAColor();
+                            oPr2.TableBorders.InsideH.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                        if(oPr.TableBorders.InsideV && oPr.TableBorders.InsideV.Unifill){
-                            oPr.TableBorders.InsideV.Unifill.check(oTheme, oColorMap);
-                            RGBA = oPr.TableBorders.InsideV.Unifill.getRGBAColor();
-                            oPr.TableBorders.InsideV.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        if(oPr2.TableBorders.InsideV && oPr2.TableBorders.InsideV.Unifill){
+                            oPr2.TableBorders.InsideV.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.InsideV.Unifill.getRGBAColor();
+                            oPr2.TableBorders.InsideV.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
                     }
                 }
@@ -1178,7 +1179,47 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
                             var aCopyContent = aCopyCells[j].Content.Content;
                             AscFormat.SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap);
                             if(aSourceCells[j].CompiledPr.Pr){
-                                aCopyCells[j].Set_Pr(aSourceCells[j].CompiledPr.Pr.Copy());
+                                var oCellPr = new CTableCellPr();
+                                if(oPr2.TableBorders){
+                                    if(i === 0){
+                                        if(oPr2.TableBorders.Top){
+                                            oCellPr.TableCellBorders.Top = oPr2.TableBorders.Top.Copy();
+                                        }
+                                    }
+                                    if(i === oCopyTable.Content.length - 1){
+                                        if(oPr2.TableBorders.Bottom){
+                                            oCellPr.TableCellBorders.Bottom = oPr2.TableBorders.Bottom.Copy();
+                                        }
+                                    }
+                                    if(oPr2.TableBorders.InsideH){
+                                        if(i !== 0){
+                                            oCellPr.TableCellBorders.Top = oPr2.TableBorders.InsideH.Copy();
+                                        }
+                                        if(i !== oCopyTable.Content.length - 1){
+                                                oCellPr.TableCellBorders.Bottom = oPr2.TableBorders.InsideH.Copy();
+                                        }
+                                    }
+                                    if(j === 0){
+                                        if(oPr2.TableBorders.Left){
+                                            oCellPr.TableCellBorders.Left = oPr2.TableBorders.Left.Copy();
+                                        }
+                                    }
+                                    if(j === aSourceCells.length - 1){
+                                        if(oPr2.TableBorders.Right){
+                                            oCellPr.TableCellBorders.Right = oPr2.TableBorders.Right.Copy();
+                                        }
+                                    }
+                                    if(oPr2.TableBorders.InsideV){
+                                        if(j !== 0){
+                                            oCellPr.TableCellBorders.Left = oPr2.TableBorders.InsideV.Copy();
+                                        }
+                                        if(j !== aSourceCells.length - 1){
+                                            oCellPr.TableCellBorders.Right = oPr2.TableBorders.InsideV.Copy();
+                                        }
+                                    }
+                                }
+                                oCellPr.Merge(aSourceCells[j].CompiledPr.Pr.Copy());
+                                aCopyCells[j].Set_Pr(oCellPr);
                                 var oPr = aCopyCells[j].Pr;
                                 if(oPr.Shd && oPr.Shd.Unifill){
                                     if(oPr.Shd.Unifill){
