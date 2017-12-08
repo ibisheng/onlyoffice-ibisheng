@@ -1084,6 +1084,7 @@
 		{
 			return;
 		}
+		this.selectSearchingResults = value;
 		this._selectSearchingResults(value);
 	};
 

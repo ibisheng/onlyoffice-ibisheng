@@ -3527,7 +3527,10 @@ var editor;
 	};
 
 	spreadsheet_api.prototype._selectSearchingResults = function () {
-	  this.wb.drawWS();
+	  var ws = this.wbModel.getActiveWs();
+	  if (ws && ws.lastFindOptions) {
+	    this.wb.drawWS();
+      }
 	};
 
   /*
