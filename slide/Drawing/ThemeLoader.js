@@ -157,9 +157,7 @@ function CThemeLoader()
             _loader.IsThemeLoader = true;
 
             var pres = {};
-            pres.themes = [];
             pres.slideMasters = [];
-            pres.slideLayouts = [];
             pres.DrawingDocument = editor.WordControl.m_oDrawingDocument;
 
             AscCommon.History.MinorChanges = true;

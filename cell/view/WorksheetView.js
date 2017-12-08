@@ -8587,8 +8587,8 @@
                         break;
                         break;
                     case "paste":
-						var clipboardBase = window['AscCommon'].g_clipboardBase;
-						clipboardBase.specialPasteProps = clipboardBase.specialPasteProps ? clipboardBase.specialPasteProps : new Asc.SpecialPasteProps();
+						var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+						specialPasteHelper.specialPasteProps = specialPasteHelper.specialPasteProps ? specialPasteHelper.specialPasteProps : new Asc.SpecialPasteProps();
 					
                         t._loadDataBeforePaste(isLargeRange, val.fromBinary, val.data, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
@@ -8644,7 +8644,7 @@
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
 			if (prop !== "paste" || (prop === "paste" && val.fromBinary)) {
 				History.EndTransaction();
-				window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			}
         };
 
@@ -8677,8 +8677,8 @@
 		var api = window["Asc"]["editor"];
 		var t = this;
 
-		var clipboard_base = window['AscCommon'].g_clipboardBase;
-		var specialPasteData = clipboard_base.specialPasteData;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteData = specialPasteHelper.specialPasteData;
 
 		if(!specialPasteData)
 		{
@@ -8693,8 +8693,8 @@
 				return false;
 			}
 
-			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
-			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+			window['AscCommon'].g_specialPasteHelper.Special_Paste_Start();
 
 			api.asc_Undo();
 
@@ -8703,9 +8703,9 @@
 			History.StartTransaction();
 
 			//далее специальная вставка
-			clipboard_base.specialPasteProps = props;
+			specialPasteHelper.specialPasteProps = props;
 			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-			window['AscCommon'].g_clipboardBase.bIsEndTransaction = true;
+			window['AscCommon'].g_specialPasteHelper.bIsEndTransaction = true;
 			AscCommonExcel.g_clipboardExcel.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		};
 
@@ -8721,11 +8721,11 @@
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
         var t = this;
-		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			if(!specialPasteHelper.specialPasteStart)
 			{
 				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
 			}
@@ -8868,7 +8868,7 @@
         }
 		
 		//for special paste
-		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
 			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var allowedSpecialPasteProps;
@@ -8887,7 +8887,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
 			//this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
 		}
 		else
@@ -8898,8 +8898,8 @@
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
-		var clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		//paste from excel binary
 		if(fromBinary)
@@ -8973,7 +8973,7 @@
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
-								window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 							}, true );
 						}
 						
@@ -8989,7 +8989,7 @@
 				if ( isEndTransaction ) 
 				{
 					History.EndTransaction();
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
 			
@@ -9204,8 +9204,8 @@
         var pasteRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
         var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
 		
-		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		var countPasteRow = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
 		var countPasteCol = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
@@ -9975,8 +9975,8 @@
 		var cellCoord;
 		if(!positionShapeContent)
 		{
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9997,12 +9997,12 @@
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
-		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
+		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton && isIntoShape)
 		{
-			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
+			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId === isIntoShape.Id)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+				var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
 				
 				/*var trueShapeSelection = isIntoShape.GetSelectionState();
 				isIntoShape.SetSelectionState(range, range.length - 1);*/
@@ -10032,15 +10032,15 @@
 				//isIntoShape.SetSelectionState(trueShapeSelection, trueShapeSelection.length - 1);
 			}
 		}
-		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+		else if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			if(changeActiveRange)
 			{
-				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = changeActiveRange;
+				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = changeActiveRange;
 			}
 			
-			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+			var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			
@@ -10059,7 +10059,7 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId)
 		{
 			disableCoords();
 			cellCoord = [cellCoord];

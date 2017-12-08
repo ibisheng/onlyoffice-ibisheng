@@ -1717,6 +1717,22 @@ background-repeat: no-repeat;\
 			return AscCommon.g_clipboardBase.Button_Paste();
 		}
 	};
+
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+
+	asc_docs_api.prototype.asc_HideSpecialPasteButton = function()
+	{
+		this.sendEvent("asc_onHideSpecialPasteOptions");
+	};
+
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function(props)
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+
 	asc_docs_api.prototype.Share          = function()
 	{
 
@@ -1779,16 +1795,37 @@ background-repeat: no-repeat;\
     	    return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		switch (_format)
+		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
+	};
+
+	asc_docs_api.prototype.asc_SpecialPaste = function(props)
+	{
+		return AscCommon.g_specialPasteHelper.Special_Paste(props);
+	};
+
+	asc_docs_api.prototype.asc_SpecialPasteData = function(props)
+	{
+		if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return;
+
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+
+		//TODO пересмотреть проверку лока и добавление новой точки(AscDFH.historydescription_Document_PasteHotKey)
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
-			case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
-				AscCommon.Editor_Paste_Exec(this, data1, data2);
-				break;
-			case AscCommon.c_oAscClipboardDataFormat.Internal:
-				AscCommon.Editor_Paste_Exec(this, null, null, data1);
-				break;
-			default:
-				break;
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+			window['AscCommon'].g_specialPasteHelper.Special_Paste_Start();
+
+			//undo previous action
+			this.WordControl.m_oLogicDocument.Document_Undo();
+
+			//if (!useCurrentPoint) {
+			_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			//}
+
+			AscCommon.Editor_Paste_Exec(this, null, null, null, null, props);
 		}
 	};
 
@@ -4752,38 +4789,8 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oMasterDrawer.WidthMM  = presentation.Width;
 				this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
 
-				if(!window['native'])
-				{
-					this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
-				}
+				this.WordControl.m_oLogicDocument.SendThemesThumbnails();
 
-				var _masters = this.WordControl.m_oLogicDocument.slideMasters;
-				for (var i = 0; i < _masters.length; i++)
-				{
-					if (_masters[i].ThemeIndex < 0)//только темы презентации
-					{
-						var theme_load_info    = new AscCommonSlide.CThemeLoadInfo();
-						theme_load_info.Master = _masters[i];
-						theme_load_info.Theme  = _masters[i].Theme;
-
-						var _lay_cnt = _masters[i].sldLayoutLst.length;
-						for (var j = 0; j < _lay_cnt; j++)
-							theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
-
-						var th_info       = {};
-						th_info.Name      = "Doc Theme " + i;
-						th_info.Url       = "";
-						th_info.Thumbnail = _masters[i].ImageBase64;
-
-						var th                                                                                = new AscCommonSlide.CAscThemeInfo(th_info);
-						this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;
-						th.Index                                                                              = -this.ThemeLoader.Themes.DocumentThemes.length;
-
-						this.ThemeLoader.themes_info_document[this.ThemeLoader.Themes.DocumentThemes.length - 1] = theme_load_info;
-					}
-				}
-
-				this.sync_InitEditorThemes(this.ThemeLoader.Themes.EditorThemes, this.ThemeLoader.Themes.DocumentThemes);
 
 				this.sendEvent("asc_onPresentationSize", presentation.Width, presentation.Height);
 

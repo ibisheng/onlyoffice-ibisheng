@@ -161,6 +161,8 @@ function BinaryPPTYLoader()
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];
+    this.aSlideLayouts = [];
+    this.aThemes = [];
 	this.DocReadResult = null;
 
 	this.arr_connectors = [];
@@ -467,6 +469,7 @@ function BinaryPPTYLoader()
             }
         }
 
+        this.aThemes.length = 0;
         if (undefined != _main_tables["20"])
         {
             // themes
@@ -474,7 +477,7 @@ function BinaryPPTYLoader()
 
             var _themes_count = s.GetULong();
             for (var i = 0; i < _themes_count; i++)
-                this.presentation.themes[i] = this.ReadTheme();
+                this.aThemes[i] = this.ReadTheme();
         }
 
         if (undefined != _main_tables["22"])
@@ -490,6 +493,7 @@ function BinaryPPTYLoader()
             }
         }
 
+        this.aSlideLayouts.length = 0;
         if (undefined != _main_tables["23"])
         {
             // slide masters
@@ -498,8 +502,8 @@ function BinaryPPTYLoader()
             var _sl_count = s.GetULong();
             for (var i = 0; i < _sl_count; i++)
             {
-                this.presentation.slideLayouts[i] = this.ReadSlideLayout();
-                this.presentation.slideLayouts[i].setSlideSize(this.presentation.Width, this.presentation.Height);
+                this.aSlideLayouts[i] = this.ReadSlideLayout();
+                this.aSlideLayouts[i].setSlideSize(this.presentation.Width, this.presentation.Height);
             }
         }
 
@@ -526,7 +530,7 @@ function BinaryPPTYLoader()
                 var _nm_count = s.GetULong();
                 for (var i = 0; i < _nm_count; i++){
                     this.presentation.notesMasters[i] = this.ReadNoteMaster();
-                    this.presentation.notesMasters[i].setTheme(this.presentation.themes[0]);//TODO: убрать после того как будут сделаны рельсы
+                    this.presentation.notesMasters[i].setTheme(this.aThemes[0]);//TODO: убрать после того как будут сделаны рельсы
                 }
             }
 
@@ -640,8 +644,8 @@ function BinaryPPTYLoader()
                         break;
 
                     var indexL = s.GetULong();
-                    this.presentation.Slides[_slideNum].setLayout(this.presentation.slideLayouts[indexL]);
-                    this.presentation.Slides[_slideNum].Master = this.presentation.slideLayouts[indexL].Master;
+                    this.presentation.Slides[_slideNum].setLayout(this.aSlideLayouts[indexL]);
+                    this.presentation.Slides[_slideNum].Master = this.aSlideLayouts[indexL].Master;
                     _slideNum++;
                 }
             }
@@ -693,7 +697,7 @@ function BinaryPPTYLoader()
 
 					var indexL = s.GetLong();
 					var notesMaster = this.presentation.notesMasters[_noteMasterNum];
-					var notesMasterTheme = this.presentation.themes[indexL];
+					var notesMasterTheme = this.aThemes[indexL];
 					if (notesMaster && notesMasterTheme) {
 						notesMaster.setTheme(notesMasterTheme);
 					}
@@ -704,32 +708,32 @@ function BinaryPPTYLoader()
 
         if (this.Api != null && !this.IsThemeLoader)
         {
-            if (this.presentation.themes.length == 0)
+            if (this.aThemes.length == 0)
             {
-                this.presentation.themes[0] = AscFormat.GenerateDefaultTheme(this.presentation);
+                this.aThemes[0] = AscFormat.GenerateDefaultTheme(this.presentation);
             }
             if (this.presentation.slideMasters.length == 0)
             {
-                this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.presentation.themes[0]);
-                this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
+                this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.aThemes[0]);
+                this.aSlideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
             if(this.presentation.slideMasters[0].sldLayoutLst.length === 0)
             {
                 this.presentation.slideMasters[0].sldLayoutLst[0] = AscFormat.GenerateDefaultSlideLayout(this.presentation.slideMasters[0]);
-                this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
+                this.aSlideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
 
             if(this.presentation.notesMasters.length === 0)
             {
                 this.presentation.notesMasters[0] = AscCommonSlide.CreateNotesMaster();
-                var oNotesTheme = this.presentation.themes[0].createDuplicate();
+                var oNotesTheme = this.aThemes[0].createDuplicate();
                 oNotesTheme.presentation = this.presentation;
-                this.presentation.themes.push(oNotesTheme);
+                this.aThemes.push(oNotesTheme);
                 this.presentation.notesMasters[0].setTheme(oNotesTheme);
             }
             if (this.presentation.Slides.length == 0)
             {
-                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
+                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.aSlideLayouts[0]);
             }
             var _slides = this.presentation.Slides;
             var _slide;
@@ -776,7 +780,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     var indexTh = s.GetULong();
-                    master.setTheme(this.presentation.themes[indexTh]);
+                    master.setTheme(this.aThemes[indexTh]);
                     master.ThemeIndex = -indexTh - 1;
                     break;
                 }
@@ -806,8 +810,8 @@ function BinaryPPTYLoader()
                     case 0:
                     {
                         var indexL = s.GetULong();
-                        master.addToSldLayoutLstToPos(master.sldLayoutLst.length, this.presentation.slideLayouts[indexL]);
-                        this.presentation.slideLayouts[indexL].setMaster( master);
+                        master.addToSldLayoutLstToPos(master.sldLayoutLst.length, this.aSlideLayouts[indexL]);
+                        this.aSlideLayouts[indexL].setMaster( master);
                         break;
                     }
                     case 1:
@@ -3895,9 +3899,9 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                theme.name = s.GetString2();
+                theme.setName(s.GetString2());
             else if (1 == _at)
-                theme.isThemeOverride = s.GetBool();
+                theme.setIsThemeOverride(s.GetBool());
             else
                 break;
         }
@@ -3920,17 +3924,17 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    theme.spDef = this.ReadDefaultShapeProperties();
+                    theme.setSpDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 2:
                 {
-                    theme.lnDef = this.ReadDefaultShapeProperties();
+                    theme.setLnDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 3:
                 {
-                    theme.txDef = this.ReadDefaultShapeProperties();
+                    theme.setTxDef(this.ReadDefaultShapeProperties());
                     break;
                 }
                 case 4:

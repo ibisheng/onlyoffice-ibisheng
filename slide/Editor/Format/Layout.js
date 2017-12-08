@@ -109,6 +109,7 @@ function SlideLayout()
     this.Master = null;
     this.maxId = 1000;
 
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     this.bounds = new AscFormat.CGraphicBounds(0.0, 0.0, 0.0, 0.0);
     this.recalcInfo =
     {
@@ -139,6 +140,50 @@ SlideLayout.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+    createDuplicate: function(IdMap)
+    {
+        var oIdMap = IdMap || {};
+        var copy = new SlideLayout();
+        if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
+        {
+            copy.setCSldName(this.cSld.name);
+        }
+        if(this.cSld.Bg)
+        {
+            copy.changeBackground(this.cSld.Bg.createFullCopy());
+        }
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            var _copy;
+            if(this.cSld.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.cSld.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.cSld.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.cSld.spTree[i].Id] = _copy.Id;
+            }
+            copy.shapeAdd(copy.cSld.spTree.length, _copy);
+            copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
+        }
+
+        if(this.clrMap){
+            copy.setClMapOverride(this.clrMap.createDuplicate());
+        }
+        if(copy.matchingName !== this.matchingName){
+            copy.setMatchingName(this.matchingName);
+        }
+
+        if(copy.showMasterPhAnim !== this.showMasterPhAnim){
+            copy.setShowPhAnim(this.showMasterPhAnim);
+        }
+        if(this.type !== copy.type){
+            copy.setType(this.type);
+        }
+        return copy;
     },
 
 
@@ -520,6 +565,22 @@ SlideLayout.prototype =
 
     Refresh_RecalcData: function()
     {},
+
+    Clear_ContentChanges: function () {
+    },
+
+    Add_ContentChanges: function (Changes) {
+    },
+
+    Refresh_ContentChanges: function () {
+    },
+
+    scale: function (kw, kh) {
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].changeSize(kw, kh);
+        }
+    },
 
     Load_Comments : function(authors)
     {

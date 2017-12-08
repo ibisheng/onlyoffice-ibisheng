@@ -2090,6 +2090,8 @@ function CBinaryFileWriter()
                 oThis.WriteRecord2(3, rPr.RFonts.Ascii, oThis.WriteTextFontTypeface);
             if (rPr.RFonts.EastAsia)
                 oThis.WriteRecord2(4, rPr.RFonts.EastAsia, oThis.WriteTextFontTypeface);
+            if (rPr.RFonts.CS)
+                oThis.WriteRecord2(5, rPr.RFonts.CS, oThis.WriteTextFontTypeface);
         }
 
         if (hlinkObj != null && hlinkObj !== undefined)
