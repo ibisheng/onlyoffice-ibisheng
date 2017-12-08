@@ -45,6 +45,9 @@
 	/** @constructor */
 	function baseEditorsApi(config, editorId)
 	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["CreateEditorApi"]();
+
 		this.editorId      = editorId;
 		this.isLoadFullApi = false;
 		this.openResult    = null;

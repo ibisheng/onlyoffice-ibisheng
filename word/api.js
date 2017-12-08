@@ -721,11 +721,6 @@
 	{
 		AscCommon.baseEditorsApi.call(this, config, AscCommon.c_oEditorId.Word);
 
-		if (window["AscDesktopEditor"])
-		{
-			window["AscDesktopEditor"]["CreateEditorApi"]();
-		}
-
 		/************ private!!! **************/
 		this.WordControl = null;
 
