@@ -1838,7 +1838,9 @@
 	prot['uniteList'] = prot.uniteList;
 	prot['doNotUniteList'] = prot.doNotUniteList;
 	prot['keepTextOnly'] = prot.keepTextOnly;
-	
+	prot['insertAsNestedTable'] = prot.insertAsNestedTable;
+	prot['overwriteCells'] = prot.overwriteCells;
+
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
 		{
