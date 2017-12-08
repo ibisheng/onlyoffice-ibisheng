@@ -4297,7 +4297,7 @@
         var align = c.getAlign();
         var angle = align.getAngle();
         var va = align.getAlignVertical();
-        if (this._isCellEmptyTextString(c)) {
+        if (c.isEmptyTextString()) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
                 str = c.getValue2();
@@ -4705,10 +4705,6 @@
     WorksheetView.prototype._isCellNullText = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isNullText();
-    };
-    WorksheetView.prototype._isCellEmptyTextString = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        return null === c || c.isEmptyTextString();
     };
 
     WorksheetView.prototype._isCellEmptyOrMerged = function (col, row) {
