@@ -2852,9 +2852,12 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
-CMathBase.prototype.Is_FromDocument = function(MathContent)
+CMathBase.prototype.Is_FromDocument = function()
 {
-	return this.Paragraph && this.Paragraph.bFromDocument
+	if (this.ParaMath)
+		return this.ParaMath.Paragraph && this.ParaMath.Paragraph.bFromDocument;
+
+	return false;
 };
 CMathBase.prototype.Clear_ContentChanges = function()
 {
