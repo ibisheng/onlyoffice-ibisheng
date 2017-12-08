@@ -2482,7 +2482,10 @@
 
             // ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
             var c = this._getVisibleCell( col, row );
-            var bg = c.getFill();
+			var findFillColor = this.handlers.trigger('selectSearchingResults') && this.model.inFindResults(row, col) ?
+				this.settings.findFillColor : null;
+			var fillColor = c.getFill();
+            var bg = fillColor || findFillColor;
             var mc = null;
             var mwidth = 0, mheight = 0;
 
@@ -2535,6 +2538,10 @@
             var h = this.rows[row].height + this.height_1px * (bg !== null ? +1 : -1) + mheight;
             var color = bg !== null ? bg : this.settings.cells.defaultState.background;
             ctx.setFillStyle( color ).fillRect( x - offsetX, y - offsetY, w, h );
+
+            if (fillColor && findFillColor) {
+				ctx.setFillStyle(findFillColor).fillRect(x - offsetX, y - offsetY, w, h);
+            }
         }
         return mergedCells;
     };
@@ -7313,6 +7320,9 @@
     // Обработка движения в выделенной области
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
         var ret;
+        if (0 === dc && 0 === dr) {
+            return this._calcActiveCellOffset();
+        }
         if (!this._moveActivePointInSelection(dc, dr)) {
             return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, false);
         }

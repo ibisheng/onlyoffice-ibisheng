@@ -3526,6 +3526,13 @@ var editor;
 		this._isLockedPivot(pivot.asc_getName(), changePivotStyle);
 	};
 
+	spreadsheet_api.prototype._selectSearchingResults = function () {
+	  var ws = this.wbModel.getActiveWs();
+	  if (ws && ws.lastFindOptions) {
+	    this.wb.drawWS();
+      }
+	};
+
   /*
    * Export
    * -----------------------------------------------------------------------------

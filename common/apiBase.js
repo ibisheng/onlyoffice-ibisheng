@@ -34,6 +34,8 @@
 
 (function(window, undefined)
 {
+	var prot;
+
 	// Import
 	var c_oEditorId = AscCommon.c_oEditorId;
 	var c_oCloseCode = AscCommon.c_oCloseCode;
@@ -156,6 +158,8 @@
 		this.noCreatePoint     = false;
 		this.exucuteHistory    = false;
 		this.exucuteHistoryEnd = false;
+
+		this.selectSearchingResults = false;
 
 		this.isSendStandartTextures = false;
 
@@ -1074,6 +1078,16 @@
 	{
 	};
 
+	baseEditorsApi.prototype.asc_selectSearchingResults = function(value)
+	{
+		if (this.selectSearchingResults === value)
+		{
+			return;
+		}
+		this.selectSearchingResults = value;
+		this._selectSearchingResults(value);
+	};
+
 
 	baseEditorsApi.prototype.asc_startEditCurrentOleObject = function(){
 
@@ -1736,4 +1750,7 @@
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;
+
+	prot = baseEditorsApi.prototype;
+	prot['asc_selectSearchingResults'] = prot.asc_selectSearchingResults;
 })(window);

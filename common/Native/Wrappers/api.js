@@ -5088,7 +5088,7 @@ Asc['asc_docs_api'].prototype.asc_replaceText = function(text, replaceWith, isRe
     }
 };
 
-Asc['asc_docs_api'].prototype.asc_selectSearchingResults = function(bShow)
+Asc['asc_docs_api'].prototype._selectSearchingResults = function(bShow)
 {
     this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
 };
