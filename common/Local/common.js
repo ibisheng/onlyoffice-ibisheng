@@ -242,6 +242,22 @@ window["UpdateInstallPlugins"] = function()
 	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	if (!window.IsFirstPluginLoad)
+	{
+		_editor.asc_registerCallback("asc_onPluginsReset", function ()
+		{
+
+			if (_editor.pluginsManager)
+			{
+				_editor.pluginsManager.unregisterAll();
+			}
+
+		});
+
+		window.IsFirstPluginLoad = true;
+	}
+
 	_editor.sendEvent("asc_onPluginsReset");
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
