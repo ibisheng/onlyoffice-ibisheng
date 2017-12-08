@@ -4722,27 +4722,6 @@
         return (null === c.hasMerged());
     };
 
-    WorksheetView.prototype._isCellEmptyOrMergedOrBackgroundColorOrBorders = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        if (null === c) {
-            return true;
-        }
-        if (!c.isEmptyTextString()) {
-            return false;
-        }
-        if (null !== c.hasMerged()) {
-            return false;
-        }
-        var bg = c.getFill();
-        if (null !== bg) {
-            return false;
-        }
-        var cb = c.getBorder();
-        return !((cb.l && c_oAscBorderStyles.None !== cb.l.s) || (cb.r && c_oAscBorderStyles.None !== cb.r.s) ||
-        (cb.t && c_oAscBorderStyles.None !== cb.t.s) || (cb.b && c_oAscBorderStyles.None !== cb.b.s) ||
-        (cb.dd && c_oAscBorderStyles.None !== cb.dd.s) || (cb.du && c_oAscBorderStyles.None !== cb.du.s));
-    };
-
     WorksheetView.prototype._getRange = function (c1, r1, c2, r2) {
         return this.model.getRange3(r1, c1, r2, c2);
     };
