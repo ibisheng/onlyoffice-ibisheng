@@ -2861,10 +2861,7 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 };
 CMathBase.prototype.Is_FromDocument = function()
 {
-	if (this.ParaMath)
-		return this.ParaMath.Paragraph && this.ParaMath.Paragraph.bFromDocument;
-
-	return false;
+	return this.ParaMath.Paragraph && this.ParaMath.Paragraph.bFromDocument;
 };
 CMathBase.prototype.Clear_ContentChanges = function()
 {
