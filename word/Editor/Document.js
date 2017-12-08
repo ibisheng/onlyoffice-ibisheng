@@ -348,6 +348,10 @@ function CSelectedContent()
     this.MoveDrawing      = false; // Только для переноса автофигур
     this.HaveMath         = false;
     this.CanConvertToMath = false;
+
+    this.InsertOptions = {
+    	Table : Asc.c_oSpecialPasteProps.overwriteCells
+	};
 }
 
 CSelectedContent.prototype =
@@ -525,6 +529,10 @@ CSelectedContent.prototype =
         }
         return oParaMath;
     }
+};
+CSelectedContent.prototype.SetInsertOptionForTable = function(nType)
+{
+	this.InsertOptions.Table = nType;
 };
 
 function CDocumentRecalculateState()

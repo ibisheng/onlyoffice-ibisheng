@@ -4022,7 +4022,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 PrevClass.Correct_Content();
             }
         }
-		else if (1 === ElementsCount && type_Table === FirstElement.Element.GetType() && this.Parent && this.Parent instanceof CTableCell)
+		else if (Asc.c_oSpecialPasteProps.overwriteCells === SelectedContent.InsertOptions.Table && 1 === ElementsCount && type_Table === FirstElement.Element.GetType() && this.Parent && this.Parent instanceof CTableCell)
 		{
 			return this.Parent.InsertTableContent(FirstElement.Element);
 		}
