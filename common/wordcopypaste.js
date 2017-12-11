@@ -2417,7 +2417,16 @@ PasteProcessor.prototype =
 				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
 			}*/
 
-			props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.keepTextOnly];
+			//если вставляем одну таблицу в ячейку другой таблицы
+			if (insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() &&
+				insertToElem.Parent && insertToElem.Parent.Is_InTable())
+			{
+				props = [sProps.insertAsNestedTable, sProps.overwriteCells, sProps.keepTextOnly];
+			}
+			else
+			{
+				props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.keepTextOnly];
+			}
 
 			if(null !== props)
 			{
