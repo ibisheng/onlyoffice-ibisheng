@@ -380,7 +380,7 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 			}
 			else
 			{
-				// TODO:
+				_api.asc_setViewMode((0 == signatures.length) ? false : true);
 			}
 
 		});
@@ -390,6 +390,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
 		if (this.WordControl)
 			this.WordControl.OnRePaintAttack();
+		else if (this._onShowDrawingObjects)
+			this._onShowDrawingObjects();
 	}, null);
 
 	_editor.sendEvent("asc_onUpdateSignatures", _editor.asc_getSignatures(), _editor.asc_getRequestSignatures());
@@ -401,6 +403,10 @@ window["DesktopSaveQuestionReturn"] = function(isNeedSaved)
 	{
 		var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 		_editor.asc_Save(false);
+	}
+	else
+	{
+		window.SaveQuestionObjectBeforeSign = null;
 	}
 };
 
@@ -457,7 +463,13 @@ window["asc_LocalRequestSign"] = function(guid, width, height, isView)
 		}
 	}
 
-	if (!_editor.isDocumentModify)
+	var isModify = false;
+	if (_editor.asc_isDocumentModified)
+		isModify = _editor.asc_isDocumentModified();
+	else
+		isModify = _editor.isDocumentModified();
+
+	if (!isModify)
 	{
 		_editor.sendEvent("asc_onSignatureClick", guid, width, height, window["asc_IsVisibleSign"](guid));
 		return;

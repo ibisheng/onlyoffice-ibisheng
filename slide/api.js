@@ -4782,6 +4782,13 @@ background-repeat: no-repeat;\
 
 				presentation.DrawingDocument.OnEndRecalculate();
 
+				this.asc_registerCallback('asc_doubleClickOnChart', function(){
+					// next tick
+					setTimeout(function() {
+						window.editor.WordControl.onMouseUpMainSimple();
+					}, 0);
+				});
+
 				this.WordControl.m_oLayoutDrawer.IsRetina = this.WordControl.bIsRetinaSupport;
 
 				this.WordControl.m_oLayoutDrawer.WidthMM  = presentation.Width;
@@ -5624,7 +5631,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.WordControl.setNodesEnable(((this.isViewMode || this.isMobileVersion) && !this.isReporterMode) ? false : true);
+		this.WordControl.setNodesEnable((this.isMobileVersion && !this.isReporterMode) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;

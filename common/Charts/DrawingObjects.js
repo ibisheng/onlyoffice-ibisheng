@@ -2588,6 +2588,7 @@ function DrawingObjects() {
             _this.controller.selectObject(oSignatureLine, 0);
             _this.controller.startRecalculate();
             worksheet.setSelectionShape(true);
+            window["Asc"]["editor"].sendEvent("asc_onAddSignature", sGuid);
         });
     };
 

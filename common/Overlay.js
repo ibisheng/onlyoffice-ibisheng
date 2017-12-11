@@ -2662,13 +2662,13 @@ CAutoshapeTrack.prototype =
 		var _wPx = _canvas.width;
 		var _hPx = _canvas.height;
 
-		var _wMm = _wPx * g_dKoef_pix_to_mm;
-		var _hMm = _hPx * g_dKoef_pix_to_mm;
+		var _wMm = _wPx * AscCommon.g_dKoef_pix_to_mm;
+		var _hMm = _hPx * AscCommon.g_dKoef_pix_to_mm;
 
 		_ctx.clearRect(0, 0, _wPx, _hPx);
 
-		var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
-		var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
+		var _pxBoundsW = par.Lines[0].Ranges[0].W * AscCommon.g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+		var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * AscCommon.g_dKoef_mm_to_pix;
 
 		var _yOffset = (_hPx - _pxBoundsH) >> 1;
 		var _xOffset = (_wPx - _pxBoundsW) >> 1;

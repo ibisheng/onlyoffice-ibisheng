@@ -2898,8 +2898,11 @@ function _HEXTORGB_( colorHEX ) {
 	/*events*/
 	ScrollObject.prototype.evt_mousemove = function ( e ) {
 
-		var arrowStat = ArrowStatus.arrowHover;
-		var evt = e || window.event;
+        if (this.style)
+            this.style.cursor = "default";
+
+        var arrowStat = ArrowStatus.arrowHover;
+        var evt = e || window.event;
 
 		if ( evt.preventDefault )
 			evt.preventDefault();

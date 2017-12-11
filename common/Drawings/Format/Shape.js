@@ -4051,8 +4051,10 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     var _oldBrush = this.brush;
     if(this.signatureLine){
         var sSignatureUrl = null;
-        if(typeof editor !== "undefined" && editor){
-            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
+
+		var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+        if(_editor){
+            sSignatureUrl = _editor.asc_getSignatureImage(this.signatureLine.id);
         }
         if(typeof sSignatureUrl === "string" && sSignatureUrl.length > 0){
             this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);

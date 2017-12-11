@@ -347,6 +347,7 @@ function CSelectedContent()
     this.HaveShape        = false;
     this.MoveDrawing      = false; // Только для переноса автофигур
     this.HaveMath         = false;
+    this.HaveTable        = false;
     this.CanConvertToMath = false;
 
     this.InsertOptions = {
@@ -393,6 +394,11 @@ CSelectedContent.prototype =
 
             if (type_Paragraph === Element.Get_Type() && Count > 1)
                 Element.Correct_Content();
+
+            if(type_Table === Element.Get_Type())
+            {
+                this.HaveTable = true;
+            }
         }
 
         this.HaveMath = (this.Maths.length > 0 ? true : false);
@@ -5839,7 +5845,7 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 
 
 	//В заголовки диаграмм не вставляем формулы и любые DrawingObjects
-	if (Para.bFromDocument === false && (SelectedContent.DrawingObjects.length > 0 || SelectedContent.HaveMath))
+	if (Para.bFromDocument === false && (SelectedContent.DrawingObjects.length > 0 || SelectedContent.HaveMath || SelectedContent.HaveTable))
 		return false;
 
 	// Проверяем корректность места, куда вставляем
