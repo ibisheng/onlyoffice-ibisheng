@@ -590,6 +590,7 @@ CBlockLevelSdt.prototype.CanSplitTableCells = function()
 };
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
+	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
 	this.Content.Document_UpdateInterfaceState();
 };
 CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)

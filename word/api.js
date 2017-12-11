@@ -7671,6 +7671,10 @@ background-repeat: no-repeat;\
 
 		return null;
 	};
+	asc_docs_api.prototype.sync_ContentControlCallback = function(oContentControlPr)
+	{
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.ContentControl, oContentControlPr);
+	};
 
 	asc_docs_api.prototype.asc_BeginViewModeInReview = function(isFinal)
 	{

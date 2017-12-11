@@ -9366,14 +9366,14 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		{
 			var Element = this.Content[CurPos];
 
-			if (true !== Element.IsSelectionEmpty() && (para_Hyperlink === Element.Type || para_Math === Element.Type))
+			if (true !== Element.IsSelectionEmpty() && Element.Document_UpdateInterfaceState)
 				Element.Document_UpdateInterfaceState();
 		}
 	}
 	else
 	{
 		var CurType = this.Content[this.CurPos.ContentPos].Type;
-		if (para_Hyperlink === CurType || para_Math === CurType)
+		if (this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState)
 			this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
 	}
 
