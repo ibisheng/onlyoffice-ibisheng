@@ -4698,10 +4698,6 @@
         return fl;
     };
 
-    WorksheetView.prototype._isCellEmptyText = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        return null === c || c.isEmptyText();
-    };
     WorksheetView.prototype._isCellNullText = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isNullText();
@@ -4709,13 +4705,7 @@
 
     WorksheetView.prototype._isCellEmptyOrMerged = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
-        if (null === c) {
-            return true;
-        }
-        if (!c.isEmptyText()) {
-            return false;
-        }
-        return (null === c.hasMerged());
+        return null === c || (c.isNullText() && null === c.hasMerged());
     };
 
     WorksheetView.prototype._getRange = function (c1, r1, c2, r2) {

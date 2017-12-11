@@ -1338,7 +1338,7 @@
       asc_applyFunction(callback);
     } else {
       if (ct.col >= 0 && ct.row >= 0) {
-        this.controller.setStrictClose(!ws._isCellEmptyText(ct.col, ct.row));
+        this.controller.setStrictClose(!ws._isCellNullText(ct.col, ct.row));
       }
 
       // Для нажатия на колонку/строку/all/frozenMove обрабатывать dblClick не нужно
