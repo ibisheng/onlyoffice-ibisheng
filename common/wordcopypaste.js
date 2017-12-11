@@ -3225,6 +3225,7 @@ PasteProcessor.prototype =
     {
 		//PASTE
 		if(text){
+			this.oLogicDocument.RemoveBeforePaste();
 			this._pasteText(text);
 			return;
 		}
