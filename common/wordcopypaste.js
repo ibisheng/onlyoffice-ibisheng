@@ -2038,6 +2038,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	//пока ввожу эти параметры для специальной вставки. возможно, нужно будет пересмотреть и убрать их
 	this.pasteTypeContent = undefined;
 	this.pasteList = undefined;
+	this.pasteIntoElem = undefined;//ссылка на элемент контента, который был выделен до вставки
 
 }
 PasteProcessor.prototype =
@@ -2130,6 +2131,10 @@ PasteProcessor.prototype =
 
 		//TODO ориентируюсь при специальной вставке на SelectionState. возможно стоит пересмотреть.
 		this.curDocSelection = this.oDocument.GetSelectionState();
+		if(this.curDocSelection && this.curDocSelection[1] && this.curDocSelection[1].CurPos)
+		{
+			this.pasteIntoElem = this.oDocument.Content[this.curDocSelection[1].CurPos.ContentPos];
+		}
 
         var nInsertLength = this.aContent.length;
         if(nInsertLength > 0)
@@ -2172,11 +2177,6 @@ PasteProcessor.prototype =
 
 		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 		var bIsSpecialPaste = specialPasteHelper.specialPasteStart;
-		var insertToElem = null;
-		if(this.curDocSelection && this.curDocSelection[1] && this.curDocSelection[1].CurPos)
-		{
-			insertToElem = this.oDocument.Content[this.curDocSelection[1].CurPos.ContentPos];
-		}
 
         var paragraph = oDoc.GetCurrentParagraph();
         if (null != paragraph) {
@@ -2296,10 +2296,10 @@ PasteProcessor.prototype =
             }
 
 			//если вставляем таблицу в ячейку таблицы
-			if (insertToElem && 1 === this.aContent.length && type_Table === this.aContent[0].GetType() &&
-				insertToElem.Parent && insertToElem.Parent.Is_InTable() && (!bIsSpecialPaste || (bIsSpecialPaste &&
+			if (this.pasteIntoElem && 1 === this.aContent.length && type_Table === this.aContent[0].GetType() &&
+				this.pasteIntoElem.Parent && this.pasteIntoElem.Parent.Is_InTable() && (!bIsSpecialPaste || (bIsSpecialPaste &&
 				Asc.c_oSpecialPasteProps.overwriteCells === specialPasteHelper.specialPasteProps))) {
-				var table = insertToElem.Parent.Parent.Get_Table();
+				var table = this.pasteIntoElem.Parent.Parent.Get_Table();
 				specialPasteHelper.showButtonIdParagraph = table.Id;
 			} else {
 				if(oSelectedContent.Elements.length === 1)
@@ -2422,12 +2422,6 @@ PasteProcessor.prototype =
 
 			var curDocSelection = this.curDocSelection;
 			var aContent = this.aContent;
-			var document = this.oDocument;
-			var insertToElem;
-			if(curDocSelection)
-			{
-				insertToElem = document.Content[curDocSelection[1].CurPos.ContentPos];
-			}
 
 			var props = null;
 			//table into table
@@ -2444,8 +2438,8 @@ PasteProcessor.prototype =
 			}*/
 
 			//если вставляем одну таблицу в ячейку другой таблицы
-			if (insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() &&
-				insertToElem.Parent && insertToElem.Parent.Is_InTable())
+			if (this.pasteIntoElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() &&
+				this.pasteIntoElem.Parent && this.pasteIntoElem.Parent.Is_InTable())
 			{
 				props = [sProps.overwriteCells, sProps.insertAsNestedTable, sProps.keepTextOnly];
 			}
