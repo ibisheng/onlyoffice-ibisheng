@@ -3088,7 +3088,7 @@
 
 	CSignatureDrawer.prototype.destroy = function()
 	{
-		window.Asc.g_signature_drawer.CanvasParent.removeChild(window.Asc.g_signature_drawer);
+		window.Asc.g_signature_drawer.CanvasParent.removeChild(this.Canvas);
 		delete window.Asc.g_signature_drawer;
 	};
 

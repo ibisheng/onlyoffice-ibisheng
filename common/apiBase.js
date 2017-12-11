@@ -635,6 +635,14 @@
 			t.isOnLoadLicense = true;
 			t._onEndPermissions();
 		};
+		this.CoAuthoringApi.onLicenseChanged          = function(res)
+		{
+			t.licenseResult   = res;
+			t.isOnLoadLicense = true;
+			var oResult = new AscCommon.asc_CAscEditorPermissions();
+			oResult.setLicenseType(res);
+			t.sendEvent('asc_onLicenseChanged', oResult);
+		};
 		this.CoAuthoringApi.onWarning                 = function(code)
 		{
 			t.sendEvent('asc_onError', code || c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);

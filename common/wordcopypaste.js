@@ -4556,8 +4556,16 @@ PasteProcessor.prototype =
 		}
 		else
 		{
-			fonts = this._convertTableFromExcel(aContentExcel);
-			aContent = this.aContent;
+		    if(!this.oDocument.bPresentation)
+            {
+                fonts = this._convertTableFromExcel(aContentExcel);
+                aContent = this.aContent;
+            }
+            else
+            {
+                fonts = [];
+                aContent = [];
+            }
 		}
 		
 		return {content: aContent, fonts: fonts};

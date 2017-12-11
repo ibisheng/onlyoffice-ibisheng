@@ -2123,7 +2123,7 @@ function CEditorPage(api)
 			global_mouseEvent.Button    = 0;
 			oWordControl.m_bIsMouseLock = true;
 
-			if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+			if (oWordControl.m_oDrawingDocument.IsEmptyPresentation && oWordControl.m_oLogicDocument.CanEdit())
 			{
 				oWordControl.m_oLogicDocument.addNextSlide();
 				return;
@@ -2269,6 +2269,30 @@ function CEditorPage(api)
 		oWordControl.m_oLogicDocument.Document_UpdateRulersState();
 
 		oWordControl.EndUpdateOverlay();
+	};
+
+	this.onMouseUpMainSimple = function()
+	{
+		if (false === oThis.m_oApi.bInit_word_control)
+			return;
+
+		var oWordControl = oThis;
+
+		global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
+
+		AscCommon.MouseUpLock.MouseUpLockedSend = true;
+
+		global_mouseEvent.Sender = null;
+
+		global_mouseEvent.UnLockMouse();
+
+		global_mouseEvent.IsPressed = false;
+
+		if (-1 != oWordControl.m_oTimerScrollSelect)
+		{
+			clearInterval(oWordControl.m_oTimerScrollSelect);
+			oWordControl.m_oTimerScrollSelect = -1;
+		}
 	};
 
 	this.setNodesEnable = function(bEnabled)
@@ -4101,7 +4125,13 @@ function CEditorPage(api)
 
 		this.ZoomFreePageNum = lPageNum;
 		drDoc.SlideCurrent   = lPageNum;
-		this.m_oLogicDocument.Set_CurPage(lPageNum);
+		var isRecalculateNote = this.m_oLogicDocument.Set_CurPage(lPageNum);
+		if (bIsAttack && !isRecalculateNote)
+		{
+			var _curPage = this.m_oLogicDocument.CurPage;
+			if (_curPage >= 0)
+				this.m_oNotesApi.OnRecalculateNote(_curPage, this.m_oLogicDocument.Slides[_curPage].NotesWidth, this.m_oLogicDocument.Slides[_curPage].getNotesHeight());
+		}
 
 		// теперь пошлем все шаблоны первой темы
 		this.CheckLayouts();
