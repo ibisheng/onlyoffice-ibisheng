@@ -1254,6 +1254,8 @@
 	window['AscDFH'].historyitem_type_Notes                  = 1129 << 16;
 	window['AscDFH'].historyitem_type_Cnx                    = 1130 << 16;
 	window['AscDFH'].historyitem_type_PresentationSection    = 1131 << 16;
+
+	window['AscDFH'].historyitem_type_DocumentMacros         = 2000 << 16;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -2595,6 +2597,11 @@
     window['AscDFH'].historyitem_PresentationSectionSetGuid       = window['AscDFH'].historyitem_type_PresentationSection | 2;
     window['AscDFH'].historyitem_PresentationSectionSetStartIndex = window['AscDFH'].historyitem_type_PresentationSection | 3;
 
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений класса CDocumentMacros
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_DocumentMacros_Data = window['Asc'].historyitem_type_DocumentMacros | 1;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
