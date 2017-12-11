@@ -3145,62 +3145,6 @@
 		return this.mapTranslate.hasOwnProperty(key) ? this.mapTranslate[key] : key;
 	};
 
-	/** @constructor */
-	function CDocumentMacros()
-	{
-		this.Id = AscCommon.g_oIdCounter.Get_NewId();
-
-		this.Data = "";
-
-		AscCommon.g_oTableId.Add(this, this.Id);
-	}
-	CDocumentMacros.prototype.SetData = function(sData)
-	{
-		AscCommon.History.Add(new CChangesDocumentMacrosData(this, this.Data, sData));
-		this.Data = sData;
-	};
-	CDocumentMacros.prototype.GetData = function()
-	{
-		return this.Data;
-	};
-	CDocumentMacros.prototype.Write_ToBinary2 = function(Writer)
-	{
-		Writer.WriteLong(AscDFH.historyitem_type_DocumentMacros);
-
-		// String2 : Id
-		// String2 : Data
-
-		Writer.WriteString2("" + this.Id);
-		Writer.WriteString2(this.Data);
-	};
-	CDocumentMacros.prototype.Read_FromBinary2 = function(Reader)
-	{
-		// String2 : Id
-		// String2 : Data
-
-		this.Id   = Reader.GetString2();
-		this.Data = Reader.GetString2();
-	};
-
-	AscDFH.changesFactory[AscDFH.historyitem_DocumentMacros_Data]     = CChangesDocumentMacrosData;
-	AscDFH.changesRelationMap[AscDFH.historyitem_DocumentMacros_Data] = [AscDFH.historyitem_DocumentMacros_Data];
-
-	/**
-	 * @constructor
-	 * @extends {AscDFH.CChangesBaseStringProperty}
-	 */
-	function CChangesDocumentMacrosData(Class, Old, New)
-	{
-		AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
-	}
-	CChangesDocumentMacrosData.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
-	CChangesDocumentMacrosData.prototype.constructor = CChangesDocumentMacrosData;
-	CChangesDocumentMacrosData.prototype.Type = AscDFH.historyitem_DocumentMacros_Data;
-	CChangesDocumentMacrosData.prototype.private_SetValue = function(Value)
-	{
-		this.Class.Data = Value;
-	};
-
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
 	window["AscCommon"].getSockJs = getSockJs;
