@@ -5920,9 +5920,6 @@
 		return (0 <= cellText.indexOf(options.findWhat)) &&
 			(true !== options.isWholeCell || options.findWhat.length === cellText.length);
 	};
-	Cell.prototype.isEmptyText=function(){
-		return this.isEmptyTextString() && !this.formulaParsed;
-	};
 	Cell.prototype.isNullText=function(){
 		return this.isNullTextString() && !this.formulaParsed;
 	};
@@ -8225,13 +8222,6 @@
 				type = null;
 		});
 		return type;
-	};
-	Range.prototype.isEmptyText=function(){
-		var isEmptyText;
-		this.worksheet._getCellNoEmpty(this.bbox.r1,this.bbox.c1, function(cell) {
-			isEmptyText = (null != cell) ? cell.isEmptyText() : true;
-		});
-		return isEmptyText;
 	};
 	Range.prototype.isNullText=function(){
 		var isNullText;
