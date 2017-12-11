@@ -371,8 +371,9 @@ var c_oSerParType = {
 	MoveFromRangeEnd: 19,
 	MoveToRangeStart: 20,
 	MoveToRangeEnd: 21,
-	BookmarkStart: 22,
-	BookmarkEnd: 23
+	JsaProject: 22,
+	BookmarkStart: 23,
+	BookmarkEnd: 24
 };
 var c_oSerDocTableType = {
     tblPr:0,
