@@ -39,6 +39,91 @@ var FOCUS_OBJECT_NOTES          = 2;
 var COMMENT_WIDTH   = 18;
 var COMMENT_HEIGHT  = 16;
 
+var global_mouseEvent = AscCommon.global_mouseEvent;
+
+function check_KeyboardEvent(e)
+{
+    AscCommon.global_keyboardEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    AscCommon.global_keyboardEvent.Sender = null;
+
+    AscCommon.global_keyboardEvent.CharCode   = e["CharCode"];
+    AscCommon.global_keyboardEvent.KeyCode    = e["KeyCode"];
+    AscCommon.global_keyboardEvent.Which      = null;
+}
+function check_KeyboardEvent_Array(_params, i)
+{
+    AscCommon.global_keyboardEvent.AltKey     = ((_params[i + 1] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((_params[i + 1] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((_params[i + 1] & 0x04) == 0x04);
+
+    AscCommon.global_keyboardEvent.Sender = null;
+
+    AscCommon.global_keyboardEvent.CharCode   = _params[i + 3];
+    AscCommon.global_keyboardEvent.KeyCode    = _params[i + 2];
+    AscCommon.global_keyboardEvent.Which      = null;
+}
+
+function check_MouseDownEvent(e, isClicks)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_down;
+    global_mouseEvent.Button    = e["Button"];
+
+    global_mouseEvent.Sender    = null;
+
+    if (isClicks)
+    {
+        global_mouseEvent.ClickCount = e["ClickCount"];
+    }
+    else
+    {
+        global_mouseEvent.ClickCount     = 1;
+    }
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+    global_mouseEvent.IsLocked = true;
+}
+
+function check_MouseMoveEvent(e)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_move;
+    global_mouseEvent.Button    = e["Button"];
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+}
+
+function check_MouseUpEvent(e)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_up;
+    global_mouseEvent.Button    = e["Button"];
+
+    global_mouseEvent.Sender    = null;
+
+    global_mouseEvent.IsLocked  = false;
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+}
+
 
 function CDrawingDocument()
 {
@@ -449,7 +534,7 @@ CDrawingDocument.prototype.UpdateTableRuler = function(isCols, index, position)
 };
 CDrawingDocument.prototype.GetDotsPerMM = function(value)
 {
-    this.Native["DD_GetDotsPerMM"](value);
+    return this.Native["DD_GetDotsPerMM"](value);
 };
 
 CDrawingDocument.prototype.GetMMPerDot = function(value)
@@ -580,6 +665,24 @@ CDrawingDocument.prototype.GetCommentHeight = function(type)
 {
 };
 
+CDrawingDocument.prototype.OnMouseDown = function(e)
+{
+    check_MouseDownEvent(e, true);
+    this.m_oLogicDocument.OnMouseDown(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
+CDrawingDocument.prototype.OnMouseMove = function(e)
+{
+    check_MouseMoveEvent(e);
+    this.m_oLogicDocument.OnMouseMove(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
+CDrawingDocument.prototype.OnMouseUp = function(e)
+{
+    check_MouseUpEvent(e);
+    this.m_oLogicDocument.OnMouseUp(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
 // collaborative targets
 CDrawingDocument.prototype.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform, is_from_paint)
 {
@@ -592,6 +695,14 @@ CDrawingDocument.prototype.Collaborative_RemoveTarget = function(_id)
 CDrawingDocument.prototype.Collaborative_TargetsUpdate = function(bIsChangePosition)
 {
     this.Native["DD_Collaborative_TargetsUpdate"](bIsChangePosition);
+};
+
+
+CDrawingDocument.prototype.DrawHorAnchor = function(pageIndex, x)
+{
+};
+CDrawingDocument.prototype.DrawVerAnchor = function(pageIndex, y)
+{
 };
 
 function DrawBackground(graphics, unifill, w, h)

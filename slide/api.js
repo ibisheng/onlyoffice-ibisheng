@@ -5537,8 +5537,13 @@ background-repeat: no-repeat;\
 			obj.lockTranzition ||
 			obj.lockBackground || slide.isLockedObject();
 
-		var oTh = editor.WordControl.Thumbnails;
-		obj.isHidden = oTh.IsSlideHidden(oTh.GetSelectedArray());
+		if(editor.WordControl.Thumbnails){
+            var oTh = editor.WordControl.Thumbnails;
+            obj.isHidden = oTh.IsSlideHidden(oTh.GetSelectedArray());
+		}
+		else{
+            obj.isHidden = false;
+		}
 		var _len = this.SelectedObjectsStack.length;
 		if (_len > 0)
 		{

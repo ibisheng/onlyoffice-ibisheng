@@ -53,8 +53,6 @@ window["ftm"] = FT_Memory;
 
 
 function NativeOpenFileP(_params){
-
-    console.log("NativeOpenFileP");
     window["CreateMainTextMeasurerWrapper"]();
     window.g_file_path = "native_open_file";
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
@@ -167,6 +165,20 @@ Asc['asc_docs_api'].prototype["GetNativePageMeta"] = function(pageIndex)
     this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
 };
 
+
+Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
+{
+   // this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
+};
+
+Asc['asc_docs_api'].prototype.Internal_Update_Ind_Left = function(Left)
+{
+};
+
+Asc['asc_docs_api'].prototype.Internal_Update_Ind_Right = function(Right)
+{
+};
+
 if(!window.native){
 	if(_private_NativeObject){
 		window.native = _private_NativeObject();
@@ -176,11 +188,23 @@ if(!window.native){
 if(window.native){
 	window.native.Call_CheckSlideBounds = function(nIndex){
 		return editor.CheckSlideBounds(nIndex);
-	}
+	};
 	
 	window.native.Call_GetPageMeta = function(nIndex){
 		return editor.GetNativePageMeta(nIndex);
-	}
+	};
+
+	window.native.Call_OnMouseDown = function(e){
+	    editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+    };
+
+    window.native.Call_OnMouseUp = function(e){
+        editor.WordControl.m_oDrawingDocument.OnMouseUp(e);
+    };
+
+    window.native.Call_OnMouseMove = function(e){
+        editor.WordControl.m_oDrawingDocument.OnMouseMove(e);
+    };
 }
 
 window.native.Call_Menu_Event = function (type, _params)

@@ -15,5 +15,5 @@ del ..\mobile_banners.js
 del tmp_newline.txt
 
 xcopy /s/y ..\..\core\build\jsnative ..\..\core-ext\resources_native\jsnative\
-
+if exist ..\..\core-ext\resources_native\jsnative\slide\script.cache del ..\..\core-ext\resources_native\jsnative\slide\script.cache
 pause
