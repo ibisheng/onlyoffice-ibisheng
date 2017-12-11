@@ -237,7 +237,8 @@
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
         "../slide/Native/Wrappers/DrawingDocument.js",
-		"../cell/native/TextDrawer.js"
+		"../cell/native/TextDrawer.js",
+        "../slide/Native/Wrappers/native.js"
       ],
       "exclude_mobile": [
         "../word/Drawing/ShapeDrawer.js",
