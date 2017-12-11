@@ -3145,6 +3145,14 @@
 		return this.mapTranslate.hasOwnProperty(key) ? this.mapTranslate[key] : key;
 	};
 
+	/** @constructor */
+	function CDocumentMacros()
+	{
+		this.Data = "";
+		this.Id = AscCommon.g_oIdCounter.Get_NewId();
+		AscCommon.g_oTableId.Add(this, this.Id);
+	}
+
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
 	window["AscCommon"].getSockJs = getSockJs;
