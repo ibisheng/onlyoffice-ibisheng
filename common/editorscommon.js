@@ -3217,6 +3217,4 @@
 	prot["destroy"] 	= prot.destroy;
 
 	window["AscCommon"].translateManager = new CTranslateManager();
-
-	window["AscCommon"].CDocumentMacros = CDocumentMacros;
 })(window);

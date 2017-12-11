@@ -176,6 +176,8 @@
 
 		this.currentPassword = "";
 
+		this.marcos = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
 			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -1198,6 +1200,8 @@
 		if (!window['IS_NATIVE_EDITOR']) {
 			setInterval(function() {t._autoSave();}, 40);
 		}
+
+		this.marcos = new AscCommon.CDocumentMacros();
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1757,6 +1761,25 @@
 	{
 		this.currentPassword = "";
 		this.asc_Save(false);
+	};
+
+	baseEditorsApi.prototype.asc_setMacros = function(sData)
+	{
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return true;
+
+		AscCommon.CollaborativeEditing.OnStart_CheckLock();
+		this.marcos.CheckLock();
+
+		if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+		{
+			AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+			this.macros.SetData(sData);
+		}
+	};
+	baseEditorsApi.prototype.asc_getMacros = function()
+	{
+		return this.macros.GetData();
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

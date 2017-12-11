@@ -1028,6 +1028,9 @@
 			case AscDFH.historydescription_Document_ChangeContentControlProperties:
 				sString = "Document_ChangeContentControlProperties";
 				break;
+			case AscDFH.historydescription_DocumentMacros_Data:
+				sString = "DocumentMacros_Data";
+				break;
 		}
 		return sString;
 	}
@@ -2940,6 +2943,7 @@
 	window['AscDFH'].historydescription_Document_RemoveContentControlWrapper        = 0x0144;
 	window['AscDFH'].historydescription_Document_ChangeContentControlProperties     = 0x0145;
     window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
+	window['AscDFH'].historydescription_DocumentMacros_Data                         = 0x0147;
 
 
 

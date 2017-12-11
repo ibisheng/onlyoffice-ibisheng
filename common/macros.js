@@ -43,6 +43,8 @@ function (window, undefined)
 	{
 		this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
+		this.Lock = new AscCommon.CLock();
+
 		this.Data = "";
 
 		AscCommon.g_oTableId.Add(this, this.Id);
@@ -55,6 +57,10 @@ function (window, undefined)
 	CDocumentMacros.prototype.GetData = function()
 	{
 		return this.Data;
+	};
+	CDocumentMacros.prototype.CheckLock = function()
+	{
+		this.Lock.Check(this.Id);
 	};
 	CDocumentMacros.prototype.Write_ToBinary2 = function(Writer)
 	{
