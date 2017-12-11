@@ -8782,13 +8782,12 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
 function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
 {
 	var diffContentIndex = 0;
-	if(bIsAddTabBefore){
+	if (bIsAddTabBefore) {
 		diffContentIndex = 1;
 		oCurRun.Add_ToContent(0, new ParaTab(), false);
 	}
 
-	for(var k = 0, length = value.length; k < length; k++)
-	{
+	for (var k = 0, length = value.length; k < length; k++) {
 		var nUnicode = null;
 		var nCharCode = value.charCodeAt(k);
 		if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
@@ -8797,32 +8796,31 @@ function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAd
 				var nTrailingChar = value.charCodeAt(k);
 				nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 			}
-		}
-		else
+		} else {
 			nUnicode = nCharCode;
+		}
 
 		var bIsSpace = true;
 		if (null != nUnicode) {
 			var Item;
-			if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+			if (0x2009 === nUnicode || 9 === nUnicode) {
+				Item = new ParaTab();
+			} else if (0x20 !== nUnicode && 0xA0 !== nUnicode) {
 				Item = new ParaText();
 				Item.Set_CharCode(nUnicode);
 				bIsSpace = false;
-			}
-			else if(0x2009 === nUnicode){
-				Item = new ParaTab();
-			}
-			else
+			} else {
 				Item = new ParaSpace();
+			}
 
 			//add text
-			if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
+			if (!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)) {
 				oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
 			}
 		}
 	}
 
-	if(bIsAddTabAfter){
+	if (bIsAddTabAfter) {
 		oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
 	}
 }
