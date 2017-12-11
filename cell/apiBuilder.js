@@ -601,6 +601,11 @@
 	ApiRange.prototype.GetRow = function () {
 		return this.range.bbox.r1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Row", {
+		get: function () {
+			return this.GetRow();
+		}
+	});
 	/**
 	 * Get cell column
 	 * @memberof ApiRange
@@ -609,6 +614,11 @@
 	ApiRange.prototype.GetCol = function () {
 		return this.range.bbox.c1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Col", {
+		get: function () {
+			return this.GetCol();
+		}
+	});
 
 	/**
 	 * Set cell value
@@ -618,6 +628,11 @@
 	ApiRange.prototype.SetValue = function (value) {
 		this.range.setValue(value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Value", {
+		set: function (value) {
+			return this.SetValue(value);
+		}
+	});
 
 	/**
 	 * Set text color in the rgb format.
@@ -627,6 +642,11 @@
 	ApiRange.prototype.SetFontColor = function (color) {
 		this.range.setFontcolor(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontColor", {
+		set: function (color) {
+			return this.SetFontColor(color);
+		}
+	});
 
 	/**
 	 * Set font size
@@ -636,6 +656,11 @@
 	ApiRange.prototype.SetFontSize = function (size) {
 		this.range.setFontsize(size);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontSize", {
+		set: function (size) {
+			return this.SetFontSize(size);
+		}
+	});
 
 	/**
 	 * Set font name
@@ -645,6 +670,11 @@
 	ApiRange.prototype.SetFontName = function (name) {
 		this.range.setFontname(name);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontName", {
+		set: function (name) {
+			return this.SetFontName(name);
+		}
+	});
 
 	/**
 	 * Set align vertical
@@ -671,6 +701,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignVertical", {
+		set: function (value) {
+			return this.SetAlignVertical(value);
+		}
+	});
 
 	/**
 	 * Set align horizontal
@@ -701,6 +736,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignHorizontal", {
+		set: function (value) {
+			return this.SetAlignHorizontal(value);
+		}
+	});
 
 	/**
 	 * Set bold
@@ -710,6 +750,11 @@
 	ApiRange.prototype.SetBold = function (value) {
 		this.range.setBold(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Bold", {
+		set: function (value) {
+			return this.SetBold(value);
+		}
+	});
 
 	/**
 	 * Set italic
@@ -719,6 +764,11 @@
 	ApiRange.prototype.SetItalic = function (value) {
 		this.range.setItalic(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Italic", {
+		set: function (value) {
+			return this.SetItalic(value);
+		}
+	});
 
 	/**
 	 * Set underline
@@ -747,6 +797,11 @@
 		}
 		this.range.setUnderline(val);
 	};
+	Object.defineProperty(ApiRange.prototype, "Underline", {
+		set: function (value) {
+			return this.SetUnderline(value);
+		}
+	});
 
 	/**
 	 * Set strikeout
@@ -756,6 +811,11 @@
 	ApiRange.prototype.SetStrikeout = function (value) {
 		this.range.setStrikeout(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Strikeout", {
+		set: function (value) {
+			return this.SetStrikeout(value);
+		}
+	});
 
 	/**
 	 * Set wrap
@@ -765,6 +825,11 @@
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Wrap", {
+		set: function (value) {
+			return this.SetWrap(value);
+		}
+	});
 
 	/**
 	 * Set fill color in the rgb format.
@@ -774,6 +839,11 @@
 	ApiRange.prototype.SetFillColor = function (color) {
 		this.range.setFill(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FillColor", {
+		set: function (color) {
+			return this.SetFillColor(color);
+		}
+	});
 
 	/**
 	 * Set the number format.
@@ -783,6 +853,11 @@
 	ApiRange.prototype.SetNumberFormat = function (value) {
 		this.range.setNumFormat(value);
 	};
+	Object.defineProperty(ApiRange.prototype, "NumberFormat", {
+		set: function (value) {
+			return this.SetNumberFormat(value);
+		}
+	});
 
 	/**
 	 * Set border properties.
@@ -848,7 +923,6 @@
 	ApiRange.prototype.UnMerge = function () {
 		this.range.unmerge();
 	};
-
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
