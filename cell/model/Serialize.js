@@ -188,7 +188,9 @@
         PivotCache: 8,
         ExternalBook: 9,
         OleLink:10,
-        DdeLink: 11
+		DdeLink: 11,
+		VbaProject: 12,
+		JsaProject: 13
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -2249,11 +2251,12 @@
             }
         };
     }
-    function BinaryWorkbookTableWriter(memory, wb)
+    function BinaryWorkbookTableWriter(memory, wb, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
+        this.isCopyPaste = isCopyPaste;
         this.Write = function()
         {
             var oThis = this;
@@ -2282,6 +2285,12 @@
 			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
+			}
+			if (!this.isCopyPaste) {
+				var macros = this.wb.oApi.macros.GetData();
+				if (macros) {
+					this.bs.WriteItem(c_oSerWorkbookTypes.JsaProject, function() {oThis.memory.WriteXmlString(macros);});
+				}
 			}
         };
         this.WriteWorkbookPr = function()
@@ -4247,7 +4256,7 @@
             //Write Styles
             var nStylesTablePos = this.ReserveTable(c_oSerTableTypes.Styles);
             //Workbook
-            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb));
+            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, this.isCopyPaste));
             //Worksheets
             var aXfs = [];
             var aFonts = [];
@@ -5781,6 +5790,10 @@
 				res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadExternalReferences(t,l);
 				});
+			}
+			else if (c_oSerWorkbookTypes.JsaProject == type)
+			{
+				this.oWorkbook.oApi.macros.SetData(AscCommon.GetStringUtf8(this.stream, length));
 			}
             else
                 res = c_oSerConstants.ReadUnknown;

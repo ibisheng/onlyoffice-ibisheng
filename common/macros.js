@@ -90,7 +90,7 @@ function (window, undefined)
 	 */
 	function CChangesDocumentMacrosData(Class, Old, New)
 	{
-		AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New, Color);
+		AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
 	}
 	CChangesDocumentMacrosData.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
 	CChangesDocumentMacrosData.prototype.constructor = CChangesDocumentMacrosData;

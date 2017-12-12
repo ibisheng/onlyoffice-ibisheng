@@ -8978,6 +8978,15 @@ function CPres()
                     s.Seek2(_end_rec2);
                     break;
                 }
+				case 9:
+				{
+					var _length = s.GetULong();
+					var _end_rec2 = s.cur + _length;
+
+					reader.presentation.Api.macros.SetData(AscCommon.GetStringUtf8(s, _length));
+					s.Seek2(_end_rec2);
+					break;
+				}
                 default:
                 {
                     s.SkipRecord();
