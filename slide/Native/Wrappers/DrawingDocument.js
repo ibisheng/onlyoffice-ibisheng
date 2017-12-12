@@ -250,6 +250,7 @@ CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
 
 CDrawingDocument.prototype.OnEndRecalculate = function()
 {
+    this.SlidesCount = this.m_oLogicDocument.Slides.length;
     this.Native["DD_OnEndRecalculate"]();
 };
 
