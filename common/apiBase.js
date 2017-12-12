@@ -176,7 +176,7 @@
 
 		this.currentPassword = "";
 
-		this.marcos = null;
+		this.macros = null;
 
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
@@ -1201,7 +1201,7 @@
 			setInterval(function() {t._autoSave();}, 40);
 		}
 
-		this.marcos = new AscCommon.CDocumentMacros();
+		this.macros = new AscCommon.CDocumentMacros();
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1769,7 +1769,7 @@
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();
-		this.marcos.CheckLock();
+		this.macros.CheckLock();
 
 		if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
 		{

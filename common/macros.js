@@ -41,7 +41,7 @@ function (window, undefined)
 	/** @constructor */
 	function CDocumentMacros()
 	{
-		this.Id = AscCommon.g_oIdCounter.Get_NewId();
+		this.Id = "_macrosGlobalId";//AscCommon.g_oIdCounter.Get_NewId();
 
 		this.Lock = new AscCommon.CLock();
 

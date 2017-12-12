@@ -129,12 +129,13 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 		this.Lock = Reader.GetLong();
 };
 
-function CContentControlPr()
+function CContentControlPr(nType)
 {
 	this.Id         = undefined;
 	this.Tag        = undefined;
 	this.Lock       = undefined;
 	this.InternalId = undefined;
+	this.CCType     = undefined !== nType ? nType : AscCommonWord.sdttype_InlineLevel;
 }
 CContentControlPr.prototype.get_Id = function()
 {
@@ -164,6 +165,10 @@ CContentControlPr.prototype.get_InternalId = function()
 {
 	return this.InternalId;
 };
+CContentControlPr.prototype.get_ContentControlType = function()
+{
+	return this.CCType;
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord']        = window['AscCommonWord'] || {};
@@ -181,11 +186,12 @@ window['AscCommonWord'].sdttype_CellLevel   = sdttype_CellLevel;
 
 window['AscCommonWord'].CContentControlPr = CContentControlPr;
 
-CContentControlPr.prototype['get_Id']         = CContentControlPr.prototype.get_Id;
-CContentControlPr.prototype['put_Id']         = CContentControlPr.prototype.put_Id;
-CContentControlPr.prototype['get_Tag']        = CContentControlPr.prototype.get_Tag;
-CContentControlPr.prototype['put_Tag']        = CContentControlPr.prototype.put_Tag;
-CContentControlPr.prototype['get_Lock']       = CContentControlPr.prototype.get_Lock;
-CContentControlPr.prototype['put_Lock']       = CContentControlPr.prototype.put_Lock;
-CContentControlPr.prototype['get_InternalId'] = CContentControlPr.prototype.get_InternalId;
+CContentControlPr.prototype['get_Id']                 = CContentControlPr.prototype.get_Id;
+CContentControlPr.prototype['put_Id']                 = CContentControlPr.prototype.put_Id;
+CContentControlPr.prototype['get_Tag']                = CContentControlPr.prototype.get_Tag;
+CContentControlPr.prototype['put_Tag']                = CContentControlPr.prototype.put_Tag;
+CContentControlPr.prototype['get_Lock']               = CContentControlPr.prototype.get_Lock;
+CContentControlPr.prototype['put_Lock']               = CContentControlPr.prototype.put_Lock;
+CContentControlPr.prototype['get_InternalId']         = CContentControlPr.prototype.get_InternalId;
+CContentControlPr.prototype['get_ContentControlType'] = CContentControlPr.prototype.get_ContentControlType;
 
