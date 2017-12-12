@@ -7272,12 +7272,13 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype._onEndLoadSdk = function()
 	{
+		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
 		History           = AscCommon.History;
 		g_fontApplication = AscFonts.g_fontApplication;
 		PasteElementsId   = AscCommon.PasteElementsId;
 		global_mouseEvent = AscCommon.global_mouseEvent;
 
-		g_oTableId.init();
 		this.WordControl      = new AscCommonWord.CEditorPage(this);
 		this.WordControl.Name = this.HtmlElementName;
 
@@ -7315,8 +7316,6 @@ background-repeat: no-repeat;\
 
 		this.asc_setViewMode(this.isViewMode);
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
-
-		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		if (this.isOnlyReaderMode)
 			this.ImageLoader.bIsAsyncLoadDocumentImages = false;

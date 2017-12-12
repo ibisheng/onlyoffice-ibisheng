@@ -2768,7 +2768,7 @@ var editor;
 		var t = this;
 		var changeSparkline = function (res) {
 			if (res) {
-				var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+				var changedSparkline = g_oTableId.Get_ById(id);
 				if (changedSparkline) {
 					History.Create_NewPoint();
 					History.StartTransaction();
@@ -3466,10 +3466,9 @@ var editor;
   };
 
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
-		History = AscCommon.History;
-
-		g_oTableId.init();
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
+		History = AscCommon.History;
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
 

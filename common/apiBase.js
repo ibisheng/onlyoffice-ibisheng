@@ -1170,6 +1170,8 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		AscCommon.g_oTableId.init();
+
 		// init drag&drop
 		var t = this;
 		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
