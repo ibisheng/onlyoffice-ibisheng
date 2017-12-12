@@ -3117,7 +3117,10 @@ Paragraph.prototype.Add = function(Item)
 					if (null === RItem || para_End === RItem.Type)
 					{
 						this.Apply_TextPr(TextPr);
-						this.TextPr.Apply_TextPr(TextPr);
+
+						// Если параграф с нумерацией, тогда к символу конца параграфа не применяем стиль
+						if (undefined === this.Numbering_Get())
+							this.TextPr.Apply_TextPr(TextPr);
 					}
 					else if (null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation())
 					{
@@ -5425,7 +5428,7 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 			this.Internal_ReplaceRun(Pos, NewElements);
 		}
 
-		if (true === this.IsCursorAtEnd())
+		if (true === this.IsCursorAtEnd() && undefined === this.Numbering_Get())
 		{
 			if (undefined === IncFontSize)
 			{
