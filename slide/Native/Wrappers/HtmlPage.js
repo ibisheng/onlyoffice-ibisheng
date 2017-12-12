@@ -389,6 +389,41 @@ CEditorPage.prototype.EndUpdateOverlay = function()
 
 CEditorPage.prototype.OnUpdateOverlay = function()
 {
+    return false;
+    if(!this.m_oLogicDocument)
+    {
+        return false;
+    }
+    if (this.IsUpdateOverlayOnlyEnd)
+    {
+        this.IsUpdateOverlayOnEndCheck = true;
+        return false;
+    }
+    this.Native["DD_Overlay_UpdateStart"]();
+    this.Native["DD_Overlay_Clear"]();
+    var drDoc = this.m_oDrawingDocument;
+    if (drDoc.m_bIsSelection)
+    {
+        this.Native["DD_Overlay_StartDrawSelection"]();
+        if (this.m_oLogicDocument.CurPage > -1)
+        {
+            this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].drawSelect(1);
+        }
+        this.Native["DD_Overlay_EndDrawSelection"]();
+    }
+    if (this.m_oLogicDocument && this.m_oLogicDocument.CurPage > -1)
+    {
+        this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].drawSelect(2);
+
+        var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].graphicObjects;
+        if (!elements.canReceiveKeyPress())
+        {
+            elements.DrawOnOverlay(drDoc.AutoShapesTrack);
+            drDoc.AutoShapesTrack.CorrectOverlayBounds();
+        }
+    }
+    this.Native["DD_Overlay_UpdateEnd"]();
+    return true;
 };
 
 CEditorPage.prototype.GetDrawingPageInfo = function(nPageIndex)
