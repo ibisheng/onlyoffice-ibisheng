@@ -547,6 +547,13 @@ Paragraph.prototype.Reset = function(X, Y, XLimit, YLimit, PageNum, ColumnNum, C
 				this.X_ColumnEnd = Ranges[Ranges.length - 1].X0;
 			else
 				this.X_ColumnEnd = XLimit;
+
+			// Ситуация, когда из-за обтекания строчка съезжает вниз целиком
+			if (this.X_ColumnStart > this.X_ColumnEnd)
+			{
+				this.X_ColumnStart = X;
+				this.X_ColumnEnd   = XLimit;
+			}
 		}
 		else
 		{
