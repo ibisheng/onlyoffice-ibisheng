@@ -1083,7 +1083,7 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
-	var oPr = new CContentControlPr();
+	var oPr = new CContentControlPr(AscCommonWord.sdttype_BlockLevel);
 
 	oPr.Tag        = this.Pr.Tag;
 	oPr.Id         = this.Pr.Id;
