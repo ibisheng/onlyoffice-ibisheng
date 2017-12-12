@@ -1415,6 +1415,16 @@
 		}
 	};
 
+	baseEditorsApi.prototype["pluginMethod_GetMacros"] = function()
+	{
+		return this.asc_getMacros();
+	};
+
+	baseEditorsApi.prototype["pluginMethod_SetMacros"] = function(data)
+	{
+		return this.asc_setMacros(data);
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
@@ -1767,16 +1777,36 @@
 
 	baseEditorsApi.prototype.asc_setMacros = function(sData)
 	{
+		if (!this.macros)
+			return true;
+
 		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();
 		this.macros.CheckLock();
 
-		if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+		if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
 		{
-			AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
-			this.macros.SetData(sData);
+			var locker = Asc.editor.wb.getWorksheet().objectRender.objectLocker;
+			locker.addObjectId(this.macros.Get_Id());
+
+			var _this = this;
+			locker.checkObjects(function(bNoLock) {
+				if (bNoLock)
+				{
+					AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+					_this.macros.SetData(sData);
+				}
+			});
+		}
+		else
+		{
+			if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+			{
+				AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+				this.macros.SetData(sData);
+			}
 		}
 	};
 	baseEditorsApi.prototype.asc_getMacros = function()

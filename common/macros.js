@@ -58,6 +58,10 @@ function (window, undefined)
 	{
 		return this.Data;
 	};
+	CDocumentMacros.prototype.Get_Id = function()
+	{
+		return this.Id;
+	};
 	CDocumentMacros.prototype.CheckLock = function()
 	{
 		this.Lock.Check(this.Id);
