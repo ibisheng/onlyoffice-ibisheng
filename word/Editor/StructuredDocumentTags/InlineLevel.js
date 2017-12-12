@@ -344,6 +344,13 @@ CInlineLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
 	arrContentControls.push(this);
 	CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls.apply(this, arguments);
 };
+CInlineLevelSdt.prototype.Document_UpdateInterfaceState = function()
+{
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+		this.Paragraph.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+
+	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------

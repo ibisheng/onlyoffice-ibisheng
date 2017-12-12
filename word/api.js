@@ -721,11 +721,6 @@
 	{
 		AscCommon.baseEditorsApi.call(this, config, AscCommon.c_oEditorId.Word);
 
-		if (window["AscDesktopEditor"])
-		{
-			window["AscDesktopEditor"]["CreateEditorApi"]();
-		}
-
 		/************ private!!! **************/
 		this.WordControl = null;
 
@@ -3712,6 +3707,8 @@ background-repeat: no-repeat;\
     };
 
     asc_docs_api.prototype.asc_getAllSignatures = function(){
+    	if (!this.WordControl.m_oLogicDocument)
+    		return [];
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
 	};
 
@@ -7673,6 +7670,10 @@ background-repeat: no-repeat;\
 			return oBlock.GetId();
 
 		return null;
+	};
+	asc_docs_api.prototype.sync_ContentControlCallback = function(oContentControlPr)
+	{
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.ContentControl, oContentControlPr);
 	};
 
 	asc_docs_api.prototype.asc_BeginViewModeInReview = function(isFinal)

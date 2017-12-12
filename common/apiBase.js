@@ -45,6 +45,9 @@
 	/** @constructor */
 	function baseEditorsApi(config, editorId)
 	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["CreateEditorApi"]();
+
 		this.editorId      = editorId;
 		this.isLoadFullApi = false;
 		this.openResult    = null;
@@ -173,6 +176,8 @@
 
 		this.currentPassword = "";
 
+		this.marcos = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
 			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -285,7 +290,12 @@
 			}
 		}
 
-		if (AscCommon.offlineMode === this.documentUrl)
+		if (AscCommon.chartMode === this.documentUrl)
+		{
+			this.isChartEditor = true;
+			this.DocInfo.put_OfflineApp(true);
+		}
+		else if (AscCommon.offlineMode === this.documentUrl)
 		{
 			this.DocInfo.put_OfflineApp(true);
 		}
@@ -476,6 +486,9 @@
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
 		this._OfflineAppDocumentEndLoad();
+	};
+	baseEditorsApi.prototype._OfflineAppDocumentEndLoad        = function()
+	{
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
@@ -1130,7 +1143,14 @@
 		{
 			if (this.DocInfo.get_OfflineApp())
 			{
-				this._OfflineAppDocumentStartLoad();
+				if (this.editorId === c_oEditorId.Spreadsheet && this.isChartEditor)
+				{
+					this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
+				}
+				else
+				{
+					this._OfflineAppDocumentStartLoad();
+				}
 			}
 			this.onEndLoadFile(null);
 		}
@@ -1180,6 +1200,8 @@
 		if (!window['IS_NATIVE_EDITOR']) {
 			setInterval(function() {t._autoSave();}, 40);
 		}
+
+		this.marcos = new AscCommon.CDocumentMacros();
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1739,6 +1761,25 @@
 	{
 		this.currentPassword = "";
 		this.asc_Save(false);
+	};
+
+	baseEditorsApi.prototype.asc_setMacros = function(sData)
+	{
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return true;
+
+		AscCommon.CollaborativeEditing.OnStart_CheckLock();
+		this.marcos.CheckLock();
+
+		if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+		{
+			AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+			this.macros.SetData(sData);
+		}
+	};
+	baseEditorsApi.prototype.asc_getMacros = function()
+	{
+		return this.macros.GetData();
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

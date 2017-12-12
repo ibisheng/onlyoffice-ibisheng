@@ -667,7 +667,6 @@ var editor;
   };
 
   spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function() {
-    this.isChartEditor = true;
     this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
   };
 
