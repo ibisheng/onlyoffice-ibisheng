@@ -1077,11 +1077,7 @@
 							
 							var currentRange = worksheet.model.getCell3(row, col);
 							var textRange = currentRange.getValueWithFormat();
-							if(textRange == '')
-							{
-								res += '\t';
-							}
-							else
+							if(textRange !== '')
 							{
 								res += textRange;
 							}
