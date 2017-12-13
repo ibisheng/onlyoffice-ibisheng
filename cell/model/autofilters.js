@@ -2839,6 +2839,22 @@
 				return res;
 			},
 
+			checkTableColumnName: function(tableColumns, name)
+			{
+				var res = name;
+
+				for(var i = 0; i < tableColumns.length; i++)
+				{
+					if(name.toLowerCase() === tableColumns[i].Name.toLowerCase())
+					{
+						res = this._generateColumnName2(tableColumns);
+						break;
+					}
+				}
+
+				return res;
+			},
+
 			_convertTableStyleToStyle: function(table)
 			{
 				if(!table)

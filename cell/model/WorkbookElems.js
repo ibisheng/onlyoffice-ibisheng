@@ -5348,7 +5348,7 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 					var cell = autoFilters.worksheet.getCell3(headerRow, i);
 					if(!cell.isNullText())
 					{
-						tableColumn.Name = cell.getValueWithoutFormat();
+						tableColumn.Name = autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns), cell.getValueWithoutFormat());
 					}
 				}
 				
