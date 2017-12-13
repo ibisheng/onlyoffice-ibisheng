@@ -623,18 +623,10 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     var bRetValue = false;
     if ( Code > 0x20 )
     {
-        if( window["Asc"]["editor"].collaborativeEditing.getFast()){
-            this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
-                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-                this.checkMobileCursorPosition();
-            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
-        }
-        else{
-            this.checkSelectedObjectsAndCallback(function(){
-                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-                this.checkMobileCursorPosition();
-            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
-        }
+        this.checkSelectedObjectsAndCallback(function(){
+            this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+            this.checkMobileCursorPosition();
+        }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         bRetValue = true;
     }
     //if ( true == bRetValue )
