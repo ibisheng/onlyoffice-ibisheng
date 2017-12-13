@@ -6844,7 +6844,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Comment == type )
+            if ( c_oSerWorksheetsTypes.Comment == type && AscCommonExcel.asc_CCommentCoords)
             {
                 var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
