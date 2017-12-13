@@ -2735,6 +2735,8 @@ CTable.prototype.RecalculateCurPos = function()
 };
 CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
+	this.private_RecalculateGrid();
+
 	if (true === isRotated)
 	{
 		var MinMargin = [], MinContent = [], MaxContent = [];
