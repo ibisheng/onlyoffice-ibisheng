@@ -14089,7 +14089,9 @@
             t._onUpdateFormatTable(range, false, true);
             //TODO добавить перерисовку таблицы и перерисовку шаблонов
             History.EndTransaction();
-			callbackAfterChange();
+			if(callbackAfterChange){
+				callbackAfterChange();
+            }
         };
 
         //TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т

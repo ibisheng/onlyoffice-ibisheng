@@ -5334,6 +5334,7 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 		{
 			this.removeDependencies();
 			var tableColumn;
+			var headerRow = this.isHeaderRow() ? this.Ref.r1 : this.Ref.r1 - 1;
 			for(var i = range.c1; i <= range.c2; i++)
 			{
 				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
@@ -5344,6 +5345,11 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 				else
 				{
 					tableColumn = new TableColumn();
+					var cell = autoFilters.worksheet.getCell3(headerRow, i);
+					if(!cell.isNullText())
+					{
+						tableColumn.Name = cell.getValueWithoutFormat();
+					}
 				}
 				
 				newTableColumns.push(tableColumn);
