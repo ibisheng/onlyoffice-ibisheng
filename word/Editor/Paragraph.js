@@ -13163,7 +13163,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = 
 		{
 			oChar.SetUse(true);
 			oComplexField.SetBeginChar(oChar);
-			this.CF.push(new CComplexFieldStatePos(oComplexField, false));
+			this.CF.push(new CComplexFieldStatePos(oComplexField, true));
 		}
 	}
 	else if (oChar.IsEnd())

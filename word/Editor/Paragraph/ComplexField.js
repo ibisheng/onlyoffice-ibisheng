@@ -239,6 +239,7 @@ function ParaInstrText(value)
 	this.Width        = 0x00000000 | 0;
 	this.WidthVisible = 0x00000000 | 0;
 	this.Run          = null;
+	this.Replacement  = null; // Используется, когда InstrText идет в неположенном месте и должно восприниматься как обычный текст
 }
 ParaInstrText.prototype = Object.create(CRunElementBase.prototype);
 ParaInstrText.prototype.constructor = ParaInstrText;
@@ -280,6 +281,14 @@ ParaInstrText.prototype.GetValue = function()
 ParaInstrText.prototype.Set_CharCode = function(CharCode)
 {
 	this.Value = CharCode;
+};
+ParaInstrText.prototype.SetReplacementItem = function(oItem)
+{
+	this.Replacement = oItem;
+};
+ParaInstrText.prototype.GetReplacementItem = function()
+{
+	return this.Replacement;
 };
 
 function CComplexField(oLogicDocument)
