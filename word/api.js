@@ -5259,12 +5259,14 @@ background-repeat: no-repeat;\
 			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
 			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
+			this.Class   = null;
 		}
 		else
 		{
 			this.Text    = null;
 			this.Value   = "";
 			this.ToolTip = "";
+			this.Class   = null;
 		}
 	}
 
@@ -5291,6 +5293,14 @@ background-repeat: no-repeat;\
 	CHyperlinkProperty.prototype.put_Text    = function(v)
 	{
 		this.Text = v;
+	};
+	CHyperlinkProperty.prototype.put_InternalHyperlink = function(oClass)
+	{
+		this.Class = oClass;
+	};
+	CHyperlinkProperty.prototype.get_InternalHyperlink = function()
+	{
+		return oClass;
 	};
 
 	asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
@@ -8872,6 +8882,7 @@ background-repeat: no-repeat;\
 	CHyperlinkProperty.prototype['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
 	CHyperlinkProperty.prototype['get_Text']              = CHyperlinkProperty.prototype.get_Text;
 	CHyperlinkProperty.prototype['put_Text']              = CHyperlinkProperty.prototype.put_Text;
+	CHyperlinkProperty.prototype['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
 	window['Asc']['asc_CCommentDataWord']                 = asc_CCommentDataWord;
 	asc_CCommentDataWord.prototype['asc_getText']         = asc_CCommentDataWord.prototype.asc_getText;
 	asc_CCommentDataWord.prototype['asc_putText']         = asc_CCommentDataWord.prototype.asc_putText;

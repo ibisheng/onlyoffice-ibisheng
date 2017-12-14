@@ -349,15 +349,15 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
 
 ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 {
-    var HyperText = new CParagraphGetText();
-    this.Get_Text( HyperText );
+	var oHyperText = new CParagraphGetText();
+	this.Get_Text(oHyperText);
 
-    var HyperProps = new Asc.CHyperlinkProperty(this);
-    HyperProps.put_Text( HyperText.Text );
+	var oHyperProps = new Asc.CHyperlinkProperty(this);
+	oHyperProps.put_Text(oHyperText.Text);
+	oHyperProps.put_InternalHyperlink(this);
 
-    editor.sync_HyperlinkPropCallback(HyperProps);
-
-    CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
+	editor.sync_HyperlinkPropCallback(oHyperProps);
+	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
 
 function CParaHyperLinkStartState(HyperLink)

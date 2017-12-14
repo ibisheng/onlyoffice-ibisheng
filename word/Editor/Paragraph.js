@@ -9442,6 +9442,23 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 			this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
 	}
 
+	var arrComplexFields = this.GetCurrentComplexFields();
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+		{
+			var oHyperProps = new Asc.CHyperlinkProperty();
+			oHyperProps.put_ToolTip(oInstruction.GetToolTip());
+			oHyperProps.put_Value(oInstruction.GetValue());
+			oHyperProps.put_Text(null);
+			oHyperProps.put_InternalHyperlink(oInstruction);
+			editor.sync_HyperlinkPropCallback(oHyperProps);
+		}
+	}
+
+	editor.sync_HyperlinkPropCallback(oHyperProps);
+
 	if (editor && this.bFromDocument)
 	{
 		var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
