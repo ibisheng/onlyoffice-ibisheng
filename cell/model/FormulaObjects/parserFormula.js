@@ -4423,39 +4423,8 @@ function parserFormula( formula, parent, _ws ) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Shared, eventData)) {
 			;
 		} else {
-			var needAssemble = true;
 			this.removeDependencies();
-			if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
-				AscCommon.c_oNotifyType.Delete === data.type) {
-				this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
-			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
-				if (!data.to) {
-					this.removeTableName(data.from, data.bConvertTableFormulaToRef);
-				} else if (data.from.name !== data.to.name) {
-					this.changeDefName(data.from, data.to);
-				} else if (data.from.isTable) {
-					needAssemble = false;
-					this.changeTableRef(data.from.name);
-				}
-			} else if (AscCommon.c_oNotifyType.DelColumnTable === data.type) {
-				this.removeTableColumn(data.tableName, data.deleted);
-			} else if (AscCommon.c_oNotifyType.RenameTableColumn === data.type) {
-				this.renameTableColumn(data.tableName);
-			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
-				needAssemble = false;
-				var changeData = data.data;
-				if (this.is3D || changeData.remove) {
-					if (changeData.replace || changeData.remove) {
-						if (changeData.remove) {
-							needAssemble = this.removeSheet(changeData.remove, changeData.tableNamesMap, changeData.wsPrevName, changeData.wsNextName);
-						} else {
-							needAssemble = this.moveSheet(changeData.replace);
-						}
-					} else if (changeData.rename) {
-						needAssemble = true;
-					}
-				}
-			}
+			var needAssemble = this.processNotify(data);
 			if (needAssemble) {
 				eventData.assemble = this.assemble(true);
 			} else {
@@ -4472,6 +4441,41 @@ function parserFormula( formula, parent, _ws ) {
 			}
 		}
 	};
+	parserFormula.prototype.processNotify = function(data) {
+		var needAssemble = true;
+		if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
+			AscCommon.c_oNotifyType.Delete === data.type) {
+			this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
+		} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
+			if (!data.to) {
+				this.removeTableName(data.from, data.bConvertTableFormulaToRef);
+			} else if (data.from.name !== data.to.name) {
+				this.changeDefName(data.from, data.to);
+			} else if (data.from.isTable) {
+				needAssemble = false;
+				this.changeTableRef(data.from.name);
+			}
+		} else if (AscCommon.c_oNotifyType.DelColumnTable === data.type) {
+			this.removeTableColumn(data.tableName, data.deleted);
+		} else if (AscCommon.c_oNotifyType.RenameTableColumn === data.type) {
+			this.renameTableColumn(data.tableName);
+		} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
+			needAssemble = false;
+			var changeData = data.data;
+			if (this.is3D || changeData.remove) {
+				if (changeData.replace || changeData.remove) {
+					if (changeData.remove) {
+						needAssemble = this.removeSheet(changeData.remove, changeData.tableNamesMap, changeData.wsPrevName, changeData.wsNextName);
+					} else {
+						needAssemble = this.moveSheet(changeData.replace);
+					}
+				} else if (changeData.rename) {
+					needAssemble = true;
+				}
+			}
+		}
+		return needAssemble;
+	}
 parserFormula.prototype.clone = function(formula, parent, ws) {
     if (null == formula) {
     formula = this.Formula;
