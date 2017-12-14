@@ -135,7 +135,7 @@ function CContentControlPr(nType)
 	this.Tag        = undefined;
 	this.Lock       = undefined;
 	this.InternalId = undefined;
-	this.CCType     = undefined !== nType ? nType : AscCommonWord.sdttype_InlineLevel;
+	this.CCType     = undefined !== nType ? nType : AscCommon.sdttype_InlineLevel;
 }
 CContentControlPr.prototype.get_Id = function()
 {
@@ -174,17 +174,19 @@ CContentControlPr.prototype.get_ContentControlType = function()
 window['AscCommonWord']        = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSdtPr = CSdtPr;
 
-window['AscCommonWord'].sdtlock_Unlocked         = sdtlock_Unlocked;
-window['AscCommonWord'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
-window['AscCommonWord'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
-window['AscCommonWord'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
+window['AscCommon'] = window['AscCommon'] || {};
 
-window['AscCommonWord'].sdttype_BlockLevel  = sdttype_BlockLevel;
-window['AscCommonWord'].sdttype_InlineLevel = sdttype_InlineLevel;
-window['AscCommonWord'].sdttype_RowLevel    = sdttype_RowLevel;
-window['AscCommonWord'].sdttype_CellLevel   = sdttype_CellLevel;
+window['AscCommon'].sdtlock_Unlocked         = sdtlock_Unlocked;
+window['AscCommon'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
+window['AscCommon'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
+window['AscCommon'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
 
-window['AscCommonWord'].CContentControlPr = CContentControlPr;
+window['AscCommon'].sdttype_BlockLevel  = sdttype_BlockLevel;
+window['AscCommon'].sdttype_InlineLevel = sdttype_InlineLevel;
+window['AscCommon'].sdttype_RowLevel    = sdttype_RowLevel;
+window['AscCommon'].sdttype_CellLevel   = sdttype_CellLevel;
+
+window['AscCommon'].CContentControlPr = CContentControlPr;
 
 CContentControlPr.prototype['get_Id']                 = CContentControlPr.prototype.get_Id;
 CContentControlPr.prototype['put_Id']                 = CContentControlPr.prototype.put_Id;

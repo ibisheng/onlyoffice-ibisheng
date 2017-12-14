@@ -998,7 +998,7 @@ CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()
 {
-	return AscCommonWord.sdttype_BlockLevel;
+	return AscCommon.sdttype_BlockLevel;
 };
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
@@ -1083,7 +1083,7 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
-	var oPr = new CContentControlPr(AscCommonWord.sdttype_BlockLevel);
+	var oPr = new CContentControlPr(AscCommon.sdttype_BlockLevel);
 
 	oPr.Tag        = this.Pr.Tag;
 	oPr.Id         = this.Pr.Id;

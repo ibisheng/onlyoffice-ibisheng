@@ -12203,7 +12203,7 @@ Paragraph.prototype.GetSelectedContentControls = function()
 };
 Paragraph.prototype.AddContentControl = function(nContentControlType)
 {
-	if (AscCommonWord.sdttype_InlineLevel !== nContentControlType)
+	if (AscCommon.sdttype_InlineLevel !== nContentControlType)
 		return null;
 
 	if (true === this.IsSelectionUse())

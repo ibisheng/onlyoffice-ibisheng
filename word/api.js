@@ -483,10 +483,10 @@
 							_isReplaced = true;
 						}
 
-						_content_control_pr = new AscCommonWord.CContentControlPr();
+						_content_control_pr = new AscCommon.CContentControlPr();
 						_content_control_pr.Id = _current["Props"]["Id"];
 						_content_control_pr.Tag = _current["Props"]["Tag"];
-						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
+						_content_control_pr.Lock = AscCommon.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
 						if (null === _blockStd)
@@ -495,7 +495,7 @@
 							if (oCurPara && !oCurPara.IsCursorAtBegin())
 								LogicDocument.AddNewParagraph(false, true);
 
-							_blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+							_blockStd = LogicDocument.AddContentControl(AscCommon.sdttype_BlockLevel);
 						}
 
 						_blockStd.SetContentControlPr(_content_control_pr);
@@ -534,7 +534,7 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if (AscCommonWord.sdttype_BlockLevel === _blockStd.GetContentControlType())
+						if (AscCommon.sdttype_BlockLevel === _blockStd.GetContentControlType())
 						{
 							if (_isReplaced)
 							{
@@ -612,7 +612,7 @@
 
 						if (_blockStd)
 						{
-							_content_control_pr = new AscCommonWord.CContentControlPr();
+							_content_control_pr = new AscCommon.CContentControlPr();
 							_content_control_pr.Id = _current["Props"]["Id"];
 							_content_control_pr.Tag = _current["Props"]["Tag"];
 							_content_control_pr.Lock = _current["Props"]["Lock"];
@@ -642,7 +642,7 @@
 
 							if (_blockStd)
 							{
-								_content_control_pr = new AscCommonWord.CContentControlPr();
+								_content_control_pr = new AscCommon.CContentControlPr();
 								_content_control_pr.Id = _current["Props"]["Id"];
 								_content_control_pr.Tag = _current["Props"]["Tag"];
 								_content_control_pr.Lock = _current["Props"]["Lock"];
@@ -7378,13 +7378,13 @@ background-repeat: no-repeat;\
 			return;
 
 		var sDefaultText = AscCommon.translateManager.getValue('Your text here');
-		if (AscCommonWord.sdttype_BlockLevel === nType)
+		if (AscCommon.sdttype_BlockLevel === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddBlockLevelContentControl);
 
-				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+				var oContentControl = oLogicDocument.AddContentControl(AscCommon.sdttype_BlockLevel);
 				if (oContentControlPr)
 					oContentControl.SetContentControlPr(oContentControlPr);
 
@@ -7407,13 +7407,13 @@ background-repeat: no-repeat;\
 				return oContentControl.GetContentControlPr();
 			}
 		}
-		else if (AscCommonWord.sdttype_InlineLevel === nType)
+		else if (AscCommon.sdttype_InlineLevel === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddInlineLevelContentControl);
 
-				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
+				var oContentControl = oLogicDocument.AddContentControl(AscCommon.sdttype_InlineLevel);
 
 				if (!oContentControl)
 				{
@@ -7469,7 +7469,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7477,7 +7477,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Remove
 				});
 			}
-			else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)
@@ -7528,7 +7528,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7536,7 +7536,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Remove
 				});
 			}
-			else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)
@@ -7589,7 +7589,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7597,7 +7597,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Properties
 				});
 			}
-			else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)
@@ -8217,7 +8217,7 @@ background-repeat: no-repeat;\
 		var _content_control_pr;
 		if (pr)
 		{
-			_content_control_pr = new AscCommonWord.CContentControlPr();
+			_content_control_pr = new AscCommon.CContentControlPr();
 			_content_control_pr.Id = pr["Id"];
 			_content_control_pr.Tag = pr["Tag"];
 			_content_control_pr.Lock = pr["Lock"];

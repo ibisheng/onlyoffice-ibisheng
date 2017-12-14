@@ -708,7 +708,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 {
 	var oElement = this.Content[this.CurPos.ContentPos];
 
-	if (AscCommonWord.sdttype_BlockLevel === nContentControlType)
+	if (AscCommon.sdttype_BlockLevel === nContentControlType)
 	{
 		if (true === this.IsSelectionUse())
 		{
