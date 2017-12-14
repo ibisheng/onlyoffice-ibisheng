@@ -396,6 +396,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
   window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
   window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
+  window['AscCommonExcel'].filteringMode = true;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;
