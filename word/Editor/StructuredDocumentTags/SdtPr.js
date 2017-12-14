@@ -181,12 +181,24 @@ window['AscCommon'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
 window['AscCommon'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
 window['AscCommon'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
 
+window['AscCommon']['sdtlock_Unlocked']         = sdtlock_Unlocked;
+window['AscCommon']['sdtlock_ContentLocked']    = sdtlock_ContentLocked;
+window['AscCommon']['sdtlock_SdtContentLocked'] = sdtlock_SdtContentLocked;
+window['AscCommon']['sdtlock_SdtLocked']        = sdtlock_SdtLocked;
+
 window['AscCommon'].sdttype_BlockLevel  = sdttype_BlockLevel;
 window['AscCommon'].sdttype_InlineLevel = sdttype_InlineLevel;
 window['AscCommon'].sdttype_RowLevel    = sdttype_RowLevel;
 window['AscCommon'].sdttype_CellLevel   = sdttype_CellLevel;
 
+window['AscCommon']['sdttype_BlockLevel']  = sdttype_BlockLevel;
+window['AscCommon']['sdttype_InlineLevel'] = sdttype_InlineLevel;
+window['AscCommon']['sdttype_RowLevel']    = sdttype_RowLevel;
+window['AscCommon']['sdttype_CellLevel']   = sdttype_CellLevel;
+
+
 window['AscCommon'].CContentControlPr = CContentControlPr;
+window['AscCommon']['CContentControlPr'] = CContentControlPr;
 
 CContentControlPr.prototype['get_Id']                 = CContentControlPr.prototype.get_Id;
 CContentControlPr.prototype['put_Id']                 = CContentControlPr.prototype.put_Id;
