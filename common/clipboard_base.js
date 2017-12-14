@@ -987,7 +987,10 @@
 				this.showSpecialPasteButton = true;
 				//if(window["Asc"] && window["Asc"]["editor"])
 				//{
-				this.Api.asc_ShowSpecialPasteButton(props);
+				if(props.cellCoord)
+				{
+					this.Api.asc_ShowSpecialPasteButton(props);
+				}
 				//}
 			}
 		},
