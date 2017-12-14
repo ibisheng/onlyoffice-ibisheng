@@ -9887,6 +9887,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
                     oParaDrawing.GraphicObj = null;
                 }
             }
+            if(AscCommon.isRealObject(oParaDrawing.docPr) && oParaDrawing.docPr.isHidden)
+            {
+                oParaDrawing.GraphicObj = null;
+            }
             if(oParaDrawing.GraphicObj)
             {
                 if(drawing_Anchor == oParaDrawing.DrawingType && typeof AscCommon.History.RecalcData_Add === "function")//TODO некорректная проверка typeof
