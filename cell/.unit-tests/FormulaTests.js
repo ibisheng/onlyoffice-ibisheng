@@ -4085,6 +4085,10 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 0 );
 
+		oParser = new parserFormula( "COUNTIF(#REF!, 1)", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#REF!" );
+
 		wb.dependencyFormulas.lockRecal();
 	} );
 

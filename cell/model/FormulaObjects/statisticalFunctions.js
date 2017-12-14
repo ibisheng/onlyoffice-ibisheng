@@ -4961,6 +4961,10 @@ function (window, undefined) {
 	cCOUNTIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
+
+		if (cElementType.error === arg0.type) {
+			return arg0;
+		}
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
 			cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
 			return new cError(cErrorType.wrong_value_type);
