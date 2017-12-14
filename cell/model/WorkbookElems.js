@@ -5942,6 +5942,49 @@ AutoFilter.prototype.addTableColumns = function(activeRange)
 	}
 };
 
+AutoFilter.prototype.getIndexByColId = function(colId)
+{
+	var res = null;
+
+	if(!this.FilterColumns)
+	{
+		return res;
+	}
+
+	for(var i = 0; i < this.FilterColumns.length; i++)
+	{
+		if(this.FilterColumns[i].ColId === colId)
+		{
+			res = i;
+			break;
+		}
+	}
+
+	return res;
+};
+
+AutoFilter.prototype.getFilterColumn = function(colId)
+{
+	var res = null;
+
+	if(!this.FilterColumns)
+	{
+		return res;
+	}
+
+	for(var i = 0; i < this.FilterColumns.length; i++)
+	{
+		if(this.FilterColumns[i].ColId === colId)
+		{
+			res = this.FilterColumns[i];
+			break;
+		}
+	}
+
+	return res;
+};
+
+
 function FilterColumns() {
 	this.ColId = null;
 	this.CustomFiltersObj = null;

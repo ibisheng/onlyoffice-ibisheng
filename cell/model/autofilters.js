@@ -1940,18 +1940,6 @@
 				return false;
 			},
 			
-			isActiveRangeIntersectionAutoFilter: function(addFormatTableOptionsObj)
-			{
-				var res = false;
-				var worksheet = this.worksheet;
-
-				var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
-				if(activeRange && worksheet.AutoFilter && worksheet.AutoFilter.Ref.intersection(activeRange))
-					res = true;
-					
-				return res;
-			},
-			
 			//если активный диапазон захватывает части нескольких табли, либо часть одной таблицы и одну целую
 			isRangeIntersectionSeveralTableParts: function(activeRange)
 			{
@@ -2785,27 +2773,6 @@
 				
 				History.EndTransaction();
 			},
-			
-			headerContains: function(col, row)
-			{
-				var res = false;
-				var worksheet = this.worksheet;
-
-				if(worksheet.TableParts && worksheet.TableParts.length) {
-					for (var i = 0; i < worksheet.TableParts.length; i++) {
-						var tablePart = worksheet.TableParts[i];
-						if(tablePart.isHeaderRow()){
-							var headerRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r1);
-							if(headerRange.contains(col, row)){
-								res = true;
-								break;
-							}
-						}
-					}
-				}
-
-				return res;
-			},
 
 			checkTableAutoExpansion: function(range){
 				var worksheet = this.worksheet;
@@ -2954,7 +2921,7 @@
 				
 				return res;
 			},
-			
+
 			_getColIdColumn: function(filter, cellId)
 			{
 				var res = null;
@@ -2971,38 +2938,7 @@
 				
 				return res;
 			},
-			
-			_getColIdColumnByRange: function(filter, range)
-			{
-				var res = null;
-				
-				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
-				
-				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
-				{
-					var colId = range.colStart - autoFilter.Ref.c1;
-					res = this._getTrueColId(filter, colId);
-				}
-				
-				return res;
-			},
-			
-			_getIndexByColId: function(autoFilter, colId)
-			{
-				var res = null;
-				
-				for(var i = 0; i < autoFilter.FilterColumns.length; i++)
-				{
-					if(autoFilter.FilterColumns[i].ColId === colId)
-					{
-						res = i;
-						break;
-					}
-				}
-				
-				return res;
-			},
-			
+
 			_hiddenAnotherFilter: function(filterColumns, cellId, r, c)
 			{
 				var worksheet = this.worksheet;
@@ -3071,11 +3007,6 @@
 					activeHistoryRange = null;
 				
 				History.Add(AscCommonExcel.g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
-			},
-			
-			_getCurrentWS : function() {
-				var ws = this.worksheet;
-				return ws.model;
 			},
 
 			renameTableColumn: function(range, bUndo, props)
@@ -4068,7 +3999,7 @@
 				
 				colId = this._getTrueColId(autoFilter, colId);
 
-				var currentFilterColumn = this._getFilterColumn(autoFilter, colId);
+				var currentFilterColumn = autoFilter.getFilterColumn(colId);
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
@@ -4317,19 +4248,6 @@
 					}
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();
-			},
-			
-			_openAllHiddenRowsByFilter: function(filter)
-			{
-				var autoFilter = filter && !filter.isAutoFilter() ? filter.AutoFilter : filter;
-				if(autoFilter && autoFilter.FilterColumns)
-				{
-					var filterColumns = autoFilter.FilterColumns;
-					for(var i = 0; i < filterColumns.length; i++)
-					{
-						this._openHiddenRowsAfterDeleteColumn(autoFilter, filterColumns[i].ColId);
-					}
-				}
 			},
 			
 			_isAddNameColumn: function(range)
@@ -4598,20 +4516,6 @@
 				}		
 			},
 			
-			_checkExceptionArray: function(curRange, exceptionArray)
-			{
-				if(!curRange || !exceptionArray || (exceptionArray && !exceptionArray.length))
-					return false;
-					
-				for(var e = 0; e < exceptionArray.length; e++)
-				{
-					if(exceptionArray[e] && exceptionArray[e].Ref && exceptionArray[e].Ref.isEqual(curRange))
-						return true;
-				}
-				
-				return false;
-			},
-			
 			_preMoveAutoFilters: function(arnFrom, arnTo, copyRange)
 			{
 				var worksheet = this.worksheet;
@@ -4748,25 +4652,6 @@
 				return result;
 			},
 			
-			//TODO пересмотреть!
-			_crossRange: function(sRange, bRange)
-			{
-				var isIn = false;
-				var isOut = false;
-				for(var c = sRange.c1; c <= sRange.c2; c++)
-				{
-					for(var r = sRange.r1; r <= sRange.r2; r++)
-					{
-						if(r >= bRange.r1 && r <= bRange.r2 && c >= bRange.c1 && c <= bRange.c2)//определяем, что хотя бы одна ячейка внутри находится
-							isIn = true;
-						else //определяем, что хотя бы одна ячейка снаружи
-							isOut = true;
-					}
-				}
-
-				return isIn && isOut;
-			},
-			
 			_intersectionRangeWithTableParts: function(range, exceptionRange)//находим фильтры, находящиеся в данном range
 			{
 				var result = [];
@@ -4893,7 +4778,7 @@
 				
 				if(colId !== null)
 				{
-					var index = this._getIndexByColId(autoFilter, colId);
+					var index = autoFilter.getIndexByColId(colId);
 					this._openHiddenRowsAfterDeleteColumn(autoFilter, colId);
 					
 					autoFilter.FilterColumns.splice(index, 1);
@@ -4974,25 +4859,6 @@
 				}
 				
 				return {isEmptyCell: isEmptyCell, isEnd: isEnd, cloneActiveRange: cloneActiveRange};
-			},
-			
-			_getFilterColumn: function(autoFilter, colId)
-			{
-				var res = null;
-				var filters;
-				if(autoFilter && autoFilter.FilterColumns)
-				{
-					filters = autoFilter.FilterColumns;
-					for(var k = 0; k < filters.length; k++)
-					{
-						if(filters[k].ColId == colId)
-						{
-							res = filters[k];
-							break;
-						}
-					}
-				}
-				return res;
 			},
 			
 			_isEmptyCellsUnderRange: function(range, exception, checkFilter)
@@ -5171,22 +5037,6 @@
 					}
 				}
 
-				return result;
-			},
-
-			_isPartAutoFilterUnderRange: function(range)
-			{
-				var worksheet = this.worksheet;
-				var result = false;
-				
-				if(worksheet.AutoFilter)
-				{
-					if((worksheet.AutoFilter.Ref.c1 < range.c1 || worksheet.AutoFilter.Ref.c2 > range.c2) && worksheet.AutoFilter.Ref.r1 >= range.r2)
-					{
-						result = true;
-					}
-				}
-				
 				return result;
 			},
 			
