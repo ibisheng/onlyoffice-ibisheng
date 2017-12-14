@@ -5584,7 +5584,7 @@ Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 {
 	var oInfo = new CSelectedElementsInfo();
 	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
-	return oInfo.Get_Hyperlink();
+	return oInfo.GetHyperlink();
 };
 Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
@@ -5595,10 +5595,10 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		// Заполняем гиперссылку полями
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		// Разделяем содержимое по меткам селекта
 		var StartContentPos = this.Get_ParaContentPos(true, true);
@@ -5714,10 +5714,10 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		// Заполняем гиперссылку полями
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		// Создаем текстовый ран в гиперссылке
 		var HyperRun = new ParaRun(this);
@@ -5812,10 +5812,10 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 		var Hyperlink = this.Content[HyperPos];
 
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		if (null != HyperProps.Text)
 		{
@@ -6046,42 +6046,12 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 };
 Paragraph.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	var Hyper = null;
-
 	if (true === this.Selection.Use)
-	{
-		// TODO: Если есть выделение, тогда Word не проверяем попадаение в гиперссылку
-		//var StartPos = this.Selection.StartPos;
-		//var EndPos   = this.Selection.EndPos;
+		return null;
 
-		//if ( StartPos > EndPos )
-		//{
-		//    StartPos = this.Selection.EndPos;
-		//    EndPos   = this.Selection.StartPos;
-		//}
-
-		//for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-		//{
-		//    var Element = this.Content[CurPos];
-
-		//    if ( para_Hyperlink === Element.Type && true !== Element.IsSelectionEmpty() )
-		//    {
-		//        if ( null === Hyper )
-		//            Hyper = Element;
-		//        else
-		//            return null;
-		//    }
-		//}
-	}
-	else
-	{
-		var Element = this.Content[this.CurPos.ContentPos];
-
-		if (para_Hyperlink === Element.Type)
-			Hyper = Element;
-	}
-
-	return Hyper;
+	var oInfo = new CSelectedElementsInfo();
+	this.GetSelectedElementsInfo(oInfo, this.Get_ParaContentPos(false), 0);
+	return oInfo.GetHyperlink();
 };
 Paragraph.prototype.Selection_SetStart = function(X, Y, CurPage, bTableBorder)
 {
@@ -9303,7 +9273,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	}
 
 	var oContentControl = oInfo.GetInlineLevelSdt();
-	var oHyperlink      = oInfo.Get_Hyperlink();
+	var oHyperlink      = oInfo.GetHyperlink();
 	if (oContentControl)
 		oContentControl.DrawContentControlsTrack(true);
 

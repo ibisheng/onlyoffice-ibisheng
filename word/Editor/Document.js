@@ -1353,11 +1353,6 @@ function CSelectedElementsInfo()
         this.m_oField = Field;
     };
 
-    this.Set_Hyperlink = function(Hyperlink)
-    {
-        this.m_oHyperlink = Hyperlink;
-    };
-
     this.Get_Math = function()
     {
         return this.m_oMath;
@@ -1366,11 +1361,6 @@ function CSelectedElementsInfo()
     this.Get_Field = function()
     {
         return this.m_oField;
-    };
-
-    this.Get_Hyperlink = function()
-    {
-        return this.m_oHyperlink;
     };
 
     this.Set_Table = function()
@@ -1441,9 +1431,27 @@ CSelectedElementsInfo.prototype.SetComplexFields = function(arrComplexFields)
 {
 	this.m_arrComplexFields = arrComplexFields;
 };
-CSelectedElementsInfo.prototype.GetComplexFields = function(arrComplexFields)
+CSelectedElementsInfo.prototype.GetComplexFields = function()
 {
 	return this.m_arrComplexFields;
+};
+CSelectedElementsInfo.prototype.SetHyperlink = function(oHyperlink)
+{
+	this.m_oHyperlink = oHyperlink;
+};
+CSelectedElementsInfo.prototype.GetHyperlink = function()
+{
+	if (this.m_oHyperlink)
+		return this.m_oHyperlink;
+
+	for (var nIndex = 0, nCount = this.m_arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = this.m_arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+			return oInstruction;
+	}
+
+	return null;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -5551,7 +5559,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 				{
 					editor.sync_HyperlinkClickCallback(sValue);
 
-					this.Selection.Data.Hyperlink.SetVisited(true);
+					oHyperlink.SetVisited(true);
 					for (var PageIdx = Item.Get_AbsolutePage(0); PageIdx < Item.Get_AbsolutePage(0) + Item.Get_PagesCount(); PageIdx++)
 						this.DrawingDocument.OnRecalculatePage(PageIdx, this.Pages[PageIdx]);
 
@@ -6400,8 +6408,8 @@ CDocument.prototype.OnKeyDown = function(e)
         var Hyperlink = this.IsCursorInHyperlink(false);
         if (null != Hyperlink && false === e.ShiftKey)
         {
-            editor.sync_HyperlinkClickCallback(Hyperlink.Get_Value());
-            Hyperlink.Set_Visited(true);
+            editor.sync_HyperlinkClickCallback(Hyperlink.GetValue());
+            Hyperlink.SetVisited(true);
 
             // TODO: Пока сделаем так, потом надо будет переделать
             this.DrawingDocument.ClearCachePages();

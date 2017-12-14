@@ -49,6 +49,7 @@ var fieldtype_NUMPAGES   = fieldtype_PAGECOUNT;
 
 var fieldtype_ASK        = 0x0007;
 var fieldtype_REF        = 0x0008;
+var fieldtype_HYPERLINK  = 0x0009;
 
 /**
  * Базовый класс для инструкции сложного поля.
@@ -302,17 +303,61 @@ CFieldInstructionREF.prototype.GetBookmarkName = function()
 };
 
 /**
- * NUMPAGES field
+ * HYPERLINK field
  * @constructor
  */
-function CFieldInstructionNUMPAGES()
+function CFieldInstructionHYPERLINK()
 {
 	CFieldInstructionBase.call(this);
 
+	this.ToolTip      = "";
+	this.Link         = "";
+	this.BookmarkName = "";
 }
-CFieldInstructionNUMPAGES.prototype = Object.create(CFieldInstructionBase.prototype);
-CFieldInstructionNUMPAGES.prototype.constructor = CFieldInstructionNUMPAGES;
-CFieldInstructionNUMPAGES.prototype.Type = fieldtype_NUMPAGES;
+CFieldInstructionHYPERLINK.prototype = Object.create(CFieldInstructionBase.prototype);
+CFieldInstructionHYPERLINK.prototype.constructor = CFieldInstructionHYPERLINK;
+CFieldInstructionHYPERLINK.prototype.Type = fieldtype_HYPERLINK;
+CFieldInstructionHYPERLINK.prototype.SetToolTip = function(sToolTip)
+{
+	this.ToolTip = sToolTip;
+};
+CFieldInstructionHYPERLINK.prototype.GetToolTip = function()
+{
+	if ("" === this.ToolTip)
+		return this.Link;
+
+	return this.ToolTip;
+};
+CFieldInstructionHYPERLINK.prototype.SetLink = function(sLink)
+{
+	this.Link = sLink;
+};
+CFieldInstructionHYPERLINK.prototype.GetLink = function()
+{
+	return this.Link;
+};
+CFieldInstructionHYPERLINK.prototype.SetBookmarkName = function(sBookmarkName)
+{
+	this.BookmarkName = sBookmarkName;
+};
+CFieldInstructionHYPERLINK.prototype.GetBookmarkName = function()
+{
+	return this.BookmarkName;
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для совместимости с обычным ParaHyperlink
+//----------------------------------------------------------------------------------------------------------------------
+CFieldInstructionHYPERLINK.prototype.GetAnchor = function()
+{
+	return this.GetBookmarkName();
+};
+CFieldInstructionHYPERLINK.prototype.GetValue = function()
+{
+	return this.GetLink();
+};
+CFieldInstructionHYPERLINK.prototype.SetVisited = function(isVisited)
+{
+};
 
 
 /**
@@ -352,6 +397,7 @@ CFieldInstructionParser.prototype.private_Parse = function()
 		case "ASK": this.private_ReadASK(); break;
 		case "REF": this.private_ReadREF(); break;
 		case "NUMPAGES": this.private_ReadNUMPAGES(); break;
+		case "HYPERLINK": this.private_ReadHYPERLINK(); break;
 
 		default: this.private_ReadREF(this.Buffer); break;
 	}
@@ -371,21 +417,26 @@ CFieldInstructionParser.prototype.private_ReadNext = function()
 			if (bWord)
 				return true;
 		}
-		else if (34 === nCharCode)
+		else if (34 === nCharCode && (0 === this.Pos || 92 !== this.Line.charCodeAt(this.Pos - 1)))
 		{
 			// Кавычки
 			this.Pos++;
 			while (this.Pos < nLen)
 			{
 				nCharCode = this.Line.charCodeAt(this.Pos);
-				if (34 === nCharCode)
+				if (34 === nCharCode && 92 !== this.Line.charCodeAt(this.Pos - 1))
 				{
 					this.Pos++;
 					break;
 				}
 
 				bWord = true;
+
+				if (34 === nCharCode && 92 === this.Line.charCodeAt(this.Pos - 1) && this.Buffer.length > 0)
+					this.Buffer = this.Buffer.substring(0, this.Buffer.length - 1);
+
 				this.Buffer += this.Line.charAt(this.Pos);
+
 				this.Pos++;
 			}
 
@@ -614,6 +665,35 @@ CFieldInstructionParser.prototype.private_ReadNUMPAGES = function()
 	this.Result = new CFieldInstructionNUMPAGES();
 
 	// TODO: Switches
+};
+CFieldInstructionParser.prototype.private_ReadHYPERLINK = function()
+{
+	this.Result = new CFieldInstructionHYPERLINK();
+	var arrArguments = this.private_ReadArguments();
+	if (arrArguments.length > 0)
+		this.Result.SetLink(arrArguments[0]);
+
+	while (this.private_ReadNext())
+	{
+		if (this.private_IsSwitch())
+		{
+			var sType = this.private_GetSwitchLetter();
+			if ('o' === sType)
+			{
+				arrArguments = this.private_ReadArguments();
+				if (arrArguments.length > 0)
+					this.Result.SetToolTip(arrArguments[0]);
+			}
+			else if ('l' === sType)
+			{
+				arrArguments = this.private_ReadArguments();
+				if (arrArguments.length > 0)
+					this.Result.SetBookmarkName(arrArguments[0]);
+			}
+
+			// TODO: Остальные флаги \m \n \t для нас бесполезны
+		}
+	}
 };
 CFieldInstructionParser.prototype.private_ParseIntegerRange = function(sValue)
 {

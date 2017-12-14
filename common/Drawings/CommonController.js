@@ -5842,8 +5842,8 @@ DrawingObjectsController.prototype =
                 var hyperlink = this.hyperlinkCheck(false);
                 if(hyperlink && !e.shiftKey)
                 {
-                    window["Asc"]["editor"].wb.handlers.trigger("asc_onHyperlinkClick", hyperlink.Get_Value());
-                    hyperlink.Set_Visited(true);
+                    window["Asc"]["editor"].wb.handlers.trigger("asc_onHyperlinkClick", hyperlink.GetValue());
+                    hyperlink.SetVisited(true);
                     this.drawingObjects.showDrawingObjects(true);
                 }
                 else

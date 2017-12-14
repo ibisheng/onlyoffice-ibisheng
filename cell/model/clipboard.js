@@ -2671,7 +2671,7 @@
 						oCurHyperlink.Set_Value( isHyperLink.Hyperlink );
 						if(isHyperLink.Tooltip)
 						{
-							oCurHyperlink.Set_ToolTip(isHyperLink.Tooltip);
+							oCurHyperlink.SetToolTip(isHyperLink.Tooltip);
 						}
 					}
 					
@@ -4553,8 +4553,8 @@
 					}
 					else if (para_Hyperlink === item.Type) {
 						sRes += "<a";
-						var sValue = item.Get_Value();
-						var sToolTip = item.Get_ToolTip();
+						var sValue = item.GetValue();
+						var sToolTip = item.GetToolTip();
 						if (null != sValue && "" != sValue)
 							sRes += " href=\"" + CopyPasteCorrectString(sValue) + "\"";
 						if (null != sToolTip && "" != sToolTip)

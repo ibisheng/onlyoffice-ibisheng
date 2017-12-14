@@ -2791,7 +2791,7 @@ function CBinaryFileWriter()
                 }
                 case para_Hyperlink:
                 {
-                    var _hObj = { Value : _elem.Value, tooltip: _elem.Get_ToolTip()};
+                    var _hObj = { Value : _elem.GetValue(), tooltip: _elem.GetToolTip()};
                     var _content_len_h = _elem.Content.length;
 
                     for (var hi = 0; hi < _content_len_h; hi++)

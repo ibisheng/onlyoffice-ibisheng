@@ -512,8 +512,8 @@ CopyProcessor.prototype =
             else if (para_Hyperlink === item.Type) {
                 if (!bOmitHyperlink) {
 					var oHyperlink = new CopyElement("a");
-                    var sValue = item.Get_Value();
-                    var sToolTip = item.Get_ToolTip();
+                    var sValue = item.GetValue();
+                    var sToolTip = item.GetToolTip();
 					oHyperlink.oAttributes["href"] = CopyPasteCorrectString(sValue);
 					oHyperlink.oAttributes["title"] = CopyPasteCorrectString(sToolTip);
 					//вложенные ссылки в html запрещены.
@@ -4959,7 +4959,7 @@ PasteProcessor.prototype =
 					oCurHyperlink.SetParagraph(this.oCurPar);
 					oCurHyperlink.Set_Value( hyperLink.Hyperlink );
 					if(hyperLink.Tooltip)
-						oCurHyperlink.Set_ToolTip(hyperLink.Tooltip);
+						oCurHyperlink.SetToolTip(hyperLink.Tooltip);
 				}
 				
 				var value2 = range.getValue2();
@@ -7956,7 +7956,7 @@ PasteProcessor.prototype =
 							oHyperlink.SetParagraph(oThis.oCurPar);
 							oHyperlink.Set_Value(href);
 							if (null != title) {
-								oHyperlink.Set_ToolTip(title);
+								oHyperlink.SetToolTip(title);
 							}
 							oOldHyperlink = oThis.oCurHyperlink;
 							oOldHyperlinkContentPos = oThis.oCurHyperlinkContentPos;

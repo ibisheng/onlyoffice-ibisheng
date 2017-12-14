@@ -8494,9 +8494,9 @@ function BinaryPPTYLoader()
                                     if (_run.hlink !== undefined)
                                     {
                                         hyperlink = new ParaHyperlink();
-                                        hyperlink.Set_Value(_run.hlink.url);
+                                        hyperlink.SetValue(_run.hlink.url);
                                         if (_run.hlink.tooltip) {
-                                          hyperlink.Set_ToolTip(_run.hlink.tooltip);
+                                          hyperlink.SetToolTip(_run.hlink.tooltip);
                                         }
                                         if(!_run.Unifill)
                                         {
@@ -8633,9 +8633,9 @@ function BinaryPPTYLoader()
                                     if (_run.hlink !== undefined)
                                     {
                                         hyperlink = new ParaHyperlink();
-                                        hyperlink.Set_Value(_run.hlink.url);
+                                        hyperlink.SetValue(_run.hlink.url);
                                         if (_run.hlink.tooltip) {
-                                          hyperlink.Set_ToolTip(_run.hlink.tooltip);
+                                          hyperlink.SetToolTip(_run.hlink.tooltip);
                                         }
                                     }
                                     var text_pr = new CTextPr();

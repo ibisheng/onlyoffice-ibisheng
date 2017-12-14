@@ -2875,8 +2875,8 @@ CPresentation.prototype =
             var Hyperlink = this.IsCursorInHyperlink(false);
             if ( null != Hyperlink && false === e.ShiftKey )
             {
-                editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() );
-                Hyperlink.Set_Visited(true);
+                editor.sync_HyperlinkClickCallback( Hyperlink.GetValue() );
+                Hyperlink.SetVisited(true);
 
                 // TODO: Пока сделаем так, потом надо будет переделать
                 this.DrawingDocument.ClearCachePages();

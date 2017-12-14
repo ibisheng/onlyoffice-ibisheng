@@ -339,8 +339,8 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMat
 function ConvertHyperlinkToPPTX(hyperlink, paragraph)
 {
     var hyperlink_ret = new ParaHyperlink(), i, item, pos = 0;
-    hyperlink_ret.Set_Value( hyperlink.Value );
-    hyperlink_ret.Set_ToolTip( hyperlink.ToolTip );
+    hyperlink_ret.SetValue( hyperlink.Value );
+    hyperlink_ret.SetToolTip( hyperlink.ToolTip );
     for(i = 0; i < hyperlink.Content.length; ++i)
     {
         item = hyperlink.Content[i];
