@@ -199,6 +199,13 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 };
 
+window["asc_nativeOnSpellCheck"] = function(response)
+{
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	if (_editor.SpellCheckApi)
+		_editor.SpellCheckApi.onSpellCheck(response);
+};
+
 window["UpdateInstallPlugins"] = function()
 {
 	var _pluginsTmp = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());

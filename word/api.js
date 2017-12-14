@@ -6796,12 +6796,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	window["asc_nativeOnSpellCheck"] = function(response)
-	{
-		if (editor.SpellCheckApi)
-			editor.SpellCheckApi.onSpellCheck(response);
-	};
-
 	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
 	{
 		var options;
