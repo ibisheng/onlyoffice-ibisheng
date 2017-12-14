@@ -85,6 +85,10 @@ function (window, undefined)
 		this.Data = Reader.GetString2();
 	};
 
+	CDocumentMacros.prototype.Refresh_RecalcData = function()
+	{
+	};
+
 	AscDFH.changesFactory[AscDFH.historyitem_DocumentMacros_Data]     = CChangesDocumentMacrosData;
 	AscDFH.changesRelationMap[AscDFH.historyitem_DocumentMacros_Data] = [AscDFH.historyitem_DocumentMacros_Data];
 
