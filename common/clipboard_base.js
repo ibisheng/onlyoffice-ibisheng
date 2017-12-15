@@ -984,14 +984,11 @@
 			}
 			if(props)
 			{
-				this.showSpecialPasteButton = true;
-				//if(window["Asc"] && window["Asc"]["editor"])
-				//{
-				if(props.cellCoord)
+				if((window["Asc"] && window["Asc"]["editor"]) || props.cellCoord)
 				{
+					this.showSpecialPasteButton = true;
 					this.Api.asc_ShowSpecialPasteButton(props);
 				}
-				//}
 			}
 		},
 
