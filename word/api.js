@@ -486,7 +486,7 @@
 						_content_control_pr = new AscCommon.CContentControlPr();
 						_content_control_pr.Id = _current["Props"]["Id"];
 						_content_control_pr.Tag = _current["Props"]["Tag"];
-						_content_control_pr.Lock = AscCommon.sdtlock_Unlocked;
+						_content_control_pr.Lock = c_oAscSdtLockType.Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
 						if (null === _blockStd)
@@ -495,7 +495,7 @@
 							if (oCurPara && !oCurPara.IsCursorAtBegin())
 								LogicDocument.AddNewParagraph(false, true);
 
-							_blockStd = LogicDocument.AddContentControl(AscCommon.sdttype_BlockLevel);
+							_blockStd = LogicDocument.AddContentControl(c_oAscSdtLevelType.Block);
 						}
 
 						_blockStd.SetContentControlPr(_content_control_pr);
@@ -534,7 +534,7 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if (AscCommon.sdttype_BlockLevel === _blockStd.GetContentControlType())
+						if (c_oAscSdtLevelType.Block === _blockStd.GetContentControlType())
 						{
 							if (_isReplaced)
 							{
@@ -7378,13 +7378,13 @@ background-repeat: no-repeat;\
 			return;
 
 		var sDefaultText = AscCommon.translateManager.getValue('Your text here');
-		if (AscCommon.sdttype_BlockLevel === nType)
+		if (c_oAscSdtLevelType.Block === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddBlockLevelContentControl);
 
-				var oContentControl = oLogicDocument.AddContentControl(AscCommon.sdttype_BlockLevel);
+				var oContentControl = oLogicDocument.AddContentControl(c_oAscSdtLevelType.Block);
 				if (oContentControlPr)
 					oContentControl.SetContentControlPr(oContentControlPr);
 
@@ -7407,13 +7407,13 @@ background-repeat: no-repeat;\
 				return oContentControl.GetContentControlPr();
 			}
 		}
-		else if (AscCommon.sdttype_InlineLevel === nType)
+		else if (c_oAscSdtLevelType.Inline === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddInlineLevelContentControl);
 
-				var oContentControl = oLogicDocument.AddContentControl(AscCommon.sdttype_InlineLevel);
+				var oContentControl = oLogicDocument.AddContentControl(c_oAscSdtLevelType.Inline);
 
 				if (!oContentControl)
 				{
@@ -7469,7 +7469,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7477,7 +7477,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Remove
 				});
 			}
-			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)
@@ -7528,7 +7528,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7536,7 +7536,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Remove
 				});
 			}
-			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)
@@ -7589,7 +7589,7 @@ background-repeat: no-repeat;\
 
 		if (oContentControl && oContentControl.GetContentControlType)
 		{
-			if (AscCommon.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType())
 			{
 				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
@@ -7597,7 +7597,7 @@ background-repeat: no-repeat;\
 					CheckType : AscCommon.changestype_ContentControl_Properties
 				});
 			}
-			else if (AscCommon.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
 			{
 				var oParagraph = oContentControl.GetParagraph();
 				if (oParagraph)

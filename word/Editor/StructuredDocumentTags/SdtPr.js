@@ -37,16 +37,6 @@
  * Time: 12:12
  */
 
-var sdtlock_ContentLocked    = 0x00;
-var sdtlock_SdtContentLocked = 0x01;
-var sdtlock_SdtLocked        = 0x02;
-var sdtlock_Unlocked         = 0x03;
-
-var sdttype_BlockLevel  = 0x01;
-var sdttype_InlineLevel = 0x02;
-var sdttype_RowLevel    = 0x03;
-var sdttype_CellLevel   = 0x04;
-
 function CSdtPr()
 {
 	this.Alias = undefined;
@@ -135,7 +125,7 @@ function CContentControlPr(nType)
 	this.Tag        = undefined;
 	this.Lock       = undefined;
 	this.InternalId = undefined;
-	this.CCType     = undefined !== nType ? nType : AscCommon.sdttype_InlineLevel;
+	this.CCType     = undefined !== nType ? nType : c_oAscSdtLevelType.Inline;
 }
 CContentControlPr.prototype.get_Id = function()
 {
@@ -176,28 +166,7 @@ window['AscCommonWord'].CSdtPr = CSdtPr;
 
 window['AscCommon'] = window['AscCommon'] || {};
 
-window['AscCommon'].sdtlock_Unlocked         = sdtlock_Unlocked;
-window['AscCommon'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
-window['AscCommon'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
-window['AscCommon'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
-
-window['AscCommon']['sdtlock_Unlocked']         = sdtlock_Unlocked;
-window['AscCommon']['sdtlock_ContentLocked']    = sdtlock_ContentLocked;
-window['AscCommon']['sdtlock_SdtContentLocked'] = sdtlock_SdtContentLocked;
-window['AscCommon']['sdtlock_SdtLocked']        = sdtlock_SdtLocked;
-
-window['AscCommon'].sdttype_BlockLevel  = sdttype_BlockLevel;
-window['AscCommon'].sdttype_InlineLevel = sdttype_InlineLevel;
-window['AscCommon'].sdttype_RowLevel    = sdttype_RowLevel;
-window['AscCommon'].sdttype_CellLevel   = sdttype_CellLevel;
-
-window['AscCommon']['sdttype_BlockLevel']  = sdttype_BlockLevel;
-window['AscCommon']['sdttype_InlineLevel'] = sdttype_InlineLevel;
-window['AscCommon']['sdttype_RowLevel']    = sdttype_RowLevel;
-window['AscCommon']['sdttype_CellLevel']   = sdttype_CellLevel;
-
-
-window['AscCommon'].CContentControlPr = CContentControlPr;
+window['AscCommon'].CContentControlPr    = CContentControlPr;
 window['AscCommon']['CContentControlPr'] = CContentControlPr;
 
 CContentControlPr.prototype['get_Id']                 = CContentControlPr.prototype.get_Id;

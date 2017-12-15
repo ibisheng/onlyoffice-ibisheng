@@ -356,7 +356,7 @@ CInlineLevelSdt.prototype.Document_UpdateInterfaceState = function()
 //----------------------------------------------------------------------------------------------------------------------
 CInlineLevelSdt.prototype.GetContentControlType = function()
 {
-	return AscCommon.sdttype_InlineLevel;
+	return c_oAscSdtLevelType.Inline;
 };
 CInlineLevelSdt.prototype.SetPr = function(oPr)
 {
@@ -423,7 +423,7 @@ CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
 };
 CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
-	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
+	return (undefined !== this.Pr.Lock ? this.Pr.Lock : c_oAscSdtLockType.Unlocked);
 };
 CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
@@ -441,7 +441,7 @@ CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 };
 CInlineLevelSdt.prototype.GetContentControlPr = function()
 {
-	var oPr = new CContentControlPr(AscCommon.sdttype_InlineLevel);
+	var oPr = new CContentControlPr(c_oAscSdtLevelType.Inline);
 
 	oPr.Tag        = this.Pr.Tag;
 	oPr.Id         = this.Pr.Id;
@@ -518,7 +518,7 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	var oInlineContentControl = oLogicDocument.AddContentControl(AscCommon.sdttype_InlineLevel);
+	var oInlineContentControl = oLogicDocument.AddContentControl(c_oAscSdtLevelType.Inline);
 	oInlineContentControl.Add(new ParaText("S"));
 	oInlineContentControl.Add(new ParaText("d"));
 	oInlineContentControl.Add(new ParaText("t"));
@@ -537,7 +537,7 @@ function TEST_ADD_SDT2()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	var oSdt = oLogicDocument.AddContentControl(AscCommon.sdttype_BlockLevel);
+	var oSdt = oLogicDocument.AddContentControl(c_oAscSdtLevelType.Block);
 	oSdt.AddToParagraph(new ParaText("S"));
 	oSdt.AddToParagraph(new ParaText("d"));
 	oSdt.AddToParagraph(new ParaText("t"));
