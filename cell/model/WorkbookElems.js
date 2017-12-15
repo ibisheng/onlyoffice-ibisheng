@@ -5334,6 +5334,7 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 		{
 			this.removeDependencies();
 			var tableColumn;
+			var headerRow = this.isHeaderRow() ? this.Ref.r1 : this.Ref.r1 - 1;
 			for(var i = range.c1; i <= range.c2; i++)
 			{
 				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
@@ -5344,6 +5345,11 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 				else
 				{
 					tableColumn = new TableColumn();
+					var cell = autoFilters.worksheet.getCell3(headerRow, i);
+					if(!cell.isNullText())
+					{
+						tableColumn.Name = autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns), cell.getValueWithoutFormat());
+					}
 				}
 				
 				newTableColumns.push(tableColumn);
@@ -5936,6 +5942,49 @@ AutoFilter.prototype.addTableColumns = function(activeRange)
 	}
 };
 
+AutoFilter.prototype.getIndexByColId = function(colId)
+{
+	var res = null;
+
+	if(!this.FilterColumns)
+	{
+		return res;
+	}
+
+	for(var i = 0; i < this.FilterColumns.length; i++)
+	{
+		if(this.FilterColumns[i].ColId === colId)
+		{
+			res = i;
+			break;
+		}
+	}
+
+	return res;
+};
+
+AutoFilter.prototype.getFilterColumn = function(colId)
+{
+	var res = null;
+
+	if(!this.FilterColumns)
+	{
+		return res;
+	}
+
+	for(var i = 0; i < this.FilterColumns.length; i++)
+	{
+		if(this.FilterColumns[i].ColId === colId)
+		{
+			res = this.FilterColumns[i];
+			break;
+		}
+	}
+
+	return res;
+};
+
+
 function FilterColumns() {
 	this.ColId = null;
 	this.CustomFiltersObj = null;
@@ -6070,10 +6119,21 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 };
 TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
-	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
-	{	
-		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
-		//this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
+	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel) {
+		var columnRange = this.getRange(tablePart);
+
+		var totalFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+		if(null !== columnRange){
+			for(var i = columnRange.r1; i <= columnRange.r2; i++){
+				var type = ws.getCell3(i, columnRange.c1).getType();
+				if(null !== type && CellValueType.Number !== type){
+					totalFunction = Asc.ETotalsRowFunction.totalrowfunctionCount;
+					break;
+				}
+			}
+		}
+
+		this.TotalsRowFunction = totalFunction;
 	}
 };
 
@@ -6167,7 +6227,7 @@ TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
 	{
 		var totalRowFormula = this.getTotalRowFormula(tablePart);
-		
+
 		if(null !== totalRowFormula)
 		{
 			this.applyTotalRowFormula(totalRowFormula, ws, true);
@@ -6185,6 +6245,27 @@ TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 		} else {
 			this.TotalsRowFormula = null;
 		}
+	};
+
+	TableColumn.prototype.getRange = function(tablePart, includeHeader, includeTotal) {
+		var res = null;
+
+		var ref = tablePart.Ref;
+		var startRow = (includeHeader && tablePart.isHeaderRow()) || (!tablePart.isHeaderRow()) ? ref.r1 : ref.r1 + 1;
+		var endRow = (includeTotal && tablePart.isTotalsRow()) || (!tablePart.isTotalsRow()) ? ref.r2 : ref.r2 - 1;
+		var col = null;
+		for(var i = 0; i < tablePart.TableColumns.length; i++){
+			if(this.Name === tablePart.TableColumns[i].Name){
+				col = ref.c1 + i;
+				break;
+			}
+		}
+
+		if(null !== col){
+			res = Asc.Range(col, startRow, col, endRow);
+		}
+
+		return res;
 	};
 
 /** @constructor */

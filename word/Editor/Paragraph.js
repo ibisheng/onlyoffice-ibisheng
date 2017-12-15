@@ -241,6 +241,11 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
 	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, !this.bFromDocument);
 
+	if (!oPr)
+		oPr = {};
+
+	oPr.Paragraph = Para;
+
 	// Копируем настройки
 	Para.Set_Pr(this.Pr.Copy());
 
@@ -542,6 +547,13 @@ Paragraph.prototype.Reset = function(X, Y, XLimit, YLimit, PageNum, ColumnNum, C
 				this.X_ColumnEnd = Ranges[Ranges.length - 1].X0;
 			else
 				this.X_ColumnEnd = XLimit;
+
+			// Ситуация, когда из-за обтекания строчка съезжает вниз целиком
+			if (this.X_ColumnStart > this.X_ColumnEnd)
+			{
+				this.X_ColumnStart = X;
+				this.X_ColumnEnd   = XLimit;
+			}
 		}
 		else
 		{
@@ -2232,7 +2244,7 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 				}
 			}
             // Рисуем подчеркивание орфографии
-            if (editor && this.LogicDocument && true === this.LogicDocument.Spelling.Use && !(pGraphics.IsThumbnail === true || pGraphics.IsDemonstrationMode === true))
+            if (editor && this.LogicDocument && true === this.LogicDocument.Spelling.Use && !(pGraphics.IsThumbnail === true || pGraphics.IsDemonstrationMode === true || AscCommon.IsShapeToImageConverter))
             {
                 pGraphics.p_color(255, 0, 0, 255);
                 var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
@@ -3105,7 +3117,10 @@ Paragraph.prototype.Add = function(Item)
 					if (null === RItem || para_End === RItem.Type)
 					{
 						this.Apply_TextPr(TextPr);
-						this.TextPr.Apply_TextPr(TextPr);
+
+						// Если параграф с нумерацией, тогда к символу конца параграфа не применяем стиль
+						if (undefined === this.Numbering_Get())
+							this.TextPr.Apply_TextPr(TextPr);
 					}
 					else if (null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation())
 					{
@@ -5413,7 +5428,7 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 			this.Internal_ReplaceRun(Pos, NewElements);
 		}
 
-		if (true === this.IsCursorAtEnd())
+		if (true === this.IsCursorAtEnd() && undefined === this.Numbering_Get())
 		{
 			if (undefined === IncFontSize)
 			{
@@ -5569,7 +5584,7 @@ Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 {
 	var oInfo = new CSelectedElementsInfo();
 	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
-	return oInfo.Get_Hyperlink();
+	return oInfo.GetHyperlink();
 };
 Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
@@ -5580,10 +5595,10 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		// Заполняем гиперссылку полями
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		// Разделяем содержимое по меткам селекта
 		var StartContentPos = this.Get_ParaContentPos(true, true);
@@ -5672,7 +5687,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		var TextPr       = new CTextPr();
 		TextPr.Color     = null;
 		TextPr.Underline = null;
-		TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
+		TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().GetDefaultHyperlink() : null;
 		if (!this.bFromDocument)
 		{
 			TextPr.Unifill   = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
@@ -5699,10 +5714,10 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		// Заполняем гиперссылку полями
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		// Создаем текстовый ран в гиперссылке
 		var HyperRun = new ParaRun(this);
@@ -5717,7 +5732,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 			HyperRun.Set_Pr(TextPr.Copy());
 			HyperRun.Set_Color(undefined);
 			HyperRun.Set_Underline(undefined);
-			HyperRun.Set_RStyle(Styles.Get_Default_Hyperlink());
+			HyperRun.Set_RStyle(Styles.GetDefaultHyperlink());
 		}
 		else
 		{
@@ -5797,10 +5812,10 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 		var Hyperlink = this.Content[HyperPos];
 
 		if (undefined != HyperProps.Value && null != HyperProps.Value)
-			Hyperlink.Set_Value(HyperProps.Value);
+			Hyperlink.SetValue(HyperProps.Value);
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
-			Hyperlink.Set_ToolTip(HyperProps.ToolTip);
+			Hyperlink.SetToolTip(HyperProps.ToolTip);
 
 		if (null != HyperProps.Text)
 		{
@@ -5822,7 +5837,7 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 				HyperRun.Set_Pr(TextPr.Copy());
 				HyperRun.Set_Color(undefined);
 				HyperRun.Set_Underline(undefined);
-				HyperRun.Set_RStyle(Styles.Get_Default_Hyperlink());
+				HyperRun.Set_RStyle(Styles.GetDefaultHyperlink());
 			}
 			else
 			{
@@ -6031,42 +6046,12 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 };
 Paragraph.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	var Hyper = null;
-
 	if (true === this.Selection.Use)
-	{
-		// TODO: Если есть выделение, тогда Word не проверяем попадаение в гиперссылку
-		//var StartPos = this.Selection.StartPos;
-		//var EndPos   = this.Selection.EndPos;
+		return null;
 
-		//if ( StartPos > EndPos )
-		//{
-		//    StartPos = this.Selection.EndPos;
-		//    EndPos   = this.Selection.StartPos;
-		//}
-
-		//for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-		//{
-		//    var Element = this.Content[CurPos];
-
-		//    if ( para_Hyperlink === Element.Type && true !== Element.IsSelectionEmpty() )
-		//    {
-		//        if ( null === Hyper )
-		//            Hyper = Element;
-		//        else
-		//            return null;
-		//    }
-		//}
-	}
-	else
-	{
-		var Element = this.Content[this.CurPos.ContentPos];
-
-		if (para_Hyperlink === Element.Type)
-			Hyper = Element;
-	}
-
-	return Hyper;
+	var oInfo = new CSelectedElementsInfo();
+	this.GetSelectedElementsInfo(oInfo, this.Get_ParaContentPos(false), 0);
+	return oInfo.GetHyperlink();
 };
 Paragraph.prototype.Selection_SetStart = function(X, Y, CurPage, bTableBorder)
 {
@@ -8429,7 +8414,7 @@ Paragraph.prototype.Clear_TextFormatting = function()
 	if (this.bFromDocument)
 	{
 		Styles   = this.Parent.Get_Styles();
-		DefHyper = Styles.Get_Default_Hyperlink();
+		DefHyper = Styles.GetDefaultHyperlink();
 	}
 
 	// TODO: Сделать, чтобы данная функция работала по выделению
@@ -9288,7 +9273,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	}
 
 	var oContentControl = oInfo.GetInlineLevelSdt();
-	var oHyperlink      = oInfo.Get_Hyperlink();
+	var oHyperlink      = oInfo.GetHyperlink();
 	if (oContentControl)
 		oContentControl.DrawContentControlsTrack(true);
 
@@ -9455,6 +9440,21 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		var CurType = this.Content[this.CurPos.ContentPos].Type;
 		if (para_Hyperlink === CurType || para_Math === CurType)
 			this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
+	}
+
+	var arrComplexFields = this.GetCurrentComplexFields();
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+		{
+			var oHyperProps = new Asc.CHyperlinkProperty();
+			oHyperProps.put_ToolTip(oInstruction.GetToolTip());
+			oHyperProps.put_Value(oInstruction.GetValue());
+			oHyperProps.put_Text(null);
+			oHyperProps.put_InternalHyperlink(oInstruction);
+			editor.sync_HyperlinkPropCallback(oHyperProps);
+		}
 	}
 
 	if (editor && this.bFromDocument)
@@ -12558,7 +12558,7 @@ Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
 	var nPagesCount = this.Pages.length;
 	var nCurPage    = 0;
 
-	while (this.Is_EmptyPage(nCurPage))
+	while (this.Is_EmptyPage(nCurPage, true))
 	{
 		if (nCurPage >= nPagesCount - 1)
 			break;
@@ -12582,6 +12582,14 @@ Paragraph.prototype.RemoveTabsForTOC = function()
 	}
 
 	return isTab;
+};
+/**
+ * Проверяем лежит ли данный параграф в таблице
+ * @returns {boolean}
+ */
+Paragraph.prototype.IsTableCellContent = function()
+{
+	return (this.Parent && this.Parent.IsTableCellContent() ? true : false);
 };
 
 var pararecalc_0_All  = 0;
@@ -13079,14 +13087,14 @@ CComplexFieldStatePos.prototype.IsFieldCode = function()
 	return this.FieldCode;
 };
 
-function CParagraphaComplexFieldsInfo()
+function CParagraphComplexFieldsInfo()
 {
 	// Массив CComplexFieldStatePos
 	this.CF = [];
 
 	this.isHidden = null;
 }
-CParagraphaComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
+CParagraphComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
 {
 	this.isHidden = null;
 
@@ -13101,14 +13109,14 @@ CParagraphaComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
  * Находимся ли мы внутри содержимого скрытого поля
  * @returns {boolean}
  */
-CParagraphaComplexFieldsInfo.prototype.IsHiddenFieldContent = function()
+CParagraphComplexFieldsInfo.prototype.IsHiddenFieldContent = function()
 {
 	if (null === this.isHidden)
 		this.isHidden = this.private_IsHiddenFieldContent();
 
 	return this.isHidden;
 };
-CParagraphaComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
+CParagraphComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
 {
 	if (this.CF.length > 0)
 	{
@@ -13125,7 +13133,7 @@ CParagraphaComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
  * Данная функция используется при пересчете, когда мы собираем сложное поле.
  * @param oChar
  */
-CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = function(oChar)
+CParagraphComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = function(oChar)
 {
 	this.isHidden = null;
 
@@ -13140,7 +13148,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = 
 		{
 			oChar.SetUse(true);
 			oComplexField.SetBeginChar(oChar);
-			this.CF.push(new CComplexFieldStatePos(oComplexField, false));
+			this.CF.push(new CComplexFieldStatePos(oComplexField, true));
 		}
 	}
 	else if (oChar.IsEnd())
@@ -13176,7 +13184,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = 
  * Данная функция используется, когда мы просто хотим отследить где мы находимся, относительно сложных полей
  * @param oChar
  */
-CParagraphaComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
+CParagraphComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
 {
 	this.isHidden = null;
 
@@ -13212,7 +13220,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
 		}
 	}
 };
-CParagraphaComplexFieldsInfo.prototype.ProcessInstruction = function(oInstruction)
+CParagraphComplexFieldsInfo.prototype.ProcessInstruction = function(oInstruction)
 {
 	if (this.CF.length <= 0)
 		return;
@@ -13221,11 +13229,11 @@ CParagraphaComplexFieldsInfo.prototype.ProcessInstruction = function(oInstructio
 	if (oComplexField && null === oComplexField.GetSeparateChar())
 		oComplexField.SetInstruction(oInstruction);
 };
-CParagraphaComplexFieldsInfo.prototype.IsComplexField = function()
+CParagraphComplexFieldsInfo.prototype.IsComplexField = function()
 {
 	return (this.CF.length > 0 ? true : false);
 };
-CParagraphaComplexFieldsInfo.prototype.IsComplexFieldCode = function()
+CParagraphComplexFieldsInfo.prototype.IsComplexFieldCode = function()
 {
 	if (!this.IsComplexField())
 		return false;
@@ -13238,7 +13246,7 @@ CParagraphaComplexFieldsInfo.prototype.IsComplexFieldCode = function()
 
 	return false;
 };
-CParagraphaComplexFieldsInfo.prototype.IsCurrentComplexField = function()
+CParagraphComplexFieldsInfo.prototype.IsCurrentComplexField = function()
 {
 	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
 	{
@@ -13247,6 +13255,23 @@ CParagraphaComplexFieldsInfo.prototype.IsCurrentComplexField = function()
 	}
 
 	return false;
+};
+CParagraphComplexFieldsInfo.prototype.IsHyperlinkField = function()
+{
+	var isHaveHyperlink = false,
+		isOtherField    = false;
+
+	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = this.CF[nIndex].ComplexField.GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+			isHaveHyperlink = true;
+		else
+			isOtherField = true;
+
+	}
+
+	return (isHaveHyperlink && !isOtherField ? true : false);
 };
 
 function CParagraphDrawStateHightlights()
@@ -13284,7 +13309,7 @@ function CParagraphDrawStateHightlights()
 
     this.Spaces = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
@@ -13432,7 +13457,7 @@ function CParagraphDrawStateElements()
     this.LineBottom = 0;
     this.BaseLine   = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 CParagraphDrawStateElements.prototype =
@@ -13498,7 +13523,7 @@ function CParagraphDrawStateLines()
     this.UnderlineOffset = 0;
     this.Spaces          = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 CParagraphDrawStateLines.prototype =

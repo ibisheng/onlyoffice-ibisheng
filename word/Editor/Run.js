@@ -198,8 +198,11 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 			|| (oPr.SkipPageBreak && Item.IsPageBreak())
 			|| (oPr.SkipColumnBreak && Item.IsColumnBreak())))
 		{
-			NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
-			AddedPos++;
+			if (oPr.Paragraph && true !== oPr.Paragraph.IsEmpty())
+			{
+				NewRun.Add_ToContent(AddedPos, new ParaSpace(), false);
+				AddedPos++;
+			}
 		}
 		else
 		{
@@ -1393,7 +1396,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
     {
         for ( ; Pos < _EndPos; Pos++ )
         {
-            var Item = this.Content[Pos];
+            var Item = this.private_CheckInstrText(this.Content[Pos]);
             var ItemType = Item.Type;
 
             if (para_Drawing === ItemType && drawing_Inline !== Item.DrawingType)
@@ -2539,6 +2542,30 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             if (PRS.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
             	continue;
 
+			if (para_InstrText === ItemType)
+			{
+				var oInstrText = Item;
+				if (!PRS.ComplexFields.IsComplexFieldCode())
+				{
+					if (32 === Item.Value)
+					{
+						Item     = new ParaSpace();
+						ItemType = para_Space;
+					}
+					else
+					{
+						Item     = new ParaText(String.fromCharCode(Item.Value));
+						ItemType = para_Text;
+					}
+					Item.Measure(g_oTextMeasurer, this.Get_CompiledPr(false));
+					oInstrText.SetReplacementItem(Item);
+				}
+				else
+				{
+					oInstrText.SetReplacementItem(null);
+				}
+			}
+
             // Проверяем, не нужно ли добавить нумерацию к данному элементу
             if (true === this.RecalcInfo.NumberingAdd && true === Item.Can_AddNumbering())
                 X = this.private_RecalculateNumbering(PRS, Item, ParaPr, X);
@@ -3511,7 +3538,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
 
 	for (var CurPos = StartPos; CurPos < EndPos; CurPos++)
 	{
-		var Item = this.Content[CurPos];
+		var Item = this.private_CheckInstrText(this.Content[CurPos]);
 
 		if (Item === Para.Numbering.Item)
 		{
@@ -3624,7 +3651,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item = this.Content[Pos];
+		var Item = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType = Item.Type;
 
 		if (PRSC.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
@@ -3807,7 +3834,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item = this.Content[Pos];
+		var Item = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType = Item.Type;
 
 		if (PRSA.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
@@ -4204,6 +4231,22 @@ ParaRun.prototype.Internal_Recalculate_LastTab = function(LastTab, X, XEnd, Word
 
     return X;
 };
+/**
+ * Специальная функия для проверки InstrText. Если InstrText идет не между Begin и Separate сложного поля, тогда
+ * мы заменяем его обычным текстовым элементом.
+ * @param oItem
+ */
+ParaRun.prototype.private_CheckInstrText = function(oItem)
+{
+	if (!oItem)
+		return oItem;
+
+	if (para_InstrText !== oItem.Type)
+		return oItem;
+
+	var oReplacement = oItem.GetReplacementItem();
+	return (oReplacement ? oReplacement : oItem);
+};
 
 ParaRun.prototype.Refresh_RecalcData = function(Data)
 {
@@ -4382,7 +4425,7 @@ ParaRun.prototype.RecalculateMinMaxContentWidth = function(MinMax)
     var Count = this.Content.length;
     for ( var Pos = 0; Pos < Count; Pos++ )
     {
-        var Item = this.Content[Pos];
+		var Item     = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType = Item.Type;
 
         switch( ItemType )
@@ -4620,7 +4663,7 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item = this.Content[Pos];
+        var Item = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType = Item.Type;
 
         switch( ItemType )
@@ -4740,7 +4783,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item = this.Content[Pos];
+		var Item = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType         = Item.Type;
         var ItemWidthVisible = Item.Get_WidthVisible();
 
@@ -4766,7 +4809,10 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         if ( true === bDrawShd )
             aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
 
-		if (PDSH.ComplexFields.IsComplexField() && !PDSH.ComplexFields.IsComplexFieldCode() && PDSH.ComplexFields.IsCurrentComplexField())
+		if (PDSH.ComplexFields.IsComplexField()
+			&& !PDSH.ComplexFields.IsComplexFieldCode()
+			&& PDSH.ComplexFields.IsCurrentComplexField()
+			&& !PDSH.ComplexFields.IsHyperlinkField())
 			PDSH.CFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
 
         switch( ItemType )
@@ -4972,7 +5018,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item = this.Content[Pos];
+		var Item = this.private_CheckInstrText(this.Content[Pos]);
         var ItemType = Item.Type;
 
 		if (PDSE.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
@@ -5279,9 +5325,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
     for ( var Pos = StartPos; Pos < EndPos; Pos++ )
     {
-        var Item             = this.Content[Pos];
-        var ItemType         = Item.Type;
-        var ItemWidthVisible = Item.Get_WidthVisible();
+		var Item             = this.private_CheckInstrText(this.Content[Pos]);
+		var ItemType         = Item.Type;
+		var ItemWidthVisible = Item.Get_WidthVisible();
 
 		if (PDSL.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
 			continue;
@@ -5561,7 +5607,7 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 
     for (; CurPos < EndPos; CurPos++ )
     {
-        var Item = this.Content[CurPos];
+        var Item = this.private_CheckInstrText(this.Content[CurPos]);
         var ItemType = Item.Type;
 
         var TempDx = 0;
@@ -5753,7 +5799,7 @@ ParaRun.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseConten
 	{
 		CurPos--;
 
-		var Item = this.Content[CurPos];
+		var Item = this.private_CheckInstrText(this.Content[CurPos]);
 
 		if (CurPos >= 0 && para_FieldChar === Item.Type)
 		{
@@ -5798,7 +5844,7 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 			if (CurPos === 0)
 				return;
 
-			var PrevItem     = this.Content[CurPos - 1];
+			var PrevItem     = this.private_CheckInstrText(this.Content[CurPos - 1]);
 			var PrevItemType = PrevItem.Type;
 
 			if (para_FieldChar === PrevItem.Type)
@@ -5822,7 +5868,7 @@ ParaRun.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseConte
 			break;
 
 		// Минимальное значение CurPos = 1, т.к. мы начинаем со значния >= 0 и добавляем 1
-		var Item     = this.Content[CurPos - 1];
+		var Item     = this.private_CheckInstrText(this.Content[CurPos - 1]);
 		var ItemType = Item.Type;
 
 		if (para_FieldChar === Item.Type)
@@ -5869,7 +5915,7 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
     {
         while ( true )
         {
-            var Item = this.Content[CurPos];
+            var Item = this.private_CheckInstrText(this.Content[CurPos]);
             var Type = Item.Type;
 
             var bSpace = false;
@@ -5924,7 +5970,7 @@ ParaRun.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseC
     while ( CurPos > 0 )
     {
         CurPos--;
-        var Item = this.Content[CurPos];
+        var Item = this.private_CheckInstrText(this.Content[CurPos]);
         var TempType = Item.Type;
 
 		if (para_FieldChar === Item.Type)
@@ -5972,7 +6018,7 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
         // На первом этапе ищем первый нетекстовый ( и не таб ) элемент
         while ( true )
         {
-            var Item = this.Content[CurPos];
+            var Item = this.private_CheckInstrText(this.Content[CurPos]);
             var Type = Item.Type;
             var bText = false;
 
@@ -6056,7 +6102,7 @@ ParaRun.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseCon
         while ( CurPos < ContentLen - 1 )
         {
             CurPos++;
-            var Item = this.Content[CurPos];
+            var Item = this.private_CheckInstrText(this.Content[CurPos]);
             var TempType = Item.Type;
 
 			if (para_FieldChar === Item.Type)
@@ -6382,7 +6428,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
 
     for(var CurPos = StartPos; CurPos < EndPos; CurPos++)
     {
-        var Item = this.Content[CurPos];
+        var Item = this.private_CheckInstrText(this.Content[CurPos]);
         var ItemType = Item.Type;
         var DrawSelection = false;
 
@@ -6582,6 +6628,9 @@ ParaRun.prototype.Recalc_RunsCompiledPr = function()
 
 ParaRun.prototype.Get_CompiledPr = function(bCopy)
 {
+	if (this.IsStyleHyperlink() && this.IsInHyperlinkInTOC())
+		this.RecalcInfo.TextPr = true;
+
     if ( true === this.RecalcInfo.TextPr )
     {
         this.RecalcInfo.TextPr = false;
@@ -6610,12 +6659,13 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
     var TextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
     // Если в прямых настройках задан стиль, тогда смержим настройки стиля
-    if ( undefined != this.Pr.RStyle )
-    {
-        var Styles = this.Paragraph.Parent.Get_Styles();
-        var StyleTextPr = Styles.Get_Pr( this.Pr.RStyle, styletype_Character ).TextPr;
-        TextPr.Merge( StyleTextPr );
-    }
+	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC
+	if (undefined != this.Pr.RStyle && (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC()))
+	{
+		var Styles      = this.Paragraph.Parent.Get_Styles();
+		var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
+		TextPr.Merge(StyleTextPr);
+	}
 
     if(this.Type == para_Math_Run)
     {
@@ -6698,6 +6748,49 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
     TextPr.FontFamily.Index = TextPr.RFonts.Ascii.Index;
 
     return TextPr;
+};
+
+ParaRun.prototype.IsStyleHyperlink = function()
+{
+	if (!this.Paragraph || !this.Paragraph.bFromDocument || !this.Paragraph.LogicDocument || !this.Paragraph.LogicDocument.Get_Styles() || !this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink)
+		return false;
+
+	return (this.Pr.RStyle === this.Paragraph.LogicDocument.Get_Styles().GetDefaultHyperlink() ? true : false);
+};
+ParaRun.prototype.IsInHyperlinkInTOC = function()
+{
+	var oParagraph = this.GetParagraph();
+	if (!oParagraph || !oParagraph.bFromDocument)
+		return false;
+
+	var oPos = oParagraph.Get_PosByElement(this);
+	if (!oPos)
+		return false;
+
+	var isHyperlink = false;
+	var arrClasses = oParagraph.Get_ClassesByPos(oPos);
+	for (var nIndex = 0, nCount = arrClasses.length; nIndex < nCount; ++nIndex)
+	{
+		if (arrClasses[nIndex] instanceof ParaHyperlink)
+		{
+			isHyperlink = true;
+			break;
+		}
+	}
+
+	if (!isHyperlink)
+		return false;
+
+	var arrComplexFields = oParagraph.GetComplexFieldsByPos(oPos);
+
+	for (var nIndex = 0, nCount = arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_TOC === oInstruction.GetType())
+			return true;
+	}
+
+	return false;
 };
 
 // В данной функции мы жестко меняем настройки на те, которые пришли (т.е. полностью удаляем старые)

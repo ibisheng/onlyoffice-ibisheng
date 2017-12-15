@@ -68,14 +68,16 @@ function (window, undefined) {
 
 	var TOK_SUBTYPE_UNION = 15;
 
-	function ParsedThing(value, type, subtype) {
+	function ParsedThing(value, type, subtype, pos, length) {
 		this.value = value;
 		this.type = type;
 		this.subtype = subtype;
+		this.pos = pos;
+		this.length = length;
 	}
 
 	ParsedThing.prototype.getStop = function () {
-		return new ParsedThing(this.value, this.type, TOK_SUBTYPE_STOP);
+		return new ParsedThing(this.value, this.type, TOK_SUBTYPE_STOP, this.pos, this.length);
 	};
 
 	var g_oCodeSpace = 32; // Code of space
@@ -139,7 +141,7 @@ function (window, undefined) {
 						offset += 1;
 					} else {
 						inString = false;
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_TEXT));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_TEXT, offset, token.length));
 						token = "";
 					}
 				} else {
@@ -180,7 +182,7 @@ function (window, undefined) {
 				offset += 1;
 				if ((",#NULL!,#DIV/0!,#VALUE!,#REF!,#NAME?,#NUM!,#N/A,").indexOf("," + token + ",") != -1) {
 					inError = false;
-					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_ERROR));
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_ERROR, offset, token.length));
 					token = "";
 				}
 				continue;
@@ -189,10 +191,10 @@ function (window, undefined) {
 			// trim white-space
 			if (currentCharCode === g_oCodeSpace) {
 				if (token.length > 0) {
-					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 					token = "";
 				}
-				tokens.push(new ParsedThing("", TOK_TYPE_WSPACE));
+				tokens.push(new ParsedThing("", TOK_TYPE_WSPACE, null, offset, token.length));
 				offset += 1;
 
 				while ((currentCharCode = formula.charCodeAt(offset)) === g_oCodeSpace) {
@@ -211,10 +213,10 @@ function (window, undefined) {
 				(nextCharCode === g_oCodeEqualSign || nextCharCode === g_oCodeGreaterSign)) ||
 				(currentCharCode === g_oCodeGreaterSign && nextCharCode === g_oCodeEqualSign)) {
 				if (token.length > 0) {
-					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 					token = "";
 				}
-				tokens.push(new ParsedThing(formula.substr(offset, 2), TOK_TYPE_OP_IN, TOK_SUBTYPE_LOGICAL));
+				tokens.push(new ParsedThing(formula.substr(offset, 2), TOK_TYPE_OP_IN, TOK_SUBTYPE_LOGICAL, offset, token.length));
 				offset += 2;
 				nextCharCode = formula.charCodeAt(offset);
 				continue;
@@ -239,7 +241,7 @@ function (window, undefined) {
 				{
 					if (token.length > 0) {
 						// not expected
-						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN, null, offset, token.length));
 						token = "";
 					}
 					inString = true;
@@ -249,7 +251,7 @@ function (window, undefined) {
 				{
 					if (token.length > 0) {
 						// not expected
-						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN, null, offset, token.length));
 						token = "";
 					}
 					inPath = true;
@@ -265,7 +267,7 @@ function (window, undefined) {
 				{
 					if (token.length > 0) {
 						// not expected
-						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN, null, offset, token.length));
 						token = "";
 					}
 					inError = true;
@@ -277,13 +279,13 @@ function (window, undefined) {
 					// mark start and end of arrays and array rows
 					if (token.length > 0) {
 						// not expected
-						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN, null, offset, token.length));
 						token = "";
 					}
-					tmp = new ParsedThing('ARRAY', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tmp = new ParsedThing('ARRAY', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START, offset, token.length);
 					tokens.push(tmp);
 					tokenStack.push(tmp.getStop());
-					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START, offset, token.length);
 					tokens.push(tmp);
 					tokenStack.push(tmp.getStop());
 					break;
@@ -291,7 +293,7 @@ function (window, undefined) {
 				case g_oCodeSemicolon:
 				{
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
 					tmp = tokenStack.pop();
@@ -299,8 +301,8 @@ function (window, undefined) {
 						return null;
 					}
 					tokens.push(tmp);
-					tokens.push(new ParsedThing(';', TOK_TYPE_ARGUMENT));
-					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tokens.push(new ParsedThing(';', TOK_TYPE_ARGUMENT, null, offset, token.length));
+					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START, offset, token.length);
 					tokens.push(tmp);
 					tokenStack.push(tmp.getStop());
 					break;
@@ -308,7 +310,7 @@ function (window, undefined) {
 				case g_oCodeRightCurlyBracked:
 				{
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
 					tokens.push(tokenStack.pop());
@@ -327,32 +329,32 @@ function (window, undefined) {
 				{
 					// standard infix operators
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
-					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_IN));
+					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_IN, null, offset, token.length));
 					break;
 				}
 				case g_oCodePercent:
 				{
 					// standard postfix operators
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
-					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_POST));
+					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_POST, null, offset, token.length));
 					break;
 				}
 				case g_oCodeLeftParenthesis:
 				{
 					// start subexpression or function
 					if (token.length > 0) {
-						tmp = new ParsedThing(token, TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+						tmp = new ParsedThing(token, TOK_TYPE_FUNCTION, TOK_SUBTYPE_START, offset, token.length);
 						tokens.push(tmp);
 						tokenStack.push(tmp.getStop());
 						token = "";
 					} else {
-						tmp = new ParsedThing("", TOK_TYPE_SUBEXPR, TOK_SUBTYPE_START);
+						tmp = new ParsedThing("", TOK_TYPE_SUBEXPR, TOK_SUBTYPE_START, offset, token.length);
 						tokens.push(tmp);
 						tokenStack.push(tmp.getStop());
 					}
@@ -362,19 +364,19 @@ function (window, undefined) {
 				{
 					// function, subexpression, array parameters
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
 					tmp = (0 !== tokenStack.length) ? (TOK_TYPE_FUNCTION === tokenStack[tokenStack.length - 1].type) : false;
-					tokens.push(tmp ? new ParsedThing(currentChar, TOK_TYPE_ARGUMENT) :
-						new ParsedThing(currentChar, TOK_TYPE_OP_IN, TOK_SUBTYPE_UNION));
+					tokens.push(tmp ? new ParsedThing(currentChar, TOK_TYPE_ARGUMENT, null, offset, token.length) :
+						new ParsedThing(currentChar, TOK_TYPE_OP_IN, TOK_SUBTYPE_UNION, offset, token.length));
 					break;
 				}
 				case g_oCodeRightParenthesis:
 				{
 					// stop subexpression
 					if (token.length > 0) {
-						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 						token = "";
 					}
 					tokens.push(tokenStack.pop());
@@ -393,7 +395,7 @@ function (window, undefined) {
 
 		// dump remaining accumulation
 		if (token.length > 0) {
-			tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+			tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, null, offset, token.length));
 		}
 
 		return tokens;
@@ -4593,6 +4595,10 @@ parserFormula.prototype.setFormula = function(formula) {
 												this.wb.getWorksheetByName(tmp.sheet2) : wsF;
 											elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) :
 												new cArea3D(tmp.getName(), wsF, wsT);
+												refPos.push({start: aTokens[i].pos - aTokens[i].length,
+													end: aTokens[i].pos,
+													index: this.outStack.length,
+													oper: elem});
 										} else {
 											this.error.push(c_oAscError.ID.FrmlWrongOperator);
 											this.outStack = [];
@@ -4603,8 +4609,16 @@ parserFormula.prototype.setFormula = function(formula) {
 										if (tmp) {
 											elem =
 												tmp.isOneCell() ? new cRef(valUp, this.ws) : new cArea(valUp, this.ws);
+											refPos.push({start: aTokens[i].pos - aTokens[i].length,
+												end: aTokens[i].pos,
+												index: this.outStack.length,
+												oper: elem});
 										} else {
 											elem = new cName(aTokens[i].value, this.ws);
+											refPos.push({start: aTokens[i].pos - aTokens[i].length,
+												end: aTokens[i].pos,
+												index: this.outStack.length,
+												oper: elem});
 										}
 									}
 								}
@@ -4742,7 +4756,8 @@ parserFormula.prototype.setFormula = function(formula) {
 									arg_count = args[indentCount] -
 										((prev && TOK_TYPE_FUNCTION === prev.type && TOK_SUBTYPE_START ===
 											prev.subtype) ? 1 : 0);
-									this.outStack.push(arg_count);
+									//this.outStack.push(arg_count);
+									this.outStack.splice(this.outStack.length - 1, 0, arg_count);
 									if (!tmp.checkArguments(arg_count)) {
 										this.outStack = [];
 										this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
@@ -6133,19 +6148,17 @@ function parseNum( str ) {
 			}
 
 			y = y.toString();
-			if ('' === y) {
-				// Empty compare string
-				rS = (cElementType.empty === x.type);
-			} else {
-				// Equal only string values
-				if(cElementType.bool === x.type){
-					x = x.tocString();
-					rS = x.value === y;
-				}else if(cElementType.error === x.type){
-					rS = x.value === y;
-				}else{
-					rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
-				}
+
+			// Equal only string values
+			if(cElementType.empty === x.type && '' === y){
+				rS = true;
+			} else if(cElementType.bool === x.type){
+				x = x.tocString();
+				rS = x.value === y;
+			}else if(cElementType.error === x.type){
+				rS = x.value === y;
+			}else{
+				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
 			}
 
 			switch (operator) {

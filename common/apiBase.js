@@ -34,6 +34,8 @@
 
 (function(window, undefined)
 {
+	var prot;
+
 	// Import
 	var c_oEditorId = AscCommon.c_oEditorId;
 	var c_oCloseCode = AscCommon.c_oCloseCode;
@@ -156,6 +158,8 @@
 		this.noCreatePoint     = false;
 		this.exucuteHistory    = false;
 		this.exucuteHistoryEnd = false;
+
+		this.selectSearchingResults = false;
 
 		this.isSendStandartTextures = false;
 
@@ -635,6 +639,14 @@
 			t.isOnLoadLicense = true;
 			t._onEndPermissions();
 		};
+		this.CoAuthoringApi.onLicenseChanged          = function(res)
+		{
+			t.licenseResult   = res;
+			t.isOnLoadLicense = true;
+			var oResult = new AscCommon.asc_CAscEditorPermissions();
+			oResult.setLicenseType(res);
+			t.sendEvent('asc_onLicenseChanged', oResult);
+		};
 		this.CoAuthoringApi.onWarning                 = function(code)
 		{
 			t.sendEvent('asc_onError', code || c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
@@ -1072,6 +1084,16 @@
 
 	baseEditorsApi.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
 	{
+	};
+
+	baseEditorsApi.prototype.asc_selectSearchingResults = function(value)
+	{
+		if (this.selectSearchingResults === value)
+		{
+			return;
+		}
+		this.selectSearchingResults = value;
+		this._selectSearchingResults(value);
 	};
 
 
@@ -1736,4 +1758,7 @@
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;
+
+	prot = baseEditorsApi.prototype;
+	prot['asc_selectSearchingResults'] = prot.asc_selectSearchingResults;
 })(window);

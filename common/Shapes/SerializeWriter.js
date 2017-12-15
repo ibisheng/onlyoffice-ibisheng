@@ -2090,6 +2090,8 @@ function CBinaryFileWriter()
                 oThis.WriteRecord2(3, rPr.RFonts.Ascii, oThis.WriteTextFontTypeface);
             if (rPr.RFonts.EastAsia)
                 oThis.WriteRecord2(4, rPr.RFonts.EastAsia, oThis.WriteTextFontTypeface);
+            if (rPr.RFonts.CS)
+                oThis.WriteRecord2(5, rPr.RFonts.CS, oThis.WriteTextFontTypeface);
         }
 
         if (hlinkObj != null && hlinkObj !== undefined)
@@ -2789,7 +2791,7 @@ function CBinaryFileWriter()
                 }
                 case para_Hyperlink:
                 {
-                    var _hObj = { Value : _elem.Value, tooltip: _elem.Get_ToolTip()};
+                    var _hObj = { Value : _elem.GetValue(), tooltip: _elem.GetToolTip()};
                     var _content_len_h = _elem.Content.length;
 
                     for (var hi = 0; hi < _content_len_h; hi++)

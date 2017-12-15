@@ -151,7 +151,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data, _len);
 
-	window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
+	window["Asc"]["editor"].sendEvent("asc_onDocumentPassword", ("" != window["Asc"]["editor"].currentPassword) ? true : false);
 };
 
 /////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 		if (window.SaveQuestionObjectBeforeSign)
 		{
 			var _obj = window.SaveQuestionObjectBeforeSign;
-			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height, window["asc_IsVisibleSign"](_obj.guid));
+			window["Asc"]["editor"].sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height, window["asc_IsVisibleSign"](_obj.guid));
 			window.SaveQuestionObjectBeforeSign = null;
 		}
 	}

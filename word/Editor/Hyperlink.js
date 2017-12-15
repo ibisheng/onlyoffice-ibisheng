@@ -80,15 +80,16 @@ ParaHyperlink.prototype.Get_FirstTextPr2 = function()
 ParaHyperlink.prototype.Copy = function(Selected, oPr)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
-    NewHyperlink.Set_Value(this.Value);
-    NewHyperlink.Set_ToolTip(this.ToolTip);
+    NewHyperlink.SetValue(this.Value);
+    NewHyperlink.SetToolTip(this.ToolTip);
+    NewHyperlink.SetAnchor(this.Anchor);
     NewHyperlink.Visited = this.Visited;
     return NewHyperlink;
 };
 
 ParaHyperlink.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
-    Info.Set_Hyperlink(this);
+    Info.SetHyperlink(this);
     CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 
@@ -156,7 +157,7 @@ ParaHyperlink.prototype.Clear_TextPr = function()
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
     {
         var Styles = this.Paragraph.Parent.Get_Styles();
-        HyperlinkStyle = Styles.Get_Default_Hyperlink();
+        HyperlinkStyle = Styles.GetDefaultHyperlink();
     }
 
     var Count = this.Content.length;
@@ -187,8 +188,8 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
 ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Split.apply(this, arguments);
-    NewHyperlink.Set_Value(this.Value);
-    NewHyperlink.Set_ToolTip(this.ToolTip);
+    NewHyperlink.SetValue(this.Value);
+    NewHyperlink.SetToolTip(this.ToolTip);
     return NewHyperlink;
 };
 
@@ -228,11 +229,7 @@ ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 //-----------------------------------------------------------------------------------
 // Работаем со значениями
 //-----------------------------------------------------------------------------------
-ParaHyperlink.prototype.Set_Visited = function(Value)
-{
-	this.SetVisited(Value);
-};
-ParaHyperlink.prototype.Get_Visited = function()
+ParaHyperlink.prototype.GetVisited = function()
 {
     return this.Visited;
 };
@@ -240,34 +237,25 @@ ParaHyperlink.prototype.SetVisited = function(isVisited)
 {
 	this.Visited = isVisited;
 };
-
-ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
+ParaHyperlink.prototype.SetToolTip = function(ToolTip)
 {
     History.Add(new CChangesHyperlinkToolTip(this, this.ToolTip, ToolTip));
     this.ToolTip = ToolTip;
 };
-ParaHyperlink.prototype.Get_ToolTip = function()
+ParaHyperlink.prototype.GetToolTip = function()
 {
 	if (this.Anchor)
 		return AscCommon.translateManager.getValue("Current Document");
 
-    if ( null === this.ToolTip )
-    {
-        if ( "string" === typeof(this.Value) )
-            return this.Value;
-        else
-            return "";
-    }
-    else
-        return this.ToolTip;
-};
-ParaHyperlink.prototype.GetToolTip = function()
-{
-	return this.Get_ToolTip();
-};
-ParaHyperlink.prototype.Get_Value = function()
-{
-    return this.Value;
+	if ( null === this.ToolTip )
+	{
+		if ( "string" === typeof(this.Value) )
+			return this.Value;
+		else
+			return "";
+	}
+	else
+		return this.ToolTip;
 };
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
@@ -285,7 +273,7 @@ ParaHyperlink.prototype.SetAnchor = function(sBookmarkName)
 };
 ParaHyperlink.prototype.GetValue = function()
 {
-	return this.Get_Value();
+	return this.Value;
 };
 ParaHyperlink.prototype.SetValue = function(sValue)
 {
@@ -361,15 +349,15 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
 
 ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 {
-    var HyperText = new CParagraphGetText();
-    this.Get_Text( HyperText );
+	var oHyperText = new CParagraphGetText();
+	this.Get_Text(oHyperText);
 
-    var HyperProps = new Asc.CHyperlinkProperty(this);
-    HyperProps.put_Text( HyperText.Text );
+	var oHyperProps = new Asc.CHyperlinkProperty(this);
+	oHyperProps.put_Text(oHyperText.Text);
+	oHyperProps.put_InternalHyperlink(this);
 
-    editor.sync_HyperlinkPropCallback(HyperProps);
-
-    CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
+	editor.sync_HyperlinkPropCallback(oHyperProps);
+	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
 
 function CParaHyperLinkStartState(HyperLink)

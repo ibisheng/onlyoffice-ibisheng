@@ -1177,7 +1177,12 @@ DrawingObjectsController.prototype =
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
                     if(object.getObjectType() === AscDFH.historyitem_type_Shape){
-                        if(this.handleDblClickEmptyShape){
+                        if(null !== object.signatureLine){
+                            if(this.handleSignatureDblClick){
+                                this.handleSignatureDblClick(object.signatureLine.id, object.extX, object.extY)
+                            }
+                        }
+                        else if(this.handleDblClickEmptyShape){
                             this.handleDblClickEmptyShape(object);
                         }
                     }
@@ -5319,7 +5324,14 @@ DrawingObjectsController.prototype =
                 this.resetConnectors(this.selectedObjects);
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
-                    this.selectedObjects[i].deleteDrawingBase(true);
+                    
+                    this.selectedObjects[i].deleteDrawingBase(true);                    
+                    if(this.selectedObjects[i].signatureLine){
+                        var oApi = this.getEditorApi();
+                        if(oApi){
+                            oApi.sendEvent("asc_onRemoveSignature", this.selectedObjects[i].signatureLine.id);
+                        }
+                    }
                     if(this.selectedObjects[i].setBDeleted){
                         this.selectedObjects[i].setBDeleted(true);
                     }
@@ -5830,8 +5842,8 @@ DrawingObjectsController.prototype =
                 var hyperlink = this.hyperlinkCheck(false);
                 if(hyperlink && !e.shiftKey)
                 {
-                    window["Asc"]["editor"].wb.handlers.trigger("asc_onHyperlinkClick", hyperlink.Get_Value());
-                    hyperlink.Set_Visited(true);
+                    window["Asc"]["editor"].wb.handlers.trigger("asc_onHyperlinkClick", hyperlink.GetValue());
+                    hyperlink.SetVisited(true);
                     this.drawingObjects.showDrawingObjects(true);
                 }
                 else

@@ -4052,11 +4052,6 @@ CStyles.prototype =
         return this.Default.Footer;
     },
 
-    Get_Default_Hyperlink : function()
-    {
-        return this.Default.Hyperlink;
-    },
-
     Get_StyleIdByName : function (Name, bUseDefault)
     {
         for ( var Id in this.Style )
@@ -4550,6 +4545,10 @@ CStyles.prototype.GetDefaultTOC = function(nLvl)
 CStyles.prototype.GetDefaultTOCHeading = function()
 {
 	return this.Default.TOCHeading;
+};
+CStyles.prototype.GetDefaultHyperlink = function()
+{
+	return this.Default.Hyperlink;
 };
 
 function CDocumentColor(r,g,b, Auto)

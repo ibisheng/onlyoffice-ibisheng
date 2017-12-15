@@ -2482,7 +2482,10 @@
 
             // ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
             var c = this._getVisibleCell( col, row );
-            var bg = c.getFill();
+			var findFillColor = this.handlers.trigger('selectSearchingResults') && this.model.inFindResults(row, col) ?
+				this.settings.findFillColor : null;
+			var fillColor = c.getFill();
+            var bg = fillColor || findFillColor;
             var mc = null;
             var mwidth = 0, mheight = 0;
 
@@ -2535,6 +2538,10 @@
             var h = this.rows[row].height + this.height_1px * (bg !== null ? +1 : -1) + mheight;
             var color = bg !== null ? bg : this.settings.cells.defaultState.background;
             ctx.setFillStyle( color ).fillRect( x - offsetX, y - offsetY, w, h );
+
+            if (fillColor && findFillColor) {
+				ctx.setFillStyle(findFillColor).fillRect(x - offsetX, y - offsetY, w, h);
+            }
         }
         return mergedCells;
     };
@@ -4290,7 +4297,7 @@
         var align = c.getAlign();
         var angle = align.getAngle();
         var va = align.getAlignVertical();
-        if (this._isCellEmptyTextString(c)) {
+        if (c.isEmptyTextString()) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
                 str = c.getValue2();
@@ -4691,49 +4698,14 @@
         return fl;
     };
 
-    WorksheetView.prototype._isCellEmptyText = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        return null === c || c.isEmptyText();
-    };
     WorksheetView.prototype._isCellNullText = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
         return null === c || c.isNullText();
     };
-    WorksheetView.prototype._isCellEmptyTextString = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        return null === c || c.isEmptyTextString();
-    };
 
     WorksheetView.prototype._isCellEmptyOrMerged = function (col, row) {
         var c = row !== undefined ? this._getCell(col, row) : col;
-        if (null === c) {
-            return true;
-        }
-        if (!c.isEmptyText()) {
-            return false;
-        }
-        return (null === c.hasMerged());
-    };
-
-    WorksheetView.prototype._isCellEmptyOrMergedOrBackgroundColorOrBorders = function (col, row) {
-        var c = row !== undefined ? this._getCell(col, row) : col;
-        if (null === c) {
-            return true;
-        }
-        if (!c.isEmptyTextString()) {
-            return false;
-        }
-        if (null !== c.hasMerged()) {
-            return false;
-        }
-        var bg = c.getFill();
-        if (null !== bg) {
-            return false;
-        }
-        var cb = c.getBorder();
-        return !((cb.l && c_oAscBorderStyles.None !== cb.l.s) || (cb.r && c_oAscBorderStyles.None !== cb.r.s) ||
-        (cb.t && c_oAscBorderStyles.None !== cb.t.s) || (cb.b && c_oAscBorderStyles.None !== cb.b.s) ||
-        (cb.dd && c_oAscBorderStyles.None !== cb.dd.s) || (cb.du && c_oAscBorderStyles.None !== cb.du.s));
+        return null === c || (c.isNullText() && null === c.hasMerged());
     };
 
     WorksheetView.prototype._getRange = function (c1, r1, c2, r2) {
@@ -7313,6 +7285,9 @@
     // Обработка движения в выделенной области
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
         var ret;
+        if (0 === dc && 0 === dr) {
+            return this._calcActiveCellOffset();
+        }
         if (!this._moveActivePointInSelection(dc, dr)) {
             return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, false);
         }
@@ -8577,8 +8552,8 @@
                         break;
                         break;
                     case "paste":
-						var clipboardBase = window['AscCommon'].g_clipboardBase;
-						clipboardBase.specialPasteProps = clipboardBase.specialPasteProps ? clipboardBase.specialPasteProps : new Asc.SpecialPasteProps();
+						var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+						specialPasteHelper.specialPasteProps = specialPasteHelper.specialPasteProps ? specialPasteHelper.specialPasteProps : new Asc.SpecialPasteProps();
 					
                         t._loadDataBeforePaste(isLargeRange, val.fromBinary, val.data, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
@@ -8634,7 +8609,7 @@
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
 			if (prop !== "paste" || (prop === "paste" && val.fromBinary)) {
 				History.EndTransaction();
-				window['AscCommon'].g_clipboardBase.Paste_Process_End();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			}
         };
 
@@ -8667,8 +8642,8 @@
 		var api = window["Asc"]["editor"];
 		var t = this;
 
-		var clipboard_base = window['AscCommon'].g_clipboardBase;
-		var specialPasteData = clipboard_base.specialPasteData;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteData = specialPasteHelper.specialPasteData;
 
 		if(!specialPasteData)
 		{
@@ -8683,8 +8658,8 @@
 				return false;
 			}
 
-			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
-			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+			window['AscCommon'].g_specialPasteHelper.Special_Paste_Start();
 
 			api.asc_Undo();
 
@@ -8693,9 +8668,9 @@
 			History.StartTransaction();
 
 			//далее специальная вставка
-			clipboard_base.specialPasteProps = props;
+			specialPasteHelper.specialPasteProps = props;
 			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-			window['AscCommon'].g_clipboardBase.bIsEndTransaction = true;
+			window['AscCommon'].g_specialPasteHelper.bIsEndTransaction = true;
 			AscCommonExcel.g_clipboardExcel.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		};
 
@@ -8711,11 +8686,11 @@
 	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
         var t = this;
-		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			if(!specialPasteHelper.specialPasteStart)
 			{
 				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
 			}
@@ -8858,7 +8833,7 @@
         }
 		
 		//for special paste
-		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
 			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var allowedSpecialPasteProps;
@@ -8877,7 +8852,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
 			//this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
 		}
 		else
@@ -8888,8 +8863,8 @@
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
-		var clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		//paste from excel binary
 		if(fromBinary)
@@ -8963,7 +8938,7 @@
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
-								window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 							}, true );
 						}
 						
@@ -8979,7 +8954,7 @@
 				if ( isEndTransaction ) 
 				{
 					History.EndTransaction();
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
 			
@@ -9194,8 +9169,8 @@
         var pasteRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
         var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
 		
-		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		var countPasteRow = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
 		var countPasteCol = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
@@ -9965,8 +9940,8 @@
 		var cellCoord;
 		if(!positionShapeContent)
 		{
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9987,12 +9962,12 @@
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
-		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
+		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton && isIntoShape)
 		{
-			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
+			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId === isIntoShape.Id)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+				var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
 				
 				/*var trueShapeSelection = isIntoShape.GetSelectionState();
 				isIntoShape.SetSelectionState(range, range.length - 1);*/
@@ -10022,15 +9997,15 @@
 				//isIntoShape.SetSelectionState(trueShapeSelection, trueShapeSelection.length - 1);
 			}
 		}
-		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+		else if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			if(changeActiveRange)
 			{
-				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = changeActiveRange;
+				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = changeActiveRange;
 			}
 			
-			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+			var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			
@@ -10049,7 +10024,7 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId)
 		{
 			disableCoords();
 			cellCoord = [cellCoord];
@@ -13095,7 +13070,12 @@
 				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
 					c_oAscError.Level.NoCritical);
 				result = false;
-			} else if (!styleName && worksheet.autoFilters._isEmptyRange(activeRange, 1)) {
+			} else if (!styleName && activeRange.isOneCell() && worksheet.autoFilters._isEmptyRange(activeRange, 1)) {
+				//add filter to empty range - if select contains 1 cell
+				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+					c_oAscError.Level.NoCritical);
+				result = false;
+			} else if (!styleName && !activeRange.isOneCell() && worksheet.autoFilters._isEmptyRange(activeRange, 0)) {
 				//add filter to empty range
 				worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
 					c_oAscError.Level.NoCritical);
@@ -13185,7 +13165,7 @@
         var openAndClosedValues = ws.autoFilters._getOpenAndClosedValues(filter, colId);
         var values = openAndClosedValues.values;
         var automaticRowCount = openAndClosedValues.automaticRowCount;
-        var filters = ws.autoFilters._getFilterColumn(autoFilter, colId);
+        var filters = autoFilter.getFilterColumn(colId);
 
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId,
           autoFilter.Ref.r1);
@@ -14109,7 +14089,9 @@
             t._onUpdateFormatTable(range, false, true);
             //TODO добавить перерисовку таблицы и перерисовку шаблонов
             History.EndTransaction();
-			callbackAfterChange();
+			if(callbackAfterChange){
+				callbackAfterChange();
+            }
         };
 
         //TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т

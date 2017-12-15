@@ -1131,7 +1131,8 @@
 		insertAsNestedTable: 20,
 		uniteIntoTable: 21,
 		insertAsNewRows: 22,
-		keepTextOnly: 23
+		keepTextOnly: 23,
+		overwriteCells : 24
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1836,7 +1837,9 @@
 	prot['uniteList'] = prot.uniteList;
 	prot['doNotUniteList'] = prot.doNotUniteList;
 	prot['keepTextOnly'] = prot.keepTextOnly;
-	
+	prot['insertAsNestedTable'] = prot.insertAsNestedTable;
+	prot['overwriteCells'] = prot.overwriteCells;
+
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
 		{

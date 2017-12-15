@@ -119,7 +119,8 @@
 		UnknownUser : 4,
 		Connections : 5,
 		ExpiredTrial: 6,
-		SuccessLimit: 7
+		SuccessLimit: 7,
+		UsersCount  : 8
 	};
 
 	var c_oRights = {
@@ -2600,6 +2601,12 @@
 
 		asc_putColumnSpace: function(v){
 			this.columnSpace = v;
+		},
+
+		asc_getSignatureId : function() {
+			if (this.ShapeProperties)
+				return this.ShapeProperties.asc_getSignatureId();
+			return undefined;
 		}
 	};
 
@@ -3616,6 +3623,7 @@
 	prot['Connections'] = prot.Connections;
 	prot['ExpiredTrial'] = prot.ExpiredTrial;
 	prot['SuccessLimit'] = prot.SuccessLimit;
+	prot['UsersCount'] = prot.UsersCount;
 
 	window['Asc']['c_oRights'] = window['Asc'].c_oRights = c_oRights;
 	prot = c_oRights;
@@ -4167,6 +4175,7 @@
 	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
 	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
+	prot["asc_getSignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
 
 
 

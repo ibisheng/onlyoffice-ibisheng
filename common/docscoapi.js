@@ -77,6 +77,7 @@
       this.onDocumentOpen = options.onDocumentOpen;
       this.onFirstConnect = options.onFirstConnect;
       this.onLicense = options.onLicense;
+      this.onLicenseChanged = options.onLicenseChanged;
     }
   }
 
@@ -165,6 +166,9 @@
       this._CoAuthoringApi.onLicense = function(res) {
         t.callback_OnLicense(res);
       };
+      this._CoAuthoringApi.onLicenseChanged = function(res) {
+        t.callback_OnLicenseChanged(res);
+	  };
 
       this._CoAuthoringApi.init(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo);
       this._onlineWork = true;
@@ -536,6 +540,11 @@
       this.onLicense(res);
     }
   };
+  CDocsCoApi.prototype.callback_OnLicenseChanged = function(res) {
+    if (this.onLicenseChanged) {
+      this.onLicenseChanged(res);
+    }
+  };
 
   function LockBufferElement(arrayBlockId, callback) {
     this._arrayBlockId = arrayBlockId ? arrayBlockId.slice() : null;
@@ -570,6 +579,7 @@
       this.onDocumentOpen = options.onDocumentOpen;
       this.onFirstConnect = options.onFirstConnect;
       this.onLicense = options.onLicense;
+      this.onLicenseChanged = options.onLicenseChanged;
     }
     this._state = ConnectionState.None;
     // Online-пользователи в документе
@@ -1379,6 +1389,10 @@
     }
   };
 
+  DocsCoApi.prototype._onLicenseChanged = function (data) {
+    this.onLicenseChanged(data['licenseType']);
+  };
+
   DocsCoApi.prototype._onDrop = function(data) {
     this.disconnect();
     this.onDisconnect(data ? data['description'] : '', this._getDisconnectErrorCode());
@@ -1407,6 +1421,7 @@
 
 	  this._onServerVersion(data);
 
+      this._onLicenseChanged(data);
       // Мы уже авторизовывались, нужно обновить пользователей (т.к. пользователи могли входить и выходить пока у нас не было соединения)
       this._onAuthParticipantsChanged(data['participants']);
 
@@ -1445,6 +1460,7 @@
       this._userId = this._user.asc_getId() + this._indexUser;
       this._sessionTimeConnect = data['sessionTimeConnect'];
 
+      this._onLicenseChanged(data);
       this._onAuthParticipantsChanged(data['participants']);
 
       this._onSpellCheckInit(data['g_cAscSpellCheckUrl']);

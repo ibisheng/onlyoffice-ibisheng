@@ -371,8 +371,9 @@ var c_oSerParType = {
 	MoveFromRangeEnd: 19,
 	MoveToRangeStart: 20,
 	MoveToRangeEnd: 21,
-	BookmarkStart: 22,
-	BookmarkEnd: 23
+	JsaProject: 22,
+	BookmarkStart: 23,
+	BookmarkEnd: 24
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -4514,8 +4515,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
     };
     this.WriteHyperlink = function (oHyperlink, bUseSelection) {
         var oThis = this;
-        var sLink = oHyperlink.Get_Value();
-        var sTooltip = oHyperlink.Get_ToolTip();
+        var sLink = oHyperlink.GetValue();
+        var sTooltip = oHyperlink.GetToolTip();
 		var sAnchor = oHyperlink.GetAnchor();
         //Link
         this.memory.WriteByte(c_oSer_HyperlinkType.Link);
@@ -9339,8 +9340,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 					if (null != oField && para_Hyperlink == oField.Get_Type()) {
 						var oHyperlink = new ParaHyperlink();
 						oHyperlink.SetParagraph(paragraph);
-						oHyperlink.Set_Value(oField.Get_Value());
-						oHyperlink.Set_ToolTip(oField.Get_ToolTip());
+						oHyperlink.SetValue(oField.GetValue());
+						oHyperlink.SetToolTip(oField.GetToolTip());
 						oParStruct.addElem(oHyperlink);
 					} else {
                         //зануляем, чтобы когда придет fldend ничего не делать
@@ -9449,9 +9450,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		        return oThis.ReadHyperlink(t, l, oHyperlinkObj, oNewHyperlink, oParStruct);
 		    });
 			if (null != oHyperlinkObj.Link)
-				oNewHyperlink.Set_Value(oHyperlinkObj.Link);
+				oNewHyperlink.SetValue(oHyperlinkObj.Link);
 			if (null != oHyperlinkObj.Tooltip)
-				 oNewHyperlink.Set_ToolTip(oHyperlinkObj.Tooltip);
+				 oNewHyperlink.SetToolTip(oHyperlinkObj.Tooltip);
 			if (null != oHyperlinkObj.Anchor)
 				oNewHyperlink.SetAnchor(oHyperlinkObj.Anchor);
 			oParStruct.addToContent(oNewHyperlink);
@@ -9536,9 +9537,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				return oThis.bcr.ReadBookmark(t,l, bookmark);
 			});
 			if (undefined !== bookmark.BookmarkId && undefined !== bookmark.BookmarkName) {
-				var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
-				this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
-				oParStruct.addToContent(newBookmark);
+				var isCopyPaste = this.openParams && this.openParams.bCopyPaste;
+				var bookmarksManager = this.Document.BookmarksManager;
+				if(!isCopyPaste || (isCopyPaste && bookmarksManager && null === bookmarksManager.GetBookmarkByName(bookmark.BookmarkName))){
+					var newBookmark = new CParagraphBookmark(true, bookmark.BookmarkId, bookmark.BookmarkName);
+					this.oReadResult.bookmarksStarted[bookmark.BookmarkId] = {parent: oParStruct.getElem(), bookmark: newBookmark};
+					oParStruct.addToContent(newBookmark);
+				}
 			}
 		} else if ( c_oSerParType.BookmarkEnd === type) {
 			var bookmark = this.oReadResult.bookmarkForRead;
@@ -10119,9 +10124,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				oRes = new ParaHyperlink();
 				oRes.SetParagraph(paragraph);
 				if(null != sLink && sLink.length > 0)
-					oRes.Set_Value(sLink);
+					oRes.SetValue(sLink);
 				if(null != sTooltip && sTooltip.length > 0)
-					oRes.Set_ToolTip(sTooltip);
+					oRes.SetToolTip(sTooltip);
 			}
 		}
 		else if("PAGE" == sFieldType){
@@ -14519,7 +14524,7 @@ function DocReadResult(doc) {
 	this.aTableCorrect = [];
 	this.footnotes = {};
 	this.footnoteRefs = [],
-	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : null;
+	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : {};
 	this.bookmarksStarted = {};
 };
 //---------------------------------------------------------export---------------------------------------------------

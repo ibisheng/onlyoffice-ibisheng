@@ -1940,18 +1940,6 @@
 				return false;
 			},
 			
-			isActiveRangeIntersectionAutoFilter: function(addFormatTableOptionsObj)
-			{
-				var res = false;
-				var worksheet = this.worksheet;
-
-				var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
-				if(activeRange && worksheet.AutoFilter && worksheet.AutoFilter.Ref.intersection(activeRange))
-					res = true;
-					
-				return res;
-			},
-			
 			//если активный диапазон захватывает части нескольких табли, либо часть одной таблицы и одну целую
 			isRangeIntersectionSeveralTableParts: function(activeRange)
 			{
@@ -2785,27 +2773,6 @@
 				
 				History.EndTransaction();
 			},
-			
-			headerContains: function(col, row)
-			{
-				var res = false;
-				var worksheet = this.worksheet;
-
-				if(worksheet.TableParts && worksheet.TableParts.length) {
-					for (var i = 0; i < worksheet.TableParts.length; i++) {
-						var tablePart = worksheet.TableParts[i];
-						if(tablePart.isHeaderRow()){
-							var headerRange = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r1);
-							if(headerRange.contains(col, row)){
-								res = true;
-								break;
-							}
-						}
-					}
-				}
-
-				return res;
-			},
 
 			checkTableAutoExpansion: function(range){
 				var worksheet = this.worksheet;
@@ -2833,6 +2800,22 @@
 							}
 							break;
 						}
+					}
+				}
+
+				return res;
+			},
+
+			checkTableColumnName: function(tableColumns, name)
+			{
+				var res = name;
+
+				for(var i = 0; i < tableColumns.length; i++)
+				{
+					if(name.toLowerCase() === tableColumns[i].Name.toLowerCase())
+					{
+						res = this._generateColumnName2(tableColumns);
+						break;
 					}
 				}
 
@@ -2938,7 +2921,7 @@
 				
 				return res;
 			},
-			
+
 			_getColIdColumn: function(filter, cellId)
 			{
 				var res = null;
@@ -2955,38 +2938,7 @@
 				
 				return res;
 			},
-			
-			_getColIdColumnByRange: function(filter, range)
-			{
-				var res = null;
-				
-				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
-				
-				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
-				{
-					var colId = range.colStart - autoFilter.Ref.c1;
-					res = this._getTrueColId(filter, colId);
-				}
-				
-				return res;
-			},
-			
-			_getIndexByColId: function(autoFilter, colId)
-			{
-				var res = null;
-				
-				for(var i = 0; i < autoFilter.FilterColumns.length; i++)
-				{
-					if(autoFilter.FilterColumns[i].ColId === colId)
-					{
-						res = i;
-						break;
-					}
-				}
-				
-				return res;
-			},
-			
+
 			_hiddenAnotherFilter: function(filterColumns, cellId, r, c)
 			{
 				var worksheet = this.worksheet;
@@ -3055,11 +3007,6 @@
 					activeHistoryRange = null;
 				
 				History.Add(AscCommonExcel.g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
-			},
-			
-			_getCurrentWS : function() {
-				var ws = this.worksheet;
-				return ws.model;
 			},
 
 			renameTableColumn: function(range, bUndo, props)
@@ -3529,7 +3476,7 @@
 							continue;
 							
 						cell = ws.getRange3(n, k, n, k);
-						isEmptyCell = cell.isEmptyText();
+						isEmptyCell = cell.isNullText();
 
 						if(!isEmptyCell && ignoreSpaceSymbols){
 							var tempVal = cell.getValueWithoutFormat().replace(/\s/g, '');
@@ -4052,7 +3999,7 @@
 				
 				colId = this._getTrueColId(autoFilter, colId);
 
-				var currentFilterColumn = this._getFilterColumn(autoFilter, colId);
+				var currentFilterColumn = autoFilter.getFilterColumn(colId);
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
@@ -4301,19 +4248,6 @@
 					}
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();
-			},
-			
-			_openAllHiddenRowsByFilter: function(filter)
-			{
-				var autoFilter = filter && !filter.isAutoFilter() ? filter.AutoFilter : filter;
-				if(autoFilter && autoFilter.FilterColumns)
-				{
-					var filterColumns = autoFilter.FilterColumns;
-					for(var i = 0; i < filterColumns.length; i++)
-					{
-						this._openHiddenRowsAfterDeleteColumn(autoFilter, filterColumns[i].ColId);
-					}
-				}
 			},
 			
 			_isAddNameColumn: function(range)
@@ -4582,20 +4516,6 @@
 				}		
 			},
 			
-			_checkExceptionArray: function(curRange, exceptionArray)
-			{
-				if(!curRange || !exceptionArray || (exceptionArray && !exceptionArray.length))
-					return false;
-					
-				for(var e = 0; e < exceptionArray.length; e++)
-				{
-					if(exceptionArray[e] && exceptionArray[e].Ref && exceptionArray[e].Ref.isEqual(curRange))
-						return true;
-				}
-				
-				return false;
-			},
-			
 			_preMoveAutoFilters: function(arnFrom, arnTo, copyRange)
 			{
 				var worksheet = this.worksheet;
@@ -4732,25 +4652,6 @@
 				return result;
 			},
 			
-			//TODO пересмотреть!
-			_crossRange: function(sRange, bRange)
-			{
-				var isIn = false;
-				var isOut = false;
-				for(var c = sRange.c1; c <= sRange.c2; c++)
-				{
-					for(var r = sRange.r1; r <= sRange.r2; r++)
-					{
-						if(r >= bRange.r1 && r <= bRange.r2 && c >= bRange.c1 && c <= bRange.c2)//определяем, что хотя бы одна ячейка внутри находится
-							isIn = true;
-						else //определяем, что хотя бы одна ячейка снаружи
-							isOut = true;
-					}
-				}
-
-				return isIn && isOut;
-			},
-			
 			_intersectionRangeWithTableParts: function(range, exceptionRange)//находим фильтры, находящиеся в данном range
 			{
 				var result = [];
@@ -4877,7 +4778,7 @@
 				
 				if(colId !== null)
 				{
-					var index = this._getIndexByColId(autoFilter, colId);
+					var index = autoFilter.getIndexByColId(colId);
 					this._openHiddenRowsAfterDeleteColumn(autoFilter, colId);
 					
 					autoFilter.FilterColumns.splice(index, 1);
@@ -4896,7 +4797,7 @@
 			{
 				var worksheet = this.worksheet;
 				var cell = worksheet.getRange3(n, k, n, k);
-				var isEmptyCell = cell.isEmptyText();
+				var isEmptyCell = cell.isNullText();
 				var isEnd = true, merged, valueMerg;
 				
 				//если мерженная ячейка
@@ -4960,25 +4861,6 @@
 				return {isEmptyCell: isEmptyCell, isEnd: isEnd, cloneActiveRange: cloneActiveRange};
 			},
 			
-			_getFilterColumn: function(autoFilter, colId)
-			{
-				var res = null;
-				var filters;
-				if(autoFilter && autoFilter.FilterColumns)
-				{
-					filters = autoFilter.FilterColumns;
-					for(var k = 0; k < filters.length; k++)
-					{
-						if(filters[k].ColId == colId)
-						{
-							res = filters[k];
-							break;
-						}
-					}
-				}
-				return res;
-			},
-			
 			_isEmptyCellsUnderRange: function(range, exception, checkFilter)
 			{
 				//если есть ячейки с непустыми значениями под активной областью, то возвращаем false
@@ -4993,7 +4875,7 @@
 					}
 
 					cell = worksheet.getRange3(range.r2 + 1, i, range.r2 + 1, i);
-					isEmptyCell = cell.isEmptyText();
+					isEmptyCell = cell.isNullText();
 					if(!isEmptyCell)
 					{
 						result = false;
@@ -5027,7 +4909,7 @@
 					}
 
 					cell = worksheet.getRange3(i, range.c2 + 1, i, range.c2 + 1);
-					isEmptyCell = cell.isEmptyText();
+					isEmptyCell = cell.isNullText();
 					if(!isEmptyCell)
 					{
 						result = false;
@@ -5157,29 +5039,13 @@
 
 				return result;
 			},
-
-			_isPartAutoFilterUnderRange: function(range)
-			{
-				var worksheet = this.worksheet;
-				var result = false;
-				
-				if(worksheet.AutoFilter)
-				{
-					if((worksheet.AutoFilter.Ref.c1 < range.c1 || worksheet.AutoFilter.Ref.c2 > range.c2) && worksheet.AutoFilter.Ref.r1 >= range.r2)
-					{
-						result = true;
-					}
-				}
-				
-				return result;
-			},
 			
 			_isEmptyRange: function(ar, addDelta)
 			{
 				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - addDelta), Math.max(0, ar.c1 - addDelta), ar.r2 + addDelta, ar.c2 + addDelta);
 				var res = true;
 				range._foreachNoEmpty(function (cell) {
-					if (!cell.isEmptyText()) {
+					if (!cell.isNullText()) {
 						res = false;
 						return true;
 					}
@@ -5390,8 +5256,5 @@
 		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_getImage"]					= prot.asc_getImage;
-
-		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-		window['AscCommonExcel'].filteringMode = true;
 	}
 )(window);

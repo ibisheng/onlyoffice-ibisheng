@@ -347,7 +347,12 @@ function CSelectedContent()
     this.HaveShape        = false;
     this.MoveDrawing      = false; // Только для переноса автофигур
     this.HaveMath         = false;
+    this.HaveTable        = false;
     this.CanConvertToMath = false;
+
+    this.InsertOptions = {
+    	Table : Asc.c_oSpecialPasteProps.overwriteCells
+	};
 }
 
 CSelectedContent.prototype =
@@ -389,6 +394,11 @@ CSelectedContent.prototype =
 
             if (type_Paragraph === Element.Get_Type() && Count > 1)
                 Element.Correct_Content();
+
+            if(type_Table === Element.Get_Type())
+            {
+                this.HaveTable = true;
+            }
         }
 
         this.HaveMath = (this.Maths.length > 0 ? true : false);
@@ -525,6 +535,10 @@ CSelectedContent.prototype =
         }
         return oParaMath;
     }
+};
+CSelectedContent.prototype.SetInsertOptionForTable = function(nType)
+{
+	this.InsertOptions.Table = nType;
 };
 
 function CDocumentRecalculateState()
@@ -1339,11 +1353,6 @@ function CSelectedElementsInfo()
         this.m_oField = Field;
     };
 
-    this.Set_Hyperlink = function(Hyperlink)
-    {
-        this.m_oHyperlink = Hyperlink;
-    };
-
     this.Get_Math = function()
     {
         return this.m_oMath;
@@ -1352,11 +1361,6 @@ function CSelectedElementsInfo()
     this.Get_Field = function()
     {
         return this.m_oField;
-    };
-
-    this.Get_Hyperlink = function()
-    {
-        return this.m_oHyperlink;
     };
 
     this.Set_Table = function()
@@ -1427,9 +1431,27 @@ CSelectedElementsInfo.prototype.SetComplexFields = function(arrComplexFields)
 {
 	this.m_arrComplexFields = arrComplexFields;
 };
-CSelectedElementsInfo.prototype.GetComplexFields = function(arrComplexFields)
+CSelectedElementsInfo.prototype.GetComplexFields = function()
 {
 	return this.m_arrComplexFields;
+};
+CSelectedElementsInfo.prototype.SetHyperlink = function(oHyperlink)
+{
+	this.m_oHyperlink = oHyperlink;
+};
+CSelectedElementsInfo.prototype.GetHyperlink = function()
+{
+	if (this.m_oHyperlink)
+		return this.m_oHyperlink;
+
+	for (var nIndex = 0, nCount = this.m_arrComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = this.m_arrComplexFields[nIndex].GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+			return oInstruction;
+	}
+
+	return null;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -2990,12 +3012,12 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 			}
 
 			//TODO функция не должна вызываться здесь! необходимо перенести(DrawingDocument.UpdateTarget)
-			var clipboardBase = window['AscCommon'].g_clipboardBase;
-			if(clipboardBase && clipboardBase.showButtonIdParagraph && !clipboardBase.pasteStart && clipboardBase.showSpecialPasteButton)
+			var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
+			if(specialPasteHelper && specialPasteHelper.showButtonIdParagraph && !specialPasteHelper.pasteStart && specialPasteHelper.showSpecialPasteButton)
 			{
-				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
+				specialPasteHelper.SpecialPasteButtonById_Show();
 			}
-			window['AscCommon'].g_clipboardBase.endRecalcDocument = true;
+			specialPasteHelper.endRecalcDocument = true;
 		}
     }
 
@@ -5388,7 +5410,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 	var newDocPosType = this.Get_DocPosType();
     if((docpostype_HdrFtr === newDocPosType && docpostype_Content === oldDocPosType) || (docpostype_Content === newDocPosType && docpostype_HdrFtr === oldDocPosType))
     {
-		window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
     }
 };
 /**
@@ -5537,7 +5559,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 				{
 					editor.sync_HyperlinkClickCallback(sValue);
 
-					this.Selection.Data.Hyperlink.SetVisited(true);
+					oHyperlink.SetVisited(true);
 					for (var PageIdx = Item.Get_AbsolutePage(0); PageIdx < Item.Get_AbsolutePage(0) + Item.Get_PagesCount(); PageIdx++)
 						this.DrawingDocument.OnRecalculatePage(PageIdx, this.Pages[PageIdx]);
 
@@ -5831,7 +5853,7 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 
 
 	//В заголовки диаграмм не вставляем формулы и любые DrawingObjects
-	if (Para.bFromDocument === false && (SelectedContent.DrawingObjects.length > 0 || SelectedContent.HaveMath))
+	if (Para.bFromDocument === false && (SelectedContent.DrawingObjects.length > 0 || SelectedContent.HaveMath || SelectedContent.HaveTable))
 		return false;
 
 	// Проверяем корректность места, куда вставляем
@@ -6386,8 +6408,8 @@ CDocument.prototype.OnKeyDown = function(e)
         var Hyperlink = this.IsCursorInHyperlink(false);
         if (null != Hyperlink && false === e.ShiftKey)
         {
-            editor.sync_HyperlinkClickCallback(Hyperlink.Get_Value());
-            Hyperlink.Set_Visited(true);
+            editor.sync_HyperlinkClickCallback(Hyperlink.GetValue());
+            Hyperlink.SetVisited(true);
 
             // TODO: Пока сделаем так, потом надо будет переделать
             this.DrawingDocument.ClearCachePages();
@@ -6476,9 +6498,9 @@ CDocument.prototype.OnKeyDown = function(e)
             this.EndHdrFtrEditing(true);
         }
 
-		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
-			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 		}
 
         bRetValue = keydownresult_PreventAll;
@@ -9280,7 +9302,7 @@ CDocument.prototype.Viewer_OnChangePosition = function()
 		var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
 		this.Api.sync_UpdateCommentPosition(Comment.Get_Id(), Coords.X, Coords.Y);
 	}
-    window['AscCommon'].g_clipboardBase.SpecialPasteButton_Update_Position();
+    window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
 //----------------------------------------------------------------------------------------------------------------------

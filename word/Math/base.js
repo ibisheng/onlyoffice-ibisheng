@@ -2039,14 +2039,21 @@ CMathBase.prototype.protected_RemoveItems = function(Pos, Items, bUpdatePosition
 };
 CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
 {
-    for(var Index = 0, Count = Items.length; Index < Count; Index++)
-    {
-        var Item = Items[Index];
-        this.Content.splice(Pos + Index, 0, Item);
-        Item.ParentElement = this;
-    }
+	for (var Index = 0, Count = Items.length; Index < Count; Index++)
+	{
+		var Item = Items[Index];
+		this.Content.splice(Pos + Index, 0, Item);
 
-    this.fillContent();
+		if (Item.Set_ParaMath)
+			Item.Set_ParaMath(this.ParaMath);
+
+		if (Item.SetParagraph)
+			Item.SetParagraph(this.Paragraph);
+
+		Item.ParentElement = this;
+	}
+
+	this.fillContent();
 };
 CMathBase.prototype.raw_RemoveFromContent = function(Pos, Count)
 {
@@ -2852,9 +2859,9 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 
     return false;
 };
-CMathBase.prototype.Is_FromDocument = function(MathContent)
+CMathBase.prototype.Is_FromDocument = function()
 {
-	return this.Paragraph && this.Paragraph.bFromDocument
+	return this.ParaMath.Paragraph && this.ParaMath.Paragraph.bFromDocument;
 };
 CMathBase.prototype.Clear_ContentChanges = function()
 {

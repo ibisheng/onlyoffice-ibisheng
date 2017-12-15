@@ -336,7 +336,6 @@ CChangesParagraphAddItem.prototype.Redo = function()
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
 		var oItem = this.Items[nIndex];
-
 		oItem.Parent = this.Class;
 		if (oItem.SetParagraph)
 			oItem.SetParagraph(this.Class);

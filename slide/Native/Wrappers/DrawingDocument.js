@@ -39,6 +39,91 @@ var FOCUS_OBJECT_NOTES          = 2;
 var COMMENT_WIDTH   = 18;
 var COMMENT_HEIGHT  = 16;
 
+var global_mouseEvent = AscCommon.global_mouseEvent;
+
+function check_KeyboardEvent(e)
+{
+    AscCommon.global_keyboardEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    AscCommon.global_keyboardEvent.Sender = null;
+
+    AscCommon.global_keyboardEvent.CharCode   = e["CharCode"];
+    AscCommon.global_keyboardEvent.KeyCode    = e["KeyCode"];
+    AscCommon.global_keyboardEvent.Which      = null;
+}
+function check_KeyboardEvent_Array(_params, i)
+{
+    AscCommon.global_keyboardEvent.AltKey     = ((_params[i + 1] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((_params[i + 1] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((_params[i + 1] & 0x04) == 0x04);
+
+    AscCommon.global_keyboardEvent.Sender = null;
+
+    AscCommon.global_keyboardEvent.CharCode   = _params[i + 3];
+    AscCommon.global_keyboardEvent.KeyCode    = _params[i + 2];
+    AscCommon.global_keyboardEvent.Which      = null;
+}
+
+function check_MouseDownEvent(e, isClicks)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_down;
+    global_mouseEvent.Button    = e["Button"];
+
+    global_mouseEvent.Sender    = null;
+
+    if (isClicks)
+    {
+        global_mouseEvent.ClickCount = e["ClickCount"];
+    }
+    else
+    {
+        global_mouseEvent.ClickCount     = 1;
+    }
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+    global_mouseEvent.IsLocked = true;
+}
+
+function check_MouseMoveEvent(e)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_move;
+    global_mouseEvent.Button    = e["Button"];
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+}
+
+function check_MouseUpEvent(e)
+{
+    global_mouseEvent.X = e["X"];
+    global_mouseEvent.Y = e["Y"];
+
+    global_mouseEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_up;
+    global_mouseEvent.Button    = e["Button"];
+
+    global_mouseEvent.Sender    = null;
+
+    global_mouseEvent.IsLocked  = false;
+    global_mouseEvent.KoefPixToMM = e["PixToMM"];
+}
+
 
 function CDrawingDocument()
 {
@@ -65,9 +150,10 @@ function CDrawingDocument()
 
 
     this.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
-}
 
-
+    this.m_lCurrentRendererPage = -1;
+    this.m_oDocRenderer         = null;
+};
 
 CDrawingDocument.prototype.Notes_GetWidth = function()
 {
@@ -164,11 +250,122 @@ CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
 
 CDrawingDocument.prototype.OnEndRecalculate = function()
 {
+    this.SlidesCount = this.m_oLogicDocument.Slides.length;
     this.Native["DD_OnEndRecalculate"]();
 };
 
 CDrawingDocument.prototype.ChangePageAttack = function(pageIndex)
 {
+};
+
+CDrawingDocument.prototype.RenderDocument = function(Renderer)
+{
+    for (var i = 0; i < this.SlidesCount; i++)
+    {
+        Renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+        this.m_oLogicDocument.DrawPage(i, Renderer);
+        Renderer.EndPage();
+    }
+};
+
+CDrawingDocument.prototype.ToRenderer = function()
+{
+    var Renderer                             = new AscCommon.CDocumentRenderer();
+    Renderer.IsNoDrawingEmptyPlaceholder     = true;
+    Renderer.VectorMemoryForPrint            = new AscCommon.CMemory();
+    var old_marks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
+    this.m_oWordControl.m_oApi.ShowParaMarks = false;
+    this.RenderDocument(Renderer);
+    this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+    var ret                                  = Renderer.Memory.GetBase64Memory();
+
+    // DEBUG
+    //console.log(ret);
+
+    return ret;
+};
+
+CDrawingDocument.prototype.ToRenderer2    = function()
+{
+    var Renderer = new AscCommon.CDocumentRenderer();
+
+    var old_marks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
+    this.m_oWordControl.m_oApi.ShowParaMarks = false;
+
+    var ret = "";
+    for (var i = 0; i < this.SlidesCount; i++)
+    {
+        Renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+        this.m_oLogicDocument.DrawPage(i, Renderer);
+        Renderer.EndPage();
+
+        ret += Renderer.Memory.GetBase64Memory();
+        Renderer.Memory.Seek(0);
+    }
+
+    this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+    return ret;
+};
+
+CDrawingDocument.prototype.ToRendererPart = function(noBase64)
+{
+    var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
+
+    var pagescount = this.SlidesCount;
+
+    if (-1 == this.m_lCurrentRendererPage)
+    {
+        if (watermark)
+            watermark.StartRenderer();
+
+        this.m_oDocRenderer                             = new AscCommon.CDocumentRenderer();
+        this.m_oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
+        this.m_lCurrentRendererPage                     = 0;
+        this.m_bOldShowMarks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
+        this.m_oWordControl.m_oApi.ShowParaMarks        = false;
+        this.m_oDocRenderer.IsNoDrawingEmptyPlaceholder = true;
+    }
+
+    var start = this.m_lCurrentRendererPage;
+    var end   = pagescount - 1;
+
+    var renderer = this.m_oDocRenderer;
+    renderer.Memory.Seek(0);
+    renderer.VectorMemoryForPrint.ClearNoAttack();
+
+    for (var i = start; i <= end; i++)
+    {
+        renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+        this.m_oLogicDocument.DrawPage(i, renderer);
+        renderer.EndPage();
+
+        if (watermark)
+            watermark.DrawOnRenderer(renderer, this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+    }
+
+    if (end == -1)
+    {
+        renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+        renderer.EndPage()
+    }
+
+    this.m_lCurrentRendererPage = end + 1;
+
+    if (this.m_lCurrentRendererPage >= pagescount)
+    {
+        if (watermark)
+            watermark.EndRenderer();
+
+        this.m_lCurrentRendererPage              = -1;
+        this.m_oDocRenderer                      = null;
+        this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
+    }
+
+    if (noBase64) {
+        return renderer.Memory.GetData();
+    } else {
+        return renderer.Memory.GetBase64Memory();
+    }
 };
 
 
@@ -338,7 +535,7 @@ CDrawingDocument.prototype.UpdateTableRuler = function(isCols, index, position)
 };
 CDrawingDocument.prototype.GetDotsPerMM = function(value)
 {
-    this.Native["DD_GetDotsPerMM"](value);
+    return this.Native["DD_GetDotsPerMM"](value);
 };
 
 CDrawingDocument.prototype.GetMMPerDot = function(value)
@@ -469,6 +666,24 @@ CDrawingDocument.prototype.GetCommentHeight = function(type)
 {
 };
 
+CDrawingDocument.prototype.OnMouseDown = function(e)
+{
+    check_MouseDownEvent(e, true);
+    this.m_oLogicDocument.OnMouseDown(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
+CDrawingDocument.prototype.OnMouseMove = function(e)
+{
+    check_MouseMoveEvent(e);
+    this.m_oLogicDocument.OnMouseMove(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
+CDrawingDocument.prototype.OnMouseUp = function(e)
+{
+    check_MouseUpEvent(e);
+    this.m_oLogicDocument.OnMouseUp(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+};
+
 // collaborative targets
 CDrawingDocument.prototype.Collaborative_UpdateTarget = function(_id, _x, _y, _size, _page, _transform, is_from_paint)
 {
@@ -481,6 +696,14 @@ CDrawingDocument.prototype.Collaborative_RemoveTarget = function(_id)
 CDrawingDocument.prototype.Collaborative_TargetsUpdate = function(bIsChangePosition)
 {
     this.Native["DD_Collaborative_TargetsUpdate"](bIsChangePosition);
+};
+
+
+CDrawingDocument.prototype.DrawHorAnchor = function(pageIndex, x)
+{
+};
+CDrawingDocument.prototype.DrawVerAnchor = function(pageIndex, y)
+{
 };
 
 function DrawBackground(graphics, unifill, w, h)

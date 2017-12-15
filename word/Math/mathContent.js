@@ -2116,6 +2116,10 @@ CMathContent.prototype.IsNormalTextInRuns = function()
 CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePosition)
 {
 	Item.Set_ParaMath(this.ParaMath);
+
+	if (Item.SetParagraph)
+		Item.SetParagraph(this.Paragraph);
+
 	Item.Parent = this;
 	Item.Recalc_RunsCompiledPr();
 

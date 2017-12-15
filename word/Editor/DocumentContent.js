@@ -1529,28 +1529,60 @@ CDocumentContent.prototype.Clear_Content                 = function()
     var Para = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
     this.Internal_Content_Add(0, Para);
 };
-CDocumentContent.prototype.Add_Content                   = function(OtherContent)
+CDocumentContent.prototype.Add_Content = function(OtherContent)
 {
-    if ("object" != typeof(OtherContent) || 0 >= OtherContent.Content.length || true === OtherContent.Is_Empty())
-        return;
+	return this.AddContent(OtherContent.Content);
+};
+/**
+ * Полностью очищаем содержимое
+ * @param {boolean} [isAddEmptyPara=true] добавлять ли пустой параграф
+ */
+CDocumentContent.prototype.ClearContent = function(isAddEmptyPara)
+{
+	this.Selection.Start    = false;
+	this.Selection.Use      = false;
+	this.Selection.StartPos = 0;
+	this.Selection.EndPos   = 0;
+	this.Selection.Flag     = selectionflag_Common;
+	this.Selection.Data     = null;
 
-    // TODO : улучшить добавление элементов здесь (чтобы добавлялось не поэлементно)
-    if (true === this.Is_Empty())
-    {
-        this.Internal_Content_RemoveAll();
-        for (var Index = 0; Index < OtherContent.Content.length; Index++)
-            this.Internal_Content_Add(Index, OtherContent.Content[Index]);
-    }
-    else
-    {
-        this.Content[this.Content.length - 1].Set_DocumentNext(OtherContent.Content[0]);
-        OtherContent.Content[0].Set_DocumentPrev(this.Content[this.Content.length - 1]);
+	this.CurPos.X          = 0;
+	this.CurPos.Y          = 0;
+	this.CurPos.ContentPos = 0;
+	this.CurPos.RealX      = 0;
+	this.CurPos.RealY      = 0;
+	this.CurPos.Type       = docpostype_Content;
 
-        for (var Index = 0; Index < OtherContent.Content.length; Index++)
-        {
-            this.Internal_Content_Add(this.Content.length, OtherContent.Content[Index]);
-        }
-    }
+	this.Internal_Content_RemoveAll();
+
+	if (false !== isAddEmptyPara)
+		this.Internal_Content_Add(0, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
+};
+/**
+ * Присоединяем к содержимому массив новых элементов (параграфов, таблиц)
+ * @param {Paragraph, CTable} arrElements[]
+ */
+CDocumentContent.prototype.AddContent = function(arrElements)
+{
+	if (!arrElements || arrElements.length <= 0)
+		return;
+
+	if (this.Content.length <= 0 || true === this.IsEmpty())
+	{
+		if (this.Content.length > 0)
+			this.Internal_Content_RemoveAll();
+
+		for (var nIndex = 0, nCount = arrElements.length; nIndex < nCount; ++nIndex)
+			this.Internal_Content_Add(nIndex, arrElements[nIndex]);
+	}
+	else
+	{
+		this.Content[this.Content.length - 1].Set_DocumentNext(arrElements[0]);
+		arrElements[0].Set_DocumentPrev(this.Content[this.Content.length - 1]);
+
+		for (var nIndex = 0, nCount = arrElements.length; nIndex < nCount; ++nIndex)
+			this.Internal_Content_Add(this.Content.length, arrElements[nIndex]);
+	}
 };
 CDocumentContent.prototype.Is_Empty = function()
 {
@@ -1558,6 +1590,10 @@ CDocumentContent.prototype.Is_Empty = function()
 		return false;
 
 	return this.Content[0].IsEmpty();
+};
+CDocumentContent.prototype.IsEmpty = function()
+{
+	return this.Is_Empty();
 };
 CDocumentContent.prototype.Is_CurrentElementTable = function()
 {
@@ -3986,6 +4022,10 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 PrevClass.Correct_Content();
             }
         }
+		else if (Asc.c_oSpecialPasteProps.overwriteCells === SelectedContent.InsertOptions.Table && 1 === ElementsCount && type_Table === FirstElement.Element.GetType() && this.Parent && this.Parent instanceof CTableCell)
+		{
+			return this.Parent.InsertTableContent(FirstElement.Element);
+		}
         else
         {
             var bConcatS   = ( type_Paragraph !== Elements[0].Element.GetType() ? false : true );
