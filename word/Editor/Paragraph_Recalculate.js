@@ -2657,7 +2657,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.BreakRealPageLine  = false; // Разрыв страницы документа (не только параграфа) в данной строке
     this.BadLeftTab         = false; // Левый таб правее правой границы
 
-	this.ComplexFields = new CParagraphaComplexFieldsInfo();
+	this.ComplexFields = new CParagraphComplexFieldsInfo();
 
 	this.WordLen         = 0;
     this.SpaceLen        = 0;
@@ -3151,7 +3151,7 @@ function CParagraphRecalculateStateCounter()
     this.SpacesSkip  = 0;
     this.LettersSkip = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 CParagraphRecalculateStateCounter.prototype =
@@ -3196,7 +3196,7 @@ function CParagraphRecalculateStateAlign()
     this.RecalcFast    = false; // Если пересчет быстрый, тогда все "плавающие" объекты мы не трогаем
     this.RecalcFast2   = false; // Второй вариант быстрого пересчета
 
-	this.ComplexFields = new CParagraphaComplexFieldsInfo();
+	this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 function CParagraphRecalculateStateInfo()

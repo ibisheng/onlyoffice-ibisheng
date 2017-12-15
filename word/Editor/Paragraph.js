@@ -9457,8 +9457,6 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		}
 	}
 
-	editor.sync_HyperlinkPropCallback(oHyperProps);
-
 	if (editor && this.bFromDocument)
 	{
 		var TrackManager = this.LogicDocument.Get_TrackRevisionsManager();
@@ -13089,14 +13087,14 @@ CComplexFieldStatePos.prototype.IsFieldCode = function()
 	return this.FieldCode;
 };
 
-function CParagraphaComplexFieldsInfo()
+function CParagraphComplexFieldsInfo()
 {
 	// Массив CComplexFieldStatePos
 	this.CF = [];
 
 	this.isHidden = null;
 }
-CParagraphaComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
+CParagraphComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
 {
 	this.isHidden = null;
 
@@ -13111,14 +13109,14 @@ CParagraphaComplexFieldsInfo.prototype.ResetPage = function(Paragraph, CurPage)
  * Находимся ли мы внутри содержимого скрытого поля
  * @returns {boolean}
  */
-CParagraphaComplexFieldsInfo.prototype.IsHiddenFieldContent = function()
+CParagraphComplexFieldsInfo.prototype.IsHiddenFieldContent = function()
 {
 	if (null === this.isHidden)
 		this.isHidden = this.private_IsHiddenFieldContent();
 
 	return this.isHidden;
 };
-CParagraphaComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
+CParagraphComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
 {
 	if (this.CF.length > 0)
 	{
@@ -13135,7 +13133,7 @@ CParagraphaComplexFieldsInfo.prototype.private_IsHiddenFieldContent = function()
  * Данная функция используется при пересчете, когда мы собираем сложное поле.
  * @param oChar
  */
-CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = function(oChar)
+CParagraphComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = function(oChar)
 {
 	this.isHidden = null;
 
@@ -13186,7 +13184,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldCharAndCollectComplexField = 
  * Данная функция используется, когда мы просто хотим отследить где мы находимся, относительно сложных полей
  * @param oChar
  */
-CParagraphaComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
+CParagraphComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
 {
 	this.isHidden = null;
 
@@ -13222,7 +13220,7 @@ CParagraphaComplexFieldsInfo.prototype.ProcessFieldChar = function(oChar)
 		}
 	}
 };
-CParagraphaComplexFieldsInfo.prototype.ProcessInstruction = function(oInstruction)
+CParagraphComplexFieldsInfo.prototype.ProcessInstruction = function(oInstruction)
 {
 	if (this.CF.length <= 0)
 		return;
@@ -13231,11 +13229,11 @@ CParagraphaComplexFieldsInfo.prototype.ProcessInstruction = function(oInstructio
 	if (oComplexField && null === oComplexField.GetSeparateChar())
 		oComplexField.SetInstruction(oInstruction);
 };
-CParagraphaComplexFieldsInfo.prototype.IsComplexField = function()
+CParagraphComplexFieldsInfo.prototype.IsComplexField = function()
 {
 	return (this.CF.length > 0 ? true : false);
 };
-CParagraphaComplexFieldsInfo.prototype.IsComplexFieldCode = function()
+CParagraphComplexFieldsInfo.prototype.IsComplexFieldCode = function()
 {
 	if (!this.IsComplexField())
 		return false;
@@ -13248,7 +13246,7 @@ CParagraphaComplexFieldsInfo.prototype.IsComplexFieldCode = function()
 
 	return false;
 };
-CParagraphaComplexFieldsInfo.prototype.IsCurrentComplexField = function()
+CParagraphComplexFieldsInfo.prototype.IsCurrentComplexField = function()
 {
 	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
 	{
@@ -13257,6 +13255,23 @@ CParagraphaComplexFieldsInfo.prototype.IsCurrentComplexField = function()
 	}
 
 	return false;
+};
+CParagraphComplexFieldsInfo.prototype.IsHyperlinkField = function()
+{
+	var isHaveHyperlink = false,
+		isOtherField    = false;
+
+	for (var nIndex = 0, nCount = this.CF.length; nIndex < nCount; ++nIndex)
+	{
+		var oInstruction = this.CF[nIndex].ComplexField.GetInstruction();
+		if (oInstruction && fieldtype_HYPERLINK === oInstruction.GetType())
+			isHaveHyperlink = true;
+		else
+			isOtherField = true;
+
+	}
+
+	return (isHaveHyperlink && !isOtherField ? true : false);
 };
 
 function CParagraphDrawStateHightlights()
@@ -13294,7 +13309,7 @@ function CParagraphDrawStateHightlights()
 
     this.Spaces = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
@@ -13442,7 +13457,7 @@ function CParagraphDrawStateElements()
     this.LineBottom = 0;
     this.BaseLine   = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 CParagraphDrawStateElements.prototype =
@@ -13508,7 +13523,7 @@ function CParagraphDrawStateLines()
     this.UnderlineOffset = 0;
     this.Spaces          = 0;
 
-    this.ComplexFields = new CParagraphaComplexFieldsInfo();
+    this.ComplexFields = new CParagraphComplexFieldsInfo();
 }
 
 CParagraphDrawStateLines.prototype =

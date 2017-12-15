@@ -8883,6 +8883,7 @@ background-repeat: no-repeat;\
 	CHyperlinkProperty.prototype['get_Text']              = CHyperlinkProperty.prototype.get_Text;
 	CHyperlinkProperty.prototype['put_Text']              = CHyperlinkProperty.prototype.put_Text;
 	CHyperlinkProperty.prototype['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
+	CHyperlinkProperty.prototype['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 	window['Asc']['asc_CCommentDataWord']                 = asc_CCommentDataWord;
 	asc_CCommentDataWord.prototype['asc_getText']         = asc_CCommentDataWord.prototype.asc_getText;
 	asc_CCommentDataWord.prototype['asc_putText']         = asc_CCommentDataWord.prototype.asc_putText;
