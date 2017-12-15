@@ -2910,13 +2910,17 @@
 
 		//change cell formulas
 		this._forEachCell(function(cell) {
-			var formula = cell.getFormulaParsed();
-			if (formula) {
-				var tempFormula = formula.clone(null, null, t);
-				tempFormula.renameSheetCopy(renameParams);
-				var newFormulaParent = new CCellWithFormula(t, cell.nRow, cell.nCol);
-				var newFormula = new parserFormula(tempFormula.assemble(true), newFormulaParent, t);
-				cell.setFormulaInternal(newFormula);
+			if (cell.isFormula()) {
+				var parsed;
+				if (cell.transformSharedFormula()) {
+					parsed = cell.getFormulaParsed();
+				} else {
+					parsed = cell.getFormulaParsed();
+					parsed = parsed.clone(null, new CCellWithFormula(t, cell.nRow, cell.nCol), t);
+				}
+				parsed.renameSheetCopy(renameParams);
+				parsed.setFormulaString(parsed.assemble(true));
+				cell.setFormulaInternal(parsed, true);
 				t.workbook.dependencyFormulas.addToBuildDependencyCell(cell);
 			}
 		});
@@ -5722,26 +5726,31 @@
 		if (this.formulaParsed) {
 			var shared = this.formulaParsed.getShared();
 			var offsetRow, offsetCol;
-			if (shared && (offsetRow = this.nRow - shared.base.nRow) !== 0 ||
-				(offsetCol = this.nCol - shared.base.nCol) !== 0) {
-				var oldRow = this.formulaParsed.parent.nRow;
-				var oldCol = this.formulaParsed.parent.nCol;
+			if (shared) {
+				offsetRow = this.nRow - shared.base.nRow;
+				offsetCol = this.nCol - shared.base.nCol;
+				if (0 !== offsetRow || 0 !== offsetCol) {
+					var oldRow = this.formulaParsed.parent.nRow;
+					var oldCol = this.formulaParsed.parent.nCol;
 
-				//todo assemble by param
-				var offsetShared = new CRangeOffset(offsetCol, offsetRow);
-				this.formulaParsed.changeOffset(offsetShared, false);
-				this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
-				this.formulaParsed.parent.nRow = this.nRow;
-				this.formulaParsed.parent.nCol = this.nCol;
-				//AscCommonExcel.g_cellFormulaState.push(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
-				callback(this.formulaParsed);
-				offsetShared.offsetRow = -offsetRow;
-				offsetShared.offsetCol = -offsetCol;
-				this.formulaParsed.changeOffset(offsetShared, false);
-				this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
-				this.formulaParsed.parent.nRow = oldRow;
-				this.formulaParsed.parent.nCol = oldCol;
-				//AscCommonExcel.g_cellFormulaState.pop();
+					//todo assemble by param
+					var offsetShared = new CRangeOffset(offsetCol, offsetRow);
+					this.formulaParsed.changeOffset(offsetShared, false);
+					this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
+					this.formulaParsed.parent.nRow = this.nRow;
+					this.formulaParsed.parent.nCol = this.nCol;
+					//AscCommonExcel.g_cellFormulaState.push(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
+					callback(this.formulaParsed);
+					offsetShared.offsetRow = -offsetRow;
+					offsetShared.offsetCol = -offsetCol;
+					this.formulaParsed.changeOffset(offsetShared, false);
+					this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
+					this.formulaParsed.parent.nRow = oldRow;
+					this.formulaParsed.parent.nCol = oldCol;
+					//AscCommonExcel.g_cellFormulaState.pop();
+				} else {
+					callback(this.formulaParsed);
+				}
 			} else {
 				callback(this.formulaParsed);
 			}
@@ -6025,8 +6034,8 @@
 			cell.ws.workbook.dependencyFormulas.addToBuildDependencyCell(cell);
 		});
 	};
-	Cell.prototype.setFormulaInternal = function(formula) {
-		if (this.formulaParsed) {
+	Cell.prototype.setFormulaInternal = function(formula, dontTouchPrev) {
+		if (!dontTouchPrev && this.formulaParsed) {
 			var shared = this.formulaParsed.getShared();
 			if (shared) {
 				if (shared.ref.isOnTheEdge(this.nCol, this.nRow)) {
@@ -7148,31 +7157,14 @@
 	CCellWithFormula.prototype._onChangeFormula = function(eventData) {
 		var t = this;
 		var parsed = eventData.formula;
-		var shared = parsed.getShared();
-		if (shared) {
-			var ref = shared.ref;
-			var first = true;
-			this.ws.getRange3(ref.r1, ref.c1, ref.r2, ref.c2)._foreachNoEmpty(function(cell) {
-				if (parsed === cell.formulaParsed) {
-					if (first) {
-						first = false;
-						cell.setFormulaTemplate(true, function(cell) {
-							cell.formulaParsed.setFormulaString(eventData.assemble);
-						});
-					}
+		this.ws._getCell(this.nRow, this.nCol, function(cell) {
+			if (parsed === cell.formulaParsed) {
+				cell.setFormulaTemplate(true, function(cell) {
+					cell.formulaParsed.setFormulaString(eventData.assemble);
 					t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
-				}
-			});
-		} else {
-			this.ws._getCell(this.nRow, this.nCol, function(cell) {
-				if (parsed === cell.formulaParsed) {
-					cell.setFormulaTemplate(true, function(cell) {
-						cell.formulaParsed.setFormulaString(eventData.assemble);
-						t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
-					});
-				}
-			});
-		}
+				});
+			}
+		});
 	};
 	CCellWithFormula.prototype._onShared = function(eventData) {
 		var res = false;
