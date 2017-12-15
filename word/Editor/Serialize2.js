@@ -4846,21 +4846,31 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     break;
 				case para_Separator:
+					sCurText = this.WriteText(sCurText, textType);
+					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
 					oThis.memory.WriteByte(c_oSerRunType.separator);
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);
 					break;
 				case para_ContinuationSeparator:
+					sCurText = this.WriteText(sCurText, textType);
+					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
 					oThis.memory.WriteByte(c_oSerRunType.continuationSeparator);
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);
 					break;
 				case para_FootnoteRef:
+					sCurText = this.WriteText(sCurText, textType);
+					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
 					oThis.memory.WriteByte(c_oSerRunType.footnoteRef);
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);
 					break;
 				case para_FootnoteReference:
+					sCurText = this.WriteText(sCurText, textType);
+					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
 					oThis.bs.WriteItem(c_oSerRunType.footnoteReference, function() {oThis.WriteFootnoteRef(item);});
 					break;
 				case para_FieldChar:
+					sCurText = this.WriteText(sCurText, textType);
+					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
 					oThis.bs.WriteItem(c_oSerRunType.fldChar, function() {oThis.WriteFldChar(item);});
 					break;
 				case para_InstrText:
