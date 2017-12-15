@@ -7267,16 +7267,7 @@
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 			this._onChangeFormula(eventData);
 		} else if (AscCommon.c_oNotifyParentType.EndCalculate === type) {
-			var nRow = this.nRow;
-			var nCol = this.nCol;
-			var ws = this.ws;
-			var state = AscCommonExcel.g_cellFormulaState;
-			if (state.isInit()) {
-				nRow = state.nRow;
-				nCol = state.nCol;
-				ws = state.ws;
-			}
-			ws._getCell(nRow, nCol, function(cell) {
+			this.ws._getCell(this.nRow, this.nCol, function(cell) {
 				cell._updateCellValue();
 			});
 		} else if (AscCommon.c_oNotifyParentType.Shared === type) {

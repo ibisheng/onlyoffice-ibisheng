@@ -1055,7 +1055,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return oRes;
 	};
 	cArea.prototype.getWsId = function () {
-		return this.getWS().Id;
+		return this.ws.Id;
 	};
 	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var val = [], r = this.getRange();
@@ -1063,14 +1063,18 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			val.push(new cError(cErrorType.bad_reference));
 		} else {
 			if (checkExclude && !excludeHiddenRows) {
-				excludeHiddenRows = this.getWS().isApplyFilterBySheet();
+				excludeHiddenRows = this.ws.isApplyFilterBySheet();
 			}
 			r._foreachNoEmpty(function (cell) {
 				var bIsFoundNestedStAg = false;
-				if (excludeNestedStAg) {
-					cell.processFormula(function(parsed) {
-						bIsFoundNestedStAg = parsed.isFoundNestedStAg();
-					});
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
 				}
 				if(!bIsFoundNestedStAg){
 					var checkTypeVal = checkTypeCell(cell);
@@ -1094,14 +1098,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return res;
 	};
 	cArea.prototype.getRange = function () {
-		var res = this.range;
 		if (!this.range) {
-			res = this.range = this.getWS().getRange2(this.value);
+			this.range = this.ws.getRange2(this.value);
 		}
-		if (g_cellFormulaState.isInit()) {
-			res = g_cellFormulaState.getRange(res);
-		}
-		return res;
+		return this.range;
 	};
 	cArea.prototype.tocNumber = function () {
 		var v = this.getValue()[0];
@@ -1120,9 +1120,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cArea.prototype.toString = function () {
 		var _c;
-		var range = this.getRange();
-		if (range) {
-			_c = range.getName();
+
+		if (this.range) {
+			_c = this.range.getName();
 		} else {
 			_c = this.value;
 		}
@@ -1188,10 +1188,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 			var bIsFoundNestedStAg = false;
 			var resValue = new cEmpty();
-			if (excludeNestedStAg) {
-				cell.processFormula(function(parsed) {
-					bIsFoundNestedStAg = parsed.isFoundNestedStAg();
-				});
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var n = 0; n < outStack.length; n++){
+					if(outStack[n] instanceof AscCommonExcel.cAGGREGATE || outStack[n] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
 			}
 			if(!bIsFoundNestedStAg){
 				var checkTypeVal = checkTypeCell(cell);
@@ -1209,10 +1213,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		r._foreachNoEmpty(function (cell) {
 			var bIsFoundNestedStAg = false;
-			if (excludeNestedStAg) {
-				cell.processFormula(function(parsed) {
-					bIsFoundNestedStAg = parsed.isFoundNestedStAg();
-				});
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var i = 0; i < outStack.length; i++){
+					if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
 			}
 			if(!bIsFoundNestedStAg){
 				var checkTypeVal = checkTypeCell(cell);
@@ -1280,15 +1288,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			return [null];
 		}
 		var r = [];
-		var bbox = this.bbox;
-		if(g_cellFormulaState.isInit()){
-			bbox = g_cellFormulaState.getBBox(bbox);
-		}
 		for (var i = 0; i < wsRange.length; i++) {
 			if (!wsRange[i]) {
 				r.push(null);
 			} else {
-				r.push(AscCommonExcel.Range.prototype.createFromBBox(wsRange[i], bbox));
+				r.push(AscCommonExcel.Range.prototype.createFromBBox(wsRange[i], this.bbox));
 			}
 		}
 		return r;
@@ -1329,10 +1333,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 			_r[i]._foreachNoEmpty(function (cell) {
 				var bIsFoundNestedStAg = false;
-				if(excludeNestedStAg){
-					cell.processFormula(function(parsed) {
-						bIsFoundNestedStAg = parsed.isFoundNestedStAg();
-					});
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
 				}
 				if(!bIsFoundNestedStAg){
 					var checkTypeVal = checkTypeCell(cell);
@@ -1382,11 +1390,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea3D.prototype.toString = function () {
 		var wsFrom = this.wsFrom.getName();
 		var wsTo = this.wsTo.getName();
-		var bbox = this.bbox;
-		if(g_cellFormulaState.isInit()){
-			bbox = g_cellFormulaState.getBBox(bbox);
-		}
-		var name = bbox ? bbox.getName() : this.value;
+		var name = this.bbox ? this.bbox.getName() : this.value;
 		return parserHelp.get3DRef(wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name);
 	};
 	cArea3D.prototype.tocNumber = function () {
@@ -1400,13 +1404,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cArea3D.prototype.tocArea = function () {
 		var wsR = this.wsRange();
-		if (wsR.length === 1) {
-			var bbox = this.bbox;
-			if(g_cellFormulaState.isInit()){
-				bbox = g_cellFormulaState.getBBox(bbox);
-			}
-			var name = bbox ? bbox.getName() : this.value;
-			return new cArea(name, wsR[0]);
+		if (wsR.length == 1) {
+			return new cArea(this.value, wsR[0]);
 		}
 		return false;
 	};
@@ -1536,22 +1535,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return oRes;
 	};
 	cRef.prototype.getWsId = function () {
-		return this.getWS().Id;
+		return this.ws.Id;
 	};
 	cRef.prototype.getValue = function () {
-		var t = this;
 		if (!this.isValid()) {
 			return new cError(cErrorType.bad_reference);
 		}
-		var res;
-		if (g_cellFormulaState.isInit()) {
-			g_cellFormulaState.processRange(this.range, function() {
-				res = checkTypeCell(t.range);
-			});
-		} else {
-			res = checkTypeCell(this.range);
-		}
-		return res;
+		return checkTypeCell(this.range);
 	};
 	cRef.prototype.tocNumber = function () {
 		return this.getValue().tocNumber();
@@ -1564,22 +1554,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue().tocBool();
 	};
 	cRef.prototype.toString = function () {
-		var t = this;
-		var res;
-		if (g_cellFormulaState.isInit()) {
-			g_cellFormulaState.processRange(this.range, function() {
-				res = t.range.getName();
-			});
-		} else {
-			res = this.value;
-		}
-		return g_cellFormulaState.isInit() ? g_cellFormulaState.getRange(this.range).getName() : this.value;
+		return this.value;
 	};
 	cRef.prototype.getRange = function () {
-		return g_cellFormulaState.isInit() ? g_cellFormulaState.getRange(this.range) : this.range;
+		return this.range;
 	};
 	cRef.prototype.getWS = function () {
-		return g_cellFormulaState.isInit() ? g_cellFormulaState.ws : this.ws;
+		return this.ws;
 	};
 	cRef.prototype.isValid = function () {
 		return !!this.getRange();
@@ -1591,12 +1572,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getRange().getBBox0();
 	};
 	cRef.prototype.isHidden = function (excludeHiddenRows) {
-		var ws = this.getWS();
 		if (!excludeHiddenRows) {
-			excludeHiddenRows = ws.isApplyFilterBySheet();
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
 		}
-		var _r = this.getRange();
-		return excludeHiddenRows && _r && ws.getRowHidden(_r.r1);
+		return excludeHiddenRows && this.isValid() && this.ws.getRowHidden(this.getRange().r1);
 	};
 
 	/**
@@ -1631,25 +1610,17 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return oRes;
 	};
 	cRef3D.prototype.getWsId = function () {
-		return this.getWS().Id;
+		return this.ws.Id;
 	};
 	cRef3D.prototype.getRange = function () {
-		var res = null;
-		var ws = this.getWS();
-		if (ws) {
+		if (this.ws) {
 			if (this.range) {
-				res = this.range;
-			} else {
-				res = this.range = ws.getRange2(this.value);
+				return this.range;
 			}
-			res = this.range = this.ws.getRange2(this.value);
+			return this.range = this.ws.getRange2(this.value);
 		} else {
-			res = this.range = null;
+			return this.range = null;
 		}
-		if (g_cellFormulaState.isInit()) {
-			res = g_cellFormulaState.getRange(res);
-		}
-		return res;
 	};
 	cRef3D.prototype.isValid = function () {
 		return !!this.getRange();
@@ -1676,16 +1647,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 	cRef3D.prototype.toString = function () {
-		var t = this;
-		var value;
-		if (g_cellFormulaState.isInit()) {
-			g_cellFormulaState.processRange(this.range, function() {
-				value = t.range.getName();
-			});
-		} else {
-			value = this.value;
-		}
-		return parserHelp.get3DRef(this.getWS().getName(), value);
+		return parserHelp.get3DRef(this.ws.getName(), this.value);
 	};
 	cRef3D.prototype.getWS = function () {
 		return this.ws;
@@ -1701,12 +1663,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return null;
 	};
 	cRef3D.prototype.isHidden = function (excludeHiddenRows) {
-		var ws = this.getWS();
 		if (!excludeHiddenRows) {
-			excludeHiddenRows = ws.isApplyFilterBySheet();
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
 		}
 		var _r = this.getRange();
-		return excludeHiddenRows && _r && ws.getRowHidden(_r.r1);
+		return excludeHiddenRows && _r && this.ws.getRowHidden(_r.r1);
 	};
 
 	/**
@@ -4510,11 +4471,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 		return this.parent;
 	};
 	parserFormula.prototype.getFormula = function() {
-		if (g_cellFormulaState.isInit()) {
-			return this.assemble(true);
-		} else {
-			return this.Formula;
-		}
+		return this.Formula;
 	};
 	parserFormula.prototype.setFormulaString = function(formula) {
 		this.Formula = formula;
@@ -6563,76 +6520,6 @@ function rtl_math_erfc( x ) {
 		return retArr;
 	}
 
-	function CellFormulaState() {
-		this.ws = undefined;
-		this.nRow = undefined;
-		this.nCol = undefined;
-		this.offset = new AscCommonExcel.CRangeOffset();
-		this.stack = [];
-	}
-
-	CellFormulaState.prototype.pop = function() {
-		var elem = this.stack.pop();
-		if (elem) {
-			this.ws = elem[0];
-			this.nRow = elem[1];
-			this.nCol = elem[2];
-			this.offset.offsetRow = elem[3];
-			this.offset.offsetCol = elem[4];
-		} else {
-			this.ws = undefined;
-			this.nRow = undefined;
-			this.nCol = undefined;
-			this.offset.offsetRow = 0;
-			this.offset.offsetCol = 0;
-		}
-	};
-	CellFormulaState.prototype.isInit = function() {
-		return undefined !== this.ws;
-	};
-	CellFormulaState.prototype.processRange = function(range, callback) {
-		range.setOffsetWithAbs(this.offset, false, false);
-		callback(range);
-		this.offset.offsetCol = -this.offset.offsetCol;
-		this.offset.offsetRow = -this.offset.offsetRow;
-		range.setOffsetWithAbs(this.offset, false, false);
-		this.offset.offsetCol = -this.offset.offsetCol;
-		this.offset.offsetRow = -this.offset.offsetRow;
-	};
-	CellFormulaState.prototype.getRange = function(range) {
-		var res;
-		if (range) {
-			this.processRange(range, function(range) {
-				res = range.clone();
-			});
-		} else {
-			res = range;
-		}
-		return res;
-	};
-	CellFormulaState.prototype.getBBox = function(bbox) {
-		var res;
-		if (bbox) {
-			this.processRange(bbox, function(range) {
-				res = range.clone();
-			});
-		} else {
-			res = bbox;
-		}
-		return res;
-	};
-	CellFormulaState.prototype.push = function(ws, nRow, nCol, offsetRow, offsetCol) {
-		if (this.isInit()) {
-			this.stack.push([this.ws, this.nRow, this.nCol, this.offset.offsetRow, this.offset.offsetCol]);
-		}
-		this.ws = ws;
-		this.nRow = nRow;
-		this.nCol = nCol;
-		this.offset.offsetRow = offsetRow;
-		this.offset.offsetCol = offsetCol;
-	};
-	var g_cellFormulaState = new CellFormulaState();
-
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].cElementType = cElementType;
@@ -6647,7 +6534,6 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
 	window['AscCommonExcel'].cNumFormatFirstCell = cNumFormatFirstCell;
 	window['AscCommonExcel'].cNumFormatNone = cNumFormatNone;
-	window['AscCommonExcel'].g_cellFormulaState = g_cellFormulaState;
 
 	window['AscCommonExcel'].cNumber = cNumber;
 	window['AscCommonExcel'].cString = cString;
