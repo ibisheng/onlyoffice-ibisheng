@@ -5243,7 +5243,7 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.remove_Hyperlink = function()
+	asc_docs_api.prototype.remove_Hyperlink = function(HyperProps)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
@@ -5300,7 +5300,7 @@ background-repeat: no-repeat;\
 	};
 	CHyperlinkProperty.prototype.get_InternalHyperlink = function()
 	{
-		return oClass;
+		return this.Class;
 	};
 
 	asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
