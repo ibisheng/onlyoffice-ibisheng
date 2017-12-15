@@ -4541,6 +4541,26 @@ DrawingObjectsController.prototype =
             ret.putShowHorAxis(!hor_axis.bDelete);
             ret.putHorAxisProps(hor_axis.getMenuProps());
         }
+        else
+        {
+            if(vert_axis)
+            {
+                if(vert_axis.getObjectType() === AscDFH.historyitem_type_ValAx)
+                {
+                    ret.putShowHorAxis(false);
+                    var _cat_ax_pr = new AscCommon.asc_CatAxisSettings();
+                    _cat_ax_pr.setDefault();
+                    ret.putHorAxisProps(_cat_ax_pr);
+                }
+                else
+                {
+                    ret.putShowHorAxis(false);
+                    var _val_ax_pr = new AscCommon.asc_ValAxisSettings();
+                    _val_ax_pr.setDefault();
+                    ret.putHorAxisProps(_val_ax_pr);
+                }
+            }
+        }
         ret.putHorGridLines(calc_grid_lines(vert_axis));
 
         if(vert_axis)
