@@ -9816,6 +9816,14 @@ ParaRun.prototype.RemoveTabsForTOC = function(_isTab)
 
 	return isTab;
 };
+ParaRun.prototype.AddToContent = function(nPos, oItem, isUpdatePositions)
+{
+	return this.Add_ToContent(nPos, oItem, isUpdatePositions);
+};
+ParaRun.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
+{
+	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
+};
 
 function CParaRunStartState(Run)
 {

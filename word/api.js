@@ -5233,22 +5233,34 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	// HyperProps - объект CHyperlinkProperty
-	asc_docs_api.prototype.change_Hyperlink = function(HyperProps)
+	/**
+	 * Изменяем гиперссылку
+	 * @param {CHyperlinkProperty} oHyperProps
+	 */
+	asc_docs_api.prototype.change_Hyperlink = function(oHyperProps)
 	{
+		if (!oHyperProps || !oHyperProps.get_InternalHyperlink())
+			return;
+
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeHyperlink);
-			this.WordControl.m_oLogicDocument.ModifyHyperlink(HyperProps);
+			this.WordControl.m_oLogicDocument.ModifyHyperlink(oHyperProps);
 		}
 	};
-
-	asc_docs_api.prototype.remove_Hyperlink = function(HyperProps)
+	/**
+	 * Удаляем гиперссылку
+	 * @param {CHyperlinkProperty} oHyperProps
+	 */
+	asc_docs_api.prototype.remove_Hyperlink = function(oHyperProps)
 	{
+		if (!oHyperProps || !oHyperProps.get_InternalHyperlink())
+			return;
+
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveHyperlink);
-			this.WordControl.m_oLogicDocument.RemoveHyperlink();
+			this.WordControl.m_oLogicDocument.RemoveHyperlink(oHyperProps);
 		}
 	};
 
@@ -5259,7 +5271,7 @@ background-repeat: no-repeat;\
 			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
 			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
-			this.Class   = null;
+			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
 		}
 		else
 		{

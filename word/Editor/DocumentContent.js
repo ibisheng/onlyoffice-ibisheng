@@ -2701,6 +2701,7 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 				case para_FootnoteRef:
 				case para_Separator:
 				case para_ContinuationSeparator:
+				case para_InstrText:
 				{
 					// Если у нас что-то заселекчено и мы вводим текст или пробел
 					// и т.д., тогда сначала удаляем весь селект.

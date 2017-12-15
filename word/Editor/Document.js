@@ -8912,9 +8912,90 @@ CDocument.prototype.AddHyperlink = function(HyperProps)
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.ModifyHyperlink = function(HyperProps)
+CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 {
-	this.Controller.ModifyHyperlink(HyperProps);
+	var sText    = oHyperProps.get_Text(),
+		sValue   = oHyperProps.get_Value(),
+		sToolTip = oHyperProps.get_ToolTip();
+
+	var oClass = oHyperProps.get_InternalHyperlink();
+	if (oClass instanceof ParaHyperlink)
+	{
+		var oHyperlink = oClass;
+
+		if (undefined !== sValue && null !== sValue)
+			oHyperlink.SetValue(sValue);
+
+		if (undefined !== sToolTip && null !== sToolTip)
+			oHyperlink.SetToolTip(sToolTip);
+
+		if (null !== sText)
+		{
+			var oHyperRun = new ParaRun(oHyperlink.GetParagraph());
+			oHyperRun.Set_Pr(oHyperlink.GetTextPr().Copy());
+			oHyperRun.Set_Color(undefined);
+			oHyperRun.Set_Underline(undefined);
+			oHyperRun.Set_RStyle(this.GetStyles().GetDefaultHyperlink());
+
+			for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
+			{
+				var nChar = sText.charAt(nPos);
+
+				if (' ' === nChar)
+					oHyperRun.AddToContent(nPos, new ParaSpace(), false);
+				else
+					oHyperRun.AddToContent(nPos, new ParaText(nChar), false);
+			}
+
+			oHyperlink.RemoveSelection();
+			oHyperlink.RemoveAll();
+			oHyperlink.AddToContent(0, oHyperRun, false);
+
+			this.RemoveSelection();
+			oHyperlink.SelectAll();
+			oHyperlink.SelectThisElement();
+		}
+	}
+	else if (oClass instanceof CFieldInstructionHYPERLINK)
+	{
+		var oInstruction = oClass;
+		var oComplexField = oInstruction.GetComplexField();
+		if (!oComplexField || oComplexField)
+		{
+			if (undefined !== sValue && null !== sValue)
+				oInstruction.SetLink(sValue);
+
+			if (undefined !== sToolTip && null !== sToolTip)
+				oInstruction.SetToolTip(sToolTip);
+
+			oComplexField.SelectFieldCode();
+			var sInstruction = oInstruction.ToString();
+			for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
+			{
+				this.AddToParagraph(new ParaInstrText(sInstruction.charAt(nPos)));
+			}
+
+			if (null !== sText)
+			{
+				oComplexField.SelectFieldValue();
+				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
+				{
+					var nChar = sText.charAt(nPos);
+					if (' ' === nChar)
+						this.AddToParagraph(new ParaSpace());
+					else
+						this.AddToParagraph(new ParaText(nChar));
+				}
+			}
+		}
+	}
+	else
+	{
+		return;
+	}
+
+	//this.Controller.ModifyHyperlink(HyperProps);
+
 	this.Recalculate();
     this.Document_UpdateSelectionState();
     this.Document_UpdateInterfaceState();
@@ -12133,6 +12214,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 			case para_FootnoteRef:
 			case para_Separator:
 			case para_ContinuationSeparator:
+			case para_InstrText:
 			{
 				// Если у нас что-то заселекчено и мы вводим текст или пробел
 				// и т.д., тогда сначала удаляем весь селект.

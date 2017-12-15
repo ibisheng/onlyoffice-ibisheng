@@ -433,6 +433,10 @@ CParagraphContentBase.prototype.AcceptRevisionChanges = function(Type, bAll)
 CParagraphContentBase.prototype.RejectRevisionChanges = function(Type, bAll)
 {
 };
+CParagraphContentBase.prototype.GetTextPr = function(ContentPos, Depth)
+{
+	return this.Get_TextPr(ContentPos, Depth);
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
@@ -1626,7 +1630,18 @@ CParagraphContentWithParagraphLikeContent.prototype.RemoveTabsForTOC = function(
 
 	return isTab;
 };
-
+CParagraphContentWithParagraphLikeContent.prototype.RemoveAll = function()
+{
+	this.Remove_FromContent(0, this.Content.length);
+};
+CParagraphContentWithParagraphLikeContent.prototype.AddToContent = function(nPos, oItem, isUpdatePositions)
+{
+	return this.Add_ToContent(nPos, oItem, isUpdatePositions);
+};
+CParagraphContentWithParagraphLikeContent.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
+{
+	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------

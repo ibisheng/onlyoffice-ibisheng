@@ -57,11 +57,24 @@ var fieldtype_HYPERLINK  = 0x0009;
  */
 function CFieldInstructionBase()
 {
+	this.ComplexField = null;
 }
 CFieldInstructionBase.prototype.Type = fieldtype_UNKNOWN;
 CFieldInstructionBase.prototype.GetType = function()
 {
 	return this.Type;
+};
+CFieldInstructionBase.prototype.SetComplexField = function(oComplexField)
+{
+	this.ComplexField = oComplexField;
+};
+CFieldInstructionBase.prototype.GetComplexField = function()
+{
+	return this.ComplexField;
+};
+CFieldInstructionBase.prototype.ToString = function()
+{
+	return "";
 };
 
 /**
@@ -343,6 +356,20 @@ CFieldInstructionHYPERLINK.prototype.SetBookmarkName = function(sBookmarkName)
 CFieldInstructionHYPERLINK.prototype.GetBookmarkName = function()
 {
 	return this.BookmarkName;
+};
+CFieldInstructionHYPERLINK.prototype.ToString = function()
+{
+	var sInstr = "HYPERLINK ";
+	if (this.Link)
+		sInstr +=  "\"" + this.Link + "\"";
+
+	if (this.ToolTip)
+		sInstr += "\\o \"" + this.ToolTip + "\"";
+
+	if (this.BookmarkName)
+		sInstr += "\\l " + this.BookmarkName;
+
+	return sInstr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для совместимости с обычным ParaHyperlink

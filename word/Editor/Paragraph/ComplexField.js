@@ -359,7 +359,7 @@ CComplexField.prototype.Update = function()
 	if (!this.Instruction || !this.BeginChar || !this.EndChar || !this.SeparateChar)
 		return;
 
-	this.private_SelectFieldValue();
+	this.SelectFieldValue();
 
 	if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		return;
@@ -641,7 +641,7 @@ CComplexField.prototype.private_UpdateNUMPAGES = function()
 		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
 	}
 };
-CComplexField.prototype.private_SelectFieldValue = function()
+CComplexField.prototype.SelectFieldValue = function()
 {
 	var oDocument = this.GetTopDocumentContent();
 	if (!oDocument)
@@ -659,7 +659,7 @@ CComplexField.prototype.private_SelectFieldValue = function()
 
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 };
-CComplexField.prototype.private_SelectFieldCode = function()
+CComplexField.prototype.SelectFieldCode = function()
 {
 	var oDocument = this.GetTopDocumentContent();
 	if (!oDocument)
@@ -764,6 +764,7 @@ CComplexField.prototype.private_UpdateInstruction = function()
 	{
 		var oParser = new CFieldInstructionParser();
 		this.Instruction = oParser.GetInstructionClass(this.InstructionLine);
+		this.Instruction.SetComplexField(this);
 	}
 };
 CComplexField.prototype.IsHidden = function()
@@ -775,6 +776,7 @@ CComplexField.prototype.IsHidden = function()
 
 	return (oInstruction && (fieldtype_ASK === oInstruction.GetType() || (this.SeparateChar.IsNumValue() && (fieldtype_NUMPAGES === oInstruction.GetType() || fieldtype_PAGE === oInstruction.GetType())))) ? true : false;
 };
+
 
 function TEST_ADDFIELD(sInstruction)
 {
