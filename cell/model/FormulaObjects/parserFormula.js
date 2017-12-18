@@ -4576,6 +4576,8 @@ parserFormula.prototype.setFormula = function(formula) {
 												end: aTokens[i].pos,
 												index: this.outStack.length,
 												oper: elem});
+										} else if(TOK_SUBTYPE_ERROR === aTokens[i].subtype) {
+											elem = new cError(val);
 										} else {
 											elem = new cName(aTokens[i].value, this.ws);
 											refPos.push({start: aTokens[i].pos - aTokens[i].length,
