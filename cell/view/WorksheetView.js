@@ -9619,17 +9619,18 @@
 		{
 			for(var i = 0; i < outStack.length; i++)
 			{
-				if(outStack[i].range /*&& activeCellsPasteFragment && activeCellsPasteFragment.containsRange(outStack[i].range.bbox)*/)
+				if(outStack[i].bbox || "object" === typeof outStack[i].range)
 				{
-					var diffCol1 = outStack[i].range.bbox.c1 - activeCellsPasteFragment.c1;
-					var diffRow1 = outStack[i].range.bbox.r1 - activeCellsPasteFragment.r1;
-					var diffCol2 = outStack[i].range.bbox.c2 - activeCellsPasteFragment.c1;
-					var diffRow2 = outStack[i].range.bbox.r2 - activeCellsPasteFragment.r1;
-					
-					outStack[i].range.bbox.c1 = activeCellsPasteFragment.c1 + diffRow1;
-					outStack[i].range.bbox.r1 = activeCellsPasteFragment.r1 + diffCol1;
-					outStack[i].range.bbox.c2 = activeCellsPasteFragment.c1 + diffRow2;
-					outStack[i].range.bbox.r2 = activeCellsPasteFragment.r1 + diffCol2;
+					var range = outStack[i].bbox ? outStack[i].bbox : outStack[i].range;
+					var diffCol1 = range.c1 - activeCellsPasteFragment.c1;
+					var diffRow1 = range.r1 - activeCellsPasteFragment.r1;
+					var diffCol2 = range.c2 - activeCellsPasteFragment.c1;
+					var diffRow2 = range.r2 - activeCellsPasteFragment.r1;
+
+					range.c1 = activeCellsPasteFragment.c1 + diffRow1;
+					range.r1 = activeCellsPasteFragment.r1 + diffCol1;
+					range.c2 = activeCellsPasteFragment.c1 + diffRow2;
+					range.r2 = activeCellsPasteFragment.r1 + diffCol2;
 				}
 				
 			}
