@@ -4628,9 +4628,9 @@ parserFormula.prototype.setFormula = function(formula) {
 							(TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
 							(TOK_SUBTYPE_STOP !== prev.subtype ||
 							(TOK_TYPE_FUNCTION !== prev.type && TOK_TYPE_SUBEXPR !== prev.type))))) {
-							elem = new cFormulaOperators['un_minus']();
+							elem = cFormulaOperators['un_minus'].prototype;
 						} else {
-							elem = new cFormulaOperators[val]();
+							elem = cFormulaOperators[val].prototype;
 						}
 						if (arr) {
 							if (bArrElemSign || 'un_minus' !== elem.name) {
@@ -4681,9 +4681,9 @@ parserFormula.prototype.setFormula = function(formula) {
 								arr.addRow();
 								break;
 							} else if (val in cFormulaList) {
-								elem = new cFormulaList[val]();
+								elem = cFormulaList[val].prototype;
 							} else if (val in cAllFormulaFunction) {
-								elem = new cAllFormulaFunction[val]();
+								elem = cAllFormulaFunction[val].prototype;
 							} else {
 								elem = new cUnknownFunction(val);
 								elem.isXLFN = (0 === val.indexOf("_xlfn."));
