@@ -8978,6 +8978,7 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 			if (null !== sText)
 			{
 				oComplexField.SelectFieldValue();
+				var oTextPr = this.GetDirectTextPr();
 				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
 				{
 					var nChar = sText.charAt(nPos);
@@ -8986,6 +8987,9 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 					else
 						this.AddToParagraph(new ParaText(nChar));
 				}
+
+				oComplexField.SelectFieldValue();
+				this.AddToParagraph(new ParaTextPr(oTextPr));
 			}
 		}
 	}
@@ -10451,6 +10455,8 @@ CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
 };
 CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 {
+	this.RemoveSelection();
+
 	this.CurPos.X     = State.CurPos.X;
 	this.CurPos.Y     = State.CurPos.Y;
 	this.CurPos.RealX = State.CurPos.RealX;
@@ -16024,6 +16030,42 @@ CDocument.prototype.CheckComplexFieldsInSelection = function()
 	}
 
 	this.SetContentSelection(oStartPos, oEndPos, 0, 0, 0);
+};
+/**
+ * Получаем текст, который лежит внутри заданного сложного поля. Если внутри текста есть объекты, то возвращается null.
+ * @param {CComplexField} oComplexField
+ * @returns {?string}
+ */
+CDocument.prototype.GetComplexFieldTextValue = function(oComplexField)
+{
+	if (!oComplexField)
+		return null;
+
+	var oState = this.SaveDocumentState();
+	oComplexField.SelectFieldValue();
+	var sResult = this.GetSelectedText();
+	this.LoadDocumentState(oState);
+	this.Document_UpdateSelectionState();
+
+	return sResult;
+};
+/**
+ * Получаем прямые текстовые настройки заданного сложного поля.
+ * @param oComplexField
+ * @returns {CTextPr}
+ */
+CDocument.prototype.GetComplexFieldTextPr = function(oComplexField)
+{
+	if (!oComplexField)
+		return new CTextPr();
+
+	var oState = this.SaveDocumentState();
+	oComplexField.SelectFieldValue();
+	var oTextPr = this.GetDirectTextPr();
+	this.LoadDocumentState(oState);
+	this.Document_UpdateSelectionState();
+
+	return oTextPr;
 };
 CDocument.prototype.GetFieldsManager = function()
 {

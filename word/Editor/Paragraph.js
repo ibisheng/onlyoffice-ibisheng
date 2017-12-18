@@ -9451,9 +9451,10 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 			var oHyperProps = new Asc.CHyperlinkProperty();
 			oHyperProps.put_ToolTip(oInstruction.GetToolTip());
 			oHyperProps.put_Value(oInstruction.GetValue());
-			oHyperProps.put_Text(null);
+			oHyperProps.put_Text(this.LogicDocument ? this.LogicDocument.GetComplexFieldTextValue(arrComplexFields[nIndex]) : null);
 			oHyperProps.put_InternalHyperlink(oInstruction);
 			editor.sync_HyperlinkPropCallback(oHyperProps);
+
 		}
 	}
 
