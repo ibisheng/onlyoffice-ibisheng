@@ -1080,6 +1080,9 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 
 	if (undefined !== oPr.Lock)
 		this.SetContentControlLock(oPr.Lock);
+
+	if (undefined !== oPr.Alias)
+		this.SetAlias(oPr.Alias);
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
@@ -1089,6 +1092,7 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 	oPr.Id         = this.Pr.Id;
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
+	oPr.Alias      = this.GetAlias();
 
 	return oPr;
 };

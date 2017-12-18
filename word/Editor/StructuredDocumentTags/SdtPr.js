@@ -123,6 +123,7 @@ function CContentControlPr(nType)
 {
 	this.Id         = undefined;
 	this.Tag        = undefined;
+	this.Alias      = undefined;
 	this.Lock       = undefined;
 	this.InternalId = undefined;
 	this.CCType     = undefined !== nType ? nType : c_oAscSdtLevelType.Inline;
@@ -159,6 +160,14 @@ CContentControlPr.prototype.get_ContentControlType = function()
 {
 	return this.CCType;
 };
+CContentControlPr.prototype.get_Alias = function()
+{
+	return this.Alias;
+};
+CContentControlPr.prototype.put_Alias = function(sAlias)
+{
+	this.Alias = sAlias;
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord']        = window['AscCommonWord'] || {};
@@ -177,4 +186,6 @@ CContentControlPr.prototype['get_Lock']               = CContentControlPr.protot
 CContentControlPr.prototype['put_Lock']               = CContentControlPr.prototype.put_Lock;
 CContentControlPr.prototype['get_InternalId']         = CContentControlPr.prototype.get_InternalId;
 CContentControlPr.prototype['get_ContentControlType'] = CContentControlPr.prototype.get_ContentControlType;
+CContentControlPr.prototype['get_Alias']              = CContentControlPr.prototype.get_Alias;
+CContentControlPr.prototype['put_Alias']              = CContentControlPr.prototype.put_Alias;
 
