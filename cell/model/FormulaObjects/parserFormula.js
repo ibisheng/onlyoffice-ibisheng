@@ -4509,6 +4509,16 @@ parserFormula.prototype.setFormula = function(formula) {
 		 */
 
 		if (false) {
+
+			var getPrevElem = function(aTokens, pos){
+				for(var n = pos - 1; n >=0; n--){
+					if("" !== aTokens[n].value){
+						return aTokens[n];
+					}
+				}
+				return aTokens[pos - 1];
+			};
+
 			//console.log(this.Formula);
 			cFormulaList =
 				(local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
@@ -4543,12 +4553,15 @@ parserFormula.prototype.setFormula = function(formula) {
 											wsF = this.wb.getWorksheetByName(tmp.sheet);
 											wsT = (null !== tmp.sheet2 && tmp.sheet !== tmp.sheet2) ?
 												this.wb.getWorksheetByName(tmp.sheet2) : wsF;
-											elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) :
-												new cArea3D(tmp.getName(), wsF, wsT);
+											var name = tmp.getName().split("!")[1];
+											elem = (tmp.isOneCell()) ? new cRef3D(name, wsF) :
+												new cArea3D(name, wsF, wsT);
 												refPos.push({start: aTokens[i].pos - aTokens[i].length,
 													end: aTokens[i].pos,
 													index: this.outStack.length,
 													oper: elem});
+										} else if(TOK_SUBTYPE_ERROR === aTokens[i].subtype) {
+											elem = new cError(val);
 										} else {
 											this.error.push(c_oAscError.ID.FrmlWrongOperator);
 											this.outStack = [];
@@ -4608,7 +4621,7 @@ parserFormula.prototype.setFormula = function(formula) {
 							return false;
 						}
 
-						prev = aTokens[i - 1];
+						prev = getPrevElem(aTokens, i);
 						if ('-' === val && (0 === i ||
 							(TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
 							(TOK_SUBTYPE_STOP !== prev.subtype ||
