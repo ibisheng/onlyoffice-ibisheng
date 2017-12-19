@@ -78,7 +78,7 @@ CDocumentOutline.prototype.GetLevel = function(nIndex)
 	if (nIndex < 0 || nIndex >= this.Elements.length)
 		return -1;
 
-	return this.Elements[nIndex].Level;
+	return this.Elements[nIndex].Lvl;
 };
 
 //-------------------------------------------------------------export---------------------------------------------------
