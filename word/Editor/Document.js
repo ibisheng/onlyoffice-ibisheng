@@ -1641,6 +1641,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisions = false;
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
+    this.DocumentOutline = new CDocumentOutline(this);
+
     // Контролируем изменения интерфейса
     this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
 	this.TurnOffPanelStyles = 0;  // == 0 - можно обновлять панельку со стилями, != 0 - нельзя обновлять
@@ -1972,6 +1974,8 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		this.Recalculate_FromStart();
 		return;
 	}
+
+	this.DocumentOutline.Update();
 
     this.StartTime = new Date().getTime();
 
@@ -10835,6 +10839,10 @@ CDocument.prototype.Get_DrawingDocument = function()
 	return this.DrawingDocument;
 };
 CDocument.prototype.Get_Api = function()
+{
+	return this.Api;
+};
+CDocument.prototype.GetApi = function()
 {
 	return this.Api;
 };
