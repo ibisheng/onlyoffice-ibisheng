@@ -808,9 +808,9 @@ function (window, undefined) {
 		var arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
 		var arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
 
-		if (cElementType.error === arg1.type || cElementType.error === arg2.type || cElementType.error === arg3.type ||
-			arg4.type) {
-			return new cError(cErrorType.bad_reference);
+		var argError;
+		if (argError = this._checkErrorArg([arg0, arg1, arg2, arg3, arg4])) {
+			return argError;
 		}
 
 		arg1 = arg1.getValue();
