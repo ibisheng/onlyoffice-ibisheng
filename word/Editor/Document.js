@@ -8998,16 +8998,63 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 		return;
 	}
 
-	//this.Controller.ModifyHyperlink(HyperProps);
-
 	this.Recalculate();
     this.Document_UpdateSelectionState();
     this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.RemoveHyperlink = function()
+CDocument.prototype.RemoveHyperlink = function(oHyperProps)
 {
-	this.Controller.RemoveHyperlink();
+	var oClass = oHyperProps.get_InternalHyperlink();
+	if (oClass instanceof ParaHyperlink)
+	{
+		var oHyperlink = oClass;
+
+		var oParent      = oHyperlink.GetParent();
+		var nPosInParent = oHyperlink.GetPosInParent(oParent);
+
+		if (!oParent)
+			return;
+
+		oParent.RemoveFromContent(nPosInParent, 1);
+
+		var oTextPr       = new CTextPr();
+		oTextPr.RStyle    = null;
+		oTextPr.Underline = null;
+		oTextPr.Color     = null;
+		oTextPr.Unifill   = null;
+
+		var oElement = null;
+		for (var nPos = 0, nCount = oHyperlink.GetElementsCount(); nPos < nCount; ++nPos)
+		{
+			oElement = oHyperlink.GetElement(nPos);
+			oParent.AddToContent(nPosInParent + nPos, oElement);
+			oElement.ApplyTextPr(oTextPr, undefined, true);
+		}
+
+		this.RemoveSelection();
+		if (oElement)
+		{
+			oElement.SetThisElementCurrent();
+			oElement.MoveCursorToEndPos();
+		}
+	}
+	else if (oClass instanceof CFieldInstructionHYPERLINK)
+	{
+		var oInstruction = oClass;
+		var oComplexField = oInstruction.GetComplexField();
+		if (!oComplexField || oComplexField)
+		{
+			
+		}
+	}
+	else
+	{
+		return;
+	}
+
+	//this.Controller.RemoveHyperlink();
 	this.Recalculate();
+	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
 CDocument.prototype.CanAddHyperlink = function(bCheckInHyperlink)

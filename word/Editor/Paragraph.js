@@ -684,9 +684,17 @@ Paragraph.prototype.Add_ToContent = function(Pos, Item)
 {
 	this.Internal_Content_Add(Pos, Item);
 };
+Paragraph.prototype.AddToContent = function(nPos, oItem)
+{
+	this.Add_ToContent(nPos, oItem);
+};
 Paragraph.prototype.Remove_FromContent = function(Pos, Count)
 {
 	this.Internal_Content_Remove2(Pos, Count);
+};
+Paragraph.prototype.RemoveFromContent = function(nPos, nCount)
+{
+	return this.Internal_Content_Remove2(nPos, nCount);
 };
 /**
  * Добавляем несколько элементов в конец параграфа

@@ -9179,6 +9179,18 @@ ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
         this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
+ParaRun.prototype.SetThisElementCurrent = function()
+{
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return;
+
+	var StartPos = ContentPos.Copy();
+	this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
+
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
+	this.Paragraph.Document_SetThisElementCurrent(false);
+};
 ParaRun.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
