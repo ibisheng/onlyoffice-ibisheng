@@ -9048,7 +9048,16 @@ CDocument.prototype.RemoveHyperlink = function(oHyperProps)
 		var oComplexField = oInstruction.GetComplexField();
 		if (!oComplexField || oComplexField)
 		{
-			
+			var oTextPr       = new CTextPr();
+			oTextPr.RStyle    = null;
+			oTextPr.Underline = null;
+			oTextPr.Color     = null;
+			oTextPr.Unifill   = null;
+
+			oComplexField.SelectFieldValue();
+			this.AddToParagraph(new ParaTextPr(oTextPr));
+
+			oComplexField.RemoveFieldWrap();
 		}
 	}
 	else

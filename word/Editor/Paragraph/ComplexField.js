@@ -776,6 +776,33 @@ CComplexField.prototype.IsHidden = function()
 
 	return (oInstruction && (fieldtype_ASK === oInstruction.GetType() || (this.SeparateChar.IsNumValue() && (fieldtype_NUMPAGES === oInstruction.GetType() || fieldtype_PAGE === oInstruction.GetType())))) ? true : false;
 };
+CComplexField.prototype.RemoveFieldWrap = function()
+{
+	if (!this.IsValid())
+		return;
+
+	var oRun = this.EndChar.GetRun();
+	var nInRunPos = oRun.GetElementPosition(this.EndChar);
+	if (-1 !== nInRunPos)
+		oRun.RemoveFromContent(nInRunPos, 1);
+
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
+
+	var oRun = this.BeginChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+	var oStartPos = oDocument.GetContentPosition(false);
+
+	oRun = this.SeparateChar.GetRun();
+	oRun.Make_ThisElementCurrent(false);
+	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar) + 1);
+	var oEndPos = oDocument.GetContentPosition(false);
+
+	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
+	oDocument.Remove();
+};
 
 
 function TEST_ADDFIELD(sInstruction)
