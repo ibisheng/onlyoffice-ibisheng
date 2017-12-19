@@ -5751,7 +5751,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		if (this.WordControl.IsFocus != value)
+		if (this.WordControl && this.WordControl.IsFocus != value)
 		{
 			this.WordControl.IsFocus = value;
 
