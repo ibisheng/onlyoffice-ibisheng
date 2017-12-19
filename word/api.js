@@ -7729,7 +7729,7 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.EndViewModeInReview();
 	};
 
-	asc_docs_api.prototype.sync_OnDocumentOutlinteUpdate = function(oDocumentOutline)
+	asc_docs_api.prototype.sync_OnDocumentOutlineUpdate = function(oDocumentOutline)
 	{
 		this.sendEvent("asc_onDocumentOutlineUpdate", oDocumentOutline);
 	};
@@ -8849,7 +8849,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
 	asc_docs_api.prototype['asc_EndViewModeInReview']                   = asc_docs_api.prototype.asc_EndViewModeInReview;
 
-	asc_docs_api.prototype['sync_OnDocumentOutlinteUpdate']             = asc_docs_api.prototype.sync_OnDocumentOutlinteUpdate;
+	asc_docs_api.prototype['sync_OnDocumentOutlineUpdate']              = asc_docs_api.prototype.sync_OnDocumentOutlineUpdate;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;

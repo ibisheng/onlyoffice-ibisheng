@@ -49,7 +49,7 @@ CDocumentOutline.prototype.Update = function()
 {
 	this.Elements = this.LogicDocument.GetOutlineParagraphs();
 
-	this.LogicDocument.GetApi().sync;
+	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
 };
 CDocumentOutline.prototype.GetElementsCount = function()
 {
