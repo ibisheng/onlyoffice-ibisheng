@@ -46,7 +46,7 @@ function CDocumentOutline(oLogicDocument)
 	this.LogicDocument = oLogicDocument;
 	this.Use           = false;
 }
-CDocumentOutline.protytype.SetUse = function(isUse)
+CDocumentOutline.prototype.SetUse = function(isUse)
 {
 	this.Use = isUse;
 };
