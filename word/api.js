@@ -7729,9 +7729,18 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.EndViewModeInReview();
 	};
 
-	asc_docs_api.prototype.sync_OnDocumentOutlineUpdate = function(oDocumentOutline)
+	asc_docs_api.prototype.asc_ShowDocumentOutline = function()
 	{
-		this.sendEvent("asc_onDocumentOutlineUpdate", oDocumentOutline);
+		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(true);
+		return this.WordControl.m_oLogicDocument.DocumentOutline;
+	};
+	asc_docs_api.prototype.asc_HideDocumentOutline = function()
+	{
+		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(false);
+	};
+	asc_docs_api.prototype.sync_OnDocumentOutlineUpdate = function()
+	{
+		this.sendEvent("asc_onDocumentOutlineUpdate");
 	};
 
 	// input
@@ -8849,6 +8858,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
 	asc_docs_api.prototype['asc_EndViewModeInReview']                   = asc_docs_api.prototype.asc_EndViewModeInReview;
 
+	asc_docs_api.prototype['asc_ShowDocumentOutline']                   = asc_docs_api.prototype.asc_ShowDocumentOutline;
+	asc_docs_api.prototype['asc_HideDocumentOutline']                   = asc_docs_api.prototype.asc_HideDocumentOutline;
 	asc_docs_api.prototype['sync_OnDocumentOutlineUpdate']              = asc_docs_api.prototype.sync_OnDocumentOutlineUpdate;
 
 	// mobile

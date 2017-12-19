@@ -44,9 +44,17 @@
 function CDocumentOutline(oLogicDocument)
 {
 	this.LogicDocument = oLogicDocument;
+	this.Use           = false;
 }
+CDocumentOutline.protytype.SetUse = function(isUse)
+{
+	this.Use = isUse;
+};
 CDocumentOutline.prototype.Update = function()
 {
+	if (!this.Use)
+		return;
+
 	this.Elements = this.LogicDocument.GetOutlineParagraphs();
 
 	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
