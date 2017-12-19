@@ -45,10 +45,13 @@ function CDocumentOutline(oLogicDocument)
 {
 	this.LogicDocument = oLogicDocument;
 	this.Use           = false;
+	this.Elements      = [];
 }
 CDocumentOutline.prototype.SetUse = function(isUse)
 {
 	this.Use = isUse;
+	if (this.Use)
+		this.Update();
 };
 CDocumentOutline.prototype.Update = function()
 {
