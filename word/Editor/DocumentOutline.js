@@ -71,14 +71,14 @@ CDocumentOutline.prototype.GetText = function(nIndex)
 	if (nIndex < 0 || nIndex >= this.Elements.length)
 		return "";
 
-	return this.Elements.Paragraph.GetText();
+	return this.Elements[nIndex].Paragraph.GetText();
 };
 CDocumentOutline.prototype.GetLevel = function(nIndex)
 {
 	if (nIndex < 0 || nIndex >= this.Elements.length)
 		return -1;
 
-	return this.Elements.Level;
+	return this.Elements[nIndex].Level;
 };
 
 //-------------------------------------------------------------export---------------------------------------------------
