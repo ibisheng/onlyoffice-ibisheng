@@ -969,6 +969,9 @@ function (window, undefined) {
 			return new cError(cErrorType.not_available);
 		}
 
+		if(0 === arg0.length){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		return TransposeMatrix(arg0);
 	};
