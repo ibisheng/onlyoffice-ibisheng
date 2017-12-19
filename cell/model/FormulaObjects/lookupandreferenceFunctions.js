@@ -958,6 +958,8 @@ function (window, undefined) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type || cElementType.array === arg0.type) {
 			arg0 = arg0.getMatrix();
+		} else if(cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.getMatrix()[0];
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			return arg0.getValue();
 		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type ||
