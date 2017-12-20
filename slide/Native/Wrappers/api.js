@@ -65,6 +65,14 @@ function NativeOpenFileP(_params){
     _api.asc_nativeOpenFile(doc_bin);
     _api.WordControl.m_oDrawingDocument.AfterLoad();
     Api = _api;
+
+    var _presentation = _api.WordControl.m_oLogicDocument;
+
+    var nSlidesCount = _presentation.Slides.length;
+    var dPresentationWidth = _presentation.Width;
+    var dPresentationHeight = _presentation.Height;
+
+    return [nSlidesCount, dPresentationWidth, dPresentationHeight];
 }
 
 
