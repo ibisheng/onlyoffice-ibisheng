@@ -10005,8 +10005,13 @@
 			{
 				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = changeActiveRange;
 			}
-			
+
 			var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
+			if(!range && window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props)
+			{
+				range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props.range;
+			}
+
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			

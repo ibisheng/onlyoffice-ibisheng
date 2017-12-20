@@ -101,6 +101,8 @@
 			this.transpose = null;
 			
 			this.comment = true;
+
+			this.property = null;
 		}
 
 		CSpecialPasteProps.prototype = {
@@ -133,6 +135,7 @@
 				this.transpose = null;
 				
 				this.comment = true;
+				this.property = null;
 			},
 			revert: function()
 			{
@@ -163,6 +166,7 @@
 			},
 			asc_setProps: function(props)
 			{
+				this.property = props;
 				switch(props)
 				{
 					case c_oSpecialPasteProps.paste:
@@ -1294,7 +1298,6 @@
 				var p_url = stream.GetString2();
 				var p_width = stream.GetULong()/100000;
 				var p_height = stream.GetULong()/100000;
-				var fonts = [];
 				var t = this;
 
 				var bIsMultipleContent = stream.GetBool();
@@ -1309,6 +1312,23 @@
 
 				var bSlideObjects = selectedContent2[0].content.SlideObjects && selectedContent2[0].content.SlideObjects.length > 0;
 				var pasteObj = bSlideObjects ? selectedContent2[2] : selectedContent2[0];
+
+				if (window['AscCommon'].g_specialPasteHelper.specialPasteStart)
+				{
+					var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps.property;
+					switch (props)
+					{
+						case Asc.c_oSpecialPasteProps.picture:
+						{
+							if(selectedContent2[2])
+							{
+								pasteObj = selectedContent2[2];
+							}
+							break;
+						}
+					}
+				}
+
 				var arr_Images = pasteObj.images;
 				var fonts = pasteObj.fonts;
 				var content = pasteObj.content;
@@ -1373,6 +1393,13 @@
 						return "";
 					}
 
+					if(!bSlideObjects)
+					{
+						var specialProps = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
+						specialProps.props = {props: allowedProps};
+					}
+
 					var arr_shapes = content.Drawings;
 					if(arr_shapes && arr_shapes.length && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 					{
@@ -1402,12 +1429,12 @@
 							if(aPastedImages && aPastedImages.length)
 							{
 								t._loadImagesOnServer(aPastedImages, function() {
-									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+									t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape, true);
 								});
 							}
 							else
 							{
-								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape, true);
 							}
 						});
 					}
@@ -1725,7 +1752,7 @@
 				}
 			},
 			
-			_insertImagesFromBinary: function(ws, data, isIntoShape)
+			_insertImagesFromBinary: function(ws, data, isIntoShape, needShowSpecialProps)
 			{
 				var activeCell = ws.model.selectionRange.activeCell;
 				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr, offX, offY, rot;
@@ -1887,6 +1914,23 @@
 				}
 				AscFormat.fResetConnectorsIds(aCopies, oIdMap);
                 ws.objectRender.showDrawingObjects(true);
+
+				if(needShowSpecialProps)
+				{
+					if(!window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props)
+					{
+						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+					}
+					else
+					{
+						var lastAddedImg = ws.model.Drawings[ws.model.Drawings.length - 1];
+						if(drawingObject && lastAddedImg)
+						{
+							window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props.range = {r1: lastAddedImg.from.row, c1: lastAddedImg.from.col, r2: lastAddedImg.to.row, c2: lastAddedImg.to.col};
+						}
+					}
+				}
+
                 ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
                 History.EndTransaction();
@@ -1900,7 +1944,10 @@
                     });
                 }
 
-				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+				if(!needShowSpecialProps)
+				{
+					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+				}
 				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			},
 			
