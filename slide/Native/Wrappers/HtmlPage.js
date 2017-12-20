@@ -389,7 +389,6 @@ CEditorPage.prototype.EndUpdateOverlay = function()
 
 CEditorPage.prototype.OnUpdateOverlay = function()
 {
-    return false;
     if(!this.m_oLogicDocument)
     {
         return false;
@@ -399,22 +398,26 @@ CEditorPage.prototype.OnUpdateOverlay = function()
         this.IsUpdateOverlayOnEndCheck = true;
         return false;
     }
-    this.Native["DD_Overlay_UpdateStart"]();
-    this.Native["DD_Overlay_Clear"]();
     var drDoc = this.m_oDrawingDocument;
+    this.Native["DD_Overlay_UpdateStart"]();
+    drDoc.AutoShapesTrack.SetCurrentPage(-100);
+    this.Native["DD_Overlay_Clear"]();
     if (drDoc.m_bIsSelection)
     {
         this.Native["DD_Overlay_StartDrawSelection"]();
+        drDoc.AutoShapesTrack.SetCurrentPage(-101);
         if (this.m_oLogicDocument.CurPage > -1)
         {
             this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].drawSelect(1);
         }
+        drDoc.AutoShapesTrack.SetCurrentPage(-100);
         this.Native["DD_Overlay_EndDrawSelection"]();
     }
     if (this.m_oLogicDocument && this.m_oLogicDocument.CurPage > -1)
     {
+        drDoc.AutoShapesTrack.SetCurrentPage(-101);
         this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].drawSelect(2);
-
+        drDoc.AutoShapesTrack.SetCurrentPage(-100);
         var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].graphicObjects;
         if (!elements.canReceiveKeyPress())
         {

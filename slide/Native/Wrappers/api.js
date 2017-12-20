@@ -187,23 +187,43 @@ if(!window.native){
 
 if(window.native){
 	window.native.Call_CheckSlideBounds = function(nIndex){
-		return editor.CheckSlideBounds(nIndex);
+        if(window.editor) {
+            return window.editor.CheckSlideBounds(nIndex);
+        }
 	};
 	
 	window.native.Call_GetPageMeta = function(nIndex){
-		return editor.GetNativePageMeta(nIndex);
+        if(window.editor) {
+            return window.editor.GetNativePageMeta(nIndex);
+        }
 	};
 
 	window.native.Call_OnMouseDown = function(e){
-	    editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+	    if(window.editor)
+        {
+            window.editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+        }
     };
 
     window.native.Call_OnMouseUp = function(e){
-        editor.WordControl.m_oDrawingDocument.OnMouseUp(e);
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oDrawingDocument.OnMouseUp(e);
+        }
     };
 
     window.native.Call_OnMouseMove = function(e){
-        editor.WordControl.m_oDrawingDocument.OnMouseMove(e);
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oDrawingDocument.OnMouseMove(e);
+        }
+    };
+
+    window.native.Call_OnUpdateOverlay = function(){
+        if(window.editor)
+        {
+            window.editor.WordControl.OnUpdateOverlay();
+        }
     };
 }
 
