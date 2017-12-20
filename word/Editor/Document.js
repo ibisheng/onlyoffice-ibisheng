@@ -10847,6 +10847,10 @@ CDocument.prototype.Get_DrawingDocument = function()
 {
 	return this.DrawingDocument;
 };
+CDocument.prototype.GetDrawingDocument = function()
+{
+	return this.DrawingDocument;
+};
 CDocument.prototype.Get_Api = function()
 {
 	return this.Api;

@@ -12452,7 +12452,7 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
-	if (this.IsEmpty())
+	if (this.IsEmpty() && (!oPr || false !== oPr.SkipEmptyParagraphs))
 		return;
 
 	var nOutlineLvl = this.GetOutlineLvl();
@@ -12460,6 +12460,8 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 		&& (!oPr
 		|| -1 === oPr.OutlineStart
 		|| -1 === oPr.OutlineEnd
+		|| undefined === oPr.OutlineStart
+		|| undefined === oPr.OutlineEnd
 		|| (nOutlineLvl >= oPr.OutlineStart - 1 && nOutlineLvl <= oPr.OutlineEnd - 1)))
 	{
 		arrOutline.push({Paragraph : this, Lvl : nOutlineLvl});

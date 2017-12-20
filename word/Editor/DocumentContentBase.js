@@ -106,6 +106,10 @@ CDocumentContentBase.prototype.Update_ContentIndexing = function()
 		this.ReindexStartPos = -1;
 	}
 };
+CDocumentContentBase.prototype.UpdateContentIndexing = function()
+{
+	return this.Update_ContentIndexing();
+};
 /**
  * Получаем массив всех автофигур.
  * @param {Array} arrDrawings - Если задан массив, тогда мы дополняем данный массив и возвращаем его.
@@ -888,7 +892,8 @@ CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
+		if (type_Paragraph === this.Content[nIndex].GetType())
+			this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
 	}
 
 	return arrOutline;
@@ -907,7 +912,6 @@ CDocumentContentBase.prototype.UpdateBookmarks = function(oManager)
 /**
  * @param StartDocPos
  * @param EndDocPos
- * @constructor
  */
 CDocumentContentBase.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
 {
@@ -925,4 +929,33 @@ CDocumentContentBase.prototype.SetSelectionByContentPositions = function(StartDo
 		this.LogicDocument.Selection.Use   = true;
 		this.LogicDocument.Selection.Start = false;
 	}
+};
+/**
+ * Получем количество элементов
+ * @return {number}
+ */
+CDocumentContentBase.prototype.GetElementsCount = function()
+{
+	return this.Content.length;
+};
+/**
+ * Добавляем новый элемент (с записью в историю)
+ * @param nPos
+ * @param oItem
+ */
+CDocumentContentBase.prototype.AddToContent = function(nPos, oItem)
+{
+	this.Add_ToContent(nPos, oItem);
+};
+/**
+ * Удаляем заданное количество элементов (с записью в историю)
+ * @param {number} nPos
+ * @param {number} [nCount=1]
+ */
+CDocumentContentBase.prototype.RemoveFromContent = function(nPos, nCount)
+{
+	if (undefined === nCount || null === nCount)
+		nCount = 1;
+
+	this.Remove_FromContent(nPos, nCount);
 };

@@ -58,7 +58,17 @@ CDocumentOutline.prototype.Update = function()
 	if (!this.Use)
 		return;
 
-	this.Elements = this.LogicDocument.GetOutlineParagraphs();
+	this.Elements = [];
+	this.LogicDocument.GetOutlineParagraphs(this.Elements, {SkipEmptyParagraphs : false});
+
+	if (this.Elements.length > 0)
+	{
+		this.LogicDocument.UpdateContentIndexing();
+		if (0 !== this.Elements[0].Paragraph.GetIndex())
+		{
+			this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
+		}
+	}
 
 	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
 };
@@ -69,6 +79,9 @@ CDocumentOutline.prototype.GetElementsCount = function()
 CDocumentOutline.prototype.GetText = function(nIndex)
 {
 	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return "";
+
+	if (!this.Elements[nIndex].Paragraph)
 		return "";
 
 	return this.Elements[nIndex].Paragraph.GetText();
@@ -86,8 +99,18 @@ CDocumentOutline.prototype.GoTo = function(nIndex)
 		return -1;
 
 	var oParagraph = this.Elements[nIndex].Paragraph;
-	oParagraph.MoveCursorToStartPos();
-	oParagraph.Document_SetThisElementCurrent(true);
+
+	this.LogicDocument.RemoveSelection();
+
+	if (!oParagraph)
+	{
+		this.LogicDocument.MoveCursorToStartPos(false);
+	}
+	else
+	{
+		oParagraph.MoveCursorToStartPos();
+		oParagraph.Document_SetThisElementCurrent(true);
+	}
 };
 CDocumentOutline.prototype.Demote = function(nIndex)
 {
@@ -104,6 +127,9 @@ CDocumentOutline.prototype.private_PromoteDemote = function(nIndex, isPromote)
 
 	var nLevel     = this.Elements[nIndex].Lvl;
 	var oParagraph = this.Elements[nIndex].Paragraph;
+
+	if (!oParagraph)
+		return;
 
 	if (isPromote && (nLevel <= 0 || nLevel > 8) || (!isPromote && (nLevel >= 8 || nLevel < 0)))
 		return;
@@ -152,6 +178,84 @@ CDocumentOutline.prototype.private_PromoteDemote = function(nIndex, isPromote)
 		this.LogicDocument.Document_UpdateInterfaceState();
 	}
 };
+CDocumentOutline.prototype.InsertHeader = function(nIndex, isBefore)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return;
+
+	var nPos   = this.private_GetPositionForInsertHeaderBefore(isBefore ? nIndex : this.private_GetNextSiblingOrHigher(nIndex));
+	var nLevel = this.GetLevel(nIndex);
+
+	// Локов особо проверять не нужно, т.к. мы добавляем параграф в верхний класс, но возможно есть глобальный лок,
+	// так что проверка нужна все равно, но без типа изменения.
+	if (false === this.LogicDocument.Document_Is_SelectionLocked(changestype_None))
+	{
+		this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddElementToOutline);
+
+		var oParagraph = new Paragraph(this.LogicDocument.GetDrawingDocument(), this.LogicDocument);
+		oParagraph.SetParagraphStyleById(this.LogicDocument.GetStyles().GetDefaultHeading(nLevel));
+		this.LogicDocument.AddToContent(nPos, oParagraph);
+		this.LogicDocument.Recalculate();
+
+		oParagraph.MoveCursorToStartPos(false);
+		oParagraph.Document_SetThisElementCurrent(true);
+	}
+};
+CDocumentOutline.prototype.InsertSubHeader = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return;
+
+	var nPos   = this.private_GetPositionForInsertHeaderBefore(this.private_GetNextSiblingOrHigher(nIndex));
+	var nLevel = this.GetLevel(nIndex);
+
+	if (nLevel >= 8)
+		return;
+
+	// Локов особо проверять не нужно, т.к. мы добавляем параграф в верхний класс, но возможно есть глобальный лок,
+	// так что проверка нужна все равно, но без типа изменения.
+	if (false === this.LogicDocument.Document_Is_SelectionLocked(changestype_None))
+	{
+		this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddElementToOutline);
+
+		var oParagraph = new Paragraph(this.LogicDocument.GetDrawingDocument(), this.LogicDocument);
+		oParagraph.SetParagraphStyleById(this.LogicDocument.GetStyles().GetDefaultHeading(nLevel + 1));
+		this.LogicDocument.AddToContent(nPos, oParagraph);
+		this.LogicDocument.Recalculate();
+
+		oParagraph.MoveCursorToStartPos(false);
+		oParagraph.Document_SetThisElementCurrent(true);
+	}
+};
+CDocumentOutline.prototype.private_GetPositionForInsertHeaderBefore = function(nIndex)
+{
+	if (nIndex === this.Elements.length)
+		return this.LogicDocument.GetElementsCount();
+
+	var oParagraph = this.Elements[nIndex].Paragraph;
+	if (!oParagraph)
+		return 0;
+
+	this.LogicDocument.UpdateContentIndexing();
+	return oParagraph.GetIndex();
+};
+CDocumentOutline.prototype.private_GetNextSiblingOrHigher = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return 0;
+
+	var nLevel = this.GetLevel(nIndex);
+	var nPos = nIndex + 1;
+	while (nPos < this.Elements.length)
+	{
+		if (nLevel >= this.GetLevel(nPos))
+			return nPos;
+
+		nPos++;
+	}
+
+	return this.Elements.length;
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 CDocumentOutline.prototype["get_ElementsCount"]  = CDocumentOutline.prototype.GetElementsCount;
@@ -160,3 +264,5 @@ CDocumentOutline.prototype["get_Level"]          = CDocumentOutline.prototype.Ge
 CDocumentOutline.prototype["goto"]               = CDocumentOutline.prototype.GoTo;
 CDocumentOutline.prototype["promote"]            = CDocumentOutline.prototype.Promote;
 CDocumentOutline.prototype["demote"]             = CDocumentOutline.prototype.Demote;
+CDocumentOutline.prototype["insertHeader"]       = CDocumentOutline.prototype.InsertHeader;
+CDocumentOutline.prototype["insertSubHeader"]    = CDocumentOutline.prototype.InsertSubHeader;
