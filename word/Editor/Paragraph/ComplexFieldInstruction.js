@@ -546,7 +546,7 @@ CFieldInstructionParser.prototype.private_ReadGeneralFormatSwitch = function()
 
 	// TODO: Тут надо прочитать поле
 
-	console.log("General switch: " + this.Buffer);
+	//console.log("General switch: " + this.Buffer);
 };
 CFieldInstructionParser.prototype.private_ReadPAGE = function()
 {

@@ -4550,6 +4550,10 @@ CStyles.prototype.GetDefaultHyperlink = function()
 {
 	return this.Default.Hyperlink;
 };
+CStyles.prototype.GetDefaultHeading = function(nLvl)
+{
+	return this.Default.Headings[Math.max(Math.min(nLvl, 8), 0)];
+};
 
 function CDocumentColor(r,g,b, Auto)
 {

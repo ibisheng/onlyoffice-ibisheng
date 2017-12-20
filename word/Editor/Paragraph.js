@@ -12231,6 +12231,10 @@ Paragraph.prototype.SetParagraphStyle = function(Name)
 	var StyleId = this.LogicDocument.Get_Styles().Get_StyleIdByName(Name);
 	this.Style_Add(StyleId);
 };
+Paragraph.prototype.SetParagraphStyleById = function(sStyleId)
+{
+	this.Style_Add(sStyleId);
+};
 Paragraph.prototype.SetParagraphContextualSpacing = function(Value)
 {
 	this.Set_ContextualSpacing(Value);

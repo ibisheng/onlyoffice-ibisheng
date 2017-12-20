@@ -80,8 +80,83 @@ CDocumentOutline.prototype.GetLevel = function(nIndex)
 
 	return this.Elements[nIndex].Lvl;
 };
+CDocumentOutline.prototype.GoTo = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return -1;
+
+	var oParagraph = this.Elements[nIndex].Paragraph;
+	oParagraph.MoveCursorToStartPos();
+	oParagraph.Document_SetThisElementCurrent(true);
+};
+CDocumentOutline.prototype.Demote = function(nIndex)
+{
+	this.private_PromoteDemote(nIndex, false);
+};
+CDocumentOutline.prototype.Promote = function(nIndex)
+{
+	this.private_PromoteDemote(nIndex, true);
+};
+CDocumentOutline.prototype.private_PromoteDemote = function(nIndex, isPromote)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return;
+
+	var nLevel     = this.Elements[nIndex].Lvl;
+	var oParagraph = this.Elements[nIndex].Paragraph;
+
+	if (isPromote && (nLevel <= 0 || nLevel > 8) || (!isPromote && (nLevel >= 8 || nLevel < 0)))
+		return;
+
+	var arrParagraphs = [oParagraph];
+	var arrLevels     = [nLevel];
+
+	nIndex++;
+	while (nIndex < this.Elements.length)
+	{
+		var nCurLevel     = this.Elements[nIndex].Lvl;
+		var oCurParagraph = this.Elements[nIndex].Paragraph;
+
+		if (nCurLevel <= nLevel)
+			break;
+
+		arrParagraphs.push(oCurParagraph);
+		arrLevels.push(nCurLevel);
+
+		nIndex++;
+	}
+
+	if (false === this.LogicDocument.Document_Is_SelectionLocked(changestype_None, {
+			Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+			Elements  : arrParagraphs,
+			CheckType : AscCommon.changestype_Paragraph_Properties
+		}))
+	{
+		AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_ChangeOutlineLevel);
+
+		for (var nPos = 0, nCount = arrParagraphs.length; nPos < nCount; ++nPos)
+		{
+			var nCurLevel = arrLevels[nPos];
+			if (isPromote && nCurLevel > 0 && nCurLevel <= 8)
+				nCurLevel--;
+			else if (!isPromote && nCurLevel < 8 && nCurLevel >= 0)
+				nCurLevel++;
+			else
+				continue;
+
+			var sStyleId = this.LogicDocument.GetStyles().GetDefaultHeading(nCurLevel);
+			arrParagraphs[nPos].SetParagraphStyleById(sStyleId);
+		}
+
+		this.LogicDocument.Recalculate();
+		this.LogicDocument.Document_UpdateInterfaceState();
+	}
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 CDocumentOutline.prototype["get_ElementsCount"]  = CDocumentOutline.prototype.GetElementsCount;
 CDocumentOutline.prototype["get_Text"]           = CDocumentOutline.prototype.GetText;
 CDocumentOutline.prototype["get_Level"]          = CDocumentOutline.prototype.GetLevel;
+CDocumentOutline.prototype["goto"]               = CDocumentOutline.prototype.GoTo;
+CDocumentOutline.prototype["promote"]            = CDocumentOutline.prototype.Promote;
+CDocumentOutline.prototype["demote"]             = CDocumentOutline.prototype.Demote;
