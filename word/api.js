@@ -7742,6 +7742,10 @@ background-repeat: no-repeat;\
 	{
 		this.sendEvent("asc_onDocumentOutlineUpdate");
 	};
+	asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition = function(nIndex)
+	{
+		this.sendEvent("asc_onDocumentOutlineCurrentPosition");
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
@@ -8861,6 +8865,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_ShowDocumentOutline']                   = asc_docs_api.prototype.asc_ShowDocumentOutline;
 	asc_docs_api.prototype['asc_HideDocumentOutline']                   = asc_docs_api.prototype.asc_HideDocumentOutline;
 	asc_docs_api.prototype['sync_OnDocumentOutlineUpdate']              = asc_docs_api.prototype.sync_OnDocumentOutlineUpdate;
+	asc_docs_api.prototype['sync_OnDocumentOutlineCurrentPosition']     = asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;

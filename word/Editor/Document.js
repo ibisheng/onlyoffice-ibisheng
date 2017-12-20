@@ -8478,8 +8478,27 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 
 	this.Controller.UpdateSelectionState();
 
+	this.UpdateDocumentOutlinePosition();
+
 	// Обновим состояние кнопок Copy/Cut
 	this.Document_UpdateCopyCutState();
+};
+CDocument.prototype.UpdateDocumentOutlinePosition = function()
+{
+	if (this.DocumentOutline.IsUse())
+	{
+		if (this.Controller !== this.LogicDocumentController)
+		{
+			this.DocumentOutline.UpdateCurrentPosition(null);
+		}
+		else
+		{
+			if (this.IsSelectionUse())
+				this.DocumentOutline.UpdateCurrentPosition(this.Selection.StartPos);
+			else
+				this.DocumentOutline.UpdateCurrentPosition(this.CurPos.ContentPos);
+		}
+	}
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {

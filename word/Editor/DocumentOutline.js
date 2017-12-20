@@ -46,12 +46,17 @@ function CDocumentOutline(oLogicDocument)
 	this.LogicDocument = oLogicDocument;
 	this.Use           = false;
 	this.Elements      = [];
+	this.CurPos        = -1;
 }
 CDocumentOutline.prototype.SetUse = function(isUse)
 {
 	this.Use = isUse;
 	if (this.Use)
 		this.Update();
+};
+CDocumentOutline.prototype.IsUse = function()
+{
+	return this.Use;
 };
 CDocumentOutline.prototype.Update = function()
 {
@@ -69,6 +74,9 @@ CDocumentOutline.prototype.Update = function()
 			this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
 		}
 	}
+
+	this.CurPos = -1;
+	this.LogicDocument.UpdateDocumentOutlinePosition();
 
 	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
 };
@@ -279,6 +287,35 @@ CDocumentOutline.prototype.SelectContent = function(nIndex)
 
 	this.LogicDocument.RemoveSelection();
 	this.LogicDocument.SelectRange(nStartPos, nEndPos);
+};
+CDocumentOutline.prototype.UpdateCurrentPosition = function(nCurPos)
+{
+	if (null === nCurPos)
+	{
+		this.LogicDocument.GetApi().sync_OnDocumentOutlineCurrentPosition(null);
+		return;
+	}
+
+	this.LogicDocument.UpdateContentIndexing();
+
+	var nFindIndex = this.Elements.length - 1;
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		var oParagraph = this.Elements[nIndex].Paragraph;
+		var nPos       = oParagraph ? oParagraph.GetIndex() : 0;
+
+		if (nPos > nCurPos)
+		{
+			nFindIndex = nIndex - 1;
+			break;
+		}
+	}
+
+	if (nFindIndex !== this.CurPos)
+	{
+		this.CurPos = nFindIndex;
+		this.LogicDocument.GetApi().sync_OnDocumentOutlineCurrentPosition(nFindIndex);
+	}
 };
 
 //-------------------------------------------------------------export---------------------------------------------------
