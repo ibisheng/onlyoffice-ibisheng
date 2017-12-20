@@ -4355,7 +4355,24 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_AutoFilter.Ref == type )
-                oAutoFilter.Ref = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+			{
+				var sRef = this.stream.GetString2LE(length);
+
+				//TODO пересмотреть проверку
+				//возможно здесь 3d ref - проверяем
+				if(-1 !== sRef.indexOf("!"))
+				{
+					var o = {
+						formula: sRef, pCurrPos: 0
+					};
+					var is3DRef = AscCommon.parserHelp.is3DRef.call(o, o.formula, o.pCurrPos);
+					if(is3DRef[0]){
+						sRef = sRef.substring(o.pCurrPos);
+					}
+				}
+
+				oAutoFilter.Ref = AscCommonExcel.g_oRangeCache.getAscRange(sRef);
+			}
             else if ( c_oSer_AutoFilter.FilterColumns == type )
             {
                 oAutoFilter.FilterColumns = [];
