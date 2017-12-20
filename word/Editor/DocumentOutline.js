@@ -256,13 +256,39 @@ CDocumentOutline.prototype.private_GetNextSiblingOrHigher = function(nIndex)
 
 	return this.Elements.length;
 };
+CDocumentOutline.prototype.IsFirstItemNotHeader = function()
+{
+	return (this.Elements.length <= 0 || !this.Elements[0].Paragraph ? true : false);
+};
+CDocumentOutline.prototype.SelectContent = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length)
+		return;
+
+	var oStartParagraph = this.Elements[nIndex].Paragraph,
+		oEndParagraph   = null;
+
+	var nNextIndex = this.private_GetNextSiblingOrHigher(nIndex);
+	if (nNextIndex < this.Elements.length)
+		oEndParagraph = this.Elements[nNextIndex].Paragraph;
+
+	this.LogicDocument.UpdateContentIndexing();
+
+	var nStartPos = (oStartParagraph ? oStartParagraph.GetIndex() : 0);
+	var nEndPos   = (oEndParagraph ? oEndParagraph.GetIndex() : this.LogicDocument.GetElementsCount()) - 1;
+
+	this.LogicDocument.RemoveSelection();
+	this.LogicDocument.SelectRange(nStartPos, nEndPos);
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
-CDocumentOutline.prototype["get_ElementsCount"]  = CDocumentOutline.prototype.GetElementsCount;
-CDocumentOutline.prototype["get_Text"]           = CDocumentOutline.prototype.GetText;
-CDocumentOutline.prototype["get_Level"]          = CDocumentOutline.prototype.GetLevel;
-CDocumentOutline.prototype["goto"]               = CDocumentOutline.prototype.GoTo;
-CDocumentOutline.prototype["promote"]            = CDocumentOutline.prototype.Promote;
-CDocumentOutline.prototype["demote"]             = CDocumentOutline.prototype.Demote;
-CDocumentOutline.prototype["insertHeader"]       = CDocumentOutline.prototype.InsertHeader;
-CDocumentOutline.prototype["insertSubHeader"]    = CDocumentOutline.prototype.InsertSubHeader;
+CDocumentOutline.prototype["get_ElementsCount"]    = CDocumentOutline.prototype.GetElementsCount;
+CDocumentOutline.prototype["get_Text"]             = CDocumentOutline.prototype.GetText;
+CDocumentOutline.prototype["get_Level"]            = CDocumentOutline.prototype.GetLevel;
+CDocumentOutline.prototype["goto"]                 = CDocumentOutline.prototype.GoTo;
+CDocumentOutline.prototype["promote"]              = CDocumentOutline.prototype.Promote;
+CDocumentOutline.prototype["demote"]               = CDocumentOutline.prototype.Demote;
+CDocumentOutline.prototype["insertHeader"]         = CDocumentOutline.prototype.InsertHeader;
+CDocumentOutline.prototype["insertSubHeader"]      = CDocumentOutline.prototype.InsertSubHeader;
+CDocumentOutline.prototype["isFirstItemNotHeader"] = CDocumentOutline.prototype.IsFirstItemNotHeader;
+CDocumentOutline.prototype["selectContent"]        = CDocumentOutline.prototype.SelectContent;

@@ -5714,6 +5714,45 @@ CDocument.prototype.SelectAll = function()
 
 	this.private_UpdateCursorXY(true, true);
 };
+/**
+ * Выделяем все элементы в заданном диапазоне
+ * @param {number} nStartPos
+ * @param {number} nEndPos
+ */
+CDocument.prototype.SelectRange = function(nStartPos, nEndPos)
+{
+	this.RemoveSelection();
+
+	this.DrawingDocument.SelectEnabled(true);
+	this.DrawingDocument.TargetEnd();
+
+	this.Set_DocPosType(docpostype_Content);
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.Selection.StartPos = Math.max(0, Math.min(nStartPos, this.Content.length - 1));
+	this.Selection.EndPos   = Math.max(this.Selection.StartPos, Math.min(nEndPos, this.Content.length - 1));
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].SelectAll();
+	}
+
+	// TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
+	//       сделать по нормальному
+	this.Selection.Start = true;
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
+	this.Selection.Start = false;
+
+	// Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
+	this.Document_UpdateCopyCutState();
+
+	this.private_UpdateCursorXY(true, true);
+};
 CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
 {
     if (true === this.Comments.Is_Use())
