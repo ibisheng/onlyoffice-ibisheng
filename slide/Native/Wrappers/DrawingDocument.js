@@ -510,7 +510,7 @@ CDrawingDocument.prototype.AddPageSelection = function(pageIndex, x, y, width, h
 };
 CDrawingDocument.prototype.SelectShow = function()
 {
-    this.Native["DD_SelectShow"]();
+    this.m_oWordControl.OnUpdateOverlay();
 };
 
 CDrawingDocument.prototype.Set_RulerState_Table = function(markup, transform)

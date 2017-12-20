@@ -227,10 +227,16 @@ if(window.native){
         }
     };
 
-    window.native.Call_OnUpdateOverlay = function(){
+    window.native.Call_OnUpdateOverlay = function(param){
         if(window.editor)
         {
-            window.editor.WordControl.OnUpdateOverlay();
+            window.editor.WordControl.OnUpdateOverlay(param);
+        }
+    };
+    window.native.Call_SetCurrentPage = function(param){
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oLogicDocument.Set_CurPage(param);
         }
     };
 }
