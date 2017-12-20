@@ -2823,6 +2823,12 @@
 		return (str == undefined) || (str == null) || (str == "");
 	}
 
+	function unleakString(s) {
+		//todo remove in the future
+		//https://bugs.chromium.org/p/v8/issues/detail?id=2869
+		return (' ' + s).substr(1);
+	}
+
 	function CUserCacheColor(nColor)
 	{
 		this.Light = null;
@@ -3225,6 +3231,7 @@
 	window["AscCommon"].prepareUrl = prepareUrl;
 	window["AscCommon"].getUserColorById = getUserColorById;
 	window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
+	window["AscCommon"].unleakString = unleakString;
 	window["AscCommon"].initStreamFromResponse = initStreamFromResponse;
 
 	window["AscCommon"].DocumentUrls = DocumentUrls;

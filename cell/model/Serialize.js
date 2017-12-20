@@ -7876,11 +7876,11 @@
 				var val;
 				val = vals["defaultTableStyle"];
 				if (undefined !== val) {
-					this.DefaultTableStyle = uq(val);
+					this.DefaultTableStyle = AscCommon.unleakString(uq(val));
 				}
 				val = vals["defaultPivotStyle"];
 				if (undefined !== val) {
-					this.DefaultPivotStyle = uq(val);
+					this.DefaultPivotStyle = AscCommon.unleakString(uq(val));
 				}
 			}
 		},
@@ -8022,12 +8022,12 @@
 			var val;
 			val = vals["name"];
 			if (undefined !== val) {
-				this.name = uq(val);
+				this.name = AscCommon.unleakString(uq(val));
 				this.displayName = this.name;
 			}
 			val = vals["displayName"];
 			if (undefined !== val) {
-				this.displayName = uq(val);
+				this.displayName = AscCommon.unleakString(uq(val));
 			}
 			val = vals["pivot"];
 			if (undefined !== val) {

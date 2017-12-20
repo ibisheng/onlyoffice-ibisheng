@@ -1526,7 +1526,7 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
 		}
 		val = vals["invalid"];
 		if (undefined !== val) {
@@ -1550,7 +1550,7 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["refreshedBy"];
 		if (undefined !== val) {
-			this.refreshedBy = uq(val);
+			this.refreshedBy = AscCommon.unleakString(uq(val));
 		}
 		val = vals["refreshedDate"];
 		if (undefined !== val) {
@@ -1861,7 +1861,7 @@ CT_PivotCacheRecords.prototype.get = function(row, col) {
 		return col.get(row);
 	}
 };
-CT_PivotCacheRecords.prototype._getCol = function(index, type) {
+CT_PivotCacheRecords.prototype._getCol = function(index) {
 	var col = this._cols[index];
 	if(!col){
 		col = new PivotRecords();
@@ -1973,7 +1973,7 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cacheId"];
 		if (undefined !== val) {
@@ -2017,15 +2017,15 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["dataCaption"];
 		if (undefined !== val) {
-			this.dataCaption = uq(val);
+			this.dataCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["grandTotalCaption"];
 		if (undefined !== val) {
-			this.grandTotalCaption = uq(val);
+			this.grandTotalCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["errorCaption"];
 		if (undefined !== val) {
-			this.errorCaption = uq(val);
+			this.errorCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showError"];
 		if (undefined !== val) {
@@ -2033,7 +2033,7 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["missingCaption"];
 		if (undefined !== val) {
-			this.missingCaption = uq(val);
+			this.missingCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showMissing"];
 		if (undefined !== val) {
@@ -2041,19 +2041,19 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["pageStyle"];
 		if (undefined !== val) {
-			this.pageStyle = uq(val);
+			this.pageStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["pivotTableStyle"];
 		if (undefined !== val) {
-			this.pivotTableStyle = uq(val);
+			this.pivotTableStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["vacatedStyle"];
 		if (undefined !== val) {
-			this.vacatedStyle = uq(val);
+			this.vacatedStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["tag"];
 		if (undefined !== val) {
-			this.tag = uq(val);
+			this.tag = AscCommon.unleakString(uq(val));
 		}
 		val = vals["updatedVersion"];
 		if (undefined !== val) {
@@ -2225,11 +2225,11 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["rowHeaderCaption"];
 		if (undefined !== val) {
-			this.rowHeaderCaption = uq(val);
+			this.rowHeaderCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["colHeaderCaption"];
 		if (undefined !== val) {
-			this.colHeaderCaption = uq(val);
+			this.colHeaderCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["fieldListSortAscending"];
 		if (undefined !== val) {
@@ -3023,11 +3023,11 @@ CT_pivotTableDefinitionX14.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["altText"];
 		if (undefined !== val) {
-			this.altText = uq(val);
+			this.altText = AscCommon.unleakString(uq(val));
 		}
 		val = vals["altTextSummary"];
 		if (undefined !== val) {
-			this.altTextSummary = uq(val);
+			this.altTextSummary = AscCommon.unleakString(uq(val));
 		}
 		val = vals["enableEdit"];
 		if (undefined !== val) {
@@ -3046,7 +3046,7 @@ CT_pivotTableDefinitionX14.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["weightExpression"];
 		if (undefined !== val) {
-			this.weightExpression = uq(val);
+			this.weightExpression = AscCommon.unleakString(uq(val));
 		}
 		val = vals["hideValuesRow"];
 		if (undefined !== val) {
@@ -3618,7 +3618,7 @@ CT_Boolean.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3711,7 +3711,7 @@ CT_DateTime.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3811,7 +3811,7 @@ CT_Error.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3974,7 +3974,7 @@ CT_Missing.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -4139,7 +4139,7 @@ CT_Number.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -4295,7 +4295,7 @@ CT_String.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			this.v = AscCommon.unleakString(uq(val));
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -4307,7 +4307,7 @@ CT_String.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -5035,7 +5035,7 @@ CT_PivotTableStyle.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showRowHeaders"];
 		if (undefined !== val) {
@@ -5364,19 +5364,19 @@ CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sheet"];
 		if (undefined !== val) {
-			this.sheet = uq(val);
+			this.sheet = AscCommon.unleakString(uq(val));
 		}
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
 		}
 
 		var text;
@@ -5436,15 +5436,15 @@ CT_CacheField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["propertyName"];
 		if (undefined !== val) {
-			this.propertyName = uq(val);
+			this.propertyName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["serverField"];
 		if (undefined !== val) {
@@ -5460,7 +5460,7 @@ CT_CacheField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["formula"];
 		if (undefined !== val) {
-			this.formula = uq(val);
+			this.formula = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sqlType"];
 		if (undefined !== val) {
@@ -5617,11 +5617,11 @@ CT_CacheHierarchy.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measure"];
 		if (undefined !== val) {
@@ -5653,27 +5653,27 @@ CT_CacheHierarchy.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["defaultMemberUniqueName"];
 		if (undefined !== val) {
-			this.defaultMemberUniqueName = uq(val);
+			this.defaultMemberUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["allUniqueName"];
 		if (undefined !== val) {
-			this.allUniqueName = uq(val);
+			this.allUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["allCaption"];
 		if (undefined !== val) {
-			this.allCaption = uq(val);
+			this.allCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["dimensionUniqueName"];
 		if (undefined !== val) {
-			this.dimensionUniqueName = uq(val);
+			this.dimensionUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["displayFolder"];
 		if (undefined !== val) {
-			this.displayFolder = uq(val);
+			this.displayFolder = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measureGroup"];
 		if (undefined !== val) {
-			this.measureGroup = uq(val);
+			this.measureGroup = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measures"];
 		if (undefined !== val) {
@@ -5830,47 +5830,47 @@ CT_PCDKPI.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["displayFolder"];
 		if (undefined !== val) {
-			this.displayFolder = uq(val);
+			this.displayFolder = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measureGroup"];
 		if (undefined !== val) {
-			this.measureGroup = uq(val);
+			this.measureGroup = AscCommon.unleakString(uq(val));
 		}
 		val = vals["parent"];
 		if (undefined !== val) {
-			this.parent = uq(val);
+			this.parent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["value"];
 		if (undefined !== val) {
-			this.value = uq(val);
+			this.value = AscCommon.unleakString(uq(val));
 		}
 		val = vals["goal"];
 		if (undefined !== val) {
-			this.goal = uq(val);
+			this.goal = AscCommon.unleakString(uq(val));
 		}
 		val = vals["status"];
 		if (undefined !== val) {
-			this.status = uq(val);
+			this.status = AscCommon.unleakString(uq(val));
 		}
 		val = vals["trend"];
 		if (undefined !== val) {
-			this.trend = uq(val);
+			this.trend = AscCommon.unleakString(uq(val));
 		}
 		val = vals["weight"];
 		if (undefined !== val) {
-			this.weight = uq(val);
+			this.weight = AscCommon.unleakString(uq(val));
 		}
 		val = vals["time"];
 		if (undefined !== val) {
-			this.time = uq(val);
+			this.time = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6119,7 +6119,7 @@ CT_CalculatedItem.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["formula"];
 		if (undefined !== val) {
-			this.formula = uq(val);
+			this.formula = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6177,23 +6177,23 @@ CT_CalculatedMember.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["mdx"];
 		if (undefined !== val) {
-			this.mdx = uq(val);
+			this.mdx = AscCommon.unleakString(uq(val));
 		}
 		val = vals["memberName"];
 		if (undefined !== val) {
-			this.memberName = uq(val);
+			this.memberName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["hierarchy"];
 		if (undefined !== val) {
-			this.hierarchy = uq(val);
+			this.hierarchy = AscCommon.unleakString(uq(val));
 		}
 		val = vals["parent"];
 		if (undefined !== val) {
-			this.parent = uq(val);
+			this.parent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["solveOrder"];
 		if (undefined !== val) {
@@ -6264,15 +6264,15 @@ CT_PivotDimension.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6303,11 +6303,11 @@ CT_MeasureGroup.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6362,7 +6362,7 @@ CT_Extension.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uri"];
 		if (undefined !== val) {
-			this.uri = uq(val);
+			this.uri = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6517,7 +6517,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["axis"];
 		if (undefined !== val) {
@@ -6532,7 +6532,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["subtotalCaption"];
 		if (undefined !== val) {
-			this.subtotalCaption = uq(val);
+			this.subtotalCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showDropDowns"];
 		if (undefined !== val) {
@@ -6544,7 +6544,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["uniqueMemberProperty"];
 		if (undefined !== val) {
-			this.uniqueMemberProperty = uq(val);
+			this.uniqueMemberProperty = AscCommon.unleakString(uq(val));
 		}
 		val = vals["compact"];
 		if (undefined !== val) {
@@ -7062,11 +7062,11 @@ CT_PageField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cap"];
 		if (undefined !== val) {
-			this.cap = uq(val);
+			this.cap = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7130,7 +7130,7 @@ CT_DataField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["fld"];
 		if (undefined !== val) {
@@ -7492,7 +7492,7 @@ CT_PivotHierarchy.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7623,19 +7623,19 @@ CT_PivotFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["description"];
 		if (undefined !== val) {
-			this.description = uq(val);
+			this.description = AscCommon.unleakString(uq(val));
 		}
 		val = vals["stringValue1"];
 		if (undefined !== val) {
-			this.stringValue1 = uq(val);
+			this.stringValue1 = AscCommon.unleakString(uq(val));
 		}
 		val = vals["stringValue2"];
 		if (undefined !== val) {
-			this.stringValue2 = uq(val);
+			this.stringValue2 = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7870,11 +7870,11 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["minDate"];
 		if (undefined !== val) {
-			this.minDate = uq(val);
+			this.minDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["maxDate"];
 		if (undefined !== val) {
-			this.maxDate = uq(val);
+			this.maxDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["count"];
 		if (undefined !== val) {
@@ -8123,7 +8123,7 @@ CT_Set.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["setDefinition"];
 		if (undefined !== val) {
-			this.setDefinition = uq(val);
+			this.setDefinition = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sortType"];
 		if (undefined !== val) {
@@ -8196,7 +8196,7 @@ CT_Query.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["mdx"];
 		if (undefined !== val) {
-			this.mdx = uq(val);
+			this.mdx = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8235,11 +8235,11 @@ CT_ServerFormat.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["culture"];
 		if (undefined !== val) {
-			this.culture = uq(val);
+			this.culture = AscCommon.unleakString(uq(val));
 		}
 		val = vals["format"];
 		if (undefined !== val) {
-			this.format = uq(val);
+			this.format = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8312,7 +8312,7 @@ CT_PivotArea.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["offset"];
 		if (undefined !== val) {
-			this.offset = uq(val);
+			this.offset = AscCommon.unleakString(uq(val));
 		}
 		val = vals["collapsedLevelsAreSubtotals"];
 		if (undefined !== val) {
@@ -8645,7 +8645,7 @@ CT_AutoFilter.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8766,19 +8766,19 @@ CT_RangeSet.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sheet"];
 		if (undefined !== val) {
-			this.sheet = uq(val);
+			this.sheet = AscCommon.unleakString(uq(val));
 		}
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8851,11 +8851,11 @@ CT_RangePr.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["startDate"];
 		if (undefined !== val) {
-			this.startDate = uq(val);
+			this.startDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["endDate"];
 		if (undefined !== val) {
-			this.endDate = uq(val);
+			this.endDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["groupInterval"];
 		if (undefined !== val) {
@@ -9008,11 +9008,11 @@ CT_GroupLevel.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["user"];
 		if (undefined !== val) {
@@ -9127,7 +9127,7 @@ CT_Item.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["n"];
 		if (undefined !== val) {
-			this.n = uq(val);
+			this.n = AscCommon.unleakString(uq(val));
 		}
 		val = vals["t"];
 		if (undefined !== val) {
@@ -9229,7 +9229,7 @@ CT_MemberProperty.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showCell"];
 		if (undefined !== val) {
@@ -9306,7 +9306,7 @@ CT_Member.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9464,7 +9464,7 @@ CT_SortState.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9521,7 +9521,7 @@ CT_PageItem.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9847,11 +9847,11 @@ CT_DynamicFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["valIso"];
 		if (undefined !== val) {
-			this.valIso = uq(val);
+			this.valIso = AscCommon.unleakString(uq(val));
 		}
 		val = vals["maxValIso"];
 		if (undefined !== val) {
-			this.maxValIso = uq(val);
+			this.maxValIso = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -10038,11 +10038,11 @@ CT_SortCondition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["customList"];
 		if (undefined !== val) {
-			this.customList = uq(val);
+			this.customList = AscCommon.unleakString(uq(val));
 		}
 		val = vals["dxfId"];
 		if (undefined !== val) {
@@ -10103,19 +10103,19 @@ CT_LevelGroup.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueParent"];
 		if (undefined !== val) {
-			this.uniqueParent = uq(val);
+			this.uniqueParent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["id"];
 		if (undefined !== val) {
@@ -10177,7 +10177,7 @@ CT_CustomFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["val"];
 		if (undefined !== val) {
-			this.val = uq(val);
+			this.val = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -10201,7 +10201,7 @@ CT_Filter.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["val"];
 		if (undefined !== val) {
-			this.val = uq(val);
+			this.val = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -10336,7 +10336,7 @@ CT_GroupMember.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["group"];
 		if (undefined !== val) {
@@ -10559,7 +10559,10 @@ PivotRecords.prototype.get = function(index) {
 			this.output.type = chunk.type;
 			if (chunk.data) {
 				this.output.val = chunk.data[index - chunk.from];
-				if (chunk.type === c_oAscPivotRecType.Boolean) {
+				if (chunk.type === c_oAscPivotRecType.String) {
+					//todo don't use global editor
+					this.output.val = window["Asc"]["editor"].wbModel.sharedStrings.get(this.output.val);
+				} else if (chunk.type === c_oAscPivotRecType.Boolean) {
 					this.output.val = !!this.output.val;
 				}
 			}
@@ -10602,10 +10605,9 @@ PivotRecords.prototype._add = function(type, val, addition) {
 				chunk.data = new Float64Array(chunk.capacity);
 				break;
 			case c_oAscPivotRecType.String:
-				if (!chunk.data) {
-					chunk.data = new Array(chunk.capacity);
-				}
-				oldData = null;
+				chunk.data = new Uint32Array(chunk.capacity);
+				//todo don't use global editor
+				val = window["Asc"]["editor"].wbModel.sharedStrings.addText(val);
 				break;
 			case c_oAscPivotRecType.Index:
 				chunk.data = new Uint32Array(chunk.capacity);

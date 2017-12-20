@@ -1443,7 +1443,7 @@
 			var val;
 			val = vals["r:id"];
 			if (undefined !== val) {
-				this.id = uq(val);
+				this.id = AscCommon.unleakString(uq(val));
 			}
 		}
 	};
@@ -1462,7 +1462,7 @@
 			}
 			val = vals["r:id"];
 			if (undefined !== val) {
-				this.id = uq(val);
+				this.id = AscCommon.unleakString(uq(val));
 			}
 		}
 	};
