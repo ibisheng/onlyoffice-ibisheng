@@ -7744,7 +7744,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition = function(nIndex)
 	{
-		this.sendEvent("asc_onDocumentOutlineCurrentPosition");
+		this.sendEvent("asc_onDocumentOutlineCurrentPosition", nIndex);
 	};
 
 	// input
