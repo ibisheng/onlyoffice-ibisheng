@@ -3345,12 +3345,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1], bIsSpecialFunction);
 	};
 
+	/** @constructor */
 	function cSpecialOperandStart() {
 	}
 
 	cSpecialOperandStart.prototype.constructor = cSpecialOperandStart;
 	cSpecialOperandStart.prototype.type = cElementType.specialFunctionStart;
 
+	/** @constructor */
 	function cSpecialOperandEnd() {
 	}
 
