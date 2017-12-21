@@ -1397,7 +1397,7 @@
 					{
 						var specialProps = window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						specialProps.props = allowedProps;
+						specialProps.options = allowedProps;
 					}
 
 					var arr_shapes = content.Drawings;
@@ -1622,7 +1622,7 @@
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 
 					window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
-					window['AscCommon'].g_specialPasteHelper.buttonOptions.props = allowedSpecialPasteProps;
+					window['AscCommon'].g_specialPasteHelper.buttonOptions.options = allowedSpecialPasteProps;
 					window['AscCommon'].g_specialPasteHelper.buttonOptions.position = position;
 					window['AscCommon'].g_specialPasteHelper.buttonOptions.range = cursorPos;
 					window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId = isIntoShape.Id;
@@ -1918,7 +1918,7 @@
 
 				if(needShowSpecialProps)
 				{
-					if(!window['AscCommon'].g_specialPasteHelper.buttonOptions.props)
+					if(!window['AscCommon'].g_specialPasteHelper.buttonOptions.options)
 					{
 						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 					}

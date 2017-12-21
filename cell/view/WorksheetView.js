@@ -8852,7 +8852,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			window['AscCommon'].g_specialPasteHelper.buttonOptions.props = allowedSpecialPasteProps;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.options = allowedSpecialPasteProps;
 			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = selectData[0];
 		}
 		else
@@ -9937,7 +9937,7 @@
 
 		var positionShapeContent = options.position;
 		var range = options.range;
-		var props = options.props;
+		var props = options.options;
 		var cellCoord;
 		if(!positionShapeContent)
 		{

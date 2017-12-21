@@ -951,7 +951,6 @@
 				//TODO только для презентаций! проверить на остальных редакторах!
 				if(this.buttonOptions){
 					this.buttonOptions.options = [];
-					this.buttonOptions.props = [];
 					this.Api.asc_ShowSpecialPasteButton(this.buttonOptions);
 				}
 			}
@@ -980,7 +979,7 @@
 			}
 
 			var props = this.buttonOptions;
-			if(props.options || props.props)
+			if(props && props.options)
 			{
 				if((window["Asc"] && window["Asc"]["editor"]) || props.cellCoord)
 				{
