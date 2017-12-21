@@ -779,6 +779,10 @@ CTableRow.prototype.GetCellInfo = function(nIndex)
 {
 	return this.Get_CellInfo(nIndex);
 };
+CTableRow.prototype.GetCellSpacing = function()
+{
+	return this.Get_CellSpacing();
+};
 
 function CTableRowRecalculateObject()
 {

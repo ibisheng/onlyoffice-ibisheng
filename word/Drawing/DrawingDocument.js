@@ -532,8 +532,7 @@ function CTableOutlineDr()
 			var _addW = (X - this.CurPos.X) * _koef - this.TrackOffsetX;
 			var _addH = (Y - this.CurPos.Y) * _koef - this.TrackOffsetY;
 
-			// TODO:
-			// _table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
+			_table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
 
 			this.AddResizeCurrentW = 0;
 			this.AddResizeCurrentH = 0;
@@ -2430,8 +2429,6 @@ function CDrawingDocument()
 			Data = new AscCommon.CMouseMoveData();
 
 		editor.sync_MouseMoveCallback(Data);
-
-		console.log(this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor);
 	}
 	this.LockCursorType = function (sType)
 	{

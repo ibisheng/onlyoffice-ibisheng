@@ -1890,6 +1890,22 @@ CTableCell.prototype.GetCalculatedW = function()
 
 	return 3.8; // 1.9 + 1.9 стандартные отступы справа и слева
 };
+/**
+ * Получаем количество промежутков, которое занимает данная ячейка
+ * @returns {number}
+ */
+CTableCell.prototype.GetGridSpan = function()
+{
+	return this.Get_GridSpan();
+};
+/**
+ * Получаем информацию о границе ячейки
+ * @param {number} nType - 0 - Top, 1 - Right, 2- Bottom, 3- Left
+ */
+CTableCell.prototype.GetBorder = function(nType)
+{
+	return this.Get_Border(nType);
+};
 
 function CTableCellRecalculateObject()
 {
