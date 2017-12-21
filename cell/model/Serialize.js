@@ -4362,12 +4362,9 @@
 				//возможно здесь 3d ref - проверяем
 				if(-1 !== sRef.indexOf("!"))
 				{
-					var o = {
-						formula: sRef, pCurrPos: 0
-					};
-					var is3DRef = AscCommon.parserHelp.is3DRef.call(o, o.formula, o.pCurrPos);
-					if(is3DRef[0]){
-						sRef = sRef.substring(o.pCurrPos);
+					var is3DRef = AscCommon.parserHelp.parse3DRef(sRef);
+					if(is3DRef){
+						sRef = is3DRef.range;
 					}
 				}
 
