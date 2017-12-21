@@ -897,7 +897,7 @@
 		this.specialPasteProps = null;
 
 		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+		this.buttonOptions = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
 
 		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
 		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
@@ -949,9 +949,10 @@
 			{
 				this.Special_Paste_End();
 				//TODO только для презентаций! проверить на остальных редакторах!
-				if(this.specialPasteButtonProps.props){
-					this.specialPasteButtonProps.props.options = [];
-					this.Api.asc_ShowSpecialPasteButton(this.specialPasteButtonProps.props);
+				if(this.buttonOptions){
+					this.buttonOptions.options = [];
+					this.buttonOptions.props = [];
+					this.Api.asc_ShowSpecialPasteButton(this.buttonOptions);
 				}
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
@@ -967,7 +968,7 @@
 			}
 		},
 		
-		SpecialPasteButton_Show : function(props)
+		SpecialPasteButton_Show : function()
 		{
 			if (!this.Api)
 				return;
@@ -978,11 +979,8 @@
 				return;
 			}
 
-			if(!props)
-			{
-				props = this.specialPasteButtonProps.props;
-			}
-			if(props)
+			var props = this.buttonOptions;
+			if(props.options || props.props)
 			{
 				if((window["Asc"] && window["Asc"]["editor"]) || props.cellCoord)
 				{
@@ -1025,13 +1023,13 @@
 				return;
 
 			//TODO метод должен быть общий для всех редакторов
-			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)
+			if(this.showSpecialPasteButton && this.buttonOptions.fixPosition)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 				
-				var _Y = this.specialPasteButtonProps.fixPosition.y;
-				var _X = this.specialPasteButtonProps.fixPosition.x;
-				var _PageNum = this.specialPasteButtonProps.fixPosition.pageNum;
+				var _Y = this.buttonOptions.fixPosition.y;
+				var _X = this.buttonOptions.fixPosition.x;
+				var _PageNum = this.buttonOptions.fixPosition.pageNum;
 				
 				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );

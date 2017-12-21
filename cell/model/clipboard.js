@@ -1395,9 +1395,9 @@
 
 					if(!bSlideObjects)
 					{
-						var specialProps = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						var specialProps = window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						specialProps.props = {props: allowedProps};
+						specialProps.props = allowedProps;
 					}
 
 					var arr_shapes = content.Drawings;
@@ -1621,10 +1621,11 @@
 
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 
-					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
-					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, position: position};
-					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = cursorPos;
-					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId = isIntoShape.Id;
+					window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
+					window['AscCommon'].g_specialPasteHelper.buttonOptions.props = allowedSpecialPasteProps;
+					window['AscCommon'].g_specialPasteHelper.buttonOptions.position = position;
+					window['AscCommon'].g_specialPasteHelper.buttonOptions.range = cursorPos;
+					window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId = isIntoShape.Id;
 				}
 			},
 
@@ -1917,16 +1918,16 @@
 
 				if(needShowSpecialProps)
 				{
-					if(!window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props)
+					if(!window['AscCommon'].g_specialPasteHelper.buttonOptions.props)
 					{
-						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 					}
 					else
 					{
 						var lastAddedImg = ws.model.Drawings[ws.model.Drawings.length - 1];
 						if(drawingObject && lastAddedImg)
 						{
-							window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props.range = {r1: lastAddedImg.from.row, c1: lastAddedImg.from.col, r2: lastAddedImg.to.row, c2: lastAddedImg.to.col};
+							window['AscCommon'].g_specialPasteHelper.buttonOptions.range = {r1: lastAddedImg.from.row, c1: lastAddedImg.from.col, r2: lastAddedImg.to.row, c2: lastAddedImg.to.col};
 						}
 					}
 				}
@@ -1946,7 +1947,7 @@
 
 				if(!needShowSpecialProps)
 				{
-					window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+					window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 				}
 				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 			},
@@ -2899,7 +2900,7 @@
 
 						t._insertSelectedContentIntoShapeContent(worksheet, selectedElements, isIntoShape);
 
-						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 						window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 						
 						//for special paste

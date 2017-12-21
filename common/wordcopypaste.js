@@ -2402,14 +2402,14 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps ? window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props : null;
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonOptions ? window['AscCommon'].g_specialPasteHelper.buttonOptions : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
-			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps)
+			if(window['AscCommon'].g_specialPasteHelper.buttonOptions)
 			{
-				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = null;
+				window['AscCommon'].g_specialPasteHelper.buttonOptions = null;
 			}
 			return;
 		}
@@ -2457,7 +2457,7 @@ PasteProcessor.prototype =
 				specialPasteShowOptions = null;
 			}
 
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -3058,7 +3058,7 @@ PasteProcessor.prototype =
 
 		var specialPasteShowOptions = new SpecialPasteShowOptions();
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
+		window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -3225,7 +3225,9 @@ PasteProcessor.prototype =
     {
 		//PASTE
 		if(text){
-			this.oLogicDocument.RemoveBeforePaste();
+			if(PasteElementsId.g_bIsDocumentCopyPaste){
+				this.oLogicDocument.RemoveBeforePaste();
+			}
 			this._pasteText(text);
 			return;
 		}
@@ -3951,7 +3953,7 @@ PasteProcessor.prototype =
 
 						oThis._setSpecialPasteShowOptionsPresentation(props);
 					} else {
-						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 					}
 
 					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();

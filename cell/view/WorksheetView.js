@@ -8852,8 +8852,8 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
-			//this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.props = allowedSpecialPasteProps;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = selectData[0];
 		}
 		else
 		{
@@ -9941,8 +9941,8 @@
 		var cellCoord;
 		if(!positionShapeContent)
 		{
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = range;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9965,10 +9965,10 @@
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
 		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton && isIntoShape)
 		{
-			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId === isIntoShape.Id)
+			if(window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId === isIntoShape.Id)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
+				var range = window['AscCommon'].g_specialPasteHelper.buttonOptions.range;
 				
 				/*var trueShapeSelection = isIntoShape.GetSelectionState();
 				isIntoShape.SetSelectionState(range, range.length - 1);*/
@@ -10003,15 +10003,10 @@
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			if(changeActiveRange)
 			{
-				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = changeActiveRange;
+				window['AscCommon'].g_specialPasteHelper.buttonOptions.range = changeActiveRange;
 			}
 
-			var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
-			if(!range && window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props)
-			{
-				range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props.range;
-			}
-
+			var range = window['AscCommon'].g_specialPasteHelper.buttonOptions.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			
@@ -10030,7 +10025,7 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId)
 		{
 			disableCoords();
 			cellCoord = [cellCoord];
