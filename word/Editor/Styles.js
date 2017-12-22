@@ -5787,34 +5787,34 @@ CTableRowPr.prototype =
     },
 
     Merge : function(RowPr)
-    {
-        if ( undefined != RowPr.CantSplit )
-            this.CantSplit = RowPr.CantSplit;
+	{
+		if (undefined !== RowPr.CantSplit)
+			this.CantSplit = RowPr.CantSplit;
 
-        if ( undefined != RowPr.GridAfter )
-            this.GridAfter = RowPr.GridAfter;
+		if (undefined !== RowPr.GridAfter)
+			this.GridAfter = RowPr.GridAfter;
 
-        if ( undefined != RowPr.GridBefore )
-            this.GridBefore = RowPr.GridBefore;
+		if (undefined !== RowPr.GridBefore)
+			this.GridBefore = RowPr.GridBefore;
 
-        if ( undefined != RowPr.Jc )
-            this.Jc = RowPr.Jc;
+		if (undefined !== RowPr.Jc)
+			this.Jc = RowPr.Jc;
 
-        if ( undefined != RowPr.TableCellSpacing )
-            this.TableCellSpacing = RowPr.TableCellSpacing;
+		if (undefined !== RowPr.TableCellSpacing)
+			this.TableCellSpacing = RowPr.TableCellSpacing;
 
-        if ( undefined != RowPr.Height )
-            this.Height = RowPr.Height.Copy();
+		if (undefined !== RowPr.Height)
+			this.Height = RowPr.Height.Copy();
 
-        if ( undefined != RowPr.WAfter )
-            this.WAfter = RowPr.WAfter.Copy();
+		if (undefined !== RowPr.WAfter)
+			this.WAfter = RowPr.WAfter.Copy();
 
-        if ( undefined != RowPr.WBefore )
-            this.WBefore = RowPr.WBefore.Copy();
+		if (undefined !== RowPr.WBefore)
+			this.WBefore = RowPr.WBefore.Copy();
 
-        if ( undefined != RowPr.TableHeader )
-            this.TableHeader = RowPr.TableHeader;
-    },
+		if (undefined !== RowPr.TableHeader)
+			this.TableHeader = RowPr.TableHeader;
+	},
 
     Is_Equal : function(RowPr)
     {
