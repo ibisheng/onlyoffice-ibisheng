@@ -1040,6 +1040,9 @@
 			case AscDFH.historydescription_Document_AddElementToOutline:
 				sString = "Document_AddElementToOutline";
 				break;
+			case AscDFH.historydescription_Document_ResizeTable:
+				sString = "Document_ResizeTable";
+				break;
 		}
 		return sString;
 	}
@@ -2959,6 +2962,7 @@
 	window['AscDFH'].historydescription_Document_AddTableOfContents                 = 0x0148;
 	window['AscDFH'].historydescription_Document_ChangeOutlineLevel                 = 0x0149;
 	window['AscDFH'].historydescription_Document_AddElementToOutline                = 0x014a;
+	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014b;
 
 
 

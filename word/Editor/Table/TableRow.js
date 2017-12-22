@@ -783,7 +783,14 @@ CTableRow.prototype.GetCellSpacing = function()
 {
 	return this.Get_CellSpacing();
 };
-
+CTableRow.prototype.GetHeight = function()
+{
+	return this.Get_Height();
+};
+CTableRow.prototype.SetHeight = function(nValue, nHRule)
+{
+	return this.Set_Height(nValue, nHRule);
+};
 function CTableRowRecalculateObject()
 {
     this.CellsInfo   = [];

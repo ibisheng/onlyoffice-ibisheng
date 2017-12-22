@@ -12332,8 +12332,18 @@ CTable.prototype.InsertTableContent = function(_nCellIndex, _nRowIndex, oTable)
  */
 CTable.prototype.Resize = function(nWidth, nHeight)
 {
+	if (!this.LogicDocument)
+		return;
+
+	if (true === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true))
+		return;
+
+	this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ResizeTable);
+
 	var nMinWidth  = this.GetMinWidth();
 	var nMinHeight = this.GetMinHeight();
+
+	var nSummaryHeight = this.GetSummaryHeight();
 
 	if (this.Pages.length <= 0)
 		return;
@@ -12342,8 +12352,106 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 	var nDiffX  = nWidth - oBounds.Right + oBounds.Left;
 	var nDiffY  = nHeight - oBounds.Bottom + oBounds.Top;
 
+	var nSummaryWidth = oBounds.Right - oBounds.Left;
 
-	console.log(nDiffX + " " + nDiffY);
+	if (nSummaryWidth + nDiffX < nMinWidth)
+		nDiffX = nMinWidth - nSummaryWidth;
+
+	if (nSummaryHeight + nDiffY < nMinHeight)
+		nDiffY = nMinHeight - nSummaryHeight;
+
+	if (nDiffY > 0.01)
+	{
+		var arrRowsH   = [];
+		var nTableSumH = 0;
+
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			var nRowSummaryH = 0;
+			for (var nCurPage in this.RowsInfo[nCurRow].H)
+				nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+			arrRowsH[nCurRow] = nRowSummaryH;
+			nTableSumH += nRowSummaryH;
+		}
+
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			var oRow  = this.GetRow(nCurRow);
+			var oRowH = oRow.GetHeight();
+			oRow.SetHeight(arrRowsH[nCurRow] / nTableSumH * (nSummaryHeight + nDiffY), oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+		}
+	}
+	else if (nDiffY < -0.01)
+	{
+		var nNewTableH  = nSummaryHeight + nDiffY;
+		var arrRowsMinH = [];
+		var arrRowsH    = [];
+		var nTableSumH  = 0;
+		var arrRowsFlag = [];
+
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			var nRowSummaryH = 0;
+			for (var nCurPage in this.RowsInfo[nCurRow].H)
+				nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+			arrRowsH[nCurRow]    = nRowSummaryH;
+			arrRowsMinH[nCurRow] = this.GetMinRowHeight(nCurRow);
+			arrRowsFlag[nCurRow] = true;
+			nTableSumH += nRowSummaryH;
+		}
+
+		var arrNewH = [];
+		while (true)
+		{
+			var isForceBreak = false;
+			var isContinue   = false;
+			for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+			{
+				if (arrRowsFlag[nCurRow])
+				{
+					arrNewH[nCurRow] = arrRowsH[nCurRow] / nTableSumH * nNewTableH;
+					if (arrNewH[nCurRow] < arrRowsMinH[nCurRow])
+					{
+						nTableSumH -= arrRowsH[nCurRow];
+						nNewTableH -= arrRowsMinH[nCurRow];
+						arrNewH[nCurRow]  = arrRowsMinH[nCurRow];
+						arrRowsFlag[nCurRow] = false;
+
+						if (nNewTableH < 0.01 || nTableSumH < 0.01)
+							isForceBreak = true;
+
+						isContinue = true;
+					}
+				}
+			}
+
+			if (isForceBreak || !isContinue)
+				break;
+		}
+
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			if (undefined !== arrNewH[nCurRow])
+			{
+				var oRow  = this.GetRow(nCurRow);
+				var oRowH = oRow.GetHeight();
+				oRow.SetHeight(arrNewH[nCurRow], oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+			}
+		}
+	}
+
+	if (nDiffX > 0.001)
+	{
+
+	}
+	else if (nDiffX < -0.01)
+	{
+
+	}
+
+	this.LogicDocument.Recalculate();
 };
 /**
  * Получаем минимальную ширину таблицы
@@ -12484,6 +12592,59 @@ CTable.prototype.GetMinHeight = function()
 	}
 
 	return nSumMin;
+};
+/**
+ * Получаем минимальную высоту для заданной строки таблицы
+ * @param nCurRow
+ * @returns {number}
+ */
+CTable.prototype.GetMinRowHeight = function(nCurRow)
+{
+	var nSumMin = 0;
+	var oRow    = this.Content[nCurRow];
+
+	var nMaxTopMargin    = 0,
+		nMaxBottomMargin = 0,
+		nMaxTopBorder    = 0;
+
+	for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell        = oRow.GetCell(nCurCell);
+		var oCellMargins = oCell.GetMargins();
+		var oCellTBorder = oCell.GetBorder(0);
+		var oCellBBorder = oCell.GetBorder(2);
+
+		if (border_None !== oCellTBorder.Value && nMaxTopBorder < oCellTBorder.Size)
+			nMaxTopBorder = oCellTBorder.Size;
+
+		if (nMaxTopMargin < oCellMargins.Top.W)
+			nMaxTopMargin = oCellMargins.Top.W;
+
+		if (nMaxBottomMargin < oCellMargins.Bottom.W)
+			nMaxBottomMargin = oCellMargins.Bottom.W;
+	}
+
+	nSumMin += 4.5; // Стандартная минимальная высота строки в таблице без учета границ и отступов
+
+	nSumMin += Math.max(nMaxTopBorder, nMaxTopMargin);
+	nSumMin += nMaxBottomMargin;
+
+	return nSumMin;
+};
+/**
+ * Получаем суммарную высоту таблицы, с учетом ее разбиения на нескольких страницах
+ * @returns {number}
+ */
+CTable.prototype.GetSummaryHeight = function()
+{
+	var nSum = 0;
+	for (var nCurPage = 0, nPagesCount = this.Pages.length; nCurPage < nPagesCount; ++nCurPage)
+	{
+		var oBounds = this.GetPageBounds(nCurPage);
+		nSum += oBounds.Bottom - oBounds.Top;
+	}
+
+	return nSum;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
