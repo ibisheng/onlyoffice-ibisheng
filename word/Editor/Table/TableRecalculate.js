@@ -295,6 +295,8 @@ CTable.prototype.private_RecalculateGrid = function()
 				SumGrid[nTempIndex] += nTempDiff;
 		}
 
+		var nCellSpacing = Row.GetCellSpacing();
+
 		var CellsCount = Row.Get_CellsCount();
 		for (var CellIndex = 0; CellIndex < CellsCount; CellIndex++)
 		{
@@ -316,6 +318,17 @@ CTable.prototype.private_RecalculateGrid = function()
 					CellWidth = PctWidth * CellW.W / 100;
 				else
 					CellWidth = CellW.W;
+
+				if (null !== nCellSpacing)
+				{
+					if (0 === CellIndex)
+						CellWidth += nCellSpacing / 2;
+
+					CellWidth += nCellSpacing;
+
+					if (CellsCount - 1 === CellIndex)
+						CellWidth += nCellSpacing / 2;
+				}
 
 				if (CellWidth + SumGrid[CurGridCol - 1] > SumGrid[CurGridCol + GridSpan - 1])
 				{
