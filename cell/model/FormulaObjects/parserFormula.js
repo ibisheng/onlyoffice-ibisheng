@@ -500,17 +500,21 @@ Date.prototype.getDateFromExcel = function ( val ) {
 
     val = Math.floor( val );
 
-  if (AscCommon.bDate1904) {
-        return new Date( val * c_msPerDay + this.getExcelNullDate() );
-  } else {
-        if ( val < 60 ) {
-            return new Date( val * c_msPerDay + this.getExcelNullDate() );
-    } else if (val === 60) {
-            return new Date( Date.UTC( 1900, 1, 29 ) );
-    } else {
-            return new Date( val * c_msPerDay + this.getExcelNullDate() );
-        }
-    }
+  return this.getDateFromExcelWithTime(val);
+};
+
+Date.prototype.getDateFromExcelWithTime = function ( val ) {
+	if (AscCommon.bDate1904) {
+		return new Date( val * c_msPerDay + this.getExcelNullDate() );
+	} else {
+		if ( val < 60 ) {
+			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+		} else if (val === 60) {
+			return new Date( Date.UTC( 1900, 1, 29 ) );
+		} else {
+			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+		}
+	}
 };
 
 Date.prototype.addYears = function ( counts ) {

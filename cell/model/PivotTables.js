@@ -3738,7 +3738,7 @@ CT_DateTime.prototype.toXml = function(writer, name) {
 CT_DateTime.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
 	if (null !== val) {
-		writer.WriteXmlAttributeStringEncode("v", Date.prototype.getDateFromExcel(val).toISOString().slice(0, 19));
+		writer.WriteXmlAttributeStringEncode("v", Date.prototype.getDateFromExcelWithTime(val).toISOString().slice(0, 19));
 	}
 	if (obj) {
 		if (null !== obj.u) {
@@ -4120,6 +4120,8 @@ function CT_Number() {
 //Members
 	this.tpls = [];
 	this.x = [];
+//internal
+	this.realNumber = null;
 }
 CT_Number.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -10364,6 +10366,7 @@ var c_oAscPivotRecType = {
 	String: 6,
 	Index: 7
 };
+var c_nNumberMissingValue =  2147483647;//Math.pow(2, 31) - 1
 
 function PivotRecordValue() {
 	this.clean();
@@ -10546,9 +10549,12 @@ PivotRecords.prototype.addNumber = function(val, addition) {
 	this._add(c_oAscPivotRecType.Number, val, addition);
 };
 PivotRecords.prototype.addString = function(val, addition) {
+	//todo don't use global editor
+	val = window["Asc"]["editor"].wbModel.sharedStrings.addText(val);
 	this._add(c_oAscPivotRecType.String, val, addition);
 };
 PivotRecords.prototype.addIndex = function(val) {
+	val++;//0 is missing value
 	this._add(c_oAscPivotRecType.Index, val);
 };
 PivotRecords.prototype.get = function(index) {
@@ -10557,16 +10563,11 @@ PivotRecords.prototype.get = function(index) {
 		var chunk = this.chunks[i];
 		if (chunk.from <= index && index < chunk.to) {
 			this.output.type = chunk.type;
+			this.output.addition = this.addition[index];
 			if (chunk.data) {
 				this.output.val = chunk.data[index - chunk.from];
-				if (chunk.type === c_oAscPivotRecType.String) {
-					//todo don't use global editor
-					this.output.val = window["Asc"]["editor"].wbModel.sharedStrings.get(this.output.val);
-				} else if (chunk.type === c_oAscPivotRecType.Boolean) {
-					this.output.val = !!this.output.val;
-				}
+				this._replaceMissingInOutput(chunk.type, this.output);
 			}
-			this.output.addition = this.addition[index];
 			break;
 		}
 	}
@@ -10576,25 +10577,59 @@ PivotRecords.prototype._add = function(type, val, addition) {
 	var index = this.size;
 	var prevChunk = this.chunks.length > 0 ? this.chunks[this.chunks.length - 1] : null;
 	var chunk;
-	if (prevChunk && (prevChunk.type === type)) {
+	var chunkIndex;
+	if (prevChunk && (prevChunk.type === type || c_oAscPivotRecType.Missing === type)) {
 		chunk = prevChunk;
+		if (c_oAscPivotRecType.Missing === type) {
+			val = this._getMissingFakeVal(chunk.type);
+		} else if (c_oAscPivotRecType.Number === type && c_nNumberMissingValue === val) {
+			//because there are much more Missing values than c_nNumberMissingValue.
+			if(!addition){
+				addition = new CT_Number();
+			}
+			addition.realNumber = true;
+		}
 	} else {
-		//todo shrink prevChunk
-		var from = prevChunk ? prevChunk.to : 0;
-		chunk = {type: type, data: null, capacity: 0, from: from, to: from + 1};
-		this.chunks.push(chunk);
+		if (prevChunk && prevChunk.type === c_oAscPivotRecType.Missing) {
+			//convert Missing chunk
+			chunk = prevChunk;
+			chunk.type = type;
+			chunkIndex = index - chunk.from;
+			this._checkChunkSize(chunk, chunkIndex);
+			var missingVal = this._getMissingFakeVal(chunk.type);
+			chunk.data.fill(missingVal, 0, chunkIndex);
+		} else {
+			//todo shrink prevChunk
+			var from = prevChunk ? prevChunk.to : 0;
+			chunk = {type: type, data: null, capacity: 0, from: from, to: from + 1};
+			this.chunks.push(chunk);
+		}
 	}
-	var chunkIndex = index - chunk.from;
-	if (c_oAscPivotRecType.Missing !== chunk.type && chunkIndex >= chunk.capacity) {
+	chunkIndex = index - chunk.from;
+	if (c_oAscPivotRecType.Missing !== chunk.type) {
+		this._checkChunkSize(chunk, chunkIndex);
+	}
+	if (chunk.data) {
+		chunk.data[chunkIndex] = val;
+	}
+	if (addition) {
+		this.addition[index] = addition;
+	}
+	this.size++;
+	chunk.to = this.size;
+};
+PivotRecords.prototype._checkChunkSize = function(chunk, chunkIndex) {
+	if (chunkIndex >= chunk.capacity) {
 		var oldData = chunk.data;
 		var chunkStartCount = (0 === this.size && this.startCount) ? this.startCount - chunk.from : 0;
-		chunk.capacity = Math.min(Math.max((1.1 * chunk.capacity) >> 0, chunkIndex + 1, chunkStartCount), AscCommon.gc_nMaxRow0 + 1);
-		switch (type) {
+		var maxSize = Math.max((1.1 * chunk.capacity) >> 0, chunkIndex + 1, chunkStartCount);
+		chunk.capacity = Math.min(maxSize, AscCommon.gc_nMaxRow0 + 1);
+		switch (chunk.type) {
 			case c_oAscPivotRecType.Boolean:
 				chunk.data = new Uint8Array(chunk.capacity);
 				break;
 			case c_oAscPivotRecType.DateTime:
-				chunk.data = new Uint32Array(chunk.capacity);
+				chunk.data = new Float64Array(chunk.capacity);
 				break;
 			case c_oAscPivotRecType.Error:
 				chunk.data = new Uint8Array(chunk.capacity);
@@ -10606,8 +10641,6 @@ PivotRecords.prototype._add = function(type, val, addition) {
 				break;
 			case c_oAscPivotRecType.String:
 				chunk.data = new Uint32Array(chunk.capacity);
-				//todo don't use global editor
-				val = window["Asc"]["editor"].wbModel.sharedStrings.addText(val);
 				break;
 			case c_oAscPivotRecType.Index:
 				chunk.data = new Uint32Array(chunk.capacity);
@@ -10617,14 +10650,71 @@ PivotRecords.prototype._add = function(type, val, addition) {
 			chunk.data.set(oldData);
 		}
 	}
-	if (chunk.data) {
-		chunk.data[chunkIndex] = val;
+};
+PivotRecords.prototype._getMissingFakeVal = function(type) {
+	var res;
+	switch (type) {
+		case c_oAscPivotRecType.Boolean:
+			res = 255;
+			break;
+		case c_oAscPivotRecType.DateTime:
+			res = -1;
+			break;
+		case c_oAscPivotRecType.Error:
+			res = 255;
+			break;
+		case c_oAscPivotRecType.Number:
+			res = c_nNumberMissingValue;
+			break;
+		case c_oAscPivotRecType.String:
+			res = 0;
+			break;
+		case c_oAscPivotRecType.Index:
+			res = 0;
+			break;
 	}
-	if (addition) {
-		this.addition[index] = addition;
+	return res;
+};
+PivotRecords.prototype._replaceMissingInOutput = function(type, output) {
+	switch (type) {
+		case c_oAscPivotRecType.Boolean:
+			if (255 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				output.val = !!output.val;
+			}
+			break;
+		case c_oAscPivotRecType.DateTime:
+			if (-1 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.Error:
+			if (255 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.Number:
+			if (c_nNumberMissingValue === output.val && !(output.addition && output.addition.realNumber)) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.String:
+			if (0 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				//todo don't use global editor
+				output.val = window["Asc"]["editor"].wbModel.sharedStrings.get(output.val);
+			}
+			break;
+		case c_oAscPivotRecType.Index:
+			if (0 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				--output.val;
+			}
+			break;
 	}
-	this.size++;
-	chunk.to = this.size;
 };
 PivotRecords.prototype._toXml = function(writer, elem) {
 	switch (elem.type) {
