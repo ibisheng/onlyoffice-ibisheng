@@ -5522,7 +5522,8 @@ DrawingObjectsController.prototype =
 
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].track(dx, dy, this.arrTrackObjects[i].originalObject.selectStartPage);
-        move_state.onMouseUp({}, 0, 0, 0);
+        var nPageIndex  = (this.arrTrackObjects[0] && this.arrTrackObjects[0].originalObject && AscFormat.isRealNumber(this.arrTrackObjects[0].originalObject.selectStartPage)) ? this.arrTrackObjects[0].originalObject.selectStartPage : 0;
+        move_state.onMouseUp({}, 0, 0, nPageIndex);
     },
 
     cursorMoveToStartPos: function()
