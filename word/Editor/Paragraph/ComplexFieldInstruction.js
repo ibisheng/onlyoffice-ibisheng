@@ -316,6 +316,18 @@ CFieldInstructionREF.prototype.GetBookmarkName = function()
 };
 
 /**
+ * NUMPAGES field
+ * @constructor
+ */
+function CFieldInstructionNUMPAGES()
+{
+	CFieldInstructionBase.call(this);
+}
+CFieldInstructionNUMPAGES.prototype = Object.create(CFieldInstructionBase.prototype);
+CFieldInstructionNUMPAGES.prototype.constructor = CFieldInstructionNUMPAGES;
+CFieldInstructionNUMPAGES.prototype.Type = fieldtype_NUMPAGES;
+
+/**
  * HYPERLINK field
  * @constructor
  */
