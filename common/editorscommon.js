@@ -2116,7 +2116,7 @@
 			// Имя листа в ссылке
 			var sheetName = is3DRefResult[1];
 			// Ищем начало range
-			var indexStartRange = formula.indexOf("!") + 1;
+			var indexStartRange = null !== this.pCurrPos ? this.pCurrPos : formula.indexOf("!") + 1;
 			if (this.isArea(formula, indexStartRange) || this.isRef(formula, indexStartRange))
 			{
 				if (this.operand_str.length == formula.substring(indexStartRange).length)
