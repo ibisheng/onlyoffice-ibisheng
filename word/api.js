@@ -1510,6 +1510,42 @@ background-repeat: no-repeat;\
 			};
 			this.SpellCheckApi.disconnect = function () {
 			};
+			if (window["AscDesktopEditor"]["IsLocalFile"] && !window["AscDesktopEditor"]["IsLocalFile"]())
+			{
+				this.sendEvent('asc_onSpellCheckInit', [
+					"1027",
+					"1029",
+					"1030",
+					"1031",
+					"1032",
+					"1033",
+					"1036",
+					"1038",
+					"1040",
+					"1042",
+					"1043",
+					"1044",
+					"1045",
+					"1046",
+					"1048",
+					"1049",
+					"1051",
+					"1053",
+					"1055",
+					"1058",
+					"1062",
+					"1063",
+					"1066",
+					"1068",
+					"2055",
+					"2057",
+					"2068",
+					"2070",
+					"3079",
+					"3081",
+					"3082"
+				]);
+			}
 		} else {
 			if (this.SpellCheckUrl && this.isSpellCheckEnable) {
 				this.SpellCheckApi.set_url(this.SpellCheckUrl);
