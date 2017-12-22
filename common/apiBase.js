@@ -219,6 +219,8 @@
 				' userAgent: ' + (navigator.userAgent || navigator.vendor || window.opera) + ' platform: ' +
 				navigator.platform + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
 			t.CoAuthoringApi.sendChangesError(msg);
+			//send only first error to reduce number of requests. also following error may be consequences of first
+			window.onerror = oldOnError;
 			if (oldOnError) {
 				return oldOnError.apply(this, arguments);
 			} else {
