@@ -566,7 +566,8 @@
 				//при выделенных столбцах ищем последнюю непустую ячейку
 				//ограничиваемся последней пустой строкой/столбцом
 				var type = selectionRange.getType();
-				if (type === Asc.c_oAscSelectionType.RangeCol || type === Asc.c_oAscSelectionType.RangeRow) {
+				var oType = Asc.c_oAscSelectionType;
+				if (type === oType.RangeCol || type === oType.RangeRow || type === oType.RangeMax) {
 					if (!range3) {
 						range3 = worksheet.model.getRange3(selectionRange.r1, selectionRange.c1, selectionRange.r2,
 							selectionRange.c2);
