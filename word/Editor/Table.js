@@ -4668,7 +4668,6 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 
 							if (BeforeSpace2 < 0)
 							{
-								this.Set_TableW(tblwidth_Auto, 0);
 								Page.X += BeforeSpace2;
 
 								if (true === this.Is_Inline())
@@ -4683,16 +4682,12 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 						{
 							BeforeSpace = Page.X - _X;
 							Page.X -= BeforeSpace;
-							this.Set_TableW(tblwidth_Auto, 0);
 
 							if (true === this.Is_Inline())
 								NewTableInd = NewTableInd - BeforeSpace;
 							else
 								this.Internal_UpdateFlowPosition(Page.X, Page.Y);
 						}
-
-						if (Index === this.Markup.Cols.length)
-							this.Set_TableW(tblwidth_Auto, 0);
 
 						for (CurRow = 0; CurRow < this.Content.length; CurRow++)
 						{
@@ -4808,8 +4803,6 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 							else
 								Page.X += Dx;
 
-							this.Set_TableW(tblwidth_Auto, 0);
-
 							if (true === this.Is_Inline())
 							{
 								if (-BeforeSpace2 > this.TableSumGrid[0])
@@ -4820,9 +4813,6 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 							else
 								this.Internal_UpdateFlowPosition(Page.X, Page.Y);
 						}
-
-						if (Index === this.Markup.Cols.length)
-							this.Set_TableW(tblwidth_Auto, 0);
 
 						var BeforeSpace = null;
 						if (0 === Index && 0 != Col && _X < Page.X)
@@ -4899,10 +4889,32 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 					if (Math.abs(NewTableInd - OldTableInd) > 0.001)
 						this.Set_TableInd(NewTableInd);
 
-					if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+					var oTablePr = this.Get_CompiledPr(false).TablePr;
+					if (tbllayout_AutoFit === oTablePr.TableLayout)
 						this.Set_TableLayout(tbllayout_Fixed);
 
 					this.Internal_CreateNewGrid(Rows_info);
+
+					if (undefined !== oTablePr.TableW && tblwidth_Auto !== oTablePr.TableW.Type)
+					{
+						var nTableW = 0;
+						for (var nCurCol = 0, nColsCount = this.TableGrid.length; nCurCol < nColsCount; ++nCurCol)
+							nTableW += this.TableGrid[nCurCol];
+
+						if (tblwidth_Pct === oTablePr.TableW.Type)
+						{
+							var nPctWidth = this.private_RecalculatePercentWidth();
+							if (nPctWidth < 0.01)
+								this.Set_TableW(tblwidth_Auto, 0);
+							else
+								this.Set_TableW(tblwidth_Pct, nTableW / nPctWidth * 100);
+						}
+						else
+						{
+							this.Set_TableW(tblwidth_Mm, nTableW);
+						}
+					}
+
 					this.private_RecalculateGrid();
 				}
 				else
