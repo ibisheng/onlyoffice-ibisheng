@@ -3682,7 +3682,121 @@
 				else
 					return ar;
 			},
-			
+
+			getExpandRange: function(activeRange){
+				var ws = this.worksheet;
+				var t = this;
+				var lockLeft, lockRight, lockUp, lockDown;
+
+				var range = activeRange.clone();
+
+				var checkEmptyCell = function(row, col){
+					var cell = ws.getCell3(row, col);
+					if(cell.getValueWithoutFormat() !== ''){
+						return false;
+					}
+					return true;
+				};
+
+				var checkLeft = function(){
+					var col = range.c1 - 1;
+					if(col < 0 || lockLeft){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(col, range.r1, col, range.r2))){
+						lockLeft = true;
+						return null;
+					}
+
+					for (var n = range.r1; n <= range.r2; n++) {
+						if(!checkEmptyCell(n, col)){
+							return true;
+						}
+					}
+				};
+
+				var checkRight = function(){
+					var col = range.c2 + 1;
+					if(lockRight){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(col, range.r1, col, range.r2))){
+						lockRight = true;
+						return null;
+					}
+
+					for (var n = range.r1; n <= range.r2; n++) {
+						if(!checkEmptyCell(n, col)){
+							return true;
+						}
+					}
+				};
+
+				var checkUp = function(){
+					var row = range.r1 - 1;
+					if(lockUp){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(range.c1, row, range.c2, row))){
+						lockUp = true;
+						return null;
+					}
+
+					for (var n = range.c1; n <= range.c2; n++) {
+						if(!checkEmptyCell(row, n)){
+							return true;
+						}
+					}
+				};
+
+				var checkDown = function(){
+					var row = range.r2 + 1;
+					if(lockDown){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(range.c1, row, range.c2, row))){
+						lockDown = true;
+						return null;
+					}
+
+					for (var n = range.c1; n <= range.c2; n++) {
+						if(!checkEmptyCell(row, n)){
+							return true;
+						}
+					}
+				};
+
+				var isInput;
+				while(true){
+					isInput = false;
+					if(checkLeft()){
+						range.c1--;
+						isInput = true;
+					}
+					if(checkRight()){
+						range.c2++;
+						isInput = true;
+					}
+					if(checkUp()){
+						range.r1--;
+						isInput = true;
+					}
+					if(checkDown()){
+						range.r2++;
+						isInput = true;
+					}
+					if(false === isInput){
+						break;
+					}
+				}
+
+				return range;
+			},
+
 			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, offset)
 			{
 				var worksheet = this.worksheet;
