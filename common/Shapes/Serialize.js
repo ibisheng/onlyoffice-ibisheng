@@ -9710,6 +9710,79 @@ function CPres()
                         break;
                 }
             }
+
+
+
+
+            var oleType = null;
+            while (s.cur < _end_rec)
+            {
+                var _at = s.GetUChar();
+                switch (_at)
+                {
+                    case 1:
+                    {
+                        s.GetLong();//length
+                        oleType = s.GetUChar();
+                        break;
+                    }
+                    case 2:
+                    {
+
+                        switch(oleType)
+                        {
+                            case 4:
+                            {
+                                s.GetLong();//length
+
+                                var type2 = s.GetUChar();
+                                if (c_oSerParType.OMath === type2 && ole.parent && ole.parent.Parent)
+                                {
+                                    var length2 = s.GetLong();
+                                    var _stream = new AscCommon.FT_Stream2();
+                                    _stream.data = s.data;
+                                    _stream.pos = s.pos;
+                                    _stream.cur = s.cur;
+                                    _stream.size = s.size;
+                                    var boMathr = new Binary_oMathReader(_stream, this.DocReadResult, null);
+                                    var oMathPara = new ParaMath();
+                                    ole.parent.ParaMath = oMathPara;
+                                    var par = ole.parent.Parent;
+                                    var oParStruct = new OpenParStruct(par, par);
+                                    oParStruct.cur.pos = par.Content.length - 1;
+                                    if (!this.DocReadResult) {
+                                        this.DocReadResult = new AscCommonWord.DocReadResult(null);
+                                    }
+                                    boMathr.bcr.Read1(length2, function(t, l){
+                                        return boMathr.ReadMathArg(t,l,oMathPara.Root,oParStruct);
+                                    });
+                                    oMathPara.Root.Correct_Content(true);
+                                }
+                                else
+                                {
+                                    s.SkipRecord();
+                                }
+                                break;
+                            }
+                            default:
+                            {
+                                s.SkipRecord();
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        s.SkipRecord();
+                        break;
+                    }
+                }
+            }
+
+
+
+
 			if (dxaOrig > 0 && dyaOrig > 0) {
 				var ratio = 4 / 3 / 20;//twips to px
 				ole.setPixSizes(ratio * dxaOrig, ratio * dyaOrig);
