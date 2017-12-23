@@ -3080,6 +3080,7 @@ CAnchorPosition.prototype.Update_PositionYHeaderFooter = function(TopMarginY, Bo
 	var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
 	var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
 
+	this.Margin_V      = TopY;
 	this.Top_Margin    = TopY;
 	this.Bottom_Margin = this.Page_H - BottomY;
 };

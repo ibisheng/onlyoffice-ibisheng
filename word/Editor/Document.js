@@ -9750,7 +9750,9 @@ CDocument.prototype.Get_SectionPageNumInfo2 = function(Page_abs)
 		Page_abs = FP;
 
 	var _FP = PageNumStart;
-	var _CP = PageNumStart + (Page_abs + 1) - FP; // + 1 потому что FP начинает считать от 1, а Page_abs от 0
+	var _CP = PageNumStart + Page_abs - FP;	// TODO: Здесь есть баг с рассчетом (чтобы его поправить добавил следующий комментарий,
+											// но такой рассчет оказался неверным)
+											// + 1 потому что FP начинает считать от 1, а Page_abs от 0
 
 	return {FirstPage : _FP, CurPage : _CP, SectIndex : StartSectIndex};
 };
