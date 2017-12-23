@@ -209,8 +209,8 @@ window["asc_nativeOnSpellCheck"] = function(response)
 window["UpdateInstallPlugins"] = function()
 {
 	var _pluginsTmp = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_pluginsTmp[0]["url"] = _pluginsTmp[0]["url"].replace(" ", "%20");
-	_pluginsTmp[1]["url"] = _pluginsTmp[1]["url"].replace(" ", "%20");
+	_pluginsTmp[0]["url"] = _pluginsTmp[0]["url"].split(" ").join("%20");
+	_pluginsTmp[1]["url"] = _pluginsTmp[1]["url"].split(" ").join("%20");
 
 	var _plugins = { "url" : _pluginsTmp[0]["url"], "pluginsData" : [] };
 	for (var k = 0; k < 2; k++)
