@@ -11306,6 +11306,14 @@ CTable.prototype.private_UpdateTableRulerOnBorderMove = function(Pos)
 	return Pos;
 };
 /**
+ * Получаем массив позиций ячеек, попавших в выделение
+ * @returns {{Cell : number, Row : number}[]}
+ */
+CTable.prototype.GetSelectionArray = function()
+{
+	return this.Internal_Get_SelectionArray();
+};
+/**
  * Считаем количество соединенных вертикально ячеек на заданной странице
  */
 CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, StartGridCol, GridSpan)

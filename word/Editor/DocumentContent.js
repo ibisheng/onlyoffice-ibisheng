@@ -465,6 +465,13 @@ CDocumentContent.prototype.IsTableCellContent = function(isReturnCell)
 {
 	return this.Parent.IsCell(isReturnCell);
 };
+CDocumentContent.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	if (!this.Parent.IsCell())
+		return false;
+
+	return this.Parent.IsLastTableCellInRow(isSelection);
+};
 CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
 	if (false === this.Parent.IsCell())

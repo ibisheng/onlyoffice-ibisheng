@@ -1906,6 +1906,34 @@ CTableCell.prototype.GetBorder = function(nType)
 {
 	return this.Get_Border(nType);
 };
+/**
+ * Проверяем, является ли данная ячейка последней в строке
+ * @returns {boolean}
+ */
+CTableCell.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	if (true !== isSelection)
+		return !!(this.Row && this.Row.GetCellsCount() - 1 === this.Index);
+
+	if (!this.Row || !this.Row.Table)
+		return false;
+
+	var nCurCell = this.Index;
+	var nCurRow  = this.Row.Index;
+
+	var oTable = this.Row.Table;
+	var arrSelectionArray = oTable.GetSelectionArray();
+	for (var nIndex = 0, nCount = arrSelectionArray.length; nIndex < nCount; ++nIndex)
+	{
+		var nRow  = arrSelectionArray[nIndex].Row;
+		var nCell = arrSelectionArray[nIndex].Cell;
+
+		if (nRow === nCurRow && nCell > nCurCell)
+			return false;
+	}
+
+	return true;
+};
 
 function CTableCellRecalculateObject()
 {
