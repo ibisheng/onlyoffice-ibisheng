@@ -4590,7 +4590,7 @@ PasteProcessor.prototype =
 		{
 			oThis.aContent = [];
 
-			oThis._getContentFromText(text);
+			oThis._getContentFromText(text, true);
 
 			oThis._AddNextPrevToContent(oThis.oDocument);
 			if(false === oThis.bNested)
@@ -4665,10 +4665,41 @@ PasteProcessor.prototype =
 		}
 	},
 
-	_getContentFromText: function(text){
+	_getContentFromText: function(text, getStyleCurSelection){
+		var t = this;
 		var Count = text.length;
 
-		var newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
+		var pasteIntoParaRunPr = this.oDocument.GetDirectTextPr();
+
+		var getNewParagraph = function(){
+			var paragraph = new Paragraph(t.oDocument.DrawingDocument, t.oDocument);
+			if(getStyleCurSelection){
+				if(pasteIntoParagraphPr)
+				{
+					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
+
+					if(paragraph.TextPr && pasteIntoParaRunPr)
+					{
+						paragraph.TextPr.Value = pasteIntoParaRunPr.Copy();
+					}
+				}
+			}
+			return paragraph;
+		};
+
+		var getNewParaRun = function(){
+			var paraRun = new ParaRun();
+			if(getStyleCurSelection){
+				if(pasteIntoParaRunPr && paraRun.Set_Pr)
+				{
+					paraRun.Set_Pr( pasteIntoParaRunPr.Copy() );
+				}
+			}
+			return paraRun;
+		};
+
+		var newParagraph = getNewParagraph();
 		var insertText = "";
 		for (var Index = 0; Index < Count; Index++) {
 			var _char = text.charAt(Index);
@@ -4677,13 +4708,14 @@ PasteProcessor.prototype =
 				if(Index === Count - 1 && 0x0A !== _charCode){
 					insertText += _char;
 				}
-				var newParaRun = new ParaRun();
+				
+				var newParaRun = getNewParaRun();
 				addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 				this.aContent.push(newParagraph);
 
 				insertText = "";
-				newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+				newParagraph = getNewParagraph();
 			} else if(13 === _charCode){
 				continue;
 			} else {
