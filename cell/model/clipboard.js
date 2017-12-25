@@ -4443,8 +4443,13 @@
 						sFontName = Value.RFonts.EastAsia.Name;
 					else if (null != Value.RFonts.CS)
 						sFontName = Value.RFonts.CS.Name;
-					if (null != sFontName)
-						aProp.push("font-family:" + "'" + CopyPasteCorrectString(sFontName) + "'");
+					if (null != sFontName){
+                        var oTheme = window["Asc"] && window["Asc"]["editor"] && window["Asc"]["editor"].wbModel && window["Asc"]["editor"].wbModel.theme;
+                        if(oTheme && oTheme.themeElements && oTheme.themeElements.fontScheme){
+                            sFontName = oTheme.themeElements.fontScheme.checkFont(sFontName)
+                        }
+                        aProp.push("font-family:" + "'" + CopyPasteCorrectString(sFontName) + "'");
+                    }
 				}
 				if (null != Value.FontSize) {
 					//if (!this.api.DocumentReaderMode)

@@ -365,8 +365,14 @@ CopyProcessor.prototype =
                 sFontName = Value.RFonts.EastAsia.Name;
             else if (null != Value.RFonts.CS)
                 sFontName = Value.RFonts.CS.Name;
-            if (null != sFontName)
+            if (null != sFontName){
+                var oTheme = this.oDocument && this.oDocument.Get_Theme && this.oDocument.Get_Theme();
+                if(oTheme && oTheme.themeElements && oTheme.themeElements.fontScheme){
+                    sFontName = oTheme.themeElements.fontScheme.checkFont(sFontName)
+                }
                 aProp.push("font-family:" + "'" + CopyPasteCorrectString(sFontName) + "'");
+            }
+
         }
         if (null != Value.FontSize) {
             if (!this.api.DocumentReaderMode)
