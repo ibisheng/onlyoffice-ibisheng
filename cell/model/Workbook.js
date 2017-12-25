@@ -320,12 +320,12 @@
 		this.tempGetByCells = [];
 		//set dirty
 		this.isInCalc = false;
-		this.changedCell = null;
-		this.changedCellRepeated = null;
+		this.changedRange = null;
+		this.changedRangeRepeated = null;
 		this.changedDefName = null;
 		this.changedDefNameRepeated = null;
 		this.changedShared = {};
-		this.dirtyCells = {};//===changedCell
+		this.calculatedCells = null;
 		this.buildCell = {};
 		this.buildDefName = {};
 		this.cleanCellCache = {};
@@ -822,32 +822,32 @@
 			this.calcTree();
 		},
 		//set dirty
-		addToChangedCell: function(cell) {
-			this.addToChangedPosition(cell.ws.getId(), cell.nRow, cell.nCol);
-		},
-		addToChangedPosition: function(sheetId, row, col) {
-			if (!this.changedCell) {
-				this.changedCell = {};
+		addToChangedRange2: function(sheetId, bbox) {
+			if (!this.changedRange) {
+				this.changedRange = {};
 			}
-			var changedSheet = this.changedCell[sheetId];
+			var changedSheet = this.changedRange[sheetId];
 			if (!changedSheet) {
 				//{}, а не [], потому что при сборке может придти сразу много одинаковых ячеек
 				changedSheet = {};
-				this.changedCell[sheetId] = changedSheet;
+				this.changedRange[sheetId] = changedSheet;
 			}
-			var cellIndex = getCellIndex(row, col);
-			if (this.isInCalc && !changedSheet[cellIndex]) {
-				if (!this.changedCellRepeated) {
-					this.changedCellRepeated = {};
+			var name = bbox.getName();
+			if (this.isInCalc && !changedSheet[name]) {
+				if (!this.changedRangeRepeated) {
+					this.changedRangeRepeated = {};
 				}
-				var changedSheetRepeated = this.changedCellRepeated[sheetId];
+				var changedSheetRepeated = this.changedRangeRepeated[sheetId];
 				if (!changedSheetRepeated) {
 					changedSheetRepeated = {};
-					this.changedCellRepeated[sheetId] = changedSheetRepeated;
+					this.changedRangeRepeated[sheetId] = changedSheetRepeated;
 				}
-				changedSheetRepeated[cellIndex] = 1;
+				changedSheetRepeated[name] = bbox;
 			}
-			changedSheet[cellIndex] = 1;
+			changedSheet[name] = bbox;
+		},
+		addToChangedCell: function(cell) {
+			this.addToChangedRange2(cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow));
 		},
 		addToChangedDefName: function(defName) {
 			if (!this.changedDefName) {
@@ -964,11 +964,11 @@
 			this.buildDependency();
 			this.addToChangedHiddenRows();
 			//broadscast Volatile only if something changed
-			if (this.changedCell || this.changedDefName) {
+			if (this.changedRange || this.changedDefName) {
 				this._broadscastVolatile(notifyData);
 			}
 			this._broadcastCellsStart();
-			while (this.changedCellRepeated || this.changedDefNameRepeated) {
+			while (this.changedRangeRepeated || this.changedDefNameRepeated) {
 				this._broadcastDefNames(notifyData);
 				this._broadcastCells(notifyData);
 			}
@@ -1154,34 +1154,29 @@
 			}
 		},
 		_broadcastCells: function(notifyData) {
-			if (this.changedCellRepeated) {
-				var changedCell = this.changedCellRepeated;
-				this.changedCellRepeated = null;
-				for (var sheetId in changedCell) {
-					var changedSheet = changedCell[sheetId];
+			if (this.changedRangeRepeated) {
+				var changedRange = this.changedRangeRepeated;
+				this.changedRangeRepeated = null;
+				for (var sheetId in changedRange) {
+					var changedSheet = changedRange[sheetId];
 					var sheetContainer = this.sheetListeners[sheetId];
 					var ws = this.wb.getWorksheetById(sheetId);
 					if (sheetContainer || ws) {
-						for (var cellIndex in changedSheet) {
-							if (sheetContainer) {
-								var cellMapElem = sheetContainer.cellMap[cellIndex];
-								if (cellMapElem) {
-									for (var listenerId in cellMapElem.listeners) {
-										cellMapElem.listeners[listenerId].notify(notifyData);
+						if (sheetContainer) {
+							for (var rangeRef in changedSheet) {
+								var range = changedSheet[rangeRef];
+								for (var cellIndex in sheetContainer.cellMap) {
+									getFromCellIndex(cellIndex);
+									if (range.contains(g_FCI.col, g_FCI.row)) {
+										var cellMapElem = sheetContainer.cellMap[cellIndex];
+										if (cellMapElem) {
+											for (var listenerId in cellMapElem.listeners) {
+												cellMapElem.listeners[listenerId].notify(notifyData);
+											}
+										}
 									}
 								}
 							}
-							if (ws) {
-								getFromCellIndex(cellIndex);
-								var dirtyCellsSheet = this.dirtyCells[sheetId];
-								if (!dirtyCellsSheet) {
-									dirtyCellsSheet = {};
-									this.dirtyCells[sheetId] = dirtyCellsSheet;
-								}
-								dirtyCellsSheet[cellIndex] = 1;
-							}
-						}
-						if (sheetContainer) {
 							var areas = sheetContainer.areaTree.getByCells(changedSheet);
 							this.tempGetByCells.push({areaTree: sheetContainer.areaTree, areas: areas});
 							for (var i = 0; i < areas.length; ++i) {
@@ -1199,12 +1194,11 @@
 		},
 		_broadcastCellsStart: function() {
 			this.isInCalc = true;
-			this.changedCellRepeated = this.changedCell;
+			this.changedRangeRepeated = this.changedRange;
 			this.changedDefNameRepeated = this.changedDefName;
 		},
 		_broadcastCellsEnd: function() {
 			this.isInCalc = false;
-			this.changedCell = null;
 			this.changedDefName = null;
 			for (var i = 0; i < this.tempGetByCells.length; ++i) {
 				var temp = this.tempGetByCells[i];
@@ -1214,46 +1208,44 @@
 		},
 		_calculateDirty: function() {
 			var t = this;
-			for (var sheetId in this.dirtyCells) {
-				if (this.dirtyCells.hasOwnProperty(sheetId)) {
-					var dirtyCellsSheet = this.dirtyCells[sheetId];
+			this.calculatedCells = {};
+			for (var sheetId in this.changedRange) {
+				if (this.changedRange.hasOwnProperty(sheetId)) {
+					var changedSheet = this.changedRange[sheetId];
 					var ws = this.wb.getWorksheetById(sheetId);
-					if (dirtyCellsSheet && ws) {
-						for (var cellIndex in dirtyCellsSheet) {
-							if (dirtyCellsSheet.hasOwnProperty(cellIndex)) {
-								if(0 !== dirtyCellsSheet[cellIndex]){
-									getFromCellIndex(cellIndex - 0);
-									ws._getCell(g_FCI.row, g_FCI.col, function(cell) {
-										if (cell && cell.isFormula()) {
-											t._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell);
-										}
-									});
-								}
+					if (changedSheet && ws) {
+						for (var name in changedSheet) {
+							if (changedSheet.hasOwnProperty(name)) {
+								var bbox = changedSheet[name];
+								ws.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2)._foreachNoEmpty(function(cell) {
+									if (cell && cell.isFormula()) {
+										t._calculateDirtyFormula(cell);
+									}
+								});
 							}
 						}
 					}
 				}
 			}
-			this.dirtyCells = {};
+			this.calculatedCells = null;
+			this.changedRange = null;
 		},
 		_calculateDirtyCell: function(cell) {
-			if (cell.isFormula()) {
-				var dirtyCellsSheet = this.dirtyCells[cell.ws.getId()];
-				if (dirtyCellsSheet) {
-					var cellIndex = getCellIndex(cell.nRow, cell.nCol);
-					this._calculateDirtyFormula(dirtyCellsSheet, cellIndex, cell);
-				}
+			if (cell.isFormula() && this.calculatedCells) {
+				this._calculateDirtyFormula(cell);
 			}
 		},
-		_calculateDirtyFormula: function(dirtyCellsSheet, cellIndex, cell) {
-			var dirtyCellVal = dirtyCellsSheet[cellIndex];
-			if (1 === dirtyCellVal || 2 === dirtyCellVal) {
+		_calculateDirtyFormula: function(cell) {
+			var t = this;
+			var cellIndex = getCellIndex(cell.nRow, cell.nCol);
+			var dirtyCellVal = t.calculatedCells[cellIndex];
+			if (0 !== dirtyCellVal || 1 === dirtyCellVal) {
 				cell.processFormula(function(parsed) {
-					if (1 === dirtyCellVal) {
-						dirtyCellsSheet[cellIndex] = 2;
+					if (0 !== dirtyCellVal) {
+						t.calculatedCells[cellIndex] = 1;
 						parsed.calculate();
-						dirtyCellsSheet[cellIndex] = 0;
-					} else if (2 === dirtyCellVal) {
+						t.calculatedCells[cellIndex] = 0;
+					} else if (1 === dirtyCellVal) {
 						parsed.calculateCycleError();
 					}
 				});
@@ -1314,7 +1306,7 @@
 		add: function(bbox, data) {
 			data.id = this.id++;
 			var startFlag = bbox.r1 !== bbox.r2 ? 1 : 3;
-			var dataWrap = {bbox: bbox, data: data, cellsInArea: {}};
+			var dataWrap = {bbox: bbox, data: data, cellsInArea: null};
 			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
 			top.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
 			top.storedValue.count++;
@@ -1345,78 +1337,97 @@
 				}
 			}
 		},
-		getByCells: function(cells) {
+		getByCells: function(changedSheet) {
 			var res = [];
+			var node, id, bbox, intersect;
 			var nodes = this.yTree.getNodeAll();
-			var cellArr = [];
-			for (var cellIndex in cells) {
-				cellArr.push(cellIndex - 0);
-			}
-			//sort завязана на реализацию getCellIndex
-			cellArr.sort(function(a, b) {
-				return a - b;
-			});
-			if (cellArr.length > 0 && nodes.length > 0) {
-				var curNodes = {};
-				var curY = null;
-				var curNodeY = null;
-				var curNodeYIndex = 0;
-				var curCellIndex = 0;
-				var curCellX = null;
-				var curCellY = null;
-				while (curNodeYIndex < nodes.length && curCellIndex < cellArr.length) {
-					if (!curNodeY) {
-						curNodeY = nodes[curNodeYIndex];
-						curY = curNodeY.key;
-						for (var id in curNodeY.storedValue.vals) {
-							var elem = curNodeY.storedValue.vals[id];
-							if (0 !== (1 & elem.startFlag)) {
-								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
-									var curNodesElem = curNodes[i];
-									if (!curNodesElem) {
-										curNodesElem = {};
-										curNodes[i] = curNodesElem;
-									}
-									curNodesElem[id] = elem;
-								}
-							}
-						}
+			if (nodes.length > 0) {
+				var starts = [];
+				var ends = [];
+				for (var rangeRef in changedSheet) {
+					if (changedSheet.hasOwnProperty(rangeRef)) {
+						bbox = changedSheet[rangeRef];
+						starts.push(bbox);
+						ends.push(bbox);
 					}
-					if (!curCellX) {
-						var cellIndex = cellArr[curCellIndex];
-						getFromCellIndex(cellIndex);
-						curCellX = g_FCI.col;
-						curCellY = g_FCI.row;
-					}
-					if (curCellY <= curY) {
-						var curNodesElemX = curNodes[curCellX];
-						for (var id in curNodesElemX) {
-							var elem = curNodesElemX[id];
-							if (elem.dataWrap.bbox.r1 <= curCellY) {
-								var cellIndex = getCellIndex(curCellY, curCellX);
-								if(!elem.dataWrap.cellsInArea[cellIndex]){
-									elem.dataWrap.cellsInArea[cellIndex] = 1;
-									res.push(elem.dataWrap);
-								}
+				}
+				if (starts.length > 0 && ends.length > 0) {
+					starts.sort(function(a, b) {
+						return a.r1 - b.r1;
+					});
+					ends.sort(function(a, b) {
+						return a.r2 - b.r2;
+					});
+					var curNodes = {};
+					var curBBoxes = {};
+					var startIndex = 0;
+					var endIndex = 0;
+					var nodeIndex = 0;
+					var startVal = starts[startIndex++];
+					var endVal = ends[endIndex++];
+					var nodeVal = nodes[nodeIndex++];
+					while (true) {
+						var type = 2;
+						if (startVal.r1 <= nodeVal.key) {
+							if (startVal.r1 <= endVal.r2) {
+								type = 1;
 							}
+						} else if (nodeVal.key <= endVal.r2) {
+							type = 0;
 						}
-						curCellIndex++;
-						curCellX = null;
-						curCellY = null;
-					} else {
-						for (var id in curNodeY.storedValue.vals) {
-							var elem = curNodeY.storedValue.vals[id];
-							if (0 !== (2 & elem.startFlag)) {
-								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
-									var curNodesElem = curNodes[i];
-									if (curNodesElem) {
-										delete curNodesElem[id];
+						if (1 === type) {
+							for (id in curNodes) {
+								if (curNodes.hasOwnProperty(id)) {
+									node = curNodes[id];
+									intersect = node.dataWrap.bbox.intersectionSimple(startVal);
+									if (intersect &&
+										!(node.dataWrap.cellsInArea && node.dataWrap.cellsInArea.isEqual(intersect))) {
+										node.dataWrap.cellsInArea = intersect;
+										res.push(node.dataWrap);
 									}
 								}
 							}
+							curBBoxes[startVal.getName()] = startVal;
+							if (startIndex < starts.length) {
+								startVal = starts[startIndex++];
+							} else {
+								startVal = {r1: Number.MAX_VALUE};
+							}
+						} else if (2 === type) {
+							delete curBBoxes[endVal.getName()];
+							if (endIndex < ends.length) {
+								endVal = ends[endIndex++];
+							} else {
+								break;
+							}
+						} else {
+							for (id in nodeVal.storedValue.vals) {
+								if (nodeVal.storedValue.vals.hasOwnProperty(id)) {
+									node = nodeVal.storedValue.vals[id];
+									if (0 !== (1 & node.startFlag)) {
+										for (var name in curBBoxes) {
+											if (curBBoxes.hasOwnProperty(name)) {
+												bbox = curBBoxes[name];
+												intersect = node.dataWrap.bbox.intersectionSimple(bbox);
+												if (intersect && !(node.dataWrap.cellsInArea &&
+													node.dataWrap.cellsInArea.isEqual(intersect))) {
+													node.dataWrap.cellsInArea = intersect;
+													res.push(node.dataWrap);
+												}
+											}
+										}
+										curNodes[node.dataWrap.data.id] = node;
+									} else if (0 !== (2 & node.startFlag)) {
+										delete curNodes[node.dataWrap.data.id];
+									}
+								}
+							}
+							if (nodeIndex < nodes.length) {
+								nodeVal = nodes[nodeIndex++];
+							} else {
+								break;
+							}
 						}
-						curNodeYIndex++;
-						curNodeY = null;
 					}
 				}
 			}
@@ -1424,7 +1435,7 @@
 		},
 		getByCellsEnd: function(areas) {
 			for (var i = 0; i < areas.length; ++i) {
-				areas[i].cellsInArea = {};
+				areas[i].cellsInArea = null;
 			}
 		}
 	};
@@ -7281,21 +7292,10 @@
 			var dependencyFormulas = this.ws.workbook.dependencyFormulas;
 			if (areaData) {
 				var bbox = areaData.bbox;
-				for (var cellIndex in areaData.cellsInArea) {
-					getFromCellIndex(cellIndex - 0);
-					var changedRange = bbox.getSharedRange(shared.ref, g_FCI.col, g_FCI.row);
-					for (var j = changedRange.r1; j <= changedRange.r2; ++j) {
-						for (var k = changedRange.c1; k <= changedRange.c2; ++k) {
-							dependencyFormulas.addToChangedPosition(this.ws.getId(), j, k);
-						}
-					}
-				}
+				var changedRange = bbox.getSharedIntersect(shared.ref, areaData.cellsInArea);
+				dependencyFormulas.addToChangedRange2(this.ws.getId(), changedRange);
 			} else {
-				for (var j = shared.ref.r1; j <= shared.ref.r2; ++j) {
-					for (var k = shared.ref.c1; k <= shared.ref.c2; ++k) {
-						dependencyFormulas.addToChangedPosition(this.ws.getId(), j, k);
-					}
-				}
+				dependencyFormulas.addToChangedRange2(this.ws.getId(), shared.ref);
 			}
 		} else {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
