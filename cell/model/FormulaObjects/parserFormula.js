@@ -5841,7 +5841,13 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
 				_numberPrevArg = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : null;
 				_count_arg = null !== _numberPrevArg ? _numberPrevArg : currentElement.argumentsCurrent;
-				_argDiff = null !== _numberPrevArg ? 1 : 0;
+				_argDiff = 0;
+				if(_numberPrevArg) {
+					_argDiff++;
+					if(this.outStack[i - 2] && cElementType.specialFunctionEnd === this.outStack[i - 2].type) {
+						_argDiff++;
+					}
+				}
 
 				if (bLocale) {
 					res = currentElement.Assemble2Locale(elemArr, j - _count_arg - _argDiff, _count_arg, locale, digitDelim);

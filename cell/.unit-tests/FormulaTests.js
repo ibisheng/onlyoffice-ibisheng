@@ -3119,6 +3119,11 @@ $( function () {
 		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:O47*P44:P47))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 388 );
+
+		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:O47))", "A2", ws );
+		ok( oParser.parse() );
+		ok( oParser.assemble() == "SUM(SUMPRODUCT(N44:O47))" );
+		strictEqual( oParser.calculate().getValue(), 36 );
     } );
 
     test( "Test: \"SINH\"", function () {
