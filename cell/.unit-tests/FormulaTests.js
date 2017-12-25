@@ -3099,6 +3099,26 @@ $( function () {
         oParser = new parserFormula( "SUMPRODUCT(N44:N47,O44:O47,P44:P47)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 780 );
+
+		oParser = new parserFormula( "SUMPRODUCT(N44:N47*O44:O47)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 70 );
+
+		oParser = new parserFormula( "SUMPRODUCT(SUM(N44:N47*O44:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 70 );
+
+		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:N47*O44:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 70 );
+
+		oParser = new parserFormula( "SUMPRODUCT(N44:O47*P44:P47)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 388 );
+
+		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:O47*P44:P47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 388 );
     } );
 
     test( "Test: \"SINH\"", function () {
