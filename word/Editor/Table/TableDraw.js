@@ -192,6 +192,8 @@ CTable.prototype.private_DrawTableBackgroundAndOuterBorder = function(pGraphics,
             Y_bottom += (PrevCellSpacing + CellSpacing) / 4;
         }
 
+        Y_bottom += this.RowsInfo[CurRow].MaxBotBorder;
+
         if ( null != CellSpacing && PNum != this.Pages.length - 1 && CurRow === Row_last )
             Y_bottom += this.Pages[PNum].MaxBotBorder;
 

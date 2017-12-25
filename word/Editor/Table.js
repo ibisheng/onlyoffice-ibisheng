@@ -8081,6 +8081,14 @@ CTable.prototype.Get_TableBorders = function()
 	var Pr = this.Get_CompiledPr(false).TablePr;
 	return Pr.TableBorders;
 };
+CTable.prototype.GetTopTableBorder = function()
+{
+	return this.Get_CompiledPr(false).TablePr.TableBorders.Top;
+};
+CTable.prototype.GetBottomTableBorder = function()
+{
+	return this.Get_CompiledPr(false).TablePr.TableBorders.Bottom;
+};
 CTable.prototype.Set_TableShd = function(Value, r, g, b)
 {
 	if (undefined === Value && undefined === this.Pr.Shd)
@@ -12365,6 +12373,28 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 
 	var nSummaryHeight = this.GetSummaryHeight();
 
+	var nCellSpacing = this.Content[0].GetCellSpacing();
+	if (null !== nCellSpacing)
+	{
+		nSummaryHeight -= nCellSpacing * (this.GetRowsCount() + 1);
+		nMinHeight     -= nCellSpacing * (this.GetRowsCount() + 1);
+
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			if (!this.RowsInfo[nCurRow])
+				continue;
+
+			nSummaryHeight -= this.RowsInfo[nCurRow].MaxTopBorder[0] + this.RowsInfo[nCurRow].MaxBotBorder;
+			nMinHeight     -= this.RowsInfo[nCurRow].MaxTopBorder[0] + this.RowsInfo[nCurRow].MaxBotBorder;
+		}
+
+		var oTopBorder    = this.GetTopTableBorder();
+		var oBottomBorder = this.GetBottomTableBorder();
+
+		nSummaryHeight -= oTopBorder.GetWidth() + oBottomBorder.GetWidth();
+		nMinHeight     -= oTopBorder.GetWidth() + oBottomBorder.GetWidth();
+	}
+
 	if (this.Pages.length <= 0)
 		return;
 
@@ -12399,7 +12429,12 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 		{
 			var oRow  = this.GetRow(nCurRow);
 			var oRowH = oRow.GetHeight();
-			oRow.SetHeight(arrRowsH[nCurRow] / nTableSumH * (nSummaryHeight + nDiffY), oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+			var nNewH = arrRowsH[nCurRow] / nTableSumH * (nSummaryHeight + nDiffY);
+
+			if (null !== nCellSpacing)
+				nNewH += nCellSpacing;
+
+			oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 		}
 	}
 	else if (nDiffY < -0.01)
@@ -12457,7 +12492,12 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 			{
 				var oRow  = this.GetRow(nCurRow);
 				var oRowH = oRow.GetHeight();
-				oRow.SetHeight(arrNewH[nCurRow], oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+				var nNewH = arrNewH[nCurRow];
+
+				if (null !== nCellSpacing)
+					nNewH += nCellSpacing;
+
+				oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 			}
 		}
 	}
@@ -12598,11 +12638,17 @@ CTable.prototype.GetMinHeight = function()
 
 		if (null !== nSpacing)
 		{
-			nSumMin += 0 === nCurRow ? nSpacing / 2 : nSpacing;
+			if (0 === nCurRow)
+				nSumMin += this.GetTopTableBorder().GetWidth();
+
+			nSumMin += nSpacing;
 			nSumMin += nMaxTopBorder;
 			nSumMin += nMaxTopMargin;
 			nSumMin += nMaxBottomMargin;
-			nSumMin += nRowsCount - 1 === nCurRow ? nSpacing / 2 : 0;
+			nSumMin += nRowsCount - 1 === nCurRow ? nSpacing : 0;
+
+			if (nRowsCount - 1 === nCurRow)
+				nSumMin += this.GetBottomTableBorder().GetWidth();
 		}
 		else
 		{

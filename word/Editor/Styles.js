@@ -5061,6 +5061,17 @@ CDocumentBorder.prototype.IsNone = function()
 {
 	return this.Value === border_None ? true : false;
 };
+/**
+ * Получаем рассчитанную толщину линии в зависимости от типа.
+ * @returns {number}
+ */
+CDocumentBorder.prototype.GetWidth = function()
+{
+	if (border_None === this.Value)
+		return 0;
+
+	return this.Size;
+};
 
 function CTableMeasurement(Type, W)
 {
