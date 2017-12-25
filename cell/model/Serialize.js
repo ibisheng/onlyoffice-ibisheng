@@ -1621,6 +1621,95 @@
             }
         };
     }
+
+	function StyleWriteMap(action, prepare) {
+		this.action = action;
+		this.prepare = prepare;
+		this.ids = {};
+		this.elems = [];
+	}
+
+	StyleWriteMap.prototype.add = function(elem) {
+		var index = 0;
+		if (elem) {
+			elem = this.action.call(g_StyleCache, elem);
+			index = this.ids[elem.getIndexNumber()];
+			if (undefined === index) {
+				index = this.elems.length;
+				this.ids[elem.getIndexNumber()] = index;
+				this.elems.push(this.prepare ? this.prepare(elem) : elem);
+			}
+		}
+		return index;
+	};
+	StyleWriteMap.prototype.addNoCheck = function(elem) {
+		this.elems.push(elem);
+	};
+	function XfForWrite(xf) {
+		this.xf = xf;
+		this.fontid = 0;
+		this.fillid = 0;
+		this.borderid = 0;
+		this.numid = 0;
+		this.XfId = null;
+	}
+
+	function StylesForWrite() {
+		var t = this;
+		this.oXfsMap = new StyleWriteMap(g_StyleCache.addXf, function(xf) {
+			return t._getElem(xf, null);
+		});
+		this.oFontMap = new StyleWriteMap(g_StyleCache.addFont);
+		this.oFillMap = new StyleWriteMap(g_StyleCache.addFill);
+		this.nDefaultFillIndex = 0;
+		this.oBorderMap = new StyleWriteMap(g_StyleCache.addBorder);
+		this.oNumMap = new StyleWriteMap(g_StyleCache.addNum);
+		this.oXfsStylesMap = [];
+	}
+
+	StylesForWrite.prototype.init = function(defaultXfs) {
+		var fill = new AscCommonExcel.Fill();
+		this.oFillMap.add(fill);
+		//second fill is equal to first (in Excel it is different, but it does not matter - they are ignored)
+		this.oFillMap.addNoCheck(fill);
+		this.oXfsMap.add(defaultXfs);
+		//first 2 fills are predefined, so default fill can be not 0
+		this.nDefaultFillIndex = this.oXfsMap.elems[this.oXfsMap.elems.length - 1].fillid;
+	};
+	StylesForWrite.prototype.add = function(xf) {
+		return this.oXfsMap.add(xf);
+	};
+	StylesForWrite.prototype.addCellStyle = function(style) {
+		this.oXfsStylesMap.push(this._getElem(style.xfs, style.XfId));
+	};
+	StylesForWrite.prototype.finalizeCellStyles = function() {
+		//XfId это порядковый номер, поэтому сортируем
+		this.oXfsStylesMap.sort(function(a, b) {
+			return a.XfId - b.XfId;
+		});
+	};
+	StylesForWrite.prototype.getNumIdByFormat = function(num) {
+		var numid = null;
+		if (null != num.id) {
+			numid = num.id;
+		} else {
+			numid = AscCommonExcel.aStandartNumFormatsId[num.getFormat()];
+		}
+
+		if (null == numid) {
+			numid = g_nNumsMaxId + this.oNumMap.add(num);
+		}
+		return numid;
+	};
+	StylesForWrite.prototype._getElem = function(xf, XfId) {
+		var elem = new XfForWrite(xf);
+		elem.fontid = this.oFontMap.add(xf.font);
+		elem.fillid = xf.fill ? this.oFillMap.add(xf.fill) : this.nDefaultFillIndex;
+		elem.borderid = this.oBorderMap.add(xf.border);
+		elem.numid = xf.num ? this.getNumIdByFormat(xf.num) : 0;
+		elem.XfId = XfId;
+		return elem;
+	};
     /** @constructor */
     function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     {
@@ -1628,22 +1717,11 @@
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
         this.aDxfs = null;
-        this.oXfsStylesMap = null;
-        this.oXfsMap = null;
-        this.oFontMap = null;
-        this.oFillMap = null;
-        this.oBorderMap = null;
-        this.oNumMap = null;
-        this.oBinaryWorksheetsTableWriter = oBinaryWorksheetsTableWriter;
+		this.stylesForWrite = null;
         if(null != oBinaryWorksheetsTableWriter)
         {
             this.aDxfs = oBinaryWorksheetsTableWriter.aDxfs;
-            this.oXfsStylesMap = oBinaryWorksheetsTableWriter.oXfsStylesMap;
-            this.oXfsMap = oBinaryWorksheetsTableWriter.oXfsMap;
-            this.oFontMap = oBinaryWorksheetsTableWriter.oFontMap;
-            this.oFillMap = oBinaryWorksheetsTableWriter.oFillMap;
-            this.oBorderMap = oBinaryWorksheetsTableWriter.oBorderMap;
-            this.oNumMap = oBinaryWorksheetsTableWriter.oNumMap;
+			this.stylesForWrite = oBinaryWorksheetsTableWriter.stylesForWrite;
         }
         this.Write = function()
         {
@@ -1678,7 +1756,7 @@
                 {
                     var dxf = this.aDxfs[i];
                     if(dxf && dxf.num)
-                        oDxfsNumFormatToId[dxf.num.getFormat()] = this.oBinaryWorksheetsTableWriter.getNumIdByFormat(dxf.num);
+                        oDxfsNumFormatToId[dxf.num.getFormat()] = this.stylesForWrite.getNumIdByFormat(dxf.num);
                 }
                 this.bs.WriteItem(c_oSerStylesTypes.Dxfs, function(){oThis.WriteDxfs(oThis.aDxfs, oDxfsNumFormatToId);});
             }
@@ -1688,16 +1766,11 @@
         this.WriteBorders = function()
         {
             var oThis = this;
-            var aBorders = [];
-            for(var i in this.oBorderMap)
-            {
-                var elem = this.oBorderMap[i];
-                aBorders[elem.index] = elem.val;
-            }
-            for(var i = 0, length = aBorders.length; i < length; ++i)
-            {
-                var border = aBorders[i];
-                this.bs.WriteItem(c_oSerStylesTypes.Border, function(){oThis.WriteBorder(border.getDif(g_oDefaultFormat.BorderAbs));});
+			var elems = this.stylesForWrite.oBorderMap.elems;
+			for (var i = 0; i < elems.length; ++i) {
+				//todo avoid diff
+				var border = elems[i].getDif(g_oDefaultFormat.BorderAbs);
+				this.bs.WriteItem(c_oSerStylesTypes.Border, function() {oThis.WriteBorder(border)});
             }
         };
         this.WriteBorder = function(border)
@@ -1770,18 +1843,9 @@
         this.WriteFills = function()
         {
             var oThis = this;
-            var aFills = [];
-            for(var i in this.oFillMap)
-            {
-                var elem = this.oFillMap[i];
-                aFills[elem.index] = elem.val;
-            }
-            //делаем второй fill как первый(Excel пишет не такой, но это не важно - они игнорируются)
-            aFills[1] = aFills[0];
-            for(var i = 0, length = aFills.length; i < length; ++i)
-            {
-                var fill = aFills[i];
-                this.bs.WriteItem(c_oSerStylesTypes.Fill, function(){oThis.WriteFill(fill);});
+			var elems = this.stylesForWrite.oFillMap.elems;
+			for (var i = 0; i < elems.length; ++i) {
+				this.bs.WriteItem(c_oSerStylesTypes.Fill, function() {oThis.WriteFill(elems[i]);});
             }
         };
         this.WriteFill = function(fill)
@@ -1798,14 +1862,9 @@
         this.WriteFonts = function()
         {
             var oThis = this;
-            var aFonts = [];
-            for(var i in this.oFontMap)
-            {
-                var elem = this.oFontMap[i];
-                aFonts[elem.index] = elem.val;
-            }
-            for(var i = 0, length = aFonts.length; i < length; ++i) {
-                this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(aFonts[i]);});
+			var elems = this.stylesForWrite.oFontMap.elems;
+			for (var i = 0; i < elems.length; ++i) {
+				this.bs.WriteItem(c_oSerStylesTypes.Font, function() {oThis.WriteFont(elems[i]);});
             }
         };
         this.WriteFont = function(font)
@@ -1877,58 +1936,49 @@
         this.WriteNumFmts = function()
         {
             var oThis = this;
-            for(var i in this.oNumMap)
-            {
-                var num = this.oNumMap[i];
-                if(false == num.val.isEqual(g_oDefaultFormat.NumAbs))
-                    this.bs.WriteItem(c_oSerStylesTypes.NumFmt, function(){oThis.WriteNum({id: num.index, f: num.val.getFormat()});});
+			var elems = this.stylesForWrite.oNumMap.elems;
+			for (var i = 0; i < elems.length; ++i) {
+				this.bs.WriteItem(c_oSerStylesTypes.NumFmt, function() {oThis.WriteNum(g_nNumsMaxId + i, elems[i].getFormat());});
             }
         };
-        this.WriteNum = function(num)
+        this.WriteNum = function(id, format)
         {
-            if(null != num.f)
+            if(null != format)
             {
                 this.memory.WriteByte(c_oSerNumFmtTypes.FormatCode);
                 this.memory.WriteByte(c_oSerPropLenType.Variable);
-                this.memory.WriteString2(num.f);
+                this.memory.WriteString2(format);
             }
-            if(null != num.id)
+            if(null != id)
             {
                 this.memory.WriteByte(c_oSerNumFmtTypes.NumFmtId);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(num.id);
+                this.memory.WriteLong(id);
             }
         };
         this.WriteCellStyleXfs = function()
         {
             var oThis = this;
-            for(var i = 0, length = this.oXfsStylesMap.length; i < length; ++i)
-            {
-                var cellStyleXfs = this.oXfsStylesMap[i];
-                this.bs.WriteItem(c_oSerStylesTypes.Xfs, function(){oThis.WriteXfs(cellStyleXfs);});
+			var elems = this.stylesForWrite.oXfsStylesMap;
+			for (var i = 0; i < elems.length; ++i) {
+				this.bs.WriteItem(c_oSerStylesTypes.Xfs, function() {oThis.WriteXfs(elems[i], true);});
             }
         };
         this.WriteCellXfs = function()
         {
             var oThis = this;
-            var aXfs = [];
-            for(var i in this.oXfsMap)
-            {
-                var elem = this.oXfsMap[i];
-                aXfs[elem.index] = elem.val;
-            }
-            for(var i = 0, length = aXfs.length; i < length; ++i)
-            {
-                var cellxfs = aXfs[i];
-                this.bs.WriteItem(c_oSerStylesTypes.Xfs, function(){oThis.WriteXfs(cellxfs);});
+			var elems = this.stylesForWrite.oXfsMap.elems;
+			for (var i = 0; i < elems.length; ++i) {
+				this.bs.WriteItem(c_oSerStylesTypes.Xfs, function() {oThis.WriteXfs(elems[i]);});
             }
         };
-        this.WriteXfs = function(xfs)
+        this.WriteXfs = function(xfForWrite, isCellStyle)
         {
             var oThis = this;
-            if(null != xfs.borderid)
+            var xf = xfForWrite.xf;
+            if(null != xfForWrite.borderid)
             {
-                if(0 != xfs.borderid)
+                if(0 != xfForWrite.borderid)
                 {
                     this.memory.WriteByte(c_oSerXfsTypes.ApplyBorder);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -1936,11 +1986,11 @@
                 }
                 this.memory.WriteByte(c_oSerXfsTypes.BorderId);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(xfs.borderid);
+                this.memory.WriteLong(xfForWrite.borderid);
             }
-            if(null != xfs.fillid)
+            if(null != xfForWrite.fillid)
             {
-                if(0 != xfs.fillid)
+                if(0 != xfForWrite.fillid)
                 {
                     this.memory.WriteByte(c_oSerXfsTypes.ApplyFill);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -1948,11 +1998,11 @@
                 }
                 this.memory.WriteByte(c_oSerXfsTypes.FillId);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(xfs.fillid);
+                this.memory.WriteLong(xfForWrite.fillid);
             }
-            if(null != xfs.fontid)
+            if(null != xfForWrite.fontid)
             {
-                if(0 != xfs.fontid)
+                if(0 != xfForWrite.fontid)
                 {
                     this.memory.WriteByte(c_oSerXfsTypes.ApplyFont);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -1960,11 +2010,11 @@
                 }
                 this.memory.WriteByte(c_oSerXfsTypes.FontId);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(xfs.fontid);
+                this.memory.WriteLong(xfForWrite.fontid);
             }
-            if(null != xfs.numid)
+            if(null != xfForWrite.numid)
             {
-                if(0 != xfs.numid)
+                if(0 != xfForWrite.numid)
                 {
                     this.memory.WriteByte(c_oSerXfsTypes.ApplyNumberFormat);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -1972,39 +2022,41 @@
                 }
                 this.memory.WriteByte(c_oSerXfsTypes.NumFmtId);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(xfs.numid);
+                this.memory.WriteLong(xfForWrite.numid);
             }
-            if(null != xfs.align)
-            {
-                var alignMinimized = xfs.align.getDif(g_oDefaultFormat.AlignAbs);
-                if(null != alignMinimized)
-                {
-                    this.memory.WriteByte(c_oSerXfsTypes.ApplyAlignment);
-                    this.memory.WriteByte(c_oSerPropLenType.Byte);
-                    this.memory.WriteBool(true);
+			if (xf) {
+				if(null != xf.align)
+				{
+					var alignMinimized = xf.align.getDif(g_oDefaultFormat.AlignAbs);
+					if(null != alignMinimized)
+					{
+						this.memory.WriteByte(c_oSerXfsTypes.ApplyAlignment);
+						this.memory.WriteByte(c_oSerPropLenType.Byte);
+						this.memory.WriteBool(true);
 
-                    this.memory.WriteByte(c_oSerXfsTypes.Aligment);
-                    this.memory.WriteByte(c_oSerPropLenType.Variable);
-                    this.bs.WriteItemWithLength(function(){oThis.WriteAlign(alignMinimized);});
-                }
-            }
-            if(null != xfs.QuotePrefix)
-            {
-                this.memory.WriteByte(c_oSerXfsTypes.QuotePrefix);
-                this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(xfs.QuotePrefix);
-            }
-			if(null != xfs.PivotButton)
-			{
-				this.memory.WriteByte(c_oSerXfsTypes.PivotButton);
-				this.memory.WriteByte(c_oSerPropLenType.Byte);
-				this.memory.WriteBool(xfs.PivotButton);
-			}
-            if(null != xfs.XfId)
-            {
-                this.memory.WriteByte(c_oSerXfsTypes.XfId);
-                this.memory.WriteByte(c_oSerPropLenType.Long);
-                this.memory.WriteLong(xfs.XfId);
+						this.memory.WriteByte(c_oSerXfsTypes.Aligment);
+						this.memory.WriteByte(c_oSerPropLenType.Variable);
+						this.bs.WriteItemWithLength(function(){oThis.WriteAlign(alignMinimized);});
+					}
+				}
+				if(null != xf.QuotePrefix)
+				{
+					this.memory.WriteByte(c_oSerXfsTypes.QuotePrefix);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteBool(xf.QuotePrefix);
+				}
+				if(null != xf.PivotButton)
+				{
+					this.memory.WriteByte(c_oSerXfsTypes.PivotButton);
+					this.memory.WriteByte(c_oSerPropLenType.Byte);
+					this.memory.WriteBool(xf.PivotButton);
+				}
+				if(!isCellStyle && null != xf.XfId)
+				{
+					this.memory.WriteByte(c_oSerXfsTypes.XfId);
+					this.memory.WriteByte(c_oSerPropLenType.Long);
+					this.memory.WriteLong(xf.XfId);
+				}
             }
         };
         this.WriteAlign = function(align)
@@ -2080,7 +2132,7 @@
             {
                 var numId = oDxfsNumFormatToId[Dxf.num.getFormat()];
                 if(null != numId)
-                    this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum({id: numId, f: Dxf.num.getFormat()});});
+                    this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum(numId, Dxf.num.getFormat());});
             }
         };
         this.WriteCellStyles = function (cellStyles) {
@@ -2513,81 +2565,28 @@
 			}
 		};
     }
-    function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, isCopyPaste)
+	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, idWorksheet, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
         this.oSharedStrings = oSharedStrings;
         this.aDxfs = aDxfs;
-        this.aXfs = aXfs;
-        this.aFonts = aFonts;
-        this.aFills = aFills;
-        this.aBorders = aBorders;
-        this.aNums = aNums;
-        this.oXfsStylesMap = [];
-        this.oXfsMap = {};
-        this.nXfsMapIndex = 0;
-        this.oFontMap = {};
-        this.nFontMapIndex = 0;
-        this.oFillMap = {};
-        this.nFillMapIndex = 0;
-        this.nDefaultFillIndex = 0;//может быть 0(если default заливка пустая) или 2(если default заливка не пустая)
-        this.oBorderMap = {};
-        this.nBorderMapIndex = 0;
-        this.oNumMap = {};
-        this.nNumMapIndex = 0;
+		this.stylesForWrite = new StylesForWrite();
         this.idWorksheet = idWorksheet;
-        this.oAllColXfsId = null;
         this.isCopyPaste = isCopyPaste;
-        this._getCrc32FromObjWithProperty = function(val)
-        {
-            return Asc.crc32(this._getStringFromObjWithProperty(val));
-        };
-        this._getStringFromObjWithProperty = function(val)
-        {
-            var sRes = "";
-            if(val.getProperties)
-            {
-                var properties = val.getProperties();
-                for(var i in properties)
-                {
-                    var oCurProp = val.getProperty(properties[i]);
-                    if(null != oCurProp && oCurProp.getProperties)
-                        sRes += this._getStringFromObjWithProperty(oCurProp);
-                    else
-                        sRes += oCurProp;
-                }
-            }
-            return sRes;
-        };
         this._prepeareStyles = function()
         {
-            this.oFontMap[this._getStringFromObjWithProperty(g_oDefaultFormat.Font)] = {index: this.nFontMapIndex++, val: g_oDefaultFormat.Font};
-            //первый 2 fill должны быть стандартными. Excel игнорирует то что записано, берет стандартные
-            this.oFillMap[this._getStringFromObjWithProperty(new AscCommonExcel.Fill())] = { index: this.nFillMapIndex++, val: new AscCommonExcel.Fill() };
-            //не добавляем в oFillMap а делаем nFillMapIndex, потому что элементы совпадают и перетрут друг друга
-            this.nFillMapIndex++;
-            //проверяем совпадает ли g_oDefaultFill с new Fill
-            var sFillHash = this._getStringFromObjWithProperty(g_oDefaultFormat.Fill);
-            var oFillDefElement = this.oFillMap[sFillHash];
-            if (null == oFillDefElement) {
-                this.nDefaultFillIndex = this.nFillMapIndex;
-                oFillDefElement =  {index: this.nFillMapIndex++, val: g_oDefaultFormat.Fill};
-                this.oFillMap[sFillHash] = oFillDefElement;
-            }
-            this.oBorderMap[this._getStringFromObjWithProperty(g_oDefaultFormat.Border)] = {index: this.nBorderMapIndex++, val: g_oDefaultFormat.Border};
-            this.nNumMapIndex = g_nNumsMaxId;
-            var sAlign = "0";
-            var oAlign = null;
-            if(false == g_oDefaultFormat.Align.isEqual(g_oDefaultFormat.AlignAbs))
-            {
-                oAlign = g_oDefaultFormat.Align;
-                sAlign = this._getStringFromObjWithProperty(g_oDefaultFormat.Align);
-            }
-            this.prepareXfsStyles();
-            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null, PivotButton: null };
-            this.oXfsMap["0|0|" + this.nDefaultFillIndex + "|0|" + sAlign] = { index: this.nXfsMapIndex++, val: xfs };
+			this.stylesForWrite.init(this.wb.oStyleManager.oDefaultXfs);
+			var styles = this.wb.CellStyles.CustomStyles;
+			var style = null;
+			for(var i = 0; i < styles.length; ++i) {
+				style = styles[i];
+				if (style.xfs) {
+					this.stylesForWrite.addCellStyle(style);
+				}
+			}
+			this.stylesForWrite.finalizeCellStyles();
         };
         this.Write = function()
         {
@@ -2748,14 +2747,13 @@
                         oRes.width = AscCommonExcel.oDefaultMetrics.ColWidthChars;
                 }
                 if(null != col.xfs)
-                    oRes.xfsid = oThis.prepareXfs(col.xfs);
+					oRes.xfsid = oThis.stylesForWrite.add(col.xfs);
                 return oRes;
             };
             var oAllCol = null;
             if(null != ws.oAllCol)
             {
                 oAllCol = fInitCol(ws.oAllCol, 0, gc_nMaxCol0);
-                this.oAllColXfsId = oAllCol.xfsid;
             }
             for(var i = 0 , length = aIndexes.length; i < length; ++i)
             {
@@ -3298,10 +3296,10 @@
 				var cellXfs = cell.xfs;
 				/*if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
 					var compiledXfs = cell.getCompiledStyle();
-					nXfsId = oThis.prepareXfs(compiledXfs);
+					nXfsId = oThis.stylesForWrite.add(compiledXfs);
 					cellXfs = compiledXfs;
 				} else {*/
-					nXfsId = oThis.prepareXfs(cell.xfs);
+					nXfsId = oThis.stylesForWrite.add(cell.xfs);
 				//}
 
 				//сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
@@ -3329,7 +3327,7 @@
             }
             if(null != oRow.xfs)
             {
-                var nXfsId = this.prepareXfs(oRow.xfs);
+                var nXfsId = this.stylesForWrite.add(oRow.xfs);
                 this.memory.WriteByte(c_oSerRowTypes.Style);
                 this.memory.WriteByte(c_oSerPropLenType.Long);
                 this.memory.WriteLong(nXfsId);
@@ -3356,154 +3354,6 @@
             this.memory.WriteByte(c_oSerRowTypes.Cells);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             return this.bs.WriteItemWithLengthStart();
-        };
-        this.prepareXfsStyles = function () {
-            var styles = this.wb.CellStyles.CustomStyles;
-            var xfs = null;
-            for(var i = 0, length = styles.length; i < length; ++i) {
-				var style = styles[i];
-				xfs = style.xfs;
-                if (xfs) {
-                    var sStyle = this.prepareXfsStyle(xfs);
-					//XfId в CustomStyles писать не нужно, поэтому null
-                    var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId, PivotButton: null};
-                    if("0" != sStyle.align)
-                        oXfs.align = xfs.align;
-                    if(null != xfs.QuotePrefix)
-                        oXfs.QuotePrefix = xfs.QuotePrefix;
-					if(null != xfs.PivotButton)
-						oXfs.PivotButton = xfs.PivotButton;
-
-                    this.oXfsStylesMap.push(oXfs);
-                }
-            }
-			//XfId это порядковый номер, поэтому сортируем
-			this.oXfsStylesMap.sort(function (a, b) {
-				return a.index - b.index;
-			});
-        };
-        this.prepareXfsStyle = function(xfs) {
-            var sStyle = {val: "", borderid: 0, fontid: 0, fillid: 0, numid: 0, align: "0"};
-            if(null != xfs)
-            {
-                if(null != xfs.font)
-                {
-                    var sHash = this._getStringFromObjWithProperty(xfs.font);
-                    var elem = this.oFontMap[sHash];
-                    if(null == elem)
-                    {
-                        sStyle.fontid = this.nFontMapIndex++;
-                        this.oFontMap[sHash] = {index: sStyle.fontid, val: xfs.font};
-                    }
-                    else
-                        sStyle.fontid = elem.index;
-                }
-                sStyle.val += sStyle.fontid.toString();
-
-                if(null != xfs.fill)
-                {
-                    var sHash = this._getStringFromObjWithProperty(xfs.fill);
-                    var elem = this.oFillMap[sHash];
-                    if(null == elem)
-                    {
-                        sStyle.fillid = this.nFillMapIndex++;
-                        this.oFillMap[sHash] = {index: sStyle.fillid, val: xfs.fill};
-                    }
-                    else
-                        sStyle.fillid = elem.index;
-                }
-                else if (0 != this.nDefaultFillIndex) {
-                    //если default fill не пустой, то надо его надо записывать даже если null != xfs.fill
-                    sStyle.fillid = this.nDefaultFillIndex;
-                }
-                sStyle.val += "|" + sStyle.fillid.toString();
-
-                if(null != xfs.border)
-                {
-                    var sHash = this._getStringFromObjWithProperty(xfs.border);
-                    var elem = this.oBorderMap[sHash];
-                    if(null == elem)
-                    {
-                        sStyle.borderid = this.nBorderMapIndex++;
-                        this.oBorderMap[sHash] = {index: sStyle.borderid, val: xfs.border};
-                    }
-                    else
-                        sStyle.borderid = elem.index;
-                }
-                sStyle.val += "|" + sStyle.borderid.toString();
-
-                if(null != xfs.num)
-                    sStyle.numid = this.getNumIdByFormat(xfs.num);
-                sStyle.val += "|" + sStyle.numid.toString();
-
-                if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultFormat.AlignAbs))
-                    sStyle.align = this._getStringFromObjWithProperty(xfs.align);
-                sStyle.val += "|" + sStyle.align;
-                sStyle.val += "|";
-                if (null != xfs.QuotePrefix) {
-                  sStyle.val += xfs.QuotePrefix;
-                }
-				sStyle.val += "|";
-				if (null != xfs.PivotButton) {
-					sStyle.val += xfs.PivotButton;
-				}
-                sStyle.val += "|";
-                if (null != xfs.XfId) {
-                  sStyle.val += xfs.XfId;
-                }
-            }
-
-            return sStyle;
-        };
-      this.getNumIdByFormat = function(num) {
-        var numid = null;
-        //стандартные форматы не записываем в map, на них можно ссылаться по id
-        var nStandartId;
-        if (null != num.id) {
-          nStandartId = num.id;
-        } else {
-          nStandartId = AscCommonExcel.aStandartNumFormatsId[num.getFormat()];
-        }
-
-        if (null == nStandartId) {
-          var sHash = this._getStringFromObjWithProperty(num);
-          var elem = this.oNumMap[sHash];
-          if (null == elem) {
-            numid = this.nNumMapIndex++;
-            this.oNumMap[sHash] = {index: numid, val: num};
-          } else {
-            numid = elem.index;
-          }
-        } else {
-          numid = nStandartId;
-        }
-        return numid;
-      };
-        this.prepareXfs = function(xfs)
-        {
-            var nXfsId = 0;
-            if(null != xfs)
-            {
-                var sStyle = this.prepareXfsStyle(xfs);
-                var oXfsMapObj = this.oXfsMap[sStyle.val];
-                if(null == oXfsMapObj)
-                {
-                    nXfsId = this.nXfsMapIndex;
-                    var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId, PivotButton: null};
-                    if("0" != sStyle.align)
-                        oXfs.align = xfs.align;
-                    if(null != xfs.QuotePrefix)
-                        oXfs.QuotePrefix = xfs.QuotePrefix;
-					if(null != xfs.PivotButton)
-						oXfs.PivotButton = xfs.PivotButton;
-                    this.oXfsMap[sStyle.val] = {index: this.nXfsMapIndex++, val: oXfs};
-                }
-                else
-                    nXfsId = oXfsMapObj.index;
-            }
-            return nXfsId;
         };
         this.WriteCell = function(cell, nXfsId, nRowIndex)
         {
@@ -4180,13 +4030,8 @@
             //Workbook
             this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb));
             //Worksheets
-            var aXfs = [];
-            var aFonts = [];
-            var aFills = [];
-            var aBorders = [];
-            var aNums = [];
             var aDxfs = [];
-            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, this.isCopyPaste);
+            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, idWorksheet, this.isCopyPaste);
             this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
             //OtherTable
             if(!this.isCopyPaste)
