@@ -12645,6 +12645,11 @@
 
         var drawCurrentFilterButtons = function (filter) {
 			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+
+			if(!filter.Ref) {
+				return;
+			}
+
             var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
 
             if (range.isIntersect(updatedRange)) {
