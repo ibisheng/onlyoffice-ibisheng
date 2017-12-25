@@ -317,6 +317,13 @@ CDocumentOutline.prototype.UpdateCurrentPosition = function(nCurPos)
 		this.LogicDocument.GetApi().sync_OnDocumentOutlineCurrentPosition(nFindIndex);
 	}
 };
+CDocumentOutline.prototype.IsEmptyItem = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Elements.length || !this.Elements[nIndex].Paragraph)
+		return true;
+
+	return this.Elements[nIndex].Paragraph.IsEmpty();
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 CDocumentOutline.prototype["get_ElementsCount"]    = CDocumentOutline.prototype.GetElementsCount;
@@ -329,3 +336,4 @@ CDocumentOutline.prototype["insertHeader"]         = CDocumentOutline.prototype.
 CDocumentOutline.prototype["insertSubHeader"]      = CDocumentOutline.prototype.InsertSubHeader;
 CDocumentOutline.prototype["isFirstItemNotHeader"] = CDocumentOutline.prototype.IsFirstItemNotHeader;
 CDocumentOutline.prototype["selectContent"]        = CDocumentOutline.prototype.SelectContent;
+CDocumentOutline.prototype["isEmptyItem"]          = CDocumentOutline.prototype.IsEmptyItem;
