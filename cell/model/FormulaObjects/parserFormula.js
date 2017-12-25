@@ -4694,6 +4694,14 @@ parserFormula.prototype.setFormula = function(formula) {
 								elem = new cUnknownFunction(val);
 								elem.isXLFN = (0 === val.indexOf("_xlfn."));
 							}
+							if("SUMPRODUCT" === val){
+								startSumproduct = true;
+
+								counterSumproduct++;
+								if(1 === counterSumproduct){
+									this.outStack.push(cSpecialOperandStart.prototype);
+								}
+							}
 							if (elem && elem.ca) {
 								this.ca = elem.ca;
 							}
@@ -4729,6 +4737,15 @@ parserFormula.prototype.setFormula = function(formula) {
 											prev.subtype) ? 1 : 0);
 									//this.outStack.push(arg_count);
 									this.outStack.splice(this.outStack.length - 1, 0, arg_count);
+
+									if(startSumproduct && "SUMPRODUCT" === tmp.name){
+										counterSumproduct--;
+										if(counterSumproduct < 1){
+											startSumproduct = false;
+											this.outStack.push(cSpecialOperandEnd.prototype);
+										}
+									}
+
 									if (!tmp.checkArguments(arg_count)) {
 										this.outStack = [];
 										this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
