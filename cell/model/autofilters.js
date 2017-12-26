@@ -61,7 +61,10 @@
 			val		    : 0,
 			visible	    : 1,
 			text        : 2,
-			isDateFormat: 3
+			isDateFormat: 3,
+			year        : 4,
+			month       : 5,
+			day         : 6
 		};
 		function AutoFiltersOptionsElements () {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements();}
@@ -72,6 +75,9 @@
 			this.text = null;
 			this.visible = null;
 			this.isDateFormat = null;
+			this.year = null;
+			this.month = null;
+			this.day = null;
 		}
 		AutoFiltersOptionsElements.prototype = {
 			constructor: AutoFiltersOptionsElements,
@@ -88,6 +94,9 @@
 					case this.Properties.visible: return this.visible; break;
 					case this.Properties.text: return this.text; break;
 					case this.Properties.isDateFormat: return this.isDateFormat; break;
+					case this.Properties.year: return this.year; break;
+					case this.Properties.month: return this.month; break;
+					case this.Properties.day: return this.day; break;
 				}
 
 				return null;
@@ -98,6 +107,9 @@
 					case this.Properties.visible: this.visible = value;break;
 					case this.Properties.text: this.text = value;break;
 					case this.Properties.isDateFormat: this.isDateFormat = value;break;
+					case this.Properties.year: this.year = value;break;
+					case this.Properties.month: this.month = value;break;
+					case this.Properties.day: this.day = value;break;
 				}
 			},
 			
@@ -110,6 +122,9 @@
 				res.visible = this.visible;
 				res.isDateFormat = this.isDateFormat;
 				res.Properties = this.Properties;
+				res.year = this.visible;
+				res.month = this.isDateFormat;
+				res.day = this.Properties;
 				
 				return res;
 			},
@@ -118,11 +133,17 @@
 			asc_getVisible: function () { return this.visible; },
 			asc_getText: function () { return this.text; },
 			asc_getIsDateFormat: function () { return this.isDateFormat; },
+			asc_getYear: function () { return this.year; },
+			asc_getMonth: function () { return this.month; },
+			asc_getDay: function () { return this.day; },
 			
 			asc_setVal: function (val) { this.val = val; },
 			asc_setVisible: function (val) { this.visible = val; },
 			asc_setText: function (val) { this.text = val; },
-			asc_setIsDateFormat: function (val) { this.isDateFormat = val; }
+			asc_setIsDateFormat: function (val) { this.isDateFormat = val; },
+			asc_setYear: function (val) { this.year = val; },
+			asc_setMonth: function (val) { this.month = val; },
+			asc_setDay: function (val) { this.day = val; }
 		};
 
 		/** @constructor */
@@ -5328,6 +5349,10 @@
 		prot["asc_getText"]						= prot.asc_getText;
 		prot["asc_getVisible"]					= prot.asc_getVisible;
 		prot["asc_setVisible"]					= prot.asc_setVisible;
+		prot["asc_getIsDateFormat"]				= prot.asc_getIsDateFormat;
+		prot["asc_getYear"]						= prot.asc_getYear;
+		prot["asc_getMonth"]					= prot.asc_getMonth;
+		prot["asc_getDay"]						= prot.asc_getDay;
 		
 		window["AscCommonExcel"].AddFormatTableOptions = AddFormatTableOptions;
 		prot									= AddFormatTableOptions.prototype;
