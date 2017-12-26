@@ -6878,9 +6878,9 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_Comments.Row == type )
-                oCommentCoords.asc_setRow(this.stream.GetULongLE());
+                oCommentCoords.nRow = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Col == type )
-                oCommentCoords.asc_setCol(this.stream.GetULongLE());
+                oCommentCoords.nCol = this.stream.GetULongLE();
             else if ( c_oSer_Comments.CommentDatas == type )
             {
                 res = this.bcr.Read1(length, function(t,l){
@@ -6888,33 +6888,33 @@
                 });
             }
             else if ( c_oSer_Comments.Left == type )
-                oCommentCoords.asc_setLeft(this.stream.GetULongLE());
+                oCommentCoords.nLeft = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftOffset == type )
-                oCommentCoords.asc_setLeftOffset(this.stream.GetULongLE());
+                oCommentCoords.nLeftOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Top == type )
-                oCommentCoords.asc_setTop(this.stream.GetULongLE());
+                oCommentCoords.nTop = this.stream.GetULongLE();
             else if ( c_oSer_Comments.TopOffset == type )
-                oCommentCoords.asc_setTopOffset(this.stream.GetULongLE());
+                oCommentCoords.nTopOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Right == type )
-                oCommentCoords.asc_setRight(this.stream.GetULongLE());
+                oCommentCoords.nRight = this.stream.GetULongLE();
             else if ( c_oSer_Comments.RightOffset == type )
-                oCommentCoords.asc_setRightOffset(this.stream.GetULongLE());
+                oCommentCoords.nRightOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Bottom == type )
-                oCommentCoords.asc_setBottom(this.stream.GetULongLE());
+                oCommentCoords.nBottom = this.stream.GetULongLE();
             else if ( c_oSer_Comments.BottomOffset == type )
-                oCommentCoords.asc_setBottomOffset(this.stream.GetULongLE());
+                oCommentCoords.nBottomOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftMM == type )
-                oCommentCoords.asc_setLeftMM(this.stream.GetDoubleLE());
+                oCommentCoords.dLeftMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.TopMM == type )
-                oCommentCoords.asc_setTopMM(this.stream.GetDoubleLE());
+                oCommentCoords.dTopMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.WidthMM == type )
-                oCommentCoords.asc_setWidthMM(this.stream.GetDoubleLE());
+                oCommentCoords.dWidthMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.HeightMM == type )
-                oCommentCoords.asc_setHeightMM(this.stream.GetDoubleLE());
+                oCommentCoords.dHeightMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.MoveWithCells == type )
-                oCommentCoords.asc_setMoveWithCells(this.stream.GetBool());
+                oCommentCoords.bMoveWithCells = this.stream.GetBool();
             else if ( c_oSer_Comments.SizeWithCells == type )
-                oCommentCoords.asc_setSizeWithCells(this.stream.GetBool());
+                oCommentCoords.bSizeWithCells = this.stream.GetBool();
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
