@@ -1739,8 +1739,8 @@
 		} else if (c_oCloseCode.jwtError === opt_closeCode) {
 			code = Asc.c_oAscError.ID.VKeyEncrypt;
 			level = Asc.c_oAscError.Level.Critical;
-    } else if (c_oCloseCode.drop === opt_closeCode) {
-        return Asc.c_oAscError.ID.UserDrop;
+		} else if (c_oCloseCode.drop === opt_closeCode) {
+			code = Asc.c_oAscError.ID.UserDrop;
 		}
 		return {code: code, level: level};
 	};
