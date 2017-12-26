@@ -104,25 +104,9 @@ function asc_CCommentCoords(obj) {
 	}
 }
 asc_CCommentCoords.prototype = {
-	asc_getRow: function() { return this.nRow; },
-	asc_getCol: function() { return this.nCol; },
-	asc_getLeft: function() { return this.nLeft; },
-	asc_getLeftOffset: function() { return this.nLeftOffset; },
-	asc_getTop: function() { return this.nTop; },
-	asc_getTopOffset: function() { return this.nTopOffset; },
-	asc_getRight: function() { return this.nRight; },
-	asc_getRightOffset: function() { return this.nRightOffset; },
-	asc_getBottom: function() { return this.nBottom; },
-	asc_getBottomOffset: function() { return this.nBottomOffset; },
-	asc_getLeftMM: function() { return this.dLeftMM; },
 	asc_getLeftPX: function() { return this.dLeftPX; },
 	asc_getReverseLeftPX: function() { return this.dReverseLeftPX; },
-	asc_getTopMM: function() { return this.dTopMM; },
-	asc_getTopPX: function() { return this.dTopPX; },
-	asc_getWidthMM: function() { return this.dWidthMM; },
-	asc_getHeightMM: function() { return this.dHeightMM; },
-	asc_getMoveWithCells: function() { return this.bMoveWithCells; },
-	asc_getSizeWithCells: function() { return this.bSizeWithCells; }
+	asc_getTopPX: function() { return this.dTopPX; }
 };
 
 /** @constructor */

@@ -3765,10 +3765,10 @@
                 if(this.isCopyPaste && !this.isCopyPaste.contains(aCommentsCoords[i].nCol, aCommentsCoords[i].nRow))
                     continue;
                 elem = aCommentsCoords[i];
-                nRow = elem.asc_getRow();
+                nRow = elem.nRow;
                 if(null == nRow)
                     nRow = 0;
-                nCol = elem.asc_getCol();
+                nCol = elem.nCol;
                 if(null == nCol)
                     nCol = 0;
                 row = oNewComments[nRow];
@@ -3794,9 +3794,9 @@
                     if(null == comment.coord || 0 == comment.data.length)
                         continue;
                     var coord = comment.coord;
-                    if(null == coord.asc_getLeft() || null == coord.asc_getTop() || null == coord.asc_getRight() || null == coord.asc_getBottom() ||
-                        null == coord.asc_getLeftOffset() || null == coord.asc_getTopOffset() || null == coord.asc_getRightOffset() || null == coord.asc_getBottomOffset() ||
-                        null == coord.asc_getLeftMM() || null == coord.asc_getTopMM() || null == coord.asc_getWidthMM() || null == coord.asc_getHeightMM())
+                    if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
+                        null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
+                        null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
                         continue;
                     this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(comment);});
                 }
@@ -3807,11 +3807,11 @@
             var oThis = this;
             this.memory.WriteByte(c_oSer_Comments.Row);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRow());
+            this.memory.WriteLong(comment.coord.nRow);
 
             this.memory.WriteByte(c_oSer_Comments.Col);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getCol());
+            this.memory.WriteLong(comment.coord.nCol);
 
             this.memory.WriteByte(c_oSer_Comments.CommentDatas);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -3819,59 +3819,59 @@
 
             this.memory.WriteByte(c_oSer_Comments.Left);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeft());
+            this.memory.WriteLong(comment.coord.nLeft);
 
             this.memory.WriteByte(c_oSer_Comments.Top);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTop());
+            this.memory.WriteLong(comment.coord.nTop);
 
             this.memory.WriteByte(c_oSer_Comments.Right);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRight());
+            this.memory.WriteLong(comment.coord.nRight);
 
             this.memory.WriteByte(c_oSer_Comments.Bottom);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottom());
+            this.memory.WriteLong(comment.coord.nBottom);
 
             this.memory.WriteByte(c_oSer_Comments.LeftOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeftOffset());
+            this.memory.WriteLong(comment.coord.nLeftOffset);
 
             this.memory.WriteByte(c_oSer_Comments.TopOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTopOffset());
+            this.memory.WriteLong(comment.coord.nTopOffset);
 
             this.memory.WriteByte(c_oSer_Comments.RightOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRightOffset());
+            this.memory.WriteLong(comment.coord.nRightOffset);
 
             this.memory.WriteByte(c_oSer_Comments.BottomOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottomOffset());
+            this.memory.WriteLong(comment.coord.nBottomOffset);
 
             this.memory.WriteByte(c_oSer_Comments.LeftMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getLeftMM());
+            this.memory.WriteDouble2(comment.coord.dLeftMM);
 
             this.memory.WriteByte(c_oSer_Comments.TopMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getTopMM());
+            this.memory.WriteDouble2(comment.coord.dTopMM);
 
             this.memory.WriteByte(c_oSer_Comments.WidthMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getWidthMM());
+            this.memory.WriteDouble2(comment.coord.dWidthMM);
 
             this.memory.WriteByte(c_oSer_Comments.HeightMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getHeightMM());
+            this.memory.WriteDouble2(comment.coord.dHeightMM);
 
             this.memory.WriteByte(c_oSer_Comments.MoveWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getMoveWithCells());
+            this.memory.WriteBool(comment.coord.bMoveWithCells);
 
             this.memory.WriteByte(c_oSer_Comments.SizeWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getSizeWithCells());
+            this.memory.WriteBool(comment.coord.bSizeWithCells);
         };
         this.WriteCommentDatas = function(aDatas)
         {
@@ -6856,8 +6856,8 @@
                 for(i = 0, length = aCommentData.length; i < length; ++i)
                 {
                     var elem = aCommentData[i];
-                    elem.asc_putRow(oCommentCoords.asc_getRow());
-                    elem.asc_putCol(oCommentCoords.asc_getCol());
+                    elem.asc_putRow(oCommentCoords.nRow);
+                    elem.asc_putCol(oCommentCoords.nCol);
 
                     if (elem.asc_getDocumentFlag()) {
                         elem.nId = "doc_" + (this.wb.aComments.length + 1);
