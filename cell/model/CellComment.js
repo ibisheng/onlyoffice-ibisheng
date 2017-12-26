@@ -103,11 +103,6 @@ function asc_CCommentCoords(obj) {
 		this.bSizeWithCells = obj.bSizeWithCells;
 	}
 }
-asc_CCommentCoords.prototype = {
-	asc_getLeftPX: function() { return this.dLeftPX; },
-	asc_getReverseLeftPX: function() { return this.dReverseLeftPX; },
-	asc_getTopPX: function() { return this.dTopPX; }
-};
 
 /** @constructor */
 function asc_CCommentData(obj) {
@@ -528,9 +523,9 @@ CCellCommentator.prototype.updateCommentPosition = function() {
 				var isVisible = (null !== this.worksheet.getCellVisibleRange(comment.asc_getCol(), comment.asc_getRow()));
 
 				this.model.workbook.handlers.trigger( "asc_onUpdateCommentPosition", indexes,
-					(isVisible ? coords.asc_getLeftPX() : -1),
-					(isVisible ? coords.asc_getTopPX() : -1),
-					(isVisible ? coords.asc_getReverseLeftPX() : -1) );
+					(isVisible ? coords.dLeftPX : -1),
+					(isVisible ? coords.dTopPX : -1),
+					(isVisible ? coords.dReverseLeftPX : -1) );
 			}
 		}
 	}
@@ -917,8 +912,8 @@ CCellCommentator.prototype.showComment = function(id, bNew) {
 
 		// Second click - hide comment
 		if (indexes.length) {
-			this.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(),
-				coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
+			this.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.dLeftPX, coords.dTopPX,
+				coords.dReverseLeftPX, bNew);
 			this.drawCommentCells();
 		}
 		this.lastSelectedId = id;
