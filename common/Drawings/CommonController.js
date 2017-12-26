@@ -5502,6 +5502,12 @@ DrawingObjectsController.prototype =
                 }
             }
             this.updateOverlay();
+            if(this.drawingObjects && this.drawingObjects.sendGraphicObjectProps){
+                this.drawingObjects.sendGraphicObjectProps();
+            }
+            else if(this.document && this.document.Document_UpdateInterfaceState){
+                this.document.Document_UpdateInterfaceState();
+            }
         }
     },
 
