@@ -243,6 +243,15 @@
 	};
 
 	/**
+	 * Create a sheet.
+	 * @memberof ApiWorkbook
+	 * @param {string} name
+	 */
+	ApiWorkbook.prototype.AddSheet = function (name) {
+		this.workbook.oApi.asc_addWorksheet(name);
+	};
+
+	/**
 	 * Returns an object that represents the active cell
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
@@ -1336,6 +1345,8 @@
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
+
+	ApiWorkbook.prototype["AddSheet"] = ApiWorkbook.prototype.AddSheet;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
