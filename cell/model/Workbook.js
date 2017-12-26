@@ -1238,13 +1238,18 @@
 		_calculateDirtyFormula: function(cell) {
 			var t = this;
 			var cellIndex = getCellIndex(cell.nRow, cell.nCol);
-			var dirtyCellVal = t.calculatedCells[cellIndex];
-			if (0 !== dirtyCellVal || 1 === dirtyCellVal) {
+			var calculatedSheet = this.calculatedCells[cell.ws.getId()];
+			if(!calculatedSheet){
+				calculatedSheet = {};
+				this.calculatedCells[cell.ws.getId()] = calculatedSheet;
+			}
+			var dirtyCellVal = calculatedSheet[cellIndex];
+			if ((0 !== dirtyCellVal || 1 === dirtyCellVal)) {
 				cell.processFormula(function(parsed) {
 					if (0 !== dirtyCellVal) {
-						t.calculatedCells[cellIndex] = 1;
+						calculatedSheet[cellIndex] = 1;
 						parsed.calculate();
-						t.calculatedCells[cellIndex] = 0;
+						calculatedSheet[cellIndex] = 0;
 					} else if (1 === dirtyCellVal) {
 						parsed.calculateCycleError();
 					}
@@ -1382,7 +1387,11 @@
 									intersect = node.dataWrap.bbox.intersectionSimple(startVal);
 									if (intersect &&
 										!(node.dataWrap.cellsInArea && node.dataWrap.cellsInArea.isEqual(intersect))) {
-										node.dataWrap.cellsInArea = intersect;
+										if (node.dataWrap.cellsInArea) {
+											node.dataWrap.cellsInArea.union2(intersect);
+										} else {
+											node.dataWrap.cellsInArea = intersect;
+										}
 										res.push(node.dataWrap);
 									}
 								}
@@ -1411,7 +1420,11 @@
 												intersect = node.dataWrap.bbox.intersectionSimple(bbox);
 												if (intersect && !(node.dataWrap.cellsInArea &&
 													node.dataWrap.cellsInArea.isEqual(intersect))) {
-													node.dataWrap.cellsInArea = intersect;
+													if (node.dataWrap.cellsInArea) {
+														node.dataWrap.cellsInArea.union2(intersect);
+													} else {
+														node.dataWrap.cellsInArea = intersect;
+													}
 													res.push(node.dataWrap);
 												}
 											}
