@@ -41,6 +41,14 @@
 	var Api = window["Asc"]["spreadsheet_api"];
 
 	/**
+	 * Class representing a workbook.
+	 * @constructor
+	 */
+	function ApiWorkbook(workbook) {
+		this.workbook = workbook;
+	}
+
+	/**
 	 * Class representing a sheet.
 	 * @constructor
 	 */
@@ -146,6 +154,20 @@
 	}
 
 	/**
+	 * Returns an object that represents the active workbook
+	 * @memberof Api
+	 * @returns {ApiWorkbook}
+	 */
+	Api.prototype.GetActiveWorkbook = function () {
+		return new ApiWorkbook(this.wbModel);
+	};
+	Object.defineProperty(Api.prototype, "ActiveWorkbook", {
+		get: function () {
+			return this.GetActiveWorkbook();
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -154,6 +176,11 @@
 		var index = this.wbModel.getActive();
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
 	};
+	Object.defineProperty(Api.prototype, "ActiveSheet", {
+		get: function () {
+			return this.GetActiveSheet();
+		}
+	});
 
 	/**
 	 * Returns an object that represents the active sheet
@@ -1302,6 +1329,7 @@
 	};
 
 
+	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
 	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
