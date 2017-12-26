@@ -4130,14 +4130,14 @@
 
 				var addValueToMenuObj = function (val, text, visible, count) {
 					var res = new AutoFiltersOptionsElements();
-					res.visible = visible;
-					res.val = val;
-					res.text = text;
-					res.isDateFormat = isDateTimeFormat;
+					res.asc_setVisible(visible);
+					res.asc_setVal(val);
+					res.asc_setText(text);
+					res.asc_setIsDateFormat(isDateTimeFormat);
 					if (isDateTimeFormat) {
-						res.year = dataValue.year;
-						res.month = dataValue.month;
-						res.day = dataValue.d;
+						res.asc_setYear(dataValue.year);
+						res.asc_setMonth(dataValue.month);
+						res.asc_setDay(dataValue.d);
 					}
 
 					values[count] = res;
