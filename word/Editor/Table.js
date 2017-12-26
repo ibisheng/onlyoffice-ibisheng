@@ -12394,6 +12394,11 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 		nSummaryHeight -= oTopBorder.GetWidth() + oBottomBorder.GetWidth();
 		nMinHeight     -= oTopBorder.GetWidth() + oBottomBorder.GetWidth();
 	}
+	else
+	{
+		nSummaryHeight -= this.RowsInfo[this.RowsInfo.length - 1].MaxBotBorder;
+		nMinHeight     -= this.RowsInfo[this.RowsInfo.length - 1].MaxBotBorder;
+	}
 
 	if (this.Pages.length <= 0)
 		return;
@@ -12433,6 +12438,8 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 
 			if (null !== nCellSpacing)
 				nNewH += nCellSpacing;
+			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+				nNewH -= this.RowsInfo[nCurRow].TopDy[0];
 
 			oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 		}
@@ -12496,6 +12503,8 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 
 				if (null !== nCellSpacing)
 					nNewH += nCellSpacing;
+				else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+					nNewH -= this.RowsInfo[nCurRow].TopDy[0];
 
 				oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 			}
@@ -12621,11 +12630,9 @@ CTable.prototype.GetMinHeight = function()
 
 			if (border_None !== oCellTBorder.Value && nMaxTopBorder < oCellTBorder.Size)
 				nMaxTopBorder = oCellTBorder.Size;
-			if (null !== nSpacing)
-			{
-				if (border_None !== oCellBBorder.Value && nMaxBottomBorder < oCellBBorder.Size)
-					nMaxBottomBorder = oCellBBorder.Size;
-			}
+
+			if (border_None !== oCellBBorder.Value && nMaxBottomBorder < oCellBBorder.Size)
+				nMaxBottomBorder = oCellBBorder.Size;
 
 			if (nMaxTopMargin < oCellMargins.Top.W)
 				nMaxTopMargin = oCellMargins.Top.W;
@@ -12645,6 +12652,7 @@ CTable.prototype.GetMinHeight = function()
 			nSumMin += nMaxTopBorder;
 			nSumMin += nMaxTopMargin;
 			nSumMin += nMaxBottomMargin;
+			nSumMin += nMaxBottomBorder;
 			nSumMin += nRowsCount - 1 === nCurRow ? nSpacing : 0;
 
 			if (nRowsCount - 1 === nCurRow)
@@ -12654,6 +12662,9 @@ CTable.prototype.GetMinHeight = function()
 		{
 			nSumMin += Math.max(nMaxTopBorder, nMaxTopMargin);
 			nSumMin += nMaxBottomMargin;
+
+			if (nRowsCount - 1 === nCurRow)
+				nSumMin += nMaxBottomBorder;
 		}
 	}
 
