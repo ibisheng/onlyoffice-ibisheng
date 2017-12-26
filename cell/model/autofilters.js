@@ -704,7 +704,7 @@
 							}
 							
 							var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
-							
+							currentValue = window["Asc"].trim(currentValue);
 							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
 							
 							if(isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null)
@@ -4179,8 +4179,8 @@
 					
 					//value in current column
 					var cell = worksheet.getCell3(i, colId + ref.c1);
-					var text = cell.getValueWithFormat();
-					var val = cell.getValueWithoutFormat();
+					var text = window["Asc"].trim(cell.getValueWithFormat());
+					var val = window["Asc"].trim(cell.getValueWithoutFormat());
 					var textLowerCase = text.toLowerCase();
 					
 					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
