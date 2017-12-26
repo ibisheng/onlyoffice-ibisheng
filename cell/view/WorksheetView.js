@@ -13168,7 +13168,7 @@
 
         //get values
         var colId = filterProp.colId;
-        var openAndClosedValues = ws.autoFilters._getOpenAndClosedValues(filter, colId);
+        var openAndClosedValues = ws.autoFilters.getOpenAndClosedValues(filter, colId);
         var values = openAndClosedValues.values;
         var automaticRowCount = openAndClosedValues.automaticRowCount;
         var filters = autoFilter.getFilterColumn(colId);

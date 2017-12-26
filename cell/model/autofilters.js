@@ -4101,7 +4101,7 @@
 				}	
 			},
 			
-			_getOpenAndClosedValues: function(filter, colId, isOpenHiddenRows)
+			getOpenAndClosedValues: function(filter, colId, isOpenHiddenRows)
 			{
 				//filter - TablePart or AutoFilter
 				//autoFilter - only autoFilter
@@ -4109,36 +4109,31 @@
 				var autoFilter = isTablePart ? filter.AutoFilter : filter;
 				var ref = filter.Ref;
 				var filterColumns = autoFilter.FilterColumns;
-				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
-				
-				colId = this._getTrueColId(autoFilter, colId);
+				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, dataValue, values = [];
 
-				var currentFilterColumn = autoFilter.getFilterColumn(colId);
-				
-				var addValueToMenuObj = function(tempResult, count)
+				var addValueToMenuObj = function(val, text, visible, count)
 				{
-					//TODO ветка для добавления даты(как заделаем разделение год/месяц/число в меню)
-					/*if(isDateTimeFormat)
+					var res = new AutoFiltersOptionsElements();
+					res.visible = visible;
+					res.val = val;
+					res.text = text;
+					res.isDateFormat = isDateTimeFormat;
+					if(isDateTimeFormat)
 					{
-						if(!result.dates.year)
-							result.dates.year = [];
-						if(!result.dates.year[dataValue.year])
-							result.dates.year[dataValue.year] = {};
-						
-						if(!result.dates.year[dataValue.year].month)
-							result.dates.year[dataValue.year].month = [];
-						if(!result.dates.year[dataValue.year].month[dataValue.month])
-							result.dates.year[dataValue.year].month[dataValue.month] = {};
-						
-						if(!result.dates.year[dataValue.year].month[dataValue.month].day)
-							result.dates.year[dataValue.year].month[dataValue.month].day = [];
-						if(!result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d])
-							result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d] = {};
-							
-						result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d].val = tempResult;
+						res.year = dataValue.year;
+						res.month = dataValue.month;
+						res.day = dataValue.d;
 					}
-					else*/
-						values[count] = tempResult;
+
+					values[count] = res;
+				};
+
+				var hideValue = function(val, num)
+				{
+					if(isOpenHiddenRows)
+					{
+						worksheet.setRowHidden(val, num, num);
+					}
 				};
 
 				if(isOpenHiddenRows)
@@ -4148,6 +4143,8 @@
 
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
+				colId = this._getTrueColId(autoFilter, colId);
+				var currentFilterColumn = autoFilter.getFilterColumn(colId);
 				
 				if(!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
@@ -4184,10 +4181,12 @@
 					var textLowerCase = text.toLowerCase();
 					
 					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-					
-					//if(isDateTimeFormat)
-						//dataValue = NumFormat.prototype.parseDate(val);
-						
+
+					if(isDateTimeFormat)
+					{
+						dataValue = AscCommon.NumFormat.prototype.parseDate(val);
+					}
+
 					//check duplicate value
 					if(temp.hasOwnProperty(textLowerCase))
 						continue;
@@ -4197,46 +4196,31 @@
 					{
 						if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 						{
-							tempResult = new AutoFiltersOptionsElements();
-							tempResult.val = val;
-							tempResult.text = text;
-							tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-							
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
+							var visible = false;
 							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
 								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
 							{
-								if(isOpenHiddenRows)
-									worksheet.setRowHidden(false, i, i);
-								tempResult.visible = true;
+								hideValue(false, i);
+								visible = true;
 							}
 							else
 							{
-								if(isOpenHiddenRows)
-									worksheet.setRowHidden(false, i, i);
-								tempResult.visible = false;
+								hideValue(false, i);
 							}
-								
-							
-							addValueToMenuObj(tempResult, count);
-							
+
+							addValueToMenuObj(val, text, visible, count);
+
 							temp[textLowerCase] = 1;
 							count++;
 						}
 					}
 					else
 					{
-						tempResult = new AutoFiltersOptionsElements();
-						tempResult.visible = true;
-						tempResult.val = val;
-						tempResult.text = text;
-						tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-						
-						if(isOpenHiddenRows)
-							worksheet.setRowHidden(false, i, i);
-						
-						addValueToMenuObj(tempResult, count);
+						hideValue(false, i);
+						addValueToMenuObj(val, text, true, count);
+
 						temp[textLowerCase] = 1;
 						count++;
 					}
@@ -4248,6 +4232,7 @@
 				{
 					worksheet.workbook.dependencyFormulas.unlockRecal();
 				}
+
 				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
 			},
 			
