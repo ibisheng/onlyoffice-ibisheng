@@ -4100,9 +4100,8 @@
 					return result;
 				}	
 			},
-			
-			getOpenAndClosedValues: function(filter, colId, isOpenHiddenRows)
-			{
+
+			getOpenAndClosedValues: function (filter, colId, isOpenHiddenRows) {
 				//filter - TablePart or AutoFilter
 				//autoFilter - only autoFilter
 				var isTablePart = !filter.isAutoFilter();
@@ -4111,15 +4110,13 @@
 				var filterColumns = autoFilter.FilterColumns;
 				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, dataValue, values = [];
 
-				var addValueToMenuObj = function(val, text, visible, count)
-				{
+				var addValueToMenuObj = function (val, text, visible, count) {
 					var res = new AutoFiltersOptionsElements();
 					res.visible = visible;
 					res.val = val;
 					res.text = text;
 					res.isDateFormat = isDateTimeFormat;
-					if(isDateTimeFormat)
-					{
+					if (isDateTimeFormat) {
 						res.year = dataValue.year;
 						res.month = dataValue.month;
 						res.day = dataValue.d;
@@ -4128,16 +4125,13 @@
 					values[count] = res;
 				};
 
-				var hideValue = function(val, num)
-				{
-					if(isOpenHiddenRows)
-					{
+				var hideValue = function (val, num) {
+					if (isOpenHiddenRows) {
 						worksheet.setRowHidden(val, num, num);
 					}
 				};
 
-				if(isOpenHiddenRows)
-				{
+				if (isOpenHiddenRows) {
 					worksheet.workbook.dependencyFormulas.lockRecal();
 				}
 
@@ -4145,68 +4139,64 @@
 				var automaticRowCount = null;
 				colId = this._getTrueColId(autoFilter, colId);
 				var currentFilterColumn = autoFilter.getFilterColumn(colId);
-				
-				if(!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+
+				if (!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(filter.Ref, true);
 					automaticRowCount = automaticRange.r2;
-					
-					if(automaticRowCount > maxFilterRow)
+
+					if (automaticRowCount > maxFilterRow) {
 						maxFilterRow = automaticRowCount;
+					}
 				}
-				
-				if(isTablePart && filter.TotalsRowCount)
-				{
+
+				if (isTablePart && filter.TotalsRowCount) {
 					maxFilterRow--;
 				}
-				
+
 				var individualCount = 0, count = 0, tempResult;
-				for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
-				{
+				for (var i = ref.r1 + 1; i <= maxFilterRow; i++) {
 					//max strings
-					if(individualCount > maxIndividualValues)
+					if (individualCount > maxIndividualValues) {
 						break;
-					
+					}
+
 					//not apply filter by current button
-					if(null === currentFilterColumn && worksheet.getRowHidden(i) === true)
-					{
+					if (null === currentFilterColumn && worksheet.getRowHidden(i) === true) {
 						individualCount++;
 						continue;
 					}
-					
+
 					//value in current column
 					var cell = worksheet.getCell3(i, colId + ref.c1);
 					var text = window["Asc"].trim(cell.getValueWithFormat());
 					var val = window["Asc"].trim(cell.getValueWithoutFormat());
 					var textLowerCase = text.toLowerCase();
-					
+
 					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 
-					if(isDateTimeFormat)
-					{
+					if (isDateTimeFormat) {
 						dataValue = AscCommon.NumFormat.prototype.parseDate(val);
 					}
 
 					//check duplicate value
-					if(temp.hasOwnProperty(textLowerCase))
+					if (temp.hasOwnProperty(textLowerCase)) {
 						continue;
-					
+					}
+
 					//apply filter by current button
-					if(null !== currentFilterColumn)
-					{
-						if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
+					if (null !== currentFilterColumn) {
+						if (!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 						{
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
 							var visible = false;
 							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
-							{
+								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter &&
+								!currentFilterColumn.isHideValue(checkValue, isDateTimeFormat)) {
 								hideValue(false, i);
 								visible = true;
-							}
-							else
-							{
+							} else {
 								hideValue(false, i);
 							}
 
@@ -4215,21 +4205,18 @@
 							temp[textLowerCase] = 1;
 							count++;
 						}
-					}
-					else
-					{
+					} else {
 						hideValue(false, i);
 						addValueToMenuObj(val, text, true, count);
 
 						temp[textLowerCase] = 1;
 						count++;
 					}
-					
+
 					individualCount++;
 				}
 
-				if(isOpenHiddenRows)
-				{
+				if (isOpenHiddenRows) {
 					worksheet.workbook.dependencyFormulas.unlockRecal();
 				}
 
