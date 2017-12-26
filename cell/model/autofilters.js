@@ -4123,11 +4123,8 @@
 			},
 
 			getOpenAndClosedValues: function (filter, colId, isOpenHiddenRows) {
-				//filter - TablePart or AutoFilter
-				//autoFilter - only autoFilter
-				var isTablePart = !filter.isAutoFilter();
-				var autoFilter = isTablePart ? filter.AutoFilter : filter;
-				var ref = filter.Ref;
+
+				var isTablePart = !filter.isAutoFilter(), autoFilter = filter.getAutoFilter(), ref = filter.Ref;
 				var filterColumns = autoFilter.FilterColumns;
 				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, dataValue, values = [];
 

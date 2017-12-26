@@ -5504,6 +5504,11 @@ TablePart.prototype.isAutoFilter = function()
 	return false;
 };
 
+TablePart.prototype.getAutoFilter = function()
+{
+	return this.AutoFilter;
+};
+
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
 {
 	var res = null;
@@ -5982,6 +5987,11 @@ AutoFilter.prototype.getFilterColumn = function(colId)
 	}
 
 	return res;
+};
+
+AutoFilter.prototype.getAutoFilter = function()
+{
+	return this;
 };
 
 
