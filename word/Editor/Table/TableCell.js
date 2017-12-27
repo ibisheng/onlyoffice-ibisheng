@@ -1934,6 +1934,23 @@ CTableCell.prototype.IsLastTableCellInRow = function(isSelection)
 
 	return true;
 };
+/**
+ * Получаем скомпилированную настройку ширины ячейки
+ * @returns {?CTableMeasurement}
+ */
+CTableCell.prototype.GetW = function()
+{
+	return this.Get_W();
+};
+/**
+ * Задаем предпочитаемую ширину ячейки
+ * @param {CTableMeasurement} oCellW
+ */
+CTableCell.prototype.SetW = function(oCellW)
+{
+	return this.Set_W(oCellW);
+};
+
 
 function CTableCellRecalculateObject()
 {

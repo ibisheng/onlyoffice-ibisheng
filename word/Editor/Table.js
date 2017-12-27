@@ -7869,6 +7869,23 @@ CTable.prototype.Get_TableW = function()
 	var Pr = this.Get_CompiledPr(false).TablePr;
 	return Pr.TableW;
 };
+/**
+ * Задаем предпочитаемую ширину таблицы
+ * @param nType
+ * @param nW
+ */
+CTable.prototype.SetTableW = function(nType, nW)
+{
+	this.Set_TableW(nType, nW);
+};
+/**
+ * Получаем предпочитаемую ширину таблицы
+ * @returns {CTableMeasurement}
+ */
+CTable.prototype.GetTableW = function()
+{
+	return this.Get_TableW();
+};
 CTable.prototype.Set_TableLayout = function(Value)
 {
 	if (this.Pr.TableLayout === Value)
@@ -11918,6 +11935,25 @@ CTable.prototype.SetTableGrid = function(arrGrid)
 	History.Add(new CChangesTableTableGrid(this, this.TableGrid, arrGrid));
 	this.TableGrid = arrGrid;
 };
+/**
+ * Получаем ширину заданного промежутка в сетке таблицы
+ * @param nStartCol
+ * @param nGridSpan
+ * @returns {number}
+ */
+CTable.prototype.GetSpanWidth = function(nStartCol, nGridSpan)
+{
+	if (nStartCol < 0 || nStartCol + nGridSpan < 0 || nGridSpan <= 0 || nStartCol + nGridSpan >= this.TableGrid.length)
+		return 0;
+
+	var nSum = 0;
+	for (var nCurCol = nStartCol; nCurCol < nStartCol + nGridSpan; ++nCurCol)
+	{
+		nSum += this.TableGrid[nCurCol];
+	}
+
+	return nSum;
+};
 CTable.prototype.private_CopyTableGrid = function()
 {
 	var arrGrid = [];
@@ -12511,22 +12547,156 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 		}
 	}
 
+	this.private_RecalculateGrid();
+
+	var nFinalTableSum = null;
 	if (nDiffX > 0.001)
 	{
+		var arrColsW   = [];
+		var nTableSumW = 0;
 
+		for (var nCurCol = 0, nColsCount = this.TableGridCalc.length; nCurCol < nColsCount; ++nCurCol)
+		{
+			arrColsW[nCurCol] = this.TableGridCalc[nCurCol];
+			nTableSumW       += arrColsW[nCurCol];
+		}
+
+		nFinalTableSum = 0;
+		var arrNewGrid = [];
+		for (var nCurCol = 0, nColsCount = this.TableGridCalc.length; nCurCol < nColsCount; ++nCurCol)
+		{
+			arrNewGrid[nCurCol] = arrColsW[nCurCol] / nTableSumW * (nTableSumW + nDiffX);
+			nFinalTableSum += arrNewGrid[nCurCol];
+		}
+
+		this.SetTableGrid(arrNewGrid);
 	}
 	else if (nDiffX < -0.01)
 	{
+		var arrColsMinW = this.GetMinWidth(true);
+		var arrColsW    = [];
+		var nTableSumW  = 0;
+		var arrColsFlag = [];
 
+		for (var nCurCol = 0, nColsCount = this.TableGridCalc.length; nCurCol < nColsCount; ++nCurCol)
+		{
+			arrColsW[nCurCol]    = this.TableGridCalc[nCurCol];
+			nTableSumW          += arrColsW[nCurCol];
+			arrColsFlag[nCurCol] = true;
+		}
+
+		var nNewTableW = nTableSumW + nDiffX;
+		var arrNewGrid = [];
+		while (true)
+		{
+			var isForceBreak = false;
+			var isContinue   = false;
+			for (var nCurCol = 0, nColsCount = this.TableGridCalc.length; nCurCol < nColsCount; ++nCurCol)
+			{
+				if (arrColsFlag[nCurCol])
+				{
+					arrNewGrid[nCurCol] = arrColsW[nCurCol] / nTableSumW * nNewTableW;
+					if (arrNewGrid[nCurCol] < arrColsMinW[nCurCol])
+					{
+						nTableSumW -= arrColsW[nCurCol];
+						nNewTableW -= arrColsMinW[nCurCol];
+						arrNewGrid[nCurCol]  = arrColsMinW[nCurCol];
+						arrColsFlag[nCurCol] = false;
+
+						if (nNewTableW < 0.01 || nTableSumW < 0.01)
+							isForceBreak = true;
+
+						isContinue = true;
+					}
+				}
+			}
+
+			if (isForceBreak || !isContinue)
+				break;
+		}
+
+		nFinalTableSum = 0;
+		for (var nCurCol = 0, nColsCount = this.TableGridCalc.length; nCurCol < nColsCount; ++nCurCol)
+		{
+			nFinalTableSum += arrNewGrid[nCurCol];
+		}
+
+		this.SetTableGrid(arrNewGrid);
+	}
+
+	var nPercentWidth = this.private_RecalculatePercentWidth();
+	if (null !== nFinalTableSum)
+	{
+		for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+		{
+			var oRow    = this.GetRow(nCurRow);
+			var oBefore = oRow.GetBefore();
+			if (oBefore.W && oBefore.Grid > 0)
+			{
+				var nW = this.GetSpanWidth(0, oBefore.Grid);
+				if (oBefore.W.IsMM())
+					oRow.SetBefore(oBefore.Grid, new CTableMeasurement(tblwidth_Mm, nW));
+				else if (oBefore.W.IsPercent() && nPercentWidth > 0.001)
+					oRow.SetBefore(oBefore.Grid, new CTableMeasurement(tblwidth_Pct, nW / nPercentWidth * 100));
+				else
+					oRow.SetBefore(oBefore.Grid, new CTableMeasurement(tblwidth_Auto, 0));
+			}
+
+			var nCurCol = oBefore.Grid;
+			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+			{
+				var oCell     = oRow.GetCell(nCurCell);
+				var oCellW    = oCell.GetW();
+				var nGridSpan = oCell.GetGridSpan();
+
+				if (oCellW)
+				{
+					var nW = this.GetSpanWidth(nCurCol, nGridSpan);
+					if (oCellW.IsMM())
+						oCell.SetW(new CTableMeasurement(tblwidth_Mm, nW));
+					else if (oCell.IsPercent() && nPercentWidth > 0.001)
+						oCell.SetW(new CTableMeasurement(tblwidth_Pct, nW / nPercentWidth * 100));
+					else
+						oCell.SetW(new CTableMeasurement(tblwidth_Auto, 0));
+				}
+
+				nCurCol += nGridSpan;
+			}
+
+			var oAfter = oRow.GetAfter();
+			if (oAfter.W && oAfter.Grid > 0)
+			{
+				var nW = this.GetSpanWidth(nCurCol, oAfter.Grid);
+				if (oAfter.W.IsMM())
+					oRow.SetAfter(oAfter.Grid, new CTableMeasurement(tblwidth_Mm, nW));
+				else if (oAfter.W.IsPercent() && nPercentWidth > 0.001)
+					oRow.SetAfter(oAfter.Grid, new CTableMeasurement(tblwidth_Pct, nW / nPercentWidth * 100));
+				else
+					oRow.SetAfter(oAfter.Grid, new CTableMeasurement(tblwidth_Auto, 0));
+			}
+
+		}
+
+		var oTableW = this.GetTableW();
+		if (oTableW)
+		{
+			if (oTableW.IsMM())
+				this.SetTableW(tblwidth_Mm, nFinalTableSum);
+			else if (oTableW.IsPercent() && nPercentWidth > 0.001)
+				this.SetTableW(tblwidth_Pct, nFinalTableSum / nPercentWidth * 100);
+			else
+				this.SetTableW(tblwidth_Auto, 0);
+		}
 	}
 
 	this.LogicDocument.Recalculate();
 };
 /**
  * Получаем минимальную ширину таблицы
+ * @param {number} [isReturnByColumns=false]
  * @returns {number}
  */
-CTable.prototype.GetMinWidth = function()
+CTable.prototype.GetMinWidth = function(isReturnByColumns)
 {
 	var arrMinMargin = [];
 
@@ -12593,6 +12763,9 @@ CTable.prototype.GetMinWidth = function()
 			nCurGridCol += nGridSpan;
 		}
 	}
+
+	if (isReturnByColumns)
+		return arrMinMargin;
 
 	var nSumMin = 0;
 	for (var nCurCol = 0; nCurCol < nGridCount; ++nCurCol)

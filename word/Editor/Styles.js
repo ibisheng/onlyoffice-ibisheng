@@ -5118,6 +5118,22 @@ CTableMeasurement.prototype =
         this.Type = Obj.Type;
     }
 };
+/**
+ * Измерение в миллиметрах?
+ * @returns {boolean}
+ */
+CTableMeasurement.prototype.IsMM = function()
+{
+	return !!(tblwidth_Mm === this.Type);
+};
+/**
+ * Измерение в процентах?
+ * @returns {boolean}
+ */
+CTableMeasurement.prototype.IsPercent = function()
+{
+	return !!(tblwidth_Pct === this.Type);
+};
 
 function CTablePr()
 {
