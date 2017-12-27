@@ -2454,6 +2454,9 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function (pageCount)
 	{
+		if (!this.m_oWordControl.MobileTouchManager)
+			this.TableOutlineDr.TableOutline = null;
+
 		if (this.m_oWordControl)
 			this.m_oWordControl.m_oApi.checkLastWork();
 
@@ -2484,8 +2487,6 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function (index, pageObject)
 	{
-		if (!this.m_oWordControl.MobileTouchManager)
-			this.TableOutlineDr.TableOutline = null;
 		editor.sendEvent("asc_onDocumentChanged");
 		if (true === this.m_bIsSearching)
 		{
@@ -6837,7 +6838,10 @@ function CDrawingDocument()
 		{
 			oWordControl.m_oLogicDocument.RemoveSelection(true);
 			this.TableOutlineDr.bIsTracked = true;
-			this.LockCursorType("move");
+			if (!this.TableOutlineDr.IsResizeTableTrack)
+				this.LockCursorType("move");
+			else
+				this.LockCursorType("default");
 
 			this.TableOutlineDr.TableOutline.Table.SelectAll();
 			this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
