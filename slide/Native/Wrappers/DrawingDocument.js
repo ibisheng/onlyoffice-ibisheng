@@ -417,12 +417,39 @@ CDrawingDocument.prototype.IsCursorInTableCur = function(x, y, page)
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
 {
-    return this.Native["DD_ConvertCoordsToCursorWR"]();
+    var m11, m22, m12, m21, tx, ty, _page_index;
+    if(transform)
+    {
+        m11 = transform.sx;
+        m22 = transform.sy;
+        m12 = transform.shx;
+        m21 = transform.shy;
+        tx = transform.tx;
+        ty = transform.ty;
+    }
+    else
+    {
+        m11 = 1.0;
+        m22 = 1.0;
+        m12 = 0.0;
+        m21 = 0.0;
+        tx = 0.0;
+        ty = 0.0;
+    }
+    if(AscFormat.isRealNumber(pageIndex))
+    {
+        _page_index = pageIndex;
+    }
+    else
+    {
+        _page_index = 0;
+    }
+    return this.Native["DD_ConvertCoordsToCursor"](x, y, _page_index, m11, m21, m12, m22, tx, ty);
 };
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR_2 = function(x, y)
 {
-    return this.Native["DD_ConvertCoordsToCursorWR_2"]();
+    return this.Native["DD_ConvertCoordsToCursor"]();
 };
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR_Comment = function(x, y)
@@ -432,7 +459,7 @@ CDrawingDocument.prototype.ConvertCoordsToCursorWR_Comment = function(x, y)
 
 CDrawingDocument.prototype.ConvertCoordsToCursor = function(x, y)
 {
-    return this.Native["DD_ConvertCoordsToCursor"]();
+    return this.Native["DD_ConvertCoordsToCursor"](x, y, 0);
 };
 
 CDrawingDocument.prototype.TargetStart = function()
