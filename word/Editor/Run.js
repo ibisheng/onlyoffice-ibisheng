@@ -1181,6 +1181,7 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
     }
 
     this.protected_UpdateSpellChecking();
+	this.private_UpdateDocumentOutline();
     this.private_UpdateTrackRevisionOnChangeContent(true);
 
     // Обновляем позиции меток совместного редактирования
@@ -1201,7 +1202,7 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     if (true === UpdatePosition)
         this.private_UpdatePositionsOnRemove(Pos, Count);
 
-    // Обновляем позиции в NearestPos
+	// Обновляем позиции в NearestPos
     var NearPosLen = this.NearPosArray.length;
     for ( var Index = 0; Index < NearPosLen; Index++ )
     {
@@ -1244,7 +1245,8 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     }
 
     this.protected_UpdateSpellChecking();
-    this.private_UpdateTrackRevisionOnChangeContent(true);
+	this.private_UpdateDocumentOutline();
+	this.private_UpdateTrackRevisionOnChangeContent(true);
 
     // Обновляем позиции меток совместного редактирования
     this.CollaborativeMarks.Update_OnRemove( Pos, Count );

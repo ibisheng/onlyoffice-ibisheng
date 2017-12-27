@@ -609,6 +609,7 @@ Paragraph.prototype.Internal_Content_Add = function(Pos, Item, bCorrectPos)
 	this.Content.splice(Pos, 0, Item);
 	this.private_UpdateTrackRevisions();
 	this.private_CheckUpdateBookmarks([Item]);
+	this.UpdateDocumentOutline();
 
 	if (this.CurPos.ContentPos >= Pos)
 	{
@@ -707,6 +708,7 @@ Paragraph.prototype.Internal_Content_Concat = function(Items)
 	History.Add(new CChangesParagraphAddItem(this, StartPos, Items));
 	this.private_UpdateTrackRevisions();
 	this.private_CheckUpdateBookmarks(Items);
+	this.UpdateDocumentOutline();
 
 	// Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
 	for (var CurPos = StartPos; CurPos < this.Content.length; CurPos++)
@@ -730,6 +732,7 @@ Paragraph.prototype.Internal_Content_Remove = function(Pos)
 	this.Content.splice(Pos, 1);
 	this.private_UpdateTrackRevisions();
 	this.private_CheckUpdateBookmarks([Item]);
+	this.UpdateDocumentOutline();
 
 	if (Item.PreDelete)
 		Item.PreDelete();
@@ -845,6 +848,7 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 	History.Add(new CChangesParagraphRemoveItem(this, Pos, DeletedItems));
 	this.private_UpdateTrackRevisions();
 	this.private_CheckUpdateBookmarks(DeletedItems);
+	this.UpdateDocumentOutline();
 
 	if (this.Selection.StartPos > Pos + Count)
 		this.Selection.StartPos -= Count;
@@ -8238,6 +8242,7 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 		History.Add(new CChangesParagraphPStyle(this, this.Pr.PStyle, Id));
 		this.Pr.PStyle = Id;
 		this.private_UpdateTrackRevisionOnChangeParaPr(true);
+		this.UpdateDocumentOutline();
 	}
 
 	// Надо пересчитать конечный стиль самого параграфа и всех текстовых блоков
@@ -8299,6 +8304,7 @@ Paragraph.prototype.Style_Remove = function()
 		this.private_AddPrChange();
 		History.Add(new CChangesParagraphPStyle(this, this.Pr.PStyle, undefined));
 		this.Pr.PStyle = undefined;
+		this.UpdateDocumentOutline();
 	}
 
 	// Надо пересчитать конечный стиль
@@ -9544,6 +9550,8 @@ Paragraph.prototype.PreDelete = function()
 			this.LogicDocument.GetBookmarksManager().SetNeedUpdate(true);
 		}
 	}
+
+	this.UpdateDocumentOutline();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
@@ -11523,6 +11531,16 @@ Paragraph.prototype.private_UpdateTrackRevisions = function()
         var RevisionsManager = this.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this);
     }
+};
+Paragraph.prototype.UpdateDocumentOutline = function()
+{
+	// Обновляем только если родительский класс и есть документ
+	if (this.Parent && this.Parent === this.LogicDocument)
+	{
+		var oDocumentOutline = this.Parent.GetDocumentOutline();
+		if (oDocumentOutline.IsUse())
+			oDocumentOutline.CheckParagraph(this);
+	}
 };
 Paragraph.prototype.AcceptRevisionChanges = function(Type, bAll)
 {

@@ -7789,6 +7789,9 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckL
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
+
+	if (type_Paragraph === NewObject.GetType())
+		this.DocumentOutline.CheckParagraph(NewObject);
 };
 CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCheckLastElement)
 {
@@ -10934,6 +10937,10 @@ CDocument.prototype.Get_History = function()
 CDocument.prototype.Get_CollaborativeEditing = function()
 {
 	return this.CollaborativeEditing;
+};
+CDocument.prototype.GetDocumentOutline = function()
+{
+	return this.DocumentOutline;
 };
 CDocument.prototype.private_CorrectDocumentPosition = function()
 {

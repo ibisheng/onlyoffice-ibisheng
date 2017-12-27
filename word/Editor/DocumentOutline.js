@@ -47,23 +47,26 @@ function CDocumentOutline(oLogicDocument)
 	this.Use           = false;
 	this.Elements      = [];
 	this.CurPos        = -1;
+
+	this.ParagraphsToUpdate = {};
 }
 CDocumentOutline.prototype.SetUse = function(isUse)
 {
 	this.Use = isUse;
 	if (this.Use)
-		this.Update();
+		this.UpdateAll();
 };
 CDocumentOutline.prototype.IsUse = function()
 {
 	return this.Use;
 };
-CDocumentOutline.prototype.Update = function()
+CDocumentOutline.prototype.UpdateAll = function()
 {
 	if (!this.Use)
 		return;
 
-	this.Elements = [];
+	this.ParagraphsToUpdate = {};
+	this.Elements           = [];
 	this.LogicDocument.GetOutlineParagraphs(this.Elements, {SkipEmptyParagraphs : false});
 
 	if (this.Elements.length > 0)
@@ -79,6 +82,80 @@ CDocumentOutline.prototype.Update = function()
 	this.LogicDocument.UpdateDocumentOutlinePosition();
 
 	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
+};
+CDocumentOutline.prototype.CheckParagraph = function(oParagraph)
+{
+	if ((-1 !== this.private_FindElementByParagraph(oParagraph)
+		|| undefined !== oParagraph.GetOutlineLvl())
+		&& !this.ParagraphsToUpdate[oParagraph.GetId()])
+	{
+		this.ParagraphsToUpdate[oParagraph.GetId()] = oParagraph;
+	}
+};
+CDocumentOutline.prototype.Update = function()
+{
+	// TODO: Надо проверить нумерацию
+
+	var arrParagraphs = [];
+	for (var sId in this.ParagraphsToUpdate)
+	{
+		arrParagraphs.push(this.ParagraphsToUpdate[sId]);
+	}
+
+	if (arrParagraphs.length > 0)
+	{
+		this.LogicDocument.UpdateContentIndexing();
+		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			var oParagraph = arrParagraphs[nIndex];
+
+			var nPos   = this.private_FindElementByParagraph(oParagraph);
+			var nLevel = oParagraph.GetOutlineLvl();
+			var isUse  = oParagraph.Is_UseInDocument();
+
+			if (undefined !== nLevel && isUse)
+			{
+				if (-1 === nPos)
+				{
+					nPos = this.private_GetParagraphPosition(oParagraph);
+					this.Elements.splice(nPos, 0, {Paragraph : oParagraph, Lvl : nLevel});
+					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(nPos);
+				}
+				else
+				{
+					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateChange(nPos);
+				}
+			}
+			else if (-1 !== nPos && (undefined === nLevel || !isUse))
+			{
+				this.Elements.splice(nPos, 1);
+				this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateRemove(nPos);
+			}
+		}
+	}
+
+	this.ParagraphsToUpdate = {};
+};
+CDocumentOutline.prototype.private_FindElementByParagraph = function(oParagraph)
+{
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Elements[nIndex].Paragraph === oParagraph)
+			return nIndex;
+	}
+
+	return -1;
+};
+CDocumentOutline.prototype.private_GetParagraphPosition = function(oParagraph)
+{
+	var nParaIndex = oParagraph.GetIndex();
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		if (nParaIndex <= this.Elements[nIndex].Paragraph.GetIndex())
+			return nIndex;
+	}
+
+	return this.Elements.length;
 };
 CDocumentOutline.prototype.GetElementsCount = function()
 {

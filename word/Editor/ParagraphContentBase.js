@@ -610,6 +610,11 @@ CParagraphContentWithContentBase.prototype.CanSplit = function()
 CParagraphContentWithContentBase.prototype.PreDelete = function()
 {
 };
+CParagraphContentWithContentBase.prototype.private_UpdateDocumentOutline = function()
+{
+	if (this.Paragraph)
+		this.Paragraph.UpdateDocumentOutline();
+};
 /**
  * Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
  * @constructor
@@ -911,6 +916,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 {
     this.Content.splice(Pos, 0, Item);
     this.private_UpdateTrackRevisions();
+	this.private_UpdateDocumentOutline();
     this.private_CheckUpdateBookmarks([Item]);
 
     if (false !== UpdatePosition)
@@ -990,6 +996,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
 	this.Content.splice(Pos, Count);
     this.private_UpdateTrackRevisions();
+	this.private_UpdateDocumentOutline();
 	this.private_CheckUpdateBookmarks(DeletedItems);
 
     if (false !== UpdatePosition)
