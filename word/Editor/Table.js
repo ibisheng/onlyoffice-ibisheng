@@ -11943,7 +11943,7 @@ CTable.prototype.SetTableGrid = function(arrGrid)
  */
 CTable.prototype.GetSpanWidth = function(nStartCol, nGridSpan)
 {
-	if (nStartCol < 0 || nStartCol + nGridSpan < 0 || nGridSpan <= 0 || nStartCol + nGridSpan >= this.TableGrid.length)
+	if (nStartCol < 0 || nStartCol + nGridSpan < 0 || nGridSpan <= 0 || nStartCol + nGridSpan > this.TableGrid.length)
 		return 0;
 
 	var nSum = 0;
@@ -12642,7 +12642,8 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 					oRow.SetBefore(oBefore.Grid, new CTableMeasurement(tblwidth_Auto, 0));
 			}
 
-			var nCurCol = oBefore.Grid;
+			var nCellSpacing = oRow.GetCellSpacing();
+			var nCurCol      = oBefore.Grid;
 			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
 			{
 				var oCell     = oRow.GetCell(nCurCell);
@@ -12652,6 +12653,18 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 				if (oCellW)
 				{
 					var nW = this.GetSpanWidth(nCurCol, nGridSpan);
+
+					if (null !== nCellSpacing)
+					{
+						if (0 === nCurCell)
+							nW -= nCellSpacing / 2;
+
+						nW -= nCellSpacing;
+
+						if (nCellsCount - 1 === nCurCell)
+							nW -= nCellSpacing / 2;
+					}
+
 					if (oCellW.IsMM())
 						oCell.SetW(new CTableMeasurement(tblwidth_Mm, nW));
 					else if (oCell.IsPercent() && nPercentWidth > 0.001)
