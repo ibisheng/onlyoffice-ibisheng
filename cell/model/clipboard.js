@@ -3267,6 +3267,7 @@
 			this.ws = ws;
 			this.isUsuallyPutImages = null;
 			this.maxLengthRowCount = 0;
+			this.rowDiff = 0;//для обработки данных в ране, разделенных shift+enter
 			
 			this.paragraphText = "";
 			
@@ -3321,6 +3322,7 @@
 			_parseChildren: function(children)
 			{
 				var childrens = children.children;
+				var colSpan, rowSpan;
 				for(var i = 0; i < childrens.length; i++)
 				{
 					if(childrens[i].type === c_oAscBoundsElementType.Cell)
@@ -3331,8 +3333,8 @@
 							{
 								var isCtable = false;
 								var tempChildren = childrens[i].children[0].children;
-								var colSpan = null;
-								var rowSpan = null;
+								colSpan = null;
+								rowSpan = null;
 								for(var temp = 0; temp < tempChildren.length; temp++)
 								{
 									if(tempChildren[temp].type === c_oAscBoundsElementType.Table)
@@ -3370,161 +3372,150 @@
 					if(childrens[i].children.length === 0)
 					{
 						//if parent - cell of table
-						var colSpan = null;
-						var rowSpan = null;
+						colSpan = null;
+						rowSpan = null;
 						
-						this._parseParagraph(childrens[i], childrens[i].top, childrens[i].left);
+						this._parseParagraph(childrens[i], childrens[i].top + this.rowDiff, childrens[i].left);
 					}
 					else
 						this._parseChildren(childrens[i]);
 				}
 			},
-			
-			_parseParagraph: function(paragraph, row, col, rowSpan, colSpan)
-			{
+
+			_parseParagraph: function (paragraph, row, col) {
 				this.paragraphText = "";
-				
+
 				var content = paragraph.elem.Content;
-				var row, cTextPr, fontFamily = "Arial";
+				var fontFamily = "Arial";
 				var text = null;
-				var oNewItem = new pasteCell(), cloneNewItem;
-				var paraRunContent;
+				var oNewItem = new pasteCell();
 
 				var aResult = this.aResult;
-				if(row === undefined)
-				{
-					if(aResult.content.length === 0)
-					{
+				if (row === undefined) {
+					if (aResult.content.length === 0) {
 						row = 0;
-					}
-					else
+					} else {
 						row = aResult.length;
+					}
 				}
-				
+
 				var cell = this.aResult.getCell(row + this.maxLengthRowCount, col);
-				if(cell && cell.content && cell.content.length === 0 && (cell.borders || cell.rowSpan != null))
-				{
-					if(cell.borders)
-					{
+				if (cell && cell.content && cell.content.length === 0 && (cell.borders || cell.rowSpan != null)) {
+					if (cell.borders) {
 						oNewItem.borders = cell.borders;
 					}
-						
-					if(cell.rowSpan != null)
-					{
+
+					if (cell.rowSpan != null) {
 						oNewItem.rowSpan = cell.rowSpan;
 						oNewItem.colSpan = cell.colSpan;
 					}
 					this.aResult.deleteCell(row + this.maxLengthRowCount, col)
 				}
-	
-				var s = 0;
-				var c1 = col !== undefined ? col : 0;
-				
+
+				var startRow = row;
+				var innerCol = 0;
+				if (col === undefined) {
+					col = 0;
+				}
+
 				//backgroundColor
 				var backgroundColor = this.getBackgroundColorTCell(paragraph);
-				if(backgroundColor)
+				if (backgroundColor) {
 					oNewItem.bc = backgroundColor;
-				
+				}
+
 				//настройки параграфа
 				paragraph.elem.CompiledPr.NeedRecalc = true;
 				var paraPr = paragraph.elem.Get_CompiledPr();
-				//var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
-				
+
 				//горизонтальное выравнивание
-				var horisonalAlign = this._getAlignHorisontal(paraPr);
-				/*if(horisonalAlign)
-					oNewItem.a = horisonalAlign;
-				else*/ if(horisonalAlign == null)
+				var horisontalAlign = this._getAlignHorisontal(paraPr);
+				if (horisontalAlign == null) {
 					oNewItem.wrap = true;
-					
+				}
+
 				//вертикальное выравнивание
 				oNewItem.va = Asc.c_oAscVAlign.Center;
-					
+
 				//так же wrap выставляем у параграфа, чьим родителем является ячейка таблицы	
-				if(this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null)
+				if (this._getParentByTag(paragraph, c_oAscBoundsElementType.Cell) != null) {
 					oNewItem.wrap = false;
-				
+				}
+
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
 				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
 				var numberingText = null;
 				var formatText;
-				if(oNumPr != null)
-				{
-					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
-					if(null != aNum)
-					{
+				if (oNumPr != null) {
+					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum(oNumPr.NumId);
+					if (null != aNum) {
 						LvlPr = aNum.Lvl[oNumPr.Lvl];
 						Lvl = oNumPr.Lvl;
 					}
-					
+
 					numberingText = this._parseNumbering(paragraph.elem);
-					
-					if(text == null)
+
+					if (text == null) {
 						text = "";
-					
+					}
+
 					text += this._getAllNumberingText(Lvl, numberingText);
-						
+
 					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
 					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
-					
+
 					oNewItem.content.push(formatText);
-					
-					if(text !== null)
-					{
+
+					if (text !== null) {
 						oNewItem.content[oNewItem.content.length - 1].text = text;
 						this.paragraphText += text;
-					}	
+					}
 					text = "";
 				}
 
-				
+
 				//проходимся по контенту paragraph
 				var paraRunObj;
-				for(var n = 0; n < content.length; n++)
-				{
-					this.aResult.getCell(row + this.maxLengthRowCount, s + c1);
-						
-					if(text == null)
+				for (var n = 0; n < content.length; n++) {
+					this.aResult.getCell(row + this.maxLengthRowCount, innerCol + col);
+
+					if (text == null) {
 						text = "";
-					
-					switch(content[n].Type)
-					{
+					}
+
+					switch (content[n].Type) {
 						case para_Run://*paraRun*
 						{
-							paraRunObj = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
-							s = paraRunObj.s;
+							paraRunObj = this._parseParaRun(content[n], oNewItem, paraPr, innerCol, row, col, text);
+							innerCol = paraRunObj.col;
 							row = paraRunObj.row;
 							break;
 						}
 						case para_Hyperlink://*hyperLink*
-						{	
+						{
 							//если несколько ссылок в одном параграфе, то отменяем ссылки
-							if(!oNewItem.doNotApplyHyperlink)
-							{
-								if(!oNewItem.hyperLink)
-								{
+							if (!oNewItem.doNotApplyHyperlink) {
+								if (!oNewItem.hyperLink) {
 									oNewItem.hyperLink = content[n].Value;
 									oNewItem.toolTip = content[n].ToolTip;
-								}
-								else
-								{
+								} else {
 									oNewItem.hyperLink = null;
 									oNewItem.toolTip = null;
 									oNewItem.doNotApplyHyperlink = true;
 								}
 							}
-							
-							for(var h = 0; h < content[n].Content.length; h++)
-							{
-								switch(content[n].Content[h].Type)
-								{
+
+							for (var h = 0; h < content[n].Content.length; h++) {
+								switch (content[n].Content[h].Type) {
 									case para_Run://*paraRun*
 									{
-										paraRunObj = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
-										s = paraRunObj.s;
+										paraRunObj =
+											this._parseParaRun(content[n].Content[h], oNewItem, paraPr, innerCol, row,
+												col, text);
+										innerCol = paraRunObj.col;
 										row = paraRunObj.row;
 										break;
 									}
@@ -3536,73 +3527,75 @@
 						{
 							var tempFonts = [];
 							content[n].Get_AllFontNames(tempFonts);
-							
-							for(var i in tempFonts)
-							{
+
+							for (var i in tempFonts) {
 								this.fontsNew[i] = 1;
 							}
-							
-							if(!aResult.props.addImagesFromWord)
-							{
+
+							if (!aResult.props.addImagesFromWord) {
 								aResult.props.addImagesFromWord = [];
 							}
-							aResult.props.addImagesFromWord.push({image: content[n], col: s + c1, row: row});
-							
-							if(null === this.isUsuallyPutImages)
-							{
+							aResult.props.addImagesFromWord.push({image: content[n], col: innerCol + col, row: row});
+
+							if (null === this.isUsuallyPutImages) {
 								this._addImageToMap(content[n]);
 							}
-							
+
 							break;
 						}
 					}
 				}
-				
+
 				oNewItem.textVal = this.paragraphText;
+				this.rowDiff += row - startRow;
 			},
-			
-			_parseParaRun: function(paraRun, oNewItem, paraPr, s, row, c1, text)
-			{
+
+			_parseParaRun: function (paraRun, oNewItem, paraPr, innerCol, row, col, text) {
+				var t = this;
 				var paraRunContent = paraRun.Content;
 				var aResult = this.aResult;
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				var cloneNewItem, formatText;
-			
-				var cTextPr = paraRun.Get_CompiledPr();
-				if(cTextPr && !(paraRunContent.length === 1 && paraRunContent[0] instanceof ParaEnd))//settings for text
-					formatText = this._getPrParaRun(paraPr, cTextPr);
-				else if(!formatText)
-					formatText = this._getPrParaRun(paraPr, cTextPr);
-				
-				//проходимся по контенту paraRun
-				for(var pR = 0; pR < paraRunContent.length; pR++)
-				{
 
-					switch(paraRunContent[pR].Type)
-					{
+				var cTextPr = paraRun.Get_CompiledPr();
+				if (cTextPr && !(paraRunContent.length === 1 && paraRunContent[0] instanceof ParaEnd))//settings for text
+				{
+					formatText = this._getPrParaRun(paraPr, cTextPr);
+				} else if (!formatText) {
+					formatText = this._getPrParaRun(paraPr, cTextPr);
+				}
+
+				var pushData = function () {
+					t.fontsNew[paragraphFontFamily] = 1;
+					oNewItem.content.push(formatText);
+
+					if (text !== null) {
+						oNewItem.content[oNewItem.content.length - 1].text = text;
+					}
+
+					cloneNewItem = oNewItem.clone();
+
+					//переходим в следующую ячейку
+					cell = aResult.getCell(row + t.maxLengthRowCount, innerCol + col);
+					aResult.setCellContent(row + t.maxLengthRowCount, innerCol + col, cloneNewItem);
+
+					text = "";
+					oNewItem = new pasteCell();
+				};
+
+				//проходимся по контенту paraRun
+				var cell;
+				for (var pR = 0; pR < paraRunContent.length; pR++) {
+					switch (paraRunContent[pR].Type) {
 						case para_Text://*paraText*
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
 						}
-						case para_NewLine:
-						{
-							this.fontsNew[paragraphFontFamily] = 1;
-							oNewItem.content.push(formatText);
-
-							if(text !== null)
-								oNewItem.content[oNewItem.content.length - 1].text = text;
-
-							cloneNewItem  = oNewItem.clone();
-
-							//переходим в следующую ячейку
-							var cell = aResult.getCell(row + this.maxLengthRowCount, s + c1);
-							aResult.setCellContent(row + this.maxLengthRowCount, s + c1, cloneNewItem);
-
-							text = "";
-							oNewItem = new pasteCell();
+						case para_NewLine: {
+							pushData();
 							row++;
-							s = 0;
+							innerCol = 0;
 
 							break;
 						}
@@ -3613,71 +3606,50 @@
 						}
 						case para_Tab://*paraEnd / paraTab*
 						{
-							this.fontsNew[paragraphFontFamily] = 1;	
-							oNewItem.content.push(formatText);
-							
-							if(text !== null)
-								oNewItem.content[oNewItem.content.length - 1].text = text;
-							
-							cloneNewItem  = oNewItem.clone();
-							
-							//переходим в следующую ячейку
-							var cell = aResult.getCell(row + this.maxLengthRowCount, s + c1);
-							aResult.setCellContent(row + this.maxLengthRowCount, s + c1, cloneNewItem);
-								
-							text = "";
-							oNewItem = new pasteCell();
-							s++;
-							
+							pushData();
+							innerCol++;
+
 							break;
 						}
-						case para_Drawing:
-						{
-							if(!aResult.props.addImagesFromWord)
+						case para_Drawing: {
+							if (!aResult.props.addImagesFromWord) {
 								aResult.props.addImagesFromWord = [];
-							aResult.props.addImagesFromWord.push({image: paraRunContent[pR], col: s + c1, row: row});
-							
-							if(null === this.isUsuallyPutImages)
+							}
+							aResult.props.addImagesFromWord.push(
+								{image: paraRunContent[pR], col: innerCol + col, row: row});
+
+							if (null === this.isUsuallyPutImages) {
 								this._addImageToMap(paraRunContent[pR]);
-								
+							}
+
 							break;
 						}
-						case para_End:
-						{	
-							var cell = aResult.getCell(row, s + c1);
-							aResult.setCellContent(row, s + c1, oNewItem);
-							
-							var checkMaxTextLength = this.clipboard._checkMaxTextLength(this.aResult, row + this.maxLengthRowCount, s + c1);
-							if(checkMaxTextLength)
-							{	
+						case para_End: {
+							cell = aResult.getCell(row, innerCol + col);
+							aResult.setCellContent(row, innerCol + col, oNewItem);
+
+							var checkMaxTextLength = this.clipboard._checkMaxTextLength(this.aResult,
+								row + this.maxLengthRowCount, innerCol + col);
+							if (checkMaxTextLength) {
 								aResult.content = checkMaxTextLength.aResult.content;
 								this.maxLengthRowCount += checkMaxTextLength.r - row;
 							}
-							
+
 							break;
 						}
 					}
 				}
-				
-				if(text != "")
-				{	
+
+				if (text != "") {
 					this.fontsNew[paragraphFontFamily] = 1;
-					
 					oNewItem.content.push(formatText);
-					
-					
-					if(text !== null)
-					{
+					if (text !== null) {
 						oNewItem.content[oNewItem.content.length - 1].text = text;
 						this.paragraphText += text;
 					}
-					
-					cloneNewItem  = oNewItem.clone();
-					
-					text = "";
 				}
-				
-				return {s: s, row: row};
+
+				return {col: innerCol, row: row};
 			},
 			
 			_addImageToMap: function(paraDrawing)
