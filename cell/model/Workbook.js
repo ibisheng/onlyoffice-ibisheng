@@ -1244,15 +1244,15 @@
 				this.calculatedCells[cell.ws.getId()] = calculatedSheet;
 			}
 			var dirtyCellVal = calculatedSheet[cellIndex];
-			if ((0 !== dirtyCellVal || 1 === dirtyCellVal)) {
+			if ((0 !== dirtyCellVal)) {
 				cell.processFormula(function(parsed) {
-					if (0 !== dirtyCellVal) {
-						calculatedSheet[cellIndex] = 1;
+					calculatedSheet[cellIndex] = 1;
+					if (1 !== dirtyCellVal) {
 						parsed.calculate();
-						calculatedSheet[cellIndex] = 0;
-					} else if (1 === dirtyCellVal) {
+					} else {
 						parsed.calculateCycleError();
 					}
+					calculatedSheet[cellIndex] = 0;
 				});
 			}
 		},
