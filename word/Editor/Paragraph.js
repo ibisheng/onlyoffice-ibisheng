@@ -684,9 +684,17 @@ Paragraph.prototype.Add_ToContent = function(Pos, Item)
 {
 	this.Internal_Content_Add(Pos, Item);
 };
+Paragraph.prototype.AddToContent = function(nPos, oItem)
+{
+	this.Add_ToContent(nPos, oItem);
+};
 Paragraph.prototype.Remove_FromContent = function(Pos, Count)
 {
 	this.Internal_Content_Remove2(Pos, Count);
+};
+Paragraph.prototype.RemoveFromContent = function(nPos, nCount)
+{
+	return this.Internal_Content_Remove2(nPos, nCount);
 };
 /**
  * Добавляем несколько элементов в конец параграфа
@@ -9451,9 +9459,10 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 			var oHyperProps = new Asc.CHyperlinkProperty();
 			oHyperProps.put_ToolTip(oInstruction.GetToolTip());
 			oHyperProps.put_Value(oInstruction.GetValue());
-			oHyperProps.put_Text(null);
+			oHyperProps.put_Text(this.LogicDocument ? this.LogicDocument.GetComplexFieldTextValue(arrComplexFields[nIndex]) : null);
 			oHyperProps.put_InternalHyperlink(oInstruction);
 			editor.sync_HyperlinkPropCallback(oHyperProps);
+
 		}
 	}
 
@@ -12222,6 +12231,10 @@ Paragraph.prototype.SetParagraphStyle = function(Name)
 	var StyleId = this.LogicDocument.Get_Styles().Get_StyleIdByName(Name);
 	this.Style_Add(StyleId);
 };
+Paragraph.prototype.SetParagraphStyleById = function(sStyleId)
+{
+	this.Style_Add(sStyleId);
+};
 Paragraph.prototype.SetParagraphContextualSpacing = function(Value)
 {
 	this.Set_ContextualSpacing(Value);
@@ -12439,7 +12452,7 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
-	if (this.IsEmpty())
+	if (this.IsEmpty() && (!oPr || false !== oPr.SkipEmptyParagraphs))
 		return;
 
 	var nOutlineLvl = this.GetOutlineLvl();
@@ -12447,6 +12460,8 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 		&& (!oPr
 		|| -1 === oPr.OutlineStart
 		|| -1 === oPr.OutlineEnd
+		|| undefined === oPr.OutlineStart
+		|| undefined === oPr.OutlineEnd
 		|| (nOutlineLvl >= oPr.OutlineStart - 1 && nOutlineLvl <= oPr.OutlineEnd - 1)))
 	{
 		arrOutline.push({Paragraph : this, Lvl : nOutlineLvl});

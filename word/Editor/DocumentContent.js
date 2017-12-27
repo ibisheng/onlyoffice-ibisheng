@@ -465,6 +465,13 @@ CDocumentContent.prototype.IsTableCellContent = function(isReturnCell)
 {
 	return this.Parent.IsCell(isReturnCell);
 };
+CDocumentContent.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	if (!this.Parent.IsCell())
+		return false;
+
+	return this.Parent.IsLastTableCellInRow(isSelection);
+};
 CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
 	if (false === this.Parent.IsCell())
@@ -2701,6 +2708,7 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 				case para_FootnoteRef:
 				case para_Separator:
 				case para_ContinuationSeparator:
+				case para_InstrText:
 				{
 					// Если у нас что-то заселекчено и мы вводим текст или пробел
 					// и т.д., тогда сначала удаляем весь селект.

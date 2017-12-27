@@ -365,8 +365,14 @@ CopyProcessor.prototype =
                 sFontName = Value.RFonts.EastAsia.Name;
             else if (null != Value.RFonts.CS)
                 sFontName = Value.RFonts.CS.Name;
-            if (null != sFontName)
+            if (null != sFontName){
+                var oTheme = this.oDocument && this.oDocument.Get_Theme && this.oDocument.Get_Theme();
+                if(oTheme && oTheme.themeElements && oTheme.themeElements.fontScheme){
+                    sFontName = oTheme.themeElements.fontScheme.checkFont(sFontName)
+                }
                 aProp.push("font-family:" + "'" + CopyPasteCorrectString(sFontName) + "'");
+            }
+
         }
         if (null != Value.FontSize) {
             if (!this.api.DocumentReaderMode)
@@ -2402,14 +2408,14 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps ? window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props : null;
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonOptions ? window['AscCommon'].g_specialPasteHelper.buttonOptions : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
-			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps)
+			if(window['AscCommon'].g_specialPasteHelper.buttonOptions)
 			{
-				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = null;
+				window['AscCommon'].g_specialPasteHelper.buttonOptions = null;
 			}
 			return;
 		}
@@ -2457,7 +2463,7 @@ PasteProcessor.prototype =
 				specialPasteShowOptions = null;
 			}
 
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -3058,7 +3064,7 @@ PasteProcessor.prototype =
 
 		var specialPasteShowOptions = new SpecialPasteShowOptions();
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = specialPasteShowOptions;
+		window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -3225,7 +3231,9 @@ PasteProcessor.prototype =
     {
 		//PASTE
 		if(text){
-			this.oLogicDocument.RemoveBeforePaste();
+			if(PasteElementsId.g_bIsDocumentCopyPaste){
+				this.oLogicDocument.RemoveBeforePaste();
+			}
 			this._pasteText(text);
 			return;
 		}
@@ -3951,7 +3959,7 @@ PasteProcessor.prototype =
 
 						oThis._setSpecialPasteShowOptionsPresentation(props);
 					} else {
-						window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
+						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 					}
 
 					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
@@ -4588,7 +4596,7 @@ PasteProcessor.prototype =
 		{
 			oThis.aContent = [];
 
-			oThis._getContentFromText(text);
+			oThis._getContentFromText(text, true);
 
 			oThis._AddNextPrevToContent(oThis.oDocument);
 			if(false === oThis.bNested)
@@ -4663,10 +4671,41 @@ PasteProcessor.prototype =
 		}
 	},
 
-	_getContentFromText: function(text){
+	_getContentFromText: function(text, getStyleCurSelection){
+		var t = this;
 		var Count = text.length;
 
-		var newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
+		var pasteIntoParaRunPr = this.oDocument.GetDirectTextPr();
+
+		var getNewParagraph = function(){
+			var paragraph = new Paragraph(t.oDocument.DrawingDocument, t.oDocument);
+			if(getStyleCurSelection){
+				if(pasteIntoParagraphPr)
+				{
+					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
+
+					if(paragraph.TextPr && pasteIntoParaRunPr)
+					{
+						paragraph.TextPr.Value = pasteIntoParaRunPr.Copy();
+					}
+				}
+			}
+			return paragraph;
+		};
+
+		var getNewParaRun = function(){
+			var paraRun = new ParaRun();
+			if(getStyleCurSelection){
+				if(pasteIntoParaRunPr && paraRun.Set_Pr)
+				{
+					paraRun.Set_Pr( pasteIntoParaRunPr.Copy() );
+				}
+			}
+			return paraRun;
+		};
+
+		var newParagraph = getNewParagraph();
 		var insertText = "";
 		for (var Index = 0; Index < Count; Index++) {
 			var _char = text.charAt(Index);
@@ -4675,13 +4714,14 @@ PasteProcessor.prototype =
 				if(Index === Count - 1 && 0x0A !== _charCode){
 					insertText += _char;
 				}
-				var newParaRun = new ParaRun();
+				
+				var newParaRun = getNewParaRun();
 				addTextIntoRun(newParaRun, insertText);
 				newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 				this.aContent.push(newParagraph);
 
 				insertText = "";
-				newParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
+				newParagraph = getNewParagraph();
 			} else if(13 === _charCode){
 				continue;
 			} else {

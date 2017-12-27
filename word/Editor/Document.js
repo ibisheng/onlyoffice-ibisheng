@@ -1641,6 +1641,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisions = false;
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
+    this.DocumentOutline = new CDocumentOutline(this);
+
     // Контролируем изменения интерфейса
     this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
 	this.TurnOffPanelStyles = 0;  // == 0 - можно обновлять панельку со стилями, != 0 - нельзя обновлять
@@ -1972,6 +1974,8 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		this.Recalculate_FromStart();
 		return;
 	}
+
+	this.DocumentOutline.Update();
 
     this.StartTime = new Date().getTime();
 
@@ -5710,6 +5714,45 @@ CDocument.prototype.SelectAll = function()
 
 	this.private_UpdateCursorXY(true, true);
 };
+/**
+ * Выделяем все элементы в заданном диапазоне
+ * @param {number} nStartPos
+ * @param {number} nEndPos
+ */
+CDocument.prototype.SelectRange = function(nStartPos, nEndPos)
+{
+	this.RemoveSelection();
+
+	this.DrawingDocument.SelectEnabled(true);
+	this.DrawingDocument.TargetEnd();
+
+	this.Set_DocPosType(docpostype_Content);
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.Selection.StartPos = Math.max(0, Math.min(nStartPos, this.Content.length - 1));
+	this.Selection.EndPos   = Math.max(this.Selection.StartPos, Math.min(nEndPos, this.Content.length - 1));
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].SelectAll();
+	}
+
+	// TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
+	//       сделать по нормальному
+	this.Selection.Start = true;
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
+	this.Selection.Start = false;
+
+	// Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
+	this.Document_UpdateCopyCutState();
+
+	this.private_UpdateCursorXY(true, true);
+};
 CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
 {
     if (true === this.Comments.Is_Use())
@@ -8435,8 +8478,27 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 
 	this.Controller.UpdateSelectionState();
 
+	this.UpdateDocumentOutlinePosition();
+
 	// Обновим состояние кнопок Copy/Cut
 	this.Document_UpdateCopyCutState();
+};
+CDocument.prototype.UpdateDocumentOutlinePosition = function()
+{
+	if (this.DocumentOutline.IsUse())
+	{
+		if (this.Controller !== this.LogicDocumentController)
+		{
+			this.DocumentOutline.UpdateCurrentPosition(null);
+		}
+		else
+		{
+			if (this.IsSelectionUse())
+				this.DocumentOutline.UpdateCurrentPosition(this.Selection.StartPos);
+			else
+				this.DocumentOutline.UpdateCurrentPosition(this.CurPos.ContentPos);
+		}
+	}
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
@@ -8912,17 +8974,158 @@ CDocument.prototype.AddHyperlink = function(HyperProps)
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.ModifyHyperlink = function(HyperProps)
+CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 {
-	this.Controller.ModifyHyperlink(HyperProps);
+	var sText    = oHyperProps.get_Text(),
+		sValue   = oHyperProps.get_Value(),
+		sToolTip = oHyperProps.get_ToolTip();
+
+	var oClass = oHyperProps.get_InternalHyperlink();
+	if (oClass instanceof ParaHyperlink)
+	{
+		var oHyperlink = oClass;
+
+		if (undefined !== sValue && null !== sValue)
+			oHyperlink.SetValue(sValue);
+
+		if (undefined !== sToolTip && null !== sToolTip)
+			oHyperlink.SetToolTip(sToolTip);
+
+		if (null !== sText)
+		{
+			var oHyperRun = new ParaRun(oHyperlink.GetParagraph());
+			oHyperRun.Set_Pr(oHyperlink.GetTextPr().Copy());
+			oHyperRun.Set_Color(undefined);
+			oHyperRun.Set_Underline(undefined);
+			oHyperRun.Set_RStyle(this.GetStyles().GetDefaultHyperlink());
+
+			for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
+			{
+				var nChar = sText.charAt(nPos);
+
+				if (' ' === nChar)
+					oHyperRun.AddToContent(nPos, new ParaSpace(), false);
+				else
+					oHyperRun.AddToContent(nPos, new ParaText(nChar), false);
+			}
+
+			oHyperlink.RemoveSelection();
+			oHyperlink.RemoveAll();
+			oHyperlink.AddToContent(0, oHyperRun, false);
+
+			this.RemoveSelection();
+			oHyperlink.SelectAll();
+			oHyperlink.SelectThisElement();
+		}
+	}
+	else if (oClass instanceof CFieldInstructionHYPERLINK)
+	{
+		var oInstruction = oClass;
+		var oComplexField = oInstruction.GetComplexField();
+		if (!oComplexField || oComplexField)
+		{
+			if (undefined !== sValue && null !== sValue)
+				oInstruction.SetLink(sValue);
+
+			if (undefined !== sToolTip && null !== sToolTip)
+				oInstruction.SetToolTip(sToolTip);
+
+			oComplexField.SelectFieldCode();
+			var sInstruction = oInstruction.ToString();
+			for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
+			{
+				this.AddToParagraph(new ParaInstrText(sInstruction.charAt(nPos)));
+			}
+
+			if (null !== sText)
+			{
+				oComplexField.SelectFieldValue();
+				var oTextPr = this.GetDirectTextPr();
+				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
+				{
+					var nChar = sText.charAt(nPos);
+					if (' ' === nChar)
+						this.AddToParagraph(new ParaSpace());
+					else
+						this.AddToParagraph(new ParaText(nChar));
+				}
+
+				oComplexField.SelectFieldValue();
+				this.AddToParagraph(new ParaTextPr(oTextPr));
+			}
+		}
+	}
+	else
+	{
+		return;
+	}
+
 	this.Recalculate();
     this.Document_UpdateSelectionState();
     this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.RemoveHyperlink = function()
+CDocument.prototype.RemoveHyperlink = function(oHyperProps)
 {
-	this.Controller.RemoveHyperlink();
+	var oClass = oHyperProps.get_InternalHyperlink();
+	if (oClass instanceof ParaHyperlink)
+	{
+		var oHyperlink = oClass;
+
+		var oParent      = oHyperlink.GetParent();
+		var nPosInParent = oHyperlink.GetPosInParent(oParent);
+
+		if (!oParent)
+			return;
+
+		oParent.RemoveFromContent(nPosInParent, 1);
+
+		var oTextPr       = new CTextPr();
+		oTextPr.RStyle    = null;
+		oTextPr.Underline = null;
+		oTextPr.Color     = null;
+		oTextPr.Unifill   = null;
+
+		var oElement = null;
+		for (var nPos = 0, nCount = oHyperlink.GetElementsCount(); nPos < nCount; ++nPos)
+		{
+			oElement = oHyperlink.GetElement(nPos);
+			oParent.AddToContent(nPosInParent + nPos, oElement);
+			oElement.ApplyTextPr(oTextPr, undefined, true);
+		}
+
+		this.RemoveSelection();
+		if (oElement)
+		{
+			oElement.SetThisElementCurrent();
+			oElement.MoveCursorToEndPos();
+		}
+	}
+	else if (oClass instanceof CFieldInstructionHYPERLINK)
+	{
+		var oInstruction = oClass;
+		var oComplexField = oInstruction.GetComplexField();
+		if (!oComplexField || oComplexField)
+		{
+			var oTextPr       = new CTextPr();
+			oTextPr.RStyle    = null;
+			oTextPr.Underline = null;
+			oTextPr.Color     = null;
+			oTextPr.Unifill   = null;
+
+			oComplexField.SelectFieldValue();
+			this.AddToParagraph(new ParaTextPr(oTextPr));
+
+			oComplexField.RemoveFieldWrap();
+		}
+	}
+	else
+	{
+		return;
+	}
+
+	//this.Controller.RemoveHyperlink();
 	this.Recalculate();
+	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
 CDocument.prototype.CanAddHyperlink = function(bCheckInHyperlink)
@@ -9547,7 +9750,9 @@ CDocument.prototype.Get_SectionPageNumInfo2 = function(Page_abs)
 		Page_abs = FP;
 
 	var _FP = PageNumStart;
-	var _CP = PageNumStart + (Page_abs + 1) - FP; // + 1 потому что FP начинает считать от 1, а Page_abs от 0
+	var _CP = PageNumStart + Page_abs - FP;	// TODO: Здесь есть баг с рассчетом (чтобы его поправить добавил следующий комментарий,
+											// но такой рассчет оказался неверным)
+											// + 1 потому что FP начинает считать от 1, а Page_abs от 0
 
 	return {FirstPage : _FP, CurPage : _CP, SectIndex : StartSectIndex};
 };
@@ -10370,6 +10575,8 @@ CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
 };
 CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 {
+	this.RemoveSelection();
+
 	this.CurPos.X     = State.CurPos.X;
 	this.CurPos.Y     = State.CurPos.Y;
 	this.CurPos.RealX = State.CurPos.RealX;
@@ -10700,7 +10907,15 @@ CDocument.prototype.Get_DrawingDocument = function()
 {
 	return this.DrawingDocument;
 };
+CDocument.prototype.GetDrawingDocument = function()
+{
+	return this.DrawingDocument;
+};
 CDocument.prototype.Get_Api = function()
+{
+	return this.Api;
+};
+CDocument.prototype.GetApi = function()
 {
 	return this.Api;
 };
@@ -12133,6 +12348,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 			case para_FootnoteRef:
 			case para_Separator:
 			case para_ContinuationSeparator:
+			case para_InstrText:
 			{
 				// Если у нас что-то заселекчено и мы вводим текст или пробел
 				// и т.д., тогда сначала удаляем весь селект.
@@ -15942,6 +16158,42 @@ CDocument.prototype.CheckComplexFieldsInSelection = function()
 	}
 
 	this.SetContentSelection(oStartPos, oEndPos, 0, 0, 0);
+};
+/**
+ * Получаем текст, который лежит внутри заданного сложного поля. Если внутри текста есть объекты, то возвращается null.
+ * @param {CComplexField} oComplexField
+ * @returns {?string}
+ */
+CDocument.prototype.GetComplexFieldTextValue = function(oComplexField)
+{
+	if (!oComplexField)
+		return null;
+
+	var oState = this.SaveDocumentState();
+	oComplexField.SelectFieldValue();
+	var sResult = this.GetSelectedText();
+	this.LoadDocumentState(oState);
+	this.Document_UpdateSelectionState();
+
+	return sResult;
+};
+/**
+ * Получаем прямые текстовые настройки заданного сложного поля.
+ * @param oComplexField
+ * @returns {CTextPr}
+ */
+CDocument.prototype.GetComplexFieldTextPr = function(oComplexField)
+{
+	if (!oComplexField)
+		return new CTextPr();
+
+	var oState = this.SaveDocumentState();
+	oComplexField.SelectFieldValue();
+	var oTextPr = this.GetDirectTextPr();
+	this.LoadDocumentState(oState);
+	this.Document_UpdateSelectionState();
+
+	return oTextPr;
 };
 CDocument.prototype.GetFieldsManager = function()
 {

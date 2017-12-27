@@ -155,7 +155,7 @@ CParagraphContentBase.prototype.Split = function()
 CParagraphContentBase.prototype.Get_Text = function(Text)
 {
 };
-CParagraphContentBase.prototype.Apply_TextPr = function()
+CParagraphContentBase.prototype.Apply_TextPr = function(oTextPr, isIncFontSize, isApplyToAll)
 {
 };
 CParagraphContentBase.prototype.Get_ParaPosByContentPos = function(ContentPos, Depth)
@@ -432,6 +432,14 @@ CParagraphContentBase.prototype.AcceptRevisionChanges = function(Type, bAll)
 };
 CParagraphContentBase.prototype.RejectRevisionChanges = function(Type, bAll)
 {
+};
+CParagraphContentBase.prototype.GetTextPr = function(ContentPos, Depth)
+{
+	return this.Get_TextPr(ContentPos, Depth);
+};
+CParagraphContentBase.prototype.ApplyTextPr = function(oTextPr, isIncFontSize, isApplyToAll)
+{
+	return this.Apply_TextPr(oTextPr, isIncFontSize, isApplyToAll);
 };
 
 /**
@@ -1626,7 +1634,18 @@ CParagraphContentWithParagraphLikeContent.prototype.RemoveTabsForTOC = function(
 
 	return isTab;
 };
-
+CParagraphContentWithParagraphLikeContent.prototype.RemoveAll = function()
+{
+	this.Remove_FromContent(0, this.Content.length);
+};
+CParagraphContentWithParagraphLikeContent.prototype.AddToContent = function(nPos, oItem, isUpdatePositions)
+{
+	return this.Add_ToContent(nPos, oItem, isUpdatePositions);
+};
+CParagraphContentWithParagraphLikeContent.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
+{
+	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -3373,6 +3392,13 @@ CParagraphContentWithParagraphLikeContent.prototype.AddContentControl = function
 		this.Add(oContentControl);
 		return oContentControl;
 	}
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetElement = function(nPos)
+{
+	if (nPos < 0 || nPos >= this.Content.length)
+		return null;
+
+	return this.Content[nPos];
 };
 CParagraphContentWithParagraphLikeContent.prototype.GetElementsCount = function()
 {

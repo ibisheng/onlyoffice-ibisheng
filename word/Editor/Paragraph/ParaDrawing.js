@@ -1301,6 +1301,7 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 {
 	if (Paragraph)
 	{
+		var PageNumOld = this.PageNum;
 		var ContentPos = Paragraph.Get_DrawingObjectContentPos(this.Get_Id());
 		if (null === ContentPos)
 			return;
@@ -1321,7 +1322,12 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 		if (null !== nRecalcIndex)
 			oLogicDocument.Get_History().SetRecalculateIndex(nRecalcIndex);
 
-		Layout = Paragraph.Get_Layout(ContentPos, this);
+		if (!this.LogicDocument
+			|| null === this.LogicDocument.FullRecalc.Id
+			|| (PageNum < this.LogicDocument.FullRecalc.PageIndex
+			&& PageNumOld < this.LogicDocument.FullRecalc.PageIndex))
+			Layout = Paragraph.Get_Layout(ContentPos, this);
+
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
 	}
 };
@@ -3080,6 +3086,7 @@ CAnchorPosition.prototype.Update_PositionYHeaderFooter = function(TopMarginY, Bo
 	var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
 	var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
 
+	this.Margin_V      = TopY;
 	this.Top_Margin    = TopY;
 	this.Bottom_Margin = this.Page_H - BottomY;
 };

@@ -1543,7 +1543,7 @@
 			var val;
 			val = vals["r:id"];
 			if (undefined !== val) {
-				this.id = uq(val);
+				this.id = AscCommon.unleakString(uq(val));
 			}
 		}
 	};
@@ -1562,7 +1562,7 @@
 			}
 			val = vals["r:id"];
 			if (undefined !== val) {
-				this.id = uq(val);
+				this.id = AscCommon.unleakString(uq(val));
 			}
 		}
 	};
@@ -4278,6 +4278,9 @@
 			if (nCol >= t.nColsCount)
 				t.nColsCount = nCol + 1;
 		});
+		//init ColData otherwise all 'foreach' will not return this cell until saveContent(loadCells)
+		var sheetMemory = this.getColData(nCol);
+		sheetMemory.checkSize(nRow);
 	};
 	Worksheet.prototype._getCellNoEmpty=function(row, col, fAction){
 		var wb = this.workbook;

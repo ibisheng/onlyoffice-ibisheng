@@ -4550,6 +4550,10 @@ CStyles.prototype.GetDefaultHyperlink = function()
 {
 	return this.Default.Hyperlink;
 };
+CStyles.prototype.GetDefaultHeading = function(nLvl)
+{
+	return this.Default.Headings[Math.max(Math.min(nLvl, 8), 0)];
+};
 
 function CDocumentColor(r,g,b, Auto)
 {
@@ -5057,6 +5061,17 @@ CDocumentBorder.prototype.IsNone = function()
 {
 	return this.Value === border_None ? true : false;
 };
+/**
+ * Получаем рассчитанную толщину линии в зависимости от типа.
+ * @returns {number}
+ */
+CDocumentBorder.prototype.GetWidth = function()
+{
+	if (border_None === this.Value)
+		return 0;
+
+	return this.Size;
+};
 
 function CTableMeasurement(Type, W)
 {
@@ -5102,6 +5117,22 @@ CTableMeasurement.prototype =
         this.W    = Obj.W;
         this.Type = Obj.Type;
     }
+};
+/**
+ * Измерение в миллиметрах?
+ * @returns {boolean}
+ */
+CTableMeasurement.prototype.IsMM = function()
+{
+	return !!(tblwidth_Mm === this.Type);
+};
+/**
+ * Измерение в процентах?
+ * @returns {boolean}
+ */
+CTableMeasurement.prototype.IsPercent = function()
+{
+	return !!(tblwidth_Pct === this.Type);
 };
 
 function CTablePr()
@@ -5783,34 +5814,34 @@ CTableRowPr.prototype =
     },
 
     Merge : function(RowPr)
-    {
-        if ( undefined != RowPr.CantSplit )
-            this.CantSplit = RowPr.CantSplit;
+	{
+		if (undefined !== RowPr.CantSplit)
+			this.CantSplit = RowPr.CantSplit;
 
-        if ( undefined != RowPr.GridAfter )
-            this.GridAfter = RowPr.GridAfter;
+		if (undefined !== RowPr.GridAfter)
+			this.GridAfter = RowPr.GridAfter;
 
-        if ( undefined != RowPr.GridBefore )
-            this.GridBefore = RowPr.GridBefore;
+		if (undefined !== RowPr.GridBefore)
+			this.GridBefore = RowPr.GridBefore;
 
-        if ( undefined != RowPr.Jc )
-            this.Jc = RowPr.Jc;
+		if (undefined !== RowPr.Jc)
+			this.Jc = RowPr.Jc;
 
-        if ( undefined != RowPr.TableCellSpacing )
-            this.TableCellSpacing = RowPr.TableCellSpacing;
+		if (undefined !== RowPr.TableCellSpacing)
+			this.TableCellSpacing = RowPr.TableCellSpacing;
 
-        if ( undefined != RowPr.Height )
-            this.Height = RowPr.Height.Copy();
+		if (undefined !== RowPr.Height)
+			this.Height = RowPr.Height.Copy();
 
-        if ( undefined != RowPr.WAfter )
-            this.WAfter = RowPr.WAfter.Copy();
+		if (undefined !== RowPr.WAfter)
+			this.WAfter = RowPr.WAfter.Copy();
 
-        if ( undefined != RowPr.WBefore )
-            this.WBefore = RowPr.WBefore.Copy();
+		if (undefined !== RowPr.WBefore)
+			this.WBefore = RowPr.WBefore.Copy();
 
-        if ( undefined != RowPr.TableHeader )
-            this.TableHeader = RowPr.TableHeader;
-    },
+		if (undefined !== RowPr.TableHeader)
+			this.TableHeader = RowPr.TableHeader;
+	},
 
     Is_Equal : function(RowPr)
     {

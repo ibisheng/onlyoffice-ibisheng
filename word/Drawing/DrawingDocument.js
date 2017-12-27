@@ -227,6 +227,8 @@ function CTableOutlineDr()
 	this.IsResizeTableTrack = false;
 	this.AddResizeCurrentW = 0;
 	this.AddResizeCurrentH = 0;
+	this.AddResizeMinW     = 0;
+	this.AddResizeMinH     = 0;
 
 	this.checkMouseDown = function (pos, word_control)
 	{
@@ -363,6 +365,11 @@ function CTableOutlineDr()
 					this.AddResizeCurrentW = 0;
 					this.AddResizeCurrentH = 0;
 					this.IsResizeTableTrack = true;
+
+					var _table = this.TableOutline.Table;
+
+					this.AddResizeMinH = _table.GetMinHeight() - this.TableOutline.H;
+					this.AddResizeMinW = _table.GetMinWidth() - this.TableOutline.W;
 
 					word_control.m_oDrawingDocument.LockCursorType("se-resize");
 					return true;
@@ -532,8 +539,7 @@ function CTableOutlineDr()
 			var _addW = (X - this.CurPos.X) * _koef - this.TrackOffsetX;
 			var _addH = (Y - this.CurPos.Y) * _koef - this.TrackOffsetY;
 
-			// TODO:
-			// _table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
+			_table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
 
 			this.AddResizeCurrentW = 0;
 			this.AddResizeCurrentH = 0;
@@ -650,8 +656,9 @@ function CTableOutlineDr()
 		if (this.IsResizeTableTrack)
 		{
 			var _koef = g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
-			this.AddResizeCurrentW = (X - this.CurPos.X) * _koef - this.TrackOffsetX;
-			this.AddResizeCurrentH = (Y - this.CurPos.Y) * _koef - this.TrackOffsetY;
+			this.AddResizeCurrentW = Math.max(this.AddResizeMinW, (X - this.CurPos.X) * _koef - this.TrackOffsetX);
+			this.AddResizeCurrentH = Math.max(this.AddResizeMinH, (Y - this.CurPos.Y) * _koef - this.TrackOffsetY);
+
 			return true;
 		}
 
@@ -2430,8 +2437,6 @@ function CDrawingDocument()
 			Data = new AscCommon.CMouseMoveData();
 
 		editor.sync_MouseMoveCallback(Data);
-
-		console.log(this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor);
 	}
 	this.LockCursorType = function (sType)
 	{

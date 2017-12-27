@@ -1839,7 +1839,7 @@ Num.prototype =
 			}
 			val = vals["formatCode"];
 			if (undefined !== val) {
-				sFormat = uq(val);
+				sFormat = AscCommon.unleakString(uq(val));
 			}
 			this.f = null != sFormat ? sFormat : (AscCommonExcel.aStandartNumFormats[id] || "General");
 			if ((5 <= id && id <= 8) || (14 <= id && id <= 17) || 22 == id || (27 <= id && id <= 31) ||
@@ -5504,6 +5504,11 @@ TablePart.prototype.isAutoFilter = function()
 	return false;
 };
 
+TablePart.prototype.getAutoFilter = function()
+{
+	return this.AutoFilter;
+};
+
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
 {
 	var res = null;
@@ -5982,6 +5987,11 @@ AutoFilter.prototype.getFilterColumn = function(colId)
 	}
 
 	return res;
+};
+
+AutoFilter.prototype.getAutoFilter = function()
+{
+	return this;
 };
 
 

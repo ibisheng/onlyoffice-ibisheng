@@ -8852,8 +8852,8 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
-			//this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.options = allowedSpecialPasteProps;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = selectData[0];
 		}
 		else
 		{
@@ -9619,17 +9619,18 @@
 		{
 			for(var i = 0; i < outStack.length; i++)
 			{
-				if(outStack[i].range /*&& activeCellsPasteFragment && activeCellsPasteFragment.containsRange(outStack[i].range.bbox)*/)
+				if(outStack[i].bbox || "object" === typeof outStack[i].range)
 				{
-					var diffCol1 = outStack[i].range.bbox.c1 - activeCellsPasteFragment.c1;
-					var diffRow1 = outStack[i].range.bbox.r1 - activeCellsPasteFragment.r1;
-					var diffCol2 = outStack[i].range.bbox.c2 - activeCellsPasteFragment.c1;
-					var diffRow2 = outStack[i].range.bbox.r2 - activeCellsPasteFragment.r1;
-					
-					outStack[i].range.bbox.c1 = activeCellsPasteFragment.c1 + diffRow1;
-					outStack[i].range.bbox.r1 = activeCellsPasteFragment.r1 + diffCol1;
-					outStack[i].range.bbox.c2 = activeCellsPasteFragment.c1 + diffRow2;
-					outStack[i].range.bbox.r2 = activeCellsPasteFragment.r1 + diffCol2;
+					var range = outStack[i].bbox ? outStack[i].bbox : outStack[i].range;
+					var diffCol1 = range.c1 - activeCellsPasteFragment.c1;
+					var diffRow1 = range.r1 - activeCellsPasteFragment.r1;
+					var diffCol2 = range.c2 - activeCellsPasteFragment.c1;
+					var diffRow2 = range.r2 - activeCellsPasteFragment.r1;
+
+					range.c1 = activeCellsPasteFragment.c1 + diffRow1;
+					range.r1 = activeCellsPasteFragment.r1 + diffCol1;
+					range.c2 = activeCellsPasteFragment.c1 + diffRow2;
+					range.r2 = activeCellsPasteFragment.r1 + diffCol2;
 				}
 				
 			}
@@ -9936,12 +9937,12 @@
 
 		var positionShapeContent = options.position;
 		var range = options.range;
-		var props = options.props;
+		var props = options.options;
 		var cellCoord;
 		if(!positionShapeContent)
 		{
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps = {};
-			window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = range;
+			window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
+			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = range;
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9964,10 +9965,10 @@
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
 		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton && isIntoShape)
 		{
-			if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId === isIntoShape.Id)
+			if(window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId === isIntoShape.Id)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
+				var range = window['AscCommon'].g_specialPasteHelper.buttonOptions.range;
 				
 				/*var trueShapeSelection = isIntoShape.GetSelectionState();
 				isIntoShape.SetSelectionState(range, range.length - 1);*/
@@ -10002,10 +10003,10 @@
 			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			if(changeActiveRange)
 			{
-				window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range = changeActiveRange;
+				window['AscCommon'].g_specialPasteHelper.buttonOptions.range = changeActiveRange;
 			}
-			
-			var range = window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.range;
+
+			var range = window['AscCommon'].g_specialPasteHelper.buttonOptions.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			
@@ -10024,7 +10025,7 @@
 		
 		//TODO пересмотреть когда иконка вылезает за пределы области видимости
 		var cellCoord = this.getCellCoord(range.c2, range.r2);
-		if(window['AscCommon'].g_specialPasteHelper.specialPasteButtonProps.shapeId)
+		if(window['AscCommon'].g_specialPasteHelper.buttonOptions.shapeId)
 		{
 			disableCoords();
 			cellCoord = [cellCoord];
@@ -12644,6 +12645,11 @@
 
         var drawCurrentFilterButtons = function (filter) {
 			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+
+			if(!filter.Ref) {
+				return;
+			}
+
             var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
 
             if (range.isIntersect(updatedRange)) {
@@ -13162,7 +13168,7 @@
 
         //get values
         var colId = filterProp.colId;
-        var openAndClosedValues = ws.autoFilters._getOpenAndClosedValues(filter, colId);
+        var openAndClosedValues = ws.autoFilters.getOpenAndClosedValues(filter, colId);
         var values = openAndClosedValues.values;
         var automaticRowCount = openAndClosedValues.automaticRowCount;
         var filters = autoFilter.getFilterColumn(colId);

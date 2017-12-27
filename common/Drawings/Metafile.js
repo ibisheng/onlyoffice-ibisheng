@@ -632,18 +632,21 @@
 			this.data[this.pos++] = (lval >>> 16) & 0xFF;
 			this.data[this.pos++] = (lval >>> 24) & 0xFF;
 		}
+		var tempHelp = new ArrayBuffer(8);
+		var tempHelpUnit = new Uint8Array(tempHelp);
+		var tempHelpFloat = new Float64Array(tempHelp);
 		this.WriteDouble2       = function(val)
 		{
 			this.CheckSize(8);
-			var aVal              = this._doubleEncodeLE754(val);
-			this.data[this.pos++] = aVal[0];
-			this.data[this.pos++] = aVal[1];
-			this.data[this.pos++] = aVal[2];
-			this.data[this.pos++] = aVal[3];
-			this.data[this.pos++] = aVal[4];
-			this.data[this.pos++] = aVal[5];
-			this.data[this.pos++] = aVal[6];
-			this.data[this.pos++] = aVal[7];
+			tempHelpFloat[0] = val;
+			this.data[this.pos++] = tempHelpUnit[0];
+			this.data[this.pos++] = tempHelpUnit[1];
+			this.data[this.pos++] = tempHelpUnit[2];
+			this.data[this.pos++] = tempHelpUnit[3];
+			this.data[this.pos++] = tempHelpUnit[4];
+			this.data[this.pos++] = tempHelpUnit[5];
+			this.data[this.pos++] = tempHelpUnit[6];
+			this.data[this.pos++] = tempHelpUnit[7];
 		}
 		this._doubleEncodeLE754 = function(v)
 		{

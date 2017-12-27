@@ -61,7 +61,10 @@
 			val		    : 0,
 			visible	    : 1,
 			text        : 2,
-			isDateFormat: 3
+			isDateFormat: 3,
+			year        : 4,
+			month       : 5,
+			day         : 6
 		};
 		function AutoFiltersOptionsElements () {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements();}
@@ -72,6 +75,9 @@
 			this.text = null;
 			this.visible = null;
 			this.isDateFormat = null;
+			this.year = null;
+			this.month = null;
+			this.day = null;
 		}
 		AutoFiltersOptionsElements.prototype = {
 			constructor: AutoFiltersOptionsElements,
@@ -88,6 +94,9 @@
 					case this.Properties.visible: return this.visible; break;
 					case this.Properties.text: return this.text; break;
 					case this.Properties.isDateFormat: return this.isDateFormat; break;
+					case this.Properties.year: return this.year; break;
+					case this.Properties.month: return this.month; break;
+					case this.Properties.day: return this.day; break;
 				}
 
 				return null;
@@ -98,6 +107,9 @@
 					case this.Properties.visible: this.visible = value;break;
 					case this.Properties.text: this.text = value;break;
 					case this.Properties.isDateFormat: this.isDateFormat = value;break;
+					case this.Properties.year: this.year = value;break;
+					case this.Properties.month: this.month = value;break;
+					case this.Properties.day: this.day = value;break;
 				}
 			},
 			
@@ -110,6 +122,9 @@
 				res.visible = this.visible;
 				res.isDateFormat = this.isDateFormat;
 				res.Properties = this.Properties;
+				res.year = this.visible;
+				res.month = this.isDateFormat;
+				res.day = this.Properties;
 				
 				return res;
 			},
@@ -118,11 +133,17 @@
 			asc_getVisible: function () { return this.visible; },
 			asc_getText: function () { return this.text; },
 			asc_getIsDateFormat: function () { return this.isDateFormat; },
+			asc_getYear: function () { return this.year; },
+			asc_getMonth: function () { return this.month; },
+			asc_getDay: function () { return this.day; },
 			
 			asc_setVal: function (val) { this.val = val; },
 			asc_setVisible: function (val) { this.visible = val; },
 			asc_setText: function (val) { this.text = val; },
-			asc_setIsDateFormat: function (val) { this.isDateFormat = val; }
+			asc_setIsDateFormat: function (val) { this.isDateFormat = val; },
+			asc_setYear: function (val) { this.year = val; },
+			asc_setMonth: function (val) { this.month = val; },
+			asc_setDay: function (val) { this.day = val; }
 		};
 
 		/** @constructor */
@@ -704,7 +725,7 @@
 							}
 							
 							var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
-							
+							currentValue = window["Asc"].trim(currentValue);
 							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
 							
 							if(isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null)
@@ -3682,7 +3703,121 @@
 				else
 					return ar;
 			},
-			
+
+			getExpandRange: function(activeRange){
+				var ws = this.worksheet;
+				var t = this;
+				var lockLeft, lockRight, lockUp, lockDown;
+
+				var range = activeRange.clone();
+
+				var checkEmptyCell = function(row, col){
+					var cell = ws.getCell3(row, col);
+					if(cell.getValueWithoutFormat() !== ''){
+						return false;
+					}
+					return true;
+				};
+
+				var checkLeft = function(){
+					var col = range.c1 - 1;
+					if(col < 0 || lockLeft){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(col, range.r1, col, range.r2))){
+						lockLeft = true;
+						return null;
+					}
+
+					for (var n = range.r1; n <= range.r2; n++) {
+						if(!checkEmptyCell(n, col)){
+							return true;
+						}
+					}
+				};
+
+				var checkRight = function(){
+					var col = range.c2 + 1;
+					if(lockRight){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(col, range.r1, col, range.r2))){
+						lockRight = true;
+						return null;
+					}
+
+					for (var n = range.r1; n <= range.r2; n++) {
+						if(!checkEmptyCell(n, col)){
+							return true;
+						}
+					}
+				};
+
+				var checkUp = function(){
+					var row = range.r1 - 1;
+					if(lockUp){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(range.c1, row, range.c2, row))){
+						lockUp = true;
+						return null;
+					}
+
+					for (var n = range.c1; n <= range.c2; n++) {
+						if(!checkEmptyCell(row, n)){
+							return true;
+						}
+					}
+				};
+
+				var checkDown = function(){
+					var row = range.r2 + 1;
+					if(lockDown){
+						return null;
+					}
+
+					if(t._intersectionRangeWithTableParts(new Asc.Range(range.c1, row, range.c2, row))){
+						lockDown = true;
+						return null;
+					}
+
+					for (var n = range.c1; n <= range.c2; n++) {
+						if(!checkEmptyCell(row, n)){
+							return true;
+						}
+					}
+				};
+
+				var isInput;
+				while(true){
+					isInput = false;
+					if(checkLeft()){
+						range.c1--;
+						isInput = true;
+					}
+					if(checkRight()){
+						range.c2++;
+						isInput = true;
+					}
+					if(checkUp()){
+						range.r1--;
+						isInput = true;
+					}
+					if(checkDown()){
+						range.r2++;
+						isInput = true;
+					}
+					if(false === isInput){
+						break;
+					}
+				}
+
+				return range;
+			},
+
 			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, offset)
 			{
 				var worksheet = this.worksheet;
@@ -3986,154 +4121,123 @@
 					return result;
 				}	
 			},
-			
-			_getOpenAndClosedValues: function(filter, colId, isOpenHiddenRows)
-			{
-				//filter - TablePart or AutoFilter
-				//autoFilter - only autoFilter
-				var isTablePart = !filter.isAutoFilter();
-				var autoFilter = isTablePart ? filter.AutoFilter : filter;
-				var ref = filter.Ref;
-				var filterColumns = autoFilter.FilterColumns;
-				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
-				
-				colId = this._getTrueColId(autoFilter, colId);
 
-				var currentFilterColumn = autoFilter.getFilterColumn(colId);
-				
-				var addValueToMenuObj = function(tempResult, count)
-				{
-					//TODO ветка для добавления даты(как заделаем разделение год/месяц/число в меню)
-					/*if(isDateTimeFormat)
-					{
-						if(!result.dates.year)
-							result.dates.year = [];
-						if(!result.dates.year[dataValue.year])
-							result.dates.year[dataValue.year] = {};
-						
-						if(!result.dates.year[dataValue.year].month)
-							result.dates.year[dataValue.year].month = [];
-						if(!result.dates.year[dataValue.year].month[dataValue.month])
-							result.dates.year[dataValue.year].month[dataValue.month] = {};
-						
-						if(!result.dates.year[dataValue.year].month[dataValue.month].day)
-							result.dates.year[dataValue.year].month[dataValue.month].day = [];
-						if(!result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d])
-							result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d] = {};
-							
-						result.dates.year[dataValue.year].month[dataValue.month].day[dataValue.d].val = tempResult;
+			getOpenAndClosedValues: function (filter, colId, isOpenHiddenRows) {
+
+				var isTablePart = !filter.isAutoFilter(), autoFilter = filter.getAutoFilter(), ref = filter.Ref;
+				var filterColumns = autoFilter.FilterColumns;
+				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, dataValue, values = [];
+
+				var addValueToMenuObj = function (val, text, visible, count) {
+					var res = new AutoFiltersOptionsElements();
+					res.asc_setVisible(visible);
+					res.asc_setVal(val);
+					res.asc_setText(text);
+					res.asc_setIsDateFormat(isDateTimeFormat);
+					if (isDateTimeFormat) {
+						res.asc_setYear(dataValue.year);
+						res.asc_setMonth(dataValue.month);
+						res.asc_setDay(dataValue.d);
 					}
-					else*/
-						values[count] = tempResult;
+
+					values[count] = res;
 				};
 
-				if(isOpenHiddenRows)
-				{
+				var hideValue = function (val, num) {
+					if (isOpenHiddenRows) {
+						worksheet.setRowHidden(val, num, num);
+					}
+				};
+
+				if (isOpenHiddenRows) {
 					worksheet.workbook.dependencyFormulas.lockRecal();
 				}
 
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
-				
-				if(!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+				colId = this._getTrueColId(autoFilter, colId);
+				var currentFilterColumn = autoFilter.getFilterColumn(colId);
+
+				if (!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(filter.Ref, true);
 					automaticRowCount = automaticRange.r2;
-					
-					if(automaticRowCount > maxFilterRow)
+
+					if (automaticRowCount > maxFilterRow) {
 						maxFilterRow = automaticRowCount;
+					}
 				}
-				
-				if(isTablePart && filter.TotalsRowCount)
-				{
+
+				if (isTablePart && filter.TotalsRowCount) {
 					maxFilterRow--;
 				}
-				
+
 				var individualCount = 0, count = 0, tempResult;
-				for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
-				{
+				for (var i = ref.r1 + 1; i <= maxFilterRow; i++) {
 					//max strings
-					if(individualCount > maxIndividualValues)
+					if (individualCount > maxIndividualValues) {
 						break;
-					
+					}
+
 					//not apply filter by current button
-					if(null === currentFilterColumn && worksheet.getRowHidden(i) === true)
-					{
+					if (null === currentFilterColumn && worksheet.getRowHidden(i) === true) {
 						individualCount++;
 						continue;
 					}
-					
+
 					//value in current column
 					var cell = worksheet.getCell3(i, colId + ref.c1);
-					var text = cell.getValueWithFormat();
-					var val = cell.getValueWithoutFormat();
+					var text = window["Asc"].trim(cell.getValueWithFormat());
+					var val = window["Asc"].trim(cell.getValueWithoutFormat());
 					var textLowerCase = text.toLowerCase();
-					
+
 					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-					
-					//if(isDateTimeFormat)
-						//dataValue = NumFormat.prototype.parseDate(val);
-						
+
+					if (isDateTimeFormat) {
+						dataValue = AscCommon.NumFormat.prototype.parseDate(val);
+					}
+
 					//check duplicate value
-					if(temp.hasOwnProperty(textLowerCase))
+					if (temp.hasOwnProperty(textLowerCase)) {
 						continue;
-					
+					}
+
 					//apply filter by current button
-					if(null !== currentFilterColumn)
-					{
-						if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
+					if (null !== currentFilterColumn) {
+						if (!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 						{
-							tempResult = new AutoFiltersOptionsElements();
-							tempResult.val = val;
-							tempResult.text = text;
-							tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-							
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
+							var visible = false;
 							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
-							{
-								if(isOpenHiddenRows)
-									worksheet.setRowHidden(false, i, i);
-								tempResult.visible = true;
+								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter &&
+								!currentFilterColumn.isHideValue(checkValue, isDateTimeFormat)) {
+								hideValue(false, i);
+								visible = true;
+							} else {
+								hideValue(false, i);
 							}
-							else
-							{
-								if(isOpenHiddenRows)
-									worksheet.setRowHidden(false, i, i);
-								tempResult.visible = false;
-							}
-								
-							
-							addValueToMenuObj(tempResult, count);
-							
+
+							addValueToMenuObj(val, text, visible, count);
+
 							temp[textLowerCase] = 1;
 							count++;
 						}
-					}
-					else
-					{
-						tempResult = new AutoFiltersOptionsElements();
-						tempResult.visible = true;
-						tempResult.val = val;
-						tempResult.text = text;
-						tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-						
-						if(isOpenHiddenRows)
-							worksheet.setRowHidden(false, i, i);
-						
-						addValueToMenuObj(tempResult, count);
+					} else {
+						hideValue(false, i);
+						addValueToMenuObj(val, text, true, count);
+
 						temp[textLowerCase] = 1;
 						count++;
 					}
-					
+
 					individualCount++;
 				}
 
-				if(isOpenHiddenRows)
-				{
+				if (isOpenHiddenRows) {
 					worksheet.workbook.dependencyFormulas.unlockRecal();
 				}
+
 				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
 			},
 			
@@ -5242,6 +5346,10 @@
 		prot["asc_getText"]						= prot.asc_getText;
 		prot["asc_getVisible"]					= prot.asc_getVisible;
 		prot["asc_setVisible"]					= prot.asc_setVisible;
+		prot["asc_getIsDateFormat"]				= prot.asc_getIsDateFormat;
+		prot["asc_getYear"]						= prot.asc_getYear;
+		prot["asc_getMonth"]					= prot.asc_getMonth;
+		prot["asc_getDay"]						= prot.asc_getDay;
 		
 		window["AscCommonExcel"].AddFormatTableOptions = AddFormatTableOptions;
 		prot									= AddFormatTableOptions.prototype;

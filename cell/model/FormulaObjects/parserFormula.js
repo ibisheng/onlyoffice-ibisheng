@@ -500,17 +500,21 @@ Date.prototype.getDateFromExcel = function ( val ) {
 
     val = Math.floor( val );
 
-  if (AscCommon.bDate1904) {
-        return new Date( val * c_msPerDay + this.getExcelNullDate() );
-  } else {
-        if ( val < 60 ) {
-            return new Date( val * c_msPerDay + this.getExcelNullDate() );
-    } else if (val === 60) {
-            return new Date( Date.UTC( 1900, 1, 29 ) );
-    } else {
-            return new Date( val * c_msPerDay + this.getExcelNullDate() );
-        }
-    }
+  return this.getDateFromExcelWithTime(val);
+};
+
+Date.prototype.getDateFromExcelWithTime = function ( val ) {
+	if (AscCommon.bDate1904) {
+		return new Date( val * c_msPerDay + this.getExcelNullDate() );
+	} else {
+		if ( val < 60 ) {
+			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+		} else if (val === 60) {
+			return new Date( Date.UTC( 1900, 1, 29 ) );
+		} else {
+			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+		}
+	}
 };
 
 Date.prototype.addYears = function ( counts ) {
@@ -3348,12 +3352,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1], bIsSpecialFunction);
 	};
 
+	/** @constructor */
 	function cSpecialOperandStart() {
 	}
 
 	cSpecialOperandStart.prototype.constructor = cSpecialOperandStart;
 	cSpecialOperandStart.prototype.type = cElementType.specialFunctionStart;
 
+	/** @constructor */
 	function cSpecialOperandEnd() {
 	}
 
@@ -4516,6 +4522,16 @@ parserFormula.prototype.setFormula = function(formula) {
 		 */
 
 		if (false) {
+
+			var getPrevElem = function(aTokens, pos){
+				for(var n = pos - 1; n >=0; n--){
+					if("" !== aTokens[n].value){
+						return aTokens[n];
+					}
+				}
+				return aTokens[pos - 1];
+			};
+
 			//console.log(this.Formula);
 			cFormulaList =
 				(local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
@@ -4550,12 +4566,15 @@ parserFormula.prototype.setFormula = function(formula) {
 											wsF = this.wb.getWorksheetByName(tmp.sheet);
 											wsT = (null !== tmp.sheet2 && tmp.sheet !== tmp.sheet2) ?
 												this.wb.getWorksheetByName(tmp.sheet2) : wsF;
-											elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) :
-												new cArea3D(tmp.getName(), wsF, wsT);
+											var name = tmp.getName().split("!")[1];
+											elem = (tmp.isOneCell()) ? new cRef3D(name, wsF) :
+												new cArea3D(name, wsF, wsT);
 												refPos.push({start: aTokens[i].pos - aTokens[i].length,
 													end: aTokens[i].pos,
 													index: this.outStack.length,
 													oper: elem});
+										} else if(TOK_SUBTYPE_ERROR === aTokens[i].subtype) {
+											elem = new cError(val);
 										} else {
 											this.error.push(c_oAscError.ID.FrmlWrongOperator);
 											this.outStack = [];
@@ -4570,6 +4589,8 @@ parserFormula.prototype.setFormula = function(formula) {
 												end: aTokens[i].pos,
 												index: this.outStack.length,
 												oper: elem});
+										} else if(TOK_SUBTYPE_ERROR === aTokens[i].subtype) {
+											elem = new cError(val);
 										} else {
 											elem = new cName(aTokens[i].value, this.ws);
 											refPos.push({start: aTokens[i].pos - aTokens[i].length,
@@ -4615,14 +4636,14 @@ parserFormula.prototype.setFormula = function(formula) {
 							return false;
 						}
 
-						prev = aTokens[i - 1];
+						prev = getPrevElem(aTokens, i);
 						if ('-' === val && (0 === i ||
 							(TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
 							(TOK_SUBTYPE_STOP !== prev.subtype ||
 							(TOK_TYPE_FUNCTION !== prev.type && TOK_TYPE_SUBEXPR !== prev.type))))) {
-							elem = new cFormulaOperators['un_minus']();
+							elem = cFormulaOperators['un_minus'].prototype;
 						} else {
-							elem = new cFormulaOperators[val]();
+							elem = cFormulaOperators[val].prototype;
 						}
 						if (arr) {
 							if (bArrElemSign || 'un_minus' !== elem.name) {
@@ -4673,12 +4694,20 @@ parserFormula.prototype.setFormula = function(formula) {
 								arr.addRow();
 								break;
 							} else if (val in cFormulaList) {
-								elem = new cFormulaList[val]();
+								elem = cFormulaList[val].prototype;
 							} else if (val in cAllFormulaFunction) {
-								elem = new cAllFormulaFunction[val]();
+								elem = cAllFormulaFunction[val].prototype;
 							} else {
 								elem = new cUnknownFunction(val);
 								elem.isXLFN = (0 === val.indexOf("_xlfn."));
+							}
+							if("SUMPRODUCT" === val){
+								startSumproduct = true;
+
+								counterSumproduct++;
+								if(1 === counterSumproduct){
+									this.outStack.push(cSpecialOperandStart.prototype);
+								}
 							}
 							if (elem && elem.ca) {
 								this.ca = elem.ca;
@@ -4715,6 +4744,15 @@ parserFormula.prototype.setFormula = function(formula) {
 											prev.subtype) ? 1 : 0);
 									//this.outStack.push(arg_count);
 									this.outStack.splice(this.outStack.length - 1, 0, arg_count);
+
+									if(startSumproduct && "SUMPRODUCT" === tmp.name){
+										counterSumproduct--;
+										if(counterSumproduct < 1){
+											startSumproduct = false;
+											this.outStack.push(cSpecialOperandEnd.prototype);
+										}
+									}
+
 									if (!tmp.checkArguments(arg_count)) {
 										this.outStack = [];
 										this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
@@ -5841,7 +5879,13 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
 				_numberPrevArg = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : null;
 				_count_arg = null !== _numberPrevArg ? _numberPrevArg : currentElement.argumentsCurrent;
-				_argDiff = null !== _numberPrevArg ? 1 : 0;
+				_argDiff = 0;
+				if(_numberPrevArg) {
+					_argDiff++;
+					if(this.outStack[i - 2] && cElementType.specialFunctionEnd === this.outStack[i - 2].type) {
+						_argDiff++;
+					}
+				}
 
 				if (bLocale) {
 					res = currentElement.Assemble2Locale(elemArr, j - _count_arg - _argDiff, _count_arg, locale, digitDelim);

@@ -321,11 +321,10 @@ CTableRow.prototype =
     {
         var RowPr = this.Get_CompiledPr( false );
 
-        var Before =
-            {
-                WBefore    : RowPr.WBefore.Copy(),
-                GridBefore : RowPr.GridBefore
-            };
+		var Before = {
+			WBefore    : RowPr.WBefore.Copy(),
+			GridBefore : RowPr.GridBefore
+		};
 
         return Before;
     },
@@ -367,11 +366,10 @@ CTableRow.prototype =
     {
         var RowPr = this.Get_CompiledPr( false );
 
-        var After =
-            {
-                WAfter    : RowPr.WAfter.Copy(),
-                GridAfter : RowPr.GridAfter
-            };
+		var After = {
+			WAfter    : RowPr.WAfter.Copy(),
+			GridAfter : RowPr.GridAfter
+		};
 
         return After;
     },
@@ -779,6 +777,64 @@ CTableRow.prototype.GetCellInfo = function(nIndex)
 {
 	return this.Get_CellInfo(nIndex);
 };
+CTableRow.prototype.GetCellSpacing = function()
+{
+	return this.Get_CellSpacing();
+};
+CTableRow.prototype.GetHeight = function()
+{
+	return this.Get_Height();
+};
+CTableRow.prototype.SetHeight = function(nValue, nHRule)
+{
+	return this.Set_Height(nValue, nHRule);
+};
+/**
+ * Получаем информацию о отступе сетки в начале строки
+ * @returns {{W, Grid}}
+ */
+CTableRow.prototype.GetBefore = function()
+{
+	var oRowPr = this.Get_CompiledPr(false);
+
+	return {
+		W    : oRowPr.WBefore.Copy(),
+		Grid : oRowPr.GridBefore
+	};
+};
+/**
+ * Задаем информацию об отступе сетки в начале строки
+ * @param {number} Grid - сколько колонок занимает отступ
+ * @param {CTableMeasurement | 'false'} W - желаемая ширина (если задано значение false, тогда не меняем ширину)
+ */
+CTableRow.prototype.SetBefore = function(Grid, W)
+{
+	this.Set_Before(Grid, W);
+};
+/**
+ * Получаем информацию об отступе сетки в конце строки
+ * @returns {{W, Grid}}
+ */
+CTableRow.prototype.GetAfter = function()
+{
+	var oRowPr = this.Get_CompiledPr(false);
+
+	return {
+		W    : oRowPr.WAfter.Copy(),
+		Grid : oRowPr.GridAfter
+	};
+};
+/**
+ * Задаем информацию об отступе сетки в конце строки
+ * @param {number} Grid - сколько колонок занимает отступ
+ * @param {CTableMeasurement | 'false'} W - желаемая ширина (если задано значение false, тогда не меняем ширину)
+ */
+CTableRow.prototype.SetAfter = function(Grid, W)
+{
+	this.Set_After(Grid, W);
+};
+
+
 
 function CTableRowRecalculateObject()
 {

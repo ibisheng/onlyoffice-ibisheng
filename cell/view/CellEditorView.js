@@ -2248,7 +2248,7 @@
 				return false;
 
 			case 46:  // "del"
-				if (!this.enableKeyEvents) {
+				if (!this.enableKeyEvents || event.shiftKey) {
 					break;
 				}
 

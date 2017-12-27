@@ -808,9 +808,9 @@ function (window, undefined) {
 		var arg3 = 3 < arg.length ? arg[3].tocNumber() : new cNumber(-1);
 		var arg4 = 5 === arg.length ? arg[4].tocNumber() : new cNumber(-1);
 
-		if (cElementType.error === arg1.type || cElementType.error === arg2.type || cElementType.error === arg3.type ||
-			arg4.type) {
-			return new cError(cErrorType.bad_reference);
+		var argError;
+		if (argError = this._checkErrorArg([arg0, arg1, arg2, arg3, arg4])) {
+			return argError;
 		}
 
 		arg1 = arg1.getValue();
@@ -958,6 +958,8 @@ function (window, undefined) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type || cElementType.array === arg0.type) {
 			arg0 = arg0.getMatrix();
+		} else if(cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.getMatrix()[0];
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			return arg0.getValue();
 		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type ||
@@ -967,6 +969,9 @@ function (window, undefined) {
 			return new cError(cErrorType.not_available);
 		}
 
+		if(0 === arg0.length){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		return TransposeMatrix(arg0);
 	};

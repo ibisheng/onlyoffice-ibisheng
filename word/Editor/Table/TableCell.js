@@ -1890,6 +1890,67 @@ CTableCell.prototype.GetCalculatedW = function()
 
 	return 3.8; // 1.9 + 1.9 стандартные отступы справа и слева
 };
+/**
+ * Получаем количество промежутков, которое занимает данная ячейка
+ * @returns {number}
+ */
+CTableCell.prototype.GetGridSpan = function()
+{
+	return this.Get_GridSpan();
+};
+/**
+ * Получаем информацию о границе ячейки
+ * @param {number} nType - 0 - Top, 1 - Right, 2- Bottom, 3- Left
+ */
+CTableCell.prototype.GetBorder = function(nType)
+{
+	return this.Get_Border(nType);
+};
+/**
+ * Проверяем, является ли данная ячейка последней в строке
+ * @returns {boolean}
+ */
+CTableCell.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	if (true !== isSelection)
+		return !!(this.Row && this.Row.GetCellsCount() - 1 === this.Index);
+
+	if (!this.Row || !this.Row.Table)
+		return false;
+
+	var nCurCell = this.Index;
+	var nCurRow  = this.Row.Index;
+
+	var oTable = this.Row.Table;
+	var arrSelectionArray = oTable.GetSelectionArray();
+	for (var nIndex = 0, nCount = arrSelectionArray.length; nIndex < nCount; ++nIndex)
+	{
+		var nRow  = arrSelectionArray[nIndex].Row;
+		var nCell = arrSelectionArray[nIndex].Cell;
+
+		if (nRow === nCurRow && nCell > nCurCell)
+			return false;
+	}
+
+	return true;
+};
+/**
+ * Получаем скомпилированную настройку ширины ячейки
+ * @returns {?CTableMeasurement}
+ */
+CTableCell.prototype.GetW = function()
+{
+	return this.Get_W();
+};
+/**
+ * Задаем предпочитаемую ширину ячейки
+ * @param {CTableMeasurement} oCellW
+ */
+CTableCell.prototype.SetW = function(oCellW)
+{
+	return this.Set_W(oCellW);
+};
+
 
 function CTableCellRecalculateObject()
 {

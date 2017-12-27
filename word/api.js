@@ -2101,7 +2101,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		var specialPasteShowOptions = specialPasteHelper.specialPasteButtonProps ? specialPasteHelper.specialPasteButtonProps.props : null;
+		var specialPasteShowOptions = specialPasteHelper.buttonOptions ? specialPasteHelper.buttonOptions : null;
 		if(specialPasteShowOptions && null !== specialPasteHelper.showButtonIdParagraph)
 		{
 			var isUpdate = specialPasteShowOptions.cellCoord;
@@ -2137,7 +2137,7 @@ background-repeat: no-repeat;\
 
 			var _PageNum = this.WordControl.m_oLogicDocument.CurPage;
 
-			specialPasteHelper.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
+			specialPasteHelper.buttonOptions.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
 
 			var _coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 			var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
@@ -5233,22 +5233,34 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	// HyperProps - объект CHyperlinkProperty
-	asc_docs_api.prototype.change_Hyperlink = function(HyperProps)
+	/**
+	 * Изменяем гиперссылку
+	 * @param {CHyperlinkProperty} oHyperProps
+	 */
+	asc_docs_api.prototype.change_Hyperlink = function(oHyperProps)
 	{
+		if (!oHyperProps || !oHyperProps.get_InternalHyperlink())
+			return;
+
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeHyperlink);
-			this.WordControl.m_oLogicDocument.ModifyHyperlink(HyperProps);
+			this.WordControl.m_oLogicDocument.ModifyHyperlink(oHyperProps);
 		}
 	};
-
-	asc_docs_api.prototype.remove_Hyperlink = function(HyperProps)
+	/**
+	 * Удаляем гиперссылку
+	 * @param {CHyperlinkProperty} oHyperProps
+	 */
+	asc_docs_api.prototype.remove_Hyperlink = function(oHyperProps)
 	{
+		if (!oHyperProps || !oHyperProps.get_InternalHyperlink())
+			return;
+
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveHyperlink);
-			this.WordControl.m_oLogicDocument.RemoveHyperlink();
+			this.WordControl.m_oLogicDocument.RemoveHyperlink(oHyperProps);
 		}
 	};
 
@@ -5259,7 +5271,7 @@ background-repeat: no-repeat;\
 			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
 			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
-			this.Class   = null;
+			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
 		}
 		else
 		{
@@ -7717,6 +7729,24 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.EndViewModeInReview();
 	};
 
+	asc_docs_api.prototype.asc_ShowDocumentOutline = function()
+	{
+		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(true);
+		return this.WordControl.m_oLogicDocument.DocumentOutline;
+	};
+	asc_docs_api.prototype.asc_HideDocumentOutline = function()
+	{
+		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(false);
+	};
+	asc_docs_api.prototype.sync_OnDocumentOutlineUpdate = function()
+	{
+		this.sendEvent("asc_onDocumentOutlineUpdate");
+	};
+	asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition = function(nIndex)
+	{
+		this.sendEvent("asc_onDocumentOutlineCurrentPosition", nIndex);
+	};
+
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
 	{
@@ -8831,6 +8861,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
 	asc_docs_api.prototype['asc_EndViewModeInReview']                   = asc_docs_api.prototype.asc_EndViewModeInReview;
+
+	asc_docs_api.prototype['asc_ShowDocumentOutline']                   = asc_docs_api.prototype.asc_ShowDocumentOutline;
+	asc_docs_api.prototype['asc_HideDocumentOutline']                   = asc_docs_api.prototype.asc_HideDocumentOutline;
+	asc_docs_api.prototype['sync_OnDocumentOutlineUpdate']              = asc_docs_api.prototype.sync_OnDocumentOutlineUpdate;
+	asc_docs_api.prototype['sync_OnDocumentOutlineCurrentPosition']     = asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;

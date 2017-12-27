@@ -4890,58 +4890,60 @@ CPresentation.prototype =
                                     if(bNeedSelectAll){
                                         oDocContent.Set_ApplyToAll(false);
                                     }
-                                    oDocContentForDraw = new AscFormat.CDrawingDocContent(oDocContent.Parent, oDocContent.DrawingDocument, 0, 0, 20000, 20000);
-                                    oParagraph = oDocContentForDraw.Content[0];
-                                    oNearPos = { Paragraph: oParagraph, ContentPos: oParagraph.Get_ParaContentPos(false, false) };
-                                    oParagraph.Check_NearestPos(oNearPos);
-                                    bOldVal = oDocContentForDraw.MoveDrawing;
-                                    oDocContentForDraw.MoveDrawing = true;
-                                    oDocContentForDraw.Insert_Content(oSelectedContent, oNearPos);
-                                    oDocContentForDraw.MoveDrawing = bOldVal;
+                                    if(oSelectedContent.Elements.length > 0){
+                                        oDocContentForDraw = new AscFormat.CDrawingDocContent(oDocContent.Parent, oDocContent.DrawingDocument, 0, 0, 20000, 20000);
+                                        oParagraph = oDocContentForDraw.Content[0];
+                                        oNearPos = { Paragraph: oParagraph, ContentPos: oParagraph.Get_ParaContentPos(false, false) };
+                                        oParagraph.Check_NearestPos(oNearPos);
+                                        bOldVal = oDocContentForDraw.MoveDrawing;
+                                        oDocContentForDraw.MoveDrawing = true;
+                                        oDocContentForDraw.Insert_Content(oSelectedContent, oNearPos);
+                                        oDocContentForDraw.MoveDrawing = bOldVal;
 
 
-                                    oDocContentForDraw.Reset(0, 0, 20000, 20000);
-                                    oDocContentForDraw.Recalculate_Page(0, true);
-                                    aParagraphs = oDocContentForDraw.Content;
-                                    dMaxWidth = 0;
-                                    for(i = 0; i < aParagraphs.length; ++i){
-                                        oParagraph = aParagraphs[i];
-                                        for(j = 0; j < oParagraph.Lines.length; ++j){
-                                            if(oParagraph.Lines[j].Ranges[0].W > dMaxWidth){
-                                                dMaxWidth = oParagraph.Lines[j].Ranges[0].W;
+                                        oDocContentForDraw.Reset(0, 0, 20000, 20000);
+                                        oDocContentForDraw.Recalculate_Page(0, true);
+                                        aParagraphs = oDocContentForDraw.Content;
+                                        dMaxWidth = 0;
+                                        for(i = 0; i < aParagraphs.length; ++i){
+                                            oParagraph = aParagraphs[i];
+                                            for(j = 0; j < oParagraph.Lines.length; ++j){
+                                                if(oParagraph.Lines[j].Ranges[0].W > dMaxWidth){
+                                                    dMaxWidth = oParagraph.Lines[j].Ranges[0].W;
+                                                }
                                             }
                                         }
+                                        dMaxWidth += 1;
+                                        oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
+                                        oDocContentForDraw.Recalculate_Page(0, true);
+                                        dContentHeight = oDocContentForDraw.Get_SummaryHeight();
+
+                                        oCanvas = document.createElement('canvas');
+                                        dImageWidth = dMaxWidth + 2.0*dContentIndents;
+                                        dImageHeight = dContentHeight + 2.0*dContentIndents;
+                                        oCanvas.width = this.DrawingDocument.GetDotsPerMM(dImageWidth);
+                                        oCanvas.height = this.DrawingDocument.GetDotsPerMM(dImageHeight);
+                                        //if (AscCommon.AscBrowser.isRetina) {
+                                        //    oCanvas.width <<= 1;
+                                        //    oCanvas.height <<= 1;
+                                        //}
+                                        oContext = oCanvas.getContext('2d');
+                                        oGraphics = new AscCommon.CGraphics();
+
+                                        oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth, dImageHeight);
+                                        oGraphics.m_oFontManager = AscCommon.g_fontManager;
+                                        oGraphics.m_oCoordTransform.tx = +dContentIndents;
+                                        oGraphics.m_oCoordTransform.ty = +dContentIndents;
+                                        oGraphics.transform(1,0,0,1,0,0);
+
+                                        bOldShowParaMarks = this.Api.ShowParaMarks;
+                                        this.Api.ShowParaMarks = false;
+                                        oDocContentForDraw.Draw(0, oGraphics);
+                                        this.Api.ShowParaMarks = bOldShowParaMarks;
+                                        var sImageUrl = oCanvas.toDataURL("image/png");
+                                        oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth, dImageHeight);
+                                        oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
                                     }
-                                    dMaxWidth += 1;
-                                    oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
-                                    oDocContentForDraw.Recalculate_Page(0, true);
-                                    dContentHeight = oDocContentForDraw.Get_SummaryHeight();
-
-                                    oCanvas = document.createElement('canvas');
-                                    dImageWidth = dMaxWidth + 2.0*dContentIndents;
-                                    dImageHeight = dContentHeight + 2.0*dContentIndents;
-                                    oCanvas.width = this.DrawingDocument.GetDotsPerMM(dImageWidth);
-                                    oCanvas.height = this.DrawingDocument.GetDotsPerMM(dImageHeight);
-                                    //if (AscCommon.AscBrowser.isRetina) {
-                                    //    oCanvas.width <<= 1;
-                                    //    oCanvas.height <<= 1;
-                                    //}
-                                    oContext = oCanvas.getContext('2d');
-                                    oGraphics = new AscCommon.CGraphics();
-
-                                    oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth, dImageHeight);
-                                    oGraphics.m_oFontManager = AscCommon.g_fontManager;
-                                    oGraphics.m_oCoordTransform.tx = +dContentIndents;
-                                    oGraphics.m_oCoordTransform.ty = +dContentIndents;
-                                    oGraphics.transform(1,0,0,1,0,0);
-
-                                    bOldShowParaMarks = this.Api.ShowParaMarks;
-                                    this.Api.ShowParaMarks = false;
-                                    oDocContentForDraw.Draw(0, oGraphics);
-                                    this.Api.ShowParaMarks = bOldShowParaMarks;
-                                    var sImageUrl = oCanvas.toDataURL("image/png");
-                                    oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth, dImageHeight);
-                                    oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
                                 }
                             }
                         }

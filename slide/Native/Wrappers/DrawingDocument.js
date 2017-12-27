@@ -510,7 +510,7 @@ CDrawingDocument.prototype.AddPageSelection = function(pageIndex, x, y, width, h
 };
 CDrawingDocument.prototype.SelectShow = function()
 {
-    this.Native["DD_SelectShow"]();
+    this.m_oWordControl.OnUpdateOverlay();
 };
 
 CDrawingDocument.prototype.Set_RulerState_Table = function(markup, transform)
@@ -669,19 +669,19 @@ CDrawingDocument.prototype.GetCommentHeight = function(type)
 CDrawingDocument.prototype.OnMouseDown = function(e)
 {
     check_MouseDownEvent(e, true);
-    this.m_oLogicDocument.OnMouseDown(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+    this.m_oLogicDocument.OnMouseDown(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, e["CurPage"]);
 };
 
 CDrawingDocument.prototype.OnMouseMove = function(e)
 {
     check_MouseMoveEvent(e);
-    this.m_oLogicDocument.OnMouseMove(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+    this.m_oLogicDocument.OnMouseMove(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, e["CurPage"]);
 };
 
 CDrawingDocument.prototype.OnMouseUp = function(e)
 {
     check_MouseUpEvent(e);
-    this.m_oLogicDocument.OnMouseUp(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, this.m_oLogicDocument.CurPage);
+    this.m_oLogicDocument.OnMouseUp(global_mouseEvent, global_mouseEvent.X, global_mouseEvent.Y, e["CurPage"]);
 };
 
 // collaborative targets

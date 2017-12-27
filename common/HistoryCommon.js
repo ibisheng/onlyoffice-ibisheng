@@ -1034,6 +1034,15 @@
 			case AscDFH.historydescription_Document_AddTableOfContents:
 				sString = "Document_AddTableOfContents";
 				break;
+			case AscDFH.historydescription_Document_ChangeOutlineLevel:
+				sString = "Document_ChangeOutlineLevel";
+				break;
+			case AscDFH.historydescription_Document_AddElementToOutline:
+				sString = "Document_AddElementToOutline";
+				break;
+			case AscDFH.historydescription_Document_ResizeTable:
+				sString = "Document_ResizeTable";
+				break;
 		}
 		return sString;
 	}
@@ -2951,6 +2960,9 @@
     window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
     window['AscDFH'].historydescription_Document_AddBookmark                        = 0x0147;
 	window['AscDFH'].historydescription_Document_AddTableOfContents                 = 0x0148;
+	window['AscDFH'].historydescription_Document_ChangeOutlineLevel                 = 0x0149;
+	window['AscDFH'].historydescription_Document_AddElementToOutline                = 0x014a;
+	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014b;
 
 
 
