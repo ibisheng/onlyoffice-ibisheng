@@ -3482,6 +3482,7 @@
 
 				
 				//проходимся по контенту paragraph
+				var paraRunObj;
 				for(var n = 0; n < content.length; n++)
 				{
 					this.aResult.getCell(row + this.maxLengthRowCount, s + c1);
@@ -3493,7 +3494,9 @@
 					{
 						case para_Run://*paraRun*
 						{
-							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
+							paraRunObj = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
+							s = paraRunObj.s;
+							row = paraRunObj.row;
 							break;
 						}
 						case para_Hyperlink://*hyperLink*
@@ -3520,7 +3523,9 @@
 								{
 									case para_Run://*paraRun*
 									{
-										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
+										paraRunObj = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
+										s = paraRunObj.s;
+										row = paraRunObj.row;
 										break;
 									}
 								}
@@ -3578,6 +3583,27 @@
 						case para_Text://*paraText*
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
+							break;
+						}
+						case para_NewLine:
+						{
+							this.fontsNew[paragraphFontFamily] = 1;
+							oNewItem.content.push(formatText);
+
+							if(text !== null)
+								oNewItem.content[oNewItem.content.length - 1].text = text;
+
+							cloneNewItem  = oNewItem.clone();
+
+							//переходим в следующую ячейку
+							var cell = aResult.getCell(row + this.maxLengthRowCount, s + c1);
+							aResult.setCellContent(row + this.maxLengthRowCount, s + c1, cloneNewItem);
+
+							text = "";
+							oNewItem = new pasteCell();
+							row++;
+							s = 0;
+
 							break;
 						}
 						case para_Space://*paraSpace*
@@ -3651,7 +3677,7 @@
 					text = "";
 				}
 				
-				return s;
+				return {s: s, row: row};
 			},
 			
 			_addImageToMap: function(paraDrawing)
