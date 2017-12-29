@@ -78,6 +78,7 @@
 	var c_oAscGetDefinedNamesList = Asc.c_oAscGetDefinedNamesList;
 	var c_oAscDefinedNameReason = Asc.c_oAscDefinedNameReason;
 	var CRangeOffset = AscCommonExcel.CRangeOffset;
+	var c_oNotifyType = AscCommon.c_oNotifyType;
 
 	var g_nVerticalTextAngle = 255;
 	//определяется в WorksheetView.js
@@ -282,8 +283,8 @@
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 				var notifyType = eventData.notifyData.type;
 				if (!(this.isTable &&
-					(AscCommon.c_oNotifyType.Shift === notifyType || AscCommon.c_oNotifyType.Move === notifyType ||
-					AscCommon.c_oNotifyType.Delete === notifyType))) {
+					(c_oNotifyType.Shift === notifyType || c_oNotifyType.Move === notifyType ||
+					c_oNotifyType.Delete === notifyType))) {
 					var oldUndoName = this.getUndoDefName();
 					this.parsedRef.setFormulaString(this.ref = eventData.assemble);
 					this.wb.dependencyFormulas.addToChangedDefName(this);
@@ -459,19 +460,19 @@
 		//shift, move
 		deleteNodes: function(sheetId, bbox) {
 			this.buildDependency();
-			this._shiftMoveDelete(AscCommon.c_oNotifyType.Delete, sheetId, bbox, null);
+			this._shiftMoveDelete(c_oNotifyType.Delete, sheetId, bbox, null);
 			this.addToChangedRange(sheetId, bbox);
 		},
 		shift: function(sheetId, bbox, offset) {
 			this.buildDependency();
-			return this._shiftMoveDelete(AscCommon.c_oNotifyType.Shift, sheetId, bbox, offset);
+			return this._shiftMoveDelete(c_oNotifyType.Shift, sheetId, bbox, offset);
 		},
 		move: function(sheetId, bboxFrom, offset) {
 			this.buildDependency();
-			this._shiftMoveDelete(AscCommon.c_oNotifyType.Move, sheetId, bboxFrom, offset);
+			this._shiftMoveDelete(c_oNotifyType.Move, sheetId, bboxFrom, offset);
 			this.addToChangedRange(sheetId, bboxFrom);
 		},
-		changeSheet: function(sheetId, data, tableNamesMap, opt_collectDependencies) {
+		prepareChangeSheet: function(sheetId, data, tableNamesMap) {
 			this.buildDependency();
 			var listeners = {};
 			var sheetContainer = this.sheetListeners[sheetId];
@@ -503,12 +504,33 @@
 					}
 				}
 			}
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeSheet, data: data, collectDependencies: opt_collectDependencies};
+			var notifyData = {
+				type: c_oNotifyType.Prepare, actionType: c_oNotifyType.ChangeSheet, data: data, transformed: {},
+				preparedData: {}
+			};
 			for (var listenerId in listeners) {
 				listeners[listenerId].notify(notifyData);
 			}
+			for (var listenerId in notifyData.transformed) {
+				if (notifyData.transformed.hasOwnProperty(listenerId)) {
+					delete listeners[listenerId];
+					var elems = notifyData.transformed[listenerId];
+					for (var i = 0; i < elems.length; ++i) {
+						var elem = elems[i];
+						listeners[elem.getListenerId()] = elem;
+						elem.notify(notifyData);
+					}
+				}
+			}
+			return {listeners: listeners, data: data, preparedData: notifyData.preparedData};
 		},
-		removeSheet: function(sheetId, tableNames, opt_collectDependencies) {
+		changeSheet: function(prepared) {
+			var notifyData = {type: c_oNotifyType.ChangeSheet, data: prepared.data, preparedData: prepared.preparedData};
+			for (var listenerId in prepared.listeners) {
+				prepared.listeners[listenerId].notify(notifyData);
+			}
+		},
+		prepareRemoveSheet: function(sheetId, tableNames) {
 			var t = this;
 			//cells
 			var formulas = [];
@@ -530,7 +552,10 @@
 				tableNamesMap[tableName] = 1;
 			}
 			//dependence
-			this.changeSheet(sheetId, {remove: sheetId, tableNamesMap: tableNamesMap}, tableNamesMap, opt_collectDependencies);
+			return this.prepareChangeSheet(sheetId, {remove: sheetId, tableNamesMap: tableNamesMap}, tableNamesMap);
+		},
+		removeSheet: function(prepared) {
+			this.changeSheet(prepared);
 		},
 		//lock
 		lockRecal: function() {
@@ -662,7 +687,7 @@
 					res.setUndoDefName(newUndoName);
 					this._addDefName(res);
 
-					var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
+					var notifyData = {type: c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
 					this._broadcastDefName(oldUndoName.name, notifyData);
 
 					this.addToChangedDefName(res);
@@ -776,7 +801,7 @@
 				newUndoName.ref = defName.ref.split('!')[0] + '!' + ref.getAbsName();
 				History.TurnOff();
 				this.editDefinesNames(oldUndoName, newUndoName);
-				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
+				var notifyData = {type: c_oNotifyType.ChangeDefName, from: oldUndoName, to: newUndoName};
 				this._broadcastDefName(defName.name, notifyData);
 				History.TurnOn();
 				this.addToChangedDefName(defName);
@@ -799,7 +824,7 @@
 			var defName = this.getDefNameByName(tableName);
 			
 			this.addToChangedDefName(defName);
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null, bConvertTableFormulaToRef: bConvertTableFormulaToRef};
+			var notifyData = {type: c_oNotifyType.ChangeDefName, from: defName.getUndoDefName(), to: null, bConvertTableFormulaToRef: bConvertTableFormulaToRef};
 			this._broadcastDefName(tableName, notifyData);
 			
 			this._delDefName(tableName, null);
@@ -809,14 +834,14 @@
 		},
 		delColumnTable: function(tableName, deleted) {
 			this.buildDependency();
-			var notifyData = {type: AscCommon.c_oNotifyType.DelColumnTable, tableName: tableName, deleted: deleted};
+			var notifyData = {type: c_oNotifyType.DelColumnTable, tableName: tableName, deleted: deleted};
 			this._broadcastDefName(tableName, notifyData);
 		},
 		renameTableColumn: function(tableName) {
 			var defName = this.getDefNameByName(tableName, null);
 			if (defName) {
 				this.buildDependency();
-				var notifyData = {type: AscCommon.c_oNotifyType.RenameTableColumn, tableName: tableName};
+				var notifyData = {type: c_oNotifyType.RenameTableColumn, tableName: tableName};
 				this._broadcastDefName(defName.name, notifyData);
 			}
 			this.calcTree();
@@ -863,7 +888,7 @@
 			this.changedDefName[nodeId] = 1;
 		},
 		addToChangedRange: function(sheetId, bbox) {
-			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
+			var notifyData = {type: c_oNotifyType.Dirty};
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				for (var cellIndex in sheetContainer.cellMap) {
@@ -924,7 +949,7 @@
 			this.changedShared[parsed.getIndexNumber()] = parsed;
 		},
 		notifyChanged: function(changedFormulas) {
-			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
+			var notifyData = {type: c_oNotifyType.Dirty};
 			for (var listenerId in changedFormulas) {
 				changedFormulas[listenerId].notify(notifyData);
 			}
@@ -960,7 +985,7 @@
 			if (this.lockCounter > 0) {
 				return;
 			}
-			var notifyData = {type: AscCommon.c_oNotifyType.Dirty, areaData: undefined};
+			var notifyData = {type: c_oNotifyType.Dirty, areaData: undefined};
 			this.buildDependency();
 			this.addToChangedHiddenRows();
 			//broadscast Volatile only if something changed
@@ -1261,14 +1286,14 @@
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				var bboxShift;
-				if (AscCommon.c_oNotifyType.Shift === notifyType) {
+				if (c_oNotifyType.Shift === notifyType) {
 					var bHor = 0 !== offset.offsetCol;
 					bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
 				}
 				var isIntersect;
 				for (var cellIndex in sheetContainer.cellMap) {
 					getFromCellIndex(cellIndex);
-					if (AscCommon.c_oNotifyType.Shift === notifyType) {
+					if (c_oNotifyType.Shift === notifyType) {
 						isIntersect = bboxShift.contains(g_FCI.col, g_FCI.row);
 					} else {
 						isIntersect = bbox.contains(g_FCI.col, g_FCI.row);
@@ -1282,9 +1307,9 @@
 				}
 				for (var areaIndex in sheetContainer.areaMap) {
 					var areaMapElem = sheetContainer.areaMap[areaIndex];
-					if (AscCommon.c_oNotifyType.Shift === notifyType) {
+					if (c_oNotifyType.Shift === notifyType) {
 						isIntersect = bboxShift.isIntersect(areaMapElem.bbox)
-					} else if (AscCommon.c_oNotifyType.Move === notifyType || AscCommon.c_oNotifyType.Delete === notifyType) {
+					} else if (c_oNotifyType.Move === notifyType || c_oNotifyType.Delete === notifyType) {
 						isIntersect = bbox.isIntersect(areaMapElem.bbox);
 					}
 					if (isIntersect) {
@@ -1814,7 +1839,7 @@
 	Workbook.prototype._insertWorksheetFormula=function(index){
 		if( index > 0 && index < this.aWorksheets.length ) {
 			var oWsBefore = this.aWorksheets[index - 1];
-			this.dependencyFormulas.changeSheet(oWsBefore.getId(), {insert: index});
+			this.dependencyFormulas.changeSheet(this.dependencyFormulas.prepareChangeSheet(oWsBefore.getId(), {insert: index}));
 		}
 	};
 	Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
@@ -1831,16 +1856,12 @@
 			if(tempW.wFI < tempW.wTI)
 				tempW.wTI++;
 			this.dependencyFormulas.lockRecal();
-			var collectDependencies = [];
-			this.dependencyFormulas.changeSheet(oWsFrom.getId(), {replace: tempW}, null, collectDependencies);
+			var prepared = this.dependencyFormulas.prepareChangeSheet(oWsFrom.getId(), {replace: tempW}, null);
 			//move sheets
 			var movedSheet = this.aWorksheets.splice(indexFrom, 1);
 			this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
 			this._updateWorksheetIndexes(wsActive);
-			//buildDependencies after move sheet for cArea3d
-			for (var i = 0; i < collectDependencies.length; ++i) {
-				collectDependencies[i].buildDependencies();
-			}
+			this.dependencyFormulas.changeSheet(prepared);
 
 			this._insertWorksheetFormula(indexTo);
 
@@ -1890,17 +1911,13 @@
 		{
 			var removedSheetId = removedSheet.getId();
 			this.dependencyFormulas.lockRecal();
-			var collectDependencies = [];
-			this.dependencyFormulas.removeSheet(removedSheetId, removedSheet.getTableNames(), collectDependencies);
+			var prepared = this.dependencyFormulas.prepareRemoveSheet(removedSheetId, removedSheet.getTableNames());
 			//delete sheet
 			var wsActive = this.getActiveWs();
 			var oVisibleWs = null;
 			this.aWorksheets.splice(nIndex, 1);
 			delete this.aWorksheetsById[removedSheetId];
-			//buildDependencies after move sheet for cArea3d
-			for (var i = 0; i < collectDependencies.length; ++i) {
-				collectDependencies[i].buildDependencies();
-			}
+
 			if (nIndex == this.getActive()) {
 				oVisibleWs = this.findSheetNoHidden(nIndex);
 				if (null != oVisibleWs)
@@ -1916,6 +1933,7 @@
 				outputParams.sheet = removedSheet;
 			}
 			this._updateWorksheetIndexes(wsActive);
+			this.dependencyFormulas.removeSheet(prepared);
 			this.dependencyFormulas.unlockRecal();
 			return wsActive.getIndex();
 		}
@@ -3471,9 +3489,10 @@
 		if(name.length <= g_nSheetNameMaxLength)
 		{
 			var lastName = this.sName;
-			this.sName = name;
 			History.Create_NewPoint();
-			this.workbook.dependencyFormulas.changeSheet(this.getId(), {rename: {from: lastName, to: name}});
+			var prepared = this.workbook.dependencyFormulas.prepareChangeSheet(this.getId(), {rename: {from: lastName, to: name}});
+			this.sName = name;
+			this.workbook.dependencyFormulas.changeSheet(prepared);
 
 			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
 			if(!bFromUndoRedo)
@@ -7335,10 +7354,10 @@
 		var parsed = eventData.formula;
 		var shared = parsed.getShared();
 		if (shared) {
-			if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
-				AscCommon.c_oNotifyType.Delete === data.type) {
+			if (c_oNotifyType.Shift === data.type || c_oNotifyType.Move === data.type ||
+				c_oNotifyType.Delete === data.type) {
 				var bboxShift;
-				if (AscCommon.c_oNotifyType.Shift === data.type) {
+				if (c_oNotifyType.Shift === data.type) {
 					bboxShift = AscCommonExcel.shiftGetBBox(data.bbox, 0 !== data.offset.offsetCol);
 				} else {
 					bboxShift = data.bbox;
@@ -7351,6 +7370,20 @@
 						return newFormula.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
 					});
 				}
+			} else if (c_oNotifyType.Prepare === data.type) {
+				this.ws.getRange3(shared.ref.r1, shared.ref.c1, shared.ref.r2, shared.ref.c2)._foreachNoEmpty(function(cell) {
+					var shared = cell.getFormulaParsed();
+					if (cell.transformSharedFormula()) {
+						var parsed = cell.getFormulaParsed();
+						var transformed = data.transformed[shared.getListenerId()];
+						if(!transformed){
+							transformed = [];
+							data.transformed[shared.getListenerId()] = transformed;
+						}
+						transformed.push(parsed);
+					}
+				});
+				parsed.removeDependencies();
 			} else {
 				this._processShared(shared, shared.ref, data, parsed, function(newFormula){
 					newFormula.processNotify(data);
@@ -7388,11 +7421,7 @@
 					newFormula.setFormulaString(newFormula.assemble(true));
 					cell.setFormulaTemplate(true, function(cell) {
 						cell.setFormulaInternal(newFormula);
-						if (data.collectDependencies) {
-							data.collectDependencies.push(newFormula);
-						} else {
-							newFormula.buildDependencies();
-						}
+						newFormula.buildDependencies();
 					});
 				}
 				t.ws.workbook.dependencyFormulas.addToChangedCell(cell);

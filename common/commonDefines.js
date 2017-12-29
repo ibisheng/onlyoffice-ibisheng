@@ -845,7 +845,8 @@
 		RenameTableColumn: 4,
 		ChangeDefName: 5,
 		ChangeSheet: 6,
-		DelColumnTable: 7
+		DelColumnTable: 7,
+		Prepare: 8
 	};
 
 	var c_oNotifyParentType = {

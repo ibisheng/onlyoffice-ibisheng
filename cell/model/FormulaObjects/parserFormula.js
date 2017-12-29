@@ -1263,9 +1263,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		this.wsFrom = wsFrom;
 		this.wsTo = wsTo || this.wsFrom;
-
-		//dependenceRange allow change sheets and then independently removeDependencies
-		this.dependenceRange = null;
 	}
 
 	cArea3D.prototype = Object.create(cBaseType.prototype);
@@ -4391,6 +4388,9 @@ function parserFormula( formula, parent, _ws ) {
 		} else if (this.shared && this.parent && this.parent.onFormulaEvent &&
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Shared, eventData)) {
 			;
+		} else if (AscCommon.c_oNotifyType.Prepare === data.type) {
+			this.removeDependencies();
+			this.processNotifyPrepare(data);
 		} else {
 			this.removeDependencies();
 			var needAssemble = this.processNotify(data);
@@ -4403,12 +4403,25 @@ function parserFormula( formula, parent, _ws ) {
 				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.ChangeFormula, eventData);
 			}
 			this.Formula = eventData.assemble;
-			if (data.collectDependencies) {
-				data.collectDependencies.push(this);
-			} else {
-				this.buildDependencies();
+			this.buildDependencies();
+		}
+	};
+	parserFormula.prototype.processNotifyPrepare = function(data) {
+		var needAssemble = false;
+		if (AscCommon.c_oNotifyType.ChangeSheet === data.actionType) {
+			var changeData = data.data;
+			if (this.is3D || changeData.remove){
+				if (changeData.replace || changeData.remove) {
+					if (changeData.remove) {
+						needAssemble = this.removeSheet(changeData.remove, changeData.tableNamesMap);
+					} else {
+						needAssemble = this.moveSheet(changeData.replace);
+					}
+					data.preparedData[this.getListenerId()] = needAssemble;
+				}
 			}
 		}
+		return needAssemble;
 	};
 	parserFormula.prototype.processNotify = function(data) {
 		var needAssemble = true;
@@ -4433,18 +4446,14 @@ function parserFormula( formula, parent, _ws ) {
 			var changeData = data.data;
 			if (this.is3D || changeData.remove) {
 				if (changeData.replace || changeData.remove) {
-					if (changeData.remove) {
-						needAssemble = this.removeSheet(changeData.remove, changeData.tableNamesMap, changeData.wsPrevName, changeData.wsNextName);
-					} else {
-						needAssemble = this.moveSheet(changeData.replace);
-					}
+					needAssemble = data.preparedData[this.getListenerId()];
 				} else if (changeData.rename) {
 					needAssemble = true;
 				}
 			}
 		}
 		return needAssemble;
-	}
+	};
 parserFormula.prototype.clone = function(formula, parent, ws) {
     if (null == formula) {
     formula = this.Formula;
@@ -5944,7 +5953,6 @@ parserFormula.prototype.setFormula = function(formula) {
 				this._buildDependenciesRef(ref.getWsId(), ref.getRange().getBBox0(), isDefName, true);
 			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
 				wsR = ref.range(ref.wsRange());
-				ref.dependenceRange = wsR;
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {
@@ -5982,8 +5990,8 @@ parserFormula.prototype.setFormula = function(formula) {
 			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
 				cElementType.cellsRange === ref.type) && ref.isValid()) {
 				this._buildDependenciesRef(ref.getWsId(), ref.getRange().getBBox0(), isDefName, false);
-			} else if (cElementType.cellsRange3D === ref.type && ref.dependenceRange) {
-				wsR = ref.dependenceRange;
+			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
+				wsR = ref.range(ref.wsRange());
 				for (var j = 0; j < wsR.length; j++) {
 					var range = wsR[j];
 					if (range) {
