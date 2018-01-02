@@ -7300,6 +7300,7 @@ function BinaryPPTYLoader()
                 {
                     //latin
                     rPr.RFonts.Ascii = { Name: this.ReadTextFontTypeface(), Index : -1 };
+                    rPr.RFonts.HAnsi = { Name: rPr.RFonts.Ascii.Name, Index : -1 };
                     break;
                 }
                 case 4:
