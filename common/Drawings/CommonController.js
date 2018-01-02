@@ -6369,6 +6369,9 @@ DrawingObjectsController.prototype =
                     options.putLine(false);
                 }
                 options.type = null;
+                options.bCreate = true;
+                this.applyPropsToChartSpace(options, ret);
+                options.bCreate = false;
                 this.applyPropsToChartSpace(options, ret);
                 ret.theme = this.getTheme();
                 CheckSpPrXfrm(ret);
