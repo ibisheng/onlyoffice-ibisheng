@@ -560,7 +560,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
             for(j = 0;  j < paragraph_lines.length; ++j)
             {
                 if(paragraph_lines[j].Ranges[0].W > max_width)
-                    max_width = paragraph_lines[j].Ranges[0].W;
+                    max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
             }
         }
         else if(oContentElement.Get_Type() === type_Table)
