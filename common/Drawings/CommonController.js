@@ -10521,7 +10521,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         && oChartSpace.spPr.Fill.fill.color.color.type === window['Asc'].c_oAscColor.COLOR_TYPE_SCHEME &&  oChartSpace.spPr.Fill.fill.color.color.id === 0){
         bAccent1Background = true;
     }
-    if(!bCreate && !oChartSpace.chart.title){
+    if(bCreate && !oChartSpace.chart.title){
         oChartSpace.chart.setTitle(new AscFormat.CTitle());
         oChartSpace.chart.title.setOverlay(false);
     }
