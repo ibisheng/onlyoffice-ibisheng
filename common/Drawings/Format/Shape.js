@@ -3994,6 +3994,10 @@ CShape.prototype.clipTextRect = function(graphics)
 
 CShape.prototype.draw = function (graphics, transform, transformText, pageIndex) {
 
+    if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+        return;
+    }
+
     if(graphics.updatedRect && this.bounds)
     {
         var rect = graphics.updatedRect;

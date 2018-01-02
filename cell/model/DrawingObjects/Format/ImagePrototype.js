@@ -77,6 +77,10 @@ CImageShape.prototype.setRecalculateInfo = function()
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 
+    CImageShape.prototype.checkNeedRecalculate = function(){
+        return this.recalcInfo.recalculateTransform === true;
+    };
+
 CImageShape.prototype.recalcBrush = function()
 {
     this.recalcInfo.recalculateBrush = true;

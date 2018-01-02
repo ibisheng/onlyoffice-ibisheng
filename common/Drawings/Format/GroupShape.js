@@ -412,6 +412,9 @@ function CGroupShape()
 
     CGroupShape.prototype.draw = function(graphics)
     {
+        if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+            return;
+        }
         for(var i = 0; i < this.spTree.length; ++i)
             this.spTree[i].draw(graphics);
 

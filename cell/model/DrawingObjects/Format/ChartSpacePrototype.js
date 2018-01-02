@@ -112,6 +112,11 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
+
+CChartSpace.prototype.checkNeedRecalculate = function(){
+    return this.recalcInfo.recalculateChart === true;
+};
+
 CChartSpace.prototype.recalcTransform = function()
 {
     this.recalcInfo.recalculateTransform = true;

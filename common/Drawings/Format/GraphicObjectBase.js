@@ -1191,6 +1191,10 @@
         return this.copy(oIdMap);
     };
 
+    CGraphicObjectBase.prototype.checkNeedRecalculate = function(){
+        return false;
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

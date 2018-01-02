@@ -585,6 +585,9 @@ CImageShape.prototype.getTransform = function()
 
 CImageShape.prototype.draw = function(graphics, transform)
 {
+    if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+        return;
+    }
     if(graphics.updatedRect)
     {
         var rect = graphics.updatedRect;

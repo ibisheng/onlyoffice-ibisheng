@@ -328,6 +328,12 @@ CShape.prototype.setRecalculateInfo = function()
     this.compiledStyles = [];
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
+
+
+    CShape.prototype.checkNeedRecalculate = function(){
+        return this.recalcInfo.recalculateTransform === true || this.recalcInfo.recalculateContent === true;
+    };
+
 CShape.prototype.recalcContent = function()
 {
     this.recalcInfo.recalculateContent = true;

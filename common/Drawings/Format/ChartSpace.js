@@ -10843,6 +10843,9 @@ CChartSpace.prototype.updateLinks = function()
 
 CChartSpace.prototype.draw = function(graphics)
 {
+    if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+        return;
+    }
     if(graphics.IsSlideBoundsCheckerType)
     {
         graphics.transform3(this.transform);
