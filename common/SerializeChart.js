@@ -10870,7 +10870,8 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PlotArea(t, l, oNewVal, oIdToAxisMap, aChartWithAxis);
         });
-        
+
+
         // выставляем axis в chart        
         // TODO: 1. Диаграмм может быть больше, но мы пока работаем только с одной
         // TODO: 2. Избавиться от oIdToAxisMap, aChartWithAxis, т.к. они здесь больше не нужны
@@ -10905,6 +10906,61 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
             }
         }
         val.setPlotArea(oNewVal);
+
+
+        //check: does category axis exist
+        var oChart = oNewVal.charts[0];
+        if(oChart)
+        {
+            if(oChart.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
+            {
+                var axis_by_types = oChart.getAxisByTypes();
+                if(axis_by_types.valAx.length === 0 || axis_by_types.catAx.length === 0)
+                {
+                    oNewVal.removeCharts(0, oNewVal.charts.length);
+                    var sDefaultValAxFormatCode = null;
+                    if(oChart && oChart.series[0]){
+                        var aPoints = AscFormat.getPtsFromSeries(oChart.series[0]);
+                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                            sDefaultValAxFormatCode = aPoints[0].formatCode;
+                        }
+                    }
+                    var need_num_fmt = sDefaultValAxFormatCode;
+                    var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt ? need_num_fmt : "General");
+                    var cat_ax = axis_obj.catAx;
+                    var val_ax = axis_obj.valAx;
+                    if(oChart.getObjectType() === AscDFH.historyitem_type_BarChart && oChart.barDir === AscFormat.BAR_DIR_BAR)
+                    {
+                        if(cat_ax.axPos !== AscFormat.AX_POS_L)
+                        {
+                            cat_ax.setAxPos(AscFormat.AX_POS_L);
+                        }
+                        if(val_ax.axPos !== AscFormat.AX_POS_B)
+                        {
+                            val_ax.setAxPos(AscFormat.AX_POS_B);
+                        }
+                    }
+                    else
+                    {
+                        if(cat_ax.axPos !== AscFormat.AX_POS_B)
+                        {
+                            cat_ax.setAxPos(AscFormat.AX_POS_B);
+                        }
+                        if(val_ax.axPos !== AscFormat.AX_POS_L)
+                        {
+                            val_ax.setAxPos(AscFormat.AX_POS_L);
+                        }
+                    }
+
+                    oNewVal.addChart(oChart);
+                    oChart.addAxId(cat_ax);
+                    oChart.addAxId(val_ax);
+                    oNewVal.addAxis(cat_ax);
+                    oNewVal.addAxis(val_ax);
+                }
+            }
+        }
+
     }
     else if (c_oserct_chartLEGEND === type) {
         var oNewVal = new AscFormat.CLegend();
