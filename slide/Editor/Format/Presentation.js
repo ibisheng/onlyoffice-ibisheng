@@ -3705,6 +3705,22 @@ CPresentation.prototype =
         var bFocusOnSlide = !this.FocusOnNotes;
         this.FocusOnNotes = true;
         var oCurSlide = this.Slides[this.CurPage];
+        var oDrawingObjects = oCurSlide.graphicObjects;
+        if(oDrawingObjects.curState instanceof  AscFormat.StartAddNewShape
+            || oDrawingObjects.curState instanceof  AscFormat.SplineBezierState
+            || oDrawingObjects.curState instanceof  AscFormat.PolyLineAddState
+            || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
+            || oDrawingObjects.arrTrackObjects.length > 0)
+        {
+            oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+            if( oDrawingObjects.arrTrackObjects.length > 0)
+            {
+                oDrawingObjects.clearTrackObjects();
+                oDrawingObjects.updateOverlay();
+            }
+            this.Api.sync_EndAddShape();
+            this.UpdateCursorType( 0, 0,  new AscCommon.CMouseEventHandler() );
+        }
         if(oCurSlide){
             if(bFocusOnSlide){
                 var bNeedRedraw = false;
