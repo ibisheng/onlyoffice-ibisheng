@@ -3231,6 +3231,8 @@ PasteProcessor.prototype =
     {
 		//PASTE
 		if(text){
+
+            this.oDocument = this._GetTargetDocument(this.oDocument);
 			if(PasteElementsId.g_bIsDocumentCopyPaste){
 				this.oLogicDocument.RemoveBeforePaste();
 			}
@@ -4677,9 +4679,17 @@ PasteProcessor.prototype =
 
 		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
 		var pasteIntoParaRunPr = this.oDocument.GetDirectTextPr();
+        var bPresentation = false;
+        var oCurParagraph = this.oDocument.GetCurrentParagraph();
+        var Parent = t.oDocument;
+        if(oCurParagraph && !oCurParagraph.bFromDocument)
+        {
+            bPresentation = true;
+            Parent = oCurParagraph.Parent;
+        }
 
 		var getNewParagraph = function(){
-			var paragraph = new Paragraph(t.oDocument.DrawingDocument, t.oDocument);
+			var paragraph = new Paragraph(t.oDocument.DrawingDocument, Parent, bPresentation);
 			if(getStyleCurSelection){
 				if(pasteIntoParagraphPr)
 				{
@@ -4852,14 +4862,13 @@ PasteProcessor.prototype =
 		    if(!this.oDocument.bPresentation)
             {
                 fonts = this._convertTableFromExcel(aContentExcel);
-                aContent = this.aContent;
             }
             else
             {
-                fonts = [];
-                aContent = [];
+                fonts = this._convertTableFromExcelForChartTitle(aContentExcel);
             }
-		}
+            aContent = this.aContent;
+        }
 		
 		return {content: aContent, fonts: fonts};
 	},
@@ -5079,7 +5088,142 @@ PasteProcessor.prototype =
 		
 		return fonts;
 	},
-	
+
+
+    _convertTableFromExcelForChartTitle: function(aContentExcel)
+    {
+        var worksheet = aContentExcel.workbook.aWorksheets[0];
+        var range;
+        var tempActiveRef = aContentExcel.activeRange;
+        var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
+        var t = this;
+        var fonts = [];
+
+        var addFont = function(fontFamily)
+        {
+            if(!t.aContent.fonts)
+                t.aContent.fonts = [];
+
+            if(!t.oFonts)
+                t.oFonts = [];
+
+            t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
+            fonts.push(new CFont(fontFamily, 0, "", 0));
+        };
+
+        var paragraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, true);
+        this.aContent.push(paragraph);
+
+        var diffRow = activeRange.r2 - activeRange.r1;
+        var diffCol = activeRange.c2 - activeRange.c1;
+        for(var i = 0; i <= diffRow; i++)
+        {
+            for(var j = 0; j <= diffCol; j++)
+            {
+                var range = worksheet.getCell3(i + activeRange.r1, j + activeRange.c1);
+                var isMergedCell = range.hasMerged();
+                var gridSpan = 1;
+                var vMerge = 1;
+                if(isMergedCell)
+                {
+                    gridSpan = isMergedCell.c2 - isMergedCell.c1 + 1;
+                    vMerge = isMergedCell.r2 - isMergedCell.r1 + 1;
+                }
+
+                var hyperLink = range.getHyperlink();
+                var oCurHyperlink = null;
+                if(hyperLink)
+                {
+                    var oCurHyperlink = new ParaHyperlink();
+                    oCurHyperlink.SetParagraph(paragraph);
+                    oCurHyperlink.Set_Value( hyperLink.Hyperlink );
+                    if(hyperLink.Tooltip)
+                        oCurHyperlink.SetToolTip(hyperLink.Tooltip);
+                }
+
+                var value2 = range.getValue2();
+                for(var n = 0; n < value2.length; n++)
+                {
+                    var oCurRun = new ParaRun(paragraph);
+                    var format = value2[n].format;
+
+                    //***text property***
+                    oCurRun.Pr.Bold = format.getBold();
+                    var fc = format.getColor();
+                    if(fc)
+                    {
+                        oCurRun.Set_Unifill(AscFormat.CreateUnfilFromRGB(fc.getR(), fc.getG(), fc.getB()), true);
+                    }
+
+                    //font
+                    var font_family = format.getName();
+                    addFont(font_family);
+                    var oFontItem = this.oFonts[font_family];
+                    if(null != oFontItem && null != oFontItem.Name)
+                    {
+                        oCurRun.Set_RFonts_Ascii({Name: oFontItem.Name, Index: oFontItem.Index});
+                        oCurRun.Set_RFonts_HAnsi({Name: oFontItem.Name, Index: oFontItem.Index});
+                        oCurRun.Set_RFonts_CS({Name: oFontItem.Name, Index: oFontItem.Index});
+                        oCurRun.Set_RFonts_EastAsia({Name: oFontItem.Name, Index: oFontItem.Index});
+                    }
+
+                    oCurRun.Set_FontSize(format.getSize());
+                    oCurRun.Set_Italic(format.getItalic());
+                    oCurRun.Set_Strikeout(format.getStrikeout());
+                    oCurRun.Set_Underline(format.getUnderline() !== 2 ? true : false);
+
+                    //text
+                    var value = value2[n].text;
+                    for(var k = 0, length = value.length; k < length; k++)
+                    {
+                        var nUnicode = null;
+                        var nCharCode = value.charCodeAt(k);
+                        if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+                            if (k + 1 < length) {
+                                k++;
+                                var nTrailingChar = value.charCodeAt(k);
+                                nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+                            }
+                        }
+                        else
+                            nUnicode = nCharCode;
+                        if (null != nUnicode) {
+                            var Item;
+                            if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+                                Item = new ParaText();
+                                Item.Set_CharCode(nUnicode);
+                            }
+                            else
+                                Item = new ParaSpace();
+
+                            //add text
+                            oCurRun.Add_ToContent(k, Item, false);
+                        }
+                    }
+                    if(i !== diffRow || j !== diffCol)
+                    {
+                        oCurRun.Add_ToContent(k, new ParaSpace(), false);
+                    }
+
+                    //add run
+                    if(oCurHyperlink)
+                        oCurHyperlink.Add_ToContent(n, oCurRun, false);
+                    else
+                        paragraph.Internal_Content_Add(paragraph.Content.length-1, oCurRun, false);
+                }
+
+                if(oCurHyperlink)
+                    paragraph.Internal_Content_Add(paragraph.Content.length-1, oCurHyperlink, false);
+
+                j = j + gridSpan - 1;
+            }
+            //if((i + vMerge - 1) == diffRow)
+            //i = i + vMerge - 1;
+        }
+
+        return fonts;
+    },
+
 	_convertTableToPPTX: function(table, isFromWord)
 	{
 		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
