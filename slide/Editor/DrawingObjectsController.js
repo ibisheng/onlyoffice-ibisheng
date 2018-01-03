@@ -158,7 +158,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
 
 DrawingObjectsController.prototype.paragraphFormatPaste2 = function()
 {
-    return this.paragraphFormatPaste(editor.WordControl.m_oLogicDocument.CopyTextPr, editor.WordControl.m_oLogicDocument.CopyParaPr, true);
+    return this.paragraphFormatPaste(editor.WordControl.m_oLogicDocument.CopyTextPr, null, true);
 };
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {

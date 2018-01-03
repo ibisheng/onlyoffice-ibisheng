@@ -3838,7 +3838,7 @@ CPresentation.prototype =
         if(this.CopyTextPr && this.CopyParaPr)
         {
             var oController = this.GetCurrentController();
-            oController && oController.paragraphFormatPaste(this.CopyTextPr, this.CopyParaPr, false);
+            oController && oController.paragraphFormatPaste(this.CopyTextPr, /*this.CopyParaPr*/null, false);
             this.Document_UpdateInterfaceState();
         }
     },
