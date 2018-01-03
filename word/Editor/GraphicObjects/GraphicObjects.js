@@ -3363,7 +3363,10 @@ CGraphicObjects.prototype =
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
 
 
-    paragraphClearFormatting: DrawingObjectsController.prototype.paragraphClearFormatting,
+    paragraphClearFormatting: function()
+    {
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+    },
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
     applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,

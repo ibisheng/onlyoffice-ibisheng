@@ -648,6 +648,55 @@
         }
     };
 
+
+    CDrawingDocContent.prototype.ClearParagraphFormatting = function()
+    {
+        if (true === this.ApplyToAll)
+        {
+            for (var Index = 0; Index < this.Content.length; Index++)
+            {
+                var Item = this.Content[Index];
+                Item.Set_ApplyToAll(true);
+                Item.Clear_TextFormatting();
+                Item.Set_ApplyToAll(false);
+            }
+
+            return;
+        }
+
+        if (docpostype_DrawingObjects == this.CurPos.Type)
+        {
+            return this.LogicDocument.DrawingObjects.paragraphClearFormatting();
+        }
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            if (true === this.Selection.Use)
+            {
+                if (selectionflag_Common === this.Selection.Flag)
+                {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos   = this.Selection.EndPos;
+                    if (StartPos > EndPos)
+                    {
+                        var Temp = StartPos;
+                        StartPos = EndPos;
+                        EndPos   = Temp;
+                    }
+
+                    for (var Index = StartPos; Index <= EndPos; Index++)
+                    {
+                        var Item = this.Content[Index];
+                        Item.Clear_TextFormatting();
+                    }
+                }
+            }
+            else
+            {
+                var Item = this.Content[this.CurPos.ContentPos];
+                Item.Clear_TextFormatting();
+            }
+        }
+    };
     // TODO: сделать по-нормальному!!!
     function CDocument_prototype_private_GetElementPageIndexByXY(ElementPos, X, Y, PageIndex)
     {

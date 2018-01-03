@@ -1749,7 +1749,7 @@ DrawingObjectsController.prototype =
 
     paragraphClearFormatting: function()
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(AscFormat.CDrawingDocContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: function(f, args, tableFunction)
