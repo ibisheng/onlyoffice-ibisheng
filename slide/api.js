@@ -68,6 +68,7 @@
 	{
 		this.Background     = null;
 		this.Timing         = null;
+		this.LayoutIndex    = null;
 		this.lockDelete     = null;
 		this.lockLayout     = null;
 		this.lockTiming     = null;
@@ -84,6 +85,14 @@
 	CAscSlideProps.prototype.put_background     = function(v)
 	{
 		this.Background = v;
+	};
+	CAscSlideProps.prototype.get_LayoutIndex     = function()
+	{
+		return this.LayoutIndex;
+	};
+	CAscSlideProps.prototype.put_LayoutIndex     = function(v)
+	{
+		this.LayoutIndex = v;
 	};
 	CAscSlideProps.prototype.get_timing         = function()
 	{
@@ -5621,6 +5630,15 @@ background-repeat: no-repeat;\
 		else{
             obj.isHidden = false;
 		}
+		if(slide && slide.Layout && slide.Layout.Master){
+			var aLayouts = slide.Layout.Master.sldLayoutLst;
+			for(var i = 0; i < aLayouts.length; ++i){
+				if(slide.Layout === aLayouts[i]){
+                    obj.LayoutIndex = i;
+					break;
+				}
+			}
+		}
 		var _len = this.SelectedObjectsStack.length;
 		if (_len > 0)
 		{
@@ -7550,6 +7568,8 @@ background-repeat: no-repeat;\
 	window['Asc']['CAscSlideProps']                   = CAscSlideProps;
 	CAscSlideProps.prototype['get_background']        = CAscSlideProps.prototype.get_background;
 	CAscSlideProps.prototype['put_background']        = CAscSlideProps.prototype.put_background;
+	CAscSlideProps.prototype['get_LayoutIndex']        = CAscSlideProps.prototype.get_LayoutIndex;
+	CAscSlideProps.prototype['put_LayoutIndex']        = CAscSlideProps.prototype.put_LayoutIndex;
 	CAscSlideProps.prototype['get_timing']            = CAscSlideProps.prototype.get_timing;
 	CAscSlideProps.prototype['put_timing']            = CAscSlideProps.prototype.put_timing;
 	CAscSlideProps.prototype['get_LockDelete']        = CAscSlideProps.prototype.get_LockDelete;
