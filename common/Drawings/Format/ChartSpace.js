@@ -8318,7 +8318,7 @@ CChartSpace.prototype.hitInTextRect = function()
                         calc_entryes[i].calcMarkerUnion.marker.extY = marker_size;
                     }
                 }
-                distance_to_text = marker_size;
+                distance_to_text = 0.5;
             }
             else
             {
