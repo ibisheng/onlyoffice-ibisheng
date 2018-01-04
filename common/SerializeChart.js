@@ -10912,7 +10912,7 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         var oChart = oNewVal.charts[0];
         if(oChart)
         {
-            if(oChart.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
+            if(oChart.getObjectType() !== AscDFH.historyitem_type_ScatterChart && oChart.getAxisByTypes)
             {
                 var axis_by_types = oChart.getAxisByTypes();
                 if(axis_by_types.valAx.length === 0 || axis_by_types.catAx.length === 0)
