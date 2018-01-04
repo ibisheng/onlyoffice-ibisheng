@@ -3655,6 +3655,7 @@ function CThumbnailsManager()
 		AscCommon.check_MouseDownEvent(e);
 		global_mouseEvent.LockMouse();
 
+        oThis.m_oWordControl.m_oApi.sync_EndAddShape();
 		if (global_mouseEvent.Sender != control)
 		{
 			// такого быть не должно
