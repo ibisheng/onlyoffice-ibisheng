@@ -380,7 +380,7 @@ CTextBody.prototype =
                     else
                     {
                         item.Set_FontSize(paragrRedFontSize);
-                }
+                    }
                     break;
                 }
                 case para_Hyperlink:
@@ -389,6 +389,15 @@ CTextBody.prototype =
                     break;
                 }
             }
+        }
+
+        if(AscFormat.isRealNumber(parg.TextPr.Value.FontSize))
+        {
+            parg.TextPr.Set_FontSize(Math.round(parg.TextPr.Value.FontSize*fontScale));
+        }
+        else
+        {
+            parg.TextPr.Set_FontSize(paragrRedFontSize);
         }
     },
 
