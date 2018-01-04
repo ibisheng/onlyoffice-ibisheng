@@ -2825,6 +2825,7 @@ CGraphicObjects.prototype =
     },
 
     resetSelection: DrawingObjectsController.prototype.resetSelection,
+    deselectObject: DrawingObjectsController.prototype.deselectObject,
 
     resetSelection2: function()
     {

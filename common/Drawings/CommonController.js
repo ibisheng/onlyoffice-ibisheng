@@ -1149,7 +1149,9 @@ DrawingObjectsController.prototype =
                 var b_check_internal = checkInternalSelection(selector.selection);
                 if(!(e.CtrlKey || e.ShiftKey) && !is_selected || b_is_inline || b_is_selected_inline)
                     selector.resetSelection();
-                selector.selectObject(object, pageIndex);
+                if(!e.CtrlKey || !object.selected){
+                    selector.selectObject(object, pageIndex);
+                }
                 if(!is_selected || b_check_internal)
                     this.updateOverlay();
                 this.checkSelectedObjectsForMove(group, pageIndex);
@@ -1661,7 +1663,14 @@ DrawingObjectsController.prototype =
 
     deselectObject: function(object)
     {
-
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            if(this.selectedObjects[i] === object){
+                object.selected = false;
+                this.selectedObjects.splice(i, 1);
+                return;
+            }
+        }
     },
 
     recalculate: function()

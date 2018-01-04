@@ -755,6 +755,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
     state.drawingObjects.changeCurrentState(new AscFormat.NullState(state.drawingObjects));
+    var bHandle = false;
     if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== AscCommon.g_mouse_button_right)
     {
         switch (state.majorObject.getObjectType())
@@ -769,12 +770,23 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
                 state.drawingObjects.OnMouseUp(e, x, y, pageIndex);
                 state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps &&  state.drawingObjects.drawingObjects.sendGraphicObjectProps();
                 state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
+                bHandle = true;
                 break;
             }
             case AscDFH.historyitem_type_ChartSpace:
             {
                 break;
             }
+        }
+    }
+    if(!bHandle)
+    {
+        if(e.CtrlKey && state.majorObjectIsSelected)
+        {
+            drawingObjects.deselectObject(state.majorObject);
+            state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps &&  state.drawingObjects.drawingObjects.sendGraphicObjectProps();
+            state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
+            drawingObjects.updateOverlay();
         }
     }
 }

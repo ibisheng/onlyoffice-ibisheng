@@ -424,6 +424,20 @@ function CGroupShape()
         graphics.SetIntegerGrid(true);
     };
 
+    CGroupShape.prototype.deselectObject = function(object)
+    {
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            if(this.selectedObjects[i] === object){
+                object.selected = false;
+                this.selectedObjects.splice(i, 1);
+                return;
+            }
+        }
+    };
+
+
+
     CGroupShape.prototype.getLocalTransform = function()
     {
         if(this.recalcInfo.recalculateTransform)
