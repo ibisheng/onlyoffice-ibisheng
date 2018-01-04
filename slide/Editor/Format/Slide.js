@@ -1077,7 +1077,7 @@ Slide.prototype =
                 var oOldGeometry = this.notesShape.spPr.geometry;
                 this.notesShape.spPr.geometry = null;
                 this.notesShape.extX = Width;
-                this.notesShape.extX = 2000;
+                this.notesShape.extY = 2000;
                 this.notesShape.recalculateContent2();
                 this.notesShape.spPr.geometry = oOldGeometry;
                 this.notesShape.pen = AscFormat.CreateNoFillLine();
