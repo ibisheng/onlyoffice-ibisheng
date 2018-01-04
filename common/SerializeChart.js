@@ -6290,6 +6290,9 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMajorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_seraxMINORTICKMARK === type) {
         var oNewVal = { m_val: null };
@@ -6298,6 +6301,9 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMinorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_seraxTICKLBLPOS === type) {
         var oNewVal = { m_val: null };
@@ -6757,6 +6763,9 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMajorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_dateaxMINORTICKMARK === type) {
         var oNewVal = { m_val: null };
@@ -6765,6 +6774,9 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMinorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_dateaxTICKLBLPOS === type) {
         var oNewVal = { m_val: null };
@@ -6991,6 +7003,9 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMajorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_cataxMINORTICKMARK === type) {
         var oNewVal = { m_val: null };
@@ -6999,6 +7014,9 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMinorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_cataxTICKLBLPOS === type) {
         var oNewVal = { m_val: null };
@@ -7277,6 +7295,9 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMajorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_valaxMINORTICKMARK === type) {
         var oNewVal = { m_val: null };
@@ -7285,6 +7306,9 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
         });
         if (null != oNewVal.m_val)
             val.setMinorTickMark(oNewVal.m_val);
+        else{
+            val.setMajorTickMark(c_oAscTickMark.TICK_MARK_CROSS);
+        }
     }
     else if (c_oserct_valaxTICKLBLPOS === type) {
         var oNewVal = { m_val: null };
@@ -10532,6 +10556,13 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
+
+        if(oNewVal.majorTickMark === null){
+            oNewVal.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+        }
+        if(oNewVal.minorTickMark === null){
+            oNewVal.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        }
     }
     else if (c_oserct_plotareaDATEAX === type) {
         var oNewVal = new AscFormat.CDateAx();
@@ -10541,6 +10572,13 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
+
+        if(oNewVal.majorTickMark === null){
+            oNewVal.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+        }
+        if(oNewVal.minorTickMark === null){
+            oNewVal.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        }
     }
     else if (c_oserct_plotareaSERAX === type) {
         var oNewVal = new AscFormat.CSerAx();
@@ -10550,6 +10588,13 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
+        if(oNewVal.majorTickMark === null){
+            oNewVal.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+        }
+        if(oNewVal.minorTickMark === null){
+            oNewVal.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        }
+
     }
     else if (c_oserct_plotareaVALAX === type) {
         var oNewVal = new AscFormat.CValAx();
@@ -10563,6 +10608,13 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         //{
         //    oNewVal.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
         //}
+
+        if(oNewVal.majorTickMark === null){
+            oNewVal.setMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
+        }
+        if(oNewVal.minorTickMark === null){
+            oNewVal.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        }
     }
     else if (c_oserct_plotareaDTABLE === type) {
         var oNewVal = new AscFormat.CDTable();
