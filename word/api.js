@@ -5264,60 +5264,11 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	function CHyperlinkProperty(obj)
-	{
-		if (obj)
-		{
-			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
-			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
-			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
-			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
-		}
-		else
-		{
-			this.Text    = null;
-			this.Value   = "";
-			this.ToolTip = "";
-			this.Class   = null;
-		}
-	}
 
-	CHyperlinkProperty.prototype.get_Value   = function()
-	{
-		return this.Value;
-	};
-	CHyperlinkProperty.prototype.put_Value   = function(v)
-	{
-		this.Value = v;
-	};
-	CHyperlinkProperty.prototype.get_ToolTip = function()
-	{
-		return this.ToolTip;
-	};
-	CHyperlinkProperty.prototype.put_ToolTip = function(v)
-	{
-		this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v;
-	};
-	CHyperlinkProperty.prototype.get_Text    = function()
-	{
-		return this.Text;
-	};
-	CHyperlinkProperty.prototype.put_Text    = function(v)
-	{
-		this.Text = v;
-	};
-	CHyperlinkProperty.prototype.put_InternalHyperlink = function(oClass)
-	{
-		this.Class = oClass;
-	};
-	CHyperlinkProperty.prototype.get_InternalHyperlink = function()
-	{
-		return this.Class;
-	};
 
 	asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
 	{
-		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Hyperlink, new CHyperlinkProperty(hyperProp));
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Hyperlink, new Asc.CHyperlinkProperty(hyperProp));
 	};
 
 	asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
@@ -8925,15 +8876,6 @@ background-repeat: no-repeat;\
 	CContextMenuData.prototype['get_Y']       = CContextMenuData.prototype.get_Y;
 	CContextMenuData.prototype['get_PageNum'] = CContextMenuData.prototype.get_PageNum;
 	CContextMenuData.prototype['is_Header']   = CContextMenuData.prototype.is_Header;
-	window['Asc']['CHyperlinkProperty']       = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
-	CHyperlinkProperty.prototype['get_Value']             = CHyperlinkProperty.prototype.get_Value;
-	CHyperlinkProperty.prototype['put_Value']             = CHyperlinkProperty.prototype.put_Value;
-	CHyperlinkProperty.prototype['get_ToolTip']           = CHyperlinkProperty.prototype.get_ToolTip;
-	CHyperlinkProperty.prototype['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
-	CHyperlinkProperty.prototype['get_Text']              = CHyperlinkProperty.prototype.get_Text;
-	CHyperlinkProperty.prototype['put_Text']              = CHyperlinkProperty.prototype.put_Text;
-	CHyperlinkProperty.prototype['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
-	CHyperlinkProperty.prototype['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 	window['Asc']['asc_CCommentDataWord']                 = asc_CCommentDataWord;
 	asc_CCommentDataWord.prototype['asc_getText']         = asc_CCommentDataWord.prototype.asc_getText;
 	asc_CCommentDataWord.prototype['asc_putText']         = asc_CCommentDataWord.prototype.asc_putText;

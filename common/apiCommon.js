@@ -2953,6 +2953,59 @@
 		return this.Number;
 	};
 
+
+    function CHyperlinkProperty(obj)
+    {
+        if (obj)
+        {
+            this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
+            this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
+            this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
+            this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
+        }
+        else
+        {
+            this.Text    = null;
+            this.Value   = "";
+            this.ToolTip = "";
+            this.Class   = null;
+        }
+    }
+
+    CHyperlinkProperty.prototype.get_Value   = function()
+    {
+        return this.Value;
+    };
+    CHyperlinkProperty.prototype.put_Value   = function(v)
+    {
+        this.Value = v;
+    };
+    CHyperlinkProperty.prototype.get_ToolTip = function()
+    {
+        return this.ToolTip;
+    };
+    CHyperlinkProperty.prototype.put_ToolTip = function(v)
+    {
+        this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v;
+    };
+    CHyperlinkProperty.prototype.get_Text    = function()
+    {
+        return this.Text;
+    };
+    CHyperlinkProperty.prototype.put_Text    = function(v)
+    {
+        this.Text = v;
+    };
+    CHyperlinkProperty.prototype.put_InternalHyperlink = function(oClass)
+    {
+        this.Class = oClass;
+    };
+    CHyperlinkProperty.prototype.get_InternalHyperlink = function()
+    {
+        return this.Class;
+    };
+
+
 	/** @constructor */
 	function asc_CUserInfo() {
 		this.Id = null;
@@ -4273,6 +4326,19 @@
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
 	prot["get_FootnoteText"] =  prot.get_FootnoteText;
 	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
+
+
+
+    window['Asc']['CHyperlinkProperty']       = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
+    prot = CHyperlinkProperty.prototype;
+    prot['get_Value']             = CHyperlinkProperty.prototype.get_Value;
+    prot['put_Value']             = CHyperlinkProperty.prototype.put_Value;
+    prot['get_ToolTip']           = CHyperlinkProperty.prototype.get_ToolTip;
+    prot['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
+    prot['get_Text']              = CHyperlinkProperty.prototype.get_Text;
+    prot['put_Text']              = CHyperlinkProperty.prototype.put_Text;
+    prot['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
+    prot['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

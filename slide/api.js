@@ -5382,50 +5382,9 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.RemoveHyperlink();
 	};
 
-	function CHyperlinkProperty(obj)
-	{
-		if (obj)
-		{
-			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
-			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
-			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : null;
-		}
-		else
-		{
-			this.Text    = null;
-			this.Value   = "";
-			this.ToolTip = null;
-		}
-	}
-
-	CHyperlinkProperty.prototype.get_Value   = function()
-	{
-		return this.Value;
-	};
-	CHyperlinkProperty.prototype.put_Value   = function(v)
-	{
-		this.Value = v;
-	};
-	CHyperlinkProperty.prototype.get_ToolTip = function()
-	{
-		return this.ToolTip;
-	};
-	CHyperlinkProperty.prototype.put_ToolTip = function(v)
-	{
-		this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v;
-	};
-	CHyperlinkProperty.prototype.get_Text    = function()
-	{
-		return this.Text;
-	};
-	CHyperlinkProperty.prototype.put_Text    = function(v)
-	{
-		this.Text = v;
-	};
-
 	asc_docs_api.prototype.sync_HyperlinkPropCallback = function(hyperProp)
 	{
-		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Hyperlink, new CHyperlinkProperty(hyperProp));
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Hyperlink, new Asc.CHyperlinkProperty(hyperProp));
 	};
 
 	asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
@@ -7552,19 +7511,6 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype['asc_getReply']        = asc_CCommentData.prototype.asc_getReply;
 	asc_CCommentData.prototype['asc_addReply']        = asc_CCommentData.prototype.asc_addReply;
 	asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
-	window['Asc']['CHyperlinkProperty']               = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
-	CHyperlinkProperty.prototype['get_Value']         = CHyperlinkProperty.prototype.get_Value;
-	CHyperlinkProperty.prototype['put_Value']         = CHyperlinkProperty.prototype.put_Value;
-	CHyperlinkProperty.prototype['get_ToolTip']       = CHyperlinkProperty.prototype.get_ToolTip;
-	CHyperlinkProperty.prototype['put_ToolTip']       = CHyperlinkProperty.prototype.put_ToolTip;
-	CHyperlinkProperty.prototype['get_Text']          = CHyperlinkProperty.prototype.get_Text;
-	CHyperlinkProperty.prototype['put_Text']          = CHyperlinkProperty.prototype.put_Text;
-	CHyperlinkProperty.prototype['get_Value']         = CHyperlinkProperty.prototype.get_Value;
-	CHyperlinkProperty.prototype['put_Value']         = CHyperlinkProperty.prototype.put_Value;
-	CHyperlinkProperty.prototype['get_ToolTip']       = CHyperlinkProperty.prototype.get_ToolTip;
-	CHyperlinkProperty.prototype['put_ToolTip']       = CHyperlinkProperty.prototype.put_ToolTip;
-	CHyperlinkProperty.prototype['get_Text']          = CHyperlinkProperty.prototype.get_Text;
-	CHyperlinkProperty.prototype['put_Text']          = CHyperlinkProperty.prototype.put_Text;
 	window['AscCommonSlide'].CContextMenuData         = CContextMenuData;
 	CContextMenuData.prototype['get_Type']            = CContextMenuData.prototype.get_Type;
 	CContextMenuData.prototype['get_X']               = CContextMenuData.prototype.get_X;

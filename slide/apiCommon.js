@@ -223,29 +223,6 @@ CLayoutThumbnail.prototype.get_Name = function() { return this.Name; };
 CLayoutThumbnail.prototype.get_Width = function() { return this.Width; };
 CLayoutThumbnail.prototype.get_Height = function() { return this.Height; };
 
-function CHyperlinkProperty( obj )
-{
-    if( obj )
-    {
-        this.Text    = (undefined != obj.Text   ) ? obj.Text    : null;
-        this.Value   = (undefined != obj.Value  ) ? obj.Value   : "";
-        this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : null;
-    }
-    else
-    {
-        this.Text    = null;
-        this.Value   = "";
-        this.ToolTip = null;
-    }
-}
-
-CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
-CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
-CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v; };
-CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
-CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
-
 
 //------------------------------------------------------------export----------------------------------------------------
 window['Asc'] = window['Asc'] || {};
