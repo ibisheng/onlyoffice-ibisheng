@@ -969,13 +969,16 @@ if(typeof CPresentation !== "undefined")
         {
             if(!AdditionalData || !AdditionalData.All)
             {
+                var aSelectedSlides = this.Api.WordControl.Thumbnails.GetSelectedArray();
+                for(var i = 0; i < aSelectedSlides.length; ++i){
                     var check_obj =
-                    {
-                        "type": c_oAscLockTypeElemPresentation.Slide,
-                        "val": this.Slides[this.CurPage].timingLock.Get_Id(),
-                        "guid": this.Slides[this.CurPage].timingLock.Get_Id()
-                    };
-                    this.Slides[this.CurPage].timingLock.Lock.Check(check_obj);
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Slide,
+                            "val": this.Slides[this.CurPage].timingLock.Get_Id(),
+                            "guid": this.Slides[this.CurPage].timingLock.Get_Id()
+                        };
+                    this.Slides[aSelectedSlides[i]].timingLock.Lock.Check(check_obj);
+                }
             }
             else{
                 for(var i = 0; i < this.Slides.length; ++i)

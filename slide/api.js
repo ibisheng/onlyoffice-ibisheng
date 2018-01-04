@@ -6384,8 +6384,14 @@ background-repeat: no-repeat;\
 			var _cur   = this.WordControl.m_oDrawingDocument.SlideCurrent;
 			if (_cur < 0 || _cur >= _count)
 				return;
-			var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
-			_curSlide.applyTiming(oTiming);
+
+            var aSelectedSlides = this.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < aSelectedSlides.length; ++i)
+            {
+                var _curSlide = this.WordControl.m_oLogicDocument.Slides[aSelectedSlides[i]];
+                _curSlide.applyTiming(oTiming);
+			}
+
             if(oTiming){
                 if(AscFormat.isRealBool(oTiming.get_ShowLoop()) && oTiming.get_ShowLoop() !== this.WordControl.m_oLogicDocument.isLoopShowMode()){
                     this.WordControl.m_oLogicDocument.setShowLoop(oTiming.get_ShowLoop());
