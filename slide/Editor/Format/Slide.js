@@ -1099,11 +1099,14 @@ Slide.prototype =
             }
         }
 
-        if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
-            this.Layout.draw(graphics);
-        else{
-            _bounds =  this.Layout.bounds;
-            graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+        if(this.showMasterSp !== false)
+        {
+            if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
+                this.Layout.draw(graphics);
+            else{
+                _bounds =  this.Layout.bounds;
+                graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+            }
         }
         for(var i=0; i < this.cSld.spTree.length; ++i)
         {
