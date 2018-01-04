@@ -3602,8 +3602,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     {
                         var bLayout = AscCommon.isRealObject(this.recalcInfo.dataLbls[i].layout) && (AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.x) || AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.y));
                         var pos = this.chartObj.reCalculatePositionText("dlbl", this, /*this.recalcInfo.dataLbls[i].series.idx todo здесь оставить как есть в chartDrawere выбирать серии по индексу*/j, this.recalcInfo.dataLbls[i].pt.idx, bLayout);//
-                        if(this.recalcInfo.dataLbls[i].layout){
-                            layout = this.recalcInfo.dataLbls[i].layout;
+                        var oLbl = this.recalcInfo.dataLbls[i];
+                        if(oLbl.layout){
+                            layout = oLbl.layout;
                             if(AscFormat.isRealNumber(layout.x)){
                                 pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, this.recalcInfo.dataLbls[i].extX, this.extX);
                             }
@@ -3611,7 +3612,19 @@ CChartSpace.prototype.getValAxisCrossType = function()
                                 pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, this.recalcInfo.dataLbls[i].extY, this.extY);
                             }
                         }
-                        this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+                        if(pos.x + oLbl.extX > this.extX){
+                            pos.x -= (pos.x + oLbl.extX - this.extX);
+                        }
+                        if(pos.y + oLbl.extY > this.extY){
+                            pos.y -= (pos.y + oLbl.extY - this.extY);
+                        }
+                        if(pos.x < 0){
+                            pos.x = 0;
+                        }
+                        if(pos.y < 0){
+                            pos.y = 0;
+                        }
+                        oLbl.setPosition(pos.x, pos.y);
                         break;
                     }
                 }
