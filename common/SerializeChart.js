@@ -9558,8 +9558,12 @@ BinaryChartReader.prototype.ReadCT_ScatterSer = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Boolean(t, l, oNewVal);
         });
-        if (null != oNewVal.m_val)
+        if (null != oNewVal.m_val){
             val.setSmooth(oNewVal.m_val);
+        }
+        else{
+            val.setSmooth(true);
+        }
     }
     else if (c_oserct_scatterserEXTLST === type) {
         var oNewVal = {};
@@ -9614,6 +9618,9 @@ BinaryChartReader.prototype.ReadCT_ScatterChart = function (type, length, val, a
             return oThis.ReadCT_ScatterSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
+        if(oNewVal.smooth === null){
+            oNewVal.setSmooth(false);
+        }
     }
     else if (c_oserct_scatterchartDLBLS === type) {
         var oNewVal = new AscFormat.CDLbls();
@@ -9930,8 +9937,12 @@ BinaryChartReader.prototype.ReadCT_LineSer = function (type, length, val) {
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Boolean(t, l, oNewVal);
         });
-        if (null != oNewVal.m_val)
+        if (null != oNewVal.m_val) {
             val.setSmooth(oNewVal.m_val);
+        }
+        else {
+            val.setSmooth(true);
+        }
     }
     else if (c_oserct_lineserEXTLST === type) {
         var oNewVal = {};
@@ -10020,6 +10031,9 @@ BinaryChartReader.prototype.ReadCT_Line3DChart = function (type, length, val, aC
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LineSer(t, l, oNewVal);
         });
+        if(oNewVal.smooth === null){
+            oNewVal.setSmooth(false);
+        }
         val.addSer(oNewVal);
     }
     else if (c_oserct_line3dchartDLBLS === type) {
@@ -10105,6 +10119,9 @@ BinaryChartReader.prototype.ReadCT_LineChart = function (type, length, val, aCha
             return oThis.ReadCT_LineSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
+        if(oNewVal.smooth === null){
+            oNewVal.setSmooth(false);
+        }
     }
     else if (c_oserct_linechartDLBLS === type) {
         var oNewVal = new AscFormat.CDLbls();
@@ -10153,8 +10170,12 @@ BinaryChartReader.prototype.ReadCT_LineChart = function (type, length, val, aCha
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Boolean(t, l, oNewVal);
         });
-        if (null != oNewVal.m_val)
+        if (null != oNewVal.m_val){
             val.setSmooth(oNewVal.m_val);
+        }
+        else{
+            val.setSmooth(true);
+        }
     }
     else if (c_oserct_linechartAXID === type) {
         var oNewVal = { m_val: null };
@@ -10481,6 +10502,9 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
             return oThis.ReadCT_LineChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
+        if(oNewVal.smooth === null){
+            oNewVal.setSmooth(false);
+        }
     }
     else if (c_oserct_plotareaOFPIECHART === type) {
         var oNewVal = new AscFormat.COfPieChart();
