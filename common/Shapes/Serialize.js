@@ -7839,6 +7839,7 @@ function BinaryPPTYLoader()
                             {
                                 Pct = s.GetLong();
                                 para_pr.Spacing.After = 0;
+                                para_pr.Spacing.AfterPct = Pct;
                                 break;
                             }
                             case 1:
@@ -7873,6 +7874,7 @@ function BinaryPPTYLoader()
                             {
                                 Pct = s.GetLong();
                                 para_pr.Spacing.Before = 0;
+                                para_pr.Spacing.BeforePct = Pct;
                                 break;
                             }
                             case 1:

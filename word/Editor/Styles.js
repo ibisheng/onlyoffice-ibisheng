@@ -8779,8 +8779,10 @@ function CParaSpacing()
     this.Line              = undefined; // Расстояние между строками внутри абзаца
     this.LineRule          = undefined; // Тип расстрояния между строками
     this.Before            = undefined; // Дополнительное расстояние до абзаца
+    this.BeforePct         = undefined; // Расстояние до абзаца в процентах от высоты строки
     this.BeforeAutoSpacing = undefined; // Использовать ли автоматический расчет расстояния до параграфа
     this.After             = undefined; // Дополнительное расстояние после абзаца
+    this.AfterPct          = undefined; // Расстояние после абзаца в процентах от высоты строки
     this.AfterAutoSpacing  = undefined; // Использовать ли автоматический расчет расстояния после параграфа
 }
 
@@ -8795,6 +8797,8 @@ CParaSpacing.prototype =
         Spacing.BeforeAutoSpacing = this.BeforeAutoSpacing;
         Spacing.After             = this.After;
         Spacing.AfterAutoSpacing  = this.AfterAutoSpacing;
+        Spacing.BeforePct         = this.BeforePct;
+        Spacing.AfterPct          = this.AfterPct;
         return Spacing;
     },
 
@@ -8817,6 +8821,12 @@ CParaSpacing.prototype =
 
         if ( undefined != Spacing.AfterAutoSpacing )
             this.AfterAutoSpacing = Spacing.AfterAutoSpacing;
+
+        if ( undefined != Spacing.BeforePct )
+            this.BeforePct = Spacing.BeforePct;
+
+        if ( undefined != Spacing.AfterPct )
+            this.AfterPct = Spacing.AfterPct;
     },
 
 	Is_Equal : function(Spacing)
@@ -8830,6 +8840,12 @@ CParaSpacing.prototype =
 			|| (this.After === undefined && Spacing.After !== undefined)
 			|| (this.After !== undefined && Spacing.After === undefined)
 			|| ((this.After !== undefined && Spacing.After !== undefined) && (this.After - Spacing.After) > 0.001)
+			|| (this.AfterPct === undefined && Spacing.AfterPct !== undefined)
+			|| (this.AfterPct !== undefined && Spacing.AfterPct === undefined)
+			|| ((this.AfterPct !== undefined && Spacing.AfterPct !== undefined) && (this.AfterPct - Spacing.AfterPct) > 0.001)
+			|| (this.BeforePct === undefined && Spacing.BeforePct !== undefined)
+			|| (this.BeforePct !== undefined && Spacing.BeforePct === undefined)
+			|| ((this.BeforePct !== undefined && Spacing.BeforePct !== undefined) && (this.BeforePct - Spacing.BeforePct) > 0.001)
 			|| this.AfterAutoSpacing !== Spacing.AfterAutoSpacing)
 			return false;
 
@@ -8844,6 +8860,8 @@ CParaSpacing.prototype =
         this.BeforeAutoSpacing = Spacing.BeforeAutoSpacing;
         this.After             = Spacing.After;
         this.AfterAutoSpacing  = Spacing.AfterAutoSpacing;
+        this.BeforePct         = Spacing.BeforePct;
+        this.AfterPct          = Spacing.AfterPct;
     },
 
     Write_ToBinary : function(Writer)
@@ -8888,6 +8906,18 @@ CParaSpacing.prototype =
             Flags |= 32;
         }
 
+        if ( undefined != this.BeforePct )
+        {
+            Writer.WriteLong( this.BeforePct );
+            Flags |= 64;
+        }
+
+        if ( undefined != this.AfterPct )
+        {
+            Writer.WriteLong( this.AfterPct );
+            Flags |= 128;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -8915,6 +8945,12 @@ CParaSpacing.prototype =
 
         if ( Flags & 32 )
             this.BeforeAutoSpacing = Reader.GetBool();
+
+        if ( Flags & 64 )
+            this.BeforePct = Reader.GetLong();
+
+        if ( Flags & 128 )
+            this.AfterPct = Reader.GetLong();
     }
 };
 CParaSpacing.prototype.Get_Diff = function(Spacing)
@@ -8939,6 +8975,13 @@ CParaSpacing.prototype.Get_Diff = function(Spacing)
     if (this.AfterAutoSpacing !== Spacing.AfterAutoSpacing)
         DiffSpacing.AfterAutoSpacing = this.AfterAutoSpacing;
 
+    if (this.BeforePct !== Spacing.BeforePct)
+        DiffSpacing.BeforePct = this.BeforePct;
+
+    if (this.AfterPct !== Spacing.AfterPct)
+        DiffSpacing.AfterPct = this.AfterPct;
+
+
     return DiffSpacing;
 };
 CParaSpacing.prototype.Is_Empty = function()
@@ -8948,7 +8991,9 @@ CParaSpacing.prototype.Is_Empty = function()
 		|| undefined !== this.Before
 		|| undefined !== this.BeforeAutoSpacing
 		|| undefined !== this.After
-		|| undefined !== this.AfterAutoSpacing)
+		|| undefined !== this.AfterAutoSpacing
+		|| undefined !== this.BeforePct
+		|| undefined !== this.AfterPct)
 		return false;
 
 	return true;
