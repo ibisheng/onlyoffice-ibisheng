@@ -2953,6 +2953,17 @@ function CEditorPage(api)
 					drDoc.m_arrPages[_page].DrawTableOutline(overlay,
 						drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.TableOutlineDr);
 				}
+				if (true)
+				{
+					var _lastBounds = drDoc.TableOutlineDr.getLastPageBounds();
+					_page = _lastBounds.Page;
+					if (_page >= drDoc.m_lDrawingFirst && _page <= drDoc.m_lDrawingEnd)
+					{
+						var drawPage = drDoc.m_arrPages[_page].drawingPage;
+						drDoc.m_arrPages[_page].DrawTableOutline(overlay,
+							drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.TableOutlineDr, _lastBounds);
+					}
+				}
 			}
 
 			// drawShapes (+ track)

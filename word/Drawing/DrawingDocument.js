@@ -230,6 +230,58 @@ function CTableOutlineDr()
 	this.AddResizeMinW     = 0;
 	this.AddResizeMinH     = 0;
 
+	this.getLastPageBounds = function()
+	{
+		var _bounds = { Page: 0, X : 0, Y : 0, W : 0, H : 0 };
+		if (!this.TableOutline || !this.TableOutline.Table)
+			return _bounds;
+
+		var _pagesCount = this.TableOutline.Table.GetPagesCount();
+		if (0 >= _pagesCount)
+			return _bounds;
+
+		var _boundsTmp = this.TableOutline.Table.Get_PageBounds(_pagesCount - 1);
+		_bounds.Page = this.TableOutline.Table.Get_AbsolutePage(_pagesCount - 1);
+		_bounds.X = _boundsTmp.Left;
+		_bounds.Y = _boundsTmp.Top;
+		_bounds.W = (_boundsTmp.Right - _boundsTmp.Left);
+		_bounds.H = (_boundsTmp.Bottom - _boundsTmp.Top);
+		
+		return _bounds;
+	}
+
+	this.getFullHeight = function()
+	{
+		var _height = 0;
+		if (!this.TableOutline || !this.TableOutline.Table)
+			return _height;
+
+		var _pagesCount = this.TableOutline.Table.GetPagesCount();
+		var _boundsTmp;
+		for (var i = 0; i < _pagesCount; i++)
+		{
+			_boundsTmp = this.TableOutline.Table.Get_PageBounds(i);
+			_height += (_boundsTmp.Bottom - _boundsTmp.Top);
+		}
+
+		return _height;
+	}
+
+	this.getFullTopPosition = function(_lastBounds)
+	{
+		if (_lastBounds.Page == this.TableOutline.PageNum)
+		{
+			return this.TableOutline.Y;	
+		}
+
+		var _height = this.getFullHeight();
+		var _top = _lastBounds.Y + _lastBounds.H - _height;
+		if (_top < 0)
+			_top = 0;
+
+		return _top;
+	}
+
 	this.checkMouseDown = function (pos, word_control)
 	{
 		if (null == this.TableOutline)
@@ -347,14 +399,15 @@ function CTableOutlineDr()
 
 			if (true)
 			{
-				var _x = _table_track.X + _table_track.W;
-				var _y = _table_track.Y + _table_track.H;
+				var _lastBounds = this.getLastPageBounds();
+				var _x = _lastBounds.X + _lastBounds.W;
+				var _y = _lastBounds.Y + _lastBounds.H;
 				_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 				var _r = _x + _d;
 				var _b = _y + _d;
 
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+				if ((_lastBounds.Page == pos.Page) && (pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
 				{
 					this.TrackOffsetX = pos.X - _x;
 					this.TrackOffsetY = pos.Y - _y;
@@ -368,8 +421,20 @@ function CTableOutlineDr()
 
 					var _table = this.TableOutline.Table;
 
-					this.AddResizeMinH = _table.GetMinHeight() - this.TableOutline.H;
-					this.AddResizeMinW = _table.GetMinWidth() - this.TableOutline.W;
+					if (_lastBounds.Page == this.PageNum)
+					{
+						this.AddResizeMinH = _table.GetMinHeight() - this.TableOutline.H;
+						this.AddResizeMinW = _table.GetMinWidth() - this.TableOutline.W;
+					}
+					else
+					{
+						var _fullTop = this.getFullTopPosition(_lastBounds);
+						if (0 == _fullTop)
+							this.AddResizeMinH = _fullTop - (_lastBounds.Y + _lastBounds.H);
+						else
+							this.AddResizeMinH = _fullTop + _table.GetMinHeight() - (_lastBounds.Y + _lastBounds.H);
+						this.AddResizeMinW = _table.GetMinWidth() - _lastBounds.W;
+					}
 
 					word_control.m_oDrawingDocument.LockCursorType("se-resize");
 					return true;
@@ -488,8 +553,9 @@ function CTableOutlineDr()
 
 			if (true)
 			{
-				var _x = _table_track.X + _table_track.W;
-				var _y = _table_track.Y + _table_track.H;
+				var _lastBounds = this.getLastPageBounds();
+				var _x = _lastBounds.X + _lastBounds.W;
+				var _y = _lastBounds.Y + _lastBounds.H;
 				_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 				var _r = _x + _d;
@@ -712,10 +778,14 @@ function CTableOutlineDr()
 		else
 			pos = word_control.m_oDrawingDocument.ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, word_control.m_oDrawingDocument.AutoShapesTrackLockPageNum);
 
+		var _lastBounds = word_control.m_oDrawingDocument.TableOutlineDr.getLastPageBounds();
+		if (_lastBounds.Page != pos.Page)
+			return false;
+
 		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
 		{
-			var _x = _table_track.X + _table_track.W;
-			var _y = _table_track.Y + _table_track.H;
+			var _x = _lastBounds.X + _lastBounds.W;
+			var _y = _lastBounds.Y + _lastBounds.H;
 			var _d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 			var _r = _x + _d;
@@ -733,8 +803,8 @@ function CTableOutlineDr()
 			var _posx = _invert.TransformPointX(pos.X, pos.Y);
 			var _posy = _invert.TransformPointY(pos.X, pos.Y);
 
-			var _x = _table_track.X + _table_track.W;
-			var _y = _table_track.Y + _table_track.H;
+			var _x = _lastBounds.X + _lastBounds.W;
+			var _y = _lastBounds.Y + _lastBounds.H;
 			_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 			var _r = _x + _d;
@@ -1874,7 +1944,7 @@ function CPage()
 		ctx.beginPath();
 	}
 
-	this.DrawTableOutline = function (overlay, xDst, yDst, wDst, hDst, table_outline_dr)
+	this.DrawTableOutline = function (overlay, xDst, yDst, wDst, hDst, table_outline_dr, lastBounds)
 	{
 		var transform = table_outline_dr.TableMatrix;
 		if (null == transform || transform.IsIdentity2())
@@ -1885,69 +1955,73 @@ function CPage()
 			var _offX = (null == transform) ? 0 : transform.tx;
 			var _offY = (null == transform) ? 0 : transform.ty;
 
-			var _x = 0;
-			var _y = 0;
-			switch (table_outline_dr.TrackTablePos)
+			if (!lastBounds)
 			{
-				case 1:
+				var _x = 0;
+				var _y = 0;
+				switch (table_outline_dr.TrackTablePos)
 				{
-					_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
-					_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
-					break;
+					case 1:
+					{
+						_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+						_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
+						break;
+					}
+					case 2:
+					{
+						_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+						_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
+						break;
+					}
+					case 3:
+					{
+						_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+						_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
+						break;
+					}
+					case 0:
+					default:
+					{
+						_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+						_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
+						break;
+					}
 				}
-				case 2:
-				{
-					_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
-					_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
-					break;
-				}
-				case 3:
-				{
-					_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
-					_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
-					break;
-				}
-				case 0:
-				default:
-				{
-					_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
-					_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
-					break;
-				}
+
+				var _w = 13;
+				var _h = 13;
+
+				if (_x < overlay.min_x)
+					overlay.min_x = _x;
+				if ((_x + _w) > overlay.max_x)
+					overlay.max_x = _x + _w;
+
+				if (_y < overlay.min_y)
+					overlay.min_y = _y;
+				if ((_y + _h) > overlay.max_y)
+					overlay.max_y = _y + _h;
+
+				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y);
 			}
+			else
+			{
+				var _xLast = (xDst + dKoefX * (lastBounds.X + lastBounds.W + _offX) + 0.5) >> 0;
+				var _yLast = (yDst + dKoefY * (lastBounds.Y + lastBounds.H + _offY) + 0.5) >> 0;
 
-			var _w = 13;
-			var _h = 13;
+				var ctx = overlay.m_oContext;
+				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.lineWidth = 1;
+				ctx.beginPath();
 
-			if (_x < overlay.min_x)
-				overlay.min_x = _x;
-			if ((_x + _w) > overlay.max_x)
-				overlay.max_x = _x + _w;
+				overlay.AddRect(_xLast - 0.5, _yLast - 0.5, 6, 6);
 
-			if (_y < overlay.min_y)
-				overlay.min_y = _y;
-			if ((_y + _h) > overlay.max_y)
-				overlay.max_y = _y + _h;
-
-			overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y);
-
-			var _xLast = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX) + 0.5) >> 0;
-			var _yLast = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY) + 0.5) >> 0;
-
-			var ctx = overlay.m_oContext;
-			ctx.strokeStyle = "rgb(160, 160, 160)";
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-
-			overlay.AddRect(_xLast - 0.5, _yLast - 0.5, 6, 6);
-
-			ctx.stroke();
-			ctx.beginPath();
+				ctx.stroke();
+				ctx.beginPath();
+			}
 		}
 		else
 		{
 			var ctx = overlay.m_oContext;
-
 
 			var _ft = new AscCommon.CMatrix();
 			_ft.sx = transform.sx;
@@ -1965,51 +2039,54 @@ function CPage()
 
 			global_MatrixTransformer.MultiplyAppend(_ft, coords);
 
-			ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
-
-			var _x = 0;
-			var _y = 0;
-			var _w = 13 / coords.sx;
-			var _h = 13 / coords.sy;
-			switch (table_outline_dr.TrackTablePos)
+			if (!lastBounds)
 			{
-				case 1:
+				ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
+
+				var _x = 0;
+				var _y = 0;
+				var _w = 13 / coords.sx;
+				var _h = 13 / coords.sy;
+				switch (table_outline_dr.TrackTablePos)
 				{
-					_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-					_y = (table_outline_dr.TableOutline.Y - _h);
-					break;
+					case 1:
+					{
+						_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
+						_y = (table_outline_dr.TableOutline.Y - _h);
+						break;
+					}
+					case 2:
+					{
+						_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
+						_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+						break;
+					}
+					case 3:
+					{
+						_x = (table_outline_dr.TableOutline.X - _w);
+						_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+						break;
+					}
+					case 0:
+					default:
+					{
+						_x = (table_outline_dr.TableOutline.X - _w);
+						_y = (table_outline_dr.TableOutline.Y - _h);
+						break;
+					}
 				}
-				case 2:
-				{
-					_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-					_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
-					break;
-				}
-				case 3:
-				{
-					_x = (table_outline_dr.TableOutline.X - _w);
-					_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
-					break;
-				}
-				case 0:
-				default:
-				{
-					_x = (table_outline_dr.TableOutline.X - _w);
-					_y = (table_outline_dr.TableOutline.Y - _h);
-					break;
-				}
+
+				overlay.CheckPoint(_ft.TransformPointX(_x, _y), _ft.TransformPointY(_x, _y));
+				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y), _ft.TransformPointY(_x + _w, _y));
+				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
+				overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
+
+				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
 			}
 
-			overlay.CheckPoint(_ft.TransformPointX(_x, _y), _ft.TransformPointY(_x, _y));
-			overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y), _ft.TransformPointY(_x + _w, _y));
-			overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
-			overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
-
-			overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-			var _xLast = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-			var _yLast = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+			var _xLast = (lastBounds.X + lastBounds.W);
+			var _yLast = (lastBounds.Y + lastBounds.H);
 
 			var ctx = overlay.m_oContext;
 			ctx.strokeStyle = "rgb(0, 0, 0)";
@@ -4914,11 +4991,17 @@ function CDrawingDocument()
 
 				if (this.TableOutlineDr.IsResizeTableTrack)
 				{
-					_x = ((drPage.left + dKoefX * this.TableOutlineDr.TableOutline.X) >> 0) + 0.5;
-					_y = ((drPage.top + dKoefY * this.TableOutlineDr.TableOutline.Y) >> 0) + 0.5;
+					var _lastBounds = this.TableOutlineDr.getLastPageBounds();
+					var _lastX = _lastBounds.X;
+					var _lastY = this.TableOutlineDr.getFullTopPosition(_lastBounds);
+					var _lastYStart = _lastBounds.Y;
 
-					_r = _x + ((dKoefX * (this.TableOutlineDr.TableOutline.W + this.TableOutlineDr.AddResizeCurrentW)) >> 0);
-					_b = _y + ((dKoefY * (this.TableOutlineDr.TableOutline.H + this.TableOutlineDr.AddResizeCurrentH)) >> 0);
+					_x = ((drPage.left + dKoefX * _lastX) >> 0) + 0.5;
+					_y = ((drPage.top + dKoefY * _lastY) >> 0) + 0.5;
+					var _yStart = ((drPage.top + dKoefY * _lastYStart) >> 0) + 0.5;
+
+					_r = _x + ((dKoefX * (_lastBounds.W + this.TableOutlineDr.AddResizeCurrentW)) >> 0);
+					_b = _yStart + ((dKoefY * (_lastBounds.H + this.TableOutlineDr.AddResizeCurrentH)) >> 0);
 				}
 
 				overlay.CheckPoint(_x, _y);
