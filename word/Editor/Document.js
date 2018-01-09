@@ -8805,6 +8805,7 @@ CDocument.prototype.Document_Undo = function(Options)
 		this.DrawingObjects.TurnOffCheckChartSelection();
 
 		this.History.Undo(Options);
+		this.DocumentOutline.UpdateAll(); // TODO: надо бы подумать как переделать на более легкий пересчет
 		this.DrawingObjects.TurnOnCheckChartSelection();
 		this.Recalculate(false, false, this.History.RecalculateData);
 
@@ -8822,6 +8823,7 @@ CDocument.prototype.Document_Redo = function()
 	this.DrawingObjects.TurnOffCheckChartSelection();
 
 	this.History.Redo();
+	this.DocumentOutline.UpdateAll(); // TODO: надо бы подумать как переделать на более легкий пересчет
 	this.DrawingObjects.TurnOnCheckChartSelection();
 	this.Recalculate(false, false, this.History.RecalculateData);
 

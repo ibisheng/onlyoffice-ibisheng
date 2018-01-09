@@ -8235,6 +8235,10 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 
 	var oDefParaId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_Paragraph() : null;
 
+	// Надо пересчитать конечный стиль самого параграфа и всех текстовых блоков
+	this.CompiledPr.NeedRecalc = true;
+	this.Recalc_RunsCompiledPr();
+
 	// Если стиль является стилем по умолчанию для параграфа, тогда не надо его записывать.
 	if (Id != oDefParaId)
 	{
@@ -8244,10 +8248,6 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 		this.private_UpdateTrackRevisionOnChangeParaPr(true);
 		this.UpdateDocumentOutline();
 	}
-
-	// Надо пересчитать конечный стиль самого параграфа и всех текстовых блоков
-	this.CompiledPr.NeedRecalc = true;
-	this.Recalc_RunsCompiledPr();
 
 	if (true === bDoNotDeleteProps)
 		return;

@@ -7700,17 +7700,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.sync_OnDocumentOutlineUpdateAdd = function(nIndex)
 	{
 		this.sendEvent("asc_onDocumentOutlineUpdateAdd", nIndex);
-		console.log("Add " + nIndex);
 	};
 	asc_docs_api.prototype.sync_OnDocumentOutlineUpdateChange = function(nIndex)
 	{
 		this.sendEvent("asc_onDocumentOutlineUpdateChange", nIndex);
-		console.log("Change " + nIndex);
 	};
 	asc_docs_api.prototype.sync_OnDocumentOutlineUpdateRemove = function(nIndex)
 	{
 		this.sendEvent("asc_onDocumentOutlineUpdateRemove", nIndex);
-		console.log("Remove " + nIndex);
 	};
 
 	// input

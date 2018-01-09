@@ -151,7 +151,8 @@ CDocumentOutline.prototype.private_GetParagraphPosition = function(oParagraph)
 	var nParaIndex = oParagraph.GetIndex();
 	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		if (nParaIndex <= this.Elements[nIndex].Paragraph.GetIndex())
+		if ((this.Elements[nIndex].Paragraph && nParaIndex <= this.Elements[nIndex].Paragraph.GetIndex())
+			|| (!this.Elements[nIndex].Paragraph && nParaIndex <= 0))
 			return nIndex;
 	}
 
