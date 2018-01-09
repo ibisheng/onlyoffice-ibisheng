@@ -631,9 +631,9 @@
 						oPresentationWriter.WriteString2("SelectedContent");
 						oPresentationWriter.WriteULong(1);
 						oPresentationWriter.WriteULong(1);
-						oPresentationWriter.WriteDouble(1);
+						oPresentationWriter.WriteULong(1);
 						oPresentationWriter.WriteString2("DocContent");
-						oPresentationWriter.WriteULong(elements.length);
+						oPresentationWriter.WriteDouble(elements.length);
 						
 						//пишем контент
 						for ( var Index = 0; Index < elements.length; Index++ )
