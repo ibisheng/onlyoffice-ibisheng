@@ -3713,6 +3713,8 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
+		//remove tail
+		this.cellsByCol.splice(gc_nMaxCol0 - count + 1, count);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
 		for(var i = 0; i < count; ++i) {
 			var sheetMemory = prevCellsByCol ? prevCellsByCol.clone() : undefined;
@@ -4591,16 +4593,12 @@
 		});
 
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
-		var cellsByColLength = this.cellsByCol.length;
+		var cellsByColLength = this.getColDataLength();
 		for (var i = nRight + 1; i < cellsByColLength; ++i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
-			var sheetMemoryTo = this.getColData(i + dif);
 			if (sheetMemoryFrom) {
-				sheetMemoryTo.copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
-				//todo fill only tail
+				this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
 				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
-			} else {
-				sheetMemoryTo.fill(0, oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		
@@ -4628,7 +4626,7 @@
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
-			if(sheetMemory){
+			if (sheetMemory) {
 				sheetMemory.deleteRange(nTop, -dif);
 			}
 		}
@@ -4651,16 +4649,14 @@
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif, displayNameFormatTable );
 
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
-		var cellsByColLength = this.cellsByCol.length;
+		var cellsByColLength = this.getColDataLength();
 		for (var i = cellsByColLength - 1; i >= nLeft; --i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
-			var sheetMemoryTo = this.getColData(i + dif);
-			if(sheetMemoryFrom){
-				sheetMemoryTo.copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
-				//todo fill only tail
+			if (sheetMemoryFrom) {
+				if (i + dif <= gc_nMaxCol0) {
+					this.getColData(i + dif).copyRange(sheetMemoryFrom, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
+				}
 				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
-			} else {
-				sheetMemoryTo.fill(0, oBBox.r1, oBBox.r2 + 1);
 			}
 		}
 		if (nLeft > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
@@ -4669,10 +4665,7 @@
 			if (prevSheetMemory) {
 				//todo hidden, keep only style
 				for (var i = nLeft; i <= nRight; ++i) {
-					var sheetMemory = this.getColDataNoEmpty(i);
-					if (sheetMemory) {
-						sheetMemory.copyRange(prevSheetMemory, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
-					}
+					this.getColData(i).copyRange(prevSheetMemory, oBBox.r1, oBBox.r1, oBBox.r2 - oBBox.r1 + 1);
 				}
 				//show rows and remain only cell xf property
 				this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
@@ -4705,7 +4698,7 @@
 		//rowcount
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
-			if(sheetMemory){
+			if (sheetMemory) {
 				sheetMemory.insertRange(nTop, dif);
 				if (nTop > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 				{
