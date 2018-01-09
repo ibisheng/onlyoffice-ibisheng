@@ -601,16 +601,17 @@
 				return res;
 			},
 
-			_getBinaryShapeContent : function(worksheet, isIntoShape)
-			{	
+			_getBinaryShapeContent: function (worksheet, isIntoShape) {
 				var sBase64;
-				
-				var selectedContent = new CSelectedContent();
-                AscFormat.ExecuteNoHistory(function(){isIntoShape.GetSelectedContent(selectedContent);}, this, []);
 
-				
+				var selectedContent = new CSelectedContent();
+				AscFormat.ExecuteNoHistory(function () {
+					isIntoShape.GetSelectedContent(selectedContent);
+				}, this, []);
+
+
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
-				
+
 				//начало записи
 				oPresentationWriter.WriteString2("");
 				oPresentationWriter.WriteDouble(1);
@@ -619,14 +620,13 @@
 				oPresentationWriter.WriteBool(true);
 				oPresentationWriter.WriteULong(1);
 
-				if(selectedContent)//пишем контент
+				if (selectedContent)//пишем контент
 				{
 					var docContent = selectedContent;
-					
-					if(docContent.Elements)
-					{
+
+					if (docContent.Elements) {
 						var elements = docContent.Elements;
-						
+
 						//пишем метку и длины
 						oPresentationWriter.WriteString2("SelectedContent");
 						oPresentationWriter.WriteULong(1);
@@ -634,33 +634,31 @@
 						oPresentationWriter.WriteULong(1);
 						oPresentationWriter.WriteString2("DocContent");
 						oPresentationWriter.WriteDouble(elements.length);
-						
+
 						//пишем контент
-						for ( var Index = 0; Index < elements.length; Index++ )
-						{
+						for (var Index = 0; Index < elements.length; Index++) {
 							var Item;
-							if(elements[Index].Element)
+							if (elements[Index].Element) {
 								Item = elements[Index].Element;
-							else
+							} else {
 								Item = elements[Index];
-							
-							if ( type_Paragraph === Item.GetType() )
-							{
+							}
+
+							if (type_Paragraph === Item.GetType()) {
 								oPresentationWriter.StartRecord(0);
 								oPresentationWriter.WriteParagraph(Item);
 								oPresentationWriter.EndRecord();
 							}
 						}
-						
+
 						sBase64 = oPresentationWriter.GetBase64Memory();
 					}
-					
-					if(null !== sBase64)
-					{
+
+					if (null !== sBase64) {
 						sBase64 = "pptData;" + oPresentationWriter.pos + ";" + sBase64;
 					}
 				}
-				
+
 				return sBase64;
 			},
 			
