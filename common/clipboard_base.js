@@ -897,7 +897,7 @@
 		this.specialPasteProps = null;
 
 		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-		this.buttonOptions = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+		this.buttonInfo = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
 
 		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
 		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
@@ -949,9 +949,9 @@
 			{
 				this.Special_Paste_End();
 				//TODO только для презентаций! проверить на остальных редакторах!
-				if(this.buttonOptions){
-					this.buttonOptions.options = [];
-					this.Api.asc_ShowSpecialPasteButton(this.buttonOptions);
+				if(this.buttonInfo){
+					this.buttonInfo.options = [];
+					this.Api.asc_ShowSpecialPasteButton(this.buttonInfo);
 				}
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
@@ -978,7 +978,7 @@
 				return;
 			}
 
-			var props = this.buttonOptions;
+			var props = this.buttonInfo;
 			if(props && props.options)
 			{
 				if((window["Asc"] && window["Asc"]["editor"]) || props.cellCoord)
@@ -1022,13 +1022,13 @@
 				return;
 
 			//TODO метод должен быть общий для всех редакторов
-			if(this.showSpecialPasteButton && this.buttonOptions.fixPosition)
+			if(this.showSpecialPasteButton && this.buttonInfo.fixPosition)
 			{
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 				
-				var _Y = this.buttonOptions.fixPosition.y;
-				var _X = this.buttonOptions.fixPosition.x;
-				var _PageNum = this.buttonOptions.fixPosition.pageNum;
+				var _Y = this.buttonInfo.fixPosition.y;
+				var _X = this.buttonInfo.fixPosition.x;
+				var _PageNum = this.buttonInfo.fixPosition.pageNum;
 				
 				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
@@ -1064,6 +1064,11 @@
 			}
 
 			return res;
+		},
+
+		CleanButtonInfo: function()
+		{
+			this.buttonInfo = {};
 		}
 	};
 

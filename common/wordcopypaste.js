@@ -2408,14 +2408,14 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonOptions ? window['AscCommon'].g_specialPasteHelper.buttonOptions : null;
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo ? window['AscCommon'].g_specialPasteHelper.buttonInfo : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
-			if(window['AscCommon'].g_specialPasteHelper.buttonOptions)
+			if(window['AscCommon'].g_specialPasteHelper.buttonInfo)
 			{
-				window['AscCommon'].g_specialPasteHelper.buttonOptions = null;
+				window['AscCommon'].g_specialPasteHelper.buttonInfo = null;
 			}
 			return;
 		}
@@ -2463,7 +2463,7 @@ PasteProcessor.prototype =
 				specialPasteShowOptions = null;
 			}
 
-			window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
+			window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -3064,7 +3064,7 @@ PasteProcessor.prototype =
 
 		var specialPasteShowOptions = new SpecialPasteShowOptions();
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_specialPasteHelper.buttonOptions = specialPasteShowOptions;
+		window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -3961,7 +3961,7 @@ PasteProcessor.prototype =
 
 						oThis._setSpecialPasteShowOptionsPresentation(props);
 					} else {
-						window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
+						window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 					}
 
 					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();

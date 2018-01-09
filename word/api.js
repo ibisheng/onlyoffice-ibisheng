@@ -2101,7 +2101,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		var specialPasteShowOptions = specialPasteHelper.buttonOptions ? specialPasteHelper.buttonOptions : null;
+		var specialPasteShowOptions = specialPasteHelper.buttonInfo ? specialPasteHelper.buttonInfo : null;
 		if(specialPasteShowOptions && null !== specialPasteHelper.showButtonIdParagraph)
 		{
 			var isUpdate = specialPasteShowOptions.cellCoord;
@@ -2137,7 +2137,7 @@ background-repeat: no-repeat;\
 
 			var _PageNum = this.WordControl.m_oLogicDocument.CurPage;
 
-			specialPasteHelper.buttonOptions.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
+			specialPasteHelper.buttonInfo.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
 
 			var _coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 			var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
