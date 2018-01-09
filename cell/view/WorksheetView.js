@@ -8852,6 +8852,7 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
+			window['AscCommon'].g_specialPasteHelper.buttonOptions = {};
 			window['AscCommon'].g_specialPasteHelper.buttonOptions.options = allowedSpecialPasteProps;
 			window['AscCommon'].g_specialPasteHelper.buttonOptions.range = selectData[0];
 		}
