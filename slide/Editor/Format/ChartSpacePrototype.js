@@ -89,7 +89,7 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
             default_brush.merge(plot_area.spPr.Fill);
         }
         var parents = this.getParentObjects();
-        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
         plot_area.brush = default_brush;
     }
 };
@@ -120,7 +120,7 @@ CChartSpace.prototype.recalculateChartBrush = function()
         default_brush.merge(this.spPr.Fill);
     }
     var parents = this.getParentObjects();
-    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
     this.brush = default_brush;
 
 };
@@ -156,7 +156,7 @@ CChartSpace.prototype.recalculateChartPen = function()
     if(this.spPr && this.spPr.ln)
         default_line.merge(this.spPr.ln);
     var parents = this.getParentObjects();
-    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
     this.pen = default_line;
     AscFormat.checkBlackUnifill(this.pen.Fill, true);
 };

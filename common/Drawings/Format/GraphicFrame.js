@@ -565,7 +565,7 @@ CGraphicFrame.prototype.canRotate = function()
 
 CGraphicFrame.prototype.canResize = function()
     {
-        return false;
+        return true;
 };
 
 CGraphicFrame.prototype.canMove = function()
@@ -1070,11 +1070,7 @@ CGraphicFrame.prototype.Get_PageContentStartPos2 = function()
         return this.Get_PageContentStartPos();
 };
 
-CGraphicFrame.prototype.hitToHandles = function()
-    {
-        return -1;
-};
-
+CGraphicFrame.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CGraphicFrame.prototype.hitToAdjustment = function()
     {
         return {hit:false};

@@ -1628,7 +1628,7 @@ CSchemeColor.prototype =
         return duplicate;
     },
 
-    Calculate : function(theme, slide, layout, masterSlide, RGBA)
+    Calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if(theme.themeElements.clrScheme)
         {
@@ -1639,7 +1639,11 @@ CSchemeColor.prototype =
             else
             {
                 var clrMap;
-                if(slide!=null && slide.clrMap!=null)
+                if(colorMap && colorMap.color_map)
+                {
+                    clrMap = colorMap.color_map;
+                }
+                else if(slide!=null && slide.clrMap!=null)
                 {
                     clrMap = slide.clrMap.color_map;
                 }
@@ -1897,12 +1901,12 @@ CUniColor.prototype =
         return true;
     },
 
-    Calculate : function(theme, slide, layout, masterSlide, RGBA)
+    Calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if (this.color == null)
             return this.RGBA;
 
-        this.color.Calculate(theme, slide, layout, masterSlide, RGBA);
+        this.color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
 
         this.RGBA = {R:this.color.RGBA.R, G:this.color.RGBA.G, B: this.color.RGBA.B, A: this.color.RGBA.A};
         if(this.Mods)
@@ -3561,25 +3565,25 @@ CUniFill.prototype =
 
 
 
-    calculate : function(theme, slide, layout, masterSlide, RGBA)
+    calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if(this.fill )
         {
             if(this.fill.color)
             {
-                this.fill.color.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
             }
             if(this.fill.colors)
             {
                 for(var i  = 0; i <this.fill.colors.length; ++i )
                 {
-                    this.fill.colors[i].color.Calculate(theme, slide, layout, masterSlide, RGBA);
+                    this.fill.colors[i].color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
                 }
             }
             if (this.fill.fgClr)
-                this.fill.fgClr.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.fgClr.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
             if (this.fill.bgClr)
-                this.fill.bgClr.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.bgClr.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
         }
     },
 
@@ -4384,11 +4388,11 @@ CLn.prototype =
         }
     },
 
-    calculate: function(theme, slide, layout, master, RGBA)
+    calculate: function(theme, slide, layout, master, RGBA, colorMap)
     {
         if(isRealObject(this.Fill))
         {
-            this.Fill.calculate(theme, slide, layout, master, RGBA);
+            this.Fill.calculate(theme, slide, layout, master, RGBA, colorMap);
         }
     },
 

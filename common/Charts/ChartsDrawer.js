@@ -4373,7 +4373,7 @@ drawBarChart.prototype =
 				
 				cColorMod.name = "shade";
 				duplicateBrush.addColorMod(cColorMod);
-				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+				duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 				
 				if(null === pen)
 				{
@@ -5004,7 +5004,7 @@ drawLineChart.prototype =
 			
 			this._addColorMods(cColorMod, duplicateBrush);
 			
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 			pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
 			
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
@@ -6475,7 +6475,7 @@ drawAreaChart.prototype =
 				cColorMod.val = 35000;
 			cColorMod.name = "shade";
 			duplicateBrush.fill.color.Mods.addMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 			
 			pen.setFill(duplicateBrush);
 			if(path && path.length)
@@ -7797,7 +7797,7 @@ drawHBarChart.prototype =
 		
 		cColorMod.name = "shade";
 		duplicateBrush.addColorMod(cColorMod);
-		duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+		duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 		
 		return duplicateBrush;
 	}
@@ -8955,7 +8955,7 @@ drawPieChart.prototype =
 					if(duplicateBrush)
 					{
 						duplicateBrush.addColorMod(cColorMod);
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, t.cChartSpace.clrMapOvr);
 					}
 					if(isShadePen)
 					{
@@ -9572,7 +9572,7 @@ drawPieChart.prototype =
 					cColorMod.name = "shade";
 					
 					duplicateBrush.addColorMod(cColorMod);
-					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
+					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 				}
 				
 				this.cChartDrawer.drawPath(path, pen, duplicateBrush);
