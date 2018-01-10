@@ -605,7 +605,7 @@ function CTableOutlineDr()
 			var _addW = (X - this.CurPos.X) * _koef - this.TrackOffsetX;
 			var _addH = (Y - this.CurPos.Y) * _koef - this.TrackOffsetY;
 
-			_table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
+			_table.ResizeTableInDocument(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
 
 			this.AddResizeCurrentW = 0;
 			this.AddResizeCurrentH = 0;

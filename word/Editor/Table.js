@@ -3180,11 +3180,29 @@ CTable.prototype.Get_CurrentPage_Absolute = function()
 {
 	if (true === this.Selection.Use)
 	{
+		// Проходимся по всей последней выделенной строке и находим текущую страницу с наибольшим значением
+		// Если мы будет брать текущую страницу просто у последней ячейки выделения, тогда нужно переделать функцию
+		// CDocument.GetCurPage
+
 		var Pos = this.Selection.EndPos.Pos;
-		return this.Content[Pos.Row].Get_Cell(Pos.Cell).Content.Get_CurrentPage_Absolute();
+		var arrSelectionArray = this.GetSelectionArray();
+		var nCurPage = -1;
+		for (var nIndex = 0, nCount = arrSelectionArray; nIndex < nCount; ++nIndex)
+		{
+			if (Pos.Row === arrSelectionArray[nIndex].Row)
+			{
+				var nCellCurPage = this.Content[arrSelectionArray[nIndex].Row].GetCell(arrSelectionArray[nIndex].Cell).Content.Get_CurrentPage_Absolute();
+				if (nCellCurPage > nCurPage)
+					nCurPage = nCellCurPage;
+			}
+		}
+
+		return nCurPage;
 	}
 	else
+	{
 		return this.CurCell.Content.Get_CurrentPage_Absolute();
+	}
 };
 CTable.prototype.Get_CurrentPage_Relative = function()
 {
@@ -12396,14 +12414,6 @@ CTable.prototype.InsertTableContent = function(_nCellIndex, _nRowIndex, oTable)
  */
 CTable.prototype.Resize = function(nWidth, nHeight)
 {
-	if (!this.LogicDocument)
-		return;
-
-	if (true === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true))
-		return;
-
-	this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ResizeTable);
-
 	var nMinWidth  = this.GetMinWidth();
 	var nMinHeight = this.GetMinHeight();
 
@@ -12701,6 +12711,23 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 				this.SetTableW(tblwidth_Auto, 0);
 		}
 	}
+};
+/**
+ * Изменяем размер тширину и высоту таблицы в документе (создается точка в истории и запускается пересчет)
+ * @param nWidth
+ * @param nHeight
+ */
+CTable.prototype.ResizeTableInDocument = function(nWidth, nHeight)
+{
+	if (!this.LogicDocument)
+		return;
+
+	if (true === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true))
+		return;
+
+	this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ResizeTable);
+
+	this.Resize(nWidth, nHeight);
 
 	this.LogicDocument.Recalculate();
 	this.Start_TrackTable();
