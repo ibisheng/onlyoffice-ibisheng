@@ -2366,6 +2366,9 @@ CShape.prototype.recalculateTextStyles = function (level) {
             default_style.TextPr.RFonts.CS = {Name: "+mn-cs", Index: -1};
             default_style.TextPr.RFonts.HAnsi = {Name: "+mn-lt", Index: -1};
         }
+        if(this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+            default_style.TextPr.FontSize = 18;
+        }
         if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)) {
 
             if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[9]))
