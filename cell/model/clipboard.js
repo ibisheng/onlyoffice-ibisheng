@@ -2455,35 +2455,44 @@
 				
 				return result;
 			},
-			
-			_getBorderStyleName: function (borderStyle, borderWidth) 
-			{
+
+			_getBorderStyleName: function (borderStyle, borderWidth) {
 				var res = null;
 				var nBorderWidth = parseFloat(borderWidth);
-				if (isNaN(nBorderWidth))
+				if (isNaN(nBorderWidth)) {
 					return res;
-				if (typeof borderWidth === "string" && -1 !== borderWidth.indexOf("pt"))
+				}
+				if (typeof borderWidth === "string" && -1 !== borderWidth.indexOf("pt")) {
 					nBorderWidth = nBorderWidth * 96 / 72;
+				}
 
 				switch (borderStyle) {
 					case "solid":
-						if (0 < nBorderWidth && nBorderWidth <= 1)
+						if (0 < nBorderWidth && nBorderWidth <= 1) {
 							res = c_oAscBorderStyles.Thin;
-						else if (1 < nBorderWidth && nBorderWidth <= 2)
+						} else if (1 <
+							nBorderWidth && nBorderWidth <= 2) {
 							res = c_oAscBorderStyles.Medium;
-						else if (2 < nBorderWidth && nBorderWidth <= 6)
+						} else if (2 <
+							nBorderWidth && nBorderWidth <= 6) {
 							res = c_oAscBorderStyles.Thick;
-						else
+						} else {
 							res = c_oAscBorderStyles.None;
+						}
 						break;
 					case "dashed":
-						if (0 < nBorderWidth && nBorderWidth <= 1)
+						if (0 < nBorderWidth && nBorderWidth <= 1) {
 							res = c_oAscBorderStyles.DashDot;
-						else
+						} else {
 							res = c_oAscBorderStyles.MediumDashDot;
+						}
 						break;
-					case "double": res = c_oAscBorderStyles.Double; break;
-					case "dotted": res = c_oAscBorderStyles.Hair; break;
+					case "double":
+						res = c_oAscBorderStyles.Double;
+						break;
+					case "dotted":
+						res = c_oAscBorderStyles.Hair;
+						break;
 				}
 				return res;
 			},
@@ -3698,79 +3707,66 @@
 				aResult.props._aPastedImages.push(new AscCommon.CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, oGraphicObj.spPr, null));
 				aResult.props._images.push(sImageUrl);
 			},
-			
-			
-			_getBorders: function(cellTable, top, left, oldBorders)
-			{
+
+
+			_getBorders: function (cellTable, top, left, oldBorders) {
 				var borders = cellTable.elem.Get_Borders();
 				var widthCell = cellTable.width;
-				var heigthCell = cellTable.height;
+				var heightCell = cellTable.height;
 				var defaultStyle = "solid";
 				var borderStyleName;
 				var t = this;
-				
-				var getBorderColor = function(curBorder)
-				{
+
+				var getBorderColor = function (curBorder) {
 					var color = null;
 					var backgroundColor = null;
 
 					var unifill = curBorder.Unifill && curBorder.Unifill.fill && curBorder.Unifill.fill.color ? curBorder.Unifill.fill.color : null;
-					if(unifill && unifill.color && unifill.color.type !== Asc.c_oAscColor.COLOR_TYPE_SCHEME && unifill.color.RGBA)
-					{
+					if (unifill && unifill.color && unifill.color.type !== Asc.c_oAscColor.COLOR_TYPE_SCHEME && unifill.color.RGBA) {
 						color = unifill.color.RGBA;
 						backgroundColor = new AscCommonExcel.RgbColor(t.clipboard._getBinaryColor("rgb(" + color.R + "," + color.G + "," + color.B + ")"));
-					}
-					else
-					{
+					} else {
 						color = curBorder.Color;
 						backgroundColor = new AscCommonExcel.RgbColor(t.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
 					}
-					
+
 					return backgroundColor;
 				};
-				
+
 				var formatBorders = oldBorders ? oldBorders : new AscCommonExcel.Border();
 				//top border for cell
-				if(top === cellTable.top && !formatBorders.t.s && borders.Top.Value !== 0/*border_None*/)
-				{
+				if (top === cellTable.top && !formatBorders.t.s && borders.Top.Value !== 0/*border_None*/) {
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size, 3, 1));
-					if (null !== borderStyleName) 
-					{
+					if (null !== borderStyleName) {
 						formatBorders.t.setStyle(borderStyleName);
 						formatBorders.t.c = getBorderColor(borders.Top);
 					}
 				}
 				//left border for cell
-				if(left === cellTable.left && !formatBorders.l.s && borders.Left.Value !== 0/*border_None*/)
-				{
+				if (left === cellTable.left && !formatBorders.l.s && borders.Left.Value !== 0/*border_None*/) {
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size, 3, 1));
-					if (null !== borderStyleName) 
-					{
+					if (null !== borderStyleName) {
 						formatBorders.l.setStyle(borderStyleName);
 						formatBorders.l.c = getBorderColor(borders.Left);
 					}
 				}
 				//bottom border for cell
-				if(top === cellTable.top + heigthCell - 1 && !formatBorders.b.s && borders.Bottom.Value !== 0/*border_None*/)
-				{
+				if (top === cellTable.top + heightCell - 1 && !formatBorders.b.s && borders.Bottom.Value !== 0/*border_None*/) {
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size, 3, 1));
-					if (null !== borderStyleName) 
-					{
+					if (null !== borderStyleName) {
 						formatBorders.b.setStyle(borderStyleName);
 						formatBorders.b.c = getBorderColor(borders.Bottom);
 					}
 				}
 				//right border for cell
-				if(left === cellTable.left + widthCell - 1 && !formatBorders.r.s && borders.Right.Value !== 0/*border_None*/)
-				{
+				if (left === cellTable.left + widthCell - 1 && !formatBorders.r.s && borders.Right.Value !== 0/*border_None*/) {
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size, 3, 1));
-					if (null !== borderStyleName) 
-					{
+					if (null !== borderStyleName) {
 						formatBorders.r.setStyle(borderStyleName);
 						formatBorders.r.c = getBorderColor(borders.Right);
 					}
 				}
-				
+
 				return formatBorders;
 			},
 			
