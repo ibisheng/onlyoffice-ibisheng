@@ -1426,7 +1426,8 @@
 
 					if(!bSlideObjects)
 					{
-						var specialProps = window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+						window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+						var specialProps = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
 						specialProps.options = allowedProps;
 					}
@@ -1472,7 +1473,6 @@
 
 					return true;
 				}
-
 			},
 
 			_readPresentationSelectedContent: function(stream, worksheet){
