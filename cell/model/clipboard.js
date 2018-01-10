@@ -2471,7 +2471,7 @@
 							res = c_oAscBorderStyles.Thin;
 						else if (1 < nBorderWidth && nBorderWidth <= 2)
 							res = c_oAscBorderStyles.Medium;
-						else if (2 < nBorderWidth && nBorderWidth <= 3)
+						else if (2 < nBorderWidth && nBorderWidth <= 6)
 							res = c_oAscBorderStyles.Thick;
 						else
 							res = c_oAscBorderStyles.None;
@@ -3713,10 +3713,11 @@
 				{
 					var color = null;
 					var backgroundColor = null;
-					
-					if(curBorder.Unifill && curBorder.Unifill.fill && curBorder.Unifill.fill.color && curBorder.Unifill.fill.color.color && curBorder.Unifill.fill.color.color.RGBA)
+
+					var unifill = curBorder.Unifill && curBorder.Unifill.fill && curBorder.Unifill.fill.color ? curBorder.Unifill.fill.color : null;
+					if(unifill && unifill.color && unifill.color.type !== Asc.c_oAscColor.COLOR_TYPE_SCHEME && unifill.color.RGBA)
 					{
-						color = curBorder.Unifill.fill.color.color.RGBA;
+						color = unifill.color.RGBA;
 						backgroundColor = new AscCommonExcel.RgbColor(t.clipboard._getBinaryColor("rgb(" + color.R + "," + color.G + "," + color.B + ")"));
 					}
 					else
