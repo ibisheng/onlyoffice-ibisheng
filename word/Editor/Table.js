@@ -3178,26 +3178,18 @@ CTable.prototype.Is_UseInDocument = function(Id)
 };
 CTable.prototype.Get_CurrentPage_Absolute = function()
 {
-	if (true === this.Selection.Use)
+	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
 		// Проходимся по всей последней выделенной строке и находим текущую страницу с наибольшим значением
 		// Если мы будет брать текущую страницу просто у последней ячейки выделения, тогда нужно переделать функцию
 		// CDocument.GetCurPage
 
-		var Pos = this.Selection.EndPos.Pos;
-		var arrSelectionArray = this.GetSelectionArray();
-		var nCurPage = -1;
-		for (var nIndex = 0, nCount = arrSelectionArray; nIndex < nCount; ++nIndex)
-		{
-			if (Pos.Row === arrSelectionArray[nIndex].Row)
-			{
-				var nCellCurPage = this.Content[arrSelectionArray[nIndex].Row].GetCell(arrSelectionArray[nIndex].Cell).Content.Get_CurrentPage_Absolute();
-				if (nCellCurPage > nCurPage)
-					nCurPage = nCellCurPage;
-			}
-		}
+		var nCurPage = 0;
+		var nRow = this.Selection.EndPos.Pos.Row;
+		if (this.RowsInfo[nRow])
+			nCurPage = this.RowsInfo[nRow].StartPage + this.RowsInfo[nRow].Pages - 1;
 
-		return nCurPage;
+		return this.Get_AbsolutePage(nCurPage);
 	}
 	else
 	{
