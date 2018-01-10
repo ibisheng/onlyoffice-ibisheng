@@ -6596,8 +6596,6 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 33) // PgUp
     {
-        // TODO: Реализовать Ctrl + Shift + PgUp / Ctrl + PgUp / Shift + PgUp
-
         if (true === e.AltKey)
         {
             var MouseEvent = new AscCommon.CMouseEventHandler();
@@ -6627,77 +6625,13 @@ CDocument.prototype.OnKeyDown = function(e)
             }
             else
             {
+            	if (this.Controller !== this.LogicDocumentController)
+				{
+					this.RemoveSelection();
+					this.Set_DocPosType(docpostype_Content);
+				}
 
-                var TempXY = this.GetCursorPosXY();
-
-                this.Controller = this.LogicDocumentController;
-
-                var X = TempXY.X;
-                var Y = TempXY.Y;
-
-                var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                if (Y - Dy < 0)
-                {
-                    this.CurPage--;
-                    var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-
-                    Dy -= Y;
-                    Y = PageH;
-                    while (Dy > PageH)
-                    {
-                        Dy -= PageH;
-                        this.CurPage--;
-                    }
-
-                    if (this.CurPage < 0)
-                    {
-                        this.CurPage = 0;
-                        var oElement = this.Content[0];
-                        Dy           = PageH - oElement.GetPageBounds(oElement.GetPagesCount() - 1).Top;
-                    }
-                }
-
-                // TODO: переделать данную проверку
-                if (this.CurPage >= this.DrawingDocument.m_lPagesCount)
-                    this.CurPage = this.DrawingDocument.m_lPagesCount;
-
-                var StartX = X;
-                var StartY = Y;
-                var CurY   = Y;
-
-                while (Math.abs(StartY - Y) < 0.001)
-                {
-                    var bBreak = false;
-                    CurY -= Dy;
-
-                    if (CurY < 0)
-                    {
-                        this.CurPage--;
-                        var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-                        CurY      = PageH;
-
-                        // Эта проверка нужна для выполнения PgUp в начале документа
-                        if (this.CurPage < 0)
-                        {
-                            this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-                            CurY         = 0;
-                        }
-
-                        // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                        bBreak = true;
-                    }
-
-                    this.MoveCursorToXY(StartX, CurY, false);
-                    this.CurPos.RealX = StartX;
-                    this.CurPos.RealY = CurY;
-
-                    TempXY = this.GetCursorPosXY();
-                    X      = TempXY.X;
-                    Y      = TempXY.Y;
-
-                    if (true === bBreak)
-                        break;
-                }
+            	this.MoveCursorPageUp(true === e.ShiftKey, true === e.CtrlKey);
             }
         }
 
@@ -6707,8 +6641,6 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 34) // PgDn
     {
-        // TODO: Реализовать Ctrl + Shift + PgDn / Ctrl + PgDn / Shift + PgDn
-
         if (true === e.AltKey)
         {
             var MouseEvent = new AscCommon.CMouseEventHandler();
@@ -6739,78 +6671,13 @@ CDocument.prototype.OnKeyDown = function(e)
             }
             else
             {
-                if (this.Pages.length > 0)
-                {
-                    var TempXY = this.GetCursorPosXY();
+				if (this.Controller !== this.LogicDocumentController)
+				{
+					this.RemoveSelection();
+					this.Set_DocPosType(docpostype_Content);
+				}
 
-					this.Controller = this.LogicDocumentController;
-
-                    var X = TempXY.X;
-                    var Y = TempXY.Y;
-
-                    var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                    if (Y + Dy > this.Get_PageLimits(this.CurPage).YLimit)
-                    {
-                        this.CurPage++;
-                        var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-                        Dy -= PageH - Y;
-                        Y         = 0;
-                        while (Dy > PageH)
-                        {
-                            Dy -= PageH;
-                            this.CurPage++;
-                        }
-
-                        if (this.CurPage >= this.Pages.length)
-                        {
-                            this.CurPage    = this.Pages.length - 1;
-                            var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                            Dy              = LastElement.GetPageBounds(LastElement.GetPagesCount() - 1).Bottom;
-                        }
-                    }
-
-                    if (this.CurPage >= this.Pages.length)
-                        this.CurPage = this.Pages.length - 1;
-
-                    var StartX = X;
-                    var StartY = Y;
-                    var CurY   = Y;
-
-                    while (Math.abs(StartY - Y) < 0.001)
-                    {
-                        var bBreak = false;
-                        CurY += Dy;
-
-                        var PageH = this.Get_PageLimits(this.CurPage).YLimit;
-                        if (CurY > PageH)
-                        {
-                            this.CurPage++;
-                            CurY = 0;
-
-                            // Эта проверка нужна для выполнения PgDn в конце документа
-                            if (this.CurPage >= this.Pages.length)
-                            {
-                                this.CurPage    = this.Pages.length - 1;
-                                var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                                CurY            = LastElement.GetPageBounds(LastElement.GetPagesCount() - 1).Bottom;
-                            }
-
-                            // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                            bBreak = true;
-                        }
-
-                        this.MoveCursorToXY(StartX, CurY, false);
-                        this.CurPos.RealX = StartX;
-                        this.CurPos.RealY = CurY;
-
-                        TempXY = this.GetCursorPosXY();
-                        X      = TempXY.X;
-                        Y      = TempXY.Y;
-
-                        if (true === bBreak)
-                            break;
-                    }
-                }
+				this.MoveCursorPageDown(true === e.ShiftKey, true === e.CtrlKey);
             }
         }
 
@@ -10294,6 +10161,157 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 	this.CheckEmptyElementsOnSelection = true;
 	this.TurnOn_InterfaceEvents(true);
 	return Result;
+};
+CDocument.prototype.MoveCursorPageDown = function(AddToSelect, NextPage)
+{
+	if (this.Pages.length <= 0)
+		return;
+
+	if (true === this.IsSelectionUse() && true !== AddToSelect)
+		this.MoveCursorRight(false, false);
+
+	var bStopSelection = false;
+	if (true !== this.IsSelectionUse() && true === AddToSelect && true !== NextPage)
+	{
+		bStopSelection = true;
+		this.StartSelectionFromCurPos();
+	}
+
+	this.private_UpdateCursorXY(false, true);
+	var Result = this.private_MoveCursorPageDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect, NextPage);
+
+	if (true === AddToSelect && true !== NextPage && true !== Result)
+		this.MoveCursorToEndPos(true);
+
+	if (bStopSelection)
+		this.private_StopSelection();
+};
+CDocument.prototype.private_MoveCursorPageDown = function(StartX, StartY, AddToSelect, NextPage)
+{
+	var Dy        = 0;
+	var StartPage = this.CurPage;
+	if (NextPage)
+	{
+		if (this.CurPage >= this.Pages.length - 1)
+		{
+			this.MoveCursorToXY(0, 0, false);
+			this.private_UpdateCursorXY(false, true);
+			return;
+		}
+
+		this.CurPage++;
+		StartX = 0;
+		StartY = 0;
+	}
+	else
+	{
+		Dy = this.DrawingDocument.GetVisibleMMHeight();
+		if (StartY + Dy > this.Get_PageLimits(this.CurPage).YLimit)
+		{
+			this.CurPage++;
+			var PageH = this.Get_PageLimits(this.CurPage).YLimit;
+			Dy -= PageH - StartY;
+			StartY    = 0;
+			while (Dy > PageH)
+			{
+				Dy -= PageH;
+				this.CurPage++;
+			}
+
+			if (this.CurPage >= this.Pages.length)
+			{
+				this.CurPage    = this.Pages.length - 1;
+				var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
+				Dy              = LastElement.GetPageBounds(LastElement.GetPagesCount() - 1).Bottom;
+			}
+
+			StartPage = this.CurPage;
+		}
+	}
+
+	this.MoveCursorToXY(StartX, StartY + Dy, AddToSelect);
+	this.private_UpdateCursorXY(false, true);
+
+	if (this.CurPage > StartPage || (this.CurPos.RealY > StartY + 0.001 && this.CurPage === StartPage))
+		return true;
+
+	return this.private_MoveCursorDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
+};
+CDocument.prototype.MoveCursorPageUp = function(AddToSelect, PrevPage)
+{
+	if (this.Pages.length <= 0)
+		return;
+
+	if (true === this.IsSelectionUse() && true !== AddToSelect)
+		this.MoveCursorRight(false, false);
+
+	var bStopSelection = false;
+	if (true !== this.IsSelectionUse() && true === AddToSelect && true !== PrevPage)
+	{
+		bStopSelection = true;
+		this.StartSelectionFromCurPos();
+	}
+
+	this.private_UpdateCursorXY(false, true);
+	var Result = this.private_MoveCursorPageUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect, PrevPage);
+
+	if (true === AddToSelect && true !== PrevPage && true !== Result)
+		this.MoveCursorToEndPos(true);
+
+	if (bStopSelection)
+		this.private_StopSelection();
+};
+CDocument.prototype.private_MoveCursorPageUp = function(StartX, StartY, AddToSelect, PrevPage)
+{
+	var Dy        = 0;
+	var StartPage = this.CurPage;
+	if (PrevPage)
+	{
+		if (this.CurPage <= 0)
+		{
+			this.MoveCursorToXY(0, 0, false);
+			this.private_UpdateCursorXY(false, true);
+			return;
+		}
+
+		this.CurPage--;
+		StartX = 0;
+		StartY = 0;
+	}
+	else
+	{
+		Dy = this.DrawingDocument.GetVisibleMMHeight();
+		if (StartY - Dy < 0)
+		{
+			this.CurPage--;
+			var PageH = this.Get_PageLimits(this.CurPage).YLimit;
+
+			Dy -= StartY;
+			StartY = PageH;
+			while (Dy > PageH)
+			{
+				Dy -= PageH;
+				this.CurPage--;
+			}
+
+			if (this.CurPage < 0)
+			{
+				this.CurPage = 0;
+				var oElement = this.Content[0];
+				Dy           = PageH - oElement.GetPageBounds(oElement.GetPagesCount() - 1).Top;
+			}
+
+			StartPage = this.CurPage;
+		}
+	}
+
+	this.MoveCursorToXY(StartX, StartY - Dy, AddToSelect);
+	this.private_UpdateCursorXY(false, true);
+
+	if (this.CurPage < StartPage || (this.CurPos.RealY < StartY - 0.001 && this.CurPage === StartPage))
+		return true;
+
+	return this.private_MoveCursorUp(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
 };
 CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplacementData)
 {
