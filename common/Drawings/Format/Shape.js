@@ -5580,20 +5580,22 @@ function SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColo
     if(aCopyContent.length === aSourceContent.length){
         var bMergeRunPr = (aCopyContent === aSourceContent);
         for(var i = 0; i< aSourceContent.length; ++i){
-            var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
-            oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
-            aCopyContent[i].Set_Pr(oPr);
-            for(var j = 0; j < aCopyContent[i].Content.length; ++j){
-                if(aCopyContent[i].Content[j] instanceof ParaRun && aCopyContent[i].Content[j].Pr){
-                    if(bMergeRunPr){
-                        var oCoprPr = oPr.DefaultRunPr.Copy();
-                        oCoprPr.Merge(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
-                        aCopyContent[i].Content[j].Set_Pr(oCoprPr)
-                    }
-                    else {
-                        aCopyContent[i].Content[j].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
-                    }
+            if(aSourceContent[i].CompiledPr.Pr){
+                var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
+                oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
+                aCopyContent[i].Set_Pr(oPr);
+                for(var j = 0; j < aCopyContent[i].Content.length; ++j){
+                    if(aCopyContent[i].Content[j] instanceof ParaRun && aCopyContent[i].Content[j].Pr){
+                        if(bMergeRunPr){
+                            var oCoprPr = oPr.DefaultRunPr.Copy();
+                            oCoprPr.Merge(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
+                            aCopyContent[i].Content[j].Set_Pr(oCoprPr)
+                        }
+                        else {
+                            aCopyContent[i].Content[j].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Content[j].Pr.Copy(), oTheme, oColorMap));
+                        }
 
+                    }
                 }
             }
         }
