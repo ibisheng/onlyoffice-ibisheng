@@ -1059,7 +1059,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 {
                     this.originalObject.graphicObject.Resize(this.resizedExtX, this.resizedExtY);
                 }
-                if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace)
+                if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace && this.originalObject.getObjectType() !== AscDFH.historyitem_type_GraphicFrame)
                 {
                     xfrm.setFlipH(this.resizedflipH);
                     xfrm.setFlipV(this.resizedflipV);
