@@ -118,6 +118,13 @@ CDocumentOutline.prototype.Update = function()
 				if (-1 === nPos)
 				{
 					nPos = this.private_GetParagraphPosition(oParagraph);
+
+					if (0 === nPos && this.Elements[0] && null === this.Elements[0].Paragraph)
+					{
+						this.Elements.splice(0, 1);
+						this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateRemove(0);
+					}
+
 					this.Elements.splice(nPos, 0, {Paragraph : oParagraph, Lvl : nLevel});
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(nPos);
 				}
@@ -130,6 +137,12 @@ CDocumentOutline.prototype.Update = function()
 			{
 				this.Elements.splice(nPos, 1);
 				this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateRemove(nPos);
+
+				if (0 === nPos && (!this.Elements[0] || (null !== this.Elements[0].Paragraph && 0 !== this.Elements[0].Paragraph.GetIndex())))
+				{
+					this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
+					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(0);
+				}
 			}
 		}
 	}
