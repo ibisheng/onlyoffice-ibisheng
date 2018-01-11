@@ -3717,7 +3717,7 @@ function CThumbnailsManager()
 				oThis.ShowPage(pos.Page);
 			}
 		}
-		else if (global_keyboardEvent.ShiftKey)
+		else if (global_keyboardEvent.ShiftKey && !oThis.m_oWordControl.m_oApi.isReporterMode)
 		{
 			var pages_count = oThis.m_arrPages.length;
 			for (var i = 0; i < pages_count; i++)
@@ -3739,6 +3739,7 @@ function CThumbnailsManager()
 				oThis.m_arrPages[i].IsSelected = true;
 			}
 
+			oThis.OnUpdateOverlay();
 			oThis.ShowPage(pos.Page);
 		}
 		else if (0 == global_mouseEvent.Button || 2 == global_mouseEvent.Button)
