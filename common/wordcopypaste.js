@@ -3773,6 +3773,12 @@ PasteProcessor.prototype =
 		var content = pasteObj.content;
 		var font_map = {};
 
+		if(null === content) {
+			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+			return;
+		}
+
 		if (content && content.DocContent) {
 
 			var elements = content.DocContent.Elements;
@@ -3898,7 +3904,6 @@ PasteProcessor.prototype =
 		var p_url = stream.GetString2();
 		var p_width = stream.GetULong() / 100000;
 		var p_height = stream.GetULong() / 100000;
-		var fonts = [];
 
 		var bIsMultipleContent = stream.GetBool();
 		if (true === bIsMultipleContent) {
@@ -3944,6 +3949,12 @@ PasteProcessor.prototype =
 			var arr_Images = pasteObj.images;
 			var fonts = pasteObj.fonts;
 			var presentationSelectedContent = pasteObj.content;
+
+			if(null === presentationSelectedContent) {
+				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+				return;
+			}
 
 			var paste_callback = function(){
 				if (false === oThis.bNested) {
