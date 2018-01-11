@@ -8886,8 +8886,7 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 			oHyperlink.AddToContent(0, oHyperRun, false);
 
 			this.RemoveSelection();
-			oHyperlink.SelectAll();
-			oHyperlink.SelectThisElement();
+			oHyperlink.MoveCursorOutsideElement(false);
 		}
 	}
 	else if (oClass instanceof CFieldInstructionHYPERLINK)
@@ -8925,6 +8924,7 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 				oComplexField.SelectFieldValue();
 				this.AddToParagraph(new ParaTextPr(oTextPr));
 			}
+			oComplexField.MoveCursorOutsideElement(false);
 		}
 	}
 	else

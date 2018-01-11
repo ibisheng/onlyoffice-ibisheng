@@ -287,6 +287,10 @@ CParagraphContentBase.prototype.Is_CursorPlaceable = function()
 {
 	return false;
 };
+CParagraphContentBase.prototype.IsCursorPlaceable = function()
+{
+	return this.Is_CursorPlaceable();
+};
 CParagraphContentBase.prototype.Cursor_Is_Start = function()
 {
 	return true;
@@ -373,6 +377,71 @@ CParagraphContentBase.prototype.Get_StartPos = function(ContentPos, Depth)
 };
 CParagraphContentBase.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 {
+};
+CParagraphContentBase.prototype.MoveCursorOutsideElement = function(isBefore)
+{
+	var oParent = this.GetParent();
+	if (!oParent)
+		return;
+
+	var nPosInParent = this.GetPosInParent(oParent);
+
+	if (isBefore)
+	{
+		if (nPosInParent <= 0)
+		{
+			if (this.SetThisElementCurrent)
+				this.SetThisElementCurrent();
+
+			this.MoveCursorToStartPos();
+		}
+		else
+		{
+			var oElement = oParent.GetElement(nPosInParent - 1);
+			if (oElement.IsCursorPlaceable())
+			{
+				if (oElement.SetThisElementCurrent)
+					oElement.SetThisElementCurrent();
+
+				oElement.MoveCursorToEndPos();
+			}
+			else
+			{
+				if (this.SetThisElementCurrent)
+					this.SetThisElementCurrent();
+
+				this.MoveCursorToStartPos();
+			}
+		}
+	}
+	else
+	{
+		if (nPosInParent >= oParent.GetElementsCount() - 1)
+		{
+			if (this.SetThisElementCurrent)
+				this.SetThisElementCurrent();
+
+			this.MoveCursorToEndPos();
+		}
+		else
+		{
+			var oElement = oParent.GetElement(nPosInParent + 1);
+			if (oElement.IsCursorPlaceable())
+			{
+				if (oElement.SetThisElementCurrent)
+					oElement.SetThisElementCurrent();
+
+				oElement.MoveCursorToStartPos();
+			}
+			else
+			{
+				if (this.SetThisElementCurrent)
+					this.SetThisElementCurrent();
+
+				this.MoveCursorToEndPos();
+			}
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с селектом
@@ -3225,7 +3294,7 @@ CParagraphContentWithParagraphLikeContent.prototype.SetThisElementCurrent = func
 	var StartPos = ContentPos.Copy();
 	this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
 
-	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1, false);
 	this.Paragraph.Document_SetThisElementCurrent(false);
 };
 CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls = function(arrContentControls)

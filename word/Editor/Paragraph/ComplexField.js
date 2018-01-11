@@ -803,6 +803,33 @@ CComplexField.prototype.RemoveFieldWrap = function()
 	oDocument.SetSelectionByContentPositions(oStartPos, oEndPos);
 	oDocument.Remove();
 };
+CComplexField.prototype.MoveCursorOutsideElement = function(isBefore)
+{
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
+
+	oDocument.RemoveSelection();
+
+	if (isBefore)
+	{
+		var oRun = this.BeginChar.GetRun();
+		oRun.Make_ThisElementCurrent(false);
+		oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar));
+
+		if (oRun.IsCursorAtBegin())
+			oRun.MoveCursorOutsideElement(true);
+	}
+	else
+	{
+		var oRun = this.EndChar.GetRun();
+		oRun.Make_ThisElementCurrent(false);
+		oRun.SetCursorPosition(oRun.GetElementPosition(this.EndChar) + 1);
+
+		if (oRun.IsCursorAtEnd())
+			oRun.MoveCursorOutsideElement(false);
+	}
+};
 
 
 function TEST_ADDFIELD(sInstruction)

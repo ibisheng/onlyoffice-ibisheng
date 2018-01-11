@@ -2547,7 +2547,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             if (PRS.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
             	continue;
 
-			if (para_InstrText === ItemType)
+			if (para_InstrText === ItemType && !PRS.IsFastRecalculate())
 			{
 				var oInstrText = Item;
 				if (!PRS.ComplexFields.IsComplexFieldCode())
@@ -5564,6 +5564,22 @@ ParaRun.prototype.Cursor_Is_End = function()
         return true;
 
     return false;
+};
+/**
+ * Проверяем находится ли курсор в начале рана
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsCursorAtBegin = function()
+{
+	return this.Cursor_Is_Start();
+};
+/**
+ * Проверяем находится ли курсор в конце рана
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsCursorAtEnd = function()
+{
+	return this.Cursor_Is_End();
 };
 
 ParaRun.prototype.MoveCursorToStartPos = function()
@@ -9193,7 +9209,7 @@ ParaRun.prototype.SetThisElementCurrent = function()
 	var StartPos = ContentPos.Copy();
 	this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
 
-	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1, false);
 	this.Paragraph.Document_SetThisElementCurrent(false);
 };
 ParaRun.prototype.GetAllParagraphs = function(Props, ParaArray)

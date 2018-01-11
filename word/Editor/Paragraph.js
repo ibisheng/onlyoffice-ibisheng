@@ -12624,6 +12624,27 @@ Paragraph.prototype.IsTableCellContent = function()
 {
 	return (this.Parent && this.Parent.IsTableCellContent() ? true : false);
 };
+/**
+ * Получаем элемент содержимого параграфа
+ * @param nIndex
+ * @returns {?CParagraphContentBase}
+ */
+Paragraph.prototype.GetElement = function(nIndex)
+{
+	if (nIndex < 0 || nIndex >= this.Content.length)
+		return null;
+
+	return this.Content[nIndex];
+};
+/**
+ * Получаем количество элементов содержимого параграфа
+ * @returns {Number}
+ */
+Paragraph.prototype.GetElementsCount = function()
+{
+	// TODO: (ParaEnd) Возвращаем -1, т.к. последний ParaRun используется только для знака конца параграфа
+	return this.Content.length - 1;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
