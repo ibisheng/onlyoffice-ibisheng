@@ -683,6 +683,14 @@
 				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 			return;
 		}
+		else if ("reload" == name)
+		{
+			if (true === pluginData.getAttribute("ctrl"))
+			{				
+				// TODO:
+			}
+			return;
+		}
 		else if ("close" == name || "command" == name)
 		{
 			if (runObject.closeAttackTimer != -1)
