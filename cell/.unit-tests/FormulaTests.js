@@ -2213,6 +2213,10 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "abc def" );
 
+		oParser = new parserFormula( "TRIM(\" First Quarter Earnings \")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "First Quarter Earnings" );
+
     } );
 
 	test( "Test: \"TRIMMEAN\"", function () {
