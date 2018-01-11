@@ -9552,6 +9552,9 @@ Paragraph.prototype.PreDelete = function()
 	}
 
 	this.UpdateDocumentOutline();
+
+	if (undefined !== this.Get_SectionPr() && this.LogicDocument)
+		this.LogicDocument.Update_SectionsInfo();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
