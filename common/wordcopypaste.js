@@ -3765,14 +3765,15 @@ PasteProcessor.prototype =
 			}
 		}
 
-		var pasteObj = selectedContent2[0].content.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : selectedContent2[0];
-        var bSlideObjects = selectedContent2[0].content.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste && selectedContent2[0].content.SlideObjects.length > 0;
+		var firstContent = selectedContent2[0].content;
+		var pasteObj = firstContent && firstContent.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : selectedContent2[0];
+		var bSlideObjects = firstContent && firstContent.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste && firstContent.SlideObjects.length > 0;
 		var arr_Images = pasteObj.images;
 		var fonts = pasteObj.fonts;
 		var content = pasteObj.content;
 		var font_map = {};
 
-		if (content.DocContent) {
+		if (content && content.DocContent) {
 
 			var elements = content.DocContent.Elements;
 			var aContent = [];
@@ -3783,7 +3784,7 @@ PasteProcessor.prototype =
 
 			oThis.api.pre_Paste(fonts, arr_Images, fPrepasteCallback);
 
-		} else if (content.Drawings) {
+		} else if (content && content.Drawings) {
 
 			var arr_shapes = content.Drawings;
 			var arrImages = pasteObj.images;
@@ -3953,9 +3954,9 @@ PasteProcessor.prototype =
 					presentation.Document_UpdateInterfaceState();
 
 					//пока не показываю значок специальной вставки после copy/paste слайдов
-					if(!(aContents[nIndex].SlideObjects && aContents[nIndex].SlideObjects.length)){
+					if(!(aContents[nIndex] && aContents[nIndex].SlideObjects && aContents[nIndex].SlideObjects.length)){
 						var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						if(presentationSelectedContent.DocContent){
+						if(presentationSelectedContent && presentationSelectedContent.DocContent){
 							props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
 						}
 
