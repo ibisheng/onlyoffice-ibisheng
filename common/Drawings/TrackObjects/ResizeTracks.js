@@ -527,6 +527,15 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             var _new_used_half_height;
             var _temp;
 
+           if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+               if(kd1 < 0){
+                   kd1 = 0;
+               }
+               if(kd2 < 0){
+                   kd2 = 0;
+               }
+           }
+
             if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
                 var _new_aspect = this.aspect*(Math.abs(kd1/ kd2));
@@ -851,6 +860,15 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             }
             kd1 = 2*kd1 - 1;
             kd2 = 2*kd2 - 1;
+
+            if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+                if(kd1 < 0){
+                    kd1 = 0;
+                }
+                if(kd2 < 0){
+                    kd2 = 0;
+                }
+            }
             var _real_height, _real_width;
             var _abs_height, _abs_width;
 
@@ -1047,17 +1065,29 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 }
                 AscFormat.CheckSpPrXfrm(this.originalObject);
                 var xfrm = this.originalObject.spPr.xfrm;
-                xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
-                xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
 
                 if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_GraphicFrame)
                 {
+                    xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
+                    xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
                     xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
                     xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
                 }
                 else
                 {
+                    var oldX = xfrm.offX;
+                    var oldY = xfrm.offY;
+                    var newX = this.resizedPosX/scale_coefficients.cx + ch_off_x;
+                    var newY = this.resizedPosY/scale_coefficients.cy + ch_off_y;
                     this.originalObject.graphicObject.Resize(this.resizedExtX, this.resizedExtY);
+                    this.originalObject.recalculateTable();
+                    this.originalObject.recalculateSizes();
+                    if(!AscFormat.fApproxEqual(oldX, newX, 0.5)){
+                        xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x - this.originalObject.extX + this.resizedExtX);
+                    }
+                    if(!AscFormat.fApproxEqual(oldY, newY, 0.5)){
+                        xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y - this.originalObject.extY + this.resizedExtY);
+                    }
                 }
                 if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace && this.originalObject.getObjectType() !== AscDFH.historyitem_type_GraphicFrame)
                 {
