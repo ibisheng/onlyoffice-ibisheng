@@ -1083,13 +1083,12 @@ BinaryChartWriter.prototype.WriteCT_ChartSpace = function (oVal) {
             });
         });
     }
-    //var oCurVal = oVal.m_clrMapOvr;
-    //if (null != oCurVal) {
-    //    this.bs.WriteItem(c_oserct_chartspaceCLRMAPOVR, function () {
-    //        //todo
-    //        oThis.memory.WriteString3(oCurVal);
-    //    });
-    //}
+    var oCurVal = oVal.clrMapOvr;
+    if (null != oCurVal) {
+       this.bs.WriteItem(c_oserct_chartspaceCLRMAPOVR, function () {
+            oThis.WriteClrMapOverride(oCurVal);
+       });
+    }
     if (null != oVal.pivotSource) {
         this.bs.WriteItem(c_oserct_chartspacePIVOTSOURCE, function () {
             oThis.WriteCT_PivotSource(oVal.pivotSource);
@@ -1143,6 +1142,9 @@ BinaryChartWriter.prototype.WriteCT_ChartSpace = function (oVal) {
 }
 BinaryChartWriter.prototype.WriteSpPr = function (oVal) {
   AscCommon.pptx_content_writer.WriteSpPr(this.memory, oVal);
+}
+BinaryChartWriter.prototype.WriteClrMapOverride = function (oVal) {
+  AscCommon.pptx_content_writer.WriteClrMapOverride(this.memory, oVal);
 }
 BinaryChartWriter.prototype.WriteTxPr = function (oVal) {
   AscCommon.pptx_content_writer.WriteTextBody(this.memory, oVal);
