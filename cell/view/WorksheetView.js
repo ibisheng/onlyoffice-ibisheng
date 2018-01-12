@@ -6134,16 +6134,13 @@
 			}
 
 			// Проверим есть ли комменты
-			var comments = this.cellCommentator.getComments(c.col, r.row);
-			var coords = undefined;
-			var indexes = undefined;
+			var comment = this.cellCommentator.getComment(c.col, r.row);
+			var coords = null;
+			var indexes = null;
 
-			if (0 < comments.length) {
-				indexes = [];
-				for (i = 0; i < comments.length; ++i) {
-					indexes.push(comments[i].asc_getId());
-				}
-				coords = this.cellCommentator.getCommentTooltipPosition(comments[0]);
+			if (comment) {
+				indexes = [comment.asc_getId()];
+				coords = this.cellCommentator.getCommentTooltipPosition(comment);
 			}
 
 			// Проверим, может мы в гиперлинке
@@ -6880,7 +6877,7 @@
             cell_info.hyperlink = null;
         }
 
-        cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
+        cell_info.comments = [this.cellCommentator.getComment(ar.c1, ar.r1)];
 		cell_info.flags.merge = range.isOneCell() ? Asc.c_oAscMergeOptions.Disabled :
 			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merge : Asc.c_oAscMergeOptions.None;
 
@@ -7174,9 +7171,8 @@
         var ret = {};
         var isChangeSelectionShape = false;
 
-        var commentList = this.cellCommentator.getCommentsXY(x, y);
-        if (!commentList.length) {
-            this.model.workbook.handlers.trigger("asc_onHideComment");
+        var comment = this.cellCommentator.getCommentByXY(x, y);
+        if (!comment) {
             this.cellCommentator.resetLastSelectedId();
         }
 

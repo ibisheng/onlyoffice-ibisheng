@@ -1379,7 +1379,7 @@
 					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
 						t._autoFiltersClick(t.targetInfo.idFilter);
 						return;
-					} else if (undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
 						t._commentCellClick(event);
 					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode) {
 						this.isMoveResizeRange = true;

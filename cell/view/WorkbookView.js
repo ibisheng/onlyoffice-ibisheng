@@ -1110,7 +1110,7 @@
       }
 
       // Проверяем комментарии ячейки
-      if (undefined !== ct.commentIndexes) {
+      if (ct.commentIndexes) {
         arrMouseMoveObjects.push(new asc_CMM({
           type: c_oAscMouseMoveType.Comment,
           x: ct.commentCoords.dLeftPX,
@@ -1261,11 +1261,7 @@
   };
 
   WorkbookView.prototype._onCommentCellClick = function(x, y) {
-    var ws = this.getWorksheet();
-    var comments = ws.cellCommentator.getCommentsXY(x, y);
-    if (comments.length) {
-      ws.cellCommentator.showComment(comments[0].asc_getId());
-    }
+    this.getWorksheet().cellCommentator.showCommentByXY(x, y);
   };
 
   WorkbookView.prototype._onUpdateSelectionName = function() {

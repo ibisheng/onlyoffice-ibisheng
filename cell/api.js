@@ -2468,7 +2468,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_showComment = function(id, bNew) {
     var ws = this.wb.getWorksheet();
-    ws.cellCommentator.showComment(id, bNew);
+    ws.cellCommentator.showCommentById(id, bNew);
   };
 
   spreadsheet_api.prototype.asc_findComment = function(id) {

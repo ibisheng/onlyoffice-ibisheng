@@ -426,11 +426,10 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 	}
 };
 
-	CCellCommentator.prototype.getCommentsXY = function (x, y) {
+	CCellCommentator.prototype.getCommentByXY = function (x, y) {
 		var findCol = this.worksheet._findColUnderCursor(this.pxToPt(x), true);
 		var findRow = this.worksheet._findRowUnderCursor(this.pxToPt(y), true);
-
-		return (findCol && findRow) ? this.getComments(findCol.col, findRow.row) : [];
+		return this.getComment(findCol.col, findRow.row);
 	};
 
 	CCellCommentator.prototype.drawCommentCells = function () {
@@ -444,8 +443,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 		var aComments = this.model.aComments;
 		for (var i = 0; i < aComments.length; ++i) {
 			commentCell = aComments[i];
-			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() ||
-				(commentCell.asc_getSolved() && !this.showSolved())) {
+			if (this._checkHidden(commentCell)) {
 				continue;
 			}
 
@@ -640,6 +638,7 @@ CCellCommentator.prototype.sortComments = function(sortData) {
 };
 
 CCellCommentator.prototype.resetLastSelectedId = function() {
+	this.model.workbook.handlers.trigger('asc_onHideComment');
 	this.cleanLastSelection();
 	this.lastSelectedId = null;
 };
@@ -764,7 +763,7 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		var metrics;
 		if (this.lastSelectedId) {
 			var comment = this.findComment(this.lastSelectedId);
-			if (comment && !comment.asc_getDocumentFlag() && (this.showSolved() || !comment.asc_getSolved()) &&
+			if (comment && !this._checkHidden(comment) &&
 				(metrics = this.worksheet.getCellMetrics(comment.asc_getCol(), comment.asc_getRow()))) {
 				this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 			}
@@ -795,29 +794,24 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		return Asc.getCvtRatio(fromUnits, toUnits, this.overlayCtx.getPPIX());
 	};
 
-// Main
+	CCellCommentator.prototype.showCommentById = function (id, bNew) {
+		this._showComment(this.findComment(id), bNew);
+	};
+	CCellCommentator.prototype.showCommentByXY = function (x, y) {
+		this._showComment(this.getCommentByXY(x, y), false);
+	};
 
-CCellCommentator.prototype.showComment = function(id, bNew) {
-	var comment = this.findComment(id);
-	if (comment) {
-		var commentList = this.getComments(comment.asc_getCol(), comment.asc_getRow());
-		var coords = this.getCommentTooltipPosition(commentList[0]);
-
-		var indexes = [];
-		for (var i = 0; i < commentList.length; i++) {
-			indexes.push(commentList[i].asc_getId());
-		}
-
-		// Second click - hide comment
-		if (indexes.length) {
-			this.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.dLeftPX, coords.dTopPX,
-				coords.dReverseLeftPX, bNew);
+	CCellCommentator.prototype._showComment = function (comment, bNew) {
+		if (comment && !this._checkHidden(comment)) {
+			var coords = this.getCommentTooltipPosition(comment);
+			this.model.workbook.handlers.trigger("asc_onShowComment", [comment.asc_getId()], coords.dLeftPX,
+				coords.dTopPX, coords.dReverseLeftPX, bNew);
 			this.drawCommentCells();
+			this.lastSelectedId = comment.asc_getId();
+		} else {
+			this.lastSelectedId = null;
 		}
-		this.lastSelectedId = id;
-	} else
-		this.lastSelectedId = null;
-};
+	};
 
 CCellCommentator.prototype.selectComment = function(id, bMove) {
 	var comment = this.findComment(id);
@@ -827,7 +821,7 @@ CCellCommentator.prototype.selectComment = function(id, bMove) {
 	this.cleanLastSelection();
 	this.lastSelectedId = null;
 
-	if (comment && !comment.asc_getDocumentFlag() && (this.showSolved() || !comment.asc_getSolved())) {
+	if (comment && !this._checkHidden(comment)) {
 
 		this.lastSelectedId = id;
 
@@ -966,15 +960,15 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 // Extra functions
 
-	CCellCommentator.prototype.getComments = function (col, row) {
+	CCellCommentator.prototype.getComment = function (col, row) {
 		// Array of root items
-		var comments = [];
+		var comment = null;
 		var _col = col, _row = row, mergedRange = null;
 		var aComments = this.model.aComments;
 		var length = aComments.length;
 
 		if (this.hiddenComments()) {
-			return comments;
+			return comment;
 		}
 
 		if (0 < length) {
@@ -988,21 +982,21 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 			for (var i = 0; i < length; i++) {
 				var commentCell = aComments[i];
-				if (!commentCell.asc_getDocumentFlag() && !commentCell.asc_getHiddenFlag() &&
-					(!commentCell.asc_getSolved() || this.showSolved()) && 0 === commentCell.nLevel) {
-					if (!mergedRange) {
-						if (_col === commentCell.nCol && _row === commentCell.nRow) {
-							comments.push(commentCell);
-						}
-					} else {
-						if (mergedRange.contains(commentCell.nCol, commentCell.nRow)) {
-							comments.push(commentCell);
-						}
+				if (!mergedRange) {
+					if (_col === commentCell.nCol && _row === commentCell.nRow) {
+						comment = commentCell;
 					}
+				} else {
+					if (mergedRange.contains(commentCell.nCol, commentCell.nRow)) {
+						comment = commentCell;
+					}
+				}
+				if (comment) {
+					return this._checkHidden(comment) ? null : comment;
 				}
 			}
 		}
-		return comments;
+		return comment;
 	};
 
 	CCellCommentator.prototype.getRangeComments = function (range) {
@@ -1025,6 +1019,11 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 		}
 
 		return bEmpty ? null : oComments;
+	};
+
+	CCellCommentator.prototype._checkHidden = function (comment) {
+		return this.hiddenComments() || comment.asc_getDocumentFlag() || comment.asc_getHiddenFlag() ||
+			(comment.asc_getSolved() && !this.showSolved()) || 0 !== comment.nLevel;
 	};
 
 CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {

@@ -62,8 +62,8 @@
       oComment.asc_putRow(activeCell.row);
     }
 
-    var existComments = this.getComments(oComment.nCol, oComment.nRow);
-    if (existComments.length) {
+    var existComment = this.getComment(oComment.nCol, oComment.nRow);
+    if (existComment) {
       oComment = existComments[0];
       bChange = true;
     }
