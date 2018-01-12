@@ -2208,28 +2208,27 @@
 				worksheet.workbook.dependencyFormulas.unlockRecal();
 				return isUpdate ? range : null;
 			},
-			
-			afterMoveAutoFilters: function(arnFrom, arnTo)
-			{
+
+			afterMoveAutoFilters: function (arnFrom, arnTo) {
 				//если переносим часть ф/т, применяем стиль к ячейкам arnTo
 				//todo пересмотреть перенос ячеек из ф/т. скорее всего нужно будет внести правки со стилями внутри moveRange
 				var worksheet = this.worksheet;
-				
-				var intersectionRangeWithTablePartsFrom = this._intersectionRangeWithTableParts(arnFrom);
-				var intersectionRangeWithTablePartsTo = this._intersectionRangeWithTableParts(arnTo);
-				if(intersectionRangeWithTablePartsFrom && intersectionRangeWithTablePartsFrom.length === 1 && intersectionRangeWithTablePartsTo === false)
-				{
-					var refTable = intersectionRangeWithTablePartsFrom[0] ? intersectionRangeWithTablePartsFrom[0].Ref : null;
-					if(refTable && !arnFrom.containsRange(refTable))
-					{
+
+				var intersectionFrom = this._intersectionRangeWithTableParts(arnFrom);
+				var intersectionTo = this._intersectionRangeWithTableParts(arnTo);
+				if (intersectionFrom && intersectionFrom.length === 1 && intersectionTo === false) {
+					var refTable = intersectionFrom[0] ? intersectionFrom[0].Ref : null;
+
+					if (refTable && !arnFrom.containsRange(refTable) && refTable.containsRange(arnFrom)) {
 						var intersection = refTable.intersection(arnFrom);
 						//проходимся по всем ячейкам
 						var diffRow = arnTo.r1 - arnFrom.r1;
 						var diffCol = arnTo.c1 - arnFrom.c1;
-						var tempRange = worksheet.getRange3(intersection.r1, intersection.c1, intersection.r2, intersection.c2);
-						tempRange._foreach(function(cellFrom){
+						var tempRange = worksheet.getRange3(intersection.r1, intersection.c1, intersection.r2,
+							intersection.c2);
+						tempRange._foreach(function (cellFrom) {
 							var xfsFrom = cellFrom.getCompiledStyle();
-							worksheet._getCell(cellFrom.nRow + diffRow, cellFrom.nCol + diffCol, function(cellTo) {
+							worksheet._getCell(cellFrom.nRow + diffRow, cellFrom.nCol + diffCol, function (cellTo) {
 								cellTo.setStyle(xfsFrom);
 							});
 						});
