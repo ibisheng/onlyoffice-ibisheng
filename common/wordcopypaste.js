@@ -4022,11 +4022,7 @@ PasteProcessor.prototype =
                     fonts.push(new CFont(i, 0, "", 0));
                 }
 
-                /*for (var i = 0; i < docContent.length; ++i) {
-                    if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
-                        docContent[i].Element = oThis._specialPasteItemConvert(docContent[i].Element);
-                    }
-                }*/
+				bIsEmptyContent = false;
             };
 
             var readDrawings = function () {
@@ -4047,9 +4043,6 @@ PasteProcessor.prototype =
                     if (arr_shapes[i].Drawing.getAllFonts) {
                         arr_shapes[i].Drawing.getAllFonts(font_map);
                     }
-                    /*if (arr_shapes[i].Drawing.getAllImages) {
-                        arr_shapes[i].Drawing.getAllImages(images);
-                    }*/
                 }
 
                 for (var i in font_map) {
@@ -4239,7 +4232,7 @@ PasteProcessor.prototype =
                 return array;
             };
 
-
+			var bIsEmptyContent = true;
             var first_content = stream.GetString2();
             if(first_content === "SelectedContent"){
                 var PresentationWidth = stream.GetULong()/100000.0;
@@ -4252,6 +4245,10 @@ PasteProcessor.prototype =
                         presentationSelectedContent.PresentationHeight = PresentationHeight;
                     }
                     var first_string = stream.GetString2();
+					if("DocContent" !== first_string) {
+						bIsEmptyContent = false;
+					}
+
                     switch (first_string) {
                         case "DocContent": {
                             readContent();
@@ -4312,6 +4309,10 @@ PasteProcessor.prototype =
                     }
                 }
             }
+
+			if(bIsEmptyContent) {
+				presentationSelectedContent = null;
+			}
 
             return {content: presentationSelectedContent, fonts: fonts, images: arr_Images};
         }, this, []);
