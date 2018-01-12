@@ -10025,6 +10025,21 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
             }
             if(oParaDrawing.GraphicObj)
             {
+                if(oParaDrawing.GraphicObj.bEmptyTransform)
+                {
+                    var oXfrm = new AscFormat.CXfrm();
+                    oXfrm.setOffX(0);
+                    oXfrm.setOffY(0);
+                    oXfrm.setChOffX(0);
+                    oXfrm.setChOffY(0);
+                    oXfrm.setExtX(oParaDrawing.Extent.W);
+                    oXfrm.setExtY(oParaDrawing.Extent.H);
+                    oXfrm.setChExtX(oParaDrawing.Extent.W);
+                    oXfrm.setChExtY(oParaDrawing.Extent.H);
+                    oXfrm.setParent(oParaDrawing.GraphicObj.spPr);
+                    oParaDrawing.GraphicObj.spPr.setXfrm(oXfrm);
+                    delete oParaDrawing.GraphicObj.bEmptyTransform;
+                }
                 if(drawing_Anchor == oParaDrawing.DrawingType && typeof AscCommon.History.RecalcData_Add === "function")//TODO некорректная проверка typeof
                   AscCommon.History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Flow, Data : oParaDrawing});
             }

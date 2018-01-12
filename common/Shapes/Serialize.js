@@ -9832,8 +9832,13 @@ function CPres()
                     }
                 }
             }
-            
-            this.Reader.CheckGroupXfrm(shape);
+
+            if(oldParaDrawing && shape.spPr && !shape.spPr.xfrm){
+                shape.bEmptyTransform = true;
+            }
+            if(!oldParaDrawing){
+                this.Reader.CheckGroupXfrm(shape);
+            }
             this.ParaDrawing = oldParaDrawing;
             s.Seek2(_end_rec);
             this.TempGroupObject = null;
