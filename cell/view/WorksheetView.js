@@ -334,7 +334,6 @@
         // Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
         this.maxDigitWidth = maxDigitWidth;
 
-        this.nBaseColWidth = 8; // Число символов для дефалтовой ширины (по умолчинию 8)
         this.defaultColWidthChars = 0;
         this.defaultColWidth = 0;
         this.defaultRowHeight = 0;
@@ -1208,9 +1207,8 @@
     };
 
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
-        this.nBaseColWidth = this.model.oSheetFormatPr.nBaseColWidth || this.nBaseColWidth;
         // Теперь рассчитываем число px
-        var defaultColWidthChars = this.model.charCountToModelColWidth(this.nBaseColWidth);
+        var defaultColWidthChars = this.model.charCountToModelColWidth(this.model.getBaseColWidth());
         this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
         this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;

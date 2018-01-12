@@ -3568,6 +3568,9 @@
 	Worksheet.prototype.getDefaultFontSize=function(){
 		return this.workbook.getDefaultSize();
 	};
+	Worksheet.prototype.getBaseColWidth = function () {
+		return this.oSheetFormatPr.nBaseColWidth || 8; // Число символов для дефалтовой ширины (по умолчинию 8)
+	};
 	Worksheet.prototype.charCountToModelColWidth = function (count) {
 		return this.workbook.charCountToModelColWidth(count);
 	};
