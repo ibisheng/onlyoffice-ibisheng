@@ -391,13 +391,16 @@ CTextBody.prototype =
             }
         }
 
-        if(AscFormat.isRealNumber(parg.TextPr.Value.FontSize))
+        if(parg.TextPr && parg.TextPr.Value)
         {
-            parg.TextPr.Set_FontSize(Math.round(parg.TextPr.Value.FontSize*fontScale));
-        }
-        else
-        {
-            parg.TextPr.Set_FontSize(paragrRedFontSize);
+            if(AscFormat.isRealNumber(parg.TextPr.Value.FontSize))
+            {
+                parg.TextPr.Set_FontSize(Math.round(parg.TextPr.Value.FontSize*fontScale));
+            }
+            else
+            {
+                parg.TextPr.Set_FontSize(paragrRedFontSize);
+            }
         }
     },
 
