@@ -468,31 +468,20 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 		}
 	};
 
-CCellCommentator.prototype.updateCommentPosition = function() {
-	if (this.lastSelectedId) {
-		var comment = this.findComment(this.lastSelectedId);
-		if (comment) {
-
-			var commentList = this.getComments(comment.asc_getCol(), comment.asc_getRow());
-			if (commentList.length) {
-
+	CCellCommentator.prototype.updateCommentPosition = function () {
+		if (this.lastSelectedId) {
+			var comment = this.findComment(this.lastSelectedId);
+			if (comment) {
 				this.drawCommentCells();
-				var coords = this.getCommentTooltipPosition(commentList[0]);
-
-				var indexes = [];
-				for (var i = 0; i < commentList.length; i++) {
-					indexes.push(commentList[i].asc_getId());
-				}
-				var isVisible = (null !== this.worksheet.getCellVisibleRange(comment.asc_getCol(), comment.asc_getRow()));
-
-				this.model.workbook.handlers.trigger( "asc_onUpdateCommentPosition", indexes,
-					(isVisible ? coords.dLeftPX : -1),
-					(isVisible ? coords.dTopPX : -1),
-					(isVisible ? coords.dReverseLeftPX : -1) );
+				var coords = this.getCommentTooltipPosition(comment);
+				var isVisible = (null !==
+				this.worksheet.getCellVisibleRange(comment.asc_getCol(), comment.asc_getRow()));
+				this.model.workbook.handlers.trigger("asc_onUpdateCommentPosition", [comment.asc_getId()],
+					(isVisible ? coords.dLeftPX : -1), (isVisible ? coords.dTopPX : -1),
+					(isVisible ? coords.dReverseLeftPX : -1));
 			}
 		}
-	}
-};
+	};
 
 CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operType, updateRange) {
 	// ToDo переделать функцию, странная какая-то
