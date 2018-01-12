@@ -2383,7 +2383,7 @@
 			this.aWorksheets[i].updateSparklineCache(sheet, ranges);
 		}
 	};
-	Workbook.prototype.sortDependency = function (setCellFormat) {
+	Workbook.prototype.sortDependency = function () {
 		this.dependencyFormulas.calcTree();
 	};
 	/**
