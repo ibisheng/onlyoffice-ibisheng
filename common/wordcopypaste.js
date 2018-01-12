@@ -1326,7 +1326,7 @@ CopyProcessor.prototype =
 		for(var i in elementsContent){
 			if(elementsContent[i] && elementsContent[i].length){
 				contentCount++;
-			} else if(i === "DocContent" && null !== elementsContent[i]){
+			} else if(null !== elementsContent[i] && elementsContent[i] instanceof CSelectedContent){
 				contentCount++;
 			}
 		}
