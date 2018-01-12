@@ -9554,7 +9554,11 @@ Paragraph.prototype.PreDelete = function()
 	this.UpdateDocumentOutline();
 
 	if (undefined !== this.Get_SectionPr() && this.LogicDocument)
-		this.LogicDocument.Update_SectionsInfo();
+	{
+		// Чтобы при удалении параграфа с секцией автоматически запускался правильно пересчет секции, и правильно
+		// пересчитывалось на Undo/Redo.
+		this.Set_SectionPr(undefined);
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
@@ -12570,7 +12574,7 @@ Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, is
  * @param X
  * @param Y
  * @param CurPage
- * @returns {CComplexField?}
+ * @returns {?CComplexField}
  */
 Paragraph.prototype.CheckPageRefLink = function(X, Y, CurPage)
 {
