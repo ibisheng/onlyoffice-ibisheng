@@ -1117,11 +1117,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.H + (val * 10.0) / 9.0 + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.H = res;
+                HSL.H = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
@@ -1148,11 +1144,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.L + val * max_hls + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.L = res;
+                HSL.L = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
@@ -1173,11 +1165,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.S + val * max_hls + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.S = res;
+                HSL.S = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
