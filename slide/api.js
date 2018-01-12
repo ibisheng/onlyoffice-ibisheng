@@ -4689,30 +4689,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_getComments = function()
-	{
-		var comms = [];
-		if (null == this.WordControl.m_oLogicDocument)
-			return comms;
-
-		var _slides      = this.WordControl.m_oLogicDocument.Slides;
-		var _slidesCount = _slides.length;
-		for (var i = 0; i < _slidesCount; i++)
-		{
-			var _comments      = _slides[i].slideComments.comments;
-			var _commentsCount = _comments.length;
-
-			for (var j = 0; j < _commentsCount; j++)
-			{
-				var _id             = _comments[j].Get_Id();
-				var _ascCommentData = new asc_CCommentData(_comments[j].Data);
-
-				comms.push({"Id" : _id, "Comment" : _ascCommentData});
-			}
-		}
-		return comms;
-	};
-
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
 		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete ||
@@ -7249,7 +7225,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['GenerateStyles']                      = asc_docs_api.prototype.GenerateStyles;
 	asc_docs_api.prototype['asyncFontsDocumentEndLoaded']         = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 	asc_docs_api.prototype['asyncImagesDocumentEndLoaded']        = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
-	asc_docs_api.prototype['asc_getComments']                     = asc_docs_api.prototype.asc_getComments;
 	asc_docs_api.prototype['asyncFontEndLoaded']                  = asc_docs_api.prototype.asyncFontEndLoaded;
 	asc_docs_api.prototype['asyncImageEndLoaded']                 = asc_docs_api.prototype.asyncImageEndLoaded;
 	asc_docs_api.prototype['get_PresentationWidth']               = asc_docs_api.prototype.get_PresentationWidth;

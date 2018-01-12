@@ -666,21 +666,7 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 
 		var aComments = this.model.aComments;
 		for (var i = 0; i < aComments.length; i++) {
-
-			var commentCell = aComments[i];
-			var commentList = this.getComments(commentCell.asc_getCol(), commentCell.asc_getRow());
-
-			// Calculate coords for document comments
-			if (commentCell.asc_getCol() == 0 && commentCell.asc_getRow() == 0) {
-				var documentComments = this.getDocumentComments();
-				for (var j = 0; j < documentComments.length; j++) {
-					commentList.push(documentComments[j]);
-				}
-			}
-
-			if (commentList.length) {
-				aCommentsCoords.push(this.calcCommentArea(commentList[0]));
-			}
+			aCommentsCoords.push(this.calcCommentArea(aComments[i]));
 		}
 
 		return aCommentsCoords;
@@ -1040,20 +1026,6 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 		return bEmpty ? null : oComments;
 	};
-
-CCellCommentator.prototype.getDocumentComments = function() {
-
-	// Array of root items
-	var comments = [];
-	var aComments = this.model.aComments;
-
-	for (var i = 0; i < aComments.length; i++) {
-		var commentCell = aComments[i];
-		if ((commentCell.nLevel == 0) && commentCell.asc_getDocumentFlag())
-			comments.push(commentCell);
-	}
-	return comments;
-};
 
 CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {
 	// Add new comment
