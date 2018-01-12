@@ -6143,7 +6143,7 @@
 				for (i = 0; i < comments.length; ++i) {
 					indexes.push(comments[i].asc_getId());
 				}
-				coords = this.cellCommentator.getCommentsCoords(comments);
+				coords = this.cellCommentator.getCommentTooltipPosition(comments[0]);
 			}
 
 			// Проверим, может мы в гиперлинке
