@@ -687,7 +687,10 @@
 		{
 			if (true === pluginData.getAttribute("ctrl"))
 			{				
-				// TODO:
+				if (AscCommon.c_oEditorId.Presentation === window.g_asc_plugins.api.getEditorId())
+				{
+					window.g_asc_plugins.api.sendEvent("asc_onStartDemonstration");
+				}
 			}
 			return;
 		}
