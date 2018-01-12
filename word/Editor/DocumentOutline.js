@@ -130,6 +130,7 @@ CDocumentOutline.prototype.Update = function()
 				}
 				else
 				{
+					this.Elements[nPos].Lvl = nLevel;
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateChange(nPos);
 				}
 			}

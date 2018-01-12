@@ -1043,6 +1043,9 @@
 			case AscDFH.historydescription_Document_ResizeTable:
 				sString = "Document_ResizeTable";
 				break;
+			case AscDFH.historydescription_Document_RemoveComplexField:
+				sString = "Document_RemoveComplexField";
+				break;
 		}
 		return sString;
 	}
@@ -2963,6 +2966,7 @@
 	window['AscDFH'].historydescription_Document_ChangeOutlineLevel                 = 0x0149;
 	window['AscDFH'].historydescription_Document_AddElementToOutline                = 0x014a;
 	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014b;
+	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014c;
 
 
 

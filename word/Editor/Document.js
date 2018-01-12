@@ -16093,7 +16093,7 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 	oComplexField.SetInstructionLine(sInstruction);
 	oComplexField.SetSeparateChar(oSeparateChar);
 	oComplexField.SetEndChar(oEndChar);
-	oComplexField.Update();
+	oComplexField.Update(false);
 
 	return oComplexField;
 };
@@ -16102,7 +16102,7 @@ CDocument.prototype.UpdateComplexField = function(oField)
 	if (!oField)
 		return;
 
-	oField.Update();
+	oField.Update(true);
 };
 CDocument.prototype.GetCurrentComplexFields = function()
 {
@@ -16363,14 +16363,17 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 		this.Remove(1, true, true, true);
 		var oSdt = this.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 
-		var oParagraph = oSdt.GetCurrentParagraph();
-		oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
-		for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+		if (sHeading)
 		{
-			oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+			var oParagraph = oSdt.GetCurrentParagraph();
+			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
+			for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+			{
+				oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+			}
+			oSdt.AddNewParagraph(false, true);
 		}
 
-		oSdt.AddNewParagraph(false, true);
 		oSdt.SetThisElementCurrent();
 
 		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
@@ -16381,6 +16384,28 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 CDocument.prototype.GetPagesCount = function()
 {
 	return this.Pages.length;
+};
+/**
+ * Данная функция получает первую таблицу TOC по схеме Word (сначала ищем среди CBlockLevelSdt, потом просто в сложных полях)
+ * @returns {CBlockLevelSdt | CComplexField | null}
+ */
+CDocument.prototype.GetTableOfContents = function()
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetTableOfContents(false);
+		if (oResult)
+			return oResult;
+	}
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetTableOfContents(true);
+		if (oResult)
+			return oResult;
+	}
+
+	return null;
 };
 
 function CDocumentSelectionState()
