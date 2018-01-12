@@ -2397,6 +2397,15 @@
 		}
 		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 	};
+	/**
+	 * Вычисляет ширину столбца в пунктах
+	 * @param {Number} mcw  Количество символов
+	 * @returns {Number}    Ширина столбца в пунктах (pt)
+	 */
+	Workbook.prototype.modelColWidthToColWidth = function (mcw) {
+		var px = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
+		return px * Asc.getCvtRatio(0, 1, 96);
+	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {
 			return ascName;
@@ -3573,6 +3582,9 @@
 	};
 	Worksheet.prototype.charCountToModelColWidth = function (count) {
 		return this.workbook.charCountToModelColWidth(count);
+	};
+	Worksheet.prototype.modelColWidthToColWidth = function (mcw) {
+		return this.workbook.modelColWidthToColWidth(mcw);
 	};
 	Worksheet.prototype.getColWidth=function(index){
 		//index 0 based

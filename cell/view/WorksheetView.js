@@ -1209,14 +1209,14 @@
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
         // Теперь рассчитываем число px
         var defaultColWidthChars = this.model.charCountToModelColWidth(this.model.getBaseColWidth());
-        this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+        this.defaultColWidthPx = this.model.modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
         this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
         this.defaultColWidthChars =
           this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
         AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
-        this.defaultColWidth = this._modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
+        this.defaultColWidth = this.model.modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
 
         var defaultFontSize = this.model.getDefaultFontSize();
         // ToDo разобраться со значениями
@@ -1307,16 +1307,6 @@
     };
 
     /**
-     * Вычисляет ширину столбца в пунктах
-     * @param {Number} mcw  Количество символов
-     * @returns {Number}    Ширина столбца в пунктах (pt)
-     */
-    WorksheetView.prototype._modelColWidthToColWidth = function ( mcw ) {
-        var px = asc_floor( ((256 * mcw + asc_floor( 128 / this.maxDigitWidth )) / 256) * this.maxDigitWidth );
-        return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
-    };
-
-    /**
      * Вычисляет количество символов по ширине столбца
      * @param {Number} w  Ширина столбца в пунктах
      * @returns {Number}  Количество символов
@@ -1339,7 +1329,7 @@
         var useDefault = w === undefined || w === null || w === -1;
         var width;
         res.width =
-          useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
+          useDefault ? t.defaultColWidth : (width = t.model.modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
         res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
         res.charCount = t._colWidthToCharCount( res.width );
         return res;
@@ -1362,7 +1352,7 @@
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
             var numDigit = Math.max(calcDecades(this.visibleRange.r2 + 1), 3);
             var nCharCount = this.model.charCountToModelColWidth(numDigit);
-            this.headersWidth = this._modelColWidthToColWidth(nCharCount);
+            this.headersWidth = this.model.modelColWidthToColWidth(nCharCount);
         }
 
         //var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
