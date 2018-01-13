@@ -4844,7 +4844,7 @@ CPresentation.prototype =
             oImagesSelectedContent.PresentationWidth = this.Width;
             oImagesSelectedContent.PresentationHeight = this.Height;
             var oSelectedContent, oDocContent, oController, oTargetTextObject, oGraphicFrame, oTable, oImage, dImageWidth, dImageHeight, bNeedSelectAll,
-                oDocContentForDraw, oParagraph, oNearPos, bOldVal, aParagraphs, dMaxWidth, oCanvas, oContext, oGraphics, dContentHeight, dContentIndents = 20, bOldShowParaMarks, oSelector;
+                oDocContentForDraw, oParagraph, oNearPos, bOldVal, aParagraphs, dMaxWidth, oCanvas, oContext, oGraphics, dContentHeight, nContentIndents = 30, bOldShowParaMarks, oSelector;
             var i, j;
             if(this.Slides.length > 0){
                 switch(this.Api.WordControl.Thumbnails.FocusObjType){
@@ -4935,10 +4935,10 @@ CPresentation.prototype =
                                         dContentHeight = oDocContentForDraw.Get_SummaryHeight();
 
                                         oCanvas = document.createElement('canvas');
-                                        dImageWidth = dMaxWidth + 2.0*dContentIndents;
-                                        dImageHeight = dContentHeight + 2.0*dContentIndents;
-                                        oCanvas.width = this.DrawingDocument.GetDotsPerMM(dImageWidth);
-                                        oCanvas.height = this.DrawingDocument.GetDotsPerMM(dImageHeight);
+                                        dImageWidth = dMaxWidth;
+                                        dImageHeight = dContentHeight;
+                                        oCanvas.width = ((dImageWidth*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
+                                        oCanvas.height = ((dImageHeight*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
                                         //if (AscCommon.AscBrowser.isRetina) {
                                         //    oCanvas.width <<= 1;
                                         //    oCanvas.height <<= 1;
@@ -4946,10 +4946,10 @@ CPresentation.prototype =
                                         oContext = oCanvas.getContext('2d');
                                         oGraphics = new AscCommon.CGraphics();
 
-                                        oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth, dImageHeight);
+                                        oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
                                         oGraphics.m_oFontManager = AscCommon.g_fontManager;
-                                        oGraphics.m_oCoordTransform.tx = +dContentIndents;
-                                        oGraphics.m_oCoordTransform.ty = +dContentIndents;
+                                        oGraphics.m_oCoordTransform.tx = nContentIndents;
+                                        oGraphics.m_oCoordTransform.ty = nContentIndents;
                                         oGraphics.transform(1,0,0,1,0,0);
 
                                         bOldShowParaMarks = this.Api.ShowParaMarks;
@@ -4957,7 +4957,7 @@ CPresentation.prototype =
                                         oDocContentForDraw.Draw(0, oGraphics);
                                         this.Api.ShowParaMarks = bOldShowParaMarks;
                                         var sImageUrl = oCanvas.toDataURL("image/png");
-                                        oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth, dImageHeight);
+                                        oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
                                         oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
                                     }
                                 }
