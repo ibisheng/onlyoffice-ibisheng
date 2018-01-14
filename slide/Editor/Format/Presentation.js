@@ -2121,6 +2121,11 @@ CPresentation.prototype =
         for(i = 0; i < content.length; ++i)
         {
 			var row = content[i];
+			if(row.Pr && row.Pr.Height && row.Pr.Height.HRule === Asc.linerule_AtLeast
+                && AscFormat.isRealNumber(row.Pr.Height.Value) && row.Pr.Height.Value > 0)
+			{
+			    continue;
+            }
 			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
 			for(j = 0;  j < row.Content.length; ++j){
 				var oCell = row.Content[j];
