@@ -1205,11 +1205,11 @@
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
         // Теперь рассчитываем число px
         var defaultColWidthChars = this.model.charCountToModelColWidth(this.model.getBaseColWidth());
-        this.defaultColWidthPx = this.model.modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+        var defaultColWidthPx = this.model.modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
-        this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
+        defaultColWidthPx = asc_ceil(defaultColWidthPx / 8) * 8;
 		this.defaultColWidthChars =
-			this.model.colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
+			this.model.colWidthToCharCount(defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
         AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
         this.defaultColWidth = this.model.modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
