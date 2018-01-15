@@ -165,10 +165,6 @@
 
     var kMaxAutoCompleteCellEdit = 20000;
 
-    function calcDecades(num) {
-        return Math.abs(num) < 10 ? 1 : 1 + calcDecades(asc_floor(num * 0.1));
-    }
-
     function CacheElement() {
         if (!(this instanceof CacheElement)) {
             return new CacheElement();
@@ -1350,13 +1346,10 @@
             this.headersWidth = 0;
         } else {
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
-            var numDigit = Math.max(calcDecades(this.visibleRange.r2 + 1), 3);
+            var numDigit = Math.max(AscCommonExcel.calcDecades(this.visibleRange.r2 + 1), 3);
             var nCharCount = this.model.charCountToModelColWidth(numDigit);
             this.headersWidth = this.model.modelColWidthToColWidth(nCharCount);
         }
-
-        //var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
-        //this.headersWidth = asc_calcnpt(w, this._getPPIX());
 
         this.cellsLeft = this.headersLeft + this.headersWidth;
     };
@@ -5272,7 +5265,7 @@
 			return this;
 		}
 
-        var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
+        var oldDec = Math.max(AscCommonExcel.calcDecades(oldEnd + 1), 3);
         var oldW, x, dx;
         var dy = this.rows[start].top - this.rows[oldStart].top;
         var oldH = ctxH - this.cellsTop - Math.abs(dy) - diffHeight;
@@ -5286,7 +5279,7 @@
               this.cellsTop + diffHeight, ctxW, ctxH);
         }
 
-        var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
+        var widthChanged = Math.max(AscCommonExcel.calcDecades(vr.r2 + 1), 3) !== oldDec;
         if (widthChanged) {
             x = this.cellsLeft;
             this._calcHeaderColumnWidth();
