@@ -8107,7 +8107,7 @@ DrawingObjectsController.prototype =
         var sText, oSelectedContent, oNearestPos, sSelectedText;
         if(this.document)
         {
-            sSelectedText = this.document.GetSelectedText(true, {});
+            sSelectedText = this.document.GetSelectedText(false, {});
             oSelectedContent = this.document.GetSelectedContent(true);
             oContent.Recalculate_Page(0, true);
             oContent.MoveCursorToStartPos(false);
@@ -8118,6 +8118,13 @@ DrawingObjectsController.prototype =
                 if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
                 {
                     oSelectedContent.MoveDrawing = true;
+                    if(oSelectedContent.Elements.length > 1 && oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.GetType() === AscCommonWord.type_Paragraph
+                    && oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.IsEmpty()){
+                        oSelectedContent.Elements.splice(oSelectedContent.Elements.length - 1, 1);
+                    }
+                    if(oSelectedContent.Elements.length > 0){
+                        oSelectedContent.Elements[oSelectedContent.Elements.length - 1].SelectedAll = false;
+                    }
                     oContent.Insert_Content(oSelectedContent, oNearestPos);
                     oContent.Selection.Start    = false;
                     oContent.Selection.Use      = false;
@@ -8146,11 +8153,18 @@ DrawingObjectsController.prototype =
         {
             oShape.setParent(this.drawingObjects);
             var oTargetDocContent = this.getTargetDocContent();
-            if(oTargetDocContent && oTargetDocContent.Selection.Use && oTargetDocContent.GetSelectedText(true, {}).length > 0)
+            if(oTargetDocContent && oTargetDocContent.Selection.Use && oTargetDocContent.GetSelectedText(false, {}).length > 0)
             {
                 oSelectedContent = new CSelectedContent();
                 oTargetDocContent.GetSelectedContent(oSelectedContent);
                 oSelectedContent.MoveDrawing = true;
+                if(oSelectedContent.Elements.length > 1 && oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.GetType() === AscCommonWord.type_Paragraph
+                    && oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.IsEmpty()){
+                    oSelectedContent.Elements.splice(oSelectedContent.Elements.length - 1, 1);
+                }
+                if(oSelectedContent.Elements.length > 0){
+                    oSelectedContent.Elements[oSelectedContent.Elements.length - 1].SelectedAll = false;
+                }
 
                 oContent.Recalculate_Page(0, true);
                 oContent.MoveCursorToStartPos(false);
