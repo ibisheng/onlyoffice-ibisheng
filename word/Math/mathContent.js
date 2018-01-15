@@ -2208,6 +2208,10 @@ CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
             this.Remove_FromContent(Pos+1, len - Pos - 1);
         }
     }
+    else
+	{
+		NewContent.Add_ToContent(0, new ParaRun(this.Paragraph, true));
+	}
 };
 CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {

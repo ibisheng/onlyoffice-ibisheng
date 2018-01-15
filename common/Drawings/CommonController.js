@@ -4541,6 +4541,26 @@ DrawingObjectsController.prototype =
             ret.putShowHorAxis(!hor_axis.bDelete);
             ret.putHorAxisProps(hor_axis.getMenuProps());
         }
+        else
+        {
+            if(vert_axis)
+            {
+                if(vert_axis.getObjectType() === AscDFH.historyitem_type_ValAx)
+                {
+                    ret.putShowHorAxis(false);
+                    var _cat_ax_pr = new AscCommon.asc_CatAxisSettings();
+                    _cat_ax_pr.setDefault();
+                    ret.putHorAxisProps(_cat_ax_pr);
+                }
+                else
+                {
+                    ret.putShowHorAxis(false);
+                    var _val_ax_pr = new AscCommon.asc_ValAxisSettings();
+                    _val_ax_pr.setDefault();
+                    ret.putHorAxisProps(_val_ax_pr);
+                }
+            }
+        }
         ret.putHorGridLines(calc_grid_lines(vert_axis));
 
         if(vert_axis)
@@ -5509,7 +5529,8 @@ DrawingObjectsController.prototype =
 
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].track(dx, dy, this.arrTrackObjects[i].originalObject.selectStartPage);
-        move_state.onMouseUp({}, 0, 0, 0);
+        var nPageIndex  = (this.arrTrackObjects[0] && this.arrTrackObjects[0].originalObject && AscFormat.isRealNumber(this.arrTrackObjects[0].originalObject.selectStartPage)) ? this.arrTrackObjects[0].originalObject.selectStartPage : 0;
+        move_state.onMouseUp({}, 0, 0, nPageIndex);
     },
 
     cursorMoveToStartPos: function()
@@ -5789,12 +5810,7 @@ DrawingObjectsController.prototype =
         if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
         {
             var oTargetTextObject = getTargetTextObject(this);
-            if(oTargetTextObject && oApi.collaborativeEditing.getFast()){
-                this.checkSelectedObjectsAndCallbackNoCheckLock(this.removeCallback,  [-1, undefined, undefined], false, AscDFH.historydescription_Spreadsheet_Remove)
-            }
-            else{
-                drawingObjectsController.remove(-1);
-            }
+            drawingObjectsController.remove(-1);
             bRetValue = true;
         }
         else if ( e.keyCode == 9 && false === isViewMode ) // Tab
@@ -5807,13 +5823,7 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaTab());
                 };
-
-                if(oApi.collaborativeEditing.getFast()){
-                    this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddTab);
-                }
-                else{
-                    this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddTab)
-                }
+                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddTab)
             }
             else
             {
@@ -5835,13 +5845,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-
-                    if(oApi.collaborativeEditing.getFast()){
-                        this.checkSelectedObjectsAndCallbackNoCheckLock(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph);
-                    }
-                    else{
-                        this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph);
-                    }
+                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph);
                     this.recalculate();
                 }
             }
@@ -5931,12 +5935,7 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaSpace(1));
                 };
-                if(oApi.collaborativeEditing.getFast()){
-                    this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace);
-                }
-                else{
-                    this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace);
-                }
+                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace);
                 //}
                // else
                // {
@@ -6040,12 +6039,7 @@ DrawingObjectsController.prototype =
         else if ( e.keyCode == 46 && false === isViewMode ) // Delete
         {
             var oTargetTextObject = getTargetTextObject(this);
-            if(oTargetTextObject && oApi.collaborativeEditing.getFast()){
-                this.checkSelectedObjectsAndCallbackNoCheckLock(this.removeCallback,  [1, undefined, undefined], false, AscDFH.historydescription_Spreadsheet_Remove)
-            }
-            else{
-                drawingObjectsController.remove(1);
-            }
+            drawingObjectsController.remove(1);
             bRetValue = true;
         }
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
@@ -6210,13 +6204,7 @@ DrawingObjectsController.prototype =
                     Item = new ParaText( "-" );
                 oThis.paragraphAdd(Item);
             };
-            if(oApi.collaborativeEditing.getFast()){
-                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem);
-            }
-            else{
-                this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem);
-            }
-          //  this.recalculate();
+            this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem);
             bRetValue = true;
         }
         else if ( e.keyCode == 190 && true === ctrlKey ) // Ctrl + .

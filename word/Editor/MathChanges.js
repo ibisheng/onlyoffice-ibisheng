@@ -235,6 +235,13 @@ CChangesMathContentAddItem.prototype.Load = function(Color)
 		if (null != Element)
 		{
 			oMathContent.Content.splice(Pos, 0, Element);
+
+			if (Element.SetParagraph)
+				Element.SetParagraph(oMathContent.Paragraph);
+
+			if (Element.Set_ParaMath)
+				Element.Set_ParaMath(oMathContent.ParaMath);
+
 			Element.Recalc_RunsCompiledPr();
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oMathContent, Pos);
 		}
@@ -388,6 +395,13 @@ CChangesMathBaseAddItems.prototype.Load = function(Color)
 		{
 			oMathBase.Content.splice(Pos, 0, Element);
 			Element.ParentElement = oMathBase;
+
+			if (Element.SetParagraph)
+				Element.SetParagraph(oMathContent.Paragraph);
+
+			if (Element.Set_ParaMath)
+				Element.Set_ParaMath(oMathContent.ParaMath);
+
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oMathBase, Pos);
 		}
 	}

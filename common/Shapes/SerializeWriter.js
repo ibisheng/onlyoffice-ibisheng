@@ -51,6 +51,7 @@ var c_oMainTables = {
     VmlDrawing		: 5,
     TableStyles		: 6,
     PresProps		: 7,
+	JsaProject		: 8,
 
     Themes			: 20,
     ThemeOverride	: 21,
@@ -895,6 +896,20 @@ function CBinaryFileWriter()
 		
 		return _memory.GetData();
 	}
+	this.WriteByMemory = function(callback) {
+		var _memory = new AscCommon.CMemory(true);
+		_memory.ImData = this.ImData;
+		_memory.data = this.data;
+		_memory.len = this.len;
+		_memory.pos = this.pos;
+
+		callback(_memory);
+
+		this.ImData = _memory.ImData;
+		this.data = _memory.data;
+		this.len = _memory.len;
+		this.pos = _memory.pos;
+	};
 
     this.WriteApp = function(app)
     {
@@ -1100,6 +1115,14 @@ function CBinaryFileWriter()
                 this.EndRecord();
             }
         }
+		var macros = presentation.Api.macros.GetData();
+		if (macros) {
+			this.StartRecord(9);
+			this.WriteByMemory(function(_memory){
+				_memory.WriteXmlString(macros);
+			});
+			this.EndRecord();
+		}
 
         this.EndRecord();
     }

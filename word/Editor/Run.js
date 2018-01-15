@@ -9276,7 +9276,7 @@ CReviewInfo.prototype.Get_Color = function()
 };
 CReviewInfo.prototype.Is_CurrentUser = function()
 {
-    if (this.Editor)
+    if (this.Editor && this.Editor.DocInfo)
     {
         var UserId = this.Editor.DocInfo.get_UserId();
         return (UserId === this.UserId);

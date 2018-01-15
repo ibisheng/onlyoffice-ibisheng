@@ -41,6 +41,14 @@
 	var Api = window["Asc"]["spreadsheet_api"];
 
 	/**
+	 * Class representing a workbook.
+	 * @constructor
+	 */
+	function ApiWorkbook(workbook) {
+		this.workbook = workbook;
+	}
+
+	/**
 	 * Class representing a sheet.
 	 * @constructor
 	 */
@@ -146,6 +154,20 @@
 	}
 
 	/**
+	 * Returns an object that represents the active workbook
+	 * @memberof Api
+	 * @returns {ApiWorkbook}
+	 */
+	Api.prototype.GetActiveWorkbook = function () {
+		return new ApiWorkbook(this.wbModel);
+	};
+	Object.defineProperty(Api.prototype, "ActiveWorkbook", {
+		get: function () {
+			return this.GetActiveWorkbook();
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -154,6 +176,11 @@
 		var index = this.wbModel.getActive();
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
 	};
+	Object.defineProperty(Api.prototype, "ActiveSheet", {
+		get: function () {
+			return this.GetActiveSheet();
+		}
+	});
 
 	/**
 	 * Returns an object that represents the active sheet
@@ -213,6 +240,15 @@
 	Api.prototype.CreateColorByName = function (presetColor) {
 		var rgb = AscFormat.mapPrstColor[presetColor];
 		return new ApiColor(AscCommonExcel.createRgbColor((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF));
+	};
+
+	/**
+	 * Create a sheet.
+	 * @memberof ApiWorkbook
+	 * @param {string} name
+	 */
+	ApiWorkbook.prototype.AddSheet = function (name) {
+		this.workbook.oApi.asc_addWorksheet(name);
 	};
 
 	/**
@@ -601,6 +637,11 @@
 	ApiRange.prototype.GetRow = function () {
 		return this.range.bbox.r1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Row", {
+		get: function () {
+			return this.GetRow();
+		}
+	});
 	/**
 	 * Get cell column
 	 * @memberof ApiRange
@@ -609,6 +650,11 @@
 	ApiRange.prototype.GetCol = function () {
 		return this.range.bbox.c1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Col", {
+		get: function () {
+			return this.GetCol();
+		}
+	});
 
 	/**
 	 * Set cell value
@@ -618,6 +664,11 @@
 	ApiRange.prototype.SetValue = function (value) {
 		this.range.setValue(value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Value", {
+		set: function (value) {
+			return this.SetValue(value);
+		}
+	});
 
 	/**
 	 * Set text color in the rgb format.
@@ -627,6 +678,11 @@
 	ApiRange.prototype.SetFontColor = function (color) {
 		this.range.setFontcolor(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontColor", {
+		set: function (color) {
+			return this.SetFontColor(color);
+		}
+	});
 
 	/**
 	 * Set font size
@@ -636,6 +692,11 @@
 	ApiRange.prototype.SetFontSize = function (size) {
 		this.range.setFontsize(size);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontSize", {
+		set: function (size) {
+			return this.SetFontSize(size);
+		}
+	});
 
 	/**
 	 * Set font name
@@ -645,6 +706,11 @@
 	ApiRange.prototype.SetFontName = function (name) {
 		this.range.setFontname(name);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontName", {
+		set: function (name) {
+			return this.SetFontName(name);
+		}
+	});
 
 	/**
 	 * Set align vertical
@@ -671,6 +737,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignVertical", {
+		set: function (value) {
+			return this.SetAlignVertical(value);
+		}
+	});
 
 	/**
 	 * Set align horizontal
@@ -701,6 +772,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignHorizontal", {
+		set: function (value) {
+			return this.SetAlignHorizontal(value);
+		}
+	});
 
 	/**
 	 * Set bold
@@ -710,6 +786,11 @@
 	ApiRange.prototype.SetBold = function (value) {
 		this.range.setBold(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Bold", {
+		set: function (value) {
+			return this.SetBold(value);
+		}
+	});
 
 	/**
 	 * Set italic
@@ -719,6 +800,11 @@
 	ApiRange.prototype.SetItalic = function (value) {
 		this.range.setItalic(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Italic", {
+		set: function (value) {
+			return this.SetItalic(value);
+		}
+	});
 
 	/**
 	 * Set underline
@@ -747,6 +833,11 @@
 		}
 		this.range.setUnderline(val);
 	};
+	Object.defineProperty(ApiRange.prototype, "Underline", {
+		set: function (value) {
+			return this.SetUnderline(value);
+		}
+	});
 
 	/**
 	 * Set strikeout
@@ -756,6 +847,11 @@
 	ApiRange.prototype.SetStrikeout = function (value) {
 		this.range.setStrikeout(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Strikeout", {
+		set: function (value) {
+			return this.SetStrikeout(value);
+		}
+	});
 
 	/**
 	 * Set wrap
@@ -765,6 +861,11 @@
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Wrap", {
+		set: function (value) {
+			return this.SetWrap(value);
+		}
+	});
 
 	/**
 	 * Set fill color in the rgb format.
@@ -774,6 +875,11 @@
 	ApiRange.prototype.SetFillColor = function (color) {
 		this.range.setFill(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FillColor", {
+		set: function (color) {
+			return this.SetFillColor(color);
+		}
+	});
 
 	/**
 	 * Set the number format.
@@ -783,6 +889,11 @@
 	ApiRange.prototype.SetNumberFormat = function (value) {
 		this.range.setNumFormat(value);
 	};
+	Object.defineProperty(ApiRange.prototype, "NumberFormat", {
+		set: function (value) {
+			return this.SetNumberFormat(value);
+		}
+	});
 
 	/**
 	 * Set border properties.
@@ -848,7 +959,6 @@
 	ApiRange.prototype.UnMerge = function () {
 		this.range.unmerge();
 	};
-
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -1228,12 +1338,15 @@
 	};
 
 
+	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
 	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
+
+	ApiWorkbook.prototype["AddSheet"] = ApiWorkbook.prototype.AddSheet;
 
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;

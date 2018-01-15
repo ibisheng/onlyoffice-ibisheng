@@ -1262,7 +1262,7 @@
 			var url = sUploadServiceLocalUrlOld + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
-				url += '/' + jwt;
+				url += '?token=' + encodeURIComponent(jwt);
 			}
 			var content = '<html><head></head><body><form action="' + url + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 			frameWindow.document.open();
@@ -1326,7 +1326,7 @@
 			var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
-				url += '/' + jwt;
+				url += '?token=' + encodeURIComponent(jwt);
 			}
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', url, true);
@@ -3078,7 +3078,7 @@
 			_drawer.ImageHtml.src = _drawer.Image;
 			_drawer = null;
 		};
-		window["AscDesktopEditor"]["OpenFilenameDialog"]("filter");
+		window["AscDesktopEditor"]["OpenFilenameDialog"]("images");
 	};
 
 	CSignatureDrawer.prototype.isValid = function()

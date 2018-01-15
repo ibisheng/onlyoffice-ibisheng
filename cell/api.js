@@ -294,7 +294,6 @@ var editor;
     // History & global counters
     History.init(wbModel);
 
-    g_oTableId.init();
     AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wbModel);
     AscCommonExcel.g_oUndoRedoWorksheet = new AscCommonExcel.UndoRedoWoorksheet(wbModel);
     AscCommonExcel.g_oUndoRedoWorkbook = new AscCommonExcel.UndoRedoWorkbook(wbModel);
@@ -667,7 +666,6 @@ var editor;
   };
 
   spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function() {
-    this.isChartEditor = true;
     this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
   };
 
@@ -2770,7 +2768,7 @@ var editor;
 		var t = this;
 		var changeSparkline = function (res) {
 			if (res) {
-				var changedSparkline = AscCommon.g_oTableId.Get_ById(id);
+				var changedSparkline = g_oTableId.Get_ById(id);
 				if (changedSparkline) {
 					History.Create_NewPoint();
 					History.StartTransaction();
@@ -3468,9 +3466,9 @@ var editor;
   };
 
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
-		History = AscCommon.History;
-
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
+		History = AscCommon.History;
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
 

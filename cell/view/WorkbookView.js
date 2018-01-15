@@ -1113,9 +1113,9 @@
       if (undefined !== ct.commentIndexes) {
         arrMouseMoveObjects.push(new asc_CMM({
           type: c_oAscMouseMoveType.Comment,
-          x: ct.commentCoords.asc_getLeftPX(),
-          reverseX: ct.commentCoords.asc_getReverseLeftPX(),
-          y: ct.commentCoords.asc_getTopPX(),
+          x: ct.commentCoords.dLeftPX,
+          reverseX: ct.commentCoords.dReverseLeftPX,
+          y: ct.commentCoords.dTopPX,
           aCommentIndexes: ct.commentIndexes
         }));
       }

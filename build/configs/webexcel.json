@@ -17,6 +17,7 @@
 		"../cell/utils/utils.js",
 		"../cell/view/HandlerList.js",
 		"../cell/model/CollaborativeEditing.js",
+		"../common/macros.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
 		"../word/apiCommon.js",

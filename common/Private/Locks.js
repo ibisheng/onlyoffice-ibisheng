@@ -670,9 +670,9 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 			bSelectedOnlyThis = oInfo.GetBlockLevelSdt() === this ? true : false;
 		}
 
-		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-			|| (AscCommonWord.sdtlock_SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
-			|| (AscCommonWord.sdtlock_ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
+		if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+			|| (c_oAscSdtLockType.SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
+			|| (c_oAscSdtLockType.ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
 		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 		}
@@ -685,8 +685,8 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 		}
 	}
 	else if (isCheckContentControlLock
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-		|| AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+		|| c_oAscSdtLockType.ContentLocked === nContentControlLock))
 	{
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 	}
@@ -704,7 +704,7 @@ CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
 	var nContentControlLock = this.GetContentControlLock();
 
 	if (false === AscCommon.CollaborativeEditing.IsNeedToSkipContentControlOnCheckEditingLock(this)
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock || c_oAscSdtLockType.ContentLocked === nContentControlLock))
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 
 	if (this.Parent && this.Parent.CheckContentControlEditingLock)
@@ -718,7 +718,7 @@ CBlockLevelSdt.prototype.CheckContentControlDeletingLock = function()
 
 	var nContentControlLock = this.GetContentControlLock();
 
-	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+	if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock || c_oAscSdtLockType.SdtLocked === nContentControlLock)
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 
 	this.Content.CheckContentControlEditingLock();
@@ -749,9 +749,9 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 			bSelectedOnlyThis = oInfo.GetInlineLevelSdt() === this ? true : false;
 		}
 
-		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-			|| (AscCommonWord.sdtlock_SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
-			|| (AscCommonWord.sdtlock_ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
+		if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+			|| (c_oAscSdtLockType.SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
+			|| (c_oAscSdtLockType.ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
 		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 		}
@@ -764,8 +764,8 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 		|| AscCommon.changestype_Document_Content === CheckType
 		|| AscCommon.changestype_Document_Content_Add === CheckType
 		|| AscCommon.changestype_Image_Properties === CheckType)
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-		|| AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+		|| c_oAscSdtLockType.ContentLocked === nContentControlLock))
 	{
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 	}

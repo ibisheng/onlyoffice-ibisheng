@@ -15385,7 +15385,7 @@ CDocument.prototype.RemoveContentControl = function(Id)
 	if (!oContentControl)
 		return;
 
-	if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType() && oContentControl.Parent)
+	if (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType() && oContentControl.Parent)
 	{
 		this.RemoveSelection();
 		var oDocContent = oContentControl.Parent;
@@ -15412,7 +15412,7 @@ CDocument.prototype.RemoveContentControl = function(Id)
 			oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.Get_ElementsCount() - 1, nCurPos - 1));
 		}
 	}
-	else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+	else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
 	{
 		this.SelectContentControl(Id);
 		this.RemoveBeforePaste();
@@ -15444,8 +15444,8 @@ CDocument.prototype.ClearContentControl = function(Id)
 	this.RemoveSelection();
 
 	if (oContentControl.GetContentControlType
-		&& (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType()
-		|| AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType()))
+		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
+		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
 	{
 		oContentControl.ClearContentControl();
 		oContentControl.SetThisElementCurrent();
