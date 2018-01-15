@@ -4922,6 +4922,9 @@ CPresentation.prototype =
                                         oDocContentForDraw.MoveDrawing = bOldVal;
 
 
+                                        if(oDocContentForDraw.Content.length > 1 && oDocContentForDraw.Content[oDocContentForDraw.Content.length - 1].IsEmpty()){
+                                            oDocContentForDraw.Content.splice(oDocContentForDraw.Content.length - 1, 1);
+                                        }
                                         oDocContentForDraw.Reset(0, 0, 20000, 20000);
                                         oDocContentForDraw.Recalculate_Page(0, true);
                                         aParagraphs = oDocContentForDraw.Content;
