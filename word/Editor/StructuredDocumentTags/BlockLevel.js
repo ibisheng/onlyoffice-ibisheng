@@ -998,6 +998,13 @@ CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 {
 	return this.Parent.IsTableFirstRowOnNewPage();
 };
+CBlockLevelSdt.prototype.GetTableOfContents = function(isCheckFields)
+{
+	if (this.IsBuiltInTableOfContents())
+		return this;
+
+	return this.Content.GetTableOfContents(isCheckFields);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()
 {

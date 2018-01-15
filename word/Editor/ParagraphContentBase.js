@@ -198,6 +198,15 @@ CParagraphContentBase.prototype.RemoveTabsForTOC = function(isTab)
 {
 	return isTab;
 };
+/**
+ * Ищем сложное поле заданного типа
+ * @param nType
+ * @returns {?CComplexField}
+ */
+CParagraphContentBase.prototype.GetComplexField = function(nType)
+{
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -1721,6 +1730,16 @@ CParagraphContentWithParagraphLikeContent.prototype.AddToContent = function(nPos
 CParagraphContentWithParagraphLikeContent.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
 {
 	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetComplexField = function(nType)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetComplexField(nType);
+		if (oResult)
+			return oResult;
+	}
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета

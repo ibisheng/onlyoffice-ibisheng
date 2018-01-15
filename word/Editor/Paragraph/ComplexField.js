@@ -352,7 +352,7 @@ CComplexField.prototype.SetSeparateChar = function(oChar)
 	this.SeparateChar = oChar;
 	this.EndChar      = null;
 };
-CComplexField.prototype.Update = function()
+CComplexField.prototype.Update = function(isCreateHistoryPoint)
 {
 	this.private_UpdateInstruction();
 
@@ -361,10 +361,13 @@ CComplexField.prototype.Update = function()
 
 	this.SelectFieldValue();
 
-	if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-		return;
+	if (true === isCreateHistoryPoint)
+	{
+		if (true === this.LogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+			return;
 
-	this.LogicDocument.Create_NewHistoryPoint();
+		this.LogicDocument.Create_NewHistoryPoint();
+	}
 
 	switch (this.Instruction.GetType())
 	{
@@ -829,6 +832,18 @@ CComplexField.prototype.MoveCursorOutsideElement = function(isBefore)
 		if (oRun.IsCursorAtEnd())
 			oRun.MoveCursorOutsideElement(false);
 	}
+};
+CComplexField.prototype.RemoveField = function()
+{
+	if (!this.IsValid())
+		return;
+
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
+
+	this.SelectField();
+	oDocument.Remove();
 };
 
 

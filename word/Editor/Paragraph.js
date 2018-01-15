@@ -12527,6 +12527,20 @@ Paragraph.prototype.private_CheckUpdateBookmarks = function(Items)
 		}
 	}
 };
+Paragraph.prototype.GetTableOfContents = function(isCheckFields)
+{
+	if (true !== isCheckFields)
+		return null;
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetComplexField(fieldtype_TOC);
+		if (oResult)
+			return oResult;
+	}
+
+	return null;
+};
 Paragraph.prototype.AddBookmarkForTOC = function()
 {
 	if (!this.LogicDocument)

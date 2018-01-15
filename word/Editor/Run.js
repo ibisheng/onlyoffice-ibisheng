@@ -9857,6 +9857,28 @@ ParaRun.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
 {
 	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
 };
+ParaRun.prototype.GetComplexField = function(nType)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var oItem = this.Content[nPos];
+
+		if (para_FieldChar === oItem.Type && oItem.IsBegin())
+		{
+			var oComplexField = oItem.GetComplexField();
+			if (!oComplexField)
+				continue;
+
+			var oInstruction = oComplexField.GetInstruction();
+			if (!oInstruction)
+				continue;
+
+			if (nType === oInstruction.GetType())
+				return oComplexField;
+		}
+	}
+	return null;
+};
 
 function CParaRunStartState(Run)
 {

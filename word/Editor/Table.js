@@ -12961,6 +12961,21 @@ CTable.prototype.GetSummaryHeight = function()
 
 	return nSum;
 };
+CTable.prototype.GetTableOfContents = function(isCheckFields)
+{
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oResult = oRow.GetCell(nCurCell).Content.GetTableOfContents(isCheckFields);
+			if (oResult)
+				return oResult;
+		}
+	}
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

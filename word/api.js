@@ -7710,6 +7710,49 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onDocumentOutlineUpdateRemove", nIndex);
 	};
 
+	asc_docs_api.prototype.asc_AddTableOfContents = function(sHeading)
+	{
+		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading);
+	};
+	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var oTOC = oLogicDocument.GetTableOfContents();
+		if (!oTOC)
+			return;
+
+		if (oTOC instanceof CBlockLevelSdt)
+		{
+			this.asc_RemoveContentControl(oTOC.GetId());
+		}
+		else if (oTOC instanceof CComplexField)
+		{
+			this.asc_RemoveComplexField(oTOC);
+		}
+	};
+
+	asc_docs_api.prototype.asc_RemoveComplexField = function(oComplexField)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oComplexField || !oLogicDocument)
+			return;
+
+		oComplexField.SelectField();
+		if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Remove))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveComplexField);
+
+			oComplexField.RemoveField();
+
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
+	};
+
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
 	{

@@ -818,6 +818,15 @@ CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
 CDocumentContentElementBase.prototype.UpdateBookmarks = function(oManager)
 {
 };
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentElementBase.prototype.GetTableOfContents = function(isCheckFields)
+{
+	return null;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

@@ -959,3 +959,19 @@ CDocumentContentBase.prototype.RemoveFromContent = function(nPos, nCount)
 
 	this.Remove_FromContent(nPos, nCount);
 };
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentBase.prototype.GetTableOfContents = function(isCheckFields)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetTableOfContents(isCheckFields);
+		if (oResult)
+			return oResult;
+	}
+
+	return null;
+};
