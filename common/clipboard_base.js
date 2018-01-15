@@ -950,7 +950,7 @@
 				this.Special_Paste_End();
 				//TODO только для презентаций! проверить на остальных редакторах!
 				if(this.buttonInfo){
-					this.buttonInfo.options = [];
+					this.buttonInfo.asc_setOptions(null);
 					this.Api.asc_ShowSpecialPasteButton(this.buttonInfo);
 				}
 			}
@@ -1068,7 +1068,7 @@
 
 		CleanButtonInfo: function()
 		{
-			this.buttonInfo = new Asc.SpecialPasteShowOptions();
+			this.buttonInfo.clean();
 		}
 	};
 

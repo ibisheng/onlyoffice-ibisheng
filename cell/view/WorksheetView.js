@@ -8855,7 +8855,7 @@
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.options = allowedSpecialPasteProps;
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.asc_setOptions(allowedSpecialPasteProps);
 			window['AscCommon'].g_specialPasteHelper.buttonInfo.range = selectData[0];
 		}
 		else
@@ -9973,6 +9973,8 @@
 				specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 				range = specialPasteShowOptions.range;
 
+				specialPasteShowOptions.options = [];
+
 				var curShape = isIntoShape.Parent.parent;
 				
 				var asc_getcvt = Asc.getCvtRatio;
@@ -9998,6 +10000,8 @@
 		else if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
 			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
+			specialPasteShowOptions.options = [];
+
 			if(changeActiveRange)
 			{
 				specialPasteShowOptions.range = changeActiveRange;

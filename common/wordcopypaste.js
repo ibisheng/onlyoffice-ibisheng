@@ -2408,25 +2408,23 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo ? window['AscCommon'].g_specialPasteHelper.buttonInfo : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 			if(window['AscCommon'].g_specialPasteHelper.buttonInfo)
 			{
-				window['AscCommon'].g_specialPasteHelper.buttonInfo = null;
+				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
 			return;
 		}
 
+		var specialPasteShowOptions = !window['AscCommon'].g_specialPasteHelper.buttonInfo.isClean() ? window['AscCommon'].g_specialPasteHelper.buttonInfo : null;
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
 			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 
 			var sProps = Asc.c_oSpecialPasteProps;
-
-			var curDocSelection = this.curDocSelection;
 			var aContent = this.aContent;
 
 			var props = null;
@@ -9042,12 +9040,13 @@ function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAd
 
 function SpecialPasteShowOptions()
 {
-	this.options = [];
+	this.options = null;
 	this.cellCoord = null;
 
 	this.range = null;
 	this.shapeId = null;
 	this.fixPosition = null;
+	this.position = null;
 }
 
 SpecialPasteShowOptions.prototype = {
@@ -9061,10 +9060,24 @@ SpecialPasteShowOptions.prototype = {
 		return res;
 	},
 
+	clean: function() {
+		this.options = null;
+		this.cellCoord = null;
+
+		this.range = null;
+		this.shapeId = null;
+		this.fixPosition = null;
+		this.position = null;
+	},
+
 	asc_setCellCoord: function (val) {
 		this.cellCoord = val;
 	}, asc_setOptions: function (val) {
-		this.options = val;
+		if(val === null) {
+			this.options = [];
+		} else {
+			this.options = val;
+		}
 	},
 
 	asc_getCellCoord: function () {
