@@ -2422,7 +2422,7 @@ PasteProcessor.prototype =
 
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
-			specialPasteShowOptions = new SpecialPasteShowOptions();
+			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 
 			var sProps = Asc.c_oSpecialPasteProps;
 
@@ -2460,10 +2460,8 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				specialPasteShowOptions = null;
+				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
-
-			window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -3062,9 +3060,8 @@ PasteProcessor.prototype =
 		}
 		var screenPos = window["editor"].WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
 
-		var specialPasteShowOptions = new SpecialPasteShowOptions();
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -9047,16 +9044,34 @@ function SpecialPasteShowOptions()
 {
 	this.options = [];
 	this.cellCoord = null;
+
+	this.range = null;
+	this.shapeId = null;
+	this.fixPosition = null;
 }
 
 SpecialPasteShowOptions.prototype = {
 	constructor: SpecialPasteShowOptions,
-	
-	asc_setCellCoord : function(val) { this.cellCoord = val; },
-	asc_setOptions : function(val) { this.options = val; },
-	
-	asc_getCellCoord : function() { return this.cellCoord; },
-	asc_getOptions : function(val) { return this.options; }
+
+	isClean: function() {
+		var res = false;
+		if(null === this.options && null === this.cellCoord && null === this.range && null === this.shapeId && null === this.fixPosition) {
+			res = true;
+		}
+		return res;
+	},
+
+	asc_setCellCoord: function (val) {
+		this.cellCoord = val;
+	}, asc_setOptions: function (val) {
+		this.options = val;
+	},
+
+	asc_getCellCoord: function () {
+		return this.cellCoord;
+	}, asc_getOptions: function (val) {
+		return this.options;
+	}
 };
 
   //---------------------------------------------------------export---------------------------------------------------

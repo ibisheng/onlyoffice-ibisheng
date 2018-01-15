@@ -897,7 +897,7 @@
 		this.specialPasteProps = null;
 
 		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-		this.buttonInfo = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+		this.buttonInfo = new Asc.SpecialPasteShowOptions();//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
 
 		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
 		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
@@ -1068,7 +1068,7 @@
 
 		CleanButtonInfo: function()
 		{
-			this.buttonInfo = {};
+			this.buttonInfo = new Asc.SpecialPasteShowOptions();
 		}
 	};
 

@@ -58,22 +58,6 @@
 				return n;
 			return "rgb(" + (n >> 16 & 0xFF) + "," + (n >> 8 & 0xFF) + "," + (n & 0xFF) + ")";
 		}
-		//TODO убрать дубликат!!!
-		function SpecialPasteShowOptions()
-		{
-			this.options = [];
-			this.cellCoord = null;
-		}
-
-		SpecialPasteShowOptions.prototype = {
-			constructor: SpecialPasteShowOptions,
-			
-			asc_setCellCoord : function(val) { this.cellCoord = val; },
-			asc_setOptions : function(val) { this.options = val; },
-			
-			asc_getCellCoord : function() { return this.cellCoord; },
-			asc_getOptions : function(val) { return this.options; }
-		};
 		
 		function CSpecialPasteProps()
 		{
@@ -4316,11 +4300,5 @@
 		window["Asc"]["SpecialPasteProps"]       = window["Asc"].SpecialPasteProps = CSpecialPasteProps;
 		prot									 = CSpecialPasteProps.prototype;
 		prot["asc_setProps"]				     = prot.asc_setProps;
-		
-		//TODO убрать дубликат(в wordcopypaste такая же функция)
-		window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
-		prot									 = SpecialPasteShowOptions.prototype;
-		prot["asc_getCellCoord"]				 = prot.asc_getCellCoord;
-		prot["asc_getOptions"]					 = prot.asc_getOptions;
 	}
 )(jQuery, window);
