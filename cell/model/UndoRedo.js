@@ -1822,6 +1822,13 @@ function (window, undefined) {
 				cell.setPivotButton(Val);
 			} else if (AscCH.historyitem_Cell_Style == Type) {
 				cell.setCellStyle(Val);
+			} else if (AscCH.historyitem_Cell_RemoveSharedFormula == Type) {
+				if (null !== Val && bUndo) {
+					var parsed = ws.workbook.workbookFormulas.get(Val);
+					if (parsed) {
+						cell.setFormulaParsed(parsed);
+					}
+				}
 			}
 		});
 	};
@@ -2581,6 +2588,41 @@ function (window, undefined) {
 		}
 	};
 
+	function UndoRedoSharedFormula(wb) {
+		this.wb = wb;
+		this.nType = UndoRedoClassTypes.Add(function () {
+			return AscCommonExcel.g_oUndoRedoSharedFormula;
+		});
+	}
+
+	UndoRedoSharedFormula.prototype.getClassType = function () {
+		return this.nType;
+	};
+	UndoRedoSharedFormula.prototype.Undo = function (Type, Data, nSheetId, opt_wb) {
+		this.UndoRedo(Type, Data, nSheetId, true, opt_wb);
+	};
+	UndoRedoSharedFormula.prototype.Redo = function (Type, Data, nSheetId, opt_wb) {
+		this.UndoRedo(Type, Data, nSheetId, false, opt_wb);
+	};
+	UndoRedoSharedFormula.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo, opt_wb) {
+		var wb = opt_wb ? opt_wb : this.wb;
+		var parsed = wb.workbookFormulas.get(Data.index);
+		if (parsed && bUndo) {
+			var val = bUndo ? Data.oOldVal : Data.oNewVal;
+			if (AscCH.historyitem_SharedFormula_ChangeFormula == Type) {
+				parsed.removeDependencies();
+				parsed.setFormula(val);
+				wb.dependencyFormulas.addToBuildDependencyShared(parsed);
+			} else if (AscCH.historyitem_SharedFormula_ChangeShared == Type) {
+				parsed.removeDependencies();
+				if (val) {
+					parsed.setSharedRef(val);
+					parsed.buildDependencies();
+				}
+			}
+		}
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
@@ -2611,6 +2653,7 @@ function (window, undefined) {
 	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
 	window['AscCommonExcel'].UndoRedoSparklines = UndoRedoSparklines;
 	window['AscCommonExcel'].UndoRedoPivotTables = UndoRedoPivotTables;
+	window['AscCommonExcel'].UndoRedoSharedFormula = UndoRedoSharedFormula;
 
 	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
 	window['AscCommonExcel'].g_oUndoRedoCell = null;
@@ -2621,4 +2664,5 @@ function (window, undefined) {
 	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
 	window['AscCommonExcel'].g_oUndoRedoSparklines = null;
 	window['AscCommonExcel'].g_oUndoRedoPivotTables = null;
+	window['AscCommonExcel'].g_oUndoRedoSharedFormula = null;
 })(window);
