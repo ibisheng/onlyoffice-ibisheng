@@ -192,7 +192,7 @@
 			{
 				var _frame = document.getElementById(this.runnedPluginsMap[guid].frameId);
 				if (_frame)
-					_iframe.contentWindow.postMessage(data, "*");
+					_frame.contentWindow.postMessage(data, "*");
 			}
 		},
 		getPluginByGuid : function(guid)
