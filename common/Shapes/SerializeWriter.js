@@ -4781,7 +4781,9 @@ function CBinaryFileWriter()
 
             var _writer = this.BinaryFileWriter;
             _writer.StartRecord(0);
+            _writer.StartRecord(0);
             _writer.WriteClrMapOvr(clrMapOverride);
+            _writer.EndRecord();
             _writer.EndRecord();
 
             if (this.BinaryFileWriter.UseContinueWriter)
