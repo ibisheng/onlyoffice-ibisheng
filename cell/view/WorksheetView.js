@@ -10777,11 +10777,10 @@
         if (width > 0) {
             pad = this.width_padding * 2 + this.width_1px;
             cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
-            cw = this.model.charCountToModelColWidth(cc);
         } else {
-            cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;
             cc = this.defaultColWidthChars;
         }
+		cw = this.model.charCountToModelColWidth(cc);
 
         if (cc === oldColWidth || (onlyIfMore && cc < oldColWidth)) {
             return -1;
