@@ -9070,19 +9070,33 @@ SpecialPasteShowOptions.prototype = {
 		this.position = null;
 	},
 
+	setRange: function(val) {
+		this.range = val;
+	},
+	setShapeId: function(val) {
+		this.shapeId = val;
+	},
+	setFixPosition: function(val) {
+		this.fixPosition = val;
+	},
+	setPosition: function(val) {
+		this.position = val;
+	},
+
 	asc_setCellCoord: function (val) {
 		this.cellCoord = val;
-	}, asc_setOptions: function (val) {
+	},
+	asc_setOptions: function (val) {
 		if(val === null) {
 			this.options = [];
 		} else {
 			this.options = val;
 		}
 	},
-
 	asc_getCellCoord: function () {
 		return this.cellCoord;
-	}, asc_getOptions: function (val) {
+	},
+	asc_getOptions: function (val) {
 		return this.options;
 	}
 };

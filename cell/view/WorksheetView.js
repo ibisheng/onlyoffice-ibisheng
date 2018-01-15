@@ -8856,7 +8856,7 @@
 			}
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			window['AscCommon'].g_specialPasteHelper.buttonInfo.asc_setOptions(allowedSpecialPasteProps);
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.range = selectData[0];
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(selectData[0]);
 		}
 		else
 		{
@@ -9945,7 +9945,7 @@
 		if(!positionShapeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.range = range;
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(range);
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9973,7 +9973,7 @@
 				specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 				range = specialPasteShowOptions.range;
 
-				specialPasteShowOptions.options = [];
+				specialPasteShowOptions.asc_setOptions(null);
 
 				var curShape = isIntoShape.Parent.parent;
 				
@@ -10000,11 +10000,11 @@
 		else if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
 			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
-			specialPasteShowOptions.options = [];
+			specialPasteShowOptions.asc_setOptions(null);
 
 			if(changeActiveRange)
 			{
-				specialPasteShowOptions.range = changeActiveRange;
+				specialPasteShowOptions.setRange(changeActiveRange);
 			}
 
 			range = specialPasteShowOptions.range;

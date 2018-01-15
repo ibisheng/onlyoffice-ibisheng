@@ -1638,9 +1638,9 @@
 
 					window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 					window['AscCommon'].g_specialPasteHelper.buttonInfo.asc_setOptions(allowedSpecialPasteProps);
-					window['AscCommon'].g_specialPasteHelper.buttonInfo.position = position;
-					window['AscCommon'].g_specialPasteHelper.buttonInfo.range = cursorPos;
-					window['AscCommon'].g_specialPasteHelper.buttonInfo.shapeId = isIntoShape.Id;
+					window['AscCommon'].g_specialPasteHelper.buttonInfo.setPosition(position);
+					window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(cursorPos);
+					window['AscCommon'].g_specialPasteHelper.buttonInfo.setShapeId(isIntoShape.Id);
 				}
 			},
 
@@ -1942,7 +1942,7 @@
 						var lastAddedImg = ws.model.Drawings[ws.model.Drawings.length - 1];
 						if(drawingObject && lastAddedImg)
 						{
-							window['AscCommon'].g_specialPasteHelper.buttonInfo.range = {r1: lastAddedImg.from.row, c1: lastAddedImg.from.col, r2: lastAddedImg.to.row, c2: lastAddedImg.to.col};
+							window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange({r1: lastAddedImg.from.row, c1: lastAddedImg.from.col, r2: lastAddedImg.to.row, c2: lastAddedImg.to.col});
 						}
 					}
 				}
