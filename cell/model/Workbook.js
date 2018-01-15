@@ -2406,6 +2406,19 @@
 		var px = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 		return px * Asc.getCvtRatio(0, 1, 96);
 	};
+	/**
+	 * Вычисляет количество символов по ширине столбца
+	 * @param {Number} w  Ширина столбца в пунктах
+	 * @returns {Number}  Количество символов
+	 */
+	Workbook.prototype.colWidthToCharCount = function (w) {
+		var px = w * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
+		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
+		return px < pxInOneCharacter ?
+			(1 - asc_floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
+			asc_floor((px - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
+	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {
 			return ascName;
@@ -3585,6 +3598,9 @@
 	};
 	Worksheet.prototype.modelColWidthToColWidth = function (mcw) {
 		return this.workbook.modelColWidthToColWidth(mcw);
+	};
+	Worksheet.prototype.colWidthToCharCount = function (w) {
+		return this.workbook.colWidthToCharCount(w);
 	};
 	Worksheet.prototype.getColWidth=function(index){
 		//index 0 based

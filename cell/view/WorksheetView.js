@@ -755,7 +755,7 @@
         if (w === t.cols[col].width) {
             return;
         }
-        var cc = Math.min(t._colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
+        var cc = Math.min(this.model.colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
 
         var onChangeWidthCallback = function (isSuccess) {
             if (false === isSuccess) {
@@ -1208,8 +1208,8 @@
         this.defaultColWidthPx = this.model.modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
         this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
-        this.defaultColWidthChars =
-          this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
+		this.defaultColWidthChars =
+			this.model.colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
         AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
         this.defaultColWidth = this.model.modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
@@ -1303,18 +1303,6 @@
     };
 
     /**
-     * Вычисляет количество символов по ширине столбца
-     * @param {Number} w  Ширина столбца в пунктах
-     * @returns {Number}  Количество символов
-     */
-    WorksheetView.prototype._colWidthToCharCount = function ( w ) {
-        var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
-        var pxInOneCharacter = this.maxDigitWidth + this.settings.cells.paddingPlusBorder;
-        // Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-        return px < pxInOneCharacter ? (1 - asc_floor( 100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999 ) / 100) : asc_floor( (px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5 ) / 100;
-    };
-
-    /**
      * Вычисляет ширину столбца для отрисовки
      * @param {Number} w  Ширина столбца в символах
      * @returns {Number}  Ширина столбца в пунктах (pt)
@@ -1327,7 +1315,7 @@
         res.width =
           useDefault ? t.defaultColWidth : (width = t.model.modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
         res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
-        res.charCount = t._colWidthToCharCount( res.width );
+		res.charCount = this.model.colWidthToCharCount(res.width);
         return res;
     };
 
@@ -3975,7 +3963,7 @@
 
         return new asc_CMM( {
             type      : Asc.c_oAscMouseMoveType.ResizeColumn,
-            sizeCCOrPt: this._colWidthToCharCount( widthPt ),
+            sizeCCOrPt: this.model.colWidthToCharCount(widthPt),
             sizePx    : widthPt * 96 / 72,
             x         : (x1 + this.cols[col].width) * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ),
             y         : this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() )
@@ -4193,7 +4181,7 @@
     };
 
     WorksheetView.prototype._changeColWidth = function (col, width, pad) {
-        var cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
+        var cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
         var modelw = this.model.charCountToModelColWidth(cc);
         var colw = this._calcColWidth(modelw);
 
@@ -10786,7 +10774,7 @@
         var pad, cc, cw;
         if (width > 0) {
             pad = this.width_padding * 2 + this.width_1px;
-            cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
+            cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
             cw = this.model.charCountToModelColWidth(cc);
         } else {
             cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;

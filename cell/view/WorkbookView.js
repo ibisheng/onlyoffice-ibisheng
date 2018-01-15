@@ -99,8 +99,7 @@
     this.cells = {
       defaultState: {
         background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
-      }, padding: -1, /*px horizontal padding*/
-      paddingPlusBorder: -1
+      }, padding: -1 /*px horizontal padding*/
     };
     this.activeCellBorderColor = new CColor(72, 121, 92);
     this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
@@ -2677,7 +2676,7 @@
 
     // Padding рассчитывается исходя из maxDigitWidth (http://social.msdn.microsoft.com/Forums/en-US/9a6a9785-66ad-4b6b-bb9f-74429381bd72/margin-padding-in-cell-excel?forum=os_binaryfile)
     this.defaults.worksheetView.cells.padding = Math.max(asc.ceil(this.maxDigitWidth / 4), 2);
-    this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
+    this.model.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
 	WorkbookView.prototype.getPivotMergeStyle = function (sheetMergedStyles, range, style, pivot) {
