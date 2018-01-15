@@ -2412,12 +2412,12 @@
 	 * @returns {Number}  Количество символов
 	 */
 	Workbook.prototype.colWidthToCharCount = function (w) {
-		var px = w * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+		var px = w * Asc.getCvtRatio(1/*pt*/, 0/*px*/, 96);
 		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
 		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
 		return px < pxInOneCharacter ?
-			(1 - asc_floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
-			asc_floor((px - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
+			(1 - Asc.floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
+			Asc.floor((px - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {

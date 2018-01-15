@@ -205,7 +205,7 @@
 		}
 
 		function calcDecades(num) {
-			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(asc_floor(num * 0.1));
+			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(floor(num * 0.1));
 		}
 
 		// Определяет времени работы функции
