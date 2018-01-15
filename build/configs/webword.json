@@ -19,6 +19,7 @@
 		"../word/apiDefines.js",
 		"../common/CollaborativeEditingBase.js",
 		"../word/Editor/CollaborativeEditing.js",
+		"../common/macros.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
 		"../word/apiCommon.js",

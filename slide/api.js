@@ -181,7 +181,7 @@
 			this.Height          = undefined;
 			this.Position        = undefined;
 			this.Locked          = false;
-			this.lockAspect      = false;
+			this.lockAspect      = undefined;
 			this.ChartProperties = new AscCommon.asc_ChartSettings();
 
 			this.severalCharts      = false;
@@ -1036,11 +1036,47 @@
 
         var t = this;
         if (window["AscDesktopEditor"]) {
-            this.SpellCheckApi.spellCheck = function (spellData) {
+			this.SpellCheckApi.spellCheck = function (spellData) {
                 window["AscDesktopEditor"]["SpellCheck"](spellData);
             };
             this.SpellCheckApi.disconnect = function () {
             };
+			if (window["AscDesktopEditor"]["IsLocalFile"] && !window["AscDesktopEditor"]["IsLocalFile"]())
+			{
+				this.sendEvent('asc_onSpellCheckInit', [
+					"1027",
+					"1029",
+					"1030",
+					"1031",
+					"1032",
+					"1033",
+					"1036",
+					"1038",
+					"1040",
+					"1042",
+					"1043",
+					"1044",
+					"1045",
+					"1046",
+					"1048",
+					"1049",
+					"1051",
+					"1053",
+					"1055",
+					"1058",
+					"1062",
+					"1063",
+					"1066",
+					"1068",
+					"2055",
+					"2057",
+					"2068",
+					"2070",
+					"3079",
+					"3081",
+					"3082"
+				]);
+			}
         } else {
             if (this.SpellCheckUrl && this.isSpellCheckEnable) {
                 this.SpellCheckApi.set_url(this.SpellCheckUrl);
@@ -4409,7 +4445,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		if (this.WordControl.IsFocus != value)
+		if (this.WordControl && this.WordControl.IsFocus != value)
 		{
 			this.WordControl.IsFocus = value;
 			this.sendEvent("asc_onEnableKeyEventsChanged", value);
@@ -6532,11 +6568,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype._onEndLoadSdk  = function()
 	{
+		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
 		History           = AscCommon.History;
 		PasteElementsId   = AscCommon.PasteElementsId;
 		global_mouseEvent = AscCommon.global_mouseEvent;
 
-		g_oTableId.init();
 		this.WordControl      = new AscCommonSlide.CEditorPage(this);
 		this.WordControl.Name = this.HtmlElementName;
 
@@ -6586,8 +6623,6 @@ background-repeat: no-repeat;\
 		}
 
 		this.asc_setViewMode(this.isViewMode);
-
-		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		if (this.isReporterMode)
 		{

@@ -1832,6 +1832,8 @@
                     newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
                     newPagePrint.pageHeight =
                       newPagePrint.pageClipRectHeight * vector_koef + (pageTopField + pageBottomField);
+                } else {
+					newPagePrint.pageClipRectHeight = Math.min(currentHeight, newPagePrint.pageClipRectHeight);
                 }
 
                 // Нужно будет пересчитывать колонки

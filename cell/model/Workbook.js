@@ -1797,10 +1797,6 @@
 			var oVisibleWs = null;
 			this.aWorksheets.splice(nIndex, 1);
 			delete this.aWorksheetsById[removedSheetId];
-			//buildDependencies after move sheet for cArea3d
-			for (var i = 0; i < collectDependencies.length; ++i) {
-				collectDependencies[i].buildDependencies();
-			}
 			if (nIndex == this.getActive()) {
 				oVisibleWs = this.findSheetNoHidden(nIndex);
 				if (null != oVisibleWs)
@@ -1816,6 +1812,10 @@
 				outputParams.sheet = removedSheet;
 			}
 			this._updateWorksheetIndexes(wsActive);
+			//buildDependencies after move sheet and _updateWorksheetIndexes for cArea3d
+			for (var i = 0; i < collectDependencies.length; ++i) {
+				collectDependencies[i].buildDependencies();
+			}
 			this.dependencyFormulas.unlockRecal();
 			return wsActive.getIndex();
 		}

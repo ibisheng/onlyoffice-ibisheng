@@ -47,6 +47,9 @@
 	/** @constructor */
 	function baseEditorsApi(config, editorId)
 	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["CreateEditorApi"]();
+
 		this.editorId      = editorId;
 		this.isLoadFullApi = false;
 		this.openResult    = null;
@@ -177,6 +180,8 @@
 
 		this.currentPassword = "";
 
+		this.macros = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -291,7 +296,12 @@
 			}
 		}
 
-		if (AscCommon.offlineMode === this.documentUrl)
+		if (AscCommon.chartMode === this.documentUrl)
+		{
+			this.isChartEditor = true;
+			this.DocInfo.put_OfflineApp(true);
+		}
+		else if (AscCommon.offlineMode === this.documentUrl)
 		{
 			this.DocInfo.put_OfflineApp(true);
 		}
@@ -482,6 +492,9 @@
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
 		this._OfflineAppDocumentEndLoad();
+	};
+	baseEditorsApi.prototype._OfflineAppDocumentEndLoad        = function()
+	{
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
@@ -1146,7 +1159,14 @@
 		{
 			if (this.DocInfo.get_OfflineApp())
 			{
-				this._OfflineAppDocumentStartLoad();
+				if (this.editorId === c_oEditorId.Spreadsheet && this.isChartEditor)
+				{
+					this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
+				}
+				else
+				{
+					this._OfflineAppDocumentStartLoad();
+				}
 			}
 			this.onEndLoadFile(null);
 		}
@@ -1166,6 +1186,8 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		AscCommon.g_oTableId.init();
+
 		// init drag&drop
 		var t = this;
 		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
@@ -1196,6 +1218,8 @@
 		if (!window['IS_NATIVE_EDITOR']) {
 			setInterval(function() {t._autoSave();}, 40);
 		}
+
+		this.macros = new AscCommon.CDocumentMacros();
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1405,6 +1429,16 @@
 			_elem = null;
             AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
 		}
+	};
+
+	baseEditorsApi.prototype["pluginMethod_GetMacros"] = function()
+	{
+		return this.asc_getMacros();
+	};
+
+	baseEditorsApi.prototype["pluginMethod_SetMacros"] = function(data)
+	{
+		return this.asc_setMacros(data);
 	};
 
 	// Builder
@@ -1755,6 +1789,45 @@
 	{
 		this.currentPassword = "";
 		this.asc_Save(false);
+	};
+
+	baseEditorsApi.prototype.asc_setMacros = function(sData)
+	{
+		if (!this.macros)
+			return true;
+
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return true;
+
+		AscCommon.CollaborativeEditing.OnStart_CheckLock();
+		this.macros.CheckLock();
+
+		if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
+		{
+			var locker = Asc.editor.wb.getWorksheet().objectRender.objectLocker;
+			locker.addObjectId(this.macros.Get_Id());
+
+			var _this = this;
+			locker.checkObjects(function(bNoLock) {
+				if (bNoLock)
+				{
+					AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+					_this.macros.SetData(sData);
+				}
+			});
+		}
+		else
+		{
+			if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+			{
+				AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+				this.macros.SetData(sData);
+			}
+		}
+	};
+	baseEditorsApi.prototype.asc_getMacros = function()
+	{
+		return this.macros.GetData();
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

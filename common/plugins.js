@@ -101,6 +101,21 @@
 
 	CPluginsManager.prototype =
 	{
+		unregisterAll : function()
+		{
+			// удаляем все, кроме запущенного
+			var i = 0;
+			for (i = 0; i < this.plugins.length; i++)
+			{
+				if (!this.runnedPluginsMap[this.plugins[i].guid])
+				{
+					delete this.pluginsMap[this.plugins[i].guid];
+					this.plugins.splice(i, 1);
+					i--;
+				}
+			}
+		},
+
 		register : function(basePath, plugins)
 		{
 			this.path = basePath;

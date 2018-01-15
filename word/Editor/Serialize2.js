@@ -4250,7 +4250,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         var oThis = this;
         this.bs.WriteItemWithLength(function(){oThis.WriteDocumentContent(oThis.Document, true);});
     };
-    this.WriteDocumentContent = function(oDocument, bSectPr)
+    this.WriteDocumentContent = function(oDocument, bIsMainDoc)
     {
         var Content = oDocument.Content;
         var oThis = this;
@@ -4273,12 +4273,18 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.bs.WriteItemWithLength(function(){oThis.WriteSdt(item, 0);});
 			}
         }
-        if(true == bSectPr)
+        if(bIsMainDoc)
         {
             //sectPr
             this.bs.WriteItem(c_oSerParType.sectPr, function(){oThis.bpPrs.WriteSectPr(oThis.Document.SectPr, oThis.Document);});
 			if (oThis.Document.Background) {
 				this.bs.WriteItem(c_oSerParType.Background, function(){oThis.WriteBackground(oThis.Document.Background);});
+			}
+			var macros = this.Document.DrawingDocument.m_oWordControl.m_oApi.macros.GetData();
+			if (macros) {
+				this.bs.WriteItem(c_oSerParType.JsaProject, function() {
+					oThis.memory.WriteXmlString(macros);
+				});
 			}
 		}
     };
@@ -9296,6 +9302,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			// res = this.bcr.Read2(length, function(t, l){
 				// return oThis.ReadBackground(t,l, oThis.Document.Background);
 			// });
+		} else if (c_oSerParType.JsaProject === type) {
+			this.Document.DrawingDocument.m_oWordControl.m_oApi.macros.SetData(AscCommon.GetStringUtf8(this.stream, length));
 		} else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -10022,6 +10030,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
                 {
                     oParaDrawing.GraphicObj = null;
                 }
+            }
+            if(AscCommon.isRealObject(oParaDrawing.docPr) && oParaDrawing.docPr.isHidden)
+            {
+                oParaDrawing.GraphicObj = null;
             }
             if(oParaDrawing.GraphicObj)
             {

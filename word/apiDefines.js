@@ -206,6 +206,20 @@ var c_oAscNumberingFormat = {
 	DecimalZero : 0x2007  // numbering_numfmt_DecimalZero
 };
 
+var c_oAscSdtLockType = {
+	ContentLocked    : 0x00,
+	SdtContentLocked : 0x01,
+	SdtLocked        : 0x02,
+	Unlocked         : 0x03
+};
+
+var c_oAscSdtLevelType = {
+	Block  : 0x01,
+	Inline : 0x02,
+	Row    : 0x03,
+	Cell   : 0x04
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -303,6 +317,18 @@ prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
 prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
 prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
 prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
+
+prot = window['Asc']['c_oAscSdtLockType'] = c_oAscSdtLockType;
+prot['ContentLocked']    = c_oAscSdtLockType.ContentLocked;
+prot['SdtContentLocked'] = c_oAscSdtLockType.SdtContentLocked;
+prot['SdtLocked']        = c_oAscSdtLockType.SdtLocked;
+prot['Unlocked']         = c_oAscSdtLockType.Unlocked;
+
+prot = window['Asc']['c_oAscSdtLevelType'] = c_oAscSdtLevelType;
+prot['Block']  = c_oAscSdtLevelType.Block;
+prot['Inline'] = c_oAscSdtLevelType.Inline;
+prot['Row']    = c_oAscSdtLevelType.Row;
+prot['Cell']   = c_oAscSdtLevelType.Cell;
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
