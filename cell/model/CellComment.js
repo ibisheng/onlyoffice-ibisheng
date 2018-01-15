@@ -429,7 +429,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 	CCellCommentator.prototype.getCommentByXY = function (x, y) {
 		var findCol = this.worksheet._findColUnderCursor(this.pxToPt(x), true);
 		var findRow = this.worksheet._findRowUnderCursor(this.pxToPt(y), true);
-		return this.getComment(findCol.col, findRow.row);
+		return (findCol && findRow) ? this.getComment(findCol.col, findRow.row) : null;
 	};
 
 	CCellCommentator.prototype.drawCommentCells = function () {

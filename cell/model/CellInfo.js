@@ -285,7 +285,7 @@
 		this.innertext = null;
 		this.numFormat = null;
 		this.hyperlink = null;
-		this.comments = [];
+		this.comment = null;
 		this.isLocked = false;
 		this.isLockedTable = false;
 		this.isLockedSparkline = false;
@@ -335,7 +335,7 @@
 		return this.hyperlink;
 	};
 	asc_CCellInfo.prototype.asc_getComments = function () {
-		return this.comments;
+		return this.comment ? [this.comment] : [];
 	};
 	asc_CCellInfo.prototype.asc_getLocked = function () {
 		return this.isLocked;

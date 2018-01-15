@@ -6846,7 +6846,7 @@
             cell_info.hyperlink = null;
         }
 
-        cell_info.comments = [this.cellCommentator.getComment(ar.c1, ar.r1)];
+        cell_info.comment = this.cellCommentator.getComment(ar.c1, ar.r1);
 		cell_info.flags.merge = range.isOneCell() ? Asc.c_oAscMergeOptions.Disabled :
 			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merge : Asc.c_oAscMergeOptions.None;
 
@@ -7140,20 +7140,22 @@
         var ret = {};
         var isChangeSelectionShape = false;
 
-        var comment = this.cellCommentator.getCommentByXY(x, y);
-        if (!comment) {
-            this.cellCommentator.resetLastSelectedId();
-        }
-
+		var comment;
         if (isCoord) {
+			comment = this.cellCommentator.getCommentByXY(x, y);
             // move active range to coordinates x,y
             this._moveActiveCellToXY(x, y);
             isChangeSelectionShape = this._checkSelectionShape();
         } else {
+			comment = this.cellCommentator.getComment(x, y);
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
                 ret = this._calcActiveRangeOffset();
             }
+
+		if (!comment) {
+			this.cellCommentator.resetLastSelectedId();
+		}
 
         if (this.isSelectionDialogMode) {
             if (!this.model.selectionRange.isEqual(ar)) {
