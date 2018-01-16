@@ -4668,6 +4668,11 @@ PasteProcessor.prototype =
 				}
 			}
 
+			var oTextPr = presentation.GetCalculatedTextPr();
+            shape.txBody.content.Set_ApplyToAll(true);
+            var paraTextPr = new AscCommonWord.ParaTextPr(oTextPr);
+            shape.txBody.content.AddToParagraph(paraTextPr);
+            shape.txBody.content.Set_ApplyToAll(false);
 			oThis.InsertInPlacePresentation(oThis.aContent, true);
 		};
 
