@@ -8611,7 +8611,9 @@
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
 			if (prop !== "paste" || (prop === "paste" && val.fromBinary)) {
 				History.EndTransaction();
-				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+				if(prop === "paste") {
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+				}
 			}
         };
 

@@ -941,6 +941,11 @@
 		
 		Paste_Process_End : function()
 		{
+			//todo возможно стоит добавить проверку
+			/*if(!this.pasteStart)
+			{
+				return;
+			}*/
 			this.pasteStart = false;
 			this.specialPasteProps = null;
 			this.bSaveFormat = false;
