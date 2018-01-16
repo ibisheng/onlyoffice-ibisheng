@@ -3061,6 +3061,11 @@ PasteProcessor.prototype =
 		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 		specialPasteShowOptions.asc_setOptions(props);
 
+		var targetDocContent = presentation.Get_TargetDocContent();
+		if(targetDocContent && targetDocContent.Id) {
+			specialPasteShowOptions.setShapeId(targetDocContent.Id);
+		}
+
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
 	},
@@ -4668,11 +4673,6 @@ PasteProcessor.prototype =
 				}
 			}
 
-			var oTextPr = presentation.GetCalculatedTextPr();
-            shape.txBody.content.Set_ApplyToAll(true);
-            var paraTextPr = new AscCommonWord.ParaTextPr(oTextPr);
-            shape.txBody.content.AddToParagraph(paraTextPr);
-            shape.txBody.content.Set_ApplyToAll(false);
 			oThis.InsertInPlacePresentation(oThis.aContent, true);
 		};
 

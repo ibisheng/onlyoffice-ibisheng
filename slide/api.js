@@ -1773,8 +1773,18 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onHideSpecialPasteOptions");
 	};
 
-	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function(props)
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function()
 	{
+		var props = AscCommon.g_specialPasteHelper.buttonInfo;
+
+		//при переходе между шейпами, скрываем значок спец.вставки
+		if(props.shapeId) {
+			var presentation = editor.WordControl.m_oLogicDocument;
+			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
+			if(!targetDocContent && targetDocContent.Id !== props.shapeId) {
+				return;
+			}
+		}
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 
@@ -1839,12 +1849,8 @@ background-repeat: no-repeat;\
 	    if (this.getViewMode())
     	    return;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, true, false))
-		{
-			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-			AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
-		}
-
+		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
 	};
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)
