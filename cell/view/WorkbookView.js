@@ -1197,7 +1197,7 @@
       }
 
       ws.cellCommentator.updateCommentPosition();
-      ws.updateSpecialPasteOptionsPosition();
+      window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
       this._onDocumentPlaceChanged();
     }
     ws.draw();
@@ -2112,6 +2112,12 @@
   WorkbookView.prototype.showSpecialPasteButton = function(props) {
 	if (!this.getCellEditMode()) {
 		this.getWorksheet().showSpecialPasteOptions(props);
+	}
+  };
+
+  WorkbookView.prototype.updateSpecialPasteButton = function(props) {
+  	if (!this.getCellEditMode()) {
+  		this.getWorksheet().updateSpecialPasteButton(props);
 	}
   };
 

@@ -670,7 +670,7 @@
 
             this._prepareCellTextMetricsCache();
             this.cellCommentator.updateCommentPosition();
-            this.updateSpecialPasteOptionsPosition();
+			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
             this.handlers.trigger("toggleAutoCorrectOptions", null, true);
             this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
@@ -705,7 +705,7 @@
 
         this._prepareCellTextMetricsCache();
         this.cellCommentator.updateCommentPosition();
-        this.updateSpecialPasteOptionsPosition();
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
 
@@ -5402,7 +5402,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
-        this.updateSpecialPasteOptionsPosition();
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
@@ -5563,7 +5563,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
-        this.updateSpecialPasteOptionsPosition();
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
         return this;
     };
@@ -7088,7 +7088,7 @@
         if (this.isSelectOnShape) {
             this.isSelectOnShape = false;
             this.objectRender.unselectDrawingObjects();
-			this.updateSpecialPasteOptionsPosition();
+			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         }
         return isSelectOnShape;
     };
@@ -7107,8 +7107,8 @@
         // отправляем евент для получения свойств картинки, шейпа или группы
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
-		
-		this.updateSpecialPasteOptionsPosition();
+
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
     };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
@@ -8860,7 +8860,8 @@
 		}
 		else
 		{
-			this.updateSpecialPasteOptionsPosition(selectData[0]);
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(selectData[0]);
+			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 		}
     };
 
@@ -9962,7 +9963,7 @@
 		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 	};
 
-	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
+	WorksheetView.prototype.updateSpecialPasteButton = function()
 	{
 		var specialPasteShowOptions, range;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
@@ -10001,11 +10002,6 @@
 		{
 			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 			specialPasteShowOptions.asc_setOptions(null);
-
-			if(changeActiveRange)
-			{
-				specialPasteShowOptions.setRange(changeActiveRange);
-			}
 
 			range = specialPasteShowOptions.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
