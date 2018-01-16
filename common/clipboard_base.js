@@ -1021,21 +1021,10 @@
 		{
 			if (!this.Api)
 				return;
-
-			//TODO метод должен быть общий для всех редакторов
-			if(this.showSpecialPasteButton && this.buttonInfo.fixPosition)
+			
+			if(this.showSpecialPasteButton)
 			{
-				var specialPasteShowOptions = this.buttonInfo;
-				
-				var _Y = this.buttonInfo.fixPosition.y;
-				var _X = this.buttonInfo.fixPosition.x;
-				var _PageNum = this.buttonInfo.fixPosition.pageNum;
-				
-				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
-				specialPasteShowOptions.asc_setCellCoord(curCoord);
-				
-				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+				this.Api.asc_UpdateSpecialPasteButton();
 			}
 		},
 

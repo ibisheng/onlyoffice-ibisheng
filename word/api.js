@@ -2198,9 +2198,32 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onHideSpecialPasteOptions");
 	};
 	
-	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function(props)
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function()
 	{
-		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+		var pasteHepler = AscCommon.g_specialPasteHelper;
+		if(!pasteHepler)
+		{
+			return;
+		}
+
+		var props;
+		if(pasteHepler.buttonInfo && pasteHepler.buttonInfo.fixPosition)
+		{
+			props = pasteHepler.buttonInfo;
+
+			var _Y = props.fixPosition.y;
+			var _X = props.fixPosition.x;
+			var _PageNum = props.fixPosition.pageNum;
+
+			var _coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+			var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
+			props.asc_setCellCoord(curCoord);
+		}
+
+		if(props)
+		{
+			this.sendEvent("asc_onShowSpecialPasteOptions", props);
+		}
 	};
 	
 	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
