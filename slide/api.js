@@ -1839,8 +1839,12 @@ background-repeat: no-repeat;\
 	    if (this.getViewMode())
     	    return;
 
-		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props, null, true, false))
+		{
+			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
+		}
+
 	};
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)
