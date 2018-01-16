@@ -1688,6 +1688,15 @@ CUniColor.prototype =
         }
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CUniColor();
+        _ret.color = new CRGBColor();
+        _ret.color.RGBA.R = this.RGBA.R;
+        _ret.color.RGBA.G = this.RGBA.G;
+        _ret.color.RGBA.B = this.RGBA.B;
+        return _ret;
+    },
 
     addColorMod: function(mod)
     {
@@ -2176,6 +2185,11 @@ CBlipFill.prototype =
         return this.Id;
     },
 
+    saveSourceFormatting: function()
+    {
+        return this.createDuplicate();
+    },
+
     Write_ToBinary: function(w)
     {
         writeString(w, this.RasterImageId);
@@ -2429,6 +2443,15 @@ CSolidFill.prototype =
         }
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CSolidFill();
+        if(this.color){
+            _ret.color = this.color.saveSourceFormatting();
+        }
+        return _ret;
+    },
+
     getObjectType: function()
     {
         return AscDFH.historyitem_type_SolidFill;
@@ -2549,6 +2572,16 @@ CGs.prototype =
     setPos: function(pos)
     {
         this.pos = pos;
+    },
+
+    saveSourceFormatting: function()
+    {
+        var _ret = new CGs();
+        _ret.pos = this.pos;
+        if(this.color){
+            _ret.color = this.color.saveSourceFormatting();
+        }
+        return _ret;
     },
 
     Write_ToBinary: function(w)
@@ -2773,6 +2806,21 @@ CGradFill.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    saveSourceFormatting: function()
+    {
+        var _ret = new CGradFill();
+        if(this.lin){
+            _ret.lin = this.lin.createDuplicate();
+        }
+        if(this.path){
+            _ret.path = this.path.createDuplicate();
+        }
+        for(var i = 0; i < this.colors.length; ++i){
+            _ret.push(this.colors[i].saveSourceFormatting());
+        }
+        return _ret;
+    },
 
     check: function(theme, colorMap)
     {
@@ -3019,6 +3067,19 @@ CPattFill.prototype =
 
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CPattFill();
+        if(this.fgClr){
+            _ret.fgClr = this.fgClr.saveSourceFormatting();
+        }
+        if(this.bgClr){
+            _ret.bgClr = this.bgClr.saveSourceFormatting();
+        }
+        _ret.ftype = this.ftype;
+        return _ret;
+    },
+
     convertToPPTXMods: function()
     {
         this.fgClr && this.fgClr.convertToPPTXMods();
@@ -3169,6 +3230,10 @@ CNoFill.prototype =
     },
 
 
+    saveSourceFormatting: function()
+    {
+        return this.createDuplicate();
+    },
 
     Write_ToBinary: function(w)
     {
@@ -3623,6 +3688,23 @@ CUniFill.prototype =
         if(this.fill != null)
         {
             duplicate.fill = this.fill.createDuplicate();
+        }
+        duplicate.transparent = this.transparent;
+        return duplicate;
+    },
+
+    saveSourceFormatting: function()
+    {
+        var duplicate = new CUniFill();
+        if(this.fill)
+        {
+            if(this.fill.saveSourceFormatting){
+                duplicate.fill = this.fill.saveSourceFormatting();
+            }
+            else{
+                duplicate.fill = this.fill.createDuplicate();
+            }
+
         }
         duplicate.transparent = this.transparent;
         return duplicate;
@@ -4384,13 +4466,19 @@ CLn.prototype =
         }
     },
 
-    createDuplicate:  function()
+    createDuplicate:  function(bSaveFormatting)
     {
         var duplicate = new CLn();
 
         if (null != this.Fill)
         {
-            duplicate.Fill = this.Fill.createDuplicate();
+            if(bSaveFormatting === true){
+                duplicate.Fill = this.Fill.saveSourceFormatting();
+            }
+            else{
+                duplicate.Fill = this.Fill.createDuplicate();
+            }
+
         }
 
         duplicate.prstDash = this.prstDash;

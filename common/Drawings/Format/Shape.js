@@ -5368,10 +5368,10 @@ CShape.prototype.getColumnNumber = function(){
         var oCopy = this.copy();
         if(oCopy.spPr){
             if(this.brush){
-                oCopy.spPr.setFill(this.brush.createDuplicate());
+                oCopy.spPr.setFill(this.brush.saveSourceFormatting());
             }
             if(this.pen){
-                oCopy.spPr.setLn(this.pen.createDuplicate());
+                oCopy.spPr.setLn(this.pen.createDuplicate(true));
             }
         }
         if(oCopy.txBody && oCopy.txBody.content){
@@ -5565,13 +5565,11 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
     var RGBA;
     if(oTextPr.Unifill){
         oTextPr.Unifill.check(oTheme, oColorMap);
-        RGBA = oTextPr.Unifill.getRGBAColor();
-        oTextPr.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+        oTextPr.Unifill = oTextPr.Unifill.saveSourceFormatting();
     }
     if(oTextPr.TextOutline && oTextPr.TextOutline.Fill){
         oTextPr.TextOutline.Fill.check(oTheme, oColorMap);
-        RGBA = oTextPr.TextOutline.Fill.getRGBAColor();
-        oTextPr.TextOutline.Fill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+        oTextPr.TextOutline.Fill = oTextPr.TextOutline.Fill.saveSourceFormatting();
     }
     return oTextPr;
 }
