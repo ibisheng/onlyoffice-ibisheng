@@ -322,7 +322,6 @@ function CCellCommentator(currentSheet) {
 	// Drawing settings
 	this.commentIconColor = new AscCommon.CColor(255, 144, 0);
 	this.commentFillColor = new AscCommon.CColor(255, 255, 0);
-	this.commentPadding = 4; 	// px
 
 	this.lastSelectedId = null;
 	this.bSaveHistory = true;
