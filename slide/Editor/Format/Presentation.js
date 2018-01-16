@@ -5256,6 +5256,25 @@ CPresentation.prototype =
                 }
             }
         }
+        if(oContent.DocContent && oContent.DocContent.Elements.length > 0)
+        {
+            var oTextPr = this.GetCalculatedTextPr();
+            if(oTextPr && AscFormat.isRealNumber(oTextPr.FontSize))
+            {
+                var oTextPr2 = new AscCommonWord.CTextPr();
+                oTextPr2.FontSize = oTextPr.FontSize;
+                var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+                for(i = 0; i < oContent.DocContent.Elements.length; ++i)
+                {
+                    if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)
+                    {
+                        oContent.DocContent.Elements[i].Element.Set_ApplyToAll(true);
+                        oContent.DocContent.Elements[i].Element.AddToParagraph(oParaTextPr);
+                        oContent.DocContent.Elements[i].Element.Set_ApplyToAll(false);
+                    }
+                }
+            }
+        }
         this.Insert_Content(oContent);
         if(bNeedGenerateThumbnails)
         {
