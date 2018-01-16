@@ -17,6 +17,7 @@
 		"../slide/apiDefines.js",
 		"../common/CollaborativeEditingBase.js",
 		"../slide/Editor/CollaborativeEditing.js",
+		"../common/macros.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
 		"../word/apiCommon.js",

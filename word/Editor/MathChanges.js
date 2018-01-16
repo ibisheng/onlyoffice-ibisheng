@@ -243,10 +243,11 @@ CChangesMathContentAddItem.prototype.Load = function(Color)
 		{
 			oMathContent.Content.splice(Pos, 0, Element);
 
-			Element.Set_ParaMath(oMathContent.ParaMath);
-
 			if (Element.SetParagraph)
 				Element.SetParagraph(oMathContent.Paragraph);
+
+			if (Element.Set_ParaMath)
+				Element.Set_ParaMath(oMathContent.ParaMath);
 
 			Element.Recalc_RunsCompiledPr();
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oMathContent, Pos);

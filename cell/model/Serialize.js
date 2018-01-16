@@ -189,7 +189,9 @@
         PivotCache: 8,
         ExternalBook: 9,
         OleLink:10,
-        DdeLink: 11
+		DdeLink: 11,
+		VbaProject: 12,
+		JsaProject: 13
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -2291,11 +2293,12 @@
             }
         };
     }
-    function BinaryWorkbookTableWriter(memory, wb)
+    function BinaryWorkbookTableWriter(memory, wb, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
+        this.isCopyPaste = isCopyPaste;
         this.Write = function()
         {
             var oThis = this;
@@ -2324,6 +2327,12 @@
 			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
+			}
+			if (!this.isCopyPaste) {
+				var macros = this.wb.oApi.macros.GetData();
+				if (macros) {
+					this.bs.WriteItem(c_oSerWorkbookTypes.JsaProject, function() {oThis.memory.WriteXmlString(macros);});
+				}
 			}
         };
         this.WriteWorkbookPr = function()
@@ -3537,10 +3546,10 @@
                 if(this.isCopyPaste && !this.isCopyPaste.contains(aCommentsCoords[i].nCol, aCommentsCoords[i].nRow))
                     continue;
                 elem = aCommentsCoords[i];
-                nRow = elem.asc_getRow();
+                nRow = elem.nRow;
                 if(null == nRow)
                     nRow = 0;
-                nCol = elem.asc_getCol();
+                nCol = elem.nCol;
                 if(null == nCol)
                     nCol = 0;
                 row = oNewComments[nRow];
@@ -3566,9 +3575,9 @@
                     if(null == comment.coord || 0 == comment.data.length)
                         continue;
                     var coord = comment.coord;
-                    if(null == coord.asc_getLeft() || null == coord.asc_getTop() || null == coord.asc_getRight() || null == coord.asc_getBottom() ||
-                        null == coord.asc_getLeftOffset() || null == coord.asc_getTopOffset() || null == coord.asc_getRightOffset() || null == coord.asc_getBottomOffset() ||
-                        null == coord.asc_getLeftMM() || null == coord.asc_getTopMM() || null == coord.asc_getWidthMM() || null == coord.asc_getHeightMM())
+                    if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
+                        null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
+                        null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
                         continue;
                     this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(comment);});
                 }
@@ -3579,11 +3588,11 @@
             var oThis = this;
             this.memory.WriteByte(c_oSer_Comments.Row);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRow());
+            this.memory.WriteLong(comment.coord.nRow);
 
             this.memory.WriteByte(c_oSer_Comments.Col);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getCol());
+            this.memory.WriteLong(comment.coord.nCol);
 
             this.memory.WriteByte(c_oSer_Comments.CommentDatas);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -3591,59 +3600,59 @@
 
             this.memory.WriteByte(c_oSer_Comments.Left);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeft());
+            this.memory.WriteLong(comment.coord.nLeft);
 
             this.memory.WriteByte(c_oSer_Comments.Top);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTop());
+            this.memory.WriteLong(comment.coord.nTop);
 
             this.memory.WriteByte(c_oSer_Comments.Right);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRight());
+            this.memory.WriteLong(comment.coord.nRight);
 
             this.memory.WriteByte(c_oSer_Comments.Bottom);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottom());
+            this.memory.WriteLong(comment.coord.nBottom);
 
             this.memory.WriteByte(c_oSer_Comments.LeftOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeftOffset());
+            this.memory.WriteLong(comment.coord.nLeftOffset);
 
             this.memory.WriteByte(c_oSer_Comments.TopOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTopOffset());
+            this.memory.WriteLong(comment.coord.nTopOffset);
 
             this.memory.WriteByte(c_oSer_Comments.RightOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRightOffset());
+            this.memory.WriteLong(comment.coord.nRightOffset);
 
             this.memory.WriteByte(c_oSer_Comments.BottomOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottomOffset());
+            this.memory.WriteLong(comment.coord.nBottomOffset);
 
             this.memory.WriteByte(c_oSer_Comments.LeftMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getLeftMM());
+            this.memory.WriteDouble2(comment.coord.dLeftMM);
 
             this.memory.WriteByte(c_oSer_Comments.TopMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getTopMM());
+            this.memory.WriteDouble2(comment.coord.dTopMM);
 
             this.memory.WriteByte(c_oSer_Comments.WidthMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getWidthMM());
+            this.memory.WriteDouble2(comment.coord.dWidthMM);
 
             this.memory.WriteByte(c_oSer_Comments.HeightMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getHeightMM());
+            this.memory.WriteDouble2(comment.coord.dHeightMM);
 
             this.memory.WriteByte(c_oSer_Comments.MoveWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getMoveWithCells());
+            this.memory.WriteBool(comment.coord.bMoveWithCells);
 
             this.memory.WriteByte(c_oSer_Comments.SizeWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getSizeWithCells());
+            this.memory.WriteBool(comment.coord.bSizeWithCells);
         };
         this.WriteCommentDatas = function(aDatas)
         {
@@ -4028,7 +4037,7 @@
             //Write Styles
             var nStylesTablePos = this.ReserveTable(c_oSerTableTypes.Styles);
             //Workbook
-            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb));
+            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, this.isCopyPaste));
             //Worksheets
             var aDxfs = [];
             var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, idWorksheet, this.isCopyPaste);
@@ -5579,6 +5588,10 @@
 					return oThis.ReadExternalReferences(t,l);
 				});
 			}
+			else if (c_oSerWorkbookTypes.JsaProject == type)
+			{
+				this.oWorkbook.oApi.macros.SetData(AscCommon.GetStringUtf8(this.stream, length));
+			}
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6630,7 +6643,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Comment == type )
+            if ( c_oSerWorksheetsTypes.Comment == type && AscCommonExcel.asc_CCommentCoords)
             {
                 var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
@@ -6642,8 +6655,8 @@
                 for(i = 0, length = aCommentData.length; i < length; ++i)
                 {
                     var elem = aCommentData[i];
-                    elem.asc_putRow(oCommentCoords.asc_getRow());
-                    elem.asc_putCol(oCommentCoords.asc_getCol());
+                    elem.asc_putRow(oCommentCoords.nRow);
+                    elem.asc_putCol(oCommentCoords.nCol);
 
                     if (elem.asc_getDocumentFlag()) {
                         elem.nId = "doc_" + (this.wb.aComments.length + 1);
@@ -6664,9 +6677,9 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_Comments.Row == type )
-                oCommentCoords.asc_setRow(this.stream.GetULongLE());
+                oCommentCoords.nRow = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Col == type )
-                oCommentCoords.asc_setCol(this.stream.GetULongLE());
+                oCommentCoords.nCol = this.stream.GetULongLE();
             else if ( c_oSer_Comments.CommentDatas == type )
             {
                 res = this.bcr.Read1(length, function(t,l){
@@ -6674,33 +6687,33 @@
                 });
             }
             else if ( c_oSer_Comments.Left == type )
-                oCommentCoords.asc_setLeft(this.stream.GetULongLE());
+                oCommentCoords.nLeft = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftOffset == type )
-                oCommentCoords.asc_setLeftOffset(this.stream.GetULongLE());
+                oCommentCoords.nLeftOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Top == type )
-                oCommentCoords.asc_setTop(this.stream.GetULongLE());
+                oCommentCoords.nTop = this.stream.GetULongLE();
             else if ( c_oSer_Comments.TopOffset == type )
-                oCommentCoords.asc_setTopOffset(this.stream.GetULongLE());
+                oCommentCoords.nTopOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Right == type )
-                oCommentCoords.asc_setRight(this.stream.GetULongLE());
+                oCommentCoords.nRight = this.stream.GetULongLE();
             else if ( c_oSer_Comments.RightOffset == type )
-                oCommentCoords.asc_setRightOffset(this.stream.GetULongLE());
+                oCommentCoords.nRightOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Bottom == type )
-                oCommentCoords.asc_setBottom(this.stream.GetULongLE());
+                oCommentCoords.nBottom = this.stream.GetULongLE();
             else if ( c_oSer_Comments.BottomOffset == type )
-                oCommentCoords.asc_setBottomOffset(this.stream.GetULongLE());
+                oCommentCoords.nBottomOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftMM == type )
-                oCommentCoords.asc_setLeftMM(this.stream.GetDoubleLE());
+                oCommentCoords.dLeftMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.TopMM == type )
-                oCommentCoords.asc_setTopMM(this.stream.GetDoubleLE());
+                oCommentCoords.dTopMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.WidthMM == type )
-                oCommentCoords.asc_setWidthMM(this.stream.GetDoubleLE());
+                oCommentCoords.dWidthMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.HeightMM == type )
-                oCommentCoords.asc_setHeightMM(this.stream.GetDoubleLE());
+                oCommentCoords.dHeightMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.MoveWithCells == type )
-                oCommentCoords.asc_setMoveWithCells(this.stream.GetBool());
+                oCommentCoords.bMoveWithCells = this.stream.GetBool();
             else if ( c_oSer_Comments.SizeWithCells == type )
-                oCommentCoords.asc_setSizeWithCells(this.stream.GetBool());
+                oCommentCoords.bSizeWithCells = this.stream.GetBool();
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;

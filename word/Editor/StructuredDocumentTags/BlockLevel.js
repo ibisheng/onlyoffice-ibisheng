@@ -594,6 +594,7 @@ CBlockLevelSdt.prototype.CanSplitTableCells = function()
 };
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
+	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
 	this.Content.Document_UpdateInterfaceState();
 };
 CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
@@ -1008,7 +1009,7 @@ CBlockLevelSdt.prototype.GetTableOfContents = function(isCheckFields)
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()
 {
-	return AscCommonWord.sdttype_BlockLevel;
+	return c_oAscSdtLevelType.Block;
 };
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
@@ -1090,7 +1091,7 @@ CBlockLevelSdt.prototype.SetContentControlLock = function(nLockType)
 };
 CBlockLevelSdt.prototype.GetContentControlLock = function()
 {
-	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
+	return (undefined !== this.Pr.Lock ? this.Pr.Lock : c_oAscSdtLockType.Unlocked);
 };
 CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
@@ -1105,15 +1106,19 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 
 	if (undefined !== oPr.Lock)
 		this.SetContentControlLock(oPr.Lock);
+
+	if (undefined !== oPr.Alias)
+		this.SetAlias(oPr.Alias);
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
-	var oPr = new CContentControlPr();
+	var oPr = new CContentControlPr(c_oAscSdtLevelType.Block);
 
 	oPr.Tag        = this.Pr.Tag;
 	oPr.Id         = this.Pr.Id;
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
+	oPr.Alias      = this.GetAlias();
 
 	return oPr;
 };

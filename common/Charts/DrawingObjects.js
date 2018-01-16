@@ -4427,14 +4427,8 @@ function DrawingObjects() {
 
     _this.Begin_CompositeInput = function(){
         if(_this.controller){
-            if(window['Asc']['editor'].collaborativeEditing.getFast()){
-                _this.controller.checkSelectedObjectsAndCallbackNoCheckLock(_this.beginCompositeInput,  [], false, AscDFH.historydescription_Document_CompositeInput);
-            }
-            else{
-                _this.controller.checkSelectedObjectsAndCallback(_this.beginCompositeInput, [], false, AscDFH.historydescription_Document_CompositeInput);
-            }
+            _this.controller.checkSelectedObjectsAndCallback(_this.beginCompositeInput, [], false, AscDFH.historydescription_Document_CompositeInput);
         }
-        _this.beginCompositeInput();
     };
 
 

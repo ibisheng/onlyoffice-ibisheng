@@ -288,17 +288,18 @@
 	};
 
 	var c_oAscTypeSelectElement = {
-		Paragraph  : 0,
-		Table      : 1,
-		Image      : 2,
-		Header     : 3,
-		Hyperlink  : 4,
-		SpellCheck : 5,
-		Shape      : 6,
-		Slide      : 7,
-		Chart      : 8,
-		Math       : 9,
-		MailMerge  : 10
+		Paragraph      : 0,
+		Table          : 1,
+		Image          : 2,
+		Header         : 3,
+		Hyperlink      : 4,
+		SpellCheck     : 5,
+		Shape          : 6,
+		Slide          : 7,
+		Chart          : 8,
+		Math           : 9,
+		MailMerge      : 10,
+		ContentControl : 11
 	};
 
 	var c_oAscLineDrawingRule = {
@@ -1103,6 +1104,7 @@
 
 
 	var offlineMode = '_offline_';
+	var chartMode = '_chart_';
 	
 	var c_oSpecialPasteProps = {
 		paste: 0,
@@ -1809,6 +1811,7 @@
 	window["AscCommon"].contentchanges_Remove                 = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
+	window["AscCommon"].chartMode = chartMode;
 
 	window['AscCommon']['align_Right'] = window['AscCommon'].align_Right = align_Right;
 	window['AscCommon']['align_Left'] = window['AscCommon'].align_Left = align_Left;

@@ -1832,6 +1832,8 @@
                     newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
                     newPagePrint.pageHeight =
                       newPagePrint.pageClipRectHeight * vector_koef + (pageTopField + pageBottomField);
+                } else {
+					newPagePrint.pageClipRectHeight = Math.min(currentHeight, newPagePrint.pageClipRectHeight);
                 }
 
                 // Нужно будет пересчитывать колонки
@@ -8853,8 +8855,8 @@
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.options = allowedSpecialPasteProps;
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.range = selectData[0];
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.asc_setOptions(allowedSpecialPasteProps);
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(selectData[0]);
 		}
 		else
 		{
@@ -9934,7 +9936,7 @@
 	WorksheetView.prototype.showSpecialPasteOptions = function(options/*, range, positionShapeContent*/)
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
-		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 
 		var positionShapeContent = options.position;
 		var range = options.range;
@@ -9943,7 +9945,7 @@
 		if(!positionShapeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-			window['AscCommon'].g_specialPasteHelper.buttonInfo.range = range;
+			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(range);
 			
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			cellCoord = this.getSpecialPasteCoords(range, isVisible);
@@ -9962,19 +9964,17 @@
 
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
-		var _clipboard = AscCommonExcel.g_clipboardExcel;
+		var specialPasteShowOptions, range;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent();
 		if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton && isIntoShape)
 		{
 			if(window['AscCommon'].g_specialPasteHelper.buttonInfo.shapeId === isIntoShape.Id)
 			{
-				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				var range = window['AscCommon'].g_specialPasteHelper.buttonInfo.range;
-				
-				/*var trueShapeSelection = isIntoShape.GetSelectionState();
-				isIntoShape.SetSelectionState(range, range.length - 1);*/
-				
-				var sProps = Asc.c_oSpecialPasteProps;
+				specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
+				range = specialPasteShowOptions.range;
+
+				specialPasteShowOptions.asc_setOptions(null);
+
 				var curShape = isIntoShape.Parent.parent;
 				
 				var asc_getcvt = Asc.getCvtRatio;
@@ -9984,7 +9984,7 @@
 				var cellsLeft = this.cellsLeft * ptToPx;
 				var cellsTop = this.cellsTop * ptToPx;
 				
-				var cursorPos = range//isIntoShape.Cursor_GetPos();
+				var cursorPos = range;
 				var offsetX = this.cols[this.visibleRange.c1].left * ptToPx - cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top * ptToPx - cellsTop;
 				var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
@@ -9995,19 +9995,19 @@
 				
 				specialPasteShowOptions.asc_setCellCoord(cellCoord);
 				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
-				
-				//isIntoShape.SetSelectionState(trueShapeSelection, trueShapeSelection.length - 1);
 			}
 		}
 		else if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
 		{
-			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
+			specialPasteShowOptions.asc_setOptions(null);
+
 			if(changeActiveRange)
 			{
-				window['AscCommon'].g_specialPasteHelper.buttonInfo.range = changeActiveRange;
+				specialPasteShowOptions.setRange(changeActiveRange);
 			}
 
-			var range = window['AscCommon'].g_specialPasteHelper.buttonInfo.range;
+			range = specialPasteShowOptions.range;
 			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
 			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
 			

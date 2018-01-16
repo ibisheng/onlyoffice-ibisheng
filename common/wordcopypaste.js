@@ -2408,25 +2408,23 @@ PasteProcessor.prototype =
 		//особые параметры при вставке таблиц из EXCEL
 
 
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo ? window['AscCommon'].g_specialPasteHelper.buttonInfo : null;
 		//если вставляются только изображения, пока не показываем параметры специальной
 		if(para_Drawing === this.pasteTypeContent)
 		{
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 			if(window['AscCommon'].g_specialPasteHelper.buttonInfo)
 			{
-				window['AscCommon'].g_specialPasteHelper.buttonInfo = null;
+				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
 			return;
 		}
 
+		var specialPasteShowOptions = !window['AscCommon'].g_specialPasteHelper.buttonInfo.isClean() ? window['AscCommon'].g_specialPasteHelper.buttonInfo : null;
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
-			specialPasteShowOptions = new SpecialPasteShowOptions();
+			specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 
 			var sProps = Asc.c_oSpecialPasteProps;
-
-			var curDocSelection = this.curDocSelection;
 			var aContent = this.aContent;
 
 			var props = null;
@@ -2460,10 +2458,8 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				specialPasteShowOptions = null;
+				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
-
-			window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -3062,9 +3058,8 @@ PasteProcessor.prototype =
 		}
 		var screenPos = window["editor"].WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
 
-		var specialPasteShowOptions = new SpecialPasteShowOptions();
+		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
 		specialPasteShowOptions.asc_setOptions(props);
-		window['AscCommon'].g_specialPasteHelper.buttonInfo = specialPasteShowOptions;
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
@@ -9045,18 +9040,65 @@ function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAd
 
 function SpecialPasteShowOptions()
 {
-	this.options = [];
+	this.options = null;
 	this.cellCoord = null;
+
+	this.range = null;
+	this.shapeId = null;
+	this.fixPosition = null;
+	this.position = null;
 }
 
 SpecialPasteShowOptions.prototype = {
 	constructor: SpecialPasteShowOptions,
-	
-	asc_setCellCoord : function(val) { this.cellCoord = val; },
-	asc_setOptions : function(val) { this.options = val; },
-	
-	asc_getCellCoord : function() { return this.cellCoord; },
-	asc_getOptions : function(val) { return this.options; }
+
+	isClean: function() {
+		var res = false;
+		if(null === this.options && null === this.cellCoord && null === this.range && null === this.shapeId && null === this.fixPosition) {
+			res = true;
+		}
+		return res;
+	},
+
+	clean: function() {
+		this.options = null;
+		this.cellCoord = null;
+
+		this.range = null;
+		this.shapeId = null;
+		this.fixPosition = null;
+		this.position = null;
+	},
+
+	setRange: function(val) {
+		this.range = val;
+	},
+	setShapeId: function(val) {
+		this.shapeId = val;
+	},
+	setFixPosition: function(val) {
+		this.fixPosition = val;
+	},
+	setPosition: function(val) {
+		this.position = val;
+	},
+
+	asc_setCellCoord: function (val) {
+		this.cellCoord = val;
+	},
+	asc_setOptions: function (val) {
+		if(val === null) {
+			this.options = [];
+		} else {
+			this.options = val;
+		}
+	},
+	asc_getCellCoord: function () {
+		return this.cellCoord;
+	},
+	asc_getOptions: function (val) {
+		return this.options;
+	}
 };
 
   //---------------------------------------------------------export---------------------------------------------------

@@ -4789,10 +4789,12 @@ RangeDataManager.prototype = {
 		var sparklineRange;
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			sparklineRange = this.arrSparklines[i]._f;
-			for (var j = 0; j < ranges.length; ++j) {
-				if (sparklineRange.isIntersect(ranges[j], sheet)) {
-					this.arrSparklines[i].oCacheView = null;
-					break;
+			if (sparklineRange) {
+				for (var j = 0; j < ranges.length; ++j) {
+					if (sparklineRange.isIntersect(ranges[j], sheet)) {
+						this.arrSparklines[i].oCacheView = null;
+						break;
+					}
 				}
 			}
 		}
@@ -4842,12 +4844,16 @@ RangeDataManager.prototype = {
 		var sheet = this.worksheet.getName();
 		var result = new AscCommonExcel.SelectionRange();
 		this.arrSparklines.forEach(function (item, i) {
-			isUnion = isUnion && sheet === item._f.sheet;
-			if (0 === i) {
-				result.assign2(item._f);
+			if (item._f) {
+				isUnion = isUnion && sheet === item._f.sheet;
+				if (0 === i) {
+					result.assign2(item._f);
+				} else {
+					result.addRange();
+					result.getLast().assign2(item._f);
+				}
 			} else {
-				result.addRange();
-				result.getLast().assign2(item._f);
+				isUnion = false;
 			}
 		});
 		var unionRange = isUnion ? result.getUnion() : result;
@@ -4940,7 +4946,7 @@ RangeDataManager.prototype = {
 			}
 		} else {
 			this.arrSparklines.forEach(function (item) {
-				arrResultData.push(item.f);
+				arrResultData.push(item.f || cErrorOrigin['ref']);
 				arrResultLocation.push(item.sqref.getAbsName());
 			});
 		}
