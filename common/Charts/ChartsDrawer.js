@@ -2113,7 +2113,40 @@ CChartsDrawer.prototype =
 
         return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
-	
+
+	drawPaths: function (paths, series) {
+
+		var seria, brush, pen, numCache, point;
+		var seriesPaths = paths.series;
+
+		for (var i = 0; i < seriesPaths.length; i++) {
+
+			if (!seriesPaths[i]) {
+				continue;
+			}
+
+			seria = series[i];
+			brush = seria.brush;
+			pen = seria.pen;
+
+			for (var j = 0; j < seriesPaths[i].length; j++) {
+				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+
+				point = numCache.getPtByIndex(j);
+				if (point && point.pen) {
+					pen = point.pen;
+				}
+				if (point && point.brush) {
+					brush = point.brush;
+				}
+
+				if (seriesPaths[i][j]) {
+					this.drawPath(seriesPaths[i][j], pen, brush);
+				}
+			}
+		}
+	},
+
 	drawPath: function(path, pen, brush)
 	{
 		if(!AscFormat.isRealNumber(path)){
@@ -3605,26 +3638,7 @@ drawBarChart.prototype =
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		var brush, pen, seria, numCache;
-		for (var i = 0; i < this.paths.series.length; i++) {
-		
-			if(!this.paths.series[i])
-				continue;
-			
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-			
-			for (var j = 0; j < this.paths.series[i].length; j++) {
-				numCache = this.cChartDrawer.getNumCache(seria.val);
-				if(numCache && numCache.pts[j] && numCache.pts[j].pen)
-					pen = numCache.pts[j].pen;
-				if(numCache && numCache.pts[j] && numCache.pts[j].brush)
-					brush = numCache.pts[j].brush;
-					
-				if(this.paths.series[i][j])
-					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
-			}
-		}
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 	},
 	
@@ -7067,26 +7081,7 @@ drawHBarChart.prototype =
 		
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		for (var i = 0; i < this.paths.series.length; i++) {
-			
-			if(!this.paths.series[i])
-				continue;
-			
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-			
-			for (var j = 0; j < this.paths.series[i].length; j++) {
-				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
-				if(numCache.pts[j] && numCache.pts[j].pen)
-					pen = numCache.pts[j].pen;
-				if(numCache.pts[j] && numCache.pts[j].brush)
-					brush = numCache.pts[j].brush;
-					
-				if(this.paths.series[i][j])
-					this.cChartDrawer.drawPath(this.paths.series[i][j], pen, brush);
-			}
-		}
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
