@@ -427,8 +427,14 @@ CComplexField.prototype.private_UpdateTOC = function()
 	var isPreserveTabs   = this.Instruction.IsPreserveTabs();
 	var sSeparator       = this.Instruction.GetSeparator();
 
-	var oTab             = new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot);
-	if ((!sSeparator || "" === sSeparator) && arrOutline.length > 0)
+	var nForceTabLeader = this.Instruction.GetForceTabLeader();
+
+	var oTab = new CParaTab(tab_Right, nTabPos, Asc.c_oAscTabLeader.Dot);
+	if (undefined !== nForceTabLeader)
+	{
+		oTab = new CParaTab(tab_Right, nTabPos, nForceTabLeader);
+	}
+	else if ((!sSeparator || "" === sSeparator) && arrOutline.length > 0)
 	{
 		var arrSelectedParagraphs = this.LogicDocument.GetCurrentParagraph(false, true);
 		if (arrSelectedParagraphs.length > 0)
@@ -845,6 +851,37 @@ CComplexField.prototype.RemoveField = function()
 	this.SelectField();
 	oDocument.Remove();
 };
+/**
+ * Выставляем свойства для данного поля
+ * @param oPr (зависит от типа данного поля)
+ */
+CComplexField.prototype.SetPr = function(oPr)
+{
+	if (!this.IsValid())
+		return;
+
+	var oInstruction = this.GetInstruction();
+	if (!oInstruction)
+		return;
+
+	var oDocument = this.GetTopDocumentContent();
+	if (!oDocument)
+		return;
+
+	oInstruction.SetPr(oPr);
+	var sNewInstruction = oInstruction.ToString();
+
+	this.SelectFieldCode();
+	oDocument.Remove();
+
+	var oRun      = this.BeginChar.GetRun();
+	var nInRunPos = oRun.GetElementPosition(this.BeginChar) + 1;
+	for (var nPos = 0, nLen = sNewInstruction.length; nPos < nLen; ++nPos)
+	{
+		oRun.AddToContent(nInRunPos + nPos, new ParaInstrText(sNewInstruction.charAt(nPos)));
+	}
+};
+
 
 
 function TEST_ADDFIELD(sInstruction)

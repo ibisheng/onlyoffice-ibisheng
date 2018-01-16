@@ -1049,6 +1049,9 @@
 			case AscDFH.historydescription_Document_RemoveComplexField:
 				sString = "Document_RemoveComplexField";
 				break;
+			case AscDFH.historydescription_Document_SetComplexFieldPr:
+				sString = "Document_SetComplexFieldPr";
+				break;
 		}
 		return sString;
 	}
@@ -2978,6 +2981,7 @@
 	window['AscDFH'].historydescription_Document_AddElementToOutline                = 0x014b;
 	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014c;
 	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014d;
+	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
 
 
 

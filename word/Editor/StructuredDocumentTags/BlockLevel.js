@@ -1006,6 +1006,14 @@ CBlockLevelSdt.prototype.GetTableOfContents = function(isCheckFields)
 
 	return this.Content.GetTableOfContents(isCheckFields);
 };
+CBlockLevelSdt.prototype.GetInnerTableOfContents = function()
+{
+	var oTOC = this.Content.GetTableOfContents(true);
+	if (oTOC instanceof CBlockLevelSdt)
+		return oTOC.GetInnerTableOfContents();
+
+	return oTOC;
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()
 {

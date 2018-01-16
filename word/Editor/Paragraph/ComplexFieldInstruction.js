@@ -76,6 +76,9 @@ CFieldInstructionBase.prototype.ToString = function()
 {
 	return "";
 };
+CFieldInstructionBase.prototype.SetPr = function()
+{
+};
 
 /**
  * PAGE field
@@ -145,6 +148,7 @@ function CFieldInstructionTOC()
 	this.SkipPageRef      = false;
 	this.SkipPageRefStart = -1;
 	this.SkipPageRefEnd   = -1;
+	this.ForceTabLeader   = undefined;
 }
 
 CFieldInstructionTOC.prototype = Object.create(CFieldInstructionBase.prototype);
@@ -257,6 +261,33 @@ CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 		return true;
 
 	return  (nLvl >= this.SkipPageRefStart - 1 && nLvl <= this.SkipPageRefEnd - 1);
+};
+CFieldInstructionTOC.prototype.SetPr = function(oPr)
+{
+	if (!(oPr instanceof Asc.CTableOfContentsPr))
+		return;
+
+	this.SetStylesArray(oPr.get_Styles());
+	this.SetHeadingRange(oPr.get_OutlineStart(), oPr.get_OutlineEnd());
+	this.SetHyperlinks(oPr.get_Hyperlink());
+
+	if (oPr.PageNumbers)
+		this.SetPageRefSkippedLvls(false);
+	else
+		this.SetPageRefSkippedLvls(true);
+
+	if (oPr.RightTab)
+		this.SetSeparator("");
+	else
+		this.SetSeparator(" ");
+
+	this.ForceTabLeader = oPr.TabLeader;
+};
+CFieldInstructionTOC.prototype.GetForceTabLeader = function()
+{
+	var nTabLeader = this.ForceTabLeader;
+	this.ForceTabLeader = undefined;
+	return nTabLeader;
 };
 
 /**

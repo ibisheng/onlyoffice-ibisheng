@@ -7786,6 +7786,46 @@ background-repeat: no-repeat;\
 			this.asc_RemoveComplexField(oTOC);
 		}
 	};
+	asc_docs_api.prototype.asc_GetTableOfContentsPr = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var oTOC = oLogicDocument.GetTableOfContents();
+		if (!oTOC)
+			return;
+
+		if (oTOC instanceof CBlockLevelSdt)
+			oTOC = oTOC.GetInnerTableOfContents();
+
+		if (oTOC instanceof CComplexField)
+		{
+			var oPr = new Asc.CTableOfContentsPr();
+			oPr.InitFromTOCInstruction(oTOC);
+			return oPr;
+		}
+
+		return null;
+	};
+	asc_docs_api.prototype.asc_SetTableOfContentsPr = function(oPr)
+	{
+		if (!(oPr instanceof Asc.CTableOfContentsPr))
+			return;
+
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var oTOC = oLogicDocument.GetTableOfContents();
+		if (!oTOC)
+			return;
+
+		if (oTOC instanceof CBlockLevelSdt)
+			oTOC = oTOC.GetInnerTableOfContents();
+
+		this.asc_SetComplexFieldPr(oTOC, oPr, true);
+	};
 
 	asc_docs_api.prototype.asc_RemoveComplexField = function(oComplexField)
 	{
@@ -7799,6 +7839,26 @@ background-repeat: no-repeat;\
 			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveComplexField);
 
 			oComplexField.RemoveField();
+
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
+	};
+	asc_docs_api.prototype.asc_SetComplexFieldPr = function(oComplexField, oPr, isUpdate)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument || !oPr || !(oComplexField instanceof CComplexField))
+			return;
+
+		oComplexField.SelectField();
+		if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetComplexFieldPr);
+
+			oComplexField.SetPr(oPr);
+			if (isUpdate)
+				oComplexField.Update();
 
 			oLogicDocument.Recalculate();
 			oLogicDocument.Document_UpdateInterfaceState();
@@ -8934,6 +8994,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_HideDocumentOutline']                   = asc_docs_api.prototype.asc_HideDocumentOutline;
 	asc_docs_api.prototype['sync_OnDocumentOutlineUpdate']              = asc_docs_api.prototype.sync_OnDocumentOutlineUpdate;
 	asc_docs_api.prototype['sync_OnDocumentOutlineCurrentPosition']     = asc_docs_api.prototype.sync_OnDocumentOutlineCurrentPosition;
+
+	asc_docs_api.prototype['asc_AddTableOfContents']                     = asc_docs_api.prototype.asc_AddTableOfContents;
+	asc_docs_api.prototype['asc_RemoveTableOfContents']                  = asc_docs_api.prototype.asc_RemoveTableOfContents;
+	asc_docs_api.prototype['asc_GetTableOfContentsPr']                   = asc_docs_api.prototype.asc_GetTableOfContentsPr;
+	asc_docs_api.prototype['asc_SetTableOfContentsPr']                   = asc_docs_api.prototype.asc_SetTableOfContentsPr;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;

@@ -1418,4 +1418,118 @@
 	CHeader.prototype['get_X'] = CHeader.prototype.get_X;
 	CHeader.prototype['get_Y'] = CHeader.prototype.get_Y;
 	CHeader.prototype['get_Level'] = CHeader.prototype.get_Level;
+
+	/**
+	 * Класс для работы с настройками таблицы содержимого
+	 * @constructor
+	 */
+	function CTableOfContentsPr()
+	{
+		this.Hyperlink    = true;
+		this.OutlineStart = -1;
+		this.OutlineEnd   = -1;
+		this.Styles       = [];
+
+		// Эти параметры задаются только из интерфейса
+		this.PageNumbers = undefined;
+		this.RightTab    = undefined;
+		this.TabLeader   = undefined;
+	}
+	CTableOfContentsPr.prototype.InitFromTOCInstruction = function(oComplexField)
+	{
+		if (!oComplexField)
+			return;
+
+		var oInstruction = oComplexField.GetInstruction();
+		if (!oInstruction)
+			return;
+
+		this.Hyperlink    = oInstruction.IsHyperlinks();
+		this.OutlineStart = oInstruction.GetHeadingRangeStart();
+		this.OutlineEnd   = oInstruction.GetHeadingRangeEnd();
+		this.Styles       = oInstruction.GetStylesArray();
+	};
+	CTableOfContentsPr.prototype.get_Hyperlink = function()
+	{
+		return this.Hyperlink;
+	};
+	CTableOfContentsPr.prototype.put_Hyperlink = function(isHyperlink)
+	{
+		this.Hyperlink = isHyperlink;
+	};
+	CTableOfContentsPr.prototype.get_OutlineStart = function()
+	{
+		return this.OutlineStart;
+	};
+	CTableOfContentsPr.prototype.get_OutlineEnd = function()
+	{
+		return this.OutlineEnd;
+	};
+	CTableOfContentsPr.prototype.put_OutlineRange = function(nStart, nEnd)
+	{
+		this.OutlineStart = nStart;
+		this.OutlineEnd   = nEnd;
+	};
+	CTableOfContentsPr.prototype.get_StylesCount = function()
+	{
+		return this.Styles.length;
+	};
+	CTableOfContentsPr.prototype.get_StyleName = function(nIndex)
+	{
+		if (nIndex < 0 || nIndex >= this.Styles.length)
+			return "";
+
+		return this.Styles[nIndex].Name;
+	};
+	CTableOfContentsPr.prototype.get_StyleLevel = function(nIndex)
+	{
+		if (nIndex < 0 || nIndex >= this.Styles.length)
+			return -1;
+
+		return this.Styles[nIndex].Lvl;
+	};
+	CTableOfContentsPr.prototype.get_Styles = function()
+	{
+		return this.Styles;
+	};
+	CTableOfContentsPr.prototype.clear_Styles = function()
+	{
+		this.Styles = [];
+	};
+	CTableOfContentsPr.prototype.add_Style = function(sName, nLvl)
+	{
+		this.Styles.push({Name : sName, Lvl : nLvl});
+	};
+	CTableOfContentsPr.prototype.put_ShowPageNumbers = function(isShow)
+	{
+		this.PageNumbers = isShow;
+	};
+	CTableOfContentsPr.prototype.put_RightAlignTab = function(isRightTab)
+	{
+		this.RightTab = isRightTab;
+	};
+	CTableOfContentsPr.prototype.put_TabLeader = function(nTabLeader)
+	{
+		this.TabLeader = nTabLeader;
+	};
+
+
+
+	window['Asc']['CTableOfContentsPr'] = window['Asc'].CTableOfContentsPr = CTableOfContentsPr;
+	CTableOfContentsPr.prototype['get_Hyperlink']       = CTableOfContentsPr.prototype.get_Hyperlink;
+	CTableOfContentsPr.prototype['put_Hyperlink']       = CTableOfContentsPr.prototype.put_Hyperlink;
+	CTableOfContentsPr.prototype['get_OutlineStart']    = CTableOfContentsPr.prototype.get_OutlineStart;
+	CTableOfContentsPr.prototype['get_OutlineEnd']      = CTableOfContentsPr.prototype.get_OutlineEnd;
+	CTableOfContentsPr.prototype['put_OutlineRange']    = CTableOfContentsPr.prototype.put_OutlineRange;
+	CTableOfContentsPr.prototype['get_StylesCount']     = CTableOfContentsPr.prototype.get_StylesCount;
+	CTableOfContentsPr.prototype['get_StyleName']       = CTableOfContentsPr.prototype.get_StyleName;
+	CTableOfContentsPr.prototype['get_StyleLevel']      = CTableOfContentsPr.prototype.get_StyleLevel;
+	CTableOfContentsPr.prototype['clear_Styles']        = CTableOfContentsPr.prototype.clear_Styles;
+	CTableOfContentsPr.prototype['add_Style']           = CTableOfContentsPr.prototype.add_Style;
+	CTableOfContentsPr.prototype['put_ShowPageNumbers'] = CTableOfContentsPr.prototype.put_ShowPageNumbers;
+	CTableOfContentsPr.prototype['put_RightAlignTab']   = CTableOfContentsPr.prototype.put_RightAlignTab;
+	CTableOfContentsPr.prototype['put_TabLeader']       = CTableOfContentsPr.prototype.put_TabLeader;
+
+
+
 })(window, undefined);

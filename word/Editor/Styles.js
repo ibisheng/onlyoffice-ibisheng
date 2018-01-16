@@ -8491,6 +8491,22 @@ CParaTab.prototype.IsEqual = function(Tab)
 
 	return true;
 };
+CParaTab.prototype.IsRightTab = function()
+{
+	return this.Value === tab_Right;
+};
+CParaTab.prototype.IsLeftTab = function()
+{
+	return this.Value === tab_Left;
+};
+CParaTab.prototype.IsCenterTab = function()
+{
+	return this.Value === tab_Center;
+};
+CParaTab.prototype.GetLeader = function()
+{
+	return this.Leader;
+};
 
 function CParaTabs()
 {
