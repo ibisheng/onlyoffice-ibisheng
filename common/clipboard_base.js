@@ -1012,6 +1012,7 @@
 			if(this.showSpecialPasteButton)
 			{
 				this.showSpecialPasteButton = false;
+				this.CleanButtonInfo();
 				this.Api.asc_HideSpecialPasteButton();
 			}
 		},
@@ -1024,7 +1025,7 @@
 			//TODO метод должен быть общий для всех редакторов
 			if(this.showSpecialPasteButton && this.buttonInfo.fixPosition)
 			{
-				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				var specialPasteShowOptions = this.buttonInfo;
 				
 				var _Y = this.buttonInfo.fixPosition.y;
 				var _X = this.buttonInfo.fixPosition.x;
