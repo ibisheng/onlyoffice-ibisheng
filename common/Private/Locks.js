@@ -823,6 +823,20 @@ if(typeof CPresentation !== "undefined")
         if(!oController){
             return false;
         }
+
+        if(CheckType === AscCommon.changestype_Paragraph_Content)
+        {
+            var oTargetTextObject = oController.getTargetDocContent(false, true);
+            if(oTargetTextObject)
+            {
+                CheckType = AscCommon.changestype_Drawing_Props;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         if(CheckType === AscCommon.changestype_Drawing_Props)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
