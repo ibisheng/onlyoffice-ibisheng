@@ -165,10 +165,6 @@
 
     var kMaxAutoCompleteCellEdit = 20000;
 
-    function calcDecades(num) {
-        return Math.abs(num) < 10 ? 1 : 1 + calcDecades(asc_floor(num * 0.1));
-    }
-
     function CacheElement() {
         if (!(this instanceof CacheElement)) {
             return new CacheElement();
@@ -334,7 +330,6 @@
         // Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
         this.maxDigitWidth = maxDigitWidth;
 
-        this.nBaseColWidth = 8; // Число символов для дефалтовой ширины (по умолчинию 8)
         this.defaultColWidthChars = 0;
         this.defaultColWidth = 0;
         this.defaultRowHeight = 0;
@@ -761,7 +756,7 @@
         if (w === t.cols[col].width) {
             return;
         }
-        var cc = Math.min(t._colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
+        var cc = Math.min(this.model.colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
 
         var onChangeWidthCallback = function (isSuccess) {
             if (false === isSuccess) {
@@ -1207,17 +1202,16 @@
     };
 
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
-        this.nBaseColWidth = this.model.oSheetFormatPr.nBaseColWidth || this.nBaseColWidth;
         // Теперь рассчитываем число px
-        var defaultColWidthChars = this.model.charCountToModelColWidth(this.nBaseColWidth);
-        this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
+        var defaultColWidthChars = this.model.charCountToModelColWidth(this.model.getBaseColWidth());
+        var defaultColWidthPx = this.model.modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
-        this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
-        this.defaultColWidthChars =
-          this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
+        defaultColWidthPx = asc_ceil(defaultColWidthPx / 8) * 8;
+		this.defaultColWidthChars =
+			this.model.colWidthToCharCount(defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
 
         AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
-        this.defaultColWidth = this._modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
+        this.defaultColWidth = this.model.modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
 
         var defaultFontSize = this.model.getDefaultFontSize();
         // ToDo разобраться со значениями
@@ -1308,28 +1302,6 @@
     };
 
     /**
-     * Вычисляет ширину столбца в пунктах
-     * @param {Number} mcw  Количество символов
-     * @returns {Number}    Ширина столбца в пунктах (pt)
-     */
-    WorksheetView.prototype._modelColWidthToColWidth = function ( mcw ) {
-        var px = asc_floor( ((256 * mcw + asc_floor( 128 / this.maxDigitWidth )) / 256) * this.maxDigitWidth );
-        return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
-    };
-
-    /**
-     * Вычисляет количество символов по ширине столбца
-     * @param {Number} w  Ширина столбца в пунктах
-     * @returns {Number}  Количество символов
-     */
-    WorksheetView.prototype._colWidthToCharCount = function ( w ) {
-        var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
-        var pxInOneCharacter = this.maxDigitWidth + this.settings.cells.paddingPlusBorder;
-        // Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-        return px < pxInOneCharacter ? (1 - asc_floor( 100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999 ) / 100) : asc_floor( (px - this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5 ) / 100;
-    };
-
-    /**
      * Вычисляет ширину столбца для отрисовки
      * @param {Number} w  Ширина столбца в символах
      * @returns {Number}  Ширина столбца в пунктах (pt)
@@ -1340,9 +1312,9 @@
         var useDefault = w === undefined || w === null || w === -1;
         var width;
         res.width =
-          useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
+          useDefault ? t.defaultColWidth : (width = t.model.modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
         res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
-        res.charCount = t._colWidthToCharCount( res.width );
+		res.charCount = this.model.colWidthToCharCount(res.width);
         return res;
     };
 
@@ -1361,13 +1333,10 @@
             this.headersWidth = 0;
         } else {
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
-            var numDigit = Math.max(calcDecades(this.visibleRange.r2 + 1), 3);
+            var numDigit = Math.max(AscCommonExcel.calcDecades(this.visibleRange.r2 + 1), 3);
             var nCharCount = this.model.charCountToModelColWidth(numDigit);
-            this.headersWidth = this._modelColWidthToColWidth(nCharCount);
+            this.headersWidth = this.model.modelColWidthToColWidth(nCharCount);
         }
-
-        //var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
-        //this.headersWidth = asc_calcnpt(w, this._getPPIX());
 
         this.cellsLeft = this.headersLeft + this.headersWidth;
     };
@@ -4012,7 +3981,7 @@
 
         return new asc_CMM( {
             type      : Asc.c_oAscMouseMoveType.ResizeColumn,
-            sizeCCOrPt: this._colWidthToCharCount( widthPt ),
+            sizeCCOrPt: this.model.colWidthToCharCount(widthPt),
             sizePx    : widthPt * 96 / 72,
             x         : (x1 + this.cols[col].width) * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ),
             y         : this.cellsTop * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() )
@@ -4221,7 +4190,7 @@
     };
 
     WorksheetView.prototype._changeColWidth = function (col, width, pad) {
-        var cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
+        var cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
         var modelw = this.model.charCountToModelColWidth(cc);
         var colw = this._calcColWidth(modelw);
 
@@ -5260,7 +5229,7 @@
 			return this;
 		}
 
-        var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
+        var oldDec = Math.max(AscCommonExcel.calcDecades(oldEnd + 1), 3);
         var oldW, x, dx;
         var dy = this.rows[start].top - this.rows[oldStart].top;
         var oldH = ctxH - this.cellsTop - Math.abs(dy) - diffHeight;
@@ -5274,7 +5243,7 @@
               this.cellsTop + diffHeight, ctxW, ctxH);
         }
 
-        var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
+        var widthChanged = Math.max(AscCommonExcel.calcDecades(vr.r2 + 1), 3) !== oldDec;
         if (widthChanged) {
             x = this.cellsLeft;
             this._calcHeaderColumnWidth();
@@ -6112,16 +6081,13 @@
 			}
 
 			// Проверим есть ли комменты
-			var comments = this.cellCommentator.getComments(c.col, r.row);
-			var coords = undefined;
-			var indexes = undefined;
+			var comment = this.cellCommentator.getComment(c.col, r.row);
+			var coords = null;
+			var indexes = null;
 
-			if (0 < comments.length) {
-				indexes = [];
-				for (i = 0; i < comments.length; ++i) {
-					indexes.push(comments[i].asc_getId());
-				}
-				coords = this.cellCommentator.getCommentsCoords(comments);
+			if (comment) {
+				indexes = [comment.asc_getId()];
+				coords = this.cellCommentator.getCommentTooltipPosition(comment);
 			}
 
 			// Проверим, может мы в гиперлинке
@@ -6856,7 +6822,7 @@
             cell_info.hyperlink = null;
         }
 
-        cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
+        cell_info.comment = this.cellCommentator.getComment(ar.c1, ar.r1);
 		cell_info.flags.merge = range.isOneCell() ? Asc.c_oAscMergeOptions.Disabled :
 			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merge : Asc.c_oAscMergeOptions.None;
 
@@ -7150,21 +7116,22 @@
         var ret = {};
         var isChangeSelectionShape = false;
 
-        var commentList = this.cellCommentator.getCommentsXY(x, y);
-        if (!commentList.length) {
-            this.model.workbook.handlers.trigger("asc_onHideComment");
-            this.cellCommentator.resetLastSelectedId();
-        }
-
+		var comment;
         if (isCoord) {
+			comment = this.cellCommentator.getCommentByXY(x, y);
             // move active range to coordinates x,y
             this._moveActiveCellToXY(x, y);
             isChangeSelectionShape = this._endSelectionShape();
         } else {
+			comment = this.cellCommentator.getComment(x, y);
             // move active range to offset x,y
             this._moveActiveCellToOffset(x, y);
                 ret = this._calcActiveRangeOffset();
             }
+
+		if (!comment) {
+			this.cellCommentator.resetLastSelectedId();
+		}
 
         if (this.isSelectionDialogMode) {
             if (!this.model.selectionRange.isEqual(ar)) {
@@ -10866,12 +10833,11 @@
         var pad, cc, cw;
         if (width > 0) {
             pad = this.width_padding * 2 + this.width_1px;
-            cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
-            cw = this.model.charCountToModelColWidth(cc);
+            cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
         } else {
-            cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;
             cc = this.defaultColWidthChars;
         }
+		cw = this.model.charCountToModelColWidth(cc);
 
         if (cc === oldColWidth || (onlyIfMore && cc < oldColWidth)) {
             return -1;

@@ -2479,7 +2479,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_showComment = function(id, bNew) {
     var ws = this.wb.getWorksheet();
-    ws.cellCommentator.showComment(id, bNew);
+    ws.cellCommentator.showCommentById(id, bNew);
   };
 
   spreadsheet_api.prototype.asc_findComment = function(id) {
@@ -2491,15 +2491,6 @@ var editor;
     var ws = this.wb.getWorksheet();
     ws.cellCommentator.removeComment(id);
     this.wb.cellCommentator.removeComment(id);
-  };
-
-  spreadsheet_api.prototype.asc_getComments = function(col, row) {
-    var ws = this.wb.getWorksheet();
-    return ws.cellCommentator.getComments(col, row);
-  };
-
-  spreadsheet_api.prototype.asc_getDocumentComments = function() {
-    return this.wb.cellCommentator.getDocumentComments();
   };
 
   spreadsheet_api.prototype.asc_showComments = function (isShowSolved) {
@@ -3712,9 +3703,6 @@ var editor;
 
   prot["asc_showComments"] = prot.asc_showComments;
   prot["asc_hideComments"] = prot.asc_hideComments;
-
-  prot["asc_getComments"] = prot.asc_getComments;
-  prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
 
   // Shapes
   prot["setStartPointHistory"] = prot.setStartPointHistory;

@@ -5666,22 +5666,6 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onUnLockComment", Id);
 	};
 
-	asc_docs_api.prototype.asc_getComments        = function()
-	{
-		var ResComments   = [];
-		var LogicDocument = this.WordControl.m_oLogicDocument;
-		if (undefined != LogicDocument)
-		{
-			var DocComments = LogicDocument.Comments;
-			for (var Id in DocComments.m_aComments)
-			{
-				var AscCommentData = new asc_CCommentDataWord(DocComments.m_aComments[Id].Data);
-				ResComments.push({"Id" : Id, "Comment" : AscCommentData});
-			}
-		}
-
-		return ResComments;
-	};
 	//-----------------------------------------------------------------
 	asc_docs_api.prototype.sync_LockHeaderFooters = function()
 	{
@@ -8840,7 +8824,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_ChangeCommentData']                    = asc_docs_api.prototype.sync_ChangeCommentData;
 	asc_docs_api.prototype['sync_LockComment']                          = asc_docs_api.prototype.sync_LockComment;
 	asc_docs_api.prototype['sync_UnLockComment']                        = asc_docs_api.prototype.sync_UnLockComment;
-	asc_docs_api.prototype['asc_getComments']                           = asc_docs_api.prototype.asc_getComments;
 	asc_docs_api.prototype['sync_LockHeaderFooters']                    = asc_docs_api.prototype.sync_LockHeaderFooters;
 	asc_docs_api.prototype['sync_LockDocumentProps']                    = asc_docs_api.prototype.sync_LockDocumentProps;
 	asc_docs_api.prototype['sync_UnLockHeaderFooters']                  = asc_docs_api.prototype.sync_UnLockHeaderFooters;

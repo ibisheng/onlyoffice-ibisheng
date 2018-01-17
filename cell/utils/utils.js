@@ -167,6 +167,10 @@
 			return aSizes[i];
 		}
 
+		function calcDecades(num) {
+			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(floor(num * 0.1));
+		}
+
 		// Определяет времени работы функции
 		function profileTime(fn/*[, arguments]*/) {
 			var start, end, arg = [], i;
@@ -2406,6 +2410,7 @@
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
+		window["AscCommonExcel"].calcDecades = calcDecades;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
 		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;
