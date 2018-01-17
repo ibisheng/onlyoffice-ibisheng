@@ -370,7 +370,7 @@
 				}
 			},
 
-			pasteData: function(ws, _format, data1, data2, text_data, bIsSpecialPaste)
+			pasteData: function(ws, _format, data1, data2, text_data, bIsSpecialPaste, doNotShowButton)
 			{
 				var t = this;
 				t.pasteProcessor.clean();
@@ -379,7 +379,7 @@
 				{
 					ws.model.workbook.handlers.trigger("hideSpecialPasteOptions");
 				}
-				window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+				window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(doNotShowButton);
 				
 				if(!bIsSpecialPaste)
 				{

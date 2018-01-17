@@ -2092,10 +2092,10 @@
     g_clipboardExcel.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
-  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
+  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data, doNotShowButton) {
     var t = this, ws;
     ws = t.getWorksheet();
-    g_clipboardExcel.pasteData(ws, _format, data1, data2, text_data);
+    g_clipboardExcel.pasteData(ws, _format, data1, data2, text_data, null, doNotShowButton);
   };
   
   WorkbookView.prototype.specialPasteData = function(props) {

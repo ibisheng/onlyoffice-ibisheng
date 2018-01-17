@@ -1408,7 +1408,7 @@
 		this.incrementCounterLongAction();
 		var b_old_save_format = AscCommon.g_clipboardBase.bSaveFormat;
         AscCommon.g_clipboardBase.bSaveFormat = true;
-		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem, null, null, null, true);
 		this.decrementCounterLongAction();
 
 		if (true)

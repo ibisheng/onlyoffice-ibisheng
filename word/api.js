@@ -2082,7 +2082,7 @@ background-repeat: no-repeat;\
 
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
-			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(arguments[5]);
 			
 			if (!useCurrentPoint) {
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
@@ -2186,6 +2186,7 @@ background-repeat: no-repeat;\
 		}
 
 		specialPasteHelper.showButtonIdParagraph = null;
+		return true;
 	};
 
 	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)

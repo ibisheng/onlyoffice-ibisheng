@@ -1850,6 +1850,8 @@ background-repeat: no-repeat;\
     	    return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+		
+		window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(arguments[5]);
 		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
 	};
 

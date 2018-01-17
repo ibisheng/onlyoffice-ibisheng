@@ -906,6 +906,7 @@
 
 		this.showButtonIdParagraph = null;
 		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
+		this.doNotShowButton = false;
 	}
 
 	CSpecialPasteHelper.prototype = {
@@ -934,8 +935,12 @@
 			this.specialPasteStart = false;
 		},
 		
-		Paste_Process_Start : function()
+		Paste_Process_Start : function(doNotShowButton)
 		{
+			if(doNotShowButton)
+			{
+				this.doNotShowButton = true;
+			}
 			this.pasteStart = true;
 		},
 		
@@ -964,6 +969,8 @@
 				this.SpecialPasteButton_Show();
 			}
 
+			this.doNotShowButton = false;
+
 			//TODO для excel заглушка. пересмотреть!
 			if(this.bIsEndTransaction)
 			{
@@ -974,7 +981,7 @@
 		
 		SpecialPasteButton_Show : function()
 		{
-			if (!this.Api)
+			if (!this.Api || this.doNotShowButton)
 				return;
 
 			//при быстром совместном редактировании отключаем возможность специальной вставки
@@ -997,16 +1004,15 @@
 
 		SpecialPasteButtonById_Show: function()
 		{
-			if (!this.Api)
-			{
-				return;
-			}
-			if(!this.Api.asc_specialPasteShowButton)
+			if(!this.Api || !this.Api.asc_specialPasteShowButton || this.doNotShowButton)
 			{
 				return;
 			}
 
-			this.Api.asc_specialPasteShowButton();
+			if(this.Api.asc_specialPasteShowButton())
+			{
+				this.showSpecialPasteButton = true;
+			}
 		},
 
 		SpecialPasteButton_Hide : function()

@@ -433,7 +433,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2, text_data) {
     if (!this.getViewMode()) {
-      this.wb.pasteData(_format, data1, data2, text_data);
+      this.wb.pasteData(_format, data1, data2, text_data, arguments[5]);
     }
   };
 
