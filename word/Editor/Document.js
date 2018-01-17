@@ -16354,7 +16354,7 @@ CDocument.prototype.private_RemoveBookmark = function(sName)
 {
 
 };
-CDocument.prototype.AddTableOfContents = function(sHeading)
+CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 {
 	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
 	{
@@ -16378,6 +16378,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading)
 
 		var oComplexField = this.AddFieldWithInstruction("TOC \\o \"1-3\" \\h \\z \\u");
 		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
+
+		if (oPr)
+			oComplexField.SetPr(oPr);
+
 		this.Recalculate();
 	}
 };

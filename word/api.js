@@ -7763,9 +7763,9 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onDocumentOutlineUpdateRemove", nIndex);
 	};
 
-	asc_docs_api.prototype.asc_AddTableOfContents = function(sHeading)
+	asc_docs_api.prototype.asc_AddTableOfContents = function(sHeading, oPr)
 	{
-		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading);
+		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
 	};
 	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
 	{
