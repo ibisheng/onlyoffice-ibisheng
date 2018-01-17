@@ -189,22 +189,22 @@ CChangesSdtPrDocPartObj.prototype.WriteToBinary = function(Writer)
 
 	var nFlags = 0;
 
-	if (undefined === this.Old.Category)
+	if (undefined !== this.Old.Category)
 		nFlags |= 1;
 
-	if (undefined === this.Old.Gallery)
+	if (undefined !== this.Old.Gallery)
 		nFlags |= 2;
 
-	if (undefined === this.Old.Unique)
+	if (undefined !== this.Old.Unique)
 		nFlags |= 4;
 
-	if (undefined === this.New.Category)
+	if (undefined !== this.New.Category)
 		nFlags |= 8;
 
-	if (undefined === this.New.Gallery)
+	if (undefined !== this.New.Gallery)
 		nFlags |= 16;
 
-	if (undefined === this.New.Unique)
+	if (undefined !== this.New.Unique)
 		nFlags |= 32;
 
 	Writer.WriteLong(nFlags);
@@ -218,14 +218,14 @@ CChangesSdtPrDocPartObj.prototype.WriteToBinary = function(Writer)
 	if (undefined !== this.Old.Unique)
 		Writer.WriteBool(this.Old.Unique);
 
-	if (undefined !== this.Old.Category)
-		Writer.WriteString2(this.Old.Category);
+	if (undefined !== this.New.Category)
+		Writer.WriteString2(this.New.Category);
 
-	if (undefined !== this.Old.Gallery)
-		Writer.WriteString2(this.Old.Gallery);
+	if (undefined !== this.New.Gallery)
+		Writer.WriteString2(this.New.Gallery);
 
-	if (undefined !== this.Old.Unique)
-		Writer.WriteBool(this.Old.Unique);
+	if (undefined !== this.New.Unique)
+		Writer.WriteBool(this.New.Unique);
 };
 CChangesSdtPrDocPartObj.prototype.ReadFromBinary = function(Reader)
 {

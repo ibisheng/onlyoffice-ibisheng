@@ -7777,7 +7777,7 @@ background-repeat: no-repeat;\
 		if (!oTOC)
 			return;
 
-		if (oTOC instanceof CBlockLevelSdt)
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 		{
 			this.asc_RemoveContentControl(oTOC.GetId());
 		}
@@ -7796,7 +7796,7 @@ background-repeat: no-repeat;\
 		if (!oTOC)
 			return;
 
-		if (oTOC instanceof CBlockLevelSdt)
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 			oTOC = oTOC.GetInnerTableOfContents();
 
 		if (oTOC instanceof CComplexField)
@@ -7821,7 +7821,7 @@ background-repeat: no-repeat;\
 		if (!oTOC)
 			return;
 
-		if (oTOC instanceof CBlockLevelSdt)
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 			oTOC = oTOC.GetInnerTableOfContents();
 
 		this.asc_SetComplexFieldPr(oTOC, oPr, true);
