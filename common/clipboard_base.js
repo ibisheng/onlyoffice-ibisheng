@@ -1033,7 +1033,7 @@
 			if (!this.Api || !this.buttonInfo || this.buttonInfo.isClean())
 				return;
 			
-			if(this.showSpecialPasteButton)
+			if(this.showSpecialPasteButton && !this.pasteStart)
 			{
 				this.Api.asc_UpdateSpecialPasteButton();
 			}

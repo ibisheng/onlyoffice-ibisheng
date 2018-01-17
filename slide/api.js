@@ -1776,25 +1776,32 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function()
 	{
 		var props = AscCommon.g_specialPasteHelper.buttonInfo;
+		var presentation = editor.WordControl.m_oLogicDocument;
 
 		//при переходе между шейпами, скрываем значок спец.вставки
 		if(props.shapeId)
 		{
-			var presentation = editor.WordControl.m_oLogicDocument;
 			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
 			if(targetDocContent && targetDocContent.Id === props.shapeId)
 			{
-				if(props.position)
+				if(props.fixPosition)
 				{
-					props.asc_setCellCoord(props.position);
+					props.asc_setCellCoord(new AscCommon.asc_CRect( props.fixPosition.x, props.fixPosition.y, 0, 0 ));
 				}
 			}
 			else
 			{
-				if(!props.position)
-				{
-					props.setPosition(props.cellCoord);
-				}
+				props.asc_setCellCoord(new AscCommon.asc_CRect( -1, -1, 0, 0 ));
+			}
+		}
+		else
+		{
+			if(props.fixPosition && props.fixPosition.pageNum === presentation.CurPage)
+			{
+				props.asc_setCellCoord(new AscCommon.asc_CRect( props.fixPosition.x, props.fixPosition.y, 0, 0 ));
+			}
+			else
+			{
 				props.asc_setCellCoord(new AscCommon.asc_CRect( -1, -1, 0, 0 ));
 			}
 		}
