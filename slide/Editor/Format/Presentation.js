@@ -4922,51 +4922,117 @@ CPresentation.prototype =
                                         oDocContentForDraw.MoveDrawing = bOldVal;
 
 
-                                        if(oDocContentForDraw.Content.length > 1 && oDocContentForDraw.Content[oDocContentForDraw.Content.length - 1].IsEmpty()){
-                                            oDocContentForDraw.Content.splice(oDocContentForDraw.Content.length - 1, 1);
-                                        }
-                                        oDocContentForDraw.Reset(0, 0, 20000, 20000);
-                                        oDocContentForDraw.Recalculate_Page(0, true);
-                                        aParagraphs = oDocContentForDraw.Content;
-                                        dMaxWidth = 0;
-                                        for(i = 0; i < aParagraphs.length; ++i){
-                                            oParagraph = aParagraphs[i];
-                                            for(j = 0; j < oParagraph.Lines.length; ++j){
-                                                if(oParagraph.Lines[j].Ranges[0].W > dMaxWidth){
-                                                    dMaxWidth = oParagraph.Lines[j].Ranges[0].W;
+                                        var oCheckParagraph, aRuns;
+                                        for(i = oDocContentForDraw.Content.length - 1; i > -1; --i){
+                                            oCheckParagraph = oDocContentForDraw.Content[i];
+                                            if(!oCheckParagraph.IsEmpty()){
+                                                aRuns = oCheckParagraph.Content;
+                                                if(aRuns.length > 2){
+                                                    for(j = aRuns.length - 2; j > -1; --j){
+                                                        var oRun = aRuns[i];
+                                                        for(var k = oRun.Content.length - 1; k > -1; --k){
+                                                            if(oRun.Content[k].Type === para_NewLine){
+                                                                oRun.Content.splice(k, 1);
+                                                            }
+                                                            else{
+                                                                break;
+                                                            }
+                                                        }
+                                                        if(oRun.Content.length === 0){
+                                                            aRuns.splice(j, 1);
+                                                        }
+                                                        else {
+                                                            break;
+                                                        }
+                                                    }
                                                 }
                                             }
+                                            if(oCheckParagraph.IsEmpty()){
+                                                oDocContentForDraw.Content.splice(i, 1);
+                                            }
+                                            else{
+
+                                                break;
+                                            }
                                         }
-                                        dMaxWidth += 1;
-                                        oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
-                                        oDocContentForDraw.Recalculate_Page(0, true);
-                                        dContentHeight = oDocContentForDraw.Get_SummaryHeight();
+                                        for(i = 0; i < oDocContentForDraw.Content.length; ++i){
+                                            oCheckParagraph = oDocContentForDraw.Content[i];
+                                            if(!oCheckParagraph.IsEmpty()){
+                                                aRuns = oCheckParagraph.Content;
+                                                if(aRuns.length > 2){
+                                                    for(j = 0; j < aRuns.length - 1; ++j){
+                                                        var oRun = aRuns[i];
+                                                        for(var k = 0; k < oRun.Content.length; ++k){
+                                                            if(oRun.Content[k].Type === para_NewLine){
+                                                                oRun.Content.splice(k, 1);
+                                                                k--;
+                                                            }
+                                                            else{
+                                                                break;
+                                                            }
+                                                        }
+                                                        if(oRun.Content.length === 0){
+                                                            aRuns.splice(j, 1);
+                                                        }
+                                                        else {
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if(oCheckParagraph.IsEmpty()){
+                                                oDocContentForDraw.Content.splice(i, 1);
+                                                i--;
+                                            }
+                                            else{
 
-                                        oCanvas = document.createElement('canvas');
-                                        dImageWidth = dMaxWidth;
-                                        dImageHeight = dContentHeight;
-                                        oCanvas.width = ((dImageWidth*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
-                                        oCanvas.height = ((dImageHeight*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
-                                        //if (AscCommon.AscBrowser.isRetina) {
-                                        //    oCanvas.width <<= 1;
-                                        //    oCanvas.height <<= 1;
-                                        //}
-                                        oContext = oCanvas.getContext('2d');
-                                        oGraphics = new AscCommon.CGraphics();
+                                                break;
+                                            }
+                                        }
+                                        if(oDocContentForDraw.Content.length > 0){
+                                            oDocContentForDraw.Reset(0, 0, 20000, 20000);
+                                            oDocContentForDraw.Recalculate_Page(0, true);
+                                            aParagraphs = oDocContentForDraw.Content;
+                                            dMaxWidth = 0;
+                                            for(i = 0; i < aParagraphs.length; ++i){
+                                                oParagraph = aParagraphs[i];
+                                                for(j = 0; j < oParagraph.Lines.length; ++j){
+                                                    if(oParagraph.Lines[j].Ranges[0].W > dMaxWidth){
+                                                        dMaxWidth = oParagraph.Lines[j].Ranges[0].W;
+                                                    }
+                                                }
+                                            }
+                                            dMaxWidth += 1;
+                                            oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
+                                            oDocContentForDraw.Recalculate_Page(0, true);
+                                            dContentHeight = oDocContentForDraw.Get_SummaryHeight();
 
-                                        oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
-                                        oGraphics.m_oFontManager = AscCommon.g_fontManager;
-                                        oGraphics.m_oCoordTransform.tx = nContentIndents;
-                                        oGraphics.m_oCoordTransform.ty = nContentIndents;
-                                        oGraphics.transform(1,0,0,1,0,0);
+                                            oCanvas = document.createElement('canvas');
+                                            dImageWidth = dMaxWidth;
+                                            dImageHeight = dContentHeight;
+                                            oCanvas.width = ((dImageWidth*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
+                                            oCanvas.height = ((dImageHeight*AscCommon.g_dKoef_mm_to_pix) + 2*nContentIndents + 0.5) >> 0;
+                                            //if (AscCommon.AscBrowser.isRetina) {
+                                            //    oCanvas.width <<= 1;
+                                            //    oCanvas.height <<= 1;
+                                            //}
+                                            oContext = oCanvas.getContext('2d');
+                                            oGraphics = new AscCommon.CGraphics();
 
-                                        bOldShowParaMarks = this.Api.ShowParaMarks;
-                                        this.Api.ShowParaMarks = false;
-                                        oDocContentForDraw.Draw(0, oGraphics);
-                                        this.Api.ShowParaMarks = bOldShowParaMarks;
-                                        var sImageUrl = oCanvas.toDataURL("image/png");
-                                        oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
-                                        oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
+                                            oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
+                                            oGraphics.m_oFontManager = AscCommon.g_fontManager;
+                                            oGraphics.m_oCoordTransform.tx = nContentIndents;
+                                            oGraphics.m_oCoordTransform.ty = nContentIndents;
+                                            oGraphics.transform(1,0,0,1,0,0);
+
+                                            bOldShowParaMarks = this.Api.ShowParaMarks;
+                                            this.Api.ShowParaMarks = false;
+                                            oDocContentForDraw.Draw(0, oGraphics);
+                                            this.Api.ShowParaMarks = bOldShowParaMarks;
+                                            var sImageUrl = oCanvas.toDataURL("image/png");
+                                            oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
+                                            oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
+                                        }
                                     }
                                 }
                             }
