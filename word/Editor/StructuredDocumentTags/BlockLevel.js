@@ -1092,13 +1092,6 @@ CBlockLevelSdt.prototype.IsBuiltInUnique = function()
 {
 	return true === this.Pr.DocPartObj.Unique;
 };
-CBlockLevelSdt.prototype.IsBuiltInDocPart = function()
-{
-	if (this.Pr.DocPartObj && (this.Pr.DocPartObj.Category || this.Pr.DocPartObj.Gallery))
-		return true;
-
-	return false;
-};
 CBlockLevelSdt.prototype.SetContentControlLock = function(nLockType)
 {
 	if (this.Pr.Lock !== nLockType)

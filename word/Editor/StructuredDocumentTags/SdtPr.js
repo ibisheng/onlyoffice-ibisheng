@@ -152,6 +152,13 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 	if (Flags & 128)
 		this.DocPartObj.Category = Reader.GetString2();
 };
+CSdtPr.prototype.IsBuiltInDocPart = function()
+{
+	if (this.DocPartObj && (this.DocPartObj.Category || this.DocPartObj.Gallery))
+		return true;
+
+	return false;
+};
 
 function CContentControlPr(nType)
 {
