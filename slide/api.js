@@ -1781,7 +1781,7 @@ background-repeat: no-repeat;\
 		if(props.shapeId) {
 			var presentation = editor.WordControl.m_oLogicDocument;
 			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
-			if(!targetDocContent && targetDocContent.Id !== props.shapeId) {
+			if(!targetDocContent || targetDocContent.Id !== props.shapeId) {
 				return;
 			}
 		}
