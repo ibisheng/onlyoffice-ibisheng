@@ -2896,6 +2896,11 @@
 							return false;
 						}
 
+						isIntoShape = worksheet.objectRender.controller.getTargetDocContent(true);
+						if(!isIntoShape)
+						{
+							return false;
+						}
 						var Count = text.length;
 
 						var newParagraph = new Paragraph(isIntoShape.DrawingDocument, isIntoShape);
