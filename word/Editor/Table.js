@@ -12961,14 +12961,14 @@ CTable.prototype.GetSummaryHeight = function()
 
 	return nSum;
 };
-CTable.prototype.GetTableOfContents = function(isCheckFields)
+CTable.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
 	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
 	{
 		var oRow = this.GetRow(nCurRow);
 		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
 		{
-			var oResult = oRow.GetCell(nCurCell).Content.GetTableOfContents(isCheckFields);
+			var oResult = oRow.GetCell(nCurCell).Content.GetTableOfContents(isUnique, isCheckFields);
 			if (oResult)
 				return oResult;
 		}

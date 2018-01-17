@@ -16390,21 +16390,25 @@ CDocument.prototype.GetPagesCount = function()
 	return this.Pages.length;
 };
 /**
- * Данная функция получает первую таблицу TOC по схеме Word (сначала ищем среди CBlockLevelSdt, потом просто в сложных полях)
+ * Данная функция получает первую таблицу TOC по схеме Word
  * @returns {CBlockLevelSdt | CComplexField | null}
  */
 CDocument.prototype.GetTableOfContents = function()
 {
+	// 1. Ищем среди CBlockLevelSdt с параметром Unique = true
+	// 2. Ищем среди CBlockLevelSdt
+	// 3. Ищем потом просто в сложных полях
+
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		var oResult = this.Content[nIndex].GetTableOfContents(false);
+		var oResult = this.Content[nIndex].GetTableOfContents(true, false);
 		if (oResult)
 			return oResult;
 	}
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		var oResult = this.Content[nIndex].GetTableOfContents(true);
+		var oResult = this.Content[nIndex].GetTableOfContents(false, true);
 		if (oResult)
 			return oResult;
 	}

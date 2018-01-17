@@ -12527,7 +12527,7 @@ Paragraph.prototype.private_CheckUpdateBookmarks = function(Items)
 		}
 	}
 };
-Paragraph.prototype.GetTableOfContents = function(isCheckFields)
+Paragraph.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
 	if (true !== isCheckFields)
 		return null;

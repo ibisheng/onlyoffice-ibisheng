@@ -999,16 +999,16 @@ CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 {
 	return this.Parent.IsTableFirstRowOnNewPage();
 };
-CBlockLevelSdt.prototype.GetTableOfContents = function(isCheckFields)
+CBlockLevelSdt.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
-	if (this.IsBuiltInTableOfContents())
+	if (this.IsBuiltInTableOfContents() && (!isUnique || this.IsBuiltInUnique()))
 		return this;
 
 	return this.Content.GetTableOfContents(isCheckFields);
 };
 CBlockLevelSdt.prototype.GetInnerTableOfContents = function()
 {
-	var oTOC = this.Content.GetTableOfContents(true);
+	var oTOC = this.Content.GetTableOfContents(false, true);
 	if (oTOC instanceof CBlockLevelSdt)
 		return oTOC.GetInnerTableOfContents();
 

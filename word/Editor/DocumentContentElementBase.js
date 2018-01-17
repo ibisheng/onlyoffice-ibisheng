@@ -820,10 +820,11 @@ CDocumentContentElementBase.prototype.UpdateBookmarks = function(oManager)
 };
 /**
  * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isUnique ищем с параметром Unique = true
  * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
  * @returns {CComplexField | CBlockLevelSdt | null}
  */
-CDocumentContentElementBase.prototype.GetTableOfContents = function(isCheckFields)
+CDocumentContentElementBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
 	return null;
 };

@@ -7765,7 +7765,15 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_AddTableOfContents = function(sHeading, oPr)
 	{
-		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var oTOC = oLogicDocument.GetTableOfContents();
+		if (oTOC instanceof AscCommonWord.CBlockLevelSdt && oTOC.IsBuiltInUnique())
+			return;
+
+		this.this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
 	};
 	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
 	{
