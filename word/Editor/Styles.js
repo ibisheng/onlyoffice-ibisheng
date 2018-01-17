@@ -4554,6 +4554,20 @@ CStyles.prototype.GetDefaultHeading = function(nLvl)
 {
 	return this.Default.Headings[Math.max(Math.min(nLvl, 8), 0)];
 };
+CStyles.prototype.GetHeadingLevelByName = function(sStyleName)
+{
+	var sId = this.Get_StyleIdByName(sStyleName);
+	if (!sId)
+		return -1;
+
+	for (var nIndex = 0; nIndex <= 8; ++nIndex)
+	{
+		if (sId === this.Default.Headings[nIndex])
+			return nIndex;
+	}
+
+	return -1;
+};
 
 function CDocumentColor(r,g,b, Auto)
 {

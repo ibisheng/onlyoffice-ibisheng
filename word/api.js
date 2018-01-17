@@ -7864,6 +7864,15 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_GetHeadingLevel = function (sStyleName)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument || !sStyleName)
+			return -1;
+
+		return oLogicDocument.GetStyles().GetHeadingLevelByName(sStyleName);
+	};
+
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
 	{
@@ -8996,6 +9005,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_RemoveTableOfContents']                  = asc_docs_api.prototype.asc_RemoveTableOfContents;
 	asc_docs_api.prototype['asc_GetTableOfContentsPr']                   = asc_docs_api.prototype.asc_GetTableOfContentsPr;
 	asc_docs_api.prototype['asc_SetTableOfContentsPr']                   = asc_docs_api.prototype.asc_SetTableOfContentsPr;
+
+	asc_docs_api.prototype['asc_GetHeadingLevel']                        = asc_docs_api.prototype.asc_GetHeadingLevel;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
