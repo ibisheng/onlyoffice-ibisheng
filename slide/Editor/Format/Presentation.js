@@ -4282,6 +4282,7 @@ CPresentation.prototype =
         editor.sendEvent("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
         editor.sendEvent("asc_onCanGroup", this.canGroup());
         editor.sendEvent("asc_onCanUnGroup", this.canUnGroup());
+        AscCommon.g_specialPasteHelper.SpecialPasteButton_Update_Position();
     },
 
     changeBackground: function(bg, arr_ind, bNoCreatePoint)
@@ -5030,7 +5031,7 @@ CPresentation.prototype =
                                             oDocContentForDraw.Draw(0, oGraphics);
                                             this.Api.ShowParaMarks = bOldShowParaMarks;
                                             var sImageUrl = oCanvas.toDataURL("image/png");
-                                            oImage = oController.createImage(sImageUrl, 0, 0, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
+                                            oImage = oController.createImage(sImageUrl, 0, 0, oCanvas.width*AscCommon.g_dKoef_pix_to_mm, oCanvas.height*AscCommon.g_dKoef_pix_to_mm);
                                             oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
                                         }
                                     }
