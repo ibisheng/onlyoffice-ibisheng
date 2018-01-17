@@ -1778,11 +1778,24 @@ background-repeat: no-repeat;\
 		var props = AscCommon.g_specialPasteHelper.buttonInfo;
 
 		//при переходе между шейпами, скрываем значок спец.вставки
-		if(props.shapeId) {
+		if(props.shapeId)
+		{
 			var presentation = editor.WordControl.m_oLogicDocument;
 			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
-			if(!targetDocContent || targetDocContent.Id !== props.shapeId) {
-				return;
+			if(targetDocContent && targetDocContent.Id === props.shapeId)
+			{
+				if(props.position)
+				{
+					props.asc_setCellCoord(props.position);
+				}
+			}
+			else
+			{
+				if(!props.position)
+				{
+					props.setPosition(props.cellCoord);
+				}
+				props.asc_setCellCoord(new AscCommon.asc_CRect( -1, -1, 0, 0 ));
 			}
 		}
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
