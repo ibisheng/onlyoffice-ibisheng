@@ -1025,6 +1025,9 @@ CBlockLevelSdt.prototype.SetPr = function(oPr)
 	this.SetTag(oPr.Tag);
 	this.SetLabel(oPr.Label);
 	this.SetContentControlLock(oPr.Lock);
+
+	if (undefined !== oPr.DocPartObj)
+		this.SetDocPartObj(oPr.DocPartObj.Category, oPr.DocPartObj.Gallery, oPr.DocPartObj.Unique);
 };
 CBlockLevelSdt.prototype.SetAlias = function(sAlias)
 {
@@ -1088,6 +1091,13 @@ CBlockLevelSdt.prototype.IsBuiltInTableOfContents = function()
 CBlockLevelSdt.prototype.IsBuiltInUnique = function()
 {
 	return true === this.Pr.DocPartObj.Unique;
+};
+CBlockLevelSdt.prototype.IsBuiltInDocPart = function()
+{
+	if (this.Pr.DocPartObj && (this.Pr.DocPartObj.Category || this.Pr.DocPartObj.Gallery))
+		return true;
+
+	return false;
 };
 CBlockLevelSdt.prototype.SetContentControlLock = function(nLockType)
 {
