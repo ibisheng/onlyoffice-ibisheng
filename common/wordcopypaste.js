@@ -3065,6 +3065,8 @@ PasteProcessor.prototype =
 		var targetDocContent = presentation.Get_TargetDocContent();
 		if(targetDocContent && targetDocContent.Id) {
 			specialPasteShowOptions.setShapeId(targetDocContent.Id);
+		} else {
+			specialPasteShowOptions.setShapeId(null);
 		}
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
