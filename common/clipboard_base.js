@@ -959,7 +959,7 @@
 			{
 				this.Special_Paste_End();
 				//TODO только для презентаций! проверить на остальных редакторах!
-				if(this.buttonInfo){
+				if(!this.buttonInfo.isClean()){
 					this.buttonInfo.asc_setOptions(null);
 					this.Api.asc_ShowSpecialPasteButton(this.buttonInfo);
 				}
