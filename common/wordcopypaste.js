@@ -1888,6 +1888,7 @@ function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPastePr
 
 	if(undefined === specialPasteProps)
 	{
+		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 		window['AscCommon'].g_specialPasteHelper.specialPasteData._format = _format;
 		window['AscCommon'].g_specialPasteHelper.specialPasteData.data1 = data1;
 		window['AscCommon'].g_specialPasteHelper.specialPasteData.data2 = data2;
