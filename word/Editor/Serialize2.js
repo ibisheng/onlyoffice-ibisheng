@@ -5477,9 +5477,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	this.WriteSdtPr = function (val)
 	{
 		var oThis = this;
-		// if (null != val.Type) {
-		// 	oThis.bs.WriteItem(c_oSerSdt.Type, function (){oThis.memory.WriteByte(val.Type);});
-		// }
+		var type;
 		if (null != val.Alias) {
 			this.memory.WriteByte(c_oSerSdt.Alias);
 			this.memory.WriteString2(val.Alias);
@@ -5496,9 +5494,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		// if (null != val.DocPartList) {
 		// 	oThis.bs.WriteItem(c_oSerSdt.DocPartList, function (){oThis.WriteDocPartList(val.DocPartList);});
 		// }
-		// if (null != val.DocPartObj) {
-		// 	oThis.bs.WriteItem(c_oSerSdt.DocPartObj, function (){oThis.WriteDocPartList(val.DocPartObj);});
-		// }
+		if (val.IsBuiltInDocPart()) {
+			type = 5;
+			oThis.bs.WriteItem(c_oSerSdt.DocPartObj, function (){oThis.WriteDocPartList(val.DocPartObj);});
+		}
 		// if (null != val.DropDownList) {
 		// 	oThis.bs.WriteItem(c_oSerSdt.DropDownList, function (){oThis.WriteSdtComboBox(val.DropDownList);});
 		// }
@@ -5534,6 +5533,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		// if (null != val.MultiLine) {
 		// 	oThis.bs.WriteItem(c_oSerSdt.MultiLine, function (){oThis.memory.WriteBool(val.MultiLine);});
 		// }
+		if (undefined !== type) {
+			oThis.bs.WriteItem(c_oSerSdt.Type, function (){oThis.memory.WriteByte(type);});
+		}
 	};
 	this.WriteSdtComboBox = function (val)
 	{
@@ -5601,16 +5603,16 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	this.WriteDocPartList = function (val)
 	{
 		var oThis = this;
-		if (null != val.DocPartCategory) {
+		if (null != val.Category) {
 			this.memory.WriteByte(c_oSerSdt.DocPartCategory);
-			this.memory.WriteString2(val.DocPartCategory);
+			this.memory.WriteString2(val.Category);
 		}
-		if (null != val.DocPartGallery) {
+		if (null != val.Gallery) {
 			this.memory.WriteByte(c_oSerSdt.DocPartGallery);
-			this.memory.WriteString2(val.DocPartGallery);
+			this.memory.WriteString2(val.Gallery);
 		}
-		if (null != val.DocPartUnique) {
-			oThis.bs.WriteItem(c_oSerSdt.DocPartUnique, function (){oThis.memory.WriteBool(val.DocPartUnique);});
+		if (null != val.Unique) {
+			oThis.bs.WriteItem(c_oSerSdt.DocPartUnique, function (){oThis.memory.WriteBool(val.Unique);});
 		}
 	};
 };
@@ -10888,11 +10890,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		// 	res = this.bcr.Read1(length, function(t, l) {
 		// 		return oThis.ReadDocPartList(t, l, oSdtPr.DocPartList);
 		// 	});
-		// } else if (c_oSerSdt.DocPartObj === type) {
-		// 	oSdtPr.DocPartObj = {};
-		// 	res = this.bcr.Read1(length, function(t, l) {
-		// 		return oThis.ReadDocPartList(t, l, oSdtPr.DocPartObj);
-		// 	});
+		} else if (c_oSerSdt.DocPartObj === type) {
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadDocPartList(t, l, oSdtPr.DocPartObj);
+			});
 		// } else if (c_oSerSdt.DropDownList === type) {
 		// 	oSdtPr.DropDownList = {};
 		// 	res = this.bcr.Read1(length, function(t, l) {
@@ -10989,13 +10990,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 	};
 	this.ReadDocPartList = function(type, length, val) {
 		var res = c_oSerConstants.ReadOk;
-		var oThis = this;
 		if (c_oSerSdt.DocPartCategory === type) {
-			val.DocPartCategory = this.stream.GetString2LE(length);
+			val.Category = this.stream.GetString2LE(length);
 		} else if (c_oSerSdt.DocPartGallery === type) {
-			val.DocPartGallery = this.stream.GetString2LE(length);
+			val.Gallery = this.stream.GetString2LE(length);
 		} else if (c_oSerSdt.DocPartUnique === type) {
-			val.DocPartUnique = (this.stream.GetUChar() != 0);
+			val.Unique = (this.stream.GetUChar() != 0);
 		} else {
 			res = c_oSerConstants.ReadUnknown;
 		}
