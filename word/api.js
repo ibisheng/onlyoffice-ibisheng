@@ -7771,7 +7771,12 @@ background-repeat: no-repeat;\
 
 		var oTOC = oLogicDocument.GetTableOfContents();
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt && oTOC.IsBuiltInUnique())
+		{
+			if (oPr)
+				this.asc_SetTableOfContentsPr(oPr);
+
 			return;
+		}
 
 		this.this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
 	};
