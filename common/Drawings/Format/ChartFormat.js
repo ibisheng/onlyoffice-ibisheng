@@ -5004,9 +5004,17 @@ CValAx.prototype =
         return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
     },
 
-    createDuplicate: function()
+    createDuplicate: function(o)
     {
-        var c = new CValAx();
+        var c;
+        if(o)
+        {
+            c = o;
+        }
+        else
+        {
+            c = new CValAx();
+        }
         c.setAxPos(this.axPos);
         c.setCrossBetween(this.crossBetween);
         c.setCrossesAt(this.crossesAt);

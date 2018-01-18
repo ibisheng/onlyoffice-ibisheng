@@ -3197,6 +3197,9 @@ DrawingObjectsController.prototype =
         }
 
 
+        chart_space.updateLinks();
+        var oValAx = chart_space.chart.plotArea.valAx;
+        var oCatAx = chart_space.chart.plotArea.catAx;
         chart_space.setStyle(chart_space.style);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
@@ -3327,6 +3330,41 @@ DrawingObjectsController.prototype =
                 var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt ? need_num_fmt : "General");
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
+
+
+
+                if(oValAx && oValAx instanceof AscFormat.CValAx){
+                    oValAx.createDuplicate(val_ax);
+                    val_ax.numFmt.setFormatCode(need_num_fmt);
+                }
+                if(oCatAx){
+                    if(oCatAx.majorGridlines)
+                    {
+                        axis_obj.catAx.setMajorGridlines(oCatAx.majorGridlines.createDuplicate());
+                    }
+                    axis_obj.catAx.setMajorTickMark(oCatAx.majorTickMark);
+
+                    if(oCatAx.minorGridlines)
+                    {
+                        axis_obj.catAx.setMinorGridlines(oCatAx.minorGridlines.createDuplicate());
+                    }
+                    axis_obj.catAx.setMinorTickMark(oCatAx.minorTickMark);
+
+                    if(oCatAx.spPr)
+                    {
+                        axis_obj.catAx.setSpPr(oCatAx.spPr.createDuplicate());
+                    }
+                    axis_obj.catAx.setTickLblPos(oCatAx.tickLblPos);
+                    if(oCatAx.title)
+                    {
+                        axis_obj.catAx.setTitle(oCatAx.title.createDuplicate());
+                    }
+                    if(oCatAx.txPr)
+                    {
+                        axis_obj.catAx.setTxPr(oCatAx.txPr.createDuplicate());
+                    }
+                }
+
             }
             if(cat_ax && val_ax)
             {
@@ -3935,6 +3973,37 @@ DrawingObjectsController.prototype =
                     }
                     new_chart_type.setScatterStyle(SCATTER_STYLE_MARKER);
                     axis_obj = AscFormat.CreateScatterAxis(); //cat - 0, val - 1
+                    if(oValAx && oValAx instanceof AscFormat.CValAx){
+                        oValAx.createDuplicate(axis_obj.valAx);
+                        axis_obj.valAx.setAxPos(AscFormat.AX_POS_L);
+                    }
+                    if(oCatAx){
+                        if(oCatAx.majorGridlines)
+                        {
+                            axis_obj.catAx.setMajorGridlines(oCatAx.majorGridlines.createDuplicate());
+                        }
+                        axis_obj.catAx.setMajorTickMark(oCatAx.majorTickMark);
+
+                        if(oCatAx.minorGridlines)
+                        {
+                            axis_obj.catAx.setMinorGridlines(oCatAx.minorGridlines.createDuplicate());
+                        }
+                        axis_obj.catAx.setMinorTickMark(oCatAx.minorTickMark);
+
+                        if(oCatAx.spPr)
+                        {
+                            axis_obj.catAx.setSpPr(oCatAx.spPr.createDuplicate());
+                        }
+                        axis_obj.catAx.setTickLblPos(oCatAx.tickLblPos);
+                        if(oCatAx.title)
+                        {
+                            axis_obj.catAx.setTitle(oCatAx.title.createDuplicate());
+                        }
+                        if(oCatAx.txPr)
+                        {
+                            axis_obj.catAx.setTxPr(oCatAx.txPr.createDuplicate());
+                        }
+                    }
                     new_chart_type.addAxId(axis_obj.catAx);
                     new_chart_type.addAxId(axis_obj.valAx);
                     plot_area.addAxis(axis_obj.catAx);
