@@ -38,14 +38,8 @@
 		if (value instanceof Date) {
 			res = new AscCommonExcel.cNumber(value.getExcelDate() +
 				(value.getHours() * 60 * 60 + value.getMinutes() * 60 + value.getSeconds()) / AscCommonExcel.c_sPerDay)
-		} else if (value instanceof Number) {
-			res = new AscCommonExcel.cNumber(value);
 		} else {
-			value += '';
-			res = new AscCommonExcel.cNumber(value);
-			if (AscCommonExcel.cElementType.error === res.type) {
-				res = new AscCommonExcel.cString(value);
-			}
+			res = new AscCommonExcel.cString(value + '');
 		}
 		return res;
 	}
@@ -792,7 +786,7 @@
 	 * @param {string} value
 	 */
 	ApiRange.prototype.SetValue = function (value) {
-		this.range.setValue(value);
+		this.range.setValue(checkFormat(value).getValue());
 	};
 	Object.defineProperty(ApiRange.prototype, "Value", {
 		get: function () {
