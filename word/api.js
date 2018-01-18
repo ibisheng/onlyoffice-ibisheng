@@ -7763,7 +7763,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
+		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
 	};
 	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
 	{

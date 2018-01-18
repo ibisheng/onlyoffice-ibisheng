@@ -3446,7 +3446,6 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 		}
 	}
 
-
 	this.Set_UiPriority(39);
 	this.Set_UnhideWhenUsed(true);
 	this.Set_ParaPr(ParaPr);
