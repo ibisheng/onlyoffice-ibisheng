@@ -4959,19 +4959,21 @@ CPresentation.prototype =
                                                 if(aRuns.length > 1){
                                                     for(j = aRuns.length - 2; j > -1; --j){
                                                         var oRun = aRuns[j];
-                                                        for(var k = oRun.Content.length - 1; k > -1; --k){
-                                                            if(oRun.Content[k].Type === para_NewLine){
-                                                                oRun.Content.splice(k, 1);
+                                                        if(oRun.Type === para_Run){
+                                                            for(var k = oRun.Content.length - 1; k > -1; --k){
+                                                                if(oRun.Content[k].Type === para_NewLine){
+                                                                    oRun.Content.splice(k, 1);
+                                                                }
+                                                                else{
+                                                                    break;
+                                                                }
                                                             }
-                                                            else{
+                                                            if(oRun.Content.length === 0){
+                                                                aRuns.splice(j, 1);
+                                                            }
+                                                            else {
                                                                 break;
                                                             }
-                                                        }
-                                                        if(oRun.Content.length === 0){
-                                                            aRuns.splice(j, 1);
-                                                        }
-                                                        else {
-                                                            break;
                                                         }
                                                     }
                                                 }
@@ -4991,21 +4993,23 @@ CPresentation.prototype =
                                                 if(aRuns.length > 1){
                                                     for(j = 0; j < aRuns.length - 1; ++j){
                                                         var oRun = aRuns[j];
-                                                        for(var k = 0; k < oRun.Content.length; ++k){
-                                                            if(oRun.Content[k].Type === para_NewLine){
-                                                                oRun.Content.splice(k, 1);
-                                                                k--;
+                                                        if(oRun.Type === para_Run) {
+                                                            for (var k = 0; k < oRun.Content.length; ++k) {
+                                                                if (oRun.Content[k].Type === para_NewLine) {
+                                                                    oRun.Content.splice(k, 1);
+                                                                    k--;
+                                                                }
+                                                                else {
+                                                                    break;
+                                                                }
                                                             }
-                                                            else{
+                                                            if (oRun.Content.length === 0) {
+                                                                aRuns.splice(j, 1);
+                                                                j--;
+                                                            }
+                                                            else {
                                                                 break;
                                                             }
-                                                        }
-                                                        if(oRun.Content.length === 0){
-                                                            aRuns.splice(j, 1);
-                                                            j--;
-                                                        }
-                                                        else {
-                                                            break;
                                                         }
                                                     }
                                                 }
