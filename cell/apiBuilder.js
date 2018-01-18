@@ -751,14 +751,25 @@
 	/**
 	 * Set cell value
 	 * @memberof ApiRange
+	 * @returns {string}
+	 */
+	ApiRange.prototype.GetValue = function () {
+		return this.range.getValue();
+	};
+	/**
+	 * Set cell value
+	 * @memberof ApiRange
 	 * @param {string} value
 	 */
 	ApiRange.prototype.SetValue = function (value) {
 		this.range.setValue(value);
 	};
 	Object.defineProperty(ApiRange.prototype, "Value", {
+		get: function () {
+			return this.GetValue();
+		},
 		set: function (value) {
-			return this.SetValue(value);
+			this.SetValue(value);
 		}
 	});
 
@@ -1461,6 +1472,7 @@
 
 	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
 	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
+	ApiRange.prototype["GetValue"] = ApiRange.prototype.GetValue;
 	ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
 	ApiRange.prototype["SetFontColor"] = ApiRange.prototype.SetFontColor;
 	ApiRange.prototype["SetFontSize"] = ApiRange.prototype.SetFontSize;
