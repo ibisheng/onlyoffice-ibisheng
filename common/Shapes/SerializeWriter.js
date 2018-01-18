@@ -2878,6 +2878,39 @@ function CBinaryFileWriter()
                                 }
                                 break;
                             }
+                            case para_Math:
+                            {
+                                if (null != _elem_h.Root)
+                                {
+                                    oThis.StartRecord(0); // subtype
+                                    oThis.StartRecord(AscFormat.PARRUN_TYPE_MATHPARA);
+                                    var _memory = new AscCommon.CMemory(true);
+                                    _memory.ImData = oThis.ImData;
+                                    _memory.data = oThis.data;
+                                    _memory.len = oThis.len;
+                                    _memory.pos = oThis.pos;
+                                    oThis.UseContinueWriter = true;
+
+                                    if (!oThis.DocSaveParams) {
+                                        oThis.DocSaveParams = new AscCommonWord.DocSaveParams(false, false);
+                                    }
+                                    var boMaths = new Binary_oMathWriter(_memory, null, oThis.DocSaveParams);
+                                    boMaths.bs.WriteItemWithLength(function(){boMaths.WriteOMathPara(_elem_h)});
+
+                                    oThis.ImData = _memory.ImData;
+                                    oThis.data = _memory.data;
+                                    oThis.len = _memory.len;
+                                    oThis.pos = _memory.pos;
+                                    oThis.UseContinueWriter = false;
+
+                                    _memory.ImData = null;
+                                    _memory.data = null;
+
+                                    oThis.EndRecord();
+                                    oThis.EndRecord();
+                                    _count++;
+                                }
+                            }
                             default:
                                 break;
                         }
