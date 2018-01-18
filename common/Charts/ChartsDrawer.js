@@ -146,7 +146,7 @@ CChartsDrawer.prototype =
 		this.allAreaChart = new allAreaChart();
 		
 		//создаём область
-		this.areaChart = new areaChart();
+		this.plotAreaChart = new plotAreaChart();
 		
 		//создаём сетку
 		this.gridChart = new gridChart();
@@ -230,7 +230,7 @@ CChartsDrawer.prototype =
 			if(this.nDimensionCount === 3)
 				this._calaculate3DProperties(chartSpace);
 			
-			this.areaChart.recalculate(this);
+			this.plotAreaChart.recalculate(this);
 			
 			if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart)
 				this.gridChart.recalculate(this);
@@ -271,7 +271,7 @@ CChartsDrawer.prototype =
 		
 		if(!chartSpace.bEmptySeries)
 		{
-			this.areaChart.draw(this);
+			this.plotAreaChart.draw(this, true);
 			
 			if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart)
 			{
@@ -281,7 +281,8 @@ CChartsDrawer.prototype =
 					this.sideWall3DChart.draw(this);
 					this.backWall3DChart.draw(this);
 				}
-                this.gridChart.draw(this);
+				this.gridChart.draw(this);
+				this.plotAreaChart.draw(this, null, true);
 			}
 			
 			if(this.nDimensionCount === 3)
@@ -13593,7 +13594,7 @@ allAreaChart.prototype =
 };
 
 	/** @constructor */
-function areaChart()
+function plotAreaChart()
 {
 	this.chartProp = null;
 	this.cChartSpace = null;
@@ -13602,17 +13603,17 @@ function areaChart()
 	this.paths = null;
 }
 
-areaChart.prototype =
+plotAreaChart.prototype =
 {
-    constructor: areaChart,
+    constructor: plotAreaChart,
 	
-	draw : function(chartsDrawer)
-    {
+	draw: function(chartsDrawer, ignorePen, ignoreBrush)
+	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
 		
-		this._drawArea();
+		this._drawArea(ignorePen, ignoreBrush);
 	},
 	
 	recalculate: function(chartsDrawer)
@@ -13703,10 +13704,10 @@ areaChart.prototype =
 		this.paths = pathId;
 	},
 	
-	_drawArea: function()
+	_drawArea: function(ignorePen, ignoreBrush)
 	{
-		var pen = this.cChartSpace.chart.plotArea.pen;
-		var brush = this.cChartSpace.chart.plotArea.brush;
+		var pen = ignorePen ? null : this.cChartSpace.chart.plotArea.pen;
+		var brush = ignoreBrush ? null : this.cChartSpace.chart.plotArea.brush;
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 };
