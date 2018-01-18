@@ -1049,8 +1049,8 @@
 			if (this.m_bIsNeedUpdateMatrix12)
 			{
 				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+					this.m_pDefaultFont.UpdateMatrix2();
+				this.UpdateMatrix2();
 			}
 
 			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
@@ -1230,19 +1230,19 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
 		}
 
 		this.GetString2 = function (pString)
 		{
 			if (pString.GetLength() <= 0)
 				return true;
+
+            if (this.m_bIsNeedUpdateMatrix12)
+            {
+                if (this.m_pDefaultFont)
+                    this.m_pDefaultFont.UpdateMatrix2();
+                this.UpdateMatrix2();
+            }
 
 			var unPrevGID = 0;
 			var fPenX = 0, fPenY = 0;
@@ -1251,14 +1251,6 @@
 
 			for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
 			{
-				// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-				if (this.m_bIsNeedUpdateMatrix12)
-				{
-					if (this.m_pDefaultFont)
-						this.m_pDefaultFont.UpdateMatrix1();
-					this.UpdateMatrix1();
-				}
-
 				var pFace = this.m_pFace;
 				var pCurentGliph = pFace.glyph;
 
@@ -1313,13 +1305,6 @@
 
 					oSizes.ushGID = unGID;
 					oSizes.nCMapIndex = nCMapIndex.index;
-
-					if (this.m_bIsNeedUpdateMatrix12)
-					{
-						if (this.m_pDefaultFont)
-							this.m_pDefaultFont.UpdateMatrix2();
-						this.UpdateMatrix2();
-					}
 
 					var _LOAD_MODE = this.GetCharLoadMode();
 					if (0 != this.FT_Load_Glyph_Wrapper(pFace, unGID, _LOAD_MODE))
@@ -1507,13 +1492,6 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
 		}
 
 		this.GetString2C = function (pString)
@@ -1525,8 +1503,8 @@
 			if (this.m_bIsNeedUpdateMatrix12)
 			{
 				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+					this.m_pDefaultFont.UpdateMatrix2();
+				this.UpdateMatrix2();
 			}
 
 			var pCurGlyph = pString.m_pGlyphsBuffer[0];
@@ -1576,13 +1554,6 @@
 
 				oSizes.ushGID = unGID;
 				oSizes.nCMapIndex = nCMapIndex.index;
-
-				if (this.m_bIsNeedUpdateMatrix12)
-				{
-					if (this.m_pDefaultFont)
-						this.m_pDefaultFont.UpdateMatrix2();
-					this.UpdateMatrix2();
-				}
 
 				if (true)
 				{
@@ -1793,14 +1764,6 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
 		}
 
 		this.SetCMapForCharCode = function (lUnicode, pnCMapIndex)
@@ -1866,8 +1829,8 @@
 			if (this.m_bIsNeedUpdateMatrix12)
 			{
 				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+					this.m_pDefaultFont.UpdateMatrix2();
+				this.UpdateMatrix2();
 			}
 
 			var unGID = 0;
@@ -2012,13 +1975,6 @@
 				 */
 
 				Result = charSymbolObj;
-			}
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
 			}
 
 			return Result;
@@ -2197,8 +2153,8 @@
 			if (this.m_bIsNeedUpdateMatrix12)
 			{
 				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+					this.m_pDefaultFont.UpdateMatrix2();
+				this.UpdateMatrix2();
 			}
 
 			var unGID = 0;
@@ -2251,13 +2207,6 @@
 			_painter.start(worker);
 			FT_Outline_Decompose(pGlyph.outline, _painter, worker);
 			_painter.end(worker);
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
 		}
 
 		this.GetStringPath = function (string, worker)
