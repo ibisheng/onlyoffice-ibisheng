@@ -1434,6 +1434,8 @@
 		this.PageNumbers = undefined;
 		this.RightTab    = undefined;
 		this.TabLeader   = undefined;
+
+		this.StylesType  = Asc.c_oAscTOCStylesType.Current;
 	}
 	CTableOfContentsPr.prototype.InitFromTOCInstruction = function(oComplexField)
 	{
@@ -1448,6 +1450,11 @@
 		this.OutlineStart = oInstruction.GetHeadingRangeStart();
 		this.OutlineEnd   = oInstruction.GetHeadingRangeEnd();
 		this.Styles       = oInstruction.GetStylesArray();
+	};
+	CTableOfContentsPr.prototype.CheckStylesType = function(oStyles)
+	{
+		if (oStyles)
+			this.StylesType = oStyles.GetTOCStylesType();
 	};
 	CTableOfContentsPr.prototype.get_Hyperlink = function()
 	{
@@ -1512,7 +1519,14 @@
 	{
 		this.TabLeader = nTabLeader;
 	};
-
+	CTableOfContentsPr.prototype.get_StylesType = function()
+	{
+		return this.StylesType;
+	};
+	CTableOfContentsPr.prototype.put_StylesType = function(nType)
+	{
+		this.StylesType = nType;
+	};
 
 
 	window['Asc']['CTableOfContentsPr'] = window['Asc'].CTableOfContentsPr = CTableOfContentsPr;
@@ -1529,7 +1543,7 @@
 	CTableOfContentsPr.prototype['put_ShowPageNumbers'] = CTableOfContentsPr.prototype.put_ShowPageNumbers;
 	CTableOfContentsPr.prototype['put_RightAlignTab']   = CTableOfContentsPr.prototype.put_RightAlignTab;
 	CTableOfContentsPr.prototype['put_TabLeader']       = CTableOfContentsPr.prototype.put_TabLeader;
-
-
+	CTableOfContentsPr.prototype['get_StylesType']      = CTableOfContentsPr.prototype.get_StylesType;
+	CTableOfContentsPr.prototype['put_StylesType']      = CTableOfContentsPr.prototype.put_StylesType;
 
 })(window, undefined);

@@ -7801,6 +7801,7 @@ background-repeat: no-repeat;\
 		{
 			var oPr = new Asc.CTableOfContentsPr();
 			oPr.InitFromTOCInstruction(oTOC);
+			oPr.CheckStylesType(oLogicDocument.GetStyles());
 			return oPr;
 		}
 
@@ -7822,7 +7823,40 @@ background-repeat: no-repeat;\
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 			oTOC = oTOC.GetInnerTableOfContents();
 
-		this.asc_SetComplexFieldPr(oTOC, oPr, true);
+
+		var oStyles     = oLogicDocument.GetStyles();
+		var nStylesType = oPr.get_StylesType();
+
+		var isNeedChangeStyles = (Asc.c_oAscTOCStylesType.Current !== nStylesType && nStylesType !== oStyles.GetTOCStylesType());
+
+		oTOC.SelectField();
+
+		var isLocked = true;
+		if (isNeedChangeStyles)
+		{
+			isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, {
+				Type : AscCommon.changestype_2_AdditionalTypes, Types : [AscCommon.changestype_Document_Styles]
+			});
+		}
+		else
+		{
+			isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)
+		}
+
+		if (!isLocked)
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetComplexFieldPr);
+
+			if (isNeedChangeStyles)
+				oStyles.SetTOCStylesType(nStylesType);
+
+			oTOC.SetPr(oPr);
+			oTOC.Update();
+
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
 	};
 
 	asc_docs_api.prototype.asc_RemoveComplexField = function(oComplexField)

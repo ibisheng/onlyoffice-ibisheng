@@ -3203,7 +3203,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 	var ParaPr = {},
 		TextPr = {};
 
-	if (undefined === nType || null === nType || Asc.c_oAscTOCStyleType.Simple === nType)
+	if (undefined === nType || null === nType || Asc.c_oAscTOCStylesType.Simple === nType)
 	{
 		ParaPr = {
 			Spacing : {
@@ -3234,7 +3234,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 		else if (8 === nLvl)
 			ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
 	}
-	else if (Asc.c_oAscTOCStyleType.Standard === nType)
+	else if (Asc.c_oAscTOCStylesType.Standard === nType)
 	{
 		ParaPr = {
 			Spacing : {
@@ -3295,7 +3295,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 			TextPr.FontSize = 11;
 		}
 	}
-	else if (Asc.c_oAscTOCStyleType.Modern === nType)
+	else if (Asc.c_oAscTOCStylesType.Modern === nType)
 	{
 		ParaPr = {
 			Ind : {
@@ -3350,7 +3350,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 			TextPr.FontSize = 11;
 		}
 	}
-	else if (Asc.c_oAscTOCStyleType.Classic === nType)
+	else if (Asc.c_oAscTOCStylesType.Classic === nType)
 	{
 
 		if (0 === nLvl)
@@ -4850,20 +4850,20 @@ CStyles.prototype.GetHeadingLevelByName = function(sStyleName)
 };
 /**
  * Получаем тип набора стилей для Table of Contents
- * @returns {Asc.c_oAscTOCStyleType}
+ * @returns {Asc.c_oAscTOCStylesType}
  */
 CStyles.prototype.GetTOCStylesType = function()
 {
-	if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Simple))
-		return Asc.c_oAscTOCStyleType.Simple;
-	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Standard))
-		return Asc.c_oAscTOCStyleType.Standard;
-	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Modern))
-		return Asc.c_oAscTOCStyleType.Modern;
-	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Classic))
-		return Asc.c_oAscTOCStyleType.Classic;
+	if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Simple))
+		return Asc.c_oAscTOCStylesType.Simple;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Standard))
+		return Asc.c_oAscTOCStylesType.Standard;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Modern))
+		return Asc.c_oAscTOCStylesType.Modern;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Classic))
+		return Asc.c_oAscTOCStylesType.Classic;
 
-	return Asc.c_oAscTOCStyleType.Current;
+	return Asc.c_oAscTOCStylesType.Current;
 };
 CStyles.prototype.private_CheckTOCStyles = function(nType)
 {
@@ -4889,6 +4889,25 @@ CStyles.prototype.private_CheckTOCStyle = function(nLvl, nType)
 	this.LogicDocument.TurnOnHistory();
 
 	return (!!oCheckStyle.IsEqual(oTOCStyle));
+};
+/**
+ * Переделываем стили для Table of Contents на заданную коллекцию стилей
+ * @param nType {Asc.c_oAscTOCStylesType}
+ */
+CStyles.prototype.SetTOCStylesType = function(nType)
+{
+	if (Asc.c_oAscTOCStylesType.Current === nType)
+		return;
+
+	for (var nLvl = 0; nLvl <= 8; ++nLvl)
+	{
+		var oStyle = this.Get(this.GetDefaultTOC(nLvl));
+		if (!oStyle)
+			continue;
+
+		oStyle.Clear(oStyle.GetName(), oStyle.GetBasedOn(), oStyle.GetNext(), oStyle.GetType());
+		oStyle.CreateTOC(nLvl, nType);
+	}
 };
 
 function CDocumentColor(r,g,b, Auto)
