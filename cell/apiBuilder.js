@@ -328,7 +328,7 @@
 	ApiWorksheet.prototype.SetVisible = function (value) {
 		this.worksheet.setHidden(!value);
 	};
-	Object.defineProperty(Api.prototype, "Visible", {
+	Object.defineProperty(ApiWorksheet.prototype, "Visible", {
 		get: function () {
 			return this.GetVisible();
 		},
@@ -346,7 +346,7 @@
 		var cell = this.worksheet.selectionRange.activeCell;
 		return new ApiRange(this.worksheet.getCell3(cell.row, cell.col));
 	};
-	Object.defineProperty(Api.prototype, "ActiveCell", {
+	Object.defineProperty(ApiWorksheet.prototype, "ActiveCell", {
 		get: function () {
 			return this.GetActiveCell();
 		}
@@ -369,7 +369,7 @@
 	ApiWorksheet.prototype.SetName = function (name) {
 		this.worksheet.setName(name);
 	};
-	Object.defineProperty(Api.prototype, "Name", {
+	Object.defineProperty(ApiWorksheet.prototype, "Name", {
 		get: function () {
 			return this.GetName();
 		},
@@ -386,7 +386,7 @@
 	ApiWorksheet.prototype.GetIndex = function () {
 		return this.worksheet.getIndex();
 	};
-	Object.defineProperty(Api.prototype, "Index", {
+	Object.defineProperty(ApiWorksheet.prototype, "Index", {
 		get: function () {
 			return this.GetIndex();
 		}
