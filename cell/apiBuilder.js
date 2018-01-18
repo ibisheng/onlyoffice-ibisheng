@@ -154,6 +154,24 @@
 	}
 
 	/**
+	 * Returns a Sheets collection that represents all the sheets in the active workbook.
+	 * @memberof Api
+	 * @returns {Array.<ApiWorksheet>}
+	 */
+	Api.prototype.GetSheets = function () {
+		var result = [];
+		for (var i = 0; i < this.wbModel.getWorksheetCount(); ++i) {
+			result.push(new ApiWorksheet(this.wbModel.getWorksheet(i)));
+		}
+		return result;
+	};
+	Object.defineProperty(Api.prototype, "Sheets", {
+		get: function () {
+			return this.GetSheets();
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active workbook
 	 * @memberof Api
 	 * @returns {ApiWorkbook}
@@ -181,6 +199,18 @@
 			return this.GetActiveSheet();
 		}
 	});
+
+	/**
+	 * Returns an object that represents the sheet
+	 * @memberof Api
+	 * @param {string | number} nameOrIndex Sheet name or Sheet index
+	 * @returns {ApiWorksheet | null}
+	 */
+	Api.prototype.GetSheet = function (nameOrIndex) {
+		var ws = ('string' === typeof theme) ? this.wbModel.getWorksheetByName(nameOrIndex) :
+			this.wbModel.getWorksheet(nameOrIndex);
+		return ws ? new ApiWorksheet(ws) : null;
+	};
 
 	/**
 	 * Returns an object that represents the active sheet
@@ -252,6 +282,32 @@
 	};
 
 	/**
+	 * Returns Visible of sheet
+	 * @memberof ApiWorksheet
+	 * @returns {bool}
+	 */
+	ApiWorksheet.prototype.GetVisible = function () {
+		return !this.worksheet.getHidden();
+	};
+
+	/**
+	 * Set Visible of sheet
+	 * @param {bool} value
+	 * @memberof ApiWorksheet
+	 */
+	ApiWorksheet.prototype.SetVisible = function (value) {
+		this.worksheet.setHidden(!value);
+	};
+	Object.defineProperty(Api.prototype, "Visible", {
+		get: function () {
+			return this.GetVisible();
+		},
+		set: function (value) {
+			this.SetVisible(value);
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active cell
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
@@ -262,6 +318,15 @@
 	};
 
 	/**
+	 * Get sheet name
+	 * @memberof ApiWorksheet
+	 * @returns {string}
+	 */
+	ApiWorksheet.prototype.GetName = function () {
+		return this.worksheet.getName();
+	};
+
+	/**
 	 * Set sheet name
 	 * @memberof ApiWorksheet
 	 * @param {string} name
@@ -269,6 +334,28 @@
 	ApiWorksheet.prototype.SetName = function (name) {
 		this.worksheet.setName(name);
 	};
+	Object.defineProperty(Api.prototype, "Name", {
+		get: function () {
+			return this.GetName();
+		},
+		set: function (value) {
+			this.SetName(value);
+		}
+	});
+
+	/**
+	 * Get sheet index
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetIndex = function () {
+		return this.worksheet.getIndex();
+	};
+	Object.defineProperty(Api.prototype, "Index", {
+		get: function () {
+			return this.GetIndex();
+		}
+	});
 
 	/**
 	 * Returns an object that represents the range
@@ -1338,8 +1425,10 @@
 	};
 
 
+	Api.prototype["GetSheets"] = Api.prototype.GetSheets;
 	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
+	Api.prototype["GetSheet"] = Api.prototype.GetSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
 	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
@@ -1348,8 +1437,12 @@
 
 	ApiWorkbook.prototype["AddSheet"] = ApiWorkbook.prototype.AddSheet;
 
+	ApiWorksheet.prototype["GetVisible"] = ApiWorksheet.prototype.GetVisible;
+	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
+	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
+	ApiWorksheet.prototype["GetIndex"] = ApiWorksheet.prototype.GetIndex;
 	ApiWorksheet.prototype["GetRange"] = ApiWorksheet.prototype.GetRange;
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
