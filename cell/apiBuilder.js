@@ -175,7 +175,7 @@
 	 * @memberof Api
 	 * @param {string} expression Any valid expression.
 	 * @param {string} [format] A valid named or user-defined format expression.
-	 * @returns {class}
+	 * @returns {string}
 	 */
 	Api.prototype.Format = function (expression, format) {
 		format = null == format ? '' : format;
