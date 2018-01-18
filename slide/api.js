@@ -1777,41 +1777,43 @@ background-repeat: no-repeat;\
 	{
 		var props = AscCommon.g_specialPasteHelper.buttonInfo;
 		var presentation = editor.WordControl.m_oLogicDocument;
+		var drawingDocument = presentation.DrawingDocument;
 		var _coord, curCoord;
 
-		//при переходе между шейпами, скрываем значок спец.вставки
-		if(props.shapeId)
+		var fixPos = props.fixPosition;
+		if(props.shapeId)//при переходе между шейпами, скрываем значок спец.вставки
 		{
 			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
 			if(targetDocContent && targetDocContent.Id === props.shapeId)
 			{
-				if(props.fixPosition)
+				if(fixPos)
 				{
-					_coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(props.fixPosition.x, props.fixPosition.y, props.fixPosition.pageNum);
+					_coord = drawingDocument.ConvertCoordsToCursorWR(fixPos.x, fixPos.y, fixPos.pageNum);
 					curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
-
-					props.asc_setCellCoord(curCoord);
 				}
 			}
 			else
 			{
-				props.asc_setCellCoord(new AscCommon.asc_CRect( -1, -1, 0, 0 ));
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
 			}
 		}
 		else
 		{
-			if(props.fixPosition && props.fixPosition.pageNum === presentation.CurPage)
+			if(fixPos && fixPos.pageNum === presentation.CurPage)
 			{
-				_coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(props.fixPosition.x, props.fixPosition.y, props.fixPosition.pageNum);
+				_coord = drawingDocument.ConvertCoordsToCursorWR(fixPos.x, fixPos.y, fixPos.pageNum);
 				curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
-
-				props.asc_setCellCoord(curCoord);
 			}
 			else
 			{
-				props.asc_setCellCoord(new AscCommon.asc_CRect( -1, -1, 0, 0 ));
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
 			}
 		}
+		if(curCoord)
+		{
+			props.asc_setCellCoord(curCoord);
+		}
+
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 
