@@ -1777,6 +1777,7 @@ background-repeat: no-repeat;\
 	{
 		var props = AscCommon.g_specialPasteHelper.buttonInfo;
 		var presentation = editor.WordControl.m_oLogicDocument;
+		var _coord, curCoord;
 
 		//при переходе между шейпами, скрываем значок спец.вставки
 		if(props.shapeId)
@@ -1786,7 +1787,10 @@ background-repeat: no-repeat;\
 			{
 				if(props.fixPosition)
 				{
-					props.asc_setCellCoord(new AscCommon.asc_CRect( props.fixPosition.x, props.fixPosition.y, 0, 0 ));
+					_coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(props.fixPosition.x, props.fixPosition.y, props.fixPosition.pageNum);
+					curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
+
+					props.asc_setCellCoord(curCoord);
 				}
 			}
 			else
@@ -1798,7 +1802,10 @@ background-repeat: no-repeat;\
 		{
 			if(props.fixPosition && props.fixPosition.pageNum === presentation.CurPage)
 			{
-				props.asc_setCellCoord(new AscCommon.asc_CRect( props.fixPosition.x, props.fixPosition.y, 0, 0 ));
+				_coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(props.fixPosition.x, props.fixPosition.y, props.fixPosition.pageNum);
+				curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
+
+				props.asc_setCellCoord(curCoord);
 			}
 			else
 			{

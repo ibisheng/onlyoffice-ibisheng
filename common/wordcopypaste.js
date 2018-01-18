@@ -3071,7 +3071,7 @@ PasteProcessor.prototype =
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
-		specialPasteShowOptions.setFixPosition({x: screenPos.X, y: screenPos.Y, pageNum: presentation.CurPage});
+		specialPasteShowOptions.setFixPosition({x: x, y: y, pageNum: curPage});
 	},
 
     insertInPlace2: function(oDoc, aNewContent)
