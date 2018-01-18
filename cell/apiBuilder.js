@@ -33,6 +33,23 @@
 "use strict";
 
 (function (window, builder) {
+	function checkFormat(value) {
+		var res;
+		if (value instanceof Date) {
+			res = new AscCommonExcel.cNumber(value.getExcelDate() +
+				(value.getHours() * 60 * 60 + value.getMinutes() * 60 + value.getSeconds()) / AscCommonExcel.c_sPerDay)
+		} else if (value instanceof Number) {
+			res = new AscCommonExcel.cNumber(value);
+		} else {
+			value += '';
+			res = new AscCommonExcel.cNumber(value);
+			if (AscCommonExcel.cElementType.error === res.type) {
+				res = new AscCommonExcel.cString(value);
+			}
+		}
+		return res;
+	}
+
 	/**
 	 * @global
 	 * @class
@@ -152,6 +169,19 @@
 	function ApiColor(color) {
 		this.color = color;
 	}
+
+	/**
+	 * Returns a class formatted according to instructions contained in a format expression
+	 * @memberof Api
+	 * @param {string} expression Any valid expression.
+	 * @param {string} [format] A valid named or user-defined format expression.
+	 * @returns {class}
+	 */
+	Api.prototype.Format = function (expression, format) {
+		format = null == format ? '' : format;
+		return AscCommonExcel.cTEXT.prototype.Calculate([checkFormat(expression), new AscCommonExcel.cString(format)])
+			.getValue();
+	};
 
 	/**
 	 * Returns a Sheets collection that represents all the sheets in the active workbook.
@@ -1441,6 +1471,7 @@
 	};
 
 
+	Api.prototype["Format"] = Api.prototype.Format;
 	Api.prototype["GetSheets"] = Api.prototype.GetSheets;
 	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;

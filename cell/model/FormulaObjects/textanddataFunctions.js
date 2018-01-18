@@ -2001,4 +2001,8 @@ function (window, undefined) {
 		}
 
 	};
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cTEXT = cTEXT;
 })(window);
