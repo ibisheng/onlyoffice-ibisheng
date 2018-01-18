@@ -347,6 +347,20 @@
 	});
 
 	/**
+	 * Returns a ApiRange that represents all the cells on the worksheet (not just the cells that are currently in use).
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetCells = function () {
+		return new ApiRange(this.worksheet.getRange3(0, 0, AscCommon.gc_nMaxRow0, AscCommon.gc_nMaxCol0));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Cells", {
+		get: function () {
+			return this.GetCells();
+		}
+	});
+
+	/**
 	 * Get sheet name
 	 * @memberof ApiWorksheet
 	 * @returns {string}
@@ -1494,6 +1508,7 @@
 	ApiWorksheet.prototype["GetVisible"] = ApiWorksheet.prototype.GetVisible;
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
+	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
 	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
 	ApiWorksheet.prototype["GetIndex"] = ApiWorksheet.prototype.GetIndex;
