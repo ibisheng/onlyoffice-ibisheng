@@ -109,6 +109,17 @@ function IsEqualStyleObjects(Object1, Object2)
     return Object1.Is_Equal(Object2);
 }
 
+function IsEqualNullableFloatNumbers(nNum1, nNum2)
+{
+	if (undefined === nNum1 && undefined === nNum2)
+		return true;
+
+	if (undefined === nNum1 || undefined === nNum2)
+		return false;
+
+	return Math.abs(nNum1 - nNum2) < 0.001;
+}
+
 function CTableStylePr()
 {
     this.TextPr      = new CTextPr();
@@ -3126,6 +3137,26 @@ CStyle.prototype =
         }
     }
 };
+CStyle.prototype.GetName = function()
+{
+	return this.Get_Name();
+};
+CStyle.prototype.GetBasedOn = function()
+{
+	return this.Get_BasedOn();
+};
+CStyle.prototype.GetNext = function()
+{
+	return this.Get_Next()
+};
+CStyle.prototype.GetType = function()
+{
+	return this.Get_Type();
+};
+CStyle.prototype.IsEqual = function(oOtherStyle)
+{
+	return this.Is_Equal(oOtherStyle);
+};
 CStyle.prototype.CreateFootnoteText = function()
 {
 	var oParaPr = {
@@ -4816,6 +4847,48 @@ CStyles.prototype.GetHeadingLevelByName = function(sStyleName)
 	}
 
 	return -1;
+};
+/**
+ * Получаем тип набора стилей для Table of Contents
+ * @returns {Asc.c_oAscTOCStyleType}
+ */
+CStyles.prototype.GetTOCStylesType = function()
+{
+	if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Simple))
+		return Asc.c_oAscTOCStyleType.Simple;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Standard))
+		return Asc.c_oAscTOCStyleType.Standard;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Modern))
+		return Asc.c_oAscTOCStyleType.Modern;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStyleType.Classic))
+		return Asc.c_oAscTOCStyleType.Classic;
+
+	return Asc.c_oAscTOCStyleType.Current;
+};
+CStyles.prototype.private_CheckTOCStyles = function(nType)
+{
+	for (var nLvl = 0; nLvl <= 8; ++nLvl)
+	{
+		if (!this.private_CheckTOCStyle(nLvl, nType))
+			return false;
+	}
+
+	return true;
+};
+CStyles.prototype.private_CheckTOCStyle = function(nLvl, nType)
+{
+	var oTOCStyle = this.Get(this.GetDefaultTOC(nLvl));
+
+	if (!this.LogicDocument || !oTOCStyle)
+		return false;
+
+	this.LogicDocument.TurnOffHistory();
+	var oCheckStyle = new CStyle();
+	oCheckStyle.Clear(oTOCStyle.GetName(), oTOCStyle.GetBasedOn(), oTOCStyle.GetNext(), oTOCStyle.GetType());
+	oCheckStyle.CreateTOC(nLvl, nType);
+	this.LogicDocument.TurnOnHistory();
+
+	return (!!oCheckStyle.IsEqual(oTOCStyle));
 };
 
 function CDocumentColor(r,g,b, Auto)
@@ -8958,12 +9031,12 @@ CParaInd.prototype =
 
     Is_Equal  : function(Ind)
     {
-        if (this.Left !== Ind.Left
-            || this.Right !== Ind.Right
-            || this.FirstLine !== Ind.FirstLine)
-            return false;
+        if (IsEqualNullableFloatNumbers(this.Left, Ind.Left)
+			&& IsEqualNullableFloatNumbers(this.Right, Ind.Right)
+			&& IsEqualNullableFloatNumbers(this.FirstLine, Ind.FirstLine))
+            return true;
 
-        return true;
+        return false;
     },
 
     Set_FromObject : function(Ind)
