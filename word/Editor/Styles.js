@@ -3167,40 +3167,290 @@ CStyle.prototype.CreateFootnoteReference = function()
 	this.Set_UnhideWhenUsed(true);
 	this.Set_TextPr(oTextPr);
 };
-CStyle.prototype.CreateTOC = function(nLvl)
+CStyle.prototype.CreateTOC = function(nLvl, nType)
 {
-	var ParaPr = {
-		Spacing : {
-			After  : 57 / 20 * g_dKoef_pt_to_mm
-		},
+	var ParaPr = {},
+		TextPr = {};
 
-		Ind : {
-			Left      : 0,
-			Right     : 0,
-			FirstLine : 0
+	if (undefined === nType || null === nType || Asc.c_oAscTOCStyleType.Simple === nType)
+	{
+		ParaPr = {
+			Spacing : {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			},
+
+			Ind : {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 0
+			}
+		};
+
+		if (1 === nLvl)
+			ParaPr.Ind.Left = 283 / 20 * g_dKoef_pt_to_mm;
+		else if (2 === nLvl)
+			ParaPr.Ind.Left = 567 / 20 * g_dKoef_pt_to_mm;
+		else if (3 === nLvl)
+			ParaPr.Ind.Left = 850 / 20 * g_dKoef_pt_to_mm;
+		else if (4 === nLvl)
+			ParaPr.Ind.Left = 1134 / 20 * g_dKoef_pt_to_mm;
+		else if (5 === nLvl)
+			ParaPr.Ind.Left = 1417 / 20 * g_dKoef_pt_to_mm;
+		else if (6 === nLvl)
+			ParaPr.Ind.Left = 1701 / 20 * g_dKoef_pt_to_mm;
+		else if (7 === nLvl)
+			ParaPr.Ind.Left = 1984 / 20 * g_dKoef_pt_to_mm;
+		else if (8 === nLvl)
+			ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
+	}
+	else if (Asc.c_oAscTOCStyleType.Standard === nType)
+	{
+		ParaPr = {
+			Spacing : {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			},
+
+			Ind : {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 0
+			}
+		};
+
+		if (0 === nLvl)
+		{
+			TextPr.Bold     = true;
+			TextPr.FontSize = 14;
 		}
-	};
+		else if (1 === nLvl)
+		{
+			ParaPr.Ind.Left = 283 / 20 * g_dKoef_pt_to_mm;
+			TextPr.Bold     = true;
+			TextPr.FontSize = 13;
+		}
+		else if (2 === nLvl)
+		{
+			ParaPr.Ind.Left = 567 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 13;
+		}
+		else if (3 === nLvl)
+		{
+			ParaPr.Ind.Left = 850 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+		else if (4 === nLvl)
+		{
+			ParaPr.Ind.Left = 1134 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+		else if (5 === nLvl)
+		{
+			ParaPr.Ind.Left = 1417 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+		else if (6 === nLvl)
+		{
+			ParaPr.Ind.Left = 1701 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+		else if (7 === nLvl)
+		{
+			ParaPr.Ind.Left = 1984 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+		else if (8 === nLvl)
+		{
+			ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
+			TextPr.FontSize = 11;
+		}
+	}
+	else if (Asc.c_oAscTOCStyleType.Modern === nType)
+	{
+		ParaPr = {
+			Ind : {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 0
+			}
+		};
 
-	if (1 === nLvl)
-		ParaPr.Ind.Left = 283 / 20 * g_dKoef_pt_to_mm;
-	else if (2 === nLvl)
-		ParaPr.Ind.Left = 567 / 20 * g_dKoef_pt_to_mm;
-	else if (3 === nLvl)
-		ParaPr.Ind.Left = 850 / 20 * g_dKoef_pt_to_mm;
-	else if (4 === nLvl)
-		ParaPr.Ind.Left = 1134 / 20 * g_dKoef_pt_to_mm;
-	else if (5 === nLvl)
-		ParaPr.Ind.Left = 1417 / 20 * g_dKoef_pt_to_mm;
-	else if (6 === nLvl)
-		ParaPr.Ind.Left = 1701 / 20 * g_dKoef_pt_to_mm;
-	else if (7 === nLvl)
-		ParaPr.Ind.Left = 1984 / 20 * g_dKoef_pt_to_mm;
-	else if (8 === nLvl)
-		ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
+		if (0 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 170 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Brd = {
+				Bottom : {
+					Color : {r : 0x00, g : 0x00, b : 0x00},
+					Space : 0,
+					Size  : 1 * g_dKoef_pt_to_mm,
+					Value : border_Single
+				}
+			};
+
+
+			TextPr.Bold     = true;
+			TextPr.FontSize = 14;
+		}
+		else if (1 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.Bold     = true;
+			TextPr.FontSize = 13;
+		}
+		else if (2 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 13;
+		}
+		else
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+	}
+	else if (Asc.c_oAscTOCStyleType.Classic === nType)
+	{
+
+		if (0 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 170 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.Bold     = true;
+			TextPr.FontSize = 14;
+		}
+		else if (1 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 0
+			};
+
+			TextPr.Bold     = true;
+			TextPr.FontSize = 13;
+		}
+		else if (2 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 283 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 13;
+		}
+		else if (3 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 567 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+		else if (4 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 850 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+		else if (5 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 1134 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+		else if (6 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 1417 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+		else if (7 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 1701 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+		else if (7 === nLvl)
+		{
+			ParaPr.Spacing = {
+				After : 57 / 20 * g_dKoef_pt_to_mm
+			};
+
+			ParaPr.Ind = {
+				Left      : 0,
+				Right     : 0,
+				FirstLine : 1984 / 20 * g_dKoef_pt_to_mm
+			};
+
+			TextPr.FontSize = 11;
+		}
+	}
+
 
 	this.Set_UiPriority(39);
 	this.Set_UnhideWhenUsed(true);
 	this.Set_ParaPr(ParaPr);
+	this.Set_TextPr(TextPr);
 };
 CStyle.prototype.CreateTOCHeading = function()
 {

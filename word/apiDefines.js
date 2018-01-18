@@ -220,6 +220,14 @@ var c_oAscSdtLevelType = {
 	Cell   : 0x04
 };
 
+var c_oAscTOCStyleType = {
+	Current  : 0,
+	Simple   : 1,
+	Standard : 2,
+	Modern   : 3,
+	Classic  : 4
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -329,6 +337,13 @@ prot['Block']  = c_oAscSdtLevelType.Block;
 prot['Inline'] = c_oAscSdtLevelType.Inline;
 prot['Row']    = c_oAscSdtLevelType.Row;
 prot['Cell']   = c_oAscSdtLevelType.Cell;
+
+prot = window['Asc']['c_oAscTOCStyleType'] = c_oAscTOCStyleType;
+prot['Current']  = c_oAscTOCStyleType.Current;
+prot['Simple']   = c_oAscTOCStyleType.Simple;
+prot['Standard'] = c_oAscTOCStyleType.Standard;
+prot['Modern']   = c_oAscTOCStyleType.Modern;
+prot['Classic']  = c_oAscTOCStyleType.Classic;
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
