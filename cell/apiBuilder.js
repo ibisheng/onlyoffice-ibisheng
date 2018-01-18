@@ -316,6 +316,11 @@
 		var cell = this.worksheet.selectionRange.activeCell;
 		return new ApiRange(this.worksheet.getCell3(cell.row, cell.col));
 	};
+	Object.defineProperty(Api.prototype, "ActiveCell", {
+		get: function () {
+			return this.GetActiveCell();
+		}
+	});
 
 	/**
 	 * Get sheet name
