@@ -3514,6 +3514,8 @@ function CEditorPage(api)
 
 		if (this.m_bDocumentPlaceChangedEnabled)
 			this.m_oApi.sendEvent("asc_onDocumentPlaceChanged");
+
+		AscCommon.g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	};
 
 	this.OnPaint = function()
