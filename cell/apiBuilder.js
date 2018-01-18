@@ -1087,6 +1087,19 @@
 		this.range.unmerge();
 	};
 
+	/**
+	 * The ForEach() method executes a provided function once for each cell
+	 * @memberof ApiRange
+	 */
+	ApiRange.prototype.ForEach = function (callback) {
+		if (callback instanceof Function) {
+			var ws = this.range.getWorksheet();
+			this.range._foreach(function (cell) {
+				callback(new ApiRange(ws.getCell3(cell.nRow, cell.nCol)));
+			});
+		}
+	};
+
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// ApiDrawing
@@ -1514,6 +1527,7 @@
 	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
 	ApiRange.prototype["Merge"] = ApiRange.prototype.Merge;
 	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
+	ApiRange.prototype["ForEach"] = ApiRange.prototype.ForEach;
 
 
 	ApiDrawing.prototype["GetClassType"]               =  ApiDrawing.prototype.GetClassType;
