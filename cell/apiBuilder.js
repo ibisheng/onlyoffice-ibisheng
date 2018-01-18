@@ -361,6 +361,21 @@
 	});
 
 	/**
+	 * Returns a ApiRange that represents the used range on the specified worksheet.
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetUsedRange = function () {
+		return new ApiRange(this.worksheet.getRange3(0, 0, this.worksheet.getRowsCount(),
+			this.worksheet.getColsCount()));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "UsedRange", {
+		get: function () {
+			return this.GetUsedRange();
+		}
+	});
+
+	/**
 	 * Get sheet name
 	 * @memberof ApiWorksheet
 	 * @returns {string}
@@ -1509,6 +1524,7 @@
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
+	ApiWorksheet.prototype["GetUsedRange"] = ApiWorksheet.prototype.GetUsedRange;
 	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
 	ApiWorksheet.prototype["GetIndex"] = ApiWorksheet.prototype.GetIndex;
