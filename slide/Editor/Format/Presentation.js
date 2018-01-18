@@ -748,6 +748,34 @@ CPresentation.prototype =
         }
     },
 
+    GetSelectionBounds: function()
+    {
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetDocContent = oController.getTargetDocContent();
+            if(oTargetDocContent)
+            {
+                return oTargetDocContent.GetSelectionBounds();
+            }
+        }
+        return null;
+    },
+
+
+    GetTextTransformMatrix: function()
+    {
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetDocContent = oController.getTargetDocContent();
+            if(oTargetDocContent)
+            {
+                return oTargetDocContent.Get_ParentTextTransform();
+            }
+        }
+        return null;
+    },
 
 
     IsViewMode: function()
