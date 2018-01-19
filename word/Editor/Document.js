@@ -16380,7 +16380,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 		oSdt.SetDocPartObj(undefined, "Table of Contents", true);
 
 		if (oPr)
+		{
 			oComplexField.SetPr(oPr);
+			oComplexField.Update();
+		}
 
 		this.Recalculate();
 	}
