@@ -3502,8 +3502,8 @@ CStyle.prototype.ToAscStyle = function()
 
 	oAscStyle.Name       = this.Name;
 	oAscStyle.Type       = this.Type;
-	oAscStyle.qFormat    = this.qFormat;
-	oAscStyle.uiPriority = this.uiPriority;
+	oAscStyle.qFormat    = null === this.qFormat || undefined === this.qFormat ? false : this.qFormat;
+	oAscStyle.uiPriority = null === this.qFormat || undefined === this.qFormat ? -1 : this.uiPriority;
 
 	return oAscStyle;
 };
