@@ -1074,7 +1074,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
 					var outStack = cell.formulaParsed.outStack;
 					for(var i = 0; i < outStack.length; i++){
-						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+						if(outStack[i] && (outStack[i].name === "AGGREGATE" || outStack[i].name === "SUBTOTAL")){
 							bIsFoundNestedStAg = true;
 							break;
 						}

@@ -4236,6 +4236,9 @@
 		}
 		var res;
 		if (f) {
+			//вложенные итоги игнорируются, чтобы избежать двойного суммирования
+			f.excludeNestedStAg = true;
+
 			f.checkExclude = true;
 			f.excludeHiddenRows = exclude;
 			res = f.Calculate(arg.slice(1));
