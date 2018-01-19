@@ -9049,6 +9049,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_SetTableOfContentsPr']                   = asc_docs_api.prototype.asc_SetTableOfContentsPr;
 
 	asc_docs_api.prototype['asc_GetHeadingLevel']                        = asc_docs_api.prototype.asc_GetHeadingLevel;
+	asc_docs_api.prototype['asc_GetStylesArray']                         = asc_docs_api.prototype.asc_GetStylesArray;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
