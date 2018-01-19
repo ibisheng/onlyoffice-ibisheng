@@ -9105,6 +9105,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_RemoveTableOfContents']                  = asc_docs_api.prototype.asc_RemoveTableOfContents;
 	asc_docs_api.prototype['asc_GetTableOfContentsPr']                   = asc_docs_api.prototype.asc_GetTableOfContentsPr;
 	asc_docs_api.prototype['asc_SetTableOfContentsPr']                   = asc_docs_api.prototype.asc_SetTableOfContentsPr;
+	asc_docs_api.prototype['asc_UpdateTableOfContents']                  = asc_docs_api.prototype.asc_UpdateTableOfContents;
 
 	asc_docs_api.prototype['asc_GetHeadingLevel']                        = asc_docs_api.prototype.asc_GetHeadingLevel;
 	asc_docs_api.prototype['asc_GetStylesArray']                         = asc_docs_api.prototype.asc_GetStylesArray;
