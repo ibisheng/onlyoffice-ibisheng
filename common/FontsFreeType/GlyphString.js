@@ -93,6 +93,13 @@
         this.m_fTransX = 0;
         this.m_fTransY = 0;
 
+        this.GetFirstGlyph = function()
+        {
+            if (!this.m_pGlyphsBuffer[0])
+                this.m_pGlyphsBuffer[0] = new CGlyph();
+            return this.m_pGlyphsBuffer[0];
+        };
+
         this.SetString = function(wsString, fX, fY)
         {
             this.m_fX = fX + this.m_fTransX;
