@@ -61,7 +61,7 @@
 	var EGlyphState =
 	{
 		glyphstateNormal : 0,	// символ отрисовался в нужном шрифте
-		glyphstateDeafault : 1, // символ отрисовался в дефолтовом шрифте
+		glyphstateDefault : 1, // символ отрисовался в дефолтовом шрифте
 		glyphstateMiss : 2  	// символ не отрисовался
 	};
 
@@ -1069,7 +1069,6 @@
 
 			for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
 			{
-				nCMapIndex.index = 0;
 				var pFace = this.m_pFace;
 				var pCurentGliph = pFace.m_pGlyph;
 
@@ -1111,7 +1110,7 @@
 						}
 						else
 						{
-							oSizes.eState = EGlyphState.glyphstateDeafault;
+							oSizes.eState = EGlyphState.glyphstateDefault;
 
 							pFace = this.m_pDefaultFont.m_pFace;
 							pCurentGliph = this.m_pDefaultFont.m_pGlyph;
@@ -1189,9 +1188,9 @@
 
 						continue;
 					}
-					else if (EGlyphState.glyphstateDeafault == eState)
+					else if (EGlyphState.glyphstateDefault == eState)
 					{
-						pString.SetState(nIndex, EGlyphState.glyphstateDeafault);
+						pString.SetState(nIndex, EGlyphState.glyphstateDefault);
 						//pFace = pDefFace;
 					}
 					else // if ( glyphstateNormal == eState )
@@ -1304,7 +1303,7 @@
 						}
 						else
 						{
-							oSizes.eState = EGlyphState.glyphstateDeafault;
+							oSizes.eState = EGlyphState.glyphstateDefault;
 
 							pFace = this.m_pDefaultFont.m_pFace;
 							pCurentGliph = this.m_pDefaultFont.m_pFace.glyph;
@@ -1448,9 +1447,9 @@
 
 						continue;
 					}
-					else if (EGlyphState.glyphstateDeafault == eState)
+					else if (EGlyphState.glyphstateDefault == eState)
 					{
-						pString.SetState(nIndex, EGlyphState.glyphstateDeafault);
+						pString.SetState(nIndex, EGlyphState.glyphstateDefault);
 						//pFace = pDefFace;
 					}
 					else
@@ -1556,7 +1555,7 @@
 					}
 					else
 					{
-						oSizes.eState = EGlyphState.glyphstateDeafault;
+						oSizes.eState = EGlyphState.glyphstateDefault;
 					}
 				}
 				else
@@ -1714,9 +1713,9 @@
 
 					return;
 				}
-				else if (EGlyphState.glyphstateDeafault == eState)
+				else if (EGlyphState.glyphstateDefault == eState)
 				{
-					pCurGlyph.eState = EGlyphState.glyphstateDeafault;
+					pCurGlyph.eState = EGlyphState.glyphstateDefault;
 					//pFace = pDefFace;
 				}
 				else
@@ -1883,7 +1882,7 @@
 					}
 					else
 					{
-						oSizes.eState = EGlyphState.glyphstateDeafault;
+						oSizes.eState = EGlyphState.glyphstateDefault;
 
 						pFace = this.m_pDefaultFont.m_pFace;
 						pCurentGliph = this.m_pDefaultFont.m_pGlyph;
@@ -1963,7 +1962,7 @@
 				{
 					return;
 				}
-				else if (EGlyphState.glyphstateDeafault == eState)
+				else if (EGlyphState.glyphstateDefault == eState)
 				{
 					//pFace = pDefFace;
 				}
