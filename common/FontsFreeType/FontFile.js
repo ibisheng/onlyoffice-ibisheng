@@ -34,39 +34,35 @@
 
 (function (window, undefined)
 {
+    var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
+    var FT_Matrix = AscFonts.FT_Matrix;
+    var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
+    var FT_Set_Transform = AscFonts.FT_Set_Transform;
+    var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
+    var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
+    var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
+    var FT_Load_Glyph = AscFonts.FT_Load_Glyph;
+    var FT_Get_Glyph = AscFonts.FT_Get_Glyph;
+    var FT_BBox = AscFonts.FT_BBox;
+    var FT_Glyph_Get_CBox = AscFonts.FT_Glyph_Get_CBox;
+    var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
+    var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
+    var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
+    var raster_memory = AscFonts.raster_memory;
+    var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
 
-// Import
-	var AscBrowser = AscCommon.AscBrowser;
-
-	var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
-	var FT_Matrix = AscFonts.FT_Matrix;
-	var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
-	var FT_Set_Transform = AscFonts.FT_Set_Transform;
-	var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
-	var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
-	var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
-	var FT_Load_Glyph = AscFonts.FT_Load_Glyph;
-	var FT_Get_Glyph = AscFonts.FT_Get_Glyph;
-	var FT_BBox = AscFonts.FT_BBox;
-	var FT_Glyph_Get_CBox = AscFonts.FT_Glyph_Get_CBox;
-	var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
-	var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
-	var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
-	var raster_memory = AscFonts.raster_memory;
-	var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
-
-	var FONT_ITALIC_ANGLE = 0.3090169943749;
+	var FONT_ITALIC_ANGLE 	= 0.3090169943749;
 	var FT_ENCODING_UNICODE = 1970170211;
-	var FT_ENCODING_NONE = 0;
-	var FT_ENCODING_MS_SYMBOL = 1937337698;
+	var FT_ENCODING_NONE 	= 0;
+	var FT_ENCODING_MS_SYMBOL 	= 1937337698;
 	var FT_ENCODING_APPLE_ROMAN = 1634889070;
-	var REND_MODE = 0;
+	var REND_MODE 			= 0;
 
 	var EGlyphState =
 	{
-		glyphstateNormal: 0,  // символ отрисовался в нужном шрифте
-		glyphstateDeafault: 1,  // символ отрисовался в дефолтовом шрифте
-		glyphstateMiss: 2   // символ не отрисовался
+		glyphstateNormal : 0,	// символ отрисовался в нужном шрифте
+		glyphstateDeafault : 1, // символ отрисовался в дефолтовом шрифте
+		glyphstateMiss : 2  	// символ не отрисовался
 	};
 
 	function get_raster_bounds(data, width, height, stride)
@@ -184,6 +180,111 @@
 
 	CGlyphData.prototype =
 	{
+		// not used (old devices)
+		checkColorAppleDevices : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            // full repaint
+            this.TempImage = document.createElement("canvas");
+            this.TempImage.width = w;
+            this.TempImage.height = h;
+            var ctxD = this.TempImage.getContext("2d");
+            var pixDst = null;
+
+            if (this.m_oCanvas != null)
+            {
+                pixDst = this.m_oContext.getImageData(0, 0, w, h);
+                var dataPx = pixDst.data;
+
+                var cur = 0;
+                var cnt = w * h;
+                for (var i = 0; i < cnt; i++)
+                {
+                    dataPx[cur++] = r;
+                    dataPx[cur++] = g;
+                    dataPx[cur++] = b;
+                    cur++;
+                }
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+
+                pixDst = _raster.Chunk.CanvasCtx.getImageData(_x, _y, w, h);
+                var dataPx = pixDst.data;
+
+                var cur = 0;
+                var cnt = w * h;
+                for (var i = 0; i < cnt; i++)
+                {
+                    dataPx[cur++] = r;
+                    dataPx[cur++] = g;
+                    dataPx[cur++] = b;
+                    cur++;
+                }
+            }
+
+            ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
+		},
+
+		checkColorMozillaLinux : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            if (this.m_oCanvas != null)
+            {
+                this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                this.m_oContext.fillRect(0, 0, w, h);
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                _raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+                this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+            }
+		},
+
+		checkColorNormal : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            if (this.m_oCanvas != null)
+            {
+                this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                this.m_oContext.fillRect(0, 0, w, h);
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                _raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+                this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+            }
+		},
+
+		checkColor : undefined,
+
 		init: function (width, height)
 		{
 			if (width == 0 || height == 0)
@@ -196,104 +297,12 @@
 
 			this.m_oContext = this.m_oCanvas.getContext('2d');
 			this.m_oContext.globalCompositeOperation = "source-in";
-		},
-		checkColor: function (r, g, b, w, h)
-		{
-			if ((r == this.R) && (g == this.G) && (b == this.B))
-				return;
-
-			if (/*!AscBrowser.isAppleDevices*/true)
-			{
-				this.R = r;
-				this.G = g;
-				this.B = b;
-
-				if (this.m_oCanvas != null)
-				{
-					if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-					{
-						this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						this.m_oContext.fillRect(0, 0, w, h);
-					}
-					else
-					{
-						this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						this.m_oContext.fillRect(0, 0, w, h);
-					}
-				}
-				else
-				{
-					if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-					{
-						var _raster = this.RasterData;
-						_raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						var _x = _raster.Line.Height * _raster.Index;
-						var _y = _raster.Line.Y;
-						this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-					}
-					else
-					{
-						var _raster = this.RasterData;
-						_raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						var _x = _raster.Line.Height * _raster.Index;
-						var _y = _raster.Line.Y;
-						this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-					}
-				}
-			}
-			else
-			{
-				var _r = r;
-				var _g = g;
-				var _b = b;
-
-				this.TempImage = document.createElement("canvas");
-				this.TempImage.width = w;
-				this.TempImage.height = h;
-				var ctxD = this.TempImage.getContext("2d");
-				var pixDst = null;
-
-				if (this.m_oCanvas != null)
-				{
-					pixDst = this.m_oContext.getImageData(0, 0, w, h);
-					var dataPx = pixDst.data;
-
-					var cur = 0;
-					var cnt = w * h;
-					for (var i = 0; i < cnt; i++)
-					{
-						dataPx[cur++] = _r;
-						dataPx[cur++] = _g;
-						dataPx[cur++] = _b;
-						cur++;
-					}
-				}
-				else
-				{
-					var _raster = this.RasterData;
-					var _x = _raster.Line.Height * _raster.Index;
-					var _y = _raster.Line.Y;
-
-					pixDst = _raster.Chunk.CanvasCtx.getImageData(_x, _y, w, h);
-					var dataPx = pixDst.data;
-
-					var cur = 0;
-					var cnt = w * h;
-					for (var i = 0; i < cnt; i++)
-					{
-						dataPx[cur++] = _r;
-						dataPx[cur++] = _g;
-						dataPx[cur++] = _b;
-						cur++;
-					}
-				}
-
-				ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
-			}
 		}
 	};
 
-	function TGlyphBitmap()
+    CGlyphData.prototype.checkColor = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.isLinuxOS) ? CGlyphData.prototype.checkColorMozillaLinux : CGlyphData.prototype.checkColorNormal;
+
+	function CGlyphBitmap()
 	{
 		this.nX = 0;            // Сдвиг по X начальной точки для рисования символа
 		this.nY = 0;            // Сдвиг по Y начальной точки для рисования символа
@@ -303,7 +312,7 @@
 		this.oGlyphData = new CGlyphData();
 	}
 
-	TGlyphBitmap.prototype =
+	CGlyphBitmap.prototype =
 	{
 		fromAlphaMask: function (font_manager)
 		{
@@ -344,7 +353,7 @@
 				{
 					for (var i = 0; i < this.nWidth; i++)
 					{
-						dst[nIndexDst] = Math.min(parseInt(dst[nIndexDst] * gamma), 255);
+						dst[nIndexDst] = Math.min((dst[nIndexDst] * gamma) >> 0, 255);
 						nIndexDst += 4;
 					}
 					nIndexDst += nPitch;
@@ -478,7 +487,7 @@
 		}
 	};
 
-	function TBBox()
+	function CBBox()
 	{
 		this.fMinX = 0;
 		this.fMaxX = 0;
@@ -488,7 +497,7 @@
 		this.rasterDistances = null;
 	}
 
-	function TMetrics()
+	function CMetrics()
 	{
 		this.fWidth = 0;
 		this.fHeight = 0;
@@ -502,7 +511,7 @@
 		this.fVertAdvance = 0;
 	}
 
-	function TFontCacheSizes()
+	function CFontCacheSizes()
 	{
 		this.ushUnicode; // Значение символа в юникоде
 		this.eState;     // Есть ли символ в шрифте/стандартном шрифте
@@ -512,8 +521,8 @@
 
 		this.fAdvanceX;
 
-		this.oBBox = new TBBox();
-		this.oMetrics = new TMetrics();
+		this.oBBox = new CBBox();
+		this.oMetrics = new CMetrics();
 
 		this.bBitmap = false;
 		this.oBitmap = null;
@@ -635,7 +644,7 @@
 		}
 	};
 
-	function CFontFile(fileName, faceIndex)
+    function CFontFile(fileName, faceIndex)
 	{
 		this.m_arrdFontMatrix = new Array(6);
 		this.m_arrdTextMatrix = new Array(6);
@@ -689,10 +698,10 @@
 		this.HintsSupport = true;
 		this.HintsSubpixelSupport = true;
 
-		this.SetDefaultFont = function (pDefFont)
+		this.SetDefaultFont = function(pDefFont)
 		{
 			this.m_pDefaultFont = pDefFont;
-		}
+		};
 
 		this.FT_Load_Glyph_Wrapper = function(pFace, unGID, _LOAD_MODE)
 		{
@@ -706,9 +715,9 @@
 				return err2;
 			}
 			return err;
-		}
+		};
 
-		this.LoadDefaultCharAndSymbolicCmapIndex = function ()
+		this.LoadDefaultCharAndSymbolicCmapIndex = function()
 		{
 			this.m_nDefaultChar = -1;
 			this.m_nSymbolic = -1;
@@ -742,9 +751,9 @@
 					return;
 				}
 			}
-		}
+		};
 
-		this.ResetFontMatrix = function ()
+		this.ResetFontMatrix = function()
 		{
 			if (this.m_pDefaultFont)
 				this.m_pDefaultFont.ResetFontMatrix();
@@ -770,9 +779,9 @@
 			}
 
 			this.UpdateMatrix0();
-		}
+		};
 
-		this.ResetTextMatrix = function ()
+		this.ResetTextMatrix = function()
 		{
 			var m = this.m_arrdTextMatrix;
 			m[0] = 1;
@@ -783,9 +792,9 @@
 			m[5] = 0;
 
 			this.CheckTextMatrix();
-		}
+		};
 
-		this.CheckTextMatrix = function ()
+		this.CheckTextMatrix = function()
 		{
 			this.m_bIsNeedUpdateMatrix12 = true;
 			var m = this.m_arrdTextMatrix;
@@ -797,10 +806,12 @@
 					this.m_pDefaultFont.UpdateMatrix1();
 				this.UpdateMatrix1();
 			}
-		}
+		};
 
-		this.UpdateMatrix0 = function ()
+		this.UpdateMatrix0 = function()
 		{
+			//this.UpdateMatrix2();
+			//return;
 			var dSize = this.m_fSize;
 
 			var m1 = this.m_arrdTextMatrix[2];
@@ -893,9 +904,9 @@
 			tm.yy = Math.floor(((this.m_arrdTextMatrix[3] / this.m_dTextScale) * 65536));
 
 			FT_Set_Transform(this.m_pFace, fm, 0);
-		}
+		};
 
-		this.UpdateMatrix1 = function ()
+		this.UpdateMatrix1 = function()
 		{
 			var m = this.m_arrdFontMatrix;
 			var fm = this.m_oFontMatrix;
@@ -905,9 +916,9 @@
 			fm.yy = Math.floor((m[3] * 65536));
 
 			FT_Set_Transform(this.m_pFace, this.m_oFontMatrix, 0);
-		}
+		};
 
-		this.UpdateMatrix2 = function ()
+		this.UpdateMatrix2 = function()
 		{
 			var m = this.m_arrdFontMatrix;
 			var t = this.m_arrdTextMatrix;
@@ -919,7 +930,7 @@
 			fm.yy = parseInt((m[2] * t[1] + m[3] * t[3] ) * 65536);
 
 			FT_Set_Transform(this.m_pFace, fm, 0);
-		}
+		};
 
 		this.SetSizeAndDpi = function (fSize, _unHorDpi, _unVerDpi)
 		{
@@ -951,20 +962,21 @@
 
 				this.ClearCache();
 			}
-		}
+		};
 
-		this.ClearCache = function ()
+		this.ClearCache = function()
 		{
 			this.Destroy();
 			this.ClearCacheNoAttack();
-		}
-		this.ClearCacheNoAttack = function ()
+		};
+
+		this.ClearCacheNoAttack = function()
 		{
 			this.m_arrCacheSizes = [];
 			this.m_arrCacheSizesGid = [];
-		}
+		};
 
-		this.Destroy = function ()
+		this.Destroy = function()
 		{
 			if (this.m_oFontManager != null && this.m_oFontManager.RasterMemory != null)
 			{
@@ -981,9 +993,9 @@
 						_arr[i].oBitmap.Free();
 				}
 			}
-		}
+		};
 
-		this.SetTextMatrix = function (fA, fB, fC, fD, fE, fF)
+		this.SetTextMatrix = function(fA, fB, fC, fD, fE, fF)
 		{
 			var m = this.m_arrdTextMatrix;
 
@@ -1007,9 +1019,9 @@
 			}
 			this.CheckTextMatrix();
 			return true;
-		}
+		};
 
-		this.SetFontMatrix = function (fA, fB, fC, fD, fE, fF)
+		this.SetFontMatrix = function(fA, fB, fC, fD, fE, fF)
 		{
 			if (this.m_pDefaultFont)
 				this.m_pDefaultFont.SetFontMatrix(fA, fB, fC, fD, fE, fF);
@@ -1035,9 +1047,9 @@
 			}
 
 			this.ClearCache();
-		}
+		};
 
-		this.GetString = function (pString)
+		this.GetString = function(pString)
 		{
 			if (pString.GetLength() <= 0)
 				return true;
@@ -1071,7 +1083,7 @@
 					var nCMapIndex = new CCMapIndex();
 					unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
 
-					var oSizes = new TFontCacheSizes();
+					var oSizes = new CFontCacheSizes();
 					oSizes.ushUnicode = ushUnicode;
 
 					if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
@@ -1230,9 +1242,9 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-		}
+		};
 
-		this.GetString2 = function (pString)
+		this.GetString2 = function(pString)
 		{
 			if (pString.GetLength() <= 0)
 				return true;
@@ -1264,7 +1276,7 @@
 					var nCMapIndex = new CCMapIndex();
 					unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
 
-					var oSizes = new TFontCacheSizes();
+					var oSizes = new CFontCacheSizes();
 					oSizes.ushUnicode = ushUnicode;
 
 					if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
@@ -1351,7 +1363,7 @@
 					if (FT_Render_Glyph(pCurentGliph, REND_MODE))
 						return;
 
-					oSizes.oBitmap = new TGlyphBitmap();
+					oSizes.oBitmap = new CGlyphBitmap();
 					oSizes.oBitmap.nX = pCurentGliph.bitmap_left;
 					oSizes.oBitmap.nY = pCurentGliph.bitmap_top;
 					oSizes.oBitmap.nWidth = pCurentGliph.bitmap.width;
@@ -1492,9 +1504,9 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-		}
+		};
 
-		this.GetString2C = function (pString)
+		this.GetString2C = function(pString)
 		{
 			var unPrevGID = 0;
 			var fPenX = 0, fPenY = 0;
@@ -1519,7 +1531,7 @@
 				var nCMapIndex = new CCMapIndex();
 				unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
 
-				var oSizes = new TFontCacheSizes();
+				var oSizes = new CFontCacheSizes();
 				oSizes.ushUnicode = ushUnicode;
 
 				if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
@@ -1615,7 +1627,7 @@
 				var _width = pCurentGliph.bitmap.pitch;
 				if (0 != _width)
 				{
-					oSizes.oBitmap = new TGlyphBitmap();
+					oSizes.oBitmap = new CGlyphBitmap();
 					oSizes.oBitmap.nX = pCurentGliph.bitmap_left;
 					oSizes.oBitmap.nY = pCurentGliph.bitmap_top;
 					oSizes.oBitmap.nWidth = pCurentGliph.bitmap.width;
@@ -1764,9 +1776,9 @@
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
-		}
+		};
 
-		this.SetCMapForCharCode = function (lUnicode, pnCMapIndex)
+		this.SetCMapForCharCode = function(lUnicode, pnCMapIndex)
 		{
 			if (this.m_bStringGID || !this.m_pFace || 0 == this.m_nNum_charmaps)
 				return lUnicode;
@@ -1815,9 +1827,9 @@
 			}
 
 			return nCharIndex;
-		}
+		};
 
-		this.GetChar = function (lUnicode, is_raster_distances)
+		this.GetChar = function(lUnicode, is_raster_distances)
 		{
 			var pFace = this.m_pFace;
 			var pCurentGliph = pFace.glyph;
@@ -1843,7 +1855,7 @@
 				var nCMapIndex = new CCMapIndex();
 				unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
 
-				var oSizes = new TFontCacheSizes();
+				var oSizes = new CFontCacheSizes();
 				oSizes.ushUnicode = ushUnicode;
 
 				if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
@@ -1978,50 +1990,55 @@
 			}
 
 			return Result;
-		}
+		};
 
-		this.GetKerning = function (unPrevGID, unGID)
+		this.GetKerning = function(unPrevGID, unGID)
 		{
 			var pDelta = new AscFonts.FT_Vector();
 			AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
 			return (pDelta.x >> 6);
-		}
+		};
 
-		this.SetStringGID = function (bGID)
+		this.SetStringGID = function(bGID)
 		{
 			if (this.m_bStringGID == bGID)
 				return;
 
 			//this.ClearCache();
 			this.m_bStringGID = bGID;
-		}
-		this.GetStringGID = function ()
+		};
+
+		this.GetStringGID = function()
 		{
 			return this.m_bStringGID;
-		}
-		this.SetUseDefaultFont = function (bUse)
+		};
+
+		this.SetUseDefaultFont = function(bUse)
 		{
 			this.m_bUseDefaultFont = bUse;
-		}
-		this.GetUseDefaultFont = function ()
+		};
+
+		this.GetUseDefaultFont = function()
 		{
 			return this.m_bUseDefaultFont;
-		}
-		this.SetCharSpacing = function (fCharSpacing)
+		};
+
+		this.SetCharSpacing = function(fCharSpacing)
 		{
 			this.m_fCharSpacing = fCharSpacing;
-		}
-		this.GetCharSpacing = function ()
+		};
+
+		this.GetCharSpacing = function()
 		{
 			return this.m_fCharSpacing;
-		}
+		};
 
-		this.GetStyleName = function ()
+		this.GetStyleName = function()
 		{
 			return this.m_pFace.style_name;
-		}
+		};
 
-		this.UpdateStyles = function (bBold, bItalic)
+		this.UpdateStyles = function(bBold, bItalic)
 		{
 			var sStyle = this.GetStyleName();
 
@@ -2064,10 +2081,9 @@
 					this.SetItalic(true);
 				}
 			}
+		};
 
-		}
-
-		this.SetItalic = function (value)
+		this.SetItalic = function(value)
 		{
 			if (this.m_bNeedDoItalic != value)
 			{
@@ -2075,43 +2091,47 @@
 				this.m_bNeedDoItalic = value;
 				this.ResetFontMatrix();
 			}
-		}
-		this.SetNeedBold = function (value)
+		};
+
+		this.SetNeedBold = function(value)
 		{
 			if (this.m_bNeedDoBold != value)
 				this.ClearCache();
 
 			this.m_bNeedDoBold = value;
-		}
+		};
 
-		this.ReleaseFontFace = function ()
+		this.ReleaseFontFace = function()
 		{
 			this.m_pFace = null;
-		}
+		};
 
-		this.IsSuccess = function ()
+		this.IsSuccess = function()
 		{
 			return (0 == this.m_nError);
-		}
+		};
 
-		this.GetAscender = function ()
+		this.GetAscender = function()
 		{
 			return this.m_lAscender;
-		}
-		this.GetDescender = function ()
+		};
+
+		this.GetDescender = function()
 		{
 			return this.m_lDescender;
-		}
-		this.GetHeight = function ()
+		};
+
+		this.GetHeight = function()
 		{
 			return this.m_lLineHeight;
-		}
-		this.Units_Per_Em = function ()
+		};
+
+		this.Units_Per_Em = function()
 		{
 			return this.m_lUnits_Per_Em;
-		}
+		};
 
-		this.CheckHintsSupport = function ()
+		this.CheckHintsSupport = function()
 		{
 			this.HintsSupport = true;
 
@@ -2134,14 +2154,14 @@
 			{
 				this.HintsSubpixelSupport = false;
 			}
-		}
+		};
 
-		this.GetCharLoadMode = function ()
+		this.GetCharLoadMode = function()
 		{
 			return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
-		}
+		};
 
-		this.GetCharPath = function (lUnicode, worker, x, y)
+		this.GetCharPath = function(lUnicode, worker, x, y)
 		{
 			var pFace = this.m_pFace;
 			var pCurentGliph = pFace.glyph;
@@ -2207,9 +2227,9 @@
 			_painter.start(worker);
 			FT_Outline_Decompose(pGlyph.outline, _painter, worker);
 			_painter.end(worker);
-		}
+		};
 
-		this.GetStringPath = function (string, worker)
+		this.GetStringPath = function(string, worker)
 		{
 			var _len = string.GetLength();
 			if (_len <= 0)
@@ -2226,10 +2246,9 @@
 				worker.df();
 				worker._e();
 			}
-		}
+		};
 	}
 
-	//--------------------------------------------------------export------------------------------------------------------
 	window['AscFonts'] = window['AscFonts'] || {};
 	window['AscFonts'].EGlyphState = EGlyphState;
 	window['AscFonts'].CFontFile = CFontFile;
