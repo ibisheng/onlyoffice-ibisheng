@@ -7898,13 +7898,21 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_GetHeadingLevel = function (sStyleName)
+	asc_docs_api.prototype.asc_GetHeadingLevel = function(sStyleName)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument || !sStyleName)
 			return -1;
 
 		return oLogicDocument.GetStyles().GetHeadingLevelByName(sStyleName);
+	};
+	asc_docs_api.prototype.asc_GetStylesArray = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return [];
+
+		return oLogicDocument.GetStyles().GetAscStylesArray();
 	};
 
 	// input

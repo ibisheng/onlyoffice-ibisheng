@@ -1546,4 +1546,67 @@
 	CTableOfContentsPr.prototype['get_StylesType']      = CTableOfContentsPr.prototype.get_StylesType;
 	CTableOfContentsPr.prototype['put_StylesType']      = CTableOfContentsPr.prototype.put_StylesType;
 
+
+	/**
+	 * Класс для работы с настройками стиля
+	 * @constructor
+	 */
+	function CAscStyle()
+	{
+		this.Name = "";
+		this.Type = Asc.c_oAscStyleType.Paragraph;
+
+		this.qFormat    = undefined;
+		this.uiPriority = undefined;
+
+		this.StyleId  = "";
+	}
+	CAscStyle.prototype.get_Name = function()
+	{
+		return this.Name;
+	};
+	CAscStyle.prototype.put_Name = function(sName)
+	{
+		this.Name = sName;
+	};
+	CAscStyle.prototype.get_Type = function()
+	{
+		return this.Type;
+	};
+	CAscStyle.prototype.put_Type = function(nType)
+	{
+		this.Type = nType;
+	};
+	CAscStyle.prototype.get_QFormat = function()
+	{
+		return this.qFormat;
+	};
+	CAscStyle.prototype.put_QFormat = function(isQFormat)
+	{
+		this.qFormat = isQFormat;
+	};
+	CAscStyle.prototype.get_UIPriority = function()
+	{
+		return this.uiPriority;
+	};
+	CAscStyle.prototype.put_UIPriority = function(nPriority)
+	{
+		this.uiPriority = nPriority;
+	};
+	CAscStyle.prototype.get_StyleId = function()
+	{
+		return this.StyleId;
+	};
+
+	window['Asc']['CAscStyle'] = window['Asc'].CAscStyle = CAscStyle;
+	CAscStyle.prototype['get_Name']       = CAscStyle.prototype.get_Name;
+	CAscStyle.prototype['put_Name']       = CAscStyle.prototype.put_Name;
+	CAscStyle.prototype['get_Type']       = CAscStyle.prototype.get_Type;
+	CAscStyle.prototype['put_Type']       = CAscStyle.prototype.put_Type;
+	CAscStyle.prototype['get_QFormat']    = CAscStyle.prototype.get_QFormat;
+	CAscStyle.prototype['put_QFormat']    = CAscStyle.prototype.put_QFormat;
+	CAscStyle.prototype['get_UIPriority'] = CAscStyle.prototype.get_UIPriority;
+	CAscStyle.prototype['put_UIPriority'] = CAscStyle.prototype.put_UIPriority;
+	CAscStyle.prototype['get_StyleId']    = CAscStyle.prototype.get_StyleId;
+
 })(window, undefined);

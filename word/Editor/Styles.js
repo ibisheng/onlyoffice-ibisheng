@@ -3490,6 +3490,23 @@ CStyle.prototype.CreateTOCHeading = function()
 	this.Set_UnhideWhenUsed(true);
 	this.Set_ParaPr(ParaPr);
 };
+/**
+ * Конвертируем стиль в Asc.CAscStyle
+ * @returns {Asc.CAscStyle}
+ */
+CStyle.prototype.ToAscStyle = function()
+{
+	var oAscStyle = new Asc.CAscStyle();
+
+	oAscStyle.StyleId    = this.Id;
+
+	oAscStyle.Name       = this.Name;
+	oAscStyle.Type       = this.Type;
+	oAscStyle.qFormat    = this.qFormat;
+	oAscStyle.uiPriority = this.uiPriority;
+
+	return oAscStyle;
+};
 
 function CStyles(bCreateDefault)
 {
@@ -4908,6 +4925,20 @@ CStyles.prototype.SetTOCStylesType = function(nType)
 		oStyle.Clear(oStyle.GetName(), oStyle.GetBasedOn(), oStyle.GetNext(), oStyle.GetType());
 		oStyle.CreateTOC(nLvl, nType);
 	}
+};
+/**
+ * Получаем массив стилей в виде классов Asc.CAscStyle
+ * @returns {Asc.CAscStyle[]}
+ */
+CStyles.prototype.GetAscStylesArray = function()
+{
+	var arrStyles = [];
+	for (var sId in this.Style)
+	{
+		arrStyles.push(this.Style[sId].ToAscStyle());
+	}
+
+	return arrStyles;
 };
 
 function CDocumentColor(r,g,b, Auto)

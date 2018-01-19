@@ -228,6 +228,13 @@ var c_oAscTOCStylesType = {
 	Classic  : 4
 };
 
+var c_oAscStyleType = {
+	Paragraph : 1,
+	Numbering : 2,
+	Table     : 3,
+	Character : 4
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -344,6 +351,13 @@ prot['Simple']   = c_oAscTOCStylesType.Simple;
 prot['Standard'] = c_oAscTOCStylesType.Standard;
 prot['Modern']   = c_oAscTOCStylesType.Modern;
 prot['Classic']  = c_oAscTOCStylesType.Classic;
+
+
+prot = window['Asc']['c_oAscStyleType'] = c_oAscStyleType;
+prot['Paragraph'] = c_oAscStyleType.Paragraph;
+prot['Numbering'] = c_oAscStyleType.Numbering;
+prot['Table']     = c_oAscStyleType.Table;
+prot['Character'] = c_oAscStyleType.Character;
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;
