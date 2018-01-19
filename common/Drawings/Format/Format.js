@@ -2817,7 +2817,7 @@ CGradFill.prototype =
             _ret.path = this.path.createDuplicate();
         }
         for(var i = 0; i < this.colors.length; ++i){
-            _ret.push(this.colors[i].saveSourceFormatting());
+            _ret.colors.push(this.colors[i].saveSourceFormatting());
         }
         return _ret;
     },
