@@ -5356,7 +5356,7 @@ CPresentation.prototype =
                 }
             }
         }
-        if(oContent.DocContent && oContent.DocContent.Elements.length > 0 && i === 0)
+        if(oContent.DocContent && oContent.DocContent.Elements.length > 0 && nIndex === 0)
         {
             var oTextPr = this.GetCalculatedTextPr();
             if(oTextPr && AscFormat.isRealNumber(oTextPr.FontSize))
