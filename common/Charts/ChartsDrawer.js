@@ -4674,20 +4674,30 @@ drawLineChart.prototype =
 	{
 		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
 		var path;
-		
+
+		var commandIndex = 0;
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			if(val === this.paths.series[ser].length && this.paths.series[ser][val - 1] && AscFormat.isRealNumber(this.paths.series[ser][val - 1][5]))
+			var curSer = this.paths.series[ser];
+			if(val === curSer.length && curSer[val - 1])
 			{
-				path = this.paths.series[ser][val - 1][5];
+				if(AscFormat.isRealNumber(curSer[val - 1][5]))
+				{
+					path = curSer[val - 1][5];
+				}
+				else if(AscFormat.isRealNumber(curSer[val - 1][2]))
+				{
+					path = curSer[val - 1][2];
+				}
+				commandIndex = 3;
 			}
-			else if(this.paths.series[ser][val] && AscFormat.isRealNumber(this.paths.series[ser][val][3]))//reverse
+			else if(curSer[val] && AscFormat.isRealNumber(curSer[val][3]))//reverse
 			{
-				path = this.paths.series[ser][val][3];
+				path = curSer[val][3];
 			}
-			else if(this.paths.series[ser][val] && AscFormat.isRealNumber(this.paths.series[ser][val][2]))
+			else if(curSer[val] && AscFormat.isRealNumber(curSer[val][2]))
 			{
-				path = this.paths.series[ser][val][2];
+				path = curSer[val][2];
 			}
 		}
 		else
@@ -4699,7 +4709,7 @@ drawLineChart.prototype =
 			return;
 
 		var oPath = this.cChartSpace.GetPath(path);
-		var oCommand0 = oPath.getCommandByIndex(0);
+		var oCommand0 = oPath.getCommandByIndex(commandIndex);
 		var x = oCommand0.X;
 		var y = oCommand0.Y;
 		
