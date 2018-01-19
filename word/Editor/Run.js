@@ -9879,6 +9879,27 @@ ParaRun.prototype.GetComplexField = function(nType)
 	}
 	return null;
 };
+ParaRun.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var oItem = this.Content[nPos];
+
+		if (para_FieldChar === oItem.Type && oItem.IsBegin())
+		{
+			var oComplexField = oItem.GetComplexField();
+			if (!oComplexField)
+				continue;
+
+			var oInstruction = oComplexField.GetInstruction();
+			if (!oInstruction)
+				continue;
+
+			if (nType === oInstruction.GetType())
+				arrComplexFields.push(oComplexField);
+		}
+	}
+};
 
 function CParaRunStartState(Run)
 {

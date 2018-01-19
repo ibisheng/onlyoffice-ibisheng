@@ -207,6 +207,14 @@ CParagraphContentBase.prototype.GetComplexField = function(nType)
 {
 	return null;
 };
+/**
+ * Ищем все сложные поля заданного типа
+ * @param nType
+ * @param arrComplexFields
+ */
+CParagraphContentBase.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -1740,6 +1748,13 @@ CParagraphContentWithParagraphLikeContent.prototype.GetComplexField = function(n
 			return oResult;
 	}
 	return null;
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetComplexFieldsArray(nType, arrComplexFields);
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета

@@ -1052,6 +1052,9 @@
 			case AscDFH.historydescription_Document_SetComplexFieldPr:
 				sString = "Document_SetComplexFieldPr";
 				break;
+			case AscDFH.historydescription_Document_UpdateTableOfContents:
+				sString = "Document_UpdateTableOfContents";
+				break;
 		}
 		return sString;
 	}
@@ -2982,6 +2985,7 @@
 	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014c;
 	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014d;
 	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
+	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
 
 
 

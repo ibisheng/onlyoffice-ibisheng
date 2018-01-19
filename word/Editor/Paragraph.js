@@ -12541,6 +12541,16 @@ Paragraph.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 
 	return null;
 };
+Paragraph.prototype.GetComplexFieldsArrayByType = function(nType)
+{
+	var arrComplexFields = [];
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetComplexFieldsArray(nType, arrComplexFields);
+	}
+
+	return arrComplexFields;
+};
 Paragraph.prototype.AddBookmarkForTOC = function()
 {
 	if (!this.LogicDocument)
