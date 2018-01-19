@@ -4637,7 +4637,7 @@ PasteProcessor.prototype =
 			oThis.aContent = shape.txBody.content.Content;
 
 			text = text.replace(/^(\r|\t)+|(\r|\t)+$/g, '');
-			text = text.replace(/(\r|\t)/g, ' ');
+			//text = text.replace(/(\r|\t)/g, ' ');
 			if (text.length > 0) {
 
 				oThis.oDocument = shape.txBody.content;
@@ -4663,13 +4663,18 @@ PasteProcessor.prototype =
 
 					if (null !== nUnicode) {
 						var Item;
-						if(0x0A === nUnicode) {
+						if(0x0A === nUnicode || 0x0D === nUnicode) {
 							bAddParagraph = true;
 						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText();
 							Item.Value = nUnicode;
 							shape.paragraphAdd(Item);
-						} else {
+						}
+						else if(0x09 === nUnicode){
+                            Item = new ParaTab();
+                            shape.paragraphAdd(Item);
+                        }
+						else {
 							Item = new ParaSpace();
 							shape.paragraphAdd(Item);
 						}
