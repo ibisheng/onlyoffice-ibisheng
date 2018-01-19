@@ -103,7 +103,7 @@
 
             font.m_pFace = face;
             font.LoadDefaultCharAndSymbolicCmapIndex();
-            font.m_nError = FT_Set_Char_Size(face, 0, font.m_fSize * 64, 0, 0);
+            font.m_nError = AscFonts.FT_Set_Char_Size(face, 0, font.m_fSize * 64, 0, 0);
 
             if (!font.IsSuccess())
             {
@@ -132,7 +132,7 @@
             if (pFontFile)
                 return pFontFile;
 
-            pFontFile = this.Fonts[key] = LoadFontFile(this.m_oLibrary, stream_index, fontName, faceIndex, fontManager);
+            pFontFile = this.Fonts[key] = this.LoadFontFile(stream_index, fontName, faceIndex, fontManager);
             return pFontFile;
         };
     }
@@ -240,7 +240,7 @@
 
         this.Initialize = function(is_init_raster_memory)
         {
-            this.m_oLibrary = new FT_Library();
+            this.m_oLibrary = new AscFonts.FT_Library();
             this.m_oLibrary.Init();
 
             this.m_oFontsCache = new CFontFilesCache();
@@ -354,7 +354,7 @@
             var _g = string.GetFirstGlyph();
             _g.bBitmap = false;
             _g.oBitmap = null;
-            _g.eState = EGlyphState.glyphstateNormal;
+            _g.eState = AscFonts.EGlyphState.glyphstateNormal;
             _g.lUnicode = gid;
 
             this.m_pFont.GetString2C(string);
@@ -380,7 +380,7 @@
             var _g = string.GetFirstGlyph();
             _g.bBitmap = false;
             _g.oBitmap = null;
-            _g.eState = EGlyphState.glyphstateNormal;
+            _g.eState = AscFonts.EGlyphState.glyphstateNormal;
             _g.lUnicode = wsBuffer.charCodeAt(0);
 
             this.m_pFont.GetString2C(string);
@@ -404,7 +404,7 @@
             var _g = string.GetFirstGlyph();
             _g.bBitmap = false;
             _g.oBitmap = null;
-            _g.eState = EGlyphState.glyphstateNormal;
+            _g.eState = AscFonts.EGlyphState.glyphstateNormal;
             _g.lUnicode = lUnicode;
 
             this.m_pFont.GetString2C(string);
@@ -430,7 +430,7 @@
             var _g = string.GetFirstGlyph();
             _g.bBitmap = false;
             _g.oBitmap = null;
-            _g.eState = EGlyphState.glyphstateNormal;
+            _g.eState = AscFonts.EGlyphState.glyphstateNormal;
             _g.lUnicode = code;
 
             this.m_pFont.GetStringPath(string, worker);
