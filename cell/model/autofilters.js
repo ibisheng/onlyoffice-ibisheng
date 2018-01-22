@@ -218,7 +218,7 @@
 					case this.Properties.filter: this.filter = value;break;
 					case this.Properties.automaticRowCount: this.automaticRowCount = value;break;
 					case this.Properties.displayName: this.displayName = value;break;
-                    case this.Properties.isTextFilter: this.IsTextFilter = value;break;
+                    case this.Properties.isTextFilter: this.isTextFilter = value;break;
                     case this.Properties.colorsFill: this.colorsFill = value;break;
                     case this.Properties.colorsFont: this.colorsFont = value;break;
                     case this.Properties.sortColor: this.sortColor = value;break;
