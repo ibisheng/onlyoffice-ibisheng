@@ -5149,9 +5149,11 @@ CPresentation.prototype =
                                 oNotes = oSlide.notes;
                                 oNotesCopy = oNotes;//.createDuplicate();
                                 oSourceFormattingContent.Notes.push(oNotesCopy);
+                                oEndFormattingContent.Notes.push(oNotesCopy);
                                 for(j = 0; j < oSourceFormattingContent.NotesMasters.length; ++j){
                                     if(oSourceFormattingContent.NotesMasters[j] === oNotes.Master){
                                         oSourceFormattingContent.NotesMastersIndexes.push(j);
+                                        oEndFormattingContent.NotesMastersIndexes.push(j);
                                         break;
                                     }
                                 }
@@ -5159,11 +5161,16 @@ CPresentation.prototype =
                                     oSourceFormattingContent.NotesMastersIndexes.push(j);
                                     oSourceFormattingContent.NotesMasters.push(oNotes.Master);
                                     oSourceFormattingContent.NotesThemes.push(oNotes.Master.Theme);
+                                    oEndFormattingContent.NotesMastersIndexes.push(j);
+                                    oEndFormattingContent.NotesMasters.push(oNotes.Master);
+                                    oEndFormattingContent.NotesThemes.push(oNotes.Master.Theme);
                                 }
                             }
                             else{
                                 oSourceFormattingContent.Notes.push(null);
                                 oSourceFormattingContent.NotesMastersIndexes.push(-1);
+                                oEndFormattingContent.Notes.push(null);
+                                oEndFormattingContent.NotesMastersIndexes.push(-1);
                             }
                         }
                     }
@@ -5262,6 +5269,14 @@ CPresentation.prototype =
                     {
                         oSlide.setLayout(oCurrentMaster.sldLayoutLst[0]);
                     }
+                    oNotes = oContent.Notes[i];
+                    if(!oNotes)
+                    {
+                        oNotes = AscCommonSlide.CreateNotes();
+                    }
+                    oSlide.setNotes(oNotes);
+                    oSlide.notes.setNotesMaster(this.notesMasters[0]);
+                    oSlide.notes.setSlide(oSlide);
                 }
             }
             else
