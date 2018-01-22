@@ -5900,6 +5900,21 @@ CPresentation.prototype =
     },
 
 
+    RemoveBeforePaste: function()
+    {
+
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetContent = oController.getTargetDocContent();
+            if (oTargetContent)
+            {
+                oTargetContent.Remove(-1, true, true, true);
+            }
+
+        }
+    },
+
     addNextSlide: function(layoutIndex)
     {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_AddNextSlide);

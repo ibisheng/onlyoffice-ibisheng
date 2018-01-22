@@ -3237,9 +3237,7 @@ PasteProcessor.prototype =
 		if(text){
 
             this.oDocument = this._GetTargetDocument(this.oDocument);
-			if(PasteElementsId.g_bIsDocumentCopyPaste){
-				this.oLogicDocument.RemoveBeforePaste();
-			}
+            this.oLogicDocument.RemoveBeforePaste();
 			this._pasteText(text);
 			return;
 		}
