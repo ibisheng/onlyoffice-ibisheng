@@ -3769,9 +3769,10 @@ PasteProcessor.prototype =
 			}
 		}
 
-		var firstContent = selectedContent2[0].content;
-		var pasteObj = firstContent && firstContent.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : selectedContent2[0];
-		var bSlideObjects = firstContent && firstContent.SlideObjects && PasteElementsId.g_bIsDocumentCopyPaste && firstContent.SlideObjects.length > 0;
+		var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
+		var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
+		var pasteObj = bSlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : defaultSelectedContent;
+
 		var arr_Images = pasteObj.images;
 		var fonts = pasteObj.fonts;
 		var content = pasteObj.content;

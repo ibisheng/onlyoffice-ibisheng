@@ -1325,8 +1325,9 @@
 					}
 				}
 
-				var bSlideObjects = selectedContent2[0].content.SlideObjects && selectedContent2[0].content.SlideObjects.length > 0;
-				var pasteObj = bSlideObjects ? selectedContent2[2] : selectedContent2[0];
+				var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
+				var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
+				var pasteObj = bSlideObjects ? selectedContent2[2] : defaultSelectedContent;
 
 				if (window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 				{
