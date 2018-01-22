@@ -86,7 +86,7 @@ function CDocumentReaderMode()
     };
 }
 
-function GetObjectsForImageDownload(aBuilderImages)
+function GetObjectsForImageDownload(aBuilderImages, bSameDoc)
 {
     var oMapImages = {}, aBuilderImagesByUrl = [], aUrls =[];
     for(var i = 0; i < aBuilderImages.length; ++i)
@@ -108,15 +108,18 @@ function GetObjectsForImageDownload(aBuilderImages)
             aBuilderImagesByUrl.push(oMapImages[key]);
         }
     }
-    //в конце добавляем ссылки на wmf, ole
-    for(var i = 0; i < aBuilderImages.length; ++i)
-    {
-        var oBuilderImage = aBuilderImages[i];
-        if (oBuilderImage.AdditionalUrls) {
-            for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
-                aUrls.push(oBuilderImage.AdditionalUrls[j]);
+    if(bSameDoc !== true){
+        //в конце добавляем ссылки на wmf, ole
+        for(var i = 0; i < aBuilderImages.length; ++i)
+        {
+            var oBuilderImage = aBuilderImages[i];
+            if (oBuilderImage.AdditionalUrls) {
+                for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+                    aUrls.push(oBuilderImage.AdditionalUrls[j]);
+                }
             }
         }
+
     }
     return {aUrls: aUrls, aBuilderImagesByUrl: aBuilderImagesByUrl};
 }
@@ -3993,7 +3996,7 @@ PasteProcessor.prototype =
 				}
 			};
 
-			var oObjectsForDownload = GetObjectsForImageDownload(arr_Images);
+			var oObjectsForDownload = GetObjectsForImageDownload(arr_Images, p_url === this.api.documentId);
 			if (oObjectsForDownload.aUrls.length > 0) {
 				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
 					var oImageMap = {};
