@@ -617,7 +617,7 @@ CImageShape.prototype.draw = function(graphics, transform)
             var oApi = editor || window['Asc']['editor'];
             if(oApi){
                 sImageId = AscCommon.getFullImageSrc2(sImageId);
-                var _img = editor.ImageLoader.map_image_index[sImageId];
+                var _img = oApi.ImageLoader.map_image_index[sImageId];
                 if ((_img && _img.Status === AscFonts.ImageLoadStatus.Loading) || (_img && _img.Image)){
                     this.brush = new AscFormat.CUniFill();
                     this.brush.fill = this.blipFill;
