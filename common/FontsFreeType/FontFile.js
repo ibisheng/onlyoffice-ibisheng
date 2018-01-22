@@ -34,21 +34,11 @@
 
 (function (window, undefined)
 {
-    var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
-    var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
-    var FT_Set_Transform = AscFonts.FT_Set_Transform;
-    var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
     var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
     var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
-    var FT_Load_Glyph = AscFonts.FT_Load_Glyph;
-    var FT_Get_Glyph = AscFonts.FT_Get_Glyph;
-    var FT_BBox = AscFonts.FT_BBox;
-    var FT_Glyph_Get_CBox = AscFonts.FT_Glyph_Get_CBox;
-    var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
-    var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
-    var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
+    var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
+
     var raster_memory = AscFonts.raster_memory;
-    var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
 
 	var FONT_ITALIC_ANGLE 	= 0.3090169943749;
 	var FT_ENCODING_UNICODE = 1970170211;
@@ -695,10 +685,10 @@
 
 		this.FT_Load_Glyph_Wrapper = function(pFace, unGID, _LOAD_MODE)
 		{
-			var err = FT_Load_Glyph(pFace, unGID, _LOAD_MODE);
+			var err = AscFonts.FT_Load_Glyph(pFace, unGID, _LOAD_MODE);
 			if (0 != err && this.HintsSupport)
 			{
-				var err2 = FT_Load_Glyph(pFace, unGID, 40970);
+				var err2 = AscFonts.FT_Load_Glyph(pFace, unGID, 40970);
 				if (err2 != 0)
 					return err;
 				this.HintsSupport = false;
@@ -712,7 +702,7 @@
 			this.m_nDefaultChar = -1;
 			this.m_nSymbolic = -1;
 
-			var pTable = FT_Get_Sfnt_Table(this.m_pFace, 2);
+			var pTable = AscFonts.FT_Get_Sfnt_Table(this.m_pFace, 2);
 			if (null == pTable)
 				return;
 
@@ -730,7 +720,7 @@
 			var charMapArray = this.m_pFace.charmaps;
 			for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
 			{
-				var pCharMap = __FT_CharmapRec(charMapArray[nIndex]);
+				var pCharMap = AscFonts.__FT_CharmapRec(charMapArray[nIndex]);
 
 				var nPlatformId = pCharMap.platform_id;
 				var nEncodingId = pCharMap.encoding_id;
@@ -839,7 +829,7 @@
 			fm.xy = ((m[2] * t[0] + m[3] * t[2]) * 65536) >> 0;
 			fm.yy = ((m[2] * t[1] + m[3] * t[3]) * 65536) >> 0;
 
-			FT_Set_Transform(this.m_pFace, fm, 0);
+			AscFonts.FT_Set_Transform(this.m_pFace, fm, 0);
 		};
 
 		this.SetSizeAndDpi = function (dSize, unHorDpi, unVerDpi)
@@ -867,7 +857,7 @@
 				this.m_dUnitsKoef = this.m_unHorDpi / 72.0 * this.m_fSize;
 
 				// Выставляем размер шрифта (dSize) и DPI
-				this.m_nError = FT_Set_Char_Size(this.m_pFace, 0, (dNewSize * 64) >> 0, dpiX, dpiY);
+				this.m_nError = AscFonts.FT_Set_Char_Size(this.m_pFace, 0, (dNewSize * 64) >> 0, dpiX, dpiY);
 				this.ClearCache();
 			}
 		};
@@ -992,7 +982,7 @@
                 return oSizes;
 
             var pFaceGlyph = this.m_pFace.glyph;
-            var pGlyph = FT_Get_Glyph(this.m_pFace.glyph);
+            var pGlyph = AscFonts.FT_Get_Glyph(this.m_pFace.glyph);
             if (null == pGlyph)
                 return oSizes;
 
@@ -1008,14 +998,14 @@
                     _painter.Y = workerVectorY;
 
                 _painter.start(workerVector);
-                FT_Outline_Decompose(pGlyph.outline, _painter, workerVector);
+                AscFonts.FT_Outline_Decompose(pGlyph.outline, _painter, workerVector);
                 _painter.end(workerVector);
                 return;
 			}
 
-            var oBBox = new FT_BBox();
-            FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
-            FT_Done_Glyph(pGlyph);
+            var oBBox = new AscFonts.FT_BBox();
+            AscFonts.FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
+            AscFonts.FT_Done_Glyph(pGlyph);
             pGlyph = null;
 
             oSizes.fAdvanceX = (pFaceGlyph.linearHoriAdvance * this.m_dUnitsKoef / this.m_lUnits_Per_Em);
@@ -1043,7 +1033,7 @@
             {
             	if (isRasterDistances)
 				{
-                    if (0 == FT_Render_Glyph(pFaceGlyph, REND_MODE))
+                    if (0 == AscFonts.FT_Render_Glyph(pFaceGlyph, REND_MODE))
                     {
                         oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pCurentGliph.bitmap.width, pCurentGliph.bitmap.rows, raster_memory.pitch);
                     }
@@ -1052,7 +1042,7 @@
             }
 
             oSizes.bBitmap = true;
-            if (FT_Render_Glyph(pFaceGlyph, REND_MODE))
+            if (AscFonts.FT_Render_Glyph(pFaceGlyph, REND_MODE))
                 return oSizes;
 
             if (0 == pFaceGlyph.bitmap.pitch)
@@ -1159,12 +1149,12 @@
 				if (0 != this.m_nNum_charmaps)
 				{
 					var nCharmap = pFace.charmap;
-					var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
+					var nCurCMapIndex = AscFonts.FT_Get_Charmap_Index(nCharmap);
 					if (nCurCMapIndex != _cmap_index)
 					{
 						_cmap_index = Math.max(0, _cmap_index);
 						nCharmap = pFace.charmaps[_cmap_index];
-						FT_Set_Charmap(pFace, nCharmap);
+						AscFonts.FT_Set_Charmap(pFace, nCharmap);
 					}
 				}
 				*/
@@ -1256,12 +1246,12 @@
 				if (0 != this.m_nNum_charmaps)
 				{
 					var nCharmap = pFace.charmap;
-					var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
+					var nCurCMapIndex = AscFonts.FT_Get_Charmap_Index(nCharmap);
 					if (nCurCMapIndex != nCMapIndex)
 					{
 						nCMapIndex = Math.max(0, nCMapIndex);
 						nCharmap = this.m_pFace.charmaps[nCMapIndex];
-						FT_Set_Charmap(this.m_pFace, nCharmap);
+						AscFonts.FT_Set_Charmap(this.m_pFace, nCharmap);
 					}
 				}
 				*/
