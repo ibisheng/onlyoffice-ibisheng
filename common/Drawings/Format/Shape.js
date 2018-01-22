@@ -362,11 +362,36 @@ function ConvertParagraphToWord(paragraph, docContent)
     var oldFlag = paragraph.bFromDocument;
     paragraph.bFromDocument = true;
     var new_paragraph = paragraph.Copy(_docContent);
-    CheckWordParagraphContent(new_paragraph.Content);
+    CheckWordParagraphContent(new_paragraph.Content, new_paragraph.Pr.DefaultRunPr);
     var NewRPr = CheckWordRunPr(new_paragraph.TextPr.Value);
+    var oCopyDefaultPr;
     if(NewRPr)
     {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(NewRPr);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+        }
         new_paragraph.TextPr.Apply_TextPr(NewRPr);
+    }
+    else
+    {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(new_paragraph.TextPr.Value);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+            new_paragraph.TextPr.Apply_TextPr(NewRPr);
+        }
     }
     paragraph.bFromDocument = oldFlag;
     return new_paragraph;
@@ -447,9 +472,9 @@ function CheckWordRunPr(Pr, bMath)
     return NewRPr;
 }
 
-function CheckWordParagraphContent(aContent)
+function CheckWordParagraphContent(aContent, oTextPr)
 {
-    var NewRPr;
+    var NewRPr, MergePr;
     for(var i = 0; i < aContent.length; ++i)
     {
         var oItem = aContent[i];
@@ -460,7 +485,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
@@ -482,7 +532,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr, true);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
