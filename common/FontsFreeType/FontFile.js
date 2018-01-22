@@ -1066,21 +1066,10 @@
 
 			var isDisableNeedBold = (this.m_pFace.os2 && (this.m_pFace.os2.version != 0xFFFF) && (this.m_pFace.os2.usWeightClass >= 800)) ? true : false;
 
-			var nRowSize = 0;
-			if (this.m_bAntiAliasing && !isDisableNeedBold)
-			{
-				if (this.m_bNeedDoBold)
-					oSizes.oBitmap.nWidth++;
-
-				nRowSize = oSizes.oBitmap.nWidth;
-			}
-			else
-			{
-				nRowSize = (oSizes.oBitmap.nWidth + 7) >> 3;
-			}
-
 			if (this.m_bNeedDoBold && this.m_bAntiAliasing && !isDisableNeedBold)
 			{
+                oSizes.oBitmap.nWidth++;
+
 				var _width_im = oSizes.oBitmap.nWidth;
 				var _height = oSizes.oBitmap.nHeight;
 
@@ -1374,7 +1363,6 @@
             if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
             {
                 // Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
-                //fPenX += 1;
                 pString.m_fEndX += this.m_unHorDpi / 72;
             }
 		};
