@@ -1940,6 +1940,14 @@
 					}
 				}
 				AscFormat.fResetConnectorsIds(aCopies, oIdMap);
+				if(aImagesSync.length > 0)
+				{
+					window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
+						function(){
+							ws.objectRender.showDrawingObjects(true);
+							ws.objectRender.controller.getGraphicObjectProps();
+						});
+				}
                 ws.objectRender.showDrawingObjects(true);
 
 				if(needShowSpecialProps)
@@ -1961,15 +1969,7 @@
                 ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
                 History.EndTransaction();
-				
-                if(aImagesSync.length > 0)
-                {
-                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
-                        function(){
-                            ws.objectRender.showDrawingObjects(true);
-                            ws.objectRender.controller.getGraphicObjectProps();
-                    });
-                }
+
 
 				if(!needShowSpecialProps)
 				{
