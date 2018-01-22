@@ -7980,6 +7980,27 @@ CDocument.prototype.Document_SetHdrFtrLink = function(bLinkToPrevious)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
+CDocument.prototype.SetSectionStartPage = function(nStartPage)
+{
+	var oCurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (!oCurHdrFtr)
+		return;
+
+	var nCurPage = oCurHdrFtr.RecalcInfo.CurPage;
+	if (-1 === nCurPage)
+		return;
+
+	var nIndex  = this.Pages[nCurPage].Pos;
+	var oSectPr = this.SectionsInfo.Get_SectPr(nIndex).SectPr;
+
+	oSectPr.Set_PageNum_Start(nStartPage);
+
+	this.Recalculate();
+
+	this.Document_UpdateRulersState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateSelectionState();
+};
 CDocument.prototype.Document_Format_Copy = function()
 {
 	this.CopyTextPr = this.GetDirectTextPr();

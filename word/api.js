@@ -127,6 +127,7 @@
 			this.DifferentEvenOdd = (undefined != obj.DifferentEvenOdd) ? obj.DifferentEvenOdd : null;
 			this.LinkToPrevious   = (undefined != obj.LinkToPrevious) ? obj.LinkToPrevious : null;
 			this.Locked           = (undefined != obj.Locked) ? obj.Locked : false;
+			this.StartPageNumber  = (undefined != obj.StartPageNumber) ? obj.StartPageNumber : -1;
 		}
 		else
 		{
@@ -136,6 +137,7 @@
 			this.DifferentEvenOdd = false;
 			this.LinkToPrevious   = null;
 			this.Locked           = false;
+			this.StartPageNumber  = -1;
 		}
 	}
 
@@ -178,6 +180,14 @@
 	CHeaderProp.prototype.get_Locked           = function()
 	{
 		return this.Locked;
+	};
+	CHeaderProp.prototype.get_StartPageNumber = function()
+	{
+		return this.StartPageNumber;
+	};
+	CHeaderProp.prototype.put_StartPageNumber = function(nStartPage)
+	{
+		this.StartPageNumber = nStartPage;
 	};
 
 	var DocumentPageSize = new function()
@@ -4228,6 +4238,22 @@ background-repeat: no-repeat;\
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetHdrFtrLink);
 			this.WordControl.m_oLogicDocument.Document_SetHdrFtrLink(isOn);
+		}
+	};
+
+	asc_docs_api.prototype.asc_SetSectionStartPage = function(nStartPage)
+	{
+		if (isNaN(nStartPage))
+			return;
+
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		if (false === oLogicDocument.Document_Is_SelectionLocked())
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SectionStartPage);
+			oLogicDocument.SetSectionStartPage(nStartPage);
 		}
 	};
 
@@ -8598,6 +8624,8 @@ background-repeat: no-repeat;\
 	CHeaderProp.prototype['put_DifferentEvenOdd']                       = CHeaderProp.prototype.put_DifferentEvenOdd;
 	CHeaderProp.prototype['get_LinkToPrevious']                         = CHeaderProp.prototype.get_LinkToPrevious;
 	CHeaderProp.prototype['get_Locked']                                 = CHeaderProp.prototype.get_Locked;
+	CHeaderProp.prototype['get_StartPageNumber']                        = CHeaderProp.prototype.get_StartPageNumber;
+	CHeaderProp.prototype['put_StartPageNumber']                        = CHeaderProp.prototype.put_StartPageNumber;
 	window['Asc']['CMailMergeSendData'] = window['Asc'].CMailMergeSendData = CMailMergeSendData;
 	CMailMergeSendData.prototype['get_From']                            = CMailMergeSendData.prototype.get_From;
 	CMailMergeSendData.prototype['put_From']                            = CMailMergeSendData.prototype.put_From;
@@ -8840,6 +8868,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['HeadersAndFooters_DifferentFirstPage']      = asc_docs_api.prototype.HeadersAndFooters_DifferentFirstPage;
 	asc_docs_api.prototype['HeadersAndFooters_DifferentOddandEvenPage'] = asc_docs_api.prototype.HeadersAndFooters_DifferentOddandEvenPage;
 	asc_docs_api.prototype['HeadersAndFooters_LinkToPrevious']          = asc_docs_api.prototype.HeadersAndFooters_LinkToPrevious;
+	asc_docs_api.prototype['asc_SetSectionStartPage']                   = asc_docs_api.prototype.asc_SetSectionStartPage;
 	asc_docs_api.prototype['sync_DocSizeCallback']                      = asc_docs_api.prototype.sync_DocSizeCallback;
 	asc_docs_api.prototype['sync_PageOrientCallback']                   = asc_docs_api.prototype.sync_PageOrientCallback;
 	asc_docs_api.prototype['sync_HeadersAndFootersPropCallback']        = asc_docs_api.prototype.sync_HeadersAndFootersPropCallback;

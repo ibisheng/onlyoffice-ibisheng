@@ -1055,6 +1055,9 @@
 			case AscDFH.historydescription_Document_UpdateTableOfContents:
 				sString = "Document_UpdateTableOfContents";
 				break;
+			case AscDFH.historydescription_Document_SectionStartPage:
+				sString = "Document_SectionStartPage";
+				break;
 		}
 		return sString;
 	}
@@ -2986,7 +2989,7 @@
 	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014d;
 	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
 	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
-
+	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
