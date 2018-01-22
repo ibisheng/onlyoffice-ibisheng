@@ -106,7 +106,7 @@
 		return {arr: arr, map: map};
 	}
 
-	function getNeedValuesFromDataBase(dataBase, field, conditionData, bIsGetObjArray){
+	function getNeedValuesFromDataBase(dataBase, field, conditionData, bIsGetObjArray, doNotCheckEmptyField){
 
 		//заполняем map название столбца-> его содержимое(из базы данных)
 		var databaseObj = convertDatabase(dataBase);
@@ -117,8 +117,12 @@
 		var headersConditionArr = databaseObj.arr, headersConditionMap = databaseObj.map;
 
 		//преобразуем аргумент поле
-		if(cElementType.cell === field.type || cElementType.cell3D === field.type){
+		if (cElementType.cell === field.type || cElementType.cell3D === field.type) {
 			field = field.getValue();
+		}
+
+		if (!doNotCheckEmptyField && cElementType.empty === field.type) {
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var isNumberField = field.tocNumber();
@@ -274,7 +278,7 @@
 			return argError;
 		}
 
-		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], null, true);
 		if(cElementType.error === resArr.type){
 			return resArr;
 		}
@@ -313,7 +317,7 @@
 			return argError;
 		}
 
-		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true, true);
 		if(cElementType.error === resArr.type){
 			return resArr;
 		}
