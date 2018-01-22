@@ -120,9 +120,6 @@
 		if(cElementType.cell === field.type || cElementType.cell3D === field.type){
 			field = field.getValue();
 		}
-		if(cElementType.empty === field.type){
-			return new cError(cErrorType.wrong_value_type);
-		}
 
 		var isNumberField = field.tocNumber();
 		var isEmptyField = cElementType.empty === field.type;
