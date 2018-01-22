@@ -4912,7 +4912,7 @@ CPresentation.prototype =
                                     oGraphicFrame.bDeleted = false;
                                     oGraphicFrame.recalculate();
                                     oSourceFormattingContent.Drawings.push(new DrawingCopyObject(oGraphicFrame.getCopyWithSourceFormatting(), oTargetTextObject.x, oTargetTextObject.y, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
-                                    oImage = oController.createImage(oGraphicFrame.getBase64Img(), 0, 0, oTargetTextObject.extX, oTargetTextObject.extY);
+                                    oImage = oController.createImage(oGraphicFrame.getBase64Img(), 0, 0, oGraphicFrame.extX, oGraphicFrame.extY);
                                     oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, oTargetTextObject.extX, oTargetTextObject.extY, oTargetTextObject.getBase64Img()));
                                     oGraphicFrame.parent = null;
                                     oGraphicFrame.bDeleted = true;
