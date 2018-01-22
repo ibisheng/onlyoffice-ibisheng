@@ -1103,8 +1103,6 @@ CFontInfo.prototype =
 
         if (!pFontFile)
             pFontFile = fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic);
-        else
-            pFontFile.SetDefaultFont(fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic));
 
         if (!pFontFile)
             return false;
@@ -1113,13 +1111,12 @@ CFontInfo.prototype =
 
         fontManager.m_pFont = pFontFile;
         pFontFile.SetNeedBold(bNeedBold);
-        pFontFile.SetItalic(bNeedItalic);
+        pFontFile.SetNeedItalic(bNeedItalic);
 
         var _fEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
         pFontFile.SetSizeAndDpi(_fEmSize, dHorDpi, dVerDpi);
 
         pFontFile.SetStringGID(fontManager.m_bStringGID);
-        pFontFile.SetUseDefaultFont(fontManager.m_bUseDefaultFont);
         pFontFile.SetCharSpacing(fontManager.m_fCharSpacing);
 
         fontManager.m_oGlyphString.ResetCTM();

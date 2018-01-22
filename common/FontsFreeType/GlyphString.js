@@ -49,6 +49,20 @@
         this.fRight = 0;
         this.fBottom = 0;
     }
+    CGlyphBounds.prototype =
+    {
+        checkPoint : function(x, y)
+        {
+            if (x < this.fLeft)
+                this.fLeft = x;
+            if (x > this.fRight)
+                this.fRight = x;
+            if (y < this.fTop)
+                this.fTop = y;
+            if (y > this.fBottom)
+                this.fBottom = y;
+        }
+    };
 
     function CGlyph()
     {
@@ -396,6 +410,7 @@
 
     window['AscFonts'] = window['AscFonts'] || {};
     window['AscFonts'].CGlyphRect = CGlyphRect;
+    window['AscFonts'].CGlyphBounds = CGlyphBounds;
     window['AscFonts'].CGlyphString = CGlyphString;
 
 })(window, undefined);

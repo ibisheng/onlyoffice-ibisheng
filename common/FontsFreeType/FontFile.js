@@ -35,7 +35,6 @@
 (function (window, undefined)
 {
     var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
-    var FT_Matrix = AscFonts.FT_Matrix;
     var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
     var FT_Set_Transform = AscFonts.FT_Set_Transform;
     var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
@@ -646,8 +645,12 @@
 
     function CFontFile(fileName, faceIndex)
 	{
-		this.m_arrdFontMatrix = new Array(6);
-		this.m_arrdTextMatrix = new Array(6);
+        this.m_sFileName = fileName;
+        this.m_lFaceIndex = faceIndex;
+
+		this.m_arrdFontMatrix = ("undefined" == typeof Float64Array) ? new Array(6) : new Float64Array(6);
+		this.m_arrdTextMatrix = ("undefined" == typeof Float64Array) ? new Array(6) : new Float64Array(6);
+
 		this.m_bAntiAliasing = true;
 		this.m_bUseKerning = false;
 
@@ -660,13 +663,8 @@
 
 		this.m_fCharSpacing = 0.0;
 
-		this.m_nMinX = 0;        //
-		this.m_nMinY = 0;        // Glyph BBox
-		this.m_nMaxX = 0;        //
-		this.m_nMaxY = 0;        //
+		this.m_oBox = new AscFonts.CGlyphBounds(); // Glyph box
 
-		this.m_sFileName = fileName;
-		this.m_lFaceIndex = faceIndex;
 		this.m_nError = 0;
 		this.m_pFace = null;
 
@@ -677,8 +675,7 @@
 
 		this.m_bStringGID = false;
 
-		this.m_oFontMatrix = new FT_Matrix();
-		this.m_oTextMatrix = new FT_Matrix();
+        this.m_oTransform = new AscFonts.FT_Matrix();
 
 		this.m_nNum_charmaps = 0;
 
@@ -690,18 +687,11 @@
 		this.m_arrCacheSizes = [];
 		this.m_arrCacheSizesGid = [];
 
-		this.m_bUseDefaultFont = false;
-		this.m_pDefaultFont = null;
-
-		this.m_bIsNeedUpdateMatrix12 = true;
 		this.m_oFontManager = null;
 		this.HintsSupport = true;
 		this.HintsSubpixelSupport = true;
 
-		this.SetDefaultFont = function(pDefFont)
-		{
-			this.m_pDefaultFont = pDefFont;
-		};
+        this.m_bIsTransform = true; // !IsIdentity matrix transform
 
 		this.FT_Load_Glyph_Wrapper = function(pFace, unGID, _LOAD_MODE)
 		{
@@ -755,9 +745,6 @@
 
 		this.ResetFontMatrix = function()
 		{
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.ResetFontMatrix();
-
 			var m = this.m_arrdFontMatrix;
 			if (this.m_bNeedDoItalic)
 			{
@@ -778,7 +765,7 @@
 				m[5] = 0;
 			}
 
-			this.UpdateMatrix0();
+			this.UpdateMatrix();
 		};
 
 		this.ResetTextMatrix = function()
@@ -796,170 +783,91 @@
 
 		this.CheckTextMatrix = function()
 		{
-			this.m_bIsNeedUpdateMatrix12 = true;
+			this.m_bIsTransform = true;
 			var m = this.m_arrdTextMatrix;
 			if ((m[0] == 1) && (m[1] == 0) && (m[2] == 0) && (m[3] == 1))
 			{
-				this.m_bIsNeedUpdateMatrix12 = false;
-
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+				this.m_bIsTransform = false;
+				this.UpdateMatrix();
 			}
 		};
 
-		this.UpdateMatrix0 = function()
+		this.CheckBBox = function()
 		{
-			//this.UpdateMatrix2();
-			//return;
-			var dSize = this.m_fSize;
+            if (this.m_lUnits_Per_Em == 0)
+                this.m_lUnits_Per_Em = this.m_pFace.units_per_EM = 2048;
 
-			var m1 = this.m_arrdTextMatrix[2];
-			var m2 = this.m_arrdTextMatrix[3];
-			this.m_dTextScale = Math.sqrt(m1 * m1 + m2 * m2);
+            this.m_dTextScale = 1;
+            //this.m_dTextScale = Math.sqrt(this.m_arrdTextMatrix[2] * this.m_arrdTextMatrix[2] + this.m_arrdTextMatrix[3] * this.m_arrdTextMatrix[3]);
 
-			var bbox = this.m_pFace.bbox;
-			var xMin = bbox.xMin;
-			var yMin = bbox.yMin;
-			var xMax = bbox.xMax;
-			var yMax = bbox.yMax;
+            var bbox = this.m_pFace.bbox;
+            var xMin = bbox.xMin;
+            var yMin = bbox.yMin;
+            var xMax = bbox.xMax;
+            var yMax = bbox.yMax;
 
-			if (this.m_lUnits_Per_Em == 0)
-				this.m_lUnits_Per_Em = this.m_pFace.units_per_EM = 2048;
+            var dDiv = xMax > 20000 ? 65536 : 1;
+            var dScale = this.fSize / (dDiv * this.m_lUnits_Per_Em);
 
-			var units_per_EM = this.m_lUnits_Per_Em;
-			var dDiv = xMax > 20000 ? 65536 : 1;
-			var del = dDiv * units_per_EM;
+            var m = this.m_arrdFontMatrix;
+            this.m_oBox.checkPoint(((m[0] * xMin + m[2] * yMin) * dScale) >> 0, ((m[1] * xMin + m[3] * yMin) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMin + m[2] * yMax) * dScale) >> 0, ((m[1] * xMin + m[3] * yMax) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMax + m[2] * yMin) * dScale) >> 0, ((m[1] * xMax + m[3] * yMin) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMax + m[2] * yMax) * dScale) >> 0, ((m[1] * xMax + m[3] * yMax) * dScale) >> 0);
 
-			var m = this.m_arrdFontMatrix;
-
-			var nX = parseInt(((m[0] * xMin + m[2] * yMin) * dSize / del));
-			this.m_nMinX = this.m_nMaxX = nX;
-
-			var nY = parseInt(((m[1] * xMin + m[3] * yMin) * dSize / del));
-			this.m_nMinY = this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMin + m[2] * yMax) * dSize / del));
-
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMin + m[3] * yMax) * dSize / del));
-
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMax + m[2] * yMin) * dSize / del));
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMax + m[3] * yMin) * dSize / del));
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMax + m[2] * yMax) * dSize / del));
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMax + m[3] * yMax) * dSize / del));
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			// This is a kludge: some buggy PDF generators embed fonts with  zero bounding boxes.
-			if (this.m_nMaxX == this.m_nMinX)
+            // This is a kludge: some buggy PDF generators embed fonts with  zero bounding boxes.
+            if (this.m_oBox.fLeft == this.m_oBox.fRight)
 			{
-				this.m_nMinX = 0;
-				this.m_nMaxX = parseInt(dSize);
+				this.m_oBox.fLeft = 0;
+				this.m_oBox.fRight = this.m_fSize >> 0;
 			}
-
-			if (this.m_nMaxY == this.m_nMinY)
-			{
-				this.m_nMinY = 0;
-				this.m_nMaxY = parseInt((1.2 * dSize));
-			}
-
-			// Вычислим матрицу преобразования (FontMatrix)
-			var fm = this.m_oFontMatrix;
-			fm.xx = Math.floor((m[0] * 65536));
-			fm.yx = Math.floor((m[1] * 65536));
-			fm.xy = Math.floor((m[2] * 65536));
-			fm.yy = Math.floor((m[3] * 65536));
-
-			var tm = this.m_oTextMatrix;
-			tm.xx = Math.floor(((this.m_arrdTextMatrix[0] / this.m_dTextScale) * 65536));
-			tm.yx = Math.floor(((this.m_arrdTextMatrix[1] / this.m_dTextScale) * 65536));
-			tm.xy = Math.floor(((this.m_arrdTextMatrix[2] / this.m_dTextScale) * 65536));
-			tm.yy = Math.floor(((this.m_arrdTextMatrix[3] / this.m_dTextScale) * 65536));
-
-			FT_Set_Transform(this.m_pFace, fm, 0);
+            if (this.m_oBox.fTop == this.m_oBox.fBottom)
+            {
+                this.m_oBox.fTop = 0;
+                this.m_oBox.fBottom = (1.2 * this.m_fSize) >> 0;
+            }
 		};
 
-		this.UpdateMatrix1 = function()
-		{
-			var m = this.m_arrdFontMatrix;
-			var fm = this.m_oFontMatrix;
-			fm.xx = Math.floor((m[0] * 65536));
-			fm.yx = Math.floor((m[1] * 65536));
-			fm.xy = Math.floor((m[2] * 65536));
-			fm.yy = Math.floor((m[3] * 65536));
-
-			FT_Set_Transform(this.m_pFace, this.m_oFontMatrix, 0);
-		};
-
-		this.UpdateMatrix2 = function()
+		this.UpdateMatrix = function()
 		{
 			var m = this.m_arrdFontMatrix;
 			var t = this.m_arrdTextMatrix;
-			var fm = this.m_oFontMatrix;
+			var fm = this.m_oTransform;
 
-			fm.xx = parseInt((m[0] * t[0] + m[1] * t[2] ) * 65536);
-			fm.yx = parseInt((m[0] * t[1] + m[1] * t[3] ) * 65536);
-			fm.xy = parseInt((m[2] * t[0] + m[3] * t[2] ) * 65536);
-			fm.yy = parseInt((m[2] * t[1] + m[3] * t[3] ) * 65536);
+			fm.xx = ((m[0] * t[0] + m[1] * t[2]) * 65536) >> 0;
+			fm.yx = ((m[0] * t[1] + m[1] * t[3]) * 65536) >> 0;
+			fm.xy = ((m[2] * t[0] + m[3] * t[2]) * 65536) >> 0;
+			fm.yy = ((m[2] * t[1] + m[3] * t[3]) * 65536) >> 0;
 
 			FT_Set_Transform(this.m_pFace, fm, 0);
 		};
 
-		this.SetSizeAndDpi = function (fSize, _unHorDpi, _unVerDpi)
+		this.SetSizeAndDpi = function (dSize, unHorDpi, unVerDpi)
 		{
-			var unHorDpi = parseInt(_unHorDpi + 0.5);
-			var unVerDpi = parseInt(_unVerDpi + 0.5);
+			var dpiX = (unHorDpi + 0.5) >> 0;
+			var dpiY = (unVerDpi + 0.5) >> 0;
 
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetSizeAndDpi(fSize, unHorDpi, unVerDpi);
+			var dOldSize = this.m_fSize;
+			var dNewSize = dSize;
+			var dKoef = dNewSize / dOldSize;
+			var isResize = (dKoef > 1.001 || dKoef < 0.999) ? true : false;
 
-			var fOldSize = this.m_fSize;
-			var fNewSize = fSize;
-			var fKoef = fNewSize / fOldSize;
-
-			if (fKoef > 1.001 || fKoef < 0.999 || unHorDpi != this.m_unHorDpi || unVerDpi != this.m_unVerDpi)
+			if (isResize || dpiX != this.m_unHorDpi || dpiY != this.m_unVerDpi)
 			{
-				this.m_unHorDpi = unHorDpi;
-				this.m_unVerDpi = unVerDpi;
+				this.m_unHorDpi = dpiX;
+				this.m_unVerDpi = dpiY;
 
-				if (fKoef > 1.001 || fKoef < 0.999)
+				if (isResize)
 				{
-					this.m_fSize = fNewSize;
-					this.UpdateMatrix0();
+					this.m_fSize = dNewSize;
+					this.UpdateMatrix();
+					this.CheckBBox();
 				}
 
 				this.m_dUnitsKoef = this.m_unHorDpi / 72.0 * this.m_fSize;
 
 				// Выставляем размер шрифта (dSize) и DPI
-				this.m_nError = FT_Set_Char_Size(this.m_pFace, 0, parseInt(fNewSize * 64), unHorDpi, unVerDpi);
-
+				this.m_nError = FT_Set_Char_Size(this.m_pFace, 0, (dNewSize * 64) >> 0, dpiX, dpiY);
 				this.ClearCache();
 			}
 		};
@@ -1003,9 +911,6 @@
 			if (b1 && m[4] == fE && m[5] == fF)
 				return false;
 
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetTextMatrix(fA, fB, fC, fD, fE, fF);
-
 			m[0] = fA;
 			m[1] = -fB;
 			m[2] = -fC;
@@ -1023,9 +928,6 @@
 
 		this.SetFontMatrix = function(fA, fB, fC, fD, fE, fF)
 		{
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetFontMatrix(fA, fB, fC, fD, fE, fF);
-
 			var m = this.m_arrdFontMatrix;
 			if (this.m_bNeedDoItalic)
 			{
@@ -1058,12 +960,8 @@
 			var fPenX = 0, fPenY = 0;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
+			if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
 
@@ -1248,12 +1146,8 @@
 			if (pString.GetLength() <= 0)
 				return true;
 
-            if (this.m_bIsNeedUpdateMatrix12)
-            {
-                if (this.m_pDefaultFont)
-                    this.m_pDefaultFont.UpdateMatrix2();
-                this.UpdateMatrix2();
-            }
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var unPrevGID = 0;
 			var fPenX = 0, fPenY = 0;
@@ -1511,12 +1405,8 @@
 			var fPenX = 0, fPenY = 0;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var pCurGlyph = pString.m_pGlyphsBuffer[0];
 			var ushUnicode = pCurGlyph.lUnicode;
@@ -1777,57 +1667,6 @@
 			pString.m_fEndY = fPenY + pString.m_fY;
 		};
 
-		this.SetCMapForCharCode = function(lUnicode, pnCMapIndex)
-		{
-			if (this.m_bStringGID || !this.m_pFace || 0 == this.m_nNum_charmaps)
-				return lUnicode;
-
-			var nCharIndex = 0;
-
-			var charMapArray = this.m_pFace.charmaps;
-			for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
-			{
-				var pCMap = charMapArray[nIndex];
-				var pCharMap = __FT_CharmapRec(pCMap);
-
-				if (0 != FT_Set_Charmap(this.m_pFace, pCMap))
-					continue;
-
-				var pEncoding = pCharMap.encoding;
-
-				if (FT_ENCODING_UNICODE == pEncoding)
-				{
-					if ((nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode)) != 0)
-					{
-						pnCMapIndex.index = nIndex;
-						return nCharIndex;
-					}
-				}
-				else if (FT_ENCODING_NONE == pEncoding || FT_ENCODING_MS_SYMBOL == pEncoding || FT_ENCODING_APPLE_ROMAN == pEncoding)
-				{
-					/*
-					 var res_code = FT_Get_First_Char(this.m_pFace);
-					 while (res_code.gindex != 0)
-					 {
-					 res_code = FT_Get_Next_Char(this.m_pFace, res_code.char_code);
-					 if (res_code.char_code == lUnicode)
-					 {
-					 nCharIndex = res_code.gindex;
-					 pnCMapIndex.index = nIndex;
-					 break;
-					 }
-					 }
-					 */
-
-					nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode);
-					if (0 != nCharIndex)
-						pnCMapIndex.index = nIndex;
-				}
-			}
-
-			return nCharIndex;
-		};
-
 		this.GetChar = function(lUnicode, is_raster_distances)
 		{
 			var pFace = this.m_pFace;
@@ -1837,12 +1676,8 @@
 			var ushUnicode = lUnicode;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var unGID = 0;
 
@@ -1991,175 +1826,6 @@
 			return Result;
 		};
 
-		this.GetKerning = function(unPrevGID, unGID)
-		{
-			var pDelta = new AscFonts.FT_Vector();
-			AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
-			return (pDelta.x >> 6);
-		};
-
-		this.SetStringGID = function(bGID)
-		{
-			if (this.m_bStringGID == bGID)
-				return;
-
-			//this.ClearCache();
-			this.m_bStringGID = bGID;
-		};
-
-		this.GetStringGID = function()
-		{
-			return this.m_bStringGID;
-		};
-
-		this.SetUseDefaultFont = function(bUse)
-		{
-			this.m_bUseDefaultFont = bUse;
-		};
-
-		this.GetUseDefaultFont = function()
-		{
-			return this.m_bUseDefaultFont;
-		};
-
-		this.SetCharSpacing = function(fCharSpacing)
-		{
-			this.m_fCharSpacing = fCharSpacing;
-		};
-
-		this.GetCharSpacing = function()
-		{
-			return this.m_fCharSpacing;
-		};
-
-		this.GetStyleName = function()
-		{
-			return this.m_pFace.style_name;
-		};
-
-		this.UpdateStyles = function(bBold, bItalic)
-		{
-			var sStyle = this.GetStyleName();
-
-			// Смотрим какой стиль у исходного шрифта
-			var bSrcBold = (-1 != sStyle.indexOf("Bold"));
-			var bSrcItalic = (-1 != sStyle.indexOf("Italic"));
-
-			if (!bBold) // Нам нужен не жирный шрифт
-			{
-				this.m_bNeedDoBold = false;
-			}
-			else if (bBold) // Нам нужно сделать шрифт жирным
-			{
-				if (bSrcBold)
-				{
-					// Исходный шрифт уже жирный, поэтому ничего дополнительного делать не надо
-					this.m_bNeedDoBold = false;
-				}
-				else
-				{
-					// Иходный шрифт не жирный, поэтому жирность делаем сами
-					this.m_bNeedDoBold = true;
-				}
-			}
-
-			if (!bItalic) // Нам нужен не наклонный шрифт
-			{
-				this.SetItalic(false);
-			}
-			else if (bItalic) // Нам нужно сделать наклонный шрифт
-			{
-				if (bSrcItalic)
-				{
-					// Исходный шрифт уже наклонный, поэтому ничего дополнительного делать не надо
-					this.SetItalic(false);
-				}
-				else
-				{
-					// Иходный шрифт не наклонный, поэтому делаем его наклонным сами
-					this.SetItalic(true);
-				}
-			}
-		};
-
-		this.SetItalic = function(value)
-		{
-			if (this.m_bNeedDoItalic != value)
-			{
-				this.ClearCache();
-				this.m_bNeedDoItalic = value;
-				this.ResetFontMatrix();
-			}
-		};
-
-		this.SetNeedBold = function(value)
-		{
-			if (this.m_bNeedDoBold != value)
-				this.ClearCache();
-
-			this.m_bNeedDoBold = value;
-		};
-
-		this.ReleaseFontFace = function()
-		{
-			this.m_pFace = null;
-		};
-
-		this.IsSuccess = function()
-		{
-			return (0 == this.m_nError);
-		};
-
-		this.GetAscender = function()
-		{
-			return this.m_lAscender;
-		};
-
-		this.GetDescender = function()
-		{
-			return this.m_lDescender;
-		};
-
-		this.GetHeight = function()
-		{
-			return this.m_lLineHeight;
-		};
-
-		this.Units_Per_Em = function()
-		{
-			return this.m_lUnits_Per_Em;
-		};
-
-		this.CheckHintsSupport = function()
-		{
-			this.HintsSupport = true;
-
-			if (!this.m_pFace || !this.m_pFace.driver || !this.m_pFace.driver.clazz)
-				return;
-
-			if (this.m_pFace.driver.clazz.name != "truetype")
-			{
-				this.HintsSupport = false;
-				return;
-			}
-
-			if (this.m_pFace.family_name == "MS Mincho" ||
-				this.m_pFace.family_name == "Castellar")
-			{
-				this.HintsSupport = false;
-			}
-			else if (this.m_pFace.family_name == "Microsoft JhengHei UI Light" ||
-				this.m_pFace.family_name == "Kalinga")
-			{
-				this.HintsSubpixelSupport = false;
-			}
-		};
-
-		this.GetCharLoadMode = function()
-		{
-			return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
-		};
-
 		this.GetCharPath = function(lUnicode, worker, x, y)
 		{
 			var pFace = this.m_pFace;
@@ -2169,12 +1835,8 @@
 			var ushUnicode = lUnicode;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var unGID = 0;
 			var nCMapIndex = new CCMapIndex();
@@ -2228,6 +1890,57 @@
 			_painter.end(worker);
 		};
 
+        this.SetCMapForCharCode = function(lUnicode, pnCMapIndex)
+        {
+            if (this.m_bStringGID || !this.m_pFace || 0 == this.m_nNum_charmaps)
+                return lUnicode;
+
+            var nCharIndex = 0;
+
+            var charMapArray = this.m_pFace.charmaps;
+            for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
+            {
+                var pCMap = charMapArray[nIndex];
+                var pCharMap = __FT_CharmapRec(pCMap);
+
+                if (0 != FT_Set_Charmap(this.m_pFace, pCMap))
+                    continue;
+
+                var pEncoding = pCharMap.encoding;
+
+                if (FT_ENCODING_UNICODE == pEncoding)
+                {
+                    if ((nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode)) != 0)
+                    {
+                        pnCMapIndex.index = nIndex;
+                        return nCharIndex;
+                    }
+                }
+                else if (FT_ENCODING_NONE == pEncoding || FT_ENCODING_MS_SYMBOL == pEncoding || FT_ENCODING_APPLE_ROMAN == pEncoding)
+                {
+                    /*
+                     var res_code = FT_Get_First_Char(this.m_pFace);
+                     while (res_code.gindex != 0)
+                     {
+                     res_code = FT_Get_Next_Char(this.m_pFace, res_code.char_code);
+                     if (res_code.char_code == lUnicode)
+                     {
+                     nCharIndex = res_code.gindex;
+                     pnCMapIndex.index = nIndex;
+                     break;
+                     }
+                     }
+                     */
+
+                    nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode);
+                    if (0 != nCharIndex)
+                        pnCMapIndex.index = nIndex;
+                }
+            }
+
+            return nCharIndex;
+        };
+
 		this.GetStringPath = function(string, worker)
 		{
 			var _len = string.GetLength();
@@ -2246,6 +1959,127 @@
 				worker._e();
 			}
 		};
+
+        this.GetCharLoadMode = function()
+        {
+            return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
+        };
+
+        this.GetKerning = function(unPrevGID, unGID)
+        {
+            var pDelta = new AscFonts.FT_Vector();
+            AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
+            return (pDelta.x >> 6);
+        };
+
+        this.SetStringGID = function(bGID)
+        {
+            if (this.m_bStringGID == bGID)
+                return;
+
+            this.m_bStringGID = bGID;
+        };
+
+        this.GetStringGID = function()
+        {
+            return this.m_bStringGID;
+        };
+
+        this.SetCharSpacing = function(fCharSpacing)
+        {
+            this.m_fCharSpacing = fCharSpacing;
+        };
+
+        this.GetCharSpacing = function()
+        {
+            return this.m_fCharSpacing;
+        };
+
+        this.GetStyleName = function()
+        {
+            return this.m_pFace.style_name;
+        };
+
+        this.UpdateStyles = function(bBold, bItalic)
+        {
+            var sStyle = this.GetStyleName();
+
+            // Смотрим какой стиль у исходного шрифта
+            var bSrcBold = (-1 != sStyle.indexOf("Bold"));
+            var bSrcItalic = (-1 != sStyle.indexOf("Italic"));
+
+            this.SetNeedBold(bBold && !bSrcBold);
+            this.SetNeedItalic(bItalic && !bSrcItalic);
+        };
+
+        this.SetNeedItalic = function(value)
+        {
+            if (this.m_bNeedDoItalic != value)
+            {
+                this.ClearCache();
+                this.m_bNeedDoItalic = value;
+                this.ResetFontMatrix();
+            }
+        };
+
+        this.SetNeedBold = function(value)
+        {
+            if (this.m_bNeedDoBold != value)
+            {
+                this.ClearCache();
+                this.m_bNeedDoBold = value;
+            }
+        };
+
+        this.IsSuccess = function()
+        {
+            return (0 == this.m_nError);
+        };
+
+        this.GetAscender = function()
+        {
+            return this.m_lAscender;
+        };
+
+        this.GetDescender = function()
+        {
+            return this.m_lDescender;
+        };
+
+        this.GetHeight = function()
+        {
+            return this.m_lLineHeight;
+        };
+
+        this.Units_Per_Em = function()
+        {
+            return this.m_lUnits_Per_Em;
+        };
+
+        this.CheckHintsSupport = function()
+        {
+            this.HintsSupport = true;
+
+            if (!this.m_pFace || !this.m_pFace.driver || !this.m_pFace.driver.clazz)
+                return;
+
+            if (this.m_pFace.driver.clazz.name != "truetype")
+            {
+                this.HintsSupport = false;
+                return;
+            }
+
+            if (this.m_pFace.family_name == "MS Mincho" ||
+                this.m_pFace.family_name == "Castellar")
+            {
+                this.HintsSupport = false;
+            }
+            else if (this.m_pFace.family_name == "Microsoft JhengHei UI Light" ||
+                this.m_pFace.family_name == "Kalinga")
+            {
+                this.HintsSubpixelSupport = false;
+            }
+        };
 	}
 
 	window['AscFonts'] = window['AscFonts'] || {};
