@@ -1036,6 +1036,13 @@
 
         var t = this;
         if (window["AscDesktopEditor"]) {
+
+        	window["asc_nativeOnSpellCheck"] = function(response) {
+                var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+                if (_editor.SpellCheckApi)
+                    _editor.SpellCheckApi.onSpellCheck(response);
+            };
+
 			this.SpellCheckApi.spellCheck = function (spellData) {
                 window["AscDesktopEditor"]["SpellCheck"](spellData);
             };
