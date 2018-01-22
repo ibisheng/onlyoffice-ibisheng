@@ -1325,6 +1325,14 @@
 					}
 				}
 
+				var specialOptionsArr = [];
+				var specialProps = Asc.c_oSpecialPasteProps;
+				if(2 === multipleParamsCount) {
+					specialOptionsArr = [specialProps.sourceformatting];
+				} else if(3 === multipleParamsCount) {
+					specialOptionsArr = [specialProps.sourceformatting, specialProps.picture];
+				}
+
 				var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
 				var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
 				var pasteObj = bSlideObjects ? selectedContent2[2] : defaultSelectedContent;
@@ -1413,8 +1421,10 @@
 					{
 						window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 						var specialProps = window['AscCommon'].g_specialPasteHelper.buttonInfo;
-						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						specialProps.asc_setOptions(allowedProps);
+						if(specialOptionsArr.length > 1)
+						{
+							specialProps.asc_setOptions(specialOptionsArr);
+						}
 					}
 
 					var arr_shapes = content.Drawings;

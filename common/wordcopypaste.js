@@ -3921,8 +3921,18 @@ PasteProcessor.prototype =
 				aContents.push(curContent.content);
 			}
 
+			var specialOptionsArr = [];
+			var specialProps = Asc.c_oSpecialPasteProps;
+			if(1 === multipleParamsCount) {
+				specialOptionsArr = [specialProps.destinationFormatting];
+			} else if(2 === multipleParamsCount) {
+				specialOptionsArr = [specialProps.destinationFormatting, specialProps.sourceformatting];
+			} else if(3 === multipleParamsCount) {
+				specialOptionsArr = [specialProps.destinationFormatting, specialProps.sourceformatting, specialProps.picture];
+			}
+
 			var pasteObj = selectedContent2[0];
-            var nIndex = 0;
+			var nIndex = 0;
 			if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
 				var props = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 				switch (props) {
@@ -3970,13 +3980,13 @@ PasteProcessor.prototype =
 					presentation.Document_UpdateInterfaceState();
 
 					//пока не показываю значок специальной вставки после copy/paste слайдов
-					if(!(aContents[nIndex] && aContents[nIndex].SlideObjects && aContents[nIndex].SlideObjects.length)){
-						var props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						if(presentationSelectedContent && presentationSelectedContent.DocContent){
-							props = [Asc.c_oSpecialPasteProps.destinationFormatting, Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture, Asc.c_oSpecialPasteProps.keepTextOnly];
+					var bSlideObjects = aContents[nIndex] && aContents[nIndex].content.SlideObjects && aContents[nIndex].content.SlideObjects.length > 0;
+					if (specialOptionsArr.length > 1 && !bSlideObjects) {
+						if (presentationSelectedContent && presentationSelectedContent.DocContent) {
+							specialOptionsArr.push(Asc.c_oSpecialPasteProps.keepTextOnly);
 						}
 
-						oThis._setSpecialPasteShowOptionsPresentation(props);
+						oThis._setSpecialPasteShowOptionsPresentation(specialOptionsArr);
 					} else {
 						window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 					}
@@ -3993,16 +4003,8 @@ PasteProcessor.prototype =
 					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
 				});
 			} else {
-				/*var im_arr = [];
-				for (var key  in images) {
-					im_arr.push(key);
-				}
-				oThis.SetShortImageId(arr_Images);*/
-
 				oThis.api.pre_Paste(fonts, {}, paste_callback);
 			}
-		} else {
-
 		}
 	},
 
