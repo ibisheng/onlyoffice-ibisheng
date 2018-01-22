@@ -1376,8 +1376,6 @@
             if (this.m_bIsTransform)
                 this.UpdateMatrix();
 
-			var unGID = 0;
-
 			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
 
             var charSymbolObj = _cache_array[ushUnicode];
