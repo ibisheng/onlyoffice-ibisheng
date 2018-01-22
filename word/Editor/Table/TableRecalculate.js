@@ -1543,7 +1543,7 @@ CTable.prototype.private_RecalculatePageXY = function(CurPage)
     var FirstRow = 0;
     if (0 !== CurPage)
     {
-        if (true === this.Is_EmptyPage(CurPage - 1))
+        if (true === this.IsEmptyPage(CurPage - 1))
             FirstRow = this.Pages[CurPage - 1].FirstRow;
         else if (true === this.Pages[CurPage - 1].LastRowSplit)
             FirstRow = this.Pages[CurPage - 1].LastRow;
@@ -1688,7 +1688,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     }
     else
     {
-        if (true === this.Is_EmptyPage(CurPage - 1))
+        if (true === this.IsEmptyPage(CurPage - 1))
         {
             ResetStartElement = false;
             FirstRow = this.Pages[CurPage - 1].FirstRow;
@@ -3117,7 +3117,7 @@ CTable.prototype.private_RecalculateSkipPage = function(CurPage)
     else
     {
         var FirstRow;
-        if (true === this.Is_EmptyPage(CurPage - 1))
+        if (true === this.IsEmptyPage(CurPage - 1))
             FirstRow = this.Pages[CurPage - 1].FirstRow;
         else
             FirstRow = this.Pages[CurPage - 1].LastRow;

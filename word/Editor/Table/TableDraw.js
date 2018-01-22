@@ -45,7 +45,7 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
     if (CurPage < 0 || CurPage >= this.Pages.length)
         return 0;
 
-    if (true === this.Is_EmptyPage(CurPage))
+    if (true === this.IsEmptyPage(CurPage))
         return;
 
     var Page = this.Pages[CurPage];

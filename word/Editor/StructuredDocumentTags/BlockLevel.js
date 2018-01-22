@@ -110,10 +110,9 @@ CBlockLevelSdt.prototype.GetContentBounds = function(CurPage)
 {
 	return this.Content.GetContentBounds(CurPage);
 };
-CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
+CBlockLevelSdt.prototype.IsEmptyPage = function(nCurPage)
 {
-	// TODO: Реализовать
-	return false;
+	return this.Content.IsEmptyPage(nCurPage);
 };
 CBlockLevelSdt.prototype.Get_PagesCount = function()
 {
@@ -644,12 +643,12 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
+		if (this.IsEmptyPage(nCurPage))
+			continue;
+
 		var nPageAbs = this.Get_AbsolutePage(nCurPage);
 		var oBounds = this.Content.GetContentBounds(nCurPage);
-
-		// TODO: В принципе, правильнее было бы сделать проверку на пустую страницу, но пока так тоже сойдет
-		if (Math.abs(oBounds.Left - oBounds.Right) > 0.001 && Math.abs(oBounds.Top - oBounds.Bottom) > 0.001)
-			arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
+		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());
@@ -1016,6 +1015,15 @@ CBlockLevelSdt.prototype.GetInnerTableOfContents = function()
 		return oTOC.GetInnerTableOfContents();
 
 	return oTOC;
+};
+CBlockLevelSdt.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	if (null !== this.Get_DocumentPrev()
+		|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
+		|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage()))
+		return false;
+
+	return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()

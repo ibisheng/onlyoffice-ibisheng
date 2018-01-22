@@ -1430,7 +1430,14 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
     // Перенос не делаем, если это первая строка на новой странице
-    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
+    if (true === this.Use_YLimit()
+		&& (Top > YLimit || Bottom2 > YLimit)
+		&& (CurLine != this.Pages[CurPage].FirstLine
+		|| false === bNoFootnotes
+		|| (0 === RealCurPage && (null != this.Get_DocumentPrev()
+		|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
+		|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage()))))
+		&& false === BreakPageLineEmpty)
     {
 		this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
 		return false;
@@ -2113,7 +2120,7 @@ Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage
 
 Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
 {
-    if (this.Is_EmptyPage(CurPage))
+    if (this.IsEmptyPage(CurPage))
         return;
 
     var Page = this.Pages[CurPage];

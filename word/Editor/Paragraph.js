@@ -2341,13 +2341,13 @@ Paragraph.prototype.Internal_Draw_6 = function(CurPage, pGraphics, Pr)
 
 	for (var TempCurPage = 0; TempCurPage < CurPage; ++TempCurPage)
 	{
-		if (false === this.Is_EmptyPage(TempCurPage))
+		if (false === this.IsEmptyPage(TempCurPage))
 		{
 			bEmptyPagesBefore = false;
 			break;
 		}
 	}
-	bEmptyPageCurrent = this.Is_EmptyPage(CurPage);
+	bEmptyPageCurrent = this.IsEmptyPage(CurPage);
 
 	var bDrawTop = false;
 	if (border_Single === Pr.ParaPr.Brd.Top.Value
@@ -2504,7 +2504,7 @@ Paragraph.prototype.Internal_Draw_6 = function(CurPage, pGraphics, Pr)
  */
 Paragraph.prototype.private_IsEmptyPageWithBreak = function(CurPage)
 {
-	//if (true === this.Is_EmptyPage(CurPage))
+	//if (true === this.IsEmptyPage(CurPage))
 	//    return true;
 
 	if (this.Pages[CurPage].EndLine !== this.Pages[CurPage].StartLine)
@@ -11864,7 +11864,7 @@ Paragraph.prototype.Get_PagesCount = function()
 {
     return this.Pages.length;
 };
-Paragraph.prototype.Is_EmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
+Paragraph.prototype.IsEmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
     if (!this.Pages[CurPage] || this.Pages[CurPage].EndLine < this.Pages[CurPage].StartLine)
         return true;
@@ -11880,7 +11880,7 @@ Paragraph.prototype.Is_EmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
 };
 Paragraph.prototype.Check_FirstPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
-    if (true === this.Is_EmptyPage(CurPage, bSkipEmptyLinesWithBreak))
+    if (true === this.IsEmptyPage(CurPage, bSkipEmptyLinesWithBreak))
         return false;
 
     return this.Check_EmptyPages(CurPage - 1, bSkipEmptyLinesWithBreak);
@@ -11889,7 +11889,7 @@ Paragraph.prototype.Check_EmptyPages = function(CurPage, bSkipEmptyLinesWithBrea
 {
     for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        if (true !== this.Is_EmptyPage(_CurPage, bSkipEmptyLinesWithBreak))
+        if (true !== this.IsEmptyPage(_CurPage, bSkipEmptyLinesWithBreak))
             return false;
     }
 
@@ -12622,7 +12622,7 @@ Paragraph.prototype.GetFirstNonEmptyPageAbsolute = function()
 	var nPagesCount = this.Pages.length;
 	var nCurPage    = 0;
 
-	while (this.Is_EmptyPage(nCurPage, true))
+	while (this.IsEmptyPage(nCurPage, true))
 	{
 		if (nCurPage >= nPagesCount - 1)
 			break;

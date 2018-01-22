@@ -286,7 +286,7 @@
                     {
                         var Element          = this.Content[oColumn.Pos];
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, nColumnIndex, nColumnsCount);
-                        if (true === Element.Is_EmptyPage(ElementPageIndex))
+                        if (true === Element.IsEmptyPage(ElementPageIndex))
                             oColumn.Empty = true;
                     }
                     for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
@@ -315,7 +315,7 @@
                     {
                         var Element          = this.Content[oColumn.Pos];
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, nColumnIndex, nColumnsCount);
-                        if (true === Element.Is_EmptyPage(nElementPageIndex))
+                        if (true === Element.IsEmptyPage(nElementPageIndex))
                             oColumn.Empty = true;
                     }
                     for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
@@ -351,7 +351,7 @@
                     {
                         var Element          = this.Content[oColumn.Pos];
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, nColumnIndex, nColumnsCount);
-                        if (true === Element.Is_EmptyPage(ElementPageIndex))
+                        if (true === Element.IsEmptyPage(ElementPageIndex))
                             oColumn.Empty = true;
                     }
 

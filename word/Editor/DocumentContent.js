@@ -8639,6 +8639,13 @@ CDocumentContent.prototype.IsBlockLevelSdtContent = function()
 {
 	return (this.Parent && this.Parent instanceof CBlockLevelSdt);
 };
+CDocumentContent.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	if (this.Parent && this.Parent instanceof CBlockLevelSdt)
+		return this.Parent.IsBlockLevelSdtFirstOnNewPage();
+
+	return false;
+};
 CDocumentContent.prototype.IsSelectedAll = function()
 {
 	if (true === this.Selection.Use
@@ -8681,7 +8688,23 @@ CDocumentContent.prototype.GetMargins = function()
 		Right  : new CTableMeasurement(tblwidth_Mm, 0)
 	};
 };
+CDocumentContent.prototype.IsEmptyPage = function(nCurPage)
+{
+	if (nCurPage < 0 || nCurPage >= this.Pages.length)
+		return true;
 
+	var nStartPos = this.Pages[nCurPage].Pos;
+	var nEndPos   = this.Pages[nCurPage].EndPos;
+
+	if (nStartPos > nEndPos)
+		return true;
+
+	if (nStartPos < nEndPos)
+		return false;
+
+	var nElementPageIndex = this.private_GetElementPageIndex(nStartPos, nCurPage, 0, 1);
+	return this.Content[nStartPos].IsEmptyPage(nElementPageIndex);
+};
 
 function CDocumentContentStartState(DocContent)
 {

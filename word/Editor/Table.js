@@ -3078,7 +3078,7 @@ CTable.prototype.Get_ParentTextTransform = function()
  */
 CTable.prototype.IsStartFromNewPage = function()
 {
-	if ((this.Pages.length > 1 && true === this.Is_EmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
+	if ((this.Pages.length > 1 && true === this.IsEmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
 		return true;
 
 	return false;
@@ -3097,7 +3097,7 @@ CTable.prototype.IsTableBorder = function(X, Y, CurPage)
 
 	CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
 
-	if (true === this.Is_EmptyPage(CurPage))
+	if (true === this.IsEmptyPage(CurPage))
 		return null;
 
 	var Result = this.Internal_CheckBorders(X, Y, CurPage);
@@ -3229,7 +3229,7 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 		return;
 
 	var NewOutline = null;
-	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.Is_EmptyPage(CurPage))
+	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.IsEmptyPage(CurPage))
 	{
 		this.private_StartTrackTable(CurPage);
 	}
@@ -3291,7 +3291,7 @@ CTable.prototype.Start_TrackTable = function()
 	var CurPage = 0;
 	while (CurPage < this.Pages.length)
 	{
-		if (true != this.Is_EmptyPage(CurPage))
+		if (true != this.IsEmptyPage(CurPage))
 			break;
 
 		CurPage++;
@@ -11367,7 +11367,7 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 {
 	var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
 
-	if (true !== this.Is_EmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
+	if (true !== this.IsEmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
 	{
 		VMergeCount = this.Pages[CurPage].LastRow + 1 - CurRow;
 		if (false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && CurPage === this.RowsInfo[CurRow + VMergeCount - 1].StartPage)
@@ -11851,7 +11851,7 @@ CTable.prototype.Set_CurCell = function(Cell)
 
     this.CurCell = Cell;
 };
-CTable.prototype.Is_EmptyPage = function(CurPage)
+CTable.prototype.IsEmptyPage = function(CurPage)
 {
     if (!this.Pages[CurPage]
         || (this.Pages[CurPage].LastRow < this.Pages[CurPage].FirstRow)
@@ -11864,7 +11864,7 @@ CTable.prototype.Check_EmptyPages = function(CurPage)
 {
     for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        if (true !== this.Is_EmptyPage(_CurPage))
+        if (true !== this.IsEmptyPage(_CurPage))
             return false;
     }
 
@@ -11913,7 +11913,10 @@ CTable.prototype.IsTableFirstRowOnNewPage = function(CurRow)
     {
         if (CurRow === this.Pages[CurPage].FirstRow && CurRow <= this.Pages[CurPage].LastRow)
         {
-            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))
+            if (0 === CurPage
+				&& (null != this.Get_DocumentPrev()
+				|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
+				|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage())))
                 return false;
 
             return true;

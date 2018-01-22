@@ -2814,7 +2814,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 {
                     var Element          = this.Content[PageColumn.Pos];
                     var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
-                    if (true === Element.Is_EmptyPage(ElementPageIndex))
+                    if (true === Element.IsEmptyPage(ElementPageIndex))
                         PageColumn.Empty = true;
                 }
 
@@ -2845,7 +2845,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 {
                     var Element          = this.Content[PageColumn.Pos];
                     var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
-                    if (true === Element.Is_EmptyPage(ElementPageIndex))
+                    if (true === Element.IsEmptyPage(ElementPageIndex))
                         PageColumn.Empty = true;
                 }
 
@@ -2888,7 +2888,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 {
                     var Element          = this.Content[PageColumn.Pos];
                     var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
-                    if (true === Element.Is_EmptyPage(ElementPageIndex))
+                    if (true === Element.IsEmptyPage(ElementPageIndex))
                         PageColumn.Empty = true;
                 }
 
