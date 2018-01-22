@@ -646,7 +646,10 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	{
 		var nPageAbs = this.Get_AbsolutePage(nCurPage);
 		var oBounds = this.Content.GetContentBounds(nCurPage);
-		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
+
+		// TODO: В принципе, правильнее было бы сделать проверку на пустую страницу, но пока так тоже сойдет
+		if (Math.abs(oBounds.Left - oBounds.Right) > 0.001 && Math.abs(oBounds.Top - oBounds.Bottom) > 0.001)
+			arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());

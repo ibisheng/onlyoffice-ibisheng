@@ -778,15 +778,21 @@ Paragraph.prototype.private_RecalculatePageXY          = function(CurLine, CurPa
 
 Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPage, PRS, ParaPr)
 {
-    // Для пустых параграфов с разрывом секции не делаем переноса страницы
-    if (undefined !== this.Get_SectionPr() && true === this.IsEmpty())
-        return true;
+	// Для пустых параграфов с разрывом секции не делаем переноса страницы
+	if (undefined !== this.Get_SectionPr() && true === this.IsEmpty())
+		return true;
 
-    if (this.Parent instanceof CDocument)
+	var isParentDocument = this.Parent instanceof CDocument;
+	var isParentBlockSdt = this.Parent instanceof CDocumentContent
+		&& this.Parent.Parent instanceof CBlockLevelSdt
+		&& PRS.GetTopDocument() instanceof CDocument
+		&& !PRS.IsInTable();
+
+    if (isParentDocument || isParentBlockSdt)
     {
         // Начинаем параграф с новой страницы
         var PageRelative = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
-        if (0 === PageRelative && true === ParaPr.PageBreakBefore)
+        if (isParentDocument && 0 === PageRelative && true === ParaPr.PageBreakBefore)
         {
             // Если это первый элемент документа или секции, тогда не надо начинать его с новой страницы.
             // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для
@@ -819,7 +825,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                 return false;
             }
         }
-        else if ( true === this.Parent.RecalcInfo.Check_KeepNext(this) && 0 === CurPage && null != this.Get_DocumentPrev() )
+        else if (isParentDocument && true === this.Parent.RecalcInfo.Check_KeepNext(this) && 0 === CurPage && null != this.Get_DocumentPrev())
         {
             this.Pages[CurPage].Set_EndLine( CurLine - 1 );
             if ( 0 === CurLine )
@@ -835,6 +841,21 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             var isColumnBreakOnPrevLine = false;
 
             var PrevElement = this.Get_DocumentPrev();
+            if (!PrevElement && isParentBlockSdt)
+			{
+				var oSdt = this.Parent.Parent;
+				while (oSdt instanceof CBlockLevelSdt)
+				{
+					PrevElement = oSdt.Get_DocumentPrev();
+					if (PrevElement)
+						break;
+
+					if (oSdt.Parent instanceof CDocumentContent && oSdt.Parent.Parent instanceof CBlockLevelSdt)
+						oSdt = oSdt.Parent.Parent;
+					else
+						oSdt = null;
+				}
+			}
 
             if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
 			{
@@ -890,17 +911,6 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             }
         }
     }
-
-    //// Эта проверка на случай, если предыдущий параграф закончился PageBreak
-    //if (PRS.YStart > PRS.YLimit - 0.001 && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.IsTableCellContent()))) && true === this.Use_YLimit())
-    //{
-    //    this.Pages[CurPage].Set_EndLine(CurLine - 1);
-    //    if ( 0 === CurLine )
-    //        this.Lines[-1] = new CParaLine( 0 );
-    //
-    //    PRS.RecalcResult = recalcresult_NextPage;
-    //    return false;
-    //}
 
     return true;
 };
@@ -3135,6 +3145,10 @@ CParagraphRecalculateStateWrap.prototype.GetSectPr = function()
 		this.SectPr = this.Paragraph.Get_SectPr();
 
 	return this.SectPr;
+};
+CParagraphRecalculateStateWrap.prototype.GetTopDocument = function()
+{
+	return this.TopDocument;
 };
 
 function CParagraphRecalculateStateCounter()
