@@ -8547,6 +8547,7 @@ function BinaryPPTYLoader()
                                         new_run.Add_ToContent(pos++, new ParaSpace(1), false);
                                     }
                                 }
+                                AscFonts.FontPickerByCharacter.getFontsByString(_text);
 
                                 if (hyperlink !== null)
                                 {

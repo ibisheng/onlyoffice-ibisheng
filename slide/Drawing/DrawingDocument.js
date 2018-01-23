@@ -2689,6 +2689,11 @@ function CDrawingDocument()
 		{
 			dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
 		}
+        map_keys = AscFonts.FontPickerByCharacter.FontsByRange;
+        for (var j in map_keys)
+        {
+            dstfonts[dstfonts.length] = new AscFonts.CFont(map_keys[j], 0, "", 0, null);
+        }
 		this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
 		return;
 	}
