@@ -683,6 +683,8 @@
 
         this.m_bIsTransform = true; // !IsIdentity matrix transform
 
+		this.Picker = new CFontLoaderBySymbol();
+
 		this.FT_Load_Glyph_Wrapper = function(pFace, unGID, _LOAD_MODE)
 		{
 			var err = AscFonts.FT_Load_Glyph(pFace, unGID, _LOAD_MODE);
@@ -866,12 +868,18 @@
 		{
 			this.Destroy();
 			this.ClearCacheNoAttack();
+
+			if (this.Picker)
+				this.Picker.ClearCache();
 		};
 
 		this.ClearCacheNoAttack = function()
 		{
 			this.m_arrCacheSizes = [];
 			this.m_arrCacheSizesGid = [];
+
+			if (this.Picker)
+				this.Picker.ClearCacheNoAttack();
 		};
 
 		this.Destroy = function()
@@ -941,7 +949,7 @@
 			this.ClearCache();
 		};
 
-		this.CacheGlyph = function(glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY)
+		this.CacheGlyph = function(glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, isFromPicker)
 		{
             var oSizes = new CFontCacheSizes();
             oSizes.ushUnicode = glyph_index_or_unicode;
@@ -957,6 +965,17 @@
 
 			if (unGID <= 0)
 			{
+                if (isFromPicker === true)
+                	return null;
+
+				if (!this.m_bStringGID && this.Picker)
+				{
+					// пробуем подобрать нужный шрифт
+					var oSizesCheck = this.Picker.LoadSymbol(this, glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY);
+					if (oSizesCheck)
+						return oSizesCheck;
+				}
+
 				if (this.m_nDefaultChar >= 0)
 				{
 					unGID = this.m_nDefaultChar;
@@ -1516,6 +1535,22 @@
             this.SetNeedItalic(bItalic && !bSrcItalic);
         };
 
+        this.IsBold = function()
+        {
+        	if (this.m_bNeedDoBold)
+        		return true;
+
+        	return (-1 != this.m_pFace.style_name.indexOf("Bold")) ? true : false;
+        };
+
+        this.IsItalic = function()
+        {
+            if (this.m_bNeedDoItalic)
+                return true;
+
+            return (-1 != this.m_pFace.style_name.indexOf("Italic")) ? true : false;
+        };
+
         this.SetNeedItalic = function(value)
         {
             if (this.m_bNeedDoItalic != value)
@@ -1588,7 +1623,57 @@
 
 	function CFontLoaderBySymbol()
 	{
-		this.Picker = new window.FontPickerByCharacter();
+		this.FontFiles = {};
+
+		this.LoadSymbol = function(pFontFile, symbol, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, isFromPicker)
+		{
+			var fontManager = pFontFile.m_oFontManager;
+
+			var name = window.FontPickerByCharacter.getFontBySymbol(symbol);
+			var _fontFilePick = this.FontFiles[name];
+			if (!_fontFilePick)
+			{
+                var _font_info = AscFonts.g_font_infos[AscFonts.g_map_font_index[name]];
+                var _style = AscFonts.FontStyle.FontStyleRegular;
+                if (pFontFile.IsBold())
+                	_style |= AscFonts.FontStyle.FontStyleBold;
+                if (pFontFile.IsItalic())
+                    _style |= AscFonts.FontStyle.FontStyleItalic;
+
+                _fontFilePick = _font_info.LoadFont(AscCommon.g_font_loader, fontManager, pFontFile.m_fSize, _style, pFontFile.m_unHorDpi, pFontFile.m_unVerDpi, undefined, true);
+                this.FontFiles[name] = _fontFilePick;
+			}
+
+			if (!_fontFilePick)
+				return null;
+
+            _fontFilePick.SetSizeAndDpi(pFontFile.m_fSize, pFontFile.m_unHorDpi, pFontFile.m_unVerDpi);
+
+            var s = pFontFile.m_arrdTextMatrix;
+            var d = _fontFilePick.m_arrdTextMatrix;
+
+            d[0] = s[0];
+            d[1] = s[1];
+            d[2] = s[2];
+            d[3] = s[3];
+            d[4] = s[4];
+            d[5] = s[5];
+
+            _fontFilePick.UpdateMatrix();
+            return _fontFilePick.CacheGlyph(symbol, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, true);
+		};
+
+		this.ClearCache = function()
+		{
+			for (var font in this.FontFiles)
+				this.FontFiles[font].ClearCache();
+		};
+
+		this.ClearCacheNoAttack = function()
+		{
+            for (var font in this.FontFiles)
+                this.FontFiles[font].ClearCacheNoAttack();
+		};
 	}
 
 	window['AscFonts'] = window['AscFonts'] || {};

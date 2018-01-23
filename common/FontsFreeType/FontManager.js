@@ -595,7 +595,7 @@
             this.IsAdvanceNeedBoldFonts = value;
         };
 
-        this.LoadFont = function(fontFile, faceIndex, size, isBold, isItalic, needBold, needItalic)
+        this.LoadFont = function(fontFile, faceIndex, size, isBold, isItalic, needBold, needItalic, isNoSetupToManager)
         {
             var _ext = "";
             if (needBold)
@@ -612,7 +612,6 @@
                 return null;
 
             pFontFile.m_oFontManager = this;
-            this.m_pFont = pFontFile;
 
             pFontFile.SetNeedBold(needBold);
             pFontFile.SetNeedItalic(needItalic);
@@ -621,7 +620,12 @@
             pFontFile.SetCharSpacing(this.m_fCharSpacing);
 
             this.m_oGlyphString.ResetCTM();
-            this.AfterLoad();
+
+            if (isNoSetupToManager !== true)
+            {
+                this.m_pFont = pFontFile;
+                this.AfterLoad();
+            }
 
             return pFontFile;
         };

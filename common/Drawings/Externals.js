@@ -946,7 +946,7 @@ CFontInfo.prototype =
         }
     },
 
-    LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
+    LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform, isNoSetupToManager)
     {
         // подбираем шрифт по стилю
         var sReturnName = this.Name;
@@ -1093,9 +1093,9 @@ CFontInfo.prototype =
 			fontfile.LoadFontNative();
         }        
 
-        var pFontFile = fontManager.LoadFont(fontfile, faceIndex, fEmSize, bSrcBold, bSrcItalic, bNeedBold, bNeedItalic);
+        var pFontFile = fontManager.LoadFont(fontfile, faceIndex, fEmSize, bSrcBold, bSrcItalic, bNeedBold, bNeedItalic, isNoSetupToManager);
 
-        if (pFontFile)
+        if (pFontFile && (true !== isNoSetupToManager))
         {
             var newEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
             pFontFile.SetSizeAndDpi(newEmSize, dHorDpi, dVerDpi);
@@ -1109,6 +1109,8 @@ CFontInfo.prototype =
                 fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
             }
         }
+
+        return pFontFile;
     },
 
     GetFontID : function(font_loader, lStyle)

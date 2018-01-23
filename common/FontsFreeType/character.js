@@ -949,7 +949,7 @@
 	function CFontByCharacter()
 	{
 		this.UsedRanges = [];
-		this.FontsByRange = [];
+		this.FontsByRange = {};
 	}
 
 	CFontByCharacter.prototype =
