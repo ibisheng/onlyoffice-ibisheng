@@ -1641,6 +1641,10 @@
                     _style |= AscFonts.FontStyle.FontStyleItalic;
 
                 _fontFilePick = _font_info.LoadFont(AscCommon.g_font_loader, fontManager, pFontFile.m_fSize, _style, pFontFile.m_unHorDpi, pFontFile.m_unVerDpi, undefined, true);
+
+                if (!_fontFilePick)
+                	return null;
+
                 this.FontFiles[name] = _fontFilePick;
 			}
 
