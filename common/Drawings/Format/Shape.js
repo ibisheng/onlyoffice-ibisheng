@@ -1272,7 +1272,7 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function()
+CShape.prototype.getHierarchy = function(bIsSingleBody)
 {
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
@@ -1284,7 +1284,15 @@ CShape.prototype.getHierarchy = function()
             {
                 var ph_type = this.getPlaceholderType();
                 var ph_index = this.getPlaceholderIndex();
-                var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                var b_is_single_body;
+                if(AscFormat.isRealBool(bIsSingleBody))
+                {
+                    b_is_single_body = bIsSingleBody;
+                }
+                else
+                {
+                    b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                }
                 switch (this.parent.kind)
                 {
                     case AscFormat.TYPE_KIND.SLIDE:
@@ -2505,7 +2513,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
             }
         }
 
-        var hierarchy = this.getHierarchy();
+        var hierarchy = this.getHierarchy(false);
         var hierarchy_styles = [];
         for (var i = 0; i < hierarchy.length; ++i) {
             var hierarchy_shape = hierarchy[i];
