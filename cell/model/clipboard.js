@@ -598,6 +598,7 @@
 
 				//начало записи
 				oPresentationWriter.WriteString2("");
+				oPresentationWriter.WriteString2("");
 				oPresentationWriter.WriteDouble(1);
 				oPresentationWriter.WriteDouble(1);
 
