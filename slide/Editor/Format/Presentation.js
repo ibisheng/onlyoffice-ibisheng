@@ -2344,6 +2344,18 @@ CPresentation.prototype =
             }
             if(false === bRecalculate){
                 this.Recalculate();
+                this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
+                var oContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(false, false);
+                if(oContent)
+                {
+                    var oCurrentParagraph = oContent.GetCurrentParagraph(true);
+                    if(oCurrentParagraph && oCurrentParagraph.GetType() === type_Paragraph)
+                    {
+                        oCurrentParagraph.CurPos.RealX = oCurrentParagraph.CurPos.X;
+                        oCurrentParagraph.CurPos.RealY = oCurrentParagraph.CurPos.Y;
+                    }
+                }
+
             }
             //this.Slides[this.CurPage].graphicObjects.startRecalculate();
             //this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
@@ -3628,7 +3640,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = oController.getTargetDocContent();
             }
-            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), undefined, true );
+            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), false, true );
             if(oController)
             {
                 target_doc_content2 = oController.getTargetDocContent();
