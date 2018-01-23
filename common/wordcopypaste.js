@@ -1088,8 +1088,10 @@ CopyProcessor.prototype =
 		if(elementsContent && elementsContent.length){
 			if(elementsContent[0].DocContent || (elementsContent[0].Drawings && elementsContent[0].Drawings.length) || (elementsContent[0].SlideObjects && elementsContent[0].SlideObjects.length))
 			{
+				var themeName = elementsContent[0].ThemeName ? elementsContent[0].ThemeName : "";
+
 				this.oPresentationWriter.WriteString2(this.api.documentId);
-				this.oPresentationWriter.WriteString2(elementsContent[0].ThemeName);
+				this.oPresentationWriter.WriteString2(themeName);
 				this.oPresentationWriter.WriteDouble(presentation.Width);
 				this.oPresentationWriter.WriteDouble(presentation.Height);
 				//флаг о том, что множественный контент в буфере
@@ -3973,6 +3975,14 @@ PasteProcessor.prototype =
 				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				return;
+			}
+
+			if(presentationSelectedContent.Drawings && presentationSelectedContent.Drawings.length > 0) {
+				var controller = this.oDocument.GetCurrentController();
+				var curTheme = controller ? controller.getTheme() : null;
+				if(curTheme && curTheme.name === p_theme) {
+					specialOptionsArr.splice(1, 1);
+				}
 			}
 
 			var paste_callback = function(){
