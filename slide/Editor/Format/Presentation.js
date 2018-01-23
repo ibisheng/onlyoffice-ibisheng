@@ -4543,6 +4543,7 @@ CPresentation.prototype =
                 this.DrawingDocument.OnRecalculatePage(this.CurPage, oCurSlide);
                 this.DrawingDocument.OnEndRecalculate();
             }
+            oCurSlide.graphicObjects.updateSelectionState();
         }
 
     },
