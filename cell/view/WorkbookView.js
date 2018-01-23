@@ -2485,7 +2485,7 @@
       if (tmpWs && (0 < tmpWs.aComments.length || isFirst)) {
         wsView = this.getWorksheet(i);
         wsModel = wsView.model;
-        wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
+        wsView.cellCommentator.updatePositionComments();
 
         if (isFirst) {
           isFirst = false;
@@ -2493,7 +2493,7 @@
           this.cellCommentator.worksheet = wsView;
           this.cellCommentator.overlayCtx = wsView.overlayCtx;
           this.cellCommentator.drawingCtx = wsView.drawingCtx;
-          this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
+          this.cellCommentator.updatePositionComments();
           this.cellCommentator.worksheet = tmpWs;
         }
       }

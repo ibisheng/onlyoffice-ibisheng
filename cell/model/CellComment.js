@@ -40,7 +40,7 @@
 function (window, undefined) {
 	// Import
 	var History = AscCommon.History;
-	
+
 	var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 	var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 
@@ -50,7 +50,7 @@ function (window, undefined) {
 		this.dReverseLeftPX = null;
 		this.dTopPX = null;
 	}
-	
+
 /** @constructor */
 function asc_CCommentCoords() {
 	this.nRow = null;
@@ -94,6 +94,8 @@ function asc_CCommentData(obj) {
 	this.bDocument = true; 	// For compatibility with 'Word Comment Control'
 	this.bSolved = false;
 	this.aReplies = [];
+
+	this.coords = new asc_CCommentCoords();
 
 	if (obj) {
 		this.bHidden = obj.bHidden;
@@ -634,23 +636,6 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		}
 	}
 };
-
-	CCellCommentator.prototype.getCoordsToSave = function () {
-		/*	Calculate the coords of comments for:
-		 *	first visible col = 0
-		 *	first visible row = 0
-		 *	+ document comments -> A1
-		 */
-
-		var aCommentsCoords = [];
-
-		var aComments = this.model.aComments;
-		for (var i = 0; i < aComments.length; i++) {
-			aCommentsCoords.push(this.updateCommentArea(aComments[i]));
-		}
-
-		return aCommentsCoords;
-	};
 
 	CCellCommentator.prototype.updateCommentArea = function (comment) {
 		var coords = comment.coords;
@@ -1230,6 +1215,13 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	};
 	CCellCommentator.prototype.showSolved = function () {
 		return this.model.workbook.handlers.trigger('showSolved');
+	};
+
+	CCellCommentator.prototype.updatePositionComments = function () {
+		var comment, aComments = this.model.aComments;
+		for (var i = 0; i < aComments.length; ++i) {
+			this.updateCommentArea(aComments[i]);
+		}
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

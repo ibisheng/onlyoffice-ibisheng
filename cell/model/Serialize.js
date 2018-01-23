@@ -2653,11 +2653,9 @@
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
             var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
-            var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
-              ws.aCommentsCoords;
-            if (aComments.length > 0 && aCommentsCoords.length > 0) {
+            if (aComments.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
-                    oThis.WriteComments(aComments, aCommentsCoords, ws);
+                    oThis.WriteComments(aComments, ws);
                 });
             }
 
@@ -3503,7 +3501,7 @@
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.memory.WriteString2(formulaParsed.Formula);
         };
-        this.WriteComments = function(aComments, aCommentsCoords, ws)
+        this.WriteComments = function(aComments, ws)
         {
             var oThis = this;
             var oNewComments = {}, i, length, elem, nRow, nCol, row, comment;
@@ -3539,32 +3537,7 @@
                     row[nCol] = comment;
                 }
                 comment.data.push(elem);
-            }
-            for(i = 0, length = aCommentsCoords.length; i < length; ++i)
-            {
-                //write only active comments, if copy/paste
-                if(this.isCopyPaste && !this.isCopyPaste.contains(aCommentsCoords[i].nCol, aCommentsCoords[i].nRow))
-                    continue;
-                elem = aCommentsCoords[i];
-                nRow = elem.nRow;
-                if(null == nRow)
-                    nRow = 0;
-                nCol = elem.nCol;
-                if(null == nCol)
-                    nCol = 0;
-                row = oNewComments[nRow];
-                if(null == row)
-                {
-                    row = {};
-                    oNewComments[nRow] = row;
-                }
-                comment = row[nCol];
-                if(null == comment)
-                {
-                    comment = {data: [], coord: null};
-                    row[nCol] = comment;
-                }
-                comment.coord = elem;
+				comment.coord = elem.coords;
             }
             for(i in oNewComments)
             {

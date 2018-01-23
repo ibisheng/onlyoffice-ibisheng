@@ -1486,7 +1486,6 @@
 		this.loadCells = [];//to return one object when nested _getCell calls
 
 		this.aComments = [];	// Комментарии к документу
-		this.aCommentsCoords = [];
 		this.aWorksheets = [];
 		this.aWorksheetsById = {};
 		this.pivotCaches = {};
@@ -2709,7 +2708,6 @@
 		this.AutoFilter = null;
 		this.oAllCol = null;
 		this.aComments = [];
-		this.aCommentsCoords = [];
 		var oThis = this;
 		this.bExcludeHiddenRows = false;
 		this.mergeManager = new RangeDataManager(function(data, from, to){
