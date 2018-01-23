@@ -4390,6 +4390,30 @@ PasteProcessor.prototype =
 				shape.spPr.xfrm.setExtY(h);
 				shape.spPr.xfrm.setOffX(0);
 				shape.spPr.xfrm.setOffY(0);
+
+
+                var oBodyPr = shape.getBodyPr().createDuplicate();
+                oBodyPr.rot = 0;
+                oBodyPr.spcFirstLastPara = false;
+                oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+                oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+                oBodyPr.vert = AscFormat.nVertTThorz;
+                oBodyPr.lIns = 2.54;
+                oBodyPr.tIns = 1.27;
+                oBodyPr.rIns = 2.54;
+                oBodyPr.bIns = 1.27;
+                oBodyPr.numCol = 1;
+                oBodyPr.spcCol = 0;
+                oBodyPr.rtlCol = 0;
+                oBodyPr.fromWordArt = false;
+                oBodyPr.anchor = 4;
+                oBodyPr.anchorCtr = false;
+                oBodyPr.forceAA = false;
+                oBodyPr.compatLnSpc = true;
+                oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textNoShape");}, this, []);
+                oBodyPr.textFit = new AscFormat.CTextFit();
+                oBodyPr.textFit.type = AscFormat.text_fit_Auto;
+                shape.txBody.setBodyPr(oBodyPr);
 				shape.txBody.content.MoveCursorToEndPos();
 				arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
