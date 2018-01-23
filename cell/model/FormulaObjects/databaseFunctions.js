@@ -284,11 +284,17 @@
 			return resArr;
 		}
 
+		var isEmptyField = cElementType.empty === argClone[1].type;
 		var count = 0;
 		for(var i = 0; i < resArr.length; i++){
-			var val = parseFloat(resArr[i]);
-			if(!isNaN(val)){
+			//если Поле пустое, то ms игнорирует числовой формат полученных данных
+			if(isEmptyField) {
 				count++;
+			} else {
+				var val = parseFloat(resArr[i]);
+				if(!isNaN(val)){
+					count++;
+				}
 			}
 		}
 
