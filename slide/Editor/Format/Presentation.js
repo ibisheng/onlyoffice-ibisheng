@@ -74,6 +74,7 @@ function PresentationSelectedContent()
     this.DocContent = null;
     this.PresentationWidth = null;
     this.PresentationHeight = null;
+    this.ThemeName = null;
 }
 
 PresentationSelectedContent.prototype.copy = function()
@@ -5075,6 +5076,13 @@ CPresentation.prototype =
                             var bRecursive = isRealObject(oController.selection.groupSelection);
                             var aSpTree = bRecursive ? oController.selection.groupSelection.spTree : this.Slides[this.CurPage].cSld.spTree;
                             oIdMap = {};
+
+                            var oTheme = oController.getTheme();
+                            if(oTheme){
+                                oEndFormattingContent.ThemeName = oTheme.name;
+                                oSourceFormattingContent.ThemeName = oTheme.name;
+                                oImagesSelectedContent.ThemeName = oTheme.name;
+                            }
                             collectSelectedObjects(aSpTree, oEndFormattingContent.Drawings, bRecursive, oIdMap);
                             AscFormat.fResetConnectorsIds(oEndFormattingContent.Drawings, oIdMap);
                             oIdMap = {};
