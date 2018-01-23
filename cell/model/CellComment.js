@@ -257,46 +257,6 @@ function asc_CCommentCoords() {
 		}
 	};
 
-	function CompositeCommentData() {
-		this.commentBefore = null;
-		this.commentAfter = null;
-
-		this.Properties = {
-			commentBefore: 0, commentAfter: 1
-		};
-	}
-
-	CompositeCommentData.prototype.getType = function () {
-		return AscCommonExcel.UndoRedoDataTypes.CompositeCommentData;
-	};
-
-	CompositeCommentData.prototype.getProperties = function () {
-		return this.Properties;
-	};
-
-	CompositeCommentData.prototype.getProperty = function (nType) {
-		switch (nType) {
-			case this.Properties.commentBefore:
-				return this.commentBefore;
-				break;
-			case this.Properties.commentAfter:
-				return this.commentAfter;
-				break;
-		}
-		return null;
-	};
-
-	CompositeCommentData.prototype.setProperty = function (nType, value) {
-		switch (nType) {
-			case this.Properties.commentBefore:
-				this.commentBefore = value;
-				break;
-			case this.Properties.commentAfter:
-				this.commentAfter = value;
-				break;
-		}
-	};
-
 /** @constructor */
 function CCellCommentator(currentSheet) {
 	this.worksheet = currentSheet;
@@ -372,20 +332,14 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 						newComment.setId();
 						this.addComment(newComment, true);
 					} else {
-						var commentBefore = new asc_CCommentData(comment);
+						var from = comment.clone();
 						comment.nCol += colOffset;
 						comment.nRow += rowOffset;
 						this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 
-						var commentAfter = new asc_CCommentData(comment);
-
-						var compositeComment = new CompositeCommentData();
-						compositeComment.commentBefore = commentBefore;
-						compositeComment.commentAfter = commentAfter;
-
 						History.Create_NewPoint();
 						History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, this.model.getId(),
-							null, compositeComment);
+							null, new AscCommonExcel.UndoRedoData_FromTo(from, comment.clone()));
 					}
 				}
 			}
@@ -860,7 +814,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 		if (false === isSuccess)
 			return;
 
-		var commentBefore = new asc_CCommentData(comment);
+		var from = comment.clone();
 		if (comment) {
 			if ( bChangeCoords ) {
 				comment.asc_putCol(oComment.asc_getCol());
@@ -884,14 +838,9 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 		}
 
 		if ( t.bSaveHistory ) {
-			var commentAfter = new asc_CCommentData(comment);
-
-			var compositeComment = new CompositeCommentData();
-			compositeComment.commentBefore = commentBefore;
-			compositeComment.commentAfter = commentAfter;
-
 			History.Create_NewPoint();
-			History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, t.model.getId(), null, compositeComment);
+			History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, t.model.getId(), null,
+				new AscCommonExcel.UndoRedoData_FromTo(from, comment.clone()));
 		}
 
 		if (!bNoDraw)
@@ -1129,21 +1078,21 @@ CCellCommentator.prototype.Undo = function(type, data) {
 			break;
 
 		case AscCH.historyitem_Comment_Change:
-			if (data.commentAfter.oParent) {
-				parentComment = this.findComment(data.commentAfter.oParent.asc_getId());
+			if (data.to.oParent) {
+				parentComment = this.findComment(data.to.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {
 					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 						parentComment.aReplies.splice(i, 1);
-						parentComment.aReplies.push(data.commentBefore);
+						parentComment.aReplies.push(data.from);
 						break;
 					}
 				}
 			} else {
 				for (i = 0; i < aComments.length; i++) {
-					if (aComments[i].asc_getId() == data.commentAfter.asc_getId()) {
+					if (aComments[i].asc_getId() == data.to.asc_getId()) {
 						aComments.splice(i, 1);
-						aComments.push(data.commentBefore);
-						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentBefore.asc_getId(), data.commentBefore);
+						aComments.push(data.from);
+						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.from.asc_getId(), data.from);
 						break;
 					}
 				}
@@ -1188,21 +1137,21 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			break;
 
 		case AscCH.historyitem_Comment_Change:
-			if (data.commentBefore.oParent) {
-				parentComment = this.findComment(data.commentBefore.oParent.asc_getId());
+			if (data.from.oParent) {
+				parentComment = this.findComment(data.from.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {
 					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
 						parentComment.aReplies.splice(i, 1);
-						parentComment.aReplies.push(data.commentAfter);
+						parentComment.aReplies.push(data.to);
 						break;
 					}
 				}
 			} else {
 				for (i = 0; i < aComments.length; i++) {
-					if (aComments[i].asc_getId() == data.commentBefore.asc_getId()) {
+					if (aComments[i].asc_getId() == data.from.asc_getId()) {
 						aComments.splice(i, 1);
-						aComments.push(data.commentAfter);
-						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.commentAfter.asc_getId(), data.commentAfter);
+						aComments.push(data.to);
+						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.to.asc_getId(), data.to);
 						break;
 					}
 				}
@@ -1229,7 +1178,6 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	var prot;
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window["AscCommonExcel"].asc_CCommentCoords = asc_CCommentCoords;
-	window["AscCommonExcel"].CompositeCommentData = CompositeCommentData;
 	window["AscCommonExcel"].CCellCommentator = CCellCommentator;
 
 	window['Asc'] = window['Asc'] || {};
