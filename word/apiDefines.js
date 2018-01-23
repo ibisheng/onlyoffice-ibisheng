@@ -339,13 +339,13 @@ prot['SdtContentLocked'] = c_oAscSdtLockType.SdtContentLocked;
 prot['SdtLocked']        = c_oAscSdtLockType.SdtLocked;
 prot['Unlocked']         = c_oAscSdtLockType.Unlocked;
 
-prot = window['Asc']['c_oAscSdtLevelType'] = c_oAscSdtLevelType;
+prot = window['Asc']['c_oAscSdtLevelType'] = window['Asc'].c_oAscSdtLevelType = c_oAscSdtLevelType;
 prot['Block']  = c_oAscSdtLevelType.Block;
 prot['Inline'] = c_oAscSdtLevelType.Inline;
 prot['Row']    = c_oAscSdtLevelType.Row;
 prot['Cell']   = c_oAscSdtLevelType.Cell;
 
-prot = window['Asc']['c_oAscTOCStylesType'] = c_oAscTOCStylesType;
+prot = window['Asc']['c_oAscTOCStylesType'] = window['Asc'].c_oAscTOCStylesType = c_oAscTOCStylesType;
 prot['Current']  = c_oAscTOCStylesType.Current;
 prot['Simple']   = c_oAscTOCStylesType.Simple;
 prot['Standard'] = c_oAscTOCStylesType.Standard;
@@ -353,7 +353,7 @@ prot['Modern']   = c_oAscTOCStylesType.Modern;
 prot['Classic']  = c_oAscTOCStylesType.Classic;
 
 
-prot = window['Asc']['c_oAscStyleType'] = c_oAscStyleType;
+prot = window['Asc']['c_oAscStyleType'] = window['Asc'].c_oAscStyleType = c_oAscStyleType;
 prot['Paragraph'] = c_oAscStyleType.Paragraph;
 prot['Numbering'] = c_oAscStyleType.Numbering;
 prot['Table']     = c_oAscStyleType.Table;

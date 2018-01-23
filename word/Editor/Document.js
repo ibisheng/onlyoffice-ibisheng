@@ -8239,6 +8239,13 @@ CDocument.prototype.CheckTableCoincidence = function(Table)
 {
 	return false;
 };
+CDocument.prototype.DistributeTableCells = function(isHorizontally)
+{
+	this.Controller.DistributeTableCells(isHorizontally);
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -15241,6 +15248,20 @@ CDocument.prototype.controller_MergeTableCells = function()
 			Pos = this.CurPos.ContentPos;
 
 		this.Content[Pos].MergeTableCells();
+	}
+};
+CDocument.prototype.controller_DistributeTableCells = function(isHorizontally)
+{
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
+
+		this.Content[Pos].DistributeTableCells(isHorizontally);
 	}
 };
 CDocument.prototype.controller_SplitTableCells = function(Cols, Rows)

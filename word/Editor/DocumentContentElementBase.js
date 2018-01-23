@@ -535,6 +535,9 @@ CDocumentContentElementBase.prototype.RemoveTable = function()
 CDocumentContentElementBase.prototype.SelectTable = function(Type)
 {
 };
+CDocumentContentElementBase.prototype.DistributeTableCells = function(isHorizontally)
+{
+};
 CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 {
 	return false;

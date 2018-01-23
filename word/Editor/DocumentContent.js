@@ -7285,6 +7285,26 @@ CDocumentContent.prototype.CanSplitTableCells = function()
 
 	return false;
 };
+CDocumentContent.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.distributeTableCells(isHorizontally);
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
+
+		this.Content[Pos].DistributeTableCells(isHorizontally);
+		return true;
+	}
+
+	return false;
+};
 //-----------------------------------------------------------------------------------
 // Вспомогательные(внутренние ) функции
 //-----------------------------------------------------------------------------------
