@@ -3741,6 +3741,7 @@ function CThumbnailsManager()
 
 			oThis.OnUpdateOverlay();
 			oThis.ShowPage(pos.Page);
+			oThis.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 		else if (0 == global_mouseEvent.Button || 2 == global_mouseEvent.Button)
 		{
@@ -4924,6 +4925,8 @@ function CThumbnailsManager()
 			this.m_arrPages[i].IsSelected = false;
 		}
 
+
+		this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		this.OnUpdateOverlay();
 		this.ShowPage(_page);
 	};
@@ -5109,6 +5112,7 @@ function CThumbnailsManager()
 					{
 						this.m_arrPages[i].IsSelected = true;
 					}
+					this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 					this.OnUpdateOverlay();
 				}
 				break;
