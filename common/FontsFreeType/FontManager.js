@@ -594,6 +594,37 @@
         {
             this.IsAdvanceNeedBoldFonts = value;
         };
+
+        this.LoadFont = function(fontFile, faceIndex, size, isBold, isItalic, needBold, needItalic)
+        {
+            var _ext = "";
+            if (needBold)
+                _ext += "nbold";
+            if (needItalic)
+                _ext += "nitalic";
+
+            var pFontFile = this.m_oFontsCache.LockFont(fontFile.stream_index, fontFile.Id, faceIndex, size, _ext, this);
+
+            if (!pFontFile)
+                pFontFile = this.m_oDefaultFont.GetDefaultFont(isBold, isItalic);
+
+            if (!pFontFile)
+                return null;
+
+            pFontFile.m_oFontManager = this;
+            this.m_pFont = pFontFile;
+
+            pFontFile.SetNeedBold(needBold);
+            pFontFile.SetNeedItalic(needItalic);
+
+            pFontFile.SetStringGID(this.m_bStringGID);
+            pFontFile.SetCharSpacing(this.m_fCharSpacing);
+
+            this.m_oGlyphString.ResetCTM();
+            this.AfterLoad();
+
+            return pFontFile;
+        };
     }
 
     window['AscFonts'].CFontManager = CFontManager;

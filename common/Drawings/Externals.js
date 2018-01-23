@@ -1093,43 +1093,22 @@ CFontInfo.prototype =
 			fontfile.LoadFontNative();
         }        
 
-        var _ext = "";
-        if (bNeedBold)
-            _ext += "nbold";
-        if (bNeedItalic)
-            _ext += "nitalic";
+        var pFontFile = fontManager.LoadFont(fontfile, faceIndex, fEmSize, bSrcBold, bSrcItalic, bNeedBold, bNeedItalic);
 
-        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize, _ext, fontManager);
-
-        if (!pFontFile)
-            pFontFile = fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic);
-
-        if (!pFontFile)
-            return false;
-
-        pFontFile.m_oFontManager = fontManager;
-
-        fontManager.m_pFont = pFontFile;
-        pFontFile.SetNeedBold(bNeedBold);
-        pFontFile.SetNeedItalic(bNeedItalic);
-
-        var _fEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
-        pFontFile.SetSizeAndDpi(_fEmSize, dHorDpi, dVerDpi);
-
-        pFontFile.SetStringGID(fontManager.m_bStringGID);
-        pFontFile.SetCharSpacing(fontManager.m_fCharSpacing);
-
-        fontManager.m_oGlyphString.ResetCTM();
-        if (undefined !== transform)
+        if (pFontFile)
         {
-            fontManager.SetTextMatrix2(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
-        }
-        else
-        {
-            fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
-        }
+            var newEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
+            pFontFile.SetSizeAndDpi(newEmSize, dHorDpi, dVerDpi);
 
-        fontManager.AfterLoad();
+            if (undefined !== transform)
+            {
+                fontManager.SetTextMatrix2(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
+            }
+            else
+            {
+                fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
+            }
+        }
     },
 
     GetFontID : function(font_loader, lStyle)

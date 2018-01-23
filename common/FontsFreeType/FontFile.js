@@ -1586,6 +1586,11 @@
         };
 	}
 
+	function CFontLoaderBySymbol()
+	{
+		this.Picker = new window.FontPickerByCharacter();
+	}
+
 	window['AscFonts'] = window['AscFonts'] || {};
 	window['AscFonts'].EGlyphState = EGlyphState;
 	window['AscFonts'].CFontFile = CFontFile;
