@@ -268,6 +268,7 @@
 	cDCOUNT.prototype.name = "DCOUNT";
 	cDCOUNT.prototype.argumentsMin = 3;
 	cDCOUNT.prototype.argumentsMax = 3;
+	cDCOUNT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDCOUNT.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -307,6 +308,7 @@
 	cDCOUNTA.prototype.name = "DCOUNTA";
 	cDCOUNTA.prototype.argumentsMin = 3;
 	cDCOUNTA.prototype.argumentsMax = 3;
+	cDCOUNTA.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDCOUNTA.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
