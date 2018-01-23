@@ -1311,6 +1311,7 @@
 				var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 				var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 				var p_url = stream.GetString2();
+				var p_theme = stream.GetString2();
 				var p_width = stream.GetULong()/100000;
 				var p_height = stream.GetULong()/100000;
 				var t = this;

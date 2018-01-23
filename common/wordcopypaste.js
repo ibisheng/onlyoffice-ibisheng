@@ -1089,6 +1089,7 @@ CopyProcessor.prototype =
 			if(elementsContent[0].DocContent || (elementsContent[0].Drawings && elementsContent[0].Drawings.length) || (elementsContent[0].SlideObjects && elementsContent[0].SlideObjects.length))
 			{
 				this.oPresentationWriter.WriteString2(this.api.documentId);
+				this.oPresentationWriter.WriteString2(elementsContent[0].ThemeName);
 				this.oPresentationWriter.WriteDouble(presentation.Width);
 				this.oPresentationWriter.WriteDouble(presentation.Height);
 				//флаг о том, что множественный контент в буфере
@@ -1327,7 +1328,7 @@ CopyProcessor.prototype =
 		//получаем пишем количество
 		var contentCount = 0;
 		for(var i in elementsContent){
-			if(elementsContent[i] && elementsContent[i].length){
+			if(elementsContent[i] && typeof elementsContent[i] === "object" && elementsContent[i].length){
 				contentCount++;
 			} else if(null !== elementsContent[i] && elementsContent[i] instanceof CSelectedContent){
 				contentCount++;
@@ -3757,6 +3758,7 @@ PasteProcessor.prototype =
 		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 		var p_url = stream.GetString2();
+		var p_theme = stream.GetString2();
 		var p_width = stream.GetULong() / 100000;
 		var p_height = stream.GetULong() / 100000;
 
@@ -3908,6 +3910,7 @@ PasteProcessor.prototype =
 		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 		var p_url = stream.GetString2();
+		var p_theme = stream.GetString2();
 		var p_width = stream.GetULong() / 100000;
 		var p_height = stream.GetULong() / 100000;
 
