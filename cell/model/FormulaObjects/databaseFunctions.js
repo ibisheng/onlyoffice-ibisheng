@@ -222,6 +222,7 @@
 	cDAVERAGE.prototype.name = "DAVERAGE";
 	cDAVERAGE.prototype.argumentsMin = 3;
 	cDAVERAGE.prototype.argumentsMax = 3;
+	cDAVERAGE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAVERAGE.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -352,6 +353,7 @@
 	cDGET.prototype.name = "DGET";
 	cDGET.prototype.argumentsMin = 3;
 	cDGET.prototype.argumentsMax = 3;
+	cDGET.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDGET.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -386,6 +388,7 @@
 	cDMAX.prototype.name = "DMAX";
 	cDMAX.prototype.argumentsMin = 3;
 	cDMAX.prototype.argumentsMax = 3;
+	cDMAX.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDMAX.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -421,6 +424,7 @@
 	cDMIN.prototype.name = "DMIN";
 	cDMIN.prototype.argumentsMin = 3;
 	cDMIN.prototype.argumentsMax = 3;
+	cDMIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDMIN.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -457,6 +461,7 @@
 	cDPRODUCT.prototype.name = "DPRODUCT";
 	cDPRODUCT.prototype.argumentsMin = 3;
 	cDPRODUCT.prototype.argumentsMax = 3;
+	cDPRODUCT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDPRODUCT.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -500,6 +505,7 @@
 	cDSTDEV.prototype.name = "DSTDEV";
 	cDSTDEV.prototype.argumentsMin = 3;
 	cDSTDEV.prototype.argumentsMax = 3;
+	cDSTDEV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSTDEV.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -551,6 +557,7 @@
 	cDSTDEVP.prototype.name = "DSTDEVP";
 	cDSTDEVP.prototype.argumentsMin = 3;
 	cDSTDEVP.prototype.argumentsMax = 3;
+	cDSTDEVP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSTDEVP.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -603,6 +610,7 @@
 	cDSUM.prototype.name = "DSUM";
 	cDSUM.prototype.argumentsMin = 3;
 	cDSUM.prototype.argumentsMax = 3;
+	cDSUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSUM.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -642,6 +650,7 @@
 	cDVAR.prototype.name = "DVAR";
 	cDVAR.prototype.argumentsMin = 3;
 	cDVAR.prototype.argumentsMax = 3;
+	cDVAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDVAR.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -700,6 +709,7 @@
 	cDVARP.prototype.name = "DVARP";
 	cDVARP.prototype.argumentsMin = 3;
 	cDVARP.prototype.argumentsMax = 3;
+	cDVARP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDVARP.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
