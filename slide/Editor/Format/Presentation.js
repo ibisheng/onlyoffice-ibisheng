@@ -162,6 +162,7 @@ PresentationSelectedContent.prototype.copy = function()
     }
     ret.PresentationWidth = this.PresentationWidth;
     ret.PresentationHeight = this.PresentationHeight;
+    ret.ThemeName = this.ThemeName;
     return ret;
 };
 
