@@ -6164,6 +6164,11 @@ function CDrawingDocument()
 		{
 			dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
 		}
+		map_keys = AscFonts.FontPickerByCharacter.FontsByRange;
+        for (var j in map_keys)
+        {
+            dstfonts[dstfonts.length] = new AscFonts.CFont(map_keys[j], 0, "", 0, null);
+        }
 		this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
 		return;
 
@@ -7729,6 +7734,36 @@ function CStylesPainter()
 }
 CStylesPainter.prototype =
 {
+	CheckStylesNames : function(_api, ds)
+	{
+        var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
+        for (var i in ds)
+        {
+            var style = ds[i];
+            if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
+            {
+            	AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+            }
+        }
+
+        AscFonts.FontPickerByCharacter.getFontsByString("Aa");
+
+        var styles = DocumentStyles.Style;
+
+        if (!styles)
+            return;
+
+        for (var i in styles)
+        {
+            var style = styles[i];
+            if (true == style.qFormat)
+            {
+                AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+                AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(style.Name));
+            }
+        }
+	},
+
 	GenerateStyles: function (_api, ds)
 	{
 		var _oldX = this.STYLE_THUMBNAIL_WIDTH;
@@ -7764,7 +7799,7 @@ CStylesPainter.prototype =
 				aPriorityStyles[index] = aSubArray;
 			}
 			aSubArray.push(style);
-		}
+		};
 		var _map_document = {};
 
 		for (var i = 0; i < _count_doc; i++)

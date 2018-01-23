@@ -1023,9 +1023,33 @@
 
 			this.FontsByRange[_range.Name] = _fontName;
 			return _fontName;
+		},
+
+		getFontsByString : function(_text)
+		{
+            for (var i = 0; i < _text.length; ++i)
+            {
+                var nUnicode = null;
+                var nCharCode = _text.charCodeAt(i);
+                if (AscCommon.isLeadingSurrogateChar(nCharCode))
+                {
+                    if (i + 1 < _text.length)
+                    {
+                        i++;
+                        var nTrailingChar = _text.charCodeAt(i);
+                        nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+                    }
+                }
+                else
+                    nUnicode = nCharCode;
+
+                AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+            }
 		}
+
 	};
 
-	window.FontPickerByCharacter = new CFontByCharacter();
+    window['AscFonts'] = window['AscFonts'] || {};
+    window['AscFonts'].FontPickerByCharacter = new CFontByCharacter();
 
 })(window);

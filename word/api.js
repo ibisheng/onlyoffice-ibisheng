@@ -1175,6 +1175,9 @@ background-repeat: no-repeat;\
 			this.LoadedObject = 1;
 
 			// проверяем какие шрифты нужны
+            var StylesPainter = new AscCommonWord.CStylesPainter();
+            StylesPainter.CheckStylesNames(this, this.LoadedObjectDS);
+
 			this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 			AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
