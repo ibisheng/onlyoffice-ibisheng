@@ -75,53 +75,54 @@ function asc_CCommentCoords() {
 	this.bSizeWithCells = false;
 }
 
-/** @constructor */
-function asc_CCommentData(obj) {
-	this.bHidden = false;
-	this.wsId = null;
-	this.nCol = 0;
-	this.nRow = 0;
-	this.nId = null;
-	this.oParent = null;
-	this.nLevel = 0;
-
-	// Common
-	this.sText = "";
-	this.sTime = "";
-	this.sOOTime = "";
-	this.sUserId = "";
-	this.sUserName = "";
-	this.bDocument = true; 	// For compatibility with 'Word Comment Control'
-	this.bSolved = false;
-	this.aReplies = [];
-
-	this.coords = new asc_CCommentCoords();
-
-	if (obj) {
-		this.bHidden = obj.bHidden;
-		this.wsId = obj.wsId;
-		this.nCol = obj.nCol;
-		this.nRow = obj.nRow;
-		this.nId = obj.nId;
-		this.oParent = obj.oParent;
-		this.nLevel = (null === this.oParent) ? 0 : this.oParent.asc_getLevel() + 1;
+	/** @constructor */
+	function asc_CCommentData() {
+		this.bHidden = false;
+		this.wsId = null;
+		this.nCol = 0;
+		this.nRow = 0;
+		this.nId = null;
+		this.oParent = null;
+		this.nLevel = 0;
 
 		// Common
-		this.sText = obj.sText;
-		this.sTime = obj.sTime;
-		this.sOOTime = obj.sOOTime;
-		this.sUserId = obj.sUserId;
-		this.sUserName = obj.sUserName;
-		this.bDocument = obj.bDocument;
-		this.bSolved = obj.bSolved;
+		this.sText = "";
+		this.sTime = "";
+		this.sOOTime = "";
+		this.sUserId = "";
+		this.sUserName = "";
+		this.bDocument = true; 	// For compatibility with 'Word Comment Control'
+		this.bSolved = false;
 		this.aReplies = [];
 
-		for (var i = 0; i < obj.aReplies.length; i++) {
-			var item = new asc_CCommentData(obj.aReplies[i]);
-			this.aReplies.push(item);
-		}
+		this.coords = null;
 	}
-}
+
+	asc_CCommentData.prototype.clone = function () {
+		var res = new asc_CCommentData();
+		res.bHidden = this.bHidden;
+		res.wsId = this.wsId;
+		res.nCol = this.nCol;
+		res.nRow = this.nRow;
+		res.nId = this.nId;
+		res.oParent = this.oParent;
+		res.nLevel = (null === res.oParent) ? 0 : res.oParent.asc_getLevel() + 1;
+
+		// Common
+		res.sText = this.sText;
+		res.sTime = this.sTime;
+		res.sOOTime = this.sOOTime;
+		res.sUserId = this.sUserId;
+		res.sUserName = this.sUserName;
+		res.bDocument = this.bDocument;
+		res.bSolved = this.bSolved;
+		res.aReplies = [];
+
+		for (var i = 0; i < this.aReplies.length; i++) {
+			res.aReplies.push(this.aReplies[i].clone());
+		}
+		return res;
+	};
 	asc_CCommentData.prototype.guid = function () {
 		function S4() {
 			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -365,7 +366,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 				var comment = aComments[i];
 				if (rangeFrom.contains(comment.nCol, comment.nRow)) {
 					if (copy) {
-						var newComment = new asc_CCommentData(comment);
+						var newComment = comment.clone();
 						newComment.nCol += colOffset;
 						newComment.nRow += rowOffset;
 						newComment.setId();
@@ -505,7 +506,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 		switch (operType) {
 			case c_oAscInsertOptions.InsertCellsAndShiftDown:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if ((comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
 						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -515,7 +516,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscInsertOptions.InsertCellsAndShiftRight:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if ((comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
 						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -525,7 +526,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscInsertOptions.InsertColumns:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if (comment.nCol >= updateRange.c1) {
 						comment.nCol += updateRange.c2 - updateRange.c1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -535,7 +536,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscInsertOptions.InsertRows:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if (comment.nRow >= updateRange.r1) {
 						comment.nRow += updateRange.r2 - updateRange.r1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -547,7 +548,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 		switch (operType) {
 			case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
 						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -559,7 +560,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
 						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -571,7 +572,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscDeleteOptions.DeleteColumns:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if (comment.nCol > updateRange.c2) {
 						comment.nCol -= updateRange.c2 - updateRange.c1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -583,7 +584,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 
 			case c_oAscDeleteOptions.DeleteRows:
 				for (i = 0; i < aComments.length; i++) {
-					comment = new asc_CCommentData(aComments[i]);
+					comment = aComments[i].clone();
 					if (comment.nRow > updateRange.r2) {
 						comment.nRow -= updateRange.r2 - updateRange.r1 + 1;
 						aChangedComments.push(new UpdatePair(comment, true));
@@ -610,7 +611,7 @@ CCellCommentator.prototype.sortComments = function(sortData) {
 	for (; i < l; ++i) {
 		if (oComments.hasOwnProperty((row = places[i].from))) {
 			for (j = 0, line = oComments[row]; j < line.length; ++j) {
-				comment = new asc_CCommentData(line[j]);
+				comment = line[j].clone();
 				comment.nRow = places[i].to;
 				this.changeComment(comment.asc_getId(), comment, true, false, true, true);
 			}
@@ -994,7 +995,7 @@ CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpda
 	// Add new comment
 	if (!bChange) {
 		History.Create_NewPoint();
-		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Add, this.model.getId(), null, new asc_CCommentData(oComment));
+		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Add, this.model.getId(), null, oComment.clone());
 
 		this.model.aComments.push(oComment);
 
@@ -1016,7 +1017,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.model.getId(), null, comment.oParent.aReplies[i].clone());
 				}
 
 				comment.oParent.aReplies.splice(i, 1);
@@ -1029,7 +1030,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.model.getId(), null, new asc_CCommentData(aComments[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.model.getId(), null, aComments[i].clone());
 				}
 
 				aComments.splice(i, 1);

@@ -9288,7 +9288,7 @@
 			for (var i = 0; i < comments.length; i++) {
 				comment = comments[i];
 				if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
-					var commentData = new Asc.asc_CCommentData(comment);
+					var commentData = comment.clone();
 					//change nRow, nCol
 					commentData.asc_putCol(nCol);
 					commentData.asc_putRow(nRow);

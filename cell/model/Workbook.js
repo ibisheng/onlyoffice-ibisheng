@@ -2900,7 +2900,7 @@
 		}
 		if(null != wsFrom.aComments) {
 			for (i = 0; i < wsFrom.aComments.length; i++) {
-				var comment = new Asc.asc_CCommentData(wsFrom.aComments[i]);
+				var comment = wsFrom.aComments[i].clone()
 				comment.wsId = this.getId();
 				comment.nId = "sheet" + comment.wsId + "_" + (i + 1);
 				this.aComments.push(comment);

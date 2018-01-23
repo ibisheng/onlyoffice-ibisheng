@@ -6627,6 +6627,8 @@
                 var i;
                 for(i = 0, length = aCommentData.length; i < length; ++i)
                 {
+					aCommentData[i].coords = oCommentCoords;
+
                     var elem = aCommentData[i];
                     elem.asc_putRow(oCommentCoords.nRow);
                     elem.asc_putCol(oCommentCoords.nCol);
