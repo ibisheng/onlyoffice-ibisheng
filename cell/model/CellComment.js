@@ -77,23 +77,6 @@ function asc_CCommentCoords() {
 
 /** @constructor */
 function asc_CCommentData(obj) {
-	this.Properties = {
-		wsId: 0,
-		nCol: 1,
-		nRow: 2,
-		nId: 3,
-		nLevel: 5,
-		sText: 6,
-		sTime: 8,
-		sUserId: 9,
-		sUserName: 10,
-		bDocument: 11,
-		bSolved: 12,
-		aReplies: 13,
-		bHidden: 14,
-		sOOTime: 15
-	};
-
 	this.bHidden = false;
 	this.wsId = null;
 	this.nCol = 0;
@@ -221,46 +204,47 @@ asc_CCommentData.prototype = {
 		return AscCommonExcel.UndoRedoDataTypes.CommentData;
 	},
 
-	getProperties: function() {
-		return this.Properties;
-	},
+	Read_FromBinary2 : function(r) {
+		this.wsId = r.GetString2();
+		this.nCol = r.GetULongLE();
+		this.nRow = r.GetULongLE();
+		this.nId = r.GetString2();
+		this.nLevel = r.GetULongLE();
+		this.sText = r.GetString2();
+		this.sTime = r.GetString2();
+		this.sOOTime = r.GetString2();
+		this.sUserId = r.GetString2();
+		this.sUserName = r.GetString2();
+		this.bDocument = r.GetBool();
+		this.bSolved = r.GetBool();
+		this.bHidden = r.GetBool();
 
-	getProperty: function(nType) {
-		switch (nType) {
-			case this.Properties.wsId: return this.wsId; break;
-			case this.Properties.nCol: return this.nCol; break;
-			case this.Properties.nRow: return this.nRow; break;
-			case this.Properties.nId: return this.nId; break;
-			case this.Properties.nLevel: return this.nLevel; break;
-			case this.Properties.sText: return this.sText; break;
-			case this.Properties.sTime: return this.sTime; break;
-			case this.Properties.sOOTime: return this.sOOTime; break;
-			case this.Properties.sUserId: return this.sUserId; break;
-			case this.Properties.sUserName: return this.sUserName; break;
-			case this.Properties.bDocument: return this.bDocument; break;
-			case this.Properties.bSolved: return this.bSolved; break;
-			case this.Properties.aReplies: return this.aReplies; break;
-			case this.Properties.bHidden: return this.bHidden; break;
+		var length = r.GetULongLE();
+		for (var i = 0; i < length; ++i) {
+			var reply = new asc_CCommentData();
+			reply.Read_FromBinary2(r);
+			this.aReplies.push(reply);
 		}
-		return null;
 	},
 
-	setProperty: function(nType, value) {
-		switch (nType) {
-			case this.Properties.wsId: this.wsId = value; break;
-			case this.Properties.nCol: this.nCol = value; break;
-			case this.Properties.nRow: this.nRow = value; break;
-			case this.Properties.nId: this.nId = value; break;
-			case this.Properties.nLevel: this.nLevel = value; break;
-			case this.Properties.sText: this.sText = value; break;
-			case this.Properties.sTime: this.sTime = value; break;
-			case this.Properties.sOOTime: this.sOOTime = value; break;
-			case this.Properties.sUserId: this.sUserId = value; break;
-			case this.Properties.sUserName: this.sUserName = value; break;
-			case this.Properties.bDocument: this.bDocument = value; break;
-			case this.Properties.bSolved: this.bSolved = value; break;
-			case this.Properties.aReplies: this.aReplies = value; break;
-			case this.Properties.bHidden: this.bHidden = value; break;
+	Write_ToBinary2 : function(w) {
+		w.WriteString2(this.wsId);
+		w.WriteLong(this.nCol);
+		w.WriteLong(this.nRow);
+		w.WriteString2(this.nId);
+		w.WriteLong(this.nLevel);
+		w.WriteString2(this.sText);
+		w.WriteString2(this.sTime);
+		w.WriteString2(this.sOOTime);
+		w.WriteString2(this.sUserId);
+		w.WriteString2(this.sUserName);
+		w.WriteBool(this.bDocument);
+		w.WriteBool(this.bSolved);
+		w.WriteBool(this.bHidden);
+
+		w.WriteLong(this.aReplies.length);
+		for (var i = 0; i < this.aReplies.length; ++i) {
+			this.aReplies[i].Write_ToBinary2(w);
 		}
 	},
 	
@@ -664,14 +648,14 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 
 		var aComments = this.model.aComments;
 		for (var i = 0; i < aComments.length; i++) {
-			aCommentsCoords.push(this.calcCommentArea(aComments[i]));
+			aCommentsCoords.push(this.updateCommentArea(aComments[i]));
 		}
 
 		return aCommentsCoords;
 	};
 
-	CCellCommentator.prototype.calcCommentArea = function (comment) {
-		var coords = new asc_CCommentCoords();
+	CCellCommentator.prototype.updateCommentArea = function (comment) {
+		var coords = comment.coords;
 		var dWidthPT = 108;
 		var dHeightPT = 59.25;
 		coords.dWidthMM = this.ptToMm(dWidthPT);
@@ -715,8 +699,6 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		pos = this.worksheet._findRowUnderCursor(y, true);
 		coords.nBottom = pos ? pos.row : 0;
 		coords.nBottomOffset = this.ptToPx(y - this.worksheet.getCellTop(coords.nBottom, 1));
-
-		return coords;
 	};
 
 	CCellCommentator.prototype.getCommentTooltipPosition = function(comment) {
