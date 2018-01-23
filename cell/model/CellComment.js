@@ -120,68 +120,67 @@ function asc_CCommentData(obj) {
 		}
 	}
 }
-asc_CCommentData.prototype = {
-	guid: function () {
+	asc_CCommentData.prototype.guid = function () {
 		function S4() {
 			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 		}
 		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-	},
-	setId: function () {
+	};
+	asc_CCommentData.prototype.setId = function () {
 		if (this.bDocument)
 			this.nId = "doc_" + this.guid();
 		else
 			this.nId = "sheet" + this.wsId + "_" + this.guid();
-	},
+	};
 
-	asc_putQuoteText: function(val) {},
-	asc_getQuoteText: function() {
+	asc_CCommentData.prototype.asc_putQuoteText = function(val) {};
+	asc_CCommentData.prototype.asc_getQuoteText = function() {
 		return this.bDocument ? null : AscCommon.g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
-	},
+	};
 
-	asc_putRow: function(val) { this.nRow = val; },
-	asc_getRow: function() { return this.nRow; },
+	asc_CCommentData.prototype.asc_putRow = function(val) { this.nRow = val; };
+	asc_CCommentData.prototype.asc_getRow = function() { return this.nRow; };
 
-	asc_putCol: function(val) { this.nCol = val; },
-	asc_getCol: function() { return this.nCol; },
+	asc_CCommentData.prototype.asc_putCol = function(val) { this.nCol = val; };
+	asc_CCommentData.prototype.asc_getCol = function() { return this.nCol; };
 
-	asc_putId: function(val) { this.nId = val; },
-	asc_getId: function() { return this.nId; },
+	asc_CCommentData.prototype.asc_putId = function(val) { this.nId = val; };
+	asc_CCommentData.prototype.asc_getId = function() { return this.nId; };
 
-	asc_putLevel: function(val) { this.nLevel = val; },
-	asc_getLevel: function() { return this.nLevel; },
+	asc_CCommentData.prototype.asc_putLevel = function(val) { this.nLevel = val; };
+	asc_CCommentData.prototype.asc_getLevel = function() { return this.nLevel; };
 
-	asc_putParent: function(obj) { this.oParent = obj; },
-	asc_getParent: function() { return this.oParent; },
+	asc_CCommentData.prototype.asc_putParent = function(obj) { this.oParent = obj; };
+	asc_CCommentData.prototype.asc_getParent = function() { return this.oParent; };
 
-	asc_putText: function(val) { this.sText = val ? val.slice(0, Asc.c_oAscMaxCellOrCommentLength) : val; },
-	asc_getText: function() { return this.sText; },
+	asc_CCommentData.prototype.asc_putText = function(val) { this.sText = val ? val.slice(0, Asc.c_oAscMaxCellOrCommentLength) : val; };
+	asc_CCommentData.prototype.asc_getText = function() { return this.sText; };
 
-	asc_putTime: function(val) { this.sTime = val; },
-	asc_getTime: function() { return this.sTime; },
-	
-	asc_putOnlyOfficeTime: function(val) { this.sOOTime = val; },
-	asc_getOnlyOfficeTime: function() { return this.sOOTime; },
+	asc_CCommentData.prototype.asc_putTime = function(val) { this.sTime = val; };
+	asc_CCommentData.prototype.asc_getTime = function() { return this.sTime; };
 
-	asc_putUserId: function(val) { this.sUserId = val; },
-	asc_getUserId: function() { return this.sUserId; },
+	asc_CCommentData.prototype.asc_putOnlyOfficeTime = function(val) { this.sOOTime = val; };
+	asc_CCommentData.prototype.asc_getOnlyOfficeTime = function() { return this.sOOTime; };
 
-	asc_putUserName: function(val) { this.sUserName = val; },
-	asc_getUserName: function() { return this.sUserName; },
+	asc_CCommentData.prototype.asc_putUserId = function(val) { this.sUserId = val; };
+	asc_CCommentData.prototype.asc_getUserId = function() { return this.sUserId; };
 
-	asc_putDocumentFlag: function(val) { this.bDocument = val; },
-	asc_getDocumentFlag: function() { return this.bDocument; },
-	
-	asc_putHiddenFlag: function(val) { this.bHidden = val; },
-	asc_getHiddenFlag: function() { return this.bHidden; },
+	asc_CCommentData.prototype.asc_putUserName = function(val) { this.sUserName = val; };
+	asc_CCommentData.prototype.asc_getUserName = function() { return this.sUserName; };
 
-	asc_putSolved: function(val) { this.bSolved = val; },
-	asc_getSolved: function() { return this.bSolved; },
+	asc_CCommentData.prototype.asc_putDocumentFlag = function(val) { this.bDocument = val; };
+	asc_CCommentData.prototype.asc_getDocumentFlag = function() { return this.bDocument; };
 
-	asc_getRepliesCount: function() { return this.aReplies.length; },
-	asc_getReply: function(index) { return this.aReplies[index]; },
+	asc_CCommentData.prototype.asc_putHiddenFlag = function(val) { this.bHidden = val; };
+	asc_CCommentData.prototype.asc_getHiddenFlag = function() { return this.bHidden; };
 
-	asc_addReply: function(oReply) {
+	asc_CCommentData.prototype.asc_putSolved = function(val) { this.bSolved = val; };
+	asc_CCommentData.prototype.asc_getSolved = function() { return this.bSolved; };
+
+	asc_CCommentData.prototype.asc_getRepliesCount = function() { return this.aReplies.length; };
+	asc_CCommentData.prototype.asc_getReply = function(index) { return this.aReplies[index]; };
+
+	asc_CCommentData.prototype.asc_addReply = function(oReply) {
 
 		oReply.asc_putParent(this);
 		oReply.asc_putDocumentFlag(this.asc_getDocumentFlag());
@@ -193,18 +192,18 @@ asc_CCommentData.prototype = {
 		this.aReplies.push(oReply);
 
 		return oReply;
-	},
+	};
 
-	asc_getMasterCommentId: function () {
+	asc_CCommentData.prototype.asc_getMasterCommentId = function () {
 		return this.wsId;
-	},
+	};
 
 	//	For collaborative editing
-	getType: function() {
+	asc_CCommentData.prototype.getType = function() {
 		return AscCommonExcel.UndoRedoDataTypes.CommentData;
-	},
+	};
 
-	Read_FromBinary2 : function(r) {
+	asc_CCommentData.prototype.Read_FromBinary2 = function(r) {
 		this.wsId = r.GetString2();
 		this.nCol = r.GetULongLE();
 		this.nRow = r.GetULongLE();
@@ -225,9 +224,9 @@ asc_CCommentData.prototype = {
 			reply.Read_FromBinary2(r);
 			this.aReplies.push(reply);
 		}
-	},
+	};
 
-	Write_ToBinary2 : function(w) {
+	asc_CCommentData.prototype.Write_ToBinary2 = function(w) {
 		w.WriteString2(this.wsId);
 		w.WriteLong(this.nCol);
 		w.WriteLong(this.nRow);
@@ -246,15 +245,14 @@ asc_CCommentData.prototype = {
 		for (var i = 0; i < this.aReplies.length; ++i) {
 			this.aReplies[i].Write_ToBinary2(w);
 		}
-	},
-	
-	applyCollaborative: function (nSheetId, collaborativeEditing) {
+	};
+
+	asc_CCommentData.prototype.applyCollaborative = function (nSheetId, collaborativeEditing) {
 		if ( !this.bDocument ) {
 			this.nCol = collaborativeEditing.getLockMeColumn2(nSheetId, this.nCol);
 			this.nRow = collaborativeEditing.getLockMeRow2(nSheetId, this.nRow);
 		}
-	}
-};
+	};
 
 	function CompositeCommentData() {
 		this.commentBefore = null;
