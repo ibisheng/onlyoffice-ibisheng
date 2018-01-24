@@ -3555,7 +3555,7 @@ PasteProcessor.prototype =
 		var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 		if (window['AscCommon'].g_specialPasteHelper.specialPasteStart &&
 			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps) {
-			fPrepasteCallback();
+			oThis.api.pre_Paste([], [], fPrepasteCallback);
 		} else if (oObjectsForDownload.aUrls.length > 0) {
 			if (bIsOnlyFromBinary && window["NativeCorrectImageUrlOnPaste"]) {
 				var url;
@@ -3892,9 +3892,7 @@ PasteProcessor.prototype =
 				oThis.aContent = aContent.content;
 				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
 			});
-
 		}
-
 	},
 
 	//from PRESENTATION to PRESENTATION
@@ -4505,7 +4503,7 @@ PasteProcessor.prototype =
 
 			if(window['AscCommon'].g_specialPasteHelper.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps)
 			{
-				fPasteHtmlWordCallback();
+				oThis.api.pre_Paste([], [], fPasteHtmlWordCallback);
 			}
 			else
 			{
@@ -4521,7 +4519,7 @@ PasteProcessor.prototype =
 			this.oRootNode = node;
 			if(window['AscCommon'].g_specialPasteHelper.specialPasteStart && Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps)
 			{
-				fPasteHtmlPresentationCallback();
+				oThis.api.pre_Paste([], [], fPasteHtmlPresentationCallback);
 			}
 			else
 			{
@@ -4613,19 +4611,28 @@ PasteProcessor.prototype =
 
 		var fPasteTextWordCallback = function()
 		{
-			oThis.aContent = [];
-
-			oThis._getContentFromText(text, true);
-
-			oThis._AddNextPrevToContent(oThis.oDocument);
-			if(false === oThis.bNested)
+			var executePasteWord = function()
 			{
-				oThis.InsertInDocument();
-			}
+				if(false === oThis.bNested)
+				{
+					oThis.InsertInDocument();
+				}
+			};
+
+			oThis.aContent = [];
+			oThis._getContentFromText(text, true);
+			oThis._AddNextPrevToContent(oThis.oDocument);
+
+			oThis.api.pre_Paste([], [], executePasteWord);
 		};
 
 		var fPasteTextPresentationCallback = function()
 		{
+			var executePastePresentation = function()
+			{
+				oThis.InsertInPlacePresentation(oThis.aContent, true);
+			};
+
 			var presentation = editor.WordControl.m_oLogicDocument;
 			if(presentation.Slides.length === 0)
 			{
@@ -4683,7 +4690,7 @@ PasteProcessor.prototype =
 			shape.txBody.content.AddToParagraph(paraTextPr);
 			shape.txBody.content.Set_ApplyToAll(false);
 
-			oThis.InsertInPlacePresentation(oThis.aContent, true);
+			oThis.api.pre_Paste([], [], executePastePresentation);
 		};
 
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
