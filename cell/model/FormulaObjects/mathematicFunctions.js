@@ -437,10 +437,12 @@
 			f.excludeNestedStAg = ignoreNestedStAg;
 
 			var newArgs = [];
+			//14 - 19 особенные функции, требующие второго аргумента
+			var doNotCheckRef = nFunc >= 14 && nFunc <= 19;
 			for (var i = 2; i < arg.length; i++) {
 				//аргумент может быть только ссылка на ячейку или диапазон ячеек
 				//в противном случае - ошибка
-				if(this.checkRef(arg[i])) {
+				if(doNotCheckRef || this.checkRef(arg[i])) {
 					newArgs.push(arg[i]);
 				} else {
 					return new cError(cErrorType.wrong_value_type);

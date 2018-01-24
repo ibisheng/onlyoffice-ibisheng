@@ -3717,7 +3717,7 @@ $( function () {
 
 		oParser = new parserFormula( "AGGREGATE(6,1,100)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 100);
+		strictEqual( oParser.calculate().getValue(), "#VALUE!");
 
 		oParser = new parserFormula( "AGGREGATE(7,3,A101:B105)", "A1", ws );
 		ok( oParser.parse() );
