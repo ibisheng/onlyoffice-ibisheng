@@ -1267,6 +1267,22 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
 };
+/**
+ * Добавляем в конец рана заданную строку
+ * @param {string} sString
+ */
+ParaRun.prototype.AddText = function(sString)
+{
+	var nShift = this.Content.length;
+	for (var nPos = 0, nCount = sString.length; nPos < nCount; ++nPos)
+	{
+		var nChar = sString.charAt(nPos);
+		if (' ' === nChar)
+			this.AddToContent(nShift + nPos, new ParaSpace());
+		else
+			this.AddToContent(nShift + nPos, new ParaText(nChar));
+	}
+};
 
 // Определим строку и отрезок текущей позиции
 ParaRun.prototype.Get_CurrentParaPos = function()

@@ -8917,6 +8917,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['CheckBeforeSplitCells']                     = asc_docs_api.prototype.CheckBeforeSplitCells;
 	asc_docs_api.prototype['MergeCells']                                = asc_docs_api.prototype.MergeCells;
 	asc_docs_api.prototype['SplitCell']                                 = asc_docs_api.prototype.SplitCell;
+	asc_docs_api.prototype['asc_DistributeTableCells']                  = asc_docs_api.prototype.asc_DistributeTableCells;
 	asc_docs_api.prototype['widthTable']                                = asc_docs_api.prototype.widthTable;
 	asc_docs_api.prototype['put_CellsMargin']                           = asc_docs_api.prototype.put_CellsMargin;
 	asc_docs_api.prototype['set_TblWrap']                               = asc_docs_api.prototype.set_TblWrap;
