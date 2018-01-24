@@ -5836,6 +5836,9 @@ background-repeat: no-repeat;\
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
+            if (undefined !== this.asyncMethodCallback)
+            	return;
+
 			// заполним прогресс
 			var _progress         = this.OpenDocumentProgress;
 			_progress.Type        = c_oAscAsyncAction.LoadDocumentFonts;
