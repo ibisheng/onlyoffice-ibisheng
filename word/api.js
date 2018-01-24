@@ -7831,7 +7831,7 @@ background-repeat: no-repeat;\
 		{
 			this.asc_RemoveContentControl(oTOC.GetId());
 		}
-		else if (oTOC instanceof CComplexField)
+		else if (oTOC instanceof AscCommonWord.CComplexField)
 		{
 			this.asc_RemoveComplexField(oTOC);
 		}
@@ -7849,7 +7849,7 @@ background-repeat: no-repeat;\
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 			oTOC = oTOC.GetInnerTableOfContents();
 
-		if (oTOC instanceof CComplexField)
+		if (oTOC instanceof AscCommonWord.CComplexField)
 		{
 			var oPr = new Asc.CTableOfContentsPr();
 			oPr.InitFromTOCInstruction(oTOC);
@@ -7990,7 +7990,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_SetComplexFieldPr = function(oComplexField, oPr, isUpdate)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
-		if (!oLogicDocument || !oPr || !(oComplexField instanceof CComplexField))
+		if (!oLogicDocument || !oPr || !(oComplexField instanceof AscCommonWord.CComplexField))
 			return;
 
 		oComplexField.SelectField();

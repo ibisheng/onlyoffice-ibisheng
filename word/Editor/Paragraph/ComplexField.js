@@ -882,6 +882,10 @@ CComplexField.prototype.SetPr = function(oPr)
 	}
 };
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CComplexField = CComplexField;
+
 
 
 function TEST_ADDFIELD(sInstruction)
