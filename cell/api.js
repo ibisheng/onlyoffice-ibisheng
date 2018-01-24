@@ -433,7 +433,9 @@ var editor;
 
   spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2, text_data) {
     if (!this.getViewMode()) {
+      AscFonts.IsCheckSymbols = true;
       this.wb.pasteData(_format, data1, data2, text_data, arguments[5]);
+      AscFonts.IsCheckSymbols = false;
     }
   };
 
@@ -3454,6 +3456,8 @@ var editor;
 
   spreadsheet_api.prototype.pre_Paste = function(_fonts, _images, callback)
   {
+    AscFonts.FontPickerByCharacter.extendFonts(_fonts);
+
     var oFontMap = {};
     for(var i = 0; i < _fonts.length; ++i){
       oFontMap[_fonts[i].name] = 1;

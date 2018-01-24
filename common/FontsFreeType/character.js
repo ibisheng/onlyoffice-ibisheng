@@ -958,6 +958,9 @@
 	{
 		getFontBySymbol : function(_char)
 		{
+			if (undefined === _char || 0 == _char)
+				return;
+
 			// ищем среди уже найденных
 			var _range = getRangeBySymbol(_char, this.UsedRanges);
 			if (_range != null)
@@ -1079,6 +1082,7 @@
 	};
 
     window['AscFonts'] = window['AscFonts'] || {};
+    window['AscFonts'].IsCheckSymbols = false;
     window['AscFonts'].FontPickerByCharacter = new CFontByCharacter();
 
 })(window);

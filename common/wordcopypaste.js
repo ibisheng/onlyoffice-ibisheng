@@ -4667,7 +4667,7 @@ PasteProcessor.prototype =
 							bAddParagraph = true;
 						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText();
-							Item.Value = nUnicode;
+							Item.Set_CharCode(nUnicode);
 							shape.paragraphAdd(Item);
 						} else {
 							Item = new ParaSpace();
@@ -7742,7 +7742,7 @@ PasteProcessor.prototype =
 							var Item;
 							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 								Item = new ParaText();
-								Item.Value = nUnicode;
+                                Item.Set_CharCode(nUnicode);
 							} else {
 								Item = new ParaSpace();
 							}

@@ -1879,9 +1879,11 @@ background-repeat: no-repeat;\
     	    return;
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-		
+
+        AscFonts.IsCheckSymbols = true;
 		window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(arguments[5]);
 		AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
+        AscFonts.IsCheckSymbols = false;
 	};
 
 	asc_docs_api.prototype.asc_SpecialPaste = function(props)
@@ -5102,6 +5104,8 @@ background-repeat: no-repeat;\
 		var _count = 0;
 		for (var i in this.pasteImageMap)
 			++_count;
+
+        AscFonts.FontPickerByCharacter.extendFonts(_fonts);
 		if (0 == _count && false === this.FontLoader.CheckFontsNeedLoading(_fonts))
 		{
 			// никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.

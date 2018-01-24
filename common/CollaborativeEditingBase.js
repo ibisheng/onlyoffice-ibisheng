@@ -347,6 +347,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
     // Если нет чужих изменений, тогда и делать ничего не надо
     if (true === OtherChanges)
     {
+        AscFonts.IsCheckSymbols = true;
         editor.WordControl.m_oLogicDocument.Stop_Recalculate();
         editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 
@@ -361,6 +362,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
         this.Lock_NeedLock();
         this.private_RestoreDocumentState(DocState);
         this.OnStart_Load_Objects();
+        AscFonts.IsCheckSymbols = false;
     }
 };
 CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
