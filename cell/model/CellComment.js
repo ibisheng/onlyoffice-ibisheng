@@ -51,29 +51,55 @@ function (window, undefined) {
 		this.dTopPX = null;
 	}
 
-/** @constructor */
-function asc_CCommentCoords() {
-	this.nRow = null;
-	this.nCol = null;
+	/** @constructor */
+	function asc_CCommentCoords() {
+		this.nRow = null;
+		this.nCol = null;
 
-	this.nLeft = null;
-	this.nLeftOffset = null;
-	this.nTop = null;
-	this.nTopOffset = null;
-	this.nRight = null;
-	this.nRightOffset = null;
-	this.nBottom = null;
-	this.nBottomOffset = null;
+		this.nLeft = null;
+		this.nLeftOffset = null;
+		this.nTop = null;
+		this.nTopOffset = null;
+		this.nRight = null;
+		this.nRightOffset = null;
+		this.nBottom = null;
+		this.nBottomOffset = null;
 
-	this.dLeftMM = null;
-	this.dTopMM = null;
+		this.dLeftMM = null;
+		this.dTopMM = null;
 
-	this.dWidthMM = null;
-	this.dHeightMM = null;
+		this.dWidthMM = null;
+		this.dHeightMM = null;
 
-	this.bMoveWithCells = false;
-	this.bSizeWithCells = false;
-}
+		this.bMoveWithCells = false;
+		this.bSizeWithCells = false;
+	}
+
+	asc_CCommentCoords.prototype.clone = function () {
+		var res = new asc_CCommentCoords();
+		res.nRow = this.nRow;
+		res.nCol = this.nCol;
+
+		res.nLeft = this.nLeft;
+		res.nLeftOffset = this.nLeftOffset;
+		res.nTop = this.nTop;
+		res.nTopOffset = this.nTopOffset;
+		res.nRight = this.nRight;
+		res.nRightOffset = this.nRightOffset;
+		res.nBottom = this.nBottom;
+		res.nBottomOffset = this.nBottomOffset;
+
+		res.dLeftMM = this.dLeftMM;
+		res.dTopMM = this.dTopMM;
+
+		res.dWidthMM = this.dWidthMM;
+		res.dHeightMM = this.dHeightMM;
+
+		res.bMoveWithCells = this.bMoveWithCells;
+		res.bSizeWithCells = this.bSizeWithCells;
+
+		return res;
+	};
 
 	/** @constructor */
 	function asc_CCommentData() {
@@ -121,6 +147,8 @@ function asc_CCommentCoords() {
 		for (var i = 0; i < this.aReplies.length; i++) {
 			res.aReplies.push(this.aReplies[i].clone());
 		}
+
+		res.coords = this.coords ? this.coords.clone() : null;
 		return res;
 	};
 	asc_CCommentData.prototype.guid = function () {
@@ -943,6 +971,8 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {
 	// Add new comment
 	if (!bChange) {
+		oComment.coords = new asc_CCommentCoords();
+		this.updateCommentArea(oComment);
 		History.Create_NewPoint();
 		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Add, this.model.getId(), null, oComment.clone());
 
