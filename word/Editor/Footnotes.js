@@ -2763,6 +2763,13 @@ CFootnotesController.prototype.CanSplitTableCells = function()
 
 	return this.CurFootnote.CanSplitTableCells();
 };
+CFootnotesController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
+
+	return this.CurFootnote.DistributeTableCells(isHorizontally);
+};
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {
 	if (true === this.private_IsOnFootnoteSelected())

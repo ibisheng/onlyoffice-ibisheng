@@ -537,6 +537,7 @@ CDocumentContentElementBase.prototype.SelectTable = function(Type)
 };
 CDocumentContentElementBase.prototype.DistributeTableCells = function(isHorizontally)
 {
+	return false;
 };
 CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 {

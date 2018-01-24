@@ -1058,6 +1058,10 @@
 			case AscDFH.historydescription_Document_SectionStartPage:
 				sString = "Document_SectionStartPage";
 				break;
+			case AscDFH.historydescription_Document_DistributeTableCells:
+				sString = "Document_DistributeTableCells";
+				break;
+
 		}
 		return sString;
 	}
@@ -2990,6 +2994,7 @@
 	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
 	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
 	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
+	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

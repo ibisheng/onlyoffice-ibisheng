@@ -4407,6 +4407,25 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.SplitTableCells(Cols, Rows);
 		}
 	};
+	asc_docs_api.prototype.asc_DistributeTableCells = function(isHorizontally)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		if (false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DistributeTableCells);
+			if (!oLogicDocument.DistributeTableCells(isHorizontally))
+			{
+				oLogicDocument.GetHistory().RemoveLastPoint();
+				console.log("Нельзя");
+				return false;
+			}
+		}
+
+		return true;
+	};
 	asc_docs_api.prototype.widthTable              = function(width)
 	{
 

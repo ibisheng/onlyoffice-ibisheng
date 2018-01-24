@@ -8241,10 +8241,14 @@ CDocument.prototype.CheckTableCoincidence = function(Table)
 };
 CDocument.prototype.DistributeTableCells = function(isHorizontally)
 {
-	this.Controller.DistributeTableCells(isHorizontally);
+	if (!this.Controller.DistributeTableCells(isHorizontally))
+		return false;
+
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
+
+	return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
@@ -10979,6 +10983,10 @@ CDocument.prototype.Get_TableId = function()
 	return this.TableId;
 };
 CDocument.prototype.Get_History = function()
+{
+	return this.History;
+};
+CDocument.prototype.GetHistory = function()
 {
 	return this.History;
 };
@@ -15261,8 +15269,10 @@ CDocument.prototype.controller_DistributeTableCells = function(isHorizontally)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].DistributeTableCells(isHorizontally);
+		return this.Content[Pos].DistributeTableCells(isHorizontally);
 	}
+
+	return false;
 };
 CDocument.prototype.controller_SplitTableCells = function(Cols, Rows)
 {

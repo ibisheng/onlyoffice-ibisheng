@@ -2044,6 +2044,12 @@ CGraphicObjects.prototype =
         return content && content.AddTableRow(bBefore);
     },
 
+	distributeTableCells : function(isHorizontally)
+	{
+		var content = this.getTargetDocContent();
+		return content && content.DistributeTableCells(isHorizontally);
+	},
+
 
     documentSearch: function( CurPage, String, search_Common )
     {

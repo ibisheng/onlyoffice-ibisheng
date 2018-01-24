@@ -658,7 +658,7 @@ CDocumentControllerBase.prototype.CanMergeTableCells = function(){return false;}
  */
 CDocumentControllerBase.prototype.CanSplitTableCells = function(){return false;};
 /**
- * Распраделяем ячейки таблицы по ширине или высоте.
+ * Распределяем ячейки таблицы по ширине или высоте.
  * @returns {boolean}
  */
 CDocumentControllerBase.prototype.DistributeTableCells = function(isHorizontally)

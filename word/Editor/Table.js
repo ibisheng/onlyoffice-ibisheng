@@ -9821,6 +9821,18 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 	this.Internal_Recalculate_1();
 	editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 };
+/**
+ * Распраделяем выделенные ячейки по ширине или высоте
+ * @param isHorizontally
+ * @returns {boolean} Возвращаем false, если операция невозможна
+ */
+CTable.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (isHorizontally)
+		return this.DistributeColumns();
+	else
+		return this.DistributeRows();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Внутренние функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -12978,6 +12990,182 @@ CTable.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 	}
 
 	return null;
+};
+/**
+ * Делаем выделенные ячейки равными по ширине
+ * @returns {boolean} Возрвщаем false, если операция невозможна
+ */
+CTable.prototype.DistributeColumns = function()
+{
+	var isApplyToAll = this.ApplyToAll;
+	if (!this.Selection.Use || table_Selection_Text === this.Selection.Type)
+		this.ApplyToAll = true;
+
+	var arrSelectedCells = this.GetSelectionArray();
+	this.ApplyToAll = isApplyToAll;
+
+	if (arrSelectedCells.length <= 1)
+		return false;
+
+	var arrRows = [];
+	var arrCheckMergedCells = [];
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		var nCurRow  = arrSelectedCells[nIndex].Row;
+		if (!arrRows[nCurRow])
+		{
+			arrRows[nCurRow] = {
+				Start : nCurCell,
+				End   : nCurCell
+			};
+		}
+		else
+		{
+			if (arrRows[nCurRow].Start > nCurCell)
+				arrRows[nCurRow].Start = nCurCell;
+
+			if (arrRows[nCurRow].End < nCurCell)
+				arrRows[nCurRow].End = nCurCell;
+		}
+
+		var oCell = this.Content[nCurRow].GetCell(nCurCell);
+		if (oCell)
+		{
+			var oCellInfo      = this.Content[nCurRow].GetCellInfo(nCurCell);
+			var arrMergedCells = this.private_GetMergedCells(nCurRow, oCellInfo.StartGridCol, oCell.GetGridSpan());
+
+			if (arrMergedCells.length > 1)
+			{
+				arrCheckMergedCells.push([nCurRow]);
+			}
+
+
+			for (var nMergeIndex = 1, nMergedCount = arrMergedCells.length; nMergeIndex < nMergedCount; ++nMergeIndex)
+			{
+				var nCurCell2 = arrMergedCells[nMergeIndex].Index;
+				var nCurRow2  = arrMergedCells[nMergeIndex].Row.Index;
+
+				if (!arrRows[nCurRow2])
+				{
+					arrRows[nCurRow2] = {
+						Start : nCurCell2,
+						End   : nCurCell2
+					};
+				}
+				else
+				{
+					if (arrRows[nCurRow2].Start > nCurCell2)
+						arrRows[nCurRow2].Start = nCurCell2;
+
+					if (arrRows[nCurRow2].End < nCurCell2)
+						arrRows[nCurRow2].End = nCurCell2;
+				}
+
+				arrCheckMergedCells[arrCheckMergedCells.length - 1].push(nCurRow2);
+			}
+		}
+	}
+
+	for (var nIndex = 0, nCount = arrCheckMergedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nFirstStartGridCol = null,
+			arrFirstGridSpans  = null;
+
+		for (var nRowIndex = 0, nRowsCount = arrCheckMergedCells[nIndex].length; nRowIndex < nRowsCount; ++nRowIndex)
+		{
+			var nCurRow = arrCheckMergedCells[nIndex][nRowIndex];
+			var oRow = this.GetRow(nCurRow);
+
+			var nStartGridCol = this.Content[nCurRow].GetBefore().Grid;
+			var arrGridSpans  = [];
+
+			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+			{
+				var nGridSpan = oRow.GetCell(nCurCell).GetGridSpan();
+				if (nCurCell < arrRows[nCurRow].Start)
+					nStartGridCol += nGridSpan;
+				else if (nCurCell <= arrRows[nCurRow].End)
+					arrGridSpans.push(nGridSpan);
+				else
+					break;
+			}
+
+
+			if (null === nFirstStartGridCol)
+			{
+				nFirstStartGridCol = nStartGridCol;
+				arrFirstGridSpans  = arrGridSpans;
+			}
+			else
+			{
+				if (nStartGridCol !== nFirstStartGridCol || arrFirstGridSpans.length !== arrGridSpans.length)
+				{
+					return false;
+				}
+				else
+				{
+					for (var nSpanIndex = 0, nSpansCount = arrGridSpans.length; nSpanIndex < nSpansCount; ++nSpanIndex)
+					{
+						if (arrFirstGridSpans[nSpanIndex] !== arrGridSpans[nSpanIndex])
+							return false;
+					}
+				}
+			}
+		}
+	}
+
+	var arrRowsInfo = this.private_GetRowsInfo();
+	for (nCurRow in arrRows)
+	{
+		if (!arrRowsInfo[nCurRow] || arrRowsInfo[nCurRow].length <= 0)
+			continue;
+
+		var nStartCell = arrRows[nCurRow].Start;
+		var nEndCell   = arrRows[nCurRow].End;
+
+		var nSum = 0;
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell = nStartCell; nCurCell <= nEndCell; ++nCurCell)
+		{
+			nSum += arrRowsInfo[nCurRow][nCurCell + nAdd].W;
+		}
+
+		for (var nCurCell = nStartCell; nCurCell <= nEndCell; ++nCurCell)
+		{
+			arrRowsInfo[nCurRow][nCurCell + nAdd].W = nSum / (nEndCell - nStartCell + 1);
+		}
+	}
+
+	this.private_CreateNewGrid(arrRowsInfo);
+
+	return true;
+};
+/**
+ * Делаем выделенные ячейки равными по высоте
+ * @returns {boolean}
+ */
+CTable.prototype.DistributeRows = function()
+{
+	var isApplyToAll = this.ApplyToAll;
+	if (!this.Selection.Use || table_Selection_Text === this.Selection.Type)
+		this.ApplyToAll = true;
+
+	var arrSelectedCells = this.GetSelectionArray();
+	this.ApplyToAll = isApplyToAll;
+
+	if (arrSelectedCells.length <= 1)
+		return false;
+
+	var arrRows = [];
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurRow = arrSelectedCells[nIndex].Row;
+
+	}
+
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

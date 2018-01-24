@@ -591,6 +591,10 @@ CBlockLevelSdt.prototype.CanSplitTableCells = function()
 {
 	return this.Content.CanSplitTableCells();
 };
+CBlockLevelSdt.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.Content.DistributeTableCells(isHorizontally);
+};
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
 	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());

@@ -7299,8 +7299,7 @@ CDocumentContent.prototype.DistributeTableCells = function(isHorizontally)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].DistributeTableCells(isHorizontally);
-		return true;
+		return this.Content[Pos].DistributeTableCells(isHorizontally);
 	}
 
 	return false;

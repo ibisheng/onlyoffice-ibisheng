@@ -292,6 +292,10 @@ CLogicDocumentController.prototype.MergeTableCells = function()
 {
 	this.LogicDocument.controller_MergeTableCells();
 };
+CLogicDocumentController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.LogicDocument.controller_DistributeTableCells(isHorizontally);
+};
 CLogicDocumentController.prototype.SplitTableCells = function(Cols, Rows)
 {
 	this.LogicDocument.controller_SplitTableCells(Cols, Rows);

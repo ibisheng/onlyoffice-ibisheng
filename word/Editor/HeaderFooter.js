@@ -1084,6 +1084,11 @@ CHeaderFooter.prototype =
     {
         return false;
     },
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		return this.Content.DistributeTableCells(isHorizontally);
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------    
@@ -2439,6 +2444,15 @@ CHeaderFooterController.prototype =
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.CanSplitTableCells();
 	},
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.DistributeTableCells(isHorizontally);
+
+		return false;
+	},
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

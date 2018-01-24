@@ -1249,6 +1249,10 @@ CHistory.prototype.PopRedoPoints = function()
 
 	this.StoredData.length = this.StoredData.length - 1;
 };
+CHistory.prototype.RemoveLastPoint = function()
+{
+	this.Remove_LastPoint();
+};
 
 function CRC32()
 {
