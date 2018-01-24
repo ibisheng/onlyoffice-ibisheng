@@ -5039,6 +5039,7 @@ CPresentation.prototype =
                                             }
                                         }
                                         if(oDocContentForDraw.Content.length > 0){
+
                                             oDocContentForDraw.Reset(0, 0, 20000, 20000);
                                             oDocContentForDraw.Recalculate_Page(0, true);
                                             aParagraphs = oDocContentForDraw.Content;
@@ -5052,9 +5053,17 @@ CPresentation.prototype =
                                                 }
                                             }
                                             dMaxWidth += 1;
+
+
                                             oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
                                             oDocContentForDraw.Recalculate_Page(0, true);
                                             dContentHeight = oDocContentForDraw.Get_SummaryHeight();
+
+                                            var oTextWarpObject = null;
+                                            if(oDocContentForDraw.Parent && oDocContentForDraw.Parent.parent && oDocContentForDraw.Parent.parent instanceof AscFormat.CShape){
+                                                oTextWarpObject = oDocContentForDraw.Parent.parent.checkTextWarp(oDocContentForDraw, oDocContentForDraw.Parent.parent.getBodyPr(), dMaxWidth, dContentHeight, true, false);
+                                            }
+
 
                                             oCanvas = document.createElement('canvas');
                                             dImageWidth = dMaxWidth;
@@ -5074,10 +5083,17 @@ CPresentation.prototype =
                                             oGraphics.m_oCoordTransform.ty = nContentIndents;
                                             oGraphics.transform(1,0,0,1,0,0);
 
-                                            bOldShowParaMarks = this.Api.ShowParaMarks;
-                                            this.Api.ShowParaMarks = false;
-                                            oDocContentForDraw.Draw(0, oGraphics);
-                                            this.Api.ShowParaMarks = bOldShowParaMarks;
+                                            if(oTextWarpObject && oTextWarpObject.oTxWarpStructNoTransform){
+                                                oTextWarpObject.oTxWarpStructNoTransform.draw(oGraphics, oDocContentForDraw.Parent.parent.Get_Theme(), oDocContentForDraw.Parent.parent.Get_ColorMap());
+                                            }
+                                            else {
+
+                                                bOldShowParaMarks = this.Api.ShowParaMarks;
+                                                this.Api.ShowParaMarks = false;
+                                                oDocContentForDraw.Draw(0, oGraphics);
+                                                this.Api.ShowParaMarks = bOldShowParaMarks;
+                                            }
+
                                             var sImageUrl = oCanvas.toDataURL("image/png");
                                             oImage = oController.createImage(sImageUrl, 0, 0, oCanvas.width*AscCommon.g_dKoef_pix_to_mm, oCanvas.height*AscCommon.g_dKoef_pix_to_mm);
                                             oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
