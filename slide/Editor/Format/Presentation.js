@@ -2941,7 +2941,7 @@ CPresentation.prototype =
                     if(oController && oController.selectedObjects.length !== 0) {
                         if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.AddToParagraph(new ParaNewLine(AscCommonWord.break_Line));
+                            this.AddToParagraph(new ParaNewLine(break_Line));
                         }
                     }
                 }
@@ -2952,7 +2952,7 @@ CPresentation.prototype =
                         && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
                             if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                this.AddToParagraph(new ParaNewLine(AscCommonWord.break_Line));
+                                this.AddToParagraph(new ParaNewLine(break_Line));
                             }
                         }
                         else{
