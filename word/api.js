@@ -5901,6 +5901,13 @@ background-repeat: no-repeat;\
 		else
 			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
+        if (undefined !== this.asyncMethodCallback)
+        {
+            this.asyncMethodCallback();
+            this.asyncMethodCallback = undefined;
+            return;
+        }
+
 		this.EndActionLoadImages = 0;
 		if (this.isPasteFonts_Images)
 		{

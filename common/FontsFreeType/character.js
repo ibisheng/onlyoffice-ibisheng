@@ -871,6 +871,7 @@
 			if (_param[3] != (_select.m_ulUnicodeRange4 & _param[3]))
 				continue;
 
+			/*
 			if (_range.Name == c_oUnicodeRangesLID.CJK_Unified_Ideographs)
 			{
 				if (0 == (_select.m_ulCodePageRange1 & _param[4]))
@@ -881,6 +882,10 @@
 				if (_param[4] != (_select.m_ulCodePageRange1 & _param[4]))
 					continue;
 			}
+			*/
+
+            if (_param[4] != (_select.m_ulCodePageRange1 & _param[4]))
+                continue;
 
 			if (_param[5] != (_select.m_ulCodePageRange2 & _param[5]))
 				continue;
@@ -1053,6 +1058,21 @@
                 AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
             }
             return (this.FontsByRangeCount != oldCount);
+		},
+
+        getFontsByString2 : function(_array)
+        {
+            var oldCount = this.FontsByRangeCount;
+            for (var i = 0; i < _array.length; ++i)
+            {
+                AscFonts.FontPickerByCharacter.getFontBySymbol(_array[i]);
+            }
+            return (this.FontsByRangeCount != oldCount);
+        },
+
+		isExtendFonts : function()
+		{
+			return this.ExtendFontsByRangeCount != this.FontsByRangeCount;
 		},
 
 		extendFonts : function(fonts)

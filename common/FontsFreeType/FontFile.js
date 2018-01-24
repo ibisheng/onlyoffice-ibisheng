@@ -1630,6 +1630,9 @@
 			var fontManager = pFontFile.m_oFontManager;
 
 			var name = AscFonts.FontPickerByCharacter.getFontBySymbol(symbol);
+			if (undefined === name || name == "")
+				return null;
+
 			var _fontFilePick = this.FontFiles[name];
 			if (!_fontFilePick)
 			{
