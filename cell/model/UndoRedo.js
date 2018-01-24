@@ -377,6 +377,7 @@ function (window, undefined) {
 		this.Hyperlink = 19;
 		this.SortData = 20;
 		this.CommentData = 21;
+		this.CommentCoords = 22;
 		this.ChartSeriesData = 24;
 		this.SheetAdd = 25;
 		this.SheetRemove = 26;
@@ -473,6 +474,9 @@ function (window, undefined) {
 					break;
 				case this.CommentData:
 					return new Asc.asc_CCommentData();
+					break;
+				case this.CommentCoords:
+					return new AscCommonExcel.asc_CCommentCoords();
 					break;
 				case this.ChartSeriesData:
 					return new AscFormat.asc_CChartSeria();

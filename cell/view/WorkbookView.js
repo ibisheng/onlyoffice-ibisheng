@@ -1194,8 +1194,6 @@
       } else if (target.target === c_oTargetType.RowResize) {
         ws.changeRowHeight(target.row, y, target.mouseY);
       }
-
-      ws.cellCommentator.updateCommentPosition();
       window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
       this._onDocumentPlaceChanged();
     }
@@ -2473,30 +2471,6 @@
       item = this.wsViews[i];
       item._cleanCellsTextMetricsCache();
       item._prepareDrawingObjects();
-    }
-  };
-
-  WorkbookView.prototype._initCommentsToSave = function() {
-    var isFirst = true, wsView, wsModel, tmpWs;
-    // Колличество листов
-    var countWorksheets = this.model.getWorksheetCount();
-    for (var i = 0; i < countWorksheets; ++i) {
-      tmpWs = this.model.getWorksheet(i);
-      if (tmpWs && (0 < tmpWs.aComments.length || isFirst)) {
-        wsView = this.getWorksheet(i);
-        wsModel = wsView.model;
-        wsView.cellCommentator.updatePositionComments();
-
-        if (isFirst) {
-          isFirst = false;
-          tmpWs = this.cellCommentator.worksheet;
-          this.cellCommentator.worksheet = wsView;
-          this.cellCommentator.overlayCtx = wsView.overlayCtx;
-          this.cellCommentator.drawingCtx = wsView.drawingCtx;
-          this.cellCommentator.updatePositionComments();
-          this.cellCommentator.worksheet = tmpWs;
-        }
-      }
     }
   };
 

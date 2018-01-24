@@ -2601,7 +2601,6 @@
         {
             var oThis = this;
             this._prepeareStyles();
-            window["Asc"]["editor"].wb._initCommentsToSave();
             this.bs.WriteItemWithLength(function(){oThis.WriteWorksheetsContent();});
         };
         this.WriteWorksheetsContent = function()

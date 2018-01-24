@@ -67,7 +67,6 @@ function (window, undefined) {
 
 		this.dLeftMM = null;
 		this.dTopMM = null;
-
 		this.dWidthMM = null;
 		this.dHeightMM = null;
 
@@ -100,6 +99,55 @@ function (window, undefined) {
 
 		return res;
 	};
+	asc_CCommentCoords.prototype.getType = function() {
+		return AscCommonExcel.UndoRedoDataTypes.CommentCoords;
+	};
+	asc_CCommentCoords.prototype.Read_FromBinary2 = function(r) {
+		this.nRow = r.GetLong();
+		this.nCol = r.GetLong();
+
+		this.nLeft = r.GetLong();
+		this.nLeftOffset = r.GetLong();
+		this.nTop = r.GetLong();
+		this.nTopOffset = r.GetLong();
+		this.nRight = r.GetLong();
+		this.nRightOffset = r.GetLong();
+		this.nBottom = r.GetLong();
+		this.nBottomOffset = r.GetLong();
+
+		this.dLeftMM = r.GetDouble();
+		this.dTopMM = r.GetDouble();
+		this.dWidthMM = r.GetDouble();
+		this.dHeightMM = r.GetDouble();
+
+		this.bMoveWithCells = r.GetBool();
+		this.bSizeWithCells = r.GetBool();
+	};
+	asc_CCommentCoords.prototype.Write_ToBinary2 = function(w) {
+		w.WriteLong(this.nRow);
+		w.WriteLong(this.nCol);
+
+		w.WriteLong(this.nLeft);
+		w.WriteLong(this.nLeftOffset);
+		w.WriteLong(this.nTop);
+		w.WriteLong(this.nTopOffset);
+		w.WriteLong(this.nRight);
+		w.WriteLong(this.nRightOffset);
+		w.WriteLong(this.nBottom);
+		w.WriteLong(this.nBottomOffset);
+
+		w.WriteDouble(this.dLeftMM);
+		w.WriteDouble(this.dTopMM);
+		w.WriteDouble(this.dWidthMM);
+		w.WriteDouble(this.dHeightMM);
+
+		w.WriteBool(this.bMoveWithCells);
+		w.WriteBool(this.bSizeWithCells);
+	};
+	asc_CCommentCoords.prototype.applyCollaborative = function (nSheetId, collaborativeEditing) {
+		this.nCol = collaborativeEditing.getLockMeColumn2(nSheetId, this.nCol);
+		this.nRow = collaborativeEditing.getLockMeRow2(nSheetId, this.nRow);
+	};
 
 	/** @constructor */
 	function asc_CCommentData() {
@@ -126,30 +174,32 @@ function (window, undefined) {
 
 	asc_CCommentData.prototype.clone = function () {
 		var res = new asc_CCommentData();
-		res.bHidden = this.bHidden;
-		res.wsId = this.wsId;
-		res.nCol = this.nCol;
-		res.nRow = this.nRow;
-		res.nId = this.nId;
-		res.oParent = this.oParent;
-		res.nLevel = (null === res.oParent) ? 0 : res.oParent.asc_getLevel() + 1;
-
-		// Common
-		res.sText = this.sText;
-		res.sTime = this.sTime;
-		res.sOOTime = this.sOOTime;
-		res.sUserId = this.sUserId;
-		res.sUserName = this.sUserName;
-		res.bDocument = this.bDocument;
-		res.bSolved = this.bSolved;
-		res.aReplies = [];
-
-		for (var i = 0; i < this.aReplies.length; i++) {
-			res.aReplies.push(this.aReplies[i].clone());
-		}
-
+		res.updateData(this);
 		res.coords = this.coords ? this.coords.clone() : null;
 		return res;
+	};
+	asc_CCommentData.prototype.updateData = function (comment) {
+		this.bHidden = comment.bHidden;
+		this.wsId = comment.wsId;
+		this.nCol = comment.nCol;
+		this.nRow = comment.nRow;
+		this.nId = comment.nId;
+		this.oParent = comment.oParent;
+		this.nLevel = (null === this.oParent) ? 0 : this.oParent.asc_getLevel() + 1;
+
+		// Common
+		this.sText = comment.sText;
+		this.sTime = comment.sTime;
+		this.sOOTime = comment.sOOTime;
+		this.sUserId = comment.sUserId;
+		this.sUserName = comment.sUserName;
+		this.bDocument = comment.bDocument;
+		this.bSolved = comment.bSolved;
+		this.aReplies = [];
+
+		for (var i = 0; i < comment.aReplies.length; i++) {
+			this.aReplies.push(comment.aReplies[i].clone());
+		}
 	};
 	asc_CCommentData.prototype.guid = function () {
 		function S4() {
@@ -236,10 +286,10 @@ function (window, undefined) {
 
 	asc_CCommentData.prototype.Read_FromBinary2 = function(r) {
 		this.wsId = r.GetString2();
-		this.nCol = r.GetULongLE();
-		this.nRow = r.GetULongLE();
+		this.nCol = r.GetLong();
+		this.nRow = r.GetLong();
 		this.nId = r.GetString2();
-		this.nLevel = r.GetULongLE();
+		this.nLevel = r.GetLong();
 		this.sText = r.GetString2();
 		this.sTime = r.GetString2();
 		this.sOOTime = r.GetString2();
@@ -249,7 +299,7 @@ function (window, undefined) {
 		this.bSolved = r.GetBool();
 		this.bHidden = r.GetBool();
 
-		var length = r.GetULongLE();
+		var length = r.GetLong();
 		for (var i = 0; i < length; ++i) {
 			var reply = new asc_CCommentData();
 			reply.Read_FromBinary2(r);
@@ -368,6 +418,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 						History.Create_NewPoint();
 						History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, this.model.getId(),
 							null, new AscCommonExcel.UndoRedoData_FromTo(from, comment.clone()));
+						this.updateAreaComment(comment);
 					}
 				}
 			}
@@ -432,7 +483,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 		}
 	};
 
-	CCellCommentator.prototype.updateCommentPosition = function () {
+	CCellCommentator.prototype.updateActiveComment = function () {
 		if (this.lastSelectedId) {
 			var comment = this.findComment(this.lastSelectedId);
 			if (comment) {
@@ -620,7 +671,18 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 	}
 };
 
-	CCellCommentator.prototype.updateCommentArea = function (comment) {
+	CCellCommentator.prototype.updateAreaComments = function () {
+		var aComments = this.model.aComments;
+		for (var i = 0; i < aComments.length; ++i) {
+			this.updateAreaComment(aComments[i]);
+		}
+	};
+
+	CCellCommentator.prototype.updateAreaComment = function (comment) {
+		var lastCoords = comment.coords && comment.coords.clone();
+		if (!comment.coords) {
+			comment.coords = new asc_CCommentCoords();
+		}
 		var coords = comment.coords;
 		var dWidthPT = 108;
 		var dHeightPT = 59.25;
@@ -665,6 +727,9 @@ CCellCommentator.prototype.cleanLastSelection = function() {
 		pos = this.worksheet._findRowUnderCursor(y, true);
 		coords.nBottom = pos ? pos.row : 0;
 		coords.nBottomOffset = this.ptToPx(y - this.worksheet.getCellTop(coords.nBottom, 1));
+
+		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Coords, this.model.getId(), null,
+			new AscCommonExcel.UndoRedoData_FromTo(lastCoords, coords.clone()));
 	};
 
 	CCellCommentator.prototype.getCommentTooltipPosition = function(comment) {
@@ -869,6 +934,9 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			History.Create_NewPoint();
 			History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, t.model.getId(), null,
 				new AscCommonExcel.UndoRedoData_FromTo(from, comment.clone()));
+			if (bChangeCoords) {
+				this.updateAreaComment(comment);
+			}
 		}
 
 		if (!bNoDraw)
@@ -971,10 +1039,11 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpdate) {
 	// Add new comment
 	if (!bChange) {
-		oComment.coords = new asc_CCommentCoords();
-		this.updateCommentArea(oComment);
 		History.Create_NewPoint();
 		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Add, this.model.getId(), null, oComment.clone());
+		if (!oComment.bDocument) {
+			this.updateAreaComment(oComment);
+		}
 
 		this.model.aComments.push(oComment);
 
@@ -1009,6 +1078,8 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
+					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Coords, this.model.getId(), null,
+						new AscCommonExcel.UndoRedoData_FromTo(aComments[i].coords.clone(), null));
 					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.model.getId(), null, aComments[i].clone());
 				}
 
@@ -1074,15 +1145,15 @@ CCellCommentator.prototype.mergeComments = function (range) {
 
 CCellCommentator.prototype.Undo = function(type, data) {
 	var aComments = this.model.aComments;
-	var i, parentComment;
+	var i, comment;
 	switch (type) {
 
 		case AscCH.historyitem_Comment_Add:
 			if (data.oParent) {
-				parentComment = this.findComment(data.oParent.asc_getId());
-				for (i = 0; i < parentComment.aReplies.length; i++) {
-					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-						parentComment.aReplies.splice(i, 1);
+				comment = this.findComment(data.oParent.asc_getId());
+				for (i = 0; i < comment.aReplies.length; i++) {
+					if (comment.aReplies[i].asc_getId() == data.asc_getId()) {
+						comment.aReplies.splice(i, 1);
 						break;
 					}
 				}
@@ -1099,8 +1170,8 @@ CCellCommentator.prototype.Undo = function(type, data) {
 
 		case AscCH.historyitem_Comment_Remove:
 			if (data.oParent) {
-				parentComment = this.findComment(data.oParent.asc_getId());
-				parentComment.aReplies.push(data);
+				comment = this.findComment(data.oParent.asc_getId());
+				comment.aReplies.push(data);
 			} else {
 				aComments.push(data);
 				this.model.workbook.handlers.trigger('addComment', data.asc_getId(), data);
@@ -1109,22 +1180,26 @@ CCellCommentator.prototype.Undo = function(type, data) {
 
 		case AscCH.historyitem_Comment_Change:
 			if (data.to.oParent) {
-				parentComment = this.findComment(data.to.oParent.asc_getId());
-				for (i = 0; i < parentComment.aReplies.length; i++) {
-					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-						parentComment.aReplies.splice(i, 1);
-						parentComment.aReplies.push(data.from);
+				comment = this.findComment(data.to.oParent.asc_getId());
+				for (i = 0; i < comment.aReplies.length; i++) {
+					if (comment.aReplies[i].asc_getId() == data.asc_getId()) {
+						comment.aReplies.splice(i, 1);
+						comment.aReplies.push(data.from);
 						break;
 					}
 				}
 			} else {
-				for (i = 0; i < aComments.length; i++) {
-					if (aComments[i].asc_getId() == data.to.asc_getId()) {
-						aComments.splice(i, 1);
-						aComments.push(data.from);
-						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.from.asc_getId(), data.from);
-						break;
-					}
+				comment = this.findComment(data.to.asc_getId());
+				comment.updateData(data.from);
+				this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
+			}
+			break;
+
+		case AscCH.historyitem_Comment_Coords:
+			if (data.from) {
+				comment = this.getComment(data.from.nCol, data.from.nRow);
+				if (comment) {
+					comment.coords = data.from.clone();
 				}
 			}
 			break;
@@ -1133,13 +1208,13 @@ CCellCommentator.prototype.Undo = function(type, data) {
 
 CCellCommentator.prototype.Redo = function(type, data) {
 	var aComments = this.model.aComments;
-	var parentComment, i;
+	var comment, i;
 	switch (type) {
 
 		case AscCH.historyitem_Comment_Add:
 			if (data.oParent) {
-				parentComment = this.findComment(data.oParent.asc_getId());
-				parentComment.aReplies.push(data);
+				comment = this.findComment(data.oParent.asc_getId());
+				comment.aReplies.push(data);
 			} else {
 				aComments.push(data);
 				this.model.workbook.handlers.trigger('addComment', data.asc_getId(), data);
@@ -1148,10 +1223,10 @@ CCellCommentator.prototype.Redo = function(type, data) {
 
 		case AscCH.historyitem_Comment_Remove:
 			if (data.oParent) {
-				parentComment = this.findComment(data.oParent.asc_getId());
-				for (i = 0; i < parentComment.aReplies.length; i++) {
-					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-						parentComment.aReplies.splice(i, 1);
+				comment = this.findComment(data.oParent.asc_getId());
+				for (i = 0; i < comment.aReplies.length; i++) {
+					if (comment.aReplies[i].asc_getId() == data.asc_getId()) {
+						comment.aReplies.splice(i, 1);
 						break;
 					}
 				}
@@ -1168,22 +1243,26 @@ CCellCommentator.prototype.Redo = function(type, data) {
 
 		case AscCH.historyitem_Comment_Change:
 			if (data.from.oParent) {
-				parentComment = this.findComment(data.from.oParent.asc_getId());
-				for (i = 0; i < parentComment.aReplies.length; i++) {
-					if (parentComment.aReplies[i].asc_getId() == data.asc_getId()) {
-						parentComment.aReplies.splice(i, 1);
-						parentComment.aReplies.push(data.to);
+				comment = this.findComment(data.from.oParent.asc_getId());
+				for (i = 0; i < comment.aReplies.length; i++) {
+					if (comment.aReplies[i].asc_getId() == data.asc_getId()) {
+						comment.aReplies.splice(i, 1);
+						comment.aReplies.push(data.to);
 						break;
 					}
 				}
 			} else {
-				for (i = 0; i < aComments.length; i++) {
-					if (aComments[i].asc_getId() == data.from.asc_getId()) {
-						aComments.splice(i, 1);
-						aComments.push(data.to);
-						this.model.workbook.handlers.trigger("asc_onChangeCommentData", data.to.asc_getId(), data.to);
-						break;
-					}
+				comment = this.findComment(data.from.asc_getId());
+				comment.updateData(data.to);
+				this.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
+			}
+			break;
+
+		case AscCH.historyitem_Comment_Coords:
+			if (data.to) {
+				comment = this.getComment(data.to.nCol, data.to.nRow);
+				if (comment) {
+					comment.coords = data.to.clone();
 				}
 			}
 			break;
@@ -1195,13 +1274,6 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	};
 	CCellCommentator.prototype.showSolved = function () {
 		return this.model.workbook.handlers.trigger('showSolved');
-	};
-
-	CCellCommentator.prototype.updatePositionComments = function () {
-		var comment, aComments = this.model.aComments;
-		for (var i = 0; i < aComments.length; ++i) {
-			this.updateCommentArea(aComments[i]);
-		}
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

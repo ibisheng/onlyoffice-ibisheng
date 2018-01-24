@@ -664,7 +664,7 @@
             }
 
             this._prepareCellTextMetricsCache();
-            this.cellCommentator.updateCommentPosition();
+            this.cellCommentator.updateActiveComment();
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
             this.handlers.trigger("toggleAutoCorrectOptions", null, true);
             this.handlers.trigger("onDocumentPlaceChanged");
@@ -699,7 +699,7 @@
 		}
 
         this._prepareCellTextMetricsCache();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
@@ -767,6 +767,8 @@
             t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
             t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleColsCount();
+			t.cellCommentator.updateActiveComment();
+            t.cellCommentator.updateAreaComments();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
 				t.objectRender.rebuildChartGraphicObjects([new asc_Range(col, 0, col, gc_nMaxRow0)]);
@@ -814,6 +816,8 @@
             t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
             t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleRowsCount();
+			t.cellCommentator.updateActiveComment();
+			t.cellCommentator.updateAreaComments();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
 				t.objectRender.rebuildChartGraphicObjects([new asc_Range(0, row, gc_nMaxCol0, row)]);
@@ -5369,7 +5373,7 @@
 
         this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         this.cellCommentator.drawCommentCells();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
@@ -5530,7 +5534,7 @@
 
         this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         this.cellCommentator.drawCommentCells();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
@@ -10277,6 +10281,8 @@
 
 			arrChangedRanges = arrChangedRanges.concat(t.model.hiddenManager.getRecalcHidden());
 
+			t.model.updateAreaComments();
+
 			if (t.objectRender) {
 				if (reinitRanges && t.objectRender.drawingArea) {
 					t.objectRender.drawingArea.reinitRanges();
@@ -11844,7 +11850,7 @@
 
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         //this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
