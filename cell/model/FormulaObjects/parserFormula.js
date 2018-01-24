@@ -2641,6 +2641,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		return res;
 	};
+	cBaseFunction.prototype.checkRef = function (arg) {
+		var res = false;
+		if(cElementType.cell === arg.type || cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
+			res = true;
+		}
+		return res;
+	};
 
 	/** @constructor */
 	function cUnknownFunction(name) {

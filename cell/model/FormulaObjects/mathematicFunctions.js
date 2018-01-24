@@ -438,7 +438,13 @@
 
 			var newArgs = [];
 			for (var i = 2; i < arg.length; i++) {
-				newArgs.push(arg[i]);
+				//аргумент может быть только ссылка на ячейку или диапазон ячеек
+				//в противном случае - ошибка
+				if(this.checkRef(arg[i])) {
+					newArgs.push(arg[i]);
+				} else {
+					return new cError(cErrorType.wrong_value_type);
+				}
 			}
 
 			if (f.argumentsMax && newArgs.length > f.argumentsMax) {
