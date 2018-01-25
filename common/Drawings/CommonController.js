@@ -7132,8 +7132,11 @@ DrawingObjectsController.prototype =
         if(oTargetDocContent)
         {
             oState.Pos      = oTargetDocContent.GetContentPosition(false, false, undefined);
+            oState.Pos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.StartPos = oTargetDocContent.GetContentPosition(true, true, undefined);
+            oState.StartPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.EndPos   = oTargetDocContent.GetContentPosition(true, false, undefined);
+            oState.EndPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.DrawingSelection = oTargetDocContent.Selection.Use;
         }
         oState.DrawingsSelectionState = this.getSelectionState()[0];
@@ -7161,16 +7164,23 @@ DrawingObjectsController.prototype =
                 if(oDrawingSelectionState.textObject.Is_UseInDocument() && (!oDrawingSelectionState.textObject.group || oDrawingSelectionState.textObject.group === this))
                 {
                     this.selectObject(oDrawingSelectionState.textObject, bDocument ? (oDrawingSelectionState.textObject.parent ? oDrawingSelectionState.textObject.parent.PageNum : nPageIndex) : nPageIndex);
-                    var oDocContent = oDrawingSelectionState.textObject.getDocContent();
+                    var oDocContent;
+                    if(oDrawingSelectionState.textObject instanceof AscFormat.CGraphicFrame){
+                        oDocContent = oDrawingSelectionState.textObject.graphicObject;
+                    }
+                    else {
+                        oDocContent = oDrawingSelectionState.textObject.getDocContent();
+                    }
+
                     if(oDocContent){
                         if (true === oSelectionState.DrawingSelection)
                         {
-                            oDocContent.SetContentPosition(oSelectionState.StartPos, 0, 0);
-                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 0, 0, 0);
+                            oDocContent.SetContentPosition(oSelectionState.StartPos, 1, 0);
+                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 1, 0, 0);
                         }
                         else
                         {
-                            oDocContent.SetContentPosition(oSelectionState.Pos, 0, 0);
+                            oDocContent.SetContentPosition(oSelectionState.Pos, 1, 0);
                             bNeedRecalculateCurPos = true;
                         }
                         this.selection.textSelection = oDrawingSelectionState.textObject;

@@ -5615,7 +5615,10 @@ background-repeat: no-repeat;\
 			obj.isHidden = oTh.IsSlideHidden(aSelectedArray);
 			for(i = 0; i < aSelectedArray.length; ++i)
 			{
-				aSlides.push(oPresentation.Slides[aSelectedArray[i]]);
+				if(oPresentation.Slides[aSelectedArray[i]])
+				{
+					aSlides.push(oPresentation.Slides[aSelectedArray[i]]);
+				}
 			}
 		}
 		else{
