@@ -4706,15 +4706,14 @@ PasteProcessor.prototype =
 						var Item;
 						if(0x0A === nUnicode || 0x0D === nUnicode) {
 							bAddParagraph = true;
+						} else if(0x09 === nUnicode){
+							Item = new ParaTab();
+							shape.paragraphAdd(Item);
 						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText();
 							Item.Value = nUnicode;
 							shape.paragraphAdd(Item);
 						}
-						else if(0x09 === nUnicode){
-                            Item = new ParaTab();
-                            shape.paragraphAdd(Item);
-                        }
 						else {
 							Item = new ParaSpace();
 							shape.paragraphAdd(Item);
