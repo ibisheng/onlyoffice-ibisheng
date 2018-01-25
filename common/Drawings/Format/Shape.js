@@ -2737,8 +2737,15 @@ CShape.prototype.changeSize = function (kw, kh) {
         var xfrm = this.spPr.xfrm;
         xfrm.setOffX(xfrm.offX * kw);
         xfrm.setOffY(xfrm.offY * kh);
-        xfrm.setExtX(xfrm.extX * kw);
-        xfrm.setExtY(xfrm.extY * kh);
+        if(this.getNoChangeAspect()){
+            var k = Math.min(kw, kh);
+            xfrm.setExtX(xfrm.extX * k);
+            xfrm.setExtY(xfrm.extY * k);
+        }
+        else{
+            xfrm.setExtX(xfrm.extX * kw);
+            xfrm.setExtY(xfrm.extY * kh);
+        }
     }
     this.recalcTransform && this.recalcTransform();
 };
