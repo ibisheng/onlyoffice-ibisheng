@@ -2316,13 +2316,8 @@
 			
 			_getClassBinaryFromHtml: function(node)
 			{
-				var classNode, base64 = null, base64FromWord = null, base64FromPresentation = null;
-				if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].getAttribute("class");
-				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].children[0].getAttribute("class");
-				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].children[0].children[0].getAttribute("class");
+				var base64 = null, base64FromWord = null, base64FromPresentation = null;
+				var classNode = AscCommon.searchBinaryClass(node);
 				
 				if( classNode != null ){
 					var cL = classNode.split(" ");

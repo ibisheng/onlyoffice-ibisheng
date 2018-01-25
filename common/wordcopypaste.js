@@ -4612,19 +4612,7 @@ PasteProcessor.prototype =
 		}
 		else if(node)
 		{
-			//todo переделать получения класса
-			if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
-			{
-				classNode = node.children[0].getAttribute("class");
-			}
-			else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-			{
-				classNode = node.children[0].children[0].getAttribute("class");
-			}
-			else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-			{
-				classNode = node.children[0].children[0].children[0].getAttribute("class");
-			}	
+			classNode = searchBinaryClass(node);
 			
 			if( classNode != null ){
 				var cL = classNode.split(" ");
@@ -9098,6 +9086,25 @@ function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAd
 	}
 }
 
+function searchBinaryClass(node)
+{
+	var res = null;
+	if(node.children[0])
+	{
+		var child = node.children[0];
+		var childClass = child ? child.getAttribute("class") : null;
+		if(childClass != null && (childClass.indexOf("xslData;") > -1 || childClass.indexOf("docData;") > -1 || childClass.indexOf("pptData;") > -1))
+		{
+			return childClass;
+		}
+		else
+		{
+			return searchBinaryClass(node.children[0]);
+		}
+	}
+	return res;
+}
+
 function SpecialPasteShowOptions()
 {
 	this.options = null;
@@ -9174,6 +9181,7 @@ SpecialPasteShowOptions.prototype = {
   window["AscCommon"].PasteProcessor = PasteProcessor;
 
   window["AscCommon"].addTextIntoRun = addTextIntoRun;
+  window["AscCommon"].searchBinaryClass = searchBinaryClass;
   
   window["AscCommon"].PasteElementsId = PasteElementsId;
   
