@@ -4419,7 +4419,6 @@ background-repeat: no-repeat;\
 			if (!oLogicDocument.DistributeTableCells(isHorizontally))
 			{
 				oLogicDocument.GetHistory().RemoveLastPoint();
-				console.log("Нельзя");
 				return false;
 			}
 		}
