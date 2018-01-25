@@ -441,17 +441,19 @@ CTable.prototype.private_RecalculateGrid = function()
                 var SumSpanMinContent = 0;
                 var SumSpanMaxContent = 0;
                 var SumSpanCurContent = 0;
+                var SumSpanMinMargin  = 0;
                 for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
                 {
                     SumSpanMinContent += MinContent[CurSpan];
                     SumSpanMaxContent += MaxContent[CurSpan];
+                    SumSpanMinMargin  += MinMargin[CurSpan];
                     SumSpanCurContent += this.TableGridCalc[CurSpan];
                 }
 
-                if (null !== WBeforeW && SumSpanMinContent < WBeforeW)
+                if (null !== WBeforeW && SumSpanMinContent < WBeforeW - SumSpanMinMargin)
                 {
-                    for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                        MinContent[CurSpan] = WBeforeW * this.TableGridCalc[CurSpan] / SumSpanCurContent;
+					for (var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++)
+						MinContent[CurSpan] = WBeforeW * this.TableGridCalc[CurSpan] / SumSpanCurContent - MinMargin[CurSpan];
                 }
 
                 // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
@@ -554,18 +556,20 @@ CTable.prototype.private_RecalculateGrid = function()
                     var SumSpanMinContent = 0;
                     var SumSpanMaxContent = 0;
                     var SumSpanCurContent = 0;
+                    var SumSpanMinMargin  = 0;
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
                     {
                         SumSpanMinContent += MinContent[CurSpan];
                         SumSpanMaxContent += MaxContent[CurSpan];
+                        SumSpanMinMargin  += MinMargin[CurSpan];
                         SumSpanCurContent += this.TableGridCalc[CurSpan];
                     }
 
-                    if ( SumSpanMinContent < CellMin )
-                    {
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MinContent[CurSpan] = CellMin * this.TableGridCalc[CurSpan] / SumSpanCurContent;
-                    }
+					if (SumSpanMinContent < CellMin - SumSpanMinMargin)
+					{
+						for (var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++)
+							MinContent[CurSpan] = CellMin * this.TableGridCalc[CurSpan] / SumSpanCurContent - MinMargin[CurSpan];
+					}
 
                     // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
                     // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении

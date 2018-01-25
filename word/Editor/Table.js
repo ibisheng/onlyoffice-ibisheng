@@ -1190,7 +1190,7 @@ CTable.prototype.Set_Props = function(Props)
 	// TableLayout
 	if (undefined != Props.TableLayout)
 	{
-		this.Set_TableLayout(( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ));
+		this.SetTableLayout(( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ));
 		bRecalc_All = true;
 	}
 
@@ -4901,7 +4901,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 
 					var oTablePr = this.Get_CompiledPr(false).TablePr;
 					if (tbllayout_AutoFit === oTablePr.TableLayout)
-						this.Set_TableLayout(tbllayout_Fixed);
+						this.SetTableLayout(tbllayout_Fixed);
 
 					this.Internal_CreateNewGrid(Rows_info);
 
@@ -7896,7 +7896,7 @@ CTable.prototype.GetTableW = function()
 {
 	return this.Get_TableW();
 };
-CTable.prototype.Set_TableLayout = function(Value)
+CTable.prototype.SetTableLayout = function(Value)
 {
 	if (this.Pr.TableLayout === Value)
 		return;
@@ -7905,9 +7905,9 @@ CTable.prototype.Set_TableLayout = function(Value)
 	this.Pr.TableLayout = Value;
 	this.Recalc_CompiledPr();
 };
-CTable.prototype.Get_TableLayout = function()
+CTable.prototype.GetTableLayout = function()
 {
-	var Pr = this.Get_CompliedPr(false).TablePr;
+	var Pr = this.Get_CompiledPr(false).TablePr;
 	return Pr.TableLayout;
 };
 CTable.prototype.Set_TableCellMar = function(Left, Top, Right, Bottom)
@@ -12130,7 +12130,7 @@ CTable.prototype.private_SetTableLayoutFixedAndUpdateCellsWidth = function(nExce
 {
 	if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
 	{
-		this.Set_TableLayout(tbllayout_Fixed);
+		this.SetTableLayout(tbllayout_Fixed);
 
 		// Обновляем ширины ячеек
 		var nColsCount = this.TableGrid.length;
@@ -13115,7 +13115,9 @@ CTable.prototype.DistributeColumns = function()
 		}
 	}
 
-	var arrRowsInfo = this.private_GetRowsInfo();
+	var isAutofitLayout    = this.GetTableLayout() === tbllayout_AutoFit;
+	var isNeedChangeLayout = false;
+	var arrRowsInfo        = this.private_GetRowsInfo();
 	for (nCurRow in arrRows)
 	{
 		if (!arrRowsInfo[nCurRow] || arrRowsInfo[nCurRow].length <= 0)
@@ -13134,11 +13136,30 @@ CTable.prototype.DistributeColumns = function()
 
 		for (var nCurCell = nStartCell; nCurCell <= nEndCell; ++nCurCell)
 		{
-			arrRowsInfo[nCurRow][nCurCell + nAdd].W = nSum / (nEndCell - nStartCell + 1);
+			var nNewW = nSum / (nEndCell - nStartCell + 1);
+			arrRowsInfo[nCurRow][nCurCell + nAdd].W = nNewW;
+
+			// TODO: Надо поправить баг в рассчете AutoFit из-за которого тут сдвиг происходит
+			var oRow = this.GetRow(nCurRow);
+			if (!oRow)
+				continue;
+
+			var oCell = oRow.GetCell(nCurCell);
+			if (!oCell)
+				continue;
+
+			if (isAutofitLayout
+				&& !isNeedChangeLayout
+				&& oCell.Content_RecalculateMinMaxContentWidth(false).Max - 0.001 > nNewW)
+					isNeedChangeLayout = true;
 		}
 	}
 
+	if (isAutofitLayout && isNeedChangeLayout)
+		this.SetTableLayout(tbllayout_Fixed);
+
 	this.private_CreateNewGrid(arrRowsInfo);
+	this.private_RecalculateGrid();
 
 	return true;
 };
@@ -13158,14 +13179,61 @@ CTable.prototype.DistributeRows = function()
 	if (arrSelectedCells.length <= 1)
 		return false;
 
-	var arrRows = [];
+	var arrRows = [], nRowsCount = 0;
 	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
 	{
-		var nCurRow = arrSelectedCells[nIndex].Row;
-
+		if (true !== arrRows[arrSelectedCells[nIndex].Row])
+		{
+			arrRows[arrSelectedCells[nIndex].Row] = true;
+			nRowsCount++;
+		}
 	}
 
-	return false;
+	if (nRowsCount <= 0)
+		return false;
+
+	var nSumH = 0;
+	for (var nCurRow in arrRows)
+	{
+		var nRowSummaryH = 0;
+		for (var nCurPage in this.RowsInfo[nCurRow].H)
+			nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+		nSumH += nRowSummaryH;
+	}
+
+	var nCellSpacing = this.GetRow(0).GetCellSpacing();
+	for (var nCurRow in arrRows)
+	{
+		var oRow  = this.GetRow(nCurRow);
+		var oRowH = oRow.GetHeight();
+		var nNewH = nSumH / nRowsCount;
+
+		if (null !== nCellSpacing)
+			nNewH += nCellSpacing;
+		else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+			nNewH -= this.RowsInfo[nCurRow].TopDy[0];
+
+		var nTopMargin = 0,
+			nBotMargin = 0;
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell    = oRow.GetCell(nCurCell);
+			var oMargins = oCell.GetMargins();
+
+			if (oMargins.Top.W > nTopMargin)
+				nTopMargin = oMargins.Top.W;
+
+			if (oMargins.Bottom.W > nBotMargin)
+				nBotMargin = oMargins.Bottom.W;
+		}
+
+		nNewH -= nTopMargin + nBotMargin;
+
+		oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+	}
+
+	return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

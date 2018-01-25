@@ -2264,7 +2264,7 @@ CPresentation.prototype =
             table.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0);
             table.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0);
         }
-        table.Set_TableLayout(tbllayout_Fixed);
+        table.SetTableLayout(tbllayout_Fixed);
         if(typeof StyleId === "string")
         {
             table.Set_TableStyle(StyleId);

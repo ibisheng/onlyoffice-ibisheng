@@ -6489,7 +6489,7 @@ function BinaryPPTYLoader()
             _table.Set_Pr(props.props);
             _table.Set_TableLook(props.look);
         }
-        _table.Set_TableLayout(tbllayout_Fixed);
+        _table.SetTableLayout(tbllayout_Fixed);
 
         s.Seek2(_return_to_rows);
 
