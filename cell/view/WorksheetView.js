@@ -10281,7 +10281,7 @@
 
 			arrChangedRanges = arrChangedRanges.concat(t.model.hiddenManager.getRecalcHidden());
 
-			t.model.updateAreaComments();
+			t.cellCommentator.updateAreaComments();
 
 			if (t.objectRender) {
 				if (reinitRanges && t.objectRender.drawingArea) {
