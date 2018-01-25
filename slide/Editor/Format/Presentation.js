@@ -555,6 +555,7 @@ function CPresentation(DrawingDocument)
     this.TableId              = g_oTableId;
     this.CollaborativeEditing = (("undefined" !== typeof(CCollaborativeEditing) && AscCommon.CollaborativeEditing instanceof CCollaborativeEditing) ? AscCommon.CollaborativeEditing : null);
     this.Api                  = editor;
+    this.TurnOffInterfaceEvents = false;
     //------------------------------------------------------------------------
     if (DrawingDocument)
     {
@@ -1456,11 +1457,7 @@ CPresentation.prototype =
                 this.bNeedUpdateTh = false;
             }
         }
-
-        var oController = this.GetCurrentController();
-        if(oController){
-            oController.updateSelectionState();
-        }
+        this.Document_UpdateSelectionState();
 
         for(i = 0; i < this.slidesToUnlock.length; ++i)
         {
@@ -4176,6 +4173,10 @@ CPresentation.prototype =
     // Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
     Document_UpdateInterfaceState : function()
     {
+        if(this.TurnOffInterfaceEvents)
+        {
+            return;
+        }
         editor.sync_BeginCatchSelectedElements();
         editor.ClearPropObjCallback();
         if(this.Slides[this.CurPage])
@@ -4453,6 +4454,10 @@ CPresentation.prototype =
     // Обновляем линейки
     Document_UpdateRulersState : function()
     {
+        if(this.TurnOffInterfaceEvents)
+        {
+            return;
+        }
         if(this.Slides[this.CurPage])
         {
             var target_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(undefined, true);
@@ -4471,6 +4476,10 @@ CPresentation.prototype =
     // Обновляем линейки
     Document_UpdateSelectionState : function()
     {
+        if(this.TurnOffInterfaceEvents)
+        {
+            return;
+        }
         var oController = this.GetCurrentController();
         if(oController)
         {

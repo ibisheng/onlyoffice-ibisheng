@@ -1915,8 +1915,10 @@ background-repeat: no-repeat;\
 			window['AscCommon'].g_specialPasteHelper.Special_Paste_Start();
 
 			//undo previous action
-			this.WordControl.m_oLogicDocument.Document_Undo();
 
+            this.WordControl.m_oLogicDocument.TurnOffInterfaceEvents = true;
+			this.WordControl.m_oLogicDocument.Document_Undo();
+            this.WordControl.m_oLogicDocument.TurnOffInterfaceEvents = false;
 			//if (!useCurrentPoint) {
 			_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			//}
