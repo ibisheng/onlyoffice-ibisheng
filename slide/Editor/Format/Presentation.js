@@ -6883,6 +6883,15 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap, bSou
             else{
                 if(!bSourceFormatting){
                     oCopy = oSp.copy();
+                    if(oSp.isPlaceholder && oSp.isPlaceholder())
+                    {
+                        oCopy.x = oSp.x;
+                        oCopy.y = oSp.y;
+                        oCopy.extX = oSp.extX;
+                        oCopy.extY = oSp.extY;
+                        oCopy.rot = oSp.rot;
+                        AscFormat.CheckSpPrXfrm(oCopy, true);
+                    }
                 }
                 else{
                     oCopy = oSp.getCopyWithSourceFormatting();
