@@ -483,6 +483,44 @@ Slide.prototype =
         {
             return last_body;
         }
+
+
+        for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
+        {
+            _glyph = _sp_tree[_shape_index];
+            if(_glyph.isPlaceholder())
+            {
+                if(_glyph instanceof AscFormat.CShape)
+                {
+                    _index = _glyph.nvSpPr.nvPr.ph.idx;
+                    _type = _glyph.nvSpPr.nvPr.ph.type;
+                }
+                if(_glyph instanceof AscFormat.CImageShape)
+                {
+                    _index = _glyph.nvPicPr.nvPr.ph.idx;
+                    _type = _glyph.nvPicPr.nvPr.ph.type;
+                }
+                if(_glyph instanceof  AscFormat.CGroupShape)
+                {
+                    _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
+                    _type = _glyph.nvGrpSpPr.nvPr.ph.type;
+                }
+
+                if(_index == null)
+                {
+                    _final_index = 0;
+                }
+                else
+                {
+                    _final_index = _index;
+                }
+
+                if(_input_reduced_index == _final_index)
+                {
+                    return _glyph;
+                }
+            }
+        }
         return null;
     },
 
