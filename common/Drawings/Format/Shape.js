@@ -2000,7 +2000,7 @@ CShape.prototype.getTextRect = function () {
 CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
     oMatrix.Reset();
     var _shape_transform = this.localTransform;
-    var _content_height = oContent.Get_SummaryHeight();
+    var _content_height = oContent.GetSummaryHeight();
     var _l, _t, _r, _b;
     var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
     var oRect = this.getTextRect();
@@ -3472,14 +3472,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent(w, h, nStartPage);
                 oRet.w = w + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = l_ins + r_ins;
@@ -3493,14 +3493,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent( h, h, nStartPage);
                 oRet.w = h + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = t_ins + b_ins;
@@ -3578,7 +3578,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
 
         oDocContent.RecalculateContent(oRet.w, oRet.h, nStartPage);
 
-        oRet.contentH = oDocContent.Get_SummaryHeight();
+        oRet.contentH = oDocContent.GetSummaryHeight();
 
         if(this.bWordShape)
         {
@@ -5254,7 +5254,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
                 oContentToDraw.Reset(0, 0, oContent.XLimit, 20000);
                 oContentToDraw.Recalculate_Page(0, true);
             }
-            var dContentHeight = oContentToDraw.Get_SummaryHeight();
+            var dContentHeight = oContentToDraw.GetSummaryHeight();
             var OldShowParaMarks, width_ = dWidth*dKoeff, height_ = dHeight*dKoeff;
             if(isRealObject(editor))
             {

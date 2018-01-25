@@ -833,6 +833,59 @@ CTableRow.prototype.SetAfter = function(Grid, W)
 {
 	this.Set_After(Grid, W);
 };
+/**
+ * Получаем общий отступ сверху у строки (максимальный отступ сверху среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetTopMargin = function()
+{
+	var nTopMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Top.W > nTopMargin)
+			nTopMargin = oMargins.Top.W;
+	}
+
+	return nTopMargin;
+};
+/**
+ * Получаем общий отступ снизу у строки (максимальный отступ снизу среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetBottomMargin = function()
+{
+	// Ячейки, участвующие в вертикальном объединении, не влияют на отступ снизу
+
+	var nBottomMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var nVMergeCount = this.Table.GetVMergeCount(nCurCell, this.Index);
+		if (nVMergeCount > 1)
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Bottom.W > nBottomMargin)
+			nBottomMargin = oMargins.Bottom.W;
+	}
+
+	return nBottomMargin;
+};
+
 
 
 

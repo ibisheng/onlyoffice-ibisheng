@@ -1440,7 +1440,7 @@ CTable.prototype.Set_Props = function(Props)
 					for (var CurCell = 0; CurCell < Cells_count; CurCell++)
 					{
 						var Cell = Row.Get_Cell(CurCell);
-						if (vmerge_Continue === Cell.Get_VMerge())
+						if (vmerge_Continue === Cell.GetVMerge())
 							continue;
 
 						var StartGridCol    = this.Content[CurRow].Get_CellInfo(CurCell).StartGridCol;
@@ -2209,7 +2209,7 @@ CTable.prototype.Get_PageContentStartPos = function(CurPage, RowIndex, CellIndex
 	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 	{
 		var Cell   = Row.Get_Cell(CurCell);
-		var VMerge = Cell.Get_VMerge();
+		var VMerge = Cell.GetVMerge();
 
 		if (vmerge_Continue === VMerge)
 			Cell = this.Internal_Get_StartMergedCell(RowIndex, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
@@ -2261,7 +2261,7 @@ CTable.prototype.Get_MaxTopBorder = function(RowIndex)
 	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 	{
 		var Cell   = Row.Get_Cell(CurCell);
-		var VMerge = Cell.Get_VMerge();
+		var VMerge = Cell.GetVMerge();
 
 		if (vmerge_Continue === VMerge)
 			Cell = this.Internal_Get_StartMergedCell(RowIndex, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
@@ -2462,7 +2462,7 @@ CTable.prototype.Shift = function(CurPage, Dx, Dy)
 		{
 			var Cell          = Row.Get_Cell(CurCell);
 			var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-			if (vmerge_Restart === Cell.Get_VMerge())
+			if (vmerge_Restart === Cell.GetVMerge())
 			{
 				Cell.Content_Shift(CellPageIndex, Dx, Dy);
 			}
@@ -3487,7 +3487,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 
 					if (vmerge_Continue === Vmerge)
 						continue;
@@ -3528,7 +3528,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 					if (vmerge_Continue === Vmerge)
 						continue;
 
@@ -3577,7 +3577,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 					if (vmerge_Continue === Vmerge)
 						continue;
 
@@ -6483,7 +6483,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		if (true === bNext)
 		{
 			var TempCell = this.Internal_Get_NextCell(Pos);
-			while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+			while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 				TempCell = this.Internal_Get_NextCell(Pos);
 
 			if (null != TempCell)
@@ -6504,7 +6504,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 					return;
 
 				var TempCell = this.Internal_Get_NextCell(Pos);
-				while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+				while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 					TempCell = this.Internal_Get_NextCell(Pos);
 
 				if (null != TempCell)
@@ -6514,7 +6514,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		else
 		{
 			var TempCell = this.Internal_Get_PrevCell(Pos);
-			while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+			while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 				TempCell = this.Internal_Get_PrevCell(Pos);
 
 			if (null != TempCell)
@@ -6664,7 +6664,7 @@ CTable.prototype.GetSelectedContent = function(SelectedContent)
 			{
 				var Cell     = Row.Get_Cell(CurCell);
 				var GridSpan = Cell.Get_GridSpan();
-				var VMerge   = Cell.Get_VMerge();
+				var VMerge   = Cell.GetVMerge();
 
 				var bSelected = false;
 				if (VMerge === vmerge_Restart)
@@ -6810,7 +6810,7 @@ CTable.prototype.GetSelectedContent = function(SelectedContent)
 					History.Add(new CChangesTableRowAddCell(Row, CurCell, [Row.Content[CurCell]]));
 					CurCell++;
 
-					var VMerge = CellInfo.Cell.Get_VMerge();
+					var VMerge = CellInfo.Cell.GetVMerge();
 					if (VMerge === vmerge_Restart)
 						bMergedRow = false;
 				}
@@ -8447,7 +8447,7 @@ CTable.prototype.MergeTableCells = function(isClearMerge)
 				{
 					var Cell = Row.Get_Cell(CellIndex);
 					Cell.Set_GridSpan(Grid_end - Grid_start + 1);
-					Cell.Set_VMerge(vmerge_Continue);
+					Cell.SetVMerge(vmerge_Continue);
 				}
 				else
 				{
@@ -8637,9 +8637,9 @@ CTable.prototype.SplitTableCells = function(Rows, Cols)
 						Cells_pos[Index] = {Row : Cell_pos.Row + Index, Cell : CurCell};
 
 						if (0 === Index % New_VMerge_Count)
-							TempCell.Set_VMerge(vmerge_Restart);
+							TempCell.SetVMerge(vmerge_Restart);
 						else
-							TempCell.Set_VMerge(vmerge_Continue);
+							TempCell.SetVMerge(vmerge_Continue);
 					}
 				}
 			}
@@ -8680,7 +8680,7 @@ CTable.prototype.SplitTableCells = function(Rows, Cols)
 					}
 					else
 					{
-						New_Cell.Set_VMerge(vmerge_Continue);
+						New_Cell.SetVMerge(vmerge_Continue);
 					}
 				}
 			}
@@ -8978,16 +8978,16 @@ CTable.prototype.AddTableRow = function(bBefore)
 			if (true === bBefore)
 			{
 				if (Cells_info[CurCell].VMerge_count_before > 1)
-					New_Cell.Set_VMerge(vmerge_Continue);
+					New_Cell.SetVMerge(vmerge_Continue);
 				else
-					New_Cell.Set_VMerge(vmerge_Restart);
+					New_Cell.SetVMerge(vmerge_Restart);
 			}
 			else
 			{
 				if (Cells_info[CurCell].VMerge_count_after > 1)
-					New_Cell.Set_VMerge(vmerge_Continue);
+					New_Cell.SetVMerge(vmerge_Continue);
 				else
-					New_Cell.Set_VMerge(vmerge_Restart);
+					New_Cell.SetVMerge(vmerge_Restart);
 			}
 		}
 	}
@@ -9012,7 +9012,7 @@ CTable.prototype.AddTableRow = function(bBefore)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			if (vmerge_Continue === Cell.Get_VMerge())
+			if (vmerge_Continue === Cell.GetVMerge())
 				continue;
 
 			this.Selection.Data.push({Row : StartRow + Index, Cell : CurCell});
@@ -9076,7 +9076,7 @@ CTable.prototype.RemoveTableRow = function(Ind)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 
 			if (vmerge_Continue != VMerge)
 				continue;
@@ -9085,7 +9085,7 @@ CTable.prototype.RemoveTableRow = function(Ind)
 			// Найдем строку, с которой начинается данное объединение.
 			var VMerge_count = this.Internal_GetVertMergeCount2(CurRow, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
 			if (CurRow - ( VMerge_count - 1 ) >= FirstRow_to_delete)
-				Cell.Set_VMerge(vmerge_Restart);
+				Cell.SetVMerge(vmerge_Restart);
 		}
 	}
 
@@ -9309,7 +9309,7 @@ CTable.prototype.RemoveTableColumn = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			if (vmerge_Continue != Cell.Get_VMerge())
+			if (vmerge_Continue != Cell.GetVMerge())
 			{
 				bRemove = false;
 				break;
@@ -9909,7 +9909,7 @@ CTable.prototype.Internal_GetCellByXY = function(X, Y, PageIndex)
 		{
 			var Cell     = Row.Get_Cell(CurCell);
 			var GridSpan = Cell.Get_GridSpan();
-			var Vmerge   = Cell.Get_VMerge();
+			var Vmerge   = Cell.GetVMerge();
 
 			// Обсчет такик ячеек произошел ранее
 			if (vmerge_Continue === Vmerge && Row_start != CurRow)
@@ -9970,7 +9970,7 @@ CTable.prototype.Internal_GetVertMergeCount = function(StartRow, StartGridCol, G
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -10014,7 +10014,7 @@ CTable.prototype.Internal_GetVertMergeCount2 = function(StartRow, StartGridCol, 
 		var Temp_Grid_start = Start_Row.Get_CellInfo(Index).StartGridCol;
 		if (Temp_Grid_start === StartGridCol)
 		{
-			Start_VMerge = Start_Row.Get_Cell(Index).Get_VMerge();
+			Start_VMerge = Start_Row.Get_Cell(Index).GetVMerge();
 			break;
 		}
 	}
@@ -10035,7 +10035,7 @@ CTable.prototype.Internal_GetVertMergeCount2 = function(StartRow, StartGridCol, 
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -10098,7 +10098,7 @@ CTable.prototype.Internal_Check_TableRows = function(bSaveHeight)
 		for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 
 			if (VMerge != vmerge_Continue)
 			{
@@ -10138,7 +10138,7 @@ CTable.prototype.Internal_Check_TableRows = function(bSaveHeight)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 			if (vmerge_Restart === VMerge)
 			{
 				var CurMinHeight = Cell.Content.Get_EmptyHeight();
@@ -10605,7 +10605,7 @@ CTable.prototype.Internal_Get_StartMergedCell = function(StartRow, StartGridCol,
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -10652,7 +10652,7 @@ CTable.prototype.Internal_Get_EndMergedCell = function(StartRow, StartGridCol, G
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan)
 			{
@@ -10707,7 +10707,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 		if (GridSpan !== Cell.Get_GridSpan())
 			break;
 
-		var Vmerge = Cell.Get_VMerge();
+		var Vmerge = Cell.GetVMerge();
 		if (vmerge_Continue !== Vmerge)
 			break;
 
@@ -10725,7 +10725,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 		if (GridSpan !== Cell.Get_GridSpan())
 			break;
 
-		var Vmerge = Cell.Get_VMerge();
+		var Vmerge = Cell.GetVMerge();
 		if (vmerge_Continue !== Vmerge)
 			break;
 
@@ -10747,6 +10747,7 @@ CTable.prototype.private_GetCellsPosArrayByCellsArray = function(CellsArray)
 };
 /**
  * Получаем левую верхнюю ячейку в текущем объединении
+ * @returns {CTableCell}
  */
 CTable.prototype.GetStartMergedCell = function(nCellIndex, nRowIndex)
 {
@@ -10759,6 +10760,28 @@ CTable.prototype.Internal_Get_StartMergedCell2 = function(CellIndex, RowIndex)
 	var CellInfo = Row.Get_CellInfo(CellIndex);
 
 	return this.Internal_Get_StartMergedCell(RowIndex, CellInfo.StartGridCol, Cell.Get_GridSpan());
+};
+/**
+ * Получаем количество ячеек (=количество строк) попавших в вертикальное объединения, начиная с заданной ячейки внизю
+ * @param nCellIndex номер ячейки в строке
+ * @param nRowIndex номер строки
+ * @returns {number}
+ */
+CTable.prototype.GetVMergeCount = function(nCellIndex, nRowIndex)
+{
+	var oRow = this.GetRow(nRowIndex);
+	if (!oRow)
+		return 1;
+
+	var oCell = oRow.GetCell(nCellIndex);
+	if (!oCell)
+		return 1;
+
+	var oCellInfo = oRow.GetCellInfo(nCellIndex);
+	if (!oCellInfo)
+		return 1;
+
+	return this.Internal_GetVertMergeCount(nRowIndex, oCellInfo.StartGridCol, oCell.GetGridSpan());
 };
 /**
  * Получаем номер ячейки в заданной строке по заданной колонке.
@@ -10967,7 +10990,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 			{
 				var Cell     = Row.Get_Cell(CurCell);
 				var GridSpan = Cell.Get_GridSpan();
-				var Vmerge   = Cell.Get_VMerge();
+				var Vmerge   = Cell.GetVMerge();
 
 				// Обсчет такик ячеек произошел ранее
 				if (vmerge_Continue === Vmerge)
@@ -11006,7 +11029,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 				{
 					var Cell     = Row.Get_Cell(CurCell);
 					var GridSpan = Cell.Get_GridSpan();
-					var Vmerge   = Cell.Get_VMerge();
+					var Vmerge   = Cell.GetVMerge();
 
 					// Обсчет такик ячеек произошел ранее
 					if (vmerge_Continue === Vmerge)
@@ -11050,7 +11073,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell   = Row.Get_Cell(CurCell);
-				var Vmerge = Cell.Get_VMerge();
+				var Vmerge = Cell.GetVMerge();
 
 				if (vmerge_Continue === Vmerge)
 					continue;
@@ -11136,7 +11159,7 @@ CTable.prototype.Internal_Get_SelectionArray = function()
 			for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
 			{
 				var Cell   = Row.Get_Cell(CurCell);
-				var Vmerge = Cell.Get_VMerge();
+				var Vmerge = Cell.GetVMerge();
 
 				if (vmerge_Continue === Vmerge)
 					continue;
@@ -11563,7 +11586,7 @@ CTable.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 
     var Cell = this.Get_Row(CurRow).Get_Cell(CurCell);
 
-    while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+    while (null != Cell && vmerge_Restart != Cell.GetVMerge())
         Cell = this.private_GetPrevCell(CurRow, CurCell);
 
     Cell.Content.GetRevisionsChangeParagraph(SearchEngine);
@@ -11572,13 +11595,13 @@ CTable.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
         if (SearchEngine.Get_Direction() > 0)
         {
             Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
-            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+            while (null != Cell && vmerge_Restart != Cell.GetVMerge())
                 Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
         }
         else
         {
             Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
-            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+            while (null != Cell && vmerge_Restart != Cell.GetVMerge())
                 Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
         }
 
@@ -12089,7 +12112,7 @@ CTable.prototype.private_CorrectVerticalMerge = function()
 		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
 		{
 			var oCell       = oRow.Get_Cell(nCurCell);
-			var nVMergeType = oCell.Get_VMerge();
+			var nVMergeType = oCell.GetVMerge();
 			var nGridSpan   = oCell.Get_GridSpan();
 
 			if (vmerge_Continue === nVMergeType)
@@ -12119,7 +12142,7 @@ CTable.prototype.private_CorrectVerticalMerge = function()
 				}
 
 				if (true === bNeedReset)
-					oCell.Set_VMerge(vmerge_Restart);
+					oCell.SetVMerge(vmerge_Restart);
 			}
 
 			nGridCol += nGridSpan;
@@ -13187,6 +13210,23 @@ CTable.prototype.DistributeRows = function()
 			arrRows[arrSelectedCells[nIndex].Row] = true;
 			nRowsCount++;
 		}
+
+		var oCell = this.GetStartMergedCell(arrSelectedCells[nIndex].Cell, arrSelectedCells[nIndex].Row);
+		if (oCell)
+		{
+			var nVMergeCount = this.GetVMergeCount(oCell.Index, oCell.Row.Index);
+			if (nVMergeCount > 1)
+			{
+				for (var nCurRow = oCell.Row.Index; nCurRow < oCell.Row.Index + nVMergeCount - 1; ++nCurRow)
+				{
+					if (true !== arrRows[nCurRow])
+					{
+						arrRows[nCurRow] = true;
+						nRowsCount++;
+					}
+				}
+			}
+		}
 	}
 
 	if (nRowsCount <= 0)
@@ -13202,12 +13242,47 @@ CTable.prototype.DistributeRows = function()
 		nSumH += nRowSummaryH;
 	}
 
+	var nNewValueH = nSumH / nRowsCount;
 	var nCellSpacing = this.GetRow(0).GetCellSpacing();
 	for (var nCurRow in arrRows)
 	{
+		nCurRow = parseInt(nCurRow);
+
+		var oRow = this.GetRow(nCurRow);
+
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.GetCell(nCurCell);
+			if (vmerge_Restart !== oCell.GetVMerge())
+				continue;
+
+			var nVMergeCount = this.GetVMergeCount(nCurCell, nCurRow);
+
+			var nNewH = nNewValueH;
+
+			if (null !== nCellSpacing)
+				nNewH += nCellSpacing;
+			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+				nNewH -= this.RowsInfo[nCurRow].TopDy[0];
+
+			var nTopMargin = oRow.GetTopMargin();
+			var nBotMargin = this.GetRow(nCurRow + nVMergeCount - 1).GetBottomMargin();
+
+			nNewH -= nTopMargin + nBotMargin;
+
+			var nContentH = oCell.GetContent().GetSummaryHeight();
+			if (nNewH * nVMergeCount < nContentH)
+				nNewValueH += (nContentH / nVMergeCount - nNewH);
+		}
+	}
+
+	for (var nCurRow in arrRows)
+	{
+		nCurRow = parseInt(nCurRow);
+
 		var oRow  = this.GetRow(nCurRow);
 		var oRowH = oRow.GetHeight();
-		var nNewH = nSumH / nRowsCount;
+		var nNewH = nNewValueH;
 
 		if (null !== nCellSpacing)
 			nNewH += nCellSpacing;

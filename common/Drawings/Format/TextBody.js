@@ -504,12 +504,12 @@ CTextBody.prototype =
 
     getSummaryHeight: function()
     {
-        return this.content.Get_SummaryHeight();
+        return this.content.GetSummaryHeight();
     },
 
     getSummaryHeight2: function()
     {
-        return this.content2 ? this.content2.Get_SummaryHeight() : 0;
+        return this.content2 ? this.content2.GetSummaryHeight() : 0;
     },
 
     getCompiledBodyPr: function()
@@ -537,7 +537,7 @@ CTextBody.prototype =
                 if(graphics.IsNoSupportTextDraw)
                 {
                     var _w2 = this.content2.XLimit;
-                    var _h2 = this.content2.Get_SummaryHeight();
+                    var _h2 = this.content2.GetSummaryHeight();
                     graphics.rect(this.content2.X, this.content2.Y, _w2, _h2);
                 }
 
@@ -550,7 +550,7 @@ CTextBody.prototype =
             if(graphics.IsNoSupportTextDraw)
             {
                 var _w = this.content.XLimit;
-                var _h = this.content.Get_SummaryHeight();
+                var _h = this.content.GetSummaryHeight();
                 graphics.rect(this.content.X, this.content.Y, _w, _h);
             }
             var old_start_page = this.content.StartPage;
@@ -638,7 +638,7 @@ CTextBody.prototype =
         //TODO: потом переделать
         this.content.Reset(0, 0, 20000, 20000);//выставляем большую ширину чтобы текст расчитался в одну строку.
         this.content.Recalculate_Page(0, true);
-        return {w: this.content.Content[0].Lines[0].Ranges[0].W+0.1, h: this.content.Get_SummaryHeight()+0.1};
+        return {w: this.content.Content[0].Lines[0].Ranges[0].W+0.1, h: this.content.GetSummaryHeight()+0.1};
     },
 
     recalculateByMaxWord: function()
@@ -649,7 +649,7 @@ CTextBody.prototype =
         this.content.Set_ApplyToAll(false);
         this.content.Reset(0, 0,max_content, 20000);
         this.content.Recalculate_Page(0, true);
-        return {w: max_content, h: this.content.Get_SummaryHeight()};
+        return {w: max_content, h: this.content.GetSummaryHeight()};
     },
 
     Get_FirstParagraphNextCell: function(){

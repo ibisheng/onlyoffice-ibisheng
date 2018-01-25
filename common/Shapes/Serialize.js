@@ -6639,7 +6639,7 @@ function BinaryPPTYLoader()
                     var rowSpan = s.GetULong();
                     if (1 < rowSpan)
                     {
-                        cell.Set_VMerge(vmerge_Restart);
+                        cell.SetVMerge(vmerge_Restart);
                     }
                     break;
                 }
@@ -6663,7 +6663,7 @@ function BinaryPPTYLoader()
                     var bIsVMerge = s.GetBool();
                     if (bIsVMerge && cell.Pr.VMerge != vmerge_Restart)
                     {
-                        cell.Set_VMerge(vmerge_Continue);
+                        cell.SetVMerge(vmerge_Continue);
                     }
                     break;
                 }

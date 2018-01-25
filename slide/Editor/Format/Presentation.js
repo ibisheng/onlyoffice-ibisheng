@@ -5057,7 +5057,7 @@ CPresentation.prototype =
 
                                             oDocContentForDraw.Reset(0, 0, dMaxWidth, 20000);
                                             oDocContentForDraw.Recalculate_Page(0, true);
-                                            dContentHeight = oDocContentForDraw.Get_SummaryHeight();
+                                            dContentHeight = oDocContentForDraw.GetSummaryHeight();
 
                                             var oTextWarpObject = null;
                                             if(oDocContentForDraw.Parent && oDocContentForDraw.Parent.parent && oDocContentForDraw.Parent.parent instanceof AscFormat.CShape){
@@ -5236,7 +5236,7 @@ CPresentation.prototype =
         oDocContent.MoveDrawing = old_val;
         var body_pr = shape.getBodyPr();
         var w = shape.txBody.getMaxContentWidth(this.Width/2, true) + body_pr.lIns + body_pr.rIns;
-        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        var h = shape.txBody.content.GetSummaryHeight() + body_pr.tIns + body_pr.bIns;
         shape.spPr.xfrm.setExtX(w);
         shape.spPr.xfrm.setExtY(h);
         shape.spPr.xfrm.setOffX((this.Width - w) / 2);

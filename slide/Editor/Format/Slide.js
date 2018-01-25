@@ -1041,7 +1041,7 @@ Slide.prototype =
 
         var oDocContent = this.notesShape.getDocContent();
         if(oDocContent){
-            return oDocContent.Get_SummaryHeight();
+            return oDocContent.GetSummaryHeight();
         }
         return 0;
     },
@@ -1138,7 +1138,7 @@ Slide.prototype =
                     g.transform3(this.notesShape.transformText);
                     var Width = this.notesShape.txBody.content.XLimit - 2;
                     Width = Math.max(Width, 1);
-                    var Height = this.notesShape.txBody.content.Get_SummaryHeight();
+                    var Height = this.notesShape.txBody.content.GetSummaryHeight();
                     g.DrawLockObjectRect(oLock.Get_Type(), 0, 0, Width, Height);
                 }
             }

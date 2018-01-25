@@ -46,7 +46,7 @@
 	CDrawingDocContent.prototype = Object.create(CDocumentContent.prototype);
 	CDrawingDocContent.prototype.constructor = CDrawingDocContent;
 
-    CDrawingDocContent.prototype.Get_SummaryHeight = function(){
+    CDrawingDocContent.prototype.GetSummaryHeight = function(){
         var fSummHeight = 0;
         var nColumnsCount = this.Get_ColumnsCount();
         for(var i = 0; i < this.Pages.length; ++i){
@@ -133,7 +133,7 @@
         else{
             this.Start_Recalculate(fWidth, fHeight);
             if(this.Pages.length > 1){
-                var fSummaryHeight = this.Get_SummaryHeight();
+                var fSummaryHeight = this.GetSummaryHeight();
 
                 var fLow = fHeight, fHigh = fSummaryHeight;
                 this.Start_Recalculate(fWidth, fHigh);

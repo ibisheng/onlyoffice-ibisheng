@@ -887,7 +887,7 @@ CopyProcessor.prototype =
         for(var i in elems.cells)
         {
             var cell = row.Content[i];
-			if(vmerge_Continue !== cell.Get_VMerge())
+			if(vmerge_Continue !== cell.GetVMerge())
 			{
 				var StartGridCol = cell.Metrics.StartGridCol;
 				var GridSpan = cell.Get_GridSpan();
@@ -1613,7 +1613,7 @@ CopyProcessor.prototype =
                     for(var j = elem.indexStart - 1; j >= 0; --j)
                     {
                         var cellCur = row.Get_Cell(j);
-                        if(vmerge_Continue === cellCur.Get_VMerge())
+                        if(vmerge_Continue === cellCur.GetVMerge())
                         {
                             var nCurGridCol = cellCur.Metrics.StartGridCol;
                             if(nCurGridCol >= nPrevStartGrid)
@@ -1633,7 +1633,7 @@ CopyProcessor.prototype =
                     for(var j = elem.indexEnd + 1; j < row.Get_CellsCount(); ++j)
                     {
                         var cellCur = row.Get_Cell(j);
-                        if(vmerge_Continue === cellCur.Get_VMerge())
+                        if(vmerge_Continue === cellCur.GetVMerge())
                         {
                             var nCurGridCol = cellCur.Metrics.StartGridCol + cellCur.Get_GridSpan() - 1;
                             if(nCurGridCol <= nPrevEndGrid)
@@ -4384,7 +4384,7 @@ PasteProcessor.prototype =
 				}
 				
 				var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
-				var h = shape.txBody.content.Get_SummaryHeight();
+				var h = shape.txBody.content.GetSummaryHeight();
 				AscFormat.CheckSpPrXfrm(shape);
 				shape.spPr.xfrm.setExtX(w);
 				shape.spPr.xfrm.setExtY(h);
@@ -4424,7 +4424,7 @@ PasteProcessor.prototype =
 			   
 				//TODO передалать высоту/ширину!
 				//var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
-				//var h = shape.txBody.content.Get_SummaryHeight();
+				//var h = shape.txBody.content.GetSummaryHeight();
 				var w = 100;
 				var h = 100;
 				AscFormat.CheckSpPrXfrm(shape);
@@ -5046,11 +5046,11 @@ PasteProcessor.prototype =
 				{
 					if(isMergedCell.r1 === i + activeRange.r1)
 					{
-						oCurCell.Set_VMerge(vmerge_Restart);
+						oCurCell.SetVMerge(vmerge_Restart);
 					}
 					else
 					{
-						oCurCell.Set_VMerge(vmerge_Continue);
+						oCurCell.SetVMerge(vmerge_Continue);
 					}
 				}
 				
@@ -7531,7 +7531,7 @@ PasteProcessor.prototype =
             while(null != spans)
             {
 				var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
-				oCurCell.Set_VMerge(vmerge_Continue);
+				oCurCell.SetVMerge(vmerge_Continue);
                 if(spans.col > 1)
                     oCurCell.Set_GridSpan(spans.col);
                 spans.row--;
@@ -8724,7 +8724,7 @@ PasteProcessor.prototype =
             while(null != spans)
             {
                 var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
-                oCurCell.Set_VMerge(vmerge_Continue);
+                oCurCell.SetVMerge(vmerge_Continue);
                 if(spans.col > 1)
                     oCurCell.Set_GridSpan(spans.col);
                 spans.row--;

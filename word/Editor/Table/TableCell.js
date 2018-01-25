@@ -1027,7 +1027,7 @@ CTableCell.prototype =
         if ( true === bClearMerge )
         {
             this.Set_GridSpan( undefined );
-            this.Set_VMerge( undefined );
+            this.SetVMerge( undefined );
         }
     },
 
@@ -1067,7 +1067,7 @@ CTableCell.prototype =
         if ( true != bCopyOnlyVisualProps )
         {
             // VMerge
-            this.Set_VMerge(OtherPr.VMerge);
+            this.SetVMerge(OtherPr.VMerge);
         }
 
         // Border Top
@@ -1342,22 +1342,6 @@ CTableCell.prototype =
 			this.Pr.Shd = _Shd;
 			this.Recalc_CompiledPr();
 		}
-	},
-
-    Get_VMerge : function()
-    {
-        var VMerge = this.Get_CompiledPr(false).VMerge;
-        return VMerge;
-    },
-
-	Set_VMerge : function(Value)
-	{
-		if (Value === this.Pr.VMerge)
-			return;
-
-		History.Add(new CChangesTableCellVMerge(this, this.Pr.VMerge, Value));
-		this.Pr.VMerge = Value;
-		this.Recalc_CompiledPr();
 	},
 
     Get_VAlign : function()
@@ -1794,6 +1778,15 @@ CTableCell.prototype =
     {
     }
 };
+/**
+ * Доступ к содержимому ячейки
+ * @returns {CDocumentContent}
+ */
+CTableCell.prototype.GetContent = function()
+{
+	return this.Content;
+};
+
 CTableCell.prototype.private_TransformXY = function(X, Y)
 {
 	// TODO: Везде, где идет такой код заменить на данную функцию
@@ -1950,7 +1943,27 @@ CTableCell.prototype.SetW = function(oCellW)
 {
 	return this.Set_W(oCellW);
 };
+/**
+ * Участвует ли в вертикальном объединении данная ячейка
+ * @returns {vmerge_Restart | vmerge_Continue}
+ */
+CTableCell.prototype.GetVMerge = function()
+{
+	return this.Get_CompiledPr(false).VMerge;
+};
+/**
+ * Задаем настройку участия данной ячейки в вертикальном объединении
+ * @param {vmerge_Restart | vmerge_Continue} nType
+ */
+CTableCell.prototype.SetVMerge = function(nType)
+{
+	if (nType === this.Pr.VMerge)
+		return;
 
+	History.Add(new CChangesTableCellVMerge(this, this.Pr.VMerge, nType));
+	this.Pr.VMerge = nType;
+	this.Recalc_CompiledPr();
+};
 
 function CTableCellRecalculateObject()
 {

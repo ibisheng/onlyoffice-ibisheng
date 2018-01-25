@@ -1439,7 +1439,7 @@ CDocumentContent.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
 };
-CDocumentContent.prototype.Get_SummaryHeight = function()
+CDocumentContent.prototype.GetSummaryHeight = function()
 {
 	var Height = 0;
 	for (var Page = 0; Page < this.Get_PagesCount(); Page++)
@@ -8771,8 +8771,8 @@ CDocumentRecalculateObject.prototype =
             Doc.Content[Index].LoadRecalculateObject( this.Content[Index] );
         }
     },
-    
-    Get_SummaryHeight : function()
+
+	GetSummaryHeight : function()
     {
         var Height = 0;
         var PagesCount = this.Pages.length;
