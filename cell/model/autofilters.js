@@ -1053,29 +1053,45 @@
 				var cloneData;
 				
 				if(!undoData)
+				{
 					return;
+				}
 				
-				if (undoData.clone) {
+				if (undoData.clone)
+				{
 					cloneData = undoData.clone(null);
-				} else
+				}
+				else
+				{
 					cloneData = undoData;
+				}
 					
 				if(!cloneData)
+				{
 					return;
+				}
+
 				if(cloneData.insCells)
+				{
 					delete cloneData.insCells;
+				}
 
 				//TODO переделать undo, по типам
+				//TODO избавиться от добавления в историю целиком объекта фильтра/таблицы
+				//ниже в комментариях написал то, что ипользуется для undo в различных функциях
 				if(type === AscCH.historyitem_AutoFilter_ChangeColumnName || type === AscCH.historyitem_AutoFilter_ChangeTotalRow)//перемещение
 				{
+					//ипользуется объект c полями val, formula, nCol, nRow(undoData)
 					this.renameTableColumn(null, null, undoData);
 				}
 				else if(type === AscCH.historyitem_AutoFilter_Move)//перемещение
 				{
+					//ипользуется moveFrom, moveTo + FilterColumns(data)
 					this._moveAutoFilters(null, null, data);
 				}
 				else if(type === AscCH.historyitem_AutoFilter_Empty)//было удаление, на undo добавляем
 				{
+					//ипользуется целиком объект фильтра/фт(cloneData)
 					if(cloneData.TableStyleInfo)
 					{
 						worksheet.addTablePart(cloneData ,true);
@@ -1086,6 +1102,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_Change || type === AscCH.historyitem_AutoFilter_ChangeTableInfo || type === AscCH.historyitem_AutoFilter_ChangeTableRef)
 				{
+					//ипользуется целиком объект фильтра/фт(cloneData)
 					if(worksheet.AutoFilter && (cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref) || (cloneData.oldFilter && cloneData.oldFilter.isAutoFilter())))
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
 					else if(worksheet.TableParts)
@@ -1115,6 +1132,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_ChangeTableName)
 				{
+					//ипользуется целиком объект фт(cloneData)
 					var oldName = cloneData.newDisplayName;
 					
 					for(var l = 0; l < worksheet.TableParts.length; l++)
@@ -1128,8 +1146,11 @@
 				}
 				else if((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter)//сортировка
 				{
+					//ипользуется целиком объект фт(cloneData)
 					if(worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter())
+					{
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
+					}
 					else if(worksheet.TableParts)
 					{
 						for(var l = 0; l < worksheet.TableParts.length; l++)
@@ -1144,6 +1165,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_CleanFormat)
 				{
+					//ипользуется целиком объект фт(cloneData)
 					if(worksheet.TableParts && cloneData && cloneData.Ref)
 					{
 						for(var l = 0; l < worksheet.TableParts.length; l++)
@@ -1159,8 +1181,9 @@
 						}
 					}
 				}
-				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart)))//add
+				else if(type === AscCH.historyitem_AutoFilter_ApplyMF || type === AscCH.historyitem_AutoFilter_ApplyDF)//apply
 				{
+					//ипользуется целиком объект фильтра/фт(cloneData)
 					if(cloneData.Ref)
 					{
 						var isEn = false;
@@ -1179,15 +1202,17 @@
 								{
 									worksheet.changeTablePart(l, cloneData, false);
 									if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
+									{
 										this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, worksheet.TableParts[l]);
+									}
 									else
+									{
 										this._reDrawCurrentFilter(null, worksheet.TableParts[l]);
+									}
 									isEn = true;
 
-									
 									//перерисовываем фильтры, находящиеся на одном уровне с данным фильтром
 									this._resetTablePartStyle(worksheet.TableParts[l].Ref);
-									
 									break;
 								}	
 							}
@@ -1210,8 +1235,9 @@
 						this.worksheet.handlers.trigger('onFilterInfo');
 					}
 				}
-				else if(cloneData.Ref) //удаление таблиц / автофильтров
+				else if(type === AscCH.historyitem_AutoFilter_Add) //удаление таблиц / автофильтров
 				{
+					//используется только Ref
 					if(worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref))
 						worksheet.AutoFilter = null;
 					else if(worksheet.TableParts)
