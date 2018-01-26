@@ -12428,8 +12428,8 @@
 				{
 					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell.clone();
-					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
-					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true, true, true);
+					var activeRange = selectionRange.getLast();
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeRange, true, true, true);
 
 					var bIgnoreFirstRow = window['AscCommonExcel'].ignoreFirstRowSort(t.model, expandRange);
 					if(bIgnoreFirstRow)
