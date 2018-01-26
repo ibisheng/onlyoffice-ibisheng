@@ -5218,59 +5218,65 @@ RangeDataManager.prototype = {
 		return this.sqref ? this.sqref.intersectionSimple(range) : false;
 	};
 
-// For Auto Filters
-/** @constructor */
-function TablePart(handlers) {
-	this.Ref = null;
-	this.HeaderRowCount = null;
-	this.TotalsRowCount = null;
-	this.DisplayName = null;
-	this.AutoFilter = null;
-	this.SortState = null;
-	this.TableColumns = null;
-	this.TableStyleInfo = null;
-	
-	this.altText = null;
-	this.altTextSummary = null;
-	
-	this.result = null;
-	this.handlers = handlers;
-}
-TablePart.prototype.clone = function() {
-	var i, res = new TablePart(this.handlers);
-	res.Ref = this.Ref ? this.Ref.clone() : null;
-	res.HeaderRowCount = this.HeaderRowCount;
-	res.TotalsRowCount = this.TotalsRowCount;
-	if (this.AutoFilter)
-		res.AutoFilter = this.AutoFilter.clone();
-	if (this.SortState)
-		res.SortState = this.SortState.clone();
-	if (this.TableColumns) {
-		res.TableColumns = [];
-		for (i = 0; i < this.TableColumns.length; ++i)
-			res.TableColumns.push(this.TableColumns[i].clone());
+	// For Auto Filters
+	/** @constructor */
+	function TablePart(handlers) {
+		this.Ref = null;
+		this.HeaderRowCount = null;
+		this.TotalsRowCount = null;
+		this.DisplayName = null;
+		this.AutoFilter = null;
+		this.SortState = null;
+		this.TableColumns = null;
+		this.TableStyleInfo = null;
+
+		this.altText = null;
+		this.altTextSummary = null;
+
+		this.result = null;
+		this.handlers = handlers;
 	}
-	if (this.TableStyleInfo)
-		res.TableStyleInfo = this.TableStyleInfo.clone();
-	
-	if (this.result) {
-		res.result = [];
-		for (i = 0; i < this.result.length; ++i)
-			res.result.push(this.result[i].clone());
-	}
-	res.DisplayName = this.DisplayName;
-	
-	res.altText = this.altText;
-	res.altTextSummary = this.altTextSummary;
-	
-	return res;
-};
-	TablePart.prototype.renameSheetCopy = function(ws, renameParams) {
+
+	TablePart.prototype.clone = function () {
+		var i, res = new TablePart(this.handlers);
+		res.Ref = this.Ref ? this.Ref.clone() : null;
+		res.HeaderRowCount = this.HeaderRowCount;
+		res.TotalsRowCount = this.TotalsRowCount;
+		if (this.AutoFilter) {
+			res.AutoFilter = this.AutoFilter.clone();
+		}
+		if (this.SortState) {
+			res.SortState = this.SortState.clone();
+		}
+		if (this.TableColumns) {
+			res.TableColumns = [];
+			for (i = 0; i < this.TableColumns.length; ++i) {
+				res.TableColumns.push(this.TableColumns[i].clone());
+			}
+		}
+		if (this.TableStyleInfo) {
+			res.TableStyleInfo = this.TableStyleInfo.clone();
+		}
+
+		if (this.result) {
+			res.result = [];
+			for (i = 0; i < this.result.length; ++i) {
+				res.result.push(this.result[i].clone());
+			}
+		}
+		res.DisplayName = this.DisplayName;
+
+		res.altText = this.altText;
+		res.altTextSummary = this.altTextSummary;
+
+		return res;
+	};
+	TablePart.prototype.renameSheetCopy = function (ws, renameParams) {
 		for (var i = 0; i < this.TableColumns.length; ++i) {
 			this.TableColumns[i].renameSheetCopy(ws, renameParams);
 		}
 	};
-	TablePart.prototype.removeDependencies = function(opt_cols) {
+	TablePart.prototype.removeDependencies = function (opt_cols) {
 		if (!opt_cols) {
 			opt_cols = this.TableColumns;
 		}
@@ -5278,985 +5284,893 @@ TablePart.prototype.clone = function() {
 			opt_cols[i].removeDependencies();
 		}
 	};
-	TablePart.prototype.buildDependencies = function() {
+	TablePart.prototype.buildDependencies = function () {
 		for (var i = 0; i < this.TableColumns.length; ++i) {
 			this.TableColumns[i].buildDependencies();
 		}
 	};
-	TablePart.prototype.getAllFormulas = function(formulas) {
+	TablePart.prototype.getAllFormulas = function (formulas) {
 		for (var i = 0; i < this.TableColumns.length; ++i) {
 			this.TableColumns[i].getAllFormulas(formulas);
 		}
 	};
-TablePart.prototype.moveRef = function(col, row) {
-	var ref = this.Ref.clone();
-	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	TablePart.prototype.moveRef = function (col, row) {
+		var ref = this.Ref.clone();
+		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 
-	this.Ref = ref;
-	//event
-	this.handlers.trigger("changeRefTablePart", this);
+		this.Ref = ref;
+		//event
+		this.handlers.trigger("changeRefTablePart", this);
 
-	if(this.AutoFilter)
-	{
-		this.AutoFilter.moveRef(col, row);
-	}	
-	if(this.SortState)
-	{
-		this.SortState.moveRef(col, row);
-	}
-};
-TablePart.prototype.changeRef = function(col, row, bIsFirst, bIsNotChangeAutoFilter) {
-	var ref = this.Ref.clone();
-	if(bIsFirst)
-		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
-		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
-	this.Ref = ref;
-	
-	//event
-	this.handlers.trigger("changeRefTablePart", this);
-	
-	if(this.AutoFilter && !bIsNotChangeAutoFilter)
-	{
-		this.AutoFilter.changeRef(col, row, bIsFirst);
-	}
-	if(this.SortState)
-	{
-		this.SortState.changeRef(col, row, bIsFirst);
-	}
-};
-TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewTableColumns) {
-	if(!range)
-		return;
-	
-	//add table columns
-	if(generateNewTableColumns)
-	{
-		var newTableColumns = [];
-		var intersectionRanges = this.Ref.intersection(range);
-		
-		if(null !== intersectionRanges)
-		{
-			this.removeDependencies();
-			var tableColumn;
-			var headerRow = this.isHeaderRow() ? this.Ref.r1 : this.Ref.r1 - 1;
-			for(var i = range.c1; i <= range.c2; i++)
-			{
-				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
-				{
-					var tableIndex = i - this.Ref.c1;
-					tableColumn = this.TableColumns[tableIndex];
+		if (this.AutoFilter) {
+			this.AutoFilter.moveRef(col, row);
+		}
+		if (this.SortState) {
+			this.SortState.moveRef(col, row);
+		}
+	};
+	TablePart.prototype.changeRef = function (col, row, bIsFirst, bIsNotChangeAutoFilter) {
+		var ref = this.Ref.clone();
+		if (bIsFirst) {
+			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		} else {
+			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
+
+		this.Ref = ref;
+
+		//event
+		this.handlers.trigger("changeRefTablePart", this);
+
+		if (this.AutoFilter && !bIsNotChangeAutoFilter) {
+			this.AutoFilter.changeRef(col, row, bIsFirst);
+		}
+		if (this.SortState) {
+			this.SortState.changeRef(col, row, bIsFirst);
+		}
+	};
+	TablePart.prototype.changeRefOnRange = function (range, autoFilters, generateNewTableColumns) {
+		if (!range) {
+			return;
+		}
+
+		//add table columns
+		if (generateNewTableColumns) {
+			var newTableColumns = [];
+			var intersectionRanges = this.Ref.intersection(range);
+
+			if (null !== intersectionRanges) {
+				this.removeDependencies();
+				var tableColumn;
+				var headerRow = this.isHeaderRow() ? this.Ref.r1 : this.Ref.r1 - 1;
+				for (var i = range.c1; i <= range.c2; i++) {
+					if (i >= intersectionRanges.c1 && i <= intersectionRanges.c2) {
+						var tableIndex = i - this.Ref.c1;
+						tableColumn = this.TableColumns[tableIndex];
+					} else {
+						tableColumn = new TableColumn();
+						var cell = autoFilters.worksheet.getCell3(headerRow, i);
+						if (!cell.isNullText()) {
+							tableColumn.Name =
+								autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns),
+									cell.getValueWithoutFormat());
+						}
+					}
+
+					newTableColumns.push(tableColumn);
 				}
-				else
-				{
-					tableColumn = new TableColumn();
-					var cell = autoFilters.worksheet.getCell3(headerRow, i);
-					if(!cell.isNullText())
-					{
-						tableColumn.Name = autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns), cell.getValueWithoutFormat());
+
+				for (var j = 0; j < newTableColumns.length; j++) {
+					tableColumn = newTableColumns[j];
+					if (tableColumn.Name === null) {
+						tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 					}
 				}
-				
-				newTableColumns.push(tableColumn);
+
+				this.TableColumns = newTableColumns;
+				this.buildDependencies();
 			}
-			
-			for(var j = 0; j < newTableColumns.length; j++)
-			{
-				tableColumn = newTableColumns[j];
-				if(tableColumn.Name === null)
-					tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
-			}
-			
-			this.TableColumns = newTableColumns;
-			this.buildDependencies();
 		}
-	}
-	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
-	//event
-	this.handlers.trigger("changeRefTablePart", this);
-	
-	if(this.AutoFilter)
-		this.AutoFilter.changeRefOnRange(range);
-};
-TablePart.prototype.isApplyAutoFilter = function() {
-	var res = false;
-	
-	if(this.AutoFilter)
-		res = this.AutoFilter.isApplyAutoFilter();
-		
-	return res;
-};
-TablePart.prototype.isApplySortConditions = function() {
-	var res = false;
-	
-	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
-		res = true;
-		
-	return res;
-};
+		this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+		//event
+		this.handlers.trigger("changeRefTablePart", this);
 
-TablePart.prototype.setHandlers = function(handlers) {
-	if(this.handlers === null)
-		this.handlers = handlers;
-};
-
-TablePart.prototype.deleteTableColumns = function(activeRange)
-{
-	if(!activeRange)
-		return;
-	
-	var diff = null, startCol;
-	if(activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
-	{
-		diff = activeRange.c2 - this.Ref.c1 + 1;
-		startCol = 0;
-	}
-	else if(activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
-	{
-		diff = this.Ref.c2 - activeRange.c1 + 1;
-		startCol = activeRange.c1 - this.Ref.c1;
-	}
-	else if(activeRange.c1 >= this.Ref.c1 && activeRange.c2 <= this.Ref.c2)//inside
-	{
-		diff = activeRange.c2 - activeRange.c1 + 1;
-		startCol = activeRange.c1 - this.Ref.c1;
-	}
-
-	if (diff !== null) {
-		var deleted = this.TableColumns.splice(startCol, diff);
-		this.removeDependencies(deleted);
-
-		//todo undo
-		var deletedMap = {};
-		for (var i = 0; i < deleted.length; ++i) {
-			deletedMap[deleted[i].Name] = 1;
+		if (this.AutoFilter) {
+			this.AutoFilter.changeRefOnRange(range);
 		}
-		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
-		
-		if(this.SortState) 
+	};
+	TablePart.prototype.isApplyAutoFilter = function () {
+		var res = false;
+
+		if (this.AutoFilter) {
+			res = this.AutoFilter.isApplyAutoFilter();
+		}
+
+		return res;
+	};
+	TablePart.prototype.isApplySortConditions = function () {
+		var res = false;
+
+		if (this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0]) {
+			res = true;
+		}
+
+		return res;
+	};
+
+	TablePart.prototype.setHandlers = function (handlers) {
+		if (this.handlers === null) {
+			this.handlers = handlers;
+		}
+	};
+
+	TablePart.prototype.deleteTableColumns = function (activeRange) {
+		if (!activeRange) {
+			return;
+		}
+
+		var diff = null, startCol;
+		if (activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
 		{
+			diff = activeRange.c2 - this.Ref.c1 + 1;
+			startCol = 0;
+		} else if (activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
+		{
+			diff = this.Ref.c2 - activeRange.c1 + 1;
+			startCol = activeRange.c1 - this.Ref.c1;
+		} else if (activeRange.c1 >= this.Ref.c1 && activeRange.c2 <= this.Ref.c2)//inside
+		{
+			diff = activeRange.c2 - activeRange.c1 + 1;
+			startCol = activeRange.c1 - this.Ref.c1;
+		}
+
+		if (diff !== null) {
+			var deleted = this.TableColumns.splice(startCol, diff);
+			this.removeDependencies(deleted);
+
+			//todo undo
+			var deletedMap = {};
+			for (var i = 0; i < deleted.length; ++i) {
+				deletedMap[deleted[i].Name] = 1;
+			}
+			this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
+
+			if (this.SortState) {
+				var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
+				if (bIsDeleteSortState) {
+					this.SortState = null;
+				}
+			}
+		}
+
+	};
+
+	TablePart.prototype.addTableColumns = function (activeRange, autoFilters) {
+		var newTableColumns = [], num = 0;
+		this.removeDependencies();
+		for (var j = 0; j < this.TableColumns.length;) {
+			var curCol = num + this.Ref.c1;
+			if (activeRange.c1 <= curCol && activeRange.c2 >= curCol) {
+				newTableColumns[newTableColumns.length] = new TableColumn();
+			} else {
+				newTableColumns[newTableColumns.length] = this.TableColumns[j];
+				j++
+			}
+
+			num++;
+		}
+
+		for (var j = 0; j < newTableColumns.length; j++) {
+			var tableColumn = newTableColumns[j];
+			if (tableColumn.Name === null) {
+				tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
+			}
+		}
+
+		this.TableColumns = newTableColumns;
+
+		/*if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+		 {
+		 var SortConditions = this.SortState.SortConditions[0];
+		 if(activeRange.c1 <= SortConditions.Ref.c1)
+		 {
+		 var offset = activeRange.c2 - activeRange.c1 + 1;
+		 SortConditions.Ref.c1 += offset;
+		 SortConditions.Ref.c2 += offset;
+		 }
+		 }*/
+
+		if (this.SortState) {
+			this.SortState.changeColumns(activeRange);
+		}
+
+		this.buildDependencies();
+	};
+
+	TablePart.prototype.addTableLastColumn = function (activeRange, autoFilters, isAddLastColumn) {
+		this.removeDependencies();
+		var newTableColumns = this.TableColumns;
+		newTableColumns.push(new TableColumn());
+		newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
+
+		this.TableColumns = newTableColumns;
+		this.buildDependencies();
+	};
+
+	TablePart.prototype.isAutoFilter = function () {
+		return false;
+	};
+
+	TablePart.prototype.getAutoFilter = function () {
+		return this.AutoFilter;
+	};
+
+	TablePart.prototype.getTableRangeForFormula = function (objectParam) {
+		var res = null;
+		var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+		var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+		switch (objectParam.param) {
+			case FormulaTablePartInfo.all: {
+				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
+				break;
+			}
+			case FormulaTablePartInfo.data: {
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				break;
+			}
+			case FormulaTablePartInfo.headers: {
+				if (this.HeaderRowCount === null) {
+					res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
+				} else if (!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				}
+				break;
+			}
+			case FormulaTablePartInfo.totals: {
+				if (this.TotalsRowCount) {
+					res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
+				} else if (!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				}
+				break;
+			}
+			case FormulaTablePartInfo.thisRow: {
+				if (objectParam.cell) {
+					if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
+						res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+					} else if (objectParam.bConvertTableFormulaToRef) {
+						res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+					}
+				} else {
+					if (objectParam.bConvertTableFormulaToRef) {
+						res = new Asc.Range(this.Ref.c1, 0, this.Ref.c2, 0);
+					} else {
+						res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+					}
+				}
+				break;
+			}
+			case FormulaTablePartInfo.columns: {
+				var startCol = this.getTableIndexColumnByName(objectParam.startCol);
+				var endCol = this.getTableIndexColumnByName(objectParam.endCol);
+
+				if (startCol === null) {
+					break;
+				}
+				if (endCol === null) {
+					endCol = startCol;
+				}
+
+				res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
+				break;
+			}
+		}
+		if (res) {
+			if (objectParam.param === FormulaTablePartInfo.thisRow) {
+				res.setAbs(false, true, false, true);
+			} else {
+				res.setAbs(true, true, true, true);
+			}
+		}
+		return res;
+	};
+
+	TablePart.prototype.getTableIndexColumnByName = function (name) {
+		var res = null;
+		if (name === null || name === undefined || !this.TableColumns) {
+			return res;
+		}
+
+		for (var i = 0; i < this.TableColumns.length; i++) {
+			if (name.toLowerCase() === this.TableColumns[i].Name.toLowerCase()) {
+				res = i;
+				break;
+			}
+		}
+
+		return res;
+	};
+
+	TablePart.prototype.getTableNameColumnByIndex = function (index) {
+		var res = null;
+		if (index === null || index === undefined || !this.TableColumns) {
+			return res;
+		}
+
+		for (var i = 0; i < this.TableColumns.length; i++) {
+			if (index === i) {
+				res = this.TableColumns[i].Name;
+				break;
+			}
+		}
+
+		return res;
+	};
+
+	TablePart.prototype.showButton = function (val) {
+		if (val === false) {
+			if (!this.AutoFilter) {
+				this.AutoFilter = new AutoFilter();
+				this.AutoFilter.Ref = this.Ref;
+			}
+
+			this.AutoFilter.showButton(val);
+		} else {
+			if (this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length) {
+				this.AutoFilter.showButton(val);
+			}
+		}
+	};
+
+	TablePart.prototype.isShowButton = function () {
+		var res = false;
+
+		if (this.AutoFilter) {
+			res = this.AutoFilter.isShowButton();
+		} else {
+			res = null;
+		}
+
+		return res;
+	};
+
+	TablePart.prototype.generateTotalsRowLabel = function (ws) {
+		if (!this.TableColumns) {
+			return;
+		}
+
+		//в случае одной колонки выставляем только формулу
+		if (this.TableColumns.length > 1) {
+			this.TableColumns[0].generateTotalsRowLabel();
+		}
+		this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
+	};
+
+	TablePart.prototype.changeDisplayName = function (newName) {
+		this.DisplayName = newName;
+	};
+
+	TablePart.prototype.getRangeWithoutHeaderFooter = function () {
+		var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+		var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+
+		return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+	};
+
+	TablePart.prototype.checkTotalRowFormula = function (ws) {
+		for (var i = 0; i < this.TableColumns.length; i++) {
+			this.TableColumns[i].checkTotalRowFormula(ws, this);
+		}
+	};
+
+	TablePart.prototype.changeAltText = function (val) {
+		this.altText = val;
+	};
+
+	TablePart.prototype.changeAltTextSummary = function (val) {
+		this.altTextSummary = val;
+	};
+
+	TablePart.prototype.addAutoFilter = function () {
+		var autoFilter = new AscCommonExcel.AutoFilter();
+		var cloneRef = this.Ref.clone();
+		if (this.TotalsRowCount) {
+			cloneRef.r2--
+		}
+		autoFilter.Ref = cloneRef;
+
+		this.AutoFilter = autoFilter;
+		return autoFilter;
+	};
+
+	TablePart.prototype.isHeaderRow = function () {
+		return null === this.HeaderRowCount || this.HeaderRowCount > 0;
+	};
+
+	TablePart.prototype.isTotalsRow = function () {
+		return this.TotalsRowCount > 0;
+	};
+
+
+	/** @constructor */
+	function AutoFilter() {
+		this.Ref = null;
+		this.FilterColumns = null;
+		this.SortState = null;
+
+		this.result = null;
+	}
+
+	AutoFilter.prototype.clone = function () {
+		var i, res = new AutoFilter();
+		res.Ref = this.Ref ? this.Ref.clone() : null;
+		res.refTable = this.refTable ? this.refTable.clone() : null;
+		if (this.FilterColumns) {
+			res.FilterColumns = [];
+			for (i = 0; i < this.FilterColumns.length; ++i) {
+				res.FilterColumns.push(this.FilterColumns[i].clone());
+			}
+		}
+
+		if (this.SortState) {
+			res.SortState = this.SortState.clone();
+		}
+
+		if (this.result) {
+			res.result = [];
+			for (i = 0; i < this.result.length; ++i) {
+				res.result.push(this.result[i].clone());
+			}
+		}
+
+		return res;
+	};
+
+	AutoFilter.prototype.addFilterColumn = function () {
+		if (this.FilterColumns === null) {
+			this.FilterColumns = [];
+		}
+
+		var oNewElem = new FilterColumn();
+		this.FilterColumns.push(oNewElem);
+
+		return oNewElem;
+	};
+	AutoFilter.prototype.moveRef = function (col, row) {
+		var ref = this.Ref.clone();
+		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+
+		if (this.SortState) {
+			this.SortState.moveRef(col, row);
+		}
+
+		this.Ref = ref;
+	};
+	AutoFilter.prototype.changeRef = function (col, row, bIsFirst) {
+		var ref = this.Ref.clone();
+		if (bIsFirst) {
+			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		} else {
+			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
+
+		this.Ref = ref;
+	};
+	AutoFilter.prototype.changeRefOnRange = function (range) {
+		if (!range) {
+			return;
+		}
+
+		this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+
+		if (this.AutoFilter) {
+			this.AutoFilter.changeRefOnRange(range);
+		}
+	};
+	AutoFilter.prototype.isApplyAutoFilter = function () {
+		var res = false;
+
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].isApplyAutoFilter()) {
+					res = true;
+					break;
+				}
+			}
+		}
+
+		return res;
+	};
+
+	AutoFilter.prototype.isApplySortConditions = function () {
+		var res = false;
+
+		if (this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0]) {
+			res = true;
+		}
+
+		return res;
+	};
+
+	AutoFilter.prototype.isAutoFilter = function () {
+		return true;
+	};
+
+	AutoFilter.prototype.cleanFilters = function () {
+		if (!this.FilterColumns) {
+			return;
+		}
+
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ShowButton === false) {
+				this.FilterColumns[i].clean();
+			} else {
+				this.FilterColumns.splice(i, 1);
+				i--;
+			}
+		}
+	};
+
+	AutoFilter.prototype.showButton = function (val) {
+
+		if (val === false) {
+			if (this.FilterColumns === null) {
+				this.FilterColumns = [];
+			}
+
+			var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
+			for (var i = 0; i < columnsLength; i++) {
+				var filterColumn = this._getFilterColumnByColId(i);
+				if (filterColumn) {
+					filterColumn.ShowButton = false;
+				} else {
+					filterColumn = new FilterColumn();
+					filterColumn.ColId = i;
+					filterColumn.ShowButton = false;
+					this.FilterColumns.push(filterColumn);
+				}
+			}
+		} else {
+			if (this.FilterColumns && this.FilterColumns.length) {
+				for (var i = 0; i < this.FilterColumns.length; i++) {
+					this.FilterColumns[i].ShowButton = true;
+				}
+			}
+		}
+	};
+
+	AutoFilter.prototype.isShowButton = function () {
+		var res = true;
+
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].ShowButton === false) {
+					res = false;
+					break;
+				}
+			}
+		}
+
+		return res;
+	};
+
+	AutoFilter.prototype.getRangeWithoutHeaderFooter = function () {
+		return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+	};
+
+	AutoFilter.prototype._getFilterColumnByColId = function (colId) {
+		var res = false;
+
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].ColId === colId) {
+					res = this.FilterColumns[i];
+					break;
+				}
+			}
+		}
+
+		return res;
+	};
+
+	//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
+	AutoFilter.prototype.deleteTableColumns = function (activeRange) {
+		if (this.SortState) {
 			var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
-			if(bIsDeleteSortState)
-			{
+			if (bIsDeleteSortState) {
 				this.SortState = null;
 			}
 		}
-	}
+	};
 
-};
+	//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
+	AutoFilter.prototype.addTableColumns = function (activeRange) {
+		if (this.SortState) {
+			this.SortState.changeColumns(activeRange);
+		}
+	};
 
-TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
-{
-	var newTableColumns = [], num = 0;
-	this.removeDependencies();
-	for(var j = 0; j < this.TableColumns.length;)
-	{
-		var curCol = num + this.Ref.c1;
-		if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
-		{
-			newTableColumns[newTableColumns.length] = new TableColumn();
-		}
-		else
-		{
-			newTableColumns[newTableColumns.length] = this.TableColumns[j];
-			j++
-		}
-		
-		num++;
-	}
-	
-	for(var j = 0; j < newTableColumns.length; j++)
-	{
-		var tableColumn = newTableColumns[j];
-		if(tableColumn.Name === null)
-			tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
-	}
-	
-	this.TableColumns = newTableColumns;
-	
-	/*if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
-	{
-		var SortConditions = this.SortState.SortConditions[0];
-		if(activeRange.c1 <= SortConditions.Ref.c1)
-		{
-			var offset = activeRange.c2 - activeRange.c1 + 1;
-			SortConditions.Ref.c1 += offset;
-			SortConditions.Ref.c2 += offset;
-		}
-	}*/
-	
-	if(this.SortState) 
-	{
-		this.SortState.changeColumns(activeRange);
-	}
-	
-	this.buildDependencies();
-};
+	AutoFilter.prototype.getIndexByColId = function (colId) {
+		var res = null;
 
-TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
-{
-	this.removeDependencies();
-	var newTableColumns = this.TableColumns;
-	newTableColumns.push(new TableColumn());
-	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
-	
-	this.TableColumns = newTableColumns;
-	this.buildDependencies();
-};
+		if (!this.FilterColumns) {
+			return res;
+		}
 
-TablePart.prototype.isAutoFilter = function()
-{
-	return false;
-};
-
-TablePart.prototype.getAutoFilter = function()
-{
-	return this.AutoFilter;
-};
-
-TablePart.prototype.getTableRangeForFormula = function(objectParam)
-{
-	var res = null;
-	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	switch(objectParam.param)
-	{
-		case FormulaTablePartInfo.all:
-		{
-			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
-			break;
-		}
-		case FormulaTablePartInfo.data:
-		{
-			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-			break;
-		}
-		case FormulaTablePartInfo.headers:
-		{
-			if(this.HeaderRowCount === null) {
-				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
-			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
-				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-			}
-			break;
-		}
-		case FormulaTablePartInfo.totals:
-		{
-			if(this.TotalsRowCount) {
-				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
-			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
-				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-			}
-			break;
-		}
-		case FormulaTablePartInfo.thisRow:
-		{
-			if (objectParam.cell) {
-				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
-					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
-				} else if (objectParam.bConvertTableFormulaToRef) {
-					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-				}
-			} else {
-				if (objectParam.bConvertTableFormulaToRef) {
-					res = new Asc.Range(this.Ref.c1, 0, this.Ref.c2, 0);
-				} else {
-					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-				}
-			}
-			break;
-		}
-		case FormulaTablePartInfo.columns:
-		{
-			var startCol = this.getTableIndexColumnByName(objectParam.startCol);
-			var endCol = this.getTableIndexColumnByName(objectParam.endCol);
-			
-			if(startCol === null)
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ColId === colId) {
+				res = i;
 				break;
-			if(endCol === null)
-				endCol = startCol;
-
-			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
-			break;
+			}
 		}
-	}
-	if (res) {
-		if (objectParam.param === FormulaTablePartInfo.thisRow) {
-			res.setAbs(false, true, false, true);
-		} else {
-			res.setAbs(true, true, true, true);
-		}
-	}
-	return res;
-};
 
-TablePart.prototype.getTableIndexColumnByName = function(name)
-{
-	var res = null;
-	if(name === null || name === undefined || !this.TableColumns)
 		return res;
-		
-	for(var i = 0; i < this.TableColumns.length; i++)
-	{
-		if(name.toLowerCase() === this.TableColumns[i].Name.toLowerCase())
-		{
-			res = i;
-			break;
+	};
+
+	AutoFilter.prototype.getFilterColumn = function (colId) {
+		var res = null;
+
+		if (!this.FilterColumns) {
+			return res;
 		}
-	}
-	
-	return res;
-};
 
-TablePart.prototype.getTableNameColumnByIndex = function(index)
-{
-	var res = null;
-	if(index === null || index === undefined || !this.TableColumns)
-		return res;
-		
-	for(var i = 0; i < this.TableColumns.length; i++)
-	{
-		if(index === i)
-		{
-			res = this.TableColumns[i].Name;
-			break;
-		}
-	}
-	
-	return res;
-};
-
-TablePart.prototype.showButton = function(val)
-{
-	if(val === false)
-	{
-		if(!this.AutoFilter)
-		{
-			this.AutoFilter = new AutoFilter();
-			this.AutoFilter.Ref = this.Ref;
-		}
-		
-		this.AutoFilter.showButton(val);
-	}
-	else
-	{
-		if(this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length)
-		{
-			this.AutoFilter.showButton(val);
-		}
-	}
-};
-
-TablePart.prototype.isShowButton = function()
-{
-	var res = false;
-	
-	if(this.AutoFilter)
-	{
-		res = this.AutoFilter.isShowButton();
-	}
-	else
-	{
-		res = null;
-	}
-	
-	return res;
-};
-
-TablePart.prototype.generateTotalsRowLabel = function(ws)
-{
-	if(!this.TableColumns)
-	{
-		return;
-	}
-	
-	//в случае одной колонки выставляем только формулу
-	if(this.TableColumns.length > 1)
-	{
-		this.TableColumns[0].generateTotalsRowLabel();
-	}
-	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
-};
-
-TablePart.prototype.changeDisplayName = function(newName)
-{
-	this.DisplayName = newName;
-}; 
-
-TablePart.prototype.getRangeWithoutHeaderFooter = function()
-{
-	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	
-	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
-};
-
-TablePart.prototype.checkTotalRowFormula = function(ws)
-{
-	for (var i = 0; i < this.TableColumns.length; i++) {
-		this.TableColumns[i].checkTotalRowFormula(ws, this);
-	}
-};
-
-TablePart.prototype.changeAltText = function(val)
-{
-	this.altText = val;
-};
-
-TablePart.prototype.changeAltTextSummary = function(val)
-{
-	this.altTextSummary = val;
-};
-
-TablePart.prototype.addAutoFilter = function()
-{
-	var autoFilter = new AscCommonExcel.AutoFilter();
-	var cloneRef = this.Ref.clone();
-	if(this.TotalsRowCount)
-	{
-		cloneRef.r2--
-	}
-	autoFilter.Ref = cloneRef;
-	
-	this.AutoFilter = autoFilter;
-	return autoFilter;
-};
-
-TablePart.prototype.isHeaderRow = function()
-{
-	return null === this.HeaderRowCount || this.HeaderRowCount > 0; 
-};
-
-TablePart.prototype.isTotalsRow = function()
-{
-	return this.TotalsRowCount > 0; 
-};
-
-
-/** @constructor */
-function AutoFilter() {
-	this.Ref = null;
-	this.FilterColumns = null;
-	this.SortState = null;
-	
-	this.result = null;
-}
-AutoFilter.prototype.clone = function() {
-	var i, res = new AutoFilter();
-	res.Ref = this.Ref ? this.Ref.clone() : null;
-	res.refTable = this.refTable ? this.refTable.clone() : null;
-	if (this.FilterColumns) {
-		res.FilterColumns = [];
-		for (i = 0; i < this.FilterColumns.length; ++i)
-			res.FilterColumns.push(this.FilterColumns[i].clone());
-	}
-	
-	if (this.SortState)
-		res.SortState = this.SortState.clone();
-		
-	if (this.result) {
-		res.result = [];
-		for (i = 0; i < this.result.length; ++i)
-			res.result.push(this.result[i].clone());
-	}
-	
-	return res;
-};
-
-AutoFilter.prototype.addFilterColumn = function() {
-	if(this.FilterColumns === null)
-		this.FilterColumns = [];
-	
-	var oNewElem = new FilterColumn();
-	this.FilterColumns.push(oNewElem);
-	
-	return oNewElem;
-};
-AutoFilter.prototype.moveRef = function(col, row) {
-	var ref = this.Ref.clone();
-	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
-	if(this.SortState)
-	{
-		this.SortState.moveRef(col, row);
-	}
-	
-	this.Ref = ref;
-};
-AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
-	var ref = this.Ref.clone();
-	if(bIsFirst)
-		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
-		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
-	this.Ref = ref;
-};
-AutoFilter.prototype.changeRefOnRange = function(range) {
-	if(!range)
-		return;
-		
-	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
-	
-	if(this.AutoFilter)
-		this.AutoFilter.changeRefOnRange(range);
-};
-AutoFilter.prototype.isApplyAutoFilter = function() {
-	var res = false;
-	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].isApplyAutoFilter())
-			{
-				res = true;
-				break;
-			}
-		}
-	}
-		
-	return res;
-};
-
-AutoFilter.prototype.isApplySortConditions = function() {
-	var res = false;
-	
-	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
-		res = true;
-		
-	return res;
-};
-
-AutoFilter.prototype.isAutoFilter = function()
-{
-	return true;
-};
-
-AutoFilter.prototype.cleanFilters = function() {
-	if(!this.FilterColumns)
-		return;
-	
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ShowButton === false)
-			this.FilterColumns[i].clean();
-		else
-		{
-			this.FilterColumns.splice(i, 1);
-			i--;
-		}	
-	}
-};
-
-AutoFilter.prototype.showButton = function(val) {
-	
-	if(val === false)
-	{
-		if(this.FilterColumns === null)
-		{
-			this.FilterColumns = [];
-		}
-		
-		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
-		for(var i = 0; i < columnsLength; i++)
-		{
-			var filterColumn = this._getFilterColumnByColId(i);
-			if(filterColumn)
-			{
-				filterColumn.ShowButton = false;
-			}
-			else
-			{
-				filterColumn = new FilterColumn();
-				filterColumn.ColId = i;
-				filterColumn.ShowButton = false;
-				this.FilterColumns.push(filterColumn);
-			}
-		}
-	}
-	else
-	{
-		if(this.FilterColumns && this.FilterColumns.length)
-		{
-			for(var i = 0; i < this.FilterColumns.length; i++)
-			{
-				this.FilterColumns[i].ShowButton = true;
-			}
-		}
-	}
-};
-
-AutoFilter.prototype.isShowButton = function()
-{
-	var res = true;
-	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].ShowButton === false)
-			{
-				res = false;
-				break;
-			}
-		}
-	}
-	
-	return res;
-};
-
-AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
-{
-	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
-}; 
-
-AutoFilter.prototype._getFilterColumnByColId = function(colId)
-{
-	var res = false;
-	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].ColId === colId)
-			{
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ColId === colId) {
 				res = this.FilterColumns[i];
 				break;
 			}
 		}
-	}
-	
-	return res;
-};
 
-//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
-AutoFilter.prototype.deleteTableColumns = function(activeRange)
-{
-	if(this.SortState) 
-	{
-		var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
-		if(bIsDeleteSortState)
-		{
-			this.SortState = null;
-		}
-	}
-};
-
-//функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
-AutoFilter.prototype.addTableColumns = function(activeRange)
-{
-	if(this.SortState) 
-	{
-		this.SortState.changeColumns(activeRange);
-	}
-};
-
-AutoFilter.prototype.getIndexByColId = function(colId)
-{
-	var res = null;
-
-	if(!this.FilterColumns)
-	{
 		return res;
+	};
+
+	AutoFilter.prototype.getAutoFilter = function () {
+		return this;
+	};
+
+
+	function FilterColumns() {
+		this.ColId = null;
+		this.CustomFiltersObj = null;
 	}
 
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ColId === colId)
-		{
-			res = i;
-			break;
+	FilterColumns.prototype.clone = function () {
+		var res = new FilterColumns();
+		res.ColId = this.ColId;
+		if (this.CustomFiltersObj) {
+			res.CustomFiltersObj = this.CustomFiltersObj.clone();
 		}
-	}
 
-	return res;
-};
-
-AutoFilter.prototype.getFilterColumn = function(colId)
-{
-	var res = null;
-
-	if(!this.FilterColumns)
-	{
 		return res;
+	};
+
+	/** @constructor */
+	function SortState() {
+		this.Ref = null;
+		this.CaseSensitive = null;
+		this.SortConditions = null;
 	}
 
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ColId === colId)
-		{
-			res = this.FilterColumns[i];
-			break;
-		}
-	}
-
-	return res;
-};
-
-AutoFilter.prototype.getAutoFilter = function()
-{
-	return this;
-};
-
-
-function FilterColumns() {
-	this.ColId = null;
-	this.CustomFiltersObj = null;
-}
-FilterColumns.prototype.clone = function() {
-	var res = new FilterColumns();
-	res.ColId = this.ColId;
-	if(this.CustomFiltersObj)
-		res.CustomFiltersObj = this.CustomFiltersObj.clone();
-	
-	return res;
-};
-
-/** @constructor */
-function SortState() {
-	this.Ref = null;
-	this.CaseSensitive = null;
-	this.SortConditions = null;
-}
-
-SortState.prototype.clone = function() {
-	var i, res = new SortState();
-	res.Ref = this.Ref ? this.Ref.clone() : null;
-	res.CaseSensitive = this.CaseSensitive;
-	if (this.SortConditions) {
-		res.SortConditions = [];
-		for (i = 0; i < this.SortConditions.length; ++i)
-			res.SortConditions.push(this.SortConditions[i].clone());
-	}
-	return res;
-};
-
-SortState.prototype.moveRef = function(col, row) {
-	var ref = this.Ref.clone();
-	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
-	this.Ref = ref;
-	
-	if (this.SortConditions) {
-		for (var i = 0; i < this.SortConditions.length; ++i)
-			this.SortConditions[i].moveRef(col, row);
-	}
-};
-
-SortState.prototype.changeRef = function(col, row, bIsFirst) {
-	var ref = this.Ref.clone();
-	if(bIsFirst)
-		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
-		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	
-	this.Ref = ref;
-};
-
-SortState.prototype.changeColumns = function(activeRange, isDelete)
-{
-	var bIsSortStateDelete = true;
-	//если изменяем диапазон так, что удаляется колонка с сортировкой, удаляем ее
-	if (this.SortConditions) 
-	{
-		for (var i = 0; i < this.SortConditions.length; ++i)
-		{
-			var bIsSortConditionsDelete = this.SortConditions[i].changeColumns(activeRange, isDelete);
-			if(bIsSortConditionsDelete)
-			{
-				this.SortConditions[i] = null;
-			}
-			else
-			{
-				bIsSortStateDelete = false;
+	SortState.prototype.clone = function () {
+		var i, res = new SortState();
+		res.Ref = this.Ref ? this.Ref.clone() : null;
+		res.CaseSensitive = this.CaseSensitive;
+		if (this.SortConditions) {
+			res.SortConditions = [];
+			for (i = 0; i < this.SortConditions.length; ++i) {
+				res.SortConditions.push(this.SortConditions[i].clone());
 			}
 		}
+		return res;
+	};
+
+	SortState.prototype.moveRef = function (col, row) {
+		var ref = this.Ref.clone();
+		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+
+		this.Ref = ref;
+
+		if (this.SortConditions) {
+			for (var i = 0; i < this.SortConditions.length; ++i) {
+				this.SortConditions[i].moveRef(col, row);
+			}
+		}
+	};
+
+	SortState.prototype.changeRef = function (col, row, bIsFirst) {
+		var ref = this.Ref.clone();
+		if (bIsFirst) {
+			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		} else {
+			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
+
+		this.Ref = ref;
+	};
+
+	SortState.prototype.changeColumns = function (activeRange, isDelete) {
+		var bIsSortStateDelete = true;
+		//если изменяем диапазон так, что удаляется колонка с сортировкой, удаляем ее
+		if (this.SortConditions) {
+			for (var i = 0; i < this.SortConditions.length; ++i) {
+				var bIsSortConditionsDelete = this.SortConditions[i].changeColumns(activeRange, isDelete);
+				if (bIsSortConditionsDelete) {
+					this.SortConditions[i] = null;
+				} else {
+					bIsSortStateDelete = false;
+				}
+			}
+		}
+		return bIsSortStateDelete;
+	};
+
+
+	/** @constructor */
+	function TableColumn() {
+		this.Name = null;
+		this.TotalsRowLabel = null;
+		this.TotalsRowFunction = null;
+		this.TotalsRowFormula = null;
+		this.dxf = null;
+		this.CalculatedColumnFormula = null;
 	}
-	return bIsSortStateDelete;
-};
 
-
-/** @constructor */
-function TableColumn() {
-	this.Name = null;
-	this.TotalsRowLabel = null;
-	this.TotalsRowFunction = null;
-	this.TotalsRowFormula = null;
-	this.dxf = null;
-	this.CalculatedColumnFormula = null;
-}
-	TableColumn.prototype.onFormulaEvent = function(type, eventData) {
+	TableColumn.prototype.onFormulaEvent = function (type, eventData) {
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.TotalsRowFormula.setIsDirty(false);
 		}
 	};
-	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
+	TableColumn.prototype.renameSheetCopy = function (ws, renameParams) {
 		if (this.TotalsRowFormula) {
 			this.buildDependencies();
 			this.TotalsRowFormula.renameSheetCopy(renameParams);
 			this.applyTotalRowFormula(this.TotalsRowFormula.assemble(true), ws, true);
 		}
 	};
-	TableColumn.prototype.buildDependencies = function() {
+	TableColumn.prototype.buildDependencies = function () {
 		if (this.TotalsRowFormula) {
 			this.TotalsRowFormula.parse();
 			this.TotalsRowFormula.buildDependencies();
 		}
 	};
-	TableColumn.prototype.removeDependencies = function() {
+	TableColumn.prototype.removeDependencies = function () {
 		if (this.TotalsRowFormula) {
 			this.TotalsRowFormula.removeDependencies();
 		}
 	};
-	TableColumn.prototype.getAllFormulas = function(formulas) {
+	TableColumn.prototype.getAllFormulas = function (formulas) {
 		if (this.TotalsRowFormula) {
 			formulas.push(this.TotalsRowFormula);
 		}
 	};
-TableColumn.prototype.clone = function() {
-	var res = new TableColumn();
-	res.Name = this.Name;
-	res.TotalsRowLabel = this.TotalsRowLabel;
-	res.TotalsRowFunction = this.TotalsRowFunction;
+	TableColumn.prototype.clone = function () {
+		var res = new TableColumn();
+		res.Name = this.Name;
+		res.TotalsRowLabel = this.TotalsRowLabel;
+		res.TotalsRowFunction = this.TotalsRowFunction;
 
-	if (this.TotalsRowFormula) {
-		res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
-	}
-	if (this.dxf)
-		res.dxf = this.dxf.clone;
-	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
-	return res;
-};
-TableColumn.prototype.generateTotalsRowLabel = function(){
-	//TODO добавить в перевод
-	if(this.TotalsRowLabel === null)
-	{	
-		this.TotalsRowLabel = "Summary";
-	}
-};
-TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
-	//TODO добавить в перевод
-	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel) {
-		var columnRange = this.getRange(tablePart);
+		if (this.TotalsRowFormula) {
+			res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		}
+		if (this.dxf) {
+			res.dxf = this.dxf.clone;
+		}
+		res.CalculatedColumnFormula = this.CalculatedColumnFormula;
+		return res;
+	};
+	TableColumn.prototype.generateTotalsRowLabel = function () {
+		//TODO добавить в перевод
+		if (this.TotalsRowLabel === null) {
+			this.TotalsRowLabel = "Summary";
+		}
+	};
+	TableColumn.prototype.generateTotalsRowFunction = function (ws, tablePart) {
+		//TODO добавить в перевод
+		if (null === this.TotalsRowFunction && null === this.TotalsRowLabel) {
+			var columnRange = this.getRange(tablePart);
 
-		var totalFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
-		if(null !== columnRange){
-			for(var i = columnRange.r1; i <= columnRange.r2; i++){
-				var type = ws.getCell3(i, columnRange.c1).getType();
-				if(null !== type && CellValueType.Number !== type){
-					totalFunction = Asc.ETotalsRowFunction.totalrowfunctionCount;
+			var totalFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+			if (null !== columnRange) {
+				for (var i = columnRange.r1; i <= columnRange.r2; i++) {
+					var type = ws.getCell3(i, columnRange.c1).getType();
+					if (null !== type && CellValueType.Number !== type) {
+						totalFunction = Asc.ETotalsRowFunction.totalrowfunctionCount;
+						break;
+					}
+				}
+			}
+
+			this.TotalsRowFunction = totalFunction;
+		}
+	};
+
+	TableColumn.prototype.getTotalRowFormula = function (tablePart) {
+		var res = null;
+
+		if (null !== this.TotalsRowFunction) {
+			switch (this.TotalsRowFunction) {
+				case Asc.ETotalsRowFunction.totalrowfunctionAverage: {
+					res = "SUBTOTAL(101," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionCount: {
+					res = "SUBTOTAL(103," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionCountNums: {
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionCustom: {
+					res = this.getTotalsRowFormula();
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionMax: {
+					res = "SUBTOTAL(104," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionMin: {
+					res = "SUBTOTAL(105," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionNone: {
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionStdDev: {
+					res = "SUBTOTAL(107," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionSum: {
+					res = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
+					break;
+				}
+				case Asc.ETotalsRowFunction.totalrowfunctionVar: {
+					res = "SUBTOTAL(110," + tablePart.DisplayName + "[" + this.Name + "])";
 					break;
 				}
 			}
 		}
 
-		this.TotalsRowFunction = totalFunction;
-	}
-};
+		return res;
+	};
 
-TableColumn.prototype.getTotalRowFormula = function(tablePart){
-	var res = null;
-	
-	if(null !== this.TotalsRowFunction)
-	{
-		switch(this.TotalsRowFunction)
-		{
-			case Asc.ETotalsRowFunction.totalrowfunctionAverage:
-			{
-				res = "SUBTOTAL(101," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCount:
-			{
-				res = "SUBTOTAL(103," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCountNums:
-			{
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
-			{
-				res = this.getTotalsRowFormula();
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionMax:
-			{
-				res = "SUBTOTAL(104," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionMin:
-			{
-				res = "SUBTOTAL(105," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionNone:
-			{
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionStdDev:
-			{
-				res = "SUBTOTAL(107," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionSum:
-			{
-				res = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-			case Asc.ETotalsRowFunction.totalrowfunctionVar:
-			{
-				res = "SUBTOTAL(110," + tablePart.DisplayName + "[" + this.Name + "])";
-				break;
-			}
-		}
-	}
-	
-	return res;
-};
-
-TableColumn.prototype.cleanTotalsData = function(){
-	this.CalculatedColumnFormula = null;
-	this.applyTotalRowFormula(null, null, false);
-	this.TotalsRowFunction = null;
-	this.TotalsRowLabel = null;
-};
-	TableColumn.prototype.getTotalsRowFormula = function(){
+	TableColumn.prototype.cleanTotalsData = function () {
+		this.CalculatedColumnFormula = null;
+		this.applyTotalRowFormula(null, null, false);
+		this.TotalsRowFunction = null;
+		this.TotalsRowLabel = null;
+	};
+	TableColumn.prototype.getTotalsRowFormula = function () {
 		return this.TotalsRowFormula ? this.TotalsRowFormula.getFormula() : null;
 	};
-TableColumn.prototype.setTotalsRowFormula = function(val, ws){
-	this.cleanTotalsData();
-	if("=" === val[0])
-	{
-		val = val.substring(1);
-	}
-	this.applyTotalRowFormula(val, ws, true);
-	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
-};
-
-TableColumn.prototype.setTotalsRowLabel = function(val){
-	this.cleanTotalsData();
-	
-	this.TotalsRowLabel = val;
-};
-
-TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
-	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
-	{
-		var totalRowFormula = this.getTotalRowFormula(tablePart);
-
-		if(null !== totalRowFormula)
-		{
-			this.applyTotalRowFormula(totalRowFormula, ws, true);
-			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+	TableColumn.prototype.setTotalsRowFormula = function (val, ws) {
+		this.cleanTotalsData();
+		if ("=" === val[0]) {
+			val = val.substring(1);
 		}
-	}
-};
-	TableColumn.prototype.applyTotalRowFormula = function(val, opt_ws, opt_buildDep) {
+		this.applyTotalRowFormula(val, ws, true);
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+	};
+
+	TableColumn.prototype.setTotalsRowLabel = function (val) {
+		this.cleanTotalsData();
+
+		this.TotalsRowLabel = val;
+	};
+
+	TableColumn.prototype.checkTotalRowFormula = function (ws, tablePart) {
+		if (null !== this.TotalsRowFunction &&
+			Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction) {
+			var totalRowFormula = this.getTotalRowFormula(tablePart);
+
+			if (null !== totalRowFormula) {
+				this.applyTotalRowFormula(totalRowFormula, ws, true);
+				this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+			}
+		}
+	};
+	TableColumn.prototype.applyTotalRowFormula = function (val, opt_ws, opt_buildDep) {
 		this.removeDependencies();
 		if (val) {
 			this.TotalsRowFormula = new AscCommonExcel.parserFormula(val, this, opt_ws);
@@ -6268,371 +6182,328 @@ TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
 		}
 	};
 
-	TableColumn.prototype.getRange = function(tablePart, includeHeader, includeTotal) {
+	TableColumn.prototype.getRange = function (tablePart, includeHeader, includeTotal) {
 		var res = null;
 
 		var ref = tablePart.Ref;
 		var startRow = (includeHeader && tablePart.isHeaderRow()) || (!tablePart.isHeaderRow()) ? ref.r1 : ref.r1 + 1;
 		var endRow = (includeTotal && tablePart.isTotalsRow()) || (!tablePart.isTotalsRow()) ? ref.r2 : ref.r2 - 1;
 		var col = null;
-		for(var i = 0; i < tablePart.TableColumns.length; i++){
-			if(this.Name === tablePart.TableColumns[i].Name){
+		for (var i = 0; i < tablePart.TableColumns.length; i++) {
+			if (this.Name === tablePart.TableColumns[i].Name) {
 				col = ref.c1 + i;
 				break;
 			}
 		}
 
-		if(null !== col){
+		if (null !== col) {
 			res = Asc.Range(col, startRow, col, endRow);
 		}
 
 		return res;
 	};
 
-/** @constructor */
-function TableStyleInfo() {
-	this.Name = null;
-	this.ShowColumnStripes = null;
-	this.ShowRowStripes = null;
-	this.ShowFirstColumn = null;
-	this.ShowLastColumn = null;
-}
-TableStyleInfo.prototype.clone = function() {
-	var res = new TableStyleInfo();
-	res.Name = this.Name;
-	res.ShowColumnStripes = this.ShowColumnStripes;
-	res.ShowRowStripes = this.ShowRowStripes;
-	res.ShowFirstColumn = this.ShowFirstColumn;
-	res.ShowLastColumn = this.ShowLastColumn;
-	return res;
-};
-/** @constructor */
-function FilterColumn() {
-	this.ColId = null;
-	this.Filters = null;
-	this.CustomFiltersObj = null;
-	this.DynamicFilter = null;
-	this.ColorFilter = null;
-	this.Top10 = null;
-	this.ShowButton = true;
-}
-FilterColumn.prototype.clone = function() {
-	var res = new FilterColumn();
-	res.ColId = this.ColId;
-	if (this.Filters) {
-		res.Filters = this.Filters.clone();
+	/** @constructor */
+	function TableStyleInfo() {
+		this.Name = null;
+		this.ShowColumnStripes = null;
+		this.ShowRowStripes = null;
+		this.ShowFirstColumn = null;
+		this.ShowLastColumn = null;
 	}
-	if (this.CustomFiltersObj) {
-		res.CustomFiltersObj = this.CustomFiltersObj.clone();
-	}
-	if (this.DynamicFilter) {
-		res.DynamicFilter = this.DynamicFilter.clone();
-	}
-	if (this.ColorFilter) {
-		res.ColorFilter = this.ColorFilter.clone();
-	}
-	if (this.Top10) {
-		res.Top10 = this.Top10.clone();
-	}
-	res.ShowButton = this.ShowButton;
-	return res;
-};
-FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length, cell) {
-	var res = false;
-	if(this.Filters)
-	{
-		this.Filters._initLowerCaseValues();
-		res = this.Filters.isHideValue(val.toLowerCase(), isDateTimeFormat);
-	}
-	else if(this.CustomFiltersObj)
-	{
-		res = this.CustomFiltersObj.isHideValue(val);
-	}
-	else if(this.Top10)
-	{
-		res = this.Top10.isHideValue(val, top10Length);
-	}
-	else if(this.ColorFilter)
-	{
-		res = this.ColorFilter.isHideValue(cell);
-	}
-	else if(this.DynamicFilter)
-	{
-		res = this.DynamicFilter.isHideValue(val);
-	}
-		
-	return res;
-};
-FilterColumn.prototype.clean = function() {
-	this.Filters = null;
-	this.CustomFiltersObj = null;
-	this.DynamicFilter = null;
-	this.ColorFilter = null;
-	this.Top10 = null;
-};
-FilterColumn.prototype.createFilter = function(obj) {
-	
-	var allFilterOpenElements = false;
-	var newFilter;
 
-	switch (obj.filter.type)
-	{
-		case c_oAscAutoFilterTypes.ColorFilter:
-		{
-			this.ColorFilter = obj.filter.filter.clone();
-			break;
+	TableStyleInfo.prototype.clone = function () {
+		var res = new TableStyleInfo();
+		res.Name = this.Name;
+		res.ShowColumnStripes = this.ShowColumnStripes;
+		res.ShowRowStripes = this.ShowRowStripes;
+		res.ShowFirstColumn = this.ShowFirstColumn;
+		res.ShowLastColumn = this.ShowLastColumn;
+		return res;
+	};
+	/** @constructor */
+	function FilterColumn() {
+		this.ColId = null;
+		this.Filters = null;
+		this.CustomFiltersObj = null;
+		this.DynamicFilter = null;
+		this.ColorFilter = null;
+		this.Top10 = null;
+		this.ShowButton = true;
+	}
+
+	FilterColumn.prototype.clone = function () {
+		var res = new FilterColumn();
+		res.ColId = this.ColId;
+		if (this.Filters) {
+			res.Filters = this.Filters.clone();
 		}
-		case c_oAscAutoFilterTypes.CustomFilters:
-		{
-			obj.filter.filter.check();
-			this.CustomFiltersObj = obj.filter.filter.clone();
-			break;
-		}	
-		case c_oAscAutoFilterTypes.DynamicFilter:
-		{
-			this.DynamicFilter = obj.filter.filter.clone();
-			break;
+		if (this.CustomFiltersObj) {
+			res.CustomFiltersObj = this.CustomFiltersObj.clone();
 		}
-		case c_oAscAutoFilterTypes.Top10:
-		{
-			this.Top10 = obj.filter.filter.clone();
-			break;
-		}	
-		case c_oAscAutoFilterTypes.Filters:
-		{
-			//если приходит только скрытое Blank, тогда добавляем CustomFilter, так же делает MS
-			var addCustomFilter = false;
-			for(var i = 0; i < obj.values.length; i++)
-			{
-				if("" === obj.values[i].text && false === obj.values[i].visible)
-				{
-					addCustomFilter = true;
-				}
-				else if("" !== obj.values[i].text && false === obj.values[i].visible)
-				{
-					addCustomFilter = false;
-					break;
-				}
+		if (this.DynamicFilter) {
+			res.DynamicFilter = this.DynamicFilter.clone();
+		}
+		if (this.ColorFilter) {
+			res.ColorFilter = this.ColorFilter.clone();
+		}
+		if (this.Top10) {
+			res.Top10 = this.Top10.clone();
+		}
+		res.ShowButton = this.ShowButton;
+		return res;
+	};
+	FilterColumn.prototype.isHideValue = function (val, isDateTimeFormat, top10Length, cell) {
+		var res = false;
+		if (this.Filters) {
+			this.Filters._initLowerCaseValues();
+			res = this.Filters.isHideValue(val.toLowerCase(), isDateTimeFormat);
+		} else if (this.CustomFiltersObj) {
+			res = this.CustomFiltersObj.isHideValue(val);
+		} else if (this.Top10) {
+			res = this.Top10.isHideValue(val, top10Length);
+		} else if (this.ColorFilter) {
+			res = this.ColorFilter.isHideValue(cell);
+		} else if (this.DynamicFilter) {
+			res = this.DynamicFilter.isHideValue(val);
+		}
+
+		return res;
+	};
+	FilterColumn.prototype.clean = function () {
+		this.Filters = null;
+		this.CustomFiltersObj = null;
+		this.DynamicFilter = null;
+		this.ColorFilter = null;
+		this.Top10 = null;
+	};
+	FilterColumn.prototype.createFilter = function (obj) {
+
+		var allFilterOpenElements = false;
+		var newFilter;
+
+		switch (obj.filter.type) {
+			case c_oAscAutoFilterTypes.ColorFilter: {
+				this.ColorFilter = obj.filter.filter.clone();
+				break;
 			}
-
-			if(addCustomFilter)
-			{
-				this.CustomFiltersObj = new CustomFilters();
-				this.CustomFiltersObj._generateEmptyValueFilter();
+			case c_oAscAutoFilterTypes.CustomFilters: {
+				obj.filter.filter.check();
+				this.CustomFiltersObj = obj.filter.filter.clone();
+				break;
 			}
-			else
-			{
-				newFilter = new Filters();
-				allFilterOpenElements = newFilter.init(obj);
-
-				if(!allFilterOpenElements)
-				{
-					this.Filters = newFilter;
+			case c_oAscAutoFilterTypes.DynamicFilter: {
+				this.DynamicFilter = obj.filter.filter.clone();
+				break;
+			}
+			case c_oAscAutoFilterTypes.Top10: {
+				this.Top10 = obj.filter.filter.clone();
+				break;
+			}
+			case c_oAscAutoFilterTypes.Filters: {
+				//если приходит только скрытое Blank, тогда добавляем CustomFilter, так же делает MS
+				var addCustomFilter = false;
+				for (var i = 0; i < obj.values.length; i++) {
+					if ("" === obj.values[i].text && false === obj.values[i].visible) {
+						addCustomFilter = true;
+					} else if ("" !== obj.values[i].text && false === obj.values[i].visible) {
+						addCustomFilter = false;
+						break;
+					}
 				}
+
+				if (addCustomFilter) {
+					this.CustomFiltersObj = new CustomFilters();
+					this.CustomFiltersObj._generateEmptyValueFilter();
+				} else {
+					newFilter = new Filters();
+					allFilterOpenElements = newFilter.init(obj);
+
+					if (!allFilterOpenElements) {
+						this.Filters = newFilter;
+					}
+				}
+
+				break;
 			}
-			
-			break;
-		}	
-	}	
-	
-	return allFilterOpenElements;
-};
+		}
 
-FilterColumn.prototype.isApplyAutoFilter = function() {
-	var res = false;
-	
-	if(this.Filters !== null || this.CustomFiltersObj !== null || this.DynamicFilter !== null || this.ColorFilter !== null || this.Top10 !== null)
-		res = true;
-		
-	return res;
-};
+		return allFilterOpenElements;
+	};
 
-FilterColumn.prototype.init = function(range) {
-	
-	//добавляем данные, которые не передаются из меню при примененни а/ф(в данном случае только DynamicFilter)
-	if(null !== this.DynamicFilter)
-	{
-		this.DynamicFilter.init(range);
-	}
-	else if(null !== this.Top10)
-	{
-		this.Top10.init(range);
-	}
-	
-};
+	FilterColumn.prototype.isApplyAutoFilter = function () {
+		var res = false;
 
-FilterColumn.prototype.isApplyCustomFilter = function() {
-	var res = false;
-
-	if(this.Top10 || this.CustomFiltersObj || this.ColorFilter || this.DynamicFilter)
-	{
-		res = true;
-	}
-
-	return res;
-};
-
-FilterColumn.prototype.isOnlyNotEqualEmpty = function() {
-	var res = false;
-
-	if(this.CustomFiltersObj)
-	{
-		var customFilters = this.CustomFiltersObj.CustomFilters;
-		var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
-		if(c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val)
-		{
+		if (this.Filters !== null || this.CustomFiltersObj !== null || this.DynamicFilter !== null ||
+			this.ColorFilter !== null || this.Top10 !== null) {
 			res = true;
 		}
-	}
 
-	return res;
-};
+		return res;
+	};
 
+	FilterColumn.prototype.init = function (range) {
 
-/** @constructor */
-function Filters() {
-	this.Values = {};
-	this.Dates = [];
-	this.Blank = null;
-	
-	this.lowerCaseValues = null;
-}
-Filters.prototype.clone = function() {
-	var i, res = new Filters();
-	for(var i in this.Values)
-		res.Values[i] = this.Values[i];
-	if (this.Dates) {
-		for (i = 0; i < this.Dates.length; ++i)
-			res.Dates.push(this.Dates[i].clone());
-	}
-	res.Blank = this.Blank;
-	return res;
-};
-Filters.prototype.init = function(obj) {
-	var allFilterOpenElements = true;
-	for(var i = 0; i < obj.values.length; i++)
-	{
-		if(obj.values[i].visible)
-		{
-			if(obj.values[i].isDateFormat)
-			{
-				if(obj.values[i].text === "")
-				{
-					this.Blank = true;
-				}
-				else
-				{
-					var dateGroupItem = new DateGroupItem();
-					var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
-					dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
-					autoFilterDateElem.convertDateGroupItemToRange(dateGroupItem);
-					
-					this.Dates.push(autoFilterDateElem);
-				}
+		//добавляем данные, которые не передаются из меню при примененни а/ф(в данном случае только DynamicFilter)
+		if (null !== this.DynamicFilter) {
+			this.DynamicFilter.init(range);
+		} else if (null !== this.Top10) {
+			this.Top10.init(range);
+		}
+
+	};
+
+	FilterColumn.prototype.isApplyCustomFilter = function () {
+		var res = false;
+
+		if (this.Top10 || this.CustomFiltersObj || this.ColorFilter || this.DynamicFilter) {
+			res = true;
+		}
+
+		return res;
+	};
+
+	FilterColumn.prototype.isOnlyNotEqualEmpty = function () {
+		var res = false;
+
+		if (this.CustomFiltersObj) {
+			var customFilters = this.CustomFiltersObj.CustomFilters;
+			var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
+			if (c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
+				res = true;
 			}
-			else
-			{
-				if(obj.values[i].text === "")
-					this.Blank = true;
-				else
-					this.Values[obj.values[i].text] = true;
+		}
+
+		return res;
+	};
+
+
+	/** @constructor */
+	function Filters() {
+		this.Values = {};
+		this.Dates = [];
+		this.Blank = null;
+
+		this.lowerCaseValues = null;
+	}
+
+	Filters.prototype.clone = function () {
+		var i, res = new Filters();
+		for (var i in this.Values) {
+			res.Values[i] = this.Values[i];
+		}
+		if (this.Dates) {
+			for (i = 0; i < this.Dates.length; ++i) {
+				res.Dates.push(this.Dates[i].clone());
 			}
-		}	
-		else
-			allFilterOpenElements = false;
-	}
-	this._sortDate();
-	this._initLowerCaseValues();
-
-	return allFilterOpenElements;
-};
-Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
-	var res = false;
-	
-	if(isDateTimeFormat && this.Dates)
-	{
-		if(val === "")
-		{
-			res = !this.Blank ? true : false;
 		}
-		else
-		{
-			res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
+		res.Blank = this.Blank;
+		return res;
+	};
+	Filters.prototype.init = function (obj) {
+		var allFilterOpenElements = true;
+		for (var i = 0; i < obj.values.length; i++) {
+			if (obj.values[i].visible) {
+				if (obj.values[i].isDateFormat) {
+					if (obj.values[i].text === "") {
+						this.Blank = true;
+					} else {
+						var dateGroupItem = new DateGroupItem();
+						var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
+						dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
+						autoFilterDateElem.convertDateGroupItemToRange(dateGroupItem);
+
+						this.Dates.push(autoFilterDateElem);
+					}
+				} else {
+					if (obj.values[i].text === "") {
+						this.Blank = true;
+					} else {
+						this.Values[obj.values[i].text] = true;
+					}
+				}
+			} else {
+				allFilterOpenElements = false;
+			}
 		}
-	}
-	else if(this.Values)
-	{
-		if(val === "")
-		{
-			res = !this.Blank ? true : false;
+		this._sortDate();
+		this._initLowerCaseValues();
+
+		return allFilterOpenElements;
+	};
+	Filters.prototype.isHideValue = function (val, isDateTimeFormat) {
+		var res = false;
+
+		if (isDateTimeFormat && this.Dates) {
+			if (val === "") {
+				res = !this.Blank ? true : false;
+			} else {
+				res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
+			}
+		} else if (this.Values) {
+			if (val === "") {
+				res = !this.Blank ? true : false;
+			} else {
+				res = !this.lowerCaseValues[val] ? true : false;
+			}
 		}
-		else
-		{
-			res = !this.lowerCaseValues[val] ? true : false;
+
+		return res;
+	};
+
+	Filters.prototype.binarySearch = function (val, array) {
+		var i = 0, j = array.length - 1, k;
+		val = parseFloat(val);
+
+		while (i <= j) {
+			k = Math.floor((i + j) / 2);
+
+			if (val >= array[k].start && val < array[k].end) {
+				return k;
+			} else if (val < array[k].start) {
+				j = k - 1;
+			} else {
+				i = k + 1;
+			}
 		}
-	}
-	
-	return res;
-};
 
-Filters.prototype.binarySearch = function(val, array) {
-	var i = 0, j = array.length - 1, k;
-	val = parseFloat(val);
-
-	while (i <= j)
-	{
-		k = Math.floor((i + j) / 2);
-		
-		if (val >= array[k].start && val < array[k].end) 
-			return k;
-		else if (val < array[k].start)
-			j = k - 1;
-		else
-			i = k + 1;
-	}
-
-	return -1; 
-};
-
-Filters.prototype.linearSearch = function(val, array) {
-	var n = array.length, i = 0;
-	val = parseFloat(val);
-
-	while (i <= n && !(array[i] && val >= array[i].start && val < array[i].end))
-		i++;
- 
-	if (i < n)
-		return i;
-	else
 		return -1;
-};
-Filters.prototype._initLowerCaseValues = function() {
-	if(this.lowerCaseValues === null)
-	{
-		this.lowerCaseValues = {};
-		for(var i in this.Values)
-		{
-			this.lowerCaseValues[i.toLowerCase()] = true;
-		}
-	}
-};
-Filters.prototype._sortDate = function()
-{
-	if(this.Dates && this.Dates.length)
-	{
-		this.Dates.sort (function sortArr(a, b)
-		{
-			return a.start - b.start;
-		})
-	}
-};
+	};
 
-Filters.prototype.clean = function()
-{
-	this.Values = {};
-	this.Dates = [];
-	this.Blank = null;
-};
+	Filters.prototype.linearSearch = function (val, array) {
+		var n = array.length, i = 0;
+		val = parseFloat(val);
+
+		while (i <= n && !(array[i] && val >= array[i].start && val < array[i].end))
+			i++;
+
+		if (i < n) {
+			return i;
+		} else {
+			return -1;
+		}
+	};
+	Filters.prototype._initLowerCaseValues = function () {
+		if (this.lowerCaseValues === null) {
+			this.lowerCaseValues = {};
+			for (var i in this.Values) {
+				this.lowerCaseValues[i.toLowerCase()] = true;
+			}
+		}
+	};
+	Filters.prototype._sortDate = function () {
+		if (this.Dates && this.Dates.length) {
+			this.Dates.sort(function sortArr(a, b) {
+				return a.start - b.start;
+			})
+		}
+	};
+
+	Filters.prototype.clean = function () {
+		this.Values = {};
+		this.Dates = [];
+		this.Blank = null;
+	};
 	
 /** @constructor */
 function Filter() {
