@@ -1098,10 +1098,10 @@
 
 	function CMetafileFontPicker(cache)
 	{
-		this.Cache = cache ? cache : new AscFonts.CFontFilesCache();
+		this.Cache = cache ? cache : new AscFonts.CFontFilesCache(); // в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
 		this.FontsInCache = {}; // "Arial_12_bi_needI" -> "Arial_bi" так как зависимость только от имени и стиля. (без размера и нужно ли эмулировать стиль)
-		this.LastPickFont = "";
-		this.Metafile = null;
+		this.LastPickFont = ""; // последний выставленный шрифт, из измененных
+		this.Metafile = null; // класс, которому будет подменяться шрифт
 
 		this.SetFont = function(name, style)
 		{
