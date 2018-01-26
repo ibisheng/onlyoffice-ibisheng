@@ -1800,19 +1800,19 @@ CDocument.prototype.Get_PageContentStartPos        = function(PageIndex, Element
 
     var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-    var Y      = SectPr.PageMargins.Top;
-    var YLimit = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
-    var X      = SectPr.PageMargins.Left;
-    var XLimit = SectPr.PageSize.W - SectPr.PageMargins.Right;
+    var Y      = Math.abs(SectPr.Get_PageMargin_Top());
+    var YLimit = SectPr.Get_PageHeight() - Math.abs(SectPr.Get_PageMargin_Bottom());
+    var X      = SectPr.Get_PageMargin_Left();
+    var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
 
     var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines(PageIndex);
 
     var YHeader = HdrFtrLine.Top;
-    if (null !== YHeader && YHeader > Y)
+    if (null !== YHeader && YHeader > Y && SectPr.Get_PageMargin_Top() >= 0)
         Y = YHeader;
 
     var YFooter = HdrFtrLine.Bottom;
-    if (null !== YFooter && YFooter < YLimit)
+    if (null !== YFooter && YFooter < YLimit && SectPr.Get_PageMargin_Bottom() >= 0)
         YLimit = YFooter;
 
     return {X : X, Y : Y, XLimit : XLimit, YLimit : YLimit};
@@ -1828,8 +1828,8 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-	var Y      = SectPr.Get_PageMargin_Top();
-	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+	var Y      = Math.abs(SectPr.Get_PageMargin_Top());
+	var YLimit = SectPr.Get_PageHeight() - Math.abs(SectPr.Get_PageMargin_Bottom());
 	var X      = SectPr.Get_PageMargin_Left();
 	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
 
@@ -1853,11 +1853,11 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
         XLimit = X + SectPr.Get_ColumnWidth(ColumnAbs);
 
     var YHeader = HdrFtrLine.Top;
-    if (null !== YHeader && YHeader > Y)
+    if (null !== YHeader && YHeader > Y && SectPr.Get_PageMargin_Top() >= 0)
         Y = YHeader;
 
     var YFooter = HdrFtrLine.Bottom;
-    if (null !== YFooter && YFooter < YLimit)
+    if (null !== YFooter && YFooter < YLimit && SectPr.Get_PageMargin_Bottom() >= 0)
         YLimit = YFooter;
 
     var ColumnSpaceBefore = (ColumnAbs > 0 ? SectPr.Get_ColumnSpace(ColumnAbs - 1) : 0);
@@ -2352,9 +2352,9 @@ CDocument.prototype.Recalculate_Page = function()
             Page.Width          = SectPr.PageSize.W;
             Page.Height         = SectPr.PageSize.H;
             Page.Margins.Left   = SectPr.PageMargins.Left;
-            Page.Margins.Top    = SectPr.PageMargins.Top;
+            Page.Margins.Top    = Math.abs(SectPr.PageMargins.Top);
             Page.Margins.Right  = SectPr.PageSize.W - SectPr.PageMargins.Right;
-            Page.Margins.Bottom = SectPr.PageSize.H - SectPr.PageMargins.Bottom;
+            Page.Margins.Bottom = SectPr.PageSize.H - Math.abs(SectPr.PageMargins.Bottom);
 
             Page.Sections[0] = new CDocumentPageSection();
             var ColumnsCount = SectPr.Get_ColumnsCount();
@@ -3956,8 +3956,17 @@ CDocument.prototype.Draw                                     = function(nPageInd
             FooterInfo = {bFirst : bFirst, bEven : bEven};
         }
 
-        pGraphics.DrawHeaderEdit(this.Pages[nPageIndex].Y, this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, HeaderInfo);
-        pGraphics.DrawFooterEdit(this.Pages[nPageIndex].YLimit, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, FooterInfo);
+		var oHdrFtrLine = this.HdrFtr.Get_HdrFtrLines(nPageIndex);
+        var nHeaderY = this.Pages[nPageIndex].Y;
+        if (oHdrFtrLine.Top > nHeaderY)
+        	nHeaderY = oHdrFtrLine.Top;
+
+		var nFooterY = this.Pages[nPageIndex].YLimit;
+		if (oHdrFtrLine.Bottom < nFooterY)
+			nFooterY = oHdrFtrLine.Bottom;
+
+        pGraphics.DrawHeaderEdit(nHeaderY, this.HdrFtr.Lock.Get_Type(), SectIndex, RepH, HeaderInfo);
+        pGraphics.DrawFooterEdit(nFooterY, this.HdrFtr.Lock.Get_Type(), SectIndex, RepF, FooterInfo);
     }
 };
 CDocument.prototype.Draw_Borders                             = function(Graphics, SectPr)
@@ -8359,9 +8368,9 @@ CDocument.prototype.Document_UpdateRulersStateBySection = function(Pos)
 	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
 	var L = SectPr.Get_PageMargin_Left();
-	var T = SectPr.Get_PageMargin_Top();
+	var T = Math.abs(SectPr.Get_PageMargin_Top());
 	var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-	var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+	var B = SectPr.Get_PageHeight() - Math.abs(SectPr.Get_PageMargin_Bottom());
 
 	var ColumnsCount = SectPr.Get_ColumnsCount();
 
