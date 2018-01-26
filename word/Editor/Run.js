@@ -1650,7 +1650,7 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
  * или ссылки на сноску или разметки сложного поля. На вход приходит либо массив изменений, либо одно изменение
  * (можно не в массиве).
  */
-ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
+ParaRun.prototype.IsParagraphSimpleChanges = function(_Changes)
 {
     var Changes = _Changes;
     if (!_Changes.length)
@@ -1674,6 +1674,20 @@ ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
     }
 
     return true;
+};
+/**
+ * Проверяем, подходит ли содержимое данного рана быстрого пересчета
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsContentSuitableForParagraphSimpleChanges = function()
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var nItemType = this.Content[nPos].Type;
+		if (1 !== g_oSRCFPSC[nItemType])
+			return false;
+	}
+	return true;
 };
 
 // Возвращаем строку и отрезок, в котором произошли простейшие изменения

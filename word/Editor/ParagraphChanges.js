@@ -400,6 +400,22 @@ CChangesParagraphAddItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesParagraphRemoveItem);
 };
+CChangesParagraphAddItem.prototype.IsParagraphSimpleChanges = function()
+{
+	// Простыми измененями считаем добавление комментариев и добавление ранов с простым текстом
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
+			&& para_Comment !== oItem.Type
+			&& para_Bookmark !== Item.Type)
+		{
+			return false;
+		}
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -475,6 +491,22 @@ CChangesParagraphRemoveItem.prototype.IsRelated = function(oChanges)
 CChangesParagraphRemoveItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesParagraphAddItem);
+};
+CChangesParagraphRemoveItem.prototype.IsParagraphSimpleChanges = function()
+{
+	// Простыми измененями считаем добавление комментариев и добавление ранов с простым текстом
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
+			&& para_Comment !== oItem.Type
+			&& para_Bookmark !== Item.Type)
+		{
+			return false;
+		}
+	}
+
+	return true;
 };
 /**
  * @constructor

@@ -821,6 +821,8 @@ ParaComment.prototype.IsCommentStart = function()
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+
 window['AscCommon'].CCommentData = CCommentData;
-window['AscCommon'].CComment = CComment;
-window['AscCommon'].ParaComment = ParaComment;
+window['AscCommon'].CComments    = CComments;
+window['AscCommon'].CComment     = CComment;
+window['AscCommon'].ParaComment  = ParaComment;

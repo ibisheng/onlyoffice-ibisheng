@@ -2041,7 +2041,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 
         // TODO: Тут надо вставить заглушку, что если у нас в долгом пересчете находится страница <= PageIndex + 1,
         //       по отношению к данной, тогда не надо делать быстрый пересчет.
-        var SimplePara = History.Is_ParagraphSimpleChanges();
+        var SimplePara = History.IsParagraphSimpleChanges();
         if (null !== SimplePara)
         {
             var FastPages      = SimplePara.Recalculate_FastWholeParagraph();

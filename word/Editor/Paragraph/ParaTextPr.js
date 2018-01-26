@@ -91,6 +91,17 @@ ParaTextPr.prototype.Get_Id = function()
 {
 	return this.Id;
 };
+ParaTextPr.prototype.GetParagraph = function()
+{
+	if (this.Parent instanceof Paragraph)
+		return this.Parent;
+
+	return null;
+};
+ParaTextPr.prototype.IsParagraphSimpleChanges = function()
+{
+	return true;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для изменения свойств
 //----------------------------------------------------------------------------------------------------------------------

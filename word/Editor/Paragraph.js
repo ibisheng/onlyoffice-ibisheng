@@ -12676,6 +12676,26 @@ Paragraph.prototype.GetElementsCount = function()
 	// TODO: (ParaEnd) Возвращаем -1, т.к. последний ParaRun используется только для знака конца параграфа
 	return this.Content.length - 1;
 };
+/**
+ * Проверяем произошло ли простое изменение параграфа, сейчас это только добавление/удаление комментариев.
+ * (можно не в массиве).
+ */
+Paragraph.prototype.IsParagraphSimpleChanges = function(_Changes)
+{
+	var Changes = _Changes;
+	if (!_Changes.length)
+		Changes = [_Changes];
+
+	var ChangesCount = Changes.length;
+	for (var ChangesIndex = 0; ChangesIndex < ChangesCount; ChangesIndex++)
+	{
+		var Data = Changes[ChangesIndex].Data;
+		if (!Data.IsParagraphSimpleChanges())
+			return false;
+	}
+
+	return true;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

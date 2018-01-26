@@ -3092,6 +3092,10 @@
 	{
 		this.Reverted = isReverted;
 	};
+	CChangesBase.prototype.IsParagraphSimpleChanges = function()
+	{
+		return false;
+	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**
 	 * Базовый класс для изменений, которые меняют содержимое родительского класса.*
