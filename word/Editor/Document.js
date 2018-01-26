@@ -2238,14 +2238,16 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 			ChangeIndex = this.Content.length - 1;
 		}
 
-		// Здсь мы должны проверить предыдущие элементы на наличие параматра KeepNext
-		while (ChangeIndex > 0)
+		// Проверяем предыдущие элементы на наличие параметра KeepNext, но не более, чем на 1 страницу
+		var nTempPage  = this.private_GetPageByPos(ChangeIndex);
+		var nTempIndex = (-1 !== nTempPage && nTempPage > 1) ? this.Pages[nTempPage - 1].Pos : 0;
+		while (ChangeIndex > nTempIndex)
 		{
 			var PrevElement = this.Content[ChangeIndex - 1];
-			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
+			if (type_Paragraph === PrevElement.GetType() && PrevElement.IsKeepNext())
 			{
 				ChangeIndex--;
-				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1);
+				RecalcData.Inline.PageNum = PrevElement.Get_AbsolutePage(PrevElement.GetPagesCount());
 				// считаем, что изменилась последняя страница
 			}
 			else
@@ -2262,16 +2264,11 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		}
 		else
 		{
-			var PagesCount = this.Pages.length;
-			for (var PageIndex = 0; PageIndex < PagesCount; PageIndex++)
+			var nTempPage = this.private_GetPageByPos(ChangeIndex);
+			if (-1 !== nTempPage)
 			{
-				if (ChangeIndex > this.Pages[PageIndex].Pos)
-				{
-					StartPage  = PageIndex;
-					StartIndex = this.Pages[PageIndex].Pos;
-				}
-				else
-					break;
+				StartPage  = nTempPage;
+				StartIndex = this.Pages[nTempPage].Pos;
 			}
 
 			if (ChangeIndex === StartIndex && StartPage < RecalcData.Inline.PageNum)
@@ -3663,6 +3660,24 @@ CDocument.prototype.private_CheckUnusedFields = function()
 		if (oSeparateChar)
 			oSeparateChar.SetUse(false);
 	}
+};
+/**
+ * Получаем номер рассчитанной страницы, с которой начинается заданный элемент
+ * @param nElementPos
+ * @returns {number}
+ */
+CDocument.prototype.private_GetPageByPos = function(nElementPos)
+{
+	var nResultPage = -1;
+	for (var nCurPage = 0, nPagesCount = this.Pages.length; nCurPage < nPagesCount; ++nCurPage)
+	{
+		if (nElementPos > this.Pages[nCurPage].Pos)
+			nResultPage = nCurPage;
+		else
+			break;
+	}
+
+	return nResultPage;
 };
 CDocument.prototype.OnColumnBreak_WhileRecalculate           = function()
 {
@@ -12127,15 +12142,6 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 			Item.AddNewParagraph();
 		}
 	}
-
-	if (false !== bRecalculate)
-	{
-		this.Recalculate();
-
-		this.Document_UpdateInterfaceState();
-		//this.Document_UpdateRulersState()
-		this.Document_UpdateSelectionState();
-	}
 };
 CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
@@ -12611,11 +12617,6 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 		Count = -Count;
 
 	this.private_Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
-
-	this.Recalculate();
-
-	this.Document_UpdateInterfaceState();
-	this.Document_UpdateRulersState();
 };
 CDocument.prototype.controller_GetCursorPosXY = function()
 {

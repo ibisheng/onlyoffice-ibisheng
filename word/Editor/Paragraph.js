@@ -8685,6 +8685,10 @@ Paragraph.prototype.Set_KeepNext = function(Value)
 		this.private_UpdateTrackRevisionOnChangeParaPr(true);
 	}
 };
+Paragraph.prototype.IsKeepNext = function()
+{
+	return this.Get_CompiledPr2(false).ParaPr.KeepNext;
+};
 Paragraph.prototype.Set_WidowControl = function(Value)
 {
 	if (Value != this.Pr.WidowControl)
@@ -11863,6 +11867,10 @@ Paragraph.prototype.Get_ContentLength = function()
 Paragraph.prototype.Get_PagesCount = function()
 {
     return this.Pages.length;
+};
+Paragraph.prototype.GetPagesCount = function()
+{
+	return this.Pages.length;
 };
 Paragraph.prototype.IsEmptyPage = function(CurPage, bSkipEmptyLinesWithBreak)
 {
