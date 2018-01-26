@@ -5456,7 +5456,11 @@ CShape.prototype.getColumnNumber = function(){
 
     CShape.prototype.getCopyWithSourceFormatting = function(){
         var oCopy = this.copy();
-        if(oCopy.spPr){
+        if(this.pen || this.brush){
+            if(!oCopy.spPr){
+                oCopy.setSpPr(AscFormat.CSpPr());
+                oCopy.spPr.setParent(oCopy);
+            }
             if(this.brush){
                 oCopy.spPr.setFill(this.brush.saveSourceFormatting());
             }

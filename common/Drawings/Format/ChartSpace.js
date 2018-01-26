@@ -9511,6 +9511,212 @@ CChartSpace.prototype.recalculatePenBrush = function()
     }
 };
 
+function fSaveChartObjectSourceFormatting(oObject, oObjectCopy, oTheme, oColorMap){
+    if(oObject === oObjectCopy || !oObjectCopy || !oObject){
+        return;
+    }
+
+    if(oObject.pen || oObject.brush){
+        if(oObject.pen || oObject.brush){
+            if(!oObjectCopy.spPr){
+                if(oObjectCopy.setSpPr){
+                    oObjectCopy.setSpPr(new AscFormat.CSpPr());
+                    oObjectCopy.spPr.setParent(oObjectCopy);
+                }
+            }
+            if(oObject.brush){
+                oObjectCopy.spPr.setFill(oObject.brush.saveSourceFormatting());
+            }
+            if(oObject.pen){
+                oObjectCopy.spPr.setLn(oObject.pen.createDuplicate(true));
+            }
+        }
+    }
+    if(oObject.txPr && oObject.txPr.content){
+        AscFormat.SaveContentSourceFormatting(oObject.txPr.content.Content, oObjectCopy.txPr.content.Content, oTheme, oColorMap);
+    }
+    if(oObject.tx && oObject.tx.rich && oObject.tx.rich.content){
+        AscFormat.SaveContentSourceFormatting(oObject.tx.rich.content.Content, oObjectCopy.tx.rich.content.Content, oTheme, oColorMap);
+    }
+}
+
+CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
+{
+    var oCopy = this.copy(this.getDrawingDocument());
+    oCopy.updateLinks();
+    if(oIdMap){
+        oIdMap[this.Id] = oCopy.Id;
+    }
+    var oTheme = this.Get_Theme();
+    var oColorMap = this.Get_ColorMap();
+
+    if(!oCopy.txPr || !oCopy.txPr.content || !oCopy.txPr.content.Content[0] || !oCopy.txPr.content.Content[0].Pr
+        || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts
+        || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii.Name){
+        var oTextPr = new CTextPr();
+        oTextPr.RFonts.Set_FromObject(
+            {
+                Ascii: {
+                    Name: "+mn-lt",
+                    Index: -1
+                },
+                EastAsia: {
+                    Name: "+mn-ea",
+                    Index: -1
+                },
+                HAnsi: {
+                    Name: "+mn-lt",
+                    Index: -1
+                },
+                CS: {
+                    Name: "+mn-lt",
+                    Index: -1
+                }
+            }
+        );
+        CheckObjectTextPr(this, oTextPr, this.getDrawingDocument());
+    }
+    fSaveChartObjectSourceFormatting(this, oCopy, oTheme, oColorMap);
+    if(this.chart)
+    {
+        if(this.chart.title)
+        {
+            fSaveChartObjectSourceFormatting(this.chart.title, oCopy.chart.title, oTheme, oColorMap);
+        }
+        if(this.chart.plotArea)
+        {
+            fSaveChartObjectSourceFormatting(this.chart.plotArea, oCopy.chart.plotArea, oTheme, oColorMap);
+            if(oCopy.chart.plotArea.valAx)
+            {
+                fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx, oCopy.chart.plotArea.valAx, oTheme, oColorMap);
+                if(oCopy.chart.plotArea.valAx.title)
+                {
+                    fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx.title, oCopy.chart.plotArea.valAx.title, oTheme, oColorMap);
+                }
+            }
+            if(oCopy.chart.plotArea.catAx)
+            {
+                fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx, oCopy.chart.plotArea.catAx, oTheme, oColorMap);
+                if(oCopy.chart.plotArea.valAx.title)
+                {
+                    fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx.title, oCopy.chart.plotArea.catAx.title, oTheme, oColorMap);
+                }
+            }
+
+            if(this.chart.plotArea.charts[0])
+            {
+                var series = this.chart.plotArea.charts[0].series;
+                var seriesCopy = oCopy.chart.plotArea.charts[0].series;
+
+                var oDataPoint;
+                for(var i = 0; i < series.length; ++i)
+                {
+                    series[i].brush = series[i].compiledSeriesBrush;
+                    series[i].pen = series[i].compiledSeriesPen;
+                    fSaveChartObjectSourceFormatting(series[i], seriesCopy[i], oTheme, oColorMap);
+                    var pts = AscFormat.getPtsFromSeries(series[i]);
+                    var ptsCopy = AscFormat.getPtsFromSeries(seriesCopy[i]);
+                    for(var j = 0; j < pts.length; ++j)
+                    {
+                        var pt = pts[j];
+                        oDataPoint = null;
+                        if(Array.isArray(seriesCopy[i].dPt))
+                        {
+                            for(var k = 0; k < seriesCopy[i].dPt.length; ++k)
+                            {
+                                if(seriesCopy[i].dPt[k].idx === pts[j].idx)
+                                {
+                                    oDataPoint = seriesCopy[i].dPt[k];
+                                    break;
+                                }
+                            }
+                        }
+                        if(!oDataPoint)
+                        {
+                            oDataPoint = new AscFormat.CDPt();
+                            oDataPoint.setIdx(pt.idx);
+                            seriesCopy[i].addDPt(oDataPoint);
+                        }
+                        fSaveChartObjectSourceFormatting(pt, oDataPoint, oTheme, oColorMap);
+                        if(pt.compiledMarker)
+                        {
+                            var oMarker = pt.compiledMarker.createDuplicate();
+                            oDataPoint.setMarker(oMarker);
+                            fSaveChartObjectSourceFormatting(pt.compiledMarker, oMarker, oTheme, oColorMap);
+                        }
+                    }
+                }
+                if(oCopy.chart.plotArea.charts[0].calculatedHiLowLines)
+                {
+                    if(!oCopy.chart.plotArea.charts[0].hiLowLines)
+                    {
+                        oCopy.chart.plotArea.charts[0].setHiLowLines(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.charts[0].hiLowLines.setLn(this.chart.plotArea.charts[0].calculatedHiLowLines.createDuplicate(true));
+                }
+                if( oCopy.chart.plotArea.charts[0].upDownBars)
+                {
+                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsBrush)
+                    {
+                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        {
+                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                        }
+                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setFill(this.chart.plotArea.charts[0].upDownBars.upBarsBrush.saveSourceFormatting());
+                    }
+                    if(oCopy.chart.plotArea.charts[0].upDownBars.upBarsPen)
+                    {
+                        if(!oCopy.chart.plotArea.charts[0].upDownBars.upBars)
+                        {
+                            oCopy.chart.plotArea.charts[0].upDownBars.setUpBars(new AscFormat.CSpPr());
+                        }
+                        oCopy.chart.plotArea.charts[0].upDownBars.upBars.setLn(this.chart.plotArea.charts[0].upDownBars.upBarsPen.createDuplicate(true));
+                    }
+                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsBrush)
+                    {
+                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        {
+                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                        }
+                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setFill(this.chart.plotArea.charts[0].upDownBars.downBarsBrush.saveSourceFormatting());
+                    }
+                    if(oCopy.chart.plotArea.charts[0].upDownBars.downBarsPen)
+                    {
+                        if(!oCopy.chart.plotArea.charts[0].upDownBars.downBars)
+                        {
+                            oCopy.chart.plotArea.charts[0].upDownBars.setDownBars(new AscFormat.CSpPr());
+                        }
+                        oCopy.chart.plotArea.charts[0].upDownBars.downBars.setLn(this.chart.plotArea.charts[0].upDownBars.downBarsPen.createDuplicate(true));
+                    }
+                }
+            }
+        }
+        if(this.chart.legend)
+        {
+            fSaveChartObjectSourceFormatting(this.chart.legend, oCopy.chart.legend, oTheme, oColorMap);
+            var legend = this.chart.legend;
+            for(var i = 0; i < legend.legendEntryes.length; ++i)
+            {
+                fSaveChartObjectSourceFormatting(legend.legendEntryes[i], oCopy.chart.legend.legendEntryes[i], oTheme, oColorMap);
+            }
+        }
+        if(this.chart.floor)
+        {
+            fSaveChartObjectSourceFormatting(this.chart.floor, oCopy.chart.floor, oTheme, oColorMap);
+        }
+        if(this.chart.sideWall)
+        {
+
+            fSaveChartObjectSourceFormatting(this.chart.sideWall, oCopy.chart.sideWall, oTheme, oColorMap);
+        }
+        if(this.chart.backWall)
+        {
+            fSaveChartObjectSourceFormatting(this.chart.backWall, oCopy.chart.backWall, oTheme, oColorMap);
+        }
+    }
+    return oCopy;
+};
+
 CChartSpace.prototype.getChartSizes = function()
 {
     if(this.plotAreaRect && !this.recalcInfo.recalculateAxisVal){
@@ -9742,11 +9948,8 @@ CChartSpace.prototype.recalculateDLbls = function()
         var default_lbl = new AscFormat.CDLbl();
         default_lbl.initDefault(nDefaultPosition);
         var bSkip = false;
-        var nSkiped = 0;
-        var n
         if(this.ptsCount > MAX_LABELS_COUNT){
             bSkip = true;
-            nSkiped = (this.ptsCount/(MAX_LABELS_COUNT) - 0.5) >> 0;
         }
         var nCount = 0;
         var nLblCount = 0;
