@@ -949,6 +949,19 @@
 			this.ClearCache();
 		};
 
+		this.GetGIDByUnicode = function(glyph)
+		{
+            var nCMapIndex = new CCMapIndex();
+            var unGID = this.SetCMapForCharCode(glyph, nCMapIndex);
+            if (unGID > 0)
+            	return unGID;
+
+            if (-1 != this.m_nSymbolic && glyph < 0xF000)
+                unGID = this.SetCMapForCharCode(glyph + 0xF000, nCMapIndex);
+
+            return unGID;
+		};
+
 		this.CacheGlyph = function(glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, isFromPicker)
 		{
             var oSizes = new CFontCacheSizes();
