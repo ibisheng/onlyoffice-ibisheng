@@ -1487,6 +1487,9 @@ function DecodeBase64(imData, szSrc)
 		g_map_font_index["ASCW3"] = l;
 		/////////////////////////////////////////////////////////////////////
 
+        if (AscFonts.FontPickerByCharacter)
+            AscFonts.FontPickerByCharacter.init(window["__fonts_infos"]);
+
 		// удаляем временные переменные
 		delete window["__fonts_files"];
 		delete window["__fonts_infos"];
