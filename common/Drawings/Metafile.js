@@ -1096,6 +1096,29 @@
 		[1, 1]
 	];
 
+	function CMetafileFontPicker(cache)
+	{
+		this.Cache = cache ? cache : new AscFonts.CFontFilesCache();
+		this.FontsInCache = {}; // "Arial_12_bi_needI" -> "Arial_bi" так как зависимость только от имени и стиля. (без размера и нужно ли эмулировать стиль)
+		this.LastPickFont = "";
+		this.Metafile = null;
+
+		this.SetFont = function(name, style)
+		{
+
+		};
+
+		this.FillTextCode = function(glyph)
+		{
+
+		};
+
+		this.LoadFont = function(name, style)
+		{
+
+		};
+	}
+
 
 	function CMetafile(width, height)
 	{
