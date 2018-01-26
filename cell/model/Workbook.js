@@ -7247,6 +7247,48 @@
 		return this.v;
 	};
 
+	function ignoreFirstRowSort(worksheet, bbox) {
+		var res = false;
+
+		if(bbox.r1 < bbox.r2) {
+			var rowFirst = worksheet.getRange3(bbox.r1, bbox.c1, bbox.r1, bbox.c2);
+			var rowSecond = worksheet.getRange3(bbox.r1 + 1, bbox.c1, bbox.r1 + 1, bbox.c2);
+			var typesFirst = [];
+			var typesSecond = [];
+			rowFirst._setPropertyNoEmpty(null, null, function(cell, row, col) {
+				if (cell && !cell.isNullTextString()) {
+					typesFirst.push({col: col, type: cell.getType()});
+				}
+			});
+			rowSecond._setPropertyNoEmpty(null, null, function(cell, row, col) {
+				if (cell && !cell.isNullTextString()) {
+					typesSecond.push({col: col, type: cell.getType()});
+				}
+			});
+			var indexFirst = 0;
+			var indexSecond = 0;
+			while (indexFirst < typesFirst.length && indexSecond < typesSecond.length) {
+				var curFirst = typesFirst[indexFirst];
+				var curSecond = typesSecond[indexSecond];
+				if (curFirst.col < curSecond.col) {
+					indexFirst++;
+				} else if (curFirst.col > curSecond.col) {
+					indexSecond++;
+				} else {
+					if (curFirst.type != curSecond.type) {
+						//has head
+						res = true;
+						break;
+					}
+					indexFirst++;
+					indexSecond++;
+				}
+			}
+		}
+
+		return res;
+	}
+
 	/**
 	 * @constructor
 	 */
@@ -9429,42 +9471,14 @@
 	};
 	Range.prototype.sort=function(nOption, nStartCol, sortColor, opt_guessHeader){
 		var bbox = this.bbox;
-		if (opt_guessHeader && bbox.r1 < bbox.r2) {
+		if (opt_guessHeader) {
 			//если тип ячеек первого и второго row попарно совпадает, то считаем первую строку заголовком
 			//todo рассмотреть замерженые ячейки. стили тоже влияют, но непонятно как сравнивать border
-			var rowFirst = this.worksheet.getRange3(bbox.r1, bbox.c1, bbox.r1, bbox.c2);
-			var rowSecond = this.worksheet.getRange3(bbox.r1 + 1, bbox.c1, bbox.r1 + 1, bbox.c2);
-			var typesFirst = [];
-			var typesSecond = [];
-			rowFirst._setPropertyNoEmpty(null, null, function(cell, row, col) {
-				if (cell && !cell.isNullTextString()) {
-					typesFirst.push({col: col, type: cell.getType()});
-				}
-			});
-			rowSecond._setPropertyNoEmpty(null, null, function(cell, row, col) {
-				if (cell && !cell.isNullTextString()) {
-					typesSecond.push({col: col, type: cell.getType()});
-				}
-			});
-			var indexFirst = 0;
-			var indexSecond = 0;
-			while (indexFirst < typesFirst.length && indexSecond < typesSecond.length) {
-				var curFirst = typesFirst[indexFirst];
-				var curSecond = typesSecond[indexSecond];
-				if (curFirst.col < curSecond.col) {
-					indexFirst++;
-				} else if (curFirst.col > curSecond.col) {
-					indexSecond++;
-				} else {
-					if (curFirst.type != curSecond.type) {
-						//has head
-						bbox = bbox.clone();
-						bbox.r1++;
-						break;
-					}
-					indexFirst++;
-					indexSecond++;
-				}
+
+			var bIgnoreFirstRow = ignoreFirstRowSort(this.worksheet, bbox);
+			if(bIgnoreFirstRow) {
+				bbox = bbox.clone();
+				bbox.r1++;
 			}
 		}
 		//todo горизонтальная сортировка
@@ -10979,4 +10993,5 @@
 	window['AscCommonExcel'].promoteFromTo = promoteFromTo;
 	window['AscCommonExcel'].getCompiledStyle = getCompiledStyle;
 	window['AscCommonExcel'].getCompiledStyleFromArray = getCompiledStyleFromArray;
+	window['AscCommonExcel'].ignoreFirstRowSort = ignoreFirstRowSort;
 })(window);

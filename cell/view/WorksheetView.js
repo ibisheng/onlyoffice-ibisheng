@@ -12431,6 +12431,12 @@
 					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true, true, true);
 
+					var bIgnoreFirstRow = window['AscCommonExcel'].ignoreFirstRowSort(t.model, expandRange);
+					if(bIgnoreFirstRow)
+					{
+						expandRange.r1++;
+					}
+
 					//change selection
 					t.setSelection(expandRange);
 					selectionRange.activeCell = activeCell;
