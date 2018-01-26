@@ -1123,6 +1123,9 @@ function CBinaryFileWriter()
 			});
 			this.EndRecord();
 		}
+        if (presentation.writecomments) {
+            this.WriteComments(10, presentation.writecomments);
+        }
 
         this.EndRecord();
     }
@@ -1198,55 +1201,58 @@ function CBinaryFileWriter()
         this.WriteRecord1(0, _slide.cSld, this.WriteCSld);
         this.WriteRecord2(1, _slide.clrMap, this.WriteClrMapOvr);
         this.WriteRecord1(2, _slide.timing, this.WriteSlideTransition);
+        this.WriteComments(4, _slide.writecomments);
 
+        this.EndRecord();
+    }
+    this.WriteComments = function(type, comments)
+    {
         var _countComments = 0;
 
-        if (!this.IsUseFullUrl)
+        if (!oThis.IsUseFullUrl)
         {
-            for (var i in _slide.writecomments)
+            for (var i in comments)
                 ++_countComments;
         }
 
         if (_countComments > 0)
         {
-            this.StartRecord(4);
-            this.StartRecord(0);
+            oThis.StartRecord(type);
+            oThis.StartRecord(0);
 
-            this.WriteULong(_countComments);
+            oThis.WriteULong(_countComments);
 
-            for (var i in _slide.writecomments)
+            for (var i in comments)
             {
-                var _comment = _slide.writecomments[i];
+                var _comment = comments[i];
 
-                this.StartRecord(0);
+                oThis.StartRecord(0);
 
-                this.WriteUChar(g_nodeAttributeStart);
+                oThis.WriteUChar(g_nodeAttributeStart);
 
-                this._WriteInt1(0, _comment.WriteAuthorId);
-                this._WriteString1(1, _comment.WriteTime);
-                this._WriteInt1(2, _comment.WriteCommentId);
-                this._WriteInt1(3, (_comment.x * 25.4) >> 0);
-                this._WriteInt1(4, (_comment.y * 25.4) >> 0);
-                this._WriteString1(5, _comment.Data.m_sText);
+                oThis._WriteInt1(0, _comment.WriteAuthorId);
+                oThis._WriteString1(1, _comment.WriteTime);
+                oThis._WriteInt1(2, _comment.WriteCommentId);
+                oThis._WriteInt1(3, (_comment.x * 25.4) >> 0);
+                oThis._WriteInt1(4, (_comment.y * 25.4) >> 0);
+                oThis._WriteString1(5, _comment.Data.m_sText);
 
                 if (0 != _comment.WriteParentAuthorId)
                 {
-                    this._WriteInt1(6, _comment.WriteParentAuthorId);
-                    this._WriteInt1(7, _comment.WriteParentCommentId);
+                    oThis._WriteInt1(6, _comment.WriteParentAuthorId);
+                    oThis._WriteInt1(7, _comment.WriteParentCommentId);
                 }
 
-                this._WriteString1(8, _comment.AdditionalData);
+                oThis._WriteString1(8, _comment.AdditionalData);
 
-                this.WriteUChar(g_nodeAttributeEnd);
+                oThis.WriteUChar(g_nodeAttributeEnd);
 
-                this.EndRecord();
+                oThis.EndRecord();
             }
 
-            this.EndRecord();
-            this.EndRecord();
+            oThis.EndRecord();
+            oThis.EndRecord();
         }
-
-        this.EndRecord();
     }
 
     this.WriteSlideTransition = function(_timing)

@@ -191,7 +191,8 @@
         OleLink:10,
 		DdeLink: 11,
 		VbaProject: 12,
-		JsaProject: 13
+		JsaProject: 13,
+		Comments: 14
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -2293,11 +2294,12 @@
             }
         };
     }
-    function BinaryWorkbookTableWriter(memory, wb, isCopyPaste)
+    function BinaryWorkbookTableWriter(memory, wb, oBinaryWorksheetsTableWriter, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
+        this.oBinaryWorksheetsTableWriter = oBinaryWorksheetsTableWriter;
         this.isCopyPaste = isCopyPaste;
         this.Write = function()
         {
@@ -2333,6 +2335,9 @@
 				if (macros) {
 					this.bs.WriteItem(c_oSerWorkbookTypes.JsaProject, function() {oThis.memory.WriteXmlString(macros);});
 				}
+                if (this.wb.aComments.length > 0) {
+                    this.bs.WriteItem(c_oSerWorkbookTypes.Comments, function() {oThis.WriteComments(oThis.wb.aComments);});
+                }
 			}
         };
         this.WriteWorkbookPr = function()
@@ -2573,6 +2578,12 @@
 				oThis.memory.WriteString2(cell.CellValue);
 			}
 		};
+        this.WriteComments = function(aComments) {
+            var t = this;
+            for (var i = 0; i < aComments.length; ++i) {
+                this.bs.WriteItem( c_oSer_Comments.CommentData, function(){t.oBinaryWorksheetsTableWriter.WriteCommentData(aComments[i]);});
+            }
+        };
     }
 	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, idWorksheet, isCopyPaste)
     {
@@ -2651,10 +2662,9 @@
             if (ws.Drawings && (ws.Drawings.length))
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
-            var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
-            if (aComments.length > 0) {
+            if (ws.aComments.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
-                    oThis.WriteComments(aComments, ws);
+                    oThis.WriteComments(ws.aComments, ws);
                 });
             }
 
@@ -3503,56 +3513,25 @@
         this.WriteComments = function(aComments, ws)
         {
             var oThis = this;
-            var oNewComments = {}, i, length, elem, nRow, nCol, row, comment;
-            for(i = 0, length = aComments.length; i < length; ++i)
+            var i, elem, coord;
+            for(i = 0; i < aComments.length; ++i)
             {
+                elem = aComments[i];
                 //write only active comments, if copy/paste
                 if(this.isCopyPaste)
 				{
 					//ignore hidden rows if ws.bExcludeHiddenRows === true
-					if(!this.isCopyPaste.contains(aComments[i].nCol, aComments[i].nRow) || (ws.bExcludeHiddenRows && ws.getRowHidden(aComments[i].nRow)))
+					if(!this.isCopyPaste.contains(elem.nCol, elem.nRow) || (ws.bExcludeHiddenRows && ws.getRowHidden(elem.nRow)))
 					{
 						continue;
 					}
 				}
-
-                elem = aComments[i];
-                nRow = elem.asc_getRow();
-                if(null == nRow)
-                    nRow = 0;
-                nCol = elem.asc_getCol();
-                if(null == nCol)
-                    nCol = 0;
-                row = oNewComments[nRow];
-                if(null == row)
-                {
-                    row = {};
-                    oNewComments[nRow] = row;
-                }
-                comment = row[nCol];
-                if(null == comment)
-                {
-                    comment = {data: [], coord: null};
-                    row[nCol] = comment;
-                }
-                comment.data.push(elem);
-				comment.coord = elem.coords;
-            }
-            for(i in oNewComments)
-            {
-                row = oNewComments[i];
-                for(var j in row)
-                {
-                    comment = row[j];
-                    if(null == comment.coord || 0 == comment.data.length)
-                        continue;
-                    var coord = comment.coord;
-                    if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
-                        null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
-                        null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
-                        continue;
-                    this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(comment);});
-                }
+                coord = elem.coords;
+                if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
+                    null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
+                    null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
+                    continue;
+                this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
             }
         };
         this.WriteComment = function(comment)
@@ -3560,77 +3539,76 @@
             var oThis = this;
             this.memory.WriteByte(c_oSer_Comments.Row);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nRow);
+            this.memory.WriteLong(comment.coords.nRow);
 
             this.memory.WriteByte(c_oSer_Comments.Col);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nCol);
+            this.memory.WriteLong(comment.coords.nCol);
 
             this.memory.WriteByte(c_oSer_Comments.CommentDatas);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.bs.WriteItemWithLength(function(){oThis.WriteCommentDatas(comment.data);});
+            this.bs.WriteItemWithLength(function(){oThis.WriteCommentDatas(comment);});
 
             this.memory.WriteByte(c_oSer_Comments.Left);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nLeft);
+            this.memory.WriteLong(comment.coords.nLeft);
 
             this.memory.WriteByte(c_oSer_Comments.Top);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nTop);
+            this.memory.WriteLong(comment.coords.nTop);
 
             this.memory.WriteByte(c_oSer_Comments.Right);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nRight);
+            this.memory.WriteLong(comment.coords.nRight);
 
             this.memory.WriteByte(c_oSer_Comments.Bottom);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nBottom);
+            this.memory.WriteLong(comment.coords.nBottom);
 
             this.memory.WriteByte(c_oSer_Comments.LeftOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nLeftOffset);
+            this.memory.WriteLong(comment.coords.nLeftOffset);
 
             this.memory.WriteByte(c_oSer_Comments.TopOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nTopOffset);
+            this.memory.WriteLong(comment.coords.nTopOffset);
 
             this.memory.WriteByte(c_oSer_Comments.RightOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nRightOffset);
+            this.memory.WriteLong(comment.coords.nRightOffset);
 
             this.memory.WriteByte(c_oSer_Comments.BottomOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.nBottomOffset);
+            this.memory.WriteLong(comment.coords.nBottomOffset);
 
             this.memory.WriteByte(c_oSer_Comments.LeftMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.dLeftMM);
+            this.memory.WriteDouble2(comment.coords.dLeftMM);
 
             this.memory.WriteByte(c_oSer_Comments.TopMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.dTopMM);
+            this.memory.WriteDouble2(comment.coords.dTopMM);
 
             this.memory.WriteByte(c_oSer_Comments.WidthMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.dWidthMM);
+            this.memory.WriteDouble2(comment.coords.dWidthMM);
 
             this.memory.WriteByte(c_oSer_Comments.HeightMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.dHeightMM);
+            this.memory.WriteDouble2(comment.coords.dHeightMM);
 
             this.memory.WriteByte(c_oSer_Comments.MoveWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.bMoveWithCells);
+            this.memory.WriteBool(comment.coords.bMoveWithCells);
 
             this.memory.WriteByte(c_oSer_Comments.SizeWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.bSizeWithCells);
+            this.memory.WriteBool(comment.coords.bSizeWithCells);
         };
-        this.WriteCommentDatas = function(aDatas)
+        this.WriteCommentDatas = function(data)
         {
             var oThis = this;
-            for(var i = 0, length = aDatas.length; i < length; ++i)
-                this.bs.WriteItem( c_oSer_Comments.CommentData, function(){oThis.WriteCommentData(aDatas[i]);});
+            this.bs.WriteItem( c_oSer_Comments.CommentData, function(){oThis.WriteCommentData(data);});
         };
         this.WriteCommentData = function(oCommentData)
         {
@@ -4009,10 +3987,10 @@
             //Write Styles
             var nStylesTablePos = this.ReserveTable(c_oSerTableTypes.Styles);
             //Workbook
-            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, this.isCopyPaste));
-            //Worksheets
             var aDxfs = [];
             var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, idWorksheet, this.isCopyPaste);
+            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, oBinaryWorksheetsTableWriter, this.isCopyPaste));
+            //Worksheets
             this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
             //OtherTable
             if(!this.isCopyPaste)
@@ -5518,11 +5496,12 @@
         };
     }
     /** @constructor */
-    function Binary_WorkbookTableReader(stream, oWorkbook)
+    function Binary_WorkbookTableReader(stream, oWorkbook, bwtr)
     {
         this.stream = stream;
         this.oWorkbook = oWorkbook;
         this.bcr = new Binary_CommonReader(this.stream);
+        this.bwtr = bwtr;
         this.Read = function()
         {
             var oThis = this;
@@ -5564,6 +5543,12 @@
 			{
 				this.oWorkbook.oApi.macros.SetData(AscCommon.GetStringUtf8(this.stream, length));
 			}
+            else if (c_oSerWorkbookTypes.Comments == type)
+            {
+                res = this.bcr.Read1(length, function(t,l){
+                    return oThis.bwtr.ReadCommentDatas(t,l, oThis.oWorkbook.aComments);
+                });
+            }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -7654,6 +7639,7 @@
                     res = this.stream.Seek(mtiOffBits);
                     if(c_oSerConstants.ReadOk != res)
                         break;
+                    var bwtr = new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
                     switch(mtiType)
                     {
                         // case c_oSerTableTypes.SharedStrings:
@@ -7666,7 +7652,7 @@
                         // res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
                         // break;
                         case c_oSerTableTypes.Worksheets:
-                            res = (new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
+                            res = bwtr.Read();
                             break;
                         // case c_oSerTableTypes.CalcChain:
                         //     res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
@@ -7687,7 +7673,7 @@
                 {
                     res = this.stream.Seek(nWorkbookTableOffset);
                     if(c_oSerConstants.ReadOk == res)
-                        res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
+                        res = (new Binary_WorkbookTableReader(this.stream, wb, bwtr)).Read();
                 }
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
             } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){

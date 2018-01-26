@@ -3115,83 +3115,7 @@ function BinaryPPTYLoader()
                 }
                 case 4:
                 {
-                    var end2 = s.cur + s.GetLong() + 4;
-                    while (s.cur < end2)
-                    {
-                        var _rec2 = s.GetUChar();
-                        switch (_rec2)
-                        {
-                            case 0:
-                            {
-                                s.Skip2(4); // len
-                                var lCount = s.GetULong();
-
-                                for (var i = 0; i < lCount; i++)
-                                {
-                                    s.Skip2(1);
-
-                                    var _comment = new CWriteCommentData();
-
-                                    var _end_rec3 = s.cur + s.GetLong() + 4;
-
-                                    s.Skip2(1); // start attributes
-                                    while (true)
-                                    {
-                                        var _at3 = s.GetUChar();
-                                        if (_at3 == g_nodeAttributeEnd)
-                                            break;
-
-                                        switch (_at3)
-                                        {
-                                            case 0:
-                                                _comment.WriteAuthorId = s.GetLong();
-                                                break;
-                                            case 1:
-                                                _comment.WriteTime = s.GetString2();
-                                                break;
-                                            case 2:
-                                                _comment.WriteCommentId = s.GetLong();
-                                                break;
-                                            case 3:
-                                                _comment.x = s.GetLong();
-                                                break;
-                                            case 4:
-                                                _comment.y = s.GetLong();
-                                                break;
-                                            case 5:
-                                                _comment.WriteText = s.GetString2();
-                                                break;
-                                            case 6:
-                                                _comment.WriteParentAuthorId = s.GetLong();
-                                                break;
-                                            case 7:
-                                                _comment.WriteParentCommentId = s.GetLong();
-                                                break;
-                                            case 8:
-                                                _comment.AdditionalData = s.GetString2();
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-
-                                    s.Seek2(_end_rec3);
-
-                                    _comment.Calculate2();
-                                    slide.writecomments.push(_comment);
-                                }
-
-                                break;
-                            }
-                            default:
-                            {
-                                s.SkipRecord();
-                                break;
-                            }
-                        }
-                    }
-
-                    s.Seek2(end2);
+                    this.ReadComments(slide.writecomments);
                     break;
                 }
                 default:
@@ -3208,6 +3132,88 @@ function BinaryPPTYLoader()
         s.Seek2(end);
         this.TempMainObject = null;
         return slide;
+    }
+
+    this.ReadComments = function(writecomments)
+    {
+        var s = this.stream;
+        var end2 = s.cur + s.GetLong() + 4;
+        while (s.cur < end2)
+        {
+            var _rec2 = s.GetUChar();
+            switch (_rec2)
+            {
+                case 0:
+                {
+                    s.Skip2(4); // len
+                    var lCount = s.GetULong();
+
+                    for (var i = 0; i < lCount; i++)
+                    {
+                        s.Skip2(1);
+
+                        var _comment = new CWriteCommentData();
+
+                        var _end_rec3 = s.cur + s.GetLong() + 4;
+
+                        s.Skip2(1); // start attributes
+                        while (true)
+                        {
+                            var _at3 = s.GetUChar();
+                            if (_at3 == g_nodeAttributeEnd)
+                                break;
+
+                            switch (_at3)
+                            {
+                                case 0:
+                                    _comment.WriteAuthorId = s.GetLong();
+                                    break;
+                                case 1:
+                                    _comment.WriteTime = s.GetString2();
+                                    break;
+                                case 2:
+                                    _comment.WriteCommentId = s.GetLong();
+                                    break;
+                                case 3:
+                                    _comment.x = s.GetLong();
+                                    break;
+                                case 4:
+                                    _comment.y = s.GetLong();
+                                    break;
+                                case 5:
+                                    _comment.WriteText = s.GetString2();
+                                    break;
+                                case 6:
+                                    _comment.WriteParentAuthorId = s.GetLong();
+                                    break;
+                                case 7:
+                                    _comment.WriteParentCommentId = s.GetLong();
+                                    break;
+                                case 8:
+                                    _comment.AdditionalData = s.GetString2();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        s.Seek2(_end_rec3);
+
+                        _comment.Calculate2();
+                        writecomments.push(_comment);
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    s.SkipRecord();
+                    break;
+                }
+            }
+        }
+
+        s.Seek2(end2);
     }
 
     this.ReadTransition = function()
@@ -8997,6 +9003,12 @@ function CPres()
 					s.Seek2(_end_rec2);
 					break;
 				}
+                case 10:
+                {
+                    var writecomments = [];
+                    reader.ReadComments(writecomments);
+                    break;
+                }
                 default:
                 {
                     s.SkipRecord();
