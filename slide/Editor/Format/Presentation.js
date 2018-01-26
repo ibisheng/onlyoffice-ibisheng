@@ -53,8 +53,22 @@ function DrawingCopyObject(Drawing, X, Y, ExtX, ExtY, ImageUrl)
     this.ImageUrl = ImageUrl;
 }
 
-DrawingCopyObject.prototype.copy = function(){
-    return new DrawingCopyObject(this.Drawing ? this.Drawing.copy() : this.Drawing, this.X, this.Y, this.ExtX, this.ExtY, this.ImageUrl);
+DrawingCopyObject.prototype.copy = function(oIdMap){
+
+    var _copy = this.Drawing;
+    if(this.Drawing){
+        if(this.Drawing.getObjectType() === AscDFH.historyitem_type_GroupShape){
+            _copy = this.Drawing.copy(oIdMap);
+        }
+        else{
+            _copy = this.Drawing.copy();
+        }
+        if(AscCommon.isRealObject(oIdMap)){
+            oIdMap[this.Drawing.Id] = _copy.Id;
+        }
+    }
+    return new DrawingCopyObject(this.Drawing ? _copy : this.Drawing, this.X, this.Y, this.ExtX, this.ExtY, this.ImageUrl);
+
 };
 
 function PresentationSelectedContent()
@@ -141,10 +155,19 @@ PresentationSelectedContent.prototype.copy = function()
     {
         ret.Themes.push(this.Themes[i].createDuplicate());
     }
+
+
+    oIdMap = {};
+    var aDrawingsCopy = [];
     for(i = 0; i < this.Drawings.length; ++i)
     {
-        ret.Drawings.push(this.Drawings[i].copy());
+        ret.Drawings.push(this.Drawings[i].copy(oIdMap));
+        if(ret.Drawings[ret.Drawings.length - 1].Drawing)
+        {
+            aDrawingsCopy.push(ret.Drawings[ret.Drawings.length - 1].Drawing);
+        }
     }
+    AscFormat.fResetConnectorsIds(aDrawingsCopy, oIdMap);
     if(this.DocContent)
     {
         //TODO: перенести копирование в CSelectedContent;
@@ -5178,8 +5201,8 @@ CPresentation.prototype =
                                     {
                                         sImageUrl = "";
                                     }
-                                    oImage = oController.createImage(sImageUrl, _bounds_cheker.Bounds.min_x*AscCommon.g_dKoef_pix_to_mm, _bounds_cheker.Bounds.min_y*AscCommon.g_dKoef_pix_to_mm, (_need_pix_width)*AscCommon.g_dKoef_pix_to_mm, (_need_pix_height)*AscCommon.g_dKoef_pix_to_mm);
-                                    oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, (_need_pix_width)*AscCommon.g_dKoef_pix_to_mm,  (_need_pix_height)*AscCommon.g_dKoef_pix_to_mm, sImageUrl));
+                                    oImage = oController.createImage(sImageUrl, _bounds_cheker.Bounds.min_x*AscCommon.g_dKoef_pix_to_mm, _bounds_cheker.Bounds.min_y*AscCommon.g_dKoef_pix_to_mm, (_canvas.width)*AscCommon.g_dKoef_pix_to_mm, (_canvas.height)*AscCommon.g_dKoef_pix_to_mm);
+                                    oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, (_canvas.width)*AscCommon.g_dKoef_pix_to_mm,  (_canvas.height)*AscCommon.g_dKoef_pix_to_mm, sImageUrl));
                                 }
 
                             }
