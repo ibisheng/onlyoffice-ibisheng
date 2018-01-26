@@ -1103,19 +1103,16 @@
 		this.LastPickFont = ""; // последний выставленный шрифт, из измененных
 		this.Metafile = null; // класс, которому будет подменяться шрифт
 
-		this.SetFont = function(name, style)
+		this.SetFont = function(name, style, size)
 		{
-
 		};
 
 		this.FillTextCode = function(glyph)
 		{
-
 		};
 
 		this.LoadFont = function(name, style)
 		{
-
 		};
 	}
 
