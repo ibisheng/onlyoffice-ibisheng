@@ -6374,7 +6374,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	var allFilterOpenElements = false;
 	var newFilter;
-	
+
 	switch (obj.filter.type)
 	{
 		case c_oAscAutoFilterTypes.ColorFilter:
@@ -6384,6 +6384,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 		}
 		case c_oAscAutoFilterTypes.CustomFilters:
 		{
+			obj.filter.filter.check();
 			this.CustomFiltersObj = obj.filter.filter.clone();
 			break;
 		}	
@@ -6399,12 +6400,35 @@ FilterColumn.prototype.createFilter = function(obj) {
 		}	
 		case c_oAscAutoFilterTypes.Filters:
 		{
-			newFilter = new Filters();
-			allFilterOpenElements = newFilter.init(obj);
-			
-			if(!allFilterOpenElements)
+			//если приходит только скрытое Blank, тогда добавляем CustomFilter, так же делает MS
+			var addCustomFilter = false;
+			for(var i = 0; i < obj.values.length; i++)
 			{
-				this.Filters = newFilter;
+				if("" === obj.values[i].text && false === obj.values[i].visible)
+				{
+					addCustomFilter = true;
+				}
+				else if("" !== obj.values[i].text && false === obj.values[i].visible)
+				{
+					addCustomFilter = false;
+					break;
+				}
+			}
+
+			if(addCustomFilter)
+			{
+				this.CustomFiltersObj = new CustomFilters();
+				this.CustomFiltersObj._generateEmptyValueFilter();
+			}
+			else
+			{
+				newFilter = new Filters();
+				allFilterOpenElements = newFilter.init(obj);
+
+				if(!allFilterOpenElements)
+				{
+					this.Filters = newFilter;
+				}
 			}
 			
 			break;
@@ -6413,6 +6437,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	return allFilterOpenElements;
 };
+
 FilterColumn.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
@@ -6436,6 +6461,32 @@ FilterColumn.prototype.init = function(range) {
 	
 };
 
+FilterColumn.prototype.isApplyCustomFilter = function() {
+	var res = false;
+
+	if(this.Top10 || this.CustomFiltersObj || this.ColorFilter || this.DynamicFilter)
+	{
+		res = true;
+	}
+
+	return res;
+};
+
+FilterColumn.prototype.isOnlyNotEqualEmpty = function() {
+	var res = false;
+
+	if(this.CustomFiltersObj)
+	{
+		var customFilters = this.CustomFiltersObj.CustomFilters;
+		var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
+		if(c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val)
+		{
+			res = true;
+		}
+	}
+
+	return res;
+};
 
 
 /** @constructor */
@@ -6739,6 +6790,22 @@ CustomFilters.prototype.asc_getCustomFilters = function () { return this.CustomF
 CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; };
 CustomFilters.prototype.asc_setCustomFilters = function (val) { this.CustomFilters = val; };
 
+CustomFilters.prototype.check = function () {
+	if(this.CustomFilters) {
+		for(var i = 0; i < this.CustomFilters.length; i++) {
+			this.CustomFilters[i].check();
+		}
+	}
+};
+
+CustomFilters.prototype._generateEmptyValueFilter = function() {
+	this.And = true;
+	this.CustomFilters = [];
+	var customFilter = new CustomFilter();
+	customFilter._generateEmptyValueFilter();
+	this.CustomFilters.push(customFilter);
+};
+
 var g_oCustomFilter = {
 	Operator	 : 0,
 	Val	: 1
@@ -6784,7 +6851,7 @@ CustomFilter.prototype.init = function(operator, val) {
 CustomFilter.prototype.isHideValue = function(val) {
 
 	var result = false;
-	var isDigitValue = isNaN(val) ? false : true;
+	var isDigitValue = !isNaN(val);
 	if(!isDigitValue)
 	{
 		val = val.toLowerCase();
@@ -6819,12 +6886,15 @@ CustomFilter.prototype.isHideValue = function(val) {
 		{
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 		}
-		
+
+		var trimVal = window["Asc"].trim(val);
+		var trimFilterVal = window["Asc"].trim(filterVal);
+
 		switch (this.Operator)
 		{
 			case c_oAscCustomAutoFilter.equals://equals
 			{
-				if(val === filterVal)
+				if(trimVal === trimFilterVal)
 				{
 					result = true;
 				}
@@ -6833,7 +6903,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 			}
 			case c_oAscCustomAutoFilter.doesNotEqual://doesNotEqual
 			{
-				if(val !== filterVal)
+				if(trimVal !== trimFilterVal)
 				{
 					result = true;
 				}
@@ -6955,6 +7025,18 @@ CustomFilter.prototype.asc_getVal = function () { return this.Val; };
 CustomFilter.prototype.asc_setOperator = function (val) { this.Operator = val; };
 CustomFilter.prototype.asc_setVal = function (val) { this.Val = val; };
 
+CustomFilter.prototype.check = function () {
+	if(c_oAscCustomAutoFilter.doesNotEqual === this.Operator) {
+		if("" === this.Val.replace(/ /g, "")){
+			this.Val = " ";
+		}
+	}
+};
+
+CustomFilter.prototype._generateEmptyValueFilter = function () {
+	this.Operator = c_oAscCustomAutoFilter.doesNotEqual;
+	this.Val = " ";
+};
 
 var g_oDynamicFilter = {
 	Type : 0,

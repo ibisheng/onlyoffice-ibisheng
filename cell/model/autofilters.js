@@ -4155,7 +4155,11 @@
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
 				colId = this._getTrueColId(autoFilter, colId);
+
 				var currentFilterColumn = autoFilter.getFilterColumn(colId);
+				//если скрыты только пустые значение, игнорируем пользовательский фильтр при отображении в меню
+				var ignoreCustomFilter = currentFilterColumn ? currentFilterColumn.isOnlyNotEqualEmpty() : null;
+				var isCustomFilter = currentFilterColumn && !ignoreCustomFilter && currentFilterColumn.isApplyCustomFilter();
 
 				if (!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
@@ -4208,9 +4212,7 @@
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
 							var visible = false;
-							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter &&
-								!currentFilterColumn.isHideValue(checkValue, isDateTimeFormat)) {
+							if (!isCustomFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat)) {
 								hideValue(false, i);
 								visible = true;
 							} else {
@@ -4237,7 +4239,7 @@
 					worksheet.workbook.dependencyFormulas.unlockRecal();
 				}
 
-				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
+				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount, ignoreCustomFilter: ignoreCustomFilter};
 			},
 			
 			_getTrueColId: function(filter, colId)
