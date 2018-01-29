@@ -720,12 +720,15 @@ CTable.prototype.Get_Props = function()
 			break;
 	}
 
-	Pr.RowsInHeader = 0;
-	for (var Index = 0; Index < this.Content.length; Index++)
-	{
-		if (true === this.Content[Index].Is_Header())
-			Pr.RowsInHeader++;
-	}
+	var oSelectionRowsRange = this.GetSelectedRowsRange();
+	var nRowsInHeader       = this.GetRowsCountInHeader();
+
+	if (oSelectionRowsRange.Start > nRowsInHeader)
+		Pr.RowsInHeader = null;
+	else if (oSelectionRowsRange.End < nRowsInHeader)
+		Pr.RowsInHeader = true;
+	else
+		Pr.RowsInHeader = false;
 
 	if (true === this.Is_Inline())
 	{
@@ -849,15 +852,20 @@ CTable.prototype.Set_Props = function(Props)
 	}
 
 	// RowsInHeader
-	if (undefined != Props.RowsInHeader)
+	if (undefined !== Props.RowsInHeader && null !== Props.RowsInHeader)
 	{
-		var RowsInHeader = Props.RowsInHeader
-		for (var Index = 0; Index < this.Content.length; Index++)
+		var oSelectionRowsRange = this.GetSelectedRowsRange();
+		var nRowsInHeader       = this.GetRowsCountInHeader();
+
+		if (oSelectionRowsRange.Start <= nRowsInHeader)
 		{
-			if (Index < RowsInHeader && true != this.Content[Index].Is_Header())
-				this.Content[Index].Set_Header(true);
-			else if (Index >= RowsInHeader && true === this.Content[Index].Is_Header())
-				this.Content[Index].Set_Header(false);
+			for (var nCurRow = oSelectionRowsRange.Start, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+			{
+				if (nCurRow <= oSelectionRowsRange.End)
+					this.Content[nCurRow].SetHeader(Props.RowsInHeader ? true : false);
+				else
+					this.Content[nCurRow].SetHeader(false);
+			}
 		}
 	}
 
@@ -11411,6 +11419,50 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 
 	return VMergeCount;
 };
+/**
+ * Получаем отрезок выделенных строк
+ * @returns {{Start: number, End: number}}
+ */
+CTable.prototype.GetSelectedRowsRange = function()
+{
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var nStartRow = -1,
+		nEndRow   = -1;
+
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nRowIndex = arrSelectedCells[nIndex].Row;
+
+		if (-1 === nStartRow || nStartRow > nRowIndex)
+			nStartRow = nRowIndex;
+
+		if (-1 === nEndRow || nEndRow < nRowIndex)
+			nEndRow = nRowIndex;
+	}
+
+	return {
+		Start : nStartRow,
+		End   : nEndRow
+	};
+};
+/**
+ * Получаем количество строк в заголовке таблицы
+ * @returns {number}
+ */
+CTable.prototype.GetRowsCountInHeader = function()
+{
+	var nRowsInHeader = 0;
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		if (true === this.Content[nCurRow].IsHeader())
+			nRowsInHeader++;
+		else
+			break;
+	}
+
+	return nRowsInHeader;
+};
 CTable.prototype.GetTopElement = function()
 {
     if (!this.Parent)
@@ -11431,7 +11483,7 @@ CTable.prototype.Get_Row = function(Index)
 };
 CTable.prototype.GetRowsCount = function()
 {
-	return this.Get_RowsCount();
+	return this.Content.length;
 };
 CTable.prototype.GetRow = function(nIndex)
 {

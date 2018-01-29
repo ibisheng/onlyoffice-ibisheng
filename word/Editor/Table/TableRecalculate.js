@@ -1501,7 +1501,7 @@ CTable.prototype.private_RecalculateHeader = function()
     for ( var Index = 0; Index < Rows_Count; Index++ )
     {
         var Row = this.Content[Index];
-        if ( true != Row.Is_Header() )
+        if ( true != Row.IsHeader() )
             break;
 
         Header_RowsCount++;

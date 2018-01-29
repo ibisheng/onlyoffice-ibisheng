@@ -442,22 +442,6 @@ CTableRow.prototype =
 		this.Recalc_CompiledPr();
 	},
 
-    Is_Header : function()
-    {
-        var RowPr = this.Get_CompiledPr(false);
-        return RowPr.TableHeader;
-    },
-
-	Set_Header : function(Value)
-	{
-		if (Value === this.Pr.TableHeader)
-			return;
-
-		History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, Value));
-		this.Pr.TableHeader = Value;
-		this.Recalc_CompiledPr();
-	},
-
     Copy_Pr : function(OtherPr)
     {
         // Before
@@ -486,9 +470,9 @@ CTableRow.prototype =
 
         // TableHeader
         if ( undefined != OtherPr.TableHeader )
-            this.Set_Header( OtherPr.TableHeader );
+            this.SetHeader( OtherPr.TableHeader );
         else
-            this.Set_Header( undefined );
+            this.SetHeader( undefined );
     },
 
     Set_SpacingInfo : function(bSpacingTop, bSpacingBot)
@@ -884,6 +868,27 @@ CTableRow.prototype.GetBottomMargin = function()
 	}
 
 	return nBottomMargin;
+};
+/**
+ * Проверяем является ли данная строка строкой заголовка таблицы
+ * @returns {boolean}
+ */
+CTableRow.prototype.IsHeader = function()
+{
+	return this.Get_CompiledPr(false).TableHeader;
+};
+/**
+ * Устанавливаем является ли данная строка строкой заголовка таблицы
+ * @param isHeader {boolean}
+ */
+CTableRow.prototype.SetHeader = function(isHeader)
+{
+	if (isHeader === this.Pr.TableHeader)
+		return;
+
+	History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, isHeader));
+	this.Pr.TableHeader = isHeader;
+	this.Recalc_CompiledPr();
 };
 
 
