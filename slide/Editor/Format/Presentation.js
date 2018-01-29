@@ -3756,6 +3756,8 @@ CPresentation.prototype =
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.onMouseMove(e, X, Y);
+        var s = "" + this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects4(X, Y, 0);
+        console.log(s);
         var bOldFocus = this.FocusOnNotes;
         this.FocusOnNotes = false;
         this.UpdateCursorType(X, Y,  e );

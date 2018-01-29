@@ -235,6 +235,11 @@ if(window.native){
         return window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
     };
 
+    window.native.Call_OnCheckMouseDown2 = function(e)
+    {
+        return window.editor.WordControl.m_oDrawingDocument.CheckMouseDown2(e);
+    };
+
     window.native.Call_OnUpdateOverlay = function(param){
         if(window.editor)
         {
