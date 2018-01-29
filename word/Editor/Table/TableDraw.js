@@ -84,7 +84,7 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
     //-------------------------------------------------------------------------------------
     // 2. Рисуем заливку всех ячеек таблицы
     //-------------------------------------------------------------------------------------
-    this.private_DrawCellsBackround(pGraphics, CurPage, Row_start, Row_last);
+    this.private_DrawCellsBackground(pGraphics, CurPage, Row_start, Row_last);
     //-------------------------------------------------------------------------------------
     // 3. Рисуем содержимое ячеек
     //-------------------------------------------------------------------------------------
@@ -379,7 +379,7 @@ CTable.prototype.private_DrawRowBackgroundAndOuterBorder = function(pGraphics, T
     }
 
 };
-CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_start, Row_last)
+CTable.prototype.private_DrawCellsBackground = function(pGraphics, PNum, Row_start, Row_last)
 {
     var CurPage = PNum;
     var Page = this.Pages[CurPage];

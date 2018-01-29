@@ -96,7 +96,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
             && isPageBreakLastLine1 === (this.Lines[this.Lines.length - 1].Info & paralineinfo_BreakPage)
             && isPageBreakLastLine2 === (this.Lines[this.Lines.length - 1].Info & paralineinfo_BreakRealPage))
         {
-            console.log("Recalc Fast WholeParagraph 1 page");
+            //console.log("Recalc Fast WholeParagraph 1 page");
             return [this.Get_AbsolutePage(0)];
         }
     }
@@ -165,7 +165,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
                 return [];
         }
 
-        console.log("Recalc Fast WholeParagraph 2 pages");
+        //console.log("Recalc Fast WholeParagraph 2 pages");
 
         // Если параграф начинается с новой страницы, тогда не надо перерисовывать первую страницу, т.к. она
         // изначально была пустая, и сейчас пустая.
