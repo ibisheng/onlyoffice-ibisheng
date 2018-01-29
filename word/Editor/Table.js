@@ -304,6 +304,8 @@ CTable.prototype.Get_Props = function()
 		var TextDirection = null;
 		var NoWrap        = null;
 
+		var nRowHeight = null;
+
 		for (var Index = 0; Index < this.Selection.Data.length; Index++)
 		{
 			var Pos          = this.Selection.Data[Index];
@@ -342,26 +344,20 @@ CTable.prototype.Get_Props = function()
 					CellShd = null;
 			}
 
+			var _CellWidth;
+			if (tblwidth_Auto === Cell_w.Type)
+				_CellWidth = null;
+			else if (tblwidth_Mm === Cell_w.Type)
+				_CellWidth = Cell_w.W;
+			else// if (tblwidth_Pct === Cell_w.Type)
+				_CellWidth = -Cell_w.W;
+
 			if (0 === Index)
 			{
-				if (tblwidth_Auto === Cell_w.Type)
-					CellWidth = null;
-				else if (tblwidth_Mm === Cell_w.Type)
-					CellWidth = Cell_w.W;
-				else// if (tblwidth_Pct === Cell_w.Type)
-					CellWidth = -Cell_w.W;
-
-				CellWidthStart = CellWidth;
+				CellWidthStart = _CellWidth;
 			}
 			else
 			{
-				var _CellWidth;
-				if (tblwidth_Auto === Cell_w.Type)
-					_CellWidth = null;
-				else if (tblwidth_Mm === Cell_w.Type)
-					_CellWidth = Cell_w.W;
-				else// if (tblwidth_Pct === Cell_w.Type)
-					_CellWidth = -Cell_w.W;
 
 				if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
 					|| (undefined === CellWidth
@@ -474,6 +470,37 @@ CTable.prototype.Get_Props = function()
 			{
 				CellMarginFlag = true;
 			}
+
+
+			var nCurRowHeight;
+			var oRowH = Row.GetHeight();
+			if (oRowH.IsAuto())
+			{
+				var oRow    = Row;
+				var nCurRow = oRow.GetIndex();
+
+				var nRowSummaryH = 0;
+				for (var nCurPage in this.RowsInfo[nCurRow].H)
+					nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+				if (null !== Pr.TableSpacing)
+					nRowSummaryH += Pr.TableSpacing;
+				else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+					nRowSummaryH -= this.RowsInfo[nCurRow].TopDy[0];
+
+				nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
+
+				nCurRowHeight = nRowSummaryH;
+			}
+			else
+			{
+				nCurRowHeight = oRowH.GetValue();
+			}
+
+			if (null === nRowHeight)
+				nRowHeight = nCurRowHeight;
+			else if (undefined !== nRowHeight && Math.abs(nRowHeight - nCurRowHeight) > 0.001)
+				nRowHeight = undefined;
 		}
 
 		Pr.CellsVAlign        = VAlign;
@@ -491,6 +518,8 @@ CTable.prototype.Get_Props = function()
 			Pr.CellsWidthNotEqual = false;
 		}
 
+		Pr.ColumnWidth = CellWidth;
+		Pr.RowHeight   = nRowHeight;
 
 		Pr.CellBorders = {
 			Left    : Border_left.Copy(),
@@ -580,6 +609,8 @@ CTable.prototype.Get_Props = function()
 
 		var CellShd = null;
 
+		var nCellWidth = null;
+
 		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
 		{
 			var Row         = this.Content[CurRow];
@@ -590,6 +621,7 @@ CTable.prototype.Get_Props = function()
 				var Cell         = Row.Get_Cell(CurCell);
 				var Cell_borders = Cell.Get_Borders();
 				var Cell_shd     = Cell.Get_Shd();
+				var oCellW       = Cell.GetW();
 
 				if (0 === CurCell && Cells_Count)
 				{
@@ -599,6 +631,25 @@ CTable.prototype.Get_Props = function()
 				{
 					if (null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ))
 						CellShd = null;
+				}
+
+				if (CurCell === this.CurCell.Index)
+				{
+					var _nCellWidth;
+					if (tblwidth_Auto === oCellW.Type)
+						_nCellWidth = null;
+					else if (tblwidth_Mm === oCellW.Type)
+						_nCellWidth = oCellW.W;
+					else// if (tblwidth_Pct === oCellW.Type)
+						_nCellWidth = -oCellW.W;
+
+					if (null === nCellWidth)
+						nCellWidth = _nCellWidth;
+					else if ((tblwidth_Auto === oCellW.Type && null !== nCellWidth)
+						|| (undefined === nCellWidth
+						|| null === nCellWidth
+						|| Math.abs(nCellWidth - _nCellWidth) > 0.001))
+						nCellWidth = undefined;
 				}
 
 				// Крайняя левая ли данная ячейка в выделении?
@@ -686,7 +737,35 @@ CTable.prototype.Get_Props = function()
 			InsideH : null === Border_insideH ? null : Border_insideH.Copy(),
 			InsideV : null === Border_insideV ? null : Border_insideV.Copy()
 		};
+
+		var oRowH = this.CurCell.Row.GetHeight();
+		if (oRowH.IsAuto())
+		{
+			var oRow    = this.CurCell.GetRow();
+			var nCurRow = oRow.GetIndex();
+
+			var nRowSummaryH = 0;
+			for (var nCurPage in this.RowsInfo[nCurRow].H)
+				nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+			if (null !== Pr.TableSpacing)
+				nRowSummaryH += Pr.TableSpacing;
+			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+				nRowSummaryH -= this.RowsInfo[nCurRow].TopDy[0];
+
+			nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
+			Pr.RowHeight = nRowSummaryH;
+		}
+
+		else
+		{
+			Pr.RowHeight = oRowH.GetValue();
+		}
+
+		Pr.ColumnWidth = nCellWidth;
 	}
+
+	console.log(Pr.RowHeight);
 
 	switch (Pr.CellsVAlign)
 	{

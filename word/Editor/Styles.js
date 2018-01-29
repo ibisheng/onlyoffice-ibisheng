@@ -6159,6 +6159,14 @@ CTableRowHeight.prototype =
         this.HRule = Reader.GetLong();
     }
 };
+CTableRowHeight.prototype.IsAuto = function()
+{
+	return (this.HRule === Asc.linerule_Auto ? true : false);
+};
+CTableRowHeight.prototype.GetValue = function()
+{
+	return this.Value;
+};
 
 function CTableRowPr()
 {

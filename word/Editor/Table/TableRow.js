@@ -728,6 +728,14 @@ CTableRow.prototype =
     {
     }
 };
+/**
+ * Получаем номер данной строки в родительской таблице
+ * @returns {number}
+ */
+CTableRow.prototype.GetIndex = function()
+{
+	return this.Index;
+};
 CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
@@ -765,10 +773,19 @@ CTableRow.prototype.GetCellSpacing = function()
 {
 	return this.Get_CellSpacing();
 };
+/**
+ * Получаем высоту строки
+ * @returns {CTableRowHeight}
+ */
 CTableRow.prototype.GetHeight = function()
 {
 	return this.Get_Height();
 };
+/**
+ * Устанавливаем высоту строки
+ * @param nValue
+ * @param nHRule
+ */
 CTableRow.prototype.SetHeight = function(nValue, nHRule)
 {
 	return this.Set_Height(nValue, nHRule);

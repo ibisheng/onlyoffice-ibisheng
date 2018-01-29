@@ -1786,7 +1786,14 @@ CTableCell.prototype.GetContent = function()
 {
 	return this.Content;
 };
-
+/**
+ * Доступ к родительской строке
+ * @returns {CTableRow}
+ */
+CTableCell.prototype.GetRow = function()
+{
+	return this.Row;
+};
 CTableCell.prototype.private_TransformXY = function(X, Y)
 {
 	// TODO: Везде, где идет такой код заменить на данную функцию

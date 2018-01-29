@@ -516,6 +516,9 @@
 			this.PercentFullWidth = tblProp.PercentFullWidth;
 			this.TableDescription = tblProp.TableDescription;
 			this.TableCaption = tblProp.TableCaption;
+
+			this.ColumnWidth = undefined;
+			this.RowHeight   = undefined;
 		}
 		else
 		{
@@ -795,6 +798,22 @@
 	{
 		this.TableCaption = v;
 	};
+	CTableProp.prototype.get_ColumnWidth = function()
+	{
+		return this.ColumnWidth;
+	};
+	CTableProp.prototype.put_ColumnWidth = function(v)
+	{
+		this.ColumnWidth = v;
+	};
+	CTableProp.prototype.get_RowHeight = function()
+	{
+		return this.RowHeight;
+	};
+	CTableProp.prototype.put_RowHeight = function(v)
+	{
+		this.RowHeight = v;
+	};
 
 	window['Asc']['CTableProp'] = window['Asc'].CTableProp = CTableProp;
 	CTableProp.prototype['get_Width'] = CTableProp.prototype.get_Width;
@@ -859,6 +878,10 @@
 	CTableProp.prototype['put_TableDescription'] = CTableProp.prototype.put_TableDescription;
 	CTableProp.prototype['get_TableCaption'] = CTableProp.prototype.get_TableCaption;
 	CTableProp.prototype['put_TableCaption'] = CTableProp.prototype.put_TableCaption;
+	CTableProp.prototype['get_ColumnWidth'] = CTableProp.prototype.get_ColumnWidth;
+	CTableProp.prototype['put_ColumnWidth'] = CTableProp.prototype.put_ColumnWidth;
+	CTableProp.prototype['get_RowHeight'] = CTableProp.prototype.get_RowHeight;
+	CTableProp.prototype['put_RowHeight'] = CTableProp.prototype.put_RowHeight;
 
 // ---------------------------------------------------------------
 	function CBorders(obj)
