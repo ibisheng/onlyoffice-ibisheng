@@ -209,8 +209,11 @@ if(window.native){
 	window.native.Call_OnMouseDown = function(e){
 	    if(window.editor)
         {
+            var ret = window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
             window.editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+            return ret;
         }
+        return -1;
     };
 
     window.native.Call_OnMouseUp = function(e){
