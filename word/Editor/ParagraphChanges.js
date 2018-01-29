@@ -408,7 +408,7 @@ CChangesParagraphAddItem.prototype.IsParagraphSimpleChanges = function()
 		var oItem = this.Items[nIndex];
 		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
 			&& para_Comment !== oItem.Type
-			&& para_Bookmark !== Item.Type)
+			&& para_Bookmark !== oItem.Type)
 		{
 			return false;
 		}
@@ -500,7 +500,7 @@ CChangesParagraphRemoveItem.prototype.IsParagraphSimpleChanges = function()
 		var oItem = this.Items[nIndex];
 		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
 			&& para_Comment !== oItem.Type
-			&& para_Bookmark !== Item.Type)
+			&& para_Bookmark !== oItem.Type)
 		{
 			return false;
 		}

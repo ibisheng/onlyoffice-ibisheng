@@ -12793,6 +12793,7 @@ CTable.prototype.ResizeTableInDocument = function(nWidth, nHeight)
 
 	this.LogicDocument.Recalculate();
 	this.Start_TrackTable();
+	this.LogicDocument.Document_UpdateSelectionState();
 };
 /**
  * Получаем минимальную ширину таблицы
