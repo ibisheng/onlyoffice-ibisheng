@@ -1894,7 +1894,9 @@
 			this.m_arrayPages[this.m_lPagesCount - 1].StartOffset          = this.Memory.pos;
 			this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = this.VectorMemoryForPrint;
             this.m_arrayPages[this.m_lPagesCount - 1].FontPicker		   = this.FontPicker;
-            this.m_arrayPages[this.m_lPagesCount - 1].FontPicker.Metafile  = this.m_arrayPages[this.m_lPagesCount - 1];
+
+            if (this.FontPicker)
+            	this.m_arrayPages[this.m_lPagesCount - 1].FontPicker.Metafile  = this.m_arrayPages[this.m_lPagesCount - 1];
 
 			this.Memory.WriteByte(CommandType.ctPageStart);
 
