@@ -171,6 +171,9 @@
 
 			LockedCellPivot				: -312,
 
+			ForceSaveButton: -331,
+			ForceSaveTimeout: -332,
+
 			OpenWarning : 500
 		}
 	};
@@ -1244,6 +1247,8 @@
 	prot['InvalidReferenceOrName']           = prot.InvalidReferenceOrName;
 	prot['LockCreateDefName']                = prot.LockCreateDefName;
 	prot['LockedCellPivot']                  = prot.LockedCellPivot;
+	prot['ForceSaveButton']                  = prot.ForceSaveButton;
+	prot['ForceSaveTimeout']                 = prot.ForceSaveTimeout;
 	prot['OpenWarning']                      = prot.OpenWarning;
 	window['Asc']['c_oAscAsyncAction']       = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
 	prot                                     = c_oAscAsyncAction;

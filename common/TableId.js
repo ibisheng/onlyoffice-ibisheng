@@ -307,4 +307,5 @@
 	};
 
 	window["AscCommon"].g_oTableId = new CTableId();
+	window["AscCommon"].CTableId = CTableId;
 })(window);

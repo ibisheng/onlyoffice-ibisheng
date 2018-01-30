@@ -577,7 +577,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                         if(!Cell2){
                             break;
                         }
-                        var VMerge = Cell2.Get_VMerge();
+                        var VMerge = Cell2.GetVMerge();
                         if (vmerge_Continue === VMerge){
                             H += this.RowsInfo[i].H[CurPage];
                         }

@@ -377,7 +377,7 @@ function (window, undefined) {
 		this.Hyperlink = 19;
 		this.SortData = 20;
 		this.CommentData = 21;
-		this.CompositeCommentData = 22;
+		this.CommentCoords = 22;
 		this.ChartSeriesData = 24;
 		this.SheetAdd = 25;
 		this.SheetRemove = 26;
@@ -475,8 +475,8 @@ function (window, undefined) {
 				case this.CommentData:
 					return new Asc.asc_CCommentData();
 					break;
-				case this.CompositeCommentData:
-					return new AscCommonExcel.CompositeCommentData();
+				case this.CommentCoords:
+					return new AscCommonExcel.asc_CCommentCoords();
 					break;
 				case this.ChartSeriesData:
 					return new AscFormat.asc_CChartSeria();
@@ -2442,7 +2442,7 @@ function (window, undefined) {
 		} else {
 			var collaborativeEditing;
 			// CCommentData
-			if ((Data.commentBefore == undefined) && (Data.commentAfter == undefined)) {
+			if ((Data.from == undefined) && (Data.to == undefined)) {
 				if (!Data.bDocument) {
 					if (false != this.wb.bCollaborativeChanges) {
 						collaborativeEditing = this.wb.oApi.collaborativeEditing;
@@ -2451,14 +2451,14 @@ function (window, undefined) {
 					}
 				}
 			} else {
-				// CompositeCommentData
-				if (!Data.commentAfter.bDocument) {
+				// UndoRedoData_FromTo
+				if (!Data.to.bDocument) {
 					if (false != this.wb.bCollaborativeChanges) {
 						collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						Data.commentAfter.nRow =
-							collaborativeEditing.getLockOtherRow2(nSheetId, Data.commentAfter.nRow);
-						Data.commentAfter.nCol =
-							collaborativeEditing.getLockOtherColumn2(nSheetId, Data.commentAfter.nCol);
+						Data.to.nRow =
+							collaborativeEditing.getLockOtherRow2(nSheetId, Data.to.nRow);
+						Data.to.nCol =
+							collaborativeEditing.getLockOtherColumn2(nSheetId, Data.to.nCol);
 					}
 				}
 			}

@@ -1074,7 +1074,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
 					var outStack = cell.formulaParsed.outStack;
 					for(var i = 0; i < outStack.length; i++){
-						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+						if(outStack[i] && (outStack[i].name === "AGGREGATE" || outStack[i].name === "SUBTOTAL")){
 							bIsFoundNestedStAg = true;
 							break;
 						}
@@ -2639,6 +2639,14 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 		}
 
+		return res;
+	};
+	cBaseFunction.prototype.checkRef = function (arg) {
+		var res = false;
+		if (cElementType.cell3D === arg.type || cElementType.cell === arg.type || cElementType.cellsRange === arg.type ||
+			cElementType.cellsRange3D === arg.type) {
+			res = true;
+		}
 		return res;
 	};
 
@@ -5384,9 +5392,12 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 	};
 
-	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset) {
-		if (this.isCalculate && (!this.calculateDefName || this.calculateDefName[opt_bbox ? opt_bbox.getName() :
-		 opt_bbox])) {
+	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset, opt_forceCalculate) {
+		if (!this.incRecursionLevel()) {
+			return this.value || new cError(cErrorType.bad_reference);
+		}
+		if ((this.isCalculate && !opt_forceCalculate) &&
+			(!this.calculateDefName || this.calculateDefName[opt_bbox ? opt_bbox.getName() : opt_bbox])) {
 			//cycle
 			this.value = new cError(cErrorType.bad_reference);
 			this._endCalculate();
@@ -5471,9 +5482,32 @@ parserFormula.prototype.setFormula = function(formula) {
 		if (this.parent && this.parent.onFormulaEvent) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
 		}
-		this.isCalculate = false;
 		this.calculateDefName = null;
-		this.isDirty = false;
+		this.decRecursionLevel();
+	};
+	parserFormula.prototype.incRecursionLevel = function() {
+		return !g_cCalcRecursion.getIsForceBacktracking() && g_cCalcRecursion.incLevel();
+	};
+	parserFormula.prototype.decRecursionLevel = function() {
+		g_cCalcRecursion.decLevel();
+		if (g_cCalcRecursion.getIsForceBacktracking()) {
+			g_cCalcRecursion.insert(this);
+			if (0 === g_cCalcRecursion.getLevel() && !g_cCalcRecursion.getIsProcessRecursion()) {
+				g_cCalcRecursion.setIsProcessRecursion(true);
+				do {
+					g_cCalcRecursion.setIsForceBacktracking(false);
+					g_cCalcRecursion.foreachInReverse(function(parsed){
+						if (parsed.getIsDirty()) {
+							parsed.calculate(undefined, undefined, undefined, true);
+						}
+					});
+				} while (g_cCalcRecursion.getIsForceBacktracking());
+				g_cCalcRecursion.setIsProcessRecursion(false);
+			}
+		} else {
+			this.isCalculate = false;
+			this.isDirty = false;
+		}
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
@@ -6085,6 +6119,66 @@ parserFormula.prototype.getElementByPos = function(pos) {
 	parserFormula.prototype.setIndexNumber = function(val) {
 		this._index = val;
 	};
+
+	function CalcRecursion() {
+		this.level = 0;
+		this.elemsPart = [];
+		this.elems = [];
+		this.isForceBacktracking = false;
+		this.isProcessRecursion = false;
+	}
+	//for chrome63(real maximum call stack size is 12575) MAXRECURSION that cause excaption is 783
+	CalcRecursion.prototype.MAXRECURSION = 400;
+	CalcRecursion.prototype.incLevel = function() {
+		if(!window.level){
+			window.level = 0;
+		}
+		window.level++;
+		var res = this.level <= g_cCalcRecursion.MAXRECURSION;
+		if (res) {
+			this.level++;
+		} else {
+			this.setIsForceBacktracking(true);
+		}
+		return res;
+	};
+	CalcRecursion.prototype.decLevel = function() {
+		this.level--;
+	};
+	CalcRecursion.prototype.getLevel = function() {
+		return this.level;
+	};
+	CalcRecursion.prototype.insert = function(val) {
+		this.elemsPart.push(val);
+	};
+	CalcRecursion.prototype.foreachInReverse = function(callback) {
+		for (var i = this.elems.length - 1; i >= 0; --i) {
+			var elemsPart = this.elems[i];
+			for (var j = 0; j < elemsPart.length; ++j) {
+				callback(elemsPart[j]);
+				if (this.getIsForceBacktracking()) {
+					return;
+				}
+			}
+		}
+	};
+	CalcRecursion.prototype.setIsForceBacktracking = function(val) {
+		if (!this.isForceBacktracking) {
+			this.elemsPart = [];
+			this.elems.push(this.elemsPart);
+		}
+		this.isForceBacktracking = val;
+	};
+	CalcRecursion.prototype.getIsForceBacktracking = function() {
+		return this.isForceBacktracking;
+	};
+	CalcRecursion.prototype.setIsProcessRecursion = function(val) {
+		this.isProcessRecursion = val;
+	};
+	CalcRecursion.prototype.getIsProcessRecursion = function() {
+		return this.isProcessRecursion;
+	};
+	var g_cCalcRecursion =  new CalcRecursion();
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.

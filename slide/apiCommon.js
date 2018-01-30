@@ -134,6 +134,18 @@ CAscSlideTiming.prototype.setDefaultParams = function()
     this.SlideAdvanceDuration       = 10000;
     this.ShowLoop                   = true;
 };
+CAscSlideTiming.prototype.setDefaultParams = function()
+{
+    this.TransitionType     = c_oAscSlideTransitionTypes.None;
+    this.TransitionOption   = -1;
+    this.TransitionDuration = 2000;
+
+    this.SlideAdvanceOnMouseClick   = true;
+    this.SlideAdvanceAfter          = false;
+    this.SlideAdvanceDuration       = 10000;
+    this.ShowLoop                   = true;
+};
+
 
 CAscSlideTiming.prototype.Write_ToBinary = function(w)
 {
@@ -224,10 +236,40 @@ CLayoutThumbnail.prototype.get_Width = function() { return this.Width; };
 CLayoutThumbnail.prototype.get_Height = function() { return this.Height; };
 
 
+function CompareTiming(timing1, timing2){
+    if(!timing1 || !timing2){
+        return null;
+    }
+    var ret = new CAscSlideTiming();
+    if(timing1.TransitionType === timing2.TransitionType){
+        ret.TransitionType = timing1.TransitionType;
+    }
+    if(timing1.TransitionOption === timing2.TransitionOption){
+        ret.TransitionOption = timing1.TransitionOption;
+    }
+    if(timing1.TransitionDuration === timing2.TransitionDuration){
+        ret.TransitionDuration = timing1.TransitionDuration;
+    }
+    if(timing1.SlideAdvanceOnMouseClick === timing2.SlideAdvanceOnMouseClick){
+        ret.SlideAdvanceOnMouseClick = timing1.SlideAdvanceOnMouseClick;
+    }
+    if(timing1.SlideAdvanceAfter === timing2.SlideAdvanceAfter){
+        ret.SlideAdvanceAfter = timing1.SlideAdvanceAfter;
+    }
+    if(timing1.SlideAdvanceDuration === timing2.SlideAdvanceDuration){
+        ret.SlideAdvanceDuration = timing1.SlideAdvanceDuration;
+    }
+    if(timing1.ShowLoop === timing2.ShowLoop){
+        ret.ShowLoop = timing1.ShowLoop;
+    }
+    return ret;
+
+}
 //------------------------------------------------------------export----------------------------------------------------
 window['Asc'] = window['Asc'] || {};
 window['AscCommonSlide'] = window['AscCommonSlide'] || {};
 window['Asc']['CAscSlideTiming'] = CAscSlideTiming;
+window['AscCommonSlide'].CompareTiming = CompareTiming;
 CAscSlideTiming.prototype['put_TransitionType'] = CAscSlideTiming.prototype.put_TransitionType;
 CAscSlideTiming.prototype['get_TransitionType'] = CAscSlideTiming.prototype.get_TransitionType;
 CAscSlideTiming.prototype['put_TransitionOption'] = CAscSlideTiming.prototype.put_TransitionOption;

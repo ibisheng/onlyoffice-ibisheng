@@ -1439,7 +1439,7 @@ CDocumentContent.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
 };
-CDocumentContent.prototype.Get_SummaryHeight = function()
+CDocumentContent.prototype.GetSummaryHeight = function()
 {
 	var Height = 0;
 	for (var Page = 0; Page < this.Get_PagesCount(); Page++)
@@ -7285,6 +7285,25 @@ CDocumentContent.prototype.CanSplitTableCells = function()
 
 	return false;
 };
+CDocumentContent.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.distributeTableCells(isHorizontally);
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
+
+		return this.Content[Pos].DistributeTableCells(isHorizontally);
+	}
+
+	return false;
+};
 //-----------------------------------------------------------------------------------
 // Вспомогательные(внутренние ) функции
 //-----------------------------------------------------------------------------------
@@ -8639,6 +8658,13 @@ CDocumentContent.prototype.IsBlockLevelSdtContent = function()
 {
 	return (this.Parent && this.Parent instanceof CBlockLevelSdt);
 };
+CDocumentContent.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	if (this.Parent && this.Parent instanceof CBlockLevelSdt)
+		return this.Parent.IsBlockLevelSdtFirstOnNewPage();
+
+	return false;
+};
 CDocumentContent.prototype.IsSelectedAll = function()
 {
 	if (true === this.Selection.Use
@@ -8681,7 +8707,23 @@ CDocumentContent.prototype.GetMargins = function()
 		Right  : new CTableMeasurement(tblwidth_Mm, 0)
 	};
 };
+CDocumentContent.prototype.IsEmptyPage = function(nCurPage)
+{
+	if (nCurPage < 0 || nCurPage >= this.Pages.length)
+		return true;
 
+	var nStartPos = this.Pages[nCurPage].Pos;
+	var nEndPos   = this.Pages[nCurPage].EndPos;
+
+	if (nStartPos > nEndPos)
+		return true;
+
+	if (nStartPos < nEndPos)
+		return false;
+
+	var nElementPageIndex = this.private_GetElementPageIndex(nStartPos, nCurPage, 0, 1);
+	return this.Content[nStartPos].IsEmptyPage(nElementPageIndex);
+};
 
 function CDocumentContentStartState(DocContent)
 {
@@ -8729,8 +8771,8 @@ CDocumentRecalculateObject.prototype =
             Doc.Content[Index].LoadRecalculateObject( this.Content[Index] );
         }
     },
-    
-    Get_SummaryHeight : function()
+
+	GetSummaryHeight : function()
     {
         var Height = 0;
         var PagesCount = this.Pages.length;

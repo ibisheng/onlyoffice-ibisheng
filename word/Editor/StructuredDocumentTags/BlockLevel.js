@@ -110,10 +110,9 @@ CBlockLevelSdt.prototype.GetContentBounds = function(CurPage)
 {
 	return this.Content.GetContentBounds(CurPage);
 };
-CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
+CBlockLevelSdt.prototype.IsEmptyPage = function(nCurPage)
 {
-	// TODO: Реализовать
-	return false;
+	return this.Content.IsEmptyPage(nCurPage);
 };
 CBlockLevelSdt.prototype.Get_PagesCount = function()
 {
@@ -592,6 +591,10 @@ CBlockLevelSdt.prototype.CanSplitTableCells = function()
 {
 	return this.Content.CanSplitTableCells();
 };
+CBlockLevelSdt.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.Content.DistributeTableCells(isHorizontally);
+};
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
 	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
@@ -644,6 +647,9 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
+		if (this.IsEmptyPage(nCurPage))
+			continue;
+
 		var nPageAbs = this.Get_AbsolutePage(nCurPage);
 		var oBounds = this.Content.GetContentBounds(nCurPage);
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
@@ -1013,6 +1019,15 @@ CBlockLevelSdt.prototype.GetInnerTableOfContents = function()
 		return oTOC.GetInnerTableOfContents();
 
 	return oTOC;
+};
+CBlockLevelSdt.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	if (null !== this.Get_DocumentPrev()
+		|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
+		|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage()))
+		return false;
+
+	return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()

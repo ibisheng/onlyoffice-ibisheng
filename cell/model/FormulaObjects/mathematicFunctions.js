@@ -437,8 +437,16 @@
 			f.excludeNestedStAg = ignoreNestedStAg;
 
 			var newArgs = [];
+			//14 - 19 особенные функции, требующие второго аргумента
+			var doNotCheckRef = nFunc >= 14 && nFunc <= 19;
 			for (var i = 2; i < arg.length; i++) {
-				newArgs.push(arg[i]);
+				//аргумент может быть только ссылка на ячейку или диапазон ячеек
+				//в противном случае - ошибка
+				if(doNotCheckRef || this.checkRef(arg[i])) {
+					newArgs.push(arg[i]);
+				} else {
+					return new cError(cErrorType.wrong_value_type);
+				}
 			}
 
 			if (f.argumentsMax && newArgs.length > f.argumentsMax) {
@@ -4236,6 +4244,9 @@
 		}
 		var res;
 		if (f) {
+			//вложенные итоги игнорируются, чтобы избежать двойного суммирования
+			f.excludeNestedStAg = true;
+
 			f.checkExclude = true;
 			f.excludeHiddenRows = exclude;
 			res = f.Calculate(arg.slice(1));

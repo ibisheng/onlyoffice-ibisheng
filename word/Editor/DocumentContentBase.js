@@ -708,6 +708,10 @@ CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 {
 	return false;
 };
+CDocumentContentBase.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	return false;
+};
 CDocumentContentBase.prototype.private_AddContentControl = function(nContentControlType)
 {
 	var oElement = this.Content[this.CurPos.ContentPos];

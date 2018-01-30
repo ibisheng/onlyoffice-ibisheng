@@ -123,6 +123,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
 	window['AscCH'].historyitem_Comment_Change = 3;
+	window['AscCH'].historyitem_Comment_Coords = 4;
 
 	window['AscCH'].historyitem_AutoFilter_Add		= 1;
 	window['AscCH'].historyitem_AutoFilter_Sort		= 2;

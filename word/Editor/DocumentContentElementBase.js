@@ -132,7 +132,7 @@ CDocumentContentElementBase.prototype.GetContentBounds = function(CurPage)
 {
 	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
 };
-CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
+CDocumentContentElementBase.prototype.IsEmptyPage = function(nCurPage)
 {
 	return false;
 };
@@ -534,6 +534,10 @@ CDocumentContentElementBase.prototype.RemoveTable = function()
 };
 CDocumentContentElementBase.prototype.SelectTable = function(Type)
 {
+};
+CDocumentContentElementBase.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return false;
 };
 CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 {

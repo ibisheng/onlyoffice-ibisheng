@@ -598,6 +598,7 @@
 
 				//начало записи
 				oPresentationWriter.WriteString2("");
+				oPresentationWriter.WriteString2("");
 				oPresentationWriter.WriteDouble(1);
 				oPresentationWriter.WriteDouble(1);
 
@@ -1311,6 +1312,7 @@
 				var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 				var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 				var p_url = stream.GetString2();
+				var p_theme = stream.GetString2();
 				var p_width = stream.GetULong()/100000;
 				var p_height = stream.GetULong()/100000;
 				var t = this;
@@ -1325,8 +1327,17 @@
 					}
 				}
 
-				var bSlideObjects = selectedContent2[0].content.SlideObjects && selectedContent2[0].content.SlideObjects.length > 0;
-				var pasteObj = bSlideObjects ? selectedContent2[2] : selectedContent2[0];
+				var specialOptionsArr = [];
+				var specialProps = Asc.c_oSpecialPasteProps;
+				if(2 === multipleParamsCount) {
+					specialOptionsArr = [specialProps.sourceformatting];
+				} else if(3 === multipleParamsCount) {
+					specialOptionsArr = [specialProps.sourceformatting, specialProps.picture];
+				}
+
+				var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
+				var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
+				var pasteObj = bSlideObjects ? selectedContent2[2] : defaultSelectedContent;
 
 				if (window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 				{
@@ -1412,8 +1423,10 @@
 					{
 						window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 						var specialProps = window['AscCommon'].g_specialPasteHelper.buttonInfo;
-						var allowedProps = [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.picture];
-						specialProps.asc_setOptions(allowedProps);
+						if(specialOptionsArr.length > 1)
+						{
+							specialProps.asc_setOptions(specialOptionsArr);
+						}
 					}
 
 					var arr_shapes = content.Drawings;
@@ -1929,6 +1942,14 @@
 					}
 				}
 				AscFormat.fResetConnectorsIds(aCopies, oIdMap);
+				if(aImagesSync.length > 0)
+				{
+					window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
+						function(){
+							ws.objectRender.showDrawingObjects(true);
+							ws.objectRender.controller.getGraphicObjectProps();
+						});
+				}
                 ws.objectRender.showDrawingObjects(true);
 
 				if(needShowSpecialProps)
@@ -1950,15 +1971,7 @@
                 ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
                 History.EndTransaction();
-				
-                if(aImagesSync.length > 0)
-                {
-                    window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
-                        function(){
-                            ws.objectRender.showDrawingObjects(true);
-                            ws.objectRender.controller.getGraphicObjectProps();
-                    });
-                }
+
 
 				if(!needShowSpecialProps)
 				{
@@ -2303,13 +2316,8 @@
 			
 			_getClassBinaryFromHtml: function(node)
 			{
-				var classNode, base64 = null, base64FromWord = null, base64FromPresentation = null;
-				if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].getAttribute("class");
-				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].children[0].getAttribute("class");
-				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1  || node.children[0].children[0].children[0].getAttribute("class").indexOf("pptData;") > -1))
-					classNode = node.children[0].children[0].children[0].getAttribute("class");
+				var base64 = null, base64FromWord = null, base64FromPresentation = null;
+				var classNode = AscCommon.searchBinaryClass(node);
 				
 				if( classNode != null ){
 					var cL = classNode.split(" ");

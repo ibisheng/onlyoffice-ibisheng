@@ -109,6 +109,17 @@ function IsEqualStyleObjects(Object1, Object2)
     return Object1.Is_Equal(Object2);
 }
 
+function IsEqualNullableFloatNumbers(nNum1, nNum2)
+{
+	if (undefined === nNum1 && undefined === nNum2)
+		return true;
+
+	if (undefined === nNum1 || undefined === nNum2)
+		return false;
+
+	return Math.abs(nNum1 - nNum2) < 0.001;
+}
+
 function CTableStylePr()
 {
     this.TextPr      = new CTextPr();
@@ -3126,6 +3137,26 @@ CStyle.prototype =
         }
     }
 };
+CStyle.prototype.GetName = function()
+{
+	return this.Get_Name();
+};
+CStyle.prototype.GetBasedOn = function()
+{
+	return this.Get_BasedOn();
+};
+CStyle.prototype.GetNext = function()
+{
+	return this.Get_Next()
+};
+CStyle.prototype.GetType = function()
+{
+	return this.Get_Type();
+};
+CStyle.prototype.IsEqual = function(oOtherStyle)
+{
+	return this.Is_Equal(oOtherStyle);
+};
 CStyle.prototype.CreateFootnoteText = function()
 {
 	var oParaPr = {
@@ -3172,7 +3203,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 	var ParaPr = {},
 		TextPr = {};
 
-	if (undefined === nType || null === nType || Asc.c_oAscTOCStyleType.Simple === nType)
+	if (undefined === nType || null === nType || Asc.c_oAscTOCStylesType.Simple === nType)
 	{
 		ParaPr = {
 			Spacing : {
@@ -3203,7 +3234,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 		else if (8 === nLvl)
 			ParaPr.Ind.Left = 2268 / 20 * g_dKoef_pt_to_mm;
 	}
-	else if (Asc.c_oAscTOCStyleType.Standard === nType)
+	else if (Asc.c_oAscTOCStylesType.Standard === nType)
 	{
 		ParaPr = {
 			Spacing : {
@@ -3264,7 +3295,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 			TextPr.FontSize = 11;
 		}
 	}
-	else if (Asc.c_oAscTOCStyleType.Modern === nType)
+	else if (Asc.c_oAscTOCStylesType.Modern === nType)
 	{
 		ParaPr = {
 			Ind : {
@@ -3319,7 +3350,7 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 			TextPr.FontSize = 11;
 		}
 	}
-	else if (Asc.c_oAscTOCStyleType.Classic === nType)
+	else if (Asc.c_oAscTOCStylesType.Classic === nType)
 	{
 
 		if (0 === nLvl)
@@ -3458,6 +3489,23 @@ CStyle.prototype.CreateTOCHeading = function()
 	this.Set_UiPriority(39);
 	this.Set_UnhideWhenUsed(true);
 	this.Set_ParaPr(ParaPr);
+};
+/**
+ * Конвертируем стиль в Asc.CAscStyle
+ * @returns {Asc.CAscStyle}
+ */
+CStyle.prototype.ToAscStyle = function()
+{
+	var oAscStyle = new Asc.CAscStyle();
+
+	oAscStyle.StyleId    = this.Id;
+
+	oAscStyle.Name       = this.Name;
+	oAscStyle.Type       = this.Type;
+	oAscStyle.qFormat    = null === this.qFormat || undefined === this.qFormat ? false : this.qFormat;
+	oAscStyle.uiPriority = null === this.qFormat || undefined === this.qFormat ? -1 : this.uiPriority;
+
+	return oAscStyle;
 };
 
 function CStyles(bCreateDefault)
@@ -4817,6 +4865,81 @@ CStyles.prototype.GetHeadingLevelByName = function(sStyleName)
 
 	return -1;
 };
+/**
+ * Получаем тип набора стилей для Table of Contents
+ * @returns {Asc.c_oAscTOCStylesType}
+ */
+CStyles.prototype.GetTOCStylesType = function()
+{
+	if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Simple))
+		return Asc.c_oAscTOCStylesType.Simple;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Standard))
+		return Asc.c_oAscTOCStylesType.Standard;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Modern))
+		return Asc.c_oAscTOCStylesType.Modern;
+	else if (this.private_CheckTOCStyles(Asc.c_oAscTOCStylesType.Classic))
+		return Asc.c_oAscTOCStylesType.Classic;
+
+	return Asc.c_oAscTOCStylesType.Current;
+};
+CStyles.prototype.private_CheckTOCStyles = function(nType)
+{
+	for (var nLvl = 0; nLvl <= 8; ++nLvl)
+	{
+		if (!this.private_CheckTOCStyle(nLvl, nType))
+			return false;
+	}
+
+	return true;
+};
+CStyles.prototype.private_CheckTOCStyle = function(nLvl, nType)
+{
+	var oTOCStyle = this.Get(this.GetDefaultTOC(nLvl));
+
+	if (!this.LogicDocument || !oTOCStyle)
+		return false;
+
+	this.LogicDocument.TurnOffHistory();
+	var oCheckStyle = new CStyle();
+	oCheckStyle.Clear(oTOCStyle.GetName(), oTOCStyle.GetBasedOn(), oTOCStyle.GetNext(), oTOCStyle.GetType());
+	oCheckStyle.CreateTOC(nLvl, nType);
+	this.LogicDocument.TurnOnHistory();
+
+	return (!!oCheckStyle.IsEqual(oTOCStyle));
+};
+/**
+ * Переделываем стили для Table of Contents на заданную коллекцию стилей
+ * @param nType {Asc.c_oAscTOCStylesType}
+ */
+CStyles.prototype.SetTOCStylesType = function(nType)
+{
+	if (Asc.c_oAscTOCStylesType.Current === nType)
+		return;
+
+	for (var nLvl = 0; nLvl <= 8; ++nLvl)
+	{
+		var oStyle = this.Get(this.GetDefaultTOC(nLvl));
+		if (!oStyle)
+			continue;
+
+		oStyle.Clear(oStyle.GetName(), oStyle.GetBasedOn(), oStyle.GetNext(), oStyle.GetType());
+		oStyle.CreateTOC(nLvl, nType);
+	}
+};
+/**
+ * Получаем массив стилей в виде классов Asc.CAscStyle
+ * @returns {Asc.CAscStyle[]}
+ */
+CStyles.prototype.GetAscStylesArray = function()
+{
+	var arrStyles = [];
+	for (var sId in this.Style)
+	{
+		arrStyles.push(this.Style[sId].ToAscStyle());
+	}
+
+	return arrStyles;
+};
 
 function CDocumentColor(r,g,b, Auto)
 {
@@ -6035,6 +6158,18 @@ CTableRowHeight.prototype =
         this.Value = Reader.GetDouble();
         this.HRule = Reader.GetLong();
     }
+};
+CTableRowHeight.prototype.IsAuto = function()
+{
+	return (this.HRule === Asc.linerule_Auto ? true : false);
+};
+CTableRowHeight.prototype.GetValue = function()
+{
+	return this.Value;
+};
+CTableRowHeight.prototype.GetRule = function()
+{
+	return this.HRule;
 };
 
 function CTableRowPr()
@@ -8958,12 +9093,12 @@ CParaInd.prototype =
 
     Is_Equal  : function(Ind)
     {
-        if (this.Left !== Ind.Left
-            || this.Right !== Ind.Right
-            || this.FirstLine !== Ind.FirstLine)
-            return false;
+        if (IsEqualNullableFloatNumbers(this.Left, Ind.Left)
+			&& IsEqualNullableFloatNumbers(this.Right, Ind.Right)
+			&& IsEqualNullableFloatNumbers(this.FirstLine, Ind.FirstLine))
+            return true;
 
-        return true;
+        return false;
     },
 
     Set_FromObject : function(Ind)

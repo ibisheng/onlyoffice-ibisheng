@@ -1459,6 +1459,36 @@ DrawingObjectsController.prototype =
         return bRet;
     },
 
+
+    isPointInDrawingObjects4: function(x, y, pageIndex){
+        var oOldState = this.curState;
+        this.changeCurrentState(new AscFormat.NullState(this));
+        var oResult, nRet = 0;
+        this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+        oResult = this.curState.onMouseDown(AscCommon.global_mouseEvent, x, y, 0);
+        this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+        var object;
+        if(AscCommon.isRealObject(oResult)){
+            if(oResult.cursorType === "text"){
+                nRet = 1;
+            }
+            else if(oResult.cursorType === "move"){
+                object = g_oTableId.Get_ById(oResult.objectId);
+                if(object && object.hitInBoundingRect && object.hitInBoundingRect(x, y)){
+                    nRet = 3;
+                }
+                else{
+                    nRet = 2;
+                }
+            }
+            else{
+                nRet = 3;
+            }
+        }
+        this.changeCurrentState(oOldState);
+        return nRet;
+    },
+
 	GetSelectionBounds: function()
     {
         var oTargetDocContent = this.getTargetDocContent(false, true);
@@ -3197,6 +3227,9 @@ DrawingObjectsController.prototype =
         }
 
 
+        chart_space.updateLinks();
+        var oValAx = chart_space.chart.plotArea.valAx;
+        var oCatAx = chart_space.chart.plotArea.catAx;
         chart_space.setStyle(chart_space.style);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
@@ -3327,6 +3360,41 @@ DrawingObjectsController.prototype =
                 var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt ? need_num_fmt : "General");
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
+
+
+
+                if(oValAx && oValAx instanceof AscFormat.CValAx){
+                    oValAx.createDuplicate(val_ax);
+                    val_ax.numFmt.setFormatCode(need_num_fmt);
+                }
+                if(oCatAx){
+                    if(oCatAx.majorGridlines)
+                    {
+                        axis_obj.catAx.setMajorGridlines(oCatAx.majorGridlines.createDuplicate());
+                    }
+                    axis_obj.catAx.setMajorTickMark(oCatAx.majorTickMark);
+
+                    if(oCatAx.minorGridlines)
+                    {
+                        axis_obj.catAx.setMinorGridlines(oCatAx.minorGridlines.createDuplicate());
+                    }
+                    axis_obj.catAx.setMinorTickMark(oCatAx.minorTickMark);
+
+                    if(oCatAx.spPr)
+                    {
+                        axis_obj.catAx.setSpPr(oCatAx.spPr.createDuplicate());
+                    }
+                    axis_obj.catAx.setTickLblPos(oCatAx.tickLblPos);
+                    if(oCatAx.title)
+                    {
+                        axis_obj.catAx.setTitle(oCatAx.title.createDuplicate());
+                    }
+                    if(oCatAx.txPr)
+                    {
+                        axis_obj.catAx.setTxPr(oCatAx.txPr.createDuplicate());
+                    }
+                }
+
             }
             if(cat_ax && val_ax)
             {
@@ -3935,6 +4003,37 @@ DrawingObjectsController.prototype =
                     }
                     new_chart_type.setScatterStyle(SCATTER_STYLE_MARKER);
                     axis_obj = AscFormat.CreateScatterAxis(); //cat - 0, val - 1
+                    if(oValAx && oValAx instanceof AscFormat.CValAx){
+                        oValAx.createDuplicate(axis_obj.valAx);
+                        axis_obj.valAx.setAxPos(AscFormat.AX_POS_L);
+                    }
+                    if(oCatAx){
+                        if(oCatAx.majorGridlines)
+                        {
+                            axis_obj.catAx.setMajorGridlines(oCatAx.majorGridlines.createDuplicate());
+                        }
+                        axis_obj.catAx.setMajorTickMark(oCatAx.majorTickMark);
+
+                        if(oCatAx.minorGridlines)
+                        {
+                            axis_obj.catAx.setMinorGridlines(oCatAx.minorGridlines.createDuplicate());
+                        }
+                        axis_obj.catAx.setMinorTickMark(oCatAx.minorTickMark);
+
+                        if(oCatAx.spPr)
+                        {
+                            axis_obj.catAx.setSpPr(oCatAx.spPr.createDuplicate());
+                        }
+                        axis_obj.catAx.setTickLblPos(oCatAx.tickLblPos);
+                        if(oCatAx.title)
+                        {
+                            axis_obj.catAx.setTitle(oCatAx.title.createDuplicate());
+                        }
+                        if(oCatAx.txPr)
+                        {
+                            axis_obj.catAx.setTxPr(oCatAx.txPr.createDuplicate());
+                        }
+                    }
                     new_chart_type.addAxId(axis_obj.catAx);
                     new_chart_type.addAxId(axis_obj.valAx);
                     plot_area.addAxis(axis_obj.catAx);
@@ -7063,8 +7162,11 @@ DrawingObjectsController.prototype =
         if(oTargetDocContent)
         {
             oState.Pos      = oTargetDocContent.GetContentPosition(false, false, undefined);
+            oState.Pos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.StartPos = oTargetDocContent.GetContentPosition(true, true, undefined);
+            oState.StartPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.EndPos   = oTargetDocContent.GetContentPosition(true, false, undefined);
+            oState.EndPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.DrawingSelection = oTargetDocContent.Selection.Use;
         }
         oState.DrawingsSelectionState = this.getSelectionState()[0];
@@ -7092,16 +7194,23 @@ DrawingObjectsController.prototype =
                 if(oDrawingSelectionState.textObject.Is_UseInDocument() && (!oDrawingSelectionState.textObject.group || oDrawingSelectionState.textObject.group === this))
                 {
                     this.selectObject(oDrawingSelectionState.textObject, bDocument ? (oDrawingSelectionState.textObject.parent ? oDrawingSelectionState.textObject.parent.PageNum : nPageIndex) : nPageIndex);
-                    var oDocContent = oDrawingSelectionState.textObject.getDocContent();
+                    var oDocContent;
+                    if(oDrawingSelectionState.textObject instanceof AscFormat.CGraphicFrame){
+                        oDocContent = oDrawingSelectionState.textObject.graphicObject;
+                    }
+                    else {
+                        oDocContent = oDrawingSelectionState.textObject.getDocContent();
+                    }
+
                     if(oDocContent){
                         if (true === oSelectionState.DrawingSelection)
                         {
-                            oDocContent.SetContentPosition(oSelectionState.StartPos, 0, 0);
-                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 0, 0, 0);
+                            oDocContent.SetContentPosition(oSelectionState.StartPos, 1, 0);
+                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 1, 0, 0);
                         }
                         else
                         {
-                            oDocContent.SetContentPosition(oSelectionState.Pos, 0, 0);
+                            oDocContent.SetContentPosition(oSelectionState.Pos, 1, 0);
                             bNeedRecalculateCurPos = true;
                         }
                         this.selection.textSelection = oDrawingSelectionState.textObject;

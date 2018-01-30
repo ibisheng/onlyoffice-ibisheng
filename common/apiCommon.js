@@ -3534,7 +3534,7 @@
 
 						var sCustomText = oRunS['text'];
 						if(sCustomText === "<%br%>"){
-							oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
+							oRun.Add_ToContent(0, new ParaNewLine(break_Line), false);
 						}
 						else{
 							for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)

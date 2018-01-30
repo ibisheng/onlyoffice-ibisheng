@@ -391,6 +391,10 @@ CDrawingsController.prototype.CanSplitTableCells = function()
 {
 	return this.DrawingObjects.tableCheckSplit();
 };
+CDrawingsController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.DrawingObjects.distributeTableCells(isHorizontally);
+};
 CDrawingsController.prototype.UpdateInterfaceState = function()
 {
 	var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);

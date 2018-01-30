@@ -1846,7 +1846,7 @@ function DrawingObjects() {
         shape.txBody.content.Content[0].Add_ToContent(0, oParaContent.Copy());
         var body_pr = shape.getBodyPr();
         var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
-        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        var h = shape.txBody.content.GetSummaryHeight() + body_pr.tIns + body_pr.bIns;
         shape.spPr.xfrm.setExtX(w);
         shape.spPr.xfrm.setExtY(h);
         shape.spPr.xfrm.setOffX(0);

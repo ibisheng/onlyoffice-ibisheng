@@ -1267,6 +1267,22 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
     // Отмечаем, что надо перемерить элементы в данном ране
     this.RecalcInfo.Measure = true;
 };
+/**
+ * Добавляем в конец рана заданную строку
+ * @param {string} sString
+ */
+ParaRun.prototype.AddText = function(sString)
+{
+	var nShift = this.Content.length;
+	for (var nPos = 0, nCount = sString.length; nPos < nCount; ++nPos)
+	{
+		var nChar = sString.charAt(nPos);
+		if (' ' === nChar)
+			this.AddToContent(nShift + nPos, new ParaSpace());
+		else
+			this.AddToContent(nShift + nPos, new ParaText(nChar));
+	}
+};
 
 // Определим строку и отрезок текущей позиции
 ParaRun.prototype.Get_CurrentParaPos = function()
@@ -1634,7 +1650,7 @@ ParaRun.prototype.Is_SimpleChanges = function(Changes)
  * или ссылки на сноску или разметки сложного поля. На вход приходит либо массив изменений, либо одно изменение
  * (можно не в массиве).
  */
-ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
+ParaRun.prototype.IsParagraphSimpleChanges = function(_Changes)
 {
     var Changes = _Changes;
     if (!_Changes.length)
@@ -1658,6 +1674,20 @@ ParaRun.prototype.Is_ParagraphSimpleChanges = function(_Changes)
     }
 
     return true;
+};
+/**
+ * Проверяем, подходит ли содержимое данного рана быстрого пересчета
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsContentSuitableForParagraphSimpleChanges = function()
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var nItemType = this.Content[nPos].Type;
+		if (1 !== g_oSRCFPSC[nItemType])
+			return false;
+	}
+	return true;
 };
 
 // Возвращаем строку и отрезок, в котором произошли простейшие изменения
@@ -4766,7 +4796,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
     var oCompiledPr = this.Get_CompiledPr(false);
     var oShd = oCompiledPr.Shd;
-    var bDrawShd  = ( oShd === undefined || c_oAscShdNil === oShd.Value ? false : true );
+    var bDrawShd  = ( oShd === undefined || c_oAscShdNil === oShd.Value || (oShd.Color && true === oShd.Color.Auto) ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
     if(this.Type == para_Math_Run && this.IsPlaceholder())
@@ -9878,6 +9908,27 @@ ParaRun.prototype.GetComplexField = function(nType)
 		}
 	}
 	return null;
+};
+ParaRun.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var oItem = this.Content[nPos];
+
+		if (para_FieldChar === oItem.Type && oItem.IsBegin())
+		{
+			var oComplexField = oItem.GetComplexField();
+			if (!oComplexField)
+				continue;
+
+			var oInstruction = oComplexField.GetInstruction();
+			if (!oInstruction)
+				continue;
+
+			if (nType === oInstruction.GetType())
+				arrComplexFields.push(oComplexField);
+		}
+	}
 };
 
 function CParaRunStartState(Run)

@@ -362,11 +362,36 @@ function ConvertParagraphToWord(paragraph, docContent)
     var oldFlag = paragraph.bFromDocument;
     paragraph.bFromDocument = true;
     var new_paragraph = paragraph.Copy(_docContent);
-    CheckWordParagraphContent(new_paragraph.Content);
+    CheckWordParagraphContent(new_paragraph.Content, new_paragraph.Pr.DefaultRunPr);
     var NewRPr = CheckWordRunPr(new_paragraph.TextPr.Value);
+    var oCopyDefaultPr;
     if(NewRPr)
     {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(NewRPr);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+        }
         new_paragraph.TextPr.Apply_TextPr(NewRPr);
+    }
+    else
+    {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(new_paragraph.TextPr.Value);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+            new_paragraph.TextPr.Apply_TextPr(NewRPr);
+        }
     }
     paragraph.bFromDocument = oldFlag;
     return new_paragraph;
@@ -447,9 +472,9 @@ function CheckWordRunPr(Pr, bMath)
     return NewRPr;
 }
 
-function CheckWordParagraphContent(aContent)
+function CheckWordParagraphContent(aContent, oTextPr)
 {
-    var NewRPr;
+    var NewRPr, MergePr;
     for(var i = 0; i < aContent.length; ++i)
     {
         var oItem = aContent[i];
@@ -460,7 +485,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
@@ -482,7 +532,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr, true);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
@@ -499,7 +574,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     var oGraphicFrame = new AscFormat.CGraphicFrame();
     var oTable2 = new CTable(oPresentation.DrawingDocument, oGraphicFrame, true, 0, [].concat(oTable.TableGrid), oTable.TableGrid.length, true);
     oTable2.Reset(0, 0, 50, 100000, 0, 0, 1);
-    oTable2.Set_TableLayout(tbllayout_Fixed);
+    oTable2.SetTableLayout(tbllayout_Fixed);
     oTable2.Set_Pr(oTable.Pr.Copy());
     oTable2.Set_TableLook(oTable.TableLook.Copy());
     for(var i = 0; i < oTable.Content.length; ++i){
@@ -1197,7 +1272,7 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function()
+CShape.prototype.getHierarchy = function(bIsSingleBody)
 {
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
@@ -1209,7 +1284,15 @@ CShape.prototype.getHierarchy = function()
             {
                 var ph_type = this.getPlaceholderType();
                 var ph_index = this.getPlaceholderIndex();
-                var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                var b_is_single_body;
+                if(AscFormat.isRealBool(bIsSingleBody))
+                {
+                    b_is_single_body = bIsSingleBody;
+                }
+                else
+                {
+                    b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                }
                 switch (this.parent.kind)
                 {
                     case AscFormat.TYPE_KIND.SLIDE:
@@ -1917,7 +2000,7 @@ CShape.prototype.getTextRect = function () {
 CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
     oMatrix.Reset();
     var _shape_transform = this.localTransform;
-    var _content_height = oContent.Get_SummaryHeight();
+    var _content_height = oContent.GetSummaryHeight();
     var _l, _t, _r, _b;
     var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
     var oRect = this.getTextRect();
@@ -2430,7 +2513,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
             }
         }
 
-        var hierarchy = this.getHierarchy();
+        var hierarchy = this.getHierarchy(false);
         var hierarchy_styles = [];
         for (var i = 0; i < hierarchy.length; ++i) {
             var hierarchy_shape = hierarchy[i];
@@ -2652,10 +2735,22 @@ CShape.prototype.isEmptyPlaceholder = function () {
 CShape.prototype.changeSize = function (kw, kh) {
     if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
         var xfrm = this.spPr.xfrm;
-        xfrm.setOffX(xfrm.offX * kw);
-        xfrm.setOffY(xfrm.offY * kh);
-        xfrm.setExtX(xfrm.extX * kw);
-        xfrm.setExtY(xfrm.extY * kh);
+        if(this.getNoChangeAspect()){
+            var k = Math.min(kw, kh);
+            var oldXC = xfrm.offX + xfrm.extX/2.0;
+            var oldYC = xfrm.offY + xfrm.extY/2.0;
+            xfrm.setExtX(xfrm.extX * k);
+            xfrm.setExtY(xfrm.extY * k);
+            xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
+            xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
+        }
+        else{
+
+            xfrm.setOffX(xfrm.offX * kw);
+            xfrm.setOffY(xfrm.offY * kh);
+            xfrm.setExtX(xfrm.extX * kw);
+            xfrm.setExtY(xfrm.extY * kh);
+        }
     }
     this.recalcTransform && this.recalcTransform();
 };
@@ -3389,14 +3484,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent(w, h, nStartPage);
                 oRet.w = w + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = l_ins + r_ins;
@@ -3410,14 +3505,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent( h, h, nStartPage);
                 oRet.w = h + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = t_ins + b_ins;
@@ -3495,7 +3590,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
 
         oDocContent.RecalculateContent(oRet.w, oRet.h, nStartPage);
 
-        oRet.contentH = oDocContent.Get_SummaryHeight();
+        oRet.contentH = oDocContent.GetSummaryHeight();
 
         if(this.bWordShape)
         {
@@ -5171,7 +5266,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
                 oContentToDraw.Reset(0, 0, oContent.XLimit, 20000);
                 oContentToDraw.Recalculate_Page(0, true);
             }
-            var dContentHeight = oContentToDraw.Get_SummaryHeight();
+            var dContentHeight = oContentToDraw.GetSummaryHeight();
             var OldShowParaMarks, width_ = dWidth*dKoeff, height_ = dHeight*dKoeff;
             if(isRealObject(editor))
             {
@@ -5366,7 +5461,11 @@ CShape.prototype.getColumnNumber = function(){
 
     CShape.prototype.getCopyWithSourceFormatting = function(){
         var oCopy = this.copy();
-        if(oCopy.spPr){
+        if(this.pen || this.brush){
+            if(!oCopy.spPr){
+                oCopy.setSpPr(AscFormat.CSpPr());
+                oCopy.spPr.setParent(oCopy);
+            }
             if(this.brush){
                 oCopy.spPr.setFill(this.brush.saveSourceFormatting());
             }

@@ -152,6 +152,19 @@ g_aNumber[0x0037] = 1;
 g_aNumber[0x0038] = 1;
 g_aNumber[0x0039] = 1;
 
+// Suitable Run content for the paragraph simple changes
+var g_oSRCFPSC             = [];
+g_oSRCFPSC[para_Text]      = 1;
+g_oSRCFPSC[para_Space]     = 1;
+g_oSRCFPSC[para_End]       = 1;
+g_oSRCFPSC[para_Tab]       = 1;
+g_oSRCFPSC[para_Sym]       = 1;
+g_oSRCFPSC[para_PageCount] = 1;
+g_oSRCFPSC[para_FieldChar] = 1;
+g_oSRCFPSC[para_InstrText] = 1;
+g_oSRCFPSC[para_Bookmark]  = 1;
+
+
 
 var g_aSpecialSymbols     = [];
 g_aSpecialSymbols[0x00AE] = 1;

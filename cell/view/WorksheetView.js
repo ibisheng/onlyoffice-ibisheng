@@ -664,7 +664,7 @@
             }
 
             this._prepareCellTextMetricsCache();
-            this.cellCommentator.updateCommentPosition();
+            this.cellCommentator.updateActiveComment();
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
             this.handlers.trigger("toggleAutoCorrectOptions", null, true);
             this.handlers.trigger("onDocumentPlaceChanged");
@@ -699,7 +699,7 @@
 		}
 
         this._prepareCellTextMetricsCache();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
@@ -767,6 +767,8 @@
             t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
             t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleColsCount();
+			t.cellCommentator.updateActiveComment();
+            t.cellCommentator.updateAreaComments();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
 				t.objectRender.rebuildChartGraphicObjects([new asc_Range(col, 0, col, gc_nMaxRow0)]);
@@ -814,6 +816,8 @@
             t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
             t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleRowsCount();
+			t.cellCommentator.updateActiveComment();
+			t.cellCommentator.updateAreaComments();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
 				t.objectRender.rebuildChartGraphicObjects([new asc_Range(0, row, gc_nMaxCol0, row)]);
@@ -5369,7 +5373,7 @@
 
         this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         this.cellCommentator.drawCommentCells();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
@@ -5530,7 +5534,7 @@
 
         this.handlers.trigger("onDocumentPlaceChanged");
         //ToDo this.drawDepCells();
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         this.cellCommentator.drawCommentCells();
 		window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
         this.handlers.trigger("toggleAutoCorrectOptions", true);
@@ -9288,7 +9292,7 @@
 			for (var i = 0; i < comments.length; i++) {
 				comment = comments[i];
 				if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
-					var commentData = new Asc.asc_CCommentData(comment);
+					var commentData = comment.clone();
 					//change nRow, nCol
 					commentData.asc_putCol(nCol);
 					commentData.asc_putRow(nRow);
@@ -10276,6 +10280,8 @@
 			t._prepareCellTextMetricsCache();
 
 			arrChangedRanges = arrChangedRanges.concat(t.model.hiddenManager.getRecalcHidden());
+
+			t.cellCommentator.updateAreaComments();
 
 			if (t.objectRender) {
 				if (reinitRanges && t.objectRender.drawingArea) {
@@ -11844,7 +11850,7 @@
 
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
-        this.cellCommentator.updateCommentPosition();
+        this.cellCommentator.updateActiveComment();
         //this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
@@ -12422,8 +12428,14 @@
 				{
 					var selectionRange = t.model.selectionRange;
 					var activeCell = selectionRange.activeCell.clone();
-					var activeCellRange = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
-					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeCellRange, true, true, true);
+					var activeRange = selectionRange.getLast();
+					var expandRange = t.model.autoFilters._getAdjacentCellsAF(activeRange, true, true, true);
+
+					var bIgnoreFirstRow = window['AscCommonExcel'].ignoreFirstRowSort(t.model, expandRange);
+					if(bIgnoreFirstRow)
+					{
+						expandRange.r1++;
+					}
 
 					//change selection
 					t.setSelection(expandRange);
@@ -13136,10 +13148,11 @@
         var openAndClosedValues = ws.autoFilters.getOpenAndClosedValues(filter, colId);
         var values = openAndClosedValues.values;
         var automaticRowCount = openAndClosedValues.automaticRowCount;
+        //для случае когда скрыто только пустое значение не отображаем customfilter
+		var ignoreCustomFilter = openAndClosedValues.ignoreCustomFilter;
         var filters = autoFilter.getFilterColumn(colId);
 
-        var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId,
-          autoFilter.Ref.r1);
+        var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
         var cellId = ws.autoFilters._rangeToId(rangeButton);
 
         var cellCoord = this.getCellCoord(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
@@ -13149,7 +13162,7 @@
         if (filters && filters.ColorFilter) {
             filterObj.type = c_oAscAutoFilterTypes.ColorFilter;
             filterObj.filter = filters.ColorFilter.clone();
-        } else if (filters && filters.CustomFiltersObj && filters.CustomFiltersObj.CustomFilters) {
+        } else if (!ignoreCustomFilter && filters && filters.CustomFiltersObj && filters.CustomFiltersObj.CustomFilters) {
             filterObj.type = c_oAscAutoFilterTypes.CustomFilters;
             filterObj.filter = filters.CustomFiltersObj;
         } else if (filters && filters.DynamicFilter) {

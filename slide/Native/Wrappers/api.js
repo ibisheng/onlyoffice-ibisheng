@@ -209,8 +209,11 @@ if(window.native){
 	window.native.Call_OnMouseDown = function(e){
 	    if(window.editor)
         {
+            var ret = window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
             window.editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+            return ret;
         }
+        return -1;
     };
 
     window.native.Call_OnMouseUp = function(e){
@@ -230,6 +233,18 @@ if(window.native){
     window.native.Call_OnCheckMouseDown = function(e)
     {
         return window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
+    };
+
+    window.native.Call_OnCheckMouseDown2 = function(e)
+    {
+        return window.editor.WordControl.m_oDrawingDocument.CheckMouseDown2(e);
+    };
+
+    window.native.Call_ResetSelection = function()
+    {
+        window.editor.WordControl.m_oLogicDocument.RemoveSelection(false);
+        window.editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        window.editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     };
 
     window.native.Call_OnUpdateOverlay = function(param){

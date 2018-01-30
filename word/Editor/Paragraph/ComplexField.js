@@ -447,141 +447,154 @@ CComplexField.prototype.private_UpdateTOC = function()
 		}
 	}
 
-	for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
+	if (arrOutline.length > 0)
 	{
-		var oSrcParagraph = arrOutline[nIndex].Paragraph;
-
-		var oPara = oSrcParagraph.Copy(null, null, {
-			SkipPageBreak   : true,
-			SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
-			SkipColumnBreak : true
-		});
-		oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
-
-		var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
-
-		var oContainer    = oPara,
-			nContainerPos = 0;
-
-		if (this.Instruction.IsHyperlinks())
+		for (var nIndex = 0, nCount = arrOutline.length; nIndex < nCount; ++nIndex)
 		{
-			var sHyperlinkStyleId = oStyles.GetDefaultHyperlink();
+			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
-			var oHyperlink = new ParaHyperlink();
-			for (var nParaPos = 0, nParaCount = oPara.Content.length - 1; nParaPos < nParaCount; ++nParaPos)
+			var oPara = oSrcParagraph.Copy(null, null, {
+				SkipPageBreak   : true,
+				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
+				SkipColumnBreak : true
+			});
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+
+			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
+
+			var oContainer    = oPara,
+				nContainerPos = 0;
+
+			if (this.Instruction.IsHyperlinks())
 			{
-				// TODO: Проверить, нужно ли проставлять этот стиль во внутренние раны
-				if (oPara.Content[0] instanceof ParaRun)
-					oPara.Content[0].Set_RStyle(sHyperlinkStyleId);
+				var sHyperlinkStyleId = oStyles.GetDefaultHyperlink();
 
-				oHyperlink.Add_ToContent(nParaPos, oPara.Content[0]);
-				oPara.Remove_FromContent(0, 1);
-			}
-			oHyperlink.SetAnchor(sBookmarkName);
-			oPara.Add_ToContent(0, oHyperlink);
+				var oHyperlink = new ParaHyperlink();
+				for (var nParaPos = 0, nParaCount = oPara.Content.length - 1; nParaPos < nParaCount; ++nParaPos)
+				{
+					// TODO: Проверить, нужно ли проставлять этот стиль во внутренние раны
+					if (oPara.Content[0] instanceof ParaRun)
+						oPara.Content[0].Set_RStyle(sHyperlinkStyleId);
 
-			oContainer    = oHyperlink;
-			nContainerPos = oHyperlink.Content.length;
-		}
-		else
-		{
-			// TODO: ParaEnd
-			oContainer    = oPara;
-			nContainerPos = oPara.Content.length - 1;
-		}
+					oHyperlink.Add_ToContent(nParaPos, oPara.Content[0]);
+					oPara.Remove_FromContent(0, 1);
+				}
+				oHyperlink.SetAnchor(sBookmarkName);
+				oPara.Add_ToContent(0, oHyperlink);
 
-		var isAddTabForNumbering = false;
-		if (oSrcParagraph.HaveNumbering())
-		{
-			var oNumPr     = oSrcParagraph.Numbering_Get();
-			var oNumbering = this.LogicDocument.Get_Numbering();
-			var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
-			var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
-
-			var oNumberingRun = new ParaRun(oPara, false);
-			for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
-			{
-				oNumberingRun.Add_ToContent(nPos, 32 === sText.charCodeAt(0) ? new ParaSpace() : new ParaText(sText.charAt(nPos)));
-			}
-
-			var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
-			var nNumSuff = oNumLvl.Suff;
-
-			if (numbering_suff_Space === nNumSuff)
-			{
-				oNumberingRun.Add_ToContent(sText.length, new ParaSpace());
-			}
-			else if (numbering_suff_Tab === nNumSuff)
-			{
-				oNumberingRun.Add_ToContent(sText.length, new ParaTab());
-				isAddTabForNumbering = true;
-			}
-
-			oContainer.Add_ToContent(0, oNumberingRun);
-			nContainerPos++;
-		}
-
-		// Word добавляет табы независимо о наличия Separator и PAGEREF
-		var oTabs = new CParaTabs();
-		oTabs.Add(oTab);
-
-		if ((!isPreserveTabs && oPara.RemoveTabsForTOC()) || isAddTabForNumbering)
-		{
-			// TODO: Табы для нумерации как-то зависят от самой нумерации и не совсем такие, как без нумерации
-
-
-			// В данной ситуации ворд делает следующим образом: он пробегает по параграфу и смотрит, если там есть
-			// табы (в контенте, а не в свойствах), тогда он первый таб оставляет, а остальные заменяет на пробелы,
-			// при этом в список табов добавляется новый левый таб без заполнителя, отступающий на 1,16 см от левого
-			// поля параграфа, т.е. позиция таба зависит от стиля.
-
-			var nFirstTabPos = 11.6;
-			var sTOCStyleId  = this.LogicDocument.GetStyles().GetDefaultTOC(arrOutline[nIndex].Lvl);
-			if (sTOCStyleId)
-			{
-				var oParaPr  = this.LogicDocument.GetStyles().Get_Pr(sTOCStyleId, styletype_Paragraph, null, null).ParaPr;
-				nFirstTabPos = 11.6 + (oParaPr.Ind.Left + oParaPr.Ind.FirstLine);
-			}
-
-			oTabs.Add(new CParaTab(tab_Left, nFirstTabPos, Asc.c_oAscTabLeader.None));
-		}
-
-		oPara.Set_Tabs(oTabs);
-
-		if (!(this.Instruction.IsSkipPageRefLvl(arrOutline[nIndex].Lvl)))
-		{
-			var oSeparatorRun = new ParaRun(oPara, false);
-			if (!sSeparator || "" === sSeparator)
-			{
-				oSeparatorRun.Add_ToContent(0, new ParaTab());
+				oContainer    = oHyperlink;
+				nContainerPos = oHyperlink.Content.length;
 			}
 			else
 			{
-				oSeparatorRun.Add_ToContent(0, 32 === sSeparator.charCodeAt(0) ? new ParaSpace() : new ParaText(sSeparator.charAt(0)));
+				// TODO: ParaEnd
+				oContainer    = oPara;
+				nContainerPos = oPara.Content.length - 1;
 			}
 
-			oContainer.Add_ToContent(nContainerPos, oSeparatorRun);
-
-			var oPageRefRun = new ParaRun(oPara, false);
-
-			var nTempIndex = -1;
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
-			var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
-			for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
+			var isAddTabForNumbering = false;
+			if (oSrcParagraph.HaveNumbering())
 			{
-				oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
+				var oNumPr     = oSrcParagraph.Numbering_Get();
+				var oNumbering = this.LogicDocument.Get_Numbering();
+				var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
+				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
+
+				var oNumberingRun = new ParaRun(oPara, false);
+				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
+				{
+					oNumberingRun.Add_ToContent(nPos, 32 === sText.charCodeAt(0) ? new ParaSpace() : new ParaText(sText.charAt(nPos)));
+				}
+
+				var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
+				var nNumSuff = oNumLvl.Suff;
+
+				if (numbering_suff_Space === nNumSuff)
+				{
+					oNumberingRun.Add_ToContent(sText.length, new ParaSpace());
+				}
+				else if (numbering_suff_Tab === nNumSuff)
+				{
+					oNumberingRun.Add_ToContent(sText.length, new ParaTab());
+					isAddTabForNumbering = true;
+				}
+
+				oContainer.Add_ToContent(0, oNumberingRun);
+				nContainerPos++;
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
-			var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
-			for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
+
+			// Word добавляет табы независимо о наличия Separator и PAGEREF
+			var oTabs = new CParaTabs();
+			oTabs.Add(oTab);
+
+			if ((!isPreserveTabs && oPara.RemoveTabsForTOC()) || isAddTabForNumbering)
 			{
-				oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
+				// TODO: Табы для нумерации как-то зависят от самой нумерации и не совсем такие, как без нумерации
+
+
+				// В данной ситуации ворд делает следующим образом: он пробегает по параграфу и смотрит, если там есть
+				// табы (в контенте, а не в свойствах), тогда он первый таб оставляет, а остальные заменяет на пробелы,
+				// при этом в список табов добавляется новый левый таб без заполнителя, отступающий на 1,16 см от левого
+				// поля параграфа, т.е. позиция таба зависит от стиля.
+
+				var nFirstTabPos = 11.6;
+				var sTOCStyleId  = this.LogicDocument.GetStyles().GetDefaultTOC(arrOutline[nIndex].Lvl);
+				if (sTOCStyleId)
+				{
+					var oParaPr  = this.LogicDocument.GetStyles().Get_Pr(sTOCStyleId, styletype_Paragraph, null, null).ParaPr;
+					nFirstTabPos = 11.6 + (oParaPr.Ind.Left + oParaPr.Ind.FirstLine);
+				}
+
+				oTabs.Add(new CParaTab(tab_Left, nFirstTabPos, Asc.c_oAscTabLeader.None));
 			}
-			oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this.LogicDocument));
-			oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
+
+			oPara.Set_Tabs(oTabs);
+
+			if (!(this.Instruction.IsSkipPageRefLvl(arrOutline[nIndex].Lvl)))
+			{
+				var oSeparatorRun = new ParaRun(oPara, false);
+				if (!sSeparator || "" === sSeparator)
+				{
+					oSeparatorRun.Add_ToContent(0, new ParaTab());
+				}
+				else
+				{
+					oSeparatorRun.Add_ToContent(0, 32 === sSeparator.charCodeAt(0) ? new ParaSpace() : new ParaText(sSeparator.charAt(0)));
+				}
+
+				oContainer.Add_ToContent(nContainerPos, oSeparatorRun);
+
+				var oPageRefRun = new ParaRun(oPara, false);
+
+				var nTempIndex = -1;
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
+				var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
+				for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
+				{
+					oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
+				}
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
+				var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
+				for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
+				{
+					oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
+				}
+				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this.LogicDocument));
+				oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
+			}
+
+			oSelectedContent.Add(new CSelectedElement(oPara, true));
 		}
+	}
+	else
+	{
+		var sReplacementText = AscCommon.translateManager.getValue("No table of contents entries found.");
 
-
+		var oPara = new Paragraph(this.LogicDocument.GetDrawingDocument(), this.LogicDocument, false);
+		var oRun  = new ParaRun(oPara, false);
+		oRun.Set_Bold(true);
+		oRun.AddText(sReplacementText);
+		oPara.AddToContent(0, oRun);
 		oSelectedContent.Add(new CSelectedElement(oPara, true));
 	}
 
@@ -881,6 +894,10 @@ CComplexField.prototype.SetPr = function(oPr)
 		oRun.AddToContent(nInRunPos + nPos, new ParaInstrText(sNewInstruction.charAt(nPos)));
 	}
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CComplexField = CComplexField;
 
 
 

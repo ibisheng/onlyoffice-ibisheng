@@ -1052,6 +1052,16 @@
 			case AscDFH.historydescription_Document_SetComplexFieldPr:
 				sString = "Document_SetComplexFieldPr";
 				break;
+			case AscDFH.historydescription_Document_UpdateTableOfContents:
+				sString = "Document_UpdateTableOfContents";
+				break;
+			case AscDFH.historydescription_Document_SectionStartPage:
+				sString = "Document_SectionStartPage";
+				break;
+			case AscDFH.historydescription_Document_DistributeTableCells:
+				sString = "Document_DistributeTableCells";
+				break;
+
 		}
 		return sString;
 	}
@@ -2982,7 +2992,9 @@
 	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014c;
 	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014d;
 	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
-
+	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
+	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
+	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3079,6 +3091,10 @@
 	CChangesBase.prototype.SetReverted = function(isReverted)
 	{
 		this.Reverted = isReverted;
+	};
+	CChangesBase.prototype.IsParagraphSimpleChanges = function()
+	{
+		return false;
 	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**

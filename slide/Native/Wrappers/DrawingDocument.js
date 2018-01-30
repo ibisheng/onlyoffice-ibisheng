@@ -851,6 +851,20 @@ CDrawingDocument.prototype.OnCheckMouseDown = function(e)
     return 0;
 };
 
+CDrawingDocument.prototype.CheckMouseDown2 = function (e) {
+    check_MouseDownEvent(e, false);
+    var pos = {X: global_mouseEvent.X, Y: global_mouseEvent.Y, Page: this.LogicDocument.CurPage};
+    if (pos.Page == -1)
+        return 0;
+
+    var oController = this.LogicDocument.GetCurrentController();
+    var _isDrawings = 0;
+    if(oController){
+        _isDrawings = oController.isPointInDrawingObjects4(pos.X, pos.Y, pos.Page, true);
+    }
+    return _isDrawings;
+};
+
 function DrawBackground(graphics, unifill, w, h)
 {
     // первым делом рисуем белый рект!

@@ -3717,7 +3717,7 @@ $( function () {
 
 		oParser = new parserFormula( "AGGREGATE(6,1,100)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 100);
+		strictEqual( oParser.calculate().getValue(), "#VALUE!");
 
 		oParser = new parserFormula( "AGGREGATE(7,3,A101:B105)", "A1", ws );
 		ok( oParser.parse() );
@@ -8992,6 +8992,14 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
 
+		oParser = new parserFormula( 'DCOUNT(A4:E10,, A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNT(A4:E10,"", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
 	});
 
 	test( "Test: \"DCOUNTA\"", function () {
@@ -9001,6 +9009,14 @@ $( function () {
 		oParser = new parserFormula( 'DCOUNTA(A4:E10, "Profit", A1:F2)', "AA2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNTA(A4:E10,, A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNTA(A4:E10,"", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 
 	});
 
