@@ -517,8 +517,8 @@
 			this.TableDescription = tblProp.TableDescription;
 			this.TableCaption = tblProp.TableCaption;
 
-			this.ColumnWidth = undefined;
-			this.RowHeight   = undefined;
+			this.ColumnWidth = tblProp.ColumnWidth;
+			this.RowHeight   = tblProp.RowHeight;
 		}
 		else
 		{

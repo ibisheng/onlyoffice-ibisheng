@@ -6167,6 +6167,10 @@ CTableRowHeight.prototype.GetValue = function()
 {
 	return this.Value;
 };
+CTableRowHeight.prototype.GetRule = function()
+{
+	return this.HRule;
+};
 
 function CTableRowPr()
 {

@@ -518,7 +518,6 @@ CTable.prototype.Get_Props = function()
 			Pr.CellsWidthNotEqual = false;
 		}
 
-		Pr.ColumnWidth = CellWidth;
 		Pr.RowHeight   = nRowHeight;
 
 		Pr.CellBorders = {
@@ -609,8 +608,6 @@ CTable.prototype.Get_Props = function()
 
 		var CellShd = null;
 
-		var nCellWidth = null;
-
 		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
 		{
 			var Row         = this.Content[CurRow];
@@ -631,25 +628,6 @@ CTable.prototype.Get_Props = function()
 				{
 					if (null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ))
 						CellShd = null;
-				}
-
-				if (CurCell === this.CurCell.Index)
-				{
-					var _nCellWidth;
-					if (tblwidth_Auto === oCellW.Type)
-						_nCellWidth = null;
-					else if (tblwidth_Mm === oCellW.Type)
-						_nCellWidth = oCellW.W;
-					else// if (tblwidth_Pct === oCellW.Type)
-						_nCellWidth = -oCellW.W;
-
-					if (null === nCellWidth)
-						nCellWidth = _nCellWidth;
-					else if ((tblwidth_Auto === oCellW.Type && null !== nCellWidth)
-						|| (undefined === nCellWidth
-						|| null === nCellWidth
-						|| Math.abs(nCellWidth - _nCellWidth) > 0.001))
-						nCellWidth = undefined;
 				}
 
 				// Крайняя левая ли данная ячейка в выделении?
@@ -756,16 +734,53 @@ CTable.prototype.Get_Props = function()
 			nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
 			Pr.RowHeight = nRowSummaryH;
 		}
-
 		else
 		{
 			Pr.RowHeight = oRowH.GetValue();
 		}
-
-		Pr.ColumnWidth = nCellWidth;
 	}
 
-	console.log(Pr.RowHeight);
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var oCells = {};
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		if (!oCells[nCurCell])
+			oCells[nCurCell] = 1;
+	}
+
+	var nColumnWidth = null;
+
+	var arrRowsInfo = this.private_GetRowsInfo();
+	for (var nCurRow = 0, nCount = arrRowsInfo.length; nCurRow < nCount; ++nCurRow)
+	{
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell in oCells)
+		{
+			var _nCurCell = nCurCell | 0;
+			if (arrRowsInfo[nCurRow][_nCurCell + nAdd])
+			{
+				if (null === nColumnWidth)
+				{
+					nColumnWidth = arrRowsInfo[nCurRow][_nCurCell + nAdd].W;
+				}
+				else if (Math.abs(nColumnWidth - arrRowsInfo[nCurRow][_nCurCell + nAdd].W) > 0.001)
+				{
+					nColumnWidth = undefined;
+					break;
+				}
+			}
+		}
+
+		if (undefined === nColumnWidth)
+			break;
+	}
+
+	Pr.ColumnWidth = nColumnWidth;
+
+	this.private_CreateNewGrid(arrRowsInfo);
 
 	switch (Pr.CellsVAlign)
 	{
@@ -2130,6 +2145,12 @@ CTable.prototype.Set_Props = function(Props)
 	{
 		this.Set_TableCaption(Props.TableCaption);
 	}
+
+	if (undefined !== Props.RowHeight)
+		this.SetRowHeight(Props.RowHeight);
+
+	if (undefined !== Props.ColumnWidth)
+		this.SetColumnWidth(Props.ColumnWidth);
 
 	return true;
 };
@@ -11507,7 +11528,7 @@ CTable.prototype.GetSelectedRowsRange = function()
 	var arrSelectedCells = this.GetSelectionArray();
 
 	var nStartRow = -1,
-		nEndRow   = -1;
+		nEndRow   = -2;
 
 	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
 	{
@@ -13441,6 +13462,56 @@ CTable.prototype.DistributeRows = function()
 	}
 
 	return true;
+};
+/**
+ * Выставляем ширину текущей колонки
+ * @param nWidth
+ */
+CTable.prototype.SetColumnWidth = function(nWidth)
+{
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var oCells = {};
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		if (!oCells[nCurCell])
+			oCells[nCurCell] = 1;
+	}
+
+	var arrRowsInfo = this.private_GetRowsInfo();
+	for (var nCurRow = 0, nCount = arrRowsInfo.length; nCurRow < nCount; ++nCurRow)
+	{
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell in oCells)
+		{
+			var _nCurCell = nCurCell | 0;
+			if (arrRowsInfo[nCurRow][_nCurCell + nAdd])
+				arrRowsInfo[nCurRow][_nCurCell + nAdd].W = nWidth;
+		}
+	}
+
+	this.private_CreateNewGrid(arrRowsInfo);
+};
+/**
+ * Выставляем высоту текущей строки
+ * @param nHeight
+ */
+CTable.prototype.SetRowHeight = function(nHeight)
+{
+	var oRowsRange = this.GetSelectedRowsRange();
+
+	for (var nCurRow = oRowsRange.Start; nCurRow <= oRowsRange.End; ++nCurRow)
+	{
+		var oRow  = this.GetRow(nCurRow);
+		var oRowH = oRow.GetHeight();
+
+		if (oRowH.IsAuto())
+			oRow.SetHeight(nHeight, Asc.linerule_AtLeast);
+		else
+			oRow.SetHeight(nHeight, oRowH.GetRule());
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
