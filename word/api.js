@@ -1185,6 +1185,9 @@ background-repeat: no-repeat;\
 			this.LoadedObject = 1;
 
 			// проверяем какие шрифты нужны
+            var StylesPainter = new AscCommonWord.CStylesPainter();
+            StylesPainter.CheckStylesNames(this, this.LoadedObjectDS);
+
 			this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 			AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
@@ -2105,7 +2108,9 @@ background-repeat: no-repeat;\
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			}
 
+			AscFonts.IsCheckSymbols = true;
 			AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
+            AscFonts.IsCheckSymbols = false;
 		}
 	};
 	
@@ -5882,6 +5887,9 @@ background-repeat: no-repeat;\
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
+            if (undefined !== this.asyncMethodCallback)
+            	return;
+
 			// заполним прогресс
 			var _progress         = this.OpenDocumentProgress;
 			_progress.Type        = c_oAscAsyncAction.LoadDocumentFonts;
@@ -5946,6 +5954,13 @@ background-repeat: no-repeat;\
 			this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
 		else
 			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+
+        if (undefined !== this.asyncMethodCallback)
+        {
+            this.asyncMethodCallback();
+            this.asyncMethodCallback = undefined;
+            return;
+        }
 
 		this.EndActionLoadImages = 0;
 		if (this.isPasteFonts_Images)
@@ -6389,6 +6404,8 @@ background-repeat: no-repeat;\
 		var _count = 0;
 		for (var i in this.pasteImageMap)
 			++_count;
+
+        AscFonts.FontPickerByCharacter.extendFonts(_fonts);
 		if (0 == _count && false === this.FontLoader.CheckFontsNeedLoading(_fonts))
 		{
 			// никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.

@@ -946,7 +946,7 @@ CFontInfo.prototype =
         }
     },
 
-    LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
+    LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform, isNoSetupToManager)
     {
         // подбираем шрифт по стилю
         var sReturnName = this.Name;
@@ -1093,46 +1093,24 @@ CFontInfo.prototype =
 			fontfile.LoadFontNative();
         }        
 
-        var _ext = "";
-        if (bNeedBold)
-            _ext += "nbold";
-        if (bNeedItalic)
-            _ext += "nitalic";
+        var pFontFile = fontManager.LoadFont(fontfile, faceIndex, fEmSize, bSrcBold, bSrcItalic, bNeedBold, bNeedItalic, isNoSetupToManager);
 
-        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize, _ext, fontManager);
-
-        if (!pFontFile)
-            pFontFile = fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic);
-        else
-            pFontFile.SetDefaultFont(fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic));
-
-        if (!pFontFile)
-            return false;
-
-        pFontFile.m_oFontManager = fontManager;
-
-        fontManager.m_pFont = pFontFile;
-        pFontFile.SetNeedBold(bNeedBold);
-        pFontFile.SetItalic(bNeedItalic);
-
-        var _fEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
-        pFontFile.SetSizeAndDpi(_fEmSize, dHorDpi, dVerDpi);
-
-        pFontFile.SetStringGID(fontManager.m_bStringGID);
-        pFontFile.SetUseDefaultFont(fontManager.m_bUseDefaultFont);
-        pFontFile.SetCharSpacing(fontManager.m_fCharSpacing);
-
-        fontManager.m_oGlyphString.ResetCTM();
-        if (undefined !== transform)
+        if (pFontFile && (true !== isNoSetupToManager))
         {
-            fontManager.SetTextMatrix2(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
-        }
-        else
-        {
-            fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
+            var newEmSize = fontManager.UpdateSize(fEmSize, dVerDpi, dVerDpi);
+            pFontFile.SetSizeAndDpi(newEmSize, dHorDpi, dVerDpi);
+
+            if (undefined !== transform)
+            {
+                fontManager.SetTextMatrix2(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
+            }
+            else
+            {
+                fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
+            }
         }
 
-        fontManager.AfterLoad();
+        return pFontFile;
     },
 
     GetFontID : function(font_loader, lStyle)
@@ -1508,6 +1486,9 @@ function DecodeBase64(imData, szSrc)
 		g_font_infos[l] = new CFontInfo("ASCW3", 0, FONT_TYPE_ADDITIONAL, g_font_files.length - 1, 0, -1, -1, -1, -1, -1, -1);
 		g_map_font_index["ASCW3"] = l;
 		/////////////////////////////////////////////////////////////////////
+
+        if (AscFonts.FontPickerByCharacter)
+            AscFonts.FontPickerByCharacter.init(window["__fonts_infos"]);
 
 		// удаляем временные переменные
 		delete window["__fonts_files"];

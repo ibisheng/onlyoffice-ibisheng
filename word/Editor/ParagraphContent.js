@@ -244,12 +244,15 @@ CRunElementBase.prototype.GetType = function()
 // Класс ParaText
 function ParaText(value)
 {
-    this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);    
+    this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);
     this.Width        = 0x00000000 | 0;
     this.WidthVisible = 0x00000000 | 0;
     this.Flags        = 0x00000000 | 0;
     
     this.Set_SpaceAfter(this.private_IsSpaceAfter());
+
+    if (AscFonts.IsCheckSymbols)
+        AscFonts.FontPickerByCharacter.getFontBySymbol(this.Value);
 }
 
 ParaText.prototype =
@@ -265,6 +268,9 @@ ParaText.prototype =
     {
         this.Value = CharCode;
         this.Set_SpaceAfter(this.private_IsSpaceAfter());
+
+        if (AscFonts.IsCheckSymbols)
+            AscFonts.FontPickerByCharacter.getFontBySymbol(this.Value);
     },
     
     Draw : function(X, Y, Context)
@@ -379,7 +385,9 @@ ParaText.prototype =
 
     Copy : function()
     {
-        return new ParaText(String.fromCharCode(this.Value));
+        var retValue = new ParaText();
+        retValue.Set_CharCode(this.Value);
+        return retValue;
     },
 
     Is_NBSP : function()
@@ -458,8 +466,7 @@ ParaText.prototype =
 
     Read_FromBinary : function(Reader)
     {
-        this.Value = Reader.GetLong();
-        this.Set_SpaceAfter(this.private_IsSpaceAfter());
+        this.Set_CharCode(Reader.GetLong());
     }
 };
 ParaText.prototype.private_IsSpaceAfter = function()

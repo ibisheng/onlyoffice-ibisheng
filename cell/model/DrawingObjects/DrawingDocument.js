@@ -3522,6 +3522,7 @@ function CDrawingDocument(drawingObjects)
         {
             dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
 

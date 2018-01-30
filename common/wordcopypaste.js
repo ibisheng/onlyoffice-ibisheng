@@ -3603,7 +3603,7 @@ PasteProcessor.prototype =
 		var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 		if (window['AscCommon'].g_specialPasteHelper.specialPasteStart &&
 			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps) {
-			fPrepasteCallback();
+			oThis.api.pre_Paste([], [], fPrepasteCallback);
 		} else if (oObjectsForDownload.aUrls.length > 0) {
 			if (bIsOnlyFromBinary && window["NativeCorrectImageUrlOnPaste"]) {
 				var url;
@@ -3942,9 +3942,7 @@ PasteProcessor.prototype =
 				oThis.aContent = aContent.content;
 				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
 			});
-
 		}
-
 	},
 
 	//from PRESENTATION to PRESENTATION
@@ -4387,8 +4385,35 @@ PasteProcessor.prototype =
 	{
 		var oThis = this;
 		
-		var fPasteHtmlPresentationCallback = function()
+		var fPasteHtmlPresentationCallback = function(fonts, images)
 		{
+			var executePastePresentation = function()
+			{
+				var oController = presentation.GetCurrentController();
+				var targetDocContent =  oController  && oController.getTargetDocContent();
+				if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
+				{
+					if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
+					{
+						var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
+						oThis.InsertInPlacePresentation(aNewContent);
+					}
+				}
+				else
+				{
+					var presentationSelectedContent = new PresentationSelectedContent();
+					presentationSelectedContent.Drawings = arrShapes;
+
+					presentation.Insert_Content(presentationSelectedContent);
+					presentation.Recalculate();
+					presentation.Check_CursorMoveRight();
+					presentation.Document_UpdateInterfaceState();
+
+					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly]);
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+				}
+			};
+
 			oThis.aContent = [];
 			//на время заполнения контента для вставки отключаем историю
 			 var arrShapes = [], arrImages = [], arrTables = [];
@@ -4492,47 +4517,31 @@ PasteProcessor.prototype =
 				
 				arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
-			var presentation = editor.WordControl.m_oLogicDocument;
-			var oController = presentation.GetCurrentController();
-			var targetDocContent =  oController  && oController.getTargetDocContent();
-			if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
+
+			if(!fonts)
 			{
-				if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
-				{
-					var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
-					oThis.InsertInPlacePresentation(aNewContent);
-				}
+				fonts = [];
 			}
-			else
+			if(!images)
 			{
-				/*if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
-					for (var i = 0; i < arrShapes.length; ++i) {
-						shape = arrShapes[i].Drawing;
-
-						var txBobyContent = shape.txBody.content.Content;
-						for (var j = 0, length = txBobyContent.length; j < length; ++j) {
-							if (window['AscCommon'].g_specialPasteHelper.specialPasteStart) {
-								txBobyContent[j] = oThis._specialPasteItemConvert(txBobyContent[j]);
-							}
-						}
-					}
-				}*/
-
-				var presentationSelectedContent = new PresentationSelectedContent();
-				presentationSelectedContent.Drawings = arrShapes;
-
-				presentation.Insert_Content(presentationSelectedContent);
-				presentation.Recalculate();
-				presentation.Check_CursorMoveRight();
-				presentation.Document_UpdateInterfaceState();
-
-				oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly]);
-				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+				images = [];
 			}
+			oThis.api.pre_Paste(fonts, images, executePastePresentation);
 		};
 		
-		var fPasteHtmlWordCallback = function()
+		var fPasteHtmlWordCallback = function(fonts, images)
 		{
+			var executePasteWord = function()
+			{
+				if(false === oThis.bNested)
+				{
+					oThis.InsertInDocument();
+				}
+				if(bTurnOffTrackRevisions){
+					oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+				}
+			};
+
 			oThis.aContent = [];
 			
 			//если находимся внутри текстовой области диаграммы, то не вставляем ссылки
@@ -4571,15 +4580,9 @@ PasteProcessor.prototype =
 			}
 			//на время заполнения контента для вставки отключаем историю
 			oThis._Execute(node, {}, true, true, false);
-				
 			oThis._AddNextPrevToContent(oThis.oDocument);
-			if(false === oThis.bNested)
-			{
-				oThis.InsertInDocument();
-			}
-			if(bTurnOffTrackRevisions){
-				oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
-			}
+
+			oThis.api.pre_Paste(fonts, images, executePasteWord);
 		};
 		
 		this.oRootNode = node;
@@ -4686,19 +4689,28 @@ PasteProcessor.prototype =
 
 		var fPasteTextWordCallback = function()
 		{
-			oThis.aContent = [];
-
-			oThis._getContentFromText(text, true);
-
-			oThis._AddNextPrevToContent(oThis.oDocument);
-			if(false === oThis.bNested)
+			var executePasteWord = function()
 			{
-				oThis.InsertInDocument();
-			}
+				if(false === oThis.bNested)
+				{
+					oThis.InsertInDocument();
+				}
+			};
+
+			oThis.aContent = [];
+			oThis._getContentFromText(text, true);
+			oThis._AddNextPrevToContent(oThis.oDocument);
+
+			oThis.api.pre_Paste([], [], executePasteWord);
 		};
 
 		var fPasteTextPresentationCallback = function()
 		{
+			var executePastePresentation = function()
+			{
+				oThis.InsertInPlacePresentation(oThis.aContent, true);
+			};
+
 			var presentation = editor.WordControl.m_oLogicDocument;
 			if(presentation.Slides.length === 0)
 			{
@@ -4743,7 +4755,7 @@ PasteProcessor.prototype =
 							shape.paragraphAdd(Item);
 						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText();
-							Item.Value = nUnicode;
+							Item.Set_CharCode(nUnicode);
 							shape.paragraphAdd(Item);
 						}
 						else {
@@ -4760,7 +4772,7 @@ PasteProcessor.prototype =
 			shape.txBody.content.AddToParagraph(paraTextPr);
 			shape.txBody.content.Set_ApplyToAll(false);
 
-			oThis.InsertInPlacePresentation(oThis.aContent, true);
+			oThis.api.pre_Paste([], [], executePastePresentation);
 		};
 
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
@@ -5768,27 +5780,31 @@ PasteProcessor.prototype =
 			}
 			if(aImagesToDownload.length > 0)
 			{
-        AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-          var image_map = {};
-          for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) {
-            var elem = data[i];
-            var sFrom = aImagesToDownload[i];
-            if (null != elem.url) {
-              var name = g_oDocumentUrls.imagePath2Local(elem.path);
-              oThis.oImages[sFrom] = name;
-              image_map[i] = name;
-            } else {
-              image_map[i] = sFrom;
-            }
-          }
-          oThis.api.pre_Paste(aPrepeareFonts, image_map, fCallback);
-        });
+				AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+				  var image_map = {};
+				  for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) {
+					var elem = data[i];
+					var sFrom = aImagesToDownload[i];
+					if (null != elem.url) {
+					  var name = g_oDocumentUrls.imagePath2Local(elem.path);
+					  oThis.oImages[sFrom] = name;
+					  image_map[i] = name;
+					} else {
+					  image_map[i] = sFrom;
+					}
+				  }
+				  fCallback(aPrepeareFonts, image_map);
+				});
 			}
 			else
-				this.api.pre_Paste(aPrepeareFonts, this.oImages, fCallback);
+			{
+				fCallback(aPrepeareFonts, this.oImages);
+			}
         }
         else
-            fCallback();
+		{
+			fCallback();
+		}
     },
     _Prepeare_recursive : function(node, bIgnoreStyle, isCheckFonts)
     {
@@ -7819,7 +7835,7 @@ PasteProcessor.prototype =
 							var Item;
 							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 								Item = new ParaText();
-								Item.Value = nUnicode;
+                                Item.Set_CharCode(nUnicode);
 							} else {
 								Item = new ParaSpace();
 							}

@@ -2867,6 +2867,7 @@ function CDrawingDocument()
 	this.ToRenderer = function ()
 	{
 		var Renderer = new AscCommon.CDocumentRenderer();
+		Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 		Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2880,6 +2881,7 @@ function CDrawingDocument()
 	this.ToRenderer2 = function ()
 	{
 		var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2912,6 +2914,7 @@ function CDrawingDocument()
 				watermark.StartRenderer();
 
 			this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 			this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage = 0;
 			this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
@@ -6164,6 +6167,7 @@ function CDrawingDocument()
 		{
 			dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
 		}
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
 		this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
 		return;
 
@@ -7729,6 +7733,36 @@ function CStylesPainter()
 }
 CStylesPainter.prototype =
 {
+	CheckStylesNames : function(_api, ds)
+	{
+        var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
+        for (var i in ds)
+        {
+            var style = ds[i];
+            if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
+            {
+            	AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+            }
+        }
+
+        AscFonts.FontPickerByCharacter.getFontsByString("Aa");
+
+        var styles = DocumentStyles.Style;
+
+        if (!styles)
+            return;
+
+        for (var i in styles)
+        {
+            var style = styles[i];
+            if (true == style.qFormat)
+            {
+                AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+                AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(style.Name));
+            }
+        }
+	},
+
 	GenerateStyles: function (_api, ds)
 	{
 		var _oldX = this.STYLE_THUMBNAIL_WIDTH;
@@ -7764,7 +7798,7 @@ CStylesPainter.prototype =
 				aPriorityStyles[index] = aSubArray;
 			}
 			aSubArray.push(style);
-		}
+		};
 		var _map_document = {};
 
 		for (var i = 0; i < _count_doc; i++)

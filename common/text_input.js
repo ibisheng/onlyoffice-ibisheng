@@ -652,6 +652,7 @@
 			}
 
 			var _value = this.getAreaValue();
+
 			if (this.UseValueInComposition)
 			{
 				var _data = _value.substring(this.ieNonCompositionPrefix.length);
@@ -944,92 +945,37 @@
 		systemConfirmText : function()
 		{
 			var _value 			= this.getAreaValue();
-			var _fontSelections = g_fontApplication.g_fontSelections;
-			var _language       = _fontSelections.checkText(_value);
 
-			ti_console_log("ti: detect language - " + _language);
-
-			/*
-			 switch (_language)
-			 {
-			 case LanguagesFontSelectTypes.Arabic:
-			 {
-			 console.log("arabic");
-			 break;
-			 }
-			 case LanguagesFontSelectTypes.Korean:
-			 {
-			 console.log("korean");
-			 break;
-			 }
-			 case LanguagesFontSelectTypes.Japan:
-			 {
-			 console.log("japan");
-			 break;
-			 }
-			 case LanguagesFontSelectTypes.Chinese:
-			 {
-			 console.log("chinese");
-			 break;
-			 }
-			 case LanguagesFontSelectTypes.Unknown:
-			 {
-			 console.log("unknown");
-			 break;
-			 }
-			 default:
-			 {
-			 console.log("error");
-			 break;
-			 }
-			 }*/
-
-			if (_language == AscFonts.LanguagesFontSelectTypes.Unknown || undefined === this.Api.WordControl)
+			if (!AscFonts.FontPickerByCharacter.getFontsByString(_value))
 			{
-				this.apiCompositeStart();
-				this.checkCompositionData(_value);
-				this.apiCompositeReplace(this.compositionValue);
-				this.apiCompositeEnd();
+                this.apiCompositeStart();
+                this.checkCompositionData(_value);
+                this.apiCompositeReplace(this.compositionValue);
+                this.apiCompositeEnd();
 			}
-			else
-			{
-				var _textPr = this.Api.WordControl.m_oLogicDocument.GetCalculatedTextPr();
 
-				var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
-				if (_check_obj.is_async)
-				{
-					var loader   = AscCommon.g_font_loader;
-					var fontinfo = g_fontApplication.GetFontInfo(_check_obj.name);
-					var isasync  = loader.LoadFont(fontinfo);
-					if (false === isasync)
-					{
-						var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
-						this.Api.WordControl.m_oLogicDocument.TextBox_Put(_value, _rfonts);
-					}
-					else
-					{
-						_check_obj.text = _value;
-						this.Api.asyncMethodCallback = function() {
+			var fonts = [];
+			AscFonts.FontPickerByCharacter.extendFonts(fonts);
 
-							var _fontSelections = g_fontApplication.g_fontSelections;
-							var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
+            if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
+            {
+                this.apiCompositeStart();
+                this.checkCompositionData(_value);
+                this.apiCompositeReplace(this.compositionValue);
+                this.apiCompositeEnd();
+            }
 
-							var _api = window['AscCommon'].g_inputContext.Api;
-							_api.WordControl.m_oLogicDocument.TextBox_Put(_check_obj.text, _rfonts);
-							_api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadFont);
-						};
+            this.Api.asyncMethodCallback = function() {
 
-						this.Api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadFont);
-					}
-				}
-				else
-				{
-					this.apiCompositeStart();
-					this.checkCompositionData(_value);
-					this.apiCompositeReplace(this.compositionValue);
-					this.apiCompositeEnd();
-				}
-			}
+            	var _t = AscCommon.g_inputContext;
+                _t.apiCompositeStart();
+                _t.checkCompositionData(_value);
+                _t.apiCompositeReplace(_t.compositionValue);
+                _t.apiCompositeEnd();
+
+            };
+
+            AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
 		},
 
 		onKeyDown : function(e)
@@ -1145,6 +1091,16 @@
 
 			if (c_oCompositionState.end != this.compositionState)
 				return;
+
+            var c = e.which || e.keyCode;
+            AscFonts.FontPickerByCharacter.getFontBySymbol(c);
+            if (AscFonts.FontPickerByCharacter.isExtendFonts())
+			{
+				this.onLoadFontsForInputs(function () {
+					AscCommon.g_inputContext.onKeyPress(e);
+                });
+				return;
+			}
 
 			return this.Api.onKeyPress(e);
 		},
@@ -1296,6 +1252,15 @@
 
 		apiCompositeReplace : function(_value)
 		{
+            AscFonts.FontPickerByCharacter.getFontsByString2(_value);
+            if (AscFonts.FontPickerByCharacter.isExtendFonts())
+            {
+                this.onLoadFontsForInputs(function () {
+                    AscCommon.g_inputContext.Api.asc_Recalculate();
+                }, true);
+                return;
+            }
+
 			if (this.compositionStateApi == c_oCompositionState.end)
 				this.apiCompositeStart();
 
@@ -1312,6 +1277,21 @@
 			//console.log("[apiCompositeEnd]");
 			this.Api.End_CompositeInput();
 			this.compositionStateApi = c_oCompositionState.end;
+		},
+
+		onLoadFontsForInputs : function(callback)
+		{
+            var fonts = [];
+            AscFonts.FontPickerByCharacter.extendFonts(fonts);
+
+            if (AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
+            {
+                this.Api.asyncMethodCallback = callback;
+                AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
+
+                return;
+            }
+            callback();
 		},
 
 		onCompositionStart : function(e)

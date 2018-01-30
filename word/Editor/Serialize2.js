@@ -9802,6 +9802,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			}
 			else
 				nUnicode = nCharCode;
+            AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
 			if (null !== nUnicode) {
 				if (0x20 !== nUnicode || isInstrText) {
 					var oNewParaText = isInstrText ? new ParaInstrText() : new ParaText();
@@ -11055,6 +11056,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			    }
 			    else
 			        nUnicode = nCharCode;
+                AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
 			    if (null != nUnicode) {
 			        if (0x20 != nUnicode) {
 			            var oNewParaText = new ParaText();
