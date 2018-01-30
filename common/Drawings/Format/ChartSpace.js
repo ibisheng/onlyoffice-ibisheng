@@ -3463,13 +3463,13 @@ CChartSpace.prototype.recalculateReferences = function()
                 }
             }
         }
-        if(bHaveHidden && bHaveNoHidden)
-        {
-            for(j = 0; j < series.length; ++j)
-            {
-                series[j].isHidden = false;
-            }
-        }
+        // if(bHaveHidden && bHaveNoHidden)
+        // {
+        //     for(j = 0; j < series.length; ++j)
+        //     {
+        //         series[j].isHidden = false;
+        //     }
+        // }
     }
 };
 
@@ -9550,10 +9550,20 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
     var oTheme = this.Get_Theme();
     var oColorMap = this.Get_ColorMap();
 
-    if(!oCopy.txPr || !oCopy.txPr.content || !oCopy.txPr.content.Content[0] || !oCopy.txPr.content.Content[0].Pr
-        || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts
-        || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii.Name){
-        var oTextPr = new CTextPr();
+
+
+
+    fSaveChartObjectSourceFormatting(this, oCopy, oTheme, oColorMap);
+
+    if(!oCopy.txPr || !oCopy.txPr.content || !oCopy.txPr.content.Content[0] || !oCopy.txPr.content.Content[0].Pr){
+        oCopy.setTxPr(AscFormat.CreateTextBodyFromString("", this.getDrawingDocument(), oCopy));
+    }
+    var bMerge = false;
+    var oTextPr = new CTextPr();
+    if(!oCopy.txPr.content.Content[0].Pr.DefaultRunPr ||
+        !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii
+        || !oCopy.txPr.content.Content[0].Pr.DefaultRunPr.RFonts.Ascii.Name){
+        bMerge = true;
         oTextPr.RFonts.Set_FromObject(
             {
                 Ascii: {
@@ -9574,9 +9584,38 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
                 }
             }
         );
-        CheckObjectTextPr(this, oTextPr, this.getDrawingDocument());
     }
-    fSaveChartObjectSourceFormatting(this, oCopy, oTheme, oColorMap);
+
+    if(this.txPr.content.Content[0].Pr.DefaultRunPr && this.txPr.content.Content[0].Pr.DefaultRunPr.Unifill){
+        bMerge = true;
+        var oUnifill = this.txPr.content.Content[0].Pr.DefaultRunPr.Unifill.createDuplicate();
+        oUnifill.check(this.Get_Theme(), this.Get_ColorMap());
+        oTextPr.Unifill = oUnifill.saveSourceFormatting();
+    }
+    else if(!AscFormat.isRealNumber(this.style) || this.style < 33){
+        bMerge = true;
+        var oUnifill = CreateUnifillSolidFillSchemeColor(15, 0.0);
+        oUnifill.check(this.Get_Theme(), this.Get_ColorMap());
+        oTextPr.Unifill = oUnifill.saveSourceFormatting();
+    }
+    else{
+        bMerge = true;
+        var oUnifill = CreateUnifillSolidFillSchemeColor(6, 0.0);
+        oUnifill.check(this.Get_Theme(), this.Get_ColorMap());
+        oTextPr.Unifill = oUnifill.saveSourceFormatting();
+    }
+
+    if(bMerge){
+
+        var oParaPr = oCopy.txPr.content.Content[0].Pr.Copy();
+        var oParaPr2 = new CParaPr();
+        var oCopyTextPr = oTextPr.Copy();
+        oParaPr2.DefaultRunPr = oCopyTextPr;
+        oParaPr.Merge(oParaPr2);
+        oCopy.txPr.content.Content[0].Set_Pr(oParaPr);
+        //CheckObjectTextPr(oCopy, oTextPr, this.getDrawingDocument());
+        // fSaveChartObjectSourceFormatting(oCopy, oCopy, oTheme, oColorMap);
+    }
     if(this.chart)
     {
         if(this.chart.title)
@@ -9589,6 +9628,27 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
             if(oCopy.chart.plotArea.valAx)
             {
                 fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx, oCopy.chart.plotArea.valAx, oTheme, oColorMap);
+                if(this.chart.plotArea.valAx.compiledLn)
+                {
+                    if(!oCopy.chart.plotArea.valAx.spPr){
+                        oCopy.chart.plotArea.valAx.setSpPr(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.valAx.spPr.setLn(this.chart.plotArea.valAx.compiledLn.createDuplicate(true));
+                }
+                if(this.chart.plotArea.valAx.compiledMajorGridLines)
+                {
+                    if(!oCopy.chart.plotArea.valAx.majorGridlines){
+                        oCopyi.chart.plotArea.valAx.setMajorGridlines(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.valAx.majorGridlines.setLn(this.chart.plotArea.valAx.compiledMajorGridLines.createDuplicate(true));
+                }
+                if(this.chart.plotArea.valAx.compiledMinorGridLines)
+                {
+                    if(!oCopy.chart.plotArea.valAx.minorGridlines){
+                        oCopy.chart.plotArea.valAx.setMinorGridlines(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.valAx.minorGridlines.setLn(this.chart.plotArea.valAx.compiledMinorGridLines.createDuplicate(true));
+                }
                 if(oCopy.chart.plotArea.valAx.title)
                 {
                     fSaveChartObjectSourceFormatting(this.chart.plotArea.valAx.title, oCopy.chart.plotArea.valAx.title, oTheme, oColorMap);
@@ -9597,7 +9657,28 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
             if(oCopy.chart.plotArea.catAx)
             {
                 fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx, oCopy.chart.plotArea.catAx, oTheme, oColorMap);
-                if(oCopy.chart.plotArea.valAx.title)
+                if(this.chart.plotArea.catAx.compiledLn)
+                {
+                    if(!oCopy.chart.plotArea.catAx.spPr){
+                        oCopy.chart.plotArea.catAx.setSpPr(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.catAx.spPr.setLn(this.chart.plotArea.catAx.compiledLn.createDuplicate(true));
+                }
+                if(this.chart.plotArea.catAx.compiledMajorGridLines)
+                {
+                    if(!oCopy.chart.plotArea.catAx.majorGridlines){
+                        oCopy.chart.plotArea.catAx.setMajorGridlines(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.catAx.majorGridlines.setLn(this.chart.plotArea.catAx.compiledMajorGridLines.createDuplicate(true));
+                }
+                if(this.chart.plotArea.catAx.compiledMinorGridLines)
+                {
+                    if(!oCopy.chart.plotArea.catAx.minorGridlines){
+                        oCopy.chart.plotArea.catAx.setMinorGridlines(new AscFormat.CSpPr());
+                    }
+                    oCopy.chart.plotArea.catAx.minorGridlines.setLn(this.chart.plotArea.catAx.compiledMinorGridLines.createDuplicate(true));
+                }
+                if(oCopy.chart.plotArea.catAx.title)
                 {
                     fSaveChartObjectSourceFormatting(this.chart.plotArea.catAx.title, oCopy.chart.plotArea.catAx.title, oTheme, oColorMap);
                 }
