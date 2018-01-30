@@ -2824,7 +2824,7 @@ CChartsDrawer.prototype =
 		{
 			seriaVal = series[i].val ? series[i].val : series[i].yVal;
 			numCache = this.getNumCache(seriaVal);
-			if(numCache != null && numCache.pts && numCache.pts.length)
+			if(!series[i].isHidden)
 			{
 				if(!this.calcProp.ptCount)
 				{
@@ -2837,8 +2837,7 @@ CChartsDrawer.prototype =
 						this.calcProp.ptCount = numCache.ptCount;
 					}
 				}
-				
-				//TODO возможно нужно будет проверку добавить на isHidden
+
 				counter++;
 			}
 			else if(3 === this.nDimensionCount)
