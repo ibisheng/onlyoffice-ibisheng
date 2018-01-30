@@ -3488,6 +3488,9 @@ var editor;
 		this.asc_setLocale(this.tmpLocale);
 		this.asc_setLocalization(this.tmpLocalization);
 		this.asc_setViewMode(this.isViewMode);
+
+		// TODO: enable after tests
+        AscFonts.FontPickerByCharacter.IsUseNoSquaresMode = false;
 	};
 
 	spreadsheet_api.prototype.asc_OnShowContextMenu = function() {

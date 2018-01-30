@@ -55,6 +55,8 @@
 		this.FontsByRange = {};
 		this.FontsByRangeCount = 0;
 		this.ExtendFontsByRangeCount = 0;
+
+		this.IsUseNoSquaresMode = true;
 	}
 
 	CFontByCharacter.prototype =
@@ -119,6 +121,9 @@
 
 		getFontBySymbol : function(_char)
 		{
+			if (!this.IsUseNoSquaresMode)
+				return "";
+
 			if (undefined === _char || 0 == _char)
 				return "";
 
@@ -154,6 +159,9 @@
 
 		getFontsByString : function(_text)
 		{
+            if (!this.IsUseNoSquaresMode)
+                return "";
+
 			var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _text.length; ++i)
             {
@@ -178,6 +186,9 @@
 
         getFontsByString2 : function(_array)
         {
+            if (!this.IsUseNoSquaresMode)
+                return "";
+
             var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _array.length; ++i)
             {
