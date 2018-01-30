@@ -1071,11 +1071,6 @@
 					return;
 				}
 
-				if(cloneData.insCells)
-				{
-					delete cloneData.insCells;
-				}
-
 				//TODO переделать undo, по типам
 				//TODO избавиться от добавления в историю целиком объекта фильтра/таблицы
 				//ниже в комментариях написал то, что ипользуется для undo в различных функциях
@@ -1165,7 +1160,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_CleanFormat)
 				{
-					//ипользуется целиком объект фт(cloneData)
+					//ипользуется Ref и TableStyleInfo
 					if(worksheet.TableParts && cloneData && cloneData.Ref)
 					{
 						for(var l = 0; l < worksheet.TableParts.length; l++)
@@ -1174,8 +1169,8 @@
 							//если передавать в redo displaName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени)
 							if(cloneData.Ref.isEqual(worksheet.TableParts[l].Ref))
 							{
-								worksheet.changeTablePart(l, cloneData.clone(null), false);
-								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
+								worksheet.TableParts[l].TableStyleInfo = cloneData.TableStyleInfo.clone();
+								this._setColorStyleTable(cloneData.Ref, worksheet.TableParts[l], null, true);
 								break;
 							}	
 						}
@@ -1239,7 +1234,9 @@
 				{
 					//используется только Ref
 					if(worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref))
+					{
 						worksheet.AutoFilter = null;
+					}
 					else if(worksheet.TableParts)
 					{
 						for(var l = 0; l < worksheet.TableParts.length; l++)
