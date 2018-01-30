@@ -160,7 +160,7 @@
 		getFontsByString : function(_text)
 		{
             if (!this.IsUseNoSquaresMode)
-                return "";
+                return false;
 
 			var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _text.length; ++i)
@@ -187,7 +187,7 @@
         getFontsByString2 : function(_array)
         {
             if (!this.IsUseNoSquaresMode)
-                return "";
+                return false;
 
             var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _array.length; ++i)
