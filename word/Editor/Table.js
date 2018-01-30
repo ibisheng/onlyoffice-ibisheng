@@ -10419,6 +10419,8 @@ CTable.prototype.private_CreateNewGrid = function(arrRowsInfo)
 };
 CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 {
+	var nCellSpacing = this.Content[0].GetCellSpacing();
+
 	var CurPos = [];
 	var CurX   = [];
 	for (var Index = 0; Index < RowsInfo.length; Index++)
@@ -10516,7 +10518,19 @@ CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 			var WType = Cell.Get_W().Type;
 			if (tblwidth_Auto != WType && tblwidth_Nil != WType)
 			{
-				Cell.Set_W(new CTableMeasurement(tblwidth_Mm, RowInfo[CurIndex].W));
+				var nW = RowInfo[CurIndex].W;
+				if (null !== nCellSpacing)
+				{
+					if (0 === CurCell || (1 === CurCell && RowInfo[0].Type === -1))
+						nW -= nCellSpacing / 2;
+
+					nW -= nCellSpacing;
+
+					if (RowInfo.length - 2 === CurCell)
+						nW -= nCellSpacing / 2;
+				}
+
+				Cell.Set_W(new CTableMeasurement(tblwidth_Mm, nW));
 			}
 		}
 
