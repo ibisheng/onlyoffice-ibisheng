@@ -372,7 +372,9 @@ ParaText.prototype =
 
     Copy : function()
     {
-        return new ParaText(String.fromCharCode(this.Value));
+        var retValue = new ParaText();
+        retValue.Set_CharCode(this.Value);
+        return retValue;
     },
 
     Is_NBSP : function()
