@@ -1379,8 +1379,8 @@
 			pCurGlyph.bBitmap = charSymbolObj.bBitmap;
 			pCurGlyph.oBitmap = charSymbolObj.oBitmap;
 
-			pString.m_fEndX = pString.m_fX;
-			pString.m_fEndY = pString.m_fY;
+            pString.m_fEndX = charSymbolObj.fAdvanceX + this.m_fCharSpacing + pString.m_fX;
+            pString.m_fEndY = pString.m_fY;
 
             if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
             {
