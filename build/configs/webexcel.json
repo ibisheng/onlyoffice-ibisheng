@@ -35,7 +35,7 @@
 		"../common/FontsFreeType/character.js",
 		"../common/FontsFreeType/FontFile.js",
 		"../common/FontsFreeType/FontManager.js",	
-		"../common/FontClassification.js",
+		"../common/FontsFreeType/FontClassification.js",
 		
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
