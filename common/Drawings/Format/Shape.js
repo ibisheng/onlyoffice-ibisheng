@@ -5676,12 +5676,23 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
 function SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap) {
     if(aCopyContent.length === aSourceContent.length){
         var bMergeRunPr = (aCopyContent === aSourceContent);
+        var oElem;
         for(var i = 0; i< aSourceContent.length; ++i){
-            if(aSourceContent[i].CompiledPr.Pr){
-                var oPr = aSourceContent[i].CompiledPr.Pr.ParaPr.Copy();
-                oPr.DefaultRunPr = SaveSourceFormattingTextPr(aSourceContent[i].CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
+            oElem = aSourceContent[i];
+            if(oElem.CompiledPr.Pr){
+                var oPr = oElem.CompiledPr.Pr.ParaPr.Copy();
+                oPr.DefaultRunPr = SaveSourceFormattingTextPr(oElem.CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
                 aCopyContent[i].Set_Pr(oPr);
-                SaveRunsFormatting(aSourceContent[i].Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+                SaveRunsFormatting(oElem.Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+            }
+            else{
+                if(aCopyContent[i].Pr && aCopyContent[i].Pr.DefaultRunPr && aCopyContent[i].Pr.DefaultRunPr.Unifill){
+                    var oPr = aCopyContent[i].Pr.Copy();
+                    oPr.DefaultRunPr.Unifill.check(oTheme, oColorMap);
+                    oPr.DefaultRunPr.Unifill = oPr.DefaultRunPr.Unifill.saveSourceFormatting();
+                    oPr.DefaultRunPr = SaveSourceFormattingTextPr(oPr.DefaultRunPr.Copy(), oTheme, oColorMap);
+                    aCopyContent[i].Set_Pr(oPr);
+                }
             }
         }
     }
