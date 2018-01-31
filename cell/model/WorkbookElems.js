@@ -3754,7 +3754,7 @@ Row.prototype =
 		if (multiText) {
 			for (var i = 0, length = multiText.length; i < length; ++i) {
 				var elem = multiText[i];
-				if (null != elem.text && elem.format && elem.format.getSkip() == false) {
+				if (null != elem.text && !(elem.format && elem.format.getSkip())) {
 					sRes += elem.text;
 				}
 			}
