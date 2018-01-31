@@ -4655,7 +4655,20 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id, this.WordControl.m_oLogicDocument.IsEditCommentsMode()))
+		var comment = g_oTableId.Get_ById(Id);
+		if(!comment)
+		{
+			return;
+		}
+		var oComments = comment.Parent;
+		if(!oComments)
+		{
+			return;
+		}
+		var bPresComments = (oComments === this.comments);
+		var nCheckType = bPresComments ?  AscCommon.changestype_AddComment : AscCommon.changestype_MoveComment;
+		var oCheckData = bPresComments ? comment : Id;
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(nCheckType, oCheckData, this.WordControl.m_oLogicDocument.IsEditCommentsMode()) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
 			this.WordControl.m_oLogicDocument.RemoveComment(Id, true);
@@ -4987,6 +5000,16 @@ background-repeat: no-repeat;\
 						this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data);
 					}
 				}
+			}
+		}
+		var slideComments = this.WordControl.m_oLogicDocument.comments;
+		if (slideComments)
+		{
+			var _comments      = slideComments.comments;
+			var _commentsCount = _comments.length;
+			for (var j = 0; j < _commentsCount; j++)
+			{
+				this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data);
 			}
 		}
 		this.onDocumentContentReady();

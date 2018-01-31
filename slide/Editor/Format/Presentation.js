@@ -652,6 +652,8 @@ function CPresentation(DrawingDocument)
     this.bNeedUpdateTh = false;
     this.needSelectPages = [];
 
+    this.writecomments = [];
+
     this.forwardChangeThemeTimeOutId = null;
     this.backChangeThemeTimeOutId = null;
     this.startChangeThemeTimeOutId = null;
@@ -677,13 +679,17 @@ function CPresentation(DrawingDocument)
     this.Sections = [];//array of CPrSection
 
 
+    this.comments = new SlideComments(this);
+
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
-   this.themeLock = new PropLocker(this.Id);
-   this.schemeLock = new PropLocker(this.Id);
-   this.slideSizeLock = new PropLocker(this.Id);
-   this.defaultTextStyleLock = new PropLocker(this.Id);
+    this.themeLock = new PropLocker(this.Id);
+    this.schemeLock = new PropLocker(this.Id);
+    this.slideSizeLock = new PropLocker(this.Id);
+    this.defaultTextStyleLock = new PropLocker(this.Id);
+    this.commentsLock = new PropLocker(this.Id);
 
     this.RecalcId     = 0; // Номер пересчета
     this.CommentAuthors = {};
@@ -3756,8 +3762,6 @@ CPresentation.prototype =
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.onMouseMove(e, X, Y);
-        var s = "" + this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects4(X, Y, 0);
-        console.log(s);
         var bOldFocus = this.FocusOnNotes;
         this.FocusOnNotes = false;
         this.UpdateCursorType(X, Y,  e );
@@ -6465,50 +6469,62 @@ CPresentation.prototype =
     Clear_CollaborativeMarks: function()
     {},
 
+
+    Load_Comments : function(authors)
+    {
+        AscCommonSlide.fLoadComments(this, authors);
+    },
+
+
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    AddComment : function(CommentData)
+    AddComment : function(CommentData, bAll)
     {
-        if(this.Slides[this.CurPage])
+        var oSlideComments = bAll ? this.comments : (this.Slides[this.CurPage] ? this.Slides[this.CurPage].slideComments : null);
+        if(oSlideComments)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_AddComment);
-            var slide = this.Slides[this.CurPage];
-            var Comment = new CComment( slide.slideComments, CommentData );
-            Comment.selected = true;
-            var selected_objects = slide.graphicObjects.selection.groupSelection ? slide.graphicObjects.selection.groupSelection.selectedObjects : slide.graphicObjects.selectedObjects;
-            if(selected_objects.length  > 0)
-            {
-                var last_object = selected_objects[selected_objects.length - 1];
-                Comment.setPosition(last_object.x + last_object.extX, last_object.y);
-            }
-            else
-            {
-                Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
-            }
-            var Flags = 0;
-            var dd = editor.WordControl.m_oDrawingDocument;
-            var W = dd.GetCommentWidth(Flags);
-            var  H = dd.GetCommentHeight(Flags);
-            this.Slides[this.CurPage].commentX += W;
-            this.Slides[this.CurPage].commentY += H;
-
+            var Comment = new CComment( oSlideComments, CommentData );
             if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddComment, Comment, this.IsEditCommentsMode()) === false)
             {
-                for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
+                if(!bAll)
                 {
-                    this.Slides[this.CurPage].slideComments.comments[i].selected = false;
+                    var slide = this.Slides[this.CurPage];
+                    Comment.selected = true;
+                    var selected_objects = slide.graphicObjects.selection.groupSelection ? slide.graphicObjects.selection.groupSelection.selectedObjects : slide.graphicObjects.selectedObjects;
+                    if(selected_objects.length  > 0)
+                    {
+                        var last_object = selected_objects[selected_objects.length - 1];
+                        Comment.setPosition(last_object.x + last_object.extX, last_object.y);
+                    }
+                    else
+                    {
+                        Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
+                    }
+                    var Flags = 0;
+                    var dd = editor.WordControl.m_oDrawingDocument;
+                    var W = dd.GetCommentWidth(Flags);
+                    var  H = dd.GetCommentHeight(Flags);
+                    this.Slides[this.CurPage].commentX += W;
+                    this.Slides[this.CurPage].commentY += H;
+                    for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
+                    {
+                        this.Slides[this.CurPage].slideComments.comments[i].selected = false;
+                    }
                 }
-                this.Slides[this.CurPage].addComment(Comment);
-
-                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-                this.DrawingDocument.OnEndRecalculate();
-                this.Document_UpdateInterfaceState();
-
-                var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( Comment.x, Comment.y, this.CurPage);
+                oSlideComments.addComment(Comment);
                 editor.sync_AddComment( Comment.Get_Id(), CommentData );
-                editor.sync_HideComment();
-                editor.sync_ShowComment(Comment.Id, Coords.X, Coords.Y );
+                if(!bAll)
+                {
+                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                    this.DrawingDocument.OnEndRecalculate();
+                    var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( Comment.x, Comment.y, this.CurPage);
+                    editor.sync_HideComment();
+                    editor.sync_ShowComment(Comment.Id, Coords.X, Coords.Y );
+                }
+
+                this.Document_UpdateInterfaceState();
                 return Comment;
             }
             else
@@ -6520,11 +6536,23 @@ CPresentation.prototype =
 
 	EditComment : function(Id, CommentData)
     {
-        if(this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id, this.IsEditCommentsMode()) === false)
+        var comment = g_oTableId.Get_ById(Id);
+        if(!comment)
+        {
+            return;
+        }
+        var oComments = comment.Parent;
+        if(!oComments)
+        {
+            return;
+        }
+        var bPresComments = (oComments === this.comments);
+        var nCheckType = bPresComments ?  AscCommon.changestype_AddComment : AscCommon.changestype_MoveComment;
+        var oCheckData = bPresComments ? comment : Id;
+        if(this.Document_Is_SelectionLocked(nCheckType, oCheckData, this.IsEditCommentsMode()) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ChangeComment);
-            var comment = g_oTableId.Get_ById(Id);
-            if(isRealObject(comment))
+            if(!bPresComments)
             {
                 var slides = this.Slides;
                 var check_slide = null;
@@ -6564,6 +6592,11 @@ CPresentation.prototype =
                     return true;
                 }
             }
+            else
+            {
+                oComments.changeComment( Id, CommentData );
+                editor.sync_ChangeCommentData( Id, CommentData );
+            }
             this.Document_UpdateInterfaceState();
         }
     },
@@ -6593,6 +6626,7 @@ CPresentation.prototype =
                 }
             }
         }
+        this.comments.removeComment(Id);
         editor.sync_HideComment();
     },
 
@@ -6855,87 +6889,92 @@ CPresentation.prototype =
         }
     },
 
+    internalCalculateData: function(aSlideComments, aWriteComments, oData)
+    {
+        aWriteComments.length = 0;
+
+        var _comments = aSlideComments;
+        var _commentsCount = _comments.length;
+        var _uniIdSplitter = ";__teamlab__;";
+        for (var i = 0; i < _commentsCount; i++)
+        {
+            var _data = _comments[i].Data;
+            var _commId = 0;
+
+            var _autID = _data.m_sUserId + _uniIdSplitter + _data.m_sUserName;
+            var _author = this.CommentAuthors[_autID];
+            if (!_author)
+            {
+                this.CommentAuthors[_autID] = new CCommentAuthor();
+                _author = this.CommentAuthors[_autID];
+                _author.Name = _data.m_sUserName;
+                _author.Calculate();
+
+                oData._AuthorId++;
+                _author.Id = oData._AuthorId;
+            }
+
+            _author.LastId++;
+            _commId = _author.LastId;
+
+            var _new_data = new CWriteCommentData();
+            _new_data.Data = _data;
+            _new_data.WriteAuthorId = _author.Id;
+            _new_data.WriteCommentId = _commId;
+            _new_data.WriteParentAuthorId = 0;
+            _new_data.WriteParentCommentId = 0;
+            _new_data.x = _comments[i].x;
+            _new_data.y = _comments[i].y;
+
+            _new_data.Calculate();
+            aWriteComments.push(_new_data);
+
+            var _comments2 = _data.m_aReplies;
+            var _commentsCount2 = _comments2.length;
+
+            for (var j = 0; j < _commentsCount2; j++)
+            {
+                var _data2 = _comments2[j];
+
+                var _autID2 = _data2.m_sUserId + _uniIdSplitter + _data2.m_sUserName;
+                var _author2 = this.CommentAuthors[_autID2];
+                if (!_author2)
+                {
+                    this.CommentAuthors[_autID2] = new CCommentAuthor();
+                    _author2 = this.CommentAuthors[_autID2];
+                    _author2.Name = _data2.m_sUserName;
+                    _author2.Calculate();
+
+                    oData._AuthorId++;
+                    _author2.Id = oData._AuthorId;
+                }
+
+                _author2.LastId++;
+
+                var _new_data2 = new CWriteCommentData();
+                _new_data2.Data = _data2;
+                _new_data2.WriteAuthorId = _author2.Id;
+                _new_data2.WriteCommentId = _author2.LastId;
+                _new_data2.WriteParentAuthorId = _author.Id;
+                _new_data2.WriteParentCommentId = _commId;
+                _new_data2.x = _new_data.x;
+                _new_data2.y = _new_data.y + 136 * (j + 1); // так уж делает микрософт
+                _new_data2.Calculate();
+                aWriteComments.push(_new_data2);
+            }
+        }
+    },
+
     CalculateComments : function()
     {
         this.CommentAuthors = {};
-        var _AuthorId = 0;
+        var oData = {_AuthorId: 0};
+        this.internalCalculateData(this.comments.comments, this.writecomments, oData);
         var _slidesCount = this.Slides.length;
-
-        var _uniIdSplitter = ";__teamlab__;";
         for (var _sldIdx = 0; _sldIdx < _slidesCount; _sldIdx++)
         {
             this.Slides[_sldIdx].writecomments = [];
-
-            var _comments = this.Slides[_sldIdx].slideComments.comments;
-            var _commentsCount = _comments.length;
-
-            for (var i = 0; i < _commentsCount; i++)
-            {
-                var _data = _comments[i].Data;
-                var _commId = 0;
-
-                var _autID = _data.m_sUserId + _uniIdSplitter + _data.m_sUserName;
-                var _author = this.CommentAuthors[_autID];
-                if (!_author)
-                {
-                    this.CommentAuthors[_autID] = new CCommentAuthor();
-                    _author = this.CommentAuthors[_autID];
-                    _author.Name = _data.m_sUserName;
-                    _author.Calculate();
-
-                    _AuthorId++;
-                    _author.Id = _AuthorId;
-                }
-
-                _author.LastId++;
-                _commId = _author.LastId;
-
-                var _new_data = new CWriteCommentData();
-                _new_data.Data = _data;
-                _new_data.WriteAuthorId = _author.Id;
-                _new_data.WriteCommentId = _commId;
-                _new_data.WriteParentAuthorId = 0;
-                _new_data.WriteParentCommentId = 0;
-                _new_data.x = _comments[i].x;
-                _new_data.y = _comments[i].y;
-
-                _new_data.Calculate();
-                this.Slides[_sldIdx].writecomments.push(_new_data);
-
-                var _comments2 = _data.m_aReplies;
-                var _commentsCount2 = _comments2.length;
-
-                for (var j = 0; j < _commentsCount2; j++)
-                {
-                    var _data2 = _comments2[j];
-
-                    var _autID2 = _data2.m_sUserId + _uniIdSplitter + _data2.m_sUserName;
-                    var _author2 = this.CommentAuthors[_autID2];
-                    if (!_author2)
-                    {
-                        this.CommentAuthors[_autID2] = new CCommentAuthor();
-                        _author2 = this.CommentAuthors[_autID2];
-                        _author2.Name = _data2.m_sUserName;
-                        _author2.Calculate();
-
-                        _AuthorId++;
-                        _author2.Id = _AuthorId;
-                    }
-
-                    _author2.LastId++;
-
-                    var _new_data2 = new CWriteCommentData();
-                    _new_data2.Data = _data2;
-                    _new_data2.WriteAuthorId = _author2.Id;
-                    _new_data2.WriteCommentId = _author2.LastId;
-                    _new_data2.WriteParentAuthorId = _author.Id;
-                    _new_data2.WriteParentCommentId = _commId;
-                    _new_data2.x = _new_data.x;
-                    _new_data2.y = _new_data.y + 136 * (j + 1); // так уж делает микрософт
-                    _new_data2.Calculate();
-                    this.Slides[_sldIdx].writecomments.push(_new_data2);
-                }
-            }
+            this.internalCalculateData(this.Slides[_sldIdx].slideComments.comments, this.Slides[_sldIdx].writecomments, oData);
         }
     },
 

@@ -9006,8 +9006,7 @@ function CPres()
 				}
                 case 10:
                 {
-                    var writecomments = [];
-                    reader.ReadComments(writecomments);
+                    reader.ReadComments(reader.presentation.writecomments);
                     break;
                 }
                 default:
@@ -9017,7 +9016,7 @@ function CPres()
                 }
             }
         }
-
+        reader.presentation.Load_Comments(reader.presentation.CommentAuthors);
         s.Seek2(_end_pos);
     }
 }

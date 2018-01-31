@@ -870,16 +870,30 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_AddShape || CheckType === AscCommon.changestype_AddComment)
         {
-            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
-                return true;
-            var check_obj =
+
+            if(CheckType === AscCommon.changestype_AddComment && AdditionalData && AdditionalData.Parent === this.comments)
             {
-                "type": c_oAscLockTypeElemPresentation.Object,
-                "slideId": slide_id,
-                "objId": AdditionalData.Get_Id(),
-                "guid": AdditionalData.Get_Id()
-            };
-            AdditionalData.Lock.Check(check_obj);
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.commentsLock.Get_Id(),
+                    "guid": this.commentsLock.Get_Id()
+                };
+                this.commentsLock.Lock.Check(check_obj);
+            }
+            else
+            {
+                if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                    return true;
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": AdditionalData.Get_Id(),
+                    "guid": AdditionalData.Get_Id()
+                };
+                AdditionalData.Lock.Check(check_obj);
+            }
         }
         if(CheckType === AscCommon.changestype_AddShapes)
         {
