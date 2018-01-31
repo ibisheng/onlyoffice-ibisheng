@@ -774,7 +774,7 @@
 				}
 				
 				//history
-				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_ApplyMF,
+				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Apply,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				History.EndTransaction();
 				
@@ -996,7 +996,7 @@
 					case AscCH.historyitem_AutoFilter_Empty:
 						this.isEmptyAutoFilters(data.activeCells, null, null, data.val);
 						break;
-					case AscCH.historyitem_AutoFilter_ApplyMF:
+					case AscCH.historyitem_AutoFilter_Apply:
 						this.applyAutoFilter(data.autoFiltersObject, data.activeCells);
 						this.worksheet.handlers.trigger('onFilterInfo');
 						break;
@@ -1176,7 +1176,7 @@
 						}
 					}
 				}
-				else if(type === AscCH.historyitem_AutoFilter_ApplyMF || type === AscCH.historyitem_AutoFilter_ApplyDF)//apply
+				else if(type === AscCH.historyitem_AutoFilter_Apply)//apply
 				{
 					//ипользуется целиком объект фильтра/фт(cloneData)
 					if(cloneData.Ref)
@@ -1226,9 +1226,7 @@
 							}
 						}
 					}
-					if (AscCH.historyitem_AutoFilter_ApplyMF === type) {
-						this.worksheet.handlers.trigger('onFilterInfo');
-					}
+					this.worksheet.handlers.trigger('onFilterInfo');
 				}
 				else if(type === AscCH.historyitem_AutoFilter_Add) //удаление таблиц / автофильтров
 				{

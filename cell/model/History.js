@@ -128,8 +128,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_Add		= 1;
 	window['AscCH'].historyitem_AutoFilter_Sort		= 2;
 	window['AscCH'].historyitem_AutoFilter_Empty	= 3;
-	window['AscCH'].historyitem_AutoFilter_ApplyDF	= 4;
-	window['AscCH'].historyitem_AutoFilter_ApplyMF	= 5;
+	window['AscCH'].historyitem_AutoFilter_Apply	= 5;
 	window['AscCH'].historyitem_AutoFilter_Move     = 6;
 	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter  = 7;
 	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
