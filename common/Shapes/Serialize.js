@@ -9016,7 +9016,10 @@ function CPres()
                 }
             }
         }
-        reader.presentation.Load_Comments(reader.presentation.CommentAuthors);
+        if(reader.presentation.Load_Comments)
+        {
+            reader.presentation.Load_Comments(reader.presentation.CommentAuthors);
+        }
         s.Seek2(_end_pos);
     }
 }
