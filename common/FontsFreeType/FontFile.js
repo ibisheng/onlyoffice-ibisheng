@@ -1067,7 +1067,7 @@
 				{
                     if (0 == AscFonts.FT_Render_Glyph(pFaceGlyph, REND_MODE))
                     {
-                        oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pCurentGliph.bitmap.width, pCurentGliph.bitmap.rows, raster_memory.pitch);
+                        oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pFaceGlyph.bitmap.width, pFaceGlyph.bitmap.rows, raster_memory.pitch);
                     }
 				}
                 return oSizes;
