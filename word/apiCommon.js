@@ -1452,10 +1452,10 @@
 		this.OutlineStart = -1;
 		this.OutlineEnd   = -1;
 		this.Styles       = [];
+		this.PageNumbers  = true;
+		this.RightTab     = true;
 
 		// Эти параметры задаются только из интерфейса
-		this.PageNumbers = undefined;
-		this.RightTab    = undefined;
 		this.TabLeader   = undefined;
 
 		this.StylesType  = Asc.c_oAscTOCStylesType.Current;
@@ -1473,6 +1473,9 @@
 		this.OutlineStart = oInstruction.GetHeadingRangeStart();
 		this.OutlineEnd   = oInstruction.GetHeadingRangeEnd();
 		this.Styles       = oInstruction.GetStylesArray();
+
+		this.PageNumbers  = !oInstruction.IsSkipPageRefLvl();
+		this.RightTab     = "" === oInstruction.GetSeparator();
 	};
 	CTableOfContentsPr.prototype.CheckStylesType = function(oStyles)
 	{
@@ -1534,9 +1537,17 @@
 	{
 		this.PageNumbers = isShow;
 	};
+	CTableOfContentsPr.prototype.get_ShowPageNumbers = function()
+	{
+		return this.PageNumbers;
+	};
 	CTableOfContentsPr.prototype.put_RightAlignTab = function(isRightTab)
 	{
 		this.RightTab = isRightTab;
+	};
+	CTableOfContentsPr.prototype.get_RightAlignTab = function()
+	{
+		return this.RightTab;
 	};
 	CTableOfContentsPr.prototype.put_TabLeader = function(nTabLeader)
 	{
@@ -1564,7 +1575,9 @@
 	CTableOfContentsPr.prototype['clear_Styles']        = CTableOfContentsPr.prototype.clear_Styles;
 	CTableOfContentsPr.prototype['add_Style']           = CTableOfContentsPr.prototype.add_Style;
 	CTableOfContentsPr.prototype['put_ShowPageNumbers'] = CTableOfContentsPr.prototype.put_ShowPageNumbers;
+	CTableOfContentsPr.prototype['get_ShowPageNumbers'] = CTableOfContentsPr.prototype.get_ShowPageNumbers;
 	CTableOfContentsPr.prototype['put_RightAlignTab']   = CTableOfContentsPr.prototype.put_RightAlignTab;
+	CTableOfContentsPr.prototype['get_RightAlignTab']   = CTableOfContentsPr.prototype.get_RightAlignTab;
 	CTableOfContentsPr.prototype['put_TabLeader']       = CTableOfContentsPr.prototype.put_TabLeader;
 	CTableOfContentsPr.prototype['get_StylesType']      = CTableOfContentsPr.prototype.get_StylesType;
 	CTableOfContentsPr.prototype['put_StylesType']      = CTableOfContentsPr.prototype.put_StylesType;

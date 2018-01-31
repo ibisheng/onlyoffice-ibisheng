@@ -249,6 +249,9 @@ CFieldInstructionTOC.prototype.SetPageRefSkippedLvls = function(isSkip, nSkipSta
 };
 CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 {
+	if (undefined === nLvl)
+		return this.SkipPageRef;
+
 	if (false === this.SkipPageRef)
 		return false;
 

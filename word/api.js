@@ -7878,7 +7878,6 @@ background-repeat: no-repeat;\
 			var oPr = new Asc.CTableOfContentsPr();
 			oPr.InitFromTOCInstruction(oTOC);
 			oPr.CheckStylesType(oLogicDocument.GetStyles());
-			console.log(oPr);
 			return oPr;
 		}
 
