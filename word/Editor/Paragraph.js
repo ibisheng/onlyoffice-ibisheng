@@ -10929,11 +10929,21 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 		return;
 
 	var RunPos = Element.StartPos.Data[Element.StartPos.Depth - 1];
-	var Len    = Word.length;
-	for (var Pos = 0; Pos < Len; Pos++)
-	{
-		Class.Add_ToContent(RunPos + Pos, ( 0x0020 === Word.charCodeAt(Pos) ? new ParaSpace() : new ParaText(Word[Pos]) ));
-	}
+
+	var charCode = 0;
+	var paraText;
+    for (var Pos = Word.beginIterator(); Pos.check(); Pos.next())
+    {
+		charCode = Pos.value();
+		if (0x0020 === charCode)
+			Class.Add_ToContent(RunPos + Pos.position(), new ParaSpace());
+		else
+		{
+            paraText = new ParaText();
+            paraText.Set_CharCode(charCode);
+            Class.Add_ToContent(RunPos + Pos.position(), paraText);
+        }
+    }
 
 	// Удалим старое слово
 	var StartPos = Element.StartPos;
