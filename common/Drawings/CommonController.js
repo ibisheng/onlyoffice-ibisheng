@@ -8439,7 +8439,7 @@ DrawingObjectsController.prototype =
                     oApplyProps = props;
                 }
             }
-            if(oApplyProps &&  oApplyProps.textArtProperties && typeof oApplyProps.textArtProperties.asc_getForm() === "string")
+            if(oApplyProps &&  (oApplyProps.textArtProperties && typeof oApplyProps.textArtProperties.asc_getForm() === "string"  || oApplyProps.ChartProperties))
             {
                 this.updateSelectionState();
             }

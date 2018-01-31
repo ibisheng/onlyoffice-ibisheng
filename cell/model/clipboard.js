@@ -1866,6 +1866,7 @@
 
 				var aCopies = [];
 				var oIdMap = {};
+				ws.objectRender.controller.resetSelection();
 				for(var i = 0; i < data.Drawings.length; i++)
 				{	
 					var _copy;
@@ -1950,6 +1951,7 @@
 							ws.objectRender.controller.getGraphicObjectProps();
 						});
 				}
+				ws.objectRender.controller.updateSelectionState();
                 ws.objectRender.showDrawingObjects(true);
 
 				if(needShowSpecialProps)
