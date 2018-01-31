@@ -946,36 +946,14 @@
 		{
 			var _value 			= this.getAreaValue();
 
-			if (!AscFonts.FontPickerByCharacter.getFontsByString(_value))
-			{
+            AscFonts.FontPickerByCharacter.checkText(_value, this, function() {
+
                 this.apiCompositeStart();
                 this.checkCompositionData(_value);
                 this.apiCompositeReplace(this.compositionValue);
                 this.apiCompositeEnd();
-			}
 
-			var fonts = [];
-			AscFonts.FontPickerByCharacter.extendFonts(fonts);
-
-            if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
-            {
-                this.apiCompositeStart();
-                this.checkCompositionData(_value);
-                this.apiCompositeReplace(this.compositionValue);
-                this.apiCompositeEnd();
-            }
-
-            this.Api.asyncMethodCallback = function() {
-
-            	var _t = AscCommon.g_inputContext;
-                _t.apiCompositeStart();
-                _t.checkCompositionData(_value);
-                _t.apiCompositeReplace(_t.compositionValue);
-                _t.apiCompositeEnd();
-
-            };
-
-            AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
+            });
 		},
 
 		onKeyDown : function(e)

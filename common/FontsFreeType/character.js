@@ -57,6 +57,8 @@
 		this.ExtendFontsByRangeCount = 0;
 
 		this.IsUseNoSquaresMode = true;
+
+		this.CallbackObj = { _this : null, _callback : null };
 	}
 
 	CFontByCharacter.prototype =
@@ -225,6 +227,40 @@
 			}
 
             this.ExtendFontsByRangeCount = this.FontsByRangeCount;
+		},
+
+		checkText : function(text, _this, _callback)
+		{
+            if (!this.getFontsByString(text))
+            {
+                _callback.call(_this);
+                return;
+            }
+
+            var fonts = [];
+            this.extendFonts(fonts);
+
+            if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
+            {
+                _callback.call(_this);
+                return;
+            }
+
+            this.CallbackObj._this = _this;
+            this.CallbackObj._callback = _callback;
+
+            var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+            _editor.asyncMethodCallback = function() {
+
+            	var _t = AscFonts.FontPickerByCharacter.CallbackObj;
+            	_t._callback.call(_t._this);
+
+            	_t._this = null;
+            	_t._callback = null;
+
+            };
+
+            AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
 		}
 	};
 

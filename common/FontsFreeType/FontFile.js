@@ -1032,7 +1032,7 @@
                 _painter.start(workerVector);
                 AscFonts.FT_Outline_Decompose(pGlyph.outline, _painter, workerVector);
                 _painter.end(workerVector);
-                return;
+                return oSizes;
 			}
 
             var oBBox = new AscFonts.FT_BBox();

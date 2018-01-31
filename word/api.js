@@ -5339,11 +5339,15 @@ background-repeat: no-repeat;\
 	// HyperProps - объект CHyperlinkProperty
 	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 	{
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-		{
-			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
-			this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
-		}
+		AscFonts.FontPickerByCharacter.checkText(HyperProps.Text, this, function() {
+
+            if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
+                this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
+            }
+
+        });
 	};
 
 	/**
