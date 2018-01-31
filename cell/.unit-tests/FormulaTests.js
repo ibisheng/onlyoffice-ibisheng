@@ -9610,6 +9610,26 @@ $( function () {
 		ok( oParser.parse(), "ADDRESS(2,3,2,1,\"'\")" );
 		strictEqual( oParser.calculate().getValue(), "''''!C$2", "ADDRESS(2,3,2,1,\"'\")");
 
+		oParser = new parserFormula( "ADDRESS(2,3,,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,1,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,1,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,1,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!C$2", "ADDRESS(2,3,2,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,TRUE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,TRUE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,,TRUE,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,FALSE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,FALSE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!R2C3", "ADDRESS(2,3,,FALSE,1)");
+
 	} );
 
 	wb.dependencyFormulas.unlockRecal();
