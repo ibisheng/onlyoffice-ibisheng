@@ -8942,6 +8942,7 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
     {
         aPrepeareFonts.push(new CFont(font_family, 0, "", 0));
     }
+    AscFonts.FontPickerByCharacter.extendFonts(aPrepeareFonts);
 
     var isDesktopEditor = (window["AscDesktopEditor"] !== undefined) ? true : false;
     var isDesktopEditorLocal = false;

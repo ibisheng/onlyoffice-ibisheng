@@ -741,8 +741,10 @@
 							}
 						}
 
+                        AscFonts.IsCheckSymbols = true;
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "\n})();";
 						eval(_script);
+                        AscFonts.IsCheckSymbols = false;
 
 						if (pluginData.getAttribute("recalculate") == true)
 						{
