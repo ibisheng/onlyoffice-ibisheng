@@ -2424,6 +2424,7 @@ function (window, undefined) {
 		this.UndoRedo(Type, Data, nSheetId, false);
 	};
 	UndoRedoComment.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+		var collaborativeEditing, to;
 		var oModel = (null == nSheetId) ? this.wb : this.wb.getWorksheetById(nSheetId);
 		if (!oModel.aComments) {
 			oModel.aComments = [];
@@ -2440,27 +2441,11 @@ function (window, undefined) {
 		if (bUndo == true) {
 			cellCommentator.Undo(Type, Data);
 		} else {
-			var collaborativeEditing;
-			// CCommentData
-			if ((Data.from == undefined) && (Data.to == undefined)) {
-				if (!Data.bDocument) {
-					if (false != this.wb.bCollaborativeChanges) {
-						collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
-						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);
-					}
-				}
-			} else {
-				// UndoRedoData_FromTo
-				if (!Data.to.bDocument) {
-					if (false != this.wb.bCollaborativeChanges) {
-						collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						Data.to.nRow =
-							collaborativeEditing.getLockOtherRow2(nSheetId, Data.to.nRow);
-						Data.to.nCol =
-							collaborativeEditing.getLockOtherColumn2(nSheetId, Data.to.nCol);
-					}
-				}
+			to = (Data.from || Data.to) ? Data.to : Data;
+			if (to && !to.bDocument && false !== this.wb.bCollaborativeChanges) {
+				collaborativeEditing = this.wb.oApi.collaborativeEditing;
+				to.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, to.nRow);
+				to.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, to.nCol);
 			}
 
 			cellCommentator.Redo(Type, Data);
