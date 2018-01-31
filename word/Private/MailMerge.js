@@ -244,14 +244,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
 
         var oField = new ParaField(fieldtype_MERGEFIELD, [Name], []);
         var oRun = new ParaRun();
-
-        var Index = 0;
-        oRun.Add_ToContent(Index++, new ParaText("«"));
-        for (var Len = Name.length; Index <= Len; Index++)
-        {
-            oRun.Add_ToContent(Index, new ParaText(Name.charAt(Index - 1)));
-        }
-        oRun.Add_ToContent(Index, new ParaText("»"));
+        oRun.AddText("«" + Name + "»");
         oField.Add_ToContent(0, oRun);
 
         this.Register_Field(oField);

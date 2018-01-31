@@ -2641,16 +2641,8 @@ CAutoshapeTrack.prototype =
 
 		var parRun = new ParaRun(par); var Pos = 0;
 		parRun.Set_Pr(_textPr);
-
-		var _len = this.Text.length;
-		for (var i = 0; i < _len; i++)
-		{
-			if (this.Text.charAt(i) == " ")
-				parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
-			else
-				parRun.Add_ToContent(Pos++,new ParaText(this.Text.charAt(i)), false);
-		}
-		par.Add_ToContent(0, parRun);
+		parRun.AddText(this.Text);
+		par.AddToContent(0, parRun);
 
 		par.Recalculate_Page(0);
 		par.Recalculate_Page(0);

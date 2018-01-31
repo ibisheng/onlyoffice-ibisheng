@@ -6321,13 +6321,13 @@ DrawingObjectsController.prototype =
                 var Item = null;
                 if ( true === ctrlKey && true === e.shiftKey )
                 {
-                    Item = new ParaText( String.fromCharCode( 0x2013 ) );
+                    Item = new ParaText(0x2013);
                     Item.SpaceAfter = false;
                 }
                 else if ( true === e.shiftKey )
-                    Item = new ParaText( "_" );
+                    Item = new ParaText("_".charCodeAt(0));
                 else
-                    Item = new ParaText( "-" );
+                    Item = new ParaText("-".charCodeAt(0));
                 oThis.paragraphAdd(Item);
             };
             this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem);

@@ -980,3 +980,25 @@ CDocumentContentBase.prototype.GetTableOfContents = function(isUnique, isCheckFi
 
 	return null;
 };
+/**
+ * Добавляем заданный текст в текущей позиции
+ * @param {String} sText
+ */
+CDocumentContentBase.prototype.AddText = function(sText)
+{
+	for (var oIterator = sText.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			this.AddToParagraph(new ParaTab(), false);
+		if (10 === nCharCode) // \n
+			this.AddToParagraph(new ParaNewLine(break_Line), false);
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			this.AddToParagraph(new ParaSpace(), false);
+		else
+			this.AddToParagraph(new ParaText(nCharCode), false);
+	}
+};

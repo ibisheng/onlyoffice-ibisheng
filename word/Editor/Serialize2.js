@@ -9804,13 +9804,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				nUnicode = nCharCode;
             AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
 			if (null !== nUnicode) {
-				if (0x20 !== nUnicode || isInstrText) {
-					var oNewParaText = isInstrText ? new ParaInstrText() : new ParaText();
-					oNewParaText.Set_CharCode(nUnicode);
-					oPos.run.Add_ToContent(oPos.pos, oNewParaText, false);
-				}
+				if (0x20 !== nUnicode || isInstrText)
+					oPos.run.AddToContent(oPos.pos, isInstrText ? new ParaInstrText(nUnicode) : new ParaText(nUnicode), false);
 				else
-					oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
+					oPos.run.AddToContent(oPos.pos, new ParaSpace(), false);
 				oPos.pos++;
 			}
 		}
@@ -9948,7 +9945,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(String.fromCharCode(0x2013));
+            oNewElem = new ParaText(0x2013);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)
@@ -11058,13 +11055,10 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			        nUnicode = nCharCode;
                 AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
 			    if (null != nUnicode) {
-			        if (0x20 != nUnicode) {
-			            var oNewParaText = new ParaText();
-			            oNewParaText.Set_CharCode(nUnicode);
-			            oPos.run.Add_ToContent(oPos.pos, oNewParaText, false);
-			        }
-			        else
-			            oPos.run.Add_ToContent(oPos.pos, new ParaSpace(), false);
+					if (0x20 !== nUnicode)
+						oPos.run.AddToContent(oPos.pos, new ParaText(nUnicode), false);
+					else
+						oPos.run.AddToContent(oPos.pos, new ParaSpace(), false);
 			        oPos.pos++;
 			    }
             }
@@ -11095,7 +11089,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(String.fromCharCode(0x2013));
+            oNewElem = new ParaText(0x2013);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)

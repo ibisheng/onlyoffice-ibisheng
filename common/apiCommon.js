@@ -3534,17 +3534,10 @@
 
 						var sCustomText = oRunS['text'];
 						if(sCustomText === "<%br%>"){
-							oRun.Add_ToContent(0, new ParaNewLine(break_Line), false);
+							oRun.AddToContent(0, new ParaNewLine(break_Line), false);
 						}
 						else{
-							for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
-							{
-								var nChar = sCustomText.charAt(nIndex);
-								if (" " === nChar)
-									oRun.Add_ToContent(nIndex, new ParaSpace(), true);
-								else
-									oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
-							}
+							oRun.AddText(sCustomText);
 						}
 
 						oNewParagraph.Internal_Content_Add(i, oRun, false);

@@ -968,15 +968,10 @@ CPresentation.prototype =
         var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
         var oChar;
         if (32 == nCharCode || 12288 == nCharCode)
-        {
             oChar = new ParaSpace();
-        }
         else
-        {
-            oChar = new ParaText();
-            oChar.Set_CharCode(nCharCode);
-        }
-        oRun.Add_ToContent(nPos, oChar, true);
+            oChar = new ParaText(nCharCode);
+        oRun.AddToContent(nPos, oChar, true);
         this.CompositeInput.Length++;
     },
     Add_CompositeText: function(nCharCode)
@@ -3111,7 +3106,7 @@ CPresentation.prototype =
                 if(true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     if(oController && oController.selectedObjects.length !== 0){
                         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                        this.AddToParagraph(new ParaText(String.fromCharCode(0x00A0)));
+                        this.AddToParagraph(new ParaText(0x00A0));
                     }
                 }
             }
@@ -3123,7 +3118,7 @@ CPresentation.prototype =
                 if(true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     if(oController && oController.selectedObjects.length !== 0) {
                         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                        this.AddToParagraph(new ParaSpace(1));
+                        this.AddToParagraph(new ParaSpace());
                     }
                 }
             }
@@ -3343,7 +3338,7 @@ CPresentation.prototype =
             {
                 if(true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.AddToParagraph(new ParaText("€"));
+                    this.AddToParagraph(new ParaText("€".charCodeAt(0)));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3560,7 +3555,7 @@ CPresentation.prototype =
 
                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
 
-                var Item = new ParaText( String.fromCharCode( 0x2013 ) );
+                var Item = new ParaText(0x2013);
                 Item.SpaceAfter = false;
 
                 this.AddToParagraph( Item );
@@ -3666,7 +3661,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = oController.getTargetDocContent();
             }
-            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), false, true );
+            this.AddToParagraph(new ParaText(Code), false, true);
             if(oController)
             {
                 target_doc_content2 = oController.getTargetDocContent();
@@ -6712,27 +6707,26 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     TextBox_Put : function(sText, rFonts)
     {
-        // Отключаем пересчет, включим перед последним добавлением. Поскольку,
-        // у нас все добавляется в 1 параграф, так можно делать.
-        this.TurnOffRecalc = true;
-
         if(true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
             if(!rFonts){
-                var Count = sText.length;
-                for (var Index = 0; Index < Count; Index++) {
-                    if (Index === Count - 1)
-                        this.TurnOffRecalc = false;
 
-                    var _char = sText.charAt(Index);
-                    if (" " == _char)
-                        this.AddToParagraph(new ParaSpace(1));
+				// Отключаем пересчет, включим перед последним добавлением. Поскольку,
+				// у нас все добавляется в 1 параграф, так можно делать.
+				this.TurnOffRecalc = true;
+
+                for (var oIterator = sText.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
+
+                    var nCharCode = oIterator.value();
+                    if (0x0020 === nCharCode)
+                        this.AddToParagraph(new ParaSpace());
                     else
-                        this.AddToParagraph(new ParaText(_char));
+                        this.AddToParagraph(new ParaText(nCharCode));
 
-                    // На случай, если Count = 0
-                    this.TurnOffRecalc = false;
                 }
+
+				this.TurnOffRecalc = false;
+                this.Recalculate();
             }
             else{
                 var oController = this.GetCurrentController();
@@ -6752,17 +6746,7 @@ CPresentation.prototype =
 
                         var Run = new ParaRun(Para);
                         Run.Set_Pr(RunPr);
-
-                        var Count = sText.length;
-                        for (var Index = 0; Index < Count; Index++)
-                        {
-                            var _char = sText.charAt(Index);
-                            if (" " == _char)
-                                Run.Add_ToContent(Index, new ParaSpace(), false);
-                            else
-                                Run.Add_ToContent(Index, new ParaText(_char), false);
-                        }
-
+                        Run.AddText(sText);
                         Para.Add(Run);
                     }
                     oController.startRecalculate();

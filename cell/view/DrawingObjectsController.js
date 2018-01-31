@@ -621,7 +621,7 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     if ( Code > 0x20 )
     {
         this.checkSelectedObjectsAndCallback(function(){
-            this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ), false );
+            this.paragraphAdd( new ParaText(Code), false );
             this.checkMobileCursorPosition();
         }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         bRetValue = true;

@@ -878,7 +878,7 @@
     CUnicodeIterator.prototype.check = CUnicodeIterator.prototype.isInside;
 
     /**
-	 * @returns {UnicodeIterator}
+	 * @returns {CUnicodeIterator}
      */
     String.prototype.getUnicodeIterator = function()
     {

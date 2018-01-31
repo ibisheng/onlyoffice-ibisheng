@@ -241,10 +241,14 @@ CRunElementBase.prototype.GetType = function()
 	return this.Type;
 };
 
-// Класс ParaText
-function ParaText(value)
+/**
+ * Класс представляющий текстовый символ
+ * @param {Number} nCharCode - Юникодное значение символа
+ * @constructor
+ */
+function ParaText(nCharCode)
 {
-    this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);
+    this.Value        = undefined !== nCharCode ? nCharCode : 0x00;
     this.Width        = 0x00000000 | 0;
     this.WidthVisible = 0x00000000 | 0;
     this.Flags        = 0x00000000 | 0;
@@ -385,9 +389,7 @@ ParaText.prototype =
 
     Copy : function()
     {
-        var retValue = new ParaText();
-        retValue.Set_CharCode(this.Value);
-        return retValue;
+    	return new ParaText(this.Value);
     },
 
     Is_NBSP : function()

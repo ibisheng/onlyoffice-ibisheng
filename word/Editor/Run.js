@@ -620,18 +620,8 @@ ParaRun.prototype.private_AddItemToRun = function(nPos, Item)
 {
 	if (para_FootnoteReference === Item.Type && true === Item.IsCustomMarkFollows() && undefined !== Item.GetCustomText())
 	{
-		this.Add_ToContent(nPos, Item, true);
-
-		var sCustomText = Item.GetCustomText();
-		for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
-		{
-			var nChar = sCustomText.charAt(nIndex);
-
-			if (" " === nChar)
-				this.Add_ToContent(nPos + 1 + nIndex, new ParaSpace(), true);
-			else
-				this.Add_ToContent(nPos + 1 + nIndex, new ParaText(nChar), true);
-		}
+		this.AddToContent(nPos, Item, true);
+		this.AddText(Item.GetCustomText(), nPos + 1);
 	}
 	else
 	{
@@ -1138,6 +1128,9 @@ ParaRun.prototype.GetLogicDocument = function()
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
+	if (-1 === Pos)
+		Pos = this.Content.length;
+
 	History.Add(new CChangesRunAddItem(this, Pos, [Item], true));
     this.Content.splice( Pos, 0, Item );
 
@@ -1270,17 +1263,38 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
 /**
  * Добавляем в конец рана заданную строку
  * @param {string} sString
+ * @param {number} [nPos=-1] если позиция не задана (или значение -1), то добавляем в конец
  */
-ParaRun.prototype.AddText = function(sString)
+ParaRun.prototype.AddText = function(sString, nPos)
 {
-	var nShift = this.Content.length;
-	for (var nPos = 0, nCount = sString.length; nPos < nCount; ++nPos)
+	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
+	for (var oIterator = sString.getUnicodeIterator(), nTempPos = 0; oIterator.check(); oIterator.next(), ++nTempPos)
 	{
-		var nChar = sString.charAt(nPos);
-		if (' ' === nChar)
-			this.AddToContent(nShift + nPos, new ParaSpace());
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			this.AddToContent(nCharPos++, new ParaTab());
+		if (10 === nCharCode) // \n
+			this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			this.AddToContent(nCharPos++, new ParaSpace());
 		else
-			this.AddToContent(nShift + nPos, new ParaText(nChar));
+			this.AddToContent(nCharPos++, new ParaText(nCharCode));
+	}
+};
+/**
+ * Добавляем в конец рана заданную инструкцию для сложного поля
+ * @param {string} sString
+ * @param {number} [nPos=-1] если позиция не задана (или значение -1), то добавляем в конец
+ */
+ParaRun.prototype.AddInstrText = function(sString, nPos)
+{
+	var nShift = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
+	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		this.AddToContent(nShift + nTempPos, new ParaText(oIterator.value()));
 	}
 };
 
@@ -2589,7 +2603,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					}
 					else
 					{
-						Item     = new ParaText(String.fromCharCode(Item.Value));
+						Item     = new ParaText(Item.Value);
 						ItemType = para_Text;
 					}
 					Item.Measure(g_oTextMeasurer, this.Get_CompiledPr(false));
@@ -9929,6 +9943,14 @@ ParaRun.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
 				arrComplexFields.push(oComplexField);
 		}
 	}
+};
+/**
+ * Получаем количетсво элементов в ране
+ * @returns {Number}
+ */
+ParaRun.prototype.GetElementsCount = function()
+{
+	return this.Content.length;
 };
 
 function CParaRunStartState(Run)

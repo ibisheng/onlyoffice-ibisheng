@@ -4098,19 +4098,9 @@ function CDrawingDocument(drawingObjects)
             _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
             _textPr.Position   = this.GuiLastTextProps.Position;
 
-            var parRun = new ParaRun(par); var Pos = 0;
+            var parRun = new ParaRun(par);
             parRun.Set_Pr(_textPr);
-            parRun.Add_ToContent(Pos++,new ParaText("H"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("e"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
-            parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+            parRun.AddText("Hello World");
             par.Add_ToContent(0, parRun);
 
             par.Recalculate_Page(0);

@@ -117,21 +117,9 @@ CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 	var oRun = new ParaRun(oParagraph, false);
 	oRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
 	if (sText)
-	{
-		for (var nIndex = 0, nLen = sText.length; nIndex < nLen; ++nIndex)
-		{
-			var nChar = sText.charAt(nIndex);
-
-			if (" " === nChar)
-				oRun.Add_ToContent(nIndex, new ParaSpace(), true);
-			else
-				oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
-		}
-	}
+		oRun.AddText(sText);
 	else
-	{
 		oRun.Add_ToContent(0, new ParaFootnoteRef(this));
-	}
 
 	oParagraph.Add_ToContent(0, oRun);
 	oRun = new ParaRun(oParagraph, false);

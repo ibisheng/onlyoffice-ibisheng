@@ -504,41 +504,38 @@ CSelectedContent.prototype =
                 }
             }
         }
-    },
-
-    /**
-     * Converts current content to ParaMath if it possible. Doesn't change current SelectedContent.
-     * @returns {?AscCommonWord.ParaMath}
-     * */
-    ConvertToMath : function()
-    {
-        if(!this.CanConvertToMath)
-        {
-            return null;
-        }
-
-        var oParagraph = this.Elements[0].Element;
-        var aContent = oParagraph.Content, aRunContent;
-        var oParaMath = new AscCommonWord.ParaMath();
-        oParaMath.Root.Load_FromMenu(c_oAscMathType.Default_Text, oParagraph);
-        oParaMath.Root.Correct_Content(true);
-        for(var i = 0; i < aContent.length; ++i)
-        {
-            if(aContent[i].Get_Type() === para_Run)
-            {
-                aRunContent = aContent[i].Content;
-                for(var j = 0; j < aRunContent.length; ++j)
-                {
-                    oParaMath.Add(aRunContent[j]);
-                }
-            }
-        }
-        return oParaMath;
     }
 };
 CSelectedContent.prototype.SetInsertOptionForTable = function(nType)
 {
 	this.InsertOptions.Table = nType;
+};
+/**
+ * Converts current content to ParaMath if it possible. Doesn't change current SelectedContent.
+ * @returns {?AscCommonWord.ParaMath}
+ * */
+CSelectedContent.prototype.ConvertToMath = function()
+{
+	if (!this.CanConvertToMath)
+		return null;
+
+	var oParagraph = this.Elements[0].Element;
+	var aContent = oParagraph.Content, aRunContent;
+	var oParaMath = new AscCommonWord.ParaMath();
+	oParaMath.Root.Load_FromMenu(c_oAscMathType.Default_Text, oParagraph);
+	oParaMath.Root.Correct_Content(true);
+	for(var i = 0; i < aContent.length; ++i)
+	{
+		if(aContent[i].Get_Type() === para_Run)
+		{
+			aRunContent = aContent[i].Content;
+			for(var j = 0; j < aRunContent.length; ++j)
+			{
+				oParaMath.Add(aRunContent[j]);
+			}
+		}
+	}
+	return oParaMath;
 };
 
 function CDocumentRecalculateState()
@@ -1735,9 +1732,8 @@ CDocument.prototype.Add_TestDocument               = function()
                 var Run         = new ParaRun(Para);
                 var TextElement = String[TextIndex];
 
-                var Element = (TextElement !== " " ? new ParaText(TextElement) : new ParaSpace() );
-                Run.Add_ToContent(TextIndex, Element, false);
-                Para.Add_ToContent(0, Run);
+                Run.AddText(TextElement);
+                Para.AddToContent(0, Run);
             }
 
 
@@ -6598,7 +6594,7 @@ CDocument.prototype.OnKeyDown = function(e)
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
 
-                    this.AddToParagraph(new ParaText(String.fromCharCode(0x00A0)));
+                    this.AddToParagraph(new ParaText(0x00A0));
                 }
                 else if (true === e.CtrlKey)
                 {
@@ -6894,7 +6890,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
-                this.AddToParagraph(new ParaText("€"));
+                this.AddToParagraph(new ParaText("€".charCode(0)));
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -7159,7 +7155,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
             this.DrawingDocument.TargetShow();
 
-            var Item = new ParaText(String.fromCharCode(0x2013));
+            var Item = new ParaText(0x2013);
             Item.Set_SpaceAfter(false);
 
             this.AddToParagraph(Item);
@@ -7240,7 +7236,7 @@ CDocument.prototype.OnKeyPress = function(e)
 			this.DrawingDocument.TargetShow();
 
 			this.CheckLanguageOnTextAdd = true;
-			this.AddToParagraph(new ParaText(String.fromCharCode(Code)));
+			this.AddToParagraph(new ParaText(Code));
 			this.CheckLanguageOnTextAdd = false;
 		}
 		bRetValue = true;
@@ -8926,16 +8922,7 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 			oHyperRun.Set_Color(undefined);
 			oHyperRun.Set_Underline(undefined);
 			oHyperRun.Set_RStyle(this.GetStyles().GetDefaultHyperlink());
-
-			for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
-			{
-				var nChar = sText.charAt(nPos);
-
-				if (' ' === nChar)
-					oHyperRun.AddToContent(nPos, new ParaSpace(), false);
-				else
-					oHyperRun.AddToContent(nPos, new ParaText(nChar), false);
-			}
+			oHyperRun.AddText(sText);
 
 			oHyperlink.RemoveSelection();
 			oHyperlink.RemoveAll();
@@ -8959,24 +8946,16 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 
 			oComplexField.SelectFieldCode();
 			var sInstruction = oInstruction.ToString();
-			for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
+			for (var oIterator = sInstruction.getUnicodeIterator(); oIterator.check(); oIterator.next())
 			{
-				this.AddToParagraph(new ParaInstrText(sInstruction.charAt(nPos)));
+				this.AddToParagraph(new ParaInstrText(oIterator.value()));
 			}
 
 			if (null !== sText)
 			{
 				oComplexField.SelectFieldValue();
 				var oTextPr = this.GetDirectTextPr();
-				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
-				{
-					var nChar = sText.charAt(nPos);
-					if (' ' === nChar)
-						this.AddToParagraph(new ParaSpace());
-					else
-						this.AddToParagraph(new ParaText(nChar));
-				}
-
+				this.AddText(sText);
 				oComplexField.SelectFieldValue();
 				this.AddToParagraph(new ParaTextPr(oTextPr));
 			}
@@ -9366,16 +9345,7 @@ CDocument.prototype.TextBox_Put = function(sText, rFonts)
 
 		if (undefined === rFonts)
 		{
-			var Count = sText.length;
-			var e     = AscCommon.global_keyboardEvent;
-			for (var Index = 0; Index < Count; Index++)
-			{
-				var _char = sText.charAt(Index);
-				if (" " == _char)
-					this.AddToParagraph(new ParaSpace());
-				else
-					this.AddToParagraph(new ParaText(_char));
-			}
+			this.AddText(sText);
 		}
 		else
 		{
@@ -9391,17 +9361,7 @@ CDocument.prototype.TextBox_Put = function(sText, rFonts)
 
 			var Run = new ParaRun(Para);
 			Run.Set_Pr(RunPr);
-
-			var Count = sText.length;
-			for (var Index = 0; Index < Count; Index++)
-			{
-				var _char = sText.charAt(Index);
-				if (" " == _char)
-					Run.Add_ToContent(Index, new ParaSpace(), false);
-				else
-					Run.Add_ToContent(Index, new ParaText(_char), false);
-			}
-
+			Run.AddText(sText);
 			Para.Add(Run);
 		}
 
@@ -11719,17 +11679,12 @@ CDocument.prototype.private_AddCompositeText = function(nCharCode)
 	else
 	{
 		if (32 == nCharCode || 12288 == nCharCode)
-		{
 			oChar = new ParaSpace();
-		}
 		else
-		{
-			oChar = new ParaText();
-			oChar.Set_CharCode(nCharCode);
-		}
+			oChar = new ParaText(nCharCode);
 	}
 
-	oRun.Add_ToContent(nPos, oChar, true);
+	oRun.AddToContent(nPos, oChar, true);
 	this.CompositeInput.Length++;
 
 	this.Recalculate();
@@ -15829,10 +15784,7 @@ CDocument.prototype.AddFormTextField = function(sName, sDefaultText)
 		var oRun = new ParaRun();
 		oField.SetFormFieldName(sName);
 		oField.SetFormFieldDefaultText(sDefaultText);
-		for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
-		{
-			oRun.Add_ToContent(nIndex, new ParaText(sDefaultText.charAt(nIndex)));
-		}
+		oRun.AddText(sDefaultText);
 		oField.Add_ToContent(0, oRun);
 
 		this.Register_Field(oField);
@@ -16137,13 +16089,10 @@ CDocument.prototype.AddFieldWithInstruction = function(sInstruction)
 		oEndChar      = new ParaFieldChar(fldchartype_End, this);
 
 	var oRun = new ParaRun();
-	oRun.Add_ToContent(++nIndex, oBeginChar);
-	for (var nPos = 0, nLen = sInstruction.length; nPos < nLen; ++nPos)
-	{
-		oRun.Add_ToContent(++nIndex, new ParaInstrText(sInstruction.charAt(nPos)));
-	}
-	oRun.Add_ToContent(++nIndex, oSeparateChar);
-	oRun.Add_ToContent(++nIndex, oEndChar);
+	oRun.AddToContent(-1, oBeginChar);
+	oRun.AddInstrText(sInstruction);
+	oRun.AddToContent(-1, oSeparateChar);
+	oRun.AddToContent(-1, oEndChar);
 	oParagraph.Add(oRun);
 
 	oBeginChar.SetRun(oRun);
@@ -16429,9 +16378,9 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 		{
 			var oParagraph = oSdt.GetCurrentParagraph();
 			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
-			for (var nPos = 0, nLen = sHeading.length; nPos < nLen; ++nPos)
+			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.value())
 			{
-				oParagraph.Add(new ParaText(sHeading.charAt(nPos)));
+				oParagraph.Add(new ParaText(oIterator.value()));
 			}
 			oSdt.AddNewParagraph(false, true);
 		}

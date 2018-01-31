@@ -3358,17 +3358,7 @@ CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls =
 CParagraphContentWithParagraphLikeContent.prototype.CreateRunWithText = function(sValue)
 {
 	var oRun = new ParaRun();
-	for (var nIndex = 0, nCount = sValue.length; nIndex < nCount; ++nIndex)
-	{
-		var nChar = sValue.charCodeAt(nIndex), oText;
-
-		if (0x20 === nChar)
-			oText = new ParaSpace();
-		else
-			oText = new ParaText(sValue[nIndex]);
-
-		oRun.Add_ToContent(nIndex, oText);
-	}
+	oRun.AddText(sValue);
 	oRun.Set_Pr(this.Get_FirstTextPr());
 	return oRun;
 };

@@ -5755,15 +5755,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		}
 
 		// Заполняем ран гиперссылки текстом
-		for (var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++)
-		{
-			var Char = HyperProps.Text.charAt(NewPos);
-
-			if (" " == Char)
-				HyperRun.Add_ToContent(NewPos, new ParaSpace(), false);
-			else
-				HyperRun.Add_ToContent(NewPos, new ParaText(Char), false);
-		}
+		HyperRun.AddText(HyperProps.Text);
 
 		// Разделяем текущий элемент (возвращается правая часть)
 		var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -5861,15 +5853,7 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 
 
 			// Заполняем ран гиперссылки текстом
-			for (var NewPos = 0; NewPos < HyperProps.Text.length; NewPos++)
-			{
-				var Char = HyperProps.Text.charAt(NewPos);
-
-				if (" " == Char)
-					HyperRun.Add_ToContent(NewPos, new ParaSpace(), false);
-				else
-					HyperRun.Add_ToContent(NewPos, new ParaText(Char), false);
-			}
+			HyperRun.AddText(HyperProps.Text);
 
 			// Перемещаем кусор в конец гиперссылки
 
@@ -10929,21 +10913,7 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 		return;
 
 	var RunPos = Element.StartPos.Data[Element.StartPos.Depth - 1];
-
-	var charCode = 0;
-	var paraText;
-    for (var Pos = Word.getUnicodeIterator(); Pos.check(); Pos.next())
-    {
-		charCode = Pos.value();
-		if (0x0020 === charCode)
-			Class.Add_ToContent(RunPos + Pos.position(), new ParaSpace());
-		else
-		{
-            paraText = new ParaText();
-            paraText.Set_CharCode(charCode);
-            Class.Add_ToContent(RunPos + Pos.position(), paraText);
-        }
-    }
+	Class.AddText(Word, RunPos);
 
 	// Удалим старое слово
 	var StartPos = Element.StartPos;

@@ -231,11 +231,16 @@ ParaFieldChar.prototype.PrepareRecalculateObject = function()
 	this.String = "";
 };
 
-function ParaInstrText(value)
+/**
+ * Класс представляющий символ инструкции сложного поля
+ * @param {Number} nCharCode
+ * @constructor
+ */
+function ParaInstrText(nCharCode)
 {
 	CRunElementBase.call(this);
 
-	this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);
+	this.Value        = (undefined !== nCharCode ? nCharCode : 0x00);
 	this.Width        = 0x00000000 | 0;
 	this.WidthVisible = 0x00000000 | 0;
 	this.Run          = null;
@@ -246,7 +251,7 @@ ParaInstrText.prototype.constructor = ParaInstrText;
 ParaInstrText.prototype.Type = para_InstrText;
 ParaInstrText.prototype.Copy = function()
 {
-	return new ParaInstrText(String.fromCharCode(this.Value));
+	return new ParaInstrText(this.Value);
 };
 ParaInstrText.prototype.Measure = function(Context, TextPr)
 {
@@ -400,11 +405,7 @@ CComplexField.prototype.private_UpdatePAGE = function()
 	var nPageAbs  = oParagraph.Get_AbsolutePage(nPage) + 1;
 	// TODO: Тут надо рассчитывать значение исходя из настроек секции
 
-	var sValue = "" + nPageAbs;
-	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
-	{
-		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
-	}
+	this.LogicDocument.AddText("" + nPageAbs);
 };
 CComplexField.prototype.private_UpdateTOC = function()
 {
@@ -501,10 +502,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
 
 				var oNumberingRun = new ParaRun(oPara, false);
-				for (var nPos = 0, nLen = sText.length; nPos < nLen; ++nPos)
-				{
-					oNumberingRun.Add_ToContent(nPos, 32 === sText.charCodeAt(0) ? new ParaSpace() : new ParaText(sText.charAt(nPos)));
-				}
+				oNumberingRun.AddText(sText);
 
 				var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
 				var nNumSuff = oNumLvl.Suff;
@@ -554,32 +552,19 @@ CComplexField.prototype.private_UpdateTOC = function()
 			{
 				var oSeparatorRun = new ParaRun(oPara, false);
 				if (!sSeparator || "" === sSeparator)
-				{
-					oSeparatorRun.Add_ToContent(0, new ParaTab());
-				}
+					oSeparatorRun.AddToContent(0, new ParaTab());
 				else
-				{
-					oSeparatorRun.Add_ToContent(0, 32 === sSeparator.charCodeAt(0) ? new ParaSpace() : new ParaText(sSeparator.charAt(0)));
-				}
+					oSeparatorRun.AddText(sSeparator.charAt(0));
 
 				oContainer.Add_ToContent(nContainerPos, oSeparatorRun);
 
 				var oPageRefRun = new ParaRun(oPara, false);
 
-				var nTempIndex = -1;
-				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
-				var sInstructionLine = "PAGEREF " + sBookmarkName + " \\h";
-				for (var nPos = 0, nCount2 = sInstructionLine.length; nPos < nCount2; ++nPos)
-				{
-					oPageRefRun.Add_ToContent(++nTempIndex, new ParaInstrText(sInstructionLine.charAt(nPos)));
-				}
-				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
-				var sValue = "" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1);
-				for (var nPos = 0, nCount2 = sValue.length; nPos < nCount2; ++nPos)
-				{
-					oPageRefRun.Add_ToContent(++nTempIndex, new ParaText(sValue.charAt(nPos)));
-				}
-				oPageRefRun.Add_ToContent(++nTempIndex, new ParaFieldChar(fldchartype_End, this.LogicDocument));
+				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
+				oPageRefRun.AddInstrText("PAGEREF " + sBookmarkName + " \\h");
+				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
+				oPareRefRun.AddText("" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1));
+				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_End, this.LogicDocument));
 				oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
 			}
 
@@ -650,18 +635,11 @@ CComplexField.prototype.private_UpdatePAGEREF = function()
 		}
 	}
 
-	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
-	{
-		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
-	}
+	this.LogicDocument.AddText(sValue);
 };
 CComplexField.prototype.private_UpdateNUMPAGES = function()
 {
-	var sValue = "" + this.LogicDocument.GetPagesCount();
-	for (var nIndex = 0, nLen = sValue.length; nIndex < nLen; ++nIndex)
-	{
-		this.LogicDocument.AddToParagraph(new ParaText(sValue.charAt(nIndex)));
-	}
+	this.LogicDocument.AddText("" + this.LogicDocument.GetPagesCount());
 };
 CComplexField.prototype.SelectFieldValue = function()
 {
@@ -889,10 +867,7 @@ CComplexField.prototype.SetPr = function(oPr)
 
 	var oRun      = this.BeginChar.GetRun();
 	var nInRunPos = oRun.GetElementPosition(this.BeginChar) + 1;
-	for (var nPos = 0, nLen = sNewInstruction.length; nPos < nLen; ++nPos)
-	{
-		oRun.AddToContent(nInRunPos + nPos, new ParaInstrText(sNewInstruction.charAt(nPos)));
-	}
+	oRun.AddInstrText(sNewInstruction, nInRunPos);
 };
 
 //--------------------------------------------------------export----------------------------------------------------

@@ -13516,29 +13516,22 @@ function CreateDocContentFromString(str, drawingDocument, parent)
 
 function AddToContentFromString(content, str)
 {
-    content.MoveCursorToStartPos(false);
-    for(var i = 0; i < str.length; ++i)
-    {
-        var ch = str[i];
-        if (ch == '\t')
-        {
-            content.AddToParagraph( new ParaTab(), false );
-        }
-        else if (ch == '\n')
-        {
-            content.AddToParagraph( new ParaNewLine(break_Line), false );
-        }
-        else if (ch == '\r')
-            ;
-        else if (ch != ' ')
-        {
-            content.AddToParagraph(new ParaText(ch), false );
-        }
-        else
-        {
-            content.AddToParagraph(new ParaSpace(1), false );
-        }
-    }
+	content.MoveCursorToStartPos(false);
+	for (var oIterator = str.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			content.AddToParagraph(new ParaTab(), false);
+		if (10 === nCharCode) // \n
+			content.AddToParagraph(new ParaNewLine(break_Line), false);
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			content.AddToParagraph(new ParaSpace(), false);
+		else
+			content.AddToParagraph(new ParaText(nCharCode), false);
+	}
 }
 
 function CValAxisLabels(chart, axis)

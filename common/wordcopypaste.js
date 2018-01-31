@@ -4723,42 +4723,40 @@ PasteProcessor.prototype =
 
 			text = text.replace(/^(\r|\t)+|(\r|\t)+$/g, '');
 			//text = text.replace(/(\r|\t)/g, ' ');
-			if (text.length > 0) {
-
+			if (text.length > 0)
+			{
 				oThis.oDocument = shape.txBody.content;
 
 				var bAddParagraph = false;
-				for (var i = 0, length = text.length; i < length; i++) {
-					if (bAddParagraph) {
+				for (var oIterator = text.getUnicodeIterator(); oIterator.check(); oIterator.next())
+				{
+					if (bAddParagraph)
+					{
 						shape.txBody.content.AddNewParagraph();
 						bAddParagraph = false;
 					}
 
-					var nUnicode = null;
-					var nCharCode = text.charCodeAt(i);
-					if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-						if (i + 1 < length) {
-							i++;
-							var nTrailingChar = text.charCodeAt(i);
-							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-						}
-					} else {
-						nUnicode = nCharCode;
-					}
+					var nUnicode  = oIterator.value();
 
-					if (null !== nUnicode) {
+					if (null !== nUnicode)
+					{
 						var Item;
-						if(0x0A === nUnicode || 0x0D === nUnicode) {
+						if (0x0A === nUnicode || 0x0D === nUnicode)
+						{
 							bAddParagraph = true;
-						} else if(0x09 === nUnicode){
+						}
+						else if (0x09 === nUnicode)
+						{
 							Item = new ParaTab();
 							shape.paragraphAdd(Item);
-						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-							Item = new ParaText();
-							Item.Set_CharCode(nUnicode);
+						}
+						else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+						{
+							Item = new ParaText(nUnicode);
 							shape.paragraphAdd(Item);
 						}
-						else {
+						else
+						{
 							Item = new ParaSpace();
 							shape.paragraphAdd(Item);
 						}
@@ -5155,31 +5153,18 @@ PasteProcessor.prototype =
 					
 					//text
 					var value = value2[n].text;
-					for(var k = 0, length = value.length; k < length; k++)
+					for(var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
 					{
-						var nUnicode = null;
-						var nCharCode = value.charCodeAt(k);
-						if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-							if (k + 1 < length) {
-								k++;
-								var nTrailingChar = value.charCodeAt(k);
-								nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-							}
-						}
+						var nUnicode = oIterator.value();
+
+						var Item;
+						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+							Item = new ParaText(nUnicode);
 						else
-							nUnicode = nCharCode;
-						if (null != nUnicode) {
-							var Item;
-							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-								Item = new ParaText();
-								Item.Set_CharCode(nUnicode);
-							}
-							else
-								Item = new ParaSpace();
-							
-							//add text
-							oCurRun.Add_ToContent(k, Item, false);
-						}
+							Item = new ParaSpace();
+
+						//add text
+						oCurRun.AddToContent(-1, Item, false);
 					}
 					
 					//add run
@@ -5286,32 +5271,20 @@ PasteProcessor.prototype =
 
                     //text
                     var value = value2[n].text;
-                    for(var k = 0, length = value.length; k < length; k++)
-                    {
-                        var nUnicode = null;
-                        var nCharCode = value.charCodeAt(k);
-                        if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-                            if (k + 1 < length) {
-                                k++;
-                                var nTrailingChar = value.charCodeAt(k);
-                                nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-                            }
-                        }
-                        else
-                            nUnicode = nCharCode;
-                        if (null != nUnicode) {
-                            var Item;
-                            if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-                                Item = new ParaText();
-                                Item.Set_CharCode(nUnicode);
-                            }
-                            else
-                                Item = new ParaSpace();
+					for(var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
+					{
+						var nUnicode = oIterator.value();
 
-                            //add text
-                            oCurRun.Add_ToContent(k, Item, false);
-                        }
-                    }
+						var Item;
+						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+							Item = new ParaText(nUnicode);
+						else
+							Item = new ParaSpace();
+
+						//add text
+						oCurRun.AddToContent(-1, Item, false);
+					}
+
                     if(i !== diffRow || j !== diffCol)
                     {
                         oCurRun.Add_ToContent(k, new ParaSpace(), false);
@@ -7817,43 +7790,43 @@ PasteProcessor.prototype =
 					var bIsPreviuosSpace = false;
 				}
 
-				for (var i = 0, length = value.length; i < length; i++) {
-					var nUnicode = null;
-					var nCharCode = value.charCodeAt(i);
-					if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-						if (i + 1 < length) {
-							i++;
-							var nTrailingChar = value.charCodeAt(i);
-							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-						}
-					} else {
-						nUnicode = nCharCode;
-					}
+				for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
+				{
+					var nUnicode = oIterator.value();
 
-					if (bPresentation) {
-						if (null !== nUnicode) {
+					if (bPresentation)
+					{
+						if (null !== nUnicode)
+						{
 							var Item;
-							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-								Item = new ParaText();
-                                Item.Set_CharCode(nUnicode);
-							} else {
+
+							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+								Item = new ParaText(nUnicode);
+							else
 								Item = new ParaSpace();
-							}
+
 							shape.paragraphAdd(Item);
 						}
-					} else {
-						if (null != nUnicode) {
+					}
+					else
+					{
+						if (null != nUnicode)
+						{
 							var Item;
-							if (0x20 !== nUnicode && 0x2009 !== nUnicode) {
-								Item = new ParaText();
-								Item.Set_CharCode(nUnicode);
+							if (0x20 !== nUnicode && 0x2009 !== nUnicode)
+							{
+								Item = new ParaText(nUnicode);
 								bIsPreviuosSpace = false;
-							} else {
+							}
+							else
+							{
 								Item = new ParaSpace();
-								if (bIsPreviuosSpace) {
+								if (bIsPreviuosSpace)
+								{
 									continue;
 								}
-								if (!oThis.bIsPlainText) {
+								if (!oThis.bIsPlainText)
+								{
 									bIsPreviuosSpace = true;
 								}
 							}
@@ -9102,48 +9075,36 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
 
 function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
 {
-	var diffContentIndex = 0;
-	if (bIsAddTabBefore) {
-		diffContentIndex = 1;
-		oCurRun.Add_ToContent(0, new ParaTab(), false);
-	}
+	if (bIsAddTabBefore)
+		oCurRun.AddToContent(-1, new ParaTab(), false);
 
-	for (var k = 0, length = value.length; k < length; k++) {
-		var nUnicode = null;
-		var nCharCode = value.charCodeAt(k);
-		if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-			if (k + 1 < length) {
-				k++;
-				var nTrailingChar = value.charCodeAt(k);
-				nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-			}
-		} else {
-			nUnicode = nCharCode;
-		}
+	for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nUnicode = oIterator.value();
 
 		var bIsSpace = true;
-		if (null != nUnicode) {
-			var Item;
-			if (0x2009 === nUnicode || 9 === nUnicode) {
-				Item = new ParaTab();
-			} else if (0x20 !== nUnicode && 0xA0 !== nUnicode) {
-				Item = new ParaText();
-				Item.Set_CharCode(nUnicode);
-				bIsSpace = false;
-			} else {
-				Item = new ParaSpace();
-			}
-
-			//add text
-			if (!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)) {
-				oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
-			}
+		var Item;
+		if (0x2009 === nUnicode || 9 === nUnicode)
+		{
+			Item = new ParaTab();
 		}
+		else if (0x20 !== nUnicode && 0xA0 !== nUnicode)
+		{
+			Item     = new ParaText(nUnicode);
+			bIsSpace = false;
+		}
+		else
+		{
+			Item = new ParaSpace();
+		}
+
+		//add text
+		if (!(dNotAddLastSpace && k === value.length - 1 && bIsSpace))
+			oCurRun.AddToContent(-1, Item, false);
 	}
 
-	if (bIsAddTabAfter) {
-		oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
-	}
+	if (bIsAddTabAfter)
+		oCurRun.AddToContent(-1, new ParaTab(), false);
 }
 
 function searchBinaryClass(node)

@@ -2464,11 +2464,14 @@ CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
         this.Content[Index].Set_ParaMath(ParaMath, this);
     }
 };
-CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
+CMathContent.prototype.Load_FromMenu = function(Type, Paragraph, TextPr)
 {
     this.Paragraph = Paragraph;
 
-    var Pr = {ctrPrp: new CTextPr()};
+    var Pr = {
+    	ctrPrp : TextPr ? TextPr.Copy() : new CTextPr()
+    };
+
     Pr.ctrPrp.Italic = true;
     Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 

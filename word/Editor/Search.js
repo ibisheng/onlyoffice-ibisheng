@@ -169,12 +169,7 @@ CDocumentSearch.prototype =
                 var StartRun = SearchElement.ClassesS[SearchElement.ClassesS.length - 1];
 
                 var RunPos = StartContentPos.Get( SearchElement.ClassesS.length - 1 );
-
-                var Len = NewStr.length;
-                for ( var Pos = 0; Pos < Len; Pos++ )
-                {
-                    StartRun.Add_ToContent(RunPos + Pos, ' ' === NewStr[Pos] ? new ParaSpace() : new ParaText(NewStr[Pos]));
-                }
+                StartRun.AddText(NewStr, RunPos);
 
                 // Выделяем старый объект поиска и удаляем его
                 Para.Selection.Use = true;

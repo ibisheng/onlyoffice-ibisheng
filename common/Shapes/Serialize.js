@@ -8531,28 +8531,7 @@ function BinaryPPTYLoader()
                                     }
                                 }
 
-                                var pos = 0;
-                                for (var j = 0, length = _text.length; j < length; ++j)
-                                {
-                                    if (_text[j] == '\t')
-                                    {
-                                        new_run.Add_ToContent(pos++, new ParaTab(), false);
-                                    }
-                                    else if (_text[j] == '\n')
-                                    {
-                                        new_run.Add_ToContent(pos++, new ParaNewLine( break_Line ), false);
-                                    }
-                                    else if (_text[j] == '\r')
-                                        ;
-                                    else if (_text[j] != ' ')
-                                    {
-                                        new_run.Add_ToContent(pos++, new ParaText(_text[j]), false);
-                                    }
-                                    else
-                                    {
-                                        new_run.Add_ToContent(pos++, new ParaSpace(1), false);
-                                    }
-                                }
+                                new_run.AddText(_text);
                                 AscFonts.FontPickerByCharacter.getFontsByString(_text);
 
                                 if (hyperlink !== null)

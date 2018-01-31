@@ -6625,20 +6625,9 @@ function CDrawingDocument()
 		_textPr.Position = this.GuiLastTextProps.Position;
 
 		var parRun = new ParaRun(par);
-		var Pos = 0;
 		parRun.Set_Pr(_textPr);
-		parRun.Add_ToContent(Pos++, new ParaText("H"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("e"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaSpace(1), false);
-		parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("d"), false);
-		par.Add_ToContent(0, parRun);
+		parRun.AddText("Hello World");
+		par.AddToContent(0, parRun);
 
 		par.Reset(0, 0, 1000, 1000, 0, 0, 1);
 		par.Recalculate_Page(0);
@@ -8071,11 +8060,7 @@ CStylesPainter.prototype =
 
 			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, false);
 			var run = new ParaRun(par, false);
-
-			for (var i = 0; i < styleName.length; i++)
-			{
-				run.Add_ToContent(i, new ParaText(styleName.charAt(i)), false);
-			}
+			run.AddText(styleName);
 
 			_dc.Internal_Content_Add(0, par, false);
 			par.Add_ToContent(0, run);

@@ -2787,15 +2787,10 @@
 						{
 							var Item;
 							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
-							{
-								Item = new ParaText();
-								Item.Set_CharCode(nUnicode);
-							}
+								Item = new ParaText(nUnicode);
 							else
-							{
 								Item = new ParaSpace();
-							}
-							
+
 							//add text
 							oCurRun.Add_ToContent(k, Item, false);
 						}

@@ -4441,14 +4441,9 @@ function DrawingObjects() {
         var nPos = _this.CompositeInput.Pos + _this.CompositeInput.Length;
         var oChar;
         if (32 == nCharCode || 12288 == nCharCode)
-        {
             oChar = new ParaSpace();
-        }
         else
-        {
-            oChar = new ParaText();
-            oChar.Set_CharCode(nCharCode);
-        }
+            oChar = new ParaText(nCharCode);
         oRun.Add_ToContent(nPos, oChar, true);
         _this.CompositeInput.Length++;
     };
