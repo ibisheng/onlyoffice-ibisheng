@@ -7788,12 +7788,20 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_ShowDocumentOutline = function()
 	{
-		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(true);
-		return this.WordControl.m_oLogicDocument.DocumentOutline;
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		oLogicDocument.DocumentOutline.SetUse(true);
+		return oLogicDocument.DocumentOutline;
 	};
 	asc_docs_api.prototype.asc_HideDocumentOutline = function()
 	{
-		this.WordControl.m_oLogicDocument.DocumentOutline.SetUse(false);
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		oLogicDocument.DocumentOutline.SetUse(false);
 	};
 	asc_docs_api.prototype.sync_OnDocumentOutlineUpdate = function()
 	{
@@ -7870,6 +7878,7 @@ background-repeat: no-repeat;\
 			var oPr = new Asc.CTableOfContentsPr();
 			oPr.InitFromTOCInstruction(oTOC);
 			oPr.CheckStylesType(oLogicDocument.GetStyles());
+			console.log(oPr);
 			return oPr;
 		}
 
