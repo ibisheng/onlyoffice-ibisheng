@@ -1599,7 +1599,9 @@
       index = wb.getActive();
 	}
     if (index === this.wsActive) {
-      this.drawWorksheet();
+		if (!bLockDraw) {
+			this.drawWorksheet();
+		}
       return this;
     }
 
