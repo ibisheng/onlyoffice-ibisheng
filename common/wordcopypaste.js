@@ -6843,40 +6843,22 @@ PasteProcessor.prototype =
             }
         }
     },
-	_getMsoListSymbol: function(node)
-	{
+
+	_getMsoListSymbol: function (node) {
 		var res = null;
-		var nodeList  = this._getMsoListIgnore(node);
-		if(nodeList)
-		{
+		var nodeList = this._getMsoListIgnore(node);
+		if (nodeList) {
 			var value = nodeList.innerText;
-			if(value)
-			{
-				for(var k = 0, length = value.length; k < length; k++)
-				{
-					var nUnicode = null;
-					var nCharCode = value.charCodeAt(k);
-					if (AscCommon.isLeadingSurrogateChar(nCharCode)) 
-					{
-						if (k + 1 < length) 
-						{
-							k++;
-							var nTrailingChar = value.charCodeAt(k);
-							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-						}
-					}
-					else
-						nUnicode = nCharCode;
-					
+			if (value) {
+				for (var pos = value.getUnicodeIterator(); pos.check(); pos.next()) {
+					var nUnicode = pos.value();
+
 					if (null !== nUnicode) {
-						var Item;
-						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
-						{
-							if(!res)
-							{
+						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+							if (!res) {
 								res = "";
 							}
-							res += value.charAt(k);
+							res += value.charAt(pos.position());
 						}
 					}
 				}
@@ -6884,6 +6866,7 @@ PasteProcessor.prototype =
 		}
 		return res;
 	},
+
 	_getMsoListIgnore: function(node)
 	{
 		if(!node || (node && !node.children))
