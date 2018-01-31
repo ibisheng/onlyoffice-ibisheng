@@ -10210,6 +10210,7 @@
 					var nVal = null;
 					var bDelimiter = false;
 					var sPrefix = null;
+					var padding = 0;
 					var bDate = false;
 					if(bIsPromote)
 					{
@@ -10239,7 +10240,10 @@
 										if(sValue.length != nEndIndex)
 										{
 											sPrefix = sValue.substring(0, nEndIndex);
-											nVal = sValue.substring(nEndIndex) - 0;
+											var sNumber = sValue.substring(nEndIndex);
+											//sNumber have no decimal point, so can use simple parseInt
+											nVal = sNumber - 0;
+											padding = sNumber[0] === '0' ? sNumber.length : 0;
 										}
 									}
 								}
@@ -10255,7 +10259,7 @@
 						else
 							bDelimiter = true;
 					}
-					oPromoteHelper.add(nRow0 - nRowStart0, nCol0 - nColStart0, nVal, bDelimiter, sPrefix, bDate, oCell.duplicate());
+					oPromoteHelper.add(nRow0 - nRowStart0, nCol0 - nColStart0, nVal, bDelimiter, sPrefix, padding, bDate, oCell.duplicate());
 				}
 			});
 			var bCopy = false;
@@ -10324,12 +10328,25 @@
 							{
 								if(false == bCopy && null != data.nCurValue)
 								{
-									var sVal = "";
-									if(null != data.sPrefix)
-										sVal += data.sPrefix;
-									//change javascript NumberDecimalSeparator '.' , to cultural NumberDecimalSeparator
-									sVal += data.nCurValue.toString().replace(/\./g, AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
-									oCopyCell.setValue(sVal);
+									var valueData = oFromCell.getValueData();
+									valueData.value.multiText = null;
+									valueData.value.text = null;
+									valueData.value.number = null;
+									if (null != data.sPrefix) {
+										var sVal = data.sPrefix;
+										//toString enough, becouse nCurValue nave not decimal part
+										var sNumber = data.nCurValue.toString();
+										if (sNumber.length < data.padding) {
+											sNumber = '0'.repeat(data.padding - sNumber.length) + sNumber;
+										}
+										sVal += sNumber;
+										valueData.value.text = sVal;
+										valueData.value.type = CellValueType.String;
+									} else {
+										valueData.value.number = data.nCurValue;
+										valueData.value.type = CellValueType.Number;
+									}
+									oCopyCell.setValueData(valueData);
 								}
 								else if(null != oFromCell)
 								{
@@ -10466,7 +10483,7 @@
 		}
 	}
 	PromoteHelper.prototype = {
-		add: function(nRow, nCol, nVal, bDelimiter, sPrefix, bDate, oAdditional){
+		add: function(nRow, nCol, nVal, bDelimiter, sPrefix, padding, bDate, oAdditional){
 			if(this.bVerical)
 			{
 				//транспонируем для удобства
@@ -10482,7 +10499,7 @@
 				row = {};
 				this.oDataRow[nRow] = row;
 			}
-			row[nCol] = {nCol: nCol, nVal: nVal, bDelimiter: bDelimiter, sPrefix: sPrefix, bDate: bDate, oAdditional: oAdditional, oSequence: null, nCurValue: null};
+			row[nCol] = {nCol: nCol, nVal: nVal, bDelimiter: bDelimiter, sPrefix: sPrefix, padding: padding, bDate: bDate, oAdditional: oAdditional, oSequence: null, nCurValue: null};
 		},
 		isOnlyIntegerSequence: function(){
 			var bRes = true;
@@ -10624,6 +10641,7 @@
 					var nPrevVal = null;
 					var nIndexDif = null;
 					var nValueDif = null;
+					var nMaxPadding = 0;
 					//анализируем последовательность, если числа расположены не на одинаковом расстоянии, то считаем их сплошной последовательностью
 					//последовательность с промежутками может быть только целочисленной
 					for(var i = 0, length = aCurSequence.length; i < length; i++)
@@ -10657,6 +10675,7 @@
 								}
 							}
 						}
+						nMaxPadding = Math.max(nMaxPadding, data.padding);
 						nPrevX = nCurX;
 						nPrevVal = data.nVal;
 					}
@@ -10674,6 +10693,7 @@
 					for(var i = 0, length = aCurSequence.length; i < length; i++)
 					{
 						var data = aCurSequence[i];
+						data.padding = nMaxPadding;
 						var nCurX = data.nCol;
 						var x = nCurX - nMinIndex;
 						if(null != nIndexDif && nIndexDif > 0)
