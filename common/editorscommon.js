@@ -818,13 +818,13 @@
 		return sUnicode;
 	}
 
-    function StringIterator(str)
+    function CUnicodeIterator(str)
     {
         this._position = 0;
         this._index = 0;
         this._str = str;
     }
-    StringIterator.prototype =
+    CUnicodeIterator.prototype =
 	{
 		isOutside : function()
 		{
@@ -875,11 +875,14 @@
 		}
 	};
 
-    StringIterator.prototype.check = StringIterator.prototype.isInside;
+    CUnicodeIterator.prototype.check = CUnicodeIterator.prototype.isInside;
 
-    String.prototype.beginIterator = function()
+    /**
+	 * @returns {UnicodeIterator}
+     */
+    String.prototype.getUnicodeIterator = function()
     {
-        return new StringIterator(this);
+        return new CUnicodeIterator(this);
     };
 
 	function test_ws_name2()

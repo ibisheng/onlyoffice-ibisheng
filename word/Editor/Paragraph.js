@@ -10932,7 +10932,7 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 
 	var charCode = 0;
 	var paraText;
-    for (var Pos = Word.beginIterator(); Pos.check(); Pos.next())
+    for (var Pos = Word.getUnicodeIterator(); Pos.check(); Pos.next())
     {
 		charCode = Pos.value();
 		if (0x0020 === charCode)
