@@ -4914,6 +4914,26 @@ CPresentation.prototype =
         }, this, []);
     },
 
+
+    internalResetElementsFontSize: function(aContent)
+    {
+        for(var j = 0; j < aContent.length; ++j)
+        {
+            if(aContent[j].Type === para_Run)
+            {
+                if(aContent[j].Pr && AscFormat.isRealNumber(aContent[j].Pr.FontSize))
+                {
+                    var oPr = aContent[j].Pr.Copy();
+                    oPr.FontSize = undefined;
+                    aContent[j].Set_Pr(oPr);
+                }
+            }
+            else if(aContent[j].Type === para_Hyperlink)
+            {
+                this,internalResetElementsFontSize(aContent[j].Content);
+            }
+        }
+    },
     /**Returns array of PresentationSelectedContent for special paste
      * @returns {Array}
     **/
@@ -4979,11 +4999,23 @@ CPresentation.prototype =
                                     oSelectedContent = new CSelectedContent();
                                     oDocContent.GetSelectedContent(oSelectedContent);
                                     oEndFormattingContent.DocContent = oSelectedContent;
+                                    for(i = 0; i < oSelectedContent.Elements.length; ++i){
+                                        var oElem = oSelectedContent.Elements[i].Element;
+                                        if(oElem.GetType() === AscCommonWord.type_Paragraph){
+                                            if(oElem.Pr && oElem.Pr.DefaultRunPr && AscFormat.isRealNumber(oElem.Pr.DefaultRunPr.FontSize))
+                                            {
+                                                var oPr = oElem.Pr.Copy();
+                                                oPr.DefaultRunPr.FontSize = undefined;
+                                                oElem.Set_Pr(oPr);
+                                            }
+                                            this.internalResetElementsFontSize(oElem.Content);
+                                        }
+                                    }
                                     oSelectedContent = new CSelectedContent();
                                     oDocContent.GetSelectedContent(oSelectedContent);
                                     var aContent = [];
                                     for(i = 0; i < oSelectedContent.Elements.length; ++i){
-                                        var oParagraph = oSelectedContent.Elements[i].Element;
+                                        oParagraph = oSelectedContent.Elements[i].Element;
                                         oParagraph.Parent = oDocContent;
                                         oParagraph.Internal_CompileParaPr();
                                         aContent.push(oParagraph);
