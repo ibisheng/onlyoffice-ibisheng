@@ -4683,16 +4683,12 @@ PasteProcessor.prototype =
 		return {base64FromExcel: base64FromExcel, base64FromWord: base64FromWord, base64FromPresentation: base64FromPresentation};
 	},
 
-	_pasteText: function(text)
-	{
+	_pasteText: function (text) {
 		var oThis = this;
 
-		var fPasteTextWordCallback = function()
-		{
-			var executePasteWord = function()
-			{
-				if(false === oThis.bNested)
-				{
+		var fPasteTextWordCallback = function () {
+			var executePasteWord = function () {
+				if (false === oThis.bNested) {
 					oThis.InsertInDocument();
 				}
 			};
@@ -4704,16 +4700,13 @@ PasteProcessor.prototype =
 			oThis.api.pre_Paste([], [], executePasteWord);
 		};
 
-		var fPasteTextPresentationCallback = function()
-		{
-			var executePastePresentation = function()
-			{
+		var fPasteTextPresentationCallback = function () {
+			var executePastePresentation = function () {
 				oThis.InsertInPlacePresentation(oThis.aContent, true);
 			};
 
 			var presentation = editor.WordControl.m_oLogicDocument;
-			if(presentation.Slides.length === 0)
-			{
+			if (presentation.Slides.length === 0) {
 				presentation.addNextSlide();
 			}
 			var shape = new CShape();
@@ -4723,40 +4716,29 @@ PasteProcessor.prototype =
 
 			text = text.replace(/^(\r|\t)+|(\r|\t)+$/g, '');
 			//text = text.replace(/(\r|\t)/g, ' ');
-			if (text.length > 0)
-			{
+			if (text.length > 0) {
 				oThis.oDocument = shape.txBody.content;
 
 				var bAddParagraph = false;
-				for (var oIterator = text.getUnicodeIterator(); oIterator.check(); oIterator.next())
-				{
-					if (bAddParagraph)
-					{
+				for (var oIterator = text.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
+					if (bAddParagraph) {
 						shape.txBody.content.AddNewParagraph();
 						bAddParagraph = false;
 					}
 
-					var nUnicode  = oIterator.value();
+					var nUnicode = oIterator.value();
 
-					if (null !== nUnicode)
-					{
+					if (null !== nUnicode) {
 						var Item;
-						if (0x0A === nUnicode || 0x0D === nUnicode)
-						{
+						if (0x0A === nUnicode || 0x0D === nUnicode) {
 							bAddParagraph = true;
-						}
-						else if (0x09 === nUnicode)
-						{
+						} else if (0x09 === nUnicode) {
 							Item = new ParaTab();
 							shape.paragraphAdd(Item);
-						}
-						else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
-						{
+						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText(nUnicode);
 							shape.paragraphAdd(Item);
-						}
-						else
-						{
+						} else {
 							Item = new ParaSpace();
 							shape.paragraphAdd(Item);
 						}
@@ -4773,12 +4755,9 @@ PasteProcessor.prototype =
 			oThis.api.pre_Paste([], [], executePastePresentation);
 		};
 
-		if(PasteElementsId.g_bIsDocumentCopyPaste)
-		{
+		if (PasteElementsId.g_bIsDocumentCopyPaste) {
 			fPasteTextWordCallback();
-		}
-		else
-		{
+		} else {
 			fPasteTextPresentationCallback();
 		}
 	},
@@ -4982,332 +4961,318 @@ PasteProcessor.prototype =
 		
 		return {content: aContent, fonts: fonts};
 	},
-	
-	_convertTableFromExcel: function(aContentExcel)
-	{
+
+	_convertTableFromExcel: function (aContentExcel) {
 		var worksheet = aContentExcel.workbook.aWorksheets[0];
 		var range;
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
 		var t = this;
 		var fonts = [];
-		
-		var convertBorder = function(border)
-		{
+
+		var convertBorder = function (border) {
 			var res = new CDocumentBorder();
-			if(border.w)
-			{
+			if (border.w) {
 				res.Value = border_Single;
 				res.Size = border.w * g_dKoef_pix_to_mm;
 			}
 			res.Color = new CDocumentColor(border.c.getR(), border.c.getG(), border.c.getB());
-			
+
 			return res;
 		};
-		
-		var addFont = function(fontFamily)
-		{
-			if(!t.aContent.fonts)
+
+		var addFont = function (fontFamily) {
+			if (!t.aContent.fonts) {
 				t.aContent.fonts = [];
-			
-			if(!t.oFonts)
+			}
+
+			if (!t.oFonts) {
 				t.oFonts = [];
+			}
 
 			t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
 			fonts.push(new CFont(fontFamily, 0, "", 0));
 		};
-		
+
 		//grid
 		var grid = [];
 		var standartWidth = 17;
-		for(var i = activeRange.c1; i <= activeRange.c2; i++)
-		{
-			if(worksheet.aCols[i])
+		for (var i = activeRange.c1; i <= activeRange.c2; i++) {
+			if (worksheet.aCols[i]) {
 				grid[i - activeRange.c1] = worksheet.aCols[i].width;
-			else
+			} else {
 				grid[i - activeRange.c1] = standartWidth;
+			}
 		}
 		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
 		this.aContent.push(table);
-		
+
 		var diffRow = activeRange.r2 - activeRange.r1;
 		var diffCol = activeRange.c2 - activeRange.c1;
-		for(var i = 0; i <= diffRow; i++)
-		{
+		for (var i = 0; i <= diffRow; i++) {
 			var row = table.Internal_Add_Row(table.Content.length, 0);
-			for(var j = 0; j <= diffCol; j++)
-			{
-				if(!table.Selection.Data)
+			for (var j = 0; j <= diffCol; j++) {
+				if (!table.Selection.Data) {
 					table.Selection.Data = [];
-					
+				}
+
 				table.Selection.Data[table.Selection.Data.length] = {Cell: j, Row: i};
-				
+
 				range = worksheet.getCell3(i + activeRange.r1, j + activeRange.c1);
 				var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
-				
+
 				table.CurCell = oCurCell;
-				
+
 				var isMergedCell = range.hasMerged();
 				var gridSpan = 1;
 				var vMerge = 1;
-				if(isMergedCell)
-				{
+				if (isMergedCell) {
 					gridSpan = isMergedCell.c2 - isMergedCell.c1 + 1;
 					vMerge = isMergedCell.r2 - isMergedCell.r1 + 1;
 				}
-				
+
 				//***cell property***
 				//set grid
 				var sumWidthGrid = 0;
-				for(var l = 0; l < gridSpan; l++)
-				{
+				for (var l = 0; l < gridSpan; l++) {
 					sumWidthGrid += grid[j + l];
 				}
 				oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, sumWidthGrid));
-				
+
 				//background color
 				var background_color = range.getFill();
-				if(null != background_color)
-				{
+				if (null != background_color) {
 					var Shd = new CDocumentShd();
 					Shd.Value = c_oAscShdClear;
-					Shd.Color = new CDocumentColor(background_color.getR(), background_color.getG(), background_color.getB());
+					Shd.Color =
+						new CDocumentColor(background_color.getR(), background_color.getG(), background_color.getB());
 					oCurCell.Set_Shd(Shd);
 				}
-				
+
 				//borders
 				var borders = range.getBorderFull();
 				//left
 				var border = convertBorder(borders.l);
-				if(null != border)
+				if (null != border) {
 					oCurCell.Set_Border(border, 3);
+				}
 				//top
-				var border = convertBorder(borders.t);
-				if(null != border)
+				border = convertBorder(borders.t);
+				if (null != border) {
 					oCurCell.Set_Border(border, 0);
+				}
 				//right
-				var border = convertBorder(borders.r);
-				if(null != border)
+				border = convertBorder(borders.r);
+				if (null != border) {
 					oCurCell.Set_Border(border, 1);
+				}
 				//bottom
-				var border = convertBorder(borders.b);
-				if(null != border)
+				border = convertBorder(borders.b);
+				if (null != border) {
 					oCurCell.Set_Border(border, 2);
-				
+				}
+
 				//merge				
 				oCurCell.Set_GridSpan(gridSpan);
-				if(vMerge != 1)
-				{
-					if(isMergedCell.r1 === i + activeRange.r1)
-					{
+				if (vMerge != 1) {
+					if (isMergedCell.r1 === i + activeRange.r1) {
 						oCurCell.SetVMerge(vmerge_Restart);
-					}
-					else
-					{
+					} else {
 						oCurCell.SetVMerge(vmerge_Continue);
 					}
 				}
-				
+
 				var oCurPar = oCurCell.Content.Content[0];
-				
+
 				var hyperLink = range.getHyperlink();
 				var oCurHyperlink = null;
-				if(hyperLink)
-				{
-					var oCurHyperlink = new ParaHyperlink();
+				if (hyperLink) {
+					oCurHyperlink = new ParaHyperlink();
 					oCurHyperlink.SetParagraph(this.oCurPar);
-					oCurHyperlink.Set_Value( hyperLink.Hyperlink );
-					if(hyperLink.Tooltip)
+					oCurHyperlink.Set_Value(hyperLink.Hyperlink);
+					if (hyperLink.Tooltip) {
 						oCurHyperlink.SetToolTip(hyperLink.Tooltip);
+					}
 				}
-				
+
 				var value2 = range.getValue2();
-				for(var n = 0; n < value2.length; n++)
-				{
+				for (var n = 0; n < value2.length; n++) {
 					var oCurRun = new ParaRun(oCurPar);
 					var format = value2[n].format;
-					
+
 					//***text property***
 					oCurRun.Pr.Bold = format.getBold();
 					var fc = format.getColor();
-					if(fc)
+					if (fc) {
 						oCurRun.Pr.Color = new CDocumentColor(fc.getR(), fc.getG(), fc.getB());
-					
+					}
+
 					//font					
 					var font_family = format.getName();
 					addFont(font_family);
 					oCurRun.Pr.FontFamily = font_family;
 					var oFontItem = this.oFonts[font_family];
-					if(null != oFontItem && null != oFontItem.Name)
-					{
+					if (null != oFontItem && null != oFontItem.Name) {
 						oCurRun.Pr.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
 						oCurRun.Pr.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
 						oCurRun.Pr.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
 						oCurRun.Pr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 					}
-					
+
 					oCurRun.Pr.FontSize = format.getSize();
 					oCurRun.Pr.Italic = format.getItalic();
 					oCurRun.Pr.Strikeout = format.getStrikeout();
-					oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
-					
+					oCurRun.Pr.Underline = format.getUnderline() !== 2;
+
 					//text
 					var value = value2[n].text;
-					for(var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
-					{
+					for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
 						var nUnicode = oIterator.value();
 
 						var Item;
-						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText(nUnicode);
-						else
+						} else {
 							Item = new ParaSpace();
+						}
 
 						//add text
 						oCurRun.AddToContent(-1, Item, false);
 					}
-					
+
 					//add run
-					if(oCurHyperlink)
+					if (oCurHyperlink) {
 						oCurHyperlink.Add_ToContent(n, oCurRun, false);
-					else
+					} else {
 						oCurPar.Internal_Content_Add(n, oCurRun, false);
+					}
 				}
-				
-				if(oCurHyperlink)
+
+				if (oCurHyperlink) {
 					oCurPar.Internal_Content_Add(n, oCurHyperlink, false);
-				
+				}
+
 				j = j + gridSpan - 1;
 			}
-			//if((i + vMerge - 1) == diffRow)
-				//i = i + vMerge - 1;	
 		}
-		
+
 		return fonts;
 	},
 
+	_convertTableFromExcelForChartTitle: function (aContentExcel) {
+		var worksheet = aContentExcel.workbook.aWorksheets[0];
+		var range;
+		var tempActiveRef = aContentExcel.activeRange;
+		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
+		var t = this;
+		var fonts = [];
 
-    _convertTableFromExcelForChartTitle: function(aContentExcel)
-    {
-        var worksheet = aContentExcel.workbook.aWorksheets[0];
-        var range;
-        var tempActiveRef = aContentExcel.activeRange;
-        var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
-        var t = this;
-        var fonts = [];
+		var addFont = function (fontFamily) {
+			if (!t.aContent.fonts) {
+				t.aContent.fonts = [];
+			}
 
-        var addFont = function(fontFamily)
-        {
-            if(!t.aContent.fonts)
-                t.aContent.fonts = [];
+			if (!t.oFonts) {
+				t.oFonts = [];
+			}
 
-            if(!t.oFonts)
-                t.oFonts = [];
+			t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
+			fonts.push(new CFont(fontFamily, 0, "", 0));
+		};
 
-            t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
-            fonts.push(new CFont(fontFamily, 0, "", 0));
-        };
+		var paragraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, true);
+		this.aContent.push(paragraph);
 
-        var paragraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, true);
-        this.aContent.push(paragraph);
+		var diffRow = activeRange.r2 - activeRange.r1;
+		var diffCol = activeRange.c2 - activeRange.c1;
+		for (var i = 0; i <= diffRow; i++) {
+			for (var j = 0; j <= diffCol; j++) {
+				range = worksheet.getCell3(i + activeRange.r1, j + activeRange.c1);
+				var isMergedCell = range.hasMerged();
+				var gridSpan = 1;
+				var vMerge = 1;
+				if (isMergedCell) {
+					gridSpan = isMergedCell.c2 - isMergedCell.c1 + 1;
+					vMerge = isMergedCell.r2 - isMergedCell.r1 + 1;
+				}
 
-        var diffRow = activeRange.r2 - activeRange.r1;
-        var diffCol = activeRange.c2 - activeRange.c1;
-        for(var i = 0; i <= diffRow; i++)
-        {
-            for(var j = 0; j <= diffCol; j++)
-            {
-                var range = worksheet.getCell3(i + activeRange.r1, j + activeRange.c1);
-                var isMergedCell = range.hasMerged();
-                var gridSpan = 1;
-                var vMerge = 1;
-                if(isMergedCell)
-                {
-                    gridSpan = isMergedCell.c2 - isMergedCell.c1 + 1;
-                    vMerge = isMergedCell.r2 - isMergedCell.r1 + 1;
-                }
+				var hyperLink = range.getHyperlink();
+				var oCurHyperlink = null;
+				if (hyperLink) {
+					oCurHyperlink = new ParaHyperlink();
+					oCurHyperlink.SetParagraph(paragraph);
+					oCurHyperlink.Set_Value(hyperLink.Hyperlink);
+					if (hyperLink.Tooltip) {
+						oCurHyperlink.SetToolTip(hyperLink.Tooltip);
+					}
+				}
 
-                var hyperLink = range.getHyperlink();
-                var oCurHyperlink = null;
-                if(hyperLink)
-                {
-                    var oCurHyperlink = new ParaHyperlink();
-                    oCurHyperlink.SetParagraph(paragraph);
-                    oCurHyperlink.Set_Value( hyperLink.Hyperlink );
-                    if(hyperLink.Tooltip)
-                        oCurHyperlink.SetToolTip(hyperLink.Tooltip);
-                }
+				var value2 = range.getValue2();
+				for (var n = 0; n < value2.length; n++) {
+					var oCurRun = new ParaRun(paragraph);
+					var format = value2[n].format;
 
-                var value2 = range.getValue2();
-                for(var n = 0; n < value2.length; n++)
-                {
-                    var oCurRun = new ParaRun(paragraph);
-                    var format = value2[n].format;
+					//***text property***
+					oCurRun.Pr.Bold = format.getBold();
+					var fc = format.getColor();
+					if (fc) {
+						oCurRun.Set_Unifill(AscFormat.CreateUnfilFromRGB(fc.getR(), fc.getG(), fc.getB()), true);
+					}
 
-                    //***text property***
-                    oCurRun.Pr.Bold = format.getBold();
-                    var fc = format.getColor();
-                    if(fc)
-                    {
-                        oCurRun.Set_Unifill(AscFormat.CreateUnfilFromRGB(fc.getR(), fc.getG(), fc.getB()), true);
-                    }
+					//font
+					var font_family = format.getName();
+					addFont(font_family);
+					var oFontItem = this.oFonts[font_family];
+					if (null != oFontItem && null != oFontItem.Name) {
+						oCurRun.Set_RFonts_Ascii({Name: oFontItem.Name, Index: oFontItem.Index});
+						oCurRun.Set_RFonts_HAnsi({Name: oFontItem.Name, Index: oFontItem.Index});
+						oCurRun.Set_RFonts_CS({Name: oFontItem.Name, Index: oFontItem.Index});
+						oCurRun.Set_RFonts_EastAsia({Name: oFontItem.Name, Index: oFontItem.Index});
+					}
 
-                    //font
-                    var font_family = format.getName();
-                    addFont(font_family);
-                    var oFontItem = this.oFonts[font_family];
-                    if(null != oFontItem && null != oFontItem.Name)
-                    {
-                        oCurRun.Set_RFonts_Ascii({Name: oFontItem.Name, Index: oFontItem.Index});
-                        oCurRun.Set_RFonts_HAnsi({Name: oFontItem.Name, Index: oFontItem.Index});
-                        oCurRun.Set_RFonts_CS({Name: oFontItem.Name, Index: oFontItem.Index});
-                        oCurRun.Set_RFonts_EastAsia({Name: oFontItem.Name, Index: oFontItem.Index});
-                    }
+					oCurRun.Set_FontSize(format.getSize());
+					oCurRun.Set_Italic(format.getItalic());
+					oCurRun.Set_Strikeout(format.getStrikeout());
+					oCurRun.Set_Underline(format.getUnderline() !== 2 ? true : false);
 
-                    oCurRun.Set_FontSize(format.getSize());
-                    oCurRun.Set_Italic(format.getItalic());
-                    oCurRun.Set_Strikeout(format.getStrikeout());
-                    oCurRun.Set_Underline(format.getUnderline() !== 2 ? true : false);
-
-                    //text
-                    var value = value2[n].text;
-					for(var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
-					{
+					//text
+					var value = value2[n].text;
+					for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
 						var nUnicode = oIterator.value();
 
 						var Item;
-						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
+						if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText(nUnicode);
-						else
+						} else {
 							Item = new ParaSpace();
+						}
 
 						//add text
 						oCurRun.AddToContent(-1, Item, false);
 					}
 
-                    if(i !== diffRow || j !== diffCol)
-                    {
-                        oCurRun.Add_ToContent(k, new ParaSpace(), false);
-                    }
+					if (i !== diffRow || j !== diffCol) {
+						oCurRun.Add_ToContent(oIterator.position(), new ParaSpace(), false);
+					}
 
-                    //add run
-                    if(oCurHyperlink)
-                        oCurHyperlink.Add_ToContent(n, oCurRun, false);
-                    else
-                        paragraph.Internal_Content_Add(paragraph.Content.length-1, oCurRun, false);
-                }
+					//add run
+					if (oCurHyperlink) {
+						oCurHyperlink.Add_ToContent(n, oCurRun, false);
+					} else {
+						paragraph.Internal_Content_Add(paragraph.Content.length - 1, oCurRun, false);
+					}
+				}
 
-                if(oCurHyperlink)
-                    paragraph.Internal_Content_Add(paragraph.Content.length-1, oCurHyperlink, false);
+				if (oCurHyperlink) {
+					paragraph.Internal_Content_Add(paragraph.Content.length - 1, oCurHyperlink, false);
+				}
 
-                j = j + gridSpan - 1;
-            }
-            //if((i + vMerge - 1) == diffRow)
-            //i = i + vMerge - 1;
-        }
+				j = j + gridSpan - 1;
+			}
+		}
 
-        return fonts;
-    },
+		return fonts;
+	},
 
 	_convertTableToPPTX: function(table, isFromWord)
 	{
@@ -7741,6 +7706,8 @@ PasteProcessor.prototype =
 			//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
 			value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '');
 			value = value.replace(/(\r|\t|\n)/g, ' ');
+
+			var Item;
 			if (value.length > 0) {
 				if (bPresentation) {
 					oThis.oDocument = shape.txBody.content;
@@ -7754,7 +7721,7 @@ PasteProcessor.prototype =
 
 					if (!oThis.bIsPlainText) {
 						var rPr = oThis._read_rPr(node.parentNode);
-						var Item = new ParaTextPr(rPr);
+						Item = new ParaTextPr(rPr);
 						shape.paragraphAdd(Item);
 					}
 				} else {
@@ -7781,8 +7748,6 @@ PasteProcessor.prototype =
 					{
 						if (null !== nUnicode)
 						{
-							var Item;
-
 							if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode)
 								Item = new ParaText(nUnicode);
 							else
@@ -7795,7 +7760,6 @@ PasteProcessor.prototype =
 					{
 						if (null != nUnicode)
 						{
-							var Item;
 							if (0x20 !== nUnicode && 0x2009 !== nUnicode)
 							{
 								Item = new ParaText(nUnicode);
@@ -9056,38 +9020,34 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         _api.pre_Paste(aPrepeareFonts, _images, _callback);
 }
 
-function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
-{
-	if (bIsAddTabBefore)
+function addTextIntoRun(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter) {
+	if (bIsAddTabBefore) {
 		oCurRun.AddToContent(-1, new ParaTab(), false);
+	}
 
-	for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
-	{
+	for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
 		var nUnicode = oIterator.value();
 
 		var bIsSpace = true;
 		var Item;
-		if (0x2009 === nUnicode || 9 === nUnicode)
-		{
+		if (0x2009 === nUnicode || 9 === nUnicode) {
 			Item = new ParaTab();
-		}
-		else if (0x20 !== nUnicode && 0xA0 !== nUnicode)
-		{
-			Item     = new ParaText(nUnicode);
+		} else if (0x20 !== nUnicode && 0xA0 !== nUnicode) {
+			Item = new ParaText(nUnicode);
 			bIsSpace = false;
-		}
-		else
-		{
+		} else {
 			Item = new ParaSpace();
 		}
 
 		//add text
-		if (!(dNotAddLastSpace && k === value.length - 1 && bIsSpace))
+		if (!(dNotAddLastSpace && oIterator.position() === value.length - 1 && bIsSpace)) {
 			oCurRun.AddToContent(-1, Item, false);
+		}
 	}
 
-	if (bIsAddTabAfter)
+	if (bIsAddTabAfter) {
 		oCurRun.AddToContent(-1, new ParaTab(), false);
+	}
 }
 
 function searchBinaryClass(node)
