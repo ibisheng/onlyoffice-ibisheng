@@ -9630,6 +9630,18 @@ $( function () {
 		ok( oParser.parse(), "ADDRESS(2,3,,FALSE,1)" );
 		strictEqual( oParser.calculate().getValue(), "'1'!R2C3", "ADDRESS(2,3,,FALSE,1)");
 
+		oParser = new parserFormula( "ADDRESS(2,3,,FALSE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,FALSE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!R2C3", "ADDRESS(2,3,,FALSE,1)");
+
+		oParser = new parserFormula( "ADDRESS(1,7,,)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(1,7,,)" );
+		strictEqual( oParser.calculate().getValue(), "$G$1", "ADDRESS(1,7,,)");
+
+		oParser = new parserFormula( "ADDRESS(1,7,,,)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(1,7,,,)" );
+		strictEqual( oParser.calculate().getValue(), "$G$1", "ADDRESS(1,7,,,)");
+
 	} );
 
 	wb.dependencyFormulas.unlockRecal();

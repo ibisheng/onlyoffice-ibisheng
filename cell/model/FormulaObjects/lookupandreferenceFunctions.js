@@ -145,6 +145,8 @@ function (window, undefined) {
 				sheetName = sheetName.getElementRowCol(0, 0);
 			} else if (cElementType.cell === sheetName.type || cElementType.cell3D === sheetName.type) {
 				sheetName = sheetName.getValue();
+			} else if (cElementType.empty === sheetName.type) {
+				sheetName = null;
 			}
 		}
 
