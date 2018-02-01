@@ -7504,9 +7504,9 @@ background-repeat: no-repeat;\
 				{
 					// TODO: Разобраться с тем, чтобы пересчет не вызывался в фунции AddToParagraph
 					oLogicDocument.TurnOff_Recalculate();
-					for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+					for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
 					{
-						oContentControl.AddToParagraph(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
+						oContentControl.AddToParagraph(new AscCommonWord.ParaText(oIterator.value()));
 					}
 					oLogicDocument.SelectContentControl(oContentControl.GetId());
 					oLogicDocument.TurnOn_Recalculate();
@@ -7536,9 +7536,9 @@ background-repeat: no-repeat;\
 				{
 					if (oContentControl.IsEmpty())
 					{
-						for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+						for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
 						{
-							oContentControl.Add(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
+							oContentControl.Add(new AscCommonWord.ParaText(oIterator.value()));
 						}
 						oContentControl.SelectThisElement();
 					}
