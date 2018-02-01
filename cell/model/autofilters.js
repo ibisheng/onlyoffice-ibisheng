@@ -1102,8 +1102,9 @@
 						}
 					}
 				}
-				else if(type === AscCH.historyitem_AutoFilter_Apply)//apply
+				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart)))//apply
 				{
+					//TODO заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
 					//ипользуется целиком объект фильтра/фт(cloneData)
 					if(cloneData.Ref)
 					{
