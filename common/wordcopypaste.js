@@ -3436,6 +3436,9 @@ PasteProcessor.prototype =
 				if (false === oThis.bNested) {
 					var oIdMap = {};
 					var aCopies = [];
+
+                    var l = null, t = null, r = null, b = null, oXfrm;
+
 					for (var i = 0; i < arr_shapes.length; ++i) {
 						shape = arr_shapes[i].graphicObject.copy();
 						aCopies.push(shape);
@@ -3444,8 +3447,62 @@ PasteProcessor.prototype =
 						shape.drawingBase = null;
 
 						arr_shapes[i] = new DrawingCopyObject(shape, 0, 0, 0, 0);
+                        if(shape.spPr && shape.spPr.xfrm && AscFormat.isRealNumber(shape.spPr.xfrm.offX) && AscFormat.isRealNumber(shape.spPr.xfrm.offY)
+                            && AscFormat.isRealNumber(shape.spPr.xfrm.extX) && AscFormat.isRealNumber(shape.spPr.xfrm.extY)) {
+                            oXfrm = shape.spPr.xfrm;
+                            if(l === null){
+                                l = oXfrm.offX;
+                            }
+                            else{
+                                if(oXfrm.offX < l){
+                                    l = oXfrm.offX;
+                                }
+                            }
+                            if(t === null){
+                                t = oXfrm.offY;
+                            }
+                            else{
+                                if(oXfrm.offY < t){
+                                    t = oXfrm.offY;
+                                }
+                            }
+                            if(r === null){
+                                r = oXfrm.offX + oXfrm.extX;
+                            }
+                            else{
+                                if(oXfrm.offX + oXfrm.extX > r){
+                                    r = oXfrm.offX + oXfrm.extX;
+                                }
+                            }
+                            if(b === null){
+                                b = oXfrm.offY + oXfrm.extY;
+                            }
+                            else{
+                                if(oXfrm.offY + oXfrm.extY > b){
+                                    b = oXfrm.offY + oXfrm.extY;
+                                }
+                            }
+                        }
 					}
-
+					if(AscFormat.isRealNumber(l) && AscFormat.isRealNumber(t)
+                        && AscFormat.isRealNumber(r) && AscFormat.isRealNumber(b)){
+                        var fSlideCX = presentation.Width/2.0;
+                        var fSlideCY = presentation.Height/2.0;
+                        var fBoundsCX = (r+l)/2.0;
+                        var fBoundsCY = (t+b)/2.0;
+                        var fDiffX =  fBoundsCX - fSlideCX;
+                        var fDiffY =  fBoundsCY - fSlideCY;
+                        if(!AscFormat.fApproxEqual(fDiffX, 0) || !AscFormat.fApproxEqual(fDiffY, 0)){
+                            for (var i = 0; i < arr_shapes.length; ++i) {
+                                shape = arr_shapes[i].Drawing;
+                                if(shape.spPr && shape.spPr.xfrm && AscFormat.isRealNumber(shape.spPr.xfrm.offX) && AscFormat.isRealNumber(shape.spPr.xfrm.offY)
+                                    && AscFormat.isRealNumber(shape.spPr.xfrm.extX) && AscFormat.isRealNumber(shape.spPr.xfrm.extY)) {
+                                    shape.spPr.xfrm.setOffX(shape.spPr.xfrm.offX - fDiffX);
+                                    shape.spPr.xfrm.setOffY(shape.spPr.xfrm.offY - fDiffY);
+                                }
+                            }
+                        }
+                    }
 					AscFormat.fResetConnectorsIds(aCopies, oIdMap);
 
 					var presentationSelectedContent = new PresentationSelectedContent();
