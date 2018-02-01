@@ -1668,6 +1668,10 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.StartTime = 0;
 
+    // Кэш для некоторых запросов, которые могут за раз делаться несколько раз
+    this.AllParagraphsList = null;
+    this.AllFootnotesList  = null;
+
 	//------------------------------------------------------------------------------------------------------------------
 	//  Check StartCollaborationEditing
 	//------------------------------------------------------------------------------------------------------------------
@@ -10433,6 +10437,9 @@ CDocument.prototype.UnlockPanelStyles = function(isUpdate)
 };
 CDocument.prototype.GetAllParagraphs = function(Props)
 {
+	if (Props && true === Props.OnlyMainDocument && true === Props.All && null !== this.AllParagraphsList)
+		return this.AllParagraphsList;
+
 	var ParaArray = [];
 
 	if (true === Props.OnlyMainDocument)
@@ -10457,6 +10464,9 @@ CDocument.prototype.GetAllParagraphs = function(Props)
 
 		this.Footnotes.GetAllParagraphs(Props, ParaArray);
 	}
+
+	if (Props && true === Props.OnlyMainDocument && true === Props.All)
+		this.AllParagraphsList = ParaArray;
 
 	return ParaArray;
 };
@@ -11929,6 +11939,18 @@ CDocument.prototype.GetFootnotePr = function()
 CDocument.prototype.IsCursorInFootnote = function()
 {
 	return (docpostype_Footnotes === this.Get_DocPosType() ? true : false);
+};
+CDocument.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
+{
+	if (null === oFirstFootnote && null === oLastFootnote && null !== this.AllFootnotesList)
+		return this.AllFootnotesList;
+
+	var arrFootnotes = CDocumentContentBase.prototype.Get_FootnotesList.apply(this, arguments);
+
+	if (null === oFirstFootnote && null === oLastFootnote)
+		this.AllFootnotesList = arrFootnotes;
+
+	return arrFootnotes;
 };
 CDocument.prototype.TurnOffCheckChartSelection = function()
 {
@@ -16429,6 +16451,14 @@ CDocument.prototype.GetTableOfContents = function()
 
 	return null;
 };
+/**
+ * Событие, которое вызывается на содании новой точки в истории
+ */
+CDocument.prototype.OnCreateNewHistoryPoint = function()
+{
+	this.AllParagraphsList = null;
+	this.AllFootnotesList  = null;
+};
 
 function CDocumentSelectionState()
 {
@@ -16848,6 +16878,10 @@ CTrackRevisionsManager.prototype.Get_ParagraphChanges = function(ParaId)
 };
 CTrackRevisionsManager.prototype.Continue_TrackRevisions = function()
 {
+	// За раз обрабатываем не больше 50 параграфов, чтобы не подвешивать клиент на открытии файлов
+	var nMaxCounter = 50,
+		nCounter    = 0;
+
     var bNeedUpdate = false;
     for (var ParaId in this.CheckPara)
     {
@@ -16859,6 +16893,10 @@ CTrackRevisionsManager.prototype.Continue_TrackRevisions = function()
             Para.Check_RevisionsChanges(this);
             bNeedUpdate = true;
         }
+
+        ++nCounter;
+        if (nCounter >= nMaxCounter)
+        	break;
     }
 
     if (bNeedUpdate)

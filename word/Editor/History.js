@@ -330,6 +330,9 @@ CHistory.prototype =
 		if ( 0 !== this.TurnOffHistory )
 			return;
 
+		if (this.Document && this.Document.OnCreateNewHistoryPoint)
+			this.Document.OnCreateNewHistoryPoint();
+
         this.CanNotAddChanges = false;
 		this.CollectChanges   = false;
 
