@@ -5971,13 +5971,11 @@ RangeDataManager.prototype = {
 				var cell = worksheet.getCell3(i, colId + this.Ref.c1);
 				var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 				var isNumberFilter = false;
-				if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 ||
-					newFilterColumn.DynamicFilter) {
+				if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter) {
 					isNumberFilter = true;
 				}
 
-				var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() :
-					cell.getValueWithFormat();
+				var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
 				currentValue = window["Asc"].trim(currentValue);
 				var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
 
@@ -6015,7 +6013,7 @@ RangeDataManager.prototype = {
 			}
 		}
 
-		return {nOpenRowsCount: nRowsCount - nHiddenRowCount, nAllRowsCount: endRow - startRow + 1};
+		return {nOpenRowsCount: nRowsCount - nHiddenRowCount, nAllRowsCount: endRow - startRow + 1, minChangeRow: minChangeRow};
 	};
 
 

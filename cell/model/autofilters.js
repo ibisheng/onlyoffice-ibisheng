@@ -696,6 +696,7 @@
 					var hiddenProps = autoFilter.setRowHidden(worksheet, newFilterColumn);
 					nOpenRowsCount = hiddenProps.nOpenRowsCount;
 					nAllRowsCount = hiddenProps.nAllRowsCount;
+					minChangeRow = hiddenProps.minChangeRow;
 				}
 
 				//history
