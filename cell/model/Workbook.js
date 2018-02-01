@@ -2021,11 +2021,11 @@
 		var aRes = [];
 		//соединяем изменения, которые были до приема данных с теми, что получились после.
 
-		var worksheets = this.aWorksheets, t, j, length2;
-		for(t = 0; t < worksheets.length; ++t)
-		{
-			worksheets[t] && worksheets[t].refreshContentChanges();
-		}
+		var t, j, length2;
+
+		// Пересчитываем позиции
+		AscCommon.CollaborativeEditing.Refresh_DCChanges();
+
 		var aActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 		if(aActions.length > 0)
 		{

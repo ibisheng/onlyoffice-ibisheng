@@ -5950,7 +5950,7 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaTab());
                 };
-                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddTab)
+                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddTab, undefined, window["Asc"]["editor"].collaborativeEditing.getFast())
             }
             else
             {
@@ -5972,7 +5972,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph);
+                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
                     this.recalculate();
                 }
             }
@@ -6061,7 +6061,7 @@ DrawingObjectsController.prototype =
                 {
                     oThis.paragraphAdd(new ParaSpace(1));
                 };
-                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace);
+                this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
                 //}
                // else
                // {
@@ -6330,7 +6330,7 @@ DrawingObjectsController.prototype =
                     Item = new ParaText("-".charCodeAt(0));
                 oThis.paragraphAdd(Item);
             };
-            this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem);
+            this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddItem, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
             bRetValue = true;
         }
         else if ( e.keyCode == 190 && true === ctrlKey ) // Ctrl + .
@@ -8450,17 +8450,20 @@ DrawingObjectsController.prototype =
         }
     },
 
-    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionalObjects)
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionalObjects, bNoCheckLock)
     {
         var selection_state = this.getSelectionState();
-        this.drawingObjects.objectLocker.reset();
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        if(!(bNoCheckLock === true))
         {
-            this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
-        }
-        if(aAdditionalObjects){
-            for(var i = 0; i < aAdditionalObjects.length; ++i){
-                this.drawingObjects.objectLocker.addObjectId(aAdditionalObjects[i].Get_Id());
+            this.drawingObjects.objectLocker.reset();
+            for(var i = 0; i < this.selectedObjects.length; ++i)
+            {
+                this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
+            }
+            if(aAdditionalObjects){
+                for(var i = 0; i < aAdditionalObjects.length; ++i){
+                    this.drawingObjects.objectLocker.addObjectId(aAdditionalObjects[i].Get_Id());
+                }
             }
         }
         var _this = this;
@@ -8491,7 +8494,12 @@ DrawingObjectsController.prototype =
                 }
             }
         };
-        return this.drawingObjects.objectLocker.checkObjects(callback2);
+        if(!(bNoCheckLock === true))
+        {
+            return this.drawingObjects.objectLocker.checkObjects(callback2);
+        }
+        callback2(true, true);
+        return true;
     },
 
     checkSelectedObjectsAndCallbackNoCheckLock: function(callback, args, bNoSendProps, nHistoryPointType)

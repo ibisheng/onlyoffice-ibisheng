@@ -53,7 +53,8 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
 AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	this.m_pData.Pos = this.m_aPositions[0];
-
+    this.m_pData.UseArray = true;
+    this.m_pData.PosArray = this.m_aPositions;
 	if(editor && editor.isPresentationEditor)
 	{
 		var Binary_Writer = History.BinaryWriter;
@@ -620,14 +621,15 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     var bRetValue = false;
     if ( Code > 0x20 )
     {
-        this.checkSelectedObjectsAndCallback(function(){
+        var oApi = window["Asc"] && window["Asc"]["editor"];
+        var fCallback = function(){
             this.paragraphAdd( new ParaText(Code), false );
             this.checkMobileCursorPosition();
-        }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
+        };
+        this.checkSelectedObjectsAndCallback(fCallback, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
+
         bRetValue = true;
     }
-    //if ( true == bRetValue )
-    //    this.updateSelectionState();
     return bRetValue;
 };
 //------------------------------------------------------------export---------------------------------------------------

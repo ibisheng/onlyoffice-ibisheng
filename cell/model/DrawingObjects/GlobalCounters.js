@@ -237,21 +237,6 @@ CCollaborativeEditing.prototype.Add_NewObject = function(Class)
 CCollaborativeEditing.prototype.OnEnd_ReadForeignChanges = function()
 {
 };
-
-//-----------------------------------------------------------------------------------
-// Функции для работы с массивом m_aDC
-//-----------------------------------------------------------------------------------
-CCollaborativeEditing.prototype.Add_NewDC = function(Class)
-{
-};
-
-CCollaborativeEditing.prototype.Clear_DCChanges = function()
-{
-};
-
-CCollaborativeEditing.prototype.Refresh_DCChanges = function()
-{
-};
 //-----------------------------------------------------------------------------------
 // Функции для работы с отметками изменений
 //-----------------------------------------------------------------------------------

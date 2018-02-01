@@ -735,6 +735,18 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		curPoint.UndoSheetId = sheetid;
 	if(1 == curPoint.Items.length)
 		this._sendCanUndoRedo();
+
+	if (Class)
+	{
+		if (Class.IsContentChange && Class.IsContentChange()) {
+			var bAdd = Class.IsAdd();
+			var Count = Class.GetItemsCount();
+
+			var ContentChanges = new AscCommon.CContentChangesElement(bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove, Class.Pos, Count, Class);
+			Class.Class.Add_ContentChanges(ContentChanges);
+			AscCommon.CollaborativeEditing.Add_NewDC(Class.Class);
+		}
+	}
 };
 
 CHistory.prototype._sendCanUndoRedo = function()
