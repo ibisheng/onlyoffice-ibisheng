@@ -1268,7 +1268,7 @@ ParaRun.prototype.Concat_ToContent = function(NewItems)
 ParaRun.prototype.AddText = function(sString, nPos)
 {
 	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
-	for (var oIterator = sString.getUnicodeIterator(), nTempPos = 0; oIterator.check(); oIterator.next(), ++nTempPos)
+	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
 	{
 		var nCharCode = oIterator.value();
 
@@ -1291,10 +1291,10 @@ ParaRun.prototype.AddText = function(sString, nPos)
  */
 ParaRun.prototype.AddInstrText = function(sString, nPos)
 {
-	var nShift = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
+	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
 	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
 	{
-		this.AddToContent(nShift + nTempPos, new ParaText(oIterator.value()));
+		this.AddToContent(nCharPos++, new ParaText(oIterator.value()));
 	}
 };
 
