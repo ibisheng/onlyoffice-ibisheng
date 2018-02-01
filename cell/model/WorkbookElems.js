@@ -5928,6 +5928,30 @@ RangeDataManager.prototype = {
 		return this;
 	};
 
+	AutoFilter.prototype.hiddenByAnotherFilter = function (worksheet, cellId, row, col) {
+		var result = false;
+
+		var filterColumns = this.FilterColumns;
+		if (filterColumns) {
+			for (var j = 0; j < filterColumns.length; j++) {
+				var colId = filterColumns[j].ColId;
+				if (colId !== cellId) {
+					var cell = worksheet.getCell3(row, colId + col);
+					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+
+					var isNumberFilter = filterColumns[j].isApplyCustomFilter();
+					var val = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
+					if (filterColumns[j].isHideValue(val, isDateTimeFormat, null, cell)) {
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	};
+
 
 	function FilterColumns() {
 		this.ColId = null;
