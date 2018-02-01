@@ -5467,11 +5467,18 @@ background-repeat: no-repeat;\
 	// HyperProps - объект CHyperlinkProperty
 	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 	{
-        AscFonts.FontPickerByCharacter.checkText(HyperProps.Text, this, function() {
+		if(null !== HyperProps.Text && undefined !== HyperProps.Text)
+		{
+			AscFonts.FontPickerByCharacter.checkText(HyperProps.Text, this, function() {
 
-            this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
+				this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
 
-        });
+			});
+		}
+		else
+		{
+			this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
+		}
 	};
 
 	// HyperProps - объект CHyperlinkProperty

@@ -4479,54 +4479,8 @@ CShape.prototype.getFullOffset = function () {
     return { offX: this.x + group_offset.offX, offY: this.y + group_offset.offY };
 };
 
-CShape.prototype.getPresetGeom = function () {
-    if (this.spPr && this.spPr.geometry) {
-        return this.spPr.geometry.preset;
-    }
-    else {
-        return null;
-    }
-};
 
-CShape.prototype.getFill = function () {
-    if(this.brush && this.brush.fill)
-    {
-        return this.brush;
-    }
-    return AscFormat.CreateNoFillUniFill();
-};
 
-CShape.prototype.getStroke = function () {
-    if(this.pen && this.pen.Fill)
-    {
-        return this.pen;
-    }
-    var ret = AscFormat.CreateNoFillLine();
-    ret.w = 0;
-    return ret;
-};
-
-CShape.prototype.canChangeArrows = function () {
-    if (!this.spPr || this.spPr.geometry == null) {
-        return false;
-    }
-    var _path_list = this.spPr.geometry.pathLst;
-    var _path_index;
-    var _path_command_index;
-    var _path_command_arr;
-    for (_path_index = 0; _path_index < _path_list.length; ++_path_index) {
-        _path_command_arr = _path_list[_path_index].ArrPathCommandInfo;
-        for (_path_command_index = 0; _path_command_index < _path_command_arr.length; ++_path_command_index) {
-            if (_path_command_arr[_path_command_index].id == 5) {
-                break;
-            }
-        }
-        if (_path_command_index == _path_command_arr.length) {
-            return true;
-        }
-    }
-    return false;
-};
 
 CShape.prototype.getTextArtProperties = function()
 {
