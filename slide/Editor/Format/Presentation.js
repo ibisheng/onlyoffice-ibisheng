@@ -967,10 +967,18 @@ CPresentation.prototype =
         var oRun = this.CompositeInput.Run;
         var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
         var oChar;
-        if (32 == nCharCode || 12288 == nCharCode)
-            oChar = new ParaSpace();
+        if (para_Math_Run === oRun.Type)
+        {
+            oChar = new CMathText();
+            oChar.add(nCharCode);
+        }
         else
-            oChar = new ParaText(nCharCode);
+        {
+            if (32 == nCharCode || 12288 == nCharCode)
+                oChar = new ParaSpace();
+            else
+                oChar = new ParaText(nCharCode);
+        }
         oRun.AddToContent(nPos, oChar, true);
         this.CompositeInput.Length++;
     },
