@@ -17189,7 +17189,7 @@ CTrackRevisionsManager.prototype.private_GetVisibleChangesXY = function()
 };
 CTrackRevisionsManager.prototype.Get_AllChangesLogicDocuments = function()
 {
-    this.Continue_TrackRevisions();
+	this.CompleteTrackChanges();
     var LogicDocuments = {};
 
     for (var ParaId in this.Changes)
@@ -17311,8 +17311,25 @@ CTrackRevisionsManager.prototype.private_HaveParasToCheck = function()
 };
 CTrackRevisionsManager.prototype.Get_AllChanges = function()
 {
-	this.Continue_TrackRevisions();
+	this.CompleteTrackChanges();
 	return this.Changes;
+};
+CTrackRevisionsManager.prototype.private_IsAllParagraphsChecked = function()
+{
+	for (var ParaId in this.CheckPara)
+	{
+		return false;
+	}
+
+	return true;
+};
+/**
+ * Завершаем проверку всех элементов на наличие рецензирования
+ */
+CTrackRevisionsManager.prototype.CompleteTrackChanges = function()
+{
+	while (!this.private_IsAllParagraphsChecked())
+		this.Continue_TrackRevisions();
 };
 
 function CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, TrackManager)
