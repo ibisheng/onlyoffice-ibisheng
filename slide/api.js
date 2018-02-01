@@ -5855,18 +5855,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.can_AddHyperlink            = function()
-	{
-		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink();
-		if (true === bCanAdd)
-			return this.WordControl.m_oLogicDocument.GetSelectedText(true);
-
-		return false;
-	};
-	asc_docs_api.prototype.add_Hyperlink               = function(HyperProps)
-	{
-		this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
-	};
 	asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
 	{
 		var indAction = Url.indexOf("ppaction://hlink");
@@ -7519,8 +7507,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetDeviceInputHelperId']              = asc_docs_api.prototype.SetDeviceInputHelperId;
 	asc_docs_api.prototype['asc_setViewMode']                     = asc_docs_api.prototype.asc_setViewMode;
 	asc_docs_api.prototype['asc_setRestriction']                  = asc_docs_api.prototype.asc_setRestriction;
-	asc_docs_api.prototype['can_AddHyperlink']                    = asc_docs_api.prototype.can_AddHyperlink;
-	asc_docs_api.prototype['add_Hyperlink']                       = asc_docs_api.prototype.add_Hyperlink;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']         = asc_docs_api.prototype.sync_HyperlinkClickCallback;
 	asc_docs_api.prototype['UpdateInterfaceState']                = asc_docs_api.prototype.UpdateInterfaceState;
 	asc_docs_api.prototype['OnMouseUp']                           = asc_docs_api.prototype.OnMouseUp;
