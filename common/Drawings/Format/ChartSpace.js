@@ -6124,9 +6124,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                     max_width = cur_width;
                                 if(t.h > max_val_labels_text_height)
                                     max_val_labels_text_height = t.h;
-                                val_ax.labels.arrLabels.push(dlbl);
+                                ser_ax.labels.arrLabels.push(dlbl);
                             }
-                            ser_ax.labels.arrLabels.push(dlbl);
                         }
 
                         var ser_axis_labels_gap = ser_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
