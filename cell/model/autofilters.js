@@ -661,9 +661,8 @@
 				}
 
 				var allFilterOpenElements = newFilterColumn.createFilter(autoFiltersObject);
-				newFilterColumn.init(
-					worksheet.getRange3(autoFilter.Ref.r1 + 1, filterObj.ColId + autoFilter.Ref.c1, autoFilter.Ref.r2,
-						filterObj.ColId + autoFilter.Ref.c1));
+				newFilterColumn.init(worksheet.getRange3(autoFilter.Ref.r1 + 1, filterObj.ColId + autoFilter.Ref.c1, autoFilter.Ref.r2, filterObj.ColId + autoFilter.Ref.c1));
+
 				//for add to history
 				if (newFilterColumn.Top10 && newFilterColumn.Top10.FilterVal && autoFiltersObject.filter &&
 					autoFiltersObject.filter.filter) {
@@ -679,7 +678,6 @@
 					}
 				}
 
-
 				//автоматическое расширение диапазона а/ф
 				if (autoFiltersObject.automaticRowCount && filterObj.filter && filterObj.filter.Ref &&
 					filterObj.filter.isAutoFilter()) {
@@ -691,83 +689,17 @@
 					}
 				}
 
-
 				//****open/close rows****
 				var nOpenRowsCount = null;
 				var nAllRowsCount = null;
 				if (!bUndoChanges && !bRedoChanges) {
-					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : currentFilter.Ref.r1 + 1;
-					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
-					if (currentFilter && !currentFilter.isAutoFilter() && currentFilter.TotalsRowCount) {
-						if (currentFilter.Ref.isEqual(autoFilter.Ref)) {
-							endRow--;
-						}
-					}
-
-					var hiddenObj = {start: currentFilter.Ref.r1 + 1, h: null};
-					var nHiddenRowCount = 0;
-					var nRowsCount = 0;
-					for (var i = startRow; i <= endRow; i++) {
-						var isHidden = false;
-						if (autoFilter.FilterColumns && autoFilter.FilterColumns.length) {
-							isHidden =
-								autoFilter.hiddenByAnotherFilter(worksheet, filterObj.ColId, i, autoFilter.Ref.c1);
-						}
-
-						if (!isHidden) {
-							var cell = worksheet.getCell3(i, filterObj.ColId + autoFilter.Ref.c1);
-							var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-							var isNumberFilter = false;
-							if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 ||
-								newFilterColumn.DynamicFilter) {
-								isNumberFilter = true;
-							}
-
-							var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() :
-								cell.getValueWithFormat();
-							currentValue = window["Asc"].trim(currentValue);
-							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
-
-							if (isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null) {
-								minChangeRow = i;
-							}
-
-							//скрываем строки
-							if (hiddenObj.h === null) {
-								hiddenObj.h = isSetHidden;
-								hiddenObj.start = i;
-							} else if (hiddenObj.h !== isSetHidden) {
-								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
-								if (true === hiddenObj.h) {
-									nHiddenRowCount += i - hiddenObj.start;
-								}
-
-								hiddenObj.h = isSetHidden;
-								hiddenObj.start = i;
-							}
-
-							if (i === endRow) {
-								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i);
-								if (true === hiddenObj.h) {
-									nHiddenRowCount += i + 1 - hiddenObj.start;
-								}
-							}
-							nRowsCount++;
-						} else if (hiddenObj.h !== null) {
-							worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
-							if (true === hiddenObj.h) {
-								nHiddenRowCount += i - hiddenObj.start;
-							}
-							hiddenObj.h = null
-						}
-					}
-					nOpenRowsCount = nRowsCount - nHiddenRowCount;
-					nAllRowsCount = endRow - startRow + 1;
+					var hiddenProps = autoFilter.setRowHidden(worksheet, newFilterColumn);
+					nOpenRowsCount = hiddenProps.nOpenRowsCount;
+					nAllRowsCount = hiddenProps.nAllRowsCount;
 				}
 
 				//history
-				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Apply,
-					{activeCells: ar, autoFiltersObject: autoFiltersObject});
+				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Apply, {activeCells: ar, autoFiltersObject: autoFiltersObject});
 				History.EndTransaction();
 
 				if (!bUndoChanges && !bRedoChanges) {
@@ -775,12 +707,7 @@
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();
 
-				return {
-					minChangeRow: minChangeRow,
-					rangeOldFilter: rangeOldFilter,
-					nOpenRowsCount: nOpenRowsCount,
-					nAllRowsCount: nAllRowsCount
-				};
+				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount, nAllRowsCount: nAllRowsCount};
 			},
 			
 			reapplyAutoFilter: function (displayName, ar) 

@@ -5952,6 +5952,72 @@ RangeDataManager.prototype = {
 		return result;
 	};
 
+	AutoFilter.prototype.setRowHidden = function(worksheet, newFilterColumn) {
+		var startRow = this.Ref.r1 + 1;
+		var endRow = this.Ref.r2;
+
+		var colId = newFilterColumn.ColId;
+		var minChangeRow = null;
+		var hiddenObj = {start: this.Ref.r1 + 1, h: null};
+		var nHiddenRowCount = 0;
+		var nRowsCount = 0;
+		for (var i = startRow; i <= endRow; i++) {
+			var isHidden = false;
+			if (this.FilterColumns && this.FilterColumns.length) {
+				isHidden = this.hiddenByAnotherFilter(worksheet, colId, i, this.Ref.c1);
+			}
+
+			if (!isHidden) {
+				var cell = worksheet.getCell3(i, colId + this.Ref.c1);
+				var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+				var isNumberFilter = false;
+				if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 ||
+					newFilterColumn.DynamicFilter) {
+					isNumberFilter = true;
+				}
+
+				var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() :
+					cell.getValueWithFormat();
+				currentValue = window["Asc"].trim(currentValue);
+				var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
+
+				if (isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null) {
+					minChangeRow = i;
+				}
+
+				//скрываем строки
+				if (hiddenObj.h === null) {
+					hiddenObj.h = isSetHidden;
+					hiddenObj.start = i;
+				} else if (hiddenObj.h !== isSetHidden) {
+					worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+					if (true === hiddenObj.h) {
+						nHiddenRowCount += i - hiddenObj.start;
+					}
+
+					hiddenObj.h = isSetHidden;
+					hiddenObj.start = i;
+				}
+
+				if (i === endRow) {
+					worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i);
+					if (true === hiddenObj.h) {
+						nHiddenRowCount += i + 1 - hiddenObj.start;
+					}
+				}
+				nRowsCount++;
+			} else if (hiddenObj.h !== null) {
+				worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+				if (true === hiddenObj.h) {
+					nHiddenRowCount += i - hiddenObj.start;
+				}
+				hiddenObj.h = null
+			}
+		}
+
+		return {nOpenRowsCount: nRowsCount - nHiddenRowCount, nAllRowsCount: endRow - startRow + 1};
+	};
+
 
 	function FilterColumns() {
 		this.ColId = null;
