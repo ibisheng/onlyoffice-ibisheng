@@ -92,6 +92,40 @@ AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback,
 	xhr.send(null);
 };
 
+window["DesktopUploadFileToUrl"] = function(url, dst)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ascdesktop://fonts/" + url, true);
+    xhr.responseType = 'arraybuffer';
+
+    if (xhr.overrideMimeType)
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    else
+        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+    xhr.onload = function()
+    {
+        if (this.status != 200)
+        {
+            // error
+            return;
+        }
+
+        var fileData = new Uint8Array(this.response);
+
+        var req = new XMLHttpRequest();
+        req.open("PUT", dst, true);
+
+        req.onload = function()
+		{
+        };
+
+        req.send(fileData);
+    };
+
+    xhr.send(null);
+};
+
 /////////////////////////////////////////////////////////
 //////////////       IMAGES      ////////////////////////
 /////////////////////////////////////////////////////////
