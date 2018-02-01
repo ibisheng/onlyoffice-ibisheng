@@ -710,9 +710,8 @@
 
 				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter, nOpenRowsCount: nOpenRowsCount, nAllRowsCount: nAllRowsCount};
 			},
-			
-			reapplyAutoFilter: function (displayName, ar) 
-			{
+
+			reapplyAutoFilter: function (displayName, ar) {
 				var worksheet = this.worksheet;
 				var bUndoChanges = worksheet.workbook.bUndoChanges;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
@@ -720,23 +719,24 @@
 
 				//**get filter**
 				var filter = this._getFilterByDisplayName(displayName);
-				var autoFilter = filter.getAutoFilter();
-				
-				if(filter === null)
+
+				if (filter === null) {
 					return false;
+				}
+
+				var autoFilter = filter.getAutoFilter();
 
 				worksheet.workbook.dependencyFormulas.lockRecal();
 
 				History.Create_NewPoint();
 				History.StartTransaction();
-				
+
 				//open/close rows
-				if(!bUndoChanges && !bRedoChanges)
-				{
+				if (!bUndoChanges && !bRedoChanges) {
 					var hiddenProps = autoFilter.setRowHidden(worksheet);
 					minChangeRow = hiddenProps.minChangeRow;
 				}
-				
+
 				History.EndTransaction();
 
 				worksheet.workbook.dependencyFormulas.unlockRecal();
