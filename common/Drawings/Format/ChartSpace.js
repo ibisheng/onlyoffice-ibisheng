@@ -1314,7 +1314,6 @@ CChartSpace.prototype.getAllTitles = function()
     return ret;
 };
 CChartSpace.prototype.getFill = CShape.prototype.getFill;
-CChartSpace.prototype.getStroke = CShape.prototype.getStroke;
 CChartSpace.prototype.changeSize = CShape.prototype.changeSize;
 CChartSpace.prototype.changeFill = function (unifill)
 {

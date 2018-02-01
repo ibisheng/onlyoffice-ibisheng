@@ -2824,6 +2824,10 @@ DrawingObjectsController.prototype =
             {
                 objects_by_type.charts[i].changeLine(props.stroke);
             }
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].changeLine(props.stroke);
+            }
         }
         if(isRealObject(props.fill))
         {
@@ -7460,6 +7464,36 @@ DrawingObjectsController.prototype =
                         if(image_props.description !== new_image_props.description)
                             image_props.description = undefined;
                         
+                    }
+
+
+                    new_shape_props =
+                    {
+                        canFill: false,
+                        type: drawing.getPresetGeom(),
+                        fill: drawing.getFill(),
+                        stroke: drawing.getStroke(),
+                        paddings: null,
+                        verticalTextAlign: null,
+                        vert: null,
+                        w: drawing.extX,
+                        h: drawing.extY ,
+                        canChangeArrows: drawing.canChangeArrows(),
+                        bFromChart: true,
+                        locked: locked,
+                        textArtProperties: null,
+                        lockAspect: lockAspect,
+                        title: drawing.getTitle(),
+                        description: drawing.getDescription(),
+                        columnNumber: null,
+                        columnSpace: null,
+                        signatureId: null
+                    };
+                    if(!shape_props)
+                        shape_props = new_shape_props;
+                    else
+                    {
+                        shape_props = AscFormat.CompareShapeProperties(shape_props, new_shape_props);
                     }
                     break;
                 }
