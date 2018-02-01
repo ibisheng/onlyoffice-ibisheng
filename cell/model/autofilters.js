@@ -720,7 +720,7 @@
 
 				//**get filter**
 				var filter = this._getFilterByDisplayName(displayName);
-				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
+				var autoFilter = filter.getAutoFilter();
 				
 				if(filter === null)
 					return false;
@@ -733,32 +733,8 @@
 				//open/close rows
 				if(!bUndoChanges && !bRedoChanges)
 				{
-					var hiddenObj = {start: filter.Ref.r1 + 1, h: null};
-					
-					//TODO скрытие оптимизировать аналогично функции applyAutoFilter
-					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : filter.Ref.r1 + 1;
-					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : filter.Ref.r2;
-					for(var i = startRow; i <= endRow; i++)
-					{	
-						var isHidden = false;
-						if(autoFilter.FilterColumns && autoFilter.FilterColumns.length)
-						{
-							isHidden = autoFilter.hiddenByAnotherFilter(worksheet, null, i, autoFilter.Ref.c1);
-						}
-						
-						if(isHidden !== worksheet.getRowHidden(i))
-						{
-							if(minChangeRow === null)
-							{
-								minChangeRow = i;
-							}
-						}
-						
-						if(true === isHidden)
-						{
-							worksheet.setRowHidden(isHidden, i, i);
-						}
-					}
+					var hiddenProps = autoFilter.setRowHidden(worksheet);
+					minChangeRow = hiddenProps.minChangeRow;
 				}
 				
 				History.EndTransaction();
