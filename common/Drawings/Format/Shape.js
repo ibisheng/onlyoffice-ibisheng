@@ -2024,6 +2024,18 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         _t = _c - 0.01;
         _b = _c + 0.01;
     }
+
+    var XC = oContent.XLimit/2.0;
+    var YC = _content_height/2.0;
+
+    var _rot_angle = AscFormat.normalizeRotate((AscFormat.isRealNumber(oBodyPr.rot) ? oBodyPr.rot : 0)*AscFormat.cToRad);
+
+    if(!AscFormat.fApproxEqual(_rot_angle, 0.0))
+    {
+        global_MatrixTransformer.TranslateAppend(oMatrix, -XC, -YC);
+        global_MatrixTransformer.RotateRadAppend(oMatrix, -_rot_angle);
+        global_MatrixTransformer.TranslateAppend(oMatrix, XC, YC);
+    }
     _t_x_lt = _shape_transform.TransformPointX(_l, _t);
     _t_y_lt = _shape_transform.TransformPointY(_l, _t);
 
@@ -2229,6 +2241,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         else {
             oClipRect = {x: -1.6, y: t_ins, w: this.extX + 3.2, h: this.extY - b_ins};
         }
+
     }
     else {
         var _full_rotate = this.getFullRotate();
