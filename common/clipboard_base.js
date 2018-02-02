@@ -948,7 +948,7 @@
 		
 		Paste_Process_End : function()
 		{
-            AscFonts.IsCheckSymbols = false;
+			AscFonts.IsCheckSymbols             = false;
 			//todo возможно стоит добавить проверку
 			/*if(!this.pasteStart)
 			{
