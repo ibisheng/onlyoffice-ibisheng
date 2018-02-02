@@ -643,10 +643,7 @@
 				rangeOldFilter = oldFilter.Ref;
 
 				//change model
-				var autoFilter = filterObj.filter;
-				if (filterObj.filter.TableStyleInfo !== undefined) {
-					autoFilter = filterObj.filter.AutoFilter;
-				}
+				var autoFilter = filterObj.filter.getAutoFilter();
 				if (!autoFilter) {
 					autoFilter = filterObj.filter.addAutoFilter();
 				}
@@ -657,9 +654,9 @@
 					newFilterColumn.clean();
 				} else {
 					newFilterColumn = autoFilter.addFilterColumn();
+
 					newFilterColumn.ColId = filterObj.ColId;
 				}
-
 				var allFilterOpenElements = newFilterColumn.createFilter(autoFiltersObject);
 				newFilterColumn.init(worksheet.getRange3(autoFilter.Ref.r1 + 1, filterObj.ColId + autoFilter.Ref.c1, autoFilter.Ref.r2, filterObj.ColId + autoFilter.Ref.c1));
 
@@ -789,7 +786,7 @@
 				if(-1 !== tablePartId)
 				{
 					var tablePart = worksheet.TableParts[tablePartId];
-					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.AutoFilter && tablePart.SortState && tablePart.SortState.SortConditions && tablePart.SortState.SortConditions[0])))
+					if(tablePart.Ref && ((tablePart.AutoFilter && tablePart.AutoFilter.FilterColumns && tablePart.AutoFilter.FilterColumns.length) || (tablePart && tablePart.AutoFilter && tablePart.isApplySortConditions())))
 						result = {isFilterColumns: true, isAutoFilter: true};
 					else if(tablePart.Ref && tablePart.AutoFilter && tablePart.AutoFilter !== null)
 						result = {isFilterColumns: false, isAutoFilter: true};
@@ -798,7 +795,7 @@
 				}
 				else
 				{
-					if(worksheet.AutoFilter && ((worksheet.AutoFilter.FilterColumns && worksheet.AutoFilter.FilterColumns.length && this._isFilterColumnsContainFilter(worksheet.AutoFilter.FilterColumns)) || (worksheet.AutoFilter.SortState && worksheet.AutoFilter.SortState.SortConditions && worksheet.AutoFilter.SortState.SortConditions[0])))
+					if(worksheet.AutoFilter && ((worksheet.AutoFilter.FilterColumns && worksheet.AutoFilter.FilterColumns.length && this._isFilterColumnsContainFilter(worksheet.AutoFilter.FilterColumns)) || worksheet.AutoFilter.isApplySortConditions()))
 					{
 						result = {isFilterColumns: true, isAutoFilter: true};
 					}
