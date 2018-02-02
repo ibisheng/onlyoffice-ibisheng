@@ -415,6 +415,7 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcGeometry();
     this.recalcBounds();
     this.recalcTransform();
+    this.recalcTransformText();
     this.recalcContent();
     this.addToRecalculate();
    //delete this.fromSerialize;

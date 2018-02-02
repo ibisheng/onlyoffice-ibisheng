@@ -3486,11 +3486,19 @@ function DrawingObjects() {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.row >= target.row) {
                         if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.recalculateTransform){
-                                drawingObject.graphicObject.recalculateTransform();
+                            if(drawingObject.graphicObject.handleUpdateExtents)
+                            {
+                                drawingObject.graphicObject.handleUpdateExtents();
+                                drawingObject.graphicObject.recalculate();
                             }
-                            if(drawingObject.graphicObject.recalculateBounds){
-                                drawingObject.graphicObject.recalculateBounds();
+                            else
+                            {
+                                if(drawingObject.graphicObject.recalculateTransform){
+                                    drawingObject.graphicObject.recalculateTransform();
+                                }
+                                if(drawingObject.graphicObject.recalculateBounds){
+                                    drawingObject.graphicObject.recalculateBounds();
+                                }
                             }
                         }
                     }
@@ -3500,11 +3508,19 @@ function DrawingObjects() {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.col >= target.col) {
                         if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.recalculateTransform){
-                                drawingObject.graphicObject.recalculateTransform();
+                            if(drawingObject.graphicObject.handleUpdateExtents)
+                            {
+                                drawingObject.graphicObject.handleUpdateExtents();
+                                drawingObject.graphicObject.recalculate();
                             }
-                            if(drawingObject.graphicObject.recalculateBounds){
-                                drawingObject.graphicObject.recalculateBounds();
+                            else
+                            {
+                                if(drawingObject.graphicObject.recalculateTransform){
+                                    drawingObject.graphicObject.recalculateTransform();
+                                }
+                                if(drawingObject.graphicObject.recalculateBounds){
+                                    drawingObject.graphicObject.recalculateBounds();
+                                }
                             }
                         }
                     }
