@@ -9741,7 +9741,7 @@ function CPres()
                                 s.GetLong();//length
 
                                 var type2 = s.GetUChar();
-                                if (c_oSerParType.OMath === type2 && ole.parent && ole.parent.Parent)
+                                if (c_oSer_OMathContentType.OMath === type2 && ole.parent && ole.parent.Parent)
                                 {
                                     var length2 = s.GetLong();
                                     var _stream = new AscCommon.FT_Stream2();
