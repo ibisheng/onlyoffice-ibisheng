@@ -3352,128 +3352,59 @@ CStyle.prototype.CreateTOC = function(nLvl, nType)
 	}
 	else if (Asc.c_oAscTOCStylesType.Classic === nType)
 	{
+		ParaPr.Spacing = {
+			After : 57 / 20 * g_dKoef_pt_to_mm
+		};
+
+		ParaPr.Ind = {
+			Left      : 0,
+			Right     : 0,
+			FirstLine : 0
+		};
+
+		TextPr.FontSize = 11;
 
 		if (0 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 170 / 20 * g_dKoef_pt_to_mm
-			};
+			ParaPr.Spacing.After = 170 / 20 * g_dKoef_pt_to_mm;
 
 			TextPr.Bold     = true;
 			TextPr.FontSize = 14;
 		}
 		else if (1 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 0
-			};
-
 			TextPr.Bold     = true;
 			TextPr.FontSize = 13;
 		}
 		else if (2 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 283 / 20 * g_dKoef_pt_to_mm
-			};
+			ParaPr.Ind.FirstLine = 283 / 20 * g_dKoef_pt_to_mm;
 
 			TextPr.FontSize = 13;
 		}
 		else if (3 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 567 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 567 / 20 * g_dKoef_pt_to_mm;
 		}
 		else if (4 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 850 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 850 / 20 * g_dKoef_pt_to_mm;
 		}
 		else if (5 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 1134 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 1134 / 20 * g_dKoef_pt_to_mm;
 		}
 		else if (6 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 1417 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 1417 / 20 * g_dKoef_pt_to_mm;
 		}
 		else if (7 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 1701 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 1701 / 20 * g_dKoef_pt_to_mm;
 		}
-		else if (7 === nLvl)
+		else if (8 === nLvl)
 		{
-			ParaPr.Spacing = {
-				After : 57 / 20 * g_dKoef_pt_to_mm
-			};
-
-			ParaPr.Ind = {
-				Left      : 0,
-				Right     : 0,
-				FirstLine : 1984 / 20 * g_dKoef_pt_to_mm
-			};
-
-			TextPr.FontSize = 11;
+			ParaPr.Ind.FirstLine = 1984 / 20 * g_dKoef_pt_to_mm;
 		}
 	}
 
