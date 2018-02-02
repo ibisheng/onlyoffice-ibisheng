@@ -3679,7 +3679,6 @@ drawBarChart.prototype =
 	{
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		var brush, pen, seria, numCache;
 		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 	},
@@ -4813,7 +4812,6 @@ drawLineChart.prototype =
 		
 		//TODO для того, чтобы верхняя линия рисовалась. пересмотреть!
 		var diffPen = 3;
-		
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - diffPen) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, (this.chartProp.trueHeight + diffPen) / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
@@ -4836,7 +4834,20 @@ drawLineChart.prototype =
 					
 				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
 			}
-			
+        }
+		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
+
+		for (var i = 0; i < this.paths.series.length; i++) {
+			seria = this.chartProp.series[i];
+			brush = seria.brush;
+			pen = seria.pen;
+
+			numCache = this.cChartDrawer.getNumCache(seria.val);
+			dataSeries = this.paths.series[i];
+
+			if(!dataSeries)
+				continue;
+
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
 			{
@@ -4848,16 +4859,15 @@ drawLineChart.prototype =
 					markerBrush = numPoint.compiledMarker ? numPoint.compiledMarker.brush : null;
 					markerPen = numPoint.compiledMarker ? numPoint.compiledMarker.pen : null;
 				}
-				
+
 				//frame of point
 				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
 					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
-				//point	
+				//point
 				if(this.paths.points[i][k])
 					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
 			}
-        }
-		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
+		}
     },
 	
 	_getYVal: function(n, i)
