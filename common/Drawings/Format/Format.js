@@ -9065,8 +9065,13 @@ TextListStyle.prototype =
 
     Document_Get_AllFontNames: function(AllFonts){
         for(var i = 0; i < 10; ++i){
-            if(this.levels[i] && this.levels[i].DefaultRunPr){
-                this.levels[i].DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+            if(this.levels[i]){
+                if(this.levels[i].DefaultRunPr){
+                    this.levels[i].DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+                }
+                if(this.levels[i].Bullet){
+                    this.levels[i].Bullet.Get_AllFontNames(AllFonts);
+                }
             }
         }
     }
