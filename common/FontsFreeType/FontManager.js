@@ -619,11 +619,10 @@
             pFontFile.SetStringGID(this.m_bStringGID);
             pFontFile.SetCharSpacing(this.m_fCharSpacing);
 
-            this.m_oGlyphString.ResetCTM();
-
             if (isNoSetupToManager !== true)
             {
-                this.m_pFont = pFontFile;
+				this.m_pFont = pFontFile;
+				this.m_oGlyphString.ResetCTM();
                 this.AfterLoad();
             }
 
