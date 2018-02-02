@@ -958,6 +958,20 @@ CPresentation.prototype =
         return this.WordSelected;
     },
 
+
+    checkCurrentTextObjectExtends: function()
+    {
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject.checkExtentsByDocContent)
+            {
+                oTargetTextObject.checkExtentsByDocContent(true, true);
+            }
+        }
+    },
+
     addCompositeText: function(nCharCode){
         // TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
 
@@ -988,6 +1002,7 @@ CPresentation.prototype =
             return;
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         this.addCompositeText(nCharCode);
+        this.checkCurrentTextObjectExtends();
         this.Recalculate();
         this.Document_UpdateSelectionState();
     },
@@ -1006,6 +1021,7 @@ CPresentation.prototype =
 
     Remove_CompositeText: function(nCount){
         this.removeCompositeText(nCount);
+        this.checkCurrentTextObjectExtends();
         this.Recalculate();
         this.Document_UpdateSelectionState();
     },
@@ -1019,6 +1035,7 @@ CPresentation.prototype =
         {
             this.addCompositeText(arrCharCodes[nIndex]);
         }
+        this.checkCurrentTextObjectExtends();
         this.Recalculate();
         this.Document_UpdateSelectionState();
     },
