@@ -942,10 +942,13 @@
 				this.doNotShowButton = true;
 			}
 			this.pasteStart = true;
+
+			AscFonts.IsCheckSymbols = true;
 		},
 		
 		Paste_Process_End : function()
 		{
+            AscFonts.IsCheckSymbols = false;
 			//todo возможно стоит добавить проверку
 			/*if(!this.pasteStart)
 			{

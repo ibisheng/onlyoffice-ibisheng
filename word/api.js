@@ -2108,9 +2108,7 @@ background-repeat: no-repeat;\
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			}
 
-			AscFonts.IsCheckSymbols = true;
 			AscCommon.Editor_Paste_Exec(this, _format, data1, data2, text_data);
-            AscFonts.IsCheckSymbols = false;
 		}
 	};
 	
