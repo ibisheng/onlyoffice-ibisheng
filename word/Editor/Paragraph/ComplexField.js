@@ -459,7 +459,17 @@ CComplexField.prototype.private_UpdateTOC = function()
 				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
 				SkipColumnBreak : true
 			});
-			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false, true);
+
+
+			var oClearTextPr = new CTextPr();
+			oClearTextPr.Set_FromObject({
+				FontSize  : null
+			});
+
+			oPara.SelectAll();
+			oPara.ApplyTextPr(oClearTextPr);
+			oPara.RemoveSelection();
 
 			var sBookmarkName = oSrcParagraph.AddBookmarkForTOC();
 

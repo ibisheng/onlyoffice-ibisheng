@@ -6710,109 +6710,135 @@ ParaRun.prototype.Get_CompiledPr = function(bCopy)
 
 ParaRun.prototype.Internal_Compile_Pr = function ()
 {
-    if ( undefined === this.Paragraph || null === this.Paragraph )
-    {
-        // Сюда мы никогда не должны попадать, но на всякий случай,
-        // чтобы не выпадало ошибок сгенерим дефолтовые настройки
-        var TextPr = new CTextPr();
-        TextPr.Init_Default();
-        this.RecalcInfo.TextPr = true;
-        return TextPr;
-    }
-
-    // Получим настройки текста, для данного параграфа
-    var TextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-
-    // Если в прямых настройках задан стиль, тогда смержим настройки стиля
-	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC
-	if (undefined != this.Pr.RStyle && (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC()))
+	if (undefined === this.Paragraph || null === this.Paragraph)
 	{
-		var Styles      = this.Paragraph.Parent.Get_Styles();
-		var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
-		TextPr.Merge(StyleTextPr);
+		// Сюда мы никогда не должны попадать, но на всякий случай,
+		// чтобы не выпадало ошибок сгенерим дефолтовые настройки
+		var TextPr = new CTextPr();
+		TextPr.Init_Default();
+		this.RecalcInfo.TextPr = true;
+		return TextPr;
 	}
 
-    if(this.Type == para_Math_Run)
-    {
-        if (undefined === this.Parent || null === this.Parent)
-        {
-            // Сюда мы никогда не должны попадать, но на всякий случай,
-            // чтобы не выпадало ошибок сгенерим дефолтовые настройки
-            var TextPr = new CTextPr();
-            TextPr.Init_Default();
-            this.RecalcInfo.TextPr = true;
-            return TextPr;
-        }
+	// Получим настройки текста, для данного параграфа
+	var TextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
-        if(!this.IsNormalText()) // math text
-        {
-            // выставим дефолтные текстовые настройки  для математических Run
-            var Styles = this.Paragraph.Parent.Get_Styles();
-            var StyleId = this.Paragraph.Style_Get();
-            // скопируем текстовые настройки прежде чем подменим на пустые
+	// Мержим настройки стиля.
+	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC, то стиль
+	// мержить не надо и, более того, цвет и подчеркивание из прямых настроек тоже не используется.
+	var isInTOCHyperlink = false;
+	if (undefined !== this.Pr.RStyle)
+	{
+		isInTOCHyperlink = true;
+		if (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC())
+		{
+			var Styles      = this.Paragraph.Parent.Get_Styles();
+			var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
+			TextPr.Merge(StyleTextPr);
+			isInTOCHyperlink = false;
+		}
+	}
 
-			var MathFont = {Name : "Cambria Math", Index : -1};
-			var oShapeStyle = null, oShapeTextPr = null;;
-            if(Styles && typeof Styles.lastId === "string")
-            {
-                StyleId = Styles.lastId;
-                Styles = Styles.styles;
-				oShapeStyle = Styles.Get(StyleId);
+	if (this.Type == para_Math_Run)
+	{
+		if (undefined === this.Parent || null === this.Parent)
+		{
+			// Сюда мы никогда не должны попадать, но на всякий случай,
+			// чтобы не выпадало ошибок сгенерим дефолтовые настройки
+			var TextPr = new CTextPr();
+			TextPr.Init_Default();
+			this.RecalcInfo.TextPr = true;
+			return TextPr;
+		}
+
+		if (!this.IsNormalText()) // math text
+		{
+			// выставим дефолтные текстовые настройки  для математических Run
+			var Styles  = this.Paragraph.Parent.Get_Styles();
+			var StyleId = this.Paragraph.Style_Get();
+			// скопируем текстовые настройки прежде чем подменим на пустые
+
+			var MathFont    = {Name : "Cambria Math", Index : -1};
+			var oShapeStyle = null, oShapeTextPr = null;
+			;
+			if (Styles && typeof Styles.lastId === "string")
+			{
+				StyleId      = Styles.lastId;
+				Styles       = Styles.styles;
+				oShapeStyle  = Styles.Get(StyleId);
 				oShapeTextPr = oShapeStyle.TextPr.Copy();
-				oShapeStyle.TextPr.RFonts.Merge({Ascii: MathFont});
-            }
-            var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
-            
-
-            // Ascii - по умолчанию шрифт Cambria Math
-            // hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
-            Styles.Default.TextPr.RFonts.Merge({Ascii: MathFont});
+				oShapeStyle.TextPr.RFonts.Merge({Ascii : MathFont});
+			}
+			var StyleDefaultTextPr = Styles.Default.TextPr.Copy();
 
 
-            var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, null, null );
+			// Ascii - по умолчанию шрифт Cambria Math
+			// hAnsi, eastAsia, cs - по умолчанию шрифты не Cambria Math, а те, которые компилируются в документе
+			Styles.Default.TextPr.RFonts.Merge({Ascii : MathFont});
 
-            TextPr.RFonts.Set_FromObject(Pr.TextPr.RFonts);
 
-            // подменяем обратно
-            Styles.Default.TextPr = StyleDefaultTextPr;
-			if(oShapeStyle && oShapeTextPr)
+			var Pr = Styles.Get_Pr(StyleId, styletype_Paragraph, null, null);
+
+			TextPr.RFonts.Set_FromObject(Pr.TextPr.RFonts);
+
+			// подменяем обратно
+			Styles.Default.TextPr = StyleDefaultTextPr;
+			if (oShapeStyle && oShapeTextPr)
 			{
 				oShapeStyle.TextPr = oShapeTextPr;
 			}
-        }
+		}
 
 
-        if(this.IsPlaceholder())
-        {
+		if (this.IsPlaceholder())
+		{
 
-            TextPr.Merge(this.Parent.GetCtrPrp());
-            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
-        }
-        else
-        {
-            TextPr.Merge( this.Pr );            // Мержим прямые настройки данного рана
+			TextPr.Merge(this.Parent.GetCtrPrp());
+			TextPr.Merge(this.Pr);            // Мержим прямые настройки данного рана
+		}
+		else
+		{
+			TextPr.Merge(this.Pr);            // Мержим прямые настройки данного рана
 
-            if(!this.IsNormalText()) // math text
-            {
-                var MPrp = this.MathPrp.GetTxtPrp();
-                TextPr.Merge(MPrp); // bold, italic
-            }
-        }
-    }
-    else
-    {
-        TextPr.Merge( this.Pr ); // Мержим прямые настройки данного рана
-        if(this.Pr.Color && !this.Pr.Unifill)
-        {
-            TextPr.Unifill = undefined;
-        }
-    }
+			if (!this.IsNormalText()) // math text
+			{
+				var MPrp = this.MathPrp.GetTxtPrp();
+				TextPr.Merge(MPrp); // bold, italic
+			}
+		}
+	}
+	else
+	{
+		var oColor      = this.Pr.Color;
+		var isUnderline = this.Pr.Underline;
+		var oUnifill    = this.Pr.Unifill;
+		if (isInTOCHyperlink)
+		{
+			this.Pr.Unifill   = undefined;
+			this.Pr.Color     = undefined;
+			this.Pr.Underline = undefined;
+		}
 
-    // Для совместимости со старыми версиями запишем FontFamily
-    TextPr.FontFamily.Name  = TextPr.RFonts.Ascii.Name;
-    TextPr.FontFamily.Index = TextPr.RFonts.Ascii.Index;
+		TextPr.Merge(this.Pr); // Мержим прямые настройки данного рана
 
-    return TextPr;
+		if (isInTOCHyperlink)
+		{
+			this.Pr.Color     = oColor;
+			this.Pr.Underline = isUnderline;
+			this.Pr.Unifill   = oUnifill;
+		}
+
+		if (this.Pr.Color && !this.Pr.Unifill)
+		{
+			TextPr.Unifill = undefined;
+		}
+	}
+
+	// Для совместимости со старыми версиями запишем FontFamily
+	TextPr.FontFamily.Name  = TextPr.RFonts.Ascii.Name;
+	TextPr.FontFamily.Index = TextPr.RFonts.Ascii.Index;
+
+	return TextPr;
 };
 
 ParaRun.prototype.IsStyleHyperlink = function()
@@ -7238,186 +7264,190 @@ ParaRun.prototype.Clear_TextPr = function()
     this.Set_Pr( NewTextPr );
 };
 
-// В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
+/**
+ * В данной функции мы применяем приходящие настройки поверх старых. Если значение undefined, то старое значение
+ * не меняем, а если null, то удаляем его из прямых настроек.
+ * @param {CTextPr} TextPr
+ */
 ParaRun.prototype.Apply_Pr = function(TextPr)
 {
-    this.private_AddCollPrChangeMine();
+	this.private_AddCollPrChangeMine();
 
-    if(this.Type == para_Math_Run && false === this.IsNormalText())
-    {
-        if(null === TextPr.Bold && null === TextPr.Italic)
-            this.Math_Apply_Style(undefined);
-        else
-        {
-            if(undefined != TextPr.Bold)
-            {
-                if(TextPr.Bold == true)
-                {
-                    if(this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
-                        this.Math_Apply_Style(STY_BI);
-                    else if(this.MathPrp.sty == STY_PLAIN)
-                        this.Math_Apply_Style(STY_BOLD);
+	if (this.Type == para_Math_Run && false === this.IsNormalText())
+	{
+		if (null === TextPr.Bold && null === TextPr.Italic)
+			this.Math_Apply_Style(undefined);
+		else
+		{
+			if (undefined != TextPr.Bold)
+			{
+				if (TextPr.Bold == true)
+				{
+					if (this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
+						this.Math_Apply_Style(STY_BI);
+					else if (this.MathPrp.sty == STY_PLAIN)
+						this.Math_Apply_Style(STY_BOLD);
 
-                }
-                else if(TextPr.Bold == false || TextPr.Bold == null)
-                {
-                    if(this.MathPrp.sty == STY_BI || this.MathPrp.sty == undefined)
-                        this.Math_Apply_Style(STY_ITALIC);
-                    else if(this.MathPrp.sty == STY_BOLD)
-                        this.Math_Apply_Style(STY_PLAIN);
-                }
-            }
+				}
+				else if (TextPr.Bold == false || TextPr.Bold == null)
+				{
+					if (this.MathPrp.sty == STY_BI || this.MathPrp.sty == undefined)
+						this.Math_Apply_Style(STY_ITALIC);
+					else if (this.MathPrp.sty == STY_BOLD)
+						this.Math_Apply_Style(STY_PLAIN);
+				}
+			}
 
-            if(undefined != TextPr.Italic)
-            {
-                if(TextPr.Italic == true)
-                {
-                    if(this.MathPrp.sty == STY_BOLD)
-                        this.Math_Apply_Style(STY_BI);
-                    else if(this.MathPrp.sty == STY_PLAIN || this.MathPrp.sty == undefined)
-                        this.Math_Apply_Style(STY_ITALIC);
-                }
-                else if(TextPr.Italic == false || TextPr.Italic == null)
-                {
-                    if(this.MathPrp.sty == STY_BI)
-                        this.Math_Apply_Style(STY_BOLD);
-                    else if(this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
-                        this.Math_Apply_Style(STY_PLAIN);
-                }
-            }
-        }
-    }
-    else
-    {
-        if ( undefined != TextPr.Bold )
-            this.Set_Bold( null === TextPr.Bold ? undefined : TextPr.Bold );
+			if (undefined != TextPr.Italic)
+			{
+				if (TextPr.Italic == true)
+				{
+					if (this.MathPrp.sty == STY_BOLD)
+						this.Math_Apply_Style(STY_BI);
+					else if (this.MathPrp.sty == STY_PLAIN || this.MathPrp.sty == undefined)
+						this.Math_Apply_Style(STY_ITALIC);
+				}
+				else if (TextPr.Italic == false || TextPr.Italic == null)
+				{
+					if (this.MathPrp.sty == STY_BI)
+						this.Math_Apply_Style(STY_BOLD);
+					else if (this.MathPrp.sty == STY_ITALIC || this.MathPrp.sty == undefined)
+						this.Math_Apply_Style(STY_PLAIN);
+				}
+			}
+		}
+	}
+	else
+	{
+		if (undefined !== TextPr.Bold)
+			this.Set_Bold(null === TextPr.Bold ? undefined : TextPr.Bold);
 
-        if( undefined != TextPr.Italic )
-            this.Set_Italic( null === TextPr.Italic ? undefined : TextPr.Italic );
-    }
+		if (undefined !== TextPr.Italic)
+			this.Set_Italic(null === TextPr.Italic ? undefined : TextPr.Italic);
+	}
 
-    if ( undefined != TextPr.Strikeout )
-        this.Set_Strikeout( null === TextPr.Strikeout ? undefined : TextPr.Strikeout );
+	if (undefined !== TextPr.Strikeout)
+		this.Set_Strikeout(null === TextPr.Strikeout ? undefined : TextPr.Strikeout);
 
-    if ( undefined !== TextPr.Underline )
-        this.Set_Underline( null === TextPr.Underline ? undefined : TextPr.Underline );
+	if (undefined !== TextPr.Underline)
+		this.Set_Underline(null === TextPr.Underline ? undefined : TextPr.Underline);
 
-    if ( undefined != TextPr.FontSize )
-        this.Set_FontSize( null === TextPr.FontSize ? undefined : TextPr.FontSize );
+	if (undefined !== TextPr.FontSize)
+		this.Set_FontSize(null === TextPr.FontSize ? undefined : TextPr.FontSize);
 
-    if ( undefined !== TextPr.Color && undefined === TextPr.Unifill )
-    {
-        this.Set_Color( null === TextPr.Color ? undefined : TextPr.Color );
-        this.Set_Unifill( undefined );
-        this.Set_TextFill(undefined);
-    }
+	if (undefined !== TextPr.Color && undefined === TextPr.Unifill)
+	{
+		this.Set_Color(null === TextPr.Color ? undefined : TextPr.Color);
+		this.Set_Unifill(undefined);
+		this.Set_TextFill(undefined);
+	}
 
-    if ( undefined !== TextPr.Unifill )
-    {
-        this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
-        this.Set_Color(undefined);
-        this.Set_TextFill(undefined);
-    }
-    else if(undefined !== TextPr.AscUnifill && this.Paragraph)
-    {
-        if(!this.Paragraph.bFromDocument)
-        {
-            var oCompiledPr = this.Get_CompiledPr(true);
-            this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), AscCommon.isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
-            this.Set_Color(undefined);
-            this.Set_TextFill(undefined);
-        }
-    }
+	if (undefined !== TextPr.Unifill)
+	{
+		this.Set_Unifill(null === TextPr.Unifill ? undefined : TextPr.Unifill);
+		this.Set_Color(undefined);
+		this.Set_TextFill(undefined);
+	}
+	else if (undefined !== TextPr.AscUnifill && this.Paragraph)
+	{
+		if (!this.Paragraph.bFromDocument)
+		{
+			var oCompiledPr = this.Get_CompiledPr(true);
+			this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), AscCommon.isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet());
+			this.Set_Color(undefined);
+			this.Set_TextFill(undefined);
+		}
+	}
 
-    if(undefined !== TextPr.TextFill)
-    {
-        this.Set_Unifill(undefined);
-        this.Set_Color(undefined);
-        this.Set_TextFill(null === TextPr.TextFill ? undefined : TextPr.TextFill);
-    }
-    else if(undefined !== TextPr.AscFill && this.Paragraph)
-    {
-        var oMergeUnifill, oColor;
-        if(this.Paragraph.bFromDocument)
-        {
-            var oCompiledPr = this.Get_CompiledPr(true);
-            if(oCompiledPr.TextFill)
-            {
-                oMergeUnifill = oCompiledPr.TextFill;
-            }
-            else if(oCompiledPr.Unifill)
-            {
-                oMergeUnifill = oCompiledPr.Unifill;
-            }
-            else if(oCompiledPr.Color)
-            {
-                oColor = oCompiledPr.Color;
-                oMergeUnifill = AscFormat.CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
-            }
-            this.Set_Unifill(undefined);
-            this.Set_Color(undefined);
-            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 1), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
-        }
-    }
+	if (undefined !== TextPr.TextFill)
+	{
+		this.Set_Unifill(undefined);
+		this.Set_Color(undefined);
+		this.Set_TextFill(null === TextPr.TextFill ? undefined : TextPr.TextFill);
+	}
+	else if (undefined !== TextPr.AscFill && this.Paragraph)
+	{
+		var oMergeUnifill, oColor;
+		if (this.Paragraph.bFromDocument)
+		{
+			var oCompiledPr = this.Get_CompiledPr(true);
+			if (oCompiledPr.TextFill)
+			{
+				oMergeUnifill = oCompiledPr.TextFill;
+			}
+			else if (oCompiledPr.Unifill)
+			{
+				oMergeUnifill = oCompiledPr.Unifill;
+			}
+			else if (oCompiledPr.Color)
+			{
+				oColor        = oCompiledPr.Color;
+				oMergeUnifill = AscFormat.CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
+			}
+			this.Set_Unifill(undefined);
+			this.Set_Color(undefined);
+			this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 1), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
+		}
+	}
 
-    if(undefined !== TextPr.TextOutline)
-    {
-        this.Set_TextOutline(null === TextPr.TextOutline ? undefined : TextPr.TextOutline);
-    }
-    else if(undefined !== TextPr.AscLine && this.Paragraph)
-    {
+	if (undefined !== TextPr.TextOutline)
+	{
+		this.Set_TextOutline(null === TextPr.TextOutline ? undefined : TextPr.TextOutline);
+	}
+	else if (undefined !== TextPr.AscLine && this.Paragraph)
+	{
 		var oCompiledPr = this.Get_CompiledPr(true);
 		this.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
-    }
+	}
 
-    if ( undefined != TextPr.VertAlign )
-        this.Set_VertAlign( null === TextPr.VertAlign ? undefined : TextPr.VertAlign );
+	if (undefined !== TextPr.VertAlign)
+		this.Set_VertAlign(null === TextPr.VertAlign ? undefined : TextPr.VertAlign);
 
-    if ( undefined != TextPr.HighLight )
-        this.Set_HighLight( null === TextPr.HighLight ? undefined : TextPr.HighLight );
+	if (undefined !== TextPr.HighLight)
+		this.Set_HighLight(null === TextPr.HighLight ? undefined : TextPr.HighLight);
 
-    if ( undefined !== TextPr.RStyle )
-        this.Set_RStyle( null === TextPr.RStyle ? undefined : TextPr.RStyle );
+	if (undefined !== TextPr.RStyle)
+		this.Set_RStyle(null === TextPr.RStyle ? undefined : TextPr.RStyle);
 
-    if ( undefined != TextPr.Spacing )
-        this.Set_Spacing( null === TextPr.Spacing ? undefined : TextPr.Spacing );
+	if (undefined !== TextPr.Spacing)
+		this.Set_Spacing(null === TextPr.Spacing ? undefined : TextPr.Spacing);
 
-    if ( undefined != TextPr.DStrikeout )
-        this.Set_DStrikeout( null === TextPr.DStrikeout ? undefined : TextPr.DStrikeout );
+	if (undefined !== TextPr.DStrikeout)
+		this.Set_DStrikeout(null === TextPr.DStrikeout ? undefined : TextPr.DStrikeout);
 
-    if ( undefined != TextPr.Caps )
-        this.Set_Caps( null === TextPr.Caps ? undefined : TextPr.Caps );
+	if (undefined !== TextPr.Caps)
+		this.Set_Caps(null === TextPr.Caps ? undefined : TextPr.Caps);
 
-    if ( undefined != TextPr.SmallCaps )
-        this.Set_SmallCaps( null === TextPr.SmallCaps ? undefined : TextPr.SmallCaps );
+	if (undefined !== TextPr.SmallCaps)
+		this.Set_SmallCaps(null === TextPr.SmallCaps ? undefined : TextPr.SmallCaps);
 
-    if ( undefined != TextPr.Position )
-        this.Set_Position( null === TextPr.Position ? undefined : TextPr.Position );
+	if (undefined !== TextPr.Position)
+		this.Set_Position(null === TextPr.Position ? undefined : TextPr.Position);
 
-    if ( undefined != TextPr.RFonts )
-    {
-       if(this.Type == para_Math_Run && !this.IsNormalText()) // при смене Font в этом случае (даже на Cambria Math) cs, eastAsia не меняются
-        {
-            // только для редактирования
-            // делаем так для проверки действительно ли нужно сменить Font, чтобы при смене других текстовых настроек не выставился Cambria Math (TextPr.RFonts приходит всегда в виде объекта)
-            if(TextPr.RFonts.Ascii !== undefined || TextPr.RFonts.HAnsi !== undefined)
-            {
-                var RFonts = new CRFonts();
-                RFonts.Set_All("Cambria Math", -1);
+	if (undefined !== TextPr.RFonts)
+	{
+		if (this.Type == para_Math_Run && !this.IsNormalText()) // при смене Font в этом случае (даже на Cambria Math) cs, eastAsia не меняются
+		{
+			// только для редактирования
+			// делаем так для проверки действительно ли нужно сменить Font, чтобы при смене других текстовых настроек не выставился Cambria Math (TextPr.RFonts приходит всегда в виде объекта)
+			if (TextPr.RFonts.Ascii !== undefined || TextPr.RFonts.HAnsi !== undefined)
+			{
+				var RFonts = new CRFonts();
+				RFonts.Set_All("Cambria Math", -1);
 
-                this.Set_RFonts2(RFonts);
-            }
-        }
-        else
-            this.Set_RFonts2(TextPr.RFonts);
-    }
+				this.Set_RFonts2(RFonts);
+			}
+		}
+		else
+			this.Set_RFonts2(TextPr.RFonts);
+	}
 
 
-    if ( undefined != TextPr.Lang )
-        this.Set_Lang2( TextPr.Lang );
+	if (undefined !== TextPr.Lang)
+		this.Set_Lang2(TextPr.Lang);
 
-    if ( undefined !== TextPr.Shd )
-        this.Set_Shd( TextPr.Shd );
+	if (undefined !== TextPr.Shd)
+		this.Set_Shd(TextPr.Shd);
 };
 
 ParaRun.prototype.Have_PrChange = function()

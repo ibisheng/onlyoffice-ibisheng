@@ -7632,28 +7632,26 @@ CTextPr.prototype =
 
         this.FontSize   = TextPr.FontSize;
 
-        if ( undefined != TextPr.Color )
-            this.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto );
-        else
-            this.Color = undefined;
+		if (null === TextPr.Color || undefined === TextPr.Color)
+			this.Color = TextPr.Color;
+		else
+			this.Color = new CDocumentColor(TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto);
 
         this.VertAlign = TextPr.VertAlign;
 
-        if ( undefined === TextPr.HighLight )
-            this.HighLight = undefined;
-        else if ( highlight_None === TextPr.HighLight )
-            this.HighLight = highlight_None;
-        else
-            this.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
+		if (undefined === TextPr.HighLight || null === TextPr.HighLight)
+			this.HighLight = undefined;
+		else if (highlight_None === TextPr.HighLight)
+			this.HighLight = highlight_None;
+		else
+			this.HighLight = new CDocumentColor(TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b);
 
-        if ( undefined != TextPr.RStyle )
-            this.RStyle = TextPr.RStyle;
-
-        this.Spacing    = TextPr.Spacing;
-        this.DStrikeout = TextPr.DStrikeout;
-        this.Caps       = TextPr.Caps;
-        this.SmallCaps  = TextPr.SmallCaps;
-        this.Position   = TextPr.Position;
+		this.RStyle     = TextPr.RStyle;
+		this.Spacing    = TextPr.Spacing;
+		this.DStrikeout = TextPr.DStrikeout;
+		this.Caps       = TextPr.Caps;
+		this.SmallCaps  = TextPr.SmallCaps;
+		this.Position   = TextPr.Position;
 
         if ( undefined != TextPr.RFonts )
             this.RFonts.Set_FromObject( TextPr.RFonts );

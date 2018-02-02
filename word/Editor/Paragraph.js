@@ -5485,6 +5485,15 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 		}
 	}
 };
+/**
+ * Применяем текстовые настройки к выделенной части параграфа
+ * @param {CTextPr} oTextPr
+ * @param {boolean | undefined} isIncFontSize
+ */
+Paragraph.prototype.ApplyTextPr = function(oTextPr, isIncFontSize)
+{
+	return this.Apply_TextPr(oTextPr, isIncFontSize);
+};
 Paragraph.prototype.Internal_ReplaceRun = function(Pos, NewRuns)
 {
 	// По логике, можно удалить Run, стоящий в позиции Pos и добавить все раны, которые не null в массиве NewRuns.
@@ -8207,7 +8216,7 @@ Paragraph.prototype.Style_Get = function()
 
 	return undefined;
 };
-Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
+Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteTextProps)
 {
 	this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
@@ -8263,9 +8272,12 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 		// которые присутствуют в стиле. Пока мы удалим вообще все настроки.
 		// TODO : переделать
 
-		for (var Index = 0; Index < this.Content.length; Index++)
+		if (true !== bDoNotDeleteTextProps)
 		{
-			this.Content[Index].Clear_TextPr();
+			for (var Index = 0; Index < this.Content.length; Index++)
+			{
+				this.Content[Index].Clear_TextPr();
+			}
 		}
 
 		this.TextPr.Clear_Style();
