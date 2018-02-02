@@ -4933,7 +4933,7 @@ CPresentation.prototype =
             }
             else if(aContent[j].Type === para_Hyperlink)
             {
-                this,internalResetElementsFontSize(aContent[j].Content);
+                this.internalResetElementsFontSize(aContent[j].Content);
             }
         }
     },
