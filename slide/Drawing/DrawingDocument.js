@@ -2038,7 +2038,7 @@ function CDrawingDocument()
 
 			/// check scroll
 			var isNeedScroll = false;
-			if (0 != nValueScrollHor)
+			if (0 != nValueScrollHor && this.m_oWordControl.m_oScrollHorApi)
 			{
 				isNeedScroll                                  = true;
 				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
