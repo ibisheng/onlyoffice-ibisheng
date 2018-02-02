@@ -8022,6 +8022,7 @@ function BinaryPPTYLoader()
                         {
                             s.Skip2(6);
                             bullet.bulletType.Char = s.GetString2();
+                            AscFonts.FontPickerByCharacter.getFontsByString(bullet.bulletType.Char);
                             s.Skip2(1);
                         }
                     }
