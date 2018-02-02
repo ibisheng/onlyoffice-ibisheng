@@ -147,11 +147,6 @@ CImageShape.prototype.handleUpdateFill = function()
     this.recalcBrush();
     this.addToRecalculate();
 };
-CImageShape.prototype.handleUpdateLn = function()
-{
-    this.recalcLine();
-    this.addToRecalculate();
-};
 CImageShape.prototype.handleUpdateGeometry = function()
 {
     this.recalcBounds();

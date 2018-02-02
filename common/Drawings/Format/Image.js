@@ -652,6 +652,14 @@ CImageShape.prototype.draw = function(graphics, transform)
 
 CImageShape.prototype.select = CShape.prototype.select;
 
+
+    CImageShape.prototype.handleUpdateLn = function()
+    {
+        this.recalcLine();
+        this.recalcPen();
+        this.addToRecalculate();
+    };
+
 CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
 CImageShape.prototype.hit = CShape.prototype.hit;
 

@@ -2693,11 +2693,22 @@ CShape.prototype.recalculatePen = function () {
         //}
     }
     else {
-        this.pen = new AscFormat.CLn();
+        this.pen = null;
     }
 
-    this.pen.merge(this.getCompiledLine());
-    this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    var oCompiledLine = this.getCompiledLine();
+    if(oCompiledLine)
+    {
+        if(!this.pen)
+        {
+            this.pen = new AscFormat.CLn();
+        }
+        this.pen.merge(oCompiledLine);
+    }
+    if(this.pen)
+    {
+        this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    }
 };
 
 CShape.prototype.Get_ParentTextTransform = function()
