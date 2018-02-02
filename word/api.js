@@ -5138,7 +5138,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.get_OriginalSizeImage   = function()
 	{
         for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
-            if(this.SelectedObjectsStack[i].Type == c_oAscTypeSelectElement.Image){
+            if(this.SelectedObjectsStack[i].Type == c_oAscTypeSelectElement.Image && this.SelectedObjectsStack[i].Value && this.SelectedObjectsStack[i].Value.ImageUrl){
                 return this.SelectedObjectsStack[i].Value.asc_getOriginSize(this);
             }
         }
