@@ -390,6 +390,9 @@ function CEditorPage(api)
 	{
 		var off = jQuery("#" + this.Name).offset();
 
+        if (undefined !== window["AscDesktopEditor"] && 0 == off.top)
+            return;
+
 		if (off)
 		{
 			this.X = off.left;
