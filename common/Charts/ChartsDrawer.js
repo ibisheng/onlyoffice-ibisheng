@@ -2115,7 +2115,7 @@ CChartsDrawer.prototype =
         return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
 
-	drawPaths: function (paths, series) {
+	drawPaths: function (paths, series, bIsYVal) {
 
 		var seria, brush, pen, numCache, point;
 		var seriesPaths = paths.series;
@@ -2131,7 +2131,12 @@ CChartsDrawer.prototype =
 			pen = seria.pen;
 
 			for (var j = 0; j < seriesPaths[i].length; j++) {
-				numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+
+				if(bIsYVal) {
+					numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
+				} else {
+					numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+				}
 
 				point = numCache.getPtByIndex(j);
 				if (point && point.pen) {
@@ -4805,36 +4810,21 @@ drawLineChart.prototype =
 			
 		return {x: centerX, y: centerY};
 	},
-	
+
 	_drawLines: function (/*isSkip*/)
     {
 		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
 		
 		//TODO для того, чтобы верхняя линия рисовалась. пересмотреть!
 		var diffPen = 3;
+		var leftRect = this.chartProp.chartGutter._left / this.chartProp.pxToMM;
+		var topRect = (this.chartProp.chartGutter._top - diffPen) / this.chartProp.pxToMM;
+		var rightRect = this.chartProp.trueWidth / this.chartProp.pxToMM;
+		var bottomRect = (this.chartProp.trueHeight + diffPen) / this.chartProp.pxToMM;
+
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - diffPen) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, (this.chartProp.trueHeight + diffPen) / this.chartProp.pxToMM);
-		for (var i = 0; i < this.paths.series.length; i++) {
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-			
-			numCache = this.cChartDrawer.getNumCache(seria.val);
-			dataSeries = this.paths.series[i];
-			
-			if(!dataSeries)
-				continue;
-			
-			for(var n = 0; n < dataSeries.length; n++)
-			{
-				if(numCache && numCache.pts[n + 1] && numCache.pts[n + 1].pen)
-					pen = numCache.pts[n + 1].pen;
-				if(numCache && numCache.pts[n + 1] && numCache.pts[n + 1].brush)
-					brush = numCache.pts[n + 1].brush;
-					
-				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
-			}
-        }
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 
 		for (var i = 0; i < this.paths.series.length; i++) {
@@ -4846,7 +4836,9 @@ drawLineChart.prototype =
 			dataSeries = this.paths.series[i];
 
 			if(!dataSeries)
+			{
 				continue;
+			}
 
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
@@ -4862,10 +4854,14 @@ drawLineChart.prototype =
 
 				//frame of point
 				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
+				{
 					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
+				}
 				//point
 				if(this.paths.points[i][k])
+				{
 					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
+				}
 			}
 		}
     },
@@ -10460,38 +10456,80 @@ drawScatterChart.prototype =
 
 		return val;
 	},
-	
+
+
+
+
+	/*var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
+
+	//TODO для того, чтобы верхняя линия рисовалась. пересмотреть!
+	var diffPen = 3;
+	var leftRect = this.chartProp.chartGutter._left / this.chartProp.pxToMM;
+	var topRect = (this.chartProp.chartGutter._top - diffPen) / this.chartProp.pxToMM;
+	var rightRect = this.chartProp.trueWidth / this.chartProp.pxToMM;
+	var bottomRect = (this.chartProp.trueHeight + diffPen) / this.chartProp.pxToMM;
+
+	this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
+	this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
+	this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
+	this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
+
+	for (var i = 0; i < this.paths.series.length; i++) {
+		seria = this.chartProp.series[i];
+		brush = seria.brush;
+		pen = seria.pen;
+
+		numCache = this.cChartDrawer.getNumCache(seria.val);
+		dataSeries = this.paths.series[i];
+
+		if(!dataSeries)
+		{
+			continue;
+		}
+
+		//draw point
+		for(var k = 0; k < this.paths.points[i].length; k++)
+		{
+
+			var numPoint = numCache ? numCache.getPtByIndex(k) : null;
+			if(numPoint)
+			{
+
+				markerBrush = numPoint.compiledMarker ? numPoint.compiledMarker.brush : null;
+				markerPen = numPoint.compiledMarker ? numPoint.compiledMarker.pen : null;
+			}
+
+			//frame of point
+			if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
+			{
+				this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
+			}
+			//point
+			if(this.paths.points[i][k])
+			{
+				this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
+			}
+		}
+	}*/
+
+
+
 	_drawScatter: function ()
-    {
-		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
+	{
+		var dataSeries, seria, markerBrush, markerPen, numCache;
 		
 		//TODO 2 раза проходимся по сериям!
 		//add clip rect
+		var diffPen = 2;
+		var leftRect = this.chartProp.chartGutter._left / this.chartProp.pxToMM;
+		var topRect = (this.chartProp.chartGutter._top - diffPen) / this.chartProp.pxToMM;
+		var rightRect = this.chartProp.trueWidth / this.chartProp.pxToMM;
+		var bottomRect = (this.chartProp.trueHeight + diffPen) / this.chartProp.pxToMM;
+
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 2) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, (this.chartProp.trueHeight + 2) / this.chartProp.pxToMM);
-		
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
 		//draw lines
-		for (var i = 0; i < this.paths.series.length; i++) {
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-			
-			numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
-			dataSeries = this.paths.series[i];
-			
-			if(!dataSeries)
-				continue;
-			
-			for(var n = 0; n < dataSeries.length; n++)
-			{
-				if(numCache.pts[n + 1] && numCache.pts[n + 1].pen)
-					pen = numCache.pts[n + 1].pen;
-				if(numCache.pts[n + 1] && numCache.pts[n + 1].brush)
-					brush = numCache.pts[n + 1].brush;
-					
-				this.cChartDrawer.drawPath(this.paths.series[i][n], pen, brush);
-			}
-		}
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true);
 		//end clip rect
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 		
