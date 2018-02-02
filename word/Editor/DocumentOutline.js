@@ -79,9 +79,9 @@ CDocumentOutline.prototype.UpdateAll = function()
 	}
 
 	this.CurPos = -1;
-	this.LogicDocument.UpdateDocumentOutlinePosition();
 
 	this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdate(this);
+	this.LogicDocument.UpdateDocumentOutlinePosition();
 };
 CDocumentOutline.prototype.CheckParagraph = function(oParagraph)
 {
