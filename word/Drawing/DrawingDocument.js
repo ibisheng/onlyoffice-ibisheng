@@ -2082,44 +2082,46 @@ function CPage()
 				overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
 
 				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				overlay.SetBaseTransform();
 			}
+			else
+			{
+				var _xLast = (lastBounds.X + lastBounds.W);
+				var _yLast = (lastBounds.Y + lastBounds.H);
 
-			var _xLast = (lastBounds.X + lastBounds.W);
-			var _yLast = (lastBounds.Y + lastBounds.H);
+				var ctx = overlay.m_oContext;
+				ctx.strokeStyle = "rgb(0, 0, 0)";
+				ctx.fillStyle = "#FFFFFF";
+				ctx.lineWidth = 1;
+				ctx.beginPath();
 
-			var ctx = overlay.m_oContext;
-			ctx.strokeStyle = "rgb(0, 0, 0)";
-			ctx.fillStyle = "#FFFFFF";
-			ctx.lineWidth = 1;
-			ctx.beginPath();
+				var _dist = 12 / (_ft.sx + _ft.sy);
+				var _arr = [
+					_ft.TransformPointX(_xLast, _yLast),
+					_ft.TransformPointY(_xLast, _yLast),
+					_ft.TransformPointX(_xLast + _dist, _yLast),
+					_ft.TransformPointY(_xLast + _dist, _yLast),
+					_ft.TransformPointX(_xLast + _dist, _yLast + _dist),
+					_ft.TransformPointY(_xLast + _dist, _yLast + _dist),
+					_ft.TransformPointX(_xLast, _yLast + _dist),
+					_ft.TransformPointY(_xLast, _yLast + _dist)
+				];
 
-			var _dist = 12 / (_ft.sx + _ft.sy);
-			var _arr = [
-				_ft.TransformPointX(_xLast, _yLast),
-				_ft.TransformPointY(_xLast, _yLast),
-				_ft.TransformPointX(_xLast + _dist, _yLast),
-				_ft.TransformPointY(_xLast + _dist, _yLast),
-				_ft.TransformPointX(_xLast + _dist, _yLast + _dist),
-				_ft.TransformPointY(_xLast + _dist, _yLast + _dist),
-				_ft.TransformPointX(_xLast, _yLast + _dist),
-				_ft.TransformPointY(_xLast, _yLast + _dist)
-			];
+				overlay.CheckPoint(_arr[0], _arr[1]);
+				overlay.CheckPoint(_arr[2], _arr[3]);
+				overlay.CheckPoint(_arr[4], _arr[5]);
+				overlay.CheckPoint(_arr[6], _arr[7]);
 
-			overlay.CheckPoint(_arr[0], _arr[1]);
-			overlay.CheckPoint(_arr[2], _arr[3]);
-			overlay.CheckPoint(_arr[4], _arr[5]);
-			overlay.CheckPoint(_arr[6], _arr[7]);
+				ctx.moveTo(_arr[0], _arr[1]);
+				ctx.lineTo(_arr[2], _arr[3]);
+				ctx.lineTo(_arr[4], _arr[5]);
+				ctx.lineTo(_arr[6], _arr[7]);
+				ctx.closePath();
 
-			ctx.moveTo(_arr[0], _arr[1]);
-			ctx.lineTo(_arr[2], _arr[3]);
-			ctx.lineTo(_arr[4], _arr[5]);
-			ctx.lineTo(_arr[6], _arr[7]);
-			ctx.closePath();
-
-			ctx.fill();
-			ctx.stroke();
-			ctx.beginPath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.beginPath();
+			}
 		}
 	}
 }
