@@ -2509,6 +2509,10 @@
 			if (window['AscFormat'].isRealNumber(this.oleWidth) && window['AscFormat'].isRealNumber(this.oleHeight)) {
 				return new asc_CImageSize(this.oleWidth, this.oleHeight, true);
 			}
+			if(this.ImageUrl === null)
+			{
+				return new asc_CImageSize(50, 50, false);
+			}
 			var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
 			var _page_width = AscCommon.Page_Width;
 			var _page_height = AscCommon.Page_Height;

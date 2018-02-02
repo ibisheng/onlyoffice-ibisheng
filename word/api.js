@@ -7507,26 +7507,34 @@ background-repeat: no-repeat;\
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddBlockLevelContentControl);
 
 				var oContentControl = oLogicDocument.AddContentControl(c_oAscSdtLevelType.Block);
-				if (oContentControlPr)
-					oContentControl.SetContentControlPr(oContentControlPr);
-
-				if (oContentControl.IsEmpty())
+				if (!oContentControl)
 				{
-					// TODO: Разобраться с тем, чтобы пересчет не вызывался в фунции AddToParagraph
-					oLogicDocument.TurnOff_Recalculate();
-					for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
-					{
-						oContentControl.AddToParagraph(new AscCommonWord.ParaText(oIterator.value()));
-					}
-					oLogicDocument.SelectContentControl(oContentControl.GetId());
-					oLogicDocument.TurnOn_Recalculate();
+					History.Remove_LastPoint();
+					return;
 				}
+				else
+				{
+					if (oContentControlPr)
+						oContentControl.SetContentControlPr(oContentControlPr);
 
-				oLogicDocument.Recalculate();
-				oLogicDocument.Document_UpdateInterfaceState();
-				oLogicDocument.Document_UpdateSelectionState();
+					if (oContentControl.IsEmpty())
+					{
+						// TODO: Разобраться с тем, чтобы пересчет не вызывался в фунции AddToParagraph
+						oLogicDocument.TurnOff_Recalculate();
+						for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
+						{
+							oContentControl.AddToParagraph(new AscCommonWord.ParaText(oIterator.value()));
+						}
+						oLogicDocument.SelectContentControl(oContentControl.GetId());
+						oLogicDocument.TurnOn_Recalculate();
+					}
 
-				return oContentControl.GetContentControlPr();
+					oLogicDocument.Recalculate();
+					oLogicDocument.Document_UpdateInterfaceState();
+					oLogicDocument.Document_UpdateSelectionState();
+
+					return oContentControl.GetContentControlPr();
+				}
 			}
 		}
 		else if (c_oAscSdtLevelType.Inline === nType)
