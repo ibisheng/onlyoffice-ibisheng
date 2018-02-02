@@ -1449,6 +1449,16 @@
 		return this.asc_setMacros(data);
 	};
 
+	baseEditorsApi.prototype["pluginMethod_StartAction"] = function(type, description)
+	{
+		this.sync_StartAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
+	{
+		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
