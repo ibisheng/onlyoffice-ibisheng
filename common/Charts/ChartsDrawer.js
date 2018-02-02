@@ -2115,10 +2115,11 @@ CChartsDrawer.prototype =
         return {w: w , h: h , startX: this.calcProp.chartGutter._left / this.calcProp.pxToMM, startY: this.calcProp.chartGutter._top / this.calcProp.pxToMM};
 	},
 
-	drawPaths: function (paths, series, bIsYVal) {
+	drawPaths: function (paths, series, useNextPoint, bIsYVal) {
 
 		var seria, brush, pen, numCache, point;
 		var seriesPaths = paths.series;
+		var pointDiff = useNextPoint ? 1 : 0;
 
 		for (var i = 0; i < seriesPaths.length; i++) {
 
@@ -2138,7 +2139,7 @@ CChartsDrawer.prototype =
 					numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
 				}
 
-				point = numCache.getPtByIndex(j);
+				point = numCache.getPtByIndex(j + pointDiff);
 				if (point && point.pen) {
 					pen = point.pen;
 				}
@@ -2148,6 +2149,46 @@ CChartsDrawer.prototype =
 
 				if (seriesPaths[i][j]) {
 					this.drawPath(seriesPaths[i][j], pen, brush);
+				}
+			}
+		}
+	},
+
+	drawPathsPoints: function (paths, series, bIsYVal) {
+
+		var seria, brush, pen, dataSeries, markerBrush, markerPen, numCache;
+		for (var i = 0; i < paths.series.length; i++) {
+			seria = series[i];
+			brush = seria.brush;
+			pen = seria.pen;
+
+			if (bIsYVal) {
+				numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
+			} else {
+				numCache = this.getNumCache(seria.val);
+			}
+
+			dataSeries = paths.series[i];
+
+			if (!dataSeries) {
+				continue;
+			}
+
+			//draw point
+			for (var k = 0; k < paths.points[i].length; k++) {
+				var numPoint = numCache ? numCache.getPtByIndex(k) : null;
+				if (numPoint) {
+					markerBrush = numPoint.compiledMarker ? numPoint.compiledMarker.brush : null;
+					markerPen = numPoint.compiledMarker ? numPoint.compiledMarker.pen : null;
+				}
+
+				//frame of point
+				if (paths.points[i][0] && paths.points[i][0].framePaths) {
+					this.drawPath(paths.points[i][k].framePaths, markerPen, markerBrush, false);
+				}
+				//point
+				if (paths.points[i][k]) {
+					this.drawPath(paths.points[i][k].path, markerPen, markerBrush, true);
 				}
 			}
 		}
@@ -4824,46 +4865,10 @@ drawLineChart.prototype =
 
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
-		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 
-		for (var i = 0; i < this.paths.series.length; i++) {
-			seria = this.chartProp.series[i];
-			brush = seria.brush;
-			pen = seria.pen;
-
-			numCache = this.cChartDrawer.getNumCache(seria.val);
-			dataSeries = this.paths.series[i];
-
-			if(!dataSeries)
-			{
-				continue;
-			}
-
-			//draw point
-			for(var k = 0; k < this.paths.points[i].length; k++)
-			{
-
-				var numPoint = numCache ? numCache.getPtByIndex(k) : null;
-				if(numPoint)
-				{
-
-					markerBrush = numPoint.compiledMarker ? numPoint.compiledMarker.brush : null;
-					markerPen = numPoint.compiledMarker ? numPoint.compiledMarker.pen : null;
-				}
-
-				//frame of point
-				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
-				{
-					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
-				}
-				//point
-				if(this.paths.points[i][k])
-				{
-					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
-				}
-			}
-		}
+		this.cChartDrawer.drawPathsPoints(this.paths, this.chartProp.series);
     },
 	
 	_getYVal: function(n, i)
@@ -7131,11 +7136,6 @@ drawHBarChart.prototype =
 	
 	_drawBars: function ()
     {
-		var brush;
-		var pen;
-		var numCache;
-		var seria;
-		
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
@@ -10529,34 +10529,11 @@ drawScatterChart.prototype =
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
 		//draw lines
-		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true);
+		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true, true);
 		//end clip rect
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
-		
-		//draw points
-		for (var i = 0; i < this.paths.series.length; i++) {
-			//draw point
-			for(var k = 0; k < this.paths.points[i].length; k++)
-			{	
-				seria = this.chartProp.series[i];
-				
-				numCache = seria.yVal.numRef ? seria.yVal.numRef.numCache : seria.yVal.numLit;
-				dataSeries = this.paths.series[i];
-				
-				if(numCache.pts[k])
-				{
-					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
-					markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
-				}
-				
-				//frame of point
-				if(this.paths.points[i][0] && this.paths.points[i][0].framePaths)
-					this.cChartDrawer.drawPath(this.paths.points[i][k].framePaths, markerPen, markerBrush, false);
-				//point	
-				if(this.paths.points[i][k])
-					this.cChartDrawer.drawPath(this.paths.points[i][k].path, markerPen, markerBrush, true);
-			}
-        }
+
+		this.cChartDrawer.drawPathsPoints(this.paths, this.chartProp.series, true);
     },
 	
 	_getYPosition: function(val, yPoints, isOx)
