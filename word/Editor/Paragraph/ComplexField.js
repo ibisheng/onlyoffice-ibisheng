@@ -563,7 +563,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_Begin, this.LogicDocument));
 				oPageRefRun.AddInstrText("PAGEREF " + sBookmarkName + " \\h");
 				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_Separate, this.LogicDocument));
-				oPareRefRun.AddText("" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1));
+				oPageRefRun.AddText("" + (oSrcParagraph.GetFirstNonEmptyPageAbsolute() + 1));
 				oPageRefRun.AddToContent(-1, new ParaFieldChar(fldchartype_End, this.LogicDocument));
 				oContainer.Add_ToContent(nContainerPos + 1, oPageRefRun);
 			}

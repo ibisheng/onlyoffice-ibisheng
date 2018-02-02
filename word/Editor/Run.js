@@ -1294,7 +1294,7 @@ ParaRun.prototype.AddInstrText = function(sString, nPos)
 	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
 	for (var oIterator = sString.getUnicodeIterator(); oIterator.check(); oIterator.next())
 	{
-		this.AddToContent(nCharPos++, new ParaText(oIterator.value()));
+		this.AddToContent(nCharPos++, new ParaInstrText(oIterator.value()));
 	}
 };
 
