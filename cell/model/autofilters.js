@@ -1026,17 +1026,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_ChangeTableName)
 				{
-					//ипользуется целиком объект фт(cloneData)
-					var oldName = cloneData.newDisplayName;
-					
-					for(var l = 0; l < worksheet.TableParts.length; l++)
-					{
-						if(oldName === worksheet.TableParts[l].DisplayName)
-						{
-							worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), true);
-							break;
-						}
-					}
+					this.changeDisplayNameTable(data.val, data.displayName);
 				}
 				else if((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter)//сортировка
 				{
