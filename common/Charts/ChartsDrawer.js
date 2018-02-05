@@ -3676,6 +3676,21 @@ CChartsDrawer.prototype =
 		var pxToMm = this.calcProp.pxToMM;
 		var plotArea = this.cChartSpace.chart.plotArea;
 		var left, right, bottom, top;
+		var t = this;
+
+		var defaultCalculate = function() {
+			var widthGraph = t.calcProp.widthCanvas;
+			var heightGraph = t.calcProp.heightCanvas;
+			var leftMargin = t.calcProp.chartGutter._left;
+			var rightMargin = t.calcProp.chartGutter._right;
+			var topMargin = t.calcProp.chartGutter._top;
+			var bottomMargin = t.calcProp.chartGutter._bottom;
+
+			left = leftMargin / pxToMm;
+			right = (widthGraph - rightMargin) / pxToMm;
+			bottom = (heightGraph - bottomMargin) / pxToMm;
+			top = (topMargin) / pxToMm;
+		};
 
 		if (xPoints && yPoints) {
 			var crossBetweenX = this.cChartSpace.getValAxisCrossType();
@@ -3694,17 +3709,11 @@ CChartsDrawer.prototype =
 			bottom = yPoints[0].pos + crossDiffY;
 			top = yPoints[yPoints.length - 1].pos - crossDiffY;
 		} else {
-			var widthGraph = this.calcProp.widthCanvas;
-			var heightGraph = this.calcProp.heightCanvas;
-			var leftMargin = this.calcProp.chartGutter._left;
-			var rightMargin = this.calcProp.chartGutter._right;
-			var topMargin = this.calcProp.chartGutter._top;
-			var bottomMargin = this.calcProp.chartGutter._bottom;
+			defaultCalculate();
+		}
 
-			left = leftMargin / pxToMm;
-			right = (widthGraph - rightMargin) / pxToMm;
-			bottom = (heightGraph - bottomMargin) / pxToMm;
-			top = (topMargin) / pxToMm;
+		if(isNaN(left) || isNaN(top) || isNaN(bottom) || isNaN(right)) {
+			defaultCalculate();
 		}
 
 		return {left: left, right: right, bottom: bottom, top: top};
