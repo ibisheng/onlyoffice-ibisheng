@@ -4672,10 +4672,10 @@ background-repeat: no-repeat;\
 		{
 			return;
 		}
-		var bPresComments = (oComments === this.comments);
+		var bPresComments = (oComments === this.WordControl.m_oLogicDocument.comments);
 		var nCheckType = bPresComments ?  AscCommon.changestype_AddComment : AscCommon.changestype_MoveComment;
 		var oCheckData = bPresComments ? comment : Id;
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(nCheckType, oCheckData, this.WordControl.m_oLogicDocument.IsEditCommentsMode()) === false)
+		if (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(nCheckType, oCheckData, this.WordControl.m_oLogicDocument.IsEditCommentsMode()) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
 			this.WordControl.m_oLogicDocument.RemoveComment(Id, true);
