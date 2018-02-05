@@ -820,6 +820,11 @@
       // Посылаем callback об изменении списка листов
       self.handlers.trigger("asc_onSheetsChanged");
     });
+    this.model.handlers.add("updateSelection", function () {
+		if (!self.lockDraw) {
+			self.getWorksheet().updateSelection();
+		}
+	});
 
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);

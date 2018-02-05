@@ -995,7 +995,7 @@
 			}
 		};
 		SelectionRange.prototype.getUnion = function () {
-			var result = new SelectionRange();
+			var result = new SelectionRange(this.worksheet);
 			var unionRanges = function (ranges, res) {
 				for (var i = 0; i < ranges.length; ++i) {
 					if (0 === i) {
@@ -1009,7 +1009,7 @@
 
 			var isUnion = true, resultTmp;
 			while (isUnion && !result.isSingleRange()) {
-				resultTmp = new SelectionRange();
+				resultTmp = new SelectionRange(this.worksheet);
 				unionRanges(result.ranges, resultTmp);
 				isUnion = result.ranges.length !== resultTmp.ranges.length;
 				result = resultTmp;
@@ -1158,6 +1158,10 @@
 			this.activeCell.col = r.GetLong();
 			this.activeCellId = r.GetLong();
 			this.update();
+		};
+		SelectionRange.prototype.Select = function () {
+			this.worksheet.selectionRange = this.clone();
+			this.worksheet.workbook.handlers.trigger('updateSelection');
 		};
 
     /**
