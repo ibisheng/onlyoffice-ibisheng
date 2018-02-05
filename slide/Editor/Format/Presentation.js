@@ -6566,6 +6566,7 @@ CPresentation.prototype =
                     }
                 }
                 oSlideComments.addComment(Comment);
+                CommentData.bDocument = bAll;
                 editor.sync_AddComment( Comment.Get_Id(), CommentData );
                 if(!bAll)
                 {

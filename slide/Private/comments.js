@@ -32,7 +32,7 @@
 
 "use strict";
 
-Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData, bForAll) {
+Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData) {
   //if ( true === CollaborativeEditing.Get_GlobalLock() )
   //   return;
 
@@ -43,7 +43,7 @@ Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData, bForAll)
   var CommentData = new CCommentData();
   CommentData.Read_FromAscCommentData(AscCommentData);
 
-  var Comment = this.WordControl.m_oLogicDocument.AddComment(CommentData, bForAll);
+  var Comment = this.WordControl.m_oLogicDocument.AddComment(CommentData, AscCommentData.asc_getDocumentFlag());
   if (Comment) {
     return Comment.Get_Id();
   }

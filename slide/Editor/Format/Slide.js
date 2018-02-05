@@ -47,6 +47,7 @@ CChangesDrawingsContentComments.prototype.constructor = CChangesDrawingsContentC
 CChangesDrawingsContentComments.prototype.addToInterface = function(){
     for(var i = 0; i < this.Items.length; ++i){
         var oComment = this.Items[i];
+        oComment.Data.bDocument = !(oComment.Parent && (oComment.Parent.slide instanceof Slide));
         editor.sync_AddComment(oComment.Get_Id(), oComment.Data);
     }
 };

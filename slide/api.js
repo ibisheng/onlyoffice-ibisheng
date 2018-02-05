@@ -4522,6 +4522,7 @@ background-repeat: no-repeat;\
 			this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
 			this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved : false;
 			this.m_sUserName  = (undefined != obj.m_sUserName ) ? obj.m_sUserName : "";
+			this.bDocument    = (undefined != obj.bDocument   ) ? obj.bDocument : false;
 			this.m_aReplies   = [];
 			if (undefined != obj.m_aReplies)
 			{
@@ -4543,6 +4544,7 @@ background-repeat: no-repeat;\
 			this.m_bSolved    = false;
 			this.m_sUserName  = "";
 			this.m_aReplies   = [];
+			this.bDocument    = false;
 		}
 	}
 
@@ -4614,7 +4616,14 @@ background-repeat: no-repeat;\
 	{
 		return this.m_aReplies.length;
 	};
-
+	asc_CCommentData.prototype.asc_putDocumentFlag        = function(v)
+	{
+		this.bDocument = v;
+	};
+	asc_CCommentData.prototype.asc_getDocumentFlag = function()
+	{
+		return this.bDocument;
+	};
 
 	asc_docs_api.prototype.asc_showComments = function()
 	{
@@ -5007,6 +5016,7 @@ background-repeat: no-repeat;\
 			var _commentsCount = _comments.length;
 			for (var j = 0; j < _commentsCount; j++)
 			{
+				_comments[j].Data.bDocument = true;
 				this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data);
 			}
 		}
@@ -7640,6 +7650,9 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype['asc_getReply']        = asc_CCommentData.prototype.asc_getReply;
 	asc_CCommentData.prototype['asc_addReply']        = asc_CCommentData.prototype.asc_addReply;
 	asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
+	asc_CCommentData.prototype["asc_putDocumentFlag"] = asc_CCommentData.prototype.asc_putDocumentFlag;
+	asc_CCommentData.prototype["asc_getDocumentFlag"] = asc_CCommentData.prototype.asc_getDocumentFlag;
+
 	window['AscCommonSlide'].CContextMenuData         = CContextMenuData;
 	CContextMenuData.prototype['get_Type']            = CContextMenuData.prototype.get_Type;
 	CContextMenuData.prototype['get_X']               = CContextMenuData.prototype.get_X;

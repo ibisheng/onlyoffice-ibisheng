@@ -3313,23 +3313,27 @@ CShape.prototype.recalculateLocalTransform = function(transform)
         // по вертикали - в зависимости от вертикального выравнивания контента.
         {
             var dSin = Math.sin(this.rot), dCos = Math.cos(this.rot);
-            var nJc = this.getDocContent().Content[0].CompiledPr.Pr.ParaPr.Jc;
+            var oContent = this.getDocContent();
+            var nJc = oContent.Content[0].CompiledPr.Pr.ParaPr.Jc;
+            var FreezePointX, FreezePointY;
             switch(nJc)
             {
                 case AscCommon.align_Right:
                 {
                     dDeltaX = dOldExtX - this.extX;
+                    FreezePointX = oContent.XLimit;
                     break;
                 }
                 case AscCommon.align_Left:
                 {
                     dDeltaX = 0;
+                    FreezePointX = 0;
                     break;
                 }
-                case AscCommon.align_Center:
-                case AscCommon.align_Justify:
+                default:
                 {
                     dDeltaX = (dOldExtX - this.extX)/2;
+                    FreezePointX = oContent.XLimit/2.0;
                     break;
                 }
             }
@@ -3338,6 +3342,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 case 0: //b
                 {
                     dDeltaY = dOldExtY - this.extY;
+                    FreezePointY = oContent.GetSummaryHeight();
                     break;
                 }
                 case 1:    //ctr
@@ -3345,16 +3350,25 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 case 3: //just
                 {// (Text Anchor Enum ( Center ))
                     dDeltaY = (dOldExtY - this.extY) / 2;
+                    FreezePointY = oContent.GetSummaryHeight()/2.0;
                     break;
                 }
-                case 4: //t
-                {//Top
+                default:
+                {
+                    FreezePointY = 0.0;
                     break;
                 }
             }
+            var tx1 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
+            var ty1 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
+            this.recalculateTransformText();
+
+            var oInvMatrix = this.invertTransformText.CreateDublicate();
+            oInvMatrix.tx = 0.0;
+            oInvMatrix.ty = 0.0;
             var dTrDeltaX, dTrDeltaY;
-            dTrDeltaX = dCos*dDeltaX - dSin*dDeltaY;
-            dTrDeltaY = dSin*dDeltaX + dCos*dDeltaY;
+            dTrDeltaX = oInvMatrix.TransformPointX(dDeltaX, dDeltaY);
+            dTrDeltaY = oInvMatrix.TransformPointY(dDeltaX, dDeltaY);
             this.x += dTrDeltaX;
             this.y += dTrDeltaY;
         }
