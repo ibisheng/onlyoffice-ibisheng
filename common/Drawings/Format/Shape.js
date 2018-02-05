@@ -3359,16 +3359,27 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     break;
                 }
             }
-            var tx1 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
-            var ty1 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
-            this.recalculateTransformText();
+            // var tx1 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
+            // var ty1 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
+            // this.recalculateTransformText();
+            // var tx2 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
+            // var ty2 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
 
-            var oInvMatrix = this.invertTransformText.CreateDublicate();
-            oInvMatrix.tx = 0.0;
-            oInvMatrix.ty = 0.0;
+
             var dTrDeltaX, dTrDeltaY;
-            dTrDeltaX = oInvMatrix.TransformPointX(dDeltaX, dDeltaY);
-            dTrDeltaY = oInvMatrix.TransformPointY(dDeltaX, dDeltaY);
+            // if(this.invertTransform)
+            // {
+            //     var oInvMatrix = this.invertTransform.CreateDublicate();
+            //     oInvMatrix.tx = 0.0;
+            //     oInvMatrix.ty = 0.0;
+            //     dTrDeltaX = oInvMatrix.TransformPointX(dDeltaX, dDeltaY);
+            //     dTrDeltaY = oInvMatrix.TransformPointY(dDeltaX, dDeltaY);
+            // }
+            // else
+            {
+                dTrDeltaX = dDeltaX;
+                dTrDeltaY = dDeltaY;
+            }
             this.x += dTrDeltaX;
             this.y += dTrDeltaY;
         }
@@ -4818,7 +4829,7 @@ CShape.prototype.changePresetGeom = function (sPreset) {
         this.spPr.setGeometry(AscFormat.CreateGeometry(_final_preset));
     }
     else {
-        this.spPr.geometry = null;
+        this.spPr.setGeometry(null);
     }
     if(!this.bWordShape)
     {
