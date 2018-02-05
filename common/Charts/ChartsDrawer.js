@@ -3619,55 +3619,95 @@ CChartsDrawer.prototype =
 
 		return pathId;
 	},
-	
-	_isSwitchCurrent3DChart: function(chartSpace)
-	{
+
+	_isSwitchCurrent3DChart: function (chartSpace) {
 		var res = false;
 
-		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.charts[0]: null;
+		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.charts[0] : null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		var oView3D = chartSpace && chartSpace.chart && chartSpace.chart.getView3d();
-		if(isTurnOn3DCharts && oView3D)
-		{
+		if (isTurnOn3DCharts && oView3D) {
 			var isPerspective = !oView3D.getRAngAx();
-			
+
 			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== AscFormat.BAR_DIR_BAR;
 			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === AscFormat.BAR_DIR_BAR;
 			var isLine = typeChart === AscDFH.historyitem_type_LineChart;
 			var isPie = typeChart === AscDFH.historyitem_type_PieChart;
 			var isArea = typeChart === AscDFH.historyitem_type_AreaChart;
 			var isSurface = typeChart === AscDFH.historyitem_type_SurfaceChart;
-			
-			if(!isPerspective && (isBar || isLine || isHBar || isPie || isArea || isSurface))
-			{
+
+			if (!isPerspective && (isBar || isLine || isHBar || isPie || isArea || isSurface)) {
 				res = true;
-			}
-			else if(isPerspective && (isBar || isLine|| isHBar || isArea || isPie || isSurface))
-			{
+			} else if (isPerspective && (isBar || isLine || isHBar || isArea || isPie || isSurface)) {
 				res = true;
 			}
 		}
-		
+
 		return res;
 	},
 
-	getNumCache: function(val)
-	{
+	getNumCache: function (val) {
 		var res = null;
 
-		if(val)
-		{
-			if(val.numRef && val.numRef.numCache)
-			{
+		if (val) {
+			if (val.numRef && val.numRef.numCache) {
 				res = val.numRef.numCache;
-			}
-			else if(val.numLit)
-			{
+			} else if (val.numLit) {
 				res = val.numLit;
 			}
 		}
 
 		return res;
+	},
+
+	getHorizontalPoints: function () {
+		var plotArea = this.cChartSpace.chart.plotArea;
+		return plotArea.valAx.xPoints ? plotArea.valAx.xPoints : plotArea.catAx.xPoints;
+	},
+
+	getVerticalPoints: function () {
+		var plotArea = this.cChartSpace.chart.plotArea;
+		return plotArea.valAx.yPoints ? plotArea.valAx.yPoints : plotArea.catAx.yPoints;
+	},
+
+	getPlotAreaPoints: function () {
+		var xPoints = this.getHorizontalPoints();
+		var yPoints = this.getVerticalPoints();
+		var pxToMm = this.calcProp.pxToMM;
+		var plotArea = this.cChartSpace.chart.plotArea;
+		var left, right, bottom, top;
+
+		if (xPoints && yPoints) {
+			var crossBetweenX = this.cChartSpace.getValAxisCrossType();
+			var crossDiffX = 0;
+			if (crossBetweenX === AscFormat.CROSS_BETWEEN_BETWEEN && plotArea.valAx.posX && this.calcProp.type !== c_oChartTypes.HBar) {
+				crossDiffX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - plotArea.valAx.posX);
+			}
+			left = xPoints[0].pos - crossDiffX;
+			right = xPoints[xPoints.length - 1].pos + crossDiffX;
+
+			var crossBetweenY = this.cChartSpace.getValAxisCrossType();
+			var crossDiffY = 0;
+			if (crossBetweenY === AscFormat.CROSS_BETWEEN_BETWEEN && plotArea.valAx.posY) {
+				crossDiffY = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - plotArea.valAx.posY);
+			}
+			bottom = yPoints[0].pos + crossDiffY;
+			top = yPoints[yPoints.length - 1].pos - crossDiffY;
+		} else {
+			var widthGraph = this.calcProp.widthCanvas;
+			var heightGraph = this.calcProp.heightCanvas;
+			var leftMargin = this.calcProp.chartGutter._left;
+			var rightMargin = this.calcProp.chartGutter._right;
+			var topMargin = this.calcProp.chartGutter._top;
+			var bottomMargin = this.calcProp.chartGutter._bottom;
+
+			left = leftMargin / pxToMm;
+			right = (widthGraph - rightMargin) / pxToMm;
+			bottom = (heightGraph - bottomMargin) / pxToMm;
+			top = (topMargin) / pxToMm;
+		}
+
+		return {left: left, right: right, bottom: bottom, top: top};
 	}
 };
 
@@ -12030,7 +12070,7 @@ gridChart.prototype =
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
 		
-		this._drawHorisontalLines();
+		this._drawHorizontalLines();
 		this._drawVerticalLines();
 	},
 	
@@ -12041,11 +12081,11 @@ gridChart.prototype =
 		this.cChartDrawer = chartsDrawer;
 		
 		this.paths = {};
-		this._calculateHorisontalLines();
+		this._calculateHorizontalLines();
 		this._calculateVerticalLines();
 	},
 	
-	_calculateHorisontalLines : function()
+	_calculateHorizontalLines : function()
 	{	
 		var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - this.chartProp.chartGutter._top)/(this.chartProp.numhlines);
 		var minorStep = stepY / this.chartProp.numhMinorlines;
@@ -12421,7 +12461,7 @@ gridChart.prototype =
 		return pathId;
 	},
 	
-	_drawHorisontalLines: function()
+	_drawHorizontalLines: function()
 	{
 		var pen;
 		var path;
@@ -13655,22 +13695,17 @@ plotAreaChart.prototype =
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		var pxToMm = this.chartProp.pxToMM;
+		var plotAreaPoints = this.cChartDrawer.getPlotAreaPoints();
+		var left = plotAreaPoints.left;
+		var right = plotAreaPoints.right;
+		var top = plotAreaPoints.top;
+		var bottom = plotAreaPoints.bottom;
 		
-		var widthGraph = this.chartProp.widthCanvas;
-		var heightGraph = this.chartProp.heightCanvas;
-		var leftMargin = this.chartProp.chartGutter._left;
-		var rightMargin = this.chartProp.chartGutter._right;
-		var topMargin = this.chartProp.chartGutter._top;
-		var bottomMargin = this.chartProp.chartGutter._bottom;
-		
-		
-		path.moveTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
-		path.lnTo((widthGraph - rightMargin)  / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
-		path.lnTo((widthGraph - rightMargin) / pxToMm * pathW, topMargin / pxToMm * pathH);
-		path.lnTo(leftMargin / pxToMm * pathW, topMargin / pxToMm * pathH);
-		path.lnTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
-		
+		path.moveTo(left * pathW, bottom * pathH);
+		path.lnTo(right * pathW, bottom * pathH);
+		path.lnTo(right * pathW, top * pathH);
+		path.lnTo(left * pathW, top * pathH);
+		path.lnTo(left * pathW, bottom * pathH);
 
 		this.paths = pathId;
 	},
@@ -13684,30 +13719,28 @@ plotAreaChart.prototype =
 		var pathW = this.chartProp.pathW;
 		
 		var pxToMm = this.chartProp.pxToMM;
-		
-		var widthGraph = this.chartProp.widthCanvas;
-		var heightGraph = this.chartProp.heightCanvas;
-		var leftMargin = this.chartProp.chartGutter._left;
-		var rightMargin = this.chartProp.chartGutter._right;
-		var topMargin = this.chartProp.chartGutter._top;
-		var bottomMargin = this.chartProp.chartGutter._bottom;
-		
-		var view3DProp = this.cChartSpace.chart.getView3d();
+
+		var plotAreaPoints = this.cChartDrawer.getPlotAreaPoints();
+		var left = plotAreaPoints.left * pxToMm;
+		var right = plotAreaPoints.right * pxToMm;
+		var top = plotAreaPoints.top * pxToMm;
+		var bottom = plotAreaPoints.bottom * pxToMm;
+
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
-		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
+		var convertResult = this.cChartDrawer._convertAndTurnPoint(left, bottom, perspectiveDepth);
 		var x1n = convertResult.x;
 		var y1n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, heightGraph - bottomMargin, perspectiveDepth);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(right, bottom, perspectiveDepth);
 		var x2n = convertResult.x;
 		var y2n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, topMargin, perspectiveDepth);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(right, top, perspectiveDepth);
 		var x3n = convertResult.x;
 		var y3n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, topMargin, perspectiveDepth);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(left, top, perspectiveDepth);
 		var x4n = convertResult.x;
 		var y4n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(left, bottom, perspectiveDepth);
 		var x5n = convertResult.x;
 		var y5n = convertResult.y;
 
