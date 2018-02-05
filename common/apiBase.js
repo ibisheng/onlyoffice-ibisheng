@@ -1451,12 +1451,12 @@
 
 	baseEditorsApi.prototype["pluginMethod_StartAction"] = function(type, description)
 	{
-		this.sync_StartAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		this.sync_StartAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
 	};
 
 	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
 	{
-		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
 	};
 
 	// Builder
