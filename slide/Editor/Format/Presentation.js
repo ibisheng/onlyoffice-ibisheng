@@ -2749,6 +2749,28 @@ CPresentation.prototype =
             var ret = oController.getParagraphTextPr();
             if(ret)
             {
+
+                if(ret.RFonts){
+                    var oTheme = oController.getTheme();
+                    if(oTheme)
+                    {
+                        if(ret.RFonts.Ascii){
+                            ret.RFonts.Ascii.Name = oTheme.themeElements.fontScheme.checkFont(ret.RFonts.Ascii.Name);
+                        }
+                        if(ret.RFonts.EastAsia){
+                            ret.RFonts.EastAsia.Name = oTheme.themeElements.fontScheme.checkFont(ret.RFonts.EastAsia.Name);
+                        }
+                        if(ret.RFonts.HAnsi){
+                            ret.RFonts.HAnsi.Name = oTheme.themeElements.fontScheme.checkFont(ret.RFonts.HAnsi.Name);
+                        }
+                        if(ret.RFonts.CS){
+                            ret.RFonts.CS.Name = oTheme.themeElements.fontScheme.checkFont(ret.RFonts.CS.Name);
+                        }
+                        if(ret.FontFamily && ret.FontFamily.Name){
+                            ret.FontFamily.Name = oTheme.themeElements.fontScheme.checkFont(ret.FontFamily.Name);
+                        }
+                    }
+                }
                 return ret;
             }
         }
