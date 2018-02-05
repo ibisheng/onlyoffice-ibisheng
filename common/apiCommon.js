@@ -2004,6 +2004,7 @@
 		this.canFill = true;
 		this.canChangeArrows = false;
 		this.bFromChart = false;
+		this.bFromImage = false;
 		this.Locked = false;
 		this.w = null;
 		this.h = null;
@@ -2111,6 +2112,14 @@
 
 		asc_putSignatureId: function(v){
 			this.signatureId = v;
+		},
+
+		asc_getFromImage: function(){
+			return this.bFromImage;
+		},
+
+		asc_putFromImage: function(v){
+			this.bFromImage = v;
 		}
 	};
 
@@ -4114,6 +4123,8 @@
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
 	prot["get_SignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
 	prot["put_SignatureId"] = prot["asc_putSignatureId"] = prot.asc_putSignatureId;
+	prot["get_FromImage"] = prot["asc_getFromImage"] = prot.asc_getFromImage;
+	prot["put_FromImage"] = prot["asc_putFromImage"] = prot.asc_putFromImage;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;

@@ -7878,6 +7878,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeChartProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeChartProps.bFromChart;
+            shape_props.ShapeProperties.bFromImage = props.shapeChartProps.bFromImage;
             shape_props.ShapeProperties.lockAspect = props.shapeChartProps.lockAspect;
 
             if(props.shapeChartProps.paddings)
@@ -7942,6 +7943,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
+            shape_props.ShapeProperties.bFromImage = props.shapeProps.bFromImage;
             shape_props.ShapeProperties.lockAspect = props.shapeProps.lockAspect;
             shape_props.ShapeProperties.description = props.shapeProps.description;
             shape_props.ShapeProperties.title = props.shapeProps.title;
