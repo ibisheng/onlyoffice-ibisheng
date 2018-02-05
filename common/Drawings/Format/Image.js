@@ -660,7 +660,12 @@ CImageShape.prototype.select = CShape.prototype.select;
         this.addToRecalculate();
     };
 
-CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
+    CImageShape.prototype.changePresetGeom = function (sPreset) {
+        this.spPr.setGeometry( AscFormat.CreateGeometry(sPreset));
+    };
+
+
+    CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
 CImageShape.prototype.hit = CShape.prototype.hit;
 
     CImageShape.prototype.changeLine = function (line)

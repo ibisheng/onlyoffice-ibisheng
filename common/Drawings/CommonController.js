@@ -2808,6 +2808,11 @@ DrawingObjectsController.prototype =
                 objects_by_type.groups[i].changePresetGeom(props.type);
                 objects_by_type.groups[i].getAllShapes(objects_by_type.groups[i].spTree, aShapes);
             }
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].changePresetGeom(props.type);
+                aShapes.push(objects_by_type.images[i]);
+            }
             this.resetConnectors(aShapes);
         }
         if(isRealObject(props.stroke))

@@ -1220,6 +1220,12 @@
     CGraphicObjectBase.prototype.getStroke = function () {
         if(this.pen && this.pen.Fill)
         {
+            if(this.getObjectType() === AscDFH.historyitem_type_ImageShape && AscFormat.isRealNumber(this.pen.w))
+            {
+                var _ret = this.pen.createDuplicate();
+                _ret.w/=2.0;
+                return _ret;
+            }
             return this.pen;
         }
         var ret = AscFormat.CreateNoFillLine();
