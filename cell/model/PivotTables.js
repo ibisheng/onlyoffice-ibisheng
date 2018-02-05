@@ -2878,6 +2878,18 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
+CT_pivotTableDefinition.prototype.asc_select = function (api) {
+	var newSelection = new AscCommonExcel.SelectionRange(api.wbModel.getActiveWs());
+	newSelection.assign2(this.getRange());
+	if (this.pageFieldsPositions && 0 < this.pageFieldsPositions.length) {
+		this.pageFieldsPositions.forEach(function (element) {
+			newSelection.addRange();
+			newSelection.getLast().assign2(new Asc.Range(element.col, element.row, element.col + 1, element.row));
+		});
+		newSelection = newSelection.getUnion();
+	}
+	newSelection.Select();
+};
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
@@ -11055,6 +11067,7 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+prot["asc_select"] = prot.asc_select;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
