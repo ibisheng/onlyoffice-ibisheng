@@ -7484,7 +7484,7 @@ DrawingObjectsController.prototype =
                         w: drawing.extX,
                         h: drawing.extY ,
                         canChangeArrows: drawing.canChangeArrows(),
-                        bFromChart: true,
+                        bFromChart: false,
                         locked: locked,
                         textArtProperties: null,
                         lockAspect: lockAspect,
