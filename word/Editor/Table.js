@@ -780,8 +780,6 @@ CTable.prototype.Get_Props = function()
 
 	Pr.ColumnWidth = nColumnWidth;
 
-	this.private_CreateNewGrid(arrRowsInfo);
-
 	switch (Pr.CellsVAlign)
 	{
 		case vertalignjc_Top    :
