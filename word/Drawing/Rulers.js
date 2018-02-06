@@ -207,6 +207,8 @@ function CHorRuler()
                         // 9 - column size
                         // 10 - column move
 
+    this.DragTypeMouseDown = 0;
+
     this.m_dIndentLeft_old      = -10000;
     this.m_dIndentLeftFirst_old = -10000;
     this.m_dIndentRight_old     = -10000;
@@ -1574,7 +1576,7 @@ function CHorRuler()
         }
     }
 
-    this.CheckMouseType = function(x, y, isMouseDown)
+    this.CheckMouseType = function(x, y, isMouseDown, isNegative)
     {
 		// проверяем где находимся
 
@@ -1665,6 +1667,10 @@ function CHorRuler()
             }
         }
 
+        var isColumnsInside = false;
+		var isColumnsInside2 = false;
+        var isTableInside = false;
+
         if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH && this.IsCanMoveMargins)
         {
             if (y >= _top && y <= _bottom)
@@ -1678,10 +1684,20 @@ function CHorRuler()
                 {
                     return 2;
                 }
+
+                if (isNegative)
+                {
+                    if (x < this.m_dMarginLeft)
+                        return -1;
+                    if (x > this.m_dMarginRight)
+                        return -2;
+                }
             }
         }
         else if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
         {
+            var nTI_x = 0;
+            var nTI_r = 0;
             if (y >= _top && y <= _bottom)
             {
                 var markup = this.m_oTableMarkup;
@@ -1695,17 +1711,31 @@ function CHorRuler()
                         return 8;
                     }
                     if (i == _count)
+                    {
+                        nTI_r = pos;
                         break;
+					}
+					if (i == 0)
+                    {
+                        nTI_x = pos;
+                    }
                     
                     pos += markup.Cols[i];
                 }
             }
+
+            if (x > nTI_x && x < nTI_r)
+                isTableInside = true;
         }
         else if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
         {
-            if (y >= _top && y <= _bottom)
+			if (y >= _top && y <= _bottom)
             {
                 var markup = this.m_oColumnMarkup;
+
+				var nCI_x = markup.X;
+				var nCI_r = nCI_x;
+
                 if (markup.EqualWidth)
                 {
                     var _w = ((markup.R - markup.X) - markup.Space * (markup.Num - 1)) / markup.Num;
@@ -1733,6 +1763,7 @@ function CHorRuler()
 
                         ++_index;
                         _x += _w;
+                        nCI_r = _x;
 
                         if (i == markup.Num - 1)
                         {
@@ -1749,6 +1780,9 @@ function CHorRuler()
                                 this.DragTablePos = _index;
                                 return 9;
                             }
+
+							if (x > _x && x < (_x + markup.Space))
+								isColumnsInside = true;
                         }
 
                         ++_index;
@@ -1781,8 +1815,9 @@ function CHorRuler()
 
                         ++_index;
                         _x += markup.Cols[i].W;
+						nCI_r = _x;
 
-                        if (i == markup.Num - 1)
+						if (i == markup.Num - 1)
                         {
                             if (Math.abs(x - _x) < 1)
                             {
@@ -1806,14 +1841,40 @@ function CHorRuler()
                                 this.DragTablePos = i;
                                 return 10;
                             }
+
+							if (x > _x && x < (_x + markup.Cols[i].Space))
+								isColumnsInside = true;
                         }
 
                         ++_index;
                         _x += markup.Cols[i].Space;
                     }
                 }
+
+				if (x > nCI_x && x < nCI_r)
+					isColumnsInside2 = true;
             }
         }
+
+        if (isNegative)
+        {
+            if (isColumnsInside)
+                return -9;
+
+            // если вникуда - то ВСЕГДА margins
+            return -1;
+
+            if (isColumnsInside2)
+                return 0;
+            if ((y >= _top && y <= _bottom) && !isTableInside)
+            {
+				if (x < _margin_left)
+					return -1;
+				if (x > _margin_right)
+					return -2;
+            }
+        }
+
         return 0;
     }
 
@@ -1827,7 +1888,7 @@ function CHorRuler()
 			word_control.m_oApi.sync_StartAddShapeCallback(false);
         }
 
-        AscCommon.check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.LockMouse();
 
         this.SimpleChanges.Reinit();
@@ -1839,7 +1900,64 @@ function CHorRuler()
         _x *= dKoefPxToMM;
         var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
 
-        this.DragType = this.CheckMouseType(_x, _y, true);
+        this.DragType = this.CheckMouseType(_x, _y, true, true);
+        if (this.DragType < 0)
+        {
+			this.DragTypeMouseDown = -this.DragType;
+			this.DragType = 0;
+		}
+		else
+        {
+            this.DragTypeMouseDown = this.DragType;
+		}
+
+		if (global_mouseEvent.ClickCount > 1)
+        {
+            var eventType = "";
+            switch (this.DragTypeMouseDown)
+            {
+                case 1:
+                case 2:
+                {
+					eventType = "margins";
+                    break;
+                }
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                {
+					eventType = "indents";
+                    break;
+                }
+                case 7:
+                {
+					eventType = "tabs";
+                    break;
+                }
+                case 8:
+                {
+					eventType = "tables";
+                    break;
+                }
+                case 9:
+                case 10:
+                {
+					eventType = "columns";
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            if (eventType != "")
+            {
+				word_control.m_oApi.sendEvent("asc_onRulerDblClick", eventType);
+                this.DragType = 0;
+                this.OnMouseUp(left, top, e);
+                return;
+            }
+        }
 
         var _margin_left = this.m_dMarginLeft;
         var _margin_right = this.m_dMarginRight;
@@ -3494,7 +3612,7 @@ function CVerRuler()
 			word_control.m_oApi.sync_StartAddShapeCallback(false);
 		}
 
-        AscCommon.check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e, true);
 
         this.SimpleChanges.Reinit();
         global_mouseEvent.LockMouse();
@@ -3507,6 +3625,29 @@ function CVerRuler()
         var _x = (global_mouseEvent.X - word_control.X) * g_dKoef_pix_to_mm - word_control.GetMainContentBounds().L;
 
         this.DragType = this.CheckMouseType(_x, _y);
+		this.DragTypeMouseDown = this.DragType;
+
+		if (global_mouseEvent.ClickCount > 1)
+		{
+			var eventType = "";
+			switch (this.DragTypeMouseDown)
+			{
+				case 5:
+				    eventType = "tables";
+				    break;
+				default:
+					eventType = "margins";
+					break;
+			}
+
+			if (eventType != "")
+			{
+				word_control.m_oApi.sendEvent("asc_onRulerDblClick", eventType);
+				this.DragType = 0;
+				this.OnMouseUp(left, top, e);
+				return;
+			}
+		}
 
         switch (this.DragType)
         {
