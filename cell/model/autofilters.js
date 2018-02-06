@@ -950,6 +950,7 @@
 				var worksheet = this.worksheet;
 				var undoData = data.undo;
 				var cloneData;
+				var t = this;
 
 				if (!undoData) {
 					return;
@@ -965,32 +966,16 @@
 					return;
 				}
 
-				//TODO переделать undo, по типам
-				//TODO избавиться от добавления в историю целиком объекта фильтра/таблицы
-				//ниже в комментариях написал то, что ипользуется для undo в различных функциях
-				if (type === AscCH.historyitem_AutoFilter_ChangeColumnName || type === AscCH.historyitem_AutoFilter_ChangeTotalRow)//перемещение
-				{
-					//ипользуется объект c полями val, formula, nCol, nRow(undoData)
-					this.renameTableColumn(null, null, undoData);
-				} else if (type === AscCH.historyitem_AutoFilter_Move)//перемещение
-				{
-					//ипользуется moveFrom, moveTo + FilterColumns(data)
-					this._moveAutoFilters(null, null, data);
-				} else if (type === AscCH.historyitem_AutoFilter_Empty)//было удаление, на undo добавляем
-				{
-					//ипользуется целиком объект фильтра/фт(cloneData)
+				var undo_empty  = function() {
 					if (cloneData.TableStyleInfo) {
 						worksheet.addTablePart(cloneData, true);
-						this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
+						t._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 					} else {
 						worksheet.AutoFilter = cloneData;
 					}
-				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableInfo) {
+				};
 
-					this.changeFormatTableInfo(data.displayName, data.type, undoData.val);
-
-				} else if (type === AscCH.historyitem_AutoFilter_Change || type === AscCH.historyitem_AutoFilter_ChangeTableRef) {
-					//ипользуется целиком объект фильтра/фт(cloneData)
+				var undo_change = function() {
 					if (worksheet.AutoFilter && (cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref) ||
 						(cloneData.oldFilter && cloneData.oldFilter.isAutoFilter()))) {
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -1004,10 +989,10 @@
 								var clearRange = new AscCommonExcel.Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
 								clearRange.clearTableStyle();
 
-								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
+								t._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 
 								//если на месте того, где находилась Ф/т находится другая, то применяем к ней стили
-								this._setStyleTables(cloneData.newFilterRef);
+								t._setStyleTables(cloneData.newFilterRef);
 
 								//event
 								worksheet.handlers.trigger("changeRefTablePart", cloneData.oldFilter);
@@ -1016,10 +1001,86 @@
 							}
 						}
 					}
+				};
+
+				var undo_apply = function() {
+					if (cloneData.Ref) {
+						var isEn = false;
+						if (worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref)) {
+							t._reDrawCurrentFilter(cloneData.FilterColumns);
+							worksheet.AutoFilter = cloneData;
+							t._resetTablePartStyle(worksheet.AutoFilter.Ref);
+							isEn = true;
+						} else if (worksheet.TableParts) {
+							for (var l = 0; l < worksheet.TableParts.length; l++) {
+								if (cloneData.Ref.isEqual(worksheet.TableParts[l].Ref)) {
+									worksheet.changeTablePart(l, cloneData, false);
+									if (cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns) {
+										t._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns,
+											worksheet.TableParts[l]);
+									} else {
+										t._reDrawCurrentFilter(null, worksheet.TableParts[l]);
+									}
+									isEn = true;
+
+									//перерисовываем фильтры, находящиеся на одном уровне с данным фильтром
+									t._resetTablePartStyle(worksheet.TableParts[l].Ref);
+									break;
+								}
+							}
+						}
+
+						if (!isEn)//добавляем фильтр
+						{
+							if (cloneData.TableStyleInfo) {
+								worksheet.addTablePart.push(cloneData);
+								t._setColorStyleTable(cloneData.Ref, cloneData, null, true);
+							} else {
+								worksheet.AutoFilter = cloneData;
+							}
+						}
+					}
+					t.worksheet.handlers.trigger('onFilterInfo');
+				};
+
+				var undo_add = function() {
+					if (worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref)) {
+						worksheet.AutoFilter = null;
+					} else if (worksheet.TableParts) {
+						for (var l = 0; l < worksheet.TableParts.length; l++) {
+							if (cloneData.Ref.isEqual(worksheet.TableParts[l].Ref)) {
+								t._cleanStyleTable(cloneData.Ref);
+								worksheet.deleteTablePart(l);
+							}
+						}
+					}
+				};
+
+				//TODO переделать undo, по типам
+				//TODO избавиться от добавления в историю целиком объекта фильтра/таблицы
+				//ниже в комментариях написал то, что ипользуется для undo в различных функциях
+				if (type === AscCH.historyitem_AutoFilter_ChangeColumnName || type === AscCH.historyitem_AutoFilter_ChangeTotalRow) {
+					//ипользуется объект c полями val, formula, nCol, nRow(undoData)
+					this.renameTableColumn(null, null, undoData);
+				} else if (type === AscCH.historyitem_AutoFilter_Move) {
+					//перемещение
+					//ипользуется moveFrom, moveTo + FilterColumns(data)
+					this._moveAutoFilters(null, null, data);
+				} else if (type === AscCH.historyitem_AutoFilter_Empty) {
+					//было удаление, на undo добавляем
+					//ипользуется целиком объект фильтра/фт(cloneData)
+					undo_empty();
+				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableInfo) {
+					this.changeFormatTableInfo(data.displayName, data.type, undoData.val);
+				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableRef) {
+					this.changeTableRange(data.displayName, undoData.moveFrom);
+				} else if (type === AscCH.historyitem_AutoFilter_Change) {
+					//ипользуется целиком объект фильтра/фт(cloneData)
+					undo_change();
 				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableName) {
 					this.changeDisplayNameTable(data.val, data.displayName);
-				} else if ((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter)//сортировка
-				{
+				} else if ((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter) {
+					//сортировка
 					//ипользуется целиком объект фт(cloneData)
 					if (worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter()) {
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -1033,7 +1094,6 @@
 					}
 				} else if (type === AscCH.historyitem_AutoFilter_CleanFormat) {
 					//ипользуется Ref и Name
-
 					//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
 					//если передавать в redo displayName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени
 					if (cloneData && cloneData.ref) {
@@ -1045,58 +1105,13 @@
 					}
 				} else if (cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart)))//apply
 				{
-					//TODO заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
+					//заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
 					//ипользуется целиком объект фильтра/фт(cloneData)
-					if (cloneData.Ref) {
-						var isEn = false;
-						if (worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref)) {
-							this._reDrawCurrentFilter(cloneData.FilterColumns);
-							worksheet.AutoFilter = cloneData;
-							this._resetTablePartStyle(worksheet.AutoFilter.Ref);
-							isEn = true;
-						} else if (worksheet.TableParts) {
-							for (var l = 0; l < worksheet.TableParts.length; l++) {
-								if (cloneData.Ref.isEqual(worksheet.TableParts[l].Ref)) {
-									worksheet.changeTablePart(l, cloneData, false);
-									if (cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns) {
-										this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns,
-											worksheet.TableParts[l]);
-									} else {
-										this._reDrawCurrentFilter(null, worksheet.TableParts[l]);
-									}
-									isEn = true;
-
-									//перерисовываем фильтры, находящиеся на одном уровне с данным фильтром
-									this._resetTablePartStyle(worksheet.TableParts[l].Ref);
-									break;
-								}
-							}
-						}
-
-						if (!isEn)//добавляем фильтр
-						{
-							if (cloneData.TableStyleInfo) {
-								worksheet.addTablePart.push(cloneData);
-								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
-							} else {
-								worksheet.AutoFilter = cloneData;
-							}
-						}
-					}
-					this.worksheet.handlers.trigger('onFilterInfo');
-				} else if (type === AscCH.historyitem_AutoFilter_Add) //удаление таблиц / автофильтров
-				{
+					undo_apply();
+				} else if (type === AscCH.historyitem_AutoFilter_Add) {
+					//удаление таблиц / автофильтров
 					//используется только Ref
-					if (worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref)) {
-						worksheet.AutoFilter = null;
-					} else if (worksheet.TableParts) {
-						for (var l = 0; l < worksheet.TableParts.length; l++) {
-							if (cloneData.Ref.isEqual(worksheet.TableParts[l].Ref)) {
-								this._cleanStyleTable(cloneData.Ref);
-								worksheet.deleteTablePart(l);
-							}
-						}
-					}
+					undo_add();
 				}
 			},
 			
@@ -2572,7 +2587,7 @@
 				
 				tablePart.changeRefOnRange(range, this, true);
 				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableRef,
+				this._addHistoryObj({moveFrom: oldFilter.Ref}, AscCH.historyitem_AutoFilter_ChangeTableRef,
 						{activeCells: tablePart.Ref.clone(), arnTo: range, displayName: tableName});
 				
 				this._cleanStyleTable(oldFilter.Ref);
