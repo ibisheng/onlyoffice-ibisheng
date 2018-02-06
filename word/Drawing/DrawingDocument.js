@@ -2090,12 +2090,13 @@ function CPage()
 				var _yLast = (lastBounds.Y + lastBounds.H);
 
 				var ctx = overlay.m_oContext;
-				ctx.strokeStyle = "rgb(0, 0, 0)";
+				ctx.strokeStyle = "rgb(160, 160, 160)";
 				ctx.fillStyle = "#FFFFFF";
 				ctx.lineWidth = 1;
 				ctx.beginPath();
 
-				var _dist = 12 / (_ft.sx + _ft.sy);
+				var _dist = 6 / _ft.GetScaleValue();
+
 				var _arr = [
 					_ft.TransformPointX(_xLast, _yLast),
 					_ft.TransformPointY(_xLast, _yLast),

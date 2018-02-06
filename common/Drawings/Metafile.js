@@ -2805,6 +2805,15 @@
 				return true;
 			}
 			return false;
+		},
+
+		GetScaleValue : function()
+		{
+			var x1 = this.TransformPointX(0, 0);
+			var y1 = this.TransformPointY(0, 0);
+			var x2 = this.TransformPointX(1, 1);
+			var y2 = this.TransformPointY(1, 1);
+			return Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
 		}
 	};
 
