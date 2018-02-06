@@ -4190,8 +4190,10 @@ EndArrow.prototype =
             {
                 case LineEndSize.Large:
                     _ret = 5 * size;
+                    break;
                 case LineEndSize.Small:
                     _ret = 2 * size;
+                    break;
                 default:
                     break;
             }
@@ -4201,14 +4203,16 @@ EndArrow.prototype =
     GetLen: function(size, _max)
     {
         var _ret = 3 * size;
-        if (null != this.w)
+        if (null != this.len)
         {
-            switch (this.w)
+            switch (this.len)
             {
                 case LineEndSize.Large:
                     _ret = 5 * size;
+                    break;
                 case LineEndSize.Small:
                     _ret = 2 * size;
+                    break;
                 default:
                     break;
             }
