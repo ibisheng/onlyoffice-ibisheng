@@ -8395,7 +8395,7 @@ background-repeat: no-repeat;\
 				ifr.style.display = "block";
 				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 				this.asc_SetSilentMode(true);
-				AscCommon.Editor_Paste_Exec(this, frameWindow.document.body, ifr);
+				AscCommon.Editor_Paste_Exec(this, AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr);
 				this.asc_SetSilentMode(false);
 			}
 		}
