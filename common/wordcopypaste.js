@@ -4514,8 +4514,8 @@ PasteProcessor.prototype =
 				AscFormat.CheckSpPrXfrm(shape);
 				shape.spPr.xfrm.setExtX(w);
 				shape.spPr.xfrm.setExtY(h);
-				shape.spPr.xfrm.setOffX(0);
-				shape.spPr.xfrm.setOffY(0);
+				shape.spPr.xfrm.setOffX((presentation.Width - w)/2.0);
+				shape.spPr.xfrm.setOffY((presentation.Height - h)/2.0);
 
 
                 var oBodyPr = shape.getBodyPr().createDuplicate();
