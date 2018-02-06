@@ -2369,221 +2369,193 @@
 				
 				return res;
 			},
-			
-			changeFormatTableInfo: function(tableName, optionType, val)
-			{	
+
+			changeFormatTableInfo: function (tableName, optionType, val) {
 				var worksheet = this.worksheet;
 				var isSetValue = false;
 				var isSetType = false;
-				
+
 				var tablePart = this._getFilterByDisplayName(tableName);
-				
-				if(!tablePart)
-				{
+
+				if (!tablePart) {
 					return false;
 				}
-				
+
 				History.Create_NewPoint();
 				History.StartTransaction();
-				
-				var oldFilter = tablePart.clone(null);
-				var bAddHistoryPoint = true;
 
+				var bAddHistoryPoint = true, clearRange;
 				var undoData = val !== undefined ? !val : undefined;
 
-				switch(optionType)
-				{
-					case c_oAscChangeTableStyleInfo.columnBanded:
-					{
+				switch (optionType) {
+					case c_oAscChangeTableStyleInfo.columnBanded: {
 						tablePart.TableStyleInfo.ShowColumnStripes = !tablePart.TableStyleInfo.ShowColumnStripes;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.columnFirst:
-					{
+					case c_oAscChangeTableStyleInfo.columnFirst: {
 						tablePart.TableStyleInfo.ShowFirstColumn = !tablePart.TableStyleInfo.ShowFirstColumn;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.columnLast:
-					{
+					case c_oAscChangeTableStyleInfo.columnLast: {
 						tablePart.TableStyleInfo.ShowLastColumn = !tablePart.TableStyleInfo.ShowLastColumn;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.rowBanded:
-					{
+					case c_oAscChangeTableStyleInfo.rowBanded: {
 						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.rowTotal:
-					{	
-						if(val === false)//снимаем галку - удаляем строку итогов
+					case c_oAscChangeTableStyleInfo.rowTotal: {
+						if (val === false)//снимаем галку - удаляем строку итогов
 						{
 							//TODO раскомментировать и протестить(для бага 34740)
 							/*var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
+							 this._clearRange(clearRange, true);
+
+							 if(!this._isPartTablePartsUnderRange(tablePart.Ref))
+							 {
+							 worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).deleteCellsShiftUp();
+							 bAddHistoryPoint = false;
+							 }
+							 else
+							 {
+							 tablePart.changeRef(null, -1, null, true);
+							 tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							 }*/
+
+							clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
 
-							if(!this._isPartTablePartsUnderRange(tablePart.Ref))
-							{
-								worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).deleteCellsShiftUp();
-								bAddHistoryPoint = false;
-							}
-							else
-							{
-								tablePart.changeRef(null, -1, null, true);
-								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-							}*/
-
-							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
-							this._clearRange(clearRange, true);
-							
 							tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 							tablePart.changeRef(null, -1, null, true);
-						}
-						else
-						{
+						} else {
 							//TODO раскомментировать и протестить(для бага 34740)
 							/*var partTableUnderRange = this._isPartTablePartsUnderRange(tablePart.Ref);
-							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
-							if(!partTableUnderRange)
-							{
-								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
+							 var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							 if(!partTableUnderRange)
+							 {
+							 worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
 
-								isSetValue = true;
-								isSetType = true;
+							 isSetValue = true;
+							 isSetType = true;
 
-								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1, null, true);
-							}
-							else if(partTableUnderRange && this._isEmptyRange(rangeUnderTable, 0))
-							{
-								isSetValue = true;
-								isSetType = true;
+							 tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							 tablePart.changeRef(null, 1, null, true);
+							 }
+							 else if(partTableUnderRange && this._isEmptyRange(rangeUnderTable, 0))
+							 {
+							 isSetValue = true;
+							 isSetType = true;
 
-								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1, null, true);
-							}
-							else
-							{
-								alert("error");
-							}*/
+							 tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							 tablePart.changeRef(null, 1, null, true);
+							 }
+							 else
+							 {
+							 alert("error");
+							 }*/
 
 
 							//если снизу пустая строка, то просто увеличиваем диапазон и меняем флаг
-							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
-							if(this._isEmptyRange(rangeUnderTable, 0) && this.searchRangeInTableParts(rangeUnderTable) === -1)
-							{
+							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 +
+								1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							if (this._isEmptyRange(rangeUnderTable, 0) &&
+								this.searchRangeInTableParts(rangeUnderTable) === -1) {
 								isSetValue = true;
 								isSetType = true;
-								
+
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1, null, true);
+							} else {
+								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1,
+									tablePart.Ref.c2).addCellsShiftBottom();
+
+								isSetValue = true;
+								isSetType = true;
+
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 								tablePart.changeRef(null, 1, null, true);
 							}
-							else
-							{
-								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
-									
-								isSetValue = true;
-								isSetType = true;
-								
-								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
-								tablePart.changeRef(null, 1, null, true);
-							}
-							
-							if(val === true)
-							{
+
+							if (val === true) {
 								tablePart.generateTotalsRowLabel(worksheet);
 							}
 						}
-						
+
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.rowHeader:
-					{
-						if(val === false)//снимаем галку
+					case c_oAscChangeTableStyleInfo.rowHeader: {
+						if (val === false)//снимаем галку
 						{
-							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
+							clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
-							
+
 							tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 							tablePart.changeRef(null, 1, true);
-							
-							if(tablePart.AutoFilter)
-							{
+
+							if (tablePart.AutoFilter) {
 								this._openHiddenRows(tablePart);
 								tablePart.AutoFilter = null;
 							}
-						}
-						else
-						{
+						} else {
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
-							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
-							if(rangeUpTable.r1 >= 0 && this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
-							{
+							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1);
+							if (rangeUpTable.r1 >= 0 && this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1) {
 								isSetValue = true;
-								
+
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 								tablePart.changeRef(null, -1, true);
-							}
-							else
-							{
+							} else {
 								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
-								worksheet._moveRange(tablePart.Ref,  new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1));
-									
+								worksheet._moveRange(tablePart.Ref, new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1));
+
 								isSetValue = true;
-								
+
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 								tablePart.changeRef(null, -1, true);
 							}
-							
-							if(null === tablePart.AutoFilter)
-							{
+
+							if (null === tablePart.AutoFilter) {
 								tablePart.addAutoFilter();
 							}
 						}
-						
-						
+
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.filterButton:
-					{
+					case c_oAscChangeTableStyleInfo.filterButton: {
 						tablePart.showButton(val);
-						
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.advancedSettings:
-					{
+					case c_oAscChangeTableStyleInfo.advancedSettings: {
 						var title = val.asc_getTitle();
 						var description = val.asc_getDescription();
 						undoData = new AdvancedTableInfoSettings();
 
 						//если ничего не меняется в advancedSettings, не заносим точку в историю
 						bAddHistoryPoint = false;
-						if(undefined !== title)
-						{
+						if (undefined !== title) {
 							undoData.asc_setTitle(tablePart.altText);
 							tablePart.changeAltText(title);
 							bAddHistoryPoint = true;
 						}
-						if(undefined !== description)
-						{
+						if (undefined !== description) {
 							undoData.asc_setDescription(tablePart.altTextSummary);
 							tablePart.changeAltTextSummary(description);
 							bAddHistoryPoint = true;
 						}
-						
+
 						break;
 					}
 				}
-				
-				if(bAddHistoryPoint)
-				{
+
+				if (bAddHistoryPoint) {
 					this._addHistoryObj({val: undoData, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
 				}
-				
+
 				this._cleanStyleTable(tablePart.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue, isSetType);
 				History.EndTransaction();
-				
+
 				return tablePart.Ref.clone();
 			},
 			
