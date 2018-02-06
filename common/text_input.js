@@ -1070,7 +1070,7 @@
 			if (c_oCompositionState.end != this.compositionState)
 				return;
 
-			if (e.which == 13 && e.keyCode == 13)
+			if ((e.which == 13 && e.keyCode == 13) || (e.which == 10 && e.keyCode == 10))
 			{
 				AscCommon.stopEvent(e);
 				return false;
