@@ -576,7 +576,7 @@
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
 					//history
-					t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_ChangeTableStyle,
+					t._addHistoryObj({ref: cloneFilter.Ref, name: cloneFilter.TableStyleInfo.Name}, AscCH.historyitem_AutoFilter_ChangeTableStyle,
 						{activeCells: activeRange, styleName: styleName}, null, filterRange);
 					
 					History.EndTransaction();
@@ -1077,8 +1077,9 @@
 						//используется только Ref
 						undo_add();
 						break;
-					/*case AscCH.historyitem_AutoFilter_ChangeTableStyle:
-						break;*/
+					case AscCH.historyitem_AutoFilter_ChangeTableStyle:
+						this.changeTableStyleInfo(cloneData.name, data.activeCells);
+						break;
 					case AscCH.historyitem_AutoFilter_Sort:
 						undo_do();
 						break;
@@ -1120,9 +1121,9 @@
 					case AscCH.historyitem_AutoFilter_ChangeTableName:
 						this.changeDisplayNameTable(data.val, data.displayName);
 						break;
-					case AscCH.historyitem_AutoFilter_ClearFilterColumn:
+					/*case AscCH.historyitem_AutoFilter_ClearFilterColumn:
 						undo_do();
-						break;
+						break;*/
 					case AscCH.historyitem_AutoFilter_ChangeColumnName:
 						//ипользуется объект c полями val, formula, nCol, nRow(undoData)
 						this.renameTableColumn(null, null, undoData);
@@ -1133,7 +1134,9 @@
 						break;
 					default:
 						if (cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart))) {
-							//заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
+							//заходим для случаев type === AscCH.historyitem_AutoFilter_Apply
+							//заходим для случаев type === historyitem_AutoFilter_CleanAutoFilter
+							//AscCH.historyitem_AutoFilter_ClearFilterColumn
 							//ипользуется целиком объект фильтра/фт(cloneData)
 							undo_apply();
 						}
