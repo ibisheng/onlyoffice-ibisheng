@@ -7916,8 +7916,10 @@ function BinaryPPTYLoader()
                         else
                         {
                             var _l = s.GetULong();
-                            s.Skip2(1);
-                            bullet.bulletColor.UniColor = this.ReadUniColor();
+                            if (0 !== _l) {
+                                s.Skip2(1);
+                                bullet.bulletColor.UniColor = this.ReadUniColor();
+                            }
                         }
                     }
                     s.Seek2(cur_pos + _len + 4);
