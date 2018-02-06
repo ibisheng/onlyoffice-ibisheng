@@ -5241,6 +5241,13 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                     }
                 }
+
+
+                var cross_between = this.getValAxisCrossType();
+
+                if(cross_between === null){
+                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                }
                 //if(string_pts.length === 0)
                 {
                     pts_len = 0;
@@ -5260,6 +5267,10 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                         }
                     }
+                    if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT && pts_len < 2)
+                    {
+                        pts_len = 2;
+                    }
                     if(pts_len > string_pts.length)
                     {
                         for(i = string_pts.length; i < pts_len; ++i)
@@ -5272,6 +5283,8 @@ CChartSpace.prototype.recalculateAxis = function()
                         string_pts.splice(pts_len, string_pts.length - pts_len);
                     }
                 }
+
+
 
 
                 /*---------------------расчет позиции блока с подписями вертикальной оси-----------------------------------------------------------------------------*/
@@ -5302,10 +5315,10 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     labels_pos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
                 }
-                var cross_between = this.getValAxisCrossType();
-                if(cross_between === null){
-                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
-                }
+                // if(string_pts.length === 1)
+                // {
+                //     cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                // }
                 var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
                 var intervals_count = cross_between === AscFormat.CROSS_BETWEEN_MID_CAT ? string_pts.length - 1 : string_pts.length;
@@ -5329,11 +5342,11 @@ CChartSpace.prototype.recalculateAxis = function()
                                 val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
                                 if(!bNeedReflect)
                                 {
-                                    point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                    point_interval =  checkFiniteNumber((rect.w - val_ax.labels.extX)/intervals_count);
                                 }
                                 else
                                 {
-                                    point_interval = rect.w/intervals_count;
+                                    point_interval = checkFiniteNumber(rect.w/intervals_count);
                                 }
                                 val_ax.posX = val_ax.labels.x;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
@@ -5360,7 +5373,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
-                                point_interval = rect.w/intervals_count;
+                                point_interval = checkFiniteNumber(rect.w/intervals_count);
                                 val_ax.posX = val_ax.labels.x;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
@@ -5382,7 +5395,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var right_intervals_count = intervals_count - (crosses - 1);//количесво интервалов правее вертикальной оси
                                     //скорректируем point_interval, поделив расстояние, которое осталось справа от подписей осей на количество интервалов справа
-                                    point_interval = (rect.w - val_ax.labels.extX) / right_intervals_count;
+                                    point_interval = checkFiniteNumber((rect.w - val_ax.labels.extX) / right_intervals_count);
                                     val_ax.labels.x = rect.x;
                                     var start_point = val_ax.labels.x + val_ax.labels.extX - (crosses - 1) * point_interval;//x-координата точки, где начинается собственно область диаграммы
                                     if (cross_between === AscFormat.CROSS_BETWEEN_MID_CAT) {
@@ -5421,7 +5434,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
-                                point_interval = rect.w/intervals_count;
+                                point_interval = checkFiniteNumber( rect.w/intervals_count);
 
                                 if (cross_between === AscFormat.CROSS_BETWEEN_MID_CAT) {
                                     for (i = 0; i < string_pts.length; ++i)
@@ -5439,11 +5452,11 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         if(!bNeedReflect)
                         {
-                            point_interval = (rect.w -  val_ax.labels.extX)/intervals_count;
+                            point_interval = checkFiniteNumber((rect.w -  val_ax.labels.extX)/intervals_count);
                         }
                         else
                         {
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber( rect.w/intervals_count);
                         }
                         val_ax.labels.x = rect.x;
                         if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
@@ -5478,11 +5491,11 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         if(!bNeedReflect)
                         {
-                            point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            point_interval = checkFiniteNumber( (rect.w - val_ax.labels.extX)/intervals_count);
                         }
                         else
                         {
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber( rect.w/intervals_count);
                         }
 
                         val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
@@ -5525,11 +5538,11 @@ CChartSpace.prototype.recalculateAxis = function()
                                 val_ax.labels.x = rect.x;
                                 if(!bNeedReflect)
                                 {
-                                    point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                    point_interval = checkFiniteNumber( (rect.w - val_ax.labels.extX)/intervals_count);
                                 }
                                 else
                                 {
-                                    point_interval = rect.w/intervals_count;
+                                    point_interval = checkFiniteNumber( rect.w/intervals_count);
                                 }
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
@@ -5563,7 +5576,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
-                                point_interval = rect.w/intervals_count;
+                                point_interval = checkFiniteNumber( rect.w/intervals_count);
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
                                     for(i = 0; i < string_pts.length; ++i)
@@ -5593,7 +5606,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
                                 var left_points_interval_count = intervals_count - (crosses - 1);
-                                point_interval = (val_ax.labels.x - rect.x)/left_points_interval_count;
+                                point_interval = checkFiniteNumber( checkFiniteNumber( (val_ax.labels.x - rect.x)/left_points_interval_count));
                                 var start_point_right = rect.x + point_interval*intervals_count;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
@@ -5620,7 +5633,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                     bCorrectedLayoutRect = true;
                                 }
 
-                                point_interval = rect.w/intervals_count;
+                                point_interval = checkFiniteNumber( rect.w/intervals_count);
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
                                     for(i = 0; i < string_pts.length; ++i)
@@ -5640,11 +5653,11 @@ CChartSpace.prototype.recalculateAxis = function()
                         left_val_ax_labels_align = false;
                         if(!bNeedReflect && !bWithoutLabels)
                         {
-                            point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            point_interval = checkFiniteNumber( (rect.w - val_ax.labels.extX)/intervals_count);
                         }
                         else
                         {
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber( rect.w/intervals_count);
                         }
                         if(!bWithoutLabels){
                             val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
@@ -5683,7 +5696,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 bCorrectedLayoutRect = true;
                             }
 
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber(rect.w/intervals_count);
 
 
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
@@ -5711,11 +5724,11 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         if(!bNeedReflect && !bWithoutLabels)
                         {
-                            point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            point_interval = checkFiniteNumber((rect.w - val_ax.labels.extX)/intervals_count);
                         }
                         else
                         {
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber(rect.w/intervals_count);
                         }
                         if(!bWithoutLabels){
                             val_ax.labels.x = rect.x;
@@ -5745,7 +5758,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 bCorrectedLayoutRect = true;
                             }
 
-                            point_interval = rect.w/intervals_count;
+                            point_interval = checkFiniteNumber(rect.w/intervals_count);
                             if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                             {
                                 for(i = 0; i < string_pts.length; ++i)
@@ -7049,7 +7062,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
                             if(!bWithoutLabels){
                                 val_ax.labels.y = rect.y;
-                                point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                                point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
                             }
                             else{
                                 val_ax.labels.y = rect.y - val_ax.labels.extY;
@@ -7074,7 +7087,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 var top_intervals_count = intervals_count - (crosses - 1);//количесво интервалов выше горизонтальной оси
                                 //скорректируем point_interval, поделив расстояние, которое осталось справа от подписей осей на количество интервалов справа
-                                point_interval = (rect.h - val_ax.labels.extY)/top_intervals_count;
+                                point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/top_intervals_count);
                                 val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
                                 var start_point = val_ax.labels.y + (crosses-1)*point_interval;//y-координата точки низа области постоения
 
@@ -7109,7 +7122,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     else if(labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW)//подписи снизу от области построения
                     {
 						if(!bWithoutLabels){
-							point_interval = (rect.h -  val_ax.labels.extY)/intervals_count;
+							point_interval = checkFiniteNumber((rect.h -  val_ax.labels.extY)/intervals_count);
 							val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;	
 						}
 						else{
@@ -7130,13 +7143,13 @@ CChartSpace.prototype.recalculateAxis = function()
                     else if(labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)//подписи сверху от области построения
                     {
 						if(!bWithoutLabels){
-							point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+							point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
 							val_ax.labels.y = rect.y;
 						}
 						else{
 							val_ax.labels.y = rect.y - val_ax.labels.extY;
 						}
-                        point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+                        point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
                         val_ax.labels.y = rect.y;
                         bottom_val_ax_labels_align = false;
                         if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
@@ -7190,7 +7203,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
 							if(!bWithoutLabels){
 								val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
-								point_interval = (rect.h - val_ax.labels.extY)/intervals_count;	
+								point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
 							}
 							else{
 								val_ax.labels.y = rect.y + rect.h;								
@@ -7215,7 +7228,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 val_ax.labels.y = rect.y;
                                 var bottom_points_interval_count = intervals_count - (crosses - 1);
-                                point_interval = (rect.h - val_ax.labels.extY)/bottom_points_interval_count;
+                                point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/bottom_points_interval_count);
                                 var start_point_bottom = rect.y + rect.h - point_interval*intervals_count;
                                 if(cross_between === AscFormat.CROSS_BETWEEN_MID_CAT)
                                 {
@@ -7249,7 +7262,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         bottom_val_ax_labels_align = false;
 						if(!bWithoutLabels){
-							point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+							point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
 							val_ax.labels.y = rect.y;	
 						}
 						else{
@@ -7270,7 +7283,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     else if(labels_pos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH)//подписи снизу от области построения
                     {
 						if(!bWithoutLabels){
-							point_interval = (rect.h - val_ax.labels.extY)/intervals_count;
+							point_interval = checkFiniteNumber((rect.h - val_ax.labels.extY)/intervals_count);
 							val_ax.labels.y = rect.y + rect.h - val_ax.labels.extY;
 						}
 						else{

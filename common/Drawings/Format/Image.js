@@ -661,6 +661,9 @@ CImageShape.prototype.select = CShape.prototype.select;
     };
 
     CImageShape.prototype.changePresetGeom = function (sPreset) {
+        if(sPreset === "textRect"){
+            return;
+        }
         this.spPr.setGeometry( AscFormat.CreateGeometry(sPreset));
     };
 
