@@ -134,7 +134,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableStyle = 9;
 	window['AscCH'].historyitem_AutoFilter_Change = 10;
-	window['AscCH'].historyitem_AutoFilter_CleanFormat  = 11;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableRef = 13;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;

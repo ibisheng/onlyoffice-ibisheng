@@ -568,9 +568,11 @@
 					
 					cloneFilter = isTablePartsContainsRange.clone(null);
 
-                    if(!isTablePartsContainsRange.TableStyleInfo)
-                        isTablePartsContainsRange.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
-					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
+					if(!isTablePartsContainsRange.TableStyleInfo)
+					{
+						isTablePartsContainsRange.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
+					}
+					isTablePartsContainsRange.TableStyleInfo.setName(styleName);
 
 					t._cleanStyleTable(isTablePartsContainsRange.Ref);
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
@@ -905,9 +907,6 @@
 					case AscCH.historyitem_AutoFilter_CleanAutoFilter:
 						this.isApplyAutoFilterInCell(data.activeCells, true);
 						break;
-					case AscCH.historyitem_AutoFilter_CleanFormat:
-						this.cleanFormat(data.activeCells, true);
-						break;
 					case AscCH.historyitem_AutoFilter_Change:
 						if(data !== null && data.displayName)
 						{
@@ -1096,18 +1095,6 @@
 						break;
 					/*case AscCH.historyitem_AutoFilter_CleanAutoFilter:
 						break;*/
-					case AscCH.historyitem_AutoFilter_CleanFormat:
-						//ипользуется Ref и Name
-						//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
-						//если передавать в redo displayName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени
-						if (cloneData && cloneData.ref) {
-							var table = this._getTableByRef(cloneData.ref);
-							if (table) {
-								table.TableStyleInfo.setName(cloneData.name);
-								this._setColorStyleTable(cloneData.ref, table, null, true);
-							}
-						}
-						break;
 					case AscCH.historyitem_AutoFilter_Change:
 						//ипользуется целиком объект фильтра/фт(cloneData)
 						undo_change();
@@ -1258,33 +1245,26 @@
 					this.isEmptyAutoFilters(worksheet.AutoFilter.Ref);
 				else
 				{
+
 					//*****callBack on delete filter
 					var deleteFormatCallBack = function()
-					{	
+					{
 						History.Create_NewPoint();
 						History.StartTransaction();
-						
+
 						for(var i = 0; i < selectedTableParts.length; i++)
 						{
-							var cloneFilter = selectedTableParts[i].clone(null);
-
-                            if(selectedTableParts[i].TableStyleInfo)
-							{
-								selectedTableParts[i].TableStyleInfo.setName(null);
-							}
-
-							t._cleanStyleTable(selectedTableParts[i].Ref);
-							t._addHistoryObj({ref: cloneFilter.Ref,name: cloneFilter.TableStyleInfo.Name}, AscCH.historyitem_AutoFilter_CleanFormat, {activeCells: range});
+							t.changeTableStyleInfo(null, selectedTableParts[i].Ref);
 						}
-						
+
 						History.EndTransaction();
 					};
-					
+
 					selectedTableParts = this._searchFiltersInRange(range, true);
 					if(selectedTableParts && selectedTableParts.length)
-                    {
-                        deleteFormatCallBack();
-                    }
+					{
+						deleteFormatCallBack();
+					}
 				}
 			},
 			
