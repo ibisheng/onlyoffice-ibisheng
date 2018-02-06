@@ -985,7 +985,11 @@
 					} else {
 						worksheet.AutoFilter = cloneData;
 					}
-				} else if (type === AscCH.historyitem_AutoFilter_Change || type === AscCH.historyitem_AutoFilter_ChangeTableInfo || type === AscCH.historyitem_AutoFilter_ChangeTableRef) {
+				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableInfo) {
+
+					this.changeFormatTableInfo(data.displayName, data.type, undoData.val);
+
+				} else if (type === AscCH.historyitem_AutoFilter_Change || type === AscCH.historyitem_AutoFilter_ChangeTableRef) {
 					//ипользуется целиком объект фильтра/фт(cloneData)
 					if (worksheet.AutoFilter && (cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref) ||
 						(cloneData.oldFilter && cloneData.oldFilter.isAutoFilter()))) {
@@ -1029,6 +1033,9 @@
 					}
 				} else if (type === AscCH.historyitem_AutoFilter_CleanFormat) {
 					//ипользуется Ref и Name
+
+					//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
+					//если передавать в redo displayName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени
 					if (cloneData && cloneData.ref) {
 						var table = this._getTableByRef(cloneData.ref);
 						if (table) {
@@ -2381,7 +2388,9 @@
 				
 				var oldFilter = tablePart.clone(null);
 				var bAddHistoryPoint = true;
-				
+
+				var undoData = val !== undefined ? !val : undefined;
+
 				switch(optionType)
 				{
 					case c_oAscChangeTableStyleInfo.columnBanded:
@@ -2542,18 +2551,21 @@
 					}
 					case c_oAscChangeTableStyleInfo.advancedSettings:
 					{
-						var title = val.asc_getTitle()
+						var title = val.asc_getTitle();
 						var description = val.asc_getDescription();
-						
+						undoData = new AdvancedTableInfoSettings();
+
 						//если ничего не меняется в advancedSettings, не заносим точку в историю
 						bAddHistoryPoint = false;
 						if(undefined !== title)
 						{
+							undoData.asc_setTitle(tablePart.altText);
 							tablePart.changeAltText(title);
 							bAddHistoryPoint = true;
 						}
 						if(undefined !== description)
 						{
+							undoData.asc_setDescription(tablePart.altTextSummary);
 							tablePart.changeAltTextSummary(description);
 							bAddHistoryPoint = true;
 						}
@@ -2564,7 +2576,7 @@
 				
 				if(bAddHistoryPoint)
 				{
-					this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
+					this._addHistoryObj({val: undoData, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
 				}
 				
