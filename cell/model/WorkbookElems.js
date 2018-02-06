@@ -6318,6 +6318,10 @@ RangeDataManager.prototype = {
 		res.ShowLastColumn = this.ShowLastColumn;
 		return res;
 	};
+	TableStyleInfo.prototype.setName = function (val) {
+		this.Name = val;
+	};
+
 	/** @constructor */
 	function FilterColumn() {
 		this.ColId = null;
