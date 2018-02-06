@@ -6298,29 +6298,63 @@ CPresentation.prototype =
                 slide.setLayout(layout);
                 for(var j = slide.cSld.spTree.length-1; j  > -1 ; --j)
                 {
-                    if(slide.cSld.spTree[j].isEmptyPlaceholder())
+                    var shape = slide.cSld.spTree[j];
+                    //if(slide.cSld.spTree[j].isEmptyPlaceholder())
                     {
-                        slide.removeFromSpTreeById(slide.cSld.spTree[j].Get_Id());
-                    }
-                    else
-                    {
-                        var shape = slide.cSld.spTree[j];
-                        if(shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+                        var hierarchy = shape.getHierarchy();
+                        var bNoPlaceholder = true;
+                        var bNeedResetTransform = false;
+                        for(var t = 0; t < hierarchy.length; ++t)
                         {
-                            var hierarchy = shape.getHierarchy();
-                            for(var t = 0; t < hierarchy.length; ++t)
+                            if(hierarchy[t])
                             {
-                                if(hierarchy[t] && hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
+                                bNoPlaceholder = false;
+                                if(hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
                                 {
-                                    break;
+                                    bNeedResetTransform = true;
                                 }
                             }
-                            if(t === hierarchy.length)
+                        }
+                        if(bNoPlaceholder)
+                        {
+                            if(slide.cSld.spTree[j].isEmptyPlaceholder())
+                            {
+                                slide.removeFromSpTreeById(slide.cSld.spTree[j].Get_Id());
+                            }
+                            else
                             {
                                 AscFormat.CheckSpPrXfrm(shape);
                             }
                         }
+                        else
+                        {
+                            if(bNeedResetTransform)
+                            {
+                                if(shape.spPr && shape.spPr.xfrm && shape.spPr.xfrm.isNotNull())
+                                {
+                                    shape.spPr.setXfrm(null);
+                                }
+                            }
+                        }
                     }
+                    // else
+                    // {
+                    //     if(shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+                    //     {
+                    //         var hierarchy = shape.getHierarchy();
+                    //         for(var t = 0; t < hierarchy.length; ++t)
+                    //         {
+                    //             if(hierarchy[t] && hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
+                    //             {
+                    //                 break;
+                    //             }
+                    //         }
+                    //         if(t === hierarchy.length)
+                    //         {
+                    //             AscFormat.CheckSpPrXfrm(shape);
+                    //         }
+                    //     }
+                    // }
                 }
                 for(var j = 0; j < layout.cSld.spTree.length; ++j)
                 {
