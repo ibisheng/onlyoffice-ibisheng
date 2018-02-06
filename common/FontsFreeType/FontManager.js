@@ -251,7 +251,7 @@
             {
                 if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isArm)
                 {
-                    this.RasterMemory = new CRasterHeapTotal();
+                    this.RasterMemory = new AscFonts.CRasterHeapTotal();
                     this.RasterMemory.CreateFirstChuck();
                 }
             }

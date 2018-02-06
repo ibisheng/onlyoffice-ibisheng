@@ -1070,6 +1070,12 @@
 			if (c_oCompositionState.end != this.compositionState)
 				return;
 
+			if (e.which == 13 && e.keyCode == 13)
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
             var c = e.which || e.keyCode;
             AscFonts.FontPickerByCharacter.getFontBySymbol(c);
             if (AscFonts.FontPickerByCharacter.isExtendFonts())
