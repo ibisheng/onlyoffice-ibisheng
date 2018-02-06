@@ -1056,30 +1056,7 @@
 					}
 				};
 
-				//TODO переделать undo, по типам
-				//TODO избавиться от добавления в историю целиком объекта фильтра/таблицы
-				//ниже в комментариях написал то, что ипользуется для undo в различных функциях
-				if (type === AscCH.historyitem_AutoFilter_ChangeColumnName || type === AscCH.historyitem_AutoFilter_ChangeTotalRow) {
-					//ипользуется объект c полями val, formula, nCol, nRow(undoData)
-					this.renameTableColumn(null, null, undoData);
-				} else if (type === AscCH.historyitem_AutoFilter_Move) {
-					//перемещение
-					//ипользуется moveFrom, moveTo + FilterColumns(data)
-					this._moveAutoFilters(null, null, data);
-				} else if (type === AscCH.historyitem_AutoFilter_Empty) {
-					//было удаление, на undo добавляем
-					//ипользуется целиком объект фильтра/фт(cloneData)
-					undo_empty();
-				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableInfo) {
-					this.changeFormatTableInfo(data.displayName, data.type, undoData.val);
-				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableRef) {
-					this.changeTableRange(data.displayName, undoData.moveFrom);
-				} else if (type === AscCH.historyitem_AutoFilter_Change) {
-					//ипользуется целиком объект фильтра/фт(cloneData)
-					undo_change();
-				} else if (type === AscCH.historyitem_AutoFilter_ChangeTableName) {
-					this.changeDisplayNameTable(data.val, data.displayName);
-				} else if ((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter) {
+				var undo_do = function() {
 					//сортировка
 					//ипользуется целиком объект фт(cloneData)
 					if (worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter()) {
@@ -1092,26 +1069,75 @@
 							}
 						}
 					}
-				} else if (type === AscCH.historyitem_AutoFilter_CleanFormat) {
-					//ипользуется Ref и Name
-					//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
-					//если передавать в redo displayName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени
-					if (cloneData && cloneData.ref) {
-						var table = this._getTableByRef(cloneData.ref);
-						if (table) {
-							table.TableStyleInfo.setName(cloneData.name);
-							this._setColorStyleTable(cloneData.ref, table, null, true);
+				};
+
+				switch (type) {
+					case AscCH.historyitem_AutoFilter_Add:
+						//удаление таблиц / автофильтров
+						//используется только Ref
+						undo_add();
+						break;
+					/*case AscCH.historyitem_AutoFilter_ChangeTableStyle:
+						break;*/
+					case AscCH.historyitem_AutoFilter_Sort:
+						undo_do();
+						break;
+					case AscCH.historyitem_AutoFilter_Empty:
+						//было удаление, на undo добавляем
+						//ипользуется целиком объект фильтра/фт(cloneData)
+						undo_empty();
+						break;
+					/*case AscCH.historyitem_AutoFilter_Apply:
+						break;*/
+					case AscCH.historyitem_AutoFilter_Move:
+						//ипользуется moveFrom, moveTo + FilterColumns(data)
+						this._moveAutoFilters(null, null, data);
+						break;
+					/*case AscCH.historyitem_AutoFilter_CleanAutoFilter:
+						break;*/
+					case AscCH.historyitem_AutoFilter_CleanFormat:
+						//ипользуется Ref и Name
+						//TODO сравниваю не по DisplayName по следующей причине: делаем undo всему, затем redo, и форматированная таблицы добавляется с новым именем
+						//если передавать в redo displayName -> конфликт при совместном ред.(1- ый добавляет ф/т + undo, 2-ой добавляет ф/т, первый делает redo->2 одинаковых имени
+						if (cloneData && cloneData.ref) {
+							var table = this._getTableByRef(cloneData.ref);
+							if (table) {
+								table.TableStyleInfo.setName(cloneData.name);
+								this._setColorStyleTable(cloneData.ref, table, null, true);
+							}
 						}
-					}
-				} else if (cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart)))//apply
-				{
-					//заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
-					//ипользуется целиком объект фильтра/фт(cloneData)
-					undo_apply();
-				} else if (type === AscCH.historyitem_AutoFilter_Add) {
-					//удаление таблиц / автофильтров
-					//используется только Ref
-					undo_add();
+						break;
+					case AscCH.historyitem_AutoFilter_Change:
+						//ипользуется целиком объект фильтра/фт(cloneData)
+						undo_change();
+						break;
+					case AscCH.historyitem_AutoFilter_ChangeTableInfo:
+						this.changeFormatTableInfo(data.displayName, data.type, undoData.val);
+						break;
+					case AscCH.historyitem_AutoFilter_ChangeTableRef:
+						this.changeTableRange(data.displayName, undoData.moveFrom);
+						break;
+					case AscCH.historyitem_AutoFilter_ChangeTableName:
+						this.changeDisplayNameTable(data.val, data.displayName);
+						break;
+					case AscCH.historyitem_AutoFilter_ClearFilterColumn:
+						undo_do();
+						break;
+					case AscCH.historyitem_AutoFilter_ChangeColumnName:
+						//ипользуется объект c полями val, formula, nCol, nRow(undoData)
+						this.renameTableColumn(null, null, undoData);
+						break;
+					case AscCH.historyitem_AutoFilter_ChangeTotalRow:
+						//ипользуется объект c полями val, formula, nCol, nRow(undoData)
+						this.renameTableColumn(null, null, undoData);
+						break;
+					default:
+						if (cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart))) {
+							//заходим для случаев type === AscCH.historyitem_AutoFilter_Apply || type === AscCH.historyitem_AutoFilter_ChangeTableStyle)
+							//ипользуется целиком объект фильтра/фт(cloneData)
+							undo_apply();
+						}
+						break;
 				}
 			},
 			
