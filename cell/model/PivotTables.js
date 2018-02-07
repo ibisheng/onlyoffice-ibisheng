@@ -1966,6 +1966,8 @@ function CT_pivotTableDefinition() {
 	this.pageFieldsPositions = null;
 	this.clearGrid = false;
 	this.hasCompactField = true;
+
+	this.worksheet = null;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {

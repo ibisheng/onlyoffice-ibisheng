@@ -5622,6 +5622,10 @@
 		}
 		return res;
 	};
+	Worksheet.prototype.insertPivotTable = function (pivotTable) {
+		pivotTable.worksheet = this;
+		this.pivotTables.push(pivotTable);
+	};
 	Worksheet.prototype.getPivotTableButtons = function (range) {
 		var res = [];
 		var pivotTable, pivotRange, j, pos, countC, countCWValues, countR, cell;

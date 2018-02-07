@@ -1033,7 +1033,7 @@ var editor;
 											var cacheDefinition = wb.pivotCaches[pivotTable.cacheId];
 											if (cacheDefinition) {
 												pivotTable.cacheDefinition = cacheDefinition;
-												ws.pivotTables.push(pivotTable);
+												ws.insertPivotTable(pivotTable);
 											}
 										}
 									}
