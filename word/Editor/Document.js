@@ -1432,6 +1432,19 @@ CSelectedElementsInfo.prototype.GetComplexFields = function()
 {
 	return this.m_arrComplexFields;
 };
+CSelectedElementsInfo.prototype.GetTableOfContents = function()
+{
+	for (var nIndex = this.m_arrComplexFields.length - 1; nIndex >= 0; --nIndex)
+	{
+		var oComplexField = this.m_arrComplexFields[nIndex];
+		var oInstruction  = oComplexField.GetInstruction();
+
+		if (AscCommonWord.fieldtype_TOC === oInstruction.GetType())
+			return oComplexField;
+	}
+
+	return null;
+};
 CSelectedElementsInfo.prototype.SetHyperlink = function(oHyperlink)
 {
 	this.m_oHyperlink = oHyperlink;
@@ -16453,26 +16466,35 @@ CDocument.prototype.GetPagesCount = function()
 };
 /**
  * Данная функция получает первую таблицу TOC по схеме Word
+ * @param {boolean} [isCurrent=false] Ищем только в текущем месте или с начала документа
  * @returns {CBlockLevelSdt | CComplexField | null}
  */
-CDocument.prototype.GetTableOfContents = function()
+CDocument.prototype.GetTableOfContents = function(isCurrent)
 {
-	// 1. Ищем среди CBlockLevelSdt с параметром Unique = true
-	// 2. Ищем среди CBlockLevelSdt
-	// 3. Ищем потом просто в сложных полях
-
-	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	if (true === isCurrent)
 	{
-		var oResult = this.Content[nIndex].GetTableOfContents(true, false);
-		if (oResult)
-			return oResult;
+		var oSelectedInfo = this.GetSelectedElementsInfo();
+		return oSelectedInfo.GetTableOfContents();
 	}
-
-	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	else
 	{
-		var oResult = this.Content[nIndex].GetTableOfContents(false, true);
-		if (oResult)
-			return oResult;
+		// 1. Ищем среди CBlockLevelSdt с параметром Unique = true
+		// 2. Ищем среди CBlockLevelSdt
+		// 3. Ищем потом просто в сложных полях
+
+		for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+		{
+			var oResult = this.Content[nIndex].GetTableOfContents(true, false);
+			if (oResult)
+				return oResult;
+		}
+
+		for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+		{
+			var oResult = this.Content[nIndex].GetTableOfContents(false, true);
+			if (oResult)
+				return oResult;
+		}
 	}
 
 	return null;

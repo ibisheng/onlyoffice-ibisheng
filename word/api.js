@@ -7882,13 +7882,13 @@ background-repeat: no-repeat;\
 			this.asc_RemoveComplexField(oTOC);
 		}
 	};
-	asc_docs_api.prototype.asc_GetTableOfContentsPr = function()
+	asc_docs_api.prototype.asc_GetTableOfContentsPr = function(isCurrent)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument)
 			return;
 
-		var oTOC = oLogicDocument.GetTableOfContents();
+		var oTOC = oLogicDocument.GetTableOfContents(isCurrent);
 		if (!oTOC)
 			return;
 
@@ -7914,15 +7914,19 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return;
 
-		var oTOC = oLogicDocument.GetTableOfContents();
+		var oTOC = oPr.ComplexField;
 		if (!oTOC)
-			return;
+		{
+			oTOC = oLogicDocument.GetTableOfContents();
+			if (!oTOC)
+				return;
 
-		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
-			oTOC = oTOC.GetInnerTableOfContents();
+			if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
+				oTOC = oTOC.GetInnerTableOfContents();
 
-		if (!oTOC)
-			return;
+			if (!oTOC)
+				return;
+		}
 
 		var oStyles     = oLogicDocument.GetStyles();
 		var nStylesType = oPr.get_StylesType();

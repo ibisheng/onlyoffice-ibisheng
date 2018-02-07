@@ -1456,9 +1456,11 @@
 		this.RightTab     = true;
 
 		// Эти параметры задаются только из интерфейса
-		this.TabLeader   = undefined;
+		this.TabLeader    = undefined;
 
-		this.StylesType  = Asc.c_oAscTOCStylesType.Current;
+		this.StylesType   = Asc.c_oAscTOCStylesType.Current;
+
+		this.ComplexField = null;
 	}
 	CTableOfContentsPr.prototype.InitFromTOCInstruction = function(oComplexField)
 	{
@@ -1476,6 +1478,8 @@
 
 		this.PageNumbers  = !oInstruction.IsSkipPageRefLvl();
 		this.RightTab     = "" === oInstruction.GetSeparator();
+
+		this.ComplexField = oComplexField;
 	};
 	CTableOfContentsPr.prototype.CheckStylesType = function(oStyles)
 	{
@@ -1561,6 +1565,10 @@
 	{
 		this.StylesType = nType;
 	};
+	CTableOfContentsPr.prototype.get_InternalClass = function()
+	{
+		return this.ComplexField;
+	};
 
 
 	window['Asc']['CTableOfContentsPr'] = window['Asc'].CTableOfContentsPr = CTableOfContentsPr;
@@ -1581,6 +1589,7 @@
 	CTableOfContentsPr.prototype['put_TabLeader']       = CTableOfContentsPr.prototype.put_TabLeader;
 	CTableOfContentsPr.prototype['get_StylesType']      = CTableOfContentsPr.prototype.get_StylesType;
 	CTableOfContentsPr.prototype['put_StylesType']      = CTableOfContentsPr.prototype.put_StylesType;
+	CTableOfContentsPr.prototype['get_InternalClass']   = CTableOfContentsPr.prototype.get_InternalClass;
 
 
 	/**
