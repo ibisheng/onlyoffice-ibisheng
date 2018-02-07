@@ -1233,8 +1233,8 @@ function CBinaryFileWriter()
                 oThis._WriteInt1(0, _comment.WriteAuthorId);
                 oThis._WriteString1(1, _comment.WriteTime);
                 oThis._WriteInt1(2, _comment.WriteCommentId);
-                oThis._WriteInt1(3, (_comment.x * 25.4) >> 0);
-                oThis._WriteInt1(4, (_comment.y * 25.4) >> 0);
+                oThis._WriteInt1(3, (22.66*_comment.x) >> 0);
+                oThis._WriteInt1(4, (22.66*_comment.y) >> 0);
                 oThis._WriteString1(5, _comment.Data.m_sText);
 
                 if (0 != _comment.WriteParentAuthorId)

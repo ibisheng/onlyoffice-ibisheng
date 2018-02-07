@@ -1471,7 +1471,7 @@ function fLoadComments(oObject, authors)
                 _wc.ParceAdditionalData(commentData);
 
                 var comment = new CComment(oComments, new CCommentData());
-                comment.setPosition(_wc.x / 25.4, _wc.y / 25.4);
+                comment.setPosition(_wc.x / 22.66, _wc.y / 22.66);
                 _comments.push(comment);
             }
         }
