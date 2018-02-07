@@ -8453,23 +8453,25 @@
 
                         switch(val) {
 							case c_oAscCleanOptions.All:
-                            range.cleanAll();
+							    range.cleanAll();
+								t.model.deletePivotTables(range.bbox);
 								t.model.removeSparklines(arn);
-                            // Удаляем комментарии
-                            t.cellCommentator.deleteCommentsRange(arn);
+								// Удаляем комментарии
+                                t.cellCommentator.deleteCommentsRange(arn);
 								break;
 							case c_oAscCleanOptions.Text:
 							case c_oAscCleanOptions.Formula:
-                            range.cleanText();
+							    range.cleanText();
+								t.model.deletePivotTables(range.bbox);
 								break;
 							case c_oAscCleanOptions.Format:
-                            range.cleanFormat();
+							    range.cleanFormat();
 								break;
 							case c_oAscCleanOptions.Comments:
-                            t.cellCommentator.deleteCommentsRange(arn);
+							    t.cellCommentator.deleteCommentsRange(arn);
 								break;
 							case c_oAscCleanOptions.Hyperlinks:
-                            range.cleanHyperlinks();
+							    range.cleanHyperlinks();
 								break;
 							case c_oAscCleanOptions.Sparklines:
 								t.model.removeSparklines(arn);
@@ -8588,15 +8590,15 @@
 			}
         };
 
-		if ("paste" === prop && val.onlyImages === true) {
-			onSelectionCallback();
-		    return;
-		}
-
-		if ("paste" === prop && val.onlyImages !== true) {
-			var newRange = val.fromBinary ? this._pasteFromBinary(val.data, true) : this._pasteFromHTML(val.data, true);
-			checkRange = [newRange];
-		} else if (onlyActive) {
+		if ("paste" === prop) {
+		    if (val.onlyImages) {
+				onSelectionCallback(true);
+				return;
+            } else {
+				var newRange = val.fromBinary ? this._pasteFromBinary(val.data, true) : this._pasteFromHTML(val.data, true);
+				checkRange = [newRange];
+            }
+        } else if (onlyActive) {
 			checkRange.push(new asc_Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row));
 		} else {
 			this.model.selectionRange.ranges.forEach(function (item) {
@@ -8604,12 +8606,18 @@
 			});
 		}
 
-		if (("merge" === prop || "paste" === prop || "sort" === prop || "empty" === prop || "hyperlink" === prop ||
-			"rh" === prop) && this.model.inPivotTable(checkRange)) {
+		if (("merge" === prop || "paste" === prop || "sort" === prop || "hyperlink" === prop || "rh" === prop) &&
+			this.model.inPivotTable(checkRange)) {
 			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 				c_oAscError.Level.NoCritical);
 			return;
 		}
+		if ("empty" === prop && !this.model.checkDeletePivotTables(checkRange)) {
+		    // ToDo other error
+			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+				c_oAscError.Level.NoCritical);
+			return;
+        }
 		this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
     };
 

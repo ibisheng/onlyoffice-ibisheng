@@ -930,6 +930,14 @@
 		SelectionRange.prototype.contains2 = function (cell) {
 			return this.contains(cell.col, cell.row);
 		};
+		SelectionRange.prototype.inContains = function (ranges) {
+			var t = this;
+			return this.ranges.every(function (item1) {
+				return ranges.some(function (item2) {
+					return item2.containsRange(item1);
+				});
+			});
+		};
 		SelectionRange.prototype.containsRange = function (range) {
 			return this.ranges.some(function (item) {
 				return item.containsRange(range);

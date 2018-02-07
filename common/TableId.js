@@ -284,6 +284,7 @@
 		if (window['AscCommonExcel'])
 		{
 			this.m_oFactoryClass[AscDFH.historyitem_type_Sparkline] = AscCommonExcel.sparklineGroup;
+			this.m_oFactoryClass[AscDFH.historyitem_type_PivotTableDefinition] = Asc.CT_pivotTableDefinition;
 		}
 
 		this.m_oFactoryClass[AscDFH.historyitem_type_DocumentMacros] = AscCommon.CDocumentMacros;

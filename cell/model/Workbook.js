@@ -5602,6 +5602,33 @@
 			return AscCommonExcel.c_oAscShiftType.Change === element.isIntersectForShift(range, offset);
 		});
 	};
+	Worksheet.prototype.checkDeletePivotTables = function (range) {
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			if (this.pivotTables[i].intersection(range) && !this.pivotTables[i].getAllRange(this).inContains(range)) {
+				return false;
+			}
+		}
+		return true;
+	};
+	Worksheet.prototype.deletePivotTable = function (id) {
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			if (id === this.pivotTables[i].Get_Id()) {
+				this.clearPivotTable(this.pivotTables[i]);
+				this.pivotTables.splice(i, 1);
+				break;
+			}
+		}
+	};
+	Worksheet.prototype.deletePivotTables = function (range) {
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			if (this.pivotTables[i].intersection(range)) {
+				this.clearPivotTable(this.pivotTables[i]);
+				History.Add(new AscDFH.CChangesPivotTableDefinitionDelete(this.pivotTables[i]));
+				this.pivotTables.splice(i--, 1);
+			}
+		}
+		return true;
+	};
 	Worksheet.prototype.getPivotTable = function (col, row) {
 		var res = null;
 		for (var i = 0; i < this.pivotTables.length; ++i) {

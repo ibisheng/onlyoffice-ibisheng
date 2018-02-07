@@ -1289,6 +1289,7 @@
 	window['AscDFH'].historyitem_type_Notes                  = 1129 << 16;
 	window['AscDFH'].historyitem_type_Cnx                    = 1130 << 16;
 	window['AscDFH'].historyitem_type_PresentationSection    = 1131 << 16;
+	window['AscDFH'].historyitem_type_PivotTableDefinition   = 1132 << 16;
 
 	window['AscDFH'].historyitem_type_DocumentMacros         = 2000 << 16;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2615,6 +2616,8 @@
     window['AscDFH'].historyitem_Sparkline_ChangeData = window['AscDFH'].historyitem_type_Sparkline | 27;
     window['AscDFH'].historyitem_Sparkline_RemoveData = window['AscDFH'].historyitem_type_Sparkline | 28;
     window['AscDFH'].historyitem_Sparkline_RemoveSparkline = window['AscDFH'].historyitem_type_Sparkline | 29;
+
+	window['AscDFH'].historyitem_PivotTableDefinitionDelete = window['AscDFH'].historyitem_type_PivotTableDefinition | 1;
 
 
     window['AscDFH'].historyitem_NotesMasterSetHF          = window['AscDFH'].historyitem_type_NotesMaster | 1;

@@ -1968,7 +1968,30 @@ function CT_pivotTableDefinition() {
 	this.hasCompactField = true;
 
 	this.worksheet = null;
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
+	AscCommon.g_oTableId.Add(this, this.Id);
 }
+CT_pivotTableDefinition.prototype.getObjectType = function () {
+	return AscDFH.historyitem_type_PivotTableDefinition;
+};
+CT_pivotTableDefinition.prototype.Get_Id = function () {
+	return this.Id;
+};
+CT_pivotTableDefinition.prototype.Write_ToBinary2 = function (w) {
+	w.WriteLong(this.getObjectType());
+	w.WriteString2(this.Id);
+	w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+};
+CT_pivotTableDefinition.prototype.Read_FromBinary2 = function (r) {
+	this.Id = r.GetString2();
+
+	// ToDo not the best scheme for adding to a sheet...
+	var api_sheet = Asc['editor'];
+	this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+	if (this.worksheet) {
+		this.worksheet.insertPivotTable(this);
+	}
+};
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
@@ -10759,6 +10782,49 @@ PivotRecords.prototype._toXml = function(writer, elem) {
 	}
 };
 
+function CChangesPivotTableDefinitionDelete(Class, bReverse) {
+	this.Type = AscDFH.historyitem_PivotTableDefinitionDelete;
+	this.bReverse = bReverse;
+	AscDFH.CChangesBase.call(this, Class);
+}
+
+CChangesPivotTableDefinitionDelete.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesPivotTableDefinitionDelete.prototype.constructor = CChangesPivotTableDefinitionDelete;
+CChangesPivotTableDefinitionDelete.prototype.Undo = function () {
+	if (this.Class.worksheet) {
+		if (this.bReverse) {
+			this.Class.worksheet.deletePivotTable(this.Class.Get_Id());
+		} else {
+			this.Class.worksheet.insertPivotTable(this.Class);
+			this.Class.worksheet.updatePivotTablesStyle(null);
+		}
+
+	}
+};
+CChangesPivotTableDefinitionDelete.prototype.Redo = function () {
+	if (this.Class.worksheet) {
+		if (this.bReverse) {
+			this.Class.worksheet.insertPivotTable(this.Class);
+			this.Class.worksheet.updatePivotTablesStyle(null);
+		} else {
+			this.Class.worksheet.deletePivotTable(this.Class.Get_Id());
+		}
+	}
+};
+CChangesPivotTableDefinitionDelete.prototype.WriteToBinary = function (Writer) {
+	Writer.WriteBool(!!this.bReverse);
+};
+CChangesPivotTableDefinitionDelete.prototype.ReadFromBinary = function (Reader) {
+	this.bReverse = Reader.GetBool();
+};
+CChangesPivotTableDefinitionDelete.prototype.Load = function () {
+	this.Redo();
+	this.RefreshRecalcData();
+};
+CChangesPivotTableDefinitionDelete.prototype.CreateReverseChange = function () {
+	return new CChangesPivotTableDefinitionDelete(this.Class, !this.bReverse);
+};
+
 var prot;
 
 window['Asc']['c_oAscSourceType'] = window['AscCommonExcel'].c_oAscSourceType = c_oAscSourceType;
@@ -11115,3 +11181,7 @@ prot["asc_getShowDataAs"] = prot.asc_getShowDataAs;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setName"] = prot.asc_setName;
 prot["asc_setSubtotal"] = prot.asc_setSubtotal;
+
+window['AscDFH'].CChangesPivotTableDefinitionDelete = CChangesPivotTableDefinitionDelete;
+
+AscDFH.changesFactory[AscDFH.historyitem_PivotTableDefinitionDelete] = AscDFH.CChangesPivotTableDefinitionDelete;
