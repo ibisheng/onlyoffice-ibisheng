@@ -3503,6 +3503,25 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.RemoveTable();
 		}
 	};
+
+	asc_docs_api.prototype.asc_DistributeTableCells = function(isHorizontally)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties))
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DistributeTableCells);
+			if (!oLogicDocument.DistributeTableCells(isHorizontally))
+			{
+				oLogicDocument.History.RemoveLastPoint();
+				return false;
+			}
+		}
+
+		return true;
+	};
 	asc_docs_api.prototype.selectRow               = function()
 	{
 		this.WordControl.m_oLogicDocument.SelectTable(c_oAscTableSelectionType.Row);
@@ -7370,6 +7389,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['remRow']                              = asc_docs_api.prototype.remRow;
 	asc_docs_api.prototype['remColumn']                           = asc_docs_api.prototype.remColumn;
 	asc_docs_api.prototype['remTable']                            = asc_docs_api.prototype.remTable;
+	asc_docs_api.prototype['asc_DistributeTableCells']            = asc_docs_api.prototype.asc_DistributeTableCells;
 	asc_docs_api.prototype['selectRow']                           = asc_docs_api.prototype.selectRow;
 	asc_docs_api.prototype['selectColumn']                        = asc_docs_api.prototype.selectColumn;
 	asc_docs_api.prototype['selectCell']                          = asc_docs_api.prototype.selectCell;

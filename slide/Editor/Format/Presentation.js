@@ -3989,6 +3989,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     ApplyTableFunction : function(Function, bBefore, bAll, Cols, Rows)
     {
+        var result = null;
         if(this.Slides[this.CurPage])
         {
             var args;
@@ -4007,7 +4008,7 @@ CPresentation.prototype =
                 if(target_text_object.graphicObject.Content.length === 0)
                 {
                     this.RemoveTable();
-                    return;
+                    return result;
                 }
                 this.Recalculate();
                 this.Document_UpdateInterfaceState();
@@ -4033,7 +4034,7 @@ CPresentation.prototype =
                     {
                         by_types.tables[0].graphicObject.SelectAll();
                     }
-                    Function.apply(by_types.tables[0].graphicObject, args);
+                    result = Function.apply(by_types.tables[0].graphicObject, args);
                     if(by_types.tables[0].graphicObject.Content.length === 0)
                     {
                         this.RemoveTable();
@@ -4045,6 +4046,7 @@ CPresentation.prototype =
                 }
             }
         }
+        return result;
     },
 
 
@@ -4066,6 +4068,11 @@ CPresentation.prototype =
 	RemoveTableColumn : function()
     {
         this.ApplyTableFunction(CTable.prototype.RemoveTableColumn, true);
+    },
+
+    DistributeTableCells : function()
+    {
+        return this.ApplyTableFunction(CTable.prototype.DistributeTableCells, true);
     },
 
 	MergeTableCells : function()
