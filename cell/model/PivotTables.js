@@ -2839,6 +2839,18 @@ CT_pivotTableDefinition.prototype._getValue = function (records, rowIndex, index
 		output.push(new AscCommonExcel.cNumber(elem.val));
 	}
 };
+CT_pivotTableDefinition.prototype.getAllRange = function (ws) {
+	var newSelection = new AscCommonExcel.SelectionRange(ws);
+	newSelection.assign2(this.getRange());
+	if (this.pageFieldsPositions && 0 < this.pageFieldsPositions.length) {
+		this.pageFieldsPositions.forEach(function (element) {
+			newSelection.addRange();
+			newSelection.getLast().assign2(new Asc.Range(element.col, element.row, element.col + 1, element.row));
+		});
+		newSelection = newSelection.getUnion();
+	}
+	return newSelection;
+};
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
 };
@@ -2879,16 +2891,7 @@ CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
 CT_pivotTableDefinition.prototype.asc_select = function (api) {
-	var newSelection = new AscCommonExcel.SelectionRange(api.wbModel.getActiveWs());
-	newSelection.assign2(this.getRange());
-	if (this.pageFieldsPositions && 0 < this.pageFieldsPositions.length) {
-		this.pageFieldsPositions.forEach(function (element) {
-			newSelection.addRange();
-			newSelection.getLast().assign2(new Asc.Range(element.col, element.row, element.col + 1, element.row));
-		});
-		newSelection = newSelection.getUnion();
-	}
-	newSelection.Select();
+	this.getAllRange(api.wbModel.getActiveWs()).Select();
 };
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
