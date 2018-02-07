@@ -7655,7 +7655,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                //console.log("JS - openDocument()");
                
-               t.wbModel = t._openDocument(sData);
+               t._openDocument(sData);
 
                var thenCallback = function() {
                    t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
