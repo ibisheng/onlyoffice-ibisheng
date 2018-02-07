@@ -5691,6 +5691,11 @@ RangeDataManager.prototype = {
 		return this.TotalsRowCount > 0;
 	};
 
+	TablePart.prototype.generateSortState = function () {
+		this.SortState = new AscCommonExcel.SortState();
+		this.SortState.SortConditions = [];
+		this.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+	};
 
 	/** @constructor */
 	function AutoFilter() {
@@ -6025,6 +6030,11 @@ RangeDataManager.prototype = {
 		return {nOpenRowsCount: nRowsCount - nHiddenRowCount, nAllRowsCount: endRow - startRow + 1, minChangeRow: minChangeRow};
 	};
 
+	AutoFilter.prototype.generateSortState = function () {
+		this.SortState = new AscCommonExcel.SortState();
+		this.SortState.SortConditions = [];
+		this.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+	};
 
 	function FilterColumns() {
 		this.ColId = null;
@@ -7495,6 +7505,29 @@ SortCondition.prototype.getSortColor = function() {
 	}
 
 	return res;
+};
+
+SortCondition.prototype.applySort = function(type, ref, color) {
+	this.Ref = ref;
+
+	if(type === Asc.c_oAscSortOptions.ByColorFill || type === Asc.c_oAscSortOptions.ByColorFont) {
+		var newDxf;
+		if (type === Asc.c_oAscSortOptions.ByColorFill) {
+			newDxf = new AscCommonExcel.CellXfs();
+			newDxf.fill = new AscCommonExcel.Fill();
+			newDxf.fill.bg = color;
+			this.ConditionSortBy = Asc.ESortBy.sortbyCellColor;
+		} else {
+			newDxf.font = new AscCommonExcel.Font();
+			newDxf.font.setColor(color);
+			this.ConditionSortBy = Asc.ESortBy.sortbyFontColor;
+		}
+
+		this.dxf = AscCommonExcel.g_StyleCache.addXf(newDxf, true);
+	} else if(type === Asc.c_oAscSortOptions.Ascending || type === Asc.c_oAscSortOptions.Descending) {
+		this.ConditionDescending = type !== Asc.c_oAscSortOptions.Ascending;
+	}
+
 };
 
 function AutoFilterDateElem(start, end, dateTimeGrouping) {
