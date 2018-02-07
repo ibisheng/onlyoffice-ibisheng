@@ -283,13 +283,10 @@ var editor;
 	};
 
   spreadsheet_api.prototype._openDocument = function(data) {
-    var wb = new AscCommonExcel.Workbook(this.handlers, this);
-    this.initGlobalObjects(wb);
-    this.wbModel = wb;
+    this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
+    this.initGlobalObjects(this.wbModel);
     var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
-    oBinaryFileReader.Read(data, wb);
-    g_oIdCounter.Set_Load(false);
-    return wb;
+    oBinaryFileReader.Read(data, this.wbModel);
   };
 
   spreadsheet_api.prototype.initGlobalObjects = function(wbModel) {
@@ -937,8 +934,9 @@ var editor;
 
   spreadsheet_api.prototype.openDocument = function(sData) {
     var t = this;
-	this.wbModel = this._openDocument(sData);
+	this._openDocument(sData);
 	this.openDocumentFromZip(this.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
+		g_oIdCounter.Set_Load(false);
 		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
 
 		// Какая-то непонятная заглушка, чтобы не падало в ipad
@@ -3298,18 +3296,13 @@ var editor;
         this.User.setId("TM");
         this.User.setUserName("native");
     }
-
-    this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
-    this.initGlobalObjects(this.wbModel);
-
-    var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
-
     if (undefined !== version) {
-		AscCommon.CurFileVersion = version;
-	}
-    oBinaryFileReader.Read(base64File, this.wbModel);
-    g_oIdCounter.Set_Load(false);
+      AscCommon.CurFileVersion = version;
+    }
+
+    this._openDocument(sData);
 	var thenCallback = function() {
+		g_oIdCounter.Set_Load(false);
 		t._coAuthoringInit();
 		t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers, window["_null_object"], window["_null_object"], t, t.collaborativeEditing, t.fontRenderingMode);
 	};
