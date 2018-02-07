@@ -1042,19 +1042,6 @@
 					t.worksheet.handlers.trigger('onFilterInfo');
 				};
 
-				var undo_add = function() {
-					if (worksheet.AutoFilter && worksheet.AutoFilter.Ref.isEqual(cloneData.Ref)) {
-						worksheet.AutoFilter = null;
-					} else if (worksheet.TableParts) {
-						for (var l = 0; l < worksheet.TableParts.length; l++) {
-							if (cloneData.Ref.isEqual(worksheet.TableParts[l].Ref)) {
-								t._cleanStyleTable(cloneData.Ref);
-								worksheet.deleteTablePart(l);
-							}
-						}
-					}
-				};
-
 				var undo_do = function() {
 					//сортировка
 					//ипользуется целиком объект фт(cloneData)
@@ -1072,9 +1059,7 @@
 
 				switch (type) {
 					case AscCH.historyitem_AutoFilter_Add:
-						//удаление таблиц / автофильтров
-						//используется только Ref
-						undo_add();
+						this.isEmptyAutoFilters(cloneData.Ref);
 						break;
 					case AscCH.historyitem_AutoFilter_ChangeTableStyle:
 						this.changeTableStyleInfo(cloneData.name, data.activeCells);
