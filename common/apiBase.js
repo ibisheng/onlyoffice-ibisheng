@@ -1439,6 +1439,14 @@
 		}
 	};
 
+	baseEditorsApi.prototype["pluginMethod_PasteText"] = function(text)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, text);
+	};
+
 	baseEditorsApi.prototype["pluginMethod_GetMacros"] = function()
 	{
 		return this.asc_getMacros();
