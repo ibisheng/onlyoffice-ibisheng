@@ -7791,10 +7791,19 @@ PasteProcessor.prototype =
 
 					//Добавляет элемени стиля если он поменялся
 					oThis._commit_rPr(oTargetNode, bUseOnlyInherit);
+				}
 
-					//TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
-					//bIsPreviuosSpace - игнорируем несколько пробелов подряд
-					var bIsPreviuosSpace = false;
+				//TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
+				//bIsPreviousSpace - игнорируем несколько пробелов подряд
+				var bIsPreviousSpace = false;
+				var whiteSpacing = false;
+				if(node.parentNode)
+				{
+					var computedStyle = oThis._getComputedStyle(node.parentNode);
+					if(computedStyle)
+					{
+						whiteSpacing = "pre" === computedStyle.getPropertyValue("white-space");
+					}
 				}
 
 				for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
@@ -7820,18 +7829,18 @@ PasteProcessor.prototype =
 							if (0x20 !== nUnicode && 0x2009 !== nUnicode)
 							{
 								Item = new ParaText(nUnicode);
-								bIsPreviuosSpace = false;
+								bIsPreviousSpace = false;
 							}
 							else
 							{
 								Item = new ParaSpace();
-								if (bIsPreviuosSpace)
+								if (bIsPreviousSpace)
 								{
 									continue;
 								}
-								if (!oThis.bIsPlainText)
+								if (!oThis.bIsPlainText && !whiteSpacing)
 								{
-									bIsPreviuosSpace = true;
+									bIsPreviousSpace = true;
 								}
 							}
 							oThis._AddToParagraph(Item);
@@ -7839,7 +7848,6 @@ PasteProcessor.prototype =
 					}
 
 				}
-
 			}
 		};
 
