@@ -3804,13 +3804,13 @@ drawBarChart.prototype =
 		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 
 		var defaultOverlap = (this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer" || this.chartProp.subType === "standard") ? 100 : 0;
-		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap        = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.overlap) ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.cChartDrawer.getNumCache(this.chartProp.series[0]);
 		var width          = widthGraph / this.chartProp.ptCount;
 		if(this.cChartSpace.getValAxisCrossType() && numCache)
 			width = widthGraph / (numCache.ptCount - 1);
 		
-		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.gapWidth) ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
@@ -6851,7 +6851,7 @@ drawHBarChart.prototype =
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer") ? 100 : 0;
-		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap        = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.overlap) ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
         var height         = heightGraph / ptCount;
 		var crossBetween   = this.cChartSpace.getValAxisCrossType();
@@ -6860,7 +6860,7 @@ drawHBarChart.prototype =
 			height = heightGraph / (ptCount - 1);
 		}
 		
-		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.gapWidth) ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
 		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap = individualBarHeight * (overlap / 100);
@@ -10813,7 +10813,7 @@ drawStockChart.prototype =
 		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var koffX = trueWidth / numCache.pts.length;
 		
-		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars && this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
+		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars && AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth) ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
 		
 		var widthBar = koffX / (1 + gapWidth / 100);
 		
