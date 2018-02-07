@@ -3661,13 +3661,29 @@ CChartsDrawer.prototype =
 	},
 
 	getHorizontalPoints: function () {
+		var res = null;
+
 		var plotArea = this.cChartSpace.chart.plotArea;
-		return plotArea.valAx.xPoints ? plotArea.valAx.xPoints : plotArea.catAx.xPoints;
+		if (plotArea.valAx && plotArea.valAx.xPoints) {
+			res = plotArea.valAx.xPoints;
+		} else if (plotArea.catAx && plotArea.catAx.xPoints) {
+			res = plotArea.catAx.xPoints;
+		}
+
+		return res;
 	},
 
 	getVerticalPoints: function () {
+		var res = null;
+
 		var plotArea = this.cChartSpace.chart.plotArea;
-		return plotArea.valAx.yPoints ? plotArea.valAx.yPoints : plotArea.catAx.yPoints;
+		if (plotArea.valAx && plotArea.valAx.yPoints) {
+			res = plotArea.valAx.yPoints;
+		} else if (plotArea.catAx && plotArea.catAx.yPoints) {
+			res = plotArea.catAx.yPoints;
+		}
+
+		return res;
 	},
 
 	getPlotAreaPoints: function () {
