@@ -51,6 +51,22 @@ var fieldtype_ASK        = 0x0007;
 var fieldtype_REF        = 0x0008;
 var fieldtype_HYPERLINK  = 0x0009;
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+
+window['AscCommonWord'].fieldtype_UNKNOWN    = fieldtype_UNKNOWN;
+window['AscCommonWord'].fieldtype_MERGEFIELD = fieldtype_MERGEFIELD;
+window['AscCommonWord'].fieldtype_PAGENUM    = fieldtype_PAGENUM;
+window['AscCommonWord'].fieldtype_PAGECOUNT  = fieldtype_PAGECOUNT;
+window['AscCommonWord'].fieldtype_FORMTEXT   = fieldtype_FORMTEXT;
+window['AscCommonWord'].fieldtype_TOC        = fieldtype_TOC;
+window['AscCommonWord'].fieldtype_PAGEREF    = fieldtype_PAGEREF;
+window['AscCommonWord'].fieldtype_PAGE       = fieldtype_PAGE;
+window['AscCommonWord'].fieldtype_NUMPAGES   = fieldtype_NUMPAGES;
+window['AscCommonWord'].fieldtype_ASK        = fieldtype_ASK;
+window['AscCommonWord'].fieldtype_REF        = fieldtype_REF;
+window['AscCommonWord'].fieldtype_HYPERLINK  = fieldtype_HYPERLINK;
+
 /**
  * Базовый класс для инструкции сложного поля.
  * @constructor
