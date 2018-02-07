@@ -239,7 +239,7 @@ var c_oAscError = Asc.c_oAscError;
 		window.doadssIsSaveAs = isSaveAs;
 		if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
 		{
-			window.g_asc_plugins.init({ "type" : "generatePassword" });
+			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
 			return;
 		}
 
