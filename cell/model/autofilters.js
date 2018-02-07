@@ -1041,22 +1041,7 @@
 					}
 					t.worksheet.handlers.trigger('onFilterInfo');
 				};
-
-				var undo_do = function() {
-					//сортировка
-					//ипользуется целиком объект фт(cloneData)
-					if (worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter()) {
-						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
-					} else if (worksheet.TableParts) {
-						for (var l = 0; l < worksheet.TableParts.length; l++) {
-							if (cloneData.oldFilter.DisplayName === worksheet.TableParts[l].DisplayName) {
-								worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), false);
-								break;
-							}
-						}
-					}
-				};
-
+				
 				switch (type) {
 					case AscCH.historyitem_AutoFilter_Add:
 						this.isEmptyAutoFilters(cloneData.Ref);
@@ -1065,7 +1050,7 @@
 						this.changeTableStyleInfo(cloneData.name, data.activeCells);
 						break;
 					case AscCH.historyitem_AutoFilter_Sort:
-						undo_do();
+						this.sortColFilter(cloneData.type, data.cellId, cloneData.activeCells, null, data.displayName, cloneData.color);
 						break;
 					case AscCH.historyitem_AutoFilter_Empty:
 						//было удаление, на undo добавляем
@@ -1597,6 +1582,7 @@
 			
 			sortColFilter: function(type, cellId, activeRange, sortProps, displayName, color) {
 				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
+				var undoType = null, undoRange = null, undoColor = null;
 				var t = this;
 				
 				if(!sortProps)
@@ -1628,12 +1614,16 @@
 					}
 					else
 					{
+						undoType = curFilter.SortState.SortConditions[0].getSortType();
+						undoColor = curFilter.SortState.SortConditions[0].getSortColor();
+						undoRange = curFilter.SortState.SortConditions[0].Ref;
+
 						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
-					
+
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 					curFilter.SortState.SortConditions[0].ConditionDescending = type !== Asc.c_oAscSortOptions.Ascending;
 
@@ -1642,7 +1632,7 @@
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 					
-					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
+					t._addHistoryObj({type: undoType, activeCells: undoRange, color: undoColor}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
@@ -1671,6 +1661,10 @@
 					}
 					else
 					{
+						undoType = curFilter.SortState.SortConditions[0].getSortType();
+						undoColor = curFilter.SortState.SortConditions[0].getSortColor();
+						undoRange = curFilter.SortState.SortConditions[0].Ref;
+
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
@@ -1698,7 +1692,7 @@
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 					
-					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
+					t._addHistoryObj({type: undoType, activeCells: undoRange, color: undoColor}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, color: color, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
@@ -1715,6 +1709,11 @@
 					case Asc.c_oAscSortOptions.ByColorFont:
 					{
 						onSortColorAutoFilterCallback(type);
+						break;
+					}
+					case null:
+					{
+						curFilter.SortState = null;
 						break;
 					}
 				}

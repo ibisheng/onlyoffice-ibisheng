@@ -7467,6 +7467,36 @@ SortCondition.prototype.changeColumns = function(activeRange, isDelete) {
 	return bIsDeleteCurSortCondition;
 };
 
+SortCondition.prototype.getSortType = function() {
+	var res = null;
+
+	if(true === this.ConditionDescending) {
+		res = Asc.c_oAscSortOptions.Ascending;
+	} else if(false === this.ConditionDescending) {
+		res = Asc.c_oAscSortOptions.Descending;
+	} else if(Asc.ESortBy.sortbyCellColor === this.ConditionSortBy) {
+		res = Asc.c_oAscSortOptions.ByColorFill;
+	} else if(Asc.ESortBy.sortbyCellColor === this.sortbyFontColor) {
+		res = Asc.c_oAscSortOptions.ByColorFont;
+	}
+
+	return res;
+};
+
+SortCondition.prototype.getSortColor = function() {
+	var res = null;
+
+	if(this.dxf) {
+		if(this.dxf.fill && this.dxf.fill.bg) {
+			res = this.dxf.fill.bg;
+		} else if(this.dxf.font && this.dxf.font.c) {
+			res = this.dxf.font.c;
+		}
+	}
+
+	return res;
+};
+
 function AutoFilterDateElem(start, end, dateTimeGrouping) {
 	this.start = start;
 	this.end = end;
