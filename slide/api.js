@@ -1816,6 +1816,23 @@ background-repeat: no-repeat;\
 				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
 			}
 		}
+
+		var specialPasteElemHeight = 22;
+		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
+		var notesFocus = presentation.IsFocusOnNotes();
+		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight) {
+			var startShapePos;
+			if(fixPos && fixPos.h && fixPos.w) {
+				startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
+			}
+			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight) {
+				curCoord._y = htmlElement.height - specialPasteElemHeight;
+			} else {
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+
+		}
+
 		if(curCoord)
 		{
 			props.asc_setCellCoord(curCoord);

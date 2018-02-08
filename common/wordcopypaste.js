@@ -3055,11 +3055,13 @@ PasteProcessor.prototype =
 		var curPage = stateSelection.CurPage;
 		var pos = presentation.GetTargetPosition();
 		props = !props ? [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly] : props;
-		var x, y;
+		var x, y, w, h;
 		if (null === pos) {
 			pos = presentation.GetSelectedBounds();
-			x = pos.x + pos.w;
-			y = pos.y + pos.h;
+			w = pos.w;
+			h = pos.h;
+			x = pos.x + w;
+			y = pos.y + h;
 		} else {
 			x = pos.X;
 			y = pos.Y;
@@ -3078,7 +3080,7 @@ PasteProcessor.prototype =
 
 		var curCoord = new AscCommon.asc_CRect( screenPos.X, screenPos.Y, 0, 0 );
 		specialPasteShowOptions.asc_setCellCoord(curCoord);
-		specialPasteShowOptions.setFixPosition({x: x, y: y, pageNum: curPage});
+		specialPasteShowOptions.setFixPosition({x: x, y: y, pageNum: curPage, w: w, h: h});
 	},
 
 	_setSpecialPasteShowOptionsPresentation2: function (props) {
