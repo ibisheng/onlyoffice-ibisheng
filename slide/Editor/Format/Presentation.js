@@ -4004,7 +4004,7 @@ CPresentation.prototype =
             var target_text_object = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
             if(target_text_object && target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                Function.apply(target_text_object.graphicObject, args);
+                result = Function.apply(target_text_object.graphicObject, args);
                 if(target_text_object.graphicObject.Content.length === 0)
                 {
                     this.RemoveTable();
