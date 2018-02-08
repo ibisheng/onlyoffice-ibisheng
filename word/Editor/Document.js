@@ -12235,6 +12235,13 @@ CDocument.prototype.controller_AddImages = function(aImages)
             Drawing.Set_GraphicObject(Image);
             this.AddToParagraph(Drawing);
         }
+        if(aImages.length === 1)
+        {
+            if(Drawing)
+            {
+                this.Select_DrawingObject(Drawing.Get_Id());
+            }
+        }
     }
     else
     {
