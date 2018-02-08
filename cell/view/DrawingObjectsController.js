@@ -100,10 +100,20 @@ DrawingObjectsController.prototype.setTableProps = function(props)
     {
         var sCaption = props.TableCaption;
         var sDescription = props.TableDescription;
+        var dRowHeight = props.RowHeight;
         by_type.tables[0].setTitle(sCaption);
         by_type.tables[0].setDescription(sDescription);
         props.TableCaption = undefined;
         props.TableDescription = undefined;
+        var bIgnoreHeight = false;
+        if(AscFormat.isRealNumber(props.RowHeight))
+        {
+            if(AscFormat.fApproxEqual(props.RowHeight, 0.0))
+            {
+                props.RowHeight = 1.0;
+            }
+            bIgnoreHeight = false;
+        }
         var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object === by_type.tables[0])
         {
@@ -117,7 +127,8 @@ DrawingObjectsController.prototype.setTableProps = function(props)
         }
         props.TableCaption = sCaption;
         props.TableDescription = sDescription;
-        editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0]);
+        props.RowHeight = dRowHeight;
+        editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0], bIgnoreHeight);
     }
 };
 

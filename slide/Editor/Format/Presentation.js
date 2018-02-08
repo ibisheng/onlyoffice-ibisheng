@@ -2190,14 +2190,14 @@ CPresentation.prototype =
         return this.Slides[this.CurPage].graphicObjects.getChartObject(type);
     },
 
-    Check_GraphicFrameRowHeight: function(grFrame)
+    Check_GraphicFrameRowHeight: function(grFrame, bIgnoreHeight)
     {
         grFrame.recalculate();
         var content = grFrame.graphicObject.Content, i, j;
         for(i = 0; i < content.length; ++i)
         {
 			var row = content[i];
-			if(row.Pr && row.Pr.Height && row.Pr.Height.HRule === Asc.linerule_AtLeast
+			if(!bIgnoreHeight && row.Pr && row.Pr.Height && row.Pr.Height.HRule === Asc.linerule_AtLeast
                 && AscFormat.isRealNumber(row.Pr.Height.Value) && row.Pr.Height.Value > 0)
 			{
 			    continue;
