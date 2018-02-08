@@ -4598,7 +4598,9 @@ background-repeat: no-repeat;\
                         }
                         if(aImages.length){
                         	History.Create_NewPoint();
+							oApi.WordControl.m_oLogicDocument.TurnOff_InterfaceEvents();
                             oApi.WordControl.m_oLogicDocument.AddImages(aImages);
+							oApi.WordControl.m_oLogicDocument.TurnOn_InterfaceEvents(true);
 						}
 
                     }
