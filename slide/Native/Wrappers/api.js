@@ -72,7 +72,12 @@ function NativeOpenFileP(_params){
     var dPresentationWidth = _presentation.Width;
     var dPresentationHeight = _presentation.Height;
 
-    return [nSlidesCount, dPresentationWidth, dPresentationHeight];
+    var aTimings = [];
+    var slides = _presentation.Slides;
+    for(var i = 0; i < slides.length; ++i){
+        aTimings.push(slides[i].timing.ToArray());
+    }
+    return [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
 }
 
 

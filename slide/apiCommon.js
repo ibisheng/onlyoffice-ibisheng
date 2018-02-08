@@ -202,6 +202,20 @@ CAscSlideTiming.prototype.Read_FromBinary = function(r)
     this.ShowLoop = AscFormat.readBool(r);
 };
 
+CAscSlideTiming.prototype.ToArray = function()
+{
+    var _ret = [];
+    _ret.push(this.TransitionType);
+    _ret.push(this.TransitionOption);
+    _ret.push(this.TransitionDuration);
+
+    _ret.push(this.SlideAdvanceOnMouseClick);
+    _ret.push(this.SlideAdvanceAfter);
+    _ret.push(this.SlideAdvanceDuration);
+    _ret.push(this.ShowLoop);
+    return _ret;
+};
+
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideSetTiming            ] = CAscSlideTiming;
 
 
