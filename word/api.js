@@ -7525,7 +7525,11 @@ background-repeat: no-repeat;\
 						oLogicDocument.TurnOff_Recalculate();
 						for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
 						{
-							oContentControl.AddToParagraph(new AscCommonWord.ParaText(oIterator.value()));
+							var nCharCode = oIterator.value();
+							if (0x0020 === nCharCode)
+								oContentControl.AddToParagraph(new AscCommonWord.ParaSpace());
+							else
+								oContentControl.AddToParagraph(new AscCommonWord.ParaText(nCharCode));
 						}
 						oLogicDocument.SelectContentControl(oContentControl.GetId());
 						oLogicDocument.TurnOn_Recalculate();
@@ -7558,7 +7562,12 @@ background-repeat: no-repeat;\
 					{
 						for (var oIterator = sDefaultText.getUnicodeIterator(); oIterator.check(); oIterator.next())
 						{
-							oContentControl.Add(new AscCommonWord.ParaText(oIterator.value()));
+							var nCharCode = oIterator.value();
+							if (0x0020 === nCharCode)
+								oContentControl.Add(new AscCommonWord.ParaSpace());
+							else
+								oContentControl.Add(new AscCommonWord.ParaText(nCharCode));
+
 						}
 						oContentControl.SelectThisElement();
 					}
