@@ -1817,20 +1817,41 @@ background-repeat: no-repeat;\
 			}
 		}
 
+		//если кнопка специальной вставки выходит за пределы окна, сдвигаем её
+		//TODO в дальнейшем необходимо делать это в меню, а для этого необходимо знать позицию поля notes и thumbnails
 		var specialPasteElemHeight = 22;
+		var specialPasteElemWidth = 33;
 		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
 		var notesFocus = presentation.IsFocusOnNotes();
-		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight) {
-			var startShapePos;
-			if(fixPos && fixPos.h && fixPos.w) {
-				startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
-			}
-			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight) {
+		var startShapePos;
+		if(fixPos && fixPos.h && fixPos.w)
+		{
+			startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
+		}
+
+		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight)
+		{
+			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight)
+			{
 				curCoord._y = htmlElement.height - specialPasteElemHeight;
-			} else {
+			}
+			else
+			{
 				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
 			}
+		}
 
+		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* g_dKoef_mm_to_pix;
+		if(!notesFocus && curCoord._x > htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+		{
+			if(startShapePos && startShapePos.X < htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+			{
+				curCoord._x = htmlElement.width - specialPasteElemWidth + thumbnailsLeft;
+			}
+			else
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
 		}
 
 		if(curCoord)
