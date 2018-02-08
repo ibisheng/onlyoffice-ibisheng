@@ -4070,9 +4070,9 @@ CPresentation.prototype =
         this.ApplyTableFunction(CTable.prototype.RemoveTableColumn, true);
     },
 
-    DistributeTableCells : function()
+    DistributeTableCells : function(isHorizontally)
     {
-        return this.ApplyTableFunction(CTable.prototype.DistributeTableCells, true);
+        return this.ApplyTableFunction(CTable.prototype.DistributeTableCells, isHorizontally);
     },
 
 	MergeTableCells : function()
