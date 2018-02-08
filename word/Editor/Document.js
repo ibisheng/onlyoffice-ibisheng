@@ -16432,6 +16432,11 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 	{
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTableOfContents);
 
+        var oParagraph = this.GetCurrentParagraph();
+        if(!oParagraph.bFromDocument)
+        {
+            this.DrawingObjects.resetInternalSelection();
+        }
 		this.Remove(1, true, true, true);
 		var oSdt = this.AddContentControl(c_oAscSdtLevelType.Block);
 
