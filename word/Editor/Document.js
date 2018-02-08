@@ -16453,7 +16453,11 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
 			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.value())
 			{
-				oParagraph.Add(new ParaText(oIterator.value()));
+				var nCharCode = oIterator.value();
+				if (0x0020 === nCharCode)
+					oParagraph.Add(new ParaSpace());
+				else
+					oParagraph.Add(new ParaText(nCharCode));
 			}
 			oSdt.AddNewParagraph(false, true);
 		}
