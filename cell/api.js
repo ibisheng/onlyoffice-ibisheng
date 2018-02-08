@@ -3300,7 +3300,7 @@ var editor;
       AscCommon.CurFileVersion = version;
     }
 
-    this._openDocument(sData);
+    this._openDocument(base64File);
 	var thenCallback = function() {
 		g_oIdCounter.Set_Load(false);
 		t._coAuthoringInit();
