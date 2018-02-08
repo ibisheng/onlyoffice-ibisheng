@@ -207,7 +207,7 @@ CGraphicObjects.prototype =
     AddContentControl: function(nContentControlType)
     {
         var oTargetDocContent = this.getTargetDocContent();
-        if(oTargetDocContent){
+        if(oTargetDocContent && !oTargetDocContent.bPresentation){
             return oTargetDocContent.AddContentControl(nContentControlType);
         }
 
