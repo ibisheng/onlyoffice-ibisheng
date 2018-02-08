@@ -16433,7 +16433,7 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTableOfContents);
 
         var oParagraph = this.GetCurrentParagraph();
-        if(!oParagraph.bFromDocument)
+        if(oParagraph && !oParagraph.bFromDocument)
         {
             this.DrawingObjects.resetInternalSelection();
         }
@@ -16442,7 +16442,7 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 
 		if (sHeading)
 		{
-			var oParagraph = oSdt.GetCurrentParagraph();
+			oParagraph = oSdt.GetCurrentParagraph();
 			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
 			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.value())
 			{
