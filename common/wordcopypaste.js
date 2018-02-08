@@ -439,6 +439,7 @@ CopyProcessor.prototype =
 			case para_Tab:
 				var oSpan = new CopyElement("span");
 				oSpan.oAttributes["style"] = "white-space:pre;";
+				oSpan.oAttributes["style"] = "mso-tab-count:1;";
 				oSpan.addChild(new CopyElement(String.fromCharCode(0x09), true));
 				oTarget.addChild(oSpan);
 				break;
