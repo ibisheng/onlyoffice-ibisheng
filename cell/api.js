@@ -652,15 +652,26 @@ var editor;
     if (opt_isPassword) {
       t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), this.advancedOptionsAction);
     } else if (data) {
-      AscCommon.loadFileContent(data, function(httpRequest) {
-        if (null === httpRequest) {
-          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
-          return;
-        }
-        var cp = JSON.parse(httpRequest.responseText);
-        cp['encodings'] = AscCommon.getEncodingParams();
-        t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
-      });
+		// ToDo разделитель пока только "," http://bugzilla.onlyoffice.com/show_bug.cgi?id=31009
+		var cp = {
+			'codepage': AscCommon.c_oAscCodePageUtf8, "delimiter": AscCommon.c_oAscCsvDelimiter.Comma,
+			'encodings': AscCommon.getEncodingParams()
+		};
+		var options;
+		if (typeof Blob !== 'undefined' && typeof FileReader !== 'undefined') {
+			AscCommon.getJSZipUtils().getBinaryContent(data, function(err, data) {
+				if (err) {
+					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+				} else {
+					cp['data'] = data;
+					options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp);
+					t.handlers.trigger("asc_onAdvancedOptions", options, t.advancedOptionsAction);
+				}
+			});
+		} else {
+			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp);
+			t.handlers.trigger("asc_onAdvancedOptions", options, t.advancedOptionsAction);
+		}
     } else {
       t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
     }
@@ -3580,6 +3591,7 @@ var editor;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
+	prot["asc_decodeBuffer"] = prot.asc_decodeBuffer;
 
   prot["asc_registerCallback"] = prot.asc_registerCallback;
   prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;

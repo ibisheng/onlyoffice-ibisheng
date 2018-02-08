@@ -1856,6 +1856,57 @@
 		return this.macros.GetData();
 	};
 
+	function parseCSV(text, options) {
+		var delimiterChar;
+		if (options.asc_getDelimiterChar()) {
+			delimiterChar = options.asc_getDelimiterChar();
+		} else {
+			switch (options.asc_getDelimiter()) {
+				case AscCommon.c_oAscCsvDelimiter.None:
+					delimiterChar = undefined;
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Tab:
+					delimiterChar = "\t";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Semicolon:
+					delimiterChar = ";";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Colon:
+					delimiterChar = ":";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Comma:
+					delimiterChar = ",";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Space:
+					delimiterChar = " ";
+					break;
+			}
+		}
+		var matrix = [];
+		var rows = text.match(/[^\r\n]+/g);
+		for (var i = 0; i < rows.length; ++i) {
+			var row = rows[i];
+			//todo quotes
+			matrix.push(row.split(delimiterChar));
+		}
+		return matrix;
+	}
+
+	baseEditorsApi.prototype.asc_decodeBuffer = function(buffer, options, callback) {
+		var reader = new FileReader();
+		//todo onerror
+		reader.onload = reader.onerror = function(e) {
+			var text = e.target.result ? e.target.result : "";
+			if (options instanceof Asc.asc_CCSVAdvancedOptions) {
+				callback(parseCSV(text, options));
+			} else {
+				callback(text);
+			}
+		};
+
+		reader.readAsText(new Blob([buffer]), AscCommon.c_oAscEncodings[options.asc_getCodePage()][2]);
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;

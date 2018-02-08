@@ -6920,14 +6920,30 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
 	{
+		var t = this;
 		var options;
 		if (opt_isPassword) {
 			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM);
-		} else {
+			t.sendEvent("asc_onAdvancedOptions", options, t.advancedOptionsAction);
+		} else if(data) {
 			var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
-			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
+			if (typeof Blob !== 'undefined' && typeof FileReader !== 'undefined') {
+				AscCommon.getJSZipUtils().getBinaryContent(data, function(err, data) {
+					if (err) {
+						t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+					} else {
+						cp['data'] = data;
+						options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
+						t.sendEvent("asc_onAdvancedOptions", options, t.advancedOptionsAction);
+					}
+				});
+			} else {
+				options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
+				t.sendEvent("asc_onAdvancedOptions", options, t.advancedOptionsAction);
+			}
+		} else {
+			t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 		}
-		this.sendEvent("asc_onAdvancedOptions", options, this.advancedOptionsAction);
 	};
 	asc_docs_api.prototype._onOpenCommand = function(data)
 	{
@@ -8824,6 +8840,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['AddURL']                                    = asc_docs_api.prototype.AddURL;
 	asc_docs_api.prototype['Help']                                      = asc_docs_api.prototype.Help;
 	asc_docs_api.prototype['asc_setAdvancedOptions']                    = asc_docs_api.prototype.asc_setAdvancedOptions;
+	asc_docs_api.prototype['asc_decodeBuffer']                    		= asc_docs_api.prototype.asc_decodeBuffer;
 	asc_docs_api.prototype['SetFontRenderingMode']                      = asc_docs_api.prototype.SetFontRenderingMode;
 	asc_docs_api.prototype['startGetDocInfo']                           = asc_docs_api.prototype.startGetDocInfo;
 	asc_docs_api.prototype['stopGetDocInfo']                            = asc_docs_api.prototype.stopGetDocInfo;
