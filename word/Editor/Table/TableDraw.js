@@ -809,7 +809,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         var Y1 = HeaderPage.RowsInfo[TempCurRow + Index].Y + HeaderPage.RowsInfo[TempCurRow + Index].H;
 
                         // Мы должны проверить последняя ли данная ячейка в строке
-                        var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
+                        var TempCellIndex  = this.private_GetCellIndexByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
                         var TempCellsCount = HeaderPage.Rows[TempCurRow + Index].Get_CellsCount();
 
                         if ( TempCellsCount - 1 === TempCellIndex )
@@ -1183,7 +1183,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                     var Y1 = this.RowsInfo[TempCurRow + Index].Y[PNum] + this.RowsInfo[TempCurRow + Index].H[PNum];
 
                     // Мы должны проверить последняя ли данная ячейка в строке
-                    var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
+                    var TempCellIndex  = this.private_GetCellIndexByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
                     var TempCellsCount = this.Content[TempCurRow + Index].Get_CellsCount();
 
                     if ( TempCellsCount - 1 === TempCellIndex )
@@ -1408,7 +1408,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                     var X0 = X_cell_start;
                     var X1 = X_cell_end;
 
-                    var LowerCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + VMergeCount - 1, Row.Get_CellInfo( CurCell ).StartGridCol );
+                    var LowerCell = this.private_GetCellIndexByStartGridCol( CurRow + VMergeCount - 1, Row.Get_CellInfo( CurCell ).StartGridCol );
 
                     var BottomBorder = ( -1 === LowerCell ? this.Pages[PNum].BotBorders[0] : this.Pages[PNum].BotBorders[LowerCell] );
                     if ( border_Single === BottomBorder.Value )

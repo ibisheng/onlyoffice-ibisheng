@@ -749,6 +749,11 @@ CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
+/**
+ * Получаем ячейку с заданным номером в строке
+ * @param nCellIndex
+ * @returns {CTableCell}
+ */
 CTableRow.prototype.GetCell = function(nCellIndex)
 {
 	return this.Get_Cell(nCellIndex);

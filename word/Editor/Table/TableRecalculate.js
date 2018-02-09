@@ -1363,7 +1363,7 @@ CTable.prototype.private_RecalculateBorders = function()
                         var Temp_CellsCount = Temp_Row.Get_CellsCount();
 
                         // ищем ячейку текущего объединения
-                        var Temp_CurCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + Temp_CurRow, CurGridCol );
+                        var Temp_CurCell = this.private_GetCellIndexByStartGridCol( CurRow + Temp_CurRow, CurGridCol );
                         if ( Temp_CurCell < 0 )
                             continue;
 

@@ -2087,6 +2087,7 @@ function ParagraphContent_Read_FromBinary(Reader)
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaNewLine = ParaNewLine;
 window['AscCommonWord'].ParaText    = ParaText;
+window['AscCommonWord'].ParaSpace   = ParaSpace;
 
 window['AscCommonWord'].break_Page = break_Page;
 window['AscCommonWord'].break_Column = break_Column;
