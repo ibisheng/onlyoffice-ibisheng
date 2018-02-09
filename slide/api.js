@@ -1772,6 +1772,52 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
 	{
+		var presentation = editor.WordControl.m_oLogicDocument;
+		var drawingDocument = presentation.DrawingDocument;
+		var notesFocus = presentation.IsFocusOnNotes();
+
+		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
+		var fixPos = props.fixPosition;
+		var curCoord = props.asc_getCellCoord();
+		var startShapePos;
+
+		var specialPasteElemHeight = 22;
+		var specialPasteElemWidth = 33;
+		if(fixPos && fixPos.h && fixPos.w)
+		{
+			startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
+		}
+
+		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight)
+		{
+			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight)
+			{
+				curCoord._y = htmlElement.height - specialPasteElemHeight;
+			}
+			else
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+		}
+
+		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* AscCommon.g_dKoef_mm_to_pix;
+		if(!notesFocus && curCoord._x > htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+		{
+			if(startShapePos && startShapePos.X < htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+			{
+				curCoord._x = htmlElement.width - specialPasteElemWidth + thumbnailsLeft;
+			}
+			else
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+		}
+
+		if(curCoord)
+		{
+			props.asc_setCellCoord(curCoord);
+		}
+
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 
@@ -1845,7 +1891,7 @@ background-repeat: no-repeat;\
 			}
 		}
 
-		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* g_dKoef_mm_to_pix;
+		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* AscCommon.g_dKoef_mm_to_pix;
 		if(!notesFocus && curCoord._x > htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
 		{
 			if(startShapePos && startShapePos.X < htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
