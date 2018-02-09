@@ -8272,7 +8272,7 @@
     WorksheetView.prototype.emptySelection = function ( options ) {
         // Удаляем выделенные графичекие объекты
         if ( this.objectRender.selectedGraphicObjectsExists() ) {
-            this.objectRender.controller.deleteSelectedObjects();
+            this.objectRender.controller.remove();
 		} else {
             this.setSelectionInfo( "empty", options );
         }
