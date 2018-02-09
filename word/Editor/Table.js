@@ -11229,9 +11229,10 @@ CTable.prototype.private_CheckHitInBorder = function(X, Y, nCurPage)
 		var nSpacingShift = null === nCellSpacing ? 0 : nCellSpacing / 2;
 
 		if (X <= X_cell_start + nSpacingShift + oLeftMargin.W)
+		{
 			oResult.CellSelection = true;
-
-		oResult.Border = -1;
+			oResult.Border        = -1;
+		}
 	}
 
 	return oResult;
