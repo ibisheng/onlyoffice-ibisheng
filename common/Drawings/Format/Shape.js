@@ -3314,7 +3314,17 @@ CShape.prototype.recalculateLocalTransform = function(transform)
         {
             var dSin = Math.sin(this.rot), dCos = Math.cos(this.rot);
             var oContent = this.getDocContent();
-            var nJc = oContent.Content[0].CompiledPr.Pr.ParaPr.Jc;
+            var nJc, nAnchor;
+            if(AscFormat.isRealNumber(this.rot) && !AscFormat.fApproxEqual(this.rot, 0))
+            {
+                nJc = AscCommon.align_Center;
+                nAnchor = 1;
+            }
+            else
+            {
+                nJc = oContent.Content[0].CompiledPr.Pr.ParaPr.Jc;
+                nAnchor = oBodyPr.anchor;
+            }
             var FreezePointX, FreezePointY;
             switch(nJc)
             {
@@ -3337,7 +3347,8 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     break;
                 }
             }
-            switch (oBodyPr.anchor)
+
+            switch (nAnchor)
             {
                 case 0: //b
                 {
@@ -5664,7 +5675,6 @@ function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
             oTextPr.RFonts.CS.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.CS.Name);
         }
     }
-    var RGBA;
     if(oTextPr.Unifill){
         oTextPr.Unifill.check(oTheme, oColorMap);
         oTextPr.Unifill = oTextPr.Unifill.saveSourceFormatting();
