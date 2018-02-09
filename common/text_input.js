@@ -1283,6 +1283,12 @@
 			if (this.DisableCompositeInput)
 				return;
 
+			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
 			//console.log("[START] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
@@ -1295,12 +1301,6 @@
 
 			if (!AscCommon.AscBrowser.isIE)
 				this.isChromeKeysNoKeyPressPresent = false;
-
-			if (this.isSystem)
-			{
-				this.isChromeKeysNoKeyPressPresent = false;
-				return;
-			}
 
 			if (this.UseValueInComposition)
 			{
@@ -1342,6 +1342,12 @@
 			if (this.DisableCompositeInput)
 				return;
 
+			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
 			//console.log("[UPDATE] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
@@ -1357,12 +1363,6 @@
 
 			if (!this.isChromeKeysNoKeyPressPresent)
 				this.isChromeKeysNoKeyPressPresentStartValue = "";
-
-			if (this.isSystem)
-			{
-				this.isChromeKeysNoKeyPressPresent = false;
-				return;
-			}
 
 			if (this.UseValueInComposition && undefined === _data)
 			{
@@ -1626,6 +1626,12 @@
 			if (this.DisableCompositeInput)
 				return;
 
+			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
 			//console.log("[END] value: " + this.getAreaValue() + ", data: " + e.data);
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
@@ -1635,12 +1641,6 @@
 
 			if (!AscCommon.AscBrowser.isIE)
 				this.isChromeKeysNoKeyPressPresent = false;
-
-			if (this.isSystem)
-			{
-				this.isChromeKeysNoKeyPressPresent = false;
-				return;
-			}
 
 			var isUseData = (_data !== undefined);
 			if (this.UseValueInComposition)
