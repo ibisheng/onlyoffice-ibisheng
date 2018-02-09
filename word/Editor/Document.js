@@ -13453,6 +13453,12 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								LvlTextPr.RFonts.Set_All("Symbol", -1);
 								break;
 							}
+							case 8:
+							{
+								LvlText = String.fromCharCode(0x2013);
+								LvlTextPr.RFonts.Set_All("Arial", -1);
+								break;
+							}
 						}
 
 						var NumId = null;
@@ -13876,6 +13882,12 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								{
 									LvlText = String.fromCharCode(0x00A8);
 									LvlTextPr.RFonts.Set_All("Symbol", -1);
+									break;
+								}
+								case 8:
+								{
+									LvlText = String.fromCharCode(0x2013);
+									LvlTextPr.RFonts.Set_All("Arial", -1);
 									break;
 								}
 							}
