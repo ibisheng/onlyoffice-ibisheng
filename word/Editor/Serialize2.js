@@ -6201,7 +6201,10 @@ function BinaryFileReader(doc, openParams)
             if(c_oSerConstants.ReadOk != res)
                 return res;
 			//todo сделать зачитывание в oReadResult, одновременно с кодом презентаций
-            res = (new Binary_OtherTableReader(this.Document, this.oReadResult, this.stream)).Read();
+			if(!this.openParams.bCopyPaste)
+			{
+				res = (new Binary_OtherTableReader(this.Document, this.oReadResult, this.stream)).Read();
+			}
             if(c_oSerConstants.ReadOk != res)
                 return res;
         }
@@ -6841,7 +6844,7 @@ function BinaryFileReader(doc, openParams)
                     }
                 }
             }
-        }
+        };
 		
 		fParseStyle(this.oReadResult.runStyles, this.Document.Styles, this.oReadResult, oStyleTypes.run);
         fParseStyle(this.oReadResult.paraStyles, this.Document.Styles, this.oReadResult, oStyleTypes.par);
