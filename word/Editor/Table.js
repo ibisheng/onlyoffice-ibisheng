@@ -5230,11 +5230,14 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 			this.CurCell         = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
 			if (table_Selection_Cells === this.Selection.Type2
-				&& this.Selection.StartPos.Cell === this.Selection.EndPos.Cell
-				&& this.Selection.StartPos.Row === this.Selection.EndPos.Row
+				&& this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell
+				&& this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row
 				&& MouseEvent.ClickCount > 1
 				&& 0 === MouseEvent.ClickCount % 2)
-				this.SelectAll(1);
+			{
+				this.Selection.StartPos.Pos.Cell = 0;
+				this.Selection.EndPos.Pos.Cell   = this.GetRow(this.Selection.StartPos.Pos.Row).GetCellsCount() - 1;
+			}
 		}
 
 		this.Selection.Type = table_Selection_Cell;
