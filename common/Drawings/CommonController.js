@@ -11370,6 +11370,14 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
+                        case 8:
+                        {
+                            bulletText = String.fromCharCode(0x2013);
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Arial";
+                            break;
+                        }
                     }
                     bullet.bulletType = new AscFormat.CBulletType();
                     bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_CHAR;
