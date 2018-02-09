@@ -5312,9 +5312,9 @@
 	};
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
 		var t = this;
-		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, x, pos, firstHeaderRow0, firstDataCol0,
-			countC, countCWValues, countR, countD, stripe1, stripe2, items, l, item, start, end, arrSubheading,
-			emptyStripe = new Asc.CTableStyleElement();
+		var pivotTable, pivotRange, pivotFields, rowFields, styleInfo, style, wholeStyle, cells, j, r, x, pos,
+			firstHeaderRow0, firstDataCol0, countC, countCWValues, countR, countD, stripe1, stripe2, items, l, item,
+			start, end, isOutline, arrSubheading, emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues, grandColumn;
 		var checkRowSubheading = function (_i, _r, _v, _dxf) {
 			var sub, bSet = true;
@@ -5340,6 +5340,8 @@
 			grandColumn = 0;
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
+			pivotFields = pivotTable.asc_getPivotFields();
+			rowFields = pivotTable.asc_getRowFields();
 			styleInfo = pivotTable.asc_getStyleInfo();
 			if (!pivotTable.isInit || !styleInfo || (range && !pivotTable.intersection(range))) {
 				continue;
@@ -5508,6 +5510,7 @@
 					} else if (styleInfo.showRowHeaders) {
 						// Row Subheading
 						r = item.getR();
+						isOutline = (false !== pivotFields[rowFields[r].asc_getIndex()].outline);
 						for (x = 0, l = item.x.length; x < l; ++x, ++r) {
 							dxf = null;
 							if (r + 1 !== countR) {
@@ -5521,7 +5524,8 @@
 								dxf = dxf && dxf.dxf;
 								if (dxf) {
 									pos = pivotTable.getRowFieldPos(r);
-									if (1 === l) {
+									if (1 === l && isOutline) {
+										endRowSubheadings(pos, start + j);
 										cells = this.getRange3(start + j, pivotRange.c1 + pos, start + j, pivotRange.c2);
 										cells.setTableStyle(dxf);
 									} else {
