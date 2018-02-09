@@ -1788,6 +1788,7 @@ background-repeat: no-repeat;\
 		var _coord, curCoord;
 
 		var fixPos = props.fixPosition;
+		var notesFocus = presentation.IsFocusOnNotes();
 		if(props.shapeId)//при переходе между шейпами, скрываем значок спец.вставки
 		{
 			var targetDocContent = presentation ? presentation.Get_TargetDocContent() : null;
@@ -1806,7 +1807,11 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			if(fixPos && fixPos.pageNum === presentation.CurPage)
+			if(true === notesFocus)
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+			else if(fixPos && fixPos.pageNum === presentation.CurPage)
 			{
 				_coord = drawingDocument.ConvertCoordsToCursorWR(fixPos.x, fixPos.y, fixPos.pageNum);
 				curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
@@ -1822,7 +1827,6 @@ background-repeat: no-repeat;\
 		var specialPasteElemHeight = 22;
 		var specialPasteElemWidth = 33;
 		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
-		var notesFocus = presentation.IsFocusOnNotes();
 		var startShapePos;
 		if(fixPos && fixPos.h && fixPos.w)
 		{

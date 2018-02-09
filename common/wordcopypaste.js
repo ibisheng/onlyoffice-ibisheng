@@ -3083,50 +3083,6 @@ PasteProcessor.prototype =
 		specialPasteShowOptions.setFixPosition({x: x, y: y, pageNum: curPage, w: w, h: h});
 	},
 
-	_setSpecialPasteShowOptionsPresentation2: function (props) {
-		var presentation = editor.WordControl.m_oLogicDocument;
-		var stateSelection = presentation.GetSelectionState();
-		var curPage = stateSelection.CurPage;
-		var pos = presentation.GetTargetPosition();
-		props = !props ? [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly] : props;
-
-		var specialPasteShowOptions = window['AscCommon'].g_specialPasteHelper.buttonInfo;
-		var curCoord, screenPosStart, screenPosEnd, x, y;
-
-		//select graphic obj
-		if (null === pos) {
-			pos = presentation.GetSelectedBounds();
-			var startX = pos.x;
-			var startY = pos.y;
-			x = pos.x + pos.w;
-			y = pos.y + pos.h;
-
-			screenPosStart = presentation.DrawingDocument.ConvertCoordsToCursorWR(startX, startY, curPage);
-			screenPosEnd = presentation.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
-
-			curCoord = [];
-			curCoord[0] = new AscCommon.asc_CRect(screenPosStart.X, screenPosStart.Y, 0, 0);
-			curCoord[1] = new AscCommon.asc_CRect(screenPosEnd.X, screenPosEnd.Y, 0, 0);
-
-		} else {
-			x = pos.X;
-			y = pos.Y;
-			screenPosStart = presentation.DrawingDocument.ConvertCoordsToCursorWR(x, y, curPage);
-			curCoord = new AscCommon.asc_CRect(screenPosStart.X, screenPosStart.Y, 0, 0);
-		}
-
-		var targetDocContent = presentation.Get_TargetDocContent();
-		if (targetDocContent && targetDocContent.Id) {
-			specialPasteShowOptions.setShapeId(targetDocContent.Id);
-		} else {
-			specialPasteShowOptions.setShapeId(null);
-		}
-
-		specialPasteShowOptions.asc_setOptions(props);
-		specialPasteShowOptions.asc_setCellCoord(curCoord);
-		specialPasteShowOptions.setFixPosition({x: x, y: y, pageNum: curPage});
-	},
-
     insertInPlace2: function(oDoc, aNewContent)
     {
         var nNewContentLength = aNewContent.length;
