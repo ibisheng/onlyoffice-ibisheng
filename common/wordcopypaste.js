@@ -2318,7 +2318,7 @@ PasteProcessor.prototype =
 			} else {
 				if(oSelectedContent.Elements.length === 1)
 				{
-					var curDocSelection = this.curDocSelection;
+					var curDocSelection = this.oDocument.GetSelectionState();
 					if(curDocSelection)
 					{
 						specialPasteHelper.showButtonIdParagraph = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
