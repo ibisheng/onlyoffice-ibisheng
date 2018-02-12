@@ -2753,15 +2753,77 @@ background-repeat: no-repeat;\
 	 */
 	asc_docs_api.prototype.put_ListType = function(type, subtype)
 	{
-		var NumberInfo =
+		var oPresentation = this.WordControl.m_oLogicDocument;
+		var sBullet = "";
+		if(type === 0)
+		{
+			switch(subtype)
+			{
+				case 0:
+				case 1:
+				{
+					sBullet = "•";
+					break;
+				}
+				case 2:
+				{
+					sBullet = "o";
+					break;
+				}
+				case 3:
+				{
+					sBullet = "§";
+					break;
+				}
+				case 4:
+				{
+					sBullet = String.fromCharCode( 0x0076 );
+					break;
+				}
+				case 5:
+				{
+					sBullet = String.fromCharCode( 0x00D8 );
+					break;
+				}
+				case 6:
+				{
+					sBullet = String.fromCharCode( 0x00FC );
+					break;
+				}
+				case 7:
+				{
+
+					sBullet = String.fromCharCode(119);
+					break;
+				}
+				case 8:
+				{
+					sBullet = String.fromCharCode(0x2013);
+					break;
+				}
+			}
+		}
+
+		var fCallback = function () {
+
+			var NumberInfo =
 			{
 				Type    : 0,
 				SubType : -1
 			};
 
-		NumberInfo.Type    = type;
-		NumberInfo.SubType = subtype;
-		this.WordControl.m_oLogicDocument.SetParagraphNumbering(NumberInfo);
+			NumberInfo.Type    = type;
+			NumberInfo.SubType = subtype;
+			oPresentation.SetParagraphNumbering(NumberInfo);
+		};
+		if(sBullet.length > 0)
+		{
+			AscFonts.FontPickerByCharacter.checkText(sBullet, this, fCallback);
+		}
+		else
+		{
+			fCallback();
+		}
 	};
 
 	asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
