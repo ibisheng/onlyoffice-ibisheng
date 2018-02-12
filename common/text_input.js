@@ -376,7 +376,7 @@
 				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.HtmlAreaOffset + "px";
 
 				this.HtmlArea.scrollTop = this.HtmlArea.scrollHeight;
-				console.log("" + this.HtmlArea.scrollTop + ", " + this.HtmlArea.scrollHeight);
+				//this.log("" + this.HtmlArea.scrollTop + ", " + this.HtmlArea.scrollHeight);
 			}
 			else
 			{
@@ -919,6 +919,7 @@
 					break;
 			}
 
+			AscCommon.stopEvent(e);
 			return ret;
 		},
 
