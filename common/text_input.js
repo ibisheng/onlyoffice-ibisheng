@@ -784,7 +784,7 @@
 				return;
 
 			this.isDebug = isEnabled;
-			this.HtmlArea.style.left = this.isSystem ? "0px" : ("-" + (this.HtmlAreaWidth >> 1) + "px");
+			this.HtmlArea.style.left = this.isDebug ? "0px" : ("-" + (this.HtmlAreaWidth >> 1) + "px");
 		},
 
 		apiInputText : function(codes)
@@ -853,6 +853,7 @@
 
 			switch (e.keyCode)
 			{
+				case 8:		// backspace
 				case 9:		// tab
 				case 13:	// enter
 				case 37:	// left
