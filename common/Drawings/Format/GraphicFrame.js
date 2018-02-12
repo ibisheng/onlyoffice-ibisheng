@@ -820,10 +820,13 @@ CGraphicFrame.prototype.draw = function(graphics)
         if(this.graphicObject)
         {
 
+
+            graphics.SaveGrState();
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
             this.drawLocks(this.transform, graphics);
+            graphics.RestoreGrState();
         }
 };
 
