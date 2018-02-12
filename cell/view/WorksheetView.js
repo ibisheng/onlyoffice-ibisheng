@@ -8269,10 +8269,14 @@
         }
     };
 
-    WorksheetView.prototype.emptySelection = function ( options ) {
+    WorksheetView.prototype.emptySelection = function ( options, bIsCut ) {
         // Удаляем выделенные графичекие объекты
         if ( this.objectRender.selectedGraphicObjectsExists() ) {
-            this.objectRender.controller.deleteSelectedObjects();
+			if(bIsCut) {
+				this.objectRender.controller.remove();
+			} else {
+				this.objectRender.controller.deleteSelectedObjects();
+			}
 		} else {
             this.setSelectionInfo( "empty", options );
         }
