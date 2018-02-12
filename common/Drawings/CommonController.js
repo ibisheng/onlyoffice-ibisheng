@@ -11239,6 +11239,11 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                                 ListType.SubType = 7;
                                 break;
                             }
+                            case String.fromCharCode(0x2013):
+                            {
+                                ListType.SubType = 8;
+                                break;
+                            }
                         }
                         break;
                     }
