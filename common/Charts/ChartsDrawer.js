@@ -114,43 +114,37 @@ CChartsDrawer.prototype =
     constructor: CChartsDrawer,
 	
 	//****draw and recalculate functions****
-	reCalculate : function(chartSpace)
-    {
+	reCalculate: function (chartSpace) {
 		this.cChartSpace = chartSpace;
-		
+
 		this.calcProp = {};
-		
+
 		//nDimensionCount - flag for 3d/2d charts
-		//TODO пока включаю только гистограммы(=== AscDFH.historyitem_type_BarChart)
-		if(this._isSwitchCurrent3DChart(chartSpace))
-		{
+		if (this._isSwitchCurrent3DChart(chartSpace)) {
 			standartMarginForCharts = 16;
 			this.nDimensionCount = 3;
-		}
-		else
+		} else {
 			this.nDimensionCount = 2;
-		
-		if(!chartSpace.bEmptySeries)
+		}
+
+		if (!chartSpace.bEmptySeries) {
 			this._calculateProperties(chartSpace);
-		
-		if(this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined)
-		{
+		}
+
+		if (this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined) {
 			this.calcProp.pathH = 1000000000;
 			this.calcProp.pathW = 1000000000;
 			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 			this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
 			this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 		}
-		
+
 		//создаём область
 		this.allAreaChart = new allAreaChart();
-		
 		//создаём область
 		this.plotAreaChart = new plotAreaChart();
-		
 		//создаём сетку
 		this.gridChart = new gridChart();
-		
 		//ось категорий
 		this.catAxisChart = new catAxisChart();
 		//ось значений
@@ -161,122 +155,124 @@ CChartsDrawer.prototype =
 		this.floor3DChart = new floor3DChart();
 		this.sideWall3DChart = new sideWall3DChart();
 		this.backWall3DChart = new backWall3DChart();
-		
+
 		//draw chart
 		var newChart;
-		switch ( this.calcProp.type )
-		{
-			case c_oChartTypes.Bar:
-			{
-				newChart = new drawBarChart();
-				break;
+		for (var i = 0; i < chartSpace.chart.plotArea.charts.length; i++) {
+			switch (this.calcProp.type) {
+				case c_oChartTypes.Bar: {
+					newChart = new drawBarChart();
+					break;
+				}
+				case c_oChartTypes.Line: {
+					newChart = new drawLineChart();
+					break;
+				}
+				case c_oChartTypes.HBar: {
+					newChart = new drawHBarChart();
+					break;
+				}
+				case c_oChartTypes.Pie: {
+					newChart = new drawPieChart();
+					break;
+				}
+				case c_oChartTypes.Scatter: {
+					newChart = new drawScatterChart();
+					break;
+				}
+				case c_oChartTypes.Area: {
+					newChart = new drawAreaChart();
+					break;
+				}
+				case c_oChartTypes.Stock: {
+					newChart = new drawStockChart();
+					break;
+				}
+				case c_oChartTypes.DoughnutChart: {
+					newChart = new drawDoughnutChart();
+					break;
+				}
+				case c_oChartTypes.Radar: {
+					newChart = new drawRadarChart();
+					break;
+				}
+				case c_oChartTypes.BubbleChart: {
+					newChart = new drawBubbleChart();
+					break;
+				}
+				case c_oChartTypes.Surface: {
+					newChart = new drawSurfaceChart();
+					break;
+				}
 			}
-			case c_oChartTypes.Line:
-			{
-				newChart = new drawLineChart();
-				break;
-			}
-			case c_oChartTypes.HBar:
-			{
-				newChart = new drawHBarChart();
-				break;
-			}
-			case c_oChartTypes.Pie:
-			{
-				newChart = new drawPieChart();
-				break;
-			}
-			case c_oChartTypes.Scatter:
-			{
-				newChart = new drawScatterChart();
-				break;
-			}
-			case c_oChartTypes.Area:
-			{
-				newChart = new drawAreaChart();
-				break;
-			}
-			case c_oChartTypes.Stock:
-			{
-				newChart = new drawStockChart();
-				break;
-			}
-			case c_oChartTypes.DoughnutChart:
-			{
-				newChart = new drawDoughnutChart();
-				break;
-			}
-			case c_oChartTypes.Radar:
-			{
-				newChart = new drawRadarChart();
-				break;
-			}
-			case c_oChartTypes.BubbleChart:
-			{
-				newChart = new drawBubbleChart();
-				break;
-			}
-			case c_oChartTypes.Surface:
-			{
-				newChart = new drawSurfaceChart();
-				break;
+			if (i === 0) {
+				this.chart = newChart;
+				this.charts = [];
+			} else {
+				this.charts.push(newChart);
 			}
 		}
-		this.chart = newChart;
-		
+
 		//делаем полный пресчёт
-		if(!chartSpace.bEmptySeries)
-		{
-			if(this.nDimensionCount === 3)
+		if (!chartSpace.bEmptySeries) {
+			if (this.nDimensionCount === 3) {
 				this._calaculate3DProperties(chartSpace);
-			
+			}
+
 			this.plotAreaChart.recalculate(this);
-			
-			if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart)
+
+			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
 				this.gridChart.recalculate(this);
+			}
 		}
-		
+
 		this.allAreaChart.recalculate(this);
-		
-		if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries)
-		{
+
+		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart &&
+			!chartSpace.bEmptySeries) {
 			this.catAxisChart.recalculate(this);
 			this.valAxisChart.recalculate(this);
-			if(this.nDimensionCount === 3)
-			{
+			if (this.nDimensionCount === 3) {
 				this.floor3DChart.recalculate(this);
 				this.serAxisChart.recalculate(this);
 				this.sideWall3DChart.recalculate(this);
 				this.backWall3DChart.recalculate(this);
 			}
-				
+
 		}
-		
-		if(!chartSpace.bEmptySeries)
-			this.chart.recalculate(this);
+
+		if (!chartSpace.bEmptySeries) {
+			for (var i = 0; i < this.charts.length; i++) {
+				this.charts[i].recalculate(this);
+			}
+		}
 	},
-	
-	draw : function(chartSpace, graphics)
-    {
+
+	draw: function (chartSpace, graphics) {
+		var t = this;
+
 		this.cChartSpace = chartSpace;
-		
+
 		var cShapeDrawer = new AscCommon.CShapeDrawer();
 		cShapeDrawer.Graphics = graphics;
 		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
-		
+
 		this.cShapeDrawer = cShapeDrawer;
-		
+
 		//отрисовываем без пересчёта
 		this.allAreaChart.draw(this);
-		
-		if(!chartSpace.bEmptySeries)
-		{
+
+		var drawCharts = function() {
+			for(var i = 0; i < t.charts.length; i++) {
+				t.charts[i].draw(t);
+			}
+		};
+
+		if (!chartSpace.bEmptySeries) {
 			this.plotAreaChart.draw(this, true);
-			
-			if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart)
-			{
-				if(this.nDimensionCount === 3)
-				{
+
+			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
+				if (this.nDimensionCount === 3) {
 					this.floor3DChart.draw(this);
 					this.sideWall3DChart.draw(this);
 					this.backWall3DChart.draw(this);
@@ -284,33 +280,27 @@ CChartsDrawer.prototype =
 				this.gridChart.draw(this);
 				this.plotAreaChart.draw(this, null, true);
 			}
-			
-			if(this.nDimensionCount === 3)
-			{
+
+			if (this.nDimensionCount === 3) {
 				this.cShapeDrawer.bIsNoSmartAttack = true;
-				this.chart.draw(this);
+				drawCharts();
 				this.cShapeDrawer.bIsNoSmartAttack = false;
 			}
-			
-			if(this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart)
-			{
+
+			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
 				this.catAxisChart.draw(this);
 				this.valAxisChart.draw(this);
 				this.serAxisChart.draw(this);
 			}
-			
-			if(this.nDimensionCount !== 3)
-			{
-				if(this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Scatter)
-				{
+
+			if (this.nDimensionCount !== 3) {
+				if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Scatter) {
 					this.cShapeDrawer.bIsNoSmartAttack = true;
-					this.chart.draw(this);
+					drawCharts();
 					this.cShapeDrawer.bIsNoSmartAttack = false;
+				} else {
+					drawCharts();
 				}
-				else
-				{
-					this.chart.draw(this);
-		}
 			}
 		}
 	},
