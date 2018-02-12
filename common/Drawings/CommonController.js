@@ -2351,7 +2351,7 @@ DrawingObjectsController.prototype =
         }
         var oThis = this;
         this.checkSelectedObjectsAndCallback(function(){
-            oThis.resetTextSelection();
+            oThis.resetInternalSelection();
             oThis.removeCallback(-1);
         }, [], false, AscDFH.historydescription_Spreadsheet_Remove);
     },
