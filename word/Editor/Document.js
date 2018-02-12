@@ -16465,9 +16465,9 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 
 		if (sHeading)
 		{
-			oParagraph = oSdt.GetCurrentParagraph();
+			var oParagraph = oSdt.GetCurrentParagraph();
 			oParagraph.Style_Add(this.Get_Styles().GetDefaultTOCHeading());
-			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.value())
+			for (var oIterator = sHeading.getUnicodeIterator(); oIterator.check(); oIterator.next())
 			{
 				var nCharCode = oIterator.value();
 				if (0x0020 === nCharCode)
