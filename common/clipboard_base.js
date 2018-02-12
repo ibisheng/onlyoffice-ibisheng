@@ -87,7 +87,7 @@
 		this.CopyPasteFocusTimer = -1;
 
 		this.inputContext = null;
-		this.LastCopyBinary = null; // для вставки по кнопке, еогда браузер не позволяет
+		this.LastCopyBinary = null; // для вставки по кнопке, когда браузер не позволяет
 
 		// images counter
 		this.PasteImagesCount = 0;
