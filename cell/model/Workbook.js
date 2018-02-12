@@ -5487,6 +5487,10 @@
 							// Grand Total Row
 							dxf = style.totalRow;
 							pos = 0;
+						} else if (AscCommonExcel.c_oAscItemType.Blank === item.t) {
+							// Blank Row
+							dxf = style.blankRow;
+							pos = 0;
 						} else if (styleInfo.showRowHeaders) {
 							// Subtotal Row
 							r = item.getR();

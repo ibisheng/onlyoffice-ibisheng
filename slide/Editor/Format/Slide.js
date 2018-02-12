@@ -522,6 +522,13 @@ Slide.prototype =
                 }
             }
         }
+
+
+        if(body_count === 1 && bSingleBody)
+        {
+            return last_body;
+        }
+
         return null;
     },
 

@@ -1772,6 +1772,52 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
 	{
+		var presentation = editor.WordControl.m_oLogicDocument;
+		var drawingDocument = presentation.DrawingDocument;
+		var notesFocus = presentation.IsFocusOnNotes();
+
+		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
+		var fixPos = props.fixPosition;
+		var curCoord = props.asc_getCellCoord();
+		var startShapePos;
+
+		var specialPasteElemHeight = 22;
+		var specialPasteElemWidth = 33;
+		if(fixPos && fixPos.h && fixPos.w)
+		{
+			startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
+		}
+
+		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight)
+		{
+			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight)
+			{
+				curCoord._y = htmlElement.height - specialPasteElemHeight;
+			}
+			else
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+		}
+
+		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* AscCommon.g_dKoef_mm_to_pix;
+		if(!notesFocus && curCoord._x > htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+		{
+			if(startShapePos && startShapePos.X < htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
+			{
+				curCoord._x = htmlElement.width - specialPasteElemWidth + thumbnailsLeft;
+			}
+			else
+			{
+				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
+			}
+		}
+
+		if(curCoord)
+		{
+			props.asc_setCellCoord(curCoord);
+		}
+
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 
@@ -1822,48 +1868,12 @@ background-repeat: no-repeat;\
 			}
 		}
 
-		//если кнопка специальной вставки выходит за пределы окна, сдвигаем её
-		//TODO в дальнейшем необходимо делать это в меню, а для этого необходимо знать позицию поля notes и thumbnails
-		var specialPasteElemHeight = 22;
-		var specialPasteElemWidth = 33;
-		var htmlElement = this.WordControl.m_oEditor.HtmlElement;
-		var startShapePos;
-		if(fixPos && fixPos.h && fixPos.w)
-		{
-			startShapePos = drawingDocument.ConvertCoordsToCursorWR(fixPos.x - fixPos.w, fixPos.y - fixPos.h, fixPos.pageNum);
-		}
-
-		if(!notesFocus && curCoord._y > htmlElement.height - specialPasteElemHeight)
-		{
-			if(startShapePos && startShapePos.Y < htmlElement.height - specialPasteElemHeight)
-			{
-				curCoord._y = htmlElement.height - specialPasteElemHeight;
-			}
-			else
-			{
-				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
-			}
-		}
-
-		var thumbnailsLeft = this.WordControl.m_oMainParent.AbsolutePosition.L* g_dKoef_mm_to_pix;
-		if(!notesFocus && curCoord._x > htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
-		{
-			if(startShapePos && startShapePos.X < htmlElement.width + thumbnailsLeft - specialPasteElemWidth)
-			{
-				curCoord._x = htmlElement.width - specialPasteElemWidth + thumbnailsLeft;
-			}
-			else
-			{
-				curCoord = new AscCommon.asc_CRect( -1, -1, 0, 0 );
-			}
-		}
-
 		if(curCoord)
 		{
 			props.asc_setCellCoord(curCoord);
 		}
 
-		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+		this.asc_ShowSpecialPasteButton(props);
 	};
 
 	asc_docs_api.prototype.Share          = function()
@@ -2743,15 +2753,77 @@ background-repeat: no-repeat;\
 	 */
 	asc_docs_api.prototype.put_ListType = function(type, subtype)
 	{
-		var NumberInfo =
+		var oPresentation = this.WordControl.m_oLogicDocument;
+		var sBullet = "";
+		if(type === 0)
+		{
+			switch(subtype)
+			{
+				case 0:
+				case 1:
+				{
+					sBullet = "•";
+					break;
+				}
+				case 2:
+				{
+					sBullet = "o";
+					break;
+				}
+				case 3:
+				{
+					sBullet = "§";
+					break;
+				}
+				case 4:
+				{
+					sBullet = String.fromCharCode( 0x0076 );
+					break;
+				}
+				case 5:
+				{
+					sBullet = String.fromCharCode( 0x00D8 );
+					break;
+				}
+				case 6:
+				{
+					sBullet = String.fromCharCode( 0x00FC );
+					break;
+				}
+				case 7:
+				{
+
+					sBullet = String.fromCharCode(119);
+					break;
+				}
+				case 8:
+				{
+					sBullet = String.fromCharCode(0x2013);
+					break;
+				}
+			}
+		}
+
+		var fCallback = function () {
+
+			var NumberInfo =
 			{
 				Type    : 0,
 				SubType : -1
 			};
 
-		NumberInfo.Type    = type;
-		NumberInfo.SubType = subtype;
-		this.WordControl.m_oLogicDocument.SetParagraphNumbering(NumberInfo);
+			NumberInfo.Type    = type;
+			NumberInfo.SubType = subtype;
+			oPresentation.SetParagraphNumbering(NumberInfo);
+		};
+		if(sBullet.length > 0)
+		{
+			AscFonts.FontPickerByCharacter.checkText(sBullet, this, fCallback);
+		}
+		else
+		{
+			fCallback();
+		}
 	};
 
 	asc_docs_api.prototype.put_ShowSnapLines = function(isShow)

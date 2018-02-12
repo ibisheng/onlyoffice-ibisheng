@@ -1486,7 +1486,13 @@ CShape.prototype.getCompiledTransparent = function () {
             }
 
         }
-        else if (isRealObject(this.group)) {
+        if(null !== this.compiledTransparent)
+        {
+
+            this.recalcInfo.recalculateTransparent = false;
+            return this.compiledTransparent;
+        }
+        if (isRealObject(this.group)) {
             var group_transparent = this.group.getCompiledTransparent();
             if (AscFormat.isRealNumber(group_transparent)) {
                 this.compiledTransparent = group_transparent;
