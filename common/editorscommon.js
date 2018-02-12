@@ -250,6 +250,39 @@
 		return res;
 	}
 
+	function getEncodingByBOM(data) {
+		var res = {encoding: AscCommon.c_oAscCodePageNone, size: 0};
+		if (data.length >= 2) {
+			res.size = 2;
+			if (0xFF == data[0] && 0xFE == data[1]) {
+				res.encoding = AscCommon.c_oAscCodePageUtf16;
+			} else if (0xFE == data[0] && 0xFF == data[1]) {
+				res.encoding = AscCommon.c_oAscCodePageUtf16BE;
+			} else if (data.length >= 3) {
+				res.size = 3;
+				if (0xEF == data[0] && 0xBB == data[1] && 0xBF == data[2]) {
+					res.encoding = AscCommon.c_oAscCodePageUtf8;
+				} else if (data.length >= 4) {
+					res.size = 4;
+					if (0xFF == data[0] && 0xFE == data[1] && 0x00 == data[2] && 0x00 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf32;
+					} else if (0x00 == data[0] && 0x00 == data[1] && 0xFE == data[2] && 0xFF == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf32BE;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x38 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x39 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x2B == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x2F == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					}
+				}
+			}
+		}
+		return res;
+	}
+
 	function DocumentUrls()
 	{
 		this.urls = {};
@@ -3262,6 +3295,7 @@
 	window["AscCommon"].getJSZip = getJSZip;
 	window["AscCommon"].getBaseUrl = getBaseUrl;
 	window["AscCommon"].getEncodingParams = getEncodingParams;
+	window["AscCommon"].getEncodingByBOM = getEncodingByBOM;
 	window["AscCommon"].saveWithParts = saveWithParts;
 	window["AscCommon"].loadFileContent = loadFileContent;
 	window["AscCommon"].getImageFromChanges = getImageFromChanges;

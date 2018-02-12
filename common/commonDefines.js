@@ -1047,7 +1047,13 @@
 		"437"   : 43, "720" : 1, "737" : 21, "775" : 5, "850" : 39, "852" : 15, "855" : 12, "857" : 35, "858" : 40, "860" : 41, "861" : 30, "862" : 25, "863" : 42, "865" : 31, "866" : 13, "869" : 22, "874" : 32, "932" : 27, "936" : 18, "949" : 28, "950" : 17, "1200" : 48, "1201" : 49, "1250" : 16, "1251" : 14, "1252" : 44, "1253" : 23, "1254" : 36, "1255" : 26, "1256" : 2, "1257" : 6, "1258" : 45, "10007" : 11, "12000" : 50, "12001" : 51, "20866" : 9, "21866" : 10, "28591" : 37, "28592" : 19,
 		"28593" : 33, "28594" : 3, "28595" : 8, "28596" : 0, "28597" : 20, "28598" : 24, "28599" : 34, "28603" : 4, "28604" : 7, "28605" : 38, "51949" : 29, "65000" : 47, "65001" : 46
 	};
+	var c_oAscCodePageNone = -1;
+	var c_oAscCodePageUtf7 = 47;//65000
 	var c_oAscCodePageUtf8 = 46;//65001
+	var c_oAscCodePageUtf16 = 48;//1200
+	var c_oAscCodePageUtf16BE = 49;//1201
+	var c_oAscCodePageUtf32 = 50;//12000
+	var c_oAscCodePageUtf32BE = 51;//12001
 
 	// https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa?ui=en-US&rs=en-US&ad=US&fromAR=1
 	var c_oAscMaxTooltipLength       = 256;
@@ -1765,7 +1771,13 @@
 	window["AscCommon"].c_oNotifyParentType         = c_oNotifyParentType;
 	window["AscCommon"].c_oAscEncodings             = c_oAscEncodings;
 	window["AscCommon"].c_oAscEncodingsMap          = c_oAscEncodingsMap;
+	window["AscCommon"].c_oAscCodePageNone          = c_oAscCodePageNone;
+	window["AscCommon"].c_oAscCodePageUtf7          = c_oAscCodePageUtf7;
 	window["AscCommon"].c_oAscCodePageUtf8          = c_oAscCodePageUtf8;
+	window["AscCommon"].c_oAscCodePageUtf16         = c_oAscCodePageUtf16;
+	window["AscCommon"].c_oAscCodePageUtf16BE       = c_oAscCodePageUtf16BE;
+	window["AscCommon"].c_oAscCodePageUtf32         = c_oAscCodePageUtf32;
+	window["AscCommon"].c_oAscCodePageUtf32BE       = c_oAscCodePageUtf32BE;
 	window["AscCommon"].c_oAscMaxFormulaLength      = c_oAscMaxFormulaLength;
 
 	window["AscCommon"].locktype_None   = locktype_None;
