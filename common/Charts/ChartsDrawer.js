@@ -159,7 +159,8 @@ CChartsDrawer.prototype =
 		//draw chart
 		var newChart;
 		for (var i = 0; i < chartSpace.chart.plotArea.charts.length; i++) {
-			switch (this.calcProp.type) {
+			var chart = chartSpace.chart.plotArea.charts[i];
+			switch (this._getChartType(chart)) {
 				case c_oChartTypes.Bar: {
 					newChart = new drawBarChart();
 					break;
@@ -208,9 +209,8 @@ CChartsDrawer.prototype =
 			if (i === 0) {
 				this.chart = newChart;
 				this.charts = [];
-			} else {
-				this.charts.push(newChart);
 			}
+			this.charts.push(newChart);
 		}
 
 		//делаем полный пресчёт
@@ -243,6 +243,7 @@ CChartsDrawer.prototype =
 
 		if (!chartSpace.bEmptySeries) {
 			for (var i = 0; i < this.charts.length; i++) {
+				this.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
 				this.charts[i].recalculate(this);
 			}
 		}
@@ -264,6 +265,7 @@ CChartsDrawer.prototype =
 
 		var drawCharts = function() {
 			for(var i = 0; i < t.charts.length; i++) {
+				t.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
 				t.charts[i].draw(t);
 			}
 		};
@@ -1989,65 +1991,8 @@ CChartsDrawer.prototype =
 		
 		this.calcProp.pathH = 1000000000;
 		this.calcProp.pathW = 1000000000;
-		
-		var typeChart = chartProp.chart.plotArea.chart.getObjectType();
-		
-		switch ( typeChart )
-		{
-			case AscDFH.historyitem_type_LineChart:
-			{
-				this.calcProp.type = c_oChartTypes.Line;
-				break;
-			}
-			case AscDFH.historyitem_type_BarChart:
-			{
-				if(chartProp.chart.plotArea.chart.barDir !== AscFormat.BAR_DIR_BAR)
-					this.calcProp.type = c_oChartTypes.Bar;
-				else 
-					this.calcProp.type = c_oChartTypes.HBar;
-				break;
-			}
-			case AscDFH.historyitem_type_PieChart:
-			{
-				this.calcProp.type = c_oChartTypes.Pie;
-				break;
-			}
-			case AscDFH.historyitem_type_AreaChart:
-			{
-				this.calcProp.type = c_oChartTypes.Area;
-				break;
-			}
-			case AscDFH.historyitem_type_ScatterChart:
-			{
-				this.calcProp.type = c_oChartTypes.Scatter;
-				break;
-			}
-			case AscDFH.historyitem_type_StockChart:
-			{
-				this.calcProp.type = c_oChartTypes.Stock;
-				break;
-			}
-			case AscDFH.historyitem_type_DoughnutChart:
-			{
-				this.calcProp.type = c_oChartTypes.DoughnutChart;
-				break;
-			}
-			case AscDFH.historyitem_type_RadarChart:
-			{
-				this.calcProp.type = c_oChartTypes.Radar;
-				break;
-			}
-			case AscDFH.historyitem_type_BubbleChart:
-			{
-				this.calcProp.type = c_oChartTypes.BubbleChart;
-				break;
-			}
-			case AscDFH.historyitem_type_SurfaceChart:
-			{
-				this.calcProp.type = c_oChartTypes.Surface;
-				break;
-			}
-		}
+
+		this.calcProp.type = this._getChartType(chartProp.chart.plotArea.chart);
 		
 		var grouping = chartProp.chart.plotArea.chart.grouping;
 		if(this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Area)
@@ -2090,7 +2035,59 @@ CChartsDrawer.prototype =
 		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
 		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
 	},
-	
+
+	_getChartType: function (chart) {
+		var res;
+		var typeChart = chart.getObjectType();
+		switch (typeChart) {
+			case AscDFH.historyitem_type_LineChart: {
+				res = c_oChartTypes.Line;
+				break;
+			}
+			case AscDFH.historyitem_type_BarChart: {
+				if (chart.barDir !== AscFormat.BAR_DIR_BAR) {
+					res = c_oChartTypes.Bar;
+				} else {
+					res = c_oChartTypes.HBar;
+				}
+				break;
+			}
+			case AscDFH.historyitem_type_PieChart: {
+				res = c_oChartTypes.Pie;
+				break;
+			}
+			case AscDFH.historyitem_type_AreaChart: {
+				res = c_oChartTypes.Area;
+				break;
+			}
+			case AscDFH.historyitem_type_ScatterChart: {
+				res = c_oChartTypes.Scatter;
+				break;
+			}
+			case AscDFH.historyitem_type_StockChart: {
+				res = c_oChartTypes.Stock;
+				break;
+			}
+			case AscDFH.historyitem_type_DoughnutChart: {
+				res = c_oChartTypes.DoughnutChart;
+				break;
+			}
+			case AscDFH.historyitem_type_RadarChart: {
+				res = c_oChartTypes.Radar;
+				break;
+			}
+			case AscDFH.historyitem_type_BubbleChart: {
+				res = c_oChartTypes.BubbleChart;
+				break;
+			}
+			case AscDFH.historyitem_type_SurfaceChart: {
+				res = c_oChartTypes.Surface;
+				break;
+			}
+		}
+		return res;
+	},
+
 	calculateSizePlotArea : function(chartSpace)
 	{
 		this._calculateMarginsChart(chartSpace);
@@ -3746,7 +3743,7 @@ drawBarChart.prototype =
 {
     constructor: drawBarChart,
 	
-	recalculate : function(chartsDrawer)
+	recalculate : function(chartsDrawer, chart)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -4931,7 +4928,7 @@ drawLineChart.prototype =
 		var tempVal;
 		var val = 0;
 		var idxPoint;
-		
+
 		if(this.chartProp.subType === "stacked")
 		{
 			for(var k = 0; k <= i; k++)
