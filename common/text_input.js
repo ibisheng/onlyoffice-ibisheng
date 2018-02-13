@@ -131,6 +131,10 @@
 
 		// Notes offset for slides
 		this.TargetOffsetY = 0;
+
+		// editor_sdk div sizes (for visible textarea)
+		this.editorSdkW = 0;
+		this.editorSdkH = 0;
 	}
 
 	CTextInput.prototype =
@@ -350,6 +354,10 @@
 					document.body.style["touchAction"] = "none";
 				}
 			}
+
+			var _editorSdk = document.getElementById("editor_sdk");
+			this.editorSdkW = _editorSdk.clientWidth;
+			this.editorSdkH = _editorSdk.clientHeight;
 		},
 
 		checkFocus : function()
@@ -489,9 +497,8 @@
 			if (undefined == _top)
 				_top = parseInt(this.HtmlDiv.style.top);
 
-			var _editorSdk = document.getElementById("editor_sdk");
-			var _r_max = parseInt(_editorSdk.clientWidth);
-			var _b_max = parseInt(_editorSdk.clientHeight);
+			var _r_max = this.editorSdkW;
+			var _b_max = this.editorSdkH;
 
 			_r_max -= 60;
 			if ((_r_max - _left) > 50)
@@ -520,46 +527,53 @@
 			this.HtmlDiv.style.left = _left + "px";
 			this.HtmlDiv.style.top  = _top + "px";
 
-			// теперь нужно расчитать ширину/высоту текстбокса
-			var _p              = document.createElement('p');
-			_p.style.zIndex     = "-1";
-			_p.style.position   = "absolute";
-			_p.style.fontFamily = "arial";
-			_p.style.fontSize   = "12pt";
-			_p.style.left       = "0px";
-			_p.style.width      = this.debugTexBoxMaxW + "px";
+			var _height = 22;
+			var _t = this.getAreaValue();
 
-			_editorSdk.appendChild(_p);
+			if (0 != _t.length)
+			{
+				var _editorSdk = document.getElementById("editor_sdk");
 
-			var _t       = this.getAreaValue();
-			_t           = _t.replace(/ /g, "&nbsp;");
-			_p.innerHTML = "<span>" + _t + "</span>";
-			var _width   = _p.firstChild.offsetWidth;
-			_width       = Math.min(_width + 20, this.debugTexBoxMaxW);
+				// теперь нужно расчитать ширину/высоту текстбокса
+				var _p = document.createElement('p');
+				_p.style.zIndex = "-1";
+				_p.style.position = "absolute";
+				_p.style.fontFamily = "arial";
+				_p.style.fontSize = "12pt";
+				_p.style.left = "0px";
+				_p.style.width = this.debugTexBoxMaxW + "px";
 
-			if (AscCommon.AscBrowser.isIE)
-				_width += 10;
+				_editorSdk.appendChild(_p);
 
-			var area          = document.createElement('textarea');
-			area.style.zIndex = "-1";
-			area.id           = "area2_id";
-			area.rows         = 1;
-			area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
-			area.style.overflow = "hidden";
-			area.style.width    = _width + "px";
-			_editorSdk.appendChild(area);
+				_t = _t.replace(/ /g, "&nbsp;");
+				_p.innerHTML = "<span>" + _t + "</span>";
+				var _width = _p.firstChild.offsetWidth;
+				_width = Math.min(_width + 20, this.debugTexBoxMaxW);
 
-			area.value = this.getAreaValue();
+				if (AscCommon.AscBrowser.isIE)
+					_width += 10;
 
-			var _height = area.clientHeight;
-			if (area.scrollHeight > _height)
-				_height = area.scrollHeight;
+				var area = document.createElement('textarea');
+				area.style.zIndex = "-1";
+				area.id = "area2_id";
+				area.rows = 1;
+				area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+				area.style.overflow = "hidden";
+				area.style.width = _width + "px";
+				_editorSdk.appendChild(area);
+
+				area.value = this.getAreaValue();
+
+				_height = area.clientHeight;
+				if (area.scrollHeight > _height)
+					_height = area.scrollHeight;
+
+				_editorSdk.removeChild(_p);
+				_editorSdk.removeChild(area);
+			}
 
 			if (_height > this.debugTexBoxMaxH)
 				_height = this.debugTexBoxMaxH;
-
-			_editorSdk.removeChild(_p);
-			_editorSdk.removeChild(area);
 
 			this.HtmlDiv.style.width  = _width + "px";
 			this.HtmlDiv.style.height = _height + "px";
@@ -1246,7 +1260,9 @@
 				t.apiCompositeEnd();
 				t.externalEndCompositeInput();
 			}
-			t.clear(true);
+
+			if (!t.isSystem)
+				t.clear(true);
 
 			var _nativeFocusElementNoRemoveOnElementFocus = t.nativeFocusElementNoRemoveOnElementFocus;
 			t.nativeFocusElementNoRemoveOnElementFocus = false;
