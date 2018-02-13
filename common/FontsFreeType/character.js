@@ -164,6 +164,9 @@
             if (!this.IsUseNoSquaresMode)
                 return false;
 
+            if (!_text)
+            	return false;
+
 			var oldCount = this.FontsByRangeCount;
             for (var i = _text.getUnicodeIterator(); i.check(); i.next())
             {
@@ -176,6 +179,9 @@
         {
             if (!this.IsUseNoSquaresMode)
                 return false;
+
+			if (!_array)
+				return false;
 
             var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _array.length; ++i)
