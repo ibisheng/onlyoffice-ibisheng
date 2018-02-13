@@ -849,6 +849,23 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
+			AscCommon.check_KeyboardEvent(e);
+			var arrCodes = this.Api.getAddedTextOnKeyDown(AscCommon.global_keyboardEvent);
+			var isAsync = AscFonts.FontPickerByCharacter.checkText(arrCodes, this, function() {
+
+				this.onKeyDown(e);
+				this.onKeyUp(e);
+				AscCommon.stopEvent(e);
+				return false;
+
+			}, true, true);
+
+			if (isAsync)
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			var ret = this.Api.onKeyDown(e);
 
 			switch (e.keyCode)
@@ -890,13 +907,6 @@
 			}
 
             var c = e.which || e.keyCode;
-
-			AscFonts.FontPickerByCharacter.getFontBySymbol(c);
-			if (AscFonts.FontPickerByCharacter.isExtendFonts())
-			{
-
-			}
-
 			var isAsync = AscFonts.FontPickerByCharacter.checkText([c], this, function() {
 
 				this.apiInputText([c]);
@@ -904,7 +914,10 @@
 			}, true, true);
 
 			if (isAsync)
-				return;
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
 
 			var ret = this.Api.onKeyPress(e);
 
