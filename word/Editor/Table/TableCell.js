@@ -1971,6 +1971,22 @@ CTableCell.prototype.SetVMerge = function(nType)
 	this.Pr.VMerge = nType;
 	this.Recalc_CompiledPr();
 };
+/**
+ * Проверяем находится ли данная ячейка в заголовке таблицы
+ * @param {boolean} [isDeep=false] Если данная ячейка не в заголовке своей таблицы, то смотрим ли у родительского класса таблицы
+ * @returns {boolean}
+ */
+CTableCell.prototype.IsInHeader = function(isDeep)
+{
+	var isInHeader = this.Row.Table.IsInHeader(this.Row.GetIndex());
+	if (isInHeader)
+		return true;
+
+	if (true === isDeep && this.Row.Table.Parent && this.Row.Table.Parent.IsTableHeader)
+		return this.Row.Table.Parent.IsTableHeader();
+
+	return false;
+};
 
 function CTableCellRecalculateObject()
 {

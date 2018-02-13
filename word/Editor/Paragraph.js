@@ -10559,6 +10559,11 @@ Paragraph.prototype.Refresh_RecalcData = function(Data)
 						bNeedRecalc = true;
 					}
 				}
+
+				// TODO: Когда пересчет заголовков таблицы будет переделан на нормальную схему, без копирования
+				// нужно будет убрать эту заглушку
+				if (this.Parent.IsTableHeader())
+					bNeedRecalc = true;
 			}
 			break;
 		}

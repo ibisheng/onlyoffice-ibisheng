@@ -1002,3 +1002,11 @@ CDocumentContentBase.prototype.AddText = function(sText)
 			this.AddToParagraph(new ParaText(nCharCode), false);
 	}
 };
+/**
+ * Проверяем находимся ли мы заголовке хоть какой-либо таблицы
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsTableHeader = function()
+{
+	return false;
+};

@@ -13709,6 +13709,22 @@ CTable.prototype.SetRowHeight = function(nHeight)
 			oRow.SetHeight(nHeight, oRowH.GetRule());
 	}
 };
+/**
+ * Проверяем попадает ли данная строка в заголовок таблицы
+ * @param nRow
+ * @returns {boolean}
+ */
+CTable.prototype.IsInHeader = function(nRow)
+{
+	for (var nCurRow = 0; nCurRow <= nRow; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+		if (!oRow.IsHeader())
+			return false;
+	}
+
+	return true;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

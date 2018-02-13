@@ -472,6 +472,18 @@ CDocumentContent.prototype.IsLastTableCellInRow = function(isSelection)
 
 	return this.Parent.IsLastTableCellInRow(isSelection);
 };
+/**
+ * Проверяем находимся ли мы заголовке хоть какой-либо таблицы
+ * @returns {boolean}
+ */
+CDocumentContent.prototype.IsTableHeader = function()
+{
+	var oCell = this.IsTableCellContent(true);
+	if (oCell)
+		return oCell.IsInHeader(true);
+
+	return false;
+};
 CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
 	if (false === this.Parent.IsCell())
