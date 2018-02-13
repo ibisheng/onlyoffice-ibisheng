@@ -985,6 +985,7 @@ var editor;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
+					var pivotCaches = {};
 					var jsZipWrapper = new AscCommon.JSZipWrapper();
 					nextPromise = jsZipWrapper.loadAsync(data || path).then(function (zip) {
 						return doc.openFromZip(zip);
@@ -1008,7 +1009,7 @@ var editor;
 										pivotTableCacheDefinition = new Asc.CT_PivotCacheDefinition();
 										new openXml.SaxParserBase().parse(content, pivotTableCacheDefinition);
 										if (pivotTableCacheDefinition.isValidCacheSource()) {
-											wb.pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
+											pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
 											if (pivotTableCacheDefinition.id) {
 												var partPivotTableCacheRecords = pivotTableCacheDefinitionPart.getPartById(
 													pivotTableCacheDefinition.id);
@@ -1047,7 +1048,7 @@ var editor;
 										for (var i = 0; i < res.length; ++i) {
 											var pivotTable = new Asc.CT_pivotTableDefinition();
 											new openXml.SaxParserBase().parse(res[i], pivotTable);
-											var cacheDefinition = wb.pivotCaches[pivotTable.cacheId];
+											var cacheDefinition = pivotCaches[pivotTable.cacheId];
 											if (cacheDefinition) {
 												pivotTable.cacheDefinition = cacheDefinition;
 												ws.insertPivotTable(pivotTable);

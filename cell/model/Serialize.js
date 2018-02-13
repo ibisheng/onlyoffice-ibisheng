@@ -2319,13 +2319,19 @@
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
 			//PivotCaches
-			var isEmpty = true;
-			for (var id in wb.pivotCaches) {
-				isEmpty = false;
-				break;
-			}
-			if(!isEmpty) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches();});
+			var isEmptyCaches = true;
+			var pivotCaches = {};
+			this.oBinaryWorksheetsTableWriter.foreachWorkSheet(function(ws, index) {
+				for (var i = 0; i < ws.pivotTables.length; ++i) {
+					var pivotTable = ws.pivotTables[i];
+					if (null !== pivotTable.cacheId && pivotTable.cacheDefinition) {
+						isEmptyCaches = false;
+						pivotCaches[pivotTable.cacheId] = pivotTable.cacheDefinition;
+					}
+				}
+			});
+			if (!isEmptyCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches(pivotCaches);});
 			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
@@ -2421,10 +2427,10 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
-		this.WritePivotCaches = function() {
+		this.WritePivotCaches = function(pivotCaches) {
 			var oThis = this;
-			for (var id in wb.pivotCaches) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, wb.pivotCaches[id]);});
+			for (var id in pivotCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, pivotCaches[id]);});
 			}
 		};
 		this.WritePivotCache = function(id, pivotCache) {
@@ -2614,18 +2620,25 @@
             this._prepeareStyles();
             this.bs.WriteItemWithLength(function(){oThis.WriteWorksheetsContent();});
         };
+		this.foreachWorkSheet = function(callback)
+		{
+			var oThis = this;
+			for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
+			{
+				//if copy/paste - write only actve ws
+				if(this.isCopyPaste && i != this.wb.nActive)
+					continue;
+				var ws = this.wb.aWorksheets[i];
+				if(null == this.idWorksheet || this.idWorksheet == ws.getId())
+					callback(ws, i);
+			}
+		};
         this.WriteWorksheetsContent = function()
         {
             var oThis = this;
-            for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
-            {
-                //if copy/paste - write only actve ws
-                if(this.isCopyPaste && i != this.wb.nActive)
-                    continue;
-                var ws = this.wb.aWorksheets[i];
-                if(null == this.idWorksheet || this.idWorksheet == ws.getId())
-                    this.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, i);});
-            }
+			this.foreachWorkSheet(function(ws, index){
+				oThis.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, index);});
+			});
         };
         this.WriteWorksheet = function(ws, index)
         {

@@ -1488,7 +1488,6 @@
 		this.aComments = [];	// Комментарии к документу
 		this.aWorksheets = [];
 		this.aWorksheetsById = {};
-		this.pivotCaches = {};
 		this.aCollaborativeActions = [];
 		this.bCollaborativeChanges = false;
 		this.bUndoChanges = false;
