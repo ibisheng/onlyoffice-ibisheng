@@ -2528,6 +2528,45 @@ CPresentation.prototype =
 
     },
 
+    /**
+     * Проверяем будет ли добавление текста на ивенте KeyDown
+     * @param e
+     * @returns {Number[]} Массив юникодных значений
+     */
+    GetAddedTextOnKeyDown : function(e)
+    {
+        if (e.KeyCode === 32) // Space
+        {
+            var oController = this.GetCurrentController();
+            if(oController)
+            {
+
+                var oTargetDocContent = oController.getTargetDocContent();
+                var oSelectedInfo = new CSelectedElementsInfo();
+                oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                var oMath         = oSelectedInfo.Get_Math();
+
+                if (!oMath)
+                {
+                    if (true === e.ShiftKey && true === e.CtrlKey)
+                        return [0x00A0];
+                }
+            }
+        }
+        else if (e.KeyCode == 69 && true === e.CtrlKey) // Ctrl + E + ...
+        {
+            if (true === e.AltKey) // Ctrl + Alt + E - добавляем знак евро €
+                return [0x20AC];
+        }
+        else if (e.KeyCode == 189) // Клавиша Num-
+        {
+            if (true === e.CtrlKey && true === e.ShiftKey)
+                return [0x2013];
+        }
+
+        return [];
+    },
+
     Get_PresentationBulletByNumInfo : function(NumInfo)
     {
        return AscFormat.fGetPresentationBulletByNumInfo(NumInfo);
