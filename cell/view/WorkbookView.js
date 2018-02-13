@@ -2125,7 +2125,7 @@
     if (this.getCellEditMode()) {
       this.cellEditor.cutSelection();
     } else {
-      this.getWorksheet().emptySelection(c_oAscCleanOptions.All);
+      this.getWorksheet().emptySelection(c_oAscCleanOptions.All, true);
     }
   };
 

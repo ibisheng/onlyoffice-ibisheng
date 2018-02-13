@@ -7934,20 +7934,24 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_AddTableOfContents = function(sHeading, oPr)
 	{
-		var oLogicDocument = this.WordControl.m_oLogicDocument;
-		if (!oLogicDocument)
-			return;
+		AscFonts.FontPickerByCharacter.checkText(sHeading, this, function() {
 
-		var oTOC = oLogicDocument.GetTableOfContents();
-		if (oTOC instanceof AscCommonWord.CBlockLevelSdt && oTOC.IsBuiltInUnique())
-		{
-			if (oPr)
-				this.asc_SetTableOfContentsPr(oPr);
+			var oLogicDocument = this.WordControl.m_oLogicDocument;
+			if (!oLogicDocument)
+				return;
 
-			return;
-		}
+			var oTOC = oLogicDocument.GetTableOfContents();
+			if (oTOC instanceof AscCommonWord.CBlockLevelSdt && oTOC.IsBuiltInUnique())
+			{
+				if (oPr)
+					this.asc_SetTableOfContentsPr(oPr);
 
-		this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
+				return;
+			}
+
+			this.WordControl.m_oLogicDocument.AddTableOfContents(sHeading, oPr);
+
+		});
 	};
 	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
 	{
@@ -8227,6 +8231,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.onKeyUp = function(e)
 	{
 		return this.WordControl.onKeyUp(e);
+	};
+	asc_docs_api.prototype.getAddedTextOnKeyDown = function(e)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return [];
+
+		return oLogicDocument.GetAddedTextOnKeyDown(e);
 	};
 
 	window["asc_docs_api"]                                      = asc_docs_api;

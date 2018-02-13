@@ -194,11 +194,6 @@
 		global_keyboardEvent.CharCode = e.charCode;
 		global_keyboardEvent.KeyCode  = e.keyCode;
 		global_keyboardEvent.Which    = e.which;
-
-		if ((global_keyboardEvent.KeyCode == 229) && ((e.code == "space") || (e.code == "Space") || (e.key == "Spacebar")))
-		{
-			global_keyboardEvent.KeyCode = 12288;
-		}
 	}
 
 	function check_KeyboardEvent2(e)

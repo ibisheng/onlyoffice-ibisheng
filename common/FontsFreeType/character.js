@@ -165,23 +165,9 @@
                 return false;
 
 			var oldCount = this.FontsByRangeCount;
-            for (var i = 0; i < _text.length; ++i)
+            for (var i = _text.getUnicodeIterator(); i.check(); i.next())
             {
-                var nUnicode = null;
-                var nCharCode = _text.charCodeAt(i);
-                if (AscCommon.isLeadingSurrogateChar(nCharCode))
-                {
-                    if (i + 1 < _text.length)
-                    {
-                        i++;
-                        var nTrailingChar = _text.charCodeAt(i);
-                        nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-                    }
-                }
-                else
-                    nUnicode = nCharCode;
-
-                AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+                AscFonts.FontPickerByCharacter.getFontBySymbol(i.value());
             }
             return (this.FontsByRangeCount != oldCount);
 		},
@@ -229,21 +215,35 @@
             this.ExtendFontsByRangeCount = this.FontsByRangeCount;
 		},
 
-		checkText : function(text, _this, _callback)
+		checkText : function(text, _this, _callback, isCodes, isOnlyAsync)
 		{
-            if (!this.getFontsByString(text))
-            {
-                _callback.call(_this);
-                return;
-            }
+			if (isCodes !== true)
+			{
+				if (!this.getFontsByString(text))
+				{
+					if (!isOnlyAsync)
+						_callback.call(_this);
+					return false;
+				}
+			}
+			else
+			{
+				if (!this.getFontsByString2(text))
+				{
+					if (!isOnlyAsync)
+						_callback.call(_this);
+					return false;
+				}
+			}
 
             var fonts = [];
             this.extendFonts(fonts);
 
             if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
             {
-                _callback.call(_this);
-                return;
+            	if (!isOnlyAsync)
+            		_callback.call(_this);
+                return false;
             }
 
             this.CallbackObj._this = _this;
@@ -261,6 +261,7 @@
             };
 
             AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
+            return true;
 		}
 	};
 

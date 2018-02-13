@@ -1740,6 +1740,15 @@
 	baseEditorsApi.prototype.onKeyUp = function(e)
 	{
 	};
+	/**
+	 * Получаем текст (в виде массива юникодных значений), который будет добавлен на ивенте KeyDown
+	 * @param e
+	 * @returns {Number[]}
+	 */
+	baseEditorsApi.prototype.getAddedTextOnKeyDown = function(e)
+	{
+		return [];
+	};
 	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
 	};
@@ -1900,7 +1909,7 @@
 			if (options instanceof Asc.asc_CCSVAdvancedOptions) {
 				callback(parseCSV(text, options));
 			} else {
-				callback(text);
+				callback(text.match(/[^\r\n]+/g));
 			}
 		};
 

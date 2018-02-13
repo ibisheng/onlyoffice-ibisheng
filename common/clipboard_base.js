@@ -87,12 +87,15 @@
 		this.CopyPasteFocusTimer = -1;
 
 		this.inputContext = null;
-		this.LastCopyBinary = null; // для вставки по кнопке, еогда браузер не позволяет
+		this.LastCopyBinary = null; // для вставки по кнопке, когда браузер не позволяет
 
 		// images counter
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
 		this.PasteImagesBody = "";
+
+		this.DivOnCopyHtmlPresent = false;
+		this.DivOnCopyText = "";
 
 		this.bSaveFormat = false; //для вставки, допустим, из плагина необходимо чтобы при добавлении текста в шейп сохранялось форматирование
 	}
@@ -697,9 +700,19 @@
 			this.CommonDiv_Start();
 
 			this.ClosureParams.isDivCopy = true;
+			this.DivOnCopyHtmlPresent = false;
+			this.DivOnCopyText = "";
 			this.LastCopyBinary = null;
 			this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 			this.ClosureParams.isDivCopy = false;
+
+			if (!this.DivOnCopyHtmlPresent && this.DivOnCopyText != "")
+			{
+				this.CommonDiv.innerHTML = this.DivOnCopyText;
+			}
+
+			this.DivOnCopyHtmlPresent = false;
+			this.DivOnCopyText = "";
 
 			this.CommonDiv_Select();
 
@@ -787,7 +800,14 @@
 			if (this.ClosureParams.isDivCopy === true)
 			{
 				if (_format == AscCommon.c_oAscClipboardDataFormat.Html)
+				{
 					this.CommonDiv.innerHTML = _data;
+					this.DivOnCopyHtmlPresent = true;
+				}
+
+				if (_format == AscCommon.c_oAscClipboardDataFormat.Text)
+					this.DivOnCopyText = _data;
+
 				return;
 			}
 

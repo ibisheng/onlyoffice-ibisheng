@@ -3369,10 +3369,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 				}
 			}
 			else
@@ -3381,10 +3381,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				}
 			}
 		}
@@ -3394,10 +3394,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 			{
 				case 0:
 				case 2:
-					return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				case 1:
 				case 3:
-					return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 			}
 		}
 	}
@@ -11022,7 +11022,7 @@ CTable.prototype.GetVMergeCount = function(nCellIndex, nRowIndex)
  * Получаем номер ячейки в заданной строке по заданной колонке
  * @param {number} nCurRow
  * @param {number} nStartGridCol
- * @param {boolean} [isAllowOverlap = false] true - ищем ячейку, в которой началась данная колонка, false - ищем ячейку, строго начавшуюся в данной колонке
+ * @param {boolean} [isAllowOverlap = false] true - ищем ячейку, в которой началась данная колонка, false - ищем ячейку, строго начавшуюся с заданной колонки
  * @returns {number} Возвращаем -1, если не найдена ячейка
  */
 CTable.prototype.private_GetCellIndexByStartGridCol = function(nCurRow, nStartGridCol, isAllowOverlap)
@@ -12144,7 +12144,7 @@ CTable.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, S
         this.private_UpdateSelectedCellsArray(isOneElement ? false : true);
     }
 
-    if (undefined !== EndDocPos[Depth].Type && undefined !== EndDocPos[Depth].Type2)
+    if (null !== EndDocPos && undefined !== EndDocPos[Depth].Type && undefined !== EndDocPos[Depth].Type2)
 	{
 		this.Selection.Type  = EndDocPos[Depth].Type;
 		this.Selection.Type2 = EndDocPos[Depth].Type2;

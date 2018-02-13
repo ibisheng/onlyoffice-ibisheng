@@ -663,6 +663,12 @@ var editor;
 				if (err) {
 					t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 				} else {
+					var dataUint = new Uint8Array(data);
+					var bom = AscCommon.getEncodingByBOM(dataUint);
+					if (AscCommon.c_oAscCodePageNone !== bom.encoding) {
+						cp['codepage'] = bom.encoding;
+						data = dataUint.subarray(bom.size);
+					}
 					cp['data'] = data;
 					options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp);
 					t.handlers.trigger("asc_onAdvancedOptions", options, t.advancedOptionsAction);

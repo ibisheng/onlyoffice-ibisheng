@@ -6570,6 +6570,15 @@ Paragraph.prototype.Select_Math = function(ParaMath)
 };
 Paragraph.prototype.GetSelectionBounds = function()
 {
+	if (this.Pages.length <= 0 || this.Lines.length <= 0)
+	{
+		return {
+			Start     : {X : 0, Y : 0, W : 0, H : 0, Page : 0},
+			End       : {X : 0, Y : 0, W : 0, H : 0, Page : 0},
+			Direction : 1
+		};
+	}
+
 	var X0 = this.X, X1 = this.XLimit, Y = this.Y;
 
 	var BeginRect = null;
@@ -9313,7 +9322,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	if ((null != oHyperlink || bPageRefLink) && true === AscCommon.global_keyboardEvent.CtrlKey)
 		this.DrawingDocument.SetCursorType("pointer", MMData);
 	else
-		this.DrawingDocument.SetCursorType("default", MMData);
+		this.DrawingDocument.SetCursorType("text", MMData);
 
 	var Bounds = this.Pages[CurPage].Bounds;
 	if (true === this.Lock.Is_Locked() && X < Bounds.Right && X > Bounds.Left && Y > Bounds.Top && Y < Bounds.Bottom && this.LogicDocument && !this.LogicDocument.IsViewModeInReview())
