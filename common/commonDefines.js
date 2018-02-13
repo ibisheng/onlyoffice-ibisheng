@@ -1037,10 +1037,10 @@
 		[46, 65001, "UTF-8", "Unicode (UTF-8)"],
 		[47, 65000, "UTF-7", "Unicode (UTF-7)"],
 
-		[48, 1200, "UTF-16", "Unicode (UTF-16)"],
+		[48, 1200, "UTF-16LE", "Unicode (UTF-16)"],
 		[49, 1201, "UTF-16BE", "Unicode (UTF-16 Big Endian)"],
 
-		[50, 12000, "UTF-32", "Unicode (UTF-32)"],
+		[50, 12000, "UTF-32LE", "Unicode (UTF-32)"],
 		[51, 12001, "UTF-32BE", "Unicode (UTF-32 Big Endian)"]
 	];
 	var c_oAscEncodingsMap = {
