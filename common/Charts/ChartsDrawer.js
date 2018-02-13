@@ -1140,86 +1140,53 @@ CChartsDrawer.prototype =
 	_calculateStackedData2: function (data) {
 		var maxMinObj;
 
-		if (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar) {
-			if (this.calcProp.subType === 'stacked') {
-				var originalData = $.extend(true, [], data);
-				for (var j = 0; j < data.length; j++) {
-					for (var i = 0; i < data[j].length; i++) {
-						data[j][i] = this._findPrevValue(originalData, j, i);
+		var calculateStacked = function(sum) {
+			for (var j = 0; j < (data.length - 1); j++) {
+				for (var i = 0; i < data[j].length; i++) {
+					if (!data[j + 1]) {
+						data[j + 1] = [];
 					}
+					data[j + 1][i] = data[j + 1][i] + data[j][i];
 				}
-
-				maxMinObj = this._getMaxMinValueArray(data);
-			} else if (this.calcProp.subType === 'stackedPer') {
-				var summ;
-				var originalData = $.extend(true, [], data);
-				for (var j = 0; j < (data.length); j++) {
-					summ = 0;
-					for (var i = 0; i < data[j].length; i++) {
-						summ += Math.abs(data[j][i]);
-					}
-					for (var i = 0; i < data[j].length; i++) {
-						data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
-					}
-				}
-
-				maxMinObj = this._getMaxMinValueArray(data);
 			}
-		}
 
-
-		if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Area) {
-			if (this.calcProp.subType == 'stacked') {
-				for (var j = 0; j < (data.length - 1); j++) {
-					for (var i = 0; i < data[j].length; i++) {
-						if (!data[j + 1]) {
-							data[j + 1] = [];
-						}
-						data[j + 1][i] = data[j + 1][i] + data[j][i];
-					}
-				}
-
-				maxMinObj = this._getMaxMinValueArray(data);
-			} else if (this.calcProp.subType === 'stackedPer') {
-				var firstData = data;
-
-				var summValue = [];
-				for (var j = 0; j < (firstData[0].length); j++) {
-					summValue[j] = 0;
-					for (var i = 0; i < firstData.length; i++) {
-						summValue[j] += Math.abs(firstData[i][j]);
-					}
-				}
-
-				for (var j = 0; j < (data.length - 1); j++) {
-					for (var i = 0; i < data[j].length; i++) {
-						data[j + 1][i] = data[j + 1][i] + data[j][i];
-					}
-				}
-
-				var tempData = data;
-
-				for (var j = 0; j < (tempData[0].length); j++) {
-					for (var i = 0; i < tempData.length; i++) {
-						if (summValue[j] == 0) {
-							tempData[i][j] = 0;
+			if(sum) {
+				for (var j = 0; j < (data[0].length); j++) {
+					for (var i = 0; i < data.length; i++) {
+						if (sum[j] == 0) {
+							data[i][j] = 0;
 						} else {
-							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
+							data[i][j] = (100 * data[i][j]) / (sum[j]);
 						}
 					}
 				}
-
-				maxMinObj = this._getMaxMinValueArray(tempData);
 			}
+		};
+
+		var calculateSum = function() {
+			//вычисляем сумму
+			var res = [];
+			for (var j = 0; j < (data[0].length); j++) {
+				res[j] = 0;
+				for (var i = 0; i < data.length; i++) {
+					res[j] += Math.abs(data[i][j]);
+				}
+			}
+			return res;
+		};
+
+		var subType = this.calcProp.subType;
+		if (subType === 'stacked') {
+			calculateStacked();
+		} else if (subType === 'stackedPer') {
+			calculateStacked(calculateSum());
 		}
 
-		if(maxMinObj) {
-			this.calcProp.max = maxMinObj.max;
-			this.calcProp.min = maxMinObj.min;
-		}
+		maxMinObj = this._getMaxMinValueArray(data);
+		return maxMinObj;
 	},
 	
-	_calculateData2: function(chart) 
+	_calculateData2: function(chart)
 	{
 		var xNumCache, yNumCache, newArr, arrValues = [], max = 0, min = 0, minY = 0, maxY = 0;
 		var series = chart.chart.plotArea.chart.series;
@@ -1363,29 +1330,26 @@ CChartsDrawer.prototype =
 			t.calcProp.ymax = maxY;
 		};
 
-		if (this.calcProp.type !== c_oChartTypes.Scatter)//берём данные из NumCache
-		{
+		if (this.calcProp.type !== c_oChartTypes.Scatter) {
 			generateArrValues();
 		} else {
 			generateArrValuesScatter();
 		}
 
-		this.calcProp.min = min;
-		this.calcProp.max = max;
-
-		if (newArr) {
-			arrValues = newArr;
-		}
-
-		var data = arrValues;
-		if (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar) {
-			data = arrReverse(arrValues);
-		}
-
 		//пересчёт данных для накопительных диаграмм
 		if (this.calcProp.subType === 'stackedPer' || this.calcProp.subType === 'stacked') {
-			this._calculateStackedData2(data);
+			if (newArr) {
+				arrValues = newArr;
+			}
+			var stackedExtremum = this._calculateStackedData2(arrValues);
+			if(stackedExtremum) {
+				min = stackedExtremum.min;
+				max = stackedExtremum.max;
+			}
 		}
+
+		this.calcProp.min = min;
+		this.calcProp.max = max;
 	},
 
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
