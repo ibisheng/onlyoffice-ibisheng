@@ -1909,7 +1909,7 @@
 			if (options instanceof Asc.asc_CCSVAdvancedOptions) {
 				callback(parseCSV(text, options));
 			} else {
-				callback(text);
+				callback(text.match(/[^\r\n]+/g));
 			}
 		};
 
