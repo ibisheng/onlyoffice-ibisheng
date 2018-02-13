@@ -4242,7 +4242,10 @@ CDocument.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 	if (undefined === bFlow)
 		bFlow = false;
 
-	this.Controller.AddInlineImage(W, H, Img, Chart, bFlow);
+
+    this.TurnOff_InterfaceEvents();
+    this.Controller.AddInlineImage(W, H, Img, Chart, bFlow);
+    this.TurnOn_InterfaceEvents(true);
 };
 
 CDocument.prototype.AddImages = function(aImages){
