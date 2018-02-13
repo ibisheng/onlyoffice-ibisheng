@@ -128,6 +128,9 @@
 
 		this.IsComposition = false;
 		this.ApiIsComposition = false;
+
+		// Notes offset for slides
+		this.TargetOffsetY = 0;
 	}
 
 	CTextInput.prototype =
@@ -373,7 +376,7 @@
 			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + this.FixedPosCheckElementX + "px";
-				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.HtmlAreaOffset + "px";
+				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.TargetOffsetY + this.HtmlAreaOffset + "px";
 
 				this.HtmlArea.scrollTop = this.HtmlArea.scrollHeight;
 				//this.log("" + this.HtmlArea.scrollTop + ", " + this.HtmlArea.scrollHeight);
@@ -381,7 +384,7 @@
 			else
 			{
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
-				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY);
+				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY + this.TargetOffsetY);
 			}
 		},
 
@@ -569,6 +572,12 @@
 
 		onInput : function(e, isFromCompositionUpdate)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem)
 			{
 				if (!this.isShow)
@@ -800,6 +809,12 @@
 
 		onKeyDown : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem && this.isShow)
 			{
 				// нужно проверить на enter
@@ -891,6 +906,12 @@
 
 		onKeyPress : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem)
 				return;
 
@@ -939,6 +960,12 @@
 
 		onKeyUp : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -1022,16 +1049,32 @@
 
 		apiCompositeReplace : function(_value)
 		{
-            if (!this.ApiIsComposition)
-            	this.Api.Begin_CompositeInput();
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
 
-			var isAsync = AscFonts.FontPickerByCharacter.checkText(_value, this, function() { }, true);
+			var isAsync = AscFonts.FontPickerByCharacter.checkText(_value, this, function() {
+
+				if (!this.ApiIsComposition)
+					this.Api.Begin_CompositeInput();
+
+				this.Api.Replace_CompositeText(_value);
+
+				this.apiCompositeEnd();
+				this.clear();
+
+			}, true, true);
+
 			if (isAsync)
 			{
-				this.apiCompositeEnd();
 				this.clear();
 				return;
 			}
+
+			if (!this.ApiIsComposition)
+				this.Api.Begin_CompositeInput();
 
             this.ApiIsComposition = true;
             this.Api.Replace_CompositeText(_value);
@@ -1214,7 +1257,7 @@
 				return;
 			}
 
-			if (t.nativeFocusElement.id == t.HtmlArea.id)
+			if (t.nativeFocusElement && (t.nativeFocusElement.id == t.HtmlArea.id))
 			{
 				t.Api.asc_enableKeyEvents(true, true);
 
@@ -1225,7 +1268,7 @@
 
 				return;
 			}
-			if (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId)
+			if (t.nativeFocusElement && (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId))
 			{
 				t.nativeFocusElement = null;
 				return;
@@ -1234,7 +1277,7 @@
 			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			var _isElementEditable = false;
-			if (true)
+			if (t.nativeFocusElement)
 			{
 				// detect _isElementEditable
 				var _name = t.nativeFocusElement.nodeName;
