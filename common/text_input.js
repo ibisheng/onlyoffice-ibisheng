@@ -1099,7 +1099,7 @@
 				return false;
 
 			setTimeout(function() {
-				this.clear();
+				window['AscCommon'].g_inputContext.clear();
 			}, 10);
 
 			return true;
