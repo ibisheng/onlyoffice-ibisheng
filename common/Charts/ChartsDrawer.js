@@ -1185,11 +1185,39 @@ CChartsDrawer.prototype =
 		maxMinObj = this._getMaxMinValueArray(data);
 		return maxMinObj;
 	},
-	
+
+	_calculateExtremumAllCharts: function(plotArea, isFirstChart){
+		//возвращает массив, где первый элемент - для основной оси, второй - для вспомогательной
+		//максимальные/минимальные значения среди всех графиков
+		var charts = plotArea.charts;
+		if(!charts || isFirstChart) {
+			charts = [plotArea.chart];
+		}
+		
+		var minMaxData, min, max, ymin, ymax;
+		for (var i = 0; i < charts.length; i++) {
+			minMaxData = this._calculateData2(charts[i]);
+			if(i == 0 || minMaxData.min < min) {
+				min = minMaxData.min;
+			}
+			if(i == 0 || minMaxData.max > max) {
+				max = minMaxData.max;
+			}
+			if(i == 0 || minMaxData.ymin < ymin) {
+				ymin = minMaxData.ymin;
+			}
+			if(i == 0 || minMaxData.ymax > ymax) {
+				ymax = minMaxData.ymax;
+			}
+		}
+
+		return [{min: min, max: max, ymin: ymin, ymax: ymax}];
+	},
+
 	_calculateData2: function(chart)
 	{
 		var xNumCache, yNumCache, newArr, arrValues = [], max = 0, min = 0, minY = 0, maxY = 0;
-		var series = chart.chart.plotArea.chart.series;
+		var series = chart.series;
 		var t = this;
 
 		var generateArrValues = function () {
@@ -1326,8 +1354,6 @@ CChartsDrawer.prototype =
 
 				}
 			}
-			t.calcProp.ymin = minY;
-			t.calcProp.ymax = maxY;
 		};
 
 		if (this.calcProp.type !== c_oChartTypes.Scatter) {
@@ -1348,8 +1374,7 @@ CChartsDrawer.prototype =
 			}
 		}
 
-		this.calcProp.min = min;
-		this.calcProp.max = max;
+		return {min: min, max: max, ymin: minY, ymax: maxY};
 	},
 
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
@@ -1931,55 +1956,57 @@ CChartsDrawer.prototype =
 		}
 		return {x: x, y: y};
 	},
-	
-	
-	
+
+
 	//****functions for UP Functions****
-	preCalculateData: function(chartProp)
-	{
+	preCalculateData: function (chartSpace) {
 		this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
-		
+
 		this.calcProp.pathH = 1000000000;
 		this.calcProp.pathW = 1000000000;
 
-		this.calcProp.type = this._getChartType(chartProp.chart.plotArea.chart);
-		
-		var grouping = chartProp.chart.plotArea.chart.grouping;
-		if(this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Area)
+		this.calcProp.type = this._getChartType(chartSpace.chart.plotArea.chart);
+
+		var grouping = chartSpace.chart.plotArea.chart.grouping;
+		if (this.calcProp.type === c_oChartTypes.Line ||
+			this.calcProp.type === c_oChartTypes.Area) {
 			this.calcProp.subType = (grouping === AscFormat.GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === AscFormat.GROUPING_STACKED) ? "stacked" : "normal";
-		else if(this.nDimensionCount === 3 && grouping === AscFormat.BAR_GROUPING_STANDARD)
+		} else if (this.nDimensionCount === 3 && grouping === AscFormat.BAR_GROUPING_STANDARD) {
 			this.calcProp.subType = "standard";
-		else
+		} else {
 			this.calcProp.subType = (grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === AscFormat.BAR_GROUPING_STACKED) ? "stacked" : "normal";
-		
-		
+		}
+
+
 		this.calcProp.xaxispos = null;
 		this.calcProp.yaxispos = null;
-		
-		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/data)
-		this._calculateData2(chartProp);
-		
+
+		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/)
+		var minMaxData = this._calculateExtremumAllCharts(chartSpace.chart.plotArea);
+		this.calcProp.min = minMaxData[0].min;
+		this.calcProp.max = minMaxData[0].max;
+		this.calcProp.ymin = minMaxData[0].ymin;
+		this.calcProp.ymax = minMaxData[0].ymax;
+
 		//***series***
-		this.calcProp.series = chartProp.chart.plotArea.chart.series;
-		
+		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
+
 		//отсеиваем пустые серии
-		this.calcProp.seriesCount = this._calculateCountSeries(chartProp);
-		
-		if(this.calcProp.type === c_oChartTypes.Scatter)
-		{
-			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.ymin, this.calcProp.ymax, chartProp));
-			this.calcProp.xScale = this._roundValues(this._getAxisValues(true, this.calcProp.min, this.calcProp.max, chartProp));
+		this.calcProp.seriesCount = this._calculateCountSeries(chartSpace);
+
+		if (this.calcProp.type === c_oChartTypes.Scatter) {
+			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.ymin, this.calcProp.ymax, chartSpace));
+			this.calcProp.xScale = this._roundValues(this._getAxisValues(true, this.calcProp.min, this.calcProp.max, chartSpace));
+		} else {
+			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.min, this.calcProp.max, chartSpace));
 		}
-		else
-			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.min, this.calcProp.max, chartProp));
-		
-		if(this.calcProp.scale && this.calcProp.scale.length >= 2)
-		{
+
+		if (this.calcProp.scale && this.calcProp.scale.length >= 2) {
 			this.calcProp.axisStep = Math.abs(this.calcProp.scale[1] - this.calcProp.scale[0]);
 		}
-		
-		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
-		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
+
+		this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
+		this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 	},
 
 	_getChartType: function (chart) {
