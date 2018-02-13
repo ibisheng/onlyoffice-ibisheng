@@ -3369,10 +3369,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 				}
 			}
 			else
@@ -3381,10 +3381,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				}
 			}
 		}
@@ -3394,10 +3394,10 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 			{
 				case 0:
 				case 2:
-					return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				case 1:
 				case 3:
-					return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 			}
 		}
 	}

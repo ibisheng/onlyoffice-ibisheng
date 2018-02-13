@@ -542,7 +542,7 @@ CHeaderFooter.prototype =
 	UpdateCursorType : function(X, Y, PageAbs)
     {
         if (PageAbs != this.Content.Get_StartPage_Absolute())
-            this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+            this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
         else
             return this.Content.UpdateCursorType(X, Y, 0);
     },

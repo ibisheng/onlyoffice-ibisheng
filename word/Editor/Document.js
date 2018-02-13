@@ -6282,7 +6282,7 @@ CDocument.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 
 	if (true === this.DrawingDocument.IsCursorInTableCur(X, Y, PageAbs))
 	{
-		this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+		this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
 		this.Api.sync_MouseMoveEndCallback();
 		return;
 	}

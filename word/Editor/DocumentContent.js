@@ -2187,7 +2187,7 @@ CDocumentContent.prototype.Get_ApplyToAll = function()
 CDocumentContent.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
 	if (CurPage < 0 || CurPage >= this.Pages.length)
-		return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+		return this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
 
 	var bInText      = (null === this.IsInText(X, Y, CurPage) ? false : true);
 	var bTableBorder = (null === this.IsTableBorder(X, Y, CurPage) ? false : true);
