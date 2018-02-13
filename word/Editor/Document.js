@@ -6933,7 +6933,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
-                this.AddToParagraph(new ParaText("€".charCode(0)));
+                this.AddToParagraph(new ParaText(0x20AC));
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -7594,6 +7594,37 @@ CDocument.prototype.OnMouseMove = function(e, X, Y, PageIndex)
 		this.Selection_SetEnd(X, Y, e);
 		this.Document_UpdateSelectionState();
 	}
+};
+/**
+ * Проверяем будет ли добавление текста на ивенте KeyDown
+ * @param e
+ * @returns {Number[]} Массив юникодных значений
+ */
+CDocument.prototype.GetAddedTextOnKeyDown = function(e)
+{
+	if (e.KeyCode === 32) // Space
+	{
+		var oSelectedInfo = this.GetSelectedElementsInfo();
+		var oMath         = oSelectedInfo.Get_Math();
+
+		if (!oMath)
+		{
+			if (true === e.ShiftKey && true === e.CtrlKey)
+				return [0x00A0];
+		}
+	}
+	else if (e.KeyCode == 69 && true === e.CtrlKey) // Ctrl + E + ...
+	{
+		if (true === e.AltKey) // Ctrl + Alt + E - добавляем знак евро €
+			return [0x20AC];
+	}
+	else if (e.KeyCode == 189) // Клавиша Num-
+	{
+		if (true === e.CtrlKey && true === e.ShiftKey)
+			return [0x2013];
+	}
+
+	return [];
 };
 CDocument.prototype.Get_Numbering = function()
 {

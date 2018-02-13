@@ -8228,6 +8228,14 @@ background-repeat: no-repeat;\
 	{
 		return this.WordControl.onKeyUp(e);
 	};
+	asc_docs_api.prototype.getAddedTextOnKeyDown = function(e)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (oLogicDocument)
+			return [];
+
+		return oLogicDocument.GetAddedTextOnKeyDown(e);
+	};
 
 	window["asc_docs_api"]                                      = asc_docs_api;
 	window["asc_docs_api"].prototype["asc_nativeOpenFile"]      = function(base64File, version)
