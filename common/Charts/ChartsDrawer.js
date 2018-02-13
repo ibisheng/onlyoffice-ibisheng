@@ -869,8 +869,8 @@ CChartsDrawer.prototype =
 		var valAx = chartSpace.chart.plotArea.valAx;
 		var catAx = chartSpace.chart.plotArea.catAx;
 		
-		var orientationValAx = valAx && valAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
-		var orientationCatAx = catAx && catAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
+		var orientationValAx = valAx && valAx.scaling.orientation === ORIENTATION_MIN_MAX;
+		var orientationCatAx = catAx && catAx.scaling.orientation === ORIENTATION_MIN_MAX;
 		
 		var crossBetween = chartSpace.getValAxisCrossType();
 		if(isHBar === c_oChartTypes.HBar && catAx && valAx && catAx.yPoints && valAx.xPoints)
@@ -1137,269 +1137,255 @@ CChartsDrawer.prototype =
 	},
 	
 	//****new calculate data****
-	_calculateStackedData2: function()
-	{	
+	_calculateStackedData2: function (data) {
 		var maxMinObj;
-		if(this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar)
-		{
+
+		if (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar) {
 			if (this.calcProp.subType === 'stacked') {
-				var originalData = $.extend(true, [], this.calcProp.data);
-				for (var j = 0; j < this.calcProp.data.length; j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j][i] = this._findPrevValue(originalData, j, i)
+				var originalData = $.extend(true, [], data);
+				for (var j = 0; j < data.length; j++) {
+					for (var i = 0; i < data[j].length; i++) {
+						data[j][i] = this._findPrevValue(originalData, j, i);
 					}
 				}
-				
-				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
-				this.calcProp.max = maxMinObj.max;
-				this.calcProp.min = maxMinObj.min;
-			}
-			else if(this.calcProp.subType === 'stackedPer') {
+
+				maxMinObj = this._getMaxMinValueArray(data);
+			} else if (this.calcProp.subType === 'stackedPer') {
 				var summ;
-				var originalData = $.extend(true, [], this.calcProp.data);
-				for (var j = 0; j < (this.calcProp.data.length); j++) {
+				var originalData = $.extend(true, [], data);
+				for (var j = 0; j < (data.length); j++) {
 					summ = 0;
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						summ += Math.abs(this.calcProp.data[j][i]);
+					for (var i = 0; i < data[j].length; i++) {
+						summ += Math.abs(data[j][i]);
 					}
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
+					for (var i = 0; i < data[j].length; i++) {
+						data[j][i] = (this._findPrevValue(originalData, j, i) * 100) / summ;
 					}
 				}
-				
-				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
-				this.calcProp.max = maxMinObj.max;
-				this.calcProp.min = maxMinObj.min;
+
+				maxMinObj = this._getMaxMinValueArray(data);
 			}
 		}
-		
-		
-		if(this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Area)
-		{
+
+
+		if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Area) {
 			if (this.calcProp.subType == 'stacked') {
-				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						if(!this.calcProp.data[j + 1])
-							this.calcProp.data[j + 1] = [];
-						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i];
+				for (var j = 0; j < (data.length - 1); j++) {
+					for (var i = 0; i < data[j].length; i++) {
+						if (!data[j + 1]) {
+							data[j + 1] = [];
+						}
+						data[j + 1][i] = data[j + 1][i] + data[j][i];
 					}
 				}
-				
-				maxMinObj = this._getMaxMinValueArray(this.calcProp.data);
-				this.calcProp.max = maxMinObj.max;
-				this.calcProp.min = maxMinObj.min;
-			}
-			else if (this.calcProp.subType === 'stackedPer') {
-				var firstData = this.calcProp.data;
-				
+
+				maxMinObj = this._getMaxMinValueArray(data);
+			} else if (this.calcProp.subType === 'stackedPer') {
+				var firstData = data;
+
 				var summValue = [];
 				for (var j = 0; j < (firstData[0].length); j++) {
 					summValue[j] = 0;
 					for (var i = 0; i < firstData.length; i++) {
-						summValue[j] += Math.abs(firstData[i][j])
+						summValue[j] += Math.abs(firstData[i][j]);
 					}
 				}
-				
-				for (var j = 0; j < (this.calcProp.data.length - 1); j++) {
-					for (var i = 0; i < this.calcProp.data[j].length; i++) {
-						this.calcProp.data[j + 1][i] = this.calcProp.data[j + 1][i] + this.calcProp.data[j][i]
+
+				for (var j = 0; j < (data.length - 1); j++) {
+					for (var i = 0; i < data[j].length; i++) {
+						data[j + 1][i] = data[j + 1][i] + data[j][i];
 					}
 				}
-				
-				var tempData = this.calcProp.data;
+
+				var tempData = data;
 
 				for (var j = 0; j < (tempData[0].length); j++) {
 					for (var i = 0; i < tempData.length; i++) {
-						if(summValue[j] == 0)
+						if (summValue[j] == 0) {
 							tempData[i][j] = 0;
-						else
+						} else {
 							tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
+						}
 					}
 				}
-				
+
 				maxMinObj = this._getMaxMinValueArray(tempData);
-				this.calcProp.max = maxMinObj.max;
-				this.calcProp.min = maxMinObj.min;
-				this.calcProp.data = tempData;
 			}
+		}
+
+		if(maxMinObj) {
+			this.calcProp.max = maxMinObj.max;
+			this.calcProp.min = maxMinObj.min;
 		}
 	},
 	
 	_calculateData2: function(chart) 
-	{	
+	{
 		var xNumCache, yNumCache, newArr, arrValues = [], max = 0, min = 0, minY = 0, maxY = 0;
 		var series = chart.chart.plotArea.chart.series;
 		var t = this;
-		
-		var generateArrValues = function()
-		{	
+
+		var generateArrValues = function () {
 			var isEn = false;
 			var numSeries = 0;
-			for(var l = 0; l < series.length; l++)
-			{
+			for (var l = 0; l < series.length; l++) {
 				var seria = series[l];
 				var numCache = t.getNumCache(seria.val);
 				var pts = numCache ? numCache.pts : null;
-				
-				if( !pts || !pts.length || seria.isHidden === true)
-				{
+
+				if (!pts || !pts.length || seria.isHidden === true) {
 					continue;
 				}
-		
+
 				var n = 0;
 				arrValues[numSeries] = [];
-				for(var col = 0; col < numCache.ptCount; col++)
-				{
+				for (var col = 0; col < numCache.ptCount; col++) {
 					var curPoint = t.getIdxPoint(seria, col);
-					
-					if(!curPoint)
-					{
+
+					if (!curPoint) {
 						curPoint = {val: 0};
-					}
-					else if(curPoint.isHidden === true)
-					{
+					} else if (curPoint.isHidden === true) {
 						continue;
 					}
-					
+
 					var val = curPoint.val;
-					var value =  parseFloat(val);
-					
-					if(!isEn && !isNaN(value))
-					{
+					var value = parseFloat(val);
+
+					if (!isEn && !isNaN(value)) {
 						min = value;
 						max = value;
 						isEn = true;
 					}
-					if(!isNaN(value) && value > max)
-					{
+					if (!isNaN(value) && value > max) {
 						max = value;
 					}
-					if(!isNaN(value) && value < min)
-					{
+					if (!isNaN(value) && value < min) {
 						min = value;
 					}
-						
-					if(isNaN(value) && val == '' && (((t.calcProp.type === c_oChartTypes.Line ) && t.calcProp.type === 'normal')))
-					{
+
+					if (isNaN(value) && val == '' &&
+						(((t.calcProp.type === c_oChartTypes.Line ) && t.calcProp.type === 'normal'))) {
 						value = '';
-					}
-					else if (isNaN(value))
-					{
+					} else if (isNaN(value)) {
 						value = 0;
 					}
-					
-					if(t.calcProp.type === c_oChartTypes.Pie || t.calcProp.type === c_oChartTypes.DoughnutChart)
-					{
+
+					if (t.calcProp.type === c_oChartTypes.Pie || t.calcProp.type === c_oChartTypes.DoughnutChart) {
 						value = Math.abs(value);
 					}
-					
+
 					arrValues[numSeries][n] = value;
 					n++;
 				}
 				numSeries++;
 			}
 		};
-		
-		var generateArrValuesScatter = function()
-		{
+
+		var generateArrValuesScatter = function () {
 			var yVal;
 			var xVal;
 			newArr = [];
-			for(var l = 0; l < series.length; ++l)
-			{
+			for (var l = 0; l < series.length; ++l) {
 				newArr[l] = [];
-				yNumCache = series[l].yVal && series[l].yVal.numRef && series[l].yVal.numRef.numCache ? series[l].yVal.numRef.numCache : series[l].yVal && series[l].yVal.numLit ? series[l].yVal.numLit : null;
-				
-				if(!yNumCache)
+				yNumCache = series[l].yVal && series[l].yVal.numRef && series[l].yVal.numRef.numCache ?
+					series[l].yVal.numRef.numCache :
+					series[l].yVal && series[l].yVal.numLit ? series[l].yVal.numLit : null;
+
+				if (!yNumCache) {
 					continue;
-				
-				for(var j = 0; j < yNumCache.ptCount; ++j)
-				{
-					if(yNumCache.pts[j])
-					{
+				}
+
+				for (var j = 0; j < yNumCache.ptCount; ++j) {
+					if (yNumCache.pts[j]) {
 						yVal = parseFloat(yNumCache.pts[j].val);
-					
-						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-						if(xNumCache && xNumCache.pts[j])
-						{
-							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache :
+							series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if (xNumCache && xNumCache.pts[j]) {
+							if (!isNaN(parseFloat(xNumCache.pts[j].val))) {
 								xVal = parseFloat(xNumCache.pts[j].val);
-							else
+							} else {
 								xVal = j + 1;
-						}
-						else
+							}
+						} else {
 							xVal = j + 1;
-						
+						}
+
 						newArr[l][j] = [xVal, yVal];
-						
-						if(l === 0 && j === 0)
-						{
+
+						if (l === 0 && j === 0) {
 							min = xVal;
 							max = xVal;
 							minY = yVal;
 							maxY = yVal;
 						}
-						
-						if(xVal < min)
+
+						if (xVal < min) {
 							min = xVal;
-						if(xVal > max)
+						}
+						if (xVal > max) {
 							max = xVal;
-						if(yVal < minY)
+						}
+						if (yVal < minY) {
 							minY = yVal;
-						if(yVal > maxY)
+						}
+						if (yVal > maxY) {
 							maxY = yVal;
-					}
-					else
-					{
-						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-						if(xNumCache && xNumCache.pts[j])
-						{
-							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+						}
+					} else {
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache :
+							series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if (xNumCache && xNumCache.pts[j]) {
+							if (!isNaN(parseFloat(xNumCache.pts[j].val))) {
 								xVal = parseFloat(xNumCache.pts[j].val);
-							else
+							} else {
 								xVal = j + 1;
-						}
-						else
+							}
+						} else {
 							xVal = j + 1;
-						
-						if(l === 0 && j === 0)
-						{
-							min = xVal;
-							max = xVal;
-							
 						}
-						
-						if(xVal < min)
+
+						if (l === 0 && j === 0) {
 							min = xVal;
-						if(xVal > max)
 							max = xVal;
+						}
+						if (xVal < min) {
+							min = xVal;
+						}
+						if (xVal > max) {
+							max = xVal;
+						}
 					}
-					
+
 				}
 			}
 			t.calcProp.ymin = minY;
 			t.calcProp.ymax = maxY;
 		};
-		
-		if(this.calcProp.type !== c_oChartTypes.Scatter)//берём данные из NumCache
+
+		if (this.calcProp.type !== c_oChartTypes.Scatter)//берём данные из NumCache
 		{
 			generateArrValues();
-		}
-		else //point(scatter) chart
-		{
+		} else {
 			generateArrValuesScatter();
 		}
 
 		this.calcProp.min = min;
 		this.calcProp.max = max;
-		
-		if(newArr)
+
+		if (newArr) {
 			arrValues = newArr;
-			
-		if(this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar)
-			this.calcProp.data = arrReverse(arrValues);
-		else
-			this.calcProp.data = arrValues
+		}
+
+		var data = arrValues;
+		if (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.HBar) {
+			data = arrReverse(arrValues);
+		}
+
+		//пересчёт данных для накопительных диаграмм
+		if (this.calcProp.subType === 'stackedPer' || this.calcProp.subType === 'stacked') {
+			this._calculateStackedData2(data);
+		}
 	},
 
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
@@ -2008,10 +1994,6 @@ CChartsDrawer.prototype =
 		
 		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/data)
 		this._calculateData2(chartProp);
-		
-		//пересчёт данных для накопительных диаграмм
-		if(this.calcProp.subType === 'stackedPer' || this.calcProp.subType === 'stacked')
-			this._calculateStackedData2();
 		
 		//***series***
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
@@ -4906,8 +4888,6 @@ drawLineChart.prototype =
 
 	_drawLines: function (/*isSkip*/)
     {
-		var brush, pen, dataSeries, seria, markerBrush, markerPen, numCache;
-		
 		//TODO для того, чтобы верхняя линия рисовалась. пересмотреть!
 		var diffPen = 3;
 		var leftRect = this.chartProp.chartGutter._left / this.chartProp.pxToMM;
