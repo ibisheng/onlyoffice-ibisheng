@@ -135,6 +135,8 @@
 		// editor_sdk div sizes (for visible textarea)
 		this.editorSdkW = 0;
 		this.editorSdkH = 0;
+
+		this.ReadOnlyCounter = 0;
 	}
 
 	CTextInput.prototype =
@@ -443,6 +445,19 @@
 			return this.TextArea_Not_ContentEditableDiv ? this.HtmlArea.value : this.HtmlArea.innerText;
 		},
 
+		setReadOnly : function(isLock)
+		{
+			if (isLock)
+				this.ReadOnlyCounter++;
+			else
+				this.ReadOnlyCounter--;
+
+			if (0 > this.ReadOnlyCounter)
+				this.ReadOnlyCounter = 0;
+
+			this.HtmlArea.readOnly = (0 == this.ReadOnlyCounter) ? false : true;
+		},
+
 		show : function()
 		{
 			if (this.isDebug || this.isSystem)
@@ -616,35 +631,83 @@
 				if (true)
 				{
 					var target = e.target;
-					if (target.msGetInputContext)
+					if (target["msGetInputContext"])
 					{
-						var ctx = target.msGetInputContext();
-						ieStart = ctx.compositionStartOffset;
-						ieEnd = ctx.compositionEndOffset;
+						var ctx = target["msGetInputContext"]();
+						ieStart = ctx["compositionStartOffset"];
+						ieEnd = ctx["compositionEndOffset"];
 					}
 				}
 
 				this.CompositionEnd = this.Text.length;
 				this.CompositionStart = this.TextBeforeComposition.length;
 
-				if (this.IsComposition && ieStart != -1 && ieEnd != -1)
-				{
-					this.CompositionStart = ieStart;
-					this.CompositionEnd = ieEnd;
-				}
-
 				var textReplace = this.Text.substr(this.CompositionStart);
-				for (var iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+				var iter;
+				for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
 				{
 					codes.push(iter.value());
 				}
 
-				this.apiCompositeReplace(codes);
+				var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(codes, true);
 
-				if (!this.IsComposition)
+				if (!isAsync)
 				{
-					this.apiCompositeEnd();
-					this.TextBeforeComposition = this.Text;
+					// ie/edge могут не присылать onCompositeEnd. И тогда ориентир - дополнительный селект
+					if (ieStart > this.CompositionStart)
+					{
+						textReplace = textReplace.substr(0, ieStart - this.CompositionStart);
+
+						codes = [];
+						for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+						{
+							codes.push(iter.value());
+						}
+
+						this.apiCompositeReplace(codes);
+						this.apiCompositeEnd();
+
+						this.TextBeforeComposition = this.Text.substr(0, ieStart);
+
+						this.apiCompositeStart();
+						this.CompositionStart = ieStart;
+
+						codes = [];
+						textReplace = this.Text.substr(this.CompositionStart);
+						for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+						{
+							codes.push(iter.value());
+						}
+
+						this.apiCompositeReplace(codes);
+					}
+					else
+					{
+						this.apiCompositeReplace(codes);
+					}
+
+					if (!this.IsComposition)
+					{
+						this.apiCompositeEnd();
+						this.TextBeforeComposition = this.Text;
+					}
+				}
+				else
+				{
+					AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+					{
+
+						this.apiCompositeReplace(codes);
+						this.apiCompositeEnd();
+
+						this.clear();
+						this.setReadOnly(false);
+
+					});
+
+					AscCommon.stopEvent(e);
+					this.setReadOnly(true);
+					return false;
 				}
 			}
 			else
@@ -812,13 +875,30 @@
 
 		apiInputText : function(codes)
 		{
-			AscFonts.FontPickerByCharacter.checkText(codes, this, function() {
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(codes, true);
 
+			if (!isAsync)
+			{
 				this.apiCompositeStart();
 				this.apiCompositeReplace(codes);
 				this.apiCompositeEnd();
+			}
+			else
+			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
 
-			}, true);
+					this.apiCompositeStart();
+					this.apiCompositeReplace(codes);
+					this.apiCompositeEnd();
+
+					this.setReadOnly(false);
+
+				});
+
+				this.setReadOnly(true);
+				return false;
+			}
 		},
 
 		onKeyDown : function(e)
@@ -880,18 +960,23 @@
 
 			AscCommon.check_KeyboardEvent(e);
 			var arrCodes = this.Api.getAddedTextOnKeyDown(AscCommon.global_keyboardEvent);
-			var isAsync = AscFonts.FontPickerByCharacter.checkText(arrCodes, this, function() {
 
-				this.onKeyDown(e);
-				this.onKeyUp(e);
-				AscCommon.stopEvent(e);
-				return false;
-
-			}, true, true);
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(arrCodes, true);
 
 			if (isAsync)
 			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
+
+					this.onKeyDown(e);
+					this.onKeyUp(e);
+
+					this.setReadOnly(false);
+
+				});
+
 				AscCommon.stopEvent(e);
+				this.setReadOnly(true);
 				return false;
 			}
 
@@ -906,6 +991,12 @@
 				case 38:	// top
 				case 39:	// right
 				case 40:	// bottom
+				case 33: 	// pageup
+				case 34: 	// pagedown
+				case 35: 	// end
+				case 36: 	// home
+				case 46:	// delete
+				case 45:	// insert
 				{
 					AscCommon.stopEvent(e);
 					this.clear();
@@ -942,15 +1033,24 @@
 			}
 
             var c = e.which || e.keyCode;
-			var isAsync = AscFonts.FontPickerByCharacter.checkText([c], this, function() {
 
-				this.apiInputText([c]);
-
-			}, true, true);
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight([c], true);
 
 			if (isAsync)
 			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
+
+					this.apiCompositeStart();
+					this.apiCompositeReplace([c]);
+					this.apiCompositeEnd();
+
+					this.setReadOnly(false);
+
+				});
+
 				AscCommon.stopEvent(e);
+				this.setReadOnly(true);
 				return false;
 			}
 
@@ -1069,24 +1169,6 @@
 				return false;
 			}
 
-			var isAsync = AscFonts.FontPickerByCharacter.checkText(_value, this, function() {
-
-				if (!this.ApiIsComposition)
-					this.Api.Begin_CompositeInput();
-
-				this.Api.Replace_CompositeText(_value);
-
-				this.apiCompositeEnd();
-				this.clear();
-
-			}, true, true);
-
-			if (isAsync)
-			{
-				this.clear();
-				return;
-			}
-
 			if (!this.ApiIsComposition)
 				this.Api.Begin_CompositeInput();
 
@@ -1116,6 +1198,7 @@
 			if (this.isSystem)
 				return;
 
+			this.IsComposition = true;
 			this.onInput(e, true);
 		},
 
