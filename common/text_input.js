@@ -727,7 +727,7 @@
 				if (this.Text.length > 0)
 				{
 					var _lastCode = this.Text.charCodeAt(this.Text.length - 1);
-					if (_lastCode == 12290)
+					if (_lastCode == 12290 || _lastCode == 46)
 					{
 						// китайская точка
 						AscCommon.stopEvent(e);
@@ -998,7 +998,7 @@
 				case 46:	// delete
 				case 45:	// insert
 				{
-					AscCommon.stopEvent(e);
+					// заканчиваем "непрерывный" ввод => очищаем текстбокс
 					this.clear();
 					return false;
 				}
@@ -1331,6 +1331,8 @@
 		{
 			window['AscCommon'].g_inputContext.systemInputEnable(true);
 		}
+
+		//window["SetInputDebugMode"]();
 
 		document.addEventListener("focus", function(e)
 		{
