@@ -111,7 +111,7 @@ CFootEndnote.prototype.IsCustomMarkFollows = function()
 CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 {
 	var oStyles    = this.LogicDocument.Get_Styles();
-	var oParagraph = this.Get_ElementByIndex(0);
+	var oParagraph = this.GetElement(0);
 
 	oParagraph.Style_Add(oStyles.GetDefaultFootnoteText());
 	var oRun = new ParaRun(oParagraph, false);

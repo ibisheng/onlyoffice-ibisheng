@@ -749,10 +749,10 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					this.Remove_FromContent(nIndex, 1);
 				}
 
-				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1, 1);
+				oSdt.Content.Remove_FromContent(oSdt.Content.GetElementsCount() - 1, 1);
 				oSdt.Content.Selection.Use      = true;
 				oSdt.Content.Selection.StartPos = 0;
-				oSdt.Content.Selection.EndPos   = oSdt.Content.Get_ElementsCount() - 1;
+				oSdt.Content.Selection.EndPos   = oSdt.Content.GetElementsCount() - 1;
 
 				this.Add_ToContent(nStartPos, oSdt);
 				this.Selection.StartPos = nStartPos;
@@ -941,6 +941,18 @@ CDocumentContentBase.prototype.SetSelectionByContentPositions = function(StartDo
 CDocumentContentBase.prototype.GetElementsCount = function()
 {
 	return this.Content.length;
+};
+/**
+ * Получаем элемент по заданной позици
+ * @param nIndex
+ * @returns {?CDocumentContentElementBase}
+ */
+CDocumentContentBase.prototype.GetElement = function(nIndex)
+{
+	if (this.Content[nIndex])
+		return this.Content[nIndex];
+
+	return null;
 };
 /**
  * Добавляем новый элемент (с записью в историю)

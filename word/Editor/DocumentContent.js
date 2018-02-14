@@ -8404,14 +8404,6 @@ CDocumentContent.prototype.Concat_Paragraphs = function(Pos)
             this.Selection.EndPos = OldSelectionEndPos - 1;
     }
 };
-CDocumentContent.prototype.Get_ElementsCount = function()
-{
-    return this.Content.length;
-};
-CDocumentContent.prototype.Get_ElementByIndex = function(Index)
-{
-    return this.Content[Index];
-};
 CDocumentContent.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
     if (undefined === PosArray)

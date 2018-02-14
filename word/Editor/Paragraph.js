@@ -7769,7 +7769,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 			var Cell = this.Parent.IsTableCellContent(true);
 			if (Cell)
 			{
-				var PrevEl = Cell.Get_LastParagraphPrevCell();
+				var PrevEl = Cell.GetLastElementInPrevCell();
 				if ((null !== PrevEl && type_Paragraph === PrevEl.GetType() && PrevEl.Style_Get() === StyleId) || (null === PrevEl && undefined === StyleId))
 				{
 					Pr.ParaPr.Spacing.Before = 0;
@@ -7851,7 +7851,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 			var Cell = this.Parent.IsTableCellContent(true);
 			if (Cell)
 			{
-				var NextEl = Cell.Get_FirstParagraphNextCell();
+				var NextEl = Cell.GetFirstElementInNextCell();
 				if ((null !== NextEl && type_Paragraph === NextEl.GetType() && NextEl.Style_Get() === StyleId) || (null === NextEl && StyleId === undefined))
 				{
 					Pr.ParaPr.Spacing.After = 0;

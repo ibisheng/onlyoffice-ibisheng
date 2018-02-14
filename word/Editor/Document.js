@@ -10597,14 +10597,6 @@ CDocument.prototype.Concat_Paragraphs = function(Pos)
 			this.Selection.EndPos = OldSelectionEndPos - 1;
 	}
 };
-CDocument.prototype.Get_ElementsCount = function()
-{
-	return this.Content.length;
-};
-CDocument.prototype.Get_ElementByIndex = function(Index)
-{
-	return this.Content[Index];
-};
 CDocument.prototype.Set_FastCollaborativeEditing = function(isOn)
 {
 	this.CollaborativeEditing.Set_Fast(isOn);
@@ -16002,19 +15994,19 @@ CDocument.prototype.RemoveContentControl = function(Id)
 
 		if (nIndex === nCurPos)
 		{
-			if (nIndex >= oDocContent.Get_ElementsCount())
+			if (nIndex >= oDocContent.GetElementsCount())
 			{
 				oDocContent.MoveCursorToEndPos();
 			}
 			else
 			{
-				oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.Get_ElementsCount() - 1, nIndex));;
+				oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.GetElementsCount() - 1, nIndex));;
 				oDocContent.Content[oDocContent.CurPos.ContentPos].MoveCursorToStartPos();
 			}
 		}
 		else if (nIndex < nCurPos)
 		{
-			oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.Get_ElementsCount() - 1, nCurPos - 1));
+			oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.GetElementsCount() - 1, nCurPos - 1));
 		}
 	}
 	else if (c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType())
@@ -17339,9 +17331,9 @@ CTrackRevisionsManager.prototype.private_GetChangeRelatedParagraphs = function(C
 
                 if (LogicDocument && -1 !== ParaIndex)
                 {
-                    if (ParaIndex < LogicDocument.Get_ElementsCount() - 1)
+                    if (ParaIndex < LogicDocument.GetElementsCount() - 1)
                     {
-                        var Element = LogicDocument.Get_ElementByIndex(ParaIndex + 1);
+                        var Element = LogicDocument.GetElement(ParaIndex + 1);
                         if (Element && type_Paragraph === Element.Get_Type())
                             RelatedParas[Element.Get_Id()] = true;
                     }

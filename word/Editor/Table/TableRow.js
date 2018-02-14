@@ -729,6 +729,14 @@ CTableRow.prototype =
     }
 };
 /**
+ * Доступ к родительской таблице
+ * @returns {null | CTable}
+ */
+CTableRow.prototype.GetTable = function()
+{
+	return this.Table;
+};
+/**
  * Получаем номер данной строки в родительской таблице
  * @returns {number}
  */

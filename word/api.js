@@ -519,7 +519,7 @@
 						// insert/replace document
 						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current["Url"], format: _current["Format"]}], endCallback : function(_api) {
 
-							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
+							_blockStd.Content.Remove_FromContent(_blockStd.Content.GetElementsCount() - 1 , 1);
 							_blockStd.MoveCursorToEndPos(false, false);
 
 							var _worker = _api.__content_control_worker;
@@ -548,16 +548,16 @@
 						{
 							if (_isReplaced)
 							{
-								if (_blockStd.Content.Get_ElementsCount() > 1)
-									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+								if (_blockStd.Content.GetElementsCount() > 1)
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.GetElementsCount() - 1, 1);
 
 								_blockStd.MoveCursorToStartPos(false);
 							}
 							else
 							{
-								if (_blockStd.Content.Get_ElementsCount() > 1)
+								if (_blockStd.Content.GetElementsCount() > 1)
 								{
-									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.GetElementsCount() - 1, 1);
 									_blockStd.MoveCursorToEndPos(false, false);
 								}
 								LogicDocument.MoveCursorRight(false, false, true);
