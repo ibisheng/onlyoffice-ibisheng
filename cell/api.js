@@ -2423,15 +2423,7 @@ var editor;
     };
 
     spreadsheet_api.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
-        var ret = [], oWorksheet;
-        var aSpTree = [];
-        for(var i = 0; i < this.wbModel.aWorksheets.length; ++i){
-            oWorksheet = this.wbModel.aWorksheets[i];
-            for(var j = 0; j < oWorksheet.Drawings.length; ++j){
-                aSpTree.push(oWorksheet.Drawings[j].graphicObject);
-            }
-        }
-        var allSpr = AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
+        var allSpr = this.asc_getAllSignatures();
         for(i = 0; i < allSpr.length; ++i){
           if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
               this.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
