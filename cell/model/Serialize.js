@@ -5820,12 +5820,7 @@
 					oNewWorksheet.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 				else if(this.copyPasteObj && this.copyPasteObj.isCopyPaste)
 				{
-					var api = window["Asc"]["editor"];
-					var nActiveSheet = api.wb.model.nActive;
-					var ws = api.wb.model.aWorksheets[nActiveSheet];
-					var DrawingDocument = ws.DrawingDocument;
-					
-					oNewWorksheet.DrawingDocument = DrawingDocument;
+					oNewWorksheet.DrawingDocument = window["Asc"]["editor"].wbModel.getActiveWs().DrawingDocument;
 				}
 				
                 this.curWorksheet = oNewWorksheet;
