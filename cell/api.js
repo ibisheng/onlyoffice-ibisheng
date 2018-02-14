@@ -791,7 +791,7 @@ var editor;
           oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
-      dataContainer.data = oBinaryFileWriter.Write(undefined, isNoBase64);
+      dataContainer.data = oBinaryFileWriter.Write(isNoBase64);
     }
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
@@ -3354,7 +3354,7 @@ var editor;
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
-    oBinaryFileWriter.Write(undefined, true);
+    oBinaryFileWriter.Write(true);
 
     var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64);
     window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());
