@@ -1083,7 +1083,7 @@ CChartsDrawer.prototype =
 		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
 		
 		//count line of chart grid
-		if((chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx.yPoints && chartSpace.chart.plotArea.catAx.xPoints) || (chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx && chartchartSpaceProp.chart.plotArea.catAx.yPoints && chartSpace.chart.plotArea.valAx.xPoints))
+		if((chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx.yPoints && chartSpace.chart.plotArea.catAx.xPoints) || (chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.catAx.yPoints && chartSpace.chart.plotArea.valAx.xPoints))
 		{	
 			if(chartSpace.chart.plotArea.valAx.yPoints)
 				this.calcProp.numhlines = chartSpace.chart.plotArea.valAx.yPoints.length - 1;
@@ -12640,8 +12640,10 @@ catAxisChart.prototype = {
 			crossMinorStep = -crossMinorStep;
 		}
 
-		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		if (orientation !== ORIENTATION_MIN_MAX) {
+		//TODO необходимо при смене ориентации оси категорий менять axPos!!!
+		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var axPos = this.catAx.axPos;
+		if (axPos !== window['AscFormat'].AX_POS_B) {
 			widthMinorLine = -widthMinorLine;
 			widthLine = -widthLine;
 			crossMajorStep = -crossMajorStep;
@@ -12649,169 +12651,145 @@ catAxisChart.prototype = {
 		}
 
 		if (!(widthLine === 0 && widthMinorLine === 0)) {
-			//исчключение для вертикальной оси
-			if (this.chartProp.type === c_oChartTypes.HBar) {
-				this._calculateVerticalTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
-
-			} else//для горизонтальной оси
-			{
-				this._calculateHorisontalTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
-			}
+			this._calculateTickMarks(widthLine, widthMinorLine, crossMajorStep, crossMinorStep);
 		}
 	},
 
-	_calculateVerticalTickMarks: function (widthLine, widthMinorLine, crossMajorStep, crossMinorStep) {
+	_calculateTickMarks: function(widthLine, widthMinorLine, crossMajorStep, crossMinorStep) {
 		var orientation = this.catAx ? this.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		var yPoints = this.catAx.yPoints;
-
-		var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) :
-			Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
-		var minorStep = stepY / this.chartProp.numhMinorlines;
-
-		var posX = this.catAx.posX;
-
-		var posY, posMinorY, k;
-
-		//сдвиг, если положение оси - между делениями
-		var firstDiff = 0, posYtemp;
-		if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN) {
-			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
-		}
-
+		var minorStep, posX, posY, k, firstDiff = 0;
 		var tickMarkSkip = this.catAx.tickMarkSkip ? this.catAx.tickMarkSkip : 1;
 
-		if (orientation !== ORIENTATION_MIN_MAX) {
-			minorStep = -minorStep;
-			firstDiff = -firstDiff;
-		}
+		if (this.chartProp.type === c_oChartTypes.HBar) {
+			var yPoints = this.catAx.yPoints;
 
-		for (var i = 0; i < yPoints.length; i++) {
-			k = i * tickMarkSkip;
-			if (k >= yPoints.length) {
-				break;
+			var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
+			minorStep = stepY / this.chartProp.numhMinorlines;
+			posX = this.catAx.posX;
+
+			//сдвиг, если положение оси - между делениями
+			if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN) {
+				//TODO избавиться от использовения параметров лругой оси!!!
+				firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
 			}
 
-			//основные линии
-			posY = yPoints[k].pos + firstDiff / 2;
-
-			if (!this.paths.tickMarks) {
-				this.paths.tickMarks = [];
-			}
-			this.paths.tickMarks[i] =
-				this._calculateLine(posX, posY, posX + widthLine / this.chartProp.pxToMM, posY);
-
-			if (((i + 1) * tickMarkSkip) === yPoints.length)//если последняя основная линия, то рисуем её
-			{
-				posYtemp = yPoints[yPoints.length - 1].pos - firstDiff / 2;
-				this.paths.tickMarks[i + 1] =
-					this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posYtemp,
-						posX + widthLine / this.chartProp.pxToMM, posYtemp);
+			if (orientation !== ORIENTATION_MIN_MAX) {
+				minorStep = -minorStep;
+				firstDiff = -firstDiff;
 			}
 
+			for (var i = 0; i < yPoints.length; i++) {
+				k = i * tickMarkSkip;
+				if (k >= yPoints.length) {
+					break;
+				}
 
-			//промежуточные линии
-			if (widthMinorLine !== 0) {
-				for (var n = 1; n < this.chartProp.numhMinorlines; n++) {
-					posMinorY = posY - n * minorStep * tickMarkSkip;
+				//основные линии
+				posY = yPoints[k].pos + firstDiff / 2;
 
-					if (((posMinorY < yPoints[yPoints.length - 1].pos - firstDiff / 2) &&
-						orientation === ORIENTATION_MIN_MAX) ||
-						((posMinorY > yPoints[yPoints.length - 1].pos - firstDiff / 2) &&
-						orientation !== ORIENTATION_MIN_MAX)) {
-						break;
+				if (!this.paths.tickMarks) {
+					this.paths.tickMarks = [];
+				}
+				this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine / this.chartProp.pxToMM, posY);
+
+				if (((i + 1) * tickMarkSkip) === yPoints.length)//если последняя основная линия, то рисуем её
+				{
+					var posYtemp = yPoints[yPoints.length - 1].pos - firstDiff / 2;
+					this.paths.tickMarks[i + 1] =
+						this._calculateLine(posX - crossMajorStep / this.chartProp.pxToMM, posYtemp, posX + widthLine / this.chartProp.pxToMM, posYtemp);
+				}
+
+
+				//промежуточные линии
+				if (widthMinorLine !== 0) {
+					for (var n = 1; n < this.chartProp.numhMinorlines; n++) {
+						var posMinorY = posY - n * minorStep * tickMarkSkip;
+
+						if (((posMinorY < yPoints[yPoints.length - 1].pos - firstDiff / 2) &&
+							orientation === ORIENTATION_MIN_MAX) ||
+							((posMinorY > yPoints[yPoints.length - 1].pos - firstDiff / 2) &&
+							orientation !== ORIENTATION_MIN_MAX)) {
+							break;
+						}
+
+						if (!this.paths.minorTickMarks) {
+							this.paths.minorTickMarks = [];
+						}
+						if (!this.paths.minorTickMarks[i]) {
+							this.paths.minorTickMarks[i] = [];
+						}
+
+						this.paths.minorTickMarks[i][n] = this._calculateLine(posX - crossMinorStep / this.chartProp.pxToMM, posMinorY, posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
 					}
+				}
+			}
+		} else {
+			var xPoints = this.catAx.xPoints;
+			var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.catAx.posX) * 2;
+			minorStep = stepX / this.chartProp.numvMinorlines;
+			posY = this.catAx.posY;
 
-					if (!this.paths.minorTickMarks) {
-						this.paths.minorTickMarks = [];
-					}
-					if (!this.paths.minorTickMarks[i]) {
-						this.paths.minorTickMarks[i] = [];
-					}
+			var posMinorX;
+			//TODO избавиться от использовения параметров лругой оси!!!
+			if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type !== c_oChartTypes.Scatter) {
+				if (xPoints[1]) {
+					firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
+				} else if (this.cChartSpace.chart.plotArea.valAx.posX) {
+					firstDiff = Math.abs(this.cChartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
+				}
+			}
 
-					this.paths.minorTickMarks[i][n] =
-						this._calculateLine(posX - crossMinorStep / this.chartProp.pxToMM, posMinorY,
-							posX + widthMinorLine / this.chartProp.pxToMM, posMinorY);
+			if (orientation !== ORIENTATION_MIN_MAX) {
+				minorStep = -minorStep;
+				firstDiff = -firstDiff;
+			}
+
+			//сам рассчёт основных и промежуточных линий
+			for (var i = 0; i < xPoints.length; i++) {
+				k = i * tickMarkSkip;
+				if (k >= xPoints.length) {
+					break;
+				}
+
+				posX = xPoints[k].pos - firstDiff / 2;
+				if (!this.paths.tickMarks) {
+					this.paths.tickMarks = [];
+				}
+				this.paths.tickMarks[i] = this._calculateLine(posX, posY - crossMajorStep / this.chartProp.pxToMM, posX, posY + widthLine / this.chartProp.pxToMM);
+
+				if (((i + 1) * tickMarkSkip) === xPoints.length)//если последняя основная линия, то рисуем её
+				{
+					var posXtemp = xPoints[xPoints.length - 1].pos + firstDiff / 2;
+					this.paths.tickMarks[i + 1] = this._calculateLine(posXtemp, posY - crossMajorStep / this.chartProp.pxToMM, posXtemp, posY + widthLine / this.chartProp.pxToMM);
+				}
+
+				//промежуточные линии
+				if (widthMinorLine !== 0) {
+					for (var n = 1; n < this.chartProp.numvMinorlines; n++) {
+						posMinorX = posX + n * minorStep * tickMarkSkip;
+
+						if (((posMinorX > xPoints[xPoints.length - 1].pos + firstDiff / 2) &&
+							orientation === ORIENTATION_MIN_MAX) ||
+							((posMinorX < xPoints[xPoints.length - 1].pos + firstDiff / 2) &&
+							orientation !== ORIENTATION_MIN_MAX)) {
+							break;
+						}
+
+						if (!this.paths.minorTickMarks) {
+							this.paths.minorTickMarks = [];
+						}
+						if (!this.paths.minorTickMarks[i]) {
+							this.paths.minorTickMarks[i] = [];
+						}
+
+						this.paths.minorTickMarks[i][n] =
+							this._calculateLine(posMinorX, posY - crossMinorStep / this.chartProp.pxToMM, posMinorX, posY + widthMinorLine / this.chartProp.pxToMM);
+					}
 				}
 			}
 		}
 	},
 
-	_calculateHorisontalTickMarks: function (widthLine, widthMinorLine, crossMajorStep, crossMinorStep) {
-		var orientation = this.catAx ? this.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		var xPoints = this.catAx.xPoints;
-
-		var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) :
-			Math.abs(xPoints[0].pos - this.catAx.posX) * 2;
-		var minorStep = stepX / this.chartProp.numvMinorlines;
-
-		var posY = this.catAx.posY;
-		var posX, posMinorX, k;
-
-		var firstDiff = 0, posXtemp;
-		if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN &&
-			this.chartProp.type !== c_oChartTypes.Scatter) {
-			if (xPoints[1]) {
-				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
-			} else if (this.cChartSpace.chart.plotArea.valAx.posX) {
-				firstDiff = Math.abs(this.cChartSpace.chart.plotArea.valAx.posX - xPoints[0].pos) * 2;
-			}
-		}
-
-		var tickMarkSkip = this.catAx.tickMarkSkip ? this.catAx.tickMarkSkip : 1;
-
-		if (orientation !== ORIENTATION_MIN_MAX) {
-			minorStep = -minorStep;
-			firstDiff = -firstDiff;
-		}
-
-		//сам рассчёт основных и промежуточных линий
-		for (var i = 0; i < xPoints.length; i++) {
-			k = i * tickMarkSkip;
-			if (k >= xPoints.length) {
-				break;
-			}
-
-			posX = xPoints[k].pos - firstDiff / 2;
-			if (!this.paths.tickMarks) {
-				this.paths.tickMarks = [];
-			}
-			this.paths.tickMarks[i] = this._calculateLine(posX, posY - crossMajorStep / this.chartProp.pxToMM, posX,
-				posY + widthLine / this.chartProp.pxToMM);
-
-			if (((i + 1) * tickMarkSkip) === xPoints.length)//если последняя основная линия, то рисуем её
-			{
-				posXtemp = xPoints[xPoints.length - 1].pos + firstDiff / 2;
-				this.paths.tickMarks[i + 1] =
-					this._calculateLine(posXtemp, posY - crossMajorStep / this.chartProp.pxToMM, posXtemp,
-						posY + widthLine / this.chartProp.pxToMM);
-			}
-
-			//промежуточные линии
-			if (widthMinorLine !== 0) {
-				for (var n = 1; n < this.chartProp.numvMinorlines; n++) {
-					posMinorX = posX + n * minorStep * tickMarkSkip;
-
-					if (((posMinorX > xPoints[xPoints.length - 1].pos + firstDiff / 2) &&
-						orientation === ORIENTATION_MIN_MAX) ||
-						((posMinorX < xPoints[xPoints.length - 1].pos + firstDiff / 2) &&
-						orientation !== ORIENTATION_MIN_MAX)) {
-						break;
-					}
-
-					if (!this.paths.minorTickMarks) {
-						this.paths.minorTickMarks = [];
-					}
-					if (!this.paths.minorTickMarks[i]) {
-						this.paths.minorTickMarks[i] = [];
-					}
-
-					this.paths.minorTickMarks[i][n] =
-						this._calculateLine(posMinorX, posY - crossMinorStep / this.chartProp.pxToMM, posMinorX,
-							posY + widthMinorLine / this.chartProp.pxToMM);
-				}
-			}
-		}
-	},
 
 	_calculateLine: function (x, y, x1, y1) {
 
