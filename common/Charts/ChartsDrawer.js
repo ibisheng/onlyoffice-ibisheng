@@ -145,10 +145,6 @@ CChartsDrawer.prototype =
 		this.plotAreaChart = new plotAreaChart();
 		//создаём сетку
 		this.gridChart = new gridChart();
-		//ось категорий
-		this.catAxisChart = new catAxisChart();
-		//ось значений
-		this.valAxisChart = new valAxisChart();
 		//ось серий
 		this.serAxisChart = new serAxisChart();
 		//Floor This element specifies the floor of a 3D chart.   
@@ -228,11 +224,23 @@ CChartsDrawer.prototype =
 
 		this.allAreaChart.recalculate(this);
 
-		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart &&
-			!chartSpace.bEmptySeries) {
-			this.catAxisChart.recalculate(this);
+		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries) {
 
-			this.valAxisChart.recalculate(this, chartSpace.chart.plotArea.valAx);
+			//оси значений и категорий
+			this.valAxisChart = [];
+			this.catAxisChart = [];
+			for (var i = 0; i < chartSpace.chart.plotArea.axId.length; i++) {
+				var axId = chartSpace.chart.plotArea.axId[i];
+				if (axId instanceof AscFormat.CCatAx) {
+					var catAx = new catAxisChart();
+					catAx.recalculate(this, axId);
+					this.catAxisChart.push(catAx);
+				} else if (axId instanceof AscFormat.CValAx) {
+					var valAx = new valAxisChart();
+					valAx.recalculate(this, axId);
+					this.valAxisChart.push(valAx);
+				}
+			}
 
 			if (this.nDimensionCount === 3) {
 				this.floor3DChart.recalculate(this);
@@ -292,8 +300,12 @@ CChartsDrawer.prototype =
 			}
 
 			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
-				this.catAxisChart.draw(this);
-				this.valAxisChart.draw(this, chartSpace.chart.plotArea.valAx);
+				for(var i = 0; i < this.catAxisChart.length; i++) {
+					this.catAxisChart[i].draw(this);
+				}
+				for(var i = 0; i < this.valAxisChart.length; i++) {
+					this.valAxisChart[i].draw(this);
+				}
 				this.serAxisChart.draw(this);
 			}
 
@@ -12882,7 +12894,9 @@ valAxisChart.prototype = {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
-		this.valAx = valAx;
+		if(valAx) {
+			this.valAx = valAx;
+		}
 
 		this._drawAxis();
 		this._drawTickMark();
@@ -12967,9 +12981,10 @@ valAxisChart.prototype = {
 			crossMinorStep = -crossMinorStep;
 		}
 
-		//TODO отрисовка данной оси не должна зависеть от другой оси!!!
-		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		if (orientation !== ORIENTATION_MIN_MAX) {
+		//TODO необходимо при смене ориентации оси категорий менять axPos!!!
+		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		var axPos = this.valAx.axPos;
+		if (axPos !== window['AscFormat'].AX_POS_L) {
 			widthMinorLine = -widthMinorLine;
 			widthLine = -widthLine;
 			crossMajorStep = -crossMajorStep;
