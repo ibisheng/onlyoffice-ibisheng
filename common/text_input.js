@@ -634,8 +634,12 @@
 					if (target["msGetInputContext"])
 					{
 						var ctx = target["msGetInputContext"]();
-						ieStart = ctx["compositionStartOffset"];
-						ieEnd = ctx["compositionEndOffset"];
+
+						if (ctx)
+						{
+							ieStart = ctx["compositionStartOffset"];
+							ieEnd = ctx["compositionEndOffset"];
+						}
 					}
 				}
 
