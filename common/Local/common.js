@@ -92,7 +92,7 @@ AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback,
 	xhr.send(null);
 };
 
-window["DesktopUploadFileToUrl"] = function(url, dst)
+window["DesktopUploadFileToUrl"] = function(url, dst, hash)
 {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "ascdesktop://fonts/" + url, true);
@@ -118,6 +118,22 @@ window["DesktopUploadFileToUrl"] = function(url, dst)
 
         req.onload = function()
 		{
+			if (this.response && this.status == 200)
+			{
+				try
+				{
+					var data = {
+						"accounts": this.response ? JSON.parse(this.response) : undefined,
+						"hash": hash,
+						"type": "share"
+					};
+
+					window["AscDesktopEditor"]["sendSystemMessage"](data);
+				}
+				catch (err)
+				{
+				}
+			}
         };
 
         req.send(fileData);
