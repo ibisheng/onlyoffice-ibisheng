@@ -3260,29 +3260,32 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
                     else
                     {
-                        if (true !== TabPos.DefaultTab && NewX > XEnd - 0.001 && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
-                        {
+                    	var twX    = AscCommon.MMToTwips(X);
+						var twXEnd = AscCommon.MMToTwips(XEnd);
+						var twNewX = AscCommon.MMToTwips(NewX);
+
+						if (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
+						{
                             Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
                             XEnd = 558.7;
                             PRS.BadLeftTab = true;
-                        }
 
-                        // Так работает Word: он не переносит на новую строку табы, начинающиеся в допустимом отрезке, а
-                        // заканчивающиеся вне его. Поэтому мы проверяем именно, где таб начинается, а не заканчивается.
-                        // (bug 32345)
-                        if (X > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
-                        {
-                            WordLen = NewX - X;
-                            RangeEndPos = Pos;
-                            NewRange = true;
-                        }
+                            twXEnd = AscCommon.MMToTwips(XEnd);
+						}
+
+                        if (twNewX > twXEnd && (false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange)))
+						{
+							WordLen     = NewX - X;
+							RangeEndPos = Pos;
+							NewRange    = true;
+						}
                         else
-                        {
-                            Item.Width = NewX - X;
-                            Item.WidthVisible = NewX - X;
+						{
+							Item.Width        = NewX - X;
+							Item.WidthVisible = NewX - X;
 
-                            X = NewX;
-                        }
+							X = NewX;
+						}
                     }
 
                     // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если

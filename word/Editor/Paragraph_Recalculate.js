@@ -2077,6 +2077,16 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
             while ( X >= NewX - 0.001 )
                 NewX += DefTab;
         }
+
+		// Так работает Word: если таб начался в допустимом отрезке, а заканчивается вне его,
+		// то мы ограничиваем его правым полем документа, но только если правый отступ параграфа
+		// неположителен (<= 0). (смотри bug 32345)
+        var twX      = AscCommon.MMToTwips(X);
+        var twEndPos = AscCommon.MMToTwips(PageStart.XLimit);
+        var twNewX   = AscCommon.MMToTwips(NewX);
+
+        if (twX < twEndPos && twNewX >= twEndPos && ParaPr.Ind.Right < 0.001)
+        	NewX = PageStart.XLimit;
     }
     else
     {
