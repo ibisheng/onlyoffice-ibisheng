@@ -6526,6 +6526,8 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else
 		{
+
+
 			var oSelectedInfo = this.GetSelectedElementsInfo();
 			var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
 
@@ -6533,6 +6535,15 @@ CDocument.prototype.OnKeyDown = function(e)
 			if ((oSelectedInfo.GetInlineLevelSdt() && (!e.ShiftKey || e.CtrlKey)) || (oSelectedInfo.Get_Field() && oSelectedInfo.Get_Field().IsFillingForm()))
 				bCanPerform = false;
 
+            if (bCanPerform && (docpostype_DrawingObjects === this.CurPos.Type ||
+                (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type )))
+            {
+                var oTargetDocContent = this.DrawingObjects.getTargetDocContent();
+                if(!oTargetDocContent){
+                    var nRet = this.DrawingObjects.handleEnter();
+                    bCanPerform = (nRet === 0);
+                }
+            }
 			if (bCanPerform && false === this.Document_Is_SelectionLocked(CheckType, null, false, true !== e.CtrlKey && this.IsFormFieldEditing()))
 			{
 				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);

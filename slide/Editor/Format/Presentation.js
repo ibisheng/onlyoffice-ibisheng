@@ -3044,29 +3044,49 @@ CPresentation.prototype =
                         this.addNextSlide();                        
                     }
                 }
-                else if ( e.ShiftKey ) {
-                    if(oController && oController.selectedObjects.length !== 0) {
-                        if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.AddToParagraph(new ParaNewLine(break_Line));
-                        }
-                    }
-                }
                 else {
-                    if(oController && oController.selectedObjects.length !== 0) {
-                        var aSelectedObjects = oController.selectedObjects;
-                        if(aSelectedObjects.length === 1 && aSelectedObjects[0].isPlaceholder && aSelectedObjects[0].isPlaceholder()
-                        && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
-                            if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                this.AddToParagraph(new ParaNewLine(break_Line));
+                    if(oController){
+                        var oTargetDocContent = oController.getTargetDocContent();
+                        if(oTargetDocContent){
+                            if ( e.ShiftKey ) {
+                                if(oController.selectedObjects.length !== 0) {
+                                    if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                        History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                        this.AddToParagraph(new ParaNewLine(break_Line));
+                                    }
+                                }
+                            }
+                            else {
+                                if(oController.selectedObjects.length !== 0) {
+                                    var aSelectedObjects = oController.selectedObjects;
+                                    if(aSelectedObjects.length === 1 && aSelectedObjects[0].isPlaceholder && aSelectedObjects[0].isPlaceholder()
+                                        && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
+                                        if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                            this.AddToParagraph(new ParaNewLine(break_Line));
+                                        }
+                                    }
+                                    else{
+                                        this.AddNewParagraph();
+                                    }
+
+
+                                }
                             }
                         }
-                        else{
-                            this.AddNewParagraph();
+                        else {
+                            var nRet = oController.handleEnter();
+                            if(nRet & 2){
+                                if(this.Slides[this.CurPage]){
+                                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                                }
+                            }
+                            if(nRet & 1){
+                               this.Document_UpdateSelectionState();
+                               this.Document_UpdateInterfaceState();
+                               this.Document_UpdateRulersState();
+                            }
                         }
-
-
                     }
                 }
             }
