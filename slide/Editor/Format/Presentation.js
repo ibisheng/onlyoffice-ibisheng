@@ -5508,7 +5508,7 @@ CPresentation.prototype =
         {
             if(oContent.PresentationWidth !== null && oContent.PresentationHeight !== null)
             {
-                if(Math.abs(this.Width - oContent.PresentationWidth) > 1e-4 || Math.abs(this.Height - oContent.PresentationHeight) > 1e-4)
+                if(!AscFormat.fApproxEqual(this.Width, oContent.PresentationWidth) || !AscFormat.fApproxEqual(this.Height, oContent.PresentationHeight))
                 {
                     bChangeSize = true;
                     kw = this.Width/oContent.PresentationWidth;
@@ -5641,12 +5641,37 @@ CPresentation.prototype =
         }
         if(oContent.DocContent && oContent.DocContent.Elements.length > 0 && nIndex === 0)
         {
-            var oTextPr = this.GetCalculatedTextPr();
+            var oTextPr, oTextPr2, oParaTextPr;
+            var oController = this.GetCurrentController();
+            if(oController)
+            {
+                var oTargetDocContent = oController.getTargetDocContent();
+                if(oTargetDocContent){
+                    var oCurParagraph = oTargetDocContent.GetCurrentParagraph();
+                    if(oCurParagraph){
+                        oTextPr = oCurParagraph.Internal_CompiledParaPrPresentation(undefined, true).TextPr;
+                        oTextPr2 = oTextPr.Copy();
+                        var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+                        for(i = 0; i < oContent.DocContent.Elements.length; ++i)
+                        {
+                            if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)
+                            {
+                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(true);
+                                oContent.DocContent.Elements[i].Element.AddToParagraph(oParaTextPr);
+                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(false);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            oTextPr = this.GetCalculatedTextPr();
             if(oTextPr && AscFormat.isRealNumber(oTextPr.FontSize))
             {
-                var oTextPr2 = new AscCommonWord.CTextPr();
+                oTextPr2 = new AscCommonWord.CTextPr();
                 oTextPr2.FontSize = oTextPr.FontSize;
-                var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+                oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
                 for(i = 0; i < oContent.DocContent.Elements.length; ++i)
                 {
                     if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)

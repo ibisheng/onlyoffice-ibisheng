@@ -8039,7 +8039,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 		return this.Internal_CompiledParaPrPresentation();
 	}
 };
-Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl)
+Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl, bNoMergeDefault)
 {
 	var _Lvl        = AscFormat.isRealNumber(Lvl) ? Lvl : (AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
 	var styleObject = this.Parent.Get_Styles(_Lvl);
@@ -8061,10 +8061,12 @@ Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl)
 
 	Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
 
-	// Копируем прямые настройки параграфа.
-	Pr.ParaPr.Merge(this.Pr);
-	if (this.Pr.DefaultRunPr)
-		Pr.TextPr.Merge(this.Pr.DefaultRunPr);
+	if(!(bNoMergeDefault === true)){
+		// Копируем прямые настройки параграфа.
+		Pr.ParaPr.Merge(this.Pr);
+		if (this.Pr.DefaultRunPr)
+			Pr.TextPr.Merge(this.Pr.DefaultRunPr);
+	}
 	Pr.TextPr.Color.Auto = false;
 
 	return Pr;
