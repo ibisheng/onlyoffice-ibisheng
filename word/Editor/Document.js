@@ -1464,13 +1464,15 @@ CSelectedElementsInfo.prototype.GetHyperlink = function()
 	return null;
 };
 
-var document_compatibility_mode_Word14 = 14;
-var document_compatibility_mode_Word15 = 15;
+var document_compatibility_mode_Word14  = 14;
+var document_compatibility_mode_Word15  = 15;
+
+var document_compatibility_mode_Current = 0xFFFF;
 
 function CDocumentSettings()
 {
     this.MathSettings      = undefined !== CMathSettings ? new CMathSettings() : {};
-    this.CompatibilityMode = document_compatibility_mode_Word14;
+    this.CompatibilityMode = document_compatibility_mode_Current;
 }
 
 /**
@@ -11553,7 +11555,7 @@ CDocument.prototype.AddPageCount = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Get_CompatibilityMode = function()
+CDocument.prototype.GetCompatibilityMode = function()
 {
 	return this.Settings.CompatibilityMode;
 };

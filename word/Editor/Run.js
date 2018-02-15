@@ -3231,7 +3231,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
                     // его ширину.
 
-                    X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
+					var isLastTabToRightEdge = PRS.LastTab && -1 !== PRS.LastTab.Value ? PRS.LastTab.TabRightEdge : false;
+
+                    X = this.private_RecalculateLastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
 
                     // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
                     // убирается ли слово, мы это проверяем при добавленнии букв.
@@ -3246,40 +3248,51 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     Item.SetLeader(TabPos.TabLeader);
 
+					PRS.LastTab.TabPos       = NewX;
+					PRS.LastTab.Value        = TabValue;
+					PRS.LastTab.X            = X;
+					PRS.LastTab.Item         = Item;
+					PRS.LastTab.TabRightEdge = TabPos.TabRightEdge;
+
                     // Если таб не левый, значит он не может быть сразу рассчитан, а если левый, тогда
                     // рассчитываем его сразу здесь
                     if (tab_Left !== TabValue)
                     {
-                        PRS.LastTab.TabPos = NewX;
-                        PRS.LastTab.Value = TabValue;
-                        PRS.LastTab.X = X;
-                        PRS.LastTab.Item = Item;
-
-                        Item.Width = 0;
-                        Item.WidthVisible = 0;
+						Item.Width        = 0;
+						Item.WidthVisible = 0;
                     }
                     else
-                    {
-                    	var twX    = AscCommon.MMToTwips(X);
+					{
+						// TODO: Если таб расположен между правым полем страницы и правым отступом параграфа (отступ
+						// должен быть положительным), то начиная с версии document_compatibility_mode_Word15
+						// табы немного неправильно рассчитываются. Смотри файл "Табы. Рассчет табов рядом с правым краем(2016).docx"
+
+						var twX    = AscCommon.MMToTwips(X);
 						var twXEnd = AscCommon.MMToTwips(XEnd);
 						var twNewX = AscCommon.MMToTwips(NewX);
 
-						if (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1)
+						var oLogicDocument     = PRS.Paragraph.LogicDocument;
+						var nCompatibilityMode = oLogicDocument ? oLogicDocument.GetCompatibilityMode() : document_compatibility_mode_Current;
+						if (nCompatibilityMode <= document_compatibility_mode_Word14
+							&& !isLastTabToRightEdge && (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1))
 						{
-                            Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
-                            XEnd = 558.7;
-                            PRS.BadLeftTab = true;
+							Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
+							XEnd                                        = 558.7;
+							PRS.BadLeftTab                              = true;
 
-                            twXEnd = AscCommon.MMToTwips(XEnd);
+							twXEnd = AscCommon.MMToTwips(XEnd);
 						}
 
-                        if (twNewX > twXEnd && (false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange)))
+						if (!PRS.BadLeftTab
+							&& (false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
+							&& (((TabPos.DefaultTab || PRS.Range < PRS.RangesCount - 1) && twNewX > twXEnd)
+							|| (!TabPos.DefaultTab && twNewX > AscCommon.MMToTwips(TabPos.PageXLimit))))
 						{
 							WordLen     = NewX - X;
 							RangeEndPos = Pos;
 							NewRange    = true;
 						}
-                        else
+						else
 						{
 							Item.Width        = NewX - X;
 							Item.WidthVisible = NewX - X;
@@ -3312,7 +3325,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
                     // его ширину.
-                    X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
+                    X = this.private_RecalculateLastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
 
                     X += WordLen;
 
@@ -3382,7 +3395,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         WordLen  = 0;
                     }
 
-                    X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
+                    X = this.private_RecalculateLastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
 
                     NewRange = true;
                     End      = true;
@@ -4247,9 +4260,13 @@ ParaRun.prototype.private_RecalculateNumbering = function(PRS, Item, ParaPr, _X)
     return X;
 };
 
-ParaRun.prototype.Internal_Recalculate_LastTab = function(LastTab, X, XEnd, Word, WordLen, SpaceLen)
+ParaRun.prototype.private_RecalculateLastTab = function(LastTab, X, XEnd, Word, WordLen, SpaceLen)
 {
-    if ( -1 !== LastTab.Value )
+	if (tab_Left === LastTab.Value)
+	{
+		LastTab.Reset();
+	}
+    else if ( -1 !== LastTab.Value )
     {
         var TempXPos = X;
 
@@ -4268,8 +4285,8 @@ ParaRun.prototype.Internal_Recalculate_LastTab = function(LastTab, X, XEnd, Word
         else if ( tab_Center === TabValue )
             TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW / 2), 0 );
 
-        if ( X + TabCalcW > XEnd )
-            TabCalcW = XEnd - X;
+        if ( X + TabCalcW > LastTab.PageXLimit )
+            TabCalcW = LastTab.PageXLimit - X;
 
         TabItem.Width        = TabCalcW;
         TabItem.WidthVisible = TabCalcW;

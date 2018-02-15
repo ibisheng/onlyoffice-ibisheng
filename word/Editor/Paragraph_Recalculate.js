@@ -2046,16 +2046,17 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть обычное сравнение (см. баг 22586)
         //       Разница с NumTab возникла из-за бага 22586, везде нестрогое оставлять нельзя из-за бага 32051.
 
-        var _X1 = (X * 72 * 20) | 0;
-        var _X2 = ((TempTab.Pos + PageStart.X) * 72 * 20) | 0;
+        var twX      = AscCommon.MMToTwips(X);
+        var twTabPos = AscCommon.MMToTwips(TempTab.Pos + PageStart.X);
 
-        //if (X < TempTab.Pos + PageStart.X)
-        if ((true === NumTab && _X1 <= _X2) || (true !== NumTab && _X1 < _X2))
+        if ((true === NumTab && twX <= twTabPos) || (true !== NumTab && twX < twTabPos))
         {
             Tab = TempTab;
             break;
         }
     }
+
+    var isTabToRightEdge = false;
 
     var NewX = 0;
 
@@ -2085,8 +2086,11 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         var twEndPos = AscCommon.MMToTwips(PageStart.XLimit);
         var twNewX   = AscCommon.MMToTwips(NewX);
 
-        if (twX < twEndPos && twNewX >= twEndPos && ParaPr.Ind.Right < 0.001)
-        	NewX = PageStart.XLimit;
+        if (twX < twEndPos && twNewX >= twEndPos && AscCommon.MMToTwips(ParaPr.Ind.Right) <= 0)
+		{
+			NewX = PageStart.XLimit;
+			isTabToRightEdge = true;
+		}
     }
     else
     {
@@ -2094,10 +2098,13 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     }
 
 	return {
-		NewX       : NewX,
-		TabValue   : Tab ? Tab.Value : tab_Left,
-		DefaultTab : Tab ? false : true,
-		TabLeader  : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None
+		NewX         : NewX,
+		TabValue     : Tab ? Tab.Value : tab_Left,
+		DefaultTab   : Tab ? false : true,
+		TabLeader    : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None,
+		TabRightEdge : isTabToRightEdge,
+		PageX        : PageStart.X,
+		PageXLimit   : PageStart.XLimit
 	};
 };
 
@@ -2179,7 +2186,7 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 		//      страницу.
 		if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
 		{
-			var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
+			var CompatibilityMode = this.LogicDocument.GetCompatibilityMode();
 			if (CompatibilityMode <= document_compatibility_mode_Word14)
 			{
 				if (null != this.Get_DocumentPrev() && true != this.Parent.IsTableCellContent() && 0 === CurPage)
