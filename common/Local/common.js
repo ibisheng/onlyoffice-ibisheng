@@ -92,7 +92,7 @@ AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback,
 	xhr.send(null);
 };
 
-window["DesktopUploadFileToUrl"] = function(url, dst, hash)
+window["DesktopUploadFileToUrl"] = function(url, dst, hash, pass)
 {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "ascdesktop://fonts/" + url, true);
@@ -125,6 +125,7 @@ window["DesktopUploadFileToUrl"] = function(url, dst, hash)
 					var data = {
 						"accounts": this.response ? JSON.parse(this.response) : undefined,
 						"hash": hash,
+						"password" : pass,
 						"type": "share"
 					};
 
