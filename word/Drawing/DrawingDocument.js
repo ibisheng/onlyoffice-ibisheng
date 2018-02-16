@@ -5073,7 +5073,7 @@ function CDrawingDocument()
 			}
 			else
 			{
-				var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+				var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
 				var _y = this.TableOutlineDr.CurPos.Y;
 				var _r = _x + this.TableOutlineDr.TableOutline.W;
 				var _b = _y + this.TableOutlineDr.TableOutline.H;

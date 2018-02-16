@@ -523,11 +523,11 @@ CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLo
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 
-CTable.prototype.Get_TableOffsetCorrection = function()
+CTable.prototype.GetTableOffsetCorrection = function()
 {
     return 0;
 };
-CTable.prototype.Get_RightTableOffsetCorrection = function()
+CTable.prototype.GetRightTableOffsetCorrection = function()
 {
     return 0;
 };

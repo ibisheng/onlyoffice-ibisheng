@@ -1589,7 +1589,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
         {
             case AscCommon.align_Left :
             {
-                Page.X = Page.X_origin + this.Get_TableOffsetCorrection() + TablePr.TableInd;
+                Page.X = Page.X_origin + this.GetTableOffsetCorrection() + TablePr.TableInd;
                 break;
             }
             case AscCommon.align_Right :
@@ -1619,17 +1619,13 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
             var OffsetCorrection_Left  = 0;
             var OffsetCorrection_Right = 0;
 
-            if (this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0 && !(this.bPresentation === true))
+            if (true !== this.bPresentation)
             {
-                var FirstRow   = this.Content[0];
-                var Cell_Left  = FirstRow.Get_Cell(0);
-                var Cell_Right = FirstRow.Get_Cell(FirstRow.Get_CellsCount() - 1);
-
-                OffsetCorrection_Left  = Cell_Left.GetMargins().Left.W;
-                OffsetCorrection_Right = Cell_Right.GetMargins().Right.W;
+                OffsetCorrection_Left  = this.GetTableOffsetCorrection();
+                OffsetCorrection_Right = this.GetRightTableOffsetCorrection();
             }
 
-            this.X = this.X_origin + this.Get_TableOffsetCorrection();
+            this.X = this.X_origin + this.GetTableOffsetCorrection();
             this.AnchorPosition.Set_X(this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, PageFields.X - OffsetCorrection_Left, PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right);
 
             // Непонятно по какой причине, но Word для плавающих таблиц добаляется значение TableInd
@@ -1637,7 +1633,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
 			this.AnchorPosition.CalcX += TablePr.TableInd;
 
             this.X        = this.AnchorPosition.CalcX;
-            this.X_origin = this.X - this.Get_TableOffsetCorrection();
+            this.X_origin = this.X - this.GetTableOffsetCorrection();
 
             if (undefined != this.PositionH_Old)
             {
@@ -1652,7 +1648,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
 
                 // На всякий случай пересчитаем заново координату
 				this.X        = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-                this.X_origin = this.X - this.Get_TableOffsetCorrection();
+                this.X_origin = this.X - this.GetTableOffsetCorrection();
 
                 this.PositionH_Old = undefined;
             }
@@ -3132,7 +3128,7 @@ CTable.prototype.private_RecalculateSkipPage = function(CurPage)
 };
 CTable.prototype.private_RecalculatePercentWidth = function()
 {
-    return this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
+    return this.XLimit - this.X - this.GetTableOffsetCorrection() + this.GetRightTableOffsetCorrection();
 };
 CTable.prototype.private_RecalculateGridCols = function()
 {

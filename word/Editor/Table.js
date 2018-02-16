@@ -2395,7 +2395,7 @@ CTable.prototype.Get_MaxTopBorder = function(RowIndex)
 /**
  * Вычисляем небольшое смещение по X, необходимое для совместимости с Word разных версий
  */
-CTable.prototype.Get_TableOffsetCorrection = function()
+CTable.prototype.GetTableOffsetCorrection = function()
 {
 	var X = 0;
 
@@ -2435,7 +2435,7 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 
 	return -X;
 };
-CTable.prototype.Get_RightTableOffsetCorrection = function()
+CTable.prototype.GetRightTableOffsetCorrection = function()
 {
 	var X = 0;
 
@@ -2596,7 +2596,7 @@ CTable.prototype.UpdateEndInfo = function()
 CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
 {
 	this.X_origin = X;
-	var Dx        = this.Get_TableOffsetCorrection();
+	var Dx        = this.GetTableOffsetCorrection();
 
 	this.X = X + Dx;
 	this.Y = Y;
@@ -3018,6 +3018,31 @@ CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 				Max += MinMargin[CurCol] + MaxContent[CurCol];
 			else
 				Max += MaxContent[CurCol];
+		}
+
+		var oTableW = this.GetTableW();
+		if (oTableW)
+		{
+			var nValue = oTableW.GetValue();
+			if (oTableW.IsMM())
+			{
+				if (Min < nValue)
+					Min = nValue;
+
+				if (Max < nValue)
+					Max = nValue;
+			}
+			else if (oTableW.IsPercent())
+			{
+				var nPercentWidth = this.private_RecalculatePercentWidth();
+				var mmValue = nValue  / 100 * nPercentWidth;
+
+				if (Min < mmValue)
+					Min = mmValue;
+
+				if (Max < mmValue)
+					Max = mmValue;
+			}
 		}
 
 		return {Min : Min, Max : Max};

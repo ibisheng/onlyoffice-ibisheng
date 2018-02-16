@@ -5451,6 +5451,14 @@ CTableMeasurement.prototype.IsPercent = function()
 {
 	return !!(tblwidth_Pct === this.Type);
 };
+/**
+ * Получаем значение ширины в процентах или в миллиметрах
+ * @returns {number}
+ */
+CTableMeasurement.prototype.GetValue = function()
+{
+	return this.W;
+};
 
 function CTablePr()
 {
