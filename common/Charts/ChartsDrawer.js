@@ -287,6 +287,13 @@ CChartsDrawer.prototype =
 					this.sideWall3DChart.draw(this);
 					this.backWall3DChart.draw(this);
 				}
+				//GRID
+				for(var i = 0; i < this.catAxisChart.length; i++) {
+					this.catAxisChart[i].draw(this, null, true);
+				}
+				for(var i = 0; i < this.valAxisChart.length; i++) {
+					this.valAxisChart[i].draw(this, null, true);
+				}
 				this.plotAreaChart.draw(this, null, true);
 			}
 
@@ -12350,7 +12357,7 @@ function catAxisChart() {
 catAxisChart.prototype = {
 	constructor: catAxisChart,
 
-	draw: function (chartsDrawer, catAx) {
+	draw: function (chartsDrawer, catAx, isDrawGrid) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
@@ -12359,9 +12366,12 @@ catAxisChart.prototype = {
 			this.catAx = catAx;
 		}
 
-		this._drawGridLines();
-		this._drawAxis();
-		this._drawTickMark();
+		if(isDrawGrid) {
+			this._drawGridLines();
+		} else {
+			this._drawAxis();
+			this._drawTickMark();
+		}
 	},
 
 	recalculate: function (chartsDrawer, catAx) {
@@ -12711,7 +12721,7 @@ function valAxisChart() {
 valAxisChart.prototype = {
 	constructor: valAxisChart,
 
-	draw: function (chartsDrawer, valAx) {
+	draw: function (chartsDrawer, valAx, isDrawGrid) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
@@ -12719,9 +12729,12 @@ valAxisChart.prototype = {
 			this.valAx = valAx;
 		}
 
-		this._drawGridLines();
-		this._drawAxis();
-		this._drawTickMark();
+		if(isDrawGrid) {
+			this._drawGridLines();
+		} else {
+			this._drawAxis();
+			this._drawTickMark();
+		}
 	},
 
 	recalculate: function (chartsDrawer, valAx) {
