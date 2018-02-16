@@ -3719,6 +3719,7 @@ CChartsDrawer.prototype =
 
 	//common functions for grid
 	getHorizontalGridLines: function (axis, isCatAxis) {
+		var t = this;
 		var gridLines, minorGridLines;
 		var crossBetween = this.cChartSpace.getValAxisCrossType();
 		var points = axis.yPoints;
@@ -3735,48 +3736,101 @@ CChartsDrawer.prototype =
 			crossDiff = points[1] ? Math.abs((points[1].pos - points[0].pos) / 2) : Math.abs(points[0].pos - posAxis);
 		}
 
-		for (var i = 0; i < points.length; i++) {
+		//TODO пересмотреть отрисовку сетки для Radar, не использовать numCache!
+		if(this.calcProp.type === c_oChartTypes.Radar)
+		{
+			var numCache = this.calcProp.series[0].val.numRef ? this.calcProp.series[0].val.numRef.numCache.pts : this.calcProp.series[0].val.numLit.pts;
+			var tempAngle = 2 * Math.PI / numCache.length;
+			var trueHeight = this.calcProp.trueHeight;
+			var trueWidth = this.calcProp.trueWidth;
+			var xDiff = ((trueHeight / 2) / points.length) / this.calcProp.pxToMM;
+			var xCenter = (this.calcProp.chartGutter._left + trueWidth/2) / this.calcProp.pxToMM;
+			var yCenter = (this.calcProp.chartGutter._top + trueHeight/2) / this.calcProp.pxToMM;
+		}
 
-			if (crossDiff) {
-				posY = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
-			} else {
-				posY = points[i].pos * this.calcProp.pxToMM;
+		var calculateRadarGridLines = function () {
+			var y, x, radius, xFirst, yFirst;
+			var pathId = t.cChartSpace.AllocPath();
+			var path = t.cChartSpace.GetPath(pathId);
+
+			for (var k = 0; k < numCache.length; k++) {
+				y = i * xDiff;
+				x = xCenter;
+
+				radius = y;
+
+				y = yCenter - radius * Math.cos(k * tempAngle);
+				x = x + radius * Math.sin(k * tempAngle);
+
+				var pathH = t.calcProp.pathH;
+				var pathW = t.calcProp.pathW;
+
+				path.stroke = true;
+				if (k === 0) {
+					xFirst = x;
+					yFirst = y;
+					path.moveTo(x * pathW, y * pathH);
+				} else {
+					if (k === numCache.length - 1) {
+						path.lnTo(x * pathW, y * pathH);
+						path.lnTo(xFirst * pathW, yFirst * pathH);
+					} else {
+						path.lnTo(x * pathW, y * pathH);
+					}
+				}
 			}
 
 			if (!gridLines) {
 				gridLines = [];
 			}
-			gridLines[i] = this._calculateGridLine(posX, posY, posX + widthLine, posY, i);
+			gridLines[i] = pathId;
+		};
 
-			//промежуточные линии
-			for (var n = 0; n < this.calcProp.numhMinorlines; n++) {
-				posMinorY = posY + n * minorStep;
-
-				if (posMinorY < this.calcProp.chartGutter._top || posMinorY > bottomMargin) {
-					break;
-				}
-
-				if (!minorGridLines) {
-					minorGridLines = [];
-				}
-				if (!minorGridLines[i]) {
-					minorGridLines[i] = [];
-				}
-
-				minorGridLines[i][n] = this._calculateGridLine(posX, posMinorY, posX + widthLine, posMinorY);
-			}
-
-
-			if (crossDiff && i === points.length - 1) {
+		for (var i = 0; i < points.length; i++) {
+			if(this.calcProp.type === c_oChartTypes.Radar) {
+				calculateRadarGridLines();
+			} else {
 				if (crossDiff) {
-					posY = (points[i].pos + crossDiff) * this.calcProp.pxToMM;
+					posY = (points[i].pos - crossDiff) * this.calcProp.pxToMM;
+				} else {
+					posY = points[i].pos * this.calcProp.pxToMM;
 				}
 
-				i++;
 				if (!gridLines) {
 					gridLines = [];
 				}
-				gridLines[i] = this._calculateGridLine(posX, posY, posX + widthLine, posY);
+				gridLines[i] = this._calculateGridLine(posX, posY, posX + widthLine, posY, i);
+
+				//промежуточные линии
+				for (var n = 0; n < this.calcProp.numhMinorlines; n++) {
+					posMinorY = posY + n * minorStep;
+
+					if (posMinorY < this.calcProp.chartGutter._top || posMinorY > bottomMargin) {
+						break;
+					}
+
+					if (!minorGridLines) {
+						minorGridLines = [];
+					}
+					if (!minorGridLines[i]) {
+						minorGridLines[i] = [];
+					}
+
+					minorGridLines[i][n] = this._calculateGridLine(posX, posMinorY, posX + widthLine, posMinorY);
+				}
+
+
+				if (crossDiff && i === points.length - 1) {
+					if (crossDiff) {
+						posY = (points[i].pos + crossDiff) * this.calcProp.pxToMM;
+					}
+
+					i++;
+					if (!gridLines) {
+						gridLines = [];
+					}
+					gridLines[i] = this._calculateGridLine(posX, posY, posX + widthLine, posY);
+				}
 			}
 		}
 
