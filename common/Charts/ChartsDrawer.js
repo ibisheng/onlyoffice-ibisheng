@@ -3880,7 +3880,7 @@ CChartsDrawer.prototype =
 			gridLines[i] = this._calculateGridLine(posX, posY, posX, posY + heightLine, i);
 
 			//промежуточные линии
-			for (var n = 1; n <= this.calcProp.numvMinorlines; n++) {
+			for (var n = 0; n <= this.calcProp.numvMinorlines; n++) {
 				posMinorX = posX + n * minorStep;
 
 				if (posMinorX < this.calcProp.chartGutter._left || posMinorX > rightMargin) {
@@ -12660,11 +12660,6 @@ catAxisChart.prototype = {
 		}
 
 		for (var i = 0; i < this.paths.gridLines.length; i++) {
-			pen = this.catAx.compiledMajorGridLines;
-
-			path = this.paths.gridLines[i];
-			this.cChartDrawer.drawPath(path, pen);
-
 			//промежуточные линии
 			if (this.paths.minorGridLines && this.paths.minorGridLines[i]) {
 				for (var n = 0; n < this.paths.minorGridLines[i].length; n++) {
@@ -12673,6 +12668,11 @@ catAxisChart.prototype = {
 					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
+
+			pen = this.catAx.compiledMajorGridLines;
+
+			path = this.paths.gridLines[i];
+			this.cChartDrawer.drawPath(path, pen);
 		}
 	},
 
@@ -13142,11 +13142,6 @@ valAxisChart.prototype = {
 		}
 
 		for (var i = 0; i < this.paths.gridLines.length; i++) {
-			pen = this.valAx.compiledMajorGridLines;
-
-			path = this.paths.gridLines[i];
-			this.cChartDrawer.drawPath(path, pen);
-
 			//промежуточные линии
 			if (this.paths.minorGridLines && this.paths.minorGridLines[i]) {
 				for (var n = 0; n < this.paths.minorGridLines[i].length; n++) {
@@ -13155,6 +13150,11 @@ valAxisChart.prototype = {
 					this.cChartDrawer.drawPath(path, pen);
 				}
 			}
+
+			pen = this.valAx.compiledMajorGridLines;
+
+			path = this.paths.gridLines[i];
+			this.cChartDrawer.drawPath(path, pen);
 		}
 	},
 
