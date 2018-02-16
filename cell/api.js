@@ -2003,7 +2003,7 @@ var editor;
 			  History.TurnOff();
 			  var wsView = t.wb.getWorksheet(ws.index, true);
 			  History.TurnOn();
-			  wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(activeName, parserHelp.getEscapeSheetName(ws.sName));
+			  ws.oDrawingOjectsManager.updateChartReferencesWidthHistory(activeName, parserHelp.getEscapeSheetName(ws.sName));
 			  if (wsView && wsView.objectRender && wsView.objectRender.controller) {
 				  wsView.objectRender.controller.recalculate2(true);
 			  }
