@@ -1069,6 +1069,15 @@ CPresentation.prototype =
         oRun.Set_CompositeInput(null);
         this.CompositeInput = null;
 
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+            {
+                oTargetTextObject.recalculateContent();
+            }
+        }
         this.Document_UpdateInterfaceState();
 
         this.DrawingDocument.ClearCachePages();

@@ -11741,6 +11741,17 @@ CDocument.prototype.End_CompositeInput = function()
 
 	this.CompositeInput = null;
 
+    var oController = this.DrawingObjects;
+    if(oController)
+    {
+        var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+        if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+        {
+            oTargetTextObject.recalcInfo.recalculateTxBoxContent = true;
+            oTargetTextObject.recalculateText();
+        }
+    }
+
 	this.Document_UpdateInterfaceState();
 
 	this.DrawingDocument.ClearCachePages();

@@ -4410,6 +4410,19 @@ function DrawingObjects() {
     };
 
 
+    _this.checkCurrentTextObjectExtends = function()
+    {
+        var oController = this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject.checkExtentsByDocContent)
+            {
+                oTargetTextObject.checkExtentsByDocContent(true, true);
+            }
+        }
+    };
+
     _this.beginCompositeInput = function(){
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInput);
         _this.controller.CreateDocContent();
@@ -4471,6 +4484,8 @@ function DrawingObjects() {
             return;
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         _this.addCompositeText(nCharCode);
+
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.recalculateCurPos();
         _this.controller.updateSelectionState();
@@ -4490,6 +4505,7 @@ function DrawingObjects() {
 
     _this.Remove_CompositeText = function(nCount){
         _this.removeCompositeText(nCount);
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.updateSelectionState();
     };
@@ -4503,6 +4519,7 @@ function DrawingObjects() {
         {
             _this.addCompositeText(arrCharCodes[nIndex]);
         }
+        _this.checkCurrentTextObjectExtends();
 		_this.controller.startRecalculate();
         _this.controller.updateSelectionState();
     };
@@ -4534,6 +4551,15 @@ function DrawingObjects() {
         var oRun = _this.CompositeInput.Run;
         oRun.Set_CompositeInput(null);
         _this.CompositeInput = null;
+        var oController = _this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+            {
+                oTargetTextObject.recalculateContent();
+            }
+        }
         _this.sendGraphicObjectProps();
         _this.showDrawingObjects(true);
     };
