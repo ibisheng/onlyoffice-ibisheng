@@ -98,7 +98,6 @@ function CChartsDrawer()
 	this.calcProp = {};
 
 	this.areaChart = null;
-	//this.gridChart = null;
 	this.chart = null;
 	this.cChartSpace = null;
 	this.cShapeDrawer = null;
@@ -148,8 +147,6 @@ CChartsDrawer.prototype =
 		this.areaChart = new areaChart();
 		//создаём область
 		this.plotAreaChart = new plotAreaChart();
-		//создаём сетку
-		//this.gridChart = new gridChart();
 		//ось серий
 		this.serAxisChart = new serAxisChart();
 		//Floor This element specifies the floor of a 3D chart.
@@ -221,10 +218,6 @@ CChartsDrawer.prototype =
 			}
 
 			this.plotAreaChart.recalculate(this);
-
-			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
-				//this.gridChart.recalculate(this);
-			}
 		}
 
 		this.areaChart.recalculate(this);
@@ -294,7 +287,6 @@ CChartsDrawer.prototype =
 					this.sideWall3DChart.draw(this);
 					this.backWall3DChart.draw(this);
 				}
-				//this.gridChart.draw(this);
 				this.plotAreaChart.draw(this, null, true);
 			}
 
@@ -3739,7 +3731,7 @@ CChartsDrawer.prototype =
 		var posMinorY, posY, crossDiff;
 
 		if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN && isCatAxis) {
-			var posAxis = null != axis.posY ? axis.posY : axis.posX;
+			var posAxis = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom)/this.calcProp.pxToMM;
 			crossDiff = points[1] ? Math.abs((points[1].pos - points[0].pos) / 2) : Math.abs(points[0].pos - posAxis);
 		}
 
@@ -3805,7 +3797,7 @@ CChartsDrawer.prototype =
 			return;
 		}
 
-		var posAxis = null != axis.posY ? axis.posY : axis.posX;
+		var posAxis = this.calcProp.chartGutter._left / this.calcProp.pxToMM;
 		var stepX = points[1] ? Math.abs((points[1].pos - points[0].pos)) : (Math.abs(points[0].pos - posAxis) * 2);
 		var minorStep = (stepX * this.calcProp.pxToMM) / this.calcProp.numvMinorlines;
 		var posX, crossDiff;
@@ -12287,402 +12279,6 @@ drawSurfaceChart.prototype =
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
 		}
-	}
-};
-
-
-	/** @constructor */
-function gridChart()
-{
-	this.chartProp = null;
-	this.cChartSpace = null;
-	this.cChartDrawer = null;
-	
-	this.paths = {};
-}
-
-gridChart.prototype =
-{
-    constructor: gridChart,
-	
-	draw : function(chartsDrawer)
-    {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-		this.cChartDrawer = chartsDrawer;
-		
-		this._drawHorizontalLines();
-		this._drawVerticalLines();
-	},
-	
-	recalculate: function(chartsDrawer)
-	{
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-		this.cChartDrawer = chartsDrawer;
-		
-		this.paths = {};
-		this._calculateHorizontalLines();
-		this._calculateVerticalLines();
-	},
-	
-	_calculateHorizontalLines : function()
-	{	
-		var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - this.chartProp.chartGutter._top)/(this.chartProp.numhlines);
-		var minorStep = stepY / this.chartProp.numhMinorlines;
-		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
-		
-		var bottomMargin = this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom;
-		
-		var posX = this.chartProp.chartGutter._left;
-		var posY;
-		var posMinorY;
-					
-		var trueWidth = this.chartProp.trueWidth;
-		var trueHeight = this.chartProp.trueHeight;
-		
-		var xCenter = (this.chartProp.chartGutter._left + trueWidth/2) / this.chartProp.pxToMM;
-		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
-		
-		var crossBetween = this.cChartSpace.getValAxisCrossType();
-		var crossDiff;
-		if(crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
-			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
-		
-		if(this.chartProp.type === c_oChartTypes.Radar)
-		{
-			var y, x, path;
-			
-			//соответствует подписям оси категорий(OX)
-			if(this.cChartSpace.chart.plotArea.valAx)
-				yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-			
-			var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
-			var tempAngle = 2 * Math.PI / numCache.length;
-			var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
-			var radius, xFirst, yFirst;
-		}
-		
-		for(var i = 0; i < yPoints.length; i++)
-		{
-			if(this.chartProp.type === c_oChartTypes.Radar)
-			{
-
-                var pathId = this.cChartSpace.AllocPath();
-                var path  = this.cChartSpace.GetPath(pathId);
-				for(var k = 0; k < numCache.length; k++)
-				{
-					y  = i * xDiff; 
-					x  = xCenter; 
-					
-					radius = y;
-					
-					y = yCenter - radius * Math.cos(k * tempAngle);
-					x = x + radius * Math.sin(k * tempAngle);
-					
-
-					var pathH = this.chartProp.pathH;
-					var pathW = this.chartProp.pathW;
-
-					
-					path.stroke = true;
-					if(k === 0)
-					{
-						xFirst = x;
-						yFirst = y;
-						path.moveTo(x * pathW, y * pathH);
-					}	
-					else
-					{
-						if(k === numCache.length - 1)
-						{
-							path.lnTo(x * pathW, y * pathH);
-							path.lnTo(xFirst * pathW, yFirst * pathH);
-						}
-						else
-							path.lnTo(x * pathW, y * pathH);
-					}
-						
-				}
-				
-
-				if(!this.paths.horisontalLines)
-					this.paths.horisontalLines = [];
-				this.paths.horisontalLines[i] = pathId;
-				
-			}
-			else
-			{
-				if(crossDiff)
-					posY = (yPoints[i].pos - crossDiff) * this.chartProp.pxToMM;
-				else
-					posY = yPoints[i].pos * this.chartProp.pxToMM;
-				
-				
-				if(!this.paths.horisontalLines)
-					this.paths.horisontalLines = [];
-				this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY, i);
-				
-				//промежуточные линии
-				for(var n = 0; n < this.chartProp.numhMinorlines; n++)
-				{
-					posMinorY = posY + n*minorStep;
-					
-					if(posMinorY < this.chartProp.chartGutter._top || posMinorY > bottomMargin)
-						break;
-					
-					if(!this.paths.horisontalMinorLines)
-						this.paths.horisontalMinorLines = [];
-					if(!this.paths.horisontalMinorLines[i])
-						this.paths.horisontalMinorLines[i] = [];
-					
-					this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
-				}
-					
-				
-				if(crossDiff && i === yPoints.length - 1)
-				{
-					if(crossDiff)
-						posY = (yPoints[i].pos + crossDiff) * this.chartProp.pxToMM;
-					
-					i++;
-					if(!this.paths.horisontalLines)
-						this.paths.horisontalLines = [];
-					this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
-				}
-				
-			}
-		}
-		//для того, чтобы отрисовывался один параллелепипед. необходимо верхний FOR закомментировать и раскомментировать то, что внизу. + убрать отрисовку самого chart'a
-		//this.paths.horisontalLines = [];
-		//this.paths.horisontalLines.push(this._calculate3DParallalepiped());
-	},
-	
-	_calculateVerticalLines: function()
-	{
-		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._bottom + this.chartProp.chartGutter._top);
-		
-		var rightMargin = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
-		
-		var posY = this.chartProp.chartGutter._top;
-		var posX;
-		var posMinorX;
-		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints ? this.cChartSpace.chart.plotArea.valAx.xPoints : this.cChartSpace.chart.plotArea.catAx.xPoints;
-		
-		var stepX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos)) : (Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX) * 2);
-		
-		var minorStep = (stepX * this.chartProp.pxToMM) / this.chartProp.numvMinorlines;
-		
-		if(!xPoints)
-			return;
-		
-		var crossBetween = this.cChartSpace.getValAxisCrossType();
-		var crossDiff;
-		if(crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type !== c_oChartTypes.HBar)
-			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
-			
-		for(var i = 0; i < xPoints.length; i++)
-		{
-			if(crossDiff)
-				posX = (xPoints[i].pos - crossDiff) * this.chartProp.pxToMM;
-			else
-				posX = xPoints[i].pos * this.chartProp.pxToMM;
-			
-			if(!this.paths.verticalLines)
-				this.paths.verticalLines = [];
-			this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine, i);
-			
-			//промежуточные линии
-			for(var n = 1; n <= this.chartProp.numvMinorlines; n++)
-			{
-				posMinorX = posX + n*minorStep;
-				
-				if(posMinorX < this.chartProp.chartGutter._left || posMinorX > rightMargin)
-					break;
-				
-				if(!this.paths.verticalMinorLines)
-					this.paths.verticalMinorLines = [];
-				if(!this.paths.verticalMinorLines[i])
-					this.paths.verticalMinorLines[i] = [];
-				
-				this.paths.verticalMinorLines[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + heightLine);
-			}
-			
-			if(crossDiff && i === xPoints.length - 1)
-			{
-				if(crossDiff)
-					posX = (xPoints[i].pos + crossDiff) * this.chartProp.pxToMM;
-				
-				i++;
-				if(!this.paths.verticalLines)
-					this.paths.verticalLines = [];
-				this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
-			}
-		}
-	},
-	
-	_calculateLine: function(x, y, x1, y1)
-	{
-		var path;
-		if(this.cChartDrawer.nDimensionCount === 3)
-		{
-			var view3DProp = this.cChartSpace.chart.getView3d();
-			var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
-			var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
-			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-			var angleOz = 0;
-			
-			var rAngAx = this.cChartDrawer.processor3D.view3D.getRAngAx();
-			var isVertLine = x === x1;
-			
-			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0);
-			var x1n = convertResult.x;
-			var y1n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, perspectiveDepth);
-			var x2n = convertResult.x;
-			var y2n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, perspectiveDepth);
-			var x3n = convertResult.x;
-			var y3n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, 0);
-			var x4n = convertResult.x;
-			var y4n = convertResult.y;
-			
-			if(!isVertLine)
-			{
-				if(rAngAx)
-					path = this._calculate3DLine(x1n, y1n, x2n, y2n, x3n, y3n);
-				else
-				{
-					var angleOyAbs = Math.abs(angleOy);
-					if(angleOyAbs >= 0 && angleOyAbs < Math.PI / 2)
-						path = this._calculate3DLine(x1n, y1n, x2n, y2n, x3n, y3n);
-					else if(angleOyAbs >= Math.PI / 2 && angleOyAbs < Math.PI)
-						path = this._calculate3DLine(x4n, y4n, x1n, y1n, x2n, y2n);
-					else if(angleOyAbs >= Math.PI && angleOyAbs < 3 * Math.PI / 2)
-						path = this._calculate3DLine(x1n, y1n, x4n, y4n, x3n, y3n);
-					else
-						path = this._calculate3DLine(x2n, y2n, x3n, y3n, x4n, y4n);
-				}
-			}
-			else
-			{
-				if(rAngAx)
-					path = this._calculate3DLine(x2n, y2n, x3n, y3n, x4n, y4n);
-				else
-					path = this._calculate3DLine(x2n, y2n, x3n, y3n, x4n, y4n);
-			}
-				
-		}
-		else
-			path = this._calculate2DLine(x, y, x1, y1);
-		
-		return path;
-	},
-	
-	_calculate2DLine: function(x, y, x1, y1)
-	{
-
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-
-		
-		path.stroke = true;
-		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-
-		
-		return pathId;
-	},
-	
-	_calculate3DLine: function(x, y, x1, y1, x2, y2, x3, y3)
-	{
-
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
-		var pathH = this.chartProp.pathH;
-		var pathW = this.chartProp.pathW;
-
-		
-		path.stroke = true;
-		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-		path.lnTo(x2 / pxToMm * pathW, y2 / pxToMm * pathH);
-		if(x3 !== undefined && y3 !== undefined)
-		{
-			path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
-			path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
-		}
-
-		
-		return pathId;
-	},
-	
-	_drawHorizontalLines: function()
-	{
-		var pen;
-		var path;
-		
-		for(var i = 0; i < this.paths.horisontalLines.length; i++)
-		{
-			if(this.chartProp.type === c_oChartTypes.HBar)
-				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
-			else
-				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-				
-			path = this.paths.horisontalLines[i];
-			this.cChartDrawer.drawPath(path, pen);
-			
-			//промежуточные линии
-			if(this.paths.horisontalMinorLines && this.paths.horisontalMinorLines[i])
-			{
-				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
-				{
-					path = this.paths.horisontalMinorLines[i][n];
-					if(this.chartProp.type === c_oChartTypes.HBar)
-						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
-					else
-						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
-					this.cChartDrawer.drawPath(path, pen);
-				}
-			}
-		}
-	},
-	
-	_drawVerticalLines: function()
-	{
-		var pen, path;
-		
-		for(var i = 0; i < this.paths.verticalLines.length; i++)
-		{
-			if(this.chartProp.type === c_oChartTypes.HBar)
-				pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
-			else
-				pen = this.cChartSpace.chart.plotArea.catAx.compiledMajorGridLines;
-				
-			path = this.paths.verticalLines[i];
-			this.cChartDrawer.drawPath(path, pen);
-			
-			//промежуточные линии
-			if(this.paths.verticalMinorLines && this.paths.verticalMinorLines[i])
-			{
-				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
-				{
-					path = this.paths.verticalMinorLines[i][n];
-					if(this.chartProp.type === c_oChartTypes.HBar)
-						pen = this.cChartSpace.chart.plotArea.valAx.compiledMinorGridLines;
-					else
-						pen = this.cChartSpace.chart.plotArea.catAx.compiledMinorGridLines;
-					this.cChartDrawer.drawPath(path, pen);
-				}
-			}
-		}	
 	}
 };
 
