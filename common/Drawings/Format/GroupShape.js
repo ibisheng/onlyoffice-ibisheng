@@ -581,6 +581,33 @@ function CGroupShape()
                     }
                 }
 
+
+                if(this.drawingBase  && this.fromSerialize)
+                {
+                    var metrics = this.drawingBase.getGraphicObjectMetrics();
+                    var rot = 0;
+                    if(this.spPr && this.spPr.xfrm){
+                        if(AscFormat.isRealNumber(this.spPr.xfrm.rot)){
+                            rot =  AscFormat.normalizeRotate(this.spPr.xfrm.rot);
+                        }
+                    }
+
+                    var metricExtX, metricExtY;
+                    //  if(!(this instanceof AscFormat.CGroupShape))
+                    {
+                        if (AscFormat.checkNormalRotate(rot))
+                        {
+                            dExtX = metrics.extX;
+                            dExtY = metrics.extY;
+                        }
+                        else
+                        {
+                            dExtX = metrics.extY;
+                            dExtY = metrics.extX;
+                        }
+                    }
+                }
+
                 if(this.spPr.xfrm.chExtX > 0)
                     cx = dExtX/this.spPr.xfrm.chExtX;
                 else

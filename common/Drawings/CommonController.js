@@ -580,6 +580,22 @@ function CheckSpPrXfrm2(object)
     }
 
 }
+    function CheckSpPrXfrm3(object)
+    {
+        if(!object.spPr)
+        {
+            object.setSpPr(new AscFormat.CSpPr());
+            object.spPr.setParent(object);
+        }
+        if(!object.spPr.xfrm) {
+            object.spPr.setXfrm(new AscFormat.CXfrm());
+            object.spPr.xfrm.setParent(object.spPr);
+        }
+        object.spPr.xfrm.setOffX(object.x);
+        object.spPr.xfrm.setOffY(object.y);
+        object.spPr.xfrm.setExtX(object.extX);
+        object.spPr.xfrm.setExtY(object.extY);
+    }
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
@@ -11637,6 +11653,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     window['AscFormat'].CompareGroups = CompareGroups;
     window['AscFormat'].CheckSpPrXfrm = CheckSpPrXfrm;
     window['AscFormat'].CheckSpPrXfrm2 = CheckSpPrXfrm2;
+    window['AscFormat'].CheckSpPrXfrm3 = CheckSpPrXfrm3;
     window['AscFormat'].getObjectsByTypesFromArr = getObjectsByTypesFromArr;
     window['AscFormat'].getTargetTextObject = getTargetTextObject;
     window['AscFormat'].DrawingObjectsController = DrawingObjectsController;

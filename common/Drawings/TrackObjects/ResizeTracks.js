@@ -1581,9 +1581,40 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
 
 
-            var xfrm = this.original.spPr.xfrm;
-            var kw = this.resizedExtX/xfrm.extX;
-            var kh = this.resizedExtY/xfrm.extY;
+            var originalExtX, originalExtY;
+            if(AscFormat.isRealNumber(this.original.extX) && AscFormat.isRealNumber(this.original.extY)){
+                originalExtX = this.original.extX;
+                originalExtY = this.original.extY;
+                if(AscFormat.fApproxEqual(0.0, originalExtX)){
+                    originalExtX = 1;
+                }
+                if(AscFormat.fApproxEqual(0.0, originalExtY)){
+                    originalExtY = 1;
+                }
+            }
+            else {
+                var xfrm = this.original.spPr.xfrm;
+                if(xfrm){
+                    originalExtX = xfrm.extX;
+                    originalExtY = xfrm.extY;
+                }
+
+                if(!AscFormat.isRealNumber(originalExtX)){
+                    originalExtX = 1;
+                }
+                if(!AscFormat.isRealNumber(originalExtY)){
+                    originalExtY = 1;
+                }
+            }
+
+            if(AscFormat.fApproxEqual(0.0, originalExtX)){
+                originalExtX = 1;
+            }
+            if(AscFormat.fApproxEqual(0.0, originalExtY)){
+                originalExtY = 1;
+            }
+            var kw = this.resizedExtX/originalExtX;
+            var kh = this.resizedExtY/originalExtY;
             for(var i = 0; i < this.childs.length; ++i)
             {
                 var cur_child = this.childs[i];

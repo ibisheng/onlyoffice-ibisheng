@@ -601,7 +601,7 @@ function RotateTrackGroup(originalObject)
         if(!this.bIsTracked){
             return;
         }
-        AscFormat.CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm3(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }
