@@ -1755,15 +1755,9 @@ Num.prototype =
     this.f = f;
     this.id = opt_id;
   },
-	getFormat: function() {
-		var res;
-		if (this.f) {
-			res = this.f;
-		} else if (null != this.id) {
-			res = AscCommon.getFormatByStandardId(this.id)
-		}
-		return res || "General";
-	},
+  getFormat: function() {
+    return (null != this.id) ? (AscCommon.getFormatByStandardId(this.id) || this.f) : this.f;
+  },
   _mergeProperty : function(first, second, def)
   {
     if(def != first)
