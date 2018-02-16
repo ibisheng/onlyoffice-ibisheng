@@ -1274,7 +1274,7 @@ ParaRun.prototype.AddText = function(sString, nPos)
 
 		if (9 === nCharCode) // \t
 			this.AddToContent(nCharPos++, new ParaTab());
-		if (10 === nCharCode) // \n
+		else if (10 === nCharCode) // \n
 			this.AddToContent(nCharPos++, new ParaNewLine(break_Line));
 		else if (13 === nCharCode) // \r
 			continue;
