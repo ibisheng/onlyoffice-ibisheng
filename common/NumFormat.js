@@ -193,18 +193,11 @@ function FormatObjBracket(sData)
             if("$" == first)
             {
                 var aParams = data.substring(1).split('-');
-                if(2 == aParams.length)
-                {
-                    var sFirstParam = aParams[0];
-                    var sSecondParam = aParams[1];
-                    if(null != sFirstParam && sFirstParam.length > 0)
-                    {
-                        this.CurrencyString = sFirstParam;
-                    }
-                    if (null != sSecondParam && sSecondParam.length > 0) {
-						this.Lid = sSecondParam;
-					}
-                }
+				if (aParams[0].length > 0) {
+					this.CurrencyString = aParams[0];
+				} if(aParams.length > 1 && aParams[1].length > 0) {
+					this.Lid = aParams[1];
+				}
             }
 			else if("=" == first || ">" == first || "<" == first)
 			{
@@ -1901,9 +1894,10 @@ NumFormat.prototype =
                     res += "[$";
                     if(null != item.CurrencyString)
                         res += item.CurrencyString;
-                    res += "-";
-                    if(null != item.Lid)
-                        res += item.Lid;
+					if (null != item.Lid) {
+						res += "-";
+						res += item.Lid;
+					}
                     res += "]";
                 }
             }
