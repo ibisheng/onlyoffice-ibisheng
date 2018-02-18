@@ -6423,6 +6423,24 @@ function BinaryPPTYLoader()
             }
         }
 
+        while(s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch(_at){
+                case 0:{
+                    cNvPr.setHlinkClick(this.ReadHyperlink());
+                    break;
+                }
+                case 1:{
+                    cNvPr.setHlinkHover(this.ReadHyperlink());
+                    break;
+                }
+                default:{
+                    this.stream.SkipRecord();
+                    break;
+                }
+            }
+        }
         s.Seek2(_end_rec);
     }
 
@@ -7355,8 +7373,7 @@ function BinaryPPTYLoader()
 
     this.ReadHyperlink = function()
     {
-        var hyper = new AscFormat.CHyperlink();
-
+        var hyper = new AscFormat.CT_Hyperlink();
         var s = this.stream;
         var _end_rec = s.cur + s.GetULong() + 4;
 
@@ -7372,12 +7389,12 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    hyper.url = s.GetString2();
+                    hyper.id = s.GetString2();
                     break;
                 }
                 case 1:
                 {
-                    var s1 = s.GetString2();
+                    hyper.invalidUrl = s.GetString2();
                     break;
                 }
                 case 2:
@@ -7387,7 +7404,7 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    var tgt = s.GetString2();
+                    hyper.tgtFrame = s.GetString2();
                     break;
                 }
                 case 4:
@@ -7397,17 +7414,17 @@ function BinaryPPTYLoader()
                 }
                 case 5:
                 {
-                    s.Skip2(1);
+                    hyper.history = s.GetBool();
                     break;
                 }
                 case 6:
                 {
-                    s.Skip2(1);
+                    hyper.highlightClick = s.GetBool();
                     break;
                 }
                 case 7:
                 {
-                    s.Skip2(1);
+                    hyper.endSnd = s.GetBool();
                     break;
                 }
                 default:
@@ -7421,18 +7438,18 @@ function BinaryPPTYLoader()
         if (hyper.action != null && hyper.action != "")
         {
             if (hyper.action == "ppaction://hlinkshowjump?jump=firstslide")
-                hyper.url = "ppaction://hlinkshowjump?jump=firstslide";
+                hyper.id = "ppaction://hlinkshowjump?jump=firstslide";
             else if (hyper.action == "ppaction://hlinkshowjump?jump=lastslide")
-                hyper.url = "ppaction://hlinkshowjump?jump=lastslide";
+                hyper.id = "ppaction://hlinkshowjump?jump=lastslide";
             else if (hyper.action == "ppaction://hlinkshowjump?jump=nextslide")
-                hyper.url = "ppaction://hlinkshowjump?jump=nextslide";
+                hyper.id = "ppaction://hlinkshowjump?jump=nextslide";
             else if (hyper.action == "ppaction://hlinkshowjump?jump=previousslide")
-                hyper.url = "ppaction://hlinkshowjump?jump=previousslide";
+                hyper.id = "ppaction://hlinkshowjump?jump=previousslide";
             else if (hyper.action == "ppaction://hlinksldjump")
             {
-                if (hyper.url != null && hyper.url.indexOf("slide") == 0)
+                if (hyper.id != null && hyper.id.indexOf("slide") == 0)
                 {
-                    var _url = hyper.url.substring(5);
+                    var _url = hyper.id.substring(5);
                     var _indexXml = _url.indexOf(".");
                     if (-1 != _indexXml)
                         _url = _url.substring(0, _indexXml);
@@ -7443,20 +7460,20 @@ function BinaryPPTYLoader()
 
                     --_slideNum;
 
-                    hyper.url = hyper.action + "slide" + _slideNum;
+                    hyper.id = hyper.action + "slide" + _slideNum;
                 }
                 else
                 {
-                    hyper.url = null;
+                    hyper.id = null;
                 }
             }
             else
             {
-                hyper.url = null;
+                hyper.id = null;
             }
         }
 
-        if (hyper.url == null)
+        if (hyper.id == null)
             return null;
 
         return hyper;
@@ -8506,7 +8523,7 @@ function BinaryPPTYLoader()
                                     if (_run.hlink !== undefined)
                                     {
                                         hyperlink = new ParaHyperlink();
-                                        hyperlink.SetValue(_run.hlink.url);
+                                        hyperlink.SetValue(_run.hlink.id);
                                         if (_run.hlink.tooltip) {
                                           hyperlink.SetToolTip(_run.hlink.tooltip);
                                         }
@@ -8625,7 +8642,7 @@ function BinaryPPTYLoader()
                                     if (_run.hlink !== undefined)
                                     {
                                         hyperlink = new ParaHyperlink();
-                                        hyperlink.SetValue(_run.hlink.url);
+                                        hyperlink.SetValue(_run.hlink.id);
                                         if (_run.hlink.tooltip) {
                                           hyperlink.SetToolTip(_run.hlink.tooltip);
                                         }

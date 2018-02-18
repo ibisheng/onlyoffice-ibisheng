@@ -190,6 +190,12 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     var hit_in_inner_area = drawing.hitInInnerArea(x, y);
     var hit_in_path = drawing.hitInPath(x, y);
     var hit_in_text_rect = drawing.hitInTextRect(x, y);
+    if(hit_in_inner_area && drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+    {
+        if(drawingObjectsController.checkDrawingHyperlink && drawingObjectsController.checkDrawingHyperlink(drawing, e)){
+            return true;
+        }
+    }
     if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, group, false, pageIndex, bWord);

@@ -57,6 +57,113 @@ var c_oAscStrokeType = Asc.c_oAscStrokeType;
 var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
 
+    function CT_Hyperlink()
+    {
+        this.snd = null;
+        this.id = null;
+        this.invalidUrl = null;
+        this.action = null;
+        this.tgtFrame = null;
+        this.tooltip = null;
+        this.history = null;
+        this.highlightClick = null;
+        this.endSnd = null;
+    }
+
+
+    CT_Hyperlink.prototype.Write_ToBinary = function(w)
+    {
+        var nStartPos = w.GetCurPos();
+        var nFlags = 0;
+        w.WriteLong(0);
+
+        if(null !== this.snd){
+            nFlags |= 1;
+            w.WriteString2(this.snd);
+        }
+        if(null !== this.id){
+            nFlags |= 2;
+            w.WriteString2(this.id);
+        }
+        if(null !== this.invalidUrl){
+            nFlags |= 4;
+            w.WriteString2(this.invalidUrl);
+        }
+        if(null !== this.action){
+            nFlags |= 8;
+            w.WriteString2(this.action);
+        }
+        if(null !== this.tgtFrame){
+            nFlags |= 16;
+            w.WriteString2(this.tgtFrame);
+        }
+        if(null !== this.tooltip){
+            nFlags |= 32;
+            w.WriteString2(this.tooltip);
+        }
+        if(null !== this.history){
+            nFlags |= 64;
+            w.WriteBool(this.history);
+        }
+        if(null !== this.highlightClick){
+            nFlags |= 128;
+            w.WriteBool(this.highlightClick);
+        }
+        if(null !== this.endSnd){
+            nFlags |= 256;
+            w.WriteBool(this.endSnd);
+        }
+        var nEndPos = w.GetCurPos();
+        w.Seek2(nStartPos);
+        w.WriteLong(nFlags);
+        w.Seek2(nEndPos);
+    };
+
+    CT_Hyperlink.prototype.Read_FromBinary = function(r){
+        var nFlags = r.GetLong();
+        if(nFlags & 1){
+            this.snd = r.GetString2();
+        }
+        if(nFlags & 2){
+            this.id = r.GetString2();
+        }
+        if(nFlags & 4){
+            this.invalidUrl = r.GetString2();
+        }
+        if(nFlags & 8){
+            this.action = r.GetString2();
+        }
+        if(nFlags & 16){
+            this.tgtFrame = r.GetString2();
+        }
+        if(nFlags & 32){
+            this.tooltip = r.GetString2();
+        }
+        if(nFlags & 64){
+            this.history = r.GetBool();
+        }
+        if(nFlags & 128){
+            this.highlightClick = r.GetBool();
+        }
+        if(nFlags & 256){
+            this.endSnd = r.GetBool();
+        }
+    };
+
+    CT_Hyperlink.prototype.createDuplicate = function(r){
+        var ret = new CT_Hyperlink();
+        ret.snd = this.snd;
+        ret.id = this.id;
+        ret.invalidUrl = this.invalidUrl;
+        ret.action = this.action;
+        ret.tgtFrame = this.tgtFrame;
+        ret.tooltip = this.tooltip;
+        ret.history = this.history;
+        ret.highlightClick = this.highlightClick;
+        ret.endSnd = this.endSnd;
+        return ret;
+    };
+
 
 
     var CChangesDrawingsBool = AscDFH.CChangesDrawingsBool;
@@ -174,6 +281,9 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = FmtScheme;
     drawingConstructorsMap[AscDFH.historyitem_UniNvPr_SetUniSpPr                 ] = CNvUniSpPr;
 
+    drawingConstructorsMap[AscDFH.historyitem_CNvPr_SetHlinkClick] = CT_Hyperlink;
+    drawingConstructorsMap[AscDFH.historyitem_CNvPr_SetHlinkHover] = CT_Hyperlink;
+
 
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetSpPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr] = CChangesDrawingsObjectNoId;
@@ -184,6 +294,8 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetIsHidden] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetDescr] = CChangesDrawingsString;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetTitle] = CChangesDrawingsString;
+    AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetHlinkClick] = CChangesDrawingsObjectNoId;
+    AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetHlinkHover] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetIsPhoto] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetUserDrawn] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetPh] = CChangesDrawingsObject;
@@ -4715,6 +4827,9 @@ function CNvPr()
     this.descr = null;
     this.title = null;
 
+    this.hlinkClick = null;
+    this.hlinkHover = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
 }
@@ -4743,6 +4858,12 @@ CNvPr.prototype =
         duplicate.setIsHidden(this.isHidden);
         duplicate.setDescr(this.descr);
         duplicate.setTitle(this.title);
+        if(this.hlinkClick){
+            duplicate.setHlinkClick(this.hlinkClick.createDuplicate());
+        }
+        if(this.hlinkHover){
+            duplicate.setHlinkClick(this.hlinkHover.createDuplicate());
+        }
         return duplicate;
     },
 
@@ -4768,6 +4889,18 @@ CNvPr.prototype =
     {
         History.Add(new CChangesDrawingsString(this, AscDFH.historyitem_CNvPr_SetDescr , this.descr,  descr));
         this.descr = descr;
+    },
+
+    setHlinkClick: function(pr)
+    {
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_CNvPr_SetHlinkClick, this.hlinkClick, pr));
+        this.hlinkClick = pr;
+    },
+
+    setHlinkHover: function(pr)
+    {
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_CNvPr_SetHlinkHover, this.hlinkHover, pr));
+        this.hlinkHover = pr;
     },
 
     setTitle: function(title)
@@ -9084,6 +9217,10 @@ TextListStyle.prototype =
     }
 };
 
+
+
+
+
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation, opt_fontName)
 {
@@ -10907,6 +11044,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
     window['AscFormat'].CNvUniSpPr = CNvUniSpPr;
     window['AscFormat'].UniMedia = UniMedia;
+    window['AscFormat'].CT_Hyperlink = CT_Hyperlink;
 
 
     window['AscFormat'].builder_CreateShape = builder_CreateShape;

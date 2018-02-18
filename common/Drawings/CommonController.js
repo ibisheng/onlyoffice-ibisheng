@@ -739,6 +739,26 @@ function CanStartEditText(oController)
 DrawingObjectsController.prototype =
 {
 
+    checkDrawingHyperlink: function(drawing, e){
+        var oApi = this.getEditorApi();
+        if(!oApi){
+            return;
+        }
+        if(this.document || this.drawingObjects && this.drawingObjects.cSld){
+            if(e.CtrlKey){
+                var oNvPr = drawing.getNvProps();
+                if(oNvPr && oNvPr.hlinkClick && oNvPr.hlinkClick.id !== null){
+                    editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
+                    return true;
+                }
+            }
+        }
+        else if(this.drawingObjects){
+
+        }
+        return false;
+    },
+
     getAllSignatures: function(){
         var _ret = [];
         this.getAllSignatures2(_ret, this.getDrawingArray());
@@ -11400,6 +11420,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 {
                     case 0:
                     case 1:
+                    case 8:
                     {
                         return "Arial";
                     }
