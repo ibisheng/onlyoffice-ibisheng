@@ -1581,14 +1581,15 @@ CChartsDrawer.prototype =
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
 
+		var yMin = axis.min;
+		var yMax = axis.max;
+
 		if (axis.scaling && axis.scaling.logBase) {
 			arrayValues = this._getLogArray(yMin, yMax, axis.scaling.logBase);
 			return arrayValues;
 		}
 
 		//максимальное и минимальное значение(по документации excel)
-		var yMin = axis.min;
-		var yMax = axis.max;
 		var trueMinMax = this._getTrueMinMax(yMin, yMax);
 
 		var manualMin = axis.scaling && axis.scaling.min !== null ? axis.scaling.min : null;
@@ -4220,7 +4221,7 @@ drawBarChart.prototype =
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
 		
-		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
+		var nullPositionOX = this.cChartSpace.chart.plotArea.catAx.posY*this.chartProp.pxToMM;
 		
 		var height, startX, startY, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
 		var cubeCount = 0;
