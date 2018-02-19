@@ -10580,163 +10580,142 @@ drawRadarChart.prototype =
 };
 
 
-
-	/** @constructor */
-function drawScatterChart()
-{
+/** @constructor */
+function drawScatterChart() {
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
 	this.paths = {};
 }
 
-drawScatterChart.prototype =
-{
-    constructor: drawScatterChart,
-	
-	recalculate : function(chartsDrawer)
-	{
+drawScatterChart.prototype = {
+	constructor: drawScatterChart,
+
+	recalculate: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
-		
+
 		this._recalculateScatter();
 	},
-	
-	draw : function(chartsDrawer)
-    {
+
+	draw: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
 		this._drawScatter();
 	},
-	
-	_recalculateScatter: function ()
-    {
+
+	_recalculateScatter: function () {
 		//соответствует подписям оси категорий(OX)
-		var catAx =  this.cChartSpace.chart.plotArea.catAx;
+		var catAx = this.cChartSpace.chart.plotArea.catAx;
 		var xPoints = catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var valAx =  this.cChartSpace.chart.plotArea.valAx;
+		var valAx = this.cChartSpace.chart.plotArea.valAx;
 		var yPoints = valAx.yPoints;
-		
-		var minOy = yPoints.min;
-		var maxOy = yPoints.max;
-		var minOx = xPoints.min;
-		var maxOx = xPoints.max;
-		
+
 		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
-		for(var i = 0; i < this.chartProp.series.length; i++)
-		{
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
-			yNumCache = seria.yVal.numRef && seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal && seria.yVal.numLit ? seria.yVal.numLit : null;
-			
-			if(!yNumCache)
+			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
+
+			if (!yNumCache) {
 				continue;
-			
-			for(var n = 0; n < yNumCache.ptCount; n++)
-			{
+			}
+
+			for (var n = 0; n < yNumCache.ptCount; n++) {
 				yVal = this._getYVal(n, i);
-				
-				xNumCache = seria.xVal && seria.xVal.numRef ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numLit ? seria.xVal.numLit : null;
-				if(xNumCache && xNumCache.pts[n])
-				{
-					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
+
+				xNumCache = this.cChartDrawer.getNumCache(seria.xVal);
+				if (xNumCache && xNumCache.pts[n]) {
+					if (!isNaN(parseFloat(xNumCache.pts[n].val))) {
 						xVal = parseFloat(xNumCache.pts[n].val);
-					else
+					} else {
 						xVal = n + 1;
-				}
-				else
+					}
+				} else {
 					xVal = n + 1;
-					
-					
+				}
+
+
 				idxPoint = this.cChartDrawer.getIdxPoint(seria, n);
 				compiledMarkerSize = idxPoint && idxPoint.compiledMarker ? idxPoint.compiledMarker.size : null;
 				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker ? idxPoint.compiledMarker.symbol : null;
-				
-				
-				if(!this.paths.points)
+
+
+				if (!this.paths.points) {
 					this.paths.points = [];
-				if(!this.paths.points[i])
+				}
+				if (!this.paths.points[i]) {
 					this.paths.points[i] = [];
-					
-				if(!points)
+				}
+
+				if (!points) {
 					points = [];
-				if(!points[i])
+				}
+				if (!points[i]) {
 					points[i] = [];
-				
-				if(yVal != null)
-				{
+				}
+
+				if (yVal != null) {
 					this.paths.points[i][n] = this.cChartDrawer.calculatePoint(this.cChartDrawer.getYPosition(xVal, xPoints, true), this.cChartDrawer.getYPosition(yVal, yPoints), compiledMarkerSize, compiledMarkerSymbol);
 					points[i][n] = {x: xVal, y: yVal};
-				}	
-				else
-				{
+				} else {
 					this.paths.points[i][n] = null;
 					points[i][n] = null;
 				}
 			}
 		}
-		
+
 		this._calculateAllLines(points);
-    },
-	
-	_calculateAllLines: function(points)
-	{
-		//соответствует подписям оси категорий(OX)
+	},
+
+	_calculateAllLines: function (points) {
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-		
+
 		var x, y, x1, y1, isSplineLine;
-		
-		for(var i = 0; i < points.length; i++)
-		{	
+
+		for (var i = 0; i < points.length; i++) {
 			isSplineLine = this.chartProp.series[i].smooth !== false;
-			
-			if(!points[i])
+
+			if (!points[i]) {
 				continue;
-			
-			for(var n = 0; n < points[i].length; n++)
-			{
-				if(!this.paths.series)
+			}
+
+			for (var n = 0; n < points[i].length; n++) {
+				if (!this.paths.series) {
 					this.paths.series = [];
-				if(!this.paths.series[i])
+				}
+				if (!this.paths.series[i]) {
 					this.paths.series[i] = [];
-					
-				if(points[i][n] != null && points[i][n + 1] != null)
-				{	
-					if(isSplineLine)
-					{
+				}
+
+				if (points[i][n] != null && points[i][n + 1] != null) {
+					if (isSplineLine) {
 						this.paths.series[i][n] = this._calculateSplineLine(points[i], n, xPoints, yPoints);
-					}
-					else
-					{
+					} else {
 						x = this.cChartDrawer.getYPosition(points[i][n].x, xPoints, true);
 						y = this.cChartDrawer.getYPosition(points[i][n].y, yPoints);
-						
+
 						x1 = this.cChartDrawer.getYPosition(points[i][n + 1].x, xPoints, true);
 						y1 = this.cChartDrawer.getYPosition(points[i][n + 1].y, yPoints);
-						
+
 						this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
-					}					
+					}
 				}
 			}
 		}
 	},
-	
-	_getYVal: function(n, i)
-	{
-		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
-		var val = idxPoint ? parseFloat(idxPoint.val) : null;
 
-		return val;
+	_getYVal: function (n, i) {
+		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+		return idxPoint ? parseFloat(idxPoint.val) : null;
 	},
 
-	_drawScatter: function ()
-	{
+	_drawScatter: function () {
 		//TODO 2 раза проходимся по сериям!
 		//add clip rect
 		var diffPen = 2;
@@ -10753,55 +10732,45 @@ drawScatterChart.prototype =
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 
 		this.cChartDrawer.drawPathsPoints(this.paths, this.chartProp.series, true);
-    },
-	
-	_getYPosition: function(val, yPoints, isOx)
-	{
+	},
+
+	_getYPosition: function (val, yPoints, isOx) {
 		//позиция в заисимости от положения точек на оси OY
-		var result;
-		var resPos;
-		var resVal;
-		var diffVal;
-		if(val < yPoints[0].val)
-		{
+		var result, resPos, resVal, diffVal;
+
+		if (val < yPoints[0].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
-		}
-		else if(val > yPoints[yPoints.length - 1].val)
-		{	
+		} else if (val > yPoints[yPoints.length - 1].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos + (diffVal / resVal) * resPos;
-		}
-		else
-		{
-			for(var s = 0; s < yPoints.length; s++)
-			{
-				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
-				{
+		} else {
+			for (var s = 0; s < yPoints.length; s++) {
+				if (val >= yPoints[s].val && val <= yPoints[s + 1].val) {
 					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
 					resVal = yPoints[s + 1].val - yPoints[s].val;
-					if(!isOx)
-						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-					else	
+					if (!isOx) {
+						result = -(resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					} else {
 						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-						
+					}
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	},
-	
-	_calculateLine: function(x, y, x1, y1)
-	{
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+
+	_calculateLine: function (x, y, x1, y1) {
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
@@ -10810,132 +10779,123 @@ drawScatterChart.prototype =
 
 		return pathId;
 	},
-	
-	_calculateDLbl: function(chartSpace, ser, val)
-	{
-		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
-		
-		var path;
-		
-		if(this.paths.points)
-		{
-			if(this.paths.points[ser] && this.paths.points[ser][val])
-			{
-				var oPath = this.cChartSpace.GetPath(this.paths.points[ser][val].path);
-                path = oPath.getCommandByIndex(0);
-			}
 
+	_calculateDLbl: function (chartSpace, ser, val) {
+		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
+
+		var path;
+
+		if (this.paths.points) {
+			if (this.paths.points[ser] && this.paths.points[ser][val]) {
+				var oPath = this.cChartSpace.GetPath(this.paths.points[ser][val].path);
+				path = oPath.getCommandByIndex(0);
+			}
 		}
-	
-		if(!path)
+
+		if (!path) {
 			return;
-			
+		}
+
 		var x = path.X;
 		var y = path.Y;
-		
+
 		var pxToMm = this.chartProp.pxToMM;
 		var constMargin = 5 / pxToMm;
-		
+
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
-		
-		var centerX = x - width/2;
-		var centerY = y - height/2;
-		
-		switch ( point.compiledDlb.dLblPos )
-		{
-			case c_oAscChartDataLabelsPos.b:
-			{
-				centerY = centerY + height/2 + constMargin;
+
+		var centerX = x - width / 2;
+		var centerY = y - height / 2;
+
+		switch (point.compiledDlb.dLblPos) {
+			case c_oAscChartDataLabelsPos.b: {
+				centerY = centerY + height / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.bestFit:
-			{
+			case c_oAscChartDataLabelsPos.bestFit: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.ctr:
-			{
+			case c_oAscChartDataLabelsPos.ctr: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.l:
-			{
-				centerX = centerX - width/2 - constMargin;
+			case c_oAscChartDataLabelsPos.l: {
+				centerX = centerX - width / 2 - constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.r:
-			{
-				centerX = centerX + width/2 + constMargin;
+			case c_oAscChartDataLabelsPos.r: {
+				centerX = centerX + width / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.t:
-			{
-				centerY = centerY - height/2 - constMargin;
+			case c_oAscChartDataLabelsPos.t: {
+				centerY = centerY - height / 2 - constMargin;
 				break;
 			}
 		}
-		
-		if(centerX < 0)
+
+		if (centerX < 0) {
 			centerX = 0;
-		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+		}
+		if (centerX + width > this.chartProp.widthCanvas / pxToMm) {
 			centerX = this.chartProp.widthCanvas / pxToMm - width;
-			
-		if(centerY < 0)
+		}
+
+		if (centerY < 0) {
 			centerY = 0;
-		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+		}
+		if (centerY + height > this.chartProp.heightCanvas / pxToMm) {
 			centerY = this.chartProp.heightCanvas / pxToMm - height;
-		
+		}
+
 		return {x: centerX, y: centerY};
 	},
 
 	//TODO пока включаю функцию _calculateSplineLine. с _calculateSplineLine2 отрисовается неверно. проверить!
-	_calculateSplineLine2 : function(points, k, xPoints, yPoints)
-	{
+	_calculateSplineLine2: function (points, k, xPoints, yPoints) {
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
 		var x = points[k - 1] ? points[k - 1].x : points[k].x;
 		var y = points[k - 1] ? points[k - 1].y : points[k].y;
-		
+
 		var x1 = points[k].x;
 		var y1 = points[k].y;
-		
+
 		var x2 = points[k + 1] ? points[k + 1].x : points[k].x;
 		var y2 = points[k + 1] ? points[k + 1].y : points[k].y;
-		
+
 		var x3 = points[k + 2] ? points[k + 2].x : points[k + 1] ? points[k + 1].x : points[k].x;
 		var y3 = points[k + 2] ? points[k + 2].y : points[k + 1] ? points[k + 1].y : points[k].y;
-		
-		
+
+
 		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3);
-		
+
 		x = this.cChartDrawer.getYPosition(splineCoords[0].x, xPoints, true);
 		y = this.cChartDrawer.getYPosition(splineCoords[0].y, yPoints);
-		
+
 		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, xPoints, true);
 		y1 = this.cChartDrawer.getYPosition(splineCoords[1].y, yPoints);
-		
+
 		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, xPoints, true);
 		y2 = this.cChartDrawer.getYPosition(splineCoords[2].y, yPoints);
-		
+
 		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, xPoints, true);
 		y3 = this.cChartDrawer.getYPosition(splineCoords[3].y, yPoints);
-		
+
 		path.moveTo(x * pathW, y * pathH);
 		path.cubicBezTo(x1 * pathW, y1 * pathH, x2 * pathW, y2 * pathH, x3 * pathW, y3 * pathH);
-		
 
-		
+
 		return pathId;
 	},
 
-	_calculateSplineLine : function(points, k, xPoints, yPoints)
-	{
+	_calculateSplineLine: function (points, k, xPoints, yPoints) {
 		var pathId = this.cChartSpace.AllocPath();
-		var path  = this.cChartSpace.GetPath(pathId);
+		var path = this.cChartSpace.GetPath(pathId);
 
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
@@ -10955,19 +10915,22 @@ drawScatterChart.prototype =
 		var startCoords;
 		var endCoords;
 
-		for(var i = 0; i <= 1;)
-		{
+		for (var i = 0; i <= 1;) {
 			var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
 
-			if(i === 0)
-			{
-				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			if (i === 0) {
+				startCoords = {
+					x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true),
+					y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)
+				};
 			}
 
-			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			endCoords = {
+				x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true),
+				y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)
+			};
 
-			if(i === 0)
-			{
+			if (i === 0) {
 				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
 			}
 			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
