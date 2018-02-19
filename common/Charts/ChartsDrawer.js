@@ -466,7 +466,7 @@ CChartsDrawer.prototype =
 		var widthTitle = chartSpace.chart.plotArea.catAx.title.extX;
 		var heightTitle = chartSpace.chart.plotArea.catAx.title.extY;
 		
-		var orientationValAx = chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
+		var orientationValAx = chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX;
 		
 		var x, y;
 		if(orientationValAx || this.calcProp.type === c_oChartTypes.HBar)
@@ -1214,32 +1214,45 @@ CChartsDrawer.prototype =
 			charts = [plotArea.chart];
 		}
 
-		var getMinMaxCurCharts = function(axisCharts) {
-			var minMaxData, min, max, ymin, ymax, chart;
+		var getMinMaxCurCharts = function(axisCharts, axis) {
+			var minMaxData, min, max, chart;
 			for (var i = 0; i < axisCharts.length; i++) {
 				chart = axisCharts[i];
 				minMaxData = t._calculateData2(chart);
-				if(i == 0 || minMaxData.min < min) {
-					min = minMaxData.min;
-				}
-				if(i == 0 || minMaxData.max > max) {
-					max = minMaxData.max;
-				}
-				if(i == 0 || minMaxData.ymin < ymin) {
-					ymin = minMaxData.ymin;
-				}
-				if(i == 0 || minMaxData.ymax > ymax) {
-					ymax = minMaxData.ymax;
+
+				if(AscDFH.historyitem_type_ScatterChart === chart.getObjectType()) {
+					if(AscDFH.historyitem_type_CatAx === axis.getObjectType()) {
+						if(i == 0 || minMaxData.min < min) {
+							min = minMaxData.min;
+						}
+						if(i == 0 || minMaxData.max > max) {
+							max = minMaxData.max;
+						}
+					} else {
+						if(i == 0 || minMaxData.ymin < min) {
+							min = minMaxData.ymin;
+						}
+						if(i == 0 || minMaxData.ymax > max) {
+							max = minMaxData.ymax;
+						}
+					}
+				} else {
+					if(i == 0 || minMaxData.min < min) {
+						min = minMaxData.min;
+					}
+					if(i == 0 || minMaxData.max > max) {
+						max = minMaxData.max;
+					}
 				}
 			}
 
-			return {min: min, max: max, ymin: ymin, ymax: ymax};
+			return {min: min, max: max};
 		};
 
 		for(var j = 0; j < plotArea.axId.length; j++) {
 			var axObj = plotArea.axId[j];
 			var axisCharts = this._getChartsByAxisId(charts, axObj.axId);
-			var minMaxAxis = getMinMaxCurCharts(axisCharts);
+			var minMaxAxis = getMinMaxCurCharts(axisCharts, axObj);
 			axObj.min = minMaxAxis.min;
 			axObj.max = minMaxAxis.max;
 			axObj.scale = this._roundValues(this._getAxisValues(false, minMaxAxis.min, minMaxAxis.max, chartSpace));
@@ -1327,9 +1340,7 @@ CChartsDrawer.prototype =
 			newArr = [];
 			for (var l = 0; l < series.length; ++l) {
 				newArr[l] = [];
-				yNumCache = series[l].yVal && series[l].yVal.numRef && series[l].yVal.numRef.numCache ?
-					series[l].yVal.numRef.numCache :
-					series[l].yVal && series[l].yVal.numLit ? series[l].yVal.numLit : null;
+				yNumCache = t.getNumCache(series[l].yVal);
 
 				if (!yNumCache) {
 					continue;
@@ -1339,8 +1350,8 @@ CChartsDrawer.prototype =
 					if (yNumCache.pts[j]) {
 						yVal = parseFloat(yNumCache.pts[j].val);
 
-						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache :
-							series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						xNumCache = t.getNumCache(series[l].xVal);
+
 						if (xNumCache && xNumCache.pts[j]) {
 							if (!isNaN(parseFloat(xNumCache.pts[j].val))) {
 								xVal = parseFloat(xNumCache.pts[j].val);
@@ -1373,8 +1384,8 @@ CChartsDrawer.prototype =
 							maxY = yVal;
 						}
 					} else {
-						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache :
-							series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						xNumCache = t.getNumCache(series[l].xVal);
+
 						if (xNumCache && xNumCache.pts[j]) {
 							if (!isNaN(parseFloat(xNumCache.pts[j].val))) {
 								xVal = parseFloat(xNumCache.pts[j].val);
@@ -1396,12 +1407,11 @@ CChartsDrawer.prototype =
 							max = xVal;
 						}
 					}
-
 				}
 			}
 		};
 
-		if (this.calcProp.type !== c_oChartTypes.Scatter) {
+		if (this._getChartType(chart) !== c_oChartTypes.Scatter) {
 			generateArrValues();
 		} else {
 			generateArrValuesScatter();
@@ -10603,80 +10613,19 @@ drawScatterChart.prototype =
 		this._drawScatter();
 	},
 	
-	_calculateLines: function ()
-	{
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-		
-		var points;
-		
-		var y, y1, y2, y3, x, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache;
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-		
-			seria = this.chartProp.series[i];
-			
-			numCache   = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
-			dataSeries = numCache.pts;
-
-			for(var n = 0; n < numCache.ptCount; n++)
-			{
-				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
-				
-				//рассчитываем значения				
-				val = this._getYVal(n, i);
-				
-				x  = xPoints[n].pos;
-				y  = this.cChartDrawer.getYPosition(val, yPoints);
-				
-				if(!this.paths.points)
-					this.paths.points = [];
-				if(!this.paths.points[i])
-					this.paths.points[i] = [];
-					
-				if(!points)
-					points = [];
-				if(!points[i])
-					points[i] = [];
-				
-				
-				compiledMarkerSize = dataSeries[n] && dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.size ? dataSeries[n].compiledMarker.size : null;
-				compiledMarkerSymbol = dataSeries[n] && dataSeries[n].compiledMarker && dataSeries[n].compiledMarker.symbol ? dataSeries[n].compiledMarker.symbol : null;
-				
-				if(val != null)
-				{
-					this.paths.points[i][n] = this.cChartDrawer.calculatePoint(x, y, compiledMarkerSize, compiledMarkerSymbol);
-					points[i][n] = {x: x, y: y};
-				}	
-				else
-				{
-					this.paths.points[i][n] = null;
-					points[i][n] = null;
-				}
-			}
-		}
-		
-		this._calculateAllLines(points);
-	},
-	
 	_recalculateScatter: function ()
     {
 		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		var catAx =  this.cChartSpace.chart.plotArea.catAx;
+		var xPoints = catAx.xPoints;
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var valAx =  this.cChartSpace.chart.plotArea.valAx;
+		var yPoints = valAx.yPoints;
 		
-		var trueHeight = this.chartProp.trueHeight;
-		var trueWidth  = this.chartProp.trueWidth;
-		
-		var minOy = this.chartProp.ymin;
-		var maxOy = this.chartProp.ymax;
-		var maxOx = this.chartProp.xScale[this.chartProp.xScale.length - 1];
-		var minOx = this.chartProp.xScale[0];
-		
-		var digHeightOy = Math.abs(maxOy - minOy);
-		var digHeightOx = Math.abs(maxOx - minOx);
+		var minOy = yPoints.min;
+		var maxOy = yPoints.max;
+		var minOx = xPoints.min;
+		var maxOx = xPoints.max;
 		
 		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
 		for(var i = 0; i < this.chartProp.series.length; i++)
@@ -10780,13 +10729,8 @@ drawScatterChart.prototype =
 	
 	_getYVal: function(n, i)
 	{
-		var val = 0;
-		var numCache;
-		var idxPoint;
-		
-		numCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache :  this.chartProp.series[i].yVal.numLit;
-		idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
-		val = idxPoint ? parseFloat(idxPoint.val) : null;
+		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+		var val = idxPoint ? parseFloat(idxPoint.val) : null;
 
 		return val;
 	},
@@ -10855,7 +10799,6 @@ drawScatterChart.prototype =
 	
 	_calculateLine: function(x, y, x1, y1)
 	{
-
         var pathId = this.cChartSpace.AllocPath();
         var path  = this.cChartSpace.GetPath(pathId);
 		
@@ -10865,7 +10808,6 @@ drawScatterChart.prototype =
 		path.moveTo(x * pathH, y * pathW);
 		path.lnTo(x1 * pathH, y1 * pathW);
 
-		
 		return pathId;
 	},
 	
