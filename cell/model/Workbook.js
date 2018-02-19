@@ -1488,7 +1488,6 @@
 		this.aComments = [];	// Комментарии к документу
 		this.aWorksheets = [];
 		this.aWorksheetsById = {};
-		this.pivotCaches = {};
 		this.aCollaborativeActions = [];
 		this.bCollaborativeChanges = false;
 		this.bUndoChanges = false;
@@ -1532,11 +1531,9 @@
 			elem.column.applyTotalRowFormula(elem.formula, elem.ws, !bNoBuildDep);
 		}
 		//ws
-		for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
-		{
-			var ws = this.aWorksheets[i];
-			ws.initPostOpen(this.wsHandlers, bNoBuildDep);
-		}
+		this.forEach(function (ws) {
+			ws.initPostOpen(self.wsHandlers, bNoBuildDep);
+		});
 		//show active if it hidden
 		var wsActive = this.getActiveWs();
 		if (wsActive && wsActive.getHidden()) {
@@ -1551,10 +1548,21 @@
 			this.snapshot = this._getSnapshot();
 		}
 	};
+	Workbook.prototype.forEach = function (callback, isCopyPaste) {
+		//if copy/paste - use only actve ws
+		if (isCopyPaste) {
+			callback(this.getActiveWs(), this.getActive());
+		} else {
+			for (var i = 0, l = this.aWorksheets.length; i < l; ++i) {
+				callback(this.aWorksheets[i], i);
+			}
+		}
+	};
 	Workbook.prototype.rebuildColors=function(){
 		AscCommonExcel.g_oColorManager.rebuildColors();
-		for(var i = 0 , length = this.aWorksheets.length; i < length; ++i)
-			this.aWorksheets[i].rebuildColors();
+		this.forEach(function (ws) {
+			ws.rebuildColors();
+		});
 	};
 	Workbook.prototype.getDefaultFont=function(){
 		return g_oDefaultFormat.Font.getName();
@@ -1821,10 +1829,12 @@
 		return -1;
 	};
 	Workbook.prototype._updateWorksheetIndexes = function (wsActive) {
-		for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
-			this.aWorksheets[i]._setIndex(i);
-		if (null != wsActive)
+		this.forEach(function (ws, index) {
+			ws._setIndex(index);
+		});
+		if (null != wsActive) {
 			this.setActive(wsActive.getIndex());
+		}
 	};
 	Workbook.prototype.checkUniqueSheetName=function(name){
 		var workbookSheetCount = this.getWorksheetCount();
@@ -1915,8 +1925,9 @@
 			}
 		}
 
-		for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
-			this.aWorksheets[i].generateFontMap(oFontMap);
+		this.forEach(function (ws) {
+			ws.generateFontMap(oFontMap);
+		});
 		this.CellStyles.generateFontMap(oFontMap);
 
 		return oFontMap;
@@ -1939,15 +1950,15 @@
 	};
 	Workbook.prototype.getAllImageUrls = function(){
 		var aImageUrls = [];
-		for(var i = 0; i < this.aWorksheets.length; ++i){
-			this.aWorksheets[i].getAllImageUrls(aImageUrls);
-		}
+		this.forEach(function (ws) {
+			ws.getAllImageUrls(aImageUrls);
+		});
 		return aImageUrls;
 	};
 	Workbook.prototype.reassignImageUrls = function(oImages){
-		for(var i = 0; i < this.aWorksheets.length; ++i){
-			this.aWorksheets[i].reassignImageUrls(oImages);
-		}
+		this.forEach(function (ws) {
+			ws.reassignImageUrls(oImages);
+		});
 	};
 	Workbook.prototype.recalcWB = function(rebuild, opt_sheetId) {
 		var formulas;
@@ -2046,11 +2057,11 @@
 	Workbook.prototype._getSnapshot = function() {
 		var wb = new Workbook(new AscCommonExcel.asc_CHandlersList(), this.oApi);
 		wb.dependencyFormulas = this.dependencyFormulas.getSnapshot(wb);
-		for (var i = 0; i < this.aWorksheets.length; ++i) {
-			var ws = this.aWorksheets[i].getSnapshot(wb);
+		this.forEach(function (ws) {
+			ws = ws.getSnapshot(wb);
 			wb.aWorksheets.push(ws);
 			wb.aWorksheetsById[ws.getId()] = ws;
-		}
+		});
 		//init trigger
 		wb.init({}, true, false);
 		return wb;
@@ -2058,9 +2069,9 @@
 	Workbook.prototype.getAllFormulas = function() {
 		var res = [];
 		this.dependencyFormulas.getAllFormulas(res);
-		for (var i = 0; i < this.aWorksheets.length; ++i) {
-			this.aWorksheets[i].getAllFormulas(res);
-		}
+		this.forEach(function (ws) {
+			ws.getAllFormulas(res);
+		});
 		return res;
 	};
 	Workbook.prototype._forwardTransformation = function(wbSnapshot, changesMine, changesTheir) {
@@ -2432,9 +2443,9 @@
 		return res;
 	};
 	Workbook.prototype.updateSparklineCache = function (sheet, ranges) {
-		for (var i = 0; i < this.aWorksheets.length; ++i) {
-			this.aWorksheets[i].updateSparklineCache(sheet, ranges);
-		}
+		this.forEach(function (ws) {
+			ws.updateSparklineCache(sheet, ranges);
+		});
 	};
 	Workbook.prototype.sortDependency = function () {
 		this.dependencyFormulas.calcTree();

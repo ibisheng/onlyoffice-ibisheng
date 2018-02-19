@@ -4750,13 +4750,13 @@ PasteProcessor.prototype =
 							bAddParagraph = true;
 						} else if (0x09 === nUnicode) {
 							Item = new ParaTab();
-							shape.paragraphAdd(Item);
+							shape.paragraphAdd(Item, false);
 						} else if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 							Item = new ParaText(nUnicode);
-							shape.paragraphAdd(Item);
+							shape.paragraphAdd(Item, false);
 						} else {
 							Item = new ParaSpace();
-							shape.paragraphAdd(Item);
+							shape.paragraphAdd(Item, false);
 						}
 					}
 				}
@@ -7738,7 +7738,7 @@ PasteProcessor.prototype =
 					if (!oThis.bIsPlainText) {
 						var rPr = oThis._read_rPr(node.parentNode);
 						Item = new ParaTextPr(rPr);
-						shape.paragraphAdd(Item);
+						shape.paragraphAdd(Item, false);
 					}
 				} else {
 					var oTargetNode = node.parentNode;
@@ -7778,7 +7778,7 @@ PasteProcessor.prototype =
 							else
 								Item = new ParaSpace();
 
-							shape.paragraphAdd(Item);
+							shape.paragraphAdd(Item, false);
 						}
 					}
 					else
@@ -8018,9 +8018,9 @@ PasteProcessor.prototype =
 				//Добавляем linebreak, если он не разделяет блочные элементы и до этого был блочный элемент
 				if ("br" === sNodeName || "always" === node.style.pageBreakBefore) {
 					if ("always" === node.style.pageBreakBefore) {
-						shape.paragraphAdd(new ParaNewLine(break_Line));
+						shape.paragraphAdd(new ParaNewLine(break_Line), false);
 					} else {
-						shape.paragraphAdd(new ParaNewLine(break_Line));
+						shape.paragraphAdd(new ParaNewLine(break_Line), false);
 					}
 				}
 			} else {
@@ -8055,10 +8055,10 @@ PasteProcessor.prototype =
 					if (!oThis.bIsPlainText) {
 						var rPr = oThis._read_rPr(node);
 						var Item = new ParaTextPr(rPr);
-						shape.paragraphAdd(Item);
+						shape.paragraphAdd(Item, false);
 					}
 					for (var i = 0; i < nTabCount; i++) {
-						shape.paragraphAdd(new ParaTab());
+						shape.paragraphAdd(new ParaTab(), false);
 					}
 					return;
 				}

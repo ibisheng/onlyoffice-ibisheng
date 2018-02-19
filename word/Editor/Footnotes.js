@@ -96,13 +96,13 @@ CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
 	var oSeparator = new CFootEndnote(this);
 	oSeparator.AddToParagraph(new ParaSeparator(), false);
-	var oParagraph = oSeparator.Get_ElementByIndex(0);
+	var oParagraph = oSeparator.GetElement(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetSeparator(oSeparator);
 
 	var oContinuationSeparator = new CFootEndnote(this);
 	oContinuationSeparator.AddToParagraph(new ParaContinuationSeparator(), false);
-	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
+	oParagraph = oContinuationSeparator.GetElement(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetContinuationSeparator(oContinuationSeparator);
 

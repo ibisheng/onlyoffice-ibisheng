@@ -2319,13 +2319,19 @@
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
 			//PivotCaches
-			var isEmpty = true;
-			for (var id in wb.pivotCaches) {
-				isEmpty = false;
-				break;
-			}
-			if(!isEmpty) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches();});
+			var isEmptyCaches = true;
+			var pivotCaches = {};
+			this.oBinaryWorksheetsTableWriter.wb.forEach(function(ws) {
+				for (var i = 0; i < ws.pivotTables.length; ++i) {
+					var pivotTable = ws.pivotTables[i];
+					if (null !== pivotTable.cacheId && pivotTable.cacheDefinition) {
+						isEmptyCaches = false;
+						pivotCaches[pivotTable.cacheId] = pivotTable.cacheDefinition;
+					}
+				}
+			}, this.oBinaryWorksheetsTableWriter.isCopyPaste);
+			if (!isEmptyCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches(pivotCaches);});
 			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
@@ -2421,10 +2427,10 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
-		this.WritePivotCaches = function() {
+		this.WritePivotCaches = function(pivotCaches) {
 			var oThis = this;
-			for (var id in wb.pivotCaches) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, wb.pivotCaches[id]);});
+			for (var id in pivotCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, pivotCaches[id]);});
 			}
 		};
 		this.WritePivotCache = function(id, pivotCache) {
@@ -2585,7 +2591,7 @@
             }
         };
     }
-	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, idWorksheet, isCopyPaste)
+	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
@@ -2593,7 +2599,6 @@
         this.oSharedStrings = oSharedStrings;
         this.aDxfs = aDxfs;
 		this.stylesForWrite = new StylesForWrite();
-        this.idWorksheet = idWorksheet;
         this.isCopyPaste = isCopyPaste;
         this._prepeareStyles = function()
         {
@@ -2616,16 +2621,12 @@
         };
         this.WriteWorksheetsContent = function()
         {
-            var oThis = this;
-            for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
-            {
-                //if copy/paste - write only actve ws
-                if(this.isCopyPaste && i != this.wb.nActive)
-                    continue;
-                var ws = this.wb.aWorksheets[i];
-                if(null == this.idWorksheet || this.idWorksheet == ws.getId())
-                    this.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, i);});
-            }
+			var oThis = this;
+			this.wb.forEach(function (ws, index) {
+				oThis.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function () {
+					oThis.WriteWorksheet(ws, index);
+				});
+			}, this.isCopyPaste);
         };
         this.WriteWorksheet = function(ws, index)
         {
@@ -3952,14 +3953,13 @@
         this.nLastFilePos = 0;
         this.nRealTableCount = 0;
         this.bs = new BinaryCommonWriter(this.Memory);
-        this.Write = function(idWorksheet, noBase64)
+        this.Write = function(noBase64)
         {
-            //если idWorksheet не null, то надо серализовать только его.
             pptx_content_writer._Start();
 			if (noBase64) {
 				this.Memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
 			}
-            this.WriteMainTable(idWorksheet);
+            this.WriteMainTable();
             pptx_content_writer._End();
 			if (noBase64) {
 				return this.Memory.GetData();
@@ -3971,7 +3971,7 @@
         {
             return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
         };
-        this.WriteMainTable = function(idWorksheet)
+        this.WriteMainTable = function()
         {
             var nTableCount = 128;//Специально ставим большое число, чтобы не увеличивать его при добавлении очередной таблицы.
             this.nRealTableCount = 0;//Специально ставим большое число, чтобы не увеличивать его при добавлении очередной таблицы.
@@ -3988,7 +3988,7 @@
             var nStylesTablePos = this.ReserveTable(c_oSerTableTypes.Styles);
             //Workbook
             var aDxfs = [];
-            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, idWorksheet, this.isCopyPaste);
+            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, this.isCopyPaste);
             this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, oBinaryWorksheetsTableWriter, this.isCopyPaste));
             //Worksheets
             this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
@@ -4764,7 +4764,7 @@
                 if(null != oCellStyleXfs.numid) {
                     var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
                     if(null != oCurNumCellStyle)
-						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNumCellStyle);
                     else
 						newXf.num = g_StyleCache.addNum(this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
@@ -4838,7 +4838,7 @@
                     var oCurNum = oStyleObject.oNumFmts[xfs.numid];
                     //todo
                     if(null != oCurNum)
-						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNum, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNum);
                     else
 						newXf.num = g_StyleCache.addNum(this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
@@ -4920,32 +4920,29 @@
                 }
             }
         };
-      this.ParseNum = function(oNum, oNumFmts) {
-        var oRes = null;
-        var sFormat = null;
-        if (null != oNum && null != oNum.f) {
-          sFormat = oNum.f;
-        } else {
-          var sStandartNumFormat = AscCommonExcel.aStandartNumFormats[oNum.id];
-          if (null != sStandartNumFormat) {
-            sFormat = sStandartNumFormat;
-          }
-          if (null == sFormat) {
-            sFormat = "General";
-          }
-          if (null != oNumFmts) {
-            oNumFmts[oNum.id] = {id: oNum.id, f: sFormat};
-          }
-        }
-        if (null != sFormat) {
-          oRes = new AscCommonExcel.Num();
-          oRes.f = sFormat;
-          if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 ==  oNum.id || (27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
-            oRes.id = oNum.id;
-          }
-        }
-        return oRes;
-      };
+		this.ParseNum = function(oNum, oNumFmts) {
+			var oRes = new AscCommonExcel.Num();
+			if (null != oNum && null != oNum.f) {
+				oRes.f = oNum.f;
+			} else {
+				var sStandartNumFormat = AscCommonExcel.aStandartNumFormats[oNum.id];
+				if (null != sStandartNumFormat) {
+					oRes.f = sStandartNumFormat;
+				}
+				if (null == oRes.f) {
+					oRes.f = "General";
+				}
+				//format string is more priority then id. so, fill oRes.id only if format is empty
+				if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
+					(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
+					oRes.id = oNum.id;
+				}
+			}
+			if (null != oNumFmts) {
+				oNumFmts[oNum.id] = oRes;
+			}
+			return oRes;
+		};
         this.ReadStylesContent = function (type, length, oStyleObject) {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
@@ -5286,8 +5283,9 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadNumFmt(t,l,oNewNumFmt);
                 });
-                if(null != oNewNumFmt.id && null != oNewNumFmt.f)
-                    oNumFmts[oNewNumFmt.id] = oNewNumFmt;
+				if (null != oNewNumFmt.id) {
+					this.ParseNum(oNewNumFmt, oNumFmts);
+				}
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5807,12 +5805,7 @@
 					oNewWorksheet.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 				else if(this.copyPasteObj && this.copyPasteObj.isCopyPaste)
 				{
-					var api = window["Asc"]["editor"];
-					var nActiveSheet = api.wb.model.nActive;
-					var ws = api.wb.model.aWorksheets[nActiveSheet];
-					var DrawingDocument = ws.DrawingDocument;
-					
-					oNewWorksheet.DrawingDocument = DrawingDocument;
+					oNewWorksheet.DrawingDocument = window["Asc"]["editor"].wbModel.getActiveWs().DrawingDocument;
 				}
 				
                 this.curWorksheet = oNewWorksheet;
@@ -8041,7 +8034,7 @@
         };
         var fReadStyles = function (type, length, oOutput) {
             var res = c_oSerConstants.ReadOk;
-            var oStyleObject = {font: null, fill: null, border: null, oNumFmts: [], xfs: null};
+            var oStyleObject = {font: null, fill: null, border: null, oNumFmts: {}, xfs: null};
             if (Types.Style === type) {
                 var oCellStyle = new AscCommonExcel.CCellStyle();
                 res = bcr.Read1(length, function (t, l) {
@@ -8062,7 +8055,7 @@
                 if (null !== oStyleObject.xfs.numid) {
                     var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
                     if(null != oCurNum)
-						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNum);
                     else
 						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }

@@ -791,7 +791,7 @@ var editor;
           oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
-      dataContainer.data = oBinaryFileWriter.Write(undefined, isNoBase64);
+      dataContainer.data = oBinaryFileWriter.Write(isNoBase64);
     }
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
@@ -985,6 +985,7 @@ var editor;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
+					var pivotCaches = {};
 					var jsZipWrapper = new AscCommon.JSZipWrapper();
 					nextPromise = jsZipWrapper.loadAsync(data || path).then(function (zip) {
 						return doc.openFromZip(zip);
@@ -1008,7 +1009,7 @@ var editor;
 										pivotTableCacheDefinition = new Asc.CT_PivotCacheDefinition();
 										new openXml.SaxParserBase().parse(content, pivotTableCacheDefinition);
 										if (pivotTableCacheDefinition.isValidCacheSource()) {
-											wb.pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
+											pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
 											if (pivotTableCacheDefinition.id) {
 												var partPivotTableCacheRecords = pivotTableCacheDefinitionPart.getPartById(
 													pivotTableCacheDefinition.id);
@@ -1047,7 +1048,7 @@ var editor;
 										for (var i = 0; i < res.length; ++i) {
 											var pivotTable = new Asc.CT_pivotTableDefinition();
 											new openXml.SaxParserBase().parse(res[i], pivotTable);
-											var cacheDefinition = wb.pivotCaches[pivotTable.cacheId];
+											var cacheDefinition = pivotCaches[pivotTable.cacheId];
 											if (cacheDefinition) {
 												pivotTable.cacheDefinition = cacheDefinition;
 												ws.insertPivotTable(pivotTable);
@@ -1986,7 +1987,7 @@ var editor;
 
     var i = this.wbModel.getActive();
     var activeSheet = this.wbModel.getWorksheet(i);
-    var activeName = activeSheet.sName;
+    var activeName = parserHelp.getEscapeSheetName(activeSheet.sName);
     var sheetId = activeSheet.getId();
     var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
@@ -1998,18 +1999,15 @@ var editor;
         History.StartTransaction();
         t.wbModel.dependencyFormulas.lockRecal();
         // Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
-        for (var key in t.wb.model.aWorksheets) {
-          var wsModel = t.wb.model.aWorksheets[key];
-          if (wsModel) {
-            History.TurnOff();
-            var ws = t.wb.getWorksheet(wsModel.index);
-            History.TurnOn();
-            wsModel.oDrawingOjectsManager.updateChartReferencesWidthHistory(parserHelp.getEscapeSheetName(activeName), parserHelp.getEscapeSheetName(wsModel.sName));
-            if (ws && ws.objectRender && ws.objectRender.controller) {
-              ws.objectRender.controller.recalculate2(true);
-            }
-          }
-        }
+          t.wbModel.forEach(function (ws) {
+			  History.TurnOff();
+			  var wsView = t.wb.getWorksheet(ws.index, true);
+			  History.TurnOn();
+			  ws.oDrawingOjectsManager.updateChartReferencesWidthHistory(activeName, parserHelp.getEscapeSheetName(ws.sName));
+			  if (wsView && wsView.objectRender && wsView.objectRender.controller) {
+				  wsView.objectRender.controller.recalculate2(true);
+			  }
+          });
 
         // Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)
         var activeNow = t.wbModel.removeWorksheet(i);
@@ -2409,28 +2407,19 @@ var editor;
     };
 
     spreadsheet_api.prototype.asc_getAllSignatures = function(){
-      var ret = [], oWorksheet;
+      var ret = [];
       var aSpTree = [];
-      for(var i = 0; i < this.wbModel.aWorksheets.length; ++i){
-        oWorksheet = this.wbModel.aWorksheets[i];
-        for(var j = 0; j < oWorksheet.Drawings.length; ++j){
-            aSpTree.push(oWorksheet.Drawings[j].graphicObject);
-        }
-      }
+		this.wbModel.forEach(function (ws) {
+			for (var j = 0; j < ws.Drawings.length; ++j) {
+				aSpTree.push(ws.Drawings[j].graphicObject);
+			}
+		});
       AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
       return ret;
     };
 
     spreadsheet_api.prototype.asc_CallSignatureDblClickEvent = function(sGuid){
-        var ret = [], oWorksheet;
-        var aSpTree = [];
-        for(var i = 0; i < this.wbModel.aWorksheets.length; ++i){
-            oWorksheet = this.wbModel.aWorksheets[i];
-            for(var j = 0; j < oWorksheet.Drawings.length; ++j){
-                aSpTree.push(oWorksheet.Drawings[j].graphicObject);
-            }
-        }
-        var allSpr = AscFormat.DrawingObjectsController.prototype.getAllSignatures2(ret, aSpTree);
+        var allSpr = this.asc_getAllSignatures();
         for(i = 0; i < allSpr.length; ++i){
           if(allSpr[i].signatureLine && allSpr[i].signatureLine.id === sGuid){
               this.sendEvent("asc_onSignatureDblClick", sGuid, allSpr[i].extX, allSpr[i].extY);
@@ -3353,7 +3342,7 @@ var editor;
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
-    oBinaryFileWriter.Write(undefined, true);
+    oBinaryFileWriter.Write(true);
 
     var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64);
     window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());

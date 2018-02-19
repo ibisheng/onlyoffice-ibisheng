@@ -2479,11 +2479,14 @@ CShape.prototype.recalculateTextStyles = function (level) {
                 default_style.ParaPr.Merge(default_ppt_style.Copy());
                 default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
-            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+            if(!isRealObject(parent_objects.master) || !isRealObject(parent_objects.master.txStyles) || !this.isPlaceholder())
             {
-                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-                default_style.ParaPr.Merge(default_ppt_style.Copy());
-                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+                if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+                {
+                    var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
+                    default_style.ParaPr.Merge(default_ppt_style.Copy());
+                    default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+                }
             }
         }
 
@@ -2837,7 +2840,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             this.rot = rot;
 
             var metricExtX, metricExtY;
-            if(!(this instanceof AscFormat.CGroupShape))
+          //  if(!(this instanceof AscFormat.CGroupShape))
             {
                 metricExtX = metrics.extX;
                 metricExtY = metrics.extY;
@@ -2852,19 +2855,19 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     this.extY = metrics.extX;
                 }
             }
-            else
-            {
-                if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY))
-                {
-                    this.extX = this.spPr.xfrm.extX;
-                    this.extY = this.spPr.xfrm.extY;
-                }
-                else
-                {
-                    metricExtX = metrics.extX;
-                    metricExtY = metrics.extY;
-                }
-            }
+            // else
+            // {
+            //     if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY))
+            //     {
+            //         this.extX = this.spPr.xfrm.extX;
+            //         this.extY = this.spPr.xfrm.extY;
+            //     }
+            //     else
+            //     {
+            //         metricExtX = metrics.extX;
+            //         metricExtY = metrics.extY;
+            //     }
+            // }
 
             if (checkNormalRotate(rot))
             {

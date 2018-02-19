@@ -128,6 +128,15 @@
 
 		this.IsComposition = false;
 		this.ApiIsComposition = false;
+
+		// Notes offset for slides
+		this.TargetOffsetY = 0;
+
+		// editor_sdk div sizes (for visible textarea)
+		this.editorSdkW = 0;
+		this.editorSdkH = 0;
+
+		this.ReadOnlyCounter = 0;
 	}
 
 	CTextInput.prototype =
@@ -347,6 +356,10 @@
 					document.body.style["touchAction"] = "none";
 				}
 			}
+
+			var _editorSdk = document.getElementById("editor_sdk");
+			this.editorSdkW = _editorSdk.clientWidth;
+			this.editorSdkH = _editorSdk.clientHeight;
 		},
 
 		checkFocus : function()
@@ -373,7 +386,7 @@
 			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + this.FixedPosCheckElementX + "px";
-				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.HtmlAreaOffset + "px";
+				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.TargetOffsetY + this.HtmlAreaOffset + "px";
 
 				this.HtmlArea.scrollTop = this.HtmlArea.scrollHeight;
 				//this.log("" + this.HtmlArea.scrollTop + ", " + this.HtmlArea.scrollHeight);
@@ -381,7 +394,7 @@
 			else
 			{
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
-				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY);
+				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY + this.TargetOffsetY);
 			}
 		},
 
@@ -430,6 +443,19 @@
 		getAreaValue : function()
 		{
 			return this.TextArea_Not_ContentEditableDiv ? this.HtmlArea.value : this.HtmlArea.innerText;
+		},
+
+		setReadOnly : function(isLock)
+		{
+			if (isLock)
+				this.ReadOnlyCounter++;
+			else
+				this.ReadOnlyCounter--;
+
+			if (0 > this.ReadOnlyCounter)
+				this.ReadOnlyCounter = 0;
+
+			this.HtmlArea.readOnly = (0 == this.ReadOnlyCounter) ? false : true;
 		},
 
 		show : function()
@@ -486,9 +512,8 @@
 			if (undefined == _top)
 				_top = parseInt(this.HtmlDiv.style.top);
 
-			var _editorSdk = document.getElementById("editor_sdk");
-			var _r_max = parseInt(_editorSdk.clientWidth);
-			var _b_max = parseInt(_editorSdk.clientHeight);
+			var _r_max = this.editorSdkW;
+			var _b_max = this.editorSdkH;
 
 			_r_max -= 60;
 			if ((_r_max - _left) > 50)
@@ -517,46 +542,53 @@
 			this.HtmlDiv.style.left = _left + "px";
 			this.HtmlDiv.style.top  = _top + "px";
 
-			// теперь нужно расчитать ширину/высоту текстбокса
-			var _p              = document.createElement('p');
-			_p.style.zIndex     = "-1";
-			_p.style.position   = "absolute";
-			_p.style.fontFamily = "arial";
-			_p.style.fontSize   = "12pt";
-			_p.style.left       = "0px";
-			_p.style.width      = this.debugTexBoxMaxW + "px";
+			var _height = 22;
+			var _t = this.getAreaValue();
 
-			_editorSdk.appendChild(_p);
+			if (0 != _t.length)
+			{
+				var _editorSdk = document.getElementById("editor_sdk");
 
-			var _t       = this.getAreaValue();
-			_t           = _t.replace(/ /g, "&nbsp;");
-			_p.innerHTML = "<span>" + _t + "</span>";
-			var _width   = _p.firstChild.offsetWidth;
-			_width       = Math.min(_width + 20, this.debugTexBoxMaxW);
+				// теперь нужно расчитать ширину/высоту текстбокса
+				var _p = document.createElement('p');
+				_p.style.zIndex = "-1";
+				_p.style.position = "absolute";
+				_p.style.fontFamily = "arial";
+				_p.style.fontSize = "12pt";
+				_p.style.left = "0px";
+				_p.style.width = this.debugTexBoxMaxW + "px";
 
-			if (AscCommon.AscBrowser.isIE)
-				_width += 10;
+				_editorSdk.appendChild(_p);
 
-			var area          = document.createElement('textarea');
-			area.style.zIndex = "-1";
-			area.id           = "area2_id";
-			area.rows         = 1;
-			area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
-			area.style.overflow = "hidden";
-			area.style.width    = _width + "px";
-			_editorSdk.appendChild(area);
+				_t = _t.replace(/ /g, "&nbsp;");
+				_p.innerHTML = "<span>" + _t + "</span>";
+				var _width = _p.firstChild.offsetWidth;
+				_width = Math.min(_width + 20, this.debugTexBoxMaxW);
 
-			area.value = this.getAreaValue();
+				if (AscCommon.AscBrowser.isIE)
+					_width += 10;
 
-			var _height = area.clientHeight;
-			if (area.scrollHeight > _height)
-				_height = area.scrollHeight;
+				var area = document.createElement('textarea');
+				area.style.zIndex = "-1";
+				area.id = "area2_id";
+				area.rows = 1;
+				area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+				area.style.overflow = "hidden";
+				area.style.width = _width + "px";
+				_editorSdk.appendChild(area);
+
+				area.value = this.getAreaValue();
+
+				_height = area.clientHeight;
+				if (area.scrollHeight > _height)
+					_height = area.scrollHeight;
+
+				_editorSdk.removeChild(_p);
+				_editorSdk.removeChild(area);
+			}
 
 			if (_height > this.debugTexBoxMaxH)
 				_height = this.debugTexBoxMaxH;
-
-			_editorSdk.removeChild(_p);
-			_editorSdk.removeChild(area);
 
 			this.HtmlDiv.style.width  = _width + "px";
 			this.HtmlDiv.style.height = _height + "px";
@@ -569,6 +601,12 @@
 
 		onInput : function(e, isFromCompositionUpdate)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem)
 			{
 				if (!this.isShow)
@@ -593,35 +631,87 @@
 				if (true)
 				{
 					var target = e.target;
-					if (target.msGetInputContext)
+					if (target["msGetInputContext"])
 					{
-						var ctx = target.msGetInputContext();
-						ieStart = ctx.compositionStartOffset;
-						ieEnd = ctx.compositionEndOffset;
+						var ctx = target["msGetInputContext"]();
+
+						if (ctx)
+						{
+							ieStart = ctx["compositionStartOffset"];
+							ieEnd = ctx["compositionEndOffset"];
+						}
 					}
 				}
 
 				this.CompositionEnd = this.Text.length;
 				this.CompositionStart = this.TextBeforeComposition.length;
 
-				if (this.IsComposition && ieStart != -1 && ieEnd != -1)
-				{
-					this.CompositionStart = ieStart;
-					this.CompositionEnd = ieEnd;
-				}
-
 				var textReplace = this.Text.substr(this.CompositionStart);
-				for (var iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+				var iter;
+				for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
 				{
 					codes.push(iter.value());
 				}
 
-				this.apiCompositeReplace(codes);
+				var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(codes, true);
 
-				if (!this.IsComposition)
+				if (!isAsync)
 				{
-					this.apiCompositeEnd();
-					this.TextBeforeComposition = this.Text;
+					// ie/edge могут не присылать onCompositeEnd. И тогда ориентир - дополнительный селект
+					if (ieStart > this.CompositionStart)
+					{
+						textReplace = textReplace.substr(0, ieStart - this.CompositionStart);
+
+						codes = [];
+						for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+						{
+							codes.push(iter.value());
+						}
+
+						this.apiCompositeReplace(codes);
+						this.apiCompositeEnd();
+
+						this.TextBeforeComposition = this.Text.substr(0, ieStart);
+
+						this.apiCompositeStart();
+						this.CompositionStart = ieStart;
+
+						codes = [];
+						textReplace = this.Text.substr(this.CompositionStart);
+						for (iter = textReplace.getUnicodeIterator(); iter.check(); iter.next())
+						{
+							codes.push(iter.value());
+						}
+
+						this.apiCompositeReplace(codes);
+					}
+					else
+					{
+						this.apiCompositeReplace(codes);
+					}
+
+					if (!this.IsComposition)
+					{
+						this.apiCompositeEnd();
+						this.TextBeforeComposition = this.Text;
+					}
+				}
+				else
+				{
+					AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+					{
+
+						this.apiCompositeReplace(codes);
+						this.apiCompositeEnd();
+
+						this.clear();
+						this.setReadOnly(false);
+
+					});
+
+					AscCommon.stopEvent(e);
+					this.setReadOnly(true);
+					return false;
 				}
 			}
 			else
@@ -641,7 +731,7 @@
 				if (this.Text.length > 0)
 				{
 					var _lastCode = this.Text.charCodeAt(this.Text.length - 1);
-					if (_lastCode == 12290)
+					if (_lastCode == 12290 || _lastCode == 46)
 					{
 						// китайская точка
 						AscCommon.stopEvent(e);
@@ -789,17 +879,40 @@
 
 		apiInputText : function(codes)
 		{
-			AscFonts.FontPickerByCharacter.checkText(codes, this, function() {
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(codes, true);
 
+			if (!isAsync)
+			{
 				this.apiCompositeStart();
 				this.apiCompositeReplace(codes);
 				this.apiCompositeEnd();
+			}
+			else
+			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
 
-			}, true);
+					this.apiCompositeStart();
+					this.apiCompositeReplace(codes);
+					this.apiCompositeEnd();
+
+					this.setReadOnly(false);
+
+				});
+
+				this.setReadOnly(true);
+				return false;
+			}
 		},
 
 		onKeyDown : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem && this.isShow)
 			{
 				// нужно проверить на enter
@@ -851,18 +964,23 @@
 
 			AscCommon.check_KeyboardEvent(e);
 			var arrCodes = this.Api.getAddedTextOnKeyDown(AscCommon.global_keyboardEvent);
-			var isAsync = AscFonts.FontPickerByCharacter.checkText(arrCodes, this, function() {
 
-				this.onKeyDown(e);
-				this.onKeyUp(e);
-				AscCommon.stopEvent(e);
-				return false;
-
-			}, true, true);
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight(arrCodes, true);
 
 			if (isAsync)
 			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
+
+					this.onKeyDown(e);
+					this.onKeyUp(e);
+
+					this.setReadOnly(false);
+
+				});
+
 				AscCommon.stopEvent(e);
+				this.setReadOnly(true);
 				return false;
 			}
 
@@ -877,8 +995,14 @@
 				case 38:	// top
 				case 39:	// right
 				case 40:	// bottom
+				case 33: 	// pageup
+				case 34: 	// pagedown
+				case 35: 	// end
+				case 36: 	// home
+				case 46:	// delete
+				case 45:	// insert
 				{
-					AscCommon.stopEvent(e);
+					// заканчиваем "непрерывный" ввод => очищаем текстбокс
 					this.clear();
 					return false;
 				}
@@ -891,6 +1015,12 @@
 
 		onKeyPress : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem)
 				return;
 
@@ -907,15 +1037,24 @@
 			}
 
             var c = e.which || e.keyCode;
-			var isAsync = AscFonts.FontPickerByCharacter.checkText([c], this, function() {
 
-				this.apiInputText([c]);
-
-			}, true, true);
+			var isAsync = AscFonts.FontPickerByCharacter.checkTextLight([c], true);
 
 			if (isAsync)
 			{
+				AscFonts.FontPickerByCharacter.loadFonts(this, function ()
+				{
+
+					this.apiCompositeStart();
+					this.apiCompositeReplace([c]);
+					this.apiCompositeEnd();
+
+					this.setReadOnly(false);
+
+				});
+
 				AscCommon.stopEvent(e);
+				this.setReadOnly(true);
 				return false;
 			}
 
@@ -939,6 +1078,12 @@
 
 		onKeyUp : function(e)
 		{
+			if (this.Api.isLongAction())
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			}
+
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -1022,16 +1167,14 @@
 
 		apiCompositeReplace : function(_value)
 		{
-            if (!this.ApiIsComposition)
-            	this.Api.Begin_CompositeInput();
-
-			var isAsync = AscFonts.FontPickerByCharacter.checkText(_value, this, function() { }, true);
-			if (isAsync)
+			if (this.Api.isLongAction())
 			{
-				this.apiCompositeEnd();
-				this.clear();
-				return;
+				AscCommon.stopEvent(e);
+				return false;
 			}
+
+			if (!this.ApiIsComposition)
+				this.Api.Begin_CompositeInput();
 
             this.ApiIsComposition = true;
             this.Api.Replace_CompositeText(_value);
@@ -1059,6 +1202,7 @@
 			if (this.isSystem)
 				return;
 
+			this.IsComposition = true;
 			this.onInput(e, true);
 		},
 
@@ -1192,6 +1336,8 @@
 			window['AscCommon'].g_inputContext.systemInputEnable(true);
 		}
 
+		//window["SetInputDebugMode"]();
+
 		document.addEventListener("focus", function(e)
 		{
 			var t                = window['AscCommon'].g_inputContext;
@@ -1203,7 +1349,9 @@
 				t.apiCompositeEnd();
 				t.externalEndCompositeInput();
 			}
-			t.clear(true);
+
+			if (!t.isSystem)
+				t.clear(true);
 
 			var _nativeFocusElementNoRemoveOnElementFocus = t.nativeFocusElementNoRemoveOnElementFocus;
 			t.nativeFocusElementNoRemoveOnElementFocus = false;
@@ -1214,7 +1362,7 @@
 				return;
 			}
 
-			if (t.nativeFocusElement.id == t.HtmlArea.id)
+			if (t.nativeFocusElement && (t.nativeFocusElement.id == t.HtmlArea.id))
 			{
 				t.Api.asc_enableKeyEvents(true, true);
 
@@ -1225,7 +1373,7 @@
 
 				return;
 			}
-			if (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId)
+			if (t.nativeFocusElement && (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId))
 			{
 				t.nativeFocusElement = null;
 				return;
@@ -1234,7 +1382,7 @@
 			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			var _isElementEditable = false;
-			if (true)
+			if (t.nativeFocusElement)
 			{
 				// detect _isElementEditable
 				var _name = t.nativeFocusElement.nodeName;

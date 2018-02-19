@@ -4030,7 +4030,63 @@ function CBinaryFileWriter()
 		oThis._WriteString2(3, cNvPr.title);
 		oThis._WriteString2(4, cNvPr.descr);
         oThis.WriteUChar(g_nodeAttributeEnd);
+        oThis.WriteRecord2(0, cNvPr.hlinkClick, oThis.Write_Hyperlink2);
+        oThis.WriteRecord2(1, cNvPr.hlinkHover, oThis.Write_Hyperlink2);
     }
+
+    this.Write_Hyperlink2 = function(hyper)
+    {
+        oThis.WriteUChar(g_nodeAttributeStart);
+
+
+        var id = hyper.id;
+        var action = hyper.action;
+
+        if (id === "ppaction://hlinkshowjump?jump=firstslide")
+        {
+            action = id;
+            id = "";
+        }
+        else if (id === "ppaction://hlinkshowjump?jump=lastslide")
+        {
+            action = id;
+            id = "";
+        }
+        else if (id === "ppaction://hlinkshowjump?jump=nextslide")
+        {
+            action = id;
+            id = "";
+        }
+        else if (id === "ppaction://hlinkshowjump?jump=previousslide")
+        {
+            action = id;
+            id = "";
+        }
+        else
+        {
+            if(typeof id === "string")
+            {
+                var mask = "ppaction://hlinksldjumpslide";
+                var indSlide = id.indexOf(mask);
+                if (0 === indSlide)
+                {
+                    var slideNum = parseInt(id.substring(mask.length));
+                    id = "slide" + (slideNum + 1) + ".xml";
+                    action = "ppaction://hlinksldjump";
+                }
+            }
+        }
+
+        oThis._WriteString2(0, id);
+        oThis._WriteString2(1, hyper.invalidUrl);
+        oThis._WriteString2(2, action);
+        oThis._WriteString2(3, hyper.tgtFrame);
+        oThis._WriteString2(4, hyper.tooltip);
+        oThis._WriteBool2(5, hyper.history);
+        oThis._WriteBool2(6, hyper.highlightClick);
+        oThis._WriteBool2(7, hyper.endSnd);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
 
     this.Write_nvPr = function(nvPr)
     {

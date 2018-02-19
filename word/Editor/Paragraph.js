@@ -464,8 +464,8 @@ Paragraph.prototype.GetContentBounds = function(CurPage)
 			if (null === Left || Left > oRange.XVisible)
 				Left = oRange.XVisible;
 
-			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd)
-				Right = oRange.XVisible + oRange.W + oRange.WEnd;
+			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak)
+				Right = oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak;
 		}
 
 
@@ -1125,7 +1125,7 @@ Paragraph.prototype.Check_PageBreak = function()
 Paragraph.prototype.Check_BreakPageEnd = function(Item)
 {
 	// Последний параграф с разрывом страницы не проверяем. Так делает Word.
-	if (null === this.Get_DocumentNext())
+	if (this.Parent instanceof CDocument && null === this.Get_DocumentNext())
 		return false;
 
 	var PBChecker = new CParagraphCheckPageBreakEnd(Item);
@@ -7769,7 +7769,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 			var Cell = this.Parent.IsTableCellContent(true);
 			if (Cell)
 			{
-				var PrevEl = Cell.Get_LastParagraphPrevCell();
+				var PrevEl = Cell.GetLastElementInPrevCell();
 				if ((null !== PrevEl && type_Paragraph === PrevEl.GetType() && PrevEl.Style_Get() === StyleId) || (null === PrevEl && undefined === StyleId))
 				{
 					Pr.ParaPr.Spacing.Before = 0;
@@ -7851,7 +7851,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 			var Cell = this.Parent.IsTableCellContent(true);
 			if (Cell)
 			{
-				var NextEl = Cell.Get_FirstParagraphNextCell();
+				var NextEl = Cell.GetFirstElementInNextCell();
 				if ((null !== NextEl && type_Paragraph === NextEl.GetType() && NextEl.Style_Get() === StyleId) || (null === NextEl && StyleId === undefined))
 				{
 					Pr.ParaPr.Spacing.After = 0;
@@ -8039,7 +8039,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 		return this.Internal_CompiledParaPrPresentation();
 	}
 };
-Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl)
+Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl, bNoMergeDefault)
 {
 	var _Lvl        = AscFormat.isRealNumber(Lvl) ? Lvl : (AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
 	var styleObject = this.Parent.Get_Styles(_Lvl);
@@ -8061,10 +8061,12 @@ Paragraph.prototype.Internal_CompiledParaPrPresentation = function(Lvl)
 
 	Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
 
-	// Копируем прямые настройки параграфа.
-	Pr.ParaPr.Merge(this.Pr);
-	if (this.Pr.DefaultRunPr)
-		Pr.TextPr.Merge(this.Pr.DefaultRunPr);
+	if(!(bNoMergeDefault === true)){
+		// Копируем прямые настройки параграфа.
+		Pr.ParaPr.Merge(this.Pr);
+		if (this.Pr.DefaultRunPr)
+			Pr.TextPr.Merge(this.Pr.DefaultRunPr);
+	}
 	Pr.TextPr.Color.Auto = false;
 
 	return Pr;
@@ -10559,6 +10561,11 @@ Paragraph.prototype.Refresh_RecalcData = function(Data)
 						bNeedRecalc = true;
 					}
 				}
+
+				// TODO: Когда пересчет заголовков таблицы будет переделан на нормальную схему, без копирования
+				// нужно будет убрать эту заглушку
+				if (this.Parent.IsTableHeader())
+					bNeedRecalc = true;
 			}
 			break;
 		}

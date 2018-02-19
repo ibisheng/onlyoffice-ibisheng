@@ -41,6 +41,7 @@ function (window, undefined) {
 
     
     var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAYAAAB10jRKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAJElEQVQYV2MAAjUQoQIiFECEDIiQABHCIIIPRHCBCDYgZmACABohANImre1SAAAAAElFTkSuQmCC';
+    //var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAQAAAD41K0JAAAAD0lEQVR42mNgEGJmAAJmAACcABmX0vttAAAAAElFTkSuQmCC';
     var sFrozenImageRotUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAABCAYAAADn9T9+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGklEQVQYV2NkYGBQA+J/QPwHCf+GYiif4Q8AnJAJBNqB9DYAAAAASUVORK5CYII='
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
@@ -4409,6 +4410,19 @@ function DrawingObjects() {
     };
 
 
+    _this.checkCurrentTextObjectExtends = function()
+    {
+        var oController = this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject.checkExtentsByDocContent)
+            {
+                oTargetTextObject.checkExtentsByDocContent(true, true);
+            }
+        }
+    };
+
     _this.beginCompositeInput = function(){
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInput);
         _this.controller.CreateDocContent();
@@ -4470,6 +4484,8 @@ function DrawingObjects() {
             return;
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         _this.addCompositeText(nCharCode);
+
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.recalculateCurPos();
         _this.controller.updateSelectionState();
@@ -4489,6 +4505,7 @@ function DrawingObjects() {
 
     _this.Remove_CompositeText = function(nCount){
         _this.removeCompositeText(nCount);
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.updateSelectionState();
     };
@@ -4502,6 +4519,7 @@ function DrawingObjects() {
         {
             _this.addCompositeText(arrCharCodes[nIndex]);
         }
+        _this.checkCurrentTextObjectExtends();
 		_this.controller.startRecalculate();
         _this.controller.updateSelectionState();
     };
@@ -4533,6 +4551,15 @@ function DrawingObjects() {
         var oRun = _this.CompositeInput.Run;
         oRun.Set_CompositeInput(null);
         _this.CompositeInput = null;
+        var oController = _this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+            {
+                oTargetTextObject.recalculateContent();
+            }
+        }
         _this.sendGraphicObjectProps();
         _this.showDrawingObjects(true);
     };

@@ -421,7 +421,7 @@ CBlockLevelSdt.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelecti
 	{
 		var oParagraph = new Paragraph(this.LogicDocument.Get_DrawingDocument(), this.Content);
 		this.Content.Add_ToContent(0, oParagraph);
-		this.Content.Remove_FromContent(1, this.Content.Get_ElementsCount() - 1);
+		this.Content.Remove_FromContent(1, this.Content.GetElementsCount() - 1);
 		this.Content.MoveCursorToStartPos(false);
 		return true;
 	}
@@ -1158,8 +1158,20 @@ CBlockLevelSdt.prototype.ClearContentControl = function()
 	oPara.Correct_Content();
 
 	this.Content.Add_ToContent(0, oPara);
-	this.Content.Remove_FromContent(1, this.Content.Get_ElementsCount() - 1);
+	this.Content.Remove_FromContent(1, this.Content.GetElementsCount() - 1);
 	this.Content.MoveCursorToStartPos(false);
+};
+/**
+ * Получаем последний элемент содержимого
+ * @returns {?CDocumentContentElementBase}
+ */
+CBlockLevelSdt.prototype.GetLastElement = function()
+{
+	var nCount = this.Content.GetElementsCount();
+	if (nCount <= 0)
+		return null;
+
+	return this.Content.GetElement(nCount - 1);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

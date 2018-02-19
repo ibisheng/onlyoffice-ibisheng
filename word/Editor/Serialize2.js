@@ -9244,7 +9244,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
                   //делаем смещение левой границы
                   if(false == oNewTable.PositionH.Align)
                   {
-                      var dx = Get_TableOffsetCorrection(oNewTable);
+                      var dx = GetTableOffsetCorrection(oNewTable);
                       oNewTable.PositionH.Value += dx;
                   }
               }
@@ -14269,7 +14269,7 @@ function Binary_NotesTableReader(doc, oReadResult, openParams, stream)
 		return res;
 	};
 };
-function Get_TableOffsetCorrection(tbl)
+function GetTableOffsetCorrection(tbl)
 {
     var X = 0;
 

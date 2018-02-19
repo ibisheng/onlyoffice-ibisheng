@@ -3397,15 +3397,14 @@ Col.prototype =
 var g_nRowOffsetFlag = 0;
 var g_nRowOffsetXf = g_nRowOffsetFlag + 1;
 var g_nRowOffsetHeight = g_nRowOffsetXf + 4;
-var g_nRowStructSize = g_nRowOffsetHeight + 2;
+var g_nRowStructSize = g_nRowOffsetHeight + 8;
 
 var g_nRowFlag_empty = 0;
 var g_nRowFlag_init = 1;
 var g_nRowFlag_hd = 2;
 var g_nRowFlag_CustomHeight = 4;
 var g_nRowFlag_CalcHeight = 8;
-
-var g_nInt16InitVal = 1<<15;
+var g_nRowFlag_NullHeight = 16;
 
 /**
  * @constructor
@@ -3434,10 +3433,15 @@ Row.prototype =
 			var sheetMemory = this.ws.rowsData;
 			sheetMemory.checkSize(this.index);
 			var xfSave = this.xfs ? this.xfs.getIndexNumber() : 0;
-			var heightSave = null != this.h ? (this._prepareHeightToSave(this.h) | g_nInt16InitVal) : 0;
-			sheetMemory.setUint8(this.index, g_nRowOffsetFlag, this.flags);
+			var flagToSave = this.flags;
+			var heightToSave = this.h;
+			if (null === heightToSave) {
+				flagToSave |= g_nRowFlag_NullHeight;
+				heightToSave = 0;
+			}
+			sheetMemory.setUint8(this.index, g_nRowOffsetFlag, flagToSave);
 			sheetMemory.setUint32(this.index, g_nRowOffsetXf, xfSave);
-			sheetMemory.setUint16(this.index, g_nRowOffsetHeight, heightSave);
+			sheetMemory.setFloat64(this.index, g_nRowOffsetHeight, heightToSave);
 		}
 	},
 	loadContent: function(index) {
@@ -3449,8 +3453,12 @@ Row.prototype =
 			this.flags = sheetMemory.getUint8(this.index, g_nRowOffsetFlag);
 			if (0 != (g_nRowFlag_init & this.flags)) {
 				this.xfs = g_StyleCache.getXf(sheetMemory.getUint32(this.index, g_nRowOffsetXf));
-				var heightSave = sheetMemory.getUint16(this.index, g_nRowOffsetHeight);
-				this.h = (0 != (heightSave & g_nInt16InitVal)) ? (heightSave & ~g_nInt16InitVal) / 100 : null;
+				if (0 !== (g_nRowFlag_NullHeight & this.flags)) {
+					this.flags &= ~g_nRowFlag_NullHeight;
+					this.h = null;
+				} else {
+					this.h = sheetMemory.getFloat64(this.index, g_nRowOffsetHeight);
+				}
 				res = true;
 			}
 		}
@@ -3735,18 +3743,11 @@ Row.prototype =
 		} else if (val > Asc.c_oAscMaxRowHeight) {
 			val = Asc.c_oAscMaxRowHeight;
 		}
-		this.h = this._prepareHeight(val);
+		this.h = val;
 		this._hasChanged = true;
 	},
 	getHeight: function() {
 		return this.h;
-	},
-	_prepareHeight: function(val) {
-		//remain 2 digits in fraction part
-		return this._prepareHeightToSave(val) / 100;
-	},
-	_prepareHeightToSave: function(val) {
-		return Math.round(val * 100);
 	}
 };
 	function getStringFromMultiText(multiText) {

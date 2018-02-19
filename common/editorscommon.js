@@ -2881,6 +2881,16 @@
 		return (null !== nTwips && undefined !== nTwips ? nTwips : 1) * 25.4 / 20 / 72;
 	}
 
+	/**
+	 * Конвертируем миллиметры в ближайшее целое значение твипсов
+	 * @param mm - значение в миллиметрах
+	 * @returns {number}
+	 */
+	function MMToTwips(mm)
+	{
+		return (((mm * 20 * 72 / 25.4) + 0.5) | 0);
+	}
+
 	var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 
 	function getUserColorById(userId, userName, isDark, isNumericValue)
@@ -3336,6 +3346,7 @@
 
 	window["AscCommon"].CorrectMMToTwips = CorrectMMToTwips;
 	window["AscCommon"].TwipsToMM = TwipsToMM;
+	window["AscCommon"].MMToTwips = MMToTwips;
 
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;

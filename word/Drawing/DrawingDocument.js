@@ -2443,6 +2443,9 @@ function CDrawingDocument()
 	this.GuiCanvasTextPropsId = "gui_textprops_canvas_id";
 	this.GuiLastTextProps = null;
 
+	this.GuiCanvasFillTOCParentId = "";
+	this.GuiCanvasFillTOC = null;
+
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
@@ -5073,7 +5076,7 @@ function CDrawingDocument()
 			}
 			else
 			{
-				var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+				var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
 				var _y = this.TableOutlineDr.CurPos.Y;
 				var _r = _x + this.TableOutlineDr.TableOutline.W;
 				var _b = _y + this.TableOutlineDr.TableOutline.H;
@@ -6696,6 +6699,75 @@ function CDrawingDocument()
 
 		History.TurnOn();
 		editor.isViewMode = _oldTurn;
+	}
+
+	this.SetDrawImagePlaceContents = function(id, props)
+	{
+		var _div_elem = null;
+		if (null == id || "" == id)
+		{
+			if ("" != this.GuiCanvasFillTOCParentId)
+			{
+				if (this.GuiCanvasFillTOC)
+				{
+					_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+					if (_div_elem)
+						_div_elem.removeChild(this.GuiCanvasFillTOC);
+				}
+
+				this.GuiCanvasFillTOCParentId = "";
+				this.GuiCanvasFillTOC = null;
+			}
+			return;
+		}
+
+		if (id != this.GuiCanvasFillTOCParentId)
+		{
+			if (this.GuiCanvasFillTOC)
+			{
+				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+				if (_div_elem)
+					_div_elem.removeChild(this.GuiCanvasFillTOC);
+			}
+
+			this.GuiCanvasFillTOCParentId = "";
+			this.GuiCanvasFillTOC = null;
+		}
+
+		this.GuiCanvasFillTOCParentId = id;
+		var widthPx = 0;
+		var heightPx = 0;
+
+		if (null == this.GuiCanvasFillTOC)
+		{
+			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+			this.GuiCanvasFillTexture = null;
+			this.GuiCanvasFillTextureCtx = null;
+
+			this.GuiCanvasFillTOC = document.createElement('canvas');
+
+			widthPx = _div_elem.offsetWidth;
+			heightPx = _div_elem.offsetHeight;
+
+			this.GuiCanvasFillTOC.style.width = widthPx + "px";
+			this.GuiCanvasFillTOC.style.height = heightPx + "px";
+
+			this.GuiCanvasFillTOC.width = AscBrowser.convertToRetinaValue(widthPx, true);
+			this.GuiCanvasFillTOC.height = AscBrowser.convertToRetinaValue(heightPx, true);
+
+			if (_div_elem)
+				_div_elem.appendChild(this.GuiCanvasFillTOC);
+		}
+
+		// draw!
+		var wPx = this.GuiCanvasFillTOC.width;
+		var hPx = this.GuiCanvasFillTOC.height;
+
+		var ctx = this.GuiCanvasFillTOC.getContext("2d");
+		ctx.fillStyle = "#808080";
+		ctx.fillRect(0, 0, wPx, hPx);
+		ctx.beginPath();
 	}
 
 	this.StartTableStylesCheck = function ()

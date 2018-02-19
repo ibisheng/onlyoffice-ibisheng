@@ -1069,6 +1069,15 @@ CPresentation.prototype =
         oRun.Set_CompositeInput(null);
         this.CompositeInput = null;
 
+        var oController = this.GetCurrentController();
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+            {
+                oTargetTextObject.recalculateContent();
+            }
+        }
         this.Document_UpdateInterfaceState();
 
         this.DrawingDocument.ClearCachePages();
@@ -2528,6 +2537,45 @@ CPresentation.prototype =
 
     },
 
+    /**
+     * Проверяем будет ли добавление текста на ивенте KeyDown
+     * @param e
+     * @returns {Number[]} Массив юникодных значений
+     */
+    GetAddedTextOnKeyDown : function(e)
+    {
+        if (e.KeyCode === 32) // Space
+        {
+            var oController = this.GetCurrentController();
+            if(oController)
+            {
+
+                var oTargetDocContent = oController.getTargetDocContent();
+                var oSelectedInfo = new CSelectedElementsInfo();
+                oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                var oMath         = oSelectedInfo.Get_Math();
+
+                if (!oMath)
+                {
+                    if (true === e.ShiftKey && true === e.CtrlKey)
+                        return [0x00A0];
+                }
+            }
+        }
+        else if (e.KeyCode == 69 && true === e.CtrlKey) // Ctrl + E + ...
+        {
+            if (true === e.AltKey) // Ctrl + Alt + E - добавляем знак евро €
+                return [0x20AC];
+        }
+        else if (e.KeyCode == 189) // Клавиша Num-
+        {
+            if (true === e.CtrlKey && true === e.ShiftKey)
+                return [0x2013];
+        }
+
+        return [];
+    },
+
     Get_PresentationBulletByNumInfo : function(NumInfo)
     {
        return AscFormat.fGetPresentationBulletByNumInfo(NumInfo);
@@ -3005,29 +3053,49 @@ CPresentation.prototype =
                         this.addNextSlide();                        
                     }
                 }
-                else if ( e.ShiftKey ) {
-                    if(oController && oController.selectedObjects.length !== 0) {
-                        if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.AddToParagraph(new ParaNewLine(break_Line));
-                        }
-                    }
-                }
                 else {
-                    if(oController && oController.selectedObjects.length !== 0) {
-                        var aSelectedObjects = oController.selectedObjects;
-                        if(aSelectedObjects.length === 1 && aSelectedObjects[0].isPlaceholder && aSelectedObjects[0].isPlaceholder()
-                        && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
-                            if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                this.AddToParagraph(new ParaNewLine(break_Line));
+                    if(oController){
+                        var oTargetDocContent = oController.getTargetDocContent();
+                        if(oTargetDocContent){
+                            if ( e.ShiftKey ) {
+                                if(oController.selectedObjects.length !== 0) {
+                                    if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                        History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                        this.AddToParagraph(new ParaNewLine(break_Line));
+                                    }
+                                }
+                            }
+                            else {
+                                if(oController.selectedObjects.length !== 0) {
+                                    var aSelectedObjects = oController.selectedObjects;
+                                    if(aSelectedObjects.length === 1 && aSelectedObjects[0].isPlaceholder && aSelectedObjects[0].isPlaceholder()
+                                        && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
+                                        if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                            this.AddToParagraph(new ParaNewLine(break_Line));
+                                        }
+                                    }
+                                    else{
+                                        this.AddNewParagraph();
+                                    }
+
+
+                                }
                             }
                         }
-                        else{
-                            this.AddNewParagraph();
+                        else {
+                            var nRet = oController.handleEnter();
+                            if(nRet & 2){
+                                if(this.Slides[this.CurPage]){
+                                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                                }
+                            }
+                            if(nRet & 1){
+                               this.Document_UpdateSelectionState();
+                               this.Document_UpdateInterfaceState();
+                               this.Document_UpdateRulersState();
+                            }
                         }
-
-
                     }
                 }
             }
@@ -5449,7 +5517,7 @@ CPresentation.prototype =
         {
             if(oContent.PresentationWidth !== null && oContent.PresentationHeight !== null)
             {
-                if(Math.abs(this.Width - oContent.PresentationWidth) > 1e-4 || Math.abs(this.Height - oContent.PresentationHeight) > 1e-4)
+                if(!AscFormat.fApproxEqual(this.Width, oContent.PresentationWidth) || !AscFormat.fApproxEqual(this.Height, oContent.PresentationHeight))
                 {
                     bChangeSize = true;
                     kw = this.Width/oContent.PresentationWidth;
@@ -5582,12 +5650,37 @@ CPresentation.prototype =
         }
         if(oContent.DocContent && oContent.DocContent.Elements.length > 0 && nIndex === 0)
         {
-            var oTextPr = this.GetCalculatedTextPr();
+            var oTextPr, oTextPr2, oParaTextPr;
+            var oController = this.GetCurrentController();
+            if(oController)
+            {
+                var oTargetDocContent = oController.getTargetDocContent();
+                if(oTargetDocContent){
+                    var oCurParagraph = oTargetDocContent.GetCurrentParagraph();
+                    if(oCurParagraph){
+                        oTextPr = oCurParagraph.Internal_CompiledParaPrPresentation(undefined, true).TextPr;
+                        oTextPr2 = oTextPr.Copy();
+                        var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+                        for(i = 0; i < oContent.DocContent.Elements.length; ++i)
+                        {
+                            if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)
+                            {
+                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(true);
+                                oContent.DocContent.Elements[i].Element.AddToParagraph(oParaTextPr);
+                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(false);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            oTextPr = this.GetCalculatedTextPr();
             if(oTextPr && AscFormat.isRealNumber(oTextPr.FontSize))
             {
-                var oTextPr2 = new AscCommonWord.CTextPr();
+                oTextPr2 = new AscCommonWord.CTextPr();
                 oTextPr2.FontSize = oTextPr.FontSize;
-                var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+                oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
                 for(i = 0; i < oContent.DocContent.Elements.length; ++i)
                 {
                     if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)

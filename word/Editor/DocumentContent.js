@@ -472,6 +472,18 @@ CDocumentContent.prototype.IsLastTableCellInRow = function(isSelection)
 
 	return this.Parent.IsLastTableCellInRow(isSelection);
 };
+/**
+ * Проверяем находимся ли мы заголовке хоть какой-либо таблицы
+ * @returns {boolean}
+ */
+CDocumentContent.prototype.IsTableHeader = function()
+{
+	var oCell = this.IsTableCellContent(true);
+	if (oCell)
+		return oCell.IsInHeader(true);
+
+	return false;
+};
 CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
 	if (false === this.Parent.IsCell())
@@ -2834,6 +2846,10 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 					Item.CurPos.RealX = Item.CurPos.X;
 					Item.CurPos.RealY = Item.CurPos.Y;
 				}
+			}
+			else if (type_BlockLevelSdt === Item.GetType())
+			{
+				Item.AddToParagraph(ParaItem);
 			}
 			else
 			{
@@ -8392,14 +8408,6 @@ CDocumentContent.prototype.Concat_Paragraphs = function(Pos)
             this.Selection.EndPos = OldSelectionEndPos - 1;
     }
 };
-CDocumentContent.prototype.Get_ElementsCount = function()
-{
-    return this.Content.length;
-};
-CDocumentContent.prototype.Get_ElementByIndex = function(Index)
-{
-    return this.Content[Index];
-};
 CDocumentContent.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
     if (undefined === PosArray)
@@ -8744,6 +8752,10 @@ CDocumentContent.prototype.IsEmptyPage = function(nCurPage)
 
 	var nElementPageIndex = this.private_GetElementPageIndex(nStartPos, nCurPage, 0, 1);
 	return this.Content[nStartPos].IsEmptyPage(nElementPageIndex);
+};
+CDocumentContent.prototype.GetParent = function()
+{
+	return this.Parent;
 };
 
 function CDocumentContentStartState(DocContent)

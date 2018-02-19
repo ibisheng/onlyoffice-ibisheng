@@ -652,13 +652,15 @@ CTextBody.prototype =
         return {w: max_content, h: this.content.GetSummaryHeight()};
     },
 
-    Get_FirstParagraphNextCell: function(){
-        return null;
-    },
+	GetFirstElementInNextCell : function()
+	{
+		return null;
+	},
 
-    Get_LastParagraphPrevCell: function(){
-        return null;
-    },
+	GetLastElementInPrevCell : function()
+	{
+		return null;
+	},
 
     getRectWidth: function(maxWidth)
     {

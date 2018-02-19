@@ -1833,12 +1833,16 @@ function CDrawingDocument()
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
 				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 4;
+
+				AscCommon.g_inputContext.TargetOffsetY = (editor.WordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 			}
 			else
 			{
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.TargetHtmlElement);
 				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 9;
+
+				AscCommon.g_inputContext.TargetOffsetY = 0;
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;

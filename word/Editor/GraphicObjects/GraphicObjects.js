@@ -195,6 +195,7 @@ CGraphicObjects.prototype =
     handleAdjustmentHit: DrawingObjectsController.prototype.handleAdjustmentHit,
     handleHandleHit: DrawingObjectsController.prototype.handleHandleHit,
     handleMoveHit: DrawingObjectsController.prototype.handleMoveHit,
+    handleEnter: DrawingObjectsController.prototype.handleEnter,
 
     rotateTrackObjects: DrawingObjectsController.prototype.rotateTrackObjects,
     handleRotateTrack: DrawingObjectsController.prototype.handleRotateTrack,
@@ -203,6 +204,19 @@ CGraphicObjects.prototype =
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
     getConnectorsForCheck: DrawingObjectsController.prototype.getConnectorsForCheck,
     getConnectorsForCheck2: DrawingObjectsController.prototype.getConnectorsForCheck2,
+    checkDrawingHyperlink: DrawingObjectsController.prototype.checkDrawingHyperlink,
+
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionaObjects)
+    {
+        var check_type = AscCommon.changestype_Drawing_Props;
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, null, false, false) === false)
+        {
+            var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
+            History.Create_NewPoint(nPointType);
+            callback.apply(this, args);
+            this.document.Recalculate();
+        }
+    },
 
     AddContentControl: function(nContentControlType)
     {

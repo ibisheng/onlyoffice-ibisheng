@@ -94,6 +94,14 @@ CDocumentContentElementBase.prototype.Get_DocumentPrev = function()
 {
 	return this.Prev;
 };
+CDocumentContentElementBase.prototype.GetParent = function()
+{
+	return this.Parent;
+};
+CDocumentContentElementBase.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
 CDocumentContentElementBase.prototype.Set_Parent = function(oParent)
 {
 	this.Parent = oParent;

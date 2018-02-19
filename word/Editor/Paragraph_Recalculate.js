@@ -857,6 +857,9 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 				}
 			}
 
+			while (PrevElement && (PrevElement instanceof CBlockLevelSdt))
+				PrevElement = PrevElement.GetLastElement();
+
             if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
 			{
 				var PrevSectPr = PrevElement.Get_SectionPr();
@@ -1714,8 +1717,9 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
 
         PRSC.Reset( this, Range );
 
-		PRSC.Range.W    = 0;
-		PRSC.Range.WEnd = 0;
+		PRSC.Range.W      = 0;
+		PRSC.Range.WEnd   = 0;
+		PRSC.Range.WBreak = 0;
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
             PRSC.Range.W += this.Numbering.WidthVisible;
 
@@ -2046,16 +2050,17 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть обычное сравнение (см. баг 22586)
         //       Разница с NumTab возникла из-за бага 22586, везде нестрогое оставлять нельзя из-за бага 32051.
 
-        var _X1 = (X * 72 * 20) | 0;
-        var _X2 = ((TempTab.Pos + PageStart.X) * 72 * 20) | 0;
+        var twX      = AscCommon.MMToTwips(X);
+        var twTabPos = AscCommon.MMToTwips(TempTab.Pos + PageStart.X);
 
-        //if (X < TempTab.Pos + PageStart.X)
-        if ((true === NumTab && _X1 <= _X2) || (true !== NumTab && _X1 < _X2))
+        if ((true === NumTab && twX <= twTabPos) || (true !== NumTab && twX < twTabPos))
         {
             Tab = TempTab;
             break;
         }
     }
+
+    var isTabToRightEdge = false;
 
     var NewX = 0;
 
@@ -2077,6 +2082,19 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
             while ( X >= NewX - 0.001 )
                 NewX += DefTab;
         }
+
+		// Так работает Word: если таб начался в допустимом отрезке, а заканчивается вне его,
+		// то мы ограничиваем его правым полем документа, но только если правый отступ параграфа
+		// неположителен (<= 0). (смотри bug 32345)
+        var twX      = AscCommon.MMToTwips(X);
+        var twEndPos = AscCommon.MMToTwips(PageStart.XLimit);
+        var twNewX   = AscCommon.MMToTwips(NewX);
+
+        if (twX < twEndPos && twNewX >= twEndPos && AscCommon.MMToTwips(ParaPr.Ind.Right) <= 0)
+		{
+			NewX = PageStart.XLimit;
+			isTabToRightEdge = true;
+		}
     }
     else
     {
@@ -2084,10 +2102,13 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     }
 
 	return {
-		NewX       : NewX,
-		TabValue   : Tab ? Tab.Value : tab_Left,
-		DefaultTab : Tab ? false : true,
-		TabLeader  : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None
+		NewX         : NewX,
+		TabValue     : Tab ? Tab.Value : tab_Left,
+		DefaultTab   : Tab ? false : true,
+		TabLeader    : Tab ? Tab.Leader : Asc.c_oAscTabLeader.None,
+		TabRightEdge : isTabToRightEdge,
+		PageX        : PageStart.X,
+		PageXLimit   : PageStart.XLimit
 	};
 };
 
@@ -2167,9 +2188,9 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 		//      страницу параграфа разместить в какой либо колонке (пересчитывая их по очереди), если параграф
 		//      все равно не рассчитан до конца, тогда размещаем его в первой колонке и делаем перенос на следующую
 		//      страницу.
-		if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
+		if (true === ParaPr.KeepLines && this.LogicDocument && this.LogicDocument.GetCompatibilityMode && false === bSkipWidowAndKeepLines)
 		{
-			var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
+			var CompatibilityMode = this.LogicDocument.GetCompatibilityMode();
 			if (CompatibilityMode <= document_compatibility_mode_Word14)
 			{
 				if (null != this.Get_DocumentPrev() && true != this.Parent.IsTableCellContent() && 0 === CurPage)
@@ -2515,6 +2536,7 @@ function CParaLineRange(X, XEnd)
     this.W         = 0;
     this.Spaces    = 0;    // Количество пробелов в отрезке, без учета пробелов в конце отрезка
 	this.WEnd      = 0;    // Если есть знак конца параграфа в данном отрезке, то это его ширина
+	this.WBreak    = 0;    // Если в конце отрезка есть разрыв строки/колонки/страницы
 }
 
 CParaLineRange.prototype =

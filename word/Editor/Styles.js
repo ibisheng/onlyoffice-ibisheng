@@ -5451,6 +5451,14 @@ CTableMeasurement.prototype.IsPercent = function()
 {
 	return !!(tblwidth_Pct === this.Type);
 };
+/**
+ * Получаем значение ширины в процентах или в миллиметрах
+ * @returns {number}
+ */
+CTableMeasurement.prototype.GetValue = function()
+{
+	return this.W;
+};
 
 function CTablePr()
 {
@@ -10631,7 +10639,7 @@ CParaPr.prototype =
                     case AscFormat.BULLET_TYPE_SIZE_PTS:{
                         Bullet.m_bSizeTx = false;
                         Bullet.m_bSizePct = false;
-                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100.0;
                         break;
                     }
                 }

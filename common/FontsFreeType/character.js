@@ -164,6 +164,9 @@
             if (!this.IsUseNoSquaresMode)
                 return false;
 
+            if (!_text)
+            	return false;
+
 			var oldCount = this.FontsByRangeCount;
             for (var i = _text.getUnicodeIterator(); i.check(); i.next())
             {
@@ -176,6 +179,9 @@
         {
             if (!this.IsUseNoSquaresMode)
                 return false;
+
+			if (!_array)
+				return false;
 
             var oldCount = this.FontsByRangeCount;
             for (var i = 0; i < _array.length; ++i)
@@ -190,7 +196,7 @@
 			return this.ExtendFontsByRangeCount != this.FontsByRangeCount;
 		},
 
-		extendFonts : function(fonts)
+		extendFonts : function(fonts, isNoRealExtend)
 		{
             if (this.ExtendFontsByRangeCount == this.FontsByRangeCount)
             	return;
@@ -212,7 +218,53 @@
 					fonts[fonts.length] = new AscFonts.CFont(this.FontsByRange[i], 0, "", 0, null);
 			}
 
-            this.ExtendFontsByRangeCount = this.FontsByRangeCount;
+			if (true !== isNoRealExtend)
+				this.ExtendFontsByRangeCount = this.FontsByRangeCount;
+		},
+
+		checkTextLight : function(text, isCodes)
+		{
+			if (isCodes !== true)
+			{
+				if (!this.getFontsByString(text))
+					return false;
+			}
+			else
+			{
+				if (!this.getFontsByString2(text))
+					return false;
+			}
+
+			var fonts = [];
+			this.extendFonts(fonts, true);
+
+			if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
+				return false;
+
+			return true;
+		},
+
+		loadFonts : function(_this, _callback)
+		{
+			var fonts = [];
+			this.extendFonts(fonts);
+
+			this.CallbackObj._this = _this;
+			this.CallbackObj._callback = _callback;
+
+			var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_editor.asyncMethodCallback = function() {
+
+				var _t = AscFonts.FontPickerByCharacter.CallbackObj;
+				_t._callback.call(_t._this);
+
+				_t._this = null;
+				_t._callback = null;
+
+			};
+
+			AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
+			return true;
 		},
 
 		checkText : function(text, _this, _callback, isCodes, isOnlyAsync)

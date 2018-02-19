@@ -580,6 +580,22 @@ function CheckSpPrXfrm2(object)
     }
 
 }
+    function CheckSpPrXfrm3(object)
+    {
+        if(!object.spPr)
+        {
+            object.setSpPr(new AscFormat.CSpPr());
+            object.spPr.setParent(object);
+        }
+        if(!object.spPr.xfrm) {
+            object.spPr.setXfrm(new AscFormat.CXfrm());
+            object.spPr.xfrm.setParent(object.spPr);
+        }
+        object.spPr.xfrm.setOffX(object.x);
+        object.spPr.xfrm.setOffY(object.y);
+        object.spPr.xfrm.setExtX(object.extX);
+        object.spPr.xfrm.setExtY(object.extY);
+    }
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
@@ -722,6 +738,26 @@ function CanStartEditText(oController)
 
 DrawingObjectsController.prototype =
 {
+
+    checkDrawingHyperlink: function(drawing, e){
+        var oApi = this.getEditorApi();
+        if(!oApi){
+            return;
+        }
+        if(this.document || this.drawingObjects && this.drawingObjects.cSld){
+            if(e.CtrlKey){
+                var oNvPr = drawing.getNvProps();
+                if(oNvPr && oNvPr.hlinkClick && oNvPr.hlinkClick.id !== null){
+                    editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
+                    return true;
+                }
+            }
+        }
+        else if(this.drawingObjects){
+
+        }
+        return false;
+    },
 
     getAllSignatures: function(){
         var _ret = [];
@@ -2013,6 +2049,104 @@ DrawingObjectsController.prototype =
     setParagraphBorders: function(Value)
     {
         this.applyTextFunction(CDocumentContent.prototype.SetParagraphBorders, CTable.prototype.SetParagraphBorders, [Value]);
+    },
+
+
+    handleEnter: function(){
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var aSelectedObjects2 = oSelector.selectedObjects;
+        var nRet = 0;
+        if(aSelectedObjects2.length === 1){
+            var oSelectedObject = aSelectedObjects2[0];
+            var nObjectType = oSelectedObject.getObjectType();
+            var oContent;
+            switch(nObjectType){
+                case AscDFH.historyitem_type_Shape:{
+                    oContent = oSelectedObject.getDocContent();
+                    if(!oContent){
+                        if(!CheckLinePresetForParagraphAdd(oSelectedObject.getPresetGeom())){
+                            this.checkSelectedObjectsAndCallback(function () {
+                                if(oSelectedObject.bWordShape){
+                                    oSelectedObject.createTextBoxContent();
+                                }
+                                else {
+                                    oSelectedObject.createTextBody();
+                                }
+                                oContent = oSelectedObject.getDocContent();
+                                if(oContent){
+                                    oContent.MoveCursorToStartPos();
+                                    oSelector.selection.textSelection = oSelectedObject;
+                                }
+                                nRet |= 1;
+                                nRet |= 2;
+                            }, [], false, undefined, [], undefined);
+                        }
+                    }
+                    else{
+                        if(oContent.IsEmpty()){
+                            oContent.MoveCursorToStartPos();
+                        }
+                        else{
+                            oContent.SelectAll();
+                        }
+                        nRet |= 1;
+                        if(oSelectedObject.isEmptyPlaceholder()){
+                            nRet |= 2;
+                        }
+                        oSelector.selection.textSelection = oSelectedObject;
+                    }
+                    break;
+                }
+                case AscDFH.historyitem_type_ChartSpace:{
+                    if(oSelector.selection.chartSelection === oSelectedObject){
+                        if(oSelectedObject.selection.title){
+                            oContent = oSelectedObject.selection.title.getDocContent();
+                            if(oContent.IsEmpty()){
+                                oContent.MoveCursorToStartPos();
+                            }
+                            else{
+                                oContent.SelectAll();
+                            }
+                            nRet |= 1;
+                            oSelectedObject.selection.textSelection = oSelectedObject.selection.title;
+                        }
+                    }
+                    break;
+                }
+                case AscDFH.historyitem_type_GraphicFrame: {
+                    var oTable = oSelectedObject.graphicObject;
+                    if(oSelector.selection.textSelection === oSelectedObject){
+                        var oTableSelection = oTable.Selection;
+                        if(oTableSelection.Type === table_Selection_Cell){
+                            this.checkSelectedObjectsAndCallback(function () {
+                                oTable.Remove(-1);
+                                oTable.RemoveSelection();
+                                nRet |= 1;
+                                nRet |= 2;
+                            }, [], false, undefined, [], undefined);
+                        }
+                    }
+                    else{
+                        oTable.MoveCursorToStartPos(false);
+                        var oCurCell = oTable.CurCell;
+                        if(oCurCell && oCurCell.Content){
+                            if(!oCurCell.Content.IsEmpty()){
+                                oCurCell.Content.SelectAll();
+                                oTable.Selection.Use          = true;
+                                oTable.Selection.Type         = table_Selection_Text;
+                                oTable.Selection.StartPos.Pos = {Row : oCurCell.Row.Index, Cell : oCurCell.Index};
+                                oTable.Selection.EndPos.Pos   = {Row : oCurCell.Row.Index, Cell : oCurCell.Index};
+                                oTable.Selection.CurRow       = oCurCell.Row.Index;
+                            }
+                            oSelector.selection.textSelection = oSelectedObject;
+                            nRet |= 1;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return nRet;
     },
 
     applyTextFunction: function(docContentFunction, tableFunction, args)
@@ -5985,9 +6119,14 @@ DrawingObjectsController.prototype =
                     this.recalculate();
                 }
             }
-            else
-            {
-                //TODO: this.selectNextObject(!e.shiftKey ? 1 : -1);
+            else{
+                var nResult = this.handleEnter();
+                if(nResult & 1){
+                    this.updateSelectionState();
+                    if(this.drawingObjects && this.drawingObjects.sendGraphicObjectProps){
+                        this.drawingObjects.sendGraphicObjectProps();
+                    }
+                }
             }
             bRetValue = true;
         }
@@ -11281,6 +11420,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 {
                     case 0:
                     case 1:
+                    case 8:
                     {
                         return "Arial";
                     }
@@ -11534,6 +11674,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     window['AscFormat'].CompareGroups = CompareGroups;
     window['AscFormat'].CheckSpPrXfrm = CheckSpPrXfrm;
     window['AscFormat'].CheckSpPrXfrm2 = CheckSpPrXfrm2;
+    window['AscFormat'].CheckSpPrXfrm3 = CheckSpPrXfrm3;
     window['AscFormat'].getObjectsByTypesFromArr = getObjectsByTypesFromArr;
     window['AscFormat'].getTargetTextObject = getTargetTextObject;
     window['AscFormat'].DrawingObjectsController = DrawingObjectsController;
