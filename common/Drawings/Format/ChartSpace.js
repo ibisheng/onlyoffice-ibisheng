@@ -10013,7 +10013,7 @@ CChartSpace.prototype.getValAxisValues = function()
         this.chartObj = new AscFormat.CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-	return [].concat(this.chart.plotArea.valAx.scale);
+	return [].concat(this.chartObj.calcProp.scale);
 };
 
 CChartSpace.prototype.getCalcProps = function()
