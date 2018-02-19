@@ -1255,7 +1255,8 @@ CChartsDrawer.prototype =
 			var minMaxAxis = getMinMaxCurCharts(axisCharts, axObj);
 			axObj.min = minMaxAxis.min;
 			axObj.max = minMaxAxis.max;
-			axObj.scale = this._roundValues(this._getAxisValues(false, minMaxAxis.min, minMaxAxis.max, chartSpace));
+			//если будут проблемы, протестить со старой функцией -> this._getAxisValues(false, minMaxAxis.min, minMaxAxis.max, chartSpace)
+			axObj.scale = this._roundValues(this._getAxisValues2(axObj, chartSpace));
 		}
 	},
 
@@ -1453,7 +1454,7 @@ CChartsDrawer.prototype =
 		}
 		
 		//максимальное и минимальное значение(по документации excel)
-		var trueMinMax = this._getTrueMinMax(isOx, yMin, yMax);
+		var trueMinMax = this._getTrueMinMax(yMin, yMax);
 		
 		var manualMin;
 		var manualMax;
@@ -1576,11 +1577,133 @@ CChartsDrawer.prototype =
 		return arrayValues;
 	},
 
-	_correctDataValuesFromHeight: function(props, chartProp, isOxAxis)
+	_getAxisValues2: function (axis, chartSpace) {
+		//chartProp.chart.plotArea.valAx.scaling.logBase
+		var axisMin, axisMax, firstDegree, step, arrayValues;
+
+		if (axis.scaling && axis.scaling.logBase) {
+			arrayValues = this._getLogArray(yMin, yMax, axis.scaling.logBase);
+			return arrayValues;
+		}
+
+		//максимальное и минимальное значение(по документации excel)
+		var yMin = axis.min;
+		var yMax = axis.max;
+		var trueMinMax = this._getTrueMinMax(yMin, yMax);
+
+		var manualMin = axis.scaling && axis.scaling.min !== null ? axis.scaling.min : null;
+		var manualMax = axis.scaling && axis.scaling.max !== null ? axis.scaling.max : null;
+
+		//TODO пересмотреть зависимость значений оси от типа диаграммы
+		if (this.calcProp.subType === 'stackedPer' && manualMin != null) {
+			manualMin = manualMin * 100;
+		}
+		if (this.calcProp.subType === 'stackedPer' && manualMax != null) {
+			manualMax = manualMax * 100;
+		}
+
+		//TODO временная проверка для некорректных минимальных и максимальных значений
+		if (manualMax && manualMin && manualMax < manualMin) {
+			if (manualMax < 0) {
+				manualMax = 0;
+			} else {
+				manualMin = 0;
+			}
+		}
+
+		axisMin = manualMin !== null && manualMin !== undefined ? manualMin : trueMinMax.min;
+		axisMax = manualMax !== null && manualMax !== undefined ? manualMax : trueMinMax.max;
+
+		//TODO пересмотреть зависимость значений оси от типа диаграммы
+		var percentChartMax = 100;
+		if (this.calcProp.subType === 'stackedPer' && axisMax > percentChartMax && manualMax === null) {
+			axisMax = percentChartMax;
+		}
+		if (this.calcProp.subType === 'stackedPer' && axisMin < -percentChartMax && manualMin === null) {
+			axisMin = -percentChartMax;
+		}
+
+		if (axisMax < axisMin) {
+			manualMax = 2 * axisMin;
+			axisMax = manualMax;
+		}
+
+		//приводим к первому порядку
+		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
+
+		var bIsManualStep = false;
+		//находим шаг
+		if (axis && axis.majorUnit !== null) {
+			step = axis.majorUnit;
+			bIsManualStep = true;
+			if (this.calcProp.subType === 'stackedPer') {
+				step = step * 100;
+			}
+		} else {
+			//было следующее условие - isOx || c_oChartTypes.HBar === this.calcProp.type
+			if (axis.axPos === window['AscFormat'].AX_POS_B || axis.axPos === window['AscFormat'].AX_POS_T) {
+				step = this._getStep(firstDegree.val + (firstDegree.val / 10) * 3);
+			} else {
+				step = this._getStep(firstDegree.val);
+			}
+
+			step = step * firstDegree.numPow;
+		}
+
+		//TODO пересмотреть зависимость значений оси от типа диаграммы
+		if (isNaN(step) || step === 0) {
+			if ('HBar' === this.calcProp.type && this.calcProp.subType === 'stackedPer') {
+				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1];
+			} else if (this.calcProp.subType === 'stackedPer') {
+				arrayValues = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+			} else {
+				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
+			}
+		} else {
+			arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
+		}
+
+		//проверка на переход в другой диапазон из-за ограничения по высоте
+		if (!bIsManualStep) {
+			var props = {
+				arrayValues: arrayValues,
+				step: step,
+				axisMin: axisMin,
+				axisMax: axisMax,
+				manualMin: manualMin,
+				manualMax: manualMax
+			};
+			arrayValues = this._correctDataValuesFromHeight(props, chartSpace);
+		}
+
+		//TODO для 3d диаграмм. пересмотреть!
+		if (this._isSwitchCurrent3DChart(chartSpace)) {
+			if (this.calcProp.max > 0 && this.calcProp.min < 0) {
+				if (manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2]) {
+					arrayValues.splice(arrayValues.length - 1, 1);
+				}
+				if (manualMin == null && this.calcProp.min >= arrayValues[1]) {
+					arrayValues.splice(0, 1);
+				}
+			} else if (this.calcProp.max > 0 && this.calcProp.min >= 0) {
+				if (manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2]) {
+					arrayValues.splice(arrayValues.length - 1, 1);
+				}
+			} else if (this.calcProp.min < 0 && this.calcProp.max <= 0) {
+				if (manualMin == null && this.calcProp.min >= arrayValues[1]) {
+					arrayValues.splice(0, 1);
+				}
+			}
+		}
+
+		return arrayValues;
+	},
+
+	_correctDataValuesFromHeight: function(props, chartSpace, isOxAxis)
 	{
 		var res = props.arrayValues;
-		var heightCanvas = chartProp.extY * this.calcProp.pxToMM;
-		var margins = this._calculateMarginsChart(chartProp, true);
+		var heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
+		var margins = this._calculateMarginsChart(chartSpace, true);
 		var trueHeight = heightCanvas - margins.top - margins.bottom;
 
 		var axisMin = props.axisMin;
@@ -1820,7 +1943,7 @@ CChartsDrawer.prototype =
 		return step;
 	},
 	
-	_getTrueMinMax : function(isOx, yMin, yMax)
+	_getTrueMinMax : function(yMin, yMax)
 	{
 		var axisMax, axisMin, diffPerMaxMin;
 		if(yMin >= 0 && yMax >= 0)
