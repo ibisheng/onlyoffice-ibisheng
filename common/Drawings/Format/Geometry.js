@@ -1162,32 +1162,39 @@ Geometry.prototype=
         CalculateAhPolarList(this.ahPolarLstInfo, this.ahPolarLst, this.gdLst);
         for(var i=0, n=this.pathLst.length; i<n; i++)
             this.pathLst[i].recalculate(this.gdLst, bResetPathsInfo);
-        if(this.rectS!=undefined)
+
+        this.rect = {};
+        if(this.rectS)
         {
-            this.rect={};
-            this.rect.l=this.gdLst[this.rectS.l];
-            if(this.rect.l===undefined)
+            this.rect.l = this.gdLst[this.rectS.l];
+            if(this.rect.l === undefined)
             {
-                this.rect.l=parseInt(this.rectS.l);
+                this.rect.l = parseInt(this.rectS.l);
             }
 
-            this.rect.t=this.gdLst[this.rectS.t];
-            if(this.rect.t===undefined)
+            this.rect.t = this.gdLst[this.rectS.t];
+            if(this.rect.t === undefined)
             {
-                this.rect.t=parseInt(this.rectS.t);
+                this.rect.t = parseInt(this.rectS.t);
             }
 
-            this.rect.r=this.gdLst[this.rectS.r];
-            if(this.rect.r===undefined)
+            this.rect.r = this.gdLst[this.rectS.r];
+            if(this.rect.r === undefined)
             {
-                this.rect.r=parseInt(this.rectS.r);
+                this.rect.r = parseInt(this.rectS.r);
             }
 
-            this.rect.b=this.gdLst[this.rectS.b];
-            if(this.rect.b===undefined)
+            this.rect.b = this.gdLst[this.rectS.b];
+            if(this.rect.b === undefined)
             {
-                this.rect.b=parseInt(this.rectS.b);
+                this.rect.b = parseInt(this.rectS.b);
             }
+        }
+        else{
+            this.rect.l = this.gdLst["l"];
+            this.rect.t = this.gdLst["t"];
+            this.rect.r = this.gdLst["r"];
+            this.rect.b = this.gdLst["b"];
         }
         if(bResetPathsInfo){
             delete this.gdLst;
