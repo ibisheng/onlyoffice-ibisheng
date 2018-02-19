@@ -464,8 +464,8 @@ Paragraph.prototype.GetContentBounds = function(CurPage)
 			if (null === Left || Left > oRange.XVisible)
 				Left = oRange.XVisible;
 
-			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd)
-				Right = oRange.XVisible + oRange.W + oRange.WEnd;
+			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak)
+				Right = oRange.XVisible + oRange.W + oRange.WEnd + oRange.WBreak;
 		}
 
 
@@ -1125,7 +1125,7 @@ Paragraph.prototype.Check_PageBreak = function()
 Paragraph.prototype.Check_BreakPageEnd = function(Item)
 {
 	// Последний параграф с разрывом страницы не проверяем. Так делает Word.
-	if (null === this.Get_DocumentNext())
+	if (this.Parent instanceof CDocument && null === this.Get_DocumentNext())
 		return false;
 
 	var PBChecker = new CParagraphCheckPageBreakEnd(Item);

@@ -3344,8 +3344,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if (break_Page === Item.BreakType)
                             PRS.BreakRealPageLine = true;
 
-						// PageBreak вне самого верхнего документа не надо учитывать
-						if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
+						// Учитываем разрыв страницы/колонки, только если мы находимся в главной части документа, либо
+						// во вложенной в нее SdtContent (вложение может быть многоуровневым)
+                        var oParent = Para.Parent;
+                        while (oParent instanceof CDocumentContent && oParent.IsBlockLevelSdtContent())
+							oParent = oParent.GetParent().GetParent();
+
+						if (!(oParent instanceof CDocument) || true !== Para.Is_Inline())
 						{
 							// TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
 							//       иначе будут проблемы с совместным редактированием.
@@ -3850,6 +3855,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
                 PRSC.SpacesCount = 0;
                 PRSC.Word        = false;
+
+                PRSC.Range.WBreak = Item.Get_WidthVisible();
 
                 break;
             }

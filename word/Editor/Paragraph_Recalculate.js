@@ -857,6 +857,9 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 				}
 			}
 
+			while (PrevElement && (PrevElement instanceof CBlockLevelSdt))
+				PrevElement = PrevElement.GetLastElement();
+
             if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
 			{
 				var PrevSectPr = PrevElement.Get_SectionPr();
@@ -1714,8 +1717,9 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
 
         PRSC.Reset( this, Range );
 
-		PRSC.Range.W    = 0;
-		PRSC.Range.WEnd = 0;
+		PRSC.Range.W      = 0;
+		PRSC.Range.WEnd   = 0;
+		PRSC.Range.WBreak = 0;
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
             PRSC.Range.W += this.Numbering.WidthVisible;
 
@@ -2532,6 +2536,7 @@ function CParaLineRange(X, XEnd)
     this.W         = 0;
     this.Spaces    = 0;    // Количество пробелов в отрезке, без учета пробелов в конце отрезка
 	this.WEnd      = 0;    // Если есть знак конца параграфа в данном отрезке, то это его ширина
+	this.WBreak    = 0;    // Если в конце отрезка есть разрыв строки/колонки/страницы
 }
 
 CParaLineRange.prototype =

@@ -2847,6 +2847,10 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 					Item.CurPos.RealY = Item.CurPos.Y;
 				}
 			}
+			else if (type_BlockLevelSdt === Item.GetType())
+			{
+				Item.AddToParagraph(ParaItem);
+			}
 			else
 			{
 				// TODO: PageBreak в таблице не ставим
@@ -8748,6 +8752,10 @@ CDocumentContent.prototype.IsEmptyPage = function(nCurPage)
 
 	var nElementPageIndex = this.private_GetElementPageIndex(nStartPos, nCurPage, 0, 1);
 	return this.Content[nStartPos].IsEmptyPage(nElementPageIndex);
+};
+CDocumentContent.prototype.GetParent = function()
+{
+	return this.Parent;
 };
 
 function CDocumentContentStartState(DocContent)

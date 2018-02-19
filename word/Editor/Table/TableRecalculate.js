@@ -185,6 +185,9 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
 
     var PrevElement = this.Get_DocumentPrev();
 
+	while (PrevElement && (PrevElement instanceof CBlockLevelSdt))
+		PrevElement = PrevElement.GetLastElement();
+
     if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
 	{
 		var PrevSectPr = PrevElement.Get_SectionPr();

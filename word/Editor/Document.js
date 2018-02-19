@@ -12651,6 +12651,10 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				Item.CurPos.RealY = Item.CurPos.Y;
 			}
 		}
+		else if (type_BlockLevelSdt === Item.GetType())
+		{
+			Item.AddToParagraph(ParaItem);
+		}
 		else
 		{
 			// TODO: PageBreak в таблице не ставим

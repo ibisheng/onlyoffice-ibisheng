@@ -1161,6 +1161,18 @@ CBlockLevelSdt.prototype.ClearContentControl = function()
 	this.Content.Remove_FromContent(1, this.Content.GetElementsCount() - 1);
 	this.Content.MoveCursorToStartPos(false);
 };
+/**
+ * Получаем последний элемент содержимого
+ * @returns {?CDocumentContentElementBase}
+ */
+CBlockLevelSdt.prototype.GetLastElement = function()
+{
+	var nCount = this.Content.GetElementsCount();
+	if (nCount <= 0)
+		return null;
+
+	return this.Content.GetElement(nCount - 1);
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

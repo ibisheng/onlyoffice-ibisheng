@@ -1022,3 +1022,10 @@ CDocumentContentBase.prototype.IsTableHeader = function()
 {
 	return false;
 };
+/**
+ * Получаем родительский класс
+ */
+CDocumentContentBase.prototype.GetParent = function()
+{
+	return null;
+};
