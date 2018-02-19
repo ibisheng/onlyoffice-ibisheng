@@ -2479,7 +2479,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
                 default_style.ParaPr.Merge(default_ppt_style.Copy());
                 default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
-            //if(!isRealObject(parent_objects.master) || !isRealObject(parent_objects.master.txStyles))
+            if(!isRealObject(parent_objects.master) || !isRealObject(parent_objects.master.txStyles) || !this.isPlaceholder())
             {
                 if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
                 {
