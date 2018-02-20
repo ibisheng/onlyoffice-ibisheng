@@ -11161,8 +11161,12 @@ drawBubbleChart.prototype = {
 
 
 /** @constructor */
-function drawSurfaceChart()
+function drawSurfaceChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
@@ -11179,7 +11183,14 @@ drawSurfaceChart.prototype =
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
-		
+
+		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
+		this.seriesCount = countSeries.series;
+		this.ptCount = countSeries.points;
+		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
+		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
+
 		this._recalculate();
 	},
 	
@@ -11194,24 +11205,14 @@ drawSurfaceChart.prototype =
 	
 	_recalculate: function()
 	{
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		
-		/*var roundInt = 1;
-		if(this.chartProp.axisStep)
-		{
-			var roundProps = this.cChartDrawer._getFirstDegree(this.chartProp.axisStep);
-			var roundProp = roundProps.numPow.toString().split('.');
-			var roundCount = roundProp && roundProp[1] ? roundProp[1].length : 0;
-			roundInt = Math.pow(10, roundCount + 1);
-		}*/
-		
-		//var roundKF = this.chartProp.axisStep;
+
 		var y, x, z, val, seria, dataSeries, idx, numCache, idxPoint, points = [], points3d = [], idx2, val2;
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-			seria = this.chartProp.series[i];
-			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
+		for (var i = 0; i < this.chart.series.length; i++) {
+			seria = this.chart.series[i];
+			numCache = this.cChartDrawer.getNumCache(seria.val);
 			
 			if(!numCache)
 			{
@@ -11219,7 +11220,7 @@ drawSurfaceChart.prototype =
 			}
 			
 			dataSeries = numCache.pts;
-			for(var n = 0; n < this.chartProp.ptCount; n++)
+			for(var n = 0; n < this.ptCount; n++)
 			{	
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
@@ -11232,7 +11233,7 @@ drawSurfaceChart.prototype =
 				
 				x  = xPoints[n].pos * this.chartProp.pxToMM;
 				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
-				z = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
+				z = (perspectiveDepth / (this.chart.series.length - 1)) * (i);
 				
 				//рассчитываем значения
 				idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;
@@ -11243,14 +11244,6 @@ drawSurfaceChart.prototype =
 				if(null === val2){
 					val2 = 0;
 				}
-				
-				if(idx2 !== null)
-				{	
-					var x2  = xPoints[n + 1].pos * this.chartProp.pxToMM;
-					var y2  = this.cChartDrawer.getYPosition(val2, yPoints) * this.chartProp.pxToMM;
-					var z2 = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
-				}
-				
 				
 				if(!points)
 					points = [];
@@ -11352,16 +11345,17 @@ drawSurfaceChart.prototype =
 			}
 			
 			//разбиваем диагональю данный сегмент на два сегмента
+			var lines1, pointsValue1, lines2, pointsValue2;
 			if(p1.val + p2.val < p21.val + p.val)
 			{	
 				//добавляем диагональ
 				lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
 				//this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
 				
-				var lines1 = [lines[0], lines[3], lines[4]];
-				var pointsValue1 = [p, p21, p2];
-				var lines2 = [lines[2], lines[1], lines[4]];
-				var pointsValue2 = [p, p1, p21];
+				lines1 = [lines[0], lines[3], lines[4]];
+				pointsValue1 = [p, p21, p2];
+				lines2 = [lines[2], lines[1], lines[4]];
+				pointsValue2 = [p, p1, p21];
 			}
 			else
 			{
@@ -11369,10 +11363,10 @@ drawSurfaceChart.prototype =
 				lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
 				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
 				
-				var lines1 = [lines[2], lines[0], lines[4]];
-				var pointsValue1 = [p, p1, p2];
-				var lines2 = [lines[4], lines[1], lines[3]];
-				var pointsValue2 = [p2, p1, p21];
+				lines1 = [lines[2], lines[0], lines[4]];
+				pointsValue1 = [p, p1, p2];
+				lines2 = [lines[4], lines[1], lines[3]];
+				pointsValue2 = [p2, p1, p21];
 			}
 			
 			//для поверхностных диаграмм без заливки
@@ -11483,8 +11477,8 @@ drawSurfaceChart.prototype =
 	_getIntersectionPlanesAndLines: function(lines, pointsValue, bIsAddIntoPaths)
 	{
 		var t = this;
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		var getGridPlain = function(index)
@@ -11626,13 +11620,13 @@ drawSurfaceChart.prototype =
 				}
 			}
 			
-			var arrPoints = null;
+			var arrPoints = null, p1, p2, p3, p4;
 			if(null !== points && prevPoints)
 			{
-				var p1 = prevPoints[0];
-				var p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
-				var p3 = points[0];
-				var p4 = points[1] ? points[1] : points[0];
+				p1 = prevPoints[0];
+				p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
+				p3 = points[0];
+				p4 = points[1] ? points[1] : points[0];
 				
 				arrPoints = [p1, p2, p3, p4];
 				if(points[2])
@@ -11643,10 +11637,10 @@ drawSurfaceChart.prototype =
 			}
 			else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
 			{
-				var p1 = prevPoints[0];
-				var p2 = prevPoints[1];
-				var p3 = prevPoints[2];
-				var p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
+				p1 = prevPoints[0];
+				p2 = prevPoints[1];
+				p3 = prevPoints[2];
+				p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
 				
 				arrPoints = [p1, p2, p3, p4];
 				res[k] = arrPoints;
@@ -11707,19 +11701,20 @@ drawSurfaceChart.prototype =
 				}
 			}
 		}
-		
+
+		var p1, p2;
 		if(!segmentIntersectionPoints.length)
 		{
 			if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
 			{
-				var p1 = clearIntersectionPoints[0];
-				var p2 = clearIntersectionPoints[1];
+				p1 = clearIntersectionPoints[0];
+				p2 = clearIntersectionPoints[1];
 				
 				res = [p1, p2];
 			}
 			else if(clearIntersectionPoints.length === 1)//одна точка, не равняющиеся ни одной точке сегмента
 			{
-				var p1 = clearIntersectionPoints[0];
+				p1 = clearIntersectionPoints[0];
 				
 				res = [p1];
 			}
@@ -11728,8 +11723,8 @@ drawSurfaceChart.prototype =
 		{
 			if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
 			{
-				var p1 = segmentIntersectionPoints[0];
-				var p2 = clearIntersectionPoints[0];
+				p1 = segmentIntersectionPoints[0];
+				p2 = clearIntersectionPoints[0];
 				
 				res = [p1, p2];
 			}
@@ -11738,14 +11733,14 @@ drawSurfaceChart.prototype =
 		{
 			if(2 === segmentIntersectionPoints.length)
 			{
-				var p1 = segmentIntersectionPoints[0];
-				var p2 = segmentIntersectionPoints[1];
+				p1 = segmentIntersectionPoints[0];
+				p2 = segmentIntersectionPoints[1];
 				
 				res = [p1, p2];
 			}
 			else if(1 === segmentIntersectionPoints.length)
 			{
-				var p1 = segmentIntersectionPoints[0];
+				p1 = segmentIntersectionPoints[0];
 				
 				res = [p1];
 			}
@@ -11828,7 +11823,7 @@ drawSurfaceChart.prototype =
 	
 	_getYVal: function(n, i)
 	{
-		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+		var idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[i], n);
 		var val = idxPoint ? parseFloat(idxPoint.val) : null;
 		
 		return val;
@@ -11858,16 +11853,7 @@ drawSurfaceChart.prototype =
 	
 	_draw: function()
 	{
-		for(var i = 0; i < this.paths.test.length; i++)
-		{
-			var pen = this.cChartSpace.chart.plotArea.catAx.compiledLn;
-			//pen.w = 20000;
-			
-			//this.cChartDrawer.drawPath(this.paths.test[i], pen, null, false);
-		}
-		
 		var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.cChartSpace.style);
-		var base_fills = AscFormat.getArrayFillsFromBase(style.fill2, 20);    
 	
 		for(var i = 0; i < this.paths.test2.length; i++)
 		{
@@ -11876,7 +11862,7 @@ drawSurfaceChart.prototype =
 				
 			for(var j = 0; j < this.paths.test2[i].length; j++)
 			{
-				var style = this.cChartSpace.chart.plotArea.chart.compiledBandFormats[i - 1];
+				style = this.chart.compiledBandFormats[i - 1];
 				var brush = style && style.spPr ? style.spPr.Fill : null;
 				var pen = style && style.spPr ? style.spPr.ln : null;
 				
