@@ -4548,6 +4548,17 @@ CDocument.prototype.GetCursorPosXY = function()
 {
 	return this.Controller.GetCursorPosXY();
 };
+/**
+ * Получаем точное физическое положение курсора
+ * @returns {{X: number, Y: number}}
+ */
+CDocument.prototype.GetCursorRealPosition = function()
+{
+	return {
+		X : this.CurPos.RealX,
+		Y : this.CurPos.RealY
+	};
+};
 CDocument.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
 	this.Reset_WordSelection();

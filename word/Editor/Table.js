@@ -11824,6 +11824,14 @@ CTable.prototype.StartSelectionFromCurPos = function()
 	this.Selection.EndPos.Pos   = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
 	this.private_UpdateSelectedCellsArray();
 
+	var oLogicDocument = this.LogicDocument;
+	if (oLogicDocument)
+	{
+		var oRealPos              = oLogicDocument.GetCursorRealPosition();
+		this.Selection.StartPos.X = oRealPos.X;
+		this.Selection.StartPos.Y = oRealPos.Y;
+	}
+
 	// В функции private_UpdateSelectedCellsArray выставляется тип по ячеейкам, но нам нужен внутри ячейки изначальный селект
 	this.Selection.Type   = table_Selection_Text;
 	this.Selection.CurRow = this.CurCell.Row.Index;
