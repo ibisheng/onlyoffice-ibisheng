@@ -332,7 +332,7 @@ function MoveGroupTrack(originalObject)
             this.x = 0;
             this.y = 0;
         }
-        AscFormat.CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm3(this.originalObject);
         var xfrm = this.originalObject.spPr.xfrm;
 
 

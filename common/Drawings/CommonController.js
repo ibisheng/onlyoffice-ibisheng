@@ -739,24 +739,124 @@ function CanStartEditText(oController)
 DrawingObjectsController.prototype =
 {
 
-    checkDrawingHyperlink: function(drawing, e){
+    checkDrawingHyperlink: function(drawing, e, hit_in_text_rect, x, y){
         var oApi = this.getEditorApi();
         if(!oApi){
             return;
         }
+
+
+        //
+        // if( this.document || (this.drawingObjects.cSld && !(this.noNeedUpdateCursorType === true)) )
+        // {
+        //     var nPageIndex = pageIndex;
+        //     if(this.drawingObjects.cSld && !( this.noNeedUpdateCursorType === true ) && AscFormat.isRealNumber(this.drawingObjects.num))
+        //     {
+        //         nPageIndex = this.drawingObjects.num;
+        //     }
+        //     content.UpdateCursorType(tx, ty, 0);
+        //     ret.updated = true;
+        // }
+        // else if(this.drawingObjects)
+        // {
+        //     hit_paragraph = content.Internal_GetContentPosByXY(tx, ty, 0);
+        //     par = content.Content[hit_paragraph];
+        //     if(isRealObject(par))
+        //     {
+        //         check_hyperlink = par.CheckHyperlink(tx, ty, 0);
+        //         if(isRealObject(check_hyperlink))
+        //         {
+        //             ret.hyperlink = check_hyperlink;
+        //         }
+        //     }
+        // }
+
+
+        var oNvPr;
         if(this.document || this.drawingObjects && this.drawingObjects.cSld){
-            if(e.CtrlKey){
-                var oNvPr = drawing.getNvProps();
+            if(/*e.CtrlKey*/true){
+                oNvPr = drawing.getNvProps();
                 if(oNvPr && oNvPr.hlinkClick && oNvPr.hlinkClick.id !== null){
-                    editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
-                    return true;
+                    if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE){
+                        if(e.CtrlKey){
+                            editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
+                            return true;
+                        }
+                    }
+                    else{
+
+
+                        var ret = {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
+                        if( !(this.noNeedUpdateCursorType === true))
+                        {
+                            var invert_transform_text = drawing.invertTransformText;
+                            var content = drawing.getDocContent && drawing.getDocContent();
+                            if(content && invert_transform_text)
+                            {
+                                var tx = invert_transform_text.TransformPointX(x, y);
+                                var ty = invert_transform_text.TransformPointY(x, y);
+                                content.UpdateCursorType(tx, ty, 0);
+                                ret.updated = true;
+                            }
+                        }
+                        return ret;
+                    }
                 }
             }
         }
-        else if(this.drawingObjects){
+        else if(this.drawingObjects && this.drawingObjects.getWorksheetModel){
+            if(/*!drawing.selected*/ true){
+                oNvPr = drawing.getNvProps();
+                if(oNvPr && oNvPr.hlinkClick && oNvPr.hlinkClick.id !== null){
 
+                    if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE) {
+                        if(e.CtrlKey){
+                            var wsModel = this.drawingObjects.getWorksheetModel();
+
+                            var _link = oNvPr.hlinkClick.id;
+                            var newHyperlink = new AscCommonExcel.Hyperlink();
+                            if (_link.search('#') === 0) {
+                                var sLink2 = _link.replace('#', '');
+                                newHyperlink.setLocation(sLink2);
+                                var aRanges = AscCommonExcel.getRangeByRef(sLink2, wsModel);
+                                newHyperlink.Ref = aRanges[0];
+                            }
+                            else {
+                                newHyperlink.Hyperlink = _link;
+                            }
+                            newHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
+                            var ascHyperlink = new Asc.asc_CHyperlink();
+                            ascHyperlink.hyperlinkModel = newHyperlink;
+                            oApi._asc_setWorksheetRange(ascHyperlink);
+                            //newHyperlink.Ref.setHyperlink(newHyperlink);
+                            // return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
+                            // editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+                    }
+                    else{
+                        var oHyperlink = new ParaHyperlink();
+                        oHyperlink.Value = oNvPr.hlinkClick.id;
+                        oHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
+                        if(hit_in_text_rect){
+                            return {objectId: drawing.Get_Id(), cursorType: "text", bMarker: false, hyperlink: oHyperlink};
+                        }
+                        else{
+                            return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false, hyperlink: oHyperlink};
+                        }
+                    }
+                }
+            }
         }
-        return false;
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE) {
+            return false;
+        }
+        else{
+            return null;
+        }
     },
 
     getAllSignatures: function(){

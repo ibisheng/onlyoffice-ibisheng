@@ -271,6 +271,12 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
     var ret = this.curState.onMouseDown(e, x, y, 0);
     if(e.ClickCount < 2)
     {
+        if(this.drawingObjects && this.drawingObjects.getWorksheet){
+            var ws = this.drawingObjects.getWorksheet();
+            if(Asc.editor.wb.getWorksheet() !== ws){
+                return ret;
+            }
+        }
         this.updateOverlay();
         this.updateSelectionState();
     }

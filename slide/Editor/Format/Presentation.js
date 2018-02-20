@@ -2551,14 +2551,17 @@ CPresentation.prototype =
             {
 
                 var oTargetDocContent = oController.getTargetDocContent();
-                var oSelectedInfo = new CSelectedElementsInfo();
-                oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
-                var oMath         = oSelectedInfo.Get_Math();
-
-                if (!oMath)
+                if(oTargetDocContent)
                 {
-                    if (true === e.ShiftKey && true === e.CtrlKey)
-                        return [0x00A0];
+                    var oSelectedInfo = new CSelectedElementsInfo();
+                    oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                    var oMath         = oSelectedInfo.Get_Math();
+
+                    if (!oMath)
+                    {
+                        if (true === e.ShiftKey && true === e.CtrlKey)
+                            return [0x00A0];
+                    }
                 }
             }
         }

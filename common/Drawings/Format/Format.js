@@ -73,7 +73,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
     CT_Hyperlink.prototype.Write_ToBinary = function(w)
     {
-        var nStartPos = w.GetCurPos();
+        var nStartPos = w.GetCurPosition();
         var nFlags = 0;
         w.WriteLong(0);
 
@@ -113,10 +113,10 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
             nFlags |= 256;
             w.WriteBool(this.endSnd);
         }
-        var nEndPos = w.GetCurPos();
-        w.Seek2(nStartPos);
+        var nEndPos = w.GetCurPosition();
+        w.Seek(nStartPos);
         w.WriteLong(nFlags);
-        w.Seek2(nEndPos);
+        w.Seek(nEndPos);
     };
 
     CT_Hyperlink.prototype.Read_FromBinary = function(r){
