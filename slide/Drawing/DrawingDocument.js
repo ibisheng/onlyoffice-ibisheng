@@ -2740,6 +2740,16 @@ function CDrawingDocument()
 		this.TextMatrix = matrix;
 	}
 
+	this.MultiplyTargetTransform = function (matrix)
+	{
+		if (!this.TextMatrix)
+			this.TextMatrix = matrix;
+		else if (matrix)
+		{
+			this.TextMatrix.Multiply(matrix, AscCommon.MATRIX_ORDER_PREPEND);
+		}
+	}
+
 	this.UpdateThumbnailsAttack = function()
 	{
 		this.m_oWordControl.Thumbnails.RecalculateAll();

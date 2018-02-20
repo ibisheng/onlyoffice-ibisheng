@@ -596,11 +596,57 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
         {
             var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
             var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-            Cell.Content.DrawSelectionOnPage(Cell_PageRel);
+            Cell.Content_DrawSelectionOnPage(Cell_PageRel);
             break;
         }
     }
 };
+
+CTableCell.prototype.Content_DrawSelectionOnPage = function(CurPage)
+{
+    var Transform       = this.private_GetTextDirectionTransform();
+    var DrawingDocument = this.Row.Table.DrawingDocument;
+    var OldTextMatrix = null;
+    if (null !== Transform && DrawingDocument){
+        if(DrawingDocument.TextMatrix)
+        {
+            OldTextMatrix = DrawingDocument.TextMatrix;
+            DrawingDocument.TextMatrix = DrawingDocument.TextMatrix.CreateDublicate();
+        }
+        DrawingDocument.MultiplyTargetTransform(Transform.CreateDublicate());
+
+    }
+
+    this.Content.DrawSelectionOnPage(CurPage);
+
+
+    if (null !== Transform && DrawingDocument){
+        DrawingDocument.TextMatrix = OldTextMatrix;
+    }
+};
+
+CTableCell.prototype.Content_RecalculateCurPos = function()
+{
+    var Transform = this.private_GetTextDirectionTransform();
+    var DrawingDocument = this.Row.Table.DrawingDocument;
+    var OldTextMatrix = null;
+    if (null !== Transform && DrawingDocument)
+    {
+        if(DrawingDocument.TextMatrix)
+        {
+            OldTextMatrix = DrawingDocument.TextMatrix;
+            DrawingDocument.TextMatrix = DrawingDocument.TextMatrix.CreateDublicate();
+        }
+        DrawingDocument.MultiplyTargetTransform(Transform.CreateDublicate());
+    }
+
+    var ret = this.Content.RecalculateCurPos();
+    if (null !== Transform && DrawingDocument){
+        DrawingDocument.TextMatrix = OldTextMatrix;
+    }
+    return ret;
+};
+
 CStyle.prototype.Create_NormalTable = function()
 {
     var TablePr =

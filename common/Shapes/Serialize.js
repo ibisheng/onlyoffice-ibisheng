@@ -6790,7 +6790,20 @@ function BinaryPPTYLoader()
                 }
                 case 5:
                 {
-                    s.Skip2(1);
+                    var nVert = s.GetUChar();
+                    switch (nVert)
+                    {
+                        case 0: props.TextDirection = Asc.c_oAscCellTextDirection.TBRL; break;
+                        case 1: props.TextDirection = Asc.c_oAscCellTextDirection.LRTB;/*_T("horz"); */break;
+                        case 2: props.TextDirection = Asc.c_oAscCellTextDirection.TBRL; break;
+                        case 3: props.TextDirection = Asc.c_oAscCellTextDirection.TBRL; break;
+                        case 4: props.TextDirection = Asc.c_oAscCellTextDirection.BTLR; break;
+                        case 5: props.TextDirection = Asc.c_oAscCellTextDirection.BTLR; break;
+                        case 6: props.TextDirection = Asc.c_oAscCellTextDirection.TBRL; break;
+                        default:
+                            props.TextDirection = LRTB;
+                            break;
+                    }
                     break;
                 }
                 case 6:

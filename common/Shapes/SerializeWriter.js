@@ -3559,6 +3559,36 @@ function CBinaryFileWriter()
             oThis._WriteInt1(3, (tableMar.Bottom.W * 36000) >> 0);
         }
 
+
+        if(AscFormat.isRealNumber(cell.Pr.TextDirection))
+        {
+            switch (cell.Pr.TextDirection)
+            {
+                case Asc.c_oAscCellTextDirection.LRTB:
+                {
+
+                    oThis._WriteUChar1(5, 1);
+                    break;
+                }
+                case Asc.c_oAscCellTextDirection.TBRL:
+                {
+
+                    oThis._WriteUChar1(5, 0);
+                    break;
+                }
+                case Asc.c_oAscCellTextDirection.BTLR:
+                {
+
+                    oThis._WriteUChar1(5, 4);
+                    break;
+                }
+                default:
+                {
+                    oThis._WriteUChar1(5, 1);
+                    break;
+                }
+            }
+        }
         if(AscFormat.isRealNumber(cell.Pr.VAlign))
         {
             switch(cell.Pr.VAlign)
