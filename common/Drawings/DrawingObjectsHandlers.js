@@ -193,7 +193,7 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     if(hit_in_inner_area || hit_in_path)
     {
         if(drawingObjectsController.checkDrawingHyperlink){
-            var ret =  drawingObjectsController.checkDrawingHyperlink(drawing, e, hit_in_text_rect, x, y);
+            var ret =  drawingObjectsController.checkDrawingHyperlink(drawing, e, hit_in_text_rect, x, y, pageIndex);
             if(ret){
                 return ret;
             }
@@ -232,7 +232,7 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     if(hit_in_inner_area || hit_in_path)
     {
         if(drawingObjectsController.checkDrawingHyperlink){
-            var ret =  drawingObjectsController.checkDrawingHyperlink(shape, e, hit_in_text_rect, x, y);
+            var ret =  drawingObjectsController.checkDrawingHyperlink(shape, e, hit_in_text_rect, x, y, pageIndex);
             if(ret){
                 return ret;
             }

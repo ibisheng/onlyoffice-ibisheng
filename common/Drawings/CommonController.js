@@ -739,7 +739,7 @@ function CanStartEditText(oController)
 DrawingObjectsController.prototype =
 {
 
-    checkDrawingHyperlink: function(drawing, e, hit_in_text_rect, x, y){
+    checkDrawingHyperlink: function(drawing, e, hit_in_text_rect, x, y, pageIndex){
         var oApi = this.getEditorApi();
         if(!oApi){
             return;
@@ -784,18 +784,26 @@ DrawingObjectsController.prototype =
                         }
                     }
                     else{
-
-
                         var ret = {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
                         if( !(this.noNeedUpdateCursorType === true))
                         {
-                            var invert_transform_text = drawing.invertTransformText;
-                            var content = drawing.getDocContent && drawing.getDocContent();
-                            if(content && invert_transform_text)
-                            {
-                                var tx = invert_transform_text.TransformPointX(x, y);
-                                var ty = invert_transform_text.TransformPointY(x, y);
-                                content.UpdateCursorType(tx, ty, 0);
+
+
+
+                            var oDD = editor &&  editor.WordControl && editor.WordControl.m_oDrawingDocument;
+                            if(oDD){
+                                var MMData         = new AscCommon.CMouseMoveData();
+                                var Coords         = oDD.ConvertCoordsToCursorWR(x, y, pageIndex, null);
+                                MMData.X_abs       = Coords.X;
+                                MMData.Y_abs       = Coords.Y;
+                                MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
+                                MMData.Hyperlink = new Asc.CHyperlinkProperty({Text: null, Value: oNvPr.hlinkClick.id, ToolTip: oNvPr.hlinkClick.tooltip, Class: null});
+                                editor.sync_MouseMoveCallback(MMData);
+                                if(hit_in_text_rect)
+                                {
+                                    ret.cursorType = "text";
+                                    oDD.SetCursorType("text", MMData);
+                                }
                                 ret.updated = true;
                             }
                         }

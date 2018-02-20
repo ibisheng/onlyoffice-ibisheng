@@ -193,6 +193,8 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetIsHidden                 ] = function (oClass, value){oClass.isHidden  = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetDescr                    ] = function (oClass, value){oClass.descr     = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetTitle                    ] = function (oClass, value){oClass.title     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkClick                    ] = function (oClass, value){oClass.hlinkClick     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkHover                    ] = function (oClass, value){oClass.hlinkHover     = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetIsPhoto                   ] = function (oClass, value){oClass.isPhoto   = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetUserDrawn                 ] = function (oClass, value){oClass.userDrawn = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetPh                        ] = function (oClass, value){oClass.ph        = value;};
