@@ -5028,8 +5028,15 @@ drawBarChart.prototype = {
 
 
 	/** @constructor */
-function drawLineChart()
+function drawLineChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+	this.ptCount = null;
+	this.seriesCount = null;
+	this.subType = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
@@ -5058,24 +5065,26 @@ drawLineChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
+		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
+		this.seriesCount = countSeries.series;
+		this.ptCount = countSeries.points;
+		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
+		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
+
 		this._calculateLines();
 	},
 	
 	_calculateLines: function ()
 	{
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
+
+		var points, y, x, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint;
+		for (var i = 0; i < this.chart.series.length; i++) {
 		
-		var points;
-		
-		var y, x, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint;
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-		
-			seria = this.chartProp.series[i];
-			
+			seria = this.chart.series[i];
 			numCache   = this.cChartDrawer.getNumCache(seria.val);
 			
 			if(!numCache)
@@ -5125,27 +5134,24 @@ drawLineChart.prototype =
 	
 	_calculateAllLines: function(points)
 	{
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
 			//сдвиг по OZ в глубину
 			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-			var seriaDiff = perspectiveDepth / this.chartProp.seriesCount;
-			var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+			var seriaDiff = perspectiveDepth / this.seriesCount;
+			var gapDepth = this.chart.gapDepth != null ? this.chart.gapDepth : globalGapDepth;
 			var depthSeria = seriaDiff / ((gapDepth / 100) + 1);
 			var DiffGapDepth = (depthSeria * (gapDepth / 100)) / 2;
-			depthSeria = (perspectiveDepth / this.chartProp.seriesCount - 2 * DiffGapDepth);
+			depthSeria = (perspectiveDepth / this.seriesCount - 2 * DiffGapDepth);
 		}
 		
 		var x, y, x1, y1, x2, y2, x3, y3, isSplineLine;
-		
 		for(var i = 0; i < points.length; i++)
 		{	
-			isSplineLine = this.chartProp.series[i].smooth !== false;
+			isSplineLine = this.chart.series[i].smooth !== false;
 			
 			if(!points[i])
 				continue;
@@ -5211,7 +5217,7 @@ drawLineChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
+		var point = this.cChartDrawer.getIdxPoint(this.chart.series[ser], val);
 		var path;
 
 		var commandIndex = 0;
@@ -5317,10 +5323,10 @@ drawLineChart.prototype =
 
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
-		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true);
+		this.cChartDrawer.drawPaths(this.paths, this.chart.series, true);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 
-		this.cChartDrawer.drawPathsPoints(this.paths, this.chartProp.series);
+		this.cChartDrawer.drawPathsPoints(this.paths, this.chart.series);
     },
 	
 	_getYVal: function(n, i)
@@ -5329,22 +5335,22 @@ drawLineChart.prototype =
 		var val = 0;
 		var idxPoint;
 
-		if(this.chartProp.subType === "stacked")
+		if(this.subType === "stacked")
 		{
 			for(var k = 0; k <= i; k++)
 			{
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[k], n);
 				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if(tempVal)
 					val += tempVal;
 			}
 		}
-		else if(this.chartProp.subType === "stackedPer")
+		else if(this.subType === "stackedPer")
 		{
 			var summVal = 0;
-			for(var k = 0; k < this.chartProp.series.length; k++)
+			for(var k = 0; k < this.chart.series.length; k++)
 			{
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[k], n);
 				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if(tempVal)
 				{
@@ -5357,7 +5363,7 @@ drawLineChart.prototype =
 		}
 		else
 		{
-			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+			idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[i], n);
 			val = idxPoint ? parseFloat(idxPoint.val) : null;
 		}
 		return val;
@@ -5454,7 +5460,7 @@ drawLineChart.prototype =
 		{
 			var brush, pen, seria;
 			
-			seria = t.chartProp.series[j];
+			seria = t.chart.series[j];
 				brush = seria.brush;
 				pen = seria.pen;
 
@@ -5480,7 +5486,7 @@ drawLineChart.prototype =
 			{
 				for (var j = 0; j < t.paths.series.length; j++)
 				{	
-					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					for (var i = 0; i < t.ptCount; i++)
 					{	
 						drawVerges(j, i, onlyLessNull);
 				}
@@ -5500,7 +5506,7 @@ drawLineChart.prototype =
 					if(!t.paths.series)
 						return;
 					
-					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					for (var i = 0; i < t.ptCount; i++)
 					{
 						drawVerges(j, i, onlyLessNull);
 		}
