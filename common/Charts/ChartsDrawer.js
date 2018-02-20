@@ -10646,8 +10646,12 @@ drawScatterChart.prototype = {
 
 
 	/** @constructor */
-function drawStockChart()
+function drawStockChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
@@ -10673,23 +10677,24 @@ drawStockChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
+
+		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
 		
 		this._calculateLines();
 	},
 	
 	_calculateLines: function ()
-	{	
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+	{
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
 		
 		var trueWidth = this.chartProp.trueWidth;
 
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
 		var koffX = trueWidth / numCache.pts.length;
 		
-		var gapWidth = this.cChartSpace.chart.plotArea.chart.upDownBars && AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth) ? this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth : 150;
+		var gapWidth = this.chart.upDownBars && AscFormat.isRealNumber(this.chart.upDownBars.gapWidth) ? this.chart.upDownBars.gapWidth : 150;
 		
 		var widthBar = koffX / (1 + gapWidth / 100);
 		
@@ -10698,13 +10703,13 @@ drawStockChart.prototype =
 			
 			val1 = null, val2 = null, val3 = null, val4 = null;
 			val1 = numCache.pts[i].val;
-			
-			lastNamCache = this.chartProp.series[this.chartProp.series.length - 1].val.numRef ? this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts : this.chartProp.series[this.chartProp.series.length - 1].val.pts;
+
+			lastNamCache =  this.cChartDrawer.getNumCache(this.chart.series[this.chart.series.length - 1].val).pts;
 			val4 = lastNamCache[i] ? lastNamCache[i].val : null;
 			
-			for(var k = 1; k < this.chartProp.series.length - 1; k++)
+			for(var k = 1; k < this.chart.series.length - 1; k++)
 			{
-				curNumCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache : this.chartProp.series[k].val.numLit;
+				curNumCache = this.cChartDrawer.getNumCache(this.chart.series[k].val);
 				if(curNumCache.pts[i])
 				{
 					if(k === 1)
@@ -10795,26 +10800,25 @@ drawStockChart.prototype =
     {
 		var brush;
 		var pen;
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
 		
 		for (var i = 0; i < numCache.pts.length; i++) {
 
-			pen = this.cChartSpace.chart.plotArea.chart.calculatedHiLowLines;
+			pen = this.chart.calculatedHiLowLines;
 				
 			this.cChartDrawer.drawPath(this.paths.values[i].lowLines, pen, brush);
-			
 			this.cChartDrawer.drawPath(this.paths.values[i].highLines, pen, brush);
 			
 			if(this.paths.values[i].downBars)
 			{
-				brush = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsBrush : null;
-				pen = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsPen : null;
+				brush = this.chart.upDownBars ? this.chart.upDownBars.downBarsBrush : null;
+				pen = this.chart.upDownBars ? this.chart.upDownBars.downBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].downBars, pen, brush);
 			}
 			else
 			{
-				brush = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsBrush : null;
-				pen = this.cChartSpace.chart.plotArea.chart.upDownBars ? this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsPen : null;
+				brush = this.chart.upDownBars ? this.chart.upDownBars.upBarsBrush : null;
+				pen = this.chart.upDownBars ? this.chart.upDownBars.upBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].upBars, pen, brush);
 			}
         }
@@ -10839,20 +10843,19 @@ drawStockChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var pxToMm = this.chartProp.pxToMM;
-		var min = this.chartProp.scale[0];
-		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
-
+		var min = this.valAx.scale[0];
+		var max = this.valAx.scale[this.valAx.scale.length - 1];
 		
 		var digHeight = Math.abs(max - min);
 		
 		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
 			min = -1*max;
 
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
+		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
 		var koffX = this.chartProp.trueWidth / numCache.pts.length;
 		var koffY = this.chartProp.trueHeight / digHeight;
 		
-		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
+		var point = this.chart.series[ser].val.numRef ? this.chart.series[ser].val.numRef.numCache.pts[val] : this.chart.series[ser].val.numLit.pts[val];
 		
 		var x = this.chartProp.chartGutter._left + (val)*koffX + koffX/2;
 		var y = this.chartProp.trueHeight - (point.val - min)*koffY + this.chartProp.chartGutter._top;
@@ -10911,28 +10914,29 @@ drawStockChart.prototype =
 	
 	_calculateUpDownBars: function(x, y, x1, y1, width)
 	{
-
         var pathId = this.cChartSpace.AllocPath();
         var path  = this.cChartSpace.GetPath(pathId);
 		
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		var pxToMm = this.chartProp.pxToMM;
 		path.moveTo((x - width/2) * pathW, y * pathH);
 		path.lnTo((x - width/2) * pathW, y1 * pathH);
 		path.lnTo((x + width/2) * pathW, y1 * pathH);
 		path.lnTo((x + width/2) * pathW, y * pathH);
 		path.lnTo((x - width/2) * pathW, y * pathH);
-
 		
 		return pathId;
 	}
 };
 
 	/** @constructor */
-function drawBubbleChart()
+function drawBubbleChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
@@ -10949,7 +10953,10 @@ drawBubbleChart.prototype =
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
-		
+
+		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
+
 		this._recalculateScatter();
 	},
 	
@@ -10964,33 +10971,20 @@ drawBubbleChart.prototype =
 	
 	_recalculateScatter: function ()
     {
-		//соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-		
-		var trueHeight = this.chartProp.trueHeight;
-		var trueWidth  = this.chartProp.trueWidth;
-		
-		var minOy = this.chartProp.ymin;
-		var maxOy = this.chartProp.ymax;
-		var maxOx = this.chartProp.xScale[this.chartProp.xScale.length - 1];
-		var minOx = this.chartProp.xScale[0];
-		
-		var digHeightOy = Math.abs(maxOy - minOy);
-		var digHeightOx = Math.abs(maxOx - minOx);
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
 		
 		var seria, yVal, xVal, points, x, y, yNumCache, xNumCache;
-		for(var i = 0; i < this.chartProp.series.length; i++)
+		for(var i = 0; i < this.chart.series.length; i++)
 		{
-			seria = this.chartProp.series[i];
+			seria = this.chart.series[i];
 			points = [];
-			yNumCache = seria.yVal.numRef.numCache ? seria.yVal.numRef.numCache : seria.yVal.numRef.numLit;
+			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
 			for(var n = 0; n < yNumCache.pts.length; n++)
 			{
 				yVal = parseFloat(yNumCache.pts[n].val);
 				
-				xNumCache = seria.xVal && seria.xVal.numRef ? seria.xVal.numRef.numCache : seria.xVal && seria.xVal.numLit ? seria.xVal.numLit : null;
+				xNumCache = this.cChartDrawer.getNumCache(seria.xVal);
 				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
 				{
 					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
@@ -11023,9 +11017,9 @@ drawBubbleChart.prototype =
 	_drawScatter: function ()
     {
 		var seria, brush, pen, markerBrush, markerPen, yNumCache;
-		for(var i = 0; i < this.chartProp.series.length; i++)
+		for(var i = 0; i < this.chart.series.length; i++)
 		{
-			seria = this.chartProp.series[i];
+			seria = this.chart.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 			
@@ -11034,7 +11028,7 @@ drawBubbleChart.prototype =
 			{
 				for(var k = 0; k < this.paths.points[i].length; k++)
 				{	
-					yNumCache = this.chartProp.series[i].yVal.numRef ? this.chartProp.series[i].yVal.numRef.numCache : this.chartProp.series[i].yVal.numLit;
+					yNumCache = this.cChartDrawer.getNumCache(this.chartProp.series[i].yVal);
 					markerBrush = yNumCache.pts[k].compiledMarker.brush;
 					markerPen = yNumCache.pts[k].compiledMarker.pen;
 					
@@ -11090,21 +11084,14 @@ drawBubbleChart.prototype =
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
 		var point;
-		if(this.chartProp.series[ser - 1])
-			point = this.chartProp.series[ser - 1].yVal.numRef ? this.chartProp.series[ser - 1].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser - 1].yVal.numLit.pts[val];
+		if(this.chart.series[ser - 1])
+			point = this.chart.series[ser - 1].yVal.numRef ? this.chart.series[ser - 1].yVal.numRef.numCache.pts[val] : this.chart.series[ser - 1].yVal.numLit.pts[val];
 		else
-			point = this.chartProp.series[ser].yVal.numRef ? this.chartProp.series[ser].yVal.numRef.numCache.pts[val] : this.chartProp.series[ser].yVal.numLit.pts[val];
+			point = this.chart.series[ser].yVal.numRef ? this.chart.series[ser].yVal.numRef.numCache.pts[val] : this.chart.series[ser].yVal.numLit.pts[val];
 		
 		var path;
 		
-		/*if(this.paths.series && this.paths.series[ser - 1])
-		{
-			if(val == this.chartProp.series[ser - 1].yVal.numRef.numCache.pts.length - 1)
-				path = this.paths.series[ser - 1][val - 1].ArrPathCommand[1];
-			else
-				path = this.paths.series[ser - 1][val].ArrPathCommand[0];
-		}
-		else*/ if(this.paths.points)
+		if(this.paths.points)
 		{
 			if(this.paths.points[ser] && this.paths.points[ser][val]){
 				var oPath = this.cChartSpace.GetPath(this.paths.points[ser][val].path);
@@ -11185,7 +11172,7 @@ drawBubbleChart.prototype =
 			maxSize = this.cChartDrawer._getMaxMinValueArray(bubbleSize).max;
 			curSize = bubbleSize[k].val;
 			
-			yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
+			yPoints = this.valAx.yPoints ? this.valAx.yPoints : this.catAx.yPoints;
 			maxDiamBubble = Math.abs(yPoints[1].pos - yPoints[0].pos) * 2;
 			
 			diffSize = maxSize / curSize;
