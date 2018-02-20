@@ -4115,6 +4115,8 @@ CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 
 	if (false !== bRecalculate)
 		this.Recalculate();
+
+	this.private_UpdateCursorXY(true, true);
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
