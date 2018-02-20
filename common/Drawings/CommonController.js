@@ -819,23 +819,23 @@ DrawingObjectsController.prototype =
 
                     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE) {
                         if(e.CtrlKey){
-                            var wsModel = this.drawingObjects.getWorksheetModel();
-
-                            var _link = oNvPr.hlinkClick.id;
-                            var newHyperlink = new AscCommonExcel.Hyperlink();
-                            if (_link.search('#') === 0) {
-                                var sLink2 = _link.replace('#', '');
-                                newHyperlink.setLocation(sLink2);
-                                var aRanges = AscCommonExcel.getRangeByRef(sLink2, wsModel);
-                                newHyperlink.Ref = aRanges[0];
-                            }
-                            else {
-                                newHyperlink.Hyperlink = _link;
-                            }
-                            newHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
-                            var ascHyperlink = new Asc.asc_CHyperlink();
-                            ascHyperlink.hyperlinkModel = newHyperlink;
-                            oApi._asc_setWorksheetRange(ascHyperlink);
+                            // var wsModel = this.drawingObjects.getWorksheetModel();
+                            //
+                            // var _link = oNvPr.hlinkClick.id;
+                            // var newHyperlink = new AscCommonExcel.Hyperlink();
+                            // if (_link.search('#') === 0) {
+                            //     var sLink2 = _link.replace('#', '');
+                            //     newHyperlink.setLocation(sLink2);
+                            //     var aRanges = AscCommonExcel.getRangeByRef(sLink2, wsModel);
+                            //     newHyperlink.Ref = aRanges[0];
+                            // }
+                            // else {
+                            //     newHyperlink.Hyperlink = _link;
+                            // }
+                            // newHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
+                            // var ascHyperlink = new Asc.asc_CHyperlink();
+                            // ascHyperlink.hyperlinkModel = newHyperlink;
+                            // oApi._asc_setWorksheetRange(ascHyperlink);
                             //newHyperlink.Ref.setHyperlink(newHyperlink);
                             // return AscCommonExcel.getRangeByRef(sFormula, this.worksheet);
                             // editor.sync_HyperlinkClickCallback(oNvPr.hlinkClick.id);
