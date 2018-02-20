@@ -1136,13 +1136,6 @@ CChartsDrawer.prototype =
 			this.calcProp.nullPositionOX = this._getNullPosition();
 			this.calcProp.nullPositionOXLog = this._getNullPositionLog();
 		}
-			
-		else
-		{
-			var scatterNullPos = this._getScatterNullPosition();
-			this.calcProp.nullPositionOX = scatterNullPos.x;
-			this.calcProp.nullPositionOY = scatterNullPos.y;
-		}
 	
 		/*if(this.calcProp.type === c_oChartTypes.Bar)
 		{
@@ -9721,8 +9714,10 @@ drawPieChart.prototype = {
 
 
 	/** @constructor */
-function drawDoughnutChart()
+function drawDoughnutChart(chart)
 {
+	this.chart = chart;
+
 	this.tempAngle = null;
 	this.paths = {};
 }
@@ -9757,15 +9752,15 @@ drawDoughnutChart.prototype =
 		var path;
 		var idxPoint, numCache;
 		
-        for(var n = 0; n < this.chartProp.series.length; n++) {
-			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
+        for(var n = 0; n < this.chart.series.length; n++) {
+			numCache = this.chart.series[n].val.numRef ? this.chart.series[n].val.numRef.numCache : this.chart.series[n].val.numLit;
 			
 			if(!numCache)
 				continue;
 			
 			for (var k = 0; k < numCache.ptCount; k++) {
 				
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[n], k);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[n], k);
 				
 				brush = idxPoint ? idxPoint.brush : null;
 				pen = idxPoint ? idxPoint.pen : null;
@@ -9786,26 +9781,26 @@ drawDoughnutChart.prototype =
 		
 		//% from out radius  
 		var defaultSize = 50;
-		var holeSize = this.cChartSpace.chart.plotArea.chart.holeSize ? this.cChartSpace.chart.plotArea.chart.holeSize : defaultSize;
+		var holeSize = this.chart.holeSize ? this.chart.holeSize : defaultSize;
 		
 		//first ang  
-		var firstSliceAng = this.cChartSpace.chart.plotArea.chart.firstSliceAng ? this.cChartSpace.chart.plotArea.chart.firstSliceAng : 0;
+		var firstSliceAng = this.chart.firstSliceAng ? this.chart.firstSliceAng : 0;
 		firstSliceAng = (firstSliceAng / 360) * (Math.PI * 2);
 		
 		//inner radius
 		var radius = outRadius * (holeSize / 100);
-		var step = (outRadius - radius) / this.chartProp.seriesCount;
+		var step = (outRadius - radius) / this.seriesCount;
 		
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
 		var numCache, idxPoint, angle, curVal, seriesCounter = 0;
-		for(var n = 0; n < this.chartProp.series.length; n++)
+		for(var n = 0; n < this.chart.series.length; n++)
 		{
 			this.tempAngle = Math.PI/2;
-			numCache = this.chartProp.series[n].val.numRef ? this.chartProp.series[n].val.numRef.numCache : this.chartProp.series[n].val.numLit;
+			numCache = this.chart.series[n].val.numRef ? this.chart.series[n].val.numRef.numCache : this.chart.series[n].val.numLit;
 			
-			if(!numCache || this.chartProp.series[n].isHidden)
+			if(!numCache || this.chart.series[n].isHidden)
 				continue;
 			
 			sumData = this.cChartDrawer._getSumArray(numCache.pts, true);
@@ -9813,7 +9808,7 @@ drawDoughnutChart.prototype =
 			//рисуем против часовой стрелки, поэтому цикл с конца
 			for (var k = numCache.ptCount - 1; k >= 0; k--) {
 				
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[n], k);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[n], k);
 				curVal = idxPoint ? idxPoint.val : 0;
 				angle = Math.abs((parseFloat(curVal / sumData)) * (Math.PI * 2));
 				
@@ -9908,7 +9903,7 @@ drawDoughnutChart.prototype =
 		var centerX = xCenter + newRadius * Math.cos(-1 * stAng - swAng / 2); 
 		var centerY = yCenter - newRadius * Math.sin(-1 * stAng - swAng / 2); 
 		
-		var point = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache.pts[val] : this.chartProp.series[ser].val.numLit.pts[val];
+		var point = this.chart.series[ser].val.numRef ? this.chart.series[ser].val.numRef.numCache.pts[val] : this.chart.series[ser].val.numLit.pts[val];
 		
 		if(!point)
 			return;
@@ -9942,8 +9937,12 @@ drawDoughnutChart.prototype =
 
 
 	/** @constructor */
-function drawRadarChart()
+function drawRadarChart(chart)
 {
+	this.chart = chart;
+	this.subType = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
@@ -9970,14 +9969,17 @@ drawRadarChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
+		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
+
 		this._calculateLines();
 	},
 	
 	_calculateLines: function ()
 	{
 		//соответствует подписям оси значений(OY)
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var yPoints = this.valAx.yPoints;
 		
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
@@ -9986,14 +9988,14 @@ drawRadarChart.prototype =
 		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
 		
 		var y, y1, x, x1, val, nextVal, seria, dataSeries;
-		var numCache = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts : this.chartProp.series[0].val.numLit.pts;
+		var numCache = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts : this.chart.series[0].val.numLit.pts;
 		var tempAngle = 2 * Math.PI / numCache.length;
 		var xDiff = ((trueHeight / 2) / yPoints.length) / this.chartProp.pxToMM;
 		var radius, radius1, xFirst, yFirst;
 		
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chart.series.length; i++) {
 		
-			seria = this.chartProp.series[i];
+			seria = this.chart.series[i];
 			
 			dataSeries = seria.val.numRef ? seria.val.numRef.numCache.pts : seria.val.numLit.pts;
 			
@@ -10122,7 +10124,7 @@ drawRadarChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var numCache = this.chartProp.series[ser].val.numRef ? this.chartProp.series[ser].val.numRef.numCache : this.chartProp.series[ser].val.numLit;
+		var numCache = this.chart.series[ser].val.numRef ? this.chart.series[ser].val.numRef.numCache : this.chart.series[ser].val.numLit;
 		var point = numCache.pts[val];
 		var path;
 
@@ -10212,8 +10214,8 @@ drawRadarChart.prototype =
 		
 		//this.cShapeDrawer.Graphics.SaveGrState();
 		//this.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, this.chartProp.chartGutter._top / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-			seria = this.chartProp.series[i];
+		for (var i = 0; i < this.chart.series.length; i++) {
+			seria = this.chart.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 			
@@ -10252,22 +10254,22 @@ drawRadarChart.prototype =
 		var tempVal;
 		var val = 0;
 		var numCache;
-		if(this.chartProp.subType === "stacked")
+		if(this.subType === "stacked")
 		{
 			for(var k = 0; k <= i; k++)
 			{
-				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
+				numCache = this.chart.series[k].val.numRef ? this.chart.series[k].val.numRef.numCache :  this.chart.series[k].val.numLit;
 				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 					val += tempVal;
 			}
 		}
-		else if(this.chartProp.subType === "stackedPer")
+		else if(this.subType === "stackedPer")
 		{
 			var summVal = 0;
-			for(var k = 0; k < this.chartProp.series.length; k++)
+			for(var k = 0; k < this.chart.series.length; k++)
 			{
-				numCache = this.chartProp.series[k].val.numRef ? this.chartProp.series[k].val.numRef.numCache :  this.chartProp.series[k].val.numLit;
+				numCache = this.chart.series[k].val.numRef ? this.chart.series[k].val.numRef.numCache :  this.chart.series[k].val.numLit;
 				tempVal = parseFloat(numCache.pts[n].val);
 				if(tempVal)
 				{
@@ -10280,7 +10282,7 @@ drawRadarChart.prototype =
 		}
 		else
 		{
-			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache :  this.chartProp.series[i].val.numLit;
+			numCache = this.chart.series[i].val.numRef ? this.chart.series[i].val.numRef.numCache :  this.chart.series[i].val.numLit;
 			val = parseFloat(numCache.pts[n].val);
 		}
 		return val;
@@ -10305,7 +10307,11 @@ drawRadarChart.prototype =
 
 
 /** @constructor */
-function drawScatterChart() {
+function drawScatterChart(chart) {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cChartSpace = null;
@@ -10321,6 +10327,9 @@ drawScatterChart.prototype = {
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 
+		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
+		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
+
 		this._recalculateScatter();
 	},
 
@@ -10333,16 +10342,12 @@ drawScatterChart.prototype = {
 	},
 
 	_recalculateScatter: function () {
-		//соответствует подписям оси категорий(OX)
-		var catAx = this.cChartSpace.chart.plotArea.catAx;
-		var xPoints = catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var valAx = this.cChartSpace.chart.plotArea.valAx;
-		var yPoints = valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
 
 		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-			seria = this.chartProp.series[i];
+		for (var i = 0; i < this.chart.series.length; i++) {
+			seria = this.chart.series[i];
 			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
 
 			if (!yNumCache) {
@@ -10397,13 +10402,13 @@ drawScatterChart.prototype = {
 	},
 
 	_calculateAllLines: function (points) {
-		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints = this.catAx.xPoints;
+		var yPoints = this.valAx.yPoints;
 
 		var x, y, x1, y1, isSplineLine;
 
 		for (var i = 0; i < points.length; i++) {
-			isSplineLine = this.chartProp.series[i].smooth !== false;
+			isSplineLine = this.chart.series[i].smooth !== false;
 
 			if (!points[i]) {
 				continue;
@@ -10435,7 +10440,7 @@ drawScatterChart.prototype = {
 	},
 
 	_getYVal: function (n, i) {
-		var idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+		var idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[i], n);
 		return idxPoint ? parseFloat(idxPoint.val) : null;
 	},
 
@@ -10451,11 +10456,11 @@ drawScatterChart.prototype = {
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(leftRect, topRect, rightRect, bottomRect);
 		//draw lines
-		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series, true, true);
+		this.cChartDrawer.drawPaths(this.paths, this.chart.series, true, true);
 		//end clip rect
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 
-		this.cChartDrawer.drawPathsPoints(this.paths, this.chartProp.series, true);
+		this.cChartDrawer.drawPathsPoints(this.paths, this.chart.series, true);
 	},
 
 	_getYPosition: function (val, yPoints, isOx) {
@@ -10505,7 +10510,7 @@ drawScatterChart.prototype = {
 	},
 
 	_calculateDLbl: function (chartSpace, ser, val) {
-		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
+		var point = this.cChartDrawer.getIdxPoint(this.chart.series[ser], val);
 
 		var path;
 
