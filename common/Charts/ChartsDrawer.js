@@ -5529,7 +5529,14 @@ drawLineChart.prototype = {
 
 
 /** @constructor */
-function drawAreaChart() {
+function drawAreaChart(chart) {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+	this.ptCount = null;
+	this.seriesCount = null;
+	this.subType = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
@@ -5577,23 +5584,30 @@ drawAreaChart.prototype = {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		this._calculateProps();
 
+		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
+		this.seriesCount = countSeries.series;
+		this.ptCount = countSeries.points;
+		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
+		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
+
+		this._calculateProps();
 		this._calculate();
 	},
 
 	_calculateProps: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
-			var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+			var gapDepth = this.chart.gapDepth != null ? this.chart.gapDepth : globalGapDepth;
 			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-			perspectiveDepth = this.chartProp.subType === "normal" ? (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount : perspectiveDepth / (gapDepth / 100 + 1);
+			perspectiveDepth = this.subType === "normal" ? (perspectiveDepth / (gapDepth / 100 + 1)) / this.seriesCount : perspectiveDepth / (gapDepth / 100 + 1);
 			var DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 
 			this.perspectiveDepth = perspectiveDepth;
-			if (this.chartProp.subType === "normal") {
+			if (this.subType === "normal") {
 				this.gapDepth = [];
 
-				for (var i = 0; i < this.chartProp.seriesCount; i++) {
+				for (var i = 0; i < this.seriesCount; i++) {
 					this.gapDepth[i] = (this.perspectiveDepth + DiffGapDepth + DiffGapDepth) * i + DiffGapDepth;
 				}
 			} else {
@@ -5601,8 +5615,8 @@ drawAreaChart.prototype = {
 			}
 		}
 
-		this.xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		this.yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		this.xPoints = this.catAx.xPoints;
+		this.yPoints = this.valAx.yPoints;
 	},
 
 	_calculate: function () {
@@ -5610,9 +5624,9 @@ drawAreaChart.prototype = {
 		var pxToMm = this.chartProp.pxToMM;
 		var nullPositionOX = this.chartProp.nullPositionOX / pxToMm;
 
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chart.series.length; i++) {
 
-			seria = this.chartProp.series[i];
+			seria = this.chart.series[i];
 			numCache = this.cChartDrawer.getNumCache(seria.val);
 
 			if (!numCache) {
@@ -5644,7 +5658,7 @@ drawAreaChart.prototype = {
 
 			if (this.cChartDrawer.nDimensionCount === 3) {
 				//для normal рассчитываем видимые/невидимые грани для каждой серии
-				if (this.chartProp.subType === "normal") {
+				if (this.subType === "normal") {
 					this._calculateDarkSideOfTheFace(i);
 				} else if (this.darkFaces === null) {
 					this._calculateDarkSideOfTheFace(null);
@@ -5681,8 +5695,7 @@ drawAreaChart.prototype = {
 				});
 			}
 
-			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack)
-				.concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
+			var anotherFaces = this.sortZIndexPathsFront.concat(this.sortZIndexPathsBack).concat(this.sortZIndexPathsLeft).concat(this.sortZIndexPathsRight);
 			this.sortZIndexPaths = upDownFaces.concat(anotherFaces);
 
 			//медленная, но более качественный сортировка
@@ -5698,7 +5711,7 @@ drawAreaChart.prototype = {
 	_calculatePaths: function () {
 		var points = this.points;
 		var prevPoints;
-		var isStacked = this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked";
+		var isStacked = this.subType === "stackedPer" || this.subType === "stacked";
 
 		for (var i = 0; i < points.length; i++) {
 			if (!this.paths.series) {
@@ -5714,7 +5727,7 @@ drawAreaChart.prototype = {
 	_calculatePaths3D: function () {
 		var points = this.points;
 		var prevPoints;
-		var isStacked = this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked";
+		var isStacked = this.subType === "stackedPer" || this.subType === "stacked";
 
 		if (isStacked) {
 			this._calculateAllIntersection();
@@ -5893,9 +5906,9 @@ drawAreaChart.prototype = {
 		var minX = this.xPoints[0].pos < this.xPoints[this.xPoints.length - 1].pos ? this.xPoints[0].pos * pxToMm : this.xPoints[this.xPoints.length - 1].pos * pxToMm;
 		var maxX = this.xPoints[0].pos < this.xPoints[this.xPoints.length - 1].pos ? this.xPoints[this.xPoints.length - 1].pos * pxToMm : this.xPoints[0].pos * pxToMm;
 
-		var minValue = this.cChartDrawer.calcProp.min;
-		var maxValue = this.cChartDrawer.calcProp.max;
-		if (this.chartProp.subType === "stackedPer") {
+		var minValue = this.valAx.min;
+		var maxValue = this.valAx.max;
+		if (this.subType === "stackedPer") {
 			minValue = minValue / 100;
 			maxValue = maxValue / 100;
 		}
@@ -6222,37 +6235,27 @@ drawAreaChart.prototype = {
 			for (var i = 0; i < breakFaces.up.length - 1; i++) {
 
 				prevPoint = breakFaces.up[i];
-				prevNearProject =
-					t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/);
-				prevFarProject = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y,
-					this.gapDepth + this.perspectiveDepth);
+				prevNearProject = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/);
+				prevFarProject = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth + this.perspectiveDepth);
 
-				prevNear =
-					t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/,
-						null, null, true);
-				prevFar = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y,
-					this.gapDepth + this.perspectiveDepth, null, null, true);
+				prevNear = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth /*+ DiffGapDepth*/, null, null, true);
+				prevFar = t.cChartDrawer._convertAndTurnPoint(prevPoint.x, prevPoint.y, this.gapDepth + this.perspectiveDepth, null, null, true);
 
 				prevNotRotateNear = {x: prevPoint.x, y: prevPoint.y, z: this.gapDepth};
 				prevNotRotateFar = {x: prevPoint.x, y: prevPoint.y, z: this.gapDepth + this.perspectiveDepth};
 
 				point = breakFaces.up[i + 1];
-				nearProject =
-					t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/);
-				farProject =
-					t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth);
+				nearProject = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/);
+				farProject = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth);
 
-				near = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/, null,
-					null, true);
-				far = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth,
-					null, null, true);
+				near = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth /*+ DiffGapDepth*/, null, null, true);
+				far = t.cChartDrawer._convertAndTurnPoint(point.x, point.y, this.gapDepth + this.perspectiveDepth, null, null, true);
 
 				notRotateNear = {x: point.x, y: point.y, z: this.gapDepth};
 				notRotateFar = {x: point.x, y: point.y, z: this.gapDepth + this.perspectiveDepth};
 
 
-				face = generateFace(prevNearProject, prevFarProject, farProject, nearProject, prevNear, prevFar,
-					far, near, prevNotRotateNear, prevNotRotateFar, notRotateNear, notRotateFar, 1);
+				face = generateFace(prevNearProject, prevFarProject, farProject, nearProject, prevNear, prevFar, far, near, prevNotRotateNear, prevNotRotateFar, notRotateNear, notRotateFar, 1);
 				this.upFaces.push(face);
 			}
 		}
@@ -6682,7 +6685,7 @@ drawAreaChart.prototype = {
 	_calculateDLbl: function (chartSpace, ser, val) {
 		var pxToMm = this.chartProp.pxToMM;
 
-		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
+		var point = this.cChartDrawer.getIdxPoint(this.chart.series[ser], val);
 		var path;
 
 		path = this.points[ser][val];
@@ -6696,7 +6699,7 @@ drawAreaChart.prototype = {
 
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			var gapDepth = this.gapDepth;
-			if (this.chartProp.subType === "normal") {
+			if (this.subType === "normal") {
 				gapDepth = this.gapDepth[ser];
 			}
 
@@ -6768,8 +6771,8 @@ drawAreaChart.prototype = {
 			(this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM,
 			this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 
-		for (var i = 0; i < this.chartProp.series.length; i++) {
-			seria = this.chartProp.series[i];
+		for (var i = 0; i < this.chart.series.length; i++) {
+			seria = this.chart.series[i];
 			numCache = this.cChartDrawer.getNumCache(seria.val);
 			dataSeries = numCache && numCache.pts ? numCache.pts : null;
 
@@ -6801,18 +6804,18 @@ drawAreaChart.prototype = {
 		var val = 0;
 		var idxPoint;
 
-		if (this.chartProp.subType === "stacked") {
+		if (this.subType === "stacked") {
 			for (var k = 0; k <= i; k++) {
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[k], n);
 				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if (tempVal) {
 					val += tempVal;
 				}
 			}
-		} else if (this.chartProp.subType === "stackedPer") {
+		} else if (this.subType === "stackedPer") {
 			var summVal = 0;
-			for (var k = 0; k < this.chartProp.series.length; k++) {
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], n);
+			for (var k = 0; k < this.chart.series.length; k++) {
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[k], n);
 				tempVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 				if (tempVal) {
 					if (k <= i) {
@@ -6823,7 +6826,7 @@ drawAreaChart.prototype = {
 			}
 			val = val / summVal;
 		} else {
-			idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[i], n);
+			idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[i], n);
 			val = idxPoint ? parseFloat(idxPoint.val) : null;
 		}
 		return val;
@@ -6841,13 +6844,13 @@ drawAreaChart.prototype = {
 			(this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM,
 			this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chart.series.length; i++) {
 
 			//в случае накопительных дигарамм, рисуем в обратном порядке
 			/*if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
 			 seria = this.chartProp.series[this.chartProp.series.length - 1 - i];
 			 else*/
-			seria = this.chartProp.series[i];
+			seria = this.chart.series[i];
 			numCache = this.cChartDrawer.getNumCache(seria.val);
 			dataSeries = numCache && numCache.pts ? numCache.pts : null;
 
@@ -6916,7 +6919,7 @@ drawAreaChart.prototype = {
 
 	_drawBars3D: function () {
 		var t = this;
-		var isStacked = this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked";
+		var isStacked = this.subType === "stackedPer" || this.subType === "stacked";
 
 		if (!isStacked) {
 			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
@@ -6924,7 +6927,7 @@ drawAreaChart.prototype = {
 			if (!this.cChartDrawer.processor3D.view3D.getRAngAx() && angle > Math.PI / 2 &&
 				angle < 3 * Math.PI / 2) {
 				for (var j = 0; j < this.paths.series.length; j++) {
-					seria = this.chartProp.series[j];
+					seria = this.chart.series[j];
 					brush = seria.brush;
 					pen = seria.pen;
 
@@ -6944,7 +6947,7 @@ drawAreaChart.prototype = {
 				}
 			} else {
 				for (var j = this.paths.series.length - 1; j >= 0; j--) {
-					seria = this.chartProp.series[j];
+					seria = this.chart.series[j];
 					brush = seria.brush;
 					pen = seria.pen;
 
@@ -6980,15 +6983,14 @@ drawAreaChart.prototype = {
 			//if(this.cChartDrawer.processor3D.view3D.rAngAx)
 			//{
 			for (var i = 0; i < this.sortZIndexPaths.length; i++) {
-				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point,
-					this.sortZIndexPaths[i].paths, null, this.sortZIndexPaths[i].verge);
+				drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, null, this.sortZIndexPaths[i].verge);
 			}
 			//}
 		}
 	},
 
 	_getOptionsForDrawing: function (ser, point, onlyLessNull) {
-		var seria = this.chartProp.series[ser];
+		var seria = this.chart.series[ser];
 		var pt = seria.val.numRef.numCache.getPtByIndex(point);
 		if (!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt) {
 			return null;
