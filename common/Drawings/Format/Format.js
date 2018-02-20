@@ -10202,11 +10202,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
 
     /* Common Functions For Builder*/
-    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
+    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord, worksheet){
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
         oShapeTrack.track({}, nWidth, nHeight);
         var oShape = oShapeTrack.getShape(bWord === true, oDrawingDocument, null);
         oShape.setParent(oParent);
+        if(worksheet){
+            oShape.setWorksheet(worksheet);
+        }
         if(bWord){
             oShape.createTextBoxContent();
         }
