@@ -846,8 +846,17 @@ DrawingObjectsController.prototype =
                         }
                     }
                     else{
+
+                        var _link = oNvPr.hlinkClick.id;
+                        var sLink2;
+                        if (_link.search('#') === 0) {
+                            sLink2 = _link.replace('#', '');
+                        }
+                        else {
+                            sLink2 = _link;
+                        }
                         var oHyperlink = new ParaHyperlink();
-                        oHyperlink.Value = oNvPr.hlinkClick.id;
+                        oHyperlink.Value = sLink2;
                         oHyperlink.Tooltip = oNvPr.hlinkClick.tooltip;
                         if(hit_in_text_rect){
                             return {objectId: drawing.Get_Id(), cursorType: "text", bMarker: false, hyperlink: oHyperlink};
