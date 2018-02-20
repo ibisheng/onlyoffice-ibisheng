@@ -7056,8 +7056,15 @@ drawAreaChart.prototype = {
 
 
 	/** @constructor */
-function drawHBarChart()
+function drawHBarChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+	this.ptCount = null;
+	this.seriesCount = null;
+	this.subType = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
@@ -7081,6 +7088,13 @@ drawHBarChart.prototype =
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
+
+		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
+		this.seriesCount = countSeries.series;
+		this.ptCount = countSeries.points;
+		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
+		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 		
 		this._recalculateBars();
 	},
@@ -7100,14 +7114,14 @@ drawHBarChart.prototype =
 	_recalculateBars: function (/*isSkip*/)
     {
         //соответствует подписям оси категорий(OX)
-		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
-		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
+		var xPoints = this.valAx.xPoints;
+		var yPoints = this.catAx.yPoints;
 
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
-		var defaultOverlap = (this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer") ? 100 : 0;
-		var overlap        = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.overlap) ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
-		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
+		var defaultOverlap = (this.subType === "stacked" || this.subType === "stackedPer") ? 100 : 0;
+		var overlap        = AscFormat.isRealNumber(this.chart.overlap) ? this.chart.overlap : defaultOverlap;
+		var ptCount        = this.cChartDrawer.getPtCount(this.chart.series);
         var height         = heightGraph / ptCount;
 		var crossBetween   = this.cChartSpace.getValAxisCrossType();
 		if(crossBetween)
@@ -7115,9 +7129,9 @@ drawHBarChart.prototype =
 			height = heightGraph / (ptCount - 1);
 		}
 		
-		var gapWidth = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.gapWidth) ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = AscFormat.isRealNumber(this.chart.gapWidth) ? this.chart.gapWidth : 150;
 		
-		var individualBarHeight = height / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
+		var individualBarHeight = height / (this.seriesCount - (this.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap = individualBarHeight * (overlap / 100);
 		var hmargin = (gapWidth / 100 * individualBarHeight) / 2;
 		
@@ -7129,17 +7143,17 @@ drawHBarChart.prototype =
 		{
 			perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 			//сдвиг по OZ в глубину
-			gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+			gapDepth = this.chart.gapDepth != null ? this.chart.gapDepth : globalGapDepth;
 			perspectiveDepth = perspectiveDepth / (gapDepth / 100 + 1);
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
 		var cubeCount = 0;
-		for (var i = 0; i < this.chartProp.series.length; i++) 
+		for (var i = 0; i < this.chart.series.length; i++)
 		{
-			numCache = this.cChartDrawer.getNumCache(this.chartProp.series[i].val);
+			numCache = this.cChartDrawer.getNumCache(this.chart.series[i].val);
 			
-			if(!numCache || this.chartProp.series[i].isHidden)
+			if(!numCache || this.chart.series[i].isHidden)
 			{
 				continue;
 			}
@@ -7160,8 +7174,8 @@ drawHBarChart.prototype =
 				else if(val < 0)
 					isValLessZero++;
 				
-				if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
-					val = this.cChartDrawer.getLogarithmicValue(val, this.cChartSpace.chart.plotArea.valAx.scaling.logBase, xPoints);
+				if(this.valAx && this.valAx.scaling.logBase)
+					val = this.cChartDrawer.getLogarithmicValue(val, this.valAx.scaling.logBase, xPoints);
 				idx = seria[j].idx != null ? seria[j].idx : j;	
 				
 				
@@ -7173,23 +7187,23 @@ drawHBarChart.prototype =
 				
 				
 				//стартовая позиция колонки Y
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				{
 					if(yPoints[1] && yPoints[1].pos)
 						startYPosition = yPoints[idx].pos + Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
 					else
-						startYPosition = yPoints[idx].pos + Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
+						startYPosition = yPoints[idx].pos + Math.abs(yPoints[0].pos - this.valAx.posY);
 				}	
 				else
 				{
 					if(yPoints[1] && yPoints[1].pos)
 						startYPosition = yPoints[idx].pos - Math.abs((yPoints[1].pos - yPoints[0].pos) / 2);
 					else
-						startYPosition = yPoints[idx].pos - Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
+						startYPosition = yPoints[idx].pos - Math.abs(yPoints[0].pos - this.valAx.posY);
 				}
 					
 				
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				{
 					if(seriesCounter === 0)
 						startY = startYPosition * this.chartProp.pxToMM - hmargin - seriesCounter * (individualBarHeight);
@@ -7205,13 +7219,13 @@ drawHBarChart.prototype =
 				}
 
 				newStartY = startY;
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation !== ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation !== ORIENTATION_MIN_MAX)
 				{
 					newStartY = startY + individualBarHeight;
 				}
 				
 				newStartX = startX;
-				if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX && (this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked"))
+				if(this.valAx.scaling.orientation !== ORIENTATION_MIN_MAX && (this.subType === "stackedPer" || this.subType === "stacked"))
 				{
 					newStartX = startX - width;
 				}
@@ -7289,7 +7303,7 @@ drawHBarChart.prototype =
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
-		var seria = this.chartProp.series[ser];
+		var seria = this.chart.series[ser];
 		var pt = seria.val.numRef.numCache.getPtByIndex(point);
 		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
@@ -7311,15 +7325,15 @@ drawHBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints)
 	{
 		var startY, width, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var catAx = this.cChartSpace.chart.plotArea.catAx;
+		var catAx = this.catAx;
 		var nullPositionOX = this.chartProp.nullPositionOX/*catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0*/;
 		
-		if(this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer")
+		if(this.subType === "stacked" || this.subType === "stackedPer")
 		{
-			curVal = this._getStackedValue(this.chartProp.series, i, j, val);
-			prevVal = this._getStackedValue(this.chartProp.series, i - 1, j, val);
+			curVal = this._getStackedValue(this.chart.series, i, j, val);
+			prevVal = this._getStackedValue(this.chart.series, i - 1, j, val);
 			
-			if(this.chartProp.subType === "stacked")
+			if(this.subType === "stacked")
 			{
 				//если максимальное значение задано вручную, и присутвуют точки, которые больше этого значения
 				if(curVal > this.cChartDrawer.calcProp.axisMax)
@@ -7384,9 +7398,9 @@ drawHBarChart.prototype =
 		{
 			var curVal;
 			var temp = 0, idxPoint;
-			for(var k = 0; k < this.chartProp.series.length; k++)
+			for(var k = 0; k < this.chart.series.length; k++)
 			{
-				idxPoint = this.cChartDrawer.getIdxPoint(this.chartProp.series[k], j);	
+				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[k], j);
 				curVal = idxPoint ? parseFloat(idxPoint.val) : 0;
 					
 				if(curVal)
@@ -7458,13 +7472,13 @@ drawHBarChart.prototype =
     {
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
 		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
-		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
+		this.cChartDrawer.drawPaths(this.paths, this.chart.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
     },
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		var point = this.cChartDrawer.getIdxPoint(this.chartProp.series[ser], val);
+		var point = this.cChartDrawer.getIdxPoint(this.chart.series[ser], val);
 		var path = this.paths.series[ser][val];
 		
 		if(this.cChartDrawer.nDimensionCount === 3 && this.paths.series[ser][val].frontPaths)
@@ -7584,7 +7598,7 @@ drawHBarChart.prototype =
 		var paths;
 		var point1, point2, point3, point4, point5, point6, point7, point8;
 		var x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
-		var xPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
+		var xPoints = this.valAx.xPoints;
 		
 		width = width * this.chartProp.pxToMM;
 		newStartX  = newStartX * this.chartProp.pxToMM;
@@ -7632,7 +7646,7 @@ drawHBarChart.prototype =
 		else
 		{
 			//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
-			if(this.chartProp.subType === "normal")
+			if(this.subType === "normal")
 			{
 				var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
 				width = startXColumnPosition.width / this.chartProp.pxToMM;
@@ -7702,7 +7716,7 @@ drawHBarChart.prototype =
 		var draw = function(onlyLessNull)
 		{
 			var brush, pen, options;
-			for (var i = 0; i < t.chartProp.ptCount; i++) 
+			for (var i = 0; i < t.ptCount; i++)
 			{
 				if(!t.paths.series)
 					return;
@@ -7729,7 +7743,7 @@ drawHBarChart.prototype =
 		var drawReverse = function(onlyLessNull)
 		{
 			var brush, pen, options;
-			for (var i = 0; i < t.chartProp.ptCount; i++) 
+			for (var i = 0; i < t.ptCount; i++)
 			{
 				if(!t.paths.series)
 					return;
@@ -7753,9 +7767,9 @@ drawHBarChart.prototype =
 			}
 		};
 		
-		if(this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer")
+		if(this.subType === "stacked" || this.subType === "stackedPer")
 		{
-			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
+			if(this.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
 			{
 				drawReverse(true);
 				draw(false);
@@ -7768,7 +7782,7 @@ drawHBarChart.prototype =
 		}
 		else
 		{
-			if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+			if(this.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				draw();
 			else
 				drawReverse();
@@ -7814,7 +7828,7 @@ drawHBarChart.prototype =
 			}
 		};
 		
-		if(this.chartProp.subType === "standard")
+		if(this.subType === "standard")
 		{
 			draw(true, verges.front, verges.unfront);
 			draw(false, verges.front, verges.unfront);
