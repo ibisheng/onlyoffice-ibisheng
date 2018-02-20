@@ -11161,8 +11161,7 @@ drawBubbleChart.prototype = {
 
 
 /** @constructor */
-function drawSurfaceChart(chart)
-{
+function drawSurfaceChart(chart) {
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -11173,38 +11172,32 @@ function drawSurfaceChart(chart)
 	this.paths = {};
 }
 
-drawSurfaceChart.prototype =
-{
+drawSurfaceChart.prototype = {
 	constructor: drawSurfaceChart,
-	
-	recalculate: function(chartsDrawer)
-	{
+
+	recalculate: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.paths = {};
 
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
-		this.seriesCount = countSeries.series;
 		this.ptCount = countSeries.points;
-		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._recalculate();
 	},
-	
-	draw: function(chartsDrawer)
-    {
+
+	draw: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
 		this._draw();
 	},
-	
-	_recalculate: function()
-	{
+
+	_recalculate: function () {
 		var yPoints = this.valAx.yPoints;
 		var xPoints = this.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
@@ -11213,95 +11206,88 @@ drawSurfaceChart.prototype =
 		for (var i = 0; i < this.chart.series.length; i++) {
 			seria = this.chart.series[i];
 			numCache = this.cChartDrawer.getNumCache(seria.val);
-			
-			if(!numCache)
-			{
+
+			if (!numCache) {
 				continue;
 			}
-			
+
 			dataSeries = numCache.pts;
-			for(var n = 0; n < this.ptCount; n++)
-			{	
+			for (var n = 0; n < this.ptCount; n++) {
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
 
 				//TODO временно заменил idx на n. позже нужно использовать idx  -> val = this._getYVal(idx, i);
 				val = this._getYVal(n, i);
-				if(null === val){
+				if (null === val) {
 					val = 0;
 				}
-				
-				x  = xPoints[n].pos * this.chartProp.pxToMM;
-				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
+
+				x = xPoints[n].pos * this.chartProp.pxToMM;
+				y = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 				z = (perspectiveDepth / (this.chart.series.length - 1)) * (i);
-				
+
 				//рассчитываем значения
 				idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;
 
 				//TODO временно заменил idx на n. позже нужно использовать idx
 				//var val2 = Math.round(this._getYVal(n + 1, i) * roundInt) / roundInt;
 				val2 = this._getYVal(n + 1, i);
-				if(null === val2){
+				if (null === val2) {
 					val2 = 0;
 				}
-				
-				if(!points)
+
+				if (!points) {
 					points = [];
-				if(!points[i])
+				}
+				if (!points[i]) {
 					points[i] = [];
-					
-				if(!points3d)
+				}
+
+				if (!points3d) {
 					points3d = [];
-				if(!points3d[i])
+				}
+				if (!points3d[i]) {
 					points3d[i] = [];
-				
-				if(val != null)
-				{
+				}
+
+				if (val != null) {
 					points3d[i][n] = {x: x, y: y, z: z, val: val};
 					var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, z);
 					var x1 = convertResult.x;
 					var y1 = convertResult.y;
 					points[i][n] = {x: x1, y: y1, val: val};
-				}
-				else
-				{
+				} else {
 					points[i][n] = null;
 				}
 			}
 		}
-		
+
 		this._calculateAllFaces(points, points3d);
 	},
-	
-	
-	
-	_calculateAllFaces: function(points, points3d)
-	{		
-		if(!this.paths.test)
-		{
+
+
+	_calculateAllFaces: function (points, points3d) {
+		if (!this.paths.test) {
 			this.paths.test = [];
 		}
-		if(!this.paths.test2)
-		{
+		if (!this.paths.test2) {
 			this.paths.test2 = [];
 		}
-		
-		for (var i = 0; i < points.length - 1; i++) 
-		{
-			for(var j = 0; j < points[i].length - 1; j++)
-			{
+
+		for (var i = 0; i < points.length - 1; i++) {
+			for (var j = 0; j < points[i].length - 1; j++) {
 				var p1 = points[i][j];
 				var p2 = points[i + 1][j];
 				var p3 = points[i][j + 1];
 				var p4 = points[i + 1][j + 1];
-				
+
 				this.paths.test.push(this.cChartDrawer._calculatePathFace(p1, p3, p4, p2, true));
-				
+
 				var p13d = points3d[i][j];
 				var p23d = points3d[i + 1][j];
 				var p33d = points3d[i][j + 1];
-				var p43d = points3d[i + 1][j + 1];	
-				
+				var p43d = points3d[i + 1][j + 1];
+
 				//рассчитываем отдельный сегмент - смотрим, может ли он располагаться в одной плоскости + делим его плоскостями сетки
 				//p, p2, p21, p1 - точки данного сегмента
 				//  p1-----p21
@@ -11313,565 +11299,481 @@ drawSurfaceChart.prototype =
 		}
 	},
 
-	_calculateFace: function(p, p1, p2, p21, p3d, p13d, p23d, p213d)
-	{
+	_calculateFace: function (p, p1, p2, p21, p3d, p13d, p23d, p213d) {
 		var t = this;
-		
+
 		//все стороны сегмента
 		var lines = [];
 		lines[0] = {p1: p3d, p2: p23d, p111: p, p222: p2};
 		lines[1] = {p1: p13d, p2: p213d, p111: p1, p222: p21};
 		lines[2] = {p1: p3d, p2: p13d, p111: p, p222: p1};
 		lines[3] = {p1: p23d, p2: p213d, p111: p2, p222: p21};
-		
-		
+
+
 		var pointsValue = [p1, p2, p21, p];
-		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))//не делим диагональю данный сегмент
+		if (this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))//не делим диагональю данный сегмент
 		{
 			this._getIntersectionPlanesAndLines(lines, pointsValue, true);
-		}
-		else//делим диагональю данный сегмент
+		} else//делим диагональю данный сегмент
 		{
 			var max = p.val;
 			var maxIndex = 0;
 			var arrVal = [p, p1, p2, p21];
-			for(var m = 0; m < arrVal.length; m++)
-			{
-				if(arrVal[m].val > max)
-				{	
+			for (var m = 0; m < arrVal.length; m++) {
+				if (arrVal[m].val > max) {
 					max = arrVal[m].val;
 					maxIndex = m;
 				}
 			}
-			
+
 			//разбиваем диагональю данный сегмент на два сегмента
 			var lines1, pointsValue1, lines2, pointsValue2;
-			if(p1.val + p2.val < p21.val + p.val)
-			{	
+			if (p1.val + p2.val < p21.val + p.val) {
 				//добавляем диагональ
 				lines.push({p1: p213d, p2: p3d, p111: p21, p222: p});
 				//this.paths.test.push(this._calculatePath(p21.x, p21.y, p.x, p.y));
-				
+
 				lines1 = [lines[0], lines[3], lines[4]];
 				pointsValue1 = [p, p21, p2];
 				lines2 = [lines[2], lines[1], lines[4]];
 				pointsValue2 = [p, p1, p21];
-			}
-			else
-			{
+			} else {
 				//добавляем диагональ
 				lines.push({p1: p13d, p2: p23d, p111: p1, p222: p2});
 				//this.paths.test.push(this._calculatePath(p2.x, p2.y, p1.x, p1.y));
-				
+
 				lines1 = [lines[2], lines[0], lines[4]];
 				pointsValue1 = [p, p1, p2];
 				lines2 = [lines[4], lines[1], lines[3]];
 				pointsValue2 = [p2, p1, p21];
 			}
-			
+
 			//для поверхностных диаграмм без заливки
 			var bIsWireframeChart = false;
-			
+
 			//находим пересечение двух сегментов с плоскостями сетки
 			var pointsFace1 = this._getIntersectionPlanesAndLines(lines1, pointsValue1, !bIsWireframeChart);
 			var pointsFace2 = this._getIntersectionPlanesAndLines(lines2, pointsValue2, !bIsWireframeChart);
-			
-			if(bIsWireframeChart)
-			{
+
+			if (bIsWireframeChart) {
 				var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
-				for(var l = 0; l < lengthFaces; l++)
-				{
+				for (var l = 0; l < lengthFaces; l++) {
 					var newPath = null;
-					if(pointsFace1[l] && pointsFace2[l])
-					{	
+					if (pointsFace1[l] && pointsFace2[l]) {
 						var cleanPoints1 = this._getArrayWithoutRepeatePoints(pointsFace1[l]);
 						var cleanPoints2 = this._getArrayWithoutRepeatePoints(pointsFace2[l]);
-						
-						if(cleanPoints1.length >= 3 && cleanPoints2.length >= 3)
-						{
+
+						if (cleanPoints1.length >= 3 && cleanPoints2.length >= 3) {
 							newPath = cleanPoints1.concat(cleanPoints2);
 						}
-					}
-					else if(pointsFace1[l])
-					{
+					} else if (pointsFace1[l]) {
 						newPath = pointsFace1[l];
-					}
-					else if(pointsFace2[l])
-					{
+					} else if (pointsFace2[l]) {
 						newPath = pointsFace2[l];
 					}
-					
-					
-					if(newPath)
-					{
-						if(!t.paths.test2[l])
-						{
+
+
+					if (newPath) {
+						if (!t.paths.test2[l]) {
 							t.paths.test2[l] = [];
 						}
-						
+
 						var path2 = t._calculateTempFace(newPath);
 						t.paths.test2[l].push(path2);
 					}
 				}
 			}
-			
+
 			//TODO временно убираю. если будут проблемы в отрисовке - раскомментировать!
 			/*var lengthFaces = Math.max(pointsFace1.length, pointsFace2.length);
-			for(var l = 0; l < lengthFaces; l++)
-			{
-				if(pointsFace1[l] && pointsFace2[l])
-				{	
-					//находим две точки, принадлежащие диагональной прямой. у обоих сегментов они должны быть
-					var lineEquation = t.cChartDrawer.getLineEquation2d(lines[4].p111, lines[4].p222);
-					
-					var points1 = [];
-					for(var s = 0; s < pointsFace1[l].length; s++)
-					{
-						if(null === this._isEqualPoints(points1, pointsFace1[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace1[l][s]))
-						{
-							points1.push(pointsFace1[l][s]);
-						}
-					}
-					
-					var points2 = []
-					for(var s = 0; s < pointsFace2[l].length; s++)
-					{
-						if(null === this._isEqualPoints(points2, pointsFace2[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace2[l][s]))
-						{
-							points2.push(pointsFace2[l][s]);
-						}
-					}
-					
-					if(points1.length < 2 && points2.length === 2)
-					{
-						pointsFace1[l].push(points2[0]);
-						pointsFace1[l].push(points2[1]);
-					}
-					else if(points2.length < 2 && points1.length === 2)
-					{
-						pointsFace2[l].push(points1[0]);
-						pointsFace2[l].push(points1[1]);
-					}
-				}
-				
-				
-				if(!t.paths.test2[l])
-				{
-					t.paths.test2[l] = [];
-				}
-				if(pointsFace1[l])
-				{	
-					var path1 = t._calculateTempFace(pointsFace1[l]);
-					t.paths.test2[l].push(path1);
-				}
-				if(pointsFace2[l])
-				{
-					var path2 = t._calculateTempFace(pointsFace2[l]);
-					t.paths.test2[l].push(path2);
-				}
-			}*/
+			 for(var l = 0; l < lengthFaces; l++)
+			 {
+			 if(pointsFace1[l] && pointsFace2[l])
+			 {
+			 //находим две точки, принадлежащие диагональной прямой. у обоих сегментов они должны быть
+			 var lineEquation = t.cChartDrawer.getLineEquation2d(lines[4].p111, lines[4].p222);
+
+			 var points1 = [];
+			 for(var s = 0; s < pointsFace1[l].length; s++)
+			 {
+			 if(null === this._isEqualPoints(points1, pointsFace1[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace1[l][s]))
+			 {
+			 points1.push(pointsFace1[l][s]);
+			 }
+			 }
+
+			 var points2 = []
+			 for(var s = 0; s < pointsFace2[l].length; s++)
+			 {
+			 if(null === this._isEqualPoints(points2, pointsFace2[l][s]) && t.cChartDrawer.isPoint2DLieOnLine(lineEquation, pointsFace2[l][s]))
+			 {
+			 points2.push(pointsFace2[l][s]);
+			 }
+			 }
+
+			 if(points1.length < 2 && points2.length === 2)
+			 {
+			 pointsFace1[l].push(points2[0]);
+			 pointsFace1[l].push(points2[1]);
+			 }
+			 else if(points2.length < 2 && points1.length === 2)
+			 {
+			 pointsFace2[l].push(points1[0]);
+			 pointsFace2[l].push(points1[1]);
+			 }
+			 }
+
+
+			 if(!t.paths.test2[l])
+			 {
+			 t.paths.test2[l] = [];
+			 }
+			 if(pointsFace1[l])
+			 {
+			 var path1 = t._calculateTempFace(pointsFace1[l]);
+			 t.paths.test2[l].push(path1);
+			 }
+			 if(pointsFace2[l])
+			 {
+			 var path2 = t._calculateTempFace(pointsFace2[l]);
+			 t.paths.test2[l].push(path2);
+			 }
+			 }*/
 		}
 	},
-	
-	
-	_getIntersectionPlanesAndLines: function(lines, pointsValue, bIsAddIntoPaths)
-	{
+
+
+	_getIntersectionPlanesAndLines: function (lines, pointsValue, bIsAddIntoPaths) {
 		var t = this;
 		var yPoints = this.valAx.yPoints;
 		var xPoints = this.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
-		
-		var getGridPlain = function(index)
-		{
+
+		var getGridPlain = function (index) {
 			var gridX1 = xPoints[0].pos * t.chartProp.pxToMM;
 			var gridX2 = xPoints[xPoints.length - 1].pos * t.chartProp.pxToMM;
-			
+
 			var gridY1 = yPoints[index].pos * t.chartProp.pxToMM;
 			var gridY2 = yPoints[index].pos * t.chartProp.pxToMM;
-			var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1,y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
-			
+			var gridPlain = t.cChartDrawer.getPlainEquation({x: gridX1, y: gridY1, z: 0}, {x: gridX2, y: gridY2, z: 0}, {x: gridX2, y: gridY2, z: perspectiveDepth});
+
 			return gridPlain;
 		};
-		
-		var getMinMaxValArray = function(pointsValue)
-		{
+
+		var getMinMaxValArray = function (pointsValue) {
 			var min, max;
-			if(pointsValue.length === 4)
-			{
+			if (pointsValue.length === 4) {
 				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
 				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val, pointsValue[3].val);
-			}
-			else
-			{
+			} else {
 				min = Math.min(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
 				max = Math.max(pointsValue[0].val, pointsValue[1].val, pointsValue[2].val);
 			}
 			return {min: min, max: max}
 		};
-		
-		var calculateFaceBetween2GridLines = function(minVal, maxVal, k, pointsValue, res)
-		{
+
+		var calculateFaceBetween2GridLines = function (minVal, maxVal, k, pointsValue, res) {
 			var result = false;
-			
-			if(yPoints[k - 1] && minVal >= yPoints[k - 1].val && maxVal <= yPoints[k].val)
-			{
+
+			if (yPoints[k - 1] && minVal >= yPoints[k - 1].val && maxVal <= yPoints[k].val) {
 				var p1 = pointsValue[0];
 				var p2 = pointsValue[1];
 				var p3 = pointsValue[2];
 				var p4 = pointsValue[3] ? pointsValue[3] : pointsValue[2];
-				
+
 				var path = t._calculateTempFace([p1, p2, p3, p4]);
-				
+
 				var addIndex = k;
-				if(minVal === maxVal && yPoints[k] && minVal === yPoints[k].val)
-				{
+				if (minVal === maxVal && yPoints[k] && minVal === yPoints[k].val) {
 					addIndex = k + 1;
 				}
-				
-				if(bIsAddIntoPaths)
-				{
-					if(!t.paths.test2[addIndex])
-					{
+
+				if (bIsAddIntoPaths) {
+					if (!t.paths.test2[addIndex]) {
 						t.paths.test2[addIndex] = [];
 					}
 					t.paths.test2[addIndex].push(path);
 				}
-				
+
 				res[k] = [p1, p2, p3, p4];
 				result = true;
 			}
-			
+
 			return result;
 		};
-		
+
 		var minMaxVal = getMinMaxValArray(pointsValue);
 		var minVal = minMaxVal.min;
 		var maxVal = minMaxVal.max;
-		
+
 		var res = [];
-		
+
 		var prevPoints = null;
-		for(var k = 0; k < yPoints.length; k++)
-		{
+		for (var k = 0; k < yPoints.length; k++) {
 			//если сегмент весь находится между двумя соседними плоскостями сетки, то есть ни с одной из них не имеет пересечений
-			if(calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue, res))
-			{
+			if (calculateFaceBetween2GridLines(minVal, maxVal, k, pointsValue, res)) {
 				break;
 			}
 			//если значение сетки больше максимального значения сегмента
-			if(yPoints[k - 1] && yPoints[k].val > maxVal && yPoints[k - 1].val >= maxVal)
-			{
+			if (yPoints[k - 1] && yPoints[k].val > maxVal && yPoints[k - 1].val >= maxVal) {
 				break;
 			}
-			
+
 			//точки, которые находятся между данными плоскостями сетки(или лежат на них), обязательно должны войти в сегмент
 			var pointNeedAddIntoFace = null;
-			if(yPoints[k - 1])
-			{
-				for(var i = 0; i < pointsValue.length; i++)
-				{
-					if(yPoints[k - 1].val <= pointsValue[i].val && yPoints[k].val >= pointsValue[i].val)
-					{
-						if(null === pointNeedAddIntoFace)
-						{
+			if (yPoints[k - 1]) {
+				for (var i = 0; i < pointsValue.length; i++) {
+					if (yPoints[k - 1].val <= pointsValue[i].val && yPoints[k].val >= pointsValue[i].val) {
+						if (null === pointNeedAddIntoFace) {
 							pointNeedAddIntoFace = [];
 						}
-						
+
 						pointNeedAddIntoFace.push(pointsValue[i]);
 					}
 				}
 			}
-			
-			
+
+
 			var isCalculatePrevPoints = false;
-			if(null === prevPoints)
-			{
-				for(var j = 0; j < pointsValue.length; j++)
-				{
-					if(pointsValue[j].val <= yPoints[k].val)
-					{
-						if(!prevPoints)
-						{
+			if (null === prevPoints) {
+				for (var j = 0; j < pointsValue.length; j++) {
+					if (pointsValue[j].val <= yPoints[k].val) {
+						if (!prevPoints) {
 							prevPoints = [];
 						}
 						prevPoints.push(pointsValue[j]);
 						isCalculatePrevPoints = true;
-					}	
+					}
 				}
 			}
-			
+
 			//находим точки пересечения с текущей плоскостью сетки
 			var gridPlane = getGridPlain(k);
 			var points = this._getIntersectionPlaneAndLines(gridPlane, lines, pointsValue);
-			
-			if(!isCalculatePrevPoints && null === points && prevPoints)
-			{
-				for(var j = 0; j < pointsValue.length; j++)
-				{
-					if(pointsValue[j].val >= yPoints[k - 1].val)
-					{
-						if(!points)
-						{
+
+			if (!isCalculatePrevPoints && null === points && prevPoints) {
+				for (var j = 0; j < pointsValue.length; j++) {
+					if (pointsValue[j].val >= yPoints[k - 1].val) {
+						if (!points) {
 							points = [];
 						}
 						points.push(pointsValue[j]);
 						isCalculatePrevPoints = true;
-					}	
+					}
 				}
 			}
-			
+
 			var arrPoints = null, p1, p2, p3, p4;
-			if(null !== points && prevPoints)
-			{
+			if (null !== points && prevPoints) {
 				p1 = prevPoints[0];
 				p2 = prevPoints[1] ? prevPoints[1] : prevPoints[0];
 				p3 = points[0];
 				p4 = points[1] ? points[1] : points[0];
-				
+
 				arrPoints = [p1, p2, p3, p4];
-				if(points[2])
-				{
+				if (points[2]) {
 					arrPoints.push(points[2]);
 				}
 				res[k] = arrPoints;
-			}
-			else if(prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints)
-			{
+			} else if (prevPoints && prevPoints.length === 3 && !points && isCalculatePrevPoints) {
 				p1 = prevPoints[0];
 				p2 = prevPoints[1];
 				p3 = prevPoints[2];
 				p4 = prevPoints[3] ? prevPoints[3] : prevPoints[2];
-				
+
 				arrPoints = [p1, p2, p3, p4];
 				res[k] = arrPoints;
 			}
-			
+
 			//добавляем точки, которые обязательно должны присутвовать в сегменте
-			if(arrPoints && null !== pointNeedAddIntoFace)
-			{
-				for(var i = 0; i < pointNeedAddIntoFace.length; i++)
-				{
+			if (arrPoints && null !== pointNeedAddIntoFace) {
+				for (var i = 0; i < pointNeedAddIntoFace.length; i++) {
 					arrPoints.push(pointNeedAddIntoFace[i]);
 				}
 			}
-			
+
 			//add to path array
-			if(arrPoints && bIsAddIntoPaths)
-			{
+			if (arrPoints && bIsAddIntoPaths) {
 				var path = t._calculateTempFace(arrPoints);
-				if(!t.paths.test2[k])
-				{
+				if (!t.paths.test2[k]) {
 					t.paths.test2[k] = [];
 				}
 				t.paths.test2[k].push(path);
 			}
-			
-			if(points !== null)
-			{
+
+			if (points !== null) {
 				prevPoints = points;
 			}
 		}
-		
+
 		return res;
 	},
-	
-	_getIntersectionPlaneAndLines: function(gridPlain, lines, pointsValue)
-	{
+
+	_getIntersectionPlaneAndLines: function (gridPlain, lines, pointsValue) {
 		var res = null;
-		
+
 		var clearIntersectionPoints = [];
 		var segmentIntersectionPoints = [];
-	
+
 		//n --> lines --> 0 - down, 1 - up, 2 - left, 3 - right, 4 - diagonal
-		for(var n = 0; n < lines.length; n++)
-		{
+		for (var n = 0; n < lines.length; n++) {
 			var convertResult = this.cChartDrawer.isIntersectionPlainAndLineSegment(gridPlain, lines[n].p1, lines[n].p2, lines[n].p111, lines[n].p222);
-			if(!convertResult)
+			if (!convertResult) {
 				continue;
-			
-			if(null === this._isEqualPoints(pointsValue, convertResult))
-			{
-				clearIntersectionPoints.push(convertResult);
 			}
-			else
-			{
-				if(null === this._isEqualPoints(segmentIntersectionPoints, convertResult))
-				{
+
+			if (null === this._isEqualPoints(pointsValue, convertResult)) {
+				clearIntersectionPoints.push(convertResult);
+			} else {
+				if (null === this._isEqualPoints(segmentIntersectionPoints, convertResult)) {
 					segmentIntersectionPoints.push(convertResult);
 				}
 			}
 		}
 
 		var p1, p2;
-		if(!segmentIntersectionPoints.length)
-		{
-			if(clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
+		if (!segmentIntersectionPoints.length) {
+			if (clearIntersectionPoints.length === 2)//две точки, не равняющиеся ни одной точке сегмента
 			{
 				p1 = clearIntersectionPoints[0];
 				p2 = clearIntersectionPoints[1];
-				
+
 				res = [p1, p2];
-			}
-			else if(clearIntersectionPoints.length === 1)//одна точка, не равняющиеся ни одной точке сегмента
+			} else if (clearIntersectionPoints.length === 1)//одна точка, не равняющиеся ни одной точке сегмента
 			{
 				p1 = clearIntersectionPoints[0];
-				
+
 				res = [p1];
 			}
-		}
-		else if(segmentIntersectionPoints.length && clearIntersectionPoints.length)
-		{
-			if(1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length)
-			{
+		} else if (segmentIntersectionPoints.length && clearIntersectionPoints.length) {
+			if (1 === segmentIntersectionPoints.length && 1 === clearIntersectionPoints.length) {
 				p1 = segmentIntersectionPoints[0];
 				p2 = clearIntersectionPoints[0];
-				
+
 				res = [p1, p2];
 			}
-		}
-		else if(segmentIntersectionPoints.length)
-		{
-			if(2 === segmentIntersectionPoints.length)
-			{
+		} else if (segmentIntersectionPoints.length) {
+			if (2 === segmentIntersectionPoints.length) {
 				p1 = segmentIntersectionPoints[0];
 				p2 = segmentIntersectionPoints[1];
-				
+
 				res = [p1, p2];
-			}
-			else if(1 === segmentIntersectionPoints.length)
-			{
+			} else if (1 === segmentIntersectionPoints.length) {
 				p1 = segmentIntersectionPoints[0];
-				
+
 				res = [p1];
 			}
 		}
-		
+
 		return res;
 	},
-	
-	_isEqualPoints: function(arr, point)
-	{
+
+	_isEqualPoints: function (arr, point) {
 		var res = null;
-		
-		for(var p = 0; p < arr.length; p++)
-		{
-			if(arr[p] && parseInt(point.x) === parseInt(arr[p].x) && parseInt(point.y) === parseInt(arr[p].y))
-			{
+
+		for (var p = 0; p < arr.length; p++) {
+			if (arr[p] && parseInt(point.x) === parseInt(arr[p].x) && parseInt(point.y) === parseInt(arr[p].y)) {
 				res = p;
 				break;
 			}
 		}
-		
+
 		return res;
 	},
-	
-	_getArrayWithoutRepeatePoints: function(arr)
-	{
+
+	_getArrayWithoutRepeatePoints: function (arr) {
 		var newArray = [];
-		
-		for(var i = 0; i < arr.length; i++)
-		{
-			if(null === this._isEqualPoints(newArray, arr[i]))
-			{
+
+		for (var i = 0; i < arr.length; i++) {
+			if (null === this._isEqualPoints(newArray, arr[i])) {
 				newArray.push(arr[i]);
 			}
 		}
-		
+
 		return newArray;
 	},
-	
-	_calculateTempFace: function(points)
-	{	
+
+	_calculateTempFace: function (points) {
 		var summX = 0;
 		var summY = 0;
-		for(var i = 0; i < points.length; i++)
-		{
+		for (var i = 0; i < points.length; i++) {
 			summX += points[i].x;
 			summY += points[i].y;
 		}
-		var x = 1/(points.length)*(summX); 
-		var y = 1/(points.length)*(summY);
-		
+		var x = 1 / (points.length) * (summX);
+		var y = 1 / (points.length) * (summY);
+
 		var sortArray = [];
 		var repeatePoint = [];
 		var nIndividualPoints = 0;
-		for(var i = 0; i < points.length; i++)
-		{
+		for (var i = 0; i < points.length; i++) {
 			var tan = Math.atan2(points[i].x - x, points[i].y - y);
-			if(!repeatePoint[tan])
-			{
+			if (!repeatePoint[tan]) {
 				sortArray[i] = {tan: tan, point: points[i]};
 				repeatePoint[tan] = 1;
 				nIndividualPoints++;
 			}
 		}
-		
+
 		var path = null
-		if(nIndividualPoints > 2)
-		{
-			sortArray.sort (function sortArr(a, b)
-			{
-				return  b.tan - a.tan;
+		if (nIndividualPoints > 2) {
+			sortArray.sort(function sortArr(a, b) {
+				return b.tan - a.tan;
 			});
-		
+
 			path = this.cChartDrawer.calculatePathFacesArray(sortArray, true);
 		}
-		
+
 		return path
 	},
-	
-	
-	_getYVal: function(n, i)
-	{
+
+
+	_getYVal: function (n, i) {
 		var idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[i], n);
 		var val = idxPoint ? parseFloat(idxPoint.val) : null;
-		
+
 		return val;
 	},
-	
-	_calculatePath: function(x, y, x1, y1)
-	{
+
+	_calculatePath: function (x, y, x1, y1) {
 		var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pxToMm = this.chartProp.pxToMM;
-		
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 		var gdLst = [];
-		
+
 		path.pathH = pathH;
 		path.pathW = pathW;
 		gdLst["w"] = 1;
 		gdLst["h"] = 1;
-		
+
 		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
 		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
-		
+
 		return pathId;
 	},
-	
-	_draw: function()
-	{
+
+	_draw: function () {
 		var style = AscFormat.CHART_STYLE_MANAGER.getStyleByIndex(this.cChartSpace.style);
-	
-		for(var i = 0; i < this.paths.test2.length; i++)
-		{
-			if(!this.paths.test2[i])
+
+		for (var i = 0; i < this.paths.test2.length; i++) {
+			if (!this.paths.test2[i]) {
 				continue;
-				
-			for(var j = 0; j < this.paths.test2[i].length; j++)
-			{
+			}
+
+			for (var j = 0; j < this.paths.test2[i].length; j++) {
 				style = this.chart.compiledBandFormats[i - 1];
 				var brush = style && style.spPr ? style.spPr.Fill : null;
 				var pen = style && style.spPr ? style.spPr.ln : null;
-				
+
 				//линии пока делаю по цвету как и заливку
-				if(!pen || (pen && 0 === pen.w))
-				{
+				if (!pen || (pen && 0 === pen.w)) {
 					pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.13);
 				}
-				
+
 				this.cChartDrawer.drawPath(this.paths.test2[i][j], pen, brush);
 			}
 		}
