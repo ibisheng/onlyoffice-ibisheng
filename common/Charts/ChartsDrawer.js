@@ -7353,7 +7353,7 @@ drawHBarChart.prototype = {
 			startY = startBlockPosition;
 			width = endBlockPosition - startBlockPosition;
 
-			if (this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX) {
+			if (this.valAx.scaling.orientation !== ORIENTATION_MIN_MAX) {
 				width = -width;
 			}
 		} else {
@@ -7816,7 +7816,7 @@ drawHBarChart.prototype = {
 			} else {
 				//if(options !== null)
 				//{
-				var pen = t.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				var pen = t.valAx.compiledMajorGridLines;
 				var brush = null;
 
 				this.cChartDrawer.drawPath(this.sortZIndexPaths[i].paths, pen, brush);
@@ -8071,8 +8071,10 @@ drawHBarChart.prototype = {
 };
 
 /** @constructor */
-function drawPieChart()
+function drawPieChart(chart)
 {
+	this.chart = chart;
+
 	this.tempAngle = null;
 	this.paths = {};
 	this.cX = null;
@@ -8159,7 +8161,7 @@ drawPieChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		var firstSliceAng = this.cChartSpace.chart.plotArea.chart &&  this.cChartSpace.chart.plotArea.chart.firstSliceAng ? this.cChartSpace.chart.plotArea.chart.firstSliceAng : 0;
+		var firstSliceAng = this.chart &&  this.chart.firstSliceAng ? this.chart.firstSliceAng : 0;
 		this.tempAngle = Math.PI/2 - (firstSliceAng / 180) * Math.PI ;
 		//рисуем против часовой стрелки, поэтому цикл с конца
 		var angle;
@@ -8177,11 +8179,11 @@ drawPieChart.prototype =
 	
 	_getFirstRealNumCache: function()
 	{
-		var series = this.chartProp.series;
+		var series = this.chart.series;
 		var numCache;
 		for(var i = 0; i < series.length; i++)
 		{
-			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache.pts : this.chartProp.series[i].val.numLit.pts;
+			numCache = series[i].val.numRef ? series[i].val.numRef.numCache.pts : series[i].val.numLit.pts;
 			if(numCache && numCache.length)
 				return numCache;
 		}
@@ -8377,7 +8379,7 @@ drawPieChart.prototype =
 			radius = getEllipseRadius(oCommand2.hR, oCommand2.wR, -1 * stAng - swAng / 2 - Math.PI / 2);
 		}
 		
-		var point = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache.pts[val] : this.chartProp.series[0].val.numLit.pts[val];
+		var point = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts[val] : this.chart.series[0].val.numLit.pts[val];
 		
 		if(!point)
 			return;
@@ -9737,10 +9739,7 @@ drawPieChart.prototype =
 			return null;
 		
 		var startAngle = (this.tempAngle);
-		var swapAngle   = angle;
-		
-		var path = this._calculateArc3D(radius, startAngle, swapAngle, xCenter, yCenter, depth, i);
-			
+		var path = this._calculateArc3D(radius, startAngle, angle, xCenter, yCenter, depth, i);
         this.tempAngle += angle;
 		
 		return path;
