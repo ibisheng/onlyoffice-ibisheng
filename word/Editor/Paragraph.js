@@ -12454,10 +12454,13 @@ Paragraph.prototype.GetCurrentComplexFields = function(bReturnFieldPos)
 };
 Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 {
+	var nLine  = this.CurPos.Line;
+	var nRange = this.CurPos.Range;
+
 	var oCurrentPos = this.Get_ParaContentPos(false);
 	this.Set_ParaContentPos(oParaPos, false, -1, -1, false);
 	var arrComplexFields = this.GetCurrentComplexFields(bReturnFieldPos);
-	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
+	this.Set_ParaContentPos(oCurrentPos, false, nLine, nRange, false);
 	return arrComplexFields;
 };
 Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldPos)
