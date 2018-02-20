@@ -2506,9 +2506,9 @@ function CDrawingDocument()
 	{
 		if ("" == this.m_sLockedCursorType)
 		{
-			if (AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
+			if (AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "text" == sType)
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
-			else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
+			else if (this.m_oWordControl.m_oApi.isMarkerFormat && "text" == sType)
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
 			else
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;

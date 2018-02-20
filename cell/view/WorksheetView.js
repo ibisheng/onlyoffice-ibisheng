@@ -8535,7 +8535,6 @@
 						specialPasteHelper.specialPasteProps = specialPasteHelper.specialPasteProps ? specialPasteHelper.specialPasteProps : new Asc.SpecialPasteProps();
 					
                         t._loadDataBeforePaste(isLargeRange, val.fromBinary, val.data, bIsUpdate, canChangeColWidth);
-                        bIsUpdate = false;
                         break;
                     case "hyperlink":
                         if (val && val.hyperlinkModel) {

@@ -40,8 +40,6 @@ var DecodeBase64Char = AscFonts.DecodeBase64Char;
 var b64_decode = AscFonts.b64_decode;
 var FT_Stream = AscFonts.FT_Stream;
 
-var g_fontNamesEncoder = undefined;
-
 var g_map_font_index = {};
 var g_fonts_streams = [];
 
@@ -420,13 +418,7 @@ function CFontFileLoader(id)
 
         var xhr = new XMLHttpRequest();
 
-        if (!g_fontNamesEncoder)
-            g_fontNamesEncoder = new ZBase32Encoder();
-
-        //var _name = this.Id;
-        var _name = g_fontNamesEncoder.Encode(this.Id) + ".js";
-
-        xhr.open('GET', basePath + "odttf/" + _name, true); // TODO:
+        xhr.open('GET', basePath + "/" + this.Id, true); // TODO:
 
         if (typeof ArrayBuffer !== 'undefined' && !window.opera)
             xhr.responseType = 'arraybuffer';
@@ -563,18 +555,7 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 	}
 	scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
 
-	var src;
-	if (this.IsNeedAddJSToFontPath)
-	{
-		if (!g_fontNamesEncoder)
-			g_fontNamesEncoder = new ZBase32Encoder();
-
-		//var _name = this.Id + ".js";
-		var _name = g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
-		src = basePath + "js/" + _name;
-	}
-	else
-		src = basePath + this.Id + ".js";
+	var src = basePath + this.Id + ".js";
 	if(isEmbed)
 		src = AscCommon.g_oDocumentUrls.getUrl(src);
 	scriptElem.setAttribute('src', src);
