@@ -10645,9 +10645,8 @@ drawScatterChart.prototype = {
 };
 
 
-	/** @constructor */
-function drawStockChart(chart)
-{
+/** @constructor */
+function drawStockChart(chart) {
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -10658,21 +10657,18 @@ function drawStockChart(chart)
 	this.paths = {};
 }
 
-drawStockChart.prototype =
-{
-    constructor: drawStockChart,
-	
-	draw : function(chartsDrawer)
-    {
+drawStockChart.prototype = {
+	constructor: drawStockChart,
+
+	draw: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
 		this._drawLines();
 	},
-	
-	recalculate : function(chartsDrawer)
-    {
+
+	recalculate: function (chartsDrawer) {
 		this.paths = {};
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -10680,259 +10676,242 @@ drawStockChart.prototype =
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
 		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
-		
+
 		this._calculateLines();
 	},
-	
-	_calculateLines: function ()
-	{
+
+	_calculateLines: function () {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
-		
+
 		var trueWidth = this.chartProp.trueWidth;
 
 		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
 		var koffX = trueWidth / numCache.pts.length;
-		
+
 		var gapWidth = this.chart.upDownBars && AscFormat.isRealNumber(this.chart.upDownBars.gapWidth) ? this.chart.upDownBars.gapWidth : 150;
-		
+
 		var widthBar = koffX / (1 + gapWidth / 100);
-		
+
 		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4, curNumCache, lastNamCache;
 		for (var i = 0; i < numCache.pts.length; i++) {
-			
+
 			val1 = null, val2 = null, val3 = null, val4 = null;
 			val1 = numCache.pts[i].val;
 
-			lastNamCache =  this.cChartDrawer.getNumCache(this.chart.series[this.chart.series.length - 1].val).pts;
+			lastNamCache = this.cChartDrawer.getNumCache(this.chart.series[this.chart.series.length - 1].val).pts;
 			val4 = lastNamCache[i] ? lastNamCache[i].val : null;
-			
-			for(var k = 1; k < this.chart.series.length - 1; k++)
-			{
+
+			for (var k = 1; k < this.chart.series.length - 1; k++) {
 				curNumCache = this.cChartDrawer.getNumCache(this.chart.series[k].val);
-				if(curNumCache.pts[i])
-				{
-					if(k === 1)
-					{
+				if (curNumCache.pts[i]) {
+					if (k === 1) {
 						val2 = curNumCache.pts[i].val;
 						val3 = curNumCache.pts[i].val;
-					}
-					else
-					{
-						if(parseFloat(val2) > parseFloat(curNumCache.pts[i].val))	
+					} else {
+						if (parseFloat(val2) > parseFloat(curNumCache.pts[i].val)) {
 							val2 = curNumCache.pts[i].val;
-						if(parseFloat(val3) < parseFloat(curNumCache.pts[i].val))	
+						}
+						if (parseFloat(val3) < parseFloat(curNumCache.pts[i].val)) {
 							val3 = curNumCache.pts[i].val;
+						}
 					}
 				}
 			}
-			
-			if(!this.paths.values)
-					this.paths.values = [];
-			if(!this.paths.values[i])
+
+			if (!this.paths.values) {
+				this.paths.values = [];
+			}
+			if (!this.paths.values[i]) {
 				this.paths.values[i] = {};
-			
+			}
+
 			xVal = this.cChartDrawer.getYPosition(i, xPoints, true);
 			yVal1 = this.cChartDrawer.getYPosition(val1, yPoints);
 			yVal2 = this.cChartDrawer.getYPosition(val2, yPoints);
 			yVal3 = this.cChartDrawer.getYPosition(val3, yPoints);
 			yVal4 = this.cChartDrawer.getYPosition(val4, yPoints);
-			
-			if(val2 !== null && val1 !== null)
+
+			if (val2 !== null && val1 !== null) {
 				this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
-			if(val3 && val4)
+			}
+			if (val3 && val4) {
 				this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
-			
-			if(val1 !== null && val4 !== null)
-			{
-				if(parseFloat(val1) > parseFloat(val4))
+			}
+
+			if (val1 !== null && val4 !== null) {
+				if (parseFloat(val1) > parseFloat(val4)) {
 					this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
-				else if(val1 && val4)
+				} else if (val1 && val4) {
 					this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar / this.chartProp.pxToMM);
+				}
 			}
 		}
 	},
-	
-	_getYPosition: function(val, yPoints, isOx)
-	{
+
+	_getYPosition: function (val, yPoints, isOx) {
 		//позиция в заисимости от положения точек на оси OY
 		var result;
 		var resPos;
 		var resVal;
 		var diffVal;
-		if(val < yPoints[0].val)
-		{
+		if (val < yPoints[0].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
-		}
-		else if(val > yPoints[yPoints.length - 1].val)
-		{	
+		} else if (val > yPoints[yPoints.length - 1].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos + (diffVal / resVal) * resPos;
-		}
-		else
-		{
-			for(var s = 0; s < yPoints.length; s++)
-			{
-				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
-				{
+		} else {
+			for (var s = 0; s < yPoints.length; s++) {
+				if (val >= yPoints[s].val && val <= yPoints[s + 1].val) {
 					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
 					resVal = yPoints[s + 1].val - yPoints[s].val;
-					if(!isOx)
-						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-					else	
+					if (!isOx) {
+						result = -(resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					} else {
 						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-						
+					}
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	},
 
-	
-	_drawLines: function ()
-    {
+
+	_drawLines: function () {
 		var brush;
 		var pen;
 		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
-		
+
 		for (var i = 0; i < numCache.pts.length; i++) {
 
 			pen = this.chart.calculatedHiLowLines;
-				
+
 			this.cChartDrawer.drawPath(this.paths.values[i].lowLines, pen, brush);
 			this.cChartDrawer.drawPath(this.paths.values[i].highLines, pen, brush);
-			
-			if(this.paths.values[i].downBars)
-			{
+
+			if (this.paths.values[i].downBars) {
 				brush = this.chart.upDownBars ? this.chart.upDownBars.downBarsBrush : null;
 				pen = this.chart.upDownBars ? this.chart.upDownBars.downBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].downBars, pen, brush);
-			}
-			else
-			{
+			} else {
 				brush = this.chart.upDownBars ? this.chart.upDownBars.upBarsBrush : null;
 				pen = this.chart.upDownBars ? this.chart.upDownBars.upBarsPen : null;
 				this.cChartDrawer.drawPath(this.paths.values[i].upBars, pen, brush);
 			}
-        }
-    },
-	
-	_calculateLine : function(x, y, x1, y1)
-	{
+		}
+	},
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+	_calculateLine: function (x, y, x1, y1) {
+
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		
+
 		path.moveTo(x * pathW, y * pathH);
 		path.lnTo(x1 * pathW, y1 * pathH);
 
 		return pathId;
 	},
-	
-	_calculateDLbl: function(chartSpace, ser, val)
-	{
+
+	_calculateDLbl: function (chartSpace, ser, val) {
 		var pxToMm = this.chartProp.pxToMM;
 		var min = this.valAx.scale[0];
 		var max = this.valAx.scale[this.valAx.scale.length - 1];
-		
+
 		var digHeight = Math.abs(max - min);
-		
-		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
-			min = -1*max;
+
+		if (this.chartProp.min < 0 && this.chartProp.max <= 0) {
+			min = -1 * max;
+		}
 
 		var numCache = this.cChartDrawer.getNumCache(this.chart.series[0].val);
 		var koffX = this.chartProp.trueWidth / numCache.pts.length;
 		var koffY = this.chartProp.trueHeight / digHeight;
-		
+
 		var point = this.chart.series[ser].val.numRef ? this.chart.series[ser].val.numRef.numCache.pts[val] : this.chart.series[ser].val.numLit.pts[val];
-		
-		var x = this.chartProp.chartGutter._left + (val)*koffX + koffX/2;
-		var y = this.chartProp.trueHeight - (point.val - min)*koffY + this.chartProp.chartGutter._top;
-		
+
+		var x = this.chartProp.chartGutter._left + (val) * koffX + koffX / 2;
+		var y = this.chartProp.trueHeight - (point.val - min) * koffY + this.chartProp.chartGutter._top;
+
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
-		
-		var centerX = x / pxToMm - width/2;
-		var centerY = y / pxToMm - height/2;
+
+		var centerX = x / pxToMm - width / 2;
+		var centerY = y / pxToMm - height / 2;
 		var constMargin = 5 / pxToMm;
-		
-		switch ( point.compiledDlb.dLblPos )
-		{
-			case c_oAscChartDataLabelsPos.b:
-			{
-				centerY = centerY + height/2 + constMargin;
+
+		switch (point.compiledDlb.dLblPos) {
+			case c_oAscChartDataLabelsPos.b: {
+				centerY = centerY + height / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.bestFit:
-			{
+			case c_oAscChartDataLabelsPos.bestFit: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.ctr:
-			{
+			case c_oAscChartDataLabelsPos.ctr: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.l:
-			{
-				centerX = centerX - width/2 - constMargin;
+			case c_oAscChartDataLabelsPos.l: {
+				centerX = centerX - width / 2 - constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.r:
-			{
-				centerX = centerX + width/2 + constMargin;
+			case c_oAscChartDataLabelsPos.r: {
+				centerX = centerX + width / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.t:
-			{
-				centerY = centerY - height/2 - constMargin;
+			case c_oAscChartDataLabelsPos.t: {
+				centerY = centerY - height / 2 - constMargin;
 				break;
 			}
 		}
-		
-		if(centerX < 0)
+
+		if (centerX < 0) {
 			centerX = 0;
-		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+		}
+		if (centerX + width > this.chartProp.widthCanvas / pxToMm) {
 			centerX = this.chartProp.widthCanvas / pxToMm - width;
-			
-		if(centerY < 0)
+		}
+
+		if (centerY < 0) {
 			centerY = 0;
-		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+		}
+		if (centerY + height > this.chartProp.heightCanvas / pxToMm) {
 			centerY = this.chartProp.heightCanvas / pxToMm - height;
-			
+		}
+
 		return {x: centerX, y: centerY};
 	},
-	
-	_calculateUpDownBars: function(x, y, x1, y1, width)
-	{
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+
+	_calculateUpDownBars: function (x, y, x1, y1, width) {
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		path.moveTo((x - width/2) * pathW, y * pathH);
-		path.lnTo((x - width/2) * pathW, y1 * pathH);
-		path.lnTo((x + width/2) * pathW, y1 * pathH);
-		path.lnTo((x + width/2) * pathW, y * pathH);
-		path.lnTo((x - width/2) * pathW, y * pathH);
-		
+		path.moveTo((x - width / 2) * pathW, y * pathH);
+		path.lnTo((x - width / 2) * pathW, y1 * pathH);
+		path.lnTo((x + width / 2) * pathW, y1 * pathH);
+		path.lnTo((x + width / 2) * pathW, y * pathH);
+		path.lnTo((x - width / 2) * pathW, y * pathH);
+
 		return pathId;
 	}
 };
 
-	/** @constructor */
-function drawBubbleChart(chart)
-{
+/** @constructor */
+function drawBubbleChart(chart) {
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -10943,12 +10922,10 @@ function drawBubbleChart(chart)
 	this.paths = {};
 }
 
-drawBubbleChart.prototype =
-{
-    constructor: drawBubbleChart,
-	
-	recalculate : function(chartsDrawer)
-	{
+drawBubbleChart.prototype = {
+	constructor: drawBubbleChart,
+
+	recalculate: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -10959,241 +10936,219 @@ drawBubbleChart.prototype =
 
 		this._recalculateScatter();
 	},
-	
-	draw : function(chartsDrawer)
-    {
+
+	draw: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
 		this._drawScatter();
 	},
-	
-	_recalculateScatter: function ()
-    {
+
+	_recalculateScatter: function () {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
-		
+
 		var seria, yVal, xVal, points, x, y, yNumCache, xNumCache;
-		for(var i = 0; i < this.chart.series.length; i++)
-		{
+		for (var i = 0; i < this.chart.series.length; i++) {
 			seria = this.chart.series[i];
 			points = [];
 			yNumCache = this.cChartDrawer.getNumCache(seria.yVal);
-			for(var n = 0; n < yNumCache.pts.length; n++)
-			{
+			for (var n = 0; n < yNumCache.pts.length; n++) {
 				yVal = parseFloat(yNumCache.pts[n].val);
-				
+
 				xNumCache = this.cChartDrawer.getNumCache(seria.xVal);
-				if(xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val)
-				{
-					if(!isNaN(parseFloat(xNumCache.pts[n].val)))
+				if (xNumCache && xNumCache.pts[n] && xNumCache.pts[n].val) {
+					if (!isNaN(parseFloat(xNumCache.pts[n].val))) {
 						xVal = parseFloat(xNumCache.pts[n].val);
-					else
+					} else {
 						xVal = n + 1;
-				}
-				else
+					}
+				} else {
 					xVal = n + 1;
-				
+				}
+
 				points[n] = {x: xVal, y: yVal}
 			}
-			
-			for(var k = 0; k < points.length; k++)
-			{
+
+			for (var k = 0; k < points.length; k++) {
 				y = this.cChartDrawer.getYPosition(points[k].y, yPoints);
 				x = this.cChartDrawer.getYPosition(points[k].x, xPoints, true);
-			
-				
-				if(!this.paths.points)
+
+
+				if (!this.paths.points) {
 					this.paths.points = [];
-				if(!this.paths.points[i])
+				}
+				if (!this.paths.points[i]) {
 					this.paths.points[i] = [];
-				
+				}
+
 				this.paths.points[i][k] = this._calculateBubble(x, y, seria.bubbleSize, k);
 			}
 		}
-    },
-	
-	_drawScatter: function ()
-    {
+	},
+
+	_drawScatter: function () {
 		var seria, brush, pen, markerBrush, markerPen, yNumCache;
-		for(var i = 0; i < this.chart.series.length; i++)
-		{
+		for (var i = 0; i < this.chart.series.length; i++) {
 			seria = this.chart.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
-			
+
 			//draw bubble
-			if(this.paths.points && this.paths.points[i])
-			{
-				for(var k = 0; k < this.paths.points[i].length; k++)
-				{	
-					yNumCache = this.cChartDrawer.getNumCache(this.chartProp.series[i].yVal);
+			if (this.paths.points && this.paths.points[i]) {
+				for (var k = 0; k < this.paths.points[i].length; k++) {
+					yNumCache = this.cChartDrawer.getNumCache(this.chart.series[i].yVal);
 					markerBrush = yNumCache.pts[k].compiledMarker.brush;
 					markerPen = yNumCache.pts[k].compiledMarker.pen;
-					
-					//point		
+
+					//point
 					this.cChartDrawer.drawPath(this.paths.points[i][k], markerPen, markerBrush, true);
 				}
 			}
 		}
-    },
-	
-	_getYPosition: function(val, yPoints, isOx)
-	{
+	},
+
+	_getYPosition: function (val, yPoints, isOx) {
 		//позиция в заисимости от положения точек на оси OY
 		var result;
 		var resPos;
 		var resVal;
 		var diffVal;
-		if(val < yPoints[0].val)
-		{
+		if (val < yPoints[0].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
-		}
-		else if(val > yPoints[yPoints.length - 1].val)
-		{	
+		} else if (val > yPoints[yPoints.length - 1].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
 			result = yPoints[0].pos + (diffVal / resVal) * resPos;
-		}
-		else
-		{
-			for(var s = 0; s < yPoints.length; s++)
-			{
-				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
-				{
+		} else {
+			for (var s = 0; s < yPoints.length; s++) {
+				if (val >= yPoints[s].val && val <= yPoints[s + 1].val) {
 					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
 					resVal = yPoints[s + 1].val - yPoints[s].val;
-					if(!isOx)
-						result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-					else	
+					if (!isOx) {
+						result = -(resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
+					} else {
 						result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + yPoints[s].pos;
-						
+					}
+
 					break;
 				}
 			}
 		}
-		
+
 		return result;
 	},
-	
-	_calculateDLbl: function(chartSpace, ser, val)
-	{
+
+	_calculateDLbl: function (chartSpace, ser, val) {
 		var point;
-		if(this.chart.series[ser - 1])
+		if (this.chart.series[ser - 1]) {
 			point = this.chart.series[ser - 1].yVal.numRef ? this.chart.series[ser - 1].yVal.numRef.numCache.pts[val] : this.chart.series[ser - 1].yVal.numLit.pts[val];
-		else
+		} else {
 			point = this.chart.series[ser].yVal.numRef ? this.chart.series[ser].yVal.numRef.numCache.pts[val] : this.chart.series[ser].yVal.numLit.pts[val];
-		
+		}
+
 		var path;
-		
-		if(this.paths.points)
-		{
-			if(this.paths.points[ser] && this.paths.points[ser][val]){
+
+		if (this.paths.points) {
+			if (this.paths.points[ser] && this.paths.points[ser][val]) {
 				var oPath = this.cChartSpace.GetPath(this.paths.points[ser][val].path);
-                path = oPath.getCommandByIndex(0);
+				path = oPath.getCommandByIndex(0);
 			}
 
 		}
-	
-		if(!path)
+
+		if (!path) {
 			return;
-			
+		}
+
 		var x = path.X;
 		var y = path.Y;
-		
+
 		var pxToMm = this.chartProp.pxToMM;
 		var constMargin = 5 / pxToMm;
-		
+
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
-		
-		var centerX = x - width/2;
-		var centerY = y - height/2;
-		
-		switch ( point.compiledDlb.dLblPos )
-		{
-			case c_oAscChartDataLabelsPos.b:
-			{
-				centerY = centerY + height/2 + constMargin;
+
+		var centerX = x - width / 2;
+		var centerY = y - height / 2;
+
+		switch (point.compiledDlb.dLblPos) {
+			case c_oAscChartDataLabelsPos.b: {
+				centerY = centerY + height / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.bestFit:
-			{
+			case c_oAscChartDataLabelsPos.bestFit: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.ctr:
-			{
+			case c_oAscChartDataLabelsPos.ctr: {
 				break;
 			}
-			case c_oAscChartDataLabelsPos.l:
-			{
-				centerX = centerX - width/2 - constMargin;
+			case c_oAscChartDataLabelsPos.l: {
+				centerX = centerX - width / 2 - constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.r:
-			{
-				centerX = centerX + width/2 + constMargin;
+			case c_oAscChartDataLabelsPos.r: {
+				centerX = centerX + width / 2 + constMargin;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.t:
-			{
-				centerY = centerY - height/2 - constMargin;
+			case c_oAscChartDataLabelsPos.t: {
+				centerY = centerY - height / 2 - constMargin;
 				break;
 			}
 		}
-		
-		if(centerX < 0)
+
+		if (centerX < 0) {
 			centerX = 0;
-		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+		}
+		if (centerX + width > this.chartProp.widthCanvas / pxToMm) {
 			centerX = this.chartProp.widthCanvas / pxToMm - width;
-			
-		if(centerY < 0)
+		}
+
+		if (centerY < 0) {
 			centerY = 0;
-		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+		}
+		if (centerY + height > this.chartProp.heightCanvas / pxToMm) {
 			centerY = this.chartProp.heightCanvas / pxToMm - height;
-		
+		}
+
 		return {x: centerX, y: centerY};
 	},
-	
-	_calculateBubble: function(x, y, bubbleSize, k)
-	{
+
+	_calculateBubble: function (x, y, bubbleSize, k) {
 		var defaultSize = 4;
-		
-		if(bubbleSize)
-		{
+
+		if (bubbleSize) {
 			var maxSize, curSize, yPoints, maxDiamBubble, diffSize, maxArea;
-			
-			
+
+
 			maxSize = this.cChartDrawer._getMaxMinValueArray(bubbleSize).max;
 			curSize = bubbleSize[k].val;
-			
+
 			yPoints = this.valAx.yPoints ? this.valAx.yPoints : this.catAx.yPoints;
 			maxDiamBubble = Math.abs(yPoints[1].pos - yPoints[0].pos) * 2;
-			
+
 			diffSize = maxSize / curSize;
-			
+
 			var isDiam = false;
-			
-			if(isDiam)
-			{
+
+			if (isDiam) {
 				defaultSize = (maxDiamBubble / diffSize) / 2;
-			}
-			else
-			{
+			} else {
 				maxArea = 1 / 4 * (Math.PI * (maxDiamBubble * maxDiamBubble));
 				defaultSize = Math.sqrt((maxArea / diffSize) / Math.PI);
 			}
 		}
 
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
