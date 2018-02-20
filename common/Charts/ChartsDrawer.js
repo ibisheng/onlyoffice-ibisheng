@@ -8071,8 +8071,7 @@ drawHBarChart.prototype = {
 };
 
 /** @constructor */
-function drawPieChart(chart)
-{
+function drawPieChart(chart) {
 	this.chart = chart;
 
 	this.tempAngle = null;
@@ -8082,283 +8081,269 @@ function drawPieChart(chart)
 	this.angleFor3D = null;
 	this.properties3d = null;
 	this.usually3dPropsCalc = [];
-	
+
 	this.tempDrawOrder = null;
 }
 
-drawPieChart.prototype =
-{
-    constructor: drawPieChart,
-	
-	draw : function(chartsDrawer)
-    {
+drawPieChart.prototype = {
+	constructor: drawPieChart,
+
+	draw: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
-		if(this.cChartDrawer.nDimensionCount === 3)
-		{
+
+		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._drawPie3D();
-		}
-		else
-		{
+		} else {
 			this._drawPie();
 		}
 	},
-	
-	recalculate : function(chartsDrawer)
-	{
+
+	recalculate: function (chartsDrawer) {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
 		this.cChartSpace = chartsDrawer.cChartSpace;
-		
+
 		this.tempAngle = null;
 		this.paths = {};
-		
-		if(this.cChartDrawer.nDimensionCount === 3)
-		{
-			if(this.cChartDrawer.processor3D.view3D.getRAngAx())
-			{
+
+		if (this.cChartDrawer.nDimensionCount === 3) {
+			if (this.cChartDrawer.processor3D.view3D.getRAngAx()) {
 				this.properties3d = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
 				this._recalculatePie3D();
-			}
-			else
-			{
+			} else {
 				this._recalculatePie3DPerspective();
 			}
-		}
-		else
-		{
+		} else {
 			this._recalculatePie();
 		}
-	},	
-	
-	_drawPie: function ()
-    {
+	},
+
+	_drawPie: function () {
 		var numCache = this._getFirstRealNumCache();
 		var brush, pen, val;
 		var path;
-        for (var i = 0,len = numCache.length; i < len; i++) 
-		{
+		for (var i = 0, len = numCache.length; i < len; i++) {
 			val = numCache[i];
 			brush = val.brush;
 			pen = val.pen;
 			path = this.paths.series[i];
-			
-            this.cChartDrawer.drawPath(path, pen, brush);
-        }
-    },
-	
-	_recalculatePie: function ()
-    {
+
+			this.cChartDrawer.drawPath(path, pen, brush);
+		}
+	},
+
+	_recalculatePie: function () {
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		
-        var radius = Math.min(trueHeight, trueWidth)/2;
-		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
-		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
-		
-		var firstSliceAng = this.chart &&  this.chart.firstSliceAng ? this.chart.firstSliceAng : 0;
-		this.tempAngle = Math.PI/2 - (firstSliceAng / 180) * Math.PI ;
+
+		var radius = Math.min(trueHeight, trueWidth) / 2;
+		var xCenter = this.chartProp.chartGutter._left + trueWidth / 2;
+		var yCenter = this.chartProp.chartGutter._top + trueHeight / 2;
+
+		var firstSliceAng = this.chart && this.chart.firstSliceAng ? this.chart.firstSliceAng : 0;
+		this.tempAngle = Math.PI / 2 - (firstSliceAng / 180) * Math.PI;
 		//рисуем против часовой стрелки, поэтому цикл с конца
 		var angle;
-        for (var i = numCache.length - 1; i >= 0; i--) 
-		{
+		for (var i = numCache.length - 1; i >= 0; i--) {
 			angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
-			if(!this.paths.series)
+			if (!this.paths.series) {
 				this.paths.series = [];
-			if(sumData === 0)//TODO стоит пересмотреть
+			}
+			if (sumData === 0)//TODO стоит пересмотреть
+			{
 				this.paths.series[i] = this._calculateEmptySegment(radius, xCenter, yCenter);
-			else
+			} else {
 				this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
-        }
-    },
-	
-	_getFirstRealNumCache: function()
-	{
+			}
+		}
+	},
+
+	_getFirstRealNumCache: function () {
 		var series = this.chart.series;
 		var numCache;
-		for(var i = 0; i < series.length; i++)
-		{
+		for (var i = 0; i < series.length; i++) {
 			numCache = series[i].val.numRef ? series[i].val.numRef.numCache.pts : series[i].val.numLit.pts;
-			if(numCache && numCache.length)
+			if (numCache && numCache.length) {
 				return numCache;
+			}
 		}
-		
+
 		return series[0].val.numRef ? series[0].val.numRef.numCache.pts : series[0].val.numLit.pts;
 	},
-	
-	_calculateSegment: function (angle, radius, xCenter, yCenter)
-    {
-		if(isNaN(angle))
+
+	_calculateSegment: function (angle, radius, xCenter, yCenter) {
+		if (isNaN(angle)) {
 			return null;
-		
+		}
+
 		var startAngle = (this.tempAngle);
-		var endAngle   = angle;
-		
-		if(radius < 0)
+		var endAngle = angle;
+
+		if (radius < 0) {
 			radius = 0;
+		}
 		var path = this._calculateArc(radius, startAngle, endAngle, xCenter, yCenter);
 
-        this.tempAngle += angle;
-		
-		return path;
-    },
-	
-	_calculateEmptySegment: function(radius, xCenter, yCenter)
-	{
+		this.tempAngle += angle;
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		return path;
+	},
+
+	_calculateEmptySegment: function (radius, xCenter, yCenter) {
+
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
 		var pxToMm = this.chartProp.pxToMM;
-		
-		var x0 = xCenter + radius*Math.cos(this.tempAngle);
-		var y0 = yCenter - radius*Math.sin(this.tempAngle);
-		
-		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+
+		var x0 = xCenter + radius * Math.cos(this.tempAngle);
+		var y0 = yCenter - radius * Math.sin(this.tempAngle);
+
+		path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
 		path.arcTo(radius / pxToMm * pathW, radius / pxToMm * pathH, this.tempAngle, this.tempAngle);
 		path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 
 		return pathId;
 	},
-	
-	_calculateArc : function(radius, stAng, swAng, xCenter, yCenter)
-	{
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+	_calculateArc: function (radius, stAng, swAng, xCenter, yCenter) {
+
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		
+
 		var pxToMm = this.chartProp.pxToMM;
-		
-		var x0 = xCenter + radius*Math.cos(stAng);
-		var y0 = yCenter - radius*Math.sin(stAng);
-		
-		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+
+		var x0 = xCenter + radius * Math.cos(stAng);
+		var y0 = yCenter - radius * Math.sin(stAng);
+
+		path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
-		path.arcTo(radius / pxToMm * pathW, radius / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
+		path.arcTo(radius / pxToMm * pathW, radius / pxToMm * pathH, -1 * stAng * cToDeg, -1 * swAng * cToDeg);
 		path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 
 		return pathId;
 	},
-	
-	_changeAngle: function(radius, stAng, swAng, xCenter, yCenter, depth, radius1, radius2)
-	{
+
+	_changeAngle: function (radius, stAng, swAng, xCenter, yCenter, depth, radius1, radius2) {
 		//корректируем центр
 		yCenter = yCenter - depth / 2;
-		
-		var x0 = xCenter + radius*Math.cos(stAng);
-		var y0 = yCenter - radius*Math.sin(stAng);
+
+		var x0 = xCenter + radius * Math.cos(stAng);
+		var y0 = yCenter - radius * Math.sin(stAng);
 		var kFX = radius / radius1;
 		var kFY = radius / radius2;
-		
+
 		var cX;
 		//if(this.cX !== null)
-			//cX = this.cX; 
-		if(x0 < xCenter)
+		//cX = this.cX;
+		if (x0 < xCenter) {
 			cX = xCenter - (xCenter - x0) / kFX;
-		else if(x0 > xCenter)
+		} else if (x0 > xCenter) {
 			cX = xCenter + (x0 - xCenter) / kFX;
-		else
+		} else {
 			cX = xCenter;
-		
+		}
+
 		var cY;
 		//if(this.cY !== null)
-			//cY = this.cY; 
-		if(y0 < yCenter)
+		//cY = this.cY;
+		if (y0 < yCenter) {
 			cY = yCenter - (yCenter - y0) / kFY;
-		else if(y0 > yCenter)
+		} else if (y0 > yCenter) {
 			cY = yCenter + (y0 - yCenter) / kFY;
-		else
+		} else {
 			cY = yCenter;
-		
-		
-		var x01 = xCenter + radius*Math.cos(stAng + swAng);
-		var y01 = yCenter - radius*Math.sin(stAng + swAng);
-		
+		}
+
+
+		var x01 = xCenter + radius * Math.cos(stAng + swAng);
+		var y01 = yCenter - radius * Math.sin(stAng + swAng);
+
 		var aX;
-		if(x01 < xCenter)
+		if (x01 < xCenter) {
 			aX = xCenter - (xCenter - x01) / kFX;
-		else if(x01 > xCenter)
+		} else if (x01 > xCenter) {
 			aX = xCenter + (x01 - xCenter) / kFX;
-		else
+		} else {
 			aX = xCenter;
-		
-		
+		}
+
+
 		var aY;
-		if(y01 < yCenter)
+		if (y01 < yCenter) {
 			aY = yCenter - (yCenter - y01) / kFY;
-		else if(y01 > yCenter)
+		} else if (y01 > yCenter) {
 			aY = yCenter + (y01 - yCenter) / kFY;
-		else
+		} else {
 			aY = yCenter;
-			
+		}
+
 		this.cX = aX;
 		this.cY = aY;
-		
+
 		var a = Math.sqrt(Math.pow(cX - xCenter, 2) + Math.pow(cY - yCenter, 2));
 		var b = Math.sqrt(Math.pow(aX - cX, 2) + Math.pow(aY - cY, 2));
 		var c = Math.sqrt(Math.pow(aX - xCenter, 2) + Math.pow(aY - yCenter, 2));
-		
+
 		var cosNewAngle = (Math.pow(c, 2) + Math.pow(a, 2) - Math.pow(b, 2)) / (2 * c * a);
-		if(cosNewAngle > 1)
+		if (cosNewAngle > 1) {
 			cosNewAngle = 1;
-		
-		if(cosNewAngle < -1)
-			cosNewAngle = - 1;
-		
+		}
+
+		if (cosNewAngle < -1) {
+			cosNewAngle = -1;
+		}
+
 		var res;
-		if(Math.abs(swAng) > Math.PI)
-			res = 2*Math.PI - Math.acos(cosNewAngle);
-		else
+		if (Math.abs(swAng) > Math.PI) {
+			res = 2 * Math.PI - Math.acos(cosNewAngle);
+		} else {
 			res = Math.acos(cosNewAngle);
-			
+		}
+
 		return res;
 	},
 
-	_calculateDLbl: function(chartSpace, ser, val, bLayout)
-	{
+	_calculateDLbl: function (chartSpace, ser, val, bLayout) {
 		var pxToMm = this.chartProp.pxToMM;
-		
+
 		//TODO сделать через idx как у drawDoughnutChart!!!
-		if(!this.paths.series[val])
+		if (!this.paths.series[val]) {
 			return;
-		
+		}
+
 		var path;
-		if(this.cChartDrawer.nDimensionCount === 3)
-		{
-			if(this.paths.series[val][ser] && this.paths.series[val][ser].upPath)
-			{
+		if (this.cChartDrawer.nDimensionCount === 3) {
+			if (this.paths.series[val][ser] && this.paths.series[val][ser].upPath) {
 				path = this.paths.series[val][ser].upPath;
 			}
-		}	
-		else
-		{
+		} else {
 			path = this.paths.series[val];
 		}
-		
-		if(!AscFormat.isRealNumber(path))
-		{
+
+		if (!AscFormat.isRealNumber(path)) {
 			return;
 		}
-		
-		var getEllipseRadius = function(radius1, radius2, alpha)
-		{
+
+		var getEllipseRadius = function (radius1, radius2, alpha) {
 			var a = radius1 * radius2;
-			var b = Math.sqrt(Math.pow(radius2, 2) * Math.pow(Math.cos(alpha), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(alpha), 2));
+			var b = Math.sqrt(Math.pow(radius2, 2) * Math.pow(Math.cos(alpha), 2) +
+				Math.pow(radius1, 2) * Math.pow(Math.sin(alpha), 2));
 			var res = a / b;
-			
+
 			return res;
 		};
 
@@ -8369,917 +8354,819 @@ drawPieChart.prototype =
 
 		var centerX = oCommand0.X;
 		var centerY = oCommand0.Y;
-		
+
 		var radius = oCommand2.hR;
-		var stAng =  oCommand2.stAng;
-		var swAng =  oCommand2.swAng;
-		
-		if(this.cChartDrawer.nDimensionCount === 3 && oCommand2.wR)
-		{
+		var stAng = oCommand2.stAng;
+		var swAng = oCommand2.swAng;
+
+		if (this.cChartDrawer.nDimensionCount === 3 && oCommand2.wR) {
 			radius = getEllipseRadius(oCommand2.hR, oCommand2.wR, -1 * stAng - swAng / 2 - Math.PI / 2);
 		}
-		
-		var point = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts[val] : this.chart.series[0].val.numLit.pts[val];
-		
-		if(!point)
+
+		var point = this.chart.series[0].val.numRef ? this.chart.series[0].val.numRef.numCache.pts[val] :
+			this.chart.series[0].val.numLit.pts[val];
+
+		if (!point) {
 			return;
-		
+		}
+
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
-		
+
 		var tempCenterX, tempCenterY;
-		
+
 		//TODO высчитать позиции, как в екселе +  ограничения
-		switch ( point.compiledDlb.dLblPos )
-		{
-			case c_oAscChartDataLabelsPos.bestFit:
-			{
-				var oPos = this._calculateBestFitPosition(stAng, swAng, radius, width, height, centerX, centerY, bLayout);
-				if(!oPos.bError){
+		var oPos;
+		switch (point.compiledDlb.dLblPos) {
+			case c_oAscChartDataLabelsPos.bestFit: {
+				oPos = this._calculateBestFitPosition(stAng, swAng, radius, width, height, centerX, centerY, bLayout);
+				if (!oPos.bError) {
 					centerX = oPos.fX;
 					centerY = oPos.fY;
-				}
-				else{
+				} else {
 					centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 					centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				}
 				break;
 			}
-			case c_oAscChartDataLabelsPos.ctr:
-			{
+			case c_oAscChartDataLabelsPos.ctr: {
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.inBase:
-			{
+			case c_oAscChartDataLabelsPos.inBase: {
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
-			case c_oAscChartDataLabelsPos.inEnd:
-			{
-                var oPos = this._calculateInEndDLblPosition(stAng, swAng, radius, width, height, centerX, centerY);
-                if(!oPos.bError){
-                    centerX = oPos.fX;
-                    centerY = oPos.fY;
-                    break;
-                }
+			case c_oAscChartDataLabelsPos.inEnd: {
+				oPos = this._calculateInEndDLblPosition(stAng, swAng, radius, width, height, centerX, centerY);
+				if (!oPos.bError) {
+					centerX = oPos.fX;
+					centerY = oPos.fY;
+					break;
+				}
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
-				
-				if(tempCenterX < centerX && tempCenterY < centerY)
-				{
-					centerX = tempCenterX;	
+
+				if (tempCenterX < centerX && tempCenterY < centerY) {
+					centerX = tempCenterX;
 					centerY = tempCenterY;
-				}
-				else if(tempCenterX > centerX && tempCenterY < centerY)
-				{
+				} else if (tempCenterX > centerX && tempCenterY < centerY) {
 					centerX = tempCenterX - width;
 					centerY = tempCenterY;
-				}
-				else if(tempCenterX < centerX && tempCenterY > centerY)
-				{
+				} else if (tempCenterX < centerX && tempCenterY > centerY) {
 					centerX = tempCenterX;
 					centerY = tempCenterY - height;
-				}
-				else
-				{
-					centerX = tempCenterX - width;	
+				} else {
+					centerX = tempCenterX - width;
 					centerY = tempCenterY - height;
 				}
 				break;
 			}
-			case c_oAscChartDataLabelsPos.outEnd:
-			{
+			case c_oAscChartDataLabelsPos.outEnd: {
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
-				
-				if(tempCenterX < centerX && tempCenterY < centerY)
-				{
+
+				if (tempCenterX < centerX && tempCenterY < centerY) {
 					centerX = tempCenterX - width;
 					centerY = tempCenterY - height;
-				}
-				else if(tempCenterX > centerX && tempCenterY < centerY)
-				{
+				} else if (tempCenterX > centerX && tempCenterY < centerY) {
 					centerX = tempCenterX;
 					centerY = tempCenterY - height;
-				}
-				else if(tempCenterX < centerX && tempCenterY > centerY)
-				{
+				} else if (tempCenterX < centerX && tempCenterY > centerY) {
 					centerX = tempCenterX - width;
 					centerY = tempCenterY;
-				}
-				else
-				{
-					centerX = tempCenterX;	
+				} else {
+					centerX = tempCenterX;
 					centerY = tempCenterY;
-				}	
+				}
 				break;
 			}
 		}
-		if(centerX < 0)
+		if (centerX < 0) {
 			centerX = 0;
-		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+		}
+		if (centerX + width > this.chartProp.widthCanvas / pxToMm) {
 			centerX = this.chartProp.widthCanvas / pxToMm - width;
-			
-		if(centerY < 0)
+		}
+
+		if (centerY < 0) {
 			centerY = 0;
-		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+		}
+		if (centerY + height > this.chartProp.heightCanvas / pxToMm) {
 			centerY = this.chartProp.heightCanvas / pxToMm - height;
-		
+		}
+
 		return {x: centerX, y: centerY};
 	},
-	
+
 	//****fast calulate and drawing(for switch on slow drawing: change name function _Slow)
-	_recalculatePie3D: function ()
-    {
+	_recalculatePie3D: function () {
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		
-        var radius = Math.min(trueHeight, trueWidth) / 2;
-		if(radius < 0)
-		{
+
+		var radius = Math.min(trueHeight, trueWidth) / 2;
+		if (radius < 0) {
 			radius = 0;
 		}
-		
-		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
-		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
-		
+
+		var xCenter = this.chartProp.chartGutter._left + trueWidth / 2;
+		var yCenter = this.chartProp.chartGutter._top + trueHeight / 2;
+
 		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
-		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, xCenter, yCenter, this.properties3d.depth, this.properties3d.radius1, this.properties3d.radius2) : 0;
-		
-		this.angleFor3D = Math.PI/2 - startAngle3D;
+		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI / 2, startAngle, xCenter, yCenter, this.properties3d.depth, this.properties3d.radius1, this.properties3d.radius2) : 0;
+
+		this.angleFor3D = Math.PI / 2 - startAngle3D;
 		startAngle = startAngle + Math.PI / 2;
-		
-		for (var i = numCache.length - 1; i >= 0; i--) 
-		{
+
+		for (var i = numCache.length - 1; i >= 0; i--) {
 			var partOfSum = numCache[i].val / sumData;
 			var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
-			
-			if(!this.paths.series)
-			{
+
+			if (!this.paths.series) {
 				this.paths.series = [];
 			}
-		
+
 			this.paths.series[i] = this._calculateSegment3D(startAngle, swapAngle, radius, xCenter, yCenter);
-			
+
 			startAngle += swapAngle;
-        }
-    },
-	
-	_recalculatePie3DPerspective: function ()
-    {
+		}
+	},
+
+	_recalculatePie3DPerspective: function () {
 		var left = this.chartProp.chartGutter._left;
 		var right = this.chartProp.chartGutter._right;
 		var top = this.chartProp.chartGutter._top;
 		var bottom = this.chartProp.chartGutter._bottom;
-		
+
 		var trueWidth = this.chartProp.trueWidth;
-		
+
 		var widthCanvas = this.chartProp.widthCanvas;
 		var heightCanvas = this.chartProp.heightCanvas;
-		
+
 		var height = heightCanvas - (top + bottom);
 		var width = widthCanvas - (left + right);
 
 		var tempDepth = this.cChartDrawer.processor3D.depthPerspective;
-		
+
 		var x1 = left, y1 = top + height, z1 = 0;
 		var x2 = left, y2 = top, z2 = 0;
 		var x3 = left + width, y3 = top, z3 = 0;
 		var x4 = left + width, y4 = top + height, z4 = 0;
-		
+
 		var x5 = left, y5 = top + height, z5 = tempDepth;
 		var x6 = left, y6 = top, z6 = tempDepth;
 		var x7 = left + width, y7 = top, z7 = tempDepth;
 		var x8 = left + width, y8 = top + height, z8 = tempDepth;
-		
+
 		var point1 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1);
 		var point2 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2);
 		//var point3 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3);
 		//var point4 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4);
-		
+
 		var point5 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5);
 		var point6 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6);
 		//var point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
 		//var point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
-		
-		
+
+
 		var radius3D1 = (z6 - z2) / 2;
 		var radius3D2 = (z5 - z1) / 2;
-		
+
 		var center3D1 = new Point3D(x2 + ((x3 - x2) / 2), y2, z2 + (radius3D1));
 		var center3D2 = new Point3D(x1 + ((x4 - x1) / 2), y1, z1 + (radius3D2));
-		
+
 		var pointCenter1 = this.cChartDrawer._convertAndTurnPoint(center3D1.x, center3D1.y, center3D1.z);
 		var pointCenter2 = this.cChartDrawer._convertAndTurnPoint(center3D2.x, center3D2.y, center3D2.z);
-		
+
 		//TEST DRAW FRAME
 		//this._calculateTestFrame(point1, point2, point3, point4, point5, point6, point7, point8);
-		
+
 		var test1 = this.cChartDrawer._convertAndTurnPoint(x2, y2, center3D1.z);
 		var test2 = this.cChartDrawer._convertAndTurnPoint(x3, y3, center3D1.z);
-		
+
 		var test11 = this.cChartDrawer._convertAndTurnPoint(x4, y4, center3D2.z);
 		var test22 = this.cChartDrawer._convertAndTurnPoint(x1, y1, center3D2.z);
-		
+
 		var radius11 = Math.abs((test2.x - test1.x) / 2);
 		var radius12 = Math.abs((point6.y - point2.y) / 2);
 		var radius21 = Math.abs((test22.x - test11.x) / 2);
 		var radius22 = Math.abs((point5.y - point1.y) / 2);
-		
-		var center1 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: (point2.y - point6.y) / 2 + point6.y};
-		var center2 = {x: this.chartProp.chartGutter._left + trueWidth/2, y: (point1.y - point5.y) / 2 + point5.y};
-		
-		var angles1 = this._calculateAngles3DPerspective(center1.x, center1.y, radius11, radius12, radius3D1, center3D1);
-		var angles2 = this._calculateAngles3DPerspective(center2.x, center2.y, radius21, radius22, radius3D2, center3D2);
-		
-		if(!this.paths.series)
-		{
+
+		var center1 = {
+			x: this.chartProp.chartGutter._left + trueWidth / 2,
+			y: (point2.y - point6.y) / 2 + point6.y
+		};
+		var center2 = {
+			x: this.chartProp.chartGutter._left + trueWidth / 2,
+			y: (point1.y - point5.y) / 2 + point5.y
+		};
+
+		var angles1 = this._calculateAngles3DPerspective(center1.x, center1.y, radius11, radius12, radius3D1,
+			center3D1);
+		var angles2 = this._calculateAngles3DPerspective(center2.x, center2.y, radius21, radius22, radius3D2,
+			center3D2);
+
+		if (!this.paths.series) {
 			this.paths.series = [];
 		}
-		
-		for(var i = 0; i < angles1.length; i++)
-		{
+
+		for (var i = 0; i < angles1.length; i++) {
 			var start = angles1[i].start;
 			var start1 = angles2[i].start;
-			
-			if(i === angles1.length - 1)
-			{
+
+			if (i === angles1.length - 1) {
 				var end = angles1[0].start + 2 * Math.PI;
 				angles1[i].swap = end - start;
-				
+
 				var end1 = angles2[0].start + 2 * Math.PI;
 				angles2[i].swap = end1 - start1;
 			}
-			
-			var paths = this._calculateSegment3DPerspective(radius11, radius12, radius21, radius22, angles1[i], angles2[i], center1, center2, pointCenter1, pointCenter2, Math.sign(point2.y - point6.y));
-			
-			if(null === this.tempDrawOrder)
-			{
+
+			var paths = this._calculateSegment3DPerspective(radius11, radius12, radius21, radius22, angles1[i],
+				angles2[i], center1, center2, pointCenter1, pointCenter2, Math.sign(point2.y - point6.y));
+
+			if (null === this.tempDrawOrder) {
 				this.tempDrawOrder = Math.sign(point2.y - point6.y) < 0 ? true : null;
 			}
-			
-			if(!this.paths.series[angles1.length - i - 1])
-			{
+
+			if (!this.paths.series[angles1.length - i - 1]) {
 				this.paths.series[angles1.length - i - 1] = [];
 			}
-			
+
 			this.paths.series[angles1.length - i - 1].push(paths);
 		}
-    },
-	
-	_calculateAngles3DPerspective: function(xCenter, yCenter, radius1, radius2, radius3D1, center3D1)
-	{
+	},
+
+	_calculateAngles3DPerspective: function (xCenter, yCenter, radius1, radius2, radius3D1, center3D1) {
 		var t = this;
 		var widthCanvas = this.chartProp.widthCanvas;
-		
+
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		
+
 		var startAngle = Math.PI / 2;
 		var newStartAngle = startAngle;
 
-        var oView3D = this.cChartSpace.chart.getView3d();
-		var firstAngle = oView3D && oView3D.rotY ? (- oView3D.rotY / 360) * (Math.PI * 2) : 0;
-		
-		
-		var getAngleByCoordsSidesTriangle = function(aC, bC, cC)
-		{
+		var oView3D = this.cChartSpace.chart.getView3d();
+		var firstAngle = oView3D && oView3D.rotY ? (-oView3D.rotY / 360) * (Math.PI * 2) : 0;
+
+
+		var getAngleByCoordsSidesTriangle = function (aC, bC, cC) {
 			var res;
-			
+
 			var a = Math.sqrt(Math.pow(aC.x, 2) + Math.pow(aC.y, 2));
 			var b = Math.sqrt(Math.pow(bC.x, 2) + Math.pow(bC.y, 2));
 			var c = Math.sqrt(Math.pow(cC.x, 2) + Math.pow(cC.y, 2));
 			res = Math.acos((Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c));
-			
+
 			return res;
 		};
-		
-		var getPointsByAngle = function(angle)
-		{
-			var point1 = t.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(angle), center3D1.y, center3D1.z + radius3D1 * Math.sin(angle));
-			
+
+		var getPointsByAngle = function (angle) {
+			var point1 = t.cChartDrawer._convertAndTurnPoint(center3D1.x + radius3D1 * Math.cos(angle), center3D1.y,
+				center3D1.z + radius3D1 * Math.sin(angle));
+
 			var y11 = point1.y;
-			var x11 = Math.sqrt(Math.abs(Math.pow(radius1, 2)*(1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
-			
+			var x11 = Math.sqrt(
+				Math.abs(Math.pow(radius1, 2) * (1 - (Math.pow(y11 - (yCenter), 2) / Math.pow(radius2, 2)))));
+
 			var x111;
-			if((angle <= 3*Math.PI/2 && angle >= Math.PI/2) || (angle >= -3*Math.PI/2 && angle <= -Math.PI/2))
-			{
+			if ((angle <= 3 * Math.PI / 2 && angle >= Math.PI / 2) || (angle >= -3 * Math.PI / 2 && angle <= -Math.PI / 2)) {
 				x111 = xCenter - x11;
-			}
-			else
-			{
+			} else {
 				x111 = widthCanvas - (xCenter - x11)
 			}
-			
+
 			return {x: x111, y: y11};
 		};
-		
+
 		var angles = [];
-		for (var i = numCache.length; i >= 0; i--) 
-		{
+		for (var i = numCache.length; i >= 0; i--) {
 			//рассчитываем угол
-			if(i === numCache.length)
-			{
-				var swapAngle = firstAngle
-			}
-			else
-			{
+			var swapAngle;
+			if (i === numCache.length) {
+				swapAngle = firstAngle
+			} else {
 				var partOfSum = numCache[i].val / sumData;
-				var swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
+				swapAngle = Math.abs((parseFloat(partOfSum)) * (Math.PI * 2));
 			}
-			
-			
+
+
 			var tempSwapAngle = 0, newSwapAngle = 0, tempStartAngle = startAngle;
-			while(true)
-			{
-				if(i === numCache.length && swapAngle < 0)
-				{
-					if(tempStartAngle - Math.PI / 2 > startAngle + swapAngle)
-					{
+			while (true) {
+				if (i === numCache.length && swapAngle < 0) {
+					if (tempStartAngle - Math.PI / 2 > startAngle + swapAngle) {
 						tempSwapAngle = -Math.PI / 2;
-					}
-					else
-					{
+					} else {
 						tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
 					}
-				}
-				else
-				{
-					if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
-					{
+				} else {
+					if (tempStartAngle + Math.PI / 2 < startAngle + swapAngle) {
 						tempSwapAngle = Math.PI / 2;
-					}
-					else
-					{
+					} else {
 						tempSwapAngle = (startAngle + swapAngle) - tempStartAngle;
 					}
 				}
-				
-				
+
+
 				var p1 = getPointsByAngle(tempStartAngle);
 				var p2 = getPointsByAngle(tempStartAngle + tempSwapAngle);
-				newSwapAngle += getAngleByCoordsSidesTriangle({x: p2.x - p1.x, y: p2.y - p1.y}, {x: xCenter - p1.x, y: yCenter - p1.y}, {x: xCenter - p2.x, y: yCenter - p2.y});
-				
-				
-				if(i === numCache.length && swapAngle < 0)
-				{
-					if(tempStartAngle - Math.PI / 2 > startAngle + swapAngle)
-					{					
+				newSwapAngle += getAngleByCoordsSidesTriangle({x: p2.x - p1.x, y: p2.y - p1.y},
+					{x: xCenter - p1.x, y: yCenter - p1.y}, {x: xCenter - p2.x, y: yCenter - p2.y});
+
+
+				if (i === numCache.length && swapAngle < 0) {
+					if (tempStartAngle - Math.PI / 2 > startAngle + swapAngle) {
 						tempStartAngle -= Math.PI / 2;
-					}
-					else
-					{
-						if(i !== numCache.length)
-							angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
-						
+					} else {
+						if (i !== numCache.length) {
+							angles.push(
+								{start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
+						}
+
 						break;
 					}
-				}
-				else
-				{
-					if(tempStartAngle + Math.PI / 2 < startAngle + swapAngle)
-					{					
+				} else {
+					if (tempStartAngle + Math.PI / 2 < startAngle + swapAngle) {
 						tempStartAngle += Math.PI / 2;
-					}
-					else
-					{
-						if(i !== numCache.length)
-							angles.push({start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
-						
+					} else {
+						if (i !== numCache.length) {
+							angles.push(
+								{start: newStartAngle, swap: newSwapAngle, end: newStartAngle + newSwapAngle});
+						}
+
 						break;
 					}
 				}
-				
+
 			}
-			
+
 			startAngle += swapAngle;
-			if(i === numCache.length)
-			{
-				if(swapAngle < 0)
-				{
+			if (i === numCache.length) {
+				if (swapAngle < 0) {
 					newStartAngle -= newSwapAngle;
-				}
-				else
-				{
+				} else {
 					newStartAngle += newSwapAngle;
 				}
-				
-			}
-			else
-			{
+
+			} else {
 				newStartAngle += newSwapAngle;
 			}
-        }
-		
+		}
+
 		return angles;
 	},
-	
-	_calculateArc3D : function(radius, stAng, swAng, xCenter, yCenter, bIsNotDrawFrontFace, depth, radius1, radius2)
-	{	
+
+	_calculateArc3D: function (radius, stAng, swAng, xCenter, yCenter, bIsNotDrawFrontFace, depth, radius1,
+							   radius2) {
 		var properties = this.cChartDrawer.processor3D.calculatePropertiesForPieCharts();
 		var oChartSpace = this.cChartSpace;
 
 		depth = !depth ? properties.depth : depth;
 		radius1 = !radius1 ? properties.radius1 : radius1;
 		radius2 = !radius2 ? properties.radius2 : radius2;
-		
-		
-		
+
+
 		var pxToMm = this.chartProp.pxToMM;
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
-		
+
 
 		swAng = this._changeAngle(radius, stAng, swAng, xCenter, yCenter, depth, radius1, radius2);
 		stAng = this.angleFor3D;
 		//корректируем центр
 		yCenter = yCenter - depth / 2;
-		
 
-		
-		var getSegmentPoints = function(startAng, endAng)
-		{
-			var radiusSpec = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(startAng),2));
-			var radiusSpec2 = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(endAng),2));
-			
-			var x0 = (xCenter + radiusSpec*Math.cos(startAng));
-			var y0 = (yCenter - radiusSpec*Math.sin(startAng));
-			
-			var x1 = (xCenter + radiusSpec*Math.cos(startAng));
-			var y1 = ((yCenter + depth) - radiusSpec*Math.sin(startAng));
-			
-			var x2 = (xCenter + radiusSpec2*Math.cos(endAng));
-			var y2 = (yCenter - radiusSpec2*Math.sin(endAng));
-			
+
+		var getSegmentPoints = function (startAng, endAng) {
+			var radiusSpec = (radius1 * radius2) / Math.sqrt(
+					Math.pow(radius2, 2) * Math.pow((Math.cos(startAng)), 2) +
+					Math.pow(radius1, 2) * Math.pow(Math.sin(startAng), 2));
+			var radiusSpec2 = (radius1 * radius2) / Math.sqrt(
+					Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) +
+					Math.pow(radius1, 2) * Math.pow(Math.sin(endAng), 2));
+
+			var x0 = (xCenter + radiusSpec * Math.cos(startAng));
+			var y0 = (yCenter - radiusSpec * Math.sin(startAng));
+
+			var x1 = (xCenter + radiusSpec * Math.cos(startAng));
+			var y1 = ((yCenter + depth) - radiusSpec * Math.sin(startAng));
+
+			var x2 = (xCenter + radiusSpec2 * Math.cos(endAng));
+			var y2 = (yCenter - radiusSpec2 * Math.sin(endAng));
+
 			var x3 = (xCenter + radiusSpec2 * Math.cos(endAng));
 			var y3 = ((yCenter + depth) - radiusSpec2 * Math.sin(endAng));
-			
+
 			return {x0: x0, y0: y0, x1: x1, y1: y1, x2: x2, y2: y2, x3: x3, y3: y3};
 		};
-		
-		var breakAng = function(startAng, swapAng)
-		{
+
+		var breakAng = function (startAng, swapAng) {
 			var res = [];
 			var endAng = startAng + swapAng;
-			
+
 			res.push({angle: startAng});
-			if(startAng < -2*Math.PI && endAng > -2*Math.PI)
-			{
-				res.push({angle: -2*Math.PI});
+			if (startAng < -2 * Math.PI && endAng > -2 * Math.PI) {
+				res.push({angle: -2 * Math.PI});
 			}
 			/*if(startAng < -3/2*Math.PI && endAng > -3/2*Math.PI)
-			{
-				res.push({angle: -3/2*Math.PI});
-			}*/
-			if(startAng < -Math.PI && endAng > -Math.PI)
-			{
+			 {
+			 res.push({angle: -3/2*Math.PI});
+			 }*/
+			if (startAng < -Math.PI && endAng > -Math.PI) {
 				res.push({angle: -Math.PI});
 			}
 			/*if(startAng < -Math.PI/2 && endAng > -Math.PI/2)
-			{
-				res.push({angle: -Math.PI/2});
-			}*/
-			if(startAng < 0 && endAng > 0)
-			{
+			 {
+			 res.push({angle: -Math.PI/2});
+			 }*/
+			if (startAng < 0 && endAng > 0) {
 				res.push({angle: 0});
 			}
 			/*if(startAng < Math.PI/2 && endAng > Math.PI/2)
-			{
-				res.push({angle: Math.PI/2});
-			}*/
-			if(startAng < Math.PI && endAng > Math.PI)
-			{
+			 {
+			 res.push({angle: Math.PI/2});
+			 }*/
+			if (startAng < Math.PI && endAng > Math.PI) {
 				res.push({angle: Math.PI});
 			}
 			/*if(startAng < 3/2*Math.PI && endAng > 3/2*Math.PI)
-			{
-				res.push({angle: 3/2*Math.PI});
-			}*/
-			if(startAng < 2*Math.PI && endAng > 2*Math.PI)
-			{
-				res.push({angle: 2*Math.PI});
+			 {
+			 res.push({angle: 3/2*Math.PI});
+			 }*/
+			if (startAng < 2 * Math.PI && endAng > 2 * Math.PI) {
+				res.push({angle: 2 * Math.PI});
 			}
 			res.push({angle: endAng});
-			
+
 			return res;
 		};
-		
-		var calculateInsideFaces = function(startAng, swapAng)
-		{
 
-            var pathId = oChartSpace.AllocPath();
-            var path  = oChartSpace.GetPath(pathId);
-			
+		var calculateInsideFaces = function (startAng, swapAng) {
+
+			var pathId = oChartSpace.AllocPath();
+			var path = oChartSpace.GetPath(pathId);
+
 			var endAng = startAng + swapAng;
 			var p = getSegmentPoints(startAng, endAng);
-			
-			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
-			path.lnTo(p.x0  /pxToMm * pathW, p.y0 / pxToMm * pathH);
-			path.lnTo(p.x1  /pxToMm * pathW, p.y1 / pxToMm * pathH);
+
+			path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.lnTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
+			path.lnTo(p.x1 / pxToMm * pathW, p.y1 / pxToMm * pathH);
 			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
-			
-			path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+
+			path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 			path.lnTo(p.x2 / pxToMm * pathW, p.y2 / pxToMm * pathH);
 			path.lnTo(p.x3 / pxToMm * pathW, p.y3 / pxToMm * pathH);
 			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
-			
 
-			
+
 			return pathId;
 		};
-		
-		var calculateFrontFace = function(startAng, swapAng)
-		{
 
-            var pathId = oChartSpace.AllocPath();
-            var path  = oChartSpace.GetPath(pathId);
-			
+		var calculateFrontFace = function (startAng, swapAng) {
+
+			var pathId = oChartSpace.AllocPath();
+			var path = oChartSpace.GetPath(pathId);
+
 			var endAng = startAng + swapAng;
 			var p = getSegmentPoints(startAng, endAng);
-			
-			path.moveTo(p.x0  /pxToMm * pathW, p.y0 / pxToMm * pathH);
-			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(p.x3  /pxToMm * pathW, p.y3 / pxToMm * pathH);
-			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng*cToDeg - 1 * swapAng*cToDeg, 1 * swapAng*cToDeg);
+
+			path.moveTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng * cToDeg, -1 * swapAng * cToDeg);
+			path.lnTo(p.x3 / pxToMm * pathW, p.y3 / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * startAng * cToDeg - 1 * swapAng * cToDeg, 1 * swapAng * cToDeg);
 			path.lnTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
 
-			
 			return pathId;
 		};
-		
-		var calculateUpFace = function(startAng, swapAng)
-		{
 
-            var pathId = oChartSpace.AllocPath();
-            var path  = oChartSpace.GetPath(pathId);
-			
+		var calculateUpFace = function (startAng, swapAng) {
+
+			var pathId = oChartSpace.AllocPath();
+			var path = oChartSpace.GetPath(pathId);
+
 			var endAng = startAng + swapAng;
 			var p = getSegmentPoints(startAng, endAng);
-			
-			path.moveTo(xCenter  / pxToMm * pathW, yCenter / pxToMm * pathH);
+
+			path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 			path.lnTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
-			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng * cToDeg, -1 * swapAng * cToDeg);
+			path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 
 			return pathId;
 		};
-		
-		var calculateDownFace = function(startAng, swapAng)
-		{
-            var pathId = oChartSpace.AllocPath();
-            var path  = oChartSpace.GetPath(pathId);
-			
+
+		var calculateDownFace = function (startAng, swapAng) {
+			var pathId = oChartSpace.AllocPath();
+			var path = oChartSpace.GetPath(pathId);
+
 			var endAng = startAng + swapAng;
 			var p = getSegmentPoints(startAng, endAng);
-			
-			path.moveTo(xCenter  / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+
+			path.moveTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
 			path.lnTo(p.x0 / pxToMm * pathW, (p.y0 + depth) / pxToMm * pathH);
-			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(xCenter  /pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
-			
+			path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng * cToDeg,
+				-1 * swapAng * cToDeg);
+			path.lnTo(xCenter / pxToMm * pathW, (yCenter + depth) / pxToMm * pathH);
+
 
 			return pathId;
 		};
-		
+
 		//FRONT FACES
 		//break front faces
 		var arrAngles = breakAng(stAng, swAng);
 		var frontPath = [];
-		for(var i = 1; i < arrAngles.length; i++)
-		{
+		for (var i = 1; i < arrAngles.length; i++) {
 			var start = arrAngles[i - 1].angle;
 			var end = arrAngles[i].angle;
 			var swap = end - start;
-			
-			if((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0))
-			{
+
+			if ((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0)) {
 				frontPath.push(calculateFrontFace(start, swap));
 			}
 		}
-		
+
 		//INSIDE FACES
 		var insidePath = calculateInsideFaces(stAng, swAng);
-		
+
 		//UP FACE
 		var upPath = calculateUpFace(stAng, swAng);
-		
+
 		//DOWN FACE
 		var downPath = calculateDownFace(stAng, swAng);
-		
+
 		this.angleFor3D += swAng;
-		
-		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};	
+
+		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};
 	},
-	
-	_calculateSegment3D: function (startAngle, swapAngle, radius, xCenter, yCenter)
-	{
-		if(isNaN(swapAngle))
-		{
+
+	_calculateSegment3D: function (startAngle, swapAngle, radius, xCenter, yCenter) {
+		if (isNaN(swapAngle)) {
 			return null;
 		}
-		
-		if(radius < 0)
-		{
+
+		if (radius < 0) {
 			radius = 0;
 		}
-		
+
 		var path = [];
 		path.push(this._calculateArc3D(radius, startAngle, swapAngle, xCenter, yCenter));
-		
+
 		return path;
 	},
-	
-	_calculateSegment3DPerspective: function(radiusUp1, radiusUp2, radiusDown1, radiusDown2, angles1, angles2, center1, center2, pointCenter1, pointCenter2, upFaceSign)
-	{	
+
+	_calculateSegment3DPerspective: function (radiusUp1, radiusUp2, radiusDown1, radiusDown2, angles1, angles2, center1, center2, pointCenter1, pointCenter2, upFaceSign) {
 		var xCenter = center1.x, yCenter = center1.y, xCenter1 = center2.x, yCenter1 = center2.y;
 		var startAngle1 = angles1.start, swapAngle1 = angles1.swap, startAngle2 = angles2.start, swapAngle2 = angles2.swap;
-		
+
 		var pxToMm = this.chartProp.pxToMM;
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
-		
 
 		var oThis = this;
 
-		
-		var getSegmentPoints = function(startAng, endAng, startAng2, endAng2)
-		{
-			var radiusSpec = (radiusUp1 * radiusUp2) /  Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng),2));
-			var radiusSpec2 = (radiusUp1 * radiusUp2) /  Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(endAng),2));
-			
-			var radiusSpec11 = (radiusDown1 * radiusDown2) /  Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng2)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng2),2));
-			var radiusSpec12 = (radiusDown1 * radiusDown2) /  Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(endAng2)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(endAng2),2));
-			
-			var x0 = (xCenter + radiusSpec*Math.cos(startAng));
-			var y0 = (yCenter - radiusSpec*Math.sin(startAng));
-			
-			var x1 = (xCenter1 + radiusSpec11*Math.cos(startAng2));
-			var y1 = ((yCenter1) - radiusSpec11*Math.sin(startAng2));
-			
-			var x2 = (xCenter + radiusSpec2*Math.cos(endAng));
-			var y2 = (yCenter - radiusSpec2*Math.sin(endAng));
-			
+
+		var getSegmentPoints = function (startAng, endAng, startAng2, endAng2) {
+			var radiusSpec = (radiusUp1 * radiusUp2) / Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng), 2));
+			var radiusSpec2 = (radiusUp1 * radiusUp2) / Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(endAng), 2));
+
+			var radiusSpec11 = (radiusDown1 * radiusDown2) / Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng2)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng2), 2));
+			var radiusSpec12 = (radiusDown1 * radiusDown2) / Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(endAng2)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(endAng2), 2));
+
+			var x0 = (xCenter + radiusSpec * Math.cos(startAng));
+			var y0 = (yCenter - radiusSpec * Math.sin(startAng));
+
+			var x1 = (xCenter1 + radiusSpec11 * Math.cos(startAng2));
+			var y1 = ((yCenter1) - radiusSpec11 * Math.sin(startAng2));
+
+			var x2 = (xCenter + radiusSpec2 * Math.cos(endAng));
+			var y2 = (yCenter - radiusSpec2 * Math.sin(endAng));
+
 			var x3 = (xCenter1 + radiusSpec12 * Math.cos(endAng2));
 			var y3 = ((yCenter1) - radiusSpec12 * Math.sin(endAng2));
-			
+
 			return {x0: x0, y0: y0, x1: x1, y1: y1, x2: x2, y2: y2, x3: x3, y3: y3};
 		};
-		
-		var breakAng = function(startAng, swapAng)
-		{
+
+		var breakAng = function (startAng, swapAng) {
 			var res = [];
 			var endAng = startAng + swapAng;
-			
+
 			res.push({angle: startAng});
-			
+
 			var tempStartAng = startAng;
 			var tempEndAng = endAng;
 			var tempPI = Math.PI;
-			
-			if(tempStartAng <= -2*tempPI && tempEndAng > -2*tempPI)
-			{
-				res.push({angle: -2*Math.PI});
+
+			if (tempStartAng <= -2 * tempPI && tempEndAng > -2 * tempPI) {
+				res.push({angle: -2 * Math.PI});
 			}
-			if(tempStartAng <= -tempPI && tempEndAng > -tempPI)
-			{
+			if (tempStartAng <= -tempPI && tempEndAng > -tempPI) {
 				res.push({angle: -Math.PI});
 			}
-			if(tempStartAng <= 0 && tempEndAng > 0)
-			{
+			if (tempStartAng <= 0 && tempEndAng > 0) {
 				res.push({angle: 0});
 			}
-			if(tempStartAng <= tempPI && tempEndAng > tempPI)
-			{
+			if (tempStartAng <= tempPI && tempEndAng > tempPI) {
 				res.push({angle: Math.PI});
 			}
-			if(tempStartAng <= 2*tempPI && tempEndAng > 2*tempPI)
-			{
-				res.push({angle: 2*Math.PI});
+			if (tempStartAng <= 2 * tempPI && tempEndAng > 2 * tempPI) {
+				res.push({angle: 2 * Math.PI});
 			}
 			res.push({angle: endAng});
-			
+
 			return res;
 		};
 
-		var calculateInsideFaces = function(startAng1, swapAng1, startAng2, swapAng2)
-		{
+		var calculateInsideFaces = function (startAng1, swapAng1, startAng2, swapAng2) {
 
-            var pathId = oThis.cChartSpace.AllocPath();
-            var path  = oThis.cChartSpace.GetPath(pathId);
-			
+			var pathId = oThis.cChartSpace.AllocPath();
+			var path = oThis.cChartSpace.GetPath(pathId);
+
 			var endAng1 = startAng1 + swapAng1;
 			var endAng2 = startAng2 + swapAng2;
 			var p = getSegmentPoints(startAng1, endAng1, startAng2, endAng2);
-			
-			path.moveTo(pointCenter1.x  /pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
-			path.lnTo(p.x0  /pxToMm * pathW, p.y0 / pxToMm * pathH);
-			path.lnTo(p.x1  /pxToMm * pathW, p.y1 / pxToMm * pathH);
+
+			path.moveTo(pointCenter1.x / pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
+			path.lnTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
+			path.lnTo(p.x1 / pxToMm * pathW, p.y1 / pxToMm * pathH);
 			path.lnTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
-			
-			path.moveTo(pointCenter1.x  /pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
+
+			path.moveTo(pointCenter1.x / pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
 			path.lnTo(p.x2 / pxToMm * pathW, p.y2 / pxToMm * pathH);
 			path.lnTo(p.x3 / pxToMm * pathW, p.y3 / pxToMm * pathH);
 			path.lnTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
-			
 
-			
 			return pathId;
 		};
-		
-		var calculateFrontFace = function(startAng, swapAng, startAng2, swapAng2)
-		{
 
-            var pathId = oThis.cChartSpace.AllocPath();
-            var path  = oThis.cChartSpace.GetPath(pathId);
-			
+		var calculateFrontFace = function (startAng, swapAng, startAng2, swapAng2) {
+
+			var pathId = oThis.cChartSpace.AllocPath();
+			var path = oThis.cChartSpace.GetPath(pathId);
+
 			var endAng = startAng + swapAng;
 			var endAng2 = startAng2 + swapAng2;
-			
+
 			var p = getSegmentPoints(startAng, endAng, startAng2, endAng2);
 			//var p2 = getSegmentPoints(startAng2, endAng2);
-			
-			path.moveTo(p.x0  /pxToMm * pathW, p.y0 / pxToMm * pathH);
-			path.arcTo(radiusUp1 / pxToMm * pathW, radiusUp2 / pxToMm * pathH, -1 * startAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(p.x3  /pxToMm * pathW, p.y3 / pxToMm * pathH);
-			path.arcTo(radiusDown1 / pxToMm * pathW, radiusDown2 / pxToMm * pathH, -1 * startAng2*cToDeg - 1 * swapAng2*cToDeg, 1 * swapAng2*cToDeg);
+
+			path.moveTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
+			path.arcTo(radiusUp1 / pxToMm * pathW, radiusUp2 / pxToMm * pathH, -1 * startAng * cToDeg, -1 * swapAng * cToDeg);
+			path.lnTo(p.x3 / pxToMm * pathW, p.y3 / pxToMm * pathH);
+			path.arcTo(radiusDown1 / pxToMm * pathW, radiusDown2 / pxToMm * pathH, -1 * startAng2 * cToDeg - 1 * swapAng2 * cToDeg, 1 * swapAng2 * cToDeg);
 			path.lnTo(p.x0 / pxToMm * pathW, p.y0 / pxToMm * pathH);
 
-			
+
 			return pathId;
 		};
-		
-		var calculateUpFace = function(startAng, swapAng)
-		{
 
-            var pathId = oThis.cChartSpace.AllocPath();
-            var path  = oThis.cChartSpace.GetPath(pathId);
-			
-			var radiusSpec = (radiusUp1 * radiusUp2) /  Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng),2));
-			
-			var x0 = (xCenter + radiusSpec*Math.cos(startAng));
-			var y0 = (yCenter - radiusSpec*Math.sin(startAng));
-			
-			path.moveTo(pointCenter1.x  / pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
+		var calculateUpFace = function (startAng, swapAng) {
+
+			var pathId = oThis.cChartSpace.AllocPath();
+			var path = oThis.cChartSpace.GetPath(pathId);
+
+			var radiusSpec = (radiusUp1 * radiusUp2) / Math.sqrt(Math.pow(radiusUp2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusUp1, 2) * Math.pow(Math.sin(startAng), 2));
+
+			var x0 = (xCenter + radiusSpec * Math.cos(startAng));
+			var y0 = (yCenter - radiusSpec * Math.sin(startAng));
+
+			path.moveTo(pointCenter1.x / pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
 			path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
-			path.arcTo(radiusUp1 / pxToMm * pathW, radiusUp2 / pxToMm * pathH, -1 * startAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(pointCenter1.x  /pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
-			
+			path.arcTo(radiusUp1 / pxToMm * pathW, radiusUp2 / pxToMm * pathH, -1 * startAng * cToDeg, -1 * swapAng * cToDeg);
+			path.lnTo(pointCenter1.x / pxToMm * pathW, pointCenter1.y / pxToMm * pathH);
 
-			
+
 			return pathId;
 		};
-		
-		var calculateDownFace = function(startAng, swapAng)
-		{
 
-            var pathId = oThis.cChartSpace.AllocPath();
-            var path  = oThis.cChartSpace.GetPath(pathId);
+		var calculateDownFace = function (startAng, swapAng) {
 
-			var radiusSpec = (radiusDown1 * radiusDown2) /  Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng),2));
+			var pathId = oThis.cChartSpace.AllocPath();
+			var path = oThis.cChartSpace.GetPath(pathId);
+
+			var radiusSpec = (radiusDown1 * radiusDown2) / Math.sqrt(Math.pow(radiusDown2, 2) * Math.pow((Math.cos(startAng)), 2) + Math.pow(radiusDown1, 2) * Math.pow(Math.sin(startAng), 2));
 			//var radiusSpec2 = (radius11 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(endAng)), 2) + Math.pow(radius11, 2) * Math.pow(Math.sin(endAng),2))
-			
-			var x = (xCenter1 + radiusSpec*Math.cos(startAng));
-			var y = (yCenter1 - radiusSpec*Math.sin(startAng));
-			
-			path.moveTo(pointCenter2.x  / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
+
+			var x = (xCenter1 + radiusSpec * Math.cos(startAng));
+			var y = (yCenter1 - radiusSpec * Math.sin(startAng));
+
+			path.moveTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
 			path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
-			path.arcTo(radiusDown1 / pxToMm * pathW, radiusDown2 / pxToMm * pathH, -1 * startAng*cToDeg, -1 * swapAng*cToDeg);
-			path.lnTo(pointCenter2.x  /pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
-			
+			path.arcTo(radiusDown1 / pxToMm * pathW, radiusDown2 / pxToMm * pathH, -1 * startAng * cToDeg, -1 * swapAng * cToDeg);
+			path.lnTo(pointCenter2.x / pxToMm * pathW, (pointCenter2.y) / pxToMm * pathH);
+
 
 			return pathId;
 		};
-		
+
 		//FRONT FACES
 		//break front faces
 		var arrAngles = breakAng(startAngle1, swapAngle1);
 		var arrAngles2 = breakAng(startAngle2, swapAngle2);
 		var frontPath = [];
-		for(var i = 1; i < arrAngles.length; i++)
-		{
+		for (var i = 1; i < arrAngles.length; i++) {
 			var start = arrAngles[i - 1].angle;
 			var end = arrAngles[i].angle;
 			var swap = end - start;
-			
+
 			var start2 = arrAngles2[i - 1].angle;
 			var end2;
-			if(!arrAngles2[i])
-			{
+			if (!arrAngles2[i]) {
 				end2 = arrAngles2[i - 1].angle;
-			}
-			else
-			{
+			} else {
 				end2 = arrAngles2[i].angle;
 			}
-			
+
 			var swap2 = end2 - start2;
-			
-			if((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0))
-			{
-				frontPath.push(calculateFrontFace(upFaceSign*start, upFaceSign*swap, start2, swap2));
+
+			if ((start >= 0 && start >= Math.PI && start <= 2 * Math.PI) || (start < 0 && start >= -Math.PI && start <= 0)) {
+				frontPath.push(calculateFrontFace(upFaceSign * start, upFaceSign * swap, start2, swap2));
 			}
 		}
-		
+
 		//INSIDE FACES
-		var insidePath = calculateInsideFaces(upFaceSign*startAngle1, upFaceSign*swapAngle1, startAngle2, swapAngle2);
-		
+		var insidePath = calculateInsideFaces(upFaceSign * startAngle1, upFaceSign * swapAngle1, startAngle2,
+			swapAngle2);
+
 		//UP FACE
-		var upPath = calculateUpFace(upFaceSign*startAngle1, upFaceSign*swapAngle1);
-		
+		var upPath = calculateUpFace(upFaceSign * startAngle1, upFaceSign * swapAngle1);
+
 		//DOWN FACE
 		var downPath = calculateDownFace(startAngle2, swapAngle2);
-		
-		
+
 		return {frontPath: frontPath, upPath: upPath, insidePath: insidePath, downPath: downPath};
 	},
-	
-	
-	_drawPie3D: function ()
-    {
+
+
+	_drawPie3D: function () {
 		var numCache = this._getFirstRealNumCache();
 		var t = this;
 		var shade = "shade";
 		var shadeValue = 35000;
-		
-		var drawPath = function(path, pen, brush, isShadePen, isShadeBrush)
-		{
-			if(path)
-			{
-				if(brush)
-				{
-					var  props = t.cChartSpace.getParentObjects();
+
+		var drawPath = function (path, pen, brush, isShadePen, isShadeBrush) {
+			if (path) {
+				if (brush) {
+					var props = t.cChartSpace.getParentObjects();
 					var duplicateBrush = brush.createDuplicate();
 					var cColorMod = new AscFormat.CColorMod;
-					
+
 					cColorMod.val = shadeValue;
 					cColorMod.name = shade;
-					
-					if(duplicateBrush)
-					{
+
+					if (duplicateBrush) {
 						duplicateBrush.addColorMod(cColorMod);
 						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, t.cChartSpace.clrMapOvr);
 					}
-					if(isShadePen)
-					{
-						pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+					if (isShadePen) {
+						pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined,
+							undefined, 0);
 					}
-					if(isShadeBrush)
-					{
+					if (isShadeBrush) {
 						brush = duplicateBrush;
 					}
 				}
-				
+
 				t.cChartDrawer.drawPath(path, pen, brush);
 			}
 
 		};
-		
+
 		var pen = numCache[0].pen;
 		drawPath(this.paths.test, pen, null);
-		
+
 		var sides = {down: 0, inside: 1, up: 2, front: 3};
-		var drawPaths = function(side)
-		{
-			for (var i = 0,len = numCache.length; i < len; i++) 
-			{
+		var drawPaths = function (side) {
+			for (var i = 0, len = numCache.length; i < len; i++) {
 				var val = numCache[i];
 				var brush = val.brush;
 				var pen = val.pen;
 				var path = t.paths.series[i];
-				
-				if(path)
-				{
-					for(var j = path.length - 1; j >= 0; j--)
-					{
-						if(side === sides.down)
-						{
+
+				if (path) {
+					for (var j = path.length - 1; j >= 0; j--) {
+						if (side === sides.down) {
 							drawPath(path[j].downPath, pen, null);
-						}
-						else if(side === sides.inside)
-						{
+						} else if (side === sides.inside) {
 							//выставляю закругленные соединения
-							if(pen && pen.Join)
-							{
+							if (pen && pen.Join) {
 								pen = pen.createDuplicate();
 								pen.Join.type = Asc['c_oAscLineJoinType'].Round;
 							}
-							
+
 							drawPath(path[j].insidePath, pen, brush, null, true);
-						}
-						else if(side === sides.up)
-						{
+						} else if (side === sides.up) {
 							drawPath(path[j].upPath, pen, brush);
-						}
-						else if(side === sides.frontPath)
-						{
-							for(var k = 0; k < path[j].frontPath.length;k++)
-							{
+						} else if (side === sides.frontPath) {
+							for (var k = 0; k < path[j].frontPath.length; k++) {
 								drawPath(path[j].frontPath[k], pen, brush, true, true);
 							}
 						}
@@ -9287,36 +9174,32 @@ drawPieChart.prototype =
 				}
 			}
 		};
-		
+
 		drawPaths(sides.down);
 		drawPaths(sides.inside);
-		if(this.tempDrawOrder !== null)
-		{
+		if (this.tempDrawOrder !== null) {
 			drawPaths(sides.up);
 			drawPaths(sides.frontPath);
-		}
-		else
-		{
+		} else {
 			drawPaths(sides.frontPath);
 			drawPaths(sides.up);
 		}
-    },
-	
+	},
+
 	//best fit DLbl
-	_calculateBestFitPosition: function(fStartAngle, fSweepAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY, bLayout){
+	_calculateBestFitPosition: function (fStartAngle, fSweepAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY, bLayout) {
 		var fStartAngle_ = fStartAngle;
 		var fEndAngle = fStartAngle + fSweepAngle;
-        if(bLayout){
-            return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
-        }
+		if (bLayout) {
+			return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+		}
 		var oRet = this._calculateBestFitPositionInner(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
-        if(!oRet.bError){
-            if(AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fStartAngle_), fCenterY + fRadius*Math.sin(fStartAngle_))
-                || AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fEndAngle), fCenterY + fRadius*Math.sin(fEndAngle))){
-                oRet.bError = true;
-            }
-        }
-		if(oRet.bError){
+		if (!oRet.bError) {
+			if (AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius * Math.cos(fStartAngle_), fCenterY + fRadius * Math.sin(fStartAngle_)) || AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius * Math.cos(fEndAngle), fCenterY + fRadius * Math.sin(fEndAngle))) {
+				oRet.bError = true;
+			}
+		}
+		if (oRet.bError) {
 			return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
 		}
 		return oRet;
@@ -9649,202 +9532,191 @@ drawPieChart.prototype =
         }
         return oResult;
     },
-	
+
 	//For test
-	_calculateTestFrame: function(point1, point2, point3, point4, point5, point6, point7, point8)
-	{
+	_calculateTestFrame: function (point1, point2, point3, point4, point5, point6, point7, point8) {
 		var pxToMm = this.chartProp.pxToMM;
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
 		path.lnTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
 		path.lnTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
 		path.lnTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
 		path.lnTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
-		
+
 		path.moveTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
 		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
 		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
 		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
 		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-		
+
 		path.moveTo(point1.x / pxToMm * pathW, point1.y / pxToMm * pathH);
 		path.lnTo(point5.x / pxToMm * pathW, point5.y / pxToMm * pathH);
-		
+
 		path.moveTo(point2.x / pxToMm * pathW, point2.y / pxToMm * pathH);
 		path.lnTo(point6.x / pxToMm * pathW, point6.y / pxToMm * pathH);
-		
+
 		path.moveTo(point3.x / pxToMm * pathW, point3.y / pxToMm * pathH);
 		path.lnTo(point7.x / pxToMm * pathW, point7.y / pxToMm * pathH);
-		
+
 		path.moveTo(point4.x / pxToMm * pathW, point4.y / pxToMm * pathH);
 		path.lnTo(point8.x / pxToMm * pathW, point8.y / pxToMm * pathH);
-		
 
-		
+
 		this.paths.test = pathId;
 	},
-	
+
 	//TODO delete after test
-	_recalculatePie3D_Slow: function ()
-    {
+	_recalculatePie3D_Slow: function () {
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 
 		var numCache = this._getFirstRealNumCache();
 		var sumData = this.cChartDrawer._getSumArray(numCache, true);
-		
-        var radius = Math.min(trueHeight, trueWidth) / 2;
-		if(radius < 0)
+
+		var radius = Math.min(trueHeight, trueWidth) / 2;
+		if (radius < 0) {
 			radius = 0;
-		
-		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
-		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
-		
+		}
+
+		var xCenter = this.chartProp.chartGutter._left + trueWidth / 2;
+		var yCenter = this.chartProp.chartGutter._top + trueHeight / 2;
+
 		var startAngle = this.cChartDrawer.processor3D.angleOy ? this.cChartDrawer.processor3D.angleOy : 0;
-		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI/2, startAngle, xCenter, yCenter, this.properties3d) : 0;
-		
-		this.tempAngle = Math.PI/2  + startAngle;
-		this.angleFor3D = Math.PI/2 - startAngle3D;
-		
+		var startAngle3D = startAngle !== 0 && startAngle !== undefined ? this._changeAngle(radius, Math.PI / 2, startAngle, xCenter, yCenter, this.properties3d) : 0;
+
+		this.tempAngle = Math.PI / 2 + startAngle;
+		this.angleFor3D = Math.PI / 2 - startAngle3D;
+
 		//рисуем против часовой стрелки, поэтому цикл с конца
 		var depth = this.properties3d.depth;
-		for(var n = 0; n < depth; n++)
-		{
-			if(!this.paths.series)
+		for (var n = 0; n < depth; n++) {
+			if (!this.paths.series) {
 				this.paths.series = [];
-			
-			for (var i = numCache.length - 1; i >= 0; i--) 
-			{
+			}
+
+			for (var i = numCache.length - 1; i >= 0; i--) {
 				var angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
-				if(!this.paths.series[n])
+				if (!this.paths.series[n]) {
 					this.paths.series[n] = [];
-					
-				if(sumData === 0)//TODO стоит пересмотреть
+				}
+
+				if (sumData === 0)//TODO стоит пересмотреть
+				{
 					this.paths.series[n][i] = this._calculateEmptySegment(radius, xCenter, yCenter);
-				else
+				} else {
 					this.paths.series[n][i] = this._calculateSegment3D(angle, radius, xCenter, yCenter, n, i);
+				}
 			}
 		}
-       
-    },
-	
-	_calculateSegment3D_Slow: function (angle, radius, xCenter, yCenter, depth, i)
-	{
-		if(isNaN(angle))
+
+	},
+
+	_calculateSegment3D_Slow: function (angle, radius, xCenter, yCenter, depth, i) {
+		if (isNaN(angle)) {
 			return null;
-		
+		}
+
 		var startAngle = (this.tempAngle);
 		var path = this._calculateArc3D(radius, startAngle, angle, xCenter, yCenter, depth, i);
-        this.tempAngle += angle;
-		
+		this.tempAngle += angle;
+
 		return path;
 	},
-	
-	_calculateArc3D_Slow : function(radius, stAng, swAng, xCenter, yCenter, depth, seriaNum)
-	{	
+
+	_calculateArc3D_Slow: function (radius, stAng, swAng, xCenter, yCenter, depth, seriaNum) {
 		var radius1 = this.properties3d.radius1;
 		var radius2 = this.properties3d.radius2;
 		var pxToMm = this.chartProp.pxToMM;
 		var t = this;
-		
+
 		var x0, y0, radiusSpec;
-		var calculateProps = function()
-		{
-			if(t.usually3dPropsCalc && t.usually3dPropsCalc[seriaNum])
-			{
+		var calculateProps = function () {
+			if (t.usually3dPropsCalc && t.usually3dPropsCalc[seriaNum]) {
 				swAng = t.usually3dPropsCalc[seriaNum].swAng;
 				stAng = t.usually3dPropsCalc[seriaNum].stAng;
-				radiusSpec =  t.usually3dPropsCalc[seriaNum].radiusSpec;
+				radiusSpec = t.usually3dPropsCalc[seriaNum].radiusSpec;
 				x0 = t.usually3dPropsCalc[seriaNum].x0;
-				
+
 				yCenter = yCenter + t.properties3d.depth / 2 - depth;
-				y0 = (yCenter - radiusSpec*Math.sin(stAng));
-			}
-			else
-			{
+				y0 = (yCenter - radiusSpec * Math.sin(stAng));
+			} else {
 				swAng = t._changeAngle(radius, stAng, swAng, xCenter, yCenter, t.properties3d);
 				stAng = t.angleFor3D;
-				
+
 				//корректируем центр
 				yCenter = yCenter + t.properties3d.depth / 2 - depth;
-					
-				radiusSpec = (radius1 * radius2) /  Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(stAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(stAng),2));
-				
-				x0 = (xCenter + radiusSpec*Math.cos(stAng));
-				y0 = (yCenter - radiusSpec*Math.sin(stAng));
+
+				radiusSpec = (radius1 * radius2) / Math.sqrt(Math.pow(radius2, 2) * Math.pow((Math.cos(stAng)), 2) + Math.pow(radius1, 2) * Math.pow(Math.sin(stAng), 2));
+
+				x0 = (xCenter + radiusSpec * Math.cos(stAng));
+				y0 = (yCenter - radiusSpec * Math.sin(stAng));
 			}
 		};
 
 
-        var pathId = this.cChartSpace.AllocPath();
-        var path  = this.cChartSpace.GetPath(pathId);
-		
+		var pathId = this.cChartSpace.AllocPath();
+		var path = this.cChartSpace.GetPath(pathId);
+
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 
-		
-		calculateProps();
-		
-		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
-		path.lnTo(x0  /pxToMm * pathW, y0 / pxToMm * pathH);
-		path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
-		path.lnTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
-		
 
-		
+		calculateProps();
+
+		path.moveTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
+		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.arcTo(radius1 / pxToMm * pathW, radius2 / pxToMm * pathH, -1 * stAng * cToDeg, -1 * swAng * cToDeg);
+		path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
+
+
 		this.angleFor3D += swAng;
-		if(!this.usually3dPropsCalc[seriaNum])
+		if (!this.usually3dPropsCalc[seriaNum]) {
 			this.usually3dPropsCalc[seriaNum] = {swAng: swAng, stAng: stAng, xCenter: xCenter, x0: x0, radiusSpec: radiusSpec};
-		
+		}
+
 		return pathId;
 	},
-	
-	_drawPie3D_Slow: function ()
-    {
+
+	_drawPie3D_Slow: function () {
 		var numCache = this._getFirstRealNumCache();
-		var  props = this.cChartSpace.getParentObjects();
+		var props = this.cChartSpace.getParentObjects();
 		var brush, pen, val;
 		var path;
-		for(var n = 0; n < this.paths.series.length; n++)
-		{
+		for (var n = 0; n < this.paths.series.length; n++) {
 			for (var i = 0, len = numCache.length; i < len; i++) {
 				val = numCache[i];
 				brush = val.brush;
-				
-				if(n === 0 || n === this.paths.series.length - 1)
-				{
+
+				if (n === 0 || n === this.paths.series.length - 1) {
 					pen = val.pen;
-				}
-				else
-				{
+				} else {
 					pen = null;
 				}
-				
+
 				path = this.paths.series[n][i];
-				
+
 				var duplicateBrush = brush;
-				if(n !== this.paths.series.length - 1)
-				{
+				if (n !== this.paths.series.length - 1) {
 					duplicateBrush = brush.createDuplicate();
 					var cColorMod = new AscFormat.CColorMod;
-					
+
 					cColorMod.val = 35000;
 					cColorMod.name = "shade";
-					
+
 					duplicateBrush.addColorMod(cColorMod);
 					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA, this.cChartSpace.clrMapOvr);
 				}
-				
+
 				this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 			}
 		}
-        
-    }
+
+	}
 };
 
 
