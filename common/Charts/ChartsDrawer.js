@@ -160,47 +160,47 @@ CChartsDrawer.prototype =
 			var chart = chartSpace.chart.plotArea.charts[i];
 			switch (this._getChartType(chart)) {
 				case c_oChartTypes.Bar: {
-					newChart = new drawBarChart();
+					newChart = new drawBarChart(chart);
 					break;
 				}
 				case c_oChartTypes.Line: {
-					newChart = new drawLineChart();
+					newChart = new drawLineChart(chart);
 					break;
 				}
 				case c_oChartTypes.HBar: {
-					newChart = new drawHBarChart();
+					newChart = new drawHBarChart(chart);
 					break;
 				}
 				case c_oChartTypes.Pie: {
-					newChart = new drawPieChart();
+					newChart = new drawPieChart(chart);
 					break;
 				}
 				case c_oChartTypes.Scatter: {
-					newChart = new drawScatterChart();
+					newChart = new drawScatterChart(chart);
 					break;
 				}
 				case c_oChartTypes.Area: {
-					newChart = new drawAreaChart();
+					newChart = new drawAreaChart(chart);
 					break;
 				}
 				case c_oChartTypes.Stock: {
-					newChart = new drawStockChart();
+					newChart = new drawStockChart(chart);
 					break;
 				}
 				case c_oChartTypes.DoughnutChart: {
-					newChart = new drawDoughnutChart();
+					newChart = new drawDoughnutChart(chart);
 					break;
 				}
 				case c_oChartTypes.Radar: {
-					newChart = new drawRadarChart();
+					newChart = new drawRadarChart(chart);
 					break;
 				}
 				case c_oChartTypes.BubbleChart: {
-					newChart = new drawBubbleChart();
+					newChart = new drawBubbleChart(chart);
 					break;
 				}
 				case c_oChartTypes.Surface: {
-					newChart = new drawSurfaceChart();
+					newChart = new drawSurfaceChart(chart);
 					break;
 				}
 			}
@@ -249,6 +249,7 @@ CChartsDrawer.prototype =
 
 		}
 
+		//CHARTS
 		if (!chartSpace.bEmptySeries) {
 			for (var i = 0; i < this.charts.length; i++) {
 				this.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
@@ -4138,14 +4139,29 @@ CChartsDrawer.prototype =
 		}
 
 		return path;
+	},
+
+	getAxisFromAxId: function(axId, type) {
+		var res = null;
+		for(var i = 0; i < axId.length; i++) {
+			if(axId[i].getObjectType() === type) {
+				res = axId[i];
+				break;
+			}
+		}
+		return res;
 	}
 };
 
 
 
 	/** @constructor */
-function drawBarChart()
+function drawBarChart(chart)
 {
+	this.chart = chart;
+	this.catAx = null;
+	this.valAx = null;
+
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
@@ -4161,7 +4177,7 @@ drawBarChart.prototype =
 {
     constructor: drawBarChart,
 	
-	recalculate : function(chartsDrawer, chart)
+	recalculate : function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -4171,7 +4187,9 @@ drawBarChart.prototype =
 		this.summBarVal = [];
 		
 		this.sortZIndexPaths = [];
-		
+
+		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 		this._recalculateBars();
 	},
 	
@@ -4194,34 +4212,38 @@ drawBarChart.prototype =
 	_DrawBars: function()
 	{
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+
+		var left = (this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM;
+		var top = (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM;
+		var right = this.chartProp.trueWidth / this.chartProp.pxToMM;
+		var bottom = this.chartProp.trueHeight / this.chartProp.pxToMM;
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(left, top, right, bottom);
+
 		this.cChartDrawer.drawPaths(this.paths, this.chartProp.series);
 		this.cChartDrawer.cShapeDrawer.Graphics.RestoreGrState();
 	},
 	
 	_recalculateBars: function (/*isSkip*/)
     {
-        //соответствует подписям оси категорий(OX)
-		var xPoints     = this.cChartSpace.chart.plotArea.catAx.xPoints;
-		//соответствует подписям оси значений(OY)
-		var yPoints     = this.cChartSpace.chart.plotArea.valAx.yPoints;
+		var xPoints  = this.catAx.xPoints;
+		var yPoints  = this.valAx.yPoints;
 		
 		var widthGraph  = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 
 		var defaultOverlap = (this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer" || this.chartProp.subType === "standard") ? 100 : 0;
-		var overlap        = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.overlap) ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
+		var overlap        = AscFormat.isRealNumber(this.chart.overlap) ? this.chart.overlap : defaultOverlap;
 		var numCache       = this.cChartDrawer.getNumCache(this.chartProp.series[0]);
 		var width          = widthGraph / this.chartProp.ptCount;
 		if(this.cChartSpace.getValAxisCrossType() && numCache)
 			width = widthGraph / (numCache.ptCount - 1);
 		
-		var gapWidth = AscFormat.isRealNumber(this.cChartSpace.chart.plotArea.chart.gapWidth) ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
+		var gapWidth = AscFormat.isRealNumber(this.chart.gapWidth) ? this.chart.gapWidth : 150;
 		
 		var individualBarWidth = width / (this.chartProp.seriesCount - (this.chartProp.seriesCount - 1) * (overlap / 100) + gapWidth / 100);
 		var widthOverLap       = individualBarWidth * (overlap / 100);
 		var hmargin            = (gapWidth / 100 * individualBarWidth) / 2;
 		
-		var nullPositionOX = this.cChartSpace.chart.plotArea.catAx.posY*this.chartProp.pxToMM;
+		var nullPositionOX = this.catAx.posY * this.chartProp.pxToMM;
 		
 		var height, startX, startY, val, paths, seriesHeight = [], tempValues = [], seria, startYColumnPosition, startXPosition, prevVal, idx, seriesCounter = 0;
 		var cubeCount = 0;
@@ -4269,23 +4291,23 @@ drawBarChart.prototype =
 				seriesHeight[i][idx] = height;
 				
 				//стартовая позиция колонки X
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				{
 					if(xPoints[1] && xPoints[1].pos)
 						startXPosition = xPoints[idx].pos - Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos - Math.abs(xPoints[0].pos - this.valAx.posX);
 				}	
 				else
 				{
 					if(xPoints[1] && xPoints[1].pos)
 						startXPosition = xPoints[idx].pos + Math.abs((xPoints[1].pos - xPoints[0].pos) / 2);
 					else
-						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
+						startXPosition = xPoints[idx].pos + Math.abs(xPoints[0].pos - this.valAx.posX);
 				}
 					
 				
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				{
 					if(seriesCounter === 0)
 						startX = startXPosition * this.chartProp.pxToMM + hmargin + seriesCounter * (individualBarWidth);
@@ -4301,10 +4323,10 @@ drawBarChart.prototype =
 				}
 				
 				
-				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation !== ORIENTATION_MIN_MAX)
+				if(this.catAx.scaling.orientation !== ORIENTATION_MIN_MAX)
 					startX = startX - individualBarWidth;
 				
-				if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX && (this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked"))
+				if(this.valAx.scaling.orientation !== ORIENTATION_MIN_MAX && (this.chartProp.subType === "stackedPer" || this.chartProp.subType === "stacked"))
 					startY = startY + height;
 				
 				//for 3d charts
@@ -4329,16 +4351,17 @@ drawBarChart.prototype =
 					}
 					else
 					{
+						var endBlockPosition, startBlockPosition;
 						if(val > 0)
 						{
-							var endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMax), yPoints) * this.chartProp.pxToMM;
-							var startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
+							endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMax), yPoints) * this.chartProp.pxToMM;
+							startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
 							testHeight = startBlockPosition - endBlockPosition;
 						}
 						else
 						{
-							var endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMin), yPoints) * this.chartProp.pxToMM;
-							var startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
+							endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMin), yPoints) * this.chartProp.pxToMM;
+							startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
 							testHeight = startBlockPosition - endBlockPosition;
 						}
 					}
@@ -4364,7 +4387,8 @@ drawBarChart.prototype =
 			if(seria.length)
 				seriesCounter++;
 		}
-		
+
+		var cSortFaces;
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
 			if(this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer")
@@ -4400,12 +4424,12 @@ drawBarChart.prototype =
 					})
 				}*/
 				
-				var cSortFaces = new CSortFaces(this.cChartDrawer);
+				cSortFaces = new CSortFaces(this.cChartDrawer);
 				this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp);
 			}
 			else if("normal" === this.chartProp.subType)
 			{
-				var cSortFaces = new CSortFaces(this.cChartDrawer);
+				cSortFaces = new CSortFaces(this.cChartDrawer);
 				this.sortParallelepipeds = cSortFaces.sortParallelepipeds(this.temp2);
 			}
 			else
@@ -4424,7 +4448,7 @@ drawBarChart.prototype =
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints)
 	{
 		var startY, height, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
+		var nullPositionOX = this.valAx && this.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
 		
 		
 		if(this.chartProp.subType === "stacked")
@@ -4438,7 +4462,7 @@ drawBarChart.prototype =
 			startY = startBlockPosition;
 			height = startBlockPosition - endBlockPosition;
 			
-			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(this.valAx.scaling.orientation != ORIENTATION_MIN_MAX)
 				height = - height;	
 		}
 		else if(this.chartProp.subType === "stackedPer")
@@ -4454,15 +4478,15 @@ drawBarChart.prototype =
 			startY = startBlockPosition;
 			height = startBlockPosition - endBlockPosition;
 			
-			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX)
+			if(this.valAx.scaling.orientation !== ORIENTATION_MIN_MAX)
 				height = - height;
 		}
 		else
 		{
 			startY = nullPositionOX;
-			if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)//исключение для логарифмической шкалы
+			if(this.valAx && this.valAx.scaling.logBase)//исключение для логарифмической шкалы
 			{
-				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.cChartSpace.chart.plotArea.valAx.scaling.logBase) * this.chartProp.pxToMM;
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, yPoints, null,this.valAx.scaling.logBase) * this.chartProp.pxToMM;
 			}
 			else
 			{
@@ -4479,7 +4503,7 @@ drawBarChart.prototype =
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		//сдвиг по OZ в глубину
-		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+		var gapDepth = this.chart.gapDepth != null ? this.chart.gapDepth : globalGapDepth;
 		if(this.chartProp.subType === "standard")
 			perspectiveDepth = (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount;
 		else	
@@ -4798,7 +4822,8 @@ drawBarChart.prototype =
 				t._drawBar3D(paths, pen, brush, k, options.val);
 			}
 		};
-		
+
+		var index, faces, face;
 		if(this.chartProp.subType === "stacked" || this.chartProp.subType === "stackedPer")
 		{
 			//если будут найдены проблемы при отрисовке stacked rAngAx - раскомментировать ветку
@@ -4817,22 +4842,22 @@ drawBarChart.prototype =
 			
 			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
-				var index = this.sortParallelepipeds[i].nextIndex;
-				var faces = this.temp[index].faces;
+				index = this.sortParallelepipeds[i].nextIndex;
+				faces = this.temp[index].faces;
 				for(var j = 0; j < faces.length; j++)
 				{
-					var face = faces[j];
+					face = faces[j];
 					drawVerges(face.seria, face.point, face.darkPaths, null, face.verge, null, true);
 				}	
 			}
 			
 			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
-				var index = this.sortParallelepipeds[i].nextIndex;
-				var faces = this.temp[index].faces;
+				index = this.sortParallelepipeds[i].nextIndex;
+				faces = this.temp[index].faces;
 				for(var j = 0; j < faces.length; j++)
 				{
-					var face = faces[j];
+					face = faces[j];
 					drawVerges(face.seria, face.point, face.frontPaths, null, face.verge);
 				}	
 			}
@@ -4841,22 +4866,22 @@ drawBarChart.prototype =
 		{
 			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
-				var index = this.sortParallelepipeds[i].nextIndex;
-				var faces = this.temp[index].faces;
+				index = this.sortParallelepipeds[i].nextIndex;
+				faces = this.temp[index].faces;
 				for(var j = 0; j < faces.length; j++)
 				{
-					var face = faces[j];
+					face = faces[j];
 					drawVerges(face.seria, face.point, face.darkPaths, null, face.verge, null, true);
 				}	
 			}
 			
 			for(var i = 0; i < this.sortParallelepipeds.length; i++)
 			{
-				var index = this.sortParallelepipeds[i].nextIndex;
-				var faces = this.temp[index].faces;
+				index = this.sortParallelepipeds[i].nextIndex;
+				faces = this.temp[index].faces;
 				for(var j = 0; j < faces.length; j++)
 				{
-					var face = faces[j];
+					face = faces[j];
 					drawVerges(face.seria, face.point, face.frontPaths, null, face.verge);
 				}	
 			}
@@ -4924,7 +4949,7 @@ drawBarChart.prototype =
 						var colors = duplicateBrush.fill.colors;
 						//ToDo проверить stacked charts!
 						var color;
-						var valAxOrientation = this.cChartSpace.chart.plotArea.valAx.scaling.orientation;
+						var valAxOrientation = this.valAx.scaling.orientation;
 						if((val > 0 && valAxOrientation === ORIENTATION_MIN_MAX) || (val < 0 && valAxOrientation !== ORIENTATION_MIN_MAX))
 						{
 							if(k === 4 && colors && colors[0] && colors[0].color)
@@ -4985,7 +5010,7 @@ drawBarChart.prototype =
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		//сдвиг по OZ в глубину
-		var gapDepth = this.cChartSpace.chart.plotArea.chart.gapDepth != null ? this.cChartSpace.chart.plotArea.chart.gapDepth : globalGapDepth;
+		var gapDepth = this.chart.gapDepth != null ? this.chart.gapDepth : globalGapDepth;
 		if(this.chartProp.subType === "standard")
 			perspectiveDepth = (perspectiveDepth / (gapDepth / 100 + 1)) / this.chartProp.seriesCount;
 		else	
