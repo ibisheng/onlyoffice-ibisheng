@@ -8134,90 +8134,64 @@ Paragraph.prototype.GetDirectParaPr = function()
 {
 	return this.Pr.Copy();
 };
-Paragraph.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
+Paragraph.prototype.PasteFormatting = function(TextPr, oParaPr, ApplyPara)
 {
 	// Применяем текстовые настройки всегда
-	if (null != TextPr)
+	if (TextPr)
 		this.Add(new ParaTextPr(TextPr));
 
-	var _ApplyPara = ApplyPara;
-	if (false === _ApplyPara)
-	{
-		if (true === this.Selection.Use)
-		{
-			_ApplyPara = true;
-
-			var Start = this.Selection.StartPos;
-			var End   = this.Selection.EndPos;
-			if (Start > End)
-			{
-				Start = this.Selection.EndPos;
-				End   = this.Selection.StartPos;
-			}
-
-			if (true === this.Internal_FindForward(End, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found)
-				_ApplyPara = false;
-			else if (true === this.Internal_FindBackward(Start - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found)
-				_ApplyPara = false;
-		}
-		else
-			_ApplyPara = true;
-	}
-
 	// Применяем настройки параграфа
-	if (true === _ApplyPara && null != ParaPr)
+	if (oParaPr)
 	{
-		// Ind
-		if (undefined != ParaPr.Ind)
-			this.Set_Ind(ParaPr.Ind, false);
+		this.Set_ContextualSpacing(oParaPr.ContextualSpacing);
 
-		// Jc
-		if (undefined != ParaPr.Jc)
-			this.Set_Align(ParaPr.Jc);
+		if (oParaPr.Ind)
+			this.Set_Ind(oParaPr.Ind, true);
+		else
+			this.Set_Ind(new CParaInd(), true);
 
-		// Spacing
-		if (undefined != ParaPr.Spacing)
-			this.Set_Spacing(ParaPr.Spacing, false);
+		this.Set_Align(oParaPr.Jc);
+		this.Set_KeepLines(oParaPr.KeepLines);
+		this.Set_KeepNext(oParaPr.KeepNext);
+		this.Set_PageBreakBefore(oParaPr.PageBreakBefore);
 
-		// PageBreakBefore
-		if (undefined != ParaPr.PageBreakBefore)
-			this.Set_PageBreakBefore(ParaPr.PageBreakBefore);
+		if (oParaPr.Spacing)
+			this.Set_Spacing(oParaPr.Spacing, true);
+		else
+			this.Set_Spacing(new CParaSpacing(), true);
 
-		// KeepLines
-		if (undefined != ParaPr.KeepLines)
-			this.Set_KeepLines(ParaPr.KeepLines);
+		if (oParaPr.Shd)
+			this.Set_Shd(oParaPr.Shd, true);
+		else
+			this.Set_Shd(undefined);
 
-		// ContextualSpacing
-		if (undefined != ParaPr.ContextualSpacing)
-			this.Set_ContextualSpacing(ParaPr.ContextualSpacing);
+		this.Set_WidowControl(oParaPr.WidowControl);
 
-		// Shd
-		if (undefined != ParaPr.Shd)
-			this.Set_Shd(ParaPr.Shd, false);
+		if (oParaPr.Tabs)
+			this.Set_Tabs(oParaPr.Tabs);
+		else
+			this.Set_Tabs(new CParaTabs());
+
 
 		if (this.bFromDocument)
 		{
-			// NumPr
-			if (undefined != ParaPr.NumPr)
-				this.Numbering_Set(ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl);
+			if (oParaPr.NumPr)
+				this.Numbering_Set(oParaPr.NumPr.NumId, oParaPr.NumPr.Lvl);
 			else
 				this.Numbering_Remove();
 
-			// StyleId
-			if (undefined != ParaPr.PStyle)
-				this.Style_Add(ParaPr.PStyle, true);
+			if (oParaPr.PStyle)
+				this.Style_Add(oParaPr.PStyle, true);
 			else
 				this.Style_Remove();
 
-			// Brd
-			if (undefined != ParaPr.Brd)
-				this.Set_Borders(ParaPr.Brd);
+			if (oParaPr.Brd)
+				this.Set_Borders(oParaPr.Brd);
 		}
 		else
 		{
-			this.Set_Bullet(ParaPr.Bullet);
+			this.Set_Bullet(oParaPr.Bullet);
 		}
-
 	}
 };
 Paragraph.prototype.Style_Get = function()
@@ -12480,10 +12454,13 @@ Paragraph.prototype.GetCurrentComplexFields = function(bReturnFieldPos)
 };
 Paragraph.prototype.GetComplexFieldsByPos = function(oParaPos, bReturnFieldPos)
 {
+	var nLine  = this.CurPos.Line;
+	var nRange = this.CurPos.Range;
+
 	var oCurrentPos = this.Get_ParaContentPos(false);
 	this.Set_ParaContentPos(oParaPos, false, -1, -1, false);
 	var arrComplexFields = this.GetCurrentComplexFields(bReturnFieldPos);
-	this.Set_ParaContentPos(oCurrentPos, false, -1, -1, false);
+	this.Set_ParaContentPos(oCurrentPos, false, nLine, nRange, false);
 	return arrComplexFields;
 };
 Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldPos)

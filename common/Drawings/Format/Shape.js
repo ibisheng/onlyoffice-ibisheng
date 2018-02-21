@@ -4018,6 +4018,10 @@ CShape.prototype.updateSelectionState = function ()
                     }
                     else
                     {
+                        if (true !== content.Selection.Start)
+                        {
+                            content.RemoveSelection();
+                        }
                         drawing_document.SelectEnabled(false);
                         content.RecalculateCurPos();
 

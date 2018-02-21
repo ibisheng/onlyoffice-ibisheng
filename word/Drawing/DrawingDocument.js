@@ -6763,11 +6763,35 @@ function CDrawingDocument()
 		// draw!
 		var wPx = this.GuiCanvasFillTOC.width;
 		var hPx = this.GuiCanvasFillTOC.height;
+		var wMm = wPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+		var hMm = hPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
 
-		var ctx = this.GuiCanvasFillTOC.getContext("2d");
-		ctx.fillStyle = "#808080";
+		History.TurnOff();
+		var _oldTurn = editor.isViewMode;
+		editor.isViewMode = true;
+
+		var ctx = this.GuiCanvasFillTOC.getContext('2d');
+
+		// clear
+		ctx.fillStyle = "#FFFFFF";
 		ctx.fillRect(0, 0, wPx, hPx);
-		ctx.beginPath();
+
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(ctx, wPx, hPx, wMm, hMm);
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		graphics.transform(1, 0, 0, 1, 0, 0);
+
+		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
+		this.m_oWordControl.m_oApi.ShowParaMarks = false;
+
+		// content
+
+		// draw
+
+		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+
+		History.TurnOn();
+		editor.isViewMode = _oldTurn;
 	}
 
 	this.StartTableStylesCheck = function ()

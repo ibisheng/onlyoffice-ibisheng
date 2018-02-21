@@ -190,10 +190,13 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     var hit_in_inner_area = drawing.hitInInnerArea(x, y);
     var hit_in_path = drawing.hitInPath(x, y);
     var hit_in_text_rect = drawing.hitInTextRect(x, y);
-    if(hit_in_inner_area && drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+    if(hit_in_inner_area || hit_in_path)
     {
-        if(drawingObjectsController.checkDrawingHyperlink && drawingObjectsController.checkDrawingHyperlink(drawing, e)){
-            return true;
+        if(drawingObjectsController.checkDrawingHyperlink){
+            var ret =  drawingObjectsController.checkDrawingHyperlink(drawing, e, hit_in_text_rect, x, y, pageIndex);
+            if(ret){
+                return ret;
+            }
         }
     }
     if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
@@ -226,6 +229,15 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     var hit_in_path = shape.hitInPath && shape.hitInPath(x, y);
     var hit_in_text_rect = shape.hitInTextRect && shape.hitInTextRect(x, y);
     var ret;
+    if(hit_in_inner_area || hit_in_path)
+    {
+        if(drawingObjectsController.checkDrawingHyperlink){
+            var ret =  drawingObjectsController.checkDrawingHyperlink(shape, e, hit_in_text_rect, x, y, pageIndex);
+            if(ret){
+                return ret;
+            }
+        }
+    }
     if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, null, false, pageIndex, true);

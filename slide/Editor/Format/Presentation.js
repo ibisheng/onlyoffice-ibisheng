@@ -2551,14 +2551,17 @@ CPresentation.prototype =
             {
 
                 var oTargetDocContent = oController.getTargetDocContent();
-                var oSelectedInfo = new CSelectedElementsInfo();
-                oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
-                var oMath         = oSelectedInfo.Get_Math();
-
-                if (!oMath)
+                if(oTargetDocContent)
                 {
-                    if (true === e.ShiftKey && true === e.CtrlKey)
-                        return [0x00A0];
+                    var oSelectedInfo = new CSelectedElementsInfo();
+                    oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                    var oMath         = oSelectedInfo.Get_Math();
+
+                    if (!oMath)
+                    {
+                        if (true === e.ShiftKey && true === e.CtrlKey)
+                            return [0x00A0];
+                    }
                 }
             }
         }
@@ -3061,7 +3064,19 @@ CPresentation.prototype =
                                 if(oController.selectedObjects.length !== 0) {
                                     if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                                         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                        this.AddToParagraph(new ParaNewLine(break_Line));
+
+                                        var oSelectedInfo = new CSelectedElementsInfo();
+                                        oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                                        var oMath         = oSelectedInfo.Get_Math();
+                                        if (null !== oMath && oMath.Is_InInnerContent())
+                                        {
+                                            if (oMath.Handle_AddNewLine())
+                                                this.Recalculate();
+                                        }
+                                        else
+                                        {
+                                            this.AddToParagraph(new ParaNewLine(break_Line));
+                                        }
                                     }
                                 }
                             }
@@ -3072,11 +3087,38 @@ CPresentation.prototype =
                                         && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
                                         if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                            this.AddToParagraph(new ParaNewLine(break_Line));
+                                            var oSelectedInfo = new CSelectedElementsInfo();
+                                            oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                                            var oMath         = oSelectedInfo.Get_Math();
+                                            if (null !== oMath && oMath.Is_InInnerContent())
+                                            {
+                                                if (oMath.Handle_AddNewLine())
+                                                    this.Recalculate();
+                                            }
+                                            else
+                                            {
+                                                this.AddToParagraph(new ParaNewLine(break_Line));
+                                            }
                                         }
                                     }
                                     else{
-                                        this.AddNewParagraph();
+
+                                        var oSelectedInfo = new CSelectedElementsInfo();
+                                        oTargetDocContent.GetSelectedElementsInfo(oSelectedInfo);
+                                        var oMath         = oSelectedInfo.Get_Math();
+                                        if (null !== oMath && oMath.Is_InInnerContent())
+                                        {
+                                            if (true === this.CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                                if (oMath.Handle_AddNewLine())
+                                                    this.Recalculate();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            this.AddNewParagraph();
+
+                                        }
                                     }
 
 

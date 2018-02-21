@@ -73,7 +73,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
     CT_Hyperlink.prototype.Write_ToBinary = function(w)
     {
-        var nStartPos = w.GetCurPos();
+        var nStartPos = w.GetCurPosition();
         var nFlags = 0;
         w.WriteLong(0);
 
@@ -113,10 +113,10 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
             nFlags |= 256;
             w.WriteBool(this.endSnd);
         }
-        var nEndPos = w.GetCurPos();
-        w.Seek2(nStartPos);
+        var nEndPos = w.GetCurPosition();
+        w.Seek(nStartPos);
         w.WriteLong(nFlags);
-        w.Seek2(nEndPos);
+        w.Seek(nEndPos);
     };
 
     CT_Hyperlink.prototype.Read_FromBinary = function(r){
@@ -193,6 +193,8 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetIsHidden                 ] = function (oClass, value){oClass.isHidden  = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetDescr                    ] = function (oClass, value){oClass.descr     = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetTitle                    ] = function (oClass, value){oClass.title     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkClick                    ] = function (oClass, value){oClass.hlinkClick     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkHover                    ] = function (oClass, value){oClass.hlinkHover     = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetIsPhoto                   ] = function (oClass, value){oClass.isPhoto   = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetUserDrawn                 ] = function (oClass, value){oClass.userDrawn = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetPh                        ] = function (oClass, value){oClass.ph        = value;};
@@ -10200,11 +10202,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
 
     /* Common Functions For Builder*/
-    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
+    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord, worksheet){
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
         oShapeTrack.track({}, nWidth, nHeight);
         var oShape = oShapeTrack.getShape(bWord === true, oDrawingDocument, null);
         oShape.setParent(oParent);
+        if(worksheet){
+            oShape.setWorksheet(worksheet);
+        }
         if(bWord){
             oShape.createTextBoxContent();
         }
