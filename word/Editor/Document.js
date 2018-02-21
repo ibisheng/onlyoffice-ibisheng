@@ -385,6 +385,7 @@ CSelectedContent.prototype =
         // Теперь пройдемся по всем найденным элементам и выясним есть ли автофигуры и комментарии
         var Count = this.Elements.length;
 
+        var isNonParagraph = false;
         for (var Pos = 0; Pos < Count; Pos++)
         {
             var Element = this.Elements[Pos].Element;
@@ -392,30 +393,26 @@ CSelectedContent.prototype =
             Element.GetAllComments(this.Comments);
             Element.GetAllMaths(this.Maths);
 
-            if (type_Paragraph === Element.Get_Type() && Count > 1)
-                Element.Correct_Content();
+            var nElementType = Element.GetType();
 
-            if(type_Table === Element.Get_Type())
-            {
-                this.HaveTable = true;
-            }
+			if (type_Paragraph === nElementType && Count > 1)
+				Element.Correct_Content();
+
+			if (type_Table === nElementType)
+				this.HaveTable = true;
+
+			if (type_Paragraph !== nElementType)
+				isNonParagraph = true;
         }
 
         this.HaveMath = (this.Maths.length > 0 ? true : false);
 
         // Проверка возможности конвертации имеющегося контента в контент для вставки в формулу.
-        // Если формулы уже имеются, то ничего не конвертируем.
-        if(!this.HaveMath)
-        {
-            if(1 === Count)
-            {
-                Element = this.Elements[0];
-                if(type_Paragraph === Element.Element.GetType() && !Element.Element.Is_Empty({SkipEnd : true, SkipAnchor : true, SkipNewLine: true, SkipPlcHldr: true}) && !Element.SelectedAll )
-                {
-                    this.CanConvertToMath = true;
-                }
-            }
-        }
+		// Если формулы уже имеются, то ничего не конвертируем.
+		if (!this.HaveMath && !isNonParagraph)
+		{
+			this.CanConvertToMath = true;
+		}
 
         // Относительно картинок нас интересует только наличие автофигур с текстом.
         Count = this.DrawingObjects.length;
@@ -519,45 +516,49 @@ CSelectedContent.prototype.ConvertToMath = function()
 	if (!this.CanConvertToMath)
 		return null;
 
-	var oParagraph = this.Elements[0].Element;
-	var aContent   = oParagraph.Content;
-	var oParaMath  = new AscCommonWord.ParaMath();
-
+	var oParaMath = new AscCommonWord.ParaMath();
 	oParaMath.Root.Remove_FromContent(0, oParaMath.Root.GetElementsCount());
 
-	for (var i = 0, nRunPos = 0; i < aContent.length; ++i)
+	for (var nParaIndex = 0, nParasCount = this.Elements.length, nRunPos = 0; nParaIndex < nParasCount; ++nParaIndex)
 	{
-		if (aContent[i].Get_Type() === para_Run)
-		{
-			var oSrcRun = aContent[i];
-			var oRun = new ParaRun(oParagraph, true);
-			oParaMath.Root.Add_ToContent(nRunPos++, oRun);
+		var oParagraph = this.Elements[nParaIndex].Element;
+		if (type_Paragraph !== oParagraph.GetType())
+			continue;
 
-			for (var j = 0, nCount = oSrcRun.GetElementsCount(); j < nCount; ++j)
+		for (var nInParaPos = 0; nInParaPos < oParagraph.GetElementsCount(); ++nInParaPos)
+		{
+			var oElement = oParagraph.Content[nInParaPos];
+			if (para_Run === oElement.Get_Type())
 			{
-				var oItem = aContent[i].Content[j];
-				if (para_Text === oItem.Type)
+				var oRun = new ParaRun(oParagraph, true);
+				oParaMath.Root.Add_ToContent(nRunPos++, oRun);
+
+				for (var nInRunPos = 0, nCount = oElement.GetElementsCount(); nInRunPos < nCount; ++nInRunPos)
 				{
-					if (38 === oItem.Value)
+					var oItem = oElement.Content[nInRunPos];
+					if (para_Text === oItem.Type)
 					{
-						oRun.Add(new CMathAmp(), true);
+						if (38 === oItem.Value)
+						{
+							oRun.Add(new CMathAmp(), true);
+						}
+						else
+						{
+							var oMathText = new CMathText(false);
+							oMathText.add(oItem.Value);
+							oRun.Add(oMathText, true);
+						}
 					}
-					else
+					else if (para_Space === oItem.Value)
 					{
 						var oMathText = new CMathText(false);
-						oMathText.add(oItem.Value);
+						oMathText.add(0x0032);
 						oRun.Add(oMathText, true);
 					}
 				}
-				else if (para_Space === oItem.Value)
-				{
-					var oMathText = new CMathText(false);
-					oMathText.add(0x0032);
-					oRun.Add(oMathText, true);
-				}
-			}
 
-			oRun.Apply_Pr(oSrcRun.Get_TextPr());
+				oRun.Apply_Pr(oElement.Get_TextPr());
+			}
 		}
 	}
 
@@ -6015,23 +6016,24 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 	var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
 	if (para_Math_Run === LastClass.Type)
 	{
-		// Проверяем, что вставляемый контент тоже формула
-		var Element = SelectedContent.Elements[0].Element;
-		if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.GetType() || null === LastClass.Parent)
-			return false;
+		if (!SelectedContent.CanConvertToMath)
+		{
+			// Проверяем, что вставляемый контент тоже формула
+			var Element = SelectedContent.Elements[0].Element;
+			if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.GetType() || null === LastClass.Parent)
+				return false;
 
-        if(!SelectedContent.CanConvertToMath)
-        {
-            var Math = null;
-            var Count = Element.Content.length;
-            for (var Index = 0; Index < Count; Index++) {
-                var Item = Element.Content[Index];
-                if (para_Math === Item.Type && null === Math)
-                    Math = Element.Content[Index];
-                else if (true !== Item.Is_Empty({SkipEnd: true}))
-                    return false;
-            }
-        }
+			var Math  = null;
+			var Count = Element.Content.length;
+			for (var Index = 0; Index < Count; Index++)
+			{
+				var Item = Element.Content[Index];
+				if (para_Math === Item.Type && null === Math)
+					Math = Element.Content[Index];
+				else if (true !== Item.Is_Empty({SkipEnd : true}))
+					return false;
+			}
+		}
 	}
 	else if (para_Run !== LastClass.Type)
 		return false;
