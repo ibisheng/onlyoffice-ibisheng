@@ -143,6 +143,58 @@ CChartsDrawer.prototype =
 			this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 		}
 
+		this.init(chartSpace);
+
+		//****recalculate****
+		//PLOTAREA
+		if (!chartSpace.bEmptySeries) {
+			if (this.nDimensionCount === 3) {
+				this._calaculate3DProperties(chartSpace);
+			}
+
+			this.plotAreaChart.recalculate(this);
+		}
+
+		//AREA
+		this.areaChart.recalculate(this);
+
+		//AXIS
+		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries) {
+
+			//оси значений и категорий
+			this.valAxisChart = [];
+			this.catAxisChart = [];
+			for (var i = 0; i < chartSpace.chart.plotArea.axId.length; i++) {
+				var axId = chartSpace.chart.plotArea.axId[i];
+				if (axId instanceof AscFormat.CCatAx) {
+					var catAx = new catAxisChart();
+					catAx.recalculate(this, axId);
+					this.catAxisChart.push(catAx);
+				} else if (axId instanceof AscFormat.CValAx) {
+					var valAx = new valAxisChart();
+					valAx.recalculate(this, axId);
+					this.valAxisChart.push(valAx);
+				}
+			}
+
+			if (this.nDimensionCount === 3) {
+				this.floor3DChart.recalculate(this);
+				this.serAxisChart.recalculate(this);
+				this.sideWall3DChart.recalculate(this);
+				this.backWall3DChart.recalculate(this);
+			}
+
+		}
+
+		//CHARTS
+		if (!chartSpace.bEmptySeries) {
+			for (var i = 0; i < this.charts.length; i++) {
+				this.charts[i].recalculate();
+			}
+		}
+	},
+
+	init: function(chartSpace) {
 		//создаём область
 		this.areaChart = new areaChart();
 		//создаём область
@@ -209,52 +261,6 @@ CChartsDrawer.prototype =
 				this.charts = [];
 			}
 			this.charts.push(newChart);
-		}
-
-		//делаем полный пресчёт
-		if (!chartSpace.bEmptySeries) {
-			if (this.nDimensionCount === 3) {
-				this._calaculate3DProperties(chartSpace);
-			}
-
-			this.plotAreaChart.recalculate(this);
-		}
-
-		this.areaChart.recalculate(this);
-
-		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries) {
-
-			//оси значений и категорий
-			this.valAxisChart = [];
-			this.catAxisChart = [];
-			for (var i = 0; i < chartSpace.chart.plotArea.axId.length; i++) {
-				var axId = chartSpace.chart.plotArea.axId[i];
-				if (axId instanceof AscFormat.CCatAx) {
-					var catAx = new catAxisChart();
-					catAx.recalculate(this, axId);
-					this.catAxisChart.push(catAx);
-				} else if (axId instanceof AscFormat.CValAx) {
-					var valAx = new valAxisChart();
-					valAx.recalculate(this, axId);
-					this.valAxisChart.push(valAx);
-				}
-			}
-
-			if (this.nDimensionCount === 3) {
-				this.floor3DChart.recalculate(this);
-				this.serAxisChart.recalculate(this);
-				this.sideWall3DChart.recalculate(this);
-				this.backWall3DChart.recalculate(this);
-			}
-
-		}
-
-		//CHARTS
-		if (!chartSpace.bEmptySeries) {
-			for (var i = 0; i < this.charts.length; i++) {
-				this.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
-				this.charts[i].recalculate();
-			}
 		}
 	},
 
