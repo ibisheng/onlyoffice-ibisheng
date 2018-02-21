@@ -676,6 +676,7 @@
 			case c_oAscServerError.ConvertPASSWORD :
 				nRes = Asc.c_oAscError.ID.ConvertationPassword;
 				break;
+			case c_oAscServerError.ConvertLIMITS :
 			case c_oAscServerError.ConvertCONVERT_CORRUPTED :
 			case c_oAscServerError.ConvertLIBREOFFICE :
 			case c_oAscServerError.ConvertPARAMS :
@@ -1155,7 +1156,9 @@
 		ConvertNEED_PARAMS:       -89,
 		ConvertDRM:               -90,
 		ConvertPASSWORD:          -91,
-		ConvertDeadLetter:        -92,
+		ConvertICU:               -92,
+		ConvertLIMITS:            -93,
+		ConvertDeadLetter:        -99,
 
 		Upload:              -100,
 		UploadContentLength: -101,
