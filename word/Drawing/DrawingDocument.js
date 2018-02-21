@@ -2377,6 +2377,9 @@ function CDrawingDocument()
 
 	this.m_lCountCalculatePages = 0;
 
+	this.m_bIsDocumentCalculating = true;
+	this.m_arPrintingWaitEndRecalculate = null;
+
 	this.m_lTimerTargetId = -1;
 	this.m_dTargetX = -1;
 	this.m_dTargetY = -1;
@@ -2548,6 +2551,8 @@ function CDrawingDocument()
 
 		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
 			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+
+		this.m_bIsDocumentCalculating = true;
 	}
 
 	this.OnRepaintPage = function (index)
@@ -2570,6 +2575,8 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function (index, pageObject)
 	{
+		this.m_bIsDocumentCalculating = true;
+
 		editor.sendEvent("asc_onDocumentChanged");
 		if (true === this.m_bIsSearching)
 		{
@@ -2706,6 +2713,10 @@ function CDrawingDocument()
 		if (isFull)
 		{
 			this.m_oWordControl.OnScroll();
+			this.m_bIsDocumentCalculating = false;
+
+			if (this.m_arPrintingWaitEndRecalculate)
+				this.m_oWordControl.m_oApi._downloadAs.apply(this.m_oWordControl.m_oApi, this.m_arPrintingWaitEndRecalculate);
 		}
 
 		//console.log("end " + this.m_lCountCalculatePages + "," + isFull + "," + isBreak);
@@ -2882,6 +2893,26 @@ function CDrawingDocument()
 		var ret = Renderer.Memory.GetBase64Memory();
 		//console.log(ret);
 		return ret;
+	}
+
+	this.CheckPrint = function(params)
+	{
+		if (!this.m_oWordControl.m_oLogicDocument)
+			return false;
+
+		if (this.m_arPrintingWaitEndRecalculate)
+		{
+			this.m_oWordControl.m_oApi.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, params[2]);
+			this.m_arPrintingWaitEndRecalculate = null;
+			return false;
+		}
+
+		if (!this.m_bIsDocumentCalculating)
+			return false;
+
+		this.m_arPrintingWaitEndRecalculate = params;
+		this.m_oWordControl.m_oApi.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, params[2]);
+		return true;
 	}
 
 	this.ToRenderer2 = function ()
