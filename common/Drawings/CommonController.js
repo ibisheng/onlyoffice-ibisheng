@@ -582,6 +582,9 @@ function CheckSpPrXfrm2(object)
 }
     function CheckSpPrXfrm3(object)
     {
+        if(object.recalcInfo && object.recalcInfo.recalculateTransform){
+            return;
+        }
         if(!object.spPr)
         {
             object.setSpPr(new AscFormat.CSpPr());
