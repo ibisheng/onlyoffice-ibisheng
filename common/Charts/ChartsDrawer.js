@@ -160,47 +160,47 @@ CChartsDrawer.prototype =
 			var chart = chartSpace.chart.plotArea.charts[i];
 			switch (this._getChartType(chart)) {
 				case c_oChartTypes.Bar: {
-					newChart = new drawBarChart(chart);
+					newChart = new drawBarChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Line: {
-					newChart = new drawLineChart(chart);
+					newChart = new drawLineChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.HBar: {
-					newChart = new drawHBarChart(chart);
+					newChart = new drawHBarChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Pie: {
-					newChart = new drawPieChart(chart);
+					newChart = new drawPieChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Scatter: {
-					newChart = new drawScatterChart(chart);
+					newChart = new drawScatterChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Area: {
-					newChart = new drawAreaChart(chart);
+					newChart = new drawAreaChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Stock: {
-					newChart = new drawStockChart(chart);
+					newChart = new drawStockChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.DoughnutChart: {
-					newChart = new drawDoughnutChart(chart);
+					newChart = new drawDoughnutChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Radar: {
-					newChart = new drawRadarChart(chart);
+					newChart = new drawRadarChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.BubbleChart: {
-					newChart = new drawBubbleChart(chart);
+					newChart = new drawBubbleChart(chart, this);
 					break;
 				}
 				case c_oChartTypes.Surface: {
-					newChart = new drawSurfaceChart(chart);
+					newChart = new drawSurfaceChart(chart, this);
 					break;
 				}
 			}
@@ -253,7 +253,7 @@ CChartsDrawer.prototype =
 		if (!chartSpace.bEmptySeries) {
 			for (var i = 0; i < this.charts.length; i++) {
 				this.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
-				this.charts[i].recalculate(this);
+				this.charts[i].recalculate();
 			}
 		}
 	},
@@ -275,7 +275,7 @@ CChartsDrawer.prototype =
 		var drawCharts = function() {
 			for(var i = 0; i < t.charts.length; i++) {
 				t.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
-				t.charts[i].draw(t);
+				t.charts[i].draw();
 			}
 		};
 
@@ -4160,7 +4160,11 @@ CChartsDrawer.prototype =
 
 
 /** @constructor */
-function drawBarChart(chart) {
+function drawBarChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -4168,9 +4172,6 @@ function drawBarChart(chart) {
 	this.seriesCount = null;
 	this.subType = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
 	this.paths = {};
 	this.sortZIndexPaths = [];
 	this.summBarVal = [];
@@ -4182,11 +4183,7 @@ function drawBarChart(chart) {
 drawBarChart.prototype = {
 	constructor: drawBarChart,
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	recalculate: function () {
 		this.paths = {};
 		this.summBarVal = [];
 
@@ -4202,11 +4199,7 @@ drawBarChart.prototype = {
 		this._recalculateBars();
 	},
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._DrawBars3D();
 		} else {
@@ -5024,7 +5017,11 @@ drawBarChart.prototype = {
 
 
 /** @constructor */
-function drawLineChart(chart) {
+function drawLineChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -5032,20 +5029,13 @@ function drawLineChart(chart) {
 	this.seriesCount = null;
 	this.subType = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
-	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawLineChart.prototype = {
 	constructor: drawLineChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
+	draw: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._drawLines3D();
 		} else {
@@ -5053,11 +5043,8 @@ drawLineChart.prototype = {
 		}
 	},
 
-	recalculate: function (chartsDrawer) {
+	recalculate: function () {
 		this.paths = {};
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
 
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
 		this.seriesCount = countSeries.series;
@@ -5526,7 +5513,11 @@ drawLineChart.prototype = {
 
 
 /** @constructor */
-function drawAreaChart(chart) {
+function drawAreaChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -5534,9 +5525,6 @@ function drawAreaChart(chart) {
 	this.seriesCount = null;
 	this.subType = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
 	this.points = null;
 	this.paths = {};
 	this.upFaces = [];
@@ -5563,11 +5551,7 @@ function drawAreaChart(chart) {
 drawAreaChart.prototype = {
 	constructor: drawAreaChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._drawBars3D();
 		} else {
@@ -5575,12 +5559,9 @@ drawAreaChart.prototype = {
 		}
 	},
 
-	recalculate: function (chartsDrawer) {
+	recalculate: function () {
 		this.paths = {};
 		this.points = null;
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
 
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
 		this.seriesCount = countSeries.series;
@@ -7052,7 +7033,11 @@ drawAreaChart.prototype = {
 
 
 /** @constructor */
-function drawHBarChart(chart) {
+function drawHBarChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
@@ -7060,9 +7045,6 @@ function drawHBarChart(chart) {
 	this.seriesCount = null;
 	this.subType = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cShapeDrawer = null;
 	this.paths = {};
 	this.sortZIndexPaths = [];
 
@@ -7072,15 +7054,11 @@ function drawHBarChart(chart) {
 drawHBarChart.prototype = {
 	constructor: drawHBarChart,
 
-	recalculate: function (chartsDrawer) {
+	recalculate: function () {
 		this.paths = {};
 		this.summBarVal = [];
 
 		this.sortZIndexPaths = [];
-
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
 
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
 		this.seriesCount = countSeries.series;
@@ -7092,11 +7070,7 @@ drawHBarChart.prototype = {
 		this._recalculateBars();
 	},
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._DrawBars3D();
 		} else {
@@ -8068,7 +8042,11 @@ drawHBarChart.prototype = {
 };
 
 /** @constructor */
-function drawPieChart(chart) {
+function drawPieChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 
 	this.tempAngle = null;
@@ -8085,11 +8063,7 @@ function drawPieChart(chart) {
 drawPieChart.prototype = {
 	constructor: drawPieChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		if (this.cChartDrawer.nDimensionCount === 3) {
 			this._drawPie3D();
 		} else {
@@ -8097,11 +8071,7 @@ drawPieChart.prototype = {
 		}
 	},
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	recalculate: function () {
 		this.tempAngle = null;
 		this.paths = {};
 
@@ -9718,7 +9688,11 @@ drawPieChart.prototype = {
 
 
 	/** @constructor */
-function drawDoughnutChart(chart) {
+function drawDoughnutChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 
 	this.tempAngle = null;
@@ -9728,19 +9702,11 @@ function drawDoughnutChart(chart) {
 drawDoughnutChart.prototype = {
 	constructor: drawDoughnutChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._drawPie();
 	},
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	recalculate: function () {
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
 		this.seriesCount = countSeries.series;
 
@@ -9943,14 +9909,14 @@ drawDoughnutChart.prototype = {
 
 
 /** @constructor */
-function drawRadarChart(chart) {
+function drawRadarChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.subType = null;
 	this.valAx = null;
-
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cChartSpace = null;
 
 	this.paths = {};
 }
@@ -9958,20 +9924,12 @@ function drawRadarChart(chart) {
 drawRadarChart.prototype = {
 	constructor: drawRadarChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._drawLines();
 	},
 
 	recalculate: function (chartsDrawer) {
 		this.paths = {};
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
 		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
@@ -10284,24 +10242,22 @@ drawRadarChart.prototype = {
 
 
 /** @constructor */
-function drawScatterChart(chart) {
+function drawScatterChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawScatterChart.prototype = {
 	constructor: drawScatterChart,
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
+	recalculate: function () {
 		this.paths = {};
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
@@ -10310,11 +10266,7 @@ drawScatterChart.prototype = {
 		this._recalculateScatter();
 	},
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._drawScatter();
 	},
 
@@ -10650,33 +10602,27 @@ drawScatterChart.prototype = {
 
 
 /** @constructor */
-function drawStockChart(chart) {
+function drawStockChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawStockChart.prototype = {
 	constructor: drawStockChart,
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._drawLines();
 	},
 
-	recalculate: function (chartsDrawer) {
+	recalculate: function () {
 		this.paths = {};
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
 		this.valAx = this.chart.axId[0].yPoints ? this.chart.axId[0] : this.chart.axId[1];
@@ -10915,24 +10861,22 @@ drawStockChart.prototype = {
 };
 
 /** @constructor */
-function drawBubbleChart(chart) {
+function drawBubbleChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawBubbleChart.prototype = {
 	constructor: drawBubbleChart,
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
+	recalculate: function () {
 		this.paths = {};
 
 		this.catAx = this.chart.axId[0].xPoints ? this.chart.axId[0] : this.chart.axId[1];
@@ -10941,11 +10885,7 @@ drawBubbleChart.prototype = {
 		this._recalculateScatter();
 	},
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._drawScatter();
 	},
 
@@ -11165,24 +11105,22 @@ drawBubbleChart.prototype = {
 
 
 /** @constructor */
-function drawSurfaceChart(chart) {
+function drawSurfaceChart(chart, chartsDrawer) {
+	this.chartProp = chartsDrawer.calcProp;
+	this.cChartDrawer = chartsDrawer;
+	this.cChartSpace = chartsDrawer.cChartSpace;
+
 	this.chart = chart;
 	this.catAx = null;
 	this.valAx = null;
 
-	this.chartProp = null;
-	this.cChartDrawer = null;
-	this.cChartSpace = null;
 	this.paths = {};
 }
 
 drawSurfaceChart.prototype = {
 	constructor: drawSurfaceChart,
 
-	recalculate: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
+	recalculate: function () {
 		this.paths = {};
 
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
@@ -11193,11 +11131,7 @@ drawSurfaceChart.prototype = {
 		this._recalculate();
 	},
 
-	draw: function (chartsDrawer) {
-		this.chartProp = chartsDrawer.calcProp;
-		this.cChartDrawer = chartsDrawer;
-		this.cChartSpace = chartsDrawer.cChartSpace;
-
+	draw: function () {
 		this._draw();
 	},
 
