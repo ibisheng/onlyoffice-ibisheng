@@ -520,21 +520,48 @@ CSelectedContent.prototype.ConvertToMath = function()
 		return null;
 
 	var oParagraph = this.Elements[0].Element;
-	var aContent = oParagraph.Content, aRunContent;
-	var oParaMath = new AscCommonWord.ParaMath();
-	oParaMath.Root.Load_FromMenu(c_oAscMathType.Default_Text, oParagraph);
-	oParaMath.Root.Correct_Content(true);
-	for(var i = 0; i < aContent.length; ++i)
+	var aContent   = oParagraph.Content;
+	var oParaMath  = new AscCommonWord.ParaMath();
+
+	oParaMath.Root.Remove_FromContent(0, oParaMath.Root.GetElementsCount());
+
+	for (var i = 0, nRunPos = 0; i < aContent.length; ++i)
 	{
-		if(aContent[i].Get_Type() === para_Run)
+		if (aContent[i].Get_Type() === para_Run)
 		{
-			aRunContent = aContent[i].Content;
-			for(var j = 0; j < aRunContent.length; ++j)
+			var oSrcRun = aContent[i];
+			var oRun = new ParaRun(oParagraph, true);
+			oParaMath.Root.Add_ToContent(nRunPos++, oRun);
+
+			for (var j = 0, nCount = oSrcRun.GetElementsCount(); j < nCount; ++j)
 			{
-				oParaMath.Add(aRunContent[j]);
+				var oItem = aContent[i].Content[j];
+				if (para_Text === oItem.Type)
+				{
+					if (38 === oItem.Value)
+					{
+						oRun.Add(new CMathAmp(), true);
+					}
+					else
+					{
+						var oMathText = new CMathText(false);
+						oMathText.add(oItem.Value);
+						oRun.Add(oMathText, true);
+					}
+				}
+				else if (para_Space === oItem.Value)
+				{
+					var oMathText = new CMathText(false);
+					oMathText.add(0x0032);
+					oRun.Add(oMathText, true);
+				}
 			}
+
+			oRun.Apply_Pr(oSrcRun.Get_TextPr());
 		}
 	}
+
+	oParaMath.Root.Correct_Content(true);
 	return oParaMath;
 };
 
