@@ -1257,6 +1257,10 @@ CChartsDrawer.prototype =
 	_getChartsByAxisId: function(charts, id) {
 		var res = [];
 		for(var i = 0; i < charts.length; i++) {
+			if(!charts[i].axId) {
+				continue;
+			}
+
 			for(var j = 0; j < charts[i].axId.length; j++) {
 				if(id === charts[i].axId[j].axId) {
 					res.push(charts[i]);
