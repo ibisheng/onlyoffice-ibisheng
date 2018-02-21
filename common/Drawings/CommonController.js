@@ -6232,8 +6232,23 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
-                    this.recalculate();
+                    var oSelectedInfo = new CSelectedElementsInfo();
+                    target_doc_content.GetSelectedElementsInfo(oSelectedInfo);
+                    var oMath         = oSelectedInfo.Get_Math();
+                    if (null !== oMath && oMath.Is_InInnerContent())
+                    {
+                        this.checkSelectedObjectsAndCallback(function()
+                        {
+                            oMath.Handle_AddNewLine();
+                        }, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
+                        this.recalculate();
+                    }
+                    else
+                    {
+                        this.checkSelectedObjectsAndCallback(this.addNewParagraph, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
+                        this.recalculate();
+                    }
+
                 }
             }
             else{
