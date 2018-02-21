@@ -2578,7 +2578,7 @@ CGraphics.prototype =
 
                     this.m_oContext.setLineDash(this.dash_no_smart);
                     this.dash_no_smart = null;
-            }
+                }
             }
 
             var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
@@ -2629,7 +2629,7 @@ CGraphics.prototype =
 
 				this.m_oContext.setLineDash(this.dash_no_smart);
 				this.dash_no_smart = null;
-        }
+            }
         }
 
         var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
