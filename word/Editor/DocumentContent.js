@@ -7457,8 +7457,10 @@ CDocumentContent.prototype.Internal_Content_Add = function(Position, NewObject, 
 	if (Position <= this.CurPos.TableMove)
 		this.CurPos.TableMove++;
 
-	// Проверим, что последний элемент - параграф
-	if (false != bCheckLastElement && type_Paragraph !== this.Content[this.Content.length - 1].GetType())
+	// Проверим, что последний элемент - параграф или SdtBlockLevel
+	if (false != bCheckLastElement
+		&& type_Paragraph !== this.Content[this.Content.length - 1].GetType()
+		&& type_BlockLevelSdt !== this.Content[this.Content.length - 1].GetType())
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
 	this.private_ReindexContent(Position);
