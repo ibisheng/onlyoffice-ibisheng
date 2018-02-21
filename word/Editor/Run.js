@@ -43,6 +43,27 @@ var reviewtype_Common = 0x00;
 var reviewtype_Remove = 0x01;
 var reviewtype_Add    = 0x02;
 
+function CSpellCheckerMarks()
+{
+	this.len = 0;
+	this.data = null;
+
+	this.Check = function(len)
+	{
+		if (len <= this.len)
+		{
+			for (var i = 0; i < len; i++)
+				this.data[i] = 0;
+			return this.data;
+		}
+
+		this.len = len;
+		this.data = new Uint8ClampedArray(this.len);
+		return this.data;
+	};
+}
+var g_oSpellCheckerMarks = new CSpellCheckerMarks();
+
 /**
  *
  * @param Paragraph
@@ -5368,31 +5389,27 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         }
     }
 
-    var SpellingMarksArray = {};
     var SpellingMarksCount = this.SpellingMarks.length;
+    var SpellDataLen = EndPos + 1;
+    var SpellData = g_oSpellCheckerMarks.Check(SpellDataLen);
+    var Mark = null, MarkIndex = 0;
     for ( var SPos = 0; SPos < SpellingMarksCount; SPos++)
     {
-        var Mark = this.SpellingMarks[SPos];
+        Mark = this.SpellingMarks[SPos];
 
         if ( false === Mark.Element.Checked )
         {
             if ( true === Mark.Start )
             {
-                var MarkPos = Mark.Element.StartPos.Get(Mark.Depth);
-
-                if ( undefined === SpellingMarksArray[MarkPos] )
-                    SpellingMarksArray[MarkPos] = 1;
-                else
-                    SpellingMarksArray[MarkPos] += 1;
+            	MarkIndex = Mark.Element.StartPos.Get(Mark.Depth);
+            	if (MarkIndex < SpellDataLen)
+            		SpellData[MarkIndex] += 1;
             }
             else
             {
-                var MarkPos = Mark.Element.EndPos.Get(Mark.Depth);
-
-                if ( undefined === SpellingMarksArray[MarkPos] )
-                    SpellingMarksArray[MarkPos] = 2;
-                else
-                    SpellingMarksArray[MarkPos] += 2;
+				MarkIndex = Mark.Element.EndPos.Get(Mark.Depth);
+				if (MarkIndex < SpellDataLen)
+					SpellData[MarkIndex] += 2;
             }
         }
     }
@@ -5406,7 +5423,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 		if (PDSL.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
 			continue;
 
-        if ( 1 === SpellingMarksArray[Pos] || 3 === SpellingMarksArray[Pos] )
+        if ( 1 == SpellData[Pos] || 3 == SpellData[Pos] )
             PDSL.SpellingCounter++;
 
         switch( ItemType )
@@ -5549,7 +5566,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 			}
         }
 
-        if ( 2 === SpellingMarksArray[Pos + 1] || 3 === SpellingMarksArray[Pos + 1] )
+        if ( 2 == SpellData[Pos + 1] || 3 == SpellData[Pos + 1] )
             PDSL.SpellingCounter--;
     }
 
