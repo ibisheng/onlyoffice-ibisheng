@@ -1471,6 +1471,9 @@ CSelectedElementsInfo.prototype.GetTableOfContents = function()
 			return oComplexField;
 	}
 
+	if (this.m_oBlockLevelSdt && this.m_oBlockLevelSdt.IsBuiltInTableOfContents())
+		return this.m_oBlockLevelSdt;
+
 	return null;
 };
 CSelectedElementsInfo.prototype.SetHyperlink = function(oHyperlink)
