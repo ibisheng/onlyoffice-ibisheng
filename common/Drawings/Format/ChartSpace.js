@@ -10003,7 +10003,7 @@ CChartSpace.prototype.getXValAxisValues = function()
         this.chartObj = new AscFormat.CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-	return [].concat(this.chart.plotArea.catAx.scale)
+	return [].concat(this.chartObj.calcProp.xScale);
 };
 
 CChartSpace.prototype.getValAxisValues = function()
@@ -10013,7 +10013,7 @@ CChartSpace.prototype.getValAxisValues = function()
         this.chartObj = new AscFormat.CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-	return [].concat(this.chart.plotArea.valAx.scale);
+	return [].concat(this.chartObj.calcProp.scale);
 };
 
 CChartSpace.prototype.getCalcProps = function()
