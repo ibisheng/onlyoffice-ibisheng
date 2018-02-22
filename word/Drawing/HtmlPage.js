@@ -2560,7 +2560,7 @@ function CEditorPage(api)
 			return;
 
 		var oWordControl                       = oThis;
-		oWordControl.m_dScrollX                = scrollPositionX;
+		oWordControl.m_dScrollX                = Math.max(0, Math.min(scrollPositionX, maxX));
 		oWordControl.m_dScrollX_max            = maxX;
 		oWordControl.m_bIsUpdateHorRuler       = true;
 		oWordControl.m_bIsUpdateTargetNoAttack = true;
