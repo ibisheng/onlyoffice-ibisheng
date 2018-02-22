@@ -278,10 +278,16 @@ CChartsDrawer.prototype =
 		//отрисовываем без пересчёта
 		this.areaChart.draw(this);
 
-		var drawCharts = function() {
+		var drawCharts = function(bIsNoSmartAttack) {
+			if(bIsNoSmartAttack) {
+				t.cShapeDrawer.bIsNoSmartAttack = true;
+			}
 			for(var i = 0; i < t.charts.length; i++) {
 				t.calcProp.series = chartSpace.chart.plotArea.charts[i].series;
 				t.charts[i].draw();
+			}
+			if(bIsNoSmartAttack) {
+				t.cShapeDrawer.bIsNoSmartAttack = false;
 			}
 		};
 
@@ -305,9 +311,13 @@ CChartsDrawer.prototype =
 			}
 
 			if (this.nDimensionCount === 3) {
-				this.cShapeDrawer.bIsNoSmartAttack = true;
-				drawCharts();
-				this.cShapeDrawer.bIsNoSmartAttack = false;
+				drawCharts(true);
+			} else {
+				if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Scatter) {
+					drawCharts(true);
+				} else {
+					drawCharts();
+				}
 			}
 
 			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
@@ -318,16 +328,6 @@ CChartsDrawer.prototype =
 					this.valAxisChart[i].draw(this);
 				}
 				this.serAxisChart.draw(this);
-			}
-
-			if (this.nDimensionCount !== 3) {
-				if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Scatter) {
-					this.cShapeDrawer.bIsNoSmartAttack = true;
-					drawCharts();
-					this.cShapeDrawer.bIsNoSmartAttack = false;
-				} else {
-					drawCharts();
-				}
 			}
 		}
 	},
@@ -383,12 +383,12 @@ CChartsDrawer.prototype =
 				}
 				case "valAx":
 				{
-					pos = this._calculatePositionValAx(chartSpace);
+					pos = this._calculatePositionValAxTitle(chartSpace);
 					break;
 				}
 				case "catAx":
 				{
-					pos = this._calculatePositionCatAx(chartSpace);
+					pos = this._calculatePositionCatAxTitle(chartSpace);
 					break;
 				}
 				case "legend":
@@ -425,7 +425,7 @@ CChartsDrawer.prototype =
 		return {x: x, y: y}
 	},
 	
-	_calculatePositionValAx: function(chartSpace)
+	_calculatePositionValAxTitle: function(chartSpace)
 	{
 		var heightTitle = chartSpace.chart.plotArea.valAx.title.extY;
 		
@@ -468,7 +468,7 @@ CChartsDrawer.prototype =
 		return {x: x , y: y}
 	},
 	
-	_calculatePositionCatAx: function(chartSpace)
+	_calculatePositionCatAxTitle: function(chartSpace)
 	{	
 		var widthTitle = chartSpace.chart.plotArea.catAx.title.extX;
 		var heightTitle = chartSpace.chart.plotArea.catAx.title.extY;
