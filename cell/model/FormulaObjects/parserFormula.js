@@ -2477,6 +2477,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		var str = "", c = start + count - 1;
 		for (var i = start; i <= c; i++) {
+			if(!arg[i]) {
+				continue;
+			}
 			str += arg[i].toString();
 			if (i !== c) {
 				str += ",";
@@ -2493,6 +2496,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		localeName = localeName || this.toString();
 		for (var i = start; i <= c; i++) {
+			if(!arg[i]) {
+				continue;
+			}
 			str += arg[i].toLocaleString(digitDelim);
 			if (i !== c) {
 				str += FormulaSeparators.functionArgumentSeparator;
