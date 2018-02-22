@@ -4161,6 +4161,30 @@ CChartsDrawer.prototype =
 			}
 		}
 		return res;
+	},
+
+	getPositionZero: function(axis) {
+		var res = null;
+
+		var points = axis.xPoints ? axis.xPoints : axis.yPoints;
+		if(points) {
+			for(var i = 0; i < points.length; i++) {
+				if(0 === points[i].val) {
+					res = points[i].pos * this.calcProp.pxToMM;
+					break;
+				}
+			}
+
+			if(null === res) {
+				if(points[0].val < 0) {
+					res = points[points.length - 1].pos * this.calcProp.pxToMM;
+				} else {
+					res = points[0].pos * this.calcProp.pxToMM;
+				}
+			}
+		}
+
+		return res;
 	}
 };
 
@@ -7286,7 +7310,10 @@ drawHBarChart.prototype = {
 	_getStartYColumnPosition: function (seriesHeight, j, i, val, xPoints) {
 		var startY, width, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.catAx;
-		var nullPositionOX = this.chartProp.nullPositionOX/*catAx.posX !== null ? catAx.posX * this.chartProp.pxToMM : 0*/;
+
+		//в ms отрисовка сделана следующим образом: если диаграмма типа normal, то стартовую точку отрисовки столбцов берем позицию X оси категорий(posX)
+		//если диаграмма типа stacked то рисуем от позиции X ноля оси категорий - getPositionZero(позиция ноля и оси могут отличиться в зависимости от настроек)
+		var nullPositionOX = this.subType === "stacked" ? this.cChartDrawer.getPositionZero(this.valAx) : catAx.posX * this.chartProp.pxToMM;
 
 		if (this.subType === "stacked" || this.subType === "stackedPer") {
 			curVal = this._getStackedValue(this.chart.series, i, j, val);
