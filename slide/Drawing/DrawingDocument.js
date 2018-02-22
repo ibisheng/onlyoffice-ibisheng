@@ -5858,6 +5858,9 @@ function CNotesDrawer(page)
 
 	this.onMouseDown = function (e)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		AscCommon.check_MouseDownEvent(e, true);
 		global_mouseEvent.LockMouse();
 
@@ -5882,6 +5885,9 @@ function CNotesDrawer(page)
 	};
 	this.onMouseMove = function (e, is_overlay_attack)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		if (e)
 			AscCommon.check_MouseMoveEvent(e);
 
@@ -5901,6 +5907,9 @@ function CNotesDrawer(page)
 	};
 	this.onMouseUp = function (e)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		AscCommon.check_MouseUpEvent(e);
 
 		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);

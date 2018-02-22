@@ -1234,6 +1234,24 @@ function CGroupShape()
         if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill))
         {
             this.compiledFill = this.spPr.Fill.createDuplicate();
+            if(this.compiledFill && this.compiledFill.fill && this.compiledFill.fill.type === Asc.c_oAscFill.FILL_TYPE_GRP)
+            {
+                if(this.group)
+                {
+                    var group_compiled_fill = this.group.getCompiledFill();
+                    if (isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill)) {
+                        this.compiledFill = group_compiled_fill.createDuplicate();
+                    }
+                    else
+                    {
+                        this.compiledFill = null;
+                    }
+                }
+                else
+                {
+                    this.compiledFill = null;
+                }
+            }
         }
         else if(isRealObject(this.group))
         {
