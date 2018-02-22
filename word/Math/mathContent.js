@@ -2231,9 +2231,9 @@ CMathContent.prototype.Add_ToContent = function(Pos, Item)
 };
 CMathContent.prototype.Concat_ToEnd = function(NewItems)
 {
-    this.Concat_ToContent(this.Content.length, NewItems);
+    this.ConcatToContent(this.Content.length, NewItems);
 };
-CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
+CMathContent.prototype.ConcatToContent = function(Pos, NewItems)
 {
 	if (NewItems != undefined && NewItems.length > 0)
 	{
@@ -5267,7 +5267,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
 
         this.Remove_FromContent(Pos, 1);
 
-        this.Concat_ToContent(Pos, Items);
+        this.ConcatToContent(Pos, Items);
 
         this.Correct_Content();
 

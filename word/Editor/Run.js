@@ -1152,6 +1152,9 @@ ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 	if (-1 === Pos)
 		Pos = this.Content.length;
 
+	if (Item.SetParent)
+		Item.SetParent(this);
+
 	History.Add(new CChangesRunAddItem(this, Pos, [Item], true));
     this.Content.splice( Pos, 0, Item );
 
@@ -1269,17 +1272,27 @@ ParaRun.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
     this.RecalcInfo.Measure = true;
 };
 
-ParaRun.prototype.Concat_ToContent = function(NewItems)
+/**
+ * Добавляем к массиву содержимого массив новых элементов
+ * @param arrNewItems
+ */
+ParaRun.prototype.ConcatToContent = function(arrNewItems)
 {
-    var StartPos = this.Content.length;
-    this.Content = this.Content.concat( NewItems );
+	for (var nIndex = 0, nCount = arrNewItems.length; nIndex < nCount; ++nIndex)
+	{
+		if (arrNewItems[nIndex].SetParent)
+			arrNewItems[nIndex].SetParent(this);
+	}
 
-    History.Add(new CChangesRunAddItem(this, StartPos, NewItems, false));
+	var StartPos = this.Content.length;
+	this.Content = this.Content.concat(arrNewItems);
 
-    this.private_UpdateTrackRevisionOnChangeContent(true);
+	History.Add(new CChangesRunAddItem(this, StartPos, arrNewItems, false));
 
-    // Отмечаем, что надо перемерить элементы в данном ране
-    this.RecalcInfo.Measure = true;
+	this.private_UpdateTrackRevisionOnChangeContent(true);
+
+	// Отмечаем, что надо перемерить элементы в данном ране
+	this.RecalcInfo.Measure = true;
 };
 /**
  * Добавляем в конец рана заданную строку
@@ -1855,7 +1868,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
     }
 
     // Разделяем содержимое по ранам
-    NewRun.Concat_ToContent( this.Content.slice(CurPos) );
+    NewRun.ConcatToContent( this.Content.slice(CurPos) );
     this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
 
     // Если были точки орфографии, тогда переместим их в новый ран
@@ -7228,7 +7241,7 @@ ParaRun.prototype.Split_Run = function(Pos)
     var OldSEPos = this.State.Selection.EndPos;
 
     // Разделяем содержимое по ранам
-    NewRun.Concat_ToContent( this.Content.slice(Pos) );
+    NewRun.ConcatToContent( this.Content.slice(Pos) );
     this.Remove_FromContent( Pos, this.Content.length - Pos, true );
 
     // Подправим точки селекта и текущей позиции
