@@ -1209,7 +1209,7 @@ function CBinaryFileWriter()
     {
         var _countComments = 0;
 
-        if (!oThis.IsUseFullUrl)
+       // if (!oThis.IsUseFullUrl)
         {
             for (var i in comments)
                 ++_countComments;

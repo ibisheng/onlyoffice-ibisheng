@@ -6704,7 +6704,12 @@ CPresentation.prototype =
         if(AscFormat.isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
             History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_RemoveSlide, pos, [this.Slides[pos]], false));
-            this.Slides[pos].removeAllCommentsToInterface();
+            var aSlideComments = this.Slides[pos] && this.Slides[pos].slideComments && this.Slides[pos].slideComments.comments;
+            if(Array.isArray(aSlideComments)){
+                for(var i = aSlideComments.length-1; i > -1; --i){
+                    this.RemoveComment(aSlideComments[i].Id, true);
+                }
+            }
             return this.Slides.splice(pos, 1)[0];
         }
         return null;
@@ -6714,6 +6719,11 @@ CPresentation.prototype =
     {
         History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_AddSlide, pos, [slide], true));
         this.Slides.splice(pos, 0, slide);
+        var aSlideComments = slide.slideComments.comments;
+        for(var i = 0; i < aSlideComments.length; ++i)
+        {
+            editor.sync_AddComment( aSlideComments[i].Get_Id(), aSlideComments[i].Data );
+        }
     },
 	
 	moveSlides: function(slidesIndexes, pos)

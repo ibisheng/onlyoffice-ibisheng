@@ -298,6 +298,15 @@ Slide.prototype =
         if(this.notes){
             copy.setNotes(this.notes.createDuplicate());
         }
+        if(this.slideComments){
+            if(!copy.slideComments) {
+                copy.setSlideComments(new SlideComments(copy));
+            }
+            var aComments = this.slideComments.comments;
+            for(i = 0; i < aComments.length; ++i){
+                copy.slideComments.addComment(aComments[i].createDuplicate(copy.slideComments));
+            }
+        }
 
         if(!this.recalcInfo.recalculateBackground && !this.recalcInfo.recalculateSpTree)
         {
