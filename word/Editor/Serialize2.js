@@ -74,7 +74,10 @@ var c_oSerTableTypes = {
 	Comments: 8,
 	Settings: 9,
 	Footnotes: 10,
-	Endnotes: 11
+	Endnotes: 11,
+	Background: 12,
+	VbaProject: 13,
+	App: 14
 };
 var c_oSerSigTypes = {
     Version:0
@@ -827,6 +830,10 @@ var c_oSerNotes = {
 	PrFntPos: 9,
 	PrEndPos: 10,
 	PrRef: 11
+};
+var c_oSerApp = {
+	Application: 0,
+	AppVersion: 1
 };
 var c_oSerDocPr = {
 	Id: 0,
@@ -6282,6 +6289,9 @@ function BinaryFileReader(doc, openParams)
                 // case c_oSerTableTypes.Other:
                     // res = (new Binary_OtherTableReader(this.Document, this.stream)).Read();
                     // break;
+				case c_oSerTableTypes.App:
+					res = (new Binary_AppTableReader(this.oReadResult, this.stream)).Read();
+					break;
             }
             if(c_oSerConstants.ReadOk != res)
                 return res;
@@ -6701,6 +6711,13 @@ function BinaryFileReader(doc, openParams)
 			var table = this.oReadResult.aTableCorrect[i];
 			table.ReIndexing(0);
 			table.Correct_BadTable();
+		}
+		if ("Microsoft Office Word" === this.oReadResult.Application && this.oReadResult.AppVersion) {
+			if (this.oReadResult.AppVersion.startsWith("14.")) {
+				this.Document.Settings.CompatibilityMode = document_compatibility_mode_Word14;
+			} else if (this.oReadResult.AppVersion.startsWith("15.")) {
+				this.Document.Settings.CompatibilityMode = document_compatibility_mode_Word15;
+			}
 		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
@@ -14269,6 +14286,28 @@ function Binary_NotesTableReader(doc, oReadResult, openParams, stream)
 		return res;
 	};
 };
+function Binary_AppTableReader(oReadResult, stream) {
+	this.oReadResult = oReadResult;
+	this.stream = stream;
+	this.bcr = new Binary_CommonReader(this.stream);
+	this.Read = function() {
+		var oThis = this;
+		return this.bcr.ReadTable(function(t, l) {
+			return oThis.ReadProperties(t, l);
+		});
+	};
+	this.ReadProperties = function(type, length) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSerApp.Application === type) {
+			this.oReadResult.Application = this.stream.GetString2LE(length);
+		} else if (c_oSerApp.AppVersion === type) {
+			this.oReadResult.AppVersion = this.stream.GetString2LE(length);
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+}
 function GetTableOffsetCorrection(tbl)
 {
     var X = 0;
@@ -14562,6 +14601,8 @@ function DocReadResult(doc) {
 	this.footnoteRefs = [],
 	this.bookmarkForRead = typeof CParagraphBookmark !== "undefined" ? new CParagraphBookmark() : {};
 	this.bookmarksStarted = {};
+	this.Application;
+	this.AppVersion;
 };
 //---------------------------------------------------------export---------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
