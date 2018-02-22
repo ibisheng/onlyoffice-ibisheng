@@ -5630,7 +5630,7 @@ drawAreaChart.prototype = {
 	_calculate: function () {
 		var y, x, val, seria, dataSeries, numCache;
 		var pxToMm = this.chartProp.pxToMM;
-		var nullPositionOX = this.chartProp.nullPositionOX / pxToMm;
+		var nullPositionOX = this.catAx.posY * this.chartProp.pxToMM;
 
 		for (var i = 0; i < this.chart.series.length; i++) {
 
@@ -5780,7 +5780,7 @@ drawAreaChart.prototype = {
 		}
 
 		//точки предыдущей серии
-		var nullPositionOX = this.chartProp.nullPositionOX;
+		var nullPositionOX = this.catAx.posY * this.chartProp.pxToMM;
 		if (prevPoints != null) {
 			for (var i = prevPoints.length - 1; i >= 0; i--) {
 				point = prevPoints[i];
@@ -5802,6 +5802,7 @@ drawAreaChart.prototype = {
 	_calculateLine3D: function (points, seriaNum) {
 		//pointsIn3D[0] - верхняя кривая ближней стороны, pointsIn3D[1] - нижняя кривая ближней стороны, pointsIn3D[2] - верхняя кривая дальней стороны, pointsIn3D[3] - нижняя кривая дальней стороны
 		var pointsIn3D = [], t = this, pxToMm = this.chartProp.pxToMM;
+		var nullPosition = this.catAx.posY * this.chartProp.pxToMM;
 
 		//сдвиг по OZ в глубину
 		var gapDepth = this.gapDepth[seriaNum];
@@ -5811,7 +5812,7 @@ drawAreaChart.prototype = {
 			pointsIn3D[startN + 1] = [];
 			for (var i = 0; i < points.length; i++) {
 				pointsIn3D[startN][i] = t.cChartDrawer._convertAndTurnPoint(points[i].x * pxToMm, points[i].y * pxToMm, currentZ + gapDepth);
-				pointsIn3D[startN + 1][i] = t.cChartDrawer._convertAndTurnPoint(points[i].x * pxToMm, t.chartProp.nullPositionOX, currentZ + gapDepth);
+				pointsIn3D[startN + 1][i] = t.cChartDrawer._convertAndTurnPoint(points[i].x * pxToMm, nullPosition, currentZ + gapDepth);
 			}
 		};
 
@@ -5826,7 +5827,7 @@ drawAreaChart.prototype = {
 
 	_calculateStacked3D: function (prevPoints, seria, allPoints) {
 		var points = allPoints[seria];
-		var t = this, nullPositionOX = this.chartProp.nullPositionOX, pxToMm = this.chartProp.pxToMM, res = [];
+		var t = this, nullPositionOX = this.catAx.posY * this.chartProp.pxToMM, pxToMm = this.chartProp.pxToMM, res = [];
 
 		for (var i = 0; i < points.length - 1; i++) {
 			var x = points[i].x * pxToMm;
@@ -6320,7 +6321,7 @@ drawAreaChart.prototype = {
 	_calculateAllIntersection: function () {
 		var allPoints = this.points;
 		var prevPoints;
-		var nullPositionOX = this.chartProp.nullPositionOX;
+		var nullPositionOX = this.catAx.posY * this.chartProp.pxToMM;
 		var pxToMm = this.chartProp.pxToMM;
 
 		for (var seria = 0; seria < allPoints.length; seria++) {
