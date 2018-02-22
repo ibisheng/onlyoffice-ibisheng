@@ -999,12 +999,19 @@
 				case 34: 	// pagedown
 				case 35: 	// end
 				case 36: 	// home
+				{
+					this.clear();
+					return false;
+				}
 				case 46:	// delete
 				case 45:	// insert
 				{
-					// заканчиваем "непрерывный" ввод => очищаем текстбокс
-					this.clear();
-					return false;
+					if (!global_keyboardEvent.CtrlKey && !global_keyboardEvent.ShiftKey) // copy/cut/paste
+					{
+						// заканчиваем "непрерывный" ввод => очищаем текстбокс
+						this.clear();
+						return false;
+					}
 				}
 				default:
 					break;
