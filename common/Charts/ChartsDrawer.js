@@ -4475,7 +4475,7 @@ drawBarChart.prototype = {
 
 	_getStartYColumnPosition: function (seriesHeight, i, j, val, yPoints) {
 		var startY, height, curVal, prevVal, endBlockPosition, startBlockPosition;
-		var nullPositionOX = this.valAx && this.valAx.scaling.logBase ? this.chartProp.nullPositionOXLog : this.chartProp.nullPositionOX;
+		var nullPositionOX = this.subType === "stacked" ? this.cChartDrawer.getPositionZero(this.valAx) : this.catAx.posY * this.chartProp.pxToMM;
 
 		if (this.subType === "stacked") {
 			curVal = this._getStackedValue(this.chart.series, i, j, val);
