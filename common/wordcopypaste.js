@@ -4582,12 +4582,12 @@ PasteProcessor.prototype =
 				}
 				
 				//Todo пока сделал так, чтобы не вставлялись графические объекты в название диаграммы, потом нужно будет сделать так же запутанно, как в MS
-				var images = node.getElementsByTagName("img");
-				if(images && images.length)
+				var htmlImages = node.getElementsByTagName("img");
+				if(htmlImages && htmlImages.length)
 				{
-					for(var i = 0; i < images.length; i++)
-					{	
-						images[i].parentNode.removeChild(images[i]);
+					for(var i = 0; i < htmlImages.length; i++)
+					{
+						htmlImages[i].parentNode.removeChild(htmlImages[i]);
 					}
 				}
 			}
