@@ -11748,7 +11748,12 @@ CDocument.prototype.Begin_CompositeInput = function()
 		this.DrawingDocument.TargetShow();
 
 		if (true === this.IsSelectionUse())
-			this.Remove(1, true, false, true);
+		{
+			if (docpostype_DrawingObjects === this.Get_DocPosType() && null === this.DrawingObjects.getTargetDocContent())
+				this.RemoveSelection();
+			else
+				this.Remove(1, true, false, true);
+		}
 
 		var oPara = this.GetCurrentParagraph();
 		if (!oPara)
