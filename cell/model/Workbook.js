@@ -5081,11 +5081,13 @@
 	};
 	Worksheet.prototype.clearPivotTable = function (pivotTable) {
 		var pos, cells;
-		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
-			pos = pivotTable.pageFieldsPositions[i];
-			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col + 1);
-			cells.clearTableStyle();
-			cells.cleanAll();
+		if (this.pageFieldsPositions) {
+			for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
+				pos = pivotTable.pageFieldsPositions[i];
+				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col + 1);
+				cells.clearTableStyle();
+				cells.cleanAll();
+			}
 		}
 
 		var pivotRange = pivotTable.getRange();
