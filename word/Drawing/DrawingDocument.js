@@ -2680,6 +2680,7 @@ function CDrawingDocument()
 			//this.m_oWordControl.m_oLogicDocument.RecalculateCurPos();
 			this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
 			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
+			this.m_bIsDocumentCalculating = false;
 		}
 
 		if (-1 != this.m_lCurrentPage)
@@ -2713,7 +2714,6 @@ function CDrawingDocument()
 		if (isFull)
 		{
 			this.m_oWordControl.OnScroll();
-			this.m_bIsDocumentCalculating = false;
 
 			if (this.m_arPrintingWaitEndRecalculate)
 				this.m_oWordControl.m_oApi._downloadAs.apply(this.m_oWordControl.m_oApi, this.m_arPrintingWaitEndRecalculate);
