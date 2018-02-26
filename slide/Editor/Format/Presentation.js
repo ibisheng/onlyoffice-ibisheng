@@ -2767,6 +2767,25 @@ CPresentation.prototype =
     },
 
 
+    Viewer_OnChangePosition: function()
+    {
+        var oSlide = this.Slides[this.CurPage];
+        if(oSlide && oSlide.slideComments && Array.isArray(oSlide.slideComments.comments))
+        {
+            var aComments = oSlide.slideComments.comments;
+            for(var i = aComments.length - 1; i > -1; --i)
+            {
+                if(aComments[i].selected)
+                {
+                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(aComments[i].x, aComments[i].y, this.PageNum);
+                    this.Api.sync_UpdateCommentPosition(aComments[i].Get_Id(), Coords.X, Coords.Y);
+                    break;
+                }
+            }
+        }
+        AscCommon.g_specialPasteHelper.SpecialPasteButton_Update_Position();
+    },
+
     IsCell: function(isReturnCell)
     {
     	if (isReturnCell)
@@ -3978,6 +3997,7 @@ CPresentation.prototype =
                         if(aComments[i].selected){
                             bNeedRedraw = true;
                             aComments[i].selected = false;
+                            editor.asc_hideComments();
                             break;
                         }
                     }
@@ -7067,6 +7087,8 @@ CPresentation.prototype =
         {
             if(!(_is_apply === false))
             {
+
+                editor.sync_HideComment();
                 this.Slides[this.CurPage].graphicObjects.startTrackNewShape(preset);
             }
             else

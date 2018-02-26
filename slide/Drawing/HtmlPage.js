@@ -3517,8 +3517,6 @@ function CEditorPage(api)
 
 		if (this.m_bDocumentPlaceChangedEnabled)
 			this.m_oApi.sendEvent("asc_onDocumentPlaceChanged");
-
-		AscCommon.g_specialPasteHelper.SpecialPasteButton_Update_Position();
 	};
 
 	this.OnPaint = function()
@@ -3881,6 +3879,8 @@ function CEditorPage(api)
 			{
 				oWordControl.Thumbnails.onCheckUpdate();
 			}
+            if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
+                oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
 		}
 		else
 		{
