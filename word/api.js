@@ -3603,6 +3603,10 @@ background-repeat: no-repeat;\
 	{
 		return this.ShowParaMarks;
 	};
+	asc_docs_api.prototype.sync_ShowParaMarks     = function()
+	{
+		this.sendEvent("asc_onShowParaMarks", this.get_ShowParaMarks());
+	};
 	asc_docs_api.prototype.put_ShowTableEmptyLine = function(isShow)
 	{
 		this.isShowTableEmptyLine = isShow;
