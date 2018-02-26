@@ -1006,7 +1006,7 @@
 				case 46:	// delete
 				case 45:	// insert
 				{
-					if (!global_keyboardEvent.CtrlKey && !global_keyboardEvent.ShiftKey) // copy/cut/paste
+					if (!AscCommon.global_keyboardEvent.CtrlKey && !AscCommon.global_keyboardEvent.ShiftKey) // copy/cut/paste
 					{
 						// заканчиваем "непрерывный" ввод => очищаем текстбокс
 						this.clear();
