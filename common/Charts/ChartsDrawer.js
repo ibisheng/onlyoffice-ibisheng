@@ -3455,12 +3455,6 @@ CChartsDrawer.prototype =
 		var d = det * factor;
 		
 		var res1 = {a: a, b: b, c: c, d: d};
-		/*var t = this.getPlainEquation(point1, point2, point3)
-		
-		if(!(Math.sign(res1.a) === Math.sign(t.a) && Math.sign(res1.b) === Math.sign(t.b) && Math.sign(res1.c) === Math.sign(t.c) && Math.sign(res1.d) === Math.sign(t.d)))
-		{
-			console.log("palundra");
-		}*/
 		
 		return res1;
 	},
