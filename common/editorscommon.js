@@ -2319,7 +2319,7 @@
 				else if (intervalSeries > maxSeries)
 					return Asc.c_oAscError.ID.MaxDataSeriesError;
 				else if(intervalValues > maxValues){
-					return Asc.c_oAscError.ID.DataRangeError;
+					return Asc.c_oAscError.ID.MaxDataPointsError;
 
 				}
 			}

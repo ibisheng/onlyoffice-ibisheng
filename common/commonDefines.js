@@ -104,6 +104,8 @@
 			NoSupportClipdoard   : -12,
 			UplImageUrl          : -13,
 
+
+			MaxDataPointsError    : -16,
 			StockChartError       : -17,
 			CoAuthoringDisconnect : -18,
 			ConvertationPassword  : -19,
