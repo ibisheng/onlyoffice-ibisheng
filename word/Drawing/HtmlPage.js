@@ -1644,17 +1644,16 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
 
 		var oWordControl = oThis;
 
 		//if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block")
 		//    return;
 
-		AscCommon.check_MouseMoveEvent(e);
+		if (e)
+			AscCommon.check_MouseMoveEvent(e);
+
 		var pos = null;
 		if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
 			pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);

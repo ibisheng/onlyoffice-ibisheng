@@ -584,6 +584,124 @@ function CTableOutlineDr()
 		return false;
 	}
 
+	this.checkMouseMoveTrack = function (pos, word_control)
+	{
+		if (null == this.TableOutline)
+			return false;
+
+		var _table_track = this.TableOutline;
+		var _d = 13 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
+
+		var _x, _y, _r, _b;
+		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+		{
+			switch (this.TrackTablePos)
+			{
+				case 1:
+				{
+					_x = _table_track.X + _table_track.W;
+					_b = _table_track.Y;
+					_y = _b - _d;
+					_r = _x + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 2:
+				{
+					_x = _table_track.X + _table_track.W;
+					_y = _table_track.Y + _table_track.H;
+					_r = _x + _d;
+					_b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 3:
+				{
+					_r = _table_track.X;
+					_x = _r - _d;
+					_y = _table_track.Y + _table_track.H;
+					_b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 0:
+				default:
+				{
+					_r = _table_track.X;
+					_b = _table_track.Y;
+					_x = _r - _d;
+					_y = _b - _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+			var _posx = _invert.TransformPointX(pos.X, pos.Y);
+			var _posy = _invert.TransformPointY(pos.X, pos.Y);
+			switch (this.TrackTablePos)
+			{
+				case 1:
+				{
+					_x = _table_track.X + _table_track.W;
+					_b = _table_track.Y;
+					_y = _b - _d;
+					_r = _x + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 2:
+				{
+					_x = _table_track.X + _table_track.W;
+					_y = _table_track.Y + _table_track.H;
+					_r = _x + _d;
+					_b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 3:
+				{
+					_r = _table_track.X;
+					_x = _r - _d;
+					_y = _table_track.Y + _table_track.H;
+					_b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 0:
+				default:
+				{
+					_r = _table_track.X;
+					_b = _table_track.Y;
+					_x = _r - _d;
+					_y = _b - _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	this.checkMouseUp = function (X, Y, word_control)
 	{
 		this.bIsTracked = false;
@@ -2681,6 +2799,8 @@ function CDrawingDocument()
 			this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
 			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
 			this.m_bIsDocumentCalculating = false;
+
+			this.m_oWordControl.onMouseMove(undefined, undefined);
 		}
 
 		if (-1 != this.m_lCurrentPage)
@@ -7203,6 +7323,14 @@ function CDrawingDocument()
 			oWordControl.OnUpdateOverlay();
 			oWordControl.EndUpdateOverlay();
 			return true;
+		}
+		if (this.TableOutlineDr.checkMouseMoveTrack)
+		{
+			if (this.TableOutlineDr.checkMouseMoveTrack(pos, oWordControl))
+			{
+				this.SetCursorType("default");
+				return true;
+			}
 		}
 		if (this.TableOutlineDr.checkMouseMove2)
 		{
