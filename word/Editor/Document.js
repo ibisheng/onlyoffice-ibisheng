@@ -11652,6 +11652,33 @@ CDocument.prototype.Get_SectionProps = function()
 
 	return new Asc.CDocumentSectionProps(SectPr);
 };
+/**
+ * Получаем ширину текущей колонки
+ * @returns {number}
+ */
+CDocument.prototype.GetCurrentColumnWidth = function()
+{
+	var nCurPos = 0;
+	if (this.Controller === this.LogicDocumentController)
+		nCurPos = this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos;
+	else
+		nCurPos = this.CurPos.ContentPos;
+
+	var oSectPr       = this.SectionsInfo.Get_SectPr(nCurPos).SectPr;
+	var nColumnsCount = oSectPr.Get_ColumnsCount();
+
+	if (nColumnsCount > 1)
+	{
+		var oParagraph = this.GetCurrentParagraph();
+		if (!oParagraph)
+			return 0;
+
+		var nCurrentColumn = oParagraph.Get_CurrentColumn();
+		return oSectPr.Get_ColumnWidth(nCurrentColumn);
+	}
+
+	return oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Right() - oSectPr.Get_PageMargin_Left();
+};
 CDocument.prototype.Get_FirstParagraph = function()
 {
 	if (type_Paragraph == this.Content[0].GetType())

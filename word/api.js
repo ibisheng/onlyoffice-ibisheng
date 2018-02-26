@@ -4045,12 +4045,21 @@ background-repeat: no-repeat;\
 	{
 		return this.WordControl.m_oLogicDocument.Get_SectionProps();
 	};
+	asc_docs_api.prototype.asc_GetCurrentColumnWidth = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return 0;
+
+		return oLogicDocument.GetCurrentColumnWidth();
+	};
 	asc_docs_api.prototype.sync_SectionPropsCallback = function(Props)
 	{
 		this.sendEvent("asc_onSectionProps", Props);
 	};
-	asc_docs_api.prototype["asc_SetSectionProps"]    = asc_docs_api.prototype.asc_SetSectionProps;
-	asc_docs_api.prototype["asc_GetSectionProps"]    = asc_docs_api.prototype.asc_GetSectionProps;
+	asc_docs_api.prototype["asc_SetSectionProps"]       = asc_docs_api.prototype.asc_SetSectionProps;
+	asc_docs_api.prototype["asc_GetSectionProps"]       = asc_docs_api.prototype.asc_GetSectionProps;
+	asc_docs_api.prototype["asc_GetCurrentColumnWidth"] = asc_docs_api.prototype.asc_GetCurrentColumnWidth;
 
 	asc_docs_api.prototype.asc_SetColumnsProps       = function(ColumnsProps)
 	{
