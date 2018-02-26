@@ -4116,8 +4116,14 @@ function setCurrentCultureInfo(val) {
 					res.push(locale + 'mmm' + separator + 'yy;@');
 					res.push(locale + 'mmmm' + separator + 'yy;@');
 					res.push(locale + 'mmmmm' + separator + 'yy;@');
+					res.push(locale + 'yy' + separator + 'mmm;@');
 					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
+					res.push(locale + 'yyyy' + separator + 'mmm' + separator + 'd;@');
+					res.push(locale + 'yy' + separator + 'mmm' + separator + 'd;@');
 				}
+				res.push('yy/m/d;@');
+				res.push('yy/mm/dd;@');
+				res.push('yyyy/m/d;@');
 			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
 				res = gc_aTimeFormats;
 			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
