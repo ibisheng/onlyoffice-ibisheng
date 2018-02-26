@@ -10927,7 +10927,7 @@ function ApplyLegendProps(aPr, oLegend, oDrawingDocument, bCreate){
 function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
     if(!aPr || !oObj){
         if(oObj){
-            !bCreate && oObj.setDLbls(null);
+            oObj.setDLbls(null);
         }
         return;
     }
@@ -10940,6 +10940,11 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
     if(oObj.dLbls){
         var lbls = oObj.dLbls;
         lbls.setParent(oObj);
+        if(oObj.dLbls.bDelete){
+            if(oObj.dLbls.setDelete){
+                oObj.dLbls.setDelete(false);
+            }
+        }
 
         ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
         ApplySpPr(aPr[1], lbls, i, baseFills);
@@ -11046,12 +11051,13 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 if(!oDPt){
                     oDPt = new AscFormat.CDPt();
                     oDPt.setIdx(j);
+                    oChart.series[i].addDPt(oDPt);
                 }
                 if(oDPt.bubble3D !== false){
                     oDPt.setBubble3D(false);
                 }
                 ApplySpPr(aPreset[11], oDPt, j, base_fills, bAccent1Background);
-                oChart.series[i].addDPt(oDPt);
+
             }
             for (j = 0; j < oChart.series[i].dPt.length; ++j ){
                 if(oChart.series[i].dPt[j].idx >= ptCount){
@@ -11071,21 +11077,21 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < ptCount; ++j){
                     var oDLbl = oChart.series[i].dLbls.findDLblByIdx(j);
-                    if(!oDLbl){
+                    if(!oDLbl) {
                         oDLbl = new AscFormat.CDLbl();
                         oChart.series[i].dLbls.addDLbl(oDLbl);
                         oDLbl.setIdx(j);
-                        ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
-                        ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
-                        oDLbl.setDLblPos(aPreset[12][2]);
-                        oDLbl.setSeparator(aPreset[12][3]);
-                        oDLbl.setShowBubbleSize(aPreset[12][4]);
-                        oDLbl.setShowCatName(aPreset[12][5]);
-                        oDLbl.setShowLegendKey(aPreset[12][7]);
-                        oDLbl.setShowPercent(aPreset[12][8]);
-                        oDLbl.setShowSerName(aPreset[12][9]);
-                        oDLbl.setShowVal(aPreset[12][10]);
                     }
+                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
+                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
+                    oDLbl.setDLblPos(aPreset[12][2]);
+                    oDLbl.setSeparator(aPreset[12][3]);
+                    oDLbl.setShowBubbleSize(aPreset[12][4]);
+                    oDLbl.setShowCatName(aPreset[12][5]);
+                    oDLbl.setShowLegendKey(aPreset[12][7]);
+                    oDLbl.setShowPercent(aPreset[12][8]);
+                    oDLbl.setShowSerName(aPreset[12][9]);
+                    oDLbl.setShowVal(aPreset[12][10]);
                 }
             }
         }
