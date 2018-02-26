@@ -1617,7 +1617,8 @@
 				this._insertSelectedContentIntoShapeContent(worksheet, insertContent, target_doc_content);
 				
 				History.EndTransaction();
-				
+
+				worksheet.objectRender.controller.startRecalculate();
 				//for special paste
 				this._setShapeSpecialPasteProperties(worksheet, isIntoShape);
 			},

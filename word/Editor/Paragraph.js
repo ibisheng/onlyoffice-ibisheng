@@ -4793,6 +4793,34 @@ Paragraph.prototype.Get_PrevRunElements = function(RunElements)
 		CurPos--;
 	}
 };
+/**
+ * Получаем следующий за курсором элемент рана
+ * @returns {?CRunElementBase}
+ */
+Paragraph.prototype.GetNextRunElement = function()
+{
+	var oRunElements = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
+	this.Get_NextRunElements(oRunElements);
+
+	if (oRunElements.Elements.length <= 0)
+		return null;
+
+	return oRunElements.Elements[0];
+};
+/**
+ * Получаем идущий до курсора элемент рана
+ * @returns {?CRunElementBase}
+ */
+Paragraph.prototype.GetPrevRunElement = function()
+{
+	var oRunElements = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
+	this.Get_PrevRunElements(oRunElements);
+
+	if (oRunElements.Elements.length <= 0)
+		return null;
+
+	return oRunElements.Elements[0];
+};
 Paragraph.prototype.MoveCursorUp = function(AddToSelect)
 {
 	var Result = true;
@@ -6887,6 +6915,36 @@ Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 			this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
 		else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
 			this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+
+		if (true !== this.Selection.Use)
+		{
+			var oNextElement = this.GetNextRunElement();
+			var oPrevElement = this.GetPrevRunElement();
+
+			if (oNextElement)
+			{
+				if (para_PageNum === oNextElement.Type)
+				{
+					Info.SetPageNum(oNextElement);
+				}
+				else if (para_PageCount === oNextElement.Type)
+				{
+					Info.SetPagesCount(oNextElement);
+				}
+			}
+
+			if (oPrevElement)
+			{
+				if (para_PageNum === oPrevElement.Type)
+				{
+					Info.SetPageNum(oPrevElement);
+				}
+				else if (para_PageCount === oPrevElement.Type)
+				{
+					Info.SetPagesCount(oPrevElement);
+				}
+			}
+		}
 	}
 
 	var arrComplexFields = this.GetComplexFieldsByPos(ContentPos ? ContentPos : (this.Selection.Use === true ? this.Get_ParaContentPos(false, false) : this.Get_ParaContentPos(false)), false);

@@ -1614,9 +1614,9 @@ function CGroupShape()
     CGroupShape.prototype.calculateSnapArrays = function(snapArrayX, snapArrayY)
     {
         var sp;
-        for(var i = 0; i < this.spTree.length; ++i)
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
         {
-            sp = this.spTree[i];
+            sp = this.arrGraphicObjects[i];
             sp.calculateSnapArrays(snapArrayX, snapArrayY);
             sp.recalculateSnapArrays();
         }

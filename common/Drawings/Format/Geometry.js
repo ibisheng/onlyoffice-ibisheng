@@ -664,7 +664,7 @@ function CChangesGeometryAddAdj(Class, Name, OldValue, NewValue, OldAvValue, bRe
     AscDFH.changesFactory[AscDFH.historyitem_GeometryAddHandleXY] = CChangesGeometryAddHandleXY;
 
     function CChangesGeometryAddHandlePolar(Class, gdRefR, minR, maxR, gdRefAng, minAng, maxAng, posX, posY, bReverse){
-        this.Type = AscDFH.historyitem_GeometryAddHandleXY;
+        this.Type = AscDFH.historyitem_GeometryAddHandlePolar;
         this.gdRefAng = gdRefAng;
         this.minAng = minAng;
         this.maxAng = maxAng;
@@ -998,7 +998,7 @@ Geometry.prototype=
 
     AddHandlePolar: function(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)
     {
-        History.Add(new CChangesGeometryAddHandlePolar(this, gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY));
+        History.Add(new CChangesGeometryAddHandlePolar(this, gdRefR, minR, maxR, gdRefAng, minAng, maxAng, posX, posY));
         this.ahPolarLstInfo.push(
             {
                 gdRefAng:gdRefAng,

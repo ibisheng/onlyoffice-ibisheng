@@ -3919,7 +3919,7 @@ CDelimiter.prototype.Get_DeletedItemsThroughInterface = function()
             var CtrPrp = this.Get_CtrPrp();
             var NewRun = new ParaRun(this.ParaMath.Paragraph, true);
             NewRun.Apply_Pr(CtrPrp);
-            NewRun.Concat_ToContent( [NewSpace] );
+            NewRun.ConcatToContent( [NewSpace] );
 
             DeletedItems = DeletedItems.concat(NewRun);
 

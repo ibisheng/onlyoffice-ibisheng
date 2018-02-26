@@ -1359,6 +1359,8 @@ function CSelectedElementsInfo()
 	this.m_oBlockLevelSdt   = null;  // Если мы находимся в классе CBlockLevelSdt
 	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt
 	this.m_arrComplexFields = [];
+	this.m_oPageNum         = null;
+	this.m_oPagesCount      = null;
 
     this.Reset = function()
     {
@@ -1493,6 +1495,22 @@ CSelectedElementsInfo.prototype.GetHyperlink = function()
 	}
 
 	return null;
+};
+CSelectedElementsInfo.prototype.SetPageNum = function(oElement)
+{
+	this.m_oPageNum = oElement;
+};
+CSelectedElementsInfo.prototype.GetPageNum = function()
+{
+	return this.m_oPageNum;
+};
+CSelectedElementsInfo.prototype.SetPagesCount = function(oElement)
+{
+	this.m_oPagesCount = oElement;
+};
+CSelectedElementsInfo.prototype.GetPagesCount = function()
+{
+	return this.m_oPagesCount;
 };
 
 var document_compatibility_mode_Word14  = 14;
@@ -16627,6 +16645,28 @@ CDocument.prototype.GetTableOfContents = function(isCurrent)
 				return oResult;
 		}
 	}
+
+	return null;
+};
+/**
+ * Получаем текущее сложное поле
+ * @returns {CComplexField | ParaPageNum | ParaPageCount | null}
+ */
+CDocument.prototype.GetCurrentComplexField = function()
+{
+	var oSelectedInfo = this.GetSelectedElementsInfo();
+	var arrComplexFields = oSelectedInfo.GetComplexFields();
+
+	if (arrComplexFields.length > 0)
+		return arrComplexFields[arrComplexFields.length - 1];
+
+	var oPageNum = oSelectedInfo.GetPageNum();
+	if (oPageNum)
+		return oPageNum;
+
+	var oPagesCount = oSelectedInfo.GetPagesCount();
+	if (oPagesCount)
+		return oPagesCount;
 
 	return null;
 };

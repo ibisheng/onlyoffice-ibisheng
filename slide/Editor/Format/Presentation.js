@@ -6479,7 +6479,9 @@ CPresentation.prototype =
                         {
                             if(hierarchy[t])
                             {
-                                bNoPlaceholder = false;
+                                if(hierarchy[t].parent && (hierarchy[t].parent instanceof AscCommonSlide.SlideLayout)){
+                                    bNoPlaceholder = false;
+                                }
                                 if(hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
                                 {
                                     bNeedResetTransform = true;

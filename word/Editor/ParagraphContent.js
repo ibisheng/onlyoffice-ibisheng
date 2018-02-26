@@ -1356,6 +1356,8 @@ function ParaPageNum()
 
     this.Width        = 0;
     this.WidthVisible = 0;
+
+    this.Parent = null;
 }
 
 ParaPageNum.prototype =
@@ -1500,6 +1502,22 @@ ParaPageNum.prototype.GetPageNumValue = function()
 ParaPageNum.prototype.GetType = function()
 {
 	return this.Type;
+};
+/**
+ * Выставляем родительский класс
+ * @param {ParaRun} oParent
+ */
+ParaPageNum.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
+/**
+ * Получаем родительский класс
+ * @returns {?ParaRun}
+ */
+ParaPageNum.prototype.GetParent = function()
+{
+	return this.Parent;
 };
 
 function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
@@ -1943,6 +1961,7 @@ function ParaPageCount(PageCount)
 	this.Widths    = [];
 	this.String    = "";
 	this.PageCount = undefined !== PageCount ? PageCount : 1;
+	this.Parent    = null;
 }
 ParaPageCount.prototype = Object.create(CRunElementBase.prototype);
 ParaPageCount.prototype.constructor = ParaPageCount;
@@ -2037,6 +2056,22 @@ ParaPageCount.prototype.GetPageCountValue = function()
 {
 	return this.PageCount;
 };
+/**
+ * Выставляем родительский класс
+ * @param {ParaRun} oParent
+ */
+ParaPageCount.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
+/**
+ * Получаем родительский класс
+ * @returns {?ParaRun}
+ */
+ParaPageCount.prototype.GetParent = function()
+{
+	return this.Parent;
+};
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
@@ -2085,9 +2120,11 @@ function ParagraphContent_Read_FromBinary(Reader)
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
-window['AscCommonWord'].ParaNewLine = ParaNewLine;
-window['AscCommonWord'].ParaText    = ParaText;
-window['AscCommonWord'].ParaSpace   = ParaSpace;
+window['AscCommonWord'].ParaNewLine   = ParaNewLine;
+window['AscCommonWord'].ParaText      = ParaText;
+window['AscCommonWord'].ParaSpace     = ParaSpace;
+window['AscCommonWord'].ParaPageNum   = ParaPageNum;
+window['AscCommonWord'].ParaPageCount = ParaPageCount;
 
 window['AscCommonWord'].break_Page = break_Page;
 window['AscCommonWord'].break_Column = break_Column;
