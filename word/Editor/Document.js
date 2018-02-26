@@ -11743,7 +11743,7 @@ CDocument.prototype.Begin_CompositeInput = function()
 	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
 	{
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
-        this.DrawingObjects.CreateDocContent();
+		this.DrawingObjects.CreateDocContent();
 		this.DrawingDocument.TargetStart();
 		this.DrawingDocument.TargetShow();
 
@@ -11762,6 +11762,13 @@ CDocument.prototype.Begin_CompositeInput = function()
 		{
 			this.History.Remove_LastPoint();
 			return false;
+		}
+
+		var oTrackRun = oRun.CheckTrackRevisionsBeforeAdd();
+		if (oTrackRun)
+		{
+			oRun = oTrackRun;
+			oRun.Make_ThisElementCurrent();
 		}
 
 		this.CompositeInput = {
