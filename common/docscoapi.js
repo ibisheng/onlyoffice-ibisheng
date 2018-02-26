@@ -311,7 +311,7 @@
   CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
-      this._CoAuthoringApi.unLockDocument(isSave, canUnlockDocument);
+      this._CoAuthoringApi.unLockDocument(isSave);
     }
   };
 
@@ -1166,7 +1166,8 @@
     } else if (isWaitAuth) {
       //it is a stub for unexpected situation(no direct reproduce scenery)
       //isCoAuthoring is true when more then one editor, but isWaitAuth mean than server has one editor
-      this.unLockDocument(false, true);
+      this.canUnlockDocument = true;
+      this.unLockDocument(false);
     }
   };
 
