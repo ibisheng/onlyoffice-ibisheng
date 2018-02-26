@@ -7159,6 +7159,7 @@ PasteProcessor.prototype =
             {
                 nCurSum = 0;
                 nCurColWidth = 0;
+                var minRowSpanIndex = null;
                 var nMinRowSpanCount = null;//минимальный rowspan ячеек строки
                 for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
                 {
@@ -7188,15 +7189,25 @@ PasteProcessor.prototype =
                         if(null != nCurRowSpan)
                         {
                             nCurRowSpan = nCurRowSpan - 0;
-                            if(null == nMinRowSpanCount)
-                                nMinRowSpanCount = nCurRowSpan;
-                            else if(nMinRowSpanCount > nCurRowSpan)
-                                nMinRowSpanCount = nCurRowSpan;
+							if(null == nMinRowSpanCount)
+							{
+								nMinRowSpanCount = nCurRowSpan;
+								minRowSpanIndex = j;
+							}
+							else if(nMinRowSpanCount > nCurRowSpan)
+							{
+								nMinRowSpanCount = nCurRowSpan;
+								minRowSpanIndex = j;
+							}
+
                             if(nCurRowSpan > 1)
                                 oRowSpans[nCurColWidth] = {row: nCurRowSpan - 1, col: nColSpan, width: dWidth};
                         }
                         else
-                            nMinRowSpanCount = 0;
+						{
+							nMinRowSpanCount = 0;
+							minRowSpanIndex = j;
+						}
 
                         nCurSum += dWidth;
                         if(null == oRowSums[nCurColWidth + nColSpan])
@@ -7213,7 +7224,7 @@ PasteProcessor.prototype =
                     {
                         var tc = tr.childNodes[j];
                         var tcName = tc.nodeName.toLowerCase();
-                        if("td" === tcName || "th" === tcName)
+                        if(minRowSpanIndex !== j && ("td" === tcName || "th" === tcName))
                         {
                             var nCurRowSpan = tc.getAttribute("rowspan");
                             if(null != nCurRowSpan)
