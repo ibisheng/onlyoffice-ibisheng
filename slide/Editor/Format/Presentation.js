@@ -2450,29 +2450,30 @@ CPresentation.prototype =
             bRemoveOnlySelection = false;
 
         var oController = this.GetCurrentController();
+
+        if(!this.FocusOnNotes){
+            var oCurSlide = this.Slides[this.CurPage];
+            if(oCurSlide && oCurSlide.slideComments){
+                var aComments = oCurSlide.slideComments.comments;
+                for(var i = aComments.length-1; i > -1; --i){
+                    if(aComments[i].selected){
+                        if (this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, aComments[i].Id, this.IsEditCommentsMode()) === false)
+                        {
+                            this.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
+                            this.RemoveComment(aComments[i].Id, true);
+                        }
+                        break;
+                    }
+                }
+                if( i > -1){
+                    return;
+                }
+            }
+        }
         if(oController && oController.selectedObjects.length !== 0)
         {
             oController.remove(Count, bOnlyText, bRemoveOnlySelection);
             this.Document_UpdateInterfaceState();
-        }
-        else
-        {
-            if(!this.FocusOnNotes){
-                var oCurSlide = this.Slides[this.CurPage];
-                if(oCurSlide.slideComments){
-                    var aComments = oCurSlide.slideComments.comments;
-                    for(var i = aComments.length-1; i > -1; --i){
-                        if(aComments[i].selected){
-                            if (this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, aComments[i].Id, this.IsEditCommentsMode()) === false)
-                            {
-                                this.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
-                                this.RemoveComment(aComments[i].Id, true);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
         }
     },
 
