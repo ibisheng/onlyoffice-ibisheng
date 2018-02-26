@@ -2292,6 +2292,7 @@
 				// Проверка максимального дипазона
 				var maxSeries = 255;
 				var minStockVal = 4;
+				var maxValues = 4096;
 
 				var intervalValues, intervalSeries;
 				if (isRows)
@@ -2317,6 +2318,10 @@
 				}
 				else if (intervalSeries > maxSeries)
 					return Asc.c_oAscError.ID.MaxDataSeriesError;
+				else if(intervalValues > maxValues){
+					return Asc.c_oAscError.ID.DataRangeError;
+
+				}
 			}
 			else if (Asc.c_oAscSelectionDialogType.FormatTable === dialogType)
 			{
