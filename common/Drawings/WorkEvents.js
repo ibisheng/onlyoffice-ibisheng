@@ -359,7 +359,8 @@
 		if (global_mouseEvent.Button == -1)
 			global_mouseEvent.Button = 0;
 
-		global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
+		if (!global_mouseEvent.IsLocked || !global_mouseEvent.Sender)
+			global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 
 		if (isClicks)
 		{

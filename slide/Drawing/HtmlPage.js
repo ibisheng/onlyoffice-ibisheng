@@ -487,7 +487,7 @@ function CEditorPage(api)
 
 		// panel right --------------------------------------------------------------
 		this.m_oPanelRight = CreateControlContainer("id_panel_right");
-		this.m_oPanelRight.Bounds.SetParams(0, 0, 1000, 0, false, false, false, true, ScrollWidthMm, -1);
+		this.m_oPanelRight.Bounds.SetParams(0, 0, 1000, ScrollWidthMm, false, false, false, true, ScrollWidthMm, -1);
 		this.m_oPanelRight.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
 
 		this.m_oMainContent.AddControl(this.m_oPanelRight);
@@ -593,7 +593,8 @@ function CEditorPage(api)
 		// ----------
 
 		this.m_oMainView = CreateControlContainer("id_main_view");
-		this.m_oMainView.Bounds.SetParams(5, 7, (this.m_oApi.isMobileVersion || this.m_oApi.isReporterMode) ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
+		var useScrollW = (this.m_oApi.isMobileVersion || this.m_oApi.isReporterMode) ? 0 : ScrollWidthMm;
+		this.m_oMainView.Bounds.SetParams(5, 7, useScrollW, useScrollW, true, true, true, true, -1, -1);
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -3233,32 +3234,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isReporterMode)
 			return false;
 
-		var oldVisible = this.m_bIsHorScrollVisible;
-
-		if (this.m_nZoomType == 0 || this.m_nZoomType == 1)
-		{
-			this.m_bIsHorScrollVisible = this.checkNeedHorScrollValue(this.m_dDocumentWidth);
-		}
-		else
-		{
-			var canvas_height1 = this.m_oEditor.HtmlElement.height;
-			var addition = AscCommon.AscBrowser.convertToRetinaValue(this.ScrollWidthPx, true);
-			var canvas_height2 = this.m_bIsHorScrollVisible ? (canvas_height1 + addition) : (canvas_height1 - addition);
-
-			var zoom1 = this.zoom_FitToPage_value(canvas_height1);
-			var zoom2 = this.zoom_FitToPage_value(canvas_height2);
-
-			var size1 = this.CalculateDocumentSizeInternal(canvas_height1, zoom1, true);
-			var size2 = this.CalculateDocumentSizeInternal(canvas_height2, zoom2, true);
-
-			var needScroll1 = this.checkNeedHorScrollValue(size1.m_dDocumentWidth);
-			var needScroll2 = this.checkNeedHorScrollValue(size2.m_dDocumentWidth);
-
-			if (needScroll1 == needScroll2)
-				this.m_bIsHorScrollVisible = needScroll1;
-			else
-				this.m_bIsHorScrollVisible = true;
-		}
+		this.m_bIsHorScrollVisible = this.checkNeedHorScrollValue(this.m_dDocumentWidth);
 
 		var hor_scroll         = document.getElementById('panel_hor_scroll');
 		hor_scroll.style.width = this.m_dDocumentWidth + "px";
@@ -3273,24 +3249,13 @@ function CEditorPage(api)
 			else
 			{
 				this.m_oScrollHor.HtmlElement.style.display = 'block';
-
-				this.m_oPanelRight.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
-				this.m_oMainView.Bounds.B   = this.ScrollWidthPx * g_dKoef_pix_to_mm;
 			}
 		}
 		else
 		{
-			this.m_oPanelRight.Bounds.B                 = 0;
-			this.m_oMainView.Bounds.B                   = 0;
 			this.m_oScrollHor.HtmlElement.style.display = 'none';
 		}
 
-		if (this.m_bIsHorScrollVisible != oldVisible)
-		{
-			this.m_dScrollX                    = 0;
-			this.OnResize(true);
-			return true;
-		}
 		return false;
 	};
 
