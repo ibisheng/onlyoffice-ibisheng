@@ -50,10 +50,10 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.getDrawingsForController();
 };
 
-DrawingObjectsController.prototype.recalculateCurPos = function(){
+DrawingObjectsController.prototype.recalculateCurPos = function(bUpdateX, bUpdateY){
     var oTargetDocContent = this.getTargetDocContent(undefined, true);
     if(oTargetDocContent){
-        oTargetDocContent.RecalculateCurPos();
+        oTargetDocContent.RecalculateCurPos(bUpdateX, bUpdateY);
         editor.WordControl.m_oLogicDocument.NeedUpdateTargetForCollaboration = true;
     }
 };

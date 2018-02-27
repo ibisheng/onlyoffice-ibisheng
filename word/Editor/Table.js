@@ -2839,10 +2839,10 @@ CTable.prototype.Reset_RecalculateCache = function()
 		}
 	}
 };
-CTable.prototype.RecalculateCurPos = function()
+CTable.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	if (null != this.CurCell)
-		return this.CurCell.Content_RecalculateCurPos();
+	if (this.CurCell)
+		return this.CurCell.Content_RecalculateCurPos(bUpdateX, bUpdateY);
 
 	return null;
 };

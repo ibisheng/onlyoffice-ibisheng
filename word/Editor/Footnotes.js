@@ -1342,10 +1342,10 @@ CFootnotesController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CFootnotesController.prototype.RecalculateCurPos = function()
+CFootnotesController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.RecalculateCurPos();
+		return this.CurFootnote.RecalculateCurPos(bUpdateX, bUpdateY);
 
 	return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};
 };

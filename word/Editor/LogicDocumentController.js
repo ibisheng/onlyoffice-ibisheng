@@ -22,9 +22,9 @@ CLogicDocumentController.prototype.CanUpdateTarget = function()
 {
 	return this.LogicDocument.controller_CanUpdateTarget();
 };
-CLogicDocumentController.prototype.RecalculateCurPos = function()
+CLogicDocumentController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.LogicDocument.controller_RecalculateCurPos();
+	return this.LogicDocument.controller_RecalculateCurPos(bUpdateX, bUpdateY);
 };
 CLogicDocumentController.prototype.GetCurPage = function()
 {
