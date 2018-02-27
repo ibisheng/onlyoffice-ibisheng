@@ -5751,15 +5751,34 @@ CPresentation.prototype =
                     var oCurParagraph = oTargetDocContent.GetCurrentParagraph();
                     if(oCurParagraph){
                         oTextPr = oCurParagraph.Internal_CompiledParaPrPresentation(undefined, true).TextPr;
-                        oTextPr2 = oTextPr.Copy();
-                        var oParaTextPr = new AscCommonWord.ParaTextPr(oTextPr2);
+
+                        var fApplyPropsToContent = function(content, textpr){
+                            for(var j = 0; j < content.length; ++j)
+                            {
+                                if(content[j].Get_Type)
+                                {
+                                    if(content[j].Get_Type() === para_Run)
+                                    {
+                                        if(content[j].Pr)
+                                        {
+                                            var oTextPr2 = textpr.Copy();
+                                            oTextPr2.Merge(content[j].Pr);
+                                            content[j].Set_Pr(oTextPr2);
+                                        }
+                                    }
+                                    else if(content[j].Get_Type() === para_Hyperlink){
+                                        fApplyPropsToContent(content[j].Content, textpr);
+                                    }
+                                }
+
+                            }
+                        };
                         for(i = 0; i < oContent.DocContent.Elements.length; ++i)
                         {
                             if(oContent.DocContent.Elements[i].Element.GetType() === AscCommonWord.type_Paragraph)
                             {
-                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(true);
-                                oContent.DocContent.Elements[i].Element.AddToParagraph(oParaTextPr);
-                                oContent.DocContent.Elements[i].Element.Set_ApplyToAll(false);
+                                var aContent = oContent.DocContent.Elements[i].Element.Content;
+                                fApplyPropsToContent(aContent, oTextPr);
                             }
                         }
                     }
