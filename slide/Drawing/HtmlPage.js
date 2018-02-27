@@ -1430,7 +1430,10 @@ function CEditorPage(api)
 		this.m_oHorRuler.IsDrawAnyMarkers          = true;
 
 		if (this.m_bIsRuler)
+		{
 			this.UpdateHorRuler();
+			this.UpdateVerRuler();
+		}
 	};
 
 	this.ToSearchResult = function()
