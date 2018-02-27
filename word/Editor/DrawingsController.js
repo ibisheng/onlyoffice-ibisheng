@@ -25,9 +25,9 @@ CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CDrawingsController.prototype.RecalculateCurPos = function()
+CDrawingsController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.DrawingObjects.recalculateCurPos();
+	return this.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 };
 CDrawingsController.prototype.GetCurPage = function()
 {

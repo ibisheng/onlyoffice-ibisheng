@@ -253,7 +253,7 @@ CDocumentContentElementBase.prototype.GetSelectionBounds = function()
 		Direction : 0
 	};
 };
-CDocumentContentElementBase.prototype.RecalculateCurPos = function()
+CDocumentContentElementBase.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	return null;
 };

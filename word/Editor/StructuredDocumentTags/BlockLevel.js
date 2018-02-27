@@ -253,9 +253,9 @@ CBlockLevelSdt.prototype.GetSelectionBounds = function()
 {
 	return this.Content.GetSelectionBounds();
 };
-CBlockLevelSdt.prototype.RecalculateCurPos = function()
+CBlockLevelSdt.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.Content.RecalculateCurPos();
+	return this.Content.RecalculateCurPos(bUpdateX, bUpdateY);
 };
 CBlockLevelSdt.prototype.Can_CopyCut = function()
 {

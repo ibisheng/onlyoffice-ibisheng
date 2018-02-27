@@ -1481,13 +1481,13 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------   
-    RecalculateCurPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.RecalculateCurPos();
+    RecalculateCurPos : function(bUpdateX, bUpdateY)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.RecalculateCurPos(bUpdateX, bUpdateY);
 
-        return null;
-    },
+		return null;
+	},
 
     Recalculate : function(PageIndex)
     {

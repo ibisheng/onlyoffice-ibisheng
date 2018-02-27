@@ -1297,9 +1297,17 @@ Paragraph.prototype.Reset_RecalculateCache = function()
 {
 
 };
-Paragraph.prototype.RecalculateCurPos = function()
+Paragraph.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, true, false);
+	var oCurPosInfo = this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, true, false);
+
+	if (bUpdateX)
+		this.CurPos.RealX = oCurPosInfo.X;
+
+	if (bUpdateY)
+		this.CurPos.RealY = oCurPosInfo.Y;
+
+	return oCurPosInfo;
 };
 Paragraph.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {

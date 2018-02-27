@@ -10156,7 +10156,7 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 
 	if (true !== this.IsSelectionUse() || true === this.IsSelectionEmpty())
 	{
-		NewCursorPos = this.Controller.RecalculateCurPos();
+		NewCursorPos = this.Controller.RecalculateCurPos(bUpdateX, bUpdateY);
 		if (NewCursorPos && NewCursorPos.Transform)
 		{
 			var x = NewCursorPos.Transform.TransformPointX(NewCursorPos.X, NewCursorPos.Y);
@@ -10195,26 +10195,11 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 	if (null === NewCursorPos || undefined === NewCursorPos)
 		return;
 
-	var RealX = NewCursorPos.X;
-	var RealY = NewCursorPos.Y;
-
-	var CurPara = this.GetCurrentParagraph();
-
 	if (bUpdateX)
-	{
-		this.CurPos.RealX = RealX;
-
-		if (null !== CurPara)
-			CurPara.CurPos.RealX = RealX;
-	}
+		this.CurPos.RealX = NewCursorPos.X;
 
 	if (bUpdateY)
-	{
-		this.CurPos.RealY = RealY;
-
-		if (null !== CurPara)
-			CurPara.CurPos.RealY = RealY;
-	}
+		this.CurPos.RealY = NewCursorPos.Y;
 
 	if (true === this.Selection.Use && true !== this.Selection.Start)
 		this.private_OnSelectionEnd();
@@ -11822,6 +11807,8 @@ CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateUndoRedoState();
 
+	this.private_UpdateCursorXY(true, true);
+
 	if (!this.History.CheckUnionLastPoints())
 		this.CompositeInput.CanUndo = false;
 };
@@ -11876,6 +11863,8 @@ CDocument.prototype.End_CompositeInput = function()
     }
 
 	this.Document_UpdateInterfaceState();
+
+    this.private_UpdateCursorXY(true, true);
 
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();
@@ -12197,13 +12186,13 @@ CDocument.prototype.controller_CanUpdateTarget = function()
 
 	return true;
 };
-CDocument.prototype.controller_RecalculateCurPos = function()
+CDocument.prototype.controller_RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	if (this.controller_CanUpdateTarget())
 	{
 		var nPos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos)
 		this.private_CheckCurPage();
-		return this.Content[nPos].RecalculateCurPos();
+		return this.Content[nPos].RecalculateCurPos(bUpdateX, bUpdateY);
 	}
 
 	return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};
