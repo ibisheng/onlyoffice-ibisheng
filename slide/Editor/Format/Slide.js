@@ -363,7 +363,7 @@ Slide.prototype =
         return null;
     },
 
-    getMatchingShape: function(type, idx, bSingleBody)
+    getMatchingShape: function(type, idx, bSingleBody, info)
     {
         var _input_reduced_type;
         if(type == null)
@@ -527,6 +527,9 @@ Slide.prototype =
 
                 if(_input_reduced_index == _final_index)
                 {
+                    if(info){
+                        info.bBadMatch = true;
+                    }
                     return _glyph;
                 }
             }

@@ -1272,7 +1272,7 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function(bIsSingleBody)
+CShape.prototype.getHierarchy = function(bIsSingleBody, info)
 {
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
@@ -1297,7 +1297,7 @@ CShape.prototype.getHierarchy = function(bIsSingleBody)
                 {
                     case AscFormat.TYPE_KIND.SLIDE:
                     {
-                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body, info));
                         hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }

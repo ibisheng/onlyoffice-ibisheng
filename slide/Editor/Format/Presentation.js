@@ -6493,7 +6493,8 @@ CPresentation.prototype =
                     var shape = slide.cSld.spTree[j];
                     //if(slide.cSld.spTree[j].isEmptyPlaceholder())
                     {
-                        var hierarchy = shape.getHierarchy();
+                        var oInfo = {};
+                        var hierarchy = shape.getHierarchy(undefined, oInfo);
                         var bNoPlaceholder = true;
                         var bNeedResetTransform = false;
                         for(var t = 0; t < hierarchy.length; ++t)
@@ -6501,7 +6502,9 @@ CPresentation.prototype =
                             if(hierarchy[t])
                             {
                                 if(hierarchy[t].parent && (hierarchy[t].parent instanceof AscCommonSlide.SlideLayout)){
-                                    bNoPlaceholder = false;
+                                    if(oInfo.bBadMatch !== true){
+                                        bNoPlaceholder = false;
+                                    }
                                 }
                                 if(hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
                                 {
