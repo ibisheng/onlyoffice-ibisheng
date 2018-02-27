@@ -4243,7 +4243,7 @@
 				for(var i = 0, length = oRes.children.length; i < length; i++)
 				{
 					var rowWrapped = oRes.children[i];
-					this._getRowMeasure(rowWrapped, aSumGridWidth);
+					this._getRowMeasure(rowWrapped, aSumGridWidth, oRes.children, i);
 					oRes.height += rowWrapped.height;
 					//в left временно занесен относительный сдвиг
 					if(rowWrapped.width + rowWrapped.left > oRes.width)
@@ -4280,17 +4280,33 @@
 				}
 				return oRes;
 			},
-			_getRowMeasure: function(rowWrapped, aSumGridWidth){
+			_getRowMeasure: function (rowWrapped, aSumGridWidth, rows, index) {
+
+				var getNotMergedPreviousCell = function (i) {
+					var res = null;
+					if (rows && index > 0) {
+						for (var j = index; j >= 0; j--) {
+							if (rows[j] && rows[j].children && rows[j].children[i]) {
+								var vMerge = rows[j].children[i].elem.GetVMerge();
+								if (1 === vMerge) {
+									res = rows[j].children[i];
+									break;
+								}
+							}
+						}
+					}
+					return res;
+				};
+
 				var nSumGrid = 0;
 				var BeforeInfo = rowWrapped.elem.Get_Before();
-				if(BeforeInfo && BeforeInfo.GridBefore)
-				{
+				if (BeforeInfo && BeforeInfo.GridBefore) {
 					//временно заносим относительный сдвиг
 					rowWrapped.left = aSumGridWidth[nSumGrid + BeforeInfo.GridBefore] - aSumGridWidth[nSumGrid];
 					nSumGrid += BeforeInfo.GridBefore;
 				}
-				for(var i = 0, length = rowWrapped.children.length; i < length; i++)
-				{
+				
+				for (var i = 0, length = rowWrapped.children.length; i < length; i++) {
 					var cellWrapped = rowWrapped.children[i];
 					var nCellGrid = cellWrapped.elem.Get_GridSpan();
 					cellWrapped.width = aSumGridWidth[nSumGrid + nCellGrid] - aSumGridWidth[nSumGrid];
@@ -4298,6 +4314,15 @@
 					cellWrapped.height = rowWrapped.height;
 					rowWrapped.width += cellWrapped.width;
 					nSumGrid += nCellGrid;
+
+					//vertical merge
+					var previousCell = getNotMergedPreviousCell(i);
+					if (previousCell) {
+						var vMerge = cellWrapped.elem.GetVMerge();
+						if (vMerge > 1) {
+							previousCell.height += vMerge - 1;
+						}
+					}
 				}
 			}
 		};
