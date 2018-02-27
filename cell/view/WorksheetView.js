@@ -9213,7 +9213,10 @@
             var heightPasteFr = rMax - arn.r1;
             //если кратны, то обрабатываем
             if (widthArea % widthPasteFr === 0 && heightArea % heightPasteFr === 0) {
-                isMultiple = true;
+				//Для случая, когда выделен весь диапазон, запрещаю множественную вставку
+            	if(arn.getType() !== window["Asc"].c_oAscSelectionType.RangeMax) {
+					isMultiple = true;
+				}
             } else if (firstCell.hasMerged() !== null)//в противном случае ошибка
             {
                 if (isCheckSelection) {
