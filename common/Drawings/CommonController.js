@@ -3448,6 +3448,33 @@ DrawingObjectsController.prototype =
         chartSpace.resetSelection(true);
         var oPr = this.getPropsFromChart(chart_space);
         if(oPr.isEqual(chartSettings)){
+
+
+            var oChartType = chart_space && chart_space.chart && chart_space.chart.plotArea && chart_space.chart.plotArea.charts[0];
+            if(!oChartType){
+                return;
+            }
+            //подписи данных
+            if(typeof oChartType.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
+            {
+                if(oChartType.dLbls && oChartType.dLbls.bDelete){
+                    oChartType.dLbls.setDelete(false);
+                }
+                for(var i = 0; i < oChartType.series.length; ++i){
+                    var oSerie = oChartType.series[i];
+                    if(oSerie.dLbls){
+                        if(oSerie.dLbls.bDelete){
+                            oSerie.dLbls.setDelete(false);
+                            for(var j = 0; j < oSerie.dLbls.dLbl.length; ++j){
+                                if(oSerie.dLbls.dLbl[j].bDelete){
+                                    oSerie.dLbls.dLbl[j].setDelete(false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return;
         }
 
@@ -4626,6 +4653,9 @@ DrawingObjectsController.prototype =
                 AscFormat.isRealBool(chartSettings.showSerName) ||
                 AscFormat.isRealBool(chartSettings.showVal)){
                 var fCheckLbls = function(oLbl){
+                    if(oLbl.setDelete && oLbl.bDelete){
+                        oLbl.setDelete(false);
+                    }
                     if(AscFormat.isRealBool(chartSettings.showCatName)){
                         oLbl.setShowCatName(chartSettings.showCatName);
                     }
