@@ -2357,37 +2357,35 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
-	asc_docs_api.prototype._autoSave = function () {
-		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode && this.canSave) {
-			var _curTime = new Date().getTime();
-			if (-1 === this.lastSaveTime) {
-				this.lastSaveTime = _curTime;
-			}
+	asc_docs_api.prototype._autoSaveInner = function () {
+		var _curTime = new Date().getTime();
+		if (-1 === this.lastSaveTime) {
+			this.lastSaveTime = _curTime;
+		}
 
-			if (this.canUnlockDocument) {
-				this.asc_Save(true);
-				this.lastSaveTime = _curTime;
+		if (this.canUnlockDocument) {
+			this.asc_Save(true);
+			this.lastSaveTime = _curTime;
+		} else {
+			if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
+				this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
 			} else {
-				if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
-					this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
-				} else {
-					var _bIsWaitScheme = false;
-					if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
-						if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
-							_bIsWaitScheme = true;
-						}
+				var _bIsWaitScheme = false;
+				if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
+					if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+						_bIsWaitScheme = true;
 					}
+				}
 
-					if (!_bIsWaitScheme) {
-						var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
-							this.autoSaveGapFast;
+				if (!_bIsWaitScheme) {
+					var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+						this.autoSaveGapFast;
 
-						if ((_curTime - this.lastSaveTime) > _interval) {
-							if (History.Have_Changes(true) == true) {
-								this.asc_Save(true);
-							}
-							this.lastSaveTime = _curTime;
+					if ((_curTime - this.lastSaveTime) > _interval) {
+						if (History.Have_Changes(true) == true) {
+							this.asc_Save(true);
 						}
+						this.lastSaveTime = _curTime;
 					}
 				}
 			}

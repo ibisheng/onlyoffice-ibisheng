@@ -553,6 +553,11 @@
 	};
 	// Функция автосохранения. Переопределяется во всех редакторах
 	baseEditorsApi.prototype._autoSave = function () {
+		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
+			this._autoSaveInner();
+		}
+	};
+	baseEditorsApi.prototype._autoSaveInner = function () {
 	};
 	// Unlock document when start co-authoring
 	baseEditorsApi.prototype._unlockDocument = function () {
@@ -560,6 +565,9 @@
 			// Document is load
 			this.canUnlockDocument = true;
 			this.canStartCoAuthoring = true;
+			if (this.canSave) {
+				// Currently not saving, but if the save is started, then unlock on the response from the server
+			}
 		} else {
 			// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
 			this.startCollaborationEditing();

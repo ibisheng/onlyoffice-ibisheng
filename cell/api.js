@@ -316,7 +316,9 @@ var editor;
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
 	spreadsheet_api.prototype.saveCheck = function() {
-		return !(!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction());
+		return !(!this.canSave || this.isChartEditor ||
+		c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction() ||
+		this.asc_getIsTrackShape() || this.isOpenedChartFrame || !History.IsEndTransaction());
 	};
 	spreadsheet_api.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
 		this.IsUserSave = !isAutoSave;
@@ -3183,13 +3185,7 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
-	spreadsheet_api.prototype._autoSave = function () {
-		if ((!this.canUnlockDocument && 0 === this.autoSaveGap &&
-			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
-			this.asc_getIsTrackShape() || this.isOpenedChartFrame || !History.IsEndTransaction() || !this.canSave) {
-			return;
-		}
-
+	spreadsheet_api.prototype._autoSaveInner = function () {
 		// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
 		if (this.canUnlockDocument) {
 			this.lastSaveTime = new Date();
