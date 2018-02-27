@@ -13698,6 +13698,12 @@ CTable.prototype.DistributeRows = function()
  */
 CTable.prototype.SetColumnWidth = function(nWidth)
 {
+	if (nWidth < 4.2)
+		nWidth = 4.2;
+
+	if (nWidth > 558.8)
+		nWidth = 558.8;
+
 	var arrSelectedCells = this.GetSelectionArray();
 
 	var oCells = {};
