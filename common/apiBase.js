@@ -521,7 +521,11 @@
 	};
 	baseEditorsApi.prototype.onDocumentContentReady              = function()
 	{
+		var t = this;
 		this.isDocumentLoadComplete = true;
+		if (!window['IS_NATIVE_EDITOR']) {
+			setInterval(function() {t._autoSave();}, 40);
+		}
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		this.sendEvent('asc_onDocumentContentReady');
 	};
@@ -1222,10 +1226,6 @@
 		}
 
 		this.pluginsManager     = Asc.createPluginsManager(this);
-
-		if (!window['IS_NATIVE_EDITOR']) {
-			setInterval(function() {t._autoSave();}, 40);
-		}
 
 		this.macros = new AscCommon.CDocumentMacros();
 	};
