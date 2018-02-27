@@ -8198,6 +8198,9 @@ CStylesPainter.prototype =
 			par.Set_Align(AscCommon.align_Left);
 			par.Set_Tabs(new CParaTabs());
 
+			if (!textPr.Color || (255 === textPr.Color.r && 255 === textPr.Color.g && 255 === textPr.Color.b))
+				run.Set_Color(new CDocumentColor(0, 0, 0, false));
+
 			var _brdL = style.ParaPr.Brd.Left;
 			if (undefined !== _brdL && null !== _brdL)
 			{
