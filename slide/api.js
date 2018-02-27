@@ -2138,33 +2138,11 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
-	asc_docs_api.prototype.saveCheck = function() {
-		return true === this.canSave && !this.isLongAction();
+	asc_docs_api.prototype._saveCheck = function() {
+		return !this.isLongAction();
 	};
-	asc_docs_api.prototype.asc_Save                     = function(isAutoSave, isUndoRequest, isIdle)
-	{
-		var res = false;
-		this.IsUserSave = !isAutoSave;
-		if (this.saveCheck())
-		{
-			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
-			{
-				this.canSave = false;
-
-				var t = this;
-				this.CoAuthoringApi.askSaveChanges(function(e)
-				{
-					t.onSaveCallback(e, isUndoRequest);
-				});
-				res = true;
-			}
-			else if (this.isForceSaveOnUserSave && this.IsUserSave)
-			{
-				this.forceSave();
-			}
-		}
-		return res;
+	asc_docs_api.prototype._haveOtherChanges = function () {
+		return AscCommon.CollaborativeEditing.Have_OtherChanges();
 	};
 	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent)
 	{//передаем число соответствующее своему формату.

@@ -551,13 +551,23 @@
 	{
 		this.isForceSaveOnUserSave = val;
 	};
-	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._saveCheck = function () {
+		return false;
+	};
+	// Переопределяется во всех редакторах
+	baseEditorsApi.prototype._haveOtherChanges = function () {
+		return false;
+	};
 	baseEditorsApi.prototype._autoSave = function () {
 		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
 			this._autoSaveInner();
 		}
 	};
+	// Функция автосохранения. Переопределяется во всех редакторах
 	baseEditorsApi.prototype._autoSaveInner = function () {
+	};
+	baseEditorsApi.prototype._prepareSave = function (isIdle) {
+		return true;
 	};
 	// Unlock document when start co-authoring
 	baseEditorsApi.prototype._unlockDocument = function () {
@@ -1145,6 +1155,27 @@
 	};
 	baseEditorsApi.prototype.asc_undoAllChanges = function()
 	{
+	};
+	baseEditorsApi.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
+		var t = this;
+		var res = false;
+		if (this.canSave && this._saveCheck()) {
+			this.IsUserSave = !isAutoSave;
+
+			if (this.asc_isDocumentCanSave() || History.Have_Changes() || this._haveOtherChanges() || isUndoRequest ||
+				this.canUnlockDocument) {
+				if (this._prepareSave(isIdle)) {
+					// Не даем пользователю сохранять, пока не закончится сохранение (если оно началось)
+					this.canSave = false;
+					this.CoAuthoringApi.askSaveChanges(function (e) {
+						t.onSaveCallback(e, isUndoRequest);
+					});
+				}
+			} else if (this.isForceSaveOnUserSave && this.IsUserSave) {
+				this.forceSave();
+			}
+		}
+		return res;
 	};
 	/**
 	 * Эта функция возвращает true, если есть изменения или есть lock-и в документе
@@ -1803,7 +1834,7 @@
 		if (this.isEmbedVersion)
 			return 0;
 
-		if (!this.saveCheck())
+		if (!this.canSave || !this._saveCheck())
 			return 0;
 
 		return new Date().getTime() - this.lastWorkTime;
@@ -1820,11 +1851,6 @@
 		this.sendEvent('asc_onCoAuthoringDisconnect');
 		// И переходим в режим просмотра т.к. мы не можем сохранить файл
 		this.asc_setViewMode(true);
-	};
-
-	baseEditorsApi.prototype.saveCheck = function()
-	{
-		return false;
 	};
 
 	baseEditorsApi.prototype.asc_setCurrentPassword = function(password)

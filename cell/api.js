@@ -315,24 +315,15 @@ var editor;
     }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
-	spreadsheet_api.prototype.saveCheck = function() {
-		return !(!this.canSave || this.isChartEditor ||
-		c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction() ||
-		this.asc_getIsTrackShape() || this.isOpenedChartFrame || !History.IsEndTransaction());
+	spreadsheet_api.prototype._saveCheck = function() {
+		return !this.isChartEditor && c_oAscAdvancedOptionsAction.None === this.advancedOptionsAction &&
+			!this.isLongAction() && !this.asc_getIsTrackShape() && !this.isOpenedChartFrame &&
+			History.IsEndTransaction();
 	};
-	spreadsheet_api.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
-		this.IsUserSave = !isAutoSave;
-		if (!this.saveCheck()) {
-			return false;
-		}
-
-		if (!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
-			if (this.isForceSaveOnUserSave && this.IsUserSave) {
-				this.forceSave();
-			}
-			return false;
-		}
-
+	spreadsheet_api.prototype._haveOtherChanges = function () {
+	  return this.collaborativeEditing.haveOtherChanges();
+    };
+	spreadsheet_api.prototype._prepareSave = function (isIdle) {
 		var tmpHandlers;
 		if (isIdle) {
 			tmpHandlers = this.wbModel.handlers.handlers['asc_onError'];
@@ -352,20 +343,8 @@ var editor;
 		if (isIdle) {
 			this.wbModel.handlers.handlers['asc_onError'] = tmpHandlers;
 		}
-
-		if (this.IsUserSave) {
-			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-		}
-
-		// Не даем пользователю сохранять, пока не закончится сохранение
-		this.canSave = false;
-
-		var t = this;
-		this.CoAuthoringApi.askSaveChanges(function (e) {
-			t.onSaveCallback(e);
-		});
 		return true;
-	};
+    };
 
   spreadsheet_api.prototype.asc_Print = function(adjustPrint, bIsDownloadEvent) {
     if (window["AscDesktopEditor"]) {
@@ -1558,7 +1537,7 @@ var editor;
 		this.wb._onSetSelection(range, /*validRange*/ true);
 	};
 
-  spreadsheet_api.prototype.onSaveCallback = function(e) {
+  spreadsheet_api.prototype.onSaveCallback = function(e, isUndoRequest) {
     var t = this;
     var nState;
     if (false == e["saveLock"]) {
@@ -1574,9 +1553,7 @@ var editor;
         return;
       }
 
-      if (!this.IsUserSave) {
-        this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-      }
+      this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
       this.canUnlockDocument2 = this.canUnlockDocument;
       if (this.canUnlockDocument && this.canStartCoAuthoring) {
@@ -1624,9 +1601,6 @@ var editor;
       nState = t.CoAuthoringApi.get_state();
       if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
         // Отключаемся от сохранения, соединение потеряно
-        if (this.IsUserSave) {
-          this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-        }
         this.IsUserSave = false;
         this.canSave = true;
       } else {
