@@ -143,6 +143,10 @@ ParaFieldChar.prototype.Read_FromBinary = function(Reader)
 	this.LogicDocument = editor.WordControl.m_oLogicDocument;
 	this.ComplexField  = (this.CharType === fldchartype_Begin) ? new CComplexField(this.LogicDocument) : null;
 };
+ParaFieldChar.prototype.SetParent = function(oParent)
+{
+	this.Run = oParent;
+};
 ParaFieldChar.prototype.SetRun = function(oRun)
 {
 	this.Run = oRun;
@@ -270,6 +274,10 @@ ParaInstrText.prototype.Read_FromBinary = function(Reader)
 {
 	// Long : Value
 	this.Value = Reader.GetLong();
+};
+ParaInstrText.prototype.SetParent = function(oParent)
+{
+	this.Run = oParent;
 };
 ParaInstrText.prototype.SetRun = function(oRun)
 {
