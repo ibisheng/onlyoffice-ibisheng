@@ -5416,6 +5416,8 @@ function CSlideDrawer()
 	this.bIsEmptyPresentation = false;
 	this.IsRecalculateSlide   = false;
 
+	this.EmptyPresenattionTextHeight = 60;
+
 	// TODO: максимальная ширина всех линий и запас под локи
 	this.SlideEps = 20;
 
@@ -5616,6 +5618,17 @@ function CSlideDrawer()
 			outputCtx.beginPath();
 			this.m_oWordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(outputCtx, _x >> 0, _y >> 0, (_x + w_px) >> 0, (_y + h_px) >> 0, 2, 2, true);
 			outputCtx.beginPath();
+
+			outputCtx.fillStyle = "#3C3C3C";
+
+			outputCtx.font = "60px Arial";
+
+			var text = AscCommon.translateManager.getValue("Click to add first slide");
+			var textWidth = outputCtx.measureText(text).width;
+
+			var xPos = ((_x >> 0) + ((w_px - textWidth) >> 1));
+			var yPos = ((_y >> 0) + ((h_px - this.EmptyPresenattionTextHeight) >> 1));
+			outputCtx.fillText(text, xPos, yPos);
 
 			return;
 		}

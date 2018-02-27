@@ -178,6 +178,14 @@
 		this.KeyCode  = 0;
 	}
 
+	CKeyboardEvent.prototype.Up = function()
+	{
+		this.AltKey   = false;
+		this.CtrlKey  = false;
+		this.ShiftKey = false;
+		this.AltGr    = false;
+	};
+
 	var global_mouseEvent    = new CMouseEventHandler();
 	var global_keyboardEvent = new CKeyboardEvent();
 
