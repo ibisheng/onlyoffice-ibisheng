@@ -554,6 +554,18 @@
 	// Функция автосохранения. Переопределяется во всех редакторах
 	baseEditorsApi.prototype._autoSave = function () {
 	};
+	// Unlock document when start co-authoring
+	baseEditorsApi.prototype._unlockDocument = function () {
+		if (this.isDocumentLoadComplete) {
+			// Document is load
+			this.canUnlockDocument = true;
+			this.canStartCoAuthoring = true;
+		} else {
+			// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+			this.startCollaborationEditing();
+			this.CoAuthoringApi.unLockDocument(false, true);
+		}
+	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
 	{
@@ -863,15 +875,7 @@
 			if (isStartEvent) {
 				t.startCollaborationEditing();
 			} else {
-				// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
-				if (!t.isDocumentLoadComplete) {
-					t.startCollaborationEditing();
-					t.CoAuthoringApi.unLockDocument(false, true);
-				} else {
-					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-					t.canUnlockDocument = true;
-					t.canStartCoAuthoring = true;
-				}
+				t._unlockDocument();
 			}
 		};
 		this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
