@@ -3184,8 +3184,8 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 	spreadsheet_api.prototype._autoSave = function () {
-		if (!this.isDocumentLoadComplete || (!this.canUnlockDocument && 0 === this.autoSaveGap &&
-				(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
+		if ((!this.canUnlockDocument && 0 === this.autoSaveGap &&
+			(!this.collaborativeEditing.getFast() || !this.collaborativeEditing.getCollaborativeEditing())) ||
 			this.asc_getIsTrackShape() || this.isOpenedChartFrame || !History.IsEndTransaction() || !this.canSave) {
 			return;
 		}
