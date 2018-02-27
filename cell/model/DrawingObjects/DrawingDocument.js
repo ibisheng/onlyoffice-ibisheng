@@ -2313,6 +2313,9 @@ function CDrawingDocument(drawingObjects)
 
         var _factor = AscCommon.AscBrowser.isRetina ? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
+        var targetPosX = 0;
+        var targetPosY = 0;
+
         if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
         {
             var _x1 = this.TextMatrix.TransformPointX(x, y);
@@ -2372,8 +2375,11 @@ function CDrawingDocument(drawingObjects)
                 ctx.stroke();
             }
 
-            this.TargetHtmlElement.style.left = ((Math.min(pos1.X, pos2.X) / _factor) >> 0) + "px";
-            this.TargetHtmlElement.style.top = ((Math.min(pos1.Y, pos2.Y) / _factor) >> 0) + "px";
+			targetPosX = (Math.min(pos1.X, pos2.X) / _factor) >> 0;
+            targetPosY = (Math.min(pos1.Y, pos2.Y) / _factor) >> 0;
+
+            this.TargetHtmlElement.style.left = targetPosX + "px";
+            this.TargetHtmlElement.style.top = targetPosY + "px";
         }
         else
         {
@@ -2404,9 +2410,15 @@ function CDrawingDocument(drawingObjects)
 
             var pos = { X : _offX + dKoef * x, Y : _offY + dKoef * y };
 
-            this.TargetHtmlElement.style.left = ((pos.X / _factor) >> 0) + "px";
-            this.TargetHtmlElement.style.top = ((pos.Y / _factor) >> 0) + "px";
+			targetPosX = (pos.X / _factor) >> 0;
+			targetPosY = (pos.Y / _factor) >> 0;
+
+			this.TargetHtmlElement.style.left = targetPosX + "px";
+			this.TargetHtmlElement.style.top = targetPosY + "px";
         }
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.move(targetPosX, targetPosY);
     }
 
     this.UpdateTargetTransform = function(matrix)
