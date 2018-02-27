@@ -1362,7 +1362,65 @@ Slide.prototype =
     {
         if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
             return this.cachedImage;
-        return AscCommon.ShapeToImageConverter(this, 0).ImageUrl;
+
+        AscCommon.IsShapeToImageConverter = true;
+
+        var dKoef = AscCommon.g_dKoef_mm_to_pix;
+        var w_mm = 210;
+        var h_mm = 297;
+        var w_px = (w_mm * dKoef) >> 0;
+        var h_px = (h_mm * dKoef) >> 0;
+        var _need_pix_width     = this.Width*dKoef;
+        var _need_pix_height    = this.Height*dKoef;
+
+        if (_need_pix_width <= 0 || _need_pix_height <= 0)
+            return null;
+
+        /*
+         if (shape.pen)
+         {
+         var _w_pen = (shape.pen.w == null) ? 12700 : parseInt(shape.pen.w);
+         _w_pen /= 36000.0;
+         _w_pen *= g_dKoef_mm_to_pix;
+
+         _need_pix_width += (2 * _w_pen);
+         _need_pix_height += (2 * _w_pen);
+
+         _bounds_cheker.Bounds.min_x -= _w_pen;
+         _bounds_cheker.Bounds.min_y -= _w_pen;
+         }*/
+
+        var _canvas = document.createElement('canvas');
+        _canvas.width = _need_pix_width;
+        _canvas.height = _need_pix_height;
+
+        var _ctx = _canvas.getContext('2d');
+
+        var g = new AscCommon.CGraphics();
+        g.init(_ctx, w_px, h_px, w_mm, h_mm);
+        g.m_oFontManager = AscCommon.g_fontManager;
+
+        g.m_oCoordTransform.tx = 0.0;
+        g.m_oCoordTransform.ty = 0.0;
+        g.transform(1,0,0,1,0,0);
+
+        this.draw(g, /*pageIndex*/0);
+
+        AscCommon.IsShapeToImageConverter = false;
+
+        var _ret = { ImageNative : _canvas, ImageUrl : "" };
+        try
+        {
+            _ret.ImageUrl = _canvas.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            if (shape.brush != null && shape.brush.fill && shape.brush.fill.RasterImageId)
+                _ret.ImageUrl = getFullImageSrc2(shape.brush.fill.RasterImageId);
+            else
+                _ret.ImageUrl = "";
+        }
+        return _ret.ImageUrl;
     },
 
     checkNoTransformPlaceholder: function()
