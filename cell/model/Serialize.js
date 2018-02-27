@@ -4665,7 +4665,7 @@
         };
     }
     /** @constructor */
-    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs, isCopyPaste)
+    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs, isCopyPaste, useNumId)
     {
         this.stream = stream;
         this.wb = wb;
@@ -4675,6 +4675,7 @@
         this.bcr = new Binary_CommonReader(this.stream);
         this.bssr = new Binary_SharedStringTableReader(this.stream, wb);
 		this.isCopyPaste = isCopyPaste;
+		this.useNumId = useNumId;
         this.Read = function()
         {
             var oThis = this;
@@ -4922,6 +4923,7 @@
         };
 		this.ParseNum = function(oNum, oNumFmts) {
 			var oRes = new AscCommonExcel.Num();
+			var useNumId = false;
 			if (null != oNum && null != oNum.f) {
 				oRes.f = oNum.f;
 			} else {
@@ -4933,10 +4935,12 @@
 					oRes.f = "General";
 				}
 				//format string is more priority then id. so, fill oRes.id only if format is empty
-				if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
-					(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
-					oRes.id = oNum.id;
-				}
+				useNumId = true;
+			}
+			if ((useNumId || this.useNumId) &&
+				((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
+				(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44))) {
+				oRes.id = oNum.id;
 			}
 			if (null != oNumFmts) {
 				oNumFmts[oNum.id] = oRes;
@@ -7988,7 +7992,7 @@
         var oBinaryFileReader = new BinaryFileReader();
         var stream = oBinaryFileReader.getbase64DecodedData(sStyles);
         var bcr = new Binary_CommonReader(stream);
-        var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
+        var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], [], undefined, true);
 
         var length = stream.GetULongLE();
 
