@@ -2968,7 +2968,7 @@ CDocumentContent.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelect
 		bOnTextAdd = false;
 
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		return this.LogicDocument.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
+		return this.LogicDocument.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 	else //if ( docpostype_Content === this.CurPos.Type )
 		return this.private_Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 };
@@ -3789,7 +3789,10 @@ CDocumentContent.prototype.SetCurPosXY = function(X, Y)
 };
 CDocumentContent.prototype.IsSelectionUse = function()
 {
-	if (true == this.Selection.Use)
+	if (docpostype_DrawingObjects === this.Get_DocPosType())
+		return this.DrawingObjects.isSelectionUse();
+
+	if (true === this.Selection.Use)
 		return true;
 
 	return false;
