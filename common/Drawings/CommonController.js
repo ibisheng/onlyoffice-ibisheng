@@ -6744,7 +6744,7 @@ DrawingObjectsController.prototype =
     Document_UpdateInterfaceState: function()
     {},
 
-    getChartObject: function(type)
+    getChartObject: function(type, w, h)
     {
         if(null != type)
         {
@@ -6785,6 +6785,13 @@ DrawingObjectsController.prototype =
                 CheckSpPrXfrm(ret);
                 ret.spPr.xfrm.setOffX(0);
                 ret.spPr.xfrm.setOffY(0);
+                if(AscFormat.isRealNumber(w) && w > 0.0){
+                    var dAspect = w/ret.spPr.xfrm.extX;
+                    if(dAspect < 1.0){
+                        ret.spPr.xfrm.setExtX(w);
+                        ret.spPr.xfrm.setExtY(ret.spPr.xfrm.extY*dAspect);
+                    }
+                }
                 ret.theme = this.getTheme();
                 ret.colorMapOverride = this.getColorMapOverride();
                 return ret;

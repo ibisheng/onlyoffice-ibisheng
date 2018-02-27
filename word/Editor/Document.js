@@ -4332,7 +4332,18 @@ CDocument.prototype.EditChart = function(Chart)
 };
 CDocument.prototype.GetChartObject = function(type)
 {
-	return this.DrawingObjects.getChartObject(type);
+    var W = null, H = null;
+    if(type != null)
+    {
+        var oColumnSize = this.GetColumnSize();
+        if(oColumnSize)
+        {
+            W = oColumnSize.W;
+            H = oColumnSize.H;
+        }
+    }
+    return this.DrawingObjects.getChartObject(type, W, H);
+
 };
 CDocument.prototype.AddInlineTable = function(Cols, Rows)
 {
