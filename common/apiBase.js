@@ -1169,7 +1169,7 @@
 		if (this.canSave && this._saveCheck()) {
 			this.IsUserSave = !isAutoSave;
 
-			if (this.asc_isDocumentCanSave() || History.Have_Changes() || this._haveOtherChanges() || isUndoRequest ||
+			if (this.asc_isDocumentCanSave() || AscCommon.History.Have_Changes() || this._haveOtherChanges() || isUndoRequest ||
 				this.canUnlockDocument) {
 				if (this._prepareSave(isIdle)) {
 					// Не даем пользователю сохранять, пока не закончится сохранение (если оно началось)
