@@ -8565,7 +8565,6 @@ function BinaryPPTYLoader()
                                 }
 
                                 new_run.AddText(_text);
-                                AscFonts.FontPickerByCharacter.getFontsByString(_text);
 
                                 if (hyperlink !== null)
                                 {

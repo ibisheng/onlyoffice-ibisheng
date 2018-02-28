@@ -1482,6 +1482,7 @@ background-repeat: no-repeat;\
 
 		_loader.Api = this;
 		g_oIdCounter.Set_Load(true);
+		AscFonts.IsCheckSymbols = true;
 		_loader.Load(gObject, this.WordControl.m_oLogicDocument);
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(true);
 		_loader.Check_TextFit();
@@ -1491,6 +1492,7 @@ background-repeat: no-repeat;\
 
 		this.LoadedObject = 1;
 		g_oIdCounter.Set_Load(false);
+		AscFonts.IsCheckSymbols = false;
 
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);

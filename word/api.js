@@ -1173,6 +1173,7 @@ background-repeat: no-repeat;\
 		this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
 
 		g_oIdCounter.Set_Load(true);
+		AscFonts.IsCheckSymbols = true;
 
 		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
@@ -1195,6 +1196,8 @@ background-repeat: no-repeat;\
 		}
 		else
 			editor.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+
+		AscFonts.IsCheckSymbols = false;
 
 		//callback
 		editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;

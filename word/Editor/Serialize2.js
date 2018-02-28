@@ -9858,7 +9858,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			}
 			else
 				nUnicode = nCharCode;
-            AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+
 			if (null !== nUnicode) {
 				if (0x20 !== nUnicode || isInstrText)
 					oPos.run.AddToContent(oPos.pos, isInstrText ? new ParaInstrText(nUnicode) : new ParaText(nUnicode), false);
@@ -11109,7 +11109,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			    }
 			    else
 			        nUnicode = nCharCode;
-                AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+
 			    if (null != nUnicode) {
 					if (0x20 !== nUnicode)
 						oPos.run.AddToContent(oPos.pos, new ParaText(nUnicode), false);
