@@ -7255,24 +7255,36 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
 CMathContent.prototype.GetTextContent = function()
 {
 	//TODO временная функция. пересмотреть!
-	var arr = [], str = "", bIsContainsOperator = false;
+	var arr = [], str = "", bIsContainsOperator = false, paraRunArr = [];
 
-	var addText = function(value, bIsAddParenthesis)
+	var addText = function(value, bIsAddParenthesis, paraRun)
 	{
 		if(bIsAddParenthesis && value.length > 1 && value.match())
 		{
 			arr.push("(");
 			str += "(";
+			paraRunArr.push("(");
 		}
 
 		arr.push(value);
 		str += value;
+		if(undefined === paraRun)
+		{
+			paraRunArr.push(value);
+		}
+		else
+		{
+			paraRunArr.push(paraRun);
+		}
+
 
 		if(bIsAddParenthesis && value.length > 1)
 		{
 			arr.push(")");
 			str += ")";
+			paraRunArr.push(")");
 		}
+
 	};
 
 	var getMathSymbol = function(elem)
@@ -7368,6 +7380,15 @@ CMathContent.prototype.GetTextContent = function()
 		return res;
 	};
 
+	var getAndPushTextContent = function(elem)
+	{
+		var tempStr = elem.GetTextContent();
+		if(tempStr.str)
+		{
+			addText(tempStr.str, tempStr.bIsContainsOperator, tempStr.paraRunArr);
+		}
+	};
+
 	var parseMathComposition = function(elem)
 	{
 		var tempStr;
@@ -7376,28 +7397,16 @@ CMathContent.prototype.GetTextContent = function()
 		if(elem instanceof CDegree)//степень
 		{
 			//основание
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//показатель
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CDelimiter)
 		{
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 		}
 		else if(elem instanceof CNary)//сумма
 		{
@@ -7408,11 +7417,7 @@ CMathContent.prototype.GetTextContent = function()
 			{
 				addText(symbol[1].value);
 
-				tempStr = elem.Content[0].GetTextContent();
-				if(tempStr.str)
-				{
-					addText(tempStr.str, tempStr.bIsContainsOperator);
-				}
+				getAndPushTextContent(elem.Content[0]);
 			}
 
 			//верхняя граница суммирования
@@ -7420,38 +7425,22 @@ CMathContent.prototype.GetTextContent = function()
 			{
 				addText(symbol[2].value);
 
-				tempStr = elem.Content[1].GetTextContent();
-				if(tempStr.str)
-				{
-					addText(tempStr.str, tempStr.bIsContainsOperator);
-				}
+				getAndPushTextContent(elem.Content[1]);
 			}
 
 			addText(symbol[3].value);
 
-			tempStr = elem.Content[2].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[2]);
 		}
 		else if(elem instanceof CFraction)//дробь
 		{
 			//числитель
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//знаменатель
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CRadical)//корень
 		{
@@ -7462,7 +7451,7 @@ CMathContent.prototype.GetTextContent = function()
 			if(tempStr.str)
 			{
 				addText("(");
-				addText(tempStr.str, tempStr.bIsContainsOperator);
+				addText(tempStr.str, tempStr.bIsContainsOperator, tempStr.paraRunArr);
 				isAddExp = true;
 			}
 
@@ -7472,11 +7461,7 @@ CMathContent.prototype.GetTextContent = function()
 			}
 
 			//подкоренное выражение
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 
 			if(isAddExp)
 			{
@@ -7496,13 +7481,7 @@ CMathContent.prototype.GetTextContent = function()
 						addText(symbol[j].value);
 					}
 
-					tempStr = elem.Content[j].GetTextContent();
-
-					if(tempStr.str)
-					{
-						addText(tempStr.str, tempStr.bIsContainsOperator);
-					}
-
+					getAndPushTextContent(elem.Content[j]);
 
 					if(symbol[j] && !symbol[j].prePosition)
 					{
@@ -7515,36 +7494,19 @@ CMathContent.prototype.GetTextContent = function()
 		else if(elem instanceof CMathFunc)
 		{
 			//функция
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//аргумент
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CLimit)
 		{
 			//функция
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str);
-			}
-
+			getAndPushTextContent(elem.Content[0]);
 			//аргумент
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 
 	};
@@ -7571,7 +7533,7 @@ CMathContent.prototype.GetTextContent = function()
 							bIsContainsOperator = true;
 						}
 					}
-					addText(string);
+					addText(string, null, this.Content[i]);
 				}
 				break;
 			}
@@ -7583,7 +7545,7 @@ CMathContent.prototype.GetTextContent = function()
 		}
 	}
 
-	return {str: str, bIsContainsOperator: bIsContainsOperator};
+	return {str: str, bIsContainsOperator: bIsContainsOperator, paraRunArr: paraRunArr};
 };
 
 function CMathBracketAcc()
