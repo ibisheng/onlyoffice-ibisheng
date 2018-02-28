@@ -2021,6 +2021,18 @@
 			}
 		}
 
+		asc_CStylesPainter.prototype.asc_checkStylesNames = function(cellStylesAll) {
+			var oStyle, i;
+			for (i = 0; i < cellStylesAll.DefaultStyles.length; ++i) {
+				oStyle = cellStylesAll.DefaultStyles[i];
+				AscFonts.FontPickerByCharacter.getFontsByString(oStyle.Name);
+				AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(oStyle.Name));
+			}
+			for (i = 0; i < cellStylesAll.CustomStyles.length; ++i) {
+				oStyle = cellStylesAll.CustomStyles[i];
+				AscFonts.FontPickerByCharacter.getFontsByString(oStyle.Name);
+			}
+		};
 		asc_CStylesPainter.prototype.asc_getStyleThumbnailWidth = function () {
 			return this.styleThumbnailWidthWithRetina;
 		};

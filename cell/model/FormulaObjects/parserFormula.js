@@ -4367,6 +4367,10 @@ function parserFormula( formula, parent, _ws ) {
 	this.isInDependencies = false;
 	this.parent = parent;
 	this._index = undefined;
+
+	if (AscFonts.IsCheckSymbols) {
+		AscFonts.FontPickerByCharacter.getFontsByString(this.Formula);
+	}
 }
   parserFormula.prototype.getWs = function() {
     return this.ws;
