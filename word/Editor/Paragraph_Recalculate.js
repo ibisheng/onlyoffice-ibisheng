@@ -236,11 +236,26 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 
     // Если у нас отрезок, в котором произошли изменения является отрезком с нумерацией, тогда надо запустить
     // обычный пересчет.
-    var NumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
-    if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ) && ( undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId ) )
+    if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ))
     {
         // TODO: Сделать проверку на само изменение, переместилась ли нумерация
-        return -1;
+        var CompiledParaPr = this.Get_CompiledPr2(false).ParaPr;
+        if(this.Numbering.Type === para_Numbering)
+        {
+            var NumPr = CompiledParaPr.NumPr;
+            if(( undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId ))
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            var Bullet = this.Numbering.Bullet;
+            if ( Bullet &&  null !== Bullet.m_oTextPr && null !== Bullet.m_nNum && null != Bullet.m_sString && Bullet.m_sString.length !== 0)
+            {
+                return -1;
+            }
+        }
     }
 
     if ( 0 === Line && 0 === Range && undefined !== this.Get_SectionPr() )
