@@ -6479,7 +6479,9 @@ DrawingObjectsController.prototype =
         {
             var oTargetTextObject = getTargetTextObject(this);
             drawingObjectsController.remove(1);
-            bRetValue = true;
+
+            if (!e.shiftKey)
+                bRetValue = true;
         }
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
         {
