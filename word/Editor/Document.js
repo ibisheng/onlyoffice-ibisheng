@@ -4335,11 +4335,20 @@ CDocument.prototype.GetChartObject = function(type)
     var W = null, H = null;
     if(type != null)
     {
-        var oColumnSize = this.GetColumnSize();
-        if(oColumnSize)
+        var oTargetContent = this.DrawingObjects.getTargetDocContent();
+        if(oTargetContent && !oTargetContent.bPresentation)
         {
-            W = oColumnSize.W;
-            H = oColumnSize.H;
+            W = oTargetContent.XLimit;
+            H = W;
+        }
+        else
+        {
+            var oColumnSize = this.GetColumnSize();
+            if(oColumnSize)
+            {
+                W = oColumnSize.W;
+                H = oColumnSize.H;
+            }
         }
     }
     return this.DrawingObjects.getChartObject(type, W, H);
