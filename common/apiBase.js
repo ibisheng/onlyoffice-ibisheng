@@ -560,7 +560,14 @@
 	};
 	baseEditorsApi.prototype._autoSave = function () {
 		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
-			this._autoSaveInner();
+			if (this.canUnlockDocument) {
+				this.lastSaveTime = new Date();
+				// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
+				// Close cell edit without errors (isIdle = true)
+				this.asc_Save(true, false, true);
+			} else {
+				this._autoSaveInner();
+			}
 		}
 	};
 	// Функция автосохранения. Переопределяется во всех редакторах

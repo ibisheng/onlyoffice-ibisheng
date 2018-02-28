@@ -3160,14 +3160,6 @@ var editor;
   ////////////////////////////AutoSave api/////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 	spreadsheet_api.prototype._autoSaveInner = function () {
-		// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
-		if (this.canUnlockDocument) {
-			this.lastSaveTime = new Date();
-			// Close cell edit without errors (isIdle = true)
-			this.asc_Save(true, false, true);
-			return;
-		}
-
 		if (this.asc_getCellEditMode()) {
 		  return;
         }
