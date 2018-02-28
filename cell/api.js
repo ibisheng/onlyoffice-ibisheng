@@ -285,8 +285,10 @@ var editor;
   spreadsheet_api.prototype._openDocument = function(data) {
     this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
+    AscFonts.IsCheckSymbols = true;
     var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
     oBinaryFileReader.Read(data, this.wbModel);
+    AscFonts.IsCheckSymbols = false;
   };
 
   spreadsheet_api.prototype.initGlobalObjects = function(wbModel) {
@@ -926,6 +928,7 @@ var editor;
     var arrLoadFonts = [];
     for (var i in fonts)
       arrLoadFonts.push(new AscFonts.CFont(i, 0, "", 0));
+    AscFonts.FontPickerByCharacter.extendFonts(arrLoadFonts);
     History.loadFonts(arrLoadFonts);
     this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
   };

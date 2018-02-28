@@ -7638,12 +7638,15 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 			this.all.push(text);
 			index = this.all.length;
 			this.text.set(text, index);
+			if (AscFonts.IsCheckSymbols) {
+				AscFonts.FontPickerByCharacter.getFontsByString(text);
+			}
 		}
 		return index;
 	};
 	CSharedStrings.prototype.addMultiText = function(multiText) {
-		var index;
-		for (var i = 0; i < this.multiText.length; ++i) {
+		var index, i;
+		for (i = 0; i < this.multiText.length; ++i) {
 			if (AscCommonExcel.isEqualMultiText(multiText, this.multiText[i])) {
 				index = this.multiTextIndex[i];
 				break;
@@ -7654,6 +7657,11 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 			index = this.all.length;
 			this.multiText.push(multiText);
 			this.multiTextIndex.push(index);
+			if (AscFonts.IsCheckSymbols) {
+				for (i = 0; i < multiText.length; ++i) {
+					AscFonts.FontPickerByCharacter.getFontsByString(multiText[i].text);
+				}
+			}
 		}
 		return index;
 	};
@@ -7662,6 +7670,17 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	};
 	CSharedStrings.prototype.getCount = function() {
 		return this.all.length;
+	};
+	CSharedStrings.prototype.generateFontMap = function(oFontMap) {
+		for (var i = 0; i < this.multiText.length; ++i) {
+			var multiText = this.multiText[i];
+			for (var j = 0; j < multiText.length; ++j) {
+				var part = multiText[j];
+				if (null != part.format) {
+					oFontMap[part.format.getName()] = 1;
+				}
+			}
+		}
 	};
 
 	/**

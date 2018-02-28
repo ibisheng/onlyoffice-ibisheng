@@ -1913,17 +1913,7 @@
 			}
 		}
 		//sharedStrings
-		for (i = 1; i <= this.sharedStrings.getCount(); ++i) {
-			var multiText = this.sharedStrings.get(i);
-			if (typeof multiText !== 'string') {
-				for (var j = 0; j < multiText.length; ++j) {
-					var part = multiText[j];
-					if (null != part.format) {
-						oFontMap[part.format.getName()] = 1;
-					}
-				}
-			}
-		}
+		this.sharedStrings.generateFontMap(oFontMap);
 
 		this.forEach(function (ws) {
 			ws.generateFontMap(oFontMap);
@@ -1946,6 +1936,7 @@
 		var aRes = [];
 		for(var i in oFontMap)
 			aRes.push(new AscFonts.CFont(i, 0, "", 0));
+		AscFonts.FontPickerByCharacter.extendFonts(aRes);
 		return aRes;
 	};
 	Workbook.prototype.getAllImageUrls = function(){
@@ -2258,57 +2249,59 @@
 				}
 				aUndoRedoElems.push(item);
 			}
-
-			window["Asc"]["editor"]._loadFonts(oFontMap, function(){
-				var wsViews = window["Asc"]["editor"].wb.wsViews;
-				if(oThis.oApi.collaborativeEditing.getFast()){
-					AscCommon.CollaborativeEditing.Clear_DocumentPositions();
-				}
-				for (var i in wsViews) {
-					if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
-						isRealObject(wsViews[i].objectRender.controller)) {
-						wsViews[i].endEditChart();
-						if (oThis.oApi.collaborativeEditing.getFast()) {
-							var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
-							if (oState) {
-								if (oState.Pos) {
-									AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
-								}
-								if (oState.StartPos) {
-									AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
-								}
-								if (oState.EndPos) {
-									AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
-								}
+			var wsViews = window["Asc"]["editor"].wb.wsViews;
+			if(oThis.oApi.collaborativeEditing.getFast()){
+				AscCommon.CollaborativeEditing.Clear_DocumentPositions();
+			}
+			for (var i in wsViews) {
+				if (isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) &&
+					isRealObject(wsViews[i].objectRender.controller)) {
+					wsViews[i].endEditChart();
+					if (oThis.oApi.collaborativeEditing.getFast()) {
+						var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
+						if (oState) {
+							if (oState.Pos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+							}
+							if (oState.StartPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+							}
+							if (oState.EndPos) {
+								AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
 							}
 						}
-						wsViews[i].objectRender.controller.resetSelection();
 					}
+					wsViews[i].objectRender.controller.resetSelection();
 				}
-				oFormulaLocaleInfo.Parse = false;
-				oFormulaLocaleInfo.DigitSep = false;
-				History.Clear();
-				History.Create_NewPoint();
+			}
+			oFormulaLocaleInfo.Parse = false;
+			oFormulaLocaleInfo.DigitSep = false;
+			AscFonts.IsCheckSymbols = true;
+			History.Clear();
+			History.Create_NewPoint();
 
-				History.SetSelection(null);
-				History.SetSelectionRedo(null);
-				var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
-				History.UndoRedoPrepare(oRedoObjectParam, false);
-				var changesMine = [].concat.apply([], oThis.aCollaborativeActions);
-				oThis._forwardTransformation(oThis.snapshot, changesMine, aUndoRedoElems);
-				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
-				{
-					var item = aUndoRedoElems[i];
-					if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
-						if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"]) {
-							if (!window["native"]["CheckNextChange"]())
-								break;
-						}
-						// TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
-						//     item.oData.drawingData.bCollaborativeChanges = true;
-						History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+			History.SetSelection(null);
+			History.SetSelectionRedo(null);
+			var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
+			History.UndoRedoPrepare(oRedoObjectParam, false);
+			var changesMine = [].concat.apply([], oThis.aCollaborativeActions);
+			oThis._forwardTransformation(oThis.snapshot, changesMine, aUndoRedoElems);
+			for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
+			{
+				var item = aUndoRedoElems[i];
+				if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType) {
+					if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["CheckNextChange"]) {
+						if (!window["native"]["CheckNextChange"]())
+							break;
 					}
+					// TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
+					//     item.oData.drawingData.bCollaborativeChanges = true;
+					History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 				}
+			}
+			AscFonts.IsCheckSymbols = false;
+
+			window["Asc"]["editor"]._loadFonts(oFontMap, function(){
 				if(oThis.oApi.collaborativeEditing.getFast()){
 
 
