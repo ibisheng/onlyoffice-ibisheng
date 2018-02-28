@@ -6477,11 +6477,12 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 46 && false === isViewMode ) // Delete
         {
-            var oTargetTextObject = getTargetTextObject(this);
-            drawingObjectsController.remove(1);
-
-            if (!e.shiftKey)
-                bRetValue = true;
+			if (!e.shiftKey)
+			{
+				var oTargetTextObject = getTargetTextObject(this);
+				drawingObjectsController.remove(1);
+				bRetValue = true;
+			}
         }
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
         {
