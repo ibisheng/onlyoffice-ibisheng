@@ -5729,6 +5729,9 @@ function CNotesDrawer(page)
 
 	this.m_oTimerScrollSelect = -1;
 
+	this.IsEmptyDrawCheck = false;
+	this.IsEmptyDraw = false;
+
 	var oThis = this;
 
 	this.Init = function ()
@@ -5757,8 +5760,10 @@ function CNotesDrawer(page)
 		var ctx = element.getContext('2d');
 		ctx.clearRect(0, 0, element.width, element.height);
 
-		if (-1 == this.Slide)
+		if (-1 == this.Slide || this.IsEmptyDraw)
+		{
 			return;
+		}
 
 		var dKoef = g_dKoef_mm_to_pix;
 		if (this.HtmlPage.bIsRetinaSupport)
@@ -5806,6 +5811,13 @@ function CNotesDrawer(page)
 
 		if (window["NATIVE_EDITOR_ENJINE"])
 			return;
+
+		this.IsEmptyDraw = false;
+		if (this.HtmlPage.m_oApi.isReporterMode && this.IsEmptyDrawCheck && !this.HtmlPage.m_oLogicDocument.IsVisibleSlide(this.Slide))
+		{
+			height = 0;
+			this.IsEmptyDraw = true;
+		}
 
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
 		var settings = new AscCommon.ScrollSettings();
@@ -6044,11 +6056,13 @@ function CNotesDrawer(page)
 	{
 		if (this.HtmlPage.m_oLogicDocument)
 		{
+			var oldEmpty = this.IsEmptyDraw;
             if (!this.HtmlPage.m_oLogicDocument.Notes_OnResize())
 			{
 				this.OnRecalculateNote(this.Slide, this.Width, this.Height);
 				this.HtmlPage.m_oLogicDocument.RecalculateCurPos();
 			}
+			this.IsEmptyDraw = oldEmpty;
 		}
 	};
 
