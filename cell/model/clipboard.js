@@ -1385,7 +1385,7 @@
 					else
 					{
 						History.TurnOff();
-						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet, true);
 
 						var oTempDrawingDocument = worksheet.model.DrawingDocument;
 						var newCDocument = new CDocument(oTempDrawingDocument, false);
@@ -2152,7 +2152,7 @@
 				var drawingObject = graphicFrame;
 				
 				//вставляем табличку из презентаций
-				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
+				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws, true);
 				
 				var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
@@ -3292,7 +3292,7 @@
 		
 		
 		/** @constructor */
-		function pasteFromBinaryWord(clipboard, ws) 
+		function pasteFromBinaryWord(clipboard, ws, bFromPresentation)
 		{
 			this.aResult = new excelPasteContent();
 			
@@ -3304,6 +3304,8 @@
 			this.rowDiff = 0;//для обработки данных в ране, разделенных shift+enter
 			
 			this.paragraphText = "";
+			this.bFromPresentation = bFromPresentation;
+			this.prevTextPr = null;
 			
 			return this;
 		}
@@ -3419,6 +3421,7 @@
 			_parseParagraph: function (paragraph, row, col) {
 				this.paragraphText = "";
 
+				var t = this;
 				var content = paragraph.elem.Content;
 				var fontFamily = "Arial";
 				var text = null;
@@ -3511,6 +3514,31 @@
 				}
 
 
+				var parseMathArr = function (mathContent) {
+					if(!mathContent) {
+						return;
+					}
+
+					for (var i = 0; i < mathContent.length; i++) {
+						var elem = mathContent[i];
+
+						var newParaRunObj;
+						if (para_Math_Run === elem.Type) {
+							newParaRunObj = t._parseParaRun(elem, oNewItem, paraPr, innerCol, row, col, text);
+							innerCol = newParaRunObj.col;
+							row = newParaRunObj.row;
+						} else if (typeof(elem) === "string") {
+							var newParaRun = new ParaRun();
+							window['AscCommon'].addTextIntoRun(newParaRun, elem);
+							newParaRunObj = t._parseParaRun(newParaRun, oNewItem, paraPr, innerCol, row, col, text, t.prevTextPr);
+							innerCol = newParaRunObj.col;
+							row = newParaRunObj.row;
+						} else if (elem.length) {
+							parseMathArr(elem);
+						}
+					}
+				};
+
 				//проходимся по контенту paragraph
 				var paraRunObj;
 				for (var n = 0; n < content.length; n++) {
@@ -3559,20 +3587,27 @@
 						}
 						case para_Math://*para_Math*
 						{
-							var tempFonts = [];
-							content[n].Get_AllFontNames(tempFonts);
+							if (this.bFromPresentation) {
+								var mathTextContent = content[n].Root.GetTextContent();
+								if(mathTextContent) {
+									parseMathArr(mathTextContent.paraRunArr);
+								}
+							} else {
+								var tempFonts = [];
+								content[n].Get_AllFontNames(tempFonts);
 
-							for (var i in tempFonts) {
-								this.fontsNew[i] = 1;
-							}
+								for (var i in tempFonts) {
+									this.fontsNew[i] = 1;
+								}
 
-							if (!aResult.props.addImagesFromWord) {
-								aResult.props.addImagesFromWord = [];
-							}
-							aResult.props.addImagesFromWord.push({image: content[n], col: innerCol + col, row: row});
+								if (!aResult.props.addImagesFromWord) {
+									aResult.props.addImagesFromWord = [];
+								}
+								aResult.props.addImagesFromWord.push({image: content[n], col: innerCol + col, row: row});
 
-							if (null === this.isUsuallyPutImages) {
-								this._addImageToMap(content[n]);
+								if (null === this.isUsuallyPutImages) {
+									this._addImageToMap(content[n]);
+								}
 							}
 
 							break;
@@ -3584,20 +3619,21 @@
 				this.rowDiff += row - startRow;
 			},
 
-			_parseParaRun: function (paraRun, oNewItem, paraPr, innerCol, row, col, text) {
+			_parseParaRun: function (paraRun, oNewItem, paraPr, innerCol, row, col, text, prevTextPr) {
 				var t = this;
 				var paraRunContent = paraRun.Content;
 				var aResult = this.aResult;
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				var cloneNewItem, formatText;
 
-				var cTextPr = paraRun.Get_CompiledPr();
+				var cTextPr = prevTextPr ? prevTextPr : paraRun.Get_CompiledPr();
 				if (cTextPr && !(paraRunContent.length === 1 && paraRunContent[0] instanceof ParaEnd))//settings for text
 				{
 					formatText = this._getPrParaRun(paraPr, cTextPr);
 				} else if (!formatText) {
 					formatText = this._getPrParaRun(paraPr, cTextPr);
 				}
+				this.prevTextPr = cTextPr;
 
 				var pushData = function () {
 					t.fontsNew[paragraphFontFamily] = 1;
@@ -3621,7 +3657,13 @@
 				var cell;
 				for (var pR = 0; pR < paraRunContent.length; pR++) {
 					switch (paraRunContent[pR].Type) {
-						case para_Text://*paraText*
+						case para_Math_BreakOperator:
+						case para_Math_Text:
+						{
+							text += String.fromCharCode(paraRunContent[pR].value);
+							break;
+						}
+						case para_Text:
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
@@ -3683,7 +3725,7 @@
 					}
 				}
 
-				return {col: innerCol, row: row};
+				return {col: innerCol, row: row, prevTextPr: cTextPr};
 			},
 			
 			_addImageToMap: function(paraDrawing)
