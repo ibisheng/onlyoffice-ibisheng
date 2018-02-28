@@ -2014,6 +2014,34 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
     var t_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
     var r_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
     var b_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
+
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+            switch (oPen.algn)
+            {
+                case 1:
+                {
+                    break;
+                }
+                default:
+                {
+                    penW/=2.0;
+                    break;
+                }
+            }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
+    }
+
     _l = oRect.l + l_ins;
     _t = oRect.t + t_ins;
     _r = oRect.r - r_ins;
@@ -3512,6 +3540,32 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         r_ins = 2.54;
         t_ins = 1.27;
         b_ins = 1.27;
+    }
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+           switch (oPen.algn)
+           {
+               case 1:
+               {
+                   break;
+               }
+               default:
+               {
+                   penW/=2.0;
+                   break;
+               }
+           }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
     }
     var oRect = this.getTextRect();
     var w, h;

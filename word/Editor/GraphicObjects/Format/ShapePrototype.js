@@ -224,6 +224,10 @@ CShape.prototype.handleUpdateLn = function()
 {
     this.recalcLine();
     this.recalcPen();
+    this.recalcBounds();
+    this.recalcWrapPolygon();
+    this.recalcContent();
+    this.recalcTransformText();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateGeometry = function()
