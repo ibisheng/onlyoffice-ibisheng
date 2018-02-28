@@ -1557,6 +1557,10 @@
 	{
 		this.TabLeader = nTabLeader;
 	};
+	CTableOfContentsPr.prototype.get_TabLeader = function()
+	{
+		return this.TabLeader;
+	};
 	CTableOfContentsPr.prototype.get_StylesType = function()
 	{
 		return this.StylesType;

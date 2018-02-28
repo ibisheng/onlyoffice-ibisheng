@@ -1290,6 +1290,14 @@ CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
 {
 	return this.Content.GetAllContentControls(arrContentControls);
 };
+/**
+ * * Получаем класс, управляющий содержимым колонтитула
+ * @returns {CDocumentContent}
+ */
+CHeaderFooter.prototype.GetContent = function()
+{
+	return this.Content;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
