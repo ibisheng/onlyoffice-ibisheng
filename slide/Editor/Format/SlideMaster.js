@@ -759,12 +759,13 @@ function CMasterThumbnailDrawer()
         par.Pr = _paraPr;
         var parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr1);
-        parRun.AddText("A", 0);
+        parRun.AddText("A");
         par.Add_ToContent(0, parRun);
         parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr2);
-        parRun.AddText("a", 0);
+        parRun.AddText("a");
         par.Add_ToContent(1, parRun);
+        par.Reset(0, 0, 1000, 1000, 0, 0, 1);
 
         par.Recalculate_Page(0);
 

@@ -2778,7 +2778,7 @@ CPresentation.prototype =
             {
                 if(aComments[i].selected)
                 {
-                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(aComments[i].x, aComments[i].y, this.PageNum);
+                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR_Comment(aComments[i].x, aComments[i].y);
                     this.Api.sync_UpdateCommentPosition(aComments[i].Get_Id(), Coords.X, Coords.Y);
                     break;
                 }
