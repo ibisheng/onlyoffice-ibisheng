@@ -840,6 +840,17 @@ CDocumentContentElementBase.prototype.GetTableOfContents = function(isUnique, is
 {
 	return null;
 };
+/**
+ * Проверяем у родительского класса выделен ли только один элемент
+ * @returns {boolean}
+ */
+CDocumentContentElementBase.prototype.IsSelectedSingleElement = function()
+{
+	if (this.Parent)
+		return this.Parent.IsSelectedSingleElement();
+
+	return false;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

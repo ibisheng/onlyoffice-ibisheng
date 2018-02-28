@@ -4783,9 +4783,34 @@ CDocument.prototype.SetParagraphShd = function(Shd)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.SetParagraphStyle = function(Name)
+/**
+ * Выставляем стиль для выделенных параграфов
+ * @param {string} sName - название стиля
+ * @param {boolean} [isCheckLinkedStyle=false] - если true и если выделен текст внутри одного параграфа, то мы выставляем линкованный стиль текста, если он есть
+ */
+CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 {
-	this.Controller.SetParagraphStyle(Name);
+	if (isCheckLinkedStyle && this.IsSelectionUse())
+	{
+		var sStyleId = this.Styles.GetStyleIdByName(sName);
+		var oStyle   = this.Styles.Get(sStyleId);
+
+		var arrCurrentParagraphs = this.GetCurrentParagraph(false, true);
+		if (1 === arrCurrentParagraphs.length && arrCurrentParagraphs[0].IsSelectedSingleElement() && oStyle && oStyle.GetLink())
+		{
+			var oLinkedStyle = this.Styles.Get(oStyle.GetLink());
+			if (oLinkedStyle && styletype_Character === oLinkedStyle.GetType())
+			{
+				this.AddToParagraph(new ParaTextPr({RStyle : oLinkedStyle.GetId()}));
+				this.Recalculate();
+				this.Document_UpdateSelectionState();
+				this.Document_UpdateInterfaceState();
+				return;
+			}
+		}
+	}
+
+	this.Controller.SetParagraphStyle(sName);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();

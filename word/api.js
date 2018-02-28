@@ -3543,12 +3543,12 @@ background-repeat: no-repeat;\
 			fCallback();
 		}
 	};
-	asc_docs_api.prototype.put_Style    = function(name)
+	asc_docs_api.prototype.put_Style    = function(sName)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphStyle);
-			this.WordControl.m_oLogicDocument.SetParagraphStyle(name);
+			this.WordControl.m_oLogicDocument.SetParagraphStyle(sName, true);
 		}
 	};
 

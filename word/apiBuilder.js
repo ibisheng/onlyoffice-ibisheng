@@ -1229,7 +1229,7 @@
     ApiDocument.prototype.GetStyle = function(sStyleName)
     {
         var oStyles  = this.Document.Get_Styles();
-        var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
+        var oStyleId = oStyles.GetStyleIdByName(sStyleName, true);
         return new ApiStyle(oStyles.Get(oStyleId));
     };
     /**
@@ -1258,7 +1258,7 @@
 
         // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
         // чтобы если были ссылки на старый стиль - теперь они стали на новый.
-        var sOldId    = oStyles.Get_StyleIdByName(sStyleName, false);
+        var sOldId    = oStyles.GetStyleIdByName(sStyleName);
         var oOldStyle = oStyles.Get(sOldId);
         if (null != sOldId && oOldStyle)
         {

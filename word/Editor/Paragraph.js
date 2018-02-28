@@ -12301,7 +12301,7 @@ Paragraph.prototype.SetParagraphStyle = function(Name)
 	if (!this.LogicDocument)
 		return;
 
-	var StyleId = this.LogicDocument.Get_Styles().Get_StyleIdByName(Name);
+	var StyleId = this.LogicDocument.Get_Styles().GetStyleIdByName(Name, true);
 	this.Style_Add(StyleId);
 };
 Paragraph.prototype.SetParagraphStyleById = function(sStyleId)

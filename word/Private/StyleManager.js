@@ -117,7 +117,7 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
  */
 CDocument.prototype.Remove_Style = function(sStyleName)
 {
-    var StyleId = this.Styles.Get_StyleIdByName(sStyleName, false);
+    var StyleId = this.Styles.GetStyleIdByName(sStyleName);
     // Сначала проверим есть ли стиль с таким именем
     if (null == StyleId)
         return;
@@ -163,7 +163,7 @@ CDocument.prototype.Is_DefaultStyleChanged = function(sName)
 CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 {
 	var sStyleName = oAscStyle.get_Name();
-	var sStyleId   = this.Get_StyleIdByName(sStyleName, false);
+	var sStyleId   = this.GetStyleIdByName(sStyleName);
 	if (null !== sStyleId)
 	{
 		var oStyle = this.Style[sStyleId];
@@ -171,8 +171,8 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 		var NewStyleParaPr = oAscStyle.get_ParaPr();
 		var NewStyleTextPr = oAscStyle.get_TextPr();
 
-		var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
-		var NextId    = this.Get_StyleIdByName(oAscStyle.get_Next(), false);
+		var BasedOnId = this.GetStyleIdByName(oAscStyle.get_BasedOn());
+		var NextId    = this.GetStyleIdByName(oAscStyle.get_Next());
 
 		oStyle.Set_Type(oAscStyle.get_Type());
 
@@ -216,9 +216,9 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 	{
 		var oStyle = new CStyle();
 
-		var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
+		var BasedOnId = this.GetStyleIdByName(oAscStyle.get_BasedOn());
 		oStyle.Set_BasedOn(BasedOnId);
-		oStyle.Set_Next(this.Get_StyleIdByName(oAscStyle.get_Next(), false));
+		oStyle.Set_Next(this.GetStyleIdByName(oAscStyle.get_Next()));
 		oStyle.Set_Type(oAscStyle.get_Type());
 		oStyle.Set_TextPr(oAscStyle.get_TextPr());
 		oStyle.Set_ParaPr(oAscStyle.get_ParaPr());
@@ -273,47 +273,47 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
     else if (StyleId == this.Default.Headings[0])
     {
         Style.Clear("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading1();
+        Style.CreateHeading(0);
     }
     else if (StyleId == this.Default.Headings[1])
     {
         Style.Clear("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading2();
+        Style.CreateHeading(1);
     }
     else if (StyleId == this.Default.Headings[2])
     {
         Style.Clear("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading3();
+        Style.CreateHeading(2);
     }
     else if (StyleId == this.Default.Headings[3])
     {
         Style.Clear("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading4();
+        Style.CreateHeading(3);
     }
     else if (StyleId == this.Default.Headings[4])
     {
         Style.Clear("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading5();
+        Style.CreateHeading(4);
     }
     else if (StyleId == this.Default.Headings[5])
     {
         Style.Clear("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading6();
+        Style.CreateHeading(5);
     }
     else if (StyleId == this.Default.Headings[6])
     {
         Style.Clear("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading7();
+        Style.CreateHeading(6);
     }
     else if (StyleId == this.Default.Headings[7])
     {
         Style.Clear("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading8();
+        Style.CreateHeading(7);
     }
     else if (StyleId == this.Default.Headings[8])
     {
         Style.Clear("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading9();
+        Style.CreateHeading(8);
     }
     else if (StyleId == this.Default.ParaList)
     {
@@ -390,7 +390,7 @@ CStyles.prototype.Remove_AllCustomStylesFromInterface = function()
 };
 CStyles.prototype.Is_StyleDefault = function(sStyleName)
 {
-    var StyleId = this.Get_StyleIdByName(sStyleName, false);
+    var StyleId = this.GetStyleIdByName(sStyleName);
     if (null === StyleId)
         return false;
 
@@ -428,7 +428,7 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     if (true != this.Is_StyleDefault(sStyleName))
         return false;
 
-    var StyleId = this.Get_StyleIdByName(sStyleName, false);
+    var StyleId = this.GetStyleIdByName(sStyleName);
     if (null === StyleId)
         return false;
 
@@ -464,47 +464,47 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     else if (StyleId == this.Default.Headings[0])
     {
         Style.Clear("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading1();
+        Style.CreateHeading(0);
     }
     else if (StyleId == this.Default.Headings[1])
     {
         Style.Clear("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading2();
+        Style.CreateHeading(1);
     }
     else if (StyleId == this.Default.Headings[2])
     {
         Style.Clear("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading3();
+        Style.CreateHeading(2);
     }
     else if (StyleId == this.Default.Headings[3])
     {
         Style.Clear("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading4();
+        Style.CreateHeading(3);
     }
     else if (StyleId == this.Default.Headings[4])
     {
         Style.Clear("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading5();
+        Style.CreateHeading(4);
     }
     else if (StyleId == this.Default.Headings[5])
     {
         Style.Clear("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading6();
+        Style.CreateHeading(5);
     }
     else if (StyleId == this.Default.Headings[6])
     {
         Style.Clear("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading7();
+        Style.CreateHeading(6);
     }
     else if (StyleId == this.Default.Headings[7])
     {
         Style.Clear("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading8();
+        Style.CreateHeading(7);
     }
     else if (StyleId == this.Default.Headings[8])
     {
         Style.Clear("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
-        Style.Create_Heading9();
+        Style.CreateHeading(8);
     }
     else if (StyleId == this.Default.ParaList)
     {
