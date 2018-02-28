@@ -8540,10 +8540,10 @@ function BinaryPPTYLoader()
                                         if (_run.hlink.tooltip) {
                                           hyperlink.SetToolTip(_run.hlink.tooltip);
                                         }
-                                        if(!_run.Unifill)
-                                        {
-                                            _run.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
-                                        }
+                                        // if(!_run.Unifill)
+                                        // {
+                                        //     _run.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
+                                        // }
                                         _run.Underline = true;
                                     }
                                     text_pr.Set_FromObject(_run);
