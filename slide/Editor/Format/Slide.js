@@ -1369,12 +1369,8 @@ Slide.prototype =
         AscCommon.IsShapeToImageConverter = true;
 
         var dKoef = AscCommon.g_dKoef_mm_to_pix;
-        var w_mm = 210;
-        var h_mm = 297;
-        var w_px = (w_mm * dKoef) >> 0;
-        var h_px = (h_mm * dKoef) >> 0;
-        var _need_pix_width     = this.Width*dKoef;
-        var _need_pix_height    = this.Height*dKoef;
+        var _need_pix_width     = ((this.Width*dKoef/3.0 + 0.5) >> 0);
+        var _need_pix_height    = ((this.Height*dKoef/3.0 + 0.5) >> 0);
 
         if (_need_pix_width <= 0 || _need_pix_height <= 0)
             return null;
@@ -1400,7 +1396,7 @@ Slide.prototype =
         var _ctx = _canvas.getContext('2d');
 
         var g = new AscCommon.CGraphics();
-        g.init(_ctx, w_px, h_px, w_mm, h_mm);
+        g.init(_ctx, _need_pix_width, _need_pix_height, this.Width, this.Height);
         g.m_oFontManager = AscCommon.g_fontManager;
 
         g.m_oCoordTransform.tx = 0.0;

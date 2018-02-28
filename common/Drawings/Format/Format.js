@@ -4761,6 +4761,18 @@ DefaultShapeDefinition.prototype=
         return this.Id;
     },
 
+
+    Write_ToBinary2: function (w)
+    {
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function (r)
+    {
+        this.Id = r.GetString2();
+    },
+
     Refresh_RecalcData: function()
     {},
     getObjectType: function()
