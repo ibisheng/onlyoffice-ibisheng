@@ -4181,22 +4181,26 @@ CPresentation.prototype =
                 var by_types = this.Slides[this.CurPage].graphicObjects.getSelectedObjectsByTypes(true);
                 if(by_types.tables.length === 1)
                 {
-                    by_types.tables[0].Set_CurrentElement();
-                    if(!(bAll === true))
+                    if(Function !== CTable.prototype.DistributeTableCells)
                     {
-                        if(bBefore)
+                        by_types.tables[0].Set_CurrentElement();
+                        if(!(bAll === true))
                         {
-                            by_types.tables[0].graphicObject.MoveCursorToStartPos();
+                            if(bBefore)
+                            {
+                                by_types.tables[0].graphicObject.MoveCursorToStartPos();
+                            }
+                            else
+                            {
+                                by_types.tables[0].graphicObject.MoveCursorToStartPos();
+                            }
                         }
                         else
                         {
-                            by_types.tables[0].graphicObject.MoveCursorToStartPos();
+                            by_types.tables[0].graphicObject.SelectAll();
                         }
                     }
-                    else
-                    {
-                        by_types.tables[0].graphicObject.SelectAll();
-                    }
+
                     result = Function.apply(by_types.tables[0].graphicObject, args);
                     if(by_types.tables[0].graphicObject.Content.length === 0)
                     {
