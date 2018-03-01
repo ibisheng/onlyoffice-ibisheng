@@ -398,7 +398,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 	if (undefined !== Item.Parent)
 		Item.Parent = this;
 
-	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
 		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
