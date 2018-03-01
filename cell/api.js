@@ -1319,7 +1319,7 @@ var editor;
   spreadsheet_api.prototype._onSaveChanges = function(recalcIndexColumns, recalcIndexRows) {
     if (this.isDocumentLoadComplete) {
       var arrChanges = this.wbModel.SerializeHistory();
-      var deleteIndex = History.Get_DeleteIndex();
+      var deleteIndex = History.GetDeleteIndex();
       var excelAdditionalInfo = null;
       if (this.collaborativeEditing.getCollaborativeEditing()) {
         // Пересчетные индексы добавляем только если мы не одни

@@ -1259,6 +1259,23 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 	return null;
 };
+	/**
+	 * Получаем сколько изменений в истории уже сохранено на сервере на данный момент с учетом текущей точки в истории
+	 * @returns {number}
+	 */
+	CHistory.prototype.GetDeleteIndex = function()
+	{
+		if (null === this.SavedIndex)
+			return null;
+
+		var nSum = 0;
+		for (var nPointIndex = 0, nLastPoint = Math.min(this.SavedIndex, this.Index); nPointIndex <= nLastPoint; ++nPointIndex)
+		{
+			nSum += this.Points[nPointIndex].Items.length;
+		}
+
+		return nSum;
+	};
 
 function CRC32()
 {

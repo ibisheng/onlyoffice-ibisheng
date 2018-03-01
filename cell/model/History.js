@@ -867,7 +867,7 @@ CHistory.prototype.Set_SavedIndex = function(Index) {
   }
 };
 /** @returns {number|null} */
-CHistory.prototype.Get_DeleteIndex = function () {
+CHistory.prototype.GetDeleteIndex = function () {
 	var DeletePointIndex = null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
 	if (null === DeletePointIndex)
 		return null;
