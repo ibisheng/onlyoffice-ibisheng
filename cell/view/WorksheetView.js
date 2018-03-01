@@ -8849,15 +8849,15 @@
 		}
     };
 
-    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
+    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
 		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 		var specialPasteProps = specialPasteHelper.specialPasteProps;
 		
 		//paste from excel binary
-		if(fromBinary)
+		if(fromBinaryExcel)
 		{
-			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
+			t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
 		}
 		else
 		{
@@ -8870,11 +8870,12 @@
 				if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
 				{
 					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
+					var oImageMap;
 
 					//if already load images on server
 					if ( AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true ) 
 					{
-						var oImageMap = {};
+						oImageMap = {};
 						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
 						{
 							var url = oObjectsForDownload.aUrls[i];
@@ -8898,43 +8899,36 @@
 							}
 						}
 						
-						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+						t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
 						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 						
 						isEndTransaction = true;
 					}
 					else 
 					{
+						oImageMap = pasteContent.props.oImageMap;
 						if(window["NATIVE_EDITOR_ENJINE"])
 						{
-							var oImageMap = {};
-							
+							//TODO для мобильных приложений  - не рабочий код!
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+							t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
 							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 							
 							isEndTransaction = true;
 						}
 						else
 						{
-							AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
-								var oImageMap = {};
-								
-								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-								AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-								
-								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-								History.EndTransaction();
-								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
-							}, true );
+							t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
+							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+
+							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+							isEndTransaction = true;
 						}
-						
 					}
 				}
 				else
 				{
-					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+					t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
 					isEndTransaction = true;
 				}
 

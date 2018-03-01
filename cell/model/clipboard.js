@@ -1114,8 +1114,6 @@
 			this.activeRange = null;
 			this.alreadyLoadImagesOnServer = false;
 			
-			this.oSpecialPaste = {};
-			
 			this.fontsNew = {};
 			this.oImages = {};
 		}
@@ -3317,6 +3315,7 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
+				var t = this;
 				
 				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
 				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
@@ -3324,8 +3323,7 @@
 				{
 					cDocument.Content = documentContent;
 				}
-				
-				var activeRange = worksheet.model.selectionRange.getLast().clone();
+
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				
@@ -3351,8 +3349,29 @@
 				this.aResult.props.cellCount = coverDocument.width;
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
 				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
-				
-				worksheet.setSelectionInfo('paste', {data: this.aResult});
+
+
+				//TODO alreadyLoadImagesOnServer - пересмотреть
+				//alreadyLoadImagesOnServer - флаг используется для загрузки изображений из html
+				//грузим картинки для вствки из документов(если это необходимо)
+				//в данный момент в worksheetView не грузятся изображения
+				var specialPasteProps = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
+				var aImagesToDownload = this.aResult.props._images;
+				if(!this.clipboard.alreadyLoadImagesOnServer && aImagesToDownload !== null && (!specialPasteProps || (specialPasteProps && specialPasteProps.images)))//load to server
+				{
+					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( t.aResult.props._aPastedImages );
+					var api = window["Asc"]["editor"];
+					var oImageMap = {};
+					AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+						t.aResult.props.oImageMap = oImageMap;
+						worksheet.setSelectionInfo('paste', {data: t.aResult});
+					}, true );
+				}
+				else
+				{
+					worksheet.setSelectionInfo('paste', {data: t.aResult});
+				}
 			},
 			
 			_parseChildren: function(children)
