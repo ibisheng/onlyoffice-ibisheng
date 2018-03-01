@@ -932,7 +932,6 @@ var editor;
     for (var i in fonts)
       arrLoadFonts.push(new AscFonts.CFont(i, 0, "", 0));
     AscFonts.FontPickerByCharacter.extendFonts(arrLoadFonts);
-    History.loadFonts(arrLoadFonts);
     this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
   };
 

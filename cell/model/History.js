@@ -46,7 +46,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Workbook_SheetRemove = 2;
 	window['AscCH'].historyitem_Workbook_SheetMove = 3;
 	window['AscCH'].historyitem_Workbook_ChangeColorScheme = 5;
-	window['AscCH'].historyitem_Workbook_AddFont = 6;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 7;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChangeUndo = 8;
 
@@ -160,8 +159,6 @@ function CHistory()
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
 	this.LastState = null;
-	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
-	this.HasLoadFonts = false;
 	this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
@@ -189,8 +186,6 @@ CHistory.prototype.Clear = function()
 	this.Points.length = 0;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
-	this.LoadFonts = {};
-	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;
   this.ForceSave= false;
@@ -688,8 +683,6 @@ CHistory.prototype.Create_NewPoint = function()
 
     // Удаляем ненужные точки
     this.Points.length = this.Index + 1;
-
-	this._addFonts(true);
 };
 
 // Регистрируем новое изменение:
@@ -909,25 +902,6 @@ CHistory.prototype.GetSerializeArray = function()
 		aRes.push(aPointChanges);
 	}
 	return aRes;
-};
-CHistory.prototype.loadFonts = function (fonts) {
-    for (var i = 0; i < fonts.length; ++i) {
-		this.LoadFonts[fonts[i].name] = 1;
-		this.HasLoadFonts = true;
-	}
-	this._addFonts(false);
-};
-CHistory.prototype._addFonts = function (isCreateNew) {
-	// Если мы начали транзакцию или мы только создаем точку, то можно добавлять
-	if (this.HasLoadFonts && (isCreateNew || !this.IsEndTransaction())) {
-		var arrFonts = [];
-		for (var i in this.LoadFonts)
-			arrFonts.push(i);
-		this.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_AddFont, null, null, new AscCommonExcel.UndoRedoData_SingleProperty(arrFonts));
-
-		this.LoadFonts = {};
-		this.HasLoadFonts = false;
-	}
 };
 CHistory.prototype._CheckCanNotAddChanges = function () {
     try {

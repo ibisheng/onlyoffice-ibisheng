@@ -2234,8 +2234,6 @@
 			var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
 			stream.obj = pointer.obj;
 			var nCurOffset = 0;
-			//пробегаемся первый раз чтобы заполнить oFontMap
-			var oFontMap = {};//собираем все шрифтры со всех изменений
 			var aUndoRedoElems = [];
 			for (i = 0; i < length; ++i) {
 				sChange = aChanges[i];
@@ -2243,10 +2241,6 @@
 				nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
 				var item = new UndoRedoItemSerializable();
 				item.Deserialize(stream);
-				if (AscCommonExcel.g_oUndoRedoWorkbook == item.oClass && AscCH.historyitem_Workbook_AddFont == item.nActionType) {
-					for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
-						oFontMap[item.oData.elem[k]] = 1;
-				}
 				aUndoRedoElems.push(item);
 			}
 			var wsViews = window["Asc"]["editor"].wb.wsViews;
@@ -2301,6 +2295,7 @@
 			}
 			AscFonts.IsCheckSymbols = false;
 
+			var oFontMap = this._generateFontMap();
 			window["Asc"]["editor"]._loadFonts(oFontMap, function(){
 				if(oThis.oApi.collaborativeEditing.getFast()){
 
