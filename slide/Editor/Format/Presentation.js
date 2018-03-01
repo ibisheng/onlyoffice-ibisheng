@@ -681,6 +681,7 @@ function CPresentation(DrawingDocument)
 
     this.comments = new SlideComments(this);
 
+	this.CheckLanguageOnTextAdd = false;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -3857,7 +3858,9 @@ CPresentation.prototype =
             {
                 target_doc_content1 = oController.getTargetDocContent();
             }
+			this.CheckLanguageOnTextAdd = true;
             this.AddToParagraph(new ParaText(Code), false, true);
+			this.CheckLanguageOnTextAdd = false;
             if(oController)
             {
                 target_doc_content2 = oController.getTargetDocContent();
