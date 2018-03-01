@@ -1618,6 +1618,7 @@
 						undoRange = curFilter.SortState.SortConditions[0].Ref;
 
 						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
 
