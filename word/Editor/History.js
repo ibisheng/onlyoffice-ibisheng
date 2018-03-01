@@ -1276,6 +1276,41 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 		return nSum;
 	};
+	/**
+	 * Удаляем изменения из истории, которые сохранены на сервере. Это происходит при подключении второго пользователя
+	 */
+	CHistory.prototype.RemovePointsByDeleteIndex = function()
+	{
+		var nDeleteIndex = this.GetDeleteIndex();
+		if (null === nDeleteIndex)
+			return;
+
+		while (nDeleteIndex > 0 && this.Points.length > 0)
+		{
+			var oPoint = this.Points[0];
+
+			if (oPoint.Items.length > nDeleteIndex)
+			{
+				oPoint.Items.splice(0, nDeleteIndex);
+				nDeleteIndex = 0;
+			}
+			else
+			{
+				nDeleteIndex -= this.Points[0].Items.length;
+
+				this.Points.splice(0, 1);
+
+				if (this.Index >= 0)
+					this.Index--;
+
+				if (this.RecIndex >= 0)
+					this.Index--;
+
+				if (null !== this.SavedIndex && this.SavedIndex >= 0)
+					this.SavedIndex--;
+			}
+		}
+	};
 
 function CRC32()
 {
