@@ -4801,7 +4801,9 @@ CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 			var oLinkedStyle = this.Styles.Get(oStyle.GetLink());
 			if (oLinkedStyle && styletype_Character === oLinkedStyle.GetType())
 			{
-				this.AddToParagraph(new ParaTextPr({RStyle : oLinkedStyle.GetId()}));
+				var oTextPr = new CTextPr();
+				oTextPr.Set_FromObject({RStyle : oLinkedStyle.GetId()}, true);
+				arrCurrentParagraphs[0].Apply_TextPr(oTextPr);
 				this.Recalculate();
 				this.Document_UpdateSelectionState();
 				this.Document_UpdateInterfaceState();

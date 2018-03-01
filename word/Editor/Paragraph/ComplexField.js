@@ -467,7 +467,7 @@ CComplexField.prototype.private_UpdateTOC = function()
 				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
 				SkipColumnBreak : true
 			});
-			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false, true);
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 
 
 			var oClearTextPr = new CTextPr();

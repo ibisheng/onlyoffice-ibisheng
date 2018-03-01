@@ -39,10 +39,11 @@
 
 /**
  * Класс представляющий собой настройки текста (сейчас используется как настройка текста для конца параграфа)
+ * @param oProps
  * @constructor
  * @extends {CRunElementBase}
  */
-function ParaTextPr(Props)
+function ParaTextPr(oProps)
 {
 	CRunElementBase.call(this);
 
@@ -57,10 +58,8 @@ function ParaTextPr(Props)
 	this.Height       = 0;
 	this.WidthVisible = 0;
 
-	if ("object" == typeof(Props))
-	{
-		this.Value.Set_FromObject(Props);
-	}
+	if (oProps)
+		this.Value.Set_FromObject(oProps);
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);

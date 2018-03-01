@@ -120,6 +120,11 @@ function IsEqualNullableFloatNumbers(nNum1, nNum2)
 	return Math.abs(nNum1 - nNum2) < 0.001;
 }
 
+function CheckUndefinedToNull(isConvert, Value)
+{
+	return (true === isConvert && undefined === Value ? null : Value);
+}
+
 function CTableStylePr()
 {
     this.TextPr      = new CTextPr();
@@ -7048,54 +7053,58 @@ CRFonts.prototype =
         this.Hint = fonthint_Default;
     },
 
-    Set_FromObject : function(RFonts)
-    {
-        if ( undefined != RFonts.Ascii )
-        {
-            this.Ascii =
-            {
-                Name  : RFonts.Ascii.Name,
-                Index : RFonts.Ascii.Index
-            };
-        }
-        else
-            this.Ascii = undefined;
+    Set_FromObject : function(RFonts, isUndefinedToNull)
+	{
+		if (undefined != RFonts.Ascii)
+		{
+			this.Ascii = {
+				Name  : RFonts.Ascii.Name,
+				Index : RFonts.Ascii.Index
+			};
+		}
+		else
+		{
+			this.Ascii = isUndefinedToNull ? null : undefined;
+		}
 
-        if ( undefined != RFonts.EastAsia )
-        {
-            this.EastAsia =
-            {
-                Name  : RFonts.EastAsia.Name,
-                Index : RFonts.EastAsia.Index
-            };
-        }
-        else
-            this.EastAsia = undefined;
+		if (undefined != RFonts.EastAsia)
+		{
+			this.EastAsia = {
+				Name  : RFonts.EastAsia.Name,
+				Index : RFonts.EastAsia.Index
+			};
+		}
+		else
+		{
+			this.EastAsia = isUndefinedToNull ? null : undefined;
+		}
 
-        if ( undefined != RFonts.HAnsi )
-        {
-            this.HAnsi =
-            {
-                Name  : RFonts.HAnsi.Name,
-                Index : RFonts.HAnsi.Index
-            };
-        }
-        else
-            this.HAnsi = undefined;
+		if (undefined != RFonts.HAnsi)
+		{
+			this.HAnsi = {
+				Name  : RFonts.HAnsi.Name,
+				Index : RFonts.HAnsi.Index
+			};
+		}
+		else
+		{
+			this.HAnsi = isUndefinedToNull ? null : undefined;
+		}
 
-        if ( undefined != RFonts.CS )
-        {
-            this.CS =
-            {
-                Name  : RFonts.CS.Name,
-                Index : RFonts.CS.Index
-            };
-        }
-        else
-            this.CS = undefined;
+		if (undefined != RFonts.CS)
+		{
+			this.CS = {
+				Name  : RFonts.CS.Name,
+				Index : RFonts.CS.Index
+			};
+		}
+		else
+		{
+			this.CS = isUndefinedToNull ? null : undefined;
+		}
 
-        this.Hint = RFonts.Hint;
-    },
+		this.Hint = CheckUndefinedToNull(isUndefinedToNull, RFonts.Hint);
+	},
 
     Compare : function(RFonts)
     {
@@ -7256,12 +7265,12 @@ CLang.prototype =
         this.Val      = lcid_enUS;
     },
 
-    Set_FromObject : function(Lang)
-    {
-        this.Bidi     = Lang.Bidi;
-        this.EastAsia = Lang.EastAsia;
-        this.Val      = Lang.Val;
-    },
+    Set_FromObject : function(Lang, isUndefinedToNull)
+	{
+		this.Bidi     = CheckUndefinedToNull(isUndefinedToNull, Lang.Bidi);
+		this.EastAsia = CheckUndefinedToNull(isUndefinedToNull, Lang.EastAsia);
+		this.Val      = CheckUndefinedToNull(isUndefinedToNull, Lang.Val);
+	},
 
     Compare : function(Lang)
     {
@@ -7634,98 +7643,81 @@ CTextPr.prototype =
         this.TextFill    = undefined;
     },
 
-    Set_FromObject : function(TextPr)
-    {
-        this.Bold      = TextPr.Bold;
-        this.Italic    = TextPr.Italic;
-        this.Strikeout = TextPr.Strikeout;
-        this.Underline = TextPr.Underline;
+    Set_FromObject : function(TextPr, isUndefinedToNull)
+	{
+		this.Bold      = CheckUndefinedToNull(isUndefinedToNull, TextPr.Bold);
+		this.Italic    = CheckUndefinedToNull(isUndefinedToNull, TextPr.Italic);
+		this.Strikeout = CheckUndefinedToNull(isUndefinedToNull, TextPr.Strikeout);
+		this.Underline = CheckUndefinedToNull(isUndefinedToNull, TextPr.Underline);
 
-        if ( undefined != TextPr.FontFamily )
-        {
-            this.FontFamily = {};
-            this.FontFamily.Name  = TextPr.FontFamily.Name;
-            this.FontFamily.Index = TextPr.FontFamily.Index;
-        }
-        else
-            this.FontFamily = undefined;
+		if (undefined !== TextPr.FontFamily)
+		{
+			this.FontFamily       = {};
+			this.FontFamily.Name  = TextPr.FontFamily.Name;
+			this.FontFamily.Index = TextPr.FontFamily.Index;
+		}
+		else
+		{
+			if (isUndefinedToNull)
+				this.FontFamily = null;
+			else
+				this.FontFamily = undefined;
+		}
 
-        this.FontSize   = TextPr.FontSize;
+		this.FontSize = CheckUndefinedToNull(isUndefinedToNull, TextPr.FontSize);
 
 		if (null === TextPr.Color || undefined === TextPr.Color)
-			this.Color = TextPr.Color;
+			this.Color = CheckUndefinedToNull(isUndefinedToNull, TextPr.Color);
 		else
 			this.Color = new CDocumentColor(TextPr.Color.r, TextPr.Color.g, TextPr.Color.b, TextPr.Color.Auto);
 
-        this.VertAlign = TextPr.VertAlign;
+		this.VertAlign = CheckUndefinedToNull(isUndefinedToNull, TextPr.VertAlign);
 
 		if (undefined === TextPr.HighLight || null === TextPr.HighLight)
-			this.HighLight = undefined;
+			this.HighLight = CheckUndefinedToNull(isUndefinedToNull, undefined);
 		else if (highlight_None === TextPr.HighLight)
 			this.HighLight = highlight_None;
 		else
 			this.HighLight = new CDocumentColor(TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b);
 
-		this.RStyle     = TextPr.RStyle;
-		this.Spacing    = TextPr.Spacing;
-		this.DStrikeout = TextPr.DStrikeout;
-		this.Caps       = TextPr.Caps;
-		this.SmallCaps  = TextPr.SmallCaps;
-		this.Position   = TextPr.Position;
+		this.RStyle     = CheckUndefinedToNull(isUndefinedToNull, TextPr.RStyle);
+		this.Spacing    = CheckUndefinedToNull(isUndefinedToNull, TextPr.Spacing);
+		this.DStrikeout = CheckUndefinedToNull(isUndefinedToNull, TextPr.DStrikeout);
+		this.Caps       = CheckUndefinedToNull(isUndefinedToNull, TextPr.Caps);
+		this.SmallCaps  = CheckUndefinedToNull(isUndefinedToNull, TextPr.SmallCaps);
+		this.Position   = CheckUndefinedToNull(isUndefinedToNull, TextPr.Position);
 
-        if ( undefined != TextPr.RFonts )
-            this.RFonts.Set_FromObject( TextPr.RFonts );
+		if (undefined !== TextPr.RFonts)
+			this.RFonts.Set_FromObject(TextPr.RFonts, isUndefinedToNull);
 
-        this.BoldCS       = TextPr.BoldCS;
-        this.ItalicCS     = TextPr.ItalicCS;
-        this.FontSizeCS   = TextPr.FontSizeCS;
-        this.CS           = TextPr.CS;
-        this.RTL          = TextPr.RTL;
+		this.BoldCS     = CheckUndefinedToNull(isUndefinedToNull, TextPr.BoldCS);
+		this.ItalicCS   = CheckUndefinedToNull(isUndefinedToNull, TextPr.ItalicCS);
+		this.FontSizeCS = CheckUndefinedToNull(isUndefinedToNull, TextPr.FontSizeCS);
+		this.CS         = CheckUndefinedToNull(isUndefinedToNull, TextPr.CS);
+		this.RTL        = CheckUndefinedToNull(isUndefinedToNull, TextPr.RTL);
 
-        if ( undefined != TextPr.Lang )
-            this.Lang.Set_FromObject( TextPr.Lang );
+		if (undefined !== TextPr.Lang)
+			this.Lang.Set_FromObject(TextPr.Lang, isUndefinedToNull);
 
-        if ( undefined != TextPr.Unifill )
-            this.Unifill =  TextPr.Unifill ;
+		if (undefined !== TextPr.Shd)
+		{
+			this.Shd = new CDocumentShd();
+			this.Shd.Set_FromObject(TextPr.Shd);
+		}
+		else
+		{
+			this.Shd = undefined;
+		}
 
-        if( undefined != TextPr.FontRef )
-        {
-            this.FontRef = TextPr.FontRef;
-        }
-        
-        if ( undefined !== TextPr.Shd )
-        {
-            this.Shd = new CDocumentShd();
-            this.Shd.Set_FromObject( TextPr.Shd );
-        }
-        else
-            this.Shd = undefined;
-        
-        this.Vanish   = TextPr.Vanish;
-
-
-        if(undefined != TextPr.TextFill)
-        {
-            this.TextFill = TextPr.TextFill;
-        }
-
-        if(undefined != TextPr.TextOutline)
-        {
-            this.TextOutline = TextPr.TextOutline;
-        }
-        if(undefined != TextPr.AscFill)
-        {
-            this.AscFill = TextPr.AscFill;
-        }
-        if(undefined != TextPr.AscUnifill)
-        {
-            this.AscUnifill = TextPr.AscUnifill;
-        }
-        if(undefined != TextPr.AscLine)
-        {
-            this.AscLine = TextPr.AscLine;
-        }
-    },
+		this.Vanish      = CheckUndefinedToNull(isUndefinedToNull, TextPr.Vanish);
+		this.Unifill     = CheckUndefinedToNull(isUndefinedToNull, TextPr.Unifill);
+		this.FontRef     = CheckUndefinedToNull(isUndefinedToNull, TextPr.FontRef);
+		this.TextFill    = CheckUndefinedToNull(isUndefinedToNull, TextPr.TextFill);
+		this.TextOutline = CheckUndefinedToNull(isUndefinedToNull, TextPr.TextOutline);
+		this.AscFill     = CheckUndefinedToNull(isUndefinedToNull, TextPr.AscFill);
+		this.AscUnifill  = CheckUndefinedToNull(isUndefinedToNull, TextPr.AscUnifill);
+		this.AscLine     = CheckUndefinedToNull(isUndefinedToNull, TextPr.AscLine);
+	},
 
     Check_PresentationPr: function()
     {

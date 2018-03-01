@@ -8259,7 +8259,7 @@ Paragraph.prototype.Style_Get = function()
 
 	return undefined;
 };
-Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteTextProps)
+Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 {
 	this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
@@ -8310,20 +8310,6 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteText
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Left);
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Right);
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Top);
-
-		// При изменении стиля убираются только те текстовые настроки внутри параграфа,
-		// которые присутствуют в стиле. Пока мы удалим вообще все настроки.
-		// TODO : переделать
-
-		if (true !== bDoNotDeleteTextProps)
-		{
-			for (var Index = 0; Index < this.Content.length; Index++)
-			{
-				this.Content[Index].Clear_TextPr();
-			}
-		}
-
-		this.TextPr.Clear_Style();
 	}
 };
 /**
