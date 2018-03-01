@@ -7676,7 +7676,7 @@ DrawingObjectsController.prototype =
 
     getDrawingPropsFromArray: function(drawings)
     {
-        var image_props, shape_props, chart_props, table_props, new_image_props, new_shape_props, new_chart_props, new_table_props, shape_chart_props, locked;
+        var image_props, shape_props, chart_props, table_props = undefined, new_image_props, new_shape_props, new_chart_props, new_table_props, shape_chart_props, locked;
         var drawing;
         for(var i = 0; i < drawings.length; ++i)
         {
@@ -7964,9 +7964,9 @@ DrawingObjectsController.prototype =
                 }
                 case AscDFH.historyitem_type_GraphicFrame:
                 {
-                    new_table_props = drawing.graphicObject.Get_Props();
-                    if(!table_props)
+                    if(table_props === undefined)
                     {
+                        new_table_props = drawing.graphicObject.Get_Props();
                         table_props = new_table_props;
                         new_table_props.Locked = locked;
                         if(new_table_props.CellsBackground)
