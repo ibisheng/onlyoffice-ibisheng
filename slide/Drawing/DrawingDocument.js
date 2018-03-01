@@ -3769,6 +3769,12 @@ function CThumbnailsManager()
 				oThis.m_oWordControl.GoToPage(pos.Page);
 				oThis.SelectPageEnabled = true;
 
+				if (oThis.m_oWordControl.m_oNotesApi.IsEmptyDraw)
+				{
+					oThis.m_oWordControl.m_oNotesApi.IsEmptyDraw = false;
+					oThis.m_oWordControl.m_oNotesApi.IsRepaint = true;
+				}
+
 				if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
 				{
 					var _data   = new AscCommonSlide.CContextMenuData();
@@ -5762,6 +5768,7 @@ function CNotesDrawer(page)
 
 		if (-1 == this.Slide || this.IsEmptyDraw)
 		{
+			this.IsRepaint = false;
 			return;
 		}
 
