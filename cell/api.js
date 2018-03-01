@@ -273,7 +273,10 @@ var editor;
         AscCommon.oNumFormatCache.cleanCache();
         this.wbModel.rebuildColors();
         if (this.isDocumentLoadComplete) {
-          this._onUpdateAfterApplyChanges();
+          AscCommon.checkCultureInfoFontPicker();
+          this._loadFonts([], function() {
+            this._onUpdateAfterApplyChanges();
+          });
         }
       }
     }
@@ -938,6 +941,7 @@ var editor;
 	this._openDocument(sData);
 	this.openDocumentFromZip(this.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
 		g_oIdCounter.Set_Load(false);
+		AscCommon.checkCultureInfoFontPicker();
 		AscCommonExcel.asc_CStylesPainter.prototype.asc_checkStylesNames(t.wbModel.CellStyles);
 		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
 
