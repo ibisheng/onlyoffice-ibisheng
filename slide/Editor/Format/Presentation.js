@@ -2415,7 +2415,7 @@ CPresentation.prototype =
             }
             //this.Slides[this.CurPage].graphicObjects.startRecalculate();
             //this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
-            if(!(noUpdateInterface === true))
+            if(!(noUpdateInterface === true) || (editor.asc_getKeyboardLanguage() !== -1))
             {
                 this.Document_UpdateInterfaceState();
             }
