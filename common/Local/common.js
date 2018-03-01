@@ -659,10 +659,26 @@ function getBinaryArray(_data, _len)
 var _proto = Asc['asc_docs_api'] ? Asc['asc_docs_api'] : Asc['spreadsheet_api'];
 _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 {
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	switch (obj.type)
 	{
 		case "generatePassword":
 		{
+			if ("" == obj["password"])
+			{
+				AscCommon.History.UserSavedIndex = _editor.LastUserSavedIndex;
+
+				if (window.editor)
+					_editor.UpdateInterfaceState();
+				else
+					_editor.onUpdateDocumentModified(AscCommon.History.Have_Changes());
+
+				_editor.LastUserSavedIndex = undefined;
+
+				_editor.sendEvent("asc_onError", "There is no connection with the blockchain", c_oAscError.Level.Critical);
+				return;
+			}
+
 			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
 			break;
 		}
@@ -671,8 +687,6 @@ _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 			if ("" != obj["password"])
 			{
 				var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
-
-				var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 				_editor.currentPassword = obj["password"];
 
 				window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
