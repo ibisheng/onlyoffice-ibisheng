@@ -1304,7 +1304,7 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 					this.Index--;
 
 				if (this.RecIndex >= 0)
-					this.Index--;
+					this.RecIndex--;
 
 				if (null !== this.SavedIndex && this.SavedIndex >= 0)
 					this.SavedIndex--;
