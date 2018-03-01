@@ -2146,6 +2146,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPos = functio
 	var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
 	ContentPos.Add(Pos);
 
+	if (Pos < 0 || Pos >= this.Content.length)
+		return;
+
 	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)

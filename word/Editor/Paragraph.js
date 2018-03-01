@@ -3831,8 +3831,10 @@ Paragraph.prototype.Get_ParaContentPos = function(bSelection, bStart, bUseCorrec
 
 	ContentPos.Add(Pos);
 
-	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
+	if (Pos < 0 || Pos >= this.Content.length)
+		return ContentPos;
 
+	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
 	return ContentPos;
 };
 Paragraph.prototype.Set_ParaContentPos = function(ContentPos, CorrectEndLinePos, Line, Range, bCorrectPos)
