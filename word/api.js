@@ -5545,6 +5545,7 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
+			this.m_bGlobal    = (undefined != obj.m_bGlobal   ) ? obj.m_bGlobal : false;
 			this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText : "";
 			this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime : "";
 			this.m_sOOTime    = (undefined != obj.m_sOOTime   ) ? obj.m_sOOTime : "";
@@ -5565,6 +5566,7 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
+			this.m_bGlobal    = false;
 			this.m_sText      = "";
 			this.m_sTime      = "";
 			this.m_sOOTime    = "";
@@ -5644,6 +5646,15 @@ background-repeat: no-repeat;\
 	{
 		return this.m_aReplies.length;
 	};
+	asc_CCommentDataWord.prototype.asc_putDocumentFlag = function(val)
+	{
+		this.m_bGlobal = val;
+	};
+	asc_CCommentDataWord.prototype.asc_getDocumentFlag = function()
+	{
+		return this.m_bGlobal;
+	};
+
 
 
 	asc_docs_api.prototype.asc_showComments = function(isShowSolved)
@@ -9460,4 +9471,6 @@ background-repeat: no-repeat;\
 	asc_CCommentDataWord.prototype['asc_getReply']        = asc_CCommentDataWord.prototype.asc_getReply;
 	asc_CCommentDataWord.prototype['asc_addReply']        = asc_CCommentDataWord.prototype.asc_addReply;
 	asc_CCommentDataWord.prototype['asc_getRepliesCount'] = asc_CCommentDataWord.prototype.asc_getRepliesCount;
+	asc_CCommentDataWord.prototype['asc_getDocumentFlag'] = asc_CCommentDataWord.prototype.asc_getDocumentFlag;
+	asc_CCommentDataWord.prototype['asc_putDocumentFlag'] = asc_CCommentDataWord.prototype.asc_putDocumentFlag;
 })(window, window.document);

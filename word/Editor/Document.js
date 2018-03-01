@@ -9375,9 +9375,9 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.AddComment = function(CommentData)
+CDocument.prototype.AddComment = function(CommentData, isForceGlobal)
 {
-	if (true != this.CanAddComment())
+	if (true === isForceGlobal || true != this.CanAddComment())
 	{
 		CommentData.Set_QuoteText(null);
 		var Comment = new CComment(this.Comments, CommentData);
