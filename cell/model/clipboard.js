@@ -1257,10 +1257,9 @@
 						else if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
 						{
 							newFonts = {};
-							pasteData.generateFontMap(newFonts);
-							worksheet._loadFonts(newFonts, function() {
-								worksheet.setSelectionInfo('paste', {data: pasteData, fromBinary: true});
-							});
+							newFonts = tempWorkbook.generateFontMap2();
+							newFonts = t._convertFonts(newFonts);
+							worksheet.setSelectionInfo('paste', {data: pasteData, fromBinary: true, fontsNew: newFonts});
 						}
 					}
 					
@@ -2721,7 +2720,7 @@
 				var fontName;
 				for(var i in oFonts)
 				{
-					fontName = oFonts[i].Name;
+					fontName = undefined !== oFonts[i].Name ? oFonts[i].Name : oFonts[i].name;
 					newFonts[fontName] = 1;
 				}
 				return newFonts;
@@ -3357,7 +3356,7 @@
 				//в данный момент в worksheetView не грузятся изображения
 				var specialPasteProps = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
 				var aImagesToDownload = this.aResult.props._images;
-				if(!this.clipboard.alreadyLoadImagesOnServer && aImagesToDownload !== null && (!specialPasteProps || (specialPasteProps && specialPasteProps.images)))//load to server
+				if(!this.clipboard.alreadyLoadImagesOnServer && aImagesToDownload && (!specialPasteProps || (specialPasteProps && specialPasteProps.images)))//load to server
 				{
 					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( t.aResult.props._aPastedImages );
 					var api = window["Asc"]["editor"];
