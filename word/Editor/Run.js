@@ -429,75 +429,77 @@ ParaRun.prototype.Add = function(Item, bMath)
 			}
 		}
 
-		// Специальный код, связанный с работой сносок:
-		// 1. При добавлении сноски мы ее оборачиваем в отдельный ран со специальным стилем.
-		// 2. Если мы находимся в ране со специальным стилем сносок и следующий или предыдущий элемент и есть сноска, тогда
-		//    мы добавляем элемент (если это не ссылка на сноску) в новый ран без стиля для сносок.
-		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
-		if (para_FootnoteRef === Item.Type || para_FootnoteReference === Item.Type)
-		{
-			if (this.Is_Empty())
-			{
-				this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-			}
-			else
-			{
-				var NewRun = this.private_SplitRunInCurPos();
-				if (NewRun)
-				{
-					NewRun.Set_VertAlign(undefined);
-					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-					NewRun.MoveCursorToStartPos();
-					NewRun.Add(Item, bMath);
-					NewRun.Make_ThisElementCurrent();
-					return;
-				}
-			}
-		}
-		else if (true === this.private_IsCurPosNearFootnoteReference())
-		{
-			var NewRun = this.private_SplitRunInCurPos();
-			if (NewRun)
-			{
-				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
-				NewRun.MoveCursorToStartPos();
-				NewRun.Add(Item, bMath);
-				NewRun.Make_ThisElementCurrent();
-				return;
-			}
-		}
-
-		// Специальный код с обработкой выделения (highlight)
-		// Текст, который пишем до или после выделенного текста делаем без выделения.
-		if ((0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
-		{
-			var Parent = this.Get_Parent();
-			var RunPos = this.private_GetPosInParent(Parent);
-			if (null !== Parent && -1 !== RunPos)
-			{
-				if ((0 === this.State.ContentPos
-					&& (0 === RunPos
-					|| Parent.Content[RunPos - 1].Type !== para_Run
-					|| highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
-					|| (this.Content.length === this.State.ContentPos
-					&& (RunPos === Parent.Content.length - 1
-					|| para_Run !== Parent.Content[RunPos + 1].Type
-					|| highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
-					|| (RunPos === Parent.Content.length - 2
-					&& Parent instanceof Paragraph)))
-				{
-					var NewRun = this.private_SplitRunInCurPos();
-					if (NewRun)
-					{
-						NewRun.Set_HighLight(highlight_None);
-						NewRun.MoveCursorToStartPos();
-						NewRun.Add(Item, bMath);
-						NewRun.Make_ThisElementCurrent();
-						return;
-					}
-				}
-			}
-		}
+		if(this.Paragraph.bFromDocument)
+        {
+            // Специальный код, связанный с работой сносок:
+            // 1. При добавлении сноски мы ее оборачиваем в отдельный ран со специальным стилем.
+            // 2. Если мы находимся в ране со специальным стилем сносок и следующий или предыдущий элемент и есть сноска, тогда
+            //    мы добавляем элемент (если это не ссылка на сноску) в новый ран без стиля для сносок.
+            var oStyles = this.Paragraph.LogicDocument.Get_Styles();
+            if (para_FootnoteRef === Item.Type || para_FootnoteReference === Item.Type)
+            {
+                if (this.Is_Empty())
+                {
+                    this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+                }
+                else
+                {
+                    var NewRun = this.private_SplitRunInCurPos();
+                    if (NewRun)
+                    {
+                        NewRun.Set_VertAlign(undefined);
+                        NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+                        NewRun.MoveCursorToStartPos();
+                        NewRun.Add(Item, bMath);
+                        NewRun.Make_ThisElementCurrent();
+                        return;
+                    }
+                }
+            }
+            else if (true === this.private_IsCurPosNearFootnoteReference())
+            {
+                var NewRun = this.private_SplitRunInCurPos();
+                if (NewRun)
+                {
+                    NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
+                    NewRun.MoveCursorToStartPos();
+                    NewRun.Add(Item, bMath);
+                    NewRun.Make_ThisElementCurrent();
+                    return;
+                }
+            }
+            // Специальный код с обработкой выделения (highlight)
+            // Текст, который пишем до или после выделенного текста делаем без выделения.
+            if ((0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
+            {
+                var Parent = this.Get_Parent();
+                var RunPos = this.private_GetPosInParent(Parent);
+                if (null !== Parent && -1 !== RunPos)
+                {
+                    if ((0 === this.State.ContentPos
+                        && (0 === RunPos
+                        || Parent.Content[RunPos - 1].Type !== para_Run
+                        || highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
+                        || (this.Content.length === this.State.ContentPos
+                        && (RunPos === Parent.Content.length - 1
+                        || para_Run !== Parent.Content[RunPos + 1].Type
+                        || highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
+                        || (RunPos === Parent.Content.length - 2
+                        && Parent instanceof Paragraph)))
+                    {
+                        var NewRun = this.private_SplitRunInCurPos();
+                        if (NewRun)
+                        {
+                            NewRun.Set_HighLight(highlight_None);
+                            NewRun.MoveCursorToStartPos();
+                            NewRun.Add(Item, bMath);
+                            NewRun.Make_ThisElementCurrent();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 	}
 
     var TrackRevisions = false;
