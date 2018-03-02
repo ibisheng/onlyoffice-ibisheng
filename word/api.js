@@ -2039,12 +2039,15 @@ background-repeat: no-repeat;\
 		}
 
 		var sBase64 = null, _data;
+		var checkData = function(data) {
+			return 	"" === data ? null : data;
+		};
 
 		//TEXT
 		if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 		{
 			_data = this.WordControl.m_oLogicDocument.GetSelectedText(false, {NewLineParagraph : true});
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, checkData(_data))
 		}
 		//HTML
 		if (AscCommon.c_oAscClipboardDataFormat.Html & _formats)
@@ -2053,7 +2056,7 @@ background-repeat: no-repeat;\
 			sBase64            = oCopyProcessor.Start();
 			_data              = oCopyProcessor.getInnerHtml();
 
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, checkData(_data))
 		}
 		//INTERNAL
 		if (AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
@@ -2073,7 +2076,7 @@ background-repeat: no-repeat;\
 			}
 
 			_data = sBase64;
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, checkData(_data))
 		}
 	};
 
