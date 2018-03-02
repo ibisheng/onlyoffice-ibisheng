@@ -1636,6 +1636,10 @@ background-repeat: no-repeat;\
 			this.sendEvent('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 		}
 	};
+	asc_docs_api.prototype._onUpdateDocumentCanUndoRedo = function ()
+	{
+
+	};
 
 	// get functions
 	// Возвращает

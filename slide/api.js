@@ -1204,6 +1204,10 @@
 			this.sendEvent('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 		}
 	};
+	asc_docs_api.prototype._onUpdateDocumentCanUndoRedo = function ()
+	{
+
+	};
 
 	///////////////////////////////////////////
 	asc_docs_api.prototype.CheckChangedDocument = function()
