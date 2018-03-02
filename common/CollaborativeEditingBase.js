@@ -289,6 +289,10 @@ CCollaborativeEditingBase.prototype.Is_SingleUser = function()
 {
 	return (1 === this.m_nUseType);
 };
+CCollaborativeEditingBase.prototype.getCollaborativeEditing = function()
+{
+	return !this.Is_SingleUser();
+};
 CCollaborativeEditingBase.prototype.Start_CollaborationEditing = function()
 {
     this.m_nUseType = -1;
