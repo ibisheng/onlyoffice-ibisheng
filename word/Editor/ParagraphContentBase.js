@@ -527,6 +527,27 @@ CParagraphContentBase.prototype.ApplyTextPr = function(oTextPr, isIncFontSize, i
 {
 	return this.Apply_TextPr(oTextPr, isIncFontSize, isApplyToAll);
 };
+/**
+ * Функция для поиска внутри элементов параграфа
+ * @param {CParagraphSearch} oParaSearch
+ * @param {number} nDepth
+ */
+CParagraphContentBase.prototype.Search = function(oParaSearch, nDepth)
+{
+};
+CParagraphContentBase.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
+{
+};
+CParagraphContentBase.prototype.Clear_SearchResults = function()
+{
+};
+CParagraphContentBase.prototype.Remove_SearchResult = function(SearchResult)
+{
+};
+CParagraphContentBase.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
+{
+	return null;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
