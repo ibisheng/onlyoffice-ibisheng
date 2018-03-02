@@ -11338,6 +11338,7 @@ Paragraph.prototype.GetStyleFromFormatting = function()
     var oRStyle = oStyles.Get(TextPr.RStyle);
     if (null !== oRStyle)
     {
+
         oRunStyle.put_BasedOn(oRStyle.Get_Name());
         var oRNextStyle = oStyles.Get(oRStyle.Get_Next());
         if (null !== oRNextStyle)

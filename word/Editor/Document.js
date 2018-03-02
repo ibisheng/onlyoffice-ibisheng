@@ -4796,7 +4796,7 @@ CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 		var oStyle   = this.Styles.Get(sStyleId);
 
 		var arrCurrentParagraphs = this.GetCurrentParagraph(false, true);
-		if (1 === arrCurrentParagraphs.length && arrCurrentParagraphs[0].IsSelectedSingleElement() && oStyle && oStyle.GetLink())
+		if (1 === arrCurrentParagraphs.length && arrCurrentParagraphs[0].IsSelectedSingleElement() && true !== arrCurrentParagraphs[0].IsSelectedAll() && oStyle && oStyle.GetLink())
 		{
 			var oLinkedStyle = this.Styles.Get(oStyle.GetLink());
 			if (oLinkedStyle && styletype_Character === oLinkedStyle.GetType())
