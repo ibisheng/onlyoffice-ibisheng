@@ -7065,6 +7065,9 @@ function CDrawingDocument()
 			oStyles.Remove(arrStylesToDelete[nIndex]);
 		}
 
+		var nContentHeight = oDocumentContent.GetSummaryHeight();
+
+
 		// draw
 
 		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
