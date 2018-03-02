@@ -287,10 +287,7 @@ CCollaborativeEditingBase.prototype.Is_Fast = function()
 };
 CCollaborativeEditingBase.prototype.Is_SingleUser = function()
 {
-    if (1 === this.m_nUseType)
-        return true;
-
-    return false;
+	return (1 === this.m_nUseType);
 };
 CCollaborativeEditingBase.prototype.Start_CollaborationEditing = function()
 {
