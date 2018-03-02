@@ -551,6 +551,10 @@
 	{
 		this.isForceSaveOnUserSave = val;
 	};
+	baseEditorsApi.prototype._onUpdateDocumentCanSave = function () {
+	};
+	baseEditorsApi.prototype._onUpdateDocumentCanUndoRedo = function () {
+	};
 	baseEditorsApi.prototype._saveCheck = function () {
 		return false;
 	};

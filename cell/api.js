@@ -3217,6 +3217,9 @@ var editor;
 			this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 		}
 	};
+	spreadsheet_api.prototype._onUpdateDocumentCanUndoRedo = function () {
+		AscCommon.History._sendCanUndoRedo();
+	};
 
   spreadsheet_api.prototype._onCheckCommentRemoveLock = function(lockElem) {
     var res = false;
