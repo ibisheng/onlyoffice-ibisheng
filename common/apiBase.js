@@ -587,7 +587,16 @@
 			this.canUnlockDocument = true;
 			this.canStartCoAuthoring = true;
 			if (this.canSave) {
-				// Currently not saving, but if the save is started, then unlock on the response from the server
+				// We can only unlock with delete index
+				this.CoAuthoringApi.unLockDocument(false, true, AscCommon.History.GetDeleteIndex());
+				this.startCollaborationEditing();
+				AscCommon.History.RemovePointsByDeleteIndex();
+				this._onUpdateDocumentCanSave();
+				this._onUpdateDocumentCanUndoRedo();
+				this.canStartCoAuthoring = false;
+				this.canUnlockDocument = false;
+			} else {
+				// ToDo !!!!
 			}
 		} else {
 			// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)

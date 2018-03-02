@@ -1324,17 +1324,18 @@ var editor;
       var arrChanges = this.wbModel.SerializeHistory();
       var deleteIndex = History.GetDeleteIndex();
       var excelAdditionalInfo = null;
-      if (this.collaborativeEditing.getCollaborativeEditing()) {
+      var bCollaborative = this.collaborativeEditing.getCollaborativeEditing();
+      if (bCollaborative) {
         // Пересчетные индексы добавляем только если мы не одни
         if (recalcIndexColumns || recalcIndexRows) {
           excelAdditionalInfo = {"indexCols": recalcIndexColumns, "indexRows": recalcIndexRows};
         }
       }
       if (0 < arrChanges.length || null !== deleteIndex || null !== excelAdditionalInfo) {
-        this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo, this.canUnlockDocument2);
+        this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo, this.canUnlockDocument2, bCollaborative);
         History.CanNotAddChanges = true;
       } else {
-        this.CoAuthoringApi.unLockDocument(true, this.canUnlockDocument2);
+        this.CoAuthoringApi.unLockDocument(true, this.canUnlockDocument2, null, bCollaborative);
       }
       this.canUnlockDocument2 = false;
     }

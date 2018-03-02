@@ -110,7 +110,8 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     var UnlockCount = 0;
 
     // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
-    if (1 !== this.m_nUseType)
+    var bCollaborative = this.getCollaborativeEditing();
+    if (bCollaborative)
 	{
 		UnlockCount = this.m_aNeedUnlock.length;
 		this.Release_Locks();
@@ -131,12 +132,12 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
 	if (0 < aChanges.length || null !== deleteIndex)
 	{
 		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
-		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2, bCollaborative);
 		AscCommon.History.CanNotAddChanges = true;
 	}
 	else
 	{
-		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2, null, bCollaborative);
 	}
 	editor.canUnlockDocument2 = false;
 

@@ -101,11 +101,12 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
         }
     }
 
-	
-	    // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
+
+    // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
+	var bCollaborative = this.getCollaborativeEditing();
 		
 	var num_arr = [];
-    if (1 !== this.m_nUseType)
+    if (bCollaborative)
 	{
 		var map = this.Release_Locks();
 
@@ -204,10 +205,10 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
 
     if (0 < aChanges.length || null !== deleteIndex) {
         this.private_OnSendOwnChanges(aChanges2, deleteIndex);
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
+        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2, bCollaborative);
         AscCommon.History.CanNotAddChanges = true;
     } else
-        editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+        editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2, null, bCollaborative);
 	editor.canUnlockDocument2 = false;
 
     if ( -1 === this.m_nUseType )

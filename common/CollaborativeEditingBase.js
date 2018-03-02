@@ -1257,7 +1257,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         oHistory.Remove_LastPoint();
         this.Clear_DCChanges();
 
-        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null, false, this.getCollaborativeEditing());
 
         this.private_RestoreDocumentState(DocState);
 

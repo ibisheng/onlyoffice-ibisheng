@@ -301,17 +301,19 @@
     }
   };
 
-  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo, canUnlockDocument) {
+  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo, canUnlockDocument, canReleaseLocks) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
+      this._CoAuthoringApi.canReleaseLocks = canReleaseLocks;
       this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex, excelAdditionalInfo);
     }
   };
 
-  CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument) {
+  CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument, deleteIndex, canReleaseLocks) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
-      this._CoAuthoringApi.unLockDocument(isSave);
+      this._CoAuthoringApi.canReleaseLocks = canReleaseLocks;
+      this._CoAuthoringApi.unLockDocument(isSave, deleteIndex);
     }
   };
 
@@ -627,6 +629,8 @@
     this.excelAdditionalInfo = null;
     // Unlock document
     this.canUnlockDocument = false;
+    // Release locks
+    this.canReleaseLocks = false;
 
     this._url = "";
 
@@ -868,11 +872,16 @@
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
       'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
-        'unlock': this.canUnlockDocument});
+        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks});
   };
 
-  DocsCoApi.prototype.unLockDocument = function(isSave) {
-    this._send({'type': 'unLockDocument', 'isSave': isSave, 'unlock': this.canUnlockDocument});
+  DocsCoApi.prototype.unLockDocument = function(isSave, deleteIndex) {
+    this.deleteIndex = deleteIndex;
+    if (null != this.deleteIndex && -1 !== this.deleteIndex) {
+      this.deleteIndex += this.changesIndex;
+    }
+    this._send({'type': 'unLockDocument', 'isSave': isSave, 'unlock': this.canUnlockDocument,
+      'deleteIndex': this.deleteIndex, 'releaseLocks': this.canReleaseLocks});
   };
 
   DocsCoApi.prototype.getUsers = function() {
