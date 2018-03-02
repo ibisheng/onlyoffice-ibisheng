@@ -124,13 +124,13 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Comment_Change = 3;
 	window['AscCH'].historyitem_Comment_Coords = 4;
 
-	window['AscCH'].historyitem_AutoFilter_Add		= 1;
-	window['AscCH'].historyitem_AutoFilter_Sort		= 2;
-	window['AscCH'].historyitem_AutoFilter_Empty	= 3;
-	window['AscCH'].historyitem_AutoFilter_Apply	= 5;
-	window['AscCH'].historyitem_AutoFilter_Move     = 6;
-	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter  = 7;
-	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
+	window['AscCH'].historyitem_AutoFilter_Add = 1;
+	window['AscCH'].historyitem_AutoFilter_Sort = 2;
+	window['AscCH'].historyitem_AutoFilter_Empty = 3;
+	window['AscCH'].historyitem_AutoFilter_Apply = 5;
+	window['AscCH'].historyitem_AutoFilter_Move = 6;
+	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter = 7;
+	window['AscCH'].historyitem_AutoFilter_Delete = 8;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableStyle = 9;
 	window['AscCH'].historyitem_AutoFilter_Change = 10;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
@@ -837,52 +837,55 @@ CHistory.prototype.Is_On = function()
 {
 	return (0 === this.TurnOffHistory);
 };
-CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
-  this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
-  if (this.Is_UserSaveMode()) {
-    if (IsUserSave) {
-      this.UserSavedIndex = this.Index;
-      this.ForceSave  = false;
-    }
-  } else {
-    this.ForceSave  = false;
-  }
-};
-CHistory.prototype.Set_SavedIndex = function(Index) {
-  this.SavedIndex = Index;
-  if (this.Is_UserSaveMode()) {
-    if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
-      this.UserSavedIndex = Index;
-      this.ForceSave = true;
-    }
-  } else {
-    this.ForceSave = true;
-  }
-};
-/** @returns {number|null} */
-CHistory.prototype.GetDeleteIndex = function () {
-	var DeletePointIndex = null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
-	if (null === DeletePointIndex)
-		return null;
-	var DeleteIndex = 0;
-	for (var i = 0; i < DeletePointIndex; ++i) {
-		var point = this.Points[i];
-		for (var j = 0; j < point.Items.length; ++j) {
-			if (!point.Items[j].LocalChange) {//LocalChange изменения не пойдут в совместное редактирование.
-				DeleteIndex += 1;
+	CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
+		this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
+		if (this.Is_UserSaveMode()) {
+			if (IsUserSave) {
+				this.UserSavedIndex = this.Index;
+				this.ForceSave = false;
+			}
+		} else {
+			this.ForceSave = false;
+		}
+	};
+	CHistory.prototype.Set_SavedIndex = function(Index) {
+		this.SavedIndex = Index;
+		if (this.Is_UserSaveMode()) {
+			if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
+				this.UserSavedIndex = Index;
+				this.ForceSave = true;
+			}
+		} else {
+			this.ForceSave = true;
+		}
+	};
+	/** @returns {number|null} */
+	CHistory.prototype.GetDeleteIndex = function() {
+		var DeletePointIndex = this.GetDeletePointIndex();
+		if (null === DeletePointIndex)
+			return null;
+		var DeleteIndex = 0;
+		for (var i = 0; i < DeletePointIndex; ++i) {
+			var point = this.Points[i];
+			for (var j = 0; j < point.Items.length; ++j) {
+				if (!point.Items[j].LocalChange) {//LocalChange изменения не пойдут в совместное редактирование.
+					DeleteIndex += 1;
+				}
 			}
 		}
-	}
-	return DeleteIndex;
-};
-/** @returns {boolean} */
-CHistory.prototype.Have_Changes = function(IsNotUserSave) {
-  var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
-  if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
-    return false;
-  }
+		return DeleteIndex;
+	};
+	CHistory.prototype.GetDeletePointIndex = function() {
+		return null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
+	};
+	/** @returns {boolean} */
+	CHistory.prototype.Have_Changes = function(IsNotUserSave) {
+		var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
+		if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
+			return false;
+		}
 
-  return (this.Index != checkIndex || true === this.ForceSave);
+		return (this.Index != checkIndex || true === this.ForceSave);
 };
 CHistory.prototype.GetSerializeArray = function()
 {
@@ -901,19 +904,37 @@ CHistory.prototype.GetSerializeArray = function()
 		}
 		aRes.push(aPointChanges);
 	}
-	return aRes;
-};
-CHistory.prototype._CheckCanNotAddChanges = function () {
-    try {
-        if (this.CanNotAddChanges) {
-            var tmpErr = new Error();
-            if (tmpErr.stack) {
-                this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
-            }
-        }
-    } catch (e) {
-    }
-};
+		return aRes;
+	};
+	CHistory.prototype._CheckCanNotAddChanges = function() {
+		try {
+			if (this.CanNotAddChanges) {
+				var tmpErr = new Error();
+				if (tmpErr.stack) {
+					this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
+				}
+			}
+		} catch (e) {
+		}
+	};
+	/**
+	 * Удаляем изменения из истории, которые сохранены на сервере. Это происходит при подключении второго пользователя
+	 */
+	CHistory.prototype.RemovePointsByDeleteIndex = function()
+	{
+		var DeletePointIndex = this.GetDeletePointIndex();
+		if (null === DeletePointIndex)
+			return;
+		this.Points.splice(0, DeletePointIndex);
+		this.Index = Math.max(this.Index - DeletePointIndex, -1);
+		this.RecIndex = Math.max(this.RecIndex - DeletePointIndex, -1);
+		if (null !== this.SavedIndex) {
+			this.SavedIndex = this.SavedIndex - DeletePointIndex;
+			if (this.SavedIndex < 0) {
+				this.SavedIndex = null;
+			}
+		}
+	};
 
 	//------------------------------------------------------------export--------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
