@@ -7729,10 +7729,24 @@ PasteProcessor.prototype =
 			if (!value) {
 				value = "";
 			}
+
+			var whiteSpacing = false;
+			if(node.parentNode)
+			{
+				var computedStyle = oThis._getComputedStyle(node.parentNode);
+				if(computedStyle)
+				{
+					whiteSpacing = "pre" === computedStyle.getPropertyValue("white-space");
+				}
+			}
+
 			//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
 			//потому что(например иногда chrome при вставке разбивает строки с помощью \n)
-			value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '');
-			value = value.replace(/(\r|\t|\n)/g, ' ');
+			if(!whiteSpacing)
+			{
+				value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '');
+				value = value.replace(/(\r|\t|\n)/g, ' ');
+			}
 
 			var Item;
 			if (value.length > 0) {
@@ -7766,15 +7780,6 @@ PasteProcessor.prototype =
 				//TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
 				//bIsPreviousSpace - игнорируем несколько пробелов подряд
 				var bIsPreviousSpace = false;
-				var whiteSpacing = false;
-				if(node.parentNode)
-				{
-					var computedStyle = oThis._getComputedStyle(node.parentNode);
-					if(computedStyle)
-					{
-						whiteSpacing = "pre" === computedStyle.getPropertyValue("white-space");
-					}
-				}
 
 				for (var oIterator = value.getUnicodeIterator(); oIterator.check(); oIterator.next())
 				{
@@ -7796,7 +7801,17 @@ PasteProcessor.prototype =
 					{
 						if (null != nUnicode)
 						{
-							if (0x20 !== nUnicode && 0x2009 !== nUnicode)
+							if(whiteSpacing && 0xa === nUnicode)
+							{
+								Item = null;
+								bAddParagraph = oThis._Decide_AddParagraph(oTargetNode, pPr, true);
+								oThis._commit_rPr(oTargetNode, bUseOnlyInherit);
+							}
+							else if(whiteSpacing && (0x9 === nUnicode || 0x2009 === nUnicode))
+							{
+								Item = new ParaTab();
+							}
+							else if (0x20 !== nUnicode && 0x2009 !== nUnicode)
 							{
 								Item = new ParaText(nUnicode);
 								bIsPreviousSpace = false;
@@ -7813,7 +7828,10 @@ PasteProcessor.prototype =
 									bIsPreviousSpace = true;
 								}
 							}
-							oThis._AddToParagraph(Item);
+							if(null !== Item)
+							{
+								oThis._AddToParagraph(Item);
+							}
 						}
 					}
 
