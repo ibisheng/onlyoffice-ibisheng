@@ -115,6 +115,9 @@
   CCollaborativeEditing.prototype.getFast = function () {
     return this.m_bFast;
   };
+		CCollaborativeEditing.prototype.Is_SingleUser = function () {
+			return !this.getCollaborativeEditing();
+		};
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
 			if (this.m_bIsViewerMode)
 				return false;
