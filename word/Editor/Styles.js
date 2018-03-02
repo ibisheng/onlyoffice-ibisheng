@@ -3549,6 +3549,25 @@ CStyle.prototype.GetParaPr = function()
 {
 	return this.ParaPr;
 };
+/**
+ * Показывать ли данный стиль в верхней панели
+ * @param {CStyles} oStyles
+ * @returns {boolean}
+ */
+CStyle.prototype.IsExpressStyle = function(oStyles)
+{
+	if (true === this.qFormat)
+		return true;
+
+	if (oStyles
+		&& oStyles.Default
+		&& (oStyles.Default.Header === this.Id
+		|| oStyles.Default.Footer === this.Id
+		|| oStyles.Default.FootnoteText === this.Id))
+		return true;
+
+	return false;
+};
 
 function CStyles(bCreateDefault)
 {

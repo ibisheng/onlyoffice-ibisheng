@@ -8120,7 +8120,7 @@ CStylesPainter.prototype =
         for (var i in ds)
         {
             var style = ds[i];
-            if (true == style.qFormat && null === DocumentStyles.GetStyleIdByName(style.Name))
+            if (style.IsExpressStyle(DocumentStyles) && null === DocumentStyles.GetStyleIdByName(style.Name))
             {
             	AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
             }
@@ -8136,7 +8136,7 @@ CStylesPainter.prototype =
         for (var i in styles)
         {
             var style = styles[i];
-            if (true == style.qFormat)
+            if (style.IsExpressStyle(DocumentStyles))
             {
                 AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
                 AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(style.Name));
@@ -8259,7 +8259,7 @@ CStylesPainter.prototype =
 		for (var i in styles)
 		{
 			var style = styles[i];
-			if (true == style.qFormat && null === DocumentStyles.GetStyleIdByName(style.Name))
+			if (style.IsExpressStyle(DocumentStyles) && null === DocumentStyles.GetStyleIdByName(style.Name))
 			{
 				this.drawStyle(graphics, style, AscCommon.translateManager.getValue(style.Name));
 				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default,
@@ -8313,7 +8313,7 @@ CStylesPainter.prototype =
 		for (var i in styles)
 		{
 			var style = styles[i];
-			if (true == style.qFormat)
+			if (style.IsExpressStyle(__Styles))
 			{
 				// как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
 				// зато быстро делается
