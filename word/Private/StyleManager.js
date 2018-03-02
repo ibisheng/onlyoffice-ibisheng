@@ -157,7 +157,24 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 
 		if (BasedOnId === sStyleId || sStyleId === this.Default.Paragraph)
 		{
-			oStyle.Set_BasedOn(null);
+			if (sStyleId !== this.Default.Paragraph)
+			{
+				var oBaseStyle      = this.Get(BasedOnId);
+				var oBasedBasesOnId = this.Get_Default_Paragraph();
+				if (oBaseStyle)
+				{
+					oBasedBasesOnId = oBaseStyle.Get_BasedOn();
+					if (oBaseStyle.Get_BasedOn() !== sStyleId)
+						oBasedBasesOnId = oBaseStyle.Get_BasedOn();
+				}
+
+				oStyle.Set_BasedOn(oBasedBasesOnId);
+			}
+			else
+			{
+				oStyle.Set_BasedOn(null);
+			}
+
 			var OldStyleParaPr = oStyle.ParaPr.Copy();
 			var OldStyleTextPr = oStyle.TextPr.Copy();
 			OldStyleParaPr.Merge(NewStyleParaPr);
