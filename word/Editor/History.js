@@ -1287,27 +1287,22 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 		while (nDeleteIndex > 0 && this.Points.length > 0)
 		{
-			var oPoint = this.Points[0];
+			nDeleteIndex -= this.Points[0].Items.length;
 
-			if (oPoint.Items.length > nDeleteIndex)
+			this.Points.splice(0, 1);
+
+			if (this.Index >= 0)
+				this.Index--;
+
+			if (this.RecIndex >= 0)
+				this.RecIndex--;
+
+			if (null !== this.SavedIndex && this.SavedIndex >= 0)
 			{
-				oPoint.Items.splice(0, nDeleteIndex);
-				nDeleteIndex = 0;
-			}
-			else
-			{
-				nDeleteIndex -= this.Points[0].Items.length;
+				this.SavedIndex--;
 
-				this.Points.splice(0, 1);
-
-				if (this.Index >= 0)
-					this.Index--;
-
-				if (this.RecIndex >= 0)
-					this.RecIndex--;
-
-				if (null !== this.SavedIndex && this.SavedIndex >= 0)
-					this.SavedIndex--;
+				if (this.SavedIndex < 0)
+					this.SavedIndex = null;
 			}
 		}
 	};
