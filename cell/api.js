@@ -1442,6 +1442,16 @@ var editor;
   spreadsheet_api.prototype.startCollaborationEditing = function() {
     // Начинаем совместное редактирование
     this.collaborativeEditing.startCollaborationEditing();
+
+	  if (this.isDocumentLoadComplete) {
+		  var worksheet = this.wb.getWorksheet();
+		  worksheet.cleanSelection();
+		  worksheet._drawSelection();
+		  worksheet._drawFrozenPaneLines();
+		  if (worksheet.objectRender) {
+			  worksheet.objectRender.showDrawingObjects(true);
+		  }
+	  }
   };
 
   spreadsheet_api.prototype.endCollaborationEditing = function() {
