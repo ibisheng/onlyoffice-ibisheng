@@ -1638,7 +1638,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype._onUpdateDocumentCanUndoRedo = function ()
 	{
-
+		if (this.WordControl && this.WordControl.m_oLogicDocument)
+			this.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 	};
 
 	// get functions
