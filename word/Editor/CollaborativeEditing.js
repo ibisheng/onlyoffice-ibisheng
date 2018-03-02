@@ -110,7 +110,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     var UnlockCount = 0;
 
     // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
-    if (1 === this.m_nType)
+    if (1 !== this.m_nUseType)
 	{
 		UnlockCount = this.m_aNeedUnlock.length;
 		this.Release_Locks();
