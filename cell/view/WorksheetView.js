@@ -8872,86 +8872,55 @@
 		}
 		else
 		{
-			var pasteExec = function()
-			{
-				var api = asc["editor"];
-				var isEndTransaction = false;
-				
-				var imagesFromWord = pasteContent.props.addImagesFromWord;
-				if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
-				{
-					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
-					var oImageMap;
+			var imagesFromWord = pasteContent.props.addImagesFromWord;
+			if (imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) {
+				var oObjectsForDownload = AscCommon.GetObjectsForImageDownload(pasteContent.props._aPastedImages);
+				var oImageMap;
 
-					//if already load images on server
-					if ( AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true ) 
-					{
-						oImageMap = {};
-						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
-						{
-							var url = oObjectsForDownload.aUrls[i];
+				//if already load images on server
+				if (AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true) {
+					oImageMap = {};
+					for (var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i) {
+						var url = oObjectsForDownload.aUrls[i];
 
-							//get name from array already load on server urls
-							var name = AscCommonExcel.g_clipboardExcel.pasteProcessor.oImages[url];
-							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
-							if ( name ) {
-								if ( Array.isArray( aImageElem ) ) {
-									for ( var j = 0; j < aImageElem.length; ++j ) {
-										var imageElem = aImageElem[j];
-										if ( null != imageElem ) {
-											imageElem.SetUrl( name );
-										}
+						//get name from array already load on server urls
+						var name = AscCommonExcel.g_clipboardExcel.pasteProcessor.oImages[url];
+						var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
+						if (name) {
+							if (Array.isArray(aImageElem)) {
+								for (var j = 0; j < aImageElem.length; ++j) {
+									var imageElem = aImageElem[j];
+									if (null != imageElem) {
+										imageElem.SetUrl(name);
 									}
 								}
-								oImageMap[i] = name;
 							}
-							else {
-								oImageMap[i] = url;
-							}
-						}
-
-						selectData = t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
-						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-						
-						isEndTransaction = true;
-					}
-					else 
-					{
-						oImageMap = pasteContent.props.oImageMap;
-						if(window["NATIVE_EDITOR_ENJINE"])
-						{
-							//TODO для мобильных приложений  - не рабочий код!
-							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-							selectData = t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
-							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-							
-							isEndTransaction = true;
-						}
-						else
-						{
-							selectData = t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
-							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-
-							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-							isEndTransaction = true;
+							oImageMap[i] = name;
+						} else {
+							oImageMap[i] = url;
 						}
 					}
-				}
-				else
-				{
-					selectData = t._pasteData( isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth );
-					isEndTransaction = true;
-				}
 
-				//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-				if ( isEndTransaction ) 
-				{
-					History.EndTransaction();
-					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+					selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+					AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+				} else {
+					oImageMap = pasteContent.props.oImageMap;
+					if (window["NATIVE_EDITOR_ENJINE"]) {
+						//TODO для мобильных приложений  - не рабочий код!
+						AscCommon.ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+					} else {
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+					}
 				}
-			};
+			} else {
+				selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+			}
 
-			pasteExec();
+            History.EndTransaction();
+            window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 		}
 
 		var fonts = pasteContent.props && pasteContent.props.fontsNew ? pasteContent.props.fontsNew : val.fontsNew;
