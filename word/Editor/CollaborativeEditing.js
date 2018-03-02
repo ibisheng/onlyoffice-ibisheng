@@ -107,19 +107,25 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
         }
     }
 
-    var UnlockCount = this.m_aNeedUnlock.length;
-    this.Release_Locks();
+    var UnlockCount = 0;
 
-    var UnlockCount2 = this.m_aNeedUnlock2.length;
-    for (var Index = 0; Index < UnlockCount2; Index++)
-    {
-        var Class = this.m_aNeedUnlock2[Index];
-        Class.Lock.Set_Type(AscCommon.locktype_None, false);
-        editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
-    }
+    // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
+    if (1 === this.m_nType)
+	{
+		UnlockCount = this.m_aNeedUnlock.length;
+		this.Release_Locks();
 
-    this.m_aNeedUnlock.length = 0;
-    this.m_aNeedUnlock2.length = 0;
+		var UnlockCount2 = this.m_aNeedUnlock2.length;
+		for (var Index = 0; Index < UnlockCount2; Index++)
+		{
+			var Class = this.m_aNeedUnlock2[Index];
+			Class.Lock.Set_Type(AscCommon.locktype_None, false);
+			editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
+		}
+
+		this.m_aNeedUnlock.length  = 0;
+		this.m_aNeedUnlock2.length = 0;
+	}
 
 	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 	if (0 < aChanges.length || null !== deleteIndex)
