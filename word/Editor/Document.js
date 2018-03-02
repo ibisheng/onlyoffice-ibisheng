@@ -16011,6 +16011,20 @@ CDocument.prototype.controller_AddContentControl = function(nContentControlType)
 {
 	return this.private_AddContentControl(nContentControlType);
 };
+CDocument.prototype.controller_GetStyleFromFormatting = function()
+{
+	if (true == this.Selection.Use)
+	{
+		if (this.Selection.StartPos > this.Selection.EndPos)
+			return this.Content[this.Selection.EndPos].GetStyleFromFormatting();
+		else
+			return this.Content[this.Selection.StartPos].GetStyleFromFormatting();
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------

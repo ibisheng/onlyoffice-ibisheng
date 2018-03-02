@@ -3239,6 +3239,13 @@ CFootnotesController.prototype.AddContentControl = function(nContentControlType)
 
 	return null;
 };
+CFootnotesController.prototype.GetStyleFromFormatting = function()
+{
+	if (this.CurFootnote)
+		return this.CurFootnote.GetStyleFromFormatting();
+
+	return null;
+};
 
 
 function CFootEndnotePageColumn()

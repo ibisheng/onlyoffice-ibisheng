@@ -501,3 +501,7 @@ CHdrFtrController.prototype.AddContentControl = function(nContentControlType)
 
 	return null;
 };
+CHdrFtrController.prototype.GetStyleFromFormatting = function()
+{
+	return this.HdrFtr.GetStyleFromFormatting();
+};

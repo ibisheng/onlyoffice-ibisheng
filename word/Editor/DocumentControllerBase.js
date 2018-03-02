@@ -758,3 +758,7 @@ CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
  * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
  */
 CDocumentControllerBase.prototype.AddContentControl = function(nContentControlType){return null;};
+/**
+ * Получаем стиль по выделенному фрагменту
+ */
+CDocumentControllerBase.prototype.GetStyleFromFormatting = function(){return null;};

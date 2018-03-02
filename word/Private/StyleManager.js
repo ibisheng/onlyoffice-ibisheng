@@ -70,32 +70,11 @@ Asc['asc_docs_api'].prototype['asc_IsDefaultStyleChanged']  = Asc['asc_docs_api'
 //  CDocument
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Получаем стиль по выделенному фрагменту.
+ * Получаем стиль по выделенному фрагменту
  */
 CDocument.prototype.GetStyleFromFormatting = function()
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.GetStyleFromFormatting();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.GetStyleFromFormatting();
-    }
-    else //if (docpostype_Content === this.CurPos.Type)
-    {
-        if (true == this.Selection.Use)
-        {
-            if (this.Selection.StartPos > this.Selection.EndPos)
-                return this.Content[this.Selection.EndPos].GetStyleFromFormatting();
-            else
-                return this.Content[this.Selection.StartPos].GetStyleFromFormatting();
-        }
-        else
-        {
-            return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
-        }
-    }
+	return this.Controller.GetStyleFromFormatting();
 };
 /**
  * Добавляем новый стиль (или заменяем старый с таким же названием).
