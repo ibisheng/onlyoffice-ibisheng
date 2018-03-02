@@ -7024,7 +7024,7 @@ function CDrawingDocument()
 					if (isRightTab)
 					{
 						var oParaTabs = new CParaTabs();
-						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5 - wMmOffset, nTabLeader));
+						oParaTabs.Add(new CParaTab(tab_Right, wMm - 2 - wMmOffset, nTabLeader));
 						oParagraph.SetParagraphTabs(oParaTabs);
 
 						oRun.AddToContent(-1, new ParaTab());
