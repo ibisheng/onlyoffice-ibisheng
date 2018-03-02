@@ -6855,16 +6855,15 @@ function CDrawingDocument()
 	this.SetDrawImagePlaceContents = function(id, props)
 	{
 		var _div_elem = null;
+
 		if (null == id || "" == id)
 		{
 			if ("" != this.GuiCanvasFillTOCParentId)
 			{
-				if (this.GuiCanvasFillTOC)
-				{
-					_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-					if (_div_elem)
-						_div_elem.removeChild(this.GuiCanvasFillTOC);
-				}
+				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+				if (this.GuiCanvasFillTOC && _div_elem)
+					_div_elem.removeChild(this.GuiCanvasFillTOC);
 
 				this.GuiCanvasFillTOCParentId = "";
 				this.GuiCanvasFillTOC = null;
@@ -6874,63 +6873,49 @@ function CDrawingDocument()
 
 		if (id != this.GuiCanvasFillTOCParentId)
 		{
-			if (this.GuiCanvasFillTOC)
-			{
-				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-				if (_div_elem)
-					_div_elem.removeChild(this.GuiCanvasFillTOC);
-			}
+			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+			if (this.GuiCanvasFillTOC && _div_elem)
+				_div_elem.removeChild(this.GuiCanvasFillTOC);
 
 			this.GuiCanvasFillTOCParentId = "";
 			this.GuiCanvasFillTOC = null;
 		}
 
 		this.GuiCanvasFillTOCParentId = id;
-		var widthPx = 0;
-		var heightPx = 0;
+		_div_elem =  document.getElementById(this.GuiCanvasFillTOCParentId);
+		if (!_div_elem)
+			return;
+
+		var widthPx = _div_elem.offsetWidth;
+		var heightPx = _div_elem.offsetHeight;
 
 		if (null == this.GuiCanvasFillTOC)
 		{
-			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-
 			this.GuiCanvasFillTexture = null;
 			this.GuiCanvasFillTextureCtx = null;
 
 			this.GuiCanvasFillTOC = document.createElement('canvas');
-
-			widthPx = _div_elem.offsetWidth;
-			heightPx = _div_elem.offsetHeight;
-
-			this.GuiCanvasFillTOC.style.width = widthPx + "px";
-			this.GuiCanvasFillTOC.style.height = heightPx + "px";
-
-			this.GuiCanvasFillTOC.width = AscBrowser.convertToRetinaValue(widthPx, true);
-			this.GuiCanvasFillTOC.height = AscBrowser.convertToRetinaValue(heightPx, true);
-
-			if (_div_elem)
-				_div_elem.appendChild(this.GuiCanvasFillTOC);
+			_div_elem.appendChild(this.GuiCanvasFillTOC);
 		}
 
 		// draw!
-		var wPx = this.GuiCanvasFillTOC.width;
-		var hPx = this.GuiCanvasFillTOC.height;
+		var wPx = AscBrowser.convertToRetinaValue(widthPx, true);
+		var hPx = AscBrowser.convertToRetinaValue(heightPx, true);
 		var wMm = wPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
 		var hMm = hPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+
+		var wPxOffset = AscBrowser.convertToRetinaValue(8, true);
+		var wMmOffset = wPxOffset * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+
+		this.GuiCanvasFillTOC.style.width = widthPx + "px";
+		this.GuiCanvasFillTOC.width = wPx;
 
 		History.TurnOff();
 		var _oldTurn = editor.isViewMode;
 		editor.isViewMode = true;
 
 		var ctx = this.GuiCanvasFillTOC.getContext('2d');
-
-		// clear
-		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(0, 0, wPx, hPx);
-
-		var graphics = new AscCommon.CGraphics();
-		graphics.init(ctx, wPx, hPx, wMm, hMm);
-		graphics.m_oFontManager = AscCommon.g_fontManager;
-		graphics.transform(1, 0, 0, 1, 0, 0);
 
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -7039,7 +7024,7 @@ function CDrawingDocument()
 					if (isRightTab)
 					{
 						var oParaTabs = new CParaTabs();
-						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5, nTabLeader));
+						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5 - wMmOffset, nTabLeader));
 						oParagraph.SetParagraphTabs(oParaTabs);
 
 						oRun.AddToContent(-1, new ParaTab());
@@ -7058,7 +7043,6 @@ function CDrawingDocument()
 
 		oDocumentContent.Reset(1, 0, 1000, 10000);
 		oDocumentContent.Recalculate_Page(0, true);
-		oDocumentContent.Draw(0, graphics);
 
 		for (var nIndex = 0, nCount = arrStylesToDelete.length; nIndex < nCount; ++nIndex)
 		{
@@ -7066,9 +7050,28 @@ function CDrawingDocument()
 		}
 
 		var nContentHeight = oDocumentContent.GetSummaryHeight();
+		var nContentHeightPx = (AscCommon.AscBrowser.retinaPixelRatio * nContentHeight / g_dKoef_pix_to_mm) >> 0;
 
+		if (nContentHeightPx > hPx)
+		{
+			hPx = nContentHeightPx;
+			hMm = nContentHeight;
+		}
 
-		// draw
+		this.GuiCanvasFillTOC.style.height = AscBrowser.convertToRetinaValue(hPx, false) + "px";
+		this.GuiCanvasFillTOC.height = hPx;
+
+		var ctx = this.GuiCanvasFillTOC.getContext('2d');
+
+		ctx.fillStyle = "#FFFFFF";
+		ctx.fillRect(0, 0, wPx, hPx);
+
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(ctx, wPx, hPx, wMm, hMm);
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		graphics.m_oCoordTransform.tx = graphics.m_oCoordTransform.ty = wPxOffset;
+		graphics.transform(1, 0, 0, 1, 0, 0);
+		oDocumentContent.Draw(0, graphics);
 
 		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
 
