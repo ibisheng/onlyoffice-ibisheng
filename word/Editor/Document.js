@@ -4803,7 +4803,7 @@ CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 			{
 				var oTextPr = new CTextPr();
 				oTextPr.Set_FromObject({RStyle : oLinkedStyle.GetId()}, true);
-				arrCurrentParagraphs[0].Apply_TextPr(oTextPr);
+				arrCurrentParagraphs[0].ApplyTextPr(oTextPr);
 				this.Recalculate();
 				this.Document_UpdateSelectionState();
 				this.Document_UpdateInterfaceState();

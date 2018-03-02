@@ -5508,10 +5508,8 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 
 			// TODO (ParaEnd): Переделать
 			var LastElement = this.Content[this.Content.length - 1];
-			if (para_Run === Element.Type)
-			{
+			if (para_Run === LastElement.Type)
 				LastElement.Set_Pr(this.TextPr.Value.Copy());
-			}
 		}
 	}
 };
@@ -12734,6 +12732,28 @@ Paragraph.prototype.IsParagraphSimpleChanges = function(_Changes)
 	}
 
 	return true;
+};
+/**
+ * Получаем скомпилированные настройки символа конца параграфа
+ * @returns {CTextPr}
+ */
+Paragraph.prototype.GetParaEndCompiledPr = function()
+{
+	var oLogicDocument = this.bFromDocument ? this.LogicDocument : null;
+
+	var oTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+	if (oLogicDocument && undefined !== this.TextPr.Value.RStyle)
+	{
+		var oStyles = oLogicDocument.GetStyles();
+		if (this.TextPr.Value.RStyle !== oStyles.GetDefaultHyperlink())
+		{
+			var oStyleTextPr = oStyles.Get_Pr(this.TextPr.Value.RStyle, styletype_Character).TextPr;
+			oTextPr.Merge(oStyleTextPr);
+		}
+	}
+
+	oTextPr.Merge(this.TextPr.Value);
+	return oTextPr;
 };
 
 var pararecalc_0_All  = 0;

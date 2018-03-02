@@ -2481,15 +2481,13 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
 
         // TODO: Как только избавимся от para_End переделать здесь
         if ( para_End === ItemType )
-        {
-            var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-            EndTextPr.Merge(this.Paragraph.TextPr.Value);
+		{
+			var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
+			g_oTextMeasurer.SetTextPr(oEndTextPr, this.Paragraph.Get_Theme());
+			Item.Measure(g_oTextMeasurer, oEndTextPr);
 
-            g_oTextMeasurer.SetTextPr( EndTextPr, this.Paragraph.Get_Theme());
-            Item.Measure( g_oTextMeasurer, EndTextPr );
-
-            continue;
-        }
+			continue;
+		}
 
         Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
 
@@ -5222,29 +5220,27 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
                 if ( undefined === SectPr )
                 {
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge(Para.TextPr.Value);
+                	var oEndTextPr = Para.GetParaEndCompiledPr();
 
                     if (reviewtype_Common !== ReviewType)
                     {
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
                         pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
                     }
-                    else if (EndTextPr.Unifill)
+                    else if (oEndTextPr.Unifill)
                     {
-                        EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                        var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+						oEndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                        var RGBAEnd = oEndTextPr.Unifill.getRGBAColor();
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
                         pGraphics.b_color1(RGBAEnd.R, RGBAEnd.G, RGBAEnd.B, 255);
                     }
                     else
                     {
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
-                        if (true === EndTextPr.Color.Auto)
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
+                        if (true === oEndTextPr.Color.Auto)
                             pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
-                            pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+                            pGraphics.b_color1(oEndTextPr.Color.r, oEndTextPr.Color.g, oEndTextPr.Color.b, 255);
                     }
 
                     var bEndCell = false;
@@ -6713,19 +6709,16 @@ ParaRun.prototype.Get_FirstTextPr = function()
 
 ParaRun.prototype.Get_CompiledTextPr = function(Copy)
 {
-    if ( true === this.State.Selection.Use && true === this.Selection_CheckParaEnd() )
-    {
-        var ThisTextPr = this.Get_CompiledPr( true );
+	if (true === this.State.Selection.Use && true === this.Selection_CheckParaEnd())
+	{
+		var oRunTextPr = this.Get_CompiledPr(true);
+		var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
-        var Para       = this.Paragraph;
-        var EndTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
-        EndTextPr.Merge( Para.TextPr.Value );
+		oRunTextPr = oRunTextPr.Compare(oEndTextPr);
 
-        ThisTextPr = ThisTextPr.Compare( EndTextPr );
-
-        return ThisTextPr;
-    }
-    else
+		return oRunTextPr;
+	}
+	else
 	{
 		return this.Get_CompiledPr(Copy);
 	}
@@ -6998,43 +6991,38 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
         }
 
         if ( true === bEnd )
-        {
-            if ( undefined === IncFontSize )
-            {
-                if(!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
-                {
-                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
-                }
-                else
-                {
-                    var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge( this.Paragraph.TextPr.Value );
-                    if(TextPr.AscFill)
-                    {
-                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
-                    }
-                    if(TextPr.AscUnifill)
-                    {
-                        this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
-                    }
-                    if(TextPr.AscLine)
-                    {
-                        this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
-                    }
-                }
-            }
-            else
-            {
-                var Para = this.Paragraph;
+		{
+			if (undefined === IncFontSize)
+			{
+				if (!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
+				{
+					this.Paragraph.TextPr.Apply_TextPr(TextPr);
+				}
+				else
+				{
+					var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
+					if (TextPr.AscFill)
+					{
+						this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oEndTextPr.TextFill, 1));
+					}
+					if (TextPr.AscUnifill)
+					{
+						this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oEndTextPr.Unifill, 0));
+					}
+					if (TextPr.AscLine)
+					{
+						this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oEndTextPr.TextOutline, 0));
+					}
+				}
+			}
+			else
+			{
+				var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
-                // Выставляем настройки для символа параграфа
-                var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                EndTextPr.Merge( Para.TextPr.Value );
-
-                // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-                Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
-            }
-        }
+				// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+				Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
+			}
+		}
     }
     else
     {
@@ -7132,32 +7120,27 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 						}
 						else
 						{
-							var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-							EndTextPr.Merge(this.Paragraph.TextPr.Value);
+							var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 							if (TextPr.AscFill)
 							{
-								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
+								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oEndTextPr.TextFill, 1));
 							}
 							if (TextPr.AscUnifill)
 							{
-								this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+								this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oEndTextPr.Unifill, 0));
 							}
 							if (TextPr.AscLine)
 							{
-								this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+								this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oEndTextPr.TextOutline, 0));
 							}
 						}
 					}
 					else
 					{
-						var Para = this.Paragraph;
-
-						// Выставляем настройки для символа параграфа
-						var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-						EndTextPr.Merge(Para.TextPr.Value);
+						var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
 						// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-						Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, EndTextPr.FontSize));
+						Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
 					}
 				}
 			}
