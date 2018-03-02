@@ -13614,6 +13614,8 @@ CTable.prototype.DistributeRows = function()
 	if (nRowsCount <= 0)
 		return false;
 
+	var nCellSpacing = this.GetRow(0).GetCellSpacing();
+
 	var nSumH = 0;
 	for (var nCurRow in arrRows)
 	{
@@ -13621,11 +13623,16 @@ CTable.prototype.DistributeRows = function()
 		for (var nCurPage in this.RowsInfo[nCurRow].H)
 			nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
 
+		for (var nCurPage in this.RowsInfo[nCurRow].TopDy)
+			nRowSummaryH -= this.RowsInfo[nCurRow].TopDy[nCurPage];
+
+		var oRow      = this.GetRow(nCurRow);
+		nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
+
 		nSumH += nRowSummaryH;
 	}
 
 	var nNewValueH = nSumH / nRowsCount;
-	var nCellSpacing = this.GetRow(0).GetCellSpacing();
 	for (var nCurRow in arrRows)
 	{
 		nCurRow = parseInt(nCurRow);
@@ -13644,13 +13651,6 @@ CTable.prototype.DistributeRows = function()
 
 			if (null !== nCellSpacing)
 				nNewH += nCellSpacing;
-			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
-				nNewH -= this.RowsInfo[nCurRow].TopDy[0];
-
-			var nTopMargin = oRow.GetTopMargin();
-			var nBotMargin = this.GetRow(nCurRow + nVMergeCount - 1).GetBottomMargin();
-
-			nNewH -= nTopMargin + nBotMargin;
 
 			var nContentH = oCell.GetContent().GetSummaryHeight();
 			if (nNewH * nVMergeCount < nContentH)
@@ -13668,24 +13668,6 @@ CTable.prototype.DistributeRows = function()
 
 		if (null !== nCellSpacing)
 			nNewH += nCellSpacing;
-		else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
-			nNewH -= this.RowsInfo[nCurRow].TopDy[0];
-
-		var nTopMargin = 0,
-			nBotMargin = 0;
-		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
-		{
-			var oCell    = oRow.GetCell(nCurCell);
-			var oMargins = oCell.GetMargins();
-
-			if (oMargins.Top.W > nTopMargin)
-				nTopMargin = oMargins.Top.W;
-
-			if (oMargins.Bottom.W > nBotMargin)
-				nBotMargin = oMargins.Bottom.W;
-		}
-
-		nNewH -= nTopMargin + nBotMargin;
 
 		oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 	}
