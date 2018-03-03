@@ -3560,6 +3560,9 @@ DrawingObjectsController.prototype =
                     //chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
+                    if(chart_space.pivotSource){
+                        chart_space.setPivotSource(null);
+                    }
                 }
             }
         }
