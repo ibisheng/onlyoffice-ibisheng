@@ -11373,14 +11373,14 @@ function getPtsFromSeries(ser)
             if(ser.val.numRef && ser.val.numRef.numCache)
                 return ser.val.numRef.numCache.pts;
             else if(ser.val.numLit)
-                return ser.val.numLit.pts
+                return ser.val.numLit.pts;
         }
         else if(ser.yVal)
         {
             if(ser.yVal.numRef && ser.yVal.numRef.numCache)
                 return ser.yVal.numRef.numCache.pts;
             else if(ser.yVal.numLit)
-                return ser.yVal.numLit.pts
+                return ser.yVal.numLit.pts;
         }
     }
     return [];
