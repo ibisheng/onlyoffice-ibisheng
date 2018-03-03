@@ -68,7 +68,7 @@ function (window, undefined) {
 	}
 
 	UndoRedoItemSerializable.prototype.Serialize = function (oBinaryWriter, collaborativeEditing) {
-		if ((this.oData && this.oData.getType) || this.oClass.Save_Changes || this.oClass.WriteToBinary) {
+		if ((this.oData && this.oData.getType) || (this.oClass && (this.oClass.Save_Changes || this.oClass.WriteToBinary))) {
 			var oThis = this;
 			var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
 			oBinaryCommonWriter.WriteItemWithLength(function () {
