@@ -130,6 +130,9 @@ window["DesktopUploadFileToUrl"] = function(url, dst, hash, pass)
 					};
 
 					window["AscDesktopEditor"]["sendSystemMessage"](data);
+					window["AscDesktopEditor"]["CallInAllWindows"](function(){
+						// TODO: call update document icons (onlyoffice saas)
+					});
 				}
 				catch (err)
 				{
