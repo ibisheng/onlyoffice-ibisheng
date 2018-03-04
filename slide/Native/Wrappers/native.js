@@ -38,6 +38,19 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
     switch (type)
     {
+        case 62: //ASC_MENU_EVENT_TYPE_SEARCH_FINDTEXT
+        {
+            var SearchEngine = editor.WordControl.m_oLogicDocument.Search(_params[0], {MatchCase : _params[2]});
+            var Id = this.WordControl.m_oLogicDocument.Search_GetId(_params[1]);
+            if (null != Id)
+                this.WordControl.m_oLogicDocument.Search_Select(Id);
+
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteLong"](SearchEngine.Count);
+            _return = _stream;
+            break;
+        }
         case 200: // ASC_MENU_EVENT_TYPE_DOCUMENT_BASE64
         {
             var _stream = global_memory_stream_menu;
