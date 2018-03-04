@@ -519,7 +519,7 @@ CEditorPage.prototype.CheckLayouts = function(bIsAttack)
 
 CEditorPage.prototype.GoToPage = function(lPageNum)
 {
-    this.Native["WC_GoToPage"](lPageNum);
+    this.Native["DD_SetCurrentPage"](lPageNum);
 };
 
 CEditorPage.prototype.GetVerticalScrollTo = function(y)
