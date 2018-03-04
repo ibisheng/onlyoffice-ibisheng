@@ -63,6 +63,7 @@ function NativeOpenFileP(_params){
     _api = new window["Asc"]["asc_docs_api"]("");
     _api.Native_Editor_Initialize_Settings(_params);
     _api.asc_nativeOpenFile(doc_bin);
+    _api.documentId = "1";
     _api.WordControl.m_oDrawingDocument.AfterLoad();
     Api = _api;
 
@@ -191,6 +192,114 @@ Asc['asc_docs_api'].prototype.Internal_Update_Ind_Left = function(Left)
 Asc['asc_docs_api'].prototype.Internal_Update_Ind_Right = function(Right)
 {
 };
+
+
+
+/***************************** COPY|PASTE *******************************/
+
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
+{
+    var dataBuffer = {};
+
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+
+            dataBuffer.text = data;
+
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    };
+
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
+    }
+
+    if (dataBuffer.drawingUrls) {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
+    }
+
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
+{
+    var dataBuffer = {};
+
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+
+            dataBuffer.text = data;
+
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+
+    this.asc_SelectionCut();
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
+    }
+
+    if (dataBuffer.drawingUrls) {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
+    }
+
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
+{
+    this.WordControl.m_oLogicDocument.MoveCursorLeft(false, true);
+    this.WordControl.m_oLogicDocument.MoveCursorRight(true, true);
+    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()
+{
+    this.WordControl.m_oLogicDocument.SelectAll();
+};
+
 
 if(!window.native){
 	if(_private_NativeObject){
