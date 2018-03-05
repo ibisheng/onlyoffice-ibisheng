@@ -548,6 +548,9 @@ CParagraphContentBase.prototype.Search_GetId = function(bNext, bUseContentPos, C
 {
 	return null;
 };
+CParagraphContentBase.prototype.Check_NearestPos = function(ParaNearPos, Depth)
+{
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.

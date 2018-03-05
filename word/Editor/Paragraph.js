@@ -12602,6 +12602,8 @@ Paragraph.prototype.AddBookmarkForTOC = function()
 	this.Add_ToContent(0, new CParagraphBookmark(true, sId, sName));
 	this.Add_ToContent(this.Content.length - 1, new CParagraphBookmark(false, sId, sName));
 
+	this.Correct_Content();
+
 	return sName;
 };
 Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, isStartSelection)
