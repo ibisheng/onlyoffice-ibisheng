@@ -3592,9 +3592,8 @@
 								switch (content[n].Content[h].Type) {
 									case para_Run://*paraRun*
 									{
-										paraRunObj =
-											this._parseParaRun(content[n].Content[h], oNewItem, paraPr, innerCol, row,
-												col, text);
+										paraRunObj = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, innerCol, row, col, text);
+										oNewItem = paraRunObj.oNewItem;
 										innerCol = paraRunObj.col;
 										row = paraRunObj.row;
 										break;
@@ -3743,7 +3742,7 @@
 					}
 				}
 
-				return {col: innerCol, row: row, prevTextPr: cTextPr};
+				return {col: innerCol, row: row, prevTextPr: cTextPr, oNewItem: oNewItem};
 			},
 			
 			_addImageToMap: function(paraDrawing)
@@ -4265,6 +4264,11 @@
 						elem.ReIndexing(0);
 						oNewElem = this._getTableMeasure(elem, oRes);
 					}
+					else if(type_BlockLevelSdt === elem.GetType())
+					{
+						oNewElem = this._getMeasure(elem.Content.Content, oRes);
+					}
+
 					if(null != oNewElem)
 					{
 						oRes.children.push(oNewElem);
