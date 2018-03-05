@@ -489,11 +489,13 @@ Slide.prototype =
             }
         }
 
+        if(info){
+            return null;
+        }
         if(body_count === 1 && _input_reduced_type === AscFormat.phType_body && bSingleBody)
         {
             return last_body;
         }
-
 
         for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
         {

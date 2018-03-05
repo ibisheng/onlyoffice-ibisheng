@@ -6591,9 +6591,7 @@ CPresentation.prototype =
                             if(hierarchy[t])
                             {
                                 if(hierarchy[t].parent && (hierarchy[t].parent instanceof AscCommonSlide.SlideLayout)){
-                                    if(oInfo.bBadMatch !== true){
                                         bNoPlaceholder = false;
-                                    }
                                 }
                                 if(hierarchy[t].spPr && hierarchy[t].spPr.xfrm && hierarchy[t].spPr.xfrm.isNotNull())
                                 {
