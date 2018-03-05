@@ -871,6 +871,12 @@ CDrawingCollaborativeTarget.prototype =
 			this.HtmlParent.appendChild(this.HtmlElement);
 		}
 
+		if (_drawing_doc.m_oWordControl.m_oApi.isReporterMode)
+		{
+			this.HtmlElement.style.display = "none";
+			return;
+		}
+
 		if (this.HtmlElement.style.display != "block")
 		{
 			this.HtmlElement.style.display = "block";
