@@ -1491,13 +1491,13 @@ background-repeat: no-repeat;\
 		AscFonts.IsCheckSymbols = true;
 		_loader.Load(gObject, this.WordControl.m_oLogicDocument);
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(true);
-		_loader.Check_TextFit();
 
 		if (History && History.Update_FileDescription)
 			History.Update_FileDescription(_loader.stream);
 
 		this.LoadedObject = 1;
 		g_oIdCounter.Set_Load(false);
+		_loader.Check_TextFit();
 		AscFonts.IsCheckSymbols = false;
 
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
