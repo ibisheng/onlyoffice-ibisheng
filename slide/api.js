@@ -3536,7 +3536,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.addRowAbove             = function(count)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_AddRowAbove);
 			this.WordControl.m_oLogicDocument.AddTableRow(true);
@@ -3545,7 +3550,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.addRowBelow             = function(count)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_AddRowBelow);
 			this.WordControl.m_oLogicDocument.AddTableRow(false);
@@ -3554,7 +3564,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.addColumnLeft           = function(count)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_AddColLeft);
 			this.WordControl.m_oLogicDocument.AddTableColumn(true);
@@ -3563,7 +3578,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.addColumnRight          = function(count)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_AddColRight);
 			this.WordControl.m_oLogicDocument.AddTableColumn(false);
@@ -3572,7 +3592,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.remRow                  = function()
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveRow);
 			this.WordControl.m_oLogicDocument.RemoveTableRow();
@@ -3581,7 +3606,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.remColumn               = function()
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveCol);
 			this.WordControl.m_oLogicDocument.RemoveTableColumn();
@@ -3603,7 +3633,14 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return;
 
-		if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties))
+
+		var doc = this.WordControl.m_oLogicDocument;
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DistributeTableCells);
 			if (!oLogicDocument.DistributeTableCells(isHorizontally))
@@ -3654,7 +3691,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.MergeCells              = function()
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_MergeCells);
 			this.WordControl.m_oLogicDocument.MergeTableCells();
@@ -3663,7 +3705,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.SplitCell               = function(Cols, Rows)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_SplitCells);
 			this.WordControl.m_oLogicDocument.SplitTableCells(Cols, Rows);
@@ -3888,7 +3935,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.tblApply = function(obj)
 	{
 		var doc = this.WordControl.m_oLogicDocument;
-		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+		var oController = doc.GetCurrentController();
+		if(!oController){
+			return;
+		}
+		var aAdditionalObjects = oController.getConnectorsForCheck2();
+		if (doc.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined, undefined, aAdditionalObjects) === false)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_TblApply);
 			if (obj.CellBorders)

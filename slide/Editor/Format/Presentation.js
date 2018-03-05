@@ -2829,6 +2829,23 @@ CPresentation.prototype =
         if(oController){
             oController.setTableProps(Props);
             this.Recalculate();
+
+            if(!this.FocusOnNotes)
+            {
+                var aConnectors = oController.getConnectorsForCheck();
+                for(var i = 0; i < aConnectors.length; ++i){
+                    aConnectors[i].calculateTransform(false);
+                    var oGroup = aConnectors[i].getMainGroup();
+                    if(oGroup){
+                        checkObjectInArray([], oGroup);
+                    }
+                }
+                if(aConnectors.length > 0)
+                {
+                    this.Recalculate();
+                }
+            }
+
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
         }
@@ -4190,6 +4207,21 @@ CPresentation.prototype =
                     return result;
                 }
                 this.Recalculate();
+                if(!this.FocusOnNotes)
+                {
+                    var aConnectors = this.Slides[this.CurPage].graphicObjects.getConnectorsForCheck();
+                    for(var i = 0; i < aConnectors.length; ++i){
+                        aConnectors[i].calculateTransform(false);
+                        var oGroup = aConnectors[i].getMainGroup();
+                        if(oGroup){
+                            checkObjectInArray([], oGroup);
+                        }
+                    }
+                    if(aConnectors.length > 0)
+                    {
+                        this.Recalculate();
+                    }
+                }
                 this.Document_UpdateInterfaceState();
             }
             else
@@ -4224,6 +4256,21 @@ CPresentation.prototype =
                         return;
                     }
                     this.Recalculate();
+                    if(!this.FocusOnNotes)
+                    {
+                        var aConnectors = this.Slides[this.CurPage].graphicObjects.getConnectorsForCheck();
+                        for(var i = 0; i < aConnectors.length; ++i){
+                            aConnectors[i].calculateTransform(false);
+                            var oGroup = aConnectors[i].getMainGroup();
+                            if(oGroup){
+                                checkObjectInArray([], oGroup);
+                            }
+                        }
+                        if(aConnectors.length > 0)
+                        {
+                            this.Recalculate();
+                        }
+                    }
                     this.Document_UpdateSelectionState();
                     this.Document_UpdateInterfaceState();
                 }
