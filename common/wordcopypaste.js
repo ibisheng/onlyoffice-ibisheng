@@ -1041,7 +1041,7 @@ CopyProcessor.prototype =
         oDomTarget.addChild(DomTable);
     },
 	
-	CopyDocument2 : function(oDomTarget, oDocument, elementsContent, bFromPresentation)
+	CopyDocument2 : function(oDomTarget, oDocument, elementsContent, dNotGetBinary)
 	{
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
@@ -1063,18 +1063,30 @@ CopyProcessor.prototype =
 						this.CopyTable(oDomTarget, Item, null);
 					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
 					
-					if(!bFromPresentation)
+					if(!dNotGetBinary)
 						this.oBinaryFileWriter.CopyTable(Item, null);
 				}
 				else if ( type_Paragraph === Item.GetType() )
 				{
 					var SelectedAll = Index === elementsContent.length - 1 ? elementsContent[Index].SelectedAll : true;
 					//todo может только для верхнего уровня надо Index == End
-					if(!bFromPresentation)
+					if(!dNotGetBinary)
 						this.oBinaryFileWriter.CopyParagraph(Item, SelectedAll);
 						
 					if(!this.onlyBinaryCopy)
 						this.CopyParagraph(oDomTarget, Item, SelectedAll);
+				}
+				else if(type_BlockLevelSdt === Item.GetType() )
+				{
+					this.oBinaryFileWriter.copyParams.bLockCopyElems++;
+					if(!this.onlyBinaryCopy)
+					{
+						this.CopyDocument2(oDomTarget, oDocument, Item.Content.Content, true);
+					}
+					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
+
+					if(!dNotGetBinary)
+						this.oBinaryFileWriter.CopySdt(Item);
 				}
 			}
 		}
