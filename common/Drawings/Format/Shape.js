@@ -612,10 +612,36 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     return oGraphicFrame;
 }
 
+
+function fHandleContent(aContent, oMax){
+    for(var i = 0;  i < aContent.length; ++i)
+    {
+        var oContentElement = aContent[i];
+        if(oContentElement.Get_Type() === type_Paragraph)
+        {
+            var paragraph_lines = aContent[i].Lines;
+            for(var j = 0;  j < paragraph_lines.length; ++j)
+            {
+                if(paragraph_lines[j].Ranges[0].W > oMax.max_width)
+                    oMax.max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
+            }
+        }
+        else if(oContentElement.Get_Type() === type_Table)
+        {
+
+        }
+        else if(oContentElement.Get_Type() === type_BlockLevelSdt)
+        {
+            if(oContentElement && oContentElement.Content){
+                fHandleContent(oContentElement.Content.Content, oMax);
+            }
+        }
+    }
+}
+
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
 {
-
-    var max_width = 0, arr_content = oDocContent.Content, paragraph_lines, i, j;
+    var oMaxWidth = {max_width: 0}, i;
     oDocContent.Reset(0, 0, dMaxWidth, 20000);
     if(bNeedRecalcAllDrawings)
     {
@@ -626,24 +652,8 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
     }
     oDocContent.Recalculate_Page(0, true);
-    for(i = 0;  i < arr_content.length; ++i)
-    {
-        var oContentElement = arr_content[i];
-        if(oContentElement.Get_Type() === type_Paragraph)
-        {
-            paragraph_lines = arr_content[i].Lines;
-            for(j = 0;  j < paragraph_lines.length; ++j)
-            {
-                if(paragraph_lines[j].Ranges[0].W > max_width)
-                    max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
-            }
-        }
-        else if(oContentElement.Get_Type() === type_Table)
-        {
-
-        }
-    }
-    if(max_width === 0)
+    fHandleContent(oDocContent.Content, oMaxWidth);
+    if(oMaxWidth.max_width === 0)
     {
         if(oDocContent.Is_Empty())
         {
@@ -654,7 +664,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
         return 0.001;
     }
-    return max_width;
+    return oMaxWidth.max_width;
 }
 
 
