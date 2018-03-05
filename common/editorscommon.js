@@ -328,6 +328,10 @@
 						 },
 		getImageLocal:   function (url)
 						 {
+							 if(url && 0 === url.indexOf('data:image'))
+							 {
+								 return null;
+							 }
 							 var imageLocal = this.getLocal(url);
 							 if (imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
 								 imageLocal = imageLocal.substring(this.mediaPrefix.length);
