@@ -7437,7 +7437,16 @@ CDocument.prototype.OnMouseDown = function(e, X, Y, PageIndex)
 
 	// Если мы только что расширяли документ двойным щелчком, то отменяем это действие
 	if (true === this.History.Is_ExtendDocumentToPos())
+	{
 		this.Document_Undo();
+
+		// Заглушка на случай "неудачного" пересчета, когда после него страниц меньше, чем ту, по которое мы кликаем
+		if (PageIndex >= this.Pages.length)
+		{
+			this.RemoveSelection();
+			return;
+		}
+	}
 
 	var OldCurPage = this.CurPage;
 	this.CurPage   = PageIndex;
