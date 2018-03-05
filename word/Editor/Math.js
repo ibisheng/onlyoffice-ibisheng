@@ -1106,7 +1106,17 @@ ParaMath.prototype.Get_Text = function(Text)
 
 ParaMath.prototype.Is_Empty = function()
 {
-    return this.Root.Content.length == 0;
+	if (this.Root.Content.length <= 0)
+		return true;
+
+	for (var nIndex = 0, nCount = this.Root.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Root.Content[nIndex];
+		if (para_Math_Run !== oItem.Type || !oItem.Is_Empty({SkipPlcHldr : true}))
+			return false;
+	}
+
+	return true;
 };
 
 ParaMath.prototype.Is_CheckingNearestPos = function()
