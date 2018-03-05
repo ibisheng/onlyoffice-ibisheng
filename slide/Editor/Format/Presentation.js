@@ -889,6 +889,22 @@ CPresentation.prototype =
 
     Begin_CompositeInput: function()
     {
+        var oCurSlide = this.Slides[this.CurPage];
+        if(!this.FocusOnNotes && oCurSlide && oCurSlide.graphicObjects.selectedObjects.length === 0){
+            var oTitle = oCurSlide.getMatchingShape(AscFormat.phType_title, null);
+            if(oTitle){
+                var oDocContent = oTitle.getDocContent();
+                if(oDocContent.Is_Empty()){
+                    oDocContent.Set_CurrentElement(0, false);
+                }
+                else{
+                    return;
+                }
+            }
+            else{
+                return;
+            }
+        }
         if (false === this.Document_Is_SelectionLocked(changestype_Drawing_Props, null, true))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
@@ -896,8 +912,6 @@ CPresentation.prototype =
             if(oController){
                 oController.CreateDocContent();
             }
-            this.DrawingDocument.TargetStart();
-            this.DrawingDocument.TargetShow();
 
 
             var oContent = this.Get_TargetDocContent();
@@ -906,6 +920,8 @@ CPresentation.prototype =
                 this.History.Remove_LastPoint();
                 return false;
             }
+            this.DrawingDocument.TargetStart();
+            this.DrawingDocument.TargetShow();
             var oPara = oContent.GetCurrentParagraph();
             if (!oPara)
             {
