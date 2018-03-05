@@ -3683,45 +3683,53 @@ PasteProcessor.prototype =
 		var presentationSelectedContent = new PresentationSelectedContent();
 		presentationSelectedContent.DocContent = new CSelectedContent();
 
+		var parseContent = function(content) {
+			for(var i = 0; i < content.length; ++i)
+			{
+				selectedElement = new CSelectedElement();
+				element = content[i];
+				//drawings
+				element.GetAllDrawingObjects(drawings);
+				if(type_Paragraph === element.GetType())//paragraph
+				{
+					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
+					elements.push(selectedElement);
+				}
+				else if(type_Table === element.GetType())//table
+				{
+					//TODO переделать количество строк и ширину
+					var W = 100;
+					var Rows = 3;
+					var graphic_frame = new CGraphicFrame();
+					graphic_frame.setSpPr(new AscFormat.CSpPr());
+					graphic_frame.spPr.setParent(graphic_frame);
+					graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
+					graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
+					graphic_frame.spPr.xfrm.setOffX((oThis.oDocument.Width - W)/2);
+					graphic_frame.spPr.xfrm.setOffY(oThis.oDocument.Height/5);
+					graphic_frame.spPr.xfrm.setExtX(W);
+					graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
+					graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
+
+					element = oThis._convertTableToPPTX(element, true);
+					graphic_frame.setGraphicObject(element.Copy(graphic_frame));
+					graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
+
+					drawingCopyObject = new DrawingCopyObject();
+					drawingCopyObject.Drawing = graphic_frame;
+					pDrawings.push(drawingCopyObject);
+
+				}
+				else if(type_BlockLevelSdt === element.GetType())//TOC
+				{
+					parseContent(element.Content.Content);
+				}
+			}
+		};
+
 		var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
 		var defaultTableStyleId = presentation.DefaultTableStyleId;
-		for(var i = 0; i < aContent.content.length; ++i)
-		{
-			selectedElement = new CSelectedElement();
-			element = aContent.content[i];
-			//drawings
-			element.GetAllDrawingObjects(drawings);
-			if(type_Paragraph === element.GetType())//paragraph
-			{
-				selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
-				elements.push(selectedElement);
-			}
-			else if(type_Table === element.GetType())//table
-			{
-				//TODO переделать количество строк и ширину
-				var W = 100;
-				var Rows = 3;
-				var graphic_frame = new CGraphicFrame();
-				graphic_frame.setSpPr(new AscFormat.CSpPr());
-				graphic_frame.spPr.setParent(graphic_frame);
-				graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
-				graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
-				graphic_frame.spPr.xfrm.setOffX((this.oDocument.Width - W)/2);
-				graphic_frame.spPr.xfrm.setOffY(this.oDocument.Height/5);
-				graphic_frame.spPr.xfrm.setExtX(W);
-				graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
-				graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
-
-				element = this._convertTableToPPTX(element, true);
-				graphic_frame.setGraphicObject(element.Copy(graphic_frame));
-				graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
-
-				drawingCopyObject = new DrawingCopyObject();
-				drawingCopyObject.Drawing = graphic_frame;
-				pDrawings.push(drawingCopyObject);
-
-			}
-		}
+		parseContent(aContent.content);
 
 		if(drawings && drawings.length)
 		{
