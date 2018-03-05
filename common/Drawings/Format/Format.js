@@ -421,6 +421,9 @@ function scRGB_to_sRGB(value)
 }
 
 function checkRasterImageId(rasterImageId) {
+    if(rasterImageId && rasterImageId.indexOf('data:image')){
+        return rasterImageId;
+    }
   var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(rasterImageId);
   return imageLocal ? imageLocal : rasterImageId;
 }
