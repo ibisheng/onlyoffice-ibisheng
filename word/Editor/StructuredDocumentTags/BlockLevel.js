@@ -359,11 +359,15 @@ CBlockLevelSdt.prototype.AddNewParagraph = function()
 };
 CBlockLevelSdt.prototype.Get_SelectionState2 = function()
 {
-	return this.Content.Get_SelectionState2();
+	var oState  = new CDocumentSelectionState();
+	oState.Id   = this.GetId();
+	oState.Data = this.Content.Get_SelectionState2();
+	return oState;
 };
 CBlockLevelSdt.prototype.Set_SelectionState2 = function(State)
 {
-	this.Content.Set_SelectionState2(State);
+	if (State.Data)
+		this.Content.Set_SelectionState2(State.Data);
 };
 CBlockLevelSdt.prototype.IsStartFromNewPage = function()
 {

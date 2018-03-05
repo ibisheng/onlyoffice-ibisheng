@@ -13120,7 +13120,7 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 
 					if (oCellW.IsMM())
 						oCell.SetW(new CTableMeasurement(tblwidth_Mm, nW));
-					else if (oCell.IsPercent() && nPercentWidth > 0.001)
+					else if (oCellW.IsPercent() && nPercentWidth > 0.001)
 						oCell.SetW(new CTableMeasurement(tblwidth_Pct, nW / nPercentWidth * 100));
 					else
 						oCell.SetW(new CTableMeasurement(tblwidth_Auto, 0));
