@@ -1325,6 +1325,7 @@
 	};
 	asc_docs_api.prototype.asc_setLocale = function(val)
 	{
+		this.locale = val;
 	};
 
 	asc_docs_api.prototype.SetThemesPath = function(path)
@@ -6228,6 +6229,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationReporterStart = function(startObject)
 	{
 		this.reporterStartObject = startObject;
+		this.reporterStartObject["translate"] = AscCommon.translateManager.mapTranslate;
 
 		if (window["AscDesktopEditor"])
 		{
@@ -6248,7 +6250,10 @@ background-repeat: no-repeat;\
 		var top = ((height / 2) - (h / 2)) + dualScreenTop;
 
 		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
-		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=yes,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+		var _url = "index.reporter.html";
+		if (this.locale)
+			_url += ("?lang=" + this.locale);
+		this.reporterWindow = window.open(_url, "_blank", "resizable=yes,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
 
 		if (!this.reporterWindow)
 			return;
@@ -6396,6 +6401,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.preloadReporter = function(data)
 	{
+		if (data["translate"])
+			this.translateManager = AscCommon.translateManager.init(data["translate"]);
+
 		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
 		if (!this.WordControl)
 			return;
