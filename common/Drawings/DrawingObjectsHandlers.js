@@ -360,7 +360,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
-    if(e.CtrlKey || e.Button === AscCommon.g_mouse_button_right){
+    if(e.CtrlKey || (e.Button === AscCommon.g_mouse_button_right && drawingObjectsController.selectedObjects.length > 1)){
         return false;
     }
     var ret = false, i, title;
