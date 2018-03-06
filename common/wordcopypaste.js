@@ -5373,6 +5373,7 @@ PasteProcessor.prototype =
 					{
 						this._replaceInnerTables(cDocumentContent.Content[n], allRows);
 						cDocumentContent.Content.splice(n, 1);
+						n--;
 					}
 				}
 			}
