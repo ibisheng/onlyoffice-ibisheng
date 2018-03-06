@@ -2272,12 +2272,15 @@
 			oFormulaLocaleInfo.DigitSep = false;
 			AscFonts.IsCheckSymbols = true;
 			History.Clear();
-			History.Create_NewPoint();
+			History.TurnOff();
+			var history = new AscCommon.CHistory();
+			history.init(this);
+			history.Create_NewPoint();
 
-			History.SetSelection(null);
-			History.SetSelectionRedo(null);
+			history.SetSelection(null);
+			history.SetSelectionRedo(null);
 			var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
-			History.UndoRedoPrepare(oRedoObjectParam, false);
+			history.UndoRedoPrepare(oRedoObjectParam, false);
 			var changesMine = [].concat.apply([], oThis.aCollaborativeActions);
 			oThis._forwardTransformation(oThis.snapshot, changesMine, aUndoRedoElems);
 			for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
@@ -2290,7 +2293,7 @@
 					}
 					// TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
 					//     item.oData.drawingData.bCollaborativeChanges = true;
-					History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+					history.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 				}
 			}
 			AscFonts.IsCheckSymbols = false;
@@ -2317,15 +2320,16 @@
 				}
 				oFormulaLocaleInfo.Parse = true;
 				oFormulaLocaleInfo.DigitSep = true;
-				History.UndoRedoEnd(null, oRedoObjectParam, false);
-
+				history.UndoRedoEnd(null, oRedoObjectParam, false);
+				History.TurnOn();
 				oThis.bCollaborativeChanges = false;
 				//make snapshot for faormulas
 				oThis.snapshot = oThis._getSnapshot();
-				History.Clear();
 				if(null != fCallback)
 					fCallback();
 			});
+		} else if(null != fCallback) {
+			fCallback();
 		}
 	};
 	Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, isFull){
