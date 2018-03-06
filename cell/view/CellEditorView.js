@@ -2707,8 +2707,8 @@
 			this.beginCompositePos = this.cursorPos;
 			this.compositeLength = 0;
 		} else {
-			this.beginCompositePos = this.selectionBegin;
-			this.compositeLength = this.selectionEnd - this.selectionBegin;
+			this.beginCompositePos = Math.min(this.selectionBegin, this.selectionEnd);
+			this.compositeLength = Math.max(this.selectionBegin, this.selectionEnd) - this.beginCompositePos;
 		}
 		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
 	};
