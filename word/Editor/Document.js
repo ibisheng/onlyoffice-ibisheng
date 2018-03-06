@@ -8020,10 +8020,14 @@ CDocument.prototype.Document_SetHdrFtrFirstPage = function(Value)
 		this.HdrFtr.Set_CurHdrFtr(TempSectPr.Get_Header_Default());
 	}
 
-	if (null !== this.HdrFtr.CurHdrFtr)
-		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
 
 	this.Recalculate();
+
+	if (null !== this.HdrFtr.CurHdrFtr)
+	{
+		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
+		this.HdrFtr.CurHdrFtr.Set_Page(CurPage);
+	}
 
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
