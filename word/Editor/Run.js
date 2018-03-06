@@ -228,7 +228,7 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 		else
 		{
 			// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
-			if (para_End !== Item.Type)
+			if (para_End !== Item.Type && (para_Drawing !== Item.Type || Item.Is_Inline() || true !== oPr.SkipAnchors))
 			{
 				NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
 				AddedPos++;
