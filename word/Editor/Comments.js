@@ -712,8 +712,8 @@ ParaComment.prototype.Recalculate_Range_Spaces = function(PRSA, CurLine, CurRang
 		return;
 
 	var X    = PRSA.X;
-	var Y    = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
-	var H    = Para.Lines[CurLine].Bottom - Para.Lines[CurLine].Top;
+	var Y    = Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent;
+	var H    = Para.Lines[CurLine].Metrics.Ascent + Para.Lines[CurLine].Metrics.Descent;
 	var Page = Para.Get_StartPage_Absolute() + CurPage;
 
 	if (comment_type_HdrFtr === Comment.m_oTypeInfo.Type)
