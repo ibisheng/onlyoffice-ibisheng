@@ -851,6 +851,14 @@ CDocumentContentElementBase.prototype.IsSelectedSingleElement = function()
 
 	return false;
 };
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetLastParagraph = function()
+{
+	return null;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

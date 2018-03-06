@@ -12765,6 +12765,10 @@ Paragraph.prototype.GetParaEndCompiledPr = function()
 	oTextPr.Merge(this.TextPr.Value);
 	return oTextPr;
 };
+Paragraph.prototype.GetLastParagraph = function()
+{
+	return this;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

@@ -1177,6 +1177,10 @@ CBlockLevelSdt.prototype.GetLastElement = function()
 
 	return this.Content.GetElement(nCount - 1);
 };
+CBlockLevelSdt.prototype.GetLastParagraph = function()
+{
+	return this.Content.GetLastParagraph();
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

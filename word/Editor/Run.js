@@ -5246,8 +5246,14 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     }
 
                     var bEndCell = false;
-                    if (null === Para.Get_DocumentNext() && true === Para.Parent.IsTableCellContent())
-                        bEndCell = true;
+
+                    var oDocContent = Para.GetParent();
+                    var oCell       = oDocContent.IsTableCellContent(true);
+                    if (oCell)
+					{
+						var oCellContent = oCell.GetContent();
+						bEndCell = Para === oCellContent.GetLastParagraph();
+					}
 
                     Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell, reviewtype_Common !== ReviewType ?  true : false);
                 }

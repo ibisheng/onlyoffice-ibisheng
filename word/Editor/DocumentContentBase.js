@@ -1029,3 +1029,14 @@ CDocumentContentBase.prototype.GetParent = function()
 {
 	return null;
 };
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetLastParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[this.Content.length - 1].GetLastParagraph();
+};

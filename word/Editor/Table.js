@@ -13750,6 +13750,19 @@ CTable.prototype.IsInHeader = function(nRow)
 
 	return true;
 };
+CTable.prototype.GetLastParagraph = function()
+{
+	var nRowsCount = this.GetRowsCount();
+	if (nRowsCount <= 0)
+		return null;
+
+	var oRow = this.GetRow(nRowsCount - 1);
+	var nCellsCount = oRow.GetCellsCount();
+	if (nCellsCount <= 0)
+		return null;
+
+	return oRow.GetCell(nCellsCount - 1).GetContent().GetLastParagraph();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------
