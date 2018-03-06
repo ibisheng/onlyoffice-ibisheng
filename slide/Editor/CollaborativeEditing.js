@@ -136,7 +136,8 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
 					|| Class.getObjectType() === AscDFH.historyitem_type_GroupShape
 					|| Class.getObjectType() === AscDFH.historyitem_type_GraphicFrame
 					|| Class.getObjectType() === AscDFH.historyitem_type_ChartSpace
-					|| Class.getObjectType() === AscDFH.historyitem_type_OleObject) && AscCommon.isRealObject(Class.parent))
+					|| Class.getObjectType() === AscDFH.historyitem_type_OleObject
+					|| Class.getObjectType() === AscDFH.historyitem_type_Cnx) && AscCommon.isRealObject(Class.parent))
 				{
 					if(Class.parent && AscFormat.isRealNumber(Class.parent.num))
 					{
