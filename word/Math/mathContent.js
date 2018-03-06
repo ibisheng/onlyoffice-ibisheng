@@ -7252,7 +7252,7 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
     }
 };
 
-CMathContent.prototype.GetTextContent = function()
+CMathContent.prototype.GetTextContent = function(bSelectedText)
 {
 	//TODO временная функция. пересмотреть!
 	var arr = [], str = "", bIsContainsOperator = false, paraRunArr = [];
@@ -7322,7 +7322,7 @@ CMathContent.prototype.GetTextContent = function()
 			res.push(getVal(String.fromCharCode(elem.Pr.chr), true));
 			if(!elem.Pr.supHide)
 			{
-				res.push(getVal(String.fromCharCode(95), true))
+				res.push(getVal(String.fromCharCode(95), true));
 				//res.push(getVal("_", true));
 			}
 			else
@@ -7382,7 +7382,7 @@ CMathContent.prototype.GetTextContent = function()
 
 	var getAndPushTextContent = function(elem)
 	{
-		var tempStr = elem.GetTextContent();
+		var tempStr = elem.GetTextContent(bSelectedText);
 		if(tempStr.str)
 		{
 			addText(tempStr.str, tempStr.bIsContainsOperator, tempStr.paraRunArr);
@@ -7446,7 +7446,7 @@ CMathContent.prototype.GetTextContent = function()
 		{
 			addText(symbol[0].value);
 			//степень корня
-			tempStr = elem.Content[0].GetTextContent();
+			tempStr = elem.Content[0].GetTextContent(bSelectedText);
 			var isAddExp = false;
 			if(tempStr.str)
 			{
@@ -7511,18 +7511,42 @@ CMathContent.prototype.GetTextContent = function()
 
 	};
 
-
-	for(var i = 0; i < this.Content.length; i++)
+	var StartPos = 0, EndPos = this.Content.length;
+	if(bSelectedText)
 	{
+		StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+		EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+	}
+
+
+	for(var i = StartPos; i <= EndPos; i++)
+	{
+		if(!this.Content[i])
+		{
+			continue;
+		}
+
 		switch(this.Content[i].Type)
 		{
 			case para_Math_Run:
 			{
 				if(this.Content[i].Content.length)
 				{
-					var string = "";
-					for(var j = 0; j < this.Content[i].Content.length; j++)
+					var StartContentPos = 0, EndContentPos = this.Content[i].Content.length;
+					if(bSelectedText)
 					{
+						StartContentPos = ( true == this.Content[i].Selection.Use ? Math.min(this.Content[i].Selection.StartPos, this.Content[i].Selection.EndPos) : this.Content[i].CurPos.ContentPos );
+						EndContentPos   = ( true == this.Content[i].Selection.Use ? Math.max(this.Content[i].Selection.StartPos, this.Content[i].Selection.EndPos) : this.Content[i].CurPos.ContentPos );
+					}
+
+					var string = "";
+					for(var j = StartContentPos; j <= EndContentPos; j++)
+					{
+						if(!this.Content[i].Content[j])
+						{
+							continue;
+						}
+
 						if(para_Math_Text === this.Content[i].Content[j].Type)
 						{
 							string += String.fromCharCode(this.Content[i].Content[j].value);
