@@ -103,7 +103,7 @@ var GlobalSkinFlat2    = {
 	RulersButton                          : false,
 	NavigationButtons                     : false,
 	BackgroundColor                       : "#E2E2E2",
-	BackgroundColorThumbnails             : "#E2E2E2",
+	BackgroundColorThumbnails             : "#F4F4F4",
 	BackgroundScroll       				  : "#E2E2E2",
 	RulerDark                             : "#CFCFCF",
 	RulerLight                            : "#FFFFFF",
@@ -156,6 +156,7 @@ function CEditorPage(api)
 	// thumbnails
 	this.m_oThumbnailsContainer = null;
 	this.m_oThumbnailsBack      = null;
+	this.m_oThumbnailsSplit		= null;
 	this.m_oThumbnails          = null;
 	this.m_oThumbnails_scroll   = null;
 
@@ -448,7 +449,7 @@ function CEditorPage(api)
 		this.m_oBody = CreateControlContainer(this.Name);
 
 		this.Splitter1Pos    = 67.5;
-		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
+		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 11 : 0;
 
 		this.OldSplitter1Pos = this.Splitter1Pos;
 
@@ -473,6 +474,11 @@ function CEditorPage(api)
 		this.m_oThumbnailsContainer.Bounds.SetParams(0, 0, this.Splitter1Pos, 1000, false, false, true, false, this.Splitter1Pos, -1);
 		this.m_oThumbnailsContainer.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
 		this.m_oBody.AddControl(this.m_oThumbnailsContainer);
+
+		this.m_oThumbnailsSplit = CreateControlContainer("id_panel_thumbnails_split");
+		this.m_oThumbnailsSplit.Bounds.SetParams(this.Splitter1Pos, 0, 1000, 1000, true, false, false, false, GlobalSkin.SplitterWidthMM, -1);
+		this.m_oThumbnailsSplit.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
+		this.m_oBody.AddControl(this.m_oThumbnailsSplit);
 
 		this.m_oThumbnailsBack = CreateControl("id_thumbnails_background");
 		this.m_oThumbnailsBack.Bounds.SetParams(0, 0, ScrollWidthMm9, 1000, false, false, true, false, -1, -1);
@@ -1979,6 +1985,7 @@ function CEditorPage(api)
 
 		this.m_oThumbnailsContainer.Bounds.R    = this.Splitter1Pos;
 		this.m_oThumbnailsContainer.Bounds.AbsW = this.Splitter1Pos;
+		this.m_oThumbnailsSplit.Bounds.L 		= this.Splitter1Pos;
 
 		if (!this.IsSupportNotes)
 			this.Splitter2Pos = 0;
@@ -1995,6 +2002,7 @@ function CEditorPage(api)
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
+			this.m_oThumbnailsSplit.HtmlElement.style.display = "block";
 			this.m_oMainParent.HtmlElement.style.borderLeft = ("1px solid " + GlobalSkin.BorderSplitterColor);
 		}
 		else
@@ -2006,6 +2014,7 @@ function CEditorPage(api)
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
+			this.m_oThumbnailsSplit.HtmlElement.style.display = "none";
 			this.m_oMainParent.HtmlElement.style.borderLeft = "none";
 		}
 
