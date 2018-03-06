@@ -2675,12 +2675,15 @@
 
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
+		var t = this;
 		if (this.handlers.trigger("isViewerMode")) {
 			return true;
 		}
-		this.skipTLUpdate = true;
-		this.replaceText(0, this.textRender.getEndOfText(), this.input.value);
-		this._updateCursorByTopLine();
+		AscFonts.FontPickerByCharacter.checkText(this.input.value, this, function () {
+			t.skipTLUpdate = true;
+			t.replaceText(0, t.textRender.getEndOfText(), t.input.value);
+			t._updateCursorByTopLine();
+		});
 		return true;
 	};
 
