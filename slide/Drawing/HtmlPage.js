@@ -2990,7 +2990,7 @@ function CEditorPage(api)
 		this.onButtonTabsDraw();
 
 		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.onResize("id_main_view");
+			AscCommon.g_inputContext.onResize("id_main_parent");
 
 		this.DemonstrationManager.Resize();
 
@@ -3796,9 +3796,9 @@ function CEditorPage(api)
 
 		if (true)
 		{
-			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor", "id_main_parent");
 			if (AscCommon.g_inputContext)
-				AscCommon.g_inputContext.onResize("id_main_view");
+				AscCommon.g_inputContext.onResize("id_main_parent");
 
 			if (this.m_oApi.isMobileVersion)
 				this.initEventsMobile();

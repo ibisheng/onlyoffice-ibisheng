@@ -1838,9 +1838,9 @@ function CDrawingDocument()
 			{
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
-				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 4;
+				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 9;
 
-				AscCommon.g_inputContext.TargetOffsetY = (editor.WordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
+				AscCommon.g_inputContext.TargetOffsetY = (this.m_oWordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 			}
 			else
 			{
@@ -1852,6 +1852,10 @@ function CDrawingDocument()
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;
+		}
+		else if (!this.TargetHtmlElementOnSlide)
+		{
+			AscCommon.g_inputContext.TargetOffsetY = (this.m_oWordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 		}
 
 		var _oldW = this.TargetHtmlElement.width;
@@ -5967,6 +5971,8 @@ function CNotesDrawer(page)
 		oThis.HtmlPage.StartUpdateOverlay();
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseUp(global_mouseEvent, _x, _y);
 		oThis.HtmlPage.EndUpdateOverlay();
+
+		oThis.HtmlPage.m_bIsMouseLock = false;
 	};
 
 	this.onMouseWhell = function(e)

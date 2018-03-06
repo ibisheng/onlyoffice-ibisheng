@@ -146,11 +146,17 @@
 			//console.log(_val);
 		},
 
-		init : function(target_id)
+		init : function(target_id, parent_id)
 		{
 			this.TargetId   = target_id;
+
+			var oHtmlParent = null;
+
 			var oHtmlTarget = document.getElementById(this.TargetId);
-			var oHtmlParent = oHtmlTarget.parentNode;
+			if (undefined == parent_id)
+				oHtmlParent = oHtmlTarget.parentNode;
+			else
+				oHtmlParent = document.getElementById(parent_id);
 
 			this.HtmlDiv                  = document.createElement("div");
 			this.HtmlDiv.id               = "area_id_parent";
@@ -1330,13 +1336,13 @@
 	window['AscCommon']            = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
 
-	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
+	window['AscCommon'].InitBrowserInputContext = function(api, target_id, parent_id)
 	{
 		if (window['AscCommon'].g_inputContext)
 			return;
 
 		window['AscCommon'].g_inputContext = new CTextInput(api);
-		window['AscCommon'].g_inputContext.init(target_id);
+		window['AscCommon'].g_inputContext.init(target_id, parent_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
 		window['AscCommon'].g_clipboardBase.inputContext = window['AscCommon'].g_inputContext;
 
