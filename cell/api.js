@@ -3075,20 +3075,11 @@ var editor;
 
   };
 
-  spreadsheet_api.prototype.asc_insertHyperlink = function(options) {
-    if(null !== options.text && undefined !== options.text)
-    {
-      AscFonts.FontPickerByCharacter.checkText(options.text, this, function() {
-
-        this.wb.insertHyperlink(options);
-
-      });
-    }
-    else
-    {
-      this.wb.insertHyperlink(options);
-    }
-  };
+	spreadsheet_api.prototype.asc_insertHyperlink = function (options) {
+		AscFonts.FontPickerByCharacter.checkText(options.text, this, function () {
+			this.wb.insertHyperlink(options);
+		});
+	};
 
   spreadsheet_api.prototype.asc_removeHyperlink = function() {
     this.wb.removeHyperlink();
