@@ -6626,7 +6626,7 @@ PasteProcessor.prototype =
 			
 			//заглушка для вставки в excel внутрь шейпа
 			var tempRpr;
-			var bSaveExcelFormat = window['AscCommon'].g_specialPasteHelper.bSaveFormat;
+			var bSaveExcelFormat = window['AscCommon'].g_clipboardBase.bSaveFormat;
 			if (this.pasteInExcel === true && !bSaveExcelFormat && this.oDocument && this.oDocument.Parent &&
 				this.oDocument.Parent.parent &&
 				this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape) {

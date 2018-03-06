@@ -395,7 +395,7 @@
 						{
 							//fragments = пока только для плагина вставка символов
 							var fragments;
-							if(window['AscCommon'].g_specialPasteHelper.bSaveFormat){
+							if(window['AscCommon'].g_clipboardBase.bSaveFormat){
 								fragments = this.pasteProcessor._getFragmentsFromHtml(data1);
 							}
 							if(fragments){
