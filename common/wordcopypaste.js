@@ -5008,6 +5008,12 @@ PasteProcessor.prototype =
 		var t = this;
 		var fonts = [];
 
+		var charToMM = function (mcw) {
+			var maxDigitWidth = 7;
+			var px = Asc.floor(((256 * mcw + Asc.floor(128 / maxDigitWidth)) / 256) * maxDigitWidth);
+			return px * g_dKoef_pix_to_mm;
+		};
+
 		var convertBorder = function (border) {
 			var res = new CDocumentBorder();
 			if (border.w) {
@@ -5034,12 +5040,12 @@ PasteProcessor.prototype =
 
 		//grid
 		var grid = [];
-		var standartWidth = 17;
+		var standardWidth = 9;
 		for (var i = activeRange.c1; i <= activeRange.c2; i++) {
 			if (worksheet.aCols[i]) {
-				grid[i - activeRange.c1] = worksheet.aCols[i].width;
+				grid[i - activeRange.c1] = charToMM(worksheet.aCols[i].width);
 			} else {
-				grid[i - activeRange.c1] = standartWidth;
+				grid[i - activeRange.c1] = charToMM(standardWidth);
 			}
 		}
 		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
