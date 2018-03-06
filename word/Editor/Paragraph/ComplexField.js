@@ -466,7 +466,8 @@ CComplexField.prototype.private_UpdateTOC = function()
 				SkipLineBreak         : this.Instruction.IsRemoveBreaks(),
 				SkipColumnBreak       : true,
 				SkipAnchors           : true,
-				SkipFootnoteReference : true
+				SkipFootnoteReference : true,
+				SkipComplexFields     : true
 			});
 			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 

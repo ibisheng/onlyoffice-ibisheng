@@ -7142,6 +7142,9 @@ Paragraph.prototype.Is_Empty = function(Props)
 	{
 		if (undefined !== Props.SkipNewLine)
 			Pr.SkipNewLine = true;
+
+		if (Props.SkipComplexFields)
+			Pr.SkipComplexFields = true;
 	}
 
 	var ContentLen = this.Content.length;
@@ -12522,7 +12525,7 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
-	if (this.IsEmpty() && (!oPr || false !== oPr.SkipEmptyParagraphs))
+	if (this.IsEmpty({SkipNewLine : true, SkipComplexFields : true}) && (!oPr || false !== oPr.SkipEmptyParagraphs))
 		return;
 
 	var nOutlineLvl = this.GetOutlineLvl();

@@ -810,9 +810,9 @@ CDocumentContentElementBase.prototype.GetReviewType = function()
 {
 	return this.Get_ReviewType();
 };
-CDocumentContentElementBase.prototype.IsEmpty = function()
+CDocumentContentElementBase.prototype.IsEmpty = function(oProps)
 {
-	return this.Is_Empty();
+	return this.Is_Empty(oProps);
 };
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {

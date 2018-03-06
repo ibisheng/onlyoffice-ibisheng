@@ -230,7 +230,8 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 			// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
 			if (para_End !== Item.Type
 				&& (para_Drawing !== Item.Type || Item.Is_Inline() || true !== oPr.SkipAnchors)
-				&& (para_FootnoteReference !== Item.Type || true !== oPr.SkipFootnoteReference))
+				&& (para_FootnoteReference !== Item.Type || true !== oPr.SkipFootnoteReference)
+				&& ((para_FieldChar !== Item.Type && para_InstrText !== Item.Type) || true !== oPr.SkipComplexFields))
 			{
 				NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
 				AddedPos++;
@@ -346,35 +347,44 @@ ParaRun.prototype.Get_Text = function(Text)
 };
 
 // Проверяем пустой ли ран
-ParaRun.prototype.Is_Empty = function(Props)
+ParaRun.prototype.Is_Empty = function(oProps)
 {
-    var SkipAnchor = (undefined !== Props ? Props.SkipAnchor : false);
-    var SkipEnd    = (undefined !== Props ? Props.SkipEnd    : false);
-    var SkipPlcHldr= (undefined !== Props ? Props.SkipPlcHldr: false);
-    var SkipNewLine= (undefined !== Props ? Props.SkipNewLine: false);
+	var SkipAnchor  = (undefined !== oProps ? oProps.SkipAnchor : false);
+	var SkipEnd     = (undefined !== oProps ? oProps.SkipEnd : false);
+	var SkipPlcHldr = (undefined !== oProps ? oProps.SkipPlcHldr : false);
+	var SkipNewLine = (undefined !== oProps ? oProps.SkipNewLine : false);
+	var SkipCF      = (undefined !== oProps ? oProps.SkipComplexFields : false);
 
-    var Count = this.Content.length;
+	var nCount = this.Content.length;
 
-    if (true !== SkipAnchor && true !== SkipEnd && true !== SkipPlcHldr && true !== SkipNewLine)
-    {
-        if ( Count > 0 )
-            return false;
-        else
-            return true;
-    }
-    else
-    {
-        for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
-        {
-            var Item = this.Content[CurPos];
-            var ItemType = Item.Type;
+	if (true !== SkipAnchor
+		&& true !== SkipEnd
+		&& true !== SkipPlcHldr
+		&& true !== SkipNewLine
+		&& true !== SkipCF)
+	{
+		if (nCount > 0)
+			return false;
+		else
+			return true;
+	}
+	else
+	{
+		for (var nCurPos = 0; nCurPos < nCount; ++nCurPos)
+		{
+			var oItem = this.Content[nCurPos];
+			var nType = oItem.Type;
 
-            if ((true !== SkipAnchor || para_Drawing !== ItemType || false !== Item.Is_Inline()) && (true !== SkipEnd || para_End !== ItemType) && (true !== SkipPlcHldr || true !== Item.IsPlaceholder()) && (true !== SkipNewLine || para_NewLine !== ItemType))
-                return false;
-        }
+			if ((true !== SkipAnchor || para_Drawing !== nType || false !== oItem.Is_Inline())
+				&& (true !== SkipEnd || para_End !== nType)
+				&& (true !== SkipPlcHldr || true !== oItem.IsPlaceholder())
+				&& (true !== SkipNewLine || para_NewLine !== nType)
+				&& (true !== SkipCF || (para_InstrText !== nType && para_FieldChar !== nType)))
+				return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 };
 
 ParaRun.prototype.Is_CheckingNearestPos = function()
