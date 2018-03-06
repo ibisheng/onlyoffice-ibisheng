@@ -386,7 +386,8 @@
 					window['AscCommon'].g_specialPasteHelper.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
 					window['AscCommon'].g_specialPasteHelper.specialPasteData.pasteFromWord = false;
 				}
-				
+
+				var text;
 				switch (_format)
 				{
 					case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
@@ -396,6 +397,7 @@
 							//fragments = пока только для плагина вставка символов
 							var fragments;
 							if(window['AscCommon'].g_clipboardBase.bSaveFormat){
+								//проверяем иероглифы внутри
 								fragments = this.pasteProcessor._getFragmentsFromHtml(data1);
 							}
 							if(fragments){
@@ -407,11 +409,14 @@
 								});
 
 							}else{
-								var text = text_data ? text_data : data1.innerText;
+								text = text_data ? text_data : data1.innerText;
 								if(text)
 								{
-									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-									window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+									AscFonts.FontPickerByCharacter.getFontsByString(text);
+									ws._loadFonts([], function() {
+										window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+										window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+									});
 								}
 							}
 						}
@@ -426,7 +431,7 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
+							text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
@@ -3177,6 +3182,7 @@
 						}
 
 						fragment.text = children.innerText;
+						AscFonts.FontPickerByCharacter.getFontsByString(fragment.text);
 						fragment.format = format;
 
 						res.fragments.push(fragment);
