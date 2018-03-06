@@ -267,53 +267,56 @@
 			return true;
 		},
 
-		checkText : function(text, _this, _callback, isCodes, isOnlyAsync)
+		checkText : function(text, _this, _callback, isCodes, isOnlyAsync, isCheckSymbols)
 		{
-			if (isCodes !== true)
+			if (isCheckSymbols !== false)
 			{
-				if (!this.getFontsByString(text))
+				if (isCodes !== true)
 				{
-					if (!isOnlyAsync)
-						_callback.call(_this);
-					return false;
+					if (!this.getFontsByString(text))
+					{
+						if (!isOnlyAsync)
+							_callback.call(_this);
+						return false;
+					}
+				}
+				else
+				{
+					if (!this.getFontsByString2(text))
+					{
+						if (!isOnlyAsync)
+							_callback.call(_this);
+						return false;
+					}
 				}
 			}
-			else
+
+			var fonts = [];
+			this.extendFonts(fonts);
+
+			if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
 			{
-				if (!this.getFontsByString2(text))
-				{
-					if (!isOnlyAsync)
-						_callback.call(_this);
-					return false;
-				}
+				if (!isOnlyAsync)
+					_callback.call(_this);
+				return false;
 			}
 
-            var fonts = [];
-            this.extendFonts(fonts);
+			this.CallbackObj._this = _this;
+			this.CallbackObj._callback = _callback;
 
-            if (false === AscCommon.g_font_loader.CheckFontsNeedLoading(fonts))
-            {
-            	if (!isOnlyAsync)
-            		_callback.call(_this);
-                return false;
-            }
+			var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_editor.asyncMethodCallback = function() {
 
-            this.CallbackObj._this = _this;
-            this.CallbackObj._callback = _callback;
+				var _t = AscFonts.FontPickerByCharacter.CallbackObj;
+				_t._callback.call(_t._this);
 
-            var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-            _editor.asyncMethodCallback = function() {
+				_t._this = null;
+				_t._callback = null;
 
-            	var _t = AscFonts.FontPickerByCharacter.CallbackObj;
-            	_t._callback.call(_t._this);
+			};
 
-            	_t._this = null;
-            	_t._callback = null;
-
-            };
-
-            AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
-            return true;
+			AscCommon.g_font_loader.LoadDocumentFonts2(fonts);
+			return true;
 		}
 	};
 

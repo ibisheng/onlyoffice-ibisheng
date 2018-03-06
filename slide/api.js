@@ -6746,7 +6746,9 @@ background-repeat: no-repeat;\
 		{
 			//if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
 			{
-				this.WordControl.m_oLogicDocument.addChart(chartBinary);
+				AscFonts.IsCheckSymbols = true;
+				this.WordControl.m_oLogicDocument.addChart(chartBinary, true);
+				AscFonts.IsCheckSymbols = false;
 			}
 		}
 	};

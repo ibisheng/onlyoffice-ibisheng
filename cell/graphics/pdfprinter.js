@@ -36,9 +36,10 @@
 
 var vector_koef = 25.4 / 72;
 
-function CPdfPrinter()
+function CPdfPrinter(fontManager)
 {
     this.DocumentRenderer = new AscCommon.CDocumentRenderer();
+	this.DocumentRenderer.InitPicker(fontManager);
     this.DocumentRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 
     this.font = new window["Asc"].FontProperties("Arial", -1);
@@ -288,19 +289,17 @@ CPdfPrinter.prototype =
     fillText : function(text, x, y, maxWidth, charWidths)
     {
         //this.DocumentRenderer.FillText(x * vector_koef, y * vector_koef, text);
-        var _len = text.length;
-        if (charWidths.length != _len)
-            this.DocumentRenderer.FillText(x * vector_koef, y * vector_koef, text);
-        else
-        {
-            var offset = 0;
-            for (var i = 0; i < _len; ++i)
-            {
-                this.DocumentRenderer.FillText((x + offset) * vector_koef, y * vector_koef, "" + text[i]);
-                offset += charWidths[i];
-            }
-        }
-        return this;
+		var charPos = 0;
+		var _x = x * vector_koef;
+		var _y = y * vector_koef;
+		for (var iter = text.getUnicodeIterator(); iter.check(); iter.next())
+		{
+			this.DocumentRenderer.FillTextCode(_x, _y, iter.value());
+			if (charPos < charWidths.length)
+				_x += (charWidths[charPos] * vector_koef);
+			charPos++;
+		}
+		return this;
     },
 
     beginPath : function()

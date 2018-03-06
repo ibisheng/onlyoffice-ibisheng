@@ -2172,7 +2172,7 @@ CPresentation.prototype =
     },
 
 
-    addChart: function(binary)
+    addChart: function(binary, isFromInterface)
     {
         var _this = this;
       //  _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
@@ -2187,9 +2187,22 @@ CPresentation.prototype =
             Image.spPr.xfrm.setOffY((_this.Slides[_this.CurPage].Height - Image.spPr.xfrm.extY)/2);
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
             _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, 0);
-            _this.Recalculate();
-            _this.Document_UpdateInterfaceState();
-            _this.CheckEmptyPlaceholderNotes();
+
+            if (isFromInterface)
+			{
+				AscFonts.FontPickerByCharacter.checkText("", this, function ()
+				{
+					this.Recalculate();
+					this.Document_UpdateInterfaceState();
+					this.CheckEmptyPlaceholderNotes();
+				}, false, false, false);
+			}
+			else
+            {
+				_this.Recalculate();
+				_this.Document_UpdateInterfaceState();
+				_this.CheckEmptyPlaceholderNotes();
+            }
       //  }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 

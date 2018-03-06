@@ -1123,7 +1123,13 @@
 
 	function CMetafileFontPicker(manager)
 	{
-		this.Manager = manager ? manager : new AscFonts.CFontManager(); 	// в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
+		this.Manager = manager; 	// в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
+		if (!this.Manager)
+		{
+			this.Manager = new AscFonts.CFontManager();
+			this.Manager.Initialize(false)
+		}
+
 		this.FontsInCache = {};
 		this.LastPickFont = null;
 		this.LastPickFontNameOrigin = "";

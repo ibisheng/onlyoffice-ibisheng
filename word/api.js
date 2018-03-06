@@ -7220,7 +7220,13 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Document_AddChart);
+			AscFonts.IsCheckSymbols = true;
+			this.asc_SetSilentMode(true);
 			this.WordControl.m_oLogicDocument.AddInlineImage(null, null, null, options);
+			AscFonts.IsCheckSymbols = false;
+			AscFonts.FontPickerByCharacter.checkText("", this, function() {
+				this.asc_SetSilentMode(false, true);
+			}, false, false, false);
 		}
 	};
 	asc_docs_api.prototype.asc_doubleClickOnChart    = function(obj)
@@ -8445,14 +8451,14 @@ background-repeat: no-repeat;\
 		AscCommon.CollaborativeEditing.Apply_OtherChanges();
 	};
 
-	window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled)
+	window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled, bAddition)
 	{
 		if (!this.WordControl.m_oLogicDocument)
 			return;
 		if (bEnabled)
 			this.WordControl.m_oLogicDocument.Start_SilentMode();
 		else
-			this.WordControl.m_oLogicDocument.End_SilentMode();
+			this.WordControl.m_oLogicDocument.End_SilentMode(bAddition);
 	};
 
 	window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
