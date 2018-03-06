@@ -462,10 +462,11 @@ CComplexField.prototype.private_UpdateTOC = function()
 			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
 			var oPara = oSrcParagraph.Copy(null, null, {
-				SkipPageBreak   : true,
-				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
-				SkipColumnBreak : true,
-				SkipAnchors     : true
+				SkipPageBreak         : true,
+				SkipLineBreak         : this.Instruction.IsRemoveBreaks(),
+				SkipColumnBreak       : true,
+				SkipAnchors           : true,
+				SkipFootnoteReference : true
 			});
 			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 

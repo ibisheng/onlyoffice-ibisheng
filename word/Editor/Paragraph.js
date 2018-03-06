@@ -8290,6 +8290,13 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 
 	// TODO: По мере добавления элементов в стили параграфа и текста добавить их обработку здесь.
 
+	// При выставлении стиля свойства буквицы(рамки) всегда сбрасываются
+	if (undefined !== this.Get_FramePr())
+	{
+		this.Set_FramePr(undefined, true);
+		this.Clear_TextFormatting();
+	}
+
 	// Не удаляем форматирование, при добавлении списка к данному параграфу
 	var DefNumId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (Id !== DefNumId)
