@@ -71,11 +71,14 @@ CInlineLevelSdt.prototype.GetId = function()
 };
 CInlineLevelSdt.prototype.Copy = function(Selected, oPr)
 {
-	var ContentControl = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
+	var oContentControl = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 
-	// TODO: Сделать копирование настроек
+	oContentControl.SetLabel(this.GetLabel());
+	oContentControl.SetTag(this.GetTag());
+	oContentControl.SetAlias(this.GetAlias());
+	oContentControl.SetContentControlLock(this.GetContentControlLock());
 
-	return ContentControl;
+	return oContentControl;
 };
 CInlineLevelSdt.prototype.GetSelectedElementsInfo = function(Info)
 {
