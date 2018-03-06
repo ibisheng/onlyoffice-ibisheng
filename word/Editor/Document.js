@@ -5990,7 +5990,7 @@ CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
             {
                 this.TurnOff_Recalculate();
                 this.TurnOff_InterfaceEvents();
-                this.Remove(1, false, false, true);
+                this.Remove(1, false, false, false);
                 this.TurnOn_Recalculate(false);
                 this.TurnOn_InterfaceEvents(false);
 
