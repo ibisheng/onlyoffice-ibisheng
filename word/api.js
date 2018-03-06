@@ -1035,7 +1035,7 @@
 	{
 		if (window["flat_desine"] === true)
 		{
-			AscCommonWord.updateGlobalSkin(AscCommonWord.GlobalSkinFlat);
+			AscCommonWord.updateGlobalSkin(AscCommonWord.GlobalSkinFlat2);
 		}
 
 		var _head = document.getElementsByTagName('head')[0];

@@ -66,6 +66,7 @@ var GlobalSkinTeamlab = {
 	NavigationButtons                     : true,
 	BackgroundColor                       : "#B0B0B0",
 	BackgroundColorThumbnails             : "#EBEBEB",
+	BackgroundScroll                      : "#F1F1F1",
 	RulerDark                             : "#B0B0B0",
 	RulerLight                            : "EDEDED",
 	RulerOutline                          : "#929292",
@@ -84,6 +85,26 @@ var GlobalSkinFlat    = {
 	NavigationButtons                     : false,
 	BackgroundColor                       : "#F4F4F4",
 	BackgroundColorThumbnails             : "#F4F4F4",
+	BackgroundScroll                      : "#F1F1F1",
+	RulerDark                             : "#CFCFCF",
+	RulerLight                            : "#FFFFFF",
+	RulerOutline                          : "#BBBEC2",
+	RulerMarkersFillColor                 : "#FFFFFF",
+	PageOutline                           : "#BBBEC2",
+	STYLE_THUMBNAIL_WIDTH                 : 109,
+	STYLE_THUMBNAIL_HEIGHT                : 45,
+	BorderSplitterColor                   : "#CBCBCB",
+	SupportNotes                          : true,
+	SplitterWidthMM                       : 1,
+	ThumbnailScrollWidthNullIfNoScrolling : false
+};
+var GlobalSkinFlat2    = {
+	Name                                  : "flat",
+	RulersButton                          : false,
+	NavigationButtons                     : false,
+	BackgroundColor                       : "#E2E2E2",
+	BackgroundColorThumbnails             : "#E2E2E2",
+	BackgroundScroll       				  : "#E2E2E2",
 	RulerDark                             : "#CFCFCF",
 	RulerLight                            : "#FFFFFF",
 	RulerOutline                          : "#BBBEC2",
@@ -97,7 +118,7 @@ var GlobalSkinFlat    = {
 	ThumbnailScrollWidthNullIfNoScrolling : false
 };
 
-var GlobalSkin = GlobalSkinFlat;
+var GlobalSkin = GlobalSkinFlat2;
 
 function updateGlobalSkin(newSkin)
 {
@@ -2795,6 +2816,10 @@ function CEditorPage(api)
 		settings.contentH = this.m_dDocumentHeight;
 		settings.contentW = this.m_dDocumentWidth;
 
+		settings.scrollBackgroundColor = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorHover = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorActive = GlobalSkin.BackgroundScroll;
+
 		if (this.m_bIsRuler)
 		{
 			settings.screenAddH = this.m_oTopRuler_horRuler.HtmlElement.height;
@@ -4201,6 +4226,7 @@ function CEditorPage(api)
 window['AscCommon']                       = window['AscCommon'] || {};
 window['AscCommonSlide']                  = window['AscCommonSlide'] || {};
 window['AscCommonSlide'].GlobalSkinFlat   = GlobalSkinFlat;
+window['AscCommonSlide'].GlobalSkinFlat2  = GlobalSkinFlat2;
 window['AscCommonSlide'].GlobalSkin       = GlobalSkin;
 window['AscCommonSlide'].updateGlobalSkin = updateGlobalSkin;
 window['AscCommonSlide'].CEditorPage      = CEditorPage;

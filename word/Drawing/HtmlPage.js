@@ -92,8 +92,23 @@ var GlobalSkinFlat    = {
 	STYLE_THUMBNAIL_HEIGHT : 38,
 	isNeedInvertOnActive   : false
 };
+var GlobalSkinFlat2    = {
+	Name                   : "flat",
+	RulersButton           : false,
+	NavigationButtons      : false,
+	BackgroundColor        : "#E2E2E2",
+	RulerDark              : "#CFCFCF",
+	RulerLight             : "#FFFFFF",
+	BackgroundScroll       : "#E2E2E2",
+	RulerOutline           : "#BBBEC2",
+	RulerMarkersFillColor  : "#FFFFFF",
+	PageOutline            : "#BBBEC2",
+	STYLE_THUMBNAIL_WIDTH  : 104,
+	STYLE_THUMBNAIL_HEIGHT : 38,
+	isNeedInvertOnActive   : false
+};
 
-var GlobalSkin = GlobalSkinFlat;
+var GlobalSkin = GlobalSkinFlat2;
 if (AscCommon.TEMP_STYLE_THUMBNAIL_WIDTH !== undefined && AscCommon.TEMP_STYLE_THUMBNAIL_HEIGHT !== undefined)
 {
 	// TODO: переделать.
@@ -2586,6 +2601,10 @@ function CEditorPage(api)
 		settings.hscrollStep = 45;
 		settings.isNeedInvertOnActive = GlobalSkin.isNeedInvertOnActive;
 
+		settings.scrollBackgroundColor = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorHover = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorActive = GlobalSkin.BackgroundScroll;
+
 		if (this.bIsRetinaSupport)
 		{
 			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
@@ -3875,6 +3894,7 @@ var _message_update = "zero_delay_update";
 window['AscCommon']                      = window['AscCommon'] || {};
 window['AscCommonWord']                  = window['AscCommonWord'] || {};
 window['AscCommonWord'].GlobalSkinFlat   = GlobalSkinFlat;
+window['AscCommonWord'].GlobalSkinFlat2 = GlobalSkinFlat2;
 window['AscCommonWord'].GlobalSkin       = GlobalSkin;
 window['AscCommonWord'].updateGlobalSkin = updateGlobalSkin;
 window['AscCommonWord'].CEditorPage      = CEditorPage;
