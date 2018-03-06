@@ -227,8 +227,9 @@
 			var length = this.m_arrChanges.length;
 			// Принимаем изменения
 			if (0 < length) {
-				this.handlers.trigger("applyChanges", this.m_arrChanges, function () {
-					t.m_arrChanges.splice(0, length);
+				//splice to prevent double apply other changes in case of load fonts
+				var changes = t.m_arrChanges.splice(0, length);
+				this.handlers.trigger("applyChanges", changes, function () {
 					t.handlers.trigger("updateAfterApplyChanges");
 				});
 
