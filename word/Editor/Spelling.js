@@ -630,7 +630,7 @@ CParaSpellChecker.prototype =
         {
             var Element = this.Elements[Index];
 
-            if (true === Element.Checked)
+            if (true === Element.Checked && true !== Element.CurPos)
             {
                 if (undefined == this.Words[Element.Word])
                     this.Words[Element.Word] = {};
