@@ -1183,7 +1183,7 @@
 
 	CellEditor.prototype._fireUpdated = function () {
 		var s = this._getFragmentsText(this.options.fragments);
-		var isFormula = s.charAt(0) === "=";
+		var isFormula = -1 === this.beginCompositePos && s.charAt(0) === "=";
 		var funcPos, funcName, match;
 
 		if (!this.isTopLineActive || !this.skipTLUpdate || this.undoMode) {
