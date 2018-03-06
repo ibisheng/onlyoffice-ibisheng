@@ -6829,21 +6829,24 @@ CTable.prototype.GetSelectedText = function(bClearText, oPr)
 	}
 	else if (false === bClearText)
 	{
-		if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
+		if (this.IsCellSelection())
 		{
-			var Count      = this.Selection.Data.length;
-			var ResultText = "";
-			for (var Index = 0; Index < Count; Index++)
-			{
-				var Pos  = this.Selection.Data[Index];
-				var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+			var arrSelectedCells = this.GetSelectionArray();
 
-				Cell.Content.Set_ApplyToAll(true);
-				ResultText += Cell.Content.GetSelectedText(false, oPr);
-				Cell.Content.Set_ApplyToAll(false);
+			var sResultText = "";
+			for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+			{
+				var oPos  = arrSelectedCells[nIndex];
+				var oCell = this.GetRow(oPos.Row).GetCell(oPos.Cell);
+
+				var oCellContent = oCell.GetContent();
+
+				oCellContent.Set_ApplyToAll(true);
+				sResultText += oCellContent.GetSelectedText(false, oPr);
+				oCellContent.Set_ApplyToAll(false);
 			}
 
-			return ResultText;
+			return sResultText;
 		}
 		else
 		{
@@ -12656,9 +12659,16 @@ CTable.prototype.CanUpdateTarget = function(CurPage)
 
 	return oCell.Content.CanUpdateTarget(CurPage - oCell.Content.Get_StartPage_Relative());
 };
+/**
+ * Проверяем, выделение идет по  ячейкам или нет
+ * @returns {boolean}
+ */
 CTable.prototype.IsCellSelection = function()
 {
-	if (true === this.IsSelectionUse() && table_Selection_Cell === this.Selection.Type)
+	if (true === this.ApplyToAll
+		|| (this.IsSelectionUse()
+		&& table_Selection_Cell === this.Selection.Type
+		&& this.Selection.Data.length > 0))
 		return true;
 
 	return false;
