@@ -2118,7 +2118,7 @@ function CPage()
 				var _yLast = (yDst + dKoefY * (lastBounds.Y + lastBounds.H + _offY) + 0.5) >> 0;
 
 				var ctx = overlay.m_oContext;
-				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.strokeStyle = "rgb(140, 140, 140)";
 				ctx.lineWidth = 1;
 				ctx.beginPath();
 
@@ -2199,7 +2199,7 @@ function CPage()
 				var _yLast = (lastBounds.Y + lastBounds.H);
 
 				var ctx = overlay.m_oContext;
-				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.strokeStyle = "rgb(140, 140, 140)";
 				ctx.fillStyle = "#FFFFFF";
 				ctx.lineWidth = 1;
 				ctx.beginPath();
