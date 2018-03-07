@@ -7583,6 +7583,24 @@ Paragraph.prototype.Numbering_Remove = function()
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
 /**
+ * Удаляем нумерацию из прямых настроек
+ */
+Paragraph.prototype.RemoveDirectNumbering = function()
+{
+	if (undefined !== this.Pr.NumPr)
+	{
+		this.private_AddPrChange();
+
+		History.Add(new CChangesParagraphNumbering(this, this.Pr.NumPr, undefined));
+		this.private_RefreshNumbering(this.Pr.NumPr);
+
+		this.Pr.NumPr = undefined;
+
+		this.CompiledPr.NeedRecalc = true;
+		this.private_UpdateTrackRevisionOnChangeParaPr(true);
+	}
+};
+/**
  * Используется ли заданная нумерация в параграфе
  */
 Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
@@ -8304,7 +8322,7 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 	var DefNumId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (Id !== DefNumId)
 	{
-		this.Numbering_Remove();
+		this.RemoveDirectNumbering();
 		this.Set_ContextualSpacing(undefined);
 		this.Set_Ind(new CParaInd(), true);
 		this.Set_Align(undefined);
