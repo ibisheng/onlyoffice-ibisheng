@@ -408,6 +408,9 @@ CStyles.prototype.Is_StyleDefault = function(sStyleName)
         || StyleId == this.Default.Header
         || StyleId == this.Default.Footer
         || StyleId == this.Default.Hyperlink
+		|| StyleId == this.Default.FootnoteText
+		|| StyleId == this.Default.FootnoteTextChar
+		|| StyleId == this.Default.FootnoteReference
 		|| StyleId == this.Default.NoSpacing
 		|| StyleId == this.Default.Title
 		|| StyleId == this.Default.Subtitle
