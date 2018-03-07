@@ -3323,7 +3323,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						var oLogicDocument     = PRS.Paragraph.LogicDocument;
 						var nCompatibilityMode = oLogicDocument && oLogicDocument.GetCompatibilityMode ? oLogicDocument.GetCompatibilityMode() : document_compatibility_mode_Current;
 						if (nCompatibilityMode <= document_compatibility_mode_Word14
-							&& !isLastTabToRightEdge && (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1))
+							&& !isLastTabToRightEdge
+							&& true !== TabPos.DefaultTab
+							&& (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1))
 						{
 							Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
 							XEnd                                        = 558.7;
