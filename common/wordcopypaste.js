@@ -5048,13 +5048,23 @@ PasteProcessor.prototype =
 				grid[i - activeRange.c1] = charToMM(standardWidth);
 			}
 		}
-		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
+
+		var table;
+		if(editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Slides) {
+			table = this._createNewPresentationTable(grid);
+		} else {
+			table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
+		}
+
 		this.aContent.push(table);
 
 		var diffRow = activeRange.r2 - activeRange.r1;
 		var diffCol = activeRange.c2 - activeRange.c1;
 		for (var i = 0; i <= diffRow; i++) {
 			var row = table.Internal_Add_Row(table.Content.length, 0);
+			var heightRowPt = worksheet.getRowHeight(i + activeRange.r1);
+			row.SetHeight(heightRowPt * g_dKoef_pt_to_mm, linerule_AtLeast);
+
 			for (var j = 0; j <= diffCol; j++) {
 				if (!table.Selection.Data) {
 					table.Selection.Data = [];
@@ -5082,6 +5092,16 @@ PasteProcessor.prototype =
 					sumWidthGrid += grid[j + l];
 				}
 				oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, sumWidthGrid));
+
+				//margins
+				//left
+				oCurCell.Set_Margins({W : 0, Type : tblwidth_Mm}, 3);
+				//right
+				oCurCell.Set_Margins({W : 0, Type : tblwidth_Mm}, 1);
+				//top
+				oCurCell.Set_Margins({W : 0, Type : tblwidth_Mm}, 0);
+				//bottom
+				oCurCell.Set_Margins({W : 0, Type : tblwidth_Mm}, 2);
 
 				//background color
 				var background_color = range.getFill();
@@ -5406,7 +5426,17 @@ PasteProcessor.prototype =
 		
 		return table;
 	},
-	
+
+	_createNewPresentationTable: function (grid) {
+		var presentation = editor.WordControl.m_oLogicDocument;
+		var graphicFrame = new CGraphicFrame(presentation.Slides[presentation.CurPage]);
+		var table = new CTable(this.oDocument.DrawingDocument, graphicFrame, true, 0, 0, grid, true);
+		graphicFrame.setGraphicObject(table);
+		graphicFrame.setNvSpPr(new AscFormat.UniNvPr());
+
+		return table;
+	},
+
 	_getImagesFromExcelShapes: function(aDrawings, aSpTree, aPastedImages, aUrls)
 	{
 		//пока только распознаём только графические объекты
@@ -8601,15 +8631,10 @@ PasteProcessor.prototype =
                 nPrevVal = nCurVal;
                 nPrevIndex = nCurIndex;
             }
-            var CurPage = 0;
-            var presentation = editor.WordControl.m_oLogicDocument;
-            var graphicFrame = new CGraphicFrame(presentation.Slides[presentation.CurPage]);
 
-            var table = new CTable(presentation.DrawingDocument, graphicFrame, true, 0, 0, aGrid, true);
-            table.Set_TableStyle(0);
-            var dd = editor.WordControl.m_oDrawingDocument;
-            graphicFrame.setGraphicObject(table);
-            graphicFrame.setNvSpPr(new AscFormat.UniNvPr());
+			var table = this._createNewPresentationTable(aGrid);
+			var graphicFrame = table.Parent;
+			table.Set_TableStyle(0);
             arrTables.push(graphicFrame);
 			
 			//TODO пересмотреть!!!
