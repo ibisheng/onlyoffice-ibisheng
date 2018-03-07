@@ -8603,37 +8603,6 @@ background-repeat: no-repeat;\
 			document.body.removeChild(ifr);
 	};
 
-	window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
-	{
-		if (true)
-		{
-			// pos не должен минимизироваться!!!
-
-			_memory1.Copy          = _memory1["Copy"];
-			_memory1.ClearNoAttack = _memory1["ClearNoAttack"];
-			_memory1.WriteByte     = _memory1["WriteByte"];
-			_memory1.WriteBool     = _memory1["WriteBool"];
-			_memory1.WriteLong     = _memory1["WriteLong"];
-			_memory1.WriteDouble   = _memory1["WriteDouble"];
-			_memory1.WriteString   = _memory1["WriteString"];
-			_memory1.WriteString2  = _memory1["WriteString2"];
-
-			_memory2.Copy          = _memory1["Copy"];
-			_memory2.ClearNoAttack = _memory1["ClearNoAttack"];
-			_memory2.WriteByte     = _memory1["WriteByte"];
-			_memory2.WriteBool     = _memory1["WriteBool"];
-			_memory2.WriteLong     = _memory1["WriteLong"];
-			_memory2.WriteDouble   = _memory1["WriteDouble"];
-			_memory2.WriteString   = _memory1["WriteString"];
-			_memory2.WriteString2  = _memory1["WriteString2"];
-		}
-
-		var _printer                  = new AscCommon.CDocumentRenderer();
-		_printer.Memory               = _memory1;
-		_printer.VectorMemoryForPrint = _memory2;
-		return _printer;
-	};
-
 	window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
 	{
 	};

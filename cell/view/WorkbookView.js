@@ -2423,12 +2423,16 @@
   };
 
   // Печать
-  WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
+  WorkbookView.prototype.printSheets = function(printPagesData, pdfDocRenderer) {
+  	var pdfPrinter = new AscCommonExcel.CPdfPrinter(this.fmgrGraphics[3]);
+  	if (pdfDocRenderer) {
+		pdfPrinter.DocumentRenderer = pdfDocRenderer;
+	}
     var ws;
     if (0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
-      ws.drawForPrint(pdf_writer, null);
+      ws.drawForPrint(pdfPrinter, null);
     } else {
       var indexWorksheet = -1;
       var indexWorksheetTmp = -1;
@@ -2438,9 +2442,10 @@
           ws = this.getWorksheet(indexWorksheetTmp);
           indexWorksheet = indexWorksheetTmp;
         }
-        ws.drawForPrint(pdf_writer, printPagesData.arrPages[i]);
+        ws.drawForPrint(pdfPrinter, printPagesData.arrPages[i]);
       }
     }
+    return pdfPrinter;
   };
 
   WorkbookView.prototype.calcPagesPrint = function (adjustPrint) {
