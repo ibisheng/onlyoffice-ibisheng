@@ -222,7 +222,8 @@
 		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
 			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber + ':' + column +
 				' userAgent: ' + (navigator.userAgent || navigator.vendor || window.opera) + ' platform: ' +
-				navigator.platform + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+				navigator.platform + ' isLoadFullApi: ' + t.isLoadFullApi + ' isDocumentLoadComplete: ' +
+				t.isDocumentLoadComplete + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
 			t.CoAuthoringApi.sendChangesError(msg);
 			//send only first error to reduce number of requests. also following error may be consequences of first
 			window.onerror = oldOnError;
