@@ -6870,8 +6870,8 @@ CustomFilter.prototype.isHideValue = function(val) {
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 		}
 
-		var trimVal = window["Asc"].trim(val);
-		var trimFilterVal = window["Asc"].trim(filterVal);
+		var trimVal = "string" === typeof(val) ? window["Asc"].trim(val) : val;
+		var trimFilterVal = "string" === typeof(filterVal) ? window["Asc"].trim(filterVal) : filterVal;
 
 		switch (this.Operator)
 		{
