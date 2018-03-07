@@ -180,6 +180,9 @@ ParaRun.prototype.Save_StartState = function()
 //-----------------------------------------------------------------------------------
 ParaRun.prototype.Copy = function(Selected, oPr)
 {
+	if (!oPr)
+		oPr = {};
+
     var bMath = this.Type == para_Math_Run ? true : false;
 
     var NewRun = new ParaRun(this.Paragraph, bMath);
