@@ -1157,8 +1157,9 @@
         ct.cursor = "copy";
       }
 
-      if (canvasElem.style.cursor !== ct.cursor) {
-        canvasElem.style.cursor = ct.cursor;
+      var newHtmlCursor = AscCommon.g_oHtmlCursor.value(ct.cursor);
+      if (canvasElem.style.cursor !== newHtmlCursor) {
+        canvasElem.style.cursor = newHtmlCursor;
       }
       if (ct.target === c_oTargetType.ColumnHeader || ct.target === c_oTargetType.RowHeader) {
         ws.drawHighlightedHeaders(ct.col, ct.row);
