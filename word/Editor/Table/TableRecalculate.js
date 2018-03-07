@@ -1629,7 +1629,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
             }
 
             this.X = this.X_origin + this.GetTableOffsetCorrection();
-            this.AnchorPosition.Set_X(this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, PageFields.X - OffsetCorrection_Left, PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right);
+            this.AnchorPosition.Set_X(this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, PageFields.X + OffsetCorrection_Left, PageFields.XLimit + OffsetCorrection_Right, LD_PageLimits.XLimit, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right);
 
             // Непонятно по какой причине, но Word для плавающих таблиц добаляется значение TableInd
 			this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
