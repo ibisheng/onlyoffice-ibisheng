@@ -6481,7 +6481,7 @@ RangeDataManager.prototype = {
 		if (this.CustomFiltersObj) {
 			var customFilters = this.CustomFiltersObj.CustomFilters;
 			var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
-			if (c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
+			if (customFilter && c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
 				res = true;
 			}
 		}
