@@ -2041,6 +2041,10 @@ background-repeat: no-repeat;\
 				t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
 				t.disconnectOnSave = null;
 			}
+
+			if (t.canUnlockDocument) {
+				t._unlockDocument();
+			}
 		};
 		var CursorInfo                   = null;
 		if (true === AscCommon.CollaborativeEditing.Is_Fast())

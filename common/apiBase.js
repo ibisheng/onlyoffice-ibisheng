@@ -574,6 +574,10 @@
 					t.canSave = true;
 					t.IsUserSave = false;
 					t.lastSaveTime = null;
+
+					if (t.canUnlockDocument) {
+						t._unlockDocument();
+					}
 				};
 				this.CoAuthoringApi.unSaveLock();
 				return;
@@ -599,6 +603,9 @@
 				// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
 				if (!this.IsUserSave) {
 					this.canSave = true;
+					if (this.canUnlockDocument) {
+						this._unlockDocument();
+					}
 					return;
 				}
 

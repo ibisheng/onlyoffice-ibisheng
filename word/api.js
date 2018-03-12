@@ -2300,6 +2300,10 @@ background-repeat: no-repeat;\
 			if(AscCommon.g_specialPasteHelper && !AscCommon.CollaborativeEditing.Is_SingleUser()){
 				AscCommon.g_specialPasteHelper.SpecialPasteButton_Hide();
 			}
+
+			if (t.canUnlockDocument) {
+				t._unlockDocument();
+			}
 		};
 
 		var CursorInfo = null;

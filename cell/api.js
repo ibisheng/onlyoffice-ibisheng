@@ -1583,6 +1583,10 @@ var editor;
 				t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
 				t.disconnectOnSave = null;
 			}
+
+			if (t.canUnlockDocument) {
+				t._unlockDocument();
+			}
 		};
 		// Пересылаем свои изменения
 		this.collaborativeEditing.sendChanges(this.IsUserSave);
