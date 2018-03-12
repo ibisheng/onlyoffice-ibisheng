@@ -13229,7 +13229,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -13258,7 +13258,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
