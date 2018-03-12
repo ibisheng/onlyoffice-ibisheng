@@ -3566,7 +3566,7 @@ PasteProcessor.prototype =
 
 					element = this._convertTableToPPTX(element);
 					graphic_frame.setGraphicObject(element.Copy(graphic_frame));
-					graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
+					//graphic_frame.graphicObject.Set_TableStyle(presentation.DefaultTableStyleId);
 
 					drawingCopyObject = new DrawingCopyObject();
 					drawingCopyObject.Drawing = graphic_frame;
@@ -5052,6 +5052,7 @@ PasteProcessor.prototype =
 		var table;
 		if(editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Slides) {
 			table = this._createNewPresentationTable(grid);
+			table.Set_TableStyle(editor.WordControl.m_oLogicDocument.DefaultTableStyleId)
 		} else {
 			table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
 		}
