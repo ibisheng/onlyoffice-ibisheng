@@ -563,6 +563,56 @@
 	baseEditorsApi.prototype._haveOtherChanges = function () {
 		return false;
 	};
+	baseEditorsApi.prototype._onSaveCallback = function (e, isUndoRequest) {
+		var t = this;
+		var nState;
+		if (false == e["saveLock"]) {
+			if (this.isLongAction()) {
+				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+				// Нужно снять lock с сохранения
+				this.CoAuthoringApi.onUnSaveLock = function () {
+					t.canSave = true;
+					t.IsUserSave = false;
+					t.lastSaveTime = null;
+				};
+				this.CoAuthoringApi.unSaveLock();
+				return;
+			}
+
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
+
+			this._onSaveCallbackInner(isUndoRequest);
+		} else {
+			nState = this.CoAuthoringApi.get_state();
+			if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
+				// Отключаемся от сохранения, соединение потеряно
+				this.IsUserSave = false;
+				this.canSave = true;
+			} else {
+				// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+				if (!this.IsUserSave) {
+					this.canSave = true;
+					return;
+				}
+
+				setTimeout(function() {
+					t.CoAuthoringApi.askSaveChanges(function(event) {
+						t._onSaveCallback(event, isUndoRequest);
+					});
+				}, 1000);
+			}
+		}
+	};
+	// Функция сохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._onSaveCallbackInner = function (isUndoRequest) {
+	};
 	baseEditorsApi.prototype._autoSave = function () {
 		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
 			if (this.canUnlockDocument) {
@@ -1189,7 +1239,7 @@
 					// Не даем пользователю сохранять, пока не закончится сохранение (если оно началось)
 					this.canSave = false;
 					this.CoAuthoringApi.askSaveChanges(function (e) {
-						t.onSaveCallback(e, isUndoRequest);
+						t._onSaveCallback(e, isUndoRequest);
 					});
 				}
 			} else if (this.isForceSaveOnUserSave && this.IsUserSave) {

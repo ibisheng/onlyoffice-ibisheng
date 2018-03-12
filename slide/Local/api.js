@@ -171,7 +171,7 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 
 		var t = this;
 		this.CoAuthoringApi.askSaveChanges(function(e) {
-			t.onSaveCallback(e);
+			t._onSaveCallback(e);
 		});
 		
 		if (this.CoAuthoringApi.onUnSaveLock)

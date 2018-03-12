@@ -165,7 +165,7 @@ var c_oAscError = Asc.c_oAscError;
 		{
 			var _isNaturalSave = this.IsUserSave;
 			this.canSave = false;
-			this.CoAuthoringApi.askSaveChanges(function(e){t.onSaveCallback(e);});
+			this.CoAuthoringApi.askSaveChanges(function(e){t._onSaveCallback(e);});
 
 			if (this.CoAuthoringApi.onUnSaveLock)
 				this.CoAuthoringApi.onUnSaveLock();
