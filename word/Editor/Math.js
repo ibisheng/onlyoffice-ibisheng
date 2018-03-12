@@ -1101,7 +1101,8 @@ ParaMath.prototype.GetParagraph = function()
 
 ParaMath.prototype.Get_Text = function(Text)
 {
-    Text.Text = null;
+	if (true === Text.BreakOnNonText)
+		Text.Text = null;
 };
 
 ParaMath.prototype.Is_Empty = function()
