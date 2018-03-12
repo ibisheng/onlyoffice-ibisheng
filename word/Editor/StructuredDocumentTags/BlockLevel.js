@@ -659,7 +659,16 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());
+	var sName      = this.GetTag();
+	var isBuiltIn  = false;
+	var arrButtons = [];
+
+	if (this.IsBuiltInTableOfContents())
+	{
+		isBuiltIn  = true;
+	}
+
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
 };
 CBlockLevelSdt.prototype.AddContentControl = function(nContentControlType)
 {

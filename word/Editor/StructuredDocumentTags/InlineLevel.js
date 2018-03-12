@@ -268,7 +268,12 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		return;
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform());
+
+	var sName      = this.GetTag();
+	var isBuiltIn  = false;
+	var arrButtons = [];
+
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
 };
 CInlineLevelSdt.prototype.SelectContentControl = function()
 {
