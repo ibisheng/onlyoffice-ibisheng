@@ -457,6 +457,8 @@
 						}
 						else
 						{
+							//не показываем иконку с/в если вставляется только текст
+							window['AscCommon'].g_specialPasteHelper.Special_Paste_Hide_Button();
 							t.pasteProcessor.pasteTextOnSheet(ws, data1);
 						}
 						

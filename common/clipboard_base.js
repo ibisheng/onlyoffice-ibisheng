@@ -959,13 +959,18 @@
 		{
 			if(doNotShowButton)
 			{
-				this.doNotShowButton = true;
+				this.Special_Paste_Hide_Button();
 			}
 			this.pasteStart = true;
 
 			AscFonts.IsCheckSymbols = true;
 		},
-		
+
+		Special_Paste_Hide_Button: function()
+		{
+			this.doNotShowButton = true;
+		},
+
 		Paste_Process_End : function()
 		{
 			AscFonts.IsCheckSymbols             = false;
