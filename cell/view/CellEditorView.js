@@ -1571,13 +1571,12 @@
 	};
 
 	CellEditor.prototype._topLineGotFocus = function () {
-		var t = this;
-		t.isTopLineActive = true;
-		t.input.isFocused = true;
-		t.setFocus(true);
-		t._hideCursor();
-		t._updateTopLineCurPos();
-		t._cleanSelection();
+		this.isTopLineActive = true;
+		this.input.isFocused = true;
+		this.setFocus(true);
+		this._hideCursor();
+		this._updateTopLineCurPos();
+		this._cleanSelection();
 	};
 
 	CellEditor.prototype._topLineMouseUp = function () {
