@@ -667,6 +667,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	{
 		sName      = AscCommon.translateManager.getValue("Table of Contents");
 		isBuiltIn  = true;
+		arrButtons.push(1);
 	}
 
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);

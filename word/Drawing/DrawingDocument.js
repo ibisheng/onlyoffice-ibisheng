@@ -54,7 +54,94 @@ var c_oContentControlTrack = {
 	In 		: 1
 };
 
-function CContentControlTrack(_id, _type, _data, _transform)
+function CContentControlButtonIcons()
+{
+	function CCCBI()
+	{
+		this.type = 0;
+		this.images = [];
+
+		this.load = function(type, url)
+		{
+			this.type = type;
+			this.images[0] = new Image();
+			this.images[0].onload = function() { this.asc_complete = true; };
+			this.images[0].src = "../../../../sdkjs/common/Images/content_control_" + url + ".png";
+
+			this.images[1] = new Image();
+			this.images[1].onload = function() { this.asc_complete = true; };
+			this.images[1].src = "../../../../sdkjs/common/Images/content_control_" + url + "_active.png";
+
+			this.images[2] = new Image();
+			this.images[2].onload = function() { this.asc_complete = true; };
+			this.images[2].src = "../../../../sdkjs/common/Images/content_control_" + url + "_2x.png";
+
+			this.images[3] = new Image();
+			this.images[3].onload = function() { this.asc_complete = true; };
+			this.images[3].src = "../../../../sdkjs/common/Images/content_control_" + url + "_active_2x.png";
+		};
+
+		this.get = function(isActive)
+		{
+			var index = AscCommon.AscBrowser.isRetina ? 2 : 0;
+			if (isActive)
+				index++;
+			if (this.images[index].asc_complete)
+				return this.images[index];
+			return null;
+		};
+	}
+
+	this.images = {};
+	this.measures = {};
+
+	this.register = function(type, url)
+	{
+		var image = new CCCBI();
+		image.load(type, url);
+		this.images[type] = image;
+	};
+
+	this.getFont = function(dKoef)
+	{
+		if (!dKoef)
+			return "11px Helvetica, Arial, sans-serif";
+		var size = (1 + 2 * 11 / dKoef) >> 0;
+		if (size & 1)
+			return (size >> 1) + ".5px Helvetica, Arial, sans-serif";
+		return (size >> 1) + "px Helvetica, Arial, sans-serif";
+	};
+
+	this.measure = function(text, ctx, not_cache)
+	{
+		if (!this.measures[text])
+			this.measures[text] = [0, 0];
+
+		if (not_cache)
+			return ctx.measureText(text).width;
+
+		var arr = this.measures[text];
+		var index = AscCommon.AscBrowser.isRetina ? 1 : 0;
+		if (0 != arr[index])
+			return arr[index];
+
+		arr[index] = ctx.measureText(text).width;
+		return arr[index];
+	};
+
+	this.getImage = function(type, isActive)
+	{
+		if (!this.images[type])
+			return null;
+
+		return this.images[type].get(isActive);
+	};
+}
+
+var g_oContentControlButtonIcons = new CContentControlButtonIcons();
+g_oContentControlButtonIcons.register(1, "toc");
+
+function CContentControlTrack(_id, _type, _data, _transform, _name, _name_advanced, _button_types)
 {
 	this.id = (undefined == _id) ? -1 : _id;
 	this.type = (undefined == _type) ? -1 : _type;
@@ -71,6 +158,10 @@ function CContentControlTrack(_id, _type, _data, _transform)
 
 	this.X = undefined;
 	this.Y = undefined;
+
+	this.Name = _name ? _name : "";
+	this.NameButtonAdvanced = _name_advanced ? true : false;
+	this.Buttons = _button_types ? _button_types : [];
 }
 CContentControlTrack.prototype.getPage = function()
 {
@@ -4593,9 +4684,39 @@ function CDrawingDocument()
 					_x = ((_x >> 0) + 0.5) - 15;
 					_y = ((_y >> 0) + 0.5);
 
-					ctx.rect(_x, _y, 15, 20);
+					var nAdvancedL = 0;
+					var nAdvancedLB = 0;
 
-					overlay.CheckRect(_x, _y, 15, 20);
+					if (_object.Name == "" && 0 == _object.Buttons.length)
+					{
+						ctx.rect(_x, _y, 15, 20);
+						overlay.CheckRect(_x, _y, 15, 20);
+					}
+					else
+					{
+						_x += 15;
+						_y -= 20;
+
+						var widthControl = 0;
+
+						if (_object.Name != 0)
+						{
+							ctx.font = g_oContentControlButtonIcons.getFont();
+							widthControl += g_oContentControlButtonIcons.measure(_object.Name, ctx);
+							widthControl += 6; // 3 + 3
+							if (_object.NameButtonAdvanced)
+							{
+								nAdvancedL = _x + 15 + widthControl;
+								widthControl += 5;
+							}
+						}
+
+						nAdvancedLB = _x + 15 + widthControl;
+						widthControl += (20 * _object.Buttons.length);
+
+						ctx.rect(_x, _y, 15 + widthControl, 20);
+						overlay.CheckRect(_x, _y, 15 + widthControl, 20);
+					}
 
 					if (1 == this.ContentControlObjectState)
 					{
@@ -4610,6 +4731,38 @@ function CDrawingDocument()
 
 					ctx.stroke();
 					ctx.beginPath();
+
+					if (_object.Name != "")
+					{
+						ctx.fillStyle = "#000000";
+
+						ctx.fillText(_object.Name, _x + 15 + 3, _y + 20 - 6);
+
+						if (_object.NameButtonAdvanced)
+						{
+							nAdvancedL += 0.5;
+							var nY = _y - 0.5;
+							nY += 10;
+							nY -= 1;
+
+							for (var i = 0; i < 3; i++)
+								ctx.rect(nAdvancedL + i, nY + i, 1, 1);
+
+							for (var i = 0; i < 2; i++)
+								ctx.rect(nAdvancedL + 4 - i, nY + i, 1, 1);
+
+							ctx.fill();
+							ctx.beginPath();
+						}
+					}
+
+					for (var i = 0; i < _object.Buttons.length; i++)
+					{
+						var image = g_oContentControlButtonIcons.getImage(_object.Buttons[i], 1 == this.ContentControlObjectState);
+						if (image)
+							ctx.drawImage(image, nAdvancedLB, _y, 20, 20);
+						nAdvancedLB += 20;
+					}
 
 					var cx = _x - 0.5 + 4;
 					var cy = _y - 0.5 + 4;
@@ -4671,6 +4824,34 @@ function CDrawingDocument()
 					var _r = _rect.X;
 					var _b = _rect.Y + (20 / dKoefY);
 
+					var nAdvancedL = 0;
+					var nAdvancedLB = 0;
+					if (_object.Name != "" || 0 != _object.Buttons.length)
+					{
+						_x = _rect.X;
+						_y = _rect.Y - (20 / dKoefY);
+						_b = _rect.Y;
+
+						var widthControl = 0;
+
+						if (_object.Name != 0)
+						{
+							ctx.font = g_oContentControlButtonIcons.getFont();
+							widthControl += (g_oContentControlButtonIcons.measure(_object.Name, ctx) + 3);
+							widthControl += 6; // 3 + 3
+							if (_object.NameButtonAdvanced)
+							{
+								nAdvancedL = 15 + widthControl;
+								widthControl += 5;
+							}
+						}
+
+						nAdvancedLB = 15 + widthControl;
+						widthControl += (20 * _object.Buttons.length);
+
+						_r = _x + ((15 + widthControl) / dKoefX);
+					}
+
 					var x1 = _transform.TransformPointX(_x, _y);
 					var y1 = _transform.TransformPointY(_x, _y);
 
@@ -4718,6 +4899,62 @@ function CDrawingDocument()
 					}
 
 					ctx.stroke();
+
+					ctx.beginPath();
+
+					if (_object.Name != "" || 0 != _object.Buttons.length)
+					{
+						var _ft = new AscCommon.CMatrix();
+						_ft.sx = _transform.sx;
+						_ft.shx = _transform.shx;
+						_ft.shy = _transform.shy;
+						_ft.sy = _transform.sy;
+						_ft.tx = _transform.tx;
+						_ft.ty = _transform.ty;
+
+						var coords = new AscCommon.CMatrix();
+						coords.sx = dKoefX;
+						coords.sy = dKoefY;
+						coords.tx = drPage.left;
+						coords.ty = drPage.top;
+
+						global_MatrixTransformer.MultiplyAppend(_ft, coords);
+
+						ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
+
+						if (_object.Name != "")
+						{
+							ctx.fillStyle = "#000000";
+							ctx.font = g_oContentControlButtonIcons.getFont(dKoefY);
+							ctx.fillText(_object.Name, _x + (15 + 3) / dKoefX, _y + (20 - 6) / dKoefY);
+
+							if (_object.NameButtonAdvanced)
+							{
+								var nY = _y;
+								nY += 9 / dKoefY;
+
+								for (var i = 0; i < 3; i++)
+									ctx.rect(_x + (nAdvancedL + i) / dKoefX, nY + i / dKoefY, 1 / dKoefX, 1 / dKoefY);
+
+								for (var i = 0; i < 2; i++)
+									ctx.rect(_x + (nAdvancedL + 4 - i) / dKoefX, nY + i / dKoefY, 1 / dKoefX, 1 / dKoefY);
+
+								ctx.fill();
+								ctx.beginPath();
+							}
+						}
+
+						for (var i = 0; i < _object.Buttons.length; i++)
+						{
+							var image = g_oContentControlButtonIcons.getImage(_object.Buttons[i], 1 == this.ContentControlObjectState);
+							if (image)
+								ctx.drawImage(image, _x + nAdvancedLB / dKoefX, _y, 20 / dKoefX, 20 / dKoefY);
+							nAdvancedLB += 20;
+						}
+
+						overlay.SetBaseTransform();
+					}
+
 					ctx.beginPath();
 
 					var cx1 = _x + 5  / dKoefX;
@@ -4756,7 +4993,7 @@ function CDrawingDocument()
 		this.ContentControlsSaveLast();
 	};
 
-	this.OnDrawContentControl = function(id, type, rects, transform)
+	this.OnDrawContentControl = function(id, type, rects, transform, name, name_advanced, button_types)
 	{
 		// всегда должен быть максимум один hover и in
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
@@ -4777,14 +5014,14 @@ function CDrawingDocument()
 			{
 				this.ContentControlObjects.splice(0, 1);
 			}
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
 		else
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 				return;
 
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
 	};
 
@@ -7392,6 +7629,14 @@ function CDrawingDocument()
 				var _r = _rect.X;
 				var _b = _rect.Y + (20 / dKoefY);
 
+				if (_object.Name != "" || 0 != _object.Buttons.length)
+				{
+					_x = _rect.X;
+					_y = _rect.Y - (20 / dKoefY);
+					_r = _rect.X + (15 / dKoefX);
+					_b = _rect.Y;
+				}
+
 				var posX = pos.X;
 				var posY = pos.Y;
 
@@ -7424,6 +7669,8 @@ function CDrawingDocument()
 					oWordControl.ShowOverlay();
 					oWordControl.OnUpdateOverlay();
 					oWordControl.EndUpdateOverlay();
+
+					this.LockCursorType("default");
 					return true;
 				}
 
@@ -7578,6 +7825,14 @@ function CDrawingDocument()
 			var _r = rect.X;
 			var _b = rect.Y + (20 / dKoefY);
 
+			if (_content_control.Name != "" || 0 != _content_control.Buttons.length)
+			{
+				_x = rect.X;
+				_y = rect.Y - (20 / dKoefY);
+				_r = rect.X + (15 / dKoefX);
+				_b = rect.Y;
+			}
+
 			var posX = pos.X;
 			var posY = pos.Y;
 
@@ -7606,6 +7861,8 @@ function CDrawingDocument()
 				oWordControl.ShowOverlay();
 				oWordControl.OnUpdateOverlay();
 				oWordControl.EndUpdateOverlay();
+
+				this.SetCursorType("default");
 				return true;
 			}
 
