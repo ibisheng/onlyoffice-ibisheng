@@ -1409,13 +1409,12 @@
 	};
 
 	CellEditor.prototype._hideCursor = function () {
-		if ( window['IS_NATIVE_EDITOR'] ) {
+		if (window['IS_NATIVE_EDITOR']) {
 			return;
 		}
 
-		var t = this;
-		window.clearInterval( t.cursorTID );
-		t.cursorStyle.display = "none";
+		window.clearInterval(this.cursorTID);
+		this.cursorStyle.display = "none";
 	};
 
 	CellEditor.prototype._updateCursorPosition = function (redrawText) {
