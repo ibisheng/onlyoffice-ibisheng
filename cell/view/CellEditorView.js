@@ -143,6 +143,7 @@
 		this.enableKeyEvents = true;
 		this.isTopLineActive = false;
 		this.skipTLUpdate = true;
+		this.loadFonts = false;
 		this.isOpened = false;
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
@@ -1560,12 +1561,14 @@
 	};
 
 	CellEditor.prototype._updateTopLineCurPos = function () {
-		var t = this;
-		var isSelected = t.selectionBegin !== t.selectionEnd;
-		var b = isSelected ? t.selectionBegin : t.cursorPos;
-		var e = isSelected ? t.selectionEnd : t.cursorPos;
-		if ( t.input.setSelectionRange ) {
-			t.input.setSelectionRange( Math.min( b, e ), Math.max( b, e ) );
+		if (this.loadFonts) {
+			return;
+		}
+		var isSelected = this.selectionBegin !== this.selectionEnd;
+		var b = isSelected ? this.selectionBegin : this.cursorPos;
+		var e = isSelected ? this.selectionEnd : this.cursorPos;
+		if (this.input.setSelectionRange) {
+			this.input.setSelectionRange(Math.min(b, e), Math.max(b, e));
 		}
 	};
 
@@ -2674,10 +2677,12 @@
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
 		var t = this;
-		if (this.handlers.trigger("isViewerMode")) {
+		if (this.handlers.trigger("isViewerMode") || this.loadFonts) {
 			return true;
 		}
+		this.loadFonts = true;
 		AscFonts.FontPickerByCharacter.checkText(this.input.value, this, function () {
+			t.loadFonts = false;
 			t.skipTLUpdate = true;
 			t.replaceText(0, t.textRender.getEndOfText(), t.input.value);
 			t._updateCursorByTopLine();
