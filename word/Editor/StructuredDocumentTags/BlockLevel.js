@@ -665,6 +665,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	if (this.IsBuiltInTableOfContents())
 	{
+		sName      = AscCommon.translateManager.getValue("Table of Contents");
 		isBuiltIn  = true;
 	}
 
