@@ -3627,6 +3627,8 @@ var editor;
   prot["asc_convertTableToRange"] = prot.asc_convertTableToRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
 
+  prot["asc_applyAutoCorrectOptions"] = prot.asc_applyAutoCorrectOptions;
+
   // Drawing objects interface
 
   prot["asc_showDrawingObjects"] = prot.asc_showDrawingObjects;
