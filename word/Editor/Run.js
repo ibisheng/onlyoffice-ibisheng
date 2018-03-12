@@ -2239,16 +2239,18 @@ ParaRun.prototype.Create_FontMap = function(Map)
 
 ParaRun.prototype.Get_AllFontNames = function(AllFonts)
 {
-    this.Pr.Document_Get_AllFontNames( AllFonts );
+	this.Pr.Document_Get_AllFontNames(AllFonts);
 
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Item = this.Content[Index];
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item = this.Content[Index];
 
-        if ( para_Drawing === Item.Type )
-            Item.documentGetAllFontNames( AllFonts );
-    }
+		if (para_Drawing === Item.Type)
+			Item.documentGetAllFontNames(AllFonts);
+		else if (para_FootnoteReference === Item.Type)
+			Item.GetAllFontNames(AllFonts);
+	}
 };
 
 ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)

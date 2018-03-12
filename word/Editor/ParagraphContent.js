@@ -1784,6 +1784,11 @@ ParaFootnoteReference.prototype.GetAllContentControls = function(arrContentContr
 	if (this.Footnote)
 		this.Footnote.GetAllContentControls(arrContentControls);
 };
+ParaFootnoteReference.prototype.GetAllFontNames = function(arrAllFonts)
+{
+	if (this.Footnote)
+		this.Footnote.Document_Get_AllFontNames(arrAllFonts);
+};
 
 /**
  * Класс представляющий номер сноски внутри сноски.
