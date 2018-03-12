@@ -193,9 +193,11 @@ function CTableOutlineDr()
 {
 	this.image = new Image();
 	this.image.src = "../../../../sdkjs/common/Images/table_move.png";
+	this.image.onload = function() { this.asc_complete = true; };
 
 	this.image2 = new Image();
 	this.image2.src = "../../../../sdkjs/common/Images/table_move_2x.png";
+	this.image2.onload = function() { this.asc_complete = true; };
 
 	this.TableOutline = null;
 	this.Counter = 0;
@@ -2110,7 +2112,9 @@ function CPage()
 				if ((_y + _h) > overlay.max_y)
 					overlay.max_y = _y + _h;
 
-				overlay.m_oContext.drawImage(overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image, _x, _y, 13, 13);
+				var tmp_image = overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image;
+				if (tmp_image.asc_complete)
+					overlay.m_oContext.drawImage(tmp_image, _x, _y, 13, 13);
 			}
 			else
 			{
@@ -2190,7 +2194,10 @@ function CPage()
 				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
 				overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
 
-				overlay.m_oContext.drawImage(overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image, _x, _y, _w, _h);
+				var tmp_image = overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image;
+				if (tmp_image.asc_complete)
+					overlay.m_oContext.drawImage(tmp_image, _x, _y, _w, _h);
+
 				overlay.SetBaseTransform();
 			}
 			else
