@@ -1671,7 +1671,24 @@ ParaMath.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 		if (true === bClearText)
 			return null;
 
-		return "";
+		var res = "";
+
+		//TODO проверить!!! +  пересмотреть работу функции GetTextContent
+		//включаю эту ветку только для copy/paste
+		if(window['AscCommon'].g_clipboardBase && window['AscCommon'].g_clipboardBase.CopyPasteFocus)
+		{
+			var selectedContent = this.GetSelectContent();
+			if(selectedContent && selectedContent.Content && selectedContent.Content.GetTextContent)
+			{
+				var textContent = selectedContent.Content.GetTextContent(!bAll);
+				if(textContent && textContent.str)
+				{
+					res = textContent.str;
+				}
+			}
+		}
+
+		return res;
 	}
 
 	return "";
