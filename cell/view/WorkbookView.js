@@ -1356,6 +1356,13 @@
     }
   };
 
+	WorkbookView.prototype._onWindowMouseUpExternal = function (event, x, y) {
+		this.controller._onWindowMouseUpExternal(event, x, y);
+		if (this.isCellEditMode) {
+			this.cellEditor._onWindowMouseUp(event, x, y);
+		}
+	};
+
   WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback) {
     var t = this;
 

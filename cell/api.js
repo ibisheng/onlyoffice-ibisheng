@@ -3021,7 +3021,9 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_onMouseUp = function(event, x, y) {
-    this.controller._onWindowMouseUpExternal(event, x, y);
+    if (this.wb) {
+      this.wb._onWindowMouseUpExternal(event, x, y);
+    }
   };
 
   //
