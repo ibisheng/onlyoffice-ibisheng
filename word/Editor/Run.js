@@ -7045,7 +7045,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 				var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
 				// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-				Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
+				this.Paragraph.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
 			}
 		}
     }
