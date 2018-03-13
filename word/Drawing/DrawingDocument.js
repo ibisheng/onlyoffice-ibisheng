@@ -5128,23 +5128,34 @@ function CDrawingDocument()
 
 	this.OnDrawContentControl = function(id, type, rects, transform, name, name_advanced, button_types)
 	{
+		var isActiveRemove = false;
 		// всегда должен быть максимум один hover и in
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
 			if (type == this.ContentControlObjects[i].type)
 			{
+				if (-2 != this.ContentControlObjects[i].ActiveButtonIndex)
+					isActiveRemove = true;
+
 				this.ContentControlObjects.splice(i, 1);
 				i--;
 			}
 		}
 
 		if (null == id || !rects || rects.length == 0)
+		{
+			if (isActiveRemove)
+				this.m_oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
 			return;
+		}
 
 		if (type == c_oContentControlTrack.In)
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 			{
+				if (-2 != this.ContentControlObjects[0].ActiveButtonIndex)
+					isActiveRemove = true;
+
 				this.ContentControlObjects.splice(0, 1);
 			}
 			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
@@ -5156,6 +5167,9 @@ function CDrawingDocument()
 
 			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
+
+		if (isActiveRemove)
+			this.m_oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
 	};
 
 	this.private_DrawMathTrack = function (overlay, oPath, shift, color, dKoefX, dKoefY, drPage)
@@ -7809,9 +7823,25 @@ function CDrawingDocument()
 				else if (_content_control.NameButtonAdvanced && posX > _r && posX < (_r + _content_control.NameWidth / dKoefX) && posY > _y && posY < _b)
 				{
 					if (_content_control.ActiveButtonIndex == -1)
+					{
 						_content_control.ActiveButtonIndex = -2;
+						oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
+					}
 					else
+					{
 						_content_control.ActiveButtonIndex = -1;
+
+						var xCC = _r;
+						var yCC = _b;
+						if (_transform)
+						{
+							xCC = _transform.TransformPointX(_r, _b);
+							yCC = _transform.TransformPointY(_r, _b);
+						}
+
+						var posOnScreen = this.ConvertCoordsToCursorWR(xCC, yCC, _content_control.getPage());
+						oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", posOnScreen.X, posOnScreen.Y);
+					}
 
 					oWordControl.ShowOverlay();
 					oWordControl.OnUpdateOverlay();
@@ -7828,9 +7858,25 @@ function CDrawingDocument()
 						if (posX > _posR && posX < (_posR + 20 / dKoefX) && posY > _y && posY < _b)
 						{
 							if (_content_control.ActiveButtonIndex == indexB)
+							{
 								_content_control.ActiveButtonIndex = -2;
+								oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
+							}
 							else
+							{
 								_content_control.ActiveButtonIndex = indexB;
+
+								var xCC = _posR;
+								var yCC = _b;
+								if (_transform)
+								{
+									xCC = _transform.TransformPointX(_posR, _b);
+									yCC = _transform.TransformPointY(_posR, _b);
+								}
+
+								var posOnScreen = this.ConvertCoordsToCursorWR(xCC, yCC, _content_control.getPage());
+								oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", indexB + 1, posOnScreen.X, posOnScreen.Y);
+							}
 
 							oWordControl.ShowOverlay();
 							oWordControl.OnUpdateOverlay();
