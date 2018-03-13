@@ -1637,6 +1637,7 @@ function CEditorPage(api)
 					if (-1 == oWordControl.m_oTimerScrollSelect)
 						oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
 
+					AscCommon.stopEvent(e);
 					return;
 				}
 
