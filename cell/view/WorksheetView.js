@@ -11648,7 +11648,6 @@
      */
     WorksheetView.prototype.updateRanges = function (ranges, lockDraw, updateHeight) {
         if (0 < ranges.length) {
-			var range;
 			for (var i = 0; i < ranges.length; ++i) {
 				this.updateRange(ranges[i], ranges[i].canChangeColWidth || c_oAscCanChangeColWidth.none, true);
 			}
