@@ -2588,6 +2588,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseUp = function ( event ) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		if ( this.callTopLineMouseup ) {
 			this._topLineMouseUp();
@@ -2607,6 +2608,8 @@
 	CellEditor.prototype._onMouseDown = function (event) {
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
+
+		AscCommon.global_mouseEvent.LockMouse();
 
 		var pos;
 		var coord = this._getCoordinates(event);
@@ -2650,6 +2653,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseUp = function (event) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		if (2 === event.button) {
 			return true;
 		}
