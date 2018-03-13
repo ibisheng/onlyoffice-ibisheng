@@ -959,7 +959,7 @@
 			var tmpCellCache = this.cleanCellCache;
 			this.cleanCellCache = {};
 			for (var i in tmpCellCache) {
-				this.wb.handlers.trigger("cleanCellCache", i, {0: tmpCellCache[i]},
+				this.wb.handlers.trigger("cleanCellCache", i, [tmpCellCache[i]],
 										 AscCommonExcel.c_oAscCanChangeColWidth.none);
 			}
 			AscCommonExcel.g_oVLOOKUPCache.clean();

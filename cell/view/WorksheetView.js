@@ -8277,7 +8277,7 @@
                 return;
             }
             var bIsUpdate = true;
-            var oUpdateRanges = {}, hasUpdates = false;
+            var oUpdateRanges = [], hasUpdates = false;
 
             var callTrigger = false;
             var res;
@@ -8551,8 +8551,8 @@
 
                 if (bIsUpdate) {
                     hasUpdates = true;
-                    oUpdateRanges[i] = item;
-                    oUpdateRanges[i].canChangeColWidth = canChangeColWidth;
+					item.canChangeColWidth = canChangeColWidth;
+                    oUpdateRanges.push(item);
                     bIsUpdate = false;
                 }
             });
@@ -11647,19 +11647,17 @@
      * @param updateHeight
      */
     WorksheetView.prototype.updateRanges = function (ranges, lockDraw, updateHeight) {
-        var arrRanges = [], range;
-        for (var i in ranges) {
-            range = ranges[i];
-            this.updateRange(range, range.canChangeColWidth || c_oAscCanChangeColWidth.none, true);
-            arrRanges.push(range);
-        }
+        if (0 < ranges.length) {
+			var range;
+			for (var i = 0; i < ranges.length; ++i) {
+				this.updateRange(ranges[i], ranges[i].canChangeColWidth || c_oAscCanChangeColWidth.none, true);
+			}
 
-        if (0 < arrRanges.length) {
             if (updateHeight) {
                 this.isChanged = true;
             }
 
-            this._recalculateAfterUpdate(arrRanges, lockDraw);
+            this._recalculateAfterUpdate(ranges, lockDraw);
         }
     };
     // ToDo избавиться от этой функции!!!!Заглушка для принятия изменений
