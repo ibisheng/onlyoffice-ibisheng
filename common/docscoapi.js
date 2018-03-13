@@ -662,6 +662,8 @@
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
+    this._authChanges = [];
+    this._authOtherChanges = [];
   }
 
   DocsCoApi.prototype.isRightURL = function() {
@@ -1138,6 +1140,9 @@
 
   DocsCoApi.prototype._onSaveChanges = function(data) {
     if (!this.check_state()) {
+      if (!this.get_isAuth()) {
+        this._authOtherChanges.push(data);
+      }
       return;
     }
     if (data["locks"]) {
@@ -1491,7 +1496,7 @@
             this.onSaveChanges(changeOneUser[j], null, true);
         }
       }
-      this._updateChanges(data["changes"], data["changesIndex"], true);
+      this._updateAuthChanges();
       // Посылать нужно всегда, т.к. на это рассчитываем при открытии
       if (this.onFirstLoadChangesEnd) {
         this.onFirstLoadChangesEnd();
@@ -1504,6 +1509,33 @@
       this._sendPrebuffered();
     }
     //TODO: Add errors
+  };
+  DocsCoApi.prototype._onAuthChanges = function(data) {
+    this._authChanges.push(data["changes"]);
+  };
+  DocsCoApi.prototype._updateAuthChanges = function() {
+    //todo apply changes with chunk on arrival
+    var changesIndex = 0, i, changes, data, indexDiff;
+    for (i = 0; i < this._authChanges.length; ++i) {
+      changes = this._authChanges[i];
+      changesIndex += changes.length;
+      this._updateChanges(changes, changesIndex, true);
+    }
+    this._authChanges = [];
+    for (i = 0; i < this._authOtherChanges.length; ++i) {
+      data = this._authOtherChanges[i];
+      indexDiff = data["changesIndex"] - changesIndex;
+      if (indexDiff > 0) {
+        if (indexDiff >= data["changes"].length) {
+          changes = data["changes"];
+        } else {
+          changes = data["changes"].splice(data["changes"].length - indexDiff, indexDiff);
+        }
+        changesIndex += changes.length;
+        this._updateChanges(changes, changesIndex, true);
+      }
+    }
+    this._authOtherChanges = [];
   };
 
   DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
@@ -1643,6 +1675,9 @@
 				break;
 			case 'saveChanges'    :
 				this._onSaveChanges(dataObject);
+				break;
+			case 'authChanges' :
+				this._onAuthChanges(dataObject);
 				break;
 			case 'saveLock'      :
 				this._onSaveLock(dataObject);
