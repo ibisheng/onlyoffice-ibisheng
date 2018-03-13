@@ -807,7 +807,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
     {
         // Начинаем параграф с новой страницы
         var PageRelative = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
-        if (isParentDocument && 0 === PageRelative && true === ParaPr.PageBreakBefore)
+        if (0 === PageRelative && true === ParaPr.PageBreakBefore)
         {
             // Если это первый элемент документа или секции, тогда не надо начинать его с новой страницы.
             // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для
@@ -815,7 +815,26 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 
             var bNeedPageBreak = true;
 
-            var Prev = this.Get_DocumentPrev();
+			var Prev = this.Get_DocumentPrev();
+			if (!Prev && isParentBlockSdt)
+			{
+				var oSdt = this.Parent.Parent;
+				while (oSdt instanceof CBlockLevelSdt)
+				{
+					Prev = oSdt.Get_DocumentPrev();
+					if (Prev)
+						break;
+
+					if (oSdt.Parent instanceof CDocumentContent && oSdt.Parent.Parent instanceof CBlockLevelSdt)
+						oSdt = oSdt.Parent.Parent;
+					else
+						oSdt = null;
+				}
+			}
+
+			while (Prev && (Prev instanceof CBlockLevelSdt))
+				Prev = Prev.GetLastElement();
+
             if ((true === this.IsEmpty() && undefined !== this.Get_SectionPr()) || null === Prev)
             {
                 bNeedPageBreak = false;

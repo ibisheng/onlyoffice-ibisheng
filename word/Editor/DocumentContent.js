@@ -5499,7 +5499,35 @@ CDocumentContent.prototype.SetParagraphContextualSpacing = function(Value)
 };
 CDocumentContent.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-	// Ничего не делаем
+	// В таблице или вне самого верхнего документа нет смысла ставить PageBreak
+	if (docpostype_Content !== this.Get_DocPosType() || this.Is_InTable() || this.GetTopDocumentContent() !== this.LogicDocument)
+		return;
+
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.SetParagraphPageBreakBefore(Value);
+		}
+	}
+	else
+	{
+		var Item = this.Content[this.CurPos.ContentPos];
+		Item.SetParagraphPageBreakBefore(Value);
+	}
 };
 CDocumentContent.prototype.SetParagraphKeepLines = function(Value)
 {
