@@ -1026,6 +1026,19 @@
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
+			// Check one cell
+			if (1 === this.ranges.length) {
+				curRange = this.ranges[this.activeCellId];
+				if (curRange.isOneCell()) {
+					return false;
+				} else {
+					mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+					if (mc && curRange.isEqual(mc)) {
+						return false;
+					}
+				}
+			}
+
 			var lastRow = this.activeCell.row;
 			var lastCol = this.activeCell.col;
 			this.activeCell.row += dr;
