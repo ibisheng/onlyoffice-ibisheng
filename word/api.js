@@ -7196,6 +7196,12 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_doubleClickOnChart", obj);
 	};
 
+	asc_docs_api.prototype.asc_onCloseChartFrame               = function()
+	{
+		AscCommon.baseEditorsApi.prototype.asc_onCloseChartFrame.call(this);
+		this.WordControl.m_bIsMouseLock = false;
+	};
+
 	asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 	{
 		/**/

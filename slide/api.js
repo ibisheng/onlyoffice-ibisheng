@@ -6722,6 +6722,12 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_onCloseChartFrame               = function()
+	{
+		AscCommon.baseEditorsApi.prototype.asc_onCloseChartFrame.call(this);
+		this.WordControl.m_bIsMouseLock = false;
+	};
+
 	asc_docs_api.prototype.sync_closeChartEditor = function()
 	{
 		this.sendEvent("asc_onCloseChartEditor");
