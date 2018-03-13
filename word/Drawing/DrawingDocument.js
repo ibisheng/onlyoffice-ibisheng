@@ -8036,6 +8036,9 @@ function CDrawingDocument()
 				oWordControl.EndUpdateOverlay();
 
 				this.SetCursorType("default");
+
+				oWordControl.m_oApi.sync_MouseMoveStartCallback();
+				oWordControl.m_oApi.sync_MouseMoveEndCallback();
 				return true;
 			}
 			else if (_content_control.NameButtonAdvanced && posX > _r && posX < (_r + _content_control.NameWidth / dKoefX) && posY > _y && posY < _b)
@@ -8046,6 +8049,9 @@ function CDrawingDocument()
 				oWordControl.EndUpdateOverlay();
 
 				this.SetCursorType("default");
+
+				oWordControl.m_oApi.sync_MouseMoveStartCallback();
+				oWordControl.m_oApi.sync_MouseMoveEndCallback();
 				return true;
 			}
 			else
@@ -8061,6 +8067,9 @@ function CDrawingDocument()
 						oWordControl.EndUpdateOverlay();
 
 						this.SetCursorType("default");
+
+						oWordControl.m_oApi.sync_MouseMoveStartCallback();
+						oWordControl.m_oApi.sync_MouseMoveEndCallback();
 						return true;
 					}
 					_posR += (20 / dKoefX);
