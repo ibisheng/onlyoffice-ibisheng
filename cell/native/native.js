@@ -3807,7 +3807,7 @@ function OfflineEditor () {
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
-					type = arrRanges[i].getType();
+					type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
                     ranges.push(undefined !== rangetype ? rangetype : type);
                     ranges.push(arrRanges[i].c1);
                     ranges.push(arrRanges[i].c2);
@@ -3937,7 +3937,7 @@ function OfflineEditor () {
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
-				type = arrRanges[i].getType();
+				type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
                 ranges.push(undefined !== rangetype ? rangetype : type);
                 ranges.push(arrRanges[i].c1);
                 ranges.push(arrRanges[i].c2);
@@ -4747,7 +4747,9 @@ function OfflineEditor () {
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        return _api.wb.printSheets(pagesData).DocumentRenderer.Memory.GetBase64Memory();
+        var pdfWriter   = new AscCommonExcel.CPdfPrinter();
+        _api.wb.printSheets(pdfWriter, pagesData);
+        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 
     this.onSelectionChanged = function(info) {
