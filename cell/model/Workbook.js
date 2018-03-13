@@ -5691,17 +5691,22 @@
 
 				if (countR) {
 					countR = pivotTable.hasCompact() ? 1 : countR;
+					pos = pivotRange.r1 + pivotTable.getFirstHeaderRow0();
 					for (j = 0; j < countR; ++j) {
-						cell = new AscCommon.CellBase(pivotRange.r1 + pivotTable.getFirstHeaderRow0(), pivotRange.c1 + j);
+						cell = new AscCommon.CellBase(pos, pivotRange.c1 + j);
 						if (range.contains2(cell)) {
 							res.push(cell);
 						}
 					}
 				}
 				if (countCWValues) {
-					cell = new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + pivotTable.getFirstDataCol());
-					if (range.contains2(cell)) {
-						res.push(cell);
+					countC = pivotTable.hasCompact() ? 1 : countC;
+					pos = pivotRange.c1 + pivotTable.getFirstDataCol();
+					for (j = 0; j < countC; ++j) {
+						cell = new AscCommon.CellBase(pivotRange.r1, pos + j);
+						if (range.contains2(cell)) {
+							res.push(cell);
+						}
 					}
 				}
 			}
