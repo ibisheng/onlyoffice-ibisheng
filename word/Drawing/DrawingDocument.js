@@ -4457,9 +4457,9 @@ function CDrawingDocument()
 		var _transform, offset_x, offset_y;
 		var _curPage;
 
-		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		for (var nIndexContentControl = 0; nIndexContentControl < this.ContentControlObjects.length; nIndexContentControl++)
 		{
-			_object = this.ContentControlObjects[i];
+			_object = this.ContentControlObjects[nIndexContentControl];
 			_transform = _object.transform;
 			_curPage = _object.getPage();
 
@@ -4820,9 +4820,9 @@ function CDrawingDocument()
 						}
 					}
 
-					for (var i = 0; i < _object.Buttons.length; i++)
+					for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
 					{
-						var image = g_oContentControlButtonIcons.getImage(_object.Buttons[i], i == _object.ActiveButtonIndex);
+						var image = g_oContentControlButtonIcons.getImage(_object.Buttons[nIndexB], nIndexB == _object.ActiveButtonIndex);
 						if (image)
 							ctx.drawImage(image, nAdvancedLB, _y, 20, 20);
 						nAdvancedLB += 20;
@@ -7840,7 +7840,7 @@ function CDrawingDocument()
 						}
 
 						var posOnScreen = this.ConvertCoordsToCursorWR(xCC, yCC, _content_control.getPage());
-						oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", posOnScreen.X, posOnScreen.Y);
+						oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", 0, posOnScreen.X, posOnScreen.Y);
 					}
 
 					oWordControl.ShowOverlay();
