@@ -75,7 +75,13 @@ var GlobalSkinTeamlab = {
 	RulerMarkersFillColor  : "#E7E7E7",
 	PageOutline            : "#81878F",
 	STYLE_THUMBNAIL_WIDTH  : 80,
-	STYLE_THUMBNAIL_HEIGHT : 40
+	STYLE_THUMBNAIL_HEIGHT : 40,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
 };
 var GlobalSkinFlat    = {
 	Name                   : "flat",
@@ -90,7 +96,13 @@ var GlobalSkinFlat    = {
 	PageOutline            : "#BBBEC2",
 	STYLE_THUMBNAIL_WIDTH  : 104,
 	STYLE_THUMBNAIL_HEIGHT : 38,
-	isNeedInvertOnActive   : false
+	isNeedInvertOnActive   : false,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
 };
 var GlobalSkinFlat2    = {
 	Name                   : "flat",
@@ -105,7 +117,13 @@ var GlobalSkinFlat2    = {
 	PageOutline            : "#BBBEC2",
 	STYLE_THUMBNAIL_WIDTH  : 104,
 	STYLE_THUMBNAIL_HEIGHT : 38,
-	isNeedInvertOnActive   : false
+	isNeedInvertOnActive   : false,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
 };
 
 var GlobalSkin = GlobalSkinFlat2;
