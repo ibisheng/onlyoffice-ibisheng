@@ -1711,6 +1711,7 @@
 
     //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
     this.toggleAutoCorrectOptions(null, true);
+    this.handlers.trigger("hideSpecialPasteOptions");
     return this;
   };
 
