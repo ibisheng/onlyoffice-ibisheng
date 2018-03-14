@@ -4805,15 +4805,17 @@ function CDrawingDocument()
 
 						if (_object.NameButtonAdvanced)
 						{
-							nAdvancedL += 0.5;
+							nAdvancedL = (nAdvancedL + 0.5) >> 0;
 							var nY = _y - 0.5;
 							nY += 10;
 							nY -= 1;
 
-							for (var i = 0; i < 3; i++)
+							var plus = AscCommon.AscBrowser.isRetina ? 0.5 : 1;
+
+							for (var i = 0; i <= 2; i+=plus)
 								ctx.rect(nAdvancedL + i, nY + i, 1, 1);
 
-							for (var i = 0; i < 2; i++)
+							for (var i = 0; i <= 2; i+=plus)
 								ctx.rect(nAdvancedL + 4 - i, nY + i, 1, 1);
 
 							ctx.fill();
