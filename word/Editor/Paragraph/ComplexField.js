@@ -484,7 +484,10 @@ CComplexField.prototype.private_UpdateTOC = function()
 
 			var oClearTextPr = new CTextPr();
 			oClearTextPr.Set_FromObject({
-				FontSize  : null
+				FontSize  : null,
+				Unifill   : null,
+				Underline : null,
+				Color     : null
 			});
 
 			oPara.SelectAll();

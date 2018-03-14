@@ -6801,16 +6801,13 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 	// Мержим настройки стиля.
 	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC, то стиль
 	// мержить не надо и, более того, цвет и подчеркивание из прямых настроек тоже не используется.
-	var isInTOCHyperlink = false;
 	if (undefined !== this.Pr.RStyle)
 	{
-		isInTOCHyperlink = true;
 		if (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC())
 		{
 			var Styles      = this.Paragraph.Parent.Get_Styles();
 			var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
 			TextPr.Merge(StyleTextPr);
-			isInTOCHyperlink = false;
 		}
 	}
 
@@ -6884,24 +6881,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 	}
 	else
 	{
-		var oColor      = this.Pr.Color;
-		var isUnderline = this.Pr.Underline;
-		var oUnifill    = this.Pr.Unifill;
-		if (isInTOCHyperlink)
-		{
-			this.Pr.Unifill   = undefined;
-			this.Pr.Color     = undefined;
-			this.Pr.Underline = undefined;
-		}
-
 		TextPr.Merge(this.Pr); // Мержим прямые настройки данного рана
-
-		if (isInTOCHyperlink)
-		{
-			this.Pr.Color     = oColor;
-			this.Pr.Underline = isUnderline;
-			this.Pr.Unifill   = oUnifill;
-		}
 
 		if (this.Pr.Color && !this.Pr.Unifill)
 		{
