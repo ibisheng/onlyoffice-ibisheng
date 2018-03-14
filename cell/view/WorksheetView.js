@@ -1017,6 +1017,28 @@
                 History.SetSelectionRedo(arCopy.clone());
                 History.StartTransaction();
 
+				var updateScroll = false;
+                var checkExpand = function (range) {
+					if (range.c2 >= t.nColsCount) {
+						updateScroll = true;
+						t.expandColsOnScroll(false, true, range.c2 + 1);
+					}
+					if (range.r2 >= t.nRowsCount) {
+						updateScroll = true;
+						t.expandRowsOnScroll(false, true, range.r2 + 1);
+					}
+                };
+
+                if (Array.isArray(changedRange)) {
+                    changedRange.forEach(changedRange);
+				} else {
+					checkExpand(changedRange);
+				}
+
+				if (updateScroll) {
+					t.handlers.trigger("reinitializeScroll");
+				}
+
                 asc_applyFunction(functionAction);
                 t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 
