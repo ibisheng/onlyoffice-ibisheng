@@ -6629,12 +6629,23 @@ CDocument.prototype.OnKeyDown = function(e)
         var Hyperlink = this.IsCursorInHyperlink(false);
         if (null != Hyperlink && false === e.ShiftKey)
         {
-            editor.sync_HyperlinkClickCallback(Hyperlink.GetValue());
-            Hyperlink.SetVisited(true);
+			var sBookmarkName = Hyperlink.GetAnchor();
+			var sValue        = Hyperlink.GetValue();
+			if (sBookmarkName)
+			{
+				var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
+				if (oBookmark)
+					oBookmark[0].GoToBookmark();
+			}
+			else if (sValue)
+			{
+				editor.sync_HyperlinkClickCallback(sValue);
+				Hyperlink.SetVisited(true);
 
-            // TODO: Пока сделаем так, потом надо будет переделать
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+				// TODO: Пока сделаем так, потом надо будет переделать
+				this.DrawingDocument.ClearCachePages();
+				this.DrawingDocument.FirePaint();
+			}
         }
         else
 		{
