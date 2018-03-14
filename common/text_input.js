@@ -137,6 +137,9 @@
 		this.editorSdkH = 0;
 
 		this.ReadOnlyCounter = 0;
+
+		this.LastReplaceText = [];
+		this.IsLastReplaceFlag = false;
 	}
 
 	CTextInput.prototype =
@@ -1176,6 +1179,12 @@
 			this.Api.asc_LockTargetUpdate(false);
 		},
 
+		clearLastCompositeText : function()
+		{
+			this.LastReplaceText = [];
+			this.IsLastReplaceFlag = false;
+		},
+
 		apiCompositeStart : function()
 		{
 		},
@@ -1189,10 +1198,37 @@
 			}
 
 			if (!this.ApiIsComposition)
+			{
 				this.Api.Begin_CompositeInput();
+				this.clearLastCompositeText();
+			}
 
             this.ApiIsComposition = true;
+
+			if (this.IsLastReplaceFlag)
+			{
+				// check _value == this.LastReplaceText
+				if (_value.length == this.LastReplaceText.length)
+				{
+					var isEqual = true;
+					for (var nC = 0; nC < _value.length; nC++)
+					{
+						if (_value[nC] != this.LastReplaceText[nC])
+						{
+							isEqual = false;
+							break;
+						}
+					}
+
+					if (isEqual)
+						return; // не посылаем одинаковые замены!
+				}
+			}
+
             this.Api.Replace_CompositeText(_value);
+
+			this.LastReplaceText = _value.slice();
+			this.IsLastReplaceFlag = true;
 		},
 
 		apiCompositeEnd : function()
@@ -1202,6 +1238,7 @@
 
 			this.ApiIsComposition = false;
 			this.Api.End_CompositeInput();
+			this.clearLastCompositeText();
 		},
 
 		onCompositionStart : function(e)
