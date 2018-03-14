@@ -2256,7 +2256,9 @@ var editor;
 
   spreadsheet_api.prototype.asc_addChartDrawingObject = function(chart) {
     var ws = this.wb.getWorksheet();
+    AscFonts.IsCheckSymbols = true;
     var ret = ws.objectRender.addChartDrawingObject(chart);
+    AscFonts.IsCheckSymbols = false;
     this.asc_onCloseChartFrame();
     return ret;
   };
