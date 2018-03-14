@@ -127,6 +127,16 @@ CDocumentOutline.prototype.Update = function()
 
 					this.Elements.splice(nPos, 0, {Paragraph : oParagraph, Lvl : nLevel});
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(nPos);
+
+					if (0 === nPos)
+					{
+						this.LogicDocument.UpdateContentIndexing();
+						if (0 !== this.Elements[0].Paragraph.GetIndex())
+						{
+							this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
+							this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(0);
+						}
+					}
 				}
 				else
 				{
@@ -143,6 +153,12 @@ CDocumentOutline.prototype.Update = function()
 				{
 					this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(0);
+				}
+
+				if (1 === this.Elements.length && this.Elements[0].Paragraph === null)
+				{
+					this.Elements.splice(0, 1);
+					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateRemove(0);
 				}
 			}
 		}
