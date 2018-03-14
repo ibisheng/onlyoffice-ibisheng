@@ -752,6 +752,11 @@ CHistory.prototype._sendCanUndoRedo = function()
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}
+	//в данном случае не показываем опции авторазвертывания таблиц
+	if(-1 === this.Index)
+	{
+		this.workbook.handlers.trigger("toggleAutoCorrectOptions");
+	}
 };
 CHistory.prototype.SetSelection = function(range)
 {
