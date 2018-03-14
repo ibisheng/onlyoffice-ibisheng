@@ -810,7 +810,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
 
-				oLogicDocument.RemoveCommentsOnPreDelete = false;
+				oLogicDocument.RemoveCommentsOnPreDelete = true;
 				return oSdt;
 			}
 		}

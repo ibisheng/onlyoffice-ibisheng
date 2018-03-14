@@ -1683,7 +1683,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.ForceCopySectPr           = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
     this.CopyNumberingMap          = null;  // Мап старый индекс -> новый индекс для копирования нумерации
     this.CheckLanguageOnTextAdd    = false; // Проверять ли язык при добавлении текста в ран
-	this.RemoveCommentsOnPreDelete = false; // Удалять ли комментарий при удалением объекта
+	this.RemoveCommentsOnPreDelete = true; // Удалять ли комментарий при удалении объекта
 
     // Мап для рассылки
     this.MailMergeMap             = null;
