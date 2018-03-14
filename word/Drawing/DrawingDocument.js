@@ -2676,6 +2676,7 @@ function CDrawingDocument()
 	this.ContentControlObjects = [];
 	this.ContentControlObjectsLast = [];
 	this.ContentControlObjectState = -1;
+	this.ContentControlSmallChangesCheck = { X: 0, Y: 0, Page: 0, Min: 2, IsSmall : true };
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -7808,8 +7809,12 @@ function CDrawingDocument()
 				{
 					oWordControl.m_oLogicDocument.SelectContentControl(_content_control.id);
 					this.ContentControlObjectState = 1;
+					this.ContentControlSmallChangesCheck.X = pos.X;
+					this.ContentControlSmallChangesCheck.Y = pos.Y;
+					this.ContentControlSmallChangesCheck.Page = pos.Page;
+					this.ContentControlSmallChangesCheck.IsSmall = true;
 
-					this.InlineTextTrackEnabled = true;
+					//this.InlineTextTrackEnabled = true;
 					this.InlineTextTrack = null;
 					this.InlineTextTrackPage = -1;
 
@@ -7923,6 +7928,13 @@ function CDrawingDocument()
 
 		if (this.InlineTextTrackEnabled)
 		{
+			if (pos.Page != this.ContentControlSmallChangesCheck.Page ||
+				Math.abs(pos.X - this.ContentControlSmallChangesCheck.X) > this.ContentControlSmallChangesCheck.Min ||
+				Math.abs(pos.Y - this.ContentControlSmallChangesCheck.Y) > this.ContentControlSmallChangesCheck.Min)
+			{
+				this.ContentControlSmallChangesCheck.IsSmall = false;
+			}
+
 			this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 			this.InlineTextTrackPage = pos.Page;
 
@@ -8023,6 +8035,19 @@ function CDrawingDocument()
 		{
 			if (1 == this.ContentControlObjectState)
 			{
+				if (pos.Page == this.ContentControlSmallChangesCheck.Page &&
+					Math.abs(pos.X - this.ContentControlSmallChangesCheck.X) < this.ContentControlSmallChangesCheck.Min &&
+					Math.abs(pos.Y - this.ContentControlSmallChangesCheck.Y) < this.ContentControlSmallChangesCheck.Min)
+				{
+					oWordControl.ShowOverlay();
+					oWordControl.OnUpdateOverlay();
+					oWordControl.EndUpdateOverlay();
+					return true;
+				}
+
+				this.InlineTextTrackEnabled = true;
+				this.ContentControlSmallChangesCheck.IsSmall = false;
+
 				this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 				this.InlineTextTrackPage = pos.Page;
 
@@ -8135,6 +8160,10 @@ function CDrawingDocument()
 	this.checkMouseUp_Drawing = function (pos)
 	{
 		var oWordControl = this.m_oWordControl;
+
+		var oldContentControlSmall = this.ContentControlSmallChangesCheck.IsSmall;
+		this.ContentControlSmallChangesCheck.IsSmall = true;
+
 		if (this.TableOutlineDr.bIsTracked)
 		{
 			this.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
@@ -8192,7 +8221,7 @@ function CDrawingDocument()
 				{
 					if (this.InlineTextTrackEnabled)
 					{
-						if (this.InlineTextTrack) // значит был MouseMove
+						if (this.InlineTextTrack && !oldContentControlSmall) // значит был MouseMove
 						{
 							this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 							this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(_object.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
