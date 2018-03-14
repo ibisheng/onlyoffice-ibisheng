@@ -3555,9 +3555,36 @@
 			result = Math.max(result, pane.topLeftFrozenCell.getRow0());
 		return result;
 	};
-	Worksheet.prototype.removeRows=function(start, stop){
-		var oRange = this.getRange(new CellAddress(start, 0, 0), new CellAddress(stop, gc_nMaxCol0, 0));
-		oRange.deleteCellsShiftUp();
+	Worksheet.prototype.removeRows=function(start, stop, bExcludeHiddenRows){
+		var removeRowsArr = bExcludeHiddenRows ? this._getNoHiddenRowsArr(start, stop) : [{start: start, stop: stop}];
+		for(var i = removeRowsArr.length - 1; i >= 0; i--) {
+			var oRange = this.getRange(new CellAddress(removeRowsArr[i].start, 0, 0), new CellAddress(removeRowsArr[i].stop, gc_nMaxCol0, 0));
+			oRange.deleteCellsShiftUp();
+		}
+	};
+	Worksheet.prototype._getNoHiddenRowsArr=function(start, stop){
+		var res = [];
+		var elem = null;
+		for (var i = start; i <= stop; i++) {
+			if (this.getRowHidden(i)) {
+				if (elem) {
+					res.push(elem);
+					elem = null;
+				}
+			} else {
+				if (!elem) {
+					elem = {};
+					elem.start = i;
+					elem.stop = i;
+				} else {
+					elem.stop++;
+				}
+				if (i === stop) {
+					res.push(elem);
+				}
+			}
+		}
+		return res;
 	};
 	Worksheet.prototype._updateFormulasParents=function(r1, c1, r2, c2, offset){
 		var t = this;

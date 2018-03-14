@@ -10662,7 +10662,10 @@
 							checkRange = t.model.autoFilters.checkDeleteAllRowsFormatTable(checkRange, true);
 							t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 							t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
-							t.model.removeRows(checkRange.r1, checkRange.r2);
+
+							var bExcludeHiddenRows = t.model.autoFilters.bIsExcludeHiddenRows(checkRange, t.model.selectionRange.activeCell);
+							t.model.removeRows(checkRange.r1, checkRange.r2, bExcludeHiddenRows);
+
 							updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
 							History.EndTransaction();
 						};
