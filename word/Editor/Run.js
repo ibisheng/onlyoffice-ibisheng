@@ -58,7 +58,7 @@ function CSpellCheckerMarks()
 		}
 
 		this.len = len;
-		this.data = new Uint8ClampedArray(this.len);
+		this.data = typeof(Int8Array) !== undefined ? new Int8Array(this.len) : new Array(this.len);
 		return this.data;
 	};
 }
@@ -5445,7 +5445,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             {
 				MarkIndex = Mark.Element.EndPos.Get(Mark.Depth);
 				if (MarkIndex < SpellDataLen)
-					SpellData[MarkIndex] += 2;
+					SpellData[MarkIndex] -= 1;
             }
         }
     }
@@ -5459,8 +5459,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 		if (PDSL.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
 			continue;
 
-        if ( 1 == SpellData[Pos] || 3 == SpellData[Pos] )
-            PDSL.SpellingCounter++;
+		if (SpellData[Pos])
+			PDSL.SpellingCounter += SpellData[Pos];
 
         switch( ItemType )
         {
@@ -5601,9 +5601,6 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 				break;
 			}
         }
-
-        if ( 2 == SpellData[Pos + 1] || 3 == SpellData[Pos + 1] )
-            PDSL.SpellingCounter--;
     }
 
     if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)

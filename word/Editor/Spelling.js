@@ -165,7 +165,7 @@ CDocumentSpelling.prototype =
 
             // TODO: Послать сообщение
             if (this.Get_ErrorsCount() > DOCUMENT_SPELLING_MAX_ERRORS)
-                this.ErrorsExceed = true; 
+                this.ErrorsExceed = true;
         }
 
         for ( var Id in this.CurPara )
