@@ -432,11 +432,16 @@ CDocumentOutline.prototype.IsEmptyItem = function(nIndex)
 
 	return this.Elements[nIndex].Paragraph.IsEmpty();
 };
+CDocumentOutline.prototype.GetCurrentPosition = function()
+{
+	return this.CurPos;
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 CDocumentOutline.prototype["get_ElementsCount"]    = CDocumentOutline.prototype.GetElementsCount;
 CDocumentOutline.prototype["get_Text"]             = CDocumentOutline.prototype.GetText;
 CDocumentOutline.prototype["get_Level"]            = CDocumentOutline.prototype.GetLevel;
+CDocumentOutline.prototype["get_CurrentPosition"]  = CDocumentOutline.prototype.GetCurrentPosition;
 CDocumentOutline.prototype["goto"]                 = CDocumentOutline.prototype.GoTo;
 CDocumentOutline.prototype["promote"]              = CDocumentOutline.prototype.Promote;
 CDocumentOutline.prototype["demote"]               = CDocumentOutline.prototype.Demote;
