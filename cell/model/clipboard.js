@@ -3154,7 +3154,7 @@
 							if("italic" === italic){
 								format.setItalic(true);
 							}
-							var fontFamily = computedStyle.getPropertyValue("font-family");
+							var fontFamily = window["AscCommon"].CheckDefaultFontFamily(computedStyle.getPropertyValue("font-family"), window["Asc"]["editor"]);
 							fontFamily = g_fontApplication.GetFontNameDictionary(fontFamily, true);
 							if(fontFamily){
 								format.setName(fontFamily);

@@ -2068,6 +2068,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 	this.pasteList = undefined;
 	this.pasteIntoElem = undefined;//ссылка на элемент контента, который был выделен до вставки
 
+	this.apiEditor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window["editor"];
+
 }
 PasteProcessor.prototype =
 {
@@ -5832,7 +5834,7 @@ PasteProcessor.prototype =
                 var computedStyle = this._getComputedStyle(node.parentNode);
                 if ( computedStyle )
                 {
-                    var fontFamily = computedStyle.getPropertyValue( "font-family" );
+                    var fontFamily = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
                     this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
                 }
             }
@@ -6138,7 +6140,7 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if (computedStyle)
         {
-			var font_family = computedStyle.getPropertyValue( "font-family" );
+			var font_family = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
 			if(font_family && "" != font_family)
 			{
 				var oFontItem = this.oFonts[font_family];
@@ -6727,7 +6729,7 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if ( computedStyle )
         {
-            var font_family = computedStyle.getPropertyValue( "font-family" );
+            var font_family = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
             if(font_family && "" != font_family)
             {
                 var oFontItem = this.oFonts[font_family];
@@ -8993,7 +8995,12 @@ PasteProcessor.prototype =
 		}
 	}
 };
-	
+
+function CheckDefaultFontFamily(val, api)
+{
+	return "onlyofficeDefaultFont" === val && api && api.getDefaultFontFamily ? api.getDefaultFontFamily() : val;
+}
+
 function CreateImageFromBinary(bin, nW, nH)
 {
     var w, h;
@@ -9263,6 +9270,8 @@ SpecialPasteShowOptions.prototype = {
   window["AscCommon"].searchBinaryClass = searchBinaryClass;
   
   window["AscCommon"].PasteElementsId = PasteElementsId;
+  window["AscCommon"].CheckDefaultFontFamily = CheckDefaultFontFamily;
+
   
   window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
   prot									 = SpecialPasteShowOptions.prototype;

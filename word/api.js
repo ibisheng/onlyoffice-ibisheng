@@ -8826,6 +8826,18 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.getDefaultFontFamily = function () {
+		//TODO переделать и отдавать дефолтовый шрифт
+		var defaultFont = "Arial";
+		return defaultFont;
+	};
+
+	asc_docs_api.prototype.getDefaultFontSize = function () {
+		//TODO переделать и отдавать дефолтовый шрифт
+		var defaultSize = 11;
+		return defaultSize;
+	};
+
 	window["AscDesktopEditor_Save"] = function()
 	{
 		return editor.asc_Save(false);

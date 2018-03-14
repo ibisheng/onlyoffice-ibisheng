@@ -3394,6 +3394,14 @@ var editor;
     });
   };
 
+  spreadsheet_api.prototype.getDefaultFontFamily = function () {
+      return this.wbModel.getDefaultFont();
+  };
+
+  spreadsheet_api.prototype.getDefaultFontSize = function () {
+      return this.wbModel.getDefaultSize();
+  };
+
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
