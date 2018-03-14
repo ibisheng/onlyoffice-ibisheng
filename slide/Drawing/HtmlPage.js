@@ -668,7 +668,10 @@ function CEditorPage(api)
 			demBottonsDiv.setAttribute("class", "block_elem");
 			demBottonsDiv.style.overflow = "hidden";
 			demBottonsDiv.style.backgroundColor = GlobalSkin.BackgroundColor;
+			demBottonsDiv.style.cursor = "default";
 			_documentParent.appendChild(demBottonsDiv);
+
+			demBottonsDiv.onmousedown = function (e) { AscCommon.stopEvent(e); };
 
 			var _ctrl = CreateControlContainer("id_reporter_dem_controller");
 			_ctrl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 8);
