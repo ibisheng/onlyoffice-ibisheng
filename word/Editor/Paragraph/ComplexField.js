@@ -422,7 +422,17 @@ CComplexField.prototype.private_UpdateTOC = function()
 	var nTabPos = 9345 / 20 / 72 * 25.4; // Стандартное значение для A4 и обычных полей 3см и 2см
 	var oSectPr = this.LogicDocument.GetCurrentSectionPr();
 	if (oSectPr)
-		nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+	{
+		if (oSectPr.Get_ColumnsCount() > 1)
+		{
+			// TODO: Сейчас забирается ширина текущей колонки. По правильному надо читать поля от текущего места
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_ColumnWidth(0), oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+		}
+		else
+		{
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+		}
+	}
 
 	var oStyles          = this.LogicDocument.Get_Styles();
 	var arrOutline       = this.LogicDocument.GetOutlineParagraphs(null, {
