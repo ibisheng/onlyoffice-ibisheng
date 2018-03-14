@@ -3850,22 +3850,25 @@ PasteProcessor.prototype =
 
 
 		var bIsMultipleContent = stream.GetBool();
+		var selectedContent2 = [];
 		if (true === bIsMultipleContent) {
 			var multipleParamsCount = stream.GetULong();
-			var selectedContent2 = [];
 			for(var i = 0; i < multipleParamsCount; i++){
 				selectedContent2.push(this._readPresentationSelectedContent(stream));
 			}
 		}
 
 		var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
-		var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
+		var bSlideObjects = defaultSelectedContent && defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
 		var pasteObj = bSlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : defaultSelectedContent;
 
-		var arr_Images = pasteObj.images;
-		var fonts = pasteObj.fonts;
-		var content = pasteObj.content;
-		var font_map = {};
+		var arr_Images, fonts, content = null, font_map = {};
+		if(pasteObj) {
+			arr_Images = pasteObj.images;
+			fonts = pasteObj.fonts;
+			content = pasteObj.content;
+			font_map = {};
+		}
 
 		if(null === content) {
 			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
