@@ -6155,7 +6155,7 @@ PasteProcessor.prototype =
 
 			var font_size = node.style ? node.style.fontSize : null;
 			if(!font_size)
-				font_size = computedStyle.getPropertyValue( "font-size" );
+				font_size = CheckDefaultFontSize(computedStyle.getPropertyValue( "font-size" ), this.apiEditor);
 			if(font_size && Para.TextPr && Para.TextPr.Value)
 			{
 				var obj = this._ValueToMmType(font_size);
@@ -6743,7 +6743,7 @@ PasteProcessor.prototype =
             }
             var font_size = node.style ? node.style.fontSize : null;
             if(!font_size)
-                font_size = computedStyle.getPropertyValue( "font-size" );
+                font_size = CheckDefaultFontSize(computedStyle.getPropertyValue( "font-size" ), this.apiEditor);
             if(font_size)
             {
                 var obj = this._ValueToMmType(font_size);
@@ -8999,6 +8999,11 @@ PasteProcessor.prototype =
 function CheckDefaultFontFamily(val, api)
 {
 	return "onlyofficeDefaultFont" === val && api && api.getDefaultFontFamily ? api.getDefaultFontFamily() : val;
+}
+
+function CheckDefaultFontSize(val, api)
+{
+	return 0 === val && api && api.getDefaultFontSize ? api.getDefaultFontSize() : val;
 }
 
 function CreateImageFromBinary(bin, nW, nH)
