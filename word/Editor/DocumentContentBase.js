@@ -644,6 +644,15 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos > 0 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos - 1].GetType())
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (0 === this.CurPos.ContentPos)
+					{
+						bRetValue = false;
+					}
 				}
 				else if (Count > 0)
 				{
@@ -678,6 +687,11 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos + 1].GetType())
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
 					else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
 					{
 						// Если данный параграф пустой, последний, не единственный и идущий перед
@@ -685,6 +699,10 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 						this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
 						this.CurPos.ContentPos--;
 						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+					}
+					else if (this.CurPos.ContentPos === this.Content.length - 1)
+					{
+						bRetValue = false;
 					}
 				}
 			}
@@ -694,6 +712,39 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 			{
 				Item.CurPos.RealX = Item.CurPos.X;
 				Item.CurPos.RealY = Item.CurPos.Y;
+			}
+		}
+		else if (type_BlockLevelSdt === this.Content[this.CurPos.ContentPos].GetType())
+		{
+			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
+			{
+				if (this.Content[this.CurPos.ContentPos].IsEmpty())
+				{
+					this.RemoveFromContent(this.CurPos.ContentPos, 1);
+
+					if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else
+					{
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
+				else
+				{
+					if (Count < 0 && this.CurPos.ContentPos > 0)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1)
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
 			}
 		}
 		else
