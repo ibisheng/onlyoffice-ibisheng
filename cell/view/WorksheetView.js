@@ -7061,7 +7061,7 @@
     };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
-        if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
+        if (validRange) {
             if (range.c2 >= this.nColsCount) {
                 this.expandColsOnScroll(false, true, range.c2 + 1);
             }
