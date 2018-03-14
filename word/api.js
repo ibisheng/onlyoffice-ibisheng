@@ -7852,6 +7852,20 @@ background-repeat: no-repeat;\
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.ContentControl, oContentControlPr);
 	};
 
+	asc_docs_api.prototype.asc_UncheckContentControlButtons = function()
+	{
+		var _controls = this.WordControl.m_oDrawingDocument.ContentControlObjects;
+		for (var i = 0; i < _controls.length; i++)
+		{
+			_controls[i].ActiveButtonIndex = -2;
+		}
+
+		this.WordControl.ShowOverlay();
+		this.WordControl.StartUpdateOverlay();
+		this.WordControl.OnUpdateOverlay();
+		this.WordControl.EndUpdateOverlay();
+	};
+
 	asc_docs_api.prototype.asc_BeginViewModeInReview = function(isFinal)
 	{
 		this.WordControl.m_oLogicDocument.BeginViewModeInReview(isFinal);
@@ -9334,6 +9348,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_IsContentControl"]                      = asc_docs_api.prototype.asc_IsContentControl;
 	asc_docs_api.prototype["asc_GetContentControlProperties"]           = asc_docs_api.prototype.asc_GetContentControlProperties;
 	asc_docs_api.prototype["asc_GetCurrentContentControl"]              = asc_docs_api.prototype.asc_GetCurrentContentControl;
+	asc_docs_api.prototype["asc_UncheckContentControlButtons"]          = asc_docs_api.prototype.asc_UncheckContentControlButtons;
 
 
 	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
