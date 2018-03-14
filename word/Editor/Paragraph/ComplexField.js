@@ -680,6 +680,8 @@ CComplexField.prototype.SelectFieldValue = function()
 	if (!oDocument)
 		return;
 
+	oDocument.RemoveSelection();
+
 	var oRun = this.SeparateChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
 	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar) + 1);
@@ -698,6 +700,8 @@ CComplexField.prototype.SelectFieldCode = function()
 	if (!oDocument)
 		return;
 
+	oDocument.RemoveSelection();
+
 	var oRun = this.BeginChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
 	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar) + 1);
@@ -715,6 +719,8 @@ CComplexField.prototype.SelectField = function()
 	var oDocument = this.GetTopDocumentContent();
 	if (!oDocument)
 		return;
+
+	oDocument.RemoveSelection();
 
 	var oRun = this.BeginChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
