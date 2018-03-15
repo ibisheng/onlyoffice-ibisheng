@@ -11763,14 +11763,6 @@
 
         this._cleanCache(range);
 
-        // Если размер диапазона превышает размер видимой области больше чем в 3 раза, то очищаем весь кэш
-        if (this._isLargeRange(range)) {
-            this.changeWorksheet("update", {lockDraw: lockDraw});
-
-            this._updateSelectionNameAndInfo();
-            return;
-        }
-
         var cto;
         for (r = range.r1; r <= range.r2; ++r) {
             if (this.height_1px > this.rows[r].height) {
