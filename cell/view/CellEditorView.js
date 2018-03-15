@@ -2474,10 +2474,6 @@
 				break;
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
-				if (!this.enableKeyEvents) {
-					break;
-				}
-
 				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
