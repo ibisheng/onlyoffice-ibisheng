@@ -4458,7 +4458,7 @@
       function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
 			var rowInfo = this.rows[row];
           // update row's descender
-			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged) {
+			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged && !angle) {
               rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
           }
 
@@ -11801,10 +11801,10 @@
                     bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
                 }
                 if (bUpdateRowHeight) {
-                    h = Math.max(h, ct.metrics.height + this.height_1px);
+                    h = Math.max(h, ct.angle ? ct.textBound.height : ct.metrics.height + this.height_1px);
                 }
 
-                if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged) {
+                if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged && !ct.angle) {
                     d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }
