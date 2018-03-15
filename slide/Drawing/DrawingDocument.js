@@ -5638,7 +5638,8 @@ function CSlideDrawer()
 
 			outputCtx.fillStyle = "#3C3C3C";
 
-			outputCtx.font = "60px Arial";
+			var fontCtx = ((this.m_oWordControl.m_nZoomValue * 60 / 100) >> 0) + "px Arial";
+			outputCtx.font = fontCtx;
 
 			var text = AscCommon.translateManager.getValue("Click to add first slide");
 			var textWidth = outputCtx.measureText(text).width;
