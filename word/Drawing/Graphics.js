@@ -2408,7 +2408,8 @@ CGraphics.prototype =
 
     drawMailMergeField : function(x, y, w, h)
     {
-        this.b_color1(216, 221, 230, 255);
+		this.b_color1(206, 212, 223, 204);
+    	//this.b_color1(216, 221, 230, 255);
         this.rect( x, y, w, h );
         this.df();
     },

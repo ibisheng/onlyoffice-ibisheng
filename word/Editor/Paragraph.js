@@ -1758,26 +1758,6 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем выделение текста
 			//----------------------------------------------------------------------------------------------------------
-			var aHigh   = PDSH.High;
-			var Element = aHigh.Get_Next();
-			while (null != Element)
-			{
-				if (!pGraphics.set_fillColor)
-				{
-					pGraphics.b_color1(Element.r, Element.g, Element.b, 255);
-				}
-				else
-				{
-					pGraphics.set_fillColor(Element.r, Element.g, Element.b);
-				}
-				pGraphics.rect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2);
-				pGraphics.df();
-				Element = aHigh.Get_Next();
-			}
-
-			//----------------------------------------------------------------------------------------------------------
-			// Рисуем выделение текста
-			//----------------------------------------------------------------------------------------------------------
 			var aMMFields = PDSH.MMFields;
 			var Element   = (pGraphics.RENDERER_PDF_FLAG === true ? null : aMMFields.Get_Next());
 			while (null != Element)
@@ -1796,6 +1776,27 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
 				Element = aCFields.Get_Next();
 			}
+
+			//----------------------------------------------------------------------------------------------------------
+			// Рисуем выделение текста
+			//----------------------------------------------------------------------------------------------------------
+			var aHigh   = PDSH.High;
+			var Element = aHigh.Get_Next();
+			while (null != Element)
+			{
+				if (!pGraphics.set_fillColor)
+				{
+					pGraphics.b_color1(Element.r, Element.g, Element.b, 255);
+				}
+				else
+				{
+					pGraphics.set_fillColor(Element.r, Element.g, Element.b);
+				}
+				pGraphics.rect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2);
+				pGraphics.df();
+				Element = aHigh.Get_Next();
+			}
+
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем комментарии
 			//----------------------------------------------------------------------------------------------------------
