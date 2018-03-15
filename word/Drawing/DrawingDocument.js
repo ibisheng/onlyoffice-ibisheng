@@ -5161,14 +5161,20 @@ function CDrawingDocument()
 
 				this.ContentControlObjects.splice(0, 1);
 			}
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
+			if (this.m_oWordControl.m_oApi.isViewMode)
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+			else
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
 		else
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 				return;
 
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
+			if (this.m_oWordControl.m_oApi.isViewMode)
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+			else
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
 
 		if (isActiveRemove)
