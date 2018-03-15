@@ -3838,26 +3838,8 @@ PasteProcessor.prototype =
 			}
 		};
 
-
-		pptx_content_loader.Clear();
-
-		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
-		var p_url = stream.GetString2();
-		var p_theme = stream.GetString2();
-		var p_width = stream.GetULong() / 100000;
-		var p_height = stream.GetULong() / 100000;
-
-
-		var bIsMultipleContent = stream.GetBool();
-		var selectedContent2 = [];
-		if (true === bIsMultipleContent) {
-			var multipleParamsCount = stream.GetULong();
-			for(var i = 0; i < multipleParamsCount; i++){
-				selectedContent2.push(this._readPresentationSelectedContent(stream));
-			}
-		}
-
+		var oSelectedContent2 = this._readPresentationSelectedContent2(base64);
+		var selectedContent2 = oSelectedContent2.content;
 		var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
 		var bSlideObjects = defaultSelectedContent && defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
 		var pasteObj = bSlideObjects && PasteElementsId.g_bIsDocumentCopyPaste ? selectedContent2[2] : defaultSelectedContent;
@@ -3991,23 +3973,16 @@ PasteProcessor.prototype =
 	_pasteBinaryFromPresentationToPresentation: function (base64, bDuplicate) {
 		var oThis = this;
 		var presentation = editor.WordControl.m_oLogicDocument;
-		pptx_content_loader.Clear();
 
-		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
-		var p_url = stream.GetString2();
-		var p_theme = stream.GetString2();
-		var p_width = stream.GetULong() / 100000;
-		var p_height = stream.GetULong() / 100000;
-
-		var bIsMultipleContent = stream.GetBool();
-		if (true === bIsMultipleContent) {
-			var multipleParamsCount = stream.GetULong();
-			var selectedContent2 = [];
+		var oSelectedContent2 = this._readPresentationSelectedContent2(base64, bDuplicate);
+		var p_url = oSelectedContent2.p_url;
+		var p_theme = oSelectedContent2.p_theme;
+		var selectedContent2 = oSelectedContent2.content;
+		var multipleParamsCount = selectedContent2 ? selectedContent2.length : 0;
+		if (multipleParamsCount) {
 			var aContents = [];
 			for(var i = 0; i < multipleParamsCount; i++){
-				var curContent = this._readPresentationSelectedContent(stream, bDuplicate);
-				selectedContent2.push(curContent);
+				var curContent = selectedContent2[i];
 				aContents.push(curContent.content);
 			}
 
@@ -4106,6 +4081,26 @@ PasteProcessor.prototype =
 		}
 	},
 
+	_readPresentationSelectedContent2: function(base64, bDuplicate) {
+		pptx_content_loader.Clear();
+
+		var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
+		var stream = new AscCommon.FileStream(_stream.data, _stream.size);
+		var p_url = stream.GetString2();
+		var p_theme = stream.GetString2();
+		var p_width = stream.GetULong() / 100000;
+		var p_height = stream.GetULong() / 100000;
+
+		var bIsMultipleContent = stream.GetBool();
+		var selectedContent2 = [];
+		if (true === bIsMultipleContent) {
+			var multipleParamsCount = stream.GetULong();
+			for(var i = 0; i < multipleParamsCount; i++){
+				selectedContent2.push(this._readPresentationSelectedContent(stream, bDuplicate));
+			}
+		}
+		return {content: selectedContent2, p_url: p_url, p_theme: p_theme};
+	},
 
 	_readPresentationSelectedContent: function(stream, bDuplicate){
 	    return AscFormat.ExecuteNoHistory(function(){
