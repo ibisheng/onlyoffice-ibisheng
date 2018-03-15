@@ -16680,6 +16680,17 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 			oComplexField.Update();
 		}
 
+		var oNextParagraph = oSdt.GetNextParagraph();
+		if (oNextParagraph)
+		{
+			oNextParagraph.MoveCursorToStartPos(false);
+			oNextParagraph.Document_SetThisElementCurrent();
+		}
+		else
+		{
+			oSdt.MoveCursorToEndPos(false);
+		}
+
 		this.Recalculate();
 	}
 };

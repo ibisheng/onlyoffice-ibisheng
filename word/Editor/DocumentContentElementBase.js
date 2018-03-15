@@ -859,6 +859,56 @@ CDocumentContentElementBase.prototype.GetLastParagraph = function()
 {
 	return null;
 };
+/**
+ * Получаем первый параграф в данном контенте
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetFirstParagraph = function()
+{
+	return this.Get_FirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetNextParagraph = function()
+{
+	var oNextElement = this.Get_DocumentNext();
+
+	if (oNextElement)
+	{
+		if (type_Paragraph === oNextElement.GetType())
+			return oNextElement;
+		else
+			return oNextElement.GetFirstParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetNextParagraph)
+		return this.Parent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetPrevParagraph = function()
+{
+	var oPrevElement = this.Get_DocumentPrev();
+
+	if (oPrevElement)
+	{
+		if (type_Paragraph === oPrevElement.GetType())
+			return oPrevElement;
+		else
+			return oPrevElement.GetLastParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetPrevParagraph)
+		return this.Parent.GetPrevParagraph();
+
+	return null;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;
