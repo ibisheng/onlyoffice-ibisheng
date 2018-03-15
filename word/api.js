@@ -7934,15 +7934,18 @@ background-repeat: no-repeat;\
 
 		});
 	};
-	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
+	asc_docs_api.prototype.asc_RemoveTableOfContents = function(oTOC)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument)
 			return;
 
-		var oTOC = oLogicDocument.GetTableOfContents();
 		if (!oTOC)
-			return;
+		{
+			oTOC = oLogicDocument.GetTableOfContents();
+			if (!oTOC)
+				return;
+		}
 
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 		{
