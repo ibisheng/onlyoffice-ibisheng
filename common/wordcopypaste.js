@@ -3867,7 +3867,6 @@ PasteProcessor.prototype =
 			arr_Images = pasteObj.images;
 			fonts = pasteObj.fonts;
 			content = pasteObj.content;
-			font_map = {};
 		}
 
 		if(null === content) {
