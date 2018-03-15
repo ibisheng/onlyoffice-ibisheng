@@ -1091,3 +1091,39 @@ CDocumentContentBase.prototype.GetLastParagraph = function()
 
 	return this.Content[this.Content.length - 1].GetLastParagraph();
 };
+/**
+ * Получаем первый параграф в данном контенте, если первый элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ * @constructor
+ */
+CDocumentContentBase.prototype.GetFirstParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[0].GetFirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetNextParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetNextParagraph)
+		return oParent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetPrevParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetPrevParagraph)
+		return oParent.GetPrevParagraph();
+
+	return null;
+};
