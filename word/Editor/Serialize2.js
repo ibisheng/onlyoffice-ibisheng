@@ -160,7 +160,8 @@ var c_oSer_sts = {
     Style_unhideWhenUsed:14,
 	Style_RowPr: 15,
 	Style_CellPr: 16,
-	Style_TblStylePr: 17
+	Style_TblStylePr: 17,
+	Style_Link: 18
 };
 var c_oSerProp_tblStylePrType = {
 	TblStylePr: 0,
@@ -1531,6 +1532,11 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams, saveParams)
             this.memory.WriteByte(c_oSer_sts.Style_Next);
             this.memory.WriteString2(style.Next.toString());
         }
+		if(null != style.Link)
+		{
+			this.memory.WriteByte(c_oSer_sts.Style_Link);
+			this.memory.WriteString2(style.Link);
+		}
         //qFormat
         if(null != style.qFormat)
             this.bs.WriteItem(c_oSer_sts.Style_qFormat, function(){oThis.memory.WriteBool(style.qFormat);});
@@ -6394,6 +6400,11 @@ function BinaryFileReader(doc, openParams)
 				if(null != oNewId)
 					stObj.Set_Next(oNewId.id);
 			}
+			if(null != stObj.Link){
+				oNewId = oIdRenameMap[stObj.Link];
+				if(null != oNewId)
+					stObj.Set_Link(oNewId.id);
+			}
         }
 		//меняем Headings
 		for(var i = 0, length = stDefault.Headings.length; i < length; ++i)
@@ -6488,6 +6499,13 @@ function BinaryFileReader(doc, openParams)
 					oNewStyle.Set_Next(oStyleNext.style.Get_Id());
 				else
 					oNewStyle.Set_Next(null);
+			}
+			if(null != oNewStyle.Link){
+				var oStyleNext = this.oReadResult.styles[oNewStyle.Link];
+				if(oStyleNext)
+					oNewStyle.Set_Link(oStyleNext.style.Get_Id());
+				else
+					oNewStyle.Set_Link(null);
 			}
 			var oNewId = elem.param;
 			var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
@@ -7143,6 +7161,8 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
             style.Set_BasedOn(this.stream.GetString2LE(length));
         else if(c_oSer_sts.Style_Next == type)
             style.Set_Next(this.stream.GetString2LE(length));
+		else if(c_oSer_sts.Style_Link == type)
+			style.Set_Link(this.stream.GetString2LE(length));
         else if(c_oSer_sts.Style_qFormat == type)
             style.Set_QFormat(this.stream.GetBool());
         else if(c_oSer_sts.Style_uiPriority == type)

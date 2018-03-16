@@ -521,7 +521,15 @@ CDrawingDocument.prototype.SetCurrentPage = function(PageIndex)
 
 CDrawingDocument.prototype.SelectEnabled = function(bIsEnabled)
 {
-    return this.Native["DD_SelectEnabled"](bIsEnabled);
+    this.m_bIsSelection = bIsEnabled;
+    if (false === this.m_bIsSelection)
+    {
+        this.SelectClear();
+//            //this.m_oWordControl.CheckUnShowOverlay();
+//            //this.drawingObjects.OnUpdateOverlay();
+//            this.drawingObjects.getOverlay().m_oContext.globalAlpha = 1.0;
+    }
+    //return this.Native["DD_SelectEnabled"](bIsEnabled);
 };
 CDrawingDocument.prototype.SelectClear = function()
 {

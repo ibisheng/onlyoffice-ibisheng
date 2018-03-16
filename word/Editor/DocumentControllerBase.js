@@ -272,7 +272,7 @@ CDocumentControllerBase.prototype.CanUpdateTarget = function(){return true;};
  * Пересчитываем текущую позицию.
  * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}
  */
-CDocumentControllerBase.prototype.RecalculateCurPos = function(){return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};};
+CDocumentControllerBase.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY){return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};};
 /**
  * Получаем текущий номер страницы.
  * @returns {number} -1 - значит, номер страницы определеить невозможно

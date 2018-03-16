@@ -2148,20 +2148,21 @@
 			_insertTableFromPresentation: function(ws, graphicFrame)
 			{
 				History.TurnOff();
-				graphicFrame.graphicObject = graphicFrame.graphicObject.copy();
+				//из-за данной строки падение при вставке таблицы pe->se
+				//graphicFrame.graphicObject = graphicFrame.graphicObject.copy();
 				var drawingObject = graphicFrame;
 				
 				//вставляем табличку из презентаций
 				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
-				
+				var oTempDrawingDocument = ws.model.DrawingDocument;
+
 				var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
 				
 				drawingObject.graphicObject.setBDeleted(true);
 				drawingObject.graphicObject.setWordFlag(false, newCDocument);
-				
-				var oTempDrawingDocument = ws.model.DrawingDocument;
+
 				var oldLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 				oTempDrawingDocument.m_oLogicDocument = newCDocument;
 				drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);

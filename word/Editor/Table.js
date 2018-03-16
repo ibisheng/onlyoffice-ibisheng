@@ -2839,10 +2839,10 @@ CTable.prototype.Reset_RecalculateCache = function()
 		}
 	}
 };
-CTable.prototype.RecalculateCurPos = function()
+CTable.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	if (null != this.CurCell)
-		return this.CurCell.Content_RecalculateCurPos();
+	if (this.CurCell)
+		return this.CurCell.Content_RecalculateCurPos(bUpdateX, bUpdateY);
 
 	return null;
 };
@@ -13698,6 +13698,12 @@ CTable.prototype.DistributeRows = function()
  */
 CTable.prototype.SetColumnWidth = function(nWidth)
 {
+	if (nWidth < 4.2)
+		nWidth = 4.2;
+
+	if (nWidth > 558.8)
+		nWidth = 558.8;
+
 	var arrSelectedCells = this.GetSelectionArray();
 
 	var oCells = {};

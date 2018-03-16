@@ -1327,8 +1327,10 @@ CDocumentContent.prototype.UpdateEndInfo = function()
 		this.Content[Index].UpdateEndInfo();
 	}
 };
-CDocumentContent.prototype.RecalculateCurPos = function()
+CDocumentContent.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
+	var oCurPosInfo = null;
+
 	if (docpostype_Content === this.CurPos.Type)
 	{
 		if (this.CurPos.ContentPos >= 0 && undefined != this.Content[this.CurPos.ContentPos])
@@ -1341,15 +1343,23 @@ CDocumentContent.prototype.RecalculateCurPos = function()
 				this.DrawingDocument.TargetEnd();
 			}
 			else
-				return this.Content[this.CurPos.ContentPos].RecalculateCurPos();
+			{
+				oCurPosInfo = this.Content[this.CurPos.ContentPos].RecalculateCurPos(bUpdateX, bUpdateY);
+			}
 		}
 	}
-	else // if ( docpostype_DrawingObjects === this.CurPos.Type )
+	else // if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
-		return this.LogicDocument.DrawingObjects.recalculateCurPos();
+		oCurPosInfo = this.LogicDocument.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 	}
 
-	return null;
+	if (bUpdateX)
+		this.CurPos.RealX = oCurPosInfo.X;
+
+	if (bUpdateY)
+		this.CurPos.RealY = oCurPosInfo.Y;
+
+	return oCurPosInfo;
 };
 CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceCheckDrawings)
 {
@@ -2968,7 +2978,7 @@ CDocumentContent.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelect
 		bOnTextAdd = false;
 
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		return this.LogicDocument.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
+		return this.LogicDocument.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 	else //if ( docpostype_Content === this.CurPos.Type )
 		return this.private_Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 };
@@ -3789,7 +3799,10 @@ CDocumentContent.prototype.SetCurPosXY = function(X, Y)
 };
 CDocumentContent.prototype.IsSelectionUse = function()
 {
-	if (true == this.Selection.Use)
+	if (docpostype_DrawingObjects === this.Get_DocPosType())
+		return this.DrawingObjects.isSelectionUse();
+
+	if (true === this.Selection.Use)
 		return true;
 
 	return false;

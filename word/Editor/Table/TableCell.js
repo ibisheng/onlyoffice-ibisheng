@@ -759,14 +759,14 @@ CTableCell.prototype =
 		this.Content.DrawSelectionOnPage(CurPage);
 	},
 
-    Content_RecalculateCurPos : function()
+    Content_RecalculateCurPos : function(bUpdateX, bUpdateY)
     {
         var Transform = this.private_GetTextDirectionTransform();
         var DrawingDocument = this.Row.Table.DrawingDocument;
         if (null !== Transform && DrawingDocument)
             DrawingDocument.MultiplyTargetTransform(Transform);
 
-        return this.Content.RecalculateCurPos();
+        return this.Content.RecalculateCurPos(bUpdateX, bUpdateY);
     },
 
     Content_Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing)

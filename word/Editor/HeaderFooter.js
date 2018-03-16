@@ -1290,6 +1290,14 @@ CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
 {
 	return this.Content.GetAllContentControls(arrContentControls);
 };
+/**
+ * * Получаем класс, управляющий содержимым колонтитула
+ * @returns {CDocumentContent}
+ */
+CHeaderFooter.prototype.GetContent = function()
+{
+	return this.Content;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -1473,13 +1481,13 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------   
-    RecalculateCurPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.RecalculateCurPos();
+    RecalculateCurPos : function(bUpdateX, bUpdateY)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.RecalculateCurPos(bUpdateX, bUpdateY);
 
-        return null;
-    },
+		return null;
+	},
 
     Recalculate : function(PageIndex)
     {

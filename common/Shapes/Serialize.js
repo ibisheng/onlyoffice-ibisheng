@@ -733,7 +733,7 @@ function BinaryPPTYLoader()
             }
             if (this.presentation.Slides.length == 0)
             {
-                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.aSlideLayouts[0]);
+                //this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.aSlideLayouts[0]);
             }
             var _slides = this.presentation.Slides;
             var _slide;

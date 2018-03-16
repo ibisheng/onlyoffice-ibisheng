@@ -2767,6 +2767,25 @@ CPresentation.prototype =
     },
 
 
+    Viewer_OnChangePosition: function()
+    {
+        var oSlide = this.Slides[this.CurPage];
+        if(oSlide && oSlide.slideComments && Array.isArray(oSlide.slideComments.comments))
+        {
+            var aComments = oSlide.slideComments.comments;
+            for(var i = aComments.length - 1; i > -1; --i)
+            {
+                if(aComments[i].selected)
+                {
+                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(aComments[i].x, aComments[i].y, this.PageNum);
+                    this.Api.sync_UpdateCommentPosition(aComments[i].Get_Id(), Coords.X, Coords.Y);
+                    break;
+                }
+            }
+        }
+        AscCommon.g_specialPasteHelper.SpecialPasteButton_Update_Position();
+    },
+
     IsCell: function(isReturnCell)
     {
     	if (isReturnCell)
@@ -3978,6 +3997,7 @@ CPresentation.prototype =
                         if(aComments[i].selected){
                             bNeedRedraw = true;
                             aComments[i].selected = false;
+                            editor.asc_hideComments();
                             break;
                         }
                     }
@@ -5142,7 +5162,8 @@ CPresentation.prototype =
                 oDocContentForDraw, oParagraph, oNearPos, bOldVal, aParagraphs, dMaxWidth, oCanvas, oContext, oGraphics, dContentHeight, nContentIndents = 30, bOldShowParaMarks, oSelector;
             var i, j;
             if(this.Slides.length > 0){
-                switch(this.Api.WordControl.Thumbnails.FocusObjType){
+                var FocusObjectType = (this.Api && this.Api.WordControl && this.Api.WordControl.Thumbnails) ? this.Api.WordControl.Thumbnails.FocusObjType : FOCUS_OBJECT_MAIN;
+                switch(FocusObjectType){
                     case FOCUS_OBJECT_MAIN:{
                         oController = this.GetCurrentController();
                         oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
@@ -5332,27 +5353,36 @@ CPresentation.prototype =
                                             //    oCanvas.width <<= 1;
                                             //    oCanvas.height <<= 1;
                                             //}
-                                            oContext = oCanvas.getContext('2d');
-                                            oGraphics = new AscCommon.CGraphics();
 
-                                            oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
-                                            oGraphics.m_oFontManager = AscCommon.g_fontManager;
-                                            oGraphics.m_oCoordTransform.tx = nContentIndents;
-                                            oGraphics.m_oCoordTransform.ty = nContentIndents;
-                                            oGraphics.transform(1,0,0,1,0,0);
+                                            var sImageUrl;
+                                            if(!window["NATIVE_EDITOR_ENJINE"])
+                                            {
+                                                oContext = oCanvas.getContext('2d');
+                                                oGraphics = new AscCommon.CGraphics();
 
-                                            if(oTextWarpObject && oTextWarpObject.oTxWarpStructNoTransform){
-                                                oTextWarpObject.oTxWarpStructNoTransform.draw(oGraphics, oDocContentForDraw.Parent.parent.Get_Theme(), oDocContentForDraw.Parent.parent.Get_ColorMap());
+                                                oGraphics.init(oContext, oCanvas.width, oCanvas.height, dImageWidth + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix, dImageHeight + 2.0*nContentIndents/AscCommon.g_dKoef_mm_to_pix);
+                                                oGraphics.m_oFontManager = AscCommon.g_fontManager;
+                                                oGraphics.m_oCoordTransform.tx = nContentIndents;
+                                                oGraphics.m_oCoordTransform.ty = nContentIndents;
+                                                oGraphics.transform(1,0,0,1,0,0);
+
+                                                if(oTextWarpObject && oTextWarpObject.oTxWarpStructNoTransform){
+                                                    oTextWarpObject.oTxWarpStructNoTransform.draw(oGraphics, oDocContentForDraw.Parent.parent.Get_Theme(), oDocContentForDraw.Parent.parent.Get_ColorMap());
+                                                }
+                                                else
+                                                    {
+
+                                                    bOldShowParaMarks = this.Api.ShowParaMarks;
+                                                    this.Api.ShowParaMarks = false;
+                                                    oDocContentForDraw.Draw(0, oGraphics);
+                                                    this.Api.ShowParaMarks = bOldShowParaMarks;
+                                                }
+                                                sImageUrl = oCanvas.toDataURL("image/png");
                                             }
                                             else {
-
-                                                bOldShowParaMarks = this.Api.ShowParaMarks;
-                                                this.Api.ShowParaMarks = false;
-                                                oDocContentForDraw.Draw(0, oGraphics);
-                                                this.Api.ShowParaMarks = bOldShowParaMarks;
+                                                sImageUrl = "";
                                             }
 
-                                            var sImageUrl = oCanvas.toDataURL("image/png");
                                             oImage = oController.createImage(sImageUrl, 0, 0, oCanvas.width*AscCommon.g_dKoef_pix_to_mm, oCanvas.height*AscCommon.g_dKoef_pix_to_mm);
                                             oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, dImageWidth, dImageHeight, sImageUrl));
                                         }
@@ -5405,28 +5435,36 @@ CPresentation.prototype =
 
                                     var _ctx = _canvas.getContext('2d');
 
-                                    var g = new AscCommon.CGraphics();
-                                    g.init(_ctx, w_px, h_px, w_mm, h_mm);
-                                    g.m_oFontManager = AscCommon.g_fontManager;
 
-                                    g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
-                                    g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
-                                    g.transform(1,0,0,1,0,0);
-
-                                    for(i = 0; i < oController2.selectedObjects.length; ++i){
-                                        oController2.selectedObjects[i].draw(g);
-                                    }
                                     var sImageUrl;
-
-
-                                    try
+                                    if(!window["NATIVE_EDITOR_ENJINE"])
                                     {
-                                        sImageUrl = _canvas.toDataURL("image/png");
+                                        var g = new AscCommon.CGraphics();
+                                        g.init(_ctx, w_px, h_px, w_mm, h_mm);
+                                        g.m_oFontManager = AscCommon.g_fontManager;
+
+                                        g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
+                                        g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
+                                        g.transform(1,0,0,1,0,0);
+
+                                        for(i = 0; i < oController2.selectedObjects.length; ++i){
+                                            oController2.selectedObjects[i].draw(g);
+                                        }
+
+                                        try
+                                        {
+                                            sImageUrl = _canvas.toDataURL("image/png");
+                                        }
+                                        catch (err)
+                                        {
+                                            sImageUrl = "";
+                                        }
                                     }
-                                    catch (err)
-                                    {
+                                    else {
                                         sImageUrl = "";
                                     }
+
+
                                     oImage = oController.createImage(sImageUrl, _bounds_cheker.Bounds.min_x*AscCommon.g_dKoef_pix_to_mm, _bounds_cheker.Bounds.min_y*AscCommon.g_dKoef_pix_to_mm, (_canvas.width)*AscCommon.g_dKoef_pix_to_mm, (_canvas.height)*AscCommon.g_dKoef_pix_to_mm);
                                     oImagesSelectedContent.Drawings.push(new DrawingCopyObject(oImage, 0, 0, (_canvas.width)*AscCommon.g_dKoef_pix_to_mm,  (_canvas.height)*AscCommon.g_dKoef_pix_to_mm, sImageUrl));
                                 }
@@ -7067,6 +7105,8 @@ CPresentation.prototype =
         {
             if(!(_is_apply === false))
             {
+
+                editor.sync_HideComment();
                 this.Slides[this.CurPage].graphicObjects.startTrackNewShape(preset);
             }
             else

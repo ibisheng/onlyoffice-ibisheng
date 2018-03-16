@@ -3438,6 +3438,22 @@ CStyle.prototype.ToAscStyle = function()
 
 	return oAscStyle;
 };
+/**
+ * Получаем текстовые настройки
+ * @returns {CTextPr}
+ */
+CStyle.prototype.GetTextPr = function()
+{
+	return this.TextPr;
+};
+/**
+ * Получаем настройки для параграфа
+ * @returns {CParaPr}
+ */
+CStyle.prototype.GetParaPr = function()
+{
+	return this.ParaPr;
+};
 
 function CStyles(bCreateDefault)
 {

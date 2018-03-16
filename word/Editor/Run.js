@@ -500,78 +500,11 @@ ParaRun.prototype.Add = function(Item, bMath)
 		}
 	}
 
-    var TrackRevisions = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument)
-        TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
-
-    var ReviewType = this.Get_ReviewType();
-    if ((true === TrackRevisions && (reviewtype_Add !== ReviewType || true !== this.ReviewInfo.Is_CurrentUser())) || (false === TrackRevisions && reviewtype_Common !== ReviewType))
+	var oTrackRevisionsRun = this.CheckTrackRevisionsBeforeAdd();
+    if (oTrackRevisionsRun)
     {
-        var DstReviewType = true === TrackRevisions ? reviewtype_Add : reviewtype_Common;
-
-        // Если мы стоим в конце рана, тогда проверяем следующий элемент родительского класса, аналогично если мы стоим
-        // в начале рана, проверяем предыдущий элемент родительского класса.
-
-        var Parent = this.Get_Parent();
-        if (null === Parent)
-            return;
-
-        // Ищем данный элемент в родительском классе
-        var RunPos = this.private_GetPosInParent(Parent);
-
-        if (-1 === RunPos)
-            return;
-
-        var CurPos = this.State.ContentPos;
-        if (0 === CurPos && RunPos > 0)
-        {
-            var PrevElement = Parent.Content[RunPos - 1];
-            if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
-            {
-                PrevElement.State.ContentPos = PrevElement.Content.length;
-                PrevElement.private_AddItemToRun(PrevElement.Content.length, Item);
-                PrevElement.Make_ThisElementCurrent();
-                return;
-            }
-        }
-
-        if (this.Content.length === CurPos && (RunPos < Parent.Content.length - 2 || (RunPos < Parent.Content.length - 1 && !(Parent instanceof Paragraph))))
-        {
-            var NextElement = Parent.Content[RunPos + 1];
-            if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
-            {
-                NextElement.State.ContentPos = 0;
-                NextElement.private_AddItemToRun(0, Item);
-                NextElement.Make_ThisElementCurrent();
-                return;
-            }
-        }
-
-        // Если мы дошли до сюда, значит нам надо создать новый ран
-        var NewRun = new ParaRun(this.Paragraph, bMath);
-        NewRun.Set_Pr(this.Pr.Copy());
-        NewRun.Set_ReviewType(DstReviewType);
-        NewRun.private_AddItemToRun(0, Item);
-
-        if (0 === CurPos)
-            Parent.Add_ToContent(RunPos, NewRun);
-        else if (this.Content.length === CurPos)
-            Parent.Add_ToContent(RunPos + 1, NewRun);
-        else
-        {
-            var OldReviewInfo = (this.ReviewInfo ? this.ReviewInfo.Copy() : undefined);
-            var OldReviewType = this.ReviewType;
-
-            // Нужно разделить данный ран в текущей позиции
-            var RightRun = this.Split2(CurPos);
-            Parent.Add_ToContent(RunPos + 1, NewRun);
-            Parent.Add_ToContent(RunPos + 2, RightRun);
-
-            this.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
-            RightRun.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
-        }
-
-        NewRun.Make_ThisElementCurrent();
+		oTrackRevisionsRun.private_AddItemToRun(oTrackRevisionsRun.State.ContentPos, Item);
+		oTrackRevisionsRun.Make_ThisElementCurrent();
     }
     else if(this.Type == para_Math_Run && this.State.ContentPos == 0 && true === this.Is_StartForcedBreakOperator()) // если в начале текущего Run идет принудительный перенос => создаем новый Run
     {
@@ -588,6 +521,98 @@ ParaRun.prototype.Add = function(Item, bMath)
 	{
 		this.private_AddItemToRun(this.State.ContentPos, Item);
 	}
+};
+
+/**
+ * Ищем подходящий ран для добавления текста в режиме рецензирования (если нужно создаем новый), если возвращается
+ * null, значит текущий ран подходит.
+ * @returns {?ParaRun}
+ */
+ParaRun.prototype.CheckTrackRevisionsBeforeAdd = function()
+{
+	var TrackRevisions = false;
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+		TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
+
+	var ReviewType = this.Get_ReviewType();
+	if ((true === TrackRevisions && (reviewtype_Add !== ReviewType || true !== this.ReviewInfo.Is_CurrentUser()))
+		|| (false === TrackRevisions && reviewtype_Common !== ReviewType))
+	{
+		var DstReviewType = true === TrackRevisions ? reviewtype_Add : reviewtype_Common;
+
+		// Если мы стоим в конце рана, тогда проверяем следующий элемент родительского класса, аналогично если мы стоим
+		// в начале рана, проверяем предыдущий элемент родительского класса.
+
+		var Parent = this.Get_Parent();
+		if (null === Parent)
+			return null;
+
+		// Ищем данный элемент в родительском классе
+		var RunPos = this.private_GetPosInParent(Parent);
+
+		if (-1 === RunPos)
+			return null;
+
+		var CurPos = this.State.ContentPos;
+		if (0 === CurPos && RunPos > 0)
+		{
+			var PrevElement = Parent.Content[RunPos - 1];
+			if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
+			{
+				PrevElement.State.ContentPos = PrevElement.Content.length;
+				return PrevElement;
+			}
+		}
+
+		if (this.Content.length === CurPos && (RunPos < Parent.Content.length - 2 || (RunPos < Parent.Content.length - 1 && !(Parent instanceof Paragraph))))
+		{
+			var NextElement = Parent.Content[RunPos + 1];
+			if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
+			{
+				NextElement.State.ContentPos = 0;
+				return NextElement;
+			}
+		}
+
+		var NewRun = new ParaRun(this.Paragraph, this.IsMathRun());
+		NewRun.Set_Pr(this.Pr.Copy());
+		NewRun.Set_ReviewType(DstReviewType);
+		NewRun.State.ContentPos = 0;
+
+		if (0 === CurPos)
+		{
+			Parent.Add_ToContent(RunPos, NewRun);
+		}
+		else if (this.Content.length === CurPos)
+		{
+			Parent.Add_ToContent(RunPos + 1, NewRun);
+		}
+		else
+		{
+			var OldReviewInfo = (this.ReviewInfo ? this.ReviewInfo.Copy() : undefined);
+			var OldReviewType = this.ReviewType;
+
+			// Нужно разделить данный ран в текущей позиции
+			var RightRun = this.Split2(CurPos);
+			Parent.Add_ToContent(RunPos + 1, NewRun);
+			Parent.Add_ToContent(RunPos + 2, RightRun);
+
+			this.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
+			RightRun.Set_ReviewTypeWithInfo(OldReviewType, OldReviewInfo);
+		}
+
+		return NewRun;
+	}
+
+	return null;
+};
+/**
+ * Проверяем, предзназначен ли данный ран чисто для математических формул.
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsMathRun = function()
+{
+	return this.Type === para_Math_Run ? true : false;
 };
 
 ParaRun.prototype.private_SplitRunInCurPos = function()

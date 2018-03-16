@@ -6816,6 +6816,134 @@ function CDrawingDocument()
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
 
 		// content
+		var oLogicDocument = this.m_oWordControl.m_oLogicDocument;
+		var oStyles        = oLogicDocument.GetStyles();
+
+		var oHeader          = new CHeaderFooter(oLogicDocument.HdrFtr, oLogicDocument, this, AscCommon.hdrftr_Header);
+		var oDocumentContent = oHeader.GetContent();
+
+		var nOutlineStart = props.get_OutlineStart();
+		var nOutlineEnd   = props.get_OutlineEnd();
+		var nStylesType   = props.get_StylesType();
+		var isShowPageNum = props.get_ShowPageNumbers();
+		var isRightTab    = props.get_RightAlignTab();
+		var nTabLeader    = props.get_TabLeader();
+
+		var arrLevels         = [];
+		var arrStylesToDelete = [];
+
+		for (var nIndex = 0, nCount = props.get_StylesCount(); nIndex < nCount; ++nIndex)
+		{
+			var nLvl  = props.get_StyleLevel(nIndex) - 1;
+			var sName = props.get_StyleName(nIndex);
+
+			if (!arrLevels[nLvl])
+			{
+				var sStyleId = null;
+				if (Asc.c_oAscTOCStylesType.Current === nStylesType)
+				{
+					sStyleId = oStyles.GetDefaultTOC(nLvl);
+				}
+				else
+				{
+					var oStyle = new CStyle("", null, null, styletype_Paragraph, true);
+					oStyle.CreateTOC(nLvl, nStylesType);
+					sStyleId = oStyle.GetId();
+					oStyles.Add(oStyle);
+					arrStylesToDelete.push(oStyle.GetId());
+				}
+
+				arrLevels[nLvl] = {
+					Styles  : [],
+					StyleId : sStyleId
+				};
+			}
+
+			arrLevels[nLvl].Styles.push(sName);
+		}
+
+		for (var _nLvl = nOutlineStart; _nLvl <= nOutlineEnd; ++_nLvl)
+		{
+			var sName = "Heading " + _nLvl;
+			var nLvl  = _nLvl - 1;
+
+			if (!arrLevels[nLvl])
+			{
+				var sStyleId = null;
+				if (Asc.c_oAscTOCStylesType.Current === nStylesType)
+				{
+					sStyleId = oStyles.GetDefaultTOC(nLvl);
+				}
+				else
+				{
+					var oStyle = new CStyle("", null, null, styletype_Paragraph, true);
+					oStyle.CreateTOC(nLvl, nStylesType);
+					sStyleId = oStyle.GetId();
+					oStyles.Add(oStyle);
+					arrStylesToDelete.push(oStyle.GetId());
+				}
+
+				arrLevels[nLvl] = {
+					Styles  : [],
+					StyleId : sStyleId
+				};
+			}
+
+			arrLevels[nLvl ].Styles.push(sName);
+		}
+
+		var oParaIndex = 0;
+		var nPageIndex = 1;
+
+
+		for (var nLvl = 0; nLvl <= 8; ++nLvl)
+		{
+			if (!arrLevels[nLvl])
+				continue;
+
+			var sStyleId = arrLevels[nLvl].StyleId;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				var sStyleName = arrLevels[nLvl].Styles[nIndex];
+
+				var oParagraph = new Paragraph(this, oDocumentContent, false);
+				oDocumentContent.AddToContent(oParaIndex++, oParagraph);
+				oParagraph.SetParagraphStyleById(sStyleId);
+
+				var oRun = new ParaRun(oParagraph, false);
+				oParagraph.AddToContent(0, oRun);
+				oRun.AddText(sStyleName);
+
+				if (isShowPageNum)
+				{
+					if (isRightTab)
+					{
+						var oParaTabs = new CParaTabs();
+						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5, nTabLeader));
+						oParagraph.SetParagraphTabs(oParaTabs);
+
+						oRun.AddToContent(-1, new ParaTab());
+					}
+					else
+					{
+						oRun.AddToContent(-1, new ParaSpace());
+					}
+
+					oRun.AddText("" + nPageIndex);
+
+					nPageIndex += 2;
+				}
+			}
+		}
+
+		oDocumentContent.Reset(1, 0, 1000, 10000);
+		oDocumentContent.Recalculate_Page(0, true);
+		oDocumentContent.Draw(0, graphics);
+
+		for (var nIndex = 0, nCount = arrStylesToDelete.length; nIndex < nCount; ++nIndex)
+		{
+			oStyles.Remove(arrStylesToDelete[nIndex]);
+		}
 
 		// draw
 
@@ -8197,6 +8325,9 @@ CStylesPainter.prototype =
 			par.Style_Add(style.Id, false);
 			par.Set_Align(AscCommon.align_Left);
 			par.Set_Tabs(new CParaTabs());
+
+			if (!textPr.Color || (255 === textPr.Color.r && 255 === textPr.Color.g && 255 === textPr.Color.b))
+				run.Set_Color(new CDocumentColor(0, 0, 0, false));
 
 			var _brdL = style.ParaPr.Brd.Left;
 			if (undefined !== _brdL && null !== _brdL)

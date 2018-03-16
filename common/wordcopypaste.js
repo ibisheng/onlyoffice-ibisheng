@@ -5694,7 +5694,8 @@ PasteProcessor.prototype =
         {
 			//Пробегаемся по документу собираем список шрифтов и картинок.
             var aPrepeareFonts = this._Prepeare_recursive(node, true, true);
-     
+
+			//TODO пересмотреть все "local" и сделать одинаковые проверки во всех редакторах
 			var aImagesToDownload = [];
 			var _mapLocal = {};
 			for(var image in this.oImages)
@@ -5704,30 +5705,25 @@ PasteProcessor.prototype =
 				{
 					this.oImages[image] = window["Native"]["GetImageUrl"](this.oImages[image]);
 				}
-				else if(0 === src.indexOf("file:"))
+				else if(0 === src.indexOf("file:") && window["AscDesktopEditor"] !== undefined)
 				{
-					if (window["AscDesktopEditor"] !== undefined)
+					if (window["AscDesktopEditor"]["LocalFileGetImageUrl"] !== undefined)
 					{
-						if (window["AscDesktopEditor"]["LocalFileGetImageUrl"] !== undefined)
+						aImagesToDownload.push(src);
+					}
+					else
+					{
+						var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
+						if (_base64 != "")
 						{
-							aImagesToDownload.push(src);
+							aImagesToDownload.push(_base64);
+							_mapLocal[_base64] = src;
 						}
 						else
 						{
-							var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
-							if (_base64 != "")
-							{
-								aImagesToDownload.push(_base64);
-								_mapLocal[_base64] = src;
-							}
-							else
-							{
-								this.oImages[image] = "local";
-							}
-						}						
+							this.oImages[image] = "local";
+						}
 					}
-					else
-						this.oImages[image] = "local";
 				}
 				else if(!g_oDocumentUrls.getImageLocal(src))
 					aImagesToDownload.push(src);
@@ -7159,6 +7155,7 @@ PasteProcessor.prototype =
             {
                 nCurSum = 0;
                 nCurColWidth = 0;
+                var minRowSpanIndex = null;
                 var nMinRowSpanCount = null;//минимальный rowspan ячеек строки
                 for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
                 {
@@ -7213,7 +7210,7 @@ PasteProcessor.prototype =
                     {
                         var tc = tr.childNodes[j];
                         var tcName = tc.nodeName.toLowerCase();
-                        if("td" === tcName || "th" === tcName)
+                        if(minRowSpanIndex !== j && ("td" === tcName || "th" === tcName))
                         {
                             var nCurRowSpan = tc.getAttribute("rowspan");
                             if(null != nCurRowSpan)
