@@ -115,9 +115,12 @@ function GetObjectsForImageDownload(aBuilderImages, bSameDoc)
         for(var i = 0; i < aBuilderImages.length; ++i)
         {
             var oBuilderImage = aBuilderImages[i];
-            if (oBuilderImage.AdditionalUrls) {
-                for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
-                    aUrls.push(oBuilderImage.AdditionalUrls[j]);
+            if (!g_oDocumentUrls.getImageLocal(oBuilderImage.Url))
+            {
+                if (oBuilderImage.AdditionalUrls) {
+                    for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+                        aUrls.push(oBuilderImage.AdditionalUrls[j]);
+                    }
                 }
             }
         }
