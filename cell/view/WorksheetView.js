@@ -9079,8 +9079,7 @@
 			}
 			
 			//hyperlink
-			var link = currentObj.hyperLink;
-			if (link) {
+			if (currentObj.hyperLink || currentObj.location) {
 				pastedRangeProps.hyperLink = currentObj;
 			}
 			
@@ -9892,6 +9891,7 @@
 			}
 			newHyperlink.Ref = range;
 			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
+			newHyperlink.Location = rangeStyle.hyperLink.location;
 			range.setHyperlink(newHyperlink);
 		}
 		else if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 

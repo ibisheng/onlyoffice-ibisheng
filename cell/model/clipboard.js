@@ -3272,6 +3272,7 @@
 			this.borders = null;
 			this.toolTip = null;
 			this.hyperLink = null;
+			this.location = null;
 			
 			return this;
 		}
@@ -3300,6 +3301,7 @@
 				result.toolTip = this.toolTip;
 				result.bc = this.bc;
 				result.hyperLink = this.hyperLink;
+				result.location = this.location;
 				
 				return result;
 			}
@@ -3321,6 +3323,10 @@
 			this.paragraphText = "";
 			this.bFromPresentation = bFromPresentation;
 			this.prevTextPr = null;
+
+			//работает когда есть внутренние табы
+			//TODO  в дальнейшем учитывать внутреннии табы в DocumentContentBounds
+			this.maxCellCount = 0;
 			
 			return this;
 		}
@@ -3363,7 +3369,7 @@
 
 				this.aResult.props.fontsNew = newFonts;
 				this.aResult.props.rowSpanSpCount = 0;
-				this.aResult.props.cellCount = coverDocument.width;
+				this.aResult.props.cellCount = this.maxCellCount + 1 > coverDocument.width ? this.maxCellCount + 1 : coverDocument.width;
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
 				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
 
@@ -3599,6 +3605,7 @@
 								if (!oNewItem.hyperLink) {
 									oNewItem.hyperLink = content[n].Value;
 									oNewItem.toolTip = content[n].ToolTip;
+									oNewItem.location = content[n].Anchor;
 								} else {
 									oNewItem.hyperLink = null;
 									oNewItem.toolTip = null;
@@ -3606,6 +3613,7 @@
 								}
 							}
 
+							var lastTab;
 							for (var h = 0; h < content[n].Content.length; h++) {
 								switch (content[n].Content[h].Type) {
 									case para_Run://*paraRun*
@@ -3614,6 +3622,15 @@
 										oNewItem = paraRunObj.oNewItem;
 										innerCol = paraRunObj.col;
 										row = paraRunObj.row;
+										if(lastTab)
+										{
+											oNewItem.hyperLink = content[n].Value;
+											oNewItem.toolTip = content[n].ToolTip;
+											oNewItem.location = content[n].Anchor;
+										}
+
+										lastTab = paraRunObj.lastTab;
+
 										break;
 									}
 								}
@@ -3690,7 +3707,9 @@
 
 				//проходимся по контенту paraRun
 				var cell;
+				var lastTab;
 				for (var pR = 0; pR < paraRunContent.length; pR++) {
+					lastTab = false;
 					switch (paraRunContent[pR].Type) {
 						case para_Math_BreakOperator:
 						case para_Math_Text:
@@ -3718,7 +3737,13 @@
 						case para_Tab://*paraEnd / paraTab*
 						{
 							pushData();
+							lastTab = true;
 							innerCol++;
+
+							if(innerCol > this.maxCellCount)
+							{
+								this.maxCellCount = innerCol;
+							}
 
 							break;
 						}
@@ -3760,7 +3785,7 @@
 					}
 				}
 
-				return {col: innerCol, row: row, prevTextPr: cTextPr, oNewItem: oNewItem};
+				return {col: innerCol, row: row, prevTextPr: cTextPr, oNewItem: oNewItem, lastTab: lastTab};
 			},
 			
 			_addImageToMap: function(paraDrawing)
