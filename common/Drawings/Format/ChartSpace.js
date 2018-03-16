@@ -9958,7 +9958,7 @@ CChartSpace.prototype.recalculateAxisTickMark = function()
                 //}
                 compiled_grid_lines.Fill.merge(defaultStyle);
 
-                if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
+                if(subtleLine && subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
                     && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
                 {
                     compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
@@ -10287,7 +10287,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                             this.ptsCount += pts.length;
                             var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
-                            compiled_line.Fill.merge(base_line_fills[ser.idx]);
+							compiled_line.Fill && compiled_line.Fill.merge(base_line_fills[ser.idx]);
                             compiled_line.w *= style.line3;
                             if(ser.spPr && ser.spPr.ln)
                                 compiled_line.merge(ser.spPr.ln);
@@ -10296,7 +10296,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                             {
                                 var compiled_line = new AscFormat.CLn();
                                 compiled_line.merge(default_line);
-                                compiled_line.Fill.merge(base_line_fills[ser.idx]);
+								compiled_line.Fill && compiled_line.Fill.merge(base_line_fills[ser.idx]);
                                 compiled_line.w *= style.line3;
                                 if(ser.spPr && ser.spPr.ln)
                                     compiled_line.merge(ser.spPr.ln);
@@ -10473,7 +10473,9 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         var compiled_line = new AscFormat.CLn();
                         compiled_line.merge(default_line);
                         if(!(this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_MARKER || this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_NONE))
-                            compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                        {
+                            compiled_line.Fill && compiled_line.Fill.merge(base_line_fills[ser.idx]);
+						}
                         compiled_line.w *= style.line3;
                         if(ser.spPr && ser.spPr.ln)
                             compiled_line.merge(ser.spPr.ln);
@@ -10483,7 +10485,9 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                             var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
                             if(!(this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_MARKER || this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_NONE))
-                                compiled_line.Fill.merge(base_line_fills[ser.idx]);
+                            {
+								compiled_line.Fill && compiled_line.Fill.merge(base_line_fills[ser.idx]);
+							}
                             compiled_line.w *= style.line3;
                             if(ser.spPr && ser.spPr.ln)
                                 compiled_line.merge(ser.spPr.ln);
@@ -10990,7 +10994,7 @@ CChartSpace.prototype.calcGridLine = function(defaultStyle, spPr, subtleLine, pa
         //}
         compiled_grid_lines.Fill.merge(defaultStyle);
 
-        if(subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
+        if(subtleLine && subtleLine.Fill && subtleLine.Fill.fill && subtleLine.Fill.fill.color && subtleLine.Fill.fill.color.Mods
             && compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color)
         {
             compiled_grid_lines.Fill.fill.color.Mods =  subtleLine.Fill.fill.color.Mods.createDuplicate();
