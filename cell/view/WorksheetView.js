@@ -9014,24 +9014,7 @@
             arn.c2 = (cMax2 - 1 > 0) ? (cMax2 - 1) : 0;
         }
 
-        if (isMultiple)//случай автозаполнения сложных форм
-        {
-			if(specialPasteProps.format)
-			{
-				t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
-			}
-
-            var maxARow = heightArea / heightPasteFr;
-            var maxACol = widthArea / widthPasteFr;
-            var plRow = (rMax2 - arn.r1);
-            var plCol = (arn.c2 - arn.c1) + 1;
-        } else {
-            var maxARow = 1;
-            var maxACol = 1;
-            var plRow = 0;
-            var plCol = 0;
-        }
-		
+		var maxARow = 1, maxACol = 1, plRow = 0, plCol = 0;
 		var mergeArr = [];
 		var putInsertedCellIntoRange = function(row, col, currentObj)
 		{
@@ -9130,9 +9113,8 @@
         t.isChanged = true;
         lastSelection.c2 = arn.c2;
         lastSelection.r2 = arn.r2;
-        var arnFor = [arn, arrFormula];
 		
-        return arnFor;
+		return [arn, arrFormula];
     };
 
     WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap) {
@@ -9262,23 +9244,18 @@
             arn.c2 = cMax2 - 1;
         }
 
-       
+		var maxARow = 1, maxACol = 1, plRow = 0, plCol = 0;
         if (isMultiple)//случай автозаполнения сложных форм
         {
             if(specialPasteProps.format)
 			{
 				t.model.getRange3(trueActiveRange.r1, trueActiveRange.c1, trueActiveRange.r2, trueActiveRange.c2).unmerge();
 			}
-            var maxARow = heightArea / heightPasteFr;
-            var maxACol = widthArea / widthPasteFr;
-            var plRow = (rMax2 - arn.r1);
-            var plCol = (arn.c2 - arn.c1) + 1;
+            maxARow = heightArea / heightPasteFr;
+            maxACol = widthArea / widthPasteFr;
+            plRow = (rMax2 - arn.r1);
+            plCol = (arn.c2 - arn.c1) + 1;
         } else {
-            var maxARow = 1;
-            var maxACol = 1;
-            var plRow = 0;
-            var plCol = 0;
-			
 			trueActiveRange.r2 = arn.r2;
 			trueActiveRange.c2 = arn.c2;
         }
@@ -9593,7 +9570,19 @@
 			activeCellsPasteFragment = formulaProps.activeCellsPasteFragment;
 			transposeRange = formulaProps.transposeRange;
 		}
-		
+
+		var value2ToValue = function(value2) {
+			var res = "";
+
+			if(value2 && value2.length) {
+				for(var i = 0; i < value2.length; i++) {
+					res += value2[i].text;
+				}
+			}
+
+			return res;
+		};
+
 		var transposeOutStack = function(outStack)
 		{
 			for(var i = 0; i < outStack.length; i++)
@@ -9832,6 +9821,10 @@
 		else if(rangeStyle.val && specialPasteProps.val)
 		{
 			range.setValue(rangeStyle.val);
+		}
+		else if(rangeStyle.value2 && specialPasteProps.val)
+		{
+			range.setValue(value2ToValue(rangeStyle.value2));
 		}
 		
 		//alignVertical
