@@ -8196,7 +8196,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 		while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < Count)
 			StartPos++;
 
-		TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+		TextPr = this.Content[StartPos].GetDirectTextPr();
 
 		this.RemoveSelection();
 	}
@@ -8216,13 +8216,18 @@ Paragraph.prototype.GetDirectTextPr = function()
 			while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
 				StartPos++;
 
-			TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+			TextPr = this.Content[StartPos].GetDirectTextPr();
 		}
 		else
 		{
-			TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+			TextPr = this.Content[this.CurPos.ContentPos].GetDirectTextPr();
 		}
 	}
+
+	if (TextPr)
+		TextPr = TextPr.Copy();
+	else
+		TextPr = new CTextPr();
 
 	return TextPr;
 };

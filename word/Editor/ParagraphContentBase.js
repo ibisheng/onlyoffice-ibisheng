@@ -554,6 +554,10 @@ CParagraphContentBase.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 CParagraphContentBase.prototype.Restart_CheckSpelling = function()
 {
 };
+CParagraphContentBase.prototype.GetDirectTextPr = function()
+{
+	return null;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.
@@ -3549,6 +3553,29 @@ CParagraphContentWithParagraphLikeContent.prototype.GetCurrentComplexFields = fu
 	{
 		if (this.Content[nIndex] && this.Content[nIndex].GetCurrentComplexFields)
 			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, isCurrent && nIndex === nEndPos, isFieldPos);
+	}
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetDirectTextPr = function()
+{
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
+			StartPos++;
+
+		return this.Content[StartPos].GetDirectTextPr();
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].GetDirectTextPr();
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------

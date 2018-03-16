@@ -6755,6 +6755,11 @@ ParaRun.prototype.Get_CompiledTextPr = function(Copy)
 	}
 };
 
+ParaRun.prototype.GetDirectTextPr = function()
+{
+	return this.Pr;
+};
+
 ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
 {
     this.RecalcInfo.TextPr  = true;
