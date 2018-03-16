@@ -2236,7 +2236,11 @@ CTextDrawer.prototype =
 
     private_restoreVectors : function()
     {
-    }
+    },
+
+	drawMailMergeField : function(x, y, w, h)
+	{
+	}
 };
 
 
