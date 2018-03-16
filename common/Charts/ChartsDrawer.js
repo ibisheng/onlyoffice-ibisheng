@@ -2572,44 +2572,34 @@ CChartsDrawer.prototype =
 		
 		return result;
 	},
-	
-	_getYPositionLogBase: function(val, yPoints, isOx, logBase)
-	{
-		if(val < 0)
+
+	_getYPositionLogBase: function (val, yPoints, isOx, logBase) {
+		if (val < 0) {
 			return 0;
+		}
 
 		var logVal = Math.log(val) / Math.log(logBase);
 		var result;
-		
-		if(logVal < 0)
-		{
-			var parseVal = logVal.toString().split(".");
-			var maxVal = Math.pow(logBase, parseVal[0]);
-			var minVal = Math.pow(logBase, parseFloat(parseVal[0]) - 1);
-			var startPos = 0;
-			var diffPos;
-			for(var i = 0; i < yPoints.length; i++)
-			{
-				if(yPoints[i].val < maxVal && yPoints[i].val > minVal)
-				{
+
+		var parseVal, maxVal, minVal, startPos = 0, diffPos;
+		if (logVal < 0) {
+			parseVal = logVal.toString().split(".");
+			maxVal = Math.pow(logBase, parseVal[0]);
+			minVal = Math.pow(logBase, parseFloat(parseVal[0]) - 1);
+			for (var i = 0; i < yPoints.length; i++) {
+				if (yPoints[i].val < maxVal && yPoints[i].val > minVal) {
 					startPos = yPoints[i + 1].pos;
 					diffPos = yPoints[i].pos - yPoints[i + 1].pos;
 					break;
 				}
 			}
 			result = startPos + parseFloat("0." + parseVal[1]) * diffPos;
-		}
-		else
-		{
-			var parseVal = logVal.toString().split(".");
-			var minVal = Math.pow(logBase, parseVal[0]);
-			var maxVal = Math.pow(logBase, parseFloat(parseVal[0]) + 1);
-			var startPos = 0;
-			var diffPos;
-			for(var i = 0; i < yPoints.length; i++)
-			{
-				if(yPoints[i].val < maxVal && yPoints[i].val >= minVal)
-				{
+		} else {
+			parseVal = logVal.toString().split(".");
+			minVal = Math.pow(logBase, parseVal[0]);
+			maxVal = Math.pow(logBase, parseFloat(parseVal[0]) + 1);
+			for (var i = 0; i < yPoints.length; i++) {
+				if (yPoints[i].val < maxVal && yPoints[i].val >= minVal) {
 					startPos = yPoints[i].pos;
 					diffPos = yPoints[i].pos - yPoints[i + 1].pos;
 					break;
@@ -2617,7 +2607,7 @@ CChartsDrawer.prototype =
 			}
 			result = startPos - parseFloat("0." + parseVal[1]) * diffPos;
 		}
-		
+
 		return result;
 	},
 	
@@ -2679,21 +2669,15 @@ CChartsDrawer.prototype =
 	},
 
 	//position of catAx labels(left or right) - returns false(left of axis)/true(right of axis) or null(standard position)
-	calculatePositionLabelsCatAxFromAngle: function(chartSpace)
-	{
+	calculatePositionLabelsCatAxFromAngle: function (chartSpace) {
 		var res = null;
 		var oView3D = chartSpace.chart.getView3d();
-		var angleOy = oView3D && oView3D.rotY ? (- oView3D.rotY / 360) * (Math.PI * 2) : 0;
-		if(oView3D && !oView3D.getRAngAx() && angleOy !== 0)
-		{
+		var angleOy = oView3D && oView3D.rotY ? (-oView3D.rotY / 360) * (Math.PI * 2) : 0;
+		if (oView3D && !oView3D.getRAngAx() && angleOy !== 0) {
 			angleOy = Math.abs(angleOy);
-
-			if(angleOy >= Math.PI / 2 && angleOy < 3 * Math.PI / 2)
-				res = true;
-			else
-				res = false;
+			res = angleOy >= Math.PI / 2 && angleOy < 3 * Math.PI / 2;
 		}
-		
+
 		return res;
 	},
 	
@@ -2761,16 +2745,16 @@ CChartsDrawer.prototype =
 	_getFirstDegree: function(val)
 	{
 		var secPart = val.toString().split('.');
-		var numPow = 1, tempMax;
+		var numPow = 1, tempMax, expNum;
 		
 		if(secPart[1] && secPart[1].toString().indexOf('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
-			var expNum = secPart[1].toString().split('e+');
+			expNum = secPart[1].toString().split('e+');
 			numPow = Math.pow(10, expNum[1]);
 		}
 		else if(secPart[1] && secPart[1].toString().indexOf('e-') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
-			var expNum = secPart[1].toString().split('e');
+			expNum = secPart[1].toString().split('e');
 			numPow = Math.pow(10, expNum[1]);
 		}
 		else if(0 != secPart[0])
@@ -3079,25 +3063,6 @@ CChartsDrawer.prototype =
 	
 	isIntersectionLineAndLine: function(equation1, equation2)
 	{
-		var x10 = equation1.x1;
-		var y10 = equation1.y1;
-		var z10 = equation1.z1;
-		var l0 = equation1.l;
-		var m0 = equation1.m;
-		var n0 = equation1.n;
-		
-		var x11 = equation2.x1;
-		var y11 = equation2.y1;
-		var z11 = equation2.z1;
-		var l1 = equation2.l;
-		var m1 = equation2.m;
-		var n1 = equation2.n;
-		
-		var x = (x10 * m0 * l1 - x11 * m1 * l0 - y10 * l0 * l1 + y11 * l0 * l1) / (m0 * l1 - m1 * l0);
-		var y = (y10 * l0 *m1 - y11 * l1 * m0 - x10 * m0 * m1 + x11 * m0 * m1) / (l0 * m1 - l1 * m0);
-		var z = (z10 * m0 * n1 - z11 * m1 * n0 - y10 * n0 * n1 + y11 * n0 * n1) / (m0 * n1 - m1 * n0);
-		
-		
 		var xo = equation1.x1;
 		var yo = equation1.y1;
 		var zo = equation1.z1;
@@ -3186,21 +3151,13 @@ CChartsDrawer.prototype =
 	
 	isPoint2DLieOnLine: function(lineEquation, point)
 	{
-		var bRes = false;
-		
-		bRes = !!(Math.round(point.y * 1000) / 1000 === Math.round((lineEquation.k * point.x + lineEquation.b) * 1000) / 1000);
-		
-		return bRes;
+		return Math.round(point.y * 1000) / 1000 === Math.round((lineEquation.k * point.x + lineEquation.b) * 1000) / 1000;
 	},
 	
 	isPointLieIntoPlane: function(planeEquation, point)
 	{
-		var bRes = false;
-		
-		var resEquation = planeEquation.a * point.x + planeEquation.b * point.y + planeEquation.c * point.z + planeEquation.d; 
-		bRes = !!(Math.round(resEquation) === 0);
-		
-		return bRes;
+		var resEquation = planeEquation.a * point.x + planeEquation.b * point.y + planeEquation.c * point.z + planeEquation.d;
+		return Math.round(resEquation) === 0;
 	},
 	
 	isPointsLieIntoOnePlane2: function(point1, point2, point3, point4)
@@ -3291,9 +3248,7 @@ CChartsDrawer.prototype =
 		//полупериметр
 		var p = (a + b + c ) / 2;
 
-		var res = Math.sqrt(p * (p - a) * (p - b) * (p - c));
-		
-		return res;
+		return Math.sqrt(p * (p - a) * (p - b) * (p - c));
 	},
 	
 	//из массива точек получаем минимальные/максимальные x,y,z
@@ -3453,10 +3408,8 @@ CChartsDrawer.prototype =
 		var b = determinant(replaceCol(mat, 1, vec)) * factor;
 		var c = determinant(replaceCol(mat, 2, vec)) * factor;
 		var d = det * factor;
-		
-		var res1 = {a: a, b: b, c: c, d: d};
-		
-		return res1;
+
+		return {a: a, b: b, c: c, d: d};
 	},
 	
 	//TODO если будет проблема при отрисовке граней(перекрытие друг другом), вернуть протестированную функцию  - getPlainEquation3
@@ -3696,7 +3649,7 @@ CChartsDrawer.prototype =
 		var result;
 		if(this.calcProp.type === c_oChartTypes.Bar)
 		{
-			result = !!(val > 0 && visible < 0 || val < 0 && visible > 0);
+			result = val > 0 && visible < 0 || val < 0 && visible > 0;
 			if(!(this.calcProp.subType === "stacked") && !(this.calcProp.subType === "stackedPer") && this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX)
 				result = !result;
 		}
@@ -3706,7 +3659,7 @@ CChartsDrawer.prototype =
 		}
 		else if(this.calcProp.type === c_oChartTypes.HBar)
 		{
-			result = !!(val < 0 && visible < 0 || val > 0 && visible > 0);
+			result = val < 0 && visible < 0 || val > 0 && visible > 0;
 			
 			if(!(this.calcProp.subType === "stacked") && !(this.calcProp.subType === "stackedPer") && this.cChartSpace.chart.plotArea.valAx.scaling.orientation !== ORIENTATION_MIN_MAX)
 				result = !result;
