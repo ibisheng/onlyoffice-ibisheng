@@ -4339,6 +4339,15 @@ ParaRun.prototype.private_RecalculateLastTab = function(LastTab, X, XEnd, Word, 
         var TabValue  = LastTab.Value;
         var TabPos    = LastTab.TabPos;
 
+		var oLogicDocument     = this.Paragraph ? this.Paragraph.LogicDocument : null;
+		var nCompatibilityMode = oLogicDocument && oLogicDocument.GetCompatibilityMode ? oLogicDocument.GetCompatibilityMode() : document_compatibility_mode_Current;
+
+		if (AscCommon.MMToTwips(TabPos) > AscCommon.MMToTwips(XEnd) && nCompatibilityMode >= document_compatibility_mode_Word15)
+		{
+			TabValue = tab_Right;
+			TabPos   = XEnd;
+		}
+
         var TabCalcW = 0;
         if ( tab_Right === TabValue )
             TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW), 0 );
