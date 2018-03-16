@@ -7344,7 +7344,18 @@ function CDrawingDocument()
 				};
 			}
 
-			arrLevels[nLvl].Styles.push(sName);
+			var isAddStyle = true;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				if (arrLevels[nLvl].Styles[nIndex] === sName)
+				{
+					isAddStyle = false;
+					break;
+				}
+			}
+
+			if (isAddStyle)
+				arrLevels[nLvl].Styles.push(sName);
 		}
 
 		for (var _nLvl = nOutlineStart; _nLvl <= nOutlineEnd; ++_nLvl)
@@ -7374,7 +7385,18 @@ function CDrawingDocument()
 				};
 			}
 
-			arrLevels[nLvl ].Styles.push(sName);
+			var isAddStyle = true;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				if (arrLevels[nLvl].Styles[nIndex] === sName)
+				{
+					isAddStyle = false;
+					break;
+				}
+			}
+
+			if (isAddStyle)
+				arrLevels[nLvl].Styles.push(sName);
 		}
 
 		var oParaIndex = 0;
