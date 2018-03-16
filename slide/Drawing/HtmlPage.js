@@ -661,6 +661,7 @@ function CEditorPage(api)
 			this.m_oDemonstrationDivId.Bounds.SetParams(0, 0, 1000, 8, false, false, false, true, -1, -1);
 			this.m_oDemonstrationDivId.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 			this.m_oDemonstrationDivParent.AddControl(this.m_oDemonstrationDivId);
+			this.m_oDemonstrationDivId.HtmlElement.style.cursor = "default";
 
 			// bottons
 			var demBottonsDiv = document.createElement("div");
