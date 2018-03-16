@@ -6034,6 +6034,10 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 		}
 		else
 		{
+			// Если мы в элементе, который нельзя делить, тогда не разрешаем добавлять гиперссылку
+			if (false === this.Content[this.CurPos.ContentPos].CanSplit())
+				return false;
+
 			// Внутри гиперссылки мы не можем задать ниперссылку
 			var CurType = this.Content[this.CurPos.ContentPos].Type;
 			if (para_Hyperlink === CurType || para_Math === CurType)
@@ -6077,6 +6081,10 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 		}
 		else
 		{
+			// Если мы в элементе, который нельзя делить, тогда не разрешаем добавлять гиперссылку
+			if (false === this.Content[this.CurPos.ContentPos].CanSplit())
+				return false;
+
 			// Внутри гиперссылки мы не можем задать ниперссылку
 			var CurType = this.Content[this.CurPos.ContentPos].Type;
 			if (para_Math === CurType)
