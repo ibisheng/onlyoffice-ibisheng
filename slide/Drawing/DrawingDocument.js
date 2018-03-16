@@ -4561,10 +4561,14 @@ function CThumbnailsManager()
 			 */
 			if (!page.IsLocked)
 			{
+				/*
 				if (i == this.m_oWordControl.m_oDrawingDocument.SlideCurrent || !page.IsSelected)
 					g.b_color1(0, 0, 0, 255);
 				else
 					g.b_color1(191, 191, 191, 255);
+				*/
+				// теперь рисуем не выделяя текущий
+				g.b_color1(0, 0, 0, 255);
 			}
 			else
 				g.b_color1(211, 79, 79, 255);
