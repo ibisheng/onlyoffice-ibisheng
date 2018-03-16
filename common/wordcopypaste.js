@@ -3937,9 +3937,11 @@ PasteProcessor.prototype =
 			//в конце добавляем ссылки на wmf, ole
 			for (var i = 0; i < arrImages.length; ++i) {
 				var oBuilderImage = arrImages[i];
-				if (oBuilderImage.AdditionalUrls) {
-					for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
-						aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
+				if (!g_oDocumentUrls.getImageLocal(oBuilderImage.Url)) {
+					if (oBuilderImage.AdditionalUrls) {
+						for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+							aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
+						}
 					}
 				}
 			}
