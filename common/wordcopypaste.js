@@ -3907,44 +3907,17 @@ PasteProcessor.prototype =
 			}
 
 
-			var aImagesToDownload = [];
-			for (var i = 0; i < arrImages.length; i++) {
-				aImagesToDownload.push(arrImages[i].Url);
-			}
-
 			//если несколько графических объектов, то собираем base64 у таблиц(graphicFrame)
 			if (arr_shapes.length > 1) {
 				for (var i = 0; i < arr_shapes.length; i++) {
 					if (typeof CGraphicFrame !== "undefined" && arr_shapes[i].Drawing instanceof CGraphicFrame) {
-						aImagesToDownload.push(arr_shapes[i].base64);
-						arrImages.push(arr_shapes[i]);
+						arrImages.push(new AscCommon.CBuilderImages(null, arr_shapes[i].base64, arr_shapes[i], null, null));
 					}
 				}
 			}
-
-			//get fonts from shapes
-			/*var images = [];
-			for (var i = 0; i < arr_shapes.length; ++i) {
-				if (arr_shapes[i].Drawing.getAllFonts) {
-					arr_shapes[i].Drawing.getAllFonts(font_map);
-				}
-			}
-			//перебираем шрифты
-			for (var i in font_map) {
-				fonts.push(new CFont(i, 0, "", 0));
-			}*/
-
-			//в конце добавляем ссылки на wmf, ole
-			for (var i = 0; i < arrImages.length; ++i) {
-				var oBuilderImage = arrImages[i];
-				if (!g_oDocumentUrls.getImageLocal(oBuilderImage.Url)) {
-					if (oBuilderImage.AdditionalUrls) {
-						for (var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
-							aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
-						}
-					}
-				}
-			}
+			
+			var oObjectsForDownload = GetObjectsForImageDownload(arrImages);
+			var aImagesToDownload = oObjectsForDownload.aUrls;
 
 			AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
 				var image_map = {};
@@ -3955,8 +3928,8 @@ PasteProcessor.prototype =
 						var imageElem = arrImages[i];
 						if (null != imageElem) {
 							//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
-							if (imageElem.base64) {
-								imageElem.base64 = name;
+							if (imageElem.ImageShape && imageElem.ImageShape.base64) {
+								imageElem.ImageShape.base64 = name;
 							} else {
 								imageElem.SetUrl(name);
 							}
