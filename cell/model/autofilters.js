@@ -1041,7 +1041,22 @@
 					}
 					t.worksheet.handlers.trigger('onFilterInfo');
 				};
-				
+
+				var undo_do = function() {
+					//сортировка
+					//ипользуется целиком объект фт(cloneData)
+					if (worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter()) {
+						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
+					} else if (worksheet.TableParts) {
+						for (var l = 0; l < worksheet.TableParts.length; l++) {
+							if (cloneData.oldFilter.DisplayName === worksheet.TableParts[l].DisplayName) {
+								worksheet.changeTablePart(l, cloneData.oldFilter.clone(null), false);
+								break;
+							}
+						}
+					}
+				};
+
 				switch (type) {
 					case AscCH.historyitem_AutoFilter_Add:
 						this.isEmptyAutoFilters(cloneData.Ref);
@@ -1050,7 +1065,7 @@
 						this.changeTableStyleInfo(cloneData.name, data.activeCells);
 						break;
 					case AscCH.historyitem_AutoFilter_Sort:
-						this.sortColFilter(cloneData.type, data.cellId, cloneData.activeCells, null, data.displayName, cloneData.color);
+						undo_do();
 						break;
 					case AscCH.historyitem_AutoFilter_Empty:
 						//было удаление, на undo добавляем
@@ -1580,106 +1595,128 @@
 				return redrawTablesArr;
 			},
 
-			sortColFilter: function (type, cellId, activeRange, sortProps, displayName, color) {
-				var curFilter, filterRef, startCol, maxFilterRow, cellIdRange;
-				var undoType = null, undoRange = null, undoColor = null;
+			sortColFilter: function(type, cellId, activeRange, sortProps, displayName, color) {
+				//TODO возвращаю старую версию функции(для истории использую весь объект а/ф). есть проблемы в undo при сортировке. позже пересмотреть новую версию.
+
+				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
 				var t = this;
 
-				if (!sortProps) {
+				if(!sortProps)
 					sortProps = this.getPropForSort(cellId, activeRange, displayName);
-				}
 
-				curFilter = sortProps.curFilter, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
+				curFilter = sortProps.curFilter, sortRange = sortProps.sortRange, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
 				var bIsAutoFilter = curFilter.isAutoFilter();
 
-				var addToHistory = function() {
-					t._addHistoryObj({type: undoType, activeCells: undoRange, color: undoColor},
-						AscCH.historyitem_AutoFilter_Sort,
-						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName, color: color}, null,
-						curFilter.Ref);
-				};
-
-				var onSortAutoFilterCallback = function (type) {
+				var onSortAutoFilterCallback = function(type)
+				{
 					History.Create_NewPoint();
 					History.StartTransaction();
 
+					var oldFilter = curFilter.clone(null);
+
 					//изменяем содержимое фильтра
-					if (!curFilter.SortState) {
+					if(!curFilter.SortState)
+					{
 						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
-						if (bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount)) {
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
 							sortStateRange.r1++;
 						}
 
-						curFilter.generateSortState();
+						curFilter.SortState = new AscCommonExcel.SortState();
 						curFilter.SortState.Ref = sortStateRange;
-					} else {
-						undoType = curFilter.SortState.SortConditions[0].getSortType();
-						undoColor = curFilter.SortState.SortConditions[0].getSortColor();
-						undoRange = curFilter.SortState.SortConditions[0].Ref;
-
-						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
+					else
+					{
+						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
 
-					cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
-					curFilter.SortState.SortConditions[0].applySort(type, new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2), color);
+					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 
-					if (curFilter.TableStyleInfo) {
+					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+					curFilter.SortState.SortConditions[0].ConditionDescending = type !== Asc.c_oAscSortOptions.Ascending;
+
+					if(curFilter.TableStyleInfo)
+					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 
-					addToHistory();
+					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
+						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
 
 
-				var onSortColorAutoFilterCallback = function (type) {
+				var onSortColorAutoFilterCallback = function(type)
+				{
 					History.Create_NewPoint();
 					History.StartTransaction();
 
+					var oldFilter = curFilter.clone(null);
+
 					//изменяем содержимое фильтра
-					if (!curFilter.SortState) {
+					if(!curFilter.SortState)
+					{
 						var sortStateRange = new Asc.Range(curFilter.Ref.c1, curFilter.Ref.r1, curFilter.Ref.c2, maxFilterRow);
-						if (bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount)) {
+						if(bIsAutoFilter || (!bIsAutoFilter && null === curFilter.HeaderRowCount))
+						{
 							sortStateRange.r1++;
 						}
 
-						curFilter.generateSortState();
+						curFilter.SortState = new AscCommonExcel.SortState();
 						curFilter.SortState.Ref = sortStateRange;
-					} else {
-						undoType = curFilter.SortState.SortConditions[0].getSortType();
-						undoColor = curFilter.SortState.SortConditions[0].getSortColor();
-						undoRange = curFilter.SortState.SortConditions[0].Ref;
-
+						curFilter.SortState.SortConditions = [];
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
+					else
+					{
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
 
-					cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
-					curFilter.SortState.SortConditions[0].applySort(type, new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2), color);
+					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 
-					if (curFilter.TableStyleInfo) {
+					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+					var newDxf = new AscCommonExcel.CellXfs();
+
+					if(type === Asc.c_oAscSortOptions.ByColorFill)
+					{
+						newDxf.fill = new AscCommonExcel.Fill();
+						newDxf.fill.bg = color;
+						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
+					}
+					else
+					{
+						newDxf.font = new AscCommonExcel.Font();
+						newDxf.font.setColor(color);
+						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
+					}
+					curFilter.SortState.SortConditions[0].dxf = AscCommonExcel.g_StyleCache.addXf(newDxf, true);
+					if(curFilter.TableStyleInfo)
+					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 
-					addToHistory();
+					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
+						{activeCells: cellIdRange, type: type, cellId: cellId, color: color, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
 
-				switch (type) {
+				switch(type)
+				{
 					case Asc.c_oAscSortOptions.Ascending:
-					case Asc.c_oAscSortOptions.Descending: {
+					case Asc.c_oAscSortOptions.Descending:
+					{
 						onSortAutoFilterCallback(type);
 						break;
 					}
 					case Asc.c_oAscSortOptions.ByColorFill:
-					case Asc.c_oAscSortOptions.ByColorFont: {
+					case Asc.c_oAscSortOptions.ByColorFont:
+					{
 						onSortColorAutoFilterCallback(type);
-						break;
-					}
-					case null: {
-						curFilter.SortState = null;
 						break;
 					}
 				}
