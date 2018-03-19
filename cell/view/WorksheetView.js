@@ -8802,16 +8802,6 @@
 
         t.model.workbook.dependencyFormulas.unlockRecal();
 
-		//UPDATE AFTER PASTE
-		var arn = selectData[0];
-		if (bIsUpdate) {
-			if (callTrigger) {
-				t.handlers.trigger("slowOperation", false);
-			}
-			arn.canChangeColWidth = canChangeColWidth;
-			t.updateRanges([arn], false, true);
-		}
-
 		//for special paste
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
@@ -8863,7 +8853,8 @@
 					t.handlers.trigger("slowOperation", false);
 				}
 				t.isChanged = true;
-				t._updateCellsRange(arn, canChangeColWidth);
+				arn.canChangeColWidth = canChangeColWidth;
+				t.updateRanges([arn], false, true);
 			}
 
 			var oSelection = History.GetSelection();
