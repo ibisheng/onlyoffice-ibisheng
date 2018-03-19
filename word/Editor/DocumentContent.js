@@ -1353,11 +1353,14 @@ CDocumentContent.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 		oCurPosInfo = this.LogicDocument.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 	}
 
-	if (bUpdateX)
-		this.CurPos.RealX = oCurPosInfo.X;
+	if (oCurPosInfo)
+	{
+		if (bUpdateX)
+			this.CurPos.RealX = oCurPosInfo.X;
 
-	if (bUpdateY)
-		this.CurPos.RealY = oCurPosInfo.Y;
+		if (bUpdateY)
+			this.CurPos.RealY = oCurPosInfo.Y;
+	}
 
 	return oCurPosInfo;
 };
