@@ -5189,12 +5189,6 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Separator:
             case para_ContinuationSeparator:
             {
-                if (para_Tab === ItemType)
-                {
-                    pGraphics.p_color(0, 0, 0, 255);
-                    pGraphics.b_color1(0, 0, 0, 255);
-                }
-
                 if (para_Drawing != ItemType || Item.Is_Inline())
                 {
                     Item.Draw(X, Y - this.YOffset, pGraphics, PDSE);

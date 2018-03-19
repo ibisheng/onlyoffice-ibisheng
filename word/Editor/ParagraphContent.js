@@ -1278,6 +1278,9 @@ ParaTab.prototype.Draw = function(X, Y, Context)
 
 	if (editor && editor.ShowParaMarks)
 	{
+		Context.p_color(0, 0, 0, 255);
+		Context.b_color1(0, 0, 0, 255);
+
 		var X0 = this.Width / 2 - this.RealWidth / 2;
 
 		Context.SetFont({FontFamily : {Name : "ASCW3", Index : -1}, FontSize : 10, Italic : false, Bold : false});
