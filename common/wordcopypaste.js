@@ -6130,7 +6130,8 @@ PasteProcessor.prototype =
 
 			var font_size = node.style ? node.style.fontSize : null;
 			if(!font_size)
-				font_size = CheckDefaultFontSize(computedStyle.getPropertyValue( "font-size" ), this.apiEditor);
+				font_size = computedStyle.getPropertyValue( "font-size" );
+			font_size = CheckDefaultFontSize(font_size, this.apiEditor);
 			if(font_size && Para.TextPr && Para.TextPr.Value)
 			{
 				var obj = this._ValueToMmType(font_size);
@@ -6716,9 +6717,10 @@ PasteProcessor.prototype =
 					rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 				}
             }
-            var font_size = node.style ? node.style.fontSize : null;
-            if(!font_size)
-                font_size = CheckDefaultFontSize(computedStyle.getPropertyValue( "font-size" ), this.apiEditor);
+			var font_size = node.style ? node.style.fontSize : null;
+			if(!font_size)
+				font_size = computedStyle.getPropertyValue( "font-size" );
+			font_size = CheckDefaultFontSize(font_size, this.apiEditor);
             if(font_size)
             {
                 var obj = this._ValueToMmType(font_size);
@@ -8978,7 +8980,7 @@ function CheckDefaultFontFamily(val, api)
 
 function CheckDefaultFontSize(val, api)
 {
-	return 0 === val && api && api.getDefaultFontSize ? api.getDefaultFontSize() : val;
+	return "0px" === val && api && api.getDefaultFontSize ? api.getDefaultFontSize() + "pt" : val;
 }
 
 function CreateImageFromBinary(bin, nW, nH)

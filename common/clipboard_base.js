@@ -588,6 +588,9 @@
 				ElemToSelect.style.overflow               = 'hidden';
 				ElemToSelect.style.zIndex                 = -1000;
 				ElemToSelect.style.MozUserSelect          = "text";
+				ElemToSelect.style.fontFamily             = "onlyofficeDefaultFont";//дефолтовый шрифт
+				ElemToSelect.style.fontSize               = "11pt";//дефолтовый размер. значения 0 и тп не подходят - изменяются такие параметры, как line-height
+				ElemToSelect.style.color                  = "black";
 				ElemToSelect.style["-khtml-user-select"]  = "text";
 				ElemToSelect.style["-o-user-select"]      = "text";
 				ElemToSelect.style["user-select"]         = "text";
