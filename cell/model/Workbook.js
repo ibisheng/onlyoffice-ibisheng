@@ -5894,7 +5894,7 @@
 		this._hasChanged = true;
 	};
 	Cell.prototype.saveContent = function(opt_inCaseOfChange) {
-		if (this.nRow >= 0 && this.nCol >= 0 && (!opt_inCaseOfChange || this._hasChanged)) {
+		if (this.hasRowCol() && (!opt_inCaseOfChange || this._hasChanged)) {
 			this._hasChanged = false;
 			var wb = this.ws.workbook;
 			var sheetMemory = this.ws.getColData(this.nCol);
@@ -6011,6 +6011,9 @@
 	Cell.prototype.setRowCol=function(nRow, nCol){
 		this.nRow = nRow;
 		this.nCol = nCol;
+	};
+	Cell.prototype.hasRowCol = function() {
+		return this.nRow >= 0 && this.nCol >= 0;
 	};
 	Cell.prototype.isEqual = function (options) {
 		var cellText;
