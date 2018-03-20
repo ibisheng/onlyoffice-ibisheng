@@ -5845,6 +5845,13 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 ParaRun.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
     var Pos = ( true !== bSelection ? this.State.ContentPos : ( false !== bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) );
+
+    if (Pos < 0)
+    	Pos = 0;
+
+    if (Pos > this.Content.length)
+    	Pos = this.Content.length;
+
     ContentPos.Add(Pos);
 };
 
