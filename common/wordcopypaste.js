@@ -3241,6 +3241,11 @@ PasteProcessor.prototype =
         var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
+
+		if(!oRes.content.length && !oRes.aPastedImages.length && !oRes.images.length) {
+			oRes = null;
+		}
+
         return oRes;
 	},
 
@@ -3308,43 +3313,34 @@ PasteProcessor.prototype =
 			{
 				if(PasteElementsId.g_bIsDocumentCopyPaste)
 				{
-					this._pasteBinaryFromExcelToWord(base64FromExcel);
+					bInsertFromBinary = null !== this._pasteBinaryFromExcelToWord(base64FromExcel);
 				}
 				else
 				{
-					this._pasteBinaryFromExcelToPresentation(base64FromExcel);
+					bInsertFromBinary = null !== this._pasteBinaryFromExcelToPresentation(base64FromExcel);
 				}
-				bInsertFromBinary = true;
 			}
 			else if(base64FromWord)//вставка из редактора документов
 			{
 				if(PasteElementsId.g_bIsDocumentCopyPaste)
 				{
-					this._pasteBinaryFromWordToWord(base64FromWord, !!(fromBinary));
+					bInsertFromBinary = null !== this._pasteBinaryFromWordToWord(base64FromWord, !!(fromBinary));
 				}
 				else
 				{
-					this._pasteBinaryFromWordToPresentation(base64FromWord, !!(fromBinary));
+					bInsertFromBinary = null !== this._pasteBinaryFromWordToPresentation(base64FromWord, !!(fromBinary));
 				}
-				bInsertFromBinary = true;
 			}
 			else if(base64FromPresentation)//вставка из редактора презентаций
 			{
 				if(PasteElementsId.g_bIsDocumentCopyPaste)
 				{
-					this._pasteBinaryFromPresentationToWord(base64FromPresentation, bDuplicate);
+					bInsertFromBinary = null !== this._pasteBinaryFromPresentationToWord(base64FromPresentation, bDuplicate);
 				}
 				else
 				{
-					this._pasteBinaryFromPresentationToPresentation(base64FromPresentation);
+					bInsertFromBinary = null !== this._pasteBinaryFromPresentationToPresentation(base64FromPresentation);
 				}
-
-				bInsertFromBinary = true;
-			}
-			
-			if(fromBinary)
-			{
-				bInsertFromBinary = true;
 			}
 		}
 		
@@ -3357,6 +3353,11 @@ PasteProcessor.prototype =
 		else if(node)
 		{
 			this._pasteFromHtml(node, bTurnOffTrackRevisions);
+		}
+		else
+		{
+			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+			window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 		}
     },
 
@@ -3376,6 +3377,10 @@ PasteProcessor.prototype =
 		History.TurnOff();
 		var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 		History.TurnOn();
+
+		if(null === aContentExcel) {
+			return null;
+		}
 
 		if (window['AscCommon'].g_specialPasteHelper.specialPasteStart &&
 			Asc.c_oSpecialPasteProps.keepTextOnly === window['AscCommon'].g_specialPasteHelper.specialPasteProps) {
@@ -3404,6 +3409,10 @@ PasteProcessor.prototype =
 		var presentation = editor.WordControl.m_oLogicDocument;
 
 		var excelContent = AscFormat.ExecuteNoHistory(this._readFromBinaryExcel, this, [base64FromExcel]);
+		if(null === excelContent) {
+			return null;
+		}
+
 		var aContentExcel = excelContent.workbook;
 		var aPastedImages = excelContent.arrImages;
 
@@ -3604,6 +3613,10 @@ PasteProcessor.prototype =
 		var oThis = this;
 		var aContent = this.ReadFromBinary(base64FromWord);
 
+		if(null === aContent) {
+			return null;
+		}
+
 		//вставляем в заголовок диаграммы, предварительно конвертируем все параграфы в презентационный формат
 		if (aContent && aContent.content && this.oDocument.bPresentation && oThis.oDocument && oThis.oDocument.Parent &&
 			oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent &&
@@ -3681,6 +3694,11 @@ PasteProcessor.prototype =
 		AscCommon.g_oIdCounter.m_bRead = true;
 		var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord, this.oDocument]);
 		AscCommon.g_oIdCounter.m_bRead = false;
+
+		if(null === aContent) {
+			return null;
+		}
+
 		//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 		this.oDocument = trueDocument;
 		History.Document = trueDocument;
@@ -3855,9 +3873,7 @@ PasteProcessor.prototype =
 		}
 
 		if(null === content) {
-			window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-			window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
-			return;
+			return null;
 		}
 
 		if (content && content.DocContent) {
@@ -4009,9 +4025,7 @@ PasteProcessor.prototype =
 			var presentationSelectedContent = pasteObj.content;
 
 			if(null === presentationSelectedContent) {
-				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
-				window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
-				return;
+				return null;
 			}
 
 			if(presentationSelectedContent.Drawings && presentationSelectedContent.Drawings.length > 0) {
@@ -5528,7 +5542,11 @@ PasteProcessor.prototype =
         pptx_content_loader.Reader.ClearConnectorsMaps();
 		oBinaryFileReader.Read(base64, tempWorkbook);
         pptx_content_loader.Reader.AssignConnectorsId();
-		
+
+		if(!tempWorkbook.aWorksheets.length) {
+			return null;
+		}
+
 		return {workbook: tempWorkbook, activeRange: oBinaryFileReader.copyPasteObj.activeRange, arrImages: pptx_content_loader.End_UseFullUrl()};
 	},
 	
