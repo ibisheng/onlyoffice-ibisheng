@@ -6872,6 +6872,14 @@
 		}
 
 		cell_info.pivotTableInfo = this.model.getPivotTable(c1, r1);
+		if (cell_info.pivotTableInfo) {
+			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
+				cell_info.pivotTableInfo.asc_getName());
+			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                    /*bCheckOnlyLockAll*/false)) {
+				cell_info.isLockedPivotTable = true;
+			}
+		}
 
         return cell_info;
 	};

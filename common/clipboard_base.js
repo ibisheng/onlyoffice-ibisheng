@@ -201,9 +201,9 @@
 
 				var _text_format = this.ClosureParams.getData("text/plain");
 				var _internal = this.ClosureParams.getData("text/x-custom");
-				if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
+				if (_internal && _internal != "" && _internal.indexOf("asc_internalData2;") == 0)
 				{
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length), null, _text_format);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData2;".length), null, _text_format);
 					g_clipboardBase.Paste_End();
 					return false;
 				}
@@ -833,7 +833,7 @@
 			if (_data_format != "" && _data !== null && this.isCopyOutEnabled())
 			{
 				if (_data_format == "text/x-custom")
-					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);
+					this.ClosureParams.setData(_data_format, "asc_internalData2;" + _data);
 				else
 					this.ClosureParams.setData(_data_format, _data);
 			}
