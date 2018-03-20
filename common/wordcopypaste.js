@@ -4070,6 +4070,8 @@ PasteProcessor.prototype =
 			} else {
 				oThis.api.pre_Paste(fonts, {}, paste_callback);
 			}
+		} else {
+			return null;
 		}
 	},
 
