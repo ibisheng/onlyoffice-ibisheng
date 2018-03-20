@@ -4069,6 +4069,8 @@ function OfflineEditor () {
         //
         //        }
 
+        AscFonts.FontPickerByCharacter.IsUseNoSquaresMode = true;
+
         this.initSettings = settings;
 
         this.beforeOpen();
@@ -4746,10 +4748,9 @@ function OfflineEditor () {
     };
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
-        var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        _api.wb.printSheets(pdfWriter, pagesData);
-        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
+        var printPagesData = _api.wb.calcPagesPrint(adjustPrint);
+        var pdfPrinterMemory = _api.wb.printSheets(printPagesData).DocumentRenderer.Memory;
+        return pdfPrinterMemory.GetBase64Memory();
     };
 
     this.onSelectionChanged = function(info) {

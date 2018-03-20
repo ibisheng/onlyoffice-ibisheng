@@ -39,7 +39,9 @@ var vector_koef = 25.4 / 72;
 function CPdfPrinter(fontManager)
 {
     this.DocumentRenderer = new AscCommon.CDocumentRenderer();
-	this.DocumentRenderer.InitPicker(fontManager);
+    if (!window['IS_NATIVE_EDITOR']) {
+	   this.DocumentRenderer.InitPicker(fontManager);
+    }
     this.DocumentRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 
     this.font = new window["Asc"].FontProperties("Arial", -1);
