@@ -311,8 +311,8 @@ CChangesTableRowAfter.prototype.private_SetValue = function(Value)
 {
 	var oTableRow = this.Class;
 
-	oTableRow.Pr.GridAfter = Value.GridBefore;
-	oTableRow.Pr.WAfter    = Value.WBefore;
+	oTableRow.Pr.GridAfter = Value.GridAfter;
+	oTableRow.Pr.WAfter    = Value.WAfter;
 	oTableRow.Recalc_CompiledPr();
 };
 CChangesTableRowAfter.prototype.Merge = private_TableRowChangesOnMergePr;
