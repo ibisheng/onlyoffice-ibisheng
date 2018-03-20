@@ -16692,6 +16692,10 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 		}
 
 		this.Recalculate();
+
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateRulersState();
 	}
 };
 CDocument.prototype.GetPagesCount = function()
