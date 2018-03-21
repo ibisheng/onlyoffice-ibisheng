@@ -2614,6 +2614,7 @@
 		}
 
 		this.setFocus(true);
+		this.handlers.trigger('setStrictClose', true);
 
 		this.isTopLineActive = false;
 		this.input.isFocused = false;
