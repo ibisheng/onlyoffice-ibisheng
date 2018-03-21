@@ -10016,31 +10016,12 @@
 		return cellCoord;
 	};
 
-    // Залочена ли панель для закрепления
-    WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
-        var sheetId = this.model.getId();
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
-
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
-            callback = undefined;
-        }
-        if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false ) ) {
-            // Редактируем сами
-            asc_applyFunction( callback, true );
-            return;
-        }
-        else if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
-            return;
-        }
-
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
-    };
+	// Залочена ли панель для закрепления
+	WorksheetView.prototype._isLockedFrozenPane = function (callback) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockNameFrozenPane);
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
 
     WorksheetView.prototype._isLockedDefNames = function ( callback, defNameId ) {
         var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
