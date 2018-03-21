@@ -150,6 +150,39 @@
 			// Вызывать эту функцию только в случае окончания редактирования ячейки!!!
 			this.m_bGlobalLockEditCell = false;
 		};
+		CCollaborativeEditing.prototype.lock = function (arrLocks, callback) {
+			callback = this._checkCollaborative(callback);
+
+			this.onStartCheckLock();
+			for (var i = 0; i < arrLocks.length; ++i) {
+				if (this._addCheckLock(arrLocks[i], callback)) {
+					return;
+				}
+			}
+			this.onEndCheckLock(callback);
+		};
+		CCollaborativeEditing.prototype._checkCollaborative = function (callback) {
+			if (false === this.getCollaborativeEditing()) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				AscCommonExcel.applyFunction(callback, true);
+				callback = undefined;
+			}
+			return callback;
+		};
+		CCollaborativeEditing.prototype._addCheckLock = function (lockInfo, callback) {
+			if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
+				// Редактируем сами
+				AscCommonExcel.applyFunction(callback, true);
+				return true;
+			} else if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
+				// Уже ячейку кто-то редактирует
+				AscCommonExcel.applyFunction(callback, false);
+				return true;
+			}
+
+			this.m_arrCheckLocks.push(lockInfo);
+			return false;
+		};
 		CCollaborativeEditing.prototype.onStartCheckLock = function () {
 			this.m_arrCheckLocks.length = 0;
 		};
