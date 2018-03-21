@@ -159,7 +159,7 @@ CChartsDrawer.prototype =
 		this.areaChart.recalculate(this);
 
 		//AXIS
-		if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart && !chartSpace.bEmptySeries) {
+		if (!chartSpace.bEmptySeries) {
 
 			//оси значений и категорий
 			this.valAxisChart = [];
@@ -1638,7 +1638,7 @@ CChartsDrawer.prototype =
 
 		var bIsManualStep = false;
 		//находим шаг
-		if (axis && axis.majorUnit !== null) {
+		if (axis && axis.majorUnit != null) {
 			step = axis.majorUnit;
 			bIsManualStep = true;
 			if (this.calcProp.subType === 'stackedPer') {
