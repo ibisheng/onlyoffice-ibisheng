@@ -6855,7 +6855,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 		}
 		else if(isNumberFilter)
 		{
-			if(isNaN(this.Val))
+			if(isNaN(this.Val) && isNaN(val))
 			{
 				filterVal =  this.Val;
 			}
