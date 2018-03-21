@@ -1787,10 +1787,6 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asc_showActiveWorksheet = function() {
-    this.wb.showWorksheet(this.wbModel.getActive());
-  };
-
   spreadsheet_api.prototype.asc_hideWorksheet = function() {
     var t = this;
     // Колличество листов
@@ -3457,7 +3453,6 @@ var editor;
   prot["asc_isWorkbookLocked"] = prot.asc_isWorkbookLocked;
   prot["asc_getHiddenWorksheets"] = prot.asc_getHiddenWorksheets;
   prot["asc_showWorksheet"] = prot.asc_showWorksheet;
-  prot["asc_showActiveWorksheet"] = prot.asc_showActiveWorksheet;
   prot["asc_hideWorksheet"] = prot.asc_hideWorksheet;
   prot["asc_renameWorksheet"] = prot.asc_renameWorksheet;
   prot["asc_addWorksheet"] = prot.asc_addWorksheet;
