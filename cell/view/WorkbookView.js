@@ -818,7 +818,7 @@
     this.model.handlers.add("undoRedoHideSheet", function(sheetId) {
       self.showWorksheet(sheetId);
       // Посылаем callback об изменении списка листов
-      self.handlers.trigger("asc_onSheetsChanged");
+      self.Api.sheetsChanged();
     });
     this.model.handlers.add("updateSelection", function () {
 		if (!self.lockDraw) {
