@@ -844,7 +844,7 @@ var editor;
    * asc_onWorksheetLocked		(index, result)										- эвент залочен ли лист или нет
    * asc_onGetEditorPermissions	(permission)										- эвент о правах редактора
    * asc_onStopFormatPainter		()													- эвент об окончании форматирования по образцу
-   * asc_onUpdateSheetSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
+   * asc_onUpdateSheetViewSettings	()													- эвент об обновлении свойств листа (закрепленная область, показывать сетку/заголовки)
    * asc_onUpdateTabColor			(index)												- эвент об обновлении цвета иконки листа
    * asc_onDocumentCanSaveChanged	(bIsCanSave)										- эвент об обновлении статуса "можно ли сохранять файл"
    * asc_onDocumentUpdateVersion	(callback)											- эвент о том, что файл собрался и не может больше редактироваться
