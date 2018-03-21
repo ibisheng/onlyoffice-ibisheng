@@ -10023,32 +10023,11 @@
 		this.collaborativeEditing.lock([lockInfo], callback);
 	};
 
-    WorksheetView.prototype._isLockedDefNames = function ( callback, defNameId ) {
-        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
+	WorksheetView.prototype._isLockedDefNames = function (callback, defNameId) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
             /*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId);
-
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
-            callback = undefined;
-        }
-        if (false !==
-            this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
-                false)) {
-            // Редактируем сами
-            asc_applyFunction( callback, true );
-            return;
-        } else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                /*bCheckOnlyLockAll*/false)) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
-            return;
-        }
-
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
-    };
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
 
     // Залочен ли весь лист
     WorksheetView.prototype._isLockedAll = function (callback) {
