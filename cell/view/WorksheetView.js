@@ -10029,38 +10029,16 @@
 		this.collaborativeEditing.lock([lockInfo], callback);
 	};
 
-    // Залочен ли весь лист
-    WorksheetView.prototype._isLockedAll = function (callback) {
-        var sheetId = this.model.getId();
-        var subType = c_oAscLockTypeElemSubType.ChangeProperties;
-        var ar = this.model.selectionRange.getLast();
+	// Залочен ли весь лист
+	WorksheetView.prototype._isLockedAll = function (callback) {
+		var sheetId = this.model.getId();
+		var subType = c_oAscLockTypeElemSubType.ChangeProperties;
+		var ar = this.model.selectionRange.getLast();
 
-        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId,
-          new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
-
-        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction(callback, true);
-            callback = undefined;
-        }
-        if (false !==
-          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
-            true)) {
-            // Редактируем сами
-            asc_applyFunction(callback, true);
-            return;
-        } else if (false !==
-          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/
-            true)) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction(callback, false);
-            return;
-        }
-
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock(lockInfo);
-        this.collaborativeEditing.onEndCheckLock(callback);
-    };
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId,
+			new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
     // Пересчет для входящих ячеек в добавленные строки/столбцы
     WorksheetView.prototype._recalcRangeByInsertRowsAndColumns = function (sheetId, ar) {
         var isIntersection = false, isIntersectionC1 = true, isIntersectionC2 = true, isIntersectionR1 = true, isIntersectionR2 = true;
