@@ -898,6 +898,12 @@ CBlockLevelSdt.prototype.Get_PageContentStartPos = function(CurPage)
 	var StartPage   = this.Get_AbsolutePage(0);
 	var StartColumn = this.Get_AbsoluteColumn(0);
 
+	if (this.Parent instanceof CDocumentContent)
+	{
+		StartPage   = this.Parent.StartPage;
+		StartColumn = this.Parent.StartColumn;
+	}
+
 	return this.Parent.Get_PageContentStartPos2(StartPage, StartColumn, CurPage, this.Index);
 };
 CBlockLevelSdt.prototype.CheckTableCoincidence = function(Table)
