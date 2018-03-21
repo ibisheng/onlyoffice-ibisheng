@@ -11818,13 +11818,6 @@ catAxisChart.prototype = {
 			}
 		}
 
-		if (this.chartProp.type === c_oChartTypes.HBar) {
-			widthMinorLine = -widthMinorLine;
-			widthLine = -widthLine;
-			crossMajorStep = -crossMajorStep;
-			crossMinorStep = -crossMinorStep;
-		}
-
 		//TODO необходимо при смене ориентации оси категорий менять axPos!!!
 		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var axPos = this.catAx.axPos;
@@ -12371,13 +12364,6 @@ valAxisChart.prototype = {
 				widthMinorLine = -3;
 				break;
 			}
-		}
-
-		if (this.chartProp.type === c_oChartTypes.HBar) {
-			widthMinorLine = -widthMinorLine;
-			widthLine = -widthLine;
-			crossMajorStep = -crossMajorStep;
-			crossMinorStep = -crossMinorStep;
 		}
 
 		//TODO необходимо при смене ориентации оси категорий менять axPos!!!
