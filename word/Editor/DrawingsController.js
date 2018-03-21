@@ -25,9 +25,9 @@ CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CDrawingsController.prototype.RecalculateCurPos = function()
+CDrawingsController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.DrawingObjects.recalculateCurPos();
+	return this.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 };
 CDrawingsController.prototype.GetCurPage = function()
 {
@@ -390,6 +390,10 @@ CDrawingsController.prototype.CanMergeTableCells = function()
 CDrawingsController.prototype.CanSplitTableCells = function()
 {
 	return this.DrawingObjects.tableCheckSplit();
+};
+CDrawingsController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.DrawingObjects.distributeTableCells(isHorizontally);
 };
 CDrawingsController.prototype.UpdateInterfaceState = function()
 {

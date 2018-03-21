@@ -412,6 +412,9 @@ function CGroupShape()
 
     CGroupShape.prototype.draw = function(graphics)
     {
+        if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+            return;
+        }
         for(var i = 0; i < this.spTree.length; ++i)
             this.spTree[i].draw(graphics);
 
@@ -420,6 +423,20 @@ function CGroupShape()
         graphics.reset();
         graphics.SetIntegerGrid(true);
     };
+
+    CGroupShape.prototype.deselectObject = function(object)
+    {
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            if(this.selectedObjects[i] === object){
+                object.selected = false;
+                this.selectedObjects.splice(i, 1);
+                return;
+            }
+        }
+    };
+
+
 
     CGroupShape.prototype.getLocalTransform = function()
     {
@@ -560,6 +577,33 @@ function CGroupShape()
                                     dExtY *= oParaDrawing.SizeRelV.Percent;
                                 }
                             }
+                        }
+                    }
+                }
+
+
+                if(this.drawingBase  && this.fromSerialize)
+                {
+                    var metrics = this.drawingBase.getGraphicObjectMetrics();
+                    var rot = 0;
+                    if(this.spPr && this.spPr.xfrm){
+                        if(AscFormat.isRealNumber(this.spPr.xfrm.rot)){
+                            rot =  AscFormat.normalizeRotate(this.spPr.xfrm.rot);
+                        }
+                    }
+
+                    var metricExtX, metricExtY;
+                    //  if(!(this instanceof AscFormat.CGroupShape))
+                    {
+                        if (AscFormat.checkNormalRotate(rot))
+                        {
+                            dExtX = metrics.extX;
+                            dExtY = metrics.extY;
+                        }
+                        else
+                        {
+                            dExtX = metrics.extY;
+                            dExtY = metrics.extX;
                         }
                     }
                 }
@@ -1190,6 +1234,24 @@ function CGroupShape()
         if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill))
         {
             this.compiledFill = this.spPr.Fill.createDuplicate();
+            if(this.compiledFill && this.compiledFill.fill && this.compiledFill.fill.type === Asc.c_oAscFill.FILL_TYPE_GRP)
+            {
+                if(this.group)
+                {
+                    var group_compiled_fill = this.group.getCompiledFill();
+                    if (isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill)) {
+                        this.compiledFill = group_compiled_fill.createDuplicate();
+                    }
+                    else
+                    {
+                        this.compiledFill = null;
+                    }
+                }
+                else
+                {
+                    this.compiledFill = null;
+                }
+            }
         }
         else if(isRealObject(this.group))
         {
@@ -1552,9 +1614,9 @@ function CGroupShape()
     CGroupShape.prototype.calculateSnapArrays = function(snapArrayX, snapArrayY)
     {
         var sp;
-        for(var i = 0; i < this.spTree.length; ++i)
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
         {
-            sp = this.spTree[i];
+            sp = this.arrGraphicObjects[i];
             sp.calculateSnapArrays(snapArrayX, snapArrayY);
             sp.recalculateSnapArrays();
         }

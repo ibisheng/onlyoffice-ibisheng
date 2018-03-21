@@ -1154,6 +1154,7 @@ function CDrawingDocument()
 	this.ToRenderer = function()
 	{
 		var Renderer                             = new AscCommon.CDocumentRenderer();
+        Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 		Renderer.IsNoDrawingEmptyPlaceholder     = true;
 		Renderer.VectorMemoryForPrint            = new AscCommon.CMemory();
 		var old_marks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
@@ -1171,6 +1172,7 @@ function CDrawingDocument()
 	this.ToRenderer2    = function()
 	{
 		var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 
 		var old_marks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -1201,6 +1203,7 @@ function CDrawingDocument()
 				watermark.StartRenderer();
 
 			this.m_oDocRenderer                             = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 			this.m_oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage                     = 0;
 			this.m_bOldShowMarks                            = this.m_oWordControl.m_oApi.ShowParaMarks;
@@ -1410,20 +1413,9 @@ function CDrawingDocument()
 		_textPr.Position = this.GuiLastTextProps.Position;
 
 		var parRun = new ParaRun(par);
-		var Pos    = 0;
 		parRun.Set_Pr(_textPr);
-		parRun.Add_ToContent(Pos++, new ParaText("H"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("e"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaSpace(1), false);
-		parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("d"), false);
-		par.Add_ToContent(0, parRun);
+		parRun.AddText("Hello World");
+		par.AddToContent(0, parRun);
 
 		docContent.Recalculate_Page(0, true);
 
@@ -1841,12 +1833,16 @@ function CDrawingDocument()
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
 				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 4;
+
+				AscCommon.g_inputContext.TargetOffsetY = (editor.WordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 			}
 			else
 			{
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.TargetHtmlElement);
 				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 9;
+
+				AscCommon.g_inputContext.TargetOffsetY = 0;
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;
@@ -2046,7 +2042,7 @@ function CDrawingDocument()
 
 			/// check scroll
 			var isNeedScroll = false;
-			if (0 != nValueScrollHor)
+			if (0 != nValueScrollHor && this.m_oWordControl.m_oScrollHorApi)
 			{
 				isNeedScroll                                  = true;
 				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
@@ -2689,6 +2685,7 @@ function CDrawingDocument()
 		{
 			dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
 		}
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
 		this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
 		return;
 	}
@@ -2741,6 +2738,16 @@ function CDrawingDocument()
 	this.UpdateTargetTransform = function(matrix)
 	{
 		this.TextMatrix = matrix;
+	}
+
+	this.MultiplyTargetTransform = function (matrix)
+	{
+		if (!this.TextMatrix)
+			this.TextMatrix = matrix;
+		else if (matrix)
+		{
+			this.TextMatrix.Multiply(matrix, AscCommon.MATRIX_ORDER_PREPEND);
+		}
 	}
 
 	this.UpdateThumbnailsAttack = function()
@@ -3655,6 +3662,7 @@ function CThumbnailsManager()
 		AscCommon.check_MouseDownEvent(e);
 		global_mouseEvent.LockMouse();
 
+        oThis.m_oWordControl.m_oApi.sync_EndAddShape();
 		if (global_mouseEvent.Sender != control)
 		{
 			// такого быть не должно
@@ -3716,7 +3724,7 @@ function CThumbnailsManager()
 				oThis.ShowPage(pos.Page);
 			}
 		}
-		else if (global_keyboardEvent.ShiftKey)
+		else if (global_keyboardEvent.ShiftKey && !oThis.m_oWordControl.m_oApi.isReporterMode)
 		{
 			var pages_count = oThis.m_arrPages.length;
 			for (var i = 0; i < pages_count; i++)
@@ -3738,7 +3746,9 @@ function CThumbnailsManager()
 				oThis.m_arrPages[i].IsSelected = true;
 			}
 
+			oThis.OnUpdateOverlay();
 			oThis.ShowPage(pos.Page);
+			oThis.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
 		else if (0 == global_mouseEvent.Button || 2 == global_mouseEvent.Button)
 		{
@@ -4922,6 +4932,8 @@ function CThumbnailsManager()
 			this.m_arrPages[i].IsSelected = false;
 		}
 
+
+		this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		this.OnUpdateOverlay();
 		this.ShowPage(_page);
 	};
@@ -5107,6 +5119,7 @@ function CThumbnailsManager()
 					{
 						this.m_arrPages[i].IsSelected = true;
 					}
+					this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 					this.OnUpdateOverlay();
 				}
 				break;
@@ -5845,6 +5858,9 @@ function CNotesDrawer(page)
 
 	this.onMouseDown = function (e)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		AscCommon.check_MouseDownEvent(e, true);
 		global_mouseEvent.LockMouse();
 
@@ -5869,6 +5885,9 @@ function CNotesDrawer(page)
 	};
 	this.onMouseMove = function (e, is_overlay_attack)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		if (e)
 			AscCommon.check_MouseMoveEvent(e);
 
@@ -5888,6 +5907,9 @@ function CNotesDrawer(page)
 	};
 	this.onMouseUp = function (e)
 	{
+		if (-1 == oThis.HtmlPage.m_oDrawingDocument.SlideCurrent)
+			return;
+
 		AscCommon.check_MouseUpEvent(e);
 
 		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);

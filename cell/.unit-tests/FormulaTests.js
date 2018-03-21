@@ -2213,6 +2213,10 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "abc def" );
 
+		oParser = new parserFormula( "TRIM(\" First Quarter Earnings \")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "First Quarter Earnings" );
+
     } );
 
 	test( "Test: \"TRIMMEAN\"", function () {
@@ -3713,7 +3717,7 @@ $( function () {
 
 		oParser = new parserFormula( "AGGREGATE(6,1,100)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 100);
+		strictEqual( oParser.calculate().getValue(), "#VALUE!");
 
 		oParser = new parserFormula( "AGGREGATE(7,3,A101:B105)", "A1", ws );
 		ok( oParser.parse() );
@@ -8988,6 +8992,14 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
 
+		oParser = new parserFormula( 'DCOUNT(A4:E10,, A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNT(A4:E10,"", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
 	});
 
 	test( "Test: \"DCOUNTA\"", function () {
@@ -8997,6 +9009,14 @@ $( function () {
 		oParser = new parserFormula( 'DCOUNTA(A4:E10, "Profit", A1:F2)', "AA2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNTA(A4:E10,, A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'DCOUNTA(A4:E10,"", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 
 	});
 
@@ -9589,6 +9609,38 @@ $( function () {
 		oParser = new parserFormula( "ADDRESS(2,3,2,1,\"'\")", "A2", ws );
 		ok( oParser.parse(), "ADDRESS(2,3,2,1,\"'\")" );
 		strictEqual( oParser.calculate().getValue(), "''''!C$2", "ADDRESS(2,3,2,1,\"'\")");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,1,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,1,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,1,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,2,,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,2,,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!C$2", "ADDRESS(2,3,2,,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,TRUE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,TRUE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!$C$2", "ADDRESS(2,3,,TRUE,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,FALSE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,FALSE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!R2C3", "ADDRESS(2,3,,FALSE,1)");
+
+		oParser = new parserFormula( "ADDRESS(2,3,,FALSE,1)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(2,3,,FALSE,1)" );
+		strictEqual( oParser.calculate().getValue(), "'1'!R2C3", "ADDRESS(2,3,,FALSE,1)");
+
+		oParser = new parserFormula( "ADDRESS(1,7,,)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(1,7,,)" );
+		strictEqual( oParser.calculate().getValue(), "$G$1", "ADDRESS(1,7,,)");
+
+		oParser = new parserFormula( "ADDRESS(1,7,,,)", "A2", ws );
+		ok( oParser.parse(), "ADDRESS(1,7,,,)" );
+		strictEqual( oParser.calculate().getValue(), "$G$1", "ADDRESS(1,7,,,)");
 
 	} );
 

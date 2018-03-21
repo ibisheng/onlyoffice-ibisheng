@@ -2560,7 +2560,7 @@ function CEditorPage(api)
 			return;
 
 		var oWordControl                       = oThis;
-		oWordControl.m_dScrollX                = scrollPositionX;
+		oWordControl.m_dScrollX                = Math.max(0, Math.min(scrollPositionX, maxX));
 		oWordControl.m_dScrollX_max            = maxX;
 		oWordControl.m_bIsUpdateHorRuler       = true;
 		oWordControl.m_bIsUpdateTargetNoAttack = true;
@@ -2952,6 +2952,17 @@ function CEditorPage(api)
 					var drawPage = drDoc.m_arrPages[_page].drawingPage;
 					drDoc.m_arrPages[_page].DrawTableOutline(overlay,
 						drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.TableOutlineDr);
+				}
+				if (true)
+				{
+					var _lastBounds = drDoc.TableOutlineDr.getLastPageBounds();
+					_page = _lastBounds.Page;
+					if (_page >= drDoc.m_lDrawingFirst && _page <= drDoc.m_lDrawingEnd)
+					{
+						var drawPage = drDoc.m_arrPages[_page].drawingPage;
+						drDoc.m_arrPages[_page].DrawTableOutline(overlay,
+							drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.TableOutlineDr, _lastBounds);
+					}
 				}
 			}
 

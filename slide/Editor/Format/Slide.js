@@ -47,6 +47,7 @@ CChangesDrawingsContentComments.prototype.constructor = CChangesDrawingsContentC
 CChangesDrawingsContentComments.prototype.addToInterface = function(){
     for(var i = 0; i < this.Items.length; ++i){
         var oComment = this.Items[i];
+        oComment.Data.bDocument = !(oComment.Parent && (oComment.Parent.slide instanceof Slide));
         editor.sync_AddComment(oComment.Get_Id(), oComment.Data);
     }
 };
@@ -297,6 +298,15 @@ Slide.prototype =
         if(this.notes){
             copy.setNotes(this.notes.createDuplicate());
         }
+        if(this.slideComments){
+            if(!copy.slideComments) {
+                copy.setSlideComments(new SlideComments(copy));
+            }
+            var aComments = this.slideComments.comments;
+            for(i = 0; i < aComments.length; ++i){
+                copy.slideComments.addComment(aComments[i].createDuplicate(copy.slideComments));
+            }
+        }
 
         if(!this.recalcInfo.recalculateBackground && !this.recalcInfo.recalculateSpTree)
         {
@@ -483,6 +493,51 @@ Slide.prototype =
         {
             return last_body;
         }
+
+
+        for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
+        {
+            _glyph = _sp_tree[_shape_index];
+            if(_glyph.isPlaceholder())
+            {
+                if(_glyph instanceof AscFormat.CShape)
+                {
+                    _index = _glyph.nvSpPr.nvPr.ph.idx;
+                    _type = _glyph.nvSpPr.nvPr.ph.type;
+                }
+                if(_glyph instanceof AscFormat.CImageShape)
+                {
+                    _index = _glyph.nvPicPr.nvPr.ph.idx;
+                    _type = _glyph.nvPicPr.nvPr.ph.type;
+                }
+                if(_glyph instanceof  AscFormat.CGroupShape)
+                {
+                    _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
+                    _type = _glyph.nvGrpSpPr.nvPr.ph.type;
+                }
+
+                if(_index == null)
+                {
+                    _final_index = 0;
+                }
+                else
+                {
+                    _final_index = _index;
+                }
+
+                if(_input_reduced_index == _final_index)
+                {
+                    return _glyph;
+                }
+            }
+        }
+
+
+        if(body_count === 1 && bSingleBody)
+        {
+            return last_body;
+        }
+
         return null;
     },
 
@@ -1041,7 +1096,7 @@ Slide.prototype =
 
         var oDocContent = this.notesShape.getDocContent();
         if(oDocContent){
-            return oDocContent.Get_SummaryHeight();
+            return oDocContent.GetSummaryHeight();
         }
         return 0;
     },
@@ -1077,7 +1132,7 @@ Slide.prototype =
                 var oOldGeometry = this.notesShape.spPr.geometry;
                 this.notesShape.spPr.geometry = null;
                 this.notesShape.extX = Width;
-                this.notesShape.extX = 2000;
+                this.notesShape.extY = 2000;
                 this.notesShape.recalculateContent2();
                 this.notesShape.spPr.geometry = oOldGeometry;
                 this.notesShape.pen = AscFormat.CreateNoFillLine();
@@ -1099,11 +1154,14 @@ Slide.prototype =
             }
         }
 
-        if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
-            this.Layout.draw(graphics);
-        else{
-            _bounds =  this.Layout.bounds;
-            graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+        if(this.showMasterSp !== false)
+        {
+            if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
+                this.Layout.draw(graphics);
+            else{
+                _bounds =  this.Layout.bounds;
+                graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+            }
         }
         for(var i=0; i < this.cSld.spTree.length; ++i)
         {
@@ -1135,7 +1193,7 @@ Slide.prototype =
                     g.transform3(this.notesShape.transformText);
                     var Width = this.notesShape.txBody.content.XLimit - 2;
                     Width = Math.max(Width, 1);
-                    var Height = this.notesShape.txBody.content.Get_SummaryHeight();
+                    var Height = this.notesShape.txBody.content.GetSummaryHeight();
                     g.DrawLockObjectRect(oLock.Get_Type(), 0, 0, Width, Height);
                 }
             }
@@ -1360,91 +1418,7 @@ Slide.prototype =
 
     Load_Comments : function(authors)
     {
-        var _comments_count = this.writecomments.length;
-        var _comments_id = [];
-        var _comments_data = [];
-        var _comments_data_author_id = [];
-        var _comments = [];
-
-        for (var i = 0; i < _comments_count; i++)
-        {
-            var _wc = this.writecomments[i];
-
-            if (0 == _wc.WriteParentAuthorId || 0 == _wc.WriteParentCommentId)
-            {
-                var commentData = new CCommentData();
-
-                commentData.m_sText = _wc.WriteText;
-                commentData.m_sUserId = ("" + _wc.WriteAuthorId);
-                commentData.m_sUserName = "";
-                commentData.m_sTime = _wc.WriteTime;
-
-                for (var k in authors)
-                {
-                    if (_wc.WriteAuthorId == authors[k].Id)
-                    {
-                        commentData.m_sUserName = authors[k].Name;
-                        break;
-                    }
-                }
-
-                //if ("" != commentData.m_sUserName)
-                {
-                    _comments_id.push(_wc.WriteCommentId);
-                    _comments_data.push(commentData);
-                    _comments_data_author_id.push(_wc.WriteAuthorId);
-
-                    _wc.ParceAdditionalData(commentData);
-
-                    var comment = new CComment(this.slideComments, new CCommentData());
-                    comment.setPosition(_wc.x / 25.4, _wc.y / 25.4);
-                    _comments.push(comment);
-                }
-            }
-            else
-            {
-                var commentData = new CCommentData();
-
-                commentData.m_sText = _wc.WriteText;
-                commentData.m_sUserId = ("" + _wc.WriteAuthorId);
-                commentData.m_sUserName = "";
-                commentData.m_sTime = _wc.WriteTime;
-
-                for (var k in authors)
-                {
-                    if (_wc.WriteAuthorId == authors[k].Id)
-                    {
-                        commentData.m_sUserName = authors[k].Name;
-                        break;
-                    }
-                }
-
-                _wc.ParceAdditionalData(commentData);
-
-                var _parent = null;
-                for (var j = 0; j < _comments_data.length; j++)
-                {
-                    if ((_wc.WriteParentAuthorId == _comments_data_author_id[j]) && (_wc.WriteParentCommentId == _comments_id[j]))
-                    {
-                        _parent = _comments_data[j];
-                        break;
-                    }
-                }
-
-                if (null != _parent)
-                {
-                    _parent.m_aReplies.push(commentData);
-                }
-            }
-        }
-
-        for (var i = 0; i < _comments.length; i++)
-        {
-            _comments[i].Set_Data(_comments_data[i]);
-            this.addComment(_comments[i]);
-        }
-
-        this.writecomments = [];
+        AscCommonSlide.fLoadComments(this, authors);
     },
 
 
@@ -1468,6 +1442,100 @@ Slide.prototype =
         return this.cSld.spTree;
     }
 };
+
+function fLoadComments(oObject, authors)
+{
+    var _comments_count = oObject.writecomments.length;
+    var _comments_id = [];
+    var _comments_data = [];
+    var _comments_data_author_id = [];
+    var _comments = [];
+
+    var oComments = oObject.slideComments ? oObject.slideComments : oObject.comments;
+    if(!oComments)
+    {
+        return;
+    }
+    for (var i = 0; i < _comments_count; i++)
+    {
+        var _wc = oObject.writecomments[i];
+
+        if (0 == _wc.WriteParentAuthorId || 0 == _wc.WriteParentCommentId)
+        {
+            var commentData = new CCommentData();
+
+            commentData.m_sText = _wc.WriteText;
+            commentData.m_sUserId = ("" + _wc.WriteAuthorId);
+            commentData.m_sUserName = "";
+            commentData.m_sTime = _wc.WriteTime;
+
+            for (var k in authors)
+            {
+                if (_wc.WriteAuthorId == authors[k].Id)
+                {
+                    commentData.m_sUserName = authors[k].Name;
+                    break;
+                }
+            }
+
+            //if ("" != commentData.m_sUserName)
+            {
+                _comments_id.push(_wc.WriteCommentId);
+                _comments_data.push(commentData);
+                _comments_data_author_id.push(_wc.WriteAuthorId);
+
+                _wc.ParceAdditionalData(commentData);
+
+                var comment = new CComment(oComments, new CCommentData());
+                comment.setPosition(_wc.x / 22.66, _wc.y / 22.66);
+                _comments.push(comment);
+            }
+        }
+        else
+        {
+            var commentData = new CCommentData();
+
+            commentData.m_sText = _wc.WriteText;
+            commentData.m_sUserId = ("" + _wc.WriteAuthorId);
+            commentData.m_sUserName = "";
+            commentData.m_sTime = _wc.WriteTime;
+
+            for (var k in authors)
+            {
+                if (_wc.WriteAuthorId == authors[k].Id)
+                {
+                    commentData.m_sUserName = authors[k].Name;
+                    break;
+                }
+            }
+
+            _wc.ParceAdditionalData(commentData);
+
+            var _parent = null;
+            for (var j = 0; j < _comments_data.length; j++)
+            {
+                if ((_wc.WriteParentAuthorId == _comments_data_author_id[j]) && (_wc.WriteParentCommentId == _comments_id[j]))
+                {
+                    _parent = _comments_data[j];
+                    break;
+                }
+            }
+
+            if (null != _parent)
+            {
+                _parent.m_aReplies.push(commentData);
+            }
+        }
+    }
+
+    for (var i = 0; i < _comments.length; i++)
+    {
+        _comments[i].Set_Data(_comments_data[i]);
+        oObject.addComment(_comments[i]);
+    }
+
+    oObject.writecomments = [];
+}
 
 function PropLocker(objectId)
 {
@@ -1681,3 +1749,4 @@ window['AscCommonSlide'] = window['AscCommonSlide'] || {};
 window['AscCommonSlide'].Slide = Slide;
 window['AscCommonSlide'].PropLocker = PropLocker;
 window['AscCommonSlide'].SlideComments = SlideComments;
+window['AscCommonSlide'].fLoadComments = fLoadComments;

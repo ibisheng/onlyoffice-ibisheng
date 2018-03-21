@@ -585,6 +585,9 @@ CImageShape.prototype.getTransform = function()
 
 CImageShape.prototype.draw = function(graphics, transform)
 {
+    if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+        return;
+    }
     if(graphics.updatedRect)
     {
         var rect = graphics.updatedRect;
@@ -614,7 +617,7 @@ CImageShape.prototype.draw = function(graphics, transform)
             var oApi = editor || window['Asc']['editor'];
             if(oApi){
                 sImageId = AscCommon.getFullImageSrc2(sImageId);
-                var _img = editor.ImageLoader.map_image_index[sImageId];
+                var _img = oApi.ImageLoader.map_image_index[sImageId];
                 if ((_img && _img.Status === AscFonts.ImageLoadStatus.Loading) || (_img && _img.Image)){
                     this.brush = new AscFormat.CUniFill();
                     this.brush.fill = this.blipFill;
@@ -649,8 +652,38 @@ CImageShape.prototype.draw = function(graphics, transform)
 
 CImageShape.prototype.select = CShape.prototype.select;
 
-CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
+
+    CImageShape.prototype.handleUpdateLn = function()
+    {
+        this.recalcLine();
+        this.recalcPen();
+        this.addToRecalculate();
+    };
+
+    CImageShape.prototype.changePresetGeom = function (sPreset) {
+        if(sPreset === "textRect"){
+            return;
+        }
+        this.spPr.setGeometry( AscFormat.CreateGeometry(sPreset));
+    };
+
+
+    CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
 CImageShape.prototype.hit = CShape.prototype.hit;
+
+    CImageShape.prototype.changeLine = function (line)
+    {
+        if(this.recalcInfo.recalculatePen)
+        {
+            this.recalculatePen();
+        }
+        var stroke = AscFormat.CorrectUniStroke(line, this.pen);
+        if(stroke.Fill)
+        {
+            stroke.Fill.convertToPPTXMods();
+        }
+        this.spPr.setLn(stroke);
+    };
 
 CImageShape.prototype.deselect = function(drawingObjectsController)
 {

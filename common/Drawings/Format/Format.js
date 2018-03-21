@@ -57,6 +57,113 @@ var c_oAscStrokeType = Asc.c_oAscStrokeType;
 var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
 
+    function CT_Hyperlink()
+    {
+        this.snd = null;
+        this.id = null;
+        this.invalidUrl = null;
+        this.action = null;
+        this.tgtFrame = null;
+        this.tooltip = null;
+        this.history = null;
+        this.highlightClick = null;
+        this.endSnd = null;
+    }
+
+
+    CT_Hyperlink.prototype.Write_ToBinary = function(w)
+    {
+        var nStartPos = w.GetCurPosition();
+        var nFlags = 0;
+        w.WriteLong(0);
+
+        if(null !== this.snd){
+            nFlags |= 1;
+            w.WriteString2(this.snd);
+        }
+        if(null !== this.id){
+            nFlags |= 2;
+            w.WriteString2(this.id);
+        }
+        if(null !== this.invalidUrl){
+            nFlags |= 4;
+            w.WriteString2(this.invalidUrl);
+        }
+        if(null !== this.action){
+            nFlags |= 8;
+            w.WriteString2(this.action);
+        }
+        if(null !== this.tgtFrame){
+            nFlags |= 16;
+            w.WriteString2(this.tgtFrame);
+        }
+        if(null !== this.tooltip){
+            nFlags |= 32;
+            w.WriteString2(this.tooltip);
+        }
+        if(null !== this.history){
+            nFlags |= 64;
+            w.WriteBool(this.history);
+        }
+        if(null !== this.highlightClick){
+            nFlags |= 128;
+            w.WriteBool(this.highlightClick);
+        }
+        if(null !== this.endSnd){
+            nFlags |= 256;
+            w.WriteBool(this.endSnd);
+        }
+        var nEndPos = w.GetCurPosition();
+        w.Seek(nStartPos);
+        w.WriteLong(nFlags);
+        w.Seek(nEndPos);
+    };
+
+    CT_Hyperlink.prototype.Read_FromBinary = function(r){
+        var nFlags = r.GetLong();
+        if(nFlags & 1){
+            this.snd = r.GetString2();
+        }
+        if(nFlags & 2){
+            this.id = r.GetString2();
+        }
+        if(nFlags & 4){
+            this.invalidUrl = r.GetString2();
+        }
+        if(nFlags & 8){
+            this.action = r.GetString2();
+        }
+        if(nFlags & 16){
+            this.tgtFrame = r.GetString2();
+        }
+        if(nFlags & 32){
+            this.tooltip = r.GetString2();
+        }
+        if(nFlags & 64){
+            this.history = r.GetBool();
+        }
+        if(nFlags & 128){
+            this.highlightClick = r.GetBool();
+        }
+        if(nFlags & 256){
+            this.endSnd = r.GetBool();
+        }
+    };
+
+    CT_Hyperlink.prototype.createDuplicate = function(r){
+        var ret = new CT_Hyperlink();
+        ret.snd = this.snd;
+        ret.id = this.id;
+        ret.invalidUrl = this.invalidUrl;
+        ret.action = this.action;
+        ret.tgtFrame = this.tgtFrame;
+        ret.tooltip = this.tooltip;
+        ret.history = this.history;
+        ret.highlightClick = this.highlightClick;
+        ret.endSnd = this.endSnd;
+        return ret;
+    };
+
 
 
     var CChangesDrawingsBool = AscDFH.CChangesDrawingsBool;
@@ -86,6 +193,8 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetIsHidden                 ] = function (oClass, value){oClass.isHidden  = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetDescr                    ] = function (oClass, value){oClass.descr     = value;};
         drawingsChangesMap[AscDFH.historyitem_CNvPr_SetTitle                    ] = function (oClass, value){oClass.title     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkClick                    ] = function (oClass, value){oClass.hlinkClick     = value;};
+        drawingsChangesMap[AscDFH.historyitem_CNvPr_SetHlinkHover                    ] = function (oClass, value){oClass.hlinkHover     = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetIsPhoto                   ] = function (oClass, value){oClass.isPhoto   = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetUserDrawn                 ] = function (oClass, value){oClass.userDrawn = value;};
         drawingsChangesMap[AscDFH.historyitem_NvPr_SetPh                        ] = function (oClass, value){oClass.ph        = value;};
@@ -174,6 +283,9 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = FmtScheme;
     drawingConstructorsMap[AscDFH.historyitem_UniNvPr_SetUniSpPr                 ] = CNvUniSpPr;
 
+    drawingConstructorsMap[AscDFH.historyitem_CNvPr_SetHlinkClick] = CT_Hyperlink;
+    drawingConstructorsMap[AscDFH.historyitem_CNvPr_SetHlinkHover] = CT_Hyperlink;
+
 
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetSpPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr] = CChangesDrawingsObjectNoId;
@@ -184,6 +296,8 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetIsHidden] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetDescr] = CChangesDrawingsString;
     AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetTitle] = CChangesDrawingsString;
+    AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetHlinkClick] = CChangesDrawingsObjectNoId;
+    AscDFH.changesFactory[AscDFH.historyitem_CNvPr_SetHlinkHover] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetIsPhoto] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetUserDrawn] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetPh] = CChangesDrawingsObject;
@@ -1117,11 +1231,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.H + (val * 10.0) / 9.0 + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.H = res;
+                HSL.H = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
@@ -1148,11 +1258,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.L + val * max_hls + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.L = res;
+                HSL.L = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
@@ -1173,11 +1279,7 @@ CColorModifiers.prototype =
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
                 var res = (HSL.S + val * max_hls + 0.5) >> 0;
-                while(res > max_hls)
-                    res = res - max_hls;
-                while(res < 0)
-                    res += max_hls;
-                HSL.S = res;
+                HSL.S = Math.min(max_hls, Math.max(0, res));
 
                 this.HSL2RGB(HSL, RGBA);
             }
@@ -1628,7 +1730,7 @@ CSchemeColor.prototype =
         return duplicate;
     },
 
-    Calculate : function(theme, slide, layout, masterSlide, RGBA)
+    Calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if(theme.themeElements.clrScheme)
         {
@@ -1639,7 +1741,11 @@ CSchemeColor.prototype =
             else
             {
                 var clrMap;
-                if(slide!=null && slide.clrMap!=null)
+                if(colorMap && colorMap.color_map)
+                {
+                    clrMap = colorMap.color_map;
+                }
+                else if(slide!=null && slide.clrMap!=null)
                 {
                     clrMap = slide.clrMap.color_map;
                 }
@@ -1696,6 +1802,15 @@ CUniColor.prototype =
         }
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CUniColor();
+        _ret.color = new CRGBColor();
+        _ret.color.RGBA.R = this.RGBA.R;
+        _ret.color.RGBA.G = this.RGBA.G;
+        _ret.color.RGBA.B = this.RGBA.B;
+        return _ret;
+    },
 
     addColorMod: function(mod)
     {
@@ -1897,12 +2012,12 @@ CUniColor.prototype =
         return true;
     },
 
-    Calculate : function(theme, slide, layout, masterSlide, RGBA)
+    Calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if (this.color == null)
             return this.RGBA;
 
-        this.color.Calculate(theme, slide, layout, masterSlide, RGBA);
+        this.color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
 
         this.RGBA = {R:this.color.RGBA.R, G:this.color.RGBA.G, B: this.color.RGBA.B, A: this.color.RGBA.A};
         if(this.Mods)
@@ -2184,6 +2299,11 @@ CBlipFill.prototype =
         return this.Id;
     },
 
+    saveSourceFormatting: function()
+    {
+        return this.createDuplicate();
+    },
+
     Write_ToBinary: function(w)
     {
         writeString(w, this.RasterImageId);
@@ -2437,6 +2557,15 @@ CSolidFill.prototype =
         }
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CSolidFill();
+        if(this.color){
+            _ret.color = this.color.saveSourceFormatting();
+        }
+        return _ret;
+    },
+
     getObjectType: function()
     {
         return AscDFH.historyitem_type_SolidFill;
@@ -2557,6 +2686,16 @@ CGs.prototype =
     setPos: function(pos)
     {
         this.pos = pos;
+    },
+
+    saveSourceFormatting: function()
+    {
+        var _ret = new CGs();
+        _ret.pos = this.pos;
+        if(this.color){
+            _ret.color = this.color.saveSourceFormatting();
+        }
+        return _ret;
     },
 
     Write_ToBinary: function(w)
@@ -2781,6 +2920,21 @@ CGradFill.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
+    saveSourceFormatting: function()
+    {
+        var _ret = new CGradFill();
+        if(this.lin){
+            _ret.lin = this.lin.createDuplicate();
+        }
+        if(this.path){
+            _ret.path = this.path.createDuplicate();
+        }
+        for(var i = 0; i < this.colors.length; ++i){
+            _ret.colors.push(this.colors[i].saveSourceFormatting());
+        }
+        return _ret;
+    },
 
     check: function(theme, colorMap)
     {
@@ -3027,6 +3181,19 @@ CPattFill.prototype =
 
     },
 
+    saveSourceFormatting: function()
+    {
+        var _ret = new CPattFill();
+        if(this.fgClr){
+            _ret.fgClr = this.fgClr.saveSourceFormatting();
+        }
+        if(this.bgClr){
+            _ret.bgClr = this.bgClr.saveSourceFormatting();
+        }
+        _ret.ftype = this.ftype;
+        return _ret;
+    },
+
     convertToPPTXMods: function()
     {
         this.fgClr && this.fgClr.convertToPPTXMods();
@@ -3177,6 +3344,10 @@ CNoFill.prototype =
     },
 
 
+    saveSourceFormatting: function()
+    {
+        return this.createDuplicate();
+    },
 
     Write_ToBinary: function(w)
     {
@@ -3561,25 +3732,25 @@ CUniFill.prototype =
 
 
 
-    calculate : function(theme, slide, layout, masterSlide, RGBA)
+    calculate : function(theme, slide, layout, masterSlide, RGBA, colorMap)
     {
         if(this.fill )
         {
             if(this.fill.color)
             {
-                this.fill.color.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
             }
             if(this.fill.colors)
             {
                 for(var i  = 0; i <this.fill.colors.length; ++i )
                 {
-                    this.fill.colors[i].color.Calculate(theme, slide, layout, masterSlide, RGBA);
+                    this.fill.colors[i].color.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
                 }
             }
             if (this.fill.fgClr)
-                this.fill.fgClr.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.fgClr.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
             if (this.fill.bgClr)
-                this.fill.bgClr.Calculate(theme, slide, layout, masterSlide, RGBA);
+                this.fill.bgClr.Calculate(theme, slide, layout, masterSlide, RGBA, colorMap);
         }
     },
 
@@ -3631,6 +3802,23 @@ CUniFill.prototype =
         if(this.fill != null)
         {
             duplicate.fill = this.fill.createDuplicate();
+        }
+        duplicate.transparent = this.transparent;
+        return duplicate;
+    },
+
+    saveSourceFormatting: function()
+    {
+        var duplicate = new CUniFill();
+        if(this.fill)
+        {
+            if(this.fill.saveSourceFormatting){
+                duplicate.fill = this.fill.saveSourceFormatting();
+            }
+            else{
+                duplicate.fill = this.fill.createDuplicate();
+            }
+
         }
         duplicate.transparent = this.transparent;
         return duplicate;
@@ -3978,7 +4166,10 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.bFromChart = false;
     }
-
+    if(!shapeProp1.bFromImage || !shapeProp2.bFromImage)
+    {
+        _result_shape_prop.bFromImage = false;
+    }
     if(shapeProp1.locked || shapeProp2.locked)
     {
         _result_shape_prop.locked = true;
@@ -4113,8 +4304,10 @@ EndArrow.prototype =
             {
                 case LineEndSize.Large:
                     _ret = 5 * size;
+                    break;
                 case LineEndSize.Small:
                     _ret = 2 * size;
+                    break;
                 default:
                     break;
             }
@@ -4124,14 +4317,16 @@ EndArrow.prototype =
     GetLen: function(size, _max)
     {
         var _ret = 3 * size;
-        if (null != this.w)
+        if (null != this.len)
         {
-            switch (this.w)
+            switch (this.len)
             {
                 case LineEndSize.Large:
                     _ret = 5 * size;
+                    break;
                 case LineEndSize.Small:
                     _ret = 2 * size;
+                    break;
                 default:
                     break;
             }
@@ -4384,21 +4579,27 @@ CLn.prototype =
         }
     },
 
-    calculate: function(theme, slide, layout, master, RGBA)
+    calculate: function(theme, slide, layout, master, RGBA, colorMap)
     {
         if(isRealObject(this.Fill))
         {
-            this.Fill.calculate(theme, slide, layout, master, RGBA);
+            this.Fill.calculate(theme, slide, layout, master, RGBA, colorMap);
         }
     },
 
-    createDuplicate:  function()
+    createDuplicate:  function(bSaveFormatting)
     {
         var duplicate = new CLn();
 
         if (null != this.Fill)
         {
-            duplicate.Fill = this.Fill.createDuplicate();
+            if(bSaveFormatting === true){
+                duplicate.Fill = this.Fill.saveSourceFormatting();
+            }
+            else{
+                duplicate.Fill = this.Fill.createDuplicate();
+            }
+
         }
 
         duplicate.prstDash = this.prstDash;
@@ -4628,6 +4829,9 @@ function CNvPr()
     this.descr = null;
     this.title = null;
 
+    this.hlinkClick = null;
+    this.hlinkHover = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
 }
@@ -4656,6 +4860,12 @@ CNvPr.prototype =
         duplicate.setIsHidden(this.isHidden);
         duplicate.setDescr(this.descr);
         duplicate.setTitle(this.title);
+        if(this.hlinkClick){
+            duplicate.setHlinkClick(this.hlinkClick.createDuplicate());
+        }
+        if(this.hlinkHover){
+            duplicate.setHlinkClick(this.hlinkHover.createDuplicate());
+        }
         return duplicate;
     },
 
@@ -4681,6 +4891,18 @@ CNvPr.prototype =
     {
         History.Add(new CChangesDrawingsString(this, AscDFH.historyitem_CNvPr_SetDescr , this.descr,  descr));
         this.descr = descr;
+    },
+
+    setHlinkClick: function(pr)
+    {
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_CNvPr_SetHlinkClick, this.hlinkClick, pr));
+        this.hlinkClick = pr;
+    },
+
+    setHlinkHover: function(pr)
+    {
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_CNvPr_SetHlinkHover, this.hlinkHover, pr));
+        this.hlinkHover = pr;
     },
 
     setTitle: function(title)
@@ -8985,12 +9207,21 @@ TextListStyle.prototype =
 
     Document_Get_AllFontNames: function(AllFonts){
         for(var i = 0; i < 10; ++i){
-            if(this.levels[i] && this.levels[i].DefaultRunPr){
-                this.levels[i].DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+            if(this.levels[i]){
+                if(this.levels[i].DefaultRunPr){
+                    this.levels[i].DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+                }
+                if(this.levels[i].Bullet){
+                    this.levels[i].Bullet.Get_AllFontNames(AllFonts);
+                }
             }
         }
     }
 };
+
+
+
+
 
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation, opt_fontName)
@@ -9796,6 +10027,7 @@ function CreateAscShapePropFromProp(shapeProp)
         obj.canFill = shapeProp.canFill;
     }
     obj.bFromChart = shapeProp.bFromChart;
+    obj.bFromImage = shapeProp.bFromImage;
     obj.w = shapeProp.w;
     obj.h = shapeProp.h;
     obj.vert = shapeProp.vert;
@@ -9970,11 +10202,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
 
     /* Common Functions For Builder*/
-    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
+    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord, worksheet){
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
         oShapeTrack.track({}, nWidth, nHeight);
         var oShape = oShapeTrack.getShape(bWord === true, oDrawingDocument, null);
         oShape.setParent(oParent);
+        if(worksheet){
+            oShape.setWorksheet(worksheet);
+        }
         if(bWord){
             oShape.createTextBoxContent();
         }
@@ -10814,6 +11049,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
     window['AscFormat'].CNvUniSpPr = CNvUniSpPr;
     window['AscFormat'].UniMedia = UniMedia;
+    window['AscFormat'].CT_Hyperlink = CT_Hyperlink;
 
 
     window['AscFormat'].builder_CreateShape = builder_CreateShape;

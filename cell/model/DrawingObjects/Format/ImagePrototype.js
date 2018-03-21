@@ -77,6 +77,10 @@ CImageShape.prototype.setRecalculateInfo = function()
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 
+    CImageShape.prototype.checkNeedRecalculate = function(){
+        return this.recalcInfo.recalculateTransform === true;
+    };
+
 CImageShape.prototype.recalcBrush = function()
 {
     this.recalcInfo.recalculateBrush = true;
@@ -145,11 +149,6 @@ CImageShape.prototype.handleUpdateFlip = function()
 CImageShape.prototype.handleUpdateFill = function()
 {
     this.recalcBrush();
-    this.addToRecalculate();
-};
-CImageShape.prototype.handleUpdateLn = function()
-{
-    this.recalcLine();
     this.addToRecalculate();
 };
 CImageShape.prototype.handleUpdateGeometry = function()

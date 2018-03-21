@@ -124,18 +124,17 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
 	window['AscCH'].historyitem_Comment_Change = 3;
+	window['AscCH'].historyitem_Comment_Coords = 4;
 
 	window['AscCH'].historyitem_AutoFilter_Add		= 1;
 	window['AscCH'].historyitem_AutoFilter_Sort		= 2;
 	window['AscCH'].historyitem_AutoFilter_Empty	= 3;
-	window['AscCH'].historyitem_AutoFilter_ApplyDF	= 4;
-	window['AscCH'].historyitem_AutoFilter_ApplyMF	= 5;
+	window['AscCH'].historyitem_AutoFilter_Apply	= 5;
 	window['AscCH'].historyitem_AutoFilter_Move     = 6;
 	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter  = 7;
 	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableStyle = 9;
 	window['AscCH'].historyitem_AutoFilter_Change = 10;
-	window['AscCH'].historyitem_AutoFilter_CleanFormat  = 11;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableRef = 13;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
@@ -738,6 +737,18 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		curPoint.UndoSheetId = sheetid;
 	if(1 == curPoint.Items.length)
 		this._sendCanUndoRedo();
+
+	if (Class)
+	{
+		if (Class.IsContentChange && Class.IsContentChange()) {
+			var bAdd = Class.IsAdd();
+			var Count = Class.GetItemsCount();
+
+			var ContentChanges = new AscCommon.CContentChangesElement(bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove, Class.Pos, Count, Class);
+			Class.Class.Add_ContentChanges(ContentChanges);
+			AscCommon.CollaborativeEditing.Add_NewDC(Class.Class);
+		}
+	}
 };
 
 CHistory.prototype._sendCanUndoRedo = function()

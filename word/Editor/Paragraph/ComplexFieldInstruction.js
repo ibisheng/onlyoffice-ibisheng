@@ -51,6 +51,22 @@ var fieldtype_ASK        = 0x0007;
 var fieldtype_REF        = 0x0008;
 var fieldtype_HYPERLINK  = 0x0009;
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+
+window['AscCommonWord'].fieldtype_UNKNOWN    = fieldtype_UNKNOWN;
+window['AscCommonWord'].fieldtype_MERGEFIELD = fieldtype_MERGEFIELD;
+window['AscCommonWord'].fieldtype_PAGENUM    = fieldtype_PAGENUM;
+window['AscCommonWord'].fieldtype_PAGECOUNT  = fieldtype_PAGECOUNT;
+window['AscCommonWord'].fieldtype_FORMTEXT   = fieldtype_FORMTEXT;
+window['AscCommonWord'].fieldtype_TOC        = fieldtype_TOC;
+window['AscCommonWord'].fieldtype_PAGEREF    = fieldtype_PAGEREF;
+window['AscCommonWord'].fieldtype_PAGE       = fieldtype_PAGE;
+window['AscCommonWord'].fieldtype_NUMPAGES   = fieldtype_NUMPAGES;
+window['AscCommonWord'].fieldtype_ASK        = fieldtype_ASK;
+window['AscCommonWord'].fieldtype_REF        = fieldtype_REF;
+window['AscCommonWord'].fieldtype_HYPERLINK  = fieldtype_HYPERLINK;
+
 /**
  * Базовый класс для инструкции сложного поля.
  * @constructor
@@ -75,6 +91,9 @@ CFieldInstructionBase.prototype.GetComplexField = function()
 CFieldInstructionBase.prototype.ToString = function()
 {
 	return "";
+};
+CFieldInstructionBase.prototype.SetPr = function()
+{
 };
 
 /**
@@ -145,6 +164,7 @@ function CFieldInstructionTOC()
 	this.SkipPageRef      = false;
 	this.SkipPageRefStart = -1;
 	this.SkipPageRefEnd   = -1;
+	this.ForceTabLeader   = undefined;
 }
 
 CFieldInstructionTOC.prototype = Object.create(CFieldInstructionBase.prototype);
@@ -201,17 +221,12 @@ CFieldInstructionTOC.prototype.SetStylesArrayRaw = function(sString)
 	var arrValues = sString.split(";");
 	var arrStyles = [];
 
-	for (var nIndex = 0, nCount = arrValues.length; nIndex < nCount; ++nIndex)
+	for (var nIndex = 0, nCount = arrValues.length; nIndex < nCount - 1; nIndex += 2)
 	{
-		var sValue = arrValues[nIndex];
-		var nPos = sValue.lastIndexOf(',');
-		if (nPos <= 0)
-			continue;
-
-		var sName = sValue.substr(0, nPos);
-		var nLvl  = parseInt(sValue.substr(nPos + 1));
+		var sName = arrValues[nIndex];
+		var nLvl  = parseInt(arrValues[nIndex + 1]);
 		if (isNaN(nLvl))
-			continue;
+			break;
 
 		arrStyles.push({
 			Name : sName,
@@ -250,6 +265,9 @@ CFieldInstructionTOC.prototype.SetPageRefSkippedLvls = function(isSkip, nSkipSta
 };
 CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 {
+	if (undefined === nLvl)
+		return this.SkipPageRef;
+
 	if (false === this.SkipPageRef)
 		return false;
 
@@ -257,6 +275,80 @@ CFieldInstructionTOC.prototype.IsSkipPageRefLvl = function(nLvl)
 		return true;
 
 	return  (nLvl >= this.SkipPageRefStart - 1 && nLvl <= this.SkipPageRefEnd - 1);
+};
+CFieldInstructionTOC.prototype.SetPr = function(oPr)
+{
+	if (!(oPr instanceof Asc.CTableOfContentsPr))
+		return;
+
+	this.SetStylesArray(oPr.get_Styles());
+	this.SetHeadingRange(oPr.get_OutlineStart(), oPr.get_OutlineEnd());
+	this.SetHyperlinks(oPr.get_Hyperlink());
+
+	if (oPr.PageNumbers)
+		this.SetPageRefSkippedLvls(false);
+	else
+		this.SetPageRefSkippedLvls(true);
+
+	if (oPr.RightTab)
+		this.SetSeparator("");
+	else
+		this.SetSeparator(" ");
+
+	this.ForceTabLeader = oPr.TabLeader;
+};
+CFieldInstructionTOC.prototype.GetForceTabLeader = function()
+{
+	var nTabLeader = this.ForceTabLeader;
+	this.ForceTabLeader = undefined;
+	return nTabLeader;
+};
+CFieldInstructionTOC.prototype.ToString = function()
+{
+	var sInstr = "TOC ";
+
+	if (this.HeadingS >= 1
+		&& this.HeadingS <= 9
+		&& this.HeadingE >= this.HeadingS
+		&& this.HeadingE <= 9)
+		sInstr +=  "\\o " + "\"" + this.HeadingS + "-" + this.HeadingE + "\" ";
+
+	if (this.SkipPageRef)
+	{
+		sInstr += "\\n ";
+
+		if (this.SkipPageRefStart >= 1
+			&& this.SkipPageRefStart <= 9
+			&& this.SkipPageRefEnd >= this.SkipPageRefStart
+			&& this.SkipPageRefEnd <= 9)
+			sInstr +=  "\"" + this.SkipPageRefStart + "-" + this.SkipPageRefEnd + "\" ";
+	}
+
+	if (this.Hyperlinks)
+		sInstr += "\\h ";
+
+	if (!this.RemoveBreaks)
+		sInstr += "\\x ";
+
+	if (this.PreserveTabs)
+		sInstr += "\\w ";
+
+	if (this.Separator)
+		sInstr += "\\p \"" + this.Separator + "\"";
+
+	if (this.Styles.length > 0)
+	{
+		sInstr += "\\t \"";
+
+		for (var nIndex = 0, nCount = this.Styles.length; nIndex < nCount; ++nIndex)
+		{
+			sInstr += this.Styles[nIndex].Name + ";" + this.Styles[nIndex].Lvl + ";";
+		}
+
+		sInstr += "\" ";
+	}
+
+	return sInstr;
 };
 
 /**

@@ -2738,7 +2738,7 @@ function CDrawingDocument(drawingObjects)
 
             if (!this.TableOutlineDr.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableOutlineDr.TableMatrix))
             {
-                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection())) + 0.5;
+                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection())) + 0.5;
                 var _y = parseInt(drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) + 0.5;
 
                 var _r = _x + parseInt(dKoefX * this.TableOutlineDr.TableOutline.W);
@@ -2812,7 +2812,7 @@ function CDrawingDocument(drawingObjects)
             }
             else
             {
-                var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+                var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
                 var _y = this.TableOutlineDr.CurPos.Y;
                 var _r = _x + this.TableOutlineDr.TableOutline.W;
                 var _b = _y + this.TableOutlineDr.TableOutline.H;
@@ -3522,6 +3522,7 @@ function CDrawingDocument(drawingObjects)
         {
             dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
 
@@ -4097,19 +4098,9 @@ function CDrawingDocument(drawingObjects)
             _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
             _textPr.Position   = this.GuiLastTextProps.Position;
 
-            var parRun = new ParaRun(par); var Pos = 0;
+            var parRun = new ParaRun(par);
             parRun.Set_Pr(_textPr);
-            parRun.Add_ToContent(Pos++,new ParaText("H"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("e"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
-            parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+            parRun.AddText("Hello World");
             par.Add_ToContent(0, parRun);
 
             par.Recalculate_Page(0);

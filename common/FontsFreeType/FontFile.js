@@ -34,39 +34,24 @@
 
 (function (window, undefined)
 {
+    var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
+    var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
+    var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
 
-// Import
-	var AscBrowser = AscCommon.AscBrowser;
+    var raster_memory = AscFonts.raster_memory;
 
-	var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
-	var FT_Matrix = AscFonts.FT_Matrix;
-	var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
-	var FT_Set_Transform = AscFonts.FT_Set_Transform;
-	var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
-	var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
-	var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
-	var FT_Load_Glyph = AscFonts.FT_Load_Glyph;
-	var FT_Get_Glyph = AscFonts.FT_Get_Glyph;
-	var FT_BBox = AscFonts.FT_BBox;
-	var FT_Glyph_Get_CBox = AscFonts.FT_Glyph_Get_CBox;
-	var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
-	var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
-	var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
-	var raster_memory = AscFonts.raster_memory;
-	var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
-
-	var FONT_ITALIC_ANGLE = 0.3090169943749;
+	var FONT_ITALIC_ANGLE 	= 0.3090169943749;
 	var FT_ENCODING_UNICODE = 1970170211;
-	var FT_ENCODING_NONE = 0;
-	var FT_ENCODING_MS_SYMBOL = 1937337698;
+	var FT_ENCODING_NONE 	= 0;
+	var FT_ENCODING_MS_SYMBOL 	= 1937337698;
 	var FT_ENCODING_APPLE_ROMAN = 1634889070;
-	var REND_MODE = 0;
+	var REND_MODE 			= 0;
 
 	var EGlyphState =
 	{
-		glyphstateNormal: 0,  // символ отрисовался в нужном шрифте
-		glyphstateDeafault: 1,  // символ отрисовался в дефолтовом шрифте
-		glyphstateMiss: 2   // символ не отрисовался
+		glyphstateNormal : 0,	// символ отрисовался в нужном шрифте
+		glyphstateDefault : 1, // символ отрисовался в дефолтовом шрифте
+		glyphstateMiss : 2  	// символ не отрисовался
 	};
 
 	function get_raster_bounds(data, width, height, stride)
@@ -184,6 +169,111 @@
 
 	CGlyphData.prototype =
 	{
+		// not used (old devices)
+		checkColorAppleDevices : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            // full repaint
+            this.TempImage = document.createElement("canvas");
+            this.TempImage.width = w;
+            this.TempImage.height = h;
+            var ctxD = this.TempImage.getContext("2d");
+            var pixDst = null;
+
+            if (this.m_oCanvas != null)
+            {
+                pixDst = this.m_oContext.getImageData(0, 0, w, h);
+                var dataPx = pixDst.data;
+
+                var cur = 0;
+                var cnt = w * h;
+                for (var i = 0; i < cnt; i++)
+                {
+                    dataPx[cur++] = r;
+                    dataPx[cur++] = g;
+                    dataPx[cur++] = b;
+                    cur++;
+                }
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+
+                pixDst = _raster.Chunk.CanvasCtx.getImageData(_x, _y, w, h);
+                var dataPx = pixDst.data;
+
+                var cur = 0;
+                var cnt = w * h;
+                for (var i = 0; i < cnt; i++)
+                {
+                    dataPx[cur++] = r;
+                    dataPx[cur++] = g;
+                    dataPx[cur++] = b;
+                    cur++;
+                }
+            }
+
+            ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
+		},
+
+		checkColorMozillaLinux : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            if (this.m_oCanvas != null)
+            {
+                this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                this.m_oContext.fillRect(0, 0, w, h);
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                _raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+                this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+            }
+		},
+
+		checkColorNormal : function(r, g, b, w, h)
+		{
+            if ((r == this.R) && (g == this.G) && (b == this.B))
+                return;
+
+            this.R = r;
+            this.G = g;
+            this.B = b;
+
+            if (this.m_oCanvas != null)
+            {
+                this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                this.m_oContext.fillRect(0, 0, w, h);
+            }
+            else
+            {
+                var _raster = this.RasterData;
+                _raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
+                var _x = _raster.Line.Height * _raster.Index;
+                var _y = _raster.Line.Y;
+                this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
+            }
+		},
+
+		checkColor : undefined,
+
 		init: function (width, height)
 		{
 			if (width == 0 || height == 0)
@@ -196,104 +286,12 @@
 
 			this.m_oContext = this.m_oCanvas.getContext('2d');
 			this.m_oContext.globalCompositeOperation = "source-in";
-		},
-		checkColor: function (r, g, b, w, h)
-		{
-			if ((r == this.R) && (g == this.G) && (b == this.B))
-				return;
-
-			if (/*!AscBrowser.isAppleDevices*/true)
-			{
-				this.R = r;
-				this.G = g;
-				this.B = b;
-
-				if (this.m_oCanvas != null)
-				{
-					if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-					{
-						this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						this.m_oContext.fillRect(0, 0, w, h);
-					}
-					else
-					{
-						this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						this.m_oContext.fillRect(0, 0, w, h);
-					}
-				}
-				else
-				{
-					if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-					{
-						var _raster = this.RasterData;
-						_raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						var _x = _raster.Line.Height * _raster.Index;
-						var _y = _raster.Line.Y;
-						this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-					}
-					else
-					{
-						var _raster = this.RasterData;
-						_raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-						var _x = _raster.Line.Height * _raster.Index;
-						var _y = _raster.Line.Y;
-						this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-					}
-				}
-			}
-			else
-			{
-				var _r = r;
-				var _g = g;
-				var _b = b;
-
-				this.TempImage = document.createElement("canvas");
-				this.TempImage.width = w;
-				this.TempImage.height = h;
-				var ctxD = this.TempImage.getContext("2d");
-				var pixDst = null;
-
-				if (this.m_oCanvas != null)
-				{
-					pixDst = this.m_oContext.getImageData(0, 0, w, h);
-					var dataPx = pixDst.data;
-
-					var cur = 0;
-					var cnt = w * h;
-					for (var i = 0; i < cnt; i++)
-					{
-						dataPx[cur++] = _r;
-						dataPx[cur++] = _g;
-						dataPx[cur++] = _b;
-						cur++;
-					}
-				}
-				else
-				{
-					var _raster = this.RasterData;
-					var _x = _raster.Line.Height * _raster.Index;
-					var _y = _raster.Line.Y;
-
-					pixDst = _raster.Chunk.CanvasCtx.getImageData(_x, _y, w, h);
-					var dataPx = pixDst.data;
-
-					var cur = 0;
-					var cnt = w * h;
-					for (var i = 0; i < cnt; i++)
-					{
-						dataPx[cur++] = _r;
-						dataPx[cur++] = _g;
-						dataPx[cur++] = _b;
-						cur++;
-					}
-				}
-
-				ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
-			}
 		}
 	};
 
-	function TGlyphBitmap()
+    CGlyphData.prototype.checkColor = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.isLinuxOS) ? CGlyphData.prototype.checkColorMozillaLinux : CGlyphData.prototype.checkColorNormal;
+
+	function CGlyphBitmap()
 	{
 		this.nX = 0;            // Сдвиг по X начальной точки для рисования символа
 		this.nY = 0;            // Сдвиг по Y начальной точки для рисования символа
@@ -303,7 +301,7 @@
 		this.oGlyphData = new CGlyphData();
 	}
 
-	TGlyphBitmap.prototype =
+	CGlyphBitmap.prototype =
 	{
 		fromAlphaMask: function (font_manager)
 		{
@@ -344,7 +342,7 @@
 				{
 					for (var i = 0; i < this.nWidth; i++)
 					{
-						dst[nIndexDst] = Math.min(parseInt(dst[nIndexDst] * gamma), 255);
+						dst[nIndexDst] = Math.min((dst[nIndexDst] * gamma) >> 0, 255);
 						nIndexDst += 4;
 					}
 					nIndexDst += nPitch;
@@ -478,7 +476,7 @@
 		}
 	};
 
-	function TBBox()
+	function CBBox()
 	{
 		this.fMinX = 0;
 		this.fMaxX = 0;
@@ -488,7 +486,7 @@
 		this.rasterDistances = null;
 	}
 
-	function TMetrics()
+	function CMetrics()
 	{
 		this.fWidth = 0;
 		this.fHeight = 0;
@@ -502,7 +500,7 @@
 		this.fVertAdvance = 0;
 	}
 
-	function TFontCacheSizes()
+	function CFontCacheSizes()
 	{
 		this.ushUnicode; // Значение символа в юникоде
 		this.eState;     // Есть ли символ в шрифте/стандартном шрифте
@@ -512,8 +510,8 @@
 
 		this.fAdvanceX;
 
-		this.oBBox = new TBBox();
-		this.oMetrics = new TMetrics();
+		this.oBBox = new CBBox();
+		this.oMetrics = new CMetrics();
 
 		this.bBitmap = false;
 		this.oBitmap = null;
@@ -635,10 +633,14 @@
 		}
 	};
 
-	function CFontFile(fileName, faceIndex)
+    function CFontFile(fileName, faceIndex)
 	{
-		this.m_arrdFontMatrix = new Array(6);
-		this.m_arrdTextMatrix = new Array(6);
+        this.m_sFileName = fileName;
+        this.m_lFaceIndex = faceIndex;
+
+		this.m_arrdFontMatrix = ("undefined" == typeof Float64Array) ? new Array(6) : new Float64Array(6);
+		this.m_arrdTextMatrix = ("undefined" == typeof Float64Array) ? new Array(6) : new Float64Array(6);
+
 		this.m_bAntiAliasing = true;
 		this.m_bUseKerning = false;
 
@@ -651,13 +653,8 @@
 
 		this.m_fCharSpacing = 0.0;
 
-		this.m_nMinX = 0;        //
-		this.m_nMinY = 0;        // Glyph BBox
-		this.m_nMaxX = 0;        //
-		this.m_nMaxY = 0;        //
+		this.m_oBox = new AscFonts.CGlyphBounds(); // Glyph box
 
-		this.m_sFileName = fileName;
-		this.m_lFaceIndex = faceIndex;
 		this.m_nError = 0;
 		this.m_pFace = null;
 
@@ -668,8 +665,7 @@
 
 		this.m_bStringGID = false;
 
-		this.m_oFontMatrix = new FT_Matrix();
-		this.m_oTextMatrix = new FT_Matrix();
+        this.m_oTransform = new AscFonts.FT_Matrix();
 
 		this.m_nNum_charmaps = 0;
 
@@ -681,39 +677,34 @@
 		this.m_arrCacheSizes = [];
 		this.m_arrCacheSizesGid = [];
 
-		this.m_bUseDefaultFont = false;
-		this.m_pDefaultFont = null;
-
-		this.m_bIsNeedUpdateMatrix12 = true;
 		this.m_oFontManager = null;
 		this.HintsSupport = true;
 		this.HintsSubpixelSupport = true;
 
-		this.SetDefaultFont = function (pDefFont)
-		{
-			this.m_pDefaultFont = pDefFont;
-		}
+        this.m_bIsTransform = true; // !IsIdentity matrix transform
+
+		this.Picker = new CFontLoaderBySymbol();
 
 		this.FT_Load_Glyph_Wrapper = function(pFace, unGID, _LOAD_MODE)
 		{
-			var err = FT_Load_Glyph(pFace, unGID, _LOAD_MODE);
+			var err = AscFonts.FT_Load_Glyph(pFace, unGID, _LOAD_MODE);
 			if (0 != err && this.HintsSupport)
 			{
-				var err2 = FT_Load_Glyph(pFace, unGID, 40970);
+				var err2 = AscFonts.FT_Load_Glyph(pFace, unGID, 40970);
 				if (err2 != 0)
 					return err;
 				this.HintsSupport = false;
 				return err2;
 			}
 			return err;
-		}
+		};
 
-		this.LoadDefaultCharAndSymbolicCmapIndex = function ()
+		this.LoadDefaultCharAndSymbolicCmapIndex = function()
 		{
 			this.m_nDefaultChar = -1;
 			this.m_nSymbolic = -1;
 
-			var pTable = FT_Get_Sfnt_Table(this.m_pFace, 2);
+			var pTable = AscFonts.FT_Get_Sfnt_Table(this.m_pFace, 2);
 			if (null == pTable)
 				return;
 
@@ -731,7 +722,7 @@
 			var charMapArray = this.m_pFace.charmaps;
 			for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
 			{
-				var pCharMap = __FT_CharmapRec(charMapArray[nIndex]);
+				var pCharMap = AscFonts.__FT_CharmapRec(charMapArray[nIndex]);
 
 				var nPlatformId = pCharMap.platform_id;
 				var nEncodingId = pCharMap.encoding_id;
@@ -742,13 +733,10 @@
 					return;
 				}
 			}
-		}
+		};
 
-		this.ResetFontMatrix = function ()
+		this.ResetFontMatrix = function()
 		{
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.ResetFontMatrix();
-
 			var m = this.m_arrdFontMatrix;
 			if (this.m_bNeedDoItalic)
 			{
@@ -769,10 +757,10 @@
 				m[5] = 0;
 			}
 
-			this.UpdateMatrix0();
-		}
+			this.UpdateMatrix();
+		};
 
-		this.ResetTextMatrix = function ()
+		this.ResetTextMatrix = function()
 		{
 			var m = this.m_arrdTextMatrix;
 			m[0] = 1;
@@ -783,188 +771,118 @@
 			m[5] = 0;
 
 			this.CheckTextMatrix();
-		}
+		};
 
-		this.CheckTextMatrix = function ()
+		this.CheckTextMatrix = function()
 		{
-			this.m_bIsNeedUpdateMatrix12 = true;
+			this.m_bIsTransform = true;
 			var m = this.m_arrdTextMatrix;
 			if ((m[0] == 1) && (m[1] == 0) && (m[2] == 0) && (m[3] == 1))
 			{
-				this.m_bIsNeedUpdateMatrix12 = false;
-
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+				this.m_bIsTransform = false;
+				this.UpdateMatrix();
 			}
-		}
+		};
 
-		this.UpdateMatrix0 = function ()
+		this.CheckBBox = function()
 		{
-			var dSize = this.m_fSize;
+            if (this.m_lUnits_Per_Em == 0)
+                this.m_lUnits_Per_Em = this.m_pFace.units_per_EM = 2048;
 
-			var m1 = this.m_arrdTextMatrix[2];
-			var m2 = this.m_arrdTextMatrix[3];
-			this.m_dTextScale = Math.sqrt(m1 * m1 + m2 * m2);
+            this.m_dTextScale = 1;
+            //this.m_dTextScale = Math.sqrt(this.m_arrdTextMatrix[2] * this.m_arrdTextMatrix[2] + this.m_arrdTextMatrix[3] * this.m_arrdTextMatrix[3]);
 
-			var bbox = this.m_pFace.bbox;
-			var xMin = bbox.xMin;
-			var yMin = bbox.yMin;
-			var xMax = bbox.xMax;
-			var yMax = bbox.yMax;
+            var bbox = this.m_pFace.bbox;
+            var xMin = bbox.xMin;
+            var yMin = bbox.yMin;
+            var xMax = bbox.xMax;
+            var yMax = bbox.yMax;
 
-			if (this.m_lUnits_Per_Em == 0)
-				this.m_lUnits_Per_Em = this.m_pFace.units_per_EM = 2048;
+            var dDiv = xMax > 20000 ? 65536 : 1;
+            var dScale = this.fSize / (dDiv * this.m_lUnits_Per_Em);
 
-			var units_per_EM = this.m_lUnits_Per_Em;
-			var dDiv = xMax > 20000 ? 65536 : 1;
-			var del = dDiv * units_per_EM;
+            var m = this.m_arrdFontMatrix;
+            this.m_oBox.checkPoint(((m[0] * xMin + m[2] * yMin) * dScale) >> 0, ((m[1] * xMin + m[3] * yMin) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMin + m[2] * yMax) * dScale) >> 0, ((m[1] * xMin + m[3] * yMax) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMax + m[2] * yMin) * dScale) >> 0, ((m[1] * xMax + m[3] * yMin) * dScale) >> 0);
+            this.m_oBox.checkPoint(((m[0] * xMax + m[2] * yMax) * dScale) >> 0, ((m[1] * xMax + m[3] * yMax) * dScale) >> 0);
 
-			var m = this.m_arrdFontMatrix;
-
-			var nX = parseInt(((m[0] * xMin + m[2] * yMin) * dSize / del));
-			this.m_nMinX = this.m_nMaxX = nX;
-
-			var nY = parseInt(((m[1] * xMin + m[3] * yMin) * dSize / del));
-			this.m_nMinY = this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMin + m[2] * yMax) * dSize / del));
-
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMin + m[3] * yMax) * dSize / del));
-
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMax + m[2] * yMin) * dSize / del));
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMax + m[3] * yMin) * dSize / del));
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			nX = parseInt(((m[0] * xMax + m[2] * yMax) * dSize / del));
-			if (nX < this.m_nMinX)
-				this.m_nMinX = nX;
-			else if (nX > this.m_nMaxX)
-				this.m_nMaxX = nX;
-
-			nY = parseInt(((m[1] * xMax + m[3] * yMax) * dSize / del));
-			if (nY < this.m_nMinY)
-				this.m_nMinY = nY;
-			else if (nY > this.m_nMaxY)
-				this.m_nMaxY = nY;
-
-			// This is a kludge: some buggy PDF generators embed fonts with  zero bounding boxes.
-			if (this.m_nMaxX == this.m_nMinX)
+            // This is a kludge: some buggy PDF generators embed fonts with  zero bounding boxes.
+            if (this.m_oBox.fLeft == this.m_oBox.fRight)
 			{
-				this.m_nMinX = 0;
-				this.m_nMaxX = parseInt(dSize);
+				this.m_oBox.fLeft = 0;
+				this.m_oBox.fRight = this.m_fSize >> 0;
 			}
+            if (this.m_oBox.fTop == this.m_oBox.fBottom)
+            {
+                this.m_oBox.fTop = 0;
+                this.m_oBox.fBottom = (1.2 * this.m_fSize) >> 0;
+            }
+		};
 
-			if (this.m_nMaxY == this.m_nMinY)
-			{
-				this.m_nMinY = 0;
-				this.m_nMaxY = parseInt((1.2 * dSize));
-			}
-
-			// Вычислим матрицу преобразования (FontMatrix)
-			var fm = this.m_oFontMatrix;
-			fm.xx = Math.floor((m[0] * 65536));
-			fm.yx = Math.floor((m[1] * 65536));
-			fm.xy = Math.floor((m[2] * 65536));
-			fm.yy = Math.floor((m[3] * 65536));
-
-			var tm = this.m_oTextMatrix;
-			tm.xx = Math.floor(((this.m_arrdTextMatrix[0] / this.m_dTextScale) * 65536));
-			tm.yx = Math.floor(((this.m_arrdTextMatrix[1] / this.m_dTextScale) * 65536));
-			tm.xy = Math.floor(((this.m_arrdTextMatrix[2] / this.m_dTextScale) * 65536));
-			tm.yy = Math.floor(((this.m_arrdTextMatrix[3] / this.m_dTextScale) * 65536));
-
-			FT_Set_Transform(this.m_pFace, fm, 0);
-		}
-
-		this.UpdateMatrix1 = function ()
-		{
-			var m = this.m_arrdFontMatrix;
-			var fm = this.m_oFontMatrix;
-			fm.xx = Math.floor((m[0] * 65536));
-			fm.yx = Math.floor((m[1] * 65536));
-			fm.xy = Math.floor((m[2] * 65536));
-			fm.yy = Math.floor((m[3] * 65536));
-
-			FT_Set_Transform(this.m_pFace, this.m_oFontMatrix, 0);
-		}
-
-		this.UpdateMatrix2 = function ()
+		this.UpdateMatrix = function()
 		{
 			var m = this.m_arrdFontMatrix;
 			var t = this.m_arrdTextMatrix;
-			var fm = this.m_oFontMatrix;
+			var fm = this.m_oTransform;
 
-			fm.xx = parseInt((m[0] * t[0] + m[1] * t[2] ) * 65536);
-			fm.yx = parseInt((m[0] * t[1] + m[1] * t[3] ) * 65536);
-			fm.xy = parseInt((m[2] * t[0] + m[3] * t[2] ) * 65536);
-			fm.yy = parseInt((m[2] * t[1] + m[3] * t[3] ) * 65536);
+			fm.xx = ((m[0] * t[0] + m[1] * t[2]) * 65536) >> 0;
+			fm.yx = ((m[0] * t[1] + m[1] * t[3]) * 65536) >> 0;
+			fm.xy = ((m[2] * t[0] + m[3] * t[2]) * 65536) >> 0;
+			fm.yy = ((m[2] * t[1] + m[3] * t[3]) * 65536) >> 0;
 
-			FT_Set_Transform(this.m_pFace, fm, 0);
-		}
+			AscFonts.FT_Set_Transform(this.m_pFace, fm, 0);
+		};
 
-		this.SetSizeAndDpi = function (fSize, _unHorDpi, _unVerDpi)
+		this.SetSizeAndDpi = function (dSize, unHorDpi, unVerDpi)
 		{
-			var unHorDpi = parseInt(_unHorDpi + 0.5);
-			var unVerDpi = parseInt(_unVerDpi + 0.5);
+			var dpiX = (unHorDpi + 0.5) >> 0;
+			var dpiY = (unVerDpi + 0.5) >> 0;
 
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetSizeAndDpi(fSize, unHorDpi, unVerDpi);
+			var dOldSize = this.m_fSize;
+			var dNewSize = dSize;
+			var dKoef = dNewSize / dOldSize;
+			var isResize = (dKoef > 1.001 || dKoef < 0.999) ? true : false;
 
-			var fOldSize = this.m_fSize;
-			var fNewSize = fSize;
-			var fKoef = fNewSize / fOldSize;
-
-			if (fKoef > 1.001 || fKoef < 0.999 || unHorDpi != this.m_unHorDpi || unVerDpi != this.m_unVerDpi)
+			if (isResize || dpiX != this.m_unHorDpi || dpiY != this.m_unVerDpi)
 			{
-				this.m_unHorDpi = unHorDpi;
-				this.m_unVerDpi = unVerDpi;
+				this.m_unHorDpi = dpiX;
+				this.m_unVerDpi = dpiY;
 
-				if (fKoef > 1.001 || fKoef < 0.999)
+				if (isResize)
 				{
-					this.m_fSize = fNewSize;
-					this.UpdateMatrix0();
+					this.m_fSize = dNewSize;
+					this.UpdateMatrix();
+					this.CheckBBox();
 				}
 
 				this.m_dUnitsKoef = this.m_unHorDpi / 72.0 * this.m_fSize;
 
 				// Выставляем размер шрифта (dSize) и DPI
-				this.m_nError = FT_Set_Char_Size(this.m_pFace, 0, parseInt(fNewSize * 64), unHorDpi, unVerDpi);
-
+				this.m_nError = AscFonts.FT_Set_Char_Size(this.m_pFace, 0, (dNewSize * 64) >> 0, dpiX, dpiY);
 				this.ClearCache();
 			}
-		}
+		};
 
-		this.ClearCache = function ()
+		this.ClearCache = function()
 		{
 			this.Destroy();
 			this.ClearCacheNoAttack();
-		}
-		this.ClearCacheNoAttack = function ()
+
+			if (this.Picker)
+				this.Picker.ClearCache();
+		};
+
+		this.ClearCacheNoAttack = function()
 		{
 			this.m_arrCacheSizes = [];
 			this.m_arrCacheSizesGid = [];
-		}
 
-		this.Destroy = function ()
+			if (this.Picker)
+				this.Picker.ClearCacheNoAttack();
+		};
+
+		this.Destroy = function()
 		{
 			if (this.m_oFontManager != null && this.m_oFontManager.RasterMemory != null)
 			{
@@ -981,18 +899,15 @@
 						_arr[i].oBitmap.Free();
 				}
 			}
-		}
+		};
 
-		this.SetTextMatrix = function (fA, fB, fC, fD, fE, fF)
+		this.SetTextMatrix = function(fA, fB, fC, fD, fE, fF)
 		{
 			var m = this.m_arrdTextMatrix;
 
 			var b1 = (m[0] == fA && m[1] == -fB && m[2] == -fC && m[3] == fD);
 			if (b1 && m[4] == fE && m[5] == fF)
 				return false;
-
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetTextMatrix(fA, fB, fC, fD, fE, fF);
 
 			m[0] = fA;
 			m[1] = -fB;
@@ -1007,13 +922,10 @@
 			}
 			this.CheckTextMatrix();
 			return true;
-		}
+		};
 
-		this.SetFontMatrix = function (fA, fB, fC, fD, fE, fF)
+		this.SetFontMatrix = function(fA, fB, fC, fD, fE, fF)
 		{
-			if (this.m_pDefaultFont)
-				this.m_pDefaultFont.SetFontMatrix(fA, fB, fC, fD, fE, fF);
-
 			var m = this.m_arrdFontMatrix;
 			if (this.m_bNeedDoItalic)
 			{
@@ -1035,214 +947,289 @@
 			}
 
 			this.ClearCache();
-		}
+		};
 
-		this.GetString = function (pString)
+		this.GetGIDByUnicode = function(glyph)
 		{
-			if (pString.GetLength() <= 0)
-				return true;
+            var nCMapIndex = new CCMapIndex();
+            var unGID = this.SetCMapForCharCode(glyph, nCMapIndex);
+            if (unGID > 0)
+            	return unGID;
 
-			var unPrevGID = 0;
-			var fPenX = 0, fPenY = 0;
+            if (-1 != this.m_nSymbolic && glyph < 0xF000)
+                unGID = this.SetCMapForCharCode(glyph + 0xF000, nCMapIndex);
 
-			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
+            return unGID;
+		};
+
+		this.CacheGlyph = function(glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, isFromPicker)
+		{
+            var oSizes = new CFontCacheSizes();
+            oSizes.ushUnicode = glyph_index_or_unicode;
+
+            var nCMapIndex = new CCMapIndex();
+            var unGID = this.SetCMapForCharCode(glyph_index_or_unicode, nCMapIndex);
+
+            if (unGID <= 0 && !this.m_bStringGID)
 			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
+				if (-1 != this.m_nSymbolic && glyph_index_or_unicode < 0xF000)
+					unGID = this.SetCMapForCharCode(glyph_index_or_unicode + 0xF000, nCMapIndex);
 			}
 
-			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
-
-			for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
+			if (unGID <= 0)
 			{
-				nCMapIndex.index = 0;
-				var pFace = this.m_pFace;
-				var pCurentGliph = pFace.m_pGlyph;
+                if (isFromPicker === true)
+                	return null;
 
-				var pCurGlyph = pString.GetAt(nIndex);
-				var ushUnicode = pCurGlyph.lUnicode;
-
-				var unGID = 0;
-				var charSymbolObj = _cache_array[ushUnicode];
-				if (undefined == charSymbolObj)
+				if (!this.m_bStringGID && this.Picker)
 				{
-					var nCMapIndex = new CCMapIndex();
-					unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+					// пробуем подобрать нужный шрифт
+					var oSizesCheck = this.Picker.LoadSymbol(this, glyph_index_or_unicode, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY);
+					if (oSizesCheck)
+						return oSizesCheck;
+				}
 
-					var oSizes = new TFontCacheSizes();
-					oSizes.ushUnicode = ushUnicode;
-
-					if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
-					{
-						// Пробуем загрузить через стандартный шрифт
-						if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont || 0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
-						{
-							if (this.m_nDefaultChar < 0)
-							{
-								oSizes.ushGID = -1;
-								oSizes.eState = EGlyphState.glyphstateMiss;
-								var max_advance = this.m_pFace.size.metrics.max_advance;
-								oSizes.fAdvanceX = (max_advance >> 6) / 2.0;
-
-								return;
-							}
-							else
-							{
-								unGID = this.m_nDefaultChar;
-								oSizes.eState = EGlyphState.glyphstateNormal;
-
-								pFace = this.m_pFace;
-								pCurentGliph = pFace.glyph;
-							}
-						}
-						else
-						{
-							oSizes.eState = EGlyphState.glyphstateDeafault;
-
-							pFace = this.m_pDefaultFont.m_pFace;
-							pCurentGliph = this.m_pDefaultFont.m_pGlyph;
-						}
-					}
-					else
-					{
-						oSizes.eState = EGlyphState.glyphstateNormal;
-					}
-
-					oSizes.ushGID = unGID;
-					oSizes.nCMapIndex = nCMapIndex.index;
-
-					var _LOAD_MODE = this.GetCharLoadMode();
-					if (0 != this.FT_Load_Glyph_Wrapper(pFace, unGID, _LOAD_MODE))
-						return;
-
-					var pGlyph = FT_Get_Glyph(pCurentGliph);
-					if (null == pGlyph)
-						return;
-
-					var oBBox = new FT_BBox();
-
-					FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
-					var xMin = oBBox.xMin;
-					var yMin = oBBox.yMin;
-					var xMax = oBBox.xMax;
-					var yMax = oBBox.yMax;
-					FT_Done_Glyph(pGlyph);
-					pGlyph = null;
-
-					var linearHoriAdvance = pCurentGliph.linearHoriAdvance;
-					var units_per_EM = this.m_lUnits_Per_Em;
-
-					oSizes.fAdvanceX = (linearHoriAdvance * this.m_dUnitsKoef / units_per_EM);
-					oSizes.oBBox.fMinX = (xMin >> 6);
-					oSizes.oBBox.fMaxX = (xMax >> 6);
-					oSizes.oBBox.fMinY = (yMin >> 6);
-					oSizes.oBBox.fMaxY = (yMax >> 6);
-
-					if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
-						oSizes.fAdvanceX += 1;
-
-					var dstM = oSizes.oMetrics;
-					var srcM = pCurentGliph.metrics;
-
-					dstM.fWidth = (srcM.width >> 6);
-					dstM.fHeight = (srcM.height >> 6);
-					dstM.fHoriBearingX = (srcM.horiBearingX >> 6);
-					dstM.fHoriBearingY = (srcM.horiBearingY >> 6);
-					dstM.fHoriAdvance = (srcM.horiAdvance >> 6);
-					dstM.fVertBearingX = (srcM.vertBearingX >> 6);
-					dstM.fVertBearingY = (srcM.vertBearingY >> 6);
-					dstM.fVertAdvance = (srcM.vertAdvance >> 6);
-
-					oSizes.bBitmap = false;
-					oSizes.oBitmap = null;
-
-					_cache_array[oSizes.ushUnicode] = oSizes;
+				if (this.m_nDefaultChar >= 0)
+				{
+					unGID = this.m_nDefaultChar;
+					oSizes.eState = EGlyphState.glyphstateDefault;
 				}
 				else
 				{
-					var _cmap_index = charSymbolObj.nCMapIndex;
-					unGID = charSymbolObj.ushGID;
-					var eState = charSymbolObj.eState;
+					oSizes.eState = EGlyphState.glyphstateMiss;
+                    oSizes.ushGID = -1;
+                    oSizes.fAdvanceX = (this.m_pFace.size.metrics.max_advance >> 6) / 2.0;
+                    return oSizes;
+				}
+			}
+			else
+			{
+				oSizes.eState = EGlyphState.glyphstateNormal;
+			}
 
-					if (EGlyphState.glyphstateMiss == eState)
-					{
-						pString.SetStartPoint(nIndex, fPenX, fPenY);
-						pString.SetBBox(nIndex, 0, 0, 0, 0);
-						pString.SetState(nIndex, EGlyphState.glyphstateMiss);
+            oSizes.ushGID = unGID;
+            oSizes.nCMapIndex = nCMapIndex.index;
 
-						fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
-						unPrevGID = 0;
+            if (0 != this.FT_Load_Glyph_Wrapper(this.m_pFace, unGID, this.GetCharLoadMode()))
+                return oSizes;
 
-						continue;
-					}
-					else if (EGlyphState.glyphstateDeafault == eState)
-					{
-						pString.SetState(nIndex, EGlyphState.glyphstateDeafault);
-						//pFace = pDefFace;
-					}
-					else // if ( glyphstateNormal == eState )
-					{
-						pString.SetState(nIndex, EGlyphState.glyphstateNormal);
-						//pFace = pSrcFace;
-					}
+            var pFaceGlyph = this.m_pFace.glyph;
+            var pGlyph = AscFonts.FT_Get_Glyph(this.m_pFace.glyph);
+            if (null == pGlyph)
+                return oSizes;
 
-					if (0 != this.m_nNum_charmaps)
+            if (undefined !== workerVector)
+			{
+                var _painter = new CGlyphVectorPainter();
+                _painter.KoefX = 25.4 / this.m_unHorDpi;
+                _painter.KoefY = 25.4 / this.m_unVerDpi;
+
+                if (workerVectorX !== undefined)
+                    _painter.X = workerVectorX;
+                if (workerVectorY !== undefined)
+                    _painter.Y = workerVectorY;
+
+                _painter.start(workerVector);
+                AscFonts.FT_Outline_Decompose(pGlyph.outline, _painter, workerVector);
+                _painter.end(workerVector);
+                return oSizes;
+			}
+
+            var oBBox = new AscFonts.FT_BBox();
+            AscFonts.FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
+            AscFonts.FT_Done_Glyph(pGlyph);
+            pGlyph = null;
+
+            oSizes.fAdvanceX = (pFaceGlyph.linearHoriAdvance * this.m_dUnitsKoef / this.m_lUnits_Per_Em);
+            if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
+                oSizes.fAdvanceX += 1;
+
+            oSizes.oBBox.fMinX = (oBBox.xMin >> 6);
+            oSizes.oBBox.fMaxX = (oBBox.xMax >> 6);
+            oSizes.oBBox.fMinY = (oBBox.yMin >> 6);
+            oSizes.oBBox.fMaxY = (oBBox.yMax >> 6);
+
+            var dstM = oSizes.oMetrics;
+            var srcM = pFaceGlyph.metrics;
+
+            dstM.fWidth = (srcM.width >> 6);
+            dstM.fHeight = (srcM.height >> 6);
+            dstM.fHoriBearingX = (srcM.horiBearingX >> 6);
+            dstM.fHoriBearingY = (srcM.horiBearingY >> 6);
+            dstM.fHoriAdvance = (srcM.horiAdvance >> 6);
+            dstM.fVertBearingX = (srcM.vertBearingX >> 6);
+            dstM.fVertBearingY = (srcM.vertBearingY >> 6);
+            dstM.fVertAdvance = (srcM.vertAdvance >> 6);
+
+            if (!isRaster)
+            {
+            	if (isRasterDistances)
+				{
+                    if (0 == AscFonts.FT_Render_Glyph(pFaceGlyph, REND_MODE))
+                    {
+                        oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pFaceGlyph.bitmap.width, pFaceGlyph.bitmap.rows, raster_memory.pitch);
+                    }
+				}
+                return oSizes;
+            }
+
+            oSizes.bBitmap = true;
+            if (AscFonts.FT_Render_Glyph(pFaceGlyph, REND_MODE))
+                return oSizes;
+
+            if (0 == pFaceGlyph.bitmap.pitch)
+            	return oSizes;
+
+			oSizes.oBitmap = new CGlyphBitmap();
+			oSizes.oBitmap.nX = pFaceGlyph.bitmap_left;
+			oSizes.oBitmap.nY = pFaceGlyph.bitmap_top;
+			oSizes.oBitmap.nWidth = pFaceGlyph.bitmap.width;
+			oSizes.oBitmap.nHeight = pFaceGlyph.bitmap.rows;
+
+			var isDisableNeedBold = (this.m_pFace.os2 && (this.m_pFace.os2.version != 0xFFFF) && (this.m_pFace.os2.usWeightClass >= 800)) ? true : false;
+
+			if (this.m_bNeedDoBold && this.m_bAntiAliasing && !isDisableNeedBold)
+			{
+                oSizes.oBitmap.nWidth++;
+
+				var _width_im = oSizes.oBitmap.nWidth;
+				var _height = oSizes.oBitmap.nHeight;
+
+				var nY, nX;
+				var pDstBuffer;
+
+				var _input = raster_memory.m_oBuffer.data;
+				for (nY = 0, pDstBuffer = 0; nY < _height; ++nY, pDstBuffer += (raster_memory.pitch))
+				{
+					for (nX = _width_im - 1; nX >= 0; --nX)
 					{
-						var nCharmap = pFace.charmap;
-						var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
-						if (nCurCMapIndex != _cmap_index)
+						if (0 != nX) // иначе ничего не делаем
 						{
-							_cmap_index = Math.max(0, _cmap_index);
-							nCharmap = pFace.charmaps[_cmap_index];
-							FT_Set_Charmap(pFace, nCharmap);
+							var _pos_x = pDstBuffer + nX * 4 + 3;
+
+							if (_width_im - 1 == nX)
+							{
+								// последний - просто копируем
+								_input[_pos_x] = _input[_pos_x - 4];
+							}
+							else
+							{
+								// сдвигаем все вправо
+								_input[_pos_x] = Math.min(255, _input[_pos_x - 4] + _input[_pos_x]);
+							}
 						}
 					}
+				}
+			}
 
-					if (this.m_bUseKerning && unPrevGID && (nIndex >= 0 && pString.GetAt(nIndex).eState == pString.GetAt(nIndex - 1).eState))
-					{
-						fPenX += this.GetKerning(unPrevGID, unGID);
-					}
+			oSizes.oBitmap.fromAlphaMask(this.m_oFontManager);
+			return oSizes;
+		};
 
-					var fX = pString.m_fX + fPenX;
-					var fY = pString.m_fY + fPenY;
+		this.GetString = function(pString)
+		{
+			if (pString.GetLength() <= 0)
+				return true;
 
-					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
-					var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
-					var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
+			var unPrevGID = 0;
+			var fPenX = 0, fPenY = 0;
 
-					pString.SetStartPoint(nIndex, fXX, fYY);
+			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
+			if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
-					var _metrics = charSymbolObj.oMetrics;
-					pString.SetMetrics(nIndex, _metrics.fWidth, _metrics.fHeight, _metrics.fHoriAdvance, _metrics.fHoriBearingX, _metrics.fHoriBearingY, _metrics.fVertAdvance, _metrics.fVertBearingX, _metrics.fVertBearingY);
-					pString.SetBBox(nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY);
+			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
+
+			for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
+			{
+				var pCurGlyph = pString.GetAt(nIndex);
+				var ushUnicode = pCurGlyph.lUnicode;
+
+				var charSymbolObj = _cache_array[ushUnicode];
+				if (undefined == charSymbolObj)
+				{
+					_cache_array[ushUnicode] = this.CacheGlyph(ushUnicode, false);
+                    charSymbolObj = _cache_array[ushUnicode];
+                }
+
+				var unGID = charSymbolObj.ushGID;
+				var eState = charSymbolObj.eState;
+
+				if (EGlyphState.glyphstateMiss == eState)
+				{
+					pString.SetStartPoint(nIndex, fPenX, fPenY);
+					pString.SetBBox(nIndex, 0, 0, 0, 0);
+					pString.SetState(nIndex, EGlyphState.glyphstateMiss);
+
 					fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
+					unPrevGID = 0;
 
-					if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
+					continue;
+				}
+				else if (EGlyphState.glyphstateDefault == eState)
+				{
+					pString.SetState(nIndex, EGlyphState.glyphstateDefault);
+					// kerning face!!!
+				}
+				else // if ( glyphstateNormal == eState )
+				{
+					pString.SetState(nIndex, EGlyphState.glyphstateNormal);
+                    // kerning face!!!
+				}
+
+				/*
+				if (0 != this.m_nNum_charmaps)
+				{
+					var nCharmap = pFace.charmap;
+					var nCurCMapIndex = AscFonts.FT_Get_Charmap_Index(nCharmap);
+					if (nCurCMapIndex != _cmap_index)
 					{
-						// Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
-						fPenX += 1;
+						_cmap_index = Math.max(0, _cmap_index);
+						nCharmap = pFace.charmaps[_cmap_index];
+						AscFonts.FT_Set_Charmap(pFace, nCharmap);
 					}
 				}
+				*/
+
+				if (this.m_bUseKerning && unPrevGID && (nIndex > 0 && pString.GetAt(nIndex).eState == pString.GetAt(nIndex - 1).eState))
+				{
+					fPenX += this.GetKerning(unPrevGID, unGID);
+				}
+
+				var fX = pString.m_fX + fPenX;
+				var fY = pString.m_fY + fPenY;
+
+				// Начальную точку рассчитываем сразу исходя из глобальной матрицы
+				var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
+				var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
+
+				pString.SetStartPoint(nIndex, fXX, fYY);
+
+				var _metrics = charSymbolObj.oMetrics;
+				pString.SetMetrics(nIndex, _metrics.fWidth, _metrics.fHeight, _metrics.fHoriAdvance, _metrics.fHoriBearingX, _metrics.fHoriBearingY, _metrics.fVertAdvance, _metrics.fVertBearingX, _metrics.fVertBearingY);
+				pString.SetBBox(nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY);
+				fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
+
+				if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
+				{
+					// Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
+					fPenX += 1;
+				}
+
 				unPrevGID = unGID;
 			}
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
+		};
 
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
-		}
-
-		this.GetString2 = function (pString)
+		this.GetString2 = function(pString)
 		{
 			if (pString.GetLength() <= 0)
 				return true;
+
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var unPrevGID = 0;
 			var fPenX = 0, fPenY = 0;
@@ -1251,941 +1238,179 @@
 
 			for (var nIndex = 0; nIndex < pString.GetLength(); ++nIndex)
 			{
-				// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-				if (this.m_bIsNeedUpdateMatrix12)
-				{
-					if (this.m_pDefaultFont)
-						this.m_pDefaultFont.UpdateMatrix1();
-					this.UpdateMatrix1();
-				}
-
-				var pFace = this.m_pFace;
-				var pCurentGliph = pFace.glyph;
-
 				var pCurGlyph = pString.GetAt(nIndex);
 				var ushUnicode = pCurGlyph.lUnicode;
 
-				var unGID = 0;
 				var charSymbolObj = _cache_array[ushUnicode];
-				if (undefined == charSymbolObj || null == charSymbolObj.oBitmap)
+                if (undefined == charSymbolObj || null == charSymbolObj.oBitmap)
+                {
+                    _cache_array[ushUnicode] = this.CacheGlyph(ushUnicode, true);
+                    charSymbolObj = _cache_array[ushUnicode];
+                }
+
+				var nCMapIndex = charSymbolObj.nCMapIndex;
+				var unGID = charSymbolObj.ushGID;
+				var eState = charSymbolObj.eState;
+
+				if (EGlyphState.glyphstateMiss == eState)
 				{
-					var nCMapIndex = new CCMapIndex();
-					unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+					pString.SetStartPoint(nIndex, fPenX, fPenY);
+					pString.SetBBox(nIndex, 0, 0, 0, 0);
+					pString.SetState(nIndex, EGlyphState.glyphstateMiss);
 
-					var oSizes = new TFontCacheSizes();
-					oSizes.ushUnicode = ushUnicode;
-
-					if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
-					{
-						// Пробуем загрузить через стандартный шрифт
-						if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont || 0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
-						{
-							if (this.m_nDefaultChar < 0)
-							{
-								oSizes.ushGID = -1;
-								oSizes.eState = EGlyphState.glyphstateMiss;
-								var max_advance = this.m_pFace.size.metrics.max_advance;
-								oSizes.fAdvanceX = (max_advance >> 6) / 2.0;
-
-								return;
-							}
-							else
-							{
-								unGID = this.m_nDefaultChar;
-								oSizes.eState = EGlyphState.glyphstateNormal;
-
-								pFace = this.m_pFace;
-								pCurentGliph = pFace.glyph;
-							}
-						}
-						else
-						{
-							oSizes.eState = EGlyphState.glyphstateDeafault;
-
-							pFace = this.m_pDefaultFont.m_pFace;
-							pCurentGliph = this.m_pDefaultFont.m_pFace.glyph;
-						}
-					}
-					else
-					{
-						oSizes.eState = EGlyphState.glyphstateNormal;
-					}
-
-					oSizes.ushGID = unGID;
-					oSizes.nCMapIndex = nCMapIndex.index;
-
-					if (this.m_bIsNeedUpdateMatrix12)
-					{
-						if (this.m_pDefaultFont)
-							this.m_pDefaultFont.UpdateMatrix2();
-						this.UpdateMatrix2();
-					}
-
-					var _LOAD_MODE = this.GetCharLoadMode();
-					if (0 != this.FT_Load_Glyph_Wrapper(pFace, unGID, _LOAD_MODE))
-						return;
-
-					var pGlyph = FT_Get_Glyph(this.m_pFace.glyph);
-					if (null == pGlyph)
-						return;
-
-					var oBBox = new FT_BBox();
-
-					FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
-					var xMin = oBBox.xMin;
-					var yMin = oBBox.yMin;
-					var xMax = oBBox.xMax;
-					var yMax = oBBox.yMax;
-					FT_Done_Glyph(pGlyph);
-					pGlyph = null;
-
-					pCurentGliph = this.m_pFace.glyph;
-
-					var linearHoriAdvance = pCurentGliph.linearHoriAdvance;
-					var units_per_EM = this.m_lUnits_Per_Em;
-
-					oSizes.fAdvanceX = (linearHoriAdvance * this.m_dUnitsKoef / units_per_EM);
-					oSizes.oBBox.fMinX = (xMin >> 6);
-					oSizes.oBBox.fMaxX = (xMax >> 6);
-					oSizes.oBBox.fMinY = (yMin >> 6);
-					oSizes.oBBox.fMaxY = (yMax >> 6);
-
-					var dstM = oSizes.oMetrics;
-					var srcM = pCurentGliph.metrics;
-
-					dstM.fWidth = (srcM.width >> 6);
-					dstM.fHeight = (srcM.height >> 6);
-					dstM.fHoriBearingX = (srcM.horiBearingX >> 6);
-					dstM.fHoriBearingY = (srcM.horiBearingY >> 6);
-					dstM.fHoriAdvance = (srcM.horiAdvance >> 6);
-					dstM.fVertBearingX = (srcM.vertBearingX >> 6);
-					dstM.fVertBearingY = (srcM.vertBearingY >> 6);
-					dstM.fVertAdvance = (srcM.vertAdvance >> 6);
-
-					oSizes.bBitmap = true;
-					if (FT_Render_Glyph(pCurentGliph, REND_MODE))
-						return;
-
-					oSizes.oBitmap = new TGlyphBitmap();
-					oSizes.oBitmap.nX = pCurentGliph.bitmap_left;
-					oSizes.oBitmap.nY = pCurentGliph.bitmap_top;
-					oSizes.oBitmap.nWidth = pCurentGliph.bitmap.width;
-					oSizes.oBitmap.nHeight = pCurentGliph.bitmap.rows;
-
-					var _width = pCurentGliph.bitmap.pitch;
-
-					var _disable_need_bold = (pFace.os2 && (pFace.os2.version != 0xFFFF) && (pFace.os2.usWeightClass >= 800)) ? true : false;
-
-					if (_width != 0)
-					{
-						var nRowSize = 0;
-						if (this.m_bAntiAliasing)
-						{
-							if (this.m_bNeedDoBold && !_disable_need_bold)
-								oSizes.oBitmap.nWidth++;
-
-							nRowSize = oSizes.oBitmap.nWidth;
-						}
-						else
-						{
-							nRowSize = (oSizes.oBitmap.nWidth + 7) >> 3;
-						}
-
-						if (this.m_bNeedDoBold && this.m_bAntiAliasing && !_disable_need_bold)
-						{
-							var _width_im = oSizes.oBitmap.nWidth;
-							var _height = oSizes.oBitmap.nHeight;
-
-							var nY, nX;
-							var pDstBuffer;
-
-							var _input = raster_memory.m_oBuffer.data;
-							for (nY = 0, pDstBuffer = 0; nY < _height; ++nY, pDstBuffer += (raster_memory.pitch))
-							{
-								for (nX = _width_im - 1; nX >= 0; --nX)
-								{
-									if (0 != nX) // иначе ничего не делаем
-									{
-										var _pos_x = pDstBuffer + nX * 4 + 3;
-
-										if (_width_im - 1 == nX)
-										{
-											// последний - просто копируем
-											_input[_pos_x] = _input[_pos_x - 4];
-										}
-										else
-										{
-											// сдвигаем все вправо
-											_input[_pos_x] = Math.min(255, _input[_pos_x - 4] + _input[_pos_x]);
-										}
-									}
-								}
-							}
-						}
-
-						pCurGlyph.bBitmap = oSizes.bBitmap;
-						pCurGlyph.oBitmap = oSizes.oBitmap;
-
-						// new scheme!!! --------------------------
-						oSizes.oBitmap.fromAlphaMask(this.m_oFontManager);
-						// ----------------------------------------
-					}
-
-					_cache_array[oSizes.ushUnicode] = oSizes;
-					charSymbolObj = oSizes;
-				}
-				if (null != charSymbolObj)
-				{
-					var nCMapIndex = charSymbolObj.nCMapIndex;
-					unGID = charSymbolObj.ushGID;
-					var eState = charSymbolObj.eState;
-
-					if (EGlyphState.glyphstateMiss == eState)
-					{
-						pString.SetStartPoint(nIndex, fPenX, fPenY);
-						pString.SetBBox(nIndex, 0, 0, 0, 0);
-						pString.SetState(nIndex, EGlyphState.glyphstateMiss);
-
-						fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
-						unPrevGID = 0;
-
-						continue;
-					}
-					else if (EGlyphState.glyphstateDeafault == eState)
-					{
-						pString.SetState(nIndex, EGlyphState.glyphstateDeafault);
-						//pFace = pDefFace;
-					}
-					else
-					{
-						pString.SetState(nIndex, EGlyphState.glyphstateNormal);
-						//pFace = pSrcFace;
-					}
-
-					if (0 != this.m_nNum_charmaps)
-					{
-						var nCharmap = pFace.charmap;
-						var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
-						if (nCurCMapIndex != nCMapIndex)
-						{
-							nCMapIndex = Math.max(0, nCMapIndex);
-							nCharmap = this.m_pFace.charmaps[nCMapIndex];
-							FT_Set_Charmap(this.m_pFace, nCharmap);
-						}
-					}
-
-					if (this.m_bUseKerning && unPrevGID && (nIndex >= 0 && pString.GetAt(nIndex).eState == pString.GetAt(nIndex - 1).eState))
-					{
-						fPenX += this.GetKerning(unPrevGID, unGID);
-					}
-
-					var fX = pString.m_fX + fPenX;
-					var fY = pString.m_fY + fPenY;
-
-					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
-					var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
-					var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
-
-					pString.SetStartPoint(nIndex, fXX, fYY);
-
-					//pString.SetMetrics (nIndex, charSymbolObj.oMetrics.fWidth, charSymbolObj.oMetrics.fHeight, charSymbolObj.oMetrics.fHoriAdvance, charSymbolObj.oMetrics.fHoriBearingX, charSymbolObj.oMetrics.fHoriBearingY, charSymbolObj.oMetrics.fVertAdvance, charSymbolObj.oMetrics.fVertBearingX, charSymbolObj.oMetrics.fVertBearingY);
-					pString.m_pGlyphsBuffer[nIndex].oMetrics = charSymbolObj.oMetrics;
-					pString.SetBBox(nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY);
 					fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
+					unPrevGID = 0;
 
-					if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
-					{
-						// Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
-						fPenX += 1;
-					}
-
-					pCurGlyph.bBitmap = charSymbolObj.bBitmap;
-					pCurGlyph.oBitmap = charSymbolObj.oBitmap;
+					continue;
 				}
+				else if (EGlyphState.glyphstateDefault == eState)
+				{
+					pString.SetState(nIndex, EGlyphState.glyphstateDefault);
+                    // kerning face!!!
+				}
+				else
+				{
+					pString.SetState(nIndex, EGlyphState.glyphstateNormal);
+                    // kerning face!!!
+				}
+
+				/*
+				if (0 != this.m_nNum_charmaps)
+				{
+					var nCharmap = pFace.charmap;
+					var nCurCMapIndex = AscFonts.FT_Get_Charmap_Index(nCharmap);
+					if (nCurCMapIndex != nCMapIndex)
+					{
+						nCMapIndex = Math.max(0, nCMapIndex);
+						nCharmap = this.m_pFace.charmaps[nCMapIndex];
+						AscFonts.FT_Set_Charmap(this.m_pFace, nCharmap);
+					}
+				}
+				*/
+
+				if (this.m_bUseKerning && unPrevGID && (nIndex > 0 && pString.GetAt(nIndex).eState == pString.GetAt(nIndex - 1).eState))
+				{
+					fPenX += this.GetKerning(unPrevGID, unGID);
+				}
+
+				var fX = pString.m_fX + fPenX;
+				var fY = pString.m_fY + fPenY;
+
+				// Начальную точку рассчитываем сразу исходя из глобальной матрицы
+				var fXX = (pString.m_arrCTM[4] + fX * pString.m_arrCTM[0] + fY * pString.m_arrCTM[2] - pString.m_fX);
+				var fYY = (pString.m_arrCTM[5] + fX * pString.m_arrCTM[1] + fY * pString.m_arrCTM[3] - pString.m_fY);
+
+				pString.SetStartPoint(nIndex, fXX, fYY);
+
+                pCurGlyph.oMetrics = charSymbolObj.oMetrics;
+				pString.SetBBox(nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY);
+				fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
+
+				if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
+				{
+					// Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
+					fPenX += 1;
+				}
+
+				pCurGlyph.bBitmap = charSymbolObj.bBitmap;
+				pCurGlyph.oBitmap = charSymbolObj.oBitmap;
+
 				unPrevGID = unGID;
 			}
 
 			pString.m_fEndX = fPenX + pString.m_fX;
 			pString.m_fEndY = fPenY + pString.m_fY;
+		};
 
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
-		}
-
-		this.GetString2C = function (pString)
+		this.GetString2C = function(pString)
 		{
-			var unPrevGID = 0;
-			var fPenX = 0, fPenY = 0;
-
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
-			}
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var pCurGlyph = pString.m_pGlyphsBuffer[0];
 			var ushUnicode = pCurGlyph.lUnicode;
 
 			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
 
-			var unGID = 0;
-			var charSymbolObj = _cache_array[ushUnicode];
-			if (undefined == charSymbolObj || (null == charSymbolObj.oBitmap && charSymbolObj.bBitmap === false))
+            var charSymbolObj = _cache_array[ushUnicode];
+            if (undefined == charSymbolObj || (null == charSymbolObj.oBitmap && charSymbolObj.bBitmap === false))
+            {
+                _cache_array[ushUnicode] = this.CacheGlyph(ushUnicode, true);
+                charSymbolObj = _cache_array[ushUnicode];
+            }
+
+            if (!charSymbolObj)
+            	return;
+
+			var eState = charSymbolObj.eState;
+			pCurGlyph.eState = charSymbolObj.eState;
+			if (EGlyphState.glyphstateMiss == eState)
 			{
-				var nCMapIndex = new CCMapIndex();
-				unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+				pCurGlyph.fX = 0;
+				pCurGlyph.fY = 0;
 
-				var oSizes = new TFontCacheSizes();
-				oSizes.ushUnicode = ushUnicode;
-
-				if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
-				{
-					// Пробуем загрузить через стандартный шрифт
-					if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont || 0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
-					{
-						if (this.m_nDefaultChar < 0)
-						{
-							oSizes.ushGID = -1;
-							oSizes.eState = EGlyphState.glyphstateMiss;
-							var max_advance = this.m_pFace.size.metrics.max_advance;
-							oSizes.fAdvanceX = (max_advance >> 6) / 2.0;
-
-							return;
-						}
-						else
-						{
-							unGID = this.m_nDefaultChar;
-							oSizes.eState = EGlyphState.glyphstateNormal;
-						}
-					}
-					else
-					{
-						oSizes.eState = EGlyphState.glyphstateDeafault;
-					}
-				}
-				else
-				{
-					oSizes.eState = EGlyphState.glyphstateNormal;
-				}
-
-				oSizes.ushGID = unGID;
-				oSizes.nCMapIndex = nCMapIndex.index;
-
-				if (this.m_bIsNeedUpdateMatrix12)
-				{
-					if (this.m_pDefaultFont)
-						this.m_pDefaultFont.UpdateMatrix2();
-					this.UpdateMatrix2();
-				}
-
-				if (true)
-				{
-					var fX = pString.m_fX + fPenX;
-					var fY = pString.m_fY + fPenY;
-
-					var _m = pString.m_arrCTM;
-
-					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
-					pCurGlyph.fX = (_m[4] + fX * _m[0] + fY * _m[2] - pString.m_fX);
-					pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
-				}
-
-				var _LOAD_MODE = this.GetCharLoadMode();
-				if (0 != this.FT_Load_Glyph_Wrapper(this.m_pFace, unGID, _LOAD_MODE))
-					return;
-
-				var pGlyph = FT_Get_Glyph(this.m_pFace.glyph);
-				if (null == pGlyph)
-					return;
-
-				var oBBox = new FT_BBox();
-
-				FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
-				var xMin = oBBox.xMin;
-				var yMin = oBBox.yMin;
-				var xMax = oBBox.xMax;
-				var yMax = oBBox.yMax;
-				FT_Done_Glyph(pGlyph);
-				pGlyph = null;
-
-				var pCurentGliph = this.m_pFace.glyph;
-
-				var linearHoriAdvance = pCurentGliph.linearHoriAdvance;
-				var units_per_EM = this.m_lUnits_Per_Em;
-
-				oSizes.fAdvanceX = (linearHoriAdvance * this.m_dUnitsKoef / units_per_EM);
-				oSizes.oBBox.fMinX = (xMin >> 6);
-				oSizes.oBBox.fMaxX = (xMax >> 6);
-				oSizes.oBBox.fMinY = (yMin >> 6);
-				oSizes.oBBox.fMaxY = (yMax >> 6);
-
-				var dstM = oSizes.oMetrics;
-				var srcM = pCurentGliph.metrics;
-
-				dstM.fWidth = (srcM.width >> 6);
-				dstM.fHeight = (srcM.height >> 6);
-				dstM.fHoriBearingX = (srcM.horiBearingX >> 6);
-				dstM.fHoriBearingY = (srcM.horiBearingY >> 6);
-				dstM.fHoriAdvance = (srcM.horiAdvance >> 6);
-				dstM.fVertBearingX = (srcM.vertBearingX >> 6);
-				dstM.fVertBearingY = (srcM.vertBearingY >> 6);
-				dstM.fVertAdvance = (srcM.vertAdvance >> 6);
-
-				oSizes.bBitmap = true;
-				if (FT_Render_Glyph(pCurentGliph, REND_MODE))
-					return;
-
-				var _width = pCurentGliph.bitmap.pitch;
-				if (0 != _width)
-				{
-					oSizes.oBitmap = new TGlyphBitmap();
-					oSizes.oBitmap.nX = pCurentGliph.bitmap_left;
-					oSizes.oBitmap.nY = pCurentGliph.bitmap_top;
-					oSizes.oBitmap.nWidth = pCurentGliph.bitmap.width;
-					oSizes.oBitmap.nHeight = pCurentGliph.bitmap.rows;
-
-					var _disable_need_bold = (this.m_pFace.os2 && (this.m_pFace.os2.version != 0xFFFF) && (this.m_pFace.os2.usWeightClass >= 800)) ? true : false;
-
-					var nRowSize = 0;
-					if (this.m_bAntiAliasing && !_disable_need_bold)
-					{
-						if (this.m_bNeedDoBold)
-							oSizes.oBitmap.nWidth++;
-
-						nRowSize = oSizes.oBitmap.nWidth;
-					}
-					else
-					{
-						nRowSize = (oSizes.oBitmap.nWidth + 7) >> 3;
-					}
-
-					if (this.m_bNeedDoBold && this.m_bAntiAliasing && !_disable_need_bold)
-					{
-						var _width_im = oSizes.oBitmap.nWidth;
-						var _height = oSizes.oBitmap.nHeight;
-
-						var nY, nX;
-						var pDstBuffer;
-
-						var _input = raster_memory.m_oBuffer.data;
-						for (nY = 0, pDstBuffer = 0; nY < _height; ++nY, pDstBuffer += (raster_memory.pitch))
-						{
-							for (nX = _width_im - 1; nX >= 0; --nX)
-							{
-								if (0 != nX) // иначе ничего не делаем
-								{
-									var _pos_x = pDstBuffer + nX * 4 + 3;
-
-									if (_width_im - 1 == nX)
-									{
-										// последний - просто копируем
-										_input[_pos_x] = _input[_pos_x - 4];
-									}
-									else
-									{
-										// сдвигаем все вправо
-										_input[_pos_x] = Math.min(255, _input[_pos_x - 4] + _input[_pos_x]);
-									}
-								}
-							}
-						}
-					}
-
-					pCurGlyph.bBitmap = oSizes.bBitmap;
-					pCurGlyph.oBitmap = oSizes.oBitmap;
-
-					// new scheme!!! --------------------------
-					oSizes.oBitmap.fromAlphaMask(this.m_oFontManager);
-					// ----------------------------------------
-				}
-
-				_cache_array[oSizes.ushUnicode] = oSizes;
-				charSymbolObj = oSizes;
-			}
-			else
-			{
-				var nCMapIndex = charSymbolObj.nCMapIndex;
-				unGID = charSymbolObj.ushGID;
-				var eState = charSymbolObj.eState;
-
-				if (EGlyphState.glyphstateMiss == eState)
-				{
-					pCurGlyph.fX = fPenX;
-					pCurGlyph.fY = fPenY;
-
-					pCurGlyph.fLeft = 0;
-					pCurGlyph.fTop = 0;
-					pCurGlyph.fRight = 0;
-					pCurGlyph.fBottom = 0;
-
-					pCurGlyph.eState = EGlyphState.glyphstateMiss;
-
-					fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
-					unPrevGID = 0;
-
-					return;
-				}
-				else if (EGlyphState.glyphstateDeafault == eState)
-				{
-					pCurGlyph.eState = EGlyphState.glyphstateDeafault;
-					//pFace = pDefFace;
-				}
-				else
-				{
-					pCurGlyph.eState = EGlyphState.glyphstateNormal;
-					//pFace = pSrcFace;
-				}
-
-				/*
-				 if (0 != this.m_nNum_charmaps)
-				 {
-				 var nCharmap = this.m_pFace.charmap;
-				 var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
-				 if (nCurCMapIndex != nCMapIndex)
-				 {
-				 nCMapIndex = Math.max(0, nCMapIndex);
-				 nCharmap = this.m_pFace.charmaps[nCMapIndex];
-				 FT_Set_Charmap(this.m_pFace, nCharmap);
-				 }
-				 }
-				 */
-
-				// кернинга нету пока.
-				if (true)
-				{
-					var fX = pString.m_fX + fPenX;
-					var fY = pString.m_fY + fPenY;
-
-					var _m = pString.m_arrCTM;
-
-					// Начальную точку рассчитываем сразу исходя из глобальной матрицы
-					pCurGlyph.fX = (_m[4] + fX * _m[0] + fY * _m[2] - pString.m_fX);
-					pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
-				}
-
-				//pString.SetMetrics (nIndex, charSymbolObj.oMetrics.fWidth, charSymbolObj.oMetrics.fHeight, charSymbolObj.oMetrics.fHoriAdvance, charSymbolObj.oMetrics.fHoriBearingX, charSymbolObj.oMetrics.fHoriBearingY, charSymbolObj.oMetrics.fVertAdvance, charSymbolObj.oMetrics.fVertBearingX, charSymbolObj.oMetrics.fVertBearingY);
-				pCurGlyph.oMetrics = charSymbolObj.oMetrics;
-
-				/*
-				 pCurGlyph.fLeft   = charSymbolObj.oBBox.fMinX;
-				 pCurGlyph.fTop    = charSymbolObj.oBBox.fMaxY;
-				 pCurGlyph.fRight  = charSymbolObj.oBBox.fMaxX;
-				 pCurGlyph.fBottom = charSymbolObj.oBBox.fMinY;
-				 */
-
-				pCurGlyph.bBitmap = charSymbolObj.bBitmap;
-				pCurGlyph.oBitmap = charSymbolObj.oBitmap;
+				pCurGlyph.fLeft = 0;
+				pCurGlyph.fTop = 0;
+				pCurGlyph.fRight = 0;
+				pCurGlyph.fBottom = 0;
+				return;
 			}
 
-			fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
-			if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
-			{
-				// Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
-				//fPenX += 1;
-				fPenX += this.m_unHorDpi / 72;
-			}
+			// кернинга нету пока.
+            var fX = pString.m_fX;
+            var fY = pString.m_fY;
+            var _m = pString.m_arrCTM;
 
-			pString.m_fEndX = fPenX + pString.m_fX;
-			pString.m_fEndY = fPenY + pString.m_fY;
+            // Начальную точку рассчитываем сразу исходя из глобальной матрицы
+            pCurGlyph.fX = (_m[4] + fX * _m[0] + fY * _m[2] - pString.m_fX);
+            pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
 
+			//pString.SetMetrics(nIndex, charSymbolObj.oMetrics.fWidth, charSymbolObj.oMetrics.fHeight, charSymbolObj.oMetrics.fHoriAdvance, charSymbolObj.oMetrics.fHoriBearingX, charSymbolObj.oMetrics.fHoriBearingY, charSymbolObj.oMetrics.fVertAdvance, charSymbolObj.oMetrics.fVertBearingX, charSymbolObj.oMetrics.fVertBearingY);
+			pCurGlyph.oMetrics = charSymbolObj.oMetrics;
 
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
-		}
+			/*
+			pCurGlyph.fLeft   = charSymbolObj.oBBox.fMinX;
+			pCurGlyph.fTop    = charSymbolObj.oBBox.fMaxY;
+			pCurGlyph.fRight  = charSymbolObj.oBBox.fMaxX;
+			pCurGlyph.fBottom = charSymbolObj.oBBox.fMinY;
+			*/
 
-		this.SetCMapForCharCode = function (lUnicode, pnCMapIndex)
+			pCurGlyph.bBitmap = charSymbolObj.bBitmap;
+			pCurGlyph.oBitmap = charSymbolObj.oBitmap;
+
+            pString.m_fEndX = charSymbolObj.fAdvanceX + this.m_fCharSpacing + pString.m_fX;
+            pString.m_fEndY = pString.m_fY;
+
+            if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
+            {
+                // Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
+                pString.m_fEndX += this.m_unHorDpi / 72;
+            }
+		};
+
+		this.GetChar = function(lUnicode, is_raster_distances)
 		{
-			if (this.m_bStringGID || !this.m_pFace || 0 == this.m_nNum_charmaps)
-				return lUnicode;
-
-			var nCharIndex = 0;
-
-			var charMapArray = this.m_pFace.charmaps;
-			for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
-			{
-				var pCMap = charMapArray[nIndex];
-				var pCharMap = __FT_CharmapRec(pCMap);
-
-				if (0 != FT_Set_Charmap(this.m_pFace, pCMap))
-					continue;
-
-				var pEncoding = pCharMap.encoding;
-
-				if (FT_ENCODING_UNICODE == pEncoding)
-				{
-					if ((nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode)) != 0)
-					{
-						pnCMapIndex.index = nIndex;
-						return nCharIndex;
-					}
-				}
-				else if (FT_ENCODING_NONE == pEncoding || FT_ENCODING_MS_SYMBOL == pEncoding || FT_ENCODING_APPLE_ROMAN == pEncoding)
-				{
-					/*
-					 var res_code = FT_Get_First_Char(this.m_pFace);
-					 while (res_code.gindex != 0)
-					 {
-					 res_code = FT_Get_Next_Char(this.m_pFace, res_code.char_code);
-					 if (res_code.char_code == lUnicode)
-					 {
-					 nCharIndex = res_code.gindex;
-					 pnCMapIndex.index = nIndex;
-					 break;
-					 }
-					 }
-					 */
-
-					nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode);
-					if (0 != nCharIndex)
-						pnCMapIndex.index = nIndex;
-				}
-			}
-
-			return nCharIndex;
-		}
-
-		this.GetChar = function (lUnicode, is_raster_distances)
-		{
-			var pFace = this.m_pFace;
-			var pCurentGliph = pFace.glyph;
-
-			var Result;
+			var Result = undefined;
 			var ushUnicode = lUnicode;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
-			}
-
-			var unGID = 0;
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
 			var _cache_array = (this.m_bStringGID === false) ? this.m_arrCacheSizes : this.m_arrCacheSizesGid;
 
-			var charSymbolObj = _cache_array[ushUnicode];
-			if (undefined == charSymbolObj)
-			{
-				var nCMapIndex = new CCMapIndex();
-				unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+            var charSymbolObj = _cache_array[ushUnicode];
+            if (undefined == charSymbolObj)
+            {
+                _cache_array[ushUnicode] = this.CacheGlyph(ushUnicode, false, is_raster_distances);
+                charSymbolObj = _cache_array[ushUnicode];
+            }
 
-				var oSizes = new TFontCacheSizes();
-				oSizes.ushUnicode = ushUnicode;
+            return charSymbolObj;
+		};
 
-				if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) && 0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
-				{
-					// Пробуем загрузить через стандартный шрифт
-					if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont || 0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
-					{
-						if (this.m_nDefaultChar < 0)
-						{
-							oSizes.ushGID = -1;
-							oSizes.eState = EGlyphState.glyphstateMiss;
-							var max_advance = pFace.size.metrics.max_advance;
-							oSizes.fAdvanceX = (max_advance >> 6) / 2.0;
-
-							return;
-						}
-						else
-						{
-							unGID = this.m_nDefaultChar;
-							oSizes.eState = EGlyphState.glyphstateNormal;
-
-							pFace = this.m_pFace;
-							pCurentGliph = pFace.glyph;
-						}
-					}
-					else
-					{
-						oSizes.eState = EGlyphState.glyphstateDeafault;
-
-						pFace = this.m_pDefaultFont.m_pFace;
-						pCurentGliph = this.m_pDefaultFont.m_pGlyph;
-					}
-				}
-				else
-				{
-					oSizes.eState = EGlyphState.glyphstateNormal;
-				}
-
-				oSizes.ushGID = unGID;
-				oSizes.nCMapIndex = nCMapIndex.index;
-
-				var _LOAD_MODE = this.GetCharLoadMode();
-				if (0 != this.FT_Load_Glyph_Wrapper(pFace, unGID, _LOAD_MODE))
-					return;
-
-				var pGlyph = FT_Get_Glyph(pCurentGliph);
-				if (null == pGlyph)
-					return;
-
-				var oBBox = new FT_BBox();
-
-				FT_Glyph_Get_CBox(pGlyph, 1, oBBox);
-				var xMin = oBBox.xMin;
-				var yMin = oBBox.yMin;
-				var xMax = oBBox.xMax;
-				var yMax = oBBox.yMax;
-				FT_Done_Glyph(pGlyph);
-				pGlyph = null;
-
-				var linearHoriAdvance = pCurentGliph.linearHoriAdvance;
-				var units_per_EM = this.m_lUnits_Per_Em;
-
-				oSizes.fAdvanceX = (linearHoriAdvance * this.m_dUnitsKoef / units_per_EM);
-				oSizes.oBBox.fMinX = (xMin >> 6);
-				oSizes.oBBox.fMaxX = (xMax >> 6);
-				oSizes.oBBox.fMinY = (yMin >> 6);
-				oSizes.oBBox.fMaxY = (yMax >> 6);
-
-				if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
-					oSizes.fAdvanceX += 1;
-
-				var dstM = oSizes.oMetrics;
-				var srcM = pCurentGliph.metrics;
-
-				dstM.fWidth = (srcM.width >> 6);
-				dstM.fHeight = (srcM.height >> 6);
-				dstM.fHoriBearingX = (srcM.horiBearingX >> 6);
-				dstM.fHoriBearingY = (srcM.horiBearingY >> 6);
-				dstM.fHoriAdvance = (srcM.horiAdvance >> 6);
-				dstM.fVertBearingX = (srcM.vertBearingX >> 6);
-				dstM.fVertBearingY = (srcM.vertBearingY >> 6);
-				dstM.fVertAdvance = (srcM.vertAdvance >> 6);
-
-				oSizes.bBitmap = false;
-				oSizes.oBitmap = null;
-
-				if (is_raster_distances === true)
-				{
-					if (0 == FT_Render_Glyph(pCurentGliph, REND_MODE))
-					{
-						oSizes.oBBox.rasterDistances = get_raster_bounds(raster_memory.m_oBuffer.data, pCurentGliph.bitmap.width, pCurentGliph.bitmap.rows, raster_memory.pitch);
-					}
-				}
-
-				_cache_array[oSizes.ushUnicode] = oSizes;
-				Result = oSizes;
-			}
-			else
-			{
-				var nCMapIndex = charSymbolObj.nCMapIndex;
-				unGID = charSymbolObj.ushGID;
-				var eState = charSymbolObj.eState;
-
-				if (EGlyphState.glyphstateMiss == eState)
-				{
-					return;
-				}
-				else if (EGlyphState.glyphstateDeafault == eState)
-				{
-					//pFace = pDefFace;
-				}
-				else // if ( glyphstateNormal == eState )
-				{
-					//pFace = pSrcFace;
-				}
-
-				/*
-				 if (0 != this.m_nNum_charmaps)
-				 {
-				 var nCharmap = pFace.charmap;
-				 var nCurCMapIndex = FT_Get_Charmap_Index(nCharmap);
-				 if (nCurCMapIndex != nCMapIndex)
-				 {
-				 nCMapIndex = Math.max(0, nCMapIndex);
-				 nCharmap = this.m_pFace.charmaps[nCMapIndex];
-				 FT_Set_Charmap(this.m_pFace, nCharmap);
-				 }
-				 }
-				 */
-
-				Result = charSymbolObj;
-			}
-
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
-
-			return Result;
-		}
-
-		this.GetKerning = function (unPrevGID, unGID)
-		{
-			var pDelta = new AscFonts.FT_Vector();
-			AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
-			return (pDelta.x >> 6);
-		}
-
-		this.SetStringGID = function (bGID)
-		{
-			if (this.m_bStringGID == bGID)
-				return;
-
-			//this.ClearCache();
-			this.m_bStringGID = bGID;
-		}
-		this.GetStringGID = function ()
-		{
-			return this.m_bStringGID;
-		}
-		this.SetUseDefaultFont = function (bUse)
-		{
-			this.m_bUseDefaultFont = bUse;
-		}
-		this.GetUseDefaultFont = function ()
-		{
-			return this.m_bUseDefaultFont;
-		}
-		this.SetCharSpacing = function (fCharSpacing)
-		{
-			this.m_fCharSpacing = fCharSpacing;
-		}
-		this.GetCharSpacing = function ()
-		{
-			return this.m_fCharSpacing;
-		}
-
-		this.GetStyleName = function ()
-		{
-			return this.m_pFace.style_name;
-		}
-
-		this.UpdateStyles = function (bBold, bItalic)
-		{
-			var sStyle = this.GetStyleName();
-
-			// Смотрим какой стиль у исходного шрифта
-			var bSrcBold = (-1 != sStyle.indexOf("Bold"));
-			var bSrcItalic = (-1 != sStyle.indexOf("Italic"));
-
-			if (!bBold) // Нам нужен не жирный шрифт
-			{
-				this.m_bNeedDoBold = false;
-			}
-			else if (bBold) // Нам нужно сделать шрифт жирным
-			{
-				if (bSrcBold)
-				{
-					// Исходный шрифт уже жирный, поэтому ничего дополнительного делать не надо
-					this.m_bNeedDoBold = false;
-				}
-				else
-				{
-					// Иходный шрифт не жирный, поэтому жирность делаем сами
-					this.m_bNeedDoBold = true;
-				}
-			}
-
-			if (!bItalic) // Нам нужен не наклонный шрифт
-			{
-				this.SetItalic(false);
-			}
-			else if (bItalic) // Нам нужно сделать наклонный шрифт
-			{
-				if (bSrcItalic)
-				{
-					// Исходный шрифт уже наклонный, поэтому ничего дополнительного делать не надо
-					this.SetItalic(false);
-				}
-				else
-				{
-					// Иходный шрифт не наклонный, поэтому делаем его наклонным сами
-					this.SetItalic(true);
-				}
-			}
-
-		}
-
-		this.SetItalic = function (value)
-		{
-			if (this.m_bNeedDoItalic != value)
-			{
-				this.ClearCache();
-				this.m_bNeedDoItalic = value;
-				this.ResetFontMatrix();
-			}
-		}
-		this.SetNeedBold = function (value)
-		{
-			if (this.m_bNeedDoBold != value)
-				this.ClearCache();
-
-			this.m_bNeedDoBold = value;
-		}
-
-		this.ReleaseFontFace = function ()
-		{
-			this.m_pFace = null;
-		}
-
-		this.IsSuccess = function ()
-		{
-			return (0 == this.m_nError);
-		}
-
-		this.GetAscender = function ()
-		{
-			return this.m_lAscender;
-		}
-		this.GetDescender = function ()
-		{
-			return this.m_lDescender;
-		}
-		this.GetHeight = function ()
-		{
-			return this.m_lLineHeight;
-		}
-		this.Units_Per_Em = function ()
-		{
-			return this.m_lUnits_Per_Em;
-		}
-
-		this.CheckHintsSupport = function ()
-		{
-			this.HintsSupport = true;
-
-			if (!this.m_pFace || !this.m_pFace.driver || !this.m_pFace.driver.clazz)
-				return;
-
-			if (this.m_pFace.driver.clazz.name != "truetype")
-			{
-				this.HintsSupport = false;
-				return;
-			}
-
-			if (this.m_pFace.family_name == "MS Mincho" ||
-				this.m_pFace.family_name == "Castellar")
-			{
-				this.HintsSupport = false;
-			}
-			else if (this.m_pFace.family_name == "Microsoft JhengHei UI Light" ||
-				this.m_pFace.family_name == "Kalinga")
-			{
-				this.HintsSubpixelSupport = false;
-			}
-		}
-
-		this.GetCharLoadMode = function ()
-		{
-			return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
-		}
-
-		this.GetCharPath = function (lUnicode, worker, x, y)
+		this.GetCharPath = function(lUnicode, worker, x, y)
 		{
 			var pFace = this.m_pFace;
 			var pCurentGliph = pFace.glyph;
@@ -2194,93 +1419,283 @@
 			var ushUnicode = lUnicode;
 
 			// Сначала мы все рассчитываем исходя только из матрицы шрифта FontMatrix
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix1();
-				this.UpdateMatrix1();
-			}
+            if (this.m_bIsTransform)
+                this.UpdateMatrix();
 
-			var unGID = 0;
-			var nCMapIndex = new CCMapIndex();
-			unGID = this.SetCMapForCharCode(ushUnicode, nCMapIndex);
+            // no really cashe
+            this.CacheGlyph(ushUnicode, false, false, worker, x, y);
+		};
 
-			if (!((unGID > 0) || (-1 != this.m_nSymbolic && (ushUnicode < 0xF000) &&
-				0 < (unGID = this.SetCMapForCharCode(ushUnicode + 0xF000, nCMapIndex)))))
-			{
-				// Пробуем загрузить через стандартный шрифт
-				if (false === this.m_bUseDefaultFont || null == this.m_pDefaultFont ||
-					0 >= (unGID = this.m_pDefaultFont.SetCMapForCharCode(ushUnicode, nCMapIndex)))
-				{
-					if (this.m_nDefaultChar < 0)
-					{
-						return;
-					}
-					else
-					{
-						unGID = this.m_nDefaultChar;
+        this.GetStringPath = function(string, worker)
+        {
+            var _len = string.GetLength();
+            if (_len <= 0)
+                return true;
 
-						pFace = this.m_pFace;
-						pCurentGliph = pFace.glyph;
-					}
-				}
-				else
-				{
-					pFace = this.m_pDefaultFont.m_pFace;
-					pCurentGliph = this.m_pDefaultFont.m_pGlyph;
-				}
-			}
+            for (var nIndex = 0; nIndex < _len; ++nIndex)
+            {
+                var _glyph = string.m_pGlyphsBuffer[nIndex];
+                var _x = string.m_fX + 25.4 * _glyph.fX / this.m_unHorDpi;
+                var _y = string.m_fY + 25.4 * _glyph.fY / this.m_unVerDpi;
 
-			var _LOAD_MODE = this.GetCharLoadMode();
-			if (0 != this.FT_Load_Glyph_Wrapper(pFace, unGID, _LOAD_MODE))
-				return;
+                worker._s();
+                this.GetCharPath(_glyph.lUnicode, worker, _x, _y);
+                worker.df();
+                worker._e();
+            }
+        };
 
-			var pGlyph = FT_Get_Glyph(pCurentGliph);
-			if (null == pGlyph)
-				return;
+        this.SetCMapForCharCode = function(lUnicode, pnCMapIndex)
+        {
+            if (this.m_bStringGID || !this.m_pFace || 0 == this.m_nNum_charmaps)
+                return lUnicode;
 
-			var _painter = new CGlyphVectorPainter();
-			_painter.KoefX = 25.4 / this.m_unHorDpi;
-			_painter.KoefY = 25.4 / this.m_unVerDpi;
+            var nCharIndex = 0;
 
-			if (x !== undefined)
-				_painter.X = x;
-			if (y !== undefined)
-				_painter.Y = y;
+            var charMapArray = this.m_pFace.charmaps;
+            for (var nIndex = 0; nIndex < this.m_nNum_charmaps; ++nIndex)
+            {
+                var pCMap = charMapArray[nIndex];
+                var pCharMap = __FT_CharmapRec(pCMap);
 
-			_painter.start(worker);
-			FT_Outline_Decompose(pGlyph.outline, _painter, worker);
-			_painter.end(worker);
+                if (0 != FT_Set_Charmap(this.m_pFace, pCMap))
+                    continue;
 
-			if (this.m_bIsNeedUpdateMatrix12)
-			{
-				if (this.m_pDefaultFont)
-					this.m_pDefaultFont.UpdateMatrix2();
-				this.UpdateMatrix2();
-			}
-		}
+                var pEncoding = pCharMap.encoding;
 
-		this.GetStringPath = function (string, worker)
-		{
-			var _len = string.GetLength();
-			if (_len <= 0)
-				return true;
+                if (FT_ENCODING_UNICODE == pEncoding)
+                {
+                    if ((nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode)) != 0)
+                    {
+                        pnCMapIndex.index = nIndex;
+                        return nCharIndex;
+                    }
+                }
+                else if (FT_ENCODING_NONE == pEncoding || FT_ENCODING_MS_SYMBOL == pEncoding || FT_ENCODING_APPLE_ROMAN == pEncoding)
+                {
+                    /*
+                     var res_code = FT_Get_First_Char(this.m_pFace);
+                     while (res_code.gindex != 0)
+                     {
+                     res_code = FT_Get_Next_Char(this.m_pFace, res_code.char_code);
+                     if (res_code.char_code == lUnicode)
+                     {
+                     nCharIndex = res_code.gindex;
+                     pnCMapIndex.index = nIndex;
+                     break;
+                     }
+                     }
+                     */
 
-			for (var nIndex = 0; nIndex < _len; ++nIndex)
-			{
-				var _glyph = string.m_pGlyphsBuffer[nIndex];
-				var _x = string.m_fX + 25.4 * _glyph.fX / this.m_unHorDpi;
-				var _y = string.m_fY + 25.4 * _glyph.fY / this.m_unVerDpi;
+                    nCharIndex = FT_Get_Char_Index(this.m_pFace, lUnicode);
+                    if (0 != nCharIndex)
+                        pnCMapIndex.index = nIndex;
+                }
+            }
 
-				worker._s();
-				this.GetCharPath(_glyph.lUnicode, worker, _x, _y);
-				worker.df();
-				worker._e();
-			}
-		}
+            return nCharIndex;
+        };
+
+		this.GetCharLoadMode = function()
+        {
+            return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
+        };
+
+        this.GetKerning = function(unPrevGID, unGID)
+        {
+            var pDelta = new AscFonts.FT_Vector();
+            AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
+            return (pDelta.x >> 6);
+        };
+
+        this.SetStringGID = function(bGID)
+        {
+            if (this.m_bStringGID == bGID)
+                return;
+
+            this.m_bStringGID = bGID;
+        };
+
+        this.GetStringGID = function()
+        {
+            return this.m_bStringGID;
+        };
+
+        this.SetCharSpacing = function(fCharSpacing)
+        {
+            this.m_fCharSpacing = fCharSpacing;
+        };
+
+        this.GetCharSpacing = function()
+        {
+            return this.m_fCharSpacing;
+        };
+
+        this.GetStyleName = function()
+        {
+            return this.m_pFace.style_name;
+        };
+
+        this.UpdateStyles = function(bBold, bItalic)
+        {
+            var sStyle = this.GetStyleName();
+
+            // Смотрим какой стиль у исходного шрифта
+            var bSrcBold = (-1 != sStyle.indexOf("Bold"));
+            var bSrcItalic = (-1 != sStyle.indexOf("Italic"));
+
+            this.SetNeedBold(bBold && !bSrcBold);
+            this.SetNeedItalic(bItalic && !bSrcItalic);
+        };
+
+        this.IsBold = function()
+        {
+        	if (this.m_bNeedDoBold)
+        		return true;
+
+        	return (-1 != this.m_pFace.style_name.indexOf("Bold")) ? true : false;
+        };
+
+        this.IsItalic = function()
+        {
+            if (this.m_bNeedDoItalic)
+                return true;
+
+            return (-1 != this.m_pFace.style_name.indexOf("Italic")) ? true : false;
+        };
+
+        this.SetNeedItalic = function(value)
+        {
+            if (this.m_bNeedDoItalic != value)
+            {
+                this.ClearCache();
+                this.m_bNeedDoItalic = value;
+                this.ResetFontMatrix();
+            }
+        };
+
+        this.SetNeedBold = function(value)
+        {
+            if (this.m_bNeedDoBold != value)
+            {
+                this.ClearCache();
+                this.m_bNeedDoBold = value;
+            }
+        };
+
+        this.IsSuccess = function()
+        {
+            return (0 == this.m_nError);
+        };
+
+        this.GetAscender = function()
+        {
+            return this.m_lAscender;
+        };
+
+        this.GetDescender = function()
+        {
+            return this.m_lDescender;
+        };
+
+        this.GetHeight = function()
+        {
+            return this.m_lLineHeight;
+        };
+
+        this.Units_Per_Em = function()
+        {
+            return this.m_lUnits_Per_Em;
+        };
+
+        this.CheckHintsSupport = function()
+        {
+            this.HintsSupport = true;
+
+            if (!this.m_pFace || !this.m_pFace.driver || !this.m_pFace.driver.clazz)
+                return;
+
+            if (this.m_pFace.driver.clazz.name != "truetype")
+            {
+                this.HintsSupport = false;
+                return;
+            }
+
+            if (this.m_pFace.family_name == "MS Mincho" ||
+                this.m_pFace.family_name == "Castellar")
+            {
+                this.HintsSupport = false;
+            }
+            else if (this.m_pFace.family_name == "Microsoft JhengHei UI Light" ||
+                this.m_pFace.family_name == "Kalinga")
+            {
+                this.HintsSubpixelSupport = false;
+            }
+        };
 	}
 
-	//--------------------------------------------------------export------------------------------------------------------
+	function CFontLoaderBySymbol()
+	{
+		this.FontFiles = {};
+
+		this.LoadSymbol = function(pFontFile, symbol, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, isFromPicker)
+		{
+			var fontManager = pFontFile.m_oFontManager;
+
+			var name = AscFonts.FontPickerByCharacter.getFontBySymbol(symbol);
+			if (undefined === name || name == "")
+				return null;
+
+			var _fontFilePick = this.FontFiles[name];
+			if (!_fontFilePick)
+			{
+                var _font_info = AscFonts.g_font_infos[AscFonts.g_map_font_index[name]];
+                var _style = AscFonts.FontStyle.FontStyleRegular;
+                if (pFontFile.IsBold())
+                	_style |= AscFonts.FontStyle.FontStyleBold;
+                if (pFontFile.IsItalic())
+                    _style |= AscFonts.FontStyle.FontStyleItalic;
+
+                _fontFilePick = _font_info.LoadFont(AscCommon.g_font_loader, fontManager, pFontFile.m_fSize, _style, pFontFile.m_unHorDpi, pFontFile.m_unVerDpi, undefined, true);
+
+                if (!_fontFilePick)
+                	return null;
+
+                this.FontFiles[name] = _fontFilePick;
+			}
+
+			if (!_fontFilePick)
+				return null;
+
+            _fontFilePick.SetSizeAndDpi(pFontFile.m_fSize, pFontFile.m_unHorDpi, pFontFile.m_unVerDpi);
+
+            var s = pFontFile.m_arrdTextMatrix;
+            var d = _fontFilePick.m_arrdTextMatrix;
+
+            d[0] = s[0];
+            d[1] = s[1];
+            d[2] = s[2];
+            d[3] = s[3];
+            d[4] = s[4];
+            d[5] = s[5];
+
+            _fontFilePick.UpdateMatrix();
+            return _fontFilePick.CacheGlyph(symbol, isRaster, isRasterDistances, workerVector, workerVectorX, workerVectorY, true);
+		};
+
+		this.ClearCache = function()
+		{
+			for (var font in this.FontFiles)
+				this.FontFiles[font].ClearCache();
+		};
+
+		this.ClearCacheNoAttack = function()
+		{
+            for (var font in this.FontFiles)
+                this.FontFiles[font].ClearCacheNoAttack();
+		};
+	}
+
 	window['AscFonts'] = window['AscFonts'] || {};
 	window['AscFonts'].EGlyphState = EGlyphState;
 	window['AscFonts'].CFontFile = CFontFile;

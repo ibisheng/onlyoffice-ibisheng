@@ -92,6 +92,57 @@ AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback,
 	xhr.send(null);
 };
 
+window["DesktopUploadFileToUrl"] = function(url, dst, hash, pass)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ascdesktop://fonts/" + url, true);
+    xhr.responseType = 'arraybuffer';
+
+    if (xhr.overrideMimeType)
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    else
+        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+    xhr.onload = function()
+    {
+        if (this.status != 200)
+        {
+            // error
+            return;
+        }
+
+        var fileData = new Uint8Array(this.response);
+
+        var req = new XMLHttpRequest();
+        req.open("PUT", dst, true);
+
+        req.onload = function()
+		{
+			if (this.response && this.status == 200)
+			{
+				try
+				{
+					var data = {
+						"accounts": this.response ? JSON.parse(this.response) : undefined,
+						"hash": hash,
+						"password" : pass,
+						"type": "share"
+					};
+
+					window["AscDesktopEditor"]["sendSystemMessage"](data);
+				}
+				catch (err)
+				{
+				}
+			}
+        };
+
+        req.send(fileData);
+    };
+
+    xhr.send(null);
+};
+
 /////////////////////////////////////////////////////////
 //////////////       IMAGES      ////////////////////////
 /////////////////////////////////////////////////////////
@@ -201,13 +252,27 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 
 window["UpdateInstallPlugins"] = function()
 {
-	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins["url"] = _plugins["url"].replace(" ", "%20");
+	var _pluginsTmp = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	_pluginsTmp[0]["url"] = _pluginsTmp[0]["url"].split(" ").join("%20");
+	_pluginsTmp[1]["url"] = _pluginsTmp[1]["url"].split(" ").join("%20");
+
+	var _plugins = { "url" : _pluginsTmp[0]["url"], "pluginsData" : [] };
+	for (var k = 0; k < 2; k++)
+	{
+		var _pluginsCur = _pluginsTmp[k];
+
+		var _len = _pluginsCur["pluginsData"].length;
+		for (var i = 0; i < _len; i++)
+		{
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+			_plugins["pluginsData"].push(_pluginsCur["pluginsData"][i]);
+		}
+	}
 
 	for (var i = 0; i < _plugins["pluginsData"].length; i++)
 	{
 		var _plugin = _plugins["pluginsData"][i];
-		_plugin["baseUrl"] = _plugins["url"] + _plugin["guid"].substring(4) + "/";
+		//_plugin["baseUrl"] = _plugins["url"] + _plugin["guid"].substring(4) + "/";
 
 		var isSystem = false;
 		for (var j = 0; j < _plugin["variations"].length; j++)
@@ -228,31 +293,61 @@ window["UpdateInstallPlugins"] = function()
 	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	if (!window.IsFirstPluginLoad)
+	{
+		_editor.asc_registerCallback("asc_onPluginsReset", function ()
+		{
+
+			if (_editor.pluginsManager)
+			{
+				_editor.pluginsManager.unregisterAll();
+			}
+
+		});
+
+		window.IsFirstPluginLoad = true;
+	}
+
+	_editor.sendEvent("asc_onPluginsReset");
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
 window["UpdateSystemPlugins"] = function()
 {
 	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins["url"] = _plugins["url"].replace(" ", "%20");
+	_plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
+	_plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
 
-	var _len = _plugins["pluginsData"].length;
-	for (var i = 0; i < _len; i++)
-		_plugins["pluginsData"][i]["baseUrl"] = _plugins["url"] + _plugins["pluginsData"][i]["guid"].substring(4) + "/";
+	for (var k = 0; k < 2; k++)
+	{
+		var _pluginsCur = _plugins[k];
+
+		var _len = _pluginsCur["pluginsData"].length;
+		for (var i = 0; i < _len; i++)
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+	}
 
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
 	var _array = [];
-	for (var i = 0; i < _len; i++)
+
+	for (var k = 0; k < 2; k++)
 	{
-		var _plugin = _plugins["pluginsData"][i];
-		for (var j = 0; j < _plugin["variations"].length; j++)
+		var _pluginsCur = _plugins[k];
+		var _len = _pluginsCur["pluginsData"].length;
+
+		for (var i = 0; i < _len; i++)
 		{
-			var _variation = _plugin["variations"][j];
-			if (_variation["initDataType"] == "desktop")
+			var _plugin = _pluginsCur["pluginsData"][i];
+			for (var j = 0; j < _plugin["variations"].length; j++)
 			{
-				_array.push(_plugin);
-				break;
+				var _variation = _plugin["variations"][j];
+				if (_variation["initDataType"] == "desktop")
+				{
+					_array.push(_plugin);
+					break;
+				}
 			}
 		}
 	}
@@ -380,7 +475,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 			}
 			else
 			{
-				_api.asc_setViewMode((0 == signatures.length) ? false : true);
+				//_api.asc_setViewMode((0 == signatures.length) ? false : true);
+				_api.collaborativeEditing.m_bGlobalLock = (0 == signatures.length) ? false : true;
 			}
 
 		});

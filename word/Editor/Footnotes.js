@@ -96,13 +96,13 @@ CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
 	var oSeparator = new CFootEndnote(this);
 	oSeparator.AddToParagraph(new ParaSeparator(), false);
-	var oParagraph = oSeparator.Get_ElementByIndex(0);
+	var oParagraph = oSeparator.GetElement(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetSeparator(oSeparator);
 
 	var oContinuationSeparator = new CFootEndnote(this);
 	oContinuationSeparator.AddToParagraph(new ParaContinuationSeparator(), false);
-	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
+	oParagraph = oContinuationSeparator.GetElement(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetContinuationSeparator(oContinuationSeparator);
 
@@ -1342,10 +1342,10 @@ CFootnotesController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CFootnotesController.prototype.RecalculateCurPos = function()
+CFootnotesController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.RecalculateCurPos();
+		return this.CurFootnote.RecalculateCurPos(bUpdateX, bUpdateY);
 
 	return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};
 };
@@ -1390,13 +1390,6 @@ CFootnotesController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightP
 		return false;
 
 	return this.CurFootnote.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
-};
-CFootnotesController.prototype.AddTextArt = function(nStyle)
-{
-	if (false === this.private_CheckFootnotesSelectionBeforeAction())
-		return false;
-
-	return this.CurFootnote.AddTextArt(nStyle);
 };
 CFootnotesController.prototype.EditChart = function(Chart)
 {
@@ -2762,6 +2755,13 @@ CFootnotesController.prototype.CanSplitTableCells = function()
 		return false;
 
 	return this.CurFootnote.CanSplitTableCells();
+};
+CFootnotesController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
+
+	return this.CurFootnote.DistributeTableCells(isHorizontally);
 };
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {

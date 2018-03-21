@@ -124,13 +124,27 @@
 						var _client = new XMLHttpRequest();
 						_client.open("GET", url);
 
+						_client.onreadystatechange = function() {
+							if (_client.readyState == 4 && (_client.status == 200 || location.href.indexOf("file:") == 0))
+							{
+								var _type = (_isClose === true) ? "close" : "command";
+								window.Asc.plugin.info.recalculate = true;
+								window.Asc.plugin.executeCommand(_type, _client.responseText);
+								if (callback)
+									callback(_client.responseText);
+							}
+						};
+						_client.send();
+					};
+
+					window.Asc.plugin.loadModule = function(url, callback)
+					{
+						var _client = new XMLHttpRequest();
+						_client.open("GET", url);
 
 						_client.onreadystatechange = function() {
 							if (_client.readyState == 4 && (_client.status == 200 || location.href.indexOf("file:") == 0))
 							{
-								var _type = (_isClose === true) ? "close" : "command"
-								window.Asc.plugin.info.recalculate = true;
-								window.Asc.plugin.executeCommand(_type, _client.responseText);
 								if (callback)
 									callback(_client.responseText);
 							}

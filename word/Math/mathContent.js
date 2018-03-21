@@ -2212,6 +2212,10 @@ CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
             this.Remove_FromContent(Pos+1, len - Pos - 1);
         }
     }
+    else
+	{
+		NewContent.Add_ToContent(0, new ParaRun(this.Paragraph, true));
+	}
 };
 CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {
@@ -2227,9 +2231,9 @@ CMathContent.prototype.Add_ToContent = function(Pos, Item)
 };
 CMathContent.prototype.Concat_ToEnd = function(NewItems)
 {
-    this.Concat_ToContent(this.Content.length, NewItems);
+    this.ConcatToContent(this.Content.length, NewItems);
 };
-CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
+CMathContent.prototype.ConcatToContent = function(Pos, NewItems)
 {
 	if (NewItems != undefined && NewItems.length > 0)
 	{
@@ -2460,11 +2464,14 @@ CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
         this.Content[Index].Set_ParaMath(ParaMath, this);
     }
 };
-CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
+CMathContent.prototype.Load_FromMenu = function(Type, Paragraph, TextPr)
 {
     this.Paragraph = Paragraph;
 
-    var Pr = {ctrPrp: new CTextPr()};
+    var Pr = {
+    	ctrPrp : TextPr ? TextPr.Copy() : new CTextPr()
+    };
+
     Pr.ctrPrp.Italic = true;
     Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 
@@ -5260,7 +5267,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
 
         this.Remove_FromContent(Pos, 1);
 
-        this.Concat_ToContent(Pos, Items);
+        this.ConcatToContent(Pos, Items);
 
         this.Correct_Content();
 

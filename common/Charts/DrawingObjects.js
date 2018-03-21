@@ -41,6 +41,7 @@ function (window, undefined) {
 
     
     var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAYAAAB10jRKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAJElEQVQYV2MAAjUQoQIiFECEDIiQABHCIIIPRHCBCDYgZmACABohANImre1SAAAAAElFTkSuQmCC';
+    //var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAQAAAD41K0JAAAAD0lEQVR42mNgEGJmAAJmAACcABmX0vttAAAAAElFTkSuQmCC';
     var sFrozenImageRotUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAABCAYAAADn9T9+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGklEQVQYV2NkYGBQA+J/QPwHCf+GYiif4Q8AnJAJBNqB9DYAAAAASUVORK5CYII='
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
@@ -1846,7 +1847,7 @@ function DrawingObjects() {
         shape.txBody.content.Content[0].Add_ToContent(0, oParaContent.Copy());
         var body_pr = shape.getBodyPr();
         var w = shape.txBody.getMaxContentWidth(150, true) + body_pr.lIns + body_pr.rIns;
-        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        var h = shape.txBody.content.GetSummaryHeight() + body_pr.tIns + body_pr.bIns;
         shape.spPr.xfrm.setExtX(w);
         shape.spPr.xfrm.setExtY(h);
         shape.spPr.xfrm.setOffX(0);
@@ -3486,11 +3487,19 @@ function DrawingObjects() {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.row >= target.row) {
                         if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.recalculateTransform){
-                                drawingObject.graphicObject.recalculateTransform();
+                            if(drawingObject.graphicObject.handleUpdateExtents)
+                            {
+                                drawingObject.graphicObject.handleUpdateExtents();
+                                drawingObject.graphicObject.recalculate();
                             }
-                            if(drawingObject.graphicObject.recalculateBounds){
-                                drawingObject.graphicObject.recalculateBounds();
+                            else
+                            {
+                                if(drawingObject.graphicObject.recalculateTransform){
+                                    drawingObject.graphicObject.recalculateTransform();
+                                }
+                                if(drawingObject.graphicObject.recalculateBounds){
+                                    drawingObject.graphicObject.recalculateBounds();
+                                }
                             }
                         }
                     }
@@ -3500,11 +3509,19 @@ function DrawingObjects() {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.col >= target.col) {
                         if(drawingObject.graphicObject){
-                            if(drawingObject.graphicObject.recalculateTransform){
-                                drawingObject.graphicObject.recalculateTransform();
+                            if(drawingObject.graphicObject.handleUpdateExtents)
+                            {
+                                drawingObject.graphicObject.handleUpdateExtents();
+                                drawingObject.graphicObject.recalculate();
                             }
-                            if(drawingObject.graphicObject.recalculateBounds){
-                                drawingObject.graphicObject.recalculateBounds();
+                            else
+                            {
+                                if(drawingObject.graphicObject.recalculateTransform){
+                                    drawingObject.graphicObject.recalculateTransform();
+                                }
+                                if(drawingObject.graphicObject.recalculateBounds){
+                                    drawingObject.graphicObject.recalculateBounds();
+                                }
                             }
                         }
                     }
@@ -4393,6 +4410,19 @@ function DrawingObjects() {
     };
 
 
+    _this.checkCurrentTextObjectExtends = function()
+    {
+        var oController = this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject.checkExtentsByDocContent)
+            {
+                oTargetTextObject.checkExtentsByDocContent(true, true);
+            }
+        }
+    };
+
     _this.beginCompositeInput = function(){
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInput);
         _this.controller.CreateDocContent();
@@ -4427,14 +4457,8 @@ function DrawingObjects() {
 
     _this.Begin_CompositeInput = function(){
         if(_this.controller){
-            if(window['Asc']['editor'].collaborativeEditing.getFast()){
-                _this.controller.checkSelectedObjectsAndCallbackNoCheckLock(_this.beginCompositeInput,  [], false, AscDFH.historydescription_Document_CompositeInput);
-            }
-            else{
-                _this.controller.checkSelectedObjectsAndCallback(_this.beginCompositeInput, [], false, AscDFH.historydescription_Document_CompositeInput);
-            }
+            _this.controller.checkSelectedObjectsAndCallback(_this.beginCompositeInput, [], false, AscDFH.historydescription_Document_CompositeInput);
         }
-        _this.beginCompositeInput();
     };
 
 
@@ -4447,14 +4471,9 @@ function DrawingObjects() {
         var nPos = _this.CompositeInput.Pos + _this.CompositeInput.Length;
         var oChar;
         if (32 == nCharCode || 12288 == nCharCode)
-        {
             oChar = new ParaSpace();
-        }
         else
-        {
-            oChar = new ParaText();
-            oChar.Set_CharCode(nCharCode);
-        }
+            oChar = new ParaText(nCharCode);
         oRun.Add_ToContent(nPos, oChar, true);
         _this.CompositeInput.Length++;
     };
@@ -4465,6 +4484,8 @@ function DrawingObjects() {
             return;
         History.Create_NewPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         _this.addCompositeText(nCharCode);
+
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.recalculateCurPos();
         _this.controller.updateSelectionState();
@@ -4484,6 +4505,7 @@ function DrawingObjects() {
 
     _this.Remove_CompositeText = function(nCount){
         _this.removeCompositeText(nCount);
+        _this.checkCurrentTextObjectExtends();
         _this.controller.recalculate();
         _this.controller.updateSelectionState();
     };
@@ -4497,6 +4519,7 @@ function DrawingObjects() {
         {
             _this.addCompositeText(arrCharCodes[nIndex]);
         }
+        _this.checkCurrentTextObjectExtends();
 		_this.controller.startRecalculate();
         _this.controller.updateSelectionState();
     };
@@ -4528,6 +4551,15 @@ function DrawingObjects() {
         var oRun = _this.CompositeInput.Run;
         oRun.Set_CompositeInput(null);
         _this.CompositeInput = null;
+        var oController = _this.controller;
+        if(oController)
+        {
+            var oTargetTextObject = AscFormat.getTargetTextObject(oController);
+            if(oTargetTextObject && oTargetTextObject.txWarpStructNoTransform)
+            {
+                oTargetTextObject.recalculateContent();
+            }
+        }
         _this.sendGraphicObjectProps();
         _this.showDrawingObjects(true);
     };

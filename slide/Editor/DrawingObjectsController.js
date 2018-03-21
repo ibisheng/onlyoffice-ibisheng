@@ -50,10 +50,10 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.getDrawingsForController();
 };
 
-DrawingObjectsController.prototype.recalculateCurPos = function(){
+DrawingObjectsController.prototype.recalculateCurPos = function(bUpdateX, bUpdateY){
     var oTargetDocContent = this.getTargetDocContent(undefined, true);
     if(oTargetDocContent){
-        oTargetDocContent.RecalculateCurPos();
+        oTargetDocContent.RecalculateCurPos(bUpdateX, bUpdateY);
         editor.WordControl.m_oLogicDocument.NeedUpdateTargetForCollaboration = true;
     }
 };
@@ -158,7 +158,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
 
 DrawingObjectsController.prototype.paragraphFormatPaste2 = function()
 {
-    return this.paragraphFormatPaste(editor.WordControl.m_oLogicDocument.CopyTextPr, editor.WordControl.m_oLogicDocument.CopyParaPr, true);
+    return this.paragraphFormatPaste(editor.WordControl.m_oLogicDocument.CopyTextPr, null, true);
 };
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {

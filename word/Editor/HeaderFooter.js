@@ -157,7 +157,7 @@ CHeaderFooter.prototype =
             bChanges = true;
         else
         {
-            OldSumH   = RecalcObj.Get_SummaryHeight();
+            OldSumH   = RecalcObj.GetSummaryHeight();
             OldBounds = RecalcObj.Get_PageBounds(0);
             RecalcObj.Get_DrawingFlowPos( OldFlowPos );
         }
@@ -233,7 +233,7 @@ CHeaderFooter.prototype =
 
         if ( false === bChanges )
         {
-            var NewSumH = this.Content.Get_SummaryHeight();
+            var NewSumH = this.Content.GetSummaryHeight();
             if ( Math.abs( OldSumH - NewSumH ) > 0.001 )
                 bChanges = true;
         }
@@ -542,7 +542,7 @@ CHeaderFooter.prototype =
 	UpdateCursorType : function(X, Y, PageAbs)
     {
         if (PageAbs != this.Content.Get_StartPage_Absolute())
-            this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+            this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
         else
             return this.Content.UpdateCursorType(X, Y, 0);
     },
@@ -1084,6 +1084,11 @@ CHeaderFooter.prototype =
     {
         return false;
     },
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		return this.Content.DistributeTableCells(isHorizontally);
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------    
@@ -1285,6 +1290,14 @@ CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
 {
 	return this.Content.GetAllContentControls(arrContentControls);
 };
+/**
+ * * Получаем класс, управляющий содержимым колонтитула
+ * @returns {CDocumentContent}
+ */
+CHeaderFooter.prototype.GetContent = function()
+{
+	return this.Content;
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -1446,6 +1459,8 @@ CHeaderFooterController.prototype =
 
             Pr.Locked = this.Lock.Is_Locked();
 
+			Pr.StartPageNumber = SectPr.Get_PageNum_Start();
+
             return Pr;
         }
         else
@@ -1466,13 +1481,13 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------   
-    RecalculateCurPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.RecalculateCurPos();
+    RecalculateCurPos : function(bUpdateX, bUpdateY)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.RecalculateCurPos(bUpdateX, bUpdateY);
 
-        return null;
-    },
+		return null;
+	},
 
     Recalculate : function(PageIndex)
     {
@@ -1537,7 +1552,7 @@ CHeaderFooterController.prototype =
                 Footer.Reset( X, Y, XLimit, YLimit );
                 Footer.Recalculate2(PageIndex);
 
-                var SummaryHeight = Footer.Content.Get_SummaryHeight();
+                var SummaryHeight = Footer.Content.GetSummaryHeight();
                 Y = Math.max( 2 * YLimit / 3, YLimit - SectPr.Get_PageMargins_Footer() - SummaryHeight );
 
                 Footer.Reset( X, Y, XLimit, YLimit );
@@ -2437,6 +2452,15 @@ CHeaderFooterController.prototype =
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.CanSplitTableCells();
 	},
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.DistributeTableCells(isHorizontally);
+
+		return false;
+	},
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

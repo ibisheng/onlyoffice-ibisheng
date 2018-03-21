@@ -37,16 +37,6 @@
  * Time: 12:12
  */
 
-var sdtlock_ContentLocked    = 0x00;
-var sdtlock_SdtContentLocked = 0x01;
-var sdtlock_SdtLocked        = 0x02;
-var sdtlock_Unlocked         = 0x03;
-
-var sdttype_BlockLevel  = 0x01;
-var sdttype_InlineLevel = 0x02;
-var sdttype_RowLevel    = 0x03;
-var sdttype_CellLevel   = 0x04;
-
 function CSdtPr()
 {
 	this.Alias = undefined;
@@ -162,13 +152,22 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 	if (Flags & 128)
 		this.DocPartObj.Category = Reader.GetString2();
 };
+CSdtPr.prototype.IsBuiltInDocPart = function()
+{
+	if (this.DocPartObj && (this.DocPartObj.Category || this.DocPartObj.Gallery))
+		return true;
 
-function CContentControlPr()
+	return false;
+};
+
+function CContentControlPr(nType)
 {
 	this.Id         = undefined;
 	this.Tag        = undefined;
+	this.Alias      = undefined;
 	this.Lock       = undefined;
 	this.InternalId = undefined;
+	this.CCType     = undefined !== nType ? nType : c_oAscSdtLevelType.Inline;
 }
 CContentControlPr.prototype.get_Id = function()
 {
@@ -198,28 +197,36 @@ CContentControlPr.prototype.get_InternalId = function()
 {
 	return this.InternalId;
 };
+CContentControlPr.prototype.get_ContentControlType = function()
+{
+	return this.CCType;
+};
+CContentControlPr.prototype.get_Alias = function()
+{
+	return this.Alias;
+};
+CContentControlPr.prototype.put_Alias = function(sAlias)
+{
+	this.Alias = sAlias;
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord']        = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSdtPr = CSdtPr;
 
-window['AscCommonWord'].sdtlock_Unlocked         = sdtlock_Unlocked;
-window['AscCommonWord'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
-window['AscCommonWord'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
-window['AscCommonWord'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
+window['AscCommon'] = window['AscCommon'] || {};
 
-window['AscCommonWord'].sdttype_BlockLevel  = sdttype_BlockLevel;
-window['AscCommonWord'].sdttype_InlineLevel = sdttype_InlineLevel;
-window['AscCommonWord'].sdttype_RowLevel    = sdttype_RowLevel;
-window['AscCommonWord'].sdttype_CellLevel   = sdttype_CellLevel;
+window['AscCommon'].CContentControlPr    = CContentControlPr;
+window['AscCommon']['CContentControlPr'] = CContentControlPr;
 
-window['AscCommonWord'].CContentControlPr = CContentControlPr;
-
-CContentControlPr.prototype['get_Id']         = CContentControlPr.prototype.get_Id;
-CContentControlPr.prototype['put_Id']         = CContentControlPr.prototype.put_Id;
-CContentControlPr.prototype['get_Tag']        = CContentControlPr.prototype.get_Tag;
-CContentControlPr.prototype['put_Tag']        = CContentControlPr.prototype.put_Tag;
-CContentControlPr.prototype['get_Lock']       = CContentControlPr.prototype.get_Lock;
-CContentControlPr.prototype['put_Lock']       = CContentControlPr.prototype.put_Lock;
-CContentControlPr.prototype['get_InternalId'] = CContentControlPr.prototype.get_InternalId;
+CContentControlPr.prototype['get_Id']                 = CContentControlPr.prototype.get_Id;
+CContentControlPr.prototype['put_Id']                 = CContentControlPr.prototype.put_Id;
+CContentControlPr.prototype['get_Tag']                = CContentControlPr.prototype.get_Tag;
+CContentControlPr.prototype['put_Tag']                = CContentControlPr.prototype.put_Tag;
+CContentControlPr.prototype['get_Lock']               = CContentControlPr.prototype.get_Lock;
+CContentControlPr.prototype['put_Lock']               = CContentControlPr.prototype.put_Lock;
+CContentControlPr.prototype['get_InternalId']         = CContentControlPr.prototype.get_InternalId;
+CContentControlPr.prototype['get_ContentControlType'] = CContentControlPr.prototype.get_ContentControlType;
+CContentControlPr.prototype['get_Alias']              = CContentControlPr.prototype.get_Alias;
+CContentControlPr.prototype['put_Alias']              = CContentControlPr.prototype.put_Alias;
 

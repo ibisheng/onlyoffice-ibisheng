@@ -3397,15 +3397,14 @@ Col.prototype =
 var g_nRowOffsetFlag = 0;
 var g_nRowOffsetXf = g_nRowOffsetFlag + 1;
 var g_nRowOffsetHeight = g_nRowOffsetXf + 4;
-var g_nRowStructSize = g_nRowOffsetHeight + 2;
+var g_nRowStructSize = g_nRowOffsetHeight + 8;
 
 var g_nRowFlag_empty = 0;
 var g_nRowFlag_init = 1;
 var g_nRowFlag_hd = 2;
 var g_nRowFlag_CustomHeight = 4;
 var g_nRowFlag_CalcHeight = 8;
-
-var g_nInt16InitVal = 1<<15;
+var g_nRowFlag_NullHeight = 16;
 
 /**
  * @constructor
@@ -3434,10 +3433,15 @@ Row.prototype =
 			var sheetMemory = this.ws.rowsData;
 			sheetMemory.checkSize(this.index);
 			var xfSave = this.xfs ? this.xfs.getIndexNumber() : 0;
-			var heightSave = null != this.h ? (this._prepareHeightToSave(this.h) | g_nInt16InitVal) : 0;
-			sheetMemory.setUint8(this.index, g_nRowOffsetFlag, this.flags);
+			var flagToSave = this.flags;
+			var heightToSave = this.h;
+			if (null === heightToSave) {
+				flagToSave |= g_nRowFlag_NullHeight;
+				heightToSave = 0;
+			}
+			sheetMemory.setUint8(this.index, g_nRowOffsetFlag, flagToSave);
 			sheetMemory.setUint32(this.index, g_nRowOffsetXf, xfSave);
-			sheetMemory.setUint16(this.index, g_nRowOffsetHeight, heightSave);
+			sheetMemory.setFloat64(this.index, g_nRowOffsetHeight, heightToSave);
 		}
 	},
 	loadContent: function(index) {
@@ -3449,8 +3453,12 @@ Row.prototype =
 			this.flags = sheetMemory.getUint8(this.index, g_nRowOffsetFlag);
 			if (0 != (g_nRowFlag_init & this.flags)) {
 				this.xfs = g_StyleCache.getXf(sheetMemory.getUint32(this.index, g_nRowOffsetXf));
-				var heightSave = sheetMemory.getUint16(this.index, g_nRowOffsetHeight);
-				this.h = (0 != (heightSave & g_nInt16InitVal)) ? (heightSave & ~g_nInt16InitVal) / 100 : null;
+				if (0 !== (g_nRowFlag_NullHeight & this.flags)) {
+					this.flags &= ~g_nRowFlag_NullHeight;
+					this.h = null;
+				} else {
+					this.h = sheetMemory.getFloat64(this.index, g_nRowOffsetHeight);
+				}
 				res = true;
 			}
 		}
@@ -3735,18 +3743,11 @@ Row.prototype =
 		} else if (val > Asc.c_oAscMaxRowHeight) {
 			val = Asc.c_oAscMaxRowHeight;
 		}
-		this.h = this._prepareHeight(val);
+		this.h = val;
 		this._hasChanged = true;
 	},
 	getHeight: function() {
 		return this.h;
-	},
-	_prepareHeight: function(val) {
-		//remain 2 digits in fraction part
-		return this._prepareHeightToSave(val) / 100;
-	},
-	_prepareHeightToSave: function(val) {
-		return Math.round(val * 100);
 	}
 };
 	function getStringFromMultiText(multiText) {
@@ -3754,7 +3755,7 @@ Row.prototype =
 		if (multiText) {
 			for (var i = 0, length = multiText.length; i < length; ++i) {
 				var elem = multiText[i];
-				if (null != elem.text && elem.format && elem.format.getSkip() == false) {
+				if (null != elem.text && !(elem.format && elem.format.getSkip())) {
 					sRes += elem.text;
 				}
 			}
@@ -4789,12 +4790,14 @@ RangeDataManager.prototype = {
 		var sparklineRange;
 		for (var i = 0; i < this.arrSparklines.length; ++i) {
 			sparklineRange = this.arrSparklines[i]._f;
+			if (sparklineRange) {
 			for (var j = 0; j < ranges.length; ++j) {
 				if (sparklineRange.isIntersect(ranges[j], sheet)) {
 					this.arrSparklines[i].oCacheView = null;
 					break;
 				}
 			}
+		}
 		}
 	};
 	sparklineGroup.prototype.contains = function (c, r) {
@@ -4842,12 +4845,16 @@ RangeDataManager.prototype = {
 		var sheet = this.worksheet.getName();
 		var result = new AscCommonExcel.SelectionRange();
 		this.arrSparklines.forEach(function (item, i) {
+			if (item._f) {
 			isUnion = isUnion && sheet === item._f.sheet;
 			if (0 === i) {
 				result.assign2(item._f);
 			} else {
 				result.addRange();
 				result.getLast().assign2(item._f);
+			}
+			} else {
+				isUnion = false;
 			}
 		});
 		var unionRange = isUnion ? result.getUnion() : result;
@@ -4940,7 +4947,7 @@ RangeDataManager.prototype = {
 			}
 		} else {
 			this.arrSparklines.forEach(function (item) {
-				arrResultData.push(item.f);
+				arrResultData.push(item.f || cErrorOrigin['ref']);
 				arrResultLocation.push(item.sqref.getAbsName());
 			});
 		}
@@ -5230,28 +5237,34 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
+
 TablePart.prototype.clone = function() {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
 	res.TotalsRowCount = this.TotalsRowCount;
-	if (this.AutoFilter)
+		if (this.AutoFilter) {
 		res.AutoFilter = this.AutoFilter.clone();
-	if (this.SortState)
+		}
+		if (this.SortState) {
 		res.SortState = this.SortState.clone();
+		}
 	if (this.TableColumns) {
 		res.TableColumns = [];
-		for (i = 0; i < this.TableColumns.length; ++i)
+			for (i = 0; i < this.TableColumns.length; ++i) {
 			res.TableColumns.push(this.TableColumns[i].clone());
 	}
-	if (this.TableStyleInfo)
+		}
+		if (this.TableStyleInfo) {
 		res.TableStyleInfo = this.TableStyleInfo.clone();
+		}
 	
 	if (this.result) {
 		res.result = [];
-		for (i = 0; i < this.result.length; ++i)
+			for (i = 0; i < this.result.length; ++i) {
 			res.result.push(this.result[i].clone());
 	}
+		}
 	res.DisplayName = this.DisplayName;
 	
 	res.altText = this.altText;
@@ -5290,77 +5303,70 @@ TablePart.prototype.moveRef = function(col, row) {
 	//event
 	this.handlers.trigger("changeRefTablePart", this);
 
-	if(this.AutoFilter)
-	{
+		if (this.AutoFilter) {
 		this.AutoFilter.moveRef(col, row);
 	}	
-	if(this.SortState)
-	{
+		if (this.SortState) {
 		this.SortState.moveRef(col, row);
 	}
 };
 TablePart.prototype.changeRef = function(col, row, bIsFirst, bIsNotChangeAutoFilter) {
 	var ref = this.Ref.clone();
-	if(bIsFirst)
+		if (bIsFirst) {
 		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
+		} else {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
 	
 	this.Ref = ref;
 	
 	//event
 	this.handlers.trigger("changeRefTablePart", this);
 	
-	if(this.AutoFilter && !bIsNotChangeAutoFilter)
-	{
+		if (this.AutoFilter && !bIsNotChangeAutoFilter) {
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 	}
-	if(this.SortState)
-	{
+		if (this.SortState) {
 		this.SortState.changeRef(col, row, bIsFirst);
 	}
 };
 TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewTableColumns) {
-	if(!range)
+		if (!range) {
 		return;
+		}
 	
 	//add table columns
-	if(generateNewTableColumns)
-	{
+		if (generateNewTableColumns) {
 		var newTableColumns = [];
 		var intersectionRanges = this.Ref.intersection(range);
 		
-		if(null !== intersectionRanges)
-		{
+			if (null !== intersectionRanges) {
 			this.removeDependencies();
 			var tableColumn;
 			var headerRow = this.isHeaderRow() ? this.Ref.r1 : this.Ref.r1 - 1;
-			for(var i = range.c1; i <= range.c2; i++)
-			{
-				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
-				{
+				for (var i = range.c1; i <= range.c2; i++) {
+					if (i >= intersectionRanges.c1 && i <= intersectionRanges.c2) {
 					var tableIndex = i - this.Ref.c1;
 					tableColumn = this.TableColumns[tableIndex];
-				}
-				else
-				{
+					} else {
 					tableColumn = new TableColumn();
 					var cell = autoFilters.worksheet.getCell3(headerRow, i);
-					if(!cell.isNullText())
-					{
-						tableColumn.Name = autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns), cell.getValueWithoutFormat());
+						if (!cell.isNullText()) {
+							tableColumn.Name =
+								autoFilters.checkTableColumnName(newTableColumns.concat(this.TableColumns),
+									cell.getValueWithoutFormat());
 					}
 				}
 				
 				newTableColumns.push(tableColumn);
 			}
 			
-			for(var j = 0; j < newTableColumns.length; j++)
-			{
+				for (var j = 0; j < newTableColumns.length; j++) {
 				tableColumn = newTableColumns[j];
-				if(tableColumn.Name === null)
+					if (tableColumn.Name === null) {
 					tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 			}
+				}
 			
 			this.TableColumns = newTableColumns;
 			this.buildDependencies();
@@ -5370,48 +5376,50 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 	//event
 	this.handlers.trigger("changeRefTablePart", this);
 	
-	if(this.AutoFilter)
+		if (this.AutoFilter) {
 		this.AutoFilter.changeRefOnRange(range);
+		}
 };
 TablePart.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
-	if(this.AutoFilter)
+		if (this.AutoFilter) {
 		res = this.AutoFilter.isApplyAutoFilter();
+		}
 		
 	return res;
 };
 TablePart.prototype.isApplySortConditions = function() {
 	var res = false;
 	
-	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+		if (this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0]) {
 		res = true;
+		}
 		
 	return res;
 };
 
 TablePart.prototype.setHandlers = function(handlers) {
-	if(this.handlers === null)
+		if (this.handlers === null) {
 		this.handlers = handlers;
+		}
 };
 
-TablePart.prototype.deleteTableColumns = function(activeRange)
-{
-	if(!activeRange)
+	TablePart.prototype.deleteTableColumns = function (activeRange) {
+		if (!activeRange) {
 		return;
+		}
 	
 	var diff = null, startCol;
 	if(activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
 	{
 		diff = activeRange.c2 - this.Ref.c1 + 1;
 		startCol = 0;
-	}
-	else if(activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
+		} else if (activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
 	{
 		diff = this.Ref.c2 - activeRange.c1 + 1;
 		startCol = activeRange.c1 - this.Ref.c1;
-	}
-	else if(activeRange.c1 >= this.Ref.c1 && activeRange.c2 <= this.Ref.c2)//inside
+		} else if (activeRange.c1 >= this.Ref.c1 && activeRange.c2 <= this.Ref.c2)//inside
 	{
 		diff = activeRange.c2 - activeRange.c1 + 1;
 		startCol = activeRange.c1 - this.Ref.c1;
@@ -5428,11 +5436,9 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		}
 		this.handlers.trigger("deleteColumnTablePart", this.DisplayName, deletedMap);
 		
-		if(this.SortState) 
-		{
+			if (this.SortState) {
 			var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
-			if(bIsDeleteSortState)
-			{
+				if (bIsDeleteSortState) {
 				this.SortState = null;
 			}
 		}
@@ -5440,19 +5446,14 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 
 };
 
-TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
-{
+	TablePart.prototype.addTableColumns = function (activeRange, autoFilters) {
 	var newTableColumns = [], num = 0;
 	this.removeDependencies();
-	for(var j = 0; j < this.TableColumns.length;)
-	{
+		for (var j = 0; j < this.TableColumns.length;) {
 		var curCol = num + this.Ref.c1;
-		if(activeRange.c1 <= curCol && activeRange.c2 >= curCol)
-		{
+			if (activeRange.c1 <= curCol && activeRange.c2 >= curCol) {
 			newTableColumns[newTableColumns.length] = new TableColumn();
-		}
-		else
-		{
+			} else {
 			newTableColumns[newTableColumns.length] = this.TableColumns[j];
 			j++
 		}
@@ -5460,12 +5461,12 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 		num++;
 	}
 	
-	for(var j = 0; j < newTableColumns.length; j++)
-	{
+		for (var j = 0; j < newTableColumns.length; j++) {
 		var tableColumn = newTableColumns[j];
-		if(tableColumn.Name === null)
+			if (tableColumn.Name === null) {
 			tableColumn.Name = autoFilters._generateColumnName2(newTableColumns);
 	}
+		}
 	
 	this.TableColumns = newTableColumns;
 	
@@ -5480,16 +5481,14 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 		}
 	}*/
 	
-	if(this.SortState) 
-	{
+		if (this.SortState) {
 		this.SortState.changeColumns(activeRange);
 	}
 	
 	this.buildDependencies();
 };
 
-TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
-{
+	TablePart.prototype.addTableLastColumn = function (activeRange, autoFilters, isAddLastColumn) {
 	this.removeDependencies();
 	var newTableColumns = this.TableColumns;
 	newTableColumns.push(new TableColumn());
@@ -5499,35 +5498,28 @@ TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAd
 	this.buildDependencies();
 };
 
-TablePart.prototype.isAutoFilter = function()
-{
+	TablePart.prototype.isAutoFilter = function () {
 	return false;
 };
 
-TablePart.prototype.getAutoFilter = function()
-{
+	TablePart.prototype.getAutoFilter = function () {
 	return this.AutoFilter;
 };
 
-TablePart.prototype.getTableRangeForFormula = function(objectParam)
-{
+	TablePart.prototype.getTableRangeForFormula = function (objectParam) {
 	var res = null;
 	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
 	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	switch(objectParam.param)
-	{
-		case FormulaTablePartInfo.all:
-		{
+		switch (objectParam.param) {
+			case FormulaTablePartInfo.all: {
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
 			break;
 		}
-		case FormulaTablePartInfo.data:
-		{
+			case FormulaTablePartInfo.data: {
 			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
-		case FormulaTablePartInfo.headers:
-		{
+			case FormulaTablePartInfo.headers: {
 			if(this.HeaderRowCount === null) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
 			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
@@ -5535,8 +5527,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			}
 			break;
 		}
-		case FormulaTablePartInfo.totals:
-		{
+			case FormulaTablePartInfo.totals: {
 			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
 			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
@@ -5544,8 +5535,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			}
 			break;
 		}
-		case FormulaTablePartInfo.thisRow:
-		{
+			case FormulaTablePartInfo.thisRow: {
 			if (objectParam.cell) {
 				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
 					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
@@ -5561,15 +5551,16 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			}
 			break;
 		}
-		case FormulaTablePartInfo.columns:
-		{
+			case FormulaTablePartInfo.columns: {
 			var startCol = this.getTableIndexColumnByName(objectParam.startCol);
 			var endCol = this.getTableIndexColumnByName(objectParam.endCol);
 			
-			if(startCol === null)
+				if (startCol === null) {
 				break;
-			if(endCol === null)
+				}
+				if (endCol === null) {
 				endCol = startCol;
+				}
 
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
@@ -5585,16 +5576,14 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 	return res;
 };
 
-TablePart.prototype.getTableIndexColumnByName = function(name)
-{
+	TablePart.prototype.getTableIndexColumnByName = function (name) {
 	var res = null;
-	if(name === null || name === undefined || !this.TableColumns)
+		if (name === null || name === undefined || !this.TableColumns) {
 		return res;
+		}
 		
-	for(var i = 0; i < this.TableColumns.length; i++)
-	{
-		if(name.toLowerCase() === this.TableColumns[i].Name.toLowerCase())
-		{
+		for (var i = 0; i < this.TableColumns.length; i++) {
+			if (name.toLowerCase() === this.TableColumns[i].Name.toLowerCase()) {
 			res = i;
 			break;
 		}
@@ -5603,16 +5592,14 @@ TablePart.prototype.getTableIndexColumnByName = function(name)
 	return res;
 };
 
-TablePart.prototype.getTableNameColumnByIndex = function(index)
-{
+	TablePart.prototype.getTableNameColumnByIndex = function (index) {
 	var res = null;
-	if(index === null || index === undefined || !this.TableColumns)
+		if (index === null || index === undefined || !this.TableColumns) {
 		return res;
+		}
 		
-	for(var i = 0; i < this.TableColumns.length; i++)
-	{
-		if(index === i)
-		{
+		for (var i = 0; i < this.TableColumns.length; i++) {
+			if (index === i) {
 			res = this.TableColumns[i].Name;
 			break;
 		}
@@ -5621,94 +5608,74 @@ TablePart.prototype.getTableNameColumnByIndex = function(index)
 	return res;
 };
 
-TablePart.prototype.showButton = function(val)
-{
-	if(val === false)
-	{
-		if(!this.AutoFilter)
-		{
+	TablePart.prototype.showButton = function (val) {
+		if (val === false) {
+			if (!this.AutoFilter) {
 			this.AutoFilter = new AutoFilter();
 			this.AutoFilter.Ref = this.Ref;
 		}
 		
 		this.AutoFilter.showButton(val);
-	}
-	else
-	{
-		if(this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length)
-		{
+		} else {
+			if (this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length) {
 			this.AutoFilter.showButton(val);
 		}
 	}
 };
 
-TablePart.prototype.isShowButton = function()
-{
+	TablePart.prototype.isShowButton = function () {
 	var res = false;
 	
-	if(this.AutoFilter)
-	{
+		if (this.AutoFilter) {
 		res = this.AutoFilter.isShowButton();
-	}
-	else
-	{
+		} else {
 		res = null;
 	}
 	
 	return res;
 };
 
-TablePart.prototype.generateTotalsRowLabel = function(ws)
-{
-	if(!this.TableColumns)
-	{
+	TablePart.prototype.generateTotalsRowLabel = function (ws) {
+		if (!this.TableColumns) {
 		return;
 	}
 	
 	//в случае одной колонки выставляем только формулу
-	if(this.TableColumns.length > 1)
-	{
+		if (this.TableColumns.length > 1) {
 		this.TableColumns[0].generateTotalsRowLabel();
 	}
 	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(ws, this);
 };
 
-TablePart.prototype.changeDisplayName = function(newName)
-{
+	TablePart.prototype.changeDisplayName = function (newName) {
 	this.DisplayName = newName;
 }; 
 
-TablePart.prototype.getRangeWithoutHeaderFooter = function()
-{
+	TablePart.prototype.getRangeWithoutHeaderFooter = function () {
 	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
 	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 };
 
-TablePart.prototype.checkTotalRowFormula = function(ws)
-{
+	TablePart.prototype.checkTotalRowFormula = function (ws) {
 	for (var i = 0; i < this.TableColumns.length; i++) {
 		this.TableColumns[i].checkTotalRowFormula(ws, this);
 	}
 };
 
-TablePart.prototype.changeAltText = function(val)
-{
+	TablePart.prototype.changeAltText = function (val) {
 	this.altText = val;
 };
 
-TablePart.prototype.changeAltTextSummary = function(val)
-{
+	TablePart.prototype.changeAltTextSummary = function (val) {
 	this.altTextSummary = val;
 };
 
-TablePart.prototype.addAutoFilter = function()
-{
+	TablePart.prototype.addAutoFilter = function () {
 	var autoFilter = new AscCommonExcel.AutoFilter();
 	var cloneRef = this.Ref.clone();
-	if(this.TotalsRowCount)
-	{
+		if (this.TotalsRowCount) {
 		cloneRef.r2--
 	}
 	autoFilter.Ref = cloneRef;
@@ -5717,16 +5684,19 @@ TablePart.prototype.addAutoFilter = function()
 	return autoFilter;
 };
 
-TablePart.prototype.isHeaderRow = function()
-{
+	TablePart.prototype.isHeaderRow = function () {
 	return null === this.HeaderRowCount || this.HeaderRowCount > 0; 
 };
 
-TablePart.prototype.isTotalsRow = function()
-{
+	TablePart.prototype.isTotalsRow = function () {
 	return this.TotalsRowCount > 0; 
 };
 
+	TablePart.prototype.generateSortState = function () {
+		this.SortState = new AscCommonExcel.SortState();
+		this.SortState.SortConditions = [];
+		this.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+	};
 
 /** @constructor */
 function AutoFilter() {
@@ -5736,31 +5706,36 @@ function AutoFilter() {
 	
 	this.result = null;
 }
+
 AutoFilter.prototype.clone = function() {
 	var i, res = new AutoFilter();
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.refTable = this.refTable ? this.refTable.clone() : null;
 	if (this.FilterColumns) {
 		res.FilterColumns = [];
-		for (i = 0; i < this.FilterColumns.length; ++i)
+			for (i = 0; i < this.FilterColumns.length; ++i) {
 			res.FilterColumns.push(this.FilterColumns[i].clone());
 	}
+		}
 	
-	if (this.SortState)
+		if (this.SortState) {
 		res.SortState = this.SortState.clone();
+		}
 		
 	if (this.result) {
 		res.result = [];
-		for (i = 0; i < this.result.length; ++i)
+			for (i = 0; i < this.result.length; ++i) {
 			res.result.push(this.result[i].clone());
 	}
+		}
 	
 	return res;
 };
 
 AutoFilter.prototype.addFilterColumn = function() {
-	if(this.FilterColumns === null)
+		if (this.FilterColumns === null) {
 		this.FilterColumns = [];
+		}
 	
 	var oNewElem = new FilterColumn();
 	this.FilterColumns.push(oNewElem);
@@ -5771,8 +5746,7 @@ AutoFilter.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
 	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
-	if(this.SortState)
-	{
+		if (this.SortState) {
 		this.SortState.moveRef(col, row);
 	}
 	
@@ -5780,31 +5754,31 @@ AutoFilter.prototype.moveRef = function(col, row) {
 };
 AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
 	var ref = this.Ref.clone();
-	if(bIsFirst)
+		if (bIsFirst) {
 		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
+		} else {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
 	
 	this.Ref = ref;
 };
 AutoFilter.prototype.changeRefOnRange = function(range) {
-	if(!range)
+		if (!range) {
 		return;
+		}
 		
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	
-	if(this.AutoFilter)
+		if (this.AutoFilter) {
 		this.AutoFilter.changeRefOnRange(range);
+		}
 };
 AutoFilter.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].isApplyAutoFilter())
-			{
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].isApplyAutoFilter()) {
 				res = true;
 				break;
 			}
@@ -5817,27 +5791,26 @@ AutoFilter.prototype.isApplyAutoFilter = function() {
 AutoFilter.prototype.isApplySortConditions = function() {
 	var res = false;
 	
-	if(this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0])
+		if (this.SortState && this.SortState.SortConditions && this.SortState.SortConditions[0]) {
 		res = true;
+		}
 		
 	return res;
 };
 
-AutoFilter.prototype.isAutoFilter = function()
-{
+	AutoFilter.prototype.isAutoFilter = function () {
 	return true;
 };
 
 AutoFilter.prototype.cleanFilters = function() {
-	if(!this.FilterColumns)
+		if (!this.FilterColumns) {
 		return;
+		}
 	
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ShowButton === false)
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ShowButton === false) {
 			this.FilterColumns[i].clean();
-		else
-		{
+			} else {
 			this.FilterColumns.splice(i, 1);
 			i--;
 		}	
@@ -5846,52 +5819,38 @@ AutoFilter.prototype.cleanFilters = function() {
 
 AutoFilter.prototype.showButton = function(val) {
 	
-	if(val === false)
-	{
-		if(this.FilterColumns === null)
-		{
+		if (val === false) {
+			if (this.FilterColumns === null) {
 			this.FilterColumns = [];
 		}
 		
 		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
-		for(var i = 0; i < columnsLength; i++)
-		{
+			for (var i = 0; i < columnsLength; i++) {
 			var filterColumn = this._getFilterColumnByColId(i);
-			if(filterColumn)
-			{
+				if (filterColumn) {
 				filterColumn.ShowButton = false;
-			}
-			else
-			{
+				} else {
 				filterColumn = new FilterColumn();
 				filterColumn.ColId = i;
 				filterColumn.ShowButton = false;
 				this.FilterColumns.push(filterColumn);
 			}
 		}
-	}
-	else
-	{
-		if(this.FilterColumns && this.FilterColumns.length)
-		{
-			for(var i = 0; i < this.FilterColumns.length; i++)
-			{
+		} else {
+			if (this.FilterColumns && this.FilterColumns.length) {
+				for (var i = 0; i < this.FilterColumns.length; i++) {
 				this.FilterColumns[i].ShowButton = true;
 			}
 		}
 	}
 };
 
-AutoFilter.prototype.isShowButton = function()
-{
+	AutoFilter.prototype.isShowButton = function () {
 	var res = true;
 	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].ShowButton === false)
-			{
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].ShowButton === false) {
 				res = false;
 				break;
 			}
@@ -5901,21 +5860,16 @@ AutoFilter.prototype.isShowButton = function()
 	return res;
 };
 
-AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
-{
+	AutoFilter.prototype.getRangeWithoutHeaderFooter = function () {
 	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 }; 
 
-AutoFilter.prototype._getFilterColumnByColId = function(colId)
-{
+	AutoFilter.prototype._getFilterColumnByColId = function (colId) {
 	var res = false;
 	
-	if(this.FilterColumns && this.FilterColumns.length)
-	{
-		for(var i = 0; i < this.FilterColumns.length; i++)
-		{
-			if(this.FilterColumns[i].ColId === colId)
-			{
+		if (this.FilterColumns && this.FilterColumns.length) {
+			for (var i = 0; i < this.FilterColumns.length; i++) {
+				if (this.FilterColumns[i].ColId === colId) {
 				res = this.FilterColumns[i];
 				break;
 			}
@@ -5926,40 +5880,31 @@ AutoFilter.prototype._getFilterColumnByColId = function(colId)
 };
 
 //функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
-AutoFilter.prototype.deleteTableColumns = function(activeRange)
-{
-	if(this.SortState) 
-	{
+	AutoFilter.prototype.deleteTableColumns = function (activeRange) {
+		if (this.SortState) {
 		var bIsDeleteSortState = this.SortState.changeColumns(activeRange, true);
-		if(bIsDeleteSortState)
-		{
+			if (bIsDeleteSortState) {
 			this.SortState = null;
 		}
 	}
 };
 
 //функция используется только для изменения данных сортировки, называется так как и в классе TablePart. возможно стоит переименовать.
-AutoFilter.prototype.addTableColumns = function(activeRange)
-{
-	if(this.SortState) 
-	{
+	AutoFilter.prototype.addTableColumns = function (activeRange) {
+		if (this.SortState) {
 		this.SortState.changeColumns(activeRange);
 	}
 };
 
-AutoFilter.prototype.getIndexByColId = function(colId)
-{
+	AutoFilter.prototype.getIndexByColId = function (colId) {
 	var res = null;
 
-	if(!this.FilterColumns)
-	{
+		if (!this.FilterColumns) {
 		return res;
 	}
 
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ColId === colId)
-		{
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ColId === colId) {
 			res = i;
 			break;
 		}
@@ -5968,19 +5913,15 @@ AutoFilter.prototype.getIndexByColId = function(colId)
 	return res;
 };
 
-AutoFilter.prototype.getFilterColumn = function(colId)
-{
+	AutoFilter.prototype.getFilterColumn = function (colId) {
 	var res = null;
 
-	if(!this.FilterColumns)
-	{
+		if (!this.FilterColumns) {
 		return res;
 	}
 
-	for(var i = 0; i < this.FilterColumns.length; i++)
-	{
-		if(this.FilterColumns[i].ColId === colId)
-		{
+		for (var i = 0; i < this.FilterColumns.length; i++) {
+			if (this.FilterColumns[i].ColId === colId) {
 			res = this.FilterColumns[i];
 			break;
 		}
@@ -5989,21 +5930,124 @@ AutoFilter.prototype.getFilterColumn = function(colId)
 	return res;
 };
 
-AutoFilter.prototype.getAutoFilter = function()
-{
+	AutoFilter.prototype.getAutoFilter = function () {
 	return this;
 };
 
+	AutoFilter.prototype.hiddenByAnotherFilter = function (worksheet, cellId, row, col) {
+		var result = false;
+
+		var filterColumns = this.FilterColumns;
+		if (filterColumns) {
+			for (var j = 0; j < filterColumns.length; j++) {
+				var colId = filterColumns[j].ColId;
+				if (colId !== cellId) {
+					var cell = worksheet.getCell3(row, colId + col);
+					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+
+					var isNumberFilter = filterColumns[j].isApplyCustomFilter();
+					var val = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
+					if (filterColumns[j].isHideValue(val, isDateTimeFormat, null, cell)) {
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	};
+
+	AutoFilter.prototype.setRowHidden = function(worksheet, newFilterColumn) {
+		var startRow = this.Ref.r1 + 1;
+		var endRow = this.Ref.r2;
+
+		var colId = newFilterColumn ? newFilterColumn.ColId : null;
+		var minChangeRow = null;
+		var hiddenObj = {start: this.Ref.r1 + 1, h: null};
+		var nHiddenRowCount = 0;
+		var nRowsCount = 0;
+		for (var i = startRow; i <= endRow; i++) {
+
+			var isHidden = this.hiddenByAnotherFilter(worksheet, colId, i, this.Ref.c1);
+			if(!newFilterColumn) {
+				if (isHidden !== worksheet.getRowHidden(i)) {
+					if (minChangeRow === null) {
+						minChangeRow = i;
+					}
+				}
+
+				if (true === isHidden) {
+					worksheet.setRowHidden(isHidden, i, i);
+				}
+			} else {
+				if (!isHidden) {
+					var cell = worksheet.getCell3(i, colId + this.Ref.c1);
+					var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					var isNumberFilter = false;
+					if (newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter) {
+						isNumberFilter = true;
+					}
+
+					var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
+					currentValue = window["Asc"].trim(currentValue);
+					var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
+
+					if (isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null) {
+						minChangeRow = i;
+					}
+
+					//скрываем строки
+					if (hiddenObj.h === null) {
+						hiddenObj.h = isSetHidden;
+						hiddenObj.start = i;
+					} else if (hiddenObj.h !== isSetHidden) {
+						worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+						if (true === hiddenObj.h) {
+							nHiddenRowCount += i - hiddenObj.start;
+						}
+
+						hiddenObj.h = isSetHidden;
+						hiddenObj.start = i;
+					}
+
+					if (i === endRow) {
+						worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i);
+						if (true === hiddenObj.h) {
+							nHiddenRowCount += i + 1 - hiddenObj.start;
+						}
+					}
+					nRowsCount++;
+				} else if (hiddenObj.h !== null) {
+					worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+					if (true === hiddenObj.h) {
+						nHiddenRowCount += i - hiddenObj.start;
+					}
+					hiddenObj.h = null
+				}
+			}
+		}
+
+		return {nOpenRowsCount: nRowsCount - nHiddenRowCount, nAllRowsCount: endRow - startRow + 1, minChangeRow: minChangeRow};
+	};
+
+	AutoFilter.prototype.generateSortState = function () {
+		this.SortState = new AscCommonExcel.SortState();
+		this.SortState.SortConditions = [];
+		this.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+	};
 
 function FilterColumns() {
 	this.ColId = null;
 	this.CustomFiltersObj = null;
 }
+
 FilterColumns.prototype.clone = function() {
 	var res = new FilterColumns();
 	res.ColId = this.ColId;
-	if(this.CustomFiltersObj)
+		if (this.CustomFiltersObj) {
 		res.CustomFiltersObj = this.CustomFiltersObj.clone();
+		}
 	
 	return res;
 };
@@ -6021,9 +6065,10 @@ SortState.prototype.clone = function() {
 	res.CaseSensitive = this.CaseSensitive;
 	if (this.SortConditions) {
 		res.SortConditions = [];
-		for (i = 0; i < this.SortConditions.length; ++i)
+			for (i = 0; i < this.SortConditions.length; ++i) {
 			res.SortConditions.push(this.SortConditions[i].clone());
 	}
+		}
 	return res;
 };
 
@@ -6034,36 +6079,32 @@ SortState.prototype.moveRef = function(col, row) {
 	this.Ref = ref;
 	
 	if (this.SortConditions) {
-		for (var i = 0; i < this.SortConditions.length; ++i)
+			for (var i = 0; i < this.SortConditions.length; ++i) {
 			this.SortConditions[i].moveRef(col, row);
 	}
+		}
 };
 
 SortState.prototype.changeRef = function(col, row, bIsFirst) {
 	var ref = this.Ref.clone();
-	if(bIsFirst)
+		if (bIsFirst) {
 		ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
-	else
+		} else {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		}
 	
 	this.Ref = ref;
 };
 
-SortState.prototype.changeColumns = function(activeRange, isDelete)
-{
+	SortState.prototype.changeColumns = function (activeRange, isDelete) {
 	var bIsSortStateDelete = true;
 	//если изменяем диапазон так, что удаляется колонка с сортировкой, удаляем ее
-	if (this.SortConditions) 
-	{
-		for (var i = 0; i < this.SortConditions.length; ++i)
-		{
+		if (this.SortConditions) {
+			for (var i = 0; i < this.SortConditions.length; ++i) {
 			var bIsSortConditionsDelete = this.SortConditions[i].changeColumns(activeRange, isDelete);
-			if(bIsSortConditionsDelete)
-			{
+				if (bIsSortConditionsDelete) {
 				this.SortConditions[i] = null;
-			}
-			else
-			{
+				} else {
 				bIsSortStateDelete = false;
 			}
 		}
@@ -6081,6 +6122,7 @@ function TableColumn() {
 	this.dxf = null;
 	this.CalculatedColumnFormula = null;
 }
+
 	TableColumn.prototype.onFormulaEvent = function(type, eventData) {
 	};
 	TableColumn.prototype.renameSheetCopy = function(ws, renameParams) {
@@ -6115,15 +6157,15 @@ TableColumn.prototype.clone = function() {
 	if (this.TotalsRowFormula) {
 		res.applyTotalRowFormula(this.TotalsRowFormula.getFormula(), this.TotalsRowFormula.ws, false);
 	}
-	if (this.dxf)
+		if (this.dxf) {
 		res.dxf = this.dxf.clone;
+		}
 	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
 	return res;
 };
 TableColumn.prototype.generateTotalsRowLabel = function(){
 	//TODO добавить в перевод
-	if(this.TotalsRowLabel === null)
-	{	
+		if (this.TotalsRowLabel === null) {
 		this.TotalsRowLabel = "Summary";
 	}
 };
@@ -6150,55 +6192,43 @@ TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 TableColumn.prototype.getTotalRowFormula = function(tablePart){
 	var res = null;
 	
-	if(null !== this.TotalsRowFunction)
-	{
-		switch(this.TotalsRowFunction)
-		{
-			case Asc.ETotalsRowFunction.totalrowfunctionAverage:
-			{
+		if (null !== this.TotalsRowFunction) {
+			switch (this.TotalsRowFunction) {
+				case Asc.ETotalsRowFunction.totalrowfunctionAverage: {
 				res = "SUBTOTAL(101," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCount:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionCount: {
 				res = "SUBTOTAL(103," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCountNums:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionCountNums: {
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionCustom: {
 				res = this.getTotalsRowFormula();
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionMax:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionMax: {
 				res = "SUBTOTAL(104," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionMin:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionMin: {
 				res = "SUBTOTAL(105," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionNone:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionNone: {
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionStdDev:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionStdDev: {
 				res = "SUBTOTAL(107," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionSum:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionSum: {
 				res = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
-			case Asc.ETotalsRowFunction.totalrowfunctionVar:
-			{
+				case Asc.ETotalsRowFunction.totalrowfunctionVar: {
 				res = "SUBTOTAL(110," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
@@ -6219,8 +6249,7 @@ TableColumn.prototype.cleanTotalsData = function(){
 	};
 TableColumn.prototype.setTotalsRowFormula = function(val, ws){
 	this.cleanTotalsData();
-	if("=" === val[0])
-	{
+		if ("=" === val[0]) {
 		val = val.substring(1);
 	}
 	this.applyTotalRowFormula(val, ws, true);
@@ -6234,12 +6263,11 @@ TableColumn.prototype.setTotalsRowLabel = function(val){
 };
 
 TableColumn.prototype.checkTotalRowFormula = function(ws, tablePart){
-	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
-	{
+		if (null !== this.TotalsRowFunction &&
+			Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction) {
 		var totalRowFormula = this.getTotalRowFormula(tablePart);
 
-		if(null !== totalRowFormula)
-		{
+			if (null !== totalRowFormula) {
 			this.applyTotalRowFormula(totalRowFormula, ws, true);
 			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 		}
@@ -6286,6 +6314,7 @@ function TableStyleInfo() {
 	this.ShowFirstColumn = null;
 	this.ShowLastColumn = null;
 }
+
 TableStyleInfo.prototype.clone = function() {
 	var res = new TableStyleInfo();
 	res.Name = this.Name;
@@ -6295,6 +6324,10 @@ TableStyleInfo.prototype.clone = function() {
 	res.ShowLastColumn = this.ShowLastColumn;
 	return res;
 };
+	TableStyleInfo.prototype.setName = function (val) {
+		this.Name = val;
+	};
+
 /** @constructor */
 function FilterColumn() {
 	this.ColId = null;
@@ -6305,6 +6338,7 @@ function FilterColumn() {
 	this.Top10 = null;
 	this.ShowButton = true;
 }
+
 FilterColumn.prototype.clone = function() {
 	var res = new FilterColumn();
 	res.ColId = this.ColId;
@@ -6328,25 +6362,16 @@ FilterColumn.prototype.clone = function() {
 };
 FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length, cell) {
 	var res = false;
-	if(this.Filters)
-	{
+		if (this.Filters) {
 		this.Filters._initLowerCaseValues();
 		res = this.Filters.isHideValue(val.toLowerCase(), isDateTimeFormat);
-	}
-	else if(this.CustomFiltersObj)
-	{
+		} else if (this.CustomFiltersObj) {
 		res = this.CustomFiltersObj.isHideValue(val);
-	}
-	else if(this.Top10)
-	{
+		} else if (this.Top10) {
 		res = this.Top10.isHideValue(val, top10Length);
-	}
-	else if(this.ColorFilter)
-	{
+		} else if (this.ColorFilter) {
 		res = this.ColorFilter.isHideValue(cell);
-	}
-	else if(this.DynamicFilter)
-	{
+		} else if (this.DynamicFilter) {
 		res = this.DynamicFilter.isHideValue(val);
 	}
 		
@@ -6364,37 +6389,47 @@ FilterColumn.prototype.createFilter = function(obj) {
 	var allFilterOpenElements = false;
 	var newFilter;
 	
-	switch (obj.filter.type)
-	{
-		case c_oAscAutoFilterTypes.ColorFilter:
-		{
+		switch (obj.filter.type) {
+			case c_oAscAutoFilterTypes.ColorFilter: {
 			this.ColorFilter = obj.filter.filter.clone();
 			break;
 		}
-		case c_oAscAutoFilterTypes.CustomFilters:
-		{
+			case c_oAscAutoFilterTypes.CustomFilters: {
+				obj.filter.filter.check();
 			this.CustomFiltersObj = obj.filter.filter.clone();
 			break;
 		}	
-		case c_oAscAutoFilterTypes.DynamicFilter:
-		{
+			case c_oAscAutoFilterTypes.DynamicFilter: {
 			this.DynamicFilter = obj.filter.filter.clone();
 			break;
 		}
-		case c_oAscAutoFilterTypes.Top10:
-		{
+			case c_oAscAutoFilterTypes.Top10: {
 			this.Top10 = obj.filter.filter.clone();
 			break;
 		}	
-		case c_oAscAutoFilterTypes.Filters:
-		{
+			case c_oAscAutoFilterTypes.Filters: {
+				//если приходит только скрытое Blank, тогда добавляем CustomFilter, так же делает MS
+				var addCustomFilter = false;
+				for (var i = 0; i < obj.values.length; i++) {
+					if ("" === obj.values[i].text && false === obj.values[i].visible) {
+						addCustomFilter = true;
+					} else if ("" !== obj.values[i].text && false === obj.values[i].visible) {
+						addCustomFilter = false;
+						break;
+					}
+				}
+
+				if (addCustomFilter) {
+					this.CustomFiltersObj = new CustomFilters();
+					this.CustomFiltersObj._generateEmptyValueFilter();
+				} else {
 			newFilter = new Filters();
 			allFilterOpenElements = newFilter.init(obj);
 			
-			if(!allFilterOpenElements)
-			{
+					if (!allFilterOpenElements) {
 				this.Filters = newFilter;
 			}
+				}
 			
 			break;
 		}	
@@ -6402,11 +6437,14 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	return allFilterOpenElements;
 };
+
 FilterColumn.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
-	if(this.Filters !== null || this.CustomFiltersObj !== null || this.DynamicFilter !== null || this.ColorFilter !== null || this.Top10 !== null)
+		if (this.Filters !== null || this.CustomFiltersObj !== null || this.DynamicFilter !== null ||
+			this.ColorFilter !== null || this.Top10 !== null) {
 		res = true;
+		}
 		
 	return res;
 };
@@ -6414,17 +6452,37 @@ FilterColumn.prototype.isApplyAutoFilter = function() {
 FilterColumn.prototype.init = function(range) {
 	
 	//добавляем данные, которые не передаются из меню при примененни а/ф(в данном случае только DynamicFilter)
-	if(null !== this.DynamicFilter)
-	{
+		if (null !== this.DynamicFilter) {
 		this.DynamicFilter.init(range);
-	}
-	else if(null !== this.Top10)
-	{
+		} else if (null !== this.Top10) {
 		this.Top10.init(range);
 	}
 	
 };
 
+	FilterColumn.prototype.isApplyCustomFilter = function () {
+		var res = false;
+
+		if (this.Top10 || this.CustomFiltersObj || this.ColorFilter || this.DynamicFilter) {
+			res = true;
+		}
+
+		return res;
+	};
+
+	FilterColumn.prototype.isOnlyNotEqualEmpty = function () {
+		var res = false;
+
+		if (this.CustomFiltersObj) {
+			var customFilters = this.CustomFiltersObj.CustomFilters;
+			var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
+			if (c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
+				res = true;
+			}
+		}
+
+		return res;
+	};
 
 
 /** @constructor */
@@ -6435,31 +6493,28 @@ function Filters() {
 	
 	this.lowerCaseValues = null;
 }
+
 Filters.prototype.clone = function() {
 	var i, res = new Filters();
-	for(var i in this.Values)
+		for (var i in this.Values) {
 		res.Values[i] = this.Values[i];
+		}
 	if (this.Dates) {
-		for (i = 0; i < this.Dates.length; ++i)
+			for (i = 0; i < this.Dates.length; ++i) {
 			res.Dates.push(this.Dates[i].clone());
 	}
+		}
 	res.Blank = this.Blank;
 	return res;
 };
 Filters.prototype.init = function(obj) {
 	var allFilterOpenElements = true;
-	for(var i = 0; i < obj.values.length; i++)
-	{
-		if(obj.values[i].visible)
-		{
-			if(obj.values[i].isDateFormat)
-			{
-				if(obj.values[i].text === "")
-				{
+		for (var i = 0; i < obj.values.length; i++) {
+			if (obj.values[i].visible) {
+				if (obj.values[i].isDateFormat) {
+					if (obj.values[i].text === "") {
 					this.Blank = true;
-				}
-				else
-				{
+					} else {
 					var dateGroupItem = new DateGroupItem();
 					var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
 					dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
@@ -6467,18 +6522,17 @@ Filters.prototype.init = function(obj) {
 					
 					this.Dates.push(autoFilterDateElem);
 				}
-			}
-			else
-			{
-				if(obj.values[i].text === "")
+				} else {
+					if (obj.values[i].text === "") {
 					this.Blank = true;
-				else
+					} else {
 					this.Values[obj.values[i].text] = true;
 			}
 		}	
-		else
+			} else {
 			allFilterOpenElements = false;
 	}
+		}
 	this._sortDate();
 	this._initLowerCaseValues();
 
@@ -6487,25 +6541,16 @@ Filters.prototype.init = function(obj) {
 Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
 	var res = false;
 	
-	if(isDateTimeFormat && this.Dates)
-	{
-		if(val === "")
-		{
+		if (isDateTimeFormat && this.Dates) {
+			if (val === "") {
 			res = !this.Blank ? true : false;
-		}
-		else
-		{
+			} else {
 			res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
 		}
-	}
-	else if(this.Values)
-	{
-		if(val === "")
-		{
+		} else if (this.Values) {
+			if (val === "") {
 			res = !this.Blank ? true : false;
-		}
-		else
-		{
+			} else {
 			res = !this.lowerCaseValues[val] ? true : false;
 		}
 	}
@@ -6517,17 +6562,17 @@ Filters.prototype.binarySearch = function(val, array) {
 	var i = 0, j = array.length - 1, k;
 	val = parseFloat(val);
 
-	while (i <= j)
-	{
+		while (i <= j) {
 		k = Math.floor((i + j) / 2);
 		
-		if (val >= array[k].start && val < array[k].end) 
+			if (val >= array[k].start && val < array[k].end) {
 			return k;
-		else if (val < array[k].start)
+			} else if (val < array[k].start) {
 			j = k - 1;
-		else
+			} else {
 			i = k + 1;
 	}
+		}
 
 	return -1; 
 };
@@ -6539,34 +6584,29 @@ Filters.prototype.linearSearch = function(val, array) {
 	while (i <= n && !(array[i] && val >= array[i].start && val < array[i].end))
 		i++;
  
-	if (i < n)
+		if (i < n) {
 		return i;
-	else
+		} else {
 		return -1;
+		}
 };
 Filters.prototype._initLowerCaseValues = function() {
-	if(this.lowerCaseValues === null)
-	{
+		if (this.lowerCaseValues === null) {
 		this.lowerCaseValues = {};
-		for(var i in this.Values)
-		{
+			for (var i in this.Values) {
 			this.lowerCaseValues[i.toLowerCase()] = true;
 		}
 	}
 };
-Filters.prototype._sortDate = function()
-{
-	if(this.Dates && this.Dates.length)
-	{
-		this.Dates.sort (function sortArr(a, b)
-		{
+	Filters.prototype._sortDate = function () {
+		if (this.Dates && this.Dates.length) {
+			this.Dates.sort(function sortArr(a, b) {
 			return a.start - b.start;
 		})
 	}
 };
 
-Filters.prototype.clean = function()
-{
+	Filters.prototype.clean = function () {
 	this.Values = {};
 	this.Dates = [];
 	this.Blank = null;
@@ -6728,6 +6768,22 @@ CustomFilters.prototype.asc_getCustomFilters = function () { return this.CustomF
 CustomFilters.prototype.asc_setAnd = function (val) { this.And = val; };
 CustomFilters.prototype.asc_setCustomFilters = function (val) { this.CustomFilters = val; };
 
+CustomFilters.prototype.check = function () {
+	if(this.CustomFilters) {
+		for(var i = 0; i < this.CustomFilters.length; i++) {
+			this.CustomFilters[i].check();
+		}
+	}
+};
+
+CustomFilters.prototype._generateEmptyValueFilter = function() {
+	this.And = true;
+	this.CustomFilters = [];
+	var customFilter = new CustomFilter();
+	customFilter._generateEmptyValueFilter();
+	this.CustomFilters.push(customFilter);
+};
+
 var g_oCustomFilter = {
 	Operator	 : 0,
 	Val	: 1
@@ -6773,7 +6829,7 @@ CustomFilter.prototype.init = function(operator, val) {
 CustomFilter.prototype.isHideValue = function(val) {
 
 	var result = false;
-	var isDigitValue = isNaN(val) ? false : true;
+	var isDigitValue = !isNaN(val);
 	if(!isDigitValue)
 	{
 		val = val.toLowerCase();
@@ -6809,11 +6865,14 @@ CustomFilter.prototype.isHideValue = function(val) {
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 		}
 		
+		var trimVal = window["Asc"].trim(val);
+		var trimFilterVal = window["Asc"].trim(filterVal);
+
 		switch (this.Operator)
 		{
 			case c_oAscCustomAutoFilter.equals://equals
 			{
-				if(val === filterVal)
+				if(trimVal === trimFilterVal)
 				{
 					result = true;
 				}
@@ -6822,7 +6881,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 			}
 			case c_oAscCustomAutoFilter.doesNotEqual://doesNotEqual
 			{
-				if(val !== filterVal)
+				if(trimVal !== trimFilterVal)
 				{
 					result = true;
 				}
@@ -6944,6 +7003,18 @@ CustomFilter.prototype.asc_getVal = function () { return this.Val; };
 CustomFilter.prototype.asc_setOperator = function (val) { this.Operator = val; };
 CustomFilter.prototype.asc_setVal = function (val) { this.Val = val; };
 
+CustomFilter.prototype.check = function () {
+	if(c_oAscCustomAutoFilter.doesNotEqual === this.Operator) {
+		if("" === this.Val.replace(/ /g, "")){
+			this.Val = " ";
+		}
+	}
+};
+
+CustomFilter.prototype._generateEmptyValueFilter = function () {
+	this.Operator = c_oAscCustomAutoFilter.doesNotEqual;
+	this.Val = " ";
+};
 
 var g_oDynamicFilter = {
 	Type : 0,
@@ -7400,6 +7471,59 @@ SortCondition.prototype.changeColumns = function(activeRange, isDelete) {
 	}
 	
 	return bIsDeleteCurSortCondition;
+};
+
+SortCondition.prototype.getSortType = function() {
+	var res = null;
+
+	if(true === this.ConditionDescending) {
+		res = Asc.c_oAscSortOptions.Ascending;
+	} else if(false === this.ConditionDescending) {
+		res = Asc.c_oAscSortOptions.Descending;
+	} else if(Asc.ESortBy.sortbyCellColor === this.ConditionSortBy) {
+		res = Asc.c_oAscSortOptions.ByColorFill;
+	} else if(Asc.ESortBy.sortbyCellColor === this.sortbyFontColor) {
+		res = Asc.c_oAscSortOptions.ByColorFont;
+	}
+
+	return res;
+};
+
+SortCondition.prototype.getSortColor = function() {
+	var res = null;
+
+	if(this.dxf) {
+		if(this.dxf.fill && this.dxf.fill.bg) {
+			res = this.dxf.fill.bg;
+		} else if(this.dxf.font && this.dxf.font.c) {
+			res = this.dxf.font.c;
+		}
+	}
+
+	return res;
+};
+
+SortCondition.prototype.applySort = function(type, ref, color) {
+	this.Ref = ref;
+
+	if(type === Asc.c_oAscSortOptions.ByColorFill || type === Asc.c_oAscSortOptions.ByColorFont) {
+		var newDxf;
+		if (type === Asc.c_oAscSortOptions.ByColorFill) {
+			newDxf = new AscCommonExcel.CellXfs();
+			newDxf.fill = new AscCommonExcel.Fill();
+			newDxf.fill.bg = color;
+			this.ConditionSortBy = Asc.ESortBy.sortbyCellColor;
+		} else {
+			newDxf.font = new AscCommonExcel.Font();
+			newDxf.font.setColor(color);
+			this.ConditionSortBy = Asc.ESortBy.sortbyFontColor;
+		}
+
+		this.dxf = AscCommonExcel.g_StyleCache.addXf(newDxf, true);
+	} else if(type === Asc.c_oAscSortOptions.Ascending || type === Asc.c_oAscSortOptions.Descending) {
+		this.ConditionDescending = type !== Asc.c_oAscSortOptions.Ascending;
+	}
+
 };
 
 function AutoFilterDateElem(start, end, dateTimeGrouping) {

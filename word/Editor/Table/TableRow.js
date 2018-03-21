@@ -442,22 +442,6 @@ CTableRow.prototype =
 		this.Recalc_CompiledPr();
 	},
 
-    Is_Header : function()
-    {
-        var RowPr = this.Get_CompiledPr(false);
-        return RowPr.TableHeader;
-    },
-
-	Set_Header : function(Value)
-	{
-		if (Value === this.Pr.TableHeader)
-			return;
-
-		History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, Value));
-		this.Pr.TableHeader = Value;
-		this.Recalc_CompiledPr();
-	},
-
     Copy_Pr : function(OtherPr)
     {
         // Before
@@ -486,9 +470,9 @@ CTableRow.prototype =
 
         // TableHeader
         if ( undefined != OtherPr.TableHeader )
-            this.Set_Header( OtherPr.TableHeader );
+            this.SetHeader( OtherPr.TableHeader );
         else
-            this.Set_Header( undefined );
+            this.SetHeader( undefined );
     },
 
     Set_SpacingInfo : function(bSpacingTop, bSpacingBot)
@@ -744,6 +728,22 @@ CTableRow.prototype =
     {
     }
 };
+/**
+ * Доступ к родительской таблице
+ * @returns {null | CTable}
+ */
+CTableRow.prototype.GetTable = function()
+{
+	return this.Table;
+};
+/**
+ * Получаем номер данной строки в родительской таблице
+ * @returns {number}
+ */
+CTableRow.prototype.GetIndex = function()
+{
+	return this.Index;
+};
 CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
@@ -757,6 +757,11 @@ CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
+/**
+ * Получаем ячейку с заданным номером в строке
+ * @param nCellIndex
+ * @returns {CTableCell}
+ */
 CTableRow.prototype.GetCell = function(nCellIndex)
 {
 	return this.Get_Cell(nCellIndex);
@@ -781,10 +786,19 @@ CTableRow.prototype.GetCellSpacing = function()
 {
 	return this.Get_CellSpacing();
 };
+/**
+ * Получаем высоту строки
+ * @returns {CTableRowHeight}
+ */
 CTableRow.prototype.GetHeight = function()
 {
 	return this.Get_Height();
 };
+/**
+ * Устанавливаем высоту строки
+ * @param nValue
+ * @param nHRule
+ */
 CTableRow.prototype.SetHeight = function(nValue, nHRule)
 {
 	return this.Set_Height(nValue, nHRule);
@@ -833,6 +847,80 @@ CTableRow.prototype.SetAfter = function(Grid, W)
 {
 	this.Set_After(Grid, W);
 };
+/**
+ * Получаем общий отступ сверху у строки (максимальный отступ сверху среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetTopMargin = function()
+{
+	var nTopMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Top.W > nTopMargin)
+			nTopMargin = oMargins.Top.W;
+	}
+
+	return nTopMargin;
+};
+/**
+ * Получаем общий отступ снизу у строки (максимальный отступ снизу среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetBottomMargin = function()
+{
+	// Ячейки, участвующие в вертикальном объединении, не влияют на отступ снизу
+
+	var nBottomMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var nVMergeCount = this.Table.GetVMergeCount(nCurCell, this.Index);
+		if (nVMergeCount > 1)
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Bottom.W > nBottomMargin)
+			nBottomMargin = oMargins.Bottom.W;
+	}
+
+	return nBottomMargin;
+};
+/**
+ * Проверяем является ли данная строка строкой заголовка таблицы
+ * @returns {boolean}
+ */
+CTableRow.prototype.IsHeader = function()
+{
+	return this.Get_CompiledPr(false).TableHeader;
+};
+/**
+ * Устанавливаем является ли данная строка строкой заголовка таблицы
+ * @param isHeader {boolean}
+ */
+CTableRow.prototype.SetHeader = function(isHeader)
+{
+	if (isHeader === this.Pr.TableHeader)
+		return;
+
+	History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, isHeader));
+	this.Pr.TableHeader = isHeader;
+	this.Recalc_CompiledPr();
+};
+
 
 
 

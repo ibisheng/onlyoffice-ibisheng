@@ -624,7 +624,7 @@ function (window, undefined) {
     AscDFH.changesFactory[AscDFH.historyitem_Trendline_SetBackward             ] = window['AscDFH'].CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_Trendline_SetForward              ] = window['AscDFH'].CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_Trendline_SetIntercept            ] = window['AscDFH'].CChangesDrawingsDouble;
-    AscDFH.changesFactory[AscDFH.historyitem_NumericPoint_SetVal               ] = window['AscDFH'].CChangesDrawingsDouble;
+    AscDFH.changesFactory[AscDFH.historyitem_NumericPoint_SetVal               ] = window['AscDFH'].CChangesDrawingsDouble2;
 
     AscDFH.changesFactory[AscDFH.historyitem_DLbl_SetSeparator         ] = window['AscDFH'].CChangesDrawingsString;
     AscDFH.changesFactory[AscDFH.historyitem_DateAxAxId                ] = window['AscDFH'].CChangesDrawingsString;
@@ -963,6 +963,7 @@ var c_oAscAxisType = Asc.c_oAscAxisType;
     var CChangesDrawingsObjectNoId = AscDFH.CChangesDrawingsObjectNoId;
     var CChangesDrawingsObject = AscDFH.CChangesDrawingsObject;
     var CChangesDrawingsContent = AscDFH.CChangesDrawingsContent;
+    var CChangesDrawingsDouble2 = AscDFH.CChangesDrawingsDouble2;
 
 
 function getMinMaxFromArrPoints(aPoints)
@@ -1216,7 +1217,7 @@ CDLbl.prototype =
         var _text_transform = this.ownTransformText;
         var _shape_transform = this.ownTransform;
         var _body_pr = this.getBodyPr();
-        var _content_height = this.txBody.content.Get_SummaryHeight();
+        var _content_height = this.txBody.content.GetSummaryHeight();
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
@@ -1867,7 +1868,7 @@ CDLbl.prototype =
                 case AscFormat.nVertTTwordArtVertRtl:
                 case AscFormat.nVertTTvert270:
                 {
-                    this.extX = Math.min(content.Get_SummaryHeight() + 4.4*SCALE_INSET_COEFF, max_box_width);
+                    this.extX = Math.min(content.GetSummaryHeight() + 4.4*SCALE_INSET_COEFF, max_box_width);
                     this.extY = max_width + 2*SCALE_INSET_COEFF;
                     this.x = 0;
                     this.y = 0;
@@ -1885,7 +1886,7 @@ CDLbl.prototype =
                     global_MatrixTransformer.RotateRadAppend(t, -_rot);
                     var w, h, x0, y0, x1, y1, x2, y2, x3, y3;
                     w = max_width;
-                    h = this.txBody.content.Get_SummaryHeight();
+                    h = this.txBody.content.GetSummaryHeight();
                     x0 = 0;
                     y0 = 0;
                     x1 = t.TransformPointX(w, 0);
@@ -5004,9 +5005,17 @@ CValAx.prototype =
         return this.parent && this.parent.parent && this.parent.parent.getDrawingDocument && this.parent.parent.getDrawingDocument();
     },
 
-    createDuplicate: function()
+    createDuplicate: function(o)
     {
-        var c = new CValAx();
+        var c;
+        if(o)
+        {
+            c = o;
+        }
+        else
+        {
+            c = new CValAx();
+        }
         c.setAxPos(this.axPos);
         c.setCrossBetween(this.crossBetween);
         c.setCrossesAt(this.crossesAt);
@@ -9098,7 +9107,7 @@ CNumericPoint.prototype =
         {
             _pr = 0;
         }
-        History.Add(new CChangesDrawingsDouble(this, AscDFH.historyitem_NumericPoint_SetVal, this.val, _pr));
+        History.Add(new CChangesDrawingsDouble2(this, AscDFH.historyitem_NumericPoint_SetVal, this.val, _pr));
         this.val = _pr;
             }
 };
@@ -13508,29 +13517,22 @@ function CreateDocContentFromString(str, drawingDocument, parent)
 
 function AddToContentFromString(content, str)
 {
-    content.MoveCursorToStartPos(false);
-    for(var i = 0; i < str.length; ++i)
-    {
-        var ch = str[i];
-        if (ch == '\t')
-        {
-            content.AddToParagraph( new ParaTab(), false );
-        }
-        else if (ch == '\n')
-        {
-            content.AddToParagraph( new ParaNewLine(break_Line), false );
-        }
-        else if (ch == '\r')
-            ;
-        else if (ch != ' ')
-        {
-            content.AddToParagraph(new ParaText(ch), false );
-        }
-        else
-        {
-            content.AddToParagraph(new ParaSpace(1), false );
-        }
-    }
+	content.MoveCursorToStartPos(false);
+	for (var oIterator = str.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			content.AddToParagraph(new ParaTab(), false);
+		if (10 === nCharCode) // \n
+			content.AddToParagraph(new ParaNewLine(break_Line), false);
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			content.AddToParagraph(new ParaSpace(), false);
+		else
+			content.AddToParagraph(new ParaText(nCharCode), false);
+	}
 }
 
 function CValAxisLabels(chart, axis)

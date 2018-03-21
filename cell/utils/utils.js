@@ -167,6 +167,10 @@
 			return aSizes[i];
 		}
 
+		function calcDecades(num) {
+			return Math.abs(num) < 10 ? 1 : 1 + calcDecades(floor(num * 0.1));
+		}
+
 		// Определяет времени работы функции
 		function profileTime(fn/*[, arguments]*/) {
 			var start, end, arg = [], i;
@@ -968,6 +972,14 @@
 		SelectionRange.prototype.contains2 = function (cell) {
 			return this.contains(cell.col, cell.row);
 		};
+		SelectionRange.prototype.inContains = function (ranges) {
+			var t = this;
+			return this.ranges.every(function (item1) {
+				return ranges.some(function (item2) {
+					return item2.containsRange(item1);
+				});
+			});
+		};
 		SelectionRange.prototype.containsRange = function (range) {
 			return this.ranges.some(function (item) {
 				return item.containsRange(range);
@@ -1033,7 +1045,7 @@
 			}
 		};
 		SelectionRange.prototype.getUnion = function () {
-			var result = new SelectionRange();
+			var result = new SelectionRange(this.worksheet);
 			var unionRanges = function (ranges, res) {
 				for (var i = 0; i < ranges.length; ++i) {
 					if (0 === i) {
@@ -1047,7 +1059,7 @@
 
 			var isUnion = true, resultTmp;
 			while (isUnion && !result.isSingleRange()) {
-				resultTmp = new SelectionRange();
+				resultTmp = new SelectionRange(this.worksheet);
 				unionRanges(result.ranges, resultTmp);
 				isUnion = result.ranges.length !== resultTmp.ranges.length;
 				result = resultTmp;
@@ -1196,6 +1208,10 @@
 			this.activeCell.col = r.GetLong();
 			this.activeCellId = r.GetLong();
 			this.update();
+		};
+		SelectionRange.prototype.Select = function () {
+			this.worksheet.selectionRange = this.clone();
+			this.worksheet.workbook.handlers.trigger('updateSelection');
 		};
 
     /**
@@ -2448,6 +2464,7 @@
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;
 		window["Asc"].incDecFonSize = incDecFonSize;
+		window["AscCommonExcel"].calcDecades = calcDecades;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
 		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;

@@ -57,16 +57,10 @@ function CGraphics()
     this.m_dDpiY        = 96.0;
     this.m_bIsBreak 	= false;
 
-    this.textBB_l       = 10000;
-    this.textBB_t       = 10000;
-    this.textBB_r       = -10000;
-    this.textBB_b       = -10000;
-
     this.m_oPen     = new AscCommon.CPen();
     this.m_oBrush   = new AscCommon.CBrush();
 
     this.m_oFontManager = null;
-	this.m_bIsFillTextCanvasColor = 0;
 
     this.m_oCoordTransform  = new CMatrixL();
     this.m_oBaseTransform   = new CMatrixL();
@@ -261,8 +255,6 @@ CGraphics.prototype =
         _c.A = a;
 
         this.m_oContext.fillStyle = "rgba(" + _c.R + "," + _c.G + "," + _c.B + "," + (_c.A / 255) + ")";
-
-		this.m_bIsFillTextCanvasColor = 0;
     },
     b_color2 : function(r,g,b,a)
     {
@@ -2586,7 +2578,7 @@ CGraphics.prototype =
 
                     this.m_oContext.setLineDash(this.dash_no_smart);
                     this.dash_no_smart = null;
-            }
+                }
             }
 
             var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
@@ -2637,7 +2629,7 @@ CGraphics.prototype =
 
 				this.m_oContext.setLineDash(this.dash_no_smart);
 				this.dash_no_smart = null;
-        }
+            }
         }
 
         var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;

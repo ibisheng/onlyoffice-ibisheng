@@ -68,6 +68,9 @@ var table_Selection_Text = 0x01; // Селектим текст внутри т�
 var table_Selection_Common            = 0x00;
 var table_Selection_Border            = 0x01;
 var table_Selection_Border_InnerTable = 0x02;
+var table_Selection_Rows              = 0x03; // Селектим по строкам
+var table_Selection_Columns           = 0x04; // Селектим по колонкам
+var table_Selection_Cells             = 0x05; // Селектим только по ячейкам
 
 var type_Table = 0x0002;
 
@@ -304,6 +307,8 @@ CTable.prototype.Get_Props = function()
 		var TextDirection = null;
 		var NoWrap        = null;
 
+		var nRowHeight = null;
+
 		for (var Index = 0; Index < this.Selection.Data.length; Index++)
 		{
 			var Pos          = this.Selection.Data[Index];
@@ -342,26 +347,20 @@ CTable.prototype.Get_Props = function()
 					CellShd = null;
 			}
 
+			var _CellWidth;
+			if (tblwidth_Auto === Cell_w.Type)
+				_CellWidth = null;
+			else if (tblwidth_Mm === Cell_w.Type)
+				_CellWidth = Cell_w.W;
+			else// if (tblwidth_Pct === Cell_w.Type)
+				_CellWidth = -Cell_w.W;
+
 			if (0 === Index)
 			{
-				if (tblwidth_Auto === Cell_w.Type)
-					CellWidth = null;
-				else if (tblwidth_Mm === Cell_w.Type)
-					CellWidth = Cell_w.W;
-				else// if (tblwidth_Pct === Cell_w.Type)
-					CellWidth = -Cell_w.W;
-
-				CellWidthStart = CellWidth;
+				CellWidthStart = _CellWidth;
 			}
 			else
 			{
-				var _CellWidth;
-				if (tblwidth_Auto === Cell_w.Type)
-					_CellWidth = null;
-				else if (tblwidth_Mm === Cell_w.Type)
-					_CellWidth = Cell_w.W;
-				else// if (tblwidth_Pct === Cell_w.Type)
-					_CellWidth = -Cell_w.W;
 
 				if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
 					|| (undefined === CellWidth
@@ -474,6 +473,37 @@ CTable.prototype.Get_Props = function()
 			{
 				CellMarginFlag = true;
 			}
+
+
+			var nCurRowHeight;
+			var oRowH = Row.GetHeight();
+			if (oRowH.IsAuto())
+			{
+				var oRow    = Row;
+				var nCurRow = oRow.GetIndex();
+
+				var nRowSummaryH = 0;
+				for (var nCurPage in this.RowsInfo[nCurRow].H)
+					nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+				if (null !== Pr.TableSpacing)
+					nRowSummaryH += Pr.TableSpacing;
+				else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+					nRowSummaryH -= this.RowsInfo[nCurRow].TopDy[0];
+
+				nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
+
+				nCurRowHeight = nRowSummaryH;
+			}
+			else
+			{
+				nCurRowHeight = oRowH.GetValue();
+			}
+
+			if (null === nRowHeight)
+				nRowHeight = nCurRowHeight;
+			else if (undefined !== nRowHeight && Math.abs(nRowHeight - nCurRowHeight) > 0.001)
+				nRowHeight = undefined;
 		}
 
 		Pr.CellsVAlign        = VAlign;
@@ -491,6 +521,7 @@ CTable.prototype.Get_Props = function()
 			Pr.CellsWidthNotEqual = false;
 		}
 
+		Pr.RowHeight   = nRowHeight;
 
 		Pr.CellBorders = {
 			Left    : Border_left.Copy(),
@@ -590,6 +621,7 @@ CTable.prototype.Get_Props = function()
 				var Cell         = Row.Get_Cell(CurCell);
 				var Cell_borders = Cell.Get_Borders();
 				var Cell_shd     = Cell.Get_Shd();
+				var oCellW       = Cell.GetW();
 
 				if (0 === CurCell && Cells_Count)
 				{
@@ -686,7 +718,70 @@ CTable.prototype.Get_Props = function()
 			InsideH : null === Border_insideH ? null : Border_insideH.Copy(),
 			InsideV : null === Border_insideV ? null : Border_insideV.Copy()
 		};
+
+		var oRowH = this.CurCell.Row.GetHeight();
+		if (oRowH.IsAuto())
+		{
+			var oRow    = this.CurCell.GetRow();
+			var nCurRow = oRow.GetIndex();
+
+			var nRowSummaryH = 0;
+			for (var nCurPage in this.RowsInfo[nCurRow].H)
+				nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+			if (null !== Pr.TableSpacing)
+				nRowSummaryH += Pr.TableSpacing;
+			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+				nRowSummaryH -= this.RowsInfo[nCurRow].TopDy[0];
+
+			nRowSummaryH -= oRow.GetTopMargin() + oRow.GetBottomMargin();
+			Pr.RowHeight = nRowSummaryH;
+		}
+		else
+		{
+			Pr.RowHeight = oRowH.GetValue();
+		}
 	}
+
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var oCells = {};
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		if (!oCells[nCurCell])
+			oCells[nCurCell] = 1;
+	}
+
+	var nColumnWidth = null;
+
+	var arrRowsInfo = this.private_GetRowsInfo();
+	for (var nCurRow = 0, nCount = arrRowsInfo.length; nCurRow < nCount; ++nCurRow)
+	{
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell in oCells)
+		{
+			var _nCurCell = nCurCell | 0;
+			if (arrRowsInfo[nCurRow][_nCurCell + nAdd])
+			{
+				if (null === nColumnWidth)
+				{
+					nColumnWidth = arrRowsInfo[nCurRow][_nCurCell + nAdd].W;
+				}
+				else if (Math.abs(nColumnWidth - arrRowsInfo[nCurRow][_nCurCell + nAdd].W) > 0.001)
+				{
+					nColumnWidth = undefined;
+					break;
+				}
+			}
+		}
+
+		if (undefined === nColumnWidth)
+			break;
+	}
+
+	Pr.ColumnWidth = nColumnWidth;
 
 	switch (Pr.CellsVAlign)
 	{
@@ -720,12 +815,15 @@ CTable.prototype.Get_Props = function()
 			break;
 	}
 
-	Pr.RowsInHeader = 0;
-	for (var Index = 0; Index < this.Content.length; Index++)
-	{
-		if (true === this.Content[Index].Is_Header())
-			Pr.RowsInHeader++;
-	}
+	var oSelectionRowsRange = this.GetSelectedRowsRange();
+	var nRowsInHeader       = this.GetRowsCountInHeader();
+
+	if (oSelectionRowsRange.Start > nRowsInHeader)
+		Pr.RowsInHeader = null;
+	else if (oSelectionRowsRange.End < nRowsInHeader)
+		Pr.RowsInHeader = true;
+	else
+		Pr.RowsInHeader = false;
 
 	if (true === this.Is_Inline())
 	{
@@ -849,15 +947,20 @@ CTable.prototype.Set_Props = function(Props)
 	}
 
 	// RowsInHeader
-	if (undefined != Props.RowsInHeader)
+	if (undefined !== Props.RowsInHeader && null !== Props.RowsInHeader)
 	{
-		var RowsInHeader = Props.RowsInHeader
-		for (var Index = 0; Index < this.Content.length; Index++)
+		var oSelectionRowsRange = this.GetSelectedRowsRange();
+		var nRowsInHeader       = this.GetRowsCountInHeader();
+
+		if (oSelectionRowsRange.Start <= nRowsInHeader)
 		{
-			if (Index < RowsInHeader && true != this.Content[Index].Is_Header())
-				this.Content[Index].Set_Header(true);
-			else if (Index >= RowsInHeader && true === this.Content[Index].Is_Header())
-				this.Content[Index].Set_Header(false);
+			for (var nCurRow = oSelectionRowsRange.Start, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+			{
+				if (nCurRow <= oSelectionRowsRange.End)
+					this.Content[nCurRow].SetHeader(Props.RowsInHeader ? true : false);
+				else
+					this.Content[nCurRow].SetHeader(false);
+			}
 		}
 	}
 
@@ -1190,7 +1293,7 @@ CTable.prototype.Set_Props = function(Props)
 	// TableLayout
 	if (undefined != Props.TableLayout)
 	{
-		this.Set_TableLayout(( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ));
+		this.SetTableLayout(( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ));
 		bRecalc_All = true;
 	}
 
@@ -1440,7 +1543,7 @@ CTable.prototype.Set_Props = function(Props)
 					for (var CurCell = 0; CurCell < Cells_count; CurCell++)
 					{
 						var Cell = Row.Get_Cell(CurCell);
-						if (vmerge_Continue === Cell.Get_VMerge())
+						if (vmerge_Continue === Cell.GetVMerge())
 							continue;
 
 						var StartGridCol    = this.Content[CurRow].Get_CellInfo(CurCell).StartGridCol;
@@ -2044,6 +2147,12 @@ CTable.prototype.Set_Props = function(Props)
 		this.Set_TableCaption(Props.TableCaption);
 	}
 
+	if (undefined !== Props.RowHeight)
+		this.SetRowHeight(Props.RowHeight);
+
+	if (undefined !== Props.ColumnWidth)
+		this.SetColumnWidth(Props.ColumnWidth);
+
 	return true;
 };
 CTable.prototype.Get_Styles = function(Lvl)
@@ -2209,7 +2318,7 @@ CTable.prototype.Get_PageContentStartPos = function(CurPage, RowIndex, CellIndex
 	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 	{
 		var Cell   = Row.Get_Cell(CurCell);
-		var VMerge = Cell.Get_VMerge();
+		var VMerge = Cell.GetVMerge();
 
 		if (vmerge_Continue === VMerge)
 			Cell = this.Internal_Get_StartMergedCell(RowIndex, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
@@ -2261,7 +2370,7 @@ CTable.prototype.Get_MaxTopBorder = function(RowIndex)
 	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 	{
 		var Cell   = Row.Get_Cell(CurCell);
-		var VMerge = Cell.Get_VMerge();
+		var VMerge = Cell.GetVMerge();
 
 		if (vmerge_Continue === VMerge)
 			Cell = this.Internal_Get_StartMergedCell(RowIndex, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
@@ -2286,7 +2395,7 @@ CTable.prototype.Get_MaxTopBorder = function(RowIndex)
 /**
  * Вычисляем небольшое смещение по X, необходимое для совместимости с Word разных версий
  */
-CTable.prototype.Get_TableOffsetCorrection = function()
+CTable.prototype.GetTableOffsetCorrection = function()
 {
 	var X = 0;
 
@@ -2326,7 +2435,7 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 
 	return -X;
 };
-CTable.prototype.Get_RightTableOffsetCorrection = function()
+CTable.prototype.GetRightTableOffsetCorrection = function()
 {
 	var X = 0;
 
@@ -2462,7 +2571,7 @@ CTable.prototype.Shift = function(CurPage, Dx, Dy)
 		{
 			var Cell          = Row.Get_Cell(CurCell);
 			var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
-			if (vmerge_Restart === Cell.Get_VMerge())
+			if (vmerge_Restart === Cell.GetVMerge())
 			{
 				Cell.Content_Shift(CellPageIndex, Dx, Dy);
 			}
@@ -2487,7 +2596,7 @@ CTable.prototype.UpdateEndInfo = function()
 CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
 {
 	this.X_origin = X;
-	var Dx        = this.Get_TableOffsetCorrection();
+	var Dx        = this.GetTableOffsetCorrection();
 
 	this.X = X + Dx;
 	this.Y = Y;
@@ -2730,10 +2839,10 @@ CTable.prototype.Reset_RecalculateCache = function()
 		}
 	}
 };
-CTable.prototype.RecalculateCurPos = function()
+CTable.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	if (null != this.CurCell)
-		return this.CurCell.Content_RecalculateCurPos();
+	if (this.CurCell)
+		return this.CurCell.Content_RecalculateCurPos(bUpdateX, bUpdateY);
 
 	return null;
 };
@@ -2911,6 +3020,31 @@ CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 				Max += MaxContent[CurCol];
 		}
 
+		var oTableW = this.GetTableW();
+		if (oTableW)
+		{
+			var nValue = oTableW.GetValue();
+			if (oTableW.IsMM())
+			{
+				if (Min < nValue)
+					Min = nValue;
+
+				if (Max < nValue)
+					Max = nValue;
+			}
+			else if (oTableW.IsPercent())
+			{
+				var nPercentWidth = this.private_RecalculatePercentWidth();
+				var mmValue = nValue  / 100 * nPercentWidth;
+
+				if (Min < mmValue)
+					Min = mmValue;
+
+				if (Max < mmValue)
+					Max = mmValue;
+			}
+		}
+
 		return {Min : Min, Max : Max};
 	}
 };
@@ -3078,7 +3212,7 @@ CTable.prototype.Get_ParentTextTransform = function()
  */
 CTable.prototype.IsStartFromNewPage = function()
 {
-	if ((this.Pages.length > 1 && true === this.Is_EmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
+	if ((this.Pages.length > 1 && true === this.IsEmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
 		return true;
 
 	return false;
@@ -3097,10 +3231,10 @@ CTable.prototype.IsTableBorder = function(X, Y, CurPage)
 
 	CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
 
-	if (true === this.Is_EmptyPage(CurPage))
+	if (true === this.IsEmptyPage(CurPage))
 		return null;
 
-	var Result = this.Internal_CheckBorders(X, Y, CurPage);
+	var Result = this.private_CheckHitInBorder(X, Y, CurPage);
 	if (Result.Border != -1)
 	{
 		return this;
@@ -3116,7 +3250,7 @@ CTable.prototype.IsInText = function(X, Y, CurPage)
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		CurPage = 0;
 
-	var Result = this.Internal_CheckBorders(X, Y, CurPage);
+	var Result = this.private_CheckHitInBorder(X, Y, CurPage);
 	if (Result.Border != -1)
 	{
 		return null;
@@ -3132,7 +3266,7 @@ CTable.prototype.IsInDrawing  = function(X, Y, CurPage)
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		CurPage = 0;
 
-	var Result = this.Internal_CheckBorders(X, Y, CurPage);
+	var Result = this.private_CheckHitInBorder(X, Y, CurPage);
 	if (Result.Border != -1)
 	{
 		return null;
@@ -3178,13 +3312,23 @@ CTable.prototype.Is_UseInDocument = function(Id)
 };
 CTable.prototype.Get_CurrentPage_Absolute = function()
 {
-	if (true === this.Selection.Use)
+	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
-		var Pos = this.Selection.EndPos.Pos;
-		return this.Content[Pos.Row].Get_Cell(Pos.Cell).Content.Get_CurrentPage_Absolute();
+		// Проходимся по всей последней выделенной строке и находим текущую страницу с наибольшим значением
+		// Если мы будет брать текущую страницу просто у последней ячейки выделения, тогда нужно переделать функцию
+		// CDocument.GetCurPage
+
+		var nCurPage = 0;
+		var nRow = this.Selection.EndPos.Pos.Row;
+		if (this.RowsInfo[nRow])
+			nCurPage = this.RowsInfo[nRow].StartPage + this.RowsInfo[nRow].Pages - 1;
+
+		return this.Get_AbsolutePage(nCurPage);
 	}
 	else
+	{
 		return this.CurCell.Content.Get_CurrentPage_Absolute();
+	}
 };
 CTable.prototype.Get_CurrentPage_Relative = function()
 {
@@ -3218,14 +3362,25 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 	if (true === this.Selection.Start || table_Selection_Border === this.Selection.Type2 || table_Selection_Border_InnerTable === this.Selection.Type2)
 		return;
 
-	var NewOutline = null;
-	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.Is_EmptyPage(CurPage))
+	if (true === this.Check_EmptyPages(CurPage - 1) && true !== this.IsEmptyPage(CurPage))
 	{
 		this.private_StartTrackTable(CurPage);
 	}
 
-	var Result = this.Internal_CheckBorders(X, Y, CurPage);
-	if (-1 !== Result.Border)
+	var oHitInfo = this.private_CheckHitInBorder(X, Y, CurPage);
+	if (true === oHitInfo.RowSelection)
+	{
+		return this.DrawingDocument.SetCursorType("select-table-row", new CMouseMoveData());
+	}
+	else if (true === oHitInfo.ColumnSelection)
+	{
+		return this.DrawingDocument.SetCursorType("select-table-column", new CMouseMoveData());
+	}
+	else if (true === oHitInfo.CellSelection)
+	{
+		return this.DrawingDocument.SetCursorType("select-table-cell", new CMouseMoveData());
+	}
+	else if (-1 !== oHitInfo.Border)
 	{
 		var Transform = this.Get_ParentTextTransform();
 		if (null !== Transform)
@@ -3235,39 +3390,39 @@ CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 
 			if (Math.abs(dY) > Math.abs(dX))
 			{
-				switch (Result.Border)
+				switch (oHitInfo.Border)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 				}
 			}
 			else
 			{
-				switch (Result.Border)
+				switch (oHitInfo.Border)
 				{
 					case 0:
 					case 2:
-						return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 					case 1:
 					case 3:
-						return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+						return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				}
 			}
 		}
 		else
 		{
-			switch (Result.Border)
+			switch (oHitInfo.Border)
 			{
 				case 0:
 				case 2:
-					return this.DrawingDocument.SetCursorType("s-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("row-resize", new CMouseMoveData());
 				case 1:
 				case 3:
-					return this.DrawingDocument.SetCursorType("w-resize", new CMouseMoveData());
+					return this.DrawingDocument.SetCursorType("col-resize", new CMouseMoveData());
 			}
 		}
 	}
@@ -3281,7 +3436,7 @@ CTable.prototype.Start_TrackTable = function()
 	var CurPage = 0;
 	while (CurPage < this.Pages.length)
 	{
-		if (true != this.Is_EmptyPage(CurPage))
+		if (true != this.IsEmptyPage(CurPage))
 			break;
 
 		CurPage++;
@@ -3477,7 +3632,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 
 					if (vmerge_Continue === Vmerge)
 						continue;
@@ -3518,7 +3673,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 					if (vmerge_Continue === Vmerge)
 						continue;
 
@@ -3567,7 +3722,7 @@ CTable.prototype.SelectTable = function(Type)
 				for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 				{
 					var Cell   = Row.Get_Cell(CurCell);
-					var Vmerge = Cell.Get_VMerge();
+					var Vmerge = Cell.GetVMerge();
 					if (vmerge_Continue === Vmerge)
 						continue;
 
@@ -4361,10 +4516,75 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 
 	var Page = this.Pages[CurPage];
 
-	var Result = this.Internal_CheckBorders(X, Y, CurPage);
+	var oHitInfo = this.private_CheckHitInBorder(X, Y, CurPage);
 
-	var Pos = Result.Pos;
-	if (-1 === Result.Border)
+	var Pos = oHitInfo.Pos;
+	if (oHitInfo.ColumnSelection || oHitInfo.RowSelection || oHitInfo.CellSelection)
+	{
+		this.RemoveSelection();
+
+		this.CurCell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+		this.CurCell.Content_Selection_SetStart(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), MouseEvent);
+
+		this.Selection.Use   = true;
+		this.Selection.Start = true;
+		this.Selection.Type  = table_Selection_Cell;
+		this.Selection.Type2 = table_Selection_Cells;
+		this.Selection.Data2 = null;
+
+		this.Selection.StartPos.Pos        = Pos;
+		this.Selection.StartPos.X          = X;
+		this.Selection.StartPos.Y          = Y;
+		this.Selection.StartPos.PageIndex  = CurPage;
+		this.Selection.StartPos.MouseEvent = {
+			// TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить
+			// здесь
+			ClickCount : MouseEvent.ClickCount,
+			Type       : MouseEvent.Type,
+			CtrlKey    : MouseEvent.CtrlKey
+		};
+
+		var oEndPos = {
+			Row  : Pos.Row,
+			Cell : Pos.Cell
+		};
+
+		if (oHitInfo.RowSelection)
+		{
+			oEndPos.Cell = this.GetRow(Pos.Row).GetCellsCount() - 1;
+			this.Selection.Type2 = table_Selection_Rows;
+		}
+		else if (oHitInfo.ColumnSelection)
+		{
+			var oRow     = this.GetRow(Pos.Row);
+			var nEndRow  = this.GetRowsCount() - 1;
+			var nEndCell = this.private_GetCellIndexByStartGridCol(nEndRow, oRow.GetCellInfo(Pos.Cell).StartGridCol, true);
+
+			if (-1 !== nEndCell)
+			{
+				oEndPos.Row  = nEndRow;
+				oEndPos.Cell = nEndCell;
+				this.Selection.Type2 = table_Selection_Columns;
+			}
+		}
+
+		this.Selection.EndPos.Pos        = oEndPos;
+		this.Selection.EndPos.X          = X;
+		this.Selection.EndPos.Y          = Y;
+		this.Selection.EndPos.PageIndex  = CurPage;
+		this.Selection.EndPos.MouseEvent = {
+			// TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить
+			// здесь
+			ClickCount : MouseEvent.ClickCount,
+			Type       : MouseEvent.Type,
+			CtrlKey    : MouseEvent.CtrlKey
+		};
+
+
+		this.Selection.Type = table_Selection_Cell;
+		this.private_UpdateSelectedCellsArray();
+	}
+	else if (-1 === oHitInfo.Border)
 	{
 		var bInnerTableBorder = ( null != this.IsTableBorder(X, Y, CurPage) ? true : false );
 		if (true === bInnerTableBorder)
@@ -4393,14 +4613,13 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 			this.Selection.StartPos.X          = X;
 			this.Selection.StartPos.Y          = Y;
 			this.Selection.StartPos.PageIndex  = CurPage;
-			this.Selection.StartPos.MouseEvent =
-				{
-					// TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить
-					// здесь
-					ClickCount : MouseEvent.ClickCount,
-					Type       : MouseEvent.Type,
-					CtrlKey    : MouseEvent.CtrlKey
-				};
+			this.Selection.StartPos.MouseEvent = {
+				// TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить
+				// здесь
+				ClickCount : MouseEvent.ClickCount,
+				Type       : MouseEvent.Type,
+				CtrlKey    : MouseEvent.CtrlKey
+			};
 		}
 	}
 	else
@@ -4415,7 +4634,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 		var _X = X;
 		var _Y = Y;
 
-		if (0 === Result.Border || 2 === Result.Border)
+		if (0 === oHitInfo.Border || 2 === oHitInfo.Border)
 		{
 			var PageH = this.LogicDocument.Get_PageLimits(this.Get_StartPage_Absolute()).YLimit;
 
@@ -4426,10 +4645,10 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 
 			var Row_start = this.Pages[CurPage].FirstRow;
 			var Row_end   = this.Pages[CurPage].LastRow;
-			if (0 === Result.Border)
+			if (0 === oHitInfo.Border)
 				this.Selection.Data2.Index = Pos.Row - Row_start;
 			else
-				this.Selection.Data2.Index = Result.Row - Row_start + 1;
+				this.Selection.Data2.Index = oHitInfo.Row - Row_start + 1;
 
 			if (0 != this.Selection.Data2.Index)
 			{
@@ -4466,7 +4685,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 			var X_max       = null;
 
 			this.Selection.Data2.bCol = true;
-			if (3 === Result.Border)
+			if (3 === oHitInfo.Border)
 				this.Selection.Data2.Index = Pos.Cell;
 			else
 				this.Selection.Data2.Index = Pos.Cell + 1;
@@ -4636,7 +4855,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 
 									for (var TempIndex = 1; TempIndex < VMergeCount; TempIndex++)
 									{
-										var TempCell = this.Internal_Get_Cell_ByStartGridCol(CurRow + TempIndex, StartGridCol);
+										var TempCell = this.private_GetCellIndexByStartGridCol(CurRow + TempIndex, StartGridCol);
 										if (-1 != TempCell)
 										{
 											CellsFlag[CurRow + TempIndex][TempCell] = 1;
@@ -4891,7 +5110,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 
 					var oTablePr = this.Get_CompiledPr(false).TablePr;
 					if (tbllayout_AutoFit === oTablePr.TableLayout)
-						this.Set_TableLayout(tbllayout_Fixed);
+						this.SetTableLayout(tbllayout_Fixed);
 
 					this.Internal_CreateNewGrid(Rows_info);
 
@@ -4975,7 +5194,30 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 		return;
 	}
 
-	var Pos = this.Internal_GetCellByXY(X, Y, CurPage);
+	var oTempPos = this.Internal_GetCellByXY(X, Y, CurPage);
+
+	var Pos = {
+		Row  : oTempPos.Row,
+		Cell : oTempPos.Cell
+	};
+
+	if (table_Selection_Rows === this.Selection.Type2)
+	{
+		Pos.Cell = this.GetRow(Pos.Row).GetCellsCount() - 1;
+	}
+	else if (table_Selection_Columns === this.Selection.Type2)
+	{
+		var oRow     = this.GetRow(oTempPos.Row);
+		var nEndRow  = this.GetRowsCount() - 1;
+		var nEndCell = this.private_GetCellIndexByStartGridCol(nEndRow, oRow.GetCellInfo(oTempPos.Cell).StartGridCol, true);
+
+		if (-1 !== nEndCell)
+		{
+			Pos.Row  = nEndRow;
+			Pos.Cell = nEndCell;
+		}
+	}
+
 	this.Content[Pos.Row].Get_Cell(Pos.Cell).Content_SetCurPosXY(X, Y);
 	this.Selection.Data              = null;
 	this.Selection.EndPos.Pos        = Pos;
@@ -4986,7 +5228,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	this.Selection.CurRow            = Pos.Row;
 
 	// При селекте внутри ячейки мы селектим содержимое ячейки
-	if (this.Parent.IsSelectedSingleElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
+	if (table_Selection_Common === this.Selection.Type2 && this.Parent.IsSelectedSingleElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
 	{
 		this.CurCell.Content_Selection_SetStart(this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex - this.CurCell.Content.Get_StartPage_Relative(), this.Selection.StartPos.MouseEvent);
 
@@ -5007,14 +5249,24 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	}
 	else
 	{
-		if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
+		if (AscCommon.g_mouse_event_type_up === MouseEvent.Type)
 		{
 			this.Selection.Start = false;
 			this.CurCell         = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+
+			if (table_Selection_Cells === this.Selection.Type2
+				&& this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell
+				&& this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row
+				&& MouseEvent.ClickCount > 1
+				&& 0 === MouseEvent.ClickCount % 2)
+			{
+				this.Selection.StartPos.Pos.Cell = 0;
+				this.Selection.EndPos.Pos.Cell   = this.GetRow(this.Selection.StartPos.Pos.Row).GetCellsCount() - 1;
+			}
 		}
 
 		this.Selection.Type = table_Selection_Cell;
-		this.Internal_Selection_UpdateCells();
+		this.private_UpdateSelectedCellsArray(table_Selection_Rows === this.Selection.Type2 ? true : false);
 	}
 };
 CTable.prototype.Selection_Stop = function()
@@ -5184,6 +5436,10 @@ CTable.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 		if (CurPage < 0 || CurPage >= this.Pages.length)
 			return false;
 
+		var oHitInfo = this.private_CheckHitInBorder(X, Y, CurPage);
+		if (oHitInfo.CellSelection || oHitInfo.RowSelection || oHitInfo.ColumnSelection)
+			return false;
+
 		var CellPos = this.Internal_GetCellByXY(X, Y, CurPage);
 		if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 		{
@@ -5253,7 +5509,7 @@ CTable.prototype.SelectAll = function(nDirection)
 		this.Selection.EndPos.PageIndex = this.Pages.length - 1;
 	}
 
-	this.Internal_Selection_UpdateCells();
+	this.private_UpdateSelectedCellsArray();
 };
 /**
  * В данной функции проверяется идет ли выделение таблицы до конца таблицы.
@@ -5305,7 +5561,7 @@ CTable.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementSt
 		this.Selection.EndPos.Pos = Pos;
 
 
-	this.Internal_Selection_UpdateCells();
+	this.private_UpdateSelectedCellsArray();
 };
 CTable.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
@@ -5322,7 +5578,7 @@ CTable.prototype.MoveCursorToStartPos = function(AddToSelect)
 		this.Selection.EndPos.Pos   = {Row : EndRow, Cell : 0};
 		this.Selection.CurRow       = EndRow;
 
-		this.Internal_Selection_UpdateCells();
+		this.private_UpdateSelectedCellsArray();
 	}
 	else
 	{
@@ -5352,7 +5608,7 @@ CTable.prototype.MoveCursorToEndPos = function(AddToSelect)
 		this.Selection.EndPos.Pos   = {Row : EndRow, Cell : this.Content[EndRow].Get_CellsCount() - 1};
 		this.Selection.CurRow       = EndRow;
 
-		this.Internal_Selection_UpdateCells();
+		this.private_UpdateSelectedCellsArray();
 	}
 	else
 	{
@@ -5653,7 +5909,7 @@ CTable.prototype.MoveCursorLeft = function(AddToSelect, Word)
 				if (false === bRet && true == this.Is_Inline())
 					bForceSelectByLines = true;
 
-				this.Internal_Selection_UpdateCells(bForceSelectByLines);
+				this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 
 				return bRet;
 			}
@@ -5717,7 +5973,7 @@ CTable.prototype.MoveCursorLeft = function(AddToSelect, Word)
 				else
 					this.Selection.EndPos.Pos = {Cell : 0, Row : this.CurCell.Row.Index - 1};
 
-				this.Internal_Selection_UpdateCells();
+				this.private_UpdateSelectedCellsArray();
 
 				return bRet;
 			}
@@ -5805,7 +6061,7 @@ CTable.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 				if (false === bRet && true == this.Is_Inline())
 					bForceSelectByLines = true;
 
-				this.Internal_Selection_UpdateCells(bForceSelectByLines);
+				this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 
 				return bRet;
 			}
@@ -5872,7 +6128,7 @@ CTable.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 				if (false === bRet && true == this.Is_Inline())
 					bForceSelectByLines = true;
 
-				this.Internal_Selection_UpdateCells(bForceSelectByLines);
+				this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 
 				return bRet;
 			}
@@ -5962,7 +6218,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 			if (false === bRetValue && true === this.Is_Inline())
 				bForceSelectByLines = true;
 
-			this.Internal_Selection_UpdateCells(bForceSelectByLines);
+			this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 			return bRetValue;
 		}
 		else
@@ -6053,7 +6309,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 				if (false === bRetValue && true === this.Is_Inline())
 					bForceSelectByLines = true;
 
-				this.Internal_Selection_UpdateCells(bForceSelectByLines);
+				this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 				return bRetValue;
 			}
 			else
@@ -6142,7 +6398,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 			if (false === bRetValue && true === this.Is_Inline())
 				bForceSelectByLines = true;
 
-			this.Internal_Selection_UpdateCells(bForceSelectByLines);
+			this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 			return bRetValue;
 		}
 		else
@@ -6232,7 +6488,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 				if (false === bRetValue && true === this.Is_Inline())
 					bForceSelectByLines = true;
 
-				this.Internal_Selection_UpdateCells(bForceSelectByLines);
+				this.private_UpdateSelectedCellsArray(bForceSelectByLines);
 				return bRetValue;
 			}
 			else
@@ -6348,7 +6604,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
-			this.Internal_Selection_UpdateCells();
+			this.private_UpdateSelectedCellsArray();
 		}
 		else
 		{
@@ -6360,7 +6616,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 			};
 			this.Selection.EndPos.Pos   = {Row : this.Content.length - 1, Cell : 0};
 
-			this.Internal_Selection_UpdateCells();
+			this.private_UpdateSelectedCellsArray();
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[this.Content.length - 1].Get_Cell(0);
@@ -6411,7 +6667,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
-			this.Internal_Selection_UpdateCells();
+			this.private_UpdateSelectedCellsArray();
 		}
 		else
 		{
@@ -6420,7 +6676,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 			this.Selection.StartPos.Pos = {Row : 0, Cell : 0};
 			this.Selection.EndPos.Pos   = {Row : 0, Cell : this.Content[0].Get_CellsCount() - 1};
 
-			this.Internal_Selection_UpdateCells();
+			this.private_UpdateSelectedCellsArray();
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[0].Get_Cell(0);
@@ -6473,7 +6729,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		if (true === bNext)
 		{
 			var TempCell = this.Internal_Get_NextCell(Pos);
-			while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+			while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 				TempCell = this.Internal_Get_NextCell(Pos);
 
 			if (null != TempCell)
@@ -6494,7 +6750,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 					return;
 
 				var TempCell = this.Internal_Get_NextCell(Pos);
-				while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+				while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 					TempCell = this.Internal_Get_NextCell(Pos);
 
 				if (null != TempCell)
@@ -6504,7 +6760,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		else
 		{
 			var TempCell = this.Internal_Get_PrevCell(Pos);
-			while (null != TempCell && vmerge_Restart != TempCell.Get_VMerge())
+			while (null != TempCell && vmerge_Restart != TempCell.GetVMerge())
 				TempCell = this.Internal_Get_PrevCell(Pos);
 
 			if (null != TempCell)
@@ -6654,7 +6910,7 @@ CTable.prototype.GetSelectedContent = function(SelectedContent)
 			{
 				var Cell     = Row.Get_Cell(CurCell);
 				var GridSpan = Cell.Get_GridSpan();
-				var VMerge   = Cell.Get_VMerge();
+				var VMerge   = Cell.GetVMerge();
 
 				var bSelected = false;
 				if (VMerge === vmerge_Restart)
@@ -6800,7 +7056,7 @@ CTable.prototype.GetSelectedContent = function(SelectedContent)
 					History.Add(new CChangesTableRowAddCell(Row, CurCell, [Row.Content[CurCell]]));
 					CurCell++;
 
-					var VMerge = CellInfo.Cell.Get_VMerge();
+					var VMerge = CellInfo.Cell.GetVMerge();
 					if (VMerge === vmerge_Restart)
 						bMergedRow = false;
 				}
@@ -7886,7 +8142,7 @@ CTable.prototype.GetTableW = function()
 {
 	return this.Get_TableW();
 };
-CTable.prototype.Set_TableLayout = function(Value)
+CTable.prototype.SetTableLayout = function(Value)
 {
 	if (this.Pr.TableLayout === Value)
 		return;
@@ -7895,9 +8151,9 @@ CTable.prototype.Set_TableLayout = function(Value)
 	this.Pr.TableLayout = Value;
 	this.Recalc_CompiledPr();
 };
-CTable.prototype.Get_TableLayout = function()
+CTable.prototype.GetTableLayout = function()
 {
-	var Pr = this.Get_CompliedPr(false).TablePr;
+	var Pr = this.Get_CompiledPr(false).TablePr;
 	return Pr.TableLayout;
 };
 CTable.prototype.Set_TableCellMar = function(Left, Top, Right, Bottom)
@@ -8437,7 +8693,7 @@ CTable.prototype.MergeTableCells = function(isClearMerge)
 				{
 					var Cell = Row.Get_Cell(CellIndex);
 					Cell.Set_GridSpan(Grid_end - Grid_start + 1);
-					Cell.Set_VMerge(vmerge_Continue);
+					Cell.SetVMerge(vmerge_Continue);
 				}
 				else
 				{
@@ -8627,9 +8883,9 @@ CTable.prototype.SplitTableCells = function(Rows, Cols)
 						Cells_pos[Index] = {Row : Cell_pos.Row + Index, Cell : CurCell};
 
 						if (0 === Index % New_VMerge_Count)
-							TempCell.Set_VMerge(vmerge_Restart);
+							TempCell.SetVMerge(vmerge_Restart);
 						else
-							TempCell.Set_VMerge(vmerge_Continue);
+							TempCell.SetVMerge(vmerge_Continue);
 					}
 				}
 			}
@@ -8670,7 +8926,7 @@ CTable.prototype.SplitTableCells = function(Rows, Cols)
 					}
 					else
 					{
-						New_Cell.Set_VMerge(vmerge_Continue);
+						New_Cell.SetVMerge(vmerge_Continue);
 					}
 				}
 			}
@@ -8968,16 +9224,16 @@ CTable.prototype.AddTableRow = function(bBefore)
 			if (true === bBefore)
 			{
 				if (Cells_info[CurCell].VMerge_count_before > 1)
-					New_Cell.Set_VMerge(vmerge_Continue);
+					New_Cell.SetVMerge(vmerge_Continue);
 				else
-					New_Cell.Set_VMerge(vmerge_Restart);
+					New_Cell.SetVMerge(vmerge_Restart);
 			}
 			else
 			{
 				if (Cells_info[CurCell].VMerge_count_after > 1)
-					New_Cell.Set_VMerge(vmerge_Continue);
+					New_Cell.SetVMerge(vmerge_Continue);
 				else
-					New_Cell.Set_VMerge(vmerge_Restart);
+					New_Cell.SetVMerge(vmerge_Restart);
 			}
 		}
 	}
@@ -9002,7 +9258,7 @@ CTable.prototype.AddTableRow = function(bBefore)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			if (vmerge_Continue === Cell.Get_VMerge())
+			if (vmerge_Continue === Cell.GetVMerge())
 				continue;
 
 			this.Selection.Data.push({Row : StartRow + Index, Cell : CurCell});
@@ -9066,7 +9322,7 @@ CTable.prototype.RemoveTableRow = function(Ind)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 
 			if (vmerge_Continue != VMerge)
 				continue;
@@ -9075,7 +9331,7 @@ CTable.prototype.RemoveTableRow = function(Ind)
 			// Найдем строку, с которой начинается данное объединение.
 			var VMerge_count = this.Internal_GetVertMergeCount2(CurRow, Row.Get_CellInfo(CurCell).StartGridCol, Cell.Get_GridSpan());
 			if (CurRow - ( VMerge_count - 1 ) >= FirstRow_to_delete)
-				Cell.Set_VMerge(vmerge_Restart);
+				Cell.SetVMerge(vmerge_Restart);
 		}
 	}
 
@@ -9299,7 +9555,7 @@ CTable.prototype.RemoveTableColumn = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			if (vmerge_Continue != Cell.Get_VMerge())
+			if (vmerge_Continue != Cell.GetVMerge())
 			{
 				bRemove = false;
 				break;
@@ -9811,6 +10067,18 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 	this.Internal_Recalculate_1();
 	editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 };
+/**
+ * Распраделяем выделенные ячейки по ширине или высоте
+ * @param isHorizontally
+ * @returns {boolean} Возвращаем false, если операция невозможна
+ */
+CTable.prototype.DistributeTableCells = function(isHorizontally)
+{
+	if (isHorizontally)
+		return this.DistributeColumns();
+	else
+		return this.DistributeRows();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Внутренние функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -9887,7 +10155,7 @@ CTable.prototype.Internal_GetCellByXY = function(X, Y, PageIndex)
 		{
 			var Cell     = Row.Get_Cell(CurCell);
 			var GridSpan = Cell.Get_GridSpan();
-			var Vmerge   = Cell.Get_VMerge();
+			var Vmerge   = Cell.GetVMerge();
 
 			// Обсчет такик ячеек произошел ранее
 			if (vmerge_Continue === Vmerge && Row_start != CurRow)
@@ -9948,7 +10216,7 @@ CTable.prototype.Internal_GetVertMergeCount = function(StartRow, StartGridCol, G
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -9992,7 +10260,7 @@ CTable.prototype.Internal_GetVertMergeCount2 = function(StartRow, StartGridCol, 
 		var Temp_Grid_start = Start_Row.Get_CellInfo(Index).StartGridCol;
 		if (Temp_Grid_start === StartGridCol)
 		{
-			Start_VMerge = Start_Row.Get_Cell(Index).Get_VMerge();
+			Start_VMerge = Start_Row.Get_Cell(Index).GetVMerge();
 			break;
 		}
 	}
@@ -10013,7 +10281,7 @@ CTable.prototype.Internal_GetVertMergeCount2 = function(StartRow, StartGridCol, 
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -10076,7 +10344,7 @@ CTable.prototype.Internal_Check_TableRows = function(bSaveHeight)
 		for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 
 			if (VMerge != vmerge_Continue)
 			{
@@ -10116,7 +10384,7 @@ CTable.prototype.Internal_Check_TableRows = function(bSaveHeight)
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell   = Row.Get_Cell(CurCell);
-			var VMerge = Cell.Get_VMerge();
+			var VMerge = Cell.GetVMerge();
 			if (vmerge_Restart === VMerge)
 			{
 				var CurMinHeight = Cell.Content.Get_EmptyHeight();
@@ -10289,6 +10557,8 @@ CTable.prototype.private_CreateNewGrid = function(arrRowsInfo)
 };
 CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 {
+	var nCellSpacing = this.Content[0].GetCellSpacing();
+
 	var CurPos = [];
 	var CurX   = [];
 	for (var Index = 0; Index < RowsInfo.length; Index++)
@@ -10386,7 +10656,19 @@ CTable.prototype.Internal_CreateNewGrid = function(RowsInfo)
 			var WType = Cell.Get_W().Type;
 			if (tblwidth_Auto != WType && tblwidth_Nil != WType)
 			{
-				Cell.Set_W(new CTableMeasurement(tblwidth_Mm, RowInfo[CurIndex].W));
+				var nW = RowInfo[CurIndex].W;
+				if (null !== nCellSpacing)
+				{
+					if (0 === CurCell || (1 === CurCell && RowInfo[0].Type === -1))
+						nW -= nCellSpacing / 2;
+
+					nW -= nCellSpacing;
+
+					if (RowInfo.length - 2 === CurCell)
+						nW -= nCellSpacing / 2;
+				}
+
+				Cell.Set_W(new CTableMeasurement(tblwidth_Mm, nW));
 			}
 		}
 
@@ -10583,7 +10865,7 @@ CTable.prototype.Internal_Get_StartMergedCell = function(StartRow, StartGridCol,
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan && vmerge_Continue === Vmerge)
 			{
@@ -10630,7 +10912,7 @@ CTable.prototype.Internal_Get_EndMergedCell = function(StartRow, StartGridCol, G
 		{
 			var Cell         = Row.Get_Cell(CurCell);
 			var CellGridSpan = Cell.Get_GridSpan();
-			var Vmerge       = Cell.Get_VMerge();
+			var Vmerge       = Cell.GetVMerge();
 
 			if (CurGridCol === StartGridCol && GridSpan === CellGridSpan)
 			{
@@ -10664,7 +10946,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 {
 	// Сначала проверим данну строку
 	var Row       = this.Content[RowIndex];
-	var CellIndex = this.Internal_Get_Cell_ByStartGridCol(RowIndex, StartGridCol);
+	var CellIndex = this.private_GetCellIndexByStartGridCol(RowIndex, StartGridCol);
 	if (-1 === CellIndex)
 		return [];
 
@@ -10677,7 +10959,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 	// Ищем ячейки вверх
 	for (var Index = RowIndex - 1; Index >= 0; Index--)
 	{
-		var CellIndex = this.Internal_Get_Cell_ByStartGridCol(Index, StartGridCol);
+		var CellIndex = this.private_GetCellIndexByStartGridCol(Index, StartGridCol);
 		if (-1 === CellIndex)
 			break;
 
@@ -10685,7 +10967,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 		if (GridSpan !== Cell.Get_GridSpan())
 			break;
 
-		var Vmerge = Cell.Get_VMerge();
+		var Vmerge = Cell.GetVMerge();
 		if (vmerge_Continue !== Vmerge)
 			break;
 
@@ -10695,7 +10977,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 	// Ищем ячейки вниз
 	for (var Index = RowIndex + 1, Count = this.Content.length; Index < Count; Index++)
 	{
-		var CellIndex = this.Internal_Get_Cell_ByStartGridCol(Index, StartGridCol);
+		var CellIndex = this.private_GetCellIndexByStartGridCol(Index, StartGridCol);
 		if (-1 === CellIndex)
 			break;
 
@@ -10703,7 +10985,7 @@ CTable.prototype.private_GetMergedCells = function(RowIndex, StartGridCol, GridS
 		if (GridSpan !== Cell.Get_GridSpan())
 			break;
 
-		var Vmerge = Cell.Get_VMerge();
+		var Vmerge = Cell.GetVMerge();
 		if (vmerge_Continue !== Vmerge)
 			break;
 
@@ -10725,6 +11007,7 @@ CTable.prototype.private_GetCellsPosArrayByCellsArray = function(CellsArray)
 };
 /**
  * Получаем левую верхнюю ячейку в текущем объединении
+ * @returns {CTableCell}
  */
 CTable.prototype.GetStartMergedCell = function(nCellIndex, nRowIndex)
 {
@@ -10739,27 +11022,68 @@ CTable.prototype.Internal_Get_StartMergedCell2 = function(CellIndex, RowIndex)
 	return this.Internal_Get_StartMergedCell(RowIndex, CellInfo.StartGridCol, Cell.Get_GridSpan());
 };
 /**
- * Получаем номер ячейки в заданной строке по заданной колонке.
+ * Получаем количество ячеек (=количество строк) попавших в вертикальное объединения, начиная с заданной ячейки внизю
+ * @param nCellIndex номер ячейки в строке
+ * @param nRowIndex номер строки
+ * @returns {number}
  */
-CTable.prototype.Internal_Get_Cell_ByStartGridCol = function(RowIndex, StartGridCol)
+CTable.prototype.GetVMergeCount = function(nCellIndex, nRowIndex)
 {
-	var Row = this.Content[RowIndex];
+	var oRow = this.GetRow(nRowIndex);
+	if (!oRow)
+		return 1;
 
-	var BeforeInfo = Row.Get_Before();
-	var CurGridCol = BeforeInfo.GridBefore;
-	var CellsCount = Row.Get_CellsCount();
+	var oCell = oRow.GetCell(nCellIndex);
+	if (!oCell)
+		return 1;
 
-	for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+	var oCellInfo = oRow.GetCellInfo(nCellIndex);
+	if (!oCellInfo)
+		return 1;
+
+	return this.Internal_GetVertMergeCount(nRowIndex, oCellInfo.StartGridCol, oCell.GetGridSpan());
+};
+/**
+ * Получаем номер ячейки в заданной строке по заданной колонке
+ * @param {number} nCurRow
+ * @param {number} nStartGridCol
+ * @param {boolean} [isAllowOverlap = false] true - ищем ячейку, в которой началась данная колонка, false - ищем ячейку, строго начавшуюся с заданной колонки
+ * @returns {number} Возвращаем -1, если не найдена ячейка
+ */
+CTable.prototype.private_GetCellIndexByStartGridCol = function(nCurRow, nStartGridCol, isAllowOverlap)
+{
+	var oRow = this.GetRow(nCurRow);
+	if (!oRow)
+		return -1;
+
+	var nCurGridCol = oRow.GetBefore().Grid;
+	if (isAllowOverlap)
 	{
-		var Cell     = Row.Get_Cell(CurCell);
-		var GridSpan = Cell.Get_GridSpan();
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			if (nStartGridCol === nCurGridCol)
+				return nCurCell;
+			else if (nCurGridCol > nStartGridCol)
+				return nCurCell - 1;
 
-		if (StartGridCol === CurGridCol)
-			return CurCell;
-		else if (CurGridCol > StartGridCol)
-			return -1;
+			var oCell = oRow.GetCell(nCurCell);
+			nCurGridCol += oCell.GetGridSpan();
+		}
 
-		CurGridCol += GridSpan;
+		return oRow.GetCellsCount() - 1;
+	}
+	else
+	{
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			if (nStartGridCol === nCurGridCol)
+				return nCurCell;
+			else if (nCurGridCol > nStartGridCol)
+				return -1;
+
+			var oCell = oRow.GetCell(nCurCell);
+			nCurGridCol += oCell.GetGridSpan();
+		}
 	}
 
 	return -1;
@@ -10840,67 +11164,111 @@ CTable.prototype.Internal_Update_TableMarkup = function(RowIndex, CellIndex, Pag
 	this.DrawingDocument.Set_RulerState_Table(this.Markup, Transform);
 };
 /**
- * Проверяем попалили мы в какую либо границу.
+ * Проверяем попадание в границу и определяем дополнительно попадание во вспомогательные области
+ * Значения для поля Border: -1 - не попали в границу
  *      0
  *    |---|
  *   3|   |1
  *    |---|
  *      2
+ * @param X
+ * @param Y
+ * @param nCurPage
+ * @returns {{Pos: {Row, Cell}, Border: number, Row: number, RowSelection: boolean, ColumnSelection: boolean, CellSelection: boolean}}
  */
-CTable.prototype.Internal_CheckBorders = function(X, Y, PageNum)
+CTable.prototype.private_CheckHitInBorder = function(X, Y, nCurPage)
 {
-	var CurPage = PageNum;
-	var Page    = this.Pages[CurPage];
-
 	// Сначала определим ячейку, у которой границы мы будем проверять
-	var CellPos = this.Internal_GetCellByXY(X, Y, PageNum);
+	var oCellPos = this.Internal_GetCellByXY(X, Y, nCurPage);
 
-	var Row      = this.Content[CellPos.Row];
-	var Cell     = Row.Get_Cell(CellPos.Cell);
-	var CellInfo = Row.Get_CellInfo(CellPos.Cell);
+	var oResult = {
+		Pos             : oCellPos,
+		Border          : -1,
+		Row             : oCellPos.Row,
+		RowSelection    : false,
+		ColumnSelection : false,
+		CellSelection   : false
+	};
 
-	var VMerge_count_over = this.Internal_GetVertMergeCount(CellPos.Row, CellInfo.StartGridCol, Cell.Get_GridSpan());
-	var VMerge_count      = this.private_GetVertMergeCountOnPage(PageNum, CellPos.Row, CellInfo.StartGridCol, Cell.Get_GridSpan());
-	if (VMerge_count <= 0)
-		return {Pos : CellPos, Border : -1};
+	var nCurRow  = oCellPos.Row;
+	var nCurCell = oCellPos.Cell;
 
-	var Row_end      = this.Content[CellPos.Row + VMerge_count - 1];
-	var Cell_end     = this.Internal_Get_Cell_ByStartGridCol(CellPos.Row + VMerge_count - 1, CellInfo.StartGridCol);
-	var CellInfo_end = Row_end.Get_CellInfo(Cell_end.Index);
+	var oRow      = this.GetRow(nCurRow);
+	var oCell     = oRow.GetCell(nCurCell);
+	var oCellInfo = oRow.GetCellInfo(nCurCell);
 
-	var X_cell_start = Page.X + CellInfo.X_grid_start;
-	var X_cell_end   = Page.X + CellInfo.X_grid_end;
+	var nVMergeCount       = this.GetVMergeCount(nCurCell, nCurRow);
+	var nVMergeCountOnPage = this.private_GetVertMergeCountOnPage(nCurPage, nCurRow, oCellInfo.StartGridCol, oCell.GetGridSpan());
+	if (nVMergeCountOnPage <= 0)
+		return oResult;
 
-	var Y_cell_start = this.RowsInfo[CellPos.Row].Y[PageNum];
-	var Y_cell_end   = this.RowsInfo[CellPos.Row + VMerge_count - 1].Y[PageNum] + this.RowsInfo[CellPos.Row + VMerge_count - 1].H[PageNum];
+	var oPage = this.Pages[nCurPage];
 
-	var Radius = this.DrawingDocument.GetMMPerDot(3); // 3 px
+	var X_cell_start = oPage.X + oCellInfo.X_grid_start;
+	var X_cell_end   = oPage.X + oCellInfo.X_grid_end;
 
-	if (Y <= Y_cell_start + Radius && Y >= Y_cell_start - Radius)
+	var Y_cell_start = this.RowsInfo[nCurRow].Y[nCurPage];
+	var Y_cell_end   = this.RowsInfo[nCurRow + nVMergeCountOnPage - 1].Y[nCurPage] + this.RowsInfo[nCurRow + nVMergeCountOnPage - 1].H[nCurPage];
+
+	var nRadius = this.DrawingDocument.GetMMPerDot(3); // 3 px
+
+	if (Y <= Y_cell_start + nRadius && Y >= Y_cell_start - nRadius)
 	{
-		return {Pos : CellPos, Border : 0};
+		oResult.Border = 0;
 	}
-	else if (Y <= Y_cell_end + Radius && Y >= Y_cell_end - Radius)
+	else if (Y <= Y_cell_end + nRadius && Y >= Y_cell_end - nRadius)
 	{
-		if (VMerge_count != VMerge_count_over)
-			return {Pos : CellPos, Border : -1}
+		if (nVMergeCountOnPage !== nVMergeCount)
+		{
+			oResult.Border = -1;
+		}
+		else
+		{
+			oResult.Border = 2;
+			oResult.Row    = nCurRow + nVMergeCount - 1;
+		}
+	}
+	else if (X <= X_cell_start + nRadius && X >= X_cell_start - nRadius)
+	{
+		oResult.Border = 3;
+	}
+	else if (X <= X_cell_end + nRadius && X >= X_cell_end - nRadius)
+	{
+		oResult.Border = 1;
+	}
 
-		return {Pos : CellPos, Border : 2, Row : CellPos.Row + VMerge_count_over - 1};
-	}
-	else if (X <= X_cell_start + Radius && X >= X_cell_start - Radius)
+	if (0 === nCurCell && X <= X_cell_start)
 	{
-		return {Pos : CellPos, Border : 3};
+		oResult.RowSelection = true;
+		oResult.Border       = -1;
 	}
-	else if (X <= X_cell_end + Radius && X >= X_cell_end - Radius)
+	else if (0 === nCurRow && Y <= Y_cell_start + nRadius)
 	{
-		return {Pos : CellPos, Border : 1};
+		oResult.ColumnSelection = true;
+		oResult.Border          = -1;
+	}
+	else if (X_cell_start + nRadius <= X && X <= X_cell_end)
+	{
+		var oLeftMargin   = oCell.GetMargins().Left;
+		var nCellSpacing  = oRow.GetCellSpacing();
+		var nSpacingShift = null === nCellSpacing ? 0 : nCellSpacing / 2;
+
+		if (X <= X_cell_start + nSpacingShift + oLeftMargin.W)
+		{
+			oResult.CellSelection = true;
+			oResult.Border        = -1;
+		}
 	}
 
-	return {Pos : CellPos, Border : -1};
+	return oResult;
 };
-CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
+/**
+ * Обновляем массив выделенных ячеек
+ * @param {boolean} [bForceSelectByLines=false] использовать ли выделение по строкам
+ */
+CTable.prototype.private_UpdateSelectedCellsArray = function(bForceSelectByLines)
 {
-	if ("undefined" == typeof(bForceSelectByLines))
+	if (undefined === bForceSelectByLines)
 		bForceSelectByLines = false;
 
 	this.Selection.Type = table_Selection_Cell;
@@ -10943,16 +11311,13 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 			var Row = this.Content[StartRow];
 			for (var CurCell = StartCell; CurCell <= EndCell; CurCell++)
 			{
-				var Cell     = Row.Get_Cell(CurCell);
-				var GridSpan = Cell.Get_GridSpan();
-				var Vmerge   = Cell.Get_VMerge();
+				var Cell   = Row.Get_Cell(CurCell);
+				var Vmerge = Cell.GetVMerge();
 
 				// Обсчет такик ячеек произошел ранее
 				if (vmerge_Continue === Vmerge)
-				{
-					CurGridCol += GridSpan;
 					continue;
-				}
+
 				this.Selection.Data.push({Row : StartRow, Cell : CurCell});
 			}
 		}
@@ -10984,7 +11349,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 				{
 					var Cell     = Row.Get_Cell(CurCell);
 					var GridSpan = Cell.Get_GridSpan();
-					var Vmerge   = Cell.Get_VMerge();
+					var Vmerge   = Cell.GetVMerge();
 
 					// Обсчет такик ячеек произошел ранее
 					if (vmerge_Continue === Vmerge)
@@ -11028,7 +11393,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell   = Row.Get_Cell(CurCell);
-				var Vmerge = Cell.Get_VMerge();
+				var Vmerge = Cell.GetVMerge();
 
 				if (vmerge_Continue === Vmerge)
 					continue;
@@ -11114,7 +11479,7 @@ CTable.prototype.Internal_Get_SelectionArray = function()
 			for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
 			{
 				var Cell   = Row.Get_Cell(CurCell);
-				var Vmerge = Cell.Get_VMerge();
+				var Vmerge = Cell.GetVMerge();
 
 				if (vmerge_Continue === Vmerge)
 					continue;
@@ -11357,7 +11722,7 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 {
 	var VMergeCount = this.Internal_GetVertMergeCount(CurRow, StartGridCol, GridSpan);
 
-	if (true !== this.Is_EmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
+	if (true !== this.IsEmptyPage(CurPage) && CurRow + VMergeCount - 1 >= this.Pages[CurPage].LastRow)
 	{
 		VMergeCount = this.Pages[CurPage].LastRow + 1 - CurRow;
 		if (false === this.RowsInfo[CurRow + VMergeCount - 1].FirstPage && CurPage === this.RowsInfo[CurRow + VMergeCount - 1].StartPage)
@@ -11365,6 +11730,50 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 	}
 
 	return VMergeCount;
+};
+/**
+ * Получаем отрезок выделенных строк
+ * @returns {{Start: number, End: number}}
+ */
+CTable.prototype.GetSelectedRowsRange = function()
+{
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var nStartRow = -1,
+		nEndRow   = -2;
+
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nRowIndex = arrSelectedCells[nIndex].Row;
+
+		if (-1 === nStartRow || nStartRow > nRowIndex)
+			nStartRow = nRowIndex;
+
+		if (-1 === nEndRow || nEndRow < nRowIndex)
+			nEndRow = nRowIndex;
+	}
+
+	return {
+		Start : nStartRow,
+		End   : nEndRow
+	};
+};
+/**
+ * Получаем количество строк в заголовке таблицы
+ * @returns {number}
+ */
+CTable.prototype.GetRowsCountInHeader = function()
+{
+	var nRowsInHeader = 0;
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		if (true === this.Content[nCurRow].IsHeader())
+			nRowsInHeader++;
+		else
+			break;
+	}
+
+	return nRowsInHeader;
 };
 CTable.prototype.GetTopElement = function()
 {
@@ -11386,7 +11795,7 @@ CTable.prototype.Get_Row = function(Index)
 };
 CTable.prototype.GetRowsCount = function()
 {
-	return this.Get_RowsCount();
+	return this.Content.length;
 };
 CTable.prototype.GetRow = function(nIndex)
 {
@@ -11413,9 +11822,17 @@ CTable.prototype.StartSelectionFromCurPos = function()
 
 	this.Selection.StartPos.Pos = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
 	this.Selection.EndPos.Pos   = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
-	this.Internal_Selection_UpdateCells();
+	this.private_UpdateSelectedCellsArray();
 
-	// В функции Internal_Selection_UpdateCells выставляется тип по ячеейкам, но нам нужен внутри ячейки изначальный селект
+	var oLogicDocument = this.LogicDocument;
+	if (oLogicDocument)
+	{
+		var oRealPos              = oLogicDocument.GetCursorRealPosition();
+		this.Selection.StartPos.X = oRealPos.X;
+		this.Selection.StartPos.Y = oRealPos.Y;
+	}
+
+	// В функции private_UpdateSelectedCellsArray выставляется тип по ячеейкам, но нам нужен внутри ячейки изначальный селект
 	this.Selection.Type   = table_Selection_Text;
 	this.Selection.CurRow = this.CurCell.Row.Index;
 
@@ -11541,7 +11958,7 @@ CTable.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 
     var Cell = this.Get_Row(CurRow).Get_Cell(CurCell);
 
-    while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+    while (null != Cell && vmerge_Restart != Cell.GetVMerge())
         Cell = this.private_GetPrevCell(CurRow, CurCell);
 
     Cell.Content.GetRevisionsChangeParagraph(SearchEngine);
@@ -11550,13 +11967,13 @@ CTable.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
         if (SearchEngine.Get_Direction() > 0)
         {
             Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
-            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+            while (null != Cell && vmerge_Restart != Cell.GetVMerge())
                 Cell = this.private_GetNextCell(Cell.Row.Index, Cell.Index);
         }
         else
         {
             Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
-            while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
+            while (null != Cell && vmerge_Restart != Cell.GetVMerge())
                 Cell = this.private_GetPrevCell(Cell.Row.Index, Cell.Index);
         }
 
@@ -11599,7 +12016,7 @@ CTable.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
     var CurCell = (true === bSelection ? (true === bStart ? this.Selection.StartPos.Pos.Cell : this.Selection.EndPos.Pos.Cell) : this.CurCell.Index);
 
     var Row = this.Get_Row(CurRow);
-    PosArray.push({Class : this, Position : CurRow});
+    PosArray.push({Class : this, Position : CurRow, Type : this.Selection.Type, Type2 : this.Selection.Type2});
     PosArray.push({Class : this.Get_Row(CurRow), Position : CurCell});
 
     if (Row && CurCell >= 0 && CurCell < Row.Get_CellsCount())
@@ -11623,21 +12040,21 @@ CTable.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, S
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
 
-    var IsOneElement = true;
+    var isOneElement = true;
     var StartRow = 0;
     switch (StartFlag)
     {
         case 0 : StartRow = StartDocPos[Depth].Position; break;
-        case 1 : StartRow = 0; IsOneElement = false; break;
-        case -1: StartRow = this.Content.length - 1; IsOneElement = false; break;
+        case 1 : StartRow = 0; isOneElement = false; break;
+        case -1: StartRow = this.Content.length - 1; isOneElement = false; break;
     }
 
     var EndRow = 0;
     switch (EndFlag)
     {
         case 0 : EndRow = EndDocPos[Depth].Position; break;
-        case 1 : EndRow = 0; IsOneElement = false; break;
-        case -1: EndRow = this.Content.length - 1; IsOneElement = false; break;
+        case 1 : EndRow = 0; isOneElement = false; break;
+        case -1: EndRow = this.Content.length - 1; isOneElement = false; break;
     }
 
     var _StartDocPos = StartDocPos, _StartFlag = StartFlag;
@@ -11757,8 +12174,17 @@ CTable.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, S
     else
     {
         this.Selection.Type = table_Selection_Cell;
-        this.Internal_Selection_UpdateCells(IsOneElement ? false : true);
+        this.private_UpdateSelectedCellsArray(isOneElement ? false : true);
     }
+
+    if (null !== EndDocPos && undefined !== EndDocPos[Depth].Type && undefined !== EndDocPos[Depth].Type2)
+	{
+		this.Selection.Type  = EndDocPos[Depth].Type;
+		this.Selection.Type2 = EndDocPos[Depth].Type2;
+
+		if (table_Selection_Cell === this.Selection.Type)
+			this.private_UpdateSelectedCellsArray(!isOneElement || table_Selection_Rows === this.Selection.Type2 ? true : false);
+	}
 };
 CTable.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
@@ -11841,7 +12267,7 @@ CTable.prototype.Set_CurCell = function(Cell)
 
     this.CurCell = Cell;
 };
-CTable.prototype.Is_EmptyPage = function(CurPage)
+CTable.prototype.IsEmptyPage = function(CurPage)
 {
     if (!this.Pages[CurPage]
         || (this.Pages[CurPage].LastRow < this.Pages[CurPage].FirstRow)
@@ -11854,7 +12280,7 @@ CTable.prototype.Check_EmptyPages = function(CurPage)
 {
     for (var _CurPage = CurPage; _CurPage >= 0; --_CurPage)
     {
-        if (true !== this.Is_EmptyPage(_CurPage))
+        if (true !== this.IsEmptyPage(_CurPage))
             return false;
     }
 
@@ -11903,7 +12329,10 @@ CTable.prototype.IsTableFirstRowOnNewPage = function(CurRow)
     {
         if (CurRow === this.Pages[CurPage].FirstRow && CurRow <= this.Pages[CurPage].LastRow)
         {
-            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))
+            if (0 === CurPage
+				&& (null != this.Get_DocumentPrev()
+				|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
+				|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage())))
                 return false;
 
             return true;
@@ -11943,7 +12372,7 @@ CTable.prototype.SetTableGrid = function(arrGrid)
  */
 CTable.prototype.GetSpanWidth = function(nStartCol, nGridSpan)
 {
-	if (nStartCol < 0 || nStartCol + nGridSpan < 0 || nGridSpan <= 0 || nStartCol + nGridSpan >= this.TableGrid.length)
+	if (nStartCol < 0 || nStartCol + nGridSpan < 0 || nGridSpan <= 0 || nStartCol + nGridSpan > this.TableGrid.length)
 		return 0;
 
 	var nSum = 0;
@@ -12064,7 +12493,7 @@ CTable.prototype.private_CorrectVerticalMerge = function()
 		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
 		{
 			var oCell       = oRow.Get_Cell(nCurCell);
-			var nVMergeType = oCell.Get_VMerge();
+			var nVMergeType = oCell.GetVMerge();
 			var nGridSpan   = oCell.Get_GridSpan();
 
 			if (vmerge_Continue === nVMergeType)
@@ -12094,7 +12523,7 @@ CTable.prototype.private_CorrectVerticalMerge = function()
 				}
 
 				if (true === bNeedReset)
-					oCell.Set_VMerge(vmerge_Restart);
+					oCell.SetVMerge(vmerge_Restart);
 			}
 
 			nGridCol += nGridSpan;
@@ -12105,7 +12534,7 @@ CTable.prototype.private_SetTableLayoutFixedAndUpdateCellsWidth = function(nExce
 {
 	if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
 	{
-		this.Set_TableLayout(tbllayout_Fixed);
+		this.SetTableLayout(tbllayout_Fixed);
 
 		// Обновляем ширины ячеек
 		var nColsCount = this.TableGrid.length;
@@ -12396,14 +12825,6 @@ CTable.prototype.InsertTableContent = function(_nCellIndex, _nRowIndex, oTable)
  */
 CTable.prototype.Resize = function(nWidth, nHeight)
 {
-	if (!this.LogicDocument)
-		return;
-
-	if (true === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true))
-		return;
-
-	this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ResizeTable);
-
 	var nMinWidth  = this.GetMinWidth();
 	var nMinHeight = this.GetMinHeight();
 
@@ -12477,6 +12898,22 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
 				nNewH -= this.RowsInfo[nCurRow].TopDy[0];
 
+			var nTopMargin = 0,
+				nBotMargin = 0;
+			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+			{
+				var oCell    = oRow.GetCell(nCurCell);
+				var oMargins = oCell.GetMargins();
+
+				if (oMargins.Top.W > nTopMargin)
+					nTopMargin = oMargins.Top.W;
+
+				if (oMargins.Bottom.W > nBotMargin)
+					nBotMargin = oMargins.Bottom.W;
+			}
+
+			nNewH -= nTopMargin + nBotMargin;
+
 			oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 		}
 	}
@@ -12541,6 +12978,22 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 					nNewH += nCellSpacing;
 				else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
 					nNewH -= this.RowsInfo[nCurRow].TopDy[0];
+
+				var nTopMargin = 0,
+					nBotMargin = 0;
+				for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+				{
+					var oCell    = oRow.GetCell(nCurCell);
+					var oMargins = oCell.GetMargins();
+
+					if (oMargins.Top.W > nTopMargin)
+						nTopMargin = oMargins.Top.W;
+
+					if (oMargins.Bottom.W > nBotMargin)
+						nBotMargin = oMargins.Bottom.W;
+				}
+
+				nNewH -= nTopMargin + nBotMargin;
 
 				oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
 			}
@@ -12642,7 +13095,8 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 					oRow.SetBefore(oBefore.Grid, new CTableMeasurement(tblwidth_Auto, 0));
 			}
 
-			var nCurCol = oBefore.Grid;
+			var nCellSpacing = oRow.GetCellSpacing();
+			var nCurCol      = oBefore.Grid;
 			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
 			{
 				var oCell     = oRow.GetCell(nCurCell);
@@ -12652,6 +13106,18 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 				if (oCellW)
 				{
 					var nW = this.GetSpanWidth(nCurCol, nGridSpan);
+
+					if (null !== nCellSpacing)
+					{
+						if (0 === nCurCell)
+							nW -= nCellSpacing / 2;
+
+						nW -= nCellSpacing;
+
+						if (nCellsCount - 1 === nCurCell)
+							nW -= nCellSpacing / 2;
+					}
+
 					if (oCellW.IsMM())
 						oCell.SetW(new CTableMeasurement(tblwidth_Mm, nW));
 					else if (oCell.IsPercent() && nPercentWidth > 0.001)
@@ -12688,8 +13154,27 @@ CTable.prototype.Resize = function(nWidth, nHeight)
 				this.SetTableW(tblwidth_Auto, 0);
 		}
 	}
+};
+/**
+ * Изменяем размер тширину и высоту таблицы в документе (создается точка в истории и запускается пересчет)
+ * @param nWidth
+ * @param nHeight
+ */
+CTable.prototype.ResizeTableInDocument = function(nWidth, nHeight)
+{
+	if (!this.LogicDocument)
+		return;
+
+	if (true === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true))
+		return;
+
+	this.LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ResizeTable);
+
+	this.Resize(nWidth, nHeight);
 
 	this.LogicDocument.Recalculate();
+	this.Start_TrackTable();
+	this.LogicDocument.Document_UpdateSelectionState();
 };
 /**
  * Получаем минимальную ширину таблицы
@@ -12895,6 +13380,389 @@ CTable.prototype.GetSummaryHeight = function()
 	}
 
 	return nSum;
+};
+CTable.prototype.GetTableOfContents = function(isUnique, isCheckFields)
+{
+	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oResult = oRow.GetCell(nCurCell).Content.GetTableOfContents(isUnique, isCheckFields);
+			if (oResult)
+				return oResult;
+		}
+	}
+
+	return null;
+};
+/**
+ * Делаем выделенные ячейки равными по ширине
+ * @returns {boolean} Возрвщаем false, если операция невозможна
+ */
+CTable.prototype.DistributeColumns = function()
+{
+	var isApplyToAll = this.ApplyToAll;
+	if (!this.Selection.Use || table_Selection_Text === this.Selection.Type)
+		this.ApplyToAll = true;
+
+	var arrSelectedCells = this.GetSelectionArray();
+	this.ApplyToAll = isApplyToAll;
+
+	if (arrSelectedCells.length <= 1)
+		return false;
+
+	var arrRows = [];
+	var arrCheckMergedCells = [];
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		var nCurRow  = arrSelectedCells[nIndex].Row;
+		if (!arrRows[nCurRow])
+		{
+			arrRows[nCurRow] = {
+				Start : nCurCell,
+				End   : nCurCell
+			};
+		}
+		else
+		{
+			if (arrRows[nCurRow].Start > nCurCell)
+				arrRows[nCurRow].Start = nCurCell;
+
+			if (arrRows[nCurRow].End < nCurCell)
+				arrRows[nCurRow].End = nCurCell;
+		}
+
+		var oCell = this.Content[nCurRow].GetCell(nCurCell);
+		if (oCell)
+		{
+			var oCellInfo      = this.Content[nCurRow].GetCellInfo(nCurCell);
+			var arrMergedCells = this.private_GetMergedCells(nCurRow, oCellInfo.StartGridCol, oCell.GetGridSpan());
+
+			if (arrMergedCells.length > 1)
+			{
+				arrCheckMergedCells.push([nCurRow]);
+			}
+
+
+			for (var nMergeIndex = 1, nMergedCount = arrMergedCells.length; nMergeIndex < nMergedCount; ++nMergeIndex)
+			{
+				var nCurCell2 = arrMergedCells[nMergeIndex].Index;
+				var nCurRow2  = arrMergedCells[nMergeIndex].Row.Index;
+
+				if (!arrRows[nCurRow2])
+				{
+					arrRows[nCurRow2] = {
+						Start : nCurCell2,
+						End   : nCurCell2
+					};
+				}
+				else
+				{
+					if (arrRows[nCurRow2].Start > nCurCell2)
+						arrRows[nCurRow2].Start = nCurCell2;
+
+					if (arrRows[nCurRow2].End < nCurCell2)
+						arrRows[nCurRow2].End = nCurCell2;
+				}
+
+				arrCheckMergedCells[arrCheckMergedCells.length - 1].push(nCurRow2);
+			}
+		}
+	}
+
+	for (var nIndex = 0, nCount = arrCheckMergedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nFirstStartGridCol = null,
+			arrFirstGridSpans  = null;
+
+		for (var nRowIndex = 0, nRowsCount = arrCheckMergedCells[nIndex].length; nRowIndex < nRowsCount; ++nRowIndex)
+		{
+			var nCurRow = arrCheckMergedCells[nIndex][nRowIndex];
+			var oRow = this.GetRow(nCurRow);
+
+			var nStartGridCol = this.Content[nCurRow].GetBefore().Grid;
+			var arrGridSpans  = [];
+
+			for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+			{
+				var nGridSpan = oRow.GetCell(nCurCell).GetGridSpan();
+				if (nCurCell < arrRows[nCurRow].Start)
+					nStartGridCol += nGridSpan;
+				else if (nCurCell <= arrRows[nCurRow].End)
+					arrGridSpans.push(nGridSpan);
+				else
+					break;
+			}
+
+
+			if (null === nFirstStartGridCol)
+			{
+				nFirstStartGridCol = nStartGridCol;
+				arrFirstGridSpans  = arrGridSpans;
+			}
+			else
+			{
+				if (nStartGridCol !== nFirstStartGridCol || arrFirstGridSpans.length !== arrGridSpans.length)
+				{
+					return false;
+				}
+				else
+				{
+					for (var nSpanIndex = 0, nSpansCount = arrGridSpans.length; nSpanIndex < nSpansCount; ++nSpanIndex)
+					{
+						if (arrFirstGridSpans[nSpanIndex] !== arrGridSpans[nSpanIndex])
+							return false;
+					}
+				}
+			}
+		}
+	}
+
+	var isAutofitLayout    = this.GetTableLayout() === tbllayout_AutoFit;
+	var isNeedChangeLayout = false;
+	var arrRowsInfo        = this.private_GetRowsInfo();
+	for (nCurRow in arrRows)
+	{
+		if (!arrRowsInfo[nCurRow] || arrRowsInfo[nCurRow].length <= 0)
+			continue;
+
+		var nStartCell = arrRows[nCurRow].Start;
+		var nEndCell   = arrRows[nCurRow].End;
+
+		var nSum = 0;
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell = nStartCell; nCurCell <= nEndCell; ++nCurCell)
+		{
+			nSum += arrRowsInfo[nCurRow][nCurCell + nAdd].W;
+		}
+
+		for (var nCurCell = nStartCell; nCurCell <= nEndCell; ++nCurCell)
+		{
+			var nNewW = nSum / (nEndCell - nStartCell + 1);
+			arrRowsInfo[nCurRow][nCurCell + nAdd].W = nNewW;
+
+			// TODO: Надо поправить баг в рассчете AutoFit из-за которого тут сдвиг происходит
+			var oRow = this.GetRow(nCurRow);
+			if (!oRow)
+				continue;
+
+			var oCell = oRow.GetCell(nCurCell);
+			if (!oCell)
+				continue;
+
+			if (isAutofitLayout
+				&& !isNeedChangeLayout
+				&& oCell.Content_RecalculateMinMaxContentWidth(false).Max - 0.001 > nNewW)
+					isNeedChangeLayout = true;
+		}
+	}
+
+	if (isAutofitLayout && isNeedChangeLayout)
+		this.SetTableLayout(tbllayout_Fixed);
+
+	this.private_CreateNewGrid(arrRowsInfo);
+	this.private_RecalculateGrid();
+
+	return true;
+};
+/**
+ * Делаем выделенные ячейки равными по высоте
+ * @returns {boolean}
+ */
+CTable.prototype.DistributeRows = function()
+{
+	var isApplyToAll = this.ApplyToAll;
+	if (!this.Selection.Use || table_Selection_Text === this.Selection.Type)
+		this.ApplyToAll = true;
+
+	var arrSelectedCells = this.GetSelectionArray();
+	this.ApplyToAll = isApplyToAll;
+
+	if (arrSelectedCells.length <= 1)
+		return false;
+
+	var arrRows = [], nRowsCount = 0;
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		if (true !== arrRows[arrSelectedCells[nIndex].Row])
+		{
+			arrRows[arrSelectedCells[nIndex].Row] = true;
+			nRowsCount++;
+		}
+
+		var oCell = this.GetStartMergedCell(arrSelectedCells[nIndex].Cell, arrSelectedCells[nIndex].Row);
+		if (oCell)
+		{
+			var nVMergeCount = this.GetVMergeCount(oCell.Index, oCell.Row.Index);
+			if (nVMergeCount > 1)
+			{
+				for (var nCurRow = oCell.Row.Index; nCurRow < oCell.Row.Index + nVMergeCount - 1; ++nCurRow)
+				{
+					if (true !== arrRows[nCurRow])
+					{
+						arrRows[nCurRow] = true;
+						nRowsCount++;
+					}
+				}
+			}
+		}
+	}
+
+	if (nRowsCount <= 0)
+		return false;
+
+	var nSumH = 0;
+	for (var nCurRow in arrRows)
+	{
+		var nRowSummaryH = 0;
+		for (var nCurPage in this.RowsInfo[nCurRow].H)
+			nRowSummaryH += this.RowsInfo[nCurRow].H[nCurPage];
+
+		nSumH += nRowSummaryH;
+	}
+
+	var nNewValueH = nSumH / nRowsCount;
+	var nCellSpacing = this.GetRow(0).GetCellSpacing();
+	for (var nCurRow in arrRows)
+	{
+		nCurRow = parseInt(nCurRow);
+
+		var oRow = this.GetRow(nCurRow);
+
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.GetCell(nCurCell);
+			if (vmerge_Restart !== oCell.GetVMerge())
+				continue;
+
+			var nVMergeCount = this.GetVMergeCount(nCurCell, nCurRow);
+
+			var nNewH = nNewValueH;
+
+			if (null !== nCellSpacing)
+				nNewH += nCellSpacing;
+			else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+				nNewH -= this.RowsInfo[nCurRow].TopDy[0];
+
+			var nTopMargin = oRow.GetTopMargin();
+			var nBotMargin = this.GetRow(nCurRow + nVMergeCount - 1).GetBottomMargin();
+
+			nNewH -= nTopMargin + nBotMargin;
+
+			var nContentH = oCell.GetContent().GetSummaryHeight();
+			if (nNewH * nVMergeCount < nContentH)
+				nNewValueH += (nContentH / nVMergeCount - nNewH);
+		}
+	}
+
+	for (var nCurRow in arrRows)
+	{
+		nCurRow = parseInt(nCurRow);
+
+		var oRow  = this.GetRow(nCurRow);
+		var oRowH = oRow.GetHeight();
+		var nNewH = nNewValueH;
+
+		if (null !== nCellSpacing)
+			nNewH += nCellSpacing;
+		else if (this.RowsInfo[nCurRow] && this.RowsInfo[nCurRow].TopDy[0])
+			nNewH -= this.RowsInfo[nCurRow].TopDy[0];
+
+		var nTopMargin = 0,
+			nBotMargin = 0;
+		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell    = oRow.GetCell(nCurCell);
+			var oMargins = oCell.GetMargins();
+
+			if (oMargins.Top.W > nTopMargin)
+				nTopMargin = oMargins.Top.W;
+
+			if (oMargins.Bottom.W > nBotMargin)
+				nBotMargin = oMargins.Bottom.W;
+		}
+
+		nNewH -= nTopMargin + nBotMargin;
+
+		oRow.SetHeight(nNewH, oRowH.HRule === Asc.linerule_Exact ? Asc.linerule_Exact : Asc.linerule_AtLeast);
+	}
+
+	return true;
+};
+/**
+ * Выставляем ширину текущей колонки
+ * @param nWidth
+ */
+CTable.prototype.SetColumnWidth = function(nWidth)
+{
+	if (nWidth < 4.2)
+		nWidth = 4.2;
+
+	if (nWidth > 558.8)
+		nWidth = 558.8;
+
+	var arrSelectedCells = this.GetSelectionArray();
+
+	var oCells = {};
+	for (var nIndex = 0, nCount = arrSelectedCells.length; nIndex < nCount; ++nIndex)
+	{
+		var nCurCell = arrSelectedCells[nIndex].Cell;
+		if (!oCells[nCurCell])
+			oCells[nCurCell] = 1;
+	}
+
+	var arrRowsInfo = this.private_GetRowsInfo();
+	for (var nCurRow = 0, nCount = arrRowsInfo.length; nCurRow < nCount; ++nCurRow)
+	{
+		var nAdd = -1 === arrRowsInfo[nCurRow][0].Type ? 1 : 0;
+
+		for (var nCurCell in oCells)
+		{
+			var _nCurCell = nCurCell | 0;
+			if (arrRowsInfo[nCurRow][_nCurCell + nAdd])
+				arrRowsInfo[nCurRow][_nCurCell + nAdd].W = nWidth;
+		}
+	}
+
+	this.private_CreateNewGrid(arrRowsInfo);
+};
+/**
+ * Выставляем высоту текущей строки
+ * @param nHeight
+ */
+CTable.prototype.SetRowHeight = function(nHeight)
+{
+	var oRowsRange = this.GetSelectedRowsRange();
+
+	for (var nCurRow = oRowsRange.Start; nCurRow <= oRowsRange.End; ++nCurRow)
+	{
+		var oRow  = this.GetRow(nCurRow);
+		var oRowH = oRow.GetHeight();
+
+		if (oRowH.IsAuto())
+			oRow.SetHeight(nHeight, Asc.linerule_AtLeast);
+		else
+			oRow.SetHeight(nHeight, oRowH.GetRule());
+	}
+};
+/**
+ * Проверяем попадает ли данная строка в заголовок таблицы
+ * @param nRow
+ * @returns {boolean}
+ */
+CTable.prototype.IsInHeader = function(nRow)
+{
+	for (var nCurRow = 0; nCurRow <= nRow; ++nCurRow)
+	{
+		var oRow = this.GetRow(nCurRow);
+		if (!oRow.IsHeader())
+			return false;
+	}
+
+	return true;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

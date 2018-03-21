@@ -1191,7 +1191,74 @@
         return this.copy(oIdMap);
     };
 
-window['AscFormat'] = window['AscFormat'] || {};
+    CGraphicObjectBase.prototype.checkNeedRecalculate = function(){
+        return false;
+    };
+
+    CGraphicObjectBase.prototype.canChangeArrows = function () {
+        if (!this.spPr || this.spPr.geometry == null) {
+            return false;
+        }
+        var _path_list = this.spPr.geometry.pathLst;
+        var _path_index;
+        var _path_command_index;
+        var _path_command_arr;
+        for (_path_index = 0; _path_index < _path_list.length; ++_path_index) {
+            _path_command_arr = _path_list[_path_index].ArrPathCommandInfo;
+            for (_path_command_index = 0; _path_command_index < _path_command_arr.length; ++_path_command_index) {
+                if (_path_command_arr[_path_command_index].id == 5) {
+                    break;
+                }
+            }
+            if (_path_command_index == _path_command_arr.length) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    CGraphicObjectBase.prototype.getStroke = function () {
+        if(this.pen && this.pen.Fill)
+        {
+            if(this.getObjectType() === AscDFH.historyitem_type_ImageShape && AscFormat.isRealNumber(this.pen.w))
+            {
+                var _ret = this.pen.createDuplicate();
+                _ret.w/=2.0;
+                return _ret;
+            }
+            return this.pen;
+        }
+        var ret = AscFormat.CreateNoFillLine();
+        ret.w = 0;
+        return ret;
+    };
+
+
+    CGraphicObjectBase.prototype.getPresetGeom = function () {
+        if (this.spPr && this.spPr.geometry) {
+            return this.spPr.geometry.preset;
+        }
+        else {
+            if(this.calcGeometry)
+            {
+                return this.calcGeometry.preset;
+            }
+            return null;
+        }
+    };
+
+
+    CGraphicObjectBase.prototype.getFill = function () {
+        if(this.brush && this.brush.fill)
+        {
+            return this.brush;
+        }
+        return AscFormat.CreateNoFillUniFill();
+    };
+
+
+
+    window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;
     window['AscFormat'].checkNormalRotate  = checkNormalRotate;

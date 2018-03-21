@@ -670,9 +670,9 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 			bSelectedOnlyThis = oInfo.GetBlockLevelSdt() === this ? true : false;
 		}
 
-		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-			|| (AscCommonWord.sdtlock_SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
-			|| (AscCommonWord.sdtlock_ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
+		if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+			|| (c_oAscSdtLockType.SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
+			|| (c_oAscSdtLockType.ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
 		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 		}
@@ -685,8 +685,8 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 		}
 	}
 	else if (isCheckContentControlLock
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-		|| AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+		|| c_oAscSdtLockType.ContentLocked === nContentControlLock))
 	{
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 	}
@@ -704,7 +704,7 @@ CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
 	var nContentControlLock = this.GetContentControlLock();
 
 	if (false === AscCommon.CollaborativeEditing.IsNeedToSkipContentControlOnCheckEditingLock(this)
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock || c_oAscSdtLockType.ContentLocked === nContentControlLock))
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 
 	if (this.Parent && this.Parent.CheckContentControlEditingLock)
@@ -718,7 +718,7 @@ CBlockLevelSdt.prototype.CheckContentControlDeletingLock = function()
 
 	var nContentControlLock = this.GetContentControlLock();
 
-	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+	if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock || c_oAscSdtLockType.SdtLocked === nContentControlLock)
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 
 	this.Content.CheckContentControlEditingLock();
@@ -749,9 +749,9 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 			bSelectedOnlyThis = oInfo.GetInlineLevelSdt() === this ? true : false;
 		}
 
-		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-			|| (AscCommonWord.sdtlock_SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
-			|| (AscCommonWord.sdtlock_ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
+		if (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+			|| (c_oAscSdtLockType.SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
+			|| (c_oAscSdtLockType.ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
 		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 		}
@@ -764,8 +764,8 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 		|| AscCommon.changestype_Document_Content === CheckType
 		|| AscCommon.changestype_Document_Content_Add === CheckType
 		|| AscCommon.changestype_Image_Properties === CheckType)
-		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
-		|| AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
+		&& (c_oAscSdtLockType.SdtContentLocked === nContentControlLock
+		|| c_oAscSdtLockType.ContentLocked === nContentControlLock))
 	{
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 	}
@@ -823,6 +823,20 @@ if(typeof CPresentation !== "undefined")
         if(!oController){
             return false;
         }
+
+        if(CheckType === AscCommon.changestype_Paragraph_Content)
+        {
+            var oTargetTextObject = oController.getTargetDocContent(false, true);
+            if(oTargetTextObject)
+            {
+                CheckType = AscCommon.changestype_Drawing_Props;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         if(CheckType === AscCommon.changestype_Drawing_Props)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
@@ -856,16 +870,30 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_AddShape || CheckType === AscCommon.changestype_AddComment)
         {
-            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
-                return true;
-            var check_obj =
+
+            if(CheckType === AscCommon.changestype_AddComment && AdditionalData && AdditionalData.Parent === this.comments)
             {
-                "type": c_oAscLockTypeElemPresentation.Object,
-                "slideId": slide_id,
-                "objId": AdditionalData.Get_Id(),
-                "guid": AdditionalData.Get_Id()
-            };
-            AdditionalData.Lock.Check(check_obj);
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.commentsLock.Get_Id(),
+                    "guid": this.commentsLock.Get_Id()
+                };
+                this.commentsLock.Lock.Check(check_obj);
+            }
+            else
+            {
+                if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                    return true;
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": AdditionalData.Get_Id(),
+                    "guid": AdditionalData.Get_Id()
+                };
+                AdditionalData.Lock.Check(check_obj);
+            }
         }
         if(CheckType === AscCommon.changestype_AddShapes)
         {
@@ -969,13 +997,16 @@ if(typeof CPresentation !== "undefined")
         {
             if(!AdditionalData || !AdditionalData.All)
             {
+                var aSelectedSlides = this.Api.WordControl.Thumbnails.GetSelectedArray();
+                for(var i = 0; i < aSelectedSlides.length; ++i){
                     var check_obj =
-                    {
-                        "type": c_oAscLockTypeElemPresentation.Slide,
-                        "val": this.Slides[this.CurPage].timingLock.Get_Id(),
-                        "guid": this.Slides[this.CurPage].timingLock.Get_Id()
-                    };
-                    this.Slides[this.CurPage].timingLock.Lock.Check(check_obj);
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Slide,
+                            "val": this.Slides[this.CurPage].timingLock.Get_Id(),
+                            "guid": this.Slides[this.CurPage].timingLock.Get_Id()
+                        };
+                    this.Slides[aSelectedSlides[i]].timingLock.Lock.Check(check_obj);
+                }
             }
             else{
                 for(var i = 0; i < this.Slides.length; ++i)

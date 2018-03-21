@@ -344,12 +344,19 @@ CInlineLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
 	arrContentControls.push(this);
 	CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls.apply(this, arguments);
 };
+CInlineLevelSdt.prototype.Document_UpdateInterfaceState = function()
+{
+	if (this.Paragraph && this.Paragraph.LogicDocument)
+		this.Paragraph.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+
+	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------
 CInlineLevelSdt.prototype.GetContentControlType = function()
 {
-	return AscCommonWord.sdttype_InlineLevel;
+	return c_oAscSdtLevelType.Inline;
 };
 CInlineLevelSdt.prototype.SetPr = function(oPr)
 {
@@ -416,7 +423,7 @@ CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
 };
 CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
-	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
+	return (undefined !== this.Pr.Lock ? this.Pr.Lock : c_oAscSdtLockType.Unlocked);
 };
 CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
@@ -431,15 +438,19 @@ CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 
 	if (undefined !== oPr.Lock)
 		this.SetContentControlLock(oPr.Lock);
+
+	if (undefined !== oPr.Alias)
+		this.SetAlias(oPr.Alias);
 };
 CInlineLevelSdt.prototype.GetContentControlPr = function()
 {
-	var oPr = new CContentControlPr();
+	var oPr = new CContentControlPr(c_oAscSdtLevelType.Inline);
 
 	oPr.Tag        = this.Pr.Tag;
 	oPr.Id         = this.Pr.Id;
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
+	oPr.Alias      = this.GetAlias();
 
 	return oPr;
 };
@@ -504,41 +515,3 @@ CInlineLevelSdt.prototype.ClearContentControl = function()
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CInlineLevelSdt = CInlineLevelSdt;
-
-function TEST_ADD_SDT()
-{
-	var oLogicDocument = editor.WordControl.m_oLogicDocument;
-
-	oLogicDocument.Create_NewHistoryPoint();
-
-	var oInlineContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
-	oInlineContentControl.Add(new ParaText("S"));
-	oInlineContentControl.Add(new ParaText("d"));
-	oInlineContentControl.Add(new ParaText("t"));
-
-	oLogicDocument.Recalculate();
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
-
-	return oInlineContentControl ? oInlineContentControl.GetId() : null;
-}
-
-function TEST_ADD_SDT2()
-{
-	var oLogicDocument = editor.WordControl.m_oLogicDocument;
-
-	oLogicDocument.Create_NewHistoryPoint();
-
-	var oSdt = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
-	oSdt.AddToParagraph(new ParaText("S"));
-	oSdt.AddToParagraph(new ParaText("d"));
-	oSdt.AddToParagraph(new ParaText("t"));
-
-	oLogicDocument.Recalculate();
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
-
-	return oSdt;
-}

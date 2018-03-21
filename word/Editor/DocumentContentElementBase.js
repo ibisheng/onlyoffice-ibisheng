@@ -94,6 +94,14 @@ CDocumentContentElementBase.prototype.Get_DocumentPrev = function()
 {
 	return this.Prev;
 };
+CDocumentContentElementBase.prototype.GetParent = function()
+{
+	return this.Parent;
+};
+CDocumentContentElementBase.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
 CDocumentContentElementBase.prototype.Set_Parent = function(oParent)
 {
 	this.Parent = oParent;
@@ -132,7 +140,7 @@ CDocumentContentElementBase.prototype.GetContentBounds = function(CurPage)
 {
 	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
 };
-CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
+CDocumentContentElementBase.prototype.IsEmptyPage = function(nCurPage)
 {
 	return false;
 };
@@ -245,7 +253,7 @@ CDocumentContentElementBase.prototype.GetSelectionBounds = function()
 		Direction : 0
 	};
 };
-CDocumentContentElementBase.prototype.RecalculateCurPos = function()
+CDocumentContentElementBase.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	return null;
 };
@@ -535,6 +543,10 @@ CDocumentContentElementBase.prototype.RemoveTable = function()
 CDocumentContentElementBase.prototype.SelectTable = function(Type)
 {
 };
+CDocumentContentElementBase.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return false;
+};
 CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 {
 	return false;
@@ -749,6 +761,10 @@ CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
 {
 	return this.private_GetRelativePageIndex(0);
 };
+CDocumentContentElementBase.prototype.GetAbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
@@ -813,6 +829,16 @@ CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
 };
 CDocumentContentElementBase.prototype.UpdateBookmarks = function(oManager)
 {
+};
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isUnique ищем с параметром Unique = true
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentElementBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
+{
+	return null;
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

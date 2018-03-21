@@ -230,6 +230,58 @@ function CTableOutlineDr()
 	this.AddResizeMinW     = 0;
 	this.AddResizeMinH     = 0;
 
+	this.getLastPageBounds = function()
+	{
+		var _bounds = { Page: 0, X : 0, Y : 0, W : 0, H : 0 };
+		if (!this.TableOutline || !this.TableOutline.Table)
+			return _bounds;
+
+		var _pagesCount = this.TableOutline.Table.GetPagesCount();
+		if (0 >= _pagesCount)
+			return _bounds;
+
+		var _boundsTmp = this.TableOutline.Table.Get_PageBounds(_pagesCount - 1);
+		_bounds.Page = this.TableOutline.Table.Get_AbsolutePage(_pagesCount - 1);
+		_bounds.X = _boundsTmp.Left;
+		_bounds.Y = _boundsTmp.Top;
+		_bounds.W = (_boundsTmp.Right - _boundsTmp.Left);
+		_bounds.H = (_boundsTmp.Bottom - _boundsTmp.Top);
+		
+		return _bounds;
+	}
+
+	this.getFullHeight = function()
+	{
+		var _height = 0;
+		if (!this.TableOutline || !this.TableOutline.Table)
+			return _height;
+
+		var _pagesCount = this.TableOutline.Table.GetPagesCount();
+		var _boundsTmp;
+		for (var i = 0; i < _pagesCount; i++)
+		{
+			_boundsTmp = this.TableOutline.Table.Get_PageBounds(i);
+			_height += (_boundsTmp.Bottom - _boundsTmp.Top);
+		}
+
+		return _height;
+	}
+
+	this.getFullTopPosition = function(_lastBounds)
+	{
+		if (_lastBounds.Page == this.TableOutline.PageNum)
+		{
+			return this.TableOutline.Y;	
+		}
+
+		var _height = this.getFullHeight();
+		var _top = _lastBounds.Y + _lastBounds.H - _height;
+		if (_top < 0)
+			_top = 0;
+
+		return _top;
+	}
+
 	this.checkMouseDown = function (pos, word_control)
 	{
 		if (null == this.TableOutline)
@@ -347,14 +399,15 @@ function CTableOutlineDr()
 
 			if (true)
 			{
-				var _x = _table_track.X + _table_track.W;
-				var _y = _table_track.Y + _table_track.H;
+				var _lastBounds = this.getLastPageBounds();
+				var _x = _lastBounds.X + _lastBounds.W;
+				var _y = _lastBounds.Y + _lastBounds.H;
 				_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 				var _r = _x + _d;
 				var _b = _y + _d;
 
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+				if ((_lastBounds.Page == pos.Page) && (pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
 				{
 					this.TrackOffsetX = pos.X - _x;
 					this.TrackOffsetY = pos.Y - _y;
@@ -368,8 +421,20 @@ function CTableOutlineDr()
 
 					var _table = this.TableOutline.Table;
 
-					this.AddResizeMinH = _table.GetMinHeight() - this.TableOutline.H;
-					this.AddResizeMinW = _table.GetMinWidth() - this.TableOutline.W;
+					if (_lastBounds.Page == this.PageNum)
+					{
+						this.AddResizeMinH = _table.GetMinHeight() - this.TableOutline.H;
+						this.AddResizeMinW = _table.GetMinWidth() - this.TableOutline.W;
+					}
+					else
+					{
+						var _fullTop = this.getFullTopPosition(_lastBounds);
+						if (0 == _fullTop)
+							this.AddResizeMinH = _fullTop - (_lastBounds.Y + _lastBounds.H);
+						else
+							this.AddResizeMinH = _fullTop + _table.GetMinHeight() - (_lastBounds.Y + _lastBounds.H);
+						this.AddResizeMinW = _table.GetMinWidth() - _lastBounds.W;
+					}
 
 					word_control.m_oDrawingDocument.LockCursorType("se-resize");
 					return true;
@@ -488,8 +553,9 @@ function CTableOutlineDr()
 
 			if (true)
 			{
-				var _x = _table_track.X + _table_track.W;
-				var _y = _table_track.Y + _table_track.H;
+				var _lastBounds = this.getLastPageBounds();
+				var _x = _lastBounds.X + _lastBounds.W;
+				var _y = _lastBounds.Y + _lastBounds.H;
 				_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 				var _r = _x + _d;
@@ -539,7 +605,7 @@ function CTableOutlineDr()
 			var _addW = (X - this.CurPos.X) * _koef - this.TrackOffsetX;
 			var _addH = (Y - this.CurPos.Y) * _koef - this.TrackOffsetY;
 
-			_table.Resize(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
+			_table.ResizeTableInDocument(this.TableOutline.W + _addW, this.TableOutline.H + _addH);
 
 			this.AddResizeCurrentW = 0;
 			this.AddResizeCurrentH = 0;
@@ -712,10 +778,14 @@ function CTableOutlineDr()
 		else
 			pos = word_control.m_oDrawingDocument.ConvetToPageCoords(global_mouseEvent.X, global_mouseEvent.Y, word_control.m_oDrawingDocument.AutoShapesTrackLockPageNum);
 
+		var _lastBounds = word_control.m_oDrawingDocument.TableOutlineDr.getLastPageBounds();
+		if (_lastBounds.Page != pos.Page)
+			return false;
+
 		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
 		{
-			var _x = _table_track.X + _table_track.W;
-			var _y = _table_track.Y + _table_track.H;
+			var _x = _lastBounds.X + _lastBounds.W;
+			var _y = _lastBounds.Y + _lastBounds.H;
 			var _d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 			var _r = _x + _d;
@@ -733,8 +803,8 @@ function CTableOutlineDr()
 			var _posx = _invert.TransformPointX(pos.X, pos.Y);
 			var _posy = _invert.TransformPointY(pos.X, pos.Y);
 
-			var _x = _table_track.X + _table_track.W;
-			var _y = _table_track.Y + _table_track.H;
+			var _x = _lastBounds.X + _lastBounds.W;
+			var _y = _lastBounds.Y + _lastBounds.H;
 			_d = 6 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 			var _r = _x + _d;
@@ -1874,7 +1944,7 @@ function CPage()
 		ctx.beginPath();
 	}
 
-	this.DrawTableOutline = function (overlay, xDst, yDst, wDst, hDst, table_outline_dr)
+	this.DrawTableOutline = function (overlay, xDst, yDst, wDst, hDst, table_outline_dr, lastBounds)
 	{
 		var transform = table_outline_dr.TableMatrix;
 		if (null == transform || transform.IsIdentity2())
@@ -1885,69 +1955,73 @@ function CPage()
 			var _offX = (null == transform) ? 0 : transform.tx;
 			var _offY = (null == transform) ? 0 : transform.ty;
 
-			var _x = 0;
-			var _y = 0;
-			switch (table_outline_dr.TrackTablePos)
+			if (!lastBounds)
 			{
-				case 1:
+				var _x = 0;
+				var _y = 0;
+				switch (table_outline_dr.TrackTablePos)
 				{
-					_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
-					_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
-					break;
+					case 1:
+					{
+						_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+						_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
+						break;
+					}
+					case 2:
+					{
+						_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+						_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
+						break;
+					}
+					case 3:
+					{
+						_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+						_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
+						break;
+					}
+					case 0:
+					default:
+					{
+						_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+						_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
+						break;
+					}
 				}
-				case 2:
-				{
-					_x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
-					_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
-					break;
-				}
-				case 3:
-				{
-					_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
-					_y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
-					break;
-				}
-				case 0:
-				default:
-				{
-					_x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
-					_y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
-					break;
-				}
+
+				var _w = 13;
+				var _h = 13;
+
+				if (_x < overlay.min_x)
+					overlay.min_x = _x;
+				if ((_x + _w) > overlay.max_x)
+					overlay.max_x = _x + _w;
+
+				if (_y < overlay.min_y)
+					overlay.min_y = _y;
+				if ((_y + _h) > overlay.max_y)
+					overlay.max_y = _y + _h;
+
+				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y);
 			}
+			else
+			{
+				var _xLast = (xDst + dKoefX * (lastBounds.X + lastBounds.W + _offX) + 0.5) >> 0;
+				var _yLast = (yDst + dKoefY * (lastBounds.Y + lastBounds.H + _offY) + 0.5) >> 0;
 
-			var _w = 13;
-			var _h = 13;
+				var ctx = overlay.m_oContext;
+				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.lineWidth = 1;
+				ctx.beginPath();
 
-			if (_x < overlay.min_x)
-				overlay.min_x = _x;
-			if ((_x + _w) > overlay.max_x)
-				overlay.max_x = _x + _w;
+				overlay.AddRect(_xLast - 0.5, _yLast - 0.5, 6, 6);
 
-			if (_y < overlay.min_y)
-				overlay.min_y = _y;
-			if ((_y + _h) > overlay.max_y)
-				overlay.max_y = _y + _h;
-
-			overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y);
-
-			var _xLast = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX) + 0.5) >> 0;
-			var _yLast = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY) + 0.5) >> 0;
-
-			var ctx = overlay.m_oContext;
-			ctx.strokeStyle = "rgb(160, 160, 160)";
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-
-			overlay.AddRect(_xLast - 0.5, _yLast - 0.5, 6, 6);
-
-			ctx.stroke();
-			ctx.beginPath();
+				ctx.stroke();
+				ctx.beginPath();
+			}
 		}
 		else
 		{
 			var ctx = overlay.m_oContext;
-
 
 			var _ft = new AscCommon.CMatrix();
 			_ft.sx = transform.sx;
@@ -1965,84 +2039,90 @@ function CPage()
 
 			global_MatrixTransformer.MultiplyAppend(_ft, coords);
 
-			ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
-
-			var _x = 0;
-			var _y = 0;
-			var _w = 13 / coords.sx;
-			var _h = 13 / coords.sy;
-			switch (table_outline_dr.TrackTablePos)
+			if (!lastBounds)
 			{
-				case 1:
+				ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
+
+				var _x = 0;
+				var _y = 0;
+				var _w = 13 / coords.sx;
+				var _h = 13 / coords.sy;
+				switch (table_outline_dr.TrackTablePos)
 				{
-					_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-					_y = (table_outline_dr.TableOutline.Y - _h);
-					break;
+					case 1:
+					{
+						_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
+						_y = (table_outline_dr.TableOutline.Y - _h);
+						break;
+					}
+					case 2:
+					{
+						_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
+						_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+						break;
+					}
+					case 3:
+					{
+						_x = (table_outline_dr.TableOutline.X - _w);
+						_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+						break;
+					}
+					case 0:
+					default:
+					{
+						_x = (table_outline_dr.TableOutline.X - _w);
+						_y = (table_outline_dr.TableOutline.Y - _h);
+						break;
+					}
 				}
-				case 2:
-				{
-					_x = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-					_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
-					break;
-				}
-				case 3:
-				{
-					_x = (table_outline_dr.TableOutline.X - _w);
-					_y = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
-					break;
-				}
-				case 0:
-				default:
-				{
-					_x = (table_outline_dr.TableOutline.X - _w);
-					_y = (table_outline_dr.TableOutline.Y - _h);
-					break;
-				}
+
+				overlay.CheckPoint(_ft.TransformPointX(_x, _y), _ft.TransformPointY(_x, _y));
+				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y), _ft.TransformPointY(_x + _w, _y));
+				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
+				overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
+
+				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
+				overlay.SetBaseTransform();
 			}
+			else
+			{
+				var _xLast = (lastBounds.X + lastBounds.W);
+				var _yLast = (lastBounds.Y + lastBounds.H);
 
-			overlay.CheckPoint(_ft.TransformPointX(_x, _y), _ft.TransformPointY(_x, _y));
-			overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y), _ft.TransformPointY(_x + _w, _y));
-			overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
-			overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
+				var ctx = overlay.m_oContext;
+				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.fillStyle = "#FFFFFF";
+				ctx.lineWidth = 1;
+				ctx.beginPath();
 
-			overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
+				var _dist = 6 / _ft.GetScaleValue();
 
-			var _xLast = (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W);
-			var _yLast = (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H);
+				var _arr = [
+					_ft.TransformPointX(_xLast, _yLast),
+					_ft.TransformPointY(_xLast, _yLast),
+					_ft.TransformPointX(_xLast + _dist, _yLast),
+					_ft.TransformPointY(_xLast + _dist, _yLast),
+					_ft.TransformPointX(_xLast + _dist, _yLast + _dist),
+					_ft.TransformPointY(_xLast + _dist, _yLast + _dist),
+					_ft.TransformPointX(_xLast, _yLast + _dist),
+					_ft.TransformPointY(_xLast, _yLast + _dist)
+				];
 
-			var ctx = overlay.m_oContext;
-			ctx.strokeStyle = "rgb(0, 0, 0)";
-			ctx.fillStyle = "#FFFFFF";
-			ctx.lineWidth = 1;
-			ctx.beginPath();
+				overlay.CheckPoint(_arr[0], _arr[1]);
+				overlay.CheckPoint(_arr[2], _arr[3]);
+				overlay.CheckPoint(_arr[4], _arr[5]);
+				overlay.CheckPoint(_arr[6], _arr[7]);
 
-			var _dist = 12 / (_ft.sx + _ft.sy);
-			var _arr = [
-				_ft.TransformPointX(_xLast, _yLast),
-				_ft.TransformPointY(_xLast, _yLast),
-				_ft.TransformPointX(_xLast + _dist, _yLast),
-				_ft.TransformPointY(_xLast + _dist, _yLast),
-				_ft.TransformPointX(_xLast + _dist, _yLast + _dist),
-				_ft.TransformPointY(_xLast + _dist, _yLast + _dist),
-				_ft.TransformPointX(_xLast, _yLast + _dist),
-				_ft.TransformPointY(_xLast, _yLast + _dist)
-			];
+				ctx.moveTo(_arr[0], _arr[1]);
+				ctx.lineTo(_arr[2], _arr[3]);
+				ctx.lineTo(_arr[4], _arr[5]);
+				ctx.lineTo(_arr[6], _arr[7]);
+				ctx.closePath();
 
-			overlay.CheckPoint(_arr[0], _arr[1]);
-			overlay.CheckPoint(_arr[2], _arr[3]);
-			overlay.CheckPoint(_arr[4], _arr[5]);
-			overlay.CheckPoint(_arr[6], _arr[7]);
-
-			ctx.moveTo(_arr[0], _arr[1]);
-			ctx.lineTo(_arr[2], _arr[3]);
-			ctx.lineTo(_arr[4], _arr[5]);
-			ctx.lineTo(_arr[6], _arr[7]);
-			ctx.closePath();
-
-			ctx.fill();
-			ctx.stroke();
-			ctx.beginPath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.beginPath();
+			}
 		}
 	}
 }
@@ -2297,6 +2377,9 @@ function CDrawingDocument()
 
 	this.m_lCountCalculatePages = 0;
 
+	this.m_bIsDocumentCalculating = true;
+	this.m_arPrintingWaitEndRecalculate = null;
+
 	this.m_lTimerTargetId = -1;
 	this.m_dTargetX = -1;
 	this.m_dTargetY = -1;
@@ -2363,6 +2446,9 @@ function CDrawingDocument()
 	this.GuiCanvasTextPropsId = "gui_textprops_canvas_id";
 	this.GuiLastTextProps = null;
 
+	this.GuiCanvasFillTOCParentId = "";
+	this.GuiCanvasFillTOC = null;
+
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
@@ -2423,9 +2509,9 @@ function CDrawingDocument()
 	{
 		if ("" == this.m_sLockedCursorType)
 		{
-			if (AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
+			if (AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "text" == sType)
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
-			else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
+			else if (this.m_oWordControl.m_oApi.isMarkerFormat && "text" == sType)
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
 			else
 				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
@@ -2454,6 +2540,9 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function (pageCount)
 	{
+		if (!this.m_oWordControl.MobileTouchManager)
+			this.TableOutlineDr.TableOutline = null;
+
 		if (this.m_oWordControl)
 			this.m_oWordControl.m_oApi.checkLastWork();
 
@@ -2462,6 +2551,8 @@ function CDrawingDocument()
 
 		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
 			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+
+		this.m_bIsDocumentCalculating = true;
 	}
 
 	this.OnRepaintPage = function (index)
@@ -2484,8 +2575,8 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function (index, pageObject)
 	{
-		if (!this.m_oWordControl.MobileTouchManager)
-			this.TableOutlineDr.TableOutline = null;
+		this.m_bIsDocumentCalculating = true;
+
 		editor.sendEvent("asc_onDocumentChanged");
 		if (true === this.m_bIsSearching)
 		{
@@ -2622,6 +2713,10 @@ function CDrawingDocument()
 		if (isFull)
 		{
 			this.m_oWordControl.OnScroll();
+			this.m_bIsDocumentCalculating = false;
+
+			if (this.m_arPrintingWaitEndRecalculate)
+				this.m_oWordControl.m_oApi._downloadAs.apply(this.m_oWordControl.m_oApi, this.m_arPrintingWaitEndRecalculate);
 		}
 
 		//console.log("end " + this.m_lCountCalculatePages + "," + isFull + "," + isBreak);
@@ -2789,6 +2884,7 @@ function CDrawingDocument()
 	this.ToRenderer = function ()
 	{
 		var Renderer = new AscCommon.CDocumentRenderer();
+		Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 		Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2799,9 +2895,30 @@ function CDrawingDocument()
 		return ret;
 	}
 
+	this.CheckPrint = function(params)
+	{
+		if (!this.m_oWordControl.m_oLogicDocument)
+			return false;
+
+		if (this.m_arPrintingWaitEndRecalculate)
+		{
+			this.m_oWordControl.m_oApi.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, params[2]);
+			this.m_arPrintingWaitEndRecalculate = null;
+			return false;
+		}
+
+		if (!this.m_bIsDocumentCalculating)
+			return false;
+
+		this.m_arPrintingWaitEndRecalculate = params;
+		this.m_oWordControl.m_oApi.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, params[2]);
+		return true;
+	}
+
 	this.ToRenderer2 = function ()
 	{
 		var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2834,6 +2951,7 @@ function CDrawingDocument()
 				watermark.StartRenderer();
 
 			this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 			this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage = 0;
 			this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
@@ -4913,11 +5031,17 @@ function CDrawingDocument()
 
 				if (this.TableOutlineDr.IsResizeTableTrack)
 				{
-					_x = ((drPage.left + dKoefX * this.TableOutlineDr.TableOutline.X) >> 0) + 0.5;
-					_y = ((drPage.top + dKoefY * this.TableOutlineDr.TableOutline.Y) >> 0) + 0.5;
+					var _lastBounds = this.TableOutlineDr.getLastPageBounds();
+					var _lastX = _lastBounds.X;
+					var _lastY = this.TableOutlineDr.getFullTopPosition(_lastBounds);
+					var _lastYStart = _lastBounds.Y;
 
-					_r = _x + ((dKoefX * (this.TableOutlineDr.TableOutline.W + this.TableOutlineDr.AddResizeCurrentW)) >> 0);
-					_b = _y + ((dKoefY * (this.TableOutlineDr.TableOutline.H + this.TableOutlineDr.AddResizeCurrentH)) >> 0);
+					_x = ((drPage.left + dKoefX * _lastX) >> 0) + 0.5;
+					_y = ((drPage.top + dKoefY * _lastY) >> 0) + 0.5;
+					var _yStart = ((drPage.top + dKoefY * _lastYStart) >> 0) + 0.5;
+
+					_r = _x + ((dKoefX * (_lastBounds.W + this.TableOutlineDr.AddResizeCurrentW)) >> 0);
+					_b = _yStart + ((dKoefY * (_lastBounds.H + this.TableOutlineDr.AddResizeCurrentH)) >> 0);
 				}
 
 				overlay.CheckPoint(_x, _y);
@@ -4983,7 +5107,7 @@ function CDrawingDocument()
 			}
 			else
 			{
-				var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+				var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
 				var _y = this.TableOutlineDr.CurPos.Y;
 				var _r = _x + this.TableOutlineDr.TableOutline.W;
 				var _b = _y + this.TableOutlineDr.TableOutline.H;
@@ -6080,6 +6204,7 @@ function CDrawingDocument()
 		{
 			dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
 		}
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
 		this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
 		return;
 
@@ -6537,20 +6662,9 @@ function CDrawingDocument()
 		_textPr.Position = this.GuiLastTextProps.Position;
 
 		var parRun = new ParaRun(par);
-		var Pos = 0;
 		parRun.Set_Pr(_textPr);
-		parRun.Add_ToContent(Pos++, new ParaText("H"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("e"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaSpace(1), false);
-		parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-		parRun.Add_ToContent(Pos++, new ParaText("d"), false);
-		par.Add_ToContent(0, parRun);
+		parRun.AddText("Hello World");
+		par.AddToContent(0, parRun);
 
 		par.Reset(0, 0, 1000, 1000, 0, 0, 1);
 		par.Recalculate_Page(0);
@@ -6612,6 +6726,227 @@ function CDrawingDocument()
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
 		par.Draw(0, graphics);
+		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+
+		History.TurnOn();
+		editor.isViewMode = _oldTurn;
+	}
+
+	this.SetDrawImagePlaceContents = function(id, props)
+	{
+		var _div_elem = null;
+		if (null == id || "" == id)
+		{
+			if ("" != this.GuiCanvasFillTOCParentId)
+			{
+				if (this.GuiCanvasFillTOC)
+				{
+					_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+					if (_div_elem)
+						_div_elem.removeChild(this.GuiCanvasFillTOC);
+				}
+
+				this.GuiCanvasFillTOCParentId = "";
+				this.GuiCanvasFillTOC = null;
+			}
+			return;
+		}
+
+		if (id != this.GuiCanvasFillTOCParentId)
+		{
+			if (this.GuiCanvasFillTOC)
+			{
+				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+				if (_div_elem)
+					_div_elem.removeChild(this.GuiCanvasFillTOC);
+			}
+
+			this.GuiCanvasFillTOCParentId = "";
+			this.GuiCanvasFillTOC = null;
+		}
+
+		this.GuiCanvasFillTOCParentId = id;
+		var widthPx = 0;
+		var heightPx = 0;
+
+		if (null == this.GuiCanvasFillTOC)
+		{
+			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+			this.GuiCanvasFillTexture = null;
+			this.GuiCanvasFillTextureCtx = null;
+
+			this.GuiCanvasFillTOC = document.createElement('canvas');
+
+			widthPx = _div_elem.offsetWidth;
+			heightPx = _div_elem.offsetHeight;
+
+			this.GuiCanvasFillTOC.style.width = widthPx + "px";
+			this.GuiCanvasFillTOC.style.height = heightPx + "px";
+
+			this.GuiCanvasFillTOC.width = AscBrowser.convertToRetinaValue(widthPx, true);
+			this.GuiCanvasFillTOC.height = AscBrowser.convertToRetinaValue(heightPx, true);
+
+			if (_div_elem)
+				_div_elem.appendChild(this.GuiCanvasFillTOC);
+		}
+
+		// draw!
+		var wPx = this.GuiCanvasFillTOC.width;
+		var hPx = this.GuiCanvasFillTOC.height;
+		var wMm = wPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+		var hMm = hPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+
+		History.TurnOff();
+		var _oldTurn = editor.isViewMode;
+		editor.isViewMode = true;
+
+		var ctx = this.GuiCanvasFillTOC.getContext('2d');
+
+		// clear
+		ctx.fillStyle = "#FFFFFF";
+		ctx.fillRect(0, 0, wPx, hPx);
+
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(ctx, wPx, hPx, wMm, hMm);
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		graphics.transform(1, 0, 0, 1, 0, 0);
+
+		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
+		this.m_oWordControl.m_oApi.ShowParaMarks = false;
+
+		// content
+		var oLogicDocument = this.m_oWordControl.m_oLogicDocument;
+		var oStyles        = oLogicDocument.GetStyles();
+
+		var oHeader          = new CHeaderFooter(oLogicDocument.HdrFtr, oLogicDocument, this, AscCommon.hdrftr_Header);
+		var oDocumentContent = oHeader.GetContent();
+
+		var nOutlineStart = props.get_OutlineStart();
+		var nOutlineEnd   = props.get_OutlineEnd();
+		var nStylesType   = props.get_StylesType();
+		var isShowPageNum = props.get_ShowPageNumbers();
+		var isRightTab    = props.get_RightAlignTab();
+		var nTabLeader    = props.get_TabLeader();
+
+		var arrLevels         = [];
+		var arrStylesToDelete = [];
+
+		for (var nIndex = 0, nCount = props.get_StylesCount(); nIndex < nCount; ++nIndex)
+		{
+			var nLvl  = props.get_StyleLevel(nIndex) - 1;
+			var sName = props.get_StyleName(nIndex);
+
+			if (!arrLevels[nLvl])
+			{
+				var sStyleId = null;
+				if (Asc.c_oAscTOCStylesType.Current === nStylesType)
+				{
+					sStyleId = oStyles.GetDefaultTOC(nLvl);
+				}
+				else
+				{
+					var oStyle = new CStyle("", null, null, styletype_Paragraph, true);
+					oStyle.CreateTOC(nLvl, nStylesType);
+					sStyleId = oStyle.GetId();
+					oStyles.Add(oStyle);
+					arrStylesToDelete.push(oStyle.GetId());
+				}
+
+				arrLevels[nLvl] = {
+					Styles  : [],
+					StyleId : sStyleId
+				};
+			}
+
+			arrLevels[nLvl].Styles.push(sName);
+		}
+
+		for (var _nLvl = nOutlineStart; _nLvl <= nOutlineEnd; ++_nLvl)
+		{
+			var sName = "Heading " + _nLvl;
+			var nLvl  = _nLvl - 1;
+
+			if (!arrLevels[nLvl])
+			{
+				var sStyleId = null;
+				if (Asc.c_oAscTOCStylesType.Current === nStylesType)
+				{
+					sStyleId = oStyles.GetDefaultTOC(nLvl);
+				}
+				else
+				{
+					var oStyle = new CStyle("", null, null, styletype_Paragraph, true);
+					oStyle.CreateTOC(nLvl, nStylesType);
+					sStyleId = oStyle.GetId();
+					oStyles.Add(oStyle);
+					arrStylesToDelete.push(oStyle.GetId());
+				}
+
+				arrLevels[nLvl] = {
+					Styles  : [],
+					StyleId : sStyleId
+				};
+			}
+
+			arrLevels[nLvl ].Styles.push(sName);
+		}
+
+		var oParaIndex = 0;
+		var nPageIndex = 1;
+
+
+		for (var nLvl = 0; nLvl <= 8; ++nLvl)
+		{
+			if (!arrLevels[nLvl])
+				continue;
+
+			var sStyleId = arrLevels[nLvl].StyleId;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				var sStyleName = arrLevels[nLvl].Styles[nIndex];
+
+				var oParagraph = new Paragraph(this, oDocumentContent, false);
+				oDocumentContent.AddToContent(oParaIndex++, oParagraph);
+				oParagraph.SetParagraphStyleById(sStyleId);
+
+				var oRun = new ParaRun(oParagraph, false);
+				oParagraph.AddToContent(0, oRun);
+				oRun.AddText(sStyleName);
+
+				if (isShowPageNum)
+				{
+					if (isRightTab)
+					{
+						var oParaTabs = new CParaTabs();
+						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5, nTabLeader));
+						oParagraph.SetParagraphTabs(oParaTabs);
+
+						oRun.AddToContent(-1, new ParaTab());
+					}
+					else
+					{
+						oRun.AddToContent(-1, new ParaSpace());
+					}
+
+					oRun.AddText("" + nPageIndex);
+
+					nPageIndex += 2;
+				}
+			}
+		}
+
+		oDocumentContent.Reset(1, 0, 1000, 10000);
+		oDocumentContent.Recalculate_Page(0, true);
+		oDocumentContent.Draw(0, graphics);
+
+		for (var nIndex = 0, nCount = arrStylesToDelete.length; nIndex < nCount; ++nIndex)
+		{
+			oStyles.Remove(arrStylesToDelete[nIndex]);
+		}
+
+		// draw
+
 		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
 
 		History.TurnOn();
@@ -6837,7 +7172,10 @@ function CDrawingDocument()
 		{
 			oWordControl.m_oLogicDocument.RemoveSelection(true);
 			this.TableOutlineDr.bIsTracked = true;
-			this.LockCursorType("move");
+			if (!this.TableOutlineDr.IsResizeTableTrack)
+				this.LockCursorType("move");
+			else
+				this.LockCursorType("default");
 
 			this.TableOutlineDr.TableOutline.Table.SelectAll();
 			this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
@@ -7642,6 +7980,36 @@ function CStylesPainter()
 }
 CStylesPainter.prototype =
 {
+	CheckStylesNames : function(_api, ds)
+	{
+        var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
+        for (var i in ds)
+        {
+            var style = ds[i];
+            if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
+            {
+            	AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+            }
+        }
+
+        AscFonts.FontPickerByCharacter.getFontsByString("Aa");
+
+        var styles = DocumentStyles.Style;
+
+        if (!styles)
+            return;
+
+        for (var i in styles)
+        {
+            var style = styles[i];
+            if (true == style.qFormat)
+            {
+                AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
+                AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(style.Name));
+            }
+        }
+	},
+
 	GenerateStyles: function (_api, ds)
 	{
 		var _oldX = this.STYLE_THUMBNAIL_WIDTH;
@@ -7677,7 +8045,7 @@ CStylesPainter.prototype =
 				aPriorityStyles[index] = aSubArray;
 			}
 			aSubArray.push(style);
-		}
+		};
 		var _map_document = {};
 
 		for (var i = 0; i < _count_doc; i++)
@@ -7950,17 +8318,16 @@ CStylesPainter.prototype =
 
 			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, false);
 			var run = new ParaRun(par, false);
-
-			for (var i = 0; i < styleName.length; i++)
-			{
-				run.Add_ToContent(i, new ParaText(styleName.charAt(i)), false);
-			}
+			run.AddText(styleName);
 
 			_dc.Internal_Content_Add(0, par, false);
 			par.Add_ToContent(0, run);
 			par.Style_Add(style.Id, false);
 			par.Set_Align(AscCommon.align_Left);
 			par.Set_Tabs(new CParaTabs());
+
+			if (!textPr.Color || (255 === textPr.Color.r && 255 === textPr.Color.g && 255 === textPr.Color.b))
+				run.Set_Color(new CDocumentColor(0, 0, 0, false));
 
 			var _brdL = style.ParaPr.Brd.Left;
 			if (undefined !== _brdL && null !== _brdL)

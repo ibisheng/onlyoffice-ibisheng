@@ -250,6 +250,39 @@
 		return res;
 	}
 
+	function getEncodingByBOM(data) {
+		var res = {encoding: AscCommon.c_oAscCodePageNone, size: 0};
+		if (data.length >= 2) {
+			res.size = 2;
+			if (0xFF == data[0] && 0xFE == data[1]) {
+				res.encoding = AscCommon.c_oAscCodePageUtf16;
+			} else if (0xFE == data[0] && 0xFF == data[1]) {
+				res.encoding = AscCommon.c_oAscCodePageUtf16BE;
+			} else if (data.length >= 3) {
+				res.size = 3;
+				if (0xEF == data[0] && 0xBB == data[1] && 0xBF == data[2]) {
+					res.encoding = AscCommon.c_oAscCodePageUtf8;
+				} else if (data.length >= 4) {
+					res.size = 4;
+					if (0xFF == data[0] && 0xFE == data[1] && 0x00 == data[2] && 0x00 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf32;
+					} else if (0x00 == data[0] && 0x00 == data[1] && 0xFE == data[2] && 0xFF == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf32BE;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x38 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x39 == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x2B == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					} else if (0x2B == data[0] && 0x2F == data[1] && 0x76 == data[2] && 0x2F == data[3]) {
+						res.encoding = AscCommon.c_oAscCodePageUtf7;
+					}
+				}
+			}
+		}
+		return res;
+	}
+
 	function DocumentUrls()
 	{
 		this.urls = {};
@@ -643,6 +676,7 @@
 			case c_oAscServerError.ConvertPASSWORD :
 				nRes = Asc.c_oAscError.ID.ConvertationPassword;
 				break;
+			case c_oAscServerError.ConvertLIMITS :
 			case c_oAscServerError.ConvertCONVERT_CORRUPTED :
 			case c_oAscServerError.ConvertLIBREOFFICE :
 			case c_oAscServerError.ConvertPARAMS :
@@ -817,6 +851,73 @@
 
 		return sUnicode;
 	}
+
+    function CUnicodeIterator(str)
+    {
+        this._position = 0;
+        this._index = 0;
+        this._str = str;
+    }
+    CUnicodeIterator.prototype =
+	{
+		isOutside : function()
+		{
+			return (this._index >= this._str.length);
+		},
+		isInside : function()
+		{
+			return (this._index < this._str.length);
+		},
+		value : function()
+		{
+			if (this._index >= this._str.length)
+				return 0;
+
+			var nCharCode = this._str.charCodeAt(this._index);
+			if (!AscCommon.isLeadingSurrogateChar(nCharCode))
+				return nCharCode;
+
+			if ((this._str.length - 1) == this._index)
+				return nCharCode; // error
+
+			var nTrailingChar = this._str.charCodeAt(this._index + 1);
+			return AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+		},
+		next : function()
+		{
+			if (this._index >= this._str.length)
+				return;
+
+			this._position++;
+			if (!AscCommon.isLeadingSurrogateChar(this._str.charCodeAt(this._index)))
+			{
+				++this._index;
+				return;
+			}
+
+			if (this._index == (this._str.length - 1))
+			{
+				++this._index;
+				return;
+			}
+
+			this._index += 2;
+		},
+		position : function()
+		{
+			return this._position;
+		}
+	};
+
+    CUnicodeIterator.prototype.check = CUnicodeIterator.prototype.isInside;
+
+    /**
+	 * @returns {CUnicodeIterator}
+     */
+    String.prototype.getUnicodeIterator = function()
+    {
+        return new CUnicodeIterator(this);
+    };
 
 	function test_ws_name2()
 	{
@@ -1055,7 +1156,9 @@
 		ConvertNEED_PARAMS:       -89,
 		ConvertDRM:               -90,
 		ConvertPASSWORD:          -91,
-		ConvertDeadLetter:        -92,
+		ConvertICU:               -92,
+		ConvertLIMITS:            -93,
+		ConvertDeadLetter:        -99,
 
 		Upload:              -100,
 		UploadContentLength: -101,
@@ -1262,7 +1365,7 @@
 			var url = sUploadServiceLocalUrlOld + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
-				url += '/' + jwt;
+				url += '?token=' + encodeURIComponent(jwt);
 			}
 			var content = '<html><head></head><body><form action="' + url + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 			frameWindow.document.open();
@@ -1325,7 +1428,7 @@
 			var url = sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex();
 			if (jwt)
 			{
-				url += '/' + jwt;
+				url += '?token=' + encodeURIComponent(jwt);
 			}
 
 			var aFiles = [];
@@ -2781,6 +2884,16 @@
 		return (null !== nTwips && undefined !== nTwips ? nTwips : 1) * 25.4 / 20 / 72;
 	}
 
+	/**
+	 * Конвертируем миллиметры в ближайшее целое значение твипсов
+	 * @param mm - значение в миллиметрах
+	 * @returns {number}
+	 */
+	function MMToTwips(mm)
+	{
+		return (((mm * 20 * 72 / 25.4) + 0.5) | 0);
+	}
+
 	var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 
 	function getUserColorById(userId, userName, isDark, isNumericValue)
@@ -3121,7 +3234,7 @@
 			_drawer.ImageHtml.src = _drawer.Image;
 			_drawer = null;
 		};
-		window["AscDesktopEditor"]["OpenFilenameDialog"]("filter");
+		window["AscDesktopEditor"]["OpenFilenameDialog"]("images");
 	};
 
 	CSignatureDrawer.prototype.isValid = function()
@@ -3195,6 +3308,7 @@
 	window["AscCommon"].getJSZip = getJSZip;
 	window["AscCommon"].getBaseUrl = getBaseUrl;
 	window["AscCommon"].getEncodingParams = getEncodingParams;
+	window["AscCommon"].getEncodingByBOM = getEncodingByBOM;
 	window["AscCommon"].saveWithParts = saveWithParts;
 	window["AscCommon"].loadFileContent = loadFileContent;
 	window["AscCommon"].getImageFromChanges = getImageFromChanges;
@@ -3235,6 +3349,7 @@
 
 	window["AscCommon"].CorrectMMToTwips = CorrectMMToTwips;
 	window["AscCommon"].TwipsToMM = TwipsToMM;
+	window["AscCommon"].MMToTwips = MMToTwips;
 
 	window["AscCommon"].loadSdk = loadSdk;
 	window["AscCommon"].getAltGr = getAltGr;

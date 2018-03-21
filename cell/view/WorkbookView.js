@@ -99,8 +99,7 @@
     this.cells = {
       defaultState: {
         background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
-      }, padding: -1, /*px horizontal padding*/
-      paddingPlusBorder: -1
+      }, padding: -1 /*px horizontal padding*/
     };
     this.activeCellBorderColor = new CColor(72, 121, 92);
     this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
@@ -821,6 +820,11 @@
       // Посылаем callback об изменении списка листов
       self.handlers.trigger("asc_onSheetsChanged");
     });
+    this.model.handlers.add("updateSelection", function () {
+		if (!self.lockDraw) {
+			self.getWorksheet().updateSelection();
+		}
+	});
 
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
@@ -1115,12 +1119,12 @@
       }
 
       // Проверяем комментарии ячейки
-      if (undefined !== ct.commentIndexes) {
+      if (ct.commentIndexes) {
         arrMouseMoveObjects.push(new asc_CMM({
           type: c_oAscMouseMoveType.Comment,
-          x: ct.commentCoords.asc_getLeftPX(),
-          reverseX: ct.commentCoords.asc_getReverseLeftPX(),
-          y: ct.commentCoords.asc_getTopPX(),
+          x: ct.commentCoords.dLeftPX,
+          reverseX: ct.commentCoords.dReverseLeftPX,
+          y: ct.commentCoords.dTopPX,
           aCommentIndexes: ct.commentIndexes
         }));
       }
@@ -1195,9 +1199,7 @@
       } else if (target.target === c_oTargetType.RowResize) {
         ws.changeRowHeight(target.row, y, target.mouseY);
       }
-
-      ws.cellCommentator.updateCommentPosition();
-      ws.updateSpecialPasteOptionsPosition();
+      window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
       this._onDocumentPlaceChanged();
     }
     ws.draw();
@@ -1266,11 +1268,7 @@
   };
 
   WorkbookView.prototype._onCommentCellClick = function(x, y) {
-    var ws = this.getWorksheet();
-    var comments = ws.cellCommentator.getCommentsXY(x, y);
-    if (comments.length) {
-      ws.cellCommentator.showComment(comments[0].asc_getId());
-    }
+    this.getWorksheet().cellCommentator.showCommentByXY(x, y);
   };
 
   WorkbookView.prototype._onUpdateSelectionName = function() {
@@ -1606,7 +1604,9 @@
       index = wb.getActive();
 	}
     if (index === this.wsActive) {
-      this.drawWorksheet();
+		if (!bLockDraw) {
+			this.drawWorksheet();
+		}
       return this;
     }
 
@@ -2097,10 +2097,10 @@
     g_clipboardExcel.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
-  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
+  WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data, doNotShowButton) {
     var t = this, ws;
     ws = t.getWorksheet();
-    g_clipboardExcel.pasteData(ws, _format, data1, data2, text_data);
+    g_clipboardExcel.pasteData(ws, _format, data1, data2, text_data, null, doNotShowButton);
   };
   
   WorkbookView.prototype.specialPasteData = function(props) {
@@ -2115,11 +2115,17 @@
 	}
   };
 
+  WorkbookView.prototype.updateSpecialPasteButton = function(props) {
+  	if (!this.getCellEditMode()) {
+  		this.getWorksheet().updateSpecialPasteButton(props);
+	}
+  };
+
   WorkbookView.prototype.selectionCut = function() {
     if (this.getCellEditMode()) {
       this.cellEditor.cutSelection();
     } else {
-      this.getWorksheet().emptySelection(c_oAscCleanOptions.All);
+      this.getWorksheet().emptySelection(c_oAscCleanOptions.All, true);
     }
   };
 
@@ -2475,30 +2481,6 @@
     }
   };
 
-  WorkbookView.prototype._initCommentsToSave = function() {
-    var isFirst = true, wsView, wsModel, tmpWs;
-    // Колличество листов
-    var countWorksheets = this.model.getWorksheetCount();
-    for (var i = 0; i < countWorksheets; ++i) {
-      tmpWs = this.model.getWorksheet(i);
-      if (tmpWs && (0 < tmpWs.aComments.length || isFirst)) {
-        wsView = this.getWorksheet(i);
-        wsModel = wsView.model;
-        wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
-
-        if (isFirst) {
-          isFirst = false;
-          tmpWs = this.cellCommentator.worksheet;
-          this.cellCommentator.worksheet = wsView;
-          this.cellCommentator.overlayCtx = wsView.overlayCtx;
-          this.cellCommentator.drawingCtx = wsView.drawingCtx;
-          this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
-          this.cellCommentator.worksheet = tmpWs;
-        }
-      }
-    }
-  };
-
   WorkbookView.prototype.reInit = function() {
     var ws = this.getWorksheet();
     ws._initCellsArea(AscCommonExcel.recalcType.full);
@@ -2633,7 +2615,7 @@
 
     // Padding рассчитывается исходя из maxDigitWidth (http://social.msdn.microsoft.com/Forums/en-US/9a6a9785-66ad-4b6b-bb9f-74429381bd72/margin-padding-in-cell-excel?forum=os_binaryfile)
     this.defaults.worksheetView.cells.padding = Math.max(asc.ceil(this.maxDigitWidth / 4), 2);
-    this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
+    this.model.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
 	WorkbookView.prototype.getPivotMergeStyle = function (sheetMergedStyles, range, style, pivot) {

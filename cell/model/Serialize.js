@@ -189,7 +189,10 @@
         PivotCache: 8,
         ExternalBook: 9,
         OleLink:10,
-        DdeLink: 11
+		DdeLink: 11,
+		VbaProject: 12,
+		JsaProject: 13,
+		Comments: 14
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -2329,11 +2332,13 @@
             }
         };
     }
-    function BinaryWorkbookTableWriter(memory, wb)
+    function BinaryWorkbookTableWriter(memory, wb, oBinaryWorksheetsTableWriter, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
         this.wb = wb;
+        this.oBinaryWorksheetsTableWriter = oBinaryWorksheetsTableWriter;
+        this.isCopyPaste = isCopyPaste;
         this.Write = function()
         {
             var oThis = this;
@@ -2352,16 +2357,31 @@
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
 			//PivotCaches
-			var isEmpty = true;
-			for (var id in wb.pivotCaches) {
-				isEmpty = false;
-				break;
-			}
-			if(!isEmpty) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches();});
+			var isEmptyCaches = true;
+			var pivotCaches = {};
+			this.oBinaryWorksheetsTableWriter.wb.forEach(function(ws) {
+				for (var i = 0; i < ws.pivotTables.length; ++i) {
+					var pivotTable = ws.pivotTables[i];
+					if (null !== pivotTable.cacheId && pivotTable.cacheDefinition) {
+						isEmptyCaches = false;
+						pivotCaches[pivotTable.cacheId] = pivotTable.cacheDefinition;
+					}
+				}
+			}, this.oBinaryWorksheetsTableWriter.isCopyPaste);
+			if (!isEmptyCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches(pivotCaches);});
 			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
+			}
+			if (!this.isCopyPaste) {
+				var macros = this.wb.oApi.macros.GetData();
+				if (macros) {
+					this.bs.WriteItem(c_oSerWorkbookTypes.JsaProject, function() {oThis.memory.WriteXmlString(macros);});
+				}
+                if (this.wb.aComments.length > 0) {
+                    this.bs.WriteItem(c_oSerWorkbookTypes.Comments, function() {oThis.WriteComments(oThis.wb.aComments);});
+                }
 			}
         };
         this.WriteWorkbookPr = function()
@@ -2445,10 +2465,10 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
-		this.WritePivotCaches = function() {
+		this.WritePivotCaches = function(pivotCaches) {
 			var oThis = this;
-			for (var id in wb.pivotCaches) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, wb.pivotCaches[id]);});
+			for (var id in pivotCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, pivotCaches[id]);});
 			}
 		};
 		this.WritePivotCache = function(id, pivotCache) {
@@ -2602,8 +2622,14 @@
 				oThis.memory.WriteString2(cell.CellValue);
 			}
 		};
+        this.WriteComments = function(aComments) {
+            var t = this;
+            for (var i = 0; i < aComments.length; ++i) {
+                this.bs.WriteItem( c_oSer_Comments.CommentData, function(){t.oBinaryWorksheetsTableWriter.WriteCommentData(aComments[i]);});
+            }
+        };
     }
-	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, idWorksheet, isCopyPaste)
+	function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, isCopyPaste)
     {
         this.memory = memory;
         this.bs = new BinaryCommonWriter(this.memory);
@@ -2611,7 +2637,6 @@
         this.oSharedStrings = oSharedStrings;
         this.aDxfs = aDxfs;
 		this.stylesForWrite = new StylesForWrite();
-        this.idWorksheet = idWorksheet;
         this.isCopyPaste = isCopyPaste;
         this.sharedFormulas = {};
 		this.sharedFormulasIndex = 0;
@@ -2653,21 +2678,16 @@
         {
             var oThis = this;
             this._prepeareStyles();
-            window["Asc"]["editor"].wb._initCommentsToSave();
             this.bs.WriteItemWithLength(function(){oThis.WriteWorksheetsContent();});
         };
         this.WriteWorksheetsContent = function()
         {
-            var oThis = this;
-            for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
-            {
-                //if copy/paste - write only actve ws
-                if(this.isCopyPaste && i != this.wb.nActive)
-                    continue;
-                var ws = this.wb.aWorksheets[i];
-                if(null == this.idWorksheet || this.idWorksheet == ws.getId())
-                    this.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, i);});
-            }
+			var oThis = this;
+			this.wb.forEach(function (ws, index) {
+				oThis.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function () {
+					oThis.WriteWorksheet(ws, index);
+				});
+			}, this.isCopyPaste);
         };
         this.WriteWorksheet = function(ws, index)
         {
@@ -2704,12 +2724,9 @@
             if (ws.Drawings && (ws.Drawings.length))
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
-            var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
-            var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
-              ws.aCommentsCoords;
-            if (aComments.length > 0 && aCommentsCoords.length > 0) {
+            if (ws.aComments.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
-                    oThis.WriteComments(aComments, aCommentsCoords, ws);
+                    oThis.WriteComments(ws.aComments, ws);
                 });
             }
 
@@ -3577,84 +3594,28 @@
 				this.memory.WriteString2(formula);
 			}
         };
-        this.WriteComments = function(aComments, aCommentsCoords, ws)
+        this.WriteComments = function(aComments, ws)
         {
             var oThis = this;
-            var oNewComments = {}, i, length, elem, nRow, nCol, row, comment;
-            for(i = 0, length = aComments.length; i < length; ++i)
+            var i, elem, coord;
+            for(i = 0; i < aComments.length; ++i)
             {
+                elem = aComments[i];
                 //write only active comments, if copy/paste
                 if(this.isCopyPaste)
 				{
 					//ignore hidden rows if ws.bExcludeHiddenRows === true
-					if(!this.isCopyPaste.contains(aComments[i].nCol, aComments[i].nRow) || (ws.bExcludeHiddenRows && ws.getRowHidden(aComments[i].nRow)))
+					if(!this.isCopyPaste.contains(elem.nCol, elem.nRow) || (ws.bExcludeHiddenRows && ws.getRowHidden(elem.nRow)))
 					{
 						continue;
 					}
 				}
-
-                elem = aComments[i];
-                nRow = elem.asc_getRow();
-                if(null == nRow)
-                    nRow = 0;
-                nCol = elem.asc_getCol();
-                if(null == nCol)
-                    nCol = 0;
-                row = oNewComments[nRow];
-                if(null == row)
-                {
-                    row = {};
-                    oNewComments[nRow] = row;
-                }
-                comment = row[nCol];
-                if(null == comment)
-                {
-                    comment = {data: [], coord: null};
-                    row[nCol] = comment;
-                }
-                comment.data.push(elem);
-            }
-            for(i = 0, length = aCommentsCoords.length; i < length; ++i)
-            {
-                //write only active comments, if copy/paste
-                if(this.isCopyPaste && !this.isCopyPaste.contains(aCommentsCoords[i].nCol, aCommentsCoords[i].nRow))
+                coord = elem.coords;
+                if(null === coord.nLeft || null === coord.nTop || null === coord.nRight || null === coord.nBottom ||
+                    null === coord.nLeftOffset || null === coord.nTopOffset || null === coord.nRightOffset || null === coord.nBottomOffset ||
+                    null === coord.dLeftMM || null === coord.dTopMM || null === coord.dWidthMM || null === coord.dHeightMM)
                     continue;
-                elem = aCommentsCoords[i];
-                nRow = elem.asc_getRow();
-                if(null == nRow)
-                    nRow = 0;
-                nCol = elem.asc_getCol();
-                if(null == nCol)
-                    nCol = 0;
-                row = oNewComments[nRow];
-                if(null == row)
-                {
-                    row = {};
-                    oNewComments[nRow] = row;
-                }
-                comment = row[nCol];
-                if(null == comment)
-                {
-                    comment = {data: [], coord: null};
-                    row[nCol] = comment;
-                }
-                comment.coord = elem;
-            }
-            for(i in oNewComments)
-            {
-                row = oNewComments[i];
-                for(var j in row)
-                {
-                    comment = row[j];
-                    if(null == comment.coord || 0 == comment.data.length)
-                        continue;
-                    var coord = comment.coord;
-                    if(null == coord.asc_getLeft() || null == coord.asc_getTop() || null == coord.asc_getRight() || null == coord.asc_getBottom() ||
-                        null == coord.asc_getLeftOffset() || null == coord.asc_getTopOffset() || null == coord.asc_getRightOffset() || null == coord.asc_getBottomOffset() ||
-                        null == coord.asc_getLeftMM() || null == coord.asc_getTopMM() || null == coord.asc_getWidthMM() || null == coord.asc_getHeightMM())
-                        continue;
-                    this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(comment);});
-                }
+                this.bs.WriteItem(c_oSerWorksheetsTypes.Comment, function(){oThis.WriteComment(elem);});
             }
         };
         this.WriteComment = function(comment)
@@ -3662,77 +3623,76 @@
             var oThis = this;
             this.memory.WriteByte(c_oSer_Comments.Row);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRow());
+            this.memory.WriteLong(comment.coords.nRow);
 
             this.memory.WriteByte(c_oSer_Comments.Col);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getCol());
+            this.memory.WriteLong(comment.coords.nCol);
 
             this.memory.WriteByte(c_oSer_Comments.CommentDatas);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.bs.WriteItemWithLength(function(){oThis.WriteCommentDatas(comment.data);});
+            this.bs.WriteItemWithLength(function(){oThis.WriteCommentDatas(comment);});
 
             this.memory.WriteByte(c_oSer_Comments.Left);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeft());
+            this.memory.WriteLong(comment.coords.nLeft);
 
             this.memory.WriteByte(c_oSer_Comments.Top);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTop());
+            this.memory.WriteLong(comment.coords.nTop);
 
             this.memory.WriteByte(c_oSer_Comments.Right);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRight());
+            this.memory.WriteLong(comment.coords.nRight);
 
             this.memory.WriteByte(c_oSer_Comments.Bottom);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottom());
+            this.memory.WriteLong(comment.coords.nBottom);
 
             this.memory.WriteByte(c_oSer_Comments.LeftOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getLeftOffset());
+            this.memory.WriteLong(comment.coords.nLeftOffset);
 
             this.memory.WriteByte(c_oSer_Comments.TopOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getTopOffset());
+            this.memory.WriteLong(comment.coords.nTopOffset);
 
             this.memory.WriteByte(c_oSer_Comments.RightOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getRightOffset());
+            this.memory.WriteLong(comment.coords.nRightOffset);
 
             this.memory.WriteByte(c_oSer_Comments.BottomOffset);
             this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(comment.coord.asc_getBottomOffset());
+            this.memory.WriteLong(comment.coords.nBottomOffset);
 
             this.memory.WriteByte(c_oSer_Comments.LeftMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getLeftMM());
+            this.memory.WriteDouble2(comment.coords.dLeftMM);
 
             this.memory.WriteByte(c_oSer_Comments.TopMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getTopMM());
+            this.memory.WriteDouble2(comment.coords.dTopMM);
 
             this.memory.WriteByte(c_oSer_Comments.WidthMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getWidthMM());
+            this.memory.WriteDouble2(comment.coords.dWidthMM);
 
             this.memory.WriteByte(c_oSer_Comments.HeightMM);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(comment.coord.asc_getHeightMM());
+            this.memory.WriteDouble2(comment.coords.dHeightMM);
 
             this.memory.WriteByte(c_oSer_Comments.MoveWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getMoveWithCells());
+            this.memory.WriteBool(comment.coords.bMoveWithCells);
 
             this.memory.WriteByte(c_oSer_Comments.SizeWithCells);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(comment.coord.asc_getSizeWithCells());
+            this.memory.WriteBool(comment.coords.bSizeWithCells);
         };
-        this.WriteCommentDatas = function(aDatas)
+        this.WriteCommentDatas = function(data)
         {
             var oThis = this;
-            for(var i = 0, length = aDatas.length; i < length; ++i)
-                this.bs.WriteItem( c_oSer_Comments.CommentData, function(){oThis.WriteCommentData(aDatas[i]);});
+            this.bs.WriteItem( c_oSer_Comments.CommentData, function(){oThis.WriteCommentData(data);});
         };
         this.WriteCommentData = function(oCommentData)
         {
@@ -4076,14 +4036,13 @@
         this.nLastFilePos = 0;
         this.nRealTableCount = 0;
         this.bs = new BinaryCommonWriter(this.Memory);
-        this.Write = function(idWorksheet, noBase64)
+        this.Write = function(noBase64)
         {
-            //если idWorksheet не null, то надо серализовать только его.
             pptx_content_writer._Start();
 			if (noBase64) {
 				this.Memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
 			}
-            this.WriteMainTable(idWorksheet);
+            this.WriteMainTable();
             pptx_content_writer._End();
 			if (noBase64) {
 				return this.Memory.GetData();
@@ -4095,7 +4054,7 @@
         {
             return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
         };
-        this.WriteMainTable = function(idWorksheet)
+        this.WriteMainTable = function()
         {
             var nTableCount = 128;//Специально ставим большое число, чтобы не увеличивать его при добавлении очередной таблицы.
             this.nRealTableCount = 0;//Специально ставим большое число, чтобы не увеличивать его при добавлении очередной таблицы.
@@ -4111,10 +4070,10 @@
             //Write Styles
             var nStylesTablePos = this.ReserveTable(c_oSerTableTypes.Styles);
             //Workbook
-            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb));
-            //Worksheets
             var aDxfs = [];
-            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, idWorksheet, this.isCopyPaste);
+            var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, this.isCopyPaste);
+            this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb, oBinaryWorksheetsTableWriter, this.isCopyPaste));
+            //Worksheets
             this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
             //OtherTable
             if(!this.isCopyPaste)
@@ -4888,7 +4847,7 @@
                 if(null != oCellStyleXfs.numid) {
                     var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
                     if(null != oCurNumCellStyle)
-						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNumCellStyle);
                     else
 						newXf.num = g_StyleCache.addNum(this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
@@ -4962,7 +4921,7 @@
                     var oCurNum = oStyleObject.oNumFmts[xfs.numid];
                     //todo
                     if(null != oCurNum)
-						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNum, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNum);
                     else
 						newXf.num = g_StyleCache.addNum(this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
@@ -5044,32 +5003,29 @@
                 }
             }
         };
-      this.ParseNum = function(oNum, oNumFmts) {
-        var oRes = null;
-        var sFormat = null;
-        if (null != oNum && null != oNum.f) {
-          sFormat = oNum.f;
-        } else {
-          var sStandartNumFormat = AscCommonExcel.aStandartNumFormats[oNum.id];
-          if (null != sStandartNumFormat) {
-            sFormat = sStandartNumFormat;
-          }
-          if (null == sFormat) {
-            sFormat = "General";
-          }
-          if (null != oNumFmts) {
-            oNumFmts[oNum.id] = {id: oNum.id, f: sFormat};
-          }
-        }
-        if (null != sFormat) {
-          oRes = new AscCommonExcel.Num();
-          oRes.f = sFormat;
-          if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 ==  oNum.id || (27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
-            oRes.id = oNum.id;
-          }
-        }
-        return oRes;
-      };
+		this.ParseNum = function(oNum, oNumFmts) {
+			var oRes = new AscCommonExcel.Num();
+			if (null != oNum && null != oNum.f) {
+				oRes.f = oNum.f;
+			} else {
+				var sStandartNumFormat = AscCommonExcel.aStandartNumFormats[oNum.id];
+				if (null != sStandartNumFormat) {
+					oRes.f = sStandartNumFormat;
+				}
+				if (null == oRes.f) {
+					oRes.f = "General";
+				}
+				//format string is more priority then id. so, fill oRes.id only if format is empty
+				if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
+					(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
+					oRes.id = oNum.id;
+				}
+			}
+			if (null != oNumFmts) {
+				oNumFmts[oNum.id] = oRes;
+			}
+			return oRes;
+		};
         this.ReadStylesContent = function (type, length, oStyleObject) {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
@@ -5410,8 +5366,9 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadNumFmt(t,l,oNewNumFmt);
                 });
-                if(null != oNewNumFmt.id && null != oNewNumFmt.f)
-                    oNumFmts[oNewNumFmt.id] = oNewNumFmt;
+				if (null != oNewNumFmt.id) {
+					this.ParseNum(oNewNumFmt, oNumFmts);
+				}
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5620,11 +5577,12 @@
         };
     }
     /** @constructor */
-    function Binary_WorkbookTableReader(stream, oWorkbook)
+    function Binary_WorkbookTableReader(stream, oWorkbook, bwtr)
     {
         this.stream = stream;
         this.oWorkbook = oWorkbook;
         this.bcr = new Binary_CommonReader(this.stream);
+        this.bwtr = bwtr;
         this.Read = function()
         {
             var oThis = this;
@@ -5662,6 +5620,16 @@
 					return oThis.ReadExternalReferences(t,l);
 				});
 			}
+			else if (c_oSerWorkbookTypes.JsaProject == type)
+			{
+				this.oWorkbook.oApi.macros.SetData(AscCommon.GetStringUtf8(this.stream, length));
+			}
+            else if (c_oSerWorkbookTypes.Comments == type)
+            {
+                res = this.bcr.Read1(length, function(t,l){
+                    return oThis.bwtr.ReadCommentDatas(t,l, oThis.oWorkbook.aComments);
+                });
+            }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -5960,12 +5928,7 @@
 					oNewWorksheet.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 				else if(this.copyPasteObj && this.copyPasteObj.isCopyPaste)
 				{
-					var api = window["Asc"]["editor"];
-					var nActiveSheet = api.wb.model.nActive;
-					var ws = api.wb.model.aWorksheets[nActiveSheet];
-					var DrawingDocument = ws.DrawingDocument;
-					
-					oNewWorksheet.DrawingDocument = DrawingDocument;
+					oNewWorksheet.DrawingDocument = window["Asc"]["editor"].wbModel.getActiveWs().DrawingDocument;
 				}
 				
                 this.curWorksheet = oNewWorksheet;
@@ -6810,7 +6773,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Comment == type )
+            if ( c_oSerWorksheetsTypes.Comment == type && AscCommonExcel.asc_CCommentCoords)
             {
                 var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
@@ -6821,9 +6784,11 @@
                 var i;
                 for(i = 0, length = aCommentData.length; i < length; ++i)
                 {
+					aCommentData[i].coords = oCommentCoords;
+
                     var elem = aCommentData[i];
-                    elem.asc_putRow(oCommentCoords.asc_getRow());
-                    elem.asc_putCol(oCommentCoords.asc_getCol());
+                    elem.asc_putRow(oCommentCoords.nRow);
+                    elem.asc_putCol(oCommentCoords.nCol);
 
                     if (elem.asc_getDocumentFlag()) {
                         elem.nId = "doc_" + (this.wb.aComments.length + 1);
@@ -6844,9 +6809,9 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_Comments.Row == type )
-                oCommentCoords.asc_setRow(this.stream.GetULongLE());
+                oCommentCoords.nRow = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Col == type )
-                oCommentCoords.asc_setCol(this.stream.GetULongLE());
+                oCommentCoords.nCol = this.stream.GetULongLE();
             else if ( c_oSer_Comments.CommentDatas == type )
             {
                 res = this.bcr.Read1(length, function(t,l){
@@ -6854,33 +6819,33 @@
                 });
             }
             else if ( c_oSer_Comments.Left == type )
-                oCommentCoords.asc_setLeft(this.stream.GetULongLE());
+                oCommentCoords.nLeft = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftOffset == type )
-                oCommentCoords.asc_setLeftOffset(this.stream.GetULongLE());
+                oCommentCoords.nLeftOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Top == type )
-                oCommentCoords.asc_setTop(this.stream.GetULongLE());
+                oCommentCoords.nTop = this.stream.GetULongLE();
             else if ( c_oSer_Comments.TopOffset == type )
-                oCommentCoords.asc_setTopOffset(this.stream.GetULongLE());
+                oCommentCoords.nTopOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Right == type )
-                oCommentCoords.asc_setRight(this.stream.GetULongLE());
+                oCommentCoords.nRight = this.stream.GetULongLE();
             else if ( c_oSer_Comments.RightOffset == type )
-                oCommentCoords.asc_setRightOffset(this.stream.GetULongLE());
+                oCommentCoords.nRightOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.Bottom == type )
-                oCommentCoords.asc_setBottom(this.stream.GetULongLE());
+                oCommentCoords.nBottom = this.stream.GetULongLE();
             else if ( c_oSer_Comments.BottomOffset == type )
-                oCommentCoords.asc_setBottomOffset(this.stream.GetULongLE());
+                oCommentCoords.nBottomOffset = this.stream.GetULongLE();
             else if ( c_oSer_Comments.LeftMM == type )
-                oCommentCoords.asc_setLeftMM(this.stream.GetDoubleLE());
+                oCommentCoords.dLeftMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.TopMM == type )
-                oCommentCoords.asc_setTopMM(this.stream.GetDoubleLE());
+                oCommentCoords.dTopMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.WidthMM == type )
-                oCommentCoords.asc_setWidthMM(this.stream.GetDoubleLE());
+                oCommentCoords.dWidthMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.HeightMM == type )
-                oCommentCoords.asc_setHeightMM(this.stream.GetDoubleLE());
+                oCommentCoords.dHeightMM = this.stream.GetDoubleLE();
             else if ( c_oSer_Comments.MoveWithCells == type )
-                oCommentCoords.asc_setMoveWithCells(this.stream.GetBool());
+                oCommentCoords.bMoveWithCells = this.stream.GetBool();
             else if ( c_oSer_Comments.SizeWithCells == type )
-                oCommentCoords.asc_setSizeWithCells(this.stream.GetBool());
+                oCommentCoords.bSizeWithCells = this.stream.GetBool();
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -7849,6 +7814,7 @@
                     res = this.stream.Seek(mtiOffBits);
                     if(c_oSerConstants.ReadOk != res)
                         break;
+                    var bwtr = new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
                     switch(mtiType)
                     {
                         // case c_oSerTableTypes.SharedStrings:
@@ -7882,7 +7848,7 @@
                 {
                     res = this.stream.Seek(nWorkbookTableOffset);
                     if(c_oSerConstants.ReadOk == res)
-                        res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
+                        res = (new Binary_WorkbookTableReader(this.stream, wb, bwtr)).Read();
                 }
 				bwtr.ReadSheetDataExternal(false);
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
@@ -8252,7 +8218,7 @@
         };
         var fReadStyles = function (type, length, oOutput) {
             var res = c_oSerConstants.ReadOk;
-            var oStyleObject = {font: null, fill: null, border: null, oNumFmts: [], xfs: null};
+            var oStyleObject = {font: null, fill: null, border: null, oNumFmts: {}, xfs: null};
             if (Types.Style === type) {
                 var oCellStyle = new AscCommonExcel.CCellStyle();
                 res = bcr.Read1(length, function (t, l) {
@@ -8273,7 +8239,7 @@
                 if (null !== oStyleObject.xfs.numid) {
                     var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
                     if(null != oCurNum)
-						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts));
+						newXf.num = g_StyleCache.addNum(oCurNum);
                     else
 						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }

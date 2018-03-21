@@ -390,6 +390,9 @@ function CEditorPage(api)
 	{
 		var off = jQuery("#" + this.Name).offset();
 
+        if (undefined !== window["AscDesktopEditor"] && 0 == off.top)
+            return;
+
 		if (off)
 		{
 			this.X = off.left;
@@ -3876,6 +3879,8 @@ function CEditorPage(api)
 			{
 				oWordControl.Thumbnails.onCheckUpdate();
 			}
+            if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
+                oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
 		}
 		else
 		{

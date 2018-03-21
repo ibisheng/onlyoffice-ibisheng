@@ -152,6 +152,19 @@ g_aNumber[0x0037] = 1;
 g_aNumber[0x0038] = 1;
 g_aNumber[0x0039] = 1;
 
+// Suitable Run content for the paragraph simple changes
+var g_oSRCFPSC             = [];
+g_oSRCFPSC[para_Text]      = 1;
+g_oSRCFPSC[para_Space]     = 1;
+g_oSRCFPSC[para_End]       = 1;
+g_oSRCFPSC[para_Tab]       = 1;
+g_oSRCFPSC[para_Sym]       = 1;
+g_oSRCFPSC[para_PageCount] = 1;
+g_oSRCFPSC[para_FieldChar] = 1;
+g_oSRCFPSC[para_InstrText] = 1;
+g_oSRCFPSC[para_Bookmark]  = 1;
+
+
 
 var g_aSpecialSymbols     = [];
 g_aSpecialSymbols[0x00AE] = 1;
@@ -228,15 +241,22 @@ CRunElementBase.prototype.GetType = function()
 	return this.Type;
 };
 
-// Класс ParaText
-function ParaText(value)
+/**
+ * Класс представляющий текстовый символ
+ * @param {Number} nCharCode - Юникодное значение символа
+ * @constructor
+ */
+function ParaText(nCharCode)
 {
-    this.Value        = (undefined !== value ? value.charCodeAt(0) : 0x00);    
+    this.Value        = undefined !== nCharCode ? nCharCode : 0x00;
     this.Width        = 0x00000000 | 0;
     this.WidthVisible = 0x00000000 | 0;
     this.Flags        = 0x00000000 | 0;
     
     this.Set_SpaceAfter(this.private_IsSpaceAfter());
+
+    if (AscFonts.IsCheckSymbols)
+        AscFonts.FontPickerByCharacter.getFontBySymbol(this.Value);
 }
 
 ParaText.prototype =
@@ -252,6 +272,9 @@ ParaText.prototype =
     {
         this.Value = CharCode;
         this.Set_SpaceAfter(this.private_IsSpaceAfter());
+
+        if (AscFonts.IsCheckSymbols)
+            AscFonts.FontPickerByCharacter.getFontBySymbol(this.Value);
     },
     
     Draw : function(X, Y, Context)
@@ -366,7 +389,7 @@ ParaText.prototype =
 
     Copy : function()
     {
-        return new ParaText(String.fromCharCode(this.Value));
+    	return new ParaText(this.Value);
     },
 
     Is_NBSP : function()
@@ -445,8 +468,7 @@ ParaText.prototype =
 
     Read_FromBinary : function(Reader)
     {
-        this.Value = Reader.GetLong();
-        this.Set_SpaceAfter(this.private_IsSpaceAfter());
+        this.Set_CharCode(Reader.GetLong());
     }
 };
 ParaText.prototype.private_IsSpaceAfter = function()
@@ -1334,6 +1356,8 @@ function ParaPageNum()
 
     this.Width        = 0;
     this.WidthVisible = 0;
+
+    this.Parent = null;
 }
 
 ParaPageNum.prototype =
@@ -1478,6 +1502,22 @@ ParaPageNum.prototype.GetPageNumValue = function()
 ParaPageNum.prototype.GetType = function()
 {
 	return this.Type;
+};
+/**
+ * Выставляем родительский класс
+ * @param {ParaRun} oParent
+ */
+ParaPageNum.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
+/**
+ * Получаем родительский класс
+ * @returns {?ParaRun}
+ */
+ParaPageNum.prototype.GetParent = function()
+{
+	return this.Parent;
 };
 
 function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
@@ -1921,6 +1961,7 @@ function ParaPageCount(PageCount)
 	this.Widths    = [];
 	this.String    = "";
 	this.PageCount = undefined !== PageCount ? PageCount : 1;
+	this.Parent    = null;
 }
 ParaPageCount.prototype = Object.create(CRunElementBase.prototype);
 ParaPageCount.prototype.constructor = ParaPageCount;
@@ -2015,6 +2056,22 @@ ParaPageCount.prototype.GetPageCountValue = function()
 {
 	return this.PageCount;
 };
+/**
+ * Выставляем родительский класс
+ * @param {ParaRun} oParent
+ */
+ParaPageCount.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
+/**
+ * Получаем родительский класс
+ * @returns {?ParaRun}
+ */
+ParaPageCount.prototype.GetParent = function()
+{
+	return this.Parent;
+};
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
@@ -2063,8 +2120,11 @@ function ParagraphContent_Read_FromBinary(Reader)
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
-window['AscCommonWord'].ParaNewLine = ParaNewLine;
-window['AscCommonWord'].ParaText    = ParaText;
+window['AscCommonWord'].ParaNewLine   = ParaNewLine;
+window['AscCommonWord'].ParaText      = ParaText;
+window['AscCommonWord'].ParaSpace     = ParaSpace;
+window['AscCommonWord'].ParaPageNum   = ParaPageNum;
+window['AscCommonWord'].ParaPageCount = ParaPageCount;
 
 window['AscCommonWord'].break_Page = break_Page;
 window['AscCommonWord'].break_Column = break_Column;

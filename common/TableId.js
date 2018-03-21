@@ -284,7 +284,10 @@
 		if (window['AscCommonExcel'])
 		{
 			this.m_oFactoryClass[AscDFH.historyitem_type_Sparkline] = AscCommonExcel.sparklineGroup;
+			this.m_oFactoryClass[AscDFH.historyitem_type_PivotTableDefinition] = Asc.CT_pivotTableDefinition;
 		}
+
+		this.m_oFactoryClass[AscDFH.historyitem_type_DocumentMacros] = AscCommon.CDocumentMacros;
 	};
 	CTableId.prototype.GetClassFromFactory = function(nType)
 	{
@@ -305,4 +308,5 @@
 	};
 
 	window["AscCommon"].g_oTableId = new CTableId();
+	window["AscCommon"].CTableId = CTableId;
 })(window);

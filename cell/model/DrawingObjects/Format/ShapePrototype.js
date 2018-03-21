@@ -328,6 +328,12 @@ CShape.prototype.setRecalculateInfo = function()
     this.compiledStyles = [];
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
+
+
+    CShape.prototype.checkNeedRecalculate = function(){
+        return this.recalcInfo.recalculateTransform === true || this.recalcInfo.recalculateContent === true;
+    };
+
 CShape.prototype.recalcContent = function()
 {
     this.recalcInfo.recalculateContent = true;
@@ -409,6 +415,7 @@ CShape.prototype.handleUpdateExtents = function()
     this.recalcGeometry();
     this.recalcBounds();
     this.recalcTransform();
+    this.recalcTransformText();
     this.recalcContent();
     this.addToRecalculate();
    //delete this.fromSerialize;

@@ -47,6 +47,9 @@
 	/** @constructor */
 	function baseEditorsApi(config, editorId)
 	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["CreateEditorApi"]();
+
 		this.editorId      = editorId;
 		this.isLoadFullApi = false;
 		this.openResult    = null;
@@ -177,6 +180,8 @@
 
 		this.currentPassword = "";
 
+		this.macros = null;
+
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
 		this.watermarkDraw =
 			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
@@ -291,7 +296,12 @@
 			}
 		}
 
-		if (AscCommon.offlineMode === this.documentUrl)
+		if (AscCommon.chartMode === this.documentUrl)
+		{
+			this.isChartEditor = true;
+			this.DocInfo.put_OfflineApp(true);
+		}
+		else if (AscCommon.offlineMode === this.documentUrl)
 		{
 			this.DocInfo.put_OfflineApp(true);
 		}
@@ -482,6 +492,9 @@
 	baseEditorsApi.prototype._OfflineAppDocumentStartLoad        = function()
 	{
 		this._OfflineAppDocumentEndLoad();
+	};
+	baseEditorsApi.prototype._OfflineAppDocumentEndLoad        = function()
+	{
 	};
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
@@ -705,6 +718,7 @@
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
                         }
                         t.forceSaveButtonContinue = false;
+                        t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveButton, c_oAscError.Level.NoCritical);
                     }, Asc.c_nMaxConversionTime);
                 } else if (data.refuse) {
                     if (t.forceSaveButtonContinue) {
@@ -721,6 +735,9 @@
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
                         }
                         t.forceSaveButtonContinue = false;
+                        if (!data.success) {
+                            t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveButton, c_oAscError.Level.NoCritical);
+                        }
                     }
                 }
             } else {
@@ -734,12 +751,16 @@
                         t.forceSaveTimeoutTimeout = setTimeout(function() {
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                            t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveTimeout, c_oAscError.Level.NoCritical);
                         }, Asc.c_nMaxConversionTime);
                     } else {
                         if (null !== t.forceSaveTimeoutTimeout) {
                             clearInterval(t.forceSaveTimeoutTimeout);
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                            if (!data.success) {
+                                t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveTimeout, c_oAscError.Level.NoCritical);
+                            }
                         }
                     }
                 }
@@ -1146,7 +1167,14 @@
 		{
 			if (this.DocInfo.get_OfflineApp())
 			{
-				this._OfflineAppDocumentStartLoad();
+				if (this.editorId === c_oEditorId.Spreadsheet && this.isChartEditor)
+				{
+					this.onEndLoadFile(AscCommonExcel.getEmptyWorkbook());
+				}
+				else
+				{
+					this._OfflineAppDocumentStartLoad();
+				}
 			}
 			this.onEndLoadFile(null);
 		}
@@ -1166,6 +1194,8 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		AscCommon.g_oTableId.init();
+
 		// init drag&drop
 		var t = this;
 		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
@@ -1196,6 +1226,8 @@
 		if (!window['IS_NATIVE_EDITOR']) {
 			setInterval(function() {t._autoSave();}, 40);
 		}
+
+		this.macros = new AscCommon.CDocumentMacros();
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1384,7 +1416,7 @@
 		this.incrementCounterLongAction();
 		var b_old_save_format = AscCommon.g_clipboardBase.bSaveFormat;
         AscCommon.g_clipboardBase.bSaveFormat = true;
-		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem, null, null, null, true);
 		this.decrementCounterLongAction();
 
 		if (true)
@@ -1405,6 +1437,34 @@
 			_elem = null;
             AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
 		}
+	};
+
+	baseEditorsApi.prototype["pluginMethod_PasteText"] = function(text)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, text);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_GetMacros"] = function()
+	{
+		return this.asc_getMacros();
+	};
+
+	baseEditorsApi.prototype["pluginMethod_SetMacros"] = function(data)
+	{
+		return this.asc_setMacros(data);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_StartAction"] = function(type, description)
+	{
+		this.sync_StartAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
+	{
+		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
 	};
 
 	// Builder
@@ -1680,6 +1740,15 @@
 	baseEditorsApi.prototype.onKeyUp = function(e)
 	{
 	};
+	/**
+	 * Получаем текст (в виде массива юникодных значений), который будет добавлен на ивенте KeyDown
+	 * @param e
+	 * @returns {Number[]}
+	 */
+	baseEditorsApi.prototype.getAddedTextOnKeyDown = function(e)
+	{
+		return [];
+	};
 	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
 	};
@@ -1755,6 +1824,96 @@
 	{
 		this.currentPassword = "";
 		this.asc_Save(false);
+	};
+
+	baseEditorsApi.prototype.asc_setMacros = function(sData)
+	{
+		if (!this.macros)
+			return true;
+
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+			return true;
+
+		AscCommon.CollaborativeEditing.OnStart_CheckLock();
+		this.macros.CheckLock();
+
+		if (this.editorId == AscCommon.c_oEditorId.Spreadsheet)
+		{
+			var locker = Asc.editor.wb.getWorksheet().objectRender.objectLocker;
+			locker.addObjectId(this.macros.Get_Id());
+
+			var _this = this;
+			locker.checkObjects(function(bNoLock) {
+				if (bNoLock)
+				{
+					AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+					_this.macros.SetData(sData);
+				}
+			});
+		}
+		else
+		{
+			if (false === AscCommon.CollaborativeEditing.OnEnd_CheckLock(false))
+			{
+				AscCommon.History.Create_NewPoint(AscDFH.historydescription_DocumentMacros_Data);
+				this.macros.SetData(sData);
+			}
+		}
+	};
+	baseEditorsApi.prototype.asc_getMacros = function()
+	{
+		return this.macros.GetData();
+	};
+
+	function parseCSV(text, options) {
+		var delimiterChar;
+		if (options.asc_getDelimiterChar()) {
+			delimiterChar = options.asc_getDelimiterChar();
+		} else {
+			switch (options.asc_getDelimiter()) {
+				case AscCommon.c_oAscCsvDelimiter.None:
+					delimiterChar = undefined;
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Tab:
+					delimiterChar = "\t";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Semicolon:
+					delimiterChar = ";";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Colon:
+					delimiterChar = ":";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Comma:
+					delimiterChar = ",";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Space:
+					delimiterChar = " ";
+					break;
+			}
+		}
+		var matrix = [];
+		var rows = text.match(/[^\r\n]+/g);
+		for (var i = 0; i < rows.length; ++i) {
+			var row = rows[i];
+			//todo quotes
+			matrix.push(row.split(delimiterChar));
+		}
+		return matrix;
+	}
+
+	baseEditorsApi.prototype.asc_decodeBuffer = function(buffer, options, callback) {
+		var reader = new FileReader();
+		//todo onerror
+		reader.onload = reader.onerror = function(e) {
+			var text = e.target.result ? e.target.result : "";
+			if (options instanceof Asc.asc_CCSVAdvancedOptions) {
+				callback(parseCSV(text, options));
+			} else {
+				callback(text.match(/[^\r\n]+/g));
+			}
+		};
+
+		reader.readAsText(new Blob([buffer]), AscCommon.c_oAscEncodings[options.asc_getCodePage()][2]);
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

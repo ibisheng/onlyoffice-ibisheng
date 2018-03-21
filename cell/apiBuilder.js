@@ -33,12 +33,31 @@
 "use strict";
 
 (function (window, builder) {
+	function checkFormat(value) {
+		var res;
+		if (value instanceof Date) {
+			res = new AscCommonExcel.cNumber(value.getExcelDate() +
+				(value.getHours() * 60 * 60 + value.getMinutes() * 60 + value.getSeconds()) / AscCommonExcel.c_sPerDay)
+		} else {
+			res = new AscCommonExcel.cString(value + '');
+		}
+		return res;
+	}
+
 	/**
 	 * @global
 	 * @class
 	 * @name Api
 	 */
 	var Api = window["Asc"]["spreadsheet_api"];
+
+	/**
+	 * Class representing a workbook.
+	 * @constructor
+	 */
+	function ApiWorkbook(workbook) {
+		this.workbook = workbook;
+	}
 
 	/**
 	 * Class representing a sheet.
@@ -146,6 +165,51 @@
 	}
 
 	/**
+	 * Returns a class formatted according to instructions contained in a format expression
+	 * @memberof Api
+	 * @param {string} expression Any valid expression.
+	 * @param {string} [format] A valid named or user-defined format expression.
+	 * @returns {string}
+	 */
+	Api.prototype.Format = function (expression, format) {
+		format = null == format ? '' : format;
+		return AscCommonExcel.cTEXT.prototype.Calculate([checkFormat(expression), new AscCommonExcel.cString(format)])
+			.getValue();
+	};
+
+	/**
+	 * Returns a Sheets collection that represents all the sheets in the active workbook.
+	 * @memberof Api
+	 * @returns {Array.<ApiWorksheet>}
+	 */
+	Api.prototype.GetSheets = function () {
+		var result = [];
+		for (var i = 0; i < this.wbModel.getWorksheetCount(); ++i) {
+			result.push(new ApiWorksheet(this.wbModel.getWorksheet(i)));
+		}
+		return result;
+	};
+	Object.defineProperty(Api.prototype, "Sheets", {
+		get: function () {
+			return this.GetSheets();
+		}
+	});
+
+	/**
+	 * Returns an object that represents the active workbook
+	 * @memberof Api
+	 * @returns {ApiWorkbook}
+	 */
+	Api.prototype.GetActiveWorkbook = function () {
+		return new ApiWorkbook(this.wbModel);
+	};
+	Object.defineProperty(Api.prototype, "ActiveWorkbook", {
+		get: function () {
+			return this.GetActiveWorkbook();
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active sheet
 	 * @memberof Api
 	 * @returns {ApiWorksheet}
@@ -153,6 +217,23 @@
 	Api.prototype.GetActiveSheet = function () {
 		var index = this.wbModel.getActive();
 		return new ApiWorksheet(this.wbModel.getWorksheet(index));
+	};
+	Object.defineProperty(Api.prototype, "ActiveSheet", {
+		get: function () {
+			return this.GetActiveSheet();
+		}
+	});
+
+	/**
+	 * Returns an object that represents the sheet
+	 * @memberof Api
+	 * @param {string | number} nameOrIndex Sheet name or Sheet index
+	 * @returns {ApiWorksheet | null}
+	 */
+	Api.prototype.GetSheet = function (nameOrIndex) {
+		var ws = ('string' === typeof theme) ? this.wbModel.getWorksheetByName(nameOrIndex) :
+			this.wbModel.getWorksheet(nameOrIndex);
+		return ws ? new ApiWorksheet(ws) : null;
 	};
 
 	/**
@@ -216,6 +297,41 @@
 	};
 
 	/**
+	 * Create a sheet.
+	 * @memberof ApiWorkbook
+	 * @param {string} name
+	 */
+	ApiWorkbook.prototype.AddSheet = function (name) {
+		this.workbook.oApi.asc_addWorksheet(name);
+	};
+
+	/**
+	 * Returns Visible of sheet
+	 * @memberof ApiWorksheet
+	 * @returns {bool}
+	 */
+	ApiWorksheet.prototype.GetVisible = function () {
+		return !this.worksheet.getHidden();
+	};
+
+	/**
+	 * Set Visible of sheet
+	 * @param {bool} value
+	 * @memberof ApiWorksheet
+	 */
+	ApiWorksheet.prototype.SetVisible = function (value) {
+		this.worksheet.setHidden(!value);
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Visible", {
+		get: function () {
+			return this.GetVisible();
+		},
+		set: function (value) {
+			this.SetVisible(value);
+		}
+	});
+
+	/**
 	 * Returns an object that represents the active cell
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
@@ -223,6 +339,49 @@
 	ApiWorksheet.prototype.GetActiveCell = function () {
 		var cell = this.worksheet.selectionRange.activeCell;
 		return new ApiRange(this.worksheet.getCell3(cell.row, cell.col));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "ActiveCell", {
+		get: function () {
+			return this.GetActiveCell();
+		}
+	});
+
+	/**
+	 * Returns a ApiRange that represents all the cells on the worksheet (not just the cells that are currently in use).
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetCells = function () {
+		return new ApiRange(this.worksheet.getRange3(0, 0, AscCommon.gc_nMaxRow0, AscCommon.gc_nMaxCol0));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Cells", {
+		get: function () {
+			return this.GetCells();
+		}
+	});
+
+	/**
+	 * Returns a ApiRange that represents the used range on the specified worksheet.
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetUsedRange = function () {
+		return new ApiRange(this.worksheet.getRange3(0, 0, this.worksheet.getRowsCount(),
+			this.worksheet.getColsCount()));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "UsedRange", {
+		get: function () {
+			return this.GetUsedRange();
+		}
+	});
+
+	/**
+	 * Get sheet name
+	 * @memberof ApiWorksheet
+	 * @returns {string}
+	 */
+	ApiWorksheet.prototype.GetName = function () {
+		return this.worksheet.getName();
 	};
 
 	/**
@@ -233,6 +392,28 @@
 	ApiWorksheet.prototype.SetName = function (name) {
 		this.worksheet.setName(name);
 	};
+	Object.defineProperty(ApiWorksheet.prototype, "Name", {
+		get: function () {
+			return this.GetName();
+		},
+		set: function (value) {
+			this.SetName(value);
+		}
+	});
+
+	/**
+	 * Get sheet index
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetIndex = function () {
+		return this.worksheet.getIndex();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Index", {
+		get: function () {
+			return this.GetIndex();
+		}
+	});
 
 	/**
 	 * Returns an object that represents the range
@@ -473,7 +654,7 @@
 	 * @returns {ApiShape}
 	 * */
 	ApiWorksheet.prototype.AddShape = function(sType, nWidth, nHeight, oFill, oStroke, nFromCol, nColOffset, nFromRow, nRowOffset){
-		var oShape = AscFormat.builder_CreateShape(sType, nWidth/36000, nHeight/36000, oFill.UniFill, oStroke.Ln, null, this.worksheet.workbook.theme, this.worksheet.DrawingDocument, false);
+		var oShape = AscFormat.builder_CreateShape(sType, nWidth/36000, nHeight/36000, oFill.UniFill, oStroke.Ln, null, this.worksheet.workbook.theme, this.worksheet.DrawingDocument, false, this.worksheet);
 		private_SetCoords(oShape, this.worksheet, nWidth, nHeight, nFromCol, nColOffset,  nFromRow, nRowOffset);
 		return new ApiShape(oShape);
 	};
@@ -601,6 +782,11 @@
 	ApiRange.prototype.GetRow = function () {
 		return this.range.bbox.r1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Row", {
+		get: function () {
+			return this.GetRow();
+		}
+	});
 	/**
 	 * Get cell column
 	 * @memberof ApiRange
@@ -609,15 +795,36 @@
 	ApiRange.prototype.GetCol = function () {
 		return this.range.bbox.c1;
 	};
+	Object.defineProperty(ApiRange.prototype, "Col", {
+		get: function () {
+			return this.GetCol();
+		}
+	});
 
+	/**
+	 * Set cell value
+	 * @memberof ApiRange
+	 * @returns {string}
+	 */
+	ApiRange.prototype.GetValue = function () {
+		return this.range.getValue();
+	};
 	/**
 	 * Set cell value
 	 * @memberof ApiRange
 	 * @param {string} value
 	 */
 	ApiRange.prototype.SetValue = function (value) {
-		this.range.setValue(value);
+		this.range.setValue(checkFormat(value).getValue());
 	};
+	Object.defineProperty(ApiRange.prototype, "Value", {
+		get: function () {
+			return this.GetValue();
+		},
+		set: function (value) {
+			this.SetValue(value);
+		}
+	});
 
 	/**
 	 * Set text color in the rgb format.
@@ -627,6 +834,11 @@
 	ApiRange.prototype.SetFontColor = function (color) {
 		this.range.setFontcolor(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontColor", {
+		set: function (color) {
+			return this.SetFontColor(color);
+		}
+	});
 
 	/**
 	 * Set font size
@@ -636,6 +848,11 @@
 	ApiRange.prototype.SetFontSize = function (size) {
 		this.range.setFontsize(size);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontSize", {
+		set: function (size) {
+			return this.SetFontSize(size);
+		}
+	});
 
 	/**
 	 * Set font name
@@ -645,6 +862,11 @@
 	ApiRange.prototype.SetFontName = function (name) {
 		this.range.setFontname(name);
 	};
+	Object.defineProperty(ApiRange.prototype, "FontName", {
+		set: function (name) {
+			return this.SetFontName(name);
+		}
+	});
 
 	/**
 	 * Set align vertical
@@ -671,6 +893,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignVertical", {
+		set: function (value) {
+			return this.SetAlignVertical(value);
+		}
+	});
 
 	/**
 	 * Set align horizontal
@@ -701,6 +928,11 @@
 			}
 		}
 	};
+	Object.defineProperty(ApiRange.prototype, "AlignHorizontal", {
+		set: function (value) {
+			return this.SetAlignHorizontal(value);
+		}
+	});
 
 	/**
 	 * Set bold
@@ -710,6 +942,11 @@
 	ApiRange.prototype.SetBold = function (value) {
 		this.range.setBold(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Bold", {
+		set: function (value) {
+			return this.SetBold(value);
+		}
+	});
 
 	/**
 	 * Set italic
@@ -719,6 +956,11 @@
 	ApiRange.prototype.SetItalic = function (value) {
 		this.range.setItalic(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Italic", {
+		set: function (value) {
+			return this.SetItalic(value);
+		}
+	});
 
 	/**
 	 * Set underline
@@ -747,6 +989,11 @@
 		}
 		this.range.setUnderline(val);
 	};
+	Object.defineProperty(ApiRange.prototype, "Underline", {
+		set: function (value) {
+			return this.SetUnderline(value);
+		}
+	});
 
 	/**
 	 * Set strikeout
@@ -756,6 +1003,11 @@
 	ApiRange.prototype.SetStrikeout = function (value) {
 		this.range.setStrikeout(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Strikeout", {
+		set: function (value) {
+			return this.SetStrikeout(value);
+		}
+	});
 
 	/**
 	 * Set wrap
@@ -765,6 +1017,11 @@
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
 	};
+	Object.defineProperty(ApiRange.prototype, "Wrap", {
+		set: function (value) {
+			return this.SetWrap(value);
+		}
+	});
 
 	/**
 	 * Set fill color in the rgb format.
@@ -774,6 +1031,11 @@
 	ApiRange.prototype.SetFillColor = function (color) {
 		this.range.setFill(color.color);
 	};
+	Object.defineProperty(ApiRange.prototype, "FillColor", {
+		set: function (color) {
+			return this.SetFillColor(color);
+		}
+	});
 
 	/**
 	 * Set the number format.
@@ -783,6 +1045,11 @@
 	ApiRange.prototype.SetNumberFormat = function (value) {
 		this.range.setNumFormat(value);
 	};
+	Object.defineProperty(ApiRange.prototype, "NumberFormat", {
+		set: function (value) {
+			return this.SetNumberFormat(value);
+		}
+	});
 
 	/**
 	 * Set border properties.
@@ -849,6 +1116,18 @@
 		this.range.unmerge();
 	};
 
+	/**
+	 * The ForEach() method executes a provided function once for each cell
+	 * @memberof ApiRange
+	 */
+	ApiRange.prototype.ForEach = function (callback) {
+		if (callback instanceof Function) {
+			var ws = this.range.getWorksheet();
+			this.range._foreach(function (cell) {
+				callback(new ApiRange(ws.getCell3(cell.nRow, cell.nCol)));
+			});
+		}
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -1228,15 +1507,27 @@
 	};
 
 
+	Api.prototype["Format"] = Api.prototype.Format;
+	Api.prototype["GetSheets"] = Api.prototype.GetSheets;
+	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
+	Api.prototype["GetSheet"] = Api.prototype.GetSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
 	Api.prototype["SetThemeColors"] = Api.prototype.SetThemeColors;
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
 
+	ApiWorkbook.prototype["AddSheet"] = ApiWorkbook.prototype.AddSheet;
+
+	ApiWorksheet.prototype["GetVisible"] = ApiWorksheet.prototype.GetVisible;
+	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
+	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
+	ApiWorksheet.prototype["GetUsedRange"] = ApiWorksheet.prototype.GetUsedRange;
+	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
+	ApiWorksheet.prototype["GetIndex"] = ApiWorksheet.prototype.GetIndex;
 	ApiWorksheet.prototype["GetRange"] = ApiWorksheet.prototype.GetRange;
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
@@ -1250,6 +1541,7 @@
 
 	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
 	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
+	ApiRange.prototype["GetValue"] = ApiRange.prototype.GetValue;
 	ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
 	ApiRange.prototype["SetFontColor"] = ApiRange.prototype.SetFontColor;
 	ApiRange.prototype["SetFontSize"] = ApiRange.prototype.SetFontSize;
@@ -1266,6 +1558,7 @@
 	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
 	ApiRange.prototype["Merge"] = ApiRange.prototype.Merge;
 	ApiRange.prototype["UnMerge"] = ApiRange.prototype.UnMerge;
+	ApiRange.prototype["ForEach"] = ApiRange.prototype.ForEach;
 
 
 	ApiDrawing.prototype["GetClassType"]               =  ApiDrawing.prototype.GetClassType;

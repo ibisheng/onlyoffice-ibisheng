@@ -380,6 +380,16 @@ CGraphicFrame.prototype.getHierarchy = CShape.prototype.getHierarchy;
 
 CGraphicFrame.prototype.getAllImages = function (images) {
 };
+CGraphicFrame.prototype.recalculateTable = function () {
+    if(this.graphicObject)
+    {
+        this.graphicObject.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0, false);
+        this.graphicObject.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0, false);
+        this.graphicObject.Parent = this;
+        this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
+        this.graphicObject.Recalculate_Page(0);
+    }
+};
 
 CGraphicFrame.prototype.recalculate = function()
     {
@@ -388,14 +398,7 @@ CGraphicFrame.prototype.recalculate = function()
         AscFormat.ExecuteNoHistory(function(){
             if(this.recalcInfo.recalculateTable)
             {
-                if(this.graphicObject)
-                {
-                    this.graphicObject.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0, false);
-                    this.graphicObject.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0, false);
-                    this.graphicObject.Parent = this;
-                    this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
-                    this.graphicObject.Recalculate_Page(0);
-                }
+                this.recalculateTable();
                 this.recalcInfo.recalculateTable = false;
             }
             if(this.recalcInfo.recalculateSizes)
@@ -565,7 +568,7 @@ CGraphicFrame.prototype.canRotate = function()
 
 CGraphicFrame.prototype.canResize = function()
     {
-        return false;
+        return true;
 };
 
 CGraphicFrame.prototype.canMove = function()
@@ -817,10 +820,13 @@ CGraphicFrame.prototype.draw = function(graphics)
         if(this.graphicObject)
         {
 
+
+            graphics.SaveGrState();
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
             this.drawLocks(this.transform, graphics);
+            graphics.RestoreGrState();
         }
 };
 
@@ -1047,8 +1053,12 @@ CGraphicFrame.prototype.Get_Styles = function(level)
 };
 
 CGraphicFrame.prototype.Get_StartPage_Absolute = function()
+{
+    if(this.parent)
     {
         return this.parent.num;
+    }
+    return 0;
 };
 
 CGraphicFrame.prototype.Get_PageContentStartPos = function(PageNum)
@@ -1070,11 +1080,7 @@ CGraphicFrame.prototype.Get_PageContentStartPos2 = function()
         return this.Get_PageContentStartPos();
 };
 
-CGraphicFrame.prototype.hitToHandles = function()
-    {
-        return -1;
-};
-
+CGraphicFrame.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CGraphicFrame.prototype.hitToAdjustment = function()
     {
         return {hit:false};

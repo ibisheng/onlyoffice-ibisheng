@@ -2652,7 +2652,7 @@ function CDrawingDocument(drawingObjects)
 //
 //            if (!this.TableOutlineDr.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableOutlineDr.TableMatrix))
 //            {
-//                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection())) + 0.5;
+//                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection())) + 0.5;
 //                var _y = parseInt(drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) + 0.5;
 //
 //                var _r = _x + parseInt(dKoefX * this.TableOutlineDr.TableOutline.W);
@@ -2726,7 +2726,7 @@ function CDrawingDocument(drawingObjects)
 //            }
 //            else
 //            {
-//                var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+//                var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
 //                var _y = this.TableOutlineDr.CurPos.Y;
 //                var _r = _x + this.TableOutlineDr.TableOutline.W;
 //                var _b = _y + this.TableOutlineDr.TableOutline.H;

@@ -1610,14 +1610,7 @@
         if (!sText || !sText.length)
             return new ApiRun(oRun);
 
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                oRun.Add_ToContent(nPos, new ParaSpace(), false);
-            else
-                oRun.Add_ToContent(nPos, new ParaText(nChar), false);
-        }
+        oRun.AddText(sText);
 
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
@@ -1872,16 +1865,7 @@
         if (!sText || !sText.length)
             return;
 
-        var nLastPos = this.Run.Content.length;
-
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaSpace(), false);
-            else
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaText(nChar), false);
-        }
+        this.Run.AddText(sText);
     };
     /**
      * Add a page break.

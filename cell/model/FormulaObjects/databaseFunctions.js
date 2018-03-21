@@ -106,7 +106,7 @@
 		return {arr: arr, map: map};
 	}
 
-	function getNeedValuesFromDataBase(dataBase, field, conditionData, bIsGetObjArray){
+	function getNeedValuesFromDataBase(dataBase, field, conditionData, bIsGetObjArray, doNotCheckEmptyField){
 
 		//заполняем map название столбца-> его содержимое(из базы данных)
 		var databaseObj = convertDatabase(dataBase);
@@ -117,10 +117,11 @@
 		var headersConditionArr = databaseObj.arr, headersConditionMap = databaseObj.map;
 
 		//преобразуем аргумент поле
-		if(cElementType.cell === field.type || cElementType.cell3D === field.type){
+		if (cElementType.cell === field.type || cElementType.cell3D === field.type) {
 			field = field.getValue();
 		}
-		if(cElementType.empty === field.type){
+
+		if (!doNotCheckEmptyField && cElementType.empty === field.type) {
 			return new cError(cErrorType.wrong_value_type);
 		}
 
@@ -221,6 +222,7 @@
 	cDAVERAGE.prototype.name = "DAVERAGE";
 	cDAVERAGE.prototype.argumentsMin = 3;
 	cDAVERAGE.prototype.argumentsMax = 3;
+	cDAVERAGE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAVERAGE.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -267,6 +269,7 @@
 	cDCOUNT.prototype.name = "DCOUNT";
 	cDCOUNT.prototype.argumentsMin = 3;
 	cDCOUNT.prototype.argumentsMax = 3;
+	cDCOUNT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDCOUNT.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -277,16 +280,22 @@
 			return argError;
 		}
 
-		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], null, true);
 		if(cElementType.error === resArr.type){
 			return resArr;
 		}
 
+		var isEmptyField = cElementType.empty === argClone[1].type;
 		var count = 0;
 		for(var i = 0; i < resArr.length; i++){
-			var val = parseFloat(resArr[i]);
-			if(!isNaN(val)){
+			//если Поле пустое, то ms игнорирует числовой формат полученных данных
+			if(isEmptyField) {
 				count++;
+			} else {
+				var val = parseFloat(resArr[i]);
+				if(!isNaN(val)){
+					count++;
+				}
 			}
 		}
 
@@ -306,6 +315,7 @@
 	cDCOUNTA.prototype.name = "DCOUNTA";
 	cDCOUNTA.prototype.argumentsMin = 3;
 	cDCOUNTA.prototype.argumentsMax = 3;
+	cDCOUNTA.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDCOUNTA.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -316,7 +326,7 @@
 			return argError;
 		}
 
-		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true, true);
 		if(cElementType.error === resArr.type){
 			return resArr;
 		}
@@ -343,6 +353,7 @@
 	cDGET.prototype.name = "DGET";
 	cDGET.prototype.argumentsMin = 3;
 	cDGET.prototype.argumentsMax = 3;
+	cDGET.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDGET.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -377,6 +388,7 @@
 	cDMAX.prototype.name = "DMAX";
 	cDMAX.prototype.argumentsMin = 3;
 	cDMAX.prototype.argumentsMax = 3;
+	cDMAX.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDMAX.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -412,6 +424,7 @@
 	cDMIN.prototype.name = "DMIN";
 	cDMIN.prototype.argumentsMin = 3;
 	cDMIN.prototype.argumentsMax = 3;
+	cDMIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDMIN.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -448,6 +461,7 @@
 	cDPRODUCT.prototype.name = "DPRODUCT";
 	cDPRODUCT.prototype.argumentsMin = 3;
 	cDPRODUCT.prototype.argumentsMax = 3;
+	cDPRODUCT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDPRODUCT.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -491,6 +505,7 @@
 	cDSTDEV.prototype.name = "DSTDEV";
 	cDSTDEV.prototype.argumentsMin = 3;
 	cDSTDEV.prototype.argumentsMax = 3;
+	cDSTDEV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSTDEV.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -542,6 +557,7 @@
 	cDSTDEVP.prototype.name = "DSTDEVP";
 	cDSTDEVP.prototype.argumentsMin = 3;
 	cDSTDEVP.prototype.argumentsMax = 3;
+	cDSTDEVP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSTDEVP.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -594,6 +610,7 @@
 	cDSUM.prototype.name = "DSUM";
 	cDSUM.prototype.argumentsMin = 3;
 	cDSUM.prototype.argumentsMax = 3;
+	cDSUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDSUM.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -633,6 +650,7 @@
 	cDVAR.prototype.name = "DVAR";
 	cDVAR.prototype.argumentsMin = 3;
 	cDVAR.prototype.argumentsMax = 3;
+	cDVAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDVAR.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
@@ -691,6 +709,7 @@
 	cDVARP.prototype.name = "DVARP";
 	cDVARP.prototype.argumentsMin = 3;
 	cDVARP.prototype.argumentsMax = 3;
+	cDVARP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDVARP.prototype.Calculate = function (arg) {
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);

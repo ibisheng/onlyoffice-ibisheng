@@ -708,11 +708,15 @@ CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 {
 	return false;
 };
+CDocumentContentBase.prototype.IsBlockLevelSdtFirstOnNewPage = function()
+{
+	return false;
+};
 CDocumentContentBase.prototype.private_AddContentControl = function(nContentControlType)
 {
 	var oElement = this.Content[this.CurPos.ContentPos];
 
-	if (AscCommonWord.sdttype_BlockLevel === nContentControlType)
+	if (c_oAscSdtLevelType.Block === nContentControlType)
 	{
 		if (true === this.IsSelectionUse())
 		{
@@ -745,10 +749,10 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					this.Remove_FromContent(nIndex, 1);
 				}
 
-				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1, 1);
+				oSdt.Content.Remove_FromContent(oSdt.Content.GetElementsCount() - 1, 1);
 				oSdt.Content.Selection.Use      = true;
 				oSdt.Content.Selection.StartPos = 0;
-				oSdt.Content.Selection.EndPos   = oSdt.Content.Get_ElementsCount() - 1;
+				oSdt.Content.Selection.EndPos   = oSdt.Content.GetElementsCount() - 1;
 
 				this.Add_ToContent(nStartPos, oSdt);
 				this.Selection.StartPos = nStartPos;
@@ -939,6 +943,18 @@ CDocumentContentBase.prototype.GetElementsCount = function()
 	return this.Content.length;
 };
 /**
+ * Получаем элемент по заданной позици
+ * @param nIndex
+ * @returns {?CDocumentContentElementBase}
+ */
+CDocumentContentBase.prototype.GetElement = function(nIndex)
+{
+	if (this.Content[nIndex])
+		return this.Content[nIndex];
+
+	return null;
+};
+/**
  * Добавляем новый элемент (с записью в историю)
  * @param nPos
  * @param oItem
@@ -958,4 +974,58 @@ CDocumentContentBase.prototype.RemoveFromContent = function(nPos, nCount)
 		nCount = 1;
 
 	this.Remove_FromContent(nPos, nCount);
+};
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isUnique ищем с параметром Unique = true
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetTableOfContents(isUnique, isCheckFields);
+		if (oResult)
+			return oResult;
+	}
+
+	return null;
+};
+/**
+ * Добавляем заданный текст в текущей позиции
+ * @param {String} sText
+ */
+CDocumentContentBase.prototype.AddText = function(sText)
+{
+	for (var oIterator = sText.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			this.AddToParagraph(new ParaTab(), false);
+		if (10 === nCharCode) // \n
+			this.AddToParagraph(new ParaNewLine(break_Line), false);
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			this.AddToParagraph(new ParaSpace(), false);
+		else
+			this.AddToParagraph(new ParaText(nCharCode), false);
+	}
+};
+/**
+ * Проверяем находимся ли мы заголовке хоть какой-либо таблицы
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsTableHeader = function()
+{
+	return false;
+};
+/**
+ * Получаем родительский класс
+ */
+CDocumentContentBase.prototype.GetParent = function()
+{
+	return null;
 };

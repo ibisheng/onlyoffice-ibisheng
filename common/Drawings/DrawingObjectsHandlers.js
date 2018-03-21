@@ -190,6 +190,15 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     var hit_in_inner_area = drawing.hitInInnerArea(x, y);
     var hit_in_path = drawing.hitInPath(x, y);
     var hit_in_text_rect = drawing.hitInTextRect(x, y);
+    if(hit_in_inner_area || hit_in_path)
+    {
+        if(drawingObjectsController.checkDrawingHyperlink){
+            var ret =  drawingObjectsController.checkDrawingHyperlink(drawing, e, hit_in_text_rect, x, y, pageIndex);
+            if(ret){
+                return ret;
+            }
+        }
+    }
     if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, group, false, pageIndex, bWord);
@@ -220,6 +229,15 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     var hit_in_path = shape.hitInPath && shape.hitInPath(x, y);
     var hit_in_text_rect = shape.hitInTextRect && shape.hitInTextRect(x, y);
     var ret;
+    if(hit_in_inner_area || hit_in_path)
+    {
+        if(drawingObjectsController.checkDrawingHyperlink){
+            var ret =  drawingObjectsController.checkDrawingHyperlink(shape, e, hit_in_text_rect, x, y, pageIndex);
+            if(ret){
+                return ret;
+            }
+        }
+    }
     if(!hit_in_text_rect && (hit_in_inner_area || hit_in_path))
     {
         return drawingObjectsController.handleMoveHit(drawing, e, x, y, null, false, pageIndex, true);
@@ -755,6 +773,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
     state.drawingObjects.changeCurrentState(new AscFormat.NullState(state.drawingObjects));
+    var bHandle = false;
     if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== AscCommon.g_mouse_button_right)
     {
         switch (state.majorObject.getObjectType())
@@ -769,12 +788,23 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
                 state.drawingObjects.OnMouseUp(e, x, y, pageIndex);
                 state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps &&  state.drawingObjects.drawingObjects.sendGraphicObjectProps();
                 state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
+                bHandle = true;
                 break;
             }
             case AscDFH.historyitem_type_ChartSpace:
             {
                 break;
             }
+        }
+    }
+    if(!bHandle)
+    {
+        if(e.CtrlKey && state.majorObjectIsSelected)
+        {
+            drawingObjects.deselectObject(state.majorObject);
+            state.drawingObjects.drawingObjects && state.drawingObjects.drawingObjects.sendGraphicObjectProps &&  state.drawingObjects.drawingObjects.sendGraphicObjectProps();
+            state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
+            drawingObjects.updateOverlay();
         }
     }
 }

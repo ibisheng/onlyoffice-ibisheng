@@ -156,14 +156,24 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
             }
             else if(Class instanceof AscCommon.CComment){
                 if(Class.Parent && Class.Parent.slide){
-                    check_obj =
+                    if(Class.Parent.slide === editor.WordControl.m_oLogicDocument){
+                        check_obj =
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Slide,
+                            "val": editor.WordControl.m_oLogicDocument.commentsLock.Get_Id(),
+                            "guid": editor.WordControl.m_oLogicDocument.commentsLock.Get_Id()
+                        };
+                    }
+                    else {
+                        check_obj =
                         {
                             "type": c_oAscLockTypeElemPresentation.Object,
                             "slideId": Class.Parent.slide.deleteLock.Get_Id(),
                             "objId": Class.Get_Id(),
                             "guid": Class.Get_Id()
                         };
-                    map[Class.Parent.slide.num] = true;
+                        map[Class.Parent.slide.num] = true;
+                    }
                 }
             }
             if(check_obj)
@@ -287,7 +297,8 @@ CCollaborativeEditing.prototype.Release_Locks = function()
             if(Class instanceof AscCommon.CComment)
             {
                 editor.sync_UnLockComment(Class.Get_Id());
-                if(Class.Parent && Class.Parent.slide){
+                if(Class.Parent && Class.Parent.slide && editor.WordControl.m_oLogicDocument !== Class.Parent.slide)
+                {
                     map_redraw[Class.Parent.slide.num] = true;
                 }
             }

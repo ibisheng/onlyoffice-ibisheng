@@ -191,6 +191,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 {
     AscFormat.ExecuteNoHistory(function()
     {
+        this.bLastCenter = false;
         this.bIsTracked = false;
         this.originalObject = originalObject;
         this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
@@ -516,6 +517,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
         this.resize = function(kd1, kd2, ShiftKey)
         {
+            this.bLastCenter = false;
             var _cos = this.cos;
             var _sin = this.sin;
 
@@ -526,6 +528,15 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             var _new_used_half_width;
             var _new_used_half_height;
             var _temp;
+
+           if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+               if(kd1 < 0){
+                   kd1 = 0;
+               }
+               if(kd2 < 0){
+                   kd2 = 0;
+               }
+           }
 
             if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
@@ -849,8 +860,18 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 this.resize(kd1, kd2, ShiftKey);
                 return;
             }
+            this.bLastCenter = true;
             kd1 = 2*kd1 - 1;
             kd2 = 2*kd2 - 1;
+
+            if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+                if(kd1 < 0){
+                    kd1 = 0;
+                }
+                if(kd2 < 0){
+                    kd2 = 0;
+                }
+            }
             var _real_height, _real_width;
             var _abs_height, _abs_width;
 
@@ -1047,11 +1068,37 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 }
                 AscFormat.CheckSpPrXfrm(this.originalObject);
                 var xfrm = this.originalObject.spPr.xfrm;
-                xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
-                xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
-                xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
-                xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
-                if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace)
+
+                if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_GraphicFrame)
+                {
+                    xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
+                    xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
+                    xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
+                    xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
+                }
+                else
+                {
+                    var oldX = xfrm.offX;
+                    var oldY = xfrm.offY;
+                    var newX = this.resizedPosX/scale_coefficients.cx + ch_off_x;
+                    var newY = this.resizedPosY/scale_coefficients.cy + ch_off_y;
+                    this.originalObject.graphicObject.Resize(this.resizedExtX, this.resizedExtY);
+                    this.originalObject.recalculateTable();
+                    this.originalObject.recalculateSizes();
+                    if(!this.bLastCenter){
+                        if(!AscFormat.fApproxEqual(oldX, newX, 0.5)){
+                            xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x - this.originalObject.extX + this.resizedExtX);
+                        }
+                        if(!AscFormat.fApproxEqual(oldY, newY, 0.5)){
+                            xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y - this.originalObject.extY + this.resizedExtY);
+                        }
+                    }
+                    else{
+                        xfrm.setOffX(this.resizedPosX + this.resizedExtX/2.0  - this.originalObject.extX/2);
+                        xfrm.setOffY(this.resizedPosY + this.resizedExtY/2.0  - this.originalObject.extY/2);
+                    }
+                }
+                if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace && this.originalObject.getObjectType() !== AscDFH.historyitem_type_GraphicFrame)
                 {
                     xfrm.setFlipH(this.resizedflipH);
                     xfrm.setFlipV(this.resizedflipV);
@@ -1534,9 +1581,40 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
 
 
-            var xfrm = this.original.spPr.xfrm;
-            var kw = this.resizedExtX/xfrm.extX;
-            var kh = this.resizedExtY/xfrm.extY;
+            var originalExtX, originalExtY;
+            if(AscFormat.isRealNumber(this.original.extX) && AscFormat.isRealNumber(this.original.extY)){
+                originalExtX = this.original.extX;
+                originalExtY = this.original.extY;
+                if(AscFormat.fApproxEqual(0.0, originalExtX)){
+                    originalExtX = 1;
+                }
+                if(AscFormat.fApproxEqual(0.0, originalExtY)){
+                    originalExtY = 1;
+                }
+            }
+            else {
+                var xfrm = this.original.spPr.xfrm;
+                if(xfrm){
+                    originalExtX = xfrm.extX;
+                    originalExtY = xfrm.extY;
+                }
+
+                if(!AscFormat.isRealNumber(originalExtX)){
+                    originalExtX = 1;
+                }
+                if(!AscFormat.isRealNumber(originalExtY)){
+                    originalExtY = 1;
+                }
+            }
+
+            if(AscFormat.fApproxEqual(0.0, originalExtX)){
+                originalExtX = 1;
+            }
+            if(AscFormat.fApproxEqual(0.0, originalExtY)){
+                originalExtY = 1;
+            }
+            var kw = this.resizedExtX/originalExtX;
+            var kh = this.resizedExtY/originalExtY;
             for(var i = 0; i < this.childs.length; ++i)
             {
                 var cur_child = this.childs[i];

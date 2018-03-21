@@ -126,12 +126,16 @@ function (window, undefined) {
 			refType = refType.cross(arguments[1]);
 		} else if (cElementType.array === refType.type) {
 			refType = refType.getElementRowCol(0, 0);
+		} else if(cElementType.empty === refType.type) {
+			refType = new cNumber(1);
 		}
 
 		if (cElementType.cellsRange === A1RefType.type || cElementType.cellsRange3D === A1RefType.type) {
 			A1RefType = A1RefType.cross(arguments[1]);
 		} else if (cElementType.array === A1RefType.type) {
 			A1RefType = A1RefType.getElementRowCol(0, 0);
+		}  else if(cElementType.empty === A1RefType.type) {
+			A1RefType = new cNumber(1);
 		}
 
 		if(sheetName){
@@ -141,6 +145,8 @@ function (window, undefined) {
 				sheetName = sheetName.getElementRowCol(0, 0);
 			} else if (cElementType.cell === sheetName.type || cElementType.cell3D === sheetName.type) {
 				sheetName = sheetName.getValue();
+			} else if (cElementType.empty === sheetName.type) {
+				sheetName = null;
 			}
 		}
 

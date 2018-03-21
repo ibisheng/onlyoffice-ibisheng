@@ -43,7 +43,7 @@ Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData) {
   var CommentData = new CCommentData();
   CommentData.Read_FromAscCommentData(AscCommentData);
 
-  var Comment = this.WordControl.m_oLogicDocument.AddComment(CommentData);
+  var Comment = this.WordControl.m_oLogicDocument.AddComment(CommentData, AscCommentData.asc_getDocumentFlag());
   if (Comment) {
     return Comment.Get_Id();
   }

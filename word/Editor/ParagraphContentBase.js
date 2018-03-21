@@ -198,6 +198,23 @@ CParagraphContentBase.prototype.RemoveTabsForTOC = function(isTab)
 {
 	return isTab;
 };
+/**
+ * Ищем сложное поле заданного типа
+ * @param nType
+ * @returns {?CComplexField}
+ */
+CParagraphContentBase.prototype.GetComplexField = function(nType)
+{
+	return null;
+};
+/**
+ * Ищем все сложные поля заданного типа
+ * @param nType
+ * @param arrComplexFields
+ */
+CParagraphContentBase.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
 //----------------------------------------------------------------------------------------------------------------------
@@ -287,6 +304,10 @@ CParagraphContentBase.prototype.Is_CursorPlaceable = function()
 {
 	return false;
 };
+CParagraphContentBase.prototype.IsCursorPlaceable = function()
+{
+	return this.Is_CursorPlaceable();
+};
 CParagraphContentBase.prototype.Cursor_Is_Start = function()
 {
 	return true;
@@ -373,6 +394,71 @@ CParagraphContentBase.prototype.Get_StartPos = function(ContentPos, Depth)
 };
 CParagraphContentBase.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 {
+};
+CParagraphContentBase.prototype.MoveCursorOutsideElement = function(isBefore)
+{
+	var oParent = this.GetParent();
+	if (!oParent)
+		return;
+
+	var nPosInParent = this.GetPosInParent(oParent);
+
+	if (isBefore)
+	{
+		if (nPosInParent <= 0)
+		{
+			if (this.SetThisElementCurrent)
+				this.SetThisElementCurrent();
+
+			this.MoveCursorToStartPos();
+		}
+		else
+		{
+			var oElement = oParent.GetElement(nPosInParent - 1);
+			if (oElement.IsCursorPlaceable())
+			{
+				if (oElement.SetThisElementCurrent)
+					oElement.SetThisElementCurrent();
+
+				oElement.MoveCursorToEndPos();
+			}
+			else
+			{
+				if (this.SetThisElementCurrent)
+					this.SetThisElementCurrent();
+
+				this.MoveCursorToStartPos();
+			}
+		}
+	}
+	else
+	{
+		if (nPosInParent >= oParent.GetElementsCount() - 1)
+		{
+			if (this.SetThisElementCurrent)
+				this.SetThisElementCurrent();
+
+			this.MoveCursorToEndPos();
+		}
+		else
+		{
+			var oElement = oParent.GetElement(nPosInParent + 1);
+			if (oElement.IsCursorPlaceable())
+			{
+				if (oElement.SetThisElementCurrent)
+					oElement.SetThisElementCurrent();
+
+				oElement.MoveCursorToStartPos();
+			}
+			else
+			{
+				if (this.SetThisElementCurrent)
+					this.SetThisElementCurrent();
+
+				this.MoveCursorToEndPos();
+			}
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с селектом
@@ -609,6 +695,11 @@ CParagraphContentWithContentBase.prototype.CanSplit = function()
 };
 CParagraphContentWithContentBase.prototype.PreDelete = function()
 {
+};
+CParagraphContentWithContentBase.prototype.private_UpdateDocumentOutline = function()
+{
+	if (this.Paragraph)
+		this.Paragraph.UpdateDocumentOutline();
 };
 /**
  * Это базовый класс для элементов параграфа, которые сами по себе могут содержать элементы параграфа.
@@ -911,6 +1002,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 {
     this.Content.splice(Pos, 0, Item);
     this.private_UpdateTrackRevisions();
+	this.private_UpdateDocumentOutline();
     this.private_CheckUpdateBookmarks([Item]);
 
     if (false !== UpdatePosition)
@@ -990,6 +1082,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
 	var DeletedItems = this.Content.slice(Pos, Pos + Count);
 	this.Content.splice(Pos, Count);
     this.private_UpdateTrackRevisions();
+	this.private_UpdateDocumentOutline();
 	this.private_CheckUpdateBookmarks(DeletedItems);
 
     if (false !== UpdatePosition)
@@ -1645,6 +1738,23 @@ CParagraphContentWithParagraphLikeContent.prototype.AddToContent = function(nPos
 CParagraphContentWithParagraphLikeContent.prototype.RemoveFromContent = function(nPos, nCount, isUpdatePositions)
 {
 	return this.Remove_FromContent(nPos, nCount, isUpdatePositions);
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetComplexField = function(nType)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetComplexField(nType);
+		if (oResult)
+			return oResult;
+	}
+	return null;
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetComplexFieldsArray(nType, arrComplexFields);
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции пересчета
@@ -3218,7 +3328,7 @@ CParagraphContentWithParagraphLikeContent.prototype.SetThisElementCurrent = func
 	var StartPos = ContentPos.Copy();
 	this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
 
-	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1, false);
 	this.Paragraph.Document_SetThisElementCurrent(false);
 };
 CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls = function(arrContentControls)
@@ -3248,17 +3358,7 @@ CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls =
 CParagraphContentWithParagraphLikeContent.prototype.CreateRunWithText = function(sValue)
 {
 	var oRun = new ParaRun();
-	for (var nIndex = 0, nCount = sValue.length; nIndex < nCount; ++nIndex)
-	{
-		var nChar = sValue.charCodeAt(nIndex), oText;
-
-		if (0x20 === nChar)
-			oText = new ParaSpace();
-		else
-			oText = new ParaText(sValue[nIndex]);
-
-		oRun.Add_ToContent(nIndex, oText);
-	}
+	oRun.AddText(sValue);
 	oRun.Set_Pr(this.Get_FirstTextPr());
 	return oRun;
 };

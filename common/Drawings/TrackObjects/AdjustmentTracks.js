@@ -441,6 +441,10 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
         if(this.angleFlag)
         {
+            if(this.geometry.preset === "mathNotEqual"){
+                _pos_y_relative_center = -_pos_y_relative_center;
+                _pos_x_relative_center = -_pos_x_relative_center;
+            }
             var _angle = Math.atan2(_pos_y_relative_center, _pos_x_relative_center);
             while(_angle < 0)
                 _angle += 2*Math.PI;

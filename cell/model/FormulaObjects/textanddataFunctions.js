@@ -1857,7 +1857,7 @@ function (window, undefined) {
 		return new cString(arg0.getValue().replace(AscCommon.rx_space_g, function ($0, $1, $2) {
 			var res = " " === $2[$1 + 1] ? "" : $2[$1];
 			return res;
-		}).replace(/^\s|\s$/g, ""))
+		}).replace(/^ | $/g, ""))
 	};
 
 	/**
@@ -2001,4 +2001,8 @@ function (window, undefined) {
 		}
 
 	};
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cTEXT = cTEXT;
 })(window);

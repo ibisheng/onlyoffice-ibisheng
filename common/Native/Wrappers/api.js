@@ -5361,11 +5361,7 @@ drawStyle: function(graphics, style, _api)
 
         var par = new AscCommonWord.Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
         var run = new AscCommonWord.ParaRun(par, false);
-
-        for (var i = 0; i < style.Name.length; i++)
-        {
-            run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
-        }
+        run.AddText(style.Name);
 
         _dc.Internal_Content_Add(0, par, false);
         par.Add_ToContent(0, run);

@@ -1296,6 +1296,15 @@ PreMoveInGroupState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.CtrlKey && this.majorObjectIsSelected)
+        {
+            this.group.deselectObject(this.majorObject);
+            if(this.group.selectedObjects.length === 0){
+                this.drawingObjects.resetInternalSelection();
+            }
+            this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.sendGraphicObjectProps && this.drawingObjects.drawingObjects.sendGraphicObjectProps();
+            this.drawingObjects.updateOverlay();
+        }
         this.drawingObjects.clearPreTrackObjects();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }

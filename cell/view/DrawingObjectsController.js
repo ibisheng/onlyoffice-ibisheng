@@ -53,7 +53,8 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
 AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	this.m_pData.Pos = this.m_aPositions[0];
-
+    this.m_pData.UseArray = true;
+    this.m_pData.PosArray = this.m_aPositions;
 	if(editor && editor.isPresentationEditor)
 	{
 		var Binary_Writer = History.BinaryWriter;
@@ -99,10 +100,20 @@ DrawingObjectsController.prototype.setTableProps = function(props)
     {
         var sCaption = props.TableCaption;
         var sDescription = props.TableDescription;
+        var dRowHeight = props.RowHeight;
         by_type.tables[0].setTitle(sCaption);
         by_type.tables[0].setDescription(sDescription);
         props.TableCaption = undefined;
         props.TableDescription = undefined;
+        var bIgnoreHeight = false;
+        if(AscFormat.isRealNumber(props.RowHeight))
+        {
+            if(AscFormat.fApproxEqual(props.RowHeight, 0.0))
+            {
+                props.RowHeight = 1.0;
+            }
+            bIgnoreHeight = false;
+        }
         var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object === by_type.tables[0])
         {
@@ -116,7 +127,8 @@ DrawingObjectsController.prototype.setTableProps = function(props)
         }
         props.TableCaption = sCaption;
         props.TableDescription = sDescription;
-        editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0]);
+        props.RowHeight = dRowHeight;
+        editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0], bIgnoreHeight);
     }
 };
 
@@ -259,6 +271,12 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
     var ret = this.curState.onMouseDown(e, x, y, 0);
     if(e.ClickCount < 2)
     {
+        if(this.drawingObjects && this.drawingObjects.getWorksheet){
+            var ws = this.drawingObjects.getWorksheet();
+            if(Asc.editor.wb.getWorksheet() !== ws){
+                return ret;
+            }
+        }
         this.updateOverlay();
         this.updateSelectionState();
     }
@@ -620,22 +638,15 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     var bRetValue = false;
     if ( Code > 0x20 )
     {
-        if( window["Asc"]["editor"].collaborativeEditing.getFast()){
-            this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
-                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-                this.checkMobileCursorPosition();
-            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
-        }
-        else{
-            this.checkSelectedObjectsAndCallback(function(){
-                this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-                this.checkMobileCursorPosition();
-            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
-        }
+        var oApi = window["Asc"] && window["Asc"]["editor"];
+        var fCallback = function(){
+            this.paragraphAdd( new ParaText(Code), false );
+            this.checkMobileCursorPosition();
+        };
+        this.checkSelectedObjectsAndCallback(fCallback, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd, undefined, window["Asc"]["editor"].collaborativeEditing.getFast());
+
         bRetValue = true;
     }
-    //if ( true == bRetValue )
-    //    this.updateSelectionState();
     return bRetValue;
 };
 //------------------------------------------------------------export---------------------------------------------------

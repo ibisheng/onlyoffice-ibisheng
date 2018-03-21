@@ -226,16 +226,16 @@ CGroupShape.prototype.recalculate = function()
             this.recalculatePen();
             this.recalcInfo.recalculatePen = false;
         }
+        if(this.recalcInfo.recalculateArrGraphicObjects)
+        {
+            this.recalculateArrGraphicObjects();
+            this.recalcInfo.recalculateArrGraphicObjects = false;
+        }
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
             this.recalculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
-        }
-        if(this.recalcInfo.recalculateArrGraphicObjects)
-        {
-            this.recalculateArrGraphicObjects();
-            this.recalcInfo.recalculateArrGraphicObjects = false;
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {

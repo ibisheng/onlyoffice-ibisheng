@@ -241,11 +241,24 @@ CDrawingDocument.prototype.StartTrackTable = function()
 
 CDrawingDocument.prototype.OnRecalculatePage = function(index, pageObject)
 {
-    var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
-    pageObject.draw(oBoundsChecker);
-    var dWidth = oBoundsChecker.Bounds.max_x - oBoundsChecker.Bounds.min_x;
-    var dHeight = oBoundsChecker.Bounds.max_y - oBoundsChecker.Bounds.min_y;
-    this.Native["DD_OnRecalculatePage"](index, dWidth, dHeight);
+    var l, t, r, b;
+    if(index === this.m_oLogicDocument.CurPage)
+    {
+        var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
+        pageObject.draw(oBoundsChecker);
+        r = oBoundsChecker.Bounds.max_x;
+        l = oBoundsChecker.Bounds.min_x;
+        b = oBoundsChecker.Bounds.max_y;
+        t = oBoundsChecker.Bounds.min_y;
+    }
+    else
+    {
+        r = this.m_oLogicDocument.Width;
+        l = 0.0;
+        b = this.m_oLogicDocument.Height;
+        t = 0.0;
+    }
+    this.Native["DD_OnRecalculatePage"](index, l, t, r, b);
 };
 
 CDrawingDocument.prototype.OnEndRecalculate = function()
@@ -417,12 +430,39 @@ CDrawingDocument.prototype.IsCursorInTableCur = function(x, y, page)
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
 {
-    return this.Native["DD_ConvertCoordsToCursorWR"]();
+    var m11, m22, m12, m21, tx, ty, _page_index;
+    if(transform)
+    {
+        m11 = transform.sx;
+        m22 = transform.sy;
+        m12 = transform.shx;
+        m21 = transform.shy;
+        tx = transform.tx;
+        ty = transform.ty;
+    }
+    else
+    {
+        m11 = 1.0;
+        m22 = 1.0;
+        m12 = 0.0;
+        m21 = 0.0;
+        tx = 0.0;
+        ty = 0.0;
+    }
+    if(AscFormat.isRealNumber(pageIndex))
+    {
+        _page_index = pageIndex;
+    }
+    else
+    {
+        _page_index = 0;
+    }
+    return this.Native["DD_ConvertCoordsToCursor"](x, y, _page_index, m11, m21, m12, m22, tx, ty);
 };
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR_2 = function(x, y)
 {
-    return this.Native["DD_ConvertCoordsToCursorWR_2"]();
+    return this.Native["DD_ConvertCoordsToCursor"]();
 };
 
 CDrawingDocument.prototype.ConvertCoordsToCursorWR_Comment = function(x, y)
@@ -432,7 +472,7 @@ CDrawingDocument.prototype.ConvertCoordsToCursorWR_Comment = function(x, y)
 
 CDrawingDocument.prototype.ConvertCoordsToCursor = function(x, y)
 {
-    return this.Native["DD_ConvertCoordsToCursor"]();
+    return this.Native["DD_ConvertCoordsToCursor"](x, y, 0);
 };
 
 CDrawingDocument.prototype.TargetStart = function()
@@ -481,7 +521,15 @@ CDrawingDocument.prototype.SetCurrentPage = function(PageIndex)
 
 CDrawingDocument.prototype.SelectEnabled = function(bIsEnabled)
 {
-    return this.Native["DD_SelectEnabled"](bIsEnabled);
+    this.m_bIsSelection = bIsEnabled;
+    if (false === this.m_bIsSelection)
+    {
+        this.SelectClear();
+//            //this.m_oWordControl.CheckUnShowOverlay();
+//            //this.drawingObjects.OnUpdateOverlay();
+//            this.drawingObjects.getOverlay().m_oContext.globalAlpha = 1.0;
+    }
+    //return this.Native["DD_SelectEnabled"](bIsEnabled);
 };
 CDrawingDocument.prototype.SelectClear = function()
 {
@@ -704,6 +752,125 @@ CDrawingDocument.prototype.DrawHorAnchor = function(pageIndex, x)
 };
 CDrawingDocument.prototype.DrawVerAnchor = function(pageIndex, y)
 {
+};
+
+CDrawingDocument.prototype.OnCheckMouseDown = function(e)
+{
+    // 0 - none
+    // 1 - select markers
+    // 2 - drawing track
+    check_MouseDownEvent(e, false);
+    var pos = {X: global_mouseEvent.X, Y: global_mouseEvent.Y, Page: this.LogicDocument.CurPage};
+    if (pos.Page == -1)
+        return 0;
+
+    this.SelectRect1 = null;
+    this.SelectRect2 = null;
+    var _select = this.LogicDocument.GetSelectionBounds();
+    if (_select)
+    {
+        var _rect1 = _select.Start;
+        var _rect2 = _select.End;
+
+        this.SelectRect1 = _rect1;
+        this.SelectRect2 = _rect2;
+    }
+    this.SelectDrag = -1;
+    if (this.SelectRect1 && this.SelectRect2)
+    {
+        // проверям попадание в селект
+        var radiusMM = 5;
+        if (this.IsRetina)
+            radiusMM *= 2;
+        radiusMM /= this.Native["DD_GetDotsPerMM"]();
+
+        var _circlePos1_x = 0;
+        var _circlePos1_y = 0;
+        var _circlePos2_x = 0;
+        var _circlePos2_y = 0;
+
+        var matrixCheck = this.LogicDocument.GetTextTransformMatrix();
+        if (!matrixCheck)
+        {
+            _circlePos1_x = this.SelectRect1.X;
+            _circlePos1_y = this.SelectRect1.Y - radiusMM;
+
+            _circlePos2_x = this.SelectRect2.X + this.SelectRect2.W;
+            _circlePos2_y = this.SelectRect2.Y + this.SelectRect2.H + radiusMM;
+        }
+        else
+        {
+            var _circlePos1_x_mem = this.SelectRect1.X;
+            var _circlePos1_y_mem = this.SelectRect1.Y - radiusMM;
+
+            var _circlePos2_x_mem = this.SelectRect2.X + this.SelectRect2.W;
+            var _circlePos2_y_mem = this.SelectRect2.Y + this.SelectRect2.H + radiusMM;
+
+            _circlePos1_x = matrixCheck.TransformPointX(_circlePos1_x_mem, _circlePos1_y_mem);
+            _circlePos1_y = matrixCheck.TransformPointY(_circlePos1_x_mem, _circlePos1_y_mem);
+            _circlePos2_x = matrixCheck.TransformPointX(_circlePos2_x_mem, _circlePos2_y_mem);
+            _circlePos2_y = matrixCheck.TransformPointY(_circlePos2_x_mem, _circlePos2_y_mem);
+        }
+
+        var _selectCircleEpsMM = 10; // 1cm;
+        var _selectCircleEpsMM_square = _selectCircleEpsMM * _selectCircleEpsMM;
+
+        var _distance1 = ((pos.X - _circlePos1_x) * (pos.X - _circlePos1_x) + (pos.Y - _circlePos1_y) * (pos.Y - _circlePos1_y));
+        var _distance2 = ((pos.X - _circlePos2_x) * (pos.X - _circlePos2_x) + (pos.Y - _circlePos2_y) * (pos.Y - _circlePos2_y));
+
+        var candidate = 1;
+        if (_distance2 < _distance1)
+            candidate = 2;
+
+        if (1 == candidate && _distance1 < _selectCircleEpsMM_square)
+        {
+            this.SelectDrag = 1;
+        }
+
+        if (2 == candidate && _distance2 < _selectCircleEpsMM_square)
+        {
+            this.SelectDrag = 2;
+        }
+
+        if (this.SelectDrag != -1)
+            return 1;
+    }
+
+    // проверям н]а попадание в графические объекты (грубо говоря - треки)
+    if (!this.IsViewMode)
+    {
+        global_mouseEvent.KoefPixToMM = 5;
+
+        if (this.Native["GetDeviceDPI"])
+        {
+            // 1см
+            global_mouseEvent.AscHitToHandlesEpsilon = 5 * this.Native["GetDeviceDPI"]() / (25.4 * this.Native["DD_GetDotsPerMM"]() );
+        }
+
+        var oController = this.LogicDocument.GetCurrentController();
+        var _isDrawings = false;
+        if(oController){
+            _isDrawings = oController.isPointInDrawingObjects3(pos.X, pos.Y, pos.Page, true);
+        }
+        global_mouseEvent.KoefPixToMM = 1;
+        if (_isDrawings)
+            return 2;
+    }
+    return 0;
+};
+
+CDrawingDocument.prototype.CheckMouseDown2 = function (e) {
+    check_MouseDownEvent(e, false);
+    var pos = {X: global_mouseEvent.X, Y: global_mouseEvent.Y, Page: this.LogicDocument.CurPage};
+    if (pos.Page == -1)
+        return 0;
+
+    var oController = this.LogicDocument.GetCurrentController();
+    var _isDrawings = 0;
+    if(oController){
+        _isDrawings = oController.isPointInDrawingObjects4(pos.X, pos.Y, pos.Page, true);
+    }
+    return _isDrawings;
 };
 
 function DrawBackground(graphics, unifill, w, h)

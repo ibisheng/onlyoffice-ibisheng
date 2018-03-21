@@ -206,6 +206,35 @@ var c_oAscNumberingFormat = {
 	DecimalZero : 0x2007  // numbering_numfmt_DecimalZero
 };
 
+var c_oAscSdtLockType = {
+	ContentLocked    : 0x00,
+	SdtContentLocked : 0x01,
+	SdtLocked        : 0x02,
+	Unlocked         : 0x03
+};
+
+var c_oAscSdtLevelType = {
+	Block  : 0x01,
+	Inline : 0x02,
+	Row    : 0x03,
+	Cell   : 0x04
+};
+
+var c_oAscTOCStylesType = {
+	Current  : 0,
+	Simple   : 1,
+	Standard : 2,
+	Modern   : 3,
+	Classic  : 4
+};
+
+var c_oAscStyleType = {
+	Paragraph : 1,
+	Numbering : 2,
+	Table     : 3,
+	Character : 4
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -303,6 +332,32 @@ prot['UpperRoman']  = c_oAscNumberingFormat.UpperRoman;
 prot['LowerLetter'] = c_oAscNumberingFormat.LowerLetter;
 prot['UpperLetter'] = c_oAscNumberingFormat.UpperLetter;
 prot['DecimalZero'] = c_oAscNumberingFormat.DecimalZero;
+
+prot = window['Asc']['c_oAscSdtLockType'] = c_oAscSdtLockType;
+prot['ContentLocked']    = c_oAscSdtLockType.ContentLocked;
+prot['SdtContentLocked'] = c_oAscSdtLockType.SdtContentLocked;
+prot['SdtLocked']        = c_oAscSdtLockType.SdtLocked;
+prot['Unlocked']         = c_oAscSdtLockType.Unlocked;
+
+prot = window['Asc']['c_oAscSdtLevelType'] = window['Asc'].c_oAscSdtLevelType = c_oAscSdtLevelType;
+prot['Block']  = c_oAscSdtLevelType.Block;
+prot['Inline'] = c_oAscSdtLevelType.Inline;
+prot['Row']    = c_oAscSdtLevelType.Row;
+prot['Cell']   = c_oAscSdtLevelType.Cell;
+
+prot = window['Asc']['c_oAscTOCStylesType'] = window['Asc'].c_oAscTOCStylesType = c_oAscTOCStylesType;
+prot['Current']  = c_oAscTOCStylesType.Current;
+prot['Simple']   = c_oAscTOCStylesType.Simple;
+prot['Standard'] = c_oAscTOCStylesType.Standard;
+prot['Modern']   = c_oAscTOCStylesType.Modern;
+prot['Classic']  = c_oAscTOCStylesType.Classic;
+
+
+prot = window['Asc']['c_oAscStyleType'] = window['Asc'].c_oAscStyleType = c_oAscStyleType;
+prot['Paragraph'] = c_oAscStyleType.Paragraph;
+prot['Numbering'] = c_oAscStyleType.Numbering;
+prot['Table']     = c_oAscStyleType.Table;
+prot['Character'] = c_oAscStyleType.Character;
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;

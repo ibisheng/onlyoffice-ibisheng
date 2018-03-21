@@ -377,7 +377,7 @@ function (window, undefined) {
 		this.Hyperlink = 19;
 		this.SortData = 20;
 		this.CommentData = 21;
-		this.CompositeCommentData = 22;
+		this.CommentCoords = 22;
 		this.ChartSeriesData = 24;
 		this.SheetAdd = 25;
 		this.SheetRemove = 26;
@@ -475,8 +475,8 @@ function (window, undefined) {
 				case this.CommentData:
 					return new Asc.asc_CCommentData();
 					break;
-				case this.CompositeCommentData:
-					return new AscCommonExcel.CompositeCommentData();
+				case this.CommentCoords:
+					return new AscCommonExcel.asc_CCommentCoords();
 					break;
 				case this.ChartSeriesData:
 					return new AscFormat.asc_CChartSeria();
@@ -2431,6 +2431,7 @@ function (window, undefined) {
 		this.UndoRedo(Type, Data, nSheetId, false);
 	};
 	UndoRedoComment.prototype.UndoRedo = function (Type, Data, nSheetId, bUndo) {
+		var collaborativeEditing, to;
 		var oModel = (null == nSheetId) ? this.wb : this.wb.getWorksheetById(nSheetId);
 		if (!oModel.aComments) {
 			oModel.aComments = [];
@@ -2447,27 +2448,11 @@ function (window, undefined) {
 		if (bUndo == true) {
 			cellCommentator.Undo(Type, Data);
 		} else {
-			var collaborativeEditing;
-			// CCommentData
-			if ((Data.commentBefore == undefined) && (Data.commentAfter == undefined)) {
-				if (!Data.bDocument) {
-					if (false != this.wb.bCollaborativeChanges) {
-						collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
-						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);
-					}
-				}
-			} else {
-				// CompositeCommentData
-				if (!Data.commentAfter.bDocument) {
-					if (false != this.wb.bCollaborativeChanges) {
-						collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						Data.commentAfter.nRow =
-							collaborativeEditing.getLockOtherRow2(nSheetId, Data.commentAfter.nRow);
-						Data.commentAfter.nCol =
-							collaborativeEditing.getLockOtherColumn2(nSheetId, Data.commentAfter.nCol);
-					}
-				}
+			to = (Data.from || Data.to) ? Data.to : Data;
+			if (to && !to.bDocument && false !== this.wb.bCollaborativeChanges) {
+				collaborativeEditing = this.wb.oApi.collaborativeEditing;
+				to.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, to.nRow);
+				to.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, to.nCol);
 			}
 
 			cellCommentator.Redo(Type, Data);

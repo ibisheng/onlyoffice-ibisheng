@@ -2349,6 +2349,8 @@ function getNumInfoLvl(Lvl) {
                 NumSubType = 6;
             else if ( 0x00A8 === NumVal )
                 NumSubType = 7;
+            else if ( 0x2013 === NumVal )
+                NumSubType = 8;
         }
     }
     else
