@@ -1272,7 +1272,7 @@
 
     WorksheetView.prototype._initPane = function () {
         var pane = this.model.sheetViews[0].pane;
-        if ( null !== pane && pane.isInit() ) {
+        if ( null !== pane && pane.isInit() && !window['IS_NATIVE_EDITOR']) {
             this.topLeftFrozenCell = pane.topLeftFrozenCell;
             this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
             this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
@@ -3297,6 +3297,9 @@
     };
 
     WorksheetView.prototype._updateFreezePane = function (col, row, lockDraw) {
+        if (window['IS_NATIVE_EDITOR'])
+            return;
+        
         var lastCol = 0, lastRow = 0;
         if (this.topLeftFrozenCell) {
             lastCol = this.topLeftFrozenCell.getCol0();

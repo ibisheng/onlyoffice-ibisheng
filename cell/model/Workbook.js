@@ -3045,12 +3045,6 @@
 			// Даже если не было, создадим
 			this.sheetViews.push(new AscCommonExcel.asc_CSheetViewSettings());
 		}
-
-		if (window['IS_NATIVE_EDITOR']) {
-			for (var j = this.sheetViews.length - 1; j >= 0; --j) {
-				this.sheetViews[j].pane = null;
-			}
-		}
 		//this.setTableFormulaAfterOpen();
 		this.hiddenManager.initPostOpen();
 
