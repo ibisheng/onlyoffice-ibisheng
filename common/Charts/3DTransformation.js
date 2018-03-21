@@ -226,7 +226,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 	
 	var subType = this.chartsDrawer.calcProp.subType;
 	var type = this.chartsDrawer.calcProp.type;
-	var isStandardType = !!(subType === "standard" || type === AscFormat.c_oChartTypes.Line || (type === AscFormat.c_oChartTypes.Area && subType === "normal") || type === AscFormat.c_oChartTypes.Surface);
+	var isStandardType = subType === "standard" || type === AscFormat.c_oChartTypes.Line || (type === AscFormat.c_oChartTypes.Area && subType === "normal") || type === AscFormat.c_oChartTypes.Surface;
 
     var optimalWidthLine, kF;
 	if(!isStandardType)
@@ -428,13 +428,13 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 
 Processor3D.prototype.calculateFloorPosition = function()
 {
-	var res;
+	var res, absOy;
 	
 	if(this.view3D.getRAngAx())
 	{
 		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
 		{	
-			var absOy = Math.abs(this.angleOy);
+			absOy = Math.abs(this.angleOy);
 			res = c_oChartFloorPosition.Left;
 			if(absOy > Math.PI)
 			{
@@ -455,7 +455,7 @@ Processor3D.prototype.calculateFloorPosition = function()
 	{
 		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
 		{	
-			var absOy = Math.abs(this.angleOy);
+			absOy = Math.abs(this.angleOy);
 			res = c_oChartFloorPosition.Left;
 			if(absOy > Math.PI)
 			{
@@ -552,7 +552,7 @@ Processor3D.prototype.scale = function(point3D)
 	point3D.x = point3D.x / this.scaleX;
 	point3D.y = point3D.y / this.scaleY;
 	point3D.z = point3D.z / this.scaleZ;
-},
+};
 
 
 Processor3D.prototype.rotatePerspective = function(point3D)
@@ -1106,7 +1106,7 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	
 	var width = widthChart / this.chartsDrawer.calcProp.ptCount;
 	
-	var isNormalArea = !!((this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Area) || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface);
+	var isNormalArea = (this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area) || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface;
 	
 	var defaultOverlap = (this.chartsDrawer.calcProp.subType == "stacked" || this.chartsDrawer.calcProp.subType == "stackedPer" || this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea) ? 100 : 0;
 	var overlap       = AscFormat.isRealNumber(this.chartSpace.chart.plotArea.chart.overlap) ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
@@ -1643,10 +1643,7 @@ Processor3D.prototype._getMinMaxOxPoints = function(points, minZ)
 		var z2S = rotatePoints2.z - minZ;
 		//var x2SS = (fov * x2S / (z2S + fov)) + w / 2;
 		
-		
-		var diffX = (-a1 * z2S - a1 * fov - a2 * z1S -a2 * fov) / ( -z2S - fov - z1S - fov);
-		
-		return diffX;
+		return (-a1 * z2S - a1 * fov - a2 * z1S -a2 * fov) / ( -z2S - fov - z1S - fov);
 	};
 	
 
