@@ -10031,11 +10031,10 @@
 
 	// Залочен ли весь лист
 	WorksheetView.prototype._isLockedAll = function (callback) {
-		var sheetId = this.model.getId();
-		var subType = c_oAscLockTypeElemSubType.ChangeProperties;
 		var ar = this.model.selectionRange.getLast();
 
-		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId,
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/
+			c_oAscLockTypeElemSubType.ChangeProperties, this.model.getId(),
 			new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 		this.collaborativeEditing.lock([lockInfo], callback);
 	};
