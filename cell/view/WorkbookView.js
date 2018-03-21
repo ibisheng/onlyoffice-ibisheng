@@ -742,7 +742,6 @@
       if (wsModel) {
         index = wsModel.getIndex();
         self.showWorksheet(index, true);
-        self.handlers.trigger("asc_onActiveSheetChanged", index);
       }
     });
     this.model.handlers.add("setSelection", function() {
@@ -1436,7 +1435,6 @@
 		  this.cellFormulaEnterWSOpen = null;
 		  if( index != ws.model.getIndex() ){
 			  this.showWorksheet(index);
-			  this.handlers.trigger("asc_onActiveSheetChanged", index);
 		  }
 		  ws = this.getWorksheet(index);
      }
@@ -1496,7 +1494,6 @@
       ws = this.model.getWorksheet(i);
       if (!ws.getHidden()) {
         this.showWorksheet(i);
-        this.handlers.trigger("asc_onActiveSheetChanged", i);
         return true;
       }
 
@@ -1659,6 +1656,9 @@
     }
     this.wsActive = index;
     this.wsMustDraw = bLockDraw;
+
+    // Посылаем эвент о смене активного листа
+    this.handlers.trigger("asc_onActiveSheetChanged", this.wsActive);
 
     ws = this.getWorksheet(index);
     // Мы делали resize или меняли zoom, но не перерисовывали данный лист (он был не активный)
@@ -2203,8 +2203,6 @@
       this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
       if (this.copyActiveSheet !== this.wsActive) {
         this.showWorksheet(this.copyActiveSheet);
-        // Посылаем эвент о смене активного листа
-        this.handlers.trigger("asc_onActiveSheetChanged", this.copyActiveSheet);
       }
       this.copyActiveSheet = -1;
       this.input.disabled = false;
@@ -2221,8 +2219,6 @@
           } else {
             index = ws.getIndex();
             this.showWorksheet(index);
-            // Посылаем эвент о смене активного листа
-            this.handlers.trigger("asc_onActiveSheetChanged", index);
 
             tmpSelectRange = tmpSelectRange.range;
           }
