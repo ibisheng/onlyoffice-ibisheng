@@ -8861,8 +8861,7 @@
 					t.handlers.trigger("slowOperation", false);
 				}
 				t.isChanged = true;
-				arn.canChangeColWidth = canChangeColWidth;
-				t.updateRanges([arn], false, true);
+				t.changeWorksheet("update", {reinitRanges: true});
 			}
 
 			var oSelection = History.GetSelection();
