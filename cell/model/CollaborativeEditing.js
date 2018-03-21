@@ -151,15 +151,20 @@
 			this.m_bGlobalLockEditCell = false;
 		};
 		CCollaborativeEditing.prototype.lock = function (arrLocks, callback) {
+			var type;
 			callback = this._checkCollaborative(callback);
 
 			this.onStartCheckLock();
 			for (var i = 0; i < arrLocks.length; ++i) {
-				if (this._addCheckLock(arrLocks[i], callback)) {
-					return;
+				type = this._addCheckLock(arrLocks[i], callback);
+				if (c_oAscLockTypes.kLockTypeNone !== type) {
+					// Снимаем глобальный лок (для редактирования ячейки)
+					this.m_bGlobalLockEditCell = false;
+					return c_oAscLockTypes.kLockTypeMine === type;
 				}
 			}
 			this.onEndCheckLock(callback);
+			return true;
 		};
 		CCollaborativeEditing.prototype._checkCollaborative = function (callback) {
 			if (false === this.getCollaborativeEditing()) {
@@ -173,15 +178,15 @@
 			if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
 				// Редактируем сами
 				AscCommonExcel.applyFunction(callback, true);
-				return true;
+				return c_oAscLockTypes.kLockTypeMine;
 			} else if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
 				// Уже ячейку кто-то редактирует
 				AscCommonExcel.applyFunction(callback, false);
-				return true;
+				return c_oAscLockTypes.kLockTypeOther;
 			}
 
 			this.m_arrCheckLocks.push(lockInfo);
-			return false;
+			return c_oAscLockTypes.kLockTypeNone;
 		};
 		CCollaborativeEditing.prototype.onStartCheckLock = function () {
 			this.m_arrCheckLocks.length = 0;

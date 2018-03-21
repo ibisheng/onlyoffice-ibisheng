@@ -10095,6 +10095,7 @@
         var nLength = isArrayRange ? range.length : 1;
         var nIndex = 0;
         var ar = null;
+        var arrLocks = [];
 
         for (; nIndex < nLength; ++nIndex) {
             ar = isArrayRange ? range[nIndex].clone(true) : range.clone(true);
@@ -10106,50 +10107,42 @@
             }
 
             if (false === isIntersection) {
-                var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
-                  sheetId, new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+				arrLocks.push(this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, subType, sheetId,
+					new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2)));
 
-                if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                    /*bCheckOnlyLockAll*/false)) {
-                    // Уже ячейку кто-то редактирует
-                    asc_applyFunction(callback, false);
-                    return false;
-                } else {
-                    if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    }
-                    this.collaborativeEditing.addCheckLock(lockInfo);
-                }
+				if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+						}
+						callback(isSuccess);
+					};
+				}
             } else {
                 if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
                     t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
@@ -10167,13 +10160,7 @@
             }
         }
 
-        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            newCallback(true);
-            newCallback = undefined;
-        }
-        this.collaborativeEditing.onEndCheckLock(newCallback);
-        return true;
+		return this.collaborativeEditing.lock(arrLocks, newCallback);
     };
 
 	WorksheetView.prototype.changeWorksheet = function (prop, val) {
