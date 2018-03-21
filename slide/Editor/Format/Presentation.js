@@ -6638,7 +6638,21 @@ CPresentation.prototype =
                             }
                             else
                             {
-                                AscFormat.CheckSpPrXfrm(shape);
+                                var hierarchy2 = shape.getHierarchy(undefined, undefined);
+                                for(var t = 0; t < hierarchy2.length; ++t)
+                                {
+                                    if(hierarchy2[t])
+                                    {
+                                        if(hierarchy2[t].spPr && hierarchy2[t].spPr.xfrm && hierarchy2[t].spPr.xfrm.isNotNull())
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(t === hierarchy2.length)
+                                {
+                                    AscFormat.CheckSpPrXfrm(shape);
+                                }
                             }
                         }
                         else
