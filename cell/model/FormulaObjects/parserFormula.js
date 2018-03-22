@@ -5893,6 +5893,10 @@ parserFormula.prototype.setFormula = function(formula) {
 					}
 				}
 
+				if(j - _count_arg - _argDiff < 0) {
+					continue;
+				}
+
 				if (bLocale) {
 					res = currentElement.Assemble2Locale(elemArr, j - _count_arg - _argDiff, _count_arg, locale, digitDelim);
 				} else {
