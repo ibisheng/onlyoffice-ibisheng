@@ -428,7 +428,7 @@ CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImage
     rData['data'] = [];
     for(i = 0; i < aImages.length; ++i)
     {
-        rData['data'].push(aImages);
+        rData['data'].push(aImages[i]);
     }
     var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
     this.CheckWaitingImages(aImagesToLoad);
