@@ -3327,6 +3327,8 @@
 			//работает когда есть внутренние табы
 			//TODO  в дальнейшем учитывать внутреннии табы в DocumentContentBounds
 			this.maxCellCount = 0;
+
+			this.footnotesCount = 0;
 			
 			return this;
 		}
@@ -3758,6 +3760,15 @@
 								this._addImageToMap(paraRunContent[pR]);
 							}
 
+							break;
+						}
+						case para_FootnoteReference:
+						{
+							if(1 === paraRunContent.length) {
+								var footnotesNumber = this.footnotesCount + 1;
+								text += "[" + footnotesNumber + "]";
+								this.footnotesCount++;
+							}
 							break;
 						}
 						case para_End: {
