@@ -600,7 +600,6 @@
     this.saveLockCallbackErrorTimeOutId = null;
     this.saveCallbackErrorTimeOutId = null;
     this.unSaveLockCallbackErrorTimeOutId = null;
-	this.jwtTimeOutId = null;
     this._id = null;
     this._sessionTimeConnect = null;
 	this._allChangesSaved = null;
@@ -1029,20 +1028,8 @@
   };
 
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
-    var t = this;
-    if (jwt) {
-      t.jwtOpen = undefined;
-      t.jwtSession = jwt['token'];
-      if (null !== t.jwtTimeOutId) {
-        clearTimeout(t.jwtTimeOutId);
-        t.jwtTimeOutId = null;
-      }
-      var timeout = Math.max(0, jwt['expires'] - t.maxAttemptCount * t.reconnectInterval);
-      t.jwtTimeOutId = setTimeout(function(){
-        t.jwtTimeOutId = null;
-        t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
-      }, timeout);
-    }
+    this.jwtOpen = undefined;
+    this.jwtSession = jwt;
   };
 
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
