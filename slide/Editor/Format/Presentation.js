@@ -5315,17 +5315,31 @@ CPresentation.prototype =
                                     }
                                     AscFormat.SaveContentSourceFormatting(aContent, aContent, oDocContent.Get_Theme(), oDocContent.Get_ColorMap());
                                     oSourceFormattingContent.DocContent = oSelectedContent;
+
+
+
+                                    var oSelectedContent2 = new CSelectedContent();
+                                    oDocContent.GetSelectedContent(oSelectedContent2);
+                                    aContent = [];
+                                    for(i = 0; i < oSelectedContent2.Elements.length; ++i){
+                                        oParagraph = oSelectedContent2.Elements[i].Element;
+                                        oParagraph.Parent = oDocContent;
+                                        oParagraph.Internal_CompileParaPr();
+                                        aContent.push(oParagraph);
+                                    }
+                                    AscFormat.SaveContentSourceFormatting(aContent, aContent, oDocContent.Get_Theme(), oDocContent.Get_ColorMap());
+
                                     if(bNeedSelectAll){
                                         oDocContent.Set_ApplyToAll(false);
                                     }
-                                    if(oSelectedContent.Elements.length > 0){
+                                    if(oSelectedContent2.Elements.length > 0){
                                         oDocContentForDraw = new AscFormat.CDrawingDocContent(oDocContent.Parent, oDocContent.DrawingDocument, 0, 0, 20000, 20000);
                                         oParagraph = oDocContentForDraw.Content[0];
                                         oNearPos = { Paragraph: oParagraph, ContentPos: oParagraph.Get_ParaContentPos(false, false) };
                                         oParagraph.Check_NearestPos(oNearPos);
                                         bOldVal = oDocContentForDraw.MoveDrawing;
                                         oDocContentForDraw.MoveDrawing = true;
-                                        oDocContentForDraw.Insert_Content(oSelectedContent, oNearPos);
+                                        oDocContentForDraw.Insert_Content(oSelectedContent2, oNearPos);
                                         oDocContentForDraw.MoveDrawing = bOldVal;
 
 
