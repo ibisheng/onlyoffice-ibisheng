@@ -456,6 +456,16 @@
 	};
 
 	/**
+	 * Set Row height
+	 * @memberof ApiWorksheet
+	 * @param {number} row
+	 * @param {number} height
+	 */
+	ApiWorksheet.prototype.SetRowHeight = function (row, height) {
+		this.worksheet.setRowHeight(height, row, row, true);
+	};
+
+	/**
 	 * Set displayed gridlines
 	 * @memberof ApiWorksheet
 	 * @param {bool} value
@@ -1532,6 +1542,7 @@
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
 	ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
+	ApiWorksheet.prototype["SetRowHeight"] = ApiWorksheet.prototype.SetRowHeight;
 	ApiWorksheet.prototype["SetDisplayGridlines"] = ApiWorksheet.prototype.SetDisplayGridlines;
 	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
