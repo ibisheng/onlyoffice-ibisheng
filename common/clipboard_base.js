@@ -834,7 +834,7 @@
 			if (_data_format != "" && _data !== null && this.isCopyOutEnabled())
 			{
 				if (_data_format == "text/x-custom")
-					this.ClosureParams.setData(_data_format, "asc_internalData2;" + _data);
+					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);
 				else
 					this.ClosureParams.setData(_data_format, _data);
 			}
