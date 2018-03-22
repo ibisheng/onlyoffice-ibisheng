@@ -5003,6 +5003,12 @@ parserFormula.prototype.setFormula = function(formula) {
 						return false;
 					}
 				}
+			} else if(wasLeftParentheses && 0 === top_elem_arg_count && t.elemArr[t.elemArr.length - 1] && " " === t.elemArr[t.elemArr.length - 1].name) {
+				//intersection with empty range
+				t.outStack = [];
+				t.elemArr = [];
+				t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+				return false;
 			} else {
 				if (wasLeftParentheses && (!t.elemArr[t.elemArr.length - 1] ||
 					'(' === t.elemArr[t.elemArr.length - 1].name)) {
