@@ -7634,6 +7634,24 @@ Paragraph.prototype.HaveNumbering = function()
 {
 	return (undefined !== this.Numbering_Get() ? true : false);
 };
+/**
+ * Получаем скомпилированные текстовые настройки для символа нумерации
+ * @returns {?CTextPr}
+ */
+Paragraph.prototype.GetNumberingCompiledPr = function()
+{
+	var oNumPr = this.Numbering_Get();
+	if (!oNumPr || !this.LogicDocument)
+		return null;
+
+	var oNumbering = this.LogicDocument.Get_Numbering();
+	var oNumLvl    = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
+
+	var oTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+	oTextPr.Merge(this.TextPr.Value);
+	oTextPr.Merge(oNumLvl.TextPr);
+	return oTextPr;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с нумерацией параграфов в презентациях
 //----------------------------------------------------------------------------------------------------------------------

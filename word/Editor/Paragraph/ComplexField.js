@@ -533,25 +533,35 @@ CComplexField.prototype.private_UpdateTOC = function()
 				var oNumbering = this.LogicDocument.Get_Numbering();
 				var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
 				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
+				var oNumTextPr = oSrcParagraph.GetNumberingCompiledPr();
 
 				var oNumberingRun = new ParaRun(oPara, false);
 				oNumberingRun.AddText(sText);
+
+				if (oNumTextPr)
+					oNumberingRun.Set_RFonts(oNumTextPr.RFonts);
+
+				oContainer.Add_ToContent(0, oNumberingRun);
+				nContainerPos++;
+
+				var oNumTabRun = new ParaRun(oPara, false);
 
 				var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
 				var nNumSuff = oNumLvl.Suff;
 
 				if (numbering_suff_Space === nNumSuff)
 				{
-					oNumberingRun.Add_ToContent(sText.length, new ParaSpace());
+					oNumTabRun.Add_ToContent(0, new ParaSpace());
+					oContainer.Add_ToContent(1, oNumTabRun);
+					nContainerPos++;
 				}
 				else if (numbering_suff_Tab === nNumSuff)
 				{
-					oNumberingRun.Add_ToContent(sText.length, new ParaTab());
+					oNumTabRun.Add_ToContent(0, new ParaTab());
 					isAddTabForNumbering = true;
+					oContainer.Add_ToContent(1, oNumTabRun);
+					nContainerPos++;
 				}
-
-				oContainer.Add_ToContent(0, oNumberingRun);
-				nContainerPos++;
 			}
 
 			// Word добавляет табы независимо о наличия Separator и PAGEREF
