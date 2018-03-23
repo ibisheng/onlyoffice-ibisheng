@@ -5415,13 +5415,7 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 	};
 
-	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset, opt_forceCalculate) {
-		if (!this.incRecursionLevel()) {
-			return this.value || new cError(cErrorType.bad_reference);
-		}
-		if ((this.isCalculate && !opt_forceCalculate) &&
-			(!this.calculateDefName || this.calculateDefName[opt_bbox ? opt_bbox.getName() : opt_bbox])) {
-			//cycle
+	parserFormula.prototype.calculateCycleError = function () {
 		this.value = new cError(cErrorType.bad_reference);
 		this._endCalculate();
 		return this.value;
@@ -5500,31 +5494,6 @@ parserFormula.prototype.setFormula = function(formula) {
 			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
 		}
 		this.calculateDefName = null;
-		this.decRecursionLevel();
-	};
-	parserFormula.prototype.incRecursionLevel = function() {
-		return !g_cCalcRecursion.getIsForceBacktracking() && g_cCalcRecursion.incLevel();
-	};
-	parserFormula.prototype.decRecursionLevel = function() {
-		g_cCalcRecursion.decLevel();
-		if (g_cCalcRecursion.getIsForceBacktracking()) {
-			g_cCalcRecursion.insert(this);
-			if (0 === g_cCalcRecursion.getLevel() && !g_cCalcRecursion.getIsProcessRecursion()) {
-				g_cCalcRecursion.setIsProcessRecursion(true);
-				do {
-					g_cCalcRecursion.setIsForceBacktracking(false);
-					g_cCalcRecursion.foreachInReverse(function(parsed){
-						if (parsed.getIsDirty()) {
-							parsed.calculate(undefined, undefined, undefined, true);
-						}
-					});
-				} while (g_cCalcRecursion.getIsForceBacktracking());
-				g_cCalcRecursion.setIsProcessRecursion(false);
-			}
-		} else {
-			this.isCalculate = false;
-			this.isDirty = false;
-		}
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
@@ -6167,11 +6136,10 @@ parserFormula.prototype.getElementByPos = function(pos) {
 	//for chrome63(real maximum call stack size is 12575) MAXRECURSION that cause excaption is 783
 	CalcRecursion.prototype.MAXRECURSION = 400;
 	CalcRecursion.prototype.incLevel = function() {
-		if(!window.level){
-			window.level = 0;
+		if (this.getIsForceBacktracking()) {
+			return false;
 		}
-		window.level++;
-		var res = this.level <= g_cCalcRecursion.MAXRECURSION;
+		var res = this.level <= CalcRecursion.prototype.MAXRECURSION;
 		if (res) {
 			this.level++;
 		} else {
@@ -6693,6 +6661,7 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
 	window['AscCommonExcel'].cNumFormatFirstCell = cNumFormatFirstCell;
 	window['AscCommonExcel'].cNumFormatNone = cNumFormatNone;
+	window['AscCommonExcel'].g_cCalcRecursion = g_cCalcRecursion;
 
 	window['AscCommonExcel'].cNumber = cNumber;
 	window['AscCommonExcel'].cString = cString;
