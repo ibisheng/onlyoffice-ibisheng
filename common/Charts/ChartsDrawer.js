@@ -12384,7 +12384,6 @@ serAxisChart.prototype = {
 	_calculateAxis: function () {
 		var nullPositionOx = this.chartProp.nullPositionOX;
 
-		var view3DProp = this.cChartSpace.chart.getView3d();
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 
 		//var z = this.cChartDrawer.processor3D.calculateZPositionValAxis();
@@ -12434,7 +12433,7 @@ serAxisChart.prototype = {
 		var widthLine = 0;
 		var crossMajorStep = 0;
 
-		switch (this.cChartSpace.chart.plotArea.valAx.majorTickMark) {
+		switch (this.serAx.majorTickMark) {
 			case c_oAscTickMark.TICK_MARK_CROSS: {
 				widthLine = -5;
 				crossMajorStep = 5;
@@ -12454,9 +12453,8 @@ serAxisChart.prototype = {
 			}
 		}
 
-		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ?
-			this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		if (orientation !== ORIENTATION_MIN_MAX) {
+		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
+		if (this.serAx.axPos === window['AscFormat'].AX_POS_B) {
 			widthLine = -widthLine;
 			crossMajorStep = -crossMajorStep;
 		}
