@@ -3303,6 +3303,13 @@ CGraphicObjects.prototype =
                     nPageIndex = obj.PageNum;
                 }
             }
+            else
+            {
+                if(AscFormat.isRealNumber(obj.PageNum))
+                {
+                    nPageIndex = obj.PageNum;
+                }
+            }
             obj.GraphicObj.select(this, nPageIndex);
         }
 
