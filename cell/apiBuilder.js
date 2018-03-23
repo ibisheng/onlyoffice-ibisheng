@@ -761,6 +761,7 @@
             private_SetCoords(oImage, oWorksheet.model, Width, Height, cell ? cell.col : 0, 0,  cell ? cell.row : 0, 0, undefined);
             oController.resetSelection();
             oController.selectObject(oImage, 0);
+			oWorksheet.isSelectOnShape = true;
         }
 	};
 

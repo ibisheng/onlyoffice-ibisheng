@@ -5253,6 +5253,7 @@ function BinaryPPTYLoader()
             }
         }
 
+        var txXfrm = null;
         while (s.cur < _end_rec)
         {
             var _at = s.GetUChar();
@@ -5289,12 +5290,47 @@ function BinaryPPTYLoader()
                 }
 				case 6:
 				{
-					s.SkipRecord();
+                    txXfrm = this.ReadXfrm();
 					break;
 				}
                 default:
                 {
                     s.SkipRecord();
+                    break;
+                }
+            }
+        }
+        if(txXfrm && AscFormat.isRealNumber(txXfrm.rot) && shape.txBody){
+            var oCopyBodyPr;
+            var rot2 = txXfrm.rot;
+            while(rot2 < 0){
+                rot2 += 2*Math.PI;
+            }
+            var nSquare = ((2.0*rot2/Math.PI + 0.5) >> 0);
+            while (nSquare < 0){
+                nSquare += 4;
+            }
+            switch (nSquare){
+                case 0:
+                {
+                    break;
+                }
+                case 1:
+                {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.vert = AscFormat.nVertTTvert;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
+                    break;
+                }
+                case 2:
+                {
+                    break;
+                }
+                case 3:
+                {
+                    oCopyBodyPr = shape.txBody.bodyPr ? shape.txBody.bodyPr.createDuplicate() : new AscFormat.CBodyPr();
+                    oCopyBodyPr.vert = AscFormat.nVertTTvert270;
+                    shape.txBody.setBodyPr(oCopyBodyPr);
                     break;
                 }
             }
