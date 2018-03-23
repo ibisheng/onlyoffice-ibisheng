@@ -5604,10 +5604,11 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 				break;
 			}
         }
-    }
 
-	if (SpellData[EndPos])
-		PDSL.SpellingCounter += SpellData[EndPos];
+        // TODO: Пока так оставим, но это работает неправильно. Нужно проверенные точки отмечать
+		if (SpellData[Pos + 1])
+			PDSL.SpellingCounter += SpellData[Pos + 1];
+	}
 
 	if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
     {
