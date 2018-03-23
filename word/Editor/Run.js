@@ -5606,7 +5606,10 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         }
     }
 
-    if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
+	if (SpellData[EndPos])
+		PDSL.SpellingCounter += SpellData[EndPos];
+
+	if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
     {
         var ReviewColor = this.Get_PrReviewColor();
         PDSL.RunReview.Add(0, 0, PDSL.X, X, 0, ReviewColor.r, ReviewColor.g, ReviewColor.b, {RunPr: this.Pr});
