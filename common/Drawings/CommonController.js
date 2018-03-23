@@ -8627,7 +8627,7 @@ DrawingObjectsController.prototype =
                     oNearestPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                     paragraph.Check_NearestPos(oNearestPos);
                     oContent.Insert_Content(oSelectedContent, oNearestPos);
-                    oShape.bSelectedText = true;
+                    oShape.bSelectedText = false;
                 }
                 else
                 {
