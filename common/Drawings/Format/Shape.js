@@ -5808,7 +5808,7 @@ function SaveRunsFormatting(aSourceContent, aCopyContent, oTheme, oColorMap, oPr
         else if(aSourceContent[i].Content){
             var oElem = aSourceContent[i];
             SaveRunsFormatting(oElem.Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
-            if(oElem.Get_CompiledCtrPrp && oElem.setCtrPrp){
+            if(oElem.Get_CompiledCtrPrp && aCopyContent[i].setCtrPrp){
                 var oCtrPr = oElem.Get_CompiledCtrPrp();
                 aCopyContent[i].setCtrPrp(oCtrPr);
             }
