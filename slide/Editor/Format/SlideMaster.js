@@ -663,6 +663,7 @@ function CMasterThumbnailDrawer()
                 {
                     _master.draw(g);
                 }
+                _layout.recalculate();
                 _layout.draw(g);
             }
         }
