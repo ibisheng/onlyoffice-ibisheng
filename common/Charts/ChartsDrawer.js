@@ -106,8 +106,8 @@ function CChartsDrawer()
 	this.areaChart = null;
 	this.catAxisChart = null;
 	this.valAxisChart = null;
-
 	this.serAxisChart = null;
+
 	this.floor3DChart = null;
 	this.sideWall3DChart = null;
 	this.backWall3DChart = null;
@@ -164,6 +164,7 @@ CChartsDrawer.prototype =
 			//оси значений и категорий
 			this.valAxisChart = [];
 			this.catAxisChart = [];
+			this.serAxisChart = [];
 			for (var i = 0; i < chartSpace.chart.plotArea.axId.length; i++) {
 				var axId = chartSpace.chart.plotArea.axId[i];
 				if (axId instanceof AscFormat.CCatAx) {
@@ -174,12 +175,15 @@ CChartsDrawer.prototype =
 					var valAx = new valAxisChart();
 					valAx.recalculate(this, axId);
 					this.valAxisChart.push(valAx);
+				} else if (axId instanceof AscFormat.CSerAx) {
+					var serAx = new serAxisChart();
+					serAx.recalculate(this, axId);
+					this.serAxisChart.push(serAx);
 				}
 			}
 
 			if (this.nDimensionCount === 3) {
 				this.floor3DChart.recalculate(this);
-				this.serAxisChart.recalculate(this);
 				this.sideWall3DChart.recalculate(this);
 				this.backWall3DChart.recalculate(this);
 			}
@@ -199,8 +203,6 @@ CChartsDrawer.prototype =
 		this.areaChart = new areaChart();
 		//создаём область
 		this.plotAreaChart = new plotAreaChart();
-		//ось серий
-		this.serAxisChart = new serAxisChart();
 		//Floor This element specifies the floor of a 3D chart.
 		this.floor3DChart = new floor3DChart();
 		this.sideWall3DChart = new sideWall3DChart();
@@ -327,7 +329,9 @@ CChartsDrawer.prototype =
 				for(var i = 0; i < this.valAxisChart.length; i++) {
 					this.valAxisChart[i].draw(this);
 				}
-				this.serAxisChart.draw(this);
+				for(var i = 0; i < this.serAxisChart.length; i++) {
+					this.serAxisChart[i].draw(this);
+				}
 			}
 		}
 	},
@@ -12345,6 +12349,7 @@ function serAxisChart()
 	this.chartProp = null;
 	this.cChartSpace = null;
 	this.cChartDrawer = null;
+	this.serAx = null;
 	
 	this.paths = {};
 }
@@ -12353,21 +12358,25 @@ serAxisChart.prototype =
 {
     constructor: serAxisChart,
 	
-	draw : function(chartsDrawer)
+	draw : function(chartsDrawer, serAx)
     {
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
+		if (serAx) {
+			this.serAx = serAx;
+		}
 		
 		this._drawAxis();
 		this._drawTickMark();
 	},
 	
-	recalculate: function(chartsDrawer)
+	recalculate: function(chartsDrawer, serAx)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
 		this.cChartDrawer = chartsDrawer;
+		this.serAx = serAx;
 		
 		this.paths = {};
 		if(this.cChartSpace.chart.plotArea.serAx && this.cChartSpace.chart.plotArea.serAx.bDelete !== true)
@@ -12487,7 +12496,7 @@ serAxisChart.prototype =
 	_drawAxis: function()
 	{
 		//TODO добавлять compiledLn, как в случае с другими осями
-		var pen = this.cChartSpace.chart.plotArea.serAx ? this.cChartSpace.chart.plotArea.serAx.compiledLn : null;	
+		var pen = this.serAx ? this.serAx.compiledLn : null;
 		var path = this.paths.axisLine;
 		
 		this.cChartDrawer.drawPath(path, pen);
@@ -12501,7 +12510,7 @@ serAxisChart.prototype =
 		
 		for(var i = 0; i < this.paths.tickMarks.length; i++)
 		{
-			pen = this.cChartSpace.chart.plotArea.serAx ? this.cChartSpace.chart.plotArea.serAx.compiledTickMarkLn : null;
+			pen = this.serAx ? this.serAx.compiledTickMarkLn : null;
 				
 			path = this.paths.tickMarks[i];
 			this.cChartDrawer.drawPath(path, pen);
