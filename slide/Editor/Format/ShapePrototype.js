@@ -843,7 +843,17 @@ CShape.prototype.OnContentReDraw = function(){
             }
             else
             {
-                return this.parent.graphicObjects.selection.textSelection === this;
+                if(this.parent.getObjectType && this.parent.getObjectType() === AscDFH.historyitem_type_Notes)
+                {
+                    if(editor.WordControl.m_oLogicDocument.FocusOnNotes && this.parent.slide && this.parent.slide.num === editor.WordControl.m_oLogicDocument.CurPage)
+                    {
+                        return this.parent.graphicObjects.selection.textSelection === this;
+                    }
+                }
+                else
+                {
+                    return this.parent.graphicObjects.selection.textSelection === this;
+                }
             }
         }
         return false;
