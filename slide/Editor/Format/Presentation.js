@@ -6625,8 +6625,10 @@ CPresentation.prototype =
                 for(var j = slide.cSld.spTree.length-1; j  > -1 ; --j)
                 {
                     var shape = slide.cSld.spTree[j];
-                    //if(slide.cSld.spTree[j].isEmptyPlaceholder())
-                    {
+                    if(shape.isEmptyPlaceholder()){
+                        slide.removeFromSpTreeById(shape.Get_Id());
+                    }
+                    else {
                         var oInfo = {};
                         var hierarchy = shape.getHierarchy(undefined, oInfo);
                         var bNoPlaceholder = true;
