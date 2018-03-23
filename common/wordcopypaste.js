@@ -2476,7 +2476,7 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.keepTextOnly];
+				props = [sProps.sourceformatting/*, sProps.mergeFormatting*/, sProps.keepTextOnly];
 			}
 
 			if(null !== props)
@@ -3073,7 +3073,7 @@ PasteProcessor.prototype =
 		var stateSelection = presentation.GetSelectionState();
 		var curPage = stateSelection.CurPage;
 		var pos = presentation.GetTargetPosition();
-		props = !props ? [Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly] : props;
+		props = !props ? [Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.keepTextOnly] : props;
 		var x, y, w, h;
 		if (null === pos) {
 			pos = presentation.GetSelectedBounds();
@@ -4440,7 +4440,7 @@ PasteProcessor.prototype =
 					presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
 
-					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.paste, Asc.c_oSpecialPasteProps.keepTextOnly]);
+					oThis._setSpecialPasteShowOptionsPresentation([Asc.c_oSpecialPasteProps.sourceformatting, Asc.c_oSpecialPasteProps.keepTextOnly]);
 					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 				}
 			};
