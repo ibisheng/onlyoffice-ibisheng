@@ -4652,6 +4652,10 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "=1+1" );
 
+		oParser = new parserFormula( "FORMULATEXT(#REF!)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#REF!" );
+
 		wb.dependencyFormulas.lockRecal();
 	} );
 
