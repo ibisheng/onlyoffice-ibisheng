@@ -10401,10 +10401,7 @@
 							{
 								if(false == bCopy && null != data.nCurValue)
 								{
-									var valueData = oFromCell.getValueData();
-									valueData.value.multiText = null;
-									valueData.value.text = null;
-									valueData.value.number = null;
+									var oCellValue = new AscCommonExcel.CCellValue();
 									if (null != data.sPrefix) {
 										var sVal = data.sPrefix;
 										//toString enough, becouse nCurValue nave not decimal part
@@ -10413,13 +10410,13 @@
 											sNumber = '0'.repeat(data.padding - sNumber.length) + sNumber;
 										}
 										sVal += sNumber;
-										valueData.value.text = sVal;
-										valueData.value.type = CellValueType.String;
+										oCellValue.text = sVal;
+										oCellValue.type = CellValueType.String;
 									} else {
-										valueData.value.number = data.nCurValue;
-										valueData.value.type = CellValueType.Number;
+										oCellValue.number = data.nCurValue;
+										oCellValue.type = CellValueType.Number;
 									}
-									oCopyCell.setValueData(valueData);
+									oCopyCell.setValueData(new UndoRedoData_CellValueData(null, oCellValue));
 								}
 								else if(null != oFromCell)
 								{
