@@ -359,6 +359,29 @@
 			return this.GetCells();
 		}
 	});
+	Object.defineProperty(ApiWorksheet.prototype, "Rows", {
+		get: function () {
+			return this.GetCells();
+		}
+	});
+
+	/**
+	 * Returns a ApiRange that represents all the cells on the rows range.
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetRows = function (value) {
+		if ( (typeof(value) == "number") || (value.indexOf(':') == -1) )
+		{
+			(+value > 0) ? value = +value -1 : value = +value;
+			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
+		} else {
+			value = value.split(':');
+			for (let i in value)
+				(+value[i] > 0) ? value[i] = +value[i] -1 : value[i] = +value[i];
+			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
+		}
+	};
 
 	/**
 	 * Returns a ApiRange that represents the used range on the specified worksheet.
