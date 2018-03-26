@@ -4744,7 +4744,7 @@ PasteProcessor.prototype =
 
 					var nUnicode = oIterator.value();
 
-					if (null !== nUnicode) {
+					if (null !== nUnicode && 13 !== nUnicode) {
 						var Item;
 						if (0x0A === nUnicode || 0x0D === nUnicode) {
 							bAddParagraph = true;
