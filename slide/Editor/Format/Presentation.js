@@ -982,7 +982,7 @@ CPresentation.prototype =
         if(oController)
         {
             var oTargetTextObject = AscFormat.getTargetTextObject(oController);
-            if(oTargetTextObject.checkExtentsByDocContent)
+            if(oTargetTextObject && oTargetTextObject.checkExtentsByDocContent)
             {
                 oTargetTextObject.checkExtentsByDocContent(true, true);
             }
