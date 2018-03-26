@@ -4822,11 +4822,14 @@ PasteProcessor.prototype =
 
 		var newParagraph = getNewParagraph();
 		var insertText = "";
-		for (var Index = 0; Index < Count; Index++) {
-			var _char = text.charAt(Index);
-			var _charCode = text.charCodeAt(Index);
-			if(0x0A === _charCode ||  Index === Count - 1){
-				if(Index === Count - 1 && 0x0A !== _charCode){
+
+		for (var oIterator = text.getUnicodeIterator(); oIterator.check(); oIterator.next()) {
+			var pos = oIterator.position();
+			var _char = text.charAt(pos);
+			var _charCode = oIterator.value();
+
+			if(0x0A === _charCode ||  pos === Count - 1){
+				if(pos === Count - 1 && 0x0A !== _charCode){
 					insertText += _char;
 				}
 				
