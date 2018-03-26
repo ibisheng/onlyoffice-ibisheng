@@ -337,6 +337,10 @@ function (window, undefined) {
 	cFORMULATEXT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
+		if (cElementType.error === arg0.type) {
+			return arg0;
+		}
+
 		var res = null;
 		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
