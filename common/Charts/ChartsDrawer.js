@@ -2262,6 +2262,10 @@ CChartsDrawer.prototype =
 		var seriesPaths = paths.series;
 		var pointDiff = useNextPoint ? 1 : 0;
 
+		if(!seriesPaths) {
+			return;
+		}
+
 		for (var i = 0; i < seriesPaths.length; i++) {
 
 			if (!seriesPaths[i]) {
@@ -2298,6 +2302,11 @@ CChartsDrawer.prototype =
 	drawPathsPoints: function (paths, series, bIsYVal) {
 
 		var seria, brush, pen, dataSeries, markerBrush, markerPen, numCache;
+
+		if(!paths.series) {
+			return;
+		}
+
 		for (var i = 0; i < paths.series.length; i++) {
 			seria = series[i];
 			brush = seria.brush;
@@ -3828,6 +3837,10 @@ CChartsDrawer.prototype =
 		var crossBetween = this.cChartSpace.getValAxisCrossType();
 		var points = axis.yPoints;
 
+		if(!points) {
+			return;
+		}
+
 		var stepY = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top) / (this.calcProp.numhlines);
 		var minorStep = stepY / this.calcProp.numhMinorlines;
 		var widthLine = this.calcProp.widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right);
@@ -3841,8 +3854,7 @@ CChartsDrawer.prototype =
 		}
 
 		//TODO пересмотреть отрисовку сетки для Radar, не использовать numCache!
-		if(this.calcProp.type === c_oChartTypes.Radar)
-		{
+		if(this.calcProp.type === c_oChartTypes.Radar) {
 			var numCache = this.calcProp.series[0].val.numRef ? this.calcProp.series[0].val.numRef.numCache.pts : this.calcProp.series[0].val.numLit.pts;
 			var tempAngle = 2 * Math.PI / numCache.length;
 			var trueHeight = this.calcProp.trueHeight;
@@ -5040,6 +5052,10 @@ drawLineChart.prototype = {
 	_calculateLines: function () {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
+
+		if(!xPoints || !yPoints) {
+			return;
+		}
 
 		var points, y, x, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint;
 		for (var i = 0; i < this.chart.series.length; i++) {
@@ -11758,8 +11774,8 @@ catAxisChart.prototype = {
 		} else {
 			paths = this.cChartDrawer.getVerticalGridLines(this.catAx, true);
 		}
-		this.paths.gridLines = paths.gridLines;
-		this.paths.minorGridLines = paths.minorGridLines;
+		this.paths.gridLines = paths ? paths.gridLines : null;
+		this.paths.minorGridLines = paths ? paths.minorGridLines : null;
 	},
 
 	_calculateAxis: function () {
@@ -12114,8 +12130,8 @@ valAxisChart.prototype = {
 		} else {
 			paths = this.cChartDrawer.getVerticalGridLines(this.valAx);
 		}
-		this.paths.gridLines = paths.gridLines;
-		this.paths.minorGridLines = paths.minorGridLines;
+		this.paths.gridLines = paths ? paths.gridLines : null;
+		this.paths.minorGridLines = paths ? paths.minorGridLines : null;
 	},
 
 	_calculateAxis: function () {
