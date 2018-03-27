@@ -16486,6 +16486,10 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 
 	return arrComplexFields;
 };
+/**
+ * Получаем ссылку на класс, управляющий закладками
+ * @returns {CBookmarksManager}
+ */
 CDocument.prototype.GetBookmarksManager = function()
 {
 	return this.BookmarksManager;
