@@ -1070,6 +1070,40 @@ CChartsDrawer.prototype =
 		
 		return {left: left, right: right, top: top, bottom: bottom};
 	},
+
+	_getHorizontalAxes: function(chartSpace) {
+		var res = null;
+
+		var axId = chartSpace.chart.plotArea.axId;
+		for(var i = 0; i < axId.length; i++) {
+			var axis = chartSpace.chart.plotArea.axId[i];
+			if(axis.axPos === window['AscFormat'].AX_POS_B || axis.axPos === window['AscFormat'].AX_POS_T) {
+				if(!res) {
+					res = [];
+				}
+				res.push(axis);
+			}
+		}
+
+		return res;
+	},
+
+	_getVerticalAxes: function(chartSpace) {
+		var res = null;
+
+		var axId = chartSpace.chart.plotArea.axId;
+		for(var i = 0; i < axId.length; i++) {
+			var axis = chartSpace.chart.plotArea.axId[i];
+			if(axis.axPos === window['AscFormat'].AX_POS_R || axis.axPos === window['AscFormat'].AX_POS_L) {
+				if(!res) {
+					res = [];
+				}
+				res.push(axis);
+			}
+		}
+
+		return res;
+	},
 	
 	
 	
@@ -3743,10 +3777,14 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	getHorizontalPoints: function () {
+	getHorizontalPoints: function (chartSpace) {
 		var res = null;
 
-		var plotArea = this.cChartSpace.chart.plotArea;
+		if(!chartSpace) {
+			chartSpace = this.cChartSpace;
+		}
+
+		var plotArea = chartSpace.chart.plotArea;
 		if (plotArea.valAx && plotArea.valAx.xPoints) {
 			res = plotArea.valAx.xPoints;
 		} else if (plotArea.catAx && plotArea.catAx.xPoints) {
@@ -3756,10 +3794,14 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	getVerticalPoints: function () {
+	getVerticalPoints: function (chartSpace) {
 		var res = null;
 
-		var plotArea = this.cChartSpace.chart.plotArea;
+		if(!chartSpace) {
+			chartSpace = this.cChartSpace;
+		}
+
+		var plotArea = chartSpace.chart.plotArea;
 		if (plotArea.valAx && plotArea.valAx.yPoints) {
 			res = plotArea.valAx.yPoints;
 		} else if (plotArea.catAx && plotArea.catAx.yPoints) {
@@ -3769,11 +3811,15 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	getPlotAreaPoints: function () {
-		var xPoints = this.getHorizontalPoints();
-		var yPoints = this.getVerticalPoints();
+	getPlotAreaPoints: function (chartSpace) {
+		if(!chartSpace) {
+			chartSpace = this.cChartSpace;
+		}
+
+		var xPoints = this.getHorizontalPoints(chartSpace);
+		var yPoints = this.getVerticalPoints(chartSpace);
 		var pxToMm = this.calcProp.pxToMM;
-		var plotArea = this.cChartSpace.chart.plotArea;
+		var plotArea = chartSpace.chart.plotArea;
 		var left, right, bottom, top;
 		var t = this;
 
@@ -3792,7 +3838,7 @@ CChartsDrawer.prototype =
 		};
 
 		if (xPoints && yPoints) {
-			var crossBetweenX = this.cChartSpace.getValAxisCrossType();
+			var crossBetweenX = chartSpace.getValAxisCrossType();
 			var crossDiffX = 0;
 			if (crossBetweenX === AscFormat.CROSS_BETWEEN_BETWEEN && plotArea.valAx.posX && this.calcProp.type !== c_oChartTypes.HBar) {
 				crossDiffX = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - plotArea.valAx.posX);
@@ -3800,7 +3846,7 @@ CChartsDrawer.prototype =
 			left = xPoints[0].pos - crossDiffX;
 			right = xPoints[xPoints.length - 1].pos + crossDiffX;
 
-			var crossBetweenY = this.cChartSpace.getValAxisCrossType();
+			var crossBetweenY = chartSpace.getValAxisCrossType();
 			var crossDiffY = 0;
 			if (crossBetweenY === AscFormat.CROSS_BETWEEN_BETWEEN && plotArea.valAx.posY) {
 				crossDiffY = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - plotArea.valAx.posY);
