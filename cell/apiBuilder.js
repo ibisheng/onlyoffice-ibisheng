@@ -371,14 +371,16 @@
 	 * @returns {ApiRange}
 	 */
 	ApiWorksheet.prototype.GetRows = function (value) {
-		if ( (typeof(value) == "number") || (value.indexOf(':') == -1) )
+		if((typeof(value) == "number") || (value.indexOf(':') == -1))
 		{
-			(+value > 0) ? value = +value -1 : value = +value;
+			value = parseInt(value);
+			(value > 0) ? value = value -1 : value = value;
 			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
-		} else {
+		}
+		else{
 			value = value.split(':');
-			for (let i in value)
-				(+value[i] > 0) ? value[i] = +value[i] -1 : value[i] = +value[i];
+			for(var i in value)
+				(parseInt(value[i]) > 0) ? value[i] = parseInt(value[i]) -1 : value[i] = parseInt(value[i]);
 			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
 		}
 	};
@@ -1557,6 +1559,7 @@
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
+	ApiWorksheet.prototype["GetRows"] = ApiWorksheet.prototype.GetRows;
 	ApiWorksheet.prototype["GetUsedRange"] = ApiWorksheet.prototype.GetUsedRange;
 	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
