@@ -359,6 +359,23 @@ CBookmarksManager.prototype.GetId = function(nIndex)
 
 	return this.Bookmarks[nIndex][0].GetBookmarkId();
 };
+CBookmarksManager.prototype.RemoveBookmark = function(sName)
+{
+	this.Update();
+	if (!this.GetBookmarkByName(sName))
+		return;
+
+
+};
+CBookmarksManager.prootype.AddBookmark = function(sName)
+{
+	this.Update();
+
+	if (this.GetBookmarkByName(sName))
+		return;
+
+	this.LogicDocument.AddBookmark(sName);
+};
 
 
 //--------------------------------------------------------export----------------------------------------------------
