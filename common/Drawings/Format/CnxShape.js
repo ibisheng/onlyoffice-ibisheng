@@ -489,6 +489,9 @@
     };
 
     CConnectionShape.prototype.resetShape = function (oShape) {
+		if (!this.nvSpPr)
+		    return;
+
         var cnxPr = this.nvSpPr.nvUniSpPr;
 
         if(cnxPr.stCnxId === oShape.Id || cnxPr.endCnxId === oShape.Id){

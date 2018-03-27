@@ -396,3 +396,7 @@ CLogicDocumentController.prototype.AddContentControl = function(nContentControlT
 {
 	return this.LogicDocument.controller_AddContentControl(nContentControlType);
 };
+CLogicDocumentController.prototype.GetStyleFromFormatting = function()
+{
+	return this.LogicDocument.controller_GetStyleFromFormatting();
+};

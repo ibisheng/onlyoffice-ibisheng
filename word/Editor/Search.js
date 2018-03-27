@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1288,30 +1288,6 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
     }
 
     return NearElementId;
-};
-
-//----------------------------------------------------------------------------------------------------------------------
-// ParaComment
-//----------------------------------------------------------------------------------------------------------------------
-ParaComment.prototype.Search = function(ParaSearch, Depth)
-{
-};
-
-ParaComment.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
-{
-};
-
-ParaComment.prototype.Clear_SearchResults = function()
-{
-};
-
-ParaComment.prototype.Remove_SearchResult = function(SearchResult)
-{
-};
-
-ParaComment.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
-{
-    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // ParaMath

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -66,6 +66,7 @@ var GlobalSkinTeamlab = {
 	NavigationButtons                     : true,
 	BackgroundColor                       : "#B0B0B0",
 	BackgroundColorThumbnails             : "#EBEBEB",
+	BackgroundScroll                      : "#F1F1F1",
 	RulerDark                             : "#B0B0B0",
 	RulerLight                            : "EDEDED",
 	RulerOutline                          : "#929292",
@@ -84,6 +85,26 @@ var GlobalSkinFlat    = {
 	NavigationButtons                     : false,
 	BackgroundColor                       : "#F4F4F4",
 	BackgroundColorThumbnails             : "#F4F4F4",
+	BackgroundScroll                      : "#F1F1F1",
+	RulerDark                             : "#CFCFCF",
+	RulerLight                            : "#FFFFFF",
+	RulerOutline                          : "#BBBEC2",
+	RulerMarkersFillColor                 : "#FFFFFF",
+	PageOutline                           : "#BBBEC2",
+	STYLE_THUMBNAIL_WIDTH                 : 109,
+	STYLE_THUMBNAIL_HEIGHT                : 45,
+	BorderSplitterColor                   : "#CBCBCB",
+	SupportNotes                          : true,
+	SplitterWidthMM                       : 1,
+	ThumbnailScrollWidthNullIfNoScrolling : false
+};
+var GlobalSkinFlat2    = {
+	Name                                  : "flat",
+	RulersButton                          : false,
+	NavigationButtons                     : false,
+	BackgroundColor                       : "#E2E2E2",
+	BackgroundColorThumbnails             : "#F4F4F4",
+	BackgroundScroll       				  : "#E2E2E2",
 	RulerDark                             : "#CFCFCF",
 	RulerLight                            : "#FFFFFF",
 	RulerOutline                          : "#BBBEC2",
@@ -97,7 +118,7 @@ var GlobalSkinFlat    = {
 	ThumbnailScrollWidthNullIfNoScrolling : false
 };
 
-var GlobalSkin = GlobalSkinFlat;
+var GlobalSkin = GlobalSkinFlat2;
 
 function updateGlobalSkin(newSkin)
 {
@@ -135,6 +156,7 @@ function CEditorPage(api)
 	// thumbnails
 	this.m_oThumbnailsContainer = null;
 	this.m_oThumbnailsBack      = null;
+	this.m_oThumbnailsSplit		= null;
 	this.m_oThumbnails          = null;
 	this.m_oThumbnails_scroll   = null;
 
@@ -427,7 +449,7 @@ function CEditorPage(api)
 		this.m_oBody = CreateControlContainer(this.Name);
 
 		this.Splitter1Pos    = 67.5;
-		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
+		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 11 : 0;
 
 		this.OldSplitter1Pos = this.Splitter1Pos;
 
@@ -452,6 +474,11 @@ function CEditorPage(api)
 		this.m_oThumbnailsContainer.Bounds.SetParams(0, 0, this.Splitter1Pos, 1000, false, false, true, false, this.Splitter1Pos, -1);
 		this.m_oThumbnailsContainer.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
 		this.m_oBody.AddControl(this.m_oThumbnailsContainer);
+
+		this.m_oThumbnailsSplit = CreateControlContainer("id_panel_thumbnails_split");
+		this.m_oThumbnailsSplit.Bounds.SetParams(this.Splitter1Pos, 0, 1000, 1000, true, false, false, false, GlobalSkin.SplitterWidthMM, -1);
+		this.m_oThumbnailsSplit.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
+		this.m_oBody.AddControl(this.m_oThumbnailsSplit);
 
 		this.m_oThumbnailsBack = CreateControl("id_thumbnails_background");
 		this.m_oThumbnailsBack.Bounds.SetParams(0, 0, ScrollWidthMm9, 1000, false, false, true, false, -1, -1);
@@ -487,7 +514,7 @@ function CEditorPage(api)
 
 		// panel right --------------------------------------------------------------
 		this.m_oPanelRight = CreateControlContainer("id_panel_right");
-		this.m_oPanelRight.Bounds.SetParams(0, 0, 1000, 0, false, false, false, true, ScrollWidthMm, -1);
+		this.m_oPanelRight.Bounds.SetParams(0, 0, 1000, ScrollWidthMm, false, false, false, true, ScrollWidthMm, -1);
 		this.m_oPanelRight.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
 
 		this.m_oMainContent.AddControl(this.m_oPanelRight);
@@ -593,7 +620,8 @@ function CEditorPage(api)
 		// ----------
 
 		this.m_oMainView = CreateControlContainer("id_main_view");
-		this.m_oMainView.Bounds.SetParams(5, 7, (this.m_oApi.isMobileVersion || this.m_oApi.isReporterMode) ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
+		var useScrollW = (this.m_oApi.isMobileVersion || this.m_oApi.isReporterMode) ? 0 : ScrollWidthMm;
+		this.m_oMainView.Bounds.SetParams(5, 7, useScrollW, useScrollW, true, true, true, true, -1, -1);
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -633,6 +661,7 @@ function CEditorPage(api)
 			this.m_oDemonstrationDivId.Bounds.SetParams(0, 0, 1000, 8, false, false, false, true, -1, -1);
 			this.m_oDemonstrationDivId.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 			this.m_oDemonstrationDivParent.AddControl(this.m_oDemonstrationDivId);
+			this.m_oDemonstrationDivId.HtmlElement.style.cursor = "default";
 
 			// bottons
 			var demBottonsDiv = document.createElement("div");
@@ -640,7 +669,10 @@ function CEditorPage(api)
 			demBottonsDiv.setAttribute("class", "block_elem");
 			demBottonsDiv.style.overflow = "hidden";
 			demBottonsDiv.style.backgroundColor = GlobalSkin.BackgroundColor;
+			demBottonsDiv.style.cursor = "default";
 			_documentParent.appendChild(demBottonsDiv);
+
+			demBottonsDiv.onmousedown = function (e) { AscCommon.stopEvent(e); };
 
 			var _ctrl = CreateControlContainer("id_reporter_dem_controller");
 			_ctrl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 8);
@@ -1429,7 +1461,10 @@ function CEditorPage(api)
 		this.m_oHorRuler.IsDrawAnyMarkers          = true;
 
 		if (this.m_bIsRuler)
+		{
 			this.UpdateHorRuler();
+			this.UpdateVerRuler();
+		}
 	};
 
 	this.ToSearchResult = function()
@@ -1954,6 +1989,7 @@ function CEditorPage(api)
 
 		this.m_oThumbnailsContainer.Bounds.R    = this.Splitter1Pos;
 		this.m_oThumbnailsContainer.Bounds.AbsW = this.Splitter1Pos;
+		this.m_oThumbnailsSplit.Bounds.L 		= this.Splitter1Pos;
 
 		if (!this.IsSupportNotes)
 			this.Splitter2Pos = 0;
@@ -1970,6 +2006,7 @@ function CEditorPage(api)
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
+			this.m_oThumbnailsSplit.HtmlElement.style.display = "block";
 			this.m_oMainParent.HtmlElement.style.borderLeft = ("1px solid " + GlobalSkin.BorderSplitterColor);
 		}
 		else
@@ -1981,6 +2018,7 @@ function CEditorPage(api)
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
+			this.m_oThumbnailsSplit.HtmlElement.style.display = "none";
 			this.m_oMainParent.HtmlElement.style.borderLeft = "none";
 		}
 
@@ -2791,6 +2829,10 @@ function CEditorPage(api)
 		settings.contentH = this.m_dDocumentHeight;
 		settings.contentW = this.m_dDocumentWidth;
 
+		settings.scrollBackgroundColor = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorHover = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorActive = GlobalSkin.BackgroundScroll;
+
 		if (this.m_bIsRuler)
 		{
 			settings.screenAddH = this.m_oTopRuler_horRuler.HtmlElement.height;
@@ -2952,7 +2994,7 @@ function CEditorPage(api)
 		this.onButtonTabsDraw();
 
 		if (AscCommon.g_inputContext)
-			AscCommon.g_inputContext.onResize("id_main_view");
+			AscCommon.g_inputContext.onResize("id_main_parent");
 
 		this.DemonstrationManager.Resize();
 
@@ -3233,32 +3275,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isReporterMode)
 			return false;
 
-		var oldVisible = this.m_bIsHorScrollVisible;
-
-		if (this.m_nZoomType == 0 || this.m_nZoomType == 1)
-		{
-			this.m_bIsHorScrollVisible = this.checkNeedHorScrollValue(this.m_dDocumentWidth);
-		}
-		else
-		{
-			var canvas_height1 = this.m_oEditor.HtmlElement.height;
-			var addition = AscCommon.AscBrowser.convertToRetinaValue(this.ScrollWidthPx, true);
-			var canvas_height2 = this.m_bIsHorScrollVisible ? (canvas_height1 + addition) : (canvas_height1 - addition);
-
-			var zoom1 = this.zoom_FitToPage_value(canvas_height1);
-			var zoom2 = this.zoom_FitToPage_value(canvas_height2);
-
-			var size1 = this.CalculateDocumentSizeInternal(canvas_height1, zoom1, true);
-			var size2 = this.CalculateDocumentSizeInternal(canvas_height2, zoom2, true);
-
-			var needScroll1 = this.checkNeedHorScrollValue(size1.m_dDocumentWidth);
-			var needScroll2 = this.checkNeedHorScrollValue(size2.m_dDocumentWidth);
-
-			if (needScroll1 == needScroll2)
-				this.m_bIsHorScrollVisible = needScroll1;
-			else
-				this.m_bIsHorScrollVisible = true;
-		}
+		this.m_bIsHorScrollVisible = this.checkNeedHorScrollValue(this.m_dDocumentWidth);
 
 		var hor_scroll         = document.getElementById('panel_hor_scroll');
 		hor_scroll.style.width = this.m_dDocumentWidth + "px";
@@ -3273,24 +3290,13 @@ function CEditorPage(api)
 			else
 			{
 				this.m_oScrollHor.HtmlElement.style.display = 'block';
-
-				this.m_oPanelRight.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
-				this.m_oMainView.Bounds.B   = this.ScrollWidthPx * g_dKoef_pix_to_mm;
 			}
 		}
 		else
 		{
-			this.m_oPanelRight.Bounds.B                 = 0;
-			this.m_oMainView.Bounds.B                   = 0;
 			this.m_oScrollHor.HtmlElement.style.display = 'none';
 		}
 
-		if (this.m_bIsHorScrollVisible != oldVisible)
-		{
-			this.m_dScrollX                    = 0;
-			this.OnResize(true);
-			return true;
-		}
 		return false;
 	};
 
@@ -3794,9 +3800,9 @@ function CEditorPage(api)
 
 		if (true)
 		{
-			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+			AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor", "id_main_parent");
 			if (AscCommon.g_inputContext)
-				AscCommon.g_inputContext.onResize("id_main_view");
+				AscCommon.g_inputContext.onResize("id_main_parent");
 
 			if (this.m_oApi.isMobileVersion)
 				this.initEventsMobile();
@@ -4233,6 +4239,7 @@ function CEditorPage(api)
 window['AscCommon']                       = window['AscCommon'] || {};
 window['AscCommonSlide']                  = window['AscCommonSlide'] || {};
 window['AscCommonSlide'].GlobalSkinFlat   = GlobalSkinFlat;
+window['AscCommonSlide'].GlobalSkinFlat2  = GlobalSkinFlat2;
 window['AscCommonSlide'].GlobalSkin       = GlobalSkin;
 window['AscCommonSlide'].updateGlobalSkin = updateGlobalSkin;
 window['AscCommonSlide'].CEditorPage      = CEditorPage;

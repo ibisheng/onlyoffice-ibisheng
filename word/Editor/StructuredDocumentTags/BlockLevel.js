@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -359,11 +359,15 @@ CBlockLevelSdt.prototype.AddNewParagraph = function()
 };
 CBlockLevelSdt.prototype.Get_SelectionState2 = function()
 {
-	return this.Content.Get_SelectionState2();
+	var oState  = new CDocumentSelectionState();
+	oState.Id   = this.GetId();
+	oState.Data = this.Content.Get_SelectionState2();
+	return oState;
 };
 CBlockLevelSdt.prototype.Set_SelectionState2 = function(State)
 {
-	this.Content.Set_SelectionState2(State);
+	if (State.Data)
+		this.Content.Set_SelectionState2(State.Data);
 };
 CBlockLevelSdt.prototype.IsStartFromNewPage = function()
 {
@@ -655,7 +659,18 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());
+	var sName      = this.GetTag();
+	var isBuiltIn  = false;
+	var arrButtons = [];
+
+	if (this.IsBuiltInTableOfContents())
+	{
+		sName      = AscCommon.translateManager.getValue("Table of Contents");
+		isBuiltIn  = true;
+		arrButtons.push(1);
+	}
+
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
 };
 CBlockLevelSdt.prototype.AddContentControl = function(nContentControlType)
 {
@@ -883,6 +898,12 @@ CBlockLevelSdt.prototype.Get_PageContentStartPos = function(CurPage)
 	var StartPage   = this.Get_AbsolutePage(0);
 	var StartColumn = this.Get_AbsoluteColumn(0);
 
+	if (this.Parent instanceof CDocumentContent)
+	{
+		StartPage   = this.Parent.StartPage;
+		StartColumn = this.Parent.StartColumn;
+	}
+
 	return this.Parent.Get_PageContentStartPos2(StartPage, StartColumn, CurPage, this.Index);
 };
 CBlockLevelSdt.prototype.CheckTableCoincidence = function(Table)
@@ -988,18 +1009,6 @@ CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
 		this.Parent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
 
 	this.Content.Remove_FromContent(0, this.Content.Content.length - 1);
-};
-CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
-{
-	if (!PosArray)
-		PosArray = [];
-
-	if (this.Parent)
-	{
-		this.Parent.GetDocumentPositionFromObject(PosArray);
-	}
-
-	return PosArray;
 };
 CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 {
@@ -1172,6 +1181,10 @@ CBlockLevelSdt.prototype.GetLastElement = function()
 		return null;
 
 	return this.Content.GetElement(nCount - 1);
+};
+CBlockLevelSdt.prototype.GetLastParagraph = function()
+{
+	return this.Content.GetLastParagraph();
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -6163,6 +6163,7 @@ function BinaryFileReader(doc, openParams)
 		var styles = this.Document.Styles.Style;
         
         var stDefault = this.Document.Styles.Default;
+		stDefault.Character = null;
         stDefault.Numbering = null;
         stDefault.Paragraph = null;
 		stDefault.Table = null;
@@ -6480,6 +6481,8 @@ function BinaryFileReader(doc, openParams)
                 }
             }
 		}
+		//will be default if there is no def attribute
+		var characterNameId, numberingNameId, paragraphNameId, tableNameId;
 		//добавляем новые стили
 		for(var i in this.oReadResult.styles)
 		{
@@ -6533,6 +6536,14 @@ function BinaryFileReader(doc, openParams)
 				stDefault.FootnoteTextChar = sNewStyleId;
 			if("footnotereference" == sNewStyleName)
 				stDefault.FootnoteReference = sNewStyleId;
+			if("defaultparagraphfont" == sNewStyleName)
+				characterNameId = sNewStyleId;
+			if("normal" == sNewStyleName)
+				paragraphNameId = sNewStyleId;
+			if("nolist" == sNewStyleName)
+				numberingNameId = sNewStyleId;
+			if("normaltable" == sNewStyleName)
+				tableNameId = sNewStyleId;
 			oDocStyle.Add(oNewStyle);
 		}
 		var oStyleTypes = {par: 1, table: 2, lvl: 3, run: 4, styleLink: 5, numStyleLink: 6};
@@ -6565,34 +6576,59 @@ function BinaryFileReader(doc, openParams)
 		fParseStyle(this.oReadResult.lvlStyles, styles, oStyleTypes.lvl);
 		fParseStyle(this.oReadResult.styleLinks, styles, oStyleTypes.styleLink);
 		fParseStyle(this.oReadResult.numStyleLinks, styles, oStyleTypes.numStyleLink);
-		if(null == stDefault.Character)
-        {
-            var oNewStyle = new CStyle( "GenStyleDefChar", null, null, styletype_Character );
-			//oNewStyle.Create_Default_Character();
-            stDefault.Character = oNewStyle.Get_Id();
-			oDocStyle.Add(oNewStyle);
-        }
-        if(null == stDefault.Numbering)
-        {
-            var oNewStyle = new CStyle( "GenStyleDefNum", null, null, styletype_Numbering );
-			//oNewStyle.Create_Default_Numbering();
-			stDefault.Numbering = oNewStyle.Get_Id();
-			oDocStyle.Add(oNewStyle);
-        }
-        if(null == stDefault.Paragraph)
-        {
-            var oNewStyle = new CStyle( "GenStyleDefPar", null, null, styletype_Paragraph );
-			//oNewStyle.Create_Default_Paragraph();
-			stDefault.Paragraph = oNewStyle.Get_Id();
-			oDocStyle.Add(oNewStyle);
-        }
-		if(null == stDefault.Table)
-        {
-            var oNewStyle = new CStyle( "GenStyleDefTable", null, null, styletype_Table );
-			//oNewStyle.Create_NormalTable();
-			stDefault.Table = oNewStyle.Get_Id();
-			oDocStyle.Add(oNewStyle);
-        }
+		if (null == stDefault.Character) {
+			if (!characterNameId) {
+				var oNewStyle = new CStyle("Default Paragraph Font", null, null, styletype_Character );
+				oNewStyle.Create_Default_Character();
+				characterNameId = oDocStyle.Add(oNewStyle);
+				//remove style with same name
+				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
+				if(oStartDocStyle) {
+					oDocStyle.Remove(oStartDocStyle.Get_Id());
+				}
+			}
+			stDefault.Character = characterNameId;
+		}
+		if (null == stDefault.Numbering) {
+			if (!numberingNameId) {
+				var oNewStyle = new CStyle("No List", null, null, styletype_Numbering);
+				oNewStyle.Create_Default_Numbering();
+				numberingNameId = oDocStyle.Add(oNewStyle);
+				//remove style with same name
+				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
+				if(oStartDocStyle) {
+					oDocStyle.Remove(oStartDocStyle.Get_Id());
+				}
+			}
+			stDefault.Numbering = numberingNameId;
+		}
+		if (null == stDefault.Paragraph) {
+			if (!paragraphNameId) {
+				var oNewStyle = new CStyle("Normal", null, null, styletype_Paragraph);
+				oNewStyle.Create_Default_Paragraph();
+				paragraphNameId = oDocStyle.Add(oNewStyle);
+				//remove style with same name
+				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
+				if(oStartDocStyle) {
+					oDocStyle.Remove(oStartDocStyle.Get_Id());
+				}
+			}
+			stDefault.Paragraph = paragraphNameId;
+		}
+		if (null == stDefault.Table) {
+			if (!tableNameId) {
+				var oNewStyle = new CStyle("Normal Table", null, null, styletype_Table);
+				oNewStyle.Create_NormalTable();
+				oNewStyle.Set_TablePr(new CTablePr());
+				tableNameId = oDocStyle.Add(oNewStyle);
+				//remove style with same name
+				var oStartDocStyle = aStartDocStylesNames[oNewStyle.Name.toLowerCase().replace(/\s/g,"")];
+				if(oStartDocStyle) {
+					oDocStyle.Remove(oStartDocStyle.Get_Id());
+				}
+			}
+			stDefault.Table = tableNameId;
+		}
 		//проверяем циклы в styles по BasedOn
 		var aStylesGrey = {};
 		for(var stId in styles)
@@ -9842,7 +9878,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			}
 			else
 				nUnicode = nCharCode;
-            AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+
 			if (null !== nUnicode) {
 				if (0x20 !== nUnicode || isInstrText)
 					oPos.run.AddToContent(oPos.pos, isInstrText ? new ParaInstrText(nUnicode) : new ParaText(nUnicode), false);
@@ -11093,7 +11129,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
 			    }
 			    else
 			        nUnicode = nCharCode;
-                AscFonts.FontPickerByCharacter.getFontBySymbol(nUnicode);
+
 			    if (null != nUnicode) {
 					if (0x20 !== nUnicode)
 						oPos.run.AddToContent(oPos.pos, new ParaText(nUnicode), false);

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4470,10 +4470,20 @@ function DrawingObjects() {
         var oRun = _this.CompositeInput.Run;
         var nPos = _this.CompositeInput.Pos + _this.CompositeInput.Length;
         var oChar;
-        if (32 == nCharCode || 12288 == nCharCode)
-            oChar = new ParaSpace();
+
+        if (para_Math_Run === oRun.Type)
+        {
+            oChar = new CMathText();
+            oChar.add(nCharCode);
+        }
         else
-            oChar = new ParaText(nCharCode);
+        {
+            if (32 == nCharCode || 12288 == nCharCode)
+                oChar = new ParaSpace();
+            else
+                oChar = new ParaText(nCharCode);
+        }
+
         oRun.Add_ToContent(nPos, oChar, true);
         _this.CompositeInput.Length++;
     };

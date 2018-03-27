@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -58,7 +58,7 @@ function CSpellCheckerMarks()
 		}
 
 		this.len = len;
-		this.data = new Uint8ClampedArray(this.len);
+		this.data = typeof(Int8Array) !== undefined ? new Int8Array(this.len) : new Array(this.len);
 		return this.data;
 	};
 }
@@ -180,6 +180,9 @@ ParaRun.prototype.Save_StartState = function()
 //-----------------------------------------------------------------------------------
 ParaRun.prototype.Copy = function(Selected, oPr)
 {
+	if (!oPr)
+		oPr = {};
+
     var bMath = this.Type == para_Math_Run ? true : false;
 
     var NewRun = new ParaRun(this.Paragraph, bMath);
@@ -228,7 +231,10 @@ ParaRun.prototype.Copy = function(Selected, oPr)
 		else
 		{
 			// TODO: Как только перенесем para_End в сам параграф (как и нумерацию) убрать здесь
-			if (para_End !== Item.Type)
+			if (para_End !== Item.Type
+				&& (para_Drawing !== Item.Type || Item.Is_Inline() || true !== oPr.SkipAnchors)
+				&& (para_FootnoteReference !== Item.Type || true !== oPr.SkipFootnoteReference)
+				&& ((para_FieldChar !== Item.Type && para_InstrText !== Item.Type) || true !== oPr.SkipComplexFields))
 			{
 				NewRun.Add_ToContent(AddedPos, Item.Copy(), false);
 				AddedPos++;
@@ -344,35 +350,44 @@ ParaRun.prototype.Get_Text = function(Text)
 };
 
 // Проверяем пустой ли ран
-ParaRun.prototype.Is_Empty = function(Props)
+ParaRun.prototype.Is_Empty = function(oProps)
 {
-    var SkipAnchor = (undefined !== Props ? Props.SkipAnchor : false);
-    var SkipEnd    = (undefined !== Props ? Props.SkipEnd    : false);
-    var SkipPlcHldr= (undefined !== Props ? Props.SkipPlcHldr: false);
-    var SkipNewLine= (undefined !== Props ? Props.SkipNewLine: false);
+	var SkipAnchor  = (undefined !== oProps ? oProps.SkipAnchor : false);
+	var SkipEnd     = (undefined !== oProps ? oProps.SkipEnd : false);
+	var SkipPlcHldr = (undefined !== oProps ? oProps.SkipPlcHldr : false);
+	var SkipNewLine = (undefined !== oProps ? oProps.SkipNewLine : false);
+	var SkipCF      = (undefined !== oProps ? oProps.SkipComplexFields : false);
 
-    var Count = this.Content.length;
+	var nCount = this.Content.length;
 
-    if (true !== SkipAnchor && true !== SkipEnd && true !== SkipPlcHldr && true !== SkipNewLine)
-    {
-        if ( Count > 0 )
-            return false;
-        else
-            return true;
-    }
-    else
-    {
-        for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
-        {
-            var Item = this.Content[CurPos];
-            var ItemType = Item.Type;
+	if (true !== SkipAnchor
+		&& true !== SkipEnd
+		&& true !== SkipPlcHldr
+		&& true !== SkipNewLine
+		&& true !== SkipCF)
+	{
+		if (nCount > 0)
+			return false;
+		else
+			return true;
+	}
+	else
+	{
+		for (var nCurPos = 0; nCurPos < nCount; ++nCurPos)
+		{
+			var oItem = this.Content[nCurPos];
+			var nType = oItem.Type;
 
-            if ((true !== SkipAnchor || para_Drawing !== ItemType || false !== Item.Is_Inline()) && (true !== SkipEnd || para_End !== ItemType) && (true !== SkipPlcHldr || true !== Item.IsPlaceholder()) && (true !== SkipNewLine || para_NewLine !== ItemType))
-                return false;
-        }
+			if ((true !== SkipAnchor || para_Drawing !== nType || false !== oItem.Is_Inline())
+				&& (true !== SkipEnd || para_End !== nType)
+				&& (true !== SkipPlcHldr || true !== oItem.IsPlaceholder())
+				&& (true !== SkipNewLine || para_NewLine !== nType)
+				&& (true !== SkipCF || (para_InstrText !== nType && para_FieldChar !== nType)))
+				return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 };
 
 ParaRun.prototype.Is_CheckingNearestPos = function()
@@ -398,7 +413,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 	if (undefined !== Item.Parent)
 		Item.Parent = this;
 
-	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
 		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
@@ -429,75 +444,77 @@ ParaRun.prototype.Add = function(Item, bMath)
 			}
 		}
 
-		// Специальный код, связанный с работой сносок:
-		// 1. При добавлении сноски мы ее оборачиваем в отдельный ран со специальным стилем.
-		// 2. Если мы находимся в ране со специальным стилем сносок и следующий или предыдущий элемент и есть сноска, тогда
-		//    мы добавляем элемент (если это не ссылка на сноску) в новый ран без стиля для сносок.
-		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
-		if (para_FootnoteRef === Item.Type || para_FootnoteReference === Item.Type)
-		{
-			if (this.Is_Empty())
-			{
-				this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-			}
-			else
-			{
-				var NewRun = this.private_SplitRunInCurPos();
-				if (NewRun)
-				{
-					NewRun.Set_VertAlign(undefined);
-					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-					NewRun.MoveCursorToStartPos();
-					NewRun.Add(Item, bMath);
-					NewRun.Make_ThisElementCurrent();
-					return;
-				}
-			}
-		}
-		else if (true === this.private_IsCurPosNearFootnoteReference())
-		{
-			var NewRun = this.private_SplitRunInCurPos();
-			if (NewRun)
-			{
-				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
-				NewRun.MoveCursorToStartPos();
-				NewRun.Add(Item, bMath);
-				NewRun.Make_ThisElementCurrent();
-				return;
-			}
-		}
-
-		// Специальный код с обработкой выделения (highlight)
-		// Текст, который пишем до или после выделенного текста делаем без выделения.
-		if ((0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
-		{
-			var Parent = this.Get_Parent();
-			var RunPos = this.private_GetPosInParent(Parent);
-			if (null !== Parent && -1 !== RunPos)
-			{
-				if ((0 === this.State.ContentPos
-					&& (0 === RunPos
-					|| Parent.Content[RunPos - 1].Type !== para_Run
-					|| highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
-					|| (this.Content.length === this.State.ContentPos
-					&& (RunPos === Parent.Content.length - 1
-					|| para_Run !== Parent.Content[RunPos + 1].Type
-					|| highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
-					|| (RunPos === Parent.Content.length - 2
-					&& Parent instanceof Paragraph)))
-				{
-					var NewRun = this.private_SplitRunInCurPos();
-					if (NewRun)
-					{
-						NewRun.Set_HighLight(highlight_None);
-						NewRun.MoveCursorToStartPos();
-						NewRun.Add(Item, bMath);
-						NewRun.Make_ThisElementCurrent();
-						return;
-					}
-				}
-			}
-		}
+		if(this.Paragraph.bFromDocument)
+        {
+            // Специальный код, связанный с работой сносок:
+            // 1. При добавлении сноски мы ее оборачиваем в отдельный ран со специальным стилем.
+            // 2. Если мы находимся в ране со специальным стилем сносок и следующий или предыдущий элемент и есть сноска, тогда
+            //    мы добавляем элемент (если это не ссылка на сноску) в новый ран без стиля для сносок.
+            var oStyles = this.Paragraph.LogicDocument.Get_Styles();
+            if (para_FootnoteRef === Item.Type || para_FootnoteReference === Item.Type)
+            {
+                if (this.Is_Empty())
+                {
+                    this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+                }
+                else
+                {
+                    var NewRun = this.private_SplitRunInCurPos();
+                    if (NewRun)
+                    {
+                        NewRun.Set_VertAlign(undefined);
+                        NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
+                        NewRun.MoveCursorToStartPos();
+                        NewRun.Add(Item, bMath);
+                        NewRun.Make_ThisElementCurrent();
+                        return;
+                    }
+                }
+            }
+            else if (true === this.private_IsCurPosNearFootnoteReference())
+            {
+                var NewRun = this.private_SplitRunInCurPos();
+                if (NewRun)
+                {
+                    NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
+                    NewRun.MoveCursorToStartPos();
+                    NewRun.Add(Item, bMath);
+                    NewRun.Make_ThisElementCurrent();
+                    return;
+                }
+            }
+            // Специальный код с обработкой выделения (highlight)
+            // Текст, который пишем до или после выделенного текста делаем без выделения.
+            if ((0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
+            {
+                var Parent = this.Get_Parent();
+                var RunPos = this.private_GetPosInParent(Parent);
+                if (null !== Parent && -1 !== RunPos)
+                {
+                    if ((0 === this.State.ContentPos
+                        && (0 === RunPos
+                        || Parent.Content[RunPos - 1].Type !== para_Run
+                        || highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
+                        || (this.Content.length === this.State.ContentPos
+                        && (RunPos === Parent.Content.length - 1
+                        || para_Run !== Parent.Content[RunPos + 1].Type
+                        || highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
+                        || (RunPos === Parent.Content.length - 2
+                        && Parent instanceof Paragraph)))
+                    {
+                        var NewRun = this.private_SplitRunInCurPos();
+                        if (NewRun)
+                        {
+                            NewRun.Set_HighLight(highlight_None);
+                            NewRun.MoveCursorToStartPos();
+                            NewRun.Add(Item, bMath);
+                            NewRun.Make_ThisElementCurrent();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	var oTrackRevisionsRun = this.CheckTrackRevisionsBeforeAdd();
@@ -2247,16 +2264,18 @@ ParaRun.prototype.Create_FontMap = function(Map)
 
 ParaRun.prototype.Get_AllFontNames = function(AllFonts)
 {
-    this.Pr.Document_Get_AllFontNames( AllFonts );
+	this.Pr.Document_Get_AllFontNames(AllFonts);
 
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Item = this.Content[Index];
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item = this.Content[Index];
 
-        if ( para_Drawing === Item.Type )
-            Item.documentGetAllFontNames( AllFonts );
-    }
+		if (para_Drawing === Item.Type)
+			Item.documentGetAllFontNames(AllFonts);
+		else if (para_FootnoteReference === Item.Type)
+			Item.GetAllFontNames(AllFonts);
+	}
 };
 
 ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
@@ -2504,15 +2523,13 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
 
         // TODO: Как только избавимся от para_End переделать здесь
         if ( para_End === ItemType )
-        {
-            var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-            EndTextPr.Merge(this.Paragraph.TextPr.Value);
+		{
+			var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
+			g_oTextMeasurer.SetTextPr(oEndTextPr, this.Paragraph.Get_Theme());
+			Item.Measure(g_oTextMeasurer, oEndTextPr);
 
-            g_oTextMeasurer.SetTextPr( EndTextPr, this.Paragraph.Get_Theme());
-            Item.Measure( g_oTextMeasurer, EndTextPr );
-
-            continue;
-        }
+			continue;
+		}
 
         Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
 
@@ -3333,7 +3350,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						var oLogicDocument     = PRS.Paragraph.LogicDocument;
 						var nCompatibilityMode = oLogicDocument && oLogicDocument.GetCompatibilityMode ? oLogicDocument.GetCompatibilityMode() : document_compatibility_mode_Current;
 						if (nCompatibilityMode <= document_compatibility_mode_Word14
-							&& !isLastTabToRightEdge && (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1))
+							&& !isLastTabToRightEdge
+							&& true !== TabPos.DefaultTab
+							&& (twX >= twXEnd && XEnd < 558.7 && PRS.Range >= PRS.RangesCount - 1))
 						{
 							Para.Lines[PRS.Line].Ranges[PRS.Range].XEnd = 558.7;
 							XEnd                                        = 558.7;
@@ -4345,6 +4364,15 @@ ParaRun.prototype.private_RecalculateLastTab = function(LastTab, X, XEnd, Word, 
         var TabValue  = LastTab.Value;
         var TabPos    = LastTab.TabPos;
 
+		var oLogicDocument     = this.Paragraph ? this.Paragraph.LogicDocument : null;
+		var nCompatibilityMode = oLogicDocument && oLogicDocument.GetCompatibilityMode ? oLogicDocument.GetCompatibilityMode() : document_compatibility_mode_Current;
+
+		if (AscCommon.MMToTwips(TabPos) > AscCommon.MMToTwips(XEnd) && nCompatibilityMode >= document_compatibility_mode_Word15)
+		{
+			TabValue = tab_Right;
+			TabPos   = XEnd;
+		}
+
         var TabCalcW = 0;
         if ( tab_Right === TabValue )
             TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW), 0 );
@@ -5186,12 +5214,6 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Separator:
             case para_ContinuationSeparator:
             {
-                if (para_Tab === ItemType)
-                {
-                    pGraphics.p_color(0, 0, 0, 255);
-                    pGraphics.b_color1(0, 0, 0, 255);
-                }
-
                 if (para_Drawing != ItemType || Item.Is_Inline())
                 {
                     Item.Draw(X, Y - this.YOffset, pGraphics, PDSE);
@@ -5245,34 +5267,38 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
                 if ( undefined === SectPr )
                 {
-                    // Выставляем настройки для символа параграфа
-                    var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge(Para.TextPr.Value);
+                	var oEndTextPr = Para.GetParaEndCompiledPr();
 
                     if (reviewtype_Common !== ReviewType)
                     {
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
                         pGraphics.b_color1(ReviewColor.r, ReviewColor.g, ReviewColor.b, 255);
                     }
-                    else if (EndTextPr.Unifill)
+                    else if (oEndTextPr.Unifill)
                     {
-                        EndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                        var RGBAEnd = EndTextPr.Unifill.getRGBAColor();
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
+						oEndTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+                        var RGBAEnd = oEndTextPr.Unifill.getRGBAColor();
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
                         pGraphics.b_color1(RGBAEnd.R, RGBAEnd.G, RGBAEnd.B, 255);
                     }
                     else
                     {
-                        pGraphics.SetTextPr(EndTextPr, PDSE.Theme);
-                        if (true === EndTextPr.Color.Auto)
+                        pGraphics.SetTextPr(oEndTextPr, PDSE.Theme);
+                        if (true === oEndTextPr.Color.Auto)
                             pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
-                            pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+                            pGraphics.b_color1(oEndTextPr.Color.r, oEndTextPr.Color.g, oEndTextPr.Color.b, 255);
                     }
 
                     var bEndCell = false;
-                    if (null === Para.Get_DocumentNext() && true === Para.Parent.IsTableCellContent())
-                        bEndCell = true;
+
+                    var oDocContent = Para.GetParent();
+                    var oCell       = oDocContent.IsTableCellContent(true);
+                    if (oCell)
+					{
+						var oCellContent = oCell.GetContent();
+						bEndCell = Para === oCellContent.GetLastParagraph();
+					}
 
                     Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell, reviewtype_Common !== ReviewType ?  true : false);
                 }
@@ -5447,7 +5473,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             {
 				MarkIndex = Mark.Element.EndPos.Get(Mark.Depth);
 				if (MarkIndex < SpellDataLen)
-					SpellData[MarkIndex] += 2;
+					SpellData[MarkIndex] -= 1;
             }
         }
     }
@@ -5461,8 +5487,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 		if (PDSL.ComplexFields.IsHiddenFieldContent() && para_End !== ItemType && para_FieldChar !== ItemType)
 			continue;
 
-        if ( 1 == SpellData[Pos] || 3 == SpellData[Pos] )
-            PDSL.SpellingCounter++;
+		if (SpellData[Pos])
+			PDSL.SpellingCounter += SpellData[Pos];
 
         switch( ItemType )
         {
@@ -5604,11 +5630,12 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 			}
         }
 
-        if ( 2 == SpellData[Pos + 1] || 3 == SpellData[Pos + 1] )
-            PDSL.SpellingCounter--;
-    }
+        // TODO: Пока так оставим, но это работает неправильно. Нужно проверенные точки отмечать
+		if (SpellData[Pos + 1])
+			PDSL.SpellingCounter += SpellData[Pos + 1];
+	}
 
-    if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
+	if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
     {
         var ReviewColor = this.Get_PrReviewColor();
         PDSL.RunReview.Add(0, 0, PDSL.X, X, 0, ReviewColor.r, ReviewColor.g, ReviewColor.b, {RunPr: this.Pr});
@@ -5847,6 +5874,13 @@ ParaRun.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, 
 ParaRun.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
     var Pos = ( true !== bSelection ? this.State.ContentPos : ( false !== bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) );
+
+    if (Pos < 0)
+    	Pos = 0;
+
+    if (Pos > this.Content.length)
+    	Pos = this.Content.length;
+
     ContentPos.Add(Pos);
 };
 
@@ -6736,22 +6770,24 @@ ParaRun.prototype.Get_FirstTextPr = function()
 
 ParaRun.prototype.Get_CompiledTextPr = function(Copy)
 {
-    if ( true === this.State.Selection.Use && true === this.Selection_CheckParaEnd() )
-    {
-        var ThisTextPr = this.Get_CompiledPr( true );
+	if (true === this.State.Selection.Use && true === this.Selection_CheckParaEnd())
+	{
+		var oRunTextPr = this.Get_CompiledPr(true);
+		var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
-        var Para       = this.Paragraph;
-        var EndTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
-        EndTextPr.Merge( Para.TextPr.Value );
+		oRunTextPr = oRunTextPr.Compare(oEndTextPr);
 
-        ThisTextPr = ThisTextPr.Compare( EndTextPr );
-
-        return ThisTextPr;
-    }
-    else
+		return oRunTextPr;
+	}
+	else
 	{
 		return this.Get_CompiledPr(Copy);
 	}
+};
+
+ParaRun.prototype.GetDirectTextPr = function()
+{
+	return this.Pr;
 };
 
 ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)
@@ -6806,16 +6842,13 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 	// Мержим настройки стиля.
 	// Одно исключение, когда задан стиль Hyperlink внутри класса Hyperlink внутри поля TOC, то стиль
 	// мержить не надо и, более того, цвет и подчеркивание из прямых настроек тоже не используется.
-	var isInTOCHyperlink = false;
 	if (undefined !== this.Pr.RStyle)
 	{
-		isInTOCHyperlink = true;
 		if (!this.IsStyleHyperlink() || !this.IsInHyperlinkInTOC())
 		{
 			var Styles      = this.Paragraph.Parent.Get_Styles();
 			var StyleTextPr = Styles.Get_Pr(this.Pr.RStyle, styletype_Character).TextPr;
 			TextPr.Merge(StyleTextPr);
-			isInTOCHyperlink = false;
 		}
 	}
 
@@ -6889,24 +6922,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 	}
 	else
 	{
-		var oColor      = this.Pr.Color;
-		var isUnderline = this.Pr.Underline;
-		var oUnifill    = this.Pr.Unifill;
-		if (isInTOCHyperlink)
-		{
-			this.Pr.Unifill   = undefined;
-			this.Pr.Color     = undefined;
-			this.Pr.Underline = undefined;
-		}
-
 		TextPr.Merge(this.Pr); // Мержим прямые настройки данного рана
-
-		if (isInTOCHyperlink)
-		{
-			this.Pr.Color     = oColor;
-			this.Pr.Underline = isUnderline;
-			this.Pr.Unifill   = oUnifill;
-		}
 
 		if (this.Pr.Color && !this.Pr.Unifill)
 		{
@@ -7021,43 +7037,38 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
         }
 
         if ( true === bEnd )
-        {
-            if ( undefined === IncFontSize )
-            {
-                if(!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
-                {
-                    this.Paragraph.TextPr.Apply_TextPr( TextPr );
-                }
-                else
-                {
-                    var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-                    EndTextPr.Merge( this.Paragraph.TextPr.Value );
-                    if(TextPr.AscFill)
-                    {
-                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
-                    }
-                    if(TextPr.AscUnifill)
-                    {
-                        this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
-                    }
-                    if(TextPr.AscLine)
-                    {
-                        this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
-                    }
-                }
-            }
-            else
-            {
-                var Para = this.Paragraph;
+		{
+			if (undefined === IncFontSize)
+			{
+				if (!TextPr.AscFill && !TextPr.AscLine && !TextPr.AscUnifill)
+				{
+					this.Paragraph.TextPr.Apply_TextPr(TextPr);
+				}
+				else
+				{
+					var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
+					if (TextPr.AscFill)
+					{
+						this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oEndTextPr.TextFill, 1));
+					}
+					if (TextPr.AscUnifill)
+					{
+						this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oEndTextPr.Unifill, 0));
+					}
+					if (TextPr.AscLine)
+					{
+						this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oEndTextPr.TextOutline, 0));
+					}
+				}
+			}
+			else
+			{
+				var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
-                // Выставляем настройки для символа параграфа
-                var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                EndTextPr.Merge( Para.TextPr.Value );
-
-                // TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-                Para.TextPr.Set_FontSize( FontSize_IncreaseDecreaseValue( IncFontSize, EndTextPr.FontSize ) );
-            }
-        }
+				// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
+				this.Paragraph.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
+			}
+		}
     }
     else
     {
@@ -7155,32 +7166,27 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 						}
 						else
 						{
-							var EndTextPr = this.Paragraph.Get_CompiledPr2(false).TextPr.Copy();
-							EndTextPr.Merge(this.Paragraph.TextPr.Value);
+							var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 							if (TextPr.AscFill)
 							{
-								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 1));
+								this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oEndTextPr.TextFill, 1));
 							}
 							if (TextPr.AscUnifill)
 							{
-								this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+								this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oEndTextPr.Unifill, 0));
 							}
 							if (TextPr.AscLine)
 							{
-								this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+								this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oEndTextPr.TextOutline, 0));
 							}
 						}
 					}
 					else
 					{
-						var Para = this.Paragraph;
-
-						// Выставляем настройки для символа параграфа
-						var EndTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-						EndTextPr.Merge(Para.TextPr.Value);
+						var oEndTextPr = this.Paragraph.GetParaEndCompiledPr();
 
 						// TODO: Как только перенесем историю изменений TextPr в сам класс CTextPr, переделать тут
-						Para.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, EndTextPr.FontSize));
+						this.Paragraph.TextPr.Set_FontSize(FontSize_IncreaseDecreaseValue(IncFontSize, oEndTextPr.FontSize));
 					}
 				}
 			}

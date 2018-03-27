@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -360,7 +360,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
-    if(e.CtrlKey || e.Button === AscCommon.g_mouse_button_right){
+    if(e.CtrlKey || (e.Button === AscCommon.g_mouse_button_right && drawingObjectsController.selectedObjects.length > 1)){
         return false;
     }
     var ret = false, i, title;

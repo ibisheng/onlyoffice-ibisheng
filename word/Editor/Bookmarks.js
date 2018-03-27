@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -266,7 +266,7 @@ CBookmarksManager.prototype.EndCollectingProcess = function()
 };
 CBookmarksManager.prototype.GetBookmarkById = function(Id)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -278,7 +278,7 @@ CBookmarksManager.prototype.GetBookmarkById = function(Id)
 };
 CBookmarksManager.prototype.GetBookmarkByName = function(sName)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -291,7 +291,7 @@ CBookmarksManager.prototype.GetBookmarkByName = function(sName)
 };
 CBookmarksManager.prototype.HaveBookmark = function(sName)
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -302,26 +302,26 @@ CBookmarksManager.prototype.HaveBookmark = function(sName)
 
 	return false;
 };
-CBookmarksManager.prototype.private_CheckValidate = function()
+CBookmarksManager.prototype.Update = function()
 {
 	if (this.NeedUpdate)
 		this.LogicDocument.UpdateBookmarks();
 };
 CBookmarksManager.prototype.GetNewBookmarkId = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	return ("" + ++this.IdCounter);
 };
 CBookmarksManager.prototype.GetNewBookmarkNameTOC = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	return ("_Toc" + ++this.IdCounterTOC);
 };
 CBookmarksManager.prototype.RemoveTOCBookmarks = function()
 {
-	this.private_CheckValidate();
+	this.Update();
 
 	for (var nIndex = 0, nCount = this.Bookmarks.length; nIndex < nCount; ++nIndex)
 	{
@@ -335,9 +335,54 @@ CBookmarksManager.prototype.RemoveTOCBookmarks = function()
 		}
 	}
 };
+CBookmarksManager.prototype.GetCount = function()
+{
+	this.Update();
 
+	return this.Bookmarks.length;
+};
+CBookmarksManager.prototype.GetName = function(nIndex)
+{
+	this.Update();
+
+	if (nIndex < 0 || this.Index >= this.Bookmarks.length)
+		return "";
+
+	return this.Bookmarks[nIndex][0].GetBookmarkName();
+};
+CBookmarksManager.prototype.GetId = function(nIndex)
+{
+	this.Update();
+
+	if (nIndex < 0 || this.Index >= this.Bookmarks.length)
+		return "";
+
+	return this.Bookmarks[nIndex][0].GetBookmarkId();
+};
+CBookmarksManager.prototype.RemoveBookmark = function(sName)
+{
+	this.Update();
+	if (!this.GetBookmarkByName(sName))
+		return;
+
+
+};
+CBookmarksManager.prototype.AddBookmark = function(sName)
+{
+	this.Update();
+
+	if (this.GetBookmarkByName(sName))
+		return;
+
+	this.LogicDocument.AddBookmark(sName);
+};
 
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CParagraphBookmark = CParagraphBookmark;
+
+CBookmarksManager.prototype['get_Count'] = CBookmarksManager.prototype.GetCount;
+CBookmarksManager.prototype['get_Name']  = CBookmarksManager.prototype.GetName;
+CBookmarksManager.prototype['get_Id']    = CBookmarksManager.prototype.GetId;
+

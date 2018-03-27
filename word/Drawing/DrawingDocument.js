@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -54,7 +54,94 @@ var c_oContentControlTrack = {
 	In 		: 1
 };
 
-function CContentControlTrack(_id, _type, _data, _transform)
+function CContentControlButtonIcons()
+{
+	function CCCBI()
+	{
+		this.type = 0;
+		this.images = [];
+
+		this.load = function(type, url)
+		{
+			this.type = type;
+			this.images[0] = new Image();
+			this.images[0].onload = function() { this.asc_complete = true; };
+			this.images[0].src = "../../../../sdkjs/common/Images/content_control_" + url + ".png";
+
+			this.images[1] = new Image();
+			this.images[1].onload = function() { this.asc_complete = true; };
+			this.images[1].src = "../../../../sdkjs/common/Images/content_control_" + url + "_active.png";
+
+			this.images[2] = new Image();
+			this.images[2].onload = function() { this.asc_complete = true; };
+			this.images[2].src = "../../../../sdkjs/common/Images/content_control_" + url + "_2x.png";
+
+			this.images[3] = new Image();
+			this.images[3].onload = function() { this.asc_complete = true; };
+			this.images[3].src = "../../../../sdkjs/common/Images/content_control_" + url + "_active_2x.png";
+		};
+
+		this.get = function(isActive)
+		{
+			var index = AscCommon.AscBrowser.isRetina ? 2 : 0;
+			if (isActive)
+				index++;
+			if (this.images[index].asc_complete)
+				return this.images[index];
+			return null;
+		};
+	}
+
+	this.images = {};
+	this.measures = {};
+
+	this.register = function(type, url)
+	{
+		var image = new CCCBI();
+		image.load(type, url);
+		this.images[type] = image;
+	};
+
+	this.getFont = function(dKoef)
+	{
+		if (!dKoef)
+			return "11px Helvetica, Arial, sans-serif";
+		var size = (1 + 2 * 11 / dKoef) >> 0;
+		if (size & 1)
+			return (size >> 1) + ".5px Helvetica, Arial, sans-serif";
+		return (size >> 1) + "px Helvetica, Arial, sans-serif";
+	};
+
+	this.measure = function(text, ctx, not_cache)
+	{
+		if (!this.measures[text])
+			this.measures[text] = [0, 0];
+
+		if (not_cache)
+			return ctx.measureText(text).width;
+
+		var arr = this.measures[text];
+		var index = AscCommon.AscBrowser.isRetina ? 1 : 0;
+		if (0 != arr[index])
+			return arr[index];
+
+		arr[index] = ctx.measureText(text).width;
+		return arr[index];
+	};
+
+	this.getImage = function(type, isActive)
+	{
+		if (!this.images[type])
+			return null;
+
+		return this.images[type].get(isActive);
+	};
+}
+
+var g_oContentControlButtonIcons = new CContentControlButtonIcons();
+g_oContentControlButtonIcons.register(1, "toc");
+
+function CContentControlTrack(_id, _type, _data, _transform, _name, _name_advanced, _button_types)
 {
 	this.id = (undefined == _id) ? -1 : _id;
 	this.type = (undefined == _type) ? -1 : _type;
@@ -71,6 +158,14 @@ function CContentControlTrack(_id, _type, _data, _transform)
 
 	this.X = undefined;
 	this.Y = undefined;
+
+	this.Name = _name ? _name : "";
+	this.NameButtonAdvanced = _name_advanced ? true : false;
+	this.Buttons = _button_types ? _button_types : [];
+
+	this.HoverButtonIndex = -2; // -1 => Text, otherwise index in this.Buttons
+	this.ActiveButtonIndex = -2; // -1 => Text, otherwise index in this.Buttons
+	this.NameWidth = 0;
 }
 CContentControlTrack.prototype.getPage = function()
 {
@@ -191,20 +286,13 @@ CColumnsMarkup.prototype.CreateDuplicate = function ()
 
 function CTableOutlineDr()
 {
-	var image_64 = "u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u//6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6/4+Pj/+7u7v/9vb2//b29v/39/f/9/f3//f39/83aMT/9/f3//f39//39/f/9/f3//f39/+Pj4//u7u7//Ly8v/y8vL/8vLy//Pz8/83aMT/N2jE/zdoxP/z8/P/8/Pz//Pz8//z8/P/j4+P/7u7u//u7u7/7u7u/+7u7v/u7u7/7u7u/zdoxP/u7u7/7u7u/+7u7v/u7u7/7u7u/4+Pj/+7u7v/6Ojo/+jo6P83aMT/6enp/+np6f83aMT/6enp/+np6f83aMT/6enp/+np6f+Pj4//u7u7/+Pj4/83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP/k5OT/j4+P/7u7u//o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/4+Pj/+7u7v/7e3t/+3t7f/t7e3/7e3t/+3t7f83aMT/7e3t/+zs7P/s7Oz/7Ozs/+zs7P+Pj4//u7u7//Ly8v/y8vL/8vLy//Ly8v83aMT/N2jE/zdoxP/x8fH/8fHx//Hx8f/x8fH/j4+P/7u7u//19fX/9fX1//X19f/19fX/9fX1/zdoxP/19fX/9fX1//X19f/19fX/9fX1/4+Pj/+7u7v/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//j4+P+Pj4//u7u7/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/w==";
+	this.image = new Image();
+	this.image.src = "../../../../sdkjs/common/Images/table_move.png";
+	this.image.onload = function() { this.asc_complete = true; };
 
-	this.image = document.createElement('canvas');
-	this.image.width = 13;
-	this.image.height = 13;
-
-	var ctx = this.image.getContext('2d');
-	var _data = ctx.createImageData(13, 13);
-
-	AscFonts.DecodeBase64(_data, image_64);
-	ctx.putImageData(_data, 0, 0);
-
-	_data = null;
-	image_64 = null;
+	this.image2 = new Image();
+	this.image2.src = "../../../../sdkjs/common/Images/table_move_2x.png";
+	this.image2.onload = function() { this.asc_complete = true; };
 
 	this.TableOutline = null;
 	this.Counter = 0;
@@ -579,6 +667,124 @@ function CTableOutlineDr()
 			}
 
 			return false;
+		}
+
+		return false;
+	}
+
+	this.checkMouseMoveTrack = function (pos, word_control)
+	{
+		if (null == this.TableOutline)
+			return false;
+
+		var _table_track = this.TableOutline;
+		var _d = 13 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
+
+		var _x, _y, _r, _b;
+		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+		{
+			switch (this.TrackTablePos)
+			{
+				case 1:
+				{
+					_x = _table_track.X + _table_track.W;
+					_b = _table_track.Y;
+					_y = _b - _d;
+					_r = _x + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 2:
+				{
+					_x = _table_track.X + _table_track.W;
+					_y = _table_track.Y + _table_track.H;
+					_r = _x + _d;
+					_b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 3:
+				{
+					_r = _table_track.X;
+					_x = _r - _d;
+					_y = _table_track.Y + _table_track.H;
+					_b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+				case 0:
+				default:
+				{
+					_r = _table_track.X;
+					_b = _table_track.Y;
+					_x = _r - _d;
+					_y = _b - _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+						return true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+			var _posx = _invert.TransformPointX(pos.X, pos.Y);
+			var _posy = _invert.TransformPointY(pos.X, pos.Y);
+			switch (this.TrackTablePos)
+			{
+				case 1:
+				{
+					_x = _table_track.X + _table_track.W;
+					_b = _table_track.Y;
+					_y = _b - _d;
+					_r = _x + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 2:
+				{
+					_x = _table_track.X + _table_track.W;
+					_y = _table_track.Y + _table_track.H;
+					_r = _x + _d;
+					_b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 3:
+				{
+					_r = _table_track.X;
+					_x = _r - _d;
+					_y = _table_track.Y + _table_track.H;
+					_b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+				case 0:
+				default:
+				{
+					_r = _table_track.X;
+					_b = _table_track.Y;
+					_x = _r - _d;
+					_y = _b - _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+						return true;
+					break;
+				}
+			}
 		}
 
 		return false;
@@ -2001,7 +2207,9 @@ function CPage()
 				if ((_y + _h) > overlay.max_y)
 					overlay.max_y = _y + _h;
 
-				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y);
+				var tmp_image = overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image;
+				if (tmp_image.asc_complete)
+					overlay.m_oContext.drawImage(tmp_image, _x, _y, 13, 13);
 			}
 			else
 			{
@@ -2009,7 +2217,7 @@ function CPage()
 				var _yLast = (yDst + dKoefY * (lastBounds.Y + lastBounds.H + _offY) + 0.5) >> 0;
 
 				var ctx = overlay.m_oContext;
-				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.strokeStyle = "rgb(140, 140, 140)";
 				ctx.lineWidth = 1;
 				ctx.beginPath();
 
@@ -2081,7 +2289,10 @@ function CPage()
 				overlay.CheckPoint(_ft.TransformPointX(_x + _w, _y + _h), _ft.TransformPointY(_x + _w, _y + _h));
 				overlay.CheckPoint(_ft.TransformPointX(_x, _y + _h), _ft.TransformPointY(_x, _y + _h));
 
-				overlay.m_oContext.drawImage(table_outline_dr.image, _x, _y, _w, _h);
+				var tmp_image = overlay.IsRetina ? table_outline_dr.image2 : table_outline_dr.image;
+				if (tmp_image.asc_complete)
+					overlay.m_oContext.drawImage(tmp_image, _x, _y, _w, _h);
+
 				overlay.SetBaseTransform();
 			}
 			else
@@ -2090,7 +2301,7 @@ function CPage()
 				var _yLast = (lastBounds.Y + lastBounds.H);
 
 				var ctx = overlay.m_oContext;
-				ctx.strokeStyle = "rgb(160, 160, 160)";
+				ctx.strokeStyle = "rgb(140, 140, 140)";
 				ctx.fillStyle = "#FFFFFF";
 				ctx.lineWidth = 1;
 				ctx.beginPath();
@@ -2336,21 +2547,10 @@ function CDrawingDocument()
 {
 	this.IsLockObjectsEnable = false;
 
-	this.cursorMarkerFormat = "";
-	if (AscCommon.AscBrowser.isIE)
-	{
-		// Пути указаны относительно html в меню, не надо их исправлять
-		// и коммитить на пути относительно тестового меню
-		this.cursorMarkerFormat = "url(../../../../sdkjs/common/Images/marker_format.cur), pointer";
-	}
-	else if (window.opera)
-	{
-		this.cursorMarkerFormat = "pointer";
-	}
-	else
-	{
-		this.cursorMarkerFormat = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAYAAAAbBi9cAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AUkSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXXPues852zzwfACAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgABeNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCdmCZTAKAEAGDLY2LjAFAtAGAnf+bTAICd+Jl7AQBblCEVAaCRACATZYhEAGg7AKzPVopFAFgwABRmS8Q5ANgtADBJV2ZIALC3AMDOEAuyAAgMADBRiIUpAAR7AGDIIyN4AISZABRG8lc88SuuEOcqAAB4mbI8uSQ5RYFbCC1xB1dXLh4ozkkXKxQ2YQJhmkAuwnmZGTKBNA/g88wAAKCRFRHgg/P9eM4Ors7ONo62Dl8t6r8G/yJiYuP+5c+rcEAAAOF0ftH+LC+zGoA7BoBt/qIl7gRoXgugdfeLZrIPQLUAoOnaV/Nw+H48PEWhkLnZ2eXk5NhKxEJbYcpXff5nwl/AV/1s+X48/Pf14L7iJIEyXYFHBPjgwsz0TKUcz5IJhGLc5o9H/LcL//wd0yLESWK5WCoU41EScY5EmozzMqUiiUKSKcUl0v9k4t8s+wM+3zUAsGo+AXuRLahdYwP2SycQWHTA4vcAAPK7b8HUKAgDgGiD4c93/+8//UegJQCAZkmScQAAXkQkLlTKsz/HCAAARKCBKrBBG/TBGCzABhzBBdzBC/xgNoRCJMTCQhBCCmSAHHJgKayCQiiGzbAdKmAv1EAdNMBRaIaTcA4uwlW4Dj1wD/phCJ7BKLyBCQRByAgTYSHaiAFiilgjjggXmYX4IcFIBBKLJCDJiBRRIkuRNUgxUopUIFVIHfI9cgI5h1xGupE7yAAygvyGvEcxlIGyUT3UDLVDuag3GoRGogvQZHQxmo8WoJvQcrQaPYw2oefQq2gP2o8+Q8cwwOgYBzPEbDAuxsNCsTgsCZNjy7EirAyrxhqwVqwDu4n1Y8+xdwQSgUXACTYEd0IgYR5BSFhMWE7YSKggHCQ0EdoJNwkDhFHCJyKTqEu0JroR+cQYYjIxh1hILCPWEo8TLxB7iEPENyQSiUMyJ7mQAkmxpFTSEtJG0m5SI+ksqZs0SBojk8naZGuyBzmULCAryIXkneTD5DPkG+Qh8lsKnWJAcaT4U+IoUspqShnlEOU05QZlmDJBVaOaUt2ooVQRNY9aQq2htlKvUYeoEzR1mjnNgxZJS6WtopXTGmgXaPdpr+h0uhHdlR5Ol9BX0svpR+iX6AP0dwwNhhWDx4hnKBmbGAcYZxl3GK+YTKYZ04sZx1QwNzHrmOeZD5lvVVgqtip8FZHKCpVKlSaVGyovVKmqpqreqgtV81XLVI+pXlN9rkZVM1PjqQnUlqtVqp1Q61MbU2epO6iHqmeob1Q/pH5Z/YkGWcNMw09DpFGgsV/jvMYgC2MZs3gsIWsNq4Z1gTXEJrHN2Xx2KruY/R27iz2qqaE5QzNKM1ezUvOUZj8H45hx+Jx0TgnnKKeX836K3hTvKeIpG6Y0TLkxZVxrqpaXllirSKtRq0frvTau7aedpr1Fu1n7gQ5Bx0onXCdHZ4/OBZ3nU9lT3acKpxZNPTr1ri6qa6UbobtEd79up+6Ynr5egJ5Mb6feeb3n+hx9L/1U/W36p/VHDFgGswwkBtsMzhg8xTVxbzwdL8fb8VFDXcNAQ6VhlWGX4YSRudE8o9VGjUYPjGnGXOMk423GbcajJgYmISZLTepN7ppSTbmmKaY7TDtMx83MzaLN1pk1mz0x1zLnm+eb15vft2BaeFostqi2uGVJsuRaplnutrxuhVo5WaVYVVpds0atna0l1rutu6cRp7lOk06rntZnw7Dxtsm2qbcZsOXYBtuutm22fWFnYhdnt8Wuw+6TvZN9un2N/T0HDYfZDqsdWh1+c7RyFDpWOt6azpzuP33F9JbpL2dYzxDP2DPjthPLKcRpnVOb00dnF2e5c4PziIuJS4LLLpc+Lpsbxt3IveRKdPVxXeF60vWdm7Obwu2o26/uNu5p7ofcn8w0nymeWTNz0MPIQ+BR5dE/C5+VMGvfrH5PQ0+BZ7XnIy9jL5FXrdewt6V3qvdh7xc+9j5yn+M+4zw33jLeWV/MN8C3yLfLT8Nvnl+F30N/I/9k/3r/0QCngCUBZwOJgUGBWwL7+Hp8Ib+OPzrbZfay2e1BjKC5QRVBj4KtguXBrSFoyOyQrSH355jOkc5pDoVQfujW0Adh5mGLw34MJ4WHhVeGP45wiFga0TGXNXfR3ENz30T6RJZE3ptnMU85ry1KNSo+qi5qPNo3ujS6P8YuZlnM1VidWElsSxw5LiquNm5svt/87fOH4p3iC+N7F5gvyF1weaHOwvSFpxapLhIsOpZATIhOOJTwQRAqqBaMJfITdyWOCnnCHcJnIi/RNtGI2ENcKh5O8kgqTXqS7JG8NXkkxTOlLOW5hCepkLxMDUzdmzqeFpp2IG0yPTq9MYOSkZBxQqohTZO2Z+pn5mZ2y6xlhbL+xW6Lty8elQfJa7OQrAVZLQq2QqboVFoo1yoHsmdlV2a/zYnKOZarnivN7cyzytuQN5zvn//tEsIS4ZK2pYZLVy0dWOa9rGo5sjxxedsK4xUFK4ZWBqw8uIq2Km3VT6vtV5eufr0mek1rgV7ByoLBtQFr6wtVCuWFfevc1+1dT1gvWd+1YfqGnRs+FYmKrhTbF5cVf9go3HjlG4dvyr+Z3JS0qavEuWTPZtJm6ebeLZ5bDpaql+aXDm4N2dq0Dd9WtO319kXbL5fNKNu7g7ZDuaO/PLi8ZafJzs07P1SkVPRU+lQ27tLdtWHX+G7R7ht7vPY07NXbW7z3/T7JvttVAVVN1WbVZftJ+7P3P66Jqun4lvttXa1ObXHtxwPSA/0HIw6217nU1R3SPVRSj9Yr60cOxx++/p3vdy0NNg1VjZzG4iNwRHnk6fcJ3/ceDTradox7rOEH0x92HWcdL2pCmvKaRptTmvtbYlu6T8w+0dbq3nr8R9sfD5w0PFl5SvNUyWna6YLTk2fyz4ydlZ19fi753GDborZ752PO32oPb++6EHTh0kX/i+c7vDvOXPK4dPKy2+UTV7hXmq86X23qdOo8/pPTT8e7nLuarrlca7nuer21e2b36RueN87d9L158Rb/1tWeOT3dvfN6b/fF9/XfFt1+cif9zsu72Xcn7q28T7xf9EDtQdlD3YfVP1v+3Njv3H9qwHeg89HcR/cGhYPP/pH1jw9DBY+Zj8uGDYbrnjg+OTniP3L96fynQ89kzyaeF/6i/suuFxYvfvjV69fO0ZjRoZfyl5O/bXyl/erA6xmv28bCxh6+yXgzMV70VvvtwXfcdx3vo98PT+R8IH8o/2j5sfVT0Kf7kxmTk/8EA5jz/GMzLdsAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOkAAHUwAADqYAAAOpgAABdvkl/FRgAAANNJREFUeNq8VEsKhTAMnL5UDyMUPIsbF+4ET+VCXLjobQSh18nbPEs/saKL11VmEoZJSKqYGcnLCABKyKkQa0mkaRpPOOdOXoU55xwHMVTiiI0xmZ3jODIHxpiTFx2BiLDvu8dt24otElHEfVIhrXVUEOCrOtwJoSRUVVVZKC1I8f+F6rou4iu+5IifONJSQdd1j1sThay1Hvd9/07IWothGCL8Zth+Cbdty5bzNzdO9osBsLhtRIRxHLGua5abpgkAsCyLj+d5zo5W+kbURS464u8AmWhBvQBxpekAAAAASUVORK5CYII=') 14 8, pointer";
-	}
+	AscCommon.g_oHtmlCursor.register("de-markerformat", "marker_format", "url('data:image/png;base64,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') 14 8", "pointer");
+	AscCommon.g_oHtmlCursor.register("select-table-row", "select_row", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAJCAQAAACssQXfAAAAMklEQVR42nWPRwEAMAwC8S8gdq97l8svC9AOAYReQMwRwYbWCPRUHYG+I39hNawrlyMB0D5opxAiYKUAAAAASUVORK5CYII=') 10 5", "default");
+	AscCommon.g_oHtmlCursor.register("select-table-column", "select_column", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAMCAQAAAAaVV8oAAAAMklEQVR42q3INwEAMACEQPwLeLuktz2wHQDGUVgpff1ORhf1gvKsGB8wsPAACw8sPFAATlpop2LuFMwAAAAASUVORK5CYII=') 5 10", "default");
+	AscCommon.g_oHtmlCursor.register("select-table-cell", "select_cell", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAQAAAAnOwc2AAAANUlEQVR42o2MtwEAMAjD+P8Av6t0wFvEhFssEB0dkWgHmfwRU0oxJRftJZMpIQQoN8/TQC4NtwlwzLEhHRIAAAAASUVORK5CYII=') 9 0", "default");
 
 	this.m_oWordControl = null;
 	this.m_oLogicDocument = null;
@@ -2476,6 +2676,7 @@ function CDrawingDocument()
 	this.ContentControlObjects = [];
 	this.ContentControlObjectsLast = [];
 	this.ContentControlObjectState = -1;
+	this.ContentControlSmallChangesCheck = { X: 0, Y: 0, Page: 0, Min: 2, IsSmall : true };
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -2510,14 +2711,14 @@ function CDrawingDocument()
 		if ("" == this.m_sLockedCursorType)
 		{
 			if (AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "text" == sType)
-				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
+				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(AscCommon.kCurFormatPainterWord);
 			else if (this.m_oWordControl.m_oApi.isMarkerFormat && "text" == sType)
-				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
+				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value("de-markerformat");
 			else
-				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
+				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(sType);
 		}
 		else
-			this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+			this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
 
 		if ("undefined" === typeof(Data) || null === Data)
 			Data = new AscCommon.CMouseMoveData();
@@ -2527,7 +2728,7 @@ function CDrawingDocument()
 	this.LockCursorType = function (sType)
 	{
 		this.m_sLockedCursorType = sType;
-		this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+		this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
 	}
 	this.LockCursorTypeCur = function ()
 	{
@@ -2680,6 +2881,9 @@ function CDrawingDocument()
 			//this.m_oWordControl.m_oLogicDocument.RecalculateCurPos();
 			this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
 			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
+			this.m_bIsDocumentCalculating = false;
+
+			this.m_oWordControl.onMouseMove(undefined, undefined);
 		}
 
 		if (-1 != this.m_lCurrentPage)
@@ -2713,7 +2917,6 @@ function CDrawingDocument()
 		if (isFull)
 		{
 			this.m_oWordControl.OnScroll();
-			this.m_bIsDocumentCalculating = false;
 
 			if (this.m_arPrintingWaitEndRecalculate)
 				this.m_oWordControl.m_oApi._downloadAs.apply(this.m_oWordControl.m_oApi, this.m_arPrintingWaitEndRecalculate);
@@ -4255,9 +4458,9 @@ function CDrawingDocument()
 		var _transform, offset_x, offset_y;
 		var _curPage;
 
-		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		for (var nIndexContentControl = 0; nIndexContentControl < this.ContentControlObjects.length; nIndexContentControl++)
 		{
-			_object = this.ContentControlObjects[i];
+			_object = this.ContentControlObjects[nIndexContentControl];
 			_transform = _object.transform;
 			_curPage = _object.getPage();
 
@@ -4486,23 +4689,147 @@ function CDrawingDocument()
 					_x = ((_x >> 0) + 0.5) - 15;
 					_y = ((_y >> 0) + 0.5);
 
-					ctx.rect(_x, _y, 15, 20);
+					var nAdvancedL = 0;
+					var nAdvancedLB = 0;
 
-					overlay.CheckRect(_x, _y, 15, 20);
-
-					if (1 == this.ContentControlObjectState)
+					if (_object.Name == "" && 0 == _object.Buttons.length)
 					{
-						ctx.fillStyle = "#CFCFCF";
+						ctx.rect(_x, _y, 15, 20);
+						overlay.CheckRect(_x, _y, 15, 20);
+
+						ctx.fillStyle = (1 == this.ContentControlObjectState) ? AscCommonWord.GlobalSkin.ContentControlsAnchorActive : AscCommonWord.GlobalSkin.ContentControlsBack;
+
 						ctx.fill();
+						ctx.stroke();
 					}
 					else
 					{
-						ctx.fillStyle = "#FFFFFF";
+						_x += 15;
+						_y -= 20;
+
+						var widthControl = 0;
+
+						if (_object.Name != "")
+						{
+							ctx.font = g_oContentControlButtonIcons.getFont();
+							widthControl += g_oContentControlButtonIcons.measure(_object.Name, ctx);
+							widthControl += 6; // 3 + 3
+							if (_object.NameButtonAdvanced)
+							{
+								nAdvancedL = _x + 15 + widthControl;
+								widthControl += 5;
+								widthControl += 3;
+							}
+							else
+								widthControl += 3;
+						}
+
+						_object.NameWidth = widthControl;
+
+						nAdvancedLB = _x + 15 + widthControl;
+						widthControl += (20 * _object.Buttons.length);
+
+						overlay.CheckRect(_x, _y, 15 + widthControl, 20);
+
+						ctx.beginPath();
+
+						var _fillStyleSetup = (1 == this.ContentControlObjectState) ? AscCommonWord.GlobalSkin.ContentControlsAnchorActive : AscCommonWord.GlobalSkin.ContentControlsBack;
+						var _fillStyle = "";
+						var _fillX = _x;
+						var _fillW = 15;
+						if (_object.NameWidth != 0)
+						{
+							if (_object.ActiveButtonIndex == -1)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsActive;
+							else if (_object.HoverButtonIndex == -1)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsHover;
+							else
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsBack;
+
+							if (_fillStyle != _fillStyleSetup)
+							{
+								ctx.rect(_fillX, _y, _fillW, 20);
+								_fillX = _fillX + _fillW;
+								_fillW = 0;
+
+								ctx.fillStyle = _fillStyleSetup;
+								ctx.fill();
+								ctx.beginPath();
+							}
+							_fillW += _object.NameWidth;
+							_fillStyleSetup = _fillStyle;
+						}
+
+						for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
+						{
+							if (_object.ActiveButtonIndex == nIndexB)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsActive;
+							else if (_object.HoverButtonIndex == nIndexB)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsHover;
+							else
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsBack;
+
+							if (_fillStyle != _fillStyleSetup)
+							{
+								ctx.rect(_fillX, _y, _fillW, 20);
+								_fillX = _fillX + _fillW;
+								_fillW = 0;
+
+								ctx.fillStyle = _fillStyleSetup;
+								ctx.fill();
+								ctx.beginPath();
+							}
+
+							_fillW += 20;
+							_fillStyleSetup = _fillStyle;
+						}
+
+						ctx.rect(_fillX, _y, _fillW, 20);
+						ctx.fillStyle = _fillStyleSetup;
 						ctx.fill();
+						_fillX = _fillX + _fillW;
+						_fillW = 0;
+
+						ctx.beginPath();
+						ctx.rect(_x, _y, 15 + widthControl, 20);
+						ctx.stroke();
 					}
 
-					ctx.stroke();
 					ctx.beginPath();
+
+					if (_object.Name != "")
+					{
+						ctx.fillStyle = (_object.ActiveButtonIndex == -1) ? AscCommonWord.GlobalSkin.ContentControlsTextActive : AscCommonWord.GlobalSkin.ContentControlsText;
+
+						ctx.fillText(_object.Name, _x + 15 + 3, _y + 20 - 6);
+
+						if (_object.NameButtonAdvanced)
+						{
+							nAdvancedL = (nAdvancedL + 0.5) >> 0;
+							var nY = _y - 0.5;
+							nY += 10;
+							nY -= 1;
+
+							var plus = AscCommon.AscBrowser.isRetina ? 0.5 : 1;
+
+							for (var i = 0; i <= 2; i+=plus)
+								ctx.rect(nAdvancedL + i, nY + i, 1, 1);
+
+							for (var i = 0; i <= 2; i+=plus)
+								ctx.rect(nAdvancedL + 4 - i, nY + i, 1, 1);
+
+							ctx.fill();
+							ctx.beginPath();
+						}
+					}
+
+					for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
+					{
+						var image = g_oContentControlButtonIcons.getImage(_object.Buttons[nIndexB], nIndexB == _object.ActiveButtonIndex);
+						if (image)
+							ctx.drawImage(image, nAdvancedLB, _y, 20, 20);
+						nAdvancedLB += 20;
+					}
 
 					var cx = _x - 0.5 + 4;
 					var cy = _y - 0.5 + 4;
@@ -4564,6 +4891,39 @@ function CDrawingDocument()
 					var _r = _rect.X;
 					var _b = _rect.Y + (20 / dKoefY);
 
+					var nAdvancedL = 0;
+					var nAdvancedLB = 0;
+					if (_object.Name != "" || 0 != _object.Buttons.length)
+					{
+						_x = _rect.X;
+						_y = _rect.Y - (20 / dKoefY);
+						_b = _rect.Y;
+
+						var widthControl = 0;
+
+						if (_object.Name != 0)
+						{
+							ctx.font = g_oContentControlButtonIcons.getFont();
+							widthControl += (g_oContentControlButtonIcons.measure(_object.Name, ctx) + 3);
+							widthControl += 6; // 3 + 3
+							if (_object.NameButtonAdvanced)
+							{
+								nAdvancedL = 15 + widthControl;
+								widthControl += 5;
+								widthControl += 3;
+							}
+							else
+								widthControl += 3;
+						}
+
+						_object.NameWidth = widthControl;
+
+						nAdvancedLB = 15 + widthControl;
+						widthControl += (20 * _object.Buttons.length);
+
+						_r = _x + ((15 + widthControl) / dKoefX);
+					}
+
 					var x1 = _transform.TransformPointX(_x, _y);
 					var y1 = _transform.TransformPointY(_x, _y);
 
@@ -4586,31 +4946,151 @@ function CDrawingDocument()
 					y3 = drPage.top + dKoefY * y3;
 					y4 = drPage.top + dKoefY * y4;
 
-					ctx.beginPath();
-
 					overlay.CheckPoint(x1, y1);
 					overlay.CheckPoint(x2, y2);
 					overlay.CheckPoint(x3, y3);
 					overlay.CheckPoint(x4, y4);
 
-					ctx.moveTo(x1, y1);
-					ctx.lineTo(x2, y2);
-					ctx.lineTo(x3, y3);
-					ctx.lineTo(x4, y4);
-					ctx.closePath();
+					ctx.beginPath();
 
-					if (1 == this.ContentControlObjectState)
+					if (_object.Name == "" && 0 == _object.Buttons.length)
 					{
-						ctx.fillStyle = "#CFCFCF";
+						ctx.moveTo(x1, y1);
+						ctx.lineTo(x2, y2);
+						ctx.lineTo(x3, y3);
+						ctx.lineTo(x4, y4);
+						ctx.closePath();
+
+						ctx.fillStyle = (1 == this.ContentControlObjectState) ? AscCommonWord.GlobalSkin.ContentControlsAnchorActive : AscCommonWord.GlobalSkin.ContentControlsBack;
 						ctx.fill();
+						ctx.stroke();
 					}
 					else
 					{
-						ctx.fillStyle = "#FFFFFF";
+						var _ft = new AscCommon.CMatrix();
+						_ft.sx = _transform.sx;
+						_ft.shx = _transform.shx;
+						_ft.shy = _transform.shy;
+						_ft.sy = _transform.sy;
+						_ft.tx = _transform.tx;
+						_ft.ty = _transform.ty;
+
+						var coords = new AscCommon.CMatrix();
+						coords.sx = dKoefX;
+						coords.sy = dKoefY;
+						coords.tx = drPage.left;
+						coords.ty = drPage.top;
+
+						global_MatrixTransformer.MultiplyAppend(_ft, coords);
+
+						ctx.transform(_ft.sx, _ft.shy, _ft.shx, _ft.sy, _ft.tx, _ft.ty);
+
+						var _fillStyleSetup = (1 == this.ContentControlObjectState) ? AscCommonWord.GlobalSkin.ContentControlsAnchorActive : AscCommonWord.GlobalSkin.ContentControlsBack;
+						var _fillStyle = "";
+						var _fillX = _x;
+						var _fillW = 15;
+						if (_object.Name != "")
+						{
+							if (_object.NameWidth != 0)
+							{
+								if (_object.ActiveButtonIndex == -1)
+									_fillStyle = AscCommonWord.GlobalSkin.ContentControlsActive;
+								else if (_object.HoverButtonIndex == -1)
+									_fillStyle = AscCommonWord.GlobalSkin.ContentControlsHover;
+								else
+									_fillStyle = AscCommonWord.GlobalSkin.ContentControlsBack;
+
+								if (_fillStyle != _fillStyleSetup)
+								{
+									ctx.rect(_fillX, _y, _fillW / dKoefX, 20 / dKoefY);
+									_fillX = _fillX + _fillW / dKoefX;
+									_fillW = 0;
+
+									ctx.fillStyle = _fillStyleSetup;
+									ctx.fill();
+									ctx.beginPath();
+								}
+
+								_fillW += _object.NameWidth;
+								_fillStyleSetup = _fillStyle;
+							}
+						}
+
+						for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
+						{
+							if (_object.ActiveButtonIndex == nIndexB)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsActive;
+							else if (_object.HoverButtonIndex == nIndexB)
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsHover;
+							else
+								_fillStyle = AscCommonWord.GlobalSkin.ContentControlsBack;
+
+							if (_fillStyle != _fillStyleSetup)
+							{
+								ctx.rect(_fillX, _y, _fillW / dKoefX, 20 / dKoefY);
+								_fillX = _fillX + _fillW / dKoefX;
+								_fillW = 0;
+
+								ctx.fillStyle = _fillStyleSetup;
+								ctx.fill();
+								ctx.beginPath();
+							}
+
+							_fillW += 20;
+							_fillStyleSetup = _fillStyle;
+						}
+
+						ctx.rect(_fillX, _y, _fillW / dKoefX, 20 / dKoefY);
+						ctx.fillStyle = _fillStyleSetup;
 						ctx.fill();
+						_fillX = _fillX + _fillW / dKoefX;
+						_fillW = 0;
+
+						ctx.beginPath();
+
+						if (_object.Name != "")
+						{
+							ctx.fillStyle = (_object.ActiveButtonIndex == -1) ? AscCommonWord.GlobalSkin.ContentControlsTextActive : AscCommonWord.GlobalSkin.ContentControlsText;
+
+							ctx.font = g_oContentControlButtonIcons.getFont(dKoefY);
+							ctx.fillText(_object.Name, _x + (15 + 3) / dKoefX, _y + (20 - 6) / dKoefY);
+
+							if (_object.NameButtonAdvanced)
+							{
+								var nY = _y;
+								nY += 9 / dKoefY;
+
+								for (var i = 0; i < 3; i++)
+									ctx.rect(_x + (nAdvancedL + i) / dKoefX, nY + i / dKoefY, 1 / dKoefX, 1 / dKoefY);
+
+								for (var i = 0; i < 2; i++)
+									ctx.rect(_x + (nAdvancedL + 4 - i) / dKoefX, nY + i / dKoefY, 1 / dKoefX, 1 / dKoefY);
+
+								ctx.fill();
+								ctx.beginPath();
+							}
+						}
+
+						for (var nIndexB = 0; nIndexB < _object.Buttons.length; nIndexB++)
+						{
+							var image = g_oContentControlButtonIcons.getImage(_object.Buttons[nIndexB], nIndexB == _object.ActiveButtonIndex);
+							if (image)
+								ctx.drawImage(image, _x + nAdvancedLB / dKoefX, _y, 20 / dKoefX, 20 / dKoefY);
+							nAdvancedLB += 20;
+						}
+
+						overlay.SetBaseTransform();
+
+						ctx.beginPath();
+						ctx.moveTo(x1, y1);
+						ctx.lineTo(x2, y2);
+						ctx.lineTo(x3, y3);
+						ctx.lineTo(x4, y4);
+						ctx.closePath();
+
+						ctx.stroke();
 					}
 
-					ctx.stroke();
 					ctx.beginPath();
 
 					var cx1 = _x + 5  / dKoefX;
@@ -4649,36 +5129,56 @@ function CDrawingDocument()
 		this.ContentControlsSaveLast();
 	};
 
-	this.OnDrawContentControl = function(id, type, rects, transform)
+	this.OnDrawContentControl = function(id, type, rects, transform, name, name_advanced, button_types)
 	{
+		var isActiveRemove = false;
 		// всегда должен быть максимум один hover и in
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
 			if (type == this.ContentControlObjects[i].type)
 			{
+				if (-2 != this.ContentControlObjects[i].ActiveButtonIndex)
+					isActiveRemove = true;
+
 				this.ContentControlObjects.splice(i, 1);
 				i--;
 			}
 		}
 
 		if (null == id || !rects || rects.length == 0)
+		{
+			if (isActiveRemove)
+				this.m_oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
 			return;
+		}
 
 		if (type == c_oContentControlTrack.In)
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 			{
+				if (-2 != this.ContentControlObjects[0].ActiveButtonIndex)
+					isActiveRemove = true;
+
 				this.ContentControlObjects.splice(0, 1);
 			}
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+			if (this.m_oWordControl.m_oApi.isViewMode)
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+			else
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
 		else
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 				return;
 
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+			if (this.m_oWordControl.m_oApi.isViewMode)
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name));
+			else
+				this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform, name, name_advanced, button_types));
 		}
+
+		if (isActiveRemove)
+			this.m_oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
 	};
 
 	this.private_DrawMathTrack = function (overlay, oPath, shift, color, dKoefX, dKoefY, drPage)
@@ -6735,16 +7235,15 @@ function CDrawingDocument()
 	this.SetDrawImagePlaceContents = function(id, props)
 	{
 		var _div_elem = null;
+
 		if (null == id || "" == id)
 		{
 			if ("" != this.GuiCanvasFillTOCParentId)
 			{
-				if (this.GuiCanvasFillTOC)
-				{
-					_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-					if (_div_elem)
-						_div_elem.removeChild(this.GuiCanvasFillTOC);
-				}
+				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+				if (this.GuiCanvasFillTOC && _div_elem)
+					_div_elem.removeChild(this.GuiCanvasFillTOC);
 
 				this.GuiCanvasFillTOCParentId = "";
 				this.GuiCanvasFillTOC = null;
@@ -6754,63 +7253,49 @@ function CDrawingDocument()
 
 		if (id != this.GuiCanvasFillTOCParentId)
 		{
-			if (this.GuiCanvasFillTOC)
-			{
-				_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-				if (_div_elem)
-					_div_elem.removeChild(this.GuiCanvasFillTOC);
-			}
+			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
+
+			if (this.GuiCanvasFillTOC && _div_elem)
+				_div_elem.removeChild(this.GuiCanvasFillTOC);
 
 			this.GuiCanvasFillTOCParentId = "";
 			this.GuiCanvasFillTOC = null;
 		}
 
 		this.GuiCanvasFillTOCParentId = id;
-		var widthPx = 0;
-		var heightPx = 0;
+		_div_elem =  document.getElementById(this.GuiCanvasFillTOCParentId);
+		if (!_div_elem)
+			return;
+
+		var widthPx = _div_elem.offsetWidth;
+		var heightPx = _div_elem.offsetHeight;
 
 		if (null == this.GuiCanvasFillTOC)
 		{
-			_div_elem = document.getElementById(this.GuiCanvasFillTOCParentId);
-
 			this.GuiCanvasFillTexture = null;
 			this.GuiCanvasFillTextureCtx = null;
 
 			this.GuiCanvasFillTOC = document.createElement('canvas');
-
-			widthPx = _div_elem.offsetWidth;
-			heightPx = _div_elem.offsetHeight;
-
-			this.GuiCanvasFillTOC.style.width = widthPx + "px";
-			this.GuiCanvasFillTOC.style.height = heightPx + "px";
-
-			this.GuiCanvasFillTOC.width = AscBrowser.convertToRetinaValue(widthPx, true);
-			this.GuiCanvasFillTOC.height = AscBrowser.convertToRetinaValue(heightPx, true);
-
-			if (_div_elem)
-				_div_elem.appendChild(this.GuiCanvasFillTOC);
+			_div_elem.appendChild(this.GuiCanvasFillTOC);
 		}
 
 		// draw!
-		var wPx = this.GuiCanvasFillTOC.width;
-		var hPx = this.GuiCanvasFillTOC.height;
+		var wPx = AscBrowser.convertToRetinaValue(widthPx, true);
+		var hPx = AscBrowser.convertToRetinaValue(heightPx, true);
 		var wMm = wPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
 		var hMm = hPx * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+
+		var wPxOffset = AscBrowser.convertToRetinaValue(8, true);
+		var wMmOffset = wPxOffset * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio;
+
+		this.GuiCanvasFillTOC.style.width = widthPx + "px";
+		this.GuiCanvasFillTOC.width = wPx;
 
 		History.TurnOff();
 		var _oldTurn = editor.isViewMode;
 		editor.isViewMode = true;
 
 		var ctx = this.GuiCanvasFillTOC.getContext('2d');
-
-		// clear
-		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(0, 0, wPx, hPx);
-
-		var graphics = new AscCommon.CGraphics();
-		graphics.init(ctx, wPx, hPx, wMm, hMm);
-		graphics.m_oFontManager = AscCommon.g_fontManager;
-		graphics.transform(1, 0, 0, 1, 0, 0);
 
 		var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
 		this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -6859,7 +7344,18 @@ function CDrawingDocument()
 				};
 			}
 
-			arrLevels[nLvl].Styles.push(sName);
+			var isAddStyle = true;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				if (arrLevels[nLvl].Styles[nIndex] === sName)
+				{
+					isAddStyle = false;
+					break;
+				}
+			}
+
+			if (isAddStyle)
+				arrLevels[nLvl].Styles.push(sName);
 		}
 
 		for (var _nLvl = nOutlineStart; _nLvl <= nOutlineEnd; ++_nLvl)
@@ -6889,7 +7385,18 @@ function CDrawingDocument()
 				};
 			}
 
-			arrLevels[nLvl ].Styles.push(sName);
+			var isAddStyle = true;
+			for (var nIndex = 0, nCount = arrLevels[nLvl].Styles.length; nIndex < nCount; ++nIndex)
+			{
+				if (arrLevels[nLvl].Styles[nIndex] === sName)
+				{
+					isAddStyle = false;
+					break;
+				}
+			}
+
+			if (isAddStyle)
+				arrLevels[nLvl].Styles.push(sName);
 		}
 
 		var oParaIndex = 0;
@@ -6919,7 +7426,7 @@ function CDrawingDocument()
 					if (isRightTab)
 					{
 						var oParaTabs = new CParaTabs();
-						oParaTabs.Add(new CParaTab(tab_Right, wMm - 1.5, nTabLeader));
+						oParaTabs.Add(new CParaTab(tab_Right, wMm - 2 - wMmOffset, nTabLeader));
 						oParagraph.SetParagraphTabs(oParaTabs);
 
 						oRun.AddToContent(-1, new ParaTab());
@@ -6938,14 +7445,35 @@ function CDrawingDocument()
 
 		oDocumentContent.Reset(1, 0, 1000, 10000);
 		oDocumentContent.Recalculate_Page(0, true);
-		oDocumentContent.Draw(0, graphics);
 
 		for (var nIndex = 0, nCount = arrStylesToDelete.length; nIndex < nCount; ++nIndex)
 		{
 			oStyles.Remove(arrStylesToDelete[nIndex]);
 		}
 
-		// draw
+		var nContentHeight = oDocumentContent.GetSummaryHeight();
+		var nContentHeightPx = (AscCommon.AscBrowser.retinaPixelRatio * nContentHeight / g_dKoef_pix_to_mm) >> 0;
+
+		if (nContentHeightPx > hPx)
+		{
+			hPx = nContentHeightPx;
+			hMm = nContentHeight;
+		}
+
+		this.GuiCanvasFillTOC.style.height = AscBrowser.convertToRetinaValue(hPx, false) + "px";
+		this.GuiCanvasFillTOC.height = hPx;
+
+		var ctx = this.GuiCanvasFillTOC.getContext('2d');
+
+		ctx.fillStyle = "#FFFFFF";
+		ctx.fillRect(0, 0, wPx, hPx);
+
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(ctx, wPx, hPx, wMm, hMm);
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+		graphics.m_oCoordTransform.tx = graphics.m_oCoordTransform.ty = wPxOffset;
+		graphics.transform(1, 0, 0, 1, 0, 0);
+		oDocumentContent.Draw(0, graphics);
 
 		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
 
@@ -7260,12 +7788,12 @@ function CDrawingDocument()
 
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
-			var _object = this.ContentControlObjects[i];
-			if (_object.type == c_oContentControlTrack.In)
+			var _content_control = this.ContentControlObjects[i];
+			if (_content_control.type == c_oContentControlTrack.In)
 			{
-				var _rect = _object.getXY();
+				var _rect = _content_control.getXY();
 
-				var _page = this.m_arrPages[_object.getPage()];
+				var _page = this.m_arrPages[_content_control.getPage()];
 				if (!_page)
 					return false;
 
@@ -7279,10 +7807,18 @@ function CDrawingDocument()
 				var _r = _rect.X;
 				var _b = _rect.Y + (20 / dKoefY);
 
+				if (_content_control.Name != "" || 0 != _content_control.Buttons.length)
+				{
+					_x = _rect.X;
+					_y = _rect.Y - (20 / dKoefY);
+					_r = _rect.X + (15 / dKoefX);
+					_b = _rect.Y;
+				}
+
 				var posX = pos.X;
 				var posY = pos.Y;
 
-				var _transform = _object.transform;
+				var _transform = _content_control.transform;
 				if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
 				{
 					_x += _transform.tx;
@@ -7301,17 +7837,91 @@ function CDrawingDocument()
 
 				if (posX > _x && posX < _r && posY > _y && posY < _b)
 				{
-					oWordControl.m_oLogicDocument.SelectContentControl(_object.id);
+					oWordControl.m_oLogicDocument.SelectContentControl(_content_control.id);
 					this.ContentControlObjectState = 1;
+					this.ContentControlSmallChangesCheck.X = pos.X;
+					this.ContentControlSmallChangesCheck.Y = pos.Y;
+					this.ContentControlSmallChangesCheck.Page = pos.Page;
+					this.ContentControlSmallChangesCheck.IsSmall = true;
 
-					this.InlineTextTrackEnabled = true;
+					//this.InlineTextTrackEnabled = true;
 					this.InlineTextTrack = null;
 					this.InlineTextTrackPage = -1;
 
 					oWordControl.ShowOverlay();
 					oWordControl.OnUpdateOverlay();
 					oWordControl.EndUpdateOverlay();
+
+					this.LockCursorType("default");
 					return true;
+				}
+				else if (_content_control.NameButtonAdvanced && posX > _r && posX < (_r + _content_control.NameWidth / dKoefX) && posY > _y && posY < _b)
+				{
+					if (_content_control.ActiveButtonIndex == -1)
+					{
+						_content_control.ActiveButtonIndex = -2;
+						oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
+					}
+					else
+					{
+						_content_control.ActiveButtonIndex = -1;
+
+						var xCC = _r;
+						var yCC = _b;
+						if (_transform)
+						{
+							xCC = _transform.TransformPointX(_r, _b);
+							yCC = _transform.TransformPointY(_r, _b);
+						}
+
+						var posOnScreen = this.ConvertCoordsToCursorWR(xCC, yCC, _content_control.getPage());
+						oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", 0, posOnScreen.X, posOnScreen.Y);
+					}
+
+					oWordControl.ShowOverlay();
+					oWordControl.OnUpdateOverlay();
+					oWordControl.EndUpdateOverlay();
+
+					this.LockCursorType("default");
+					return true;
+				}
+				else
+				{
+					var _posR = _r + _content_control.NameWidth / dKoefX;
+					for (var indexB = 0; indexB < _content_control.Buttons.length; indexB++)
+					{
+						if (posX > _posR && posX < (_posR + 20 / dKoefX) && posY > _y && posY < _b)
+						{
+							if (_content_control.ActiveButtonIndex == indexB)
+							{
+								_content_control.ActiveButtonIndex = -2;
+								oWordControl.m_oApi.sendEvent("asc_onHideContentControlsActions");
+							}
+							else
+							{
+								_content_control.ActiveButtonIndex = indexB;
+
+								var xCC = _posR;
+								var yCC = _b;
+								if (_transform)
+								{
+									xCC = _transform.TransformPointX(_posR, _b);
+									yCC = _transform.TransformPointY(_posR, _b);
+								}
+
+								var posOnScreen = this.ConvertCoordsToCursorWR(xCC, yCC, _content_control.getPage());
+								oWordControl.m_oApi.sendEvent("asc_onShowContentControlsActions", indexB + 1, posOnScreen.X, posOnScreen.Y);
+							}
+
+							oWordControl.ShowOverlay();
+							oWordControl.OnUpdateOverlay();
+							oWordControl.EndUpdateOverlay();
+
+							this.LockCursorType("default");
+							return true;
+						}
+						_posR += (20 / dKoefX);
+					}
 				}
 
 				break;
@@ -7332,6 +7942,14 @@ function CDrawingDocument()
 			oWordControl.EndUpdateOverlay();
 			return true;
 		}
+		if (this.TableOutlineDr.checkMouseMoveTrack)
+		{
+			if (this.TableOutlineDr.checkMouseMoveTrack(pos, oWordControl))
+			{
+				this.SetCursorType("default");
+				return true;
+			}
+		}
 		if (this.TableOutlineDr.checkMouseMove2)
 		{
 			if (this.TableOutlineDr.checkMouseMove2(global_mouseEvent.X, global_mouseEvent.Y, oWordControl))
@@ -7340,6 +7958,13 @@ function CDrawingDocument()
 
 		if (this.InlineTextTrackEnabled)
 		{
+			if (pos.Page != this.ContentControlSmallChangesCheck.Page ||
+				Math.abs(pos.X - this.ContentControlSmallChangesCheck.X) > this.ContentControlSmallChangesCheck.Min ||
+				Math.abs(pos.Y - this.ContentControlSmallChangesCheck.Y) > this.ContentControlSmallChangesCheck.Min)
+			{
+				this.ContentControlSmallChangesCheck.IsSmall = false;
+			}
+
 			this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 			this.InlineTextTrackPage = pos.Page;
 
@@ -7423,8 +8048,12 @@ function CDrawingDocument()
 		}
 
 		var _content_control = null;
+		var isChangeHover = false;
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
+			if (-2 != this.ContentControlObjects[i].HoverButtonIndex)
+				isChangeHover = true;
+			this.ContentControlObjects[i].HoverButtonIndex = -2;
 			if (this.ContentControlObjects[i].type == c_oContentControlTrack.In)
 			{
 				_content_control = this.ContentControlObjects[i];
@@ -7436,6 +8065,19 @@ function CDrawingDocument()
 		{
 			if (1 == this.ContentControlObjectState)
 			{
+				if (pos.Page == this.ContentControlSmallChangesCheck.Page &&
+					Math.abs(pos.X - this.ContentControlSmallChangesCheck.X) < this.ContentControlSmallChangesCheck.Min &&
+					Math.abs(pos.Y - this.ContentControlSmallChangesCheck.Y) < this.ContentControlSmallChangesCheck.Min)
+				{
+					oWordControl.ShowOverlay();
+					oWordControl.OnUpdateOverlay();
+					oWordControl.EndUpdateOverlay();
+					return true;
+				}
+
+				this.InlineTextTrackEnabled = true;
+				this.ContentControlSmallChangesCheck.IsSmall = false;
+
 				this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 				this.InlineTextTrackPage = pos.Page;
 
@@ -7456,6 +8098,14 @@ function CDrawingDocument()
 			var _y = rect.Y;
 			var _r = rect.X;
 			var _b = rect.Y + (20 / dKoefY);
+
+			if (_content_control.Name != "" || 0 != _content_control.Buttons.length)
+			{
+				_x = rect.X;
+				_y = rect.Y - (20 / dKoefY);
+				_r = rect.X + (15 / dKoefX);
+				_b = rect.Y;
+			}
 
 			var posX = pos.X;
 			var posY = pos.Y;
@@ -7485,12 +8135,54 @@ function CDrawingDocument()
 				oWordControl.ShowOverlay();
 				oWordControl.OnUpdateOverlay();
 				oWordControl.EndUpdateOverlay();
+
+				this.SetCursorType("default");
+
+				oWordControl.m_oApi.sync_MouseMoveStartCallback();
+				oWordControl.m_oApi.sync_MouseMoveEndCallback();
 				return true;
+			}
+			else if (_content_control.NameButtonAdvanced && posX > _r && posX < (_r + _content_control.NameWidth / dKoefX) && posY > _y && posY < _b)
+			{
+				_content_control.HoverButtonIndex = -1;
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+
+				this.SetCursorType("default");
+
+				oWordControl.m_oApi.sync_MouseMoveStartCallback();
+				oWordControl.m_oApi.sync_MouseMoveEndCallback();
+				return true;
+			}
+			else
+			{
+				var _posR = _r + _content_control.NameWidth / dKoefX;
+				for (var indexB = 0; indexB < _content_control.Buttons.length; indexB++)
+				{
+					if (posX > _posR && posX < (_posR + 20 / dKoefX) && posY > _y && posY < _b)
+					{
+						_content_control.HoverButtonIndex = indexB;
+						oWordControl.ShowOverlay();
+						oWordControl.OnUpdateOverlay();
+						oWordControl.EndUpdateOverlay();
+
+						this.SetCursorType("default");
+
+						oWordControl.m_oApi.sync_MouseMoveStartCallback();
+						oWordControl.m_oApi.sync_MouseMoveEndCallback();
+						return true;
+					}
+					_posR += (20 / dKoefX);
+				}
 			}
 
 			if (_old != this.ContentControlObjectState)
 				oWordControl.OnUpdateOverlay();
 		}
+
+		if (isChangeHover)
+			oWordControl.OnUpdateOverlay();
 
 		return false;
 	};
@@ -7498,6 +8190,10 @@ function CDrawingDocument()
 	this.checkMouseUp_Drawing = function (pos)
 	{
 		var oWordControl = this.m_oWordControl;
+
+		var oldContentControlSmall = this.ContentControlSmallChangesCheck.IsSmall;
+		this.ContentControlSmallChangesCheck.IsSmall = true;
+
 		if (this.TableOutlineDr.bIsTracked)
 		{
 			this.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
@@ -7555,7 +8251,7 @@ function CDrawingDocument()
 				{
 					if (this.InlineTextTrackEnabled)
 					{
-						if (this.InlineTextTrack) // значит был MouseMove
+						if (this.InlineTextTrack && !oldContentControlSmall) // значит был MouseMove
 						{
 							this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 							this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(_object.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
@@ -7986,7 +8682,7 @@ CStylesPainter.prototype =
         for (var i in ds)
         {
             var style = ds[i];
-            if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
+            if (style.IsExpressStyle(DocumentStyles) && null === DocumentStyles.GetStyleIdByName(style.Name))
             {
             	AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
             }
@@ -8002,7 +8698,7 @@ CStylesPainter.prototype =
         for (var i in styles)
         {
             var style = styles[i];
-            if (true == style.qFormat)
+            if (style.IsExpressStyle(DocumentStyles))
             {
                 AscFonts.FontPickerByCharacter.getFontsByString(style.Name);
                 AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(style.Name));
@@ -8125,7 +8821,7 @@ CStylesPainter.prototype =
 		for (var i in styles)
 		{
 			var style = styles[i];
-			if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
+			if (style.IsExpressStyle(DocumentStyles) && null === DocumentStyles.GetStyleIdByName(style.Name))
 			{
 				this.drawStyle(graphics, style, AscCommon.translateManager.getValue(style.Name));
 				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default,
@@ -8179,7 +8875,7 @@ CStylesPainter.prototype =
 		for (var i in styles)
 		{
 			var style = styles[i];
-			if (true == style.qFormat)
+			if (style.IsExpressStyle(__Styles))
 			{
 				// как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
 				// зато быстро делается

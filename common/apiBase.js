@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -222,7 +222,8 @@
 		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
 			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber + ':' + column +
 				' userAgent: ' + (navigator.userAgent || navigator.vendor || window.opera) + ' platform: ' +
-				navigator.platform + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+				navigator.platform + ' isLoadFullApi: ' + t.isLoadFullApi + ' isDocumentLoadComplete: ' +
+				t.isDocumentLoadComplete + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
 			t.CoAuthoringApi.sendChangesError(msg);
 			//send only first error to reduce number of requests. also following error may be consequences of first
 			window.onerror = oldOnError;
@@ -521,7 +522,11 @@
 	};
 	baseEditorsApi.prototype.onDocumentContentReady              = function()
 	{
+		var t = this;
 		this.isDocumentLoadComplete = true;
+		if (!window['IS_NATIVE_EDITOR']) {
+			setInterval(function() {t._autoSave();}, 40);
+		}
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		this.sendEvent('asc_onDocumentContentReady');
 	};
@@ -547,8 +552,115 @@
 	{
 		this.isForceSaveOnUserSave = val;
 	};
-	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._onUpdateDocumentCanSave = function () {
+	};
+	baseEditorsApi.prototype._onUpdateDocumentCanUndoRedo = function () {
+	};
+	baseEditorsApi.prototype._saveCheck = function () {
+		return false;
+	};
+	// Переопределяется во всех редакторах
+	baseEditorsApi.prototype._haveOtherChanges = function () {
+		return false;
+	};
+	baseEditorsApi.prototype._onSaveCallback = function (e, isUndoRequest) {
+		var t = this;
+		var nState;
+		if (false == e["saveLock"]) {
+			if (this.isLongAction()) {
+				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+				// Нужно снять lock с сохранения
+				this.CoAuthoringApi.onUnSaveLock = function () {
+					t.canSave = true;
+					t.IsUserSave = false;
+					t.lastSaveTime = null;
+
+					if (t.canUnlockDocument) {
+						t._unlockDocument();
+					}
+				};
+				this.CoAuthoringApi.unSaveLock();
+				return;
+			}
+
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
+
+			this._onSaveCallbackInner(isUndoRequest);
+		} else {
+			nState = this.CoAuthoringApi.get_state();
+			if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
+				// Отключаемся от сохранения, соединение потеряно
+				this.IsUserSave = false;
+				this.canSave = true;
+			} else {
+				// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+				if (!this.IsUserSave) {
+					this.canSave = true;
+					if (this.canUnlockDocument) {
+						this._unlockDocument();
+					}
+					return;
+				}
+
+				setTimeout(function() {
+					t.CoAuthoringApi.askSaveChanges(function(event) {
+						t._onSaveCallback(event, isUndoRequest);
+					});
+				}, 1000);
+			}
+		}
+	};
+	// Функция сохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._onSaveCallbackInner = function (isUndoRequest) {
+	};
 	baseEditorsApi.prototype._autoSave = function () {
+		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
+			if (this.canUnlockDocument) {
+				this.lastSaveTime = new Date();
+				// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
+				// Close cell edit without errors (isIdle = true)
+				this.asc_Save(true, false, true);
+			} else {
+				this._autoSaveInner();
+			}
+		}
+	};
+	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._autoSaveInner = function () {
+	};
+	baseEditorsApi.prototype._prepareSave = function (isIdle) {
+		return true;
+	};
+	// Unlock document when start co-authoring
+	baseEditorsApi.prototype._unlockDocument = function () {
+		if (this.isDocumentLoadComplete) {
+			// Document is load
+			this.canUnlockDocument = true;
+			this.canStartCoAuthoring = true;
+			if (this.canSave) {
+				// We can only unlock with delete index
+				this.CoAuthoringApi.unLockDocument(false, true, AscCommon.History.GetDeleteIndex());
+				this.startCollaborationEditing();
+				AscCommon.History.RemovePointsByDeleteIndex();
+				this._onUpdateDocumentCanSave();
+				this._onUpdateDocumentCanUndoRedo();
+				this.canStartCoAuthoring = false;
+				this.canUnlockDocument = false;
+			} else {
+				// ToDo !!!!
+			}
+		} else {
+			// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+			this.startCollaborationEditing();
+			this.CoAuthoringApi.unLockDocument(false, true);
+		}
 	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
@@ -859,15 +971,7 @@
 			if (isStartEvent) {
 				t.startCollaborationEditing();
 			} else {
-				// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
-				if (!t.isDocumentLoadComplete) {
-					t.startCollaborationEditing();
-					t.CoAuthoringApi.unLockDocument(false, true);
-				} else {
-					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-					t.canUnlockDocument = true;
-					t.canStartCoAuthoring = true;
-				}
+				t._unlockDocument();
 			}
 		};
 		this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
@@ -1130,6 +1234,27 @@
 	baseEditorsApi.prototype.asc_undoAllChanges = function()
 	{
 	};
+	baseEditorsApi.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
+		var t = this;
+		var res = false;
+		if (this.canSave && this._saveCheck()) {
+			this.IsUserSave = !isAutoSave;
+
+			if (this.asc_isDocumentCanSave() || AscCommon.History.Have_Changes() || this._haveOtherChanges() || isUndoRequest ||
+				this.canUnlockDocument) {
+				if (this._prepareSave(isIdle)) {
+					// Не даем пользователю сохранять, пока не закончится сохранение (если оно началось)
+					this.canSave = false;
+					this.CoAuthoringApi.askSaveChanges(function (e) {
+						t._onSaveCallback(e, isUndoRequest);
+					});
+				}
+			} else if (this.isForceSaveOnUserSave && this.IsUserSave) {
+				this.forceSave();
+			}
+		}
+		return res;
+	};
 	/**
 	 * Эта функция возвращает true, если есть изменения или есть lock-и в документе
 	 */
@@ -1222,10 +1347,6 @@
 		}
 
 		this.pluginsManager     = Asc.createPluginsManager(this);
-
-		if (!window['IS_NATIVE_EDITOR']) {
-			setInterval(function() {t._autoSave();}, 40);
-		}
 
 		this.macros = new AscCommon.CDocumentMacros();
 	};
@@ -1481,6 +1602,36 @@
 	};
 	baseEditorsApi.prototype.asc_Recalculate       = function()
 	{
+	};
+
+	// Native
+	baseEditorsApi.prototype['asc_nativeCheckPdfRenderer'] = function (_memory1, _memory2) {
+		if (true) {
+			// pos не должен минимизироваться!!!
+
+			_memory1.Copy = _memory1["Copy"];
+			_memory1.ClearNoAttack = _memory1["ClearNoAttack"];
+			_memory1.WriteByte = _memory1["WriteByte"];
+			_memory1.WriteBool = _memory1["WriteBool"];
+			_memory1.WriteLong = _memory1["WriteLong"];
+			_memory1.WriteDouble = _memory1["WriteDouble"];
+			_memory1.WriteString = _memory1["WriteString"];
+			_memory1.WriteString2 = _memory1["WriteString2"];
+
+			_memory2.Copy = _memory1["Copy"];
+			_memory2.ClearNoAttack = _memory1["ClearNoAttack"];
+			_memory2.WriteByte = _memory1["WriteByte"];
+			_memory2.WriteBool = _memory1["WriteBool"];
+			_memory2.WriteLong = _memory1["WriteLong"];
+			_memory2.WriteDouble = _memory1["WriteDouble"];
+			_memory2.WriteString = _memory1["WriteString"];
+			_memory2.WriteString2 = _memory1["WriteString2"];
+		}
+
+		var _printer = new AscCommon.CDocumentRenderer();
+		_printer.Memory = _memory1;
+		_printer.VectorMemoryForPrint = _memory2;
+		return _printer;
 	};
 
 	// input
@@ -1791,7 +1942,7 @@
 		if (this.isEmbedVersion)
 			return 0;
 
-		if (!this.saveCheck())
+		if (!this.canSave || !this._saveCheck())
 			return 0;
 
 		return new Date().getTime() - this.lastWorkTime;
@@ -1808,11 +1959,6 @@
 		this.sendEvent('asc_onCoAuthoringDisconnect');
 		// И переходим в режим просмотра т.к. мы не можем сохранить файл
 		this.asc_setViewMode(true);
-	};
-
-	baseEditorsApi.prototype.saveCheck = function()
-	{
-		return false;
 	};
 
 	baseEditorsApi.prototype.asc_setCurrentPassword = function(password)

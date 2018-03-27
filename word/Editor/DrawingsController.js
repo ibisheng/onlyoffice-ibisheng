@@ -533,3 +533,7 @@ CDrawingsController.prototype.AddContentControl = function(nContentControlType)
 {
 	return this.DrawingObjects.AddContentControl(nContentControlType);
 };
+CDrawingsController.prototype.GetStyleFromFormatting = function()
+{
+	return this.DrawingObjects.GetStyleFromFormatting();
+};

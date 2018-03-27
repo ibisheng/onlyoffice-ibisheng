@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -758,3 +758,7 @@ CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
  * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
  */
 CDocumentControllerBase.prototype.AddContentControl = function(nContentControlType){return null;};
+/**
+ * Получаем стиль по выделенному фрагменту
+ */
+CDocumentControllerBase.prototype.GetStyleFromFormatting = function(){return null;};

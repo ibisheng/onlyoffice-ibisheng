@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -421,9 +421,18 @@ CComplexField.prototype.private_UpdateTOC = function()
 
 	var nTabPos = 9345 / 20 / 72 * 25.4; // Стандартное значение для A4 и обычных полей 3см и 2см
 	var oSectPr = this.LogicDocument.GetCurrentSectionPr();
-
 	if (oSectPr)
-		nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+	{
+		if (oSectPr.Get_ColumnsCount() > 1)
+		{
+			// TODO: Сейчас забирается ширина текущей колонки. По правильному надо читать поля от текущего места
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_ColumnWidth(0), oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+		}
+		else
+		{
+			nTabPos = Math.max(0, Math.min(oSectPr.Get_PageWidth(), oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right()));
+		}
+	}
 
 	var oStyles          = this.LogicDocument.Get_Styles();
 	var arrOutline       = this.LogicDocument.GetOutlineParagraphs(null, {
@@ -463,16 +472,22 @@ CComplexField.prototype.private_UpdateTOC = function()
 			var oSrcParagraph = arrOutline[nIndex].Paragraph;
 
 			var oPara = oSrcParagraph.Copy(null, null, {
-				SkipPageBreak   : true,
-				SkipLineBreak   : this.Instruction.IsRemoveBreaks(),
-				SkipColumnBreak : true
+				SkipPageBreak         : true,
+				SkipLineBreak         : this.Instruction.IsRemoveBreaks(),
+				SkipColumnBreak       : true,
+				SkipAnchors           : true,
+				SkipFootnoteReference : true,
+				SkipComplexFields     : true
 			});
-			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false, true);
+			oPara.Style_Add(oStyles.GetDefaultTOC(arrOutline[nIndex].Lvl), false);
 
 
 			var oClearTextPr = new CTextPr();
 			oClearTextPr.Set_FromObject({
-				FontSize  : null
+				FontSize  : null,
+				Unifill   : null,
+				Underline : null,
+				Color     : null
 			});
 
 			oPara.SelectAll();
@@ -518,25 +533,35 @@ CComplexField.prototype.private_UpdateTOC = function()
 				var oNumbering = this.LogicDocument.Get_Numbering();
 				var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
 				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
+				var oNumTextPr = oSrcParagraph.GetNumberingCompiledPr();
 
 				var oNumberingRun = new ParaRun(oPara, false);
 				oNumberingRun.AddText(sText);
+
+				if (oNumTextPr)
+					oNumberingRun.Set_RFonts(oNumTextPr.RFonts);
+
+				oContainer.Add_ToContent(0, oNumberingRun);
+				nContainerPos++;
+
+				var oNumTabRun = new ParaRun(oPara, false);
 
 				var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
 				var nNumSuff = oNumLvl.Suff;
 
 				if (numbering_suff_Space === nNumSuff)
 				{
-					oNumberingRun.Add_ToContent(sText.length, new ParaSpace());
+					oNumTabRun.Add_ToContent(0, new ParaSpace());
+					oContainer.Add_ToContent(1, oNumTabRun);
+					nContainerPos++;
 				}
 				else if (numbering_suff_Tab === nNumSuff)
 				{
-					oNumberingRun.Add_ToContent(sText.length, new ParaTab());
+					oNumTabRun.Add_ToContent(0, new ParaTab());
 					isAddTabForNumbering = true;
+					oContainer.Add_ToContent(1, oNumTabRun);
+					nContainerPos++;
 				}
-
-				oContainer.Add_ToContent(0, oNumberingRun);
-				nContainerPos++;
 			}
 
 			// Word добавляет табы независимо о наличия Separator и PAGEREF
@@ -665,6 +690,8 @@ CComplexField.prototype.SelectFieldValue = function()
 	if (!oDocument)
 		return;
 
+	oDocument.RemoveSelection();
+
 	var oRun = this.SeparateChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
 	oRun.SetCursorPosition(oRun.GetElementPosition(this.SeparateChar) + 1);
@@ -683,6 +710,8 @@ CComplexField.prototype.SelectFieldCode = function()
 	if (!oDocument)
 		return;
 
+	oDocument.RemoveSelection();
+
 	var oRun = this.BeginChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);
 	oRun.SetCursorPosition(oRun.GetElementPosition(this.BeginChar) + 1);
@@ -700,6 +729,8 @@ CComplexField.prototype.SelectField = function()
 	var oDocument = this.GetTopDocumentContent();
 	if (!oDocument)
 		return;
+
+	oDocument.RemoveSelection();
 
 	var oRun = this.BeginChar.GetRun();
 	oRun.Make_ThisElementCurrent(false);

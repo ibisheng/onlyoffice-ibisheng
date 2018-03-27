@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3299,6 +3299,13 @@ CGraphicObjects.prototype =
             if(obj.DocumentContent && obj.DocumentContent.Is_HdrFtr())
             {
                 if(obj.DocumentContent.Get_StartPage_Absolute() !== obj.PageNum)
+                {
+                    nPageIndex = obj.PageNum;
+                }
+            }
+            else
+            {
+                if(AscFormat.isRealNumber(obj.PageNum))
                 {
                     nPageIndex = obj.PageNum;
                 }

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -328,6 +328,10 @@
 						 },
 		getImageLocal:   function (url)
 						 {
+							 if(url && 0 === url.indexOf('data:image'))
+							 {
+								 return null;
+							 }
 							 var imageLocal = this.getLocal(url);
 							 if (imageLocal && this.mediaPrefix == imageLocal.substring(0, this.mediaPrefix.length))
 								 imageLocal = imageLocal.substring(this.mediaPrefix.length);
@@ -376,6 +380,37 @@
 		}
 	};
 	var g_oDocumentUrls = new DocumentUrls();
+
+	function CHTMLCursor()
+	{
+		this.map = {};
+
+		this.value = function(param)
+		{
+			return this.map[param] ? this.map[param] : param;
+		};
+
+		this.register = function(type, url_ie, url_main, default_css_value)
+		{
+			if (AscBrowser.isIE)
+			{
+				var isTestRetinaNeed = (url_ie.lastIndexOf(".cur") == (url_ie.length - 4)) ? false : true;
+
+				if (isTestRetinaNeed)
+					this.map[type] = ("url(../../../../sdkjs/common/Images/" + url_ie + (AscBrowser.isRetina ? "_2x" : "") + ".cur), " + default_css_value);
+				else
+					this.map[type] = ("url(../../../../sdkjs/common/Images/" + url_ie + "), " + default_css_value);
+			}
+			else if (window.opera)
+			{
+				this.map[type] = default_css_value;
+			}
+			else
+			{
+				this.map[type] = (url_main + ", " + default_css_value);
+			}
+		};
+	}
 
 	function OpenFileResult()
 	{
@@ -2292,6 +2327,7 @@
 				// Проверка максимального дипазона
 				var maxSeries = 255;
 				var minStockVal = 4;
+				var maxValues = 4096;
 
 				var intervalValues, intervalSeries;
 				if (isRows)
@@ -2317,6 +2353,10 @@
 				}
 				else if (intervalSeries > maxSeries)
 					return Asc.c_oAscError.ID.MaxDataSeriesError;
+				else if(intervalValues > maxValues){
+					return Asc.c_oAscError.ID.MaxDataPointsError;
+
+				}
 			}
 			else if (Asc.c_oAscSelectionDialogType.FormatTable === dialogType)
 			{
@@ -2440,15 +2480,9 @@
 
 	var parserHelp = new parserHelper();
 
-	var kCurFormatPainterWord = '';
-	if (AscBrowser.isIE)
-// Пути указаны относительно html в меню, не надо их исправлять
-// и коммитить на пути относительно тестового меню
-		kCurFormatPainterWord = 'url(../../../../sdk/common/Images/text_copy.cur), pointer';
-	else if (AscBrowser.isOpera)
-		kCurFormatPainterWord = 'pointer';
-	else
-		kCurFormatPainterWord = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11, pointer";
+	var g_oHtmlCursor = new CHTMLCursor();
+	var kCurFormatPainterWord = 'de-formatpainter';
+	g_oHtmlCursor.register(kCurFormatPainterWord, "text_copy", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11", "pointer");
 
 	function asc_ajax(obj)
 	{
@@ -3369,6 +3403,8 @@
 	window["AscCommon"].kCurFormatPainterWord = kCurFormatPainterWord;
 	window["AscCommon"].parserHelp = parserHelp;
 	window["AscCommon"].g_oIdCounter = g_oIdCounter;
+
+	window["AscCommon"].g_oHtmlCursor = g_oHtmlCursor;
 
 	window["AscCommon"].CSignatureDrawer = window["AscCommon"]["CSignatureDrawer"] = CSignatureDrawer;
 	var prot = CSignatureDrawer.prototype;

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -46,7 +46,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Workbook_SheetRemove = 2;
 	window['AscCH'].historyitem_Workbook_SheetMove = 3;
 	window['AscCH'].historyitem_Workbook_ChangeColorScheme = 5;
-	window['AscCH'].historyitem_Workbook_AddFont = 6;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 7;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChangeUndo = 8;
 
@@ -125,13 +124,13 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Comment_Change = 3;
 	window['AscCH'].historyitem_Comment_Coords = 4;
 
-	window['AscCH'].historyitem_AutoFilter_Add		= 1;
-	window['AscCH'].historyitem_AutoFilter_Sort		= 2;
-	window['AscCH'].historyitem_AutoFilter_Empty	= 3;
-	window['AscCH'].historyitem_AutoFilter_Apply	= 5;
-	window['AscCH'].historyitem_AutoFilter_Move     = 6;
-	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter  = 7;
-	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
+	window['AscCH'].historyitem_AutoFilter_Add = 1;
+	window['AscCH'].historyitem_AutoFilter_Sort = 2;
+	window['AscCH'].historyitem_AutoFilter_Empty = 3;
+	window['AscCH'].historyitem_AutoFilter_Apply = 5;
+	window['AscCH'].historyitem_AutoFilter_Move = 6;
+	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter = 7;
+	window['AscCH'].historyitem_AutoFilter_Delete = 8;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableStyle = 9;
 	window['AscCH'].historyitem_AutoFilter_Change = 10;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
@@ -160,8 +159,6 @@ function CHistory()
 	this.RecIndex = -1;
 	this.lastDrawingObjects = null;
 	this.LastState = null;
-	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
-	this.HasLoadFonts = false;
 	this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
@@ -189,8 +186,6 @@ CHistory.prototype.Clear = function()
 	this.Points.length = 0;
 	this.TurnOffHistory = 0;
 	this.Transaction = 0;
-	this.LoadFonts = {};
-	this.HasLoadFonts = false;
 
 	this.SavedIndex = null;
   this.ForceSave= false;
@@ -409,7 +404,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 				oRedoObjectParam.oChangeWorksheetUpdate[i],{lockDraw: true, reinitRanges: true});
 
 		for (i in Point.UpdateRigions)
-			this.workbook.handlers.trigger("cleanCellCache", i, {'0': Point.UpdateRigions[i]}, true, oRedoObjectParam.bAddRemoveRowCol);
+			this.workbook.handlers.trigger("cleanCellCache", i, [Point.UpdateRigions[i]], true, oRedoObjectParam.bAddRemoveRowCol);
 
 		if (oRedoObjectParam.bOnSheetsChanged)
 			this.workbook.handlers.trigger("asc_onSheetsChanged");
@@ -688,8 +683,6 @@ CHistory.prototype.Create_NewPoint = function()
 
     // Удаляем ненужные точки
     this.Points.length = this.Index + 1;
-
-	this._addFonts(true);
 };
 
 // Регистрируем новое изменение:
@@ -758,6 +751,11 @@ CHistory.prototype._sendCanUndoRedo = function()
 	if(!window['AscCommon'].g_specialPasteHelper.pasteStart && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
+	}
+	//в данном случае не показываем опции авторазвертывания таблиц
+	if(-1 === this.Index)
+	{
+		this.workbook.handlers.trigger("toggleAutoCorrectOptions");
 	}
 };
 CHistory.prototype.SetSelection = function(range)
@@ -844,52 +842,55 @@ CHistory.prototype.Is_On = function()
 {
 	return (0 === this.TurnOffHistory);
 };
-CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
-  this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
-  if (this.Is_UserSaveMode()) {
-    if (IsUserSave) {
-      this.UserSavedIndex = this.Index;
-      this.ForceSave  = false;
-    }
-  } else {
-    this.ForceSave  = false;
-  }
-};
-CHistory.prototype.Set_SavedIndex = function(Index) {
-  this.SavedIndex = Index;
-  if (this.Is_UserSaveMode()) {
-    if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
-      this.UserSavedIndex = Index;
-      this.ForceSave = true;
-    }
-  } else {
-    this.ForceSave = true;
-  }
-};
-/** @returns {number|null} */
-CHistory.prototype.Get_DeleteIndex = function () {
-	var DeletePointIndex = null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
-	if (null === DeletePointIndex)
-		return null;
-	var DeleteIndex = 0;
-	for (var i = 0; i < DeletePointIndex; ++i) {
-		var point = this.Points[i];
-		for (var j = 0; j < point.Items.length; ++j) {
-			if (!point.Items[j].LocalChange) {//LocalChange изменения не пойдут в совместное редактирование.
-				DeleteIndex += 1;
+	CHistory.prototype.Reset_SavedIndex = function(IsUserSave) {
+		this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
+		if (this.Is_UserSaveMode()) {
+			if (IsUserSave) {
+				this.UserSavedIndex = this.Index;
+				this.ForceSave = false;
+			}
+		} else {
+			this.ForceSave = false;
+		}
+	};
+	CHistory.prototype.Set_SavedIndex = function(Index) {
+		this.SavedIndex = Index;
+		if (this.Is_UserSaveMode()) {
+			if (null !== this.UserSavedIndex && this.UserSavedIndex > this.SavedIndex) {
+				this.UserSavedIndex = Index;
+				this.ForceSave = true;
+			}
+		} else {
+			this.ForceSave = true;
+		}
+	};
+	/** @returns {number|null} */
+	CHistory.prototype.GetDeleteIndex = function() {
+		var DeletePointIndex = this.GetDeletePointIndex();
+		if (null === DeletePointIndex)
+			return null;
+		var DeleteIndex = 0;
+		for (var i = 0; i < DeletePointIndex; ++i) {
+			var point = this.Points[i];
+			for (var j = 0; j < point.Items.length; ++j) {
+				if (!point.Items[j].LocalChange) {//LocalChange изменения не пойдут в совместное редактирование.
+					DeleteIndex += 1;
+				}
 			}
 		}
-	}
-	return DeleteIndex;
-};
-/** @returns {boolean} */
-CHistory.prototype.Have_Changes = function(IsNotUserSave) {
-  var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
-  if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
-    return false;
-  }
+		return DeleteIndex;
+	};
+	CHistory.prototype.GetDeletePointIndex = function() {
+		return null !== this.SavedIndex ? Math.min(this.SavedIndex + 1, this.Index + 1) : null;
+	};
+	/** @returns {boolean} */
+	CHistory.prototype.Have_Changes = function(IsNotUserSave) {
+		var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
+		if (-1 === this.Index && null === checkIndex && false === this.ForceSave) {
+			return false;
+		}
 
-  return (this.Index != checkIndex || true === this.ForceSave);
+		return (this.Index != checkIndex || true === this.ForceSave);
 };
 CHistory.prototype.GetSerializeArray = function()
 {
@@ -908,38 +909,37 @@ CHistory.prototype.GetSerializeArray = function()
 		}
 		aRes.push(aPointChanges);
 	}
-	return aRes;
-};
-CHistory.prototype.loadFonts = function (fonts) {
-    for (var i = 0; i < fonts.length; ++i) {
-		this.LoadFonts[fonts[i].name] = 1;
-		this.HasLoadFonts = true;
-	}
-	this._addFonts(false);
-};
-CHistory.prototype._addFonts = function (isCreateNew) {
-	// Если мы начали транзакцию или мы только создаем точку, то можно добавлять
-	if (this.HasLoadFonts && (isCreateNew || !this.IsEndTransaction())) {
-		var arrFonts = [];
-		for (var i in this.LoadFonts)
-			arrFonts.push(i);
-		this.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_AddFont, null, null, new AscCommonExcel.UndoRedoData_SingleProperty(arrFonts));
-
-		this.LoadFonts = {};
-		this.HasLoadFonts = false;
-	}
-};
-CHistory.prototype._CheckCanNotAddChanges = function () {
-    try {
-        if (this.CanNotAddChanges) {
-            var tmpErr = new Error();
-            if (tmpErr.stack) {
-                this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
-            }
-        }
-    } catch (e) {
-    }
-};
+		return aRes;
+	};
+	CHistory.prototype._CheckCanNotAddChanges = function() {
+		try {
+			if (this.CanNotAddChanges) {
+				var tmpErr = new Error();
+				if (tmpErr.stack) {
+					this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
+				}
+			}
+		} catch (e) {
+		}
+	};
+	/**
+	 * Удаляем изменения из истории, которые сохранены на сервере. Это происходит при подключении второго пользователя
+	 */
+	CHistory.prototype.RemovePointsByDeleteIndex = function()
+	{
+		var DeletePointIndex = this.GetDeletePointIndex();
+		if (null === DeletePointIndex)
+			return;
+		this.Points.splice(0, DeletePointIndex);
+		this.Index = Math.max(this.Index - DeletePointIndex, -1);
+		this.RecIndex = Math.max(this.RecIndex - DeletePointIndex, -1);
+		if (null !== this.SavedIndex) {
+			this.SavedIndex = this.SavedIndex - DeletePointIndex;
+			if (this.SavedIndex < 0) {
+				this.SavedIndex = null;
+			}
+		}
+	};
 
 	//------------------------------------------------------------export--------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};

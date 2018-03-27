@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -127,6 +127,16 @@ CDocumentOutline.prototype.Update = function()
 
 					this.Elements.splice(nPos, 0, {Paragraph : oParagraph, Lvl : nLevel});
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(nPos);
+
+					if (0 === nPos)
+					{
+						this.LogicDocument.UpdateContentIndexing();
+						if (0 !== this.Elements[0].Paragraph.GetIndex())
+						{
+							this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
+							this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(0);
+						}
+					}
 				}
 				else
 				{
@@ -143,6 +153,12 @@ CDocumentOutline.prototype.Update = function()
 				{
 					this.Elements.splice(0, 0, {Paragraph : null, Lvl : 0});
 					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateAdd(0);
+				}
+
+				if (1 === this.Elements.length && this.Elements[0].Paragraph === null)
+				{
+					this.Elements.splice(0, 1);
+					this.LogicDocument.GetApi().sync_OnDocumentOutlineUpdateRemove(0);
 				}
 			}
 		}
@@ -416,11 +432,16 @@ CDocumentOutline.prototype.IsEmptyItem = function(nIndex)
 
 	return this.Elements[nIndex].Paragraph.IsEmpty();
 };
+CDocumentOutline.prototype.GetCurrentPosition = function()
+{
+	return this.CurPos;
+};
 
 //-------------------------------------------------------------export---------------------------------------------------
 CDocumentOutline.prototype["get_ElementsCount"]    = CDocumentOutline.prototype.GetElementsCount;
 CDocumentOutline.prototype["get_Text"]             = CDocumentOutline.prototype.GetText;
 CDocumentOutline.prototype["get_Level"]            = CDocumentOutline.prototype.GetLevel;
+CDocumentOutline.prototype["get_CurrentPosition"]  = CDocumentOutline.prototype.GetCurrentPosition;
 CDocumentOutline.prototype["goto"]                 = CDocumentOutline.prototype.GoTo;
 CDocumentOutline.prototype["promote"]              = CDocumentOutline.prototype.Promote;
 CDocumentOutline.prototype["demote"]               = CDocumentOutline.prototype.Demote;

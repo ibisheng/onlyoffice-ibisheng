@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -478,7 +478,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
             }
             else{
                 ctx.fillStyle = this.ColorBackNone;
-                ctx.fillRect( x + 0, y + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+				ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.beginPath();
                 ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
@@ -505,7 +505,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
             }
             else{
                 ctx.fillStyle = this.ColorBackStable;
-                ctx.fillRect( x + 0, y + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+				ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.beginPath();
                 ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
                 ctx.strokeStyle = this.ColorBackStable;
@@ -536,7 +536,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackOver;
 
-                ctx.fillRect( x + xDeltaBORDER - .5, y + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+				ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderOver;
@@ -549,11 +549,9 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
         }
         case ScrollOverType.ACTIVE:
         {
-            ctx.fillStyle = this.ColorBackActive;
-            ctx.fillRect( x + 0, y + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
             ctx.beginPath();
             ctx.fillStyle = this.ColorBackActive;
-            ctx.fillRect( x + xDeltaBORDER - .5, y + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+			ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
 
             if ( !this.IsNeedInvertOnActive ) {
                 ctx.drawImage( img, x + xDeltaIMG, y + yDeltaIMG, this.SizeW, this.SizeH );
@@ -859,7 +857,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackNone;
-                ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+                ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderNone;
@@ -932,7 +930,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackStable;
-                ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+                ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderStable;
@@ -967,7 +965,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
             else{
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackOver;
-                ctx.fillRect( x1 + xDeltaBORDER - .5, y1 + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+                ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderOver;
@@ -981,7 +979,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
         {
             ctx.beginPath();
             ctx.fillStyle = this.ColorBackActive;
-            ctx.fillRect( x1 + xDeltaBORDER - .5, y1 + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+			ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
 
             if ( !this.IsNeedInvertOnActive ) {
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
@@ -1292,7 +1290,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
 
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackNone;
-                ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+                ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderNone;
@@ -1365,7 +1363,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
 
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackStable;
-                ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
+				ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 ctx.strokeStyle = this.ColorBackStable;
                 if ( this.IsDrawBorders ) {
@@ -1402,7 +1400,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
             else{
                 ctx.beginPath();
                 ctx.fillStyle = this.ColorBackOver;
-                ctx.fillRect( x1 + xDeltaBORDER - .5, y1 + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+				ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
                 if ( this.IsDrawBorders ) {
                     ctx.strokeStyle = this.ColorBorderOver;
@@ -1416,10 +1414,8 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
         case ScrollOverType.ACTIVE:
         {
             ctx.beginPath();
-            ctx.fillStyle = this.ColorBackNone;
-            ctx.fillRect( x1 + 0, y1 + 0, strokeW + xDeltaBORDER + 1, strokeH + yDeltaBORDER + 1 );
             ctx.fillStyle = this.ColorBackActive;
-            ctx.fillRect( x1 + xDeltaBORDER - .5, y1 + yDeltaBORDER - .5, strokeW + 1, strokeH + 1 );
+			ctx.fillRect( x1 + xDeltaBORDER >> 0, y1 + yDeltaBORDER >> 0, strokeW, strokeH );
 
             if ( !this.IsNeedInvertOnActive ) {
                 ctx.drawImage( img1, x1 + xDeltaIMG, y1 + yDeltaIMG, this.SizeW, this.SizeH );
@@ -1649,7 +1645,7 @@ function _HEXTORGB_( colorHEX ) {
 				i = ( i % k === 0 ) ? i + k : i
 			}
 
-			ctx_piperImg.putImageData( _data, 0, 0 )
+			ctx_piperImg.putImageData( _data, 0, 0 );
 
 			ctx_piperImg = this.piperImgHor[index].getContext( '2d' );
 

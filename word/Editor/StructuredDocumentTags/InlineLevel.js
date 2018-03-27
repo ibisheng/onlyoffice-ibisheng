@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -71,11 +71,14 @@ CInlineLevelSdt.prototype.GetId = function()
 };
 CInlineLevelSdt.prototype.Copy = function(Selected, oPr)
 {
-	var ContentControl = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
+	var oContentControl = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 
-	// TODO: Сделать копирование настроек
+	oContentControl.SetLabel(this.GetLabel());
+	oContentControl.SetTag(this.GetTag());
+	oContentControl.SetAlias(this.GetAlias());
+	oContentControl.SetContentControlLock(this.GetContentControlLock());
 
-	return ContentControl;
+	return oContentControl;
 };
 CInlineLevelSdt.prototype.GetSelectedElementsInfo = function(Info)
 {
@@ -265,7 +268,12 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		return;
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform());
+
+	var sName      = this.GetTag();
+	var isBuiltIn  = false;
+	var arrButtons = [];
+
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform(), sName, isBuiltIn, arrButtons);
 };
 CInlineLevelSdt.prototype.SelectContentControl = function()
 {

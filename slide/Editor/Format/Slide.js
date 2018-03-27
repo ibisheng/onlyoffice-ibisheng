@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -363,7 +363,7 @@ Slide.prototype =
         return null;
     },
 
-    getMatchingShape: function(type, idx, bSingleBody)
+    getMatchingShape: function(type, idx, bSingleBody, info)
     {
         var _input_reduced_type;
         if(type == null)
@@ -489,11 +489,13 @@ Slide.prototype =
             }
         }
 
+        if(info){
+            return null;
+        }
         if(body_count === 1 && _input_reduced_type === AscFormat.phType_body && bSingleBody)
         {
             return last_body;
         }
-
 
         for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
         {
@@ -527,6 +529,9 @@ Slide.prototype =
 
                 if(_input_reduced_index == _final_index)
                 {
+                    if(info){
+                        info.bBadMatch = true;
+                    }
                     return _glyph;
                 }
             }
@@ -1362,7 +1367,61 @@ Slide.prototype =
     {
         if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
             return this.cachedImage;
-        return AscCommon.ShapeToImageConverter(this, 0).ImageUrl;
+
+        AscCommon.IsShapeToImageConverter = true;
+
+        var dKoef = AscCommon.g_dKoef_mm_to_pix;
+        var _need_pix_width     = ((this.Width*dKoef/3.0 + 0.5) >> 0);
+        var _need_pix_height    = ((this.Height*dKoef/3.0 + 0.5) >> 0);
+
+        if (_need_pix_width <= 0 || _need_pix_height <= 0)
+            return null;
+
+        /*
+         if (shape.pen)
+         {
+         var _w_pen = (shape.pen.w == null) ? 12700 : parseInt(shape.pen.w);
+         _w_pen /= 36000.0;
+         _w_pen *= g_dKoef_mm_to_pix;
+
+         _need_pix_width += (2 * _w_pen);
+         _need_pix_height += (2 * _w_pen);
+
+         _bounds_cheker.Bounds.min_x -= _w_pen;
+         _bounds_cheker.Bounds.min_y -= _w_pen;
+         }*/
+
+        var _canvas = document.createElement('canvas');
+        _canvas.width = _need_pix_width;
+        _canvas.height = _need_pix_height;
+
+        var _ctx = _canvas.getContext('2d');
+
+        var g = new AscCommon.CGraphics();
+        g.init(_ctx, _need_pix_width, _need_pix_height, this.Width, this.Height);
+        g.m_oFontManager = AscCommon.g_fontManager;
+
+        g.m_oCoordTransform.tx = 0.0;
+        g.m_oCoordTransform.ty = 0.0;
+        g.transform(1,0,0,1,0,0);
+
+        this.draw(g, /*pageIndex*/0);
+
+        AscCommon.IsShapeToImageConverter = false;
+
+        var _ret = { ImageNative : _canvas, ImageUrl : "" };
+        try
+        {
+            _ret.ImageUrl = _canvas.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            if (shape.brush != null && shape.brush.fill && shape.brush.fill.RasterImageId)
+                _ret.ImageUrl = getFullImageSrc2(shape.brush.fill.RasterImageId);
+            else
+                _ret.ImageUrl = "";
+        }
+        return _ret.ImageUrl;
     },
 
     checkNoTransformPlaceholder: function()

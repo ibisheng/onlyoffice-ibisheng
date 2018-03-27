@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -871,6 +871,12 @@ CDrawingCollaborativeTarget.prototype =
 			this.HtmlParent.appendChild(this.HtmlElement);
 		}
 
+		if (_drawing_doc.m_oWordControl.m_oApi.isReporterMode)
+		{
+			this.HtmlElement.style.display = "none";
+			return;
+		}
+
 		if (this.HtmlElement.style.display != "block")
 		{
 			this.HtmlElement.style.display = "block";
@@ -1017,12 +1023,13 @@ function CDrawingDocument()
 		if ("" == this.m_sLockedCursorType)
 		{
 			if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
+				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(AscCommon.kCurFormatPainterWord);
 			else
-				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
+				this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(sType);
 		}
 		else
-			this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+			this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
+
 		if ("undefined" === typeof(Data) || null === Data)
 			Data = new AscCommon.CMouseMoveData();
 
@@ -1031,7 +1038,7 @@ function CDrawingDocument()
 	this.LockCursorType    = function(sType)
 	{
 		this.m_sLockedCursorType                                    = sType;
-		this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+		this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
 	}
 	this.LockCursorTypeCur = function()
 	{
@@ -1832,9 +1839,9 @@ function CDrawingDocument()
 			{
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
-				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 4;
+				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 9;
 
-				AscCommon.g_inputContext.TargetOffsetY = (editor.WordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
+				AscCommon.g_inputContext.TargetOffsetY = (this.m_oWordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 			}
 			else
 			{
@@ -1846,6 +1853,10 @@ function CDrawingDocument()
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;
+		}
+		else if (!this.TargetHtmlElementOnSlide)
+		{
+			AscCommon.g_inputContext.TargetOffsetY = (this.m_oWordControl.m_oNotesContainer.AbsolutePosition.T * AscCommon.g_dKoef_mm_to_pix) >> 0;
 		}
 
 		var _oldW = this.TargetHtmlElement.width;
@@ -3769,6 +3780,12 @@ function CThumbnailsManager()
 				oThis.m_oWordControl.GoToPage(pos.Page);
 				oThis.SelectPageEnabled = true;
 
+				if (oThis.m_oWordControl.m_oNotesApi.IsEmptyDraw)
+				{
+					oThis.m_oWordControl.m_oNotesApi.IsEmptyDraw = false;
+					oThis.m_oWordControl.m_oNotesApi.IsRepaint = true;
+				}
+
 				if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
 				{
 					var _data   = new AscCommonSlide.CContextMenuData();
@@ -4544,10 +4561,14 @@ function CThumbnailsManager()
 			 */
 			if (!page.IsLocked)
 			{
+				/*
 				if (i == this.m_oWordControl.m_oDrawingDocument.SlideCurrent || !page.IsSelected)
 					g.b_color1(0, 0, 0, 255);
 				else
 					g.b_color1(191, 191, 191, 255);
+				*/
+				// теперь рисуем не выделяя текущий
+				g.b_color1(0, 0, 0, 255);
 			}
 			else
 				g.b_color1(211, 79, 79, 255);
@@ -5416,6 +5437,8 @@ function CSlideDrawer()
 	this.bIsEmptyPresentation = false;
 	this.IsRecalculateSlide   = false;
 
+	this.EmptyPresenattionTextHeight = 60;
+
 	// TODO: максимальная ширина всех линий и запас под локи
 	this.SlideEps = 20;
 
@@ -5617,6 +5640,18 @@ function CSlideDrawer()
 			this.m_oWordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(outputCtx, _x >> 0, _y >> 0, (_x + w_px) >> 0, (_y + h_px) >> 0, 2, 2, true);
 			outputCtx.beginPath();
 
+			outputCtx.fillStyle = "#3C3C3C";
+
+			var fontCtx = ((this.m_oWordControl.m_nZoomValue * 60 / 100) >> 0) + "px Arial";
+			outputCtx.font = fontCtx;
+
+			var text = AscCommon.translateManager.getValue("Click to add first slide");
+			var textWidth = outputCtx.measureText(text).width;
+
+			var xPos = ((_x >> 0) + ((w_px - textWidth) >> 1));
+			var yPos = ((_y >> 0) + ((h_px - this.EmptyPresenattionTextHeight) >> 1));
+			outputCtx.fillText(text, xPos, yPos);
+
 			return;
 		}
 
@@ -5716,6 +5751,9 @@ function CNotesDrawer(page)
 
 	this.m_oTimerScrollSelect = -1;
 
+	this.IsEmptyDrawCheck = false;
+	this.IsEmptyDraw = false;
+
 	var oThis = this;
 
 	this.Init = function ()
@@ -5744,8 +5782,11 @@ function CNotesDrawer(page)
 		var ctx = element.getContext('2d');
 		ctx.clearRect(0, 0, element.width, element.height);
 
-		if (-1 == this.Slide)
+		if (-1 == this.Slide || this.IsEmptyDraw)
+		{
+			this.IsRepaint = false;
 			return;
+		}
 
 		var dKoef = g_dKoef_mm_to_pix;
 		if (this.HtmlPage.bIsRetinaSupport)
@@ -5794,6 +5835,13 @@ function CNotesDrawer(page)
 		if (window["NATIVE_EDITOR_ENJINE"])
 			return;
 
+		this.IsEmptyDraw = false;
+		if (this.HtmlPage.m_oApi.isReporterMode && this.IsEmptyDrawCheck && !this.HtmlPage.m_oLogicDocument.IsVisibleSlide(this.Slide))
+		{
+			height = 0;
+			this.IsEmptyDraw = true;
+		}
+
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
 		var settings = new AscCommon.ScrollSettings();
 		settings.screenW = element.width;
@@ -5803,6 +5851,10 @@ function CNotesDrawer(page)
 		settings.contentW = 1;
 		settings.contentH = 2 * this.OffsetY + ((height * g_dKoef_mm_to_pix) >> 0);
 		settings.scrollerMinHeight = 5;
+
+		settings.scrollBackgroundColor = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorHover = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorActive = GlobalSkin.BackgroundScroll;
 
 		if (this.HtmlPage.bIsRetinaSupport)
 		{
@@ -5929,6 +5981,8 @@ function CNotesDrawer(page)
 		oThis.HtmlPage.StartUpdateOverlay();
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseUp(global_mouseEvent, _x, _y);
 		oThis.HtmlPage.EndUpdateOverlay();
+
+		oThis.HtmlPage.m_bIsMouseLock = false;
 	};
 
 	this.onMouseWhell = function(e)
@@ -6031,17 +6085,19 @@ function CNotesDrawer(page)
 	{
 		if (this.HtmlPage.m_oLogicDocument)
 		{
+			var oldEmpty = this.IsEmptyDraw;
             if (!this.HtmlPage.m_oLogicDocument.Notes_OnResize())
 			{
 				this.OnRecalculateNote(this.Slide, this.Width, this.Height);
 				this.HtmlPage.m_oLogicDocument.RecalculateCurPos();
 			}
+			this.IsEmptyDraw = oldEmpty;
 		}
 	};
 
 	this.GetNotesWidth = function()
 	{
-		var _pix_width = this.HtmlPage.m_oNotes.HtmlElement.width - AscCommon.AscBrowser.convertToRetinaValue(20, true);
+		var _pix_width = this.HtmlPage.m_oNotes.HtmlElement.width - AscCommon.AscBrowser.convertToRetinaValue(30, true);
 		if (_pix_width < 10)
 			_pix_width = 10;
 		_pix_width = AscCommon.AscBrowser.convertToRetinaValue(_pix_width);
