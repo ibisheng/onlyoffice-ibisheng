@@ -367,7 +367,7 @@ CBookmarksManager.prototype.RemoveBookmark = function(sName)
 
 
 };
-CBookmarksManager.prootype.AddBookmark = function(sName)
+CBookmarksManager.prototype.AddBookmark = function(sName)
 {
 	this.Update();
 
