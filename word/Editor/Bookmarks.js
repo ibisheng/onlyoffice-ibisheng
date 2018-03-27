@@ -365,7 +365,7 @@ CBookmarksManager.prototype.GetId = function(nIndex)
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CParagraphBookmark = CParagraphBookmark;
 
-CParagraphBookmark.prototype['get_Count'] = CParagraphBookmark.prototype.GetCount;
-CParagraphBookmark.prototype['get_Name']  = CParagraphBookmark.prototype.GetName;
-CParagraphBookmark.prototype['get_Id']    = CParagraphBookmark.prototype.GetId;
+CBookmarksManager.prototype['get_Count'] = CBookmarksManager.prototype.GetCount;
+CBookmarksManager.prototype['get_Name']  = CBookmarksManager.prototype.GetName;
+CBookmarksManager.prototype['get_Id']    = CBookmarksManager.prototype.GetId;
 
