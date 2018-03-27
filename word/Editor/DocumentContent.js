@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1353,11 +1353,14 @@ CDocumentContent.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 		oCurPosInfo = this.LogicDocument.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 	}
 
-	if (bUpdateX)
-		this.CurPos.RealX = oCurPosInfo.X;
+	if (oCurPosInfo)
+	{
+		if (bUpdateX)
+			this.CurPos.RealX = oCurPosInfo.X;
 
-	if (bUpdateY)
-		this.CurPos.RealY = oCurPosInfo.Y;
+		if (bUpdateY)
+			this.CurPos.RealY = oCurPosInfo.Y;
+	}
 
 	return oCurPosInfo;
 };
@@ -5512,7 +5515,35 @@ CDocumentContent.prototype.SetParagraphContextualSpacing = function(Value)
 };
 CDocumentContent.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-	// Ничего не делаем
+	// В таблице или вне самого верхнего документа нет смысла ставить PageBreak
+	if (docpostype_Content !== this.Get_DocPosType() || this.Is_InTable() || this.GetTopDocumentContent() !== this.LogicDocument)
+		return;
+
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.SetParagraphPageBreakBefore(Value);
+		}
+	}
+	else
+	{
+		var Item = this.Content[this.CurPos.ContentPos];
+		Item.SetParagraphPageBreakBefore(Value);
+	}
 };
 CDocumentContent.prototype.SetParagraphKeepLines = function(Value)
 {
@@ -7500,7 +7531,10 @@ CDocumentContent.prototype.Internal_Content_Remove = function(Position, Count, b
 		NextObj.Set_DocumentPrev(PrevObj);
 
 	// Проверим, что последний элемент - параграф
-	if (false !== bCheckLastElement && (this.Content.length <= 0 || type_Paragraph !== this.Content[this.Content.length - 1].GetType()))
+	if (false !== bCheckLastElement
+		&& (this.Content.length <= 0
+		|| (type_Paragraph !== this.Content[this.Content.length - 1].GetType()
+		&& type_BlockLevelSdt !== this.Content[this.Content.length - 1].GetType())))
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
 	this.private_ReindexContent(Position);

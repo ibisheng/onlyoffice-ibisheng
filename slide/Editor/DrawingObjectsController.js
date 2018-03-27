@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -308,6 +308,7 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
     var ret = {result: null, selectedIndex: -1};
     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
     {
+
         editor.asc_hideComments();
         for(i = comments.length - 1; i > -1; --i)
         {
@@ -325,6 +326,7 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
         {
             if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
+                this.resetSelection();
                 comments[i].selected = true;
                 this.addPreTrackObject(new AscFormat.MoveComment(comments[i]));
                 this.changeCurrentState(new PreMoveCommentState(this, x, y, comments[i]));
@@ -348,6 +350,10 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
     {
         ret.result = false;
         ret.selectedIndex = index_selected;
+        if(-1 !== index_selected)
+        {
+            this.drawingObjects.showDrawingObjects(true);
+        }
         return ret;
     }
     else

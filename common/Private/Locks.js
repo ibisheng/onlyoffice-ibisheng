@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -528,6 +528,7 @@ Paragraph.prototype.CheckContentControlDeletingLock = function()
 };
 CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 {
+	var bCheckContentControl = false;
     switch (CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
@@ -557,6 +558,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.CurCell.Content.Document_Is_SelectionLocked( CheckType );
 
+            bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Remove:
@@ -578,6 +580,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 				this.CurCell.Content.Document_Is_SelectionLocked(CheckType);
 			}
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Table_Properties:
@@ -587,6 +590,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.Lock.Check( this.Get_Id() );
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Table_RemoveCells:
@@ -614,6 +618,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.Lock.Check( this.Get_Id() );
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Document_SectPr:
@@ -623,6 +628,9 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             break;
         }
     }
+
+	if (bCheckContentControl && this.Parent && this.Parent.CheckContentControlEditingLock)
+		this.Parent.CheckContentControlEditingLock();
 };
 CTable.prototype.CheckContentControlDeletingLock = function()
 {

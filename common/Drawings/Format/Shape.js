@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -612,10 +612,36 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     return oGraphicFrame;
 }
 
+
+function fHandleContent(aContent, oMax){
+    for(var i = 0;  i < aContent.length; ++i)
+    {
+        var oContentElement = aContent[i];
+        if(oContentElement.Get_Type() === type_Paragraph)
+        {
+            var paragraph_lines = aContent[i].Lines;
+            for(var j = 0;  j < paragraph_lines.length; ++j)
+            {
+                if(paragraph_lines[j].Ranges[0].W > oMax.max_width)
+                    oMax.max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
+            }
+        }
+        else if(oContentElement.Get_Type() === type_Table)
+        {
+
+        }
+        else if(oContentElement.Get_Type() === type_BlockLevelSdt)
+        {
+            if(oContentElement && oContentElement.Content){
+                fHandleContent(oContentElement.Content.Content, oMax);
+            }
+        }
+    }
+}
+
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
 {
-
-    var max_width = 0, arr_content = oDocContent.Content, paragraph_lines, i, j;
+    var oMaxWidth = {max_width: 0}, i;
     oDocContent.Reset(0, 0, dMaxWidth, 20000);
     if(bNeedRecalcAllDrawings)
     {
@@ -626,24 +652,8 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
     }
     oDocContent.Recalculate_Page(0, true);
-    for(i = 0;  i < arr_content.length; ++i)
-    {
-        var oContentElement = arr_content[i];
-        if(oContentElement.Get_Type() === type_Paragraph)
-        {
-            paragraph_lines = arr_content[i].Lines;
-            for(j = 0;  j < paragraph_lines.length; ++j)
-            {
-                if(paragraph_lines[j].Ranges[0].W > max_width)
-                    max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
-            }
-        }
-        else if(oContentElement.Get_Type() === type_Table)
-        {
-
-        }
-    }
-    if(max_width === 0)
+    fHandleContent(oDocContent.Content, oMaxWidth);
+    if(oMaxWidth.max_width === 0)
     {
         if(oDocContent.Is_Empty())
         {
@@ -654,7 +664,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
         return 0.001;
     }
-    return max_width;
+    return oMaxWidth.max_width;
 }
 
 
@@ -1272,7 +1282,7 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function(bIsSingleBody)
+CShape.prototype.getHierarchy = function(bIsSingleBody, info)
 {
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
@@ -1297,7 +1307,7 @@ CShape.prototype.getHierarchy = function(bIsSingleBody)
                 {
                     case AscFormat.TYPE_KIND.SLIDE:
                     {
-                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body, info));
                         hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
@@ -2014,6 +2024,34 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
     var t_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
     var r_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
     var b_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
+
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+            switch (oPen.algn)
+            {
+                case 1:
+                {
+                    break;
+                }
+                default:
+                {
+                    penW/=2.0;
+                    break;
+                }
+            }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
+    }
+
     _l = oRect.l + l_ins;
     _t = oRect.t + t_ins;
     _r = oRect.r - r_ins;
@@ -3512,6 +3550,32 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         r_ins = 2.54;
         t_ins = 1.27;
         b_ins = 1.27;
+    }
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+           switch (oPen.algn)
+           {
+               case 1:
+               {
+                   break;
+               }
+               default:
+               {
+                   penW/=2.0;
+                   break;
+               }
+           }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
     }
     var oRect = this.getTextRect();
     var w, h;
@@ -5741,8 +5805,17 @@ function SaveRunsFormatting(aSourceContent, aCopyContent, oTheme, oColorMap, oPr
             }
 
         }
-        else if(aCopyContent[i] instanceof ParaHyperlink){
-            SaveRunsFormatting(aSourceContent[i].Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+        else if(aSourceContent[i].Content){
+            var oElem = aSourceContent[i];
+            SaveRunsFormatting(oElem.Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+            if(oElem.Get_CompiledCtrPrp && aCopyContent[i].setCtrPrp){
+                var oCtrPr = oElem.Get_CompiledCtrPrp();
+                aCopyContent[i].setCtrPrp(oCtrPr);
+            }
+        }
+        else if(aSourceContent[i] instanceof AscCommonWord.ParaMath && aSourceContent[i].Root && aSourceContent[i].Root.Content){
+            SaveRunsFormatting(aSourceContent[i].Root.Content, aCopyContent[i].Root.Content, oTheme, oColorMap, oPr);
+
         }
     }
 }

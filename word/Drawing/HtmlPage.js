@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -75,7 +75,13 @@ var GlobalSkinTeamlab = {
 	RulerMarkersFillColor  : "#E7E7E7",
 	PageOutline            : "#81878F",
 	STYLE_THUMBNAIL_WIDTH  : 80,
-	STYLE_THUMBNAIL_HEIGHT : 40
+	STYLE_THUMBNAIL_HEIGHT : 40,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
 };
 var GlobalSkinFlat    = {
 	Name                   : "flat",
@@ -90,10 +96,37 @@ var GlobalSkinFlat    = {
 	PageOutline            : "#BBBEC2",
 	STYLE_THUMBNAIL_WIDTH  : 104,
 	STYLE_THUMBNAIL_HEIGHT : 38,
-	isNeedInvertOnActive   : false
+	isNeedInvertOnActive   : false,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
+};
+var GlobalSkinFlat2    = {
+	Name                   : "flat",
+	RulersButton           : false,
+	NavigationButtons      : false,
+	BackgroundColor        : "#E2E2E2",
+	RulerDark              : "#CFCFCF",
+	RulerLight             : "#FFFFFF",
+	BackgroundScroll       : "#E2E2E2",
+	RulerOutline           : "#BBBEC2",
+	RulerMarkersFillColor  : "#FFFFFF",
+	PageOutline            : "#BBBEC2",
+	STYLE_THUMBNAIL_WIDTH  : 104,
+	STYLE_THUMBNAIL_HEIGHT : 38,
+	isNeedInvertOnActive   : false,
+	ContentControlsBack	   : "#F1F1F1",
+	ContentControlsHover   : "#D8DADC",
+	ContentControlsActive  : "#7C838A",
+	ContentControlsText    : "#444444",
+	ContentControlsTextActive   : "#FFFFFF",
+	ContentControlsAnchorActive : "#CFCFCF"
 };
 
-var GlobalSkin = GlobalSkinFlat;
+var GlobalSkin = GlobalSkinFlat2;
 if (AscCommon.TEMP_STYLE_THUMBNAIL_WIDTH !== undefined && AscCommon.TEMP_STYLE_THUMBNAIL_HEIGHT !== undefined)
 {
 	// TODO: переделать.
@@ -1604,6 +1637,7 @@ function CEditorPage(api)
 					if (-1 == oWordControl.m_oTimerScrollSelect)
 						oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
 
+					AscCommon.stopEvent(e);
 					return;
 				}
 
@@ -1644,17 +1678,18 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		if (e)
+		{
+			if (e.preventDefault)
+				e.preventDefault();
+			else
+				e.returnValue = false;
+
+			AscCommon.check_MouseMoveEvent(e);
+		}
 
 		var oWordControl = oThis;
 
-		//if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block")
-		//    return;
-
-		AscCommon.check_MouseMoveEvent(e);
 		var pos = null;
 		if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
 			pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -2584,6 +2619,10 @@ function CEditorPage(api)
 		settings.vscrollStep = 45;
 		settings.hscrollStep = 45;
 		settings.isNeedInvertOnActive = GlobalSkin.isNeedInvertOnActive;
+
+		settings.scrollBackgroundColor = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorHover = GlobalSkin.BackgroundScroll;
+		settings.scrollBackgroundColorActive = GlobalSkin.BackgroundScroll;
 
 		if (this.bIsRetinaSupport)
 		{
@@ -3874,6 +3913,7 @@ var _message_update = "zero_delay_update";
 window['AscCommon']                      = window['AscCommon'] || {};
 window['AscCommonWord']                  = window['AscCommonWord'] || {};
 window['AscCommonWord'].GlobalSkinFlat   = GlobalSkinFlat;
+window['AscCommonWord'].GlobalSkinFlat2 = GlobalSkinFlat2;
 window['AscCommonWord'].GlobalSkin       = GlobalSkin;
 window['AscCommonWord'].updateGlobalSkin = updateGlobalSkin;
 window['AscCommonWord'].CEditorPage      = CEditorPage;

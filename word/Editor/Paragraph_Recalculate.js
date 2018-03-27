@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -236,11 +236,26 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 
     // Если у нас отрезок, в котором произошли изменения является отрезком с нумерацией, тогда надо запустить
     // обычный пересчет.
-    var NumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
-    if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ) && ( undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId ) )
+    if ( null !== this.Numbering.Item && ( Line < this.Numbering.Line || ( Line === this.Numbering.Line && Range <= this.Numbering.Range ) ))
     {
         // TODO: Сделать проверку на само изменение, переместилась ли нумерация
-        return -1;
+        var CompiledParaPr = this.Get_CompiledPr2(false).ParaPr;
+        if(this.Numbering.Type === para_Numbering)
+        {
+            var NumPr = CompiledParaPr.NumPr;
+            if(( undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId ))
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            var Bullet = this.Numbering.Bullet;
+            if ( Bullet &&  null !== Bullet.m_oTextPr && null !== Bullet.m_nNum && null != Bullet.m_sString && Bullet.m_sString.length !== 0)
+            {
+                return -1;
+            }
+        }
     }
 
     if ( 0 === Line && 0 === Range && undefined !== this.Get_SectionPr() )
@@ -792,7 +807,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
     {
         // Начинаем параграф с новой страницы
         var PageRelative = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
-        if (isParentDocument && 0 === PageRelative && true === ParaPr.PageBreakBefore)
+        if (0 === PageRelative && true === ParaPr.PageBreakBefore)
         {
             // Если это первый элемент документа или секции, тогда не надо начинать его с новой страницы.
             // Кроме случая, когда у нас разрыв секции на текущей странице. Также не добавляем разрыв страницы для
@@ -800,7 +815,26 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 
             var bNeedPageBreak = true;
 
-            var Prev = this.Get_DocumentPrev();
+			var Prev = this.Get_DocumentPrev();
+			if (!Prev && isParentBlockSdt)
+			{
+				var oSdt = this.Parent.Parent;
+				while (oSdt instanceof CBlockLevelSdt)
+				{
+					Prev = oSdt.Get_DocumentPrev();
+					if (Prev)
+						break;
+
+					if (oSdt.Parent instanceof CDocumentContent && oSdt.Parent.Parent instanceof CBlockLevelSdt)
+						oSdt = oSdt.Parent.Parent;
+					else
+						oSdt = null;
+				}
+			}
+
+			while (Prev && (Prev instanceof CBlockLevelSdt))
+				Prev = Prev.GetLastElement();
+
             if ((true === this.IsEmpty() && undefined !== this.Get_SectionPr()) || null === Prev)
             {
                 bNeedPageBreak = false;

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -526,6 +526,37 @@ CParagraphContentBase.prototype.GetTextPr = function(ContentPos, Depth)
 CParagraphContentBase.prototype.ApplyTextPr = function(oTextPr, isIncFontSize, isApplyToAll)
 {
 	return this.Apply_TextPr(oTextPr, isIncFontSize, isApplyToAll);
+};
+/**
+ * Функция для поиска внутри элементов параграфа
+ * @param {CParagraphSearch} oParaSearch
+ * @param {number} nDepth
+ */
+CParagraphContentBase.prototype.Search = function(oParaSearch, nDepth)
+{
+};
+CParagraphContentBase.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
+{
+};
+CParagraphContentBase.prototype.Clear_SearchResults = function()
+{
+};
+CParagraphContentBase.prototype.Remove_SearchResult = function(SearchResult)
+{
+};
+CParagraphContentBase.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
+{
+	return null;
+};
+CParagraphContentBase.prototype.Check_NearestPos = function(ParaNearPos, Depth)
+{
+};
+CParagraphContentBase.prototype.Restart_CheckSpelling = function()
+{
+};
+CParagraphContentBase.prototype.GetDirectTextPr = function()
+{
+	return null;
 };
 
 /**
@@ -2146,6 +2177,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPos = functio
 	var Pos = ( true === bSelection ? ( true === bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) : this.State.ContentPos );
 	ContentPos.Add(Pos);
 
+	if (Pos < 0 || Pos >= this.Content.length)
+		return;
+
 	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
@@ -3519,6 +3553,29 @@ CParagraphContentWithParagraphLikeContent.prototype.GetCurrentComplexFields = fu
 	{
 		if (this.Content[nIndex] && this.Content[nIndex].GetCurrentComplexFields)
 			this.Content[nIndex].GetCurrentComplexFields(arrComplexFields, isCurrent && nIndex === nEndPos, isFieldPos);
+	}
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetDirectTextPr = function()
+{
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
+			StartPos++;
+
+		return this.Content[StartPos].GetDirectTextPr();
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].GetDirectTextPr();
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------

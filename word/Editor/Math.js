@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1101,12 +1101,23 @@ ParaMath.prototype.GetParagraph = function()
 
 ParaMath.prototype.Get_Text = function(Text)
 {
-    Text.Text = null;
+	if (true === Text.BreakOnNonText)
+		Text.Text = null;
 };
 
 ParaMath.prototype.Is_Empty = function()
 {
-    return this.Root.Content.length == 0;
+	if (this.Root.Content.length <= 0)
+		return true;
+
+	for (var nIndex = 0, nCount = this.Root.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Root.Content[nIndex];
+		if (para_Math_Run !== oItem.Type || !oItem.Is_Empty({SkipPlcHldr : true}))
+			return false;
+	}
+
+	return true;
 };
 
 ParaMath.prototype.Is_CheckingNearestPos = function()
@@ -1660,7 +1671,24 @@ ParaMath.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 		if (true === bClearText)
 			return null;
 
-		return "";
+		var res = "";
+
+		//TODO проверить!!! +  пересмотреть работу функции GetTextContent
+		//включаю эту ветку только для copy/paste
+		if(window['AscCommon'].g_clipboardBase && window['AscCommon'].g_clipboardBase.CopyPasteFocus)
+		{
+			var selectedContent = this.GetSelectContent();
+			if(selectedContent && selectedContent.Content && selectedContent.Content.GetTextContent)
+			{
+				var textContent = selectedContent.Content.GetTextContent(!bAll);
+				if(textContent && textContent.str)
+				{
+					res = textContent.str;
+				}
+			}
+		}
+
+		return res;
 	}
 
 	return "";

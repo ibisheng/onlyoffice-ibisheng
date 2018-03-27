@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3449,6 +3449,33 @@ DrawingObjectsController.prototype =
         chartSpace.resetSelection(true);
         var oPr = this.getPropsFromChart(chart_space);
         if(oPr.isEqual(chartSettings)){
+
+
+            var oChartType = chart_space && chart_space.chart && chart_space.chart.plotArea && chart_space.chart.plotArea.charts[0];
+            if(!oChartType){
+                return;
+            }
+            //подписи данных
+            if(typeof oChartType.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
+            {
+                if(oChartType.dLbls && oChartType.dLbls.bDelete){
+                    oChartType.dLbls.setDelete(false);
+                }
+                for(var i = 0; i < oChartType.series.length; ++i){
+                    var oSerie = oChartType.series[i];
+                    if(oSerie.dLbls){
+                        if(oSerie.dLbls.bDelete){
+                            oSerie.dLbls.setDelete(false);
+                            for(var j = 0; j < oSerie.dLbls.dLbl.length; ++j){
+                                if(oSerie.dLbls.dLbl[j].bDelete){
+                                    oSerie.dLbls.dLbl[j].setDelete(false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return;
         }
 
@@ -3534,6 +3561,9 @@ DrawingObjectsController.prototype =
                     //chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
+                    if(chart_space.pivotSource){
+                        chart_space.setPivotSource(null);
+                    }
                 }
             }
         }
@@ -4627,6 +4657,9 @@ DrawingObjectsController.prototype =
                 AscFormat.isRealBool(chartSettings.showSerName) ||
                 AscFormat.isRealBool(chartSettings.showVal)){
                 var fCheckLbls = function(oLbl){
+                    if(oLbl.setDelete && oLbl.bDelete){
+                        oLbl.setDelete(false);
+                    }
                     if(AscFormat.isRealBool(chartSettings.showCatName)){
                         oLbl.setShowCatName(chartSettings.showCatName);
                     }
@@ -6448,9 +6481,12 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 46 && false === isViewMode ) // Delete
         {
-            var oTargetTextObject = getTargetTextObject(this);
-            drawingObjectsController.remove(1);
-            bRetValue = true;
+			if (!e.shiftKey)
+			{
+				var oTargetTextObject = getTargetTextObject(this);
+				drawingObjectsController.remove(1);
+				bRetValue = true;
+			}
         }
         else if ( e.keyCode == 65 && true === ctrlKey ) // Ctrl + A - выделяем все
         {
@@ -6715,7 +6751,7 @@ DrawingObjectsController.prototype =
     Document_UpdateInterfaceState: function()
     {},
 
-    getChartObject: function(type)
+    getChartObject: function(type, w, h)
     {
         if(null != type)
         {
@@ -6756,6 +6792,13 @@ DrawingObjectsController.prototype =
                 CheckSpPrXfrm(ret);
                 ret.spPr.xfrm.setOffX(0);
                 ret.spPr.xfrm.setOffY(0);
+                if(AscFormat.isRealNumber(w) && w > 0.0){
+                    var dAspect = w/ret.spPr.xfrm.extX;
+                    if(dAspect < 1.0){
+                        ret.spPr.xfrm.setExtX(w);
+                        ret.spPr.xfrm.setExtY(ret.spPr.xfrm.extY*dAspect);
+                    }
+                }
                 ret.theme = this.getTheme();
                 ret.colorMapOverride = this.getColorMapOverride();
                 return ret;
@@ -7446,11 +7489,8 @@ DrawingObjectsController.prototype =
         if(oTargetDocContent)
         {
             oState.Pos      = oTargetDocContent.GetContentPosition(false, false, undefined);
-            oState.Pos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.StartPos = oTargetDocContent.GetContentPosition(true, true, undefined);
-            oState.StartPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.EndPos   = oTargetDocContent.GetContentPosition(true, false, undefined);
-            oState.EndPos.splice(0, 0, {Class : oTargetDocContent.Parent, Position : 0});
             oState.DrawingSelection = oTargetDocContent.Selection.Use;
         }
         oState.DrawingsSelectionState = this.getSelectionState()[0];
@@ -7489,12 +7529,12 @@ DrawingObjectsController.prototype =
                     if(oDocContent){
                         if (true === oSelectionState.DrawingSelection)
                         {
-                            oDocContent.SetContentPosition(oSelectionState.StartPos, 1, 0);
-                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 1, 0, 0);
+                            oDocContent.SetContentPosition(oSelectionState.StartPos, 0, 0);
+                            oDocContent.SetContentSelection(oSelectionState.StartPos, oSelectionState.EndPos, 0, 0, 0);
                         }
                         else
                         {
-                            oDocContent.SetContentPosition(oSelectionState.Pos, 1, 0);
+                            oDocContent.SetContentPosition(oSelectionState.Pos, 0, 0);
                             bNeedRecalculateCurPos = true;
                         }
                         this.selection.textSelection = oDrawingSelectionState.textObject;
@@ -7637,7 +7677,7 @@ DrawingObjectsController.prototype =
 
     getDrawingPropsFromArray: function(drawings)
     {
-        var image_props, shape_props, chart_props, table_props, new_image_props, new_shape_props, new_chart_props, new_table_props, shape_chart_props, locked;
+        var image_props, shape_props, chart_props, table_props = undefined, new_image_props, new_shape_props, new_chart_props, new_table_props, shape_chart_props, locked;
         var drawing;
         for(var i = 0; i < drawings.length; ++i)
         {
@@ -7925,9 +7965,9 @@ DrawingObjectsController.prototype =
                 }
                 case AscDFH.historyitem_type_GraphicFrame:
                 {
-                    new_table_props = drawing.graphicObject.Get_Props();
-                    if(!table_props)
+                    if(table_props === undefined)
                     {
+                        new_table_props = drawing.graphicObject.Get_Props();
                         table_props = new_table_props;
                         new_table_props.Locked = locked;
                         if(new_table_props.CellsBackground)
@@ -8587,7 +8627,7 @@ DrawingObjectsController.prototype =
                     oNearestPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                     paragraph.Check_NearestPos(oNearestPos);
                     oContent.Insert_Content(oSelectedContent, oNearestPos);
-                    oShape.bSelectedText = true;
+                    oShape.bSelectedText = false;
                 }
                 else
                 {
@@ -10928,7 +10968,7 @@ function ApplyLegendProps(aPr, oLegend, oDrawingDocument, bCreate){
 function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
     if(!aPr || !oObj){
         if(oObj){
-            !bCreate && oObj.setDLbls(null);
+            oObj.setDLbls(null);
         }
         return;
     }
@@ -10941,6 +10981,11 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
     if(oObj.dLbls){
         var lbls = oObj.dLbls;
         lbls.setParent(oObj);
+        if(oObj.dLbls.bDelete){
+            if(oObj.dLbls.setDelete){
+                oObj.dLbls.setDelete(false);
+            }
+        }
 
         ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
         ApplySpPr(aPr[1], lbls, i, baseFills);
@@ -11047,12 +11092,13 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 if(!oDPt){
                     oDPt = new AscFormat.CDPt();
                     oDPt.setIdx(j);
+                    oChart.series[i].addDPt(oDPt);
                 }
                 if(oDPt.bubble3D !== false){
                     oDPt.setBubble3D(false);
                 }
                 ApplySpPr(aPreset[11], oDPt, j, base_fills, bAccent1Background);
-                oChart.series[i].addDPt(oDPt);
+
             }
             for (j = 0; j < oChart.series[i].dPt.length; ++j ){
                 if(oChart.series[i].dPt[j].idx >= ptCount){
@@ -11072,21 +11118,21 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
             if(oChart.series[i].dLbls){
                 for(var j = 0; j < ptCount; ++j){
                     var oDLbl = oChart.series[i].dLbls.findDLblByIdx(j);
-                    if(!oDLbl){
+                    if(!oDLbl) {
                         oDLbl = new AscFormat.CDLbl();
                         oChart.series[i].dLbls.addDLbl(oDLbl);
                         oDLbl.setIdx(j);
-                        ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
-                        ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
-                        oDLbl.setDLblPos(aPreset[12][2]);
-                        oDLbl.setSeparator(aPreset[12][3]);
-                        oDLbl.setShowBubbleSize(aPreset[12][4]);
-                        oDLbl.setShowCatName(aPreset[12][5]);
-                        oDLbl.setShowLegendKey(aPreset[12][7]);
-                        oDLbl.setShowPercent(aPreset[12][8]);
-                        oDLbl.setShowSerName(aPreset[12][9]);
-                        oDLbl.setShowVal(aPreset[12][10]);
                     }
+                    ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
+                    ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
+                    oDLbl.setDLblPos(aPreset[12][2]);
+                    oDLbl.setSeparator(aPreset[12][3]);
+                    oDLbl.setShowBubbleSize(aPreset[12][4]);
+                    oDLbl.setShowCatName(aPreset[12][5]);
+                    oDLbl.setShowLegendKey(aPreset[12][7]);
+                    oDLbl.setShowPercent(aPreset[12][8]);
+                    oDLbl.setShowSerName(aPreset[12][9]);
+                    oDLbl.setShowVal(aPreset[12][10]);
                 }
             }
         }

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -289,6 +289,7 @@
 		this.isLocked = false;
 		this.isLockedTable = false;
 		this.isLockedSparkline = false;
+		this.isLockedPivotTable = false;
 		this.styleName = null;
 		this.numFormatInfo = null;
 		this.angle = null;
@@ -345,6 +346,9 @@
 	};
 	asc_CCellInfo.prototype.asc_getLockedSparkline = function () {
 		return this.isLockedSparkline;
+	};
+	asc_CCellInfo.prototype.asc_getLockedPivotTable = function () {
+		return this.isLockedPivotTable;
 	};
 	asc_CCellInfo.prototype.asc_getStyleName = function () {
 		return this.styleName;
@@ -498,6 +502,7 @@
 	prot["asc_getLocked"] = prot.asc_getLocked;
 	prot["asc_getLockedTable"] = prot.asc_getLockedTable;
 	prot["asc_getLockedSparkline"] = prot.asc_getLockedSparkline;
+	prot["asc_getLockedPivotTable"] = prot.asc_getLockedPivotTable;
 	prot["asc_getStyleName"] = prot.asc_getStyleName;
 	prot["asc_getNumFormatInfo"] = prot.asc_getNumFormatInfo;
 	prot["asc_getAngle"] = prot.asc_getAngle;

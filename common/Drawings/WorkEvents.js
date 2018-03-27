@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -177,6 +177,14 @@
 		this.CharCode = 0;
 		this.KeyCode  = 0;
 	}
+
+	CKeyboardEvent.prototype.Up = function()
+	{
+		this.AltKey   = false;
+		this.CtrlKey  = false;
+		this.ShiftKey = false;
+		this.AltGr    = false;
+	};
 
 	var global_mouseEvent    = new CMouseEventHandler();
 	var global_keyboardEvent = new CKeyboardEvent();
@@ -359,7 +367,8 @@
 		if (global_mouseEvent.Button == -1)
 			global_mouseEvent.Button = 0;
 
-		global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
+		if (!global_mouseEvent.IsLocked || !global_mouseEvent.Sender)
+			global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 
 		if (isClicks)
 		{

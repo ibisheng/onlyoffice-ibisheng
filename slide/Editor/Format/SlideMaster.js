@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -663,6 +663,7 @@ function CMasterThumbnailDrawer()
                 {
                     _master.draw(g);
                 }
+                _layout.recalculate();
                 _layout.draw(g);
             }
         }
@@ -759,12 +760,13 @@ function CMasterThumbnailDrawer()
         par.Pr = _paraPr;
         var parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr1);
-        parRun.AddText("A", 0);
+        parRun.AddText("A");
         par.Add_ToContent(0, parRun);
         parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr2);
-        parRun.AddText("a", 0);
+        parRun.AddText("a");
         par.Add_ToContent(1, parRun);
+        par.Reset(0, 0, 1000, 1000, 0, 0, 1);
 
         par.Recalculate_Page(0);
 

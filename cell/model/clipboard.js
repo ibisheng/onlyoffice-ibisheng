@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -386,7 +386,8 @@
 					window['AscCommon'].g_specialPasteHelper.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
 					window['AscCommon'].g_specialPasteHelper.specialPasteData.pasteFromWord = false;
 				}
-				
+
+				var text;
 				switch (_format)
 				{
 					case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
@@ -395,7 +396,8 @@
 						{
 							//fragments = пока только для плагина вставка символов
 							var fragments;
-							if(window['AscCommon'].g_specialPasteHelper.bSaveFormat){
+							if(window['AscCommon'].g_clipboardBase.bSaveFormat){
+								//проверяем иероглифы внутри
 								fragments = this.pasteProcessor._getFragmentsFromHtml(data1);
 							}
 							if(fragments){
@@ -407,11 +409,14 @@
 								});
 
 							}else{
-								var text = text_data ? text_data : data1.innerText;
+								text = text_data ? text_data : data1.innerText;
 								if(text)
 								{
-									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-									window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+									AscFonts.FontPickerByCharacter.getFontsByString(text);
+									ws._loadFonts([], function() {
+										window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+										window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+									});
 								}
 							}
 						}
@@ -426,7 +431,7 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
+							text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
@@ -452,6 +457,8 @@
 						}
 						else
 						{
+							//не показываем иконку с/в если вставляется только текст
+							window['AscCommon'].g_specialPasteHelper.Special_Paste_Hide_Button();
 							t.pasteProcessor.pasteTextOnSheet(ws, data1);
 						}
 						
@@ -1114,8 +1121,6 @@
 			this.activeRange = null;
 			this.alreadyLoadImagesOnServer = false;
 			
-			this.oSpecialPaste = {};
-			
 			this.fontsNew = {};
 			this.oImages = {};
 		}
@@ -1259,10 +1264,9 @@
 						else if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
 						{
 							newFonts = {};
-							pasteData.generateFontMap(newFonts);
-							worksheet._loadFonts(newFonts, function() {
-								worksheet.setSelectionInfo('paste', {data: pasteData, fromBinary: true});
-							});
+							newFonts = tempWorkbook.generateFontMap2();
+							newFonts = t._convertFonts(newFonts);
+							worksheet.setSelectionInfo('paste', {data: pasteData, fromBinary: true, fontsNew: newFonts});
 						}
 					}
 					
@@ -1319,9 +1323,9 @@
 
 				var bIsMultipleContent = stream.GetBool();
 
+				var selectedContent2 = [];
 				if (true === bIsMultipleContent) {
 					var multipleParamsCount = stream.GetULong();
-					var selectedContent2 = [];
 					for(var i = 0; i < multipleParamsCount; i++){
 						selectedContent2.push(this._readPresentationSelectedContent(stream, worksheet));
 					}
@@ -1336,7 +1340,7 @@
 				}
 
 				var defaultSelectedContent = selectedContent2[1] ? selectedContent2[1] : selectedContent2[0];
-				var bSlideObjects = defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
+				var bSlideObjects = defaultSelectedContent && defaultSelectedContent.content.SlideObjects && defaultSelectedContent.content.SlideObjects.length > 0;
 				var pasteObj = bSlideObjects ? selectedContent2[2] : defaultSelectedContent;
 
 				if (window['AscCommon'].g_specialPasteHelper.specialPasteStart)
@@ -1355,9 +1359,18 @@
 					}
 				}
 
-				var arr_Images = pasteObj.images;
-				var fonts = pasteObj.fonts;
-				var content = pasteObj.content;
+				var arr_Images, fonts, content = null;
+				if(pasteObj) {
+					arr_Images = pasteObj.images;
+					fonts = pasteObj.fonts;
+					content = pasteObj.content;
+				}
+
+				if(null === content) {
+					window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
+					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+					return;
+				}
 
 				if (content.DocContent) {
 					var docContent = content.DocContent.Elements;
@@ -1385,7 +1398,7 @@
 					else
 					{
 						History.TurnOff();
-						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet, true);
 
 						var oTempDrawingDocument = worksheet.model.DrawingDocument;
 						var newCDocument = new CDocument(oTempDrawingDocument, false);
@@ -2153,7 +2166,7 @@
 				var drawingObject = graphicFrame;
 				
 				//вставляем табличку из презентаций
-				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
+				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws, true);
 				var oTempDrawingDocument = ws.model.DrawingDocument;
 
 				var newCDocument = new CDocument(oTempDrawingDocument, false);
@@ -2724,7 +2737,7 @@
 				var fontName;
 				for(var i in oFonts)
 				{
-					fontName = oFonts[i].Name;
+					fontName = undefined !== oFonts[i].Name ? oFonts[i].Name : oFonts[i].name;
 					newFonts[fontName] = 1;
 				}
 				return newFonts;
@@ -3150,7 +3163,7 @@
 							if("italic" === italic){
 								format.setItalic(true);
 							}
-							var fontFamily = computedStyle.getPropertyValue("font-family");
+							var fontFamily = window["AscCommon"].CheckDefaultFontFamily(computedStyle.getPropertyValue("font-family"), window["Asc"]["editor"]);
 							fontFamily = g_fontApplication.GetFontNameDictionary(fontFamily, true);
 							if(fontFamily){
 								format.setName(fontFamily);
@@ -3181,6 +3194,7 @@
 						}
 
 						fragment.text = children.innerText;
+						AscFonts.FontPickerByCharacter.getFontsByString(fragment.text);
 						fragment.format = format;
 
 						res.fragments.push(fragment);
@@ -3258,6 +3272,7 @@
 			this.borders = null;
 			this.toolTip = null;
 			this.hyperLink = null;
+			this.location = null;
 			
 			return this;
 		}
@@ -3286,6 +3301,7 @@
 				result.toolTip = this.toolTip;
 				result.bc = this.bc;
 				result.hyperLink = this.hyperLink;
+				result.location = this.location;
 				
 				return result;
 			}
@@ -3293,7 +3309,7 @@
 		
 		
 		/** @constructor */
-		function pasteFromBinaryWord(clipboard, ws) 
+		function pasteFromBinaryWord(clipboard, ws, bFromPresentation)
 		{
 			this.aResult = new excelPasteContent();
 			
@@ -3305,6 +3321,14 @@
 			this.rowDiff = 0;//для обработки данных в ране, разделенных shift+enter
 			
 			this.paragraphText = "";
+			this.bFromPresentation = bFromPresentation;
+			this.prevTextPr = null;
+
+			//работает когда есть внутренние табы
+			//TODO  в дальнейшем учитывать внутреннии табы в DocumentContentBounds
+			this.maxCellCount = 0;
+
+			this.footnotesCount = 0;
 			
 			return this;
 		}
@@ -3316,6 +3340,7 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.content;
+				var t = this;
 				
 				//у родителя(CDocument) проставляю контент. нужно для вставки извне нумерованного списка. ф-ия Internal_GetNumInfo требует наличие этих параграфов в родителе. 
 				var cDocument = documentContent && documentContent[0] && documentContent[0].Parent instanceof CDocument ? documentContent[0].Parent : null;
@@ -3323,8 +3348,7 @@
 				{
 					cDocument.Content = documentContent;
 				}
-				
-				var activeRange = worksheet.model.selectionRange.getLast().clone();
+
 				if(pasteData.images && pasteData.images.length)
 					this.isUsuallyPutImages = true;
 				
@@ -3347,11 +3371,32 @@
 
 				this.aResult.props.fontsNew = newFonts;
 				this.aResult.props.rowSpanSpCount = 0;
-				this.aResult.props.cellCount = coverDocument.width;
+				this.aResult.props.cellCount = this.maxCellCount + 1 > coverDocument.width ? this.maxCellCount + 1 : coverDocument.width;
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
 				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
-				
-				worksheet.setSelectionInfo('paste', {data: this.aResult});
+
+
+				//TODO alreadyLoadImagesOnServer - пересмотреть
+				//alreadyLoadImagesOnServer - флаг используется для загрузки изображений из html
+				//грузим картинки для вствки из документов(если это необходимо)
+				//в данный момент в worksheetView не грузятся изображения
+				var specialPasteProps = window['AscCommon'].g_specialPasteHelper.specialPasteProps;
+				var aImagesToDownload = this.aResult.props._images;
+				if(!this.clipboard.alreadyLoadImagesOnServer && aImagesToDownload && (!specialPasteProps || (specialPasteProps && specialPasteProps.images)))//load to server
+				{
+					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( t.aResult.props._aPastedImages );
+					var api = window["Asc"]["editor"];
+					var oImageMap = {};
+					AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+						t.aResult.props.oImageMap = oImageMap;
+						worksheet.setSelectionInfo('paste', {data: t.aResult});
+					}, true );
+				}
+				else
+				{
+					worksheet.setSelectionInfo('paste', {data: t.aResult});
+				}
 			},
 			
 			_parseChildren: function(children)
@@ -3420,6 +3465,7 @@
 			_parseParagraph: function (paragraph, row, col) {
 				this.paragraphText = "";
 
+				var t = this;
 				var content = paragraph.elem.Content;
 				var fontFamily = "Arial";
 				var text = null;
@@ -3512,6 +3558,31 @@
 				}
 
 
+				var parseMathArr = function (mathContent) {
+					if(!mathContent) {
+						return;
+					}
+
+					for (var i = 0; i < mathContent.length; i++) {
+						var elem = mathContent[i];
+
+						var newParaRunObj;
+						if (para_Math_Run === elem.Type) {
+							newParaRunObj = t._parseParaRun(elem, oNewItem, paraPr, innerCol, row, col, text);
+							innerCol = newParaRunObj.col;
+							row = newParaRunObj.row;
+						} else if (typeof(elem) === "string") {
+							var newParaRun = new ParaRun();
+							window['AscCommon'].addTextIntoRun(newParaRun, elem);
+							newParaRunObj = t._parseParaRun(newParaRun, oNewItem, paraPr, innerCol, row, col, text, t.prevTextPr);
+							innerCol = newParaRunObj.col;
+							row = newParaRunObj.row;
+						} else if (elem.length) {
+							parseMathArr(elem);
+						}
+					}
+				};
+
 				//проходимся по контенту paragraph
 				var paraRunObj;
 				for (var n = 0; n < content.length; n++) {
@@ -3536,6 +3607,7 @@
 								if (!oNewItem.hyperLink) {
 									oNewItem.hyperLink = content[n].Value;
 									oNewItem.toolTip = content[n].ToolTip;
+									oNewItem.location = content[n].Anchor;
 								} else {
 									oNewItem.hyperLink = null;
 									oNewItem.toolTip = null;
@@ -3543,15 +3615,24 @@
 								}
 							}
 
+							var lastTab;
 							for (var h = 0; h < content[n].Content.length; h++) {
 								switch (content[n].Content[h].Type) {
 									case para_Run://*paraRun*
 									{
-										paraRunObj =
-											this._parseParaRun(content[n].Content[h], oNewItem, paraPr, innerCol, row,
-												col, text);
+										paraRunObj = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, innerCol, row, col, text);
+										oNewItem = paraRunObj.oNewItem;
 										innerCol = paraRunObj.col;
 										row = paraRunObj.row;
+										if(lastTab)
+										{
+											oNewItem.hyperLink = content[n].Value;
+											oNewItem.toolTip = content[n].ToolTip;
+											oNewItem.location = content[n].Anchor;
+										}
+
+										lastTab = paraRunObj.lastTab;
+
 										break;
 									}
 								}
@@ -3560,20 +3641,27 @@
 						}
 						case para_Math://*para_Math*
 						{
-							var tempFonts = [];
-							content[n].Get_AllFontNames(tempFonts);
+							if (this.bFromPresentation) {
+								var mathTextContent = content[n].Root.GetTextContent();
+								if(mathTextContent) {
+									parseMathArr(mathTextContent.paraRunArr);
+								}
+							} else {
+								var tempFonts = [];
+								content[n].Get_AllFontNames(tempFonts);
 
-							for (var i in tempFonts) {
-								this.fontsNew[i] = 1;
-							}
+								for (var i in tempFonts) {
+									this.fontsNew[i] = 1;
+								}
 
-							if (!aResult.props.addImagesFromWord) {
-								aResult.props.addImagesFromWord = [];
-							}
-							aResult.props.addImagesFromWord.push({image: content[n], col: innerCol + col, row: row});
+								if (!aResult.props.addImagesFromWord) {
+									aResult.props.addImagesFromWord = [];
+								}
+								aResult.props.addImagesFromWord.push({image: content[n], col: innerCol + col, row: row});
 
-							if (null === this.isUsuallyPutImages) {
-								this._addImageToMap(content[n]);
+								if (null === this.isUsuallyPutImages) {
+									this._addImageToMap(content[n]);
+								}
 							}
 
 							break;
@@ -3585,20 +3673,21 @@
 				this.rowDiff += row - startRow;
 			},
 
-			_parseParaRun: function (paraRun, oNewItem, paraPr, innerCol, row, col, text) {
+			_parseParaRun: function (paraRun, oNewItem, paraPr, innerCol, row, col, text, prevTextPr) {
 				var t = this;
 				var paraRunContent = paraRun.Content;
 				var aResult = this.aResult;
 				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
 				var cloneNewItem, formatText;
 
-				var cTextPr = paraRun.Get_CompiledPr();
+				var cTextPr = prevTextPr ? prevTextPr : paraRun.Get_CompiledPr();
 				if (cTextPr && !(paraRunContent.length === 1 && paraRunContent[0] instanceof ParaEnd))//settings for text
 				{
 					formatText = this._getPrParaRun(paraPr, cTextPr);
 				} else if (!formatText) {
 					formatText = this._getPrParaRun(paraPr, cTextPr);
 				}
+				this.prevTextPr = cTextPr;
 
 				var pushData = function () {
 					t.fontsNew[paragraphFontFamily] = 1;
@@ -3620,9 +3709,17 @@
 
 				//проходимся по контенту paraRun
 				var cell;
+				var lastTab;
 				for (var pR = 0; pR < paraRunContent.length; pR++) {
+					lastTab = false;
 					switch (paraRunContent[pR].Type) {
-						case para_Text://*paraText*
+						case para_Math_BreakOperator:
+						case para_Math_Text:
+						{
+							text += String.fromCharCode(paraRunContent[pR].value);
+							break;
+						}
+						case para_Text:
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
@@ -3642,7 +3739,13 @@
 						case para_Tab://*paraEnd / paraTab*
 						{
 							pushData();
+							lastTab = true;
 							innerCol++;
+
+							if(innerCol > this.maxCellCount)
+							{
+								this.maxCellCount = innerCol;
+							}
 
 							break;
 						}
@@ -3657,6 +3760,15 @@
 								this._addImageToMap(paraRunContent[pR]);
 							}
 
+							break;
+						}
+						case para_FootnoteReference:
+						{
+							if(1 === paraRunContent.length) {
+								var footnotesNumber = this.footnotesCount + 1;
+								text += "[" + footnotesNumber + "]";
+								this.footnotesCount++;
+							}
 							break;
 						}
 						case para_End: {
@@ -3684,7 +3796,7 @@
 					}
 				}
 
-				return {col: innerCol, row: row};
+				return {col: innerCol, row: row, prevTextPr: cTextPr, oNewItem: oNewItem, lastTab: lastTab};
 			},
 			
 			_addImageToMap: function(paraDrawing)
@@ -4206,6 +4318,11 @@
 						elem.ReIndexing(0);
 						oNewElem = this._getTableMeasure(elem, oRes);
 					}
+					else if(type_BlockLevelSdt === elem.GetType())
+					{
+						oNewElem = this._getMeasure(elem.Content.Content, oRes);
+					}
+
 					if(null != oNewElem)
 					{
 						oRes.children.push(oNewElem);
@@ -4244,7 +4361,7 @@
 				for(var i = 0, length = oRes.children.length; i < length; i++)
 				{
 					var rowWrapped = oRes.children[i];
-					this._getRowMeasure(rowWrapped, aSumGridWidth);
+					this._getRowMeasure(rowWrapped, aSumGridWidth, oRes.children, i);
 					oRes.height += rowWrapped.height;
 					//в left временно занесен относительный сдвиг
 					if(rowWrapped.width + rowWrapped.left > oRes.width)
@@ -4281,17 +4398,33 @@
 				}
 				return oRes;
 			},
-			_getRowMeasure: function(rowWrapped, aSumGridWidth){
+			_getRowMeasure: function (rowWrapped, aSumGridWidth, rows, index) {
+
+				var getNotMergedPreviousCell = function (i) {
+					var res = null;
+					if (rows && index > 0) {
+						for (var j = index; j >= 0; j--) {
+							if (rows[j] && rows[j].children && rows[j].children[i]) {
+								var vMerge = rows[j].children[i].elem.GetVMerge();
+								if (1 === vMerge) {
+									res = rows[j].children[i];
+									break;
+								}
+							}
+						}
+					}
+					return res;
+				};
+
 				var nSumGrid = 0;
 				var BeforeInfo = rowWrapped.elem.Get_Before();
-				if(BeforeInfo && BeforeInfo.GridBefore)
-				{
+				if (BeforeInfo && BeforeInfo.GridBefore) {
 					//временно заносим относительный сдвиг
 					rowWrapped.left = aSumGridWidth[nSumGrid + BeforeInfo.GridBefore] - aSumGridWidth[nSumGrid];
 					nSumGrid += BeforeInfo.GridBefore;
 				}
-				for(var i = 0, length = rowWrapped.children.length; i < length; i++)
-				{
+				
+				for (var i = 0, length = rowWrapped.children.length; i < length; i++) {
 					var cellWrapped = rowWrapped.children[i];
 					var nCellGrid = cellWrapped.elem.Get_GridSpan();
 					cellWrapped.width = aSumGridWidth[nSumGrid + nCellGrid] - aSumGridWidth[nSumGrid];
@@ -4299,6 +4432,15 @@
 					cellWrapped.height = rowWrapped.height;
 					rowWrapped.width += cellWrapped.width;
 					nSumGrid += nCellGrid;
+
+					//vertical merge
+					var previousCell = getNotMergedPreviousCell(i);
+					if (previousCell) {
+						var vMerge = cellWrapped.elem.GetVMerge();
+						if (vMerge > 1) {
+							previousCell.height += vMerge - 1;
+						}
+					}
 				}
 			}
 		};

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -134,32 +134,11 @@
     var kCurSEResize = "se-resize";
     var kCurNEResize = "ne-resize";
     var kCurAutoFilter = "pointer";
-    var kCurCells = '';
-    var kCurFormatPainterExcel = '';
-    if (AscBrowser.isIE) {
-        // Пути указаны относительно html в меню, не надо их исправлять
-        // и коммитить на пути относительно тестового меню
-        var cursorRetina = AscBrowser.isRetina ? '_2x' : '';
-        cursorRetina = ''; // ToDo 2x cursors
-        kCurCells = 'url(../../../../sdkjs/common/Images/plus' + cursorRetina + '.cur), pointer';
-        kCurFormatPainterExcel = 'url(../../../../sdkjs/common/Images/plus_copy' + cursorRetina + '.cur), pointer';
-    } else if (AscBrowser.isOpera) {
-        kCurCells = 'cell';
-        kCurFormatPainterExcel = 'pointer';
-    } else {
-        // ToDo 2x cursors
-        /*if (AscBrowser.isRetina) {
-            kCurCells =
-              "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGtJREFUeNpidHFxYSAS/Ccgz0iMIUwMdAYspGrYvXs3Ct/V1ZUk/XT34aiFoxYOfgtZiChBqFUSDXBJg16CkFvy4AKwEmk0ldIuDokt9YdcbcFCbE09ZGv8UQtHLRxCJQ2xgNSSZcB9CBBgAA9FEd4uFbt8AAAAAElFTkSuQmCC') 12 12, pointer";
-            kCurFormatPainterExcel =
-              "url('data:image/png;base64,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') 12 25, pointer";
-        } else {*/
-            kCurCells =
-              "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFJJREFUeNpidHFxYcAC/qPxGdEVMDHgALt37wZjXACnRkKA/hpZsAQEMYHFwAAM1f+kApAeipzK4OrqijU6cMnBNDJSNQEMznjECnAFCgwABBgAcX1BU/hbd0sAAAAASUVORK5CYII=') 6 6, pointer";
-            kCurFormatPainterExcel =
-              "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAK1JREFUeNrUk+ESxBAMhG3Hm+GpeTfF0Eld0uLcj9uZTP3xdZMsxBjVRhXYsRNora2n5HSxbjLGtKPSX7uqCiHkD1adUlcfLnMdKw6zq94plXbOiVskKm1575GAF1iS6DQBSjECdUp+gFcoJ9LyBe6B09BuluCA09A8fwCK7AHsopiljCxOBLY5xVnVO2KWd779W/uKy2qLk5DjVyhGwz+qn7T/P1D9FPRVnQIMABDnBAmTp4GtAAAAAElFTkSuQmCC') 6 12, pointer";
-        //}
-    }
+
+    var kCurCells = "se-cells";
+    var kCurFormatPainterExcel = "se-formatpainter";
+    AscCommon.g_oHtmlCursor.register(kCurCells, "plus", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFJJREFUeNpidHFxYcAC/qPxGdEVMDHgALt37wZjXACnRkKA/hpZsAQEMYHFwAAM1f+kApAeipzK4OrqijU6cMnBNDJSNQEMznjECnAFCgwABBgAcX1BU/hbd0sAAAAASUVORK5CYII=') 6 6", "cell");
+	AscCommon.g_oHtmlCursor.register(kCurFormatPainterExcel, "plus_copy", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAK1JREFUeNrUk+ESxBAMhG3Hm+GpeTfF0Eld0uLcj9uZTP3xdZMsxBjVRhXYsRNora2n5HSxbjLGtKPSX7uqCiHkD1adUlcfLnMdKw6zq94plXbOiVskKm1575GAF1iS6DQBSjECdUp+gFcoJ9LyBe6B09BuluCA09A8fwCK7AHsopiljCxOBLY5xVnVO2KWd779W/uKy2qLk5DjVyhGwz+qn7T/P1D9FPRVnQIMABDnBAmTp4GtAAAAAElFTkSuQmCC') 6 12", "pointer");
 
     var kNewLine = "\n";
 
@@ -1038,6 +1017,28 @@
                 History.SetSelectionRedo(arCopy.clone());
                 History.StartTransaction();
 
+				var updateScroll = false;
+                var checkExpand = function (range) {
+					if (range.c2 >= t.nColsCount) {
+						updateScroll = true;
+						t.expandColsOnScroll(false, true, range.c2 + 1);
+					}
+					if (range.r2 >= t.nRowsCount) {
+						updateScroll = true;
+						t.expandRowsOnScroll(false, true, range.r2 + 1);
+					}
+                };
+
+                if (Array.isArray(changedRange)) {
+                    changedRange.forEach(changedRange);
+				} else {
+					checkExpand(changedRange);
+				}
+
+				if (updateScroll) {
+					t.handlers.trigger("reinitializeScroll");
+				}
+
                 asc_applyFunction(functionAction);
                 t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 
@@ -1271,7 +1272,7 @@
 
     WorksheetView.prototype._initPane = function () {
         var pane = this.model.sheetViews[0].pane;
-        if ( null !== pane && pane.isInit() ) {
+        if ( null !== pane && pane.isInit() && !window['IS_NATIVE_EDITOR']) {
             this.topLeftFrozenCell = pane.topLeftFrozenCell;
             this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
             this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
@@ -3296,6 +3297,9 @@
     };
 
     WorksheetView.prototype._updateFreezePane = function (col, row, lockDraw) {
+        if (window['IS_NATIVE_EDITOR'])
+            return;
+        
         var lastCol = 0, lastRow = 0;
         if (this.topLeftFrozenCell) {
             lastCol = this.topLeftFrozenCell.getCol0();
@@ -4457,7 +4461,7 @@
       function (tm, col, row, flags, isMerged, fMergedRows, va, ha, angle, maxW, colWidth, textBound) {
 			var rowInfo = this.rows[row];
           // update row's descender
-			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged) {
+			if (va !== Asc.c_oAscVAlign.Top && va !== Asc.c_oAscVAlign.Center && !isMerged && !angle) {
               rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
           }
 
@@ -6871,6 +6875,14 @@
 		}
 
 		cell_info.pivotTableInfo = this.model.getPivotTable(c1, r1);
+		if (cell_info.pivotTableInfo) {
+			lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId,
+				cell_info.pivotTableInfo.asc_getName());
+			if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                    /*bCheckOnlyLockAll*/false)) {
+				cell_info.isLockedPivotTable = true;
+			}
+		}
 
         return cell_info;
 	};
@@ -7082,7 +7094,7 @@
     };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
-        if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
+        if (validRange) {
             if (range.c2 >= this.nColsCount) {
                 this.expandColsOnScroll(false, true, range.c2 + 1);
             }
@@ -8298,7 +8310,7 @@
                 return;
             }
             var bIsUpdate = true;
-            var oUpdateRanges = {}, hasUpdates = false;
+            var oUpdateRanges = [], hasUpdates = false;
 
             var callTrigger = false;
             var res;
@@ -8534,7 +8546,8 @@
 						var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 						specialPasteHelper.specialPasteProps = specialPasteHelper.specialPasteProps ? specialPasteHelper.specialPasteProps : new Asc.SpecialPasteProps();
 					
-                        t._loadDataBeforePaste(isLargeRange, val.fromBinary, val.data, bIsUpdate, canChangeColWidth);
+                        t._loadDataBeforePaste(isLargeRange, val, val.data, bIsUpdate, canChangeColWidth);
+						bIsUpdate = false;
                         break;
                     case "hyperlink":
                         if (val && val.hyperlinkModel) {
@@ -8571,8 +8584,8 @@
 
                 if (bIsUpdate) {
                     hasUpdates = true;
-                    oUpdateRanges[i] = item;
-                    oUpdateRanges[i].canChangeColWidth = canChangeColWidth;
+					item.canChangeColWidth = canChangeColWidth;
+                    oUpdateRanges.push(item);
                     bIsUpdate = false;
                 }
             });
@@ -8799,25 +8812,7 @@
         }
 
         t.model.workbook.dependencyFormulas.unlockRecal();
-        var arn = selectData[0];
-        var selectionRange = arn.clone(true);
 
-        if (bIsUpdate) {
-            if (callTrigger) {
-                t.handlers.trigger("slowOperation", false);
-            }
-            t.isChanged = true;
-            t._updateCellsRange(arn, canChangeColWidth);
-        }
-
-        var oSelection = History.GetSelection();
-        if (null != oSelection) {
-            oSelection = oSelection.clone();
-            oSelection.assign(selectionRange.c1, selectionRange.r1, selectionRange.c2, selectionRange.r2);
-            History.SetSelection(oSelection);
-            History.SetSelectionRedo(oSelection);
-        }
-		
 		//for special paste
 		if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 		{
@@ -8847,108 +8842,102 @@
 			window['AscCommon'].g_specialPasteHelper.buttonInfo.setRange(selectData[0]);
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Update_Position();
 		}
+
+		return selectData;
     };
 
-    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
+    WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, val, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
 		var specialPasteHelper = window['AscCommon'].g_specialPasteHelper;
 		var specialPasteProps = specialPasteHelper.specialPasteProps;
-		
+		var selectData;
+
+		var callbackLoadFonts = function() {
+			if(!selectData) {
+				return;
+			}
+
+			var arn = selectData[0];
+			var selectionRange = arn.clone(true);
+			if (bIsUpdate) {
+				if (isLargeRange) {
+					t.handlers.trigger("slowOperation", false);
+				}
+				t.isChanged = true;
+				t.changeWorksheet("update", {reinitRanges: true});
+			}
+
+			var oSelection = History.GetSelection();
+			if (null != oSelection) {
+				oSelection = oSelection.clone();
+				oSelection.assign(selectionRange.c1, selectionRange.r1, selectionRange.c2, selectionRange.r2);
+				History.SetSelection(oSelection);
+				History.SetSelectionRedo(oSelection);
+			}
+		};
+
+		var fromBinaryExcel = val.fromBinary;
 		//paste from excel binary
-		if(fromBinary)
+		if(fromBinaryExcel)
 		{
-			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
+			selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
 		}
 		else
 		{
-			var callbackLoadFonts = function()
-			{
-				var api = asc["editor"];
-				var isEndTransaction = false;
-				
-				var imagesFromWord = pasteContent.props.addImagesFromWord;
-				if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
-				{
-					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
+			var imagesFromWord = pasteContent.props.addImagesFromWord;
+			if (imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) {
+				var oObjectsForDownload = AscCommon.GetObjectsForImageDownload(pasteContent.props._aPastedImages);
+				var oImageMap;
 
-					//if already load images on server
-					if ( AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true ) 
-					{
-						var oImageMap = {};
-						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
-						{
-							var url = oObjectsForDownload.aUrls[i];
+				//if already load images on server
+				if (AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true) {
+					oImageMap = {};
+					for (var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i) {
+						var url = oObjectsForDownload.aUrls[i];
 
-							//get name from array already load on server urls
-							var name = AscCommonExcel.g_clipboardExcel.pasteProcessor.oImages[url];
-							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
-							if ( name ) {
-								if ( Array.isArray( aImageElem ) ) {
-									for ( var j = 0; j < aImageElem.length; ++j ) {
-										var imageElem = aImageElem[j];
-										if ( null != imageElem ) {
-											imageElem.SetUrl( name );
-										}
+						//get name from array already load on server urls
+						var name = AscCommonExcel.g_clipboardExcel.pasteProcessor.oImages[url];
+						var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
+						if (name) {
+							if (Array.isArray(aImageElem)) {
+								for (var j = 0; j < aImageElem.length; ++j) {
+									var imageElem = aImageElem[j];
+									if (null != imageElem) {
+										imageElem.SetUrl(name);
 									}
 								}
-								oImageMap[i] = name;
 							}
-							else {
-								oImageMap[i] = url;
-							}
+							oImageMap[i] = name;
+						} else {
+							oImageMap[i] = url;
 						}
-						
-						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-						
-						isEndTransaction = true;
 					}
-					else 
-					{
-						if(window["NATIVE_EDITOR_ENJINE"])
-						{
-							var oImageMap = {};
-							
-							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-							
-							isEndTransaction = true;
-						}
-						else
-						{
-							AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
-								var oImageMap = {};
-								
-								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-								AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-								
-								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-								History.EndTransaction();
-								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
-							}, true );
-						}
-						
-					}
-				}
-				else
-				{
-					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-					isEndTransaction = true;
-				}
 
-				//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-				if ( isEndTransaction ) 
-				{
-					History.EndTransaction();
-					window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+					selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+					AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+				} else {
+					oImageMap = pasteContent.props.oImageMap;
+					if (window["NATIVE_EDITOR_ENJINE"]) {
+						//TODO для мобильных приложений  - не рабочий код!
+						AscCommon.ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+					} else {
+						selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord(t, pasteContent, oImageMap);
+					}
 				}
-			};
-			
-			//загрузка шрифтов, в случае удачи на callback вставляем текст
-			t._loadFonts( pasteContent.props.fontsNew, callbackLoadFonts);
+			} else {
+				selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, canChangeColWidth);
+			}
+
+            History.EndTransaction();
+            window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
 		}
+
+		var fonts = pasteContent.props && pasteContent.props.fontsNew ? pasteContent.props.fontsNew : val.fontsNew;
+		//загрузка шрифтов, в случае удачи на callback вставляем текст
+		t._loadFonts( fonts, callbackLoadFonts);
     };
 
     WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection, specialPasteProps) {
@@ -9026,24 +9015,7 @@
             arn.c2 = (cMax2 - 1 > 0) ? (cMax2 - 1) : 0;
         }
 
-        if (isMultiple)//случай автозаполнения сложных форм
-        {
-			if(specialPasteProps.format)
-			{
-				t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
-			}
-
-            var maxARow = heightArea / heightPasteFr;
-            var maxACol = widthArea / widthPasteFr;
-            var plRow = (rMax2 - arn.r1);
-            var plCol = (arn.c2 - arn.c1) + 1;
-        } else {
-            var maxARow = 1;
-            var maxACol = 1;
-            var plRow = 0;
-            var plCol = 0;
-        }
-		
+		var maxARow = 1, maxACol = 1, plRow = 0, plCol = 0;
 		var mergeArr = [];
 		var putInsertedCellIntoRange = function(row, col, currentObj)
 		{
@@ -9108,8 +9080,7 @@
 			}
 			
 			//hyperlink
-			var link = currentObj.hyperLink;
-			if (link) {
+			if (currentObj.hyperLink || currentObj.location) {
 				pastedRangeProps.hyperLink = currentObj;
 			}
 			
@@ -9142,9 +9113,8 @@
         t.isChanged = true;
         lastSelection.c2 = arn.c2;
         lastSelection.r2 = arn.r2;
-        var arnFor = [arn, arrFormula];
 		
-        return arnFor;
+		return [arn, arrFormula];
     };
 
     WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap) {
@@ -9213,7 +9183,10 @@
             var heightPasteFr = rMax - arn.r1;
             //если кратны, то обрабатываем
             if (widthArea % widthPasteFr === 0 && heightArea % heightPasteFr === 0) {
-                isMultiple = true;
+				//Для случая, когда выделен весь диапазон, запрещаю множественную вставку
+            	if(arn.getType() !== window["Asc"].c_oAscSelectionType.RangeMax) {
+					isMultiple = true;
+				}
             } else if (firstCell.hasMerged() !== null)//в противном случае ошибка
             {
                 if (isCheckSelection) {
@@ -9271,23 +9244,18 @@
             arn.c2 = cMax2 - 1;
         }
 
-       
+		var maxARow = 1, maxACol = 1, plRow = 0, plCol = 0;
         if (isMultiple)//случай автозаполнения сложных форм
         {
             if(specialPasteProps.format)
 			{
 				t.model.getRange3(trueActiveRange.r1, trueActiveRange.c1, trueActiveRange.r2, trueActiveRange.c2).unmerge();
 			}
-            var maxARow = heightArea / heightPasteFr;
-            var maxACol = widthArea / widthPasteFr;
-            var plRow = (rMax2 - arn.r1);
-            var plCol = (arn.c2 - arn.c1) + 1;
+            maxARow = heightArea / heightPasteFr;
+            maxACol = widthArea / widthPasteFr;
+            plRow = (rMax2 - arn.r1);
+            plCol = (arn.c2 - arn.c1) + 1;
         } else {
-            var maxARow = 1;
-            var maxACol = 1;
-            var plRow = 0;
-            var plCol = 0;
-			
 			trueActiveRange.r2 = arn.r2;
 			trueActiveRange.c2 = arn.c2;
         }
@@ -9602,7 +9570,19 @@
 			activeCellsPasteFragment = formulaProps.activeCellsPasteFragment;
 			transposeRange = formulaProps.transposeRange;
 		}
-		
+
+		var value2ToValue = function(value2) {
+			var res = "";
+
+			if(value2 && value2.length) {
+				for(var i = 0; i < value2.length; i++) {
+					res += value2[i].text;
+				}
+			}
+
+			return res;
+		};
+
 		var transposeOutStack = function(outStack)
 		{
 			for(var i = 0; i < outStack.length; i++)
@@ -9654,7 +9634,6 @@
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
 					isFromula = true;
-					break;
 				} else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
 					skipFormat = true;
 				} else if (value2[nF] && value2[nF].format && !value2[nF].format.getSkip()) {
@@ -9843,6 +9822,10 @@
 		{
 			range.setValue(rangeStyle.val);
 		}
+		else if(rangeStyle.value2 && specialPasteProps.val)
+		{
+			range.setValue(value2ToValue(rangeStyle.value2));
+		}
 		
 		//alignVertical
 		if(undefined !== rangeStyle.alignVertical && specialPasteProps.alignVertical)
@@ -9909,6 +9892,7 @@
 			}
 			newHyperlink.Ref = range;
 			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
+			newHyperlink.Location = rangeStyle.hyperLink.location;
 			range.setHyperlink(newHyperlink);
 		}
 		else if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 
@@ -10032,91 +10016,28 @@
 		return cellCoord;
 	};
 
-    // Залочена ли панель для закрепления
-    WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
-        var sheetId = this.model.getId();
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
+	// Залочена ли панель для закрепления
+	WorksheetView.prototype._isLockedFrozenPane = function (callback) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockNameFrozenPane);
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
 
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
-            callback = undefined;
-        }
-        if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false ) ) {
-            // Редактируем сами
-            asc_applyFunction( callback, true );
-            return;
-        }
-        else if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
-            return;
-        }
-
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
-    };
-
-    WorksheetView.prototype._isLockedDefNames = function ( callback, defNameId ) {
-        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
+	WorksheetView.prototype._isLockedDefNames = function (callback, defNameId) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null
             /*c_oAscLockTypeElemSubType.DefinedNames*/, -1, defNameId);
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
 
-        if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction( callback, true );
-            callback = undefined;
-        }
-        if (false !==
-            this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
-                false)) {
-            // Редактируем сами
-            asc_applyFunction( callback, true );
-            return;
-        } else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                /*bCheckOnlyLockAll*/false)) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction( callback, false );
-            return;
-        }
+	// Залочен ли весь лист
+	WorksheetView.prototype._isLockedAll = function (callback) {
+		var ar = this.model.selectionRange.getLast();
 
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock( lockInfo );
-        this.collaborativeEditing.onEndCheckLock( callback );
-    };
-
-    // Залочен ли весь лист
-    WorksheetView.prototype._isLockedAll = function (callback) {
-        var sheetId = this.model.getId();
-        var subType = c_oAscLockTypeElemSubType.ChangeProperties;
-        var ar = this.model.selectionRange.getLast();
-
-        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType, sheetId,
-          new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
-
-        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            asc_applyFunction(callback, true);
-            callback = undefined;
-        }
-        if (false !==
-          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/
-            true)) {
-            // Редактируем сами
-            asc_applyFunction(callback, true);
-            return;
-        } else if (false !==
-          this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/
-            true)) {
-            // Уже ячейку кто-то редактирует
-            asc_applyFunction(callback, false);
-            return;
-        }
-
-        this.collaborativeEditing.onStartCheckLock();
-        this.collaborativeEditing.addCheckLock(lockInfo);
-        this.collaborativeEditing.onEndCheckLock(callback);
-    };
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/
+			c_oAscLockTypeElemSubType.ChangeProperties, this.model.getId(),
+			new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+		this.collaborativeEditing.lock([lockInfo], callback);
+	};
     // Пересчет для входящих ячеек в добавленные строки/столбцы
     WorksheetView.prototype._recalcRangeByInsertRowsAndColumns = function (sheetId, ar) {
         var isIntersection = false, isIntersectionC1 = true, isIntersectionC2 = true, isIntersectionR1 = true, isIntersectionR2 = true;
@@ -10174,6 +10095,7 @@
         var nLength = isArrayRange ? range.length : 1;
         var nIndex = 0;
         var ar = null;
+        var arrLocks = [];
 
         for (; nIndex < nLength; ++nIndex) {
             ar = isArrayRange ? range[nIndex].clone(true) : range.clone(true);
@@ -10185,50 +10107,42 @@
             }
 
             if (false === isIntersection) {
-                var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/subType,
-                  sheetId, new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+				arrLocks.push(this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, subType, sheetId,
+					new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2)));
 
-                if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                    /*bCheckOnlyLockAll*/false)) {
-                    // Уже ячейку кто-то редактирует
-                    asc_applyFunction(callback, false);
-                    return false;
-                } else {
-                    if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    } else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
-                        newCallback = function (isSuccess) {
-                            if (isSuccess) {
-                                t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
-                                t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-                            }
-                            callback(isSuccess);
-                        };
-                    }
-                    this.collaborativeEditing.addCheckLock(lockInfo);
-                }
+				if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+						}
+						callback(isSuccess);
+					};
+				} else if (c_oAscLockTypeElemSubType.DeleteRows === subType) {
+					newCallback = function (isSuccess) {
+						if (isSuccess) {
+							t.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+						}
+						callback(isSuccess);
+					};
+				}
             } else {
                 if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
                     t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
@@ -10246,13 +10160,7 @@
             }
         }
 
-        if (false === this.collaborativeEditing.getCollaborativeEditing()) {
-            // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-            newCallback(true);
-            newCallback = undefined;
-        }
-        this.collaborativeEditing.onEndCheckLock(newCallback);
-        return true;
+		return this.collaborativeEditing.lock(arrLocks, newCallback);
     };
 
 	WorksheetView.prototype.changeWorksheet = function (prop, val) {
@@ -10682,7 +10590,10 @@
 							checkRange = t.model.autoFilters.checkDeleteAllRowsFormatTable(checkRange, true);
 							t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
 							t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
-							t.model.removeRows(checkRange.r1, checkRange.r2);
+
+							var bExcludeHiddenRows = t.model.autoFilters.bIsExcludeHiddenRows(checkRange, t.model.selectionRange.activeCell);
+							t.model.removeRows(checkRange.r1, checkRange.r2, bExcludeHiddenRows);
+
 							updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
 							History.EndTransaction();
 						};
@@ -11689,19 +11600,16 @@
      * @param updateHeight
      */
     WorksheetView.prototype.updateRanges = function (ranges, lockDraw, updateHeight) {
-        var arrRanges = [], range;
-        for (var i in ranges) {
-            range = ranges[i];
-            this.updateRange(range, range.canChangeColWidth || c_oAscCanChangeColWidth.none, true);
-            arrRanges.push(range);
-        }
+        if (0 < ranges.length) {
+			for (var i = 0; i < ranges.length; ++i) {
+				this.updateRange(ranges[i], ranges[i].canChangeColWidth || c_oAscCanChangeColWidth.none, true);
+			}
 
-        if (0 < arrRanges.length) {
             if (updateHeight) {
                 this.isChanged = true;
             }
 
-            this._recalculateAfterUpdate(arrRanges, lockDraw);
+            this._recalculateAfterUpdate(ranges, lockDraw);
         }
     };
     // ToDo избавиться от этой функции!!!!Заглушка для принятия изменений
@@ -11773,14 +11681,6 @@
 
         this._cleanCache(range);
 
-        // Если размер диапазона превышает размер видимой области больше чем в 3 раза, то очищаем весь кэш
-        if (this._isLargeRange(range)) {
-            this.changeWorksheet("update", {lockDraw: lockDraw});
-
-            this._updateSelectionNameAndInfo();
-            return;
-        }
-
         var cto;
         for (r = range.r1; r <= range.r2; ++r) {
             if (this.height_1px > this.rows[r].height) {
@@ -11819,10 +11719,10 @@
                     bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
                 }
                 if (bUpdateRowHeight) {
-                    h = Math.max(h, ct.metrics.height + this.height_1px);
+                    h = Math.max(h, ct.angle ? ct.textBound.height : ct.metrics.height + this.height_1px);
                 }
 
-                if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged) {
+                if (ct.cellVA !== Asc.c_oAscVAlign.Top && ct.cellVA !== Asc.c_oAscVAlign.Center && !isMerged && !ct.angle) {
                     d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
                 }
             }

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3666,6 +3666,24 @@ function setCurrentCultureInfo(val) {
     AscCommon.g_oDefaultCultureInfo = g_oDefaultCultureInfo = cultureInfoNew;
     return true;
 }
+	function checkCultureInfoFontPicker() {
+		var ci = g_oDefaultCultureInfo;
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.CurrencySymbol);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.NumberDecimalSeparator);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.NumberGroupSeparator);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.AMDesignator);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.PMDesignator);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.DateSeparator);
+		AscFonts.FontPickerByCharacter.getFontsByString(ci.TimeSeparator);
+		var arrays = [ci.DayNames, ci.AbbreviatedDayNames, ci.MonthNames, ci.AbbreviatedMonthNames,
+			ci.MonthGenitiveNames, ci.AbbreviatedMonthGenitiveNames
+		];
+		arrays.forEach(function(arr){
+			arr.forEach(function(text) {
+				AscFonts.FontPickerByCharacter.getFontsByString(text);
+			});
+		});
+	}
 
 	function isDMY(cultureInfo) {
 		//day month year
@@ -4116,8 +4134,14 @@ function setCurrentCultureInfo(val) {
 					res.push(locale + 'mmm' + separator + 'yy;@');
 					res.push(locale + 'mmmm' + separator + 'yy;@');
 					res.push(locale + 'mmmmm' + separator + 'yy;@');
+					res.push(locale + 'yy' + separator + 'mmm;@');
 					res.push(locale + 'd' + separator + 'mmm' + separator + 'yyyy;@');
+					res.push(locale + 'yyyy' + separator + 'mmm' + separator + 'd;@');
+					res.push(locale + 'yy' + separator + 'mmm' + separator + 'd;@');
 				}
+				res.push('yy/m/d;@');
+				res.push('yy/mm/dd;@');
+				res.push('yyyy/m/d;@');
 			} else if (Asc.c_oAscNumFormatType.Time === info.type) {
 				res = gc_aTimeFormats;
 			} else if (Asc.c_oAscNumFormatType.Percent === info.type) {
@@ -4378,6 +4402,7 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
     window["AscCommon"].CellFormat = CellFormat;
     window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
     window["AscCommon"].setCurrentCultureInfo = setCurrentCultureInfo;
+	window["AscCommon"].checkCultureInfoFontPicker = checkCultureInfoFontPicker;
 	window['AscCommon'].getShortDateFormat = getShortDateFormat;
 	window['AscCommon'].getShortDateFormat2 = getShortDateFormat2;
 	window['AscCommon'].getShortDateMonthFormat = getShortDateMonthFormat;

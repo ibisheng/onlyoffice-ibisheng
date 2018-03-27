@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -287,10 +287,11 @@ CCollaborativeEditingBase.prototype.Is_Fast = function()
 };
 CCollaborativeEditingBase.prototype.Is_SingleUser = function()
 {
-    if (1 === this.m_nUseType)
-        return true;
-
-    return false;
+	return (1 === this.m_nUseType);
+};
+CCollaborativeEditingBase.prototype.getCollaborativeEditing = function()
+{
+	return !this.Is_SingleUser();
 };
 CCollaborativeEditingBase.prototype.Start_CollaborationEditing = function()
 {
@@ -427,7 +428,7 @@ CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImage
     rData['data'] = [];
     for(i = 0; i < aImages.length; ++i)
     {
-        rData['data'].push(aImages);
+        rData['data'].push(aImages[i]);
     }
     var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
     this.CheckWaitingImages(aImagesToLoad);
@@ -1256,7 +1257,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         oHistory.Remove_LastPoint();
         this.Clear_DCChanges();
 
-        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null, false, this.getCollaborativeEditing());
 
         this.private_RestoreDocumentState(DocState);
 

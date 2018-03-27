@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1035,7 +1035,7 @@
 	{
 		if (window["flat_desine"] === true)
 		{
-			AscCommonWord.updateGlobalSkin(AscCommonWord.GlobalSkinFlat);
+			AscCommonWord.updateGlobalSkin(AscCommonWord.GlobalSkinFlat2);
 		}
 
 		var _head = document.getElementsByTagName('head')[0];
@@ -1173,6 +1173,7 @@ background-repeat: no-repeat;\
 		this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
 
 		g_oIdCounter.Set_Load(true);
+		AscFonts.IsCheckSymbols = true;
 
 		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
@@ -1195,6 +1196,8 @@ background-repeat: no-repeat;\
 		}
 		else
 			editor.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+
+		AscFonts.IsCheckSymbols = false;
 
 		//callback
 		editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
@@ -1633,6 +1636,11 @@ background-repeat: no-repeat;\
 			this.sendEvent('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 		}
 	};
+	asc_docs_api.prototype._onUpdateDocumentCanUndoRedo = function ()
+	{
+		if (this.WordControl && this.WordControl.m_oLogicDocument)
+			this.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+	};
 
 	// get functions
 	// Возвращает
@@ -2036,12 +2044,15 @@ background-repeat: no-repeat;\
 		}
 
 		var sBase64 = null, _data;
+		var checkData = function(data) {
+			return 	"" === data ? null : data;
+		};
 
 		//TEXT
 		if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 		{
 			_data = this.WordControl.m_oLogicDocument.GetSelectedText(false, {NewLineParagraph : true});
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, checkData(_data))
 		}
 		//HTML
 		if (AscCommon.c_oAscClipboardDataFormat.Html & _formats)
@@ -2050,7 +2061,7 @@ background-repeat: no-repeat;\
 			sBase64            = oCopyProcessor.Start();
 			_data              = oCopyProcessor.getInnerHtml();
 
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, checkData(_data))
 		}
 		//INTERNAL
 		if (AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
@@ -2070,7 +2081,7 @@ background-repeat: no-repeat;\
 			}
 
 			_data = sBase64;
-			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, checkData(_data))
 		}
 	};
 
@@ -2247,182 +2258,109 @@ background-repeat: no-repeat;\
 		}
 	};
 	
-	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
+	asc_docs_api.prototype._onSaveCallbackInner = function(isUndoRequest)
 	{
 		var t = this;
-		if (false == e["saveLock"])
+		History.CheckUnionLastPoints();
+		if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
 		{
-			History.CheckUnionLastPoints();
-			if (this.isLongAction())
-			{
-				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
-				// Нужно снять lock с сохранения
-				this.CoAuthoringApi.onUnSaveLock = function()
-				{
-					t.canSave    = true;
-					t.IsUserSave = false;
-				};
-				this.CoAuthoringApi.unSaveLock();
-				return;
-			}
-			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
+		}
 
-			this.canUnlockDocument2 = this.canUnlockDocument;
-			if (this.canUnlockDocument && this.canStartCoAuthoring) {
-				this.CoAuthoringApi.onStartCoAuthoring(true);
-			}
-			this.canStartCoAuthoring = false;
-			this.canUnlockDocument = false;
+		// Принимаем чужие изменения
+		var HaveOtherChanges = AscCommon.CollaborativeEditing.Have_OtherChanges();
+		AscCommon.CollaborativeEditing.Apply_Changes();
 
-			if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType)
-			{
-				AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
+		this.CoAuthoringApi.onUnSaveLock = function()
+		{
+			t.CoAuthoringApi.onUnSaveLock = null;
+			if (t.isForceSaveOnUserSave && t.IsUserSave) {
+				t.forceSaveButtonContinue = t.forceSave();
 			}
 
-			// Принимаем чужие изменения
-			var HaveOtherChanges = AscCommon.CollaborativeEditing.Have_OtherChanges();
-			AscCommon.CollaborativeEditing.Apply_Changes();
-
-			this.CoAuthoringApi.onUnSaveLock = function()
-			{
-				t.CoAuthoringApi.onUnSaveLock = null;
-				if (t.isForceSaveOnUserSave && t.IsUserSave) {
-					t.forceSaveButtonContinue = t.forceSave();
-				}
-
-				// Выставляем, что документ не модифицирован
-				t.CheckChangedDocument();
-				t.canSave    = true;
-				t.IsUserSave = false;
-				if (!t.forceSaveButtonContinue) {
-					t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-				}
-
-				// Обновляем состояние возможности сохранения документа
-				t._onUpdateDocumentCanSave();
-
-				if (undefined !== window["AscDesktopEditor"])
-				{
-					window["AscDesktopEditor"]["OnSave"]();
-				}
-				if (t.disconnectOnSave) {
-					t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
-					t.disconnectOnSave = null;
-				}
-				if(AscCommon.g_specialPasteHelper && !AscCommon.CollaborativeEditing.Is_SingleUser()){
-					AscCommon.g_specialPasteHelper.SpecialPasteButton_Hide();
-				}
-			};
-
-			var CursorInfo = null;
-			if (true === AscCommon.CollaborativeEditing.Is_Fast())
-			{
-				CursorInfo = History.Get_DocumentPositionBinary();
+			// Выставляем, что документ не модифицирован
+			t.CheckChangedDocument();
+			t.canSave    = true;
+			t.IsUserSave = false;
+			if (!t.forceSaveButtonContinue) {
+				t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			}
 
-			if (isUndoRequest)
+			// Обновляем состояние возможности сохранения документа
+			t._onUpdateDocumentCanSave();
+
+			if (undefined !== window["AscDesktopEditor"])
 			{
-				AscCommon.CollaborativeEditing.Set_GlobalLock(false);
-				AscCommon.CollaborativeEditing.Undo();
+				window["AscDesktopEditor"]["OnSave"]();
 			}
-			else
-			{
-				// Пересылаем свои изменения
-				AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
-					UserId      : this.CoAuthoringApi.getUserConnectionId(),
-					UserShortId : this.DocInfo.get_UserId(),
-					CursorInfo  : CursorInfo
-				}, HaveOtherChanges);
+			if (t.disconnectOnSave) {
+				t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
+				t.disconnectOnSave = null;
 			}
+			if(AscCommon.g_specialPasteHelper && !AscCommon.CollaborativeEditing.Is_SingleUser()){
+				AscCommon.g_specialPasteHelper.SpecialPasteButton_Hide();
+			}
+
+			if (t.canUnlockDocument) {
+				t._unlockDocument();
+			}
+		};
+
+		var CursorInfo = null;
+		if (true === AscCommon.CollaborativeEditing.Is_Fast())
+		{
+			CursorInfo = History.Get_DocumentPositionBinary();
+		}
+
+		if (isUndoRequest)
+		{
+			AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+			AscCommon.CollaborativeEditing.Undo();
 		}
 		else
 		{
-			var nState = this.CoAuthoringApi.get_state();
-			if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState)
-			{
-				// Отключаемся от сохранения, соединение потеряно
-				this.canSave    = true;
-				this.IsUserSave = false;
-			}
-			else
-			{
-				var TimeoutInterval = (true === AscCommon.CollaborativeEditing.Is_Fast() ? 1 : 1000);
-				setTimeout(function()
-				{
-					t.CoAuthoringApi.askSaveChanges(function(event)
-					{
-						t.onSaveCallback(event, isUndoRequest);
-					});
-				}, TimeoutInterval);
-			}
+			// Пересылаем свои изменения
+			AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {
+				UserId      : this.CoAuthoringApi.getUserConnectionId(),
+				UserShortId : this.DocInfo.get_UserId(),
+				CursorInfo  : CursorInfo
+			}, HaveOtherChanges);
 		}
 	};
-	asc_docs_api.prototype._autoSave = function () {
-		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode && this.canSave) {
-			var _curTime = new Date().getTime();
-			if (-1 === this.lastSaveTime) {
-				this.lastSaveTime = _curTime;
+	asc_docs_api.prototype._autoSaveInner = function () {
+		var _curTime = new Date();
+		if (null === this.lastSaveTime) {
+			this.lastSaveTime = _curTime;
+		}
+
+		if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
+			this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+		} else {
+			var _bIsWaitScheme = false;
+			if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
+				if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
+					_bIsWaitScheme = true;
+				}
 			}
 
-			if (this.canUnlockDocument) {
-				this.asc_Save(true);
-				this.lastSaveTime = _curTime;
-			} else {
-				if (AscCommon.CollaborativeEditing.Is_Fast() && !AscCommon.CollaborativeEditing.Is_SingleUser()) {
-					this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
-				} else {
-					var _bIsWaitScheme = false;
-					if (History.Points && History.Index >= 0 && History.Index < History.Points.length) {
-						if ((_curTime - History.Points[History.Index].Time) < this.intervalWaitAutoSave) {
-							_bIsWaitScheme = true;
-						}
-					}
+			if (!_bIsWaitScheme) {
+				var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
+					this.autoSaveGapFast;
 
-					if (!_bIsWaitScheme) {
-						var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? this.autoSaveGapSlow :
-							this.autoSaveGapFast;
-
-						if ((_curTime - this.lastSaveTime) > _interval) {
-							if (History.Have_Changes(true) == true) {
-								this.asc_Save(true);
-							}
-							this.lastSaveTime = _curTime;
-						}
+				if ((_curTime - this.lastSaveTime) > _interval) {
+					if (History.Have_Changes(true) == true) {
+						this.asc_Save(true);
 					}
+					this.lastSaveTime = _curTime;
 				}
 			}
 		}
 	};
-	asc_docs_api.prototype.saveCheck = function() {
-		return true === this.canSave && !this.isLongAction();
+	asc_docs_api.prototype._saveCheck = function() {
+		return !this.WordControl.m_oLogicDocument.IsViewModeInReview() && !this.isLongAction();
 	};
-	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest, isIdle)
-	{
-		if (this.WordControl.m_oLogicDocument.IsViewModeInReview())
-			return false;
-
-		var res = false;
-		this.IsUserSave = !isAutoSave;
-		if (this.saveCheck())
-		{
-			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
-				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
-			{
-				this.canSave = false;
-
-				var t = this;
-				this.CoAuthoringApi.askSaveChanges(function(e)
-				{
-					t.onSaveCallback(e, isUndoRequest);
-				});
-				res = true;
-			}
-			else if (this.isForceSaveOnUserSave && this.IsUserSave)
-			{
-				this.forceSave();
-			}
-		}
-		return res;
+	asc_docs_api.prototype._haveOtherChanges = function () {
+		return AscCommon.CollaborativeEditing.Have_OtherChanges();
 	};
 	asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent)
 	{
@@ -3572,12 +3510,12 @@ background-repeat: no-repeat;\
 			fCallback();
 		}
 	};
-	asc_docs_api.prototype.put_Style    = function(name)
+	asc_docs_api.prototype.put_Style    = function(sName)
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphStyle);
-			this.WordControl.m_oLogicDocument.SetParagraphStyle(name);
+			this.WordControl.m_oLogicDocument.SetParagraphStyle(sName, true);
 		}
 	};
 
@@ -5587,6 +5525,7 @@ background-repeat: no-repeat;\
 	{
 		if (obj)
 		{
+			this.m_bGlobal    = (undefined != obj.m_bGlobal   ) ? obj.m_bGlobal : false;
 			this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText : "";
 			this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime : "";
 			this.m_sOOTime    = (undefined != obj.m_sOOTime   ) ? obj.m_sOOTime : "";
@@ -5607,6 +5546,7 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
+			this.m_bGlobal    = false;
 			this.m_sText      = "";
 			this.m_sTime      = "";
 			this.m_sOOTime    = "";
@@ -5686,6 +5626,15 @@ background-repeat: no-repeat;\
 	{
 		return this.m_aReplies.length;
 	};
+	asc_CCommentDataWord.prototype.asc_putDocumentFlag = function(val)
+	{
+		this.m_bGlobal = val;
+	};
+	asc_CCommentDataWord.prototype.asc_getDocumentFlag = function()
+	{
+		return this.m_bGlobal;
+	};
+
 
 
 	asc_docs_api.prototype.asc_showComments = function(isShowSolved)
@@ -7032,7 +6981,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype._downloadAs    = function(command, filetype, actionType, options, fCallbackRequest)
 	{
-		if (this.WordControl && this.WordControl.m_oDrawingDocument)
+		if (this.WordControl && this.WordControl.m_oDrawingDocument && (c_oAscFileType.PDF == filetype))
 		{
 			if (this.WordControl.m_oDrawingDocument.CheckPrint([command, filetype, actionType, options, fCallbackRequest]))
 				return;
@@ -7243,7 +7192,13 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Document_AddChart);
+			AscFonts.IsCheckSymbols = true;
+			this.asc_SetSilentMode(true);
 			this.WordControl.m_oLogicDocument.AddInlineImage(null, null, null, options);
+			AscFonts.IsCheckSymbols = false;
+			AscFonts.FontPickerByCharacter.checkText("", this, function() {
+				this.asc_SetSilentMode(false, true);
+			}, false, false, false);
 		}
 	};
 	asc_docs_api.prototype.asc_doubleClickOnChart    = function(obj)
@@ -7252,6 +7207,12 @@ background-repeat: no-repeat;\
 		this.asc_onOpenChartFrame();
 		this.WordControl.onMouseUpMainSimple();
 		this.sendEvent("asc_doubleClickOnChart", obj);
+	};
+
+	asc_docs_api.prototype.asc_onCloseChartFrame               = function()
+	{
+		AscCommon.baseEditorsApi.prototype.asc_onCloseChartFrame.call(this);
+		this.WordControl.m_bIsMouseLock = false;
 	};
 
 	asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
@@ -7904,6 +7865,20 @@ background-repeat: no-repeat;\
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.ContentControl, oContentControlPr);
 	};
 
+	asc_docs_api.prototype.asc_UncheckContentControlButtons = function()
+	{
+		var _controls = this.WordControl.m_oDrawingDocument.ContentControlObjects;
+		for (var i = 0; i < _controls.length; i++)
+		{
+			_controls[i].ActiveButtonIndex = -2;
+		}
+
+		this.WordControl.ShowOverlay();
+		this.WordControl.StartUpdateOverlay();
+		this.WordControl.OnUpdateOverlay();
+		this.WordControl.EndUpdateOverlay();
+	};
+
 	asc_docs_api.prototype.asc_BeginViewModeInReview = function(isFinal)
 	{
 		this.WordControl.m_oLogicDocument.BeginViewModeInReview(isFinal);
@@ -7972,15 +7947,18 @@ background-repeat: no-repeat;\
 
 		});
 	};
-	asc_docs_api.prototype.asc_RemoveTableOfContents = function()
+	asc_docs_api.prototype.asc_RemoveTableOfContents = function(oTOC)
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
 		if (!oLogicDocument)
 			return;
 
-		var oTOC = oLogicDocument.GetTableOfContents();
 		if (!oTOC)
-			return;
+		{
+			oTOC = oLogicDocument.GetTableOfContents();
+			if (!oTOC)
+				return;
+		}
 
 		if (oTOC instanceof AscCommonWord.CBlockLevelSdt)
 		{
@@ -8479,14 +8457,14 @@ background-repeat: no-repeat;\
 		AscCommon.CollaborativeEditing.Apply_OtherChanges();
 	};
 
-	window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled)
+	window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled, bAddition)
 	{
 		if (!this.WordControl.m_oLogicDocument)
 			return;
 		if (bEnabled)
 			this.WordControl.m_oLogicDocument.Start_SilentMode();
 		else
-			this.WordControl.m_oLogicDocument.End_SilentMode();
+			this.WordControl.m_oLogicDocument.End_SilentMode(bAddition);
 	};
 
 	window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
@@ -8629,37 +8607,6 @@ background-repeat: no-repeat;\
 
 		if (ifr)
 			document.body.removeChild(ifr);
-	};
-
-	window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
-	{
-		if (true)
-		{
-			// pos не должен минимизироваться!!!
-
-			_memory1.Copy          = _memory1["Copy"];
-			_memory1.ClearNoAttack = _memory1["ClearNoAttack"];
-			_memory1.WriteByte     = _memory1["WriteByte"];
-			_memory1.WriteBool     = _memory1["WriteBool"];
-			_memory1.WriteLong     = _memory1["WriteLong"];
-			_memory1.WriteDouble   = _memory1["WriteDouble"];
-			_memory1.WriteString   = _memory1["WriteString"];
-			_memory1.WriteString2  = _memory1["WriteString2"];
-
-			_memory2.Copy          = _memory1["Copy"];
-			_memory2.ClearNoAttack = _memory1["ClearNoAttack"];
-			_memory2.WriteByte     = _memory1["WriteByte"];
-			_memory2.WriteBool     = _memory1["WriteBool"];
-			_memory2.WriteLong     = _memory1["WriteLong"];
-			_memory2.WriteDouble   = _memory1["WriteDouble"];
-			_memory2.WriteString   = _memory1["WriteString"];
-			_memory2.WriteString2  = _memory1["WriteString2"];
-		}
-
-		var _printer                  = new AscCommon.CDocumentRenderer();
-		_printer.Memory               = _memory1;
-		_printer.VectorMemoryForPrint = _memory2;
-		return _printer;
 	};
 
 	window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
@@ -8904,6 +8851,18 @@ background-repeat: no-repeat;\
 		{
 			this.WordControl.checkBodyOffset();
 		}
+	};
+
+	asc_docs_api.prototype.getDefaultFontFamily = function () {
+		//TODO переделать и отдавать дефолтовый шрифт
+		var defaultFont = "Arial";
+		return defaultFont;
+	};
+
+	asc_docs_api.prototype.getDefaultFontSize = function () {
+		//TODO переделать и отдавать дефолтовый шрифт
+		var defaultSize = 11;
+		return defaultSize;
 	};
 
 	window["AscDesktopEditor_Save"] = function()
@@ -9428,6 +9387,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_IsContentControl"]                      = asc_docs_api.prototype.asc_IsContentControl;
 	asc_docs_api.prototype["asc_GetContentControlProperties"]           = asc_docs_api.prototype.asc_GetContentControlProperties;
 	asc_docs_api.prototype["asc_GetCurrentContentControl"]              = asc_docs_api.prototype.asc_GetCurrentContentControl;
+	asc_docs_api.prototype["asc_UncheckContentControlButtons"]          = asc_docs_api.prototype.asc_UncheckContentControlButtons;
 
 
 	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
@@ -9515,4 +9475,6 @@ background-repeat: no-repeat;\
 	asc_CCommentDataWord.prototype['asc_getReply']        = asc_CCommentDataWord.prototype.asc_getReply;
 	asc_CCommentDataWord.prototype['asc_addReply']        = asc_CCommentDataWord.prototype.asc_addReply;
 	asc_CCommentDataWord.prototype['asc_getRepliesCount'] = asc_CCommentDataWord.prototype.asc_getRepliesCount;
+	asc_CCommentDataWord.prototype['asc_getDocumentFlag'] = asc_CCommentDataWord.prototype.asc_getDocumentFlag;
+	asc_CCommentDataWord.prototype['asc_putDocumentFlag'] = asc_CCommentDataWord.prototype.asc_putDocumentFlag;
 })(window, window.document);

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -810,9 +810,9 @@ CDocumentContentElementBase.prototype.GetReviewType = function()
 {
 	return this.Get_ReviewType();
 };
-CDocumentContentElementBase.prototype.IsEmpty = function()
+CDocumentContentElementBase.prototype.IsEmpty = function(oProps)
 {
-	return this.Is_Empty();
+	return this.Is_Empty(oProps);
 };
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {
@@ -838,6 +838,75 @@ CDocumentContentElementBase.prototype.UpdateBookmarks = function(oManager)
  */
 CDocumentContentElementBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
+	return null;
+};
+/**
+ * Проверяем у родительского класса выделен ли только один элемент
+ * @returns {boolean}
+ */
+CDocumentContentElementBase.prototype.IsSelectedSingleElement = function()
+{
+	if (this.Parent)
+		return this.Parent.IsSelectedSingleElement();
+
+	return false;
+};
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetLastParagraph = function()
+{
+	return null;
+};
+/**
+ * Получаем первый параграф в данном контенте
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetFirstParagraph = function()
+{
+	return this.Get_FirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetNextParagraph = function()
+{
+	var oNextElement = this.Get_DocumentNext();
+
+	if (oNextElement)
+	{
+		if (type_Paragraph === oNextElement.GetType())
+			return oNextElement;
+		else
+			return oNextElement.GetFirstParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetNextParagraph)
+		return this.Parent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetPrevParagraph = function()
+{
+	var oPrevElement = this.Get_DocumentPrev();
+
+	if (oPrevElement)
+	{
+		if (type_Paragraph === oPrevElement.GetType())
+			return oPrevElement;
+		else
+			return oPrevElement.GetLastParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetPrevParagraph)
+		return this.Parent.GetPrevParagraph();
+
 	return null;
 };
 //--------------------------------------------------------export--------------------------------------------------------

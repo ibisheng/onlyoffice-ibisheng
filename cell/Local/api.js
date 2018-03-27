@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -165,7 +165,7 @@ var c_oAscError = Asc.c_oAscError;
 		{
 			var _isNaturalSave = this.IsUserSave;
 			this.canSave = false;
-			this.CoAuthoringApi.askSaveChanges(function(e){t.onSaveCallback(e);});
+			this.CoAuthoringApi.askSaveChanges(function(e){t._onSaveCallback(e);});
 
 			if (this.CoAuthoringApi.onUnSaveLock)
 				this.CoAuthoringApi.onUnSaveLock();

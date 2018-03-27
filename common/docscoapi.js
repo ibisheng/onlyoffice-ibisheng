@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -301,17 +301,19 @@
     }
   };
 
-  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo, canUnlockDocument) {
+  CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo, canUnlockDocument, canReleaseLocks) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
+      this._CoAuthoringApi.canReleaseLocks = canReleaseLocks;
       this._CoAuthoringApi.saveChanges(arrayChanges, null, deleteIndex, excelAdditionalInfo);
     }
   };
 
-  CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument) {
+  CDocsCoApi.prototype.unLockDocument = function(isSave, canUnlockDocument, deleteIndex, canReleaseLocks) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.canUnlockDocument = canUnlockDocument;
-      this._CoAuthoringApi.unLockDocument(isSave, canUnlockDocument);
+      this._CoAuthoringApi.canReleaseLocks = canReleaseLocks;
+      this._CoAuthoringApi.unLockDocument(isSave, deleteIndex);
     }
   };
 
@@ -598,7 +600,6 @@
     this.saveLockCallbackErrorTimeOutId = null;
     this.saveCallbackErrorTimeOutId = null;
     this.unSaveLockCallbackErrorTimeOutId = null;
-	this.jwtTimeOutId = null;
     this._id = null;
     this._sessionTimeConnect = null;
 	this._allChangesSaved = null;
@@ -627,6 +628,8 @@
     this.excelAdditionalInfo = null;
     // Unlock document
     this.canUnlockDocument = false;
+    // Release locks
+    this.canReleaseLocks = false;
 
     this._url = "";
 
@@ -658,6 +661,8 @@
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
+    this._authChanges = [];
+    this._authOtherChanges = [];
   }
 
   DocsCoApi.prototype.isRightURL = function() {
@@ -868,11 +873,16 @@
       'startSaveChanges': (startIndex === 0), 'endSaveChanges': (endIndex === arrayChanges.length),
       'isCoAuthoring': this.isCoAuthoring, 'isExcel': this._isExcel, 'deleteIndex': this.deleteIndex,
       'excelAdditionalInfo': this.excelAdditionalInfo ? JSON.stringify(this.excelAdditionalInfo) : null,
-        'unlock': this.canUnlockDocument});
+        'unlock': this.canUnlockDocument, 'releaseLocks': this.canReleaseLocks});
   };
 
-  DocsCoApi.prototype.unLockDocument = function(isSave) {
-    this._send({'type': 'unLockDocument', 'isSave': isSave, 'unlock': this.canUnlockDocument});
+  DocsCoApi.prototype.unLockDocument = function(isSave, deleteIndex) {
+    this.deleteIndex = deleteIndex;
+    if (null != this.deleteIndex && -1 !== this.deleteIndex) {
+      this.deleteIndex += this.changesIndex;
+    }
+    this._send({'type': 'unLockDocument', 'isSave': isSave, 'unlock': this.canUnlockDocument,
+      'deleteIndex': this.deleteIndex, 'releaseLocks': this.canReleaseLocks});
   };
 
   DocsCoApi.prototype.getUsers = function() {
@@ -1018,20 +1028,8 @@
   };
 
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
-    var t = this;
-    if (jwt) {
-      t.jwtOpen = undefined;
-      t.jwtSession = jwt['token'];
-      if (null !== t.jwtTimeOutId) {
-        clearTimeout(t.jwtTimeOutId);
-        t.jwtTimeOutId = null;
-      }
-      var timeout = Math.max(0, jwt['expires'] - t.maxAttemptCount * t.reconnectInterval);
-      t.jwtTimeOutId = setTimeout(function(){
-        t.jwtTimeOutId = null;
-        t._send({'type': 'refreshToken', 'jwtSession': t.jwtSession});
-      }, timeout);
-    }
+    this.jwtOpen = undefined;
+    this.jwtSession = jwt;
   };
 
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
@@ -1129,6 +1127,9 @@
 
   DocsCoApi.prototype._onSaveChanges = function(data) {
     if (!this.check_state()) {
+      if (!this.get_isAuth()) {
+        this._authOtherChanges.push(data);
+      }
       return;
     }
     if (data["locks"]) {
@@ -1166,7 +1167,8 @@
     } else if (isWaitAuth) {
       //it is a stub for unexpected situation(no direct reproduce scenery)
       //isCoAuthoring is true when more then one editor, but isWaitAuth mean than server has one editor
-      this.unLockDocument(false, true);
+      this.canUnlockDocument = true;
+      this.unLockDocument(false);
     }
   };
 
@@ -1481,7 +1483,7 @@
             this.onSaveChanges(changeOneUser[j], null, true);
         }
       }
-      this._updateChanges(data["changes"], data["changesIndex"], true);
+      this._updateAuthChanges();
       // Посылать нужно всегда, т.к. на это рассчитываем при открытии
       if (this.onFirstLoadChangesEnd) {
         this.onFirstLoadChangesEnd();
@@ -1494,6 +1496,33 @@
       this._sendPrebuffered();
     }
     //TODO: Add errors
+  };
+  DocsCoApi.prototype._onAuthChanges = function(data) {
+    this._authChanges.push(data["changes"]);
+  };
+  DocsCoApi.prototype._updateAuthChanges = function() {
+    //todo apply changes with chunk on arrival
+    var changesIndex = 0, i, changes, data, indexDiff;
+    for (i = 0; i < this._authChanges.length; ++i) {
+      changes = this._authChanges[i];
+      changesIndex += changes.length;
+      this._updateChanges(changes, changesIndex, true);
+    }
+    this._authChanges = [];
+    for (i = 0; i < this._authOtherChanges.length; ++i) {
+      data = this._authOtherChanges[i];
+      indexDiff = data["changesIndex"] - changesIndex;
+      if (indexDiff > 0) {
+        if (indexDiff >= data["changes"].length) {
+          changes = data["changes"];
+        } else {
+          changes = data["changes"].splice(data["changes"].length - indexDiff, indexDiff);
+        }
+        changesIndex += changes.length;
+        this._updateChanges(changes, changesIndex, true);
+      }
+    }
+    this._authOtherChanges = [];
   };
 
   DocsCoApi.prototype.init = function(user, docid, documentCallbackUrl, token, editorType, documentFormatSave, docInfo) {
@@ -1633,6 +1662,9 @@
 				break;
 			case 'saveChanges'    :
 				this._onSaveChanges(dataObject);
+				break;
+			case 'authChanges' :
+				this._onAuthChanges(dataObject);
 				break;
 			case 'saveLock'      :
 				this._onSaveLock(dataObject);

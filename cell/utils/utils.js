@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1026,6 +1026,19 @@
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
+			// Check one cell
+			if (1 === this.ranges.length) {
+				curRange = this.ranges[this.activeCellId];
+				if (curRange.isOneCell()) {
+					return false;
+				} else {
+					mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+					if (mc && curRange.isEqual(mc)) {
+						return false;
+					}
+				}
+			}
+
 			var lastRow = this.activeCell.row;
 			var lastCol = this.activeCell.col;
 			this.activeCell.row += dr;
@@ -2021,6 +2034,18 @@
 			}
 		}
 
+		asc_CStylesPainter.prototype.asc_checkStylesNames = function(cellStylesAll) {
+			var oStyle, i;
+			for (i = 0; i < cellStylesAll.DefaultStyles.length; ++i) {
+				oStyle = cellStylesAll.DefaultStyles[i];
+				AscFonts.FontPickerByCharacter.getFontsByString(oStyle.Name);
+				AscFonts.FontPickerByCharacter.getFontsByString(AscCommon.translateManager.getValue(oStyle.Name));
+			}
+			for (i = 0; i < cellStylesAll.CustomStyles.length; ++i) {
+				oStyle = cellStylesAll.CustomStyles[i];
+				AscFonts.FontPickerByCharacter.getFontsByString(oStyle.Name);
+			}
+		};
 		asc_CStylesPainter.prototype.asc_getStyleThumbnailWidth = function () {
 			return this.styleThumbnailWidthWithRetina;
 		};

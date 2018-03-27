@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -6481,7 +6481,7 @@ RangeDataManager.prototype = {
 		if (this.CustomFiltersObj) {
 			var customFilters = this.CustomFiltersObj.CustomFilters;
 			var customFilter = customFilters && 1 === customFilters.length ? customFilters[0] : null;
-			if (c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
+			if (customFilter && c_oAscCustomAutoFilter.doesNotEqual === customFilter.Operator && " " === customFilter.Val) {
 				res = true;
 			}
 		}
@@ -6855,7 +6855,7 @@ CustomFilter.prototype.isHideValue = function(val) {
 		}
 		else if(isNumberFilter)
 		{
-			if(isNaN(this.Val))
+			if(isNaN(this.Val) && isNaN(val))
 			{
 				filterVal =  this.Val;
 			}
@@ -6870,8 +6870,8 @@ CustomFilter.prototype.isHideValue = function(val) {
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 		}
 
-		var trimVal = window["Asc"].trim(val);
-		var trimFilterVal = window["Asc"].trim(filterVal);
+		var trimVal = "string" === typeof(val) ? window["Asc"].trim(val) : val;
+		var trimFilterVal = "string" === typeof(filterVal) ? window["Asc"].trim(filterVal) : filterVal;
 
 		switch (this.Operator)
 		{
@@ -7638,12 +7638,15 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 			this.all.push(text);
 			index = this.all.length;
 			this.text.set(text, index);
+			if (AscFonts.IsCheckSymbols) {
+				AscFonts.FontPickerByCharacter.getFontsByString(text);
+			}
 		}
 		return index;
 	};
 	CSharedStrings.prototype.addMultiText = function(multiText) {
-		var index;
-		for (var i = 0; i < this.multiText.length; ++i) {
+		var index, i;
+		for (i = 0; i < this.multiText.length; ++i) {
 			if (AscCommonExcel.isEqualMultiText(multiText, this.multiText[i])) {
 				index = this.multiTextIndex[i];
 				break;
@@ -7654,6 +7657,11 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 			index = this.all.length;
 			this.multiText.push(multiText);
 			this.multiTextIndex.push(index);
+			if (AscFonts.IsCheckSymbols) {
+				for (i = 0; i < multiText.length; ++i) {
+					AscFonts.FontPickerByCharacter.getFontsByString(multiText[i].text);
+				}
+			}
 		}
 		return index;
 	};
@@ -7662,6 +7670,17 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	};
 	CSharedStrings.prototype.getCount = function() {
 		return this.all.length;
+	};
+	CSharedStrings.prototype.generateFontMap = function(oFontMap) {
+		for (var i = 0; i < this.multiText.length; ++i) {
+			var multiText = this.multiText[i];
+			for (var j = 0; j < multiText.length; ++j) {
+				var part = multiText[j];
+				if (null != part.format) {
+					oFontMap[part.format.getName()] = 1;
+				}
+			}
+		}
 	};
 
 	/**

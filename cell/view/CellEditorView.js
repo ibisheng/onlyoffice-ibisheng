@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -143,6 +143,7 @@
 		this.enableKeyEvents = true;
 		this.isTopLineActive = false;
 		this.skipTLUpdate = true;
+		this.loadFonts = false;
 		this.isOpened = false;
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
@@ -1183,7 +1184,7 @@
 
 	CellEditor.prototype._fireUpdated = function () {
 		var s = this._getFragmentsText(this.options.fragments);
-		var isFormula = s.charAt(0) === "=";
+		var isFormula = -1 === this.beginCompositePos && s.charAt(0) === "=";
 		var funcPos, funcName, match;
 
 		if (!this.isTopLineActive || !this.skipTLUpdate || this.undoMode) {
@@ -1409,13 +1410,12 @@
 	};
 
 	CellEditor.prototype._hideCursor = function () {
-		if ( window['IS_NATIVE_EDITOR'] ) {
+		if (window['IS_NATIVE_EDITOR']) {
 			return;
 		}
 
-		var t = this;
-		window.clearInterval( t.cursorTID );
-		t.cursorStyle.display = "none";
+		window.clearInterval(this.cursorTID);
+		this.cursorStyle.display = "none";
 	};
 
 	CellEditor.prototype._updateCursorPosition = function (redrawText) {
@@ -1561,23 +1561,24 @@
 	};
 
 	CellEditor.prototype._updateTopLineCurPos = function () {
-		var t = this;
-		var isSelected = t.selectionBegin !== t.selectionEnd;
-		var b = isSelected ? t.selectionBegin : t.cursorPos;
-		var e = isSelected ? t.selectionEnd : t.cursorPos;
-		if ( t.input.setSelectionRange ) {
-			t.input.setSelectionRange( Math.min( b, e ), Math.max( b, e ) );
+		if (this.loadFonts) {
+			return;
+		}
+		var isSelected = this.selectionBegin !== this.selectionEnd;
+		var b = isSelected ? this.selectionBegin : this.cursorPos;
+		var e = isSelected ? this.selectionEnd : this.cursorPos;
+		if (this.input.setSelectionRange) {
+			this.input.setSelectionRange(Math.min(b, e), Math.max(b, e));
 		}
 	};
 
 	CellEditor.prototype._topLineGotFocus = function () {
-		var t = this;
-		t.isTopLineActive = true;
-		t.input.isFocused = true;
-		t.setFocus(true);
-		t._hideCursor();
-		t._updateTopLineCurPos();
-		t._cleanSelection();
+		this.isTopLineActive = true;
+		this.input.isFocused = true;
+		this.setFocus(true);
+		this._hideCursor();
+		this._updateTopLineCurPos();
+		this._cleanSelection();
 	};
 
 	CellEditor.prototype._topLineMouseUp = function () {
@@ -2473,10 +2474,6 @@
 				break;
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
-				if (!this.enableKeyEvents) {
-					break;
-				}
-
 				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -2587,6 +2584,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseUp = function ( event ) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		if ( this.callTopLineMouseup ) {
 			this._topLineMouseUp();
@@ -2607,6 +2605,8 @@
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
+		AscCommon.global_mouseEvent.LockMouse();
+
 		var pos;
 		var coord = this._getCoordinates(event);
 		if (!window['IS_NATIVE_EDITOR']) {
@@ -2614,6 +2614,7 @@
 		}
 
 		this.setFocus(true);
+		this.handlers.trigger('setStrictClose', true);
 
 		this.isTopLineActive = false;
 		this.input.isFocused = false;
@@ -2649,6 +2650,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseUp = function (event) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		if (2 === event.button) {
 			return true;
 		}
@@ -2675,12 +2677,17 @@
 
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
-		if (this.handlers.trigger("isViewerMode")) {
+		var t = this;
+		if (this.handlers.trigger("isViewerMode") || this.loadFonts) {
 			return true;
 		}
-		this.skipTLUpdate = true;
-		this.replaceText(0, this.textRender.getEndOfText(), this.input.value);
-		this._updateCursorByTopLine();
+		this.loadFonts = true;
+		AscFonts.FontPickerByCharacter.checkText(this.input.value, this, function () {
+			t.loadFonts = false;
+			t.skipTLUpdate = true;
+			t.replaceText(0, t.textRender.getEndOfText(), t.input.value);
+			t._updateCursorByTopLine();
+		});
 		return true;
 	};
 
@@ -2707,8 +2714,8 @@
 			this.beginCompositePos = this.cursorPos;
 			this.compositeLength = 0;
 		} else {
-			this.beginCompositePos = this.selectionBegin;
-			this.compositeLength = this.selectionEnd - this.selectionBegin;
+			this.beginCompositePos = Math.min(this.selectionBegin, this.selectionEnd);
+			this.compositeLength = Math.max(this.selectionBegin, this.selectionEnd) - this.beginCompositePos;
 		}
 		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
 	};

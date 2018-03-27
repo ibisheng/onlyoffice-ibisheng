@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1259,6 +1259,53 @@ CHistory.prototype.IsParagraphSimpleChanges = function()
 
 	return null;
 };
+	/**
+	 * Получаем сколько изменений в истории уже сохранено на сервере на данный момент с учетом текущей точки в истории
+	 * @returns {number}
+	 */
+	CHistory.prototype.GetDeleteIndex = function()
+	{
+		if (null === this.SavedIndex)
+			return null;
+
+		var nSum = 0;
+		for (var nPointIndex = 0, nLastPoint = Math.min(this.SavedIndex, this.Index); nPointIndex <= nLastPoint; ++nPointIndex)
+		{
+			nSum += this.Points[nPointIndex].Items.length;
+		}
+
+		return nSum;
+	};
+	/**
+	 * Удаляем изменения из истории, которые сохранены на сервере. Это происходит при подключении второго пользователя
+	 */
+	CHistory.prototype.RemovePointsByDeleteIndex = function()
+	{
+		var nDeleteIndex = this.GetDeleteIndex();
+		if (null === nDeleteIndex)
+			return;
+
+		while (nDeleteIndex > 0 && this.Points.length > 0)
+		{
+			nDeleteIndex -= this.Points[0].Items.length;
+
+			this.Points.splice(0, 1);
+
+			if (this.Index >= 0)
+				this.Index--;
+
+			if (this.RecIndex >= 0)
+				this.RecIndex--;
+
+			if (null !== this.SavedIndex && this.SavedIndex >= 0)
+			{
+				this.SavedIndex--;
+
+				if (this.SavedIndex < 0)
+					this.SavedIndex = null;
+			}
+		}
+	};
 
 function CRC32()
 {
