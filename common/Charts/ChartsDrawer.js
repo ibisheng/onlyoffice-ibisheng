@@ -79,18 +79,6 @@ var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
 
-function arrReverse(arr) {
-	if(!arr || !arr.length)
-		return;
-	var newarr = [];
-	for (var i = 0; i < arr[0].length; ++i) {
-		newarr[i] = [];
-		for (var j = 0; j < arr.length; ++j) {
-			newarr[i][j] = arr[j][i];
-		}
-	}
-	return newarr;
-}
 
 //*****MAIN*****
 function CChartsDrawer()
@@ -335,80 +323,69 @@ CChartsDrawer.prototype =
 			}
 		}
 	},
-	
-	recalculateOnly3dProps: function(chartSpace)
-	{
+
+	recalculateOnly3dProps: function (chartSpace) {
 		//this.cChartSpace = chartSpace;
 		this.calcProp = {};
-		
-		if(this._isSwitchCurrent3DChart(chartSpace))
-		{
+
+		if (this._isSwitchCurrent3DChart(chartSpace)) {
 			standartMarginForCharts = 16;
 			this.nDimensionCount = 3;
-			
-			if(!chartSpace.bEmptySeries)
-			this._calculateProperties(chartSpace);
-		
-			if(this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined)
-			{
+
+			if (!chartSpace.bEmptySeries) {
+				this._calculateProperties(chartSpace);
+			}
+
+			if (this.calcProp.widthCanvas == undefined && this.calcProp.pxToMM == undefined) {
 				this.calcProp.pathH = 1000000000;
 				this.calcProp.pathW = 1000000000;
 				this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 				this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
 				this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 			}
-			
-			if(!chartSpace.bEmptySeries)
-			{
-				if(this.nDimensionCount === 3)
+
+			if (!chartSpace.bEmptySeries) {
+				if (this.nDimensionCount === 3) {
 					this._calaculate3DProperties(chartSpace);
+				}
 			}
 		}
 	},
-	
+
 	//****positions text labels****
-	reCalculatePositionText : function(type, chartSpace, ser, val, bLayout)
-	{
+	reCalculatePositionText: function (type, chartSpace, ser, val, bLayout) {
 		var pos;
-		
-		if(!chartSpace.bEmptySeries)
-		{
-			switch ( type )
-			{
-				case "dlbl":
-				{
+
+		if (!chartSpace.bEmptySeries) {
+			switch (type) {
+				case "dlbl": {
 					pos = this._calculatePositionDlbl(chartSpace, ser, val, bLayout);
 					break;
 				}
-				case "title":
-				{
+				case "title": {
 					pos = this._calculatePositionTitle(chartSpace);
 					break;
 				}
-				case "valAx":
-				{
+				case "valAx": {
 					pos = this._calculatePositionValAxTitle(chartSpace);
 					break;
 				}
-				case "catAx":
-				{
+				case "catAx": {
 					pos = this._calculatePositionCatAxTitle(chartSpace);
 					break;
 				}
-				case "legend":
-				{
+				case "legend": {
 					pos = this._calculatePositionLegend(chartSpace);
 					break;
 				}
-				default:
-				{
+				default: {
 					pos = {x: 0, y: 0};
 					break;
 				}
 			}
 		}
-		
-		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
+
+		return {x: pos ? pos.x : undefined, y: pos ? pos.y : undefined};
 	},
 	
 	_calculatePositionDlbl: function(chartSpace, ser, val, bLayout)
@@ -578,144 +555,146 @@ CChartsDrawer.prototype =
 	
 	
 	//****calculate margins****
-	_calculateMarginsChart: function(chartSpace, dNotPutResult) {
+	_calculateMarginsChart: function (chartSpace, dNotPutResult) {
 		this.calcProp.chartGutter = {};
-		
-		if(this._isSwitchCurrent3DChart(chartSpace))
+
+		if (this._isSwitchCurrent3DChart(chartSpace)) {
 			standartMarginForCharts = 16;
-		
-		if(!this.calcProp.pxToMM)
+		}
+
+		if (!this.calcProp.pxToMM) {
 			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
-		
+		}
+
 		var pxToMM = this.calcProp.pxToMM;
 		var plotArea = chartSpace.chart.plotArea;
-		
-		var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart && plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
-		
+
+		var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart &&
+			plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
+
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
 		var calculateLeft = marginOnPoints.calculateLeft, calculateRight = marginOnPoints.calculateRight, calculateTop = marginOnPoints.calculateTop, calculateBottom = marginOnPoints.calculateBottom;
-		
+
 		//высчитываем выходящие за пределы подписи осей
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
-		
+
 
 		var leftTextLabels = 0;
 		var rightTextLabels = 0;
 		var topTextLabels = 0;
 		var bottomTextLabels = 0;
-		
+
 		//добавляем размеры подписей осей + размеры названия
 		//***left***
-		if(plotArea.valAx && plotArea.valAx.title != null && !isHBar)
+		if (plotArea.valAx && plotArea.valAx.title != null && !isHBar) {
 			leftTextLabels += plotArea.valAx.title.extX;
-		else if(isHBar && plotArea.catAx && plotArea.catAx.title != null)
+		} else if (isHBar && plotArea.catAx &&
+			plotArea.catAx.title != null) {
 			leftTextLabels += plotArea.catAx.title.extX;
+		}
 
 		//пока ориентацию добавляю без hbar
 		var orientationValAx = plotArea.valAx && plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX;
 		//***bottom***
-		if(plotArea.catAx && plotArea.catAx.title != null && !isHBar && orientationValAx)
+		if (plotArea.catAx && plotArea.catAx.title != null && !isHBar && orientationValAx) {
 			bottomTextLabels += plotArea.catAx.title.extY;
-		else if(isHBar && plotArea.valAx && plotArea.valAx.title != null)
+		} else if (isHBar && plotArea.valAx &&
+			plotArea.valAx.title != null) {
 			bottomTextLabels += plotArea.valAx.title.extY;
+		}
 
-		
-		
+
 		//***top***
 		var topMainTitle = 0;
-		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
+		if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
 			topMainTitle += chartSpace.chart.title.extY;
-			
-		if(plotArea.catAx && plotArea.catAx.title != null && !isHBar && !orientationValAx)
+		}
+
+		if (plotArea.catAx && plotArea.catAx.title != null && !isHBar && !orientationValAx) {
 			topTextLabels += plotArea.catAx.title.extY;
-		
+		}
+
 
 		var leftKey = 0, rightKey = 0, topKey = 0, bottomKey = 0;
 		//KEY
-		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
-		{
+		if (chartSpace.chart.legend && !chartSpace.chart.legend.overlay) {
 			var fLegendExtX = chartSpace.chart.legend.extX;
 			var fLegendExtY = chartSpace.chart.legend.extY;
-			if(chartSpace.chart.legend.layout){
-				if(AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) && AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)){
+			if (chartSpace.chart.legend.layout) {
+				if (AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) &&
+					AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)) {
 					fLegendExtX = chartSpace.chart.legend.naturalWidth;
 					fLegendExtY = chartSpace.chart.legend.naturalHeight;
 				}
 			}
-            var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
-			switch ( nLegendPos )
-			{
+			var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos :
+				c_oAscChartLegendShowSettings.right;
+			switch (nLegendPos) {
 				case c_oAscChartLegendShowSettings.left:
-				case c_oAscChartLegendShowSettings.leftOverlay:
-				{
+				case c_oAscChartLegendShowSettings.leftOverlay: {
 					leftKey += fLegendExtX;
 					break;
 				}
-				case c_oAscChartLegendShowSettings.top:
-				{
+				case c_oAscChartLegendShowSettings.top: {
 					topKey += fLegendExtY;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.right:
-				case c_oAscChartLegendShowSettings.rightOverlay:
-				{
+				case c_oAscChartLegendShowSettings.rightOverlay: {
 					rightKey += fLegendExtX;
 					break;
 				}
-				case c_oAscChartLegendShowSettings.bottom:
-				{
+				case c_oAscChartLegendShowSettings.bottom: {
 					bottomKey += fLegendExtY;
 					break;
 				}
-				case c_oAscChartLegendShowSettings.topRight:
-				{
+				case c_oAscChartLegendShowSettings.topRight: {
 					rightKey += fLegendExtX;
 					break;
 				}
 			}
 		}
-		
-		
-		left   += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
+
+
+		left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 		bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
-		top    += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
-		right  += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
-		
-		
+		top +=
+			this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+		right += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
+
+
 		var pxLeft = calculateLeft ? calculateLeft * pxToMM : left * pxToMM;
 		var pxRight = calculateRight ? calculateRight * pxToMM : right * pxToMM;
 		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-        if(plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart)
-        {
-            if(plotArea.layout)
-            {
-                var oLayout = plotArea.layout;
-				pxLeft = chartSpace.calculatePosByLayout(pxLeft/pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft)/pxToMM, chartSpace.extX)*pxToMM;
-				pxTop = chartSpace.calculatePosByLayout(pxTop/pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop)/pxToMM, chartSpace.extY)*pxToMM;
+		if (plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ||
+			plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart) {
+			if (plotArea.layout) {
+				var oLayout = plotArea.layout;
+				pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x,
+						(pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
+				pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y,
+						(pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
 
-                var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft/pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode );
-                if(fWidthPlotArea > 0)
-                {
-					pxRight = chartSpace.extX*pxToMM - (pxLeft + fWidthPlotArea*pxToMM);
-                }
-                var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop/pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode );
-                if(fHeightPlotArea > 0)
-                {
-					pxBottom = chartSpace.extY*pxToMM - (pxTop + fHeightPlotArea*pxToMM);
-                }
-            }
-        }
-
-        if(dNotPutResult)
-		{
-			return {left: pxLeft, right: pxRight, top: pxTop, bottom: pxBottom};
+				var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w,
+					oLayout.wMode);
+				if (fWidthPlotArea > 0) {
+					pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
+				}
+				var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h,
+					oLayout.hMode);
+				if (fHeightPlotArea > 0) {
+					pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
+				}
+			}
 		}
-		else
-		{
+
+		if (dNotPutResult) {
+			return {left: pxLeft, right: pxRight, top: pxTop, bottom: pxBottom};
+		} else {
 			this.calcProp.chartGutter._left = pxLeft;
 			this.calcProp.chartGutter._right = pxRight;
 			this.calcProp.chartGutter._top = pxTop;
@@ -724,27 +703,36 @@ CChartsDrawer.prototype =
 
 		this._checkMargins();
 	},
-	
-	_checkMargins: function()
-	{	
-		if(this.calcProp.chartGutter._left < 0)
+
+	_checkMargins: function () {
+		if (this.calcProp.chartGutter._left < 0) {
 			this.calcProp.chartGutter._left = standartMarginForCharts;
-		if(this.calcProp.chartGutter._right < 0)
+		}
+		if (this.calcProp.chartGutter._right < 0) {
 			this.calcProp.chartGutter._right = standartMarginForCharts;
-		if(this.calcProp.chartGutter._top < 0)
+		}
+		if (this.calcProp.chartGutter._top < 0) {
 			this.calcProp.chartGutter._top = standartMarginForCharts;
-		if(this.calcProp.chartGutter._bottom < 0)
+		}
+		if (this.calcProp.chartGutter._bottom < 0) {
 			this.calcProp.chartGutter._bottom = standartMarginForCharts;
-			
-		if((this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) > this.calcProp.widthCanvas)
+		}
+
+		if ((this.calcProp.chartGutter._left + this.calcProp.chartGutter._right) >
+			this.calcProp.widthCanvas) {
 			this.calcProp.chartGutter._left = standartMarginForCharts;
-		if(this.calcProp.chartGutter._right > this.calcProp.widthCanvas)
+		}
+		if (this.calcProp.chartGutter._right > this.calcProp.widthCanvas) {
 			this.calcProp.chartGutter._right = standartMarginForCharts;
-			
-		if((this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) > this.calcProp.heightCanvas)
+		}
+
+		if ((this.calcProp.chartGutter._top + this.calcProp.chartGutter._bottom) >
+			this.calcProp.heightCanvas) {
 			this.calcProp.chartGutter._top = 0;
-		if(this.calcProp.chartGutter._bottom > this.calcProp.heightCanvas)
+		}
+		if (this.calcProp.chartGutter._bottom > this.calcProp.heightCanvas) {
 			this.calcProp.chartGutter._bottom = 0;
+		}
 	},
 	
 	_calculateMarginOnPoints: function(chartSpace, isHBar)
