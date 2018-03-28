@@ -1013,7 +1013,6 @@
 		};
 	asc_docs_api.prototype.endCollaborationEditing = function()
 		{
-			console.log("End_CollaborationEditing");
 			AscCommon.CollaborativeEditing.End_CollaborationEditing();
 		if (this.WordControl && this.WordControl.m_oLogicDocument &&
 			false !== this.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable)
