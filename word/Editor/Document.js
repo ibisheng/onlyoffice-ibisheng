@@ -16845,6 +16845,35 @@ CDocument.prototype.OnCreateNewHistoryPoint = function()
 	this.AllParagraphsList = null;
 	this.AllFootnotesList  = null;
 };
+/**
+ * Получаем массив положений, к которым можно привязать гиперссылку
+ * @returns {CHyperlinkAnchor[]}
+ */
+CDocument.prototype.GetHyperlinkAnchors = function()
+{
+	var arrAnchors = [];
+
+	arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.TopOfDocument));
+
+	var arrOutline = [];
+	this.GetOutlineParagraphs(arrOutline, {SkipEmptyParagraphs : true});
+	var nIndex = 0, nCount = arrOutline.length;
+	for (nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Heading, arrOutline[nIndex].Paragraph));
+	}
+
+	this.BookmarksManager.Update();
+	nCount = this.BookmarksManager.GetCount();
+	for (nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		var sName =  this.BookmarksManager.GetName(nIndex);
+		if (!this.BookmarksManager.IsHiddenBookmark(sName) && !this.BookmarksManager.IsInternalUseBookmark(sName))
+			arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Bookmark, sName));
+	}
+
+	return arrAnchors;
+};
 
 function CDocumentSelectionState()
 {

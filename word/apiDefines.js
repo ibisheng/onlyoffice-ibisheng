@@ -235,6 +235,12 @@ var c_oAscStyleType = {
 	Character : 4
 };
 
+var c_oAscHyperlinkAnchor = {
+	TopOfDocument : 1,
+	Heading       : 2,
+	Bookmark      : 3
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -358,6 +364,11 @@ prot['Paragraph'] = c_oAscStyleType.Paragraph;
 prot['Numbering'] = c_oAscStyleType.Numbering;
 prot['Table']     = c_oAscStyleType.Table;
 prot['Character'] = c_oAscStyleType.Character;
+
+prot = window['Asc']['c_oAscHyperlinkAnchor'] = window['Asc'].c_oAscHyperlinkAnchor = c_oAscHyperlinkAnchor;
+prot['TopOfDocument'] = c_oAscHyperlinkAnchor.TopOfDocument;
+prot['Heading']       = c_oAscHyperlinkAnchor.Heading;
+prot['Bookmark']      = c_oAscHyperlinkAnchor.Bookmark;
 
 window['AscCommon']                = window['AscCommon'] || {};
 window['AscCommon'].c_oSerFormat   = c_oSerFormat;

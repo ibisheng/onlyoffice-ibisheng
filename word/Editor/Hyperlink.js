@@ -371,6 +371,47 @@ function CParaHyperLinkStartState(HyperLink)
     }
 }
 
+/**
+ * Класс описывающий типы привязок для гиперссылки
+ * @param nType
+ * @param vParam
+ * @constructor
+ */
+function CHyperlinkAnchor(nType, vParam)
+{
+	this.Type = nType;
+
+	this.Bookmark  = null;
+	this.Paragraph = null;
+
+	if (c_oAscHyperlinkAnchor.Bookmark === this.Type)
+		this.Bookmark = vParam;
+	else if (c_oAscHyperlinkAnchor.Heading === this.Type)
+		this.Paragraph = vParam;
+}
+CHyperlinkAnchor.prototype.GetType = function()
+{
+	return this.Type;
+};
+CHyperlinkAnchor.prototype.GetBookmarkName = function()
+{
+	if (c_oAscHyperlinkAnchor.Bookmark === this.Type)
+		return this.Bookmark;
+
+	return "";
+};
+CHyperlinkAnchor.prototype.GetHeadingText = function()
+{
+	if (c_oAscHyperlinkAnchor.Heading === this.Type && this.Paragraph instanceof Paragraph)
+		this.Paragraph.GetText();
+
+	return "";
+};
+
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaHyperlink = ParaHyperlink;
+
+CHyperlinkAnchor.prototype['asc_GetType']         = CHyperlinkAnchor.prototype.GetType;
+CHyperlinkAnchor.prototype['asc_GetBookmarkName'] = CHyperlinkAnchor.prototype.GetBookmarkName;
+CHyperlinkAnchor.prototype['asc_GetHeadingText']  = CHyperlinkAnchor.prototype.GetHeadingText;
