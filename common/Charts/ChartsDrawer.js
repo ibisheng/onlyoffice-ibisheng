@@ -409,7 +409,7 @@ CChartsDrawer.prototype =
 	_calculatePositionAxisTitle: function(chartSpace, axis)
 	{
 		var legend = chartSpace.chart.legend;
-		var x = 0, y = 0;
+		var x = 0, y = 0, pxToMM = this.calcProp.pxToMM;
 
 		if(axis && axis.title) {
 			var widthAxisTitle = axis.title.extX;
@@ -417,29 +417,29 @@ CChartsDrawer.prototype =
 
 			switch (axis.axPos) {
 				case window['AscFormat'].AX_POS_B: {
-					y = (this.calcProp.heightCanvas - standartMarginForCharts) / this.calcProp.pxToMM - heightAxisTitle;
-					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthAxisTitle / 2;
+					y = (this.calcProp.heightCanvas - standartMarginForCharts) / pxToMM - heightAxisTitle;
+					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / pxToMM - widthAxisTitle / 2;
 
 					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.bottom) {
-						y -= legend.extY;
+						y -= legend.extY + (standartMarginForCharts / 2) / pxToMM;
 					}
 					break;
 				}
 				case window['AscFormat'].AX_POS_T: {
-					y = standartMarginForCharts / this.calcProp.pxToMM;
-					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthAxisTitle / 2;
+					y = standartMarginForCharts / pxToMM;
+					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / pxToMM - widthAxisTitle / 2;
 
 					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.top) {
-						y += legend.extY;
+						y += legend.extY + (standartMarginForCharts / 2) / pxToMM;
 					}
 					if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
-						y += chartSpace.chart.title.extY;
+						y += chartSpace.chart.title.extY + (standartMarginForCharts / 2) / pxToMM;
 					}
 					break;
 				}
 				case window['AscFormat'].AX_POS_L: {
-					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightAxisTitle / 2;
-					x = standartMarginForCharts / this.calcProp.pxToMM;
+					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / pxToMM - heightAxisTitle / 2;
+					x = standartMarginForCharts / pxToMM;
 
 					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.left) {
 						x += legend.extX;
@@ -447,8 +447,8 @@ CChartsDrawer.prototype =
 					break;
 				}
 				case window['AscFormat'].AX_POS_R: {
-					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightAxisTitle / 2;
-					x = (this.calcProp.widthCanvas - standartMarginForCharts) / this.calcProp.pxToMM - widthAxisTitle;
+					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / pxToMM - heightAxisTitle / 2;
+					x = (this.calcProp.widthCanvas - standartMarginForCharts) / pxToMM - widthAxisTitle;
 
 					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.right) {
 						x -= legend.extX;
