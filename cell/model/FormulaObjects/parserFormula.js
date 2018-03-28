@@ -5519,6 +5519,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			bbox = elem.getBBox0();
 		}
 		if (bbox) {
+			bbox = bbox.clone();
 			if (bbox.setOffsetWithAbs(offset, canResize)) {
 				isErr = false;
 				this.changeOffsetBBox(elem, bbox, ws);
