@@ -1085,6 +1085,10 @@ ParaDrawing.prototype.IsMovingTableBorder = function()
 		return this.GraphicObj.IsMovingTableBorder();
 	return false;
 };
+ParaDrawing.prototype.SetVerticalClip = function(Top, Bottom)
+{
+	// TODO: Реализовать
+};
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
 {
 	if (undefined != this.PositionH_Old)
