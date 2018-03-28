@@ -1004,15 +1004,16 @@
 
 	asc_docs_api.prototype.startCollaborationEditing = function()
 		{
-					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-		this.asc_setDrawCollaborationMarks(true);
-		if (this.WordControl && this.WordControl.m_oLogicDocument)
-		{
-			this.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-				}
+			AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+			this.asc_setDrawCollaborationMarks(true);
+			if (this.WordControl && this.WordControl.m_oDrawingDocument)
+			{
+				this.WordControl.m_oDrawingDocument.Start_CollaborationEditing();
+			}
 		};
 	asc_docs_api.prototype.endCollaborationEditing = function()
 		{
+			console.log("End_CollaborationEditing");
 			AscCommon.CollaborativeEditing.End_CollaborationEditing();
 		if (this.WordControl && this.WordControl.m_oLogicDocument &&
 			false !== this.WordControl.m_oLogicDocument.DrawingDocument.IsLockObjectsEnable)
