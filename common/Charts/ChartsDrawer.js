@@ -12004,7 +12004,7 @@ catAxisChart.prototype = {
 		//TODO необходимо при смене ориентации оси категорий менять axPos!!!
 		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var axPos = this.catAx.axPos;
-		if (axPos !== window['AscFormat'].AX_POS_B) {
+		if (axPos === window['AscFormat'].AX_POS_T || axPos === window['AscFormat'].AX_POS_L) {
 			widthMinorLine = -widthMinorLine;
 			widthLine = -widthLine;
 			crossMajorStep = -crossMajorStep;
