@@ -900,7 +900,7 @@ ParaDrawing.prototype.Draw = function( X, Y, pGraphics, PDSE)
 	}
 	if (pGraphics.Start_Command)
 	{
-		pGraphics.m_aDrawings.push(new AscFormat.ParaDrawingStruct(PDSE, this));
+		pGraphics.m_aDrawings.push(new AscFormat.ParaDrawingStruct(undefined, this));
 		return;
 	}
 	if (this.Is_Inline())
