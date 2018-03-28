@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1758,26 +1758,6 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем выделение текста
 			//----------------------------------------------------------------------------------------------------------
-			var aHigh   = PDSH.High;
-			var Element = aHigh.Get_Next();
-			while (null != Element)
-			{
-				if (!pGraphics.set_fillColor)
-				{
-					pGraphics.b_color1(Element.r, Element.g, Element.b, 255);
-				}
-				else
-				{
-					pGraphics.set_fillColor(Element.r, Element.g, Element.b);
-				}
-				pGraphics.rect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2);
-				pGraphics.df();
-				Element = aHigh.Get_Next();
-			}
-
-			//----------------------------------------------------------------------------------------------------------
-			// Рисуем выделение текста
-			//----------------------------------------------------------------------------------------------------------
 			var aMMFields = PDSH.MMFields;
 			var Element   = (pGraphics.RENDERER_PDF_FLAG === true ? null : aMMFields.Get_Next());
 			while (null != Element)
@@ -1796,6 +1776,27 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
 				Element = aCFields.Get_Next();
 			}
+
+			//----------------------------------------------------------------------------------------------------------
+			// Рисуем выделение текста
+			//----------------------------------------------------------------------------------------------------------
+			var aHigh   = PDSH.High;
+			var Element = aHigh.Get_Next();
+			while (null != Element)
+			{
+				if (!pGraphics.set_fillColor)
+				{
+					pGraphics.b_color1(Element.r, Element.g, Element.b, 255);
+				}
+				else
+				{
+					pGraphics.set_fillColor(Element.r, Element.g, Element.b);
+				}
+				pGraphics.rect(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element.Additional2);
+				pGraphics.df();
+				Element = aHigh.Get_Next();
+			}
+
 			//----------------------------------------------------------------------------------------------------------
 			// Рисуем комментарии
 			//----------------------------------------------------------------------------------------------------------
@@ -3839,8 +3840,10 @@ Paragraph.prototype.Get_ParaContentPos = function(bSelection, bStart, bUseCorrec
 
 	ContentPos.Add(Pos);
 
-	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
+	if (Pos < 0 || Pos >= this.Content.length)
+		return ContentPos;
 
+	this.Content[Pos].Get_ParaContentPos(bSelection, bStart, ContentPos, true === bUseCorrection ? true : false);
 	return ContentPos;
 };
 Paragraph.prototype.Set_ParaContentPos = function(ContentPos, CorrectEndLinePos, Line, Range, bCorrectPos)
@@ -5514,10 +5517,8 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 
 			// TODO (ParaEnd): Переделать
 			var LastElement = this.Content[this.Content.length - 1];
-			if (para_Run === Element.Type)
-			{
+			if (para_Run === LastElement.Type)
 				LastElement.Set_Pr(this.TextPr.Value.Copy());
-			}
 		}
 	}
 };
@@ -5747,7 +5748,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().GetDefaultHyperlink() : null;
 		if (!this.bFromDocument)
 		{
-			TextPr.Unifill   = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
+			//TextPr.Unifill   = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
 			TextPr.Underline = true;
 		}
 		Hyperlink.Apply_TextPr(TextPr, undefined, false);
@@ -5795,7 +5796,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		{
 			HyperRun.Set_Pr(TextPr.Copy());
 			HyperRun.Set_Color(undefined);
-			HyperRun.Set_Unifill(AscFormat.CreateUniFillSchemeColorWidthTint(11, 0));
+			//HyperRun.Set_Unifill(AscFormat.CreateUniFillSchemeColorWidthTint(11, 0));
 			HyperRun.Set_Underline(true);
 		}
 
@@ -6033,6 +6034,10 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 		}
 		else
 		{
+			// Если мы в элементе, который нельзя делить, тогда не разрешаем добавлять гиперссылку
+			if (false === this.Content[this.CurPos.ContentPos].CanSplit())
+				return false;
+
 			// Внутри гиперссылки мы не можем задать ниперссылку
 			var CurType = this.Content[this.CurPos.ContentPos].Type;
 			if (para_Hyperlink === CurType || para_Math === CurType)
@@ -6076,6 +6081,10 @@ Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 		}
 		else
 		{
+			// Если мы в элементе, который нельзя делить, тогда не разрешаем добавлять гиперссылку
+			if (false === this.Content[this.CurPos.ContentPos].CanSplit())
+				return false;
+
 			// Внутри гиперссылки мы не можем задать ниперссылку
 			var CurType = this.Content[this.CurPos.ContentPos].Type;
 			if (para_Math === CurType)
@@ -7150,6 +7159,9 @@ Paragraph.prototype.Is_Empty = function(Props)
 	{
 		if (undefined !== Props.SkipNewLine)
 			Pr.SkipNewLine = true;
+
+		if (Props.SkipComplexFields)
+			Pr.SkipComplexFields = true;
 	}
 
 	var ContentLen = this.Content.length;
@@ -7588,6 +7600,24 @@ Paragraph.prototype.Numbering_Remove = function()
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
 /**
+ * Удаляем нумерацию из прямых настроек
+ */
+Paragraph.prototype.RemoveDirectNumbering = function()
+{
+	if (undefined !== this.Pr.NumPr)
+	{
+		this.private_AddPrChange();
+
+		History.Add(new CChangesParagraphNumbering(this, this.Pr.NumPr, undefined));
+		this.private_RefreshNumbering(this.Pr.NumPr);
+
+		this.Pr.NumPr = undefined;
+
+		this.CompiledPr.NeedRecalc = true;
+		this.private_UpdateTrackRevisionOnChangeParaPr(true);
+	}
+};
+/**
  * Используется ли заданная нумерация в параграфе
  */
 Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
@@ -7603,6 +7633,24 @@ Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
 Paragraph.prototype.HaveNumbering = function()
 {
 	return (undefined !== this.Numbering_Get() ? true : false);
+};
+/**
+ * Получаем скомпилированные текстовые настройки для символа нумерации
+ * @returns {?CTextPr}
+ */
+Paragraph.prototype.GetNumberingCompiledPr = function()
+{
+	var oNumPr = this.Numbering_Get();
+	if (!oNumPr || !this.LogicDocument)
+		return null;
+
+	var oNumbering = this.LogicDocument.Get_Numbering();
+	var oNumLvl    = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
+
+	var oTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+	oTextPr.Merge(this.TextPr.Value);
+	oTextPr.Merge(oNumLvl.TextPr);
+	return oTextPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с нумерацией параграфов в презентациях
@@ -8166,7 +8214,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 		while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < Count)
 			StartPos++;
 
-		TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+		TextPr = this.Content[StartPos].GetDirectTextPr();
 
 		this.RemoveSelection();
 	}
@@ -8186,13 +8234,18 @@ Paragraph.prototype.GetDirectTextPr = function()
 			while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
 				StartPos++;
 
-			TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
+			TextPr = this.Content[StartPos].GetDirectTextPr();
 		}
 		else
 		{
-			TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+			TextPr = this.Content[this.CurPos.ContentPos].GetDirectTextPr();
 		}
 	}
+
+	if (TextPr)
+		TextPr = TextPr.Copy();
+	else
+		TextPr = new CTextPr();
 
 	return TextPr;
 };
@@ -8267,7 +8320,7 @@ Paragraph.prototype.Style_Get = function()
 
 	return undefined;
 };
-Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteTextProps)
+Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 {
 	this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
@@ -8298,11 +8351,18 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteText
 
 	// TODO: По мере добавления элементов в стили параграфа и текста добавить их обработку здесь.
 
+	// При выставлении стиля свойства буквицы(рамки) всегда сбрасываются
+	if (undefined !== this.Get_FramePr())
+	{
+		this.Set_FramePr(undefined, true);
+		this.Clear_TextFormatting();
+	}
+
 	// Не удаляем форматирование, при добавлении списка к данному параграфу
 	var DefNumId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (Id !== DefNumId)
 	{
-		this.Numbering_Remove();
+		this.RemoveDirectNumbering();
 		this.Set_ContextualSpacing(undefined);
 		this.Set_Ind(new CParaInd(), true);
 		this.Set_Align(undefined);
@@ -8318,20 +8378,6 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps, bDoNotDeleteText
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Left);
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Right);
 		this.Set_Border(undefined, AscDFH.historyitem_Paragraph_Borders_Top);
-
-		// При изменении стиля убираются только те текстовые настроки внутри параграфа,
-		// которые присутствуют в стиле. Пока мы удалим вообще все настроки.
-		// TODO : переделать
-
-		if (true !== bDoNotDeleteTextProps)
-		{
-			for (var Index = 0; Index < this.Content.length; Index++)
-			{
-				this.Content[Index].Clear_TextPr();
-			}
-		}
-
-		this.TextPr.Clear_Style();
 	}
 };
 /**
@@ -11360,6 +11406,7 @@ Paragraph.prototype.GetStyleFromFormatting = function()
     var oRStyle = oStyles.Get(TextPr.RStyle);
     if (null !== oRStyle)
     {
+
         oRunStyle.put_BasedOn(oRStyle.Get_Name());
         var oRNextStyle = oStyles.Get(oRStyle.Get_Next());
         if (null !== oRNextStyle)
@@ -12309,7 +12356,7 @@ Paragraph.prototype.SetParagraphStyle = function(Name)
 	if (!this.LogicDocument)
 		return;
 
-	var StyleId = this.LogicDocument.Get_Styles().Get_StyleIdByName(Name);
+	var StyleId = this.LogicDocument.Get_Styles().GetStyleIdByName(Name, true);
 	this.Style_Add(StyleId);
 };
 Paragraph.prototype.SetParagraphStyleById = function(sStyleId)
@@ -12536,7 +12583,7 @@ Paragraph.prototype.GetComplexFieldsByXY = function(X, Y, CurPage, bReturnFieldP
 };
 Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
-	if (this.IsEmpty() && (!oPr || false !== oPr.SkipEmptyParagraphs))
+	if (this.IsEmpty({SkipNewLine : true, SkipComplexFields : true}) && (!oPr || false !== oPr.SkipEmptyParagraphs))
 		return;
 
 	var nOutlineLvl = this.GetOutlineLvl();
@@ -12622,6 +12669,8 @@ Paragraph.prototype.AddBookmarkForTOC = function()
 
 	this.Add_ToContent(0, new CParagraphBookmark(true, sId, sName));
 	this.Add_ToContent(this.Content.length - 1, new CParagraphBookmark(false, sId, sName));
+
+	this.Correct_Content();
 
 	return sName;
 };
@@ -12754,6 +12803,36 @@ Paragraph.prototype.IsParagraphSimpleChanges = function(_Changes)
 	}
 
 	return true;
+};
+/**
+ * Получаем скомпилированные настройки символа конца параграфа
+ * @returns {CTextPr}
+ */
+Paragraph.prototype.GetParaEndCompiledPr = function()
+{
+	var oLogicDocument = this.bFromDocument ? this.LogicDocument : null;
+
+	var oTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+	if (oLogicDocument && undefined !== this.TextPr.Value.RStyle)
+	{
+		var oStyles = oLogicDocument.GetStyles();
+		if (this.TextPr.Value.RStyle !== oStyles.GetDefaultHyperlink())
+		{
+			var oStyleTextPr = oStyles.Get_Pr(this.TextPr.Value.RStyle, styletype_Character).TextPr;
+			oTextPr.Merge(oStyleTextPr);
+		}
+	}
+
+	oTextPr.Merge(this.TextPr.Value);
+	return oTextPr;
+};
+Paragraph.prototype.GetLastParagraph = function()
+{
+	return this;
+};
+Paragraph.prototype.GetFirstParagraph = function()
+{
+	return this;
 };
 
 var pararecalc_0_All  = 0;

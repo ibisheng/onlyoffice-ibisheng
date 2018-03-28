@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -644,6 +644,15 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos > 0 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos - 1].GetType())
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (0 === this.CurPos.ContentPos)
+					{
+						bRetValue = false;
+					}
 				}
 				else if (Count > 0)
 				{
@@ -678,6 +687,11 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos + 1].GetType())
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
 					else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
 					{
 						// Если данный параграф пустой, последний, не единственный и идущий перед
@@ -685,6 +699,10 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 						this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
 						this.CurPos.ContentPos--;
 						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+					}
+					else if (this.CurPos.ContentPos === this.Content.length - 1)
+					{
+						bRetValue = false;
 					}
 				}
 			}
@@ -694,6 +712,39 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 			{
 				Item.CurPos.RealX = Item.CurPos.X;
 				Item.CurPos.RealY = Item.CurPos.Y;
+			}
+		}
+		else if (type_BlockLevelSdt === this.Content[this.CurPos.ContentPos].GetType())
+		{
+			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
+			{
+				if (this.Content[this.CurPos.ContentPos].IsEmpty())
+				{
+					this.RemoveFromContent(this.CurPos.ContentPos, 1);
+
+					if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else
+					{
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
+				else
+				{
+					if (Count < 0 && this.CurPos.ContentPos > 0)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1)
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
 			}
 		}
 		else
@@ -759,7 +810,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
 
-				oLogicDocument.RemoveCommentsOnPreDelete = false;
+				oLogicDocument.RemoveCommentsOnPreDelete = true;
 				return oSdt;
 			}
 		}
@@ -1027,5 +1078,52 @@ CDocumentContentBase.prototype.IsTableHeader = function()
  */
 CDocumentContentBase.prototype.GetParent = function()
 {
+	return null;
+};
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetLastParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[this.Content.length - 1].GetLastParagraph();
+};
+/**
+ * Получаем первый параграф в данном контенте, если первый элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ * @constructor
+ */
+CDocumentContentBase.prototype.GetFirstParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[0].GetFirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetNextParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetNextParagraph)
+		return oParent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetPrevParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetPrevParagraph)
+		return oParent.GetPrevParagraph();
+
 	return null;
 };

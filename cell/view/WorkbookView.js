@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -742,7 +742,6 @@
       if (wsModel) {
         index = wsModel.getIndex();
         self.showWorksheet(index, true);
-        self.handlers.trigger("asc_onActiveSheetChanged", index);
       }
     });
     this.model.handlers.add("setSelection", function() {
@@ -818,7 +817,7 @@
     this.model.handlers.add("undoRedoHideSheet", function(sheetId) {
       self.showWorksheet(sheetId);
       // Посылаем callback об изменении списка листов
-      self.handlers.trigger("asc_onSheetsChanged");
+      self.Api.sheetsChanged();
     });
     this.model.handlers.add("updateSelection", function () {
 		if (!self.lockDraw) {
@@ -1157,8 +1156,9 @@
         ct.cursor = "copy";
       }
 
-      if (canvasElem.style.cursor !== ct.cursor) {
-        canvasElem.style.cursor = ct.cursor;
+      var newHtmlCursor = AscCommon.g_oHtmlCursor.value(ct.cursor);
+      if (canvasElem.style.cursor !== newHtmlCursor) {
+        canvasElem.style.cursor = newHtmlCursor;
       }
       if (ct.target === c_oTargetType.ColumnHeader || ct.target === c_oTargetType.RowHeader) {
         ws.drawHighlightedHeaders(ct.col, ct.row);
@@ -1355,6 +1355,13 @@
     }
   };
 
+	WorkbookView.prototype._onWindowMouseUpExternal = function (event, x, y) {
+		this.controller._onWindowMouseUpExternal(event, x, y);
+		if (this.isCellEditMode) {
+			this.cellEditor._onWindowMouseUp(event, x, y);
+		}
+	};
+
   WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback) {
     var t = this;
 
@@ -1428,7 +1435,6 @@
 		  this.cellFormulaEnterWSOpen = null;
 		  if( index != ws.model.getIndex() ){
 			  this.showWorksheet(index);
-			  this.handlers.trigger("asc_onActiveSheetChanged", index);
 		  }
 		  ws = this.getWorksheet(index);
      }
@@ -1488,7 +1494,6 @@
       ws = this.model.getWorksheet(i);
       if (!ws.getHidden()) {
         this.showWorksheet(i);
-        this.handlers.trigger("asc_onActiveSheetChanged", i);
         return true;
       }
 
@@ -1652,6 +1657,9 @@
     this.wsActive = index;
     this.wsMustDraw = bLockDraw;
 
+    // Посылаем эвент о смене активного листа
+    this.handlers.trigger("asc_onActiveSheetChanged", this.wsActive);
+
     ws = this.getWorksheet(index);
     // Мы делали resize или меняли zoom, но не перерисовывали данный лист (он был не активный)
     if (ws.updateResize && ws.updateZoom) {
@@ -1703,6 +1711,7 @@
 
     //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
     this.toggleAutoCorrectOptions(null, true);
+    this.handlers.trigger("hideSpecialPasteOptions");
     return this;
   };
 
@@ -2007,7 +2016,10 @@
 			}
 			if (-1 !== this.lastFormulaPos) {
 				if (-1 === this.arrExcludeFormulas.indexOf(name) && !isNotFunction) {
-					name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
+					//если следующий символ скобка - не добавляем ещё одну
+					if('(' !== this.cellEditor.textRender.getChars(this.cellEditor.cursorPos, 1)) {
+						name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
+					}
 				} else {
 					this.skipHelpSelector = true;
 				}
@@ -2191,8 +2203,6 @@
       this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
       if (this.copyActiveSheet !== this.wsActive) {
         this.showWorksheet(this.copyActiveSheet);
-        // Посылаем эвент о смене активного листа
-        this.handlers.trigger("asc_onActiveSheetChanged", this.copyActiveSheet);
       }
       this.copyActiveSheet = -1;
       this.input.disabled = false;
@@ -2209,8 +2219,6 @@
           } else {
             index = ws.getIndex();
             this.showWorksheet(index);
-            // Посылаем эвент о смене активного листа
-            this.handlers.trigger("asc_onActiveSheetChanged", index);
 
             tmpSelectRange = tmpSelectRange.range;
           }
@@ -2422,12 +2430,16 @@
   };
 
   // Печать
-  WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
+  WorkbookView.prototype.printSheets = function(printPagesData, pdfDocRenderer) {
+  	var pdfPrinter = new AscCommonExcel.CPdfPrinter(this.fmgrGraphics[3]);
+  	if (pdfDocRenderer) {
+		pdfPrinter.DocumentRenderer = pdfDocRenderer;
+	}
     var ws;
     if (0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
-      ws.drawForPrint(pdf_writer, null);
+      ws.drawForPrint(pdfPrinter, null);
     } else {
       var indexWorksheet = -1;
       var indexWorksheetTmp = -1;
@@ -2437,9 +2449,10 @@
           ws = this.getWorksheet(indexWorksheetTmp);
           indexWorksheet = indexWorksheetTmp;
         }
-        ws.drawForPrint(pdf_writer, printPagesData.arrPages[i]);
+        ws.drawForPrint(pdfPrinter, printPagesData.arrPages[i]);
       }
     }
+    return pdfPrinter;
   };
 
   WorkbookView.prototype.calcPagesPrint = function (adjustPrint) {

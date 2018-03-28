@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -215,6 +215,9 @@ CMathText.prototype.constructor = CMathText;
 CMathText.prototype.add = function(code)
 {
     this.value = code;
+
+	if (AscFonts.IsCheckSymbols)
+		AscFonts.FontPickerByCharacter.getFontBySymbol(this.value);
 
     if( this.private_Is_BreakOperator(code) )
         this.Type = para_Math_BreakOperator;
@@ -980,6 +983,9 @@ CMathText.prototype.Read_FromBinary = function(Reader)
 {
     this.Type  = Reader.GetLong();
     this.value = Reader.GetLong();
+
+	if (AscFonts.IsCheckSymbols)
+		AscFonts.FontPickerByCharacter.getFontBySymbol(this.value);
 };
 CMathText.prototype.Is_LetterCS = function()
 {
@@ -1018,6 +1024,8 @@ function CMathAmp()
     this.Type = para_Math_Ampersand;
 
     this.value = 0x26;
+	if (AscFonts.IsCheckSymbols)
+		AscFonts.FontPickerByCharacter.getFontBySymbol(this.value);
 
     this.AmpText = new CMathText(false);
     this.AmpText.add(this.value);

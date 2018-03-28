@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -101,11 +101,16 @@ CGraphicFrame.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CGraphicFrame.prototype.hit = CShape.prototype.hit;
 
 CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
-    {
-        if (!PosArray)
-            PosArray = [];
+{
+	if (!PosArray)
+		PosArray = [];
 
-        return PosArray;
+	// TODO: Судя по тому как записывается позиция и как она читается
+	//       класс CGraphicFrame не должен попадать в позицию
+	if (PosArray && PosArray.length > 0 && PosArray[0].Class === this)
+		PosArray.splice(0, 1);
+
+	return PosArray;
 };
 
 CGraphicFrame.prototype.Is_DrawingShape = function(bRetShape)

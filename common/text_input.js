@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -137,6 +137,9 @@
 		this.editorSdkH = 0;
 
 		this.ReadOnlyCounter = 0;
+
+		this.LastReplaceText = [];
+		this.IsLastReplaceFlag = false;
 	}
 
 	CTextInput.prototype =
@@ -146,11 +149,17 @@
 			//console.log(_val);
 		},
 
-		init : function(target_id)
+		init : function(target_id, parent_id)
 		{
 			this.TargetId   = target_id;
+
+			var oHtmlParent = null;
+
 			var oHtmlTarget = document.getElementById(this.TargetId);
-			var oHtmlParent = oHtmlTarget.parentNode;
+			if (undefined == parent_id)
+				oHtmlParent = oHtmlTarget.parentNode;
+			else
+				oHtmlParent = document.getElementById(parent_id);
 
 			this.HtmlDiv                  = document.createElement("div");
 			this.HtmlDiv.id               = "area_id_parent";
@@ -1006,7 +1015,7 @@
 				case 46:	// delete
 				case 45:	// insert
 				{
-					if (!global_keyboardEvent.CtrlKey && !global_keyboardEvent.ShiftKey) // copy/cut/paste
+					if (!AscCommon.global_keyboardEvent.CtrlKey && !AscCommon.global_keyboardEvent.ShiftKey) // copy/cut/paste
 					{
 						// заканчиваем "непрерывный" ввод => очищаем текстбокс
 						this.clear();
@@ -1096,6 +1105,8 @@
 
 			this.KeyDownFlag = false;
 			this.KeyPressFlag = false;
+
+			AscCommon.global_keyboardEvent.Up();
 		},
 
 		getAreaPos : function()
@@ -1168,6 +1179,12 @@
 			this.Api.asc_LockTargetUpdate(false);
 		},
 
+		clearLastCompositeText : function()
+		{
+			this.LastReplaceText = [];
+			this.IsLastReplaceFlag = false;
+		},
+
 		apiCompositeStart : function()
 		{
 		},
@@ -1181,10 +1198,37 @@
 			}
 
 			if (!this.ApiIsComposition)
+			{
 				this.Api.Begin_CompositeInput();
+				this.clearLastCompositeText();
+			}
 
             this.ApiIsComposition = true;
+
+			if (this.IsLastReplaceFlag)
+			{
+				// check _value == this.LastReplaceText
+				if (_value.length == this.LastReplaceText.length)
+				{
+					var isEqual = true;
+					for (var nC = 0; nC < _value.length; nC++)
+					{
+						if (_value[nC] != this.LastReplaceText[nC])
+						{
+							isEqual = false;
+							break;
+						}
+					}
+
+					if (isEqual)
+						return; // не посылаем одинаковые замены!
+				}
+			}
+
             this.Api.Replace_CompositeText(_value);
+
+			this.LastReplaceText = _value.slice();
+			this.IsLastReplaceFlag = true;
 		},
 
 		apiCompositeEnd : function()
@@ -1194,6 +1238,7 @@
 
 			this.ApiIsComposition = false;
 			this.Api.End_CompositeInput();
+			this.clearLastCompositeText();
 		},
 
 		onCompositionStart : function(e)
@@ -1328,13 +1373,13 @@
 	window['AscCommon']            = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
 
-	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
+	window['AscCommon'].InitBrowserInputContext = function(api, target_id, parent_id)
 	{
 		if (window['AscCommon'].g_inputContext)
 			return;
 
 		window['AscCommon'].g_inputContext = new CTextInput(api);
-		window['AscCommon'].g_inputContext.init(target_id);
+		window['AscCommon'].g_inputContext.init(target_id, parent_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
 		window['AscCommon'].g_clipboardBase.inputContext = window['AscCommon'].g_inputContext;
 

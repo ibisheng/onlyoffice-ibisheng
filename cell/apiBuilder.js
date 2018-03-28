@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -456,6 +456,16 @@
 	};
 
 	/**
+	 * Set Row height
+	 * @memberof ApiWorksheet
+	 * @param {number} row
+	 * @param {number} height
+	 */
+	ApiWorksheet.prototype.SetRowHeight = function (row, height) {
+		this.worksheet.setRowHeight(height, row, row, true);
+	};
+
+	/**
 	 * Set displayed gridlines
 	 * @memberof ApiWorksheet
 	 * @param {bool} value
@@ -761,6 +771,7 @@
             private_SetCoords(oImage, oWorksheet.model, Width, Height, cell ? cell.col : 0, 0,  cell ? cell.row : 0, 0, undefined);
             oController.resetSelection();
             oController.selectObject(oImage, 0);
+			oWorksheet.isSelectOnShape = true;
         }
 	};
 
@@ -1532,6 +1543,7 @@
 	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
 	ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
+	ApiWorksheet.prototype["SetRowHeight"] = ApiWorksheet.prototype.SetRowHeight;
 	ApiWorksheet.prototype["SetDisplayGridlines"] = ApiWorksheet.prototype.SetDisplayGridlines;
 	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;

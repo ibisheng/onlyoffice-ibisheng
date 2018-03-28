@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1155,6 +1155,8 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onWindowMouseUp = function (event) {
+			AscCommon.global_mouseEvent.UnLockMouse();
+
 			var coord = this._getCoordinates(event);
             if (this.hsbApiLockMouse)
                 this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi, event) : false;
@@ -1257,6 +1259,8 @@
 			if (AscCommon.g_inputContext) {
 				AscCommon.g_inputContext.externalChangeFocus();
 			}
+
+			AscCommon.global_mouseEvent.LockMouse();
 
 			var t = this;
 			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
@@ -1437,6 +1441,8 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseUp = function (event) {
+			AscCommon.global_mouseEvent.UnLockMouse();
+
 			if (2 === event.button) {
 				if (this.isShapeAction) {
 					this.handlers.trigger('onContextMenu', event);

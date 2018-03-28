@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3807,7 +3807,7 @@ function OfflineEditor () {
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
-					type = arrRanges[i].getType();
+					type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
                     ranges.push(undefined !== rangetype ? rangetype : type);
                     ranges.push(arrRanges[i].c1);
                     ranges.push(arrRanges[i].c2);
@@ -3937,7 +3937,7 @@ function OfflineEditor () {
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
-				type = arrRanges[i].getType();
+				type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
                 ranges.push(undefined !== rangetype ? rangetype : type);
                 ranges.push(arrRanges[i].c1);
                 ranges.push(arrRanges[i].c2);
@@ -4068,6 +4068,8 @@ function OfflineEditor () {
         //        {
         //
         //        }
+
+        AscFonts.FontPickerByCharacter.IsUseNoSquaresMode = true;
 
         this.initSettings = settings;
 
@@ -4716,40 +4718,11 @@ function OfflineEditor () {
             }
         }
     };
-
-    this.offline_showWorksheet = function(index) {
-        var me = this;
-        var t = _api;
-        var ws = _api.wbModel.getWorksheet(index);
-        var isHidden = ws.getHidden();
-        var showWorksheetCallback = function (res) {
-            if (res) {
-                t.wbModel.getWorksheet(index).setHidden(false);
-                t.wb.showWorksheet(index);
-                if (isHidden) {
-                    // Посылаем callback об изменении списка листов
-                    t.sheetsChanged();
-                }
-
-                me.updateFrozen();
-            }
-        };
-        if (_api.isHidden) {
-            var sheetId = _api.wbModel.getWorksheet(index).getId();
-            var lockInfo = _api.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
-            _api._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
-        }
-        else
-        {
-            showWorksheetCallback(true);
-        }
-    };
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
-        var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        _api.wb.printSheets(pdfWriter, pagesData);
-        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
+        var printPagesData = _api.wb.calcPagesPrint(adjustPrint);
+        var pdfPrinterMemory = _api.wb.printSheets(printPagesData).DocumentRenderer.Memory;
+        return pdfPrinterMemory.GetBase64Memory();
     };
 
     this.onSelectionChanged = function(info) {
@@ -7152,12 +7125,12 @@ window["native"]["offline_apply_event"] = function(type,params) {
         }
         case 2200: // ASC_SPREADSHEETS_EVENT_TYPE_SHOW_WORKSHEET
         {
-            _s.offline_showWorksheet(params);
+            _api.asc_showWorksheet(params);
             break;
         }
         case 2201: // ASC_SPREADSHEETS_EVENT_TYPE_UNHIDE_WORKSHEET
         {
-            _s.offline_showWorksheet(params);
+            _api.asc_showWorksheet(params);
             _s.asc_WriteAllWorksheets(true);
             break;
         }

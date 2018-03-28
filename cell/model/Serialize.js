@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4748,7 +4748,7 @@
         };
     }
     /** @constructor */
-    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs, isCopyPaste)
+    function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs, isCopyPaste, useNumId)
     {
         this.stream = stream;
         this.wb = wb;
@@ -4758,6 +4758,7 @@
         this.bcr = new Binary_CommonReader(this.stream);
         this.bssr = new Binary_SharedStringTableReader(this.stream, wb);
 		this.isCopyPaste = isCopyPaste;
+		this.useNumId = useNumId;
         this.Read = function()
         {
             var oThis = this;
@@ -5005,6 +5006,7 @@
         };
 		this.ParseNum = function(oNum, oNumFmts) {
 			var oRes = new AscCommonExcel.Num();
+			var useNumId = false;
 			if (null != oNum && null != oNum.f) {
 				oRes.f = oNum.f;
 			} else {
@@ -5016,11 +5018,13 @@
 					oRes.f = "General";
 				}
 				//format string is more priority then id. so, fill oRes.id only if format is empty
-				if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
-					(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
+				useNumId = true;
+			}
+			if ((useNumId || this.useNumId) &&
+				((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
+				(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44))) {
 					oRes.id = oNum.id;
 				}
-			}
 			if (null != oNumFmts) {
 				oNumFmts[oNum.id] = oRes;
 			}
@@ -5885,7 +5889,7 @@
 				var tmp = {
 					pos: null, len: null, bNoBuildDep: bNoBuildDep, ws: ws, row: new AscCommonExcel.Row(ws),
 					cell: new AscCommonExcel.Cell(ws), formula: new OpenFormula(), sharedFormulas: {},
-					prevFormulas: {}, siFormulas: {}
+					prevFormulas: {}, siFormulas: {}, prevRow: -1, prevCol: -1
 				};
 				res = this.bcr.Read1(sheetDataElem.len, function(t, l) {
 					return oThis.ReadSheetData(t, l, tmp);
@@ -6334,19 +6338,24 @@
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadRow(t,l, tmp);
                 });
-                if(null !== tmp.row.index){
-					tmp.row.saveContent();
-					//читаем ячейки
-					if(null !== tmp.pos && null !== tmp.len){
-						var nOldPos = this.stream.GetCurPos();
-						this.stream.Seek2(tmp.pos);
-						res = this.bcr.Read1(tmp.len, function(t,l){
-							return oThis.ReadCells(t,l, tmp, tmp.row.index);
-						});
-						this.stream.Seek2(nOldPos);
-					}
+				if(null === tmp.row.index) {
+					tmp.row.index = tmp.prevRow + 1;
 				}
-            }
+				tmp.row.saveContent();
+				if(tmp.row.index >= tmp.ws.nRowsCount)
+                    tmp.ws.nRowsCount = tmp.row.index + 1;
+				tmp.prevRow = tmp.row.index;
+				tmp.prevCol = -1;
+				//читаем ячейки
+				if (null !== tmp.pos && null !== tmp.len) {
+					var nOldPos = this.stream.GetCurPos();
+					this.stream.Seek2(tmp.pos);
+					res = this.bcr.Read1(tmp.len, function(t,l){
+						return oThis.ReadCells(t,l, tmp, tmp.row.index);
+					});
+					this.stream.Seek2(nOldPos);
+				}
+			}
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6359,8 +6368,6 @@
             {
             	var index = this.stream.GetULongLE() - 1;
 				tmp.row.setIndex(index);
-                if(index >= tmp.ws.nRowsCount)
-					tmp.ws.nRowsCount = index + 1;
             }
             else if ( c_oSerRowTypes.Style == type )
             {
@@ -6407,10 +6414,19 @@
 				tmp.cell.clear();
                 tmp.formula.clean();
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, tmp, tmp.cell, index);
+                    return oThis.ReadCell(t,l, tmp, tmp.cell, tmp.prevRow);
                 });
-                this.setFormulaOpen(tmp);
+                if (tmp.cell.hasRowCol()) {
+                    tmp.prevCol = tmp.cell.nCol;
+                } else {
+                    tmp.prevCol++;
+                    tmp.cell.setRowCol(tmp.prevRow, tmp.prevCol);
+                }
+				this.setFormulaOpen(tmp);
 				tmp.cell.saveContent();
+                if (tmp.cell.nCol >= tmp.ws.nColsCount) {
+                    tmp.ws.nColsCount = tmp.cell.nCol + 1;
+                }
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -6485,14 +6501,10 @@
             if ( c_oSerCellTypes.Ref === type ){
 				var oCellAddress = AscCommon.g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 				oCell.setRowCol(nRowIndex, oCellAddress.getCol0());
-				if(oCell.nCol >= tmp.ws.nColsCount)
-					tmp.ws.nColsCount = oCell.nCol + 1;
 			}
             else if ( c_oSerCellTypes.RefRowCol === type ){
 				var nRow = this.stream.GetULongLE();//todo не используем можно убрать
 				oCell.setRowCol(nRowIndex, this.stream.GetULongLE());
-				if(oCell.nCol >= tmp.ws.nColsCount)
-					tmp.ws.nColsCount = oCell.nCol + 1;
 			}
             else if( c_oSerCellTypes.Style === type )
             {
@@ -8172,7 +8184,7 @@
         var oBinaryFileReader = new BinaryFileReader();
         var stream = oBinaryFileReader.getbase64DecodedData(sStyles);
         var bcr = new Binary_CommonReader(stream);
-        var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
+        var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], [], undefined, true);
 
         var length = stream.GetULongLE();
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -4365,6 +4365,10 @@ function parserFormula( formula, parent, _ws ) {
 	this.isInDependencies = false;
 	this.parent = parent;
 	this._index = undefined;
+
+	if (AscFonts.IsCheckSymbols) {
+		AscFonts.FontPickerByCharacter.getFontsByString(this.Formula);
+	}
 }
   parserFormula.prototype.getWs = function() {
     return this.ws;
@@ -5015,6 +5019,12 @@ parserFormula.prototype.setFormula = function(formula) {
 						return false;
 					}
 				}
+			} else if(wasLeftParentheses && 0 === top_elem_arg_count && t.elemArr[t.elemArr.length - 1] && " " === t.elemArr[t.elemArr.length - 1].name) {
+				//intersection with empty range
+				t.outStack = [];
+				t.elemArr = [];
+				t.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+				return false;
 			} else {
 				if (wasLeftParentheses && (!t.elemArr[t.elemArr.length - 1] ||
 					'(' === t.elemArr[t.elemArr.length - 1].name)) {
@@ -5911,6 +5921,10 @@ parserFormula.prototype.setFormula = function(formula) {
 					if(this.outStack[i - 2] && cElementType.specialFunctionEnd === this.outStack[i - 2].type) {
 						_argDiff++;
 					}
+				}
+
+				if(j - _count_arg - _argDiff < 0) {
+					continue;
 				}
 
 				if (bLocale) {

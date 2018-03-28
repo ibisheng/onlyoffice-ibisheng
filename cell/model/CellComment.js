@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -368,27 +368,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 
 		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null,
 			sheetId, objectGuid);
-
-		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
-			// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-			AscCommonExcel.applyFunction(callbackFunc, true);
-			callbackFunc = undefined;
-		}
-		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-				AscCommon.c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-			// Редактируем сами
-			AscCommonExcel.applyFunction(callbackFunc, true);
-			return;
-		} else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-				AscCommon.c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-			// Уже ячейку кто-то редактирует
-			AscCommonExcel.applyFunction(callbackFunc, false);
-			return;
-		}
-
-		this.worksheet.collaborativeEditing.onStartCheckLock();
-		this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
-		this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
+		this.worksheet.collaborativeEditing.lock([lockInfo], callbackFunc);
 	}
 };
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1683,7 +1683,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.ForceCopySectPr           = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
     this.CopyNumberingMap          = null;  // Мап старый индекс -> новый индекс для копирования нумерации
     this.CheckLanguageOnTextAdd    = false; // Проверять ли язык при добавлении текста в ран
-	this.RemoveCommentsOnPreDelete = false; // Удалять ли комментарий при удалением объекта
+	this.RemoveCommentsOnPreDelete = true; // Удалять ли комментарий при удалении объекта
 
     // Мап для рассылки
     this.MailMergeMap             = null;
@@ -4332,7 +4332,27 @@ CDocument.prototype.EditChart = function(Chart)
 };
 CDocument.prototype.GetChartObject = function(type)
 {
-	return this.DrawingObjects.getChartObject(type);
+    var W = null, H = null;
+    if(type != null)
+    {
+        var oTargetContent = this.DrawingObjects.getTargetDocContent();
+        if(oTargetContent && !oTargetContent.bPresentation)
+        {
+            W = oTargetContent.XLimit;
+            H = W;
+        }
+        else
+        {
+            var oColumnSize = this.GetColumnSize();
+            if(oColumnSize)
+            {
+                W = oColumnSize.W;
+                H = oColumnSize.H;
+            }
+        }
+    }
+    return this.DrawingObjects.getChartObject(type, W, H);
+
 };
 CDocument.prototype.AddInlineTable = function(Cols, Rows)
 {
@@ -4763,9 +4783,36 @@ CDocument.prototype.SetParagraphShd = function(Shd)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.SetParagraphStyle = function(Name)
+/**
+ * Выставляем стиль для выделенных параграфов
+ * @param {string} sName - название стиля
+ * @param {boolean} [isCheckLinkedStyle=false] - если true и если выделен текст внутри одного параграфа, то мы выставляем линкованный стиль текста, если он есть
+ */
+CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 {
-	this.Controller.SetParagraphStyle(Name);
+	if (isCheckLinkedStyle && this.IsSelectionUse())
+	{
+		var sStyleId = this.Styles.GetStyleIdByName(sName);
+		var oStyle   = this.Styles.Get(sStyleId);
+
+		var arrCurrentParagraphs = this.GetCurrentParagraph(false, true);
+		if (1 === arrCurrentParagraphs.length && arrCurrentParagraphs[0].IsSelectedSingleElement() && true !== arrCurrentParagraphs[0].IsSelectedAll() && oStyle && oStyle.GetLink())
+		{
+			var oLinkedStyle = this.Styles.Get(oStyle.GetLink());
+			if (oLinkedStyle && styletype_Character === oLinkedStyle.GetType())
+			{
+				var oTextPr = new CTextPr();
+				oTextPr.Set_FromObject({RStyle : oLinkedStyle.GetId()}, true);
+				arrCurrentParagraphs[0].ApplyTextPr(oTextPr);
+				this.Recalculate();
+				this.Document_UpdateSelectionState();
+				this.Document_UpdateInterfaceState();
+				return;
+			}
+		}
+	}
+
+	this.Controller.SetParagraphStyle(sName);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
@@ -5943,7 +5990,7 @@ CDocument.prototype.OnEndTextDrag = function(NearPos, bCopy)
             {
                 this.TurnOff_Recalculate();
                 this.TurnOff_InterfaceEvents();
-                this.Remove(1, false, false, true);
+                this.Remove(1, false, false, false);
                 this.TurnOn_Recalculate(false);
                 this.TurnOn_InterfaceEvents(false);
 
@@ -6582,12 +6629,23 @@ CDocument.prototype.OnKeyDown = function(e)
         var Hyperlink = this.IsCursorInHyperlink(false);
         if (null != Hyperlink && false === e.ShiftKey)
         {
-            editor.sync_HyperlinkClickCallback(Hyperlink.GetValue());
-            Hyperlink.SetVisited(true);
+			var sBookmarkName = Hyperlink.GetAnchor();
+			var sValue        = Hyperlink.GetValue();
+			if (sBookmarkName)
+			{
+				var oBookmark = this.BookmarksManager.GetBookmarkByName(sBookmarkName);
+				if (oBookmark)
+					oBookmark[0].GoToBookmark();
+			}
+			else if (sValue)
+			{
+				editor.sync_HyperlinkClickCallback(sValue);
+				Hyperlink.SetVisited(true);
 
-            // TODO: Пока сделаем так, потом надо будет переделать
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+				// TODO: Пока сделаем так, потом надо будет переделать
+				this.DrawingDocument.ClearCachePages();
+				this.DrawingDocument.FirePaint();
+			}
         }
         else
 		{
@@ -7397,7 +7455,16 @@ CDocument.prototype.OnMouseDown = function(e, X, Y, PageIndex)
 
 	// Если мы только что расширяли документ двойным щелчком, то отменяем это действие
 	if (true === this.History.Is_ExtendDocumentToPos())
+	{
 		this.Document_Undo();
+
+		// Заглушка на случай "неудачного" пересчета, когда после него страниц меньше, чем ту, по которое мы кликаем
+		if (PageIndex >= this.Pages.length)
+		{
+			this.RemoveSelection();
+			return;
+		}
+	}
 
 	var OldCurPage = this.CurPage;
 	this.CurPage   = PageIndex;
@@ -7971,10 +8038,14 @@ CDocument.prototype.Document_SetHdrFtrFirstPage = function(Value)
 		this.HdrFtr.Set_CurHdrFtr(TempSectPr.Get_Header_Default());
 	}
 
-	if (null !== this.HdrFtr.CurHdrFtr)
-		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
 
 	this.Recalculate();
+
+	if (null !== this.HdrFtr.CurHdrFtr)
+	{
+		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
+		this.HdrFtr.CurHdrFtr.Set_Page(CurPage);
+	}
 
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
@@ -9337,9 +9408,9 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.AddComment = function(CommentData)
+CDocument.prototype.AddComment = function(CommentData, isForceGlobal)
 {
-	if (true != this.CanAddComment())
+	if (true === isForceGlobal || true != this.CanAddComment())
 	{
 		CommentData.Set_QuoteText(null);
 		var Comment = new CComment(this.Comments, CommentData);
@@ -13204,7 +13275,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -13233,7 +13304,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -15999,6 +16070,20 @@ CDocument.prototype.controller_AddContentControl = function(nContentControlType)
 {
 	return this.private_AddContentControl(nContentControlType);
 };
+CDocument.prototype.controller_GetStyleFromFormatting = function()
+{
+	if (true == this.Selection.Use)
+	{
+		if (this.Selection.StartPos > this.Selection.EndPos)
+			return this.Content[this.Selection.EndPos].GetStyleFromFormatting();
+		else
+			return this.Content[this.Selection.StartPos].GetStyleFromFormatting();
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -16486,6 +16571,10 @@ CDocument.prototype.GetComplexFieldsByContentPos = function(oDocPos)
 
 	return arrComplexFields;
 };
+/**
+ * Получаем ссылку на класс, управляющий закладками
+ * @returns {CBookmarksManager}
+ */
 CDocument.prototype.GetBookmarksManager = function()
 {
 	return this.BookmarksManager;
@@ -16591,11 +16680,39 @@ CDocument.prototype.AddBookmark = function(sName)
 };
 CDocument.prototype.RemoveBookmark = function(sName)
 {
+	var arrBookmarkChars = this.BookmarksManager.GetBookmarkByName(sName);
 
+	var arrParagraphs = [];
+	if (arrBookmarkChars)
+	{
+		var oStartPara = arrBookmarkChars[0].GetParagraph();
+		var oEndPara   = arrBookmarkChars[1].GetParagraph();
+
+		if (oStartPara)
+			arrParagraphs.push(oStartPara);
+
+		if (oEndPara)
+			arrParagraphs.push(oEndPara);
+	}
+
+	if (false === this.Document_Is_SelectionLocked(changestype_None, {Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : arrParagraphs, CheckType : changestype_Paragraph_Content}, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveBookmark);
+
+		this.private_RemoveBookmark(sName);
+
+		// TODO: Здесь добавляются просто метки закладок, нужно сделать упрощенный пересчет
+		this.Recalculate();
+	}
 };
 CDocument.prototype.private_RemoveBookmark = function(sName)
 {
+	var arrBookmarkChars = this.BookmarksManager.GetBookmarkByName(sName);
+	if (!arrBookmarkChars)
+		return;
 
+	arrBookmarkChars[1].RemoveBookmark();
+	arrBookmarkChars[0].RemoveBookmark();
 };
 CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 {
@@ -16641,7 +16758,22 @@ CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 			oComplexField.Update();
 		}
 
+		var oNextParagraph = oSdt.GetNextParagraph();
+		if (oNextParagraph)
+		{
+			oNextParagraph.MoveCursorToStartPos(false);
+			oNextParagraph.Document_SetThisElementCurrent();
+		}
+		else
+		{
+			oSdt.MoveCursorToEndPos(false);
+		}
+
 		this.Recalculate();
+
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateRulersState();
 	}
 };
 CDocument.prototype.GetPagesCount = function()

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1123,7 +1123,13 @@
 
 	function CMetafileFontPicker(manager)
 	{
-		this.Manager = manager ? manager : new AscFonts.CFontManager(); 	// в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
+		this.Manager = manager; 	// в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
+		if (!this.Manager)
+		{
+			this.Manager = new AscFonts.CFontManager();
+			this.Manager.Initialize(false)
+		}
+
 		this.FontsInCache = {};
 		this.LastPickFont = null;
 		this.LastPickFontNameOrigin = "";

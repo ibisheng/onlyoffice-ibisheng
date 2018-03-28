@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1079,6 +1079,10 @@ ParaDrawing.prototype.IsMovingTableBorder = function()
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.IsMovingTableBorder === "function")
 		return this.GraphicObj.IsMovingTableBorder();
 	return false;
+};
+ParaDrawing.prototype.SetVerticalClip = function(Top, Bottom)
+{
+	// TODO: Реализовать
 };
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
 {

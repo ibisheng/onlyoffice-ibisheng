@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -125,7 +125,9 @@
 				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 
 				setTimeout(function(){
-					g_clipboardBase.EndFocus();
+					//вызываю CommonDiv_End, поскольку на _private_onbeforecopy всегда делается CommonDiv_Start
+					//TODO перепроверить!
+					g_clipboardBase.CommonDiv_End();
 				}, 0);
 
 				e.preventDefault();
@@ -156,7 +158,9 @@
 			if (!this.IsNeedDivOnCopy)
 			{
 				setTimeout(function(){
-					g_clipboardBase.EndFocus();
+					//вызываю CommonDiv_End, поскольку на _private_onbeforecopy всегда делается CommonDiv_Start
+					//TODO перепроверить!
+					g_clipboardBase.CommonDiv_End();
 				}, 0);
 
 				e.preventDefault();
@@ -201,9 +205,9 @@
 
 				var _text_format = this.ClosureParams.getData("text/plain");
 				var _internal = this.ClosureParams.getData("text/x-custom");
-				if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
+				if (_internal && _internal != "" && _internal.indexOf("asc_internalData2;") == 0)
 				{
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length), null, _text_format);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData2;".length), null, _text_format);
 					g_clipboardBase.Paste_End();
 					return false;
 				}
@@ -588,6 +592,9 @@
 				ElemToSelect.style.overflow               = 'hidden';
 				ElemToSelect.style.zIndex                 = -1000;
 				ElemToSelect.style.MozUserSelect          = "text";
+				ElemToSelect.style.fontFamily             = "onlyofficeDefaultFont";//дефолтовый шрифт
+				ElemToSelect.style.fontSize               = "11pt";//дефолтовый размер. значения 0 и тп не подходят - изменяются такие параметры, как line-height
+				ElemToSelect.style.color                  = "black";
 				ElemToSelect.style["-khtml-user-select"]  = "text";
 				ElemToSelect.style["-o-user-select"]      = "text";
 				ElemToSelect.style["user-select"]         = "text";
@@ -830,7 +837,7 @@
 			if (_data_format != "" && _data !== null && this.isCopyOutEnabled())
 			{
 				if (_data_format == "text/x-custom")
-					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);
+					this.ClosureParams.setData(_data_format, "asc_internalData2;" + _data);
 				else
 					this.ClosureParams.setData(_data_format, _data);
 			}
@@ -959,13 +966,18 @@
 		{
 			if(doNotShowButton)
 			{
-				this.doNotShowButton = true;
+				this.Special_Paste_Hide_Button();
 			}
 			this.pasteStart = true;
 
 			AscFonts.IsCheckSymbols = true;
 		},
-		
+
+		Special_Paste_Hide_Button: function()
+		{
+			this.doNotShowButton = true;
+		},
+
 		Paste_Process_End : function()
 		{
 			AscFonts.IsCheckSymbols             = false;
