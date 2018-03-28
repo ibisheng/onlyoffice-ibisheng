@@ -569,11 +569,10 @@ CChartsDrawer.prototype =
 		var pxToMM = this.calcProp.pxToMM;
 		var plotArea = chartSpace.chart.plotArea;
 
-		var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart &&
-			plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
+		//var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart && plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
 
 		//если точки рассчитаны - ставим маргин в зависимости от них
-		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
+		var marginOnPoints = this._calculateMarginOnPoints(chartSpace/*, isHBar*/);
 		var calculateLeft = marginOnPoints.calculateLeft, calculateRight = marginOnPoints.calculateRight, calculateTop = marginOnPoints.calculateTop, calculateBottom = marginOnPoints.calculateBottom;
 
 		//высчитываем выходящие за пределы подписи осей
@@ -587,50 +586,52 @@ CChartsDrawer.prototype =
 		var bottomTextLabels = 0;
 
 		//добавляем размеры подписей осей + размеры названия
-		//***left***
-		if (plotArea.valAx && plotArea.valAx.title != null && !isHBar) {
-			leftTextLabels += plotArea.valAx.title.extX;
-		} else if (isHBar && plotArea.catAx &&
-			plotArea.catAx.title != null) {
-			leftTextLabels += plotArea.catAx.title.extX;
+		//TODO генерировать extX для всех осей
+		var axId = chartSpace.chart.plotArea.axId;
+		if(axId) {
+			for(var i = 0; i < axId.length; i++) {
+				if(null !== axId[i].title) {
+					switch (axId[i].axPos) {
+						case window['AscFormat'].AX_POS_B: {
+							bottomTextLabels += axId[i].title.extY;
+							break;
+						}
+						case window['AscFormat'].AX_POS_T: {
+							topTextLabels += axId[i].title.extY;
+							break;
+						}
+						case window['AscFormat'].AX_POS_L: {
+							leftTextLabels += axId[i].title.extX;
+							break;
+						}
+						case window['AscFormat'].AX_POS_R: {
+							rightTextLabels += axId[i].title.extX;
+							break;
+						}
+					}
+				}
+			}
 		}
 
-		//пока ориентацию добавляю без hbar
-		var orientationValAx = plotArea.valAx && plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX;
-		//***bottom***
-		if (plotArea.catAx && plotArea.catAx.title != null && !isHBar && orientationValAx) {
-			bottomTextLabels += plotArea.catAx.title.extY;
-		} else if (isHBar && plotArea.valAx &&
-			plotArea.valAx.title != null) {
-			bottomTextLabels += plotArea.valAx.title.extY;
-		}
 
-
-		//***top***
+		//TITLE
 		var topMainTitle = 0;
 		if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
 			topMainTitle += chartSpace.chart.title.extY;
 		}
 
-		if (plotArea.catAx && plotArea.catAx.title != null && !isHBar && !orientationValAx) {
-			topTextLabels += plotArea.catAx.title.extY;
-		}
-
-
-		var leftKey = 0, rightKey = 0, topKey = 0, bottomKey = 0;
 		//KEY
+		var leftKey = 0, rightKey = 0, topKey = 0, bottomKey = 0;
 		if (chartSpace.chart.legend && !chartSpace.chart.legend.overlay) {
 			var fLegendExtX = chartSpace.chart.legend.extX;
 			var fLegendExtY = chartSpace.chart.legend.extY;
 			if (chartSpace.chart.legend.layout) {
-				if (AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) &&
-					AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)) {
+				if (AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) && AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)) {
 					fLegendExtX = chartSpace.chart.legend.naturalWidth;
 					fLegendExtY = chartSpace.chart.legend.naturalHeight;
 				}
 			}
-			var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos :
-				c_oAscChartLegendShowSettings.right;
+			var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
 			switch (nLegendPos) {
 				case c_oAscChartLegendShowSettings.left:
 				case c_oAscChartLegendShowSettings.leftOverlay: {
@@ -660,8 +661,7 @@ CChartsDrawer.prototype =
 
 		left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 		bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
-		top +=
-			this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+		top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
 		right += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
 
 
@@ -670,22 +670,17 @@ CChartsDrawer.prototype =
 		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-		if (plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ||
-			plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart) {
+		if (plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart) {
 			if (plotArea.layout) {
 				var oLayout = plotArea.layout;
-				pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x,
-						(pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
-				pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y,
-						(pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
+				pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
+				pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
 
-				var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w,
-					oLayout.wMode);
+				var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode);
 				if (fWidthPlotArea > 0) {
 					pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
 				}
-				var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h,
-					oLayout.hMode);
+				var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode);
 				if (fHeightPlotArea > 0) {
 					pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
 				}
