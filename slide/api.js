@@ -7136,12 +7136,12 @@ background-repeat: no-repeat;\
                     var oChange = new fChangesClass(Class);
                     oChange.ReadFromBinary(stream);
 
-                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange, false))
                         oChange.Load(_color);
                 }
                 else
                 {
-                    AscCommon.CollaborativeEditing.private_AddOverallChange(data);
+                    AscCommon.CollaborativeEditing.private_AddOverallChange(data, false);
 
                     stream.Seek(nReaderPos);
                     stream.Seek2(nReaderPos);
