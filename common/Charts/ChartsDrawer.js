@@ -405,7 +405,62 @@ CChartsDrawer.prototype =
 		
 		return {x: x, y: y}
 	},
-	
+
+	_calculatePositionAxisTitle: function(chartSpace, axis)
+	{
+		var legend = chartSpace.chart.legend;
+		var x = 0, y = 0;
+
+		if(axis && axis.title) {
+			var widthAxisTitle = axis.title.extX;
+			var heightAxisTitle = axis.title.extY;
+
+			switch (axis.axPos) {
+				case window['AscFormat'].AX_POS_B: {
+					y = (this.calcProp.heightCanvas - standartMarginForCharts) / this.calcProp.pxToMM - heightAxisTitle;
+					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthAxisTitle / 2;
+
+					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.bottom) {
+						y -= legend.extY;
+					}
+					break;
+				}
+				case window['AscFormat'].AX_POS_T: {
+					y = standartMarginForCharts / this.calcProp.pxToMM;
+					x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthAxisTitle / 2;
+
+					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.top) {
+						y += legend.extY;
+					}
+					if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
+						y += chartSpace.chart.title.extY;
+					}
+					break;
+				}
+				case window['AscFormat'].AX_POS_L: {
+					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightAxisTitle / 2;
+					x = standartMarginForCharts / this.calcProp.pxToMM;
+
+					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.left) {
+						x += legend.extX;
+					}
+					break;
+				}
+				case window['AscFormat'].AX_POS_R: {
+					y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightAxisTitle / 2;
+					x = (this.calcProp.widthCanvas - standartMarginForCharts) / this.calcProp.pxToMM - widthAxisTitle;
+
+					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.right) {
+						x -= legend.extX;
+					}
+					break;
+				}
+			}
+		}
+
+		return {x: x , y: y};
+	},
+
 	_calculatePositionValAxTitle: function(chartSpace)
 	{
 		var heightTitle = chartSpace.chart.plotArea.valAx.title.extY;
