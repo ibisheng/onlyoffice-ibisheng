@@ -4321,6 +4321,10 @@ drawBarChart.prototype = {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
 
+		if(!xPoints || !yPoints) {
+			return;
+		}
+
 		var widthGraph = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 
 		var defaultOverlap = (this.subType === "stacked" || this.subType === "stackedPer" || this.subType === "standard") ? 100 : 0;
@@ -11965,6 +11969,10 @@ catAxisChart.prototype = {
 		if (this.chartProp.type === c_oChartTypes.HBar) {
 			var yPoints = this.catAx.yPoints;
 
+			if(!yPoints) {
+				return;
+			}
+
 			var stepY = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.chartProp.chartGutter._bottom / this.chartProp.pxToMM);
 			minorStep = stepY / this.chartProp.numhMinorlines;
 			posX = this.catAx.posX;
@@ -12027,6 +12035,11 @@ catAxisChart.prototype = {
 			}
 		} else {
 			var xPoints = this.catAx.xPoints;
+
+			if(!xPoints) {
+				return;
+			}
+
 			var stepX = xPoints[1] ? Math.abs(xPoints[1].pos - xPoints[0].pos) : Math.abs(xPoints[0].pos - this.catAx.posX) * 2;
 			minorStep = stepX / this.chartProp.numvMinorlines;
 			posY = this.catAx.posY;
