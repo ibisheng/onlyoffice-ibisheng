@@ -734,8 +734,83 @@ CChartsDrawer.prototype =
 			this.calcProp.chartGutter._bottom = 0;
 		}
 	},
-	
-	_calculateMarginOnPoints: function(chartSpace, isHBar)
+
+	//включаю новую функцию. если будут проблемы с отступами - использовать функцию _calculateMarginOnPoints2
+	_calculateMarginOnPoints: function (chartSpace) {
+		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0, diffPoints, curBetween;
+		var pxToMM = this.calcProp.pxToMM;
+
+		var crossBetween = chartSpace.getValAxisCrossType();
+		var horizontalAxes = this._getHorizontalAxes(chartSpace);
+		var verticalAxes = this._getVerticalAxes(chartSpace);
+		var horizontalAxis = horizontalAxes ? horizontalAxes[0] : null;
+		var verticalAxis = verticalAxes ? verticalAxes[0] : null;
+
+		if (horizontalAxis && horizontalAxis.xPoints && horizontalAxis.xPoints.length && this.calcProp.widthCanvas != undefined) {
+			if (horizontalAxis instanceof AscFormat.CValAx) {
+				if (horizontalAxis.scaling.orientation == ORIENTATION_MIN_MAX) {
+					calculateLeft = horizontalAxis.xPoints[0].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos;
+				} else {
+					calculateLeft = horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - horizontalAxis.xPoints[0].pos;
+				}
+			} else if (horizontalAxis instanceof AscFormat.CCatAx && verticalAxis && !isNaN(verticalAxis.posX)) {
+				diffPoints = horizontalAxis.xPoints[1] ? Math.abs(horizontalAxis.xPoints[1].pos - horizontalAxis.xPoints[0].pos) : Math.abs(horizontalAxis.xPoints[0].pos - verticalAxis.posX) * 2;
+
+				if (horizontalAxis.scaling.orientation === ORIENTATION_MIN_MAX) {
+					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+						curBetween = diffPoints / 2;
+					}
+
+					calculateLeft = horizontalAxis.xPoints[0].pos - curBetween;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - (horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos + curBetween);
+				} else {
+					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+						curBetween = diffPoints / 2;
+					}
+
+					calculateLeft = horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos - curBetween;
+					calculateRight = this.calcProp.widthCanvas / pxToMM - (horizontalAxis.xPoints[0].pos + curBetween);
+				}
+			}
+		}
+
+		if (verticalAxis && verticalAxis.yPoints && verticalAxis.yPoints.length && this.calcProp.heightCanvas != undefined) {
+			if (verticalAxis instanceof AscFormat.CValAx) {
+				if (verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX) {
+					calculateTop = verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - verticalAxis.yPoints[0].pos;
+				} else {
+					calculateTop = verticalAxis.yPoints[0].pos;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos;
+				}
+			} else if (verticalAxis instanceof AscFormat.CCatAx && horizontalAxis && !isNaN(horizontalAxis.posY)) {
+
+				diffPoints = verticalAxis.yPoints[1] ? Math.abs(verticalAxis.yPoints[1].pos - verticalAxis.yPoints[0].pos) : Math.abs(verticalAxis.yPoints[0].pos - horizontalAxis.posY) * 2;
+
+				if (verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX) {
+					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+						curBetween = diffPoints / 2;
+					}
+
+					calculateTop = verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos - curBetween;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - (verticalAxis.yPoints[0].pos + curBetween);
+				} else {
+					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+						curBetween = diffPoints / 2;
+					}
+
+					calculateTop = verticalAxis.yPoints[0].pos - curBetween;
+					calculateBottom = this.calcProp.heightCanvas / pxToMM - (verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos + curBetween);
+				}
+			}
+		}
+
+		return {calculateLeft: calculateLeft, calculateRight : calculateRight, calculateTop: calculateTop, calculateBottom: calculateBottom};
+	},
+
+	_calculateMarginOnPoints2: function(chartSpace, isHBar)
 	{
 		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0;
 		var pxToMM = this.calcProp.pxToMM;
