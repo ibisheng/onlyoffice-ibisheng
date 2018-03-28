@@ -891,17 +891,22 @@ ParaDrawing.prototype.Check_WrapPolygon = function()
 		this.wrappingPolygon.setArrRelPoints(this.wrappingPolygon.calculate(this.GraphicObj));
 	}
 };
-ParaDrawing.prototype.Draw = function( X, Y, pGraphics, pageIndex, align)
+ParaDrawing.prototype.Draw = function( X, Y, pGraphics, PDSE)
 {
+	var nPageIndex = null;
+	if(AscCommon.isRealObject(PDSE))
+	{
+		nPageIndex = PDSE.Page;
+	}
 	if (pGraphics.Start_Command)
 	{
-		pGraphics.m_aDrawings.push(new AscFormat.ParaDrawingStruct(pageIndex, this));
+		pGraphics.m_aDrawings.push(new AscFormat.ParaDrawingStruct(PDSE, this));
 		return;
 	}
 	if (this.Is_Inline())
 	{
-		pGraphics.shapePageIndex = pageIndex;
-		this.draw(pGraphics, pageIndex);
+		pGraphics.shapePageIndex = nPageIndex;
+		this.draw(pGraphics, PDSE);
 		pGraphics.shapePageIndex = null;
 	}
 	if (pGraphics.End_Command)
@@ -1803,11 +1808,21 @@ ParaDrawing.prototype.Read_FromBinary2 = function(Reader)
 ParaDrawing.prototype.Load_LinkData = function()
 {
 };
-ParaDrawing.prototype.draw = function(graphics, pageIndex)
+ParaDrawing.prototype.draw = function(graphics, PDSE)
 {
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.draw === "function")
 	{
 		graphics.SaveGrState();
+		var bInline = this.Is_Inline();
+		if(bInline && AscCommon.isRealObject(PDSE) && AscCommon.isRealObject(this.GraphicObj.bounds))
+		{
+			var l, t, r, b;
+			l = PDSE.X + this.GraphicObj.bounds.l;
+			r = PDSE.X + this.GraphicObj.bounds.r;
+			t = PDSE.LineTop;
+			b = PDSE.LineBottom;
+			graphics.AddClipRect(l, t, r - l, b - t);
+		}
 		this.GraphicObj.draw(graphics);
 		graphics.RestoreGrState();
 	}
