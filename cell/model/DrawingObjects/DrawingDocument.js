@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -545,7 +545,7 @@ function CCacheManager()
 
         _cache_image.image_locked = 0;
         _cache_image.image_unusedCount = 0;
-        // ����� ����� �������� ������ � ���� (_cache_image = null) <- ��� ����������� !!!!!!!
+		// затем нужно сбросить ссылку в ноль (_cache_image = null) <- это обязательно !!!!!!!
     }
 
     this.Lock = function(_w, _h)
@@ -620,7 +620,7 @@ function CPage()
         {
             context.strokeStyle = "#81878F";
             context.strokeRect(xDst, yDst, wDst, hDst);
-            // ����� ���������� �� �������� ���������
+			// потом посмотреть на кусочную отрисовку
             context.drawImage(this.drawingPage.cachedImage.image, xDst, yDst, wDst, hDst);
         }
         else
@@ -1312,73 +1312,7 @@ function CDrawingDocument(drawingObjects)
     this.drawingObjects = drawingObjects;
     this.IsLockObjectsEnable = false;
 
-    this.cursorMarkerFormat = "";
-    if (AscCommon.AscBrowser.isIE)
-    {
-        // Пути указаны относительно html в меню, не надо их исправлять
-        // и коммитить на пути относительно тестового меню
-        this.cursorMarkerFormat = 'url(../../../../sdk/common/Images/marker_format.cur), pointer';
-    }
-    else if (window.opera)
-    {
-        this.cursorMarkerFormat = "pointer";
-    }
-    else
-    {
-        this.cursorMarkerFormat = "url('data:image/png;base64,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\
-        mWhBvQBxpekAAAAASUVORK5CYII=') 14 8, pointer";
-    }
+    AscCommon.g_oHtmlCursor.register("de-markerformat", "marker_format.cur", "url('data:image/png;base64,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') 14 8", "pointer");
 
     this.m_oWordControl     = null;
     this.m_oLogicDocument   = null;
@@ -1488,14 +1422,14 @@ function CDrawingDocument(drawingObjects)
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(AscCommon.kCurFormatPainterWord);
             else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value("de-markerformat");
             else
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(sType);
         }
         else
-            this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+            this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
 
         if ( "undefined" === typeof(Data) || null === Data )
             Data = new AscCommon.CMouseMoveData();
@@ -1505,7 +1439,7 @@ function CDrawingDocument(drawingObjects)
     this.LockCursorType = function(sType)
     {
         this.m_sLockedCursorType = sType;
-        this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
+        this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.g_oHtmlCursor.value(this.m_sLockedCursorType);
     }
     this.LockCursorTypeCur = function()
     {
@@ -1590,7 +1524,7 @@ function CDrawingDocument(drawingObjects)
             page.drawingPage.cachedImage = null;
         }
 
-        // ������ ���� ��� �������� �� ������ - �� ����� ������� ���������
+		// теперь если эта страница на экране - то нужно вызвать отрисовку
         if (index >= this.m_lDrawingFirst && index <= this.m_lDrawingEnd)
         {
             this.m_oWordControl.OnScroll();
@@ -1732,7 +1666,7 @@ function CDrawingDocument(drawingObjects)
 
         //var StartTime = new Date().getTime();
 
-        // ������ ����� �������
+		// теперь берем графикс
         var g = new AscCommon.CGraphics();
         g.init(page.drawingPage.cachedImage.image.ctx, w, h, page.width_mm, page.height_mm);
         g.m_oFontManager = AscCommon.g_fontManager;
@@ -2313,6 +2247,9 @@ function CDrawingDocument(drawingObjects)
 
         var _factor = AscCommon.AscBrowser.isRetina ? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
+        var targetPosX = 0;
+        var targetPosY = 0;
+
         if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
         {
             var _x1 = this.TextMatrix.TransformPointX(x, y);
@@ -2372,8 +2309,11 @@ function CDrawingDocument(drawingObjects)
                 ctx.stroke();
             }
 
-            this.TargetHtmlElement.style.left = ((Math.min(pos1.X, pos2.X) / _factor) >> 0) + "px";
-            this.TargetHtmlElement.style.top = ((Math.min(pos1.Y, pos2.Y) / _factor) >> 0) + "px";
+			targetPosX = (Math.min(pos1.X, pos2.X) / _factor) >> 0;
+            targetPosY = (Math.min(pos1.Y, pos2.Y) / _factor) >> 0;
+
+            this.TargetHtmlElement.style.left = targetPosX + "px";
+            this.TargetHtmlElement.style.top = targetPosY + "px";
         }
         else
         {
@@ -2404,9 +2344,15 @@ function CDrawingDocument(drawingObjects)
 
             var pos = { X : _offX + dKoef * x, Y : _offY + dKoef * y };
 
-            this.TargetHtmlElement.style.left = ((pos.X / _factor) >> 0) + "px";
-            this.TargetHtmlElement.style.top = ((pos.Y / _factor) >> 0) + "px";
+			targetPosX = (pos.X / _factor) >> 0;
+			targetPosY = (pos.Y / _factor) >> 0;
+
+			this.TargetHtmlElement.style.left = targetPosX + "px";
+			this.TargetHtmlElement.style.top = targetPosY + "px";
         }
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.move(targetPosX, targetPosY);
     }
 
     this.UpdateTargetTransform = function(matrix)
@@ -2467,7 +2413,7 @@ function CDrawingDocument(drawingObjects)
         if (true == pos.Error && (false == bIsPageChanged))
             return;
 
-        // �������, ����� �� ������ �� ������
+		// смотрим, виден ли курсор на экране
         var boxX = 0;
         var boxY = 0;
         var boxR = this.m_oWordControl.m_oEditor.HtmlElement.width;
@@ -2566,7 +2512,7 @@ function CDrawingDocument(drawingObjects)
         if (true === pos.Error && (false === bIsPageChanged))
             return;
 
-        // �������, ����� �� ������ �� ������
+		// смотрим, виден ли курсор на экране
         var boxX = 0;
         var boxY = 0;
         var boxR = oWordControl.m_oEditor.HtmlElement.width - 2;
@@ -2738,7 +2684,7 @@ function CDrawingDocument(drawingObjects)
 
             if (!this.TableOutlineDr.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableOutlineDr.TableMatrix))
             {
-                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection())) + 0.5;
+                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection())) + 0.5;
                 var _y = parseInt(drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) + 0.5;
 
                 var _r = _x + parseInt(dKoefX * this.TableOutlineDr.TableOutline.W);
@@ -2812,7 +2758,7 @@ function CDrawingDocument(drawingObjects)
             }
             else
             {
-                var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+                var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
                 var _y = this.TableOutlineDr.CurPos.Y;
                 var _r = _x + this.TableOutlineDr.TableOutline.W;
                 var _b = _y + this.TableOutlineDr.TableOutline.H;
@@ -3522,6 +3468,7 @@ function CDrawingDocument(drawingObjects)
         {
             dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
+        AscFonts.FontPickerByCharacter.extendFonts(dstfonts);
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
 
@@ -4097,19 +4044,9 @@ function CDrawingDocument(drawingObjects)
             _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
             _textPr.Position   = this.GuiLastTextProps.Position;
 
-            var parRun = new ParaRun(par); var Pos = 0;
+            var parRun = new ParaRun(par);
             parRun.Set_Pr(_textPr);
-            parRun.Add_ToContent(Pos++,new ParaText("H"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("e"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++,new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
-            parRun.Add_ToContent(Pos++, new ParaText("W"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("r"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("l"), false);
-            parRun.Add_ToContent(Pos++, new ParaText("d"), false);
+            parRun.AddText("Hello World");
             par.Add_ToContent(0, parRun);
 
             par.Recalculate_Page(0);

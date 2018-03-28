@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -112,6 +112,13 @@ var c_oSerShdType = {
     Tint: 2,
     Shade: 3
   };
+	var c_oSerBookmark = {
+		Id: 0,
+		Name: 1,
+		DisplacedByCustomXml: 2,
+		ColFirst: 3,
+		ColLast: 4
+	};
 
 function BinaryCommonWriter(memory)
 {
@@ -358,6 +365,18 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 		}
 	}
 };
+BinaryCommonWriter.prototype.WriteBookmark = function(bookmark) {
+	var oThis = this;
+	if (null !== bookmark.BookmarkId) {
+		this.WriteItem(c_oSerBookmark.Id, function() {
+			oThis.memory.WriteLong(bookmark.BookmarkId);
+		});
+	}
+	if (bookmark.IsStart() && null !== bookmark.BookmarkName) {
+		this.memory.WriteByte(c_oSerBookmark.Name);
+		this.memory.WriteString2(bookmark.BookmarkName);
+	}
+};
 function Binary_CommonReader(stream)
 {
     this.stream = stream;
@@ -544,6 +563,17 @@ Binary_CommonReader.prototype.ReadColorTheme = function(type, length, color)
         res = c_oSerConstants.ReadUnknown;
     return res;
 };
+Binary_CommonReader.prototype.ReadBookmark = function(type, length, bookmark) {
+	var res = c_oSerConstants.ReadOk;
+	if (c_oSerBookmark.Id === type) {
+		bookmark.BookmarkId = this.stream.GetULongLE();
+	} else if (c_oSerBookmark.Name === type) {
+		bookmark.BookmarkName = this.stream.GetString2LE(length);
+	} else {
+		res = c_oSerConstants.ReadUnknown;
+	}
+	return res;
+};
 /** @constructor */
 function FT_Stream2(data, size) {
     this.obj = null;
@@ -616,9 +646,22 @@ FT_Stream2.prototype.GetLongLE = function() {
 FT_Stream2.prototype.GetLong = function() {
 	return this.GetULongLE();
 };
+	var tempHelp = new ArrayBuffer(8);
+	var tempHelpUnit = new Uint8Array(tempHelp);
+	var tempHelpFloat = new Float64Array(tempHelp);
 FT_Stream2.prototype.GetDoubleLE = function() {
 	if (this.cur + 7 >= this.size)
 		return 0;
+	tempHelpUnit[0] = this.GetUChar();
+	tempHelpUnit[1] = this.GetUChar();
+	tempHelpUnit[2] = this.GetUChar();
+	tempHelpUnit[3] = this.GetUChar();
+	tempHelpUnit[4] = this.GetUChar();
+	tempHelpUnit[5] = this.GetUChar();
+	tempHelpUnit[6] = this.GetUChar();
+	tempHelpUnit[7] = this.GetUChar();
+	return tempHelpFloat[0];
+
 	var arr = [];
 	for(var i = 0; i < 8; ++i)
 		arr.push(this.GetUChar());

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -207,7 +207,7 @@
 			{
 				var _frame = document.getElementById(this.runnedPluginsMap[guid].frameId);
 				if (_frame)
-					_iframe.contentWindow.postMessage(data, "*");
+					_frame.contentWindow.postMessage(data, "*");
 			}
 		},
 		getPluginByGuid : function(guid)
@@ -692,10 +692,21 @@
 			var pluginData = new CPluginData();
 			pluginData.setAttribute("guid", guid);
 			pluginData.setAttribute("type", "plugin_init");
-			pluginData.setAttribute("data", "!function(n,e){var i=!1;n.plugin_sendMessage=function(e){n.parent.postMessage(e,\"*\")},n.plugin_onMessage=function(t){if(n.Asc.plugin&&\"string\"==typeof t.data){var s={};try{s=JSON.parse(t.data)}catch(n){s={}}if(s.guid!=n.Asc.plugin.guid)return;var a=s.type;switch(\"init\"==a&&(n.Asc.plugin.info=s),a){case\"init\":n.Asc.plugin.executeCommand=function(e,i){n.Asc.plugin.info.type=e,n.Asc.plugin.info.data=i;var t=\"\";try{t=JSON.stringify(n.Asc.plugin.info)}catch(n){t=JSON.stringify({type:i})}n.plugin_sendMessage(t)},n.Asc.plugin.executeMethod=function(e,i,t){if(!0===n.Asc.plugin.isWaitMethod)return!1;n.Asc.plugin.isWaitMethod=!0,n.Asc.plugin.methodCallback=t,n.Asc.plugin.info.type=\"method\",n.Asc.plugin.info.methodName=e,n.Asc.plugin.info.data=i;var s=\"\";try{s=JSON.stringify(n.Asc.plugin.info)}catch(n){s=JSON.stringify({type:data})}return n.plugin_sendMessage(s),!0},n.Asc.plugin.resizeWindow=function(i,t,s,a,c,u){e==s&&(s=0),e==a&&(a=0),e==c&&(c=0),e==u&&(u=0);var l=JSON.stringify({width:i,height:t,minw:s,minh:a,maxw:c,maxh:u});n.Asc.plugin.info.type=\"resize\",n.Asc.plugin.info.data=l;var o=\"\";try{o=JSON.stringify(n.Asc.plugin.info)}catch(n){o=JSON.stringify({type:l})}n.plugin_sendMessage(o)},n.Asc.plugin.callCommand=function(e,i,t){var s=\"var Asc = {}; Asc.scope = \"+JSON.stringify(n.Asc.scope)+\"; var scope = Asc.scope; (\"+e.toString()+\")();\",a=!0===i?\"close\":\"command\";n.Asc.plugin.info.recalculate=!1!==t,n.Asc.plugin.executeCommand(a,s)},n.Asc.plugin.callModule=function(e,i,t){var s=t,a=new XMLHttpRequest;a.open(\"GET\",e),a.onreadystatechange=function(){if(4==a.readyState&&(200==a.status||0==location.href.indexOf(\"file:\"))){var e=!0===s?\"close\":\"command\";n.Asc.plugin.info.recalculate=!0,n.Asc.plugin.executeCommand(e,a.responseText),i&&i(a.responseText)}},a.send()},n.Asc.plugin.init(n.Asc.plugin.info.data);break;case\"button\":var c=parseInt(s.button);n.Asc.plugin.button||-1!=c?n.Asc.plugin.button(c):n.Asc.plugin.executeCommand(\"close\",\"\");break;case\"enableMouseEvent\":i=s.isEnabled,n.Asc.plugin.onEnableMouseEvent&&n.Asc.plugin.onEnableMouseEvent(i);break;case\"onExternalMouseUp\":n.Asc.plugin.onExternalMouseUp&&n.Asc.plugin.onExternalMouseUp();break;case\"onMethodReturn\":n.Asc.plugin.isWaitMethod=!1,n.Asc.plugin.methodCallback?(n.Asc.plugin.methodCallback(s.methodReturnData),n.Asc.plugin.methodCallback=null):n.Asc.plugin.onMethodReturn&&n.Asc.plugin.onMethodReturn(s.methodReturnData);break;case\"onCommandCallback\":n.Asc.plugin.onCommandCallback&&n.Asc.plugin.onCommandCallback();break;case\"onExternalPluginMessage\":n.Asc.plugin.onExternalPluginMessage&&s.data&&s.data.type&&n.Asc.plugin.onExternalPluginMessage(s.data)}}},n.onmousemove=function(t){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var s=e===t.clientX?t.pageX:t.clientX,a=e===t.clientY?t.pageY:t.clientY;n.Asc.plugin.executeCommand(\"onmousemove\",JSON.stringify({x:s,y:a}))}},n.onmouseup=function(t){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var s=e===t.clientX?t.pageX:t.clientX,a=e===t.clientY?t.pageY:t.clientY;n.Asc.plugin.executeCommand(\"onmouseup\",JSON.stringify({x:s,y:a}))}},n.plugin_sendMessage(JSON.stringify({guid:n.Asc.plugin.guid,type:\"initialize_internal\"}))}(window,void 0);");
+			pluginData.setAttribute("data", "!function(n,e){var i=!1;n.plugin_sendMessage=function(e){n.parent.postMessage(e,\"*\")},n.plugin_onMessage=function(t){if(n.Asc.plugin&&\"string\"==typeof t.data){var s={};try{s=JSON.parse(t.data)}catch(n){s={}}if(s.guid!=n.Asc.plugin.guid)return;var a=s.type;switch(\"init\"==a&&(n.Asc.plugin.info=s),a){case\"init\":n.Asc.plugin.executeCommand=function(e,i){n.Asc.plugin.info.type=e,n.Asc.plugin.info.data=i;var t=\"\";try{t=JSON.stringify(n.Asc.plugin.info)}catch(n){t=JSON.stringify({type:i})}n.plugin_sendMessage(t)},n.Asc.plugin.executeMethod=function(e,i,t){if(!0===n.Asc.plugin.isWaitMethod)return!1;n.Asc.plugin.isWaitMethod=!0,n.Asc.plugin.methodCallback=t,n.Asc.plugin.info.type=\"method\",n.Asc.plugin.info.methodName=e,n.Asc.plugin.info.data=i;var s=\"\";try{s=JSON.stringify(n.Asc.plugin.info)}catch(n){s=JSON.stringify({type:data})}return n.plugin_sendMessage(s),!0},n.Asc.plugin.resizeWindow=function(i,t,s,a,c,u){e==s&&(s=0),e==a&&(a=0),e==c&&(c=0),e==u&&(u=0);var o=JSON.stringify({width:i,height:t,minw:s,minh:a,maxw:c,maxh:u});n.Asc.plugin.info.type=\"resize\",n.Asc.plugin.info.data=o;var l=\"\";try{l=JSON.stringify(n.Asc.plugin.info)}catch(n){l=JSON.stringify({type:o})}n.plugin_sendMessage(l)},n.Asc.plugin.callCommand=function(e,i,t){var s=\"var Asc = {}; Asc.scope = \"+JSON.stringify(n.Asc.scope)+\"; var scope = Asc.scope; (\"+e.toString()+\")();\",a=!0===i?\"close\":\"command\";n.Asc.plugin.info.recalculate=!1!==t,n.Asc.plugin.executeCommand(a,s)},n.Asc.plugin.callModule=function(e,i,t){var s=t,a=new XMLHttpRequest;a.open(\"GET\",e),a.onreadystatechange=function(){if(4==a.readyState&&(200==a.status||0==location.href.indexOf(\"file:\"))){var e=!0===s?\"close\":\"command\";n.Asc.plugin.info.recalculate=!0,n.Asc.plugin.executeCommand(e,a.responseText),i&&i(a.responseText)}},a.send()},n.Asc.plugin.loadModule=function(n,e){var i=new XMLHttpRequest;i.open(\"GET\",n),i.onreadystatechange=function(){4!=i.readyState||200!=i.status&&0!=location.href.indexOf(\"file:\")||e&&e(i.responseText)},i.send()},n.Asc.plugin.init(n.Asc.plugin.info.data);break;case\"button\":var c=parseInt(s.button);n.Asc.plugin.button||-1!=c?n.Asc.plugin.button(c):n.Asc.plugin.executeCommand(\"close\",\"\");break;case\"enableMouseEvent\":i=s.isEnabled,n.Asc.plugin.onEnableMouseEvent&&n.Asc.plugin.onEnableMouseEvent(i);break;case\"onExternalMouseUp\":n.Asc.plugin.onExternalMouseUp&&n.Asc.plugin.onExternalMouseUp();break;case\"onMethodReturn\":n.Asc.plugin.isWaitMethod=!1,n.Asc.plugin.methodCallback?(n.Asc.plugin.methodCallback(s.methodReturnData),n.Asc.plugin.methodCallback=null):n.Asc.plugin.onMethodReturn&&n.Asc.plugin.onMethodReturn(s.methodReturnData);break;case\"onCommandCallback\":n.Asc.plugin.onCommandCallback&&n.Asc.plugin.onCommandCallback();break;case\"onExternalPluginMessage\":n.Asc.plugin.onExternalPluginMessage&&s.data&&s.data.type&&n.Asc.plugin.onExternalPluginMessage(s.data)}}},n.onmousemove=function(t){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var s=e===t.clientX?t.pageX:t.clientX,a=e===t.clientY?t.pageY:t.clientY;n.Asc.plugin.executeCommand(\"onmousemove\",JSON.stringify({x:s,y:a}))}},n.onmouseup=function(t){if(i&&n.Asc.plugin&&n.Asc.plugin.executeCommand){var s=e===t.clientX?t.pageX:t.clientX,a=e===t.clientY?t.pageY:t.clientY;n.Asc.plugin.executeCommand(\"onmouseup\",JSON.stringify({x:s,y:a}))}},n.plugin_sendMessage(JSON.stringify({guid:n.Asc.plugin.guid,type:\"initialize_internal\"}))}(window,void 0);");
 			var _iframe = document.getElementById(runObject.frameId);
 			if (_iframe)
 				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+			return;
+		}
+		else if ("reload" == name)
+		{
+			if (true === pluginData.getAttribute("ctrl"))
+			{				
+				if (AscCommon.c_oEditorId.Presentation === window.g_asc_plugins.api.getEditorId())
+				{
+					window.g_asc_plugins.api.sendEvent("asc_onStartDemonstration");
+				}
+			}
 			return;
 		}
 		else if ("close" == name || "command" == name)
@@ -730,8 +741,10 @@
 							}
 						}
 
+                        AscFonts.IsCheckSymbols = true;
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "\n})();";
 						eval(_script);
+                        AscFonts.IsCheckSymbols = false;
 
 						if (pluginData.getAttribute("recalculate") == true)
 						{

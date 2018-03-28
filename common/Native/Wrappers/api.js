@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2220,11 +2220,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            t._state = AscCommon.ConnectionState.WaitAuth;
-            t.onFirstConnect();
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerOpen();
             break;
         }
 
@@ -2236,74 +2232,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            var dataObject = JSON.parse(_params);
-
-            // console.log("JS - " + dataObject['type']);
-
-            switch (dataObject['type']) {
-              case 'auth'        :
-                t._onAuth(dataObject);
-                break;
-              case 'message'      :
-                t._onMessages(dataObject, false);
-                break;
-              case 'cursor'       :
-                t._onCursor(dataObject);
-                break;
-              case 'meta' :
-                t._onMeta(dataObject);
-                break;
-              case 'getLock'      :
-                t._onGetLock(dataObject);
-                break;
-              case 'releaseLock'    :
-                t._onReleaseLock(dataObject);
-                break;
-              case 'connectState'    :
-                t._onConnectionStateChanged(dataObject);
-                break;
-              case 'saveChanges'    :
-                t._onSaveChanges(dataObject);
-                break;
-              case 'saveLock'      :
-                t._onSaveLock(dataObject);
-                break;
-              case 'unSaveLock'    :
-                t._onUnSaveLock(dataObject);
-                break;
-              case 'savePartChanges'  :
-                t._onSavePartChanges(dataObject);
-                break;
-              case 'drop'        :
-                t._onDrop(dataObject);
-                break;
-              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                break;
-              case 'error'      : /*Старая версия sdk*/
-                t._onDrop(dataObject);
-                break;
-              case 'documentOpen'    :
-                t._documentOpen(dataObject);
-                break;
-              case 'warning':
-                t._onWarning(dataObject);
-                break;
-              case 'license':
-                t._onLicense(dataObject);
-                break;
-              case 'session' :
-                t._onSession(dataObject);
-                break;
-              case 'refreshToken' :
-                t._onRefreshToken(dataObject["messages"]);
-                break;
-              case 'expiredToken' :
-                t._onExpiredToken();
-                break;
-              }
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerMessage(_params);
             break;
         }
 
@@ -2314,9 +2243,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
         case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-            delete t.sockjs;
-            t._initSocksJs();
+            _api.CoAuthoringApi._CoAuthoringApi._reconnect();
             break;
         }
 
@@ -5161,7 +5088,7 @@ Asc['asc_docs_api'].prototype.asc_replaceText = function(text, replaceWith, isRe
     }
 };
 
-Asc['asc_docs_api'].prototype.asc_selectSearchingResults = function(bShow)
+Asc['asc_docs_api'].prototype._selectSearchingResults = function(bShow)
 {
     this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
 };
@@ -5434,11 +5361,7 @@ drawStyle: function(graphics, style, _api)
 
         var par = new AscCommonWord.Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
         var run = new AscCommonWord.ParaRun(par, false);
-
-        for (var i = 0; i < style.Name.length; i++)
-        {
-            run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
-        }
+        run.AddText(style.Name);
 
         _dc.Internal_Content_Add(0, par, false);
         par.Add_ToContent(0, run);
@@ -6072,7 +5995,7 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
             _api.NativeAfterLoad();
      
         this.ImageLoader.bIsLoadDocumentFirst = true;
-
+        
         if (null != _api.WordControl.m_oLogicDocument)
         {
             _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);

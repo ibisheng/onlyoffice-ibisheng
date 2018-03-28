@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2116,6 +2116,10 @@ CMathContent.prototype.IsNormalTextInRuns = function()
 CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePosition)
 {
 	Item.Set_ParaMath(this.ParaMath);
+
+	if (Item.SetParagraph)
+		Item.SetParagraph(this.Paragraph);
+
 	Item.Parent = this;
 	Item.Recalc_RunsCompiledPr();
 
@@ -2227,9 +2231,9 @@ CMathContent.prototype.Add_ToContent = function(Pos, Item)
 };
 CMathContent.prototype.Concat_ToEnd = function(NewItems)
 {
-    this.Concat_ToContent(this.Content.length, NewItems);
+    this.ConcatToContent(this.Content.length, NewItems);
 };
-CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
+CMathContent.prototype.ConcatToContent = function(Pos, NewItems)
 {
 	if (NewItems != undefined && NewItems.length > 0)
 	{
@@ -2460,11 +2464,14 @@ CMathContent.prototype.Set_ParaMath = function(ParaMath, Parent)
         this.Content[Index].Set_ParaMath(ParaMath, this);
     }
 };
-CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
+CMathContent.prototype.Load_FromMenu = function(Type, Paragraph, TextPr)
 {
     this.Paragraph = Paragraph;
 
-    var Pr = {ctrPrp: new CTextPr()};
+    var Pr = {
+    	ctrPrp : TextPr ? TextPr.Copy() : new CTextPr()
+    };
+
     Pr.ctrPrp.Italic = true;
     Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 
@@ -4242,10 +4249,12 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             PRS.FirstItemOnLine = false;
             PRS.X += PRS.SpaceLen + PRS.WordLen;
 
-            PRS.Word = false;
-            PRS.EmptyLine = false;
-            PRS.SpaceLen = 0;
-            PRS.WordLen = 0;
+			PRS.Word               = false;
+			PRS.EmptyLine          = false;
+			PRS.EmptyLineWithBreak = false;
+			PRS.SpaceLen           = 0;
+			PRS.WordLen            = 0;
+			PRS.TextOnLine         = true;
 
             PRS.XRange = PRS.X;
         }
@@ -5258,7 +5267,7 @@ CMathContent.prototype.Delete_ItemToContentThroughInterface = function(Props, Po
 
         this.Remove_FromContent(Pos, 1);
 
-        this.Concat_ToContent(Pos, Items);
+        this.ConcatToContent(Pos, Items);
 
         this.Correct_Content();
 
@@ -7243,27 +7252,39 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
     }
 };
 
-CMathContent.prototype.GetTextContent = function()
+CMathContent.prototype.GetTextContent = function(bSelectedText)
 {
 	//TODO временная функция. пересмотреть!
-	var arr = [], str = "", bIsContainsOperator = false;
+	var arr = [], str = "", bIsContainsOperator = false, paraRunArr = [];
 
-	var addText = function(value, bIsAddParenthesis)
+	var addText = function(value, bIsAddParenthesis, paraRun)
 	{
 		if(bIsAddParenthesis && value.length > 1 && value.match())
 		{
 			arr.push("(");
 			str += "(";
+			paraRunArr.push("(");
 		}
 
 		arr.push(value);
 		str += value;
+		if(undefined === paraRun)
+		{
+			paraRunArr.push(value);
+		}
+		else
+		{
+			paraRunArr.push(paraRun);
+		}
+
 
 		if(bIsAddParenthesis && value.length > 1)
 		{
 			arr.push(")");
 			str += ")";
+			paraRunArr.push(")");
 		}
+
 	};
 
 	var getMathSymbol = function(elem)
@@ -7301,7 +7322,7 @@ CMathContent.prototype.GetTextContent = function()
 			res.push(getVal(String.fromCharCode(elem.Pr.chr), true));
 			if(!elem.Pr.supHide)
 			{
-				res.push(getVal(String.fromCharCode(95), true))
+				res.push(getVal(String.fromCharCode(95), true));
 				//res.push(getVal("_", true));
 			}
 			else
@@ -7359,6 +7380,15 @@ CMathContent.prototype.GetTextContent = function()
 		return res;
 	};
 
+	var getAndPushTextContent = function(elem)
+	{
+		var tempStr = elem.GetTextContent(bSelectedText);
+		if(tempStr.str)
+		{
+			addText(tempStr.str, tempStr.bIsContainsOperator, tempStr.paraRunArr);
+		}
+	};
+
 	var parseMathComposition = function(elem)
 	{
 		var tempStr;
@@ -7367,28 +7397,16 @@ CMathContent.prototype.GetTextContent = function()
 		if(elem instanceof CDegree)//степень
 		{
 			//основание
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//показатель
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CDelimiter)
 		{
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 		}
 		else if(elem instanceof CNary)//сумма
 		{
@@ -7399,11 +7417,7 @@ CMathContent.prototype.GetTextContent = function()
 			{
 				addText(symbol[1].value);
 
-				tempStr = elem.Content[0].GetTextContent();
-				if(tempStr.str)
-				{
-					addText(tempStr.str, tempStr.bIsContainsOperator);
-				}
+				getAndPushTextContent(elem.Content[0]);
 			}
 
 			//верхняя граница суммирования
@@ -7411,49 +7425,33 @@ CMathContent.prototype.GetTextContent = function()
 			{
 				addText(symbol[2].value);
 
-				tempStr = elem.Content[1].GetTextContent();
-				if(tempStr.str)
-				{
-					addText(tempStr.str, tempStr.bIsContainsOperator);
-				}
+				getAndPushTextContent(elem.Content[1]);
 			}
 
 			addText(symbol[3].value);
 
-			tempStr = elem.Content[2].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[2]);
 		}
 		else if(elem instanceof CFraction)//дробь
 		{
 			//числитель
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//знаменатель
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CRadical)//корень
 		{
 			addText(symbol[0].value);
 			//степень корня
-			tempStr = elem.Content[0].GetTextContent();
+			tempStr = elem.Content[0].GetTextContent(bSelectedText);
 			var isAddExp = false;
 			if(tempStr.str)
 			{
 				addText("(");
-				addText(tempStr.str, tempStr.bIsContainsOperator);
+				addText(tempStr.str, tempStr.bIsContainsOperator, tempStr.paraRunArr);
 				isAddExp = true;
 			}
 
@@ -7463,11 +7461,7 @@ CMathContent.prototype.GetTextContent = function()
 			}
 
 			//подкоренное выражение
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 
 			if(isAddExp)
 			{
@@ -7487,13 +7481,7 @@ CMathContent.prototype.GetTextContent = function()
 						addText(symbol[j].value);
 					}
 
-					tempStr = elem.Content[j].GetTextContent();
-
-					if(tempStr.str)
-					{
-						addText(tempStr.str, tempStr.bIsContainsOperator);
-					}
-
+					getAndPushTextContent(elem.Content[j]);
 
 					if(symbol[j] && !symbol[j].prePosition)
 					{
@@ -7506,52 +7494,59 @@ CMathContent.prototype.GetTextContent = function()
 		else if(elem instanceof CMathFunc)
 		{
 			//функция
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str);
-			}
+			getAndPushTextContent(elem.Content[0]);
 
 			addText(symbol[0].value);
 
 			//аргумент
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 		else if(elem instanceof CLimit)
 		{
 			//функция
-			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str);
-			}
-
+			getAndPushTextContent(elem.Content[0]);
 			//аргумент
-			tempStr = elem.Content[1].GetTextContent();
-			if(tempStr.str)
-			{
-				addText(tempStr.str, tempStr.bIsContainsOperator);
-			}
+			getAndPushTextContent(elem.Content[1]);
 		}
 
 	};
 
-
-	for(var i = 0; i < this.Content.length; i++)
+	var StartPos = 0, EndPos = this.Content.length;
+	if(bSelectedText)
 	{
+		StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+		EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+	}
+
+
+	for(var i = StartPos; i <= EndPos; i++)
+	{
+		if(!this.Content[i])
+		{
+			continue;
+		}
+
 		switch(this.Content[i].Type)
 		{
 			case para_Math_Run:
 			{
 				if(this.Content[i].Content.length)
 				{
-					var string = "";
-					for(var j = 0; j < this.Content[i].Content.length; j++)
+					var StartContentPos = 0, EndContentPos = this.Content[i].Content.length;
+					if(bSelectedText)
 					{
+						StartContentPos = ( true == this.Content[i].Selection.Use ? Math.min(this.Content[i].Selection.StartPos, this.Content[i].Selection.EndPos) : this.Content[i].CurPos.ContentPos );
+						EndContentPos   = ( true == this.Content[i].Selection.Use ? Math.max(this.Content[i].Selection.StartPos, this.Content[i].Selection.EndPos) : this.Content[i].CurPos.ContentPos );
+					}
+
+					var string = "";
+					for(var j = StartContentPos; j <= EndContentPos; j++)
+					{
+						if(!this.Content[i].Content[j])
+						{
+							continue;
+						}
+
 						if(para_Math_Text === this.Content[i].Content[j].Type)
 						{
 							string += String.fromCharCode(this.Content[i].Content[j].value);
@@ -7562,7 +7557,7 @@ CMathContent.prototype.GetTextContent = function()
 							bIsContainsOperator = true;
 						}
 					}
-					addText(string);
+					addText(string, null, this.Content[i]);
 				}
 				break;
 			}
@@ -7574,170 +7569,7 @@ CMathContent.prototype.GetTextContent = function()
 		}
 	}
 
-	return {str: str, bIsContainsOperator: bIsContainsOperator};
-};
-
-CMathContent.prototype.GetTextContent3 = function(arr, str)
-{
-	if(!arr)
-	{
-		arr = [];
-	}
-
-	if(!str)
-	{
-		str = "";
-	}
-
-	var addText = function(value)
-	{
-		arr.push(value);
-		str += value;
-	};
-
-	var getMathSymbol = function(elem)
-	{
-		var res = [];
-
-		var getVal = function(val, position)
-		{
-			var newVal = {};
-			newVal.prePosition = !!position;
-			newVal.value = undefined !== val ? val : "";
-			return newVal;
-		};
-
-		if(elem instanceof CDegree)
-		{
-
-			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
-			{
-				res.push(getVal("^"));
-			}
-			else
-			{
-				res.push(getVal("_"));
-			}
-		}
-		else if(elem instanceof CDelimiter)
-		{
-			res[-1] = getVal("(", true);
-			res.push(getVal(")"));
-		}
-		else if(elem instanceof CNary)
-		{
-			res[-1] = getVal(String.fromCharCode(elem.Pr.chr), true);
-			if(!elem.Pr.supHide)
-			{
-				res.push(getVal("_", true));
-			}
-			if(!elem.Pr.subHide)
-			{
-				res.push(getVal("^", true));
-			}
-			res.push(getVal("▒", true));
-		}
-		else if(elem instanceof CFraction)
-		{
-			res.push(getVal("/"));
-		}
-		else if(elem instanceof CRadical)
-		{
-			res.push(getVal("√", true));//8730;
-			//res.push(getVal("&", true));
-		}
-		else if(elem instanceof CMathMatrix)
-		{
-			res[-1] =  getVal("■", true);
-			for(var row = 0; row < elem.nRow; row++)
-			{
-				for(var col = 1; col < elem.nCol; col++)
-				{
-					res.push(getVal("&"));
-				}
-				if(row !== elem.nRow - 1)
-				{
-					res.push(getVal("@"));
-				}
-			}
-		}
-
-		return res;
-	};
-
-	for(var i = 0; i < this.Content.length; i++)
-	{
-		switch(this.Content[i].Type)
-		{
-			case para_Math_Run:
-			{
-				if(this.Content[i].Content.length)
-				{
-					var string = "";
-					var isBreakOperator = false;
-					var isMathText = false;
-					for(var j = 0; j < this.Content[i].Content.length; j++)
-					{
-						if(para_Math_Text === this.Content[i].Content[j].Type)
-						{
-							//addText(String.fromCharCode(this.Content[i].Content[j].value));
-							string += String.fromCharCode(this.Content[i].Content[j].value);
-							isMathText = true;
-						}
-						else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
-						{
-							//addText(String.fromCharCode(this.Content[i].Content[j].value));
-							string += String.fromCharCode(this.Content[i].Content[j].value);
-							isBreakOperator = true;
-						}
-					}
-					if(string)
-					{
-						if(isBreakOperator && isMathText)
-						{
-							addText("(");
-						}
-						addText(string);
-						if(isBreakOperator && isMathText)
-						{
-							addText(")");
-						}
-					}
-				}
-				break;
-			}
-			case para_Math_Composition:
-			{
-				var symbol = getMathSymbol(this.Content[i]);
-
-				for(var j = 0; j < this.Content[i].Content.length; j++)
-				{
-					if(para_Math_Content === this.Content[i].Content[j].Type)
-					{
-						if(j === 0 && symbol[-1] && symbol[-1].prePosition)
-						{
-							addText(symbol[-1].value);
-						}
-						if(symbol[j] && symbol[j].prePosition)
-						{
-							addText(symbol[j].value);
-						}
-
-						str = this.Content[i].Content[j].GetTextContent(arr, str);
-
-
-						if(symbol[j] && !symbol[j].prePosition)
-						{
-							addText(symbol[j].value);
-						}
-					}
-				}
-				break;
-			}
-		}
-	}
-
-	return str;
+	return {str: str, bIsContainsOperator: bIsContainsOperator, paraRunArr: paraRunArr};
 };
 
 function CMathBracketAcc()

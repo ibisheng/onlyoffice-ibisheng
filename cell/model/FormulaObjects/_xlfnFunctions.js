@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -51,173 +51,133 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
+	cFormulaFunctionGroup['Statistical'].push(cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
-	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
-	cFormulaFunctionGroup['Financial'].push(cPDURATION);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
-	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
-	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cF_TEST, cFORECAST_ETS,
-		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cMUNIT, cFORMULATEXT);
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cFORECAST_ETS,
+		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST,
+		cMUNIT);
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cDBCS() {
-		cBaseFunction.call(this, "DBCS");
-		this.isXLFN = true;
+	function cDBCS() {	
 	}
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
 	cDBCS.prototype.constructor = cDBCS;
+	cDBCS.prototype.name = "DBCS";
+	cDBCS.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cF_TEST() {
-		cBaseFunction.call(this, "F.TEST");
-		this.isXLFN = true;
-	}
-
-	cF_TEST.prototype = Object.create(cBaseFunction.prototype);
-	cF_TEST.prototype.constructor = cF_TEST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFILTERXML() {
-		cBaseFunction.call(this, "FILTERXML");
-		this.isXLFN = true;
+	function cFILTERXML() {	
 	}
 
 	cFILTERXML.prototype = Object.create(cBaseFunction.prototype);
 	cFILTERXML.prototype.constructor = cFILTERXML;
+	cFILTERXML.prototype.name = "FILTERXML";
+	cFILTERXML.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS() {
-		cBaseFunction.call(this, "FORECAST.ETS");
-		this.isXLFN = true;
+	function cFORECAST_ETS() {	
 	}
 
 	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST_ETS.prototype.constructor = cFORECAST_ETS;
+	cFORECAST_ETS.prototype.name = "FORECAST.ETS";
+	cFORECAST_ETS.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_CONFINT() {
-		cBaseFunction.call(this, "FORECAST.ETS.CONFINT");
-		this.isXLFN = true;
+	function cFORECAST_ETS_CONFINT() {	
 	}
 
 	cFORECAST_ETS_CONFINT.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST_ETS_CONFINT.prototype.constructor = cFORECAST_ETS_CONFINT;
+	cFORECAST_ETS_CONFINT.prototype.name = "FORECAST.ETS.CONFINT";
+	cFORECAST_ETS_CONFINT.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_SEASONALITY() {
-		cBaseFunction.call(this, "FORECAST.ETS.SEASONALITY");
-		this.isXLFN = true;
+	function cFORECAST_ETS_SEASONALITY() {	
 	}
 
 	cFORECAST_ETS_SEASONALITY.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST_ETS_SEASONALITY.prototype.constructor = cFORECAST_ETS_SEASONALITY;
+	cFORECAST_ETS_SEASONALITY.prototype.name = "FORECAST.ETS.SEASONALITY";
+	cFORECAST_ETS_SEASONALITY.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORECAST_ETS_STAT() {
-		cBaseFunction.call(this, "FORECAST.ETS.STAT");
-		this.isXLFN = true;
+	function cFORECAST_ETS_STAT() {	
 	}
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST_ETS_STAT.prototype.constructor = cFORECAST_ETS_STAT;
+	cFORECAST_ETS_STAT.prototype.name = "FORECAST.ETS.STAT";
+	cFORECAST_ETS_STAT.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFORMULATEXT() {
-		cBaseFunction.call(this, "FORMULATEXT");
-		this.isXLFN = true;
-	}
-
-	cFORMULATEXT.prototype = Object.create(cBaseFunction.prototype);
-	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cHYPGEOM_DIST() {
-		cBaseFunction.call(this, "HYPGEOM.DIST");
-		this.isXLFN = true;
+	function cHYPGEOM_DIST() {	
 	}
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
+	cHYPGEOM_DIST.prototype.name = "HYPGEOM.DIST";
+	cHYPGEOM_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cMUNIT() {
-		cBaseFunction.call(this, "MUNIT");
-		this.isXLFN = true;
+	function cMUNIT() {	
 	}
 
 	cMUNIT.prototype = Object.create(cBaseFunction.prototype);
 	cMUNIT.prototype.constructor = cMUNIT;
+	cMUNIT.prototype.name = "MUNIT";
+	cMUNIT.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cPDURATION() {
-		cBaseFunction.call(this, "PDURATION");
-		this.isXLFN = true;
-	}
-
-	cPDURATION.prototype = Object.create(cBaseFunction.prototype);
-	cPDURATION.prototype.constructor = cPDURATION;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cQUERYSTRING() {
-		cBaseFunction.call(this, "QUERYSTRING");
-		this.isXLFN = true;
+	function cQUERYSTRING() {	
 	}
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
+	cQUERYSTRING.prototype.name = "QUERYSTRING";
+	cQUERYSTRING.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cWEBSERVICE() {
-		cBaseFunction.call(this, "WEBSERVICE");
-		this.isXLFN = true;
+	function cWEBSERVICE() {	
 	}
 
 	cWEBSERVICE.prototype = Object.create(cBaseFunction.prototype);
 	cWEBSERVICE.prototype.constructor = cWEBSERVICE;
+	cWEBSERVICE.prototype.name = "WEBSERVICE";
+	cWEBSERVICE.prototype.isXLFN = true;
 })(window);

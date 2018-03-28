@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -79,7 +79,7 @@ Asc['asc_docs_api'].prototype.asc_RejectChanges = function(Change)
 };
 Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges = function()
 {
-    this.WordControl.m_oLogicDocument.Have_RevisionChanges();
+    return this.WordControl.m_oLogicDocument.Have_RevisionChanges();
 };
 Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges = function()
 {
@@ -219,7 +219,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
             return SearchEngine;
     }
 
-    var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.Get_TopDocumentContent() : null;
+    var oFootnote = CurrentPara.Parent ? CurrentPara.Parent.GetTopDocumentContent() : null;
     if (!(oFootnote instanceof CFootEndnote))
     	oFootnote = null;
 

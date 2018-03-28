@@ -273,6 +273,12 @@ var c_oAscDateTimeGrouping = {
 	Minute: 4,
 	Second: 5
 };
+var c_oAscAllocationMethod = {
+	EqualAllocation: 0,
+	EqualIncrement: 1,
+	WeightedAllocation: 2,
+	WeightedIncrement: 3
+};
 
 var st_VALUES = -2;
 
@@ -1452,6 +1458,33 @@ function ToXml_ST_DateTimeGrouping(val) {
 	return res;
 }
 
+function FromXml_ST_AllocationMethod(val) {
+	var res = -1;
+	if ("equalAllocation" === val) {
+		res = c_oAscAllocationMethod.EqualAllocation;
+	} else if ("equalIncrement" === val) {
+		res = c_oAscAllocationMethod.EqualIncrement;
+	} else if ("weightedAllocation" === val) {
+		res = c_oAscAllocationMethod.WeightedAllocation;
+	} else if ("weightedIncrement" === val) {
+		res = c_oAscAllocationMethod.WeightedIncrement;
+	}
+	return res;
+}
+function ToXml_ST_AllocationMethod(val) {
+	var res = "";
+	if (c_oAscAllocationMethod.EqualAllocation === val) {
+		res = "equalAllocation";
+	} else if (c_oAscAllocationMethod.EqualIncrement === val) {
+		res = "equalIncrement";
+	} else if (c_oAscAllocationMethod.WeightedAllocation === val) {
+		res = "weightedAllocation";
+	} else if (c_oAscAllocationMethod.WeightedIncrement === val) {
+		res = "weightedIncrement";
+	}
+	return res;
+}
+
 function CT_PivotCacheDefinition() {
 //Attributes
 	this.id = null;
@@ -1493,7 +1526,7 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
 		}
 		val = vals["invalid"];
 		if (undefined !== val) {
@@ -1517,7 +1550,7 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["refreshedBy"];
 		if (undefined !== val) {
-			this.refreshedBy = uq(val);
+			this.refreshedBy = AscCommon.unleakString(uq(val));
 		}
 		val = vals["refreshedDate"];
 		if (undefined !== val) {
@@ -1742,7 +1775,7 @@ CT_PivotCacheDefinition.prototype.getFields = function () {
 	return this.cacheFields && this.cacheFields.cacheField;
 };
 CT_PivotCacheDefinition.prototype.getRecords = function () {
-	return this.cacheRecords && this.cacheRecords.r;
+	return this.cacheRecords && this.cacheRecords;
 };
 CT_PivotCacheDefinition.prototype.isValidCacheSource = function () {
 	return this.cacheSource && this.cacheSource.type === c_oAscSourceType.Worksheet;
@@ -1751,10 +1784,10 @@ function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
 //Members
-	this.r = null;
 	this.extLst = null;
 //internal
-	this._curArray = null;
+	this._cols = [];
+	this._curColIndex = 0;
 }
 CT_PivotCacheRecords.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -1773,69 +1806,26 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 			newContext.readAttributes(attr, uq);
 		}
 	} else if ("r" === elem) {
-		this._curArray = [];
-	} else if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_Index();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this._curArray.push(newContext);
-	} else if ("extLst" === elem) {
-		newContext = new CT_ExtensionList();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.extLst = newContext;
+		this._curColIndex = 0;
 	} else {
-		newContext = null;
+		var newContextCandidate = this._getCol(this._curColIndex).onStartNode(elem, attr, uq);
+		if (newContextCandidate) {
+			newContext = newContextCandidate;
+		} else if ("extLst" === elem) {
+			newContext = new CT_ExtensionList();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.extLst = newContext;
+		} else {
+			newContext = null;
+		}
 	}
 	return newContext;
 };
 CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
-	if ("r" === elem) {
-		if (this._curArray && this._curArray.length > 0) {
-			if (!this.r) {
-				this.r = [];
-			}
-			this.r.push(this._curArray);
-			this._curArray = null;
-		}
+	if (this._getCol(this._curColIndex).onEndNode(prevContext, elem)) {
+		this._curColIndex++;
 	}
 };
 CT_PivotCacheRecords.prototype.toXml = function(writer) {
@@ -1847,27 +1837,12 @@ CT_PivotCacheRecords.prototype.toXml = function(writer) {
 		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	writer.WriteXmlNodeEnd("pivotCacheRecords", true);
-	if (null !== this.r) {
-		for (var i = 0; i < this.r.length; ++i) {
-			var elem = this.r[i];
+	if (null !== this._cols) {
+		var rowsCount = this._cols[0].size;
+		for (var i = 0; i < rowsCount; ++i) {
 			writer.WriteXmlNodeStart("r", true);
-			for (var j = 0; j < elem.length; ++j) {
-				var subelem = elem[j];
-				if (subelem instanceof CT_Boolean) {
-					subelem.toXml(writer, "b");
-				} else if (subelem instanceof CT_DateTime) {
-					subelem.toXml(writer, "d");
-				} else if (subelem instanceof CT_Error) {
-					subelem.toXml(writer, "e");
-				} else if (subelem instanceof CT_Missing) {
-					subelem.toXml(writer, "m");
-				} else if (subelem instanceof CT_Number) {
-					subelem.toXml(writer, "n");
-				} else if (subelem instanceof CT_String) {
-					subelem.toXml(writer, "s");
-				} else if (subelem instanceof CT_Index) {
-					subelem.toXml(writer, "x");
-				}
+			for (var j = 0; j < this._cols.length; ++j) {
+				this._cols[j].toXml(writer, i);
 			}
 			writer.WriteXmlNodeEnd("r");
 		}
@@ -1876,6 +1851,24 @@ CT_PivotCacheRecords.prototype.toXml = function(writer) {
 		this.extLst.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd("pivotCacheRecords");
+};
+CT_PivotCacheRecords.prototype.getRowsCount = function() {
+	return null !== this._cols ? this._cols[0].size : 0;
+};
+CT_PivotCacheRecords.prototype.get = function(row, col) {
+	var col = this._cols[col];
+	if (col) {
+		return col.get(row);
+	}
+};
+CT_PivotCacheRecords.prototype._getCol = function(index) {
+	var col = this._cols[index];
+	if(!col){
+		col = new PivotRecords();
+		col.setStartCount(this.count);
+		this._cols[index] = col;
+	}
+	return col;
 };
 function CT_pivotTableDefinition() {
 //Attributes
@@ -1964,19 +1957,48 @@ function CT_pivotTableDefinition() {
 	this.filters = null;
 	this.rowHierarchiesUsage = null;
 	this.colHierarchiesUsage = null;
-	this.extLst = null;
+	//ext
+	this.pivotTableDefinitionX14 = null;
 	//editor
 	this.cacheDefinition = null;
 
+	this.isInit = false;
 	this.pageFieldsPositions = null;
+	this.clearGrid = false;
+	this.hasCompactField = true;
+
+	this.worksheet = null;
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
+	AscCommon.g_oTableId.Add(this, this.Id);
 }
+CT_pivotTableDefinition.prototype.getObjectType = function () {
+	return AscDFH.historyitem_type_PivotTableDefinition;
+};
+CT_pivotTableDefinition.prototype.Get_Id = function () {
+	return this.Id;
+};
+CT_pivotTableDefinition.prototype.Write_ToBinary2 = function (w) {
+	w.WriteLong(this.getObjectType());
+	w.WriteString2(this.Id);
+	w.WriteString2(this.worksheet ? this.worksheet.getId() : '-1');
+};
+CT_pivotTableDefinition.prototype.Read_FromBinary2 = function (r) {
+	this.Id = r.GetString2();
+
+	// ToDo not the best scheme for adding to a sheet...
+	var api_sheet = Asc['editor'];
+	this.worksheet = api_sheet.wbModel.getWorksheetById(r.GetString2());
+	if (this.worksheet) {
+		this.worksheet.insertPivotTable(this);
+	}
+};
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cacheId"];
 		if (undefined !== val) {
@@ -2020,15 +2042,15 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["dataCaption"];
 		if (undefined !== val) {
-			this.dataCaption = uq(val);
+			this.dataCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["grandTotalCaption"];
 		if (undefined !== val) {
-			this.grandTotalCaption = uq(val);
+			this.grandTotalCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["errorCaption"];
 		if (undefined !== val) {
-			this.errorCaption = uq(val);
+			this.errorCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showError"];
 		if (undefined !== val) {
@@ -2036,7 +2058,7 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["missingCaption"];
 		if (undefined !== val) {
-			this.missingCaption = uq(val);
+			this.missingCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showMissing"];
 		if (undefined !== val) {
@@ -2044,19 +2066,19 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["pageStyle"];
 		if (undefined !== val) {
-			this.pageStyle = uq(val);
+			this.pageStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["pivotTableStyle"];
 		if (undefined !== val) {
-			this.pivotTableStyle = uq(val);
+			this.pivotTableStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["vacatedStyle"];
 		if (undefined !== val) {
-			this.vacatedStyle = uq(val);
+			this.vacatedStyle = AscCommon.unleakString(uq(val));
 		}
 		val = vals["tag"];
 		if (undefined !== val) {
-			this.tag = uq(val);
+			this.tag = AscCommon.unleakString(uq(val));
 		}
 		val = vals["updatedVersion"];
 		if (undefined !== val) {
@@ -2228,11 +2250,11 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["rowHeaderCaption"];
 		if (undefined !== val) {
-			this.rowHeaderCaption = uq(val);
+			this.rowHeaderCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["colHeaderCaption"];
 		if (undefined !== val) {
-			this.colHeaderCaption = uq(val);
+			this.colHeaderCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["fieldListSortAscending"];
 		if (undefined !== val) {
@@ -2355,11 +2377,20 @@ CT_pivotTableDefinition.prototype.onStartNode = function(elem, attr, uq) {
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
-		this.extLst = newContext;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_pivotTableDefinition.prototype.onEndNode = function(prevContext, elem) {
+	if ("extLst" === elem) {
+		for (var i = 0; i < prevContext.ext.length; ++i) {
+			var ext = prevContext.ext[i];
+			if ('{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}' == ext.uri) {
+				this.pivotTableDefinitionX14 = ext.elem;
+			}
+		}
+	}
 };
 CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
@@ -2619,12 +2650,18 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	if (null !== this.colHierarchiesUsage) {
 		this.colHierarchiesUsage.toXml(writer, "colHierarchiesUsage");
 	}
-	if (null !== this.extLst) {
-		this.extLst.toXml(writer, "extLst");
+	if (null !== this.pivotTableDefinitionX14) {
+		var ext = new CT_Extension();
+		ext.uri = "{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}";
+		ext.elem = this.pivotTableDefinitionX14;
+		var extList = new CT_ExtensionList();
+		extList.ext.push(ext);
+		extList.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd("pivotTableDefinition");
 };
 CT_pivotTableDefinition.prototype.init = function () {
+	this.isInit = true;
 	this.pageFieldsPositions = [];
 
 	var rowPageCount = null, colPageCount = null;
@@ -2671,9 +2708,38 @@ CT_pivotTableDefinition.prototype.init = function () {
 	}
 
 	this.location.setPageCount(rowPageCount, colPageCount);
+	this.updatePivotType();
+};
+CT_pivotTableDefinition.prototype.updatePivotType = function () {
+	this.clearGrid = false;
+	this.hasCompactField = false;
+	var pivotFields = this.asc_getPivotFields();
+	var rowFields = this.asc_getRowFields();
+	if (rowFields) {
+		var i;
+		for (i = 0; i < rowFields.length; ++i) {
+			if (false !== pivotFields[rowFields[i].asc_getIndex()].outline) {
+				this.clearGrid = true;
+				break;
+			}
+		}
+		for (i = 0; i < pivotFields.length; ++i) {
+			if (false !== pivotFields[i].compact) {
+				this.hasCompactField = true;
+				break;
+			}
+		}
+	}
+};
+CT_pivotTableDefinition.prototype.hasCompact = function () {
+	return false !== this.compactData || this.hasCompactField;
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);
+};
+CT_pivotTableDefinition.prototype.isIntersectForShift = function (range, offset) {
+	var ref = this.location && (this.location.refWithPage || this.location.ref);
+	return (ref && range.isIntersectForShift(ref, offset));
 };
 CT_pivotTableDefinition.prototype.pageFieldsIntersection = function (range) {
 	return this.pageFieldsPositions && this.pageFieldsPositions.some(function (element) {
@@ -2690,11 +2756,17 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;
 };
-CT_pivotTableDefinition.prototype.getColumnFieldsCount = function () {
+CT_pivotTableDefinition.prototype.getFirstHeaderRow0 = function () {
+	return this.location && (this.location.firstHeaderRow + this.getColumnFieldsCount() - 1);
+};
+CT_pivotTableDefinition.prototype.getFirstDataCol = function () {
+	return this.location && this.location.firstDataCol;
+};
+CT_pivotTableDefinition.prototype.getColumnFieldsCount = function (withoutValues) {
 	var res = 0;
 	if (this.colFields) {
 		res = this.colFields.field.length;
-		if (1 === res && st_VALUES === this.colFields.field[0].x) {
+		if (1 === res && withoutValues && st_VALUES === this.colFields.field[0].x) {
 			res = 0;
 		}
 	}
@@ -2708,7 +2780,7 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 			this.getField(this.rowFields.field, function (element, i) {
 				if (i !== l - 1) {
 					var field = t.pivotFields.pivotField[element.asc_getIndex()];
-					res -= (field && false !== field.compact) ? 1 : 0;
+					res -= (field && false !== field.outline && false !== field.compact) ? 1 : 0;
 				}
 			});
 		}
@@ -2721,7 +2793,7 @@ CT_pivotTableDefinition.prototype.getRowFieldPos = function (index) {
 		var field, fields = this.rowFields.field;
 		for (var i = 0; i < index && i < fields.length; ++i) {
 			field = this.pivotFields.pivotField[fields[i].asc_getIndex()];
-			res += (field && false === field.compact && 1);
+			res += (field && (false === field.outline || false === field.compact) && 1);
 		}
 	}
 
@@ -2742,37 +2814,67 @@ CT_pivotTableDefinition.prototype.getColItems = function () {
 CT_pivotTableDefinition.prototype.getRecords = function () {
 	return this.cacheDefinition.getRecords();
 };
-CT_pivotTableDefinition.prototype.getValues = function (records, index, value) {
+CT_pivotTableDefinition.prototype.getValues = function (records, rowIndexes, colIndex, value) {
 	var res = [];
-	var elem;
-	for (var i = 0; i < records.length; ++i) {
-		elem = records[i][index];
-		if (elem && elem instanceof CT_Index && value === elem.v) {
-			res.push(records[i]);
+	var i;
+	if (rowIndexes) {
+		for (i = 0; i < rowIndexes.length; ++i) {
+			this._getValues(records, rowIndexes[i], colIndex, value, res);
+		}
+	} else {
+		for (i = 0; i < records.getRowsCount(); ++i) {
+			this._getValues(records, i, colIndex, value, res);
 		}
 	}
 	return res;
 };
-CT_pivotTableDefinition.prototype.getValue = function (records, index, subtotal) {
+CT_pivotTableDefinition.prototype._getValues = function (records, rowIndex, colIndex, value, output) {
+	var elem = records.get(rowIndex, colIndex);
+	if (elem && elem.type === c_oAscPivotRecType.Index && value === elem.val) {
+		output.push(rowIndex);
+	}
+};
+CT_pivotTableDefinition.prototype.getValue = function (records, rowIndexes, index, subtotal) {
 	var cacheFields = this.asc_getCacheFields();
 	if (c_oAscItemType.Default === subtotal || c_oAscItemType.Data === subtotal || c_oAscItemType.Blank === subtotal) {
 		subtotal = c_oAscItemType.Sum;
 	}
 	var arg = [new AscCommonExcel.cNumber(subtotal)];
-	var elem;
-	for (var i = 0; i < records.length; ++i) {
-		elem = records[i][index];
-		if (elem instanceof CT_Index) {
-			elem = cacheFields[index].getSharedItem(elem.v);
+	var i;
+	if(rowIndexes){
+		for (i = 0; i < rowIndexes.length; ++i) {
+			this._getValue(records, rowIndexes[i], index, cacheFields, arg);
 		}
-		if (elem instanceof CT_Number) {
-			arg.push(new AscCommonExcel.cNumber(elem.v));
+	} else {
+		for (i = 0; i < records.getRowsCount(); ++i) {
+			this._getValue(records, i, index, cacheFields, arg);
 		}
 	}
 
 	var res = (new AscCommonExcel.cSUBTOTAL()).Calculate(arg);
 
 	return res ? res.value : null;
+};
+CT_pivotTableDefinition.prototype._getValue = function (records, rowIndex, index, cacheFields, output) {
+	var elem = records.get(rowIndex, index);
+	if (elem.type === c_oAscPivotRecType.Index) {
+		elem = cacheFields[index].getSharedItem(elem.val);
+	}
+	if (elem.type === c_oAscPivotRecType.Number) {
+		output.push(new AscCommonExcel.cNumber(elem.val));
+	}
+};
+CT_pivotTableDefinition.prototype.getAllRange = function (ws) {
+	var newSelection = new AscCommonExcel.SelectionRange(ws);
+	newSelection.assign2(this.getRange());
+	if (this.pageFieldsPositions && 0 < this.pageFieldsPositions.length) {
+		this.pageFieldsPositions.forEach(function (element) {
+			newSelection.addRange();
+			newSelection.getLast().assign2(new Asc.Range(element.col, element.row, element.col + 1, element.row));
+		});
+		newSelection = newSelection.getUnion();
+	}
+	return newSelection;
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
@@ -2813,10 +2915,13 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
+CT_pivotTableDefinition.prototype.asc_select = function (api) {
+	this.getAllRange(api.wbModel.getActiveWs()).Select();
+};
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		if (null !== newVal.rowGrandTotals && t.asc_getRowGrandTotals() !== newVal.rowGrandTotals) {
 			t.asc_setRowGrandTotals(newVal.rowGrandTotals ? null : false);
 		}
@@ -2843,7 +2948,7 @@ CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		t.addPageField(index);
 		ws.updatePivotTable(t);
 	});
@@ -2851,7 +2956,7 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 CT_pivotTableDefinition.prototype.asc_removeField = function (api, index) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
-		ws.clearPivotRable(t);
+		ws.clearPivotTable(t);
 		t.removeField(index);
 		ws.updatePivotTable(t);
 	});
@@ -2920,6 +3025,120 @@ CT_pivotTableDefinition.prototype.changeGrandTotals = function (items, newVal) {
 		items.count = i.length;
 	}
 	return res;
+};
+
+function CT_pivotTableDefinitionX14() {
+//Attributes
+	this.fillDownLabelsDefault = null;//false
+	this.visualTotalsForSets = null;//false
+	this.calculatedMembersInFilters = null;//false
+	this.altText = null;
+	this.altTextSummary = null;
+	this.enableEdit = null;//false
+	this.autoApply = null;//false
+	this.allocationMethod = null;//equalAllocation
+	this.weightExpression = null;
+	this.hideValuesRow = null;//false
+//Members
+	//this.pivotEdits = null;
+	//this.pivotChanges = null;
+	//this.conditionalFormats = null;
+}
+
+CT_pivotTableDefinitionX14.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["fillDownLabelsDefault"];
+		if (undefined !== val) {
+			this.fillDownLabelsDefault = getBoolFromXml(val);
+		}
+		val = vals["visualTotalsForSets"];
+		if (undefined !== val) {
+			this.visualTotalsForSets = getBoolFromXml(val);
+		}
+		val = vals["calculatedMembersInFilters"];
+		if (undefined !== val) {
+			this.calculatedMembersInFilters = getBoolFromXml(val);
+		}
+		val = vals["altText"];
+		if (undefined !== val) {
+			this.altText = AscCommon.unleakString(uq(val));
+		}
+		val = vals["altTextSummary"];
+		if (undefined !== val) {
+			this.altTextSummary = AscCommon.unleakString(uq(val));
+		}
+		val = vals["enableEdit"];
+		if (undefined !== val) {
+			this.enableEdit = getBoolFromXml(val);
+		}
+		val = vals["autoApply"];
+		if (undefined !== val) {
+			this.autoApply = getBoolFromXml(val);
+		}
+		val = vals["allocationMethod"];
+		if (undefined !== val) {
+			val = FromXml_ST_AllocationMethod(val);
+			if (-1 !== val) {
+				this.allocationMethod = val;
+			}
+		}
+		val = vals["weightExpression"];
+		if (undefined !== val) {
+			this.weightExpression = AscCommon.unleakString(uq(val));
+		}
+		val = vals["hideValuesRow"];
+		if (undefined !== val) {
+			this.hideValuesRow = getBoolFromXml(val);
+		}
+	}
+};
+CT_pivotTableDefinitionX14.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("pivotTableDefinition" === elem) {
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_pivotTableDefinitionX14.prototype.toXml = function(writer) {
+	writer.WriteXmlNodeStart("x14:pivotTableDefinition");
+	writer.WriteXmlString(" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"");
+	if (null !== this.fillDownLabelsDefault) {
+		writer.WriteXmlAttributeBool("fillDownLabelsDefault", this.fillDownLabelsDefault);
+	}
+	if (null !== this.visualTotalsForSets) {
+		writer.WriteXmlAttributeBool("visualTotalsForSets", this.visualTotalsForSets);
+	}
+	if (null !== this.calculatedMembersInFilters) {
+		writer.WriteXmlAttributeBool("calculatedMembersInFilters", this.calculatedMembersInFilters);
+	}
+	if (null !== this.altText) {
+		writer.WriteXmlAttributeStringEncode("altText", this.altText);
+	}
+	if (null !== this.altTextSummary) {
+		writer.WriteXmlAttributeStringEncode("altTextSummary", this.altTextSummary);
+	}
+	if (null !== this.enableEdit) {
+		writer.WriteXmlAttributeBool("enableEdit", this.enableEdit);
+	}
+	if (null !== this.autoApply) {
+		writer.WriteXmlAttributeBool("autoApply", this.autoApply);
+	}
+	if (null !== this.allocationMethod) {
+		writer.WriteXmlAttributeStringEncode("allocationMethod", ToXml_ST_AllocationMethod(this.allocationMethod));
+	}
+	if (null !== this.weightExpression) {
+		writer.WriteXmlAttributeStringEncode("weightExpression", this.weightExpression);
+	}
+	if (null !== this.hideValuesRow) {
+		writer.WriteXmlAttributeBool("hideValuesRow", this.hideValuesRow);
+	}
+	writer.WriteXmlNodeEnd("pivotTableDefinition", true, true);
 };
 function CT_CacheSource() {
 //Attributes
@@ -3439,7 +3658,7 @@ CT_Boolean.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3461,28 +3680,46 @@ CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Boolean.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Boolean.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeBool("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeBool("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Boolean.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && 0 === this.x.length;
+};
+CT_Boolean.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.x = [];
 };
 function CT_DateTime() {
 //Attributes
@@ -3500,7 +3737,9 @@ CT_DateTime.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			var d = new Date(uq(val));
+			this.v = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(),
+				d.getSeconds(),	d.getMilliseconds())).getExcelDateWithTime();
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -3512,7 +3751,7 @@ CT_DateTime.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3534,36 +3773,47 @@ CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_DateTime.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_DateTime.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", Date.prototype.getDateFromExcelWithTime(val).toISOString().slice(0, 19));
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
-	}
+
 	writer.WriteXmlNodeEnd(name);
 };
-CT_DateTime.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	var d = new Date(this.v);
-	res.number = new Date(Date.UTC(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(),
-		d.getMilliseconds())).getExcelDateWithTime();
-	res.type = AscCommon.CellValueType.Number;
-	return res;
+CT_DateTime.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && 0 === this.x.length;
+};
+CT_DateTime.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.x = [];
 };
 function CT_Error() {
 //Attributes
@@ -3580,7 +3830,7 @@ function CT_Error() {
 	this.st = null;//false
 	this.b = null;//false
 //Members
-	this.tpls = null;
+	this.tpls = [];
 	this.x = [];
 }
 CT_Error.prototype.readAttributes = function(attr, uq) {
@@ -3589,7 +3839,7 @@ CT_Error.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			this.v =  AscCommonExcel.cError.prototype.getErrorTypeFromString(uq(val));
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -3601,7 +3851,7 @@ CT_Error.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3644,7 +3894,7 @@ CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
-		this.tpls = newContext;
+		this.tpls.push(newContext);
 	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
@@ -3657,52 +3907,81 @@ CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Error.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Error.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", AscCommonExcel.cError.prototype.getStringFromErrorType(val));
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	if (null !== this.tpls) {
-		this.tpls.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Error.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && null === 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Error.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Missing() {
 //Attributes
@@ -3735,7 +4014,7 @@ CT_Missing.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3791,50 +4070,78 @@ CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Missing.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this);
+};
+CT_Missing.prototype.toXml2 = function(writer, name, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_Missing.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Missing.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Number() {
 //Attributes
@@ -3853,6 +4160,8 @@ function CT_Number() {
 //Members
 	this.tpls = [];
 	this.x = [];
+//internal
+	this.realNumber = null;
 }
 CT_Number.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -3872,7 +4181,7 @@ CT_Number.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -3928,59 +4237,81 @@ CT_Number.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Number.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_Number.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeNumber("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeNumber("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_Number.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	res.number = this.v;
-	res.type = AscCommon.CellValueType.Number;
-	return res;
+CT_Number.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_Number.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_String() {
 //Attributes
@@ -4006,7 +4337,7 @@ CT_String.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["v"];
 		if (undefined !== val) {
-			this.v = uq(val);
+			this.v = AscCommon.unleakString(uq(val));
 		}
 		val = vals["u"];
 		if (undefined !== val) {
@@ -4018,7 +4349,7 @@ CT_String.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["c"];
 		if (undefined !== val) {
-			this.c = uq(val);
+			this.c = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cp"];
 		if (undefined !== val) {
@@ -4074,59 +4405,81 @@ CT_String.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_String.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v, this);
+};
+CT_String.prototype.toXml2 = function(writer, name, val, obj) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeStringEncode("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeStringEncode("v", val);
 	}
-	if (null !== this.u) {
-		writer.WriteXmlAttributeBool("u", this.u);
-	}
-	if (null !== this.f) {
-		writer.WriteXmlAttributeBool("f", this.f);
-	}
-	if (null !== this.c) {
-		writer.WriteXmlAttributeStringEncode("c", this.c);
-	}
-	if (null !== this.cp) {
-		writer.WriteXmlAttributeNumber("cp", this.cp);
-	}
-	if (null !== this.in) {
-		writer.WriteXmlAttributeNumber("in", this.in);
-	}
-	if (null !== this.bc) {
-		writer.WriteXmlAttributeNumber("bc", this.bc);
-	}
-	if (null !== this.fc) {
-		writer.WriteXmlAttributeNumber("fc", this.fc);
-	}
-	if (null !== this.i) {
-		writer.WriteXmlAttributeBool("i", this.i);
-	}
-	if (null !== this.un) {
-		writer.WriteXmlAttributeBool("un", this.un);
-	}
-	if (null !== this.st) {
-		writer.WriteXmlAttributeBool("st", this.st);
-	}
-	if (null !== this.b) {
-		writer.WriteXmlAttributeBool("b", this.b);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.tpls.length; ++i) {
-		var elem = this.tpls[i];
-		elem.toXml(writer, "tpls");
-	}
-	for (var i = 0; i < this.x.length; ++i) {
-		var elem = this.x[i];
-		elem.toXml(writer, "x");
+	if (obj) {
+		if (null !== obj.u) {
+			writer.WriteXmlAttributeBool("u", obj.u);
+		}
+		if (null !== obj.f) {
+			writer.WriteXmlAttributeBool("f", obj.f);
+		}
+		if (null !== obj.c) {
+			writer.WriteXmlAttributeStringEncode("c", obj.c);
+		}
+		if (null !== obj.cp) {
+			writer.WriteXmlAttributeNumber("cp", obj.cp);
+		}
+		if (null !== obj.in) {
+			writer.WriteXmlAttributeNumber("in", obj.in);
+		}
+		if (null !== obj.bc) {
+			writer.WriteXmlAttributeNumber("bc", obj.bc);
+		}
+		if (null !== obj.fc) {
+			writer.WriteXmlAttributeNumber("fc", obj.fc);
+		}
+		if (null !== obj.i) {
+			writer.WriteXmlAttributeBool("i", obj.i);
+		}
+		if (null !== obj.un) {
+			writer.WriteXmlAttributeBool("un", obj.un);
+		}
+		if (null !== obj.st) {
+			writer.WriteXmlAttributeBool("st", obj.st);
+		}
+		if (null !== obj.b) {
+			writer.WriteXmlAttributeBool("b", obj.b);
+		}
+		writer.WriteXmlNodeEnd(name, true);
+		for (var i = 0; i < obj.tpls.length; ++i) {
+			var elem = obj.tpls[i];
+			elem.toXml(writer, "tpls");
+		}
+		for (var i = 0; i < obj.x.length; ++i) {
+			var elem = obj.x[i];
+			elem.toXml(writer, "x");
+		}
+	} else {
+		writer.WriteXmlNodeEnd(name, true);
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_String.prototype.getCellValue = function () {
-	var res = new AscCommonExcel.CCellValue();
-	res.text = this.v;
-	res.type = AscCommon.CellValueType.String;
-	return res;
+CT_String.prototype.isSimpleValue = function() {
+	return null === this.u && null === this.f && null === this.c && null === this.cp && null === this.in &&
+		null === this.bc && null === this.fc && null === this.i && null === this.un && null === this.st &&
+		null === this.b && 0 === this.tpls.length && 0 === this.x.length;
+};
+CT_String.prototype.clean = function() {
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+	this.tpls = [];
+	this.x = [];
 };
 function CT_Index() {
 //Attributes
@@ -4143,11 +4496,20 @@ CT_Index.prototype.readAttributes = function(attr, uq) {
 	}
 };
 CT_Index.prototype.toXml = function(writer, name) {
+	this.toXml2(writer, name, this.v);
+};
+CT_Index.prototype.toXml2 = function(writer, name, val) {
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.v) {
-		writer.WriteXmlAttributeNumber("v", this.v);
+	if (null !== val) {
+		writer.WriteXmlAttributeNumber("v", val);
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
+};
+CT_Index.prototype.isSimpleValue = function() {
+	return true;
+};
+CT_Index.prototype.clean = function() {
+	this.v = null;
 };
 function CT_Location() {
 //Attributes
@@ -4157,6 +4519,8 @@ function CT_Location() {
 	this.firstDataCol = null;
 	this.rowPageCount = null;//0
 	this.colPageCount = null;//0
+// private
+	this.refWithPage = null;
 }
 CT_Location.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -4220,8 +4584,19 @@ CT_Location.prototype.contains = function (col, row) {
 	return this.ref && this.ref.contains(col, row);
 };
 CT_Location.prototype.setPageCount = function (row, col) {
+	var c2;
 	this.rowPageCount = row;
 	this.colPageCount = col;
+	if (this.ref) {
+		this.refWithPage = this.ref.clone();
+		if (this.rowPageCount) {
+			this.refWithPage.setOffsetFirst(new AscCommonExcel.CRangeOffset(0, - (this.rowPageCount + 1)));
+		}
+		c2 = this.colPageCount * 3 - 1 - 1;
+		if (c2 > this.refWithPage.c2) {
+			this.refWithPage.setOffsetLast(new AscCommonExcel.CRangeOffset(c2 - this.refWithPage.c2, 0));
+		}
+	}
 };
 function CT_PivotFields() {
 //Attributes
@@ -4702,7 +5077,7 @@ CT_PivotTableStyle.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showRowHeaders"];
 		if (undefined !== val) {
@@ -4769,46 +5144,71 @@ CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
 CT_PivotTableStyle.prototype.asc_setName = function(api, pivot, newVal) {
 	if (newVal !== this.name) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setName(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setName(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showRowHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowHeaders(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowRowHeaders(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showColHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColHeaders(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowColHeaders(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showRowStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowStripes(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowRowStripes(newVal, pivot, ws)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showColStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColStripes(newVal)});
+		api._changePivotStyle(pivot, function(ws) {t._setShowColStripes(newVal, pivot, ws)});
 	}
 };
-CT_PivotTableStyle.prototype._setName = function(newVal) {
+CT_PivotTableStyle.prototype._setName = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.name !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleName,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.name, newVal));
+	}
 	this.name = newVal;
 };
-CT_PivotTableStyle.prototype._setShowRowHeaders = function(newVal) {
+CT_PivotTableStyle.prototype._setShowRowHeaders = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showRowHeaders !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowRowHeaders,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showRowHeaders, newVal));
+	}
 	this.showRowHeaders = newVal;
 };
-CT_PivotTableStyle.prototype._setShowColHeaders = function(newVal) {
+CT_PivotTableStyle.prototype._setShowColHeaders = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showColHeaders !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowColHeaders,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showColHeaders, newVal));
+	}
 	this.showColHeaders = newVal;
 };
-CT_PivotTableStyle.prototype._setShowRowStripes = function(newVal) {
+CT_PivotTableStyle.prototype._setShowRowStripes = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showRowStripes !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowRowStripes,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showRowStripes, newVal));
+	}
 	this.showRowStripes = newVal;
 };
-CT_PivotTableStyle.prototype._setShowColStripes = function(newVal) {
+CT_PivotTableStyle.prototype._setShowColStripes = function (newVal, pivot, ws) {
+	if (History.Is_On() && this.showColStripes !== newVal) {
+		History.Add(AscCommonExcel.g_oUndoRedoPivotTables, AscCH.historyitem_PivotTable_StyleShowColStripes,
+			ws ? ws.getId() : null, null,
+			new AscCommonExcel.UndoRedoData_PivotTable(pivot && pivot.asc_getName(), this.showColStripes, newVal));
+	}
 	this.showColStripes = newVal;
 };
 function CT_PivotFilters() {
@@ -4990,26 +5390,47 @@ function CT_WorksheetSource() {
 	this.name = null;
 	this.sheet = null;
 	this.id = null;
+//Private
+	this.formula = null;
 }
+CT_WorksheetSource.prototype.onFormulaEvent = function (type, eventData) {
+	if (AscCommon.c_oNotifyParentType.CanDo === type) {
+		return true;
+	} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
+		// ToDo update formula with eventData.assemble;
+	}
+};
 CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
 		var val;
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sheet"];
 		if (undefined !== val) {
-			this.sheet = uq(val);
+			this.sheet = AscCommon.unleakString(uq(val));
 		}
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
+		}
+
+		var text;
+		if (this.name) {
+			text = this.name;
+		} else if (this.ref && this.sheet) {
+			text = AscCommon.parserHelp.get3DRef(this.sheet, this.ref);
+		}
+		if (text) {
+			this.formula = new AscCommonExcel.parserFormula(text, this, AscCommonExcel.g_DefNameWorksheet);
+			this.formula.parse();
+			this.formula.buildDependencies();
 		}
 	}
 };
@@ -5057,15 +5478,15 @@ CT_CacheField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["propertyName"];
 		if (undefined !== val) {
-			this.propertyName = uq(val);
+			this.propertyName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["serverField"];
 		if (undefined !== val) {
@@ -5081,7 +5502,7 @@ CT_CacheField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["formula"];
 		if (undefined !== val) {
-			this.formula = uq(val);
+			this.formula = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sqlType"];
 		if (undefined !== val) {
@@ -5201,7 +5622,7 @@ CT_CacheField.prototype.asc_getName = function () {
 	return this.name;
 };
 CT_CacheField.prototype.getSharedItem = function (index) {
-	return this.sharedItems && this.sharedItems.Items[index];
+	return this.sharedItems && this.sharedItems.Items.get(index);
 };
 function CT_CacheHierarchy() {
 //Attributes
@@ -5238,11 +5659,11 @@ CT_CacheHierarchy.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measure"];
 		if (undefined !== val) {
@@ -5274,27 +5695,27 @@ CT_CacheHierarchy.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["defaultMemberUniqueName"];
 		if (undefined !== val) {
-			this.defaultMemberUniqueName = uq(val);
+			this.defaultMemberUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["allUniqueName"];
 		if (undefined !== val) {
-			this.allUniqueName = uq(val);
+			this.allUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["allCaption"];
 		if (undefined !== val) {
-			this.allCaption = uq(val);
+			this.allCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["dimensionUniqueName"];
 		if (undefined !== val) {
-			this.dimensionUniqueName = uq(val);
+			this.dimensionUniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["displayFolder"];
 		if (undefined !== val) {
-			this.displayFolder = uq(val);
+			this.displayFolder = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measureGroup"];
 		if (undefined !== val) {
-			this.measureGroup = uq(val);
+			this.measureGroup = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measures"];
 		if (undefined !== val) {
@@ -5451,47 +5872,47 @@ CT_PCDKPI.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["displayFolder"];
 		if (undefined !== val) {
-			this.displayFolder = uq(val);
+			this.displayFolder = AscCommon.unleakString(uq(val));
 		}
 		val = vals["measureGroup"];
 		if (undefined !== val) {
-			this.measureGroup = uq(val);
+			this.measureGroup = AscCommon.unleakString(uq(val));
 		}
 		val = vals["parent"];
 		if (undefined !== val) {
-			this.parent = uq(val);
+			this.parent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["value"];
 		if (undefined !== val) {
-			this.value = uq(val);
+			this.value = AscCommon.unleakString(uq(val));
 		}
 		val = vals["goal"];
 		if (undefined !== val) {
-			this.goal = uq(val);
+			this.goal = AscCommon.unleakString(uq(val));
 		}
 		val = vals["status"];
 		if (undefined !== val) {
-			this.status = uq(val);
+			this.status = AscCommon.unleakString(uq(val));
 		}
 		val = vals["trend"];
 		if (undefined !== val) {
-			this.trend = uq(val);
+			this.trend = AscCommon.unleakString(uq(val));
 		}
 		val = vals["weight"];
 		if (undefined !== val) {
-			this.weight = uq(val);
+			this.weight = AscCommon.unleakString(uq(val));
 		}
 		val = vals["time"];
 		if (undefined !== val) {
-			this.time = uq(val);
+			this.time = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -5740,7 +6161,7 @@ CT_CalculatedItem.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["formula"];
 		if (undefined !== val) {
-			this.formula = uq(val);
+			this.formula = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -5798,23 +6219,23 @@ CT_CalculatedMember.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["mdx"];
 		if (undefined !== val) {
-			this.mdx = uq(val);
+			this.mdx = AscCommon.unleakString(uq(val));
 		}
 		val = vals["memberName"];
 		if (undefined !== val) {
-			this.memberName = uq(val);
+			this.memberName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["hierarchy"];
 		if (undefined !== val) {
-			this.hierarchy = uq(val);
+			this.hierarchy = AscCommon.unleakString(uq(val));
 		}
 		val = vals["parent"];
 		if (undefined !== val) {
-			this.parent = uq(val);
+			this.parent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["solveOrder"];
 		if (undefined !== val) {
@@ -5885,15 +6306,15 @@ CT_PivotDimension.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -5924,11 +6345,11 @@ CT_MeasureGroup.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -5975,9 +6396,7 @@ function CT_Extension() {
 //Attributes
 	this.uri = null;
 //Members
-	this.Any = null;
-//internal
-	this._curElem = null;
+	this.elem = null;
 }
 CT_Extension.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -5985,36 +6404,34 @@ CT_Extension.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uri"];
 		if (undefined !== val) {
-			this.uri = uq(val);
+			this.uri = AscCommon.unleakString(uq(val));
 		}
 	}
 };
 CT_Extension.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("Any" === elem) {
-		this._curElem = elem;
+	if ("x14:pivotTableDefinition" === elem) {
+		newContext = new CT_pivotTableDefinitionX14();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.elem = newContext;
 	} else {
 		newContext = null;
 	}
 	return newContext;
 };
-CT_Extension.prototype.onTextNode = function(text, uq) {
-	if ("Any" === this._curElem) {
-		this.Any = uq(text);
-	}
-};
 CT_Extension.prototype.toXml = function(writer, name) {
-	writer.WriteXmlNodeStart(name);
-	if (null !== this.uri) {
-		writer.WriteXmlAttributeStringEncode("uri", this.uri);
-	}
-	writer.WriteXmlNodeEnd(name, true);
-	if (null !== this.Any) {
-		writer.WriteXmlNodeStart("Any", true);
-		writer.WriteXmlStringEncode(this.Any);
-		writer.WriteXmlNodeEnd("Any");
-	}
-	writer.WriteXmlNodeEnd(name);
+  if ("{962EF5D1-5CA2-4c93-8EF4-DBF5C05439D2}" === this.uri && this.elem) {
+    writer.WriteXmlNodeStart(name);
+    if (null !== this.uri) {
+      writer.WriteXmlAttributeStringEncode("uri", this.uri);
+      writer.WriteXmlString(" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"");
+    }
+    writer.WriteXmlNodeEnd(name, true);
+    this.elem.toXml(writer, "x14:pivotTableDefinition");
+    writer.WriteXmlNodeEnd(name);
+  }
 };
 function CT_X() {
 //Attributes
@@ -6142,7 +6559,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["axis"];
 		if (undefined !== val) {
@@ -6157,7 +6574,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["subtotalCaption"];
 		if (undefined !== val) {
-			this.subtotalCaption = uq(val);
+			this.subtotalCaption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showDropDowns"];
 		if (undefined !== val) {
@@ -6169,7 +6586,7 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["uniqueMemberProperty"];
 		if (undefined !== val) {
-			this.uniqueMemberProperty = uq(val);
+			this.uniqueMemberProperty = AscCommon.unleakString(uq(val));
 		}
 		val = vals["compact"];
 		if (undefined !== val) {
@@ -6687,11 +7104,11 @@ CT_PageField.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["cap"];
 		if (undefined !== val) {
-			this.cap = uq(val);
+			this.cap = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -6755,7 +7172,7 @@ CT_DataField.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["fld"];
 		if (undefined !== val) {
@@ -6853,7 +7270,7 @@ CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
 			t.asc_setSubtotal(newVal.subtotal);
 		}
 
-		ws.clearPivotRable(pivot);
+		ws.clearPivotTable(pivot);
 		ws.updatePivotTable(pivot);
 	});
 };
@@ -7117,7 +7534,7 @@ CT_PivotHierarchy.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7248,19 +7665,19 @@ CT_PivotFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["description"];
 		if (undefined !== val) {
-			this.description = uq(val);
+			this.description = AscCommon.unleakString(uq(val));
 		}
 		val = vals["stringValue1"];
 		if (undefined !== val) {
-			this.stringValue1 = uq(val);
+			this.stringValue1 = AscCommon.unleakString(uq(val));
 		}
 		val = vals["stringValue2"];
 		if (undefined !== val) {
-			this.stringValue2 = uq(val);
+			this.stringValue2 = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7447,7 +7864,7 @@ function CT_SharedItems() {
 	this.count = null;
 	this.longText = null;//false
 //Members
-	this.Items = [];
+	this.Items = new PivotRecords();
 }
 CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -7495,15 +7912,16 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["minDate"];
 		if (undefined !== val) {
-			this.minDate = uq(val);
+			this.minDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["maxDate"];
 		if (undefined !== val) {
-			this.maxDate = uq(val);
+			this.maxDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["count"];
 		if (undefined !== val) {
 			this.count = val - 0;
+			this.Items.setStartCount(this.count);
 		}
 		val = vals["longText"];
 		if (undefined !== val) {
@@ -7513,46 +7931,16 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
+	var newContextCandidate = this.Items.onStartNode(elem, attr, uq);
+	if (newContextCandidate) {
+		newContext = newContextCandidate;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_SharedItems.prototype.onEndNode = function(prevContext, elem) {
+	this.Items.onEndNode(prevContext, elem);
 };
 CT_SharedItems.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeStart(name);
@@ -7599,22 +7987,7 @@ CT_SharedItems.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeBool("longText", this.longText);
 	}
 	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.Items.length; ++i) {
-		var elem = this.Items[i];
-		if (elem instanceof CT_Boolean) {
-			elem.toXml(writer, "b");
-		} else if (elem instanceof CT_DateTime) {
-			elem.toXml(writer, "d");
-		} else if (elem instanceof CT_Error) {
-			elem.toXml(writer, "e");
-		} else if (elem instanceof CT_Missing) {
-			elem.toXml(writer, "m");
-		} else if (elem instanceof CT_Number) {
-			elem.toXml(writer, "n");
-		} else if (elem instanceof CT_String) {
-			elem.toXml(writer, "s");
-		}
-	}
+	this.Items.toXml(writer);
 	writer.WriteXmlNodeEnd(name);
 };
 function CT_FieldGroup() {
@@ -7792,7 +8165,7 @@ CT_Set.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["setDefinition"];
 		if (undefined !== val) {
-			this.setDefinition = uq(val);
+			this.setDefinition = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sortType"];
 		if (undefined !== val) {
@@ -7865,7 +8238,7 @@ CT_Query.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["mdx"];
 		if (undefined !== val) {
-			this.mdx = uq(val);
+			this.mdx = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7904,11 +8277,11 @@ CT_ServerFormat.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["culture"];
 		if (undefined !== val) {
-			this.culture = uq(val);
+			this.culture = AscCommon.unleakString(uq(val));
 		}
 		val = vals["format"];
 		if (undefined !== val) {
-			this.format = uq(val);
+			this.format = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -7981,7 +8354,7 @@ CT_PivotArea.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["offset"];
 		if (undefined !== val) {
-			this.offset = uq(val);
+			this.offset = AscCommon.unleakString(uq(val));
 		}
 		val = vals["collapsedLevelsAreSubtotals"];
 		if (undefined !== val) {
@@ -8314,7 +8687,7 @@ CT_AutoFilter.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8435,19 +8808,19 @@ CT_RangeSet.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["sheet"];
 		if (undefined !== val) {
-			this.sheet = uq(val);
+			this.sheet = AscCommon.unleakString(uq(val));
 		}
 		val = vals["r:id"];
 		if (undefined !== val) {
-			this.id = uq(val);
+			this.id = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -8520,11 +8893,11 @@ CT_RangePr.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["startDate"];
 		if (undefined !== val) {
-			this.startDate = uq(val);
+			this.startDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["endDate"];
 		if (undefined !== val) {
-			this.endDate = uq(val);
+			this.endDate = AscCommon.unleakString(uq(val));
 		}
 		val = vals["groupInterval"];
 		if (undefined !== val) {
@@ -8605,7 +8978,7 @@ function CT_GroupItems() {
 //Attributes
 	this.count = null;
 //Members
-	this.Items = [];
+	this.Items = new PivotRecords();
 }
 CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -8614,51 +8987,22 @@ CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 		val = vals["count"];
 		if (undefined !== val) {
 			this.count = val - 0;
+			this.Items.setStartCount(this.count);
 		}
 	}
 };
 CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.Items.push(newContext);
+	var newContextCandidate = this.Items.onStartNode(elem, attr, uq);
+	if (newContextCandidate) {
+		newContext = newContextCandidate;
 	} else {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_GroupItems.prototype.onEndNode = function(prevContext, elem) {
+	this.Items.onEndNode(prevContext, elem);
 };
 CT_GroupItems.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeStart(name);
@@ -8666,22 +9010,7 @@ CT_GroupItems.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	writer.WriteXmlNodeEnd(name, true);
-	for (var i = 0; i < this.Items.length; ++i) {
-		var elem = this.Items[i];
-		if (elem instanceof CT_Boolean) {
-			elem.toXml(writer, "b");
-		} else if (elem instanceof CT_DateTime) {
-			elem.toXml(writer, "d");
-		} else if (elem instanceof CT_Error) {
-			elem.toXml(writer, "e");
-		} else if (elem instanceof CT_Missing) {
-			elem.toXml(writer, "m");
-		} else if (elem instanceof CT_Number) {
-			elem.toXml(writer, "n");
-		} else if (elem instanceof CT_String) {
-			elem.toXml(writer, "s");
-		}
-	}
+	this.Items.toXml(writer);
 	writer.WriteXmlNodeEnd(name);
 };
 function CT_FieldUsage() {
@@ -8721,11 +9050,11 @@ CT_GroupLevel.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["user"];
 		if (undefined !== val) {
@@ -8840,7 +9169,7 @@ CT_Item.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["n"];
 		if (undefined !== val) {
-			this.n = uq(val);
+			this.n = AscCommon.unleakString(uq(val));
 		}
 		val = vals["t"];
 		if (undefined !== val) {
@@ -8942,7 +9271,7 @@ CT_MemberProperty.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["showCell"];
 		if (undefined !== val) {
@@ -9019,7 +9348,7 @@ CT_Member.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9177,7 +9506,7 @@ CT_SortState.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9234,7 +9563,7 @@ CT_PageItem.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9560,11 +9889,11 @@ CT_DynamicFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["valIso"];
 		if (undefined !== val) {
-			this.valIso = uq(val);
+			this.valIso = AscCommon.unleakString(uq(val));
 		}
 		val = vals["maxValIso"];
 		if (undefined !== val) {
-			this.maxValIso = uq(val);
+			this.maxValIso = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9751,11 +10080,11 @@ CT_SortCondition.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommon.unleakString(uq(val));
 		}
 		val = vals["customList"];
 		if (undefined !== val) {
-			this.customList = uq(val);
+			this.customList = AscCommon.unleakString(uq(val));
 		}
 		val = vals["dxfId"];
 		if (undefined !== val) {
@@ -9816,19 +10145,19 @@ CT_LevelGroup.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["name"];
 		if (undefined !== val) {
-			this.name = uq(val);
+			this.name = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["caption"];
 		if (undefined !== val) {
-			this.caption = uq(val);
+			this.caption = AscCommon.unleakString(uq(val));
 		}
 		val = vals["uniqueParent"];
 		if (undefined !== val) {
-			this.uniqueParent = uq(val);
+			this.uniqueParent = AscCommon.unleakString(uq(val));
 		}
 		val = vals["id"];
 		if (undefined !== val) {
@@ -9890,7 +10219,7 @@ CT_CustomFilter.prototype.readAttributes = function(attr, uq) {
 		}
 		val = vals["val"];
 		if (undefined !== val) {
-			this.val = uq(val);
+			this.val = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -9914,7 +10243,7 @@ CT_Filter.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["val"];
 		if (undefined !== val) {
-			this.val = uq(val);
+			this.val = AscCommon.unleakString(uq(val));
 		}
 	}
 };
@@ -10049,7 +10378,7 @@ CT_GroupMember.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["uniqueName"];
 		if (undefined !== val) {
-			this.uniqueName = uq(val);
+			this.uniqueName = AscCommon.unleakString(uq(val));
 		}
 		val = vals["group"];
 		if (undefined !== val) {
@@ -10066,6 +10395,434 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeBool("group", this.group);
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
+};
+
+var c_oAscPivotRecType = {
+	Boolean: 1,
+	DateTime: 2,
+	Error: 3,
+	Missing: 4,
+	Number: 5,
+	String: 6,
+	Index: 7
+};
+var c_nNumberMissingValue =  2147483647;//Math.pow(2, 31) - 1
+
+function PivotRecordValue() {
+	this.clean();
+};
+PivotRecordValue.prototype.clean = function() {
+	this.type = undefined;
+	this.val = undefined;
+	this.addition = undefined;
+}
+PivotRecordValue.prototype.getCellValue = function() {
+	var res = new AscCommonExcel.CCellValue();
+	switch (this.type) {
+		case c_oAscPivotRecType.Boolean:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val ? 1 : 0;
+			break;
+		case c_oAscPivotRecType.DateTime:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val;
+			break;
+		case c_oAscPivotRecType.Error:
+			res.type = AscCommon.CellValueType.String;
+			res.text = AscCommonExcel.cError.prototype.getStringFromErrorType(this.val);
+			break;
+		case c_oAscPivotRecType.Number:
+			res.type = AscCommon.CellValueType.Number;
+			res.number = this.val;
+			break;
+		case c_oAscPivotRecType.String:
+			res.type = AscCommon.CellValueType.String;
+			res.text = this.val;
+			break;
+		default:
+			var i = 0;
+			break;
+	}
+	return res;
+};
+
+function PivotRecords() {
+	this.chunks = [];
+	this.addition = {};
+	this.size = 0;
+	this.startCount = 0;
+
+//inner
+	this._curBoolean = new CT_Boolean();
+	this._curDateTime = new CT_DateTime();
+	this._curError = new CT_Error();
+	this._curMissing = new CT_Missing();
+	this._curNumber = new CT_Number();
+	this._curString = new CT_String();
+	this._curIndex = new CT_Index();
+	this.output = new PivotRecordValue();
+}
+
+PivotRecords.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = null;
+	if ("b" === elem) {
+		this._curBoolean.clean();
+		newContext = this._curBoolean;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("d" === elem) {
+		this._curDateTime.clean();
+		newContext = this._curDateTime;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("e" === elem) {
+		this._curError.clean();
+		newContext = this._curError;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("m" === elem) {
+		this._curMissing.clean();
+		newContext = this._curMissing;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("n" === elem) {
+		this._curNumber.clean();
+		newContext = this._curNumber;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("s" === elem) {
+		this._curString.clean();
+		newContext = this._curString;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	} else if ("x" === elem) {
+		this._curIndex.clean();
+		newContext = this._curIndex;
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+	}
+	return newContext;
+};
+PivotRecords.prototype.onEndNode = function(prevContext, elem) {
+	var res = true;
+	if ("b" === elem) {
+		if (this._curBoolean.isSimpleValue()) {
+			this.addBool(this._curBoolean.v);
+		} else {
+			this.addBool(this._curBoolean.v, this._curBoolean);
+			this._curBoolean = new CT_Boolean();
+		}
+	} else if ("d" === elem) {
+		if (this._curDateTime.isSimpleValue()) {
+			this.addDate(this._curDateTime.v);
+		} else {
+			this.addDate(this._curDateTime.v, this._curDateTime);
+			this._curDateTime = new CT_DateTime();
+		}
+	} else if ("e" === elem) {
+		if (this._curError.isSimpleValue()) {
+			this.addError(this._curError.v);
+		} else {
+			this.addError(this._curError.v, this._curError);
+			this._curError = new CT_Error();
+		}
+	} else if ("m" === elem) {
+		if (this._curMissing.isSimpleValue()) {
+			this.addMissing();
+		} else {
+			this.addMissing(this._curMissing);
+			this._curMissing = new CT_Missing();
+		}
+	} else if ("n" === elem) {
+		if (this._curNumber.isSimpleValue()) {
+			this.addNumber(this._curNumber.v);
+		} else {
+			this.addNumber(this._curNumber.v, this._curNumber);
+			this._curNumber = new CT_Number();
+		}
+	} else if ("s" === elem) {
+		if (this._curString.isSimpleValue()) {
+			this.addString(this._curString.v);
+		} else {
+			this.addString(this._curString.v, this._curString);
+			this._curString = new CT_String();
+		}
+	} else if ("x" === elem) {
+		this.addIndex(this._curIndex.v);
+	} else {
+		res = false;
+	}
+	return res;
+};
+PivotRecords.prototype.toXml = function(writer, opt_index) {
+	if (undefined !== opt_index) {
+		this._toXml(writer, this.get(opt_index));
+	} else {
+		for (var i = 0; i < this.size; ++i) {
+			this._toXml(writer, this.get(i));
+		}
+	}
+};
+PivotRecords.prototype.setStartCount = function(val) {
+	this.startCount = val;
+};
+PivotRecords.prototype.addBool = function(val, addition) {
+	this._add(c_oAscPivotRecType.Boolean, val, addition);
+};
+PivotRecords.prototype.addDate = function(val, addition) {
+	this._add(c_oAscPivotRecType.DateTime, val, addition);
+};
+PivotRecords.prototype.addError = function(val, addition) {
+	this._add(c_oAscPivotRecType.Error, val, addition);
+};
+PivotRecords.prototype.addMissing = function(addition) {
+	this._add(c_oAscPivotRecType.Missing, undefined, addition);
+};
+PivotRecords.prototype.addNumber = function(val, addition) {
+	this._add(c_oAscPivotRecType.Number, val, addition);
+};
+PivotRecords.prototype.addString = function(val, addition) {
+	//todo don't use global editor
+	val = window["Asc"]["editor"].wbModel.sharedStrings.addText(val);
+	this._add(c_oAscPivotRecType.String, val, addition);
+};
+PivotRecords.prototype.addIndex = function(val) {
+	val++;//0 is missing value
+	this._add(c_oAscPivotRecType.Index, val);
+};
+PivotRecords.prototype.get = function(index) {
+	this.output.clean();
+	for (var i = 0; i < this.chunks.length; ++i) {
+		var chunk = this.chunks[i];
+		if (chunk.from <= index && index < chunk.to) {
+			this.output.type = chunk.type;
+			this.output.addition = this.addition[index];
+			if (chunk.data) {
+				this.output.val = chunk.data[index - chunk.from];
+				this._replaceMissingInOutput(chunk.type, this.output);
+			}
+			break;
+		}
+	}
+	return this.output;
+};
+PivotRecords.prototype._add = function(type, val, addition) {
+	var index = this.size;
+	var prevChunk = this.chunks.length > 0 ? this.chunks[this.chunks.length - 1] : null;
+	var chunk;
+	var chunkIndex;
+	if (prevChunk && (prevChunk.type === type || c_oAscPivotRecType.Missing === type)) {
+		chunk = prevChunk;
+		if (c_oAscPivotRecType.Missing === type) {
+			val = this._getMissingFakeVal(chunk.type);
+		} else if (c_oAscPivotRecType.Number === type && c_nNumberMissingValue === val) {
+			//because there are much more Missing values than c_nNumberMissingValue.
+			if(!addition){
+				addition = new CT_Number();
+			}
+			addition.realNumber = true;
+		}
+	} else {
+		if (prevChunk && prevChunk.type === c_oAscPivotRecType.Missing) {
+			//convert Missing chunk
+			chunk = prevChunk;
+			chunk.type = type;
+			chunkIndex = index - chunk.from;
+			this._checkChunkSize(chunk, chunkIndex);
+			var missingVal = this._getMissingFakeVal(chunk.type);
+			chunk.data.fill(missingVal, 0, chunkIndex);
+		} else {
+			//todo shrink prevChunk
+			var from = prevChunk ? prevChunk.to : 0;
+			chunk = {type: type, data: null, capacity: 0, from: from, to: from + 1};
+			this.chunks.push(chunk);
+		}
+	}
+	chunkIndex = index - chunk.from;
+	if (c_oAscPivotRecType.Missing !== chunk.type) {
+		this._checkChunkSize(chunk, chunkIndex);
+	}
+	if (chunk.data) {
+		chunk.data[chunkIndex] = val;
+	}
+	if (addition) {
+		this.addition[index] = addition;
+	}
+	this.size++;
+	chunk.to = this.size;
+};
+PivotRecords.prototype._checkChunkSize = function(chunk, chunkIndex) {
+	if (chunkIndex >= chunk.capacity) {
+		var oldData = chunk.data;
+		var chunkStartCount = (0 === this.size && this.startCount) ? this.startCount - chunk.from : 0;
+		var maxSize = Math.max((1.1 * chunk.capacity) >> 0, chunkIndex + 1, chunkStartCount);
+		chunk.capacity = Math.min(maxSize, AscCommon.gc_nMaxRow0 + 1);
+		switch (chunk.type) {
+			case c_oAscPivotRecType.Boolean:
+				chunk.data = new Uint8Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.DateTime:
+				chunk.data = new Float64Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.Error:
+				chunk.data = new Uint8Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.Missing:
+				break;
+			case c_oAscPivotRecType.Number:
+				chunk.data = new Float64Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.String:
+				chunk.data = new Uint32Array(chunk.capacity);
+				break;
+			case c_oAscPivotRecType.Index:
+				chunk.data = new Uint32Array(chunk.capacity);
+				break;
+		}
+		if (oldData) {
+			chunk.data.set(oldData);
+		}
+	}
+};
+PivotRecords.prototype._getMissingFakeVal = function(type) {
+	var res;
+	switch (type) {
+		case c_oAscPivotRecType.Boolean:
+			res = 255;
+			break;
+		case c_oAscPivotRecType.DateTime:
+			res = -1;
+			break;
+		case c_oAscPivotRecType.Error:
+			res = 255;
+			break;
+		case c_oAscPivotRecType.Number:
+			res = c_nNumberMissingValue;
+			break;
+		case c_oAscPivotRecType.String:
+			res = 0;
+			break;
+		case c_oAscPivotRecType.Index:
+			res = 0;
+			break;
+	}
+	return res;
+};
+PivotRecords.prototype._replaceMissingInOutput = function(type, output) {
+	switch (type) {
+		case c_oAscPivotRecType.Boolean:
+			if (255 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				output.val = !!output.val;
+			}
+			break;
+		case c_oAscPivotRecType.DateTime:
+			if (-1 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.Error:
+			if (255 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.Number:
+			if (c_nNumberMissingValue === output.val && !(output.addition && output.addition.realNumber)) {
+				output.type = c_oAscPivotRecType.Missing;
+			}
+			break;
+		case c_oAscPivotRecType.String:
+			if (0 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				//todo don't use global editor
+				output.val = window["Asc"]["editor"].wbModel.sharedStrings.get(output.val);
+			}
+			break;
+		case c_oAscPivotRecType.Index:
+			if (0 === output.val) {
+				output.type = c_oAscPivotRecType.Missing;
+			} else {
+				--output.val;
+			}
+			break;
+	}
+};
+PivotRecords.prototype._toXml = function(writer, elem) {
+	switch (elem.type) {
+		case c_oAscPivotRecType.Boolean:
+			CT_Boolean.prototype.toXml2(writer, "b", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.DateTime:
+			CT_DateTime.prototype.toXml2(writer, "d", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Error:
+			CT_Error.prototype.toXml2(writer, "e", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Missing:
+			CT_Missing.prototype.toXml2(writer, "m", elem.addition);
+			break;
+		case c_oAscPivotRecType.Number:
+			CT_Number.prototype.toXml2(writer, "n", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.String:
+			CT_String.prototype.toXml2(writer, "s", elem.val, elem.addition);
+			break;
+		case c_oAscPivotRecType.Index:
+			CT_Index.prototype.toXml2(writer, "x", elem.val);
+			break;
+	}
+};
+
+function CChangesPivotTableDefinitionDelete(Class, bReverse) {
+	this.Type = AscDFH.historyitem_PivotTableDefinitionDelete;
+	this.bReverse = bReverse;
+	AscDFH.CChangesBase.call(this, Class);
+}
+
+CChangesPivotTableDefinitionDelete.prototype = Object.create(AscDFH.CChangesBase.prototype);
+CChangesPivotTableDefinitionDelete.prototype.constructor = CChangesPivotTableDefinitionDelete;
+CChangesPivotTableDefinitionDelete.prototype.Undo = function () {
+	if (this.Class.worksheet) {
+		if (this.bReverse) {
+			this.Class.worksheet.deletePivotTable(this.Class.Get_Id());
+		} else {
+			this.Class.worksheet.insertPivotTable(this.Class);
+			this.Class.worksheet.updatePivotTablesStyle(null);
+		}
+
+	}
+};
+CChangesPivotTableDefinitionDelete.prototype.Redo = function () {
+	if (this.Class.worksheet) {
+		if (this.bReverse) {
+			this.Class.worksheet.insertPivotTable(this.Class);
+			this.Class.worksheet.updatePivotTablesStyle(null);
+		} else {
+			this.Class.worksheet.deletePivotTable(this.Class.Get_Id());
+		}
+	}
+};
+CChangesPivotTableDefinitionDelete.prototype.WriteToBinary = function (Writer) {
+	Writer.WriteBool(!!this.bReverse);
+};
+CChangesPivotTableDefinitionDelete.prototype.ReadFromBinary = function (Reader) {
+	this.bReverse = Reader.GetBool();
+};
+CChangesPivotTableDefinitionDelete.prototype.Load = function () {
+	this.Redo();
+	this.RefreshRecalcData();
+};
+CChangesPivotTableDefinitionDelete.prototype.CreateReverseChange = function () {
+	return new CChangesPivotTableDefinitionDelete(this.Class, !this.bReverse);
 };
 
 var prot;
@@ -10381,6 +11138,7 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+prot["asc_select"] = prot.asc_select;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
@@ -10423,3 +11181,7 @@ prot["asc_getShowDataAs"] = prot.asc_getShowDataAs;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setName"] = prot.asc_setName;
 prot["asc_setSubtotal"] = prot.asc_setSubtotal;
+
+window['AscDFH'].CChangesPivotTableDefinitionDelete = CChangesPivotTableDefinitionDelete;
+
+AscDFH.changesFactory[AscDFH.historyitem_PivotTableDefinitionDelete] = AscDFH.CChangesPivotTableDefinitionDelete;

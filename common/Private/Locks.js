@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -528,6 +528,7 @@ Paragraph.prototype.CheckContentControlDeletingLock = function()
 };
 CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 {
+	var bCheckContentControl = false;
     switch (CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
@@ -557,6 +558,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.CurCell.Content.Document_Is_SelectionLocked( CheckType );
 
+            bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Remove:
@@ -578,6 +580,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 				this.CurCell.Content.Document_Is_SelectionLocked(CheckType);
 			}
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Table_Properties:
@@ -587,6 +590,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.Lock.Check( this.Get_Id() );
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Table_RemoveCells:
@@ -614,6 +618,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             else
                 this.Lock.Check( this.Get_Id() );
 
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Document_SectPr:
@@ -623,6 +628,9 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             break;
         }
     }
+
+	if (bCheckContentControl && this.Parent && this.Parent.CheckContentControlEditingLock)
+		this.Parent.CheckContentControlEditingLock();
 };
 CTable.prototype.CheckContentControlDeletingLock = function()
 {
@@ -823,6 +831,20 @@ if(typeof CPresentation !== "undefined")
         if(!oController){
             return false;
         }
+
+        if(CheckType === AscCommon.changestype_Paragraph_Content)
+        {
+            var oTargetTextObject = oController.getTargetDocContent(false, true);
+            if(oTargetTextObject)
+            {
+                CheckType = AscCommon.changestype_Drawing_Props;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         if(CheckType === AscCommon.changestype_Drawing_Props)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
@@ -856,16 +878,30 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_AddShape || CheckType === AscCommon.changestype_AddComment)
         {
-            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
-                return true;
-            var check_obj =
+
+            if(CheckType === AscCommon.changestype_AddComment && AdditionalData && AdditionalData.Parent === this.comments)
             {
-                "type": c_oAscLockTypeElemPresentation.Object,
-                "slideId": slide_id,
-                "objId": AdditionalData.Get_Id(),
-                "guid": AdditionalData.Get_Id()
-            };
-            AdditionalData.Lock.Check(check_obj);
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.commentsLock.Get_Id(),
+                    "guid": this.commentsLock.Get_Id()
+                };
+                this.commentsLock.Lock.Check(check_obj);
+            }
+            else
+            {
+                if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                    return true;
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": AdditionalData.Get_Id(),
+                    "guid": AdditionalData.Get_Id()
+                };
+                AdditionalData.Lock.Check(check_obj);
+            }
         }
         if(CheckType === AscCommon.changestype_AddShapes)
         {
@@ -969,13 +1005,16 @@ if(typeof CPresentation !== "undefined")
         {
             if(!AdditionalData || !AdditionalData.All)
             {
+                var aSelectedSlides = this.Api.WordControl.Thumbnails.GetSelectedArray();
+                for(var i = 0; i < aSelectedSlides.length; ++i){
                     var check_obj =
-                    {
-                        "type": c_oAscLockTypeElemPresentation.Slide,
-                        "val": this.Slides[this.CurPage].timingLock.Get_Id(),
-                        "guid": this.Slides[this.CurPage].timingLock.Get_Id()
-                    };
-                    this.Slides[this.CurPage].timingLock.Lock.Check(check_obj);
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Slide,
+                            "val": this.Slides[this.CurPage].timingLock.Get_Id(),
+                            "guid": this.Slides[this.CurPage].timingLock.Get_Id()
+                        };
+                    this.Slides[aSelectedSlides[i]].timingLock.Lock.Check(check_obj);
+                }
             }
             else{
                 for(var i = 0; i < this.Slides.length; ++i)

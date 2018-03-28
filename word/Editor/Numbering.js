@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1725,6 +1725,121 @@ CAbstractNum.prototype =
 	}
 	
 };
+CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
+{
+	var Text = this.Lvl[Lvl].LvlText;
+
+	var sResult = "";
+	for ( var Index = 0; Index < Text.length; Index++ )
+	{
+		switch( Text[Index].Type )
+		{
+			case numbering_lvltext_Text:
+			{
+				sResult += Text[Index].Value;
+				break;
+			}
+			case numbering_lvltext_Num:
+			{
+				var CurLvl = Text[Index].Value;
+				switch( this.Lvl[CurLvl].Format )
+				{
+					case numbering_numfmt_Bullet:
+					{
+						break;
+					}
+					case numbering_numfmt_Decimal:
+					{
+						if (CurLvl < NumInfo.length)
+						{
+							sResult += "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
+						}
+						break;
+					}
+					case numbering_numfmt_DecimalZero:
+					{
+						if (CurLvl < NumInfo.length)
+						{
+							var T = "" + ( this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] );
+							if (1 === T.length)
+							{
+								sResult += '0' + T.charAt(0);
+							}
+							else
+							{
+								for (var Index2 = 0; Index2 < T.length; Index2++)
+								{
+									sResult += T.charAt(Index2);
+								}
+							}
+						}
+						break;
+					}
+					case numbering_numfmt_LowerLetter:
+					case numbering_numfmt_UpperLetter:
+					{
+						if (CurLvl < NumInfo.length)
+						{
+							// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
+							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl] - 1;
+
+							var Count = (Num - Num % 26) / 26;
+							var Ost   = Num % 26;
+
+							var Letter;
+							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
+								Letter = String.fromCharCode(Ost + 97);
+							else
+								Letter = String.fromCharCode(Ost + 65);
+
+							for (var Index2 = 0; Index2 < Count + 1; Index2++)
+								sResult += Letter;
+						}
+						break;
+					}
+					case numbering_numfmt_LowerRoman:
+					case numbering_numfmt_UpperRoman:
+					{
+						if (CurLvl < NumInfo.length)
+						{
+							var Num = this.Lvl[CurLvl].Start - 1 + NumInfo[CurLvl];
+
+							// Переводим число Num в римскую систему исчисления
+							var Rims;
+
+							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
+								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
+							else
+								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
+
+							var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
+
+							var Index2 = 0;
+							while (Num > 0)
+							{
+								while (Vals[Index2] <= Num)
+								{
+									sResult += Rims[Index2];
+									Num -= Vals[Index2];
+								}
+
+								Index2++;
+
+								if (Index2 >= Rims.length)
+									break;
+							}
+						}
+						break;
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+	return sResult;
+};
 
 function CNumbering()
 {
@@ -1864,6 +1979,11 @@ CNumbering.prototype =
         AllFonts["Courier New"] = true;
         AllFonts["Wingdings"]   = true;
     }
+};
+CNumbering.prototype.GetText = function(NumId, Lvl, NumInfo)
+{
+	var oAbstractId = this.Get_AbstractNum(NumId);
+	return oAbstractId.GetText(Lvl, NumInfo);
 };
 
 
@@ -2229,6 +2349,8 @@ function getNumInfoLvl(Lvl) {
                 NumSubType = 6;
             else if ( 0x00A8 === NumVal )
                 NumSubType = 7;
+            else if ( 0x2013 === NumVal )
+                NumSubType = 8;
         }
     }
     else

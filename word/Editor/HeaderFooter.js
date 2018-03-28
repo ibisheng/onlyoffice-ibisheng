@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -157,7 +157,7 @@ CHeaderFooter.prototype =
             bChanges = true;
         else
         {
-            OldSumH   = RecalcObj.Get_SummaryHeight();
+            OldSumH   = RecalcObj.GetSummaryHeight();
             OldBounds = RecalcObj.Get_PageBounds(0);
             RecalcObj.Get_DrawingFlowPos( OldFlowPos );
         }
@@ -233,7 +233,7 @@ CHeaderFooter.prototype =
 
         if ( false === bChanges )
         {
-            var NewSumH = this.Content.Get_SummaryHeight();
+            var NewSumH = this.Content.GetSummaryHeight();
             if ( Math.abs( OldSumH - NewSumH ) > 0.001 )
                 bChanges = true;
         }
@@ -542,7 +542,7 @@ CHeaderFooter.prototype =
 	UpdateCursorType : function(X, Y, PageAbs)
     {
         if (PageAbs != this.Content.Get_StartPage_Absolute())
-            this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+            this.DrawingDocument.SetCursorType("text", new AscCommon.CMouseMoveData());
         else
             return this.Content.UpdateCursorType(X, Y, 0);
     },
@@ -671,6 +671,10 @@ CHeaderFooter.prototype =
 	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
         this.Content.AddInlineImage(W,H,Img, Chart, bFlow);
+    },
+	AddImages : function(aImages)
+    {
+        this.Content.AddImages(aImages);
     },
     AddSignatureLine : function(oSignatureDrawing)
     {
@@ -992,9 +996,9 @@ CHeaderFooter.prototype =
 		return this.Content.SelectAll();
 	},
 
-	GetCurrentParagraph : function()
+	GetCurrentParagraph : function(bIgnoreSelection, arrSelectedParagraphs)
 	{
-		return this.Content.GetCurrentParagraph();
+		return this.Content.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 	},
 
 	StartSelectionFromCurPos : function()
@@ -1080,6 +1084,11 @@ CHeaderFooter.prototype =
     {
         return false;
     },
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		return this.Content.DistributeTableCells(isHorizontally);
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------    
@@ -1270,7 +1279,7 @@ CHeaderFooter.prototype.Update_PageCountElements = function(nPageCount)
 {
 	for (var nIndex = 0, nCount = this.PageCountElements.length; nIndex < nCount; ++nIndex)
 	{
-		this.PageCountElements[nIndex].Update_PageCount(nPageCount);
+		this.PageCountElements[nIndex].SetNumValue(nPageCount);
 	}
 };
 CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
@@ -1280,6 +1289,14 @@ CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
 CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
 {
 	return this.Content.GetAllContentControls(arrContentControls);
+};
+/**
+ * * Получаем класс, управляющий содержимым колонтитула
+ * @returns {CDocumentContent}
+ */
+CHeaderFooter.prototype.GetContent = function()
+{
+	return this.Content;
 };
 
 //-----------------------------------------------------------------------------------
@@ -1442,6 +1459,8 @@ CHeaderFooterController.prototype =
 
             Pr.Locked = this.Lock.Is_Locked();
 
+			Pr.StartPageNumber = SectPr.Get_PageNum_Start();
+
             return Pr;
         }
         else
@@ -1462,13 +1481,13 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------   
-    RecalculateCurPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.RecalculateCurPos();
+    RecalculateCurPos : function(bUpdateX, bUpdateY)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.RecalculateCurPos(bUpdateX, bUpdateY);
 
-        return null;
-    },
+		return null;
+	},
 
     Recalculate : function(PageIndex)
     {
@@ -1533,7 +1552,7 @@ CHeaderFooterController.prototype =
                 Footer.Reset( X, Y, XLimit, YLimit );
                 Footer.Recalculate2(PageIndex);
 
-                var SummaryHeight = Footer.Content.Get_SummaryHeight();
+                var SummaryHeight = Footer.Content.GetSummaryHeight();
                 Y = Math.max( 2 * YLimit / 3, YLimit - SectPr.Get_PageMargins_Footer() - SummaryHeight );
 
                 Footer.Reset( X, Y, XLimit, YLimit );
@@ -1849,6 +1868,11 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.AddInlineImage(W,H,Img, Chart, bFlow);
+    },
+	AddImages : function(aImages)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.AddImages(aImages);
     },
     AddSignatureLine : function(oSignatureDrawing)
     {
@@ -2326,9 +2350,9 @@ CHeaderFooterController.prototype =
             return { X : -1, Y : -1, Height : -1 };
     },
 
-	GetCurrentParagraph : function()
+	GetCurrentParagraph : function(bIgnoreSelection, arrSelectedParagraphs)
 	{
-		return this.CurHdrFtr.GetCurrentParagraph();
+		return this.CurHdrFtr.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 	},
 
 	StartSelectionFromCurPos : function()
@@ -2428,6 +2452,15 @@ CHeaderFooterController.prototype =
 		if (null != this.CurHdrFtr)
 			return this.CurHdrFtr.CanSplitTableCells();
 	},
+
+	DistributeTableCells : function(isHorizontally)
+	{
+		if (this.CurHdrFtr)
+			return this.CurHdrFtr.DistributeTableCells(isHorizontally);
+
+		return false;
+	},
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

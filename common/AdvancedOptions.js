@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -72,10 +72,12 @@
 				}
 				return arr;
 			}();
-			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], /*opt["delimiter"]*/AscCommon.c_oAscCsvDelimiter.Comma); // ToDo разделитель пока только "," http://bugzilla.onlyoffice.com/show_bug.cgi?id=31009
+			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], opt["delimiter"]);
+			this.data = opt["data"];
 		}
 		asc_CCSVOptions.prototype.asc_getCodePages = function(){ return this.codePages;};
 		asc_CCSVOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };
+		asc_CCSVOptions.prototype.asc_getData = function () { return this.data; };
 
 		/** @constructor */
 		function asc_CTXTOptions(opt){
@@ -89,9 +91,11 @@
 				return arr;
 			}();
 			this.recommendedSettings = new asc_CTXTAdvancedOptions (opt["codepage"]);
+			this.data = opt["data"];
 		}
 		asc_CTXTOptions.prototype.asc_getCodePages = function(){ return this.codePages;};
 		asc_CTXTOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };
+		asc_CTXTOptions.prototype.asc_getData = function () { return this.data; };
 
 		/** @constructor */
 		function asc_CCSVAdvancedOptions(codepage, delimiter, delimiterChar){
@@ -177,10 +181,12 @@
 		prot = asc_CCSVOptions.prototype;
 		prot["asc_getCodePages"]			= prot.asc_getCodePages;
 		prot["asc_getRecommendedSettings"]	= prot.asc_getRecommendedSettings;
+		prot["asc_getData"]	= prot.asc_getData;
 
 		prot = asc_CTXTOptions.prototype;
 		prot["asc_getCodePages"]			= prot.asc_getCodePages;
 		prot["asc_getRecommendedSettings"]	= prot.asc_getRecommendedSettings;
+		prot["asc_getData"]	= prot.asc_getData;
 
 		window["Asc"].asc_CCSVAdvancedOptions = window["Asc"]["asc_CCSVAdvancedOptions"] = asc_CCSVAdvancedOptions;
 		prot = asc_CCSVAdvancedOptions.prototype;

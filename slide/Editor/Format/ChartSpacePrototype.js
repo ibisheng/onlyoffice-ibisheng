@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -89,7 +89,7 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
             default_brush.merge(plot_area.spPr.Fill);
         }
         var parents = this.getParentObjects();
-        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
         plot_area.brush = default_brush;
     }
 };
@@ -120,7 +120,7 @@ CChartSpace.prototype.recalculateChartBrush = function()
         default_brush.merge(this.spPr.Fill);
     }
     var parents = this.getParentObjects();
-    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
     this.brush = default_brush;
 
 };
@@ -156,7 +156,7 @@ CChartSpace.prototype.recalculateChartPen = function()
     if(this.spPr && this.spPr.ln)
         default_line.merge(this.spPr.ln);
     var parents = this.getParentObjects();
-    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
     this.pen = default_line;
     AscFormat.checkBlackUnifill(this.pen.Fill, true);
 };
@@ -523,11 +523,11 @@ CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLo
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 
-CTable.prototype.Get_TableOffsetCorrection = function()
+CTable.prototype.GetTableOffsetCorrection = function()
 {
     return 0;
 };
-CTable.prototype.Get_RightTableOffsetCorrection = function()
+CTable.prototype.GetRightTableOffsetCorrection = function()
 {
     return 0;
 };
@@ -577,7 +577,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                         if(!Cell2){
                             break;
                         }
-                        var VMerge = Cell2.Get_VMerge();
+                        var VMerge = Cell2.GetVMerge();
                         if (vmerge_Continue === VMerge){
                             H += this.RowsInfo[i].H[CurPage];
                         }
@@ -596,11 +596,57 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
         {
             var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
             var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-            Cell.Content.DrawSelectionOnPage(Cell_PageRel);
+            Cell.Content_DrawSelectionOnPage(Cell_PageRel);
             break;
         }
     }
 };
+
+CTableCell.prototype.Content_DrawSelectionOnPage = function(CurPage)
+{
+    var Transform       = this.private_GetTextDirectionTransform();
+    var DrawingDocument = this.Row.Table.DrawingDocument;
+    var OldTextMatrix = null;
+    if (null !== Transform && DrawingDocument){
+        if(DrawingDocument.TextMatrix)
+        {
+            OldTextMatrix = DrawingDocument.TextMatrix;
+            DrawingDocument.TextMatrix = DrawingDocument.TextMatrix.CreateDublicate();
+        }
+        DrawingDocument.MultiplyTargetTransform(Transform.CreateDublicate());
+
+    }
+
+    this.Content.DrawSelectionOnPage(CurPage);
+
+
+    if (null !== Transform && DrawingDocument){
+        DrawingDocument.TextMatrix = OldTextMatrix;
+    }
+};
+
+CTableCell.prototype.Content_RecalculateCurPos = function()
+{
+    var Transform = this.private_GetTextDirectionTransform();
+    var DrawingDocument = this.Row.Table.DrawingDocument;
+    var OldTextMatrix = null;
+    if (null !== Transform && DrawingDocument)
+    {
+        if(DrawingDocument.TextMatrix)
+        {
+            OldTextMatrix = DrawingDocument.TextMatrix;
+            DrawingDocument.TextMatrix = DrawingDocument.TextMatrix.CreateDublicate();
+        }
+        DrawingDocument.MultiplyTargetTransform(Transform.CreateDublicate());
+    }
+
+    var ret = this.Content.RecalculateCurPos();
+    if (null !== Transform && DrawingDocument){
+        DrawingDocument.TextMatrix = OldTextMatrix;
+    }
+    return ret;
+};
+
 CStyle.prototype.Create_NormalTable = function()
 {
     var TablePr =

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -367,6 +367,10 @@ var c_oAscPopUpSelectorType = {
     Group: 1,
     Custom: 2
   };
+  var c_oAscAutoCorrectOptions = {
+	UndoTableAutoExpansion: 0,
+	RedoTableAutoExpansion: 1
+  };
   
   var c_kMaxPrintPages = 1500;
 
@@ -392,6 +396,7 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
   window['AscCommonExcel'].c_oAscLockAddSheet = c_oAscLockAddSheet;
   window['AscCommonExcel'].c_kMaxPrintPages = c_kMaxPrintPages;
+  window['AscCommonExcel'].filteringMode = true;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerFormat = c_oSerFormat;
@@ -560,4 +565,8 @@ var c_oAscPopUpSelectorType = {
   prot['Individual'] = prot.Individual;
   prot['Group'] = prot.Group;
   prot['Custom'] = prot.Custom;
+  window['Asc']['c_oAscAutoCorrectOptions'] = window['Asc'].c_oAscAutoCorrectOptions = c_oAscAutoCorrectOptions;
+  prot = c_oAscAutoCorrectOptions;
+  prot['UndoTableAutoExpansion'] = prot.UndoTableAutoExpansion;
+  prot['RedoTableAutoExpansion'] = prot.RedoTableAutoExpansion;
 })(window);

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1463,21 +1463,38 @@
 	};
 
 	/** @constructor */
-	function asc_CParagraphTab(Pos, Value) {
-		this.Pos = Pos;
-		this.Value = Value;
+	function asc_CParagraphTab(Pos, Value, Leader)
+	{
+		this.Pos    = Pos;
+		this.Value  = Value;
+		this.Leader = Leader;
 	}
+	asc_CParagraphTab.prototype.asc_getValue = function()
+	{
+		return this.Value;
+	};
+	asc_CParagraphTab.prototype.asc_putValue = function(v)
+	{
+		this.Value = v;
+	};
+	asc_CParagraphTab.prototype.asc_getPos = function()
+	{
+		return this.Pos;
+	};
+	asc_CParagraphTab.prototype.asc_putPos = function(v)
+	{
+		this.Pos = v;
+	};
+	asc_CParagraphTab.prototype.asc_getLeader = function()
+	{
+		if (Asc.c_oAscTabLeader.Heavy === this.Leader)
+			return Asc.c_oAscTabLeader.Underscore;
 
-	asc_CParagraphTab.prototype = {
-		asc_getValue: function () {
-			return this.Value;
-		}, asc_putValue: function (v) {
-			this.Value = v;
-		}, asc_getPos: function () {
-			return this.Pos;
-		}, asc_putPos: function (v) {
-			this.Pos = v;
-		}
+		return this.Leader;
+	};
+	asc_CParagraphTab.prototype.asc_putLeader = function(v)
+	{
+		this.Leader = v;
 	};
 
 	/** @constructor */
@@ -1487,7 +1504,7 @@
 		if (undefined != obj) {
 			var Count = obj.Tabs.length;
 			for (var Index = 0; Index < Count; Index++) {
-				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value));
+				this.Tabs.push(new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value, obj.Tabs[Index].Leader));
 			}
 		}
 	}
@@ -1987,6 +2004,7 @@
 		this.canFill = true;
 		this.canChangeArrows = false;
 		this.bFromChart = false;
+		this.bFromImage = false;
 		this.Locked = false;
 		this.w = null;
 		this.h = null;
@@ -2094,6 +2112,14 @@
 
 		asc_putSignatureId: function(v){
 			this.signatureId = v;
+		},
+
+		asc_getFromImage: function(){
+			return this.bFromImage;
+		},
+
+		asc_putFromImage: function(v){
+			this.bFromImage = v;
 		}
 	};
 
@@ -2491,6 +2517,10 @@
 		asc_getOriginSize: function (api) {
 			if (window['AscFormat'].isRealNumber(this.oleWidth) && window['AscFormat'].isRealNumber(this.oleHeight)) {
 				return new asc_CImageSize(this.oleWidth, this.oleHeight, true);
+			}
+			if(this.ImageUrl === null)
+			{
+				return new asc_CImageSize(50, 50, false);
 			}
 			var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
 			var _page_width = AscCommon.Page_Width;
@@ -2935,6 +2965,59 @@
 	{
 		return this.Number;
 	};
+
+
+    function CHyperlinkProperty(obj)
+    {
+        if (obj)
+        {
+            this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
+            this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
+            this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
+            this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
+        }
+        else
+        {
+            this.Text    = null;
+            this.Value   = "";
+            this.ToolTip = "";
+            this.Class   = null;
+        }
+    }
+
+    CHyperlinkProperty.prototype.get_Value   = function()
+    {
+        return this.Value;
+    };
+    CHyperlinkProperty.prototype.put_Value   = function(v)
+    {
+        this.Value = v;
+    };
+    CHyperlinkProperty.prototype.get_ToolTip = function()
+    {
+        return this.ToolTip;
+    };
+    CHyperlinkProperty.prototype.put_ToolTip = function(v)
+    {
+        this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v;
+    };
+    CHyperlinkProperty.prototype.get_Text    = function()
+    {
+        return this.Text;
+    };
+    CHyperlinkProperty.prototype.put_Text    = function(v)
+    {
+        this.Text = v;
+    };
+    CHyperlinkProperty.prototype.put_InternalHyperlink = function(oClass)
+    {
+        this.Class = oClass;
+    };
+    CHyperlinkProperty.prototype.get_InternalHyperlink = function()
+    {
+        return this.Class;
+    };
+
 
 	/** @constructor */
 	function asc_CUserInfo() {
@@ -3464,17 +3547,10 @@
 
 						var sCustomText = oRunS['text'];
 						if(sCustomText === "<%br%>"){
-							oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
+							oRun.AddToContent(0, new ParaNewLine(break_Line), false);
 						}
 						else{
-							for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
-							{
-								var nChar = sCustomText.charAt(nIndex);
-								if (" " === nChar)
-									oRun.Add_ToContent(nIndex, new ParaSpace(), true);
-								else
-									oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
-							}
+							oRun.AddText(sCustomText);
 						}
 
 						oNewParagraph.Internal_Content_Add(i, oRun, false);
@@ -3867,6 +3943,8 @@
 	prot["put_Value"] = prot["asc_putValue"] = prot.asc_putValue;
 	prot["get_Pos"] = prot["asc_getPos"] = prot.asc_getPos;
 	prot["put_Pos"] = prot["asc_putPos"] = prot.asc_putPos;
+	prot["get_Leader"] = prot["asc_getLeader"] = prot.asc_getLeader;
+	prot["put_Leader"] = prot["asc_putLeader"] = prot.asc_putLeader;
 
 	window["Asc"]["asc_CParagraphTabs"] = window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
 	prot = asc_CParagraphTabs.prototype;
@@ -4045,6 +4123,8 @@
 	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
 	prot["get_SignatureId"] = prot["asc_getSignatureId"] = prot.asc_getSignatureId;
 	prot["put_SignatureId"] = prot["asc_putSignatureId"] = prot.asc_putSignatureId;
+	prot["get_FromImage"] = prot["asc_getFromImage"] = prot.asc_getFromImage;
+	prot["put_FromImage"] = prot["asc_putFromImage"] = prot.asc_putFromImage;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
@@ -4254,6 +4334,19 @@
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
 	prot["get_FootnoteText"] =  prot.get_FootnoteText;
 	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
+
+
+
+    window['Asc']['CHyperlinkProperty']       = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
+    prot = CHyperlinkProperty.prototype;
+    prot['get_Value']             = CHyperlinkProperty.prototype.get_Value;
+    prot['put_Value']             = CHyperlinkProperty.prototype.put_Value;
+    prot['get_ToolTip']           = CHyperlinkProperty.prototype.get_ToolTip;
+    prot['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
+    prot['get_Text']              = CHyperlinkProperty.prototype.get_Text;
+    prot['put_Text']              = CHyperlinkProperty.prototype.put_Text;
+    prot['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
+    prot['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

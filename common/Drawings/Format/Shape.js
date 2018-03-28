@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -339,8 +339,8 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMat
 function ConvertHyperlinkToPPTX(hyperlink, paragraph)
 {
     var hyperlink_ret = new ParaHyperlink(), i, item, pos = 0;
-    hyperlink_ret.Set_Value( hyperlink.Value );
-    hyperlink_ret.Set_ToolTip( hyperlink.ToolTip );
+    hyperlink_ret.SetValue( hyperlink.Value );
+    hyperlink_ret.SetToolTip( hyperlink.ToolTip );
     for(i = 0; i < hyperlink.Content.length; ++i)
     {
         item = hyperlink.Content[i];
@@ -362,11 +362,36 @@ function ConvertParagraphToWord(paragraph, docContent)
     var oldFlag = paragraph.bFromDocument;
     paragraph.bFromDocument = true;
     var new_paragraph = paragraph.Copy(_docContent);
-    CheckWordParagraphContent(new_paragraph.Content);
+    CheckWordParagraphContent(new_paragraph.Content, new_paragraph.Pr.DefaultRunPr);
     var NewRPr = CheckWordRunPr(new_paragraph.TextPr.Value);
+    var oCopyDefaultPr;
     if(NewRPr)
     {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(NewRPr);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+        }
         new_paragraph.TextPr.Apply_TextPr(NewRPr);
+    }
+    else
+    {
+        if(new_paragraph.Pr.DefaultRunPr)
+        {
+            oCopyDefaultPr  = new_paragraph.Pr.DefaultRunPr.Copy();
+            oCopyDefaultPr.Merge(new_paragraph.TextPr.Value);
+            NewRPr = CheckWordRunPr(oCopyDefaultPr);
+            if(!NewRPr)
+            {
+                NewRPr = oCopyDefaultPr;
+            }
+            new_paragraph.TextPr.Apply_TextPr(NewRPr);
+        }
     }
     paragraph.bFromDocument = oldFlag;
     return new_paragraph;
@@ -447,9 +472,9 @@ function CheckWordRunPr(Pr, bMath)
     return NewRPr;
 }
 
-function CheckWordParagraphContent(aContent)
+function CheckWordParagraphContent(aContent, oTextPr)
 {
-    var NewRPr;
+    var NewRPr, MergePr;
     for(var i = 0; i < aContent.length; ++i)
     {
         var oItem = aContent[i];
@@ -460,7 +485,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
@@ -482,7 +532,32 @@ function CheckWordParagraphContent(aContent)
                 NewRPr = CheckWordRunPr(oItem.Pr, true);
                 if(NewRPr)
                 {
+                    MergePr = NewRPr;
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(NewRPr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                    }
                     oItem.Set_Pr(NewRPr);
+                }
+                else
+                {
+                    if(oTextPr)
+                    {
+                        MergePr = oTextPr.Copy();
+                        MergePr.Merge(oItem.Pr);
+                        NewRPr = CheckWordRunPr(MergePr);
+                        if(!NewRPr)
+                        {
+                            NewRPr = MergePr;
+                        }
+                        oItem.Set_Pr(NewRPr);
+                    }
                 }
                 break;
             }
@@ -499,7 +574,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     var oGraphicFrame = new AscFormat.CGraphicFrame();
     var oTable2 = new CTable(oPresentation.DrawingDocument, oGraphicFrame, true, 0, [].concat(oTable.TableGrid), oTable.TableGrid.length, true);
     oTable2.Reset(0, 0, 50, 100000, 0, 0, 1);
-    oTable2.Set_TableLayout(tbllayout_Fixed);
+    oTable2.SetTableLayout(tbllayout_Fixed);
     oTable2.Set_Pr(oTable.Pr.Copy());
     oTable2.Set_TableLook(oTable.TableLook.Copy());
     for(var i = 0; i < oTable.Content.length; ++i){
@@ -537,10 +612,36 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     return oGraphicFrame;
 }
 
+
+function fHandleContent(aContent, oMax){
+    for(var i = 0;  i < aContent.length; ++i)
+    {
+        var oContentElement = aContent[i];
+        if(oContentElement.Get_Type() === type_Paragraph)
+        {
+            var paragraph_lines = aContent[i].Lines;
+            for(var j = 0;  j < paragraph_lines.length; ++j)
+            {
+                if(paragraph_lines[j].Ranges[0].W > oMax.max_width)
+                    oMax.max_width = paragraph_lines[j].Ranges[0].X + paragraph_lines[j].Ranges[0].W;
+            }
+        }
+        else if(oContentElement.Get_Type() === type_Table)
+        {
+
+        }
+        else if(oContentElement.Get_Type() === type_BlockLevelSdt)
+        {
+            if(oContentElement && oContentElement.Content){
+                fHandleContent(oContentElement.Content.Content, oMax);
+            }
+        }
+    }
+}
+
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
 {
-
-    var max_width = 0, arr_content = oDocContent.Content, paragraph_lines, i, j;
+    var oMaxWidth = {max_width: 0}, i;
     oDocContent.Reset(0, 0, dMaxWidth, 20000);
     if(bNeedRecalcAllDrawings)
     {
@@ -551,24 +652,8 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
     }
     oDocContent.Recalculate_Page(0, true);
-    for(i = 0;  i < arr_content.length; ++i)
-    {
-        var oContentElement = arr_content[i];
-        if(oContentElement.Get_Type() === type_Paragraph)
-        {
-            paragraph_lines = arr_content[i].Lines;
-            for(j = 0;  j < paragraph_lines.length; ++j)
-            {
-                if(paragraph_lines[j].Ranges[0].W > max_width)
-                    max_width = paragraph_lines[j].Ranges[0].W;
-            }
-        }
-        else if(oContentElement.Get_Type() === type_Table)
-        {
-
-        }
-    }
-    if(max_width === 0)
+    fHandleContent(oDocContent.Content, oMaxWidth);
+    if(oMaxWidth.max_width === 0)
     {
         if(oDocContent.Is_Empty())
         {
@@ -579,7 +664,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         }
         return 0.001;
     }
-    return max_width;
+    return oMaxWidth.max_width;
 }
 
 
@@ -1197,7 +1282,7 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function()
+CShape.prototype.getHierarchy = function(bIsSingleBody, info)
 {
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
@@ -1209,12 +1294,20 @@ CShape.prototype.getHierarchy = function()
             {
                 var ph_type = this.getPlaceholderType();
                 var ph_index = this.getPlaceholderIndex();
-                var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                var b_is_single_body;
+                if(AscFormat.isRealBool(bIsSingleBody))
+                {
+                    b_is_single_body = bIsSingleBody;
+                }
+                else
+                {
+                    b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                }
                 switch (this.parent.kind)
                 {
                     case AscFormat.TYPE_KIND.SLIDE:
                     {
-                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body, info));
                         hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
@@ -1403,7 +1496,13 @@ CShape.prototype.getCompiledTransparent = function () {
             }
 
         }
-        else if (isRealObject(this.group)) {
+        if(null !== this.compiledTransparent)
+        {
+
+            this.recalcInfo.recalculateTransparent = false;
+            return this.compiledTransparent;
+        }
+        if (isRealObject(this.group)) {
             var group_transparent = this.group.getCompiledTransparent();
             if (AscFormat.isRealNumber(group_transparent)) {
                 this.compiledTransparent = group_transparent;
@@ -1917,7 +2016,7 @@ CShape.prototype.getTextRect = function () {
 CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
     oMatrix.Reset();
     var _shape_transform = this.localTransform;
-    var _content_height = oContent.Get_SummaryHeight();
+    var _content_height = oContent.GetSummaryHeight();
     var _l, _t, _r, _b;
     var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
     var oRect = this.getTextRect();
@@ -1925,6 +2024,34 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
     var t_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
     var r_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
     var b_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
+
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+            switch (oPen.algn)
+            {
+                case 1:
+                {
+                    break;
+                }
+                default:
+                {
+                    penW/=2.0;
+                    break;
+                }
+            }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
+    }
+
     _l = oRect.l + l_ins;
     _t = oRect.t + t_ins;
     _r = oRect.r - r_ins;
@@ -1940,6 +2067,18 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         _c = (_t + _b) * 0.5;
         _t = _c - 0.01;
         _b = _c + 0.01;
+    }
+
+    var XC = oContent.XLimit/2.0;
+    var YC = _content_height/2.0;
+
+    var _rot_angle = AscFormat.normalizeRotate((AscFormat.isRealNumber(oBodyPr.rot) ? oBodyPr.rot : 0)*AscFormat.cToRad);
+
+    if(!AscFormat.fApproxEqual(_rot_angle, 0.0))
+    {
+        global_MatrixTransformer.TranslateAppend(oMatrix, -XC, -YC);
+        global_MatrixTransformer.RotateRadAppend(oMatrix, -_rot_angle);
+        global_MatrixTransformer.TranslateAppend(oMatrix, XC, YC);
     }
     _t_x_lt = _shape_transform.TransformPointX(_l, _t);
     _t_y_lt = _shape_transform.TransformPointY(_l, _t);
@@ -2146,6 +2285,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         else {
             oClipRect = {x: -1.6, y: t_ins, w: this.extX + 3.2, h: this.extY - b_ins};
         }
+
     }
     else {
         var _full_rotate = this.getFullRotate();
@@ -2366,6 +2506,9 @@ CShape.prototype.recalculateTextStyles = function (level) {
             default_style.TextPr.RFonts.CS = {Name: "+mn-cs", Index: -1};
             default_style.TextPr.RFonts.HAnsi = {Name: "+mn-lt", Index: -1};
         }
+        if(this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_GraphicFrame){
+            default_style.TextPr.FontSize = 18;
+        }
         if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)) {
 
             if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[9]))
@@ -2374,11 +2517,14 @@ CShape.prototype.recalculateTextStyles = function (level) {
                 default_style.ParaPr.Merge(default_ppt_style.Copy());
                 default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
             }
-            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+            if(!isRealObject(parent_objects.master) || !isRealObject(parent_objects.master.txStyles) || !this.isPlaceholder())
             {
-                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-                default_style.ParaPr.Merge(default_ppt_style.Copy());
-                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+                if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+                {
+                    var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
+                    default_style.ParaPr.Merge(default_ppt_style.Copy());
+                    default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+                }
             }
         }
 
@@ -2390,7 +2536,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
                 master_ppt_styles = parent_objects.master.txStyles;
             }
             else{
-                if (this.isPlaceholder()) {
+                if (this.isPlaceholder() && !(this instanceof AscFormat.CGraphicFrame)) {
                     switch (this.getPlaceholderType()) {
                         case AscFormat.phType_ctrTitle:
                         case AscFormat.phType_title:
@@ -2427,7 +2573,7 @@ CShape.prototype.recalculateTextStyles = function (level) {
             }
         }
 
-        var hierarchy = this.getHierarchy();
+        var hierarchy = this.getHierarchy(false);
         var hierarchy_styles = [];
         for (var i = 0; i < hierarchy.length; ++i) {
             var hierarchy_shape = hierarchy[i];
@@ -2594,11 +2740,22 @@ CShape.prototype.recalculatePen = function () {
         //}
     }
     else {
-        this.pen = new AscFormat.CLn();
+        this.pen = null;
     }
 
-    this.pen.merge(this.getCompiledLine());
-    this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    var oCompiledLine = this.getCompiledLine();
+    if(oCompiledLine)
+    {
+        if(!this.pen)
+        {
+            this.pen = new AscFormat.CLn();
+        }
+        this.pen.merge(oCompiledLine);
+    }
+    if(this.pen)
+    {
+        this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+    }
 };
 
 CShape.prototype.Get_ParentTextTransform = function()
@@ -2649,10 +2806,22 @@ CShape.prototype.isEmptyPlaceholder = function () {
 CShape.prototype.changeSize = function (kw, kh) {
     if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
         var xfrm = this.spPr.xfrm;
-        xfrm.setOffX(xfrm.offX * kw);
-        xfrm.setOffY(xfrm.offY * kh);
-        xfrm.setExtX(xfrm.extX * kw);
-        xfrm.setExtY(xfrm.extY * kh);
+        if(this.getNoChangeAspect()){
+            var k = Math.min(kw, kh);
+            var oldXC = xfrm.offX + xfrm.extX/2.0;
+            var oldYC = xfrm.offY + xfrm.extY/2.0;
+            xfrm.setExtX(xfrm.extX * k);
+            xfrm.setExtY(xfrm.extY * k);
+            xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
+            xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
+        }
+        else{
+
+            xfrm.setOffX(xfrm.offX * kw);
+            xfrm.setOffY(xfrm.offY * kh);
+            xfrm.setExtX(xfrm.extX * kw);
+            xfrm.setExtY(xfrm.extY * kh);
+        }
     }
     this.recalcTransform && this.recalcTransform();
 };
@@ -2709,7 +2878,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             this.rot = rot;
 
             var metricExtX, metricExtY;
-            if(!(this instanceof AscFormat.CGroupShape))
+          //  if(!(this instanceof AscFormat.CGroupShape))
             {
                 metricExtX = metrics.extX;
                 metricExtY = metrics.extY;
@@ -2724,19 +2893,19 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                     this.extY = metrics.extX;
                 }
             }
-            else
-            {
-                if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY))
-                {
-                    this.extX = this.spPr.xfrm.extX;
-                    this.extY = this.spPr.xfrm.extY;
-                }
-                else
-                {
-                    metricExtX = metrics.extX;
-                    metricExtY = metrics.extY;
-                }
-            }
+            // else
+            // {
+            //     if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY))
+            //     {
+            //         this.extX = this.spPr.xfrm.extX;
+            //         this.extY = this.spPr.xfrm.extY;
+            //     }
+            //     else
+            //     {
+            //         metricExtX = metrics.extX;
+            //         metricExtY = metrics.extY;
+            //     }
+            // }
 
             if (checkNormalRotate(rot))
             {
@@ -3191,31 +3360,47 @@ CShape.prototype.recalculateLocalTransform = function(transform)
         // по вертикали - в зависимости от вертикального выравнивания контента.
         {
             var dSin = Math.sin(this.rot), dCos = Math.cos(this.rot);
-            var nJc = this.getDocContent().Content[0].CompiledPr.Pr.ParaPr.Jc;
+            var oContent = this.getDocContent();
+            var nJc, nAnchor;
+            if(AscFormat.isRealNumber(this.rot) && !AscFormat.fApproxEqual(this.rot, 0))
+            {
+                nJc = AscCommon.align_Center;
+                nAnchor = 1;
+            }
+            else
+            {
+                nJc = oContent.Content[0].CompiledPr.Pr.ParaPr.Jc;
+                nAnchor = oBodyPr.anchor;
+            }
+            var FreezePointX, FreezePointY;
             switch(nJc)
             {
                 case AscCommon.align_Right:
                 {
                     dDeltaX = dOldExtX - this.extX;
+                    FreezePointX = oContent.XLimit;
                     break;
                 }
                 case AscCommon.align_Left:
                 {
                     dDeltaX = 0;
+                    FreezePointX = 0;
                     break;
                 }
-                case AscCommon.align_Center:
-                case AscCommon.align_Justify:
+                default:
                 {
                     dDeltaX = (dOldExtX - this.extX)/2;
+                    FreezePointX = oContent.XLimit/2.0;
                     break;
                 }
             }
-            switch (oBodyPr.anchor)
+
+            switch (nAnchor)
             {
                 case 0: //b
                 {
                     dDeltaY = dOldExtY - this.extY;
+                    FreezePointY = oContent.GetSummaryHeight();
                     break;
                 }
                 case 1:    //ctr
@@ -3223,16 +3408,36 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 case 3: //just
                 {// (Text Anchor Enum ( Center ))
                     dDeltaY = (dOldExtY - this.extY) / 2;
+                    FreezePointY = oContent.GetSummaryHeight()/2.0;
                     break;
                 }
-                case 4: //t
-                {//Top
+                default:
+                {
+                    FreezePointY = 0.0;
                     break;
                 }
             }
+            // var tx1 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
+            // var ty1 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
+            // this.recalculateTransformText();
+            // var tx2 = this.localTransformText.TransformPointX(FreezePointX, FreezePointY);
+            // var ty2 = this.localTransformText.TransformPointY(FreezePointX, FreezePointY);
+
+
             var dTrDeltaX, dTrDeltaY;
-            dTrDeltaX = dCos*dDeltaX - dSin*dDeltaY;
-            dTrDeltaY = dSin*dDeltaX + dCos*dDeltaY;
+            // if(this.invertTransform)
+            // {
+            //     var oInvMatrix = this.invertTransform.CreateDublicate();
+            //     oInvMatrix.tx = 0.0;
+            //     oInvMatrix.ty = 0.0;
+            //     dTrDeltaX = oInvMatrix.TransformPointX(dDeltaX, dDeltaY);
+            //     dTrDeltaY = oInvMatrix.TransformPointY(dDeltaX, dDeltaY);
+            // }
+            // else
+            {
+                dTrDeltaX = dDeltaX;
+                dTrDeltaY = dDeltaY;
+            }
             this.x += dTrDeltaX;
             this.y += dTrDeltaY;
         }
@@ -3346,6 +3551,32 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         t_ins = 1.27;
         b_ins = 1.27;
     }
+    if(this.bWordShape)
+    {
+        var oPen = this.pen;
+        if(oPen)
+        {
+            var penW = (oPen.w == null) ? 12700 : parseInt(oPen.w);
+            penW /= 36000.0;
+           switch (oPen.algn)
+           {
+               case 1:
+               {
+                   break;
+               }
+               default:
+               {
+                   penW/=2.0;
+                   break;
+               }
+           }
+
+            l_ins += penW;
+            r_ins += penW;
+            t_ins += penW;
+            b_ins += penW;
+        }
+    }
     var oRect = this.getTextRect();
     var w, h;
     w = oRect.r - oRect.l - (l_ins + r_ins);
@@ -3386,14 +3617,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent(w, h, nStartPage);
                 oRet.w = w + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = l_ins + r_ins;
@@ -3407,14 +3638,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
             {
                 oDocContent.RecalculateContent( h, h, nStartPage);
                 oRet.w = h + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
                 oDocContent.RecalculateContent(dMaxWidthRec, h, nStartPage);
                 oRet.w = dMaxWidthRec + 0.001;
-                oRet.contentH = oDocContent.Get_SummaryHeight();
+                oRet.contentH = oDocContent.GetSummaryHeight();
                 oRet.h = oRet.contentH;
             }
             oRet.correctW = t_ins + b_ins;
@@ -3492,7 +3723,7 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
 
         oDocContent.RecalculateContent(oRet.w, oRet.h, nStartPage);
 
-        oRet.contentH = oDocContent.Get_SummaryHeight();
+        oRet.contentH = oDocContent.GetSummaryHeight();
 
         if(this.bWordShape)
         {
@@ -3605,9 +3836,6 @@ CShape.prototype.drawAdjustments = function (drawingDocument) {
     }
 };
 
-
-
-
 CShape.prototype.getHandlePosByIndex = function(numHandle){
     var t = this.transform;
     switch (numHandle){
@@ -3630,8 +3858,6 @@ CShape.prototype.getHandlePosByIndex = function(numHandle){
         default:
     }
 };
-
-
 
 CShape.prototype.select = function (drawingObjectsController, pageIndex)
 {
@@ -3856,6 +4082,10 @@ CShape.prototype.updateSelectionState = function ()
                     }
                     else
                     {
+                        if (true !== content.Selection.Start)
+                        {
+                            content.RemoveSelection();
+                        }
                         drawing_document.SelectEnabled(false);
                         content.RecalculateCurPos();
 
@@ -3905,7 +4135,8 @@ CShape.prototype.getBase64Img = function ()
     {
         return this.cachedImage;
     }
-    if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY))
+    if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY)
+    || (AscFormat.fApproxEqual(this.extX, 0) && AscFormat.fApproxEqual(this.extY, 0)))
         return "";
     var img_object = AscCommon.ShapeToImageConverter(this, this.pageIndex);
     if(img_object)
@@ -3998,6 +4229,10 @@ CShape.prototype.clipTextRect = function(graphics)
 
 CShape.prototype.draw = function (graphics, transform, transformText, pageIndex) {
 
+    if(this.checkNeedRecalculate && this.checkNeedRecalculate()){
+        return;
+    }
+
     if(graphics.updatedRect && this.bounds)
     {
         var rect = graphics.updatedRect;
@@ -4072,10 +4307,10 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
     }
-    if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true)
+    if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true  && !AscCommon.IsShapeToImageConverter)
     {
         var drawingObjects = this.getDrawingObjectsController();
-        if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
+        if (typeof editor !== "undefined" && editor && graphics.m_oContext !== undefined && graphics.m_oContext !== null && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
         {
             if (global_MatrixTransformer.IsIdentity2(_transform))
             {
@@ -4149,7 +4384,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics.SaveGrState();
             graphics.SetIntegerGrid(false);
             var transform_text;
-            if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
+            if ((!this.txBody.content || this.txBody.content.Is_Empty()) && !AscCommon.IsShapeToImageConverter && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
             {
                 transform_text = this.transformText2;
             }
@@ -4208,7 +4443,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     {
         var oTheme = this.getParentObjects().theme;
         var oColorMap = this.Get_ColorMap();
-        if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
+        if(!this.bWordShape && (!this.txBody.content || this.txBody.content.Is_Empty()) && !AscCommon.IsShapeToImageConverter && this.txBody.content2 != null && !this.txBody.checkCurrentPlaceholder() && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false))
         {
             if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true)
             {
@@ -4327,8 +4562,6 @@ CShape.prototype.getRotateAngle = function (x, y) {
     return same_flip ? angle : -angle;
 };
 
-
-
 CShape.prototype.getRectBounds = function () {
     var transform = this.getTransformMatrix();
     var w = this.extX;
@@ -4370,54 +4603,8 @@ CShape.prototype.getFullOffset = function () {
     return { offX: this.x + group_offset.offX, offY: this.y + group_offset.offY };
 };
 
-CShape.prototype.getPresetGeom = function () {
-    if (this.spPr && this.spPr.geometry) {
-        return this.spPr.geometry.preset;
-    }
-    else {
-        return null;
-    }
-};
 
-CShape.prototype.getFill = function () {
-    if(this.brush && this.brush.fill)
-    {
-        return this.brush;
-    }
-    return AscFormat.CreateNoFillUniFill();
-};
 
-CShape.prototype.getStroke = function () {
-    if(this.pen && this.pen.Fill)
-    {
-        return this.pen;
-    }
-    var ret = AscFormat.CreateNoFillLine();
-    ret.w = 0;
-    return ret;
-};
-
-CShape.prototype.canChangeArrows = function () {
-    if (!this.spPr || this.spPr.geometry == null) {
-        return false;
-    }
-    var _path_list = this.spPr.geometry.pathLst;
-    var _path_index;
-    var _path_command_index;
-    var _path_command_arr;
-    for (_path_index = 0; _path_index < _path_list.length; ++_path_index) {
-        _path_command_arr = _path_list[_path_index].ArrPathCommandInfo;
-        for (_path_command_index = 0; _path_command_index < _path_command_arr.length; ++_path_command_index) {
-            if (_path_command_arr[_path_command_index].id == 5) {
-                break;
-            }
-        }
-        if (_path_command_index == _path_command_arr.length) {
-            return true;
-        }
-    }
-    return false;
-};
 
 CShape.prototype.getTextArtProperties = function()
 {
@@ -4730,7 +4917,7 @@ CShape.prototype.changePresetGeom = function (sPreset) {
         this.spPr.setGeometry(AscFormat.CreateGeometry(_final_preset));
     }
     else {
-        this.spPr.geometry = null;
+        this.spPr.setGeometry(null);
     }
     if(!this.bWordShape)
     {
@@ -5118,6 +5305,9 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
 {
     return AscFormat.ExecuteNoHistory(function(){
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null, oTxWarpStructNoTransform: null, oTxWarpStructParamarksNoTransform: null};
+        if(window["NATIVE_EDITOR_ENJINE"]){
+            return oRet;
+        }
         //return oRet;
         var bTransform = this.chekBodyPrTransform(oBodyPr) && bNeedWarp;
         var warpGeometry = oBodyPr.prstTxWarp;
@@ -5170,7 +5360,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
                 oContentToDraw.Reset(0, 0, oContent.XLimit, 20000);
                 oContentToDraw.Recalculate_Page(0, true);
             }
-            var dContentHeight = oContentToDraw.Get_SummaryHeight();
+            var dContentHeight = oContentToDraw.GetSummaryHeight();
             var OldShowParaMarks, width_ = dWidth*dKoeff, height_ = dHeight*dKoeff;
             if(isRealObject(editor))
             {
@@ -5363,6 +5553,39 @@ CShape.prototype.getColumnNumber = function(){
         }
     };
 
+    CShape.prototype.getCopyWithSourceFormatting = function(){
+        var oCopy = this.copy();
+        if(this.pen || this.brush){
+            if(!oCopy.spPr){
+                oCopy.setSpPr(AscFormat.CSpPr());
+                oCopy.spPr.setParent(oCopy);
+            }
+            if(this.brush){
+                oCopy.spPr.setFill(this.brush.saveSourceFormatting());
+            }
+            if(this.pen){
+                oCopy.spPr.setLn(this.pen.createDuplicate(true));
+            }
+        }
+        if(oCopy.txBody && oCopy.txBody.content){
+            var oTheme = this.Get_Theme();
+            var oColorMap = this.Get_ColorMap();
+            if(this.txBody && this.txBody.content){
+                SaveContentSourceFormatting(this.txBody.content.Content, oCopy.txBody.content.Content, oTheme, oColorMap)
+            }
+        }
+        if(oCopy.isPlaceholder() && !this.recalcInfo.recalculateTransform){
+            var oXfrm = oCopy.spPr.xfrm;
+            if(!oXfrm || !oXfrm.isNotNull()){
+                oCopy.x = this.x;
+                oCopy.y = this.y;
+                oCopy.extX = this.extX;
+                oCopy.extY = this.extY;
+                AscFormat.CheckSpPrXfrm(oCopy, true);
+            }
+        }
+        return oCopy;
+    };
     CShape.prototype.getSignatureLineGuid = function()
     {
         if(this.signatureLine){
@@ -5370,8 +5593,6 @@ CShape.prototype.getColumnNumber = function(){
         }
         return null;
     };
-
-
 function CreateBinaryReader(szSrc, offset, srcLen)
 {
     var nWritten = 0;
@@ -5480,6 +5701,124 @@ function getParaDrawing(oDrawing)
     return null;
 }
 
+function checkDrawingsTransformBeforePaste(oEndContent, oSourceContent, oTempParent)
+{
+    var i, j;
+    for(i = 0; i < oEndContent.Drawings.length; ++i)
+    {
+        var shape = oEndContent.Drawings[i].Drawing;
+        if(shape.isPlaceholder && shape.isPlaceholder() && (!shape.spPr || !shape.spPr.xfrm || !shape.spPr.xfrm.isNotNull()))
+        {
+            var oOldParent = shape.parent;
+            shape.parent = oTempParent;
+            var hierarchy = shape.getHierarchy();
+            for(j = 0; j < hierarchy.length; ++j)
+            {
+                if(hierarchy[j] && hierarchy[j].spPr && hierarchy[j].spPr.xfrm && hierarchy[j].spPr.xfrm.isNotNull())
+                {
+                    break;
+                }
+            }
+            if(j === hierarchy.length)
+            {
+                if(oSourceContent.Drawings[i] && oSourceContent.Drawings[i].Drawing)
+                {
+                    var oSourceShape = oSourceContent.Drawings[i].Drawing;
+                    if(oSourceShape && oSourceShape.spPr && oSourceShape.spPr.xfrm && oSourceShape.spPr.xfrm.isNotNull())
+                    {
+                        shape.x = oSourceShape.spPr.xfrm.offX;
+                        shape.y = oSourceShape.spPr.xfrm.offY;
+                        shape.extX = oSourceShape.spPr.xfrm.extX;
+                        shape.extY = oSourceShape.spPr.xfrm.extY;
+                        AscFormat.CheckSpPrXfrm(shape);
+                    }
+                }
+            }
+            shape.parent = oOldParent;
+        }
+    }
+}
+
+
+function SaveSourceFormattingTextPr(oTextPr, oTheme, oColorMap) {
+    if(oTextPr.RFonts){
+        if(oTextPr.RFonts.Ascii){
+            oTextPr.RFonts.Ascii.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.Ascii.Name);
+        }
+        if(oTextPr.RFonts.EastAsia){
+            oTextPr.RFonts.EastAsia.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.EastAsia.Name);
+        }
+        if(oTextPr.RFonts.HAnsi){
+            oTextPr.RFonts.HAnsi.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.HAnsi.Name);
+        }
+        if(oTextPr.RFonts.CS){
+            oTextPr.RFonts.CS.Name = oTheme.themeElements.fontScheme.checkFont(oTextPr.RFonts.CS.Name);
+        }
+    }
+    if(oTextPr.Unifill){
+        oTextPr.Unifill.check(oTheme, oColorMap);
+        oTextPr.Unifill = oTextPr.Unifill.saveSourceFormatting();
+    }
+    if(oTextPr.TextOutline && oTextPr.TextOutline.Fill){
+        oTextPr.TextOutline.Fill.check(oTheme, oColorMap);
+        oTextPr.TextOutline.Fill = oTextPr.TextOutline.Fill.saveSourceFormatting();
+    }
+    return oTextPr;
+}
+
+function SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap) {
+    if(aCopyContent.length === aSourceContent.length){
+        var bMergeRunPr = (aCopyContent === aSourceContent);
+        var oElem;
+        for(var i = 0; i< aSourceContent.length; ++i){
+            oElem = aSourceContent[i];
+            if(oElem.CompiledPr.Pr){
+                var oPr = oElem.CompiledPr.Pr.ParaPr.Copy();
+                oPr.DefaultRunPr = SaveSourceFormattingTextPr(oElem.CompiledPr.Pr.TextPr.Copy(), oTheme, oColorMap);
+                aCopyContent[i].Set_Pr(oPr);
+                SaveRunsFormatting(oElem.Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+            }
+            else{
+                if(aCopyContent[i].Pr && aCopyContent[i].Pr.DefaultRunPr && aCopyContent[i].Pr.DefaultRunPr.Unifill){
+                    var oPr = aCopyContent[i].Pr.Copy();
+                    oPr.DefaultRunPr.Unifill.check(oTheme, oColorMap);
+                    oPr.DefaultRunPr.Unifill = oPr.DefaultRunPr.Unifill.saveSourceFormatting();
+                    oPr.DefaultRunPr = SaveSourceFormattingTextPr(oPr.DefaultRunPr.Copy(), oTheme, oColorMap);
+                    aCopyContent[i].Set_Pr(oPr);
+                }
+            }
+        }
+    }
+}
+
+function SaveRunsFormatting(aSourceContent, aCopyContent, oTheme, oColorMap, oPr){
+    var bMergeRunPr = (aCopyContent === aSourceContent);
+    for(var i = 0; i < aCopyContent.length; ++i){
+        if(aCopyContent[i] instanceof ParaRun && aCopyContent[i].Pr){
+            if(bMergeRunPr){
+                var oCoprPr = oPr.DefaultRunPr.Copy();
+                oCoprPr.Merge(SaveSourceFormattingTextPr(aCopyContent[i].Pr.Copy(), oTheme, oColorMap));
+                aCopyContent[i].Set_Pr(oCoprPr)
+            }
+            else {
+                aCopyContent[i].Set_Pr(SaveSourceFormattingTextPr(aCopyContent[i].Pr.Copy(), oTheme, oColorMap));
+            }
+
+        }
+        else if(aSourceContent[i].Content){
+            var oElem = aSourceContent[i];
+            SaveRunsFormatting(oElem.Content, aCopyContent[i].Content, oTheme, oColorMap, oPr);
+            if(oElem.Get_CompiledCtrPrp && aCopyContent[i].setCtrPrp){
+                var oCtrPr = oElem.Get_CompiledCtrPrp();
+                aCopyContent[i].setCtrPrp(oCtrPr);
+            }
+        }
+        else if(aSourceContent[i] instanceof AscCommonWord.ParaMath && aSourceContent[i].Root && aSourceContent[i].Root.Content){
+            SaveRunsFormatting(aSourceContent[i].Root.Content, aCopyContent[i].Root.Content, oTheme, oColorMap, oPr);
+
+        }
+    }
+}
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;
@@ -5494,4 +5833,7 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].ConvertGraphicFrameToWordTable = ConvertGraphicFrameToWordTable;
     window['AscFormat'].ConvertTableToGraphicFrame = ConvertTableToGraphicFrame;
     window['AscFormat'].CSignatureLine = CSignatureLine;
+    window['AscFormat'].checkDrawingsTransformBeforePaste = checkDrawingsTransformBeforePaste;
+    window['AscFormat'].SaveContentSourceFormatting = SaveContentSourceFormatting;
+
 })(window);

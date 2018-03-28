@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -360,7 +360,7 @@ ParaDrawing.prototype.Get_Props = function(OtherProps)
 	if (ParentParagraph && undefined !== ParentParagraph.Parent)
 	{
 		var DocContent = ParentParagraph.Parent;
-		if (true === DocContent.Is_DrawingShape() || (DocContent.Get_TopDocumentContent() instanceof CFootEndnote))
+		if (true === DocContent.Is_DrawingShape() || (DocContent.GetTopDocumentContent() instanceof CFootEndnote))
 			Props.CanBeFlow = false;
 	}
 
@@ -1301,6 +1301,7 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 {
 	if (Paragraph)
 	{
+		var PageNumOld = this.PageNum;
 		var ContentPos = Paragraph.Get_DrawingObjectContentPos(this.Get_Id());
 		if (null === ContentPos)
 			return;
@@ -1321,7 +1322,12 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 		if (null !== nRecalcIndex)
 			oLogicDocument.Get_History().SetRecalculateIndex(nRecalcIndex);
 
-		Layout = Paragraph.Get_Layout(ContentPos, this);
+		if (!this.LogicDocument
+			|| null === this.LogicDocument.FullRecalc.Id
+			|| (PageNum < this.LogicDocument.FullRecalc.PageIndex
+			&& PageNumOld < this.LogicDocument.FullRecalc.PageIndex))
+			Layout = Paragraph.Get_Layout(ContentPos, this);
+
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
 	}
 };
@@ -1688,10 +1694,10 @@ ParaDrawing.prototype.tableAddRow = function(bBefore)
 	if (isRealObject(this.GraphicObj) && typeof  this.GraphicObj.tableAddRow === "function")
 		return this.GraphicObj.tableAddRow(bBefore);
 };
-ParaDrawing.prototype.getCurrentParagraph = function()
+ParaDrawing.prototype.getCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.getCurrentParagraph === "function")
-		return this.GraphicObj.getCurrentParagraph();
+		return this.GraphicObj.getCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 
 	if (this.Parent instanceof Paragraph)
 		return this.Parent;
@@ -3080,6 +3086,7 @@ CAnchorPosition.prototype.Update_PositionYHeaderFooter = function(TopMarginY, Bo
 	var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
 	var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
 
+	this.Margin_V      = TopY;
 	this.Top_Margin    = TopY;
 	this.Bottom_Margin = this.Page_H - BottomY;
 };

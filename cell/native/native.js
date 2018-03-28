@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3637,19 +3637,20 @@ function OfflineEditor () {
             selection.push(0);
 
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
-            var range, selectionLineType;
+            var range, selectionLineType, type;
             for (var i = 0, l = ranges.length; i < l; ++i) {
                 range = ranges[i];
-                if (Asc.c_oAscSelectionType.RangeMax === range.type) {
+				type = range.getType();
+                if (Asc.c_oAscSelectionType.RangeMax === type) {
                     range.c2 = this.cols.length - 1;
                     range.r2 = this.rows.length - 1;
-                } else if (Asc.c_oAscSelectionType.RangeCol === range.type) {
+                } else if (Asc.c_oAscSelectionType.RangeCol === type) {
                     range.r2 = this.rows.length - 1;
-                } else if (Asc.c_oAscSelectionType.RangeRow === range.type) {
+                } else if (Asc.c_oAscSelectionType.RangeRow === type) {
                     range.c2 = this.cols.length - 1;
                 }
 
-                selection.push(range.type);
+                selection.push(type);
 
                 selection.push(range.c1);
                 selection.push(range.c2);
@@ -3704,7 +3705,7 @@ function OfflineEditor () {
 
             var isChangeSelectionShape = false;
             if (isCoord) {
-                isChangeSelectionShape = this._checkSelectionShape();
+                isChangeSelectionShape = this._endSelectionShape();
             }
 
             var isMoveActiveCellToLeftTop = false;
@@ -3806,13 +3807,12 @@ function OfflineEditor () {
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
-                    ranges.push(undefined !== rangetype ? rangetype : arrRanges[i].type);
+					type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
+                    ranges.push(undefined !== rangetype ? rangetype : type);
                     ranges.push(arrRanges[i].c1);
                     ranges.push(arrRanges[i].c2);
                     ranges.push(arrRanges[i].r1);
                     ranges.push(arrRanges[i].r2);
-
-                    type = arrRanges[i].type;
 
                     addl = Math.max(arrRanges[i].c1 - colsCount,0);
                     addt = Math.max(arrRanges[i].r1 - rowsCount,0);
@@ -3937,13 +3937,12 @@ function OfflineEditor () {
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
-                ranges.push(undefined !== rangetype ? rangetype : arrRanges[i].type);
+				type = (arrRanges[i].getType == undefined) ? 0 : arrRanges[i].getType();
+                ranges.push(undefined !== rangetype ? rangetype : type);
                 ranges.push(arrRanges[i].c1);
                 ranges.push(arrRanges[i].c2);
                 ranges.push(arrRanges[i].r1);
                 ranges.push(arrRanges[i].r2);
-
-                type = arrRanges[i].type;
 
                 addl = Math.max(arrRanges[i].c1 - colsCount,0);
                 addt = Math.max(arrRanges[i].r1 - rowsCount,0);
@@ -4070,6 +4069,8 @@ function OfflineEditor () {
         //
         //        }
 
+        AscFonts.FontPickerByCharacter.IsUseNoSquaresMode = true;
+
         this.initSettings = settings;
 
         this.beforeOpen();
@@ -4143,7 +4144,7 @@ function OfflineEditor () {
 
             var ws = _api.wb.getWorksheet();
 
-            _api.wb.showWorksheet(undefined, false, true);
+            _api.wb.showWorksheet(undefined, true);
             ws._fixSelectionOfMergedCells();
 
             if (ws.topLeftFrozenCell) {
@@ -4717,40 +4718,11 @@ function OfflineEditor () {
             }
         }
     };
-
-    this.offline_showWorksheet = function(index) {
-        var me = this;
-        var t = _api;
-        var ws = _api.wbModel.getWorksheet(index);
-        var isHidden = ws.getHidden();
-        var showWorksheetCallback = function (res) {
-            if (res) {
-                t.wbModel.getWorksheet(index).setHidden(false);
-                t.wb.showWorksheet(index);
-                if (isHidden) {
-                    // Посылаем callback об изменении списка листов
-                    t.sheetsChanged();
-                }
-
-                me.updateFrozen();
-            }
-        };
-        if (_api.isHidden) {
-            var sheetId = _api.wbModel.getWorksheet(index).getId();
-            var lockInfo = _api.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
-            _api._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
-        }
-        else
-        {
-            showWorksheetCallback(true);
-        }
-    };
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
-        var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        _api.wb.printSheets(pdfWriter, pagesData);
-        return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
+        var printPagesData = _api.wb.calcPagesPrint(adjustPrint);
+        var pdfPrinterMemory = _api.wb.printSheets(printPagesData).DocumentRenderer.Memory;
+        return pdfPrinterMemory.GetBase64Memory();
     };
 
     this.onSelectionChanged = function(info) {
@@ -4908,7 +4880,9 @@ function OfflineEditor () {
                                                 if (bLock !== true)
                                                 return;
                                                 _this.controller.resetSelection();
+                                                History.Create_NewPoint();
                                                 _this.controller.addImageFromParams(_image.src, pxToMm(coordsFrom.x) + MOVE_DELTA, pxToMm(coordsFrom.y) + MOVE_DELTA, pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
+                                                _this.controller.startRecalculate();
                                                 });
 
                 worksheet.setSelectionShape(true);
@@ -5563,7 +5537,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
                 return {'action':'closeCellEditor'};
             }
 
-            ws.changeSelectionStartPoint(x, y, true, true);
+            ws.changeSelectionStartPoint(x, y, true);
 
             if (isFormulaEditMode) {
                 if (ret) {
@@ -5629,7 +5603,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                     return {'action':'closeCellEditor'};
                 }
 
-                ws.changeSelectionEndPoint(x, y, true, true);
+                ws.changeSelectionEndPoint(x, y, true);
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
@@ -5637,7 +5611,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                 else if (1 === _s.cellPin)
                     ws.__changeSelectionPoint(x, y, true, true, false);
                 else {
-                    ws.changeSelectionEndPoint(x, y, true, true);
+                    ws.changeSelectionEndPoint(x, y, true);
                 }
             }
         }
@@ -5789,17 +5763,17 @@ window["native"]["offline_keyboard_down"] = function(inputKeys) {
             }
         }
         else if (37 === codeKey)      // LEFT
-            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+            wb._onChangeSelection(true, -1, 0, false);
         else if (39 === codeKey)     // RIGHT
-            wb._onChangeSelection(true, 1, 0, false, false, undefined);
+            wb._onChangeSelection(true, 1, 0, false);
         if (38 === codeKey)          // UP
-            wb._onChangeSelection(true, 0, -1, false, false, undefined);
+            wb._onChangeSelection(true, 0, -1, false);
         else if (40 === codeKey)     // DOWN
-            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+            wb._onChangeSelection(true, 0, 1, false);
         else if (9 === codeKey)     // TAB
-            wb._onChangeSelection(true, -1, 0, false, false, undefined);
+            wb._onChangeSelection(true, -1, 0, false);
         else if (13 === codeKey)     // ENTER
-            wb._onChangeSelection(true, 0, 1, false, false, undefined);
+            wb._onChangeSelection(true, 0, 1, false);
     }
 
     ws.isFormulaEditMode = isFormulaEditMode;
@@ -7151,12 +7125,12 @@ window["native"]["offline_apply_event"] = function(type,params) {
         }
         case 2200: // ASC_SPREADSHEETS_EVENT_TYPE_SHOW_WORKSHEET
         {
-            _s.offline_showWorksheet(params);
+            _api.asc_showWorksheet(params);
             break;
         }
         case 2201: // ASC_SPREADSHEETS_EVENT_TYPE_UNHIDE_WORKSHEET
         {
-            _s.offline_showWorksheet(params);
+            _api.asc_showWorksheet(params);
             _s.asc_WriteAllWorksheets(true);
             break;
         }
@@ -7427,11 +7401,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            t._state = AscCommon.ConnectionState.WaitAuth;
-            t.onFirstConnect();
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerOpen();
             break;
         }
 
@@ -7443,74 +7413,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-
-            var dataObject = JSON.parse(params);
-
-            // console.log("JS - " + dataObject['type']);
-
-            switch (dataObject['type']) {
-              case 'auth'        :
-                t._onAuth(dataObject);
-                break;
-              case 'message'      :
-                t._onMessages(dataObject, false);
-                break;
-              case 'cursor'       :
-                t._onCursor(dataObject);
-                break;
-              case 'meta' :
-                t._onMeta(dataObject);
-                break;
-              case 'getLock'      :
-                t._onGetLock(dataObject);
-                break;
-              case 'releaseLock'    :
-                t._onReleaseLock(dataObject);
-                break;
-              case 'connectState'    :
-                t._onConnectionStateChanged(dataObject);
-                break;
-              case 'saveChanges'    :
-                t._onSaveChanges(dataObject);
-                break;
-              case 'saveLock'      :
-                t._onSaveLock(dataObject);
-                break;
-              case 'unSaveLock'    :
-                t._onUnSaveLock(dataObject);
-                break;
-              case 'savePartChanges'  :
-                t._onSavePartChanges(dataObject);
-                break;
-              case 'drop'        :
-                t._onDrop(dataObject);
-                break;
-              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                break;
-              case 'error'      : /*Старая версия sdk*/
-                t._onDrop(dataObject);
-                break;
-              case 'documentOpen'    :
-                t._documentOpen(dataObject);
-                break;
-              case 'warning':
-                t._onWarning(dataObject);
-                break;
-              case 'license':
-                t._onLicense(dataObject);
-                break;
-              case 'session' :
-                t._onSession(dataObject);
-                break;
-              case 'refreshToken' :
-                t._onRefreshToken(dataObject["messages"]);
-                break;
-              case 'expiredToken' :
-                t._onExpiredToken();
-                break;
-              }
-
+            _api.CoAuthoringApi._CoAuthoringApi._onServerMessage(params);
             break;
         }
 
@@ -7521,9 +7424,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
         case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
         {
-            var t = _api.CoAuthoringApi._CoAuthoringApi;
-            delete t.sockjs;
-            t._initSocksJs();
+            _api.CoAuthoringApi._CoAuthoringApi._reconnect();
             break;
         }
 
@@ -7727,7 +7628,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                //console.log("JS - openDocument()");
                
-               t.wbModel = t._openDocument(sData);
+               t._openDocument(sData);
 
                var thenCallback = function() {
                    t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers,
@@ -7741,7 +7642,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                //console.log("OPEN FILE ONLINE");
                
-               t.wb.showWorksheet(undefined, false, true);
+               t.wb.showWorksheet(undefined, true);
                
                     var ws = t.wb.getWorksheet();
                     window["native"]["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
@@ -7777,7 +7678,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
 
                setTimeout(function() {
 
-                          t.wb.showWorksheet(undefined, false, true);
+                          t.wb.showWorksheet(undefined, true);
                           //console.log("JS - showWorksheet()");
 
                           var ws = t.wb.getWorksheet();

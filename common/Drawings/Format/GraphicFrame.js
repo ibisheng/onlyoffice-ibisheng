@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -101,11 +101,16 @@ CGraphicFrame.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CGraphicFrame.prototype.hit = CShape.prototype.hit;
 
 CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
-    {
-        if (!PosArray)
-            PosArray = [];
+{
+	if (!PosArray)
+		PosArray = [];
 
-        return PosArray;
+	// TODO: Судя по тому как записывается позиция и как она читается
+	//       класс CGraphicFrame не должен попадать в позицию
+	if (PosArray && PosArray.length > 0 && PosArray[0].Class === this)
+		PosArray.splice(0, 1);
+
+	return PosArray;
 };
 
 CGraphicFrame.prototype.Is_DrawingShape = function(bRetShape)
@@ -380,6 +385,16 @@ CGraphicFrame.prototype.getHierarchy = CShape.prototype.getHierarchy;
 
 CGraphicFrame.prototype.getAllImages = function (images) {
 };
+CGraphicFrame.prototype.recalculateTable = function () {
+    if(this.graphicObject)
+    {
+        this.graphicObject.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0, false);
+        this.graphicObject.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0, false);
+        this.graphicObject.Parent = this;
+        this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
+        this.graphicObject.Recalculate_Page(0);
+    }
+};
 
 CGraphicFrame.prototype.recalculate = function()
     {
@@ -388,14 +403,7 @@ CGraphicFrame.prototype.recalculate = function()
         AscFormat.ExecuteNoHistory(function(){
             if(this.recalcInfo.recalculateTable)
             {
-                if(this.graphicObject)
-                {
-                    this.graphicObject.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0, false);
-                    this.graphicObject.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0, false);
-                    this.graphicObject.Parent = this;
-                    this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
-                    this.graphicObject.Recalculate_Page(0);
-                }
+                this.recalculateTable();
                 this.recalcInfo.recalculateTable = false;
             }
             if(this.recalcInfo.recalculateSizes)
@@ -441,9 +449,9 @@ CGraphicFrame.prototype.recalculateSizes = function()
         }
 };
 
-CGraphicFrame.prototype.GetSelectDirection = function()
+CGraphicFrame.prototype.IsSelectedSingleElement = function()
     {
-        return 0;
+        return true;
 };
 
 CGraphicFrame.prototype.recalculateCurPos = function()
@@ -565,7 +573,7 @@ CGraphicFrame.prototype.canRotate = function()
 
 CGraphicFrame.prototype.canResize = function()
     {
-        return false;
+        return true;
 };
 
 CGraphicFrame.prototype.canMove = function()
@@ -797,7 +805,7 @@ CGraphicFrame.prototype.deselect = CShape.prototype.deselect;
 CGraphicFrame.prototype.Update_ContentIndexing = function()
 {};
     
-CGraphicFrame.prototype.Get_TopDocumentContent = function()
+CGraphicFrame.prototype.GetTopDocumentContent = function()
 {
     return null;
 };
@@ -817,10 +825,13 @@ CGraphicFrame.prototype.draw = function(graphics)
         if(this.graphicObject)
         {
 
+
+            graphics.SaveGrState();
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
             this.drawLocks(this.transform, graphics);
+            graphics.RestoreGrState();
         }
 };
 
@@ -1074,11 +1085,7 @@ CGraphicFrame.prototype.Get_PageContentStartPos2 = function()
         return this.Get_PageContentStartPos();
 };
 
-CGraphicFrame.prototype.hitToHandles = function()
-    {
-        return -1;
-};
-
+CGraphicFrame.prototype.hitToHandles = CShape.prototype.hitToHandles;
 CGraphicFrame.prototype.hitToAdjustment = function()
     {
         return {hit:false};
@@ -1124,6 +1131,145 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
        if(this.graphicObject){
            this.graphicObject.GetAllContentControls(arrContentControls);
        }
+    };
+
+    CGraphicFrame.prototype.getCopyWithSourceFormatting = function(){
+        var ret = this.copy();
+        var oCopyTable = ret.graphicObject;
+        var oSourceTable = this.graphicObject;
+        var oTheme = this.Get_Theme();
+        var oColorMap = this.Get_ColorMap();
+        var RGBA;
+        if(oCopyTable && oSourceTable){
+            var oPr2 = oCopyTable.Pr;
+            if(oSourceTable.CompiledPr.Pr && oSourceTable.CompiledPr.Pr.TablePr){
+                oCopyTable.Set_Pr(oSourceTable.CompiledPr.Pr.TablePr.Copy());
+                oPr2 = oCopyTable.Pr;
+                if(oPr2.TableBorders){
+                    if(oPr2.TableBorders){
+                        if(oPr2.TableBorders.Bottom && oPr2.TableBorders.Bottom.Unifill){
+                            oPr2.TableBorders.Bottom.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Bottom.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr2.TableBorders.Left && oPr2.TableBorders.Left.Unifill){
+                            oPr2.TableBorders.Left.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Left.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr2.TableBorders.Right && oPr2.TableBorders.Right.Unifill){
+                            oPr2.TableBorders.Right.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Right.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr2.TableBorders.Top && oPr2.TableBorders.Top.Unifill){
+                            oPr2.TableBorders.Top.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.Top.Unifill.getRGBAColor();
+                            oPr2.TableBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr2.TableBorders.InsideH && oPr2.TableBorders.InsideH.Unifill){
+                            oPr2.TableBorders.InsideH.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.InsideH.Unifill.getRGBAColor();
+                            oPr2.TableBorders.InsideH.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        if(oPr2.TableBorders.InsideV && oPr2.TableBorders.InsideV.Unifill){
+                            oPr2.TableBorders.InsideV.Unifill.check(oTheme, oColorMap);
+                            RGBA = oPr2.TableBorders.InsideV.Unifill.getRGBAColor();
+                            oPr2.TableBorders.InsideV.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                    }
+                }
+            }
+            if(oCopyTable.Content.length === oSourceTable.Content.length){
+                for(var i = 0;  i < oCopyTable.Content.length; ++i){
+                    var aSourceCells = oSourceTable.Content[i].Content;
+                    var aCopyCells = oCopyTable.Content[i].Content;
+                    if(aSourceCells.length === aCopyCells.length){
+                        for(var j = 0; j < aSourceCells.length; ++j){
+                            var aSourceContent = aSourceCells[j].Content.Content;
+                            var aCopyContent = aCopyCells[j].Content.Content;
+                            AscFormat.SaveContentSourceFormatting(aSourceContent, aCopyContent, oTheme, oColorMap);
+                            if(aSourceCells[j].CompiledPr.Pr){
+                                var oCellPr = new CTableCellPr();
+                                if(oPr2.TableBorders){
+                                    if(i === 0){
+                                        if(oPr2.TableBorders.Top){
+                                            oCellPr.TableCellBorders.Top = oPr2.TableBorders.Top.Copy();
+                                        }
+                                    }
+                                    if(i === oCopyTable.Content.length - 1){
+                                        if(oPr2.TableBorders.Bottom){
+                                            oCellPr.TableCellBorders.Bottom = oPr2.TableBorders.Bottom.Copy();
+                                        }
+                                    }
+                                    if(oPr2.TableBorders.InsideH){
+                                        if(i !== 0){
+                                            oCellPr.TableCellBorders.Top = oPr2.TableBorders.InsideH.Copy();
+                                        }
+                                        if(i !== oCopyTable.Content.length - 1){
+                                                oCellPr.TableCellBorders.Bottom = oPr2.TableBorders.InsideH.Copy();
+                                        }
+                                    }
+                                    if(j === 0){
+                                        if(oPr2.TableBorders.Left){
+                                            oCellPr.TableCellBorders.Left = oPr2.TableBorders.Left.Copy();
+                                        }
+                                    }
+                                    if(j === aSourceCells.length - 1){
+                                        if(oPr2.TableBorders.Right){
+                                            oCellPr.TableCellBorders.Right = oPr2.TableBorders.Right.Copy();
+                                        }
+                                    }
+                                    if(oPr2.TableBorders.InsideV){
+                                        if(j !== 0){
+                                            oCellPr.TableCellBorders.Left = oPr2.TableBorders.InsideV.Copy();
+                                        }
+                                        if(j !== aSourceCells.length - 1){
+                                            oCellPr.TableCellBorders.Right = oPr2.TableBorders.InsideV.Copy();
+                                        }
+                                    }
+                                }
+                                oCellPr.Merge(aSourceCells[j].CompiledPr.Pr.Copy());
+                                aCopyCells[j].Set_Pr(oCellPr);
+                                var oPr = aCopyCells[j].Pr;
+                                if(oPr.Shd && oPr.Shd.Unifill){
+                                    if(oPr.Shd.Unifill){
+                                        oPr.Shd.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.Shd.Unifill.getRGBAColor();
+                                        oPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                }
+                                if(oPr.TableCellBorders){
+                                    if(oPr.TableCellBorders.Bottom && oPr.TableCellBorders.Bottom.Unifill){
+                                        oPr.TableCellBorders.Bottom.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Bottom.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+
+                                    if(oPr.TableCellBorders.Left && oPr.TableCellBorders.Left.Unifill){
+                                        oPr.TableCellBorders.Left.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Left.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                    if(oPr.TableCellBorders.Right && oPr.TableCellBorders.Right.Unifill){
+                                        oPr.TableCellBorders.Right.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Right.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                    if(oPr.TableCellBorders.Top && oPr.TableCellBorders.Top.Unifill){
+                                        oPr.TableCellBorders.Top.Unifill.check(oTheme, oColorMap);
+                                        RGBA = oPr.TableCellBorders.Top.Unifill.getRGBAColor();
+                                        oPr.TableCellBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(RGBA.R, RGBA.G, RGBA.B, 255);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return ret;
     };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};

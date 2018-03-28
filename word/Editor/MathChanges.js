@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -214,7 +214,14 @@ CChangesMathContentAddItem.prototype.Redo = function()
 	oMathContent.Content = Array_start.concat(this.Items, Array_end);
 
 	for (var nIndex = 0; nIndex < this.Items.length; ++nIndex)
+	{
+		this.Items[nIndex].Set_ParaMath(oMathContent.ParaMath);
+
+		if (this.Items[nIndex].SetParagraph)
+			this.Items[nIndex].SetParagraph(oMathContent.Paragraph);
+
 		this.Items[nIndex].Recalc_RunsCompiledPr();
+	}
 };
 CChangesMathContentAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -279,7 +286,14 @@ CChangesMathContentRemoveItem.prototype.Undo = function()
 	oMathContent.Content = Array_start.concat(this.Items, Array_end);
 
 	for (var nIndex = 0; nIndex < this.Items.length; ++nIndex)
+	{
+		this.Items[nIndex].Set_ParaMath(oMathContent.ParaMath);
+
+		if (this.Items[nIndex].SetParagraph)
+			this.Items[nIndex].SetParagraph(oMathContent.Paragraph);
+
 		this.Items[nIndex].Recalc_RunsCompiledPr();
+	}
 };
 CChangesMathContentRemoveItem.prototype.Redo = function()
 {
@@ -394,14 +408,14 @@ CChangesMathBaseAddItems.prototype.Load = function(Color)
 		if (null !== Element)
 		{
 			oMathBase.Content.splice(Pos, 0, Element);
-			Element.ParentElement = oMathBase;
-
-			if (Element.SetParagraph)
-				Element.SetParagraph(oMathContent.Paragraph);
 
 			if (Element.Set_ParaMath)
-				Element.Set_ParaMath(oMathContent.ParaMath);
+				Element.Set_ParaMath(oMathBase.ParaMath);
 
+			if (Element.SetParagraph)
+				Element.SetParagraph(oMathBase.Paragraph);
+
+			Element.ParentElement = oMathBase;
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oMathBase, Pos);
 		}
 	}

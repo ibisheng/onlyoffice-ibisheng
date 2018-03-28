@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -169,12 +169,7 @@ CDocumentSearch.prototype =
                 var StartRun = SearchElement.ClassesS[SearchElement.ClassesS.length - 1];
 
                 var RunPos = StartContentPos.Get( SearchElement.ClassesS.length - 1 );
-
-                var Len = NewStr.length;
-                for ( var Pos = 0; Pos < Len; Pos++ )
-                {
-                    StartRun.Add_ToContent(RunPos + Pos, ' ' === NewStr[Pos] ? new ParaSpace() : new ParaText(NewStr[Pos]));
-                }
+                StartRun.AddText(NewStr, RunPos);
 
                 // Выделяем старый объект поиска и удаляем его
                 Para.Selection.Use = true;
@@ -286,7 +281,7 @@ CDocument.prototype.Search_Select = function(Id)
     this.Document_UpdateSelectionState();
     this.Document_UpdateRulersState();
 };
-CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
+CDocument.prototype.Search_Replace = function(NewStr, bAll, Id, bInterfaceEvent)
 {
     var bResult = false;
 
@@ -340,13 +335,13 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
         bResult = true;
 
-        if ( true === bAll )
-            editor.sync_ReplaceAllCallback(AllCount, AllCount);
+		if (true === bAll && false !== bInterfaceEvent)
+			editor.sync_ReplaceAllCallback(AllCount, AllCount);
     }
     else
     {
-        if ( true === bAll )
-            editor.sync_ReplaceAllCallback(0, AllCount);
+		if (true === bAll && false !== bInterfaceEvent)
+			editor.sync_ReplaceAllCallback(0, AllCount);
     }
 
     this.Document_UpdateInterfaceState();
@@ -1243,7 +1238,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
             var Mark = this.SearchMarks[SPos];
             var MarkPos = Mark.SearchResult.StartPos.Get(Mark.Depth);
 
-            if ( MarkPos >= StartPos && MarkPos < NearPos )
+            if (Mark.SearchResult.ClassesS.length > 0 && this === Mark.SearchResult.ClassesS[Mark.SearchResult.ClassesS.length - 1] && MarkPos >= StartPos && MarkPos < NearPos)
             {
                 NearElementId = Mark.SearchResult.Id;
                 NearPos       = MarkPos;
@@ -1271,7 +1266,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
             var Mark = this.SearchMarks[SPos];
             var MarkPos = Mark.SearchResult.StartPos.Get(Mark.Depth);
 
-            if ( MarkPos < StartPos && MarkPos > NearPos )
+            if (Mark.SearchResult.ClassesS.length > 0 && this === Mark.SearchResult.ClassesS[Mark.SearchResult.ClassesS.length - 1] && MarkPos < StartPos && MarkPos > NearPos)
             {
                 NearElementId = Mark.SearchResult.Id;
                 NearPos       = MarkPos;
@@ -1293,30 +1288,6 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
     }
 
     return NearElementId;
-};
-
-//----------------------------------------------------------------------------------------------------------------------
-// ParaComment
-//----------------------------------------------------------------------------------------------------------------------
-ParaComment.prototype.Search = function(ParaSearch, Depth)
-{
-};
-
-ParaComment.prototype.Add_SearchResult = function(SearchResult, Start, ContentPos, Depth)
-{
-};
-
-ParaComment.prototype.Clear_SearchResults = function()
-{
-};
-
-ParaComment.prototype.Remove_SearchResult = function(SearchResult)
-{
-};
-
-ParaComment.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Depth)
-{
-    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // ParaMath

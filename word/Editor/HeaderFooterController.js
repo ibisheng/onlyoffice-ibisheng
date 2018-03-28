@@ -28,9 +28,9 @@ CHdrFtrController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CHdrFtrController.prototype.RecalculateCurPos = function()
+CHdrFtrController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.HdrFtr.RecalculateCurPos();
+	return this.HdrFtr.RecalculateCurPos(bUpdateX, bUpdateY);
 };
 CHdrFtrController.prototype.GetCurPage = function()
 {
@@ -51,6 +51,10 @@ CHdrFtrController.prototype.AddSignatureLine = function(oSignatureDrawing)
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
 	this.HdrFtr.AddInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CHdrFtrController.prototype.AddImages = function(aImages)
+{
+	this.HdrFtr.AddImages(aImages);
 };
 CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
@@ -85,11 +89,14 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 {
 	var nResult = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 
-	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
-	{
-		this.LogicDocument.RemoveSelection();
-		this.LogicDocument.Selection.Use = false;
-	}
+	// TODO: Проверить зачем была добавлена эта заглушка. При удалении могут быть выставлены новые позиции курсора
+	//       и селекта, поэтому странно убирать селект здесь.
+
+	// if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
+	// {
+	// 	this.LogicDocument.RemoveSelection();
+	// 	this.LogicDocument.Selection.Use = false;
+	// }
 
 	return nResult;
 };
@@ -287,9 +294,9 @@ CHdrFtrController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.HdrFtr.GetSelectedText(bClearText, oPr);
 };
-CHdrFtrController.prototype.GetCurrentParagraph = function()
+CHdrFtrController.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	return this.HdrFtr.GetCurrentParagraph();
+	return this.HdrFtr.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 };
 CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
@@ -493,4 +500,8 @@ CHdrFtrController.prototype.AddContentControl = function(nContentControlType)
 		return CurHdrFtr.Content.AddContentControl(nContentControlType);
 
 	return null;
+};
+CHdrFtrController.prototype.GetStyleFromFormatting = function()
+{
+	return this.HdrFtr.GetStyleFromFormatting();
 };

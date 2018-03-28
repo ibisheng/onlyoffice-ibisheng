@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -263,6 +263,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg]                    = AscCommonWord.CDegree;
 		this.m_oFactoryClass[AscDFH.historyitem_type_BlockLevelSdt]          = AscCommonWord.CBlockLevelSdt;
 		this.m_oFactoryClass[AscDFH.historyitem_type_InlineLevelSdt]         = AscCommonWord.CInlineLevelSdt;
+		this.m_oFactoryClass[AscDFH.historyitem_type_ParaBookmark]           = AscCommonWord.CParagraphBookmark;
 
 
 		if (window['AscCommonSlide'])
@@ -275,7 +276,6 @@
 			this.m_oFactoryClass[AscDFH.historyitem_type_NotesMaster]         = AscCommonSlide.CNotesMaster;
 			this.m_oFactoryClass[AscDFH.historyitem_type_Notes]               = AscCommonSlide.CNotes;
 			this.m_oFactoryClass[AscDFH.historyitem_type_PresentationSection] = AscCommonSlide.CPrSection;
-			this.m_oFactoryClass[AscDFH.historyitem_type_NotesMaster]         = AscCommonSlide.PropLocker;
 		}
 
 		this.m_oFactoryClass[AscDFH.historyitem_type_Theme]                  = AscFormat.CTheme;
@@ -284,6 +284,7 @@
 		if (window['AscCommonExcel'])
 		{
 			this.m_oFactoryClass[AscDFH.historyitem_type_Sparkline] = AscCommonExcel.sparklineGroup;
+			this.m_oFactoryClass[AscDFH.historyitem_type_PivotTableDefinition] = Asc.CT_pivotTableDefinition;
 		}
 
 		this.m_oFactoryClass[AscDFH.historyitem_type_DocumentMacros] = AscCommon.CDocumentMacros;
@@ -307,4 +308,5 @@
 	};
 
 	window["AscCommon"].g_oTableId = new CTableId();
+	window["AscCommon"].CTableId = CTableId;
 })(window);

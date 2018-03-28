@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -50,6 +50,7 @@ function ParaHyperlink()
     this.Value   = "";
     this.Visited = false;
     this.ToolTip = "";
+    this.Anchor  = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
@@ -76,18 +77,19 @@ ParaHyperlink.prototype.Get_FirstTextPr2 = function()
     return null;
 };
 
-ParaHyperlink.prototype.Copy = function(Selected)
+ParaHyperlink.prototype.Copy = function(Selected, oPr)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
-    NewHyperlink.Set_Value(this.Value);
-    NewHyperlink.Set_ToolTip(this.ToolTip);
+    NewHyperlink.SetValue(this.Value);
+    NewHyperlink.SetToolTip(this.ToolTip);
+    NewHyperlink.SetAnchor(this.Anchor);
     NewHyperlink.Visited = this.Visited;
     return NewHyperlink;
 };
 
 ParaHyperlink.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
-    Info.Set_Hyperlink(this);
+    Info.SetHyperlink(this);
     CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 
@@ -155,7 +157,7 @@ ParaHyperlink.prototype.Clear_TextPr = function()
     if ( undefined !== this.Paragraph && null !== this.Paragraph )
     {
         var Styles = this.Paragraph.Parent.Get_Styles();
-        HyperlinkStyle = Styles.Get_Default_Hyperlink();
+        HyperlinkStyle = Styles.GetDefaultHyperlink();
     }
 
     var Count = this.Content.length;
@@ -186,8 +188,8 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
 ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Split.apply(this, arguments);
-    NewHyperlink.Set_Value(this.Value);
-    NewHyperlink.Set_ToolTip(this.ToolTip);
+    NewHyperlink.SetValue(this.Value);
+    NewHyperlink.SetToolTip(this.ToolTip);
     return NewHyperlink;
 };
 
@@ -227,44 +229,55 @@ ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 //-----------------------------------------------------------------------------------
 // Работаем со значениями
 //-----------------------------------------------------------------------------------
-ParaHyperlink.prototype.Set_Visited = function(Value)
-{
-    this.Visited = Value;
-};
-
-ParaHyperlink.prototype.Get_Visited = function()
+ParaHyperlink.prototype.GetVisited = function()
 {
     return this.Visited;
 };
-
-ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
+ParaHyperlink.prototype.SetVisited = function(isVisited)
+{
+	this.Visited = isVisited;
+};
+ParaHyperlink.prototype.SetToolTip = function(ToolTip)
 {
     History.Add(new CChangesHyperlinkToolTip(this, this.ToolTip, ToolTip));
     this.ToolTip = ToolTip;
 };
-
-ParaHyperlink.prototype.Get_ToolTip = function()
+ParaHyperlink.prototype.GetToolTip = function()
 {
-    if ( null === this.ToolTip )
-    {
-        if ( "string" === typeof(this.Value) )
-            return this.Value;
-        else
-            return "";
-    }
-    else
-        return this.ToolTip;
-};
+	if (this.Anchor)
+		return AscCommon.translateManager.getValue("Current Document");
 
-ParaHyperlink.prototype.Get_Value = function()
-{
-    return this.Value;
+	if ( null === this.ToolTip )
+	{
+		if ( "string" === typeof(this.Value) )
+			return this.Value;
+		else
+			return "";
+	}
+	else
+		return this.ToolTip;
 };
-
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
     History.Add(new CChangesHyperlinkValue(this, this.Value, Value));
     this.Value = Value;
+};
+ParaHyperlink.prototype.GetAnchor = function()
+{
+	return this.Anchor;
+};
+ParaHyperlink.prototype.SetAnchor = function(sBookmarkName)
+{
+	History.Add(new CChangesHyperlinkAnchor(this, this.Anchor, sBookmarkName));
+	this.Anchor = sBookmarkName;
+};
+ParaHyperlink.prototype.GetValue = function()
+{
+	return this.Value;
+};
+ParaHyperlink.prototype.SetValue = function(sValue)
+{
+	this.Set_Value(sValue);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
@@ -278,6 +291,7 @@ ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
     // String : ToolTip
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
+	// String : Anchor
 
     Writer.WriteString2( this.Id );
     if(!(editor && editor.isDocumentEditor))
@@ -296,6 +310,8 @@ ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
     {
         Writer.WriteString2( this.Content[Index].Get_Id() );
     }
+
+	Writer.WriteString2(this.Anchor);
 };
 
 ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
@@ -305,6 +321,7 @@ ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
     // String : ToolTip
     // Long   : Количество элементов
     // Array of Strings : массив с Id элементов
+	// String : Anchor
 
     this.Id      = Reader.GetString2();
     this.Value   = Reader.GetString2();
@@ -319,6 +336,8 @@ ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
         if ( null !== Element )
             this.Content.push( Element );
     }
+
+    this.Anchor = Reader.GetString2();
 };
 
 ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
@@ -330,15 +349,15 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
 
 ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 {
-    var HyperText = new CParagraphGetText();
-    this.Get_Text( HyperText );
+	var oHyperText = new CParagraphGetText();
+	this.Get_Text(oHyperText);
 
-    var HyperProps = new Asc.CHyperlinkProperty(this);
-    HyperProps.put_Text( HyperText.Text );
+	var oHyperProps = new Asc.CHyperlinkProperty(this);
+	oHyperProps.put_Text(oHyperText.Text);
+	oHyperProps.put_InternalHyperlink(this);
 
-    editor.sync_HyperlinkPropCallback(HyperProps);
-
-    CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
+	editor.sync_HyperlinkPropCallback(oHyperProps);
+	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
 
 function CParaHyperLinkStartState(HyperLink)

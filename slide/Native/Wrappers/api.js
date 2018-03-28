@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -33,6 +33,7 @@
 var global_memory_stream_menu = CreateNativeMemoryStream();
 // endsectionPr -----------------------------------------------------------------------------------------
 
+
 // font engine -------------------------------------
 var FontStyle =
 {
@@ -49,6 +50,37 @@ window["use_native_fonts_only"] = true;
 
 // declarate unused methods and objects
 window["ftm"] = FT_Memory;
+
+
+function NativeOpenFileP(_params){
+    window["CreateMainTextMeasurerWrapper"]();
+    window.g_file_path = "native_open_file";
+    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+    var doc_bin = window.native.GetFileString(window.g_file_path);
+    if ("presentation" !== window.NATIVE_DOCUMENT_TYPE){
+        return;
+    }
+    _api = new window["Asc"]["asc_docs_api"]("");
+    _api.Native_Editor_Initialize_Settings(_params);
+    _api.asc_nativeOpenFile(doc_bin);
+    _api.documentId = "1";
+    _api.WordControl.m_oDrawingDocument.AfterLoad();
+    Api = _api;
+
+    var _presentation = _api.WordControl.m_oLogicDocument;
+
+    var nSlidesCount = _presentation.Slides.length;
+    var dPresentationWidth = _presentation.Width;
+    var dPresentationHeight = _presentation.Height;
+
+    var aTimings = [];
+    var slides = _presentation.Slides;
+    for(var i = 0; i < slides.length; ++i){
+        aTimings.push(slides[i].timing.ToArray());
+    }
+    return [nSlidesCount, dPresentationWidth, dPresentationHeight, aTimings];
+}
+
 
 
 Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_params)
@@ -145,4 +177,205 @@ Asc['asc_docs_api'].prototype["CheckSlideBounds"] = function(nSlideIndex){
 Asc['asc_docs_api'].prototype["GetNativePageMeta"] = function(pageIndex)
 {
     this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
+};
+
+
+Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
+{
+   // this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
+};
+
+Asc['asc_docs_api'].prototype.Internal_Update_Ind_Left = function(Left)
+{
+};
+
+Asc['asc_docs_api'].prototype.Internal_Update_Ind_Right = function(Right)
+{
+};
+
+
+
+/***************************** COPY|PASTE *******************************/
+
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
+{
+    var dataBuffer = {};
+
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+
+            dataBuffer.text = data;
+
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    };
+
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
+    }
+
+    if (dataBuffer.drawingUrls) {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
+    }
+
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
+{
+    var dataBuffer = {};
+
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+
+            dataBuffer.text = data;
+
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+
+    this.asc_SelectionCut();
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
+    }
+
+    if (dataBuffer.drawingUrls) {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
+    }
+
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+
+    _stream["WriteByte"](255);
+
+    return _stream;
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
+{
+    this.WordControl.m_oLogicDocument.MoveCursorLeft(false, true);
+    this.WordControl.m_oLogicDocument.MoveCursorRight(true, true);
+    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()
+{
+    this.WordControl.m_oLogicDocument.SelectAll();
+};
+
+
+if(!window.native){
+	if(_private_NativeObject){
+		window.native = _private_NativeObject();
+	}	
+}
+
+if(window.native){
+	window.native.Call_CheckSlideBounds = function(nIndex){
+        if(window.editor) {
+            return window.editor.CheckSlideBounds(nIndex);
+        }
+	};
+	
+	window.native.Call_GetPageMeta = function(nIndex){
+        if(window.editor) {
+            return window.editor.GetNativePageMeta(nIndex);
+        }
+	};
+
+	window.native.Call_OnMouseDown = function(e){
+	    if(window.editor)
+        {
+            var ret = window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
+            window.editor.WordControl.m_oDrawingDocument.OnMouseDown(e);
+            return ret;
+        }
+        return -1;
+    };
+
+    window.native.Call_OnMouseUp = function(e){
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oDrawingDocument.OnMouseUp(e);
+        }
+    };
+
+    window.native.Call_OnMouseMove = function(e){
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oDrawingDocument.OnMouseMove(e);
+        }
+    };
+
+    window.native.Call_OnCheckMouseDown = function(e)
+    {
+        return window.editor.WordControl.m_oDrawingDocument.OnCheckMouseDown(e);
+    };
+
+    window.native.Call_OnCheckMouseDown2 = function(e)
+    {
+        return window.editor.WordControl.m_oDrawingDocument.CheckMouseDown2(e);
+    };
+
+    window.native.Call_ResetSelection = function()
+    {
+        window.editor.WordControl.m_oLogicDocument.RemoveSelection(false);
+        window.editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        window.editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    };
+
+    window.native.Call_OnUpdateOverlay = function(param){
+        if(window.editor)
+        {
+            window.editor.WordControl.OnUpdateOverlay(param);
+        }
+    };
+    window.native.Call_SetCurrentPage = function(param){
+        if(window.editor)
+        {
+            window.editor.WordControl.m_oLogicDocument.Set_CurPage(param);
+        }
+    };
+}
+
+window.native.Call_Menu_Event = function (type, _params)
+{
+    return _api.Call_Menu_Event(type, _params);
 };

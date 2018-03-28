@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -143,6 +143,7 @@
 		this.enableKeyEvents = true;
 		this.isTopLineActive = false;
 		this.skipTLUpdate = true;
+		this.loadFonts = false;
 		this.isOpened = false;
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
@@ -169,8 +170,6 @@
 			blinkInterval: 500,
 			cursorShape: "text"
 		};
-
-		this.dontUpdateText = false;
 
 		this._formula = null;
 
@@ -415,8 +414,8 @@
 					t.newTextFormat = opt.fragments[first.index].format.clone();
 				}
 				t._setFormatProperty(t.newTextFormat, prop, val);
+				t._update();
 			}
-
 		}
 	};
 
@@ -773,7 +772,6 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function (s) {
-		//var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
 		var range = AscCommonExcel.g_oRangeCache.getAscRange(s);
 		return range ? range.clone() : null;
 	};
@@ -809,15 +807,16 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		this._formula.parse(true, true);
+		var refPos = [];
+		this._formula.parse(true, true, refPos);
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
-			for (var index = 0; index < this._formula.RefPos.length; index++) {
+		if (refPos && refPos.length > 0) {
+			for (var index = 0; index < refPos.length; index++) {
 				wsName = null;
 				isName = false;
-				r = this._formula.RefPos[index];
+				r = refPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -935,12 +934,13 @@
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		this._formula.parse(true, true);
+		var refPos = [];
+		this._formula.parse(true, true, refPos);
 
-		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
-			for (var index = 0; index < this._formula.RefPos.length; index++) {
+		if (refPos && refPos.length > 0) {
+			for (var index = 0; index < refPos.length; index++) {
 				wsName = null;
-				r = this._formula.RefPos[index];
+				r = refPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -1177,36 +1177,34 @@
 
 		this._updateUndoRedoChanged();
 
-		if (window['IS_NATIVE_EDITOR'] && !this.dontUpdateText) {
+		if (window['IS_NATIVE_EDITOR']) {
 			window['native']['onCellEditorChangeText'](this._getFragmentsText(this.options.fragments));
 		}
 	};
 
 	CellEditor.prototype._fireUpdated = function () {
-		var t = this;
-		var s = t._getFragmentsText( t.options.fragments );
-		var isFormula = s.charAt( 0 ) === "=";
+		var s = this._getFragmentsText(this.options.fragments);
+		var isFormula = -1 === this.beginCompositePos && s.charAt(0) === "=";
 		var funcPos, funcName, match;
 
-		if ( !t.isTopLineActive || !t.skipTLUpdate || t.undoMode ) {
-			t.input.value = s;
+		if (!this.isTopLineActive || !this.skipTLUpdate || this.undoMode) {
+			this.input.value = s;
 		}
 
-		if ( isFormula ) {
-			funcPos = asc_lastidx( s, t.reNotFormula, t.cursorPos ) + 1;
-			if ( funcPos > 0 ) {
-				match = s.slice( funcPos, t.cursorPos ).match( t.reFormula );
+		if (isFormula) {
+			funcPos = asc_lastidx(s, this.reNotFormula, this.cursorPos) + 1;
+			if (funcPos > 0) {
+				match = s.slice(funcPos, this.cursorPos).match(this.reFormula);
 			}
-			if ( match ) {
+			if (match) {
 				funcName = match[1];
-			}
-			else {
+			} else {
 				funcPos = undefined;
 				funcName = undefined;
 			}
 		}
 
-		t.handlers.trigger( "updated", s, t.cursorPos, isFormula, funcPos, funcName );
+		this.handlers.trigger("updated", s, this.cursorPos, isFormula, funcPos, funcName);
 	};
 
 	CellEditor.prototype._expandWidth = function () {
@@ -1412,13 +1410,12 @@
 	};
 
 	CellEditor.prototype._hideCursor = function () {
-		if ( window['IS_NATIVE_EDITOR'] ) {
+		if (window['IS_NATIVE_EDITOR']) {
 			return;
 		}
 
-		var t = this;
-		window.clearInterval( t.cursorTID );
-		t.cursorStyle.display = "none";
+		window.clearInterval(this.cursorTID);
+		this.cursorStyle.display = "none";
 	};
 
 	CellEditor.prototype._updateCursorPosition = function (redrawText) {
@@ -1491,6 +1488,7 @@
 	};
 
 	CellEditor.prototype._moveCursor = function (kind, pos) {
+		this.newTextFormat = null;
 		var t = this;
 		this.sAutoComplete = null;
 		switch (kind) {
@@ -1563,23 +1561,24 @@
 	};
 
 	CellEditor.prototype._updateTopLineCurPos = function () {
-		var t = this;
-		var isSelected = t.selectionBegin !== t.selectionEnd;
-		var b = isSelected ? t.selectionBegin : t.cursorPos;
-		var e = isSelected ? t.selectionEnd : t.cursorPos;
-		if ( t.input.setSelectionRange ) {
-			t.input.setSelectionRange( Math.min( b, e ), Math.max( b, e ) );
+		if (this.loadFonts) {
+			return;
+		}
+		var isSelected = this.selectionBegin !== this.selectionEnd;
+		var b = isSelected ? this.selectionBegin : this.cursorPos;
+		var e = isSelected ? this.selectionEnd : this.cursorPos;
+		if (this.input.setSelectionRange) {
+			this.input.setSelectionRange(Math.min(b, e), Math.max(b, e));
 		}
 	};
 
 	CellEditor.prototype._topLineGotFocus = function () {
-		var t = this;
-		t.isTopLineActive = true;
-		t.input.isFocused = true;
-		t.setFocus(true);
-		t._hideCursor();
-		t._updateTopLineCurPos();
-		t._cleanSelection();
+		this.isTopLineActive = true;
+		this.input.isFocused = true;
+		this.setFocus(true);
+		this._hideCursor();
+		this._updateTopLineCurPos();
+		this._cleanSelection();
 	};
 
 	CellEditor.prototype._topLineMouseUp = function () {
@@ -1658,14 +1657,17 @@
 	};
 
 	CellEditor.prototype._addChars = function (str, pos, isRange) {
-		var opt = this.options, f, l, s, length = str.length;
-
+		var length = str.length;
 		if (!this._checkMaxCellLength(length)) {
 			return false;
 		}
 
+		var opt = this.options, f, l, s;
+
+		var noUpdateMode = this.noUpdateMode;
+		this.noUpdateMode = true;
+
 		this.sAutoComplete = null;
-		this.dontUpdateText = true;
 
 		if (this.selectionBegin !== this.selectionEnd) {
 			var copyFragment = this._findFragmentToInsertInto(Math.min(this.selectionBegin, this.selectionEnd) + 1);
@@ -1675,8 +1677,6 @@
 
 			this._removeChars(undefined, undefined, isRange);
 		}
-
-		this.dontUpdateText = false;
 
 		if (pos === undefined) {
 			pos = this.cursorPos;
@@ -1702,6 +1702,8 @@
 		}
 
 		this.cursorPos = pos + str.length;
+
+		this.noUpdateMode = noUpdateMode;
 		if (!this.noUpdateMode) {
 			this._update();
 		}
@@ -2119,7 +2121,7 @@
 		if ( !tmp ) {
 			return;
 		}
-		tmp = this.options.fragments[tmp.index].format;
+		tmp = this.newTextFormat || this.options.fragments[tmp.index].format;
 		var va = tmp.getVerticalAlign();
 		var fc = tmp.getColor();
 		var result = new AscCommonExcel.asc_CFont();
@@ -2247,7 +2249,7 @@
 				return false;
 
 			case 46:  // "del"
-				if (!this.enableKeyEvents) {
+				if (!this.enableKeyEvents || event.shiftKey) {
 					break;
 				}
 
@@ -2472,10 +2474,6 @@
 				break;
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
-				if (!this.enableKeyEvents) {
-					break;
-				}
-
 				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -2586,6 +2584,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseUp = function ( event ) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		if ( this.callTopLineMouseup ) {
 			this._topLineMouseUp();
@@ -2606,6 +2605,8 @@
 		if (AscCommon.g_inputContext && AscCommon.g_inputContext.externalChangeFocus())
 			return;
 
+		AscCommon.global_mouseEvent.LockMouse();
+
 		var pos;
 		var coord = this._getCoordinates(event);
 		if (!window['IS_NATIVE_EDITOR']) {
@@ -2613,6 +2614,7 @@
 		}
 
 		this.setFocus(true);
+		this.handlers.trigger('setStrictClose', true);
 
 		this.isTopLineActive = false;
 		this.input.isFocused = false;
@@ -2640,14 +2642,16 @@
 				this._moveCursor(kPosition, startWord);
 				this._selectChars(kPosition, endWord);
 			}
+		} else if (2 === event.button) {
+			this.handlers.trigger('onContextMenu', event);
 		}
 		return true;
 	};
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onMouseUp = function (event) {
+		AscCommon.global_mouseEvent.UnLockMouse();
 		if (2 === event.button) {
-			this.handlers.trigger('onContextMenu', event);
 			return true;
 		}
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
@@ -2673,12 +2677,17 @@
 
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
-		if (this.handlers.trigger("isViewerMode")) {
+		var t = this;
+		if (this.handlers.trigger("isViewerMode") || this.loadFonts) {
 			return true;
 		}
-		this.skipTLUpdate = true;
-		this.replaceText(0, this.textRender.getEndOfText(), this.input.value);
-		this._updateCursorByTopLine();
+		this.loadFonts = true;
+		AscFonts.FontPickerByCharacter.checkText(this.input.value, this, function () {
+			t.loadFonts = false;
+			t.skipTLUpdate = true;
+			t.replaceText(0, t.textRender.getEndOfText(), t.input.value);
+			t._updateCursorByTopLine();
+		});
 		return true;
 	};
 
@@ -2705,8 +2714,8 @@
 			this.beginCompositePos = this.cursorPos;
 			this.compositeLength = 0;
 		} else {
-			this.beginCompositePos = this.selectionBegin;
-			this.compositeLength = this.selectionEnd - this.selectionBegin;
+			this.beginCompositePos = Math.min(this.selectionBegin, this.selectionEnd);
+			this.compositeLength = Math.max(this.selectionBegin, this.selectionEnd) - this.beginCompositePos;
 		}
 		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
 	};

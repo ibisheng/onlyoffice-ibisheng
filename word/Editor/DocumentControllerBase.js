@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -272,7 +272,7 @@ CDocumentControllerBase.prototype.CanUpdateTarget = function(){return true;};
  * Пересчитываем текущую позицию.
  * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}
  */
-CDocumentControllerBase.prototype.RecalculateCurPos = function(){return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};};
+CDocumentControllerBase.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY){return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};};
 /**
  * Получаем текущий номер страницы.
  * @returns {number} -1 - значит, номер страницы определеить невозможно
@@ -293,6 +293,12 @@ CDocumentControllerBase.prototype.AddNewParagraph = function(bRecalculate, bForc
  * @param {boolean} bFlow - инлайн объект или "плавающий"
  */
 CDocumentControllerBase.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow){};
+
+/**
+ * Добавляем несколько изображений
+ * @param {Array} aImages - массив объектов типа CImage
+ * */
+CDocumentControllerBase.prototype.AddImages = function(aImages){};
 /**
  * Добавляем OLE-объект.
  * @param nW
@@ -600,7 +606,7 @@ CDocumentControllerBase.prototype.GetSelectedText = function(bClearText, oPr){re
  * Получаем текущий параграф.
  * @returns {?Paragraph}
  */
-CDocumentControllerBase.prototype.GetCurrentParagraph = function(){return null};
+CDocumentControllerBase.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs){return null};
 /**
  * Собираем информацию о выделенной части документа.
  * @param oInfo
@@ -651,6 +657,14 @@ CDocumentControllerBase.prototype.CanMergeTableCells = function(){return false;}
  * @returns {boolean}
  */
 CDocumentControllerBase.prototype.CanSplitTableCells = function(){return false;};
+/**
+ * Распределяем ячейки таблицы по ширине или высоте.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return false;
+};
 /**
  * Обновляем состояние интерфейса.
  */
@@ -744,3 +758,7 @@ CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
  * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
  */
 CDocumentControllerBase.prototype.AddContentControl = function(nContentControlType){return null;};
+/**
+ * Получаем стиль по выделенному фрагменту
+ */
+CDocumentControllerBase.prototype.GetStyleFromFormatting = function(){return null;};

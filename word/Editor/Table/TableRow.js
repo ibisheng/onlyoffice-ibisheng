@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -160,22 +160,22 @@ CTableRow.prototype =
         this.Metrics.X_max = x_max;
     },
 
-    Get_EndInfo : function()
+	GetEndInfo : function()
     {
         var CellsCount = this.Content.length;
         if ( CellsCount > 0 )
-            return this.Content[CellsCount - 1].Get_EndInfo();
+            return this.Content[CellsCount - 1].GetEndInfo();
         else
             return null;
     },
 
 	GetPrevElementEndInfo : function(CellIndex)
-    {
-        if ( 0 === CellIndex )
-            return this.Table.GetPrevElementEndInfo( this.Index );
-        else
-            return this.Content[CellIndex - 1].Get_EndInfo();
-    },
+	{
+		if (0 === CellIndex)
+			return this.Table.GetPrevElementEndInfo(this.Index);
+		else
+			return this.Content[CellIndex - 1].GetEndInfo();
+	},
 
 	SaveRecalculateObject : function()
 	{
@@ -321,11 +321,10 @@ CTableRow.prototype =
     {
         var RowPr = this.Get_CompiledPr( false );
 
-        var Before =
-            {
-                WBefore    : RowPr.WBefore.Copy(),
-                GridBefore : RowPr.GridBefore
-            };
+		var Before = {
+			WBefore    : RowPr.WBefore.Copy(),
+			GridBefore : RowPr.GridBefore
+		};
 
         return Before;
     },
@@ -367,11 +366,10 @@ CTableRow.prototype =
     {
         var RowPr = this.Get_CompiledPr( false );
 
-        var After =
-            {
-                WAfter    : RowPr.WAfter.Copy(),
-                GridAfter : RowPr.GridAfter
-            };
+		var After = {
+			WAfter    : RowPr.WAfter.Copy(),
+			GridAfter : RowPr.GridAfter
+		};
 
         return After;
     },
@@ -444,22 +442,6 @@ CTableRow.prototype =
 		this.Recalc_CompiledPr();
 	},
 
-    Is_Header : function()
-    {
-        var RowPr = this.Get_CompiledPr(false);
-        return RowPr.TableHeader;
-    },
-
-	Set_Header : function(Value)
-	{
-		if (Value === this.Pr.TableHeader)
-			return;
-
-		History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, Value));
-		this.Pr.TableHeader = Value;
-		this.Recalc_CompiledPr();
-	},
-
     Copy_Pr : function(OtherPr)
     {
         // Before
@@ -488,9 +470,9 @@ CTableRow.prototype =
 
         // TableHeader
         if ( undefined != OtherPr.TableHeader )
-            this.Set_Header( OtherPr.TableHeader );
+            this.SetHeader( OtherPr.TableHeader );
         else
-            this.Set_Header( undefined );
+            this.SetHeader( undefined );
     },
 
     Set_SpacingInfo : function(bSpacingTop, bSpacingBot)
@@ -746,6 +728,22 @@ CTableRow.prototype =
     {
     }
 };
+/**
+ * Доступ к родительской таблице
+ * @returns {null | CTable}
+ */
+CTableRow.prototype.GetTable = function()
+{
+	return this.Table;
+};
+/**
+ * Получаем номер данной строки в родительской таблице
+ * @returns {number}
+ */
+CTableRow.prototype.GetIndex = function()
+{
+	return this.Index;
+};
 CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
@@ -759,6 +757,172 @@ CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
+/**
+ * Получаем ячейку с заданным номером в строке
+ * @param nCellIndex
+ * @returns {CTableCell}
+ */
+CTableRow.prototype.GetCell = function(nCellIndex)
+{
+	return this.Get_Cell(nCellIndex);
+};
+CTableRow.prototype.GetCellsCount = function()
+{
+	return this.Get_CellsCount()
+};
+CTableRow.prototype.AddCell = function(nIndex, oRow, oCell, isReIndexing)
+{
+	this.Add_Cell(nIndex, oRow, oCell, isReIndexing);
+};
+CTableRow.prototype.RemoveCell = function(nIndex)
+{
+	this.Remove_Cell(nIndex);
+};
+CTableRow.prototype.GetCellInfo = function(nIndex)
+{
+	return this.Get_CellInfo(nIndex);
+};
+CTableRow.prototype.GetCellSpacing = function()
+{
+	return this.Get_CellSpacing();
+};
+/**
+ * Получаем высоту строки
+ * @returns {CTableRowHeight}
+ */
+CTableRow.prototype.GetHeight = function()
+{
+	return this.Get_Height();
+};
+/**
+ * Устанавливаем высоту строки
+ * @param nValue
+ * @param nHRule
+ */
+CTableRow.prototype.SetHeight = function(nValue, nHRule)
+{
+	return this.Set_Height(nValue, nHRule);
+};
+/**
+ * Получаем информацию о отступе сетки в начале строки
+ * @returns {{W, Grid}}
+ */
+CTableRow.prototype.GetBefore = function()
+{
+	var oRowPr = this.Get_CompiledPr(false);
+
+	return {
+		W    : oRowPr.WBefore.Copy(),
+		Grid : oRowPr.GridBefore
+	};
+};
+/**
+ * Задаем информацию об отступе сетки в начале строки
+ * @param {number} Grid - сколько колонок занимает отступ
+ * @param {CTableMeasurement | 'false'} W - желаемая ширина (если задано значение false, тогда не меняем ширину)
+ */
+CTableRow.prototype.SetBefore = function(Grid, W)
+{
+	this.Set_Before(Grid, W);
+};
+/**
+ * Получаем информацию об отступе сетки в конце строки
+ * @returns {{W, Grid}}
+ */
+CTableRow.prototype.GetAfter = function()
+{
+	var oRowPr = this.Get_CompiledPr(false);
+
+	return {
+		W    : oRowPr.WAfter.Copy(),
+		Grid : oRowPr.GridAfter
+	};
+};
+/**
+ * Задаем информацию об отступе сетки в конце строки
+ * @param {number} Grid - сколько колонок занимает отступ
+ * @param {CTableMeasurement | 'false'} W - желаемая ширина (если задано значение false, тогда не меняем ширину)
+ */
+CTableRow.prototype.SetAfter = function(Grid, W)
+{
+	this.Set_After(Grid, W);
+};
+/**
+ * Получаем общий отступ сверху у строки (максимальный отступ сверху среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetTopMargin = function()
+{
+	var nTopMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Top.W > nTopMargin)
+			nTopMargin = oMargins.Top.W;
+	}
+
+	return nTopMargin;
+};
+/**
+ * Получаем общий отступ снизу у строки (максимальный отступ снизу среди всех ячеек)
+ * @returns {number}
+ */
+CTableRow.prototype.GetBottomMargin = function()
+{
+	// Ячейки, участвующие в вертикальном объединении, не влияют на отступ снизу
+
+	var nBottomMargin = 0;
+
+	for (var nCurCell = 0, nCellsCount = this.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
+	{
+		var oCell = this.GetCell(nCurCell);
+
+		if (vmerge_Restart != oCell.GetVMerge())
+			continue;
+
+		var nVMergeCount = this.Table.GetVMergeCount(nCurCell, this.Index);
+		if (nVMergeCount > 1)
+			continue;
+
+		var oMargins = oCell.GetMargins();
+
+		if (oMargins.Bottom.W > nBottomMargin)
+			nBottomMargin = oMargins.Bottom.W;
+	}
+
+	return nBottomMargin;
+};
+/**
+ * Проверяем является ли данная строка строкой заголовка таблицы
+ * @returns {boolean}
+ */
+CTableRow.prototype.IsHeader = function()
+{
+	return this.Get_CompiledPr(false).TableHeader;
+};
+/**
+ * Устанавливаем является ли данная строка строкой заголовка таблицы
+ * @param isHeader {boolean}
+ */
+CTableRow.prototype.SetHeader = function(isHeader)
+{
+	if (isHeader === this.Pr.TableHeader)
+		return;
+
+	History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, isHeader));
+	this.Pr.TableHeader = isHeader;
+	this.Recalc_CompiledPr();
+};
+
+
+
 
 function CTableRowRecalculateObject()
 {

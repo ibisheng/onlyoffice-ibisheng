@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -54,6 +54,11 @@ function CWordCollaborativeEditing()
 CWordCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
 CWordCollaborativeEditing.prototype.constructor = CWordCollaborativeEditing;
 
+CWordCollaborativeEditing.prototype.Clear = function()
+{
+	AscCommon.CCollaborativeEditingBase.prototype.Clear.apply(this, arguments);
+	this.Remove_AllForeignCursors();
+};
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
     // Пересчитываем позиции
@@ -102,30 +107,37 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
         }
     }
 
-    var UnlockCount = this.m_aNeedUnlock.length;
-    this.Release_Locks();
+    var UnlockCount = 0;
 
-    var UnlockCount2 = this.m_aNeedUnlock2.length;
-    for (var Index = 0; Index < UnlockCount2; Index++)
-    {
-        var Class = this.m_aNeedUnlock2[Index];
-        Class.Lock.Set_Type(AscCommon.locktype_None, false);
-        editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
-    }
+    // Пока пользователь сидит один, мы не чистим его локи до тех пор пока не зайдет второй
+    var bCollaborative = this.getCollaborativeEditing();
+    if (bCollaborative)
+	{
+		UnlockCount = this.m_aNeedUnlock.length;
+		this.Release_Locks();
 
-    this.m_aNeedUnlock.length = 0;
-    this.m_aNeedUnlock2.length = 0;
+		var UnlockCount2 = this.m_aNeedUnlock2.length;
+		for (var Index = 0; Index < UnlockCount2; Index++)
+		{
+			var Class = this.m_aNeedUnlock2[Index];
+			Class.Lock.Set_Type(AscCommon.locktype_None, false);
+			editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
+		}
+
+		this.m_aNeedUnlock.length  = 0;
+		this.m_aNeedUnlock2.length = 0;
+	}
 
 	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 	if (0 < aChanges.length || null !== deleteIndex)
 	{
 		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
-		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2, bCollaborative);
 		AscCommon.History.CanNotAddChanges = true;
 	}
 	else
 	{
-		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2, null, bCollaborative);
 	}
 	editor.canUnlockDocument2 = false;
 
@@ -388,6 +400,11 @@ CWordCollaborativeEditing.prototype.Remove_AllForeignCursors = function()
     {
         this.Remove_ForeignCursor(UserId);
     }
+};
+CWordCollaborativeEditing.prototype.RemoveMyCursorFromOthers = function()
+{
+	// Удаляем свой курсор у других пользователей
+	this.m_oLogicDocument.Api.CoAuthoringApi.sendCursor("");
 };
 CWordCollaborativeEditing.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos)
 {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -182,9 +182,9 @@ CTableCell.prototype =
         this.Metrics.X_content_end   = X_content_end;
     },
 
-    Get_EndInfo : function()
+	GetEndInfo : function()
     {
-        return this.Content.Get_EndInfo();
+        return this.Content.GetEndInfo();
     },
 
 	GetPrevElementEndInfo : function(CurElement)
@@ -595,57 +595,6 @@ CTableCell.prototype =
 		else
 			return CurTable.Parent.CheckTableCoincidence(Table);
 	},
-
-    Get_LastParagraphPrevCell : function()
-    {
-        if ( undefined === this.Row || null === this.Row )
-            return null;
-
-        var CellIndex = this.Index;
-        var Row = this.Row;
-
-        // TODO: Разобраться, что делать в данном случае
-        if ( 0 === CellIndex )
-        {
-            if ( 0 === this.Row.Index && undefined !== this.Row.Table && null !== this.Row.Table )
-            {
-                var Prev = this.Row.Table.Get_DocumentPrev();
-                if ( null !== Prev && type_Paragraph === Prev.GetType() )
-                    return Prev;
-            }
-
-            return null;
-        }
-
-        var PrevCell = Row.Get_Cell( CellIndex );
-
-        var Count = PrevCell.Content.Content.length;
-        if ( Count <= 0 )
-            return null;
-
-        var Element = PrevCell.Content.Content[Count - 1];
-        if ( type_Paragraph !== Element.GetType() )
-            return null;
-
-        return Element;
-    },
-
-    Get_FirstParagraphNextCell : function()
-    {
-        if ( undefined === this.Row || null === this.Row )
-            return null;
-
-        var CellIndex = this.Index;
-        var Row = this.Row;
-
-        // TODO: Разобраться, что делать в данном случае
-        if ( CellIndex >= this.Row.Get_CellsCount() - 1 )
-            return null;
-
-        var NextCell = Row.Get_Cell( CellIndex );
-
-        return NextCell.Content.Get_FirstParagraph();
-    },
     //-----------------------------------------------------------------------------------
     // Функции для работы с номерами страниц
     //-----------------------------------------------------------------------------------
@@ -810,14 +759,14 @@ CTableCell.prototype =
 		this.Content.DrawSelectionOnPage(CurPage);
 	},
 
-    Content_RecalculateCurPos : function()
+    Content_RecalculateCurPos : function(bUpdateX, bUpdateY)
     {
         var Transform = this.private_GetTextDirectionTransform();
         var DrawingDocument = this.Row.Table.DrawingDocument;
         if (null !== Transform && DrawingDocument)
             DrawingDocument.MultiplyTargetTransform(Transform);
 
-        return this.Content.RecalculateCurPos();
+        return this.Content.RecalculateCurPos(bUpdateX, bUpdateY);
     },
 
     Content_Get_NearestPos : function(CurPage, X, Y, bAnchor, Drawing)
@@ -1027,7 +976,7 @@ CTableCell.prototype =
         if ( true === bClearMerge )
         {
             this.Set_GridSpan( undefined );
-            this.Set_VMerge( undefined );
+            this.SetVMerge( undefined );
         }
     },
 
@@ -1067,7 +1016,7 @@ CTableCell.prototype =
         if ( true != bCopyOnlyVisualProps )
         {
             // VMerge
-            this.Set_VMerge(OtherPr.VMerge);
+            this.SetVMerge(OtherPr.VMerge);
         }
 
         // Border Top
@@ -1342,22 +1291,6 @@ CTableCell.prototype =
 			this.Pr.Shd = _Shd;
 			this.Recalc_CompiledPr();
 		}
-	},
-
-    Get_VMerge : function()
-    {
-        var VMerge = this.Get_CompiledPr(false).VMerge;
-        return VMerge;
-    },
-
-	Set_VMerge : function(Value)
-	{
-		if (Value === this.Pr.VMerge)
-			return;
-
-		History.Add(new CChangesTableCellVMerge(this, this.Pr.VMerge, Value));
-		this.Pr.VMerge = Value;
-		this.Recalc_CompiledPr();
 	},
 
     Get_VAlign : function()
@@ -1740,23 +1673,38 @@ CTableCell.prototype =
 
     Refresh_RecalcData2 : function(Page_Rel)
     {
-        this.Row.Table.RecalcInfo.Add_Cell( this );
+    	var oRow   = this.GetRow();
+    	var oTable = this.GetTable();
+    	if (!oRow || !oTable)
+    		return;
 
-        var Table   = this.Row.Table;
-        var TablePr = Table.Get_CompiledPr(false).TablePr;
+    	oTable.RecalcInfo.Add_Cell(this);
+
+        // Изменения в текущей ячейке могут вызвать изменения в следующей или предыдущей ячейках.
+		// Например, когда у нас сквозная есть нумерация внутри ячеек
+		var nCurCell = this.GetIndex();
+		if (nCurCell > 0)
+			oTable.RecalcInfo.Add_Cell(oRow.GetCell(nCurCell - 1));
+
+		if (nCurCell < oRow.GetCellsCount() - 1)
+			oTable.RecalcInfo.Add_Cell(oRow.GetCell(nCurCell + 1));
+
+        var TablePr = oTable.Get_CompiledPr(false).TablePr;
         if (tbllayout_AutoFit === TablePr.TableLayout)
         {
-            if (this.Row.Table.Parent.Pages.length > 0)
+            if (oTable.Parent.Pages.length > 0)
             {
                 // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
                 // пересчитывать таблицу надо с самого начала.
-                History.Add_RecalcTableGrid(Table.Get_Id());
+                History.Add_RecalcTableGrid(oTable.Get_Id());
             }
             else
-                return Table.Refresh_RecalcData2(0, 0);
+			{
+				return oTable.Refresh_RecalcData2(0, 0);
+			}
         }
 
-        this.Row.Refresh_RecalcData2( this.Index, Page_Rel );
+        oRow.Refresh_RecalcData2(nCurCell, Page_Rel);
     },
     //-----------------------------------------------------------------------------------
     // Функции для работы с совместным редактирования
@@ -1793,6 +1741,42 @@ CTableCell.prototype =
     Load_LinkData : function(LinkData)
     {
     }
+};
+/**
+ * Доступ к содержимому ячейки
+ * @returns {CDocumentContent}
+ */
+CTableCell.prototype.GetContent = function()
+{
+	return this.Content;
+};
+/**
+ * Доступ к родительской строке
+ * @returns {null | CTableRow}
+ */
+CTableCell.prototype.GetRow = function()
+{
+	return this.Row;
+};
+/**
+ * Доступ к родительской таблице
+ * @returns {null | CTable}
+ */
+CTableCell.prototype.GetTable = function()
+{
+	var oRow = this.GetRow();
+	if (!oRow)
+		return null;
+
+	return oRow.GetTable();
+};
+/**
+ * Получаем номер данной ячейки в родительской строке
+ * @returns {number}
+ */
+CTableCell.prototype.GetIndex = function()
+{
+	return this.Index;
 };
 CTableCell.prototype.private_TransformXY = function(X, Y)
 {
@@ -1855,12 +1839,191 @@ CTableCell.prototype.Get_Table = function()
 
     return Table;
 };
-CTableCell.prototype.Get_TopDocumentContent = function()
+CTableCell.prototype.GetTopDocumentContent = function()
 {
     if (this.Row && this.Row.Table && this.Row.Table.Parent)
-        return this.Row.Table.Parent.Get_TopDocumentContent();
+        return this.Row.Table.Parent.GetTopDocumentContent();
 
     return null;
+};
+/**
+ * Специальная вставка таблицы в таблицу. Данная функция вызывается из CDocumentContent
+ * @param oTable
+ */
+CTableCell.prototype.InsertTableContent = function(oTable)
+{
+	if (!this.Row || !this.Row.Table)
+		return;
+
+	this.Row.Table.InsertTableContent(this.Index, this.Row.Index, oTable);
+};
+/**
+ * Получаем ширину ячейки исходя из таблицы TableGrid
+ * @returns {number}
+ */
+CTableCell.prototype.GetCalculatedW = function()
+{
+	var oRow   = this.Row,
+		oTable = oRow.Table;
+
+	var nCurGridStart = oRow.GetCellInfo(this.Index).StartGridCol;
+	var nCurGridEnd   = nCurGridStart + this.Get_GridSpan() - 1;
+
+	if (oTable.TableSumGrid.length > nCurGridEnd)
+		return oTable.TableSumGrid[nCurGridEnd] - oTable.TableSumGrid[nCurGridStart - 1];
+
+	return 3.8; // 1.9 + 1.9 стандартные отступы справа и слева
+};
+/**
+ * Получаем количество промежутков, которое занимает данная ячейка
+ * @returns {number}
+ */
+CTableCell.prototype.GetGridSpan = function()
+{
+	return this.Get_GridSpan();
+};
+/**
+ * Получаем информацию о границе ячейки
+ * @param {number} nType - 0 - Top, 1 - Right, 2- Bottom, 3- Left
+ */
+CTableCell.prototype.GetBorder = function(nType)
+{
+	return this.Get_Border(nType);
+};
+/**
+ * Проверяем, является ли данная ячейка последней в строке
+ * @returns {boolean}
+ */
+CTableCell.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	if (true !== isSelection)
+		return !!(this.Row && this.Row.GetCellsCount() - 1 === this.Index);
+
+	if (!this.Row || !this.Row.Table)
+		return false;
+
+	var nCurCell = this.Index;
+	var nCurRow  = this.Row.Index;
+
+	var oTable = this.Row.Table;
+	var arrSelectionArray = oTable.GetSelectionArray();
+	for (var nIndex = 0, nCount = arrSelectionArray.length; nIndex < nCount; ++nIndex)
+	{
+		var nRow  = arrSelectionArray[nIndex].Row;
+		var nCell = arrSelectionArray[nIndex].Cell;
+
+		if (nRow === nCurRow && nCell > nCurCell)
+			return false;
+	}
+
+	return true;
+};
+/**
+ * Получаем скомпилированную настройку ширины ячейки
+ * @returns {?CTableMeasurement}
+ */
+CTableCell.prototype.GetW = function()
+{
+	return this.Get_W();
+};
+/**
+ * Задаем предпочитаемую ширину ячейки
+ * @param {CTableMeasurement} oCellW
+ */
+CTableCell.prototype.SetW = function(oCellW)
+{
+	return this.Set_W(oCellW);
+};
+/**
+ * Участвует ли в вертикальном объединении данная ячейка
+ * @returns {vmerge_Restart | vmerge_Continue}
+ */
+CTableCell.prototype.GetVMerge = function()
+{
+	return this.Get_CompiledPr(false).VMerge;
+};
+/**
+ * Задаем настройку участия данной ячейки в вертикальном объединении
+ * @param {vmerge_Restart | vmerge_Continue} nType
+ */
+CTableCell.prototype.SetVMerge = function(nType)
+{
+	if (nType === this.Pr.VMerge)
+		return;
+
+	History.Add(new CChangesTableCellVMerge(this, this.Pr.VMerge, nType));
+	this.Pr.VMerge = nType;
+	this.Recalc_CompiledPr();
+};
+/**
+ * Проверяем находится ли данная ячейка в заголовке таблицы
+ * @param {boolean} [isDeep=false] Если данная ячейка не в заголовке своей таблицы, то смотрим ли у родительского класса таблицы
+ * @returns {boolean}
+ */
+CTableCell.prototype.IsInHeader = function(isDeep)
+{
+	var isInHeader = this.Row.Table.IsInHeader(this.Row.GetIndex());
+	if (isInHeader)
+		return true;
+
+	if (true === isDeep && this.Row.Table.Parent && this.Row.Table.Parent.IsTableHeader)
+		return this.Row.Table.Parent.IsTableHeader();
+
+	return false;
+};
+/**
+ * Получаем последний элемент в предыдущей ячейке данной строки
+ * @returns {?CDocumentContentElementBase}
+ */
+CTableCell.prototype.GetLastElementInPrevCell = function()
+{
+	var nCurCell = this.GetIndex();
+	var oRow     = this.GetRow();
+
+	if (!oRow)
+		return null;
+
+	// TODO: Разобраться, что делать в данном случае
+	if (0 === nCurCell)
+	{
+		var oTable = this.GetTable();
+		if (0 === oRow.GetIndex() && oTable)
+			return oTable.Get_DocumentPrev();
+
+		return null;
+	}
+
+	var oPrevCell = oRow.GetCell(nCurCell - 1);
+	var oCellContent = oPrevCell.GetContent();
+
+	var nCount = oCellContent.GetElementsCount();
+	if (nCount <= 0)
+		return null;
+
+	return oCellContent.GetElement(nCount - 1);
+};
+/**
+ * Получаем первый элемент в следующей ячейке
+ * @returns {?CDocumentContentElementBase}
+ */
+CTableCell.prototype.GetFirstElementInNextCell = function()
+{
+	var nCurCell = this.GetIndex();
+	var oRow     = this.GetRow();
+
+	if (!oRow)
+		return null;
+
+	// TODO: Разобраться, что делать в данном случае
+	if (nCurCell >= oRow.GetCellsCount() - 1)
+		return null;
+
+	var oCellContent = oRow.GetCell(nCurCell + 1).GetContent();
+	var nCount = oCellContent.GetElementsCount();
+	if (nCount <= 0)
+		return null;
+
+	return oCellContent.GetElement(0);
 };
 
 function CTableCellRecalculateObject()

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -134,6 +134,18 @@ CAscSlideTiming.prototype.setDefaultParams = function()
     this.SlideAdvanceDuration       = 10000;
     this.ShowLoop                   = true;
 };
+CAscSlideTiming.prototype.setDefaultParams = function()
+{
+    this.TransitionType     = c_oAscSlideTransitionTypes.None;
+    this.TransitionOption   = -1;
+    this.TransitionDuration = 2000;
+
+    this.SlideAdvanceOnMouseClick   = true;
+    this.SlideAdvanceAfter          = false;
+    this.SlideAdvanceDuration       = 10000;
+    this.ShowLoop                   = true;
+};
+
 
 CAscSlideTiming.prototype.Write_ToBinary = function(w)
 {
@@ -190,6 +202,20 @@ CAscSlideTiming.prototype.Read_FromBinary = function(r)
     this.ShowLoop = AscFormat.readBool(r);
 };
 
+CAscSlideTiming.prototype.ToArray = function()
+{
+    var _ret = [];
+    _ret.push(this.TransitionType);
+    _ret.push(this.TransitionOption);
+    _ret.push(this.TransitionDuration);
+
+    _ret.push(this.SlideAdvanceOnMouseClick);
+    _ret.push(this.SlideAdvanceAfter);
+    _ret.push(this.SlideAdvanceDuration);
+    _ret.push(this.ShowLoop);
+    return _ret;
+};
+
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideSetTiming            ] = CAscSlideTiming;
 
 
@@ -223,34 +249,41 @@ CLayoutThumbnail.prototype.get_Name = function() { return this.Name; };
 CLayoutThumbnail.prototype.get_Width = function() { return this.Width; };
 CLayoutThumbnail.prototype.get_Height = function() { return this.Height; };
 
-function CHyperlinkProperty( obj )
-{
-    if( obj )
-    {
-        this.Text    = (undefined != obj.Text   ) ? obj.Text    : null;
-        this.Value   = (undefined != obj.Value  ) ? obj.Value   : "";
-        this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : null;
+
+function CompareTiming(timing1, timing2){
+    if(!timing1 || !timing2){
+        return null;
     }
-    else
-    {
-        this.Text    = null;
-        this.Value   = "";
-        this.ToolTip = null;
+    var ret = new CAscSlideTiming();
+    if(timing1.TransitionType === timing2.TransitionType){
+        ret.TransitionType = timing1.TransitionType;
     }
+    if(timing1.TransitionOption === timing2.TransitionOption){
+        ret.TransitionOption = timing1.TransitionOption;
+    }
+    if(timing1.TransitionDuration === timing2.TransitionDuration){
+        ret.TransitionDuration = timing1.TransitionDuration;
+    }
+    if(timing1.SlideAdvanceOnMouseClick === timing2.SlideAdvanceOnMouseClick){
+        ret.SlideAdvanceOnMouseClick = timing1.SlideAdvanceOnMouseClick;
+    }
+    if(timing1.SlideAdvanceAfter === timing2.SlideAdvanceAfter){
+        ret.SlideAdvanceAfter = timing1.SlideAdvanceAfter;
+    }
+    if(timing1.SlideAdvanceDuration === timing2.SlideAdvanceDuration){
+        ret.SlideAdvanceDuration = timing1.SlideAdvanceDuration;
+    }
+    if(timing1.ShowLoop === timing2.ShowLoop){
+        ret.ShowLoop = timing1.ShowLoop;
+    }
+    return ret;
+
 }
-
-CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
-CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
-CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v; };
-CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
-CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
-
-
 //------------------------------------------------------------export----------------------------------------------------
 window['Asc'] = window['Asc'] || {};
 window['AscCommonSlide'] = window['AscCommonSlide'] || {};
 window['Asc']['CAscSlideTiming'] = CAscSlideTiming;
+window['AscCommonSlide'].CompareTiming = CompareTiming;
 CAscSlideTiming.prototype['put_TransitionType'] = CAscSlideTiming.prototype.put_TransitionType;
 CAscSlideTiming.prototype['get_TransitionType'] = CAscSlideTiming.prototype.get_TransitionType;
 CAscSlideTiming.prototype['put_TransitionOption'] = CAscSlideTiming.prototype.put_TransitionOption;

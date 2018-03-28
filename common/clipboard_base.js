@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -87,29 +87,15 @@
 		this.CopyPasteFocusTimer = -1;
 
 		this.inputContext = null;
-		this.LastCopyBinary = null; // для вставки по кнопке, еогда браузер не позволяет
+		this.LastCopyBinary = null; // для вставки по кнопке, когда браузер не позволяет
 
 		// images counter
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
 		this.PasteImagesBody = "";
-		
-		//special paste
-		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
-		
-		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
-		this.specialPasteProps = null;
-		
-		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
-		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
-		
-		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
-		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
 
-		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
-
-		this.showButtonIdParagraph = null;
-		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
+		this.DivOnCopyHtmlPresent = false;
+		this.DivOnCopyText = "";
 
 		this.bSaveFormat = false; //для вставки, допустим, из плагина необходимо чтобы при добавлении текста в шейп сохранялось форматирование
 	}
@@ -213,10 +199,11 @@
 				if (!_clipboard || !_clipboard.getData)
 					return false;
 
+				var _text_format = this.ClosureParams.getData("text/plain");
 				var _internal = this.ClosureParams.getData("text/x-custom");
-				if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
+				if (_internal && _internal != "" && _internal.indexOf("asc_internalData2;") == 0)
 				{
-					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length));
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData2;".length), null, _text_format);
 					g_clipboardBase.Paste_End();
 					return false;
 				}
@@ -228,71 +215,14 @@
 					if (-1 != nIndex)
 						_html_format = _html_format.substring(0, nIndex + "</html>".length);
 
-					this.CommonIframe_PasteStart(_html_format);
+					this.CommonIframe_PasteStart(_html_format, _text_format);
 					return false;
 				}
 
-				var _text_format = this.ClosureParams.getData("text/plain");
 				if (_text_format && _text_format != "")
 				{
-					var sHtml     = "<html><body>";
-					var sCurPar   = "";
-					var nParCount = 0;
-					for (var i = 0, length = _text_format.length; i < length; i++)
-					{
-						var Char = _text_format.charAt(i);
-						var Code = _text_format.charCodeAt(i);
-						var Item = null;
-
-						if ('\n' === Char)
-						{
-							if ("" == sCurPar)
-								sHtml += "<p><span>&nbsp;</span></p>";
-							else
-							{
-								sHtml += "<p><span>" + sCurPar + "</span></p>";
-								sCurPar = "";
-							}
-							nParCount++;
-						}
-						else if (13 === Code)
-						{
-							continue;
-						}
-						else
-						{
-							if (32 == Code || 160 == Code) //160 - nbsp
-								sCurPar += " ";
-							else if (9 === Code)
-								sCurPar += "<span style='mso-tab-count:1'>    </span>";
-							else
-							{
-								if (Char == '&')
-									sCurPar += "&amp;";
-								else if (Char == '<')
-									sCurPar += "&lt;";
-								else if (Char == '>')
-									sCurPar += "&gt;";
-								else if (Char == '\'')
-									sCurPar += "&apos;";
-								else if (Char == '\"')
-									sCurPar += "&quot;";
-								else
-									sCurPar += Char;
-							}
-						}
-					}
-					if ("" != sCurPar)
-					{
-						if (0 == nParCount)
-							sHtml += ("<span>" + sCurPar + "</span>");
-						else
-							sHtml += ("<p><span>" + sCurPar + "</span></p>");
-						sCurPar = "";
-					}
-					sHtml += "</body></html>";
-
-					this.CommonIframe_PasteStart(sHtml, _text_format);
+					this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, _text_format);
+					g_clipboardBase.Paste_End();
 					return false;
 				}
 
@@ -418,6 +348,8 @@
 		Init : function(_api)
 		{
 			this.Api = _api;
+
+			window['AscCommon'].g_specialPasteHelper.Init(_api);
 
 			this.ClosureParams.getData = function(type)
 			{
@@ -656,6 +588,9 @@
 				ElemToSelect.style.overflow               = 'hidden';
 				ElemToSelect.style.zIndex                 = -1000;
 				ElemToSelect.style.MozUserSelect          = "text";
+				ElemToSelect.style.fontFamily             = "onlyofficeDefaultFont";//дефолтовый шрифт
+				ElemToSelect.style.fontSize               = "11pt";//дефолтовый размер. значения 0 и тп не подходят - изменяются такие параметры, как line-height
+				ElemToSelect.style.color                  = "black";
 				ElemToSelect.style["-khtml-user-select"]  = "text";
 				ElemToSelect.style["-o-user-select"]      = "text";
 				ElemToSelect.style["user-select"]         = "text";
@@ -768,9 +703,19 @@
 			this.CommonDiv_Start();
 
 			this.ClosureParams.isDivCopy = true;
+			this.DivOnCopyHtmlPresent = false;
+			this.DivOnCopyText = "";
 			this.LastCopyBinary = null;
 			this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 			this.ClosureParams.isDivCopy = false;
+
+			if (!this.DivOnCopyHtmlPresent && this.DivOnCopyText != "")
+			{
+				this.CommonDiv.innerHTML = this.DivOnCopyText;
+			}
+
+			this.DivOnCopyHtmlPresent = false;
+			this.DivOnCopyText = "";
 
 			this.CommonDiv_Select();
 
@@ -858,7 +803,14 @@
 			if (this.ClosureParams.isDivCopy === true)
 			{
 				if (_format == AscCommon.c_oAscClipboardDataFormat.Html)
+				{
 					this.CommonDiv.innerHTML = _data;
+					this.DivOnCopyHtmlPresent = true;
+				}
+
+				if (_format == AscCommon.c_oAscClipboardDataFormat.Text)
+					this.DivOnCopyText = _data;
+
 				return;
 			}
 
@@ -881,7 +833,7 @@
 			if (_data_format != "" && _data !== null && this.isCopyOutEnabled())
 			{
 				if (_data_format == "text/x-custom")
-					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);
+					this.ClosureParams.setData(_data_format, "asc_internalData2;" + _data);
 				else
 					this.ClosureParams.setData(_data_format, _data);
 			}
@@ -948,7 +900,43 @@
 			}
 			return _ret;
 		},
-		
+
+		isCopyOutEnabled : function()
+		{
+			if (this.Api && this.Api.isCopyOutEnabled)
+				return this.Api.isCopyOutEnabled();
+			return true;
+		}
+	};
+
+	function CSpecialPasteHelper()
+	{
+		this.Api = null;
+
+		//special paste
+		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
+
+		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
+		this.specialPasteProps = null;
+
+		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
+		this.buttonInfo = new Asc.SpecialPasteShowOptions();//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+
+		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
+		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
+
+		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
+
+		this.showButtonIdParagraph = null;
+		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
+		this.doNotShowButton = false;
+	}
+
+	CSpecialPasteHelper.prototype = {
+		Init : function(_api) {
+			this.Api = _api;
+		},
+
 		Special_Paste : function(props)
 		{
 			this.Api.asc_SpecialPasteData(props);
@@ -970,13 +958,30 @@
 			this.specialPasteStart = false;
 		},
 		
-		Paste_Process_Start : function()
+		Paste_Process_Start : function(doNotShowButton)
 		{
+			if(doNotShowButton)
+			{
+				this.Special_Paste_Hide_Button();
+			}
 			this.pasteStart = true;
+
+			AscFonts.IsCheckSymbols = true;
 		},
-		
+
+		Special_Paste_Hide_Button: function()
+		{
+			this.doNotShowButton = true;
+		},
+
 		Paste_Process_End : function()
 		{
+			AscFonts.IsCheckSymbols             = false;
+			//todo возможно стоит добавить проверку
+			/*if(!this.pasteStart)
+			{
+				return;
+			}*/
 			this.pasteStart = false;
 			this.specialPasteProps = null;
 			this.bSaveFormat = false;
@@ -984,11 +989,18 @@
 			if(this.specialPasteStart)
 			{
 				this.Special_Paste_End();
+				//TODO только для презентаций! проверить на остальных редакторах!
+				if(!this.buttonInfo.isClean()){
+					this.buttonInfo.asc_setOptions(null);
+					this.Api.asc_ShowSpecialPasteButton(this.buttonInfo);
+				}
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
 			{
 				this.SpecialPasteButton_Show();
 			}
+
+			this.doNotShowButton = false;
 
 			//TODO для excel заглушка. пересмотреть!
 			if(this.bIsEndTransaction)
@@ -998,9 +1010,9 @@
 			}
 		},
 		
-		SpecialPasteButton_Show : function(props)
+		SpecialPasteButton_Show : function()
 		{
-			if (!this.Api)
+			if (!this.Api || this.doNotShowButton)
 				return;
 
 			//при быстром совместном редактировании отключаем возможность специальной вставки
@@ -1009,15 +1021,12 @@
 				return;
 			}
 
-			if(!props)
+			var props = this.buttonInfo;
+			if(props && props.options)
 			{
-				props = this.specialPasteButtonProps.props;
-			}
-			if(props)
-			{
-				this.showSpecialPasteButton = true;
-				if(window["Asc"] && window["Asc"]["editor"])
+				if((window["Asc"] && window["Asc"]["editor"]) || props.cellCoord)
 				{
+					this.showSpecialPasteButton = true;
 					this.Api.asc_ShowSpecialPasteButton(props);
 				}
 			}
@@ -1026,16 +1035,15 @@
 
 		SpecialPasteButtonById_Show: function()
 		{
-			if (!this.Api)
-			{
-				return;
-			}
-			if(!this.Api.asc_specialPasteShowButton)
+			if(!this.Api || !this.Api.asc_specialPasteShowButton || this.doNotShowButton)
 			{
 				return;
 			}
 
-			this.Api.asc_specialPasteShowButton();
+			if(this.Api.asc_specialPasteShowButton())
+			{
+				this.showSpecialPasteButton = true;
+			}
 		},
 
 		SpecialPasteButton_Hide : function()
@@ -1046,29 +1054,19 @@
 			if(this.showSpecialPasteButton)
 			{
 				this.showSpecialPasteButton = false;
+				this.CleanButtonInfo();
 				this.Api.asc_HideSpecialPasteButton();
 			}
 		},
 		
 		SpecialPasteButton_Update_Position : function()
 		{
-			if (!this.Api)
+			if (!this.Api || !this.buttonInfo || this.buttonInfo.isClean())
 				return;
-
-			//TODO метод должен быть общий для всех редакторов
-			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)
+			
+			if(this.showSpecialPasteButton && !this.pasteStart)
 			{
-				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-				
-				var _Y = this.specialPasteButtonProps.fixPosition.y;
-				var _X = this.specialPasteButtonProps.fixPosition.x;
-				var _PageNum = this.specialPasteButtonProps.fixPosition.pageNum;
-				
-				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
-				specialPasteShowOptions.asc_setCellCoord(curCoord);
-				
-				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+				this.Api.asc_UpdateSpecialPasteButton();
 			}
 		},
 
@@ -1100,17 +1098,18 @@
 			return res;
 		},
 
-		isCopyOutEnabled : function()
+		CleanButtonInfo: function()
 		{
-			if (this.Api && this.Api.isCopyOutEnabled)
-				return this.Api.isCopyOutEnabled();
-			return true;
+			this.buttonInfo.clean();
 		}
 	};
 
 	var g_clipboardBase = new CClipboardBase();
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].g_clipboardBase = g_clipboardBase;
+
+	var g_specialPasteHelper = new CSpecialPasteHelper();
+	window['AscCommon'].g_specialPasteHelper = g_specialPasteHelper;
 })(window);
 
 // copy/paste focus error!!!

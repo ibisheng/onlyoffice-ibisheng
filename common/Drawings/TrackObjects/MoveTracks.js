@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -332,7 +332,7 @@ function MoveGroupTrack(originalObject)
             this.x = 0;
             this.y = 0;
         }
-        AscFormat.CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm3(this.originalObject);
         var xfrm = this.originalObject.spPr.xfrm;
 
 

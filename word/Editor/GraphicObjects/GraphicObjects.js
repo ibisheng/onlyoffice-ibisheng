@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -195,6 +195,7 @@ CGraphicObjects.prototype =
     handleAdjustmentHit: DrawingObjectsController.prototype.handleAdjustmentHit,
     handleHandleHit: DrawingObjectsController.prototype.handleHandleHit,
     handleMoveHit: DrawingObjectsController.prototype.handleMoveHit,
+    handleEnter: DrawingObjectsController.prototype.handleEnter,
 
     rotateTrackObjects: DrawingObjectsController.prototype.rotateTrackObjects,
     handleRotateTrack: DrawingObjectsController.prototype.handleRotateTrack,
@@ -203,11 +204,24 @@ CGraphicObjects.prototype =
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
     getConnectorsForCheck: DrawingObjectsController.prototype.getConnectorsForCheck,
     getConnectorsForCheck2: DrawingObjectsController.prototype.getConnectorsForCheck2,
+    checkDrawingHyperlink: DrawingObjectsController.prototype.checkDrawingHyperlink,
+
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionaObjects)
+    {
+        var check_type = AscCommon.changestype_Drawing_Props;
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, null, false, false) === false)
+        {
+            var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
+            History.Create_NewPoint(nPointType);
+            callback.apply(this, args);
+            this.document.Recalculate();
+        }
+    },
 
     AddContentControl: function(nContentControlType)
     {
         var oTargetDocContent = this.getTargetDocContent();
-        if(oTargetDocContent){
+        if(oTargetDocContent && !oTargetDocContent.bPresentation){
             return oTargetDocContent.AddContentControl(nContentControlType);
         }
 
@@ -1489,6 +1503,19 @@ CGraphicObjects.prototype =
         }
     },
 
+    addImages: function( aImages )
+    {
+        var content = this.getTargetDocContent();
+        if(content && !content.bPresentation)
+        {
+            content.AddImages(aImages);
+        }
+        else{
+            this.resetSelection2();
+            this.document.AddImages(aImages);
+        }
+    },
+
 
     canAddComment: function()
     {
@@ -2031,6 +2058,12 @@ CGraphicObjects.prototype =
         return content && content.AddTableRow(bBefore);
     },
 
+	distributeTableCells : function(isHorizontally)
+	{
+		var content = this.getTargetDocContent();
+		return content && content.DistributeTableCells(isHorizontally);
+	},
+
 
     documentSearch: function( CurPage, String, search_Common )
     {
@@ -2077,12 +2110,12 @@ CGraphicObjects.prototype =
     selectNextObject: DrawingObjectsController.prototype.selectNextObject,
 
 
-    getCurrentParagraph: function()
+    getCurrentParagraph: function(bIgnoreSelection, arrSelectedParagraphs)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.GetCurrentParagraph();
+            return content.GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
         }
         else
         {
@@ -2812,6 +2845,7 @@ CGraphicObjects.prototype =
     },
 
     resetSelection: DrawingObjectsController.prototype.resetSelection,
+    deselectObject: DrawingObjectsController.prototype.deselectObject,
 
     resetSelection2: function()
     {
@@ -3269,6 +3303,13 @@ CGraphicObjects.prototype =
                     nPageIndex = obj.PageNum;
                 }
             }
+            else
+            {
+                if(AscFormat.isRealNumber(obj.PageNum))
+                {
+                    nPageIndex = obj.PageNum;
+                }
+            }
             obj.GraphicObj.select(this, nPageIndex);
         }
 
@@ -3350,7 +3391,10 @@ CGraphicObjects.prototype =
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
 
 
-    paragraphClearFormatting: DrawingObjectsController.prototype.paragraphClearFormatting,
+    paragraphClearFormatting: function()
+    {
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+    },
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
     applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,

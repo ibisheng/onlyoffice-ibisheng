@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -384,8 +384,14 @@
         this.Gs.color = oApiUniColor.Unicolor;
     }
 
-
-
+	/**
+	 * Class represent a container for the elements of a paragraph
+	 * @constructor
+	 */
+	function ApiInlineLvlSdt(Sdt)
+	{
+		this.Sdt = Sdt;
+	}
 
     /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
@@ -479,7 +485,7 @@
 
     /**
      * The types of elements that can be in the paragraph
-     * @typedef {(ApiUnsupported | ApiRun)} ParagraphContent
+     * @typedef {(ApiUnsupported | ApiRun | ApiInlineLvlSdt)} ParagraphContent
      */
 
     /**
@@ -563,6 +569,11 @@
      *     "sphere" | "trellis" | "upDiag" | "vert" | "wave" | "wdDnDiag" | "wdUpDiag" | "weave" | "zigZag"}
      *     PatternType
      * */
+
+	/**
+	 *
+	 * @typedef {"unlocked" | "contentLocked" | "sdtContentLocked" | "sdtLocked"} SdtLock
+     */
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -1080,7 +1091,16 @@
         return new ApiBullet(oBullet);
     };
 
-
+	/**
+	 * Create a new inline container
+	 * @returns {ApiInlineLvlSdt}
+	 */
+	Api.prototype.CreateInlineLvlSdt = function()
+	{
+		var oSdt = new CInlineLevelSdt();
+		oSdt.Add_ToContent(0, new ParaRun(null, false));
+		return new ApiInlineLvlSdt(oSdt);
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiUnsupported
@@ -1209,7 +1229,7 @@
     ApiDocument.prototype.GetStyle = function(sStyleName)
     {
         var oStyles  = this.Document.Get_Styles();
-        var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
+        var oStyleId = oStyles.GetStyleIdByName(sStyleName, true);
         return new ApiStyle(oStyles.Get(oStyleId));
     };
     /**
@@ -1238,7 +1258,7 @@
 
         // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
         // чтобы если были ссылки на старый стиль - теперь они стали на новый.
-        var sOldId    = oStyles.Get_StyleIdByName(sStyleName, false);
+        var sOldId    = oStyles.GetStyleIdByName(sStyleName);
         var oOldStyle = oStyles.Get(sOldId);
         if (null != sOldId && oOldStyle)
         {
@@ -1500,6 +1520,26 @@
 		}
 		return oResult;
 	};
+	/**
+	 * Find and replace text.
+	 * @param {Object} oProperties The properties for find and replace.
+	 * @param {string} oProperties.searchString Search string.
+	 * @param {string} oProperties.replaceString Replacement string.
+	 * @param {string} [oProperties.matchCase=true]
+	 *
+	 */
+	ApiDocument.prototype.SearchAndReplace = function(oProperties)
+	{
+		var sSearch     = oProperties["searchString"];
+		var sReplace    = oProperties["replaceString"];
+		var isMatchCase = undefined !== oProperties["matchCase"] ? oProperties.matchCase : true;
+
+		var oSearchEngine = this.Document.Search(sSearch, {MatchCase : isMatchCase});
+		if (!oSearchEngine)
+			return;
+
+		this.Document.Search_Replace(sReplace, true, null, false);
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -1570,14 +1610,7 @@
         if (!sText || !sText.length)
             return new ApiRun(oRun);
 
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                oRun.Add_ToContent(nPos, new ParaSpace(), false);
-            else
-                oRun.Add_ToContent(nPos, new ParaText(nChar), false);
-        }
+        oRun.AddText(sText);
 
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
@@ -1703,11 +1736,7 @@
         if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
             return null;
 
-        var oElement = this.Paragraph.Content[nPos];
-        if (oElement instanceof ParaRun)
-            return new ApiRun(oElement);
-        else
-            return new ApiUnsupported();
+		return private_GetSupportedParaElement(this.Paragraph.Content[nPos]);
     };
     /**
      * Remove element by specified position.
@@ -1738,7 +1767,7 @@
     ApiParagraph.prototype.AddElement = function(oElement, nPos)
     {
         // TODO: ParaEnd
-        if (!(oElement instanceof ApiRun) || nPos < 0 || nPos > this.Paragraph.Content.length - 1)
+        if (!private_IsSupportedParaElement(oElement) || nPos < 0 || nPos > this.Paragraph.Content.length - 1)
             return false;
 
         var oParaElement = oElement.private_GetImpl();
@@ -1781,6 +1810,23 @@
         return new ApiRun(oRun);
     };
 
+	/**
+	 * Add a inline container
+	 * @param {ApiInlineLvlSdt?} oSdt - if undefined or null, then new class ApiInlineLvlSdt will be created and added to paragraph.
+	 * @returns {ApiInlineLvlSdt}
+	 */
+    ApiParagraph.prototype.AddInlineLvlSdt = function(oSdt)
+	{
+		if (!oSdt || !(oSdt instanceof ApiInlineLvlSdt))
+		{
+			var _oSdt = new CInlineLevelSdt();
+			_oSdt.Add_ToContent(0, new ParaRun(null, false));
+			oSdt = new ApiInlineLvlSdt(_oSdt);
+		}
+
+		private_PushElementToParagraph(this.Paragraph, oSdt.Sdt);
+		return oSdt;
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiRun
@@ -1819,16 +1865,7 @@
         if (!sText || !sText.length)
             return;
 
-        var nLastPos = this.Run.Content.length;
-
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaSpace(), false);
-            else
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaText(nChar), false);
-        }
+        this.Run.AddText(sText);
     };
     /**
      * Add a page break.
@@ -4478,6 +4515,114 @@
         return "bullet";
     };
 
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// ApiInlineLvlSdt
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Get the type of this class.
+	 * @returns {"inlineLvlSdt"}
+	 */
+	ApiInlineLvlSdt.prototype.GetClassType = function()
+	{
+		return "inlineLvlSdt";
+	};
+	/**
+	 * Set the lock type of this container
+	 * @param {SdtLock} sLockType
+	 */
+	ApiInlineLvlSdt.prototype.SetLock = function(sLockType)
+	{
+		var nLock = sdtlock_Unlocked;
+		if ("contentLocked" === sLockType)
+			nLock = sdtlock_ContentLocked;
+		else if ("sdtContentLocked" === sLockType)
+			nLock = sdtlock_SdtContentLocked;
+		else if ("sdtLocked" === sLockType)
+			nLock = sdtlock_SdtLocked;
+
+		this.Sdt.SetContentControlLock(nLock);
+	};
+	/**
+	 * Set the tag attribute for this container
+	 * @param {string} sTag
+	 */
+	ApiInlineLvlSdt.prototype.SetTag = function(sTag)
+	{
+		this.Sdt.SetTag(sTag);
+	};
+	/**
+	 * Set the label attribute for this container
+	 * @param {string} sLabel
+	 */
+	ApiInlineLvlSdt.prototype.SetLabel = function(sLabel)
+	{
+		this.Sdt.SetLabel(sLabel);
+	};
+	/**
+	 * Get the number of elements in the current container.
+	 * @returns {number}
+	 */
+	ApiInlineLvlSdt.prototype.GetElementsCount = function()
+	{
+		return this.Sdt.Content.length;
+	};
+	/**
+	 * Get the element of the container content by specified position.
+	 * @param {number} nPos
+	 * @returns {?ParagraphContent}
+	 */
+	ApiInlineLvlSdt.prototype.GetElement = function(nPos)
+	{
+		if (nPos < 0 || nPos >= this.Sdt.Content.length)
+			return null;
+
+		return private_GetSupportedParaElement(this.Sdt.Content[nPos]);
+	};
+	/**
+	 * Remove element by specified position.
+	 * @param {number} nPos
+	 */
+	ApiInlineLvlSdt.prototype.RemoveElement = function(nPos)
+	{
+		if (nPos < 0 || nPos >= this.Sdt.Content.length)
+			return;
+
+		this.Sdt.Remove_FromContent(nPos, 1);
+	};
+	/**
+	 * Remove all elements.
+	 */
+	ApiInlineLvlSdt.prototype.RemoveAllElements = function()
+	{
+		if (this.Sdt.Content.length > 0)
+			this.Sdt.Remove_FromContent(0, this.Sdt.Content.length);
+	};
+	/**
+	 * Add an element to inline container.
+	 * @param {ParagraphContent} oElement
+	 * @param {number} [nPos] If this value is not specified then element will be added to the end of this container.
+	 * @returns {boolean} Returns <code>false</code> if the type of <code>oElement</code> is not supported.
+	 * content.
+	 */
+	ApiInlineLvlSdt.prototype.AddElement = function(oElement, nPos)
+	{
+		if (!private_IsSupportedParaElement(oElement) || nPos < 0 || nPos > this.Sdt.Content.length)
+			return false;
+
+		var oParaElement = oElement.private_GetImpl();
+		if (undefined !== nPos)
+		{
+			this.Sdt.Add_ToContent(nPos, oParaElement);
+		}
+		else
+		{
+			private_PushElementToParagraph(this.Sdt, oParaElement);
+		}
+
+		return true;
+	};
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4501,6 +4646,7 @@
     Api.prototype["CreateGradientStop"]              = Api.prototype.CreateGradientStop;
     Api.prototype["CreateBullet"]                    = Api.prototype.CreateBullet;
     Api.prototype["CreateNumbering"]                 = Api.prototype.CreateNumbering;
+	Api.prototype["CreateInlineLvlSdt"]              = Api.prototype.CreateInlineLvlSdt;
 
     ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
 
@@ -4527,6 +4673,7 @@
 	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
 	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
 	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
+	ApiDocument.prototype["SearchAndReplace"]        = ApiDocument.prototype.SearchAndReplace;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -4546,6 +4693,7 @@
     ApiParagraph.prototype["AddElement"]             = ApiParagraph.prototype.AddElement;
     ApiParagraph.prototype["AddTabStop"]             = ApiParagraph.prototype.AddTabStop;
     ApiParagraph.prototype["AddDrawing"]             = ApiParagraph.prototype.AddDrawing;
+    ApiParagraph.prototype["AddInlineLvlSdt"]        = ApiParagraph.prototype.AddInlineLvlSdt;
 
     ApiRun.prototype["GetClassType"]                 = ApiRun.prototype.GetClassType;
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
@@ -4763,6 +4911,16 @@
 
     ApiBullet.prototype["GetClassType"]              = ApiBullet.prototype.GetClassType;
 
+	ApiInlineLvlSdt.prototype["GetClassType"]      = ApiInlineLvlSdt.prototype.GetClassType;
+	ApiInlineLvlSdt.prototype["SetLock"]           = ApiInlineLvlSdt.prototype.SetLock;
+	ApiInlineLvlSdt.prototype["SetTag"]            = ApiInlineLvlSdt.prototype.SetTag;
+	ApiInlineLvlSdt.prototype["SetLabel"]          = ApiInlineLvlSdt.prototype.SetLabel;
+	ApiInlineLvlSdt.prototype["GetElementsCount"]  = ApiInlineLvlSdt.prototype.GetElementsCount;
+	ApiInlineLvlSdt.prototype["GetElement"]        = ApiInlineLvlSdt.prototype.GetElement;
+	ApiInlineLvlSdt.prototype["RemoveElement"]     = ApiInlineLvlSdt.prototype.RemoveElement;
+	ApiInlineLvlSdt.prototype["RemoveAllElements"] = ApiInlineLvlSdt.prototype.RemoveAllElements;
+	ApiInlineLvlSdt.prototype["AddElement"]        = ApiInlineLvlSdt.prototype.AddElement;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4776,6 +4934,25 @@
         // Добавляем не в конец из-за рана с символом конца параграфа TODO: ParaEnd
         oPara.Add_ToContent(oPara.Content.length - 1, oElement);
     }
+
+    function private_IsSupportedParaElement(oElement)
+	{
+		if (oElement instanceof ApiRun
+			|| oElement instanceof ApiInlineLvlSdt)
+			return true;
+
+		return false;
+	}
+
+	function private_GetSupportedParaElement(oElement)
+	{
+		if (oElement instanceof ParaRun)
+			return new ApiRun(oElement);
+		else if (oElement instanceof CInlineLevelSdt)
+			return new ApiInlineLvlSdt(oElement);
+		else
+			return new ApiUnsupported();
+	}
 
     function private_GetLogicDocument()
     {
@@ -5323,6 +5500,10 @@
     {
         this.private_OnChange();
     };
+    ApiInlineLvlSdt.prototype.private_GetImpl = function()
+	{
+		return this.Sdt;
+	};
 
     Api.prototype.private_CreateApiParagraph = function(oParagraph){
         return new ApiParagraph(oParagraph);

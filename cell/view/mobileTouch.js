@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -38,7 +38,6 @@
 function (window, undefined)
 {
 	// Import
-	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
 	var global_mouseEvent = AscCommon.global_mouseEvent;
 	var AscBrowser = AscCommon.AscBrowser;
 
@@ -129,8 +128,8 @@ function (window, undefined)
 	CMobileDelegateEditorCell.prototype.GetScrollerSize = function()
 	{
 		return {
-			W : this.WB.element.clientWidth + this.WB.m_dScrollX_max,
-			H : this.WB.element.clientHeight + this.WB.m_dScrollY_max
+			W : this.WB.element.clientWidth + this.WB.controller.hsbMax,
+			H : this.WB.element.clientHeight + this.WB.controller.vsbMax
 		};
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionTransform = function()
@@ -197,32 +196,34 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.ScrollTo = function(_scroll)
 	{
+		var pos;
 		var _api = this.WB;
 
-		if (_scroll.directionLocked == "v")
+		if ('v' === _scroll.directionLocked)
 		{
-			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y == _scroll.maxScrollY)
-				_deltaY += 1;
-			_api._onScrollY(_deltaY);
+			pos = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y >= _scroll.maxScrollY)
+				pos += 1;
+			_api._onScrollY(pos);
 		}
-		else if (_scroll.directionLocked == "h")
+		else if ('h' === _scroll.directionLocked)
 		{
-			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x == _scroll.maxScrollX)
-				_deltaX += 1;
-			_api._onScrollX(_deltaX);
+			pos = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x >= _scroll.maxScrollX)
+				pos += 1;
+			_api._onScrollX(pos);
 		}
-		else if (_scroll.directionLocked == "n")
+		else if ('n' === _scroll.directionLocked)
 		{
-			var _deltaY = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y == _scroll.maxScrollY)
-				_deltaY += 1;
-			var _deltaX = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x == _scroll.maxScrollX)
-				_deltaX += 1;
-			_api._onScrollX(_deltaX);
-			_api._onScrollY(_deltaY);
+			pos = -_scroll.y / _api.controller.settings.hscrollStep;
+			if (_scroll.y >= _scroll.maxScrollY)
+				pos += 1;
+			_api._onScrollY(pos);
+
+			pos = -_scroll.x / _api.controller.settings.vscrollStep;
+			if (_scroll.x >= _scroll.maxScrollX)
+				pos += 1;
+			_api._onScrollX(pos);
 		}
 	};
 	CMobileDelegateEditorCell.prototype.GetContextMenuType = function()
@@ -659,7 +660,7 @@ function (window, undefined)
 				var _x2 = this.RectSelect2.x + this.RectSelect2.w - 0.5;
 				var _y2 = this.RectSelect2.y + this.RectSelect2.h - 0.5;
 
-				if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol || this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
+				if (this.RectSelectType === Asc.c_oAscSelectionType.RangeCol || this.RectSelectType === Asc.c_oAscSelectionType.RangeRow)
 					AscCommon.global_mouseEvent.KoefPixToMM = -10; // чтобы не попасть в движения
 
 				if (1 == this.DragSelect)
@@ -1040,7 +1041,7 @@ function (window, undefined)
 
 			var _offset = (undefined === color) ? 5 : 0;
 
-			if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol)
+			if (this.RectSelectType === Asc.c_oAscSelectionType.RangeCol)
 			{
 				pos2.Y = pos4.Y = (pos2.Y - pos1.Y);
 				pos1.Y = pos3.Y = 0;
@@ -1087,7 +1088,7 @@ function (window, undefined)
 				overlay.AddEllipse(_x2C, _yC, _koef * AscCommon.MOBILE_SELECT_TRACK_ROUND / 2);
 				ctx.fill();
 			}
-			else if (this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
+			else if (this.RectSelectType === Asc.c_oAscSelectionType.RangeRow)
 			{
 				pos3.X = pos4.X = (pos3.X - pos1.X);
 				pos1.X = pos2.X = 0;
@@ -1218,7 +1219,7 @@ function (window, undefined)
 
 	CMobileTouchManager.prototype.CheckSelectTrack = function()
 	{
-		if (this.RectSelectType != Asc.c_oAscSelectionType.RangeRow && this.RectSelectType != Asc.c_oAscSelectionType.RangeCol)
+		if (this.RectSelectType !== Asc.c_oAscSelectionType.RangeRow && this.RectSelectType !== Asc.c_oAscSelectionType.RangeCol)
 			return AscCommon.CMobileTouchManagerBase.prototype.CheckSelectTrack.call(this);
 
 		// проверим на попадание в селект - это может произойти на любом mode
@@ -1229,7 +1230,7 @@ function (window, undefined)
 
 			var _pos = this.delegate.ConvertCoordsToCursor(0, 0, 0, false);
 
-			if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol)
+			if (this.RectSelectType === Asc.c_oAscSelectionType.RangeCol)
 			{
 				var Y = this.delegate.ConvertCoordsFromCursor(0, this.delegate.Offset.Y + (this.delegate.Size.H + _pos.Y) / 2).Y;
 				pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, Y, this.PageSelect1);
@@ -1267,7 +1268,7 @@ function (window, undefined)
 			var pos1 = this.delegate.ConvertCoordsToCursor(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
 			var pos4 = this.delegate.ConvertCoordsToCursor(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
 
-			if (this.RectSelectType == Asc.c_oAscSelectionType.RangeCol)
+			if (this.RectSelectType === Asc.c_oAscSelectionType.RangeCol)
 			{
 				// только правая граница
 				if (Math.abs(pos4.X - global_mouseEvent.X) < this.TrackTargetEps)
@@ -1276,7 +1277,7 @@ function (window, undefined)
 						this.Mode = AscCommon.MobileTouchMode.SelectTrack;
 				}
 			}
-			else if (this.RectSelectType == Asc.c_oAscSelectionType.RangeRow)
+			else if (this.RectSelectType === Asc.c_oAscSelectionType.RangeRow)
 			{
 				// только нижняя граница
 				if (Math.abs(pos4.Y - global_mouseEvent.Y) < this.TrackTargetEps)

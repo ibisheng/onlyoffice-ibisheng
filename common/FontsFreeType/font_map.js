@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -317,7 +317,8 @@ function FD_FontDictionary()
         ["Arial", "Liberation Sans", "Helvetica", "Nimbus Sans L"],
         ["Times New Roman", "Liberation Serif"],
         ["Courier New", "Liberation Mono"],
-        ["Segoe", "Segoe UI"]
+        ["Segoe", "Segoe UI"],
+        ["Cambria", "Caladea"]
     ];
     this.FD_Ascii_Font_Like_Main = {
         "Cambria Math"  : 0,
@@ -340,7 +341,10 @@ function FD_FontDictionary()
         "Liberation Mono"   : 4,
 
         "Segoe"             : 5,
-        "Segoe UI"          : 5
+        "Segoe UI"          : 5,
+
+        "Cambria"           : 6,
+        "Caladea"           : 6
     };
 
     this.ChangeGlyphsMap = {

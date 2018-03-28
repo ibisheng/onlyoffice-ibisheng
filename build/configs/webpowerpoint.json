@@ -29,10 +29,13 @@
 		"../common/SerializeChart.js",
 		
 		"../common/FontsFreeType/font_engine.js",
-        "../common/FontsFreeType/FontFile.js",
-		"../common/FontsFreeType/font_map.js",
-        "../common/FontsFreeType/FontManager.js",
-		"../word/Editor/FontClassification.js",
+        "../common/FontsFreeType/font_map.js",
+	    "../common/FontsFreeType/RasterHeapManager.js",
+		"../common/FontsFreeType/GlyphString.js",
+		"../common/FontsFreeType/character.js",
+		"../common/FontsFreeType/FontFile.js",
+		"../common/FontsFreeType/FontManager.js",
+		"../common/FontsFreeType/FontClassification.js",
 		
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
@@ -149,6 +152,8 @@
         "../word/Editor/Paragraph/ParaTextPrChanges.js",
         "../word/Editor/Paragraph/ParaDrawing.js",
         "../word/Editor/Paragraph/ParaDrawingChanges.js",
+		"../word/Editor/Paragraph/ComplexFieldInstruction.js",
+		"../word/Editor/Paragraph/ComplexField.js",
         "../word/Editor/Hyperlink.js",
         "../word/Editor/HyperlinkChanges.js",
         "../word/Editor/Field.js",
@@ -174,6 +179,7 @@
         "../word/Editor/Paragraph_Recalculate.js",
 		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
+		"../word/Editor/DocumentOutline.js",
         "../word/Editor/DocumentChanges.js",
         "../word/Editor/DocumentContent.js",
         "../word/Editor/DocumentContentChanges.js",
@@ -223,24 +229,21 @@
 		]
       },
 	  "mobile_banners": {
-		  "min": [
-		    "../common/Native/native.js",
-		    "../common/Native/jquery_native.js",
-		    "../../web-apps/vendor/xregexp/xregexp-all-min.js"
+		  "min": [		 
+			"../common/Native/Wrappers/memory.js"
 	    ],
 		"common": []
 	  },
       "mobile": [        
-        "../common/Native/Wrappers/memory.js",
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",
         "../common/Native/Wrappers/ShapeDrawer.js",
         "../common/Native/Wrappers/Overlay.js",
-        "../slide/Native/native.js",
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
         "../slide/Native/Wrappers/DrawingDocument.js",
-		"../cell/native/TextDrawer.js"
+		"../cell/native/TextDrawer.js",
+        "../slide/Native/Wrappers/native.js"
       ],
       "exclude_mobile": [
         "../word/Drawing/ShapeDrawer.js",

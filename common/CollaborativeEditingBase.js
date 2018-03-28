@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -276,7 +276,10 @@ CCollaborativeEditingBase.prototype.Set_Fast = function(bFast)
     this.m_bFast = bFast;
 
     if (false === bFast)
-        this.Remove_AllForeignCursors();
+	{
+		this.Remove_AllForeignCursors();
+		this.RemoveMyCursorFromOthers();
+	}
 };
 CCollaborativeEditingBase.prototype.Is_Fast = function()
 {
@@ -284,10 +287,11 @@ CCollaborativeEditingBase.prototype.Is_Fast = function()
 };
 CCollaborativeEditingBase.prototype.Is_SingleUser = function()
 {
-    if (1 === this.m_nUseType)
-        return true;
-
-    return false;
+	return (1 === this.m_nUseType);
+};
+CCollaborativeEditingBase.prototype.getCollaborativeEditing = function()
+{
+	return !this.Is_SingleUser();
 };
 CCollaborativeEditingBase.prototype.Start_CollaborationEditing = function()
 {
@@ -344,6 +348,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
     // Если нет чужих изменений, тогда и делать ничего не надо
     if (true === OtherChanges)
     {
+        AscFonts.IsCheckSymbols = true;
         editor.WordControl.m_oLogicDocument.Stop_Recalculate();
         editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 
@@ -358,6 +363,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
         this.Lock_NeedLock();
         this.private_RestoreDocumentState(DocState);
         this.OnStart_Load_Objects();
+        AscFonts.IsCheckSymbols = false;
     }
 };
 CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
@@ -422,7 +428,7 @@ CCollaborativeEditingBase.prototype.SendImagesUrlsFromChanges = function (aImage
     rData['data'] = [];
     for(i = 0; i < aImages.length; ++i)
     {
-        rData['data'].push(aImages);
+        rData['data'].push(aImages[i]);
     }
     var aImagesToLoad = [].concat(AscCommon.CollaborativeEditing.m_aNewImages);
     this.CheckWaitingImages(aImagesToLoad);
@@ -775,6 +781,7 @@ CCollaborativeEditingBase.prototype.Remove_ForeignCursor = function(UserId){
     delete this.m_aForeignCursors[UserId];
 };
 CCollaborativeEditingBase.prototype.Remove_AllForeignCursors = function(){};
+CCollaborativeEditingBase.prototype.RemoveMyCursorFromOthers = function(){};
 CCollaborativeEditingBase.prototype.Update_DocumentPositionsOnAdd = function(Class, Pos){
     this.m_aDocumentPositions.Update_DocumentPositionsOnAdd(Class, Pos);
     this.m_aForeignCursorsPos.Update_DocumentPositionsOnAdd(Class, Pos);
@@ -1250,7 +1257,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         oHistory.Remove_LastPoint();
         this.Clear_DCChanges();
 
-        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null);
+        editor.CoAuthoringApi.saveChanges(aSendingChanges, null, null, false, this.getCollaborativeEditing());
 
         this.private_RestoreDocumentState(DocState);
 

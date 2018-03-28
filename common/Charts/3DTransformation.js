@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1018,7 +1018,7 @@ Processor3D.prototype._calculateDepth = function()
 	var subType = this.chartsDrawer.calcProp.subType;
 	var type = this.chartsDrawer.calcProp.type;
 	var defaultOverlap = (subType == "stacked" || subType == "stackedPer" || subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area || type == AscFormat.c_oChartTypes.Surface) ? 100 : 0;
-	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
+	var overlap       = AscFormat.isRealNumber(this.chartSpace.chart.plotArea.chart.overlap) ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : type === AscFormat.c_oChartTypes.Area && subType !== "normal" ? 1 : (150 / 100);
 	var basePercent = this.view3D && this.view3D.depthPercent ? this.view3D.depthPercent / 100 : globalBasePercent / 100;//процент от базовой глубины
@@ -1109,7 +1109,7 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var isNormalArea = !!((this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Area) || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface);
 	
 	var defaultOverlap = (this.chartsDrawer.calcProp.subType == "stacked" || this.chartsDrawer.calcProp.subType == "stackedPer" || this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea) ? 100 : 0;
-	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
+	var overlap       = AscFormat.isRealNumber(this.chartSpace.chart.plotArea.chart.overlap) ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : (150 / 100);

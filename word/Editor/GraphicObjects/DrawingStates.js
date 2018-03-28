@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1214,6 +1214,15 @@ PreMoveInGroupState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
+        if(e.CtrlKey && this.majorObjectIsSelected)
+        {
+            this.group.deselectObject(this.majorObject);
+            if(this.group.selectedObjects.length === 0){
+                this.drawingObjects.resetInternalSelection();
+            }
+            this.drawingObjects.document && this.drawingObjects.document.Document_UpdateInterfaceState();
+            this.drawingObjects.updateOverlay();
+        }
         this.drawingObjects.clearPreTrackObjects();
         this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
     }

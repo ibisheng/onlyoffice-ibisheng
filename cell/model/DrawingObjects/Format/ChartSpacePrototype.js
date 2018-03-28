@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -112,6 +112,11 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
+
+CChartSpace.prototype.checkNeedRecalculate = function(){
+    return this.recalcInfo.recalculateChart === true;
+};
+
 CChartSpace.prototype.recalcTransform = function()
 {
     this.recalcInfo.recalculateTransform = true;

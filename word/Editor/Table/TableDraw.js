@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -45,7 +45,7 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
     if (CurPage < 0 || CurPage >= this.Pages.length)
         return 0;
 
-    if (true === this.Is_EmptyPage(CurPage))
+    if (true === this.IsEmptyPage(CurPage))
         return;
 
     var Page = this.Pages[CurPage];
@@ -84,7 +84,7 @@ CTable.prototype.Draw = function(CurPage, pGraphics)
     //-------------------------------------------------------------------------------------
     // 2. Рисуем заливку всех ячеек таблицы
     //-------------------------------------------------------------------------------------
-    this.private_DrawCellsBackround(pGraphics, CurPage, Row_start, Row_last);
+    this.private_DrawCellsBackground(pGraphics, CurPage, Row_start, Row_last);
     //-------------------------------------------------------------------------------------
     // 3. Рисуем содержимое ячеек
     //-------------------------------------------------------------------------------------
@@ -191,6 +191,8 @@ CTable.prototype.private_DrawTableBackgroundAndOuterBorder = function(pGraphics,
             var PrevCellSpacing = this.Content[CurRow + 1].Get_CellSpacing();
             Y_bottom += (PrevCellSpacing + CellSpacing) / 4;
         }
+
+        Y_bottom += this.RowsInfo[CurRow].MaxBotBorder;
 
         if ( null != CellSpacing && PNum != this.Pages.length - 1 && CurRow === Row_last )
             Y_bottom += this.Pages[PNum].MaxBotBorder;
@@ -377,7 +379,7 @@ CTable.prototype.private_DrawRowBackgroundAndOuterBorder = function(pGraphics, T
     }
 
 };
-CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_start, Row_last)
+CTable.prototype.private_DrawCellsBackground = function(pGraphics, PNum, Row_start, Row_last)
 {
     var CurPage = PNum;
     var Page = this.Pages[CurPage];
@@ -406,7 +408,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
             {
                 var Cell       = Row.Get_Cell( CurCell );
                 var GridSpan   = Cell.Get_GridSpan();
-                var VMerge     = Cell.Get_VMerge();
+                var VMerge     = Cell.GetVMerge();
                 var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
 
                 if ( vmerge_Continue === VMerge )
@@ -484,7 +486,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
         {
             var Cell = Row.Get_Cell( CurCell );
             var GridSpan = Cell.Get_GridSpan();
-            var VMerge = Cell.Get_VMerge();
+            var VMerge = Cell.GetVMerge();
             var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
 
             if ( vmerge_Continue === VMerge )
@@ -585,7 +587,7 @@ CTable.prototype.private_DrawCellsContent = function(pGraphics, PNum, Row_start,
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell   = Row.Get_Cell( CurCell );
-                var VMerge = Cell.Get_VMerge();
+                var VMerge = Cell.GetVMerge();
 
                 if ( vmerge_Continue === VMerge )
                     continue;
@@ -615,7 +617,7 @@ CTable.prototype.private_DrawCellsContent = function(pGraphics, PNum, Row_start,
         {
             var Cell = Row.Get_Cell( CurCell );
             var GridSpan = Cell.Get_GridSpan();
-            var VMerge = Cell.Get_VMerge();
+            var VMerge = Cell.GetVMerge();
             var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
 
             if ( vmerge_Continue === VMerge )
@@ -675,7 +677,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
             {
                 var Cell = Row.Get_Cell( CurCell );
                 var GridSpan = Cell.Get_GridSpan();
-                var VMerge = Cell.Get_VMerge();
+                var VMerge = Cell.GetVMerge();
                 var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
 
                 if ( vmerge_Continue === VMerge )
@@ -807,7 +809,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         var Y1 = HeaderPage.RowsInfo[TempCurRow + Index].Y + HeaderPage.RowsInfo[TempCurRow + Index].H;
 
                         // Мы должны проверить последняя ли данная ячейка в строке
-                        var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
+                        var TempCellIndex  = this.private_GetCellIndexByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
                         var TempCellsCount = HeaderPage.Rows[TempCurRow + Index].Get_CellsCount();
 
                         if ( TempCellsCount - 1 === TempCellIndex )
@@ -877,7 +879,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
 
                                     if ( null != bLeft )
                                     {
-                                        var Prev_VMerge = Prev_Cell.Get_VMerge();
+                                        var Prev_VMerge = Prev_Cell.GetVMerge();
                                         if ( vmerge_Continue === Prev_VMerge )
                                             Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
 
@@ -943,7 +945,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
 
                                     if ( null != bLeft )
                                     {
-                                        var Prev_VMerge = Prev_Cell.Get_VMerge();
+                                        var Prev_VMerge = Prev_Cell.GetVMerge();
                                         if ( vmerge_Continue === Prev_VMerge )
                                             Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
 
@@ -1019,7 +1021,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
         {
             var Cell = Row.Get_Cell( CurCell );
             var GridSpan = Cell.Get_GridSpan();
-            var VMerge = Cell.Get_VMerge();
+            var VMerge = Cell.GetVMerge();
             var CurGridCol = Row.Get_CellInfo( CurCell ).StartGridCol;
 
             if ( vmerge_Continue === VMerge )
@@ -1181,7 +1183,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                     var Y1 = this.RowsInfo[TempCurRow + Index].Y[PNum] + this.RowsInfo[TempCurRow + Index].H[PNum];
 
                     // Мы должны проверить последняя ли данная ячейка в строке
-                    var TempCellIndex  = this.Internal_Get_Cell_ByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
+                    var TempCellIndex  = this.private_GetCellIndexByStartGridCol( TempCurRow + Index, CellInfo.StartGridCol );
                     var TempCellsCount = this.Content[TempCurRow + Index].Get_CellsCount();
 
                     if ( TempCellsCount - 1 === TempCellIndex )
@@ -1260,7 +1262,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
 
                                 if ( null != bLeft )
                                 {
-                                    var Prev_VMerge = Prev_Cell.Get_VMerge();
+                                    var Prev_VMerge = Prev_Cell.GetVMerge();
                                     if ( vmerge_Continue === Prev_VMerge )
                                         Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
 
@@ -1298,7 +1300,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         else
                             RightMW = -Max_r;//X1 -= Max_r;
 
-                        if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
+                        if ( border_Single === BorderInfo_Right[0].Value && CurBorderInfo.Size <= BorderInfo_Right[0].Size )
                             RightMW = -BorderInfo_Right[0].Size / 2;
                     }
 
@@ -1329,7 +1331,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
 
                                 if ( null != bLeft )
                                 {
-                                    var Prev_VMerge = Prev_Cell.Get_VMerge();
+                                    var Prev_VMerge = Prev_Cell.GetVMerge();
                                     if ( vmerge_Continue === Prev_VMerge )
                                         Prev_Cell = this.Internal_Get_StartMergedCell( CurRow - 1, Prev_GridCol, Prev_GridSpan );
 
@@ -1365,7 +1367,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                         //X0 -= Max_l;
                         LeftMW = -Max_l;
 
-                        if ( border_Single === CurBorderInfo.Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
+                        if ( border_Single === BorderInfo_Left[0].Value && CurBorderInfo.Size <= BorderInfo_Left[0].Size )
                             LeftMW = BorderInfo_Left[0].Size / 2;
 
                         LastBorderTop.L = Max_l;
@@ -1406,7 +1408,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                     var X0 = X_cell_start;
                     var X1 = X_cell_end;
 
-                    var LowerCell = this.Internal_Get_Cell_ByStartGridCol( CurRow + VMergeCount - 1, Row.Get_CellInfo( CurCell ).StartGridCol );
+                    var LowerCell = this.private_GetCellIndexByStartGridCol( CurRow + VMergeCount - 1, Row.Get_CellInfo( CurCell ).StartGridCol );
 
                     var BottomBorder = ( -1 === LowerCell ? this.Pages[PNum].BotBorders[0] : this.Pages[PNum].BotBorders[LowerCell] );
                     if ( border_Single === BottomBorder.Value )

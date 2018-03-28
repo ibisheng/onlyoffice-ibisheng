@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1104,8 +1104,8 @@ CShapeDrawer.prototype =
 					_graphicsCtx.ArrayPoints = null;
 					DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w, _max_w), this.Ln.headEnd.GetLen(_pen_w, _max_w), this, trans1);
 					_graphicsCtx.ArrayPoints = arr;
-                }
-            }
+                    }
+                    }
             if (this.Ln.tailEnd != null)
             {
                 var _1 = arr.length-1;
@@ -1132,8 +1132,8 @@ CShapeDrawer.prototype =
 					_graphicsCtx.ArrayPoints = null;
 					DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w, _max_w), this.Ln.tailEnd.GetLen(_pen_w, _max_w), this, trans1);
 					_graphicsCtx.ArrayPoints = arr;
-                }
-            }
+                    }
+                    }
             this.IsArrowsDrawing = false;
             this.CheckDash();
         }

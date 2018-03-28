@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1031,6 +1031,37 @@
 			case AscDFH.historydescription_DocumentMacros_Data:
 				sString = "DocumentMacros_Data";
 				break;
+			case AscDFH.historydescription_Document_AddBookmark:
+				sString = "Document_AddBookmark";
+				break;
+			case AscDFH.historydescription_Document_AddTableOfContents:
+				sString = "Document_AddTableOfContents";
+				break;
+			case AscDFH.historydescription_Document_ChangeOutlineLevel:
+				sString = "Document_ChangeOutlineLevel";
+				break;
+			case AscDFH.historydescription_Document_AddElementToOutline:
+				sString = "Document_AddElementToOutline";
+				break;
+			case AscDFH.historydescription_Document_ResizeTable:
+				sString = "Document_ResizeTable";
+				break;
+			case AscDFH.historydescription_Document_RemoveComplexField:
+				sString = "Document_RemoveComplexField";
+				break;
+			case AscDFH.historydescription_Document_SetComplexFieldPr:
+				sString = "Document_SetComplexFieldPr";
+				break;
+			case AscDFH.historydescription_Document_UpdateTableOfContents:
+				sString = "Document_UpdateTableOfContents";
+				break;
+			case AscDFH.historydescription_Document_SectionStartPage:
+				sString = "Document_SectionStartPage";
+				break;
+			case AscDFH.historydescription_Document_DistributeTableCells:
+				sString = "Document_DistributeTableCells";
+				break;
+
 		}
 		return sString;
 	}
@@ -1123,6 +1154,7 @@
 	window['AscDFH'].historyitem_type_BlockLevelSdt    = 59 << 16;
 	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
 	window['AscDFH'].historyitem_type_InlineLevelSdt   = 61 << 16;
+	window['AscDFH'].historyitem_type_ParaBookmark     = 62 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 
@@ -1257,6 +1289,7 @@
 	window['AscDFH'].historyitem_type_Notes                  = 1129 << 16;
 	window['AscDFH'].historyitem_type_Cnx                    = 1130 << 16;
 	window['AscDFH'].historyitem_type_PresentationSection    = 1131 << 16;
+	window['AscDFH'].historyitem_type_PivotTableDefinition   = 1132 << 16;
 
 	window['AscDFH'].historyitem_type_DocumentMacros         = 2000 << 16;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1320,6 +1353,7 @@
 	window['AscDFH'].historyitem_Paragraph_SectionPr                 = window['AscDFH'].historyitem_type_Paragraph | 34;
 	window['AscDFH'].historyitem_Paragraph_PrChange                  = window['AscDFH'].historyitem_type_Paragraph | 35;
 	window['AscDFH'].historyitem_Paragraph_PrReviewInfo              = window['AscDFH'].historyitem_type_Paragraph | 36;
+	window['AscDFH'].historyitem_Paragraph_OutlineLvl                = window['AscDFH'].historyitem_type_Paragraph | 37;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе ParaTextPr
 	//------------------------------------------------------------------------------------------------------------------
@@ -1460,6 +1494,7 @@
 	window['AscDFH'].historyitem_Hyperlink_ToolTip    = window['AscDFH'].historyitem_type_Hyperlink | 2;
 	window['AscDFH'].historyitem_Hyperlink_AddItem    = window['AscDFH'].historyitem_type_Hyperlink | 3;
 	window['AscDFH'].historyitem_Hyperlink_RemoveItem = window['AscDFH'].historyitem_type_Hyperlink | 4;
+	window['AscDFH'].historyitem_Hyperlink_Anchor     = window['AscDFH'].historyitem_type_Hyperlink | 5;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CStyle
 	//------------------------------------------------------------------------------------------------------------------
@@ -1680,11 +1715,12 @@
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CSdtPr
 	//------------------------------------------------------------------------------------------------------------------
-	window['AscDFH'].historyitem_SdtPr_Alias = window['AscDFH'].historyitem_type_SdtPr | 1;
-	window['AscDFH'].historyitem_SdtPr_Id    = window['AscDFH'].historyitem_type_SdtPr | 2;
-	window['AscDFH'].historyitem_SdtPr_Tag   = window['AscDFH'].historyitem_type_SdtPr | 3;
-	window['AscDFH'].historyitem_SdtPr_Label = window['AscDFH'].historyitem_type_SdtPr | 4;
-	window['AscDFH'].historyitem_SdtPr_Lock  = window['AscDFH'].historyitem_type_SdtPr | 5;
+	window['AscDFH'].historyitem_SdtPr_Alias      = window['AscDFH'].historyitem_type_SdtPr | 1;
+	window['AscDFH'].historyitem_SdtPr_Id         = window['AscDFH'].historyitem_type_SdtPr | 2;
+	window['AscDFH'].historyitem_SdtPr_Tag        = window['AscDFH'].historyitem_type_SdtPr | 3;
+	window['AscDFH'].historyitem_SdtPr_Label      = window['AscDFH'].historyitem_type_SdtPr | 4;
+	window['AscDFH'].historyitem_SdtPr_Lock       = window['AscDFH'].historyitem_type_SdtPr | 5;
+	window['AscDFH'].historyitem_SdtPr_DocPartObj = window['AscDFH'].historyitem_type_SdtPr | 6;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
@@ -1793,11 +1829,13 @@
 	window['AscDFH'].historyitem_DefaultShapeDefinition_SetLstStyle = window['AscDFH'].historyitem_type_DefaultShapeDefinition | 3;
 	window['AscDFH'].historyitem_DefaultShapeDefinition_SetStyle    = window['AscDFH'].historyitem_type_DefaultShapeDefinition | 4;
 
-	window['AscDFH'].historyitem_CNvPr_SetId       = window['AscDFH'].historyitem_type_CNvPr | 1;
-	window['AscDFH'].historyitem_CNvPr_SetName     = window['AscDFH'].historyitem_type_CNvPr | 2;
-	window['AscDFH'].historyitem_CNvPr_SetIsHidden = window['AscDFH'].historyitem_type_CNvPr | 3;
-	window['AscDFH'].historyitem_CNvPr_SetDescr    = window['AscDFH'].historyitem_type_CNvPr | 4;
-	window['AscDFH'].historyitem_CNvPr_SetTitle    = window['AscDFH'].historyitem_type_CNvPr | 5;
+	window['AscDFH'].historyitem_CNvPr_SetId         = window['AscDFH'].historyitem_type_CNvPr | 1;
+	window['AscDFH'].historyitem_CNvPr_SetName       = window['AscDFH'].historyitem_type_CNvPr | 2;
+	window['AscDFH'].historyitem_CNvPr_SetIsHidden   = window['AscDFH'].historyitem_type_CNvPr | 3;
+	window['AscDFH'].historyitem_CNvPr_SetDescr      = window['AscDFH'].historyitem_type_CNvPr | 4;
+	window['AscDFH'].historyitem_CNvPr_SetTitle      = window['AscDFH'].historyitem_type_CNvPr | 5;
+	window['AscDFH'].historyitem_CNvPr_SetHlinkClick = window['AscDFH'].historyitem_type_CNvPr | 6;
+	window['AscDFH'].historyitem_CNvPr_SetHlinkHover = window['AscDFH'].historyitem_type_CNvPr | 7;
 
 	window['AscDFH'].historyitem_NvPr_SetIsPhoto   = window['AscDFH'].historyitem_type_NvPr | 1;
 	window['AscDFH'].historyitem_NvPr_SetUserDrawn = window['AscDFH'].historyitem_type_NvPr | 2;
@@ -2534,9 +2572,15 @@
 
 	window['AscDFH'].historyitem_PropLockerSetId = window['AscDFH'].historyitem_type_PropLocker | 1;
 
-	window['AscDFH'].historyitem_ThemeSetColorScheme = window['AscDFH'].historyitem_type_Theme | 1;
-	window['AscDFH'].historyitem_ThemeSetFontScheme  = window['AscDFH'].historyitem_type_Theme | 2;
-	window['AscDFH'].historyitem_ThemeSetFmtScheme   = window['AscDFH'].historyitem_type_Theme | 3;
+	window['AscDFH'].historyitem_ThemeSetColorScheme     = window['AscDFH'].historyitem_type_Theme | 1;
+	window['AscDFH'].historyitem_ThemeSetFontScheme      = window['AscDFH'].historyitem_type_Theme | 2;
+	window['AscDFH'].historyitem_ThemeSetFmtScheme       = window['AscDFH'].historyitem_type_Theme | 3;
+	window['AscDFH'].historyitem_ThemeSetName            = window['AscDFH'].historyitem_type_Theme | 4;
+	window['AscDFH'].historyitem_ThemeSetIsThemeOverride = window['AscDFH'].historyitem_type_Theme | 5;
+	window['AscDFH'].historyitem_ThemeSetSpDef           = window['AscDFH'].historyitem_type_Theme | 6;
+	window['AscDFH'].historyitem_ThemeSetLnDef           = window['AscDFH'].historyitem_type_Theme | 7;
+	window['AscDFH'].historyitem_ThemeSetTxDef           = window['AscDFH'].historyitem_type_Theme | 8;
+	window['AscDFH'].historyitem_ThemeAddExtraClrScheme  = window['AscDFH'].historyitem_type_Theme | 9;
 
 	window['AscDFH'].historyitem_GraphicFrameSetSpPr          = window['AscDFH'].historyitem_type_GraphicFrame | 1;
 	window['AscDFH'].historyitem_GraphicFrameSetGraphicObject = window['AscDFH'].historyitem_type_GraphicFrame | 2;
@@ -2574,6 +2618,8 @@
     window['AscDFH'].historyitem_Sparkline_ChangeData = window['AscDFH'].historyitem_type_Sparkline | 27;
     window['AscDFH'].historyitem_Sparkline_RemoveData = window['AscDFH'].historyitem_type_Sparkline | 28;
     window['AscDFH'].historyitem_Sparkline_RemoveSparkline = window['AscDFH'].historyitem_type_Sparkline | 29;
+
+	window['AscDFH'].historyitem_PivotTableDefinitionDelete = window['AscDFH'].historyitem_type_PivotTableDefinition | 1;
 
 
     window['AscDFH'].historyitem_NotesMasterSetHF          = window['AscDFH'].historyitem_type_NotesMaster | 1;
@@ -2944,7 +2990,16 @@
 	window['AscDFH'].historydescription_Document_ChangeContentControlProperties     = 0x0145;
     window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
 	window['AscDFH'].historydescription_DocumentMacros_Data                         = 0x0147;
-
+    window['AscDFH'].historydescription_Document_AddBookmark                        = 0x0148;
+	window['AscDFH'].historydescription_Document_AddTableOfContents                 = 0x0149;
+	window['AscDFH'].historydescription_Document_ChangeOutlineLevel                 = 0x014a;
+	window['AscDFH'].historydescription_Document_AddElementToOutline                = 0x014b;
+	window['AscDFH'].historydescription_Document_ResizeTable                        = 0x014c;
+	window['AscDFH'].historydescription_Document_RemoveComplexField                 = 0x014d;
+	window['AscDFH'].historydescription_Document_SetComplexFieldPr                  = 0x014e;
+	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
+	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
+	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3041,6 +3096,10 @@
 	CChangesBase.prototype.SetReverted = function(isReverted)
 	{
 		this.Reverted = isReverted;
+	};
+	CChangesBase.prototype.IsParagraphSimpleChanges = function()
+	{
+		return false;
 	};
 	window['AscDFH'].CChangesBase = CChangesBase;
 	/**

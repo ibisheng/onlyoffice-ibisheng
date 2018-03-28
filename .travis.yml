@@ -8,6 +8,12 @@ before_script:
   - git clone -b develop https://github.com/ONLYOFFICE/web-apps.git ../web-apps
 jobs:
   include:
+    - stage: SonarQube Scanner
+      if: branch = develop
+      script:
+        - wget -P /tmp https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip
+        - unzip -d /tmp /tmp/sonar-scanner-cli-3.0.3.778-linux.zip
+        - /tmp/sonar-scanner-3.0.3.778-linux/bin/sonar-scanner -Dsonar.login=$SONAR_TOKEN
     - stage: Formulas tests
       script:
         - npm install -g node-qunit-phantomjs
@@ -17,13 +23,17 @@ jobs:
         - npm install -g grunt-cli
         - npm install --prefix build
         - grunt --level=WHITESPACE_ONLY --base build --gruntfile build/Gruntfile.js
-        - docker run -v $PWD/word:/opt/onlyoffice/documentbuilder/sdkjs/word
-                     -v $PWD/cell:/opt/onlyoffice/documentbuilder/sdkjs/cell
-                     -v $PWD/slide:/opt/onlyoffice/documentbuilder/sdkjs/slide
-                     onlyofficetestingrobot/doc-builder-testing:develop-latest
+        - docker pull onlyofficetestingrobot/doc-builder-testing:develop-latest
+        - travis_wait docker run -v $PWD/word:/opt/onlyoffice/documentbuilder/sdkjs/word
+                                 -v $PWD/cell:/opt/onlyoffice/documentbuilder/sdkjs/cell
+                                 -v $PWD/slide:/opt/onlyoffice/documentbuilder/sdkjs/slide
+                                 onlyofficetestingrobot/doc-builder-testing:develop-latest
 notifications:
   email:
     recipients:
       - shockwavenn@gmail.com
     on_success: never
     on_failure: always
+env:
+  global:
+    secure: iqrqqfJLJkd9KRzYxP/Zt6KQqcMhnLavYhuYmkWdZS2+HLda4x40eI9v+ub0InetPnu2avfQl3K04FGhCEhDar+olmK1rZdSuEAwSWyAP8B8acCOPobgbwnHtlKyqLYuqUXf91M9kTdz0iBcKzpE1GaI8Nq+xzAc4xqnbT0yBrRfP0J9wF4dZ3PT+6wsK1qAIV/+1ZVtQQr39v+JUkcI5JHbuhewV3rIUUnw2AQ+56HUf9HMYONdaMuSP7kqgjL8MncQ2b29s6BTb2tOmun+AKmLlaZaFGSrpjOqKLsxMHUnsCR3uaRGD9xRC2SU5Qtf2chWgaX/eZipFtN9G68lxeoO3jPYkAKjeuS3JBqaZlaCooBKjuyrjdLRr+jZ9Aj3hWptiZzZJEDviAKUqJyZpM/7PSxew8dB+te277IIFhr63ElWcDsS7lAUtUBClYTfTQLZ3BrFHTsI3KEkUcBxs8b4DzSTU3bzluFePlP+XIalNz8PHmZfgW3NECnND9pZyiFETDWEvGSOEiYQ/5CMQbzXrpWMhEtb1Ze6ya23JqDHp6jcsRVp7AoJI0IRWpdexjo+Vy/iizUH670nbAam151zaGPhUtaetuCMX1gBhBqngnR5zVaggqKrXfDR2AmrLVMzuPLEBmKtKKRE7fUhYnGo6d3wUUapTN2G0ariKp0=

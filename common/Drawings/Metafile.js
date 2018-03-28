@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -632,18 +632,21 @@
 			this.data[this.pos++] = (lval >>> 16) & 0xFF;
 			this.data[this.pos++] = (lval >>> 24) & 0xFF;
 		}
+		var tempHelp = new ArrayBuffer(8);
+		var tempHelpUnit = new Uint8Array(tempHelp);
+		var tempHelpFloat = new Float64Array(tempHelp);
 		this.WriteDouble2       = function(val)
 		{
 			this.CheckSize(8);
-			var aVal              = this._doubleEncodeLE754(val);
-			this.data[this.pos++] = aVal[0];
-			this.data[this.pos++] = aVal[1];
-			this.data[this.pos++] = aVal[2];
-			this.data[this.pos++] = aVal[3];
-			this.data[this.pos++] = aVal[4];
-			this.data[this.pos++] = aVal[5];
-			this.data[this.pos++] = aVal[6];
-			this.data[this.pos++] = aVal[7];
+			tempHelpFloat[0] = val;
+			this.data[this.pos++] = tempHelpUnit[0];
+			this.data[this.pos++] = tempHelpUnit[1];
+			this.data[this.pos++] = tempHelpUnit[2];
+			this.data[this.pos++] = tempHelpUnit[3];
+			this.data[this.pos++] = tempHelpUnit[4];
+			this.data[this.pos++] = tempHelpUnit[5];
+			this.data[this.pos++] = tempHelpUnit[6];
+			this.data[this.pos++] = tempHelpUnit[7];
 		}
 		this._doubleEncodeLE754 = function(v)
 		{
@@ -708,13 +711,38 @@
 			a[i - d] |= s * 128;
 			return a;
 		}
+        this.WriteStringBySymbol = function(code)
+        {
+        	if (code < 0xFFFF)
+			{
+				this.CheckSize(4);
+                this.data[this.pos++] = 1;
+                this.data[this.pos++] = 0;
+                this.data[this.pos++] = code & 0xFF;
+                this.data[this.pos++] = (code >>> 8) & 0xFF;
+			}
+			else
+			{
+                this.CheckSize(6);
+                this.data[this.pos++] = 2;
+                this.data[this.pos++] = 0;
+
+                var codePt = code - 0x10000;
+                var c1 = 0xD800 | (codePt >> 10);
+                var c2 = 0xDC00 | (codePt & 0x3FF);
+                this.data[this.pos++] = c1 & 0xFF;
+                this.data[this.pos++] = (c1 >>> 8) & 0xFF;
+                this.data[this.pos++] = c2 & 0xFF;
+                this.data[this.pos++] = (c2 >>> 8) & 0xFF;
+			}
+        }
 		this.WriteString        = function(text)
 		{
 			if ("string" != typeof text)
 				text = text + "";
 
 			var count = text.length & 0xFFFF;
-			this.CheckSize(count + 2);
+			this.CheckSize(2 * count + 2);
 			this.data[this.pos++] = count & 0xFF;
 			this.data[this.pos++] = (count >>> 8) & 0xFF;
 			for (var i = 0; i < count; i++)
@@ -1093,6 +1121,89 @@
 		[1, 1]
 	];
 
+	function CMetafileFontPicker(manager)
+	{
+		this.Manager = manager; 	// в идеале - кэш измерятеля. тогда ни один шрифт не будет загружен заново
+		if (!this.Manager)
+		{
+			this.Manager = new AscFonts.CFontManager();
+			this.Manager.Initialize(false)
+		}
+
+		this.FontsInCache = {};
+		this.LastPickFont = null;
+		this.LastPickFontNameOrigin = "";
+		this.LastPickFontName = "";
+		this.Metafile = null; 												// класс, которому будет подменяться шрифт
+
+		this.SetFont = function(setFont)
+		{
+			var name = setFont.FontFamily.Name;
+			var size = setFont.FontSize;
+
+            var style = 0;
+            if (setFont.Italic == true)
+                style += 2;
+            if (setFont.Bold == true)
+                style += 1;
+
+            var name_check = name + "_" + style;
+			if (this.FontsInCache[name_check])
+			{
+				this.LastPickFont = this.FontsInCache[name_check];
+			}
+			else
+			{
+				var font = g_fontApplication.GetFontFileWeb(name, style);
+                var font_name_index = AscFonts.g_map_font_index[font.m_wsFontName];
+                var fontId = AscFonts.g_font_infos[font_name_index].GetFontID(AscCommon.g_font_loader, style);
+                var test_id = fontId.id + fontId.faceIndex + size;
+
+                var cache = this.Manager.m_oFontsCache;
+                this.LastPickFont = cache.Fonts[test_id];
+                if (!this.LastPickFont)
+                	this.LastPickFont = cache.Fonts[test_id + "nbold"];
+                if (!this.LastPickFont)
+                    this.LastPickFont = cache.Fonts[test_id + "nitalic"];
+                if (!this.LastPickFont)
+                    this.LastPickFont = cache.Fonts[test_id + "nboldnitalic"];
+
+                if (!this.LastPickFont)
+				{
+					// такого при правильном кэше быть не должно
+					this.LastPickFont = cache.LockFont(fontId.file.stream_index, fontId.id, fontId.faceIndex, size, "", this.Manager);
+				}
+
+				this.FontsInCache[name_check] = this.LastPickFont;
+			}
+
+            this.LastPickFontNameOrigin = name;
+			this.LastPickFontName = name;
+			this.Metafile.SetFont(setFont, true);
+		};
+
+		this.FillTextCode = function(glyph)
+		{
+			if (this.LastPickFont.GetGIDByUnicode(glyph))
+			{
+				if (this.LastPickFontName != this.LastPickFontNameOrigin)
+				{
+                    this.LastPickFontName = this.LastPickFontNameOrigin;
+					this.Metafile.SetFontName(this.LastPickFontName);
+				}
+			}
+			else
+			{
+                var name = AscFonts.FontPickerByCharacter.getFontBySymbol(glyph);
+                if (name != this.LastPickFontName)
+				{
+					this.LastPickFontName = name;
+                    this.Metafile.SetFontName(this.LastPickFontName);
+                }
+			}
+		};
+	}
+
 
 	function CMetafile(width, height)
 	{
@@ -1129,10 +1240,13 @@
 		// просто чтобы не создавать каждый раз
 		this.m_oFontSlotFont    = new CFontSetup();
 		this.LastFontOriginInfo = {Name : "", Replace : null};
+		this.m_oFontTmp = { FontFamily : { Name : "arial" }, Bold : false, Italic : false };
 
 		this.StartOffset = 0;
 
 		this.m_bIsPenDash = false;
+
+		this.FontPicker = null;
 	}
 
 	CMetafile.prototype =
@@ -1535,8 +1649,22 @@
 			this.Memory.WriteDouble(h);
 		},
 
-		SetFont      : function(font)
+		SetFontName : function(name)
 		{
+            var fontinfo = g_fontApplication.GetFontInfo(name, 0, this.LastFontOriginInfo);
+            if (this.m_oFont.Name != fontinfo.Name)
+            {
+                this.m_oFont.Name = fontinfo.Name;
+                this.Memory.WriteByte(CommandType.ctFontName);
+                this.Memory.WriteString(this.m_oFont.Name);
+            }
+		},
+
+		SetFont      : function(font, isFromPicker)
+		{
+			if (this.FontPicker && !isFromPicker)
+				return this.FontPicker.SetFont(font);
+
 			if (null == font)
 				return;
 
@@ -1547,7 +1675,7 @@
 				style += 1;
 
 			var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
-			style        = fontinfo.GetBaseStyle(style);
+			//style        = fontinfo.GetBaseStyle(style);
 
 			if (this.m_oFont.Name != fontinfo.Name)
 			{
@@ -1568,16 +1696,12 @@
 				this.Memory.WriteLong(style);
 			}
 		},
-		FillText     : function(x, y, text, isNoReplaceAttack)
+		FillText     : function(x, y, text)
 		{
-			this.Memory.WriteByte(CommandType.ctDrawText);
+			if (null != this.LastFontOriginInfo.Replace && 1 == text.length)
+				return this.FillTextCode(x, y, text.charCodeAt(0));
 
-			if ((true !== isNoReplaceAttack) && null != this.LastFontOriginInfo.Replace && 1 == text.length)
-			{
-				var _code = text.charCodeAt(0);
-				_code     = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
-				text      = String.fromCharCode(_code);
-			}
+			this.Memory.WriteByte(CommandType.ctDrawText);
 
 			this.Memory.WriteString(text);
 			this.Memory.WriteDouble(x);
@@ -1585,45 +1709,17 @@
 		},
 		FillTextCode : function(x, y, code)
 		{
-			var _font_info = AscFonts.g_font_infos[AscFonts.g_map_font_index[this.m_oFont.Name]];
+			var _code = code;
+            if (null != this.LastFontOriginInfo.Replace)
+				_code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
-			if (code < 0xFFFF)
-				return this.FillText(x, y, String.fromCharCode(code));
-			else
-			{
-				var codePt = code - 0x10000;
-				return this.FillText(x, y, String.fromCharCode(0xD800 + (codePt >> 10), 0xDC00 + (codePt & 0x3FF)), true);
-			}
+			if (this.FontPicker)
+				this.FontPicker.FillTextCode(_code);
 
-			if (window["native"] !== undefined)
-			{
-				// TODO:
-				return;
-			}
-
-			var _is_face_index_no_0 = (_font_info.faceIndexR <= 0 && _font_info.faceIndexI <= 0 && _font_info.faceIndexB <= 0 && _font_info.faceIndexBI <= 0);
-
-			var _old_pos = this.Memory.pos;
-
-			g_fontApplication.LoadFont(_font_info.Name, AscCommon.g_font_loader, AscCommon.g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
-
-			if (null != this.LastFontOriginInfo.Replace)
-			{
-				code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
-			}
-
-			AscCommon.g_oTextMeasurer.m_oManager.LoadStringPathCode(code, false, x, y, this);
-
-			// start (1) + draw(1) + typedraw(4) + end(1) = 7!
-			if ((this.Memory.pos - _old_pos) < 8)
-				this.Memory.pos = _old_pos;
-
-			/*
-			 this.Memory.WriteByte(CommandType.ctDrawTextCode);
-			 this.Memory.WriteLong(code);
-			 this.Memory.WriteDouble(x);
-			 this.Memory.WriteDouble(y);
-			 */
+            this.Memory.WriteByte(CommandType.ctDrawText);
+			this.Memory.WriteStringBySymbol(_code);
+            this.Memory.WriteDouble(x);
+            this.Memory.WriteDouble(y);
 		},
 		tg           : function(gid, x, y)
 		{
@@ -1747,33 +1843,11 @@
 			if (undefined !== fontSizeKoef)
 				_lastFont.Size *= fontSizeKoef;
 
-			var style = 0;
-			if (_lastFont.Italic == true)
-				style += 2;
-			if (_lastFont.Bold == true)
-				style += 1;
-
-			var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
-			style        = fontinfo.GetBaseStyle(style);
-
-			if (this.m_oFont.Name != fontinfo.Name)
-			{
-				this.m_oFont.Name = fontinfo.Name;
-				this.Memory.WriteByte(CommandType.ctFontName);
-				this.Memory.WriteString(this.m_oFont.Name);
-			}
-			if (this.m_oFont.FontSize != _lastFont.Size)
-			{
-				this.m_oFont.FontSize = _lastFont.Size;
-				this.Memory.WriteByte(CommandType.ctFontSize);
-				this.Memory.WriteDouble(this.m_oFont.FontSize);
-			}
-			if (this.m_oFont.Style != style)
-			{
-				this.m_oFont.Style = style;
-				this.Memory.WriteByte(CommandType.ctFontStyle);
-				this.Memory.WriteLong(style);
-			}
+            this.m_oFontTmp.FontFamily.Name = _lastFont.Name;
+            this.m_oFontTmp.Bold = _lastFont.Bold;
+            this.m_oFontTmp.Italic = _lastFont.Italic;
+            this.m_oFontTmp.FontSize = _lastFont.Size;
+            this.SetFont(this.m_oFontTmp);
 		}
 	};
 
@@ -1803,10 +1877,17 @@
 		this.m_oBaseTransform = null;
 
 		this.UseOriginImageUrl = false;
+
+        this.FontPicker = null;
 	}
 
 	CDocumentRenderer.prototype =
 	{
+		InitPicker : function(_manager)
+		{
+			this.FontPicker = new CMetafileFontPicker(_manager);
+		},
+
 		SetBaseTransform : function(_matrix)
 		{
 			this.m_oBaseTransform = _matrix;
@@ -1818,6 +1899,10 @@
 			this.m_arrayPages[this.m_lPagesCount - 1].Memory               = this.Memory;
 			this.m_arrayPages[this.m_lPagesCount - 1].StartOffset          = this.Memory.pos;
 			this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = this.VectorMemoryForPrint;
+            this.m_arrayPages[this.m_lPagesCount - 1].FontPicker		   = this.FontPicker;
+
+            if (this.FontPicker)
+            	this.m_arrayPages[this.m_lPagesCount - 1].FontPicker.Metafile  = this.m_arrayPages[this.m_lPagesCount - 1];
 
 			this.Memory.WriteByte(CommandType.ctPageStart);
 
@@ -2555,7 +2640,7 @@
 			this.tx  = 0.0;
 			this.ty  = 0.0;
 		},
-		// ���������
+		// трансформ
 		Multiply        : function(matrix, order)
 		{
 			if (MATRIX_ORDER_PREPEND == order)
@@ -2589,7 +2674,7 @@
 			}
 			return this;
 		},
-		// � ������ ������� ������ ���������� (��� �������� �����������)
+		// а теперь частные случаи трансформа (для удобного пользования)
 		Translate       : function(x, y, order)
 		{
 			var m = new CMatrix();
@@ -2690,7 +2775,7 @@
 				a += 360;
 			return a;
 		},
-		// ������� ���������
+		// сделать дубликата
 		CreateDublicate : function()
 		{
 			var m = new CMatrix();
@@ -2726,6 +2811,15 @@
 				return true;
 			}
 			return false;
+		},
+
+		GetScaleValue : function()
+		{
+			var x1 = this.TransformPointX(0, 0);
+			var y1 = this.TransformPointY(0, 0);
+			var x2 = this.TransformPointX(1, 1);
+			var y2 = this.TransformPointY(1, 1);
+			return Math.sqrt(((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2);
 		}
 	};
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -201,7 +201,7 @@ function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oCommen
     this.pen = pen;
     this.brush = brush;
 
-    /*������� �������*/
+	/*позиция символа*/
     this.x = x;
     this.y = y;
 }
@@ -601,7 +601,7 @@ function RotateTrackGroup(originalObject)
         if(!this.bIsTracked){
             return;
         }
-        AscFormat.CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm3(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }

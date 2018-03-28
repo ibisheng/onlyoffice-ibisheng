@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2918,7 +2918,7 @@ function CDemonstrationManager(htmlpage)
 		if (-1 == start_slide_num)
 			start_slide_num = 0;
 
-		this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
+        this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
         this.DemonstrationDiv = document.getElementById(main_div_id);
         if (this.DemonstrationDiv == null || start_slide_num < 0 || start_slide_num >= this.SlidesCount)
             return;
@@ -3355,7 +3355,6 @@ function CDemonstrationManager(htmlpage)
         this.CorrectSlideNum();
 
         var _is_transition = this.Transition.IsPlaying();
-        var _is_transition = this.Transition.IsPlaying();
         if (!_is_transition)
         {
             //this.SlideNum++;
@@ -3369,12 +3368,14 @@ function CDemonstrationManager(htmlpage)
             this.End();
         else
         {
+            this.HtmlPage.m_oNotesApi.IsEmptyDrawCheck = true;
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
             this.StartSlide(!_is_transition, false);
+			this.HtmlPage.m_oNotesApi.IsEmptyDrawCheck = false;
         }
 
         this.TmpSlideVisible = -1;
-	}
+    }
 
     this.isLoop = function()
     {

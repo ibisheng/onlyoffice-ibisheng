@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -105,6 +105,10 @@ CDocumentContentBase.prototype.Update_ContentIndexing = function()
 
 		this.ReindexStartPos = -1;
 	}
+};
+CDocumentContentBase.prototype.UpdateContentIndexing = function()
+{
+	return this.Update_ContentIndexing();
 };
 /**
  * Получаем массив всех автофигур.
@@ -640,6 +644,15 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos > 0 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos - 1].GetType())
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (0 === this.CurPos.ContentPos)
+					{
+						bRetValue = false;
+					}
 				}
 				else if (Count > 0)
 				{
@@ -674,6 +687,11 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							}
 						}
 					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1 && type_BlockLevelSdt === this.Content[this.CurPos.ContentPos + 1].GetType())
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
 					else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
 					{
 						// Если данный параграф пустой, последний, не единственный и идущий перед
@@ -681,6 +699,10 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 						this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
 						this.CurPos.ContentPos--;
 						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+					}
+					else if (this.CurPos.ContentPos === this.Content.length - 1)
+					{
+						bRetValue = false;
 					}
 				}
 			}
@@ -692,6 +714,39 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				Item.CurPos.RealY = Item.CurPos.Y;
 			}
 		}
+		else if (type_BlockLevelSdt === this.Content[this.CurPos.ContentPos].GetType())
+		{
+			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
+			{
+				if (this.Content[this.CurPos.ContentPos].IsEmpty())
+				{
+					this.RemoveFromContent(this.CurPos.ContentPos, 1);
+
+					if ((Count < 0 && this.CurPos.ContentPos > 0) || this.CurPos.ContentPos >= this.Content.length)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else
+					{
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
+				else
+				{
+					if (Count < 0 && this.CurPos.ContentPos > 0)
+					{
+						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
+					}
+					else if (this.CurPos.ContentPos < this.Content.length - 1)
+					{
+						this.CurPos.ContentPos++;
+						this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+					}
+				}
+			}
+		}
 		else
 		{
 			this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText);
@@ -701,6 +756,10 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 	return bRetValue;
 };
 CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
+{
+	return false;
+};
+CDocumentContentBase.prototype.IsBlockLevelSdtFirstOnNewPage = function()
 {
 	return false;
 };
@@ -741,17 +800,17 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					this.Remove_FromContent(nIndex, 1);
 				}
 
-				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1, 1);
+				oSdt.Content.Remove_FromContent(oSdt.Content.GetElementsCount() - 1, 1);
 				oSdt.Content.Selection.Use      = true;
 				oSdt.Content.Selection.StartPos = 0;
-				oSdt.Content.Selection.EndPos   = oSdt.Content.Get_ElementsCount() - 1;
+				oSdt.Content.Selection.EndPos   = oSdt.Content.GetElementsCount() - 1;
 
 				this.Add_ToContent(nStartPos, oSdt);
 				this.Selection.StartPos = nStartPos;
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
 
-				oLogicDocument.RemoveCommentsOnPreDelete = false;
+				oLogicDocument.RemoveCommentsOnPreDelete = true;
 				return oSdt;
 			}
 		}
@@ -869,6 +928,202 @@ CDocumentContentBase.prototype.FindNextFillingForm = function(isNext, isCurrent,
 
 		}
 	}
+
+	return null;
+};
+/**
+ * Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать происходил ли выделение в
+ * пределах одного элеменета.
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsSelectedSingleElement = function()
+{
+	return (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
+};
+CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
+{
+	if (!arrOutline)
+		arrOutline = [];
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (type_Paragraph === this.Content[nIndex].GetType())
+			this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
+	}
+
+	return arrOutline;
+};
+/**
+ * Обновляем список закладок
+ * @param oManager
+ */
+CDocumentContentBase.prototype.UpdateBookmarks = function(oManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].UpdateBookmarks(oManager);
+	}
+};
+/**
+ * @param StartDocPos
+ * @param EndDocPos
+ */
+CDocumentContentBase.prototype.SetSelectionByContentPositions = function(StartDocPos, EndDocPos)
+{
+	this.RemoveSelection();
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.SetContentSelection(StartDocPos, EndDocPos, 0, 0, 0);
+
+	if (this.Parent && this.LogicDocument)
+	{
+		this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
+		this.LogicDocument.Selection.Use   = true;
+		this.LogicDocument.Selection.Start = false;
+	}
+};
+/**
+ * Получем количество элементов
+ * @return {number}
+ */
+CDocumentContentBase.prototype.GetElementsCount = function()
+{
+	return this.Content.length;
+};
+/**
+ * Получаем элемент по заданной позици
+ * @param nIndex
+ * @returns {?CDocumentContentElementBase}
+ */
+CDocumentContentBase.prototype.GetElement = function(nIndex)
+{
+	if (this.Content[nIndex])
+		return this.Content[nIndex];
+
+	return null;
+};
+/**
+ * Добавляем новый элемент (с записью в историю)
+ * @param nPos
+ * @param oItem
+ */
+CDocumentContentBase.prototype.AddToContent = function(nPos, oItem)
+{
+	this.Add_ToContent(nPos, oItem);
+};
+/**
+ * Удаляем заданное количество элементов (с записью в историю)
+ * @param {number} nPos
+ * @param {number} [nCount=1]
+ */
+CDocumentContentBase.prototype.RemoveFromContent = function(nPos, nCount)
+{
+	if (undefined === nCount || null === nCount)
+		nCount = 1;
+
+	this.Remove_FromContent(nPos, nCount);
+};
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isUnique ищем с параметром Unique = true
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oResult = this.Content[nIndex].GetTableOfContents(isUnique, isCheckFields);
+		if (oResult)
+			return oResult;
+	}
+
+	return null;
+};
+/**
+ * Добавляем заданный текст в текущей позиции
+ * @param {String} sText
+ */
+CDocumentContentBase.prototype.AddText = function(sText)
+{
+	for (var oIterator = sText.getUnicodeIterator(); oIterator.check(); oIterator.next())
+	{
+		var nCharCode = oIterator.value();
+
+		if (9 === nCharCode) // \t
+			this.AddToParagraph(new ParaTab(), false);
+		if (10 === nCharCode) // \n
+			this.AddToParagraph(new ParaNewLine(break_Line), false);
+		else if (13 === nCharCode) // \r
+			continue;
+		else if (32 === nCharCode) // space
+			this.AddToParagraph(new ParaSpace(), false);
+		else
+			this.AddToParagraph(new ParaText(nCharCode), false);
+	}
+};
+/**
+ * Проверяем находимся ли мы заголовке хоть какой-либо таблицы
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsTableHeader = function()
+{
+	return false;
+};
+/**
+ * Получаем родительский класс
+ */
+CDocumentContentBase.prototype.GetParent = function()
+{
+	return null;
+};
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetLastParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[this.Content.length - 1].GetLastParagraph();
+};
+/**
+ * Получаем первый параграф в данном контенте, если первый элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ * @constructor
+ */
+CDocumentContentBase.prototype.GetFirstParagraph = function()
+{
+	if (this.Content.length <= 0)
+		return null;
+
+	return this.Content[0].GetFirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetNextParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetNextParagraph)
+		return oParent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentBase.prototype.GetPrevParagraph = function()
+{
+	var oParent = this.GetParent();
+	if (oParent && oParent.GetPrevParagraph)
+		return oParent.GetPrevParagraph();
 
 	return null;
 };

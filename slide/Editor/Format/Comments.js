@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -690,6 +690,21 @@ function CCommentData()
 CCommentData.prototype =
 {
 
+    createDuplicate: function(){
+        var ret = new CCommentData();
+        ret.m_sText = this.m_sText;
+        ret.m_sTime = this.m_sTime;
+        ret.m_sOOTime = this.m_sOOTime;
+        ret.m_sUserId = this.m_sUserId;
+        ret.m_sUserName = this.m_sUserName;
+        ret.m_sQuoteText = this.m_sQuoteText;
+        ret.m_bSolved = this.m_bSolved;
+        for(var i = 0; i < this.m_aReplies.length; ++i){
+            ret.m_aReplies.push(this.m_aReplies[i].createDuplicate());
+        }
+        return ret;
+    },
+
     Add_Reply: function(CommentData)
     {
         this.m_aReplies.push( CommentData );
@@ -903,6 +918,13 @@ CComment.prototype =
     getObjectType: function()
     {
         return AscDFH.historyitem_type_Comment;
+    },
+
+    createDuplicate: function(Parent){
+        var oData = this.Data ? this.Data.createDuplicate() : null;
+        var ret = new CComment(Parent, oData);
+        ret.setPosition(this.x, this.y);
+        return ret;
     },
 
     hit: function(x, y)

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -40,7 +40,7 @@
 	// Import
 	var AscBrowser               = AscCommon.AscBrowser;
 
-	// ��������� ��� ����
+	// константы для мыши
 	var g_mouse_event_type_down  = 0;
 	var g_mouse_event_type_move  = 1;
 	var g_mouse_event_type_up    = 2;
@@ -66,25 +66,25 @@
 
 	function CMouseEventHandler()
 	{
-		this.X = 0;                            // ������� ������� X
-		this.Y = 0;                            // ������� ������� Y
+		this.X = 0;                            // позиция курсора X
+		this.Y = 0;                            // позиция курсора Y
 
-		this.Button = g_mouse_button_left;          // ������ ����
-		this.Type   = g_mouse_event_type_move;      // ��� ������
+		this.Button = g_mouse_button_left;          // кнопка мыши
+		this.Type   = g_mouse_event_type_move;      // тип евента
 
-		this.AltKey   = false;                        // ������ �� ������ alt
-		this.CtrlKey  = false;                        // ������ �� ������ ctrl
-		this.ShiftKey = false;                        // ������ �� ������ shift
+		this.AltKey   = false;                        // нажата ли кнопка alt
+		this.CtrlKey  = false;                        // нажата ли кнопка ctrl
+		this.ShiftKey = false;                        // нажата ли кнопка shift
 
-		this.Sender = null;                         // �� ������ html �������� ������ �����
+		this.Sender = null;                         // от какого html элемента пришел евент
 
-		this.LastClickTime = -1;                       // ����� ���������� mousedown
-		this.ClickCount    = 0;                        // ���������� ������
+		this.LastClickTime = -1;                       // время последнего mousedown
+		this.ClickCount    = 0;                        // количество кликов
 
 		this.WheelDelta = 0;
 
-		// ���������� ����� ��� ���������� mousedown (��� mousemove)
-		this.IsPressed = false;                        // ���� �� ������ ������
+		// координаты мышки при предыдущем mousedown (для mousemove)
+		this.IsPressed = false;                        // была ли зажата кнопка
 		this.LastX     = 0;
 		this.LastY     = 0;
 
@@ -167,16 +167,24 @@
 
 	function CKeyboardEvent()
 	{
-		this.AltKey   = false;                        // ������ �� ������ alt
-		this.CtrlKey  = false;                        // ������ �� ������ ctrl
-		this.ShiftKey = false;                        // ������ �� ������ shift
+		this.AltKey   = false;                        // нажата ли кнопка alt
+		this.CtrlKey  = false;                        // нажата ли кнопка ctrl
+		this.ShiftKey = false;                        // нажата ли кнопка shift
 		this.AltGr    = false;
 
-		this.Sender = null;                         // �� ������ html �������� ������ �����
+		this.Sender = null;                         // от какого html элемента пришел евент
 
 		this.CharCode = 0;
 		this.KeyCode  = 0;
 	}
+
+	CKeyboardEvent.prototype.Up = function()
+	{
+		this.AltKey   = false;
+		this.CtrlKey  = false;
+		this.ShiftKey = false;
+		this.AltGr    = false;
+	};
 
 	var global_mouseEvent    = new CMouseEventHandler();
 	var global_keyboardEvent = new CKeyboardEvent();
@@ -194,11 +202,6 @@
 		global_keyboardEvent.CharCode = e.charCode;
 		global_keyboardEvent.KeyCode  = e.keyCode;
 		global_keyboardEvent.Which    = e.which;
-
-		if ((global_keyboardEvent.KeyCode == 229) && ((e.code == "space") || (e.code == "Space") || (e.key == "Spacebar")))
-		{
-			global_keyboardEvent.KeyCode = 12288;
-		}
 	}
 
 	function check_KeyboardEvent2(e)
@@ -220,7 +223,7 @@
 
 	function check_MouseMoveEvent(e)
 	{
-		// ���� ���� ��������, �� ����� ������ �� ����.
+		// если мышь залочена, то евент придет от окна.
 		if (e.IsLocked && !e.IsLockedEvent)
 			return;
 
@@ -364,7 +367,8 @@
 		if (global_mouseEvent.Button == -1)
 			global_mouseEvent.Button = 0;
 
-		global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
+		if (!global_mouseEvent.IsLocked || !global_mouseEvent.Sender)
+			global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 
 		if (isClicks)
 		{
@@ -519,10 +523,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_down;
 				return;
 			}
@@ -536,10 +540,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_over;
 				return;
 			}
@@ -557,10 +561,10 @@
 			{
 				if (global_mouseEvent.Sender.id != oThis.Control.HtmlElement.id)
 				{
-					// ��� �� ���������� ������
+					// это не залоченная кнопка
 					return;
 				}
-				// ���������� ������
+				// залоченная кнопка
 				oThis.Control.HtmlElement.style.backgroundPosition = oThis.state_down;
 				return;
 			}

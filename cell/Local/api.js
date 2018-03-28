@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -98,7 +98,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (ws) 
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject([AscCommon.g_oDocumentUrls.getImageUrl(_url)], null);
 		}
 	};
 	spreadsheet_api.prototype.asc_showImageFileDialog = function()
@@ -165,7 +165,7 @@ var c_oAscError = Asc.c_oAscError;
 		{
 			var _isNaturalSave = this.IsUserSave;
 			this.canSave = false;
-			this.CoAuthoringApi.askSaveChanges(function(e){t.onSaveCallback(e);});
+			this.CoAuthoringApi.askSaveChanges(function(e){t._onSaveCallback(e);});
 
 			if (this.CoAuthoringApi.onUnSaveLock)
 				this.CoAuthoringApi.onUnSaveLock();
@@ -239,7 +239,7 @@ var c_oAscError = Asc.c_oAscError;
 		window.doadssIsSaveAs = isSaveAs;
 		if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
 		{
-			window.g_asc_plugins.init({ "type" : "generatePassword" });
+			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
 			return;
 		}
 

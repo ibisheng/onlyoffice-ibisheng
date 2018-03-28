@@ -1,5 +1,5 @@
 ﻿/*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -62,8 +62,8 @@
       oComment.asc_putRow(activeCell.row);
     }
 
-    var existComments = this.getComments(oComment.nCol, oComment.nRow);
-    if (existComments.length) {
+    var existComment = this.getComment(oComment.nCol, oComment.nRow);
+    if (existComment) {
       oComment = existComments[0];
       bChange = true;
     }

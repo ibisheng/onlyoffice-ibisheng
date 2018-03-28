@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -34,6 +34,8 @@
 
 (function(window, undefined)
 {
+	var prot;
+
 	// Import
 	var c_oEditorId = AscCommon.c_oEditorId;
 	var c_oCloseCode = AscCommon.c_oCloseCode;
@@ -160,6 +162,8 @@
 		this.exucuteHistory    = false;
 		this.exucuteHistoryEnd = false;
 
+		this.selectSearchingResults = false;
+
 		this.isSendStandartTextures = false;
 
 		this.tmpFocus = null;
@@ -179,8 +183,8 @@
 		this.macros = null;
 
 		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
-		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
-			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
+		this.watermarkDraw =
+			config['watermark_on_draw'] ? new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
 
 		return this;
 	}
@@ -200,7 +204,7 @@
 			}
 			else
 			{
-				t._addImageUrl(url);
+				t._addImageUrl([url]);
 			}
 
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
@@ -218,8 +222,11 @@
 		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
 			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber + ':' + column +
 				' userAgent: ' + (navigator.userAgent || navigator.vendor || window.opera) + ' platform: ' +
-				navigator.platform + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+				navigator.platform + ' isLoadFullApi: ' + t.isLoadFullApi + ' isDocumentLoadComplete: ' +
+				t.isDocumentLoadComplete + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
 			t.CoAuthoringApi.sendChangesError(msg);
+			//send only first error to reduce number of requests. also following error may be consequences of first
+			window.onerror = oldOnError;
 			if (oldOnError) {
 				return oldOnError.apply(this, arguments);
 			} else {
@@ -515,7 +522,11 @@
 	};
 	baseEditorsApi.prototype.onDocumentContentReady              = function()
 	{
+		var t = this;
 		this.isDocumentLoadComplete = true;
+		if (!window['IS_NATIVE_EDITOR']) {
+			setInterval(function() {t._autoSave();}, 40);
+		}
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		this.sendEvent('asc_onDocumentContentReady');
 	};
@@ -541,8 +552,115 @@
 	{
 		this.isForceSaveOnUserSave = val;
 	};
-	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._onUpdateDocumentCanSave = function () {
+	};
+	baseEditorsApi.prototype._onUpdateDocumentCanUndoRedo = function () {
+	};
+	baseEditorsApi.prototype._saveCheck = function () {
+		return false;
+	};
+	// Переопределяется во всех редакторах
+	baseEditorsApi.prototype._haveOtherChanges = function () {
+		return false;
+	};
+	baseEditorsApi.prototype._onSaveCallback = function (e, isUndoRequest) {
+		var t = this;
+		var nState;
+		if (false == e["saveLock"]) {
+			if (this.isLongAction()) {
+				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
+				// Нужно снять lock с сохранения
+				this.CoAuthoringApi.onUnSaveLock = function () {
+					t.canSave = true;
+					t.IsUserSave = false;
+					t.lastSaveTime = null;
+
+					if (t.canUnlockDocument) {
+						t._unlockDocument();
+					}
+				};
+				this.CoAuthoringApi.unSaveLock();
+				return;
+			}
+
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+
+			this.canUnlockDocument2 = this.canUnlockDocument;
+			if (this.canUnlockDocument && this.canStartCoAuthoring) {
+				this.CoAuthoringApi.onStartCoAuthoring(true);
+			}
+			this.canStartCoAuthoring = false;
+			this.canUnlockDocument = false;
+
+			this._onSaveCallbackInner(isUndoRequest);
+		} else {
+			nState = this.CoAuthoringApi.get_state();
+			if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
+				// Отключаемся от сохранения, соединение потеряно
+				this.IsUserSave = false;
+				this.canSave = true;
+			} else {
+				// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+				if (!this.IsUserSave) {
+					this.canSave = true;
+					if (this.canUnlockDocument) {
+						this._unlockDocument();
+					}
+					return;
+				}
+
+				setTimeout(function() {
+					t.CoAuthoringApi.askSaveChanges(function(event) {
+						t._onSaveCallback(event, isUndoRequest);
+					});
+				}, 1000);
+			}
+		}
+	};
+	// Функция сохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._onSaveCallbackInner = function (isUndoRequest) {
+	};
 	baseEditorsApi.prototype._autoSave = function () {
+		if (this.canSave && !this.isViewMode && (this.canUnlockDocument || 0 !== this.autoSaveGap)) {
+			if (this.canUnlockDocument) {
+				this.lastSaveTime = new Date();
+				// Check edit mode after unlock document http://bugzilla.onlyoffice.com/show_bug.cgi?id=35971
+				// Close cell edit without errors (isIdle = true)
+				this.asc_Save(true, false, true);
+			} else {
+				this._autoSaveInner();
+			}
+		}
+	};
+	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._autoSaveInner = function () {
+	};
+	baseEditorsApi.prototype._prepareSave = function (isIdle) {
+		return true;
+	};
+	// Unlock document when start co-authoring
+	baseEditorsApi.prototype._unlockDocument = function () {
+		if (this.isDocumentLoadComplete) {
+			// Document is load
+			this.canUnlockDocument = true;
+			this.canStartCoAuthoring = true;
+			if (this.canSave) {
+				// We can only unlock with delete index
+				this.CoAuthoringApi.unLockDocument(false, true, AscCommon.History.GetDeleteIndex());
+				this.startCollaborationEditing();
+				AscCommon.History.RemovePointsByDeleteIndex();
+				this._onUpdateDocumentCanSave();
+				this._onUpdateDocumentCanUndoRedo();
+				this.canStartCoAuthoring = false;
+				this.canUnlockDocument = false;
+			} else {
+				// ToDo !!!!
+			}
+		} else {
+			// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
+			this.startCollaborationEditing();
+			this.CoAuthoringApi.unLockDocument(false, true);
+		}
 	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
@@ -604,13 +722,13 @@
 		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
 			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
 		};
-		this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count)
+		this.CoAuthoringApi.onAuthParticipantsChanged = function(users, userId)
 		{
-			t.sendEvent("asc_onAuthParticipantsChanged", e, count);
+			t.sendEvent("asc_onAuthParticipantsChanged", users, userId);
 		};
-		this.CoAuthoringApi.onParticipantsChanged     = function(e, CountEditUsers)
+		this.CoAuthoringApi.onParticipantsChanged     = function(users)
 		{
-			t.sendEvent("asc_onParticipantsChanged", e, CountEditUsers);
+			t.sendEvent("asc_onParticipantsChanged", users);
 		};
 		this.CoAuthoringApi.onSpellCheckInit          = function(e)
 		{
@@ -704,7 +822,7 @@
                     } else {
                         clearInterval(t.forceSaveButtonTimeout);
                     }
-                    t.forceSaveButtonTimeout = setInterval(function() {
+                    t.forceSaveButtonTimeout = setTimeout(function() {
                         t.forceSaveButtonTimeout = null;
                         if (t.forceSaveButtonContinue) {
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
@@ -712,6 +830,7 @@
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
                         }
                         t.forceSaveButtonContinue = false;
+                        t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveButton, c_oAscError.Level.NoCritical);
                     }, Asc.c_nMaxConversionTime);
                 } else if (data.refuse) {
                     if (t.forceSaveButtonContinue) {
@@ -728,6 +847,9 @@
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
                         }
                         t.forceSaveButtonContinue = false;
+                        if (!data.success) {
+                            t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveButton, c_oAscError.Level.NoCritical);
+                        }
                     }
                 }
             } else {
@@ -738,15 +860,19 @@
                         } else {
                             clearInterval(t.forceSaveTimeoutTimeout);
                         }
-                        t.forceSaveTimeoutTimeout = setInterval(function() {
+                        t.forceSaveTimeoutTimeout = setTimeout(function() {
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                            t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveTimeout, c_oAscError.Level.NoCritical);
                         }, Asc.c_nMaxConversionTime);
                     } else {
                         if (null !== t.forceSaveTimeoutTimeout) {
                             clearInterval(t.forceSaveTimeoutTimeout);
                             t.forceSaveTimeoutTimeout = null;
                             t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                            if (!data.success) {
+                                t.sendEvent('asc_onError', Asc.c_oAscError.ID.ForceSaveTimeout, c_oAscError.Level.NoCritical);
+                            }
                         }
                     }
                 }
@@ -774,16 +900,16 @@
 		 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
 		 * @param {Bool} isCloseCoAuthoring
 		 */
-		this.CoAuthoringApi.onDisconnect = function(e, errorCode)
+		this.CoAuthoringApi.onDisconnect = function(e, error)
 		{
 			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
 			{
 				t.asyncServerIdEndLoaded();
 			}
-			if (null != errorCode)
+			if (null != error)
 			{
 				t.setViewModeDisconnect();
-				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
+				t.sendEvent('asc_onError', error.code, error.level);
 			}
 		};
 		this.CoAuthoringApi.onDocumentOpen = function (inputWrap) {
@@ -845,15 +971,7 @@
 			if (isStartEvent) {
 				t.startCollaborationEditing();
 			} else {
-				// Когда документ еще не загружен, нужно отпустить lock (при быстром открытии 2-мя пользователями)
-				if (!t.isDocumentLoadComplete) {
-					t.startCollaborationEditing();
-					t.CoAuthoringApi.unLockDocument(false, true);
-				} else {
-					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
-					t.canUnlockDocument = true;
-					t.canStartCoAuthoring = true;
-				}
+				t._unlockDocument();
 			}
 		};
 		this.CoAuthoringApi.onEndCoAuthoring = function (isStartEvent) {
@@ -984,7 +1102,7 @@
 		else
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, url)
+			AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, this.CoAuthoringApi.get_jwt(), function(error, urls)
 			{
 				if (c_oAscError.ID.No !== error)
 				{
@@ -992,7 +1110,7 @@
 				}
 				else
 				{
-					t._addImageUrl(url);
+					t._addImageUrl(urls);
 				}
 				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			});
@@ -1095,6 +1213,16 @@
 	{
 	};
 
+	baseEditorsApi.prototype.asc_selectSearchingResults = function(value)
+	{
+		if (this.selectSearchingResults === value)
+		{
+			return;
+		}
+		this.selectSearchingResults = value;
+		this._selectSearchingResults(value);
+	};
+
 
 	baseEditorsApi.prototype.asc_startEditCurrentOleObject = function(){
 
@@ -1105,6 +1233,27 @@
 	};
 	baseEditorsApi.prototype.asc_undoAllChanges = function()
 	{
+	};
+	baseEditorsApi.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
+		var t = this;
+		var res = false;
+		if (this.canSave && this._saveCheck()) {
+			this.IsUserSave = !isAutoSave;
+
+			if (this.asc_isDocumentCanSave() || AscCommon.History.Have_Changes() || this._haveOtherChanges() || isUndoRequest ||
+				this.canUnlockDocument) {
+				if (this._prepareSave(isIdle)) {
+					// Не даем пользователю сохранять, пока не закончится сохранение (если оно началось)
+					this.canSave = false;
+					this.CoAuthoringApi.askSaveChanges(function (e) {
+						t._onSaveCallback(e, isUndoRequest);
+					});
+				}
+			} else if (this.isForceSaveOnUserSave && this.IsUserSave) {
+				this.forceSave();
+			}
+		}
+		return res;
 	};
 	/**
 	 * Эта функция возвращает true, если есть изменения или есть lock-и в документе
@@ -1198,10 +1347,6 @@
 		}
 
 		this.pluginsManager     = Asc.createPluginsManager(this);
-
-		if (!window['IS_NATIVE_EDITOR']) {
-			setInterval(function() {t._autoSave();}, 40);
-		}
 
 		this.macros = new AscCommon.CDocumentMacros();
 	};
@@ -1392,7 +1537,7 @@
 		this.incrementCounterLongAction();
 		var b_old_save_format = AscCommon.g_clipboardBase.bSaveFormat;
         AscCommon.g_clipboardBase.bSaveFormat = true;
-		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem, null, null, null, true);
 		this.decrementCounterLongAction();
 
 		if (true)
@@ -1415,6 +1560,14 @@
 		}
 	};
 
+	baseEditorsApi.prototype["pluginMethod_PasteText"] = function(text)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, text);
+	};
+
 	baseEditorsApi.prototype["pluginMethod_GetMacros"] = function()
 	{
 		return this.asc_getMacros();
@@ -1423,6 +1576,16 @@
 	baseEditorsApi.prototype["pluginMethod_SetMacros"] = function(data)
 	{
 		return this.asc_setMacros(data);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_StartAction"] = function(type, description)
+	{
+		this.sync_StartAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
+	};
+
+	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
+	{
+		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
 	};
 
 	// Builder
@@ -1439,6 +1602,36 @@
 	};
 	baseEditorsApi.prototype.asc_Recalculate       = function()
 	{
+	};
+
+	// Native
+	baseEditorsApi.prototype['asc_nativeCheckPdfRenderer'] = function (_memory1, _memory2) {
+		if (true) {
+			// pos не должен минимизироваться!!!
+
+			_memory1.Copy = _memory1["Copy"];
+			_memory1.ClearNoAttack = _memory1["ClearNoAttack"];
+			_memory1.WriteByte = _memory1["WriteByte"];
+			_memory1.WriteBool = _memory1["WriteBool"];
+			_memory1.WriteLong = _memory1["WriteLong"];
+			_memory1.WriteDouble = _memory1["WriteDouble"];
+			_memory1.WriteString = _memory1["WriteString"];
+			_memory1.WriteString2 = _memory1["WriteString2"];
+
+			_memory2.Copy = _memory1["Copy"];
+			_memory2.ClearNoAttack = _memory1["ClearNoAttack"];
+			_memory2.WriteByte = _memory1["WriteByte"];
+			_memory2.WriteBool = _memory1["WriteBool"];
+			_memory2.WriteLong = _memory1["WriteLong"];
+			_memory2.WriteDouble = _memory1["WriteDouble"];
+			_memory2.WriteString = _memory1["WriteString"];
+			_memory2.WriteString2 = _memory1["WriteString2"];
+		}
+
+		var _printer = new AscCommon.CDocumentRenderer();
+		_printer.Memory = _memory1;
+		_printer.VectorMemoryForPrint = _memory2;
+		return _printer;
 	};
 
 	// input
@@ -1698,6 +1891,15 @@
 	baseEditorsApi.prototype.onKeyUp = function(e)
 	{
 	};
+	/**
+	 * Получаем текст (в виде массива юникодных значений), который будет добавлен на ивенте KeyDown
+	 * @param e
+	 * @returns {Number[]}
+	 */
+	baseEditorsApi.prototype.getAddedTextOnKeyDown = function(e)
+	{
+		return [];
+	};
 	baseEditorsApi.prototype.pre_Paste = function(_fonts, _images, callback)
 	{
 	};
@@ -1740,7 +1942,7 @@
 		if (this.isEmbedVersion)
 			return 0;
 
-		if (!this.saveCheck())
+		if (!this.canSave || !this._saveCheck())
 			return 0;
 
 		return new Date().getTime() - this.lastWorkTime;
@@ -1757,11 +1959,6 @@
 		this.sendEvent('asc_onCoAuthoringDisconnect');
 		// И переходим в режим просмотра т.к. мы не можем сохранить файл
 		this.asc_setViewMode(true);
-	};
-
-	baseEditorsApi.prototype.saveCheck = function()
-	{
-		return false;
 	};
 
 	baseEditorsApi.prototype.asc_setCurrentPassword = function(password)
@@ -1814,7 +2011,61 @@
 		return this.macros.GetData();
 	};
 
+	function parseCSV(text, options) {
+		var delimiterChar;
+		if (options.asc_getDelimiterChar()) {
+			delimiterChar = options.asc_getDelimiterChar();
+		} else {
+			switch (options.asc_getDelimiter()) {
+				case AscCommon.c_oAscCsvDelimiter.None:
+					delimiterChar = undefined;
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Tab:
+					delimiterChar = "\t";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Semicolon:
+					delimiterChar = ";";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Colon:
+					delimiterChar = ":";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Comma:
+					delimiterChar = ",";
+					break;
+				case AscCommon.c_oAscCsvDelimiter.Space:
+					delimiterChar = " ";
+					break;
+			}
+		}
+		var matrix = [];
+		var rows = text.match(/[^\r\n]+/g);
+		for (var i = 0; i < rows.length; ++i) {
+			var row = rows[i];
+			//todo quotes
+			matrix.push(row.split(delimiterChar));
+		}
+		return matrix;
+	}
+
+	baseEditorsApi.prototype.asc_decodeBuffer = function(buffer, options, callback) {
+		var reader = new FileReader();
+		//todo onerror
+		reader.onload = reader.onerror = function(e) {
+			var text = e.target.result ? e.target.result : "";
+			if (options instanceof Asc.asc_CCSVAdvancedOptions) {
+				callback(parseCSV(text, options));
+			} else {
+				callback(text.match(/[^\r\n]+/g));
+			}
+		};
+
+		reader.readAsText(new Blob([buffer]), AscCommon.c_oAscEncodings[options.asc_getCodePage()][2]);
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;
+
+	prot = baseEditorsApi.prototype;
+	prot['asc_selectSearchingResults'] = prot.asc_selectSearchingResults;
 })(window);

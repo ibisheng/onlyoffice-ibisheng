@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -775,7 +775,7 @@ function CCacheManager()
 
         _cache_image.image_locked = 0;
         _cache_image.image_unusedCount = 0;
-        // ����� ����� �������� ������ � ���� (_cache_image = null) <- ��� ����������� !!!!!!!
+		// затем нужно сбросить ссылку в ноль (_cache_image = null) <- это обязательно !!!!!!!
     }
 
     this.Lock = function(_w, _h)
@@ -850,7 +850,7 @@ function CPage()
         {
             context.strokeStyle = "#81878F";
             context.strokeRect(xDst, yDst, wDst, hDst);
-            // ����� ���������� �� �������� ���������
+			// потом посмотреть на кусочную отрисовку
             context.drawImage(this.drawingPage.cachedImage.image, xDst, yDst, wDst, hDst);
         }
         else
@@ -1746,7 +1746,7 @@ function CDrawingDocument(drawingObjects)
 //
 //        //var StartTime = new Date().getTime();
 //
-//        // ������ ����� �������
+//        // теперь берем графикс
 //        var g = new CGraphics();
 //        g.init(page.drawingPage.cachedImage.image.ctx, w, h, page.width_mm, page.height_mm);
 //        g.m_oFontManager = g_fontManager;
@@ -2503,7 +2503,7 @@ function CDrawingDocument(drawingObjects)
 //        if (true == pos.Error && (false == bIsPageChanged))
 //            return;
 //
-//        // �������, ����� �� ������ �� ������
+//        // смотрим, виден ли курсор на экране
 //        var boxX = 0;
 //        var boxY = 0;
 //        var boxR = this.m_oWordControl.m_oEditor.HtmlElement.width;
@@ -2652,7 +2652,7 @@ function CDrawingDocument(drawingObjects)
 //
 //            if (!this.TableOutlineDr.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableOutlineDr.TableMatrix))
 //            {
-//                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection())) + 0.5;
+//                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection())) + 0.5;
 //                var _y = parseInt(drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) + 0.5;
 //
 //                var _r = _x + parseInt(dKoefX * this.TableOutlineDr.TableOutline.W);
@@ -2726,7 +2726,7 @@ function CDrawingDocument(drawingObjects)
 //            }
 //            else
 //            {
-//                var _x = this.TableOutlineDr.CurPos.X + _table.Get_TableOffsetCorrection();
+//                var _x = this.TableOutlineDr.CurPos.X + _table.GetTableOffsetCorrection();
 //                var _y = this.TableOutlineDr.CurPos.Y;
 //                var _r = _x + this.TableOutlineDr.TableOutline.W;
 //                var _b = _y + this.TableOutlineDr.TableOutline.H;

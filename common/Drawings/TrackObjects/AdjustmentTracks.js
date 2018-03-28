@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -441,6 +441,10 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
         if(this.angleFlag)
         {
+            if(this.geometry.preset === "mathNotEqual"){
+                _pos_y_relative_center = -_pos_y_relative_center;
+                _pos_x_relative_center = -_pos_x_relative_center;
+            }
             var _angle = Math.atan2(_pos_y_relative_center, _pos_x_relative_center);
             while(_angle < 0)
                 _angle += 2*Math.PI;

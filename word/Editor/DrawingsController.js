@@ -25,9 +25,9 @@ CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
-CDrawingsController.prototype.RecalculateCurPos = function()
+CDrawingsController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.DrawingObjects.recalculateCurPos();
+	return this.DrawingObjects.recalculateCurPos(bUpdateX, bUpdateY);
 };
 CDrawingsController.prototype.GetCurPage = function()
 {
@@ -44,6 +44,10 @@ CDrawingsController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd
 CDrawingsController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
 	return this.DrawingObjects.addInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CDrawingsController.prototype.AddImages = function(aImages)
+{
+	return this.DrawingObjects.addImages(aImages);
 };
 CDrawingsController.prototype.AddSignatureLine = function(oSignatureDrawing)
 {
@@ -339,9 +343,9 @@ CDrawingsController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.DrawingObjects.getSelectedText(bClearText, oPr);
 };
-CDrawingsController.prototype.GetCurrentParagraph = function()
+CDrawingsController.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	return this.DrawingObjects.getCurrentParagraph();
+	return this.DrawingObjects.getCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 };
 CDrawingsController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
@@ -386,6 +390,10 @@ CDrawingsController.prototype.CanMergeTableCells = function()
 CDrawingsController.prototype.CanSplitTableCells = function()
 {
 	return this.DrawingObjects.tableCheckSplit();
+};
+CDrawingsController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.DrawingObjects.distributeTableCells(isHorizontally);
 };
 CDrawingsController.prototype.UpdateInterfaceState = function()
 {
@@ -524,4 +532,8 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 CDrawingsController.prototype.AddContentControl = function(nContentControlType)
 {
 	return this.DrawingObjects.AddContentControl(nContentControlType);
+};
+CDrawingsController.prototype.GetStyleFromFormatting = function()
+{
+	return this.DrawingObjects.GetStyleFromFormatting();
 };

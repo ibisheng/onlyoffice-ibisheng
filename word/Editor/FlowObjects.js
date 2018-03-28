@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -102,9 +102,9 @@ function CFlowTable(Table, PageIndex)
 
     var Bounds = Table.Get_PageBounds(this.PageController);
     this.X = Bounds.Left;
-    this.Y = Bounds.Top;
+    this.Y = AscCommon.CorrectMMToTwips(Bounds.Top) + AscCommon.TwipsToMM(1); // Сдвигаемся на 1 twips вниз, чтобы не было пересечения с предыдущей строкой
     this.W = Bounds.Right  - Bounds.Left;
-    this.H = Bounds.Bottom - Bounds.Top;
+    this.H =  AscCommon.CorrectMMToTwips(Bounds.Bottom - Bounds.Top);
 
     this.WrappingType = WRAPPING_TYPE_SQUARE;
 }

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -244,14 +244,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
 
         var oField = new ParaField(fieldtype_MERGEFIELD, [Name], []);
         var oRun = new ParaRun();
-
-        var Index = 0;
-        oRun.Add_ToContent(Index++, new ParaText("«"));
-        for (var Len = Name.length; Index <= Len; Index++)
-        {
-            oRun.Add_ToContent(Index, new ParaText(Name.charAt(Index - 1)));
-        }
-        oRun.Add_ToContent(Index, new ParaText("»"));
+        oRun.AddText("«" + Name + "»");
         oField.Add_ToContent(0, oRun);
 
         this.Register_Field(oField);

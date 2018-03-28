@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -34,12 +34,6 @@
 
 // Import
 var History = AscCommon.History;
-
-var fieldtype_UNKNOWN    = 0x0000;
-var fieldtype_MERGEFIELD = 0x0001;
-var fieldtype_PAGENUM    = 0x0002;
-var fieldtype_PAGECOUNT  = 0x0003;
-var fieldtype_FORMTEXT   = 0x0004;
 
 /**
  *
@@ -79,7 +73,7 @@ ParaField.prototype.Get_Id = function()
 {
     return this.Id;
 };
-ParaField.prototype.Copy = function(Selected)
+ParaField.prototype.Copy = function(Selected, oPr)
 {
     var NewField = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -94,6 +94,14 @@ CDocumentContentElementBase.prototype.Get_DocumentPrev = function()
 {
 	return this.Prev;
 };
+CDocumentContentElementBase.prototype.GetParent = function()
+{
+	return this.Parent;
+};
+CDocumentContentElementBase.prototype.SetParent = function(oParent)
+{
+	this.Parent = oParent;
+};
 CDocumentContentElementBase.prototype.Set_Parent = function(oParent)
 {
 	this.Parent = oParent;
@@ -132,7 +140,7 @@ CDocumentContentElementBase.prototype.GetContentBounds = function(CurPage)
 {
 	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
 };
-CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
+CDocumentContentElementBase.prototype.IsEmptyPage = function(nCurPage)
 {
 	return false;
 };
@@ -245,7 +253,7 @@ CDocumentContentElementBase.prototype.GetSelectionBounds = function()
 		Direction : 0
 	};
 };
-CDocumentContentElementBase.prototype.RecalculateCurPos = function()
+CDocumentContentElementBase.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
 	return null;
 };
@@ -385,6 +393,9 @@ CDocumentContentElementBase.prototype.GetNumberingInfo = function(oNumberingEngi
 CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 };
+CDocumentContentElementBase.prototype.AddImages = function(aImages)
+{
+};
 CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 };
@@ -497,7 +508,7 @@ CDocumentContentElementBase.prototype.GetSelectedText = function(bClearText, oPr
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
+CDocumentContentElementBase.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
 	return null;
 };
@@ -531,6 +542,10 @@ CDocumentContentElementBase.prototype.RemoveTable = function()
 };
 CDocumentContentElementBase.prototype.SelectTable = function(Type)
 {
+};
+CDocumentContentElementBase.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return false;
 };
 CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 {
@@ -690,6 +705,9 @@ CDocumentContentElementBase.prototype.Get_Index = function()
 
 	return this.Index;
 };
+CDocumentContentElementBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -743,6 +761,10 @@ CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
 {
 	return this.private_GetRelativePageIndex(0);
 };
+CDocumentContentElementBase.prototype.GetAbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
@@ -788,9 +810,9 @@ CDocumentContentElementBase.prototype.GetReviewType = function()
 {
 	return this.Get_ReviewType();
 };
-CDocumentContentElementBase.prototype.IsEmpty = function()
+CDocumentContentElementBase.prototype.IsEmpty = function(oProps)
 {
-	return this.Is_Empty();
+	return this.Is_Empty(oProps);
 };
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {
@@ -805,7 +827,88 @@ CDocumentContentElementBase.prototype.GetAllComments = function(AllComments)
 CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
 {
 };
+CDocumentContentElementBase.prototype.UpdateBookmarks = function(oManager)
+{
+};
+/**
+ * Получаем текущий TableOfContents, это может быть просто поле или поле вместе с оберткой Sdt
+ * @param isUnique ищем с параметром Unique = true
+ * @param isCheckFields Проверять ли TableOfContents, заданные через сложные поля
+ * @returns {CComplexField | CBlockLevelSdt | null}
+ */
+CDocumentContentElementBase.prototype.GetTableOfContents = function(isUnique, isCheckFields)
+{
+	return null;
+};
+/**
+ * Проверяем у родительского класса выделен ли только один элемент
+ * @returns {boolean}
+ */
+CDocumentContentElementBase.prototype.IsSelectedSingleElement = function()
+{
+	if (this.Parent)
+		return this.Parent.IsSelectedSingleElement();
 
+	return false;
+};
+/**
+ * Получаем последний параграф в данном контенте, если последний элемент не параграф, то запрашиваем у него
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetLastParagraph = function()
+{
+	return null;
+};
+/**
+ * Получаем первый параграф в данном контенте
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetFirstParagraph = function()
+{
+	return this.Get_FirstParagraph();
+};
+/**
+ * Получаем параграф, следующий за данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetNextParagraph = function()
+{
+	var oNextElement = this.Get_DocumentNext();
+
+	if (oNextElement)
+	{
+		if (type_Paragraph === oNextElement.GetType())
+			return oNextElement;
+		else
+			return oNextElement.GetFirstParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetNextParagraph)
+		return this.Parent.GetNextParagraph();
+
+	return null;
+};
+/**
+ * Получаем параграф, идущий перед данным элементом
+ * @returns {?Paragraph}
+ */
+CDocumentContentElementBase.prototype.GetPrevParagraph = function()
+{
+	var oPrevElement = this.Get_DocumentPrev();
+
+	if (oPrevElement)
+	{
+		if (type_Paragraph === oPrevElement.GetType())
+			return oPrevElement;
+		else
+			return oPrevElement.GetLastParagraph();
+	}
+
+	if (this.Parent && this.Parent.GetPrevParagraph)
+		return this.Parent.GetPrevParagraph();
+
+	return null;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

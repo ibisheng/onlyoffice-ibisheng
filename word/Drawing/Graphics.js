@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -57,16 +57,10 @@ function CGraphics()
     this.m_dDpiY        = 96.0;
     this.m_bIsBreak 	= false;
 
-    this.textBB_l       = 10000;
-    this.textBB_t       = 10000;
-    this.textBB_r       = -10000;
-    this.textBB_b       = -10000;
-
     this.m_oPen     = new AscCommon.CPen();
     this.m_oBrush   = new AscCommon.CBrush();
 
     this.m_oFontManager = null;
-	this.m_bIsFillTextCanvasColor = 0;
 
     this.m_oCoordTransform  = new CMatrixL();
     this.m_oBaseTransform   = new CMatrixL();
@@ -261,8 +255,6 @@ CGraphics.prototype =
         _c.A = a;
 
         this.m_oContext.fillStyle = "rgba(" + _c.R + "," + _c.G + "," + _c.B + "," + (_c.A / 255) + ")";
-
-		this.m_bIsFillTextCanvasColor = 0;
     },
     b_color2 : function(r,g,b,a)
     {
@@ -1509,20 +1501,20 @@ CGraphics.prototype =
         }
         this.ds();
 
-        var _header_text = "Header"
+        var _header_text = AscCommon.translateManager.getValue("Header");
         if (-1 != sectionNum)
-            _header_text += (" -Section " + (sectionNum + 1) + "-");
+            _header_text += (AscCommon.translateManager.getValue(" -Section ") + (sectionNum + 1) + "-");
 
         if (type)
         {
             if (type.bFirst)
-                _header_text = "First Page " + _header_text;
+                _header_text = AscCommon.translateManager.getValue("First Page ") + _header_text;
             else if (EvenAndOddHeaders)
             {
                 if (type.bEven)
-                    _header_text = "Even Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Even Page ") + _header_text;
                 else
-                    _header_text = "Odd Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Odd Page ") + _header_text;
             }
         }
 
@@ -1530,7 +1522,7 @@ CGraphics.prototype =
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, true);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, AscCommon.translateManager.getValue("Same as Previous"), 2, yPos, true);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -1612,20 +1604,20 @@ CGraphics.prototype =
         }
         this.ds();
 
-        var _header_text = "Footer"
+        var _header_text = AscCommon.translateManager.getValue("Footer");
         if (-1 != sectionNum)
-            _header_text += (" -Section " + (sectionNum + 1) + "-");
+            _header_text += (AscCommon.translateManager.getValue(" -Section ") + (sectionNum + 1) + "-");
 
         if (type)
         {
             if (type.bFirst)
-                _header_text = "First Page " + _header_text;
+                _header_text = AscCommon.translateManager.getValue("First Page ") + _header_text;
             else if (EvenAndOddHeaders)
             {
                 if (type.bEven)
-                    _header_text = "Even Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Even Page ") + _header_text;
                 else
-                    _header_text = "Odd Page " + _header_text;
+                    _header_text = AscCommon.translateManager.getValue("Odd Page ") + _header_text;
             }
         }
 
@@ -1633,7 +1625,7 @@ CGraphics.prototype =
         this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, false);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, AscCommon.translateManager.getValue("Same as Previous"), 2, yPos, false);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -2416,7 +2408,8 @@ CGraphics.prototype =
 
     drawMailMergeField : function(x, y, w, h)
     {
-        this.b_color1(216, 221, 230, 255);
+		this.b_color1(206, 212, 223, 204);
+    	//this.b_color1(216, 221, 230, 255);
         this.rect( x, y, w, h );
         this.df();
     },
@@ -2637,7 +2630,7 @@ CGraphics.prototype =
 
 				this.m_oContext.setLineDash(this.dash_no_smart);
 				this.dash_no_smart = null;
-			}
+            }
         }
 
         var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;

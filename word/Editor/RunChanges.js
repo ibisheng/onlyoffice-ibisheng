@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -293,6 +293,12 @@ CChangesRunAddItem.prototype.Redo = function()
 	oRun.RecalcInfo.Measure = true;
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
+
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Items.SetParent)
+			this.Items.SetParent(oRun);
+	}
 };
 CChangesRunAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -322,6 +328,9 @@ CChangesRunAddItem.prototype.Load = function(Color)
 			oRun.private_UpdatePositionsOnAdd(Pos);
 			oRun.private_UpdateCompositeInputPositionsOnAdd(Pos);
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oRun, Pos);
+
+			if (Element.SetParent)
+				Element.SetParent(oRun);
 		}
 	}
 
@@ -363,6 +372,12 @@ CChangesRunRemoveItem.prototype.Undo = function()
 	oRun.RecalcInfo.Measure = true;
 	oRun.protected_UpdateSpellChecking();
 	oRun.private_UpdateTrackRevisionOnChangeContent(false);
+
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Items.SetParent)
+			this.Items.SetParent(oRun);
+	}
 };
 CChangesRunRemoveItem.prototype.Redo = function()
 {

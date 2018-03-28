@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -831,6 +831,33 @@ CShape.prototype.OnContentReDraw = function(){
         }
     }
 };
+
+    CShape.prototype.Is_ThisElementCurrent = function()
+    {
+        if(this.parent && this.parent.graphicObjects)
+        {
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                return main_group.selection.textSelection === this;
+            }
+            else
+            {
+                if(this.parent.getObjectType && this.parent.getObjectType() === AscDFH.historyitem_type_Notes)
+                {
+                    if(editor.WordControl.m_oLogicDocument.FocusOnNotes && this.parent.slide && this.parent.slide.num === editor.WordControl.m_oLogicDocument.CurPage)
+                    {
+                        return this.parent.graphicObjects.selection.textSelection === this;
+                    }
+                }
+                else
+                {
+                    return this.parent.graphicObjects.selection.textSelection === this;
+                }
+            }
+        }
+        return false;
+    };
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};

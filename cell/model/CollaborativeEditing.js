@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -89,8 +89,6 @@
 
 		// Очищаем индексы пересчета (при открытии это необходимо)
 		CCollaborativeEditing.prototype.clearRecalcIndex = function () {
-			delete this.m_oRecalcIndexColumns;
-			delete this.m_oRecalcIndexRows;
 			this.m_oRecalcIndexColumns = {};
 			this.m_oRecalcIndexRows = {};
 		};
@@ -117,6 +115,9 @@
   CCollaborativeEditing.prototype.getFast = function () {
     return this.m_bFast;
   };
+		CCollaborativeEditing.prototype.Is_SingleUser = function () {
+			return !this.getCollaborativeEditing();
+		};
 		CCollaborativeEditing.prototype.getCollaborativeEditing = function () {
 			if (this.m_bIsViewerMode)
 				return false;
@@ -148,6 +149,44 @@
 		CCollaborativeEditing.prototype.onStopEditCell = function () {
 			// Вызывать эту функцию только в случае окончания редактирования ячейки!!!
 			this.m_bGlobalLockEditCell = false;
+		};
+		CCollaborativeEditing.prototype.lock = function (arrLocks, callback) {
+			var type;
+			callback = this._checkCollaborative(callback);
+
+			this.onStartCheckLock();
+			for (var i = 0; i < arrLocks.length; ++i) {
+				type = this._addCheckLock(arrLocks[i], callback);
+				if (c_oAscLockTypes.kLockTypeNone !== type) {
+					// Снимаем глобальный лок (для редактирования ячейки)
+					this.m_bGlobalLockEditCell = false;
+					return c_oAscLockTypes.kLockTypeMine === type;
+				}
+			}
+			this.onEndCheckLock(callback);
+			return true;
+		};
+		CCollaborativeEditing.prototype._checkCollaborative = function (callback) {
+			if (false === this.getCollaborativeEditing()) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				AscCommonExcel.applyFunction(callback, true);
+				callback = undefined;
+			}
+			return callback;
+		};
+		CCollaborativeEditing.prototype._addCheckLock = function (lockInfo, callback) {
+			if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
+				// Редактируем сами
+				AscCommonExcel.applyFunction(callback, true);
+				return c_oAscLockTypes.kLockTypeMine;
+			} else if (false !== this.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
+				// Уже ячейку кто-то редактирует
+				AscCommonExcel.applyFunction(callback, false);
+				return c_oAscLockTypes.kLockTypeOther;
+			}
+
+			this.m_arrCheckLocks.push(lockInfo);
+			return c_oAscLockTypes.kLockTypeNone;
 		};
 		CCollaborativeEditing.prototype.onStartCheckLock = function () {
 			this.m_arrCheckLocks.length = 0;
@@ -226,8 +265,9 @@
 			var length = this.m_arrChanges.length;
 			// Принимаем изменения
 			if (0 < length) {
-				this.handlers.trigger("applyChanges", this.m_arrChanges, function () {
-					t.m_arrChanges.splice(0, length);
+				//splice to prevent double apply other changes in case of load fonts
+				var changes = t.m_arrChanges.splice(0, length);
+				this.handlers.trigger("applyChanges", changes, function () {
 					t.handlers.trigger("updateAfterApplyChanges");
 				});
 
@@ -241,52 +281,52 @@
 			// Когда не совместное редактирование чистить ничего не нужно, но отправлять нужно.
 			var bIsCollaborative = this.getCollaborativeEditing();
 
-			var bCheckRedraw = false,
-                bRedrawGraphicObjects = false,
-                bUnlockDefName = false;
-			if (bIsCollaborative && (0 < this.m_arrNeedUnlock.length ||
-				0 < this.m_arrNeedUnlock2.length)) {
-				bCheckRedraw = true;
-				this.handlers.trigger("cleanSelection");
-			}
-
+			var bCheckRedraw = false, bRedrawGraphicObjects = false, bUnlockDefName = false;
 			var oLock = null;
-			// Очищаем свои изменения
-			while (bIsCollaborative && 0 < this.m_arrNeedUnlock2.length) {
-				oLock = this.m_arrNeedUnlock2.shift();
-				oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
+			if (bIsCollaborative) {
+				if (0 < this.m_arrNeedUnlock.length || 0 < this.m_arrNeedUnlock2.length) {
+					bCheckRedraw = true;
+					this.handlers.trigger("cleanSelection");
+				}
 
-                var drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
-                if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
-                    drawing.lockType = c_oAscLockTypes.kLockTypeNone;
-                    bRedrawGraphicObjects = true;
-                }
-                if(!bUnlockDefName){
-                    bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
-                }
+				// Очищаем свои изменения
+				while (0 < this.m_arrNeedUnlock2.length) {
+					oLock = this.m_arrNeedUnlock2.shift();
+					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
 
-				this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
-			}
-			// Очищаем примененные чужие изменения
-			var nIndex = 0;
-			var nCount = this.m_arrNeedUnlock.length;
-			for (;bIsCollaborative && nIndex < nCount; ++nIndex) {
-				oLock = this.m_arrNeedUnlock[nIndex];
-				if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-					if (!this.handlers.trigger("checkCommentRemoveLock", oLock.Element)) {
-						drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
-						if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
-							drawing.lockType = c_oAscLockTypes.kLockTypeNone;
-							bRedrawGraphicObjects = true;
-						}
-                        if(!bUnlockDefName){
-                            bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
-                        }
+					var drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+					if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
+						drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+						bRedrawGraphicObjects = true;
+					}
+					if(!bUnlockDefName){
+						bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
 					}
 
-					this.m_arrNeedUnlock.splice(nIndex, 1);
-					--nIndex;
-					--nCount;
+					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
+				}
+
+				// Очищаем примененные чужие изменения
+				var nIndex = 0;
+				var nCount = this.m_arrNeedUnlock.length;
+				for (;nIndex < nCount; ++nIndex) {
+					oLock = this.m_arrNeedUnlock[nIndex];
+					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
+						if (!this.handlers.trigger("checkCommentRemoveLock", oLock.Element)) {
+							drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+							if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
+								drawing.lockType = c_oAscLockTypes.kLockTypeNone;
+								bRedrawGraphicObjects = true;
+							}
+							if(!bUnlockDefName){
+								bUnlockDefName = this.handlers.trigger("checkDefNameLock", oLock);
+							}
+						}
+
+						this.m_arrNeedUnlock.splice(nIndex, 1);
+						--nIndex;
+						--nCount;
+					}
 				}
 			}
 

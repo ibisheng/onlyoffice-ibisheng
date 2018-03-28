@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -73,6 +73,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Paragraph_FramePr]                   = 
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_SectionPr]                 = CChangesParagraphSectPr;
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrChange]                  = CChangesParagraphPrChange;
 AscDFH.changesFactory[AscDFH.historyitem_Paragraph_PrReviewInfo]              = CChangesParagraphPrReviewInfo;
+AscDFH.changesFactory[AscDFH.historyitem_Paragraph_OutlineLvl]                = CChangesParagraphOutlineLvl;
 
 function private_ParagraphChangesOnLoadPr(oColor)
 {
@@ -246,7 +247,8 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_Pr]                      
 	AscDFH.historyitem_Paragraph_PresentationPr_Level,
 	AscDFH.historyitem_Paragraph_FramePr,
 	AscDFH.historyitem_Paragraph_PrChange,
-	AscDFH.historyitem_Paragraph_PrReviewInfo
+	AscDFH.historyitem_Paragraph_PrReviewInfo,
+	AscDFH.historyitem_Paragraph_OutlineLvl
 ];
 AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PresentationPr_Bullet]     = [
 	AscDFH.historyitem_Paragraph_PresentationPr_Bullet,
@@ -272,6 +274,9 @@ AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_PrReviewInfo]            
 	AscDFH.historyitem_Paragraph_Pr,
 	AscDFH.historyitem_Paragraph_PrChange,
 	AscDFH.historyitem_Paragraph_PrReviewInfo
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_Paragraph_OutlineLvl]                = [
+	AscDFH.historyitem_Paragraph_OutlineLvl
 ];
 
 // Общая функция Merge для изменений, которые зависят только от себя и AscDFH.historyitem_Paragraph_Pr
@@ -314,6 +319,7 @@ CChangesParagraphAddItem.prototype.Undo = function()
 	var oParagraph = this.Class;
 	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphAddItem.prototype.Redo = function()
@@ -324,12 +330,12 @@ CChangesParagraphAddItem.prototype.Redo = function()
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
 	{
 		var oItem = this.Items[nIndex];
-
 		oItem.Parent = this.Class;
 		if (oItem.SetParagraph)
 			oItem.SetParagraph(this.Class);
@@ -394,6 +400,22 @@ CChangesParagraphAddItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesParagraphRemoveItem);
 };
+CChangesParagraphAddItem.prototype.IsParagraphSimpleChanges = function()
+{
+	// Простыми измененями считаем добавление комментариев и добавление ранов с простым текстом
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
+			&& para_Comment !== oItem.Type
+			&& para_Bookmark !== oItem.Type)
+		{
+			return false;
+		}
+	}
+
+	return true;
+};
 /**
  * @constructor
  * @extends {AscDFH.CChangesBaseContentChange}
@@ -413,6 +435,7 @@ CChangesParagraphRemoveItem.prototype.Undo = function()
 
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 
 	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
@@ -429,6 +452,7 @@ CChangesParagraphRemoveItem.prototype.Redo = function()
 	var oParagraph  = this.Class;
 	oParagraph.Content.splice(this.Pos, this.Items.length);
 	oParagraph.private_UpdateTrackRevisions();
+	oParagraph.private_CheckUpdateBookmarks(this.Items);
 	private_ParagraphChangesOnSetValue(this.Class);
 };
 CChangesParagraphRemoveItem.prototype.private_WriteItem = function(Writer, Item)
@@ -467,6 +491,22 @@ CChangesParagraphRemoveItem.prototype.IsRelated = function(oChanges)
 CChangesParagraphRemoveItem.prototype.CreateReverseChange = function()
 {
 	return this.private_CreateReverseChange(CChangesParagraphAddItem);
+};
+CChangesParagraphRemoveItem.prototype.IsParagraphSimpleChanges = function()
+{
+	// Простыми измененями считаем добавление комментариев и добавление ранов с простым текстом
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+		if ((para_Run !== oItem.Type || !oItem.IsContentSuitableForParagraphSimpleChanges())
+			&& para_Comment !== oItem.Type
+			&& para_Bookmark !== oItem.Type)
+		{
+			return false;
+		}
+	}
+
+	return true;
 };
 /**
  * @constructor
@@ -1760,3 +1800,25 @@ CChangesParagraphPrReviewInfo.prototype.Merge = function(oChange)
 
 	return true;
 };
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseLongProperty}
+ */
+function CChangesParagraphOutlineLvl(Class, Old, New, Color)
+{
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New, Color);
+}
+CChangesParagraphOutlineLvl.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
+CChangesParagraphOutlineLvl.prototype.constructor = CChangesParagraphOutlineLvl;
+CChangesParagraphOutlineLvl.prototype.Type = AscDFH.historyitem_Paragraph_OutlineLvl;
+CChangesParagraphOutlineLvl.prototype.private_SetValue = function(Value)
+{
+	var oParagraph = this.Class;
+	oParagraph.Pr.OutlineLvl = Value;
+
+	oParagraph.CompiledPr.NeedRecalc = true;
+	oParagraph.private_UpdateTrackRevisionOnChangeParaPr(false);
+	private_ParagraphChangesOnSetValue(this.Class);
+};
+CChangesParagraphOutlineLvl.prototype.Merge = private_ParagraphChangesOnMergePr;
+CChangesParagraphOutlineLvl.prototype.Load = private_ParagraphChangesOnLoadPr;

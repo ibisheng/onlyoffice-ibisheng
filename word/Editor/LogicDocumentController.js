@@ -22,9 +22,9 @@ CLogicDocumentController.prototype.CanUpdateTarget = function()
 {
 	return this.LogicDocument.controller_CanUpdateTarget();
 };
-CLogicDocumentController.prototype.RecalculateCurPos = function()
+CLogicDocumentController.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 {
-	return this.LogicDocument.controller_RecalculateCurPos();
+	return this.LogicDocument.controller_RecalculateCurPos(bUpdateX, bUpdateY);
 };
 CLogicDocumentController.prototype.GetCurPage = function()
 {
@@ -37,6 +37,10 @@ CLogicDocumentController.prototype.AddNewParagraph = function(bRecalculate, bFor
 CLogicDocumentController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
 	this.LogicDocument.controller_AddInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CLogicDocumentController.prototype.AddImages = function(aImages)
+{
+	this.LogicDocument.controller_AddImages(aImages);
 };
 CLogicDocumentController.prototype.AddOleObject = function(nW, nH, nWidthPix, nHeightPix, oImage, oData, sApplicationId)
 {
@@ -260,9 +264,9 @@ CLogicDocumentController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	return this.LogicDocument.controller_GetSelectedText(bClearText, oPr);
 };
-CLogicDocumentController.prototype.GetCurrentParagraph = function()
+CLogicDocumentController.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	return this.LogicDocument.controller_GetCurrentParagraph();
+	return this.LogicDocument.controller_GetCurrentParagraph(bIgnoreSelection, arrSelectedParagraphs);
 };
 CLogicDocumentController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
@@ -287,6 +291,10 @@ CLogicDocumentController.prototype.RemoveTableColumn = function()
 CLogicDocumentController.prototype.MergeTableCells = function()
 {
 	this.LogicDocument.controller_MergeTableCells();
+};
+CLogicDocumentController.prototype.DistributeTableCells = function(isHorizontally)
+{
+	return this.LogicDocument.controller_DistributeTableCells(isHorizontally);
 };
 CLogicDocumentController.prototype.SplitTableCells = function(Cols, Rows)
 {
@@ -387,4 +395,8 @@ CLogicDocumentController.prototype.RemoveTextSelection = function()
 CLogicDocumentController.prototype.AddContentControl = function(nContentControlType)
 {
 	return this.LogicDocument.controller_AddContentControl(nContentControlType);
+};
+CLogicDocumentController.prototype.GetStyleFromFormatting = function()
+{
+	return this.LogicDocument.controller_GetStyleFromFormatting();
 };

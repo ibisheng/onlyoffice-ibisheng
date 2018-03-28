@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2017
+ * (c) Copyright Ascensio System SIA 2010-2018
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -90,6 +90,58 @@ AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback,
 	};
 
 	xhr.send(null);
+};
+
+window["DesktopUploadFileToUrl"] = function(url, dst, hash, pass)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ascdesktop://fonts/" + url, true);
+    xhr.responseType = 'arraybuffer';
+
+    if (xhr.overrideMimeType)
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    else
+        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+    xhr.onload = function()
+    {
+        if (this.status != 200)
+        {
+            // error
+            return;
+        }
+
+        var fileData = new Uint8Array(this.response);
+
+        var req = new XMLHttpRequest();
+        req.open("PUT", dst, true);
+
+        req.onload = function()
+		{
+			if (this.response && this.status == 200)
+			{
+				try
+				{
+					var data = {
+						"accounts": this.response ? JSON.parse(this.response) : undefined,
+						"hash": hash,
+						"password" : pass,
+						"type": "share"
+					};
+
+					window["AscDesktopEditor"]["sendSystemMessage"](data);
+					window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
+				}
+				catch (err)
+				{
+				}
+			}
+        };
+
+        req.send(fileData);
+    };
+
+    xhr.send(null);
 };
 
 /////////////////////////////////////////////////////////
@@ -197,13 +249,6 @@ window["NativeCorrectImageUrlOnCopy"] = function(url)
 window["NativeCorrectImageUrlOnPaste"] = function(url)
 {
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-};
-
-window["asc_nativeOnSpellCheck"] = function(response)
-{
-	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-	if (_editor.SpellCheckApi)
-		_editor.SpellCheckApi.onSpellCheck(response);
 };
 
 window["UpdateInstallPlugins"] = function()
@@ -615,10 +660,26 @@ function getBinaryArray(_data, _len)
 var _proto = Asc['asc_docs_api'] ? Asc['asc_docs_api'] : Asc['spreadsheet_api'];
 _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 {
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	switch (obj.type)
 	{
 		case "generatePassword":
 		{
+			if ("" == obj["password"])
+			{
+				AscCommon.History.UserSavedIndex = _editor.LastUserSavedIndex;
+
+				if (window.editor)
+					_editor.UpdateInterfaceState();
+				else
+					_editor.onUpdateDocumentModified(AscCommon.History.Have_Changes());
+
+				_editor.LastUserSavedIndex = undefined;
+
+				_editor.sendEvent("asc_onError", "There is no connection with the blockchain", c_oAscError.Level.Critical);
+				return;
+			}
+
 			window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
 			break;
 		}
@@ -627,8 +688,6 @@ _proto.prototype["pluginMethod_OnlyPass"] = function(obj)
 			if ("" != obj["password"])
 			{
 				var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
-
-				var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 				_editor.currentPassword = obj["password"];
 
 				window["AscDesktopEditor"]["SetAdvancedOptions"](_param);

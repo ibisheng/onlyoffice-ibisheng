@@ -93,19 +93,6 @@
         return this.Id;
     };
 
-    CNotes.prototype.Clear_ContentChanges = function()
-    {
-    };
-
-    CNotes.prototype.Add_ContentChanges = function(Changes)
-    {
-    };
-
-    CNotes.prototype.Refresh_ContentChanges = function()
-    {
-    };
-
-
     CNotes.prototype.Write_ToBinary2 = function(w){
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
@@ -233,8 +220,9 @@
 
     };
 
-    CNotes.prototype.createDuplicate = function(){
+    CNotes.prototype.createDuplicate = function(IdMap){
 
+        var oIdMap = IdMap || {};
         var copy = new CNotes();
         if(this.clrMap){
             copy.setClMapOverride(this.clrMap.createDuplicate());
@@ -251,7 +239,15 @@
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {
             var _copy;
-            _copy = this.cSld.spTree[i].copy();
+            if(this.cSld.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.cSld.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.cSld.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.cSld.spTree[i].Id] = _copy.Id;
+            }
             copy.addToSpTreeToPos(copy.cSld.spTree.length, _copy);
             copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
         }
@@ -310,6 +306,18 @@
     CNotes.prototype.convertPixToMM = function(pix)
     {
         return editor.WordControl.m_oDrawingDocument.GetMMPerDot(pix);
+    };
+
+    CNotes.prototype.Clear_ContentChanges = function()
+    {
+    };
+
+    CNotes.prototype.Add_ContentChanges = function(Changes)
+    {
+    };
+
+    CNotes.prototype.Refresh_ContentChanges = function()
+    {
     };
 
     function CreateNotes(){
