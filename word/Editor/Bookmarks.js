@@ -381,7 +381,7 @@ CBookmarksManager.prototype.GoToBookmark = function(sName)
 {
 	this.Update();
 
-	var oBookmark = this.BookmarksManager.GetBookmarkByName(sName);
+	var oBookmark = this.GetBookmarkByName(sName);
 	if (oBookmark)
 		oBookmark[0].GoToBookmark();
 };
