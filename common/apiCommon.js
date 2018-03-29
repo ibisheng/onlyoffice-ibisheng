@@ -3027,6 +3027,10 @@
 	{
 		return (this.Anchor === "_top");
 	};
+    CHyperlinkProperty.prototype.put_TopOfDocument = function()
+	{
+		this.Anchor = "_top";
+	};
     CHyperlinkProperty.prototype.get_Bookmark = function()
 	{
 		return this.Anchor;
@@ -3046,6 +3050,7 @@
 	CHyperlinkProperty.prototype['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
 	CHyperlinkProperty.prototype['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 	CHyperlinkProperty.prototype['is_TopOfDocument']      = CHyperlinkProperty.prototype.is_TopOfDocument;
+	CHyperlinkProperty.prototype['put_TopOfDocument']     = CHyperlinkProperty.prototype.put_TopOfDocument;
 	CHyperlinkProperty.prototype['get_Bookmark']          = CHyperlinkProperty.prototype.get_Bookmark;
 	CHyperlinkProperty.prototype['put_Bookmark']          = CHyperlinkProperty.prototype.put_Bookmark;
 
