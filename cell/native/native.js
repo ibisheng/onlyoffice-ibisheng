@@ -5537,7 +5537,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
                 return {'action':'closeCellEditor'};
             }
 
-            ws.changeSelectionStartPoint(x, y, true);
+            wb._onChangeSelection(true, x, y, true);
 
             if (isFormulaEditMode) {
                 if (ret) {
@@ -5603,7 +5603,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                     return {'action':'closeCellEditor'};
                 }
 
-                ws.changeSelectionEndPoint(x, y, true);
+                wb._onChangeSelection(false, x, y, true);
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
@@ -5611,7 +5611,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                 else if (1 === _s.cellPin)
                     ws.__changeSelectionPoint(x, y, true, true, false);
                 else {
-                    ws.changeSelectionEndPoint(x, y, true);
+                    wb._onChangeSelection(false, x, y, true);
                 }
             }
         }
