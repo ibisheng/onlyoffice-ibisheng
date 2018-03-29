@@ -362,10 +362,11 @@ CBookmarksManager.prototype.GetId = function(nIndex)
 CBookmarksManager.prototype.RemoveBookmark = function(sName)
 {
 	this.Update();
+
 	if (!this.GetBookmarkByName(sName))
 		return;
 
-
+	this.LogicDocument.RemoveBookmark(sName);
 };
 CBookmarksManager.prototype.AddBookmark = function(sName)
 {
@@ -376,13 +377,43 @@ CBookmarksManager.prototype.AddBookmark = function(sName)
 
 	this.LogicDocument.AddBookmark(sName);
 };
+CBookmarksManager.prototype.GoToBookmark = function(sName)
+{
+	this.Update();
 
+	var oBookmark = this.GetBookmarkByName(sName);
+	if (oBookmark)
+		oBookmark[0].GoToBookmark();
+};
+CBookmarksManager.prototype.IsHiddenBookmark = function(sName)
+{
+	return (sName && '_' === sName.charAt(0));
+};
+CBookmarksManager.prototype.IsInternalUseBookmark = function(sName)
+{
+	return (sName === "_GoBack");
+};
+CBookmarksManager.prototype.CheckNewBookmarkName = function(sName)
+{
+	if (!sName)
+		return false;
+
+	return (sName === XRegExp.match(sName, new XRegExp('(\\pL)(\\pL|\_|\\pN){0,39}')));
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CParagraphBookmark = CParagraphBookmark;
+CBookmarksManager.prototype['asc_GetCount']              = CBookmarksManager.prototype.GetCount;
+CBookmarksManager.prototype['asc_GetName']               = CBookmarksManager.prototype.GetName;
+CBookmarksManager.prototype['asc_GetId']                 = CBookmarksManager.prototype.GetId;
+CBookmarksManager.prototype['asc_AddBookmark']           = CBookmarksManager.prototype.AddBookmark;
+CBookmarksManager.prototype['asc_RemoveBookmark']        = CBookmarksManager.prototype.RemoveBookmark;
+CBookmarksManager.prototype['asc_GoToBookmark']          = CBookmarksManager.prototype.GoToBookmark;
+CBookmarksManager.prototype['asc_HaveBookmark']          = CBookmarksManager.prototype.HaveBookmark;
+CBookmarksManager.prototype['asc_IsHiddenBookmark']      = CBookmarksManager.prototype.IsHiddenBookmark;
+CBookmarksManager.prototype['asc_IsInternalUseBookmark'] = CBookmarksManager.prototype.IsInternalUseBookmark;
+CBookmarksManager.prototype['asc_CheckNewBookmarkName']  = CBookmarksManager.prototype.CheckNewBookmarkName;
 
-CBookmarksManager.prototype['get_Count'] = CBookmarksManager.prototype.GetCount;
-CBookmarksManager.prototype['get_Name']  = CBookmarksManager.prototype.GetName;
-CBookmarksManager.prototype['get_Id']    = CBookmarksManager.prototype.GetId;
+
 

@@ -5345,8 +5345,10 @@ background-repeat: no-repeat;\
 
 		return false;
 	};
-
-	// HyperProps - объект CHyperlinkProperty
+	/**
+	 * Добавляем гиперссылку
+	 * @param {CHyperlinkProperty} HyperProps
+	 */
 	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 	{
 		if(null !== HyperProps.Text && undefined !== HyperProps.Text)
@@ -5371,7 +5373,6 @@ background-repeat: no-repeat;\
 
 		}
 	};
-
 	/**
 	 * Изменяем гиперссылку
 	 * @param {CHyperlinkProperty} oHyperProps
@@ -5401,6 +5402,13 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveHyperlink);
 			this.WordControl.m_oLogicDocument.RemoveHyperlink(oHyperProps);
 		}
+	};
+	asc_docs_api.prototype.asc_GetHyperlinkAnchors = function()
+	{
+		if (!this.WordControl || !this.WordControl.m_oLogicDocument)
+			return [];
+
+		return this.WordControl.m_oLogicDocument.GetHyperlinkAnchors();
 	};
 
 
@@ -9200,6 +9208,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['add_Hyperlink']                             = asc_docs_api.prototype.add_Hyperlink;
 	asc_docs_api.prototype['change_Hyperlink']                          = asc_docs_api.prototype.change_Hyperlink;
 	asc_docs_api.prototype['remove_Hyperlink']                          = asc_docs_api.prototype.remove_Hyperlink;
+	asc_docs_api.prototype['asc_GetHyperlinkAnchors']                   = asc_docs_api.prototype.asc_GetHyperlinkAnchors;
 	asc_docs_api.prototype['sync_HyperlinkPropCallback']                = asc_docs_api.prototype.sync_HyperlinkPropCallback;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']               = asc_docs_api.prototype.sync_HyperlinkClickCallback;
 	asc_docs_api.prototype['sync_CanAddHyperlinkCallback']              = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;

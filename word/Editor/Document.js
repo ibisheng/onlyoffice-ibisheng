@@ -16680,11 +16680,39 @@ CDocument.prototype.AddBookmark = function(sName)
 };
 CDocument.prototype.RemoveBookmark = function(sName)
 {
+	var arrBookmarkChars = this.BookmarksManager.GetBookmarkByName(sName);
 
+	var arrParagraphs = [];
+	if (arrBookmarkChars)
+	{
+		var oStartPara = arrBookmarkChars[0].GetParagraph();
+		var oEndPara   = arrBookmarkChars[1].GetParagraph();
+
+		if (oStartPara)
+			arrParagraphs.push(oStartPara);
+
+		if (oEndPara)
+			arrParagraphs.push(oEndPara);
+	}
+
+	if (false === this.Document_Is_SelectionLocked(changestype_None, {Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : arrParagraphs, CheckType : changestype_Paragraph_Content}, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveBookmark);
+
+		this.private_RemoveBookmark(sName);
+
+		// TODO: Здесь добавляются просто метки закладок, нужно сделать упрощенный пересчет
+		this.Recalculate();
+	}
 };
 CDocument.prototype.private_RemoveBookmark = function(sName)
 {
+	var arrBookmarkChars = this.BookmarksManager.GetBookmarkByName(sName);
+	if (!arrBookmarkChars)
+		return;
 
+	arrBookmarkChars[1].RemoveBookmark();
+	arrBookmarkChars[0].RemoveBookmark();
 };
 CDocument.prototype.AddTableOfContents = function(sHeading, oPr)
 {
@@ -16816,6 +16844,33 @@ CDocument.prototype.OnCreateNewHistoryPoint = function()
 {
 	this.AllParagraphsList = null;
 	this.AllFootnotesList  = null;
+};
+/**
+ * Получаем массив положений, к которым можно привязать гиперссылку
+ * @returns {CHyperlinkAnchor[]}
+ */
+CDocument.prototype.GetHyperlinkAnchors = function()
+{
+	var arrAnchors = [];
+
+	var arrOutline = [];
+	this.GetOutlineParagraphs(arrOutline, {SkipEmptyParagraphs : true});
+	var nIndex = 0, nCount = arrOutline.length;
+	for (nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Heading, arrOutline[nIndex]));
+	}
+
+	this.BookmarksManager.Update();
+	nCount = this.BookmarksManager.GetCount();
+	for (nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		var sName =  this.BookmarksManager.GetName(nIndex);
+		if (!this.BookmarksManager.IsHiddenBookmark(sName) && !this.BookmarksManager.IsInternalUseBookmark(sName))
+			arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Bookmark, sName));
+	}
+
+	return arrAnchors;
 };
 
 function CDocumentSelectionState()

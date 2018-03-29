@@ -1956,7 +1956,7 @@ function Editor_Paste_Exec(api, _format, data1, data2, text_data, specialPastePr
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
-function sendImgUrls(api, images, callback, bExcel) {
+function sendImgUrls(api, images, callback, bExcel, bNotShowError) {
 
   if (window["AscDesktopEditor"])
   {
@@ -1993,7 +1993,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     } else {
       nError = c_oAscError.ID.Unknown;
     }
-    if ( c_oAscError.ID.No !== nError ) {
+    if ( c_oAscError.ID.No !== nError && !bNotShowError) {
       if(!bExcel)
         api.sendEvent("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
@@ -3395,7 +3395,7 @@ PasteProcessor.prototype =
 				var aContent = oThis._convertExcelBinary(aContentExcel);
 				oThis.aContent = aContent.content;
 				oThis.api.pre_Paste(aContent.fonts, oImageMap, fPrepasteCallback);
-			});
+			}, null, true);
 		} else {
 			var aContent = oThis._convertExcelBinary(aContentExcel);
 			oThis.aContent = aContent.content;
@@ -3540,7 +3540,7 @@ PasteProcessor.prototype =
 					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
 					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
 					History.TurnOn();
-				});
+				}, null, true);
 			} else {
 				var im_arr = [];
 				for (var key  in images) {
@@ -3670,7 +3670,7 @@ PasteProcessor.prototype =
 					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl,
 						aContent.images);
 					oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
-				});
+				}, null, true);
 			}
 		} else {
 			oThis.SetShortImageId(aContent.aPastedImages);
@@ -3828,7 +3828,7 @@ PasteProcessor.prototype =
 					}
 				}
 				oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-			});
+			}, null, true);
 		}
 		else
 		{
@@ -3959,7 +3959,7 @@ PasteProcessor.prototype =
 				aContent = oThis._convertExcelBinary(null, arr_shapes);
 				oThis.aContent = aContent.content;
 				oThis.api.pre_Paste(fonts, image_map, fPrepasteCallback);
-			});
+			}, null, true);
 		}
 	},
 
@@ -4066,7 +4066,7 @@ PasteProcessor.prototype =
 					var oImageMap = {};
 					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
 					oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
-				});
+				}, null, true);
 			} else {
 				oThis.api.pre_Paste(fonts, {}, paste_callback);
 			}
@@ -5804,7 +5804,7 @@ PasteProcessor.prototype =
 					}
 				  }
 				  fCallback(aPrepeareFonts, image_map);
-				});
+				}, null, true);
 			}
 			else
 			{
@@ -8033,6 +8033,9 @@ PasteProcessor.prototype =
 								nHeight = nWidth;
 							} else if (!nWidth && nHeight) {
 								nWidth = nHeight;
+							} else {
+								nWidth = parseInt(node.width);
+								nHeight = parseInt(node.height);
 							}
 						}
 					}
@@ -9137,7 +9140,7 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
                 }
             }
             _api.pre_Paste(aPrepeareFonts, image_map, _callback);
-        });
+        }, null, true);
     }
     else
         _api.pre_Paste(aPrepeareFonts, _images, _callback);

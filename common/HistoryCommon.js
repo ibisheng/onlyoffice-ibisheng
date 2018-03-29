@@ -1061,7 +1061,9 @@
 			case AscDFH.historydescription_Document_DistributeTableCells:
 				sString = "Document_DistributeTableCells";
 				break;
-
+			case AscDFH.historydescription_Document_RemoveBookmark:
+				sString = "Document_RemoveBookmark";
+				break;
 		}
 		return sString;
 	}
@@ -3000,6 +3002,8 @@
 	window['AscDFH'].historydescription_Document_UpdateTableOfContents              = 0x014f;
 	window['AscDFH'].historydescription_Document_SectionStartPage                   = 0x0150;
 	window['AscDFH'].historydescription_Document_DistributeTableCells               = 0x0151;
+	window['AscDFH'].historydescription_Document_RemoveBookmark                     = 0x0152;
+
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
