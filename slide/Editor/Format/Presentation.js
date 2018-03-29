@@ -702,6 +702,11 @@ function CPresentation(DrawingDocument)
     this.prnPr  = null;
     this.showPr = null;
 
+    this.CurPosition =
+    {
+        X: 0, Y: 0
+    };
+
     this.NotesWidth = -10;
     this.FocusOnNotes = false;
 }
@@ -2797,6 +2802,13 @@ CPresentation.prototype =
         return [];
     },
 
+    GetCursorRealPosition: function()
+    {
+        return {
+            X : this.CurPosition.X,
+            Y : this.CurPosition.Y
+        };
+    },
 
     Viewer_OnChangePosition: function()
     {
