@@ -310,16 +310,14 @@ CChartsDrawer.prototype =
 				}
 			}
 
-			if (this.calcProp.type !== c_oChartTypes.Pie && this.calcProp.type !== c_oChartTypes.DoughnutChart) {
-				for(var i = 0; i < this.catAxisChart.length; i++) {
-					this.catAxisChart[i].draw(this);
-				}
-				for(var i = 0; i < this.valAxisChart.length; i++) {
-					this.valAxisChart[i].draw(this);
-				}
-				for(var i = 0; i < this.serAxisChart.length; i++) {
-					this.serAxisChart[i].draw(this);
-				}
+			for(var i = 0; i < this.catAxisChart.length; i++) {
+				this.catAxisChart[i].draw(this);
+			}
+			for(var i = 0; i < this.valAxisChart.length; i++) {
+				this.valAxisChart[i].draw(this);
+			}
+			for(var i = 0; i < this.serAxisChart.length; i++) {
+				this.serAxisChart[i].draw(this);
 			}
 		}
 	},
@@ -726,20 +724,18 @@ CChartsDrawer.prototype =
 		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-		if (plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart) {
-			if (plotArea.layout) {
-				var oLayout = plotArea.layout;
-				pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
-				pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
+		if (plotArea.layout) {
+			var oLayout = plotArea.layout;
+			pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
+			pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
 
-				var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode);
-				if (fWidthPlotArea > 0) {
-					pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
-				}
-				var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode);
-				if (fHeightPlotArea > 0) {
-					pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
-				}
+			var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode);
+			if (fWidthPlotArea > 0) {
+				pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
+			}
+			var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode);
+			if (fHeightPlotArea > 0) {
+				pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
 			}
 		}
 
