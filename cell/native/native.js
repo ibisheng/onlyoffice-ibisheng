@@ -3639,7 +3639,7 @@ function OfflineEditor () {
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
             var range, selectionLineType, type;
             for (var i = 0, l = ranges.length; i < l; ++i) {
-                range = ranges[i];
+                range = ranges[i].clone();
 				type = range.getType();
                 if (Asc.c_oAscSelectionType.RangeMax === type) {
                     range.c2 = this.cols.length - 1;
@@ -5717,6 +5717,8 @@ window["native"]["offline_complete_cell"] = function(x, y) {return _s.getNearCel
 window["native"]["offline_keyboard_down"] = function(inputKeys) {
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
+
+    AscCommon.g_oTextMeasurer.Flush();
 
     var isFormulaEditMode = ws.isFormulaEditMode;
     ws.isFormulaEditMode = false;
