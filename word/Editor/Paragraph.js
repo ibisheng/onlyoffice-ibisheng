@@ -5658,7 +5658,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		// Заполняем гиперссылку полями
 		if (undefined !== HyperProps.Anchor && null !== HyperProps.Anchor)
 		{
-			Hyperlink.SetAnchor(HyperPos.Anchor);
+			Hyperlink.SetAnchor(HyperProps.Anchor);
 			Hyperlink.SetValue("")
 		}
 		else if (undefined != HyperProps.Value && null != HyperProps.Value)
@@ -5785,7 +5785,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		// Заполняем гиперссылку полями
 		if (undefined !== HyperProps.Anchor && null !== HyperProps.Anchor)
 		{
-			Hyperlink.SetAnchor(HyperPos.Anchor);
+			Hyperlink.SetAnchor(HyperProps.Anchor);
 			Hyperlink.SetValue("")
 		}
 		else if (undefined != HyperProps.Value && null != HyperProps.Value)
