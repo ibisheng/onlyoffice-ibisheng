@@ -1461,6 +1461,10 @@
       this._indexUser = data['indexUser'];
       this._userId = this._user.asc_getId() + this._indexUser;
       this._sessionTimeConnect = data['sessionTimeConnect'];
+      if (data['settings'] && data['settings']['reconnection']) {
+        this.maxAttemptCount = data['settings']['reconnection']['attempts'];
+        this.reconnectInterval = data['settings']['reconnection']['delay'];
+      }
 
       this._onLicenseChanged(data);
       this._onAuthParticipantsChanged(data['participants']);
