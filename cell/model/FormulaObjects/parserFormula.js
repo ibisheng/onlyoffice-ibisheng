@@ -6138,6 +6138,14 @@ parserFormula.prototype.getElementByPos = function(pos) {
 		this._index = val;
 	};
 	parserFormula.prototype.canSaveShared = function() {
+		for (var i = 0; i < this.outStack.length; i++) {
+			var elem = this.outStack[i];
+			if (cElementType.cell3D === elem.type || cElementType.cellsRange3D === elem.type ||
+				cElementType.table === elem.type || cElementType.name3D === elem.type ||
+				cElementType.error === elem.type || cElementType.array === elem.type) {
+				return false;
+			}
+		}
 		return true;
 	};
 

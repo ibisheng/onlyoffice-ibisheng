@@ -57,6 +57,7 @@
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 	var g_StyleCache = AscCommonExcel.g_StyleCache;
+    var g_cSharedWriteStreak = 64;//like Excel
 
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
@@ -3497,27 +3498,45 @@
 			var ref;
 			var type;
 			var shared = parsed.getShared();
-			if (shared) {
-				var sharedToWrite = this.sharedFormulas[parsed.getIndexNumber()];
-				var saveShared = sharedToWrite ? sharedToWrite.saveShared : parsed.canSaveShared();
-				if (saveShared) {
-					type = ECellFormulaType.cellformulatypeShared;
-					if (sharedToWrite) {
-						si = sharedToWrite.si;
-					} else {
-						formula = parsed.getFormula();
-						si = this.sharedFormulasIndex++;
-						ref = shared.ref;
-						this.sharedFormulas[parsed.getIndexNumber()] = {saveShared: saveShared, si: si};
-					}
-				} else {
-					cell.processFormula(function(parsed) {
-						formula = parsed.getFormula();
-					});
-				}
-			} else {
-				formula = parsed.getFormula();
-			}
+            if (shared) {
+                var sharedToWrite = this.sharedFormulas[parsed.getIndexNumber()];
+                if (!sharedToWrite) {
+                    sharedToWrite = {saveShared: !shared.ref.isOneCell() && parsed.canSaveShared(), si: {}};
+                    this.sharedFormulas[parsed.getIndexNumber()] = sharedToWrite;
+                }
+                if (sharedToWrite.saveShared && shared.ref.contains(cell.nCol, cell.nRow)) {
+                    type = ECellFormulaType.cellformulatypeShared;
+                    var rowIndex = Math.floor((cell.nRow - shared.ref.r1) / g_cSharedWriteStreak);
+                    var row = sharedToWrite.si[rowIndex];
+                    if (!row) {
+                        row = {};
+                        sharedToWrite.si[rowIndex] = row;
+                    }
+                    var colIndex = Math.floor((cell.nCol - shared.ref.c1) / g_cSharedWriteStreak);
+                    si = row[colIndex];
+                    if (undefined === si) {
+                        row[colIndex] = si = this.sharedFormulasIndex++;
+                        if (0 !== rowIndex || 0 !== colIndex) {
+                            cell.processFormula(function(parsed) {
+                                formula = parsed.getFormula();
+                            });
+                        } else {
+                            formula = parsed.getFormula();
+                        }
+                        var r1 = shared.ref.r1 + rowIndex * g_cSharedWriteStreak;
+                        var c1 = shared.ref.c1 + colIndex * g_cSharedWriteStreak;
+                        ref = new Asc.Range(c1, r1,
+                            Math.min(c1 + g_cSharedWriteStreak - 1, shared.ref.c2),
+                            Math.min(r1 + g_cSharedWriteStreak - 1, shared.ref.r2));
+                    }
+                } else {
+                    cell.processFormula(function(parsed) {
+                        formula = parsed.getFormula();
+                    });
+                }
+            } else {
+                formula = parsed.getFormula();
+            }
 
             // if(null != oFormula.aca)
             // {
