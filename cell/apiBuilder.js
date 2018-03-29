@@ -374,13 +374,18 @@
 		if((typeof(value) == "number") || (value.indexOf(':') == -1))
 		{
 			value = parseInt(value);
-			(value > 0) ? value = value -1 : value = value;
+			if(value > 0) 
+				value = value -1;
 			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
 		}
 		else{
 			value = value.split(':');
 			for(var i in value)
-				(parseInt(value[i]) > 0) ? value[i] = parseInt(value[i]) -1 : value[i] = parseInt(value[i]);
+				{
+					value[i] = parseInt(value[i])
+					if(value[i] > 0) 
+						value[i] = value[i] -1;
+				}
 			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
 		}
 	};
