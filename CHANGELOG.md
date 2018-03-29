@@ -8,6 +8,7 @@
 
 ### Spreadsheet Editor
 * Fix bug 37300 with enter symbol point in formula autocompleate
+* Fix bug 37354 with enter symbol '_' or '\' in start formula autocompleate
 
 ### Presentation Editor
 * 
