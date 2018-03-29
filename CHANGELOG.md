@@ -7,7 +7,7 @@
 * 
 
 ### Spreadsheet Editor
-* 
+* Fix bug 37300 with enter symbol point in formula autocompleate
 
 ### Presentation Editor
 * 
