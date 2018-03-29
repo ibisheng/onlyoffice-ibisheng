@@ -16853,14 +16853,12 @@ CDocument.prototype.GetHyperlinkAnchors = function()
 {
 	var arrAnchors = [];
 
-	arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.TopOfDocument));
-
 	var arrOutline = [];
 	this.GetOutlineParagraphs(arrOutline, {SkipEmptyParagraphs : true});
 	var nIndex = 0, nCount = arrOutline.length;
 	for (nIndex = 0; nIndex < nCount; ++nIndex)
 	{
-		arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Heading, arrOutline[nIndex].Paragraph));
+		arrAnchors.push(new CHyperlinkAnchor(c_oAscHyperlinkAnchor.Heading, arrOutline[nIndex]));
 	}
 
 	this.BookmarksManager.Update();

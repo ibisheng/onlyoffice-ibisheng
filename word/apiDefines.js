@@ -236,9 +236,8 @@ var c_oAscStyleType = {
 };
 
 var c_oAscHyperlinkAnchor = {
-	TopOfDocument : 1,
-	Heading       : 2,
-	Bookmark      : 3
+	Heading       : 1,
+	Bookmark      : 2
 };
 
 window["flat_desine"] = false;
@@ -366,7 +365,6 @@ prot['Table']     = c_oAscStyleType.Table;
 prot['Character'] = c_oAscStyleType.Character;
 
 prot = window['Asc']['c_oAscHyperlinkAnchor'] = window['Asc'].c_oAscHyperlinkAnchor = c_oAscHyperlinkAnchor;
-prot['TopOfDocument'] = c_oAscHyperlinkAnchor.TopOfDocument;
 prot['Heading']       = c_oAscHyperlinkAnchor.Heading;
 prot['Bookmark']      = c_oAscHyperlinkAnchor.Bookmark;
 
