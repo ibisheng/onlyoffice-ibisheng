@@ -4121,7 +4121,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 	if (linerule_Exact === Para.Get_CompiledPr2(false).ParaPr.Spacing.LineRule)
 					{
 						var LineTop    = Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent;
-						var LineBottom = Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Decent;
+						var LineBottom = Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Descent;
 						Item.SetVerticalClip(LineTop, LineBottom);
 					}
 					else

@@ -173,6 +173,9 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 	this.ParaMath = null;
 
 	this.SkipOnRecalculate = false;
+	//for clip
+	this.LineTop = null;
+	this.LineBottom = null;
 	//------------------------------------------------------------
 	g_oTableId.Add(this, this.Id);
 
@@ -1087,7 +1090,8 @@ ParaDrawing.prototype.IsMovingTableBorder = function()
 };
 ParaDrawing.prototype.SetVerticalClip = function(Top, Bottom)
 {
-	// TODO: Реализовать
+	this.LineTop = Top;
+	this.LineBottom = Bottom;
 };
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
 {
@@ -1176,7 +1180,56 @@ ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimi
 		this.Y = this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
 	}
 
-	this.updatePosition3(this.PageNum, this.X, this.Y, OldPageNum);
+	var DiffX = 0.0, DiffY = 0.0;
+	if(this.Is_Inline() || this.PositionH.Align || this.PositionV.Align)
+	{
+		var extX, extY, rot;
+		if (this.GraphicObj.spPr && this.GraphicObj.spPr.xfrm )
+		{
+			if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
+			{
+				extX = this.GraphicObj.spPr.xfrm.extX;
+				extY = this.GraphicObj.spPr.xfrm.extY;
+			}
+			else
+			{
+				extX = 5;
+				extY = 5;
+			}
+			if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.rot))
+			{
+				rot = this.GraphicObj.spPr.xfrm.rot;
+			}
+			else
+			{
+				rot = 0;
+			}
+		}
+		else
+		{
+			extX = 5;
+			extY = 5;
+			rot = 0;
+		}
+		var xc          = this.GraphicObj.localTransform.TransformPointX(extX / 2, extY / 2);
+		var yc          = this.GraphicObj.localTransform.TransformPointY(extX / 2, extY / 2);
+		var oBounds     = this.GraphicObj.bounds;
+		if(!AscFormat.checkNormalRotate(rot)){
+			var t = extX;
+			extX = extY;
+			extY = t;
+		}
+		var oEffectExtent = this.EffectExtent;
+		if(this.Is_Inline() || this.PositionH.Align)
+		{
+			DiffX = AscFormat.getValOrDefault(oEffectExtent.L, 0.0) - (xc - extX / 2) + oBounds.l;
+		}
+		if(this.Is_Inline() || this.PositionV.Align)
+		{
+			DiffY = AscFormat.getValOrDefault(oEffectExtent.T, 0.0) - (yc - extY / 2) + oBounds.t;
+		}
+	}
+	this.updatePosition3(this.PageNum, this.X + DiffX, this.Y - DiffY, OldPageNum);
 	this.useWrap = this.Use_TextWrap();
 };
 ParaDrawing.prototype.Update_PositionYHeaderFooter = function(TopMarginY, BottomMarginY)
@@ -1818,14 +1871,15 @@ ParaDrawing.prototype.draw = function(graphics, PDSE)
 	{
 		graphics.SaveGrState();
 		var bInline = this.Is_Inline();
-		if(bInline && AscCommon.isRealObject(PDSE) && AscCommon.isRealObject(this.GraphicObj.bounds))
+		if(bInline && AscCommon.isRealObject(PDSE) && AscFormat.isRealNumber(this.LineTop) && AscFormat.isRealNumber(this.LineBottom) && AscCommon.isRealObject(this.GraphicObj.bounds))
 		{
-			var l, t, r, b;
-			l = PDSE.X + this.GraphicObj.bounds.l;
-			r = PDSE.X + this.GraphicObj.bounds.r;
-			t = PDSE.LineTop;
-			b = PDSE.LineBottom;
-			graphics.AddClipRect(l, t, r - l, b - t);
+			var x, y, w, h;
+			var oEffectExtent = this.EffectExtent;
+			x = PDSE.X;
+			y = this.LineTop;
+			w = this.GraphicObj.bounds.r - this.GraphicObj.bounds.l + AscFormat.getValOrDefault(oEffectExtent.R, 0) + AscFormat.getValOrDefault(oEffectExtent.L, 0);
+			h = this.LineBottom - this.LineTop;
+			graphics.AddClipRect(x, y, w, h);
 		}
 		this.GraphicObj.draw(graphics);
 		graphics.RestoreGrState();
