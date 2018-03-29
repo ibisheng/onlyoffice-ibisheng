@@ -359,6 +359,36 @@
 			return this.GetCells();
 		}
 	});
+	Object.defineProperty(ApiWorksheet.prototype, "Rows", {
+		get: function () {
+			return this.GetCells();
+		}
+	});
+
+	/**
+	 * Returns a ApiRange that represents all the cells on the rows range.
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 * @param {string | number} value
+	 */
+	ApiWorksheet.prototype.GetRows = function (value) {
+		if (typeof value == "number" || value.indexOf(':') == -1) {
+			value = parseInt(value);
+			if (value > 0) {
+				value --;
+			}
+			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
+		} else {
+			value = value.split(':');
+			for (var i in value) {
+				value[i] = parseInt(value[i])
+				if (value[i] > 0) {
+					value[i] --;
+				}
+			}
+			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
+		}
+	};
 
 	/**
 	 * Returns a ApiRange that represents the used range on the specified worksheet.
@@ -1535,6 +1565,7 @@
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
+	ApiWorksheet.prototype["GetRows"] = ApiWorksheet.prototype.GetRows;
 	ApiWorksheet.prototype["GetUsedRange"] = ApiWorksheet.prototype.GetUsedRange;
 	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
