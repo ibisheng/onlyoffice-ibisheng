@@ -367,11 +367,11 @@ CChartsDrawer.prototype =
 					break;
 				}
 				case "valAx": {
-					pos = this._calculatePositionValAxTitle(chartSpace);
+					pos = this._calculatePositionAxisTitle(chartSpace, chartSpace.chart.plotArea.valAx);
 					break;
 				}
 				case "catAx": {
-					pos = this._calculatePositionCatAxTitle(chartSpace);
+					pos = this._calculatePositionAxisTitle(chartSpace, chartSpace.chart.plotArea.catAx);
 					break;
 				}
 				case "legend": {
@@ -457,6 +457,7 @@ CChartsDrawer.prototype =
 				}
 			}
 		}
+		//TODO нужна обработка для трехмерных диаграмм!!!
 
 		return {x: x , y: y};
 	},
