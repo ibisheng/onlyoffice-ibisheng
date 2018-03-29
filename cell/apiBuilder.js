@@ -381,10 +381,10 @@
 		} else {
 			value = value.split(':');
 			for (var i in value) {
-					value[i] = parseInt(value[i])
-					if (value[i] > 0) {
-						value[i] --;
-					}
+				value[i] = parseInt(value[i])
+				if (value[i] > 0) {
+					value[i] --;
+				}
 			}
 			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
 		}
