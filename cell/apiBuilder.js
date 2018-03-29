@@ -369,23 +369,23 @@
 	 * Returns a ApiRange that represents all the cells on the rows range.
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
+	 * @param {string | number} value
 	 */
 	ApiWorksheet.prototype.GetRows = function (value) {
-		if((typeof(value) == "number") || (value.indexOf(':') == -1))
-		{
+		if (typeof value == "number" || value.indexOf(':') == -1) {
 			value = parseInt(value);
-			if(value > 0) 
-				value = value -1;
+			if (value > 0) {
+				value --;
+			}
 			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
-		}
-		else{
+		} else {
 			value = value.split(':');
-			for(var i in value)
-				{
+			for (var i in value) {
 					value[i] = parseInt(value[i])
-					if(value[i] > 0) 
-						value[i] = value[i] -1;
-				}
+					if (value[i] > 0) {
+						value[i] --;
+					}
+			}
 			return new ApiRange(this.worksheet.getRange3(value[0], 0, value[1], AscCommon.gc_nMaxCol0));
 		}
 	};
