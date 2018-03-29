@@ -2967,24 +2967,30 @@
 	};
 
 
+	/**
+	 * Класс для работы с интерфейсом для гиперссылок
+	 * @param obj
+	 * @constructor
+	 */
     function CHyperlinkProperty(obj)
-    {
-        if (obj)
-        {
-            this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
-            this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
-            this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
-            this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
-        }
-        else
-        {
-            this.Text    = null;
-            this.Value   = "";
-            this.ToolTip = "";
-            this.Class   = null;
-        }
-    }
-
+	{
+		if (obj)
+		{
+			this.Text    = (undefined != obj.Text   ) ? obj.Text : null;
+			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
+			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
+			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
+			this.Anchor  = (undefined !== obj.Anchor) ? obj.Class : null;
+		}
+		else
+		{
+			this.Text    = null;
+			this.Value   = "";
+			this.ToolTip = "";
+			this.Class   = null;
+			this.Anchor  = null;
+		}
+	}
     CHyperlinkProperty.prototype.get_Value   = function()
     {
         return this.Value;
@@ -3017,6 +3023,31 @@
     {
         return this.Class;
     };
+    CHyperlinkProperty.prototype.is_TopOfDocument = function()
+	{
+		return (this.Anchor === "_top");
+	};
+    CHyperlinkProperty.prototype.get_Bookmark = function()
+	{
+		return this.Anchor;
+	};
+    CHyperlinkProperty.prototype.put_Bookmark = function(sBookmark)
+	{
+		this.Anchor = sBookmark;
+	};
+
+	window['Asc']['CHyperlinkProperty'] = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
+	CHyperlinkProperty.prototype['get_Value']             = CHyperlinkProperty.prototype.get_Value;
+	CHyperlinkProperty.prototype['put_Value']             = CHyperlinkProperty.prototype.put_Value;
+	CHyperlinkProperty.prototype['get_ToolTip']           = CHyperlinkProperty.prototype.get_ToolTip;
+	CHyperlinkProperty.prototype['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
+	CHyperlinkProperty.prototype['get_Text']              = CHyperlinkProperty.prototype.get_Text;
+	CHyperlinkProperty.prototype['put_Text']              = CHyperlinkProperty.prototype.put_Text;
+	CHyperlinkProperty.prototype['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
+	CHyperlinkProperty.prototype['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
+	CHyperlinkProperty.prototype['is_TopOfDocument']      = CHyperlinkProperty.prototype.is_TopOfDocument;
+	CHyperlinkProperty.prototype['get_Bookmark']          = CHyperlinkProperty.prototype.get_Bookmark;
+	CHyperlinkProperty.prototype['put_Bookmark']          = CHyperlinkProperty.prototype.put_Bookmark;
 
 
 	/** @constructor */
@@ -4334,19 +4365,6 @@
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
 	prot["get_FootnoteText"] =  prot.get_FootnoteText;
 	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
-
-
-
-    window['Asc']['CHyperlinkProperty']       = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
-    prot = CHyperlinkProperty.prototype;
-    prot['get_Value']             = CHyperlinkProperty.prototype.get_Value;
-    prot['put_Value']             = CHyperlinkProperty.prototype.put_Value;
-    prot['get_ToolTip']           = CHyperlinkProperty.prototype.get_ToolTip;
-    prot['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
-    prot['get_Text']              = CHyperlinkProperty.prototype.get_Text;
-    prot['put_Text']              = CHyperlinkProperty.prototype.put_Text;
-    prot['get_InternalHyperlink'] = CHyperlinkProperty.prototype.get_InternalHyperlink;
-    prot['put_InternalHyperlink'] = CHyperlinkProperty.prototype.put_InternalHyperlink;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

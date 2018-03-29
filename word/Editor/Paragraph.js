@@ -5644,6 +5644,10 @@ Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
 	return oInfo.GetHyperlink();
 };
+/**
+ * Добавляем гиперссылку
+ * @param {CHyperlinkProperty} HyperProps
+ */
 Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
 	if (true === this.Selection.Use)
@@ -5652,8 +5656,16 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		var Hyperlink = new ParaHyperlink();
 
 		// Заполняем гиперссылку полями
-		if (undefined != HyperProps.Value && null != HyperProps.Value)
+		if (undefined !== HyperProps.Anchor && null !== HyperProps.Anchor)
+		{
+			Hyperlink.SetAnchor(HyperPos.Anchor);
+			Hyperlink.SetValue("")
+		}
+		else if (undefined != HyperProps.Value && null != HyperProps.Value)
+		{
 			Hyperlink.SetValue(HyperProps.Value);
+			Hyperlink.SetAnchor("");
+		}
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
 			Hyperlink.SetToolTip(HyperProps.ToolTip);
@@ -5771,8 +5783,16 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 		var Hyperlink = new ParaHyperlink();
 
 		// Заполняем гиперссылку полями
-		if (undefined != HyperProps.Value && null != HyperProps.Value)
+		if (undefined !== HyperProps.Anchor && null !== HyperProps.Anchor)
+		{
+			Hyperlink.SetAnchor(HyperPos.Anchor);
+			Hyperlink.SetValue("")
+		}
+		else if (undefined != HyperProps.Value && null != HyperProps.Value)
+		{
 			Hyperlink.SetValue(HyperProps.Value);
+			Hyperlink.SetAnchor("");
+		}
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
 			Hyperlink.SetToolTip(HyperProps.ToolTip);

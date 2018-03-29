@@ -5345,8 +5345,10 @@ background-repeat: no-repeat;\
 
 		return false;
 	};
-
-	// HyperProps - объект CHyperlinkProperty
+	/**
+	 * Добавляем гиперссылку
+	 * @param {CHyperlinkProperty} HyperProps
+	 */
 	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 	{
 		if(null !== HyperProps.Text && undefined !== HyperProps.Text)
@@ -5371,7 +5373,6 @@ background-repeat: no-repeat;\
 
 		}
 	};
-
 	/**
 	 * Изменяем гиперссылку
 	 * @param {CHyperlinkProperty} oHyperProps
