@@ -1003,7 +1003,7 @@ CChartsDrawer.prototype =
 	},
 
 	//TEST and change _calculateMarginLabels->_calculateMarginLabels2
-	_calculateMarginLabels2: function (chartSpace) {
+	_calculateMarginLabels: function (chartSpace) {
 		var left = 0, right = 0, bottom = 0, top = 0;
 		var leftDownPointX, leftDownPointY, rightUpPointX, rightUpPointY;
 
@@ -1028,13 +1028,13 @@ CChartsDrawer.prototype =
 				rightUpPointX = horizontalAxis.xPoints[0].pos + diffPoints;
 			}
 
-			if (horizontalAxis.labels && !horizontalAxis.bDelete) {
+			if (verticalAxis.labels && !verticalAxis.bDelete) {
 				//подпись оси OY находится левее крайней левой точки
-				if (leftDownPointX >= horizontalAxis.labels.x) {
-					left = leftDownPointX - horizontalAxis.labels.x;
-				} else if ((horizontalAxis.labels.x + horizontalAxis.labels.extX) >= rightUpPointX)//правее крайней правой точки
+				if (leftDownPointX >= verticalAxis.labels.x) {
+					left = leftDownPointX - verticalAxis.labels.x;
+				} else if ((verticalAxis.labels.x + verticalAxis.labels.extX) >= rightUpPointX)//правее крайней правой точки
 				{
-					right = horizontalAxis.labels.x + horizontalAxis.labels.extX - rightUpPointX;
+					right = verticalAxis.labels.x + verticalAxis.labels.extX - rightUpPointX;
 				}
 			}
 		}
@@ -1053,13 +1053,13 @@ CChartsDrawer.prototype =
 				rightUpPointY = verticalAxis.yPoints[0].pos - diffPoints;
 			}
 
-			if (verticalAxis.labels && !verticalAxis.bDelete) {
+			if (horizontalAxis.labels && !horizontalAxis.bDelete) {
 				//подпись оси OX находится ниже крайней нижней точки
-				if ((verticalAxis.labels.y + verticalAxis.labels.extY) >= leftDownPointY) {
-					bottom = (verticalAxis.labels.y + verticalAxis.labels.extY) - leftDownPointY;
-				} else if (verticalAxis.labels.y <= rightUpPointY)//выше верхней
+				if ((horizontalAxis.labels.y + horizontalAxis.labels.extY) >= leftDownPointY) {
+					bottom = (horizontalAxis.labels.y + horizontalAxis.labels.extY) - leftDownPointY;
+				} else if (horizontalAxis.labels.y <= rightUpPointY)//выше верхней
 				{
-					top = rightUpPointY - verticalAxis.labels.y;
+					top = rightUpPointY - horizontalAxis.labels.y;
 				}
 			}
 		}
@@ -1067,7 +1067,7 @@ CChartsDrawer.prototype =
 		return {left: left, right: right, top: top, bottom: bottom};
 	},
 
-	_calculateMarginLabels: function (chartSpace) {
+	_calculateMarginLabels2: function (chartSpace) {
 		var isHBar = this.calcProp.type;
 		var left = 0, right = 0, bottom = 0, top = 0;
 
