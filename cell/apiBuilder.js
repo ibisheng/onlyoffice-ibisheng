@@ -391,6 +391,24 @@
 	};
 
 	/**
+	 * Returns a ApiRange that represents all the cells on the columns range.
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 * @param {string} sRange
+	 */
+	ApiWorksheet.prototype.GetCols = function (sRange) {
+		if (sRange.indexOf(':') == -1) {
+			sRange += ':' + sRange;
+		}
+		return new ApiRange(this.worksheet.getRange2(sRange));
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Cols", {
+		get: function () {
+			return this.GetCells();
+		}
+	});
+
+	/**
 	 * Returns a ApiRange that represents the used range on the specified worksheet.
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
