@@ -12,7 +12,7 @@
 * Fix bug with enter Chinese numbers in formula autocompleate
 
 ### Presentation Editor
-* 
+* Fix bug in calculation of slide layout bounds
 
 ### Plugins
 * 
