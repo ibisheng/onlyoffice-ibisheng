@@ -5414,7 +5414,10 @@ window["native"]["offline_dh"] = function(x, y, width, height, ratio, type) {
     _s.drawHeader(x, y, width, height, type, ratio);
 }
 
-window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow, select) {
+window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, 
+    indexRange, c1, r1, c2, r2, targetCol, targetRow, 
+    typePin, beginX, beginY, endX, endY) {
+
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -5435,15 +5438,15 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
         var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
-        if (1 === select["pin"]) {
-            wb._onGraphicObjectMouseDown(e, select["beginX"], select["beginY"]);
-            wb._onGraphicObjectMouseUp(e, select["endX"], select["endY"]);
+        if (1 === typePin) {
+            wb._onGraphicObjectMouseDown(e, beginX, beginY);
+            wb._onGraphicObjectMouseUp(e, endX, endY);
             e.shiftKey = true;
         }
 
-        if (-1 === select["pin"]) {
-            wb._onGraphicObjectMouseDown(e, select["endX"], select["endY"]);
-            wb._onGraphicObjectMouseUp(e, select["beginX"], select["beginY"]);
+        if (-1 === typePin) {
+            wb._onGraphicObjectMouseDown(e, endX, endY);
+            wb._onGraphicObjectMouseUp(e, beginX, beginY);
             e.shiftKey = true;
         }
 
