@@ -1014,7 +1014,7 @@ CChartsDrawer.prototype =
 		var verticalAxis = verticalAxes ? verticalAxes[0] : null;
 
 		var diffPoints;
-		if(horizontalAxis && horizontalAxis.xPoints) {
+		if(horizontalAxis && horizontalAxis.xPoints &&  horizontalAxis.xPoints.length) {
 			var orientationHorAxis = horizontalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
 			diffPoints = 0;
 			if(horizontalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
@@ -1039,7 +1039,7 @@ CChartsDrawer.prototype =
 			}
 		}
 
-		if(verticalAxis && verticalAxis.yPoints) {
+		if(verticalAxis && verticalAxis.yPoints && verticalAxis.yPoints.length) {
 			var orientationVerAxis = verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
 			diffPoints = 0;
 			if(verticalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
@@ -4413,6 +4413,10 @@ drawBarChart.prototype = {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
 
+		var scaleAxis = this.valAx.scale;
+		var axisMin = scaleAxis[0] < scaleAxis[scaleAxis.length - 1] ? scaleAxis[0] : scaleAxis[scaleAxis.length - 1];
+		var axisMax = scaleAxis[0] < scaleAxis[scaleAxis.length - 1] ? scaleAxis[scaleAxis.length - 1] : scaleAxis[0];
+
 		if(!xPoints || !yPoints) {
 			return;
 		}
@@ -4547,16 +4551,16 @@ drawBarChart.prototype = {
 					paths = paths.paths;
 
 					var testHeight;
-					if ((this.cChartDrawer.calcProp.axisMax > 0 && this.cChartDrawer.calcProp.axisMin > 0) || (this.cChartDrawer.calcProp.axisMax < 0 && this.cChartDrawer.calcProp.axisMin < 0)) {
+					if ((axisMax > 0 && axisMin > 0) || (axisMax < 0 && axisMin < 0)) {
 						testHeight = Math.abs(yPoints[0].pos - yPoints[yPoints.length - 1].pos) * this.chartProp.pxToMM;
 					} else {
 						var endBlockPosition, startBlockPosition;
 						if (val > 0) {
-							endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMax), yPoints) * this.chartProp.pxToMM;
+							endBlockPosition = this.cChartDrawer.getYPosition((axisMax), yPoints) * this.chartProp.pxToMM;
 							startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
 							testHeight = startBlockPosition - endBlockPosition;
 						} else {
-							endBlockPosition = this.cChartDrawer.getYPosition((this.cChartDrawer.calcProp.axisMin), yPoints) * this.chartProp.pxToMM;
+							endBlockPosition = this.cChartDrawer.getYPosition((axisMin), yPoints) * this.chartProp.pxToMM;
 							startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((0), yPoints) * this.chartProp.pxToMM : nullPositionOX;
 							testHeight = startBlockPosition - endBlockPosition;
 						}
@@ -7479,6 +7483,10 @@ drawHBarChart.prototype = {
 		var startY, width, curVal, prevVal, endBlockPosition, startBlockPosition;
 		var catAx = this.catAx;
 
+		var scaleAxis = this.valAx.scale;
+		var axisMin = scaleAxis[0] < scaleAxis[scaleAxis.length - 1] ? scaleAxis[0] : scaleAxis[scaleAxis.length - 1];
+		var axisMax = scaleAxis[0] < scaleAxis[scaleAxis.length - 1] ? scaleAxis[scaleAxis.length - 1] : scaleAxis[0];
+
 		//в ms отрисовка сделана следующим образом: если диаграмма типа normal, то стартовую точку отрисовки столбцов берем позицию X оси категорий(posX)
 		//если диаграмма типа stacked то рисуем от позиции X ноля оси категорий - getPositionZero(позиция ноля и оси могут отличиться в зависимости от настроек)
 		var nullPositionOX = this.subType === "stacked" ? this.cChartDrawer.getPositionZero(this.valAx) : catAx.posX * this.chartProp.pxToMM;
@@ -7489,11 +7497,11 @@ drawHBarChart.prototype = {
 
 			if (this.subType === "stacked") {
 				//если максимальное значение задано вручную, и присутвуют точки, которые больше этого значения
-				if (curVal > this.cChartDrawer.calcProp.axisMax) {
-					curVal = this.cChartDrawer.calcProp.axisMax;
+				if (curVal > axisMax) {
+					curVal = axisMax;
 				}
-				if (curVal < this.cChartDrawer.calcProp.axisMin) {
-					curVal = this.cChartDrawer.calcProp.axisMin;
+				if (curVal < axisMin) {
+					curVal = axisMin;
 				}
 
 				endBlockPosition = this.cChartDrawer.getYPosition((curVal), xPoints, true) * this.chartProp.pxToMM;
@@ -7504,18 +7512,18 @@ drawHBarChart.prototype = {
 				var test = this.summBarVal[j];
 
 				//если максимальное значение задано вручную, и присутвуют точки, которые больше этого значения
-				if (curVal / test > this.cChartDrawer.calcProp.axisMax) {
-					curVal = this.cChartDrawer.calcProp.axisMax * test;
+				if (curVal / test > axisMax) {
+					curVal = axisMax * test;
 				}
-				if (curVal / test < this.cChartDrawer.calcProp.axisMin) {
-					curVal = this.cChartDrawer.calcProp.axisMin * test;
+				if (curVal / test < axisMin) {
+					curVal = axisMin * test;
 				}
 
-				if (prevVal / test > this.cChartDrawer.calcProp.axisMax) {
-					prevVal = this.cChartDrawer.calcProp.axisMax * test;
+				if (prevVal / test > axisMax) {
+					prevVal = axisMax * test;
 				}
-				if (prevVal / test < this.cChartDrawer.calcProp.axisMin) {
-					prevVal = this.cChartDrawer.calcProp.axisMin * test;
+				if (prevVal / test < axisMin) {
+					prevVal = axisMin * test;
 				}
 
 				endBlockPosition = this.cChartDrawer.getYPosition((curVal / test), xPoints, true) * this.chartProp.pxToMM;
@@ -7725,6 +7733,9 @@ drawHBarChart.prototype = {
 		var x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
 		var xPoints = this.valAx.xPoints;
 
+		var scaleAxis = this.valAx.scale;
+		var axisMax = scaleAxis[0] < scaleAxis[scaleAxis.length - 1] ? scaleAxis[scaleAxis.length - 1] : scaleAxis[0];
+
 		width = width * this.chartProp.pxToMM;
 		newStartX = newStartX * this.chartProp.pxToMM;
 		newStartY = newStartY - individualBarHeight;
@@ -7784,7 +7795,7 @@ drawHBarChart.prototype = {
 		} else {
 			//рассчитываем 8 точек для каждого столбца одинакового размера для рассчета положения столбцов
 			if (this.subType === "normal") {
-				var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, this.cChartDrawer.calcProp.max, xPoints);
+				var startXColumnPosition = this._getStartYColumnPosition(seriesHeight, idx, i, axisMax, xPoints);
 				width = startXColumnPosition.width / this.chartProp.pxToMM;
 
 				x3 = newStartX + width, y3 = newStartY, z3 = perspectiveDepth + DiffGapDepth;
@@ -10982,7 +10993,7 @@ drawStockChart.prototype = {
 
 		var digHeight = Math.abs(max - min);
 
-		if (this.chartProp.min < 0 && this.chartProp.max <= 0) {
+		if (/*this.chartProp.min < 0 && this.chartProp.max <= 0*/min < 0 && max <= 0) {
 			min = -1 * max;
 		}
 
