@@ -5839,6 +5839,11 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 	this.Correct_Content();
 };
+/**
+ * Изменяем гиперссылку
+ * @param {CHyperlinkProperty} HyperProps
+ * @returns {boolean}
+ */
 Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 {
 	var HyperPos = -1;
@@ -5881,8 +5886,16 @@ Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 	{
 		var Hyperlink = this.Content[HyperPos];
 
-		if (undefined != HyperProps.Value && null != HyperProps.Value)
+		if (undefined !== HyperProps.Anchor && null !== HyperProps.Anchor)
+		{
+			Hyperlink.SetAnchor(HyperProps.Anchor);
+			Hyperlink.SetValue("")
+		}
+		else if (undefined != HyperProps.Value && null != HyperProps.Value)
+		{
 			Hyperlink.SetValue(HyperProps.Value);
+			Hyperlink.SetAnchor("");
+		}
 
 		if (undefined != HyperProps.ToolTip && null != HyperProps.ToolTip)
 			Hyperlink.SetToolTip(HyperProps.ToolTip);
