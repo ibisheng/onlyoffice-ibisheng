@@ -1002,6 +1002,71 @@ CChartsDrawer.prototype =
 		return result;
 	},
 
+	//TEST and change _calculateMarginLabels->_calculateMarginLabels2
+	_calculateMarginLabels2: function (chartSpace) {
+		var left = 0, right = 0, bottom = 0, top = 0;
+		var leftDownPointX, leftDownPointY, rightUpPointX, rightUpPointY;
+
+		var crossBetween = chartSpace.getValAxisCrossType();
+		var horizontalAxes = this._getHorizontalAxes(chartSpace);
+		var verticalAxes = this._getVerticalAxes(chartSpace);
+		var horizontalAxis = horizontalAxes ? horizontalAxes[0] : null;
+		var verticalAxis = verticalAxes ? verticalAxes[0] : null;
+
+		var diffPoints;
+		if(horizontalAxis && horizontalAxis.xPoints) {
+			var orientationHorAxis = horizontalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
+			diffPoints = 0;
+			if(horizontalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+				diffPoints = Math.abs((horizontalAxis.interval) / 2);
+			}
+			if(orientationHorAxis) {
+				leftDownPointX = horizontalAxis.xPoints[0].pos - diffPoints;
+				rightUpPointX = horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos + diffPoints;
+			} else {
+				leftDownPointX = horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos - diffPoints;
+				rightUpPointX = horizontalAxis.xPoints[0].pos + diffPoints;
+			}
+
+			if (horizontalAxis.labels && !horizontalAxis.bDelete) {
+				//подпись оси OY находится левее крайней левой точки
+				if (leftDownPointX >= horizontalAxis.labels.x) {
+					left = leftDownPointX - horizontalAxis.labels.x;
+				} else if ((horizontalAxis.labels.x + horizontalAxis.labels.extX) >= rightUpPointX)//правее крайней правой точки
+				{
+					right = horizontalAxis.labels.x + horizontalAxis.labels.extX - rightUpPointX;
+				}
+			}
+		}
+
+		if(verticalAxis && verticalAxis.yPoints) {
+			var orientationVerAxis = verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
+			diffPoints = 0;
+			if(verticalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+				diffPoints = Math.abs((verticalAxis.interval) / 2);
+			}
+			if(orientationVerAxis) {
+				leftDownPointY = verticalAxis.yPoints[0].pos + diffPoints;
+				rightUpPointY = verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos - diffPoints;
+			} else {
+				leftDownPointY = verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos + diffPoints;
+				rightUpPointY = verticalAxis.yPoints[0].pos - diffPoints;
+			}
+
+			if (verticalAxis.labels && !verticalAxis.bDelete) {
+				//подпись оси OX находится ниже крайней нижней точки
+				if ((verticalAxis.labels.y + verticalAxis.labels.extY) >= leftDownPointY) {
+					bottom = (verticalAxis.labels.y + verticalAxis.labels.extY) - leftDownPointY;
+				} else if (verticalAxis.labels.y <= rightUpPointY)//выше верхней
+				{
+					top = rightUpPointY - verticalAxis.labels.y;
+				}
+			}
+		}
+
+		return {left: left, right: right, top: top, bottom: bottom};
+	},
+
 	_calculateMarginLabels: function (chartSpace) {
 		var isHBar = this.calcProp.type;
 		var left = 0, right = 0, bottom = 0, top = 0;
