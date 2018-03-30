@@ -3041,7 +3041,7 @@
 	{
 		this.Anchor = sBookmark;
 	};
-	CHyperlinkProperty.proottype.is_Heading = function()
+	CHyperlinkProperty.prototype.is_Heading = function()
 	{
 		return (this.Heading instanceof Paragraph ? true : false)
 	};
