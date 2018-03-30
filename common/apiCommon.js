@@ -2980,7 +2980,7 @@
 			this.Value   = (undefined != obj.Value  ) ? obj.Value : "";
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
 			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
-			this.Anchor  = (undefined !== obj.Anchor) ? obj.Class : null;
+			this.Anchor  = (undefined !== obj.Anchor) ? obj.Anchor : null;
 		}
 		else
 		{
