@@ -79,7 +79,7 @@ function (window, undefined) {
 		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
+	cFormulaFunctionGroup['NotRealised'].push(cGROWTH, cLINEST, cLOGEST, cTREND);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
