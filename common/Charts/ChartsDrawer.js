@@ -2880,7 +2880,9 @@ CChartsDrawer.prototype =
 					}
 					else
 					{
-						this.calcProp.ptCount = numCache.ptCount;
+						if(numCache) {
+							this.calcProp.ptCount = numCache.ptCount;
+						}
 					}
 				}
 
