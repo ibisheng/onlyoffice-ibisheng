@@ -5669,6 +5669,7 @@ function BinaryPPTYLoader()
                     if(type === 7 || type === 8){//video or audio
                         s.GetLong();
                         s.GetUChar();//start attributes
+
                         while(true)
                         {
                             var _at2 = s.GetUChar();
@@ -5680,8 +5681,18 @@ function BinaryPPTYLoader()
                                     sMaskFileName = s.GetString2();
                                     break;
                                 }
+                                case 1:
+                                {
+                                    s.GetBool();
+                                    break;
+                                }
+                                default:
+                                {
+                                    break;
+                                }
                             }
                         }
+
                     }
                     else{
                         s.SkipRecord();
