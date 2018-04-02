@@ -1165,7 +1165,7 @@
 			if (sheetContainer) {
 				var bboxShift;
 				if (AscCommon.c_oNotifyType.Shift == notifyType) {
-					var bHor = 0 != offset.offsetCol;
+					var bHor = 0 != offset.col;
 					bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
 				}
 				var changed = {};
@@ -3384,15 +3384,15 @@
 								})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
 								break;
 							case AscCommonExcel.ECfType.expression:
-								var offset = {offsetRow: 0, offsetCol: 0};
+								var offset = new AscCommon.CellBase(0, 0);
 							var bboxCf = oRule.getBBox();
 								var rowLT = bboxCf ? bboxCf.r1 : 0;
 								var colLT = bboxCf ? bboxCf.c1 : 0;
 							var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, oRule);
 								compareFunction = getCacheFunction(oRule, (function(rule, formulaCF, rowLT, colLT) {
 									return function(row, col) {
-										offset.offsetRow = row - rowLT;
-										offset.offsetCol = col - colLT;
+										offset.row = row - rowLT;
+										offset.col = col - colLT;
 										var bboxCell = new Asc.Range(col, row, col, row);
 										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, bboxCell, offset);
 										if (res && res.tocBool) {
@@ -3583,8 +3583,8 @@
 	Worksheet.prototype._updateFormulasParents=function(r1, c1, r2, c2, offset){
 		var t = this;
 		this.getRange3(r1, c1, r2, c2)._foreachNoEmpty(function(cell){
-			var newNRow = cell.nRow + offset.offsetRow;
-			var newNCol = cell.nCol + offset.offsetCol;
+			var newNRow = cell.nRow + offset.row;
+			var newNCol = cell.nCol + offset.col;
 			var formula = cell.getFormulaParsed();
 			if (formula) {
 				var cellWithFormula = formula.getParent();
@@ -3607,7 +3607,7 @@
 		//start, stop 0 based
 		var nDif = -(stop - start + 1);
 		var oActualRange = new Asc.Range(0, start, gc_nMaxCol0, stop);
-		var offset = {offsetRow: nDif, offsetCol: 0};
+		var offset = new AscCommon.CellBase(nDif, 0);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("delCell", oActualRange, c_oAscDeleteOptions.DeleteRows);
@@ -3647,7 +3647,7 @@
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
 		History.Create_NewPoint();
-		var offset = {offsetRow: count, offsetCol: 0};
+		var offset = new AscCommon.CellBase(count, 0);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("insCell", oActualRange, c_oAscInsertOptions.InsertColumns);
@@ -3707,7 +3707,7 @@
 		//start, stop 0 based
 		var nDif = -(stop - start + 1), i, j, length;
 		var oActualRange = new Asc.Range(start, 0, stop, gc_nMaxRow0);
-		var offset = { offsetRow: 0, offsetCol: nDif };
+		var offset = new AscCommon.CellBase(0, nDif);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, nDif);
@@ -3750,7 +3750,7 @@
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0);
 		History.Create_NewPoint();
-		var offset = {offsetRow: 0, offsetCol: count};
+		var offset = new AscCommon.CellBase(0, count);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, count);
@@ -4452,7 +4452,7 @@
 		History.StartTransaction();
 
 		this.workbook.dependencyFormulas.lockRecal();
-		var offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 };
+		var offset = new AscCommon.CellBase(oBBoxTo.r1 - oBBoxFrom.r1, oBBoxTo.c1 - oBBoxFrom.c1);
 		var intersection = oBBoxFrom.intersectionSimple(oBBoxTo);
 		var oRangeIntersection = null;
 		if(null != intersection)
@@ -4636,7 +4636,7 @@
 		var nRight = oBBox.c2;
 		var dif = nLeft - nRight - 1;
 		var oActualRange = new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2);
-		var offset = {offsetRow: 0, offsetCol: dif};
+		var offset = new AscCommon.CellBase(0, dif);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif );
@@ -4668,7 +4668,7 @@
 		var nBottom = oBBox.r2;
 		var dif = nTop - nBottom - 1;
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0);
-		var offset = {offsetRow: dif, offsetCol: 0};
+		var offset = new AscCommon.CellBase(dif, 0);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertRows("delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
@@ -4696,7 +4696,7 @@
 		var nRight = oBBox.c2;
 		var dif = nRight - nLeft + 1;
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2);
-		var offset = {offsetRow: 0, offsetCol: dif};
+		var offset = new AscCommon.CellBase(0, dif);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif, displayNameFormatTable );
@@ -4739,7 +4739,7 @@
 		var nBottom = oBBox.r2;
 		var dif = nBottom - nTop + 1;
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0);
-		var offset = {offsetRow: dif, offsetCol: 0};
+		var offset = new AscCommon.CellBase(dif, 0);
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr;
@@ -5117,7 +5117,7 @@
 		if (pos && 0 > pos.row) {
 			// ToDo add check exist data in cells
 			pivotRange = pivotTable.getRange();
-			pivotRange.setOffset(new AscCommonExcel.CRangeOffset(0, -1 * pos.row));
+			pivotRange.setOffset(new AscCommon.CellBase(-1 * pos.row, 0));
 			pivotTable.init();
 			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 			cells._foreachNoEmpty(function (cell) {
@@ -5617,7 +5617,7 @@
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 
-			if ((offset.offsetCol && range.c1 <= pivotRange.c2) || (offset.offsetRow && range.r1 <= pivotRange.r2)) {
+			if ((offset.col && range.c1 <= pivotRange.c2) || (offset.row && range.r1 <= pivotRange.r2)) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 				cells.clearTableStyle();
 				pivotRange.setOffset(offset);
@@ -6661,7 +6661,7 @@
 		return this.getOffset3(cAddr2.col, cAddr2.row);
 	};
 	Cell.prototype.getOffset3=function(col, row){
-		return new AscCommonExcel.CRangeOffset((this.nCol - col + 1), (this.nRow - row + 1));
+		return new AscCommon.CellBase(this.nRow - row + 1, this.nCol - col + 1);
 	};
 	Cell.prototype.getValueData = function(){
 		this._checkDirty();
@@ -8872,7 +8872,7 @@
 			if(oFirstCellRow == elem.bbox.r1 && oFirstCellCol == elem.bbox.c1 && elem.bbox.r1 == elem.bbox.r2 && elem.bbox.c1 == elem.bbox.c2)
 			{
 				var oNewHyperlink = elem.data.clone();
-				oNewHyperlink.Ref.setOffset({offsetCol:oBBox.c1 - oFirstCellCol, offsetRow:oBBox.r1 - oFirstCellRow});
+				oNewHyperlink.Ref.setOffset(new AscCommon.CellBase(oBBox.r1 - oFirstCellRow, oBBox.c1 - oFirstCellCol));
 				aHyperlinksToRestore.push(oNewHyperlink);
 			}
 			else if( oBBox.r1 == elem.bbox.r1 && (elem.bbox.r1 != elem.bbox.r2 || (elem.bbox.c1 != elem.bbox.c2 && oBBox.r1 == oBBox.r2)))
@@ -9438,35 +9438,14 @@
 		this.worksheet.workbook.dependencyFormulas.unlockRecal();
 		return true;
 	};
-	Range.prototype.setOffset=function(offset){//offset = AscCommonExcel.CRangeOffset
-		this.bbox.c1 += offset.offsetCol;
-		if( this.bbox.c1 < 0 )
-			this.bbox.c1 = 0;
-		this.bbox.r1 += offset.offsetRow;
-		if( this.bbox.r1 < 0 )
-			this.bbox.r1 = 0;
-		this.bbox.c2 += offset.offsetCol;
-		if( this.bbox.c2 < 0 )
-			this.bbox.c2 = 0;
-		this.bbox.r2 += offset.offsetRow;
-		if( this.bbox.r2 < 0 )
-			this.bbox.r2 = 0;
+	Range.prototype.setOffset=function(offset){
+		this.bbox.setOffset(offset);
 	};
-	Range.prototype.setOffsetFirst=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
-		this.bbox.c1 += offset.offsetCol;
-		if( this.bbox.c1 < 0 )
-			this.bbox.c1 = 0;
-		this.bbox.r1 += offset.offsetRow;
-		if( this.bbox.r1 < 0 )
-			this.bbox.r1 = 0;
+	Range.prototype.setOffsetFirst=function(offset){
+		this.bbox.setOffsetFirst(offset);
 	};
-	Range.prototype.setOffsetLast=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
-		this.bbox.c2 += offset.offsetCol;
-		if( this.bbox.c2 < 0 )
-			this.bbox.c2 = 0;
-		this.bbox.r2 += offset.offsetRow;
-		if( this.bbox.r2 < 0 )
-			this.bbox.r2 = 0;
+	Range.prototype.setOffsetLast=function(offset){
+		this.bbox.setOffsetLast(offset);
 	};
 	Range.prototype.intersect=function(range){
 		var oBBox1 = this.bbox;
@@ -9848,7 +9827,7 @@
 						var oTempBBox = hyp.Ref.getBBox0();
 						this.worksheet.hyperlinkManager.removeElement(new RangeDataManagerElem(oTempBBox, hyp));
 						var oNewHyp = hyp.clone();
-						oNewHyp.Ref.setOffset({offsetCol: 0, offsetRow: nTo - nFrom});
+						oNewHyp.Ref.setOffset(new AscCommon.CellBase(nTo - nFrom, 0));
 						aSortedHyperlinks.push(oNewHyp);
 					}
 				}
@@ -9865,7 +9844,7 @@
 				var nFrom = cell.nRow;
 				var nTo = oSortedIndexes[nFrom];
 				if(null != nTo) {
-					cell.changeOffset({offsetCol: 0, offsetRow: nTo - nFrom}, true, true);
+					cell.changeOffset(new AscCommon.CellBase(nTo - nFrom, 0), true, true);
 					cellWithFormula.nRow = nTo;
 				}
 				ws.workbook.dependencyFormulas.addToChangedCell(cellWithFormula);
@@ -10011,7 +9990,7 @@
 	function preparePromoteFromTo(from, to) {
 		var bSuccess = true;
 		if (to.isOneCell())
-			to.setOffsetLast({offsetCol: (from.c2 - from.c1) - (to.c2 - to.c1), offsetRow: (from.r2 - from.r1) - (to.r2 - to.r1)});
+			to.setOffsetLast(new AscCommon.CellBase((from.r2 - from.r1) - (to.r2 - to.r1), (from.c2 - from.c1) - (to.c2 - to.c1)));
 
 		if(!from.isIntersect(to)) {
 			var bFromWholeCol = (0 == from.c1 && gc_nMaxCol0 == from.c2);
@@ -10251,7 +10230,7 @@
 			wb.handlers.trigger("changeWorksheetUpdate", wsTo.getId());
 		if(nLastCol != from.c2 || nLastRow != from.r2)
 		{
-			var offset = {offsetCol:nLastCol - from.c2, offsetRow:nLastRow - from.r2};
+			var offset = new AscCommon.CellBase(nLastRow - from.r2, nLastCol - from.c2);
 			toRange.setOffsetLast(offset);
 			to = toRange.getBBox0();
 			fromRange.setOffsetLast(offset);

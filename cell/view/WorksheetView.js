@@ -8740,10 +8740,8 @@
                     bWithoutFilter = true;
                 }
 
-                var offset = {
-                    offsetCol: range.bbox.c1 - tablePartRange.c1,
-                    offsetRow: range.bbox.r1 - tablePartRange.r1
-                };
+				var offset = new AscCommon.CellBase(range.bbox.r1 - tablePartRange.r1, range.bbox.c1 -
+					tablePartRange.c1);
                 var newDisplayName = this.model.workbook.dependencyFormulas.getNextTableName();
                 var props = {
                     bWithoutFilter: bWithoutFilter,
@@ -9057,7 +9055,7 @@
 			if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
 				var offsetCol  = currentObj.colSpan - 1;
 				var offsetRow = currentObj.rowSpan - 1;
-				pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
+				pastedRangeProps.offsetLast = new AscCommon.CellBase(offsetRow, offsetCol);
 				
 				mergeArr.push(new Asc.Range(range.bbox.c1, range.bbox.r1, range.bbox.c2 + offsetCol, range.bbox.r2 + offsetRow));
 				if (contentCurrentObj[0] == undefined) {
@@ -9303,7 +9301,7 @@
 						offsetRow = gc_nMaxRow0 - nRow;
 					}
 					
-					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
+					pastedRangeProps.offsetLast = new AscCommon.CellBase(offsetRow, offsetCol);
 					if(specialPasteProps.transpose)
 					{
 						mergeArr.push(new Asc.Range(
@@ -9326,7 +9324,7 @@
 			} 
 			else {
 				if (!isMerged) {
-					pastedRangeProps.offsetLast = {offsetCol: isMergedFirstCell.c2 - isMergedFirstCell.c1, offsetRow: isMergedFirstCell.r2 - isMergedFirstCell.r1};
+					pastedRangeProps.offsetLast = new AscCommon.CellBase(isMergedFirstCell.r2 - isMergedFirstCell.r1, isMergedFirstCell.c2 - isMergedFirstCell.c1);
 					mergeArr.push(new Asc.Range(isMergedFirstCell.c1, isMergedFirstCell.r1, isMergedFirstCell.c2, isMergedFirstCell.r2));
 				}
 			}
@@ -9439,7 +9437,7 @@
 				{
 					fullBorders = newVal.getBorderFull();
 				}
-				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
+				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.col > 0 && curMerge && fullBorders) {
 					//для мерженных ячеек, правая границу
 					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
 					var fullBordersEndMergeCell = endMergeCell.getBorderFull();
@@ -9656,12 +9654,12 @@
 					{
 						//для transpose необходимо брать offset перевернутого range
 						callAdress = new AscCommon.CellAddress(value2[0].sId);
-						offset = new AscCommonExcel.CRangeOffset((transposeRange.bbox.c1 - callAdress.col + 1), (transposeRange.bbox.r1 - callAdress.row + 1));
+						offset = new AscCommon.CellBase(transposeRange.bbox.r1 - callAdress.row + 1, transposeRange.bbox.c1 - callAdress.col + 1);
 					}
 					else
 					{
 						callAdress = new AscCommon.CellAddress(value2[0].sId);
-						offset = new AscCommonExcel.CRangeOffset((range.bbox.c1 - callAdress.col + 1), (range.bbox.r1 - callAdress.row + 1));
+						offset = new AscCommon.CellBase(range.bbox.r1 - callAdress.row + 1, range.bbox.c1 - callAdress.col + 1);
 					}
 					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[0].sFormula, null, t.model);
 					if (_p_.parse()) {
@@ -10421,7 +10419,7 @@
 						}
 						lockRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
 						count = arn.c2 - arn.c1 + 1;
-						if (this.model.checkShiftPivotTable(lockRange, new AscCommonExcel.CRangeOffset(count, 0))) {
+						if (this.model.checkShiftPivotTable(lockRange, new AscCommon.CellBase(0, count))) {
 							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 								c_oAscError.Level.NoCritical);
 							return;
@@ -10445,7 +10443,7 @@
 					case c_oAscInsertOptions.InsertRows:
 						lockRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 						count = arn.r2 - arn.r1 + 1;
-						if (this.model.checkShiftPivotTable(lockRange, new AscCommonExcel.CRangeOffset(0, count))) {
+						if (this.model.checkShiftPivotTable(lockRange, new AscCommon.CellBase(count, 0))) {
 							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 								c_oAscError.Level.NoCritical);
 							return;
@@ -10545,7 +10543,7 @@
 						}
 						lockRange = new asc_Range(checkRange.c1, 0, checkRange.c2, gc_nMaxRow0);
 						count = checkRange.c2 - checkRange.c1 + 1;
-						if (this.model.checkShiftPivotTable(lockRange, new AscCommonExcel.CRangeOffset(-count, 0))) {
+						if (this.model.checkShiftPivotTable(lockRange, new AscCommon.CellBase(0, -count))) {
 							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 								c_oAscError.Level.NoCritical);
 							return;
@@ -10576,7 +10574,7 @@
 						}
 						lockRange = new asc_Range(0, checkRange.r1, gc_nMaxCol0, checkRange.r2);
 						count = checkRange.r2 - checkRange.r1 + 1;
-						if (this.model.checkShiftPivotTable(lockRange, new AscCommonExcel.CRangeOffset(0, -count))) {
+						if (this.model.checkShiftPivotTable(lockRange, new AscCommon.CellBase(-count, 0))) {
 							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
 								c_oAscError.Level.NoCritical);
 							return;

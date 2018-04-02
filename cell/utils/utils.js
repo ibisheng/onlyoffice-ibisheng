@@ -243,11 +243,6 @@
 			R: 3			// Relative
 		};
 
-		function CRangeOffset(offsetCol, offsetRow) {
-			this.offsetCol = offsetCol;
-			this.offsetRow = offsetRow;
-		}
-
 		/**
 		 * Rectangle region of cells
 		 * @constructor
@@ -375,8 +370,8 @@
 		};
 
 		Range.prototype.isIntersectForShift = function(range, offset) {
-			var isHor = offset && offset.offsetCol;
-			var isDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
+			var isHor = offset && offset.col;
+			var isDelete = offset && (offset.col < 0 || offset.row < 0);
 			if (isHor) {
 				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
 					return (this.c1 < range.c1 || (!isDelete && this.c1 === range.c1 && this.c2 === range.c1)) ?
@@ -400,7 +395,7 @@
 		};
 
 		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
-			var isHor = offset && 0 != offset.offsetCol;
+			var isHor = offset && 0 != offset.col;
 			if (isHor) {
 				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
 			} else {
@@ -410,14 +405,14 @@
 
 		Range.prototype.forShift = function(bbox, offset, bUndo) {
 			var isNoDelete = true;
-			var isHor = 0 != offset.offsetCol;
-			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+			var isHor = 0 != offset.col;
+			var toDelete = offset.col < 0 || offset.row < 0;
 
 			if (isHor) {
 				if (toDelete) {
 					if (this.c1 < bbox.c1) {
 						if (this.c2 <= bbox.c2) {
-							this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+							this.setOffsetLast(new AscCommon.CellBase(0, -(this.c2 - bbox.c1 + 1)));
 						} else {
 							this.setOffsetLast(offset);
 						}
@@ -429,13 +424,13 @@
 								if (topIn && bottomIn) {
 									isNoDelete = false;
 								} else if (topIn) {
-									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+									this.setOffsetFirst(new AscCommon.CellBase(bbox.r2 - this.r1 + 1, 0));
 								} else if (bottomIn) {
-									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+									this.setOffsetLast(new AscCommon.CellBase(bbox.r1 - this.r2 - 1, 0));
 								}
 							}
 						} else {
-							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+							this.setOffsetFirst(new AscCommon.CellBase(0, bbox.c1 - this.c1));
 							this.setOffsetLast(offset);
 						}
 					} else {
@@ -452,7 +447,7 @@
 				if (toDelete) {
 					if (this.r1 < bbox.r1) {
 						if (this.r2 <= bbox.r2) {
-							this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+							this.setOffsetLast(new AscCommon.CellBase(-(this.r2 - bbox.r1 + 1), 0));
 						} else {
 							this.setOffsetLast(offset);
 						}
@@ -464,13 +459,13 @@
 								if (leftIn && rightIn) {
 									isNoDelete = false;
 								} else if (leftIn) {
-									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+									this.setOffsetFirst(new AscCommon.CellBase(0, bbox.c2 - this.c1 + 1));
 								} else if (rightIn) {
-									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+									this.setOffsetLast(new AscCommon.CellBase(0, bbox.c1 - this.c2 - 1));
 								}
 							}
 						} else {
-							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+							this.setOffsetFirst(new AscCommon.CellBase(bbox.r1 - this.r1, 0));
 							this.setOffsetLast(offset);
 						}
 					} else {
@@ -513,21 +508,21 @@
 		};
 		Range.prototype.setOffsetWithAbs = function(offset, opt_canResize, opt_circle) {
 			var temp;
-			var offsetRow = offset.offsetRow;
-			var offsetCol = offset.offsetCol;
-			//todo offset A1048576:A1 (offsetRow = 1 -> A1:A2; offsetRow = -1 -> A1048575:A1048576)
+			var row = offset.row;
+			var col = offset.col;
+			//todo offset A1048576:A1 (row = 1 -> A1:A2; row = -1 -> A1048575:A1048576)
 			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
-				//full sheet is 1:1048576 but offsetRow is valid for it
-				offsetRow = 0;
+				//full sheet is 1:1048576 but row is valid for it
+				row = 0;
 			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
-				offsetCol = 0;
+				col = 0;
 			}
 			var isAbsRow1 = this.isAbsRow(this.refType1);
 			var isAbsCol1 = this.isAbsCol(this.refType1);
 			var isAbsRow2 = this.isAbsRow(this.refType2);
 			var isAbsCol2 = this.isAbsCol(this.refType2);
 			if (!isAbsRow1) {
-				this.r1 += offsetRow;
+				this.r1 += row;
 				if (this.r1 < 0) {
 					if (opt_circle) {
 						this.r1 += gc_nMaxRow0 + 1;
@@ -548,7 +543,7 @@
 				}
 			}
 			if (!isAbsCol1) {
-				this.c1 += offsetCol;
+				this.c1 += col;
 				if (this.c1 < 0) {
 					if (opt_circle) {
 						this.c1 += gc_nMaxCol0 + 1;
@@ -569,7 +564,7 @@
 				}
 			}
 			if (!isAbsRow2) {
-				this.r2 += offsetRow;
+				this.r2 += row;
 				if (this.r2 < 0) {
 					if (opt_circle) {
 						this.r2 += gc_nMaxRow0 + 1;
@@ -590,7 +585,7 @@
 				}
 			}
 			if (!isAbsCol2) {
-				this.c2 += offsetCol;
+				this.c2 += col;
 				if (this.c2 < 0) {
 					if (opt_circle) {
 						this.c2 += gc_nMaxCol0 + 1;
@@ -634,8 +629,8 @@
 			return true;
 		};
 		Range.prototype.setOffset = function (offset) {
-			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
-				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
+			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.row != 0 ||
+				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.col != 0) {
 				return;
 			}
 			this.setOffsetFirst(offset);
@@ -643,14 +638,14 @@
 		};
 
 		Range.prototype.setOffsetFirst = function (offset) {
-			this.c1 += offset.offsetCol;
+			this.c1 += offset.col;
 			if (this.c1 < 0) {
 				this.c1 = 0;
 			}
 			if (this.c1 > gc_nMaxCol0) {
 				this.c1 = gc_nMaxCol0;
 			}
-			this.r1 += offset.offsetRow;
+			this.r1 += offset.row;
 			if (this.r1 < 0) {
 				this.r1 = 0;
 			}
@@ -660,14 +655,14 @@
 		};
 
 		Range.prototype.setOffsetLast = function (offset) {
-			this.c2 += offset.offsetCol;
+			this.c2 += offset.col;
 			if (this.c2 < 0) {
 				this.c2 = 0;
 			}
 			if (this.c2 > gc_nMaxCol0) {
 				this.c2 = gc_nMaxCol0;
 			}
-			this.r2 += offset.offsetRow;
+			this.r2 += offset.row;
 			if (this.r2 < 0) {
 				this.r2 = 0;
 			}
@@ -2459,7 +2454,6 @@
 		window["Asc"].getEndValueRange = getEndValueRange;
 
 		window["AscCommonExcel"].referenceType = referenceType;
-		window["AscCommonExcel"].CRangeOffset = CRangeOffset;
 		window["Asc"].Range = Range;
 		window["AscCommonExcel"].Range3D = Range3D;
 		window["AscCommonExcel"].SelectionRange = SelectionRange;
