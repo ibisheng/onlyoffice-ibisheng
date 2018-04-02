@@ -356,6 +356,25 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 	oHyperProps.put_Text(oHyperText.Text);
 	oHyperProps.put_InternalHyperlink(this);
 
+	var sAnchor = oHyperProps.get_Bookmark();
+
+	var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+	if (oLogicDocument && sAnchor)
+	{
+		var oBookmarksManager = oLogicDocument.GetBookmarksManager();
+		var oBookmark         = oBookmarksManager.GetBookmarkByName(sName);
+		if (oBookmarksManager.IsHiddenBookmark(sAnchor) && oBookmark)
+		{
+			oHyperProps.put_Bookmark(null);
+
+			var oPara = oBookmark[0].GetParagraph();
+			if (oBookmarksManager.GetNameForHeadingBookmark(oPara) === sAnchor)
+			{
+				oHyperProps.put_Heading(oPara);
+			}
+		}
+	}
+
 	editor.sync_HyperlinkPropCallback(oHyperProps);
 	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };

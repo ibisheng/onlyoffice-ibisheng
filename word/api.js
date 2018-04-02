@@ -5347,31 +5347,88 @@ background-repeat: no-repeat;\
 	};
 	/**
 	 * Добавляем гиперссылку
-	 * @param {CHyperlinkProperty} HyperProps
+	 * @param {CHyperlinkProperty} oHyperProps
 	 */
-	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
+	asc_docs_api.prototype.add_Hyperlink = function(oHyperProps)
 	{
-		if(null !== HyperProps.Text && undefined !== HyperProps.Text)
-		{
-			AscFonts.FontPickerByCharacter.checkText(HyperProps.Text, this, function() {
+		var sBookmarkName = this.private_CheckHeadingHyperlinkProps(oHyperProps);
 
-				if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		if (null !== oHyperProps.Text && undefined !== oHyperProps.Text)
+		{
+			AscFonts.FontPickerByCharacter.checkText(oHyperProps.Text, this,
+				function()
 				{
-					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
-					this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
+					this.private_AddHyperlink(oHyperProps, sBookmarkName);
+				});
+		}
+		else
+		{
+			this.private_AddHyperlink(oHyperProps, sBookmarkName);
+		}
+	};
+	asc_docs_api.prototype.private_CheckHeadingHyperlinkProps = function(oHyperProps)
+	{
+		var oHeading      = oHyperProps.get_Heading();
+		var sBookmarkName = null;
+
+		if (oHeading)
+		{
+			var oBookmarksManager = this.WordControl.m_oLogicDocument.GetBookmarksManager();
+			var oBookmark         = oBookmarksManager.GetBookmarkByName(sBookmarkName);
+			sBookmarkName         = oBookmarksManager.GetNameForHeadingBookmark(oHeading);
+
+			if (oBookmark && oBookmark[0].GetParagraph() === oHeading)
+			{
+				oHyperProps.put_Heading(null);
+				oHyperProps.put_Bookmark(sBookmarkName);
+				sBookmarkName = null;
+			}
+			else
+			{
+				sBookmarkName = "";
+				if (oBookmark)
+				{
+					var nCounter = 1;
+					while (oBookmarksManager.GetBookmarkByName(sBookmarkName + "_" + nCounter))
+					{
+						nCounter++;
+					}
+
+					sBookmarkName += "_" + nCounter;
 				}
 
+				oHyperProps.put_Bookmark(sBookmarkName);
+			}
+		}
+
+		return sBookmarkName;
+	};
+	asc_docs_api.prototype.private_AddHyperlink = function(oHyperProps, sBookmarkName, oParagraph)
+	{
+		var isLocked = false;
+		if (sBookmarkName)
+		{
+			isLocked = this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content, {
+				Type      : AscCommon.changestype_2_Element_and_Type,
+				Element   : oHyperProps.get_Heading(),
+				CheckType : changestype_Paragraph_Content
 			});
 		}
 		else
 		{
-			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-			{
-				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
-				this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
-			}
-
+			isLocked = this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content);
 		}
+
+		if (!isLocked)
+		{
+			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
+
+			if (sBookmarkName && oHyperProps.get_Heading())
+				oHyperProps.get_Heading().AddBookmarkAtBegin(sBookmarkName);
+
+			this.WordControl.m_oLogicDocument.AddHyperlink(oHyperProps);
+		}
+
 	};
 	/**
 	 * Изменяем гиперссылку
@@ -5382,9 +5439,44 @@ background-repeat: no-repeat;\
 		if (!oHyperProps || !oHyperProps.get_InternalHyperlink())
 			return;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		var sBookmarkName = this.private_CheckHeadingHyperlinkProps(oHyperProps);
+
+		if (null !== oHyperProps.Text && undefined !== oHyperProps.Text)
+		{
+			AscFonts.FontPickerByCharacter.checkText(oHyperProps.Text, this,
+				function()
+				{
+					this.private_ChangeHyperlink(oHyperProps, sBookmarkName);
+				});
+		}
+		else
+		{
+			this.private_ChangeHyperlink(oHyperProps, sBookmarkName);
+		}
+	};
+	asc_docs_api.prototype.private_ChangeHyperlink = function(oHyperProps, sBookmarkName)
+	{
+		var isLocked = false;
+		if (sBookmarkName)
+		{
+			isLocked = this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content, {
+				Type      : AscCommon.changestype_2_Element_and_Type,
+				Element   : oHyperProps.get_Heading(),
+				CheckType : changestype_Paragraph_Content
+			});
+		}
+		else
+		{
+			isLocked = this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content);
+		}
+
+		if (!isLocked)
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeHyperlink);
+
+			if (sBookmarkName && oHyperProps.get_Heading())
+				oHyperProps.get_Heading().AddBookmarkAtBegin(sBookmarkName);
+
 			this.WordControl.m_oLogicDocument.ModifyHyperlink(oHyperProps);
 		}
 	};

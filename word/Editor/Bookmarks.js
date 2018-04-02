@@ -400,6 +400,36 @@ CBookmarksManager.prototype.CheckNewBookmarkName = function(sName)
 
 	return (sName === XRegExp.match(sName, new XRegExp('(\\pL)(\\pL|\_|\\pN){0,39}')));
 };
+CBookmarksManager.prototype.GetNameForHeadingBookmark = function(oParagraph)
+{
+	if (!oParagraph)
+		return "";
+
+	var sText = oParagraph.GetText();
+
+	var nPos = 0;
+	while (nPos < sText.length)
+	{
+		var nChar = sText.charCodeAt(nPos);
+		if (0x0020 !== nChar && 0x0009 !== nChar)
+			break;
+	}
+
+	var sName = "";
+	for (var nIndex = nPos, nLen = Math.min(sText.length, nPos + 10); nIndex < nLen; ++nIndex)
+	{
+		var nChar = sText.charCodeAt(nPos);
+		if (0x0020 === nChar || 0x0009 === nChar)
+			sName += "_";
+		else
+			sName += sText.charAt(nPos);
+	}
+
+	if (!sName)
+		return "";
+
+	return "_" + sName;
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

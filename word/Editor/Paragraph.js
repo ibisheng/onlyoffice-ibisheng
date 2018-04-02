@@ -12392,6 +12392,10 @@ Paragraph.prototype.SetParagraphStyle = function(Name)
 	var StyleId = this.LogicDocument.Get_Styles().GetStyleIdByName(Name, true);
 	this.Style_Add(StyleId);
 };
+Paragraph.prototype.GetParagraphStyle = function()
+{
+	return this.Style_Get();
+};
 Paragraph.prototype.SetParagraphStyleById = function(sStyleId)
 {
 	this.Style_Add(sStyleId);
@@ -12733,6 +12737,24 @@ Paragraph.prototype.AddBookmarkChar = function(oBookmarkChar, isUseSelection, is
 	oParent.Add_ToContent(oRunPos + 1, oBookmarkChar);
 
 	return true;
+};
+/**
+ * Добавляем закладку привязанную к началу данного параграфа
+ * @param {string} sBookmarkName
+ */
+Paragraph.prototype.AddBookmarkAtBegin = function(sBookmarkName)
+{
+	if (!this.LogicDocument)
+		return;
+
+	var oBookmarksManager = this.LogicDocument.GetBookmarksManager();
+
+	var sId = oBookmarksManager.GetNewBookmarkId();
+
+	this.Add_ToContent(0, new CParagraphBookmark(true, sId, sBookmarkName));
+	this.Add_ToContent(1, new CParagraphBookmark(false, sId, sBookmarkName));
+
+	this.Correct_Content();
 };
 /**
  * Проверяем есть ли у нас в заданной точке сложное поле типа PAGEREF с флагом hyperlink = true
