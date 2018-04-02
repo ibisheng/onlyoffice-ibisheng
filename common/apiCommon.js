@@ -2981,7 +2981,7 @@
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
 			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
 			this.Anchor  = (undefined !== obj.Anchor) ? obj.Anchor : null;
-			this.Heading = null;
+			this.Heading = (obj.Heading ? obj.Heading : null);
 		}
 		else
 		{
