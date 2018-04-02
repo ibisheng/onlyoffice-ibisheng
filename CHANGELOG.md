@@ -1,7 +1,7 @@
 # Change log
 ## 5.1.1
 ### All Editors
-* 
+* Fix error with repeated reconnection
 
 ### Document Editor
 * 
