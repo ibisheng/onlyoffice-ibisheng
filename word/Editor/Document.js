@@ -9142,9 +9142,15 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 		var oHyperlink = oClass;
 
 		if (undefined !== sAnchor && null !== sAnchor && "" !== sAnchor)
+		{
 			oHyperlink.SetAnchor(sAnchor);
+			oHyperlink.SetValue("");
+		}
 		else if (undefined !== sValue && null !== sValue)
+		{
 			oHyperlink.SetValue(sValue);
+			oHyperlink.SetAnchor("");
+		}
 
 		if (undefined !== sToolTip && null !== sToolTip)
 			oHyperlink.SetToolTip(sToolTip);
@@ -9173,9 +9179,15 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 		if (!oComplexField || oComplexField)
 		{
 			if (undefined !== sAnchor && null !== sAnchor && "" !== sAnchor)
+			{
 				oInstruction.SetBookmarkName(sAnchor);
+				oInstruction.SetLink("");
+			}
 			else if (undefined !== sValue && null !== sValue)
+			{
 				oInstruction.SetLink(sValue);
+				oInstruction.SetBookmarkName("");
+			}
 
 			if (undefined !== sToolTip && null !== sToolTip)
 				oInstruction.SetToolTip(sToolTip);
