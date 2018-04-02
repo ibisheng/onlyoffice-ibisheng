@@ -6529,7 +6529,11 @@ function rtl_math_erfc( x ) {
 
 	function convertAreaToArray(area){
 		var retArr = new cArray(), _arg0;
-		area = area.getMatrix();
+		if(area instanceof cArea3D) {
+			area = area.getMatrix()[0];
+		} else {
+			area = area.getMatrix();
+		}
 
 		for ( var iRow = 0; iRow < area.length; iRow++, iRow < area.length ? retArr.addRow() : true ) {
 			for ( var iCol = 0; iCol < area[iRow].length; iCol++ ) {
