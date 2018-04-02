@@ -1488,9 +1488,10 @@ CChartsDrawer.prototype =
 				for (var col = 0; col < numCache.ptCount; col++) {
 					var curPoint = t.getIdxPoint(seria, col);
 
-					if (!curPoint) {
+					//условие дбавлено для того, чтобы диаграммы, данные которых имеют мин/макс и пустые ячейки, рисовались грамотно
+					if(!curPoint && (t.calcProp.subType === 'stackedPer' || t.calcProp.subType === 'stacked')) {
 						curPoint = {val: 0};
-					} else if (curPoint.isHidden === true) {
+					} else if (!curPoint || curPoint.isHidden === true) {
 						continue;
 					}
 
@@ -1524,6 +1525,14 @@ CChartsDrawer.prototype =
 					n++;
 				}
 				numSeries++;
+			}
+
+			if(min === max) {
+				if(min < 0) {
+					max = 0;
+				} else {
+					min = 0;
+				}
 			}
 		};
 
