@@ -1029,7 +1029,9 @@
 
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     this.jwtOpen = undefined;
-    this.jwtSession = jwt;
+    if (jwt) {
+      this.jwtSession = jwt;
+    }
   };
 
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
