@@ -4,6 +4,8 @@
 * 
 
 ### Document Editor
+Ability to work with bookmarks
+Ability to add/change hyperlinks anchored to bookmarks/headings
 * 
 
 ### Spreadsheet Editor
