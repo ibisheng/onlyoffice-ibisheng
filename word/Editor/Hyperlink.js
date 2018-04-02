@@ -370,6 +370,10 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 			{
 				oHyperProps.put_Heading(oPara);
 			}
+			else
+			{
+				oHyperProps.put_Bookmark(null);
+			}
 		}
 	}
 
