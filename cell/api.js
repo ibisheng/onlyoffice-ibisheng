@@ -1993,14 +1993,7 @@ var editor;
     }
 
     var d = this.wb.findCellText(options);
-    if (d) {
-      if (d.deltaX) {
-        this.controller.scrollHorizontal(d.deltaX);
-      }
-      if (d.deltaY) {
-        this.controller.scrollVertical(d.deltaY);
-      }
-    }
+    this.controller.scroll(d);
     return !!d;
   };
 
@@ -2043,12 +2036,7 @@ var editor;
 
     ws = this.wb.getWorksheet();
     d = ws.setSelection(d[0].getBBox0(), true);
-    if (d.deltaX) {
-      this.controller.scrollHorizontal(d.deltaX);
-    }
-    if (d.deltaY) {
-      this.controller.scrollVertical(d.deltaY);
-    }
+    this.controller.scroll(d);
   };
 
 	spreadsheet_api.prototype.asc_closeCellEditor = function (cancel) {
