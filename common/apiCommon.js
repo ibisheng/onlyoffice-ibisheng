@@ -2981,6 +2981,7 @@
 			this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
 			this.Class   = (undefined !== obj.Class ) ? obj.Class : null;
 			this.Anchor  = (undefined !== obj.Anchor) ? obj.Anchor : null;
+			this.Heading = (obj.Heading ? obj.Heading : null);
 		}
 		else
 		{
@@ -2989,6 +2990,7 @@
 			this.ToolTip = "";
 			this.Class   = null;
 			this.Anchor  = null;
+			this.Heading = null;
 		}
 	}
     CHyperlinkProperty.prototype.get_Value   = function()
@@ -3039,6 +3041,18 @@
 	{
 		this.Anchor = sBookmark;
 	};
+	CHyperlinkProperty.prototype.is_Heading = function()
+	{
+		return (this.Heading instanceof Paragraph ? true : false)
+	};
+	CHyperlinkProperty.prototype.put_Heading = function(oParagraph)
+	{
+		this.Heading = oParagraph;
+	};
+	CHyperlinkProperty.prototype.get_Heading = function()
+	{
+		return this.Heading;
+	};
 
 	window['Asc']['CHyperlinkProperty'] = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
 	CHyperlinkProperty.prototype['get_Value']             = CHyperlinkProperty.prototype.get_Value;
@@ -3053,6 +3067,9 @@
 	CHyperlinkProperty.prototype['put_TopOfDocument']     = CHyperlinkProperty.prototype.put_TopOfDocument;
 	CHyperlinkProperty.prototype['get_Bookmark']          = CHyperlinkProperty.prototype.get_Bookmark;
 	CHyperlinkProperty.prototype['put_Bookmark']          = CHyperlinkProperty.prototype.put_Bookmark;
+	CHyperlinkProperty.prototype['is_Heading']            = CHyperlinkProperty.prototype.is_Heading;
+	CHyperlinkProperty.prototype['put_Heading']           = CHyperlinkProperty.prototype.put_Heading;
+	CHyperlinkProperty.prototype['get_Heading']           = CHyperlinkProperty.prototype.get_Heading;
 
 
 	/** @constructor */

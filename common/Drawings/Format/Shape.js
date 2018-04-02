@@ -2806,16 +2806,17 @@ CShape.prototype.isEmptyPlaceholder = function () {
 CShape.prototype.changeSize = function (kw, kh) {
     if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
         var xfrm = this.spPr.xfrm;
-        if(this.getNoChangeAspect()){
-            var k = Math.min(kw, kh);
-            var oldXC = xfrm.offX + xfrm.extX/2.0;
-            var oldYC = xfrm.offY + xfrm.extY/2.0;
-            xfrm.setExtX(xfrm.extX * k);
-            xfrm.setExtY(xfrm.extY * k);
-            xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
-            xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
-        }
-        else{
+        // if(this.getNoChangeAspect()){
+        //     var k = Math.min(kw, kh);
+        //     var oldXC = xfrm.offX + xfrm.extX/2.0;
+        //     var oldYC = xfrm.offY + xfrm.extY/2.0;
+        //     xfrm.setExtX(xfrm.extX * k);
+        //     xfrm.setExtY(xfrm.extY * k);
+        //     xfrm.setOffX(oldXC * kw - xfrm.extX/2.0);
+        //     xfrm.setOffY(oldYC * kh - xfrm.extY/2.0);
+        // }
+        // else
+            {
 
             xfrm.setOffX(xfrm.offX * kw);
             xfrm.setOffY(xfrm.offY * kh);

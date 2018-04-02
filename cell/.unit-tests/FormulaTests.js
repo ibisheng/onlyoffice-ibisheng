@@ -33,7 +33,7 @@
 $( function () {
 
     function toFixed( n ) {
-        return n//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
+        return n;//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
     }
 
     function difBetween( a, b ) {
@@ -210,7 +210,7 @@ $( function () {
 
     function _getcoupdays( settl, matur, frequency, basis ) {
         _lcl_GetCouppcd( settl, matur, frequency );
-        var n = new Date( matur )
+        var n = new Date( matur );
         n.addMonths( 12 / frequency );
         return _diffDate( matur, n, basis );
     }
@@ -225,7 +225,7 @@ $( function () {
             d1 = n;
         }
 
-        var nRet,pOptDaysIn1stYear
+        var nRet,pOptDaysIn1stYear;
 
         var nD1 = d1.getDate(),
             nM1 = d1.getMonth(),
@@ -239,7 +239,7 @@ $( function () {
             case 0:			// 0=USA (NASD) 30/360
             case 4:			// 4=Europe 30/360
             {
-                var bLeap = d1.isLeapYear()
+                var bLeap = d1.isLeapYear();
                 var nDays, nMonths/*, nYears*/;
 
                 nMonths = nM2 - nM1;
@@ -9382,6 +9382,10 @@ $( function () {
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 1);
 
+		oParser = new parserFormula('COLUMN()+COLUMN()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 2);
+
 	});
 
 	test( "Test: \"ROW\"", function () {
@@ -9397,6 +9401,10 @@ $( function () {
 		oParser = new parserFormula('ROW()', "AA2", ws);
 		ok(oParser.parse());
 		strictEqual(oParser.calculate().getValue(), 1);
+
+		oParser = new parserFormula('ROW()+ROW()', "AA2", ws);
+		ok(oParser.parse());
+		strictEqual(oParser.calculate().getValue(), 2);
 
 	});
 

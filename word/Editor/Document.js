@@ -9133,15 +9133,24 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 {
 	var sText    = oHyperProps.get_Text(),
 		sValue   = oHyperProps.get_Value(),
-		sToolTip = oHyperProps.get_ToolTip();
+		sToolTip = oHyperProps.get_ToolTip(),
+		sAnchor  = oHyperProps.get_Bookmark();
 
 	var oClass = oHyperProps.get_InternalHyperlink();
 	if (oClass instanceof ParaHyperlink)
 	{
 		var oHyperlink = oClass;
 
-		if (undefined !== sValue && null !== sValue)
+		if (undefined !== sAnchor && null !== sAnchor && "" !== sAnchor)
+		{
+			oHyperlink.SetAnchor(sAnchor);
+			oHyperlink.SetValue("");
+		}
+		else if (undefined !== sValue && null !== sValue)
+		{
 			oHyperlink.SetValue(sValue);
+			oHyperlink.SetAnchor("");
+		}
 
 		if (undefined !== sToolTip && null !== sToolTip)
 			oHyperlink.SetToolTip(sToolTip);
@@ -9169,8 +9178,16 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 		var oComplexField = oInstruction.GetComplexField();
 		if (!oComplexField || oComplexField)
 		{
-			if (undefined !== sValue && null !== sValue)
+			if (undefined !== sAnchor && null !== sAnchor && "" !== sAnchor)
+			{
+				oInstruction.SetBookmarkName(sAnchor);
+				oInstruction.SetLink("");
+			}
+			else if (undefined !== sValue && null !== sValue)
+			{
 				oInstruction.SetLink(sValue);
+				oInstruction.SetBookmarkName("");
+			}
 
 			if (undefined !== sToolTip && null !== sToolTip)
 				oInstruction.SetToolTip(sToolTip);

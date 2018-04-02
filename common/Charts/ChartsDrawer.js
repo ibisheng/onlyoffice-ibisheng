@@ -3206,7 +3206,9 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					ptCount = numCache.ptCount;
+					if(numCache) {
+						this.calcProp.ptCount = numCache.ptCount;
+					}
 				}
 
 				counter++;

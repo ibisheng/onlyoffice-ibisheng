@@ -356,6 +356,27 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 	oHyperProps.put_Text(oHyperText.Text);
 	oHyperProps.put_InternalHyperlink(this);
 
+	var sAnchor = oHyperProps.get_Bookmark();
+
+	var oLogicDocument = this.Paragraph ? this.Paragraph.LogicDocument : null;
+	if (oLogicDocument && sAnchor)
+	{
+		var oBookmarksManager = oLogicDocument.GetBookmarksManager();
+		var oBookmark         = oBookmarksManager.GetBookmarkByName(sAnchor);
+		if (oBookmarksManager.IsHiddenBookmark(sAnchor) && oBookmark)
+		{
+			var oPara = oBookmark[0].GetParagraph();
+			if (oBookmarksManager.GetNameForHeadingBookmark(oPara) === sAnchor)
+			{
+				oHyperProps.put_Heading(oPara);
+			}
+			else
+			{
+				oHyperProps.put_Bookmark(null);
+			}
+		}
+	}
+
 	editor.sync_HyperlinkPropCallback(oHyperProps);
 	CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
@@ -420,12 +441,20 @@ CHyperlinkAnchor.prototype.GetHeadingLevel = function()
 
 	return -1;
 };
+CHyperlinkAnchor.prototype.GetHeadingParagraph = function()
+{
+	if (c_oAscHyperlinkAnchor.Heading === this.Type && this.Paragraph instanceof Paragraph)
+		return this.Paragraph;
+
+	return "";
+};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaHyperlink = ParaHyperlink;
 
-CHyperlinkAnchor.prototype['asc_GetType']         = CHyperlinkAnchor.prototype.GetType;
-CHyperlinkAnchor.prototype['asc_GetBookmarkName'] = CHyperlinkAnchor.prototype.GetBookmarkName;
-CHyperlinkAnchor.prototype['asc_GetHeadingText']  = CHyperlinkAnchor.prototype.GetHeadingText;
-CHyperlinkAnchor.prototype['asc_GetHeadingLevel'] = CHyperlinkAnchor.prototype.GetHeadingLevel;
+CHyperlinkAnchor.prototype['asc_GetType']             = CHyperlinkAnchor.prototype.GetType;
+CHyperlinkAnchor.prototype['asc_GetBookmarkName']     = CHyperlinkAnchor.prototype.GetBookmarkName;
+CHyperlinkAnchor.prototype['asc_GetHeadingText']      = CHyperlinkAnchor.prototype.GetHeadingText;
+CHyperlinkAnchor.prototype['asc_GetHeadingLevel']     = CHyperlinkAnchor.prototype.GetHeadingLevel;
+CHyperlinkAnchor.prototype['asc_GetHeadingParagraph'] = CHyperlinkAnchor.prototype.GetHeadingParagraph;
