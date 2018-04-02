@@ -5892,7 +5892,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				_numberPrevArg = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : null;
 				_count_arg = null !== _numberPrevArg ? _numberPrevArg : currentElement.argumentsCurrent;
 				_argDiff = 0;
-				if(_numberPrevArg) {
+				if(null !== _numberPrevArg) {
 					_argDiff++;
 					if(this.outStack[i - 2] && cElementType.specialFunctionEnd === this.outStack[i - 2].type) {
 						_argDiff++;
