@@ -5374,8 +5374,8 @@ background-repeat: no-repeat;\
 		if (oHeading)
 		{
 			var oBookmarksManager = this.WordControl.m_oLogicDocument.GetBookmarksManager();
-			var oBookmark         = oBookmarksManager.GetBookmarkByName(sBookmarkName);
 			sBookmarkName         = oBookmarksManager.GetNameForHeadingBookmark(oHeading);
+			var oBookmark         = oBookmarksManager.GetBookmarkByName(sBookmarkName);
 
 			if (oBookmark && oBookmark[0].GetParagraph() === oHeading)
 			{
@@ -5385,7 +5385,6 @@ background-repeat: no-repeat;\
 			}
 			else
 			{
-				sBookmarkName = "";
 				if (oBookmark)
 				{
 					var nCounter = 1;

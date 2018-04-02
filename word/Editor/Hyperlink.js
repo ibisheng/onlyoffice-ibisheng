@@ -362,7 +362,7 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 	if (oLogicDocument && sAnchor)
 	{
 		var oBookmarksManager = oLogicDocument.GetBookmarksManager();
-		var oBookmark         = oBookmarksManager.GetBookmarkByName(sName);
+		var oBookmark         = oBookmarksManager.GetBookmarkByName(sAnchor);
 		if (oBookmarksManager.IsHiddenBookmark(sAnchor) && oBookmark)
 		{
 			oHyperProps.put_Bookmark(null);

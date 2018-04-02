@@ -418,11 +418,11 @@ CBookmarksManager.prototype.GetNameForHeadingBookmark = function(oParagraph)
 	var sName = "";
 	for (var nIndex = nPos, nLen = Math.min(sText.length, nPos + 10); nIndex < nLen; ++nIndex)
 	{
-		var nChar = sText.charCodeAt(nPos);
+		var nChar = sText.charCodeAt(nIndex);
 		if (0x0020 === nChar || 0x0009 === nChar)
 			sName += "_";
 		else
-			sName += sText.charAt(nPos);
+			sName += sText.charAt(nIndex);
 	}
 
 	if (!sName)
