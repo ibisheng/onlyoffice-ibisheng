@@ -601,20 +601,20 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                         var _api = window["Asc"]["editor"];
                         if (_api.wb.MobileTouchManager)
 						{
-						    if(oOffset.deltaX < 0){
-                                --oOffset.deltaX;
+						    if(oOffset.col < 0){
+                                --oOffset.col;
                             }
-                            if(oOffset.deltaX > 0){
-						        ++oOffset.deltaX;
+                            if(oOffset.col > 0){
+						        ++oOffset.col;
                             }
 
-                            if(oOffset.deltaY < 0){
-                                --oOffset.deltaY;
+                            if(oOffset.row < 0){
+                                --oOffset.row;
                             }
-                            if(oOffset.deltaY > 0){
-                                ++oOffset.deltaY;
+                            if(oOffset.row > 0){
+                                ++oOffset.row;
                             }
-							_api.wb.MobileTouchManager.scrollBy((oOffset.deltaX) * _api.controller.settings.hscrollStep, (oOffset.deltaY)* _api.controller.settings.vscrollStep);
+							_api.wb.MobileTouchManager.scrollBy((oOffset.col) * _api.controller.settings.hscrollStep, (oOffset.row)* _api.controller.settings.vscrollStep);
 						}
                     }
                 }
