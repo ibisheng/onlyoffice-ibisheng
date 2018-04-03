@@ -6264,17 +6264,17 @@
 		return new asc_Range(c1, r1, c2, r2);
     };
 
-    WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
-        var selection = this._getSelection();
-        var ar = selection.getLast();
-        var range = this._getCellByXY(x, y);
+	WorksheetView.prototype._moveActiveCellToXY = function (x, y) {
+		var selection = this._getSelection();
+		var ar = selection.getLast();
+		var range = this._getCellByXY(x, y);
 		ar.assign(range.c1, range.r1, range.c2, range.r2);
 		selection.setCell(range.r1, range.c1);
 		if (c_oAscSelectionType.RangeCells !== ar.getType()) {
 			this._fixSelectionOfHiddenCells();
-        }
+		}
 		this._fixSelectionOfMergedCells();
-    };
+	};
 
     WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
         var selection = this._getSelection();
