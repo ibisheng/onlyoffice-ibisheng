@@ -2866,7 +2866,7 @@ function asc_WriteFormatTableInfo(i, c, s) {
     s['WriteByte'](255);
 }
 
-function asc_WriteCCelInfo(c, s) {
+function asc_WriteCCellInfo(c, s) {
     if (!c) return;
 
     if (null !== c.asc_getName()) {
@@ -2886,12 +2886,12 @@ function asc_WriteCCelInfo(c, s) {
 
     if (null !== c.asc_getHorAlign()) {
         s['WriteByte'](3);
-        s['WriteString2'](c.asc_getHorAlign());
+        s['WriteLong'](c.asc_getHorAlign());
     }
 
     if (null !== c.asc_getVertAlign()) {
         s['WriteByte'](4);
-        s['WriteString2'](c.asc_getVertAlign());
+        s['WriteLong'](c.asc_getVertAlign());
     }
 
     if (null !== c.asc_getFlags()) {
@@ -4231,7 +4231,7 @@ function OfflineEditor () {
         _api.asc_registerCallback("asc_onSelectionChanged", function(cellInfo) {
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
-            asc_WriteCCelInfo(cellInfo, stream);
+            asc_WriteCCellInfo(cellInfo, stream);
             window["native"]["OnCallMenuEvent"](2402, stream); // ASC_SPREADSHEETS_EVENT_TYPE_SELECTION_CHANGED
             t.onSelectionChanged(cellInfo);
         });
