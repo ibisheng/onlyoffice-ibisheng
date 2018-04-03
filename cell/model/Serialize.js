@@ -2834,7 +2834,7 @@
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(oCol.BestFit);
             }
-            if(null != oCol.hd)
+            if(oCol.hd)
             {
                 this.memory.WriteByte(c_oSerWorksheetColTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
