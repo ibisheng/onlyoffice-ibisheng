@@ -4024,10 +4024,6 @@ CChartsDrawer.prototype =
 			return;
 		}
 
-		var minorLinesCount = isCatAxis ? 2 : 5;
-
-		var stepY = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top) / (this.calcProp.numhlines);
-		var minorStep = stepY / minorLinesCount;
 		var widthLine = this.calcProp.widthCanvas - (this.calcProp.chartGutter._left + this.calcProp.chartGutter._right);
 		var bottomMargin = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom;
 		var posX = this.calcProp.chartGutter._left;
@@ -4086,6 +4082,10 @@ CChartsDrawer.prototype =
 			}
 			gridLines[i] = pathId;
 		};
+
+		var minorLinesCount = isCatAxis ? 2 : 5;
+		var stepY = points[1] ? Math.abs(points[1].pos - points[0].pos) : Math.abs(points[0].pos - axis.posY) * 2;
+		var minorStep = (stepY / minorLinesCount) * this.calcProp.pxToMM;
 
 		for (var i = 0; i < points.length; i++) {
 			if(this.calcProp.type === c_oChartTypes.Radar) {
