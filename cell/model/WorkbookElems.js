@@ -101,14 +101,14 @@ function shiftSort(a, b, offset)
 	}
 	else
 	{
-	    if (0 != offset.offsetRow) {
-	        if (offset.offsetRow > 0)
+	    if (0 != offset.row) {
+	        if (offset.row > 0)
 	            nRes = b.to.r1 - a.to.r1;
 	        else
 	            nRes = a.to.r1 - b.to.r1;
 	    }
-	    if (0 == nRes && 0 != offset.offsetCol) {
-	        if (offset.offsetCol > 0)
+	    if (0 == nRes && 0 != offset.col) {
+	        if (offset.col > 0)
 	            nRes = b.to.c1 - a.to.c1;
 	        else
 	            nRes = a.to.c1 - b.to.c1;
@@ -3106,12 +3106,12 @@ Hyperlink.prototype = {
 	},
 	applyCollaborative : function (nSheetId, collaborativeEditing) {
 		var bbox = this.Ref.getBBox0();
-		var OffsetFirst = {offsetCol:0, offsetRow:0};
-		var OffsetLast = {offsetCol:0, offsetRow:0};
-		OffsetFirst.offsetRow = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r1) - bbox.r1;
-		OffsetFirst.offsetCol = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c1) - bbox.c1;
-		OffsetLast.offsetRow = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r2) - bbox.r2;
-		OffsetLast.offsetCol = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c2) - bbox.c2;
+		var OffsetFirst = new AscCommon.CellBase(0, 0);
+		var OffsetLast = new AscCommon.CellBase(0, 0);
+		OffsetFirst.row = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r1) - bbox.r1;
+		OffsetFirst.col = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c1) - bbox.c1;
+		OffsetLast.row = collaborativeEditing.getLockMeRow2(nSheetId, bbox.r2) - bbox.r2;
+		OffsetLast.col = collaborativeEditing.getLockMeColumn2(nSheetId, bbox.c2) - bbox.c2;
 		this.Ref.setOffsetFirst(OffsetFirst);
 		this.Ref.setOffsetLast(OffsetLast);
 	}
@@ -4455,25 +4455,25 @@ RangeDataManager.prototype = {
 	        oGetRes = this.shiftGet(bbox, bHor);
 	    var offset;
 	    if (bHor)
-	        offset = { offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 };
+	        offset = new AscCommon.CellBase(0, bbox.c2 - bbox.c1 + 1);
 	    else
-	        offset = { offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 };
+	        offset = new AscCommon.CellBase(bbox.r2 - bbox.r1 + 1, 0);
 	    if (!bAdd) {
-	        offset.offsetRow = -offset.offsetRow;
-	        offset.offsetCol = -offset.offsetCol;
+	        offset.row *= -1;
+	        offset.col *= -1;
 	    }
 	    this._shiftmove(true, bbox, offset, oGetRes.elems, oChangeParam);
 	},
 	move: function (from, to, oChangeParam)
 	{
-	    var offset = { offsetRow: to.r1 - from.r1, offsetCol: to.c1 - from.c1 };
+	    var offset = new AscCommon.CellBase(to.r1 - from.r1, to.c1 - from.c1);
 	    var oGetRes = this.get(from);
 	    this._shiftmove(false, from, offset, oGetRes, oChangeParam);
 	},
 	_shiftmove: function (bShift, bbox, offset, elems, oChangeParam) {
 	    var aToChange = [];
-	    var bAdd = offset.offsetRow > 0 || offset.offsetCol > 0;
-	    var bHor = 0 != offset.offsetCol ? true : false;
+	    var bAdd = offset.row > 0 || offset.col > 0;
+	    var bHor = 0 != offset.col ? true : false;
 	    //сдвигаем inner
 	    if (elems.inner.length > 0) {
 	        var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
@@ -4490,11 +4490,11 @@ RangeDataManager.prototype = {
 	                    to = from.clone();
 	                    if (bHor) {
 	                        if (to.c1 <= bbox.c2)
-	                            to.setOffsetFirst({ offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1 });
+	                            to.setOffsetFirst(new AscCommon.CellBase(0,  bbox.c2 - to.c1 + 1));
 	                    }
 	                    else {
 	                        if (to.r1 <= bbox.r2)
-	                            to.setOffsetFirst({ offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0 });
+	                            to.setOffsetFirst(new AscCommon.CellBase(bbox.r2 - to.r1 + 1, 0));
 	                    }
 	                    to.setOffset(offset);
 	                }
@@ -4517,13 +4517,13 @@ RangeDataManager.prototype = {
 	                    if (from.c1 < bbox.c1 && bbox.r1 <= from.r1 && from.r2 <= bbox.r2) {
 	                        if (bAdd) {
 	                            to = from.clone();
-	                            to.setOffsetLast({ offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 });
+	                            to.setOffsetLast(new AscCommon.CellBase(0, bbox.c2 - bbox.c1 + 1));
 	                        }
 	                        else {
 	                            to = from.clone();
 	                            var nTemp1 = from.c2 - bbox.c1 + 1;
 	                            var nTemp2 = bbox.c2 - bbox.c1 + 1;
-	                            to.setOffsetLast({ offsetRow: 0, offsetCol: -Math.min(nTemp1, nTemp2) });
+	                            to.setOffsetLast(new AscCommon.CellBase(0, -Math.min(nTemp1, nTemp2)));
 	                        }
 	                    }
 	                }
@@ -4531,13 +4531,13 @@ RangeDataManager.prototype = {
 	                    if (from.r1 < bbox.r1 && bbox.c1 <= from.c1 && from.c2 <= bbox.c2) {
 	                        if (bAdd) {
 	                            to = from.clone();
-	                            to.setOffsetLast({ offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 });
+	                            to.setOffsetLast(new AscCommon.CellBase(bbox.r2 - bbox.r1 + 1, 0));
 	                        }
 	                        else {
 	                            to = from.clone();
 	                            var nTemp1 = from.r2 - bbox.r1 + 1;
 	                            var nTemp2 = bbox.r2 - bbox.r1 + 1;
-	                            to.setOffsetLast({ offsetRow: -Math.min(nTemp1, nTemp2), offsetCol: 0 });
+	                            to.setOffsetLast(new AscCommon.CellBase(-Math.min(nTemp1, nTemp2), 0));
 	                        }
 	                    }
 	                }
@@ -5297,7 +5297,7 @@ RangeDataManager.prototype = {
 	};
 	TablePart.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		this.Ref = ref;
 		//event
@@ -5312,10 +5312,11 @@ RangeDataManager.prototype = {
 	};
 	TablePart.prototype.changeRef = function (col, row, bIsFirst, bIsNotChangeAutoFilter) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -5744,7 +5745,7 @@ RangeDataManager.prototype = {
 	};
 	AutoFilter.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		if (this.SortState) {
 			this.SortState.moveRef(col, row);
@@ -5754,10 +5755,11 @@ RangeDataManager.prototype = {
 	};
 	AutoFilter.prototype.changeRef = function (col, row, bIsFirst) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -6074,7 +6076,7 @@ RangeDataManager.prototype = {
 
 	SortState.prototype.moveRef = function (col, row) {
 		var ref = this.Ref.clone();
-		ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+		ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 
 		this.Ref = ref;
 
@@ -6087,10 +6089,11 @@ RangeDataManager.prototype = {
 
 	SortState.prototype.changeRef = function (col, row, bIsFirst) {
 		var ref = this.Ref.clone();
+		var offset = new AscCommon.CellBase(row || 0, col || 0);
 		if (bIsFirst) {
-			ref.setOffsetFirst({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetFirst(offset);
 		} else {
-			ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+			ref.setOffsetLast(offset);
 		}
 
 		this.Ref = ref;
@@ -7441,7 +7444,7 @@ SortCondition.prototype.clone = function() {
 };
 SortCondition.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
-	ref.setOffset({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
+	ref.setOffset(new AscCommon.CellBase(row || 0, col || 0));
 	
 	this.Ref = ref;
 };
@@ -7471,7 +7474,7 @@ SortCondition.prototype.changeColumns = function(activeRange, isDelete) {
 	
 	if(null !== offsetCol)
 	{
-		ref.setOffset({offsetCol: offsetCol, offsetRow: 0});
+		ref.setOffset(new AscCommon.CellBase(0, offsetCol));
 		this.Ref = ref;
 	}
 	

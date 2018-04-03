@@ -2935,14 +2935,14 @@ CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
 	var res;
 	this.rowGrandTotals = newVal;
 	if (this.rowFields && (res = this.changeGrandTotals(this.rowItems, newVal))) {
-		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(0, res));
+		this.getRange().setOffsetLast(new AscCommon.CellBase(res, 0));
 	}
 };
 CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 	var res;
 	this.colGrandTotals = newVal;
 	if (this.colFields && (res = this.changeGrandTotals(this.colItems, newVal))) {
-		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(res, 0));
+		this.getRange().setOffsetLast(new AscCommon.CellBase(0, res));
 	}
 };
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
@@ -4590,11 +4590,11 @@ CT_Location.prototype.setPageCount = function (row, col) {
 	if (this.ref) {
 		this.refWithPage = this.ref.clone();
 		if (this.rowPageCount) {
-			this.refWithPage.setOffsetFirst(new AscCommonExcel.CRangeOffset(0, - (this.rowPageCount + 1)));
+			this.refWithPage.setOffsetFirst(new AscCommon.CellBase(- (this.rowPageCount + 1), 0));
 		}
 		c2 = this.colPageCount * 3 - 1 - 1;
 		if (c2 > this.refWithPage.c2) {
-			this.refWithPage.setOffsetLast(new AscCommonExcel.CRangeOffset(c2 - this.refWithPage.c2, 0));
+			this.refWithPage.setOffsetLast(new AscCommon.CellBase(0, c2 - this.refWithPage.c2));
 		}
 	}
 };

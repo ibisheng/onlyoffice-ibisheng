@@ -250,12 +250,12 @@
 		};
 
 		/**
-		 * @param delta {{deltaX: number, deltaY: number}}
+		 * @param {AscCommon.CellBase} delta
 		 */
 		asc_CEventsController.prototype.scroll = function (delta) {
 			if (delta) {
-				if (delta.deltaX) {this.scrollHorizontal(delta.deltaX);}
-				if (delta.deltaY) {this.scrollVertical(delta.deltaY);}
+				if (delta.col) {this.scrollHorizontal(delta.col);}
+				if (delta.row) {this.scrollVertical(delta.row);}
 			}
 		};
 

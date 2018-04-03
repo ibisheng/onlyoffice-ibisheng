@@ -3934,8 +3934,8 @@ function (window, undefined) {
 						val = checkTypeCell(cell);
 					});
 
-					offset.offsetCol *= -1;
-					offset.offsetRow *= -1;
+					offset.col *= -1;
+					offset.row *= -1;
 					r2.setOffset(offset);
 
 					if (cElementType.number === val.type) {

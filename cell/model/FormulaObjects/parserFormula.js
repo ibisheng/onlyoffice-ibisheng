@@ -1756,7 +1756,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var bbox = arguments[1];
 		if (bbox) {
 			//offset - to support relative references in def names
-			offset = {offsetRow: bbox.r1, offsetCol: bbox.c1};
+			offset = new AscCommon.CellBase(bbox.r1, bbox.c1);
 		}
 		return defName.parsedRef.calculate(this, bbox, offset);
 	};
@@ -5527,14 +5527,14 @@ parserFormula.prototype.setFormula = function(formula) {
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
-	parserFormula.prototype.changeOffset = function (offset, canResize) {//offset = AscCommonExcel.CRangeOffset
+	parserFormula.prototype.changeOffset = function (offset, canResize) {//offset = AscCommon.CellBase
 		for (var i = 0; i < this.outStack.length; i++) {
 			this.changeOffsetElem(this.outStack[i], this.outStack, i, offset, canResize);
 		}
 		return this;
 	};
 	parserFormula.prototype.changeOffsetElem = function(elem, container, index, offset, canResize) {//offset =
-		// AscCommonExcel.CRangeOffset
+		// AscCommon.CellBase
 		var range, bbox = null, ws, isErr = false;
 		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
 			cElementType.cellsRange === elem.type) {
@@ -5710,13 +5710,13 @@ parserFormula.prototype.setFormula = function(formula) {
 								var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
 								var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
 								if (ltIn && rtIn && bbox.r1 != _cellsBbox.r1) {
-									_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
+									_cellsBbox.setOffsetFirst(new AscCommon.CellBase(bbox.r2 - _cellsBbox.r1 + 1, 0));
 								} else if (rtIn && rbIn && bbox.c2 != _cellsBbox.c2) {
-									_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
+									_cellsBbox.setOffsetLast(new AscCommon.CellBase(0, bbox.c1 - _cellsBbox.c2 - 1));
 								} else if (rbIn && lbIn && bbox.r2 != _cellsBbox.r2) {
-									_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
+									_cellsBbox.setOffsetLast(new AscCommon.CellBase(bbox.r1 - _cellsBbox.r2 - 1, 0));
 								} else if (lbIn && ltIn && bbox.c1 != _cellsBbox.c1) {
-									_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
+									_cellsBbox.setOffsetFirst(new AscCommon.CellBase(0, bbox.c2 - _cellsBbox.c1 + 1));
 								}
 							}
 						}
@@ -5964,8 +5964,8 @@ parserFormula.prototype.setFormula = function(formula) {
 					//extend table formula with header/total. This allows us not to follow their change,
 					//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
 					bbox = bbox.clone();
-					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
-					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+					bbox.setOffsetFirst(new AscCommon.CellBase(-1, 0));
+					bbox.setOffsetLast(new AscCommon.CellBase(1, 0));
 				}
 				if (isDefName) {
 					bboxes = this.extendBBoxCF(isDefName, bbox);
@@ -5988,8 +5988,8 @@ parserFormula.prototype.setFormula = function(formula) {
 							//extend table formula with header/total. This allows us not to follow their change,
 							//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
 							bbox = bbox.clone();
-							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
-							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+							bbox.setOffsetFirst(new AscCommon.CellBase(-1, 0));
+							bbox.setOffsetLast(new AscCommon.CellBase(1, 0));
 						}
 						if (isDefName) {
 							bboxes = this.extendBBoxCF(isDefName, bbox);
@@ -6037,8 +6037,8 @@ parserFormula.prototype.setFormula = function(formula) {
 				bbox = ref.getRange().getBBox0();
 				if(isTable){
 					bbox = bbox.clone();
-					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
-					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+					bbox.setOffsetFirst(new AscCommon.CellBase(-1, 0));
+					bbox.setOffsetLast(new AscCommon.CellBase(1, 0));
 				}
 				if (isDefName) {
 					bboxes = this.extendBBoxCF(isDefName, bbox);
@@ -6058,8 +6058,8 @@ parserFormula.prototype.setFormula = function(formula) {
 						bbox = range.getBBox0();
 						if(isTable){
 							bbox = bbox.clone();
-							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
-							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+							bbox.setOffsetFirst(new AscCommon.CellBase(-1, 0));
+							bbox.setOffsetLast(new AscCommon.CellBase(1, 0));
 						}
 						if (isDefName) {
 							bboxes = this.extendBBoxCF(isDefName, bbox);
@@ -6098,12 +6098,10 @@ parserFormula.prototype.setFormula = function(formula) {
 			var colLT = bboxCf ? bboxCf.c1 : 0;
 			for (var i = 0; i < ranges.length; ++i) {
 				var range = ranges[i];
-				var offsetLT = {offsetRow: range.r1 - rowLT, offsetCol: range.c1 - colLT};
 				var newBBoxLT = bbox.clone();
-				newBBoxLT.setOffsetWithAbs(offsetLT, false, true);
+				newBBoxLT.setOffsetWithAbs(new AscCommon.CellBase(range.r1 - rowLT, range.c1 - colLT), false, true);
 				var newBBoxRB = newBBoxLT.clone();
-				var offsetRB = {offsetRow: range.r2 - range.r1, offsetCol: range.c2 - range.c1};
-				newBBoxRB.setOffsetWithAbs(offsetRB, false, true);
+				newBBoxRB.setOffsetWithAbs(new AscCommon.CellBase(range.r2 - range.r1, range.c2 - range.c1), false, true);
 				var newBBox = new Asc.Range(newBBoxLT.c1, newBBoxLT.r1, newBBoxRB.c2, newBBoxRB.r2);
 				//todo more accurately threshold maxRow/maxCol
 				if (!(bbox.r1 <= newBBoxLT.r1 && newBBoxLT.r1 <= newBBoxLT.r2 &&

@@ -4639,7 +4639,7 @@
 				{
 					var diffCol = arnTo.c1 - arnFrom.c1;
 					var diffRow = arnTo.r1 - arnFrom.r1;
-					var offset = {offsetCol: diffCol, offsetRow: diffRow};
+					var offset = new AscCommon.CellBase(diffRow, diffCol);
 					var newRange, ref, bWithoutFilter;
 					
 					for(var i = 0; i < findFilters.length; i++)
