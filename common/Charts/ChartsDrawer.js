@@ -808,6 +808,7 @@ CChartsDrawer.prototype =
 			} else if (horizontalAxis instanceof AscFormat.CCatAx && verticalAxis && !isNaN(verticalAxis.posX)) {
 				diffPoints = horizontalAxis.xPoints[1] ? Math.abs(horizontalAxis.xPoints[1].pos - horizontalAxis.xPoints[0].pos) : Math.abs(horizontalAxis.xPoints[0].pos - verticalAxis.posX) * 2;
 
+				curBetween = 0;
 				if (horizontalAxis.scaling.orientation === ORIENTATION_MIN_MAX) {
 					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 						curBetween = diffPoints / 2;
@@ -839,6 +840,7 @@ CChartsDrawer.prototype =
 
 				diffPoints = verticalAxis.yPoints[1] ? Math.abs(verticalAxis.yPoints[1].pos - verticalAxis.yPoints[0].pos) : Math.abs(verticalAxis.yPoints[0].pos - horizontalAxis.posY) * 2;
 
+				curBetween = 0;
 				if (verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX) {
 					if (crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 						curBetween = diffPoints / 2;
