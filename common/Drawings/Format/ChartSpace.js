@@ -13531,7 +13531,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				item.numFormatStr = cell.getNumFormatStr();
 				item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 				item.val = cell.getValue();
-				item.isHidden = ws.getColHidden || ws.getRowHidden(r1);
+				item.isHidden = ws.getColHidden(col) || ws.getRowHidden(r1);
 				cache.push(item);
 			}
 		}
