@@ -6954,6 +6954,15 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
+
+    addComment: function(comment){
+        if(AscCommon.isRealObject(this.comments))
+        {
+            this.comments.addComment(comment);
+        }
+    },
+
+
     AddComment : function(CommentData, bAll)
     {
         var oSlideComments = bAll ? this.comments : (this.Slides[this.CurPage] ? this.Slides[this.CurPage].slideComments : null);
