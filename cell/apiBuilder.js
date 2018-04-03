@@ -861,6 +861,39 @@
 	});
 
 	/**
+	 * Get count rows or columns
+	 * @memberof ApiRange
+	 * @returns {Number}
+	 */
+	ApiRange.prototype.GetCount = function () {
+		var range = this.range.bbox;
+		var	count;
+		switch (range.getType()) {
+			case 1:
+				count = (range.c2 - range.c1 + 1) * (range.r2 - range.r1 +1);
+				break;
+
+			case 2:		
+				count = range.c2 - range.c1 + 1;				
+				break;
+
+			case 3:
+				count = range.r2 - range.r1 + 1;				
+				break;
+
+			case 4:
+				count = range.r2 * range.c2;				
+				break;
+		}
+		return count;
+	};
+	Object.defineProperty(ApiRange.prototype, "Count", {
+		get: function () {
+			return this.GetCount();
+		}
+	});
+
+	/**
 	 * Set cell value
 	 * @memberof ApiRange
 	 * @returns {string}
