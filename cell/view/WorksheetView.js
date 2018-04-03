@@ -7111,65 +7111,65 @@
         return oRes;
     };
 
-    WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isCtrl) {
-        this.cleanSelection();
+	WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isCtrl) {
+		this.cleanSelection();
 
-        if (!this.isFormulaEditMode) {
+		if (!this.isFormulaEditMode) {
 			this.cleanFormulaRanges();
-            if (isCtrl) {
-                this.model.selectionRange.addRange();
-            } else {
-                this.model.selectionRange.clean();
-            }
-        }
-        var ar = this._getSelection().getLast().clone();
-        var ret = {};
-        var isChangeSelectionShape = false;
+			if (isCtrl) {
+				this.model.selectionRange.addRange();
+			} else {
+				this.model.selectionRange.clean();
+			}
+		}
+		var ar = this._getSelection().getLast().clone();
+		var ret = {};
+		var isChangeSelectionShape = false;
 
 		var comment;
-        if (isCoord) {
+		if (isCoord) {
 			comment = this.cellCommentator.getCommentByXY(x, y);
-            // move active range to coordinates x,y
-            this._moveActiveCellToXY(x, y);
-            isChangeSelectionShape = this._endSelectionShape();
-        } else {
+			// move active range to coordinates x,y
+			this._moveActiveCellToXY(x, y);
+			isChangeSelectionShape = this._endSelectionShape();
+		} else {
 			comment = this.cellCommentator.getComment(x, y);
-            // move active range to offset x,y
-            this._moveActiveCellToOffset(x, y);
-                ret = this._calcActiveRangeOffset();
-            }
+			// move active range to offset x,y
+			this._moveActiveCellToOffset(x, y);
+			ret = this._calcActiveRangeOffset();
+		}
 
 		if (!comment) {
 			this.cellCommentator.resetLastSelectedId();
 		}
 
-        if (this.isSelectionDialogMode) {
-            if (!this.model.selectionRange.isEqual(ar)) {
-                // Смена диапазона
-                this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
-            }
-        } else if (!this.isCellEditMode) {
-            if (isChangeSelectionShape || !this.model.selectionRange.isEqual(ar)) {
-                this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-                if (!isCoord) {
-                    this.handlers.trigger("selectionChanged");
-                    this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
-                }
-            }
-        }
+		if (this.isSelectionDialogMode) {
+			if (!this.model.selectionRange.isEqual(ar)) {
+				// Смена диапазона
+				this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
+			}
+		} else if (!this.isCellEditMode) {
+			if (isChangeSelectionShape || !this.model.selectionRange.isEqual(ar)) {
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				if (!isCoord) {
+					this.handlers.trigger("selectionChanged");
+					this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				}
+			}
+		}
 
-        if (!isChangeSelectionShape) {
-            if (!isCoord) {
-                this.updateSelectionWithSparklines();
-            } else {
-            this._drawSelection();
-        }
-        }
+		if (!isChangeSelectionShape) {
+			if (!isCoord) {
+				this.updateSelectionWithSparklines();
+			} else {
+				this._drawSelection();
+			}
+		}
 
-        //ToDo this.drawDepCells();
+		//ToDo this.drawDepCells();
 
-        return ret;
-    };
+		return ret;
+	};
 
     // Смена селекта по нажатию правой кнопки мыши
     WorksheetView.prototype.changeSelectionStartPointRightClick = function (x, y) {
