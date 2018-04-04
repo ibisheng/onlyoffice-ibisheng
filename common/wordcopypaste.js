@@ -7275,7 +7275,13 @@ PasteProcessor.prototype =
 
                         nCurSum += dWidth;
                         if(null == oRowSums[nCurColWidth + nColSpan])
-                            oRowSums[nCurColWidth + nColSpan] = nCurSum;
+						{
+							oRowSums[nCurColWidth + nColSpan] = nCurSum;
+						}
+						else if(null != oRowSums[nCurColWidth + nColSpan - 1] && oRowSums[nCurColWidth + nColSpan - 1] >= oRowSums[nCurColWidth + nColSpan])
+						{
+							oRowSums[nCurColWidth + nColSpan] += nCurSum;
+						}
                         nCurColWidth += nColSpan;
                     }
                 }
