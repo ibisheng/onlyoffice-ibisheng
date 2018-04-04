@@ -9,8 +9,9 @@ Ability to add/change hyperlinks anchored to bookmarks/headings
 * 
 
 ### Spreadsheet Editor
-* The following functions are added: GetRows, GetCols, GetCount
-* The following properties are added: Rows, Cols, Count
+* The following functions are added: GetRows, GetCols, GetCount, GetHidden, SetHidden
+* The following properties are added: Rows, Cols, Count, Hidden
+* Fix change active cell in selection across merge. Previously, passing through the first cell of the merge range, we fell into the merge range, even if it was not selected (through the selection of a row / column)
 
 ### Presentation Editor
 * 

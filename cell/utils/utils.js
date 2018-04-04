@@ -1020,7 +1020,7 @@
 			return result;
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
-			var done, curRange, mc;
+			var done, curRange, mc, incompleate;
 			// Check one cell
 			if (1 === this.ranges.length) {
 				curRange = this.ranges[this.activeCellId];
@@ -1084,20 +1084,21 @@
 				mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
 
 				if (mc) {
-					if (dc > 0 && (this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
+					incompleate = !curRange.containsRange(mc);
+					if (dc > 0 && (incompleate || this.activeCell.col > mc.c1 || this.activeCell.row !== mc.r1)) {
 						// Движение слева направо
 						this.activeCell.col = mc.c2 + 1;
 						done = false;
-					} else if (dc < 0 && (this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
+					} else if (dc < 0 && (incompleate || this.activeCell.col < mc.c2 || this.activeCell.row !== mc.r1)) {
 						// Движение справа налево
 						this.activeCell.col = mc.c1 - 1;
 						done = false;
 					}
-					if (dr > 0 && (this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
+					if (dr > 0 && (incompleate || this.activeCell.row > mc.r1 || this.activeCell.col !== mc.c1)) {
 						// Движение сверху вниз
 						this.activeCell.row = mc.r2 + 1;
 						done = false;
-					} else if (dr < 0 && (this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
+					} else if (dr < 0 && (incompleate || this.activeCell.row < mc.r2 || this.activeCell.col !== mc.c1)) {
 						// Движение снизу вверх
 						this.activeCell.row = mc.r1 - 1;
 						done = false;
@@ -1122,7 +1123,7 @@
 
 				break;
 			}
-			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col)
+			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col);
 		};
 		SelectionRange.prototype.setCell = function (r, c) {
 			this.activeCell.row = r;

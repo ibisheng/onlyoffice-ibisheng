@@ -3384,7 +3384,7 @@ Col.prototype =
 		this.hd = val;
 	},
 	getHidden: function() {
-		return this.hd;
+		return true === this.hd;
 	},
 	setIndex: function(val) {
 		this.index = val;

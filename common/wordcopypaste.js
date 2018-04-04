@@ -5826,11 +5826,11 @@ PasteProcessor.prototype =
             if(Node.TEXT_NODE === nodeType)
             {
                 var computedStyle = this._getComputedStyle(node.parentNode);
-                if ( computedStyle )
-                {
-                    var fontFamily = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
-                    this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
-                }
+				var fontFamily = CheckDefaultFontFamily(this._getStyle(node.parentNode, computedStyle, "font-family"), this.apiEditor);
+				if(fontFamily)
+				{
+					this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
+				}
             }
             else
             {
@@ -5891,9 +5891,51 @@ PasteProcessor.prototype =
 		if(null != node && Node.ELEMENT_NODE === node.nodeType)
 		{
 			var defaultView = node.ownerDocument.defaultView;
-            computedStyle = defaultView.getComputedStyle( node, null );
+			computedStyle = defaultView.getComputedStyle( node, null );
 		}
 		return computedStyle;
+	},
+	_getStyle : function(node, computedStyle, styleProp){
+		var getStyle = function() {
+			var style = null;
+			if(computedStyle) {
+				style = computedStyle.getPropertyValue(styleProp);
+			}
+			if(!style) {
+				if(node && node.currentStyle) {
+					style = node.currentStyle[styleProp];
+				}
+			}
+
+			return style;
+		};
+
+		var res = getStyle();
+		var sNodeName = node.nodeName.toLowerCase();
+		if(!res) {
+			switch(styleProp)
+			{
+				case "font-family":
+				{
+					res = node.fontFamily;
+					break;
+				}
+				case "background-color":
+				{
+					res = node.style.backgroundColor;
+					if("td" === sNodeName && !res) {
+						res = node.bgColor;
+					}
+					break;
+				}
+				case "font-weight":
+				{
+					res = node.style.fontWeight;
+				}
+			}
+		}
+
+		return res;
 	},
     _ValueToMm : function(value)
     {
@@ -6134,7 +6176,7 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if (computedStyle)
         {
-			var font_family = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
+			var font_family = CheckDefaultFontFamily(this._getStyle(node, computedStyle, "font-family" ), this.apiEditor);
 			if(font_family && "" != font_family)
 			{
 				var oFontItem = this.oFonts[font_family];
@@ -6149,7 +6191,7 @@ PasteProcessor.prototype =
 
 			var font_size = node.style ? node.style.fontSize : null;
 			if(!font_size)
-				font_size = computedStyle.getPropertyValue( "font-size" );
+				font_size = this._getStyle(node, computedStyle, "font-size" );
 			font_size = CheckDefaultFontSize(font_size, this.apiEditor);
 			if(font_size && Para.TextPr && Para.TextPr.Value)
 			{
@@ -6175,7 +6217,7 @@ PasteProcessor.prototype =
 			
 			//Ind
             var Ind = new CParaInd();
-            var margin_left = computedStyle.getPropertyValue( "margin-left" );
+            var margin_left = this._getStyle(node, computedStyle, "margin-left" );
 			
 			//TODO перепроверить правку с pageColumn
 			var curContent = this.oLogicDocument.Content[this.oLogicDocument.CurPos.ContentPos];
@@ -6189,7 +6231,7 @@ PasteProcessor.prototype =
 					Ind.Left = margin_left;
 				}
 			}
-            var margin_right = computedStyle.getPropertyValue( "margin-right" );
+            var margin_right = this._getStyle(node, computedStyle, "margin-right" );
             if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
 			{
 				if(!pageColumn || (pageColumn && pageColumn.XLimit - margin_right > pageColumn.X))
@@ -6211,7 +6253,7 @@ PasteProcessor.prototype =
                 if(dif < 30)
                     Ind.Right = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - 30;
             }
-            var text_indent = computedStyle.getPropertyValue( "text-indent" );
+            var text_indent = this._getStyle(node, computedStyle, "text-indent");
             if(text_indent && null != (text_indent = this._ValueToMm(text_indent)))
                 Ind.FirstLine = text_indent;
             // if(null != pPr.Ind.FirstLine && true == this.bUseScaleKoef)
@@ -6219,7 +6261,7 @@ PasteProcessor.prototype =
             if(false === this._isEmptyProperty(Ind) && !pNoHtmlPr['mso-list'])
                 Para.Set_Ind(Ind);
             //Jc
-            var text_align = computedStyle.getPropertyValue( "text-align" );
+            var text_align = this._getStyle(node, computedStyle, "text-align")
             if(text_align)
             {
 				//Может приходить -webkit-right
@@ -6235,15 +6277,15 @@ PasteProcessor.prototype =
             }
             //Spacing
 			var Spacing = new CParaSpacing();
-            var margin_top = computedStyle.getPropertyValue( "margin-top" );
+            var margin_top = this._getStyle(node, computedStyle, "margin-top");
             if(margin_top && null != (margin_top = this._ValueToMm(margin_top)) && margin_top >= 0)
                 Spacing.Before = margin_top;
-            var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
+            var margin_bottom = this._getStyle(node, computedStyle, "margin-bottom");
             if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)) && margin_bottom >= 0)
                 Spacing.After = margin_bottom;
 			//line height
 			//computedStyle возвращает значение в px. мне нужны %(ms записывает именно % в html)
-			var line_height = node.style && node.style.lineHeight ? node.style.lineHeight : computedStyle.getPropertyValue( "line-height" );
+			var line_height = node.style && node.style.lineHeight ? node.style.lineHeight : this._getStyle(node, computedStyle, "line-height");
 			if(line_height)
 			{
 				var oLineHeight = this._ValueToMmType(line_height);
@@ -6268,7 +6310,7 @@ PasteProcessor.prototype =
                 var tempComputedStyle = this._getComputedStyle(oTempNode);
                 if(null == tempComputedStyle)
                     break;
-                background_color = tempComputedStyle.getPropertyValue( "background-color" );
+                background_color = this._getStyle(oTempNode, tempComputedStyle, "background-color");
                 if(null != background_color && (background_color = this._ParseColor(background_color)))
                     break;
                 oTempNode = oTempNode.parentNode;
@@ -6724,7 +6766,7 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if ( computedStyle )
         {
-            var font_family = CheckDefaultFontFamily(computedStyle.getPropertyValue( "font-family" ), this.apiEditor);
+            var font_family = CheckDefaultFontFamily(this._getStyle(node, computedStyle, "font-family"), this.apiEditor);
             if(font_family && "" != font_family)
             {
                 var oFontItem = this.oFonts[font_family];
@@ -6738,7 +6780,7 @@ PasteProcessor.prototype =
             }
 			var font_size = node.style ? node.style.fontSize : null;
 			if(!font_size)
-				font_size = computedStyle.getPropertyValue( "font-size" );
+				font_size = this._getStyle(node, computedStyle, "font-size");
 			font_size = CheckDefaultFontSize(font_size, this.apiEditor);
             if(font_size)
             {
@@ -6761,16 +6803,16 @@ PasteProcessor.prototype =
                     rPr.FontSize = font_size;
                 }
             }
-            var font_weight = computedStyle.getPropertyValue( "font-weight" );
+            var font_weight = this._getStyle(node, computedStyle, "font-weight");
             if(font_weight)
             {
                 if("bold" === font_weight || "bolder" === font_weight || 400 < font_weight)
                     rPr.Bold = true;
             }
-            var font_style = computedStyle.getPropertyValue( "font-style" );
+            var font_style = this._getStyle(node, computedStyle, "font-style");
             if("italic" === font_style)
                 rPr.Italic = true;
-            var color = computedStyle.getPropertyValue( "color" );
+            var color = this._getStyle(node, computedStyle, "color");
             if(color && (color = this._ParseColor(color)))
             {
                 if(PasteElementsId.g_bIsDocumentCopyPaste){
@@ -6783,7 +6825,7 @@ PasteProcessor.prototype =
                 }
             }
 			
-			var spacing = computedStyle.getPropertyValue( "letter-spacing" );
+			var spacing = this._getStyle(node, computedStyle, "letter-spacing");
             if(spacing && null != (spacing = this._ValueToMm(spacing)))
                 rPr.Spacing = spacing;
 
@@ -6800,7 +6842,7 @@ PasteProcessor.prototype =
                     break;
                 if(null == underline || null == Strikeout)
                 {
-                    var text_decoration = tempComputedStyle.getPropertyValue( "text-decoration" );
+                    var text_decoration = this._getStyle(node, tempComputedStyle, "text-decoration");
                     if(text_decoration)
                     {
                         if(-1 !== text_decoration.indexOf("underline"))
@@ -6814,7 +6856,7 @@ PasteProcessor.prototype =
                 }
                 if(null == background_color)
                 {
-                    background_color = tempComputedStyle.getPropertyValue( "background-color" );
+                    background_color = this._getStyle(node, tempComputedStyle, "background-color");
                     if(background_color)
                         background_color = this._ParseColor(background_color);
                     else
@@ -6822,7 +6864,7 @@ PasteProcessor.prototype =
                 }
                 if(null == vertical_align || "baseline" === vertical_align)
                 {
-                    vertical_align = tempComputedStyle.getPropertyValue( "vertical-align" );
+                    vertical_align = this._getStyle(node, tempComputedStyle, "vertical-align");
                     if(!vertical_align)
                         vertical_align = null;
                 }
@@ -7235,12 +7277,10 @@ PasteProcessor.prototype =
 
                         var dWidth = null;
                         var computedStyle = this._getComputedStyle(tc);
-                        if ( computedStyle )
-                        {
-                            var computedWidth = computedStyle.getPropertyValue( "width" );
-                            if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
-                                dWidth = computedWidth;
-                        }
+						var computedWidth = this._getStyle(tc, computedStyle, "width");
+						if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
+							dWidth = computedWidth;
+
                         if(null == dWidth)
                             dWidth = tc.clientWidth * g_dKoef_pix_to_mm;
 
@@ -7275,7 +7315,13 @@ PasteProcessor.prototype =
 
                         nCurSum += dWidth;
                         if(null == oRowSums[nCurColWidth + nColSpan])
-                            oRowSums[nCurColWidth + nColSpan] = nCurSum;
+						{
+							oRowSums[nCurColWidth + nColSpan] = nCurSum;
+						}
+						else if(null != oRowSums[nCurColWidth + nColSpan - 1] && oRowSums[nCurColWidth + nColSpan - 1] >= oRowSums[nCurColWidth + nColSpan])
+						{
+							oRowSums[nCurColWidth + nColSpan] += nCurSum;
+						}
                         nCurColWidth += nColSpan;
                     }
                 }
@@ -7385,7 +7431,7 @@ PasteProcessor.prototype =
     _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull, setUnifill)
     {
         var res = null;
-        var style = computedStyle.getPropertyValue( "border-"+type+"-style" );
+        var style = this._getStyle(node, computedStyle, "border-"+type+"-style");
         if(null != style)
         {
             res = new CDocumentBorder();
@@ -7396,10 +7442,10 @@ PasteProcessor.prototype =
                 res.Value = border_Single;
                 var width = node.style["border"+type2+"Width"];
                 if(!width)
-                    computedStyle.getPropertyValue( "border-"+type+"-width" );
+					width = this._getStyle(node, computedStyle, "border-"+type+"-width");
                 if(null != width && null != (width = this._ValueToMm(width)))
                     res.Size = width;
-                var color = computedStyle.getPropertyValue( "border-"+type+"-color" );
+                var color = this._getStyle(node, computedStyle, "border-"+type+"-color");
                 if(null != color && (color = this._ParseColor(color)))
                 {
                     if(setUnifill && color)
@@ -7426,7 +7472,7 @@ PasteProcessor.prototype =
         {
 			//сделано через dom чтобы не писать большую функцию разбора строки
 			//todo сделать без dom, анализируя текст.
-            res = new CDocumentBorder();;
+            res = new CDocumentBorder();
             var oTestDiv = document.createElement("div");
             oTestDiv.setAttribute("style", "border-left:"+border);
             document.body.appendChild( oTestDiv );
@@ -7449,15 +7495,11 @@ PasteProcessor.prototype =
 		//align смотрим у parent tableNode
 		var sTableAlign = null;
 		if(null != tableNode.align)
-			sTableAlign = tableNode.align
+			sTableAlign = tableNode.align;
         else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
         {
             var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
-            if(null != computedStyleParent)
-            {
-				//Может приходить -webkit-right
-                sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
-            }
+			sTableAlign = this._getStyle(tableNode.parentNode, computedStyleParent, "text-align");
         }
 		if(null != sTableAlign)
 		{
@@ -7516,42 +7558,39 @@ PasteProcessor.prototype =
                 table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
         }
 		var computedStyle = this._getComputedStyle(tableNode);
-        if(computedStyle)
-        {
-			if(align_Left === table.Get_TableAlign())
-			{
-				var margin_left = computedStyle.getPropertyValue( "margin-left" );
-				//todo возможно надо еще учесть ширину таблицы
-				if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
-					table.Set_TableInd(margin_left);
-			}
-            var background_color = computedStyle.getPropertyValue( "background-color" );
-            if(null != background_color && (background_color = this._ParseColor(background_color)))
-                table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
-            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
-            if(null != oLeftBorder)
-                table.Set_TableBorder_Left(oLeftBorder);
-            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
-            if(null != oTopBorder)
-                table.Set_TableBorder_Top(oTopBorder);
-            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
-            if(null != oRightBorder)
-                table.Set_TableBorder_Right(oRightBorder);
-            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
-            if(null != oBottomBorder)
-                table.Set_TableBorder_Bottom(oBottomBorder);
+		if(align_Left === table.Get_TableAlign())
+		{
+			var margin_left = this._getStyle(tableNode, computedStyle, "margin-left");
+			//todo возможно надо еще учесть ширину таблицы
+			if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+				table.Set_TableInd(margin_left);
+		}
+		var background_color = this._getStyle(tableNode, computedStyle, "background-color");
+		if(null != background_color && (background_color = this._ParseColor(background_color)))
+			table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
+		var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
+		if(null != oLeftBorder)
+			table.Set_TableBorder_Left(oLeftBorder);
+		var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
+		if(null != oTopBorder)
+			table.Set_TableBorder_Top(oTopBorder);
+		var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
+		if(null != oRightBorder)
+			table.Set_TableBorder_Right(oRightBorder);
+		var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
+		if(null != oBottomBorder)
+			table.Set_TableBorder_Bottom(oBottomBorder);
 
-            if(null == spacing)
-            {
-                spacing = computedStyle.getPropertyValue( "padding" );
-                if(!spacing)
-                    spacing = tableNode.style.padding;
-                if(!spacing)
-                    spacing = null;
-                if(spacing && null != (spacing = this._ValueToMm(spacing)))
-                    ;
-            }
-        }
+		if(null == spacing)
+		{
+			spacing = this._getStyle(tableNode, computedStyle, "padding");
+			if(!spacing)
+				spacing = tableNode.style.padding;
+			if(!spacing)
+				spacing = null;
+			if(spacing && null != (spacing = this._ValueToMm(spacing)))
+				;
+		}
 
         //content
         var oRowSpans = {};
@@ -7677,42 +7716,39 @@ PasteProcessor.prototype =
         if(null != spacing)
             bAddIfNull = true;
 		var computedStyle = this._getComputedStyle(node);
-        if(null != computedStyle)
-        {
-            var background_color = computedStyle.getPropertyValue( "background-color" );
-            if(null != background_color && (background_color = this._ParseColor(background_color)))
-            {
-                var Shd = new CDocumentShd();
-                Shd.Value = c_oAscShdClear;
-                Shd.Color = background_color;
-                cell.Set_Shd(Shd);
-            }
-            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
-            if(null != border)
-                cell.Set_Border(border, 3);
-            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
-            if(null != border)
-                cell.Set_Border(border, 0);
-            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
-            if(null != border)
-                cell.Set_Border(border, 1);
-            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
-            if(null != border)
-                cell.Set_Border(border, 2);
+		var background_color = this._getStyle(node, computedStyle, "background-color");
+		if(null != background_color && (background_color = this._ParseColor(background_color)))
+		{
+			var Shd = new CDocumentShd();
+			Shd.Value = c_oAscShdClear;
+			Shd.Color = background_color;
+			cell.Set_Shd(Shd);
+		}
+		var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
+		if(null != border)
+			cell.Set_Border(border, 3);
+		var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
+		if(null != border)
+			cell.Set_Border(border, 0);
+		var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
+		if(null != border)
+			cell.Set_Border(border, 1);
+		var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
+		if(null != border)
+			cell.Set_Border(border, 2);
 
-            var top = computedStyle.getPropertyValue( "padding-top" );
-            if(null != top && null != (top = this._ValueToMm(top)))
-                cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
-            var right = computedStyle.getPropertyValue( "padding-right" );
-            if(null != right && null != (right = this._ValueToMm(right)))
-                cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
-            var bottom = computedStyle.getPropertyValue( "padding-bottom" );
-            if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
-                cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
-            var left = computedStyle.getPropertyValue( "padding-left" );
-            if(null != left && null != (left = this._ValueToMm(left)))
-                cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
-        }
+		var top = this._getStyle(node, computedStyle, "padding-top");
+		if(null != top && null != (top = this._ValueToMm(top)))
+			cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
+		var right = this._getStyle(node, computedStyle, "padding-right");
+		if(null != right && null != (right = this._ValueToMm(right)))
+			cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
+		var bottom = this._getStyle(node, computedStyle, "padding-bottom");
+		if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+			cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
+		var left = this._getStyle(node, computedStyle, "padding-left");
+		if(null != left && null != (left = this._ValueToMm(left)))
+			cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
 
         //content
         var oPasteProcessor = new PasteProcessor(this.api, false, false, true);
@@ -7798,10 +7834,7 @@ PasteProcessor.prototype =
 			if(node.parentNode)
 			{
 				var computedStyle = oThis._getComputedStyle(node.parentNode);
-				if(computedStyle)
-				{
-					whiteSpacing = "pre" === computedStyle.getPropertyValue("white-space");
-				}
+				whiteSpacing = "pre" === oThis._getStyle(node.parentNode, computedStyle, "white-space");
 			}
 
 			//Вначале и конце вырезаем \r|\t|\n, в середине текста заменяем их на пробелы
@@ -7983,10 +8016,8 @@ PasteProcessor.prototype =
 				var nHeight = parseInt(node.getAttribute("height"));
 				if (!nWidth || !nHeight) {
 					var computedStyle = oThis._getComputedStyle(node);
-					if (computedStyle) {
-						nWidth = parseInt(computedStyle.getPropertyValue("width"));
-						nHeight = parseInt(computedStyle.getPropertyValue("height"));
-					}
+					nWidth = parseInt(oThis._getStyle(node, computedStyle, "width"));
+					nHeight = parseInt(oThis._getStyle(node, computedStyle, "height"));
 				}
 				var sSrc = node.getAttribute("src");
 				if (sSrc && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") ||
@@ -8017,10 +8048,8 @@ PasteProcessor.prototype =
 					var nHeight = parseInt(node.getAttribute("height"));
 					if (!nWidth || !nHeight) {
 						var computedStyle = oThis._getComputedStyle(node);
-						if (computedStyle) {
-							nWidth = parseInt(computedStyle.getPropertyValue("width"));
-							nHeight = parseInt(computedStyle.getPropertyValue("height"));
-						}
+						nWidth = parseInt(oThis._getStyle(node, computedStyle, "width"));
+						nHeight = parseInt(oThis._getStyle(node, computedStyle, "height"));
 					}
 
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
@@ -8523,12 +8552,10 @@ PasteProcessor.prototype =
 
                         var dWidth = null;
 						var computedStyle = this._getComputedStyle(tc);
-                        if ( computedStyle )
-                        {
-                            var computedWidth = computedStyle.getPropertyValue( "width" );
-                            if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
-                                dWidth = computedWidth;
-                        }
+						var computedWidth = this._getStyle(tc, computedStyle, "width" );
+						if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
+							dWidth = computedWidth;
+
                         if(null == dWidth)
                             dWidth = tc.clientWidth * g_dKoef_pix_to_mm;
 
@@ -8667,15 +8694,11 @@ PasteProcessor.prototype =
 		//align смотрим у parent tableNode
         var sTableAlign = null;
         if(null != tableNode.align)
-            sTableAlign = tableNode.align
+            sTableAlign = tableNode.align;
         else if(null != tableNode.parentNode && this.oRootNode !== tableNode.parentNode)
         {
 			var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
-            if(null != computedStyleParent)
-            {
-				//Может приходить -webkit-right
-                sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
-            }
+			sTableAlign = this._getStyle(tableNode.parentNode, computedStyleParent, "text-align");
         }
         if(null != sTableAlign)
         {
@@ -8733,43 +8756,41 @@ PasteProcessor.prototype =
             if(null != insidev)
                 table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
         }
-		var computedStyle = this._getComputedStyle(tableNode);
-        if(computedStyle)
-        {
-            if(align_Left === table.Get_TableAlign())
-            {
-                var margin_left = computedStyle.getPropertyValue( "margin-left" );
-                //todo возможно надо еще учесть ширину таблицы
-                if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
-                    table.Set_TableInd(margin_left);
-            }
-            var background_color = computedStyle.getPropertyValue( "background-color" );
-            if(null != background_color && (background_color = this._ParseColor(background_color)))
-                table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
-            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false, true);
-            if(null != oLeftBorder)
-                table.Set_TableBorder_Left(oLeftBorder);
-            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false, true);
-            if(null != oTopBorder)
-                table.Set_TableBorder_Top(oTopBorder);
-            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false, true);
-            if(null != oRightBorder)
-                table.Set_TableBorder_Right(oRightBorder);
-            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false, true);
-            if(null != oBottomBorder)
-                table.Set_TableBorder_Bottom(oBottomBorder);
 
-            if(null == spacing)
-            {
-                spacing = computedStyle.getPropertyValue( "padding" );
-                if(!spacing)
-                    spacing = tableNode.style.padding;
-                if(!spacing)
-                    spacing = null;
-                if(spacing && null != (spacing = this._ValueToMm(spacing)))
-                    ;
-            }
-        }
+        var computedStyle = this._getComputedStyle(tableNode);
+		if(align_Left === table.Get_TableAlign())
+		{
+			var margin_left = this._getStyle(tableNode, computedStyle, "margin-left");
+			//todo возможно надо еще учесть ширину таблицы
+			if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+				table.Set_TableInd(margin_left);
+		}
+		var background_color = this._getStyle(tableNode, computedStyle, "background-color");
+		if(null != background_color && (background_color = this._ParseColor(background_color)))
+			table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
+		var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false, true);
+		if(null != oLeftBorder)
+			table.Set_TableBorder_Left(oLeftBorder);
+		var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false, true);
+		if(null != oTopBorder)
+			table.Set_TableBorder_Top(oTopBorder);
+		var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false, true);
+		if(null != oRightBorder)
+			table.Set_TableBorder_Right(oRightBorder);
+		var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false, true);
+		if(null != oBottomBorder)
+			table.Set_TableBorder_Bottom(oBottomBorder);
+
+		if(null == spacing)
+		{
+			spacing = this._getStyle(tableNode, computedStyle, "padding");
+			if(!spacing)
+				spacing = tableNode.style.padding;
+			if(!spacing)
+				spacing = null;
+			if(spacing && null != (spacing = this._ValueToMm(spacing)))
+				;
+		}
 
         //content
         var oRowSpans = {};
@@ -8892,43 +8913,41 @@ PasteProcessor.prototype =
         var bAddIfNull = false;
         if(null != spacing)
             bAddIfNull = true;
-		var computedStyle = this._getComputedStyle(node);
-        if(null != computedStyle)
-        {
-            var background_color = computedStyle.getPropertyValue( "background-color" );
-            if(null != background_color && (background_color = this._ParseColor(background_color)))
-            {
-                var Shd = new CDocumentShd();
-                Shd.Value = c_oAscShdClear;
-                Shd.Unifill = AscFormat.CreteSolidFillRGB(background_color.r,background_color.g, background_color.b);
-                cell.Set_Shd(Shd);
-            }
-            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull, true);
-            if(null != border)
-                cell.Set_Border(border, 3);
-            border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull, true);
-            if(null != border)
-                cell.Set_Border(border, 0);
-            border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull, true);
-            if(null != border)
-                cell.Set_Border(border, 1);
-            border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull, true);
-            if(null != border)
-                cell.Set_Border(border, 2);
 
-            var top = computedStyle.getPropertyValue( "padding-top" );
-            if(null != top && null != (top = this._ValueToMm(top)))
-                cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
-            var right = computedStyle.getPropertyValue( "padding-right" );
-            if(null != right && null != (right = this._ValueToMm(right)))
-                cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
-            var bottom = computedStyle.getPropertyValue( "padding-bottom" );
-            if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
-                cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
-            var left = computedStyle.getPropertyValue( "padding-left" );
-            if(null != left && null != (left = this._ValueToMm(left)))
-                cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
-        }
+		var computedStyle = this._getComputedStyle(node);
+		var background_color = this._getStyle(node, computedStyle, "background-color");
+		if(null != background_color && (background_color = this._ParseColor(background_color)))
+		{
+			var Shd = new CDocumentShd();
+			Shd.Value = c_oAscShdClear;
+			Shd.Unifill = AscFormat.CreteSolidFillRGB(background_color.r,background_color.g, background_color.b);
+			cell.Set_Shd(Shd);
+		}
+		var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull, true);
+		if(null != border)
+			cell.Set_Border(border, 3);
+		border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull, true);
+		if(null != border)
+			cell.Set_Border(border, 0);
+		border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull, true);
+		if(null != border)
+			cell.Set_Border(border, 1);
+		border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull, true);
+		if(null != border)
+			cell.Set_Border(border, 2);
+
+		var top = this._getStyle(node, computedStyle, "padding-top");
+		if(null != top && null != (top = this._ValueToMm(top)))
+			cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
+		var right = this._getStyle(node, computedStyle, "padding-right");
+		if(null != right && null != (right = this._ValueToMm(right)))
+			cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
+		var bottom = this._getStyle(node, computedStyle, "padding-bottom");
+		if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+			cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
+		var left = this._getStyle(node, computedStyle, "padding-left");
+		if(null != left && null != (left = this._ValueToMm(left)))
+			cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
 
         var arrShapes2 = [], arrImages2 = [], arrTables2 = [];
         var presentation = editor.WordControl.m_oLogicDocument;
