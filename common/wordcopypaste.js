@@ -5891,7 +5891,11 @@ PasteProcessor.prototype =
 		if(null != node && Node.ELEMENT_NODE === node.nodeType)
 		{
 			var defaultView = node.ownerDocument.defaultView;
-            computedStyle = defaultView.getComputedStyle( node, null );
+			computedStyle = defaultView.getComputedStyle( node, null );
+			if(null === computedStyle)
+			{
+				computedStyle = window.getComputedStyle( node, null );
+			}
 		}
 		return computedStyle;
 	},
