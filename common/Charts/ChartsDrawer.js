@@ -1281,41 +1281,6 @@ CChartsDrawer.prototype =
 
 		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
 		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
-
-		//count line of chart grid
-		if ((chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx.yPoints && chartSpace.chart.plotArea.catAx.xPoints) || (chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.catAx.yPoints && chartSpace.chart.plotArea.valAx.xPoints)) {
-			if (chartSpace.chart.plotArea.valAx.yPoints) {
-				this.calcProp.numhlines = chartSpace.chart.plotArea.valAx.yPoints.length - 1;
-			}
-			if (this.calcProp.type === c_oChartTypes.Bar) {
-				this.calcProp.numvlines = chartSpace.chart.plotArea.catAx.xPoints.length;
-			} else if (this.calcProp.type === c_oChartTypes.HBar) {
-				this.calcProp.numhlines = chartSpace.chart.plotArea.catAx.yPoints.length;
-				this.calcProp.numvlines = chartSpace.chart.plotArea.valAx.xPoints.length - 1;
-			} else if (this.calcProp.type === c_oChartTypes.Line || this.calcProp.type === c_oChartTypes.Stock) {
-				this.calcProp.numvlines = chartSpace.chart.plotArea.catAx.xPoints.length;
-			} else if (this.calcProp.type === c_oChartTypes.Scatter ||
-				this.calcProp.type === c_oChartTypes.BubbleChart) {
-				this.calcProp.numvlines = chartSpace.chart.plotArea.catAx.xPoints.length;
-			} else if (this.calcProp.type === c_oChartTypes.Area) {
-				this.calcProp.numvlines = chartSpace.chart.plotArea.catAx.xPoints.length;
-			}
-		}
-
-		if (this.calcProp.type !== c_oChartTypes.Scatter) {
-			this.calcProp.nullPositionOX = this._getNullPosition();
-			this.calcProp.nullPositionOXLog = this._getNullPositionLog();
-		}
-
-		/*if(this.calcProp.type === c_oChartTypes.Bar)
-		 {
-		 this.calcProp.max = this.calcProp.scale[this.calcProp.scale.length -1];
-		 this.calcProp.min = this.calcProp.scale[0];
-		 }
-
-
-		 this.calcProp.axisMin = this.calcProp.scale[0] < this.calcProp.scale[this.calcProp.scale.length - 1] ? this.calcProp.scale[0] : this.calcProp.scale[this.calcProp.scale.length - 1];
-		 this.calcProp.axisMax = this.calcProp.scale[0] < this.calcProp.scale[this.calcProp.scale.length - 1] ? this.calcProp.scale[this.calcProp.scale.length - 1] : this.calcProp.scale[0];*/
 	},
 	
 	//****new calculate data****
@@ -2168,102 +2133,6 @@ CChartsDrawer.prototype =
 		
 		return {min: axisMin, max: axisMax};
 	},
-	
-	
-	
-	//****get null position****
-	_getNullPosition: function()
-	{
-		var numNull = this.calcProp.numhlines;
-			
-		var min = this.calcProp.min;
-		var max = this.calcProp.max;
-		
-		if(this.cChartSpace.chart.plotArea.valAx && this.cChartSpace.chart.plotArea.valAx.scaling.logBase)
-		{
-			if(min < 0)
-				min = 0;
-			if(max < 0)
-				max = 0;
-		}
-
-		var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.valAx ? this.cChartSpace.chart.plotArea.valAx.scaling.orientation : ORIENTATION_MIN_MAX;
-		
-		if(min >= 0 && max >= 0)
-		{
-			if(orientation === ORIENTATION_MIN_MAX)
-				numNull = 0;
-			else
-			{
-				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type === c_oChartTypes.HBar)
-					numNull = this.calcProp.numvlines;
-			}
-		}
-		else if(min <= 0 && max <= 0)
-		{
-			if(orientation === ORIENTATION_MIN_MAX)
-			{
-				numNull = this.calcProp.numhlines;
-				if(this.calcProp.type === c_oChartTypes.HBar)
-					numNull = this.calcProp.numvlines;
-			}
-			else
-				numNull = 0;
-		}
-		else
-		{
-			var valPoints;
-			if(this.cChartSpace.chart.plotArea.valAx)
-			{
-				if(this.calcProp.type === c_oChartTypes.HBar)
-					valPoints = this.cChartSpace.chart.plotArea.valAx.xPoints;
-				else
-					valPoints = this.cChartSpace.chart.plotArea.valAx.yPoints;
-				
-					
-				for (var i = 0; i < valPoints.length; i++)
-				{
-					if(valPoints[i].val == 0)
-					{
-						result =  valPoints[i].pos * this.calcProp.pxToMM;
-						break;
-					}
-					else if(i !== 0 && valPoints[i - 1].val < 0 && valPoints[i].val > 0)
-					{
-						var val1 = valPoints[i - 1].val;
-						var val2 = valPoints[i].val;
-						var pos1 = valPoints[i - 1].pos * this.calcProp.pxToMM;
-						var pos2 = valPoints[i].pos * this.calcProp.pxToMM;
-						
-						result = pos2 - val2 * (pos2 - pos1) / (val2 - val1);
-						
-						break;
-					}
-				}
-			}
-			
-			return result;
-		}
-		
-		var nullPosition;
-		if(0 == numNull)
-			nullPosition = 0;
-		else if(this.calcProp.type === c_oChartTypes.HBar)
-			nullPosition = (this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right)/(this.calcProp.numvlines)*numNull;
-		else
-			nullPosition = (this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/(this.calcProp.numhlines)*numNull;
-		
-		var result;
-		if(this.calcProp.type === c_oChartTypes.HBar)
-			result = nullPosition + this.calcProp.chartGutter._left;
-		else
-			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
-			
-		return result;
-	},
-	
-	
 	
 	//****get null position****
 	_getNullPositionLog: function()
@@ -12611,6 +12480,7 @@ serAxisChart.prototype = {
 	},
 
 	_calculateAxis: function () {
+		//TODO заменить nullPositionOX!!!
 		var nullPositionOx = this.chartProp.nullPositionOX;
 
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
@@ -12634,6 +12504,7 @@ serAxisChart.prototype = {
 	},
 
 	_calculateTickMark: function () {
+		//TODO заменить nullPositionOX!!!
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		var tickmarksProps = this._getTickmarksProps();
 		var widthLine = tickmarksProps.widthLine;
