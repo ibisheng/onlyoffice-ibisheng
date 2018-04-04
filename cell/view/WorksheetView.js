@@ -1229,6 +1229,9 @@
         AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight =
           Math.min(this.maxRowHeight, this.model.getDefaultHeight() || this.headersHeightByFont);
 
+        // ToDo refactoring
+		this.model.setDefaultHeight(AscCommonExcel.oDefaultMetrics.RowHeight);
+
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
         // чтобы могли показать последнюю строку/столбец (http://bugzilla.onlyoffice.com/show_bug.cgi?id=23513)
         this.nColsCount = Math.min(this.model.getColsCount() + 1, gc_nMaxCol);

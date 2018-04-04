@@ -4018,6 +4018,12 @@
 	Worksheet.prototype.isDefaultWidthHidden=function(){
 		return null != this.oAllCol && this.oAllCol.getHidden();
 	};
+	Worksheet.prototype.setDefaultHeight = function (h){
+		// ToDo refactoring this
+		if (this.oSheetFormatPr.oAllRow && !this.oSheetFormatPr.oAllRow.getCustomHeight()) {
+			this.oSheetFormatPr.oAllRow.h = h;
+		}
+	};
 	Worksheet.prototype.getDefaultHeight=function(){
 		// ToDo http://bugzilla.onlyoffice.com/show_bug.cgi?id=19666 (флага CustomHeight нет)
 		var dRes = null;
