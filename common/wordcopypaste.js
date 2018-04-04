@@ -5827,7 +5827,10 @@ PasteProcessor.prototype =
             {
                 var computedStyle = this._getComputedStyle(node.parentNode);
 				var fontFamily = CheckDefaultFontFamily(this._getStyle(node.parentNode, computedStyle, "font-family"), this.apiEditor);
-				this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
+				if(fontFamily)
+				{
+					this.oFonts[fontFamily] = {Name: g_fontApplication.GetFontNameDictionary(fontFamily, true), Index: -1};
+				}
             }
             else
             {
