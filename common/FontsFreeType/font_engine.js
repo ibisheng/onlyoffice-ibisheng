@@ -41282,8 +41282,7 @@ function FT_Get_CMap_Format(cmap)
         return -1;
 
     var cmap_info = new TT_CMapInfo();
-    service.get_cmap_info(cmap, cmap_info);
-    if (FT_Error != 0)
+    if (0 != service.get_cmap_info(cmap, cmap_info))
         return -1;
     
     return cmap_info.format;
