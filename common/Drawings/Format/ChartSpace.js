@@ -838,14 +838,15 @@ CChartSpace.prototype.recalculateTextPr = function()
 };
 CChartSpace.prototype.getSelectionState = function()
 {
-    var content_selection = null;
+    var content_selection = null, content = null;
     if(this.selection.textSelection)
     {
-        var content = this.selection.textSelection.getDocContent();
+        content = this.selection.textSelection.getDocContent();
         if(content)
             content_selection = content.GetSelectionState();
     }
     return {
+        content: content,
         title:            this.selection.title,
         legend:           this.selection.legend,
         legendEntry:      this.selection.legendEntry,
@@ -900,7 +901,51 @@ CChartSpace.prototype.loadDocumentStateAfterLoadChanges = function(state)
      this.selection.series =        null;
      this.selection.datPoint =      null;
      this.selection.textSelection = null;
-    return false;
+    var bRet = false;
+    if(state.DrawingsSelectionState){
+        var chartSelection = state.DrawingsSelectionState.chartSelection;
+        if(chartSelection){
+            if(this.chart){
+                if(chartSelection.title){
+                    if(this.chart.title === chartSelection.title){
+                        this.selection.title = this.chart.title;
+                        bRet = true;
+                    }
+                    else{
+                        var plot_area = this.chart.plotArea;
+                        if(plot_area){
+                            for(var i = 0; i < plot_area.axId.length; ++i){
+                                var axis = plot_area.axId[i];
+                                if(axis && axis.title === chartSelection.title){
+                                    this.selection.title = axis.title;
+                                    bRet = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if(this.selection.title){
+                        if(this.selection.title === chartSelection.textSelection){
+                            var oTitleContent = this.selection.title.getDocContent();
+                            if(oTitleContent && oTitleContent === chartSelection.content){
+                                this.selection.textSelection = this.selection.title;
+                                if (true === state.DrawingSelection)
+                                {
+                                    oTitleContent.SetContentPosition(state.StartPos, 0, 0);
+                                    oTitleContent.SetContentSelection(state.StartPos, state.EndPos, 0, 0, 0);
+                                }
+                                else
+                                {
+                                    oTitleContent.SetContentPosition(state.Pos, 0, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return bRet;
 };
 CChartSpace.prototype.resetInternalSelection = function(noResetContentSelect)
 {

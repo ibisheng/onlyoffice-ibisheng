@@ -1834,6 +1834,13 @@ function CEditorPage(api)
 		if (is_drawing === true)
 			return;
 
+		var is_drawing_on_up = oWordControl.m_oDrawingDocument.checkMouseDown_DrawingOnUp(pos);
+		if (is_drawing_on_up)
+		{
+			// не посылаем в документ.
+			return;
+		}
+
 		if (null != oWordControl.m_oDrawingDocument.m_oDocumentRenderer)
 		{
 			oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnMouseUp();

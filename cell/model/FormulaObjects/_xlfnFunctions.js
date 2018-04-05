@@ -52,13 +52,13 @@
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cFORECAST_ETS, cFORECAST_ETS_CONFINT,
-		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cFORECAST_ETS,
-		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST,
+		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cMUNIT);
 
 	/**
@@ -132,18 +132,6 @@
 	cFORECAST_ETS_STAT.prototype.constructor = cFORECAST_ETS_STAT;
 	cFORECAST_ETS_STAT.prototype.name = "FORECAST.ETS.STAT";
 	cFORECAST_ETS_STAT.prototype.isXLFN = true;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cHYPGEOM_DIST() {	
-	}
-
-	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
-	cHYPGEOM_DIST.prototype.name = "HYPGEOM.DIST";
-	cHYPGEOM_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor

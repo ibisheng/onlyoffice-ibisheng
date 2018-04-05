@@ -711,7 +711,22 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
                     }
                 }
             }
-            this.graphicObject.Selection_SetStart(tx, ty, this.parent.num, e);
+
+            if(!(/*content.IsTextSelectionUse() && */e.ShiftKey))
+            {
+                if(editor.WordControl.m_oLogicDocument.CurPosition){
+                    editor.WordControl.m_oLogicDocument.CurPosition.X = tx;
+                    editor.WordControl.m_oLogicDocument.CurPosition.Y = ty;
+                }
+                this.graphicObject.Selection_SetStart(tx, ty, this.parent.num, e);
+            }
+            else
+            {
+                if(!this.graphicObject.IsSelectionUse()){
+                    this.graphicObject.StartSelectionFromCurPos();
+                }
+                this.graphicObject.Selection_SetEnd(tx, ty, this.parent.num, e);
+            }
             this.graphicObject.RecalculateCurPos();
             return;
         }

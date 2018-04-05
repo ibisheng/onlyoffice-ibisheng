@@ -8034,6 +8034,9 @@ PasteProcessor.prototype =
 								nHeight = nWidth;
 							} else if (!nWidth && nHeight) {
 								nWidth = nHeight;
+							} else {
+								nWidth = parseInt(node.width);
+								nHeight = parseInt(node.height);
 							}
 						}
 					}

@@ -360,6 +360,9 @@ SlideLayout.prototype =
         if(bRecalculateBounds){
             if(bChecked){
                 this.bounds.checkWH();
+                if(this.bounds.w < 0 || this.bounds.h < 0){
+                    this.bounds.reset(0.0, 0.0, 0.0, 0.0);
+                }
             }
             else{
                 this.bounds.reset(0.0, 0.0, 0.0, 0.0);

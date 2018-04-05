@@ -1283,7 +1283,8 @@
 		},
 		p_dash : function(params)
 		{
-			var bIsDash = params ? true : false;
+			var bIsDash = (params && (params.length > 0)) ? true : false;
+
 			if (false == this.m_bIsPenDash && bIsDash == this.m_bIsPenDash)
 				return;
 			this.m_bIsPenDash = bIsDash;

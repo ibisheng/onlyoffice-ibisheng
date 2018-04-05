@@ -928,7 +928,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             }
         }
     };
-    CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange)
+    CCollaborativeEditingBase.prototype.private_AddOverallChange = function(oChange, isSave)
     {
         // Здесь мы должны смержить пришедшее изменение с одним из наших изменений
         for (var nIndex = 0, nCount = this.m_oOwnChanges.length; nIndex < nCount; ++nIndex)
@@ -937,7 +937,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 return false;
         }
 
-        this.m_aAllChanges.push(oChange);
+        if (false !== isSave)
+        	this.m_aAllChanges.push(oChange);
+        
         return true;
     };
     CCollaborativeEditingBase.prototype.private_OnSendOwnChanges = function(arrChanges, nDeleteIndex)

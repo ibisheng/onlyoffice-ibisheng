@@ -5892,7 +5892,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				_numberPrevArg = "number" === typeof(this.outStack[i - 1]) ? this.outStack[i - 1] : null;
 				_count_arg = null !== _numberPrevArg ? _numberPrevArg : currentElement.argumentsCurrent;
 				_argDiff = 0;
-				if(_numberPrevArg) {
+				if(null !== _numberPrevArg) {
 					_argDiff++;
 					if(this.outStack[i - 2] && cElementType.specialFunctionEnd === this.outStack[i - 2].type) {
 						_argDiff++;
@@ -6529,7 +6529,11 @@ function rtl_math_erfc( x ) {
 
 	function convertAreaToArray(area){
 		var retArr = new cArray(), _arg0;
-		area = area.getMatrix();
+		if(area instanceof cArea3D) {
+			area = area.getMatrix()[0];
+		} else {
+			area = area.getMatrix();
+		}
 
 		for ( var iRow = 0; iRow < area.length; iRow++, iRow < area.length ? retArr.addRow() : true ) {
 			for ( var iCol = 0; iCol < area[iRow].length; iCol++ ) {

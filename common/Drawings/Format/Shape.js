@@ -2399,18 +2399,76 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         }
         global_MatrixTransformer.TranslateAppend(oMatrix, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
+
         var Diff = 1.6;
-        var clipW = oRect.r - oRect.l + Diff - l_ins - r_ins;
-        if(clipW <= 0)
+        if(this.bWordShape)
         {
-            clipW = 0.01;
+            var DiffLeft = 0.8;
+            var DiffRight = 1.6;
+            var aContent = oContent.Content;
+            for(var i = 0; i < aContent.length; ++i)
+            {
+                if(aContent[i].GetType && type_Paragraph === aContent[i].GetType())
+                {
+                    var oCompiledParaPr = aContent[i].CompiledPr && aContent[i].CompiledPr.Pr && aContent[i].CompiledPr.Pr.ParaPr;
+                    if(oCompiledParaPr)
+                    {
+                        var oBorders = oCompiledParaPr.Brd;
+                        if(oBorders)
+                        {
+                            if(oBorders.Left  && AscFormat.isRealNumber(oBorders.Left.Space) && AscFormat.isRealNumber(oBorders.Left.Size) && oBorders.Left.Size > 0.0)
+                            {
+                                var DiffLeft2 = oBorders.Left.Space + oBorders.Left.Size + 1.0;
+                                if(DiffLeft2 > DiffLeft)
+                                {
+                                    DiffLeft = DiffLeft2;
+                                }
+                            }
+                            if(oBorders.Right && AscFormat.isRealNumber(oBorders.Right.Space) && AscFormat.isRealNumber(oBorders.Right.Size) && oBorders.Right.Size > 0.0)
+                            {
+                                var DiffRight2 = oBorders.Right.Space + oBorders.Right.Size + 1.0;
+                                if(oCompiledParaPr.Ind && AscFormat.isRealNumber(oCompiledParaPr.Ind.Right))
+                                {
+                                    DiffRight2 -= oCompiledParaPr.Ind.Right;
+                                }
+                                if(DiffRight2 > DiffRight)
+                                {
+                                    DiffRight = DiffRight2;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            var clipW = oRect.r - oRect.l + DiffLeft + DiffRight - l_ins - r_ins;
+            if(clipW <= 0)
+            {
+                clipW = 0.01;
+            }
+            var clipH = oRect.b - oRect.t + Diff - b_ins - t_ins;
+            if(clipH < 0)
+            {
+                clipH = 0.01;
+            }
+            oClipRect = {x: oRect.l + l_ins - DiffLeft, y: oRect.t - Diff + t_ins, w: clipW, h: clipH};
         }
-        var clipH = oRect.b - oRect.t + Diff - b_ins - t_ins;
-        if(clipH < 0)
+        else
         {
-            clipH = 0.01;
+            var clipW = oRect.r - oRect.l + Diff - l_ins - r_ins;
+            if(clipW <= 0)
+            {
+                clipW = 0.01;
+            }
+            var clipH = oRect.b - oRect.t + Diff - b_ins - t_ins;
+            if(clipH < 0)
+            {
+                clipH = 0.01;
+            }
+            oClipRect = {x: oRect.l + l_ins - Diff, y: oRect.t - Diff + t_ins, w: clipW, h: clipH};
+
         }
-        oClipRect = {x: oRect.l + l_ins - Diff, y: oRect.t - Diff + t_ins, w: clipW, h: clipH};
     }
     return oClipRect;
 };
@@ -4014,10 +4072,15 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
                 return;
             }
         }
-        if(!(content.IsTextSelectionUse() && e.ShiftKey))
+        if(!(/*content.IsTextSelectionUse() && */e.ShiftKey))
             content.Selection_SetStart(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         else
+        {
+            if(!content.IsTextSelectionUse()){
+                content.StartSelectionFromCurPos();
+            }
             content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
+        }
     }
 };
 

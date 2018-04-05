@@ -1031,7 +1031,7 @@
 
 		onKeyPress : function(e)
 		{
-			if (this.Api.isLongAction())
+			if (this.Api.isLongAction() || !this.Api.asc_IsFocus())
 			{
 				AscCommon.stopEvent(e);
 				return false;

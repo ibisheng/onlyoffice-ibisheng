@@ -1029,7 +1029,9 @@
 
   DocsCoApi.prototype._onRefreshToken = function(jwt) {
     this.jwtOpen = undefined;
-    this.jwtSession = jwt;
+    if (jwt) {
+      this.jwtSession = jwt;
+    }
   };
 
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
@@ -1461,6 +1463,10 @@
       this._indexUser = data['indexUser'];
       this._userId = this._user.asc_getId() + this._indexUser;
       this._sessionTimeConnect = data['sessionTimeConnect'];
+      if (data['settings'] && data['settings']['reconnection']) {
+        this.maxAttemptCount = data['settings']['reconnection']['attempts'];
+        this.reconnectInterval = data['settings']['reconnection']['delay'];
+      }
 
       this._onLicenseChanged(data);
       this._onAuthParticipantsChanged(data['participants']);

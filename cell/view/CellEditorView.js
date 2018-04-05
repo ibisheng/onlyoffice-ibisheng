@@ -160,8 +160,8 @@
 		/** @type RegExp */
 		this.reReplaceNL = /\r?\n|\r/g;
 		this.rangeChars = ["=", "-", "+", "*", "/", "(", "{", ",", "<", ">", "^", "!", "&", ":", ";", " "];
-		this.reNotFormula = new XRegExp( "[^\\p{L}0-9_]", "i" );
-		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
+		this.reNotFormula = new XRegExp( "[^\\p{L}\\\\_\\p{N}\\.]", "i" );
+		this.reFormula = new XRegExp( "^([\\p{L}\\\\_][\\p{L}\\\\_\\p{N}\\.]*)", "i" );
 
 		this.defaults = {
 			padding: -1,

@@ -1004,12 +1004,12 @@
 
 	asc_docs_api.prototype.startCollaborationEditing = function()
 		{
-					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
-		this.asc_setDrawCollaborationMarks(true);
-		if (this.WordControl && this.WordControl.m_oLogicDocument)
-		{
-			this.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-				}
+			AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+			this.asc_setDrawCollaborationMarks(true);
+			if (this.WordControl && this.WordControl.m_oDrawingDocument)
+			{
+				this.WordControl.m_oDrawingDocument.Start_CollaborationEditing();
+			}
 		};
 	asc_docs_api.prototype.endCollaborationEditing = function()
 		{
@@ -7136,12 +7136,12 @@ background-repeat: no-repeat;\
                     var oChange = new fChangesClass(Class);
                     oChange.ReadFromBinary(stream);
 
-                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange))
+                    if (true === AscCommon.CollaborativeEditing.private_AddOverallChange(oChange, false))
                         oChange.Load(_color);
                 }
                 else
                 {
-                    AscCommon.CollaborativeEditing.private_AddOverallChange(data);
+                    AscCommon.CollaborativeEditing.private_AddOverallChange(data, false);
 
                     stream.Seek(nReaderPos);
                     stream.Seek2(nReaderPos);
