@@ -5714,10 +5714,9 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onAddComment", Id, AscCommentData);
 	};
 
-	asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
+	asc_docs_api.prototype.sync_ShowComment = function(arrId, X, Y)
 	{
-		// TODO: Переделать на нормальный массив
-		this.sendEvent("asc_onShowComment", [Id], X, Y);
+		this.sendEvent("asc_onShowComment", arrId, X, Y);
 	};
 
 	asc_docs_api.prototype.sync_HideComment = function()

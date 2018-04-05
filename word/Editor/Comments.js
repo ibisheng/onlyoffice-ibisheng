@@ -552,9 +552,9 @@ function CComments()
         this.Pages[PageNum] = [];
     };
 
-    this.Add_DrawingRect = function(X, Y, W, H, PageNum, CommentId, InvertTransform)
+    this.Add_DrawingRect = function(X, Y, W, H, PageNum, arrCommentId, InvertTransform)
     {
-        this.Pages[PageNum].push( new CCommentDrawingRect(X, Y, W, H, CommentId, InvertTransform) );
+        this.Pages[PageNum].push( new CCommentDrawingRect(X, Y, W, H, arrCommentId, InvertTransform) );
     };
 
     this.Set_Current = function(Id)
@@ -562,35 +562,42 @@ function CComments()
         this.m_sCurrent = Id;
     };
 
-    this.Get_ByXY = function(PageNum, X, Y, Type)
-    {
-        var Page = this.Pages[PageNum], _X, _Y;
-        if ( undefined !== Page )
-        {
-            var Count = Page.length;
-            for ( var Pos = 0; Pos < Count; Pos++ )
-            {
-                var DrawingRect = Page[Pos];
-                if(!DrawingRect.InvertTransform)
-                {
-                    _X = X;
-                    _Y = Y;
-                }
-                else
-                {
-                    _X = DrawingRect.InvertTransform.TransformPointX(X, Y);
-                    _Y = DrawingRect.InvertTransform.TransformPointY(X, Y);
-                }
-                if ( _X >= DrawingRect.X && _X <= DrawingRect.X + DrawingRect.W && _Y >= DrawingRect.Y && _Y <= DrawingRect.Y + DrawingRect.H )
-                {
-                    var Comment = this.Get_ById( DrawingRect.CommentId );
-                    if ( null != Comment )
-                        return Comment;
-                }
-            }
-        }
-        return null;
-    };
+    this.Get_ByXY = function(PageNum, X, Y)
+	{
+		var Page = this.Pages[PageNum], _X, _Y;
+		if (undefined !== Page)
+		{
+			var Count = Page.length;
+			for (var Pos = 0; Pos < Count; Pos++)
+			{
+				var DrawingRect = Page[Pos];
+				if (!DrawingRect.InvertTransform)
+				{
+					_X = X;
+					_Y = Y;
+				}
+				else
+				{
+					_X = DrawingRect.InvertTransform.TransformPointX(X, Y);
+					_Y = DrawingRect.InvertTransform.TransformPointY(X, Y);
+				}
+				if (_X >= DrawingRect.X && _X <= DrawingRect.X + DrawingRect.W && _Y >= DrawingRect.Y && _Y <= DrawingRect.Y + DrawingRect.H)
+				{
+					var arrComments = [];
+					for (var nCommentIndex = 0, nCommentsCount = DrawingRect.CommentId.length; nCommentIndex < nCommentsCount; ++nCommentIndex)
+					{
+						var oComment = this.Get_ById(DrawingRect.CommentId[nCommentIndex]);
+						if (oComment)
+							arrComments.push(oComment);
+					}
+
+					return arrComments;
+				}
+			}
+		}
+
+		return [];
+	};
 
     this.Get_Current = function()
     {
