@@ -1284,7 +1284,7 @@ CChartsDrawer.prototype =
 	},
 	
 	//****new calculate data****
-	_calculateStackedData2: function (data) {
+	_calculateStackedData2: function (data, grouping) {
 		var maxMinObj;
 
 		var calculateStacked = function(sum) {
@@ -1322,10 +1322,9 @@ CChartsDrawer.prototype =
 			return res;
 		};
 
-		var subType = this.calcProp.subType;
-		if (subType === 'stacked') {
+		if (grouping === 'stacked') {
 			calculateStacked();
-		} else if (subType === 'stackedPer') {
+		} else if (grouping === 'stackedPer') {
 			calculateStacked(calculateSum());
 		}
 
@@ -1561,11 +1560,12 @@ CChartsDrawer.prototype =
 		}
 
 		//пересчёт данных для накопительных диаграмм
-		if (this.calcProp.subType === 'stackedPer' || this.calcProp.subType === 'stacked') {
+		var grouping = this.getChartGrouping(chart);
+		if ("stackedPer" === grouping || "stacked" === grouping) {
 			if (newArr) {
 				arrValues = newArr;
 			}
-			var stackedExtremum = this._calculateStackedData2(arrValues);
+			var stackedExtremum = this._calculateStackedData2(arrValues, grouping);
 			if(stackedExtremum) {
 				min = stackedExtremum.min;
 				max = stackedExtremum.max;
