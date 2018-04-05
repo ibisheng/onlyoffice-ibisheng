@@ -6292,10 +6292,8 @@
 		this._fixSelectionOfMergedCells(ar, force);
 	};
 
-    WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
-        var selection = this._getSelection();
-        var ar = selection.getLast();
-        var activeCell = selection.activeCell;
+    WorksheetView.prototype._moveActiveCellToOffset = function (activeCell, dc, dr) {
+        var ar = this._getSelection().getLast();
         var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
         var c = mc ? (dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : activeCell.col) :
           activeCell.col;
@@ -7130,6 +7128,8 @@
 	WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isCtrl) {
 		this.cleanSelection();
 
+		var activeCell = this.model.selectionRange.activeCell.clone();
+
 		if (!this.isFormulaEditMode) {
 			this.cleanFormulaRanges();
 			if (isCtrl) {
@@ -7151,7 +7151,7 @@
 		} else {
 			comment = this.cellCommentator.getComment(x, y);
 			// move active range to offset x,y
-			this._moveActiveCellToOffset(x, y);
+			this._moveActiveCellToOffset(activeCell, x, y);
 			ret = this._calcActiveRangeOffset();
 		}
 
