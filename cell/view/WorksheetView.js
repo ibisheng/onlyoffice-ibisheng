@@ -6272,7 +6272,20 @@
 		var ar = selection.getLast();
 		var range = this._getCellByXY(x, y);
 		ar.assign(range.c1, range.r1, range.c2, range.r2);
-		var force = selection.setCell(range.r1, range.c1);
+		var r = range.r1, c = range.c1;
+		switch (ar.getType()) {
+			case c_oAscSelectionType.RangeCol:
+				r = this.visibleRange.r1;
+				break;
+			case c_oAscSelectionType.RangeRow:
+				c = this.visibleRange.c1;
+				break;
+			case c_oAscSelectionType.RangeMax:
+				r = this.visibleRange.r1;
+				c = this.visibleRange.c1;
+			    break;
+		}
+		var force = selection.setCell(r, c);
 		if (c_oAscSelectionType.RangeCells !== ar.getType()) {
 			this._fixSelectionOfHiddenCells();
 		}

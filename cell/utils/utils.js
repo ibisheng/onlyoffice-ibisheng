@@ -915,7 +915,8 @@
 
 		SelectionRange.prototype.clean = function () {
 			this.ranges = [new Range(0, 0, 0, 0)];
-			this.activeCellId = -1;
+			this.activeCellId = 0;
+			this.activeCell.clean();
 		};
 		SelectionRange.prototype.contains = function (c, r) {
 			return this.ranges.some(function (item) {
@@ -961,8 +962,7 @@
 			return true;
 		};
 		SelectionRange.prototype.addRange = function () {
-			this.ranges.push(new Range(0, 0, 0, 0));
-			this.activeCellId = -1;
+			this.activeCellId = this.ranges.push(new Range(0, 0, 0, 0)) - 1;
 			this.activeCell.clean();
 		};
 		SelectionRange.prototype.assign2 = function (range) {
