@@ -6141,10 +6141,10 @@
 		return oResDefault;
 	};
 
-    WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
+    WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange, force) {
         var selection;
         var ar = fixedRange ? fixedRange : ((selection = this._getSelection()) ? selection.getLast() : null);
-        if (!ar || c_oAscSelectionType.RangeCells !== ar.getType()) {
+        if (!ar || (!force && c_oAscSelectionType.RangeCells !== ar.getType())) {
             return;
         }
 
@@ -6272,11 +6272,11 @@
 		var ar = selection.getLast();
 		var range = this._getCellByXY(x, y);
 		ar.assign(range.c1, range.r1, range.c2, range.r2);
-		selection.setCell(range.r1, range.c1);
+		var force = selection.setCell(range.r1, range.c1);
 		if (c_oAscSelectionType.RangeCells !== ar.getType()) {
 			this._fixSelectionOfHiddenCells();
 		}
-		this._fixSelectionOfMergedCells();
+		this._fixSelectionOfMergedCells(ar, force);
 	};
 
     WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
@@ -6303,7 +6303,7 @@
         if (this.width_1px > this.cols[cell.col].width || this.height_1px > this.rows[cell.row].height) {
             return;
         }
-        return this.model.selectionRange.offsetCell(dr, dc, function (row, col) {
+        return this.model.selectionRange.offsetCell(dr, dc, true, function (row, col) {
             return (0 <= row) ? (t.rows[row].height < t.height_1px) : (t.cols[col].width < t.width_1px);
         });
     };
@@ -7266,12 +7266,15 @@
 
     // Обработка движения в выделенной области
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
-        var ret;
+        var ret, res;
         if (0 === dc && 0 === dr) {
             return this._calcActiveCellOffset();
         }
-        if (!this._moveActivePointInSelection(dc, dr)) {
+		res = this._moveActivePointInSelection(dc, dr);
+        if (0 === res) {
             return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, false);
+        } else if (-1 === res) {
+            return null;
         }
 
         // Очищаем выделение

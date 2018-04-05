@@ -1019,17 +1019,17 @@
 			}
 			return result;
 		};
-		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
+		SelectionRange.prototype.offsetCell = function (dr, dc, changeRange, fCheckSize) {
 			var done, curRange, mc, incompleate;
 			// Check one cell
 			if (1 === this.ranges.length) {
 				curRange = this.ranges[this.activeCellId];
 				if (curRange.isOneCell()) {
-					return false;
+					return 0;
 				} else {
 					mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
 					if (mc && curRange.isEqual(mc)) {
-						return false;
+						return 0;
 					}
 				}
 			}
@@ -1063,6 +1063,11 @@
 					}
 
 					if (!curRange.contains2(this.activeCell)) {
+						if (!changeRange) {
+							this.activeCell.row = lastRow;
+							this.activeCell.col = lastCol;
+							return -1;
+						}
 						if (0 < dc || 0 < dr) {
 							this.activeCellId += 1;
 							this.activeCellId = (this.ranges.length > this.activeCellId) ? this.activeCellId : 0;
@@ -1127,12 +1132,24 @@
 
 				break;
 			}
-			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col);
+			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col) ? 1 : -1;
 		};
 		SelectionRange.prototype.setCell = function (r, c) {
+			var res = false;
 			this.activeCell.row = r;
 			this.activeCell.col = c;
 			this.update();
+
+			// Check active cell in merge cell (bug 36708)
+			var mc = this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col);
+			if (this.worksheet.getMergedByCell(this.activeCell.row, this.activeCell.col)) {
+				res = -1 === this.offsetCell(1, 0, false, function () {return false;});
+				if (res) {
+					this.activeCell.row = mc.r1;
+					this.activeCell.col = mc.c1;
+				}
+			}
+			return res;
 		};
 		SelectionRange.prototype.getLast = function () {
 			return this.ranges[this.ranges.length - 1];
