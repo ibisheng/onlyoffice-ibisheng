@@ -964,9 +964,11 @@
 		switch (bbox.getType()) {
 			case 2:		
 				worksheet.setColHidden(value, bbox.c1, bbox.c2);	
+				break;
 
 			case 3:
-				worksheet.setRowHidden(value, bbox.r1, bbox.r2);				
+				worksheet.setRowHidden(value, bbox.r1, bbox.r2);
+				break;				
 		}
 	};
 	Object.defineProperty(ApiRange.prototype, "Hidden", {
@@ -977,6 +979,83 @@
 			this.SetHidden(value);
 		}
 	});
+
+	/**
+	 * Get columns width value
+	 * @memberof ApiRange
+	 * @returns {number}
+	 */
+	ApiRange.prototype.GetColumnWidth = function () {
+		var ws = this.range.worksheet;
+		var width = ws.getColWidth(this.range.bbox.c1);
+		width = (width < 0) ? AscCommonExcel.oDefaultMetrics.ColWidthChars : width; 
+		return ws.colWidthToCharCount(ws.modelColWidthToColWidth(width));
+	};
+	/**
+	 * Set columns width value
+	 * @memberof ApiRange
+	 * @param {number} width
+	 */
+	ApiRange.prototype.SetColumnWidth = function (width) {
+		this.range.worksheet.setColWidth(width, this.range.bbox.c1, this.range.bbox.c2);
+	};
+	Object.defineProperty(ApiRange.prototype, "ColumnWidth", {
+		get: function () {
+			return this.GetColumnWidth();
+		},
+		set: function (width) {
+			this.SetColumnWidth(width);
+		}
+	});
+	Object.defineProperty(ApiRange.prototype, "Width", {
+		get: function () {
+			var max = this.range.bbox.c2 - this.range.bbox.c1;
+			var ws = this.range.worksheet;
+			var sum = 0;
+			var width;
+			for (var i = 0; i <= max; i++) {
+				width = ws.getColWidth(i);
+				width = (width < 0) ? AscCommonExcel.oDefaultMetrics.ColWidthChars : width;
+				sum += ws.modelColWidthToColWidth(width);
+			}
+			return sum;
+		}
+	});
+
+	/**
+	 * Get rows height value
+	 * @memberof ApiRange
+	 * @returns {number}
+	 */
+	ApiRange.prototype.GetRowHeight = function () {
+		return this.range.worksheet.getRowHeight(this.range.bbox.r1);
+   	};
+   	/**
+	* Set rows height value
+	* @memberof ApiRange
+	* @param {number} height
+	 */
+   	ApiRange.prototype.SetRowHeight = function (height) {
+		this.range.worksheet.setRowHeight(height, this.range.bbox.r1, this.range.bbox.r2, false);
+   	};
+   	Object.defineProperty(ApiRange.prototype, "RowHeight", {
+	   	get: function () {
+			return this.GetRowHeight();
+	   	},
+	   	set: function (height) {
+			this.SetRowHeight(height);
+	   	}
+  	});
+   	Object.defineProperty(ApiRange.prototype, "Height", {
+	   	get: function () {
+			var max = this.range.bbox.r2 - this.range.bbox.r1;
+			var sum = 0;
+			for (var i = 0; i <= max; i++) {
+				sum += this.range.worksheet.getRowHeight(i);
+		   	}
+		   	return sum;
+	   	}
+   	});
 
 	/**
 	 * Set font size
@@ -1688,6 +1767,10 @@
 	ApiRange.prototype["SetFontColor"] = ApiRange.prototype.SetFontColor;
 	ApiRange.prototype["GetHidden"] = ApiRange.prototype.GetHidden;
 	ApiRange.prototype["SetHidden"] = ApiRange.prototype.SetHidden;	
+	ApiRange.prototype["GetColumnWidth"] = ApiRange.prototype.GetColumnWidth;	
+	ApiRange.prototype["SetColumnWidth"] = ApiRange.prototype.SetColumnWidth;	
+	ApiRange.prototype["GetRowHeight"] = ApiRange.prototype.GetRowHeight;
+	ApiRange.prototype["SetRowHeight"] = ApiRange.prototype.SetRowHeight;
 	ApiRange.prototype["SetFontSize"] = ApiRange.prototype.SetFontSize;
 	ApiRange.prototype["SetFontName"] = ApiRange.prototype.SetFontName;
 	ApiRange.prototype["SetAlignVertical"] = ApiRange.prototype.SetAlignVertical;
