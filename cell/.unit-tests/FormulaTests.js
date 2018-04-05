@@ -3112,6 +3112,18 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 70 );
 
+		oParser = new parserFormula( "SUMPRODUCT({1,2,TRUE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
 		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 70 );

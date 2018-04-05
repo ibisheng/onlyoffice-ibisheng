@@ -4517,6 +4517,8 @@
 						} else {
 							res *= arg0.tocNumber().getValue();
 						}
+					} else if(arg0 instanceof cBool) {
+						res *= 0;
 					} else {
 						res *= arg0.tocNumber().getValue();
 					}
