@@ -487,7 +487,8 @@
 			MouseUpLock.MouseUpLockedSend = true;
 			if (global_mouseEvent.IsLocked)
 			{
-				if (undefined != global_mouseEvent.Sender.onmouseup && null != global_mouseEvent.Sender.onmouseup)
+				if ((undefined != global_mouseEvent.Sender) && (null != global_mouseEvent.Sender) &&
+					(undefined != global_mouseEvent.Sender.onmouseup) && (null != global_mouseEvent.Sender.onmouseup))
 				{
 					global_mouseEvent.Sender.onmouseup(e, true);
 

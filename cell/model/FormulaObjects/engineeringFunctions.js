@@ -4334,8 +4334,6 @@ function (window, undefined) {
 		cIMPOWER, cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN,
 		cOCT2DEC, cOCT2HEX);
 
-	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCONVERT);
 
 	/**
 	 * @constructor

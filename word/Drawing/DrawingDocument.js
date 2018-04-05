@@ -7929,7 +7929,88 @@ function CDrawingDocument()
 		}
 
 		return false;
-	}
+	};
+
+	this.checkMouseDown_DrawingOnUp = function (pos)
+	{
+		var oWordControl = this.m_oWordControl;
+
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			var _content_control = this.ContentControlObjects[i];
+			if (_content_control.type == c_oContentControlTrack.In)
+			{
+				var _rect = _content_control.getXY();
+
+				var _page = this.m_arrPages[_content_control.getPage()];
+				if (!_page)
+					return false;
+
+				var drPage = _page.drawingPage;
+
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				var _x = _rect.X - (15 / dKoefX);
+				var _y = _rect.Y;
+				var _r = _rect.X;
+				var _b = _rect.Y + (20 / dKoefY);
+
+				if (_content_control.Name != "" || 0 != _content_control.Buttons.length)
+				{
+					_x = _rect.X;
+					_y = _rect.Y - (20 / dKoefY);
+					_r = _rect.X + (15 / dKoefX);
+					_b = _rect.Y;
+				}
+
+				var posX = pos.X;
+				var posY = pos.Y;
+
+				var _transform = _content_control.transform;
+				if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+				{
+					_x += _transform.tx;
+					_y += _transform.ty;
+					_r += _transform.tx;
+					_b += _transform.ty;
+
+					_transform = null;
+				}
+				if (_transform)
+				{
+					var _invert = global_MatrixTransformer.Invert(_transform);
+					posX = _invert.TransformPointX(pos.X, pos.Y);
+					posY = _invert.TransformPointY(pos.X, pos.Y);
+				}
+
+				if (posX > _x && posX < _r && posY > _y && posY < _b)
+				{
+					return true;
+				}
+				else if (_content_control.NameButtonAdvanced && posX > _r && posX < (_r + _content_control.NameWidth / dKoefX) && posY > _y && posY < _b)
+				{
+					return true;
+				}
+				else
+				{
+					var _posR = _r + _content_control.NameWidth / dKoefX;
+					for (var indexB = 0; indexB < _content_control.Buttons.length; indexB++)
+					{
+						if (posX > _posR && posX < (_posR + 20 / dKoefX) && posY > _y && posY < _b)
+						{
+							return true;
+						}
+						_posR += (20 / dKoefX);
+					}
+				}
+
+				break;
+			}
+		}
+
+		return false;
+	};
 
 	this.checkMouseMove_Drawing = function (pos)
 	{

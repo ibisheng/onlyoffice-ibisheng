@@ -3639,7 +3639,7 @@ function OfflineEditor () {
             var ranges = (this.isSelectionDialogMode ? this.copyActiveRange : this.model.selectionRange).ranges;
             var range, selectionLineType, type;
             for (var i = 0, l = ranges.length; i < l; ++i) {
-                range = ranges[i];
+                range = ranges[i].clone();
 				type = range.getType();
                 if (Asc.c_oAscSelectionType.RangeMax === type) {
                     range.c2 = this.cols.length - 1;
@@ -5414,7 +5414,10 @@ window["native"]["offline_dh"] = function(x, y, width, height, ratio, type) {
     _s.drawHeader(x, y, width, height, type, ratio);
 }
 
-window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, c1, r1, c2, r2, targetCol, targetRow, select) {
+window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, 
+    indexRange, c1, r1, c2, r2, targetCol, targetRow, 
+    typePin, beginX, beginY, endX, endY) {
+
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -5435,15 +5438,15 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
         var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
-        if (1 === select["pin"]) {
-            wb._onGraphicObjectMouseDown(e, select["beginX"], select["beginY"]);
-            wb._onGraphicObjectMouseUp(e, select["endX"], select["endY"]);
+        if (1 === typePin) {
+            wb._onGraphicObjectMouseDown(e, beginX, beginY);
+            wb._onGraphicObjectMouseUp(e, endX, endY);
             e.shiftKey = true;
         }
 
-        if (-1 === select["pin"]) {
-            wb._onGraphicObjectMouseDown(e, select["endX"], select["endY"]);
-            wb._onGraphicObjectMouseUp(e, select["beginX"], select["beginY"]);
+        if (-1 === typePin) {
+            wb._onGraphicObjectMouseDown(e, endX, endY);
+            wb._onGraphicObjectMouseUp(e, beginX, beginY);
             e.shiftKey = true;
         }
 
@@ -5537,7 +5540,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
                 return {'action':'closeCellEditor'};
             }
 
-            ws.changeSelectionStartPoint(x, y, true);
+            wb._onChangeSelection(true, x, y, true);
 
             if (isFormulaEditMode) {
                 if (ret) {
@@ -5603,7 +5606,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                     return {'action':'closeCellEditor'};
                 }
 
-                ws.changeSelectionEndPoint(x, y, true);
+                wb._onChangeSelection(false, x, y, true);
                 ws.enterCellRange(wb.cellEditor);
             } else {
                 if (-1 == _s.cellPin)
@@ -5611,7 +5614,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
                 else if (1 === _s.cellPin)
                     ws.__changeSelectionPoint(x, y, true, true, false);
                 else {
-                    ws.changeSelectionEndPoint(x, y, true);
+                    wb._onChangeSelection(false, x, y, true);
                 }
             }
         }
@@ -5717,6 +5720,8 @@ window["native"]["offline_complete_cell"] = function(x, y) {return _s.getNearCel
 window["native"]["offline_keyboard_down"] = function(inputKeys) {
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
+
+    AscCommon.g_oTextMeasurer.Flush();
 
     var isFormulaEditMode = ws.isFormulaEditMode;
     ws.isFormulaEditMode = false;

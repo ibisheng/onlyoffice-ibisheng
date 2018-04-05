@@ -4167,17 +4167,26 @@ function CEditorPage(api)
 		//this.m_oScrollVerApi.scrollTo(0, drDoc.SlideCurrent * this.m_dDocumentPageHeight);
 		if (this.IsGoToPageMAXPosition)
 		{
+			if (this.SlideScrollMAX > this.m_dScrollY_max)
+				this.SlideScrollMAX = this.m_dScrollY_max;
+
 			this.m_oScrollVerApi.scrollToY(this.SlideScrollMAX);
 			this.IsGoToPageMAXPosition = false;
 		}
 		else
 		{
 			//this.m_oScrollVerApi.scrollToY(this.SlideScrollMIN);
+			if (this.m_dScrollY_Central > this.m_dScrollY_max)
+				this.m_dScrollY_Central = this.m_dScrollY_max;
+
 			this.m_oScrollVerApi.scrollToY(this.m_dScrollY_Central);
 		}
 
 		if (this.m_bIsHorScrollVisible)
 		{
+			if (this.m_dScrollX_Central > this.m_dScrollX_max)
+				this.m_dScrollX_Central = this.m_dScrollX_max;
+
 			this.m_oScrollHorApi.scrollToX(this.m_dScrollX_Central);
 		}
 

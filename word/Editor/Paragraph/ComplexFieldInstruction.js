@@ -518,7 +518,7 @@ CFieldInstructionParser.prototype.GetInstructionClass = function(sLine)
 CFieldInstructionParser.prototype.private_Parse = function()
 {
 	if (!this.private_ReadNext())
-		return;
+		return this.private_ReadREF("");
 
 	switch (this.Buffer.toUpperCase())
 	{

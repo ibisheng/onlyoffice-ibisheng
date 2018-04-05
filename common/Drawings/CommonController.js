@@ -7571,9 +7571,12 @@ DrawingObjectsController.prototype =
                 {
                     this.selectObject(oDrawingSelectionState.chartObject, bDocument ? (oDrawingSelectionState.chartObject.parent ? oDrawingSelectionState.chartObject.parent.PageNum : nPageIndex) : nPageIndex);
                     oDrawingSelectionState.chartObject.resetSelection();
-                    if(oDrawingSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oDrawingSelectionState.chartSelection))
+                    if(oDrawingSelectionState.chartObject.loadDocumentStateAfterLoadChanges(oSelectionState))
                     {
                         this.selection.chartSelection = oDrawingSelectionState.chartObject;
+                        if(!oSelectionState.DrawingSelection){
+                            bNeedRecalculateCurPos = true;
+                        }
                     }
                 }
             }

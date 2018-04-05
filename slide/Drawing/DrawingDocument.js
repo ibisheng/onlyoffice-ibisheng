@@ -5581,6 +5581,7 @@ function CSlideDrawer()
 			else
 			{
 				// здесь просто нужно очистить место под новую отрисовку
+				this.CachedCanvasCtx.setTransform(1, 0, 0, 1, 0, 0);
 				this.CachedCanvasCtx.clearRect(0, 0, _need_pix_width, _need_pix_height);
 			}
 

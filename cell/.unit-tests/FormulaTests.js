@@ -4797,6 +4797,30 @@ $( function () {
 
     } );
 
+	test( "Test: \"HYPGEOM.DIST\"", function () {
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,4,8,20,TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.4654 );
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,4,8,20,FALSE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.3633 );
+
+		oParser = new parserFormula( "HYPGEOM.DIST(2,2,3,40,0)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.003846154);
+
+		oParser = new parserFormula( "HYPGEOM.DIST(2,3,3,40,5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.999898785);
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,2,3,4,5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue() - 0, 0.5);
+
+	} );
+
     test( "Test: \"INTERCEPT\"", function () {
 
         function intercept( y, x ) {
