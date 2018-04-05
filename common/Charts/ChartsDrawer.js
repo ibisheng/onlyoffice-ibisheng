@@ -1821,19 +1821,19 @@ CChartsDrawer.prototype =
 
 		//TODO для 3d диаграмм. пересмотреть!
 		if (this._isSwitchCurrent3DChart(chartSpace)) {
-			if (this.calcProp.max > 0 && this.calcProp.min < 0) {
-				if (manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2]) {
+			if (yMax > 0 && yMin < 0) {
+				if (manualMax == null && yMax <= arrayValues[arrayValues.length - 2]) {
 					arrayValues.splice(arrayValues.length - 1, 1);
 				}
-				if (manualMin == null && this.calcProp.min >= arrayValues[1]) {
+				if (manualMin == null && yMin >= arrayValues[1]) {
 					arrayValues.splice(0, 1);
 				}
-			} else if (this.calcProp.max > 0 && this.calcProp.min >= 0) {
-				if (manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2]) {
+			} else if (yMax > 0 && yMin >= 0) {
+				if (manualMax == null && yMax <= arrayValues[arrayValues.length - 2]) {
 					arrayValues.splice(arrayValues.length - 1, 1);
 				}
-			} else if (this.calcProp.min < 0 && this.calcProp.max <= 0) {
-				if (manualMin == null && this.calcProp.min >= arrayValues[1]) {
+			} else if (yMin < 0 && yMax <= 0) {
+				if (manualMin == null && yMin >= arrayValues[1]) {
 					arrayValues.splice(0, 1);
 				}
 			}
