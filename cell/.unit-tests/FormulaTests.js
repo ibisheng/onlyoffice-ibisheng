@@ -3100,6 +3100,8 @@ $( function () {
         ws.getRange2( "P45" ).setValue( "10" );
         ws.getRange2( "P46" ).setValue( "11" );
         ws.getRange2( "P47" ).setValue( "12" );
+		ws.getRange2( "P48" ).setValue( "" );
+		ws.getRange2( "P49" ).setValue( "" );
         oParser = new parserFormula( "SUMPRODUCT(N44:N47,O44:O47,P44:P47)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 780 );
@@ -3123,6 +3125,18 @@ $( function () {
 		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE,3})", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48, P44:P47)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48:P49)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 
 		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );

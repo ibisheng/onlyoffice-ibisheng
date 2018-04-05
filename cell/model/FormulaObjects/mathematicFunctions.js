@@ -4487,15 +4487,20 @@
 			if (arg[i] instanceof cArea || arg[i] instanceof cArray) {
 				resArr[i] = arg[i].getMatrix();
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
-				resArr[i] = [[arg[i].getValue()]];
+				var val = arg[i].getValue();
+				if(val instanceof cEmpty) {
+					return new cError(cErrorType.wrong_value_type);
+				} else {
+					resArr[i] = [[val]];
+				}
 			} else {
 				resArr[i] = [[arg[i]]];
 			}
 
 			row = Math.max(resArr[0].length, row);
-			col = Math.max(resArr[0][0].length, col);
+			col = resArr[0][0] ? Math.max(resArr[0][0].length, col) : 0;
 
-			if (row != resArr[i].length || col != resArr[i][0].length) {
+			if (row != resArr[i].length || (resArr[i][0] && col != resArr[i][0].length)) {
 				return new cError(cErrorType.not_numeric);
 			}
 
