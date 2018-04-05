@@ -1121,6 +1121,10 @@
 					done = false;
 				}
 
+				if (!done) {
+					continue;
+				}
+
 				break;
 			}
 			return (lastRow !== this.activeCell.row || lastCol !== this.activeCell.col);
