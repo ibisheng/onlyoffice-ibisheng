@@ -503,7 +503,7 @@ CChartsDrawer.prototype =
 			}
 		}
 		
-		return {x: x , y: y}
+		return {x: x , y: y};
 	},
 	
 	_calculatePositionCatAxTitle: function(chartSpace)
@@ -544,7 +544,7 @@ CChartsDrawer.prototype =
 			x = convertResult.x / this.calcProp.pxToMM - widthTitle / 2;
 		}
 		
-		return {x: x, y: y}
+		return {x: x, y: y};
 	},
 	
 	_calculatePositionLegend: function(chartSpace)
@@ -606,7 +606,7 @@ CChartsDrawer.prototype =
 			}
 		}
 		
-		return {x: x, y: y}
+		return {x: x, y: y};
 	},
 	
 	
@@ -1792,16 +1792,9 @@ CChartsDrawer.prototype =
 
 			step = step * firstDegree.numPow;
 		}
-
-		//TODO пересмотреть зависимость значений оси от типа диаграммы
+		
 		if (isNaN(step) || step === 0) {
-			if ('HBar' === this.calcProp.type && this.calcProp.subType === 'stackedPer') {
-				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1];
-			} else if (this.calcProp.subType === 'stackedPer') {
-				arrayValues = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-			} else {
-				arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
-			}
+			arrayValues = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
 		} else {
 			arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
 		}
