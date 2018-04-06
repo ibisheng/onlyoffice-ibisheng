@@ -12670,9 +12670,18 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 		}
 	}
 
-	// TODO: Проверка автофигур
 	if (oPr && oPr.SkipDrawings)
 		return;
+
+	var arrDrawings = this.GetAllDrawingObjects();
+	for (var nDrIndex = 0, nDrCount = arrDrawings.length; nDrIndex < nDrCount; ++nDrIndex)
+	{
+		var arrContents = arrDrawings[nDrIndex].GetAllDocContents();
+		for (var nContentIndex = 0, nContentsCount = arrContents.length; nContentIndex < nContentsCount; ++nContentIndex)
+		{
+			arrContents[nContentIndex].GetOutlineParagraphs(arrOutline, oPr);
+		}
+	}
 };
 Paragraph.prototype.UpdateBookmarks = function(oManager)
 {
