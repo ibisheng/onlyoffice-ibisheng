@@ -1356,7 +1356,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
-                Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
+                Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent;
 
                 if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
                 {
@@ -1372,7 +1372,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             else
             {
                 // Параграф начинается с новой страницы
-                Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
+                Bottom2 = Top + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent;
 
                 if ( border_Single === ParaPr.Brd.Top.Value )
                 {
