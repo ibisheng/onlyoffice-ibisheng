@@ -4794,6 +4794,12 @@ CShape.prototype.getAllRasterImages = function(images)
         this.checkContentByCallback(oContent, fCallback);
     }
 };
+CShape.prototype.getAllDocContents = function(aDocContents)
+{
+    if(this.textBoxContent){
+        aDocContents.push(this.textBoxContent);
+    }
+};
 
 CShape.prototype.changePresetGeom = function (sPreset) {
 

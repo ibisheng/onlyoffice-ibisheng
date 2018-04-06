@@ -2060,6 +2060,13 @@ ParaDrawing.prototype.GetAllParagraphs = function(Props, ParaArray)
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.GetAllParagraphs === "function")
 		this.GraphicObj.GetAllParagraphs(Props, ParaArray);
 };
+ParaDrawing.prototype.GetAllDocContents = function(aDocContents)
+{
+	var _ret = Array.isArray(aDocContents) ? aDocContents : [];
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.GetAllDocContents === "function")
+		this.GraphicObj.getAllDocContents(_ret);
+	return _ret;
+};
 ParaDrawing.prototype.getTableProps = function()
 {
 	if (isRealObject(this.GraphicObj) && typeof  this.GraphicObj.getTableProps === "function")

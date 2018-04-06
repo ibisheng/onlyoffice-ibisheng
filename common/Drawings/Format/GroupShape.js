@@ -116,6 +116,14 @@ function CGroupShape()
                 this.spTree[i].documentGetAllFontNames(allFonts);
         }
     };
+    CGroupShape.prototype.getAllDocContents = function(aDocContents)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].getAllDocContents)
+                this.spTree[i].getAllDocContents(aDocContents);
+        }
+    };
 
     CGroupShape.prototype.documentCreateFontMap = function(allFonts)
     {

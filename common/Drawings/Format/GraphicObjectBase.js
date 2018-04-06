@@ -960,6 +960,9 @@
         }
         return null;
     };
+    CGraphicObjectBase.prototype.getAllDocContents = function(aDrawings){
+
+    };
 
 
     CGraphicObjectBase.prototype.getFullRotate = function () {
