@@ -41252,8 +41252,12 @@ function FT_Set_Charmap(face, cmap)
     if (0 == len)
         return 38;
 
-    if (FT_Get_CMap_Format(cmap) == 14)
-        return 6;
+    if (!AscCommon.AscBrowser.isSafariMacOs && !AscCommon.AscBrowser.isAppleDevices)
+	{
+		// https://bugreport.apple.com/web/?problemID=39173151
+		if (FT_Get_CMap_Format(cmap) == 14)
+			return 6;
+	}
 
     for (var i = 0; i < len; i++)
     {
