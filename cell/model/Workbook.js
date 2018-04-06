@@ -140,6 +140,11 @@
 		Row:2,
 		All:3
 	};
+	var c_oSharedShiftType = {
+		Processed: 1,
+		NeedTransform: 2,
+		PreProcessed: 3
+	};
 	var emptyStyleComponents = {table: [], conditional: []};
 	function getRangeType(oBBox){
 		if(null == oBBox)
@@ -1049,6 +1054,7 @@
 			});
 		},
 		updateSharedFormulas: function() {
+			var newRef;
 			for (var indexNumber in this.changedShared) {
 				var parsed = this.changedShared[indexNumber];
 				var shared = parsed.getShared();
@@ -1067,18 +1073,11 @@
 							c2 = Math.max(c2, cell.nCol);
 						}
 					});
-					if (r1 !== ref.r1 || c1 !== ref.c1 || r2 !== ref.r2 || c2 !== ref.c2) {
-						parsed.removeDependencies();
-						var oldRef = shared.ref;
-						var newRef;
-						if (r1 <= r2 && c1 <= c2) {
-							newRef = new Asc.Range(c1, r1, c2, r2);
-							parsed.setSharedRef(newRef);
-							parsed.buildDependencies();
-						}
-						var index = ws.workbook.workbookFormulas.add(parsed).getIndexNumber();
-						History.Add(AscCommonExcel.g_oUndoRedoSharedFormula, AscCH.historyitem_SharedFormula_ChangeShared, null, null, new UndoRedoData_IndexSimpleProp(index, false, oldRef, newRef), true);
+					newRef = undefined;
+					if (r1 <= r2 && c1 <= c2) {
+						newRef = new Asc.Range(c1, r1, c2, r2);
 					}
+					parsed.setSharedRef(newRef);
 				}
 			}
 			this.changedShared = {};
@@ -1284,6 +1283,7 @@
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
 			var listeners = {};
+			var res = {changed: listeners, shiftedShared: {}};
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				var bboxShift;
@@ -1319,12 +1319,14 @@
 						}
 					}
 				}
-				var notifyData = {type: notifyType, sheetId: sheetId, bbox: bbox, offset: offset};
+				var notifyData = {
+					type: notifyType, sheetId: sheetId, bbox: bbox, offset: offset, shiftedShared: res.shiftedShared
+				};
 				for (var listenerId in listeners) {
 					listeners[listenerId].notify(notifyData);
 				}
 			}
-			return listeners;
+			return res;
 		}
 	};
 
@@ -3642,23 +3644,57 @@
 		}
 		return res;
 	};
-	Worksheet.prototype._updateFormulasParents=function(r1, c1, r2, c2, offset){
+	Worksheet.prototype._updateFormulasParents = function(r1, c1, r2, c2, bbox, offset, shiftedShared) {
 		var t = this;
-		this.getRange3(r1, c1, r2, c2)._foreachNoEmpty(function(cell){
+		var cellWithFormula;
+		this.getRange3(r1, c1, r2, c2)._foreachNoEmpty(function(cell) {
 			var newNRow = cell.nRow + offset.offsetRow;
 			var newNCol = cell.nCol + offset.offsetCol;
+			var bHor = 0 !== offset.offsetCol;
+			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
 
 			if (cell.isFormula()) {
-				var isTransform = cell.transformSharedFormula();
+				var processed = c_oSharedShiftType.NeedTransform;
 				var parsed = cell.getFormulaParsed();
-				if (isTransform) {
-					parsed.buildDependencies();
+				var shared = parsed.getShared();
+				if (shared) {
+					processed = shiftedShared[parsed.getListenerId()];
+					var isPreProcessed = c_oSharedShiftType.PreProcessed === processed;
+					if (!processed || isPreProcessed) {
+						if (!processed) {
+							var bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
+							//if shared not completly in shift range - transform
+							//if shared intersect delete range - transform
+							if (bboxShift.containsRange(shared.ref) && (!toDelete || !bbox.isIntersect(shared.ref))) {
+								processed = c_oSharedShiftType.Processed;
+							} else {
+								processed = c_oSharedShiftType.NeedTransform;
+							}
+						} else if(isPreProcessed) {
+							//At PreProcessed stage all required formula was transformed. here we need to shift shared
+							processed = c_oSharedShiftType.Processed;
+						}
+						if (c_oSharedShiftType.Processed === processed) {
+							var newRef = shared.ref.clone();
+							newRef.forShift(bbox, offset, t.workbook.bUndoChanges);
+							parsed.setSharedRef(newRef, !isPreProcessed);
+							t.workbook.dependencyFormulas.addToChangedRange2(t.getId(), newRef);
+						}
+						shiftedShared[parsed.getListenerId()] = processed;
+					}
 				}
+				if (c_oSharedShiftType.NeedTransform === processed) {
+					var isTransform = cell.transformSharedFormula();
+					parsed = cell.getFormulaParsed();
+					if (isTransform) {
+						parsed.buildDependencies();
+					}
 
-				var cellWithFormula = parsed.getParent();
-				cellWithFormula.nRow = newNRow;
-				cellWithFormula.nCol = newNCol;
-				t.workbook.dependencyFormulas.addToChangedCell(cellWithFormula);
+					cellWithFormula = parsed.getParent();
+					cellWithFormula.nRow = newNRow;
+					cellWithFormula.nCol = newNCol;
+					t.workbook.dependencyFormulas.addToChangedCell(cellWithFormula);
+				}
 			}
 			if (newNRow >= t.nRowsCount) {
 				t.nRowsCount = newNRow + 1;
@@ -3677,7 +3713,7 @@
 		var oActualRange = new Asc.Range(0, start, gc_nMaxCol0, stop);
 		var offset = {offsetRow: nDif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
+		var renameRes = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("delCell", oActualRange, c_oAscDeleteOptions.DeleteRows);
 		this.updatePivotOffset(oActualRange, offset);
 
@@ -3692,13 +3728,13 @@
 			t._removeCell(null, null, cell);
 		});
 
-		this._updateFormulasParents(start, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(start, 0, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
 		this.rowsData.deleteRange(start, (-nDif));
 		this._forEachColData(function(sheetMemory) {
 			sheetMemory.deleteRange(start, (-nDif));
 		});
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -3717,11 +3753,11 @@
 		History.Create_NewPoint();
 		var offset = {offsetRow: count, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
+		var renameRes = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertRows("insCell", oActualRange, c_oAscInsertOptions.InsertColumns);
 		this.updatePivotOffset(oActualRange, offset);
 
-		this._updateFormulasParents(index, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(index, 0, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
 		//insert new row/cell
 		this.rowsData.insertRange(index, count);
 		this._forEachColData(function(sheetMemory) {
@@ -3742,7 +3778,7 @@
 			});
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -3777,7 +3813,7 @@
 		var oActualRange = new Asc.Range(start, 0, stop, gc_nMaxRow0);
 		var offset = { offsetRow: 0, offsetCol: nDif };
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
+		var renameRes = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, nDif);
 		this.updatePivotOffset(oActualRange, offset);
 
@@ -3791,7 +3827,7 @@
 		}, function(cell){
 			t._removeCell(null, null, cell);
 		});
-		this._updateFormulasParents(0, start, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(0, start, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
 		this.cellsByCol.splice(start, stop - start + 1);
 		this.aCols.splice(start, stop - start + 1);
 		for(i = start, length = this.aCols.length; i < length; ++i)
@@ -3801,7 +3837,7 @@
 				elem.moveHor(nDif);
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -3820,11 +3856,11 @@
 		History.Create_NewPoint();
 		var offset = {offsetRow: 0, offsetCol: count};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
+		var renameRes = this.renameDependencyNodes(offset, oActualRange);
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, count);
 		this.updatePivotOffset(oActualRange, offset);
 
-		this._updateFormulasParents(0, index, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(0, index, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
 		//remove tail
 		this.cellsByCol.splice(gc_nMaxCol0 - count + 1, count);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
@@ -3837,7 +3873,7 @@
 			cell.clearDataKeepXf();
 		});
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -4706,14 +4742,14 @@
 		var oActualRange = new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2);
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
+		var renameRes = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif );
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
 		});
 
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
 		var cellsByColLength = this.getColDataLength();
 		for (var i = nRight + 1; i < cellsByColLength; ++i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
@@ -4723,7 +4759,7 @@
 			}
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -4737,13 +4773,13 @@
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0);
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
+		var renameRes = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertRows("delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
 		});
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
 			if(sheetMemory){
@@ -4751,7 +4787,7 @@
 			}
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
@@ -4764,10 +4800,10 @@
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2);
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
+		var renameRes = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif, displayNameFormatTable );
 
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
 		var cellsByColLength = this.getColDataLength();
 		for (var i = cellsByColLength - 1; i >= nLeft; --i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
@@ -4793,7 +4829,7 @@
 			}
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
 
 
@@ -4806,13 +4842,13 @@
 		var oActualRange = new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0);
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
-		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
+		var renameRes = this.renameDependencyNodes(offset, oBBox);
 		var redrawTablesArr;
 		if (!this.workbook.bUndoChanges && undefined === displayNameFormatTable) {
 			redrawTablesArr = this.autoFilters.insertRows("insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown,
 				displayNameFormatTable);
 		}
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
 		//rowcount
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
@@ -4832,7 +4868,7 @@
 			});
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
-		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
+		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
 
 		//пока перенес добавление только последней строки(в данном случае порядок занесения в истрию должен быть именно в таком порядке)
@@ -7533,30 +7569,73 @@
 		var res = false;
 		var data = eventData.notifyData;
 		var parsed = eventData.formula;
+		var forceTransform = false;
+		var sharedShift;//affected shared
+		var ranges;//ranges than needed to be transform
+		var i;
 		var shared = parsed.getShared();
 		if (shared) {
-			if (c_oNotifyType.Shift === data.type || c_oNotifyType.Move === data.type ||
-				c_oNotifyType.Delete === data.type) {
-				var bboxShift;
-				if (c_oNotifyType.Shift === data.type) {
-					bboxShift = AscCommonExcel.shiftGetBBox(data.bbox, 0 !== data.offset.offsetCol);
-				} else {
-					bboxShift = data.bbox;
-				}
-				var sharedShift = parsed.getSharedIntersect(data.sheetId, bboxShift);
-				//todo !sharedShift.isEqual(shared.ref)
+			if (c_oNotifyType.Shift === data.type) {
+				var bHor = 0 !== data.offset.offsetCol;
+				var toDelete = data.offset.offsetCol < 0 || data.offset.offsetRow < 0;
+				var bboxShift = AscCommonExcel.shiftGetBBox(data.bbox, bHor);
+				sharedShift = parsed.getSharedIntersect(data.sheetId, bboxShift);
 				if (sharedShift) {
-					//this._shiftCellsShared(shared, sharedShift, data, parsed);
-					this._processShared(shared, shared.ref, data, parsed, function(newFormula){
+					//try to remain as many shared formulas as possible
+					//that shared can only be at intersection with bboxShift
+					var sharedIntersect;
+					if (parsed.canShiftShared(bHor) && (sharedIntersect = bboxShift.intersectionSimple(shared.ref))) {
+						//collect relative complement of sharedShift and sharedIntersect
+						ranges = sharedIntersect.difference(sharedShift);
+						ranges = ranges.concat(sharedShift.difference(sharedIntersect));
+						//cut off shared than affected relative complement of bboxShift
+						var cantBeShared;
+						var diff = bboxShift.difference(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0));
+						if (toDelete) {
+							//cut off shared than affected delete range
+							diff.push(data.bbox);
+						}
+						for (i = 0; i < diff.length; ++i) {
+							var elem = parsed.getSharedIntersect(data.sheetId, diff[i]);
+							if (elem) {
+								if (cantBeShared) {
+									cantBeShared.union2(elem)
+								} else {
+									cantBeShared = elem;
+								}
+							}
+						}
+						if (cantBeShared) {
+							var intersection = sharedIntersect.intersectionSimple(cantBeShared);
+							if (intersection) {
+								ranges.push(intersection);
+							}
+						}
+						forceTransform = true;
+						data.shiftedShared[parsed.getListenerId()] = c_oSharedShiftType.PreProcessed;
+					} else {
+						ranges = [sharedShift];
+					}
+				}
+				res = true;
+			} else if (c_oNotifyType.Move === data.type || c_oNotifyType.Delete === data.type) {
+				sharedShift = parsed.getSharedIntersect(data.sheetId, data.bbox);
+				if (sharedShift) {
+					ranges = [sharedShift];
+				}
+				res = true;
+			}
+			if (ranges) {
+				for (i = 0; i < ranges.length; ++i) {
+					this._processShared(shared, ranges[i], data, parsed, forceTransform, function(newFormula) {
 						return newFormula.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
 					});
 				}
-				res = true;
 			}
 		}
 		return res;
 	};
-	CCellWithFormula.prototype._processShared = function(shared, ref, data, parsed, action) {
+	CCellWithFormula.prototype._processShared = function(shared, ref, data, parsed, forceTransform, action) {
 		var t = this;
 		var cellWithFormula;
 		var cellOffset = new AscCommonExcel.CRangeOffset();
@@ -7576,7 +7655,7 @@
 					cellWithFormula.nCol = cell.nCol;
 				}
 				newFormula.changeOffset(cellOffset, false);
-				if (action(newFormula)) {
+				if (action(newFormula) || forceTransform) {
 					cellWithFormula = undefined;
 					newFormula.setFormulaString(newFormula.assemble(true));
 					cell.setFormulaTemplate(true, function(cell) {

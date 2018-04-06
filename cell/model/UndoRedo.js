@@ -2599,11 +2599,7 @@ function (window, undefined) {
 				parsed.setFormula(val);
 				wb.dependencyFormulas.addToBuildDependencyShared(parsed);
 			} else if (AscCH.historyitem_SharedFormula_ChangeShared == Type) {
-				parsed.removeDependencies();
-				if (val) {
-					parsed.setSharedRef(val);
-					parsed.buildDependencies();
-				}
+				parsed.setSharedRef(val, Data.bRow);
 			}
 		}
 	};

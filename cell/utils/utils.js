@@ -410,6 +410,36 @@
 			return c_oAscShiftType.None;
 		};
 
+		Range.prototype.difference = function(range) {
+			var res = [];
+			var intersect;
+			if (this.r1 > 0) {
+				intersect = new Range(0, 0, gc_nMaxCol0, this.r1 - 1).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c1 > 0) {
+				intersect = new Range(0, this.r1, this.c1 - 1, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c2 < gc_nMaxCol0) {
+				intersect = new Range(this.c2 + 1, this.r1, gc_nMaxCol0, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.r2 < gc_nMaxRow0) {
+				intersect = new Range(0, this.r2 + 1, gc_nMaxCol0, gc_nMaxRow0).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			return res;
+		};
+
 		Range.prototype.forShift = function(bbox, offset, bUndo) {
 			var isNoDelete = true;
 			var isHor = 0 != offset.offsetCol;

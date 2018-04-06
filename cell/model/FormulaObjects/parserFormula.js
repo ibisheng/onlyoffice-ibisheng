@@ -4338,6 +4338,18 @@ _func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, bbox 
 _func[cElementType.cellsRange3D] = _func[cElementType.cellsRange];
 _func[cElementType.cell3D] = _func[cElementType.cell];
 
+	function SharedProps(ref, base) {
+		this.ref = ref;
+		this.base = base;
+	}
+
+	SharedProps.prototype.isOneDimension = function() {
+		return this.ref && (this.ref.r1 === this.ref.r2 || this.ref.c1 === this.ref.c2);
+	};
+	SharedProps.prototype.isHor = function() {
+		return this.ref && this.ref.r1 === this.ref.r2;
+	};
+
 	var lastListenerId = 0;
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
@@ -4383,15 +4395,24 @@ function parserFormula( formula, parent, _ws ) {
 		return this.shared;
 	};
 	parserFormula.prototype.setShared = function(ref, cellWithFormula) {
-		this.shared = {ref: ref, base: cellWithFormula};
+		this.shared = new SharedProps(ref, cellWithFormula);
 	};
-	parserFormula.prototype.setSharedRef = function(ref) {
-		if (this.isInDependencies && !this.shared.ref.isEqual(ref)) {
+	parserFormula.prototype.setSharedRef = function(newRef, opt_updateBase) {
+		var old = this.shared.ref;
+		if (!(newRef && newRef.r1 === old.r1 && newRef.c1 === old.c1 && newRef.r2 === old.r2 && newRef.c2 === old.c2)) {
 			this.removeDependencies();
-			this.shared.ref = ref;
-			this.buildDependencies();
-		} else {
-			this.shared.ref = ref;
+			if (newRef) {
+				this.shared.ref = newRef;
+				//todo is any issue if base is outside ref?
+				if (opt_updateBase) {
+					this.shared.base.nRow += newRef.r1 - old.r1;
+					this.shared.base.nCol += newRef.c1 - old.c1;
+				}
+				this.buildDependencies();
+			}
+			var index = this.ws.workbook.workbookFormulas.add(this).getIndexNumber();
+			History.Add(AscCommonExcel.g_oUndoRedoSharedFormula, AscCH.historyitem_SharedFormula_ChangeShared, null,
+				null, new AscCommonExcel.UndoRedoData_IndexSimpleProp(index, opt_updateBase, old, newRef), true);
 		}
 	};
 	parserFormula.prototype.removeShared = function() {
@@ -5746,6 +5767,40 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		}
 		return ref;
+	};
+	parserFormula.prototype.canShiftShared = function(bHor) {
+		if (this.shared && this.shared.isOneDimension() && !(bHor ^ this.shared.isHor())) {
+			//cut off formulas with absolute reference. it is shifted unexpectedly
+			var elem;
+			var bboxElem;
+			for (var i = 0; i < this.outStack.length; i++) {
+				elem = this.outStack[i];
+				bboxElem = undefined;
+				if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange ||
+					elem.type === cElementType.cell3D) {
+					if (elem.isValid()) {
+						bboxElem = elem.getRange().getBBox0();
+					}
+				} else if (elem.type === cElementType.cellsRange3D) {
+					if (elem.isValid()) {
+						bboxElem = elem.getBBox0();
+					}
+				}
+				if (bboxElem) {
+					if (bHor) {
+						if (bboxElem.isAbsC1() || bboxElem.isAbsC2()) {
+							return false;
+						}
+					} else {
+						if (bboxElem.isAbsR1() || bboxElem.isAbsR2()) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
 	};
 	parserFormula.prototype.renameSheetCopy = function (params) {
 		var wsLast = params.lastName ? this.wb.getWorksheetByName(params.lastName) : null;
