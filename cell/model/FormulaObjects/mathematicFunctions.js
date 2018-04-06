@@ -4480,12 +4480,14 @@
 
 		for (i = 0; i < arg.length; i++) {
 
-			if (arg[i] instanceof cArea3D) {
-				return new cError(cErrorType.bad_reference);
-			}
-
 			if (arg[i] instanceof cArea || arg[i] instanceof cArray) {
 				resArr[i] = arg[i].getMatrix();
+			} else if (arg[i] instanceof cArea3D) {
+				if (arg[i].isSingleSheet()) {
+					resArr[i] = arg[i].getMatrix()[0];
+				} else {
+					return new cError(cErrorType.bad_reference);
+				}
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
 				var val = arg[i].getValue();
 				if(val instanceof cEmpty) {

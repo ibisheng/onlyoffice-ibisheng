@@ -1250,16 +1250,21 @@
 			}
 			res = calculateFunc(arg0);
 		} else {
-			if(arg0 instanceof cArray) {
+			var matrix;
+			if (arg0 instanceof cArea || arg0 instanceof cArray) {
+				matrix = arg0.getMatrix();
+			} else if (arg0 instanceof cArea3D) {
+				matrix = arg0.getMatrix()[0];
+			}
+
+			if(matrix) {
 				res = new cArray();
-				arg0.foreach(function (elem) {
-					res.addElement(calculateFunc(elem));
-				});
-			} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-				res = new cArray();
-				arg0.foreach2(function (elem) {
-					res.addElement(calculateFunc(elem));
-				});
+				for (var i = 0; i < matrix.length; ++i) {
+					for (var j = 0; j < matrix[i].length; ++j) {
+						matrix[i][j] = calculateFunc(matrix[i][j]);
+					}
+				}
+				res.fillFromArray(matrix);
 			} else {
 				res = calculateFunc(arg0);
 			}
@@ -2010,16 +2015,21 @@
 			}
 			res = calculateFunc(arg0);
 		} else {
-			if(arg0 instanceof cArray) {
+			var matrix;
+			if (arg0 instanceof cArea || arg0 instanceof cArray) {
+				matrix = arg0.getMatrix();
+			} else if (arg0 instanceof cArea3D) {
+				matrix = arg0.getMatrix()[0];
+			}
+
+			if(matrix) {
 				res = new cArray();
-				arg0.foreach(function (elem) {
-					res.addElement(calculateFunc(elem));
-				});
-			} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-				res = new cArray();
-				arg0.foreach2(function (elem) {
-					res.addElement(calculateFunc(elem));
-				});
+				for (var i = 0; i < matrix.length; ++i) {
+					for (var j = 0; j < matrix[i].length; ++j) {
+						matrix[i][j] = calculateFunc(matrix[i][j]);
+					}
+				}
+				res.fillFromArray(matrix);
 			} else {
 				res = calculateFunc(arg0);
 			}
