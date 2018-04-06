@@ -35398,7 +35398,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 case 7:
                 {
                     if (num_args < 6)
-                        return FT_Error.FT_Err_Too_Few_Arguments;
+                        return 129;
 
                     var nargs = num_args - num_args % 6;
 
