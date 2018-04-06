@@ -9514,17 +9514,37 @@ CDocument.prototype.SelectComment = function(Id, ScrollToComment)
 		this.DrawingDocument.FirePaint();
 	}
 };
-CDocument.prototype.ShowComment = function(Id)
+CDocument.prototype.ShowComment = function(arrId)
 {
-	var Comment = this.Comments.Get_ById(Id);
-	if (null != Comment && null != Comment.StartId && null != Comment.EndId)
-	{
-		var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-		var Comment_Y       = Comment.m_oStartInfo.Y;
-		var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
+	var CommentsX     = null;
+	var CommentsY     = null;
+	var arrCommentsId = [];
 
-		var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
-		this.Api.sync_ShowComment([Comment.Get_Id()], Coords.X, Coords.Y);
+	for (var nIndex = 0, nCount = arrId.length; nIndex < nCount; ++nIndex)
+	{
+		var Comment = this.Comments.Get_ById(arrId[nIndex]);
+		if (null != Comment && null != Comment.StartId && null != Comment.EndId)
+		{
+			if (null === CommentsX)
+			{
+				var Comment_PageNum = Comment.m_oStartInfo.PageNum;
+				var Comment_Y       = Comment.m_oStartInfo.Y;
+				var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
+
+				var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
+
+				CommentsX = Coords.X;
+				CommentsY = Coords.Y;
+			}
+
+			arrCommentsId.push(Comment.Get_Id());
+		}
+
+	}
+
+	if (null !== CommentsX && null !== CommentsY && arrCommentsId.length > 0)
+	{
+		this.Api.sync_ShowComment(arrCommentsId, CommentsX, CommentsY);
 	}
 	else
 	{

@@ -5692,7 +5692,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_showComment = function(Id)
 	{
-		this.WordControl.m_oLogicDocument.ShowComment(Id);
+		if (Id instanceof Array)
+			this.WordControl.m_oLogicDocument.ShowComment(Id);
+		else
+			this.WordControl.m_oLogicDocument.ShowComment([Id]);
 	};
 
 	asc_docs_api.prototype.can_AddQuotedComment = function()
