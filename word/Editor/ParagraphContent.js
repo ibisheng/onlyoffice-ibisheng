@@ -119,6 +119,9 @@ var nbsp_charcode = 0x00A0;
 var nbsp_string = String.fromCharCode(0x00A0);
 var sp_string   = String.fromCharCode(0x0032);
 
+
+//var PUNCTUATION_FLAG = 0x00
+
 var g_aPunctuation =
 [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -165,9 +168,45 @@ g_oSRCFPSC[para_InstrText] = 1;
 g_oSRCFPSC[para_Bookmark]  = 1;
 
 
-
 var g_aSpecialSymbols     = [];
 g_aSpecialSymbols[0x00AE] = 1;
+
+// Список символов, с которых не может начинаться новая строка
+// A characters that can not be at the beginning of a line
+var g_aCCNBABL = [];
+g_aCCNBABL[0xFF01] = 1; // ！
+g_aCCNBABL[0xFF02] = 1; // ＂
+g_aCCNBABL[0xFF05] = 1; // ％
+g_aCCNBABL[0xFF07] = 1; // ＇
+g_aCCNBABL[0xFF09] = 1; // )
+g_aCCNBABL[0xFF0C] = 1; // ，
+g_aCCNBABL[0xFF0E] = 1; // ．
+g_aCCNBABL[0xFF1A] = 1; // ：
+g_aCCNBABL[0xFF1B] = 1; // ；
+g_aCCNBABL[0xFF1F] = 1; // ？
+g_aCCNBABL[0xFF3D] = 1; // ］
+g_aCCNBABL[0xFF40] = 1; // ｀
+g_aCCNBABL[0xFF5C] = 1; // ｜
+g_aCCNBABL[0xFF5D] = 1; // ｝
+g_aCCNBABL[0xFF5E] = 1; // ～
+g_aCCNBABL[0xFFE0] = 1; // ￠
+
+g_aCCNBABL[0x3001] = 1; // 、
+g_aCCNBABL[0x3002] = 1; // 。
+g_aCCNBABL[0x3003] = 1; // 〃
+g_aCCNBABL[0x3009] = 1; // 〉
+g_aCCNBABL[0x300B] = 1; // 》
+g_aCCNBABL[0x300D] = 1; // 」
+g_aCCNBABL[0x300F] = 1; // 』
+g_aCCNBABL[0x3011] = 1; // 】
+g_aCCNBABL[0x3015] = 1; // 〕
+g_aCCNBABL[0x3017] = 1; // 〗
+g_aCCNBABL[0x301E] = 1; // 〞
+
+// Список символов, которые не могут находиться в конце строки
+// A characters that can not be at the end of a line
+var g_aCCNBAEL = [];
+
 
 var PARATEXT_FLAGS_MASK               = 0xFFFFFFFF; // 4 байта
 var PARATEXT_FLAGS_FONTKOEF_SCRIPT    = 0x00000001; // 0 бит
@@ -385,7 +424,7 @@ ParaText.prototype.Is_NBSP = function()
 };
 ParaText.prototype.Is_Punctuation = function()
 {
-	if (1 === g_aPunctuation[this.Value])
+	if (undefined !== g_aPunctuation[this.Value])
 		return true;
 
 	return false;
@@ -450,8 +489,94 @@ ParaText.prototype.Read_FromBinary = function(Reader)
 };
 ParaText.prototype.private_IsSpaceAfter = function()
 {
-	if (0x002D === this.Value
-		|| 0x2014 === this.Value)
+	// Дефисы
+	if (0x002D === this.Value || 0x2014 === this.Value)
+		return true;
+
+	if (this.IsEastAsianScript())
+		return true;
+
+	return false;
+};
+ParaText.prototype.CanBeAtBeginOfLine = function()
+{
+	return (1 !== g_aCCNBABL[this.Value]);
+};
+ParaText.prototype.CanBeAtEndOfLine = function()
+{
+	return (1 !== g_aCCNBAEL[this.Value]);
+};
+ParaText.prototype.IsEastAsianScript = function()
+{
+	// Bopomofo (3100–312F)
+	// Bopomofo Extended (31A0–31BF)
+	// CJK Unified Ideographs (4E00–9FEA)
+	// CJK Unified Ideographs Extension A (3400–4DB5)
+	// CJK Unified Ideographs Extension B (20000–2A6D6)
+	// CJK Unified Ideographs Extension C (2A700–2B734)
+	// CJK Unified Ideographs Extension D (2B740–2B81D)
+	// CJK Unified Ideographs Extension E (2B820–2CEA1)
+	// CJK Unified Ideographs Extension F (2CEB0–2EBE0)
+	// CJK Compatibility Ideographs (F900–FAFF)
+	// CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+	// Kangxi Radicals (2F00–2FDF)
+	// CJK Radicals Supplement (2E80–2EFF)
+	// CJK Strokes (31C0–31EF)
+	// Ideographic Description Characters (2FF0–2FFF)
+	// Hangul Jamo (1100–11FF)
+	// Hangul Jamo Extended-A (A960–A97F)
+	// Hangul Jamo Extended-B (D7B0–D7FF)
+	// Hangul Compatibility Jamo (3130–318F)
+	// Halfwidth and Fullwidth Forms (FF00–FFEF)
+	// Hangul Syllables (AC00–D7AF)
+	// Hiragana (3040–309F)
+	// Kana Extended-A (1B100–1B12F)
+	// Kana Supplement (1B000–1B0FF)
+	// Kanbun (3190–319F)
+	// Katakana (30A0–30FF)
+	// Katakana Phonetic Extensions (31F0–31FF)
+	// Lisu (A4D0–A4FF)
+	// Miao (16F00–16F9F)
+	// Nushu (1B170–1B2FF)
+	// Tangut (17000–187EC)
+	// Tangut Components (18800–18AFF)
+	// Yi Syllables (A000–A48F)
+	// Yi Radicals (A490–A4CF)
+
+	if ((0x3100 <= this.Value && this.Value <= 0x312F)
+		|| (0x31A0 <= this.Value && this.Value <= 0x31BF)
+		|| (0x4E00 <= this.Value && this.Value <= 0x9FEA)
+		|| (0x3400 <= this.Value && this.Value <= 0x4DB5)
+		|| (0x20000 <= this.Value && this.Value <= 0x2A6D6)
+		|| (0x2A700 <= this.Value && this.Value <= 0x2B734)
+		|| (0x2B740 <= this.Value && this.Value <= 0x2B81D)
+		|| (0x2B820 <= this.Value && this.Value <= 0x2CEA1)
+		|| (0x2CEB0 <= this.Value && this.Value <= 0x2EBE0)
+		|| (0xF900 <= this.Value && this.Value <= 0xFAFF)
+		|| (0x2F800 <= this.Value && this.Value <= 0x2FA1F)
+		|| (0x2F00 <= this.Value && this.Value <= 0x2FDF)
+		|| (0x2E80 <= this.Value && this.Value <= 0x2EFF)
+		|| (0x31C0 <= this.Value && this.Value <= 0x31EF)
+		|| (0x2FF0 <= this.Value && this.Value <= 0x2FFF)
+		|| (0x1100 <= this.Value && this.Value <= 0x11FF)
+		|| (0xA960 <= this.Value && this.Value <= 0xA97F)
+		|| (0xD7B0 <= this.Value && this.Value <= 0xD7FF)
+		|| (0x3130 <= this.Value && this.Value <= 0x318F)
+		|| (0xFF00 <= this.Value && this.Value <= 0xFFEF)
+		|| (0xAC00 <= this.Value && this.Value <= 0xD7AF)
+		|| (0x3040 <= this.Value && this.Value <= 0x309F)
+		|| (0x1B100 <= this.Value && this.Value <= 0x1B12F)
+		|| (0x1B000 <= this.Value && this.Value <= 0x1B0FF)
+		|| (0x3190 <= this.Value && this.Value <= 0x319F)
+		|| (0x30A0 <= this.Value && this.Value <= 0x30FF)
+		|| (0x31F0 <= this.Value && this.Value <= 0x31FF)
+		|| (0xA4D0 <= this.Value && this.Value <= 0xA4FF)
+		|| (0x16F00 <= this.Value && this.Value <= 0x16F9F)
+		|| (0x1B170 <= this.Value && this.Value <= 0x1B2FF)
+		|| (0x17000 <= this.Value && this.Value <= 0x187EC)
+		|| (0x18800 <= this.Value && this.Value <= 0x18AFF)
+		|| (0xA000 <= this.Value && this.Value <= 0xA48F)
+		|| (0xA490 <= this.Value && this.Value <= 0xA4CF))
 		return true;
 
 	return false;
