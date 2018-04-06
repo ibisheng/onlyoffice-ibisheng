@@ -8646,10 +8646,8 @@ CDocument.prototype.UpdateDocumentOutlinePosition = function()
 		}
 		else
 		{
-			if (this.IsSelectionUse())
-				this.DocumentOutline.UpdateCurrentPosition(this.Selection.StartPos);
-			else
-				this.DocumentOutline.UpdateCurrentPosition(this.CurPos.ContentPos);
+			var oCurrentParagraph = this.GetCurrentParagraph(false, false);
+			this.DocumentOutline.UpdateCurrentPosition(oCurrentParagraph.GetDocumentPositionFromObject());
 		}
 	}
 };

@@ -12702,6 +12702,9 @@ CTable.prototype.GetAllContentControls = function(arrContentControls)
 };
 CTable.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
+	if (oPr && oPr.SkipTables)
+		return;
+
 	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
 	{
 		var oRow = this.Content[nCurRow];

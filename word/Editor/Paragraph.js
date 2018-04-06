@@ -11673,10 +11673,31 @@ Paragraph.prototype.private_UpdateTrackRevisions = function()
 };
 Paragraph.prototype.UpdateDocumentOutline = function()
 {
-	// Обновляем только если родительский класс и есть документ
-	if (this.Parent && this.Parent === this.LogicDocument)
+	if (!this.LogicDocument || !this.Parent)
+		return;
+
+	var isCheck = true;
+	var oParent = this.Parent;
+	while (oParent)
 	{
-		var oDocumentOutline = this.Parent.GetDocumentOutline();
+		if (oParent === this.LogicDocument)
+		{
+			break;
+		}
+		else if (oParent.IsBlockLevelSdtContent())
+		{
+			oParent = oParent.Parent.Parent;
+		}
+		else
+		{
+			isCheck = false;
+			break;
+		}
+	}
+
+	if (isCheck)
+	{
+		var oDocumentOutline = this.LogicDocument.GetDocumentOutline();
 		if (oDocumentOutline.IsUse())
 			oDocumentOutline.CheckParagraph(this);
 	}
@@ -12648,6 +12669,10 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 				return arrOutline.push({Paragraph : this, Lvl : oPr.Styles[nIndex].Lvl - 1});
 		}
 	}
+
+	// TODO: Проверка автофигур
+	if (oPr && oPr.SkipDrawings)
+		return;
 };
 Paragraph.prototype.UpdateBookmarks = function(oManager)
 {
