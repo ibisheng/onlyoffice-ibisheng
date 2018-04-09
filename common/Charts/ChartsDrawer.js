@@ -546,66 +546,56 @@ CChartsDrawer.prototype =
 		
 		return {x: x, y: y};
 	},
-	
-	_calculatePositionLegend: function(chartSpace)
-	{	
+
+	_calculatePositionLegend: function (chartSpace) {
 		var widthLegend = chartSpace.chart.legend.extX;
 		var heightLegend = chartSpace.chart.legend.extY;
 		var x, y;
 
 		var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
-		switch ( nLegendPos )
-		{
+		switch (nLegendPos) {
 			case c_oAscChartLegendShowSettings.left:
-			case c_oAscChartLegendShowSettings.leftOverlay:
-			{
+			case c_oAscChartLegendShowSettings.leftOverlay: {
 				x = standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				y = this.calcProp.heightCanvas / 2 / this.calcProp.pxToMM - heightLegend / 2;
 				break;
 			}
-			case c_oAscChartLegendShowSettings.top:
-			{
+			case c_oAscChartLegendShowSettings.top: {
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
-				
-				if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				{
+
+				if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
 					y += chartSpace.chart.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				}
 				break;
 			}
 			case c_oAscChartLegendShowSettings.right:
-			case c_oAscChartLegendShowSettings.rightOverlay:
-			{
-				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM  - widthLegend;
+			case c_oAscChartLegendShowSettings.rightOverlay: {
+				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - widthLegend;
 				y = (this.calcProp.heightCanvas / 2) / this.calcProp.pxToMM - heightLegend / 2;
 				break;
 			}
-			case c_oAscChartLegendShowSettings.bottom:
-			{
+			case c_oAscChartLegendShowSettings.bottom: {
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = (this.calcProp.heightCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - heightLegend;
 				break;
 			}
-			case c_oAscChartLegendShowSettings.topRight:
-			{
-				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM  - widthLegend;
+			case c_oAscChartLegendShowSettings.topRight: {
+				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - widthLegend;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
-				
-				if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
-				{
+
+				if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
 					y += chartSpace.chart.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				}
 				break;
 			}
-			default:
-			{
-				x = (this.calcProp.widthCanvas  - standartMarginForCharts / 2) / this.calcProp.pxToMM  - widthLegend;
+			default: {
+				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - widthLegend;
 				y = (this.calcProp.heightCanvas) / this.calcProp.pxToMM - heightLegend / 2;
 				break;
 			}
 		}
-		
+
 		return {x: x, y: y};
 	},
 	
@@ -1450,8 +1440,7 @@ CChartsDrawer.prototype =
 						min = value;
 					}
 
-					if (isNaN(value) && val == '' &&
-						(((t.calcProp.type === c_oChartTypes.Line ) && t.calcProp.type === 'normal'))) {
+					if (isNaN(value) && val == '' && (((t.calcProp.type === c_oChartTypes.Line ) && t.calcProp.type === 'normal'))) {
 						value = '';
 					} else if (isNaN(value)) {
 						value = 0;
@@ -1835,8 +1824,7 @@ CChartsDrawer.prototype =
 		return arrayValues;
 	},
 
-	_correctDataValuesFromHeight: function(props, chartSpace, isOxAxis)
-	{
+	_correctDataValuesFromHeight: function (props, chartSpace, isOxAxis) {
 		var res = props.arrayValues;
 		var heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 		var margins = this._calculateMarginsChart(chartSpace, true);
@@ -1849,47 +1837,39 @@ CChartsDrawer.prototype =
 		var newStep = props.step;
 
 
-		if(isOxAxis)
-		{
+		if (isOxAxis) {
 
-		}
-		else
-		{
-			if(axisMin < 0 && axisMax > 0)
-			{
+		} else {
+			if (axisMin < 0 && axisMax > 0) {
 				/*var limitArr = [0, 0, 0, 28, 20, 20, 18, 20, 18, 18, 17, 16];
-				var limit = limitArr[res.length - 1];
-				var heightGrid = Math.round((trueHeight / (res.length - 1)));
-				while(heightGrid <= limit)
-				{
-					var firstDegreeStep = this._getFirstDegree(newStep);
-					var tempStep = this._getNextStep(firstDegreeStep.val);
-					newStep = tempStep * firstDegreeStep.numPow;
-					res = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
+				 var limit = limitArr[res.length - 1];
+				 var heightGrid = Math.round((trueHeight / (res.length - 1)));
+				 while(heightGrid <= limit)
+				 {
+				 var firstDegreeStep = this._getFirstDegree(newStep);
+				 var tempStep = this._getNextStep(firstDegreeStep.val);
+				 newStep = tempStep * firstDegreeStep.numPow;
+				 res = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
 
-					if(res.length <= 3)
-					{
-						break;
-					}
+				 if(res.length <= 3)
+				 {
+				 break;
+				 }
 
-					limit = limitArr[res.length - 1];
-					heightGrid = Math.round((trueHeight / (res.length - 1)));
-				}*/
-			}
-			else
-			{
+				 limit = limitArr[res.length - 1];
+				 heightGrid = Math.round((trueHeight / (res.length - 1)));
+				 }*/
+			} else {
 				var limitArr = [0, 0, 32, 26, 24, 22, 21, 19, 18, 17, 16];
 				var limit = limitArr[res.length - 1];
 				var heightGrid = Math.round((trueHeight / (res.length - 1)));
-				while(heightGrid <= limit)
-				{
+				while (heightGrid <= limit) {
 					var firstDegreeStep = this._getFirstDegree(newStep);
 					var tempStep = this._getNextStep(firstDegreeStep.val);
 					newStep = tempStep * firstDegreeStep.numPow;
 					res = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
 
-					if(res.length <= 2)
-					{
+					if (res.length <= 2) {
 						break;
 					}
 
@@ -1903,227 +1883,185 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	_getNextStep: function(step)
-	{
-		if(step === 1)
-		{
+	_getNextStep: function (step) {
+		if (step === 1) {
 			step = 2;
-		}
-		else if(step === 2)
-		{
+		} else if (step === 2) {
 			step = 5;
-		}
-		else if(step === 5)
-		{
+		} else if (step === 5) {
 			step = 10;
 		}
 
 		return step;
 	},
 
-	_getArrayDataValues: function(step, axisMin, axisMax, manualMin, manualMax)
-	{
+	_getArrayDataValues: function (step, axisMin, axisMax, manualMin, manualMax) {
 		var arrayValues;
 		//минимальное значение оси
 		//TODO use axisMin
 		var minUnit = 0;
-		
-		if(manualMin != null)
+
+		if (manualMin != null) {
 			minUnit = manualMin;
-		else if(manualMin == null && axisMin != null && axisMin != 0 && axisMin > 0 && axisMax > 0)//TODO пересмотреть все значения, где-то могут быть расхождения с EXCEL
+		} else if (manualMin == null && axisMin != null && axisMin != 0 && axisMin > 0 && axisMax > 0)//TODO пересмотреть все значения, где-то могут быть расхождения с EXCEL
 		{
 			minUnit = parseInt(axisMin / step) * step;
-		}
-		else
-		{
-			if(axisMin < 0)
-			{
-				while(minUnit > axisMin)
-				{
+		} else {
+			if (axisMin < 0) {
+				while (minUnit > axisMin) {
 					minUnit -= step;
 				}
-			}
-			else if(axisMin > 0)
-			{
-				while(minUnit < axisMin && minUnit > (axisMin - step))
-				{
+			} else if (axisMin > 0) {
+				while (minUnit < axisMin && minUnit > (axisMin - step)) {
 					minUnit += step;
-				}	
+				}
 			}
 		}
-		
+
 		//массив подписей
 		arrayValues = this._getArrayAxisValues(minUnit, axisMin, axisMax, step, manualMin, manualMax);
-		
+
 		return arrayValues;
 	},
-	
-	_getLogArray: function(yMin, yMax, logBase)
-	{	
+
+	_getLogArray: function (yMin, yMax, logBase) {
 		var result = [];
-		
+
 		var temp;
 		var pow = 0;
 		var tempPow = yMin;
-		
-		if(yMin < 1 && yMin > 0)
-		{	
+
+		if (yMin < 1 && yMin > 0) {
 			temp = this._getFirstDegree(yMin).numPow;
-			
+
 			tempPow = temp;
-			while(tempPow < 1)
-			{
-				pow --;
+			while (tempPow < 1) {
+				pow--;
 				tempPow = tempPow * 10;
 			}
-		}
-		else	
+		} else {
 			temp = Math.pow(logBase, 0);
-			
-		if(logBase < 1)
+		}
+
+		if (logBase < 1) {
 			logBase = 2;
-		
+		}
+
 		var step = 0;
 		var lMax = 1;
-		if(yMin < 1 && yMin > 0)
-		{
-			if(lMax < yMax)
+		if (yMin < 1 && yMin > 0) {
+			if (lMax < yMax) {
 				lMax = yMax;
-			
-			while(temp < lMax)
-			{
+			}
+
+			while (temp < lMax) {
+				temp = Math.pow(logBase, pow);
+				result[step] = temp;
+				pow++;
+				step++;
+			}
+		} else {
+			while (temp <= yMax) {
 				temp = Math.pow(logBase, pow);
 				result[step] = temp;
 				pow++;
 				step++;
 			}
 		}
-		else
-		{
-			while(temp <= yMax)
-			{
-				temp = Math.pow(logBase, pow);
-				result[step] = temp;
-				pow++;
-				step++;
-			}
-		}
-		
+
 		return result;
 	},
-	
-	_getArrayAxisValues: function(minUnit, axisMin, axisMax, step, manualMin, manualMax)
-	{
+
+	_getArrayAxisValues: function (minUnit, axisMin, axisMax, step, manualMin, manualMax) {
 		var arrayValues = [];
 		var stackedPerMax = null !== manualMax ? manualMax : 100;
-		
-		if(this.calcProp.subType === 'stackedPer' && step > stackedPerMax)
-		{
+
+		if (this.calcProp.subType === 'stackedPer' && step > stackedPerMax) {
 			stackedPerMax = step;
 		}
-		
-		for(var i = 0; i < 20; i++)
-		{
-			if(this.calcProp.subType === 'stackedPer' && (minUnit + step * i) > stackedPerMax)
-			{
+
+		for (var i = 0; i < 20; i++) {
+			if (this.calcProp.subType === 'stackedPer' && (minUnit + step * i) > stackedPerMax) {
 				break;
 			}
-			
+
 			arrayValues[i] = minUnit + step * i;
-			
-			if(axisMax == 0 && axisMin < 0 && arrayValues[i] == axisMax)
-			{
+
+			if (axisMax == 0 && axisMin < 0 && arrayValues[i] == axisMax) {
 				break;
-			}
-			else if((manualMax != null && arrayValues[i] >= axisMax) || (manualMax == null && arrayValues[i] > axisMax))
-			{
-				if(this.calcProp.subType === 'stackedPer')
-				{
+			} else if ((manualMax != null && arrayValues[i] >= axisMax) || (manualMax == null && arrayValues[i] > axisMax)) {
+				if (this.calcProp.subType === 'stackedPer') {
 					arrayValues[i] = arrayValues[i] / 100;
 				}
-				
+
 				break;
-			}
-			else if(this.calcProp.subType === 'stackedPer')
-			{
+			} else if (this.calcProp.subType === 'stackedPer') {
 				arrayValues[i] = arrayValues[i] / 100;
-			}	
+			}
 		}
-		
+
 		/*if(this.calcProp.subType == 'stackedPer')
-		{
-			//TODO пересмотреть все ситуации, когда заданы фиксированные максимальные и минимальные значение выше 100%
-			if(step > axisMax)
-				arrayValues = [axisMin, axisMax];
-		}*/
-		
-		if(!arrayValues.length)
-		{
+		 {
+		 //TODO пересмотреть все ситуации, когда заданы фиксированные максимальные и минимальные значение выше 100%
+		 if(step > axisMax)
+		 arrayValues = [axisMin, axisMax];
+		 }*/
+
+		if (!arrayValues.length) {
 			arrayValues = [0.2, 0.4, 0.6, 0.8, 1, 1.2];
 		}
-			
+
 		return arrayValues;
 	},
-	
-	_getStep : function(step)
-	{
-		if(step > 1 && step <= 2)
+
+	_getStep: function (step) {
+		if (step > 1 && step <= 2) {
 			step = 2;
-		else if(step > 2 && step <= 5)
+		} else if (step > 2 && step <= 5) {
 			step = 5;
-		else if(step > 5 && step <= 10)
+		} else if (step > 5 &&
+			step <= 10) {
 			step = 10;
-		else if(step > 10 && step <= 20)
+		} else if (step > 10 && step <= 20) {
 			step = 20;
-			
+		}
+
 		return step;
 	},
-	
-	_getTrueMinMax : function(yMin, yMax)
-	{
+
+	_getTrueMinMax: function (yMin, yMax) {
 		var axisMax, axisMin, diffPerMaxMin;
-		if(yMin >= 0 && yMax >= 0)
-		{
+		if (yMin >= 0 && yMax >= 0) {
 			axisMax = yMax + 0.05 * ( yMax - yMin );
-			
-			diffPerMaxMin = ((yMax - yMin) / yMax)*100;
-			if(16.667 > diffPerMaxMin)
-			{
+
+			diffPerMaxMin = ((yMax - yMin) / yMax) * 100;
+			if (16.667 > diffPerMaxMin) {
 				axisMin = yMin - ((yMax - yMin) / 2);
-			}
-			else
-			{
+			} else {
 				axisMin = 0;
 			}
-		}
-		else if(yMin <= 0 && yMax <= 0)
-		{
+		} else if (yMin <= 0 && yMax <= 0) {
 			diffPerMaxMin = ((yMin - yMax) / yMin) * 100;
-			axisMin =  yMin + 0.05 * (yMin - yMax);
-			
-			if(16.667 < diffPerMaxMin)
-			{
+			axisMin = yMin + 0.05 * (yMin - yMax);
+
+			if (16.667 < diffPerMaxMin) {
 				axisMax = 0;
-			}
-			else
-			{
+			} else {
 				axisMax = yMax - ((yMin - yMax) / 2)
 			}
-		}
-		else if(yMax > 0 && yMin < 0)
-		{
+		} else if (yMax > 0 && yMin < 0) {
 			axisMax = yMax + 0.05 * (yMax - yMin);
 			axisMin = yMin + 0.05 * (yMin - yMax);
 		}
-		
-		if(axisMin === axisMax)
-		{
-			if(axisMin < 0)
+
+		if (axisMin === axisMax) {
+			if (axisMin < 0) {
 				axisMax = 0;
-			else
+			} else {
 				axisMin = 0;
+			}
 		}
-		
+
 		return {min: axisMin, max: axisMax};
 	},
 	
@@ -2259,7 +2197,7 @@ CChartsDrawer.prototype =
 	getChartGrouping: function(chart) {
 		var res = null;
 
-    	var grouping = chart.grouping;
+		var grouping = chart.grouping;
 		var typeChart = chart.getObjectType();
 
 		if (typeChart ===  AscDFH.historyitem_type_LineChart || typeChart === AscDFH.historyitem_type_AreaChart) {
