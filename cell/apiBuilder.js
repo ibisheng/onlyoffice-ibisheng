@@ -635,6 +635,36 @@
 		}
 	});
 
+	Object.defineProperty(ApiWorksheet.prototype, "Orientation", {
+		get: function () {
+			return this.worksheet.PagePrintOptions.pageSetup.asc_getOrientation();
+		},
+		set: function (value) {
+			value = (value == 'xlPortrait') ? 0 : (value == 'xlLandscape') ? 1 : 0;
+			this.worksheet.PagePrintOptions.pageSetup.asc_setOrientation(value);
+		}
+	});
+
+	Object.defineProperty(ApiWorksheet.prototype, "PrintHeadings", {
+		get: function () {
+			return this.worksheet.PagePrintOptions.asc_getHeadings();
+		},
+		set: function (value) {
+			value = (typeof value === 'boolean') ? value : false;
+			this.worksheet.PagePrintOptions.asc_setHeadings(value);
+		}
+	});
+
+	Object.defineProperty(ApiWorksheet.prototype, "PrintGridlines", {
+		get: function () {
+			return this.worksheet.PagePrintOptions.asc_getGridLines();
+		},
+		set: function (value) {
+			value = (typeof value === 'boolean') ? value : false;
+			this.worksheet.PagePrintOptions.asc_setGridLines(value);
+		}
+	});
+
 	/**
 	 * Set column width
 	 * @memberof ApiWorksheet
