@@ -236,6 +236,7 @@ Paragraph.prototype.Set_Pr = function(oNewPr)
 
 	this.Recalc_CompiledPr();
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
+	this.UpdateDocumentOutline();
 };
 Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
