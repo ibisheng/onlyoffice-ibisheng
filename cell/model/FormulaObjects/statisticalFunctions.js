@@ -68,9 +68,9 @@ function (window, undefined) {
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
 		cFORECAST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cF_TEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
-		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
-		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA,
-		cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
+		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cHYPGEOM_DIST, cINTERCEPT, cKURT, cLARGE,
+		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN,
+		cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
 		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
 		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
@@ -79,7 +79,7 @@ function (window, undefined) {
 		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
+	cFormulaFunctionGroup['NotRealised'].push(cGROWTH, cLINEST, cLOGEST, cTREND);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
@@ -4940,7 +4940,7 @@ function (window, undefined) {
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			return arg0.countCells();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			return new cNumber(1);
+			return cElementType.empty === arg0.getValue().type ? new cNumber(0) : new cNumber(1);
 		} else {
 			return new cError(cErrorType.bad_reference);
 		}

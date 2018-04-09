@@ -1229,6 +1229,9 @@
         AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight =
           Math.min(this.maxRowHeight, this.model.getDefaultHeight() || this.headersHeightByFont);
 
+        // ToDo refactoring
+		this.model.setDefaultHeight(AscCommonExcel.oDefaultMetrics.RowHeight);
+
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
         // чтобы могли показать последнюю строку/столбец (http://bugzilla.onlyoffice.com/show_bug.cgi?id=23513)
         this.nColsCount = Math.min(this.model.getColsCount() + 1, gc_nMaxCol);
@@ -6138,10 +6141,10 @@
 		return oResDefault;
 	};
 
-    WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
+    WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange, force) {
         var selection;
         var ar = fixedRange ? fixedRange : ((selection = this._getSelection()) ? selection.getLast() : null);
-        if (!ar || c_oAscSelectionType.RangeCells !== ar.getType()) {
+        if (!ar || (!force && c_oAscSelectionType.RangeCells !== ar.getType())) {
             return;
         }
 
@@ -6269,17 +6272,28 @@
 		var ar = selection.getLast();
 		var range = this._getCellByXY(x, y);
 		ar.assign(range.c1, range.r1, range.c2, range.r2);
-		selection.setCell(range.r1, range.c1);
+		var r = range.r1, c = range.c1;
+		switch (ar.getType()) {
+			case c_oAscSelectionType.RangeCol:
+				r = this.visibleRange.r1;
+				break;
+			case c_oAscSelectionType.RangeRow:
+				c = this.visibleRange.c1;
+				break;
+			case c_oAscSelectionType.RangeMax:
+				r = this.visibleRange.r1;
+				c = this.visibleRange.c1;
+			    break;
+		}
+		var force = selection.setCell(r, c);
 		if (c_oAscSelectionType.RangeCells !== ar.getType()) {
 			this._fixSelectionOfHiddenCells();
 		}
-		this._fixSelectionOfMergedCells();
+		this._fixSelectionOfMergedCells(ar, force);
 	};
 
-    WorksheetView.prototype._moveActiveCellToOffset = function (dc, dr) {
-        var selection = this._getSelection();
-        var ar = selection.getLast();
-        var activeCell = selection.activeCell;
+    WorksheetView.prototype._moveActiveCellToOffset = function (activeCell, dc, dr) {
+        var ar = this._getSelection().getLast();
         var mc = this.model.getMergedByCell(activeCell.row, activeCell.col);
         var c = mc ? (dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : activeCell.col) :
           activeCell.col;
@@ -6300,7 +6314,7 @@
         if (this.width_1px > this.cols[cell.col].width || this.height_1px > this.rows[cell.row].height) {
             return;
         }
-        return this.model.selectionRange.offsetCell(dr, dc, function (row, col) {
+        return this.model.selectionRange.offsetCell(dr, dc, true, function (row, col) {
             return (0 <= row) ? (t.rows[row].height < t.height_1px) : (t.cols[col].width < t.width_1px);
         });
     };
@@ -7114,6 +7128,8 @@
 	WorksheetView.prototype.changeSelectionStartPoint = function (x, y, isCoord, isCtrl) {
 		this.cleanSelection();
 
+		var activeCell = this.model.selectionRange.activeCell.clone();
+
 		if (!this.isFormulaEditMode) {
 			this.cleanFormulaRanges();
 			if (isCtrl) {
@@ -7135,7 +7151,7 @@
 		} else {
 			comment = this.cellCommentator.getComment(x, y);
 			// move active range to offset x,y
-			this._moveActiveCellToOffset(x, y);
+			this._moveActiveCellToOffset(activeCell, x, y);
 			ret = this._calcActiveRangeOffset();
 		}
 
@@ -7263,12 +7279,15 @@
 
     // Обработка движения в выделенной области
     WorksheetView.prototype.changeSelectionActivePoint = function (dc, dr) {
-        var ret;
+        var ret, res;
         if (0 === dc && 0 === dr) {
             return this._calcActiveCellOffset();
         }
-        if (!this._moveActivePointInSelection(dc, dr)) {
+		res = this._moveActivePointInSelection(dc, dr);
+        if (0 === res) {
             return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, false);
+        } else if (-1 === res) {
+            return null;
         }
 
         // Очищаем выделение

@@ -174,7 +174,7 @@ var c_oAscError = Asc.c_oAscError;
 				window["DesktopOfflineAppDocumentStartSave"](isSaveAs);
 		}
 	};
-	spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent)
+	spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint)
 	{
 		this.asc_Save(false, true);
 	};

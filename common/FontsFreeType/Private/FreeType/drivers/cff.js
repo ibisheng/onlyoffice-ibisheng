@@ -4478,7 +4478,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 case FT_Common.cff_op_rrcurveto:
                 {
                     if (num_args < 6)
-                        return FT_Error.FT_Err_Too_Few_Arguments;
+                        return FT_Common.FT_Err_Too_Few_Arguments;
 
                     var nargs = num_args - num_args % 6;
 

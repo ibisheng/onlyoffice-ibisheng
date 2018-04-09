@@ -1194,56 +1194,83 @@
 	cMONTH.prototype.argumentsMax = 1;
 	cMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMONTH.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], val;
-		if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
-		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]).tocNumber();
-		}
+		var t = this;
+		var bIsSpecialFunction = arguments[4];
 
-		if (arg0 instanceof cError) {
-			return arg0;
-		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
-			val = arg0.tocNumber().getValue();
-		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			val = arg0.getValue();
-			if (val instanceof cError) {
-				return val;
-			} else if (val instanceof cNumber || val instanceof cBool) {
-				val = arg0.tocNumber().getValue();
-			} else {
-				return new cError(cErrorType.wrong_value_type);
-			}
-		} else if (arg0 instanceof cString) {
-			val = arg0.tocNumber();
-			if (val instanceof cError || val instanceof cEmpty) {
-				var d = new Date(arg0.getValue());
-				if (isNaN(d)) {
-					return new cError(cErrorType.wrong_value_type);
+		var calculateFunc = function(curArg) {
+			var val;
+
+			if (curArg instanceof cError) {
+				return curArg;
+			} else if (curArg instanceof cNumber || curArg instanceof cBool || curArg instanceof cEmpty) {
+				val = curArg.tocNumber().getValue();
+			} else if (curArg instanceof cRef || curArg instanceof cRef3D) {
+				val = curArg.getValue();
+				if (val instanceof cError) {
+					return val;
+				} else if (val instanceof cNumber || val instanceof cBool || val instanceof cEmpty) {
+					val = curArg.tocNumber().getValue();
 				} else {
-					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
-						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
+					return new cError(cErrorType.wrong_value_type);
+				}
+			} else if (curArg instanceof cString) {
+				val = curArg.tocNumber();
+				if (val instanceof cError || val instanceof cEmpty) {
+					var d = new Date(curArg.getValue());
+					if (isNaN(d)) {
+						return new cError(cErrorType.wrong_value_type);
+					} else {
+						val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
+					}
+				} else {
+					val = curArg.tocNumber().getValue();
+				}
+			}
+			if (val < 0) {
+				return new cError(cErrorType.not_numeric);
+			}
+			if (!AscCommon.bDate1904) {
+				if (val == 60) {
+					return t.setCalcValue(new cNumber(2), 0);
+				} else {
+					return t.setCalcValue(new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) * c_msPerDay) ).getUTCMonth() + 1), 0);
 				}
 			} else {
-				val = arg0.tocNumber().getValue();
+				return t.setCalcValue(new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1), 0);
 			}
-		}
-		if (val < 0) {
-			return new cError(cErrorType.not_numeric);
-		}
-		if (!AscCommon.bDate1904) {
-			if (val == 60) {
-				return this.setCalcValue(new cNumber(2), 0);
-			} else {
-				return this.setCalcValue(new cNumber(( new Date(
-						( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) * c_msPerDay) ).getUTCMonth() +
-					1), 0);
+		};
+
+		var arg0 = arg[0], res;
+		if(!bIsSpecialFunction) {
+
+			if (arg0 instanceof cArray) {
+				arg0 = arg0.getElement(0);
+			} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+				arg0 = arg0.cross(arguments[1]).tocNumber();
 			}
+			res = calculateFunc(arg0);
 		} else {
-			return this.setCalcValue(new cNumber(
-				( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() +
-				1), 0);
+			var matrix;
+			if (arg0 instanceof cArea || arg0 instanceof cArray) {
+				matrix = arg0.getMatrix();
+			} else if (arg0 instanceof cArea3D) {
+				matrix = arg0.getMatrix()[0];
+			}
+
+			if(matrix) {
+				res = new cArray();
+				for (var i = 0; i < matrix.length; ++i) {
+					for (var j = 0; j < matrix[i].length; ++j) {
+						matrix[i][j] = calculateFunc(matrix[i][j]);
+					}
+				}
+				res.fillFromArray(matrix);
+			} else {
+				res = calculateFunc(arg0);
+			}
 		}
+
+		return res;
 	};
 
 	/**
@@ -1937,49 +1964,78 @@
 	cYEAR.prototype.argumentsMax = 1;
 	cYEAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYEAR.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], val;
-		if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
-		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]).tocNumber();
+		var t = this;
+		var bIsSpecialFunction = arguments[4];
+
+		var calculateFunc = function(curArg) {
+			var val;
+
+			if (curArg instanceof cError) {
+				return curArg;
+			} else if (curArg instanceof cNumber || curArg instanceof cBool  || curArg instanceof cEmpty) {
+				val = curArg.tocNumber().getValue();
+			} else if (curArg instanceof cArea || curArg instanceof cArea3D) {
+				return new cError(cErrorType.wrong_value_type);
+			} else if (curArg instanceof cRef || curArg instanceof cRef3D) {
+				val = curArg.getValue();
+				if (val instanceof cError) {
+					return val;
+				} else if (val instanceof cNumber || val instanceof cBool || val instanceof cEmpty) {
+					val = curArg.tocNumber().getValue();
+				} else {
+					return new cError(cErrorType.wrong_value_type);
+				}
+			} else if (curArg instanceof cString) {
+				val = curArg.tocNumber();
+				if (val instanceof cError || val instanceof cEmpty) {
+					var d = new Date(curArg.getValue());
+					if (isNaN(d)) {
+						return new cError(cErrorType.wrong_value_type);
+					} else {
+						val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
+					}
+				} else {
+					val = curArg.tocNumber().getValue();
+				}
+			}
+			if (val < 0) {
+				return t.setCalcValue(new cError(cErrorType.not_numeric), 0);
+			} else {
+				return t.setCalcValue(new cNumber((new Date((val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay)).getUTCFullYear()), 0);
+			}
+		};
+
+		var arg0 = arg[0], res;
+		if(!bIsSpecialFunction) {
+
+			if (arg0 instanceof cArray) {
+				arg0 = arg0.getElement(0);
+			} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+				arg0 = arg0.cross(arguments[1]).tocNumber();
+			}
+			res = calculateFunc(arg0);
+		} else {
+			var matrix;
+			if (arg0 instanceof cArea || arg0 instanceof cArray) {
+				matrix = arg0.getMatrix();
+			} else if (arg0 instanceof cArea3D) {
+				matrix = arg0.getMatrix()[0];
+			}
+
+			if(matrix) {
+				res = new cArray();
+				for (var i = 0; i < matrix.length; ++i) {
+					for (var j = 0; j < matrix[i].length; ++j) {
+						matrix[i][j] = calculateFunc(matrix[i][j]);
+					}
+				}
+				res.fillFromArray(matrix);
+			} else {
+				res = calculateFunc(arg0);
+			}
 		}
 
-		if (arg0 instanceof cError) {
-			return arg0;
-		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
-			val = arg0.tocNumber().getValue();
-		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			return new cError(cErrorType.wrong_value_type);
-		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			val = arg0.getValue();
-			if (val instanceof cError) {
-				return val;
-			} else if (val instanceof cNumber || val instanceof cBool) {
-				val = arg0.tocNumber().getValue();
-			} else {
-				return new cError(cErrorType.wrong_value_type);
-			}
-		} else if (arg0 instanceof cString) {
-			val = arg0.tocNumber();
-			if (val instanceof cError || val instanceof cEmpty) {
-				var d = new Date(arg0.getValue());
-				if (isNaN(d)) {
-					return new cError(cErrorType.wrong_value_type);
-				} else {
-					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
-						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
-				}
-			} else {
-				val = arg0.tocNumber().getValue();
-			}
-		}
-		if (val < 0) {
-			return this.setCalcValue(new cError(cErrorType.not_numeric), 0);
-		} else {
-			return this.setCalcValue(
-				new cNumber((new Date((val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay)).getUTCFullYear()),
-				0);
-		}
+		return res;
 	};
 
 	/**

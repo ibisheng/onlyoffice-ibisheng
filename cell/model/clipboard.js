@@ -434,8 +434,11 @@
 							text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
 							if(text)
 							{
-								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+								AscFonts.FontPickerByCharacter.getFontsByString(text);
+								ws._loadFonts([], function() {
+									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+									window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+								});
 							}
 						}
 						else
@@ -451,8 +454,11 @@
 						{
 							if(data1)
 							{
-								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
-								window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+								AscFonts.FontPickerByCharacter.getFontsByString(data1);
+								ws._loadFonts([], function() {
+									window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
+									window['AscCommon'].g_specialPasteHelper.Paste_Process_End();
+								});
 							}
 						}
 						else

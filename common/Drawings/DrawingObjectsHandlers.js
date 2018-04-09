@@ -737,6 +737,13 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
     {
         drawing = drawingArr[i];
 
+        if(drawing.parent && AscFormat.isRealNumber(drawing.parent.LineTop) && AscFormat.isRealNumber(drawing.parent.LineBottom))
+        {
+            if(y < drawing.parent.LineTop || y > drawing.parent.LineBottom)
+            {
+                continue;
+            }
+        }
         switch(drawing.getObjectType())
         {
             case AscDFH.historyitem_type_Shape:

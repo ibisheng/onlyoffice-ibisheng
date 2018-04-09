@@ -947,8 +947,7 @@ CDocumentContentBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		if (type_Paragraph === this.Content[nIndex].GetType())
-			this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
+		this.Content[nIndex].GetOutlineParagraphs(arrOutline, oPr);
 	}
 
 	return arrOutline;

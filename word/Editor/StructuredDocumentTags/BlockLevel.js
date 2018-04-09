@@ -1186,6 +1186,10 @@ CBlockLevelSdt.prototype.GetLastParagraph = function()
 {
 	return this.Content.GetLastParagraph();
 };
+CBlockLevelSdt.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
+{
+	this.Content.GetOutlineParagraphs(arrOutline, oPr);
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

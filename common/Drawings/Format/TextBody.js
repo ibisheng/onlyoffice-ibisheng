@@ -549,7 +549,8 @@ CTextBody.prototype =
         {
             if(graphics.IsNoSupportTextDraw)
             {
-                var _w = this.content.XLimit;
+                var bEmpty = this.content.IsEmpty();
+                var _w = bEmpty ? 0.1 : this.content.XLimit;
                 var _h = this.content.GetSummaryHeight();
                 graphics.rect(this.content.X, this.content.Y, _w, _h);
             }

@@ -909,6 +909,14 @@ CDocumentContentElementBase.prototype.GetPrevParagraph = function()
 
 	return null;
 };
+/**
+ * Собираем список заголовков
+ * @param {Paragraph[]} arrOutline
+ * @param {object} oPr
+ */
+CDocumentContentElementBase.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
+{
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

@@ -11673,10 +11673,31 @@ Paragraph.prototype.private_UpdateTrackRevisions = function()
 };
 Paragraph.prototype.UpdateDocumentOutline = function()
 {
-	// Обновляем только если родительский класс и есть документ
-	if (this.Parent && this.Parent === this.LogicDocument)
+	if (!this.LogicDocument || !this.Parent)
+		return;
+
+	var isCheck = true;
+	var oParent = this.Parent;
+	while (oParent)
 	{
-		var oDocumentOutline = this.Parent.GetDocumentOutline();
+		if (oParent === this.LogicDocument)
+		{
+			break;
+		}
+		else if (oParent.IsBlockLevelSdtContent())
+		{
+			oParent = oParent.Parent.Parent;
+		}
+		else
+		{
+			isCheck = false;
+			break;
+		}
+	}
+
+	if (isCheck)
+	{
+		var oDocumentOutline = this.LogicDocument.GetDocumentOutline();
 		if (oDocumentOutline.IsUse())
 			oDocumentOutline.CheckParagraph(this);
 	}
@@ -12646,6 +12667,19 @@ Paragraph.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 		{
 			if (oPr.Styles[nIndex].Name === sStyleName)
 				return arrOutline.push({Paragraph : this, Lvl : oPr.Styles[nIndex].Lvl - 1});
+		}
+	}
+
+	if (oPr && oPr.SkipDrawings)
+		return;
+
+	var arrDrawings = this.GetAllDrawingObjects();
+	for (var nDrIndex = 0, nDrCount = arrDrawings.length; nDrIndex < nDrCount; ++nDrIndex)
+	{
+		var arrContents = arrDrawings[nDrIndex].GetAllDocContents();
+		for (var nContentIndex = 0, nContentsCount = arrContents.length; nContentIndex < nContentsCount; ++nContentIndex)
+		{
+			arrContents[nContentIndex].GetOutlineParagraphs(arrOutline, oPr);
 		}
 	}
 };

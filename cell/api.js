@@ -310,13 +310,13 @@ var editor;
     AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wbModel, -1);
   };
 
-  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+  spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
     if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction) {
       return;
     }
 
     if (c_oAscFileType.PDF === typeFile) {
-      this.adjustPrint = new Asc.asc_CAdjustPrint();
+      this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
     }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };

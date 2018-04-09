@@ -4480,22 +4480,29 @@
 
 		for (i = 0; i < arg.length; i++) {
 
-			if (arg[i] instanceof cArea3D) {
-				return new cError(cErrorType.bad_reference);
-			}
-
 			if (arg[i] instanceof cArea || arg[i] instanceof cArray) {
 				resArr[i] = arg[i].getMatrix();
+			} else if (arg[i] instanceof cArea3D) {
+				if (arg[i].isSingleSheet()) {
+					resArr[i] = arg[i].getMatrix()[0];
+				} else {
+					return new cError(cErrorType.bad_reference);
+				}
 			} else if (arg[i] instanceof cRef || arg[i] instanceof cRef3D) {
-				resArr[i] = [[arg[i].getValue()]];
+				var val = arg[i].getValue();
+				if(val instanceof cEmpty) {
+					return new cError(cErrorType.wrong_value_type);
+				} else {
+					resArr[i] = [[val]];
+				}
 			} else {
 				resArr[i] = [[arg[i]]];
 			}
 
 			row = Math.max(resArr[0].length, row);
-			col = Math.max(resArr[0][0].length, col);
+			col = resArr[0][0] ? Math.max(resArr[0][0].length, col) : 0;
 
-			if (row != resArr[i].length || col != resArr[i][0].length) {
+			if (row != resArr[i].length || (resArr[i][0] && col != resArr[i][0].length)) {
 				return new cError(cErrorType.not_numeric);
 			}
 
@@ -4517,6 +4524,8 @@
 						} else {
 							res *= arg0.tocNumber().getValue();
 						}
+					} else if(arg0 instanceof cBool) {
+						res *= 0;
 					} else {
 						res *= arg0.tocNumber().getValue();
 					}

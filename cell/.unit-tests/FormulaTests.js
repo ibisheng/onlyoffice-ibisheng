@@ -3100,6 +3100,8 @@ $( function () {
         ws.getRange2( "P45" ).setValue( "10" );
         ws.getRange2( "P46" ).setValue( "11" );
         ws.getRange2( "P47" ).setValue( "12" );
+		ws.getRange2( "P48" ).setValue( "" );
+		ws.getRange2( "P49" ).setValue( "" );
         oParser = new parserFormula( "SUMPRODUCT(N44:N47,O44:O47,P44:P47)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 780 );
@@ -3111,6 +3113,30 @@ $( function () {
 		oParser = new parserFormula( "SUMPRODUCT(SUM(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 70 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,TRUE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE,3})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48, P44:P47)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "SUMPRODUCT(P48:P49)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 
 		oParser = new parserFormula( "SUM(SUMPRODUCT(N44:N47*O44:O47))", "A2", ws );
 		ok( oParser.parse() );
@@ -4121,6 +4147,29 @@ $( function () {
 		wb.dependencyFormulas.lockRecal();
 	} );
 
+	test( "Test: \"COUNTBLANK\"", function () {
+
+		ws.getRange2( "A22" ).setValue( "6" );
+		ws.getRange2( "A23" ).setValue( "" );
+		ws.getRange2( "A24" ).setValue( "4" );
+
+		ws.getRange2( "B22" ).setValue( "" );
+		ws.getRange2( "B23" ).setValue( "27" );
+		ws.getRange2( "B24" ).setValue( "34" );
+
+		oParser = new parserFormula( "COUNTBLANK(A22:B24)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTBLANK(A22)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( "COUNTBLANK(A23)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
     test( "Test: \"COVAR\"", function () {
 
         oParser = new parserFormula( "COVAR({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,6.7})", "A1", ws );
@@ -4784,6 +4833,30 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), "#NUM!" );
 
     } );
+
+	test( "Test: \"HYPGEOM.DIST\"", function () {
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,4,8,20,TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.4654 );
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,4,8,20,FALSE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.3633 );
+
+		oParser = new parserFormula( "HYPGEOM.DIST(2,2,3,40,0)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.003846154);
+
+		oParser = new parserFormula( "HYPGEOM.DIST(2,3,3,40,5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.999898785);
+
+		oParser = new parserFormula( "HYPGEOM.DIST(1,2,3,4,5)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue() - 0, 0.5);
+
+	} );
 
     test( "Test: \"INTERCEPT\"", function () {
 
