@@ -1061,7 +1061,7 @@
             dstM.fVertBearingY = (srcM.vertBearingY >> 6);
             dstM.fVertAdvance = (srcM.vertAdvance >> 6);
 
-            if (isFromPicker && (0 == dstM.fHoriAdvance))
+            if (isFromPicker && (0 == dstM.fHoriAdvance && 0 == srcM.width))
             	return null;
 
             if (!isRaster)
