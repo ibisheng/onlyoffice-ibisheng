@@ -13581,16 +13581,13 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 	this.DrawComments       = DrawComments;
 	this.DrawSolvedComments = DrawSolvedComments;
 
+	this.Comments = [];
 	if (null !== PageEndInfo)
 	{
 		for (var nIndex = 0, nCount = PageEndInfo.Comments.length; nIndex < nCount; ++nIndex)
 		{
 			this.AddComment(PageEndInfo.Comments[nIndex]);
 		}
-	}
-	else
-	{
-		this.Comments = [];
 	}
 
 	this.Check_CommentsFlag();
