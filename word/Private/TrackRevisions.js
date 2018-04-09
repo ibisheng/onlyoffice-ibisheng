@@ -41,11 +41,19 @@ var History = AscCommon.History;
 //----------------------------------------------------------------------------------------------------------------------
 Asc['asc_docs_api'].prototype.asc_SetTrackRevisions = function(bTrack)
 {
-    return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return;
+
+	return oLogicDocument.Set_TrackRevisions(bTrack);
 };
 Asc['asc_docs_api'].prototype.asc_IsTrackRevisions = function()
 {
-    return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return false;
+
+    return oLogicDocument.Is_TrackRevisions();
 };
 Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges = function()
 {
