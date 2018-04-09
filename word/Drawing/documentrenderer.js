@@ -3436,7 +3436,7 @@ CDocMeta.prototype =
                     }
                     if (!_bIsFound)
                     {
-                        for (var i = this.PagesCount - 1; i > _pageFind; i++)
+                        for (var i = this.PagesCount - 1; i > _pageFind; i--)
                         {
                             if (0 < this.SearchResults.Pages[i].length)
                             {

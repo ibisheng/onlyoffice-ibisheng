@@ -846,7 +846,15 @@
 			this.Api.asc_enableKeyEvents(true, true);
 
 			this.CommonDiv_Execute_CopyCut();
-			var _ret = document.execCommand("copy");
+			var _ret = false;
+			try
+			{
+				_ret = document.execCommand("copy");
+			}
+			catch (err)
+			{
+				_ret = false;
+			}
 			if (!_ret)
 			{
 				//　копирования не было
@@ -863,7 +871,15 @@
 			this.Api.asc_enableKeyEvents(true, true);
 
 			this.CommonDiv_Execute_CopyCut();
-			var _ret = document.execCommand("cut");
+			var _ret = false;
+			try
+			{
+				_ret = document.execCommand("cut");
+			}
+			catch (err)
+			{
+				_ret = false;
+			}
 			if (!_ret)
 			{
 				//　копирования не было
@@ -881,7 +897,16 @@
 				this.inputContext.HtmlArea.focus();
 			this.Api.asc_enableKeyEvents(true, true);
 
-			var _ret = document.execCommand("paste");
+			var _ret = false;
+			try
+			{
+				_ret = document.execCommand("paste");
+			}
+			catch (err)
+			{
+				_ret = false;
+			}
+
 			if (!_ret && null != this.LastCopyBinary)
 			{
 				var _data = null;
