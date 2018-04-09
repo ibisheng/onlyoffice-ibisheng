@@ -2357,7 +2357,8 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._saveCheck = function() {
-		return !this.WordControl.m_oLogicDocument.IsViewModeInReview() && !this.isLongAction();
+		return !this.isLongAction() &&
+			!(this.WordControl.m_oLogicDocument && this.WordControl.m_oLogicDocument.IsViewModeInReview());
 	};
 	asc_docs_api.prototype._haveOtherChanges = function () {
 		return AscCommon.CollaborativeEditing.Have_OtherChanges();
