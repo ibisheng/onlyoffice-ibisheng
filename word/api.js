@@ -6940,10 +6940,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.getViewMode     = function()
-	{
-		return this.isViewMode;
-	};
 	asc_docs_api.prototype.asc_setViewMode = function(isViewMode)
 	{
 		this.isViewMode = !!isViewMode;

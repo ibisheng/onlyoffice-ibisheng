@@ -545,10 +545,6 @@ var editor;
 		return this.wb.af_getTablePictures(props, pivot);
 	};
 
-  spreadsheet_api.prototype.getViewMode = function() {
-    return this.isViewMode;
-  };
-
   spreadsheet_api.prototype.asc_setViewMode = function (isViewMode) {
     this.isViewMode = !!isViewMode;
     if (!this.isLoadFullApi) {

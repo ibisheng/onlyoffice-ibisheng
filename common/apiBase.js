@@ -391,6 +391,7 @@
 	};
 	baseEditorsApi.prototype.getViewMode                     = function()
 	{
+		return this.isViewMode;
 	};
 	baseEditorsApi.prototype.isLongAction                    = function()
 	{
