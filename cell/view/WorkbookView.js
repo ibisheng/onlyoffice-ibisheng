@@ -472,7 +472,7 @@
       if (this.input && this.input.addEventListener) {
         this.input.addEventListener("focus", function () {
           self.input.isFocused = true;
-          if (self.controller.settings.isViewerMode) {
+          if (self.Api.isViewMode) {
             return;
           }
           self._onStopFormatPainter();
@@ -642,7 +642,7 @@
 			  }, "applyCloseEvent": function () {
 				  self.controller._onWindowKeyDown.apply(self.controller, arguments);
 			  }, "isViewerMode": function () {
-				  return self.controller.settings.isViewerMode;
+				  return self.Api.isViewMode;
 			  }, "getFormulaRanges": function () {
 				  return (self.cellFormulaEnterWSOpen || self.getWorksheet()).getFormulaRanges();
 			  }, "getCellFormulaEnterWSOpen": function () {
@@ -1026,7 +1026,7 @@
     // Нужно очистить поиск
     this.model.cleanFindResults();
 
-    var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
+    var ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
 
     if (c_oTargetType.Hyperlink === ct.target) {
       // Проверим замерженность
@@ -1083,7 +1083,7 @@
     } else if (x === undefined && y === undefined) {
       ws.cleanHighlightedHeaders();
     } else {
-      ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
+      ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
 
       // Отправление эвента об удалении всего листа (именно удалении, т.к. если просто залочен, то не рисуем рамку вокруг)
       if (undefined !== ct.userIdAllSheet) {
@@ -1329,7 +1329,7 @@
   // Double click
   WorkbookView.prototype._onMouseDblClick = function(x, y, isHideCursor, callback) {
     var ws = this.getWorksheet();
-    var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
+    var ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
 
     if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
       ct.target === c_oTargetType.ColumnResize ? ws.autoFitColumnWidth(ct.col, ct.col) : ws.autoFitRowHeight(ct.row, ct.row);
