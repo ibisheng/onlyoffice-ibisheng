@@ -537,8 +537,8 @@
 	 * @param {number} value
 	 */
 	ApiWorksheet.prototype.SetLeftMargin = function (value) {
-		Asc.asc_CPageMargins.prototype.init();
-		Asc.asc_CPageMargins.prototype.asc_setLeft(value);
+		value = (typeof value !== 'number') ? 0 : value;		
+		this.worksheet.PagePrintOptions.pageMargins.asc_setLeft(value);
 	};
 	/**
 	 * Get left margin sheet
@@ -546,8 +546,7 @@
 	 * @returns {number}
 	 */
 	ApiWorksheet.prototype.GetLeftMargin = function () {
-		Asc.asc_CPageMargins.prototype.init();
-		return Asc.asc_CPageMargins.prototype.asc_getLeft();
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getLeft();
 	};
 	Object.defineProperty(ApiWorksheet.prototype, "LeftMargin", {
 		get: function () {
@@ -555,6 +554,84 @@
 		},
 		set: function (value) {
 			this.SetLeftMargin(value);
+		}
+	});
+
+	/**
+	 * Set right margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetRightMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setRight(value);
+	};
+	/**
+	 * Get right margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetRightMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getRight();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "RightMargin", {
+		get: function () {
+			return this.GetRightMargin();
+		},
+		set: function (value) {
+			this.SetRightMargin(value);
+		}
+	});
+
+	/**
+	 * Set top margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetTopMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setTop(value);
+	};
+	/**
+	 * Get top margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetTopMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getTop();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "TopMargin", {
+		get: function () {
+			return this.GetTopMargin();
+		},
+		set: function (value) {
+			this.SetTopMargin(value);
+		}
+	});
+
+	/**
+	 * Set bottom margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetBottomMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setBottom(value);
+	};
+	/**
+	 * Get bottom margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetBottomMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getBottom();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "BottomMargin", {
+		get: function () {
+			return this.GetBottomMargin();
+		},
+		set: function (value) {
+			this.SetBottomMargin(value);
 		}
 	});
 
@@ -897,12 +974,7 @@
 		var bb = this.range.bbox;
 		var rng = this.range.worksheet.selectionRange.ranges[0];
 		if (bb.c1 === rng.c1 && bb.c2 === rng.c2 && bb.r1 === rng.r1 && bb.r2 === rng.r2) {
-			rng.c1 += col;
-			rng.r1 += row;
-			rng.c1 = (rng.c1 > AscCommon.gc_nMaxCol0) ? AscCommon.gc_nMaxCol0 : (rng.c1 < 0) ? 0 : rng.c1;
-			rng.r1 = (rng.r1 > AscCommon.gc_nMaxRow0) ? AscCommon.gc_nMaxRow0 : (rng.r1 < 0) ? 0 : rng.r1;
-			rng.c2 = rng.c1;
-			rng.r2 = rng.r1;
+			rng.setOffset({row: row, col: col});
 		}
 	};
 
@@ -916,37 +988,23 @@
 	 * @param {range} RelativeTo
 	 * @returns {string}
 	 */
-	ApiRange.prototype.GetAdress = function (RowAbsolute, ColAbsolute, RefStyle, External, RelativeTo) {
+	ApiRange.prototype.GetAdress = function (RowAbsolute = true, ColAbsolute = true, RefStyle = 'xlA1', External = false, RelativeTo = null) {
 		if (this.range.isOneCell()) {
-			var range = [this.range.bbox.c1, this.range.bbox.r1];
-			var symbol = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-			var name = [];
-			name.unshift(range[1] + 1);
-			var remainder = range[0] % 26;
-			name.unshift(symbol[remainder]);
-			var int = (range[0] - remainder) / 26;
-			if (int >= 26) {
-				remainder = (int % 26);
-				name.unshift(symbol[--remainder]);
-				int = (int - ++remainder) / 26;
-				name.unshift(symbol[--int]);
-			} else if (int > 0) {
-				name.unshift(symbol[--int]);
-			}
-			name.unshift('');
-			name[0] = (External) ? '[' + this.range.worksheet.workbook.oApi.DocInfo.Title + ']' + this.range.worksheet.sName + '!' : '';
-			
+			var range = this.range.bbox;
+			var name = [range.getName().replace(/\D/g,''), range.getName().replace(/\d/g,'')];
+			name.unshift((External) ? '[' + this.range.worksheet.workbook.oApi.DocInfo.Title + ']' + this.range.worksheet.sName + '!' : '');
 			if (RefStyle == 'xlA1') {
 					name[1] = (ColAbsolute) ? '$' + name[1]: name[1];
 					name[2] = (RowAbsolute) ? '$' + name[2]: name[2];
-			} else if (!RelativeTo) { 
-				name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
-				name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + range[0] + ']';
-			} else {
-				var relRange = [RelativeTo.range.bbox.c1, RelativeTo.range.bbox.c1];
-				name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + (range[1] - relRange[1]) + ']'; 
-				name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + (range[0] - relRange[0]) + ']';
 			}
+			// } else if (!RelativeTo) { 
+			// 	name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
+			// 	name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + range[0] + ']';
+			// } else {
+			// 	var relRange = [RelativeTo.range.bbox.c1, RelativeTo.range.bbox.c1];
+			// 	name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + (range[1] - relRange[1]) + ']'; 
+			// 	name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + (range[0] - relRange[0]) + ']';
+			// }
 			return name.join('');
 		} else {
 			return null;
@@ -1855,6 +1913,12 @@
 	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["SetLeftMargin"] = ApiWorksheet.prototype.SetLeftMargin;
 	ApiWorksheet.prototype["GetLeftMargin"] = ApiWorksheet.prototype.GetLeftMargin;	
+	ApiWorksheet.prototype["SetRighMargin"] = ApiWorksheet.prototype.SetRightMargin;
+	ApiWorksheet.prototype["GetRightMargin"] = ApiWorksheet.prototype.GetRightMargin;
+	ApiWorksheet.prototype["SetTopMargin"] = ApiWorksheet.prototype.SetTopMargin;
+	ApiWorksheet.prototype["GetTopMargin"] = ApiWorksheet.prototype.GetTopMargin;	
+	ApiWorksheet.prototype["SetBottomMargin"] = ApiWorksheet.prototype.SetBottomMargin;
+	ApiWorksheet.prototype["GetBottomMargin"] = ApiWorksheet.prototype.GetBottomMargin;		
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;
