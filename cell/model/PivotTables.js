@@ -2716,9 +2716,10 @@ CT_pivotTableDefinition.prototype.updatePivotType = function () {
 	var pivotFields = this.asc_getPivotFields();
 	var rowFields = this.asc_getRowFields();
 	if (rowFields) {
-		var i;
+		var i, index;
 		for (i = 0; i < rowFields.length; ++i) {
-			if (false !== pivotFields[rowFields[i].asc_getIndex()].outline) {
+			index = rowFields[i].asc_getIndex();
+			if (st_VALUES !== index && false !== pivotFields[index].outline) {
 				this.clearGrid = true;
 				break;
 			}
@@ -11116,6 +11117,8 @@ prot['Day'] = prot.Day;
 prot['Hour'] = prot.Hour;
 prot['Minute'] = prot.Minute;
 prot['Second'] = prot.Second;
+
+window['Asc']['st_VALUES'] = window['AscCommonExcel'].st_VALUES = st_VALUES;
 
 window['AscCommonExcel'].ToName_ST_ItemType = ToName_ST_ItemType;
 
