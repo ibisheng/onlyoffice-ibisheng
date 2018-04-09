@@ -988,7 +988,7 @@
 	 * @param {range} RelativeTo
 	 * @returns {string}
 	 */
-	ApiRange.prototype.GetAdress = function (RowAbsolute = true, ColAbsolute = true, RefStyle = 'xlA1', External = false, RelativeTo = null) {
+	ApiRange.prototype.GetAdress = function (RowAbsolute, ColAbsolute, RefStyle, External, RelativeTo) {
 		if (this.range.isOneCell()) {
 			var range = this.range.bbox;
 			var name = [range.getName().replace(/\D/g,''), range.getName().replace(/\d/g,'')];
