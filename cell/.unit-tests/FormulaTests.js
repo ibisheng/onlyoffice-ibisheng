@@ -3154,6 +3154,18 @@ $( function () {
 		ok( oParser.parse() );
 		ok( oParser.assemble() == "SUM(SUMPRODUCT(N44:O47))" );
 		strictEqual( oParser.calculate().getValue(), 36 );
+
+		oParser = new parserFormula( "SUMPRODUCT(YEAR(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 11400 );
+
+		oParser = new parserFormula( "SUMPRODUCT(MONTH(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT(DAY(N45:O47))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
     } );
 
     test( "Test: \"SINH\"", function () {
