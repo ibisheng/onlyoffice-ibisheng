@@ -7624,6 +7624,11 @@
 					ranges = [sharedShift];
 				}
 				res = true;
+			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type && data.bConvertTableFormulaToRef) {
+				this._processShared(shared, shared.ref, data, parsed, true, function(newFormula) {
+					return newFormula.processNotify(data);
+				});
+				res = true;
 			}
 			if (ranges) {
 				for (i = 0; i < ranges.length; ++i) {
