@@ -635,13 +635,32 @@
 		}
 	});
 
+	/**
+	 * Set page orientation
+	 * @param {PageOrientation} PageOrientation
+	 * */
+	ApiWorksheet.prototype.SetPageOrientation = function(PageOrientation)
+	{
+		PageOrientation = (PageOrientation == 'xlPortrait') ? 0 : (PageOrientation == 'xlLandscape') ? 1 : 0;
+		this.worksheet.PagePrintOptions.pageSetup.asc_setOrientation(PageOrientation);
+	};
+
+	/**
+	 * Get page orientation
+	 * @returns {PageOrientation}
+	 * */
+	ApiWorksheet.prototype.GetPageOrientation = function()
+	{
+		var PageOrientation = this.worksheet.PagePrintOptions.pageSetup.asc_getOrientation();
+		return (PageOrientation) ? 'xlLandscape' : 'xlPortrait';
+	};
+
 	Object.defineProperty(ApiWorksheet.prototype, "Orientation", {
 		get: function () {
-			return this.worksheet.PagePrintOptions.pageSetup.asc_getOrientation();
+			return this.GetPageOrientation();
 		},
-		set: function (value) {
-			value = (value == 'xlPortrait') ? 0 : (value == 'xlLandscape') ? 1 : 0;
-			this.worksheet.PagePrintOptions.pageSetup.asc_setOrientation(value);
+		set: function (PageOrientation) {
+			this.SetPageOrientation(PageOrientation);
 		}
 	});
 
@@ -1949,6 +1968,8 @@
 	ApiWorksheet.prototype["GetTopMargin"] = ApiWorksheet.prototype.GetTopMargin;	
 	ApiWorksheet.prototype["SetBottomMargin"] = ApiWorksheet.prototype.SetBottomMargin;
 	ApiWorksheet.prototype["GetBottomMargin"] = ApiWorksheet.prototype.GetBottomMargin;		
+	ApiWorksheet.prototype["SetPageOrientation"] = ApiWorksheet.prototype.SetPageOrientation;
+	ApiWorksheet.prototype["GetPageOrientation"] = ApiWorksheet.prototype.GetPageOrientation;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;
