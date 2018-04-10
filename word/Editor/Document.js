@@ -1779,6 +1779,14 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
+
+    // Во вьювере показываем документ без изменений в рецензировании
+    if (this.IsViewMode())
+	{
+		this.Start_SilentMode();
+		this.private_RejectAllRevisionChanges();
+		this.End_SilentMode(false);
+	}
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
