@@ -150,7 +150,10 @@
 	/**
 	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
 	 * **/
-
+	
+	/**
+	 * @typedef {("xlLandscape" | "xlPortrait")} PageOrientation
+	 * */
 
 	/**
 	 * @typedef {("cross" | "in" | "none" | "out")} TickMark
@@ -639,8 +642,7 @@
 	 * Set page orientation
 	 * @param {PageOrientation} PageOrientation
 	 * */
-	ApiWorksheet.prototype.SetPageOrientation = function(PageOrientation)
-	{
+	ApiWorksheet.prototype.SetPageOrientation = function (PageOrientation) {
 		PageOrientation = (PageOrientation == 'xlPortrait') ? 0 : (PageOrientation == 'xlLandscape') ? 1 : 0;
 		this.worksheet.PagePrintOptions.pageSetup.asc_setOrientation(PageOrientation);
 	};
@@ -649,8 +651,7 @@
 	 * Get page orientation
 	 * @returns {PageOrientation}
 	 * */
-	ApiWorksheet.prototype.GetPageOrientation = function()
-	{
+	ApiWorksheet.prototype.GetPageOrientation = function ()	{
 		var PageOrientation = this.worksheet.PagePrintOptions.pageSetup.asc_getOrientation();
 		return (PageOrientation) ? 'xlLandscape' : 'xlPortrait';
 	};
