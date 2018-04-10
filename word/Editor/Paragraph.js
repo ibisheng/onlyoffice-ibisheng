@@ -8291,7 +8291,11 @@ Paragraph.prototype.PasteFormatting = function(TextPr, oParaPr, ApplyPara)
 {
 	// Применяем текстовые настройки всегда
 	if (TextPr)
-		this.Add(new ParaTextPr(TextPr));
+	{
+		var oParaTextPr = new ParaTextPr();
+		oParaTextPr.Value.Set_FromObject(TextPr, true);
+		this.Add(oParaTextPr);
+	}
 
 	// Применяем настройки параграфа
 	if (oParaPr)
