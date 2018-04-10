@@ -120,7 +120,11 @@ var nbsp_string = String.fromCharCode(0x00A0);
 var sp_string   = String.fromCharCode(0x0032);
 
 
-//var PUNCTUATION_FLAG = 0x00
+var PUNCTUATION_FLAG_BASE             = 0x0001;
+var PUNCTUATION_FLAG_CANT_BE_AT_BEGIN = 0x0010;
+var PUNCTUATION_FLAG_CANT_BE_AT_END   = 0x0020;
+var PUNCTUATION_FLAG_EAST_ASIAN       = 0x0100;
+
 
 var g_aPunctuation =
 [
