@@ -805,24 +805,7 @@
 			}
 			res = calculateFunc(arg0);
 		} else {
-			var matrix;
-			if (arg0 instanceof cArea || arg0 instanceof cArray) {
-				matrix = arg0.getMatrix();
-			} else if (arg0 instanceof cArea3D) {
-				matrix = arg0.getMatrix()[0];
-			}
-
-			if(matrix) {
-				res = new cArray();
-				for (var i = 0; i < matrix.length; ++i) {
-					for (var j = 0; j < matrix[i].length; ++j) {
-						matrix[i][j] = calculateFunc(matrix[i][j]);
-					}
-				}
-				res.fillFromArray(matrix);
-			} else {
-				res = calculateFunc(arg0);
-			}
+			res = this._checkArrayArguments(arg0, calculateFunc);
 		}
 
 		return res;
@@ -1287,24 +1270,7 @@
 			}
 			res = calculateFunc(arg0);
 		} else {
-			var matrix;
-			if (arg0 instanceof cArea || arg0 instanceof cArray) {
-				matrix = arg0.getMatrix();
-			} else if (arg0 instanceof cArea3D) {
-				matrix = arg0.getMatrix()[0];
-			}
-
-			if(matrix) {
-				res = new cArray();
-				for (var i = 0; i < matrix.length; ++i) {
-					for (var j = 0; j < matrix[i].length; ++j) {
-						matrix[i][j] = calculateFunc(matrix[i][j]);
-					}
-				}
-				res.fillFromArray(matrix);
-			} else {
-				res = calculateFunc(arg0);
-			}
+			res = this._checkArrayArguments(arg0, calculateFunc);
 		}
 
 		return res;
@@ -2052,24 +2018,7 @@
 			}
 			res = calculateFunc(arg0);
 		} else {
-			var matrix;
-			if (arg0 instanceof cArea || arg0 instanceof cArray) {
-				matrix = arg0.getMatrix();
-			} else if (arg0 instanceof cArea3D) {
-				matrix = arg0.getMatrix()[0];
-			}
-
-			if(matrix) {
-				res = new cArray();
-				for (var i = 0; i < matrix.length; ++i) {
-					for (var j = 0; j < matrix[i].length; ++j) {
-						matrix[i][j] = calculateFunc(matrix[i][j]);
-					}
-				}
-				res.fillFromArray(matrix);
-			} else {
-				res = calculateFunc(arg0);
-			}
+			res = this._checkArrayArguments(arg0, calculateFunc);
 		}
 
 		return res;

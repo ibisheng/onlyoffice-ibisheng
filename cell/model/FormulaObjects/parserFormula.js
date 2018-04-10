@@ -2609,6 +2609,27 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return null;
 	};
+	cBaseFunction.prototype._checkArrayArguments = function (arg0, func) {
+		var matrix, res;
+		if (arg0 instanceof cArea || arg0 instanceof cArray) {
+			matrix = arg0.getMatrix();
+		} else if (arg0 instanceof cArea3D) {
+			matrix = arg0.getMatrix()[0];
+		}
+
+		if(matrix) {
+			res = new cArray();
+			for (var i = 0; i < matrix.length; ++i) {
+				for (var j = 0; j < matrix[i].length; ++j) {
+					matrix[i][j] = func(matrix[i][j]);
+				}
+			}
+			res.fillFromArray(matrix);
+		} else {
+			res = func(arg0);
+		}
+		return res;
+	};
 	cBaseFunction.prototype._getOneDimensionalArray = function (arg, type) {
 		var res = [];
 
