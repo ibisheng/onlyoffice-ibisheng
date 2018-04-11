@@ -1541,7 +1541,8 @@
 			if (val < 0) {
 				return new cError(cErrorType.not_numeric);
 			} else {
-				val = parseInt((( val * 24 * 60 - Math.floor(val * 24 * 60) ) * 60).toFixed(cExcelDateTimeDigits)) % 60;
+				//val = parseInt((( val * 24 * 60 - Math.floor(val * 24 * 60) ) * 60).toFixed(cExcelDateTimeDigits)) % 60;
+				val = Math.floor(( val * c_sPerDay + 0.5).toFixed(cExcelDateTimeDigits)) % 60;
 				return t.setCalcValue(new cNumber(val), 0);
 			}
 		};
