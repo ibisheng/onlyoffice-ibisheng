@@ -5562,7 +5562,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		} else if (cElementType.cellsRange3D === elem.type) {
 			isErr = true;
-			bbox = elem.getBBox0();
+			bbox = elem.getBBox0NoCheck();
 		}
 		if (bbox) {
 			bbox = bbox.clone();
@@ -5593,10 +5593,10 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 			}
 		} else if (cElementType.cellsRange3D === currentElement.type) {
-			bbox = currentElement.getBBox0();
+			bbox = currentElement.getBBox0NoCheck();
 			if (bbox && !bbox.isAbsAll()) {
 				cloneElem = currentElement.clone();
-				bbox = cloneElem.getBBox0();
+				bbox = cloneElem.getBBox0NoCheck();
 			}
 		}
 		if (cloneElem) {
