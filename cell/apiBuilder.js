@@ -1023,11 +1023,7 @@
 	 * @param {Number} col
 	 */
 	ApiRange.prototype.SetOffset = function (row, col) {
-		var bb = this.range.bbox;
-		var rng = this.range.worksheet.selectionRange.ranges[0];
-		if (bb.c1 === rng.c1 && bb.c2 === rng.c2 && bb.r1 === rng.r1 && bb.r2 === rng.r2) {
-			rng.setOffset({row: row, col: col});
-		}
+		this.range.setOffset({row: row, col: col});
 	};
 
 	/**
