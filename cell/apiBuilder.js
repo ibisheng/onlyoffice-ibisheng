@@ -1944,7 +1944,7 @@
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
-	ApiWorksheet.prototype["GetCols"] = ApiWorksheet.prototype.GetCols;	
+	ApiWorksheet.prototype["GetCols"] = ApiWorksheet.prototype.GetCols;
 	ApiWorksheet.prototype["GetRows"] = ApiWorksheet.prototype.GetRows;
 	ApiWorksheet.prototype["GetUsedRange"] = ApiWorksheet.prototype.GetUsedRange;
 	ApiWorksheet.prototype["GetName"] = ApiWorksheet.prototype.GetName;
