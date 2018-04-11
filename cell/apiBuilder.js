@@ -150,7 +150,10 @@
 	/**
 	 * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
 	 * **/
-
+	
+	/**
+	 * @typedef {("xlLandscape" | "xlPortrait")} PageOrientation
+	 * */
 
 	/**
 	 * @typedef {("cross" | "in" | "none" | "out")} TickMark
@@ -532,6 +535,159 @@
 	};
 
 	/**
+	 * Set left margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetLeftMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;		
+		this.worksheet.PagePrintOptions.pageMargins.asc_setLeft(value);
+	};
+	/**
+	 * Get left margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetLeftMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getLeft();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "LeftMargin", {
+		get: function () {
+			return this.GetLeftMargin();
+		},
+		set: function (value) {
+			this.SetLeftMargin(value);
+		}
+	});
+
+	/**
+	 * Set right margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetRightMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setRight(value);
+	};
+	/**
+	 * Get right margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetRightMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getRight();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "RightMargin", {
+		get: function () {
+			return this.GetRightMargin();
+		},
+		set: function (value) {
+			this.SetRightMargin(value);
+		}
+	});
+
+	/**
+	 * Set top margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetTopMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setTop(value);
+	};
+	/**
+	 * Get top margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetTopMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getTop();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "TopMargin", {
+		get: function () {
+			return this.GetTopMargin();
+		},
+		set: function (value) {
+			this.SetTopMargin(value);
+		}
+	});
+
+	/**
+	 * Set bottom margin sheet
+	 * @memberof ApiWorksheet
+	 * @param {number} value
+	 */
+	ApiWorksheet.prototype.SetBottomMargin = function (value) {
+		value = (typeof value !== 'number') ? 0 : value;				
+		this.worksheet.PagePrintOptions.pageMargins.asc_setBottom(value);
+	};
+	/**
+	 * Get bottom margin sheet
+	 * @memberof ApiWorksheet
+	 * @returns {number}
+	 */
+	ApiWorksheet.prototype.GetBottomMargin = function () {
+		return this.worksheet.PagePrintOptions.pageMargins.asc_getBottom();
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "BottomMargin", {
+		get: function () {
+			return this.GetBottomMargin();
+		},
+		set: function (value) {
+			this.SetBottomMargin(value);
+		}
+	});
+
+	/**
+	 * Set page orientation
+	 * @memberof ApiWorksheet
+	 * @param {PageOrientation} PageOrientation
+	 * */
+	ApiWorksheet.prototype.SetPageOrientation = function (PageOrientation) {
+		PageOrientation = (PageOrientation == 'xlPortrait') ? 0 : (PageOrientation == 'xlLandscape') ? 1 : 0;
+		this.worksheet.PagePrintOptions.pageSetup.asc_setOrientation(PageOrientation);
+	};
+
+	/**
+	 * Get page orientation
+	 * @memberof ApiWorksheet
+	 * @returns {PageOrientation}
+	 * */
+	ApiWorksheet.prototype.GetPageOrientation = function ()	{
+		var PageOrientation = this.worksheet.PagePrintOptions.pageSetup.asc_getOrientation();
+		return (PageOrientation) ? 'xlLandscape' : 'xlPortrait';
+	};
+
+	Object.defineProperty(ApiWorksheet.prototype, "Orientation", {
+		get: function () {
+			return this.GetPageOrientation();
+		},
+		set: function (PageOrientation) {
+			this.SetPageOrientation(PageOrientation);
+		}
+	});
+
+	Object.defineProperty(ApiWorksheet.prototype, "PrintHeadings", {
+		get: function () {
+			return this.worksheet.PagePrintOptions.asc_getHeadings();
+		},
+		set: function (value) {
+			value = (typeof value === 'boolean') ? value : false;
+			this.worksheet.PagePrintOptions.asc_setHeadings(value);
+		}
+	});
+
+	Object.defineProperty(ApiWorksheet.prototype, "PrintGridlines", {
+		get: function () {
+			return this.worksheet.PagePrintOptions.asc_getGridLines();
+		},
+		set: function (value) {
+			value = (typeof value === 'boolean') ? value : false;
+			this.worksheet.PagePrintOptions.asc_setGridLines(value);
+		}
+	});
+
+	/**
 	 * Set column width
 	 * @memberof ApiWorksheet
 	 * @param {string} sDataRange
@@ -859,6 +1015,47 @@
 			return this.GetCol();
 		}
 	});
+
+	/**
+	 * Set cell offset
+	 * @memberof ApiRange
+	 * @param {Number} row
+	 * @param {Number} col
+	 */
+	ApiRange.prototype.SetOffset = function (row, col) {
+		this.range.setOffset({row: row, col: col});
+	};
+
+	/**
+	 * Get cell adress
+	 * @memberof ApiRange
+	 * @param {boolean} RowAbs
+	 * @param {boolean} ColAbs
+	 * @param {string} RefStyle
+	 * @param {boolean} External
+	 * @param {range} RelativeTo
+	 * @returns {string}
+	 */
+	ApiRange.prototype.GetAdress = function (RowAbs, ColAbs, RefStyle, External, RelativeTo) {
+		if (this.range.isOneCell()) {
+			var range = this.range.bbox;
+			var ws = this.range.worksheet;
+			if (RefStyle == 'xlA1') {
+				(ColAbs && RowAbs) ? range.setAbs(1, 1, 1, 1) : (ColAbs) ? range.setAbs(0, 1, 0, 1) : (RowAbs) ? range.setAbs(1, 0, 1, 0) : range.setAbs(0, 0, 0, 0);
+			}
+			// } else if (!RelativeTo) { 
+			// 	name[1] = (ColAbs) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
+			// 	name[2] = (ColAbs) ? 'C' + (range[0] + 1) : 'C[' + range[0] + ']';
+			// } else {
+			// 	var relRange = [RelativeTo.range.bbox.c1, RelativeTo.range.bbox.c1];
+			// 	name[1] = (ColAbs) ? 'R' + (range[1] + 1) : 'R[' + (range[1] - relRange[1]) + ']'; 
+			// 	name[2] = (ColAbs) ? 'C' + (range[0] + 1) : 'C[' + (range[0] - relRange[0]) + ']';
+			// }
+			return (External) ? '[' + ws.workbook.oApi.DocInfo.Title + ']' + AscCommon.parserHelp.get3DRef(ws.sName, range.getName()) : range.getName();
+		} else {
+			return null;
+		}
+	};
 
 	/**
 	 * Get count rows or columns
@@ -1234,9 +1431,15 @@
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
 	};
-	Object.defineProperty(ApiRange.prototype, "Wrap", {
+	ApiRange.prototype.GetWrap = function () {
+		return this.range.getAlign().getWrap();
+	};
+	Object.defineProperty(ApiRange.prototype, "WrapText", {
 		set: function (value) {
-			return this.SetWrap(value);
+			this.SetWrap(value);
+		},
+		get: function () {
+			return this.GetWrap();
 		}
 	});
 
@@ -1765,6 +1968,16 @@
 	ApiWorksheet.prototype["SetRowHeight"] = ApiWorksheet.prototype.SetRowHeight;
 	ApiWorksheet.prototype["SetDisplayGridlines"] = ApiWorksheet.prototype.SetDisplayGridlines;
 	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
+	ApiWorksheet.prototype["SetLeftMargin"] = ApiWorksheet.prototype.SetLeftMargin;
+	ApiWorksheet.prototype["GetLeftMargin"] = ApiWorksheet.prototype.GetLeftMargin;	
+	ApiWorksheet.prototype["SetRighMargin"] = ApiWorksheet.prototype.SetRightMargin;
+	ApiWorksheet.prototype["GetRightMargin"] = ApiWorksheet.prototype.GetRightMargin;
+	ApiWorksheet.prototype["SetTopMargin"] = ApiWorksheet.prototype.SetTopMargin;
+	ApiWorksheet.prototype["GetTopMargin"] = ApiWorksheet.prototype.GetTopMargin;	
+	ApiWorksheet.prototype["SetBottomMargin"] = ApiWorksheet.prototype.SetBottomMargin;
+	ApiWorksheet.prototype["GetBottomMargin"] = ApiWorksheet.prototype.GetBottomMargin;		
+	ApiWorksheet.prototype["SetPageOrientation"] = ApiWorksheet.prototype.SetPageOrientation;
+	ApiWorksheet.prototype["GetPageOrientation"] = ApiWorksheet.prototype.GetPageOrientation;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;
@@ -1772,6 +1985,8 @@
 
 	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
 	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
+	ApiRange.prototype["SetOffset"] = ApiRange.prototype.SetOffset;
+	ApiRange.prototype["GetAdress"] = ApiRange.prototype.GetAdress;	
 	ApiRange.prototype["GetCount"] = ApiRange.prototype.GetCount;
 	ApiRange.prototype["GetValue"] = ApiRange.prototype.GetValue;
 	ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
@@ -1791,6 +2006,7 @@
 	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
 	ApiRange.prototype["SetWrap"] = ApiRange.prototype.SetWrap;
+	ApiRange.prototype["GetWrap"] = ApiRange.prototype.GetWrap;
 	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
 	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
 	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
