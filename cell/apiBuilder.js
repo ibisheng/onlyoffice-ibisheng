@@ -1332,6 +1332,17 @@
 	ApiRange.prototype.UnMerge = function () {
 		this.range.unmerge();
 	};
+	
+	Object.defineProperty(ApiRange.prototype, "MergeArea", {
+		get: function () {
+			if (this.range.isOneCell()) {
+				var bb = this.range.hasMerged();
+				return new ApiRange((bb) ? AscCommonExcel.Range.prototype.createFromBBox(this.range.worksheet, bb) : this.range);
+			} else {
+				return null;
+			}
+		}
+	});
 
 	/**
 	 * The ForEach() method executes a provided function once for each cell
