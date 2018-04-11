@@ -792,6 +792,25 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#VALUE!", 'SECH("test")' );
 	} );
 
+	test( "Test: \"SECOND\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "12:45:03 PM" );
+		ws.getRange2( "A203" ).setValue( "4:48:18 PM" );
+		ws.getRange2( "A204" ).setValue( "4:48 PM" );
+
+		oParser = new parserFormula( "SECOND(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "SECOND(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "SECOND(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
 	test( "Test: \"FLOOR.PRECISE\"", function () {
 		oParser = new parserFormula( 'FLOOR.PRECISE(-3.2, -1)', "A1", ws );
 		ok( oParser.parse(), 'FLOOR.PRECISE(-3.2, -1)' );
@@ -3102,6 +3121,9 @@ $( function () {
         ws.getRange2( "P47" ).setValue( "12" );
 		ws.getRange2( "P48" ).setValue( "" );
 		ws.getRange2( "P49" ).setValue( "" );
+		ws.getRange2( "N48" ).setValue( "0.456" );
+		ws.getRange2( "O48" ).setValue( "0.123212" );
+
         oParser = new parserFormula( "SUMPRODUCT(N44:N47,O44:O47,P44:P47)", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 780 );
@@ -3166,6 +3188,18 @@ $( function () {
 		oParser = new parserFormula( "SUMPRODUCT(DAY(N45:O47))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "SUMPRODUCT(HOUR(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 12 );
+
+		oParser = new parserFormula( "SUMPRODUCT(MINUTE(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 113 );
+
+		oParser = new parserFormula( "SUMPRODUCT(SECOND(N45:P48))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 64 );
     } );
 
     test( "Test: \"SINH\"", function () {
@@ -4868,6 +4902,25 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue() - 0, 0.5);
 
+	} );
+
+	test( "Test: \"HOUR\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "0.75" );
+		ws.getRange2( "A203" ).setValue( "7/18/2011 7:45" );
+		ws.getRange2( "A204" ).setValue( "4/21/2012" );
+
+		oParser = new parserFormula( "HOUR(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "HOUR(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 7 );
+
+		oParser = new parserFormula( "HOUR(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
     test( "Test: \"INTERCEPT\"", function () {
@@ -9566,6 +9619,25 @@ $( function () {
 		oParser = new parserFormula( "MIDB(A101,20,5)", "A2", ws );
 		ok( oParser.parse(), "MIDB(A101,20,5)" );
 		strictEqual( oParser.calculate().getValue(), "", "MIDB(A101,20,5))");
+	} );
+
+	test( "Test: \"MINUTE\"", function () {
+
+		ws.getRange2( "A202" ).setValue( "12:45:00 PM" );
+		ws.getRange2( "A203" ).setValue( "7/18/2011 7:45" );
+		ws.getRange2( "A204" ).setValue( "4/21/2012" );
+
+		oParser = new parserFormula( "MINUTE(A202)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 45 );
+
+		oParser = new parserFormula( "MINUTE(A203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 45 );
+
+		oParser = new parserFormula( "MINUTE(A204)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
 	test( "Test: \"FIND\"", function () {
