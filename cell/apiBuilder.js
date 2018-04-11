@@ -350,6 +350,20 @@
 	});
 
 	/**
+	 * Returns an object that represents the selection range
+	 * @memberof ApiWorksheet
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetSelection = function () {
+		return new ApiRange(this.worksheet.selectionRange.getLast());
+	};
+	Object.defineProperty(ApiWorksheet.prototype, "Selection", {
+		get: function () {
+			return this.GetSelection();
+		}
+	});
+
+	/**
 	 * Returns a ApiRange that represents all the cells on the worksheet (not just the cells that are currently in use).
 	 * @memberof ApiWorksheet
 	 * @returns {ApiRange}
@@ -1954,6 +1968,7 @@
 	ApiWorksheet.prototype["GetVisible"] = ApiWorksheet.prototype.GetVisible;
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
+	ApiWorksheet.prototype["GetSelection"] = ApiWorksheet.prototype.GetSelection;
 	ApiWorksheet.prototype["GetCells"] = ApiWorksheet.prototype.GetCells;
 	ApiWorksheet.prototype["GetCols"] = ApiWorksheet.prototype.GetCols;
 	ApiWorksheet.prototype["GetRows"] = ApiWorksheet.prototype.GetRows;
