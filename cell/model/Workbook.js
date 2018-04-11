@@ -327,6 +327,8 @@
 		this.tempGetByCells = [];
 		//set dirty
 		this.isInCalc = false;
+		this.changedCell = null;
+		this.changedCellRepeated = null;
 		this.changedRange = null;
 		this.changedRangeRepeated = null;
 		this.changedDefName = null;
@@ -878,7 +880,29 @@
 			changedSheet[name] = bbox;
 		},
 		addToChangedCell: function(cell) {
-			this.addToChangedRange2(cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow));
+			var sheetId = cell.ws.getId();
+			if (!this.changedCell) {
+				this.changedCell = {};
+			}
+			var changedSheet = this.changedCell[sheetId];
+			if (!changedSheet) {
+				//{}, а не [], потому что при сборке может придти сразу много одинаковых ячеек
+				changedSheet = {};
+				this.changedCell[sheetId] = changedSheet;
+			}
+			var cellIndex = getCellIndex(cell.nRow, cell.nCol);
+			if (this.isInCalc && !changedSheet[cellIndex]) {
+				if (!this.changedCellRepeated) {
+					this.changedCellRepeated = {};
+				}
+				var changedSheetRepeated = this.changedCellRepeated[sheetId];
+				if (!changedSheetRepeated) {
+					changedSheetRepeated = {};
+					this.changedCellRepeated[sheetId] = changedSheetRepeated;
+				}
+				changedSheetRepeated[cellIndex] = 1;
+			}
+			changedSheet[cellIndex] = 1;
 		},
 		addToChangedDefName: function(defName) {
 			if (!this.changedDefName) {
@@ -1010,13 +1034,14 @@
 			this.buildDependency();
 			this.addToChangedHiddenRows();
 			//broadscast Volatile only if something changed
-			if (this.changedRange || this.changedDefName) {
+			if (this.changedCell || this.changedRange || this.changedDefName) {
 				this._broadscastVolatile(notifyData);
 			}
 			this._broadcastCellsStart();
-			while (this.changedRangeRepeated || this.changedDefNameRepeated) {
+			while (this.changedCellRepeated || this.changedRangeRepeated || this.changedDefNameRepeated) {
 				this._broadcastDefNames(notifyData);
 				this._broadcastCells(notifyData);
+				this._broadcastRanges(notifyData);
 			}
 			this._broadcastCellsEnd();
 			this._calculateDirty();
@@ -1201,14 +1226,47 @@
 			}
 		},
 		_broadcastCells: function(notifyData) {
+			if (this.changedCellRepeated) {
+				var changedCell = this.changedCellRepeated;
+				this.changedCellRepeated = null;
+				for (var sheetId in changedCell) {
+					var changedSheet = changedCell[sheetId];
+					var sheetContainer = this.sheetListeners[sheetId];
+					if (sheetContainer) {
+						for (var cellIndex in changedSheet) {
+							if (sheetContainer) {
+								var cellMapElem = sheetContainer.cellMap[cellIndex];
+								if (cellMapElem) {
+									for (var listenerId in cellMapElem.listeners) {
+										cellMapElem.listeners[listenerId].notify(notifyData);
+									}
+								}
+							}
+						}
+						if (sheetContainer) {
+							var areas = sheetContainer.areaTree.getByCells(changedSheet);
+							this.tempGetByCells.push({areaTree: sheetContainer.areaTree, areas: areas});
+							for (var i = 0; i < areas.length; ++i) {
+								var area = areas[i];
+								notifyData.areaData = area;
+								for (var listenerId in area.data.listeners) {
+									area.data.listeners[listenerId].notify(notifyData);
+								}
+							}
+							notifyData.areaData = undefined;
+						}
+					}
+				}
+			}
+		},
+		_broadcastRanges: function(notifyData) {
 			if (this.changedRangeRepeated) {
 				var changedRange = this.changedRangeRepeated;
 				this.changedRangeRepeated = null;
 				for (var sheetId in changedRange) {
 					var changedSheet = changedRange[sheetId];
 					var sheetContainer = this.sheetListeners[sheetId];
-					var ws = this.wb.getWorksheetById(sheetId);
-					if (sheetContainer || ws) {
+					if (sheetContainer) {
 						if (sheetContainer) {
 							for (var rangeRef in changedSheet) {
 								var range = changedSheet[rangeRef];
@@ -1224,7 +1282,7 @@
 									}
 								}
 							}
-							var areas = sheetContainer.areaTree.getByCells(changedSheet);
+							var areas = sheetContainer.areaTree.getByRanges(changedSheet);
 							this.tempGetByCells.push({areaTree: sheetContainer.areaTree, areas: areas});
 							for (var i = 0; i < areas.length; ++i) {
 								var area = areas[i];
@@ -1241,6 +1299,7 @@
 		},
 		_broadcastCellsStart: function() {
 			this.isInCalc = true;
+			this.changedCellRepeated = this.changedCell;
 			this.changedRangeRepeated = this.changedRange;
 			this.changedDefNameRepeated = this.changedDefName;
 		},
@@ -1249,31 +1308,47 @@
 			this.changedDefName = null;
 			for (var i = 0; i < this.tempGetByCells.length; ++i) {
 				var temp = this.tempGetByCells[i];
-				temp.areaTree.getByCellsEnd(temp.areas);
+				temp.areaTree.getByCellsRangesEnd(temp.areas);
 			}
 			this.tempGetByCells = [];
 		},
 		_calculateDirty: function() {
 			var t = this;
-			this._foreachChangedRange(function(cell){
+			this._foreachChanged(function(cell){
 				if (cell && cell.isFormula()) {
 					cell.setIsDirty(true);
 				}
 			});
-			this._foreachChangedRange(function(cell){
+			this._foreachChanged(function(cell){
 				cell && cell._checkDirty();
 			});
+			this.changedCell = null;
 			this.changedRange = null;
 		},
-		_foreachChangedRange: function(callback) {
-			for (var sheetId in this.changedRange) {
+		_foreachChanged: function(callback) {
+			var sheetId, changedSheet, ws, bbox;
+			for (sheetId in this.changedCell) {
+				if (this.changedCell.hasOwnProperty(sheetId)) {
+					changedSheet = this.changedCell[sheetId];
+					ws = this.wb.getWorksheetById(sheetId);
+					if (changedSheet && ws) {
+						for (var cellIndex in changedSheet) {
+							if (changedSheet.hasOwnProperty(cellIndex)) {
+								getFromCellIndex(cellIndex);
+								ws._getCell(g_FCI.row, g_FCI.col, callback);
+							}
+						}
+					}
+				}
+			}
+			for (sheetId in this.changedRange) {
 				if (this.changedRange.hasOwnProperty(sheetId)) {
-					var changedSheet = this.changedRange[sheetId];
-					var ws = this.wb.getWorksheetById(sheetId);
+					changedSheet = this.changedRange[sheetId];
+					ws = this.wb.getWorksheetById(sheetId);
 					if (changedSheet && ws) {
 						for (var name in changedSheet) {
 							if (changedSheet.hasOwnProperty(name)) {
-								var bbox = changedSheet[name];
+								bbox = changedSheet[name];
 								ws.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2)._foreachNoEmpty(callback);
 							}
 						}
@@ -1370,7 +1445,96 @@
 				}
 			}
 		},
-		getByCells: function(changedSheet) {
+		getByCells: function(cells) {
+			var res = [];
+			var nodes = this.yTree.getNodeAll();
+			var cellArr = [];
+			for (var cellIndex in cells) {
+				cellArr.push(cellIndex - 0);
+			}
+			//sort завязана на реализацию getCellIndex
+			cellArr.sort(function(a, b) {
+				return a - b;
+			});
+			if (cellArr.length > 0 && nodes.length > 0) {
+				var curNodes = {};
+				var curY = null;
+				var curNodeY = null;
+				var curNodeYIndex = 0;
+				var curCellIndex = 0;
+				var curCellX = null;
+				var curCellY = null;
+				while (curNodeYIndex < nodes.length && curCellIndex < cellArr.length) {
+					if (!curNodeY) {
+						curNodeY = nodes[curNodeYIndex];
+						curY = curNodeY.key;
+						for (var id in curNodeY.storedValue.vals) {
+							var elem = curNodeY.storedValue.vals[id];
+							if (0 !== (1 & elem.startFlag) &&
+								!(elem.dataWrap.cellsInArea && elem.dataWrap.cellsInArea.isEqual(elem.dataWrap.bbox))) {
+								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+									var curNodesElem = curNodes[i];
+									if (!curNodesElem) {
+										curNodesElem = {};
+										curNodes[i] = curNodesElem;
+									}
+									curNodesElem[id] = elem;
+								}
+							}
+						}
+					}
+					if (!curCellX) {
+						var cellIndex = cellArr[curCellIndex];
+						getFromCellIndex(cellIndex);
+						curCellX = g_FCI.col;
+						curCellY = g_FCI.row;
+					}
+					if (curCellY <= curY) {
+						var curNodesElemX = curNodes[curCellX];
+						for (var id in curNodesElemX) {
+							var elem = curNodesElemX[id];
+							if (elem.dataWrap.bbox.r1 <= curCellY && !(elem.dataWrap.cellsInArea &&
+								elem.dataWrap.cellsInArea.contains(curCellX, curCellY))) {
+								if (elem.dataWrap.cellsInArea) {
+									elem.dataWrap.cellsInArea.union3(curCellX, curCellY);
+								} else {
+									elem.dataWrap.cellsInArea = new Asc.Range(curCellX, curCellY, curCellX, curCellY);
+								}
+								res.push(elem.dataWrap);
+								if (elem.dataWrap.cellsInArea.isEqual(elem.dataWrap.bbox)) {
+									for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+										var curNodesElem = curNodes[i];
+										if (curNodesElem) {
+											delete curNodesElem[id];
+										}
+									}
+								}
+							}
+						}
+						curCellIndex++;
+						curCellX = null;
+						curCellY = null;
+					} else {
+						for (var id in curNodeY.storedValue.vals) {
+							var elem = curNodeY.storedValue.vals[id];
+							if (0 !== (2 & elem.startFlag) &&
+								!(elem.dataWrap.cellsInArea && elem.dataWrap.cellsInArea.isEqual(elem.dataWrap.bbox))) {
+								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
+									var curNodesElem = curNodes[i];
+									if (curNodesElem) {
+										delete curNodesElem[id];
+									}
+								}
+							}
+						}
+						curNodeYIndex++;
+						curNodeY = null;
+					}
+				}
+			}
+			return res;
+		},
+		getByRanges: function(changedSheet) {
 			var res = [];
 			var node, id, bbox, intersect;
 			var nodes = this.yTree.getNodeAll();
@@ -1474,7 +1638,7 @@
 			}
 			return res;
 		},
-		getByCellsEnd: function(areas) {
+		getByCellsRangesEnd: function(areas) {
 			for (var i = 0; i < areas.length; ++i) {
 				areas[i].cellsInArea = null;
 			}
