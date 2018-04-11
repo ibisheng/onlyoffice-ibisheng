@@ -640,6 +640,7 @@
 
 	/**
 	 * Set page orientation
+	 * @memberof ApiWorksheet
 	 * @param {PageOrientation} PageOrientation
 	 * */
 	ApiWorksheet.prototype.SetPageOrientation = function (PageOrientation) {
@@ -649,6 +650,7 @@
 
 	/**
 	 * Get page orientation
+	 * @memberof ApiWorksheet
 	 * @returns {PageOrientation}
 	 * */
 	ApiWorksheet.prototype.GetPageOrientation = function ()	{
@@ -1044,7 +1046,6 @@
 			var ws = this.range.worksheet;
 			if (RefStyle == 'xlA1') {
 				(ColAbs && RowAbs) ? range.setAbs(1, 1, 1, 1) : (ColAbs) ? range.setAbs(0, 1, 0, 1) : (RowAbs) ? range.setAbs(1, 0, 1, 0) : range.setAbs(0, 0, 0, 0);
-				
 			}
 			// } else if (!RelativeTo) { 
 			// 	name[1] = (ColAbs) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
