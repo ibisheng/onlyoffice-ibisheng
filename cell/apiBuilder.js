@@ -1031,31 +1031,30 @@
 	/**
 	 * Get cell adress
 	 * @memberof ApiRange
-	 * @param {boolean} RowAbsolute
-	 * @param {boolean} ColAbsolute
+	 * @param {boolean} RowAbs
+	 * @param {boolean} ColAbs
 	 * @param {string} RefStyle
 	 * @param {boolean} External
 	 * @param {range} RelativeTo
 	 * @returns {string}
 	 */
-	ApiRange.prototype.GetAdress = function (RowAbsolute, ColAbsolute, RefStyle, External, RelativeTo) {
+	ApiRange.prototype.GetAdress = function (RowAbs, ColAbs, RefStyle, External, RelativeTo) {
 		if (this.range.isOneCell()) {
 			var range = this.range.bbox;
-			var name = [range.getName().replace(/\D/g,''), range.getName().replace(/\d/g,'')];
-			name.unshift((External) ? '[' + this.range.worksheet.workbook.oApi.DocInfo.Title + ']' + this.range.worksheet.sName + '!' : '');
+			var ws = this.range.worksheet;
 			if (RefStyle == 'xlA1') {
-					name[1] = (ColAbsolute) ? '$' + name[1]: name[1];
-					name[2] = (RowAbsolute) ? '$' + name[2]: name[2];
+				(ColAbs && RowAbs) ? range.setAbs(1, 1, 1, 1) : (ColAbs) ? range.setAbs(0, 1, 0, 1) : (RowAbs) ? range.setAbs(1, 0, 1, 0) : range.setAbs(0, 0, 0, 0);
+				
 			}
 			// } else if (!RelativeTo) { 
-			// 	name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
-			// 	name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + range[0] + ']';
+			// 	name[1] = (ColAbs) ? 'R' + (range[1] + 1) : 'R[' + range[1] + ']';
+			// 	name[2] = (ColAbs) ? 'C' + (range[0] + 1) : 'C[' + range[0] + ']';
 			// } else {
 			// 	var relRange = [RelativeTo.range.bbox.c1, RelativeTo.range.bbox.c1];
-			// 	name[1] = (ColAbsolute) ? 'R' + (range[1] + 1) : 'R[' + (range[1] - relRange[1]) + ']'; 
-			// 	name[2] = (ColAbsolute) ? 'C' + (range[0] + 1) : 'C[' + (range[0] - relRange[0]) + ']';
+			// 	name[1] = (ColAbs) ? 'R' + (range[1] + 1) : 'R[' + (range[1] - relRange[1]) + ']'; 
+			// 	name[2] = (ColAbs) ? 'C' + (range[0] + 1) : 'C[' + (range[0] - relRange[0]) + ']';
 			// }
-			return name.join('');
+			return (External) ? '[' + ws.workbook.oApi.DocInfo.Title + ']' + AscCommon.parserHelp.get3DRef(ws.sName, range.getName()) : range.getName();
 		} else {
 			return null;
 		}
