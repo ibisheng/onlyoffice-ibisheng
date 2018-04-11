@@ -269,7 +269,7 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
 
-	var sName      = this.GetTag();
+	var sName      = this.GetLabel();
 	var isBuiltIn  = false;
 	var arrButtons = [];
 

@@ -34,6 +34,9 @@
 
 (function(window, undefined){
 
+	// https://bugreport.apple.com/web/?problemID=39173151
+	var isSafariAppleDevices = (AscCommon.AscBrowser.isSafariMacOs && AscCommon.AscBrowser.isAppleDevices);
+
 function _FT_Common()
 {
 
@@ -287,8 +290,8 @@ function FT_Service_SFNT_TableRec(load_, get_, info_)
 var FT_SERVICE_ID_TT_CMAP = "tt-cmaps";
 function TT_CMapInfo()
 {
-    this.language;
-    this.format;
+    this.language = 0;
+    this.format = 0;
 }
 function FT_Service_TTCMapsRec(get_cmap_info_)
 {
@@ -15066,9 +15069,12 @@ function tt_cmap0_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format   = 0;
+    	if (isSafariAppleDevices)
+    		return 0;
+
         var data = cmap.data;
         data.pos += 4;
-        cmap_info.format   = 0;
         cmap_info.language = FT_PEEK_USHORT(data);
         data.pos -= 4;
         return 0;
@@ -15266,8 +15272,11 @@ function tt_cmap2_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format   = 2;
+		if (isSafariAppleDevices)
+			return 0;
+
         cmap.data.pos += 4;
-        cmap_info.format   = 2;
         cmap_info.language = FT_PEEK_USHORT(cmap.data);
         cmap.data.pos -= 4;
         return 0;
@@ -15865,9 +15874,12 @@ function tt_cmap4_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 4;
+		if (isSafariAppleDevices)
+			return 0;
+
         var data = cmap.cmap.data;
         data.pos += 4;
-        cmap_info.format = 4;
         cmap_info.language = FT_PEEK_USHORT(data);
         data.pos -= 4;
         return 0;
@@ -15956,9 +15968,12 @@ function tt_cmap6_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 6;
+		if (isSafariAppleDevices)
+			return 0;
+
         var data = cmap.data;
         data.pos += 4;
-        cmap_info.format = 6;
         cmap_info.language = FT_PEEK_USHORT(data);
         data.pos -= 4;
         return 0;
@@ -16098,9 +16113,12 @@ function tt_cmap8_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 8;
+		if (isSafariAppleDevices)
+			return 0;
+
         var data = cmap.cmap.data;
         data.pos += 8;
-        cmap_info.format = 8;
         cmap_info.language = FT_PEEK_ULONG(data);
         data.pos -= 8;
         return 0;
@@ -16181,9 +16199,12 @@ function tt_cmap10_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 10;
+		if (isSafariAppleDevices)
+			return 0;
+
         var data = cmap.cmap.data;
         data.pos += 8;
-        cmap_info.format = 10;
         cmap_info.language = FT_PEEK_ULONG(data);
         data.pos -= 8;
         return 0;
@@ -16388,9 +16409,12 @@ function tt_cmap12_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 12;
+		if (isSafariAppleDevices)
+			return 0;
+		
         var data = cmap.cmap.data;
         data.pos += 8;
-        cmap_info.format = 12;
         cmap_info.language = FT_PEEK_ULONG(data);
         data.pos -= 8;
         return 0;
@@ -16599,9 +16623,12 @@ function tt_cmap13_class_rec()
     }
     this.get_cmap_info = function(cmap, cmap_info)
     {
+		cmap_info.format = 13;
+		if (isSafariAppleDevices)
+			return 0;
+
         var data = cmap.data;
         data.pos += 8;
-        cmap_info.format = 13;
         cmap_info.language = FT_PEEK_ULONG(data);
         data.pos -= 8;
         return 0;
@@ -35398,7 +35425,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 case 7:
                 {
                     if (num_args < 6)
-                        return FT_Error.FT_Err_Too_Few_Arguments;
+                        return 129;
 
                     var nargs = num_args - num_args % 6;
 
@@ -41252,8 +41279,8 @@ function FT_Set_Charmap(face, cmap)
     if (0 == len)
         return 38;
 
-    if (FT_Get_CMap_Format(cmap) == 14)
-        return 6;
+	if (FT_Get_CMap_Format(cmap) == 14)
+		return 6;
 
     for (var i = 0; i < len; i++)
     {
@@ -41282,8 +41309,7 @@ function FT_Get_CMap_Format(cmap)
         return -1;
 
     var cmap_info = new TT_CMapInfo();
-    service.get_cmap_info(cmap, cmap_info);
-    if (FT_Error != 0)
+    if (0 != service.get_cmap_info(cmap, cmap_info))
         return -1;
     
     return cmap_info.format;

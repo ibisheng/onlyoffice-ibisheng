@@ -6267,16 +6267,15 @@ background-repeat: no-repeat;\
 		if (!this.reporterWindow)
 			return;
 
-		this.reporterWindow.onbeforeunload = function()
-		{
-			window.editor.EndDemonstration();
-		};
-
 		this.reporterWindowCounter = 0;
-		this.reporterWindow.onbeforeunload = function()
+		if (!AscCommon.AscBrowser.isSafariMacOs)
 		{
-			window.editor.EndDemonstration();
-		};
+			this.reporterWindow.onbeforeunload = function ()
+			{
+				window.editor.EndDemonstration();
+			};
+		}
+
 		this.reporterWindow.onunload = function () {
 			window.editor.reporterWindowCounter++;
 			if (1 < window.editor.reporterWindowCounter)
