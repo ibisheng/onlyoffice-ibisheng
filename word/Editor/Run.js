@@ -4943,9 +4943,12 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var Y0 = PDSH.Y0;
     var Y1 = PDSH.Y1;
 
-    var CommentsCount = PDSH.Comments.length;
-    var CommentId     = ( CommentsCount > 0 ? PDSH.Comments[CommentsCount - 1] : null );
     var CommentsFlag  = PDSH.CommentsFlag;
+    var arrComments   = [];
+    for (var nIndex = 0, nCount = PDSH.Comments.length; nIndex < nCount; ++nIndex)
+	{
+		arrComments.push(PDSH.Comments[nIndex]);
+	}
 
     var HighLight = oCompiledPr.HighLight;
 
@@ -5008,7 +5011,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                     break;
 
                 if ( CommentsFlag != comments_NoComment )
-                    aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
+                    aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : arrComments } );
                 else if ( highlight_None != HighLight )
                     aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
@@ -5028,7 +5031,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 if ( PDSH.Spaces > 0 )
                 {
                     if ( CommentsFlag != comments_NoComment )
-                        aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
+                        aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : arrComments } );
                     else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
@@ -5064,7 +5067,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 				if (Item.IsNumValue())
 				{
 					if ( CommentsFlag != comments_NoComment )
-						aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
+						aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : arrComments } );
 					else if ( highlight_None != HighLight )
 						aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
