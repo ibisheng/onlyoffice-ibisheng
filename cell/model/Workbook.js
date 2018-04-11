@@ -6259,20 +6259,19 @@
 					var oldCol = this.formulaParsed.parent.nCol;
 
 					//todo assemble by param
+					var old = AscCommonExcel.g_ProcessShared;
+					AscCommonExcel.g_ProcessShared = true;
 					var offsetShared = new CRangeOffset(offsetCol, offsetRow);
 					this.formulaParsed.changeOffset(offsetShared, false);
-					this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
 					this.formulaParsed.parent.nRow = this.nRow;
 					this.formulaParsed.parent.nCol = this.nCol;
-					//AscCommonExcel.g_cellFormulaState.push(this.ws, this.nRow, this.nCol, offsetRow, offsetCol);
 					callback(this.formulaParsed);
 					offsetShared.offsetRow = -offsetRow;
 					offsetShared.offsetCol = -offsetCol;
 					this.formulaParsed.changeOffset(offsetShared, false);
-					this.formulaParsed.setFormulaString(this.formulaParsed.assemble(true));
 					this.formulaParsed.parent.nRow = oldRow;
 					this.formulaParsed.parent.nCol = oldCol;
-					//AscCommonExcel.g_cellFormulaState.pop();
+					AscCommonExcel.g_ProcessShared = old;
 				} else {
 					callback(this.formulaParsed);
 				}
@@ -7730,7 +7729,7 @@
 		var shared = parsed.getShared();
 		if (shared) {
 			var index = wb.workbookFormulas.add(parsed).getIndexNumber();
-			History.Add(AscCommonExcel.g_oUndoRedoSharedFormula, AscCH.historyitem_SharedFormula_ChangeFormula, null, null, new UndoRedoData_IndexSimpleProp(index, false, parsed.Formula, eventData.assemble), true);
+			History.Add(AscCommonExcel.g_oUndoRedoSharedFormula, AscCH.historyitem_SharedFormula_ChangeFormula, null, null, new UndoRedoData_IndexSimpleProp(index, false, parsed.getFormulaRaw(), eventData.assemble), true);
 			wb.dependencyFormulas.addToChangedRange2(this.ws.getId(), shared.ref);
 		} else {
 			this.ws._getCell(this.nRow, this.nCol, function(cell) {

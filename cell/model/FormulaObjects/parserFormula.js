@@ -1555,7 +1555,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue().tocBool();
 	};
 	cRef.prototype.toString = function () {
-		return this.value;
+		if (AscCommonExcel.g_ProcessShared) {
+			return this.range.getName();
+		} else {
+			return this.value;
+		}
 	};
 	cRef.prototype.getRange = function () {
 		return this.range;
@@ -1648,7 +1652,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 	};
 	cRef3D.prototype.toString = function () {
-		return parserHelp.get3DRef(this.ws.getName(), this.value);
+		if (AscCommonExcel.g_ProcessShared) {
+			return parserHelp.get3DRef(this.ws.getName(), this.range.getName());
+		} else {
+			return parserHelp.get3DRef(this.ws.getName(), this.value);
+		}
 	};
 	cRef3D.prototype.getWS = function () {
 		return this.ws;
@@ -4525,6 +4533,13 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 		return this.parent;
 	};
 	parserFormula.prototype.getFormula = function() {
+		if (AscCommonExcel.g_ProcessShared) {
+			return this.assemble(true);
+		} else {
+			return this.Formula;
+		}
+	};
+	parserFormula.prototype.getFormulaRaw = function() {
 		return this.Formula;
 	};
 	parserFormula.prototype.setFormulaString = function(formula) {
@@ -5597,7 +5612,9 @@ parserFormula.prototype.setFormula = function(formula) {
 		} else {
 			elem.range = AscCommonExcel.Range.prototype.createFromBBox(ws, bbox);
 		}
-		elem.value = bbox.getName();
+		if (!AscCommonExcel.g_ProcessShared) {
+			elem.value = bbox.getName();
+		}
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
 		var i, elem;
@@ -6740,6 +6757,7 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].cNumFormatFirstCell = cNumFormatFirstCell;
 	window['AscCommonExcel'].cNumFormatNone = cNumFormatNone;
 	window['AscCommonExcel'].g_cCalcRecursion = g_cCalcRecursion;
+	window['AscCommonExcel'].g_ProcessShared = false;
 
 	window['AscCommonExcel'].cNumber = cNumber;
 	window['AscCommonExcel'].cString = cString;
