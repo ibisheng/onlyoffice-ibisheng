@@ -1411,10 +1411,12 @@
 	}
 
 	RangeTree.prototype = {
+		maxSharedRecursion: 100,
 		add: function(bbox, data) {
 			data.id = this.id++;
 			var startFlag = bbox.r1 !== bbox.r2 ? 1 : 3;
-			var dataWrap = {bbox: bbox, data: data, cellsInArea: null};
+			//cellsInAreaCount - heuristic for recursion shared(for example A2 shared to AN with '=A1+1')
+			var dataWrap = {bbox: bbox, data: data, cellsInArea: null, cellsInAreaCount: 0};
 			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
 			top.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
 			top.storedValue.count++;
@@ -1580,7 +1582,12 @@
 									if (intersect &&
 										!(node.dataWrap.cellsInArea && node.dataWrap.cellsInArea.isEqual(intersect))) {
 										if (node.dataWrap.cellsInArea) {
-											node.dataWrap.cellsInArea.union2(intersect);
+											if (node.dataWrap.cellsInAreaCount < this.maxSharedRecursion) {
+												node.dataWrap.cellsInArea.union2(intersect);
+												node.dataWrap.cellsInAreaCount++;
+											} else {
+												node.dataWrap.cellsInArea = node.dataWrap.bbox;
+											}
 										} else {
 											node.dataWrap.cellsInArea = intersect;
 										}
@@ -1613,7 +1620,12 @@
 												if (intersect && !(node.dataWrap.cellsInArea &&
 													node.dataWrap.cellsInArea.isEqual(intersect))) {
 													if (node.dataWrap.cellsInArea) {
-														node.dataWrap.cellsInArea.union2(intersect);
+														if (node.dataWrap.cellsInAreaCount < this.maxSharedRecursion) {
+															node.dataWrap.cellsInArea.union2(intersect);
+															node.dataWrap.cellsInAreaCount++;
+														} else {
+															node.dataWrap.cellsInArea = node.dataWrap.bbox;
+														}
 													} else {
 														node.dataWrap.cellsInArea = intersect;
 													}
@@ -1640,7 +1652,9 @@
 		},
 		getByCellsRangesEnd: function(areas) {
 			for (var i = 0; i < areas.length; ++i) {
-				areas[i].cellsInArea = null;
+				var area = areas[i];
+				area.cellsInArea = null;
+				area.cellsInAreaCount = 0;
 			}
 		}
 	};
