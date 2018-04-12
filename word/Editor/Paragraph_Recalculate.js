@@ -2775,6 +2775,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.LineBreakPos   = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
     // отрезка или строки, если что-то не умещается (например,
     // если у нас не убирается слово, то разрыв ставим перед ним)
+	this.LastItem       = null;                       // Последний непробельный элемент
 
 
     this.RunRecalcInfoLast  = null; // RecalcInfo последнего рана
@@ -2904,6 +2905,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.MoveToLBP      = false;
 		this.LineBreakPos   = new CParagraphContentPos();
 		this.LineBreakFirst = true;
+		this.LastItem       = null;
 
         // for ParaMath
         this.bMath_OneLine    = false;

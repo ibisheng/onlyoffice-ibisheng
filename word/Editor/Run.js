@@ -2713,7 +2713,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						{
 							if (X + SpaceLen + LetterLen > XEnd)
 							{
-								if (false)//Item.IsEastAsianNonBreakingPunctuation() && !PRS.LineBreakFirst)
+								if (!Item.CanBeAtBeginOfLine() && !PRS.LineBreakFirst)
 								{
 									MoveToLBP = true;
 									NewRange  = true;
@@ -2886,6 +2886,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Space:
                 {
+                	if (Word && PRS.LastItem && para_Text === PRS.LastItem.Type && !PRS.LastItem.CanBeAtEndOfLine())
+					{
+						WordLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
+						break;
+					}
+
                     FirstItemOnLine = false;
 
                     if (true === Word)
@@ -3560,6 +3566,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 				}
             }
 
+            if (para_Space !== ItemType)
+            	PRS.LastItem = Item;
 
             if (true === NewRange)
                 break;
