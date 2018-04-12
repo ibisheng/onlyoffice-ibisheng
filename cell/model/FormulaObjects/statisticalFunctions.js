@@ -1789,8 +1789,8 @@ function (window, undefined) {
 
 		// 1 = simple; 2 = multiple with Y as column; 3 = multiple with Y as row
 		var nCase = getMatrixParams.nCase;
-		var nCX = getMatrixParams.nCX, nCY = getMatrixParams.nCY; // number of columns
-		var nRX = getMatrixParams.nRX, nRY = getMatrixParams.nRY; //number of rows
+		var nCX = getMatrixParams.nRX, nCY = getMatrixParams.nCY; // number of columns
+		var nRX = getMatrixParams.nCX, nRY = getMatrixParams.nRY; //number of rows
 		var K = getMatrixParams.M, N = getMatrixParams.N; // K=number of variables X, N=number of data samples
 		pMatX = getMatrixParams.pMatX, pMatY = getMatrixParams.pMatY;
 
@@ -1808,9 +1808,9 @@ function (window, undefined) {
 			nCountXN = nCXN * nRXN;
 			pMatNewX = matrixClone(pMatX); // pMatX will be changed to X-meanX
 		} else {
-			nRXN = pMatNewX.length;
-			nCXN = pMatNewX[0].length;
-			if ((nCase === 2 && K !== nCXN) || (nCase === 3 && K !== nRXN)) {
+			nRXN = pMatNewX[0].length;
+			nCXN = pMatNewX.length;
+			if ((nCase === 2 && N !== nCXN) || (nCase === 3 && N !== nRXN)) {
 				return;
 			}
 			nCountXN = nCXN * nRXN;
