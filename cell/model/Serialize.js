@@ -57,6 +57,7 @@
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 	var g_StyleCache = AscCommonExcel.g_StyleCache;
+    var g_cSharedWriteStreak = 64;//like Excel
 
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
@@ -1150,6 +1151,44 @@
           this.tint = null;
       }
 
+	function OpenFormula() {
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	}
+	OpenFormula.prototype.clean = function(){
+		this.aca = null;
+		this.bx = null;
+		this.ca = null;
+		this.del1 = null;
+		this.del2 = null;
+		this.dt2d = null;
+		this.dtr = null;
+		this.r1 = null;
+		this.r2 = null;
+		this.ref = null;
+		this.si = null;
+		this.t = null;
+		this.v = null;
+	};
+	function OpenColumnFormula(nRow, formula, parsed, refPos, base) {
+		this.nRow = nRow;
+		this.formula = formula;
+		this.parsed = parsed;
+		this.refPos = refPos;
+		this.base = base;
+	}
+
 	function ReadColorSpreadsheet2(bcr, length) {
 		var output = null;
 		var color = new OpenColor();
@@ -1525,7 +1564,7 @@
             if(null != tableColumn.TotalsRowFormula)
             {
                 this.memory.WriteByte(c_oSer_TableColumns.TotalsRowFormula);
-                this.memory.WriteString2(tableColumn.TotalsRowFormula.Formula);
+                this.memory.WriteString2(tableColumn.TotalsRowFormula.getFormula());
             }
             if(null != tableColumn.dxf)
             {
@@ -2600,6 +2639,29 @@
         this.aDxfs = aDxfs;
 		this.stylesForWrite = new StylesForWrite();
         this.isCopyPaste = isCopyPaste;
+        this.sharedFormulas = {};
+		this.sharedFormulasIndex = 0;
+        this._getCrc32FromObjWithProperty = function(val)
+        {
+            return Asc.crc32(this._getStringFromObjWithProperty(val));
+        };
+        this._getStringFromObjWithProperty = function(val)
+        {
+            var sRes = "";
+            if(val.getProperties)
+            {
+                var properties = val.getProperties();
+                for(var i in properties)
+                {
+                    var oCurProp = val.getProperty(properties[i]);
+                    if(null != oCurProp && oCurProp.getProperties)
+                        sRes += this._getStringFromObjWithProperty(oCurProp);
+                    else
+                        sRes += oCurProp;
+                }
+            }
+            return sRes;
+        };
         this._prepeareStyles = function()
         {
 			this.stylesForWrite.init(this.wb.oStyleManager.oDefaultXfs);
@@ -3383,8 +3445,9 @@
 				{
 					this.bs.WriteItem(c_oSerCellTypes.Style, function(){oThis.memory.WriteLong(nXfsId);});
 				}
-				if(null != cell.formulaParsed)
-					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.formulaParsed);});
+				if (cell.isFormula()) {
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function() {oThis.WriteFormula(cell);});
+				}
 				if(!cell.isNullTextString())
 				{
                     if (null != cell.formulaParsed && cell.isEmptyTextString()) {
@@ -3427,8 +3490,54 @@
 				}
 			}
         };
-        this.WriteFormula = function(formulaParsed)
+        this.WriteFormula = function(cell)
         {
+			var parsed = cell.getFormulaParsed();
+			var formula;
+			var si;
+			var ref;
+			var type;
+			var shared = parsed.getShared();
+            if (shared) {
+                var sharedToWrite = this.sharedFormulas[parsed.getIndexNumber()];
+                if (!sharedToWrite) {
+                    sharedToWrite = {saveShared: !shared.ref.isOneCell() && parsed.canSaveShared(), si: {}};
+                    this.sharedFormulas[parsed.getIndexNumber()] = sharedToWrite;
+                }
+                if (sharedToWrite.saveShared && shared.ref.contains(cell.nCol, cell.nRow)) {
+                    type = ECellFormulaType.cellformulatypeShared;
+                    var rowIndex = Math.floor((cell.nRow - shared.ref.r1) / g_cSharedWriteStreak);
+                    var row = sharedToWrite.si[rowIndex];
+                    if (!row) {
+                        row = {};
+                        sharedToWrite.si[rowIndex] = row;
+                    }
+                    var colIndex = Math.floor((cell.nCol - shared.ref.c1) / g_cSharedWriteStreak);
+                    si = row[colIndex];
+                    if (undefined === si) {
+                        row[colIndex] = si = this.sharedFormulasIndex++;
+                        if (0 !== rowIndex || 0 !== colIndex) {
+                            cell.processFormula(function(parsed) {
+                                formula = parsed.getFormula();
+                            });
+                        } else {
+                            formula = parsed.getFormula();
+                        }
+                        var r1 = shared.ref.r1 + rowIndex * g_cSharedWriteStreak;
+                        var c1 = shared.ref.c1 + colIndex * g_cSharedWriteStreak;
+                        ref = new Asc.Range(c1, r1,
+                            Math.min(c1 + g_cSharedWriteStreak - 1, shared.ref.c2),
+                            Math.min(r1 + g_cSharedWriteStreak - 1, shared.ref.r2));
+                    }
+                } else {
+                    cell.processFormula(function(parsed) {
+                        formula = parsed.getFormula();
+                    });
+                }
+            } else {
+                formula = parsed.getFormula();
+            }
+
             // if(null != oFormula.aca)
             // {
             // this.memory.WriteByte(c_oSerFormulaTypes.Aca);
@@ -3441,11 +3550,11 @@
             // this.memory.WriteByte(c_oSerPropLenType.Byte);
             // this.memory.WriteBool(oFormula.bx);
             // }
-            if(true === formulaParsed.ca)
+            if(true === parsed.ca)
             {
                 this.memory.WriteByte(c_oSerFormulaTypes.Ca);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(formulaParsed.ca);
+                this.memory.WriteBool(parsed.ca);
             }
             // if(null != oFormula.del1)
             // {
@@ -3483,33 +3592,26 @@
             // this.memory.WriteByte(c_oSerPropLenType.Variable);
             // this.memory.WriteString2(oFormula.r2);
             // }
-            // if(null != oFormula.ref)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Ref);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.ref);
-            // }
-            // if(null != oFormula.si)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Si);
-            // this.memory.WriteByte(c_oSerPropLenType.Long);
-            // this.memory.WriteLong(oFormula.si);
-            // }
-            // if(null != oFormula.t)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.T);
-            // this.memory.WriteByte(c_oSerPropLenType.Byte);
-            // this.memory.WriteByte(oFormula.t);
-            // }
-            // if(null != oFormula.v)
-            // {
-            // this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            // this.memory.WriteByte(c_oSerPropLenType.Variable);
-            // this.memory.WriteString2(oFormula.v);
-            // }
-            this.memory.WriteByte(c_oSerFormulaTypes.Text);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(formulaParsed.Formula);
+			if (undefined !== ref) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Ref);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(ref.getName());
+			}
+			if (undefined !== si) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Si);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(si);
+			}
+			if (undefined !== type) {
+				this.memory.WriteByte(c_oSerFormulaTypes.T);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(type);
+			}
+			if (undefined !== formula) {
+				this.memory.WriteByte(c_oSerFormulaTypes.Text);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(formula);
+			}
         };
         this.WriteComments = function(aComments, ws)
         {
@@ -4940,8 +5042,8 @@
 			if ((useNumId || this.useNumId) &&
 				((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 == oNum.id ||
 				(27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44))) {
-				oRes.id = oNum.id;
-			}
+					oRes.id = oNum.id;
+				}
 			if (null != oNumFmts) {
 				oNumFmts[oNum.id] = oRes;
 			}
@@ -5793,6 +5895,46 @@
                 return oThis.ReadWorksheetsContent(t,l);
             });
         };
+		this.ReadSheetDataExternal = function(bNoBuildDep)
+		{
+			//console.profile('ReadSheetDataExternal');
+			var oThis = this;
+			var res = c_oSerConstants.ReadOk;
+			var oldPos = this.stream.GetCurPos();
+			for (var i = 0; i < this.oReadResult.sheetData.length; ++i) {
+				var sheetDataElem = this.oReadResult.sheetData[i];
+				var ws = sheetDataElem.ws;
+				this.stream.Seek2(sheetDataElem.pos);
+				var tmp = {
+					pos: null, len: null, bNoBuildDep: bNoBuildDep, ws: ws, row: new AscCommonExcel.Row(ws),
+					cell: new AscCommonExcel.Cell(ws), formula: new OpenFormula(), sharedFormulas: {},
+					prevFormulas: {}, siFormulas: {}, prevRow: -1, prevCol: -1
+				};
+				res = this.bcr.Read1(sheetDataElem.len, function(t, l) {
+					return oThis.ReadSheetData(t, l, tmp);
+				});
+				if (!bNoBuildDep) {
+					for (var nCol in tmp.prevFormulas) {
+						if (tmp.prevFormulas.hasOwnProperty(nCol)) {
+							var prevFormula = tmp.prevFormulas[nCol];
+							if (!tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+								prevFormula.parsed.buildDependencies();
+							}
+						}
+					}
+					for (var listenerId in tmp.siFormulas) {
+						if (tmp.siFormulas.hasOwnProperty(listenerId)) {
+							tmp.siFormulas[listenerId].buildDependencies();
+						}
+					}
+				}
+				if(c_oSerConstants.ReadOk !== res)
+					break;
+			}
+			this.stream.Seek2(oldPos);
+			//console.profileEnd();
+			return res;
+		};
         this.ReadWorksheetsContent = function(type, length)
         {
             var res = c_oSerConstants.ReadOk;
@@ -5958,11 +6100,8 @@
             }
             else if ( c_oSerWorksheetsTypes.SheetData == type )
             {
-				var tempRow = new AscCommonExcel.Row(oWorksheet);
-				var tmpData = {pos: null, len: null, prevRow: -1, prevCol: -1};
-                res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadSheetData(t,l, oWorksheet, tempRow, tmpData);
-                });
+				this.oReadResult.sheetData.push({ws: oWorksheet, pos: this.stream.GetCurPos(), len: length});
+				res = c_oSerConstants.ReadUnknown;
             }
             else if ( c_oSerWorksheetsTypes.Drawings == type )
             {
@@ -6206,124 +6345,187 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadSheetData = function(type, length, ws, tempRow, tmpData)
+        this.ReadSheetData = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerWorksheetsTypes.Row == type )
+            if ( c_oSerWorksheetsTypes.Row === type )
             {
-				tmpData.pos =  null;
-				tmpData.len = null;
-				tempRow.clear();
+				tmp.pos =  null;
+				tmp.len = null;
+				tmp.row.clear();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadRow(t,l, tempRow, ws, tmpData);
+                    return oThis.ReadRow(t,l, tmp);
                 });
-				if(null === tempRow.index) {
-					tempRow.index = tmpData.prevRow + 1;
+				if(null === tmp.row.index) {
+					tmp.row.index = tmp.prevRow + 1;
 				}
-				tempRow.saveContent();
-				if(tempRow.index >= ws.nRowsCount)
-					ws.nRowsCount = tempRow.index + 1;
-				tmpData.prevRow = tempRow.index;
-				tmpData.prevCol = -1;
+				tmp.row.saveContent();
+				if(tmp.row.index >= tmp.ws.nRowsCount)
+                    tmp.ws.nRowsCount = tmp.row.index + 1;
+				tmp.prevRow = tmp.row.index;
+				tmp.prevCol = -1;
 				//читаем ячейки
-				if (null != tmpData.pos && null != tmpData.len) {
+				if (null !== tmp.pos && null !== tmp.len) {
 					var nOldPos = this.stream.GetCurPos();
-					this.stream.Seek2(tmpData.pos);
-					var tempCell = new AscCommonExcel.Cell(ws);
-					res = this.bcr.Read1(tmpData.len, function(t, l) {
-						return oThis.ReadCells(t, l, ws, tempCell, tmpData);
+					this.stream.Seek2(tmp.pos);
+					res = this.bcr.Read1(tmp.len, function(t,l){
+						return oThis.ReadCells(t,l, tmp, tmp.row.index);
 					});
-					 this.stream.Seek2(nOldPos);
+					this.stream.Seek2(nOldPos);
 				}
-            }
+			}
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadRow = function(type, length, oRow, ws, tmpData)
+        this.ReadRow = function(type, length, tmp)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSerRowTypes.Row == type )
             {
             	var index = this.stream.GetULongLE() - 1;
-                oRow.setIndex(index);
+				tmp.row.setIndex(index);
             }
             else if ( c_oSerRowTypes.Style == type )
             {
                 var xfs = this.aCellXfs[this.stream.GetULongLE()];
                 if(xfs)
-                    oRow.setStyle(xfs);
+					tmp.row.setStyle(xfs);
             }
             else if ( c_oSerRowTypes.Height == type )
             {
             	var h = this.stream.GetDoubleLE();
-                oRow.setHeight(h);
+				tmp.row.setHeight(h);
                 if(AscCommon.CurFileVersion < 2)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.setCustomHeight(true);
+					tmp.row.setCustomHeight(true);
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.setHidden(true);
+					tmp.row.setHidden(true);
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
 				//запоминам место чтобы читать Cells в конце, когда уже зачитан oRow.index
-				tmpData.pos = this.stream.GetCurPos();
-				tmpData.len = length;
+				tmp.pos = this.stream.GetCurPos();
+				tmp.len = length;
 				res = c_oSerConstants.ReadUnknown;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCells = function(type, length, ws, tempCell, tmpData)
+        this.ReadCells = function(type, length, tmp, index)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerRowTypes.Cell == type )
+            if ( c_oSerRowTypes.Cell === type )
             {
-				tempCell.clear();
+				tmp.cell.clear();
+                tmp.formula.clean();
                 res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, ws, tempCell, tmpData.prevRow);
+                    return oThis.ReadCell(t,l, tmp, tmp.cell, tmp.prevRow);
                 });
-                if (tempCell.hasRowCol()) {
-                    tmpData.prevCol = tempCell.nCol;
+                if (tmp.cell.hasRowCol()) {
+                    tmp.prevCol = tmp.cell.nCol;
                 } else {
-                    tmpData.prevCol++;
-                    tempCell.setRowCol(tmpData.prevRow, tmpData.prevCol);
+                    tmp.prevCol++;
+                    tmp.cell.setRowCol(tmp.prevRow, tmp.prevCol);
                 }
-				tempCell.saveContent();
-                if (tempCell.nCol >= ws.nColsCount) {
-                    ws.nColsCount = tempCell.nCol + 1;
+				this.setFormulaOpen(tmp);
+				tmp.cell.saveContent();
+                if (tmp.cell.nCol >= tmp.ws.nColsCount) {
+                    tmp.ws.nColsCount = tmp.cell.nCol + 1;
                 }
             }
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
-        this.ReadCell = function(type, length, ws, oCell, nRowIndex)
+		this.setFormulaOpen = function(tmp) {
+			var cell = tmp.cell;
+			var formula = tmp.formula;
+			var curFormula;
+			var prevFormula = tmp.prevFormulas[cell.nCol];
+			if (formula.v && formula.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+				var offsetRow;
+				var shared;
+				var sharedRef;
+				if (prevFormula && (shared = prevFormula.parsed.getShared())) {
+					offsetRow = cell.nRow - shared.ref.r1;
+				} else {
+					offsetRow = 1;
+				}
+				if (prevFormula && prevFormula.nRow + offsetRow === cell.nRow &&
+					AscCommonExcel.compareFormula(prevFormula.formula, prevFormula.refPos, formula.v, offsetRow)) {
+					if (!(shared && shared.ref)) {
+					    sharedRef = new Asc.Range(cell.nCol, prevFormula.nRow, cell.nCol, cell.nRow);
+						prevFormula.parsed.setShared(sharedRef, prevFormula.base);
+					} else {
+						shared.ref.union3(cell.nCol, cell.nRow);
+					}
+					curFormula = prevFormula;
+				} else {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
+					var parsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
+					parsed.ca = formula.ca;
+					var refPos = [];
+					parsed.parse(undefined, undefined, refPos);
+					if (null !== formula.ref) {
+						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
+						parsed.setShared(sharedRef, newFormulaParent);
+					}
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, parsed, refPos, newFormulaParent);
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+				if (null !== formula.si) {
+					tmp.sharedFormulas[formula.si] = curFormula;
+					tmp.siFormulas[curFormula.parsed.getListenerId()] = curFormula.parsed;
+				}
+			} else if (null !== formula.si) {
+				curFormula = tmp.sharedFormulas[formula.si];
+				if (curFormula) {
+					curFormula.parsed.getShared().ref.union3(cell.nCol, cell.nRow);
+				}
+				if (prevFormula !== curFormula) {
+					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
+						prevFormula.parsed.buildDependencies();
+					}
+					tmp.prevFormulas[cell.nCol] = curFormula;
+				}
+			}
+			if (curFormula) {
+				cell.setFormulaInternal(curFormula.parsed);
+				if (curFormula.parsed.ca || cell.isNullTextString()) {
+					tmp.ws.workbook.dependencyFormulas.addToChangedCell(cell);
+				}
+			}
+		};
+        this.ReadCell = function(type, length, tmp, oCell, nRowIndex)
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerCellTypes.Ref == type ){
+            if ( c_oSerCellTypes.Ref === type ){
 				var oCellAddress = AscCommon.g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 				oCell.setRowCol(nRowIndex, oCellAddress.getCol0());
 			}
-            else if ( c_oSerCellTypes.RefRowCol == type ){
+            else if ( c_oSerCellTypes.RefRowCol === type ){
 				var nRow = this.stream.GetULongLE();//todo не используем можно убрать
 				oCell.setRowCol(nRowIndex, this.stream.GetULongLE());
 			}
-            else if( c_oSerCellTypes.Style == type )
+            else if( c_oSerCellTypes.Style === type )
             {
                 var nStyleIndex = this.stream.GetULongLE();
                 if(0 != nStyleIndex)
@@ -6333,7 +6535,7 @@
                         oCell.setStyle(xfs);
                 }
             }
-            else if( c_oSerCellTypes.Type == type )
+            else if( c_oSerCellTypes.Type === type )
             {
                 switch(this.stream.GetUChar())
                 {
@@ -6343,18 +6545,15 @@
                     case ECellTypeType.celltypeSharedString: oCell.setTypeInternal(CellValueType.String);break;
                 }
             }
-            else if( c_oSerCellTypes.Formula == type )
+            else if( c_oSerCellTypes.Formula === type )
             {
-                var cellWithFormula = new AscCommonExcel.CCellWithFormula(ws, oCell.nRow, oCell.nCol);
-				var oFormulaExt = {cell: cellWithFormula, aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.ReadFormula(t,l, oFormulaExt);
+                    return oThis.ReadFormula(t,l, tmp.formula);
                 });
-				ws.aFormulaExt.push(oFormulaExt);
             }
-			else if (c_oSerCellTypes.Value == type) {
+			else if (c_oSerCellTypes.Value === type) {
 				var val = this.stream.GetDoubleLE();
-				if (CellValueType.String == oCell.getType() || CellValueType.Error == oCell.getType()) {
+				if (CellValueType.String === oCell.getType() || CellValueType.Error === oCell.getType()) {
 					var ss = this.aSharedStrings[val];
                     if (typeof ss === 'string') {
                         oCell.setValueTextInternal(ss);
@@ -6372,31 +6571,31 @@
         this.ReadFormula = function(type, length, oFormula)
         {
             var res = c_oSerConstants.ReadOk;
-            if ( c_oSerFormulaTypes.Aca == type )
+            if ( c_oSerFormulaTypes.Aca === type )
                 oFormula.aca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Bx == type )
+            else if ( c_oSerFormulaTypes.Bx === type )
                 oFormula.bx = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Ca == type )
+            else if ( c_oSerFormulaTypes.Ca === type )
                 oFormula.ca = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del1 == type )
+            else if ( c_oSerFormulaTypes.Del1 === type )
                 oFormula.del1 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Del2 == type )
+            else if ( c_oSerFormulaTypes.Del2 === type )
                 oFormula.del2 = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dt2D == type )
+            else if ( c_oSerFormulaTypes.Dt2D === type )
                 oFormula.dt2d = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.Dtr == type )
+            else if ( c_oSerFormulaTypes.Dtr === type )
                 oFormula.dtr = this.stream.GetBool();
-            else if ( c_oSerFormulaTypes.R1 == type )
+            else if ( c_oSerFormulaTypes.R1 === type )
                 oFormula.r1 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.R2 == type )
+            else if ( c_oSerFormulaTypes.R2 === type )
                 oFormula.r2 = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Ref == type )
+            else if ( c_oSerFormulaTypes.Ref === type )
                 oFormula.ref = this.stream.GetString2LE(length);
-            else if ( c_oSerFormulaTypes.Si == type )
+            else if ( c_oSerFormulaTypes.Si === type )
                 oFormula.si = this.stream.GetULongLE();
-            else if ( c_oSerFormulaTypes.T == type )
+            else if ( c_oSerFormulaTypes.T === type )
                 oFormula.t = this.stream.GetUChar();
-            else if ( c_oSerFormulaTypes.Text == type )
+            else if ( c_oSerFormulaTypes.Text === type )
                 oFormula.v = this.stream.GetString2LE(length);
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -7358,7 +7557,8 @@
             activeRange: null
         };
         this.oReadResult = {
-            tableCustomFunc: []
+            tableCustomFunc: [],
+            sheetData: []
         };
         this.getbase64DecodedData = function(szSrc)
         {
@@ -7634,6 +7834,7 @@
                 if(c_oSerConstants.ReadOk == res)
                     res = (new Binary_StylesTableReader(this.stream, wb, aCellXfs, aDxfs, this.copyPasteObj.isCopyPaste)).Read();
             }
+			var bwtr = new Binary_WorksheetTableReader(this.stream, this.oReadResult, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
             if(c_oSerConstants.ReadOk == res)
             {
                 for(var i = 0; i < aSeekTable.length; ++i)
@@ -7680,8 +7881,10 @@
                     if(c_oSerConstants.ReadOk == res)
                         res = (new Binary_WorkbookTableReader(this.stream, wb, bwtr)).Read();
                 }
+				bwtr.ReadSheetDataExternal(false);
                 wb.init(this.oReadResult.tableCustomFunc, false, true);
             } else if(window["Asc"] && window["Asc"]["editor"] !== undefined){
+				bwtr.ReadSheetDataExternal(true);
                 wb.init(this.oReadResult.tableCustomFunc, true);
             }
             return res;

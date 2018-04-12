@@ -834,7 +834,7 @@
 					}
 					case cElementType.cell3D        : {
 						ret = true;
-						wsName = r.oper.ws.getName();
+						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length;
 						_sColorPos = _e - r.oper.toString().length;
 						refStr = r.oper.value;
@@ -958,7 +958,7 @@
 					case cElementType.cell3D        : {
 						refStr = r.oper.value;
 						ret = true;
-						wsName = r.oper.ws.getName();
+						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length + 1;
 						_sColorPos = _e - r.oper.toString().length;
 						break;

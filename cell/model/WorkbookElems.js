@@ -6127,11 +6127,6 @@ RangeDataManager.prototype = {
 	}
 
 	TableColumn.prototype.onFormulaEvent = function (type, eventData) {
-		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			return true;
-		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			this.TotalsRowFormula.setIsDirty(false);
-		}
 	};
 	TableColumn.prototype.renameSheetCopy = function (ws, renameParams) {
 		if (this.TotalsRowFormula) {
@@ -6163,7 +6158,7 @@ RangeDataManager.prototype = {
 		res.TotalsRowFunction = this.TotalsRowFunction;
 
 		if (this.TotalsRowFormula) {
-			res.applyTotalRowFormula(this.TotalsRowFormula.Formula, this.TotalsRowFormula.ws, false);
+		res.applyTotalRowFormula(this.TotalsRowFormula.getFormula(), this.TotalsRowFormula.ws, false);
 		}
 		if (this.dxf) {
 			res.dxf = this.dxf.clone;

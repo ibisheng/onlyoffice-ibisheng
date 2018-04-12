@@ -318,6 +318,14 @@
 		Range.prototype.isEqualAll = function (range) {
 			return this.isEqual(range) && this.refType1 === range.refType1 && this.refType2 === range.refType2;
 		};
+		Range.prototype.isEqualWithOffsetRow = function (range, offsetRow) {
+			return this.c1 === range.c1 && this.c2 === range.c2 &&
+				this.isAbsC1() === range.isAbsC1() && this.isAbsC2() === range.isAbsC2() &&
+				this.isAbsR1() === range.isAbsR1() && this.isAbsR2() === range.isAbsR2() &&
+				(((this.isAbsR1() ? this.r1 === range.r1 : this.r1 + offsetRow === range.r1) &&
+				(this.isAbsR2() ? this.r2 === range.r2 : this.r2 + offsetRow === range.r2)) ||
+				(this.r1 === 0 && this.r2 === gc_nMaxRow0 && this.r1 === range.r1 && this.r2 === range.r2));
+		};
 
 		Range.prototype.contains = function (c, r) {
 			return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
@@ -394,6 +402,35 @@
 			return c_oAscShiftType.None;
 		};
 
+		Range.prototype.difference = function(range) {
+			var res = [];
+			var intersect;
+			if (this.r1 > 0) {
+				intersect = new Range(0, 0, gc_nMaxCol0, this.r1 - 1).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c1 > 0) {
+				intersect = new Range(0, this.r1, this.c1 - 1, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.c2 < gc_nMaxCol0) {
+				intersect = new Range(this.c2 + 1, this.r1, gc_nMaxCol0, this.r2).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			if (this.r2 < gc_nMaxRow0) {
+				intersect = new Range(0, this.r2 + 1, gc_nMaxCol0, gc_nMaxRow0).intersectionSimple(range);
+				if (intersect) {
+					res.push(intersect);
+				}
+			}
+			return res;
+		};
 		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
 			var isHor = offset && 0 != offset.col;
 			if (isHor) {
@@ -484,6 +521,10 @@
 
 		Range.prototype.isOneCell = function () {
 			return this.r1 === this.r2 && this.c1 === this.c2;
+		};
+
+		Range.prototype.isOnTheEdge = function (c, r) {
+			return this.r1 === r || this.r2 === r || this.c1 === c || this.c2 === c;
 		};
 
 		Range.prototype.union = function (range) {
@@ -827,6 +868,42 @@
 			return res;
 		};
 
+		Range.prototype.getSharedRange = function (sharedRef, c, r) {
+			var isAbsR1 = this.isAbsR1();
+			var isAbsC1 = this.isAbsC1();
+			var isAbsR2 = this.isAbsR2();
+			var isAbsC2 = this.isAbsC2();
+			if(this.r1 === 0 && this.r2 === gc_nMaxRow0){
+				isAbsR1 = isAbsR2 = true;
+			}
+			if(this.c1 === 0 && this.c2 === gc_nMaxCol0){
+				isAbsC1 = isAbsC2 = true;
+			}
+			var r1 = isAbsR2 ? sharedRef.r1 : Math.max(sharedRef.r2 + (r - this.r2), sharedRef.r1);
+			var c1 = isAbsC2 ? sharedRef.c1 : Math.max(sharedRef.c2 + (c - this.c2), sharedRef.c1);
+			var r2 = isAbsR1 ? sharedRef.r2 : Math.min(sharedRef.r1 + (r - this.r1), sharedRef.r2);
+			var c2 = isAbsC1 ? sharedRef.c2 : Math.min(sharedRef.c1 + (c - this.c1), sharedRef.c2);
+			return new Range(c1, r1, c2, r2);
+		};
+		Range.prototype.getSharedRangeBbox = function(ref, base) {
+			var res = this.clone();
+			var shiftBase;
+			var offset = new AscCommon.CellBase(ref.r1 - base.nRow, ref.c1 - base.nCol);
+			if (!offset.isEmpty()) {
+				shiftBase = this.clone();
+				shiftBase.setOffsetWithAbs(offset, false, false);
+			}
+			offset.row = ref.r2 - base.nRow;
+			offset.col = ref.c2 - base.nCol;
+			res.setOffsetWithAbs(offset, false, false);
+			res.union2(shiftBase ? shiftBase : this);
+			return res;
+		};
+		Range.prototype.getSharedIntersect = function(sharedRef, bbox) {
+			var leftTop = this.getSharedRange(sharedRef, bbox.c1, bbox.r1);
+			var rightBottom = this.getSharedRange(sharedRef, bbox.c2, bbox.r2);
+			return leftTop.union(rightBottom);
+		};
 		Range.prototype.setAbs = function (absRow1, absCol1, absRow2, absCol2) {
 			this.refType1 = (absRow1 ? 0 : 2) + (absCol1 ? 0 : 1);
 			this.refType2 = (absRow2 ? 0 : 2) + (absCol2 ? 0 : 1);
