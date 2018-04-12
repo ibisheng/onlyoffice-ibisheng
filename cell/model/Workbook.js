@@ -5347,7 +5347,7 @@
 		var pivotTable, pivotRange, pivotFields, rowFields, styleInfo, style, wholeStyle, cells, j, r, x, pos,
 			firstHeaderRow0, firstDataCol0, countC, countCWValues, countR, countD, stripe1, stripe2, items, l, item,
 			start, end, isOutline, arrSubheading, emptyStripe = new Asc.CTableStyleElement();
-		var dxf, dxfLabels, dxfValues, grandColumn;
+		var dxf, dxfLabels, dxfValues, grandColumn, index;
 		var checkRowSubheading = function (_i, _r, _v, _dxf) {
 			var sub, bSet = true;
 			if ((sub = arrSubheading[_i])) {
@@ -5546,7 +5546,8 @@
 					} else if (styleInfo.showRowHeaders) {
 						// Row Subheading
 						r = item.getR();
-						isOutline = (false !== pivotFields[rowFields[r].asc_getIndex()].outline);
+						index = rowFields[r].asc_getIndex();
+						isOutline = (AscCommonExcel.st_VALUES !== index && false !== pivotFields[index].outline);
 						for (x = 0, l = item.x.length; x < l; ++x, ++r) {
 							dxf = null;
 							if (r + 1 !== countR) {

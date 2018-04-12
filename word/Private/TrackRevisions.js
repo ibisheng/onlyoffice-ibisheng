@@ -41,11 +41,19 @@ var History = AscCommon.History;
 //----------------------------------------------------------------------------------------------------------------------
 Asc['asc_docs_api'].prototype.asc_SetTrackRevisions = function(bTrack)
 {
-    return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return;
+
+	return oLogicDocument.Set_TrackRevisions(bTrack);
 };
 Asc['asc_docs_api'].prototype.asc_IsTrackRevisions = function()
 {
-    return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+	if (!oLogicDocument)
+		return false;
+
+    return oLogicDocument.Is_TrackRevisions();
 };
 Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges = function()
 {
@@ -508,15 +516,8 @@ CDocument.prototype.Reject_AllRevisionChanges = function(isSkipCheckLock)
     if (true === isSkipCheckLock || false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
     {
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RejectAllRevisionChanges);
-        var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
-        for (var LogicDocId in LogicDocuments)
-        {
-            var LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
-            if (LogicDoc)
-            {
-                LogicDoc.RejectRevisionChanges(undefined, true);
-            }
-        }
+
+        this.private_RejectAllRevisionChanges();
 
         if (true !== isSkipCheckLock && true === this.History.Is_LastPointEmpty())
         {
@@ -530,6 +531,18 @@ CDocument.prototype.Reject_AllRevisionChanges = function(isSkipCheckLock)
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     }
+};
+CDocument.prototype.private_RejectAllRevisionChanges = function()
+{
+	var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
+	for (var LogicDocId in LogicDocuments)
+	{
+		var LogicDoc = this.TableId.Get_ById(LogicDocId);
+		if (LogicDoc)
+		{
+			LogicDoc.RejectRevisionChanges(undefined, true);
+		}
+	}
 };
 CDocument.prototype.AcceptRevisionChanges = function(Type, bAll)
 {

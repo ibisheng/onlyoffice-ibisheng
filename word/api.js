@@ -2357,7 +2357,8 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._saveCheck = function() {
-		return !this.WordControl.m_oLogicDocument.IsViewModeInReview() && !this.isLongAction();
+		return !this.isLongAction() &&
+			!(this.WordControl.m_oLogicDocument && this.WordControl.m_oLogicDocument.IsViewModeInReview());
 	};
 	asc_docs_api.prototype._haveOtherChanges = function () {
 		return AscCommon.CollaborativeEditing.Have_OtherChanges();
@@ -5804,7 +5805,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_showComment = function(Id)
 	{
-		this.WordControl.m_oLogicDocument.ShowComment(Id);
+		if (Id instanceof Array)
+			this.WordControl.m_oLogicDocument.ShowComment(Id);
+		else
+			this.WordControl.m_oLogicDocument.ShowComment([Id]);
 	};
 
 	asc_docs_api.prototype.can_AddQuotedComment = function()
@@ -5826,10 +5830,9 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onAddComment", Id, AscCommentData);
 	};
 
-	asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
+	asc_docs_api.prototype.sync_ShowComment = function(arrId, X, Y)
 	{
-		// TODO: Переделать на нормальный массив
-		this.sendEvent("asc_onShowComment", [Id], X, Y);
+		this.sendEvent("asc_onShowComment", arrId, X, Y);
 	};
 
 	asc_docs_api.prototype.sync_HideComment = function()
@@ -6940,10 +6943,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.getViewMode     = function()
-	{
-		return this.isViewMode;
-	};
 	asc_docs_api.prototype.asc_setViewMode = function(isViewMode)
 	{
 		this.isViewMode = !!isViewMode;

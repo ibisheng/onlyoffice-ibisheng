@@ -5952,10 +5952,6 @@ background-repeat: no-repeat;\
 		}
 		window.ID_KEYBOARD_AREA.focus();
 	};
-	asc_docs_api.prototype.getViewMode            = function()
-	{
-		return this.isViewMode;
-	};
 	asc_docs_api.prototype.asc_setViewMode        = function(isViewMode)
 	{
 		this.isViewMode = !!isViewMode;
@@ -6267,16 +6263,15 @@ background-repeat: no-repeat;\
 		if (!this.reporterWindow)
 			return;
 
-		this.reporterWindow.onbeforeunload = function()
-		{
-			window.editor.EndDemonstration();
-		};
-
 		this.reporterWindowCounter = 0;
-		this.reporterWindow.onbeforeunload = function()
+		if (!AscCommon.AscBrowser.isSafariMacOs)
 		{
-			window.editor.EndDemonstration();
-		};
+			this.reporterWindow.onbeforeunload = function ()
+			{
+				window.editor.EndDemonstration();
+			};
+		}
+
 		this.reporterWindow.onunload = function () {
 			window.editor.reporterWindowCounter++;
 			if (1 < window.editor.reporterWindowCounter)

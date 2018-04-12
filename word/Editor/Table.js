@@ -10111,11 +10111,16 @@ CTable.prototype.Internal_GetCellByXY = function(X, Y, PageIndex)
 	var CurPage   = Math.min(this.Pages.length - 1, Math.max(0, PageIndex));
 	var Page      = this.Pages[CurPage];
 	var ColsCount = this.TableGridCalc.length;
-	if (X >= Page.X)
+
+	var twX     = AscCommon.MMToTwips(X);
+	var twPageX = AscCommon.MMToTwips(Page.X);
+	if (twX >= twPageX)
 	{
 		for (CurGrid = 0; CurGrid < ColsCount; CurGrid++)
 		{
-			if (X >= Page.X + this.TableSumGrid[CurGrid - 1] && X <= Page.X + this.TableSumGrid[CurGrid])
+			var twColStart = AscCommon.MMToTwips(Page.X + this.TableSumGrid[CurGrid - 1]);
+			var twColEnd   = AscCommon.MMToTwips(Page.X + this.TableSumGrid[CurGrid]);
+			if (twColStart <= twX && twX < twColEnd)
 				break;
 		}
 	}

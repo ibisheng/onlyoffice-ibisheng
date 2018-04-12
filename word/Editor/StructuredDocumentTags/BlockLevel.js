@@ -659,7 +659,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	var sName      = this.GetTag();
+	var sName      = this.GetLabel();
 	var isBuiltIn  = false;
 	var arrButtons = [];
 

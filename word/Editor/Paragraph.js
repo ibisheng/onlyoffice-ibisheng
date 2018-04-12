@@ -236,6 +236,7 @@ Paragraph.prototype.Set_Pr = function(oNewPr)
 
 	this.Recalc_CompiledPr();
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
+	this.UpdateDocumentOutline();
 };
 Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 {
@@ -8290,7 +8291,11 @@ Paragraph.prototype.PasteFormatting = function(TextPr, oParaPr, ApplyPara)
 {
 	// Применяем текстовые настройки всегда
 	if (TextPr)
-		this.Add(new ParaTextPr(TextPr));
+	{
+		var oParaTextPr = new ParaTextPr();
+		oParaTextPr.Value.Set_FromObject(TextPr, true);
+		this.Add(oParaTextPr);
+	}
 
 	// Применяем настройки параграфа
 	if (oParaPr)
@@ -13190,35 +13195,46 @@ CParaDrawingRangeLines.prototype =
     },
 
     private_CanUnionElements : function(PrevEl, Element)
-    {
-        if (true
-            && Math.abs(PrevEl.y0 - Element.y0) < 0.001
-                && Math.abs(PrevEl.y1 - Element.y1) < 0.001
-                && Math.abs(PrevEl.x1 - Element.x0) < 0.001
-                && Math.abs(PrevEl.w - Element.w) < 0.001
-                && PrevEl.r === Element.r
-                && PrevEl.g === Element.g
-                && PrevEl.b === Element.b
-                && (false
-                || (true
-                    && undefined === PrevEl.Additional
-                        && undefined === Element.Additional)
-                || (true
-                    && undefined !== PrevEl.Additional
-                        && undefined !== Element.Additional
-                        && (false
-                        || (true
-                            && undefined !== PrevEl.Additional.Active
-                                && PrevEl.Additional.Active === Element.Additional.Active)
-                        || (true
-                            && undefined !== PrevEl.Additional.RunPr
-                                && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))))))
-            {
-            return true;
-            }
+	{
+		if (Math.abs(PrevEl.y0 - Element.y0) < 0.001
+			&& Math.abs(PrevEl.y1 - Element.y1) < 0.001
+			&& Math.abs(PrevEl.x1 - Element.x0) < 0.001
+			&& Math.abs(PrevEl.w - Element.w) < 0.001
+			&& PrevEl.r === Element.r
+			&& PrevEl.g === Element.g
+			&& PrevEl.b === Element.b)
+		{
+			if (undefined === PrevEl.Additional && undefined === Element.Additional)
+				return true;
 
-        return false;
-    },
+			if (undefined === PrevEl.Additional || undefined === Element.Additional)
+				return false;
+
+			if (undefined !== PrevEl.Additional.Active && PrevEl.Additional.Active === Element.Additional.Active)
+			{
+				if (!PrevEl.Additional.CommentId
+					|| !Element.Additional.CommentId
+					|| PrevEl.Additional.CommentId.length !== Element.Additional.CommentId.length)
+					return false;
+
+				for (var nIndex = 0, nCount = PrevEl.Additional.CommentId.length; nIndex < nCount; ++nIndex)
+				{
+					if (PrevEl.Additional.CommentId[nIndex] !== Element.Additional.CommentId[nIndex])
+						return false;
+				}
+
+				return true;
+			}
+			else if (undefined !== PrevEl.Additional.RunPr && true === Element.Additional.RunPr.Is_Equal(PrevEl.Additional.RunPr))
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		return false;
+	},
 
     Correct_w_ForUnderline : function()
     {
@@ -13659,16 +13675,13 @@ CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, D
 	this.DrawComments       = DrawComments;
 	this.DrawSolvedComments = DrawSolvedComments;
 
+	this.Comments = [];
 	if (null !== PageEndInfo)
 	{
 		for (var nIndex = 0, nCount = PageEndInfo.Comments.length; nIndex < nCount; ++nIndex)
 		{
 			this.AddComment(PageEndInfo.Comments[nIndex]);
 		}
-	}
-	else
-	{
-		this.Comments = [];
 	}
 
 	this.Check_CommentsFlag();

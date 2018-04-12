@@ -4170,6 +4170,10 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.bFromImage = false;
     }
+    else
+    {
+        _result_shape_prop.bFromImage = true;
+    }
     if(shapeProp1.locked || shapeProp2.locked)
     {
         _result_shape_prop.locked = true;

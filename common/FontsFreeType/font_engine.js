@@ -290,8 +290,8 @@ function FT_Service_SFNT_TableRec(load_, get_, info_)
 var FT_SERVICE_ID_TT_CMAP = "tt-cmaps";
 function TT_CMapInfo()
 {
-    this.language;
-    this.format;
+    this.language = 0;
+    this.format = 0;
 }
 function FT_Service_TTCMapsRec(get_cmap_info_)
 {
