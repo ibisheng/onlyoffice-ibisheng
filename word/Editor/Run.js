@@ -2598,7 +2598,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Word                = PRS.Word;
     var StartWord           = PRS.StartWord;
     var FirstItemOnLine     = PRS.FirstItemOnLine;
-    var EmptyLine           = PRS.EmptyLine;
+	var EmptyLine           = PRS.EmptyLine;
     var TextOnLine          = PRS.TextOnLine;
 
     var RangesCount         = PRS.RangesCount;
@@ -2710,39 +2710,46 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
                         if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
-                        {
-                            if (X + SpaceLen + LetterLen > XEnd)
-                            {
-                                NewRange = true;
-                                RangeEndPos = Pos;
-                            }
-                        }
+						{
+							if (X + SpaceLen + LetterLen > XEnd)
+							{
+								if (!Item.CanBeAtBeginOfLine() && !PRS.LineBreakFirst)
+								{
+									MoveToLBP = true;
+									NewRange  = true;
+								}
+								else
+								{
+									NewRange    = true;
+									RangeEndPos = Pos;
+								}
+							}
+						}
 
                         if (true !== NewRange)
                         {
                             // Отмечаем начало нового слова
-                            PRS.Set_LineBreakPos(Pos);
+                            PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
                             if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
-                            {
-                                // Добавляем длину пробелов до слова и ширину самого слова.
-                                X += SpaceLen + LetterLen;
+							{
+								// Добавляем длину пробелов до слова и ширину самого слова.
+								X += SpaceLen + LetterLen;
 
-                                Word = false;
-                                FirstItemOnLine = false;
-                                EmptyLine = false;
-								TextOnLine = true;
-                                SpaceLen = 0;
-                                WordLen = 0;
-                            }
+								Word            = false;
+								FirstItemOnLine = false;
+								EmptyLine       = false;
+								TextOnLine      = true;
+								SpaceLen        = 0;
+								WordLen         = 0;
+							}
                             else
-                            {
-                                Word = true;
-                                WordLen = LetterLen;
-                            }
-                        }
-
+							{
+								Word    = true;
+								WordLen = LetterLen;
+							}
+						}
                     }
                     else
                     {
@@ -2834,14 +2841,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
-                                PRS.Set_LineBreakPos(Pos);
+                                PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                             }
                         }
 
                         if(true !== NewRange)
                         {
                             if(this.Parent.bRoot == true)
-                                PRS.Set_LineBreakPos(Pos);
+                                PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
 
                             WordLen += LetterLen;
                             Word = true;
@@ -2879,6 +2886,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Space:
                 {
+                	if (Word && PRS.LastItem && para_Text === PRS.LastItem.Type && !PRS.LastItem.CanBeAtEndOfLine())
+					{
+						WordLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
+						break;
+					}
+
                     FirstItemOnLine = false;
 
                     if (true === Word)
@@ -2938,7 +2951,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 Word = false;
                                 MoveToLBP = true;
                                 NewRange = true;
-                                PRS.Set_LineBreakPos(1);
+                                PRS.Set_LineBreakPos(1, FirstItemOnLine);
                             }
                         }
                     }
@@ -3000,7 +3013,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                     if(PRS.bBreakPosInLWord == true)
                                     {
-                                        PRS.Set_LineBreakPos(Pos);
+                                        PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
 
                                     }
                                     else
@@ -3034,7 +3047,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     // в этом случае Word == false && FirstItemOnLine == false, нужно также поставить отметку для потенциального переноса
 
                                     X += SpaceLen + WordLen;
-                                    PRS.Set_LineBreakPos(Pos);
+                                    PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                                     EmptyLine = false;
 									TextOnLine = true;
                                     WordLen = BrkLen;
@@ -3060,7 +3073,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 NewRange = true;
 
                                 if(Word == false)
-                                    PRS.Set_LineBreakPos(Pos);
+                                    PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                             }
                             else
                             {
@@ -3086,9 +3099,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                 // FirstItemOnLine == true
                                 if(bNotUpdate == false) // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
-                                {
-                                    PRS.Set_LineBreakPos(Pos+1);
-                                }
+								{
+									PRS.Set_LineBreakPos(Pos + 1, FirstItemOnLine);
+								}
                                 else
                                 {
                                     bNotUpdBreakOper = true;
@@ -3097,7 +3110,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 FirstItemOnLine = false;
 
                                 Word = false;
-
                             }
                         }
                     }
@@ -3354,6 +3366,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						}
                     }
 
+					// Считаем, что с таба начинается слово
+					PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+
                     // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
                     // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
                     if (RangesCount === CurRange)
@@ -3366,8 +3381,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                     }
 
-                    // Считаем, что с таба начинается слово
-                    PRS.Set_LineBreakPos(Pos);
 
                     StartWord = true;
                     Word = true;
@@ -3553,6 +3566,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 				}
             }
 
+            if (para_Space !== ItemType)
+            	PRS.LastItem = Item;
 
             if (true === NewRange)
                 break;
@@ -3608,11 +3623,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     PRS.MoveToLBP = true;
                     PRS.NewRange = true;
-                    PRS.Set_LineBreakPos(0);
+                    PRS.Set_LineBreakPos(0, PRS.FirstItemOnLine);
                 }
                 else if(this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBreakBox == true)
                 {
-                    PRS.Set_LineBreakPos(Pos);
+                    PRS.Set_LineBreakPos(Pos, PRS.FirstItemOnLine);
                     PRS.X += SpaceLen;
                     PRS.SpaceLen = 0;
                 }
