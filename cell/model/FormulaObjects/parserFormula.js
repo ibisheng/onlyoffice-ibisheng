@@ -1542,7 +1542,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		if (!this.isValid()) {
 			return new cError(cErrorType.bad_reference);
 		}
-		return checkTypeCell(this.range);
+		var res;
+		this.range.getLeftTopCellNoEmpty(function(cell) {
+			res = checkTypeCell(cell);
+		});
+		return res;
 	};
 	cRef.prototype.tocNumber = function () {
 		return this.getValue().tocNumber();
@@ -1635,7 +1639,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		if (!_r) {
 			return new cError(cErrorType.bad_reference);
 		}
-		return checkTypeCell(_r);
+		var res;
+		_r.getLeftTopCellNoEmpty(function(cell) {
+			res = checkTypeCell(cell);
+		});
+		return res;
 	};
 	cRef3D.prototype.tocBool = function () {
 		return this.getValue().tocBool();
@@ -2394,16 +2402,18 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	function checkTypeCell(cell) {
 		if (cell && !cell.isNullText()) {
-			var val = cell.getValueWithoutFormat();
 			var type = cell.getType();
 			if (CellValueType.Number === type) {
-				return new cNumber(val - 0);
-			} else if (CellValueType.Bool === type) {
-				return new cBool(val);
-			} else if (CellValueType.Error === type) {
-				return new cError(val);
-			} else {
-				return new cString(val);
+				return new cNumber(cell.getNumberValue());
+			} else{
+				var val = cell.getValueWithoutFormat();
+				if (CellValueType.Bool === type) {
+					return new cBool(val);
+				} else if (CellValueType.Error === type) {
+					return new cError(val);
+				} else {
+					return new cString(val);
+				}
 			}
 		} else {
 			return new cEmpty();
