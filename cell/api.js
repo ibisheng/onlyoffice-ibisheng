@@ -1611,9 +1611,11 @@ var editor;
       if (res) {
         t.wbModel.createWorksheet(i, name);
         t.wb.spliceWorksheet(i, 0, null);
-        t.asc_showWorksheet(i);
-        // Посылаем callback об изменении списка листов
-        t.sheetsChanged();
+        if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode']) {
+          t.asc_showWorksheet(i);
+          // Посылаем callback об изменении списка листов
+          t.sheetsChanged();
+		}
       }
     };
 
