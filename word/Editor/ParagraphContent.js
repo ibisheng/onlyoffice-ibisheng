@@ -673,10 +673,16 @@ ParaText.prototype.private_IsSpaceAfter = function()
 };
 ParaText.prototype.CanBeAtBeginOfLine = function()
 {
+	if (this.Is_NBSP())
+		return false;
+
 	return (!(g_aPunctuation[this.Value] & PUNCTUATION_FLAG_CANT_BE_AT_BEGIN));
 };
 ParaText.prototype.CanBeAtEndOfLine = function()
 {
+	if (this.Is_NBSP())
+		return false;
+
 	return (!(g_aPunctuation[this.Value] & PUNCTUATION_FLAG_CANT_BE_AT_END));
 };
 ParaText.prototype.IsEastAsianScript = function()
