@@ -234,7 +234,7 @@
 	 * @returns {ApiWorksheet | null}
 	 */
 	Api.prototype.GetSheet = function (nameOrIndex) {
-		var ws = ('string' === typeof theme) ? this.wbModel.getWorksheetByName(nameOrIndex) :
+		var ws = ('string' === typeof nameOrIndex) ? this.wbModel.getWorksheetByName(nameOrIndex) :
 			this.wbModel.getWorksheet(nameOrIndex);
 		return ws ? new ApiWorksheet(ws) : null;
 	};
