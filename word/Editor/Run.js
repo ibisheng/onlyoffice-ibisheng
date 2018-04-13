@@ -2728,8 +2728,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         if (true !== NewRange)
                         {
-                            // Отмечаем начало нового слова
-                            PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+                        	// Если с данного элемента не может начинаться строка, тогда считает все пробелы идущие
+							// до него частью этого слова.
+							// Если места для разрыва строки еще не было, значит это все еще первый элемент идет, и
+							// тогда общую ширину пробелов прибавляем к ширине символа.
+							// Если разрыв были и с данного символа не может начинаться строка, тогда испоьльзуем
+							// предыдущий разрыв.
+							if (PRS.LineBreakFirst && !Item.CanBeAtBeginOfLine())
+							{
+								FirstItemOnLine = true;
+								LetterLen       = LetterLen + SpaceLen;
+								SpaceLen        = 0;
+							}
+							else if (Item.CanBeAtBeginOfLine())
+							{
+								PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+							}
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
                             if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
