@@ -2713,7 +2713,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						{
 							if (X + SpaceLen + LetterLen > XEnd)
 							{
-								if (!Item.CanBeAtBeginOfLine() && !PRS.LineBreakFirst)
+								if (para_Text === ItemType && !Item.CanBeAtBeginOfLine() && !PRS.LineBreakFirst)
 								{
 									MoveToLBP = true;
 									NewRange  = true;
@@ -2734,15 +2734,18 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 							// тогда общую ширину пробелов прибавляем к ширине символа.
 							// Если разрыв были и с данного символа не может начинаться строка, тогда испоьльзуем
 							// предыдущий разрыв.
-							if (PRS.LineBreakFirst && !Item.CanBeAtBeginOfLine())
+							if (para_Text === ItemType)
 							{
-								FirstItemOnLine = true;
-								LetterLen       = LetterLen + SpaceLen;
-								SpaceLen        = 0;
-							}
-							else if (Item.CanBeAtBeginOfLine())
-							{
-								PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+								if (PRS.LineBreakFirst && !Item.CanBeAtBeginOfLine())
+								{
+									FirstItemOnLine = true;
+									LetterLen       = LetterLen + SpaceLen;
+									SpaceLen        = 0;
+								}
+								else if (Item.CanBeAtBeginOfLine())
+								{
+									PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+								}
 							}
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
