@@ -666,7 +666,7 @@ ParaText.prototype.private_IsSpaceAfter = function()
 	if (0x002D === this.Value || 0x2014 === this.Value)
 		return true;
 
-	if (this.IsEastAsianScript())
+	if (this.IsEastAsianScript() && this.CanBeAtEndOfLine())
 		return true;
 
 	return false;
