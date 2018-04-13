@@ -21,6 +21,7 @@ endif
 
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
 NODE_MODULES = build/node_modules ../$(WEBAPPS_DIR)/build/node_modules
+#PACKAGE_JSON = build/package.json ../$(WEBAPPS_DIR)/build/package.json
 WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/api/documents/api.js
 WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/documenteditor/main/app.js
 WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/presentationeditor/main/app.js
@@ -41,13 +42,12 @@ $(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
 	cd ../$(WEBAPPS_DIR)/build  && \
 		$(GRUNT_ENV) $(GRUNT) deploy-$(filter %editor documents,$(subst /, ,$(@D)))-component $(GRUNT_FLAGS)
 
-$(NODE_MODULES):
-	cd $(@D) && \
-		npm install
-
 $(SDKJS_FILES): $(NODE_MODULES)
 	cd build && \
 		$(GRUNT_ENV) $(GRUNT) build_$(@D) $(GRUNT_FLAGS)
 	
 clean:
 	rm -f $(WEBAPPS_FILES) $(SDKJS_FILES)
+
+%/node_modules: %/package.json
+	cd $(dir $@) && npm install
