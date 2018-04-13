@@ -902,14 +902,23 @@
 		 */
 		this.CoAuthoringApi.onDisconnect = function(e, error)
 		{
-			if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
-			{
-				t.asyncServerIdEndLoaded();
-			}
-			if (null != error)
-			{
-				t.setViewModeDisconnect();
-				t.sendEvent('asc_onError', error.code, error.level);
+			if ("Update Version error" === e) {
+				//todo avoid string comparation. redo on develop
+				t.sendEvent("asc_onDocumentUpdateVersion", function() {
+					if (t.isCoAuthoringEnable) {
+						t.asc_coAuthoringDisconnect();
+					}
+				});
+			} else {
+				if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state())
+				{
+					t.asyncServerIdEndLoaded();
+				}
+				if (null != error)
+				{
+					t.setViewModeDisconnect();
+					t.sendEvent('asc_onError', error.code, error.level);
+				}
 			}
 		};
 		this.CoAuthoringApi.onDocumentOpen = function (inputWrap) {
