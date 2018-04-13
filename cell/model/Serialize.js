@@ -193,7 +193,8 @@
 		DdeLink: 11,
 		VbaProject: 12,
 		JsaProject: 13,
-		Comments: 14
+		Comments: 14,
+		CalcPr: 15
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -216,7 +217,23 @@
         LocalSheetId: 2,
         Hidden: 3
     };
-    /** @enum */
+	/** @enum */
+	var c_oSerCalcPrTypes = {
+		CalcId: 0,
+		CalcMode: 1,
+		FullCalcOnLoad: 2,
+		RefMode: 3,
+		Iterate: 4,
+		IterateCount: 5,
+		IterateDelta: 6,
+		FullPrecision: 7,
+		CalcCompleted: 8,
+		CalcOnSave: 9,
+		ConcurrentCalc: 10,
+		ConcurrentManualCount: 11,
+		ForceFullCalc: 12
+	};
+	/** @enum */
     var c_oSerWorksheetsTypes =
     {
         Worksheet: 0,
@@ -2357,6 +2374,8 @@
             //DefinedNames
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
 
+			this.bs.WriteItem(c_oSerWorkbookTypes.CalcPr, function(){oThis.WriteCalcPr(oThis.wb.calcPr);});
+
 			//PivotCaches
 			var isEmptyCaches = true;
 			var pivotCaches = {};
@@ -2466,6 +2485,51 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
+		this.WriteCalcPr = function(calcPr)
+		{
+			var t = this;
+			//calcId Specifies the version of the calculation engine used to calculate values in the workbook
+			//do not pretend to be other editors
+			// if (null != calcPr.calcId) {
+				// this.bs.WriteItem(c_oSerCalcPrTypes.CalcId, function() {t.memory.WriteLong(calcPr.calcId)});
+			// }
+			if (null != calcPr.calcMode) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcMode, function() {t.memory.WriteByte(calcPr.calcMode)});
+			}
+			if (null != calcPr.fullCalcOnLoad) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.FullCalcOnLoad, function() {t.memory.WriteBool(calcPr.fullCalcOnLoad)});
+			}
+			if (null != calcPr.refMode) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.RefMode, function() {t.memory.WriteByte(calcPr.refMode)});
+			}
+			if (null != calcPr.iterate) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.Iterate, function() {t.memory.WriteBool(calcPr.iterate)});
+			}
+			if (null != calcPr.iterateCount) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.IterateCount, function() {t.memory.WriteLong(calcPr.iterateCount)});
+			}
+			if (null != calcPr.iterateDelta) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.IterateDelta, function() {t.memory.WriteDouble2(calcPr.iterateDelta)});
+			}
+			if (null != calcPr.fullPrecision) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.FullPrecision, function() {t.memory.WriteBool(calcPr.fullPrecision)});
+			}
+			if (null != calcPr.calcCompleted) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcCompleted, function() {t.memory.WriteBool(calcPr.calcCompleted)});
+			}
+			if (null != calcPr.calcOnSave) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.CalcOnSave, function() {t.memory.WriteBool(calcPr.calcOnSave)});
+			}
+			if (null != calcPr.concurrentCalc) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ConcurrentCalc, function() {t.memory.WriteBool(calcPr.concurrentCalc)});
+			}
+			if (null != calcPr.concurrentManualCount) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ConcurrentManualCount, function() {t.memory.WriteLong(calcPr.concurrentManualCount)});
+			}
+			if (null != calcPr.forceFullCalc) {
+				this.bs.WriteItem(c_oSerCalcPrTypes.ForceFullCalc, function() {t.memory.WriteBool(calcPr.forceFullCalc)});
+			}
+		};
 		this.WritePivotCaches = function(pivotCaches) {
 			var oThis = this;
 			for (var id in pivotCaches) {
@@ -5637,6 +5701,12 @@
                     return oThis.ReadDefinedNames(t,l);
                 });
             }
+			else if (c_oSerWorkbookTypes.CalcPr === type)
+			{
+				res = this.bcr.Read1(length, function(t, l) {
+					return oThis.ReadCalcPr(t, l, oThis.oWorkbook.calcPr);
+				});
+			}
 			else if ( c_oSerWorkbookTypes.ExternalReferences === type )
 			{
 				res = this.bcr.Read1(length, function(t,l){
@@ -5732,6 +5802,39 @@
                 res = c_oSerConstants.ReadUnknown;
             return res;
         };
+		this.ReadCalcPr = function(type, length, oCalcPr) {
+			var res = c_oSerConstants.ReadOk;
+			if (c_oSerCalcPrTypes.CalcId == type) {
+				oCalcPr.calcId = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.CalcMode == type) {
+				oCalcPr.calcMode = this.stream.GetUChar();
+			} else if (c_oSerCalcPrTypes.FullCalcOnLoad == type) {
+				oCalcPr.fullCalcOnLoad = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.RefMode == type) {
+				oCalcPr.refMode = this.stream.GetUChar();
+			} else if (c_oSerCalcPrTypes.Iterate == type) {
+				oCalcPr.iterate = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.IterateCount == type) {
+				oCalcPr.iterateCount = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.IterateDelta == type) {
+				oCalcPr.iterateDelta = this.stream.GetDoubleLE();
+			} else if (c_oSerCalcPrTypes.FullPrecision == type) {
+				oCalcPr.fullPrecision = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.CalcCompleted == type) {
+				oCalcPr.calcCompleted = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.CalcOnSave == type) {
+				oCalcPr.calcOnSave = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.ConcurrentCalc == type) {
+				oCalcPr.concurrentCalc = this.stream.GetBool();
+			} else if (c_oSerCalcPrTypes.ConcurrentManualCount == type) {
+				oCalcPr.concurrentManualCount = this.stream.GetULongLE();
+			} else if (c_oSerCalcPrTypes.ForceFullCalc == type) {
+				oCalcPr.forceFullCalc = this.stream.GetBool();
+			} else {
+				res = c_oSerConstants.ReadUnknown;
+			}
+			return res;
+		};
 		this.ReadExternalReferences = function(type, length) {
 			var res = c_oSerConstants.ReadOk;
 			var oThis = this;

@@ -1799,6 +1799,11 @@
 		this.bRedoChanges = false;
 		this.aCollaborativeChangeElements = [];
 		this.externalReferences = [];
+		this.calcPr = {
+			calcId: null, calcMode: null, fullCalcOnLoad: null, refMode: null, iterate: null, iterateCount: null,
+			iterateDelta: null, fullPrecision: null, calcCompleted: null, calcOnSave: null, concurrentCalc: null,
+			concurrentManualCount: null, forceFullCalc: null
+		};
 
 		this.wsHandlers = null;
 
