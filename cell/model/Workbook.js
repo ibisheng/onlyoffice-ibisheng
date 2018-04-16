@@ -2810,7 +2810,7 @@
 	};
 	Workbook.prototype.findCellText = function (options) {
 		var ws = this.getActiveWs();
-		var result = ws.findCellText(options);
+		var result = ws.findCellText(options), result2 = null;
 		if (!options.scanOnOnlySheet) {
 			// Search on workbook
 			var key = result && (result.col + "-" + result.row);
@@ -2818,18 +2818,17 @@
 				// Мы уже находили данную ячейку, попробуем на другом листе
 				var i, active = this.getActive(), start = 0, end = this.getWorksheetCount();
 				var inc = options.scanForward ? +1 : -1;
-				result = null;
 				for (i = active + inc; i < end && i >= start; i += inc) {
 					ws = this.getWorksheet(i);
 					if (ws.getHidden()) {
 						continue;
 					}
-					result = ws.findCellText(options);
-					if (result) {
+					result2 = ws.findCellText(options);
+					if (result2) {
 						break;
 					}
 				}
-				if (!result) {
+				if (!result2) {
 					// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
 					if (options.scanForward) {
 						i = 0;
@@ -2844,16 +2843,16 @@
 						if (ws.getHidden()) {
 							continue;
 						}
-						result = ws.findCellText(options);
-						if (result) {
+						result2 = ws.findCellText(options);
+						if (result2) {
 							break;
 						}
 					}
 				}
 
-				if (result) {
+				if (result2) {
 					this.handlers.trigger('undoRedoHideSheet', i);
-					key = result.col + "-" + result.row;
+					key = result2.col + "-" + result2.row;
 				}
 			}
 
@@ -2862,10 +2861,10 @@
 				this.lastFindCells[key] = true;
 			}
 		}
-		if (!result) {
+		if (!result2 && !result) {
 			this.cleanFindResults();
 		}
-		return result;
+		return result2 || result;
 	};
 //-------------------------------------------------------------------------------------------------
 	var tempHelp = new ArrayBuffer(8);
