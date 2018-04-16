@@ -2821,6 +2821,9 @@
 				result = null;
 				for (i = active + inc; i < end && i >= start; i += inc) {
 					ws = this.getWorksheet(i);
+					if (ws.getHidden()) {
+						continue;
+					}
 					result = ws.findCellText(options);
 					if (result) {
 						break;
@@ -2838,6 +2841,9 @@
 					inc *= -1;
 					for (; i < end && i >= start; i += inc) {
 						ws = this.getWorksheet(i);
+						if (ws.getHidden()) {
+							continue;
+						}
 						result = ws.findCellText(options);
 						if (result) {
 							break;
