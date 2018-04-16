@@ -37,6 +37,7 @@
  * @param {undefined} undefined
  */
 	function (window, undefined) {
+	var cDate = AscCommonExcel.cDate;
 	var cErrorType = AscCommonExcel.cErrorType;
 	var cNumber = AscCommonExcel.cNumber;
 	var cBool = AscCommonExcel.cBool;
@@ -199,7 +200,7 @@
 	}
 
 	function lcl_GetCouppcd(settl, matur, freq) {
-		var n = new Date(matur);
+		var n = new cDate(matur);
 		n.setUTCFullYear(settl.getUTCFullYear());
 		if (n < settl) {
 			n.addYears(1);
@@ -227,7 +228,7 @@
 
 	function getcoupdays(settl, matur, frequency, basis) {
 		if (basis == AscCommonExcel.DayCountBasis.ActualActual) {
-			var m = lcl_GetCouppcd(settl, matur, frequency), n = new Date(m);
+			var m = lcl_GetCouppcd(settl, matur, frequency), n = new cDate(m);
 			n.addMonths(12 / frequency);
 			return AscCommonExcel.diffDate(m, n, basis);
 		}
@@ -249,21 +250,21 @@
 
 		}
 
-		return getcoupdays(new Date(settl), new Date(matur), frequency, basis) -
-			getcoupdaybs(new Date(settl), new Date(matur), frequency, basis);
+		return getcoupdays(new cDate(settl), new cDate(matur), frequency, basis) -
+			getcoupdaybs(new cDate(settl), new cDate(matur), frequency, basis);
 	}
 
 	function getcoupncd(settl, matur, frequency) {
-		var s = new Date(settl), m = new Date(matur);
+		var s = new cDate(settl), m = new cDate(matur);
 		lcl_GetCoupncd(s, m, frequency);
 		return m;
 	}
 
 	function getprice(settle, mat, rate, yld, redemp, freq, base) {
 
-		var cdays = getcoupdays(new Date(settle), new Date(mat), freq, base),
-			cnum = getcoupnum(new Date(settle), new Date(mat), freq),
-			cdaybs = getcoupdaybs(new Date(settle), new Date(mat), freq, base), cdaysnc = ( cdays - cdaybs ) / cdays,
+		var cdays = getcoupdays(new cDate(settle), new cDate(mat), freq, base),
+			cnum = getcoupnum(new cDate(settle), new cDate(mat), freq),
+			cdaybs = getcoupdaybs(new cDate(settle), new cDate(mat), freq, base), cdaysnc = ( cdays - cdaybs ) / cdays,
 			fT1 = 100 * rate / freq, fT2 = 1 + yld / freq,
 			res = redemp / ( Math.pow(1 + yld / freq, cnum - 1 + cdaysnc) );
 
@@ -332,9 +333,9 @@
 
 	function getduration(settlement, maturity, coupon, yld, frequency, basis) {
 
-		var dbc = getcoupdaybs(new Date(settlement), new Date(maturity), frequency, basis),
-			coupD = getcoupdays(new Date(settlement), new Date(maturity), frequency, basis),
-			numCoup = getcoupnum(new Date(settlement), new Date(maturity), frequency);
+		var dbc = getcoupdaybs(new cDate(settlement), new cDate(maturity), frequency, basis),
+			coupD = getcoupdays(new cDate(settlement), new cDate(maturity), frequency, basis),
+			numCoup = getcoupnum(new cDate(settlement), new cDate(maturity), frequency);
 
 		var duration = 0, p = 0;
 
@@ -369,7 +370,7 @@
 		}
 
 		function addMonth(orgDate, numMonths, returnLastDay) {
-			var newDate = new Date(orgDate);
+			var newDate = new cDate(orgDate);
 			newDate.addMonths(numMonths);
 			if (returnLastDay) {
 				newDate.setUTCDate(newDate.getDaysInMonth());
@@ -380,7 +381,7 @@
 		function coupNumber(startDate, endDate, countMonths, isWholeNumber) {
 			var my = startDate.getUTCFullYear(), mm = startDate.getUTCMonth(), md = startDate.getUTCDate(),
 				endOfMonthTemp = startDate.lastDayOfMonth(),
-				endOfMonth = (!endOfMonthTemp && mm != 1 && md > 28 && md < new Date(my, mm).getDaysInMonth()) ?
+				endOfMonth = (!endOfMonthTemp && mm != 1 && md > 28 && md < new cDate(my, mm).getDaysInMonth()) ?
 					endDate.lastDayOfMonth() : endOfMonthTemp, startDate = addMonth(endDate, 0, endOfMonth),
 				coupons = (isWholeNumber - 0) + (endDate < startDate),
 				frontDate = addMonth(startDate, countMonths, endOfMonth);
@@ -395,9 +396,9 @@
 		}
 
 		var res = 0, DSC, numMonths = 12 / frequency, numMonthsNeg = -numMonths,
-			E = getcoupdays(settl, new Date(firstCoup), frequency, basis).getValue(),
-			coupNums = getcoupnum(settl, new Date(matur), frequency),
-			dfc = positiveDaysBetween(new Date(iss), new Date(firstCoup), basis);
+			E = getcoupdays(settl, new cDate(firstCoup), frequency, basis).getValue(),
+			coupNums = getcoupnum(settl, new cDate(matur), frequency),
+			dfc = positiveDaysBetween(new cDate(iss), new cDate(firstCoup), basis);
 
 		if (dfc < E) {
 			DSC = positiveDaysBetween(settl, firstCoup, basis);
@@ -416,7 +417,7 @@
 
 		} else {
 
-			var nc = getcoupnum(iss, firstCoup, frequency), lateCoupon = new Date(firstCoup), DCdivNL = 0, AdivNL = 0,
+			var nc = getcoupnum(iss, firstCoup, frequency), lateCoupon = new cDate(firstCoup), DCdivNL = 0, AdivNL = 0,
 				startDate, endDate, earlyCoupon, NLi, DCi;
 
 			for (var index = nc; index >= 1; index--) {
@@ -427,7 +428,7 @@
 				DCi = index > 1 ? NLi : positiveDaysBetween(iss, lateCoupon, basis);
 				startDate = iss > earlyCoupon ? iss : earlyCoupon;
 				endDate = settl < lateCoupon ? settl : lateCoupon;
-				lateCoupon = new Date(earlyCoupon);
+				lateCoupon = new cDate(earlyCoupon);
 				DCdivNL += DCi / NLi;
 				AdivNL += positiveDaysBetween(startDate, endDate, basis) / NLi;
 
@@ -584,7 +585,7 @@
 		}
 
 		function addMonth(orgDate, numMonths, returnLastDay) {
-			var newDate = new Date(orgDate);
+			var newDate = new cDate(orgDate);
 			newDate.addMonths(numMonths);
 			if (returnLastDay) {
 				newDate.setUTCDate(newDate.getDaysInMonth());
@@ -592,13 +593,13 @@
 			return newDate;
 		}
 
-		var iss = Date.prototype.getDateFromExcel(issue), fInter = Date.prototype.getDateFromExcel(firstInterest),
-			settl = Date.prototype.getDateFromExcel(settlement), numMonths = 12 / frequency, numMonthsNeg = -numMonths,
+		var iss = cDate.prototype.getDateFromExcel(issue), fInter = cDate.prototype.getDateFromExcel(firstInterest),
+			settl = cDate.prototype.getDateFromExcel(settlement), numMonths = 12 / frequency, numMonthsNeg = -numMonths,
 			endMonth = fInter.lastDayOfMonth(), coupPCD, firstDate, startDate, endDate, res, days, coupDays;
 
 		if (settl > fInter && calcMethod) {
-			coupPCD = new Date(fInter);
-			startDate = endDate = new Date(settl);
+			coupPCD = new cDate(fInter);
+			startDate = endDate = new cDate(settl);
 
 			while (!(numMonths > 0 ? coupPCD >= startDate : coupPCD <= startDate)) {
 				endDate = coupPCD;
@@ -609,11 +610,11 @@
 			coupPCD = addMonth(fInter, numMonthsNeg, endMonth);
 		}
 
-		firstDate = new Date(iss > coupPCD ? iss : coupPCD);
+		firstDate = new cDate(iss > coupPCD ? iss : coupPCD);
 		days = AscCommonExcel.days360(firstDate, settl, basis);
 		coupDays = getcoupdays(coupPCD, fInter, frequency, basis).getValue();
 		res = days / coupDays;
-		startDate = new Date(coupPCD);
+		startDate = new cDate(coupPCD);
 		endDate = iss;
 
 		while (!( numMonthsNeg > 0 ? startDate >= iss : startDate <= iss )) {
@@ -716,8 +717,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var res = AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(issue),
-			Date.prototype.getDateFromExcel(settlement), basis);
+		var res = AscCommonExcel.yearFrac(cDate.prototype.getDateFromExcel(issue),
+			cDate.prototype.getDateFromExcel(settlement), basis);
 
 		res *= rate * par;
 
@@ -830,8 +831,8 @@
 			return new cNumber(0);
 		}
 
-		datePurch = Date.prototype.getDateFromExcel(datePurch);
-		firstPer = Date.prototype.getDateFromExcel(firstPer);
+		datePurch = cDate.prototype.getDateFromExcel(datePurch);
+		firstPer = cDate.prototype.getDateFromExcel(firstPer);
 
 		function findDepr(countedPeriod, depr, rate, cost) {
 
@@ -865,7 +866,7 @@
 				if ((basis == AscCommonExcel.DayCountBasis.ActualActual ||
 					basis == AscCommonExcel.DayCountBasis.Actual365) && d.isLeapYear() && d.getUTCMonth() == 2 &&
 					d.getUTCDate() >= 28) {
-					return new Date(d.getUTCFullYear(), d.getUTCMonth(), 28);
+					return new cDate(d.getUTCFullYear(), d.getUTCMonth(), 28);
 				} else {
 					return d;
 				}
@@ -1011,7 +1012,7 @@
 		period = period.getValue();
 		rate = rate.getValue();
 		basis = Math.floor(basis.getValue());
-		var val0 = Date.prototype.getDateFromExcel(datePurch), val1 = Date.prototype.getDateFromExcel(firstPer);
+		var val0 = cDate.prototype.getDateFromExcel(datePurch), val1 = cDate.prototype.getDateFromExcel(firstPer);
 		if (cost < 0 || salvage < 0 || period < 0 || rate <= 0 || basis == 2 || basis < 0 || basis > 4 ||
 			datePurch < 0 || firstPer < 0 || datePurch > firstPer || cost < salvage) {
 			return new cError(cErrorType.not_numeric);
@@ -1115,7 +1116,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		return new cNumber(getcoupdaybs(settl, matur, frequency, basis));
 
@@ -1191,7 +1192,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		return new cNumber(getcoupdays(settl, matur, frequency, basis));
 
@@ -1267,9 +1268,9 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
-		return new cNumber(getcoupdaysnc(new Date(settl), new Date(matur), frequency, basis));
+		return new cNumber(getcoupdaysnc(new cDate(settl), new cDate(matur), frequency, basis));
 
 	};
 
@@ -1343,7 +1344,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var res = new cNumber(getcoupncd(settl, matur, frequency).getExcelDate());
 		res.numFormat = 14;
@@ -1421,7 +1422,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var res = getcoupnum(settl, matur, frequency);
 
@@ -1499,7 +1500,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var n = lcl_GetCouppcd(settl, matur, frequency);
 
@@ -2017,8 +2018,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var res = ( 1 - pr / redemption ) / AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
-				Date.prototype.getDateFromExcel(maturity), basis);
+		var res = ( 1 - pr / redemption ) / AscCommonExcel.yearFrac(cDate.prototype.getDateFromExcel(settlement),
+				cDate.prototype.getDateFromExcel(maturity), basis);
 
 //    this.value.numFormat = 9;
 		return new cNumber(res);
@@ -2239,7 +2240,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		return new cNumber(getduration(settl, matur, coupon, yld, frequency, basis));
 
@@ -2513,8 +2514,8 @@
 		}
 
 		var res = ( ( redemption / investment ) - 1 ) /
-			AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
-				Date.prototype.getDateFromExcel(maturity), basis);
+			AscCommonExcel.yearFrac(cDate.prototype.getDateFromExcel(settlement),
+				cDate.prototype.getDateFromExcel(maturity), basis);
 
 		var res = new cNumber(res);
 		res.numFormat = 10;
@@ -2906,7 +2907,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var duration = getduration(settl, matur, coupon, yld, frequency, basis);
 
@@ -3362,8 +3363,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			iss = Date.prototype.getDateFromExcel(issue), firstCoup = Date.prototype.getDateFromExcel(first_coupon);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			iss = cDate.prototype.getDateFromExcel(issue), firstCoup = cDate.prototype.getDateFromExcel(first_coupon);
 
 		return new cNumber(oddFPrice(settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis))
 
@@ -3496,8 +3497,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			iss = Date.prototype.getDateFromExcel(issue), firstCoup = Date.prototype.getDateFromExcel(first_coupon);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			iss = cDate.prototype.getDateFromExcel(issue), firstCoup = cDate.prototype.getDateFromExcel(first_coupon);
 
 		var years = AscCommonExcel.diffDate(settl, matur, basis), px = pr - 100, num = rate * years * 100 - px,
 			denum = px * 0.25 * ( 1 + 2 * years ) + years * 100, guess = num / denum, x = guess, g_Eps = 1e-7,
@@ -3683,8 +3684,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			lastInt = Date.prototype.getDateFromExcel(last_interest);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			lastInt = cDate.prototype.getDateFromExcel(last_interest);
 
 		var fDCi = AscCommonExcel.yearFrac(lastInt, matur, basis) * frequency;
 		var fDSCi = AscCommonExcel.yearFrac(settl, matur, basis) * frequency;
@@ -3814,8 +3815,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			lastInt = Date.prototype.getDateFromExcel(last_interest);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			lastInt = cDate.prototype.getDateFromExcel(last_interest);
 
 		var fDCi = AscCommonExcel.yearFrac(lastInt, matur, basis) * frequency;
 		var fDSCi = AscCommonExcel.yearFrac(settl, matur, basis) * frequency;
@@ -4164,7 +4165,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		return new cNumber(getprice(settl, matur, rate, yld, redemption, frequency, basis));
 
@@ -4250,7 +4251,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var res = redemption * ( 1 - discount * AscCommonExcel.yearFrac(settl, matur, basis) );
 
@@ -4350,12 +4351,12 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			iss = Date.prototype.getDateFromExcel(issue);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			iss = cDate.prototype.getDateFromExcel(issue);
 
-		var fIssMat = AscCommonExcel.yearFrac(new Date(iss), new Date(matur), basis);
-		var fIssSet = AscCommonExcel.yearFrac(new Date(iss), new Date(settl), basis);
-		var fSetMat = AscCommonExcel.yearFrac(new Date(settl), new Date(matur), basis);
+		var fIssMat = AscCommonExcel.yearFrac(new cDate(iss), new cDate(matur), basis);
+		var fIssSet = AscCommonExcel.yearFrac(new cDate(iss), new cDate(settl), basis);
+		var fSetMat = AscCommonExcel.yearFrac(new cDate(settl), new cDate(matur), basis);
 
 		var res = 1 + fIssMat * rate;
 		res /= 1 + fSetMat * yld;
@@ -4627,8 +4628,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var res = investment / ( 1 - ( discount * AscCommonExcel.yearFrac(Date.prototype.getDateFromExcel(settlement),
-				Date.prototype.getDateFromExcel(maturity), basis) ) );
+		var res = investment / ( 1 - ( discount * AscCommonExcel.yearFrac(cDate.prototype.getDateFromExcel(settlement),
+				cDate.prototype.getDateFromExcel(maturity), basis) ) );
 
 //    this.value.numFormat = 9;
 		return res >= 0 ? new cNumber(res) : new cError(cErrorType.not_numeric);
@@ -4869,9 +4870,9 @@
 		}
 		var nMat = maturity + 1;
 
-		var d1 = Date.prototype.getDateFromExcel(settlement);
+		var d1 = cDate.prototype.getDateFromExcel(settlement);
 
-		var d2 = Date.prototype.getDateFromExcel(nMat);
+		var d2 = cDate.prototype.getDateFromExcel(nMat);
 		var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(),
 			month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
@@ -4945,8 +4946,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var d1 = Date.prototype.getDateFromExcel(settlement), d2 = Date.prototype.getDateFromExcel(maturity),
-			d3 = new Date(d1);
+		var d1 = cDate.prototype.getDateFromExcel(settlement), d2 = cDate.prototype.getDateFromExcel(maturity),
+			d3 = new cDate(d1);
 
 		d3.addYears(1);
 		if (d2 > d3) {
@@ -5016,7 +5017,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var d1 = Date.prototype.getDateFromExcel(settlement), d2 = Date.prototype.getDateFromExcel(maturity),
+		var d1 = cDate.prototype.getDateFromExcel(settlement), d2 = cDate.prototype.getDateFromExcel(maturity),
 			date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(), date2 = d2.getUTCDate(),
 			month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
@@ -5681,7 +5682,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 //    this.value.numFormat = 9;
 		return new cNumber(getYield(settl, matur, rate, pr, redemption, frequency, basis));
@@ -5768,7 +5769,7 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity);
 
 		var fRet = ( redemption / pr ) - 1;
 		fRet /= AscCommonExcel.yearFrac(settl, matur, basis);
@@ -5871,8 +5872,8 @@
 			return new cError(cErrorType.not_numeric);
 		}
 
-		var settl = Date.prototype.getDateFromExcel(settlement), matur = Date.prototype.getDateFromExcel(maturity),
-			iss = Date.prototype.getDateFromExcel(issue), res = getyieldmat(settl, matur, iss, rate, pr, basis);
+		var settl = cDate.prototype.getDateFromExcel(settlement), matur = cDate.prototype.getDateFromExcel(maturity),
+			iss = cDate.prototype.getDateFromExcel(issue), res = getyieldmat(settl, matur, iss, rate, pr, basis);
 
 		var res = new cNumber(res);
 		res.numFormat = 10;

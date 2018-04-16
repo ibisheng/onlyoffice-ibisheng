@@ -38,6 +38,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var FT_Common = AscFonts.FT_Common;
+	var cDate = AscCommonExcel.cDate;
 
 	/**
 	 * Отвечает за условное форматирование
@@ -131,7 +132,7 @@
 	};
 	CConditionalFormattingRule.prototype.getTimePeriod = function() {
 		var start, end;
-		var now = new Date();
+		var now = new cDate();
 		now.setUTCHours(0, 0, 0, 0);
 		switch (this.timePeriod) {
 			case AscCommonExcel.ST_TimePeriod.last7Days:
