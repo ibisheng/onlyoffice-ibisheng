@@ -448,6 +448,7 @@ var c_msPerDay = c_sPerDay * 1000;
 	var cNumFormatNone = -2;
 	var cNumFormatNull = -3;
 
+
 function cDate(a, b, c, d, e, f, g) {
 	//TODO переделатиь передачу аргументов через FUNCTION.bind
 	var date;
@@ -512,18 +513,18 @@ cDate.prototype.getExcelDate = function () {
 	return Math.floor( this.getExcelDateWithTime() );
 };
 
-cDate.prototype['getExcelDateWithTime'] = Date.prototype.getExcelDateWithTime = function () {
+cDate.prototype['getExcelDateWithTime'] = cDate.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
 	var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
-	if (1900 < year || (1900 == year && 1 < month)) {
-		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
-			this.getExcelNullDate() ) / c_msPerDay;
+	if(1900 === year && 0 === month && 0 === date) {
+		res = 0;
+	} else if (1900 < year || (1900 == year && 1 < month)) {
+		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay;
 	} else if (1900 == year && 1 == month && 29 == date) {
 		res = 60;
 	} else {
-		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
-			this.getExcelNullDate() ) / c_msPerDay - 1;
+		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay - 1;
 	}
 
 	return res;
@@ -570,6 +571,41 @@ cDate.prototype.addDays = function ( counts ) {
 
 cDate.prototype.lastDayOfMonth = function () {
 	return this.getDaysInMonth() == this.getUTCDate();
+};
+cDate.prototype.getUTCDate = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && 31 == date) {
+		return 0;
+	} else {
+		return date;
+	}
+};
+
+cDate.prototype.getUTCMonth = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && (30 === date || 31 === date)) {
+		return 0;
+	} else {
+		return month;
+	}
+};
+
+cDate.prototype.getUTCFullYear = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && (30 === date || 31 === date)) {
+		return 1900;
+	} else {
+		return year;
+	}
 };
 
 
