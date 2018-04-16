@@ -34,14 +34,8 @@
 
 (function (window, builder) {
 	function checkFormat(value) {
-		var res;
-		if (value instanceof Date) {
-			res = new AscCommonExcel.cNumber(value.getExcelDate() +
-				(value.getHours() * 60 * 60 + value.getMinutes() * 60 + value.getSeconds()) / AscCommonExcel.c_sPerDay)
-		} else {
-			res = new AscCommonExcel.cString(value + '');
-		}
-		return res;
+		//TODO Date не обрабатывается. в будущем нужно реализовать.
+		return new AscCommonExcel.cString(value + '');
 	}
 
 	/**
