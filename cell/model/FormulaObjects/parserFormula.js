@@ -48,6 +48,8 @@ function (window, undefined) {
   var g_oFormatParser = AscCommon.g_oFormatParser;
   var CellAddress = AscCommon.CellAddress;
 
+  var prot;
+
   var c_oAscError = Asc.c_oAscError;
 
 	var TOK_TYPE_OPERAND = 1;
@@ -448,96 +450,143 @@ var c_msPerDay = c_sPerDay * 1000;
 	var cNumFormatNone = -2;
 	var cNumFormatNull = -3;
 
-Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
-Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
 
-Date.prototype.getExcelNullDate = function () {
-  return AscCommon.bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
+function cDate() {
+	var bind = Function.bind;
+	var unbind = bind.bind(bind);
+	var date = new (unbind(Date, null).apply(null, arguments));
+	date.__proto__ = cDate.prototype;
+	return date;
+}
+
+cDate.prototype = Object.create(Date.prototype);
+cDate.prototype.constructor = cDate;
+cDate.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
+cDate.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
+
+cDate.prototype.getExcelNullDate = function () {
+	return AscCommon.bDate1904 ? cDate.prototype.excelNullDate1904 : cDate.prototype.excelNullDate1900;
 };
 
-Date.prototype.isLeapYear = function () {
-    var y = this.getUTCFullYear();
-    return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+cDate.prototype.isLeapYear = function () {
+	var y = this.getUTCFullYear();
+	return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 };
 
-Date.prototype.getDaysInMonth = function () {
+cDate.prototype.getDaysInMonth = function () {
 //    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
-  return this.isLeapYear() ? this.getDaysInMonth.L[this.getUTCMonth()] : this.getDaysInMonth.R[this.getUTCMonth()];
+	return this.isLeapYear() ? this.getDaysInMonth.L[this.getUTCMonth()] : this.getDaysInMonth.R[this.getUTCMonth()];
 };
 
 // durations of months for the regular year
-Date.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+cDate.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 // durations of months for the leap year
-Date.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+cDate.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-Date.prototype.truncate = function () {
-    this.setUTCHours( 0, 0, 0, 0 );
-    return this;
+cDate.prototype.truncate = function () {
+	this.setUTCHours( 0, 0, 0, 0 );
+	return this;
 };
 
-Date.prototype.getExcelDate = function () {
-    return Math.floor( this.getExcelDateWithTime() );
+cDate.prototype.getExcelDate = function () {
+	return Math.floor( this.getExcelDateWithTime() );
 };
 
-Date.prototype['getExcelDateWithTime'] = Date.prototype.getExcelDateWithTime = function () {
+cDate.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
-    var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
+	var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
-  if (1900 < year || (1900 == year && 1 < month)) {
-    res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
-      this.getExcelNullDate() ) / c_msPerDay;
-  } else if (1900 == year && 1 == month && 29 == date) {
-        res = 60;
-  } else {
-    res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
-      this.getExcelNullDate() ) / c_msPerDay - 1;
-  }
+	if(1900 === year && 0 === month && 0 === date) {
+		res = 0;
+	} else if (1900 < year || (1900 == year && 1 < month)) {
+		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay;
+	} else if (1900 == year && 1 == month && 29 == date) {
+		res = 60;
+	} else {
+		res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) - this.getExcelNullDate() ) / c_msPerDay - 1;
+	}
 
-    return res;
+	return res;
 };
 
-Date.prototype.getDateFromExcel = function ( val ) {
+cDate.prototype.getDateFromExcel = function ( val ) {
 
-    val = Math.floor( val );
+	val = Math.floor( val );
 
-  return this.getDateFromExcelWithTime(val);
+	return this.getDateFromExcelWithTime(val);
 };
 
-Date.prototype.getDateFromExcelWithTime = function ( val ) {
+cDate.prototype.getDateFromExcelWithTime = function ( val ) {
 	if (AscCommon.bDate1904) {
-		return new Date( val * c_msPerDay + this.getExcelNullDate() );
+		return new cDate( val * c_msPerDay + this.getExcelNullDate() );
 	} else {
 		if ( val < 60 ) {
-			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+			return new cDate( val * c_msPerDay + this.getExcelNullDate() );
 		} else if (val === 60) {
-			return new Date( Date.UTC( 1900, 1, 29 ) );
+			return new cDate( Date.UTC( 1900, 1, 29 ) );
 		} else {
-			return new Date( val * c_msPerDay + this.getExcelNullDate() );
+			return new cDate( val * c_msPerDay + this.getExcelNullDate() );
 		}
 	}
 };
 
-Date.prototype.addYears = function ( counts ) {
-    this.setUTCFullYear( this.getUTCFullYear() + Math.floor( counts ) );
+cDate.prototype.addYears = function ( counts ) {
+	this.setUTCFullYear( this.getUTCFullYear() + Math.floor( counts ) );
 };
 
-Date.prototype.addMonths = function ( counts ) {
-    if ( this.lastDayOfMonth() ) {
-        this.setUTCDate( 1 );
-        this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
-        this.setUTCDate( this.getDaysInMonth() );
-  } else {
-        this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
-    }
+cDate.prototype.addMonths = function ( counts ) {
+	if ( this.lastDayOfMonth() ) {
+		this.setUTCDate( 1 );
+		this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
+		this.setUTCDate( this.getDaysInMonth() );
+	} else {
+		this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
+	}
 };
 
-Date.prototype.addDays = function ( counts ) {
-    this.setUTCDate( this.getUTCDate() + Math.floor( counts ) );
+cDate.prototype.addDays = function ( counts ) {
+	this.setUTCDate( this.getUTCDate() + Math.floor( counts ) );
 };
 
-Date.prototype.lastDayOfMonth = function () {
-    return this.getDaysInMonth() == this.getUTCDate();
+cDate.prototype.lastDayOfMonth = function () {
+	return this.getDaysInMonth() == this.getUTCDate();
 };
+cDate.prototype.getUTCDate = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && 31 == date) {
+		return 0;
+	} else {
+		return date;
+	}
+};
+
+cDate.prototype.getUTCMonth = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && (30 === date || 31 === date)) {
+		return 0;
+	} else {
+		return month;
+	}
+};
+
+cDate.prototype.getUTCFullYear = function () {
+	var year = Date.prototype.getUTCFullYear.call(this);
+	var month = Date.prototype.getUTCMonth.call(this);
+	var date = Date.prototype.getUTCDate.call(this);
+
+	if(1899 == year && 11 == month && (30 === date || 31 === date)) {
+		return 1900;
+	} else {
+		return year;
+	}
+};
+
 
 Math.sinh = function ( arg ) {
     return (this.pow( this.E, arg ) - this.pow( this.E, -arg )) / 2;
@@ -6435,9 +6484,9 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMet
         if ( nDay1 == 30 && nDay2 == 31 ) {
             nDay2--;
     } else {
-            if ( nMonth1 == 2 && nDay1 == ( new Date( nYear1, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
+            if ( nMonth1 == 2 && nDay1 == ( new cDate( nYear1, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
                 nDay1 = 30;
-                if ( nMonth2 == 2 && nDay2 == ( new Date( nYear2, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
+                if ( nMonth2 == 2 && nDay2 == ( new cDate( nYear2, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
                     nDay2 = 30;
                 }
             }
@@ -6830,4 +6879,9 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].getArrayMax = getArrayMax;
 	window['AscCommonExcel'].getArrayMin = getArrayMin;
 	window['AscCommonExcel'].compareFormula = compareFormula;
+	window['AscCommonExcel'].cDate = cDate;
+
+	window["Asc"]["cDate"] = window["Asc"].cDate = cDate;
+	prot									     = cDate.prototype;
+	prot["getExcelDateWithTime"]	             = prot.getExcelDateWithTime;
 })(window);
