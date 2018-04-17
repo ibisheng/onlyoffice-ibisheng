@@ -1273,6 +1273,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
         if (true === this.Cursor_Is_Start() || true === this.Cursor_Is_End())
         {
             this.SelectAll();
+            this.SelectThisElement(1);
         }
         else
         {

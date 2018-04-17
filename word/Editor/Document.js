@@ -1357,7 +1357,7 @@ function CSelectedElementsInfo()
 	this.m_oField           = null;  // Поле, в котором находится выделение
 	this.m_oCell            = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
 	this.m_oBlockLevelSdt   = null;  // Если мы находимся в классе CBlockLevelSdt
-	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt (важно, что мы находимся внутри класса)
 	this.m_arrComplexFields = [];
 	this.m_oPageNum         = null;
 	this.m_oPagesCount      = null;
@@ -1442,6 +1442,9 @@ CSelectedElementsInfo.prototype.SetBlockLevelSdt = function(oSdt)
 {
 	this.m_oBlockLevelSdt = oSdt;
 };
+/**
+ * @returns {?CBlockLevelSdt}
+ */
 CSelectedElementsInfo.prototype.GetBlockLevelSdt = function()
 {
 	return this.m_oBlockLevelSdt;
@@ -1450,6 +1453,9 @@ CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
 {
 	this.m_oInlineLevelSdt = oSdt;
 };
+/**
+ * @returns {?CInlineLevelSdt}
+ */
 CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
 {
 	return this.m_oInlineLevelSdt;
@@ -6563,7 +6569,38 @@ CDocument.prototype.OnKeyDown = function(e)
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
-            this.Remove(-1, true);
+
+            var oSelectInfo = this.GetSelectedElementsInfo();
+            if (oSelectInfo.GetInlineLevelSdt())
+			{
+				var oSdt = oSelectInfo.GetInlineLevelSdt();
+				var sDefaultText = AscCommon.translateManager.getValue('Your text here');
+				var sText        = oSdt.GetSelectedText(true, false);
+
+				oSdt.Remove(-1, false);
+				if (oSdt.IsEmpty())
+				{
+					if (sText === sDefaultText)
+					{
+						oSdt.RemoveContentControlWrapper();
+					}
+					else
+					{
+						oSdt.ReplaceAllWithText(sDefaultText);
+						oSdt.SelectAll();
+						oSdt.SelectThisElement(1);
+					}
+				}
+
+				this.Recalculate();
+
+				this.Document_UpdateInterfaceState();
+				this.Document_UpdateRulersState();
+			}
+			else
+			{
+				this.Remove(-1, true);
+			}
         }
         bRetValue = keydownresult_PreventAll;
     }
@@ -6986,7 +7023,38 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true, this.IsFormFieldEditing()))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DeleteButton);
-                this.Remove(1, true);
+
+				var oSelectInfo = this.GetSelectedElementsInfo();
+				if (oSelectInfo.GetInlineLevelSdt())
+				{
+					var oSdt = oSelectInfo.GetInlineLevelSdt();
+					var sDefaultText = AscCommon.translateManager.getValue('Your text here');
+					var sText        = oSdt.GetSelectedText(true, false);
+
+					oSdt.Remove(1, false);
+					if (oSdt.IsEmpty())
+					{
+						if (sText === sDefaultText)
+						{
+							oSdt.RemoveContentControlWrapper();
+						}
+						else
+						{
+							oSdt.ReplaceAllWithText(sDefaultText);
+							oSdt.SelectAll();
+							oSdt.SelectThisElement(1);
+						}
+					}
+
+					this.Recalculate();
+
+					this.Document_UpdateInterfaceState();
+					this.Document_UpdateRulersState();
+				}
+				else
+				{
+					this.Remove(1, true);
+				}
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -8437,6 +8505,10 @@ CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection, bReturnSele
 		return this.Controller.GetCurrentParagraph(bIgnoreSelection, null);
 	}
 };
+/**
+ * Получаем информацию о текущем выделении
+ * @returns {CSelectedElementsInfo}
+ */
 CDocument.prototype.GetSelectedElementsInfo = function()
 {
 	var oInfo = new CSelectedElementsInfo();
