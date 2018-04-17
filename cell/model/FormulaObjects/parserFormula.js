@@ -449,37 +449,14 @@ var c_msPerDay = c_sPerDay * 1000;
 	var cNumFormatNull = -3;
 
 
-function cDate(a, b, c, d, e, f, g) {
-	//TODO переделатиь передачу аргументов через FUNCTION.bind
-	var date;
-	switch (arguments.length) {
-		case 0:
-			date = new Date();
-			break;
-		case 1:
-			date = new Date(a);
-			break;
-		case 2:
-			date = new Date(a, b);
-			break;
-		case 3:
-			date = new Date(a, b, c);
-			break;
-		case 4:
-			date = new Date(a, b, c, d);
-			break;
-		case 5:
-			date = new Date(a, b, c, d, e);
-			break;
-		case 6:
-			date = new Date(a, b, c, d, e, f);
-			break;
-		default:
-			date = new Date(a, b, c, d, e, f, g);
-	}
+function cDate() {
+	var bind = Function.bind;
+	var unbind = bind.bind(bind);
+	var date = new (unbind(Date, null).apply(null, arguments));
 	date.__proto__ = cDate.prototype;
 	return date;
 }
+
 cDate.prototype = Object.create(Date.prototype);
 cDate.prototype.constructor = cDate;
 cDate.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
