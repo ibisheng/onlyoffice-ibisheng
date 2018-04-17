@@ -32,6 +32,8 @@
 
 $( function () {
 
+	var cDate = Asc.cDate;
+
     function toFixed( n ) {
         return n;//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
     }
