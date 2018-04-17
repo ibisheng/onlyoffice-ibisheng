@@ -1120,7 +1120,7 @@
 		var t = cBoolLocal.t = local['t'].toUpperCase();
 		var f = cBoolLocal.f = local['f'].toUpperCase();
 
-		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
+		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),}]|$)", "i");
 	}
 
 	function build_rx_error(local)
