@@ -1941,7 +1941,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2, text_data)
 	{
-	    if (this.getViewMode())
+	    if (!this.canEdit())
     	    return;
 
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, true, false)) {
@@ -1997,7 +1997,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_SelectionCut = function()
 	{
-	    if (this.getViewMode())
+	    if (!this.canEdit())
             return;
 		var _logicDoc = this.WordControl.m_oLogicDocument;
 		if (!_logicDoc)

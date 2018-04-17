@@ -393,6 +393,10 @@
 	{
 		return this.isViewMode;
 	};
+	baseEditorsApi.prototype.canEdit                         = function()
+	{
+		return !this.isViewMode && this.restrictions === Asc.c_oAscRestrictionType.None;
+	};
 	baseEditorsApi.prototype.isRestrictionForms              = function()
 	{
 		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyForms);

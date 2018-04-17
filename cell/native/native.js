@@ -4798,7 +4798,7 @@ function OfflineEditor () {
             return val * ascCvtRatio(0, 3);
         }
 
-        if (imageUrl && !objectRender.isViewerMode()) {
+        if (imageUrl && objectRender.canEdit()) {
 
             var _image = new Image();
             _image.src = imageUrl
@@ -5490,7 +5490,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
 
-    var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+    var ct = ws.getCursorTypeFromXY(x, y);
     if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
         ws.af_setDialogProp(ct.idFilter);
         //var cell = offline_get_cell_in_coord(x, y);
@@ -5501,7 +5501,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
         if (!isViewerMode) {
 
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             ws.startCellMoveResizeRange = null;
 
@@ -5565,7 +5565,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
 
     if (isRangeResize) {
         if (!isViewerMode) {
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             var rangeChange = new window["Asc"].Range(c1, r1, c2, r2);
             var target = {
@@ -7267,9 +7267,8 @@ window["native"]["offline_apply_event"] = function(type,params) {
         {
             var cellX = params[0];
             var cellY = params[1];
-            var isViewerMode = false;
             var ws = _api.wb.getWorksheet();
-            var ct = ws.getCursorTypeFromXY(cellX, cellY, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(cellX, cellY);
 
             var curIndex = _api.asc_getActiveWorksheetIndex();
 

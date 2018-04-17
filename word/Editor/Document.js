@@ -16362,14 +16362,7 @@ CDocument.prototype.IsViewModeInEditor = function()
 };
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode()
-		|| this.IsEditCommentsMode()
-		|| this.IsFillingFormMode()
-		|| this.IsEditSignaturesMode()
-		|| this.IsViewModeInEditor())
-		return false;
-
-	return true;
+	return this.Api.canEdit();
 };
 CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
 {

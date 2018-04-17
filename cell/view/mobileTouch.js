@@ -149,7 +149,7 @@ function (window, undefined)
 			var _coords = this.WB.ConvertLogicToXY(x, y);
 
 			AscCommon.global_mouseEvent.KoefPixToMM = 5;
-			var _cursor = this.WB.getWorksheet().getCursorTypeFromXY(_coords.X, _coords.Y, this.Api.isViewMode);
+			var _cursor = this.WB.getWorksheet().getCursorTypeFromXY(_coords.X, _coords.Y);
 			AscCommon.global_mouseEvent.KoefPixToMM = 1;
 			if (_cursor.target == AscCommonExcel.c_oTargetType.MoveResizeRange)
 				return true;

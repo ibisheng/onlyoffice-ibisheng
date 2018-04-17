@@ -57,7 +57,6 @@
 				vscrollStep: 10,
 				hscrollStep: 10,
 				scrollTimeout: 20,
-				isViewerMode: false,
 				wheelScrollLinesV: 3
 			};
 
@@ -206,14 +205,9 @@
 			this.isCellEditMode = !!flag;
 		};
 
-		/** @param isViewerMode {Boolean} */
-		asc_CEventsController.prototype.setViewerMode = function (isViewerMode) {
-			this.settings.isViewerMode = !!isViewerMode;
-		};
-
-		/** @return isViewerMode {Boolean} */
-		asc_CEventsController.prototype.getViewerMode = function () {
-			return this.settings.isViewerMode;
+		/** @return {Boolean} */
+		asc_CEventsController.prototype.canEdit = function () {
+			return this.handlers.trigger('canEdit');
 		};
 
 		asc_CEventsController.prototype.setFocus = function (hasFocus) {
@@ -293,7 +287,7 @@
 			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 
 			// Для формулы не нужно выходить из редактирования ячейки
-			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
+			if (!this.canEdit() || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
 
 			if(this.targetInfo && (this.targetInfo.target == c_oTargetType.MoveResizeRange ||
 				this.targetInfo.target == c_oTargetType.MoveRange ||
@@ -657,7 +651,7 @@
 
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
-			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode, action = false;
+			var t = this, dc = 0, dr = 0, canEdit = this.canEdit(), action = false;
 			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var shiftKey = event.shiftKey;
 
@@ -713,7 +707,7 @@
 					return result;
 
 				case 113: // F2
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+					if (!canEdit || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
 						return true;
 					}
 					if (AscBrowser.isOpera) {
@@ -727,7 +721,7 @@
 					return result;
 
 				case 8: // backspace
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+					if (!canEdit || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
 						return true;
 					}
 					stop();
@@ -738,7 +732,7 @@
 					return true;
 
 				case 46: // Del
-					if (isViewerMode || this.handlers.trigger("getCellEditMode") || this.isSelectionDialogMode || shiftKey) {
+					if (!canEdit || this.handlers.trigger("getCellEditMode") || this.isSelectionDialogMode || shiftKey) {
 						return true;
 					}
 					// Удаляем содержимое
@@ -857,7 +851,7 @@
 				case 40: // down
 					stop();                          // Отключим стандартную обработку браузера нажатия down
 					// Обработка Alt + down
-					if (!isViewerMode && !t.handlers.trigger("getCellEditMode") && !t.isSelectionDialogMode && event.altKey) {
+					if (canEdit && !t.handlers.trigger("getCellEditMode") && !t.isSelectionDialogMode && event.altKey) {
 						t.handlers.trigger("showAutoComplete");
 						return result;
 					}
@@ -899,7 +893,7 @@
 				case 89:  // redo					Ctrl + y
 				case 90:  // undo					Ctrl + z
 				case 192: // set general format 	Ctrl + Shift + ~
-					if (isViewerMode || t.isSelectionDialogMode) {
+					if (!canEdit || t.isSelectionDialogMode) {
 						return true;
 					}
 
@@ -1003,7 +997,7 @@
 
 				case 61:  // Firefox, Opera (+/=)
 				case 187: // +/=
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+					if (!canEdit || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
 						return true;
 					}
 
@@ -1077,7 +1071,7 @@
 			// не вводим текст в режиме просмотра
 			// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 			// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
-			if (this.settings.isViewerMode || this.isSelectionDialogMode) {
+			if (!this.canEdit() || this.isSelectionDialogMode) {
 				return true;
 			}
 
@@ -1351,12 +1345,12 @@
 						t.isResizeMode = true;
 						t._resizeElement(event);
 						return;
-					} else if (t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.target === c_oTargetType.FillHandle && this.canEdit()) {
 						// В режиме автозаполнения
 						this.isFillHandleMode = true;
 						t._changeFillHandle(event);
 						return;
-					} else if (t.targetInfo.target === c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.target === c_oTargetType.MoveRange && this.canEdit()) {
 						// В режиме перемещения диапазона
 						this.isMoveRangeMode = true;
 						t._moveRangeHandle(event);
@@ -1364,14 +1358,14 @@
 					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
 						t._autoFiltersClick(t.targetInfo.idFilter);
 						return;
-					} else if (t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.commentIndexes && this.canEdit()) {
 						t._commentCellClick(event);
-					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && this.canEdit()) {
 						this.isMoveResizeRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
 					} else if ((t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
-						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
+						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && this.canEdit()) {
 						// Режим установки закреплённых областей
 						this.frozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, this.frozenAnchorMode);
@@ -1392,7 +1386,7 @@
 						if (t.isFormulaEditMode) {
 							// !!! в зависимости от цели делаем разные действия - либо селектим область либо мувим существующий диапазон
 							if (t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange &&
-								false === this.settings.isViewerMode) {
+								this.canEdit()) {
 								this.isMoveResizeRange = true;
 								t._moveResizeRangeHandle(event, t.targetInfo);
 								return;
@@ -1426,8 +1420,7 @@
 				this.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
 				this.handlers.trigger('onContextMenu', event);
 			} else {
-				if (this.targetInfo && this.targetInfo.target === c_oTargetType.FillHandle &&
-					false === this.settings.isViewerMode) {
+				if (this.targetInfo && this.targetInfo.target === c_oTargetType.FillHandle && this.canEdit()) {
 					// В режиме автозаполнения
 					this.isFillHandleMode = true;
 					this._changeFillHandle(event);

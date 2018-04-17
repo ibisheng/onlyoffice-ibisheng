@@ -2678,7 +2678,7 @@
 	/** @param event {jQuery.Event} */
 	CellEditor.prototype._onInputTextArea = function (event) {
 		var t = this;
-		if (this.handlers.trigger("isViewerMode") || this.loadFonts) {
+		if (!this.handlers.trigger("canEdit") || this.loadFonts) {
 			return true;
 		}
 		this.loadFonts = true;

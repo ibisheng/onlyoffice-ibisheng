@@ -353,6 +353,8 @@
 				  return self._onStopCellEditing.apply(self, arguments);
 			  }, "getCellEditMode": function () {
 				  return self.isCellEditMode;
+			  }, "canEdit": function () {
+				  return self.Api.canEdit();
 			  }, "empty": function () {
 				  self._onEmpty.apply(self, arguments);
 			  }, "canEnterCellRange": function () {
@@ -472,7 +474,7 @@
       if (this.input && this.input.addEventListener) {
         this.input.addEventListener("focus", function () {
           self.input.isFocused = true;
-          if (self.Api.isViewMode) {
+          if (!self.Api.canEdit()) {
             return;
           }
           self._onStopFormatPainter();
@@ -641,8 +643,8 @@
 				  self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
 			  }, "applyCloseEvent": function () {
 				  self.controller._onWindowKeyDown.apply(self.controller, arguments);
-			  }, "isViewerMode": function () {
-				  return self.Api.isViewMode;
+			  }, "canEdit": function () {
+				  return self.Api.canEdit();
 			  }, "getFormulaRanges": function () {
 				  return (self.cellFormulaEnterWSOpen || self.getWorksheet()).getFormulaRanges();
 			  }, "getCellFormulaEnterWSOpen": function () {
@@ -661,8 +663,8 @@
 		  });
 
 	  this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
-		  "getViewerMode": function () {
-			  return self.controller.getViewerMode ? self.controller.getViewerMode() : true;
+		  "canEdit": function () {
+			  return self.Api.canEdit();
 		  }, "reinitializeScroll": function () {
 			  self._onScrollReinitialize(/*All*/);
 		  }, "reinitializeScrollY": function () {
@@ -1026,7 +1028,7 @@
     // Нужно очистить поиск
     this.model.cleanFindResults();
 
-    var ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
+    var ct = ws.getCursorTypeFromXY(x, y);
 
     if (c_oTargetType.Hyperlink === ct.target) {
       // Проверим замерженность
@@ -1083,7 +1085,7 @@
     } else if (x === undefined && y === undefined) {
       ws.cleanHighlightedHeaders();
     } else {
-      ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
+      ct = ws.getCursorTypeFromXY(x, y);
 
       // Отправление эвента об удалении всего листа (именно удалении, т.к. если просто залочен, то не рисуем рамку вокруг)
       if (undefined !== ct.userIdAllSheet) {
@@ -1329,7 +1331,7 @@
   // Double click
   WorkbookView.prototype._onMouseDblClick = function(x, y, isHideCursor, callback) {
     var ws = this.getWorksheet();
-    var ct = ws.getCursorTypeFromXY(x, y, this.Api.isViewMode);
+    var ct = ws.getCursorTypeFromXY(x, y);
 
     if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
       ct.target === c_oTargetType.ColumnResize ? ws.autoFitColumnWidth(ct.col, ct.col) : ws.autoFitRowHeight(ct.row, ct.row);

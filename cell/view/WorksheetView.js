@@ -5813,7 +5813,8 @@
         } : null;
     };
 
-	WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
+	WorksheetView.prototype.getCursorTypeFromXY = function (x, y) {
+	    var canEdit = this.handlers.trigger('canEdit');
 		this.handlers.trigger("checkLastWork");
 		var res, c, r, f, i, offsetX, offsetY, cellCursor;
 		var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
@@ -5822,7 +5823,7 @@
 
 		if (c_oAscSelectionDialogType.None === this.selectionDialogType) {
 			var frozenCursor = this._isFrozenAnchor(x, y);
-			if (!isViewerMode && frozenCursor.result) {
+			if (canEdit && frozenCursor.result) {
 				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
 					AscCommonExcel.c_oAscLockNameFrozenPane);
 				isLocked =
@@ -5927,7 +5928,7 @@
 				return oResDefault;
 			}
 			isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
-			f = !isViewerMode && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
+			f = canEdit && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
 			// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 			return {
 				cursor: f ? kCurRowResize : kCurRowSelect,
@@ -5943,7 +5944,7 @@
 				return oResDefault;
 			}
 			isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
-			f = !isViewerMode && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
+			f = canEdit && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
 			// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 			return {
 				cursor: f ? kCurColResize : kCurColSelect,
@@ -5982,7 +5983,7 @@
 		}
 
 		isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-		if (!isViewerMode && !isSelGraphicObject && this.model.selectionRange.isSingleRange() &&
+		if (canEdit && !isSelGraphicObject && this.model.selectionRange.isSingleRange() &&
 			c_oAscSelectionDialogType.None === this.selectionDialogType) {
 			this._drawElements(function (_vr, _offsetX, _offsetY) {
 				return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
@@ -6005,7 +6006,7 @@
 			var lockAllPosTop = undefined;
 			var userIdAllProps = undefined;
 			var userIdAllSheet = undefined;
-			if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
+			if (canEdit && this.collaborativeEditing.getCollaborativeEditing()) {
 				var c1Recalc = null, r1Recalc = null;
 				var selectRangeRecalc = new asc_Range(c.col, r.row, c.col, r.row);
 				// Пересчет для входящих ячеек в добавленные строки/столбцы
@@ -6070,7 +6071,7 @@
 				}
 			}
 
-			if (!isViewerMode) {
+			if (canEdit) {
 				var pivotButtons = this.model.getPivotTableButtons(new asc_Range(c.col, r.row, c.col, r.row));
 				var isPivot = pivotButtons.some(function (element) {
 					return element.row === r.row && element.col === c.col;
@@ -11142,10 +11143,10 @@
 				this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
 		};
 
-	WorksheetView.prototype.findCell = function (reference, isViewMode) {
+	WorksheetView.prototype.findCell = function (reference) {
 		var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
 
-		if (0 === ranges.length && !isViewMode) {
+		if (0 === ranges.length && this.handlers.trigger('canEdit')) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
 			if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
 				this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);

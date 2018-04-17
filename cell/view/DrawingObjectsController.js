@@ -241,7 +241,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
-    if(this.drawingObjects.isViewerMode()){
+    if(!this.drawingObjects.canEdit()){
         return;
     }
     var selection_state = this.getSelectionState();
@@ -515,9 +515,9 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.startRecalculate();
 };
 
-DrawingObjectsController.prototype.isViewMode= function()
+DrawingObjectsController.prototype.canEdit = function()
 {
-    return this.drawingObjects.isViewerMode();
+    return this.drawingObjects.canEdit();
 };
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
@@ -624,7 +624,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
 
 DrawingObjectsController.prototype.onKeyPress = function(e)
 {
-    if ( true === this.isViewMode())
+    if (!this.canEdit())
         return false;
     if(e.CtrlKey || e.AltKey)
         return false;

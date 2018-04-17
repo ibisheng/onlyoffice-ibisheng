@@ -355,8 +355,8 @@ CCellCommentator.sStartCommentId = 'comment_';
 // Public methods
 //-----------------------------------------------------------------------------------
 
-CCellCommentator.prototype.isViewerMode = function () {
-	return this.worksheet.handlers.trigger("getViewerMode");
+CCellCommentator.prototype.canEdit = function () {
+	return this.worksheet.handlers.trigger('canEdit');
 };
 CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 	var objectGuid = oComment.asc_getId();
@@ -431,7 +431,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 
 	CCellCommentator.prototype.drawCommentCells = function () {
 
-		if (this.isViewerMode() || this.hiddenComments()) {
+		if (!this.canEdit() || this.hiddenComments()) {
 			return;
 		}
 

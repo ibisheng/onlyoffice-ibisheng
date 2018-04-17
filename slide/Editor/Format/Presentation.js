@@ -838,10 +838,7 @@ CPresentation.prototype =
 
     CanEdit: function()
     {
-        if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsEditSignaturesMode() || this.IsViewModeInEditor())
-            return false;
-
-        return true;
+        return this.Api.canEdit();
     },
 
 
