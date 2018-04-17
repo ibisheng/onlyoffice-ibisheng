@@ -82,7 +82,6 @@
 			this.isSelectMode = false;
 			this.hasCursor = false;
 			this.hasFocus = false;
-			this.isCellEditMode = undefined;
 			this.skipKeyPress = undefined;
 			this.strictClose = false;
 			this.lastKeyCode = undefined;
@@ -198,11 +197,6 @@
 		/** @param flag {Boolean} */
 		asc_CEventsController.prototype.enableKeyEventsHandler = function (flag) {
 			this.enableKeyEvents = !!flag;
-		};
-
-		/** @param flag {Boolean} */
-		asc_CEventsController.prototype.setCellEditMode = function (flag) {
-			this.isCellEditMode = !!flag;
 		};
 
 		/** @return {Boolean} */

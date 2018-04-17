@@ -6179,7 +6179,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
     var openEditor = function (res) {
         if (res) {
             // Выставляем переменные, что мы редактируем
-            // t.controller.setCellEditMode(true);
             ws.setCellEditMode(true);
 
             ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
@@ -6189,7 +6188,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
             if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
                 /*activeRange*/arn)) {
                 ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
-                // t.controller.setCellEditMode(false);
                 // t.controller.setStrictClose(false);
                 // t.controller.setFormulaEditMode(false);
                 ws.setCellEditMode(false);
@@ -6202,7 +6200,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
                 wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 
         } else {
-            //t.controller.setCellEditMode(false);
             //t.controller.setStrictClose(false);
             //t.controller.setFormulaEditMode(false);
             ws.setCellEditMode(false);
