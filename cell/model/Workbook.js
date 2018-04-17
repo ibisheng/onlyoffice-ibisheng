@@ -3653,7 +3653,7 @@
 		var redrawTablesArr = this.autoFilters.insertRows("insCell", oActualRange, c_oAscInsertOptions.InsertColumns);
 		this.updatePivotOffset(oActualRange, offset);
 
-		this._updateFormulasParents(index + count, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(index, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
 		//insert new row/cell
 		this.rowsData.insertRange(index, count);
 		this._forEachColData(function(sheetMemory) {
@@ -3756,7 +3756,7 @@
 		var redrawTablesArr = this.autoFilters.insertColumn(oActualRange, count);
 		this.updatePivotOffset(oActualRange, offset);
 
-		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
+		this._updateFormulasParents(0, index, gc_nMaxRow0, gc_nMaxCol0, offset);
 		//remove tail
 		this.cellsByCol.splice(gc_nMaxCol0 - count + 1, count);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
