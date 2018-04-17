@@ -16175,7 +16175,7 @@ CDocument.prototype.GetAllFormTextFields = function()
 };
 CDocument.prototype.IsFillingFormMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
+	return this.Api.isRestrictionForms();
 };
 CDocument.prototype.IsInFormField = function()
 {
@@ -16346,19 +16346,19 @@ CDocument.prototype.IsCheckContentControlsLock = function()
 };
 CDocument.prototype.IsEditCommentsMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+	return this.Api.isRestrictionComments();
 };
 CDocument.prototype.IsViewMode = function()
 {
-	return this.Api.isViewMode;
+	return this.Api.getViewMode();
 };
 CDocument.prototype.IsEditSignaturesMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+	return this.Api.isRestrictionSignatures();
 };
 CDocument.prototype.IsViewModeInEditor = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+	return this.Api.isRestrictionView();
 };
 CDocument.prototype.CanEdit = function()
 {

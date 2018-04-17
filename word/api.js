@@ -1140,7 +1140,7 @@ background-repeat: no-repeat;\
 		if (this.WordControl.MobileTouchManager)
 			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
 
-		if (this.restrictions == Asc.c_oAscRestrictionType.OnlyForms || this.restrictions == Asc.c_oAscRestrictionType.OnlyComments)
+		if (this.isRestrictionForms() || this.isRestrictionComments())
 		{
 			this.ShowParaMarks = false;
 			this.WordControl.HideRulers();
@@ -3588,7 +3588,7 @@ background-repeat: no-repeat;\
 		 }
 		 */
 
-		if (this.restrictions == Asc.c_oAscRestrictionType.OnlyForms || this.restrictions == Asc.c_oAscRestrictionType.OnlyComments)
+		if (this.isRestrictionForms() || this.isRestrictionComments())
 			isShow = false;
 
 		this.ShowParaMarks = isShow;

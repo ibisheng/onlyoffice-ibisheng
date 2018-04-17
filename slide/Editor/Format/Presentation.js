@@ -824,16 +824,16 @@ CPresentation.prototype =
 
     IsEditCommentsMode: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+        return this.Api.isRestrictionComments();
     },
 
     IsEditSignaturesMode: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+        return this.Api.isRestrictionSignatures();
     },
     IsViewModeInEditor: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+        return this.Api.isRestrictionView();
     },
 
     CanEdit: function()
