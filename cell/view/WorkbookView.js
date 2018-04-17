@@ -355,6 +355,8 @@
 				  return self.isCellEditMode;
 			  }, "canEdit": function () {
 				  return self.Api.canEdit();
+			  }, "isRestrictionComments": function () {
+				  return self.Api.isRestrictionComments();
 			  }, "empty": function () {
 				  self._onEmpty.apply(self, arguments);
 			  }, "canEnterCellRange": function () {
@@ -665,6 +667,8 @@
 	  this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
 		  "canEdit": function () {
 			  return self.Api.canEdit();
+		  }, "isRestrictionComments": function () {
+			  return self.Api.isRestrictionComments();
 		  }, "reinitializeScroll": function () {
 			  self._onScrollReinitialize(/*All*/);
 		  }, "reinitializeScrollY": function () {

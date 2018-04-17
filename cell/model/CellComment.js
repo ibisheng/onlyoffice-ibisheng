@@ -431,7 +431,7 @@ CCellCommentator.prototype.deleteCommentsRange = function(range) {
 
 	CCellCommentator.prototype.drawCommentCells = function () {
 
-		if (!this.canEdit() || this.hiddenComments()) {
+		if (!(this.canEdit() || this.worksheet.handlers.trigger('isRestrictionComments')) || this.hiddenComments()) {
 			return;
 		}
 

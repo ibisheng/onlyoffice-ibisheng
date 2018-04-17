@@ -9,6 +9,7 @@ Ability to add/change hyperlinks anchored to bookmarks/headings
 * 
 
 ### Spreadsheet Editor
+* Add support comment mode
 * The following functions are added: GetRows, GetCols, GetCount, GetHidden, SetHidden, GetColumnWidth, SetColumnWidth, GetRowHeight, SetRowHeight, GetWpar, SetOffset, 
 GetAdress, SetLeftMargin, GetLeftMargin, SetRightMargin, GetRightMargin, SetTopMargin, GetTopMargin, SetBottomMargin, GetBottomMargin, SetPageOrientation, GetPageOrientation,
 GetSelection

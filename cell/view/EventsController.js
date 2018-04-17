@@ -889,10 +889,14 @@
 				case 73:  // make italic			Ctrl + i
 				//case 83: // save					Ctrl + s
 				case 85:  // make underline			Ctrl + u
-				case 89:  // redo					Ctrl + y
-				case 90:  // undo					Ctrl + z
 				case 192: // set general format 	Ctrl + Shift + ~
 					if (!canEdit || t.isSelectionDialogMode) {
+						return true;
+					}
+
+				case 89:  // redo					Ctrl + y
+				case 90:  // undo					Ctrl + z
+					if (!(canEdit || t.handlers.trigger('isRestrictionComments'))|| t.isSelectionDialogMode) {
 						return true;
 					}
 
