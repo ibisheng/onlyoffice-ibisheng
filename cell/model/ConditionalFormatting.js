@@ -38,7 +38,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var FT_Common = AscFonts.FT_Common;
-	var cDate = AscCommonExcel.cDate;
+	var cDate = Asc.cDate;
 
 	/**
 	 * Отвечает за условное форматирование

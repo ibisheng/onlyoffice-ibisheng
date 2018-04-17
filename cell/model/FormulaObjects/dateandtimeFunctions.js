@@ -36,7 +36,7 @@
  * @param {undefined} undefined
  */
 	function (window, undefined) {
-	var cDate = AscCommonExcel.cDate;
+	var cDate = Asc.cDate;
 	var g_oFormatParser = AscCommon.g_oFormatParser;
 
 	var cErrorType = AscCommonExcel.cErrorType;

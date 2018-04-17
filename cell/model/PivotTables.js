@@ -281,7 +281,7 @@ var c_oAscAllocationMethod = {
 };
 
 var st_VALUES = -2;
-var cDate = AscCommonExcel.cDate;
+var cDate = Asc.cDate;
 
 function FromXml_ST_SourceType(val) {
 	var res = -1;

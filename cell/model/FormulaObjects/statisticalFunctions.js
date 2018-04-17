@@ -37,7 +37,7 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
-	var cDate = AscCommonExcel.cDate;
+	var cDate = Asc.cDate;
 	var fSortAscending = AscCommon.fSortAscending;
 
 	var cElementType = AscCommonExcel.cElementType;

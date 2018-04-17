@@ -48,6 +48,8 @@ function (window, undefined) {
   var g_oFormatParser = AscCommon.g_oFormatParser;
   var CellAddress = AscCommon.CellAddress;
 
+  var prot;
+
   var c_oAscError = Asc.c_oAscError;
 
 	var TOK_TYPE_OPERAND = 1;
@@ -490,7 +492,7 @@ cDate.prototype.getExcelDate = function () {
 	return Math.floor( this.getExcelDateWithTime() );
 };
 
-cDate.prototype['getExcelDateWithTime'] = cDate.prototype.getExcelDateWithTime = function () {
+cDate.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
 	var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
@@ -6878,4 +6880,8 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].getArrayMin = getArrayMin;
 	window['AscCommonExcel'].compareFormula = compareFormula;
 	window['AscCommonExcel'].cDate = cDate;
+
+	window["Asc"]["cDate"] = window["Asc"].cDate = cDate;
+	prot									     = cDate.prototype;
+	prot["getExcelDateWithTime"]	             = prot.getExcelDateWithTime;
 })(window);
