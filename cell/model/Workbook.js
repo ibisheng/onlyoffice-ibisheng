@@ -2586,7 +2586,7 @@
 	};
 	SheetMemory.prototype.clone = function() {
 		var sheetMemory = new SheetMemory(this.structSize, this.maxIndex);
-		sheetMemory.data = this.data ? this.data.slice(0) : null;
+		sheetMemory.data = this.data ? new Uint8Array(this.data) : null;
 		sheetMemory.count = this.count;
 		return sheetMemory;
 	};
