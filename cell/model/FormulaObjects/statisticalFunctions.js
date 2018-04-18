@@ -4941,7 +4941,7 @@ function (window, undefined) {
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			return arg0.countCells();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			return cElementType.empty === arg0.getValue().type ? new cNumber(0) : new cNumber(1);
+			return cElementType.empty === arg0.getValue().type ? new cNumber(1) : new cNumber(0);
 		} else {
 			return new cError(cErrorType.bad_reference);
 		}

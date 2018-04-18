@@ -4239,11 +4239,11 @@ $( function () {
 
 		oParser = new parserFormula( "COUNTBLANK(A22)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 1 );
+		strictEqual( oParser.calculate().getValue(), 0 );
 
 		oParser = new parserFormula( "COUNTBLANK(A23)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 0 );
+		strictEqual( oParser.calculate().getValue(), 1 );
 	} );
 
     test( "Test: \"COVAR\"", function () {
