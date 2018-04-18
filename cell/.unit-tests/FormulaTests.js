@@ -3214,6 +3214,22 @@ $( function () {
 		oParser = new parserFormula( "SUMPRODUCT(YEAR(N44:P49))", "A2", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 34200 );
+
+		oParser = new parserFormula( "SUMPRODUCT(({1,2,3})*({TRUE,TRUE,TRUE}))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+		oParser = new parserFormula( "SUMPRODUCT(({1,2,3})*({TRUE;TRUE;TRUE;TRUE}))", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 24 );
+
+		oParser = new parserFormula( "SUMPRODUCT({TRUE,TRUE,FALSE})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "SUMPRODUCT({1,2,3,3,TRUE})", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 9 );
     } );
 
     test( "Test: \"SINH\"", function () {
