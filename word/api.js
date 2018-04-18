@@ -7747,7 +7747,7 @@ background-repeat: no-repeat;\
 		var oContentControl = null;
 		if (undefined === Id)
 		{
-			var oInfo          = oLogicDocument.GetSelectedElementsInfo();
+			var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 			var oInlineControl = oInfo.GetInlineLevelSdt();
 			var oBlockControl  = oInfo.GetBlockLevelSdt();
 
@@ -7806,7 +7806,7 @@ background-repeat: no-repeat;\
 		var oContentControl = null;
 		if (undefined === Id)
 		{
-			var oInfo          = oLogicDocument.GetSelectedElementsInfo();
+			var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 			var oInlineControl = oInfo.GetInlineLevelSdt();
 			var oBlockControl  = oInfo.GetBlockLevelSdt();
 
@@ -7867,7 +7867,7 @@ background-repeat: no-repeat;\
 		var oContentControl = null;
 		if (undefined === Id)
 		{
-			var oInfo          = oLogicDocument.GetSelectedElementsInfo();
+			var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 			var oInlineControl = oInfo.GetInlineLevelSdt();
 			var oBlockControl  = oInfo.GetBlockLevelSdt();
 
@@ -7918,7 +7918,7 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return false;
 
-		var oInfo = oLogicDocument.GetSelectedElementsInfo();
+		var oInfo = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 
 		return (oInfo.GetInlineLevelSdt() || oInfo.GetBlockLevelSdt() ? true : false);
 	};
@@ -7928,7 +7928,7 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return null;
 
-		var oInfo          = oLogicDocument.GetSelectedElementsInfo();
+		var oInfo          = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 		var oInlineControl = oInfo.GetInlineLevelSdt();
 		var oBlockControl  = oInfo.GetBlockLevelSdt();
 
@@ -7946,7 +7946,7 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return null;
 
-		var oInfo   = oLogicDocument.GetSelectedElementsInfo();
+		var oInfo   = oLogicDocument.GetSelectedElementsInfo({SkipTOC : true});
 		var oInline = oInfo.GetInlineLevelSdt();
 		var oBlock  = oInfo.GetBlockLevelSdt();
 

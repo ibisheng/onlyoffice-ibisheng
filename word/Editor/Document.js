@@ -1346,8 +1346,10 @@ var selected_None              = -1;
 var selected_DrawingObject     = 0;
 var selected_DrawingObjectText = 1;
 
-function CSelectedElementsInfo()
+function CSelectedElementsInfo(oPr)
 {
+	this.m_bSkipTOC = oPr && oPr.SkipTOC ? true : false;
+
 	this.m_bTable           = false; // Находится курсор или выделение целиком в какой-нибудь таблице
 	this.m_bMixedSelection  = false; // Попадает ли в выделение одновременно несколько элементов
 	this.m_nDrawing         = selected_None;
@@ -1430,6 +1432,10 @@ function CSelectedElementsInfo()
         return this.m_oCell;
     };
 }
+CSelectedElementsInfo.prototype.IsSkipTOC = function()
+{
+	return this.m_bSkipTOC;
+};
 CSelectedElementsInfo.prototype.SetParagraph = function(Para)
 {
 	this.m_pParagraph = Para;
@@ -8509,9 +8515,9 @@ CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection, bReturnSele
  * Получаем информацию о текущем выделении
  * @returns {CSelectedElementsInfo}
  */
-CDocument.prototype.GetSelectedElementsInfo = function()
+CDocument.prototype.GetSelectedElementsInfo = function(oPr)
 {
-	var oInfo = new CSelectedElementsInfo();
+	var oInfo = new CSelectedElementsInfo(oPr);
 	this.Controller.GetSelectedElementsInfo(oInfo);
 	return oInfo;
 };

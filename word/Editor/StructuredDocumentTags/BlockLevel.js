@@ -202,7 +202,9 @@ CBlockLevelSdt.prototype.IsSelectionEmpty = function(isCheckHidden)
 };
 CBlockLevelSdt.prototype.GetSelectedElementsInfo = function(oInfo)
 {
-	oInfo.SetBlockLevelSdt(this);
+	if (!oInfo.IsSkipTOC() || !this.IsBuiltInTableOfContents())
+		oInfo.SetBlockLevelSdt(this);
+
 	this.Content.GetSelectedElementsInfo(oInfo);
 };
 CBlockLevelSdt.prototype.IsSelectionUse = function()
@@ -601,7 +603,9 @@ CBlockLevelSdt.prototype.DistributeTableCells = function(isHorizontally)
 };
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
-	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+	if (!this.IsBuiltInTableOfContents())
+		this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+
 	this.Content.Document_UpdateInterfaceState();
 };
 CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
@@ -1045,6 +1049,9 @@ CBlockLevelSdt.prototype.GetContentControlType = function()
 };
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
+	if (!oPr || this.IsBuiltInTableOfContents())
+		return;
+
 	this.SetAlias(oPr.Alias);
 	this.SetTag(oPr.Tag);
 	this.SetLabel(oPr.Label);
@@ -1130,7 +1137,7 @@ CBlockLevelSdt.prototype.GetContentControlLock = function()
 };
 CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
-	if (!oPr)
+	if (!oPr || this.IsBuiltInTableOfContents())
 		return;
 
 	if (undefined !== oPr.Tag)
