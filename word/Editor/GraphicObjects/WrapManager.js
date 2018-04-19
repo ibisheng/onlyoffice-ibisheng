@@ -243,6 +243,12 @@ CWrapPolygon.prototype =
             nWrapType = this.wordGraphicObject.wrappingType;
             nWrapSide = this.wrapSide;
         }
+        if(this.wordGraphicObject.DocumentContent && this.wordGraphicObject.DocumentContent.IsTableCellContent()){
+            var oPageBounds = this.wordGraphicObject.DocumentContent.Get_PageBounds(this.wordGraphicObject.PageNum);
+            if(oPageBounds.Right < x0){
+                nWrapType = WRAPPING_TYPE_NONE;
+            }
+        }
         switch(nWrapType)
         {
             case WRAPPING_TYPE_NONE:
