@@ -3542,7 +3542,7 @@ CChartSpace.prototype.checkEmptySeries = function()
         return false;
     };
     var nChartType = chart_type.getObjectType();
-    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? 1 : series.length;
+    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? Math.min(1, series.length) : series.length;
     for(var i = 0; i < nSeriesLength; ++i)
     {
         var ser = series[i];
@@ -10880,7 +10880,7 @@ CChartSpace.prototype.recalculateMarkers = function()
             if(oThis.chart.plotArea.charts[0].varyColors && (oThis.chart.plotArea.charts[0].series.length === 1 || oThis.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart || oThis.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_DoughnutChart))
             {
                 var ser = oThis.chart.plotArea.charts[0].series[0], pts;
-                if(ser.marker && ser.marker.symbol === AscFormat.SYMBOL_NONE && (!Array.isArray(ser.dPt) || ser.dPt.length === 0))
+                if(!ser || ser.marker && ser.marker.symbol === AscFormat.SYMBOL_NONE && (!Array.isArray(ser.dPt) || ser.dPt.length === 0))
                     return;
                 pts = AscFormat.getPtsFromSeries(ser);
                 var series_marker = ser.marker;
