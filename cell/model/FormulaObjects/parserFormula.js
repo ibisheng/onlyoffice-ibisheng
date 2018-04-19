@@ -4456,7 +4456,6 @@ function parserFormula( formula, parent, _ws ) {
     this.operand_str = null;
     this.parenthesesNotEnough = false;
     this.f = [];
-    this.countRef = 0;
     this.shared = null;
 
 	this.listenerId = lastListenerId++;
@@ -4638,7 +4637,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.operand_str = null;
   this.parenthesesNotEnough = false;
   this.f = [];
-  this.countRef = 0;
   this.ca = false;
   //this.isTable = false;
   this.isInDependencies = false;
@@ -5332,7 +5330,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					pos.oper = found_operand;
 					refPos.push(pos);
 				}
-				t.countRef++;
 			}
 
 			/* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(t, t.Formula,
@@ -5344,7 +5341,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					index: t.outStack.length,
 					oper: found_operand
 				});
-				t.countRef++;
 			}
 			/* Referens to cell A4 */ else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
 				found_operand = new cRef(t.operand_str.toUpperCase(), t.ws);
@@ -5354,7 +5350,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					index: t.outStack.length,
 					oper: found_operand
 				});
-				t.countRef++;
 			}
 
 			else if (_tableTMP = parserHelp.isTable.call(t, t.Formula, t.pCurrPos, local)) {
@@ -5377,7 +5372,6 @@ parserFormula.prototype.setFormula = function(formula) {
 						isName: true,
 						oper: found_operand
 					});
-					t.countRef++;
 				}
 			}
 
@@ -5397,7 +5391,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					isName: true,
 					oper: found_operand
 				});
-				t.countRef++;
 			}
 
 			/* Numbers*/ else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {

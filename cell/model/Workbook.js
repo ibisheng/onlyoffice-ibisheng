@@ -620,12 +620,7 @@
 
 			function getNames(defName) {
 				if (defName.ref && !defName.hidden && defName.name.indexOf("_xlnm") < 0) {
-					if (defName.isTable ||
-						(defName.parsedRef && defName.parsedRef.isParsed && defName.parsedRef.countRef == 1 &&
-						defName.parsedRef.outStack.length == 1 &&
-						defName.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference)) {
-						names.push(defName.getAscCDefName());
-					}
+					names.push(defName.getAscCDefName());
 				}
 			}
 
@@ -650,11 +645,7 @@
 					break;
 				case c_oAscGetDefinedNamesList.All:
 				default:
-					this._foreachDefName(function(defName) {
-						if (defName.ref && !defName.hidden && defName.name.indexOf("_xlnm") < 0) {
-							names.push(defName.getAscCDefName());
-						}
-					});
+					this._foreachDefName(getNames);
 					break;
 			}
 			return names.sort(sort);
