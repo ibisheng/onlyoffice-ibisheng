@@ -243,12 +243,6 @@ CWrapPolygon.prototype =
             nWrapType = this.wordGraphicObject.wrappingType;
             nWrapSide = this.wrapSide;
         }
-        if(this.wordGraphicObject.DocumentContent && this.wordGraphicObject.DocumentContent.IsTableCellContent()){
-            var oPageBounds = this.wordGraphicObject.DocumentContent.Get_PageBounds(this.wordGraphicObject.PageNum);
-            if(oPageBounds.Right < x0){
-                nWrapType = WRAPPING_TYPE_NONE;
-            }
-        }
         switch(nWrapType)
         {
             case WRAPPING_TYPE_NONE:
@@ -820,6 +814,15 @@ CWrapManager.prototype =
         {
             for(var index = 0; index < objects_count; ++index)
             {
+                var oParaDrawing = arrGraphicObjects[index].parent;
+                if(oParaDrawing.LayoutInCell)
+                {
+                    var oTableCell = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                    if(oTableCell !== docContent)
+                    {
+                        continue;
+                    }
+                }
                 arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField,  arr_intervals, bMathWrap);
             }
             var arrFlowTables = this.graphicPage.flowTables;
@@ -834,9 +837,26 @@ CWrapManager.prototype =
             {
                 for(index = 0; index < objects_count; ++index)
                 {
-                    if(arrGraphicObjects[index].parent && arrGraphicObjects[index].parent.DocumentContent === docContent)
+                    var oParaDrawing = arrGraphicObjects[index].parent;
+                    if(oParaDrawing)
                     {
-                        arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+
+                        if(oParaDrawing && oParaDrawing.DocumentContent)
+                        {
+                            if(oParaDrawing.LayoutInCell)
+                            {
+                                var oTableCell1 = docContent.IsTableCellContent(true);
+                                var oTableCell2 = oParaDrawing.DocumentContent.IsTableCellContent(true);
+                                if(oTableCell1 !== oTableCell2)
+                                {
+                                    continue;
+                                }
+                            }
+                            if(oParaDrawing.DocumentContent === docContent)
+                            {
+                                arrGraphicObjects[index].getArrayWrapIntervals(x0,y0, x1, y1, Y0sp, Y1Ssp, LeftField, RightField, arr_intervals, bMathWrap);
+                            }
+                        }
                     }
                 }
                 arrFlowTables = this.graphicPage.flowTables;
