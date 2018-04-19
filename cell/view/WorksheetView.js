@@ -11118,7 +11118,6 @@
 					var cellValue = c.getValueForEdit();
 					cellValue = cellValue.replace(valueForSearching, options.replaceWith);
 
-					var oCellEdit = new asc_Range(cell.c1, cell.r1, cell.c1, cell.r1);
 					var v, newValue;
 					// get first fragment and change its text
 					v = c.getValueForEdit2().slice(0, 1);
@@ -11126,7 +11125,7 @@
 					newValue = [];
 					newValue[0] = new AscCommonExcel.Fragment({text: cellValue, format: v[0].format.clone()});
 
-					if (!t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*isNotHistory*/true,
+					if (!t._saveCellValueAfterEdit(c, newValue, /*flags*/undefined, /*isNotHistory*/true,
                             /*lockDraw*/true)) {
 						options.error = true;
 						t.draw(lockDraw);
@@ -11345,7 +11344,8 @@
         return mergedRange ? mergedRange : new asc_Range(col, row, col, row);
     };
 
-	WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, isNotHistory, lockDraw) {
+	WorksheetView.prototype._saveCellValueAfterEdit = function (c, val, flags, isNotHistory, lockDraw) {
+	    var bbox = c.bbox;
 		var t = this;
 		var oldMode = this.isFormulaEditMode;
 		this.isFormulaEditMode = false;
@@ -11372,17 +11372,17 @@
 				return false;
 			}
 			isFormula = c.isFormula();
-			this.model.autoFilters.renameTableColumn(oCellEdit);
+			this.model.autoFilters.renameTableColumn(bbox);
 		} else {
 			c.setValue2(val);
 			// Вызываем функцию пересчета для заголовков форматированной таблицы
-			this.model.autoFilters.renameTableColumn(oCellEdit);
+			this.model.autoFilters.renameTableColumn(bbox);
 
 			var api = window["Asc"]["editor"];
 			var bFast = api.collaborativeEditing.m_bFast;
 			var bIsSingleUser = !api.collaborativeEditing.getCollaborativeEditing();
 			if (!(bFast && !bIsSingleUser)) {
-				oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(oCellEdit);
+				oAutoExpansionTable = this.model.autoFilters.checkTableAutoExpansion(bbox);
 			}
 		}
 
@@ -11395,7 +11395,7 @@
 			}
 		}
 
-		this._updateCellsRange(oCellEdit, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers,
+		this._updateCellsRange(bbox, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers,
 			lockDraw);
 
 		if (!isNotHistory) {
@@ -11406,7 +11406,7 @@
 			var callback = function () {
 				var options = {
 					props: [Asc.c_oAscAutoCorrectOptions.UndoTableAutoExpansion],
-					cell: oCellEdit,
+					cell: bbox,
 					wsId: t.model.getId()
 				};
 				t.handlers.trigger("toggleAutoCorrectOptions", true, options);
@@ -11514,10 +11514,7 @@
 				cellName: c.getName(),
 				cellNumFormat: c.getNumFormatType(),
 				saveValueCallback: function (val, flags) {
-					var oCellEdit = isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) :
-						new asc_Range(col, row, col, row);
-					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, /*isNotHistory*/false,
-                        /*lockDraw*/false);
+					return t._saveCellValueAfterEdit(c, val, flags, /*isNotHistory*/false, /*lockDraw*/false);
 				},
 				getSides: function () {
 					var _c1, _r1, _c2, _r2, ri = 0, bi = 0;
