@@ -935,7 +935,9 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                     isColumnBreakOnPrevLine = true;
             }
 
-            if ((true === isPageBreakOnPrevLine && (0 !== this.private_GetColumnIndex(CurPage) || (0 === CurPage && null !== PrevElement)))
+            // Здесь используем GetAbsoluteColumn, а не у текущего класса, т.к. в данную ветку мы попадаем только, если
+			// верхний DocContent - документ и если не в таблице
+            if ((true === isPageBreakOnPrevLine && (0 !== this.GetAbsoluteColumn(CurPage) || (0 === CurPage && null !== PrevElement)))
                 || (true === isColumnBreakOnPrevLine && 0 === CurPage))
             {
                 this.Pages[CurPage].Set_EndLine(CurLine - 1);

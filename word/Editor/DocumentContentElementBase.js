@@ -765,6 +765,10 @@ CDocumentContentElementBase.prototype.GetAbsolutePage = function(CurPage)
 {
 	return this.private_GetAbsolutePageIndex(CurPage);
 };
+CDocumentContentElementBase.prototype.GetAbsoluteColumn = function(CurPage)
+{
+	return this.Get_AbsoluteColumn(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
