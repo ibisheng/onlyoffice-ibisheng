@@ -815,7 +815,7 @@ CWrapManager.prototype =
             for(var index = 0; index < objects_count; ++index)
             {
                 var oParaDrawing = arrGraphicObjects[index].parent;
-                if(oParaDrawing.LayoutInCell)
+                if(oParaDrawing.IsLayoutInCell())
                 {
                     var oTableCell = oParaDrawing.DocumentContent.IsTableCellContent(true);
                     if(oTableCell !== docContent)
@@ -843,7 +843,7 @@ CWrapManager.prototype =
 
                         if(oParaDrawing && oParaDrawing.DocumentContent)
                         {
-                            if(oParaDrawing.LayoutInCell)
+                            if(oParaDrawing.IsLayoutInCell())
                             {
                                 var oTableCell1 = docContent.IsTableCellContent(true);
                                 var oTableCell2 = oParaDrawing.DocumentContent.IsTableCellContent(true);

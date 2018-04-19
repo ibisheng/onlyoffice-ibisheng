@@ -1316,8 +1316,12 @@ ParaDrawing.prototype.Shift = function(Dx, Dy)
 
 	this.updatePosition3(this.PageNum, this.X, this.Y);
 };
-ParaDrawing.prototype.Is_LayoutInCell = function()
+ParaDrawing.prototype.IsLayoutInCell = function()
 {
+	// Начиная с 15-ой версии Word не дает менять этот параметр и всегда считает его true
+	if (this.LogicDocument && this.LogicDocument.GetCompatibilityMode() >= document_compatibility_mode_Word15)
+		return true;
+
 	return this.LayoutInCell;
 };
 ParaDrawing.prototype.Get_Distance = function()
