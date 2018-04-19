@@ -244,7 +244,7 @@
 		for (var i = 0; i < AscCommon.c_oAscEncodings.length; ++i)
 		{
 			var encoding = AscCommon.c_oAscEncodings[i];
-			var newElem = {'codepage': encoding[0], 'name': encoding[3]};
+			var newElem = {'codepage': encoding[0], 'lcid': encoding[1], 'name': encoding[3]};
 			res.push(newElem);
 		}
 		return res;
