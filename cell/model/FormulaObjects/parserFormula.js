@@ -4483,7 +4483,6 @@ function parserFormula( formula, parent, _ws ) {
     this.isParsed = false;
     //для функции parse и parseDiagramRef
     this.pCurrPos = 0;
-    this.elemArr = [];
     this.operand_str = null;
     this.shared = null;
 
@@ -4623,7 +4622,6 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
   oRes.is3D = this.is3D;
   oRes.value = this.value;
   oRes.pCurrPos = this.pCurrPos;
-  oRes.elemArr = [];
   for (var i = 0, length = this.outStack.length; i < length; i++) {
     var oCurElem = this.outStack[i];
       if (oCurElem.clone) {
@@ -4660,7 +4658,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.isParsed = false;
   //для функции parse
   this.pCurrPos = 0;
-  this.elemArr = [];
   this.operand_str = null;
   this.ca = false;
   //this.isTable = false;
@@ -4668,6 +4665,7 @@ parserFormula.prototype.setFormula = function(formula) {
 };
 
 	parserFormula.prototype.parse = function (local, digitDelim, parseResult) {
+		var elemArr = [];
 		this.pCurrPos = 0;
 		var needAssemble = false;
 		var cFormulaList;
@@ -5025,7 +5023,6 @@ parserFormula.prototype.setFormula = function(formula) {
 				} else {
 					parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
 					t.outStack = [];
-					t.elemArr = [];
 					return false;
 				}
 			} else if (!parseResult.operand_expected) {
@@ -5050,20 +5047,19 @@ parserFormula.prototype.setFormula = function(formula) {
 					} else {
 						parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
 						t.outStack = [];
-						t.elemArr = [];
 						return false;
 					}
 				}
 			}
 
-			while (0 !== t.elemArr.length && (
+			while (0 !== elemArr.length && (
 				found_operator.rightAssociative ?
-					( found_operator.priority < t.elemArr[t.elemArr.length - 1].priority ) :
-					( found_operator.priority <= t.elemArr[t.elemArr.length - 1].priority )
+					( found_operator.priority < elemArr[elemArr.length - 1].priority ) :
+					( found_operator.priority <= elemArr[elemArr.length - 1].priority )
 			)) {
-				t.outStack.push(t.elemArr.pop());
+				t.outStack.push(elemArr.pop());
 			}
-			t.elemArr.push(found_operator);
+			elemArr.push(found_operator);
 			parseResult.addElem(found_operator);
 			found_operand = null;
 			return true;
@@ -5071,15 +5067,15 @@ parserFormula.prototype.setFormula = function(formula) {
 
 		var parseLeftParentheses = function(){
 			if (wasRigthParentheses || found_operand) {
-				t.elemArr.push(new cMultOperator());
+				elemArr.push(new cMultOperator());
 			}
 			parseResult.operand_expected = true;
 			wasLeftParentheses = true;
 			wasRigthParentheses = false;
 			found_operand = null;
-			t.elemArr.push(cFormulaOperators[t.operand_str].prototype);
+			elemArr.push(cFormulaOperators[t.operand_str].prototype);
 			parseResult.addElem(cFormulaOperators[t.operand_str].prototype);
-			leftParentArgumentsCurrentArr[t.elemArr.length - 1] = 1;
+			leftParentArgumentsCurrentArr[elemArr.length - 1] = 1;
 
 			if(startSumproduct){
 				counterSumproduct++;
@@ -5095,44 +5091,41 @@ parserFormula.prototype.setFormula = function(formula) {
 			wasRigthParentheses = true;
 			var top_elem = null;
 			var top_elem_arg_count = 0;
-			if (0 !== t.elemArr.length && ( (top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' ) &&
+			if (0 !== elemArr.length && ( (top_elem = elemArr[elemArr.length - 1]).name === '(' ) &&
 				parseResult.operand_expected) {
-				top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
+				top_elem_arg_count = leftParentArgumentsCurrentArr[elemArr.length - 1];
 				if (top_elem_arg_count > 1) {
 					t.outStack.push(new cEmpty());
 				} else {
-					leftParentArgumentsCurrentArr[t.elemArr.length - 1]--;
-					top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
+					leftParentArgumentsCurrentArr[elemArr.length - 1]--;
+					top_elem_arg_count = leftParentArgumentsCurrentArr[elemArr.length - 1];
 				}
 			} else {
-				while (0 !== t.elemArr.length &&
-				!((top_elem = t.elemArr[t.elemArr.length - 1]).name === '(' )) {
+				while (0 !== elemArr.length &&
+				!((top_elem = elemArr[elemArr.length - 1]).name === '(' )) {
 					if (top_elem.name in cFormulaOperators && parseResult.operand_expected) {
 						parseResult.setError(c_oAscError.ID.FrmlOperandExpected);
 						t.outStack = [];
-						t.elemArr = [];
 						return false;
 					}
-					t.outStack.push(t.elemArr.pop());
+					t.outStack.push(elemArr.pop());
 				}
-				top_elem_arg_count = leftParentArgumentsCurrentArr[t.elemArr.length - 1];
+				top_elem_arg_count = leftParentArgumentsCurrentArr[elemArr.length - 1];
 			}
 
-			if (0 === t.elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
+			if (0 === elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
 				t.outStack = [];
-				t.elemArr = [];
 				parseResult.setError(c_oAscError.ID.FrmlWrongCountParentheses);
 				return false;
 			}
 
 			var p = top_elem, func, bError = false;
-			t.elemArr.pop();
-			if (0 !== t.elemArr.length &&
-				( func = t.elemArr[t.elemArr.length - 1] ).type === cElementType.func) {
-				p = t.elemArr.pop();
+			elemArr.pop();
+			if (0 !== elemArr.length &&
+				( func = elemArr[elemArr.length - 1] ).type === cElementType.func) {
+				p = elemArr.pop();
 				if (top_elem_arg_count > func.argumentsMax) {
 					t.outStack = [];
-					t.elemArr = [];
 					parseResult.setError(c_oAscError.ID.FrmlWrongMaxArgument);
 					return false;
 				} else {
@@ -5147,22 +5140,19 @@ parserFormula.prototype.setFormula = function(formula) {
 
 					if (bError) {
 						t.outStack = [];
-						t.elemArr = [];
 						parseResult.setError(c_oAscError.ID.FrmlWrongCountArgument);
 						return false;
 					}
 				}
-			} else if(wasLeftParentheses && 0 === top_elem_arg_count && t.elemArr[t.elemArr.length - 1] && " " === t.elemArr[t.elemArr.length - 1].name) {
+			} else if(wasLeftParentheses && 0 === top_elem_arg_count && elemArr[elemArr.length - 1] && " " === elemArr[elemArr.length - 1].name) {
 				//intersection with empty range
 				t.outStack = [];
-				t.elemArr = [];
 				parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 				return false;
 			} else {
-				if (wasLeftParentheses && (!t.elemArr[t.elemArr.length - 1] ||
-					'(' === t.elemArr[t.elemArr.length - 1].name)) {
+				if (wasLeftParentheses && (!elemArr[elemArr.length - 1] ||
+					'(' === elemArr[elemArr.length - 1].name)) {
 					t.outStack = [];
-					t.elemArr = [];
 					parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 					return false;
 				}
@@ -5189,24 +5179,24 @@ parserFormula.prototype.setFormula = function(formula) {
 		var parseCommaAndArgumentsUnion = function(){
 			wasLeftParentheses = false;
 			wasRigthParentheses = false;
-			var stackLength = t.elemArr.length, top_elem = null, top_elem_arg_pos;
+			var stackLength = elemArr.length, top_elem = null, top_elem_arg_pos;
 
-			if (t.elemArr.length !== 0 && t.elemArr[stackLength - 1].name === "(" && parseResult.operand_expected) {
+			if (elemArr.length !== 0 && elemArr[stackLength - 1].name === "(" && parseResult.operand_expected) {
 				t.outStack.push(new cEmpty());
-				top_elem = t.elemArr[stackLength - 1];
+				top_elem = elemArr[stackLength - 1];
 				top_elem_arg_pos = stackLength - 1;
 				wasLeftParentheses = true;
 				parseResult.operand_expected = false;
 			} else {
 				while (stackLength !== 0) {
-					top_elem = t.elemArr[stackLength - 1];
+					top_elem = elemArr[stackLength - 1];
 					top_elem_arg_pos = stackLength - 1;
 					if (top_elem.name === "(") {
 						wasLeftParentheses = true;
 						break;
 					} else {
-						t.outStack.push(t.elemArr.pop());
-						stackLength = t.elemArr.length;
+						t.outStack.push(elemArr.pop());
+						stackLength = elemArr.length;
 					}
 				}
 			}
@@ -5214,14 +5204,12 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (parseResult.operand_expected) {
 				parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
 				t.outStack = [];
-				t.elemArr = [];
 				return false;
 			}
 
 			if (!wasLeftParentheses) {
 				parseResult.setError(c_oAscError.ID.FrmlWrongCountParentheses);
 				t.outStack = [];
-				t.elemArr = [];
 				return false;
 			}
 			leftParentArgumentsCurrentArr[top_elem_arg_pos]++;
@@ -5252,7 +5240,6 @@ parserFormula.prototype.setFormula = function(formula) {
 							t.operand_str = operator.operatorName + "" + t.operand_str
 						} else {
 							t.outStack = [];
-							t.elemArr = [];
 							parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 							return false;
 						}
@@ -5264,7 +5251,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					operator.operatorName = t.operand_str;
 				} else {
 					t.outStack = [];
-					t.elemArr = [];
 					/*в массиве используется недопустимый параметр*/
 					parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 					return false;
@@ -5272,7 +5258,6 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 			if (!arr.isValidArray()) {
 				t.outStack = [];
-				t.elemArr = [];
 				/*размер массива не согласован*/
 				parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 				return false;
@@ -5292,7 +5277,6 @@ parserFormula.prototype.setFormula = function(formula) {
 			if (!parseResult.operand_expected) {
 				parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
 				t.outStack = [];
-				t.elemArr = [];
 				return false;
 			}
 			var prevCurrPos = t.pCurrPos;
@@ -5320,7 +5304,6 @@ parserFormula.prototype.setFormula = function(formula) {
 				if (!(wsF && wsT)) {
 					parseResult.setError(c_oAscError.ID.FrmlWrongReferences);
 					t.outStack = [];
-					t.elemArr = [];
 					return false;
 				}
 				if (parserHelp.isArea.call(t, t.Formula, t.pCurrPos)) {
@@ -5357,7 +5340,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					/*используется неверный именованный диапазон или таблица*/
 					parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 					t.outStack = [];
-					t.elemArr = [];
 					return false;
 				}
 
@@ -5384,7 +5366,6 @@ parserFormula.prototype.setFormula = function(formula) {
 				} else {
 					parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 					t.outStack = [];
-					t.elemArr = [];
 					return false;
 				}
 			}
@@ -5392,7 +5373,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			/* Function*/ else if (parserHelp.isFunc.call(t, t.Formula, t.pCurrPos)) {
 
 				if (wasRigthParentheses && parseResult.operand_expected) {
-					t.elemArr.push(new cMultOperator());
+					elemArr.push(new cMultOperator());
 				}
 
 				var found_operator = null, operandStr = t.operand_str.replace(rx_sFuncPref, "").toUpperCase();
@@ -5409,7 +5390,7 @@ parserFormula.prototype.setFormula = function(formula) {
 					if (found_operator.ca) {
 						t.ca = found_operator.ca;
 					}
-					t.elemArr.push(found_operator);
+					elemArr.push(found_operator);
 					parseResult.addElem(found_operator);
 					if("SUMPRODUCT" === found_operator.name){
 						startSumproduct = true;
@@ -5417,7 +5398,6 @@ parserFormula.prototype.setFormula = function(formula) {
 				} else {
 					parseResult.setError(c_oAscError.ID.FrmlWrongFunctionName);
 					t.outStack = [];
-					t.elemArr = [];
 					return false;
 				}
 				parseResult.operand_expected = false;
@@ -5437,7 +5417,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 
 			if (wasRigthParentheses) {
-				t.elemArr.push(new cMultOperator());
+				elemArr.push(new cMultOperator());
 			}
 			wasLeftParentheses = false;
 			wasRigthParentheses = false;
@@ -5458,7 +5438,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				//TODO протестировать
 				//если осталось только закрыть скобки за функции с нулевым количеством аргументов
 				if(this.pCurrPos === this.Formula.length){
-					if(this.elemArr[this.elemArr.length - 2] && 0 === this.elemArr[this.elemArr.length - 2].argumentsMax){
+					if(elemArr[elemArr.length - 2] && 0 === elemArr[elemArr.length - 2].argumentsMax){
 						this.operand_expected = false;
 					}
 				}
@@ -5484,19 +5464,17 @@ parserFormula.prototype.setFormula = function(formula) {
 
 		if (this.operand_expected) {
 			this.outStack = [];
-			this.elemArr = [];
 			parseResult.setError(c_oAscError.ID.FrmlOperandExpected);
 			return false;
 		}
 		var operand, parenthesesNotEnough = false;
-		while (0 !== this.elemArr.length) {
-			operand = this.elemArr.pop();
+		while (0 !== elemArr.length) {
+			operand = elemArr.pop();
 			if ('(' === operand.name) {
 				this.Formula += ")";
 				parenthesesNotEnough = true;
 			} else if ('(' === operand.name || ')' === operand.name) {
 				this.outStack = [];
-				this.elemArr = [];
 				parseResult.setError(c_oAscError.ID.FrmlWrongCountParentheses);
 				return false;
 			} else {
