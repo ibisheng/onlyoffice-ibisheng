@@ -6581,16 +6581,16 @@
 					if (prevFormula && !tmp.bNoBuildDep && !tmp.siFormulas[prevFormula.parsed.getListenerId()]) {
 						prevFormula.parsed.buildDependencies();
 					}
+					var parseResult = new AscCommonExcel.ParseResult([]);
 					var newFormulaParent = new AscCommonExcel.CCellWithFormula(cell.ws, cell.nRow, cell.nCol);
 					var parsed = new AscCommonExcel.parserFormula(formula.v, newFormulaParent, cell.ws);
 					parsed.ca = formula.ca;
-					var refPos = [];
-					parsed.parse(undefined, undefined, refPos);
+					parsed.parse(undefined, undefined, parseResult);
 					if (null !== formula.ref) {
 						sharedRef = AscCommonExcel.g_oRangeCache.getAscRange(formula.ref).clone();
 						parsed.setShared(sharedRef, newFormulaParent);
 					}
-					curFormula = new OpenColumnFormula(cell.nRow, formula.v, parsed, refPos, newFormulaParent);
+					curFormula = new OpenColumnFormula(cell.nRow, formula.v, parsed, parseResult.refPos, newFormulaParent);
 					tmp.prevFormulas[cell.nCol] = curFormula;
 				}
 				if (null !== formula.si) {

@@ -172,6 +172,7 @@
 		};
 
 		this._formula = null;
+		this._parseResult = null;
 
 		// Обработчик кликов
 		this.clickCounter = new AscFormat.ClickCounter();
@@ -344,6 +345,7 @@
 		this.isOpened = false;
 
 		this._formula = null;
+		this._parseResult = null;
 
 		if (!window['IS_NATIVE_EDITOR']) {
 			if (window.removeEventListener) {
@@ -677,8 +679,8 @@
 	CellEditor.prototype.formulaIsOperator = function () {
 		var elem;
 		return this.isFormula() &&
-			(null !== (elem = this._formula.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
-			null === elem || this._formula.operand_expected);
+			(null !== (elem = this._parseResult.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
+			null === elem || this._parseResult.operand_expected);
 	};
 
 	CellEditor.prototype.insertFormula = function ( functionName, isDefName ) {
@@ -806,17 +808,17 @@
 //             console.log("e-s "+ (__e__ - __s__));
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._parseResult = new AscCommonExcel.ParseResult([], []);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = [];
-		this._formula.parse(true, true, refPos);
+		this._formula.parse(true, true, this._parseResult);
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false, _sColorPos;
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._parseResult.refPos && this._parseResult.refPos.length > 0) {
+			for (var index = 0; index < this._parseResult.refPos.length; index++) {
 				wsName = null;
 				isName = false;
-				r = refPos[index];
+				r = this._parseResult.refPos[index];
 
 				offset = r.end;
 				_e = r.end;
@@ -933,14 +935,14 @@
 			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
 		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._parseResult = new AscCommonExcel.ParseResult([], []);
 		this._formula = new AscCommonExcel.parserFormula(s.substr(1), null, ws);
-		var refPos = [];
-		this._formula.parse(true, true, refPos);
+		this._formula.parse(true, true, this._parseResult);
 
-		if (refPos && refPos.length > 0) {
-			for (var index = 0; index < refPos.length; index++) {
+		if (this._parseResult.refPos && this._parseResult.refPos.length > 0) {
+			for (var index = 0; index < this._parseResult.refPos.length; index++) {
 				wsName = null;
-				r = refPos[index];
+				r = this._parseResult.refPos[index];
 
 				offset = r.end;
 				_e = r.end;

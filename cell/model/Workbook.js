@@ -6473,8 +6473,9 @@
 
 				var formulaLocaleParse = isCopyPaste === true ? false : oFormulaLocaleInfo.Parse;
 				var formulaLocaleDigetSep = isCopyPaste === true ? false : oFormulaLocaleInfo.DigitSep;
-				if (!newFP.parse(formulaLocaleParse, formulaLocaleDigetSep)) {
-					switch (newFP.error[newFP.error.length - 1]) {
+				var parseResult = new AscCommonExcel.ParseResult();
+				if (!newFP.parse(formulaLocaleParse, formulaLocaleDigetSep, parseResult)) {
+					switch (parseResult.error) {
 						case c_oAscError.ID.FrmlWrongFunctionName:
 							break;
 						case c_oAscError.ID.FrmlParenthesesCorrectCount:
@@ -6482,7 +6483,7 @@
 							return;
 						default :
 						{
-							wb.handlers.trigger("asc_onError", newFP.error[newFP.error.length - 1], c_oAscError.Level.NoCritical);
+							wb.handlers.trigger("asc_onError", parseResult.error, c_oAscError.Level.NoCritical);
 							if (callback) {
 								callback(false);
 							}
