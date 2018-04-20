@@ -4481,9 +4481,6 @@ function parserFormula( formula, parent, _ws ) {
     this.outStack = [];
     this.Formula = formula;
     this.isParsed = false;
-    //для функции parse и parseDiagramRef
-    this.pCurrPos = 0;
-    this.operand_str = null;
     this.shared = null;
 
 	this.listenerId = lastListenerId++;
@@ -4621,7 +4618,6 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
   var oRes = new parserFormula(formula, parent, ws);
   oRes.is3D = this.is3D;
   oRes.value = this.value;
-  oRes.pCurrPos = this.pCurrPos;
   for (var i = 0, length = this.outStack.length; i < length; i++) {
     var oCurElem = this.outStack[i];
       if (oCurElem.clone) {
@@ -4630,7 +4626,6 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
       oRes.outStack.push(oCurElem);
     }
     }
-  oRes.operand_str = this.operand_str;
   oRes.isParsed = this.isParsed;
   return oRes;
 };
@@ -4656,9 +4651,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.value = null;
   this.outStack = [];
   this.isParsed = false;
-  //для функции parse
-  this.pCurrPos = 0;
-  this.operand_str = null;
   this.ca = false;
   //this.isTable = false;
   this.isInDependencies = false;
@@ -4666,7 +4658,7 @@ parserFormula.prototype.setFormula = function(formula) {
 
 	parserFormula.prototype.parse = function (local, digitDelim, parseResult) {
 		var elemArr = [];
-		this.pCurrPos = 0;
+		var ph = {operand_str: null, pCurrPos: 0};
 		var needAssemble = false;
 		var cFormulaList;
 
@@ -5012,13 +5004,13 @@ parserFormula.prototype.setFormula = function(formula) {
 			var found_operator = null;
 
 			if (parseResult.operand_expected) {
-				if ('-' === t.operand_str) {
+				if ('-' === ph.operand_str) {
 					parseResult.operand_expected = true;
 					found_operator = cFormulaOperators['un_minus'].prototype;
-				} else if ('+' === t.operand_str) {
+				} else if ('+' === ph.operand_str) {
 					parseResult.operand_expected = true;
 					found_operator = cFormulaOperators['un_plus'].prototype;
-				} else if (' ' === t.operand_str) {
+				} else if (' ' === ph.operand_str) {
 					return true;
 				} else {
 					parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
@@ -5026,23 +5018,23 @@ parserFormula.prototype.setFormula = function(formula) {
 					return false;
 				}
 			} else if (!parseResult.operand_expected) {
-				if ('-' === t.operand_str) {
+				if ('-' === ph.operand_str) {
 					parseResult.operand_expected = true;
 					found_operator = cFormulaOperators['-'].prototype;
-				} else if ('+' === t.operand_str) {
+				} else if ('+' === ph.operand_str) {
 					parseResult.operand_expected = true;
 					found_operator = cFormulaOperators['+'].prototype;
-				} else if (':' === t.operand_str) {
+				} else if (':' === ph.operand_str) {
 					parseResult.operand_expected = true;
 					found_operator = cFormulaOperators[':'].prototype;
-				} else if ('%' === t.operand_str) {
+				} else if ('%' === ph.operand_str) {
 					parseResult.operand_expected = false;
 					found_operator = cFormulaOperators['%'].prototype;
-				} else if (' ' === t.operand_str && t.pCurrPos === t.Formula.length) {
+				} else if (' ' === ph.operand_str && ph.pCurrPos === t.Formula.length) {
 					return true;
 				} else {
-					if (t.operand_str in cFormulaOperators) {
-						found_operator = cFormulaOperators[t.operand_str].prototype;
+					if (ph.operand_str in cFormulaOperators) {
+						found_operator = cFormulaOperators[ph.operand_str].prototype;
 						parseResult.operand_expected = true;
 					} else {
 						parseResult.setError(c_oAscError.ID.FrmlWrongOperator);
@@ -5073,8 +5065,8 @@ parserFormula.prototype.setFormula = function(formula) {
 			wasLeftParentheses = true;
 			wasRigthParentheses = false;
 			found_operand = null;
-			elemArr.push(cFormulaOperators[t.operand_str].prototype);
-			parseResult.addElem(cFormulaOperators[t.operand_str].prototype);
+			elemArr.push(cFormulaOperators[ph.operand_str].prototype);
+			parseResult.addElem(cFormulaOperators[ph.operand_str].prototype);
 			leftParentArgumentsCurrentArr[elemArr.length - 1] = 1;
 
 			if(startSumproduct){
@@ -5087,7 +5079,7 @@ parserFormula.prototype.setFormula = function(formula) {
 
 		var parseRightParentheses = function(){
 
-			parseResult.addElem(cFormulaOperators[t.operand_str].prototype);
+			parseResult.addElem(cFormulaOperators[ph.operand_str].prototype);
 			wasRigthParentheses = true;
 			var top_elem = null;
 			var top_elem_arg_count = 0;
@@ -5221,34 +5213,34 @@ parserFormula.prototype.setFormula = function(formula) {
 			wasLeftParentheses = false;
 			wasRigthParentheses = false;
 			var arr = new cArray(), operator = {isOperator: false, operatorName: ""};
-			while (t.pCurrPos < t.Formula.length &&
-			!parserHelp.isRightBrace.call(t, t.Formula, t.pCurrPos)) {
-				if (parserHelp.isArraySeparator.call(t, t.Formula, t.pCurrPos, digitDelim)) {
-					if (t.operand_str === (digitDelim ? FormulaSeparators.arrayRowSeparator :
+			while (ph.pCurrPos < t.Formula.length &&
+			!parserHelp.isRightBrace.call(ph, t.Formula, ph.pCurrPos)) {
+				if (parserHelp.isArraySeparator.call(ph, t.Formula, ph.pCurrPos, digitDelim)) {
+					if (ph.operand_str === (digitDelim ? FormulaSeparators.arrayRowSeparator :
 							FormulaSeparators.arrayRowSeparatorDef)) {
 						arr.addRow();
 					}
-				} else if (parserHelp.isBoolean.call(t, t.Formula, t.pCurrPos, local)) {
-					arr.addElement(new cBool(t.operand_str));
-				} else if (parserHelp.isString.call(t, t.Formula, t.pCurrPos)) {
-					arr.addElement(new cString(t.operand_str));
-				} else if (parserHelp.isError.call(t, t.Formula, t.pCurrPos)) {
-					arr.addElement(new cError(t.operand_str));
-				} else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {
+				} else if (parserHelp.isBoolean.call(ph, t.Formula, ph.pCurrPos, local)) {
+					arr.addElement(new cBool(ph.operand_str));
+				} else if (parserHelp.isString.call(ph, t.Formula, ph.pCurrPos)) {
+					arr.addElement(new cString(ph.operand_str));
+				} else if (parserHelp.isError.call(ph, t.Formula, ph.pCurrPos)) {
+					arr.addElement(new cError(ph.operand_str));
+				} else if (parserHelp.isNumber.call(ph, t.Formula, ph.pCurrPos, digitDelim)) {
 					if (operator.isOperator) {
 						if (operator.operatorName === "+" || operator.operatorName === "-") {
-							t.operand_str = operator.operatorName + "" + t.operand_str
+							ph.operand_str = operator.operatorName + "" + ph.operand_str
 						} else {
 							t.outStack = [];
 							parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 							return false;
 						}
 					}
-					arr.addElement(new cNumber(parseFloat(t.operand_str)));
+					arr.addElement(new cNumber(parseFloat(ph.operand_str)));
 					operator = {isOperator: false, operatorName: ""};
-				} else if (parserHelp.isOperator.call(t, t.Formula, t.pCurrPos)) {
+				} else if (parserHelp.isOperator.call(ph, t.Formula, ph.pCurrPos)) {
 					operator.isOperator = true;
-					operator.operatorName = t.operand_str;
+					operator.operatorName = ph.operand_str;
 				} else {
 					t.outStack = [];
 					/*в массиве используется недопустимый параметр*/
@@ -5279,23 +5271,23 @@ parserFormula.prototype.setFormula = function(formula) {
 				t.outStack = [];
 				return false;
 			}
-			var prevCurrPos = t.pCurrPos;
+			var prevCurrPos = ph.pCurrPos;
 
 			/* Booleans */
-			if (parserHelp.isBoolean.call(t, t.Formula, t.pCurrPos, local)) {
-				found_operand = new cBool(t.operand_str);
+			if (parserHelp.isBoolean.call(ph, t.Formula, ph.pCurrPos, local)) {
+				found_operand = new cBool(ph.operand_str);
 			}
 
-			/* Strings */ else if (parserHelp.isString.call(t, t.Formula, t.pCurrPos)) {
-				found_operand = new cString(t.operand_str);
+			/* Strings */ else if (parserHelp.isString.call(ph, t.Formula, ph.pCurrPos)) {
+				found_operand = new cString(ph.operand_str);
 			}
 
-			/* Errors */ else if (parserHelp.isError.call(t, t.Formula, t.pCurrPos, local)) {
-				found_operand = new cError(t.operand_str);
+			/* Errors */ else if (parserHelp.isError.call(ph, t.Formula, ph.pCurrPos, local)) {
+				found_operand = new cError(ph.operand_str);
 			}
 
 			/* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/ else if ((_3DRefTmp =
-					parserHelp.is3DRef.call(t, t.Formula, t.pCurrPos))[0]) {
+					parserHelp.is3DRef.call(ph, t.Formula, ph.pCurrPos))[0]) {
 
 				t.is3D = true;
 				var wsF = t.wb.getWorksheetByName(_3DRefTmp[1]);
@@ -5306,33 +5298,33 @@ parserFormula.prototype.setFormula = function(formula) {
 					t.outStack = [];
 					return false;
 				}
-				if (parserHelp.isArea.call(t, t.Formula, t.pCurrPos)) {
-					found_operand = new cArea3D(t.operand_str.toUpperCase(), wsF, wsT);
-					parseResult.addRefPos(prevCurrPos, t.pCurrPos, t.outStack.length, found_operand);
-				} else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
+				if (parserHelp.isArea.call(ph, t.Formula, ph.pCurrPos)) {
+					found_operand = new cArea3D(ph.operand_str.toUpperCase(), wsF, wsT);
+					parseResult.addRefPos(prevCurrPos, ph.pCurrPos, t.outStack.length, found_operand);
+				} else if (parserHelp.isRef.call(ph, t.Formula, ph.pCurrPos)) {
 					if (wsT !== wsF) {
-						found_operand = new cArea3D(t.operand_str.toUpperCase(), wsF, wsT);
+						found_operand = new cArea3D(ph.operand_str.toUpperCase(), wsF, wsT);
 					} else {
-						found_operand = new cRef3D(t.operand_str.toUpperCase(), wsF);
+						found_operand = new cRef3D(ph.operand_str.toUpperCase(), wsF);
 					}
-					parseResult.addRefPos(prevCurrPos, t.pCurrPos, t.outStack.length, found_operand);
-				} else if (parserHelp.isName.call(t, t.Formula, t.pCurrPos)) {
-					found_operand = new cName3D(t.operand_str, wsF);
-					parseResult.addRefPos(prevCurrPos, t.pCurrPos, t.outStack.length, found_operand);
+					parseResult.addRefPos(prevCurrPos, ph.pCurrPos, t.outStack.length, found_operand);
+				} else if (parserHelp.isName.call(ph, t.Formula, ph.pCurrPos)) {
+					found_operand = new cName3D(ph.operand_str, wsF);
+					parseResult.addRefPos(prevCurrPos, ph.pCurrPos, t.outStack.length, found_operand);
 				}
 			}
 
-			/* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(t, t.Formula,
-					t.pCurrPos)) {
-				found_operand = new cArea(t.operand_str.toUpperCase(), t.ws);
-				parseResult.addRefPos(t.pCurrPos - t.operand_str.length, t.pCurrPos, t.outStack.length, found_operand);
+			/* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(ph, t.Formula,
+					ph.pCurrPos)) {
+				found_operand = new cArea(ph.operand_str.toUpperCase(), t.ws);
+				parseResult.addRefPos(ph.pCurrPos - ph.operand_str.length, ph.pCurrPos, t.outStack.length, found_operand);
 			}
-			/* Referens to cell A4 */ else if (parserHelp.isRef.call(t, t.Formula, t.pCurrPos)) {
-				found_operand = new cRef(t.operand_str.toUpperCase(), t.ws);
-				parseResult.addRefPos(t.pCurrPos - t.operand_str.length, t.pCurrPos, t.outStack.length, found_operand);
+			/* Referens to cell A4 */ else if (parserHelp.isRef.call(ph, t.Formula, ph.pCurrPos)) {
+				found_operand = new cRef(ph.operand_str.toUpperCase(), t.ws);
+				parseResult.addRefPos(ph.pCurrPos - ph.operand_str.length, ph.pCurrPos, t.outStack.length, found_operand);
 			}
 
-			else if (_tableTMP = parserHelp.isTable.call(t, t.Formula, t.pCurrPos, local)) {
+			else if (_tableTMP = parserHelp.isTable.call(ph, t.Formula, ph.pCurrPos, local)) {
 				found_operand = cStrucTable.prototype.createFromVal(_tableTMP, t.wb, t.ws);
 
 				//todo undo delete column
@@ -5344,25 +5336,25 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 
 				if (found_operand.type !== cElementType.error) {
-					parseResult.addRefPos(t.pCurrPos - t.operand_str.length, t.pCurrPos, t.outStack.length, found_operand, true);
+					parseResult.addRefPos(ph.pCurrPos - ph.operand_str.length, ph.pCurrPos, t.outStack.length, found_operand, true);
 				}
 			}
 
-			/* Referens to DefinedNames */ else if (parserHelp.isName.call(t, t.Formula, t.pCurrPos,
+			/* Referens to DefinedNames */ else if (parserHelp.isName.call(ph, t.Formula, ph.pCurrPos,
 					t.wb, t.ws)[0]) {
-				found_operand = new cName(t.operand_str, t.ws);
+				found_operand = new cName(ph.operand_str, t.ws);
 				var defName = found_operand.getDefName();
-				if (defName && defName.isTable && (_tableTMP = parserHelp.isTable(t.operand_str + "[]", 0))) {
+				if (defName && defName.isTable && (_tableTMP = parserHelp.isTable(ph.operand_str + "[]", 0))) {
 					found_operand = cStrucTable.prototype.createFromVal(_tableTMP, t.wb, t.ws);
 					//need assemble becase source formula wrong
 					needAssemble = true;
 				}
-				parseResult.addRefPos(t.pCurrPos - t.operand_str.length, t.pCurrPos, t.outStack.length, found_operand, true);
+				parseResult.addRefPos(ph.pCurrPos - ph.operand_str.length, ph.pCurrPos, t.outStack.length, found_operand, true);
 			}
 
-			/* Numbers*/ else if (parserHelp.isNumber.call(t, t.Formula, t.pCurrPos, digitDelim)) {
-				if (t.operand_str !== ".") {
-					found_operand = new cNumber(parseFloat(t.operand_str));
+			/* Numbers*/ else if (parserHelp.isNumber.call(ph, t.Formula, ph.pCurrPos, digitDelim)) {
+				if (ph.operand_str !== ".") {
+					found_operand = new cNumber(parseFloat(ph.operand_str));
 				} else {
 					parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
 					t.outStack = [];
@@ -5370,20 +5362,20 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 			}
 
-			/* Function*/ else if (parserHelp.isFunc.call(t, t.Formula, t.pCurrPos)) {
+			/* Function*/ else if (parserHelp.isFunc.call(ph, t.Formula, ph.pCurrPos)) {
 
 				if (wasRigthParentheses && parseResult.operand_expected) {
 					elemArr.push(new cMultOperator());
 				}
 
-				var found_operator = null, operandStr = t.operand_str.replace(rx_sFuncPref, "").toUpperCase();
+				var found_operator = null, operandStr = ph.operand_str.replace(rx_sFuncPref, "").toUpperCase();
 				if (operandStr in cFormulaList) {
 					found_operator = cFormulaList[operandStr].prototype;
 				} else if (operandStr in cAllFormulaFunction) {
 					found_operator = cAllFormulaFunction[operandStr].prototype;
 				} else {
 					found_operator = new cUnknownFunction(operandStr);
-					found_operator.isXLFN = ( t.operand_str.indexOf("_xlfn.") === 0 );
+					found_operator.isXLFN = ( ph.operand_str.indexOf("_xlfn.") === 0 );
 				}
 
 				if (found_operator !== null) {
@@ -5424,34 +5416,34 @@ parserFormula.prototype.setFormula = function(formula) {
 			return true;
 		};
 
-		while (this.pCurrPos < this.Formula.length) {
-			this.operand_str = this.Formula[this.pCurrPos];
+		while (ph.pCurrPos < this.Formula.length) {
+			ph.operand_str = this.Formula[ph.pCurrPos];
 
 			/* Operators*/
-			if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) || parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
+			if (parserHelp.isOperator.call(ph, this.Formula, ph.pCurrPos) || parserHelp.isNextPtg.call(ph, this.Formula, ph.pCurrPos)) {
 				if(!parseOperators()){
 					return false;
 				}
-			} /* Left Parentheses*/ else if (parserHelp.isLeftParentheses.call(this, this.Formula, this.pCurrPos)) {
+			} /* Left Parentheses*/ else if (parserHelp.isLeftParentheses.call(ph, this.Formula, ph.pCurrPos)) {
 				parseLeftParentheses();
 
 				//TODO протестировать
 				//если осталось только закрыть скобки за функции с нулевым количеством аргументов
-				if(this.pCurrPos === this.Formula.length){
+				if(ph.pCurrPos === this.Formula.length){
 					if(elemArr[elemArr.length - 2] && 0 === elemArr[elemArr.length - 2].argumentsMax){
 						this.operand_expected = false;
 					}
 				}
 
-			}/* Right Parentheses */ else if (parserHelp.isRightParentheses.call(this, this.Formula, this.pCurrPos)) {
+			}/* Right Parentheses */ else if (parserHelp.isRightParentheses.call(ph, this.Formula, ph.pCurrPos)) {
 				if(!parseRightParentheses()){
 					return false;
 				}
-			}/*Comma & arguments union*/ else if (parserHelp.isComma.call(this, this.Formula, this.pCurrPos)) {
+			}/*Comma & arguments union*/ else if (parserHelp.isComma.call(ph, this.Formula, ph.pCurrPos)) {
 				if(!parseCommaAndArgumentsUnion()){
 					return false;
 				}
-			}/* Array */ else if (parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos)) {
+			}/* Array */ else if (parserHelp.isLeftBrace.call(ph, this.Formula, ph.pCurrPos)) {
 				if(!parseArray()){
 					return false;
 				}
