@@ -1500,7 +1500,16 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     else
         Left = false === PRS.UseFirstLine ? this.Pages[CurPage].X + ParaPr.Ind.Left : this.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
-    var PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	var PageFields = null;
+    if (this.bFromDocument && PRS.GetTopDocument() === this.LogicDocument && !PRS.IsInTable())
+	{
+		// Заглушка для случая, когда параграф лежит в CBlockLevelSdt
+		PageFields = this.LogicDocument.Get_ColumnFields(PRS.GetTopIndex(), this.Get_AbsoluteColumn(CurPage));
+	}
+	else
+	{
+		PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	}
 
     var Ranges = PRS.Ranges;
     var Ranges2;
@@ -2704,6 +2713,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.Paragraph       = Para;
     this.Parent          = null;
     this.TopDocument     = null;
+    this.TopIndex        = -1;   // Номер элемента контейнера (содержащего данный параграф), либо номер данного параграфа в самом верхнем документе
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
 	this.InTable         = false;
@@ -3214,6 +3224,17 @@ CParagraphRecalculateStateWrap.prototype.GetSectPr = function()
 CParagraphRecalculateStateWrap.prototype.GetTopDocument = function()
 {
 	return this.TopDocument;
+};
+CParagraphRecalculateStateWrap.prototype.GetTopIndex = function()
+{
+	if (-1 === this.TopIndex)
+	{
+		var arrPos = this.Paragraph.GetDocumentPositionFromObject();
+		if (arrPos.length > 0)
+			this.TopIndex = arrPos[0].Position;
+	}
+
+	return this.TopIndex;
 };
 
 function CParagraphRecalculateStateCounter()
