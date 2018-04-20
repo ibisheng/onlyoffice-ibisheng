@@ -4454,7 +4454,6 @@ function parserFormula( formula, parent, _ws ) {
     this.pCurrPos = 0;
     this.elemArr = [];
     this.operand_str = null;
-    this.parenthesesNotEnough = false;
     this.f = [];
     this.shared = null;
 
@@ -4635,7 +4634,6 @@ parserFormula.prototype.setFormula = function(formula) {
   this.pCurrPos = 0;
   this.elemArr = [];
   this.operand_str = null;
-  this.parenthesesNotEnough = false;
   this.f = [];
   this.ca = false;
   //this.isTable = false;
@@ -5506,7 +5504,7 @@ parserFormula.prototype.setFormula = function(formula) {
 		var operand, parenthesesNotEnough = false;
 		while (0 !== this.elemArr.length) {
 			operand = this.elemArr.pop();
-			if ('(' === operand.name && !this.parenthesesNotEnough) {
+			if ('(' === operand.name) {
 				this.Formula += ")";
 				parenthesesNotEnough = true;
 			} else if ('(' === operand.name || ')' === operand.name) {
@@ -5518,8 +5516,7 @@ parserFormula.prototype.setFormula = function(formula) {
 				this.outStack.push(operand);
 			}
 		}
-		this.parenthesesNotEnough = parenthesesNotEnough;
-		if (this.parenthesesNotEnough) {
+		if (parenthesesNotEnough) {
 			this.error.push(c_oAscError.ID.FrmlParenthesesCorrectCount);
 			return this.isParsed = false;
 		}
