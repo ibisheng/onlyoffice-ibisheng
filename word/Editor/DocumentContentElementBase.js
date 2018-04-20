@@ -430,7 +430,7 @@ CDocumentContentElementBase.prototype.Add = function(oParaItem)
 CDocumentContentElementBase.prototype.PreDelete = function()
 {
 };
-CDocumentContentElementBase.prototype.ClearParagraphFormatting = function()
+CDocumentContentElementBase.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 };
 CDocumentContentElementBase.prototype.GetCursorPosXY = function()

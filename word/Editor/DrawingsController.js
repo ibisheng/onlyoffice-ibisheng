@@ -69,9 +69,9 @@ CDrawingsController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.DrawingObjects.addInlineTable(Cols, Rows);
 };
-CDrawingsController.prototype.ClearParagraphFormatting = function()
+CDrawingsController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.DrawingObjects.paragraphClearFormatting();
+	this.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
 };
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

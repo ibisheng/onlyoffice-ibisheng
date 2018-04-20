@@ -64,9 +64,9 @@ CLogicDocumentController.prototype.AddInlineTable = function(nCols, nRows)
 {
 	this.LogicDocument.controller_AddInlineTable(nCols, nRows);
 };
-CLogicDocumentController.prototype.ClearParagraphFormatting = function()
+CLogicDocumentController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.LogicDocument.controller_ClearParagraphFormatting();
+	this.LogicDocument.controller_ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
 {

@@ -649,7 +649,7 @@
     };
 
 
-    CDrawingDocContent.prototype.ClearParagraphFormatting = function()
+    CDrawingDocContent.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
     {
         if (true === this.ApplyToAll)
         {
@@ -657,7 +657,7 @@
             {
                 var Item = this.Content[Index];
                 Item.Set_ApplyToAll(true);
-                Item.Clear_TextFormatting();
+                Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
                 Item.Set_ApplyToAll(false);
             }
 
@@ -666,7 +666,7 @@
 
         if (docpostype_DrawingObjects == this.CurPos.Type)
         {
-            return this.LogicDocument.DrawingObjects.paragraphClearFormatting();
+            return this.LogicDocument.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -686,14 +686,14 @@
                     for (var Index = StartPos; Index <= EndPos; Index++)
                     {
                         var Item = this.Content[Index];
-                        Item.Clear_TextFormatting();
+                        Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
                     }
                 }
             }
             else
             {
                 var Item = this.Content[this.CurPos.ContentPos];
-                Item.Clear_TextFormatting();
+                Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
             }
         }
     };

@@ -12155,7 +12155,7 @@ CTitle.prototype =
                 if(bDocument && para_drawing instanceof ParaDrawing)
                 {
 
-                    var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
+                    var hdr_ftr = para_drawing.DocumentContent.IsHdrFtr(true);
                     if(hdr_ftr)
                     {
                         hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);

@@ -1126,3 +1126,27 @@ CDocumentContentBase.prototype.GetPrevParagraph = function()
 
 	return null;
 };
+/**
+ * Находимся ли мы в колонтитуле
+ * @param {boolean} [bReturnHdrFtr=false]
+ * @returns {?CHeaderFooter | boolean}
+ */
+CDocumentContentBase.prototype.IsHdrFtr = function(bReturnHdrFtr)
+{
+	if (true === bReturnHdrFtr)
+		return null;
+
+	return false;
+};
+/**
+ * Находимся ли мы в сноске
+ * @param {boolean} [bReturnFootnote=false]
+ * @returns {?CFootEndnote | boolean}
+ */
+CDocumentContentBase.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (bReturnFootnote)
+		return null;
+
+	return false;
+};

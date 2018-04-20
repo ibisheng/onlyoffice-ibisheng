@@ -4603,9 +4603,20 @@ CDocument.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 {
 	this.Controller.AddToParagraph(ParaItem, bRecalculate);
 };
-CDocument.prototype.ClearParagraphFormatting  = function()
+/**
+ * Очищаем форматирование внутри селекта
+ * {boolean} [isClearParaPr=true] Очищать ли настройки параграфа
+ * {boolean} [isClearTextPr=true] Очищать ли настройки текста
+ */
+CDocument.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.Controller.ClearParagraphFormatting();
+	if (false !== isClearParaPr)
+		isClearParaPr = true;
+
+	if (false !== isClearTextPr)
+		isClearTextPr = true;
+
+	this.Controller.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
@@ -4940,7 +4951,7 @@ CDocument.prototype.Select_Drawings = function(DrawingArray, TargetContent)
 	if (DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
 		return;
 	this.DrawingObjects.resetSelection();
-	var hdr_ftr = TargetContent.Is_HdrFtr(true);
+	var hdr_ftr = TargetContent.IsHdrFtr(true);
 	if (hdr_ftr)
 	{
 		hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
@@ -6829,7 +6840,7 @@ CDocument.prototype.OnKeyDown = function(e)
                 }
                 else if (true === e.CtrlKey)
                 {
-                    this.ClearParagraphFormatting();
+                    this.ClearParagraphFormatting(false, true);
                 }
                 else
                 {
@@ -8452,13 +8463,6 @@ CDocument.prototype.Is_DrawingShape = function(bRetShape)
 	{
 		return null;
 	}
-	return false;
-};
-CDocument.prototype.Is_HdrFtr = function(bReturnHdrFtr)
-{
-	if (true === bReturnHdrFtr)
-		return null;
-
 	return false;
 };
 CDocument.prototype.IsSelectionUse = function()
@@ -12760,7 +12764,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 
 	this.Recalculate();
 };
-CDocument.prototype.controller_ClearParagraphFormatting = function()
+CDocument.prototype.controller_ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 	if (true === this.Selection.Use)
 	{
@@ -12777,13 +12781,13 @@ CDocument.prototype.controller_ClearParagraphFormatting = function()
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				this.Content[Index].ClearParagraphFormatting();
+				this.Content[Index].ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 			}
 		}
 	}
 	else
 	{
-		this.Content[this.CurPos.ContentPos].ClearParagraphFormatting();
+		this.Content[this.CurPos.ContentPos].ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 	}
 };
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)

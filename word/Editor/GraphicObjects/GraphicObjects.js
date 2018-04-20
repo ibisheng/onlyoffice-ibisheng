@@ -1090,7 +1090,7 @@ CGraphicObjects.prototype =
 
     addFloatTable: function(table)
     {
-        var hdr_ftr = table.Table.Parent.Is_HdrFtr(true);
+        var hdr_ftr = table.Table.Parent.IsHdrFtr(true);
         if(!this.graphicPages[table.PageNum + table.PageController])
         {
             this.graphicPages[table.PageNum + table.PageController] = new CGraphicPage(table.PageNum + table.PageController, this);
@@ -1115,7 +1115,7 @@ CGraphicObjects.prototype =
         var table = g_oTableId.Get_ById(id);
         if(table)
         {
-            var hdr_ftr = table.Parent.Is_HdrFtr(true);
+            var hdr_ftr = table.Parent.IsHdrFtr(true);
             if(!hdr_ftr)
             {
                 this.graphicPages[pageIndex].removeFloatTableById(id);
@@ -1138,7 +1138,7 @@ CGraphicObjects.prototype =
         {
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         }
-        if(!documentContent.Is_HdrFtr())
+        if(!documentContent.IsHdrFtr())
             return this.graphicPages[pageIndex].getTableByXY(x, y, documentContent);
         else
             return this.graphicPages[pageIndex].hdrFtrPage.getTableByXY(x, y, documentContent);
@@ -1252,7 +1252,7 @@ CGraphicObjects.prototype =
         if(!this.graphicPages[pageIndex])
             this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
         var arr, page, i, ret = [];
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1282,7 +1282,7 @@ CGraphicObjects.prototype =
         }
 
         var tables, page;
-        if(!docContent.Is_HdrFtr())
+        if(!docContent.IsHdrFtr())
         {
 
             page = this.graphicPages[pageIndex];
@@ -1664,7 +1664,7 @@ CGraphicObjects.prototype =
 
     resetDrawingArrays : function(pageIndex, docContent)
     {
-        var hdr_ftr = docContent.Is_HdrFtr(true);
+        var hdr_ftr = docContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(isRealObject(this.graphicPages[pageIndex]))
@@ -2372,7 +2372,7 @@ CGraphicObjects.prototype =
     drawWrappingObjectsInContent: function(pageIndex, graphics, content)
     {
         var page;
-        if(content.Is_HdrFtr())
+        if(content.IsHdrFtr())
         {
             page = this.getHdrFtrObjectsByPageIndex(pageIndex);
         }
@@ -2539,7 +2539,7 @@ CGraphicObjects.prototype =
 
     addObjectOnPage: function(pageIndex, object)
     {
-        var hdr_ftr = object.parent.DocumentContent.Is_HdrFtr(true);
+        var hdr_ftr = object.parent.DocumentContent.IsHdrFtr(true);
         if(!hdr_ftr)
         {
             if(!this.graphicPages[pageIndex])
@@ -3255,7 +3255,7 @@ CGraphicObjects.prototype =
         var object = g_oTableId.Get_ById(id);
         if(isRealObject(object))
         {
-            var hdr_ftr = object.DocumentContent.Is_HdrFtr(true);
+            var hdr_ftr = object.DocumentContent.IsHdrFtr(true);
             var page = !hdr_ftr ? this.graphicPages[pageIndex] : null;
             if(isRealObject(page))
             {
@@ -3296,7 +3296,7 @@ CGraphicObjects.prototype =
         var obj = g_oTableId.Get_ById(id), nPageIndex = pageIndex;
         if(obj && obj.GraphicObj)
         {
-            if(obj.DocumentContent && obj.DocumentContent.Is_HdrFtr())
+            if(obj.DocumentContent && obj.DocumentContent.IsHdrFtr())
             {
                 if(obj.DocumentContent.Get_StartPage_Absolute() !== obj.PageNum)
                 {
@@ -3391,9 +3391,9 @@ CGraphicObjects.prototype =
     addNewParagraph: DrawingObjectsController.prototype.addNewParagraph,
 
 
-    paragraphClearFormatting: function()
+    paragraphClearFormatting: function(isClearParaPr, isClearTextPr)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [isClearParaPr, isClearTextPr], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,

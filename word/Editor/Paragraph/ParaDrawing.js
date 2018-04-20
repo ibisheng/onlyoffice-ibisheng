@@ -1265,14 +1265,14 @@ ParaDrawing.prototype.updatePosition3 = function(pageIndex, x, y, oldPageNum)
 	this.setPageIndex(pageIndex);
 	if (typeof this.GraphicObj.setStartPage === "function")
 	{
-		var bIsHfdFtr = this.DocumentContent && this.DocumentContent.Is_HdrFtr();
+		var bIsHfdFtr = this.DocumentContent && this.DocumentContent.IsHdrFtr();
 		this.GraphicObj.setStartPage(pageIndex, bIsHfdFtr, bIsHfdFtr);
 	}
 	var bInline = this.Is_Inline();
 	var _x      = (this.PositionH.Align || bInline) ? x - this.GraphicObj.bounds.x : x;
 	var _y      = (this.PositionV.Align || bInline) ? y - this.GraphicObj.bounds.y : y;
 
-	if (!(this.DocumentContent && this.DocumentContent.Is_HdrFtr() && this.DocumentContent.Get_StartPage_Absolute() !== pageIndex))
+	if (!(this.DocumentContent && this.DocumentContent.IsHdrFtr() && this.DocumentContent.Get_StartPage_Absolute() !== pageIndex))
 	{
 		this.graphicObjects.addObjectOnPage(pageIndex, this.GraphicObj);
 		this.bNoNeedToAdd = false;
@@ -2095,10 +2095,10 @@ ParaDrawing.prototype.select = function(pageIndex)
 		this.GraphicObj.select(pageIndex);
 
 };
-ParaDrawing.prototype.paragraphClearFormatting = function()
+ParaDrawing.prototype.paragraphClearFormatting = function(isClearParaPr, isClearTextPr)
 {
 	if (isRealObject(this.GraphicObj) && typeof  this.GraphicObj.paragraphAdd === "function")
-		this.GraphicObj.paragraphClearFormatting();
+		this.GraphicObj.paragraphClearFormatting(isClearParaPr, isClearTextPr);
 };
 ParaDrawing.prototype.paragraphAdd = function(paraItem, bRecalculate)
 {

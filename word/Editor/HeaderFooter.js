@@ -458,13 +458,18 @@ CHeaderFooter.prototype =
         return false;
     },
 
-    Is_HdrFtr : function(bReturnHdrFtr)
-    {
-        if ( true === bReturnHdrFtr )
-            return this;
+    IsHdrFtr : function(bReturnHdrFtr)
+	{
+		if (true === bReturnHdrFtr)
+			return this;
 
-        return true;
-    },
+		return true;
+	},
+
+	IsFootnote : function(bReturnFootnote)
+	{
+		return (bReturnFootnote ? null : false);
+	},
 
     Get_ParentTextTransform : function()
     {
@@ -706,10 +711,10 @@ CHeaderFooter.prototype =
 		this.Content.AddToParagraph(ParaItem, bRecalculate);
 	},
 
-	ClearParagraphFormatting : function()
-    {
-        this.Content.ClearParagraphFormatting();
-    },
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
+	{
+		this.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
+	},
 
 	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
 	{
@@ -1913,11 +1918,11 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.AddToParagraph(ParaItem, bRecalculate);
 	},
 
-	ClearParagraphFormatting : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.ClearParagraphFormatting();
-    },
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.ClearParagraphFormatting();
+	},
 
 	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
 	{

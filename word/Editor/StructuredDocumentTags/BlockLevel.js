@@ -446,9 +446,9 @@ CBlockLevelSdt.prototype.PreDelete = function()
 {
 	this.Content.PreDelete();
 };
-CBlockLevelSdt.prototype.ClearParagraphFormatting = function()
+CBlockLevelSdt.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.Content.ClearParagraphFormatting();
+	this.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CBlockLevelSdt.prototype.GetCursorPosXY = function()
 {
@@ -788,9 +788,13 @@ CBlockLevelSdt.prototype.IsContentOnFirstPage = function()
 	return this.Content.IsContentOnFirstPage();
 };
 //----------------------------------------------------------------------------------------------------------------------
-CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CBlockLevelSdt.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
-	return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+	return this.Parent.IsHdrFtr(bReturnHdrFtr);
+};
+CBlockLevelSdt.prototype.IsFootnote = function(bReturnFootnote)
+{
+	return this.Parent.IsFootnote(bReturnFootnote);
 };
 CBlockLevelSdt.prototype.Is_TopDocument = function(bReturnTopDocument)
 {

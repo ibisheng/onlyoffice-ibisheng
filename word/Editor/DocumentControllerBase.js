@@ -64,9 +64,21 @@ CDocumentControllerBase.prototype.Get_DrawingDocument = function()
  * @param {boolean} bReturnHdrFtr Если true, тогда возвращаем ссылку на колонтитул.
  * @returns {boolean | CHeaderFooter}
  */
-CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CDocumentControllerBase.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
 	if (bReturnHdrFtr)
+		return null;
+
+	return false;
+};
+/**
+ * Является ли данный класс контроллером для сносок
+ * @param {boolean} bReturnFootnote Если true, тогда возвращаем ссылку на колонтитул
+ * @returns {boolean | CFootEndnote}
+ */
+CDocumentControllerBase.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (bReturnFootnote)
 		return null;
 
 	return false;
@@ -76,7 +88,7 @@ CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
  * @param {boolean} bReturnShape Если true, тогда возвращаем ссылку на автофигуру.
  * @returns {boolean | CShape}
  */
-CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnShape)
+CDocumentControllerBase.prototype.Is_DrawingShape = function(bReturnShape)
 {
 	if (bReturnShape)
 		return null;
@@ -332,9 +344,11 @@ CDocumentControllerBase.prototype.EditChart = function(Chart){};
  */
 CDocumentControllerBase.prototype.AddInlineTable = function(nCols, nRows){};
 /**
- * Очищаем настройки параграфа.
+ * Очищаем форматирование внутри селекта
+ * {boolean} [isClearParaPr=true] Очищать ли настройки параграфа
+ * {boolean} [isClearTextPr=true] Очищать ли настройки текста
  */
-CDocumentControllerBase.prototype.ClearParagraphFormatting = function(){};
+CDocumentControllerBase.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr){};
 /**
  * Добавляем элемент в параграф.
  * @param oItem

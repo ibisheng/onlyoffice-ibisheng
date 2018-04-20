@@ -1406,12 +1406,12 @@ CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 	if (null !== this.CurFootnote)
 		this.CurFootnote.AddInlineTable(Cols, Rows);
 };
-CFootnotesController.prototype.ClearParagraphFormatting = function()
+CFootnotesController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.ClearParagraphFormatting();
+		oFootnote.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 	}
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)

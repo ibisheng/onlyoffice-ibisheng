@@ -6167,7 +6167,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 {
 	var PagesCount = this.Pages.length;
 
-	if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.CanEdit() && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
+	if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.CanEdit() && null === this.Parent.IsHdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
 		return this.Parent.Extend_ToPos(X, Y);
 
 	// Обновляем позицию курсора
@@ -8507,26 +8507,36 @@ Paragraph.prototype.Selection_IsFromStart = function(bCheckAnchors)
  */
 Paragraph.prototype.Clear_Formatting = function()
 {
-	if (this.bFromDocument)
+	if (this.bFromDocument && this.Parent)
 	{
-		var HdrFtr = this.Parent ? this.Parent.Is_HdrFtr(true) : null;
-		if (null !== HdrFtr)
+		var oStyles    = this.Parent.Get_Styles();
+		var oHdrFtr    = this.Parent.IsHdrFtr(true);
+		var isFootnote = this.Parent.IsFootnote();
+		if (null !== oHdrFtr)
 		{
-			var Styles = this.Parent.Get_Styles();
-
-			var HdrFtrStyle = null;
-			if (AscCommon.hdrftr_Header === HdrFtr.Type)
-				HdrFtrStyle = Styles.Get_Default_Header();
+			var sHdrFtrStyleId = null;
+			if (AscCommon.hdrftr_Header === oHdrFtr.Type)
+				sHdrFtrStyleId = oStyles.Get_Default_Header();
 			else
-				HdrFtrStyle = Styles.Get_Default_Footer();
+				sHdrFtrStyleId = oStyles.Get_Default_Footer();
 
-			if (null !== HdrFtrStyle)
-				this.Style_Add(HdrFtrStyle, true);
+			if (null !== sHdrFtrStyleId)
+				this.Style_Add(sHdrFtrStyleId, true);
+			else
+				this.Style_Remove();
+		}
+		else if (isFootnote)
+		{
+			var sFootnoteStyleId = oStyles.GetDefaultFootnoteText();
+			if (sFootnoteStyleId)
+				this.Style_Add(sFootnoteStyleId, true);
 			else
 				this.Style_Remove();
 		}
 		else
+		{
 			this.Style_Remove();
+		}
 
 		this.Numbering_Remove();
 	}
@@ -8561,8 +8571,6 @@ Paragraph.prototype.Clear_TextFormatting = function()
 		Styles   = this.Parent.Get_Styles();
 		DefHyper = Styles.GetDefaultHyperlink();
 	}
-
-	// TODO: Сделать, чтобы данная функция работала по выделению
 
 	for (var Index = 0; Index < this.Content.length; Index++)
 	{
@@ -11831,7 +11839,7 @@ Paragraph.prototype.IsSelectedAll = function()
 Paragraph.prototype.Get_HdrFtr = function()
 {
     if (this.Parent)
-        return this.Parent.Is_HdrFtr(true);
+        return this.Parent.IsHdrFtr(true);
 
     return null;
 };
@@ -12370,10 +12378,22 @@ Paragraph.prototype.GetNumberingInfo = function(oNumberingEngine)
 
 	oNumberingEngine.Check_Paragraph(this);
 };
-Paragraph.prototype.ClearParagraphFormatting = function()
+Paragraph.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.Clear_Formatting();
-	this.Clear_TextFormatting();
+	if (isClearParaPr
+		&& (!this.IsSelectionUse()
+		|| this.IsSelectedAll()
+		|| !this.Parent.IsSelectedSingleElement()))
+	{
+		this.Clear_Formatting();
+	}
+
+	if (isClearTextPr)
+	{
+		var oParaTextPr = new ParaTextPr();
+		oParaTextPr.Value.Set_FromObject(new CTextPr(), true);
+		this.Add(oParaTextPr);
+	}
 };
 Paragraph.prototype.SetParagraphAlign = function(Align)
 {

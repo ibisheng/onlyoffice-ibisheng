@@ -5733,7 +5733,7 @@ CTable.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 		this.CurCell.Content.AddToParagraph(ParaItem, bRecalculate);
 	}
 };
-CTable.prototype.ClearParagraphFormatting = function()
+CTable.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
@@ -5746,13 +5746,13 @@ CTable.prototype.ClearParagraphFormatting = function()
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.ClearParagraphFormatting();
+			Cell.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 			Cell_Content.Set_ApplyToAll(false);
 		}
 	}
 	else
 	{
-		this.CurCell.Content.ClearParagraphFormatting();
+		this.CurCell.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 	}
 };
 CTable.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)

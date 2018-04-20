@@ -530,12 +530,22 @@ CDocumentContent.prototype.Is_UseInDocument = function(Id)
 
 	return false;
 };
-CDocumentContent.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CDocumentContent.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
 	if (this.Parent)
-		return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+		return this.Parent.IsHdrFtr(bReturnHdrFtr);
 	else
 		return (bReturnHdrFtr ? null : false);
+};
+CDocumentContent.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (this instanceof CFootEndnote)
+		return true;
+
+	if (this.Parent)
+		return this.Parent.IsFootnote(bReturnFootnote);
+
+	return (bReturnFootnote ? null : false);
 };
 CDocumentContent.prototype.Is_DrawingShape = function(bRetShape)
 {
@@ -1337,7 +1347,7 @@ CDocumentContent.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 		{
 			this.private_CheckCurPage();
 
-			if (this.CurPage > 0 && true === this.Parent.Is_HdrFtr(false))
+			if (this.CurPage > 0 && true === this.Parent.IsHdrFtr(false))
 			{
 				this.CurPage = 0;
 				this.DrawingDocument.TargetEnd();
@@ -1379,7 +1389,7 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 	var PageAbs = this.Get_AbsolutePage(CurPage);
 
 	// В колонтитуле не учитывается.
-	if ((true != this.Is_HdrFtr(false) && true !== this.IsBlockLevelSdtContent()) || true === bForceCheckDrawings)
+	if ((true != this.IsHdrFtr(false) && true !== this.IsBlockLevelSdtContent()) || true === bForceCheckDrawings)
 	{
 		// Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
 		// случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
@@ -2898,15 +2908,21 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 		}
 	}
 };
-CDocumentContent.prototype.ClearParagraphFormatting = function()
+CDocumentContent.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
+	if (false !== isClearParaPr)
+		isClearParaPr = true;
+
+	if (false !== isClearTextPr)
+		isClearTextPr = true;
+
 	if (true === this.ApplyToAll)
 	{
 		for (var Index = 0; Index < this.Content.length; Index++)
 		{
 			var Item = this.Content[Index];
 			Item.Set_ApplyToAll(true);
-			Item.ClearParagraphFormatting();
+			Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 			Item.Set_ApplyToAll(false);
 		}
 
@@ -2915,7 +2931,7 @@ CDocumentContent.prototype.ClearParagraphFormatting = function()
 
 	if (docpostype_DrawingObjects == this.CurPos.Type)
 	{
-		return this.LogicDocument.DrawingObjects.paragraphClearFormatting();
+		return this.LogicDocument.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
@@ -2935,14 +2951,14 @@ CDocumentContent.prototype.ClearParagraphFormatting = function()
 				for (var Index = StartPos; Index <= EndPos; Index++)
 				{
 					var Item = this.Content[Index];
-					Item.ClearParagraphFormatting();
+					Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 				}
 			}
 		}
 		else
 		{
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.ClearParagraphFormatting();
+			Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 		}
 	}
 };
@@ -4203,7 +4219,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         {
             this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
             var DocContent = this;
-            var HdrFtr     = this.Is_HdrFtr(true);
+            var HdrFtr     = this.IsHdrFtr(true);
             if (null !== HdrFtr)
                 DocContent = HdrFtr.Content;
 
@@ -6572,7 +6588,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 		this.DrawingDocument.TargetEnd();
 		this.DrawingDocument.SetCurrentPage(AbsPage);
 
-		var HdrFtr = this.Is_HdrFtr(true);
+		var HdrFtr = this.IsHdrFtr(true);
 		if (null === HdrFtr)
 		{
 			this.LogicDocument.Selection.Use   = true;
@@ -7057,7 +7073,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
     this.DrawingDocument.TargetEnd();
     this.DrawingDocument.SetCurrentPage(this.Get_StartPage_Absolute() + this.CurPage);
 
-    var HdrFtr = this.Is_HdrFtr(true);
+    var HdrFtr = this.IsHdrFtr(true);
     if (null != HdrFtr)
     {
         HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);

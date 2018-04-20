@@ -1943,9 +1943,9 @@ DrawingObjectsController.prototype =
     },
 
 
-    paragraphClearFormatting: function()
+    paragraphClearFormatting: function(isClearParaPr, isClearTextPr)
     {
-        this.applyDocContentFunction(AscFormat.CDrawingDocContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
+        this.applyDocContentFunction(AscFormat.CDrawingDocContent.prototype.ClearParagraphFormatting, [isClearParaPr, isClearTextPr], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: function(f, args, tableFunction)
@@ -5790,7 +5790,7 @@ DrawingObjectsController.prototype =
                 var selectNext = function (oThis, last_selected_object)
                 {
                     var search_array = oThis.getAllObjectsOnPage(last_selected_object.selectStartPage,
-                        last_selected_object.parent && last_selected_object.parent.DocumentContent && last_selected_object.parent.DocumentContent.Is_HdrFtr(false));
+                        last_selected_object.parent && last_selected_object.parent.DocumentContent && last_selected_object.parent.DocumentContent.IsHdrFtr(false));
 
                     if(search_array.length > 0)
                     {
@@ -5858,7 +5858,7 @@ DrawingObjectsController.prototype =
                 var selectPrev = function (oThis, first_selected_object)
                 {
                     var search_array = oThis.getAllObjectsOnPage(first_selected_object.selectStartPage,
-                        first_selected_object.parent && first_selected_object.parent.DocumentContent && first_selected_object.parent.DocumentContent.Is_HdrFtr(false));
+                        first_selected_object.parent && first_selected_object.parent.DocumentContent && first_selected_object.parent.DocumentContent.IsHdrFtr(false));
 
                     if(search_array.length > 0)
                     {

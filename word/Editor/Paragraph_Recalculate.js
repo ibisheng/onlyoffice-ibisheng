@@ -47,7 +47,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
     if (this.Pages.length <= 0)
         return [];
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return [];
 
     //Не запускаемм быстрый пересчет, когда параграф находится в автофигуре с выставленным флагом подбора размера по размеру контента,
@@ -198,7 +198,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     if (this.Pages.length <= 0)
         return -1;
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return -1;
 
     var Run = SimpleChanges[0].Class;

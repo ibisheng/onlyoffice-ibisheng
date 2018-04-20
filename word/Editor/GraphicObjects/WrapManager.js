@@ -833,7 +833,7 @@ CWrapManager.prototype =
         }
         else
         {
-            if(!docContent.Is_HdrFtr())
+            if(!docContent.IsHdrFtr())
             {
                 for(index = 0; index < objects_count; ++index)
                 {

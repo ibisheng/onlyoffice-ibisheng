@@ -2456,10 +2456,10 @@ CPresentation.prototype =
 
     },
 
-	ClearParagraphFormatting : function()
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
     {
         var oController = this.GetCurrentController();
-        oController && oController.checkSelectedObjectsAndCallback(oController.paragraphClearFormatting, [], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
+        oController && oController.checkSelectedObjectsAndCallback(oController.paragraphClearFormatting, [isClearParaPr, isClearTextPr], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
         this.Document_UpdateInterfaceState();
     },
 

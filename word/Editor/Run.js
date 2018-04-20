@@ -3249,7 +3249,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     if (para_PageCount === ItemType)
                     {
-                        var oHdrFtr = Para.Parent.Is_HdrFtr(true);
+                        var oHdrFtr = Para.Parent.IsHdrFtr(true);
                         if (oHdrFtr)
                             oHdrFtr.Add_PageCountElement(Item);
                     }
@@ -3502,7 +3502,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					{
 						// Специальная ветка, для полей PAGE и NUMPAGES, находящихся в колонтитуле
 						var oComplexField = Item.GetComplexField();
-						var oHdrFtr       = Para.Parent.Is_HdrFtr(true);
+						var oHdrFtr       = Para.Parent.IsHdrFtr(true);
 						if (oHdrFtr && oComplexField)
 						{
 							var oInstruction = oComplexField.GetInstruction();
