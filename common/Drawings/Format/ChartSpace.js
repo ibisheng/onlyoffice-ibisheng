@@ -156,6 +156,34 @@ var SKIP_LBL_LIMIT = 100;
     }
 }
 
+function CRect(x, y, w, h){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.x1 = x;
+        this.y1 = y;
+        this.w1 = w;
+        this.h1 = h;
+}
+
+    CRect.prototype.intersection = function(oRect){
+        if(this.x + this.w < oRect.x || oRect.x + oRect.w < this.x
+            || this.y + this.h < oRect.y || oRect.y + oRect.h < this.y){
+            return false;
+        }
+        var x0 = Math.max(this.x, oRect.x);
+        var y0 = Math.max(this.y, oRect.y);
+        var x1 = Math.min(this.x + this.w, oRect.x + oRect.w);
+        var y1 = Math.min(this.y + this.h, oRect.y + oRect.h);
+        this.x = x0;
+        this.y = y0;
+        this.w = x1 - x0;
+        this.h = y1 - y0;
+        return true;
+
+    };
+
 function BBoxInfo(worksheet, bbox)
 {
     this.worksheet = worksheet;
@@ -318,6 +346,8 @@ CChartStyleManager.prototype =
 
 CHART_STYLE_MANAGER = new CChartStyleManager();
 
+
+
 function ChartLineStyle(axisAndMajorGridLines, minorGridlines, chartArea, otherLines, floorChartArea)
 {
     this.axisAndMajorGridLines = axisAndMajorGridLines;
@@ -326,6 +356,8 @@ function ChartLineStyle(axisAndMajorGridLines, minorGridlines, chartArea, otherL
     this.otherLines = otherLines;
     this.floorChartArea = floorChartArea;
 }
+
+
 
 function CChartStyle(effect, fill1, fill2, fill3, line1, line2, line3, line4, markerSize)
 {
@@ -657,6 +689,382 @@ function checkPointInMap(map, worksheet, row, col)
     drawingsChangesMap[AscDFH.historyitem_PageSetupSetUseFirstPageNumb             ] = function(oClass, value){oClass.useFirstPageNumb = value;};
     drawingsChangesMap[AscDFH.historyitem_PageSetupSetVerticalDpi                  ] = function(oClass, value){oClass.verticalDpi      = value;};
 
+
+    function CLabelsBox(aStrings, oAxis, oChartSpace){
+        this.x = 0.0;
+        this.y = 0.0;
+        this.extX = 0.0;
+        this.extY = 0.0;
+        this.aLabels = [];
+        this.maxMinWidth = -1.0;
+        this.maxOneStringWidth = -1.0;
+
+
+        var oStyle = null, oLbl, fMinW;
+        for(var i = 0; i < aStrings.length; ++i){
+            if(typeof aStrings[i] === "string"){
+                oLbl = fCreateLabel(aStrings[i], i, oAxis, oChartSpace, oAxis.txPr, oAxis.spPr, oChartSpace.getDrawingDocument());
+                if(oStyle){
+                    oLbl.lastStyleObject = oStyle;
+                }
+                fMinW = oLbl.tx.rich.content.RecalculateMinMaxContentWidth().Min;
+                if(fMinW > this.maxMinWidth){
+                    this.maxMinWidth = fMinW;
+                }
+                this.aLabels.push(oLbl);
+                if(!oStyle){
+                    oStyle = oLbl.lastStyleObject;
+                }
+            }
+            else{
+                this.aLabels.push(null);
+            }
+        }
+
+    }
+    CLabelsBox.prototype.draw = function(graphics){
+        for(var i = 0; i < this.aLabels.length; ++i)
+        {
+            if(this.aLabels[i])
+                this.aLabels[i].draw(graphics);
+        }
+    };
+
+    CLabelsBox.prototype.checkMaxMinWidth = function () {
+        if(this.maxMinWidth < 0.0){
+            var oStyle = null, oLbl, fMinW;
+            for(var i = 0; i < this.aLabels.length; ++i){
+                oLbl = this.aLabels[i];
+                if(oLbl){
+                    if(oStyle){
+                        oLbl.lastStyleObject = oStyle;
+                    }
+                    fMinW = oLbl.tx.rich.content.RecalculateMinMaxContentWidth().Min;
+                    if(fMinW > this.maxMinWidth){
+                        this.maxMinWidth = fMinW;
+                    }
+                    if(!oStyle){
+                        oStyle = oLbl.lastStyleObject;
+                    }
+                }
+            }
+        }
+        return this.maxMinWidth >= 0.0 ? this.maxMinWidth : 0.0;
+    };
+
+    CLabelsBox.prototype.checkMaxOneStringWidth = function(){
+        for(var i = 0; i < this.aLabels.length; ++i){
+
+        }
+    };
+
+    CLabelsBox.prototype.hit = function(x, y){
+    };
+
+    CLabelsBox.prototype.updatePosition = function(x, y)
+    {
+        // this.posX = x;
+        // this.posY = y;
+        // this.transform = this.localTransform.CreateDublicate();
+        // global_MatrixTransformer.TranslateAppend(this.transform, x, y);
+        // this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+        for(var i = 0; i < this.aLabels.length; ++i)
+        {
+            if(this.aLabels[i])
+                this.aLabels[i].updatePosition(x, y);
+        }
+    };
+
+    CLabelsBox.prototype.layoutHorNormal = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
+        var fMaxHeight = 0.0;
+        var fCurX = bOnTickMark ? fXStart - Math.abs(fInterval)/2.0 : fXStart;
+        var oFirstLabel = null, fFirstLabelCenterX = null, oLastLabel = null, fLastLabelCenterX = null;
+        var fContentWidth = Math.abs(fInterval);
+        for(var i = 0; i < this.aLabels.length; ++i){
+            if(this.aLabels[i]){
+                var oLabel = this.aLabels[i];
+                var oContent = oLabel.tx.rich.content;
+                oContent.Reset(0, 0, fContentWidth, 20000.0);
+                oContent.Recalculate_Page(0, true);
+                var fCurHeight = oContent.GetSummaryHeight();
+                if(fCurHeight > fMaxHeight){
+                    fMaxHeight = fCurHeight;
+                }
+                var fX, fY;
+                fX = fCurX;
+                if(fDistance >= 0.0){
+                    fY = fAxisY + fDistance;
+                }
+                else{
+                    fY = fAxisY + fDistance - fCurHeight;
+                }
+                var oTransform = oLabel.transformText;
+                oTransform.Reset();
+                global_MatrixTransformer.TranslateAppend(oTransform, fX, fY);
+                oTransform = oLabel.localTransformText;
+                oTransform.Reset();
+                global_MatrixTransformer.TranslateAppend(oTransform, fX, fY);
+
+
+                if(oFirstLabel === null){
+                    oFirstLabel = oLabel;
+                    fFirstLabelCenterX = fCurX + Math.abs(fInterval)/2.0;
+                }
+                oLastLabel = oLabel;
+                fLastLabelCenterX = fCurX + Math.abs(fInterval)/2.0;
+            }
+            fCurX += fInterval;
+        }
+
+        var x0, x1;
+        if(bOnTickMark && oFirstLabel && oLastLabel){
+            var fFirstLabelContentWidth = oFirstLabel.tx.rich.getMaxContentWidth(fContentWidth);
+            var fLastLabelContentWidth = oLastLabel.tx.rich.getMaxContentWidth(fContentWidth);
+            x0 = Math.min(fFirstLabelCenterX - fFirstLabelContentWidth/2.0,
+                fLastLabelCenterX - fLastLabelContentWidth/2.0, fXStart, fXStart + fInterval*(this.aLabels.length - 1));
+            x1 = Math.max(fFirstLabelCenterX + fFirstLabelContentWidth/2.0,
+                fLastLabelCenterX + fLastLabelContentWidth/2.0, fXStart, fXStart + fInterval*(this.aLabels.length - 1));
+        }
+        else{
+
+            x0 = Math.min(fXStart, fXStart + fInterval*(this.aLabels.length - 1));
+            x1 = Math.max(fXStart, fXStart + fInterval*(this.aLabels.length - 1));
+        }
+        this.x = x0;
+        this.extX = x1 - x0;
+
+        if(fDistance >= 0.0){
+            this.y = fAxisY;
+            this.extY = fDistance + fMaxHeight;
+        }
+        else{
+            this.y = fAxisY + fDistance - fMaxHeight;
+            this.extY = fMaxHeight - fDistance;
+        }
+    };
+
+    CLabelsBox.prototype.layoutHorRotated = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
+
+        var fMaxHeight = 0.0;
+        var fCurX = bOnTickMark ? fXStart - fInterval/2.0 : fXStart;
+        var oFirstLabel = null, oLastLabel, fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
+        var fMinLeft = null, fMaxRight = null;
+        for(var i = 0; i < this.aLabels.length; ++i){
+            if(this.aLabels[i]){
+                var oLabel = this.aLabels[i];
+                oLastLabel = oLabel;
+                var oContent = oLabel.tx.rich.content;
+                oContent.Set_ApplyToAll(true);
+                oContent.SetParagraphAlign(AscCommon.align_Left);
+                oContent.Set_ApplyToAll(false);
+                var oSize = oLabel.tx.rich.getContentOneStringSizes();
+                var fBoxW = fMultiplier*(oSize.w + oSize.h);
+                var fBoxH = fBoxW;
+                if(fBoxH > fMaxHeight){
+                    fMaxHeight = fBoxH;
+                }
+                var fX1, fY0, fXC, fYC;
+                fY0 = fAxisY + fDistance;
+                if(fDistance >= 0.0){
+                    fX1 = fCurX + oSize.h*fMultiplier;
+                    fXC = fX1 - fBoxW/2.0;
+                    fYC = fY0 + fBoxH/2.0;
+                }
+                else{
+                    fX1 = fCurX - oSize.h*fMultiplier;
+                    fXC = fX1 + fBoxW/2.0;
+                    fYC = fY0 - fBoxH/2.0;
+                }
+                var oTransform = oLabel.localTransformText;
+                oTransform.Reset();
+                global_MatrixTransformer.TranslateAppend(oTransform, -oSize.w/2.0, -oSize.h/2.0);
+                global_MatrixTransformer.RotateRadAppend(oTransform, fAngle);
+                global_MatrixTransformer.TranslateAppend(oTransform, fXC, fYC);
+                if(null === fMinLeft){
+                    fMinLeft = fXC - fBoxW/2.0;
+                }
+                fMaxRight = fXC + fBoxW/2.0;
+            }
+            fCurX += fInterval;
+        }
+        this.x = fXStart;
+        if(fMinLeft !== null){
+            if(fMinLeft < this.x){
+                this.x = fMinLeft;
+            }
+        }
+        var fRight = fXStart + fInterval*(this.aLabels.length - 1);
+        if(fMaxRight !== null){
+            fRight = fMaxRight;
+        }
+        this.extX = fRight - this.x;
+        if(fDistance >= 0.0){
+            this.y = fAxisY;
+            this.extY = fDistance + fMaxHeight;
+        }
+        else{
+            this.y = fAxisY + fDistance - fMaxHeight;
+            this.extY = fMaxHeight - fDistance;
+        }
+    };
+
+    CLabelsBox.prototype.layoutVertNormal = function(fAxisX, fDistance, fYStart, fInterval, bOnTickMark, fMaxBlockWidth){
+        var fCurY = bOnTickMark ? fYStart : fYStart + fInterval/2.0;
+
+        var fDistance_ = Math.abs(fDistance);
+        var oTransform, oContent, oLabel, fMinY = fYStart, fMaxY = fYStart + fInterval*(this.aLabels.length - 1), fY;
+        var fMaxContentWidth = 0.0;
+        for(var i = 0; i < this.aLabels.length; ++i){
+            if(this.aLabels[i]){
+                oLabel = this.aLabels[i];
+                oContent = oLabel.tx.rich.content;
+                oContent.Set_ApplyToAll(true);
+                oContent.SetParagraphAlign(AscCommon.align_Left);
+                oContent.Set_ApplyToAll(false);
+                var oSize = oLabel.tx.rich.getContentOneStringSizes();
+                if(oSize.w + fDistance_ > fMaxBlockWidth){
+                    break;
+                }
+
+                if(oSize.w > fMaxContentWidth){
+                    fMaxContentWidth = oSize.w;
+                }
+                oTransform = oLabel.localTransformText;
+                oTransform.Reset();
+                fY = fCurY - oSize.h/2.0;
+                if(fDistance > 0.0){
+                    global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance, fY);
+                }
+                else{
+                    global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - oSize.w, fY);
+                }
+                if(fY < fMinY){
+                    fMinY = fY;
+                }
+                if(fY + oSize.h > fMaxY){
+                    fMaxY = fY + oSize.h;
+                }
+            }
+            fCurY += fInterval;
+        }
+
+        if(i < this.aLabels.length){
+            var fMaxMinWidth = this.checkMaxMinWidth();
+            fMaxContentWidth = 0.0;
+            for(i = 0; i < this.aLabels.length; ++i){
+                oLabel = this.aLabels[i];
+                if(oLabel){
+                    oContent = oLabel.tx.rich.content;
+                    oContent.Set_ApplyToAll(true);
+                    oContent.SetParagraphAlign(AscCommon.align_Center);
+                    oContent.Set_ApplyToAll(false);
+                    var fContentWidth;
+                    if(fMaxMinWidth + fDistance_ < fMaxBlockWidth) {
+                        fContentWidth = oContent.RecalculateMinMaxContentWidth().Min + 0.1;
+                    }
+                    else{
+                        fContentWidth = fMaxBlockWidth - fDistance_;
+                    }
+                    if(fContentWidth > fMaxContentWidth){
+                        fMaxContentWidth = fContentWidth;
+                    }
+                    oContent.Reset(0, 0, fContentWidth, 20000);//выставляем большую ширину чтобы текст расчитался в одну строку.
+                    oContent.Recalculate_Page(0, true);
+                    var fContentHeight = oContent.GetSummaryHeight();
+                    oTransform = oLabel.localTransformText;
+                    oTransform.Reset();
+                    fY = fCurY - fContentHeight/2.0;
+                    if(fDistance > 0.0){
+                        global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance, fY);
+                    }
+                    else{
+                        fY = fCurY - fContentHeight/2.0;
+                        global_MatrixTransformer.TranslateAppend(oTransform, fAxisX + fDistance - fContentWidth, fY);
+                    }
+                    if(fY < fMinY){
+                        fMinY = fY;
+                    }
+                    if(fY + fContentHeight > fMaxY){
+                        fMaxY = fY + fContentHeight;
+                    }
+                }
+                fCurY += fInterval;
+            }
+        }
+
+        if(fDistance > 0.0){
+            this.x = fAxisX;
+        }
+        else{
+            this.x = fAxisX + fDistance - fMaxContentWidth;
+        }
+        this.extX = fMaxContentWidth + fDistance_;
+        
+        this.y = fMinY;
+        this.extY = fMaxY - fMinY;
+    };
+
+    function fCreateLabel(sText, idx, oParent, oChart, oTxPr, oSpPr, oDrawingDocument){
+        var dlbl = new AscFormat.CDLbl();
+        dlbl.parent = oParent;
+        dlbl.chart = oChart;
+        dlbl.spPr = oSpPr;
+        dlbl.txPr = oTxPr;
+        dlbl.idx = idx;
+        dlbl.tx = new AscFormat.CChartText();
+        dlbl.tx.rich = AscFormat.CreateTextBodyFromString(sText, oDrawingDocument, dlbl);
+        var content = dlbl.tx.rich.content;
+        content.Set_ApplyToAll(true);
+        content.SetParagraphAlign(AscCommon.align_Center);
+        content.Set_ApplyToAll(false);
+        dlbl.txBody = dlbl.tx.rich;
+        dlbl.oneStringWidth = -1.0;
+        return dlbl;
+    }
+
+    function fLayoutHorLabelsBox(oLabelsBox, fY, fXStart, fXEnd, bOnTickMark, fDistance, bForceVertical, bNumbers){
+        var fAxisLength = fXEnd - fXStart;
+        var nLabelsCount = oLabelsBox.aLabels.length;
+
+        var bOnTickMark_ = bOnTickMark && nLabelsCount > 1;
+        var nIntervalCount = bOnTickMark_ ? nLabelsCount - 1 : nLabelsCount;
+        var fInterval = fAxisLength/nIntervalCount;
+        if(!bForceVertical || true){//TODO: implement for vertical labels
+            var fMaxMinWidth = oLabelsBox.checkMaxMinWidth();
+            if(fMaxMinWidth <= Math.abs(fInterval)){
+                oLabelsBox.layoutHorNormal(fY, fDistance, fXStart, fInterval, bOnTickMark_);
+            }
+            else{
+                oLabelsBox.layoutHorRotated(fY, fDistance, fXStart, fInterval, bOnTickMark_);
+            }
+        }
+    }
+    function fLayoutVertLabelsBox(oLabelsBox, fX, fYStart, fYEnd, bOnTickMark, fDistance, bForceVertical){
+        var fAxisLength = fYEnd - fYStart;
+        var nLabelsCount = oLabelsBox.aLabels.length;
+
+        var bOnTickMark_ = bOnTickMark && nLabelsCount > 1;
+        var nIntervalCount = bOnTickMark_ ? nLabelsCount - 1 : nLabelsCount;
+        var fInterval = fAxisLength/nIntervalCount;
+
+        if(!bForceVertical || true){
+            oLabelsBox.layoutVertNormal(fX, fDistance, fYStart, fInterval, bOnTickMark_);
+        }
+        else{
+            //TODO: vertical text
+        }
+    }
+
+    function CAxisGrid(){
+        this.nType = 0;//0 - horizontal, 1 - vertical, 2 - series axis
+        this.fStart = 0.0;
+        this.fStride = 0.0;
+        this.bOnTickMark = true;
+        this.nCount = 0;
+        this.minVal = 0.0;
+        this.maxVal = 0.0;
+        this.aStrings = [];
+    }
 function CChartSpace()
 {
 	AscFormat.CGraphicObjectBase.call(this);
@@ -714,7 +1122,7 @@ function CChartSpace()
         return this.pathMemory.GetPath(index);
     };
 
-        CChartSpace.prototype.select = CShape.prototype.select;
+    CChartSpace.prototype.select = CShape.prototype.select;
 CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 CChartSpace.prototype.setDrawingBaseCoords = CShape.prototype.setDrawingBaseCoords;
 CChartSpace.prototype.deleteBFromSerialize = CShape.prototype.deleteBFromSerialize;
@@ -2204,19 +2612,18 @@ CChartSpace.prototype.updateChildLabelsTransform = function(posX, posY)
                     }
                 }
             }
-            if(this.chart.plotArea.catAx)
-            {
-                if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.updatePosition(posX, posY);
-                if(this.chart.plotArea.catAx.labels)
-                    this.chart.plotArea.catAx.labels.updatePosition(posX, posY);
-            }
-            if(this.chart.plotArea.valAx)
-            {
-                if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.updatePosition(posX, posY);
-                if(this.chart.plotArea.valAx.labels)
-                    this.chart.plotArea.valAx.labels.updatePosition(posX, posY);
+
+            var aAxes = this.chart.plotArea.axId;
+            for(var i = 0; i < aAxes.length; ++i){
+                var oAxis = aAxes[i];
+                if(oAxis){
+                    if(oAxis.title){
+                        oAxis.title.updatePosition(posX, posY);
+                    }
+                    if(oAxis.labels){
+                        oAxis.labels.updatePosition(posX, posY);
+                    }
+                }
             }
 
         }
@@ -3569,6 +3976,62 @@ CChartSpace.prototype.getNeedReflect = function()
     return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
 };
 
+CChartSpace.prototype.isChart3D = function(oChart){
+    var oOldFirstChart = this.chart.plotArea.charts[0];
+    this.chart.plotArea.charts[0] = oChart;
+    var ret = AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this);
+    this.chart.plotArea.charts[0] = oOldFirstChart;
+    return ret;
+};
+
+CChartSpace.prototype.getAxisCrossType = function(oAxis){
+    var oCrossAxis = oAxis.crossAx;
+    if(oCrossAxis && oCrossAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
+        var oChart = this.chart.plotArea.getChartsForAxis(oCrossAxis)[0];
+        if(oChart){
+            var nChartType = oChart.getObjectType();
+            if(nChartType === AscDFH.historyitem_type_ScatterChart){
+                return null;
+            }
+            else if(nChartType !== AscDFH.historyitem_type_BarChart && (nChartType !== AscDFH.historyitem_type_PieChart && nChartType !== AscDFH.historyitem_type_DoughnutChart)
+                || (nChartType === AscDFH.historyitem_type_BarChart && oChart.barDir !== AscFormat.BAR_DIR_BAR)){
+                if(oCrossAxis){
+                    if(this.isChart3D(oChart)){
+                        if(nChartType === AscDFH.historyitem_type_AreaChart || nChartType === AscDFH.historyitem_type_SurfaceChart ){
+                            return AscFormat.isRealNumber(oCrossAxis.crossBetween) ? oCrossAxis.crossBetween : AscFormat.CROSS_BETWEEN_MID_CAT;
+                        }
+                        else if(nChartType === AscDFH.historyitem_type_LineChart){
+                            return AscFormat.isRealNumber(oCrossAxis.crossBetween) ? oCrossAxis.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+                        }
+                        else{
+                            return AscFormat.CROSS_BETWEEN_BETWEEN;
+                        }
+                    }
+                    else{
+                        return AscFormat.isRealNumber(oCrossAxis.crossBetween) ? oCrossAxis.crossBetween :  ((nChartType === AscDFH.historyitem_type_AreaChart|| nChartType === AscDFH.historyitem_type_SurfaceChart ) ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
+                    }
+                }
+            }
+            else if(nChartType === AscDFH.historyitem_type_BarChart && oChart.barDir === AscFormat.BAR_DIR_BAR){
+                return AscFormat.isRealNumber(oCrossAxis.crossBetween) && !this.isChart3D(oChart) ? oCrossAxis.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+            }
+        }
+    }
+    switch(oAxis.getObjectType()){
+        case AscDFH.historyitem_type_ValAx:{
+            return AscFormat.CROSS_BETWEEN_MID_CAT;
+        }
+        case AscDFH.historyitem_type_CatAx:
+        case AscDFH.historyitem_type_DateAx:{
+            return AscFormat.CROSS_BETWEEN_BETWEEN;
+        }
+        default:{
+            return AscFormat.CROSS_BETWEEN_BETWEEN;
+        }
+    }
+    return AscFormat.CROSS_BETWEEN_BETWEEN;
+};
+
 CChartSpace.prototype.getValAxisCrossType = function()
 {
     if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0]){
@@ -3758,6 +4221,471 @@ CChartSpace.prototype.getValAxisCrossType = function()
             {
                 this.chart.legend.legendPos = null;
             }
+        }
+    };
+
+
+    CChartSpace.prototype.getLabelsForAxis = function(oAxis){
+        var aStrings = [];
+        var oPlotArea = this.chart.plotArea, i;
+        switch(oAxis.getObjectType()){
+            case AscDFH.historyitem_type_DateAx:
+            case AscDFH.historyitem_type_CatAx:{
+                //расчитаем подписи для горизонтальной оси
+                var oSeries = oPlotArea.getSeriesWithSmallestIndexForAxis(oAxis);
+                var nPtsLen = 0;
+                oAxis.scale = [];
+                if(oSeries && oSeries.cat) {
+                    var  oLit;
+                    var oCat = oSeries.cat;
+                    if(oCat.strRef && oCat.strRef.strCache){
+                        oLit = oCat.strRef.strCache;
+                    }
+                    else if(oCat.strLit){
+                        oLit = oCat.strLit;
+                    }
+                    else if(oCat.numRef && oCat.numRef.numCache){
+                        oLit = oCat.numRef.numCache;
+                    }
+                    else if(oCat.numLit)
+                    {
+                        oLit = oCat.numLit;
+                    }
+                    if(oLit)
+                    {
+                        var oLitFormat = null, oPtFormat = null;
+                        if(typeof oLit.formatCode === "string" && oLit.formatCode.length > 0)
+                        {
+                            oLitFormat = oNumFormatCache.get(oLit.formatCode);
+                        }
+                        nPtsLen = oLit.ptCount;
+                        for(i = 0; i < nPtsLen; ++i)
+                        {
+                            oAxis.scale.push(i);
+                            var oPt = oLit.getPtByIndex(i);
+                            if(oPt)
+                            {
+                                var sPt;
+                                if(typeof oPt.formatCode === "string" && oPt.formatCode.length > 0)
+                                {
+                                    oPtFormat = oNumFormatCache.get(oPt.formatCode);
+                                    if(oPtFormat)
+                                    {
+                                        sPt = oPtFormat.formatToChart(oPt.val);
+                                    }
+                                    else
+                                    {
+                                        sPt = oPt.val;
+                                    }
+                                }
+                                else if(oLitFormat)
+                                {
+                                    sPt = oLitFormat.formatToChart(oPt.val);
+                                }
+                                else
+                                {
+                                    sPt = oPt.val;
+                                }
+                                aStrings.push(sPt);
+                            }
+                            else
+                            {
+                                aStrings.push("");
+                            }
+                        }
+                    }
+                }
+
+
+                var nPtsLength = 0;
+                var aChartsForAxis = oPlotArea.getChartsForAxis(oAxis);
+                for(i = 0; i < aChartsForAxis.length; ++i){
+                    var oChart = aChartsForAxis[i];
+                    for(var j = 0; j < oChart.series.length; ++j){
+                        var oCurPts = null;
+                        oSeries = oChart.series[j];
+                        if(oSeries.val) {
+                            if(oSeries.val.numRef && oSeries.val.numRef.numCache){
+                                oCurPts = oSeries.val.numRef.numCache;
+                            }
+                            else if(oSeries.val.numLit){
+                                oCurPts = oSeries.val.numLit;
+                            }
+                            if(oCurPts){
+                                nPtsLength = Math.max(nPtsLength, oCurPts.ptCount);
+                            }
+                        }
+                    }
+                }
+                var nCrossBetween = this.getAxisCrossType(oAxis.crossAx);
+                if(nCrossBetween === AscFormat.CROSS_BETWEEN_MID_CAT && nPtsLength < 2){
+                    nPtsLength = 2;
+                }
+                if(nPtsLength > aStrings.length){
+                    for(i = aStrings.length; i < nPtsLength; ++i){
+                        aStrings.push(i + 1 + "");
+                        oAxis.scale.push(i);
+                    }
+                }
+                else{
+                    aStrings.splice(nPtsLength, aStrings.length - nPtsLength);
+                }
+
+                break;
+            }
+            case AscDFH.historyitem_type_ValAx:{
+                var aVal =  [].concat(oAxis.scale);
+                var fMultiplier;
+                if(oAxis.dispUnits){
+                    fMultiplier = oAxis.dispUnits.getMultiplier();
+                }
+                else{
+                    fMultiplier = 1.0;
+                }
+                var oNumFmt = oAxis.numFmt;
+                var oNumFormat = null;
+                if(oNumFmt && typeof oNumFmt.formatCode === "string"){
+                    oNumFormat = oNumFormatCache.get(oNumFmt.formatCode);
+                }
+                for(var t = 0; t < aVal.length; ++t){
+                    var fCalcValue = aVal[t]*fMultiplier;
+                    var sRichValue;
+                    if(oNumFormat){
+                        sRichValue = oNumFormat.formatToChart(fCalcValue);
+                    }
+                    else{
+                        sRichValue = fCalcValue + "";
+                    }
+                    aStrings.push(sRichValue);
+                }
+
+                break;
+            }
+            case AscDFH.historyitem_type_SerAx:{
+                break;
+            }
+        }
+        return aStrings;
+    };
+
+    CChartSpace.prototype.calculateAxisGrid = function(oAxis, oRect){
+        if(!oAxis){
+            return;
+        }
+        var oAxisGrid = new CAxisGrid();
+        oAxis.grid = oAxisGrid;
+
+       // oAxis.nType = 0;//0 - horizontal, 1 - vertical, 2 - series axis
+        var nOrientation = oAxis.scaling && AscFormat.isRealNumber(oAxis.scaling.orientation) ?  oAxis.scaling.orientation : AscFormat.ORIENTATION_MIN_MAX;
+        var aStrings = this.getLabelsForAxis(oAxis);
+        var nCrossType = this.getAxisCrossType(oAxis);
+        var bOnTickMark = ((nCrossType === AscFormat.CROSS_BETWEEN_MID_CAT) && (aStrings.length > 1));
+        var nIntervalsCount =  bOnTickMark ? (aStrings.length - 1) : (aStrings.length);
+        var fInterval;
+        oAxisGrid.nCount = nIntervalsCount;
+        oAxisGrid.bOnTickMark = bOnTickMark;
+        oAxisGrid.aStrings = aStrings;
+        if(oAxis.axPos === AscFormat.AX_POS_B || oAxis.axPos === AscFormat.AX_POS_T){
+
+            oAxisGrid.nType = 0;
+            fInterval = oRect.w/nIntervalsCount;
+            if(nOrientation === AscFormat.ORIENTATION_MIN_MAX){
+                oAxisGrid.fStart = oRect.x;
+                oAxisGrid.fStride = fInterval;
+            }
+            else{
+                oAxisGrid.fStart = oRect.x + oRect.w;
+                oAxisGrid.fStride = -fInterval;
+            }
+        }
+        else{
+            oAxis.yPoints =[];
+            oAxisGrid.nType = 1;
+            fInterval = oRect.h/nIntervalsCount;
+            if(nOrientation === AscFormat.ORIENTATION_MIN_MAX){
+                oAxisGrid.fStart = oRect.y + oRect.h;
+                oAxisGrid.fStride = -fInterval;
+            }
+            else{
+                oAxisGrid.fStart = oRect.y;
+                oAxisGrid.fStride = fInterval;
+            }
+        }
+    };
+
+    CChartSpace.prototype.recalculateAxesSet = function (aAxesSet, oRect, bRecursive, nIndex) {
+        var oCorrectedRect = null;
+
+        var bWithoutLabels = false;
+        if(this.chart.plotArea.layout && this.chart.plotArea.layout.layoutTarget === AscFormat.LAYOUT_TARGET_INNER){
+            bWithoutLabels = true;
+        }
+        var bCorrected = false;
+        var fL = oRect.x, fT = oRect.y, fR = oRect.x + oRect.w, fB = oRect.y + oRect.h;
+
+        var oCalcMap = {};
+        for(var i = 0; i < aAxesSet.length; ++i){
+            var oCurAxis = aAxesSet[i];
+            var oCrossAxis = oCurAxis.crossAx;
+            if(!oCalcMap[oCurAxis.Id]){
+                this.calculateAxisGrid(oCurAxis, oRect);
+                oCalcMap[oCurAxis.Id] = true;
+            }
+            if(!oCalcMap[oCrossAxis.Id]){
+                this.calculateAxisGrid(oCrossAxis, oRect);
+                oCalcMap[oCrossAxis.Id] = true;
+            }
+            var fCrossValue;
+            var fAxisPos;
+            if(AscFormat.isRealNumber(oCurAxis.crossesAt) && oCrossAxis.scale[0] <= oCurAxis.crossesAt && oCrossAxis.scale[oCrossAxis.scale.length - 1] >= oCurAxis.crossesAt){
+                fCrossValue = oCurAxis.crossesAt;
+            }
+
+            var fDistance = 10.0*(25.4/72);///TODO
+            var nLabelsPos;
+
+            if(oCurAxis.bDelete){
+                nLabelsPos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
+            }
+            else{
+                if(null !== oCurAxis.tickLblPos){
+                    nLabelsPos = oCurAxis.tickLblPos;
+                }
+                else{
+                    nLabelsPos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
+                }
+            }
+            switch (oCurAxis.crosses) {
+                case AscFormat.CROSSES_MAX:{
+                    fCrossValue = oCrossAxis.scale[oCrossAxis.scale.length - 1];
+                    if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
+                        fDistance = - fDistance;
+                    }
+                    break;
+                }
+                case AscFormat.CROSSES_MIN:{
+                    fCrossValue = oCrossAxis.scale[0];
+                }
+                default:{ //includes AutoZero
+                    if(oCrossAxis.scale[0] <=0 && oCrossAxis.scale[oCrossAxis.scale.length - 1] >= 0){
+                        fCrossValue = 0;
+                    }
+                    else if(oCrossAxis.scale[0] > 0){
+                        fCrossValue = oCrossAxis.scale[0];
+                    }
+                    else{
+                        fCrossValue = oCrossAxis.scale[oCrossAxis.scale.length - 1];
+                    }
+                }
+            }
+            var oCrossGrid = oCrossAxis.grid;
+            var fScale = (oCrossGrid.nCount*oCrossGrid.fStride)/(oCrossAxis.scale[oCrossAxis.scale.length - 1] - oCrossAxis.scale[0]);
+            fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*fScale;
+
+
+            var nOrientation = isRealObject(oCrossAxis.scaling) && AscFormat.isRealNumber(oCrossAxis.scaling.orientation) ? oCrossAxis.scaling.orientation : AscFormat.ORIENTATION_MIN_MAX;
+            if(nOrientation === AscFormat.ORIENTATION_MAX_MIN){
+                fDistance = -fDistance;
+            }
+            var oLabelsBox = null, fPos;
+            var fPosStart = oCurAxis.grid.fStart;
+            var fPosEnd = oCurAxis.grid.fStart + oCurAxis.grid.nCount*oCurAxis.grid.fStride;
+            var bOnTickMark = oCurAxis.grid.bOnTickMark;
+            var bForceVertical = false;
+            var bNumbers = false;//TODO
+
+            if(nLabelsPos !== c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE){
+                oLabelsBox = new CLabelsBox(oCurAxis.grid.aStrings, oCurAxis, this);
+                switch(nLabelsPos){
+                    case c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO:{
+                        fPos = fAxisPos;
+                        break;
+                    }
+                    case c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH:{
+                        fPos = oCrossGrid.fStart + oCrossGrid.nCount*oCrossGrid.fStride;
+                        fDistance = - fDistance;
+                        break;
+                    }
+                    case c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW:{
+                        fPos = oCrossGrid.fStart;
+                        break;
+                    }
+                }
+            }
+            oCurAxis.labels = oLabelsBox;
+
+            oCurAxis.posX  = null;
+            oCurAxis.posY  = null;
+            oCurAxis.xPoints = null;
+            oCurAxis.yPoints = null;
+            var aPoints = null;
+            if(oCurAxis.getObjectType() === AscDFH.historyitem_type_SerAx){
+                //TODO
+            }
+            else if(oCurAxis.axPos === AscFormat.AX_POS_B || oCurAxis.axPos === AscFormat.AX_POS_T){
+                oCurAxis.posY  = fAxisPos;
+                oCurAxis.xPoints = [];
+                aPoints = oCurAxis.xPoints;
+                if(oLabelsBox){
+                    fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers);
+                }
+            }
+            else{//vertical axis
+                fDistance = -fDistance;
+                oCurAxis.posX  = fAxisPos;
+                oCurAxis.yPoints = [];
+                aPoints = oCurAxis.yPoints;
+                if(oLabelsBox){
+                    fLayoutVertLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical);
+                }
+            }
+            if(null !== aPoints){
+                var fStartSeriesPos = 0.0;
+                if(!bOnTickMark){
+                    fStartSeriesPos = oCurAxis.grid.fStride/2.0;
+                }
+                for(var j = 0; j < oCurAxis.grid.aStrings.length; ++j){
+                    aPoints.push({val: oCurAxis.scale[j], pos: oCurAxis.grid.fStart + j*oCurAxis.grid.fStride + fStartSeriesPos})
+                }
+            }
+            if(oLabelsBox){
+                if(oLabelsBox.x < fL){
+                    fL = oLabelsBox.x;
+                }
+                if(oLabelsBox.x + oLabelsBox.extX > fR){
+                    fR = oLabelsBox.x + oLabelsBox.extX;
+                }
+                if(oLabelsBox.y < fT){
+                    fT = oLabelsBox.y;
+                }
+                if(oLabelsBox.y + oLabelsBox.extY > fB){
+                    fB = oLabelsBox.y + oLabelsBox.extY;
+                }
+            }
+        }
+        // function CAxisGrid(){
+        //     this.nType = 0;//0 - horizontal, 1 - vertical, 2 - series axis
+        //     this.fStart = 0.0;
+        //     this.fStride = 0.0;
+        //     this.nCount = 0;
+        // }
+
+
+
+        if(!bRecursive){
+            var fDiff;
+            oCorrectedRect = new CRect(oRect.x, oRect.y, oRect.w, oRect.h);
+            if(bWithoutLabels){
+                if(fL < 0.0){
+                    oCorrectedRect.x -= fL;
+                    oCorrectedRect.w += fL;
+                    bCorrected = true;
+                }
+                if(fR > this.extX){
+                    oCorrectedRect.w -= (fR - this.extX);
+                    bCorrected = true;
+                }
+                if(fT < 0.0){
+                    oCorrectedRect.y -= fT;
+                    oCorrectedRect.h += fT;
+                    bCorrected = true;
+                }
+                if(fB > this.extY){
+                    oCorrectedRect.h -= (fB - this.extY);
+                    bCorrected = true;
+                }
+            }
+            else{
+                if(fL < oRect.x){
+                    fDiff = oRect.x - fL;
+                    oCorrectedRect.x += fDiff;
+                    oCorrectedRect.w -= fDiff;
+                    bCorrected = true;
+                }
+                if(fR > oRect.x + oRect.w){
+                    fDiff = oRect.x + oRect.w - fR;
+                    oCorrectedRect.w += fDiff;
+                    bCorrected = true;
+                }
+                if(fT < oRect.y){
+                    fDiff = oRect.y - fT;
+                    oCorrectedRect.y += fDiff;
+                    oCorrectedRect.h -= fDiff;
+                    bCorrected = true;
+                }
+                if(fB > oRect.y + oRect.h){
+                    fDiff = oRect.y + oRect.h - fB;
+                    oCorrectedRect.h += fDiff;
+                    bCorrected = true;
+                }
+            }
+            if(oCorrectedRect && bCorrected){
+                return this.recalculateAxesSet(aAxesSet, oCorrectedRect, true, nIndex);
+            }
+        }
+
+        return oRect;
+    };
+
+    CChartSpace.prototype.recalculateAxes = function(){
+        this.plotAreaRect = null;
+        if(this.chart && this.chart.plotArea && this.chart.plotArea){
+            if(!this.chartObj){
+                this.chartObj = new AscFormat.CChartsDrawer()
+            }
+            this.chartObj.preCalculateData(this);
+            var i, j;
+            var oPlotArea = this.chart.plotArea;
+            var aAxes = [].concat(oPlotArea.axId);
+            var aAllAxes = [];//array of axes sets
+            var oCurAxis, oCurAxis2, aCurAxesSet;
+
+            while(aAxes.length > 0){
+                oCurAxis = aAxes.splice(0, 1)[0];
+                aCurAxesSet = [];
+                aCurAxesSet.push(oCurAxis);
+                for(i = aAxes.length - 1; i > -1; --i){
+                    oCurAxis2 = aAxes[i];
+                    for(j = 0; j < aCurAxesSet.length; ++j){
+                        if(aCurAxesSet[j].crossAx === oCurAxis2 || oCurAxis2.crossAx === aCurAxesSet[j]){
+                            aCurAxesSet.push(oCurAxis2);
+                        }
+                    }
+                }
+                if(aCurAxesSet.length > 1){
+                    aAllAxes.push(aCurAxesSet);
+                }
+            }
+
+            for(i = 0; i < oPlotArea.axId.length; ++i){
+                oCurAxis = oPlotArea.axId[i];
+                oCurAxis.posY  = null;
+                oCurAxis.posX  = null;
+                oCurAxis.xPoints = null;
+                oCurAxis.yPoints  = null;
+            }
+            var oSize = this.getChartSizes();
+            var oRect = new CRect(oSize.startX, oSize.startY, oSize.w, oSize.h);
+            var aRects = [];
+            for(i = 0; i < aAllAxes.length; ++i){
+                aCurAxesSet = aAllAxes[i];
+                aRects.push(this.recalculateAxesSet(aCurAxesSet, oRect, false, i));
+            }
+            if(aRects.length > 1){
+                oRect = aRects[0];
+                for(i = 1; i < aRects.length; ++i){
+                    if(!oRect.intersection(aRects[i])){
+                        break;
+                    }
+                }
+                if(i === aRects.length){
+                    for(i = 0; i < aAllAxes.length; ++i){
+                        aCurAxesSet = aAllAxes[i];
+                        this.recalculateAxesSet(aCurAxesSet, oRect, true, i);
+                    }
+                }
+            }
+
         }
     };
     
@@ -10048,7 +10976,7 @@ CChartSpace.prototype.getXValAxisValues = function()
         this.chartObj = new AscFormat.CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-	return [].concat(this.chartObj.calcProp.xScale);
+    return [].concat(this.chart.plotArea.catAx.scale)
 };
 
 CChartSpace.prototype.getValAxisValues = function()
@@ -10058,7 +10986,7 @@ CChartSpace.prototype.getValAxisValues = function()
         this.chartObj = new AscFormat.CChartsDrawer()
     }
     this.chartObj.preCalculateData(this);
-	return [].concat(this.chartObj.calcProp.scale);
+    return [].concat(this.chart.plotArea.valAx.scale);
 };
 
 CChartSpace.prototype.getCalcProps = function()
@@ -11265,19 +12193,14 @@ CChartSpace.prototype.draw = function(graphics)
                     }
                 }
             }
-            if(this.chart.plotArea.catAx)
-            {
-                if(this.chart.plotArea.catAx.title)
-                    this.chart.plotArea.catAx.title.draw(graphics);
-                if(this.chart.plotArea.catAx.labels)
-                    this.chart.plotArea.catAx.labels.draw(graphics);
-            }
-            if(this.chart.plotArea.valAx)
-            {
-                if(this.chart.plotArea.valAx.title)
-                    this.chart.plotArea.valAx.title.draw(graphics);
-                if(this.chart.plotArea.valAx.labels)
-                    this.chart.plotArea.valAx.labels.draw(graphics);
+            for(var  i = 0; i < this.chart.plotArea.axId.length; ++i){
+                var oAxis = this.chart.plotArea.axId[i];
+                if(oAxis.title){
+                    oAxis.title.draw(graphics);
+                }
+                if(oAxis.labels){
+                    oAxis.labels.draw(graphics);
+                }
             }
         }
         if(this.chart.title)

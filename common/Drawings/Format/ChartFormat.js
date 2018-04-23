@@ -1475,9 +1475,9 @@ CDLbl.prototype =
 
     getStyles: function()
     {
+        if(this.lastStyleObject)
+            return this.lastStyleObject;
         return AscFormat.ExecuteNoHistory(function(){
-            if(this.lastStyleObject)
-                return this.lastStyleObject;
             var styles = new CStyles(false);
             var style = new CStyle("dataLblStyle", null, null, null, true);
             var text_pr = new CTextPr();
@@ -2399,6 +2399,46 @@ CPlotArea.prototype =
             }
         }
         return c;
+    },
+
+
+    getSeriesWithSmallestIndexForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aSeries = oChart.series;
+                    for(var k = 0; k < aSeries.length; ++k){
+                        if(oRet === null || aSeries[k].idx < oRet.idx){
+                            oRet = aSeries[k];
+                        }
+                    }
+                }
+            }
+        }
+        return oRet;
+    },
+
+    getChartsForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        var aRet = []
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aRet.push(oChart);
+                    break;
+                }
+            }
+        }
+        return aRet;
     },
 
     Write_ToBinary2: function(w)
