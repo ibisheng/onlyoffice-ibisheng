@@ -384,10 +384,15 @@
 	function CHTMLCursor()
 	{
 		this.map = {};
+		this.mapRetina = {};
 
 		this.value = function(param)
 		{
-			return this.map[param] ? this.map[param] : param;
+			var _map = this.map;
+			if (window["AscDesktopEditor"] && AscCommon.AscBrowser.isRetina)
+				_map = this.mapRetina;
+
+			return _map[param] ? _map[param] : param;
 		};
 
 		this.register = function(type, url_ie, url_main, default_css_value)
@@ -407,7 +412,8 @@
 			}
 			else
 			{
-				this.map[type] = (url_main + ", " + default_css_value);
+				this.map[type] = ("url('../../../../sdkjs/common/Images/" + url_main[0] + ".png') " + url_main[1] + " " + url_main[2] + ", " + default_css_value);
+                this.mapRetina[type] = ("url('../../../../sdkjs/common/Images/" + url_main[0] + "_2x.png') " + (url_main[1] << 1) + " " + (url_main[2] << 1) + ", " + default_css_value);
 			}
 		};
 	}
@@ -2482,7 +2488,7 @@
 
 	var g_oHtmlCursor = new CHTMLCursor();
 	var kCurFormatPainterWord = 'de-formatpainter';
-	g_oHtmlCursor.register(kCurFormatPainterWord, "text_copy", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11", "pointer");
+	g_oHtmlCursor.register(kCurFormatPainterWord, "text_copy", ["text_copy", 2, 11], "pointer");
 
 	function asc_ajax(obj)
 	{
