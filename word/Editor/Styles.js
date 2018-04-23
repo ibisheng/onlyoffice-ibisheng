@@ -229,6 +229,7 @@ function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
     this.Next    = NextId;
     this.Type    = (null != type ? type : styletype_Paragraph);
     this.Link    = null;
+    this.Custom  = false;
 
     this.qFormat        = null;// false
     this.uiPriority     = null;// -1
@@ -3567,6 +3568,23 @@ CStyle.prototype.IsExpressStyle = function(oStyles)
 		return true;
 
 	return false;
+};
+/**
+ * Выставляем является ли данный стиль кастомным
+ * @param {boolean} isCustom
+ */
+CStyle.prototype.SetCustom = function(isCustom)
+{
+	History.Add(new CChangesStyleCustom(this, this.Name, isCustom));
+	this.Custom = isCustom;
+};
+/**
+ * Проверяем является ли данный стиль кастомным
+ * @returns {boolean}
+ */
+CStyle.prototype.IsCustom = function()
+{
+	return this.Custom;
 };
 
 function CStyles(bCreateDefault)
