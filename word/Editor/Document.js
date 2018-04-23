@@ -4843,7 +4843,12 @@ CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 		}
 	}
 
-	this.Controller.SetParagraphStyle(sName);
+	var oParaPr = this.GetCalculatedParaPr();
+	if (oParaPr.PStyle && this.Styles.Get(oParaPr.PStyle) && this.Styles.Get(oParaPr.PStyle).GetName() === sName)
+		this.Controller.ClearParagraphFormatting(false, true);
+	else
+		this.Controller.SetParagraphStyle(sName);
+
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
