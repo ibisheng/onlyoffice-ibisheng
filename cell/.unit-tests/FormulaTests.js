@@ -2607,6 +2607,13 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 30 );
 
+		oParser = new parserFormula( "SUMIFS(D:D,E:E,$H2)", "A11", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "SUMIFS(C:D,E:E,$H2)", "A11", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
     } );
 
 	test( "Test: \"MAXIFS\"", function () {
