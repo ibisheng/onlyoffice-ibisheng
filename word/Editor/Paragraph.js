@@ -2123,8 +2123,6 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 	var StartLine = Page.StartLine;
 	var EndLine   = Page.EndLine;
 
-	PDSL.SpellingCounter = this.SpellChecker.Get_DrawingInfo(this.Get_PageStartPos(CurPage));
-
 	var RunPrReview = null;
 
 	var arrRunReviewAreasColors = [];
@@ -2167,8 +2165,9 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 			for (var Pos = StartPos; Pos <= EndPos; Pos++)
 			{
 				PDSL.CurPos.Update(Pos, 0);
-				var Item = this.Content[Pos];
+				PDSL.CurDepth = 1;
 
+				var Item = this.Content[Pos];
 				Item.Draw_Lines(PDSL);
 			}
 		}
@@ -12948,6 +12947,13 @@ Paragraph.prototype.GetFirstParagraph = function()
 {
 	return this;
 };
+/**
+ * @returns {CParaSpellChecker}
+ */
+Paragraph.prototype.GetSpellChecker = function()
+{
+	return this.SpellChecker;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
@@ -13865,7 +13871,8 @@ function CParagraphDrawStateLines()
     this.Graphics  = undefined;
     this.BgColor   = undefined;
 
-    this.CurPos = new CParagraphContentPos();
+    this.CurPos   = new CParagraphContentPos();
+    this.CurDepth = 0;
 
     this.VisitedHyperlink = false;
     this.Hyperlink = false;
@@ -13876,8 +13883,6 @@ function CParagraphDrawStateLines()
     this.Spelling   = new CParaDrawingRangeLines();
     this.RunReview  = new CParaDrawingRangeLines();
     this.CollChange = new CParaDrawingRangeLines();
-
-    this.SpellingCounter = 0;
 
     this.Page  = 0;
     this.Line  = 0;
@@ -13902,9 +13907,8 @@ CParagraphDrawStateLines.prototype =
         this.VisitedHyperlink = false;
         this.Hyperlink = false;
 
-        this.CurPos = new CParagraphContentPos();
-
-        this.SpellingCounter = 0;
+		this.CurPos   = new CParagraphContentPos();
+		this.CurDepth = 0;
     },
 
     Reset_Line : function(Page, Line, Baseline, UnderlineOffset)
@@ -13927,6 +13931,27 @@ CParagraphDrawStateLines.prototype =
         this.X      = X;
         this.Spaces = Spaces;
     }
+};
+/**
+ * Получаем количество орфографических ошибок в данном месте
+ * @returns {number}
+ */
+CParagraphDrawStateLines.prototype.GetSpellingErrorsCounter = function()
+{
+	var nCounter = 0;
+	var oSpellChecker = this.Paragraph.GetSpellChecker();
+	for (var nIndex = 0, nCount = oSpellChecker.GetElementsCount(); nIndex < nCount; ++nIndex)
+	{
+		var oSpellElement = oSpellChecker.GetElement(nIndex);
+
+		var oStartPos = oSpellElement.GetStartPos();
+		var oEndPos   = oSpellElement.GetEndPos();
+
+		if (this.CurPos.Compare(oStartPos) > 0 && this.CurPos.Compare(oEndPos) < 0)
+			nCounter++;
+	}
+
+	return nCounter;
 };
 
 var g_oPDSH = new CParagraphDrawStateHightlights();

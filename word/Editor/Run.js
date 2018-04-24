@@ -5467,6 +5467,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         }
     }
 
+    PDSL.CurPos.Update(StartPos, PDSL.CurDepth);
+    var nSpellingErrorsCounter = PDSL.GetSpellingErrorsCounter();
+
     var SpellingMarksCount = this.SpellingMarks.length;
     var SpellDataLen = EndPos + 1;
     var SpellData = g_oSpellCheckerMarks.Check(SpellDataLen);
@@ -5502,7 +5505,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 			continue;
 
 		if (SpellData[Pos])
-			PDSL.SpellingCounter += SpellData[Pos];
+			nSpellingErrorsCounter += SpellData[Pos];
 
         switch( ItemType )
         {
@@ -5556,7 +5559,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
-                    if ( PDSL.SpellingCounter > 0 )
+					if (nSpellingErrorsCounter > 0)
                         aSpelling.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0 );
 
                     X += ItemWidthVisible;
@@ -5634,7 +5637,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 					else if (true === CurTextPr.Underline)
 						aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
 
-					if (PDSL.SpellingCounter > 0)
+					if (nSpellingErrorsCounter > 0)
 						aSpelling.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0);
 
 					X += ItemWidthVisible;
@@ -5643,10 +5646,6 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 				break;
 			}
         }
-
-        // TODO: Пока так оставим, но это работает неправильно. Нужно проверенные точки отмечать
-		if (SpellData[Pos + 1])
-			PDSL.SpellingCounter += SpellData[Pos + 1];
 	}
 
 	if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
