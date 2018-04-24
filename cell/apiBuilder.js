@@ -46,14 +46,6 @@
 	var Api = window["Asc"]["spreadsheet_api"];
 
 	/**
-	 * Class representing a workbook.
-	 * @constructor
-	 */
-	function ApiWorkbook(workbook) {
-		this.workbook = workbook;
-	}
-
-	/**
 	 * Class representing a sheet.
 	 * @constructor
 	 */
@@ -175,6 +167,15 @@
 	};
 
 	/**
+	 * Create a sheet.
+	 * @memberof Api
+	 * @param {string} name
+	 */
+	Api.prototype.AddSheet = function (name) {
+		this.asc_addWorksheet(name);
+	};
+
+	/**
 	 * Returns a Sheets collection that represents all the sheets in the active workbook.
 	 * @memberof Api
 	 * @returns {Array.<ApiWorksheet>}
@@ -189,20 +190,6 @@
 	Object.defineProperty(Api.prototype, "Sheets", {
 		get: function () {
 			return this.GetSheets();
-		}
-	});
-
-	/**
-	 * Returns an object that represents the active workbook
-	 * @memberof Api
-	 * @returns {ApiWorkbook}
-	 */
-	Api.prototype.GetActiveWorkbook = function () {
-		return new ApiWorkbook(this.wbModel);
-	};
-	Object.defineProperty(Api.prototype, "ActiveWorkbook", {
-		get: function () {
-			return this.GetActiveWorkbook();
 		}
 	});
 
@@ -294,15 +281,6 @@
 	};
 
 	/**
-	 * Create a sheet.
-	 * @memberof ApiWorkbook
-	 * @param {string} name
-	 */
-	ApiWorkbook.prototype.AddSheet = function (name) {
-		this.workbook.oApi.asc_addWorksheet(name);
-	};
-
-	/**
 	 * Returns Visible of sheet
 	 * @memberof ApiWorksheet
 	 * @returns {bool}
@@ -391,8 +369,8 @@
 			return new ApiRange(this.worksheet.getRange3(value, 0, value, AscCommon.gc_nMaxCol0));
 		} else {
 			value = value.split(':');
-			for (var i in value) {
-				value[i] = parseInt(value[i])
+			for (var i = 0; i < value.length; ++i) {
+				value[i] = parseInt(value[i]);
 				if (value[i] > 0) {
 					value[i] --;
 				}
@@ -1931,7 +1909,6 @@
             if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][nStyleIndex]){
                 plot_area.removeCharts(1, plot_area.charts.length - 1);
                 AscFormat.ApplyPresetToChartSpace(this.Chart, AscCommon.g_oChartPresets[_cur_type][nStyleIndex], false);
-                return;
             }
 		}
 	};
@@ -1947,8 +1924,8 @@
 
 
 	Api.prototype["Format"] = Api.prototype.Format;
+	Api.prototype["AddSheet"] = Api.prototype.AddSheet;
 	Api.prototype["GetSheets"] = Api.prototype.GetSheets;
-	Api.prototype["GetActiveWorkbook"] = Api.prototype.GetActiveWorkbook;
 	Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 	Api.prototype["GetSheet"] = Api.prototype.GetSheet;
 	Api.prototype["GetThemesColors"] = Api.prototype.GetThemesColors;
@@ -1956,8 +1933,6 @@
 	Api.prototype["CreateNewHistoryPoint"] = Api.prototype.CreateNewHistoryPoint;
 	Api.prototype["CreateColorFromRGB"] = Api.prototype.CreateColorFromRGB;
 	Api.prototype["CreateColorByName"] = Api.prototype.CreateColorByName;
-
-	ApiWorkbook.prototype["AddSheet"] = ApiWorkbook.prototype.AddSheet;
 
 	ApiWorksheet.prototype["GetVisible"] = ApiWorksheet.prototype.GetVisible;
 	ApiWorksheet.prototype["SetVisible"] = ApiWorksheet.prototype.SetVisible;
