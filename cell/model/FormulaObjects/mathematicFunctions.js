@@ -4401,11 +4401,34 @@
 			}
 		}
 
+		var getRange = function(curArg) {
+			var res = null;
+			if(cElementType.cellsRange === curArg.type) {
+				res = curArg.range && curArg.range.bbox ? curArg.range.bbox : null;
+			} else if(cElementType.cellsRange3D === curArg.type) {
+				res = curArg.bbox ? curArg.bbox : null;
+			}
+			return res;
+		};
+
+		var arg0Range = getRange(arg0);
+		var c_colType = Asc.c_oAscSelectionType.RangeCol;
+
 		var arg0Matrix = arg0.getMatrix();
-		var i, j, arg1, arg2, matchingInfo;
+		var i, j, arg1, arg2, matchingInfo, bSelectRangeCol, arg1Range;
 		for (var k = 1; k < arg.length; k += 2) {
 			arg1 = arg[k];
 			arg2 = arg[k + 1];
+
+			//добавляю флаг bSelectRangeCol - для случая когда нулевой и первый аргумент это area/area3d с диапазоном весь столбец
+			//в этом случае нет ошибки при разных размерах полученных массивов - arg0Matrix/arg1Matrix
+			bSelectRangeCol = false;
+			arg1Range = getRange(arg1);
+			if(arg1Range && arg1Range.getType() === c_colType && arg0Range && arg0Range.getType() === c_colType) {
+				if(arg0Range.c1 === arg0Range.c1 && arg0Range.c2 === arg0Range.c2) {
+					bSelectRangeCol = true;
+				}
+			}
 
 			if (cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
 				cElementType.cellsRange !== arg1.type) {
@@ -4434,10 +4457,13 @@
 			matchingInfo = AscCommonExcel.matchingValue(arg2);
 
 			var arg1Matrix = arg1.getMatrix();
-			if (arg0Matrix.length !== arg1Matrix.length) {
+			if (!bSelectRangeCol && arg0Matrix.length !== arg1Matrix.length) {
 				return new cError(cErrorType.wrong_value_type);
 			}
 			for (i = 0; i < arg1Matrix.length; ++i) {
+				if(bSelectRangeCol && (!arg0Matrix[i] || !arg1Matrix[i])) {
+					continue;
+				}
 				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
 					return new cError(cErrorType.wrong_value_type);
 				}
