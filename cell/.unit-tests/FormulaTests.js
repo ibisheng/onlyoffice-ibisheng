@@ -3465,7 +3465,43 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -3.14 );
 
-    } );
+		oParser = new parserFormula( "TRUNC(8.9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 8 );
+
+		oParser = new parserFormula( "TRUNC(-8.9)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), -8 );
+
+		oParser = new parserFormula( "TRUNC(0.45)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+
+		oParser = new parserFormula( "TRUNC(43214)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43214 );
+
+		oParser = new parserFormula( "TRUNC(43214, 10)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43214 );
+
+		oParser = new parserFormula( "TRUNC(43214, -2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 43200 );
+
+		oParser = new parserFormula( "TRUNC(43214, -10)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+
+		oParser = new parserFormula( "TRUNC(34123.123, -2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 34100 );
+
+		oParser = new parserFormula( "TRUNC(123.23423,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 123.2 );
+	} );
 
     test( "Test: \"MULTINOMIAL\"", function () {
         oParser = new parserFormula( "MULTINOMIAL(2,3,4)", "A1", ws );
