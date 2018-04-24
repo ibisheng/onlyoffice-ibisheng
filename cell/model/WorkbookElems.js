@@ -4333,7 +4333,6 @@ RangeDataManager.prototype = {
 	},
 	get : function(bbox)
 	{
-		var bboxRange = new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 		var oRes = {all: [], inner: [], outer: []};
 		var oNodes = this.oIntervalTreeRB.enumerate(bbox.r1, bbox.r2);
 		for(var i = 0, length = oNodes.length; i < length; i++)
@@ -4347,7 +4346,7 @@ RangeDataManager.prototype = {
 					if(elem.bbox.isIntersect(bbox))
 					{
 						oRes.all.push(elem);
-						if(bboxRange.containsRange(elem.bbox))
+						if(bbox.containsRange(elem.bbox))
 							oRes.inner.push(elem);
 						else
 							oRes.outer.push(elem);
