@@ -4950,14 +4950,13 @@
 	cTRUNC.prototype.Calculate = function (arg) {
 
 		function truncHelper(a, b) {
-			var c = a < 0 ? 1 : 0;
-			if (b == 0) {
-				return new cNumber(a.toString().substr(0, 1 + c));
-			} else if (b > 0) {
-				return new cNumber(a.toString().substr(0, b + 2 + c));
-			} else {
-				return new cNumber(0);
+			//TODO возможно стоит добавить ограничения для коэффициента b(ms не ограничивает; LO - максимальные значения 20/-20)
+			if(b > 20) {
+				b = 20;
 			}
+
+			var numDegree = Math.pow(10, b);
+			return new cNumber(Math.trunc(a*numDegree) / numDegree);
 		}
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(0);
