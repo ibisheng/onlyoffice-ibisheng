@@ -3148,6 +3148,8 @@
 		this.Height = h;
 
 		this.CanvasReturn = null;
+
+		this.IsAsync = false;
 	}
 
 	CSignatureDrawer.prototype.getCanvas = function()
@@ -3191,6 +3193,12 @@
 
 	CSignatureDrawer.prototype.setText = function(text, font, size, isItalic, isBold)
 	{
+		if (this.IsAsync)
+		{
+			this.Text = text;
+			return;
+		}
+
 		this.Image = "";
 		this.ImageHtml = null;
 
@@ -3200,17 +3208,24 @@
 		this.Italic = isItalic;
 		this.Bold = isBold;
 
-		var loader     = AscCommon.g_font_loader;
-		var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
-		var isasync    = loader.LoadFont(fontinfo, function() {
-			window.Asc.g_signature_drawer.Api.sync_EndAction(Asc.c_oAscAsyncActionType.Information, Asc.c_oAscAsyncAction.LoadFont);
-			window.Asc.g_signature_drawer.drawText();
-		});
+		this.IsAsync = true;
+        AscFonts.FontPickerByCharacter.checkText(this.Text, this, function() {
 
-		if (false === isasync)
-		{
-			this.drawText();
-		}
+        	this.IsAsync = false;
+
+            var loader     = AscCommon.g_font_loader;
+            var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
+            var isasync    = loader.LoadFont(fontinfo, function() {
+                window.Asc.g_signature_drawer.Api.sync_EndAction(Asc.c_oAscAsyncActionType.Information, Asc.c_oAscAsyncAction.LoadFont);
+                window.Asc.g_signature_drawer.drawText();
+            });
+
+            if (false === isasync)
+            {
+                this.drawText();
+            }
+
+        });
 	};
 
 	CSignatureDrawer.prototype.drawText = function()

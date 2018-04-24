@@ -7205,6 +7205,7 @@ background-repeat: no-repeat;\
 				window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, this.ThemeLoader.ThemesUrl, this.getCurrentPage());
 
 				var oDocRenderer                         = new AscCommon.CDocumentRenderer();
+                oDocRenderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 				oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
 				var bOldShowMarks                        = this.ShowParaMarks;
 				this.ShowParaMarks                       = false;
