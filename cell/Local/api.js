@@ -297,7 +297,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (ws)
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject([AscCommon.g_oDocumentUrls.getImageUrl(_url)] , null);
 		}
 	};
 	window["on_editor_native_message"] = function(sCommand, sParam)
