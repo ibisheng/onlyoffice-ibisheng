@@ -161,10 +161,8 @@ function CRect(x, y, w, h){
         this.y = y;
         this.w = w;
         this.h = h;
-        this.x1 = x;
-        this.y1 = y;
-        this.w1 = w;
-        this.h1 = h;
+        this.fHorPadding = 0.0;
+        this.fVertPadding = 0.0;
 }
 
     CRect.prototype.intersection = function(oRect){
@@ -172,10 +170,43 @@ function CRect(x, y, w, h){
             || this.y + this.h < oRect.y || oRect.y + oRect.h < this.y){
             return false;
         }
-        var x0 = Math.max(this.x, oRect.x);
-        var y0 = Math.max(this.y, oRect.y);
-        var x1 = Math.min(this.x + this.w, oRect.x + oRect.w);
-        var y1 = Math.min(this.y + this.h, oRect.y + oRect.h);
+
+        var x0, y0, x1, y1;
+        var bResetHorPadding = true, bResetVertPadding = true;
+        if(this.fHorPadding > 0.0 && oRect.fHorPadding > 0.0){
+            x0 = this.x + oRect.fHorPadding;
+            bResetHorPadding = false;
+        }
+        else{
+            x0 = Math.max(this.x, oRect.x);
+        }
+        if(this.fVertPadding > 0.0 && this.fVertPadding > 0.0){
+            y0 = this.y + oRect.fVertPadding;
+            bResetVertPadding = false;
+        }
+        else{
+            y0 = Math.max(this.y, oRect.y);
+        }
+        if(this.fHorPadding < 0.0 && oRect.fHorPadding < 0.0){
+            x1 = this.x + this.w + oRect.fHorPadding;
+            bResetHorPadding = false;
+        }
+        else{
+            x1 = Math.min(this.x + this.w, oRect.x + oRect.w);
+        }
+        if(this.fVertPadding < 0.0 && this.fVertPadding < 0.0){
+            y1 = this.y + this.h + oRect.fVertPadding;
+            bResetVertPadding = false;
+        }
+        else{
+            y1 = Math.min(this.y + this.h, oRect.y + oRect.h);
+        }
+        if(bResetHorPadding){
+            this.fHorPadding = 0.0;
+        }
+        if(bResetVertPadding){
+            this.fVertPadding = 0.0;
+        }
         this.x = x0;
         this.y = y0;
         this.w = x1 - x0;
@@ -697,7 +728,6 @@ function checkPointInMap(map, worksheet, row, col)
         this.extY = 0.0;
         this.aLabels = [];
         this.maxMinWidth = -1.0;
-        this.maxOneStringWidth = -1.0;
 
 
         var oStyle = null, oLbl, fMinW;
@@ -728,6 +758,15 @@ function checkPointInMap(map, worksheet, row, col)
             if(this.aLabels[i])
                 this.aLabels[i].draw(graphics);
         }
+        graphics.p_width(70);
+        graphics.p_color(0, 0, 0, 255);
+        graphics._s();
+        graphics._m(this.x, this.y);
+        graphics._l(this.x + this.extX, this.y + 0);
+        graphics._l(this.x + this.extX, this.y + this.extY);
+        graphics._l(this.x + 0, this.y + this.extY);
+        graphics._z();
+        graphics.ds();
     };
 
     CLabelsBox.prototype.checkMaxMinWidth = function () {
@@ -777,7 +816,10 @@ function checkPointInMap(map, worksheet, row, col)
 
     CLabelsBox.prototype.layoutHorNormal = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
         var fMaxHeight = 0.0;
-        var fCurX = bOnTickMark ? fXStart - Math.abs(fInterval)/2.0 : fXStart;
+        var fCurX = bOnTickMark ? fXStart - fInterval/2.0 : fXStart;
+        if(fInterval < 0.0){
+            fCurX += fInterval;
+        }
         var oFirstLabel = null, fFirstLabelCenterX = null, oLastLabel = null, fLastLabelCenterX = null;
         var fContentWidth = Math.abs(fInterval);
         for(var i = 0; i < this.aLabels.length; ++i){
@@ -826,9 +868,8 @@ function checkPointInMap(map, worksheet, row, col)
                 fLastLabelCenterX + fLastLabelContentWidth/2.0, fXStart, fXStart + fInterval*(this.aLabels.length - 1));
         }
         else{
-
-            x0 = Math.min(fXStart, fXStart + fInterval*(this.aLabels.length - 1));
-            x1 = Math.max(fXStart, fXStart + fInterval*(this.aLabels.length - 1));
+            x0 = Math.min(fXStart, fXStart + fInterval*(this.aLabels.length));
+            x1 = Math.max(fXStart, fXStart + fInterval*(this.aLabels.length));
         }
         this.x = x0;
         this.extX = x1 - x0;
@@ -847,12 +888,14 @@ function checkPointInMap(map, worksheet, row, col)
 
         var fMaxHeight = 0.0;
         var fCurX = bOnTickMark ? fXStart - fInterval/2.0 : fXStart;
-        var oFirstLabel = null, oLastLabel, fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
+        var fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
+        if(fInterval < 0.0){
+            fCurX += fInterval;
+        }
         var fMinLeft = null, fMaxRight = null;
         for(var i = 0; i < this.aLabels.length; ++i){
             if(this.aLabels[i]){
                 var oLabel = this.aLabels[i];
-                oLastLabel = oLabel;
                 var oContent = oLabel.tx.rich.content;
                 oContent.Set_ApplyToAll(true);
                 oContent.SetParagraphAlign(AscCommon.align_Left);
@@ -880,24 +923,26 @@ function checkPointInMap(map, worksheet, row, col)
                 global_MatrixTransformer.TranslateAppend(oTransform, -oSize.w/2.0, -oSize.h/2.0);
                 global_MatrixTransformer.RotateRadAppend(oTransform, fAngle);
                 global_MatrixTransformer.TranslateAppend(oTransform, fXC, fYC);
-                if(null === fMinLeft){
+                if(null === fMinLeft || (fXC - fBoxW/2.0) < fMinLeft){
                     fMinLeft = fXC - fBoxW/2.0;
                 }
-                fMaxRight = fXC + fBoxW/2.0;
+                if(null === fMaxRight || (fXC + fBoxW/2.0) > fMaxRight){
+                    fMaxRight = fXC + fBoxW/2.0;
+                }
             }
             fCurX += fInterval;
         }
-        this.x = fXStart;
-        if(fMinLeft !== null){
-            if(fMinLeft < this.x){
-                this.x = fMinLeft;
-            }
+        var aPoints = [];
+        aPoints.push(fXStart);
+        aPoints.push(fXStart + fInterval*(this.aLabels.length));
+        if(null !== fMinLeft){
+            aPoints.push(fMinLeft);
         }
-        var fRight = fXStart + fInterval*(this.aLabels.length - 1);
-        if(fMaxRight !== null){
-            fRight = fMaxRight;
+        if(null !== fMaxRight){
+            aPoints.push(fMaxRight);
         }
-        this.extX = fRight - this.x;
+        this.x = Math.min.apply(Math, aPoints);
+        this.extX = Math.max.apply(Math, aPoints) - this.x;
         if(fDistance >= 0.0){
             this.y = fAxisY;
             this.extY = fDistance + fMaxHeight;
@@ -4413,7 +4458,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
         }
     };
 
-    CChartSpace.prototype.recalculateAxesSet = function (aAxesSet, oRect, bRecursive, nIndex) {
+    CChartSpace.prototype.recalculateAxesSet = function (aAxesSet, oRect, oBaseRect, nIndex) {
         var oCorrectedRect = null;
 
         var bWithoutLabels = false;
@@ -4422,6 +4467,8 @@ CChartSpace.prototype.getValAxisCrossType = function()
         }
         var bCorrected = false;
         var fL = oRect.x, fT = oRect.y, fR = oRect.x + oRect.w, fB = oRect.y + oRect.h;
+        var fHorPadding = 0.0;
+        var fVertPadding = 0.0;
 
         var oCalcMap = {};
         for(var i = 0; i < aAxesSet.length; ++i){
@@ -4443,6 +4490,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
 
             var fDistance = 10.0*(25.4/72);///TODO
             var nLabelsPos;
+            var bLabelsExtremePosition = false;
 
             if(oCurAxis.bDelete){
                 nLabelsPos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
@@ -4459,12 +4507,16 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 case AscFormat.CROSSES_MAX:{
                     fCrossValue = oCrossAxis.scale[oCrossAxis.scale.length - 1];
                     if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
-                        fDistance = - fDistance;
+                        fDistance = -fDistance;
+                        bLabelsExtremePosition = true;
                     }
                     break;
                 }
                 case AscFormat.CROSSES_MIN:{
                     fCrossValue = oCrossAxis.scale[0];
+                    if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
+                        bLabelsExtremePosition = true;
+                    }
                 }
                 default:{ //includes AutoZero
                     if(oCrossAxis.scale[0] <=0 && oCrossAxis.scale[oCrossAxis.scale.length - 1] >= 0){
@@ -4475,6 +4527,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                     else{
                         fCrossValue = oCrossAxis.scale[oCrossAxis.scale.length - 1];
+                    }
+                    if(AscFormat.fApproxEqual(fCrossValue, oCrossAxis.scale[0]) || AscFormat.fApproxEqual(fCrossValue, oCrossAxis.scale[oCrossAxis.scale.length - 1])){
+                        bLabelsExtremePosition = true;
                     }
                 }
             }
@@ -4512,8 +4567,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                 }
             }
-            oCurAxis.labels = oLabelsBox;
 
+
+            oCurAxis.labels = oLabelsBox;
             oCurAxis.posX  = null;
             oCurAxis.posY  = null;
             oCurAxis.xPoints = null;
@@ -4527,7 +4583,23 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 oCurAxis.xPoints = [];
                 aPoints = oCurAxis.xPoints;
                 if(oLabelsBox){
+                    if(!AscFormat.fApproxEqual(oRect.fVertPadding, 0)){
+                        fPos -= oRect.fVertPadding;
+                        if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
+                            oCurAxis.posY -= oRect.fVertPadding;
+                        }
+                    }
+
+
                     fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers);
+                    if(bLabelsExtremePosition){
+                        if(fDistance > 0){
+                            fVertPadding = -oLabelsBox.extY;
+                        }
+                        else{
+                            fVertPadding = oLabelsBox.extY;
+                        }
+                    }
                 }
             }
             else{//vertical axis
@@ -4536,7 +4608,21 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 oCurAxis.yPoints = [];
                 aPoints = oCurAxis.yPoints;
                 if(oLabelsBox){
+                    if(!AscFormat.fApproxEqual(oRect.fHorPadding, 0)){
+                        fPos -= oRect.fHorPadding;
+                        if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
+                            oCurAxis.posX -= oRect.fVertPadding;
+                        }
+                    }
                     fLayoutVertLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical);
+                    if(bLabelsExtremePosition){
+                        if(fDistance > 0){
+                            fHorPadding = -oLabelsBox.extX;
+                        }
+                        else{
+                            fHorPadding = oLabelsBox.extX;
+                        }
+                    }
                 }
             }
             if(null !== aPoints){
@@ -4569,61 +4655,64 @@ CChartSpace.prototype.getValAxisCrossType = function()
         //     this.fStride = 0.0;
         //     this.nCount = 0;
         // }
-
-
-
-        if(!bRecursive){
+        if(nIndex < 2){
             var fDiff;
+            var fPrecision = 0.01;
             oCorrectedRect = new CRect(oRect.x, oRect.y, oRect.w, oRect.h);
             if(bWithoutLabels){
-                if(fL < 0.0){
-                    oCorrectedRect.x -= fL;
-                    oCorrectedRect.w += fL;
+                fDiff = fL;
+                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                    oCorrectedRect.x -= fDiff;
+                    oCorrectedRect.w += fDiff;
                     bCorrected = true;
                 }
-                if(fR > this.extX){
-                    oCorrectedRect.w -= (fR - this.extX);
+                fDiff = fR - this.extX;
+                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                    oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
-                if(fT < 0.0){
-                    oCorrectedRect.y -= fT;
-                    oCorrectedRect.h += fT;
+                fDiff = fT;
+                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                    oCorrectedRect.y -= fDiff;
+                    oCorrectedRect.h += fDiff;
                     bCorrected = true;
                 }
-                if(fB > this.extY){
+                fDiff = fB - this.extY;
+                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.h -= (fB - this.extY);
                     bCorrected = true;
                 }
             }
             else{
-                if(fL < oRect.x){
-                    fDiff = oRect.x - fL;
+                fDiff = oBaseRect.x - fL;
+                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision) ){
                     oCorrectedRect.x += fDiff;
                     oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
-                if(fR > oRect.x + oRect.w){
-                    fDiff = oRect.x + oRect.w - fR;
+                fDiff = oBaseRect.x + oBaseRect.w - fR;
+                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.w += fDiff;
                     bCorrected = true;
                 }
-                if(fT < oRect.y){
-                    fDiff = oRect.y - fT;
+                fDiff = oBaseRect.y - fT;
+                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y += fDiff;
                     oCorrectedRect.h -= fDiff;
                     bCorrected = true;
                 }
-                if(fB > oRect.y + oRect.h){
-                    fDiff = oRect.y + oRect.h - fB;
+                fDiff = oBaseRect.y + oBaseRect.h - fB;
+                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.h += fDiff;
                     bCorrected = true;
                 }
             }
             if(oCorrectedRect && bCorrected){
-                return this.recalculateAxesSet(aAxesSet, oCorrectedRect, true, nIndex);
+                return this.recalculateAxesSet(aAxesSet, oCorrectedRect, oBaseRect, ++nIndex);
             }
         }
-
+        oRect.fHorPadding = fHorPadding;
+        oRect.fVertPadding = fVertPadding;
         return oRect;
     };
 
@@ -4666,10 +4755,11 @@ CChartSpace.prototype.getValAxisCrossType = function()
             }
             var oSize = this.getChartSizes();
             var oRect = new CRect(oSize.startX, oSize.startY, oSize.w, oSize.h);
+            var oBaseRect = oRect;
             var aRects = [];
             for(i = 0; i < aAllAxes.length; ++i){
                 aCurAxesSet = aAllAxes[i];
-                aRects.push(this.recalculateAxesSet(aCurAxesSet, oRect, false, i));
+                aRects.push(this.recalculateAxesSet(aCurAxesSet, oRect, oBaseRect, 0));
             }
             if(aRects.length > 1){
                 oRect = aRects[0];
@@ -4678,12 +4768,48 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         break;
                     }
                 }
+                var fOldHorPadding = 0.0, fOldVertPadding = 0.0;
                 if(i === aRects.length){
+                    aRects = [];
                     for(i = 0; i < aAllAxes.length; ++i){
                         aCurAxesSet = aAllAxes[i];
-                        this.recalculateAxesSet(aCurAxesSet, oRect, true, i);
+                        if(i === 0){
+                            fOldHorPadding = oRect.fHorPadding;
+                            fOldVertPadding = oRect.fVertPadding;
+                            oRect.fHorPadding = 0.0;
+                            oRect.fVertPadding = 0.0;
+                        }
+                        aRects.push(this.recalculateAxesSet(aCurAxesSet, oRect, oBaseRect, 0));
+                        if(i === 0){
+                            oRect.fHorPadding = fOldHorPadding;
+                            oRect.fVertPadding = fOldVertPadding;
+                        }
                     }
                 }
+                // oRect = aRects[0];
+                // for(i = 1; i < aRects.length; ++i){
+                //     if(!oRect.intersection(aRects[i])){
+                //         break;
+                //     }
+                // }
+                // var fOldHorPadding = 0.0, fOldVertPadding = 0.0;
+                // if(i === aRects.length){
+                //     aRects = [];
+                //     for(i = 0; i < aAllAxes.length; ++i){
+                //         aCurAxesSet = aAllAxes[i];
+                //         if(i === 0){
+                //             fOldHorPadding = oRect.fHorPadding;
+                //             fOldVertPadding = oRect.fVertPadding;
+                //             oRect.fHorPadding = 0.0;
+                //             oRect.fVertPadding = 0.0;
+                //         }
+                //         aRects.push(this.recalculateAxesSet(aCurAxesSet, oRect, oBaseRect, 0));
+                //         if(i === 0){
+                //             oRect.fHorPadding = fOldHorPadding;
+                //             oRect.fVertPadding = fOldVertPadding;
+                //         }
+                //     }
+                // }
             }
 
         }
