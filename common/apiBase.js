@@ -1779,7 +1779,7 @@
 	baseEditorsApi.prototype.asc_ViewCertificate = function(id)
 	{
 		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["ViewCertificate"](id);
+			window["AscDesktopEditor"]["ViewCertificate"](parseInt("" + id)); // integer or string!
 	};
 
 	baseEditorsApi.prototype.asc_SelectCertificate = function()
