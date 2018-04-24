@@ -12680,7 +12680,7 @@ CTable.prototype.IsCellSelection = function()
 };
 CTable.prototype.SetTableProps = function(oProps)
 {
-	this.Set_Props(oProps);
+	return this.Set_Props(oProps);
 };
 CTable.prototype.GetTableProps = function()
 {

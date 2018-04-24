@@ -2097,7 +2097,7 @@ background-repeat: no-repeat;\
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Cut);
-			_logicDoc.Remove(-1, true, true); // -1 - нормальое удаление  (например, для таблиц)
+			_logicDoc.Remove(-1, true, true); // -1 - нормальное удаление  (например, для таблиц)
 			_logicDoc.Document_UpdateSelectionState();
 		}
 	};
