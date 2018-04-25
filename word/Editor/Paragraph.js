@@ -2666,6 +2666,8 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			else
 				this.Internal_Content_Remove2(StartPos + 1, EndPos - StartPos - 1);
 
+			var isFootnoteRefRun = (para_Run === this.Content[StartPos].Type && this.Content[StartPos].IsFootnoteReferenceRun());
+
 			this.Content[StartPos].Remove(nCount, bOnAddText);
 
 			// Мы не удаляем последний элемент с ParaEnd
@@ -2675,6 +2677,10 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 					this.Selection.Use = false;
 
 				this.Internal_Content_Remove(StartPos);
+			}
+			else if (isFootnoteRefRun)
+			{
+				this.Content[StartPos].Set_RStyle(undefined);
 			}
 
 			if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())

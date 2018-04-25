@@ -10091,6 +10091,14 @@ ParaRun.prototype.GetElementsCount = function()
 {
 	return this.Content.length;
 };
+/**
+ * Проверяем является ли данный ран специальным, содержащим ссылку на сноску
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsFootnoteReferenceRun = function()
+{
+	return (1 === this.Content.length && para_FootnoteReference === this.Content[0].Type);
+};
 
 function CParaRunStartState(Run)
 {
