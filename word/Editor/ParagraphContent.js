@@ -404,7 +404,7 @@ ParaText.prototype.Is_SpecialSymbol = function()
 
 	return false;
 };
-ParaText.prototype.Is_SpaceAfter = function()
+ParaText.prototype.IsSpaceAfter = function()
 {
 	return (this.Flags & PARATEXT_FLAGS_SPACEAFTER ? true : false);
 };
@@ -429,9 +429,9 @@ ParaText.prototype.Set_SpaceAfter = function(bSpaceAfter)
 	else
 		this.Flags &= PARATEXT_FLAGS_NON_SPACEAFTER;
 };
-ParaText.prototype.Is_NoBreakHyphen = function()
+ParaText.prototype.IsNoBreakHyphen = function()
 {
-	if (false === this.Is_SpaceAfter() && (this.Value === 0x002D || this.Value === 0x2013))
+	if (false === this.IsSpaceAfter() && this.Value === 0x002D)
 		return true;
 
 	return false;

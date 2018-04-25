@@ -4831,7 +4831,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             {
                 case para_Text:
 					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
-                    if (item.Is_NoBreakHyphen()) {
+                    if (item.IsNoBreakHyphen()) {
 						sCurText = this.WriteText(sCurText, textType);
                         oThis.memory.WriteByte(c_oSerRunType.nonBreakHyphen);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
@@ -10021,7 +10021,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(0x2013);
+            oNewElem = new ParaText(0x002D);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)
@@ -11165,7 +11165,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(0x2013);
+            oNewElem = new ParaText(0x002D);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)

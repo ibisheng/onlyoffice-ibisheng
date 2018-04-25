@@ -7440,7 +7440,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
             this.DrawingDocument.TargetShow();
 
-            var Item = new ParaText(0x2013);
+            var Item = new ParaText(0x002D);
             Item.Set_SpaceAfter(false);
 
             this.AddToParagraph(Item);

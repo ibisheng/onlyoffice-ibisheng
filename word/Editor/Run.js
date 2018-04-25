@@ -2749,7 +2749,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             PRS.Set_LineBreakPos(Pos);
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
                             {
                                 // Добавляем длину пробелов до слова и ширину самого слова.
                                 X += SpaceLen + LetterLen;
@@ -2818,7 +2818,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             WordLen += LetterLen;
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
                             {
                                 // Добавляем длину пробелов до слова и ширину самого слова.
                                 X += SpaceLen + WordLen;
@@ -3836,7 +3836,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.SpacesCount = 0;
 
                 // Если текущий символ, например, дефис, тогда на нем заканчивается слово
-                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
                     PRSC.Word = false;
 
                 break;
