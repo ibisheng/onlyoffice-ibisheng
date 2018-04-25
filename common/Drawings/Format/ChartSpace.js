@@ -186,7 +186,7 @@ function CRect(x, y, w, h){
         else{
             x0 = Math.max(this.x, oRect.x);
         }
-        if(this.fVertPadding > 0.0 && this.fVertPadding > 0.0){
+        if(this.fVertPadding > 0.0 && oRect.fVertPadding > 0.0){
             y0 = this.y + oRect.fVertPadding;
             bResetVertPadding = false;
         }
@@ -820,14 +820,14 @@ function checkPointInMap(map, worksheet, row, col)
         }
     };
 
-    CLabelsBox.prototype.layoutHorNormal = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
+    CLabelsBox.prototype.layoutHorNormal = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark, fForceContentWidth){
         var fMaxHeight = 0.0;
         var fCurX = bOnTickMark ? fXStart - fInterval/2.0 : fXStart;
         if(fInterval < 0.0){
             fCurX += fInterval;
         }
         var oFirstLabel = null, fFirstLabelCenterX = null, oLastLabel = null, fLastLabelCenterX = null;
-        var fContentWidth = Math.abs(fInterval);
+        var fContentWidth = fForceContentWidth ? fForceContentWidth : Math.abs(fInterval);
         for(var i = 0; i < this.aLabels.length; ++i){
             if(this.aLabels[i]){
                 var oLabel = this.aLabels[i];
@@ -893,11 +893,11 @@ function checkPointInMap(map, worksheet, row, col)
     CLabelsBox.prototype.layoutHorRotated = function(fAxisY, fDistance, fXStart, fInterval, bOnTickMark){
 
         var fMaxHeight = 0.0;
-        var fCurX = bOnTickMark ? fXStart - fInterval/2.0 : fXStart;
+        var fCurX = bOnTickMark ? fXStart : fXStart + fInterval/2.0;
         var fAngle = Math.PI/4.0, fMultiplier = Math.sin(fAngle);
-        if(fInterval < 0.0){
-            fCurX += fInterval;
-        }
+        // if(fInterval < 0.0){
+        //     fCurX += fInterval;
+        // }
         var fMinLeft = null, fMaxRight = null;
         for(var i = 0; i < this.aLabels.length; ++i){
             if(this.aLabels[i]){
@@ -940,7 +940,8 @@ function checkPointInMap(map, worksheet, row, col)
         }
         var aPoints = [];
         aPoints.push(fXStart);
-        aPoints.push(fXStart + fInterval*(this.aLabels.length));
+        var nIntervalCount = bOnTickMark ? this.aLabels.length - 1 : this.aLabels.length;
+        aPoints.push(fXStart + fInterval*nIntervalCount);
         if(null !== fMinLeft){
             aPoints.push(fMinLeft);
         }
@@ -1073,7 +1074,7 @@ function checkPointInMap(map, worksheet, row, col)
         return dlbl;
     }
 
-    function fLayoutHorLabelsBox(oLabelsBox, fY, fXStart, fXEnd, bOnTickMark, fDistance, bForceVertical, bNumbers){
+    function fLayoutHorLabelsBox(oLabelsBox, fY, fXStart, fXEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth){
         var fAxisLength = fXEnd - fXStart;
         var nLabelsCount = oLabelsBox.aLabels.length;
 
@@ -1082,8 +1083,9 @@ function checkPointInMap(map, worksheet, row, col)
         var fInterval = fAxisLength/nIntervalCount;
         if(!bForceVertical || true){//TODO: implement for vertical labels
             var fMaxMinWidth = oLabelsBox.checkMaxMinWidth();
-            if(fMaxMinWidth <= Math.abs(fInterval)){
-                oLabelsBox.layoutHorNormal(fY, fDistance, fXStart, fInterval, bOnTickMark_);
+            var fCheckInterval = AscFormat.isRealNumber(fForceContentWidth) ? fForceContentWidth : Math.abs(fInterval);
+            if(fMaxMinWidth <= fCheckInterval){
+                oLabelsBox.layoutHorNormal(fY, fDistance, fXStart, fInterval, bOnTickMark_, fForceContentWidth);
             }
             else{
                 oLabelsBox.layoutHorRotated(fY, fDistance, fXStart, fInterval, bOnTickMark_);
@@ -4464,7 +4466,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
         }
     };
 
-    CChartSpace.prototype.recalculateAxesSet = function (aAxesSet, oRect, oBaseRect, nIndex) {
+    CChartSpace.prototype.recalculateAxesSet = function (aAxesSet, oRect, oBaseRect, nIndex, fForceContentWidth) {
         var oCorrectedRect = null;
 
         var bWithoutLabels = false;
@@ -4475,7 +4477,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
         var fL = oRect.x, fT = oRect.y, fR = oRect.x + oRect.w, fB = oRect.y + oRect.h;
         var fHorPadding = 0.0;
         var fVertPadding = 0.0;
-
+        var fHorInterval = null;
         var oCalcMap = {};
         for(var i = 0; i < aAxesSet.length; ++i){
             var oCurAxis = aAxesSet[i];
@@ -4597,7 +4599,14 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
 
 
-                    fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers);
+                    fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth);
+                    var fAxisLength = fPosEnd - fPosStart;
+                    var nLabelsCount = oLabelsBox.aLabels.length;
+
+                    var bOnTickMark_ = bOnTickMark && nLabelsCount > 1;
+                    var nIntervalCount = bOnTickMark_ ? nLabelsCount - 1 : nLabelsCount;
+                    fHorInterval = Math.abs(fAxisLength/nIntervalCount);
+
                     if(bLabelsExtremePosition){
                         if(fDistance > 0){
                             fVertPadding = -oLabelsBox.extY;
@@ -4667,54 +4676,59 @@ CChartSpace.prototype.getValAxisCrossType = function()
             oCorrectedRect = new CRect(oRect.x, oRect.y, oRect.w, oRect.h);
             if(bWithoutLabels){
                 fDiff = fL;
-                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.x -= fDiff;
                     oCorrectedRect.w += fDiff;
                     bCorrected = true;
                 }
                 fDiff = fR - this.extX;
-                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff > 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fT;
-                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y -= fDiff;
                     oCorrectedRect.h += fDiff;
                     bCorrected = true;
                 }
                 fDiff = fB - this.extY;
-                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff > 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.h -= (fB - this.extY);
                     bCorrected = true;
                 }
             }
             else{
                 fDiff = oBaseRect.x - fL;
-                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision) ){
+                if(/*fDiff > 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision) ){
                     oCorrectedRect.x += fDiff;
                     oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = oBaseRect.x + oBaseRect.w - fR;
-                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.w += fDiff;
                     bCorrected = true;
                 }
                 fDiff = oBaseRect.y - fT;
-                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff > 0.0 &&*/ !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y += fDiff;
                     oCorrectedRect.h -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = oBaseRect.y + oBaseRect.h - fB;
-                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.h += fDiff;
                     bCorrected = true;
                 }
             }
             if(oCorrectedRect && bCorrected){
-                return this.recalculateAxesSet(aAxesSet, oCorrectedRect, oBaseRect, ++nIndex);
+                if(oCorrectedRect.w > oRect.w){
+                    return this.recalculateAxesSet(aAxesSet, oCorrectedRect, oBaseRect, ++nIndex, fHorInterval);
+                }
+                else{
+                    return this.recalculateAxesSet(aAxesSet, oCorrectedRect, oBaseRect, ++nIndex);
+                }
             }
         }
         var _ret = oRect.copy();
