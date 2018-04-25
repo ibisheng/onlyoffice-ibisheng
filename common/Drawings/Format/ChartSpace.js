@@ -4808,53 +4808,54 @@ CChartSpace.prototype.getValAxisCrossType = function()
                             oRect.fVertPadding = fOldVertPadding;
                         }
                     }
-                }
-                var bCheckPaddings = false;
-                for(i = 0; i < aRects.length; ++i){
-                    if(Math.abs(aRects2[i].fVertPadding) > Math.abs(aRects[i].fVertPadding)){
-                        if(aRects2[i].fVertPadding > 0){
-                            aRects[i].y += (aRects2[i].fVertPadding - aRects[i].fVertPadding);
-                            aRects[i].h -= (aRects2[i].fVertPadding - aRects[i].fVertPadding);
-                        }
-                        else{
-                            aRects[i].h -= Math.abs(aRects2[i].fVertPadding - aRects[i].fVertPadding);
-                        }
-                        aRects[i].fVertPadding = aRects2[i].fVertPadding;
-                        bCheckPaddings = true;
-                    }
-                    if(Math.abs(aRects2[i].fHorPadding) > Math.abs(aRects[i].fHorPadding)){
-                        if(aRects2[i].fHorPadding > 0){
-                            aRects[i].x += (aRects2[i].fHorPadding - aRects[i].fHorPadding);
-                            aRects[i].w -= (aRects2[i].fHorPadding - aRects[i].fHorPadding);
-                        }
-                        else{
-                            aRects[i].w -= Math.abs(aRects2[i].fHorPadding - aRects[i].fHorPadding);
-                        }
-                        aRects[i].fHorPadding = aRects2[i].fHorPadding;
-                        bCheckPaddings = true;
-                    }
-                }
-                if(bCheckPaddings){
-                    oRect = aRects[0].copy();
-                    for(i = 1; i < aRects.length; ++i){
-                        if(!oRect.intersection(aRects[i])){
-                            break;
-                        }
-                    }
-                    if(i === aRects.length){
-                        var aRects2 = [];
-                        for(i = 0; i < aAllAxes.length; ++i){
-                            aCurAxesSet = aAllAxes[i];
-                            if(i === 0){
-                                fOldHorPadding = oRect.fHorPadding;
-                                fOldVertPadding = oRect.fVertPadding;
-                                oRect.fHorPadding = 0.0;
-                                oRect.fVertPadding = 0.0;
+
+                    var bCheckPaddings = false;
+                    for(i = 0; i < aRects.length; ++i){
+                        if(Math.abs(aRects2[i].fVertPadding) > Math.abs(aRects[i].fVertPadding)){
+                            if(aRects2[i].fVertPadding > 0){
+                                aRects[i].y += (aRects2[i].fVertPadding - aRects[i].fVertPadding);
+                                aRects[i].h -= (aRects2[i].fVertPadding - aRects[i].fVertPadding);
                             }
-                            aRects2.push(this.recalculateAxesSet(aCurAxesSet, oRect, oBaseRect, 2));
-                            if(i === 0){
-                                oRect.fHorPadding = fOldHorPadding;
-                                oRect.fVertPadding = fOldVertPadding;
+                            else{
+                                aRects[i].h -= Math.abs(aRects2[i].fVertPadding - aRects[i].fVertPadding);
+                            }
+                            aRects[i].fVertPadding = aRects2[i].fVertPadding;
+                            bCheckPaddings = true;
+                        }
+                        if(Math.abs(aRects2[i].fHorPadding) > Math.abs(aRects[i].fHorPadding)){
+                            if(aRects2[i].fHorPadding > 0){
+                                aRects[i].x += (aRects2[i].fHorPadding - aRects[i].fHorPadding);
+                                aRects[i].w -= (aRects2[i].fHorPadding - aRects[i].fHorPadding);
+                            }
+                            else{
+                                aRects[i].w -= Math.abs(aRects2[i].fHorPadding - aRects[i].fHorPadding);
+                            }
+                            aRects[i].fHorPadding = aRects2[i].fHorPadding;
+                            bCheckPaddings = true;
+                        }
+                    }
+                    if(bCheckPaddings){
+                        oRect = aRects[0].copy();
+                        for(i = 1; i < aRects.length; ++i){
+                            if(!oRect.intersection(aRects[i])){
+                                break;
+                            }
+                        }
+                        if(i === aRects.length){
+                            var aRects2 = [];
+                            for(i = 0; i < aAllAxes.length; ++i){
+                                aCurAxesSet = aAllAxes[i];
+                                if(i === 0){
+                                    fOldHorPadding = oRect.fHorPadding;
+                                    fOldVertPadding = oRect.fVertPadding;
+                                    oRect.fHorPadding = 0.0;
+                                    oRect.fVertPadding = 0.0;
+                                }
+                                aRects2.push(this.recalculateAxesSet(aCurAxesSet, oRect, oBaseRect, 2));
+                                if(i === 0){
+                                    oRect.fHorPadding = fOldHorPadding;
+                                    oRect.fVertPadding = fOldVertPadding;
+                                }
                             }
                         }
                     }
