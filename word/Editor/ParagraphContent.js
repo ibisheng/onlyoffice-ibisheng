@@ -1933,7 +1933,7 @@ ParaContinuationSeparator.prototype.UpdateWidth = function(PRS)
 	oPara.Parent.Update_ContentIndexing();
 	var oLimits = oPara.Parent.Get_PageContentStartPos2(oPara.PageNum, oPara.ColumnNum, nCurPage, oPara.Index);
 
-	var nWidth = ((oLimits.XLimit - oLimits.X) * TEXTWIDTH_DIVIDER) | 0;
+	var nWidth = (Math.max(oLimits.XLimit - PRS.X, 50) * TEXTWIDTH_DIVIDER) | 0;
 
 	this.Width        = nWidth;
 	this.WidthVisible = nWidth;
