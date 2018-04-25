@@ -7385,24 +7385,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 187) // =
     {
-        if (true === e.CtrlKey) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
-        {
-            var TextPr = this.GetCalculatedTextPr();
-            if (null != TextPr)
-            {
-                if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey);
-                    if (true === e.ShiftKey)
-                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
-                    else
-                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
-                    this.Document_UpdateInterfaceState();
-                }
-                bRetValue = keydownresult_PreventAll;
-            }
-        }
-        else if (true === e.AltKey && !e.AltGr) // Alt + =
+        if (!e.CtrlKey && true === e.AltKey && !e.AltGr) // Alt + =
         {
             var oSelectedInfo = this.GetSelectedElementsInfo();
             var oMath         = oSelectedInfo.Get_Math();
