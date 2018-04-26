@@ -4614,7 +4614,7 @@ drawBarChart.prototype = {
 
 	_calculateDLbl: function (chartSpace, ser, val) {
 		var point = this.cChartDrawer.getIdxPoint(this.chart.series[ser], val);
-		if (!this.paths.series[ser][val]) {
+		if (!this.paths.series[ser][val] || !point || !point.compiledDlb) {
 			return;
 		}
 

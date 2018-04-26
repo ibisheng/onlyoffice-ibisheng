@@ -2650,9 +2650,10 @@ CChartSpace.prototype.updateChildLabelsTransform = function(posX, posY)
     {
         if(this.chart.plotArea)
         {
-            if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
-            {
-                var series = this.chart.plotArea.charts[0].series;
+            var aCharts = this.chart.plotArea.charts;
+            for(var t = 0; t < aCharts.length; ++t){
+                var oChart = aCharts[t];
+                var series = oChart.series;
                 for(var i = 0; i < series.length; ++i)
                 {
                     var ser = series[i];
@@ -2666,7 +2667,6 @@ CChartSpace.prototype.updateChildLabelsTransform = function(posX, posY)
                     }
                 }
             }
-
             var aAxes = this.chart.plotArea.axId;
             for(var i = 0; i < aAxes.length; ++i){
                 var oAxis = aAxes[i];
@@ -4161,7 +4161,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
         var layout;
         for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
         {
-            var series = this.chart.plotArea.charts[0].series;
+            var series = this.getAllSeries();
             if(this.recalcInfo.dataLbls[i].series && this.recalcInfo.dataLbls[i].pt)
             {
 
@@ -4171,7 +4171,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     if(series[j].idx === this.recalcInfo.dataLbls[i].series.idx)
                     {
                         var bLayout = AscCommon.isRealObject(this.recalcInfo.dataLbls[i].layout) && (AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.x) || AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.y));
-                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, /*this.recalcInfo.dataLbls[i].series.idx todo здесь оставить как есть в chartDrawere выбирать серии по индексу*/j, this.recalcInfo.dataLbls[i].pt.idx, bLayout);//
+                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx, bLayout);//
                         var oLbl = this.recalcInfo.dataLbls[i];
                         if(oLbl.layout){
                             layout = oLbl.layout;
@@ -11011,8 +11011,13 @@ CChartSpace.prototype.getChartSizes = function()
 
 CChartSpace.prototype.getAllSeries =  function()
 {
-    //TODO:Переделать когда будем поддерживать насколько вложенных чартов
-    return this.chart.plotArea.charts[0].series;
+    var _ret = [];
+    var aCharts = this.chart.plotArea.charts;
+    for(var i = 0; i < aCharts.length; ++i){
+        _ret = _ret.concat(aCharts[i].series);
+    }
+
+    return _ret;
 };
 
 CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
@@ -12295,62 +12300,74 @@ CChartSpace.prototype.updateLinks = function()
     // Здесь мы берем первую из диаграмм лежащих в массиве plotArea.charts, а также выставляем ссылки для осей ;
     if(this.chart && this.chart.plotArea)
     {
-        this.chart.plotArea.chart = this.chart.plotArea.charts[0];
-        this.chart.plotArea.serAx = null;
-        if(this.chart.plotArea.charts[0].getAxisByTypes)
-        {
-            var axis_by_types = this.chart.plotArea.charts[0].getAxisByTypes();
-            if(axis_by_types.valAx.length > 0 && axis_by_types.catAx.length > 0)
+        var oCheckChart;
+        var oPlotArea = this.chart.plotArea;
+        var aCharts = oPlotArea.charts;
+        for(var i = 0; i < aCharts.length; ++i){
+            if(aCharts[i].getObjectType() !== AscDFH.historyitem_type_PieChart && aCharts[i].getObjectType() !== AscDFH.historyitem_type_DoughnutChart){
+                oCheckChart = aCharts[i];
+                break;
+            }
+        }
+        if(oCheckChart){
+
+            this.chart.plotArea.chart = oCheckChart;
+            this.chart.plotArea.serAx = null;
+            if(oCheckChart.getAxisByTypes)
             {
-                for(var i = 0; i < axis_by_types.valAx.length; ++i)
+                var axis_by_types = oCheckChart.getAxisByTypes();
+                if(axis_by_types.valAx.length > 0 && axis_by_types.catAx.length > 0)
                 {
-                    if(axis_by_types.valAx[i].crossAx)
+                    for(var i = 0; i < axis_by_types.valAx.length; ++i)
                     {
-                        for(var j = 0; j < axis_by_types.catAx.length; ++j)
+                        if(axis_by_types.valAx[i].crossAx)
                         {
-                            if(axis_by_types.catAx[j] === axis_by_types.valAx[i].crossAx)
+                            for(var j = 0; j < axis_by_types.catAx.length; ++j)
                             {
-                                this.chart.plotArea.valAx = axis_by_types.valAx[i];
-                                this.chart.plotArea.catAx = axis_by_types.catAx[j];
+                                if(axis_by_types.catAx[j] === axis_by_types.valAx[i].crossAx)
+                                {
+                                    this.chart.plotArea.valAx = axis_by_types.valAx[i];
+                                    this.chart.plotArea.catAx = axis_by_types.catAx[j];
+                                    break;
+                                }
+                            }
+                            if(j < axis_by_types.catAx.length)
+                            {
                                 break;
                             }
                         }
-                        if(j < axis_by_types.catAx.length)
+                    }
+                    if(i ===  axis_by_types.valAx.length)
+                    {
+                        this.chart.plotArea.valAx = axis_by_types.valAx[0];
+                        this.chart.plotArea.catAx = axis_by_types.catAx[0];
+                    }
+                    if(this.chart.plotArea.valAx && this.chart.plotArea.catAx)
+                    {
+                        for(i = 0; i < axis_by_types.serAx.length; ++i)
                         {
-                            break;
+                            if(axis_by_types.serAx[i].crossAx === this.chart.plotArea.valAx)
+                            {
+                                this.chart.plotArea.serAx = axis_by_types.serAx[i];
+                                break;
+                            }
                         }
                     }
                 }
-                if(i ===  axis_by_types.valAx.length)
+                else
                 {
-                    this.chart.plotArea.valAx = axis_by_types.valAx[0];
-                    this.chart.plotArea.catAx = axis_by_types.catAx[0];
-                }
-                if(this.chart.plotArea.valAx && this.chart.plotArea.catAx)
-                {
-                    for(i = 0; i < axis_by_types.serAx.length; ++i)
-                    {
-                        if(axis_by_types.serAx[i].crossAx === this.chart.plotArea.valAx)
-                        {
-                            this.chart.plotArea.serAx = axis_by_types.serAx[i];
-                            break;
-                        }
+                    if(axis_by_types.valAx.length > 1)
+                    {//TODO: выставлять оси исходя из настроек
+                        this.chart.plotArea.valAx = axis_by_types.valAx[1];
+                        this.chart.plotArea.catAx = axis_by_types.valAx[0];
                     }
                 }
             }
             else
             {
-                if(axis_by_types.valAx.length > 1)
-                {//TODO: выставлять оси исходя из настроек
-                    this.chart.plotArea.valAx = axis_by_types.valAx[1];
-                    this.chart.plotArea.catAx = axis_by_types.valAx[0];
-                }
+                this.chart.plotArea.valAx = null;
+                this.chart.plotArea.catAx = null;
             }
-        }
-        else
-        {
-            this.chart.plotArea.valAx = null;
-            this.chart.plotArea.catAx = null;
         }
     }
 };
@@ -12414,18 +12431,22 @@ CChartSpace.prototype.draw = function(graphics)
             // graphics._l(oChartSize.startX + 0, oChartSize.startY + oChartSize.h);
             // graphics._z();
             // graphics.ds();
-            if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
-            {
-                var series = this.chart.plotArea.charts[0].series;
-                var _len = this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
-                for(var i = 0; i < _len; ++i)
+            var aCharts = this.chart.plotArea.charts;
+            for(var t = 0; t < aCharts.length; ++t){
+                var oChart = aCharts[t];
+                if(oChart && oChart.series)
                 {
-                    var ser = series[i];
-                    var pts = AscFormat.getPtsFromSeries(ser);
-                    for(var j = 0; j < pts.length; ++j)
+                    var series = oChart.series;
+                    var _len = oChart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
+                    for(var i = 0; i < _len; ++i)
                     {
-                        if(pts[j].compiledDlb)
-                            pts[j].compiledDlb.draw(graphics);
+                        var ser = series[i];
+                        var pts = AscFormat.getPtsFromSeries(ser);
+                        for(var j = 0; j < pts.length; ++j)
+                        {
+                            if(pts[j].compiledDlb)
+                                pts[j].compiledDlb.draw(graphics);
+                        }
                     }
                 }
             }

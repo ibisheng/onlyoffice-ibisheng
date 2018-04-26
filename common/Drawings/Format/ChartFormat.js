@@ -2409,6 +2409,9 @@ CPlotArea.prototype =
         for(var i = 0; i < aCharts.length; ++i){
             oChart = aCharts[i];
             var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
             for(var j = 0; j < aAxes.length; ++j){
                 if(aAxes[j] === oAxis){
                     aSeries = oChart.series;
@@ -2431,6 +2434,9 @@ CPlotArea.prototype =
         for(var i = 0; i < aCharts.length; ++i){
             oChart = aCharts[i];
             var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
             for(var j = 0; j < aAxes.length; ++j){
                 if(aAxes[j] === oAxis){
                     aRet.push(oChart);
