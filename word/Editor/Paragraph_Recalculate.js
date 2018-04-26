@@ -2718,6 +2718,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.RangesCount     = 0;
 
     this.FirstItemOnLine = true;
+	this.PrevItemFirst   = false;
     this.EmptyLine       = true;
     this.StartWord       = false;
     this.Word            = false;
@@ -2769,10 +2770,13 @@ function CParagraphRecalculateStateWrap(Para)
 
     this.NumberingPos = new CParagraphContentPos(); // Позиция элемента вместе с которым идет нумерация
 
-    this.MoveToLBP    = false;                      // Делаем ли разрыв в позиции this.LineBreakPos
-    this.LineBreakPos = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
-    // отрезка или строки, если что-то не умещается (например,
-    // если у нас не убирается слово, то разрыв ставим перед ним)
+    this.MoveToLBP      = false;                      // Делаем ли разрыв в позиции this.LineBreakPos
+	this.LineBreakFirst = true;                       // Последняя позиция для переноса - это первый элемент в отрезке
+    this.LineBreakPos   = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
+                                                      // отрезка или строки, если что-то не умещается (например,
+                                                      // если у нас не убирается слово, то разрыв ставим перед ним)
+	this.LastItem       = null;                       // Последний непробельный элемент
+
 
     this.RunRecalcInfoLast  = null; // RecalcInfo последнего рана
     this.RunRecalcInfoBreak = null; // RecalcInfo рана, на котором произошел разрыв отрезка/строки
@@ -2898,8 +2902,10 @@ CParagraphRecalculateStateWrap.prototype =
         this.XEnd            = XEnd;
         this.XRange          = X;
 
-        this.MoveToLBP    = false;
-        this.LineBreakPos = new CParagraphContentPos();
+		this.MoveToLBP      = false;
+		this.LineBreakPos   = new CParagraphContentPos();
+		this.LineBreakFirst = true;
+		this.LastItem       = null;
 
         // for ParaMath
         this.bMath_OneLine    = false;
@@ -2932,11 +2938,12 @@ CParagraphRecalculateStateWrap.prototype =
         this.RestartPageRecalcInfo.Object = Object;
     },
 
-    Set_LineBreakPos : function(PosObj)
-    {
-        this.LineBreakPos.Set( this.CurPos );
-        this.LineBreakPos.Add( PosObj );
-    },
+    Set_LineBreakPos : function(PosObj, isFirstItemOnLine)
+	{
+		this.LineBreakPos.Set(this.CurPos);
+		this.LineBreakPos.Add(PosObj);
+		this.LineBreakFirst = isFirstItemOnLine;
+	},
 
     Set_NumberingPos : function(PosObj, Item)
     {

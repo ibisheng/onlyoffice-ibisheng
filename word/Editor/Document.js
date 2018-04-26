@@ -7027,6 +7027,13 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
+    else if (e.KeyCode === 56 && true === e.CtrlKey && true === e.ShiftKey) // Ctrl + Shift + Num8 показать/скрыть невидимые символы
+	{
+		var isShow = this.Api.get_ShowParaMarks();
+		this.Api.put_ShowParaMarks(!isShow);
+		this.Api.sync_ShowParaMarks();
+		bRetValue = keydownresult_PreventAll;
+	}
     else if (e.KeyCode == 65 && true === e.CtrlKey) // Ctrl + A - выделяем все
     {
         this.SelectAll();
@@ -7219,33 +7226,33 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-	else if (e.KeyCode === 112 && true === e.CtrlKey)
-	{
-		// TODO: Добавлено для теста
-
-		this.Create_NewHistoryPoint();
-		this.AddField(fieldtype_TOC);
-		this.Recalculate();
-
-		bRetValue = keydownresult_PreventAll;
-	}
-    else if (e.KeyCode === 113 && true === e.CtrlKey)
-	{
-		// TODO: Добавлено для теста
-		var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
-		if (arrFields && arrFields.length > 0)
-			this.UpdateComplexField(arrFields[arrFields.length - 1]);
-
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 114 && true === e.CtrlKey)
-	{
-		this.Create_NewHistoryPoint();
-		this.AddField(fieldtype_PAGEREF);
-		this.Recalculate();
-
-		bRetValue = keydownresult_PreventAll;
-	}
+	// else if (e.KeyCode === 112 && true === e.CtrlKey)
+	// {
+	// 	// TODO: Добавлено для теста
+	//
+	// 	this.Create_NewHistoryPoint();
+	// 	this.AddField(fieldtype_TOC);
+	// 	this.Recalculate();
+	//
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
+	// else if (e.KeyCode === 113 && true === e.CtrlKey)
+	// {
+	// 	// TODO: Добавлено для теста
+	// 	var arrFields = this.GetComplexFieldsByContentPos(this.GetContentPosition(false));
+	// 	if (arrFields && arrFields.length > 0)
+	// 		this.UpdateComplexField(arrFields[arrFields.length - 1]);
+	//
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
+	// else if (e.KeyCode === 114 && true === e.CtrlKey)
+	// {
+	// 	this.Create_NewHistoryPoint();
+	// 	this.AddField(fieldtype_PAGEREF);
+	// 	this.Recalculate();
+	//
+	// 	bRetValue = keydownresult_PreventAll;
+	// }
 	else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -11651,6 +11658,33 @@ CDocument.prototype.Get_SectionProps = function()
 	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
 	return new Asc.CDocumentSectionProps(SectPr);
+};
+/**
+ * Получаем ширину текущей колонки
+ * @returns {number}
+ */
+CDocument.prototype.GetCurrentColumnWidth = function()
+{
+	var nCurPos = 0;
+	if (this.Controller === this.LogicDocumentController)
+		nCurPos = this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos;
+	else
+		nCurPos = this.CurPos.ContentPos;
+
+	var oSectPr       = this.SectionsInfo.Get_SectPr(nCurPos).SectPr;
+	var nColumnsCount = oSectPr.Get_ColumnsCount();
+
+	if (nColumnsCount > 1)
+	{
+		var oParagraph = this.GetCurrentParagraph();
+		if (!oParagraph)
+			return 0;
+
+		var nCurrentColumn = oParagraph.Get_CurrentColumn();
+		return oSectPr.Get_ColumnWidth(nCurrentColumn);
+	}
+
+	return oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Right() - oSectPr.Get_PageMargin_Left();
 };
 CDocument.prototype.Get_FirstParagraph = function()
 {

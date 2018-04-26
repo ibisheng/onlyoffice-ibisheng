@@ -119,25 +119,232 @@ var nbsp_charcode = 0x00A0;
 var nbsp_string = String.fromCharCode(0x00A0);
 var sp_string   = String.fromCharCode(0x0032);
 
-var g_aPunctuation =
-[
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
-];
 
-g_aPunctuation[0x002D] = 1; // символ -
-g_aPunctuation[0x00AB] = 1; // символ «
-g_aPunctuation[0x00BB] = 1; // символ »
-g_aPunctuation[0x2013] = 1; // символ –
-g_aPunctuation[0x201C] = 1; // символ “
-g_aPunctuation[0x201D] = 1; // символ ”
-g_aPunctuation[0x2026] = 1; // символ ...
+var PUNCTUATION_FLAG_BASE             = 0x0001;
+var PUNCTUATION_FLAG_CANT_BE_AT_BEGIN = 0x0010;
+var PUNCTUATION_FLAG_CANT_BE_AT_END   = 0x0020;
+var PUNCTUATION_FLAG_EAST_ASIAN       = 0x0100;
+
+var g_aPunctuation = [];
+g_aPunctuation[0x0021] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // !
+g_aPunctuation[0x0022] = PUNCTUATION_FLAG_BASE;                                     // "
+g_aPunctuation[0x0023] = PUNCTUATION_FLAG_BASE;                                     // #
+g_aPunctuation[0x0024] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // $
+g_aPunctuation[0x0025] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // %
+g_aPunctuation[0x0026] = PUNCTUATION_FLAG_BASE;                                     // &
+g_aPunctuation[0x0027] = PUNCTUATION_FLAG_BASE;                                     // '
+g_aPunctuation[0x0028] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // (
+g_aPunctuation[0x0029] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // )
+g_aPunctuation[0x002A] = PUNCTUATION_FLAG_BASE;                                     // *
+g_aPunctuation[0x002B] = PUNCTUATION_FLAG_BASE;                                     // +
+g_aPunctuation[0x002C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ,
+g_aPunctuation[0x002D] = PUNCTUATION_FLAG_BASE;                                     // -
+g_aPunctuation[0x002E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // .
+g_aPunctuation[0x002F] = PUNCTUATION_FLAG_BASE;                                     // /
+g_aPunctuation[0x003A] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // :
+g_aPunctuation[0x003B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ;
+g_aPunctuation[0x003C] = PUNCTUATION_FLAG_BASE;                                     // <
+g_aPunctuation[0x003D] = PUNCTUATION_FLAG_BASE;                                     // =
+g_aPunctuation[0x003E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // >
+g_aPunctuation[0x003F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ?
+g_aPunctuation[0x0040] = PUNCTUATION_FLAG_BASE;                                     // @
+g_aPunctuation[0x005B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // [
+g_aPunctuation[0x005C] = PUNCTUATION_FLAG_BASE;                                     // \
+g_aPunctuation[0x005D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ]
+g_aPunctuation[0x005E] = PUNCTUATION_FLAG_BASE;                                     // ^
+g_aPunctuation[0x005F] = PUNCTUATION_FLAG_BASE;                                     // _
+g_aPunctuation[0x0060] = PUNCTUATION_FLAG_BASE;                                     // `
+g_aPunctuation[0x007B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // {
+g_aPunctuation[0x007C] = PUNCTUATION_FLAG_BASE;                                     // |
+g_aPunctuation[0x007D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // }
+g_aPunctuation[0x007E] = PUNCTUATION_FLAG_BASE;                                     // ~
+
+g_aPunctuation[0x00A1] = PUNCTUATION_FLAG_BASE;                                     // ¡
+g_aPunctuation[0x00A2] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ¢
+g_aPunctuation[0x00A3] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // £
+g_aPunctuation[0x00A4] = PUNCTUATION_FLAG_BASE;                                     // ¤
+g_aPunctuation[0x00A5] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ¥
+g_aPunctuation[0x00A6] = PUNCTUATION_FLAG_BASE;                                     // ¦
+g_aPunctuation[0x00A7] = PUNCTUATION_FLAG_BASE;                                     // §
+g_aPunctuation[0x00A8] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ¨
+g_aPunctuation[0x00A9] = PUNCTUATION_FLAG_BASE;                                     // ©
+g_aPunctuation[0x00AA] = PUNCTUATION_FLAG_BASE;                                     // ª
+g_aPunctuation[0x00AB] = PUNCTUATION_FLAG_BASE;                                     // «
+g_aPunctuation[0x00AC] = PUNCTUATION_FLAG_BASE;                                     // ¬
+g_aPunctuation[0x00AD] = PUNCTUATION_FLAG_BASE;                                     // ­
+g_aPunctuation[0x00AE] = PUNCTUATION_FLAG_BASE;                                     // ®
+g_aPunctuation[0x00AF] = PUNCTUATION_FLAG_BASE;                                     // ¯
+g_aPunctuation[0x00B0] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // °
+g_aPunctuation[0x00B1] = PUNCTUATION_FLAG_BASE;                                     // ±
+g_aPunctuation[0x00B4] = PUNCTUATION_FLAG_BASE;                                     // ´
+g_aPunctuation[0x00B6] = PUNCTUATION_FLAG_BASE;                                     // ¶
+g_aPunctuation[0x00B7] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ·
+g_aPunctuation[0x00B8] = PUNCTUATION_FLAG_BASE;                                     // ¸
+g_aPunctuation[0x00BA] = PUNCTUATION_FLAG_BASE;                                     // º
+g_aPunctuation[0x00BB] = PUNCTUATION_FLAG_BASE;                                     // »
+g_aPunctuation[0x00BB] = PUNCTUATION_FLAG_BASE;                                     // »
+g_aPunctuation[0x00BF] = PUNCTUATION_FLAG_BASE;                                     // ¿
+
+g_aPunctuation[0x2010] = PUNCTUATION_FLAG_BASE;                                     // ‐
+g_aPunctuation[0x2011] = PUNCTUATION_FLAG_BASE;                                     // ‑
+g_aPunctuation[0x2012] = PUNCTUATION_FLAG_BASE;                                     // ‒
+g_aPunctuation[0x2013] = PUNCTUATION_FLAG_BASE;                                     // –
+g_aPunctuation[0x2014] = PUNCTUATION_FLAG_BASE;                                     // —
+g_aPunctuation[0x2015] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ―
+g_aPunctuation[0x2016] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ‖
+g_aPunctuation[0x2017] = PUNCTUATION_FLAG_BASE;                                     // ‗
+g_aPunctuation[0x2018] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ‘
+g_aPunctuation[0x2019] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ’
+g_aPunctuation[0x201A] = PUNCTUATION_FLAG_BASE;                                     // ‚
+g_aPunctuation[0x201B] = PUNCTUATION_FLAG_BASE;                                     // ‛
+g_aPunctuation[0x201C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // “
+g_aPunctuation[0x201D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ”
+g_aPunctuation[0x201E] = PUNCTUATION_FLAG_BASE;                                     // „
+g_aPunctuation[0x201F] = PUNCTUATION_FLAG_BASE;                                     // ‟
+g_aPunctuation[0x2020] = PUNCTUATION_FLAG_BASE;                                     // †
+g_aPunctuation[0x2021] = PUNCTUATION_FLAG_BASE;                                     // ‡
+g_aPunctuation[0x2022] = PUNCTUATION_FLAG_BASE;                                     // •
+g_aPunctuation[0x2023] = PUNCTUATION_FLAG_BASE;                                     // ‣
+g_aPunctuation[0x2024] = PUNCTUATION_FLAG_BASE;                                     // ․
+g_aPunctuation[0x2025] = PUNCTUATION_FLAG_BASE;                                     // ‥
+g_aPunctuation[0x2026] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // …
+g_aPunctuation[0x2027] = PUNCTUATION_FLAG_BASE;                                     // ‧
+g_aPunctuation[0x2030] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ‰
+g_aPunctuation[0x2031] = PUNCTUATION_FLAG_BASE;                                     // ‱
+g_aPunctuation[0x2032] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ′
+g_aPunctuation[0x2033] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ″
+g_aPunctuation[0x2034] = PUNCTUATION_FLAG_BASE;                                     // ‴
+g_aPunctuation[0x2035] = PUNCTUATION_FLAG_BASE;                                     // ‵
+g_aPunctuation[0x2036] = PUNCTUATION_FLAG_BASE;                                     // ‶
+g_aPunctuation[0x2037] = PUNCTUATION_FLAG_BASE;                                     // ‷
+g_aPunctuation[0x2038] = PUNCTUATION_FLAG_BASE;                                     // ‸
+g_aPunctuation[0x2039] = PUNCTUATION_FLAG_BASE;                                     // ‹
+g_aPunctuation[0x203A] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ›
+g_aPunctuation[0x203B] = PUNCTUATION_FLAG_BASE;                                     // ※
+g_aPunctuation[0x203C] = PUNCTUATION_FLAG_BASE;                                     // ‼
+g_aPunctuation[0x203D] = PUNCTUATION_FLAG_BASE;                                     // ‽
+g_aPunctuation[0x203E] = PUNCTUATION_FLAG_BASE;                                     // ‾
+g_aPunctuation[0x203F] = PUNCTUATION_FLAG_BASE;                                     // ‿
+g_aPunctuation[0x2040] = PUNCTUATION_FLAG_BASE;                                     // ⁀
+g_aPunctuation[0x2041] = PUNCTUATION_FLAG_BASE;                                     // ⁁
+g_aPunctuation[0x2042] = PUNCTUATION_FLAG_BASE;                                     // ⁂
+g_aPunctuation[0x2043] = PUNCTUATION_FLAG_BASE;                                     // ⁃
+g_aPunctuation[0x2044] = PUNCTUATION_FLAG_BASE;                                     // ⁄
+g_aPunctuation[0x2045] = PUNCTUATION_FLAG_BASE;                                     // ⁅
+g_aPunctuation[0x2046] = PUNCTUATION_FLAG_BASE;                                     // ⁆
+g_aPunctuation[0x2047] = PUNCTUATION_FLAG_BASE;                                     // ⁇
+g_aPunctuation[0x2048] = PUNCTUATION_FLAG_BASE;                                     // ⁈
+g_aPunctuation[0x2049] = PUNCTUATION_FLAG_BASE;                                     // ⁉
+g_aPunctuation[0x204A] = PUNCTUATION_FLAG_BASE;                                     // ⁊
+g_aPunctuation[0x204B] = PUNCTUATION_FLAG_BASE;                                     // ⁋
+g_aPunctuation[0x204C] = PUNCTUATION_FLAG_BASE;                                     // ⁌
+g_aPunctuation[0x204D] = PUNCTUATION_FLAG_BASE;                                     // ⁍
+g_aPunctuation[0x204E] = PUNCTUATION_FLAG_BASE;                                     // ⁎
+g_aPunctuation[0x204F] = PUNCTUATION_FLAG_BASE;                                     // ⁏
+g_aPunctuation[0x2050] = PUNCTUATION_FLAG_BASE;                                     // ⁐
+g_aPunctuation[0x2051] = PUNCTUATION_FLAG_BASE;                                     // ⁑
+g_aPunctuation[0x2052] = PUNCTUATION_FLAG_BASE;                                     // ⁒
+g_aPunctuation[0x2053] = PUNCTUATION_FLAG_BASE;                                     // ⁓
+g_aPunctuation[0x2054] = PUNCTUATION_FLAG_BASE;                                     // ⁔
+g_aPunctuation[0x2055] = PUNCTUATION_FLAG_BASE;                                     // ⁕
+g_aPunctuation[0x2056] = PUNCTUATION_FLAG_BASE;                                     // ⁖
+g_aPunctuation[0x2057] = PUNCTUATION_FLAG_BASE;                                     // ⁗
+g_aPunctuation[0x2058] = PUNCTUATION_FLAG_BASE;                                     // ⁘
+g_aPunctuation[0x2059] = PUNCTUATION_FLAG_BASE;                                     // ⁙
+g_aPunctuation[0x205A] = PUNCTUATION_FLAG_BASE;                                     // ⁚
+g_aPunctuation[0x205B] = PUNCTUATION_FLAG_BASE;                                     // ⁛
+g_aPunctuation[0x205C] = PUNCTUATION_FLAG_BASE;                                     // ⁜
+g_aPunctuation[0x205D] = PUNCTUATION_FLAG_BASE;                                     // ⁝
+g_aPunctuation[0x205E] = PUNCTUATION_FLAG_BASE;                                     // ⁞
+
+// Не смотря на то что следующий набор символов идет в блоке CJK Symbols and Punctuation
+// Word не считает их как EastAsian script (w:lang->w:eastAsian)
+
+g_aPunctuation[0x3001] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 、
+g_aPunctuation[0x3002] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 。
+g_aPunctuation[0x3003] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 〃
+g_aPunctuation[0x3004] = PUNCTUATION_FLAG_BASE;                                     // 〄
+g_aPunctuation[0x3005] = PUNCTUATION_FLAG_BASE;                                     // 々
+g_aPunctuation[0x3006] = PUNCTUATION_FLAG_BASE;                                     // 〆
+g_aPunctuation[0x3007] = PUNCTUATION_FLAG_BASE;                                     // 〇
+g_aPunctuation[0x3008] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 〈
+g_aPunctuation[0x3009] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 〉
+g_aPunctuation[0x300A] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 《
+g_aPunctuation[0x300B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 》
+g_aPunctuation[0x300C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 「
+g_aPunctuation[0x300D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 」
+g_aPunctuation[0x300E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 『
+g_aPunctuation[0x300F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 』
+g_aPunctuation[0x3010] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 【
+g_aPunctuation[0x3011] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 】
+g_aPunctuation[0x3012] = PUNCTUATION_FLAG_BASE;                                     // 〒
+g_aPunctuation[0x3013] = PUNCTUATION_FLAG_BASE;                                     // 〓
+g_aPunctuation[0x3014] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   //〔
+g_aPunctuation[0x3015] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 〕
+g_aPunctuation[0x3016] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   //〖
+g_aPunctuation[0x3017] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 〗
+g_aPunctuation[0x3018] = PUNCTUATION_FLAG_BASE;                                     // 〘
+g_aPunctuation[0x3019] = PUNCTUATION_FLAG_BASE;                                     // 〙
+g_aPunctuation[0x301A] = PUNCTUATION_FLAG_BASE;                                     // 〚
+g_aPunctuation[0x301B] = PUNCTUATION_FLAG_BASE;                                     // 〛
+g_aPunctuation[0x301C] = PUNCTUATION_FLAG_BASE;                                     // 〜
+g_aPunctuation[0x301D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_END;   // 〝
+g_aPunctuation[0x301E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // 〞
+g_aPunctuation[0x301F] = PUNCTUATION_FLAG_BASE;                                     // 〟
+
+g_aPunctuation[0xFF01] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ！
+g_aPunctuation[0xFF02] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ＂
+g_aPunctuation[0xFF03] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＃
+g_aPunctuation[0xFF04] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ＄
+g_aPunctuation[0xFF05] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ％
+g_aPunctuation[0xFF06] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＆
+g_aPunctuation[0xFF07] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ＇
+g_aPunctuation[0xFF08] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // （
+g_aPunctuation[0xFF09] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // )
+g_aPunctuation[0xFF0A] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＊
+g_aPunctuation[0xFF0B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＋
+g_aPunctuation[0xFF0C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ，
+g_aPunctuation[0xFF0D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // －
+g_aPunctuation[0xFF0E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ．
+g_aPunctuation[0xFF0F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ／
+g_aPunctuation[0xFF1A] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ：
+g_aPunctuation[0xFF1B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ；
+g_aPunctuation[0xFF1C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＜
+g_aPunctuation[0xFF1D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＝
+g_aPunctuation[0xFF1E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＞
+g_aPunctuation[0xFF1F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ？
+g_aPunctuation[0xFF20] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＠
+g_aPunctuation[0xFF3B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ［
+g_aPunctuation[0xFF3C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＼
+g_aPunctuation[0xFF3D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ］
+g_aPunctuation[0xFF3E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＾
+g_aPunctuation[0xFF3F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ＿
+g_aPunctuation[0xFF40] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ｀
+g_aPunctuation[0xFF5B] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ｛
+g_aPunctuation[0xFF5C] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ｜
+g_aPunctuation[0xFF5D] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ｝
+g_aPunctuation[0xFF5E] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ～
+g_aPunctuation[0xFF5F] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ｟
+g_aPunctuation[0xFF60] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ｠
+g_aPunctuation[0xFF61] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ｡
+g_aPunctuation[0xFF62] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ｢
+g_aPunctuation[0xFF63] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ｣
+g_aPunctuation[0xFF64] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ､
+g_aPunctuation[0xFF65] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ･
+g_aPunctuation[0xFFE0] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_BEGIN; // ￠
+g_aPunctuation[0xFFE1] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ￡
+g_aPunctuation[0xFFE2] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￢
+g_aPunctuation[0xFFE3] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￣
+g_aPunctuation[0xFFE4] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￤
+g_aPunctuation[0xFFE5] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN | PUNCTUATION_FLAG_CANT_BE_AT_END;   // ￥
+g_aPunctuation[0xFFE6] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￦
+g_aPunctuation[0xFFE8] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￨
+g_aPunctuation[0xFFE9] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￩
+g_aPunctuation[0xFFEA] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￪
+g_aPunctuation[0xFFEB] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￫
+g_aPunctuation[0xFFEC] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￬
+g_aPunctuation[0xFFED] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￭
+g_aPunctuation[0xFFEE] = PUNCTUATION_FLAG_BASE | PUNCTUATION_FLAG_EAST_ASIAN;                                     // ￮
 
 
 var g_aNumber     = [];
@@ -165,9 +372,14 @@ g_oSRCFPSC[para_InstrText] = 1;
 g_oSRCFPSC[para_Bookmark]  = 1;
 
 
-
 var g_aSpecialSymbols     = [];
 g_aSpecialSymbols[0x00AE] = 1;
+
+
+// Список символов, которые не могут находиться в конце строки
+// A characters that can not be at the end of a line
+var g_aCCNBAEL = [];
+
 
 var PARATEXT_FLAGS_MASK               = 0xFFFFFFFF; // 4 байта
 var PARATEXT_FLAGS_FONTKOEF_SCRIPT    = 0x00000001; // 0 бит
@@ -385,7 +597,7 @@ ParaText.prototype.Is_NBSP = function()
 };
 ParaText.prototype.Is_Punctuation = function()
 {
-	if (1 === g_aPunctuation[this.Value])
+	if (undefined !== g_aPunctuation[this.Value])
 		return true;
 
 	return false;
@@ -450,8 +662,100 @@ ParaText.prototype.Read_FromBinary = function(Reader)
 };
 ParaText.prototype.private_IsSpaceAfter = function()
 {
-	if (0x002D === this.Value
-		|| 0x2014 === this.Value)
+	// Дефисы
+	if (0x002D === this.Value || 0x2014 === this.Value)
+		return true;
+
+	if (this.IsEastAsianScript() && this.CanBeAtEndOfLine())
+		return true;
+
+	return false;
+};
+ParaText.prototype.CanBeAtBeginOfLine = function()
+{
+	if (this.Is_NBSP())
+		return false;
+
+	return (!(g_aPunctuation[this.Value] & PUNCTUATION_FLAG_CANT_BE_AT_BEGIN));
+};
+ParaText.prototype.CanBeAtEndOfLine = function()
+{
+	if (this.Is_NBSP())
+		return false;
+
+	return (!(g_aPunctuation[this.Value] & PUNCTUATION_FLAG_CANT_BE_AT_END));
+};
+ParaText.prototype.IsEastAsianScript = function()
+{
+	// Bopomofo (3100–312F)
+	// Bopomofo Extended (31A0–31BF)
+	// CJK Unified Ideographs (4E00–9FEA)
+	// CJK Unified Ideographs Extension A (3400–4DB5)
+	// CJK Unified Ideographs Extension B (20000–2A6D6)
+	// CJK Unified Ideographs Extension C (2A700–2B734)
+	// CJK Unified Ideographs Extension D (2B740–2B81D)
+	// CJK Unified Ideographs Extension E (2B820–2CEA1)
+	// CJK Unified Ideographs Extension F (2CEB0–2EBE0)
+	// CJK Compatibility Ideographs (F900–FAFF)
+	// CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+	// Kangxi Radicals (2F00–2FDF)
+	// CJK Radicals Supplement (2E80–2EFF)
+	// CJK Strokes (31C0–31EF)
+	// Ideographic Description Characters (2FF0–2FFF)
+	// Hangul Jamo (1100–11FF)
+	// Hangul Jamo Extended-A (A960–A97F)
+	// Hangul Jamo Extended-B (D7B0–D7FF)
+	// Hangul Compatibility Jamo (3130–318F)
+	// Halfwidth and Fullwidth Forms (FF00–FFEF)
+	// Hangul Syllables (AC00–D7AF)
+	// Hiragana (3040–309F)
+	// Kana Extended-A (1B100–1B12F)
+	// Kana Supplement (1B000–1B0FF)
+	// Kanbun (3190–319F)
+	// Katakana (30A0–30FF)
+	// Katakana Phonetic Extensions (31F0–31FF)
+	// Lisu (A4D0–A4FF)
+	// Miao (16F00–16F9F)
+	// Nushu (1B170–1B2FF)
+	// Tangut (17000–187EC)
+	// Tangut Components (18800–18AFF)
+	// Yi Syllables (A000–A48F)
+	// Yi Radicals (A490–A4CF)
+
+	if ((0x3100 <= this.Value && this.Value <= 0x312F)
+		|| (0x31A0 <= this.Value && this.Value <= 0x31BF)
+		|| (0x4E00 <= this.Value && this.Value <= 0x9FEA)
+		|| (0x3400 <= this.Value && this.Value <= 0x4DB5)
+		|| (0x20000 <= this.Value && this.Value <= 0x2A6D6)
+		|| (0x2A700 <= this.Value && this.Value <= 0x2B734)
+		|| (0x2B740 <= this.Value && this.Value <= 0x2B81D)
+		|| (0x2B820 <= this.Value && this.Value <= 0x2CEA1)
+		|| (0x2CEB0 <= this.Value && this.Value <= 0x2EBE0)
+		|| (0xF900 <= this.Value && this.Value <= 0xFAFF)
+		|| (0x2F800 <= this.Value && this.Value <= 0x2FA1F)
+		|| (0x2F00 <= this.Value && this.Value <= 0x2FDF)
+		|| (0x2E80 <= this.Value && this.Value <= 0x2EFF)
+		|| (0x31C0 <= this.Value && this.Value <= 0x31EF)
+		|| (0x2FF0 <= this.Value && this.Value <= 0x2FFF)
+		|| (0x1100 <= this.Value && this.Value <= 0x11FF)
+		|| (0xA960 <= this.Value && this.Value <= 0xA97F)
+		|| (0xD7B0 <= this.Value && this.Value <= 0xD7FF)
+		|| (0x3130 <= this.Value && this.Value <= 0x318F)
+		|| (0xFF00 <= this.Value && this.Value <= 0xFFEF)
+		|| (0xAC00 <= this.Value && this.Value <= 0xD7AF)
+		|| (0x3040 <= this.Value && this.Value <= 0x309F)
+		|| (0x1B100 <= this.Value && this.Value <= 0x1B12F)
+		|| (0x1B000 <= this.Value && this.Value <= 0x1B0FF)
+		|| (0x3190 <= this.Value && this.Value <= 0x319F)
+		|| (0x30A0 <= this.Value && this.Value <= 0x30FF)
+		|| (0x31F0 <= this.Value && this.Value <= 0x31FF)
+		|| (0xA4D0 <= this.Value && this.Value <= 0xA4FF)
+		|| (0x16F00 <= this.Value && this.Value <= 0x16F9F)
+		|| (0x1B170 <= this.Value && this.Value <= 0x1B2FF)
+		|| (0x17000 <= this.Value && this.Value <= 0x187EC)
+		|| (0x18800 <= this.Value && this.Value <= 0x18AFF)
+		|| (0xA000 <= this.Value && this.Value <= 0xA48F)
+		|| (0xA490 <= this.Value && this.Value <= 0xA4CF))
 		return true;
 
 	return false;

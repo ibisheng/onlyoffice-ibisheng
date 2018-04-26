@@ -1186,6 +1186,10 @@ CBlockLevelSdt.prototype.GetLastParagraph = function()
 {
 	return this.Content.GetLastParagraph();
 };
+CBlockLevelSdt.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	return this.Parent.IsLastTableCellInRow(isSelection);
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
