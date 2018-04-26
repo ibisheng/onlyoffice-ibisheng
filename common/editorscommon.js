@@ -3230,7 +3230,13 @@
 
 	CSignatureDrawer.prototype.drawText = function()
 	{
+        var _oldTurn = this.Api.isViewMode;
+        var _oldMarks = this.Api.ShowParaMarks;
+        this.Api.isViewMode = true;
+        this.Api.ShowParaMarks = false;
 		AscFormat.ExecuteNoHistory(AscCommon.DrawTextByCenter, this, []);
+        this.Api.isViewMode = _oldTurn;
+        this.Api.ShowParaMarks = _oldMarks;
 	};
 
 	CSignatureDrawer.prototype.drawImage = function()
