@@ -1201,6 +1201,10 @@ CBlockLevelSdt.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
 	this.Content.GetOutlineParagraphs(arrOutline, oPr);
 };
+CBlockLevelSdt.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	return this.Parent.IsLastTableCellInRow(isSelection);
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

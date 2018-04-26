@@ -5367,7 +5367,7 @@ PasteProcessor.prototype =
                     }
                 }
             }
-            table.SetTableLayout(tbllayout_Fixed);
+            table.SetTableLayout(tbllayout_AutoFit);
             return table;
         }, this, []);
         return oTable;
@@ -7488,8 +7488,7 @@ PasteProcessor.prototype =
     },
     _ExecuteTable : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
     {
-		//из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
-		table.SetTableLayout(tbllayout_Fixed);
+		table.SetTableLayout(tbllayout_AutoFit);
         //Pr
         var Pr = table.Pr;
 		//align смотрим у parent tableNode
@@ -8687,8 +8686,7 @@ PasteProcessor.prototype =
 
     _ExecuteTablePresentation : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables)
     {
-        //из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
-        table.SetTableLayout(tbllayout_Fixed);
+        table.SetTableLayout(tbllayout_AutoFit);
         //Pr
         var Pr = table.Pr;
 		//align смотрим у parent tableNode

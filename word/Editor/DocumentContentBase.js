@@ -1150,3 +1150,12 @@ CDocumentContentBase.prototype.IsFootnote = function(bReturnFootnote)
 
 	return false;
 };
+/**
+ * Проверяем находимся ли мы в последней ячейке таблицы
+ * @param {boolean} isSelection
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	return false;
+};

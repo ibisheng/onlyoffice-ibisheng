@@ -4475,8 +4475,12 @@ drawBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+		var numCache = this.cChartDrawer.getNumCache(seria.val);
+		if(!numCache) {
+			return null;
+		}
 
+		var pt = numCache.getPtByIndex(point);
 		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
@@ -6742,7 +6746,12 @@ drawAreaChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+		var numCache = this.cChartDrawer.getNumCache(seria.val);
+		if(!numCache) {
+			return null;
+		}
+
+		var pt = numCache.getPtByIndex(point);
 		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
@@ -7037,7 +7046,12 @@ drawHBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+		var numCache = this.cChartDrawer.getNumCache(seria.val);
+		if(!numCache) {
+			return null;
+		}
+
+		var pt = numCache.getPtByIndex(point);
 		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		

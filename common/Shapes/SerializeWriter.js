@@ -2358,6 +2358,10 @@ function CBinaryFileWriter()
 
     this.CorrectUniColorAlpha = function(color, trans)
     {
+        if(!color)
+        {
+            return;
+        }
         // делаем прозрачность
         if(!color.Mods)
         {
@@ -2480,8 +2484,8 @@ function CBinaryFileWriter()
                 oThis.CorrectUniColorAlpha(fill.fgClr, trans);
                 oThis.CorrectUniColorAlpha(fill.bgClr, trans);
 
-                oThis.WriteRecord1(0, fill.fgClr, oThis.WriteUniColor);
-                oThis.WriteRecord1(1, fill.bgClr, oThis.WriteUniColor);
+                oThis.WriteRecord2(0, fill.fgClr, oThis.WriteUniColor);
+                oThis.WriteRecord2(1, fill.bgClr, oThis.WriteUniColor);
 
                 oThis.EndRecord();
                 break;
