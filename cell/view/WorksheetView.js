@@ -9568,6 +9568,7 @@
 	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, rangeStyle, formulaProps, specialPasteProps)
 	{
 		var t = this;
+		var elemType = AscCommonExcel.cElementType;
 		
 		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val, activeCellsPasteFragment, transposeRange;
 		if(formulaProps)
@@ -9599,9 +9600,15 @@
 		{
 			for(var i = 0; i < outStack.length; i++)
 			{
-				if(outStack[i].bbox || "object" === typeof outStack[i].range)
+				//TODO пересмотреть случаи, когда возвращается ошибка
+				var range;
+				if(elemType.cellsRange === outStack[i].type || elemType.cell === outStack[i].type || elemType.cell3D === outStack[i].type) {
+					range = outStack[i].range && outStack[i].range.bbox ? outStack[i].range.bbox : null;
+				} else if(elemType.cellsRange3D === outStack[i].type) {
+					range = outStack[i].bbox && outStack[i].bbox ? outStack[i].bbox : null;
+				}
+				if(range)
 				{
-					var range = outStack[i].bbox ? outStack[i].bbox : outStack[i].range;
 					var diffCol1 = range.c1 - activeCellsPasteFragment.c1;
 					var diffRow1 = range.r1 - activeCellsPasteFragment.r1;
 					var diffCol2 = range.c2 - activeCellsPasteFragment.c1;
@@ -9612,7 +9619,6 @@
 					range.c2 = activeCellsPasteFragment.c1 + diffRow2;
 					range.r2 = activeCellsPasteFragment.r1 + diffCol2;
 				}
-				
 			}
 		};
 		
