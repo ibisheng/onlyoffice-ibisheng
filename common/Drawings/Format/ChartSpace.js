@@ -764,15 +764,15 @@ function checkPointInMap(map, worksheet, row, col)
             if(this.aLabels[i])
                 this.aLabels[i].draw(graphics);
         }
-        graphics.p_width(70);
-        graphics.p_color(0, 0, 0, 255);
-        graphics._s();
-        graphics._m(this.x, this.y);
-        graphics._l(this.x + this.extX, this.y + 0);
-        graphics._l(this.x + this.extX, this.y + this.extY);
-        graphics._l(this.x + 0, this.y + this.extY);
-        graphics._z();
-        graphics.ds();
+        // graphics.p_width(70);
+        // graphics.p_color(0, 0, 0, 255);
+        // graphics._s();
+        // graphics._m(this.x, this.y);
+        // graphics._l(this.x + this.extX, this.y + 0);
+        // graphics._l(this.x + this.extX, this.y + this.extY);
+        // graphics._l(this.x + 0, this.y + this.extY);
+        // graphics._z();
+        // graphics.ds();
     };
 
     CLabelsBox.prototype.checkMaxMinWidth = function () {
@@ -10295,133 +10295,139 @@ CChartSpace.prototype.recalculateWalls = function()
 
 CChartSpace.prototype.recalculateUpDownBars = function()
 {
-    if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].upDownBars)
+    if(this.chart && this.chart.plotArea)
     {
-        var bars = this.chart.plotArea.charts[0].upDownBars;
-        var up_bars = bars.upBars;
-        var down_bars = bars.downBars;
-        var parents = this.getParentObjects();
-        bars.upBarsBrush = null;
-        bars.upBarsPen = null;
-        bars.downBarsBrush = null;
-        bars.downBarsPen = null;
-        if(up_bars || down_bars)
-        {
-            var default_bar_line = new AscFormat.CLn();
-            if(parents.theme  && parents.theme.themeElements
-                && parents.theme.themeElements.fmtScheme
-                && parents.theme.themeElements.fmtScheme.lnStyleLst)
-            {
-                default_bar_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
-            }
-            if(this.style >= 1 && this.style <= 16)
-                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
-            else if(this.style >= 17 && this.style <= 32 ||
-                this.style >= 41 && this.style <= 48)
-                default_bar_line = CreateNoFillLine();
-            else if(this.style === 33 || this.style === 34)
-                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
-            else if(this.style >= 35 && this.style <= 40)
-                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000));
-        }
-        if(up_bars)
-        {
-            var default_up_bars_fill;
-            if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.25000);
-            }
-            else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.05000);
-            }
-            else if(this.style >= 3 && this.style <= 8)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, 0.25000);
-            }
-            else if(this.style >= 11 && this.style <= 16)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, 0.25000);
-            }
-            else if(this.style >=19 && this.style <= 24)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, 0.25000);
-            }
-            else if(this.style >= 27 && this.style <= 32 )
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, 0.25000);
-            }
-            else if(this.style >= 33 && this.style <= 40 || this.style === 42)
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(12, 0);
-            }
-            else
-            {
-                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, 0.25000);
-            }
-            if(up_bars.Fill)
-            {
-                default_up_bars_fill.merge(up_bars.Fill);
-            }
-            default_up_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
-            this.chart.plotArea.charts[0].upDownBars.upBarsBrush = default_up_bars_fill;
-            var up_bars_line = default_bar_line.createDuplicate();
-            if(up_bars.ln)
-                up_bars_line.merge(up_bars.ln);
-            up_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
-            this.chart.plotArea.charts[0].upDownBars.upBarsPen = up_bars_line;
+        var aCharts = this.chart.plotArea.charts;
+        for(var t = 0; t < aCharts.length; ++t){
+            var oChart = aCharts[t];
+            if(oChart && oChart.upDownBars){
+                var bars = oChart.upDownBars;
+                var up_bars = bars.upBars;
+                var down_bars = bars.downBars;
+                var parents = this.getParentObjects();
+                bars.upBarsBrush = null;
+                bars.upBarsPen = null;
+                bars.downBarsBrush = null;
+                bars.downBarsPen = null;
+                if(up_bars || down_bars)
+                {
+                    var default_bar_line = new AscFormat.CLn();
+                    if(parents.theme  && parents.theme.themeElements
+                        && parents.theme.themeElements.fmtScheme
+                        && parents.theme.themeElements.fmtScheme.lnStyleLst)
+                    {
+                        default_bar_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+                    }
+                    if(this.style >= 1 && this.style <= 16)
+                        default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
+                    else if(this.style >= 17 && this.style <= 32 ||
+                        this.style >= 41 && this.style <= 48)
+                        default_bar_line = CreateNoFillLine();
+                    else if(this.style === 33 || this.style === 34)
+                        default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
+                    else if(this.style >= 35 && this.style <= 40)
+                        default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000));
+                }
+                if(up_bars)
+                {
+                    var default_up_bars_fill;
+                    if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.25000);
+                    }
+                    else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.05000);
+                    }
+                    else if(this.style >= 3 && this.style <= 8)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, 0.25000);
+                    }
+                    else if(this.style >= 11 && this.style <= 16)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, 0.25000);
+                    }
+                    else if(this.style >=19 && this.style <= 24)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, 0.25000);
+                    }
+                    else if(this.style >= 27 && this.style <= 32 )
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, 0.25000);
+                    }
+                    else if(this.style >= 33 && this.style <= 40 || this.style === 42)
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(12, 0);
+                    }
+                    else
+                    {
+                        default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, 0.25000);
+                    }
+                    if(up_bars.Fill)
+                    {
+                        default_up_bars_fill.merge(up_bars.Fill);
+                    }
+                    default_up_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
+                    oChart.upDownBars.upBarsBrush = default_up_bars_fill;
+                    var up_bars_line = default_bar_line.createDuplicate();
+                    if(up_bars.ln)
+                        up_bars_line.merge(up_bars.ln);
+                    up_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
+                    oChart.upDownBars.upBarsPen = up_bars_line;
 
-        }
-        if(down_bars)
-        {
-            var default_down_bars_fill;
-            if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41 || this.style === 33)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.85000);
+                }
+                if(down_bars)
+                {
+                    var default_down_bars_fill;
+                    if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41 || this.style === 33)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.85000);
+                    }
+                    else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26 || this.style === 34)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.95000);
+                    }
+                    else if(this.style >= 3 && this.style <= 8)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, -0.25000);
+                    }
+                    else if(this.style >= 11 && this.style <= 16)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, -0.25000);
+                    }
+                    else if(this.style >=19 && this.style <= 24)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, -0.25000);
+                    }
+                    else if(this.style >= 27 && this.style <= 32 )
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -0.25000);
+                    }
+                    else if(this.style >= 35 && this.style <= 40)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000);
+                    }
+                    else if(this.style === 42)
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0);
+                    }
+                    else
+                    {
+                        default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, -0.25000);
+                    }
+                    if(down_bars.Fill)
+                    {
+                        default_down_bars_fill.merge(down_bars.Fill);
+                    }
+                    default_down_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
+                    oChart.upDownBars.downBarsBrush = default_down_bars_fill;
+                    var down_bars_line = default_bar_line.createDuplicate();
+                    if(down_bars.ln)
+                        down_bars_line.merge(down_bars.ln);
+                    down_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
+                    oChart.upDownBars.downBarsPen = down_bars_line;
+                }
             }
-            else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26 || this.style === 34)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0.95000);
-            }
-            else if(this.style >= 3 && this.style <= 8)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, -0.25000);
-            }
-            else if(this.style >= 11 && this.style <= 16)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, -0.25000);
-            }
-            else if(this.style >=19 && this.style <= 24)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, -0.25000);
-            }
-            else if(this.style >= 27 && this.style <= 32 )
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -0.25000);
-            }
-            else if(this.style >= 35 && this.style <= 40)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -0.25000);
-            }
-            else if(this.style === 42)
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0);
-            }
-            else
-            {
-                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, -0.25000);
-            }
-            if(down_bars.Fill)
-            {
-                default_down_bars_fill.merge(down_bars.Fill);
-            }
-            default_down_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
-            this.chart.plotArea.charts[0].upDownBars.downBarsBrush = default_down_bars_fill;
-            var down_bars_line = default_bar_line.createDuplicate();
-            if(down_bars.ln)
-                down_bars_line.merge(down_bars.ln);
-            down_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255}, this.clrMapOvr);
-            this.chart.plotArea.charts[0].upDownBars.downBarsPen = down_bars_line;
         }
     }
 };
@@ -11021,7 +11027,7 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
         }
         else
         {
-            if(this.chart.plotArea && this.chart.plotArea.charts[0] &&
+            if(this.chart.plotArea && this.chart.plotArea.charts.length === 1 && this.chart.plotArea.charts[0] &&
                 (this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_PieChart
                 || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_DoughnutChart))
             {
@@ -11191,64 +11197,68 @@ CChartSpace.prototype.getCalcProps = function()
 
 CChartSpace.prototype.recalculateDLbls = function()
 {
-    if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
+    if(this.chart && this.chart.plotArea)
     {
-        var series = this.chart.plotArea.charts[0].series;
-        var nDefaultPosition;
-        if(this.chart.plotArea.charts[0].getDefaultDataLabelsPosition)
-        {
-            nDefaultPosition = this.chart.plotArea.charts[0].getDefaultDataLabelsPosition();
-        }
+        var aCharts = this.chart.plotArea.charts;
+        for(var t = 0; t < aCharts.length; ++t){
 
-        var default_lbl = new AscFormat.CDLbl();
-        default_lbl.initDefault(nDefaultPosition);
-        var bSkip = false;
-        if(this.ptsCount > MAX_LABELS_COUNT){
-            bSkip = true;
-        }
-        var nCount = 0;
-        var nLblCount = 0;
-        for(var i = 0; i < series.length; ++i)
-        {
-            var ser = series[i];
-            var pts = AscFormat.getPtsFromSeries(ser);
-            for(var j = 0; j < pts.length; ++j)
+            var series = aCharts[t].series;
+            var nDefaultPosition;
+            if(this.chart.plotArea.charts[0].getDefaultDataLabelsPosition)
             {
+                nDefaultPosition = this.chart.plotArea.charts[0].getDefaultDataLabelsPosition();
+            }
 
-                var pt = pts[j];
+            var default_lbl = new AscFormat.CDLbl();
+            default_lbl.initDefault(nDefaultPosition);
+            var bSkip = false;
+            if(this.ptsCount > MAX_LABELS_COUNT){
+                bSkip = true;
+            }
+            var nCount = 0;
+            var nLblCount = 0;
+            for(var i = 0; i < series.length; ++i)
+            {
+                var ser = series[i];
+                var pts = AscFormat.getPtsFromSeries(ser);
+                for(var j = 0; j < pts.length; ++j)
+                {
 
-                if(bSkip){
+                    var pt = pts[j];
 
-                    if(nLblCount > (MAX_LABELS_COUNT*(nCount/this.ptsCount))){
-                        pt.compiledDlb = null;
-                        nCount++;
-                        continue;
+                    if(bSkip){
+
+                        if(nLblCount > (MAX_LABELS_COUNT*(nCount/this.ptsCount))){
+                            pt.compiledDlb = null;
+                            nCount++;
+                            continue;
+                        }
+
                     }
+                    var compiled_dlb = new AscFormat.CDLbl();
+                    compiled_dlb.merge(default_lbl);
+                    compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls);
+                    if(this.chart.plotArea.charts[0].dLbls)
+                        compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls.findDLblByIdx(pt.idx), false);
+                    compiled_dlb.merge(ser.dLbls);
+                    if(ser.dLbls)
+                        compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx));
 
+                    if(compiled_dlb.checkNoLbl())
+                    {
+                        pt.compiledDlb = null;
+                    }
+                    else
+                    {
+                        pt.compiledDlb = compiled_dlb;
+                        pt.compiledDlb.chart = this;
+                        pt.compiledDlb.series = ser;
+                        pt.compiledDlb.pt = pt;
+                        pt.compiledDlb.recalculate();
+                        nLblCount++;
+                    }
+                    ++nCount;
                 }
-                var compiled_dlb = new AscFormat.CDLbl();
-                compiled_dlb.merge(default_lbl);
-                compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls);
-                if(this.chart.plotArea.charts[0].dLbls)
-                    compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls.findDLblByIdx(pt.idx), false);
-                compiled_dlb.merge(ser.dLbls);
-                if(ser.dLbls)
-                    compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx));
-
-                if(compiled_dlb.checkNoLbl())
-                {
-                    pt.compiledDlb = null;
-                }
-                else
-                {
-                    pt.compiledDlb = compiled_dlb;
-                    pt.compiledDlb.chart = this;
-                    pt.compiledDlb.series = ser;
-                    pt.compiledDlb.pt = pt;
-                    pt.compiledDlb.recalculate();
-                    nLblCount++;
-                }
-                ++nCount;
             }
         }
     }
@@ -11256,25 +11266,29 @@ CChartSpace.prototype.recalculateDLbls = function()
 
 CChartSpace.prototype.recalculateHiLowLines = function()
 {
-    if(this.chart && this.chart.plotArea && (this.chart.plotArea.charts[0] instanceof AscFormat.CStockChart || this.chart.plotArea.charts[0] instanceof AscFormat.CLineChart) && this.chart.plotArea.charts[0].hiLowLines)
-    {
+    if(this.chart && this.chart.plotArea){
+        var aCharts = this.chart.plotArea.charts;
         var parents = this.getParentObjects();
-        var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0].createDuplicate();
-        if(this.style >=1 && this.style <= 32)
-            default_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
-        else if(this.style >= 33 && this.style <= 34)
-            default_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
-        else if(this.style >= 35 && this.style <= 40)
-            default_line.setFill(CreateUnifillSolidFillSchemeColor(8, -0.25000));
-        else
-            default_line.setFill(CreateUnifillSolidFillSchemeColor(12, 0));
-        default_line.merge(this.chart.plotArea.charts[0].hiLowLines.ln);
-        this.chart.plotArea.charts[0].calculatedHiLowLines = default_line;
-        default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255}, this.clrMapOvr);
-    }
-    else
-    {
-        this.chart.plotArea.charts[0].calculatedHiLowLines = null;
+        for(var i = 0; i < aCharts.length; ++i){
+            var oCurChart = aCharts[i];
+            if((oCurChart instanceof AscFormat.CStockChart || oCurChart instanceof AscFormat.CLineChart) && oCurChart.hiLowLines){
+                var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0].createDuplicate();
+                if(this.style >=1 && this.style <= 32)
+                    default_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
+                else if(this.style >= 33 && this.style <= 34)
+                    default_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
+                else if(this.style >= 35 && this.style <= 40)
+                    default_line.setFill(CreateUnifillSolidFillSchemeColor(8, -0.25000));
+                else
+                    default_line.setFill(CreateUnifillSolidFillSchemeColor(12, 0));
+                default_line.merge(oCurChart.hiLowLines.ln);
+                oCurChart.calculatedHiLowLines = default_line;
+                default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255}, this.clrMapOvr);
+            }
+            else{
+                oCurChart.calculatedHiLowLines = null;
+            }
+        }
     }
 };
 
@@ -12230,8 +12244,12 @@ CChartSpace.prototype.recalculateGridLines = function()
         {
             subtle_line = parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0];
         }
-        this.calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
-        this.calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
+        var aAxes = this.chart.plotArea.axId;
+        for(var i = 0; i < aAxes.length; ++i){
+            var oCurAxis = aAxes[i];
+            this.calcMajorMinorGridLines(oCurAxis, default_style, subtle_line, parent_objects);
+            this.calcMajorMinorGridLines(oCurAxis, default_style, subtle_line, parent_objects);
+        }
     }
 };
 
@@ -12386,16 +12404,16 @@ CChartSpace.prototype.draw = function(graphics)
     {
         if(this.chart.plotArea)
         {
-            var oChartSize = this.getChartSizes();
-            graphics.p_width(70);
-            graphics.p_color(0, 0, 0, 255);
-            graphics._s();
-            graphics._m(oChartSize.startX, oChartSize.startY);
-            graphics._l(oChartSize.startX + oChartSize.w, oChartSize.startY + 0);
-            graphics._l(oChartSize.startX + oChartSize.w, oChartSize.startY + oChartSize.h);
-            graphics._l(oChartSize.startX + 0, oChartSize.startY + oChartSize.h);
-            graphics._z();
-            graphics.ds();
+            // var oChartSize = this.getChartSizes();
+            // graphics.p_width(70);
+            // graphics.p_color(0, 0, 0, 255);
+            // graphics._s();
+            // graphics._m(oChartSize.startX, oChartSize.startY);
+            // graphics._l(oChartSize.startX + oChartSize.w, oChartSize.startY + 0);
+            // graphics._l(oChartSize.startX + oChartSize.w, oChartSize.startY + oChartSize.h);
+            // graphics._l(oChartSize.startX + 0, oChartSize.startY + oChartSize.h);
+            // graphics._z();
+            // graphics.ds();
             if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
             {
                 var series = this.chart.plotArea.charts[0].series;
