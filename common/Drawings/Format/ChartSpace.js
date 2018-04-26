@@ -828,6 +828,7 @@ function checkPointInMap(map, worksheet, row, col)
         }
         var oFirstLabel = null, fFirstLabelCenterX = null, oLastLabel = null, fLastLabelCenterX = null;
         var fContentWidth = fForceContentWidth ? fForceContentWidth : Math.abs(fInterval);
+        var fHorShift = Math.abs(fInterval)/2.0 - fContentWidth/2.0;
         for(var i = 0; i < this.aLabels.length; ++i){
             if(this.aLabels[i]){
                 var oLabel = this.aLabels[i];
@@ -839,7 +840,7 @@ function checkPointInMap(map, worksheet, row, col)
                     fMaxHeight = fCurHeight;
                 }
                 var fX, fY;
-                fX = fCurX;
+                fX = fCurX + fHorShift;
                 if(fDistance >= 0.0){
                     fY = fAxisY + fDistance;
                 }
@@ -4288,6 +4289,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 var oSeries = oPlotArea.getSeriesWithSmallestIndexForAxis(oAxis);
                 var nPtsLen = 0;
                 oAxis.scale = [];
+;
                 if(oSeries && oSeries.cat) {
                     var  oLit;
                     var oCat = oSeries.cat;
@@ -4300,50 +4302,47 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     else if(oCat.numRef && oCat.numRef.numCache){
                         oLit = oCat.numRef.numCache;
                     }
-                    else if(oCat.numLit)
-                    {
+                    else if(oCat.numLit){
                         oLit = oCat.numLit;
                     }
-                    if(oLit)
-                    {
+                    if(oLit){
                         var oLitFormat = null, oPtFormat = null;
-                        if(typeof oLit.formatCode === "string" && oLit.formatCode.length > 0)
-                        {
+                        if(typeof oLit.formatCode === "string" && oLit.formatCode.length > 0){
                             oLitFormat = oNumFormatCache.get(oLit.formatCode);
                         }
                         nPtsLen = oLit.ptCount;
-                        for(i = 0; i < nPtsLen; ++i)
-                        {
+
+                        var bTickSkip =  AscFormat.isRealNumber(oAxis.tickLblSkip);
+                        var nTickLblSkip = AscFormat.isRealNumber(oAxis.tickLblSkip) ? oAxis.tickLblSkip :  1;
+                        for(i = 0; i < nPtsLen; ++i){
                             oAxis.scale.push(i);
-                            var oPt = oLit.getPtByIndex(i);
-                            if(oPt)
-                            {
-                                var sPt;
-                                if(typeof oPt.formatCode === "string" && oPt.formatCode.length > 0)
-                                {
-                                    oPtFormat = oNumFormatCache.get(oPt.formatCode);
-                                    if(oPtFormat)
-                                    {
-                                        sPt = oPtFormat.formatToChart(oPt.val);
+                            if(!bTickSkip || ((i % nTickLblSkip) === 0)){
+                                var oPt = oLit.getPtByIndex(i);
+                                if(oPt){
+                                    var sPt;
+                                    if(typeof oPt.formatCode === "string" && oPt.formatCode.length > 0){
+                                        oPtFormat = oNumFormatCache.get(oPt.formatCode);
+                                        if(oPtFormat){
+                                            sPt = oPtFormat.formatToChart(oPt.val);
+                                        }
+                                        else{
+                                            sPt = oPt.val;
+                                        }
                                     }
-                                    else
-                                    {
+                                    else if(oLitFormat){
+                                        sPt = oLitFormat.formatToChart(oPt.val);
+                                    }
+                                    else{
                                         sPt = oPt.val;
                                     }
+                                    aStrings.push(sPt);
                                 }
-                                else if(oLitFormat)
-                                {
-                                    sPt = oLitFormat.formatToChart(oPt.val);
+                                else{
+                                    aStrings.push("");
                                 }
-                                else
-                                {
-                                    sPt = oPt.val;
-                                }
-                                aStrings.push(sPt);
                             }
-                            else
-                            {
-                                aStrings.push("");
+                            else{
+                                aStrings.push(null);
                             }
                         }
                     }
@@ -4599,13 +4598,21 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
 
 
-                    fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth);
+                    var bTickSkip = AscFormat.isRealNumber(oCurAxis.tickLblSkip);
+                    var nTickLblSkip = AscFormat.isRealNumber(oCurAxis.tickLblSkip) ? oCurAxis.tickLblSkip :  1;
+
                     var fAxisLength = fPosEnd - fPosStart;
                     var nLabelsCount = oLabelsBox.aLabels.length;
 
                     var bOnTickMark_ = bOnTickMark && nLabelsCount > 1;
                     var nIntervalCount = bOnTickMark_ ? nLabelsCount - 1 : nLabelsCount;
                     fHorInterval = Math.abs(fAxisLength/nIntervalCount);
+                    if(bTickSkip && !AscFormat.isRealNumber(fForceContentWidth)){
+                        fForceContentWidth = Math.abs(fHorInterval) +  fHorInterval/nTickLblSkip;
+                    }
+
+                    fLayoutHorLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical, bNumbers, fForceContentWidth);
+
 
                     if(bLabelsExtremePosition){
                         if(fDistance > 0){
