@@ -13858,10 +13858,6 @@ CUnionMarker.prototype =
     {
         this.lineMarker && this.lineMarker.draw(g);
         this.marker && this.marker.draw(g);
-    },
-
-    setWidth: function(w)
-    {
     }
 };
 
