@@ -241,7 +241,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
-    if(!this.drawingObjects.canEdit()){
+    if(!this.canEdit()){
         return;
     }
     var selection_state = this.getSelectionState();
@@ -515,10 +515,6 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.startRecalculate();
 };
 
-DrawingObjectsController.prototype.canEdit = function()
-{
-    return this.drawingObjects.canEdit();
-};
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {

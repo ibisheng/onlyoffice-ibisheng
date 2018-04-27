@@ -6222,6 +6222,15 @@ DrawingObjectsController.prototype =
         this.updateSelectionState();
     },
 
+    canEdit: function()
+    {
+        var oApi = this.getEditorApi();
+        var _ret = true;
+        if(oApi){
+            _ret = oApi.canEdit();
+        }
+        return _ret;
+    },
 
     onKeyDown: function(e)
     {
@@ -6229,7 +6238,7 @@ DrawingObjectsController.prototype =
         var drawingObjectsController = this;
         var bRetValue = false;
         var state = drawingObjectsController.curState;
-        var canEdit = drawingObjectsController.drawingObjects.canEdit();
+        var canEdit = drawingObjectsController.canEdit();
         var oApi = window["Asc"]["editor"];
         if ( e.keyCode == 8 && canEdit ) // BackSpace
         {

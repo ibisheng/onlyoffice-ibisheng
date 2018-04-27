@@ -4311,9 +4311,10 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
 
     var _transform = transform ? transform : this.transform;
     var _transform_text = transformText ? transformText : this.transformText;
+    var geometry = this.calcGeometry || this.spPr && this.spPr.geometry;
     if (graphics.IsSlideBoundsCheckerType === true) {
         graphics.transform3(_transform);
-        if (!this.spPr || null == this.spPr.geometry || this.spPr.geometry.pathLst.length === 0 || (this.spPr.geometry.pathLst.length === 1 && this.spPr.geometry.pathLst[0].ArrPathCommandInfo.length === 0) || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
+        if (!this.spPr || null == geometry || geometry.pathLst.length === 0 || (geometry.pathLst.length === 1 && geometry.pathLst[0].ArrPathCommandInfo.length === 0) || !graphics.IsShapeNeedBounds(geometry.preset)) {
             graphics._s();
             graphics._m(0, 0);
             graphics._l(this.extX, 0);
@@ -4322,7 +4323,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics._e();
         }
         else {
-            this.spPr.geometry.check_bounds(graphics);
+            geometry.check_bounds(graphics);
         }
 
         if (this.txBody) {
@@ -4363,13 +4364,13 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
         }
     }
-    if (this.spPr && this.spPr.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
+    if (geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);
 
         var shape_drawer = new AscCommon.CShapeDrawer();
-        shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
-        shape_drawer.draw(this.spPr.geometry);
+        shape_drawer.fromShape2(this, graphics, geometry);
+        shape_drawer.draw(geometry);
     }
     if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true  && !AscCommon.IsShapeToImageConverter)
     {
@@ -4598,6 +4599,35 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
     graphics.SetIntegerGrid(true);
     graphics.reset();
 };
+
+    CShape.prototype.recalculateGeometry = function()
+    {
+        this.calcGeometry = null;
+        if(isRealObject(this.spPr && this.spPr.geometry)){
+            this.calcGeometry = this.spPr.geometry;
+        }
+        else{
+            if(this.getHierarchy){
+                var hierarchy = this.getHierarchy();
+                for(var i = 0; i < hierarchy.length; ++i){
+                    if(hierarchy[i] && hierarchy[i].spPr && hierarchy[i].spPr.geometry){
+                        var _g = hierarchy[i].spPr.geometry;
+                        this.calcGeometry = AscFormat.ExecuteNoHistory(function(){
+                            var _r = _g.createDuplicate();
+                            _r.setParent(this);
+                            return _r;
+                        }, this, []);
+                        break;
+                    }
+                }
+            }
+        }
+        if(isRealObject(this.calcGeometry))
+        {
+            var transform = this.getTransform();
+            this.calcGeometry.Recalculate(transform.extX, transform.extY);
+        }
+    };
 
 CShape.prototype.getRotateAngle = function (x, y) {
     var transform = this.getTransformMatrix();
