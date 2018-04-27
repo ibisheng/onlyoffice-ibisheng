@@ -4640,7 +4640,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     if(!AscFormat.fApproxEqual(oRect.fHorPadding, 0)){
                         fPos -= oRect.fHorPadding;
                         if(nLabelsPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO){
-                            oCurAxis.posX -= oRect.fVertPadding;
+                            oCurAxis.posX -= oRect.fHorPadding;
                         }
                     }
                     fLayoutVertLabelsBox(oLabelsBox, fPos, fPosStart, fPosEnd, bOnTickMark, fDistance, bForceVertical);
