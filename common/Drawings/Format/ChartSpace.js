@@ -735,6 +735,8 @@ function checkPointInMap(map, worksheet, row, col)
         this.aLabels = [];
         this.maxMinWidth = -1.0;
 
+        this.chartSpace = oChartSpace;
+        this.axis = oAxis;
 
         var oStyle = null, oLbl, fMinW;
         for(var i = 0; i < aStrings.length; ++i){
@@ -797,13 +799,16 @@ function checkPointInMap(map, worksheet, row, col)
         return this.maxMinWidth >= 0.0 ? this.maxMinWidth : 0.0;
     };
 
-    CLabelsBox.prototype.checkMaxOneStringWidth = function(){
-        for(var i = 0; i < this.aLabels.length; ++i){
-
-        }
-    };
 
     CLabelsBox.prototype.hit = function(x, y){
+        var tx, ty;
+        if(this.chartSpace && this.chartSpace.invertTransform)
+        {
+            tx = this.chartSpace.invertTransform.TransformPointX(x, y);
+            ty = this.chartSpace.invertTransform.TransformPointY(x, y);
+            return tx >= this.x && ty >= this.y && tx <= this.x + this.extX && ty <= this.y + this.extY;
+        }
+        return false;
     };
 
     CLabelsBox.prototype.updatePosition = function(x, y)
@@ -1553,7 +1558,7 @@ CChartSpace.prototype.getParagraphTextPr = function()
     }
     else if(this.selection.axisLbls && this.selection.axisLbls.labels)
     {
-        return GetTextPrFormArrObjects(this.selection.axisLbls.labels.arrLabels, true);
+        return GetTextPrFormArrObjects(this.selection.axisLbls.labels.aLabels, true);
     }
     else if(AscFormat.isRealNumber(this.selection.dataLbls))
     {
@@ -2919,9 +2924,9 @@ CChartSpace.prototype.documentCreateFontMap = function(allFonts)
                 cur_axis && cur_axis.title && cur_axis.title.txBody && cur_axis.title.txBody.content.Document_CreateFontMap(allFonts);
                 if(cur_axis.labels)
                 {
-                    for(j = cur_axis.labels.arrLabels.length - 1; j > -1; --j)
+                    for(j = cur_axis.labels.aLabels.length - 1; j > -1; --j)
                     {
-                        cur_axis.labels.arrLabels[j] && cur_axis.labels.arrLabels[j].txBody && cur_axis.labels.arrLabels[j].txBody.content.Document_CreateFontMap(allFonts);
+                        cur_axis.labels.aLabels[j] && cur_axis.labels.aLabels[j].txBody && cur_axis.labels.aLabels[j].txBody.content.Document_CreateFontMap(allFonts);
                     }
                 }
             }
@@ -5039,7 +5044,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.tx.rich = AscFormat.CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                     if(i > 0)
                     {
-                        dlbl.lastStyleObject = y_ax.labels.arrLabels[0].lastStyleObject;
+                        dlbl.lastStyleObject = y_ax.labels.aLabels[0].lastStyleObject;
                     }
                     var oRecalculateByMaxWord =  dlbl.tx.rich.recalculateByMaxWord();
                     var cur_width = oRecalculateByMaxWord.w;
@@ -5048,12 +5053,12 @@ CChartSpace.prototype.recalculateAxis = function()
                     }
                     if(cur_width > max_width)
                         max_width = cur_width;
-                    y_ax.labels.arrLabels.push(dlbl);
+                    y_ax.labels.aLabels.push(dlbl);
                 }
 
 
                 //пока расстояние между подписями и краем блока с подписями берем размер шрифта.
-                var hor_gap = y_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
+                var hor_gap = y_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
                 y_ax.labels.extX = max_width + hor_gap;
 
                 /*расчитаем надписи в блоке для горизонтальной оси*/
@@ -5091,9 +5096,9 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.txPr = x_ax.txPr;
                     dlbl.tx = new AscFormat.CChartText();
                     dlbl.tx.rich = AscFormat.CreateTextBodyFromString(string_pts[i].val.replace(oNonSpaceRegExp,  ' '), this.getDrawingDocument(), dlbl);
-                    if(x_ax.labels.arrLabels[0])
+                    if(x_ax.labels.aLabels[0])
                     {
-                        dlbl.lastStyleObject = x_ax.labels.arrLabels[0].lastStyleObject;
+                        dlbl.lastStyleObject = x_ax.labels.aLabels[0].lastStyleObject;
                     }
 
                     var oWH = dlbl.tx.rich.recalculateByMaxWord();
@@ -5103,9 +5108,9 @@ CChartSpace.prototype.recalculateAxis = function()
                     if(i === string_pts.length - 1){
                         rect.w -= oWH.w/2;
                     }
-                    x_ax.labels.arrLabels.push(dlbl);
+                    x_ax.labels.aLabels.push(dlbl);
                 }
-                var vert_gap = x_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
+                var vert_gap = x_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72);
                 x_ax.labels.extY = max_height + vert_gap;
 
 
@@ -5146,8 +5151,8 @@ CChartSpace.prototype.recalculateAxis = function()
                 var arr_x_points = [], arr_y_points = [];
                 var labels_pos = y_ax.tickLblPos;
 
-                var first_hor_label_half_width = (x_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2;
-                var last_hor_label_half_width = (x_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2;
+                var first_hor_label_half_width = (x_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.aLabels[0].tx.rich.content.XLimit/2;
+                var last_hor_label_half_width = (x_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || x_ax.bDelete) ? 0 : x_ax.labels.aLabels[x_ax.labels.aLabels.length-1].tx.rich.content.XLimit/2;
                 var left_gap = 0, right_gap = 0;
                 if(x_ax_orientation === AscFormat.ORIENTATION_MIN_MAX)
                 {
@@ -5638,8 +5643,8 @@ CChartSpace.prototype.recalculateAxis = function()
 
                 var tick_labels_pos_x = x_ax.tickLblPos;
 
-                var first_vert_label_half_height = 0; //TODO (y_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.arrLabels[0].tx.rich.content.GetSummaryHeight()/2;
-                var last_vert_label_half_height =  0; //(y_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.arrLabels[0].tx.rich.content.GetSummaryHeight()/2;
+                var first_vert_label_half_height = 0; //TODO (y_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.aLabels[0].tx.rich.content.GetSummaryHeight()/2;
+                var last_vert_label_half_height =  0; //(y_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || y_ax.bDelete) ? 0 :  y_ax.labels.aLabels[0].tx.rich.content.GetSummaryHeight()/2;
 
                 var bottom_gap = 0, top_height = 0;
                 if(y_ax_orientation === AscFormat.ORIENTATION_MIN_MAX)
@@ -6095,7 +6100,7 @@ CChartSpace.prototype.recalculateAxis = function()
                 }
                 if(x_ax.labels)
                 {
-                    arr_labels = x_ax.labels.arrLabels;
+                    arr_labels = x_ax.labels.aLabels;
                     x_ax.labels.align = bottom_align_labels;
                     if(bottom_align_labels)
                     {
@@ -6157,7 +6162,7 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                     }
                     y_ax.labels.align = left_align_labels;
-                    arr_labels = y_ax.labels.arrLabels;
+                    arr_labels = y_ax.labels.aLabels;
                     if(left_align_labels)
                     {
                         for(i = 0; i < arr_labels.length; ++i)
@@ -6201,15 +6206,15 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     if(y_ax_orientation === AscFormat.ORIENTATION_MIN_MAX)
                     {
-                        var t = y_ax.labels.arrLabels[y_ax.labels.arrLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
+                        var t = y_ax.labels.aLabels[y_ax.labels.aLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
                         y_ax.labels.y = arr_y_points[arr_y_points.length-1] - t;
-                        y_ax.labels.extY = arr_y_points[0] - arr_y_points[arr_y_points.length-1] + t + y_ax.labels.arrLabels[0].tx.rich.content.GetSummaryHeight()/2;
+                        y_ax.labels.extY = arr_y_points[0] - arr_y_points[arr_y_points.length-1] + t + y_ax.labels.aLabels[0].tx.rich.content.GetSummaryHeight()/2;
                     }
                     else
                     {
-                        var t = y_ax.labels.arrLabels[0].tx.rich.content.GetSummaryHeight()/2;
+                        var t = y_ax.labels.aLabels[0].tx.rich.content.GetSummaryHeight()/2;
                         y_ax.labels.y = arr_y_points[0] - t;
-                        y_ax.labels.extY = arr_y_points[arr_y_points.length-1] - arr_y_points[0] + t + y_ax.labels.arrLabels[y_ax.labels.arrLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
+                        y_ax.labels.extY = arr_y_points[arr_y_points.length-1] - arr_y_points[0] + t + y_ax.labels.aLabels[y_ax.labels.aLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
                     }
                 }
 
@@ -6217,15 +6222,15 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     if(x_ax_orientation === AscFormat.ORIENTATION_MIN_MAX)
                     {
-                        var t = x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2;
+                        var t = x_ax.labels.aLabels[0].tx.rich.content.XLimit/2;
                         x_ax.labels.x = arr_x_points[0] - t;
-                        x_ax.labels.extX = arr_x_points[arr_x_points.length-1] + x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2 - x_ax.labels.x;
+                        x_ax.labels.extX = arr_x_points[arr_x_points.length-1] + x_ax.labels.aLabels[x_ax.labels.aLabels.length-1].tx.rich.content.XLimit/2 - x_ax.labels.x;
                     }
                     else
                     {
-                        var t = x_ax.labels.arrLabels[x_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2;
+                        var t = x_ax.labels.aLabels[x_ax.labels.aLabels.length-1].tx.rich.content.XLimit/2;
                         x_ax.labels.x = arr_x_points[arr_x_points.length-1] - t;
-                        x_ax.labels.extX = arr_x_points[0] + x_ax.labels.arrLabels[0].tx.rich.content.XLimit/2 - x_ax.labels.x;
+                        x_ax.labels.extX = arr_x_points[0] + x_ax.labels.aLabels[0].tx.rich.content.XLimit/2 - x_ax.labels.x;
                     }
                 }
                 /*new recalc*/
@@ -6321,11 +6326,11 @@ CChartSpace.prototype.recalculateAxis = function()
                         max_width = cur_width;
                     if(t.h > max_val_labels_text_height)
                         max_val_labels_text_height = t.h;
-                    val_ax.labels.arrLabels.push(dlbl);
+                    val_ax.labels.aLabels.push(dlbl);
                     val_ax.yPoints.push({val: arr_val[i], pos: null});
 
                 }
-                var val_axis_labels_gap = val_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
+                var val_axis_labels_gap = val_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
                 val_ax.labels.extX = max_width + val_axis_labels_gap;
 
                 //расчитаем подписи для горизонтальной оси
@@ -6993,9 +6998,9 @@ CChartSpace.prototype.recalculateAxis = function()
                             content.SetParagraphAlign(AscCommon.align_Center);
                             content.Set_ApplyToAll(false);
                             dlbl.txBody = dlbl.tx.rich;
-                            if(cat_ax.labels.arrLabels.length > 0)
+                            if(cat_ax.labels.aLabels.length > 0)
                             {
-                                dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
+                                dlbl.lastStyleObject = cat_ax.labels.aLabels[0].lastStyleObject;
                             }
                             var min_max =  dlbl.tx.rich.content.RecalculateMinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
@@ -7007,20 +7012,20 @@ CChartSpace.prototype.recalculateAxis = function()
                                 fMaxContentStringH = dlbl.tx.rich.content.Content[0].Content[0].TextHeight;
                             }
                         }
-                        cat_ax.labels.arrLabels.push(dlbl);
+                        cat_ax.labels.aLabels.push(dlbl);
                     }
 
                     fMaxContentStringH *= 1;
                     var stake_offset = AscFormat.isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
-                    var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
+                    var labels_offset = cat_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                     if(max_min_width < max_cat_label_width)//значит текст каждой из точек умещается в point_width
                     {
                         var max_height = 0;
-                        for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                         {
-                            if(cat_ax.labels.arrLabels[i])
+                            if(cat_ax.labels.aLabels[i])
                             {
-                                var content = cat_ax.labels.arrLabels[i].tx.rich.content;
+                                var content = cat_ax.labels.aLabels[i].tx.rich.content;
                                 content.Reset(0, 0, max_cat_label_width, 20000);
                                 content.Recalculate_Page(0, true);
                                 var cur_height = content.GetSummaryHeight();
@@ -7035,8 +7040,8 @@ CChartSpace.prototype.recalculateAxis = function()
                             var left_gap_point, right_gap_point;
                             if(cat_ax_orientation === AscFormat.ORIENTATION_MIN_MAX)
                             {
-                                var first_label_left_gap = cat_ax.labels.arrLabels[0].tx.rich.getMaxContentWidth(max_cat_label_width)/2;//на сколько вправа выходит первая подпись
-                                var last_labels_right_gap = cat_ax.labels.arrLabels[cat_ax.labels.arrLabels.length - 1] ? cat_ax.labels.arrLabels[cat_ax.labels.arrLabels.length - 1].tx.rich.getMaxContentWidth(max_cat_label_width)/2 : 0;
+                                var first_label_left_gap = cat_ax.labels.aLabels[0].tx.rich.getMaxContentWidth(max_cat_label_width)/2;//на сколько вправа выходит первая подпись
+                                var last_labels_right_gap = cat_ax.labels.aLabels[cat_ax.labels.aLabels.length - 1] ? cat_ax.labels.aLabels[cat_ax.labels.aLabels.length - 1].tx.rich.getMaxContentWidth(max_cat_label_width)/2 : 0;
 
                                 //смотрим, выходит ли подпись первой категориии выходит за пределы области построения
                                 left_gap_point = arr_cat_labels_points[0] - first_label_left_gap;
@@ -7078,8 +7083,8 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else
                             {
-                                var last_label_left_gap = cat_ax.labels.arrLabels[cat_ax.labels.arrLabels.length - 1] ? cat_ax.labels.arrLabels[cat_ax.labels.arrLabels.length - 1].tx.rich.getMaxContentWidth(max_cat_label_width)/2 : 0;
-                                var first_label_right_gap = cat_ax.labels.arrLabels[0].tx.rich.getMaxContentWidth(max_cat_label_width)/2;
+                                var last_label_left_gap = cat_ax.labels.aLabels[cat_ax.labels.aLabels.length - 1] ? cat_ax.labels.aLabels[cat_ax.labels.aLabels.length - 1].tx.rich.getMaxContentWidth(max_cat_label_width)/2 : 0;
+                                var first_label_right_gap = cat_ax.labels.aLabels[0].tx.rich.getMaxContentWidth(max_cat_label_width)/2;
                                 left_gap_point = arr_cat_labels_points[arr_cat_labels_points.length - 1] - last_label_left_gap;
                                 right_gap_point = arr_cat_labels_points[0] + first_label_right_gap;
                                 if(rect.x > left_gap_point && !bWithoutLabels)
@@ -7132,25 +7137,25 @@ CChartSpace.prototype.recalculateAxis = function()
                         var nSkip = 1;
                         if(!bTickSkip && fMaxContentStringH > 0){
                             nMaxCount = diagram_width/fMaxContentStringH;
-                            nSkip = ((cat_ax.labels.arrLabels.length/nMaxCount + 1) >> 0);
+                            nSkip = ((cat_ax.labels.aLabels.length/nMaxCount + 1) >> 0);
                         }
                         else{
                             bTickSkip = true;
                         }
                         //смотрим на сколько подписи горизонтальной оси выходят влево за пределы области построения
-                        for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                         {
-                            if(cat_ax.labels.arrLabels[i])
+                            if(cat_ax.labels.aLabels[i])
                             {
                                 if(i%nSkip !== 0){
-                                    cat_ax.labels.arrLabels[i] = null;
+                                    cat_ax.labels.aLabels[i] = null;
                                     arr_left_points[i] = arr_cat_labels_points[i];
                                     arr_right_points[i] = arr_cat_labels_points[i];
                                     nCount++;
                                     continue;
                                 }
                                 //сначала расчитаем высоту и ширину подписи так чтобы она умещалась в одну строку
-                                var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();
+                                var wh = cat_ax.labels.aLabels[i].tx.rich.getContentOneStringSizes();
                                 arr_left_points[i] = arr_cat_labels_points[i] - (wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4) - wh.h*Math.sin(Math.PI/4)/2);//вычитаем из точки привязки ширину получившейся подписи
                                 arr_right_points[i] = arr_cat_labels_points[i] + wh.h*Math.sin(Math.PI/4)/2;
                                 var h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
@@ -7159,7 +7164,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                                 nLblCount++;
                                 nCount++;
-                                cat_ax.labels.arrLabels[i].widthForTransform = wh.w;
+                                cat_ax.labels.aLabels[i].widthForTransform = wh.w;
                             }
                             else
                             {//подписи нет
@@ -7299,11 +7304,11 @@ CChartSpace.prototype.recalculateAxis = function()
                                     max_width = cur_width;
                                 if(t.h > max_val_labels_text_height)
                                     max_val_labels_text_height = t.h;
-                                ser_ax.labels.arrLabels.push(dlbl);
+                                ser_ax.labels.aLabels.push(dlbl);
                             }
                         }
 
-                        var ser_axis_labels_gap = ser_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
+                        var ser_axis_labels_gap = ser_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
                         ser_ax.labels.extX = max_width + ser_axis_labels_gap;
                         ser_ax.labels.extY = max_val_labels_text_height;
                     }
@@ -7354,8 +7359,8 @@ CChartSpace.prototype.recalculateAxis = function()
 
                 var arr_val_labels_points = [];//массив середин подписей вертикальной оси; i-й элемент - y-координата центра подписи i-огто значения;
                 var top_val_axis_gap, bottom_val_axis_gap;
-                var first_val_axis_label_half_height = 0; //TODO  (val_ax.bDelete || val_ax.tickLblPos ===c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE) ? 0 :val_ax.labels.arrLabels[0].tx.rich.content.GetSummaryHeight()/2;
-                var last_val_axis_label_half_height = 0; //TODO (val_ax.bDelete || val_ax.tickLblPos ===c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE) ? 0 : val_ax.labels.arrLabels[val_ax.labels.arrLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
+                var first_val_axis_label_half_height = 0; //TODO  (val_ax.bDelete || val_ax.tickLblPos ===c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE) ? 0 :val_ax.labels.aLabels[0].tx.rich.content.GetSummaryHeight()/2;
+                var last_val_axis_label_half_height = 0; //TODO (val_ax.bDelete || val_ax.tickLblPos ===c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE) ? 0 : val_ax.labels.aLabels[val_ax.labels.aLabels.length-1].tx.rich.content.GetSummaryHeight()/2;
 
                 var unit_height;
                 if(!bWithoutLabels){
@@ -7763,7 +7768,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     val_ax.labels.align = left_val_ax_labels_align;
                     val_ax.labels.y = Math.min.apply(Math, arr_val_labels_points) - max_val_labels_text_height/2;
                     val_ax.labels.extY = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points) + max_val_labels_text_height;
-                    arr_labels = val_ax.labels.arrLabels;
+                    arr_labels = val_ax.labels.aLabels;
                     if(left_val_ax_labels_align)
                     {
                         for(i = 0; i < arr_labels.length; ++i)
@@ -7771,12 +7776,12 @@ CChartSpace.prototype.recalculateAxis = function()
                             arr_labels[i].txBody = arr_labels[i].tx.rich;
                             transform_text = arr_labels[i].transformText;
                             transform_text.Reset();
-                            global_MatrixTransformer.TranslateAppend(transform_text, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                            global_MatrixTransformer.TranslateAppend(transform_text, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                           //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                             local_text_transform = arr_labels[i].localTransformText;
                             local_text_transform.Reset();
-                            global_MatrixTransformer.TranslateAppend(local_text_transform, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                            global_MatrixTransformer.TranslateAppend(local_text_transform, val_ax.labels.x + val_ax.labels.extX - val_axis_labels_gap - arr_labels[i].tx.rich.content.XLimit, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
 
                         }
@@ -7789,12 +7794,12 @@ CChartSpace.prototype.recalculateAxis = function()
                             arr_labels[i].txBody = arr_labels[i].tx.rich;
                             transform_text = arr_labels[i].transformText;
                             transform_text.Reset();
-                            global_MatrixTransformer.TranslateAppend(transform_text, left_line, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                            global_MatrixTransformer.TranslateAppend(transform_text, left_line, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                           //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
                             local_text_transform = arr_labels[i].localTransformText;
                             local_text_transform.Reset();
-                            global_MatrixTransformer.TranslateAppend(local_text_transform, left_line, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                            global_MatrixTransformer.TranslateAppend(local_text_transform, left_line, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                         }
                     }
@@ -7825,16 +7830,16 @@ CChartSpace.prototype.recalculateAxis = function()
                         cat_ax.labels.extX = arr_cat_labels_points[arr_cat_labels_points.length-1] + max_cat_label_width/2 - cat_ax.labels.x;
                         if(cat_labels_align_bottom)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    var label_text_transform = cat_ax.labels.aLabels[i].transformText;
                                     label_text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + labels_offset);
                                  //   global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + labels_offset);
 
@@ -7843,18 +7848,18 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                         else
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
+                                    var label_text_transform = cat_ax.labels.aLabels[i].transformText;
                                     label_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight());
+                                    global_MatrixTransformer.TranslateAppend(label_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight());
                                   //  global_MatrixTransformer.MultiplyAppend(label_text_transform, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight());
+                                    global_MatrixTransformer.TranslateAppend(local_text_transform, arr_cat_labels_points[i] - max_cat_label_width/2, cat_ax.labels.y + cat_ax.labels.extY - labels_offset - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight());
 
                                 }
                             }
@@ -7866,15 +7871,15 @@ CChartSpace.prototype.recalculateAxis = function()
                         var w2, h2, x1, xc, yc, y0;
                         if(cat_labels_align_bottom)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                                    var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
+                                    var label_text_transform = cat_ax.labels.aLabels[i].transformText;
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                                    var wh = cat_ax.labels.aLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
                                     x1 = arr_cat_labels_points[i] + wh.h*Math.sin(Math.PI/4);
@@ -7901,7 +7906,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                             right_x = xc + w2/2;
                                     }
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, -wh.w/2, -wh.h/2);
                                     global_MatrixTransformer.RotateRadAppend(local_text_transform, Math.PI/4);//TODO
@@ -7911,15 +7916,15 @@ CChartSpace.prototype.recalculateAxis = function()
                         }
                         else
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                                    var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
+                                    var label_text_transform = cat_ax.labels.aLabels[i].transformText;
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                                    var wh = cat_ax.labels.aLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
                                     x1 = arr_cat_labels_points[i] - wh.h*Math.sin(Math.PI/4);
@@ -7947,7 +7952,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                             right_x = xc + w2/2;
                                     }
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, -wh.w/2, -wh.h/2);
                                     global_MatrixTransformer.RotateRadAppend(local_text_transform, Math.PI/4);//TODO
@@ -8040,9 +8045,9 @@ CChartSpace.prototype.recalculateAxis = function()
                     dlbl.tx = new AscFormat.CChartText();
                     dlbl.tx.rich = AscFormat.CreateTextBodyFromString(arr_strings[i], this.getDrawingDocument(), dlbl);
                     dlbl.txBody = dlbl.tx.rich;
-                    if(val_ax.labels.arrLabels[0])
+                    if(val_ax.labels.aLabels[0])
                     {
-                        dlbl.lastStyleObject = val_ax.labels.arrLabels[0].lastStyleObject;
+                        dlbl.lastStyleObject = val_ax.labels.aLabels[0].lastStyleObject;
                     }
                     var t = dlbl.tx.rich.recalculateByMaxWord();
                     var h = t.h;
@@ -8050,11 +8055,11 @@ CChartSpace.prototype.recalculateAxis = function()
                         max_val_ax_label_width = t.w;
                     if(h > max_height)
                         max_height = h;
-                    val_ax.labels.arrLabels.push(dlbl);
+                    val_ax.labels.aLabels.push(dlbl);
                     val_ax.xPoints.push({val: arr_val[i], pos: null});
                 }
 
-                var val_axis_labels_gap = val_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
+                var val_axis_labels_gap = val_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*25.4/72;
                 val_ax.labels.extY = max_height + val_axis_labels_gap;
 
                 //расчитаем подписи для горизонтальной оси
@@ -8508,9 +8513,9 @@ CChartSpace.prototype.recalculateAxis = function()
                             dlbl.txPr = cat_ax.txPr;
                             dlbl.tx = new AscFormat.CChartText();
                             dlbl.tx.rich = AscFormat.CreateTextBodyFromString(string_pts[i].val.replace(oNonSpaceRegExp, ' '), this.getDrawingDocument(), dlbl);
-                            if(cat_ax.labels.arrLabels[0])
+                            if(cat_ax.labels.aLabels[0])
                             {
-                                dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
+                                dlbl.lastStyleObject = cat_ax.labels.aLabels[0].lastStyleObject;
                             }
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
                             dlbl.tx.rich.content.SetParagraphAlign(AscCommon.align_Center);
@@ -8533,10 +8538,10 @@ CChartSpace.prototype.recalculateAxis = function()
                             if(dlbl.tx.rich.content.XLimit > max_content_width)
                                 max_content_width = dlbl.tx.rich.content.XLimit;
                         }
-                        cat_ax.labels.arrLabels.push(dlbl);
+                        cat_ax.labels.aLabels.push(dlbl);
                     }
                     var stake_offset = AscFormat.isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
-                    var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
+                    var labels_offset = cat_ax.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                     //сначала посмотрим убираются ли в максимальную допустимую ширину подписей подписи расчитанные в одну строку
 
                     var width_flag;
@@ -8596,8 +8601,8 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                var first_val_lbl_half_width = (val_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || val_ax.bDelete) ? 0 : val_ax.labels.arrLabels[0].tx.rich.content.XLimit/2;
-                var last_val_lbl_half_width = (val_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || val_ax.bDelete) ? 0 : val_ax.labels.arrLabels[val_ax.labels.arrLabels.length-1].tx.rich.content.XLimit/2;
+                var first_val_lbl_half_width = (val_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || val_ax.bDelete) ? 0 : val_ax.labels.aLabels[0].tx.rich.content.XLimit/2;
+                var last_val_lbl_half_width = (val_ax.tickLblPos === c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE || val_ax.bDelete) ? 0 : val_ax.labels.aLabels[val_ax.labels.aLabels.length-1].tx.rich.content.XLimit/2;
                 var right_gap, left_gap;
 
                 var arr_val_labels_points = [];//массив середин подписей вертикальной оси; i-й элемент - x-координата центра подписи i-огто значения;
@@ -8779,31 +8784,31 @@ CChartSpace.prototype.recalculateAxis = function()
                     if(bottom_val_ax_labels_align)
                     {
                         var y_pos = val_ax.labels.y + val_axis_labels_gap;
-                        for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                        for(i = 0;  i < val_ax.labels.aLabels.length; ++i)
                         {
-                            var text_transform = val_ax.labels.arrLabels[i].transformText;
+                            var text_transform = val_ax.labels.aLabels[i].transformText;
                             text_transform.Reset();
-                            global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, y_pos);
+                            global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.XLimit/2, y_pos);
                            // global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
-                            var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
+                            var local_transform_text = val_ax.labels.aLabels[i].localTransformText;
                             local_transform_text.Reset();
-                            global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, y_pos);
+                            global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.XLimit/2, y_pos);
                         }
                     }
                     else
                     {
-                        for(i = 0;  i < val_ax.labels.arrLabels.length; ++i)
+                        for(i = 0;  i < val_ax.labels.aLabels.length; ++i)
                         {
-                            var text_transform = val_ax.labels.arrLabels[i].transformText;
+                            var text_transform = val_ax.labels.aLabels[i].transformText;
                             text_transform.Reset();
-                            global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight());
+                            global_MatrixTransformer.TranslateAppend(text_transform, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight());
                         //    global_MatrixTransformer.MultiplyAppend(text_transform, this.getTransformMatrix());
 
 
-                            var local_transform_text = val_ax.labels.arrLabels[i].localTransformText;
+                            var local_transform_text = val_ax.labels.aLabels[i].localTransformText;
                             local_transform_text.Reset();
-                            global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.arrLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight());
+                            global_MatrixTransformer.TranslateAppend(local_transform_text, arr_val_labels_points[i] - val_ax.labels.aLabels[i].tx.rich.content.XLimit/2, val_ax.labels.y + val_ax.labels.extY - val_axis_labels_gap - val_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight());
                         }
                     }
                 }
@@ -8844,60 +8849,60 @@ CChartSpace.prototype.recalculateAxis = function()
 
                         if(width_flag === 0)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                //     global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_transform_text = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_transform_text = cat_ax.labels.aLabels[i].localTransformText;
                                     local_transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                                 }
                             }
                         }
                         else if(width_flag === 1)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, arr_min_max_min[i], 20000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Reset(0, 0, arr_min_max_min[i], 20000);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Recalculate_Page(0, true);
 
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                   //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_transform_text = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_transform_text = cat_ax.labels.aLabels[i].localTransformText;
                                     local_transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                                 }
                             }
                         }
                         else
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 20000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 20000);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Recalculate_Page(0, true);
 
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                   //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.arrLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + cat_ax.labels.extX - cat_ax.labels.aLabels[i].tx.rich.content.XLimit - labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                                 }
                             }
@@ -8905,16 +8910,16 @@ CChartSpace.prototype.recalculateAxis = function()
 
 
 
-                        /*for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                        /*for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                          {
-                         if(cat_ax.labels.arrLabels[i])
+                         if(cat_ax.labels.aLabels[i])
                          {
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(align_Center);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
-                         cat_ax.labels.arrLabels[i].setPosition(cat_ax.labels.x, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                         cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(true);
+                         cat_ax.labels.aLabels[i].tx.rich.content.SetParagraphAlign(align_Center);
+                         cat_ax.labels.aLabels[i].tx.rich.content.Set_ApplyToAll(false);
+                         cat_ax.labels.aLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
+                         cat_ax.labels.aLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                         cat_ax.labels.aLabels[i].setPosition(cat_ax.labels.x, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                          }
                          }    */
                     }
@@ -8922,59 +8927,59 @@ CChartSpace.prototype.recalculateAxis = function()
                     {
                         if(width_flag === 0)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                  //   global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                                 }
                             }
                         }
                         else if(width_flag === 1)
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, arr_min_max_min[i], 20000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Reset(0, 0, arr_min_max_min[i], 20000);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Recalculate_Page(0, true);
 
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                   //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
 
                                 }
                             }
                         }
                         else
                         {
-                            for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
+                            for(i = 0; i < cat_ax.labels.aLabels.length; ++i)
                             {
-                                if(cat_ax.labels.arrLabels[i])
+                                if(cat_ax.labels.aLabels[i])
                                 {
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 20000);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);
-                                    var transform_text = cat_ax.labels.arrLabels[i].transformText;
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 20000);
+                                    cat_ax.labels.aLabels[i].tx.rich.content.Recalculate_Page(0, true);
+                                    var transform_text = cat_ax.labels.aLabels[i].transformText;
                                     transform_text.Reset();
-                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(transform_text, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                   //  global_MatrixTransformer.MultiplyAppend(transform_text, this.getTransformMatrix());
 
-                                    local_text_transform = cat_ax.labels.arrLabels[i].localTransformText;
+                                    local_text_transform = cat_ax.labels.aLabels[i].localTransformText;
                                     local_text_transform.Reset();
-                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.arrLabels[i].tx.rich.content.GetSummaryHeight()/2);
+                                    global_MatrixTransformer.TranslateAppend(local_text_transform, cat_ax.labels.x + labels_offset, arr_cat_labels_points[i] - cat_ax.labels.aLabels[i].tx.rich.content.GetSummaryHeight()/2);
                                 }
                             }
                         }
@@ -9025,9 +9030,9 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                     var fBottomLabels = -100;
                     if(!oAxisLabels.bRotated)
                     {
-                        for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                        for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                         {
-                            oLabel = oAxisLabels.arrLabels[i];
+                            oLabel = oAxisLabels.aLabels[i];
                             if(oLabel)
                             {
                                 var oCPosLabelX;
@@ -9047,12 +9052,12 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         if(oAxisLabels.align)
                         {
                             var stake_offset = AscFormat.isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
-                            var labels_offset = oCatAx.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
-                            for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                            var labels_offset = oCatAx.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
+                            for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                             {
-                                if(oAxisLabels.arrLabels[i])
+                                if(oAxisLabels.aLabels[i])
                                 {
-                                    oLabel = oAxisLabels.arrLabels[i];
+                                    oLabel = oAxisLabels.aLabels[i];
                                     var wh = {w: oLabel.widthForTransform, h: oLabel.tx.rich.content.GetSummaryHeight()}, w2, h2, x1, y0, xc, yc;
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
@@ -9080,12 +9085,12 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         else
                         {
                             var stake_offset = AscFormat.isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
-                            var labels_offset = oCatAx.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
-                            for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                            var labels_offset = oCatAx.labels.aLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
+                            for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                             {
-                                if(oAxisLabels.arrLabels[i])
+                                if(oAxisLabels.aLabels[i])
                                 {
-                                    oLabel = oAxisLabels.arrLabels[i];
+                                    oLabel = oAxisLabels.aLabels[i];
                                     var wh = {w: oLabel.widthForTransform, h: oLabel.tx.rich.content.GetSummaryHeight()}, w2, h2, x1, y0, xc, yc;
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
                                     h2 = wh.w*Math.sin(Math.PI/4) + wh.h*Math.cos(Math.PI/4);
@@ -9142,9 +9147,9 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                     }
                     aXPoints.length = 0;
                     aYPoints.length = 0;
-                    for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                    for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                     {
-                        oLabel = oAxisLabels.arrLabels[i];
+                        oLabel = oAxisLabels.aLabels[i];
                         if(oLabel)
                         {
                             oNewPos =  oProcessor3D.convertAndTurnPoint(dPosX, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
@@ -9184,9 +9189,9 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         dPosY2 = oAxisLabels.y + oAxisLabels.extY;
                     }
 
-                    for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                    for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                     {
-                        oLabel = oAxisLabels.arrLabels[i];
+                        oLabel = oAxisLabels.aLabels[i];
                         if(oLabel)
                         {
 
@@ -9239,9 +9244,9 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         dPosX = (oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM;
                     }
 
-                    for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                    for(i = 0; i < oAxisLabels.aLabels.length; ++i)
                     {
-                        oLabel = oAxisLabels.arrLabels[i];
+                        oLabel = oAxisLabels.aLabels[i];
 
                         if(oLabel)
                         {

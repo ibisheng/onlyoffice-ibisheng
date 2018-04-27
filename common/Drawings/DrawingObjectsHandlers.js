@@ -432,34 +432,27 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var oLabels;
-        var arrLabels = [];
-        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.catAx.labels);
-        }
-        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.valAx.labels);
-        }
-        for(var i = 0; i < arrLabels.length; ++i)
-        {
-            oLabels = arrLabels[i];
-            if(oLabels.hit(x, y))
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        var aAxes = drawing.chart.plotArea.axId;
+        for(var i = 0; i < aAxes.length; ++i){
+            if(aAxes[i].labels){
+                oLabels = aAxes[i].labels;
+                if(oLabels.hit(x, y))
                 {
-                    drawingObjectsController.checkChartTextSelection();
-                    selector.resetSelection();
-                    selector.selectObject(drawing, pageIndex);
-                    selector.selection.chartSelection = drawing;
-                    drawing.selection.axisLbls = oLabels.axis;
-                    drawingObjectsController.updateSelectionState();
-                    drawingObjectsController.updateOverlay();
-                    return true;
-                }
-                else
-                {
-                    return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                    {
+                        drawingObjectsController.checkChartTextSelection();
+                        selector.resetSelection();
+                        selector.selectObject(drawing, pageIndex);
+                        selector.selection.chartSelection = drawing;
+                        drawing.selection.axisLbls = oLabels.axis;
+                        drawingObjectsController.updateSelectionState();
+                        drawingObjectsController.updateOverlay();
+                        return true;
+                    }
+                    else
+                    {
+                        return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    }
                 }
             }
         }
