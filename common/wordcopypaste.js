@@ -6122,9 +6122,13 @@ PasteProcessor.prototype =
 			return;
 		}
         var oDocument = this.oDocument;
-        //Heading
-        if(null != pNoHtmlPr.hLevel && oDocument.Styles)
-            Para.Style_Add(oDocument.Styles.Get_Default_Heading(pNoHtmlPr.hLevel));
+
+		//Heading
+		//Ранее применялся весь заголовок - Para.Style_Add(oDocument.Styles.Get_Default_Heading(pNoHtmlPr.hLevel));
+		if(null != pNoHtmlPr.hLevel && oDocument.Styles)
+		{
+			Para.SetOutlineLvl(pNoHtmlPr.hLevel);
+		}
 
         var pPr = Para.Pr;
 
