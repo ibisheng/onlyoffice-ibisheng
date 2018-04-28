@@ -916,6 +916,9 @@
         if(this.rectGeometry){
             _geom = this.rectGeometry;
         }
+        else if(this.calcGeometry){
+            _geom = this.calcGeometry;
+        }
         else if(this.spPr && this.spPr.geometry){
             _geom = this.spPr.geometry;
         }
