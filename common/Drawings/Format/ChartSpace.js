@@ -4695,24 +4695,24 @@ CChartSpace.prototype.getValAxisCrossType = function()
             oCorrectedRect = new CRect(oRect.x, oRect.y, oRect.w, oRect.h);
             if(bWithoutLabels){
                 fDiff = fL;
-                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.x -= fDiff;
                     oCorrectedRect.w += fDiff;
                     bCorrected = true;
                 }
                 fDiff = fR - this.extX;
-                if(/*fDiff > 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if(fDiff > 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.w -= fDiff;
                     bCorrected = true;
                 }
                 fDiff = fT;
-                if(/*fDiff < 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if( fDiff < 0.0 && !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.y -= fDiff;
                     oCorrectedRect.h += fDiff;
                     bCorrected = true;
                 }
                 fDiff = fB - this.extY;
-                if(/*fDiff > 0.0 && */!AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
+                if( fDiff > 0.0 &&  !AscFormat.fApproxEqual(fDiff, 0.0, fPrecision)){
                     oCorrectedRect.h -= (fB - this.extY);
                     bCorrected = true;
                 }
