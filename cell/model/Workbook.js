@@ -2569,14 +2569,18 @@
 		this.maxIndex = maxIndex;
 	}
 	SheetMemory.prototype.checkSize = function(index) {
-		if (index + 1 > this.count) {
-			var oldData = this.data;
-			this.count = Math.min(Math.max((1.5 * this.count) >> 0, index + 1), (this.maxIndex + 1));
-			this.data = new Uint8Array(this.count * this.structSize);
-			if (oldData) {
-				this.data.set(oldData);
+		var allocatedCount = this.data ? this.data.length / this.structSize : 0;
+		if (allocatedCount < index + 1) {
+			var newAllocatedCount = Math.min(Math.max((1.5 * this.count) >> 0, index + 1), (this.maxIndex + 1));
+			if (newAllocatedCount > allocatedCount) {
+				var oldData = this.data;
+				this.data = new Uint8Array(newAllocatedCount * this.structSize);
+				if (oldData) {
+					this.data.set(oldData);
+				}
 			}
 		}
+		this.count = Math.min(Math.max(this.count, index + 1), this.maxIndex + 1);
 	};
 	SheetMemory.prototype.hasSize = function(index) {
 		return index + 1 <= this.count;
@@ -2597,14 +2601,16 @@
 				var endOffset = (start + deleteCount) * this.structSize;
 				this.data.set(this.data.subarray(endOffset), startOffset);
 				this.data.fill(0, (this.count - deleteCount) * this.structSize);
+				this.count -= deleteCount;
 			} else {
 				this.data.fill(0, startOffset);
+				this.count = start;
 			}
 		}
 	};
 	SheetMemory.prototype.insertRange = function(start, insertCount) {
 		if (start < this.count) {
-			this.checkSize(this.count + insertCount);
+			this.checkSize(this.count - 1 + insertCount);
 			var startOffset = start * this.structSize;
 			var endOffset = (start + insertCount) * this.structSize;
 			var endData = (this.count - insertCount) * this.structSize;
@@ -7531,8 +7537,13 @@
 							return oRes;
 						}
 					} else {
-						colDatas.splice(j, 1);
-						colDatasIndex.splice(j, 1);
+						//splice by one element is too slow
+						var endIndex = j + 1;
+						while (endIndex < colDatasIndex.length && !colDatas[endIndex].hasSize(i)) {
+							endIndex++;
+						}
+						colDatas.splice(j, endIndex - j);
+						colDatasIndex.splice(j, endIndex - j);
 						j--;
 					}
 				}
