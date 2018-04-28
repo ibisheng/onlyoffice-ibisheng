@@ -4556,15 +4556,17 @@
 			var formula = cell.getFormulaParsed();
 			if (formula) {
 				var cellWithFormula = formula.getParent();
-				cellWithFormula.nRow = cell.nRow;
-				cellWithFormula.nCol = cell.nCol;
 				if (copyRange) {
 					History.TurnOff();
+					cellWithFormula = new CCellWithFormula(cellWithFormula.ws, cell.nRow, cell.nCol);
 					var newFormula = formula.clone(null, cellWithFormula, oThis);
 					newFormula.changeOffset(offset, false, true);
 					newFormula.Formula = newFormula.assemble(true);
 					cell.setFormulaInternal(newFormula);
 					History.TurnOn();
+				} else {
+					cellWithFormula.nRow = cell.nRow;
+					cellWithFormula.nCol = cell.nCol;
 				}
 				oThis.workbook.dependencyFormulas.addToBuildDependencyCell(cell);
 			}
