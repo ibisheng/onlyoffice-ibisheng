@@ -106,7 +106,7 @@ CChartsDrawer.prototype =
     constructor: CChartsDrawer,
 
 	//****draw and recalculate functions****
-	reCalculate: function (chartSpace) {
+	recalculate: function (chartSpace) {
 		this.cChartSpace = chartSpace;
 
 		this.calcProp = {};
