@@ -10806,40 +10806,45 @@
         return oldColWidth !== cc ? cw : -1;
     };
 
-    WorksheetView.prototype.autoFitColumnWidth = function (col1, col2) {
+    WorksheetView.prototype.autoFitColumnWidth = function () {
         var t = this;
+        var max = this.model.getColsCount();
+		var selectionRanges = t.model.selectionRange.clone().ranges;
+
         return this._isLockedAll(function (isSuccess) {
             if (false === isSuccess) {
                 return;
             }
-            if (null === col1) {
-                var lastSelection = t.model.selectionRange.getLast();
-                col1 = lastSelection.c1;
-                col2 = lastSelection.c2;
+
+            var c1, c2, w, bUpdate = false;
+
+			History.Create_NewPoint();
+			History.StartTransaction();
+
+            for (var i = 0; i < selectionRanges.length; ++i) {
+                c1 = selectionRanges[i].c1;
+				c2 = Math.min(selectionRanges[i].c2, max);
+				for (; c1 <= c2; ++c1) {
+					w = t.onChangeWidthCallback(c1, null, null);
+					if (-1 !== w) {
+						t.cols[c1] = t._calcColWidth(w);
+						t.cols[c1].isCustomWidth = false;
+						bUpdate = true;
+
+						t._cleanCache(new asc_Range(c1, 0, c1, t.rows.length - 1));
+					}
+				}
             }
 
-            var w, bUpdate = false;
-            History.Create_NewPoint();
-            History.StartTransaction();
-            for (var c = col1; c <= col2; ++c) {
-                w = t.onChangeWidthCallback(c, null, null);
-                if (-1 !== w) {
-                    t.cols[c] = t._calcColWidth(w);
-                    t.cols[c].isCustomWidth = false;
-                    bUpdate = true;
-
-                    t._cleanCache(new asc_Range(c, 0, c, t.rows.length - 1));
-                }
-            }
-            if (bUpdate) {
-                t._updateColumnPositions();
-                t._updateVisibleColsCount();
-                t._calcHeightRows(AscCommonExcel.recalcType.recalc);
-                t._updateVisibleRowsCount();
-                t.objectRender.drawingArea.reinitRanges();
-                t.changeWorksheet("update");
-            }
-            History.EndTransaction();
+			if (bUpdate) {
+				t._updateColumnPositions();
+				t._updateVisibleColsCount();
+				t._calcHeightRows(AscCommonExcel.recalcType.recalc);
+				t._updateVisibleRowsCount();
+				t.objectRender.drawingArea.reinitRanges();
+				t.changeWorksheet("update");
+			}
+			History.EndTransaction();
         });
     };
 

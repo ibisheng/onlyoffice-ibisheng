@@ -1924,9 +1924,10 @@ ParaDrawing.prototype.isShapeChild = function(bRetShape)
 		return bRetShape ? null : false;
 
 	var cur_doc_content = this.DocumentContent;
-	while (cur_doc_content.IsTableCellContent())
+	var oCell;
+	while (oCell = cur_doc_content.IsTableCellContent(true))
 	{
-		cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
+		cur_doc_content = oCell.Row.Table.Parent;
 	}
 
 	if (isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.getObjectType === "function" && cur_doc_content.Parent.getObjectType() === AscDFH.historyitem_type_Shape)
@@ -1955,9 +1956,10 @@ ParaDrawing.prototype.checkShapeChildAndGetTopParagraph = function(paragraph)
 	else if (parent_doc_content.IsTableCellContent())
 	{
 		var top_doc_content = parent_doc_content;
-		while (top_doc_content.IsTableCellContent())
+		var oCell;
+		while (oCell = top_doc_content.IsTableCellContent(true))
 		{
-			top_doc_content = top_doc_content.Parent.Row.Table.Parent;
+			top_doc_content = oCell.Row.Table.Parent;
 		}
 		if (top_doc_content.Parent instanceof AscFormat.CShape)
 		{

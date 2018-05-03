@@ -9387,9 +9387,10 @@ Paragraph.prototype.Get_ParentTextTransform = function()
 Paragraph.prototype.Get_ParentTextInvertTransform = function()
 {
 	var CurDocContent = this.Parent;
-	while (CurDocContent.IsTableCellContent())
+	var oCell;
+	while (oCell = CurDocContent.IsTableCellContent(true))
 	{
-		CurDocContent = CurDocContent.Parent.Row.Table.Parent;
+		CurDocContent = oCell.Row.Table.Parent;
 	}
 	if (CurDocContent.Parent)
 	{
