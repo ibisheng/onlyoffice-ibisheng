@@ -12512,7 +12512,7 @@ CChartSpace.prototype.recalculateChart = function()
     this.pathMemory.curPos = -1;
     if(this.chartObj == null)
         this.chartObj =  new AscFormat.CChartsDrawer();
-    this.chartObj.reCalculate(this);
+    this.chartObj.recalculate(this);
 };
 
 
