@@ -10276,6 +10276,7 @@ drawScatterChart.prototype = {
 	_recalculateScatter: function () {
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
+		var betweenAxisCross = this.valAx.crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN;
 
 		var seria, yVal, xVal, points, yNumCache, xNumCache, compiledMarkerSize, compiledMarkerSymbol, idxPoint;
 		for (var i = 0; i < this.chart.series.length; i++) {
@@ -10297,7 +10298,7 @@ drawScatterChart.prototype = {
 						xVal = n + 1;
 					}
 				} else {
-					xVal = n + 1;
+					xVal = betweenAxisCross ? n : n + 1;
 				}
 
 
