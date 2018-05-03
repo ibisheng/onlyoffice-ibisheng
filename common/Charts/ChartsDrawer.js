@@ -1333,10 +1333,29 @@ CChartsDrawer.prototype =
 		}
 
 		var getMinMaxCurCharts = function(axisCharts, axis) {
-			var minMaxData, min, max, chart;
+
+			//предварительно проходимся по всем диаграммам и ищем 100% stacked тип
+			var isStackedType = false;
+			for (var i = 0; i < axisCharts.length; i++) {
+				grouping = t.getChartGrouping(axisCharts[i]);
+				if("stackedPer" === grouping) {
+					isStackedType = true;
+					break;
+				}
+			}
+
+			var minMaxData, min, max, chart, grouping;
 			for (var i = 0; i < axisCharts.length; i++) {
 				chart = axisCharts[i];
-				minMaxData = t._calculateData2(chart);
+				grouping = t.getChartGrouping(chart);
+				minMaxData = t._calculateData2(chart, grouping);
+
+				/*if("stackedPer" !== grouping && isStackedType) {
+					minMaxData.min = minMaxData.min*100;
+					minMaxData.max = minMaxData.max*100;
+					minMaxData.ymin = minMaxData.ymin*100;
+					minMaxData.ymax = minMaxData.ymax*100;
+				}*/
 
 				if(AscDFH.historyitem_type_ScatterChart === chart.getObjectType()) {
 					if(axis.axPos === window['AscFormat'].AX_POS_B || axis.axPos === window['AscFormat'].AX_POS_T) {
@@ -1395,7 +1414,7 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	_calculateData2: function(chart)
+	_calculateData2: function(chart, grouping)
 	{
 		var xNumCache, yNumCache, newArr, arrValues = [], max = 0, min = 0, minY = 0, maxY = 0;
 		var series = chart.series;
@@ -1549,7 +1568,6 @@ CChartsDrawer.prototype =
 		}
 
 		//пересчёт данных для накопительных диаграмм
-		var grouping = this.getChartGrouping(chart);
 		if ("stackedPer" === grouping || "stacked" === grouping) {
 			if (newArr) {
 				arrValues = newArr;
