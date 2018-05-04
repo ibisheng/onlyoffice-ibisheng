@@ -192,7 +192,7 @@ CChartsDrawer.prototype =
 
 		//CHARTS
 		if (!chartSpace.bEmptySeries) {
-			for (var i = 0; i < this.charts.length; i++) {
+			for(var i in this.charts) {
 				this.charts[i].recalculate();
 			}
 		}
@@ -260,9 +260,9 @@ CChartsDrawer.prototype =
 			}
 			if (i === 0) {
 				this.chart = newChart;
-				this.charts = [];
+				this.charts = {};
 			}
-			this.charts.push(newChart);
+			this.charts[chart.Id] = newChart;
 		}
 	},
 
@@ -282,9 +282,13 @@ CChartsDrawer.prototype =
 
 
 		var drawCharts = function() {
+			//TODO в дальнейшем нужно вместо массива формировать map с id модели
+			for(var i in t.charts) {
+				var chartModel = t._getChartModelById(chartSpace.chart.plotArea, i);
+				if(!chartModel) {
+					continue;
+				}
 
-			for(var i = 0; i < t.charts.length; i++) {
-				var chartModel = chartSpace.chart.plotArea.charts[i];
 				var type = chartModel.getObjectType();
 				var bIsNoSmartAttack = false;
 				if(t.nDimensionCount === 3 || type === AscDFH.historyitem_type_LineChart || type === AscDFH.historyitem_type_ScatterChart) {
@@ -365,6 +369,47 @@ CChartsDrawer.prototype =
 		}
 	},
 
+	_getChartModelById: function(plotArea, id) {
+		var res = null;
+
+		var charts = plotArea.charts;
+		if(charts) {
+			for(var i = 0; i < charts.length; i ++) {
+				if(id === charts[i].Id) {
+					res = charts[i];
+					break;
+				}
+			}
+		}
+
+    	return res;
+	},
+
+	_getChartModelIdBySerIdx: function(plotArea, idx) {
+		var res = null;
+
+		var charts = plotArea.charts;
+		if(charts) {
+			for(var i = 0; i < charts.length; i ++) {
+				for(var j = 0; j < charts[i].series.length; j++) {
+					if(idx === charts[i].series[j].idx) {
+						res = charts[i].Id;
+						break;
+					}
+				}
+			}
+		}
+
+		return res;
+	},
+
+	_getIndexByIdxSeria: function(series, val) {
+		for(var i = 0; i < series.length; i++) {
+			if(series[i].idx === val)
+				return i;
+		}
+	},
+
 	//****positions text labels****
 	reCalculatePositionText: function (type, chartSpace, ser, val, bLayout) {
 		var pos;
@@ -402,8 +447,14 @@ CChartsDrawer.prototype =
 	},
 	
 	_calculatePositionDlbl: function(chartSpace, ser, val, bLayout)
-	{	
-		return this.chart._calculateDLbl(chartSpace, ser, val, bLayout);
+	{
+		var res = null;
+		var chartId = this._getChartModelIdBySerIdx(chartSpace.chart.plotArea, ser);
+		if(null !== chartId && this.charts[chartId] && this.charts[chartId].chart && this.charts[chartId].chart.series ) {
+			var seriaIdx = this._getIndexByIdxSeria(this.charts[chartId].chart.series, ser);
+			res = this.charts[chartId]._calculateDLbl(chartSpace, seriaIdx, val, bLayout);
+		}
+		return res;
 	},
 	
 	_calculatePositionTitle: function(chartSpace)
