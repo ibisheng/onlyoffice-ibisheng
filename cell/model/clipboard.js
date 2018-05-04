@@ -1813,7 +1813,11 @@
 					this._insertTableFromPresentation(ws, data.Drawings[0]);
 					return;
 				}
-				
+
+				if(window["Asc"]["editor"].collaborativeEditing.getGlobalLock()){
+					return;
+				}
+
 				History.Create_NewPoint();
 				History.StartTransaction();
 				

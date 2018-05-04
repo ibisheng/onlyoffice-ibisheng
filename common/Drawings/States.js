@@ -122,7 +122,8 @@ StartAddNewShape.prototype =
 
     onMouseUp: function(e, x, y)
     {
-        if(this.bStart)
+        var bView = this.drawingObjects.isViewMode() === true || (this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode());
+        if(this.bStart && !bView)
         {
             if(this.drawingObjects.drawingObjects.objectLocker)
             {
@@ -594,7 +595,7 @@ RotateState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false)
+        if(this.drawingObjects.isViewMode() === false && !(this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode()))
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;

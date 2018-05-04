@@ -226,9 +226,9 @@ Asc['asc_docs_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs, password, isForce)
 {
 	window.doadssIsSaveAs = isSaveAs;
-	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+	if (true !== isForce && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
 	{
-		window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "generatePassword" });
+		window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
 		return;
 	}
 
@@ -268,9 +268,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error, hash, password)
 
 	if (hash !== null && hash !== undefined && hash != "")
 	{
-		if (window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+		if (window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
 		{
-			window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", {"type": "setPasswordByFile", "hash": hash, "password": password});
+			window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
 		}
 	}
 
