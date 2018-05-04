@@ -4051,6 +4051,9 @@ CChartSpace.prototype.isChart3D = function(oChart){
 };
 
 CChartSpace.prototype.getAxisCrossType = function(oAxis){
+    if(oAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
+        return AscFormat.CROSS_BETWEEN_MID_CAT;
+    }
     var oCrossAxis = oAxis.crossAx;
     if(oCrossAxis && oCrossAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
         var oChart = this.chart.plotArea.getChartsForAxis(oCrossAxis)[0];
