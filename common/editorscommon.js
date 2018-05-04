@@ -3347,6 +3347,71 @@
 		};
 	}
 
+    /////////////////////////////////////////////////////////
+	///////////////       CRYPT      ////////////////////////
+	/////////////////////////////////////////////////////////
+    AscCommon.EncryptionMessageType = {
+        Encrypt : 0,
+        Decrypt : 1
+    };
+    function CEncryptionData()
+    {
+        this.arrData = [];
+        this.arrImages = [];
+
+        this.sendChanges = function(sender, data, type)
+        {
+            if (!window.g_asc_plugins.isRunnedEncryption())
+            {
+                if (AscCommon.EncryptionMessageType.Encrypt == type)
+                {
+                    sender._send(data, true);
+                }
+                else if (AscCommon.EncryptionMessageType.Decrypt == type)
+                {
+                    sender._onSaveChanges(data, true);
+                }
+                return;
+            }
+
+            if (undefined !== type)
+                this.arrData.push({ sender: sender, type: type, data: data });
+
+            if (this.arrData.length == 0)
+                return;
+
+            if (AscCommon.EncryptionMessageType.Encrypt == this.arrData[0].type)
+            {
+                window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(data["changes"]) });
+            }
+            else if (AscCommon.EncryptionMessageType.Decrypt == this.arrData[0].type)
+            {
+                window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : data["changes"] });
+            }
+        };
+
+        this.receiveChanges = function(data)
+        {
+        	var obj = this.arrData[0];
+        	this.arrData.splice(0, 1);
+
+            if (AscCommon.EncryptionMessageType.Encrypt == obj.type)
+            {
+            	obj.data["changes"] = JSON.stringify(data);
+                obj.sender._send(obj.data, true);
+            }
+            else if (AscCommon.EncryptionMessageType.Decrypt == obj.type)
+            {
+                obj.data["changes"] = data;
+                obj.sender._onSaveChanges(obj.data, true);
+            }
+
+            this.sendChanges(undefined, undefined);
+        };
+    }
+
+    AscCommon.EncryptionWorker = new CEncryptionData();
+
 	/** @constructor */
 	function CTranslateManager()
 	{

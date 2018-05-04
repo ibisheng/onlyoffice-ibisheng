@@ -698,6 +698,12 @@ _proto.prototype["pluginMethod_OnEncryption"] = function(obj)
 			}
 			break;
 		}
+        case "encryptData":
+        case "decryptData":
+        {
+            AscCommon.EncryptionWorker.receiveChanges(obj["data"]);
+            break;
+        }
 	}
 };
 // -------------------------------------------

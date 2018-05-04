@@ -1588,6 +1588,19 @@
 		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
 	};
 
+    baseEditorsApi.prototype["pluginMethod_OnEncryption"] = function(obj)
+    {
+        switch (obj.type)
+        {
+            case "encryptData":
+            case "decryptData":
+            {
+                AscCommon.EncryptionWorker.receiveChanges(obj["data"]);
+                break;
+            }
+        }
+    };
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
