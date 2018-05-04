@@ -4813,6 +4813,10 @@
 		if(oBBoxTo.c2 >= this.nColsCount)
 			this.nColsCount = oBBoxTo.c2 + 1;
 		
+		//todo avoid double getRange3
+		this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2)._foreachNoEmpty(function(cell) {
+			cell.transformSharedFormula();
+		});
 		var moveCells = function(copyRange, from, to, r1From, r1To, count){
 			var fromData = oThis.getColDataNoEmpty(from);
 			var toData;
