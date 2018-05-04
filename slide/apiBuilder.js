@@ -108,6 +108,43 @@
 	ApiGroup.prototype.constructor = ApiGroup;
 
 
+	/**
+     * Represents table in presentation
+     * @param oGraphicFrame
+     * @constructor
+     * */
+	function ApiTable(oGraphicFrame){
+	    this.Table = oGraphicFrame.graphicObject;
+	    ApiDrawing.call(this, oGraphicFrame);
+    }
+
+    ApiTable.prototype = Object.create(ApiDrawing.prototype);
+    ApiTable.prototype.constructor = ApiTable;
+
+
+
+
+    /**
+     * Represents table row
+     * @param oTableRow
+     * @constructor
+     */
+
+    function ApiTableRow(oTableRow){
+        this.Row = oTableRow;
+    }
+
+
+    /**
+     * Represents table cell
+     * @param oCell
+     * @constructor
+     */
+    function ApiTableCell(oCell){
+        this.Cell = oCell;
+    }
+
+
     /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
@@ -308,6 +345,27 @@
         return null;
     };
 
+
+    /**
+     * Create table
+     * @param nCols
+     * @param nRows
+     * @returns {?ApiTable}
+     */
+    Api.prototype.CreateTable = function(nCols, nRows){
+        var oPresentation = private_GetPresentation();
+        var oSlide = private_GetCurrentSlide();
+        if(oPresentation && oSlide){
+            var oGraphicFrame = oPresentation.Create_TableGraphicFrame(nCols, nRows, oSlide, oPresentation.DefaultTableStyleId);
+            var content = oGraphicFrame.graphicObject.Content, i, j;
+            for(i = 0; i < content.length; ++i)
+            {
+                content[i].Set_Height(0, Asc.linerule_AtLeast );
+            }
+            return new ApiTable(oGraphicFrame);
+        }
+        return null;
+    };
 
     /**
      * Create a new paragraph.
@@ -913,6 +971,527 @@
     };
 
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTable
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Returns type of object
+     * @returns {"table"};
+     * */
+    ApiTable.prototype.GetClassType = function(){
+        return "table";
+    };
+
+
+    /**
+     * Returns row by index
+     * @param nIndex {number}
+     * @returns {?ApiTableRow}
+     * */
+    ApiTable.prototype.GetRow = function(nIndex){
+        if(!this.Drawing){
+            return null;
+        }
+        var aTableContent = this.Table.Content;
+        if(!aTableContent[nIndex]){
+            return null;
+        }
+        return new ApiTableRow(aTableContent[nIndex]);
+    };
+
+    /**
+     * Merge array of cells. If merge was done successfully it will return merged cell, otherwise "null".
+     * <b>Warning</b>: The number of cells in any row and the numbers of rows in the current table may be changed.
+     * @param {ApiTableCell[]} aCells
+     * @returns {?ApiTableCell}
+     */
+    ApiTable.prototype.MergeCells = function(aCells)
+    {
+        this.private_PrepareTableForActions();
+
+        var oTable            = this.Table;
+        oTable.Selection.Use  = true;
+        oTable.Selection.Type = table_Selection_Cell;
+        oTable.Selection.Data = [];
+
+        for (var nPos = 0, nCount = aCells.length; nPos < nCount; ++nPos)
+        {
+            var oCell = aCells[nPos].Cell;
+            var oPos  = {Cell : oCell.Index, Row : oCell.Row.Index};
+
+            var nResultPos    = 0;
+            var nResultLength = oTable.Selection.Data.length;
+            for (nResultPos = 0; nResultPos < nResultLength; ++nResultPos)
+            {
+                var oCurPos = oTable.Selection.Data[nResultPos];
+                if (oCurPos.Row < oPos.Row)
+                {
+                    continue;
+                }
+                else if (oCurPos.Row > oPos.Row)
+                {
+                    break;
+                }
+                else
+                {
+                    if (oCurPos.Cell < oPos.Cell)
+                        continue;
+                    else
+                        break;
+                }
+            }
+
+            oTable.Selection.Data.splice(nResultPos, 0, oPos);
+        }
+
+        var isMerged = this.Table.MergeTableCells(true);
+        var oMergedCell = this.Table.CurCell;
+        oTable.RemoveSelection();
+
+
+        if (true === isMerged)
+            return new ApiTableCell(oMergedCell);
+
+        return null;
+    };
+
+    ApiTable.prototype.OnChangeTablePr = function(oApiTablePr)
+    {
+        this.Table.Set_Pr(oApiTablePr.TablePr);
+        oApiTablePr.TablePr = this.Table.Pr.Copy();
+    };
+    ApiTable.prototype.private_PrepareTableForActions = function()
+    {
+        this.Table.private_RecalculateGrid();
+        this.Table.private_UpdateCellsGrid();
+    };
+    /**
+     * Specify the components of the conditional formatting of the referenced table style (if one exists)
+     * which shall be applied to the set of table rows with the current table-level property exceptions. A table style
+     * can specify up to six different optional conditional formats [Example: Different formatting for first column.
+     * end example], which then can be applied or omitted from individual table rows in the parent table.
+     *
+     * The default setting is to apply the row and column banding formatting, but not the first row, last row, first
+     * column, or last column formatting.
+     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting shall be applied to the
+     *     table.
+     * @param {boolean} isFirstRow - Specifies that the first row conditional formatting shall be applied to the table.
+     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting shall be applied to the
+     *     table.
+     * @param {boolean} isLastRow - Specifies that the last row conditional formatting shall be applied to the table.
+     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied
+     *     to the table.
+     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to
+     *     the table.
+     */
+    ApiTable.prototype.SetTableLook = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
+    {
+        var oTableLook = new CTableLook(private_GetBoolean(isFirstColumn),
+            private_GetBoolean(isFirstRow),
+            private_GetBoolean(isLastColumn),
+            private_GetBoolean(isLastRow),
+            private_GetBoolean(isHorBand),
+            private_GetBoolean(isVerBand));
+        this.Table.Set_TableLook(oTableLook);
+    };
+    /**
+     * Add a new row to the current table.
+     * @param {ApiTableCell} [oCell] - If not specified a new row will be added to the end of the table.
+     * @param {boolean} [isBefore=false] - Add a new row before or after the specified cell. If no cell is specified
+     * then this parameter will be ignored.
+     * @returns {ApiTableRow}
+     */
+    ApiTable.prototype.AddRow = function(oCell, isBefore)
+    {
+        this.private_PrepareTableForActions();
+
+        var _isBefore = private_GetBoolean(isBefore, false);
+        var _oCell = (oCell instanceof ApiTableCell ? oCell.Cell : undefined);
+        if (_oCell && this.Table !== _oCell.Row.Table)
+            _oCell = undefined;
+
+        if (!_oCell)
+        {
+            _oCell = this.Table.Content[this.Table.Content.length - 1].Get_Cell(0);
+            _isBefore = false;
+        }
+
+        var nRowIndex = true === _isBefore ? _oCell.Row.Index : _oCell.Row.Index + 1;
+
+        this.Table.RemoveSelection();
+        this.Table.CurCell = _oCell;
+        this.Table.AddTableRow(_isBefore);
+
+        return new ApiTableRow(this.Table.Content[nRowIndex]);
+    };
+    /**
+     * Add a new column to the end of the current table.
+     * @param {ApiTableCell} [oCell] - If not specified a new column will be added to the end of the table.
+     * @param {boolean} [isBefore=false] - Add a new column before or after the specified cell. If no cell is specified
+     * then this parameter will be ignored.
+     */
+    ApiTable.prototype.AddColumn = function(oCell, isBefore)
+    {
+        this.private_PrepareTableForActions();
+
+        var _isBefore = private_GetBoolean(isBefore, false);
+        var _oCell = (oCell instanceof ApiTableCell ? oCell.Cell : undefined);
+        if (_oCell && this.Table !== _oCell.Row.Table)
+            _oCell = undefined;
+
+        if (!_oCell)
+        {
+            _oCell = this.Table.Content[0].Get_Cell(this.Table.Content[0].Get_CellsCount() - 1);
+            _isBefore = false;
+        }
+
+        this.Table.RemoveSelection();
+        this.Table.CurCell = _oCell;
+        this.Table.AddTableColumn(_isBefore);
+    };
+    /**
+     * Remove the table row with a specified cell.
+     * @param {ApiTableCell} oCell
+     * @returns {boolean} Is the table empty after removing.
+     */
+    ApiTable.prototype.RemoveRow = function(oCell)
+    {
+        if (!(oCell instanceof ApiTableCell) || this.Table !== oCell.Cell.Row.Table)
+            return false;
+        this.private_PrepareTableForActions();
+        this.Table.RemoveSelection();
+        this.Table.CurCell = oCell.Cell;
+        var isEmpty = !(this.Table.RemoveTableRow());
+        return isEmpty;
+    };
+    /**
+     * Remove the table column with a specified cell.
+     * @param {ApiTableCell} oCell
+     * @returns {boolean} Is the table empty after removing.
+     */
+    ApiTable.prototype.RemoveColumn = function(oCell)
+    {
+        if (!(oCell instanceof ApiTableCell) || this.Table !== oCell.Cell.Row.Table)
+            return false;
+        this.private_PrepareTableForActions();
+        this.Table.RemoveSelection();
+        this.Table.CurCell = oCell.Cell;
+        var isEmpty = !(this.Table.RemoveTableColumn());
+
+        return isEmpty;
+    };
+
+    /**
+     * Specify the shading which shall be applied to the extents of the current table.
+     * @param {?ApiFill} oApiFill
+     */
+
+    ApiTable.prototype.SetShd = function(oApiFill)
+    {
+        var oPr = this.Table.Pr.Copy();
+        if(!oApiFill){
+            oPr.Shd = null;
+        }
+        else{
+            var oShd = new CDocumentShd();
+            oShd.Value = Asc.c_oAscShdClear;
+            oShd.Unifill = oApiFill.UniFill;
+            oPr.Shd = oShd;
+        }
+        this.Table.Set_Pr(oPr);
+    };
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableRow
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the number of cells in the current row.
+     * @returns {number}
+     */
+    ApiTableRow.prototype.GetCellsCount = function()
+    {
+        return this.Row.Content.length;
+    };
+    /**
+     * Get cell by position.
+     * @param {number} nPos
+     * @returns {ApiTableCell}
+     */
+    ApiTableRow.prototype.GetCell = function(nPos)
+    {
+        if (nPos < 0 || nPos >= this.Row.Content.length)
+            return null;
+
+        return new ApiTableCell(this.Row.Content[nPos]);
+    };
+
+
+    /**
+     * Set the height of the current table row within the current table.
+     * @param {EMU} [nValue]
+     */
+    ApiTableRow.prototype.SetHeight = function(nValue)
+    {
+        this.Row.Set_Height(nValue/36000, Asc.linerule_AtLeast)
+    };
+
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableRow
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"tableCell"}
+     */
+    ApiTableCell.prototype.GetClassType = function()
+    {
+        return "tableCell";
+    };
+
+    /**
+     * Returns cell content
+     * @returns {ApiDocumentContent}
+     */
+    ApiTableCell.prototype.GetContent = function(){
+        var oApi = private_GetApi();
+        return oApi.private_CreateApiDocContent(this.Cell.Content);
+
+    };
+
+
+    /**
+     * Specify the shading which shall be applied to the extents of the current table cell.
+     * @param {?ApiFill} oApiFill
+     */
+    ApiTableCell.prototype.SetShd = function(oApiFill)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if(!oApiFill){
+            oPr.Shd = null;
+        }
+        else{
+            var oShd = new CDocumentShd();
+            oShd.Value = Asc.c_oAscShdClear;
+            oShd.Unifill = oApiFill.UniFill;
+            oPr.Shd = oShd;
+        }
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Specifies the amount of space which shall be left between the bottom extent of the cell contents and the border
+     * of a specific table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCell.prototype.SetCellMarginBottom = function(nValue)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if (!oPr.TableCellMar)
+        {
+            oPr.TableCellMar =
+                {
+                    Bottom : undefined,
+                    Left   : undefined,
+                    Right  : undefined,
+                    Top    : undefined
+                };
+        }
+
+        if (null === nValue)
+            oPr.TableCellMar.Bottom = undefined;
+        else
+            oPr.TableCellMar.Bottom = private_GetTableMeasure("twips", nValue);
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Specifies the amount of space which shall be left between the left extent of the current cell contents and the
+     * left edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCell.prototype.SetCellMarginLeft = function(nValue)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if (!oPr.TableCellMar)
+        {
+            oPr.TableCellMar =
+                {
+                    Bottom : undefined,
+                    Left   : undefined,
+                    Right  : undefined,
+                    Top    : undefined
+                };
+        }
+
+        if (null === nValue)
+            oPr.TableCellMar.Left = undefined;
+        else
+            oPr.TableCellMar.Left = private_GetTableMeasure("twips", nValue);
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Specifies the amount of space which shall be left between the right extent of the current cell contents and the
+     * right edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCell.prototype.SetCellMarginRight = function(nValue)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if (!oPr.TableCellMar)
+        {
+            oPr.TableCellMar =
+                {
+                    Bottom : undefined,
+                    Left   : undefined,
+                    Right  : undefined,
+                    Top    : undefined
+                };
+        }
+
+        if (null === nValue)
+            oPr.TableCellMar.Right = undefined;
+        else
+            oPr.TableCellMar.Right = private_GetTableMeasure("twips", nValue);
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Specifies the amount of space which shall be left between the top extent of the current cell contents and the
+     * top edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCell.prototype.SetCellMarginTop = function(nValue)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if (!oPr.TableCellMar)
+        {
+            oPr.TableCellMar =
+                {
+                    Bottom : undefined,
+                    Left   : undefined,
+                    Right  : undefined,
+                    Top    : undefined
+                };
+        }
+
+        if (null === nValue)
+            oPr.TableCellMar.Top = undefined;
+        else
+            oPr.TableCellMar.Top = private_GetTableMeasure("twips", nValue);
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Set the border which shall be displayed at the bottom of the current table cell.
+     * @param {mm} fSize - The width of the current border.
+     * @param {ApiFill} oApiFill
+     */
+    ApiTableCell.prototype.SetCellBorderBottom = function(fSize, oApiFill)
+    {
+        var oBorder = new CDocumentBorder();
+        oBorder.Value = border_Single;
+        oBorder.Size  = fSize;
+        oBorder.Space = 0;
+        oBorder.Unifill = oApiFill.UniFill;
+        var oPr = this.Cell.Pr.Copy();
+        oPr.TableCellBorders.Bottom = oBorder;
+        this.Cell.Set_Pr(oPr);
+    };
+
+    /**
+     * Set the border which shall be displayed at the left of the current table cell.
+     * @param {mm} fSize - The width of the current border.
+     * @param {ApiFill} oApiFill
+     */
+    ApiTableCell.prototype.SetCellBorderLeft = function(fSize, oApiFill)
+    {
+        var oBorder = new CDocumentBorder();
+        oBorder.Value = border_Single;
+        oBorder.Size  = fSize;
+        oBorder.Space = 0;
+        oBorder.Unifill = oApiFill.UniFill;
+        var oPr = this.Cell.Pr.Copy();
+        oPr.TableCellBorders.Left = oBorder;
+        this.Cell.Set_Pr(oPr);
+    };
+
+    /**
+     * Set the border which shall be displayed at the right of the current table cell.
+     * @param {mm} fSize - The width of the current border.
+     * @param {ApiFill} oApiFill
+     */
+    ApiTableCell.prototype.SetCellBorderRight = function(fSize, oApiFill)
+    {
+        var oBorder = new CDocumentBorder();
+        oBorder.Value = border_Single;
+        oBorder.Size  = fSize;
+        oBorder.Space = 0;
+        oBorder.Unifill = oApiFill.UniFill;
+        var oPr = this.Cell.Pr.Copy();
+        oPr.TableCellBorders.Right = oBorder;
+        this.Cell.Set_Pr(oPr);
+    };
+
+    /**
+     * Set the border which shall be displayed at the top of the current table cell.
+     * @param {mm} fSize - The width of the current border.
+     * @param {ApiFill} oApiFill
+     */
+    ApiTableCell.prototype.SetCellBorderTop = function(fSize, oApiFill)
+    {
+        var oBorder = new CDocumentBorder();
+        oBorder.Value = border_Single;
+        oBorder.Size  = fSize;
+        oBorder.Space = 0;
+        oBorder.Unifill = oApiFill.UniFill;
+        var oPr = this.Cell.Pr.Copy();
+        oPr.TableCellBorders.Top = oBorder;
+        this.Cell.Set_Pr(oPr);
+    };
+
+    /**
+     * Specify the vertical alignment for text within the current table cell.
+     * @param {("top" | "center" | "bottom")} sType
+     */
+    ApiTableCell.prototype.SetVerticalAlign = function(sType)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if ("top" === sType)
+            oPr.VAlign = vertalignjc_Top;
+        else if ("bottom" === sType)
+            oPr.VAlign = vertalignjc_Bottom;
+        else if ("center" === sType)
+            oPr.VAlign = vertalignjc_Center;
+        this.Cell.Set_Pr(oPr);
+    };
+    /**
+     * Specify the direction of the text flow for this table cell.
+     * @param {("lrtb" | "tbrl" | "btlr")} sType
+     */
+    ApiTableCell.prototype.SetTextDirection = function(sType)
+    {
+        var oPr = this.Cell.Pr.Copy();
+        if ("lrtb" === sType)
+            oPr.TextDirection = textdirection_LRTB;
+        else if ("tbrl" === sType)
+            oPr.TextDirection = textdirection_TBRL;
+        else if ("btlr" === sType)
+            oPr.TextDirection = textdirection_BTLR;
+        this.Cell.Set_Pr(oPr);
+    };
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -974,6 +1553,38 @@
     ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
     ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
 
+    ApiTable.prototype["GetClassType"] = ApiTable.prototype.GetClassType;
+    ApiTable.prototype["GetRow"]       = ApiTable.prototype.GetRow;
+    ApiTable.prototype["MergeCells"]   = ApiTable.prototype.MergeCells;
+    ApiTable.prototype["SetTableLook"] = ApiTable.prototype.SetTableLook;
+    ApiTable.prototype["AddRow"]       = ApiTable.prototype.AddRow;
+    ApiTable.prototype["AddColumn"]    = ApiTable.prototype.AddColumn;
+    ApiTable.prototype["RemoveRow"]    = ApiTable.prototype.RemoveRow;
+    ApiTable.prototype["RemoveColumn"] = ApiTable.prototype.RemoveColumn;
+    ApiTable.prototype["SetShd"]       = ApiTable.prototype.SetShd;
+
+    ApiTableRow.prototype["GetCellsCount"] = ApiTableRow.prototype.GetCellsCount;
+    ApiTableRow.prototype["GetCell"] = ApiTableRow.prototype.GetCell;
+    ApiTableRow.prototype["SetHeight"] = ApiTableRow.prototype.SetHeight;
+
+
+
+    ApiTableCell.prototype["GetClassType"] = ApiTableCell.prototype.GetClassType;
+    ApiTableCell.prototype["GetContent"] = ApiTableCell.prototype.GetContent;
+    ApiTableCell.prototype["SetShd"]  = ApiTableCell.prototype.SetShd;
+    ApiTableCell.prototype["SetCellMarginBottom"] = ApiTableCell.prototype.SetCellMarginBottom;
+    ApiTableCell.prototype["SetCellMarginLeft"] = ApiTableCell.prototype.SetCellMarginLeft;
+    ApiTableCell.prototype["SetCellMarginRight"] = ApiTableCell.prototype.SetCellMarginRight;
+    ApiTableCell.prototype["SetCellMarginTop"] = ApiTableCell.prototype.SetCellMarginTop;
+    ApiTableCell.prototype["SetCellBorderBottom"] = ApiTableCell.prototype.SetCellBorderBottom;
+    ApiTableCell.prototype["SetCellBorderLeft"] = ApiTableCell.prototype.SetCellBorderLeft;
+    ApiTableCell.prototype["SetCellBorderRight"] = ApiTableCell.prototype.SetCellBorderRight;
+    ApiTableCell.prototype["SetCellBorderTop"] = ApiTableCell.prototype.SetCellBorderTop;
+    ApiTableCell.prototype["SetVerticalAlign"] = ApiTableCell.prototype.SetVerticalAlign;
+    ApiTableCell.prototype["SetTextDirection"] = ApiTableCell.prototype.SetTextDirection;
+
+
+
     function private_GetCurrentSlide(){
         var oApiPresentation = editor.GetPresentation();
         if(oApiPresentation){
@@ -1006,4 +1617,41 @@
     }
 
 
+    function private_GetBoolean(bValue, bDefValue)
+    {
+        if (true === bValue)
+            return true;
+        else if (false === bValue)
+            return false;
+        else
+            return (undefined !== bDefValue ? bDefValue : false);
+    }
+
+    function private_GetTableMeasure(sType, nValue)
+    {
+        var nType = tblwidth_Auto;
+        var nW    = 0;
+        if ("auto" === sType)
+        {
+            nType = tblwidth_Auto;
+            nW    = 0;
+        }
+        else if ("nil" === sType)
+        {
+            nType = tblwidth_Nil;
+            nW    = 0;
+        }
+        else if ("percent" === sType)
+        {
+            nType = tblwidth_Pct;
+            nW    = private_GetInt(nValue, null, null);
+        }
+        else if ("twips" === sType)
+        {
+            nType = tblwidth_Mm;
+            nW    = private_Twips2MM(nValue);
+        }
+
+        return new CTableMeasurement(nType, nW);
+    }
 })(window, null);
