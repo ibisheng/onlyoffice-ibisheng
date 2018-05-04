@@ -141,6 +141,7 @@
 	var sDownloadServiceLocalUrl = "../../../../downloadas";
 	var sUploadServiceLocalUrl = "../../../../upload";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
+	var sSaveFileLocalUrl = "../../../../savefile";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 	function getSockJs()
@@ -685,6 +686,19 @@
 								 fCallback(JSON.parse(httpRequest.responseText), true);
 							 }
 						 }
+		});
+	}
+
+	function sendSaveFile(docId, userId, title, jwt, data, fError, fsuccess)
+	{
+		var cmd = {'id': docId, "userid": userId, "jwt": jwt, 'outputpath': title};
+		asc_ajax({
+			type:        'POST',
+			url:         sSaveFileLocalUrl + '/' + docId + '?cmd=' + encodeURIComponent(JSON.stringify(cmd)),
+			data:        data,
+			contentType: "application/octet-stream",
+			error:       fError,
+			success:     fsuccess
 		});
 	}
 
@@ -3420,6 +3434,7 @@
 	window["AscCommon"].getImageFromChanges = getImageFromChanges;
 	window["AscCommon"].openFileCommand = openFileCommand;
 	window["AscCommon"].sendCommand = sendCommand;
+	window["AscCommon"].sendSaveFile = sendSaveFile;
 	window["AscCommon"].mapAscServerErrorToAscError = mapAscServerErrorToAscError;
 	window["AscCommon"].joinUrls = joinUrls;
 	window["AscCommon"].getFullImageSrc2 = getFullImageSrc2;
