@@ -455,6 +455,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             {
                 if (this.Is_Empty())
                 {
+                	this.Set_VertAlign(undefined);
                     this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
                 }
                 else
