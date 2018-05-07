@@ -9449,6 +9449,9 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 
 		if (oHyperlink.GetAnchor())
 			MMData.Hyperlink.ToolTip = oHyperlink.GetToolTip();
+		else
+			MMData.Hyperlink.ToolTip = oHyperlink.GetValue();
+
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
