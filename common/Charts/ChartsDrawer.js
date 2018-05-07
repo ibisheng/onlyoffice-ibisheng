@@ -10294,7 +10294,8 @@ drawScatterChart.prototype = {
 						xVal = n + 1;
 					}
 				} else {
-					xVal = betweenAxisCross ? n : n + 1;
+					//xVal = betweenAxisCross ? n : n + 1;
+					xVal = this.catAx instanceof AscFormat.CCatAx ? n : n + 1;
 				}
 
 
@@ -11871,7 +11872,7 @@ catAxisChart.prototype = {
 			posX = this.catAx.posX;
 
 			//сдвиг, если положение оси - между делениями
-			if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN) {
+			if (this.catAx.crossAx.crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 				//TODO избавиться от использовения параметров лругой оси!!!
 				firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
 			}
@@ -11938,8 +11939,7 @@ catAxisChart.prototype = {
 			posY = this.catAx.posY;
 
 			var posMinorX;
-			//TODO избавиться от использовения параметров лругой оси!!!
-			if (this.cChartSpace.getValAxisCrossType() === AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type !== c_oChartTypes.Scatter) {
+			if (this.catAx.crossAx.crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 				if (xPoints[1]) {
 					firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
 				} else if (this.cChartSpace.chart.plotArea.valAx.posX) {
