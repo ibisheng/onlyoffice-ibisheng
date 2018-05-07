@@ -1810,7 +1810,9 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                     {
                         X = Range.X;
 
-                        if (1 == PRSC.Words)
+                        // Проверяем по количеству пробелов, т.к., например, в китайском языке пробелов нет, но
+						// каждый иероглиф как отдельное слово идет.
+                        if (1 == PRSC.Words || PRSC.Spaces <= 0)
                         {
                             if (1 == RangesCount && !(Line.Info & paralineinfo_End))
                             {
