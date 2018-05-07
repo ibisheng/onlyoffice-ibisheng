@@ -658,6 +658,7 @@
     this.lang = undefined;
     this.jwtOpen = undefined;
     this.jwtSession = undefined;
+    this.encrypted = undefined;
     this._isViewer = false;
     this._isReSaveAfterAuth = false;	// Флаг для сохранения после повторной авторизации (для разрыва соединения во время сохранения)
     this._lockBuffer = [];
@@ -1553,6 +1554,7 @@
 	this.permissions = docInfo.get_Permissions();
 	this.lang = docInfo.get_Lang();
 	this.jwtOpen = docInfo.get_Token();
+    this.encrypted = docInfo.get_Encrypted();
 
     this.setDocId(docid);
     this._initSocksJs();
@@ -1605,6 +1607,7 @@
       'lang': this.lang,
       'mode': this.mode,
       'permissions': this.permissions,
+      'encrypted': this.encrypted,
       'jwtOpen': this.jwtOpen,
       'jwtSession': this.jwtSession
     });
