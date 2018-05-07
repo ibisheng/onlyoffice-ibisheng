@@ -118,7 +118,7 @@ CChartsDrawer.prototype =
     constructor: CChartsDrawer,
 
 	//****draw and recalculate functions****
-	recalculate: function (chartSpace) {
+	recalculate : function (chartSpace) {
 		this.cChartSpace = chartSpace;
 
 		this.calcProp = {};
@@ -689,6 +689,30 @@ CChartsDrawer.prototype =
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
 
+
+		//TODO обработать исключение
+		//исключение - когда среди диаграмм есть груговая
+		/*if(2 === this.nDimensionCount) {
+			var pie = null;
+			var charts = plotArea.charts;
+			for(var i = 0; i < charts.length; i++) {
+				if(c_oChartTypes.Pie === this._getChartType(charts[i])) {
+					pie = charts[i];
+					break;
+				}
+			}
+			if(null !== pie) {
+				left = right = top = bottom = 0;
+				calculateLeft = calculateRight = calculateTop = calculateBottom = 0;
+				var width = this.calcProp.widthCanvas / pxToMM;
+				var height = this.calcProp.heightCanvas / pxToMM;
+				if(width > height) {
+					left = right = (width - height) / 2;
+				} else {
+					top = bottom = (height - width) / 2;
+				}
+			}
+		}*/
 
 		var leftTextLabels = 0;
 		var rightTextLabels = 0;
@@ -11759,7 +11783,8 @@ catAxisChart.prototype = {
 		var right = (this.chartProp.widthCanvas - this.chartProp.chartGutter._right) / this.chartProp.pxToMM;
 		var top = this.chartProp.chartGutter._top / this.chartProp.pxToMM;
 		var bottom = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM;
-		if (this.chartProp.type === c_oChartTypes.HBar) {
+
+		if (this.catAx.axPos === window['AscFormat'].AX_POS_R || this.catAx.axPos === window['AscFormat'].AX_POS_L) {
 			axisPos = this.catAx.posX;
 			this.paths.axisLine = this._calculateLine(axisPos, top, axisPos, bottom);
 		} else {
@@ -11834,7 +11859,7 @@ catAxisChart.prototype = {
 		var tickMarkSkip = this.catAx.tickMarkSkip ? this.catAx.tickMarkSkip : 1;
 
 		var minorLinesCount = 2;
-		if (this.chartProp.type === c_oChartTypes.HBar) {
+		if (this.catAx.axPos === window['AscFormat'].AX_POS_R || this.catAx.axPos === window['AscFormat'].AX_POS_L) {
 			var yPoints = this.catAx.yPoints;
 
 			if(!yPoints) {
@@ -12126,7 +12151,7 @@ valAxisChart.prototype = {
 		var top = this.chartProp.chartGutter._top / this.chartProp.pxToMM;
 		var bottom = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom) / this.chartProp.pxToMM;
 
-		if (this.chartProp.type === c_oChartTypes.HBar) {
+		if (this.valAx.axPos === window['AscFormat'].AX_POS_T || this.valAx.axPos === window['AscFormat'].AX_POS_B) {
 			nullPosition = this.valAx.posY;
 			this.paths.axisLine = this._calculateLine(left, nullPosition, right, nullPosition);
 		} else {
@@ -12191,7 +12216,7 @@ valAxisChart.prototype = {
 
 		if (!(widthLine === 0 && widthMinorLine === 0)) {
 			var points, minorStep, posY, posX;
-			if (this.chartProp.type === c_oChartTypes.HBar) {
+			if (axPos === window['AscFormat'].AX_POS_T || axPos === window['AscFormat'].AX_POS_B) {
 				points = this.valAx.xPoints;
 				if(!points) {
 					return;
@@ -12526,7 +12551,7 @@ floor3DChart.prototype =
 		this._draw();
 	},
 	
-	recalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -12633,7 +12658,7 @@ sideWall3DChart.prototype =
 		this._draw();
 	},
 	
-	recalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
@@ -12724,7 +12749,7 @@ backWall3DChart.prototype =
 		this._draw();
 	},
 	
-	recalculate : function(chartsDrawer)
+	recalculate: function(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartSpace = chartsDrawer.cChartSpace;
