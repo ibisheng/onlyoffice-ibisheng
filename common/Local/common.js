@@ -144,6 +144,53 @@ window["DesktopUploadFileToUrl"] = function(url, dst, hash, pass)
     xhr.send(null);
 };
 
+window["DesktopUploadFileToUrl2"] = function(url, dst, hash, pass)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ascdesktop://fonts/" + url, true);
+    xhr.responseType = 'arraybuffer';
+
+    if (xhr.overrideMimeType)
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    else
+        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+    xhr.onload = function()
+    {
+        if (this.status != 200)
+        {
+            // error
+            return;
+        }
+
+        var fileData = new Uint8Array(this.response);
+
+        AscCommon.sendSaveFile(this.documentId, this.documentUserId, 'output.docx', this.asc_getSessionToken(), fileData, function(err) {
+        	console.log('error');
+		}, function(httpRequest) {
+        	console.log(httpRequest.responseText);
+
+            try
+            {
+                var data = {
+                    "accounts": this.responseText ? JSON.parse(this.responseText) : undefined,
+                    "hash": hash,
+                    "password" : pass,
+                    "type": "share"
+                };
+
+                window["AscDesktopEditor"]["sendSystemMessage"](data);
+                window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
+            }
+            catch (err)
+            {
+            }
+        });
+    };
+
+    xhr.send(null);
+};
+
 /////////////////////////////////////////////////////////
 //////////////       IMAGES      ////////////////////////
 /////////////////////////////////////////////////////////

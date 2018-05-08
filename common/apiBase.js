@@ -312,6 +312,11 @@
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 
+        if (undefined !== window["AscDesktopEditor"] && undefined !== window["AscDesktopEditor"]["isBlockchainSupport"])
+        {
+            this.DocInfo.put_Encrypted(window["AscDesktopEditor"]["isBlockchainSupport"]());
+        }
+
 		if (!oldInfo)
 		{
 			this.onEndLoadDocInfo();
