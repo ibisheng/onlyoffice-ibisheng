@@ -671,15 +671,12 @@ CChartsDrawer.prototype =
 		if (this._isSwitchCurrent3DChart(chartSpace)) {
 			standartMarginForCharts = 16;
 		}
-
 		if (!this.calcProp.pxToMM) {
 			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 		}
 
 		var pxToMM = this.calcProp.pxToMM;
 		var plotArea = chartSpace.chart.plotArea;
-
-		//var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart && plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
 
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace/*, isHBar*/);
@@ -689,30 +686,6 @@ CChartsDrawer.prototype =
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
 
-
-		//TODO обработать исключение
-		//исключение - когда среди диаграмм есть груговая
-		/*if(2 === this.nDimensionCount) {
-			var pie = null;
-			var charts = plotArea.charts;
-			for(var i = 0; i < charts.length; i++) {
-				if(c_oChartTypes.Pie === this._getChartType(charts[i])) {
-					pie = charts[i];
-					break;
-				}
-			}
-			if(null !== pie) {
-				left = right = top = bottom = 0;
-				calculateLeft = calculateRight = calculateTop = calculateBottom = 0;
-				var width = this.calcProp.widthCanvas / pxToMM;
-				var height = this.calcProp.heightCanvas / pxToMM;
-				if(width > height) {
-					left = right = (width - height) / 2;
-				} else {
-					top = bottom = (height - width) / 2;
-				}
-			}
-		}*/
 
 		var leftTextLabels = 0;
 		var rightTextLabels = 0;
@@ -792,12 +765,32 @@ CChartsDrawer.prototype =
 			}
 		}
 
-
-		left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
-		bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
-		top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
-		right += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
-
+		//исключение - когда среди диаграмм есть груговая
+		if(2 === this.nDimensionCount && false) {
+			var pie = null;
+			var charts = plotArea.charts;
+			for(var i = 0; i < charts.length; i++) {
+				if(c_oChartTypes.Pie === this._getChartType(charts[i])) {
+					pie = charts[i];
+					break;
+				}
+			}
+			if(null !== pie) {
+				left = right = top = bottom = 0;
+				var width = this.calcProp.widthCanvas / pxToMM;
+				var height = this.calcProp.heightCanvas / pxToMM;
+				if(width > height) {
+					left = right = (width - height) / 2;
+				} else {
+					top = bottom = (height - width) / 2;
+				}
+			}
+		} else {
+			left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
+			bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
+			top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+			right += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
+		}
 
 		var pxLeft = calculateLeft ? calculateLeft * pxToMM : left * pxToMM;
 		var pxRight = calculateRight ? calculateRight * pxToMM : right * pxToMM;
