@@ -161,7 +161,14 @@ var c_oSer_sts = {
 	Style_RowPr: 15,
 	Style_CellPr: 16,
 	Style_TblStylePr: 17,
-	Style_Link: 18
+	Style_Link: 18,
+	Style_CustomStyle: 19,
+	Style_Aliases: 20,
+	Style_AutoRedefine: 21,
+	Style_Locked: 22,
+	Style_Personal: 23,
+	Style_PersonalCompose: 24,
+	Style_PersonalReply: 25
 };
 var c_oSerProp_tblStylePrType = {
 	TblStylePr: 0,
@@ -1603,6 +1610,22 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams, saveParams)
 			if(aTblStylePr.length > 0)
 				this.bs.WriteItem(c_oSer_sts.Style_TblStylePr, function(){oThis.WriteTblStylePr(aTblStylePr);});
 		}
+		if(null != style.IsCustom())
+			this.bs.WriteItem(c_oSer_sts.Style_CustomStyle, function(){oThis.memory.WriteBool(true);});
+		// if(null != style.Aliases){
+		// 	this.memory.WriteByte(c_oSer_sts.Style_Aliases);
+		// 	this.memory.WriteString2(style.Aliases);
+		// }
+		// if(null != style.AutoRedefine)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_AutoRedefine, function(){oThis.memory.WriteBool(style.AutoRedefine);});
+		// if(null != style.Locked)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_Locked, function(){oThis.memory.WriteBool(style.Locked);});
+		// if(null != style.Personal)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_Personal, function(){oThis.memory.WriteBool(style.Personal);});
+		// if(null != style.PersonalCompose)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_PersonalCompose, function(){oThis.memory.WriteBool(style.PersonalCompose);});
+		// if(null != style.PersonalReply)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_PersonalReply, function(){oThis.memory.WriteBool(style.PersonalReply);});
     };
 	this.WriteTblStylePr = function(aTblStylePr)
     {
@@ -7254,6 +7277,34 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
                 return oThis.ReadTblStylePr(t,l, style);
             });
 		}
+		else if(c_oSer_sts.Style_CustomStyle == type)
+		{
+			style.SetCustom(this.stream.GetBool());
+		}
+		// else if(c_oSer_sts.Style_Aliases == type)
+		// {
+		// 	style.Aliases = this.stream.GetString2LE(length);
+		// }
+		// else if(c_oSer_sts.Style_AutoRedefine == type)
+		// {
+		// 	style.AutoRedefine = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_Locked == type)
+		// {
+		// 	style.Locked = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_Personal == type)
+		// {
+		// 	style.Personal = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_PersonalCompose == type)
+		// {
+		// 	style.PersonalCompose = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_PersonalReply == type)
+		// {
+		// 	style.PersonalReply = this.stream.GetBool();
+		// }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
