@@ -8892,6 +8892,14 @@ CTextPr.prototype.Get_Shd = function()
 {
     return this.Shd;
 };
+CTextPr.prototype.WriteToBinary = function(oWriter)
+{
+	return this.Write_ToBinary(oWriter);
+};
+CTextPr.prototype.ReadFromBinary = function(oReader)
+{
+	return this.Read_FromBinary(oReader);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CTextPr Export
 //----------------------------------------------------------------------------------------------------------------------
@@ -10930,6 +10938,14 @@ CParaPr.prototype.Get_PStyle = function()
 CParaPr.prototype.Get_OutlineLvl = function()
 {
 	return this.OutlineLvl;
+};
+CParaPr.prototype.WriteToBinary = function(oWriter)
+{
+	return this.Write_ToBinary(oWriter);
+};
+CParaPr.prototype.ReadFromBinary = function(oReader)
+{
+	return this.Read_FromBinary(oReader);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CParaPr Export

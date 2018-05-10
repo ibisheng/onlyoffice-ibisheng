@@ -112,6 +112,7 @@
         "../word/Editor/Styles.js",
 		"../slide/Editor/Format/StylesPrototype.js",
 		"../word/Editor/Numbering/NumberingCommon.js",
+		"../word/Editor/Numbering/NumberingLvl.js",
 		"../word/Editor/Numbering/AbstractNum.js",
 		"../word/Editor/Numbering/AbstractNumChanges.js",
 		"../word/Editor/Numbering/Num.js",

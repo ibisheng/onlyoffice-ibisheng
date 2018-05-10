@@ -39,11 +39,20 @@
 
 /**
  * Класс представляющий нумерацию параграфов в документах
+ * @param {CNumbering} oNumbering - ссылка на главный объект нумерации в документах
  * @constructor
  */
-function CNum()
+function CNum(oNumbering)
 {
 	this.AbstractNumId = null;
 	this.LvlOverride   = [];
 	this.NumId         = AscCommon.g_oIdCounter.Get_NewId();
+	this.Numbering     = oNumbering;
+}
+
+function CLvlOverride(nLvl)
+{
+	this.Lvl           = nLvl;
+	this.StartOverride = -1;
+	this.NumberingLvl  = null;
 }

@@ -172,6 +172,7 @@
         "../word/Editor/Sections.js",
         "../word/Editor/SectionsChanges.js",
 		"../word/Editor/Numbering/NumberingCommon.js",
+		"../word/Editor/Numbering/NumberingLvl.js",
 		"../word/Editor/Numbering/AbstractNum.js",
 		"../word/Editor/Numbering/AbstractNumChanges.js",
 		"../word/Editor/Numbering/Num.js",

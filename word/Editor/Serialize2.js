@@ -9143,12 +9143,12 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerNumTypes.lvl_LvlTextItemText === type )
         {
-            var oNewTextItem = new CLvlText_Text( this.stream.GetString2LE(length) );
+            var oNewTextItem = new CNumberingLvlTextString( this.stream.GetString2LE(length) );
             aNewText.push(oNewTextItem);
         }
         else if ( c_oSerNumTypes.lvl_LvlTextItemNum === type )
         {
-            var oNewTextItem = new CLvlText_Num( this.stream.GetUChar() );
+            var oNewTextItem = new CNumberingLvlTextNum( this.stream.GetUChar() );
             aNewText.push(oNewTextItem);
         }
         else

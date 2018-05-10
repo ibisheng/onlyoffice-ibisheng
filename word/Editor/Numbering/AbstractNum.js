@@ -91,17 +91,17 @@ function CAbstractNum(Type)
 		if ( 0 == Index % 3 )
 		{
 			TextPr.RFonts.Set_All( "Symbol", -1 );
-			Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
+			Lvl.LvlText.push( new CNumberingLvlTextString( String.fromCharCode( 0x00B7 ) ) );
 		}
 		else if ( 1 == Index % 3 )
 		{
 			TextPr.RFonts.Set_All( "Courier New", -1 );
-			Lvl.LvlText.push( new CLvlText_Text( "o" ) );
+			Lvl.LvlText.push( new CNumberingLvlTextString( "o" ) );
 		}
 		else
 		{
 			TextPr.RFonts.Set_All( "Wingdings", -1 );
-			Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
+			Lvl.LvlText.push( new CNumberingLvlTextString( String.fromCharCode( 0x00A7 ) ) );
 		}
 
 		Lvl.TextPr = TextPr;
@@ -224,8 +224,8 @@ CAbstractNum.prototype.Create_Default_Numbered = function()
 		}
 
 		Lvl.LvlText = [];
-		Lvl.LvlText.push(new CLvlText_Num(Index));
-		Lvl.LvlText.push(new CLvlText_Text("."));
+		Lvl.LvlText.push(new CNumberingLvlTextNum(Index));
+		Lvl.LvlText.push(new CNumberingLvlTextString("."));
 
 		Lvl.ParaPr               = new CParaPr();
 		Lvl.ParaPr.Ind.Left      = Left;
@@ -269,8 +269,8 @@ CAbstractNum.prototype.Create_Default_Multilevel_1 = function()
 		}
 
 		Lvl.LvlText = [];
-		Lvl.LvlText.push(new CLvlText_Num(Index));
-		Lvl.LvlText.push(new CLvlText_Text(")"));
+		Lvl.LvlText.push(new CNumberingLvlTextNum(Index));
+		Lvl.LvlText.push(new CNumberingLvlTextString(")"));
 
 		Lvl.ParaPr               = new CParaPr();
 		Lvl.ParaPr.Ind.Left      = Left;
@@ -345,8 +345,8 @@ CAbstractNum.prototype.Create_Default_Multilevel_2 = function()
 		Lvl.LvlText = [];
 		for (var Index2 = 0; Index2 <= Index; Index2++)
 		{
-			Lvl.LvlText.push(new CLvlText_Num(Index2));
-			Lvl.LvlText.push(new CLvlText_Text("."));
+			Lvl.LvlText.push(new CNumberingLvlTextNum(Index2));
+			Lvl.LvlText.push(new CNumberingLvlTextString("."));
 		}
 
 		Lvl.ParaPr               = new CParaPr();
@@ -382,31 +382,31 @@ CAbstractNum.prototype.Create_Default_Multilevel_3 = function()
 		switch (Index)
 		{
 			case 0:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x0076)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x0076)));
 				break;
 			case 1:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00D8)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
 				break;
 			case 2:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
 				break;
 			case 3:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
 				break;
 			case 4:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A8)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
 				break;
 			case 5:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00D8)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
 				break;
 			case 6:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
 				break;
 			case 7:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
 				break;
 			case 8:
-				Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A8)));
+				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
 				break;
 		}
 
@@ -455,17 +455,17 @@ CAbstractNum.prototype.Create_Default_Bullet = function()
 		if (0 == Index % 3)
 		{
 			TextPr.RFonts.Set_All("Symbol", -1);
-			Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
+			Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
 		}
 		else if (1 == Index % 3)
 		{
 			TextPr.RFonts.Set_All("Courier New", -1);
-			Lvl.LvlText.push(new CLvlText_Text("o"));
+			Lvl.LvlText.push(new CNumberingLvlTextString("o"));
 		}
 		else
 		{
 			TextPr.RFonts.Set_All("Wingdings", -1);
-			Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
+			Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
 		}
 
 		Lvl.TextPr = TextPr;
@@ -499,7 +499,7 @@ CAbstractNum.prototype.Set_Lvl_Bullet = function(iLvl, LvlText, TextPr)
 
 	Lvl.Format  = numbering_numfmt_Bullet;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Text(LvlText));
+	Lvl.LvlText.push(new CNumberingLvlTextString(LvlText));
 	Lvl.TextPr = TextPr;
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -521,8 +521,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_1 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Right;
 	Lvl.Format  = numbering_numfmt_Decimal;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text(")"));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -544,8 +544,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_2 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Right;
 	Lvl.Format  = numbering_numfmt_Decimal;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -567,8 +567,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_3 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Left;
 	Lvl.Format  = numbering_numfmt_Decimal;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -590,8 +590,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_4 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Left;
 	Lvl.Format  = numbering_numfmt_Decimal;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text(")"));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -613,8 +613,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_5 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Right;
 	Lvl.Format  = numbering_numfmt_UpperRoman;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -636,8 +636,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_6 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Left;
 	Lvl.Format  = numbering_numfmt_UpperLetter;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -659,8 +659,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_7 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Left;
 	Lvl.Format  = numbering_numfmt_LowerLetter;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text(")"));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -682,8 +682,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_8 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Left;
 	Lvl.Format  = numbering_numfmt_LowerLetter;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -705,8 +705,8 @@ CAbstractNum.prototype.Set_Lvl_Numbered_9 = function(iLvl)
 	Lvl.Jc      = AscCommon.align_Right;
 	Lvl.Format  = numbering_numfmt_LowerRoman;
 	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CLvlText_Num(iLvl));
-	Lvl.LvlText.push(new CLvlText_Text("."));
+	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
+	Lvl.LvlText.push(new CNumberingLvlTextString("."));
 	Lvl.TextPr = new CTextPr();
 
 	var Lvl_new = this.Internal_CopyLvl(Lvl);
@@ -734,10 +734,10 @@ CAbstractNum.prototype.Set_Lvl_ByFormat = function(iLvl, nType, sFormatText, nAl
 			{
 				var sSubString = sFormatText.substring(nLastPos, nPos);
 				for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
-					Lvl.LvlText.push(new CLvlText_Text(sSubString.charAt(nSubIndex)));
+					Lvl.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
 			}
 
-			Lvl.LvlText.push(new CLvlText_Num(sFormatText.charCodeAt(nPos + 1) - 49));
+			Lvl.LvlText.push(new CNumberingLvlTextNum(sFormatText.charCodeAt(nPos + 1) - 49));
 			nPos += 2;
 			nLastPos = nPos;
 		}
@@ -751,7 +751,7 @@ CAbstractNum.prototype.Set_Lvl_ByFormat = function(iLvl, nType, sFormatText, nAl
 	{
 		var sSubString = sFormatText.substring(nLastPos, nPos);
 		for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
-			Lvl.LvlText.push(new CLvlText_Text(sSubString.charAt(nSubIndex)));
+			Lvl.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
 	}
 
 	Lvl.TextPr = new CTextPr();
