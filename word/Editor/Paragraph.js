@@ -3577,7 +3577,7 @@ Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 						NewX = -ParaPr.Ind.FirstLine;
 				}
 
-				AbstractNum.Change_LeftInd(NewX);
+				AbstractNum.ShiftLeftInd(NewX);
 
 				this.private_AddPrChange();
 				History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
@@ -7402,7 +7402,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 
 				if (undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left)
 				{
-					AbstractNum.Change_LeftInd(X + NumParaPr.Ind.Left);
+					AbstractNum.ShiftLeftInd(X + NumParaPr.Ind.Left);
 
 					History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
 					History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, undefined));
@@ -8031,6 +8031,13 @@ Paragraph.prototype.Recalc_CompiledPr = function()
 {
 	this.CompiledPr.NeedRecalc = true;
 };
+/**
+ * Сообщаем, что нужно пересчитать скомпилированные настройки параграфа
+ */
+Paragraph.prototype.RecalcCompiledPr = function()
+{
+	this.CompiledPr.NeedRecalc = true;
+};
 Paragraph.prototype.Recalc_RunsCompiledPr = function()
 {
 	var Count = this.Content.length;
@@ -8147,7 +8154,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 				var AbstractNum = Numbering.Get_AbstractNum(Pr.ParaPr.NumPr.NumId);
 
 				var _StyleId            = StyleId;
-				Lvl                     = AbstractNum.Get_LvlByStyle(_StyleId);
+				Lvl                     = AbstractNum.GetLvlByStyle(_StyleId);
 				var PassedStyleId       = {};
 				PassedStyleId[_StyleId] = true;
 				while (-1 === Lvl)
@@ -8161,7 +8168,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 						break;
 
 					PassedStyleId[_StyleId] = true;
-					Lvl                     = AbstractNum.Get_LvlByStyle(_StyleId);
+					Lvl                     = AbstractNum.GetLvlByStyle(_StyleId);
 				}
 
 				if (-1 === Lvl)

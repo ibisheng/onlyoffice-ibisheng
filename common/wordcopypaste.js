@@ -6482,7 +6482,7 @@ PasteProcessor.prototype =
 						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
 						if (numbering_numfmt_Bullet === num)
 						{
-							AbstractNum.Create_Default_Bullet();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
 							var NumTextPr = new CTextPr();
 							NumTextPr.RFonts.Set_All("Symbol", -1);
@@ -6511,41 +6511,27 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-							AbstractNum.Create_Default_Numbered();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 						}
 						
 						switch(num)
 						{
-							case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(level, LvlText, NumTextPr); break;
-							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
-							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
-							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
-							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
-							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
+							case numbering_numfmt_Bullet     : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+							case numbering_numfmt_Decimal    : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.DecimalDot_Left); break;
+							case numbering_numfmt_LowerRoman : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+							case numbering_numfmt_UpperRoman : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+							case numbering_numfmt_LowerLetter: AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+							case numbering_numfmt_UpperLetter: AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 						}
 						
 						//проставляем начальную позицию
 						if(null !== startPos)
 						{
-							AbstractNum.Set_Lvl_Start(level, startPos);
+							AbstractNum.SetLvlStart(level, startPos);
 						}
 						
 						//setListTextPr(AbstractNum);
 					}
-					/*else
-					{
-						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
-						
-						switch(num)
-						{
-							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
-							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
-							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
-							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
-							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
-						}
-					}*/
-					
 					
 					//put into map listId
 					if(!this.msoListMap[listId])
@@ -6597,7 +6583,7 @@ PasteProcessor.prototype =
 						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
 						if (numbering_numfmt_Bullet === num)
 						{
-							AbstractNum.Create_Default_Bullet();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
 							var NumTextPr = new CTextPr();
 							NumTextPr.RFonts.Set_All("Symbol", -1);
@@ -6626,19 +6612,19 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-							AbstractNum.Create_Default_Numbered();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 						}
 						
 						for (var iLvl = 0; iLvl <= 8; iLvl++)
 						{
 							switch(num)
 							{
-								case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
-								case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
-								case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
-								case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
-								case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
-								case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
+								case numbering_numfmt_Bullet     : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+								case numbering_numfmt_Decimal    : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.DecimalDot_Right); break;
+								case numbering_numfmt_LowerRoman : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+								case numbering_numfmt_UpperRoman : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+								case numbering_numfmt_LowerLetter: AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+								case numbering_numfmt_UpperLetter: AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 							}
 						}
 						

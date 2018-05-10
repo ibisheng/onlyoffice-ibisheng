@@ -4581,7 +4581,7 @@ CStyles.prototype =
 				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
 				{
 					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
-					var Lvl         = AbstractNum.Get_LvlByStyle(StyleId);
+					var Lvl         = AbstractNum.GetLvlByStyle(StyleId);
 					if (-1 != Lvl)
 						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
 					else
@@ -4745,14 +4745,14 @@ CStyles.prototype =
                 continue;
 
             var iLvl = (NumPr.Lvl ? NumPr.Lvl : 0);
-            var NumLvl = AbstractNum.Get_Lvl(iLvl);
+            var NumLvl = AbstractNum.GetLvl(iLvl);
 
             if (!NumLvl || NumLvl.PStyle)
                 continue;
 
-            var NewLvl = AbstractNum.Internal_CopyLvl(NumLvl);
+            var NewLvl = AbstractNum.GetLvl(NumLvl).Copy();
             NewLvl.PStyle = StyleId;
-            AbstractNum.Set_Lvl(iLvl, NewLvl);
+            AbstractNum.SetLvl(iLvl, NewLvl);
         }
     },
 //-----------------------------------------------------------------------------------

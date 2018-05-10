@@ -9057,7 +9057,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 			if(nLevelNum < oNewNum.Lvl.length)
 			{
 				var oOldLvl = oNewNum.Lvl[nLevelNum];
-				var oNewLvl = oNewNum.Internal_CopyLvl( oOldLvl );
+				var oNewLvl = oOldLvl.Copy();
 				//сбрасываем свойства
 				oNewLvl.ParaPr = new CParaPr();
 				oNewLvl.TextPr = new CTextPr();
@@ -9066,7 +9066,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				});
 				oNewNum.Lvl[nLevelNum] = oNewLvl;
 				this.oReadResult.aPostOpenStyleNumCallbacks.push(function(){
-					oNewNum.Set_Lvl(nLevelNum, oNewLvl);
+					oNewNum.SetLvl(nLevelNum, oNewLvl);
 				});
 			}
 			else

@@ -49,6 +49,468 @@ function CNumberingLvl()
 	this.ParaPr  = new CParaPr();
 	this.LvlText = [];
 }
+/**
+ * Выставляем значения по умолчанию для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param nType {c_oAscMultiLevelNumbering}
+ */
+CNumberingLvl.prototype.InitDefault = function(nLvl, nType)
+{
+	switch (nType)
+	{
+		case c_oAscMultiLevelNumbering.Numbered:
+			this.private_InitDefaultNumbered(nLvl);
+			break;
+		case c_oAscMultiLevelNumbering.Bullet:
+			this.private_InitDefaultBullet(nLvl);
+			break;
+		case c_oAscMultiLevelNumbering.MultiLevel1:
+			this.private_InitDefaultMultilevel1(nLvl);
+			break;
+		case c_oAscMultiLevelNumbering.MultiLevel2:
+			this.private_InitDefaultMultilevel2(nLvl);
+			break;
+		case c_oAscMultiLevelNumbering.MultiLevel3:
+			this.private_InitDefaultMultiLevel3(nLvl);
+			break;
+		default:
+			this.private_InitDefault(nLvl);
+	}
+};
+CNumberingLvl.prototype.private_InitDefault = function(nLvl)
+{
+	this.Jc      = AscCommon.align_Left;
+	this.Format  = numbering_numfmt_Bullet;
+	this.PStyle  = undefined;
+	this.Start   = 1;
+	this.Restart = -1; // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
+	this.Suff    = numbering_suff_Tab;
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
+	this.ParaPr.Ind.FirstLine = -18 * g_dKoef_pt_to_mm;
+
+	this.TextPr = new CTextPr();
+	this.LvlText = [];
+
+	if (0 == nLvl % 3)
+	{
+		this.TextPr.RFonts.Set_All("Symbol", -1);
+		this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
+	}
+	else if (1 == nLvl % 3)
+	{
+		this.TextPr.RFonts.Set_All("Courier New", -1);
+		this.LvlText.push(new CNumberingLvlTextString("o"));
+	}
+	else
+	{
+		this.TextPr.RFonts.Set_All("Wingdings", -1);
+		this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
+	}
+};
+/**
+ * Выставляем значения по умолчанию для заданного уровня для нумерованного списка
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.private_InitDefaultNumbered = function(nLvl)
+{
+	this.Start   = 1;
+	this.Restart = -1;
+	this.Suff    = numbering_suff_Tab;
+
+	var nLeft      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
+	var nFirstLine = -18 * g_dKoef_pt_to_mm;
+
+	if (0 == nLvl % 3)
+	{
+		this.Jc     = AscCommon.align_Left;
+		this.Format = numbering_numfmt_Decimal;
+	}
+	else if (1 == nLvl % 3)
+	{
+		this.Jc     = AscCommon.align_Left;
+		this.Format = numbering_numfmt_LowerLetter;
+	}
+	else
+	{
+		this.Jc     = AscCommon.align_Right;
+		this.Format = numbering_numfmt_LowerRoman;
+		nFirstLine  = -9 * g_dKoef_pt_to_mm;
+	}
+
+	this.LvlText = [];
+	this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+	this.LvlText.push(new CNumberingLvlTextString("."));
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = nLeft;
+	this.ParaPr.Ind.FirstLine = nFirstLine;
+
+	this.TextPr = new CTextPr();
+};
+/**
+ * Многоуровневый символьный список
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.private_InitDefaultBullet = function(nLvl)
+{
+	this.Start   = 1;
+	this.Restart = -1;
+	this.Suff    = numbering_suff_Tab;
+	this.Jc      = AscCommon.align_Left;
+	this.Format  = numbering_numfmt_Bullet;
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
+	this.ParaPr.Ind.FirstLine = -18 * g_dKoef_pt_to_mm;
+
+	this.TextPr  = new CTextPr();
+	this.LvlText = [];
+	if (0 == nLvl % 3)
+	{
+		this.TextPr.RFonts.Set_All("Symbol", -1);
+		this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
+	}
+	else if (1 == nLvl % 3)
+	{
+		this.TextPr.RFonts.Set_All("Courier New", -1);
+		this.LvlText.push(new CNumberingLvlTextString("o"));
+	}
+	else
+	{
+		this.TextPr.RFonts.Set_All("Wingdings", -1);
+		this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
+	}
+};
+/**
+ * Многоуровневый список 1) a) i) 1) a) i) 1) a) i)
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.private_InitDefaultMultilevel1 = function(nLvl)
+{
+	this.Start   = 1;
+	this.Restart = -1;
+	this.Suff    = numbering_suff_Tab;
+	this.Jc      = AscCommon.align_Left;
+
+	if (0 == nLvl % 3)
+	{
+		this.Format = numbering_numfmt_Decimal;
+	}
+	else if (1 == nLvl % 3)
+	{
+		this.Format = numbering_numfmt_LowerLetter;
+	}
+	else
+	{
+		this.Format = numbering_numfmt_LowerRoman;
+	}
+
+	this.LvlText = [];
+	this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+	this.LvlText.push(new CNumberingLvlTextString(")"));
+
+	var nLeft      = 18 * (nLvl + 1) * g_dKoef_pt_to_mm;
+	var nFirstLine = -18 * g_dKoef_pt_to_mm;
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = nLeft;
+	this.ParaPr.Ind.FirstLine = nFirstLine;
+
+	this.TextPr = new CTextPr();
+};
+/**
+ * Многоуровневый список 1. 1.1. 1.1.1. и т.д.
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.private_InitDefaultMultilevel2 = function(nLvl)
+{
+	this.Jc     = AscCommon.align_Left;
+	this.Format = numbering_numfmt_Decimal;
+	this.Start   = 1;
+	this.Restart = -1;
+	this.Suff    = numbering_suff_Tab;
+
+	var nLeft      = 0;
+	var nFirstLine = 0;
+
+	switch (nLvl)
+	{
+		case 0 :
+			nLeft      = 18 * g_dKoef_pt_to_mm;
+			nFirstLine = -18 * g_dKoef_pt_to_mm;
+			break;
+		case 1 :
+			nLeft      = 39.6 * g_dKoef_pt_to_mm;
+			nFirstLine = -21.6 * g_dKoef_pt_to_mm;
+			break;
+		case 2 :
+			nLeft      = 61.2 * g_dKoef_pt_to_mm;
+			nFirstLine = -25.2 * g_dKoef_pt_to_mm;
+			break;
+		case 3 :
+			nLeft      = 86.4 * g_dKoef_pt_to_mm;
+			nFirstLine = -32.4 * g_dKoef_pt_to_mm;
+			break;
+		case 4 :
+			nLeft      = 111.6 * g_dKoef_pt_to_mm;
+			nFirstLine = -39.6 * g_dKoef_pt_to_mm;
+			break;
+		case 5 :
+			nLeft      = 136.8 * g_dKoef_pt_to_mm;
+			nFirstLine = -46.8 * g_dKoef_pt_to_mm;
+			break;
+		case 6 :
+			nLeft      = 162 * g_dKoef_pt_to_mm;
+			nFirstLine = -54 * g_dKoef_pt_to_mm;
+			break;
+		case 7 :
+			nLeft      = 187.2 * g_dKoef_pt_to_mm;
+			nFirstLine = -61.2 * g_dKoef_pt_to_mm;
+			break;
+		case 8 :
+			nLeft      = 216 * g_dKoef_pt_to_mm;
+			nFirstLine = -72 * g_dKoef_pt_to_mm;
+			break;
+	}
+
+	this.LvlText = [];
+	for (var nIndex = 0; nIndex <= nLvl; ++nIndex)
+	{
+		this.LvlText.push(new CNumberingLvlTextNum(nIndex));
+		this.LvlText.push(new CNumberingLvlTextString("."));
+	}
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = nLeft;
+	this.ParaPr.Ind.FirstLine = nFirstLine;
+
+	this.TextPr = new CTextPr();
+};
+/**
+ * Многоуровневый символьный список
+ * @param nLvl {number} 0..8
+ */
+CNumberingLvl.prototype.private_InitDefaultMultiLevel3 = function(nLvl)
+{
+	this.Start   = 1;
+	this.Restart = -1;
+	this.Suff    = numbering_suff_Tab;
+	this.Format  = numbering_numfmt_Bullet;
+	this.Jc      = AscCommon.align_Left;
+	this.LvlText = [];
+
+	switch (nLvl)
+	{
+		case 0:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x0076)));
+			break;
+		case 1:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
+			break;
+		case 2:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
+			break;
+		case 3:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
+			break;
+		case 4:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
+			break;
+		case 5:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
+			break;
+		case 6:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
+			break;
+		case 7:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
+			break;
+		case 8:
+			this.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
+			break;
+	}
+
+	var nLeft      = 18 * (nLvl + 1) * g_dKoef_pt_to_mm;
+	var nFirstLine = -18 * g_dKoef_pt_to_mm;
+
+	this.ParaPr               = new CParaPr();
+	this.ParaPr.Ind.Left      = nLeft;
+	this.ParaPr.Ind.FirstLine = nFirstLine;
+
+	this.TextPr = new CTextPr();
+	if (3 === nLvl || 4 === nLvl || 7 === nLvl || 8 === nLvl)
+		this.TextPr.RFonts.Set_All("Symbol", -1);
+	else
+		this.TextPr.RFonts.Set_All("Wingdings", -1);
+};
+/**
+ * Создаем копию
+ * @returns {CNumberingLvl}
+ */
+CNumberingLvl.prototype.Copy = function()
+{
+	var oLvl = new CNumberingLvl();
+
+	oLvl.Jc      = this.Jc;
+	oLvl.Format  = this.Format;
+	oLvl.PStyle  = this.PStyle;
+	oLvl.Start   = this.Start;
+	oLvl.Restart = this.Restart;
+	oLvl.Suff    = this.Suff;
+	oLvl.LvlText = [];
+
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		oLvl.LvlText.push(this.LvlText[nIndex].Copy());
+	}
+	oLvl.TextPr = this.TextPr.Copy();
+	oLvl.ParaPr = this.ParaPr.Copy();
+
+	return oLvl;
+};
+/**
+ * Выставляем значения по заданному пресету
+ * @param nType {c_oAscNumberingLevel}
+ * @param nLvl {number} 0..8
+ * @param [sText=undefined] Используется для типа c_oAscNumberingLevel.Bullet
+ * @param [oTextPr=undefined] {CTextPr} Используется для типа c_oAscNumberingLevel.Bullet
+ */
+CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
+{
+	switch (nType)
+	{
+		case c_oAscNumberingLevel.None:
+			this.Format  = numbering_numfmt_None;
+			this.LvlText = [];
+			this.TextPr  = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.Bullet:
+			this.Format  = numbering_numfmt_Bullet;
+			this.TextPr  = oTextPr;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextString(sText));
+			break;
+		case c_oAscNumberingLevel.DecimalBracket_Right:
+			this.Jc      = AscCommon.align_Right;
+			this.Format  = numbering_numfmt_Decimal;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.DecimalBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = numbering_numfmt_Decimal;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.DecimalDot_Right:
+			this.Jc      = AscCommon.align_Right;
+			this.Format  = numbering_numfmt_Decimal;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.DecimalDot_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = numbering_numfmt_Decimal;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.UpperRomanDot_Right:
+			this.Jc      = AscCommon.align_Right;
+			this.Format  = numbering_numfmt_UpperRoman;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.UpperLetterDot_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = numbering_numfmt_UpperLetter;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.LowerLetterBracket_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = numbering_numfmt_LowerLetter;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString(")"));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.LowerLetterDot_Left:
+			this.Jc      = AscCommon.align_Left;
+			this.Format  = numbering_numfmt_LowerLetter;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+		case c_oAscNumberingLevel.LowerRomanDot_Right:
+			this.Jc      = AscCommon.align_Right;
+			this.Format  = numbering_numfmt_LowerRoman;
+			this.LvlText = [];
+			this.LvlText.push(new CNumberingLvlTextNum(nLvl));
+			this.LvlText.push(new CNumberingLvlTextString("."));
+			this.TextPr = new CTextPr();
+			break;
+	}
+};
+/**
+ * Выставляем значения по заданному формату
+ * @param nLvl {number} 0..8
+ * @param nType
+ * @param sFormatText
+ * @param nAlign
+ */
+CNumberingLvl.prototype.SetByFormat = function(nLvl, nType, sFormatText, nAlign)
+{
+	this.Jc      = nAlign;
+	this.Format  = nType;
+	this.LvlText = [];
+
+	var nLastPos = 0;
+	var nPos     = 0;
+	while (-1 !== (nPos = sFormatText.indexOf("%", nPos)) && nPos < sFormatText.length)
+	{
+		if (nPos < sFormatText.length - 1 && sFormatText.charCodeAt(nPos + 1) >= 49 && sFormatText.charCodeAt(nPos + 1) <= 49 + nLvl)
+		{
+			if (nPos > nLastPos)
+			{
+				var sSubString = sFormatText.substring(nLastPos, nPos);
+				for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
+					this.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
+			}
+
+			this.LvlText.push(new CNumberingLvlTextNum(sFormatText.charCodeAt(nPos + 1) - 49));
+			nPos += 2;
+			nLastPos = nPos;
+		}
+		else
+		{
+			nPos++;
+		}
+	}
+	nPos = sFormatText.length;
+	if (nPos > nLastPos)
+	{
+		var sSubString = sFormatText.substring(nLastPos, nPos);
+		for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
+			this.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
+	}
+
+	this.TextPr = new CTextPr();
+};
 CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 {
 	// Long               : Jc
@@ -78,7 +540,7 @@ CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 	oWriter.WriteLong(nCount);
 
 	for (var nIndex = 0; nIndex < nCount; ++nIndex)
-		this.LvlText[Index].WriteToBinary(oWriter);
+		this.LvlText[nIndex].WriteToBinary(oWriter);
 };
 CNumberingLvl.prototype.ReadFromBinary = function(oReader)
 {

@@ -4448,7 +4448,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								NumId  = this.Numbering.Create_AbstractNum();
 								NumLvl = 0;
 
-								this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+								this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							}
 
 							// Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
@@ -4579,15 +4579,15 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								NumId           = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Bullet))
 							{
 								NumId           = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else
 							{
@@ -4596,7 +4596,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var NewAbstractNum = this.Numbering.Get_AbstractNum(NumId);
 
 								NewAbstractNum.Copy(OldAbstractNum);
-								NewAbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+								NewAbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 
 							// Параграфы, которые не содержали списка у них уровень выставляем 0,
@@ -4664,7 +4664,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 									NumId  = this.Numbering.Create_AbstractNum();
 									NumLvl = 0;
 
-									this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
 							}
 
@@ -4741,14 +4741,14 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								NumId       = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
 							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Decimal))
 							{
 								NumId       = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = PrevLvl;
 							}
 							else
@@ -4764,37 +4764,37 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								case 1:
 								{
-									AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 									break;
 								}
 								case 2:
 								{
-									AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 									break;
 								}
 								case 3:
 								{
-									AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 									break;
 								}
 								case 4:
 								{
-									AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 									break;
 								}
 								case 5:
 								{
-									AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 									break;
 								}
 								case 6:
 								{
-									AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 									break;
 								}
 								case 7:
 								{
-									AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 									break;
 								}
 							}
@@ -4831,17 +4831,17 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Create_Default_Multilevel_1();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Create_Default_Multilevel_2();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Create_Default_Multilevel_3();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 								break;
 							}
 						}
@@ -4900,7 +4900,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet))
 								{
-									AbstractNum.Create_Default_Bullet();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
 							}
 							else
@@ -4931,7 +4931,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 									NumId  = this.Numbering.Create_AbstractNum();
 									NumLvl = 0;
 
-									this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
 
 								var OldNumPr = Item.Numbering_Get();
@@ -5010,14 +5010,14 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								AbstractNum.Set_Lvl_Bullet(NumPr.Lvl, LvlText, LvlTextPr);
+								AbstractNum.SetLvlByType(NumPr.Lvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else
 							{
 								var NumId       = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 
 								Item.Numbering_Add(NumId, 0);
 							}
@@ -5035,7 +5035,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal))
 								{
-									AbstractNum.Create_Default_Numbered();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
 							}
 							else
@@ -5080,7 +5080,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 										NumId  = this.Numbering.Create_AbstractNum();
 										NumLvl = 0;
 
-										this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+										this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 									}
 								}
 
@@ -5111,7 +5111,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								var NumId   = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
 
@@ -5119,37 +5119,37 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								case 1:
 								{
-									AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 									break;
 								}
 								case 2:
 								{
-									AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 									break;
 								}
 								case 3:
 								{
-									AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 									break;
 								}
 								case 4:
 								{
-									AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 									break;
 								}
 								case 5:
 								{
-									AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 									break;
 								}
 								case 6:
 								{
-									AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 									break;
 								}
 								case 7:
 								{
-									AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 									break;
 								}
 							}
@@ -5186,17 +5186,17 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Create_Default_Multilevel_1();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Create_Default_Multilevel_2();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Create_Default_Multilevel_3();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 								break;
 							}
 						}

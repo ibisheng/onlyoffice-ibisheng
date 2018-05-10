@@ -53,6 +53,33 @@ var numbering_suff_Tab     = 1;
 var numbering_suff_Space   = 2;
 var numbering_suff_Nothing = 3;
 
+/** enum {number} */
+var c_oAscMultiLevelNumbering = {
+	Numbered    : 0,
+	Bullet      : 1,
+
+	MultiLevel1 : 101,
+	MultiLevel2 : 102,
+	MultiLevel3 : 103
+};
+
+/** enum {number} */
+var c_oAscNumberingLevel = {
+	None   : 0,
+	Bullet : 1,
+
+	DecimalBracket_Right    : 101,
+	DecimalBracket_Left     : 102,
+	DecimalDot_Right        : 103,
+	DecimalDot_Left         : 104,
+	UpperRomanDot_Right     : 105,
+	UpperLetterDot_Left     : 106,
+	LowerLetterBracket_Left : 107,
+	LowerLetterDot_Left     : 108,
+	LowerRomanDot_Right     : 109
+
+};
+
 // Преобразовываем число в буквенную строку :
 //  1 -> a
 //  2 -> b

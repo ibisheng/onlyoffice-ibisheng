@@ -43,754 +43,230 @@ var History         = AscCommon.History;
 
 /**
  * Класс реализующий w:abstractNum
- * @param Type - тип нумерации
  * @constructor
  */
-function CAbstractNum(Type)
+function CAbstractNum()
 {
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-	if ( "undefined" == typeof(Type) )
-		Type = numbering_numfmt_Bullet;
-
 	this.Lock = new AscCommon.CLock();
-	if ( false === AscCommon.g_oIdCounter.m_bLoad )
+	if (false === AscCommon.g_oIdCounter.m_bLoad)
 	{
 		this.Lock.Set_Type(AscCommon.locktype_Mine, false);
 		if (typeof AscCommon.CollaborativeEditing !== "undefined")
-			AscCommon.CollaborativeEditing.Add_Unlock2( this );
+			AscCommon.CollaborativeEditing.Add_Unlock2(this);
 	}
 
 	this.NumStyleLink = undefined;
 	this.StyleLink    = undefined;
 
 	this.Lvl = [];
-	for ( var Index = 0; Index < 9; Index++ )
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
 	{
-		this.Lvl[Index] = {};
-		var Lvl = this.Lvl[Index];
-
-		Lvl.PStyle  = undefined;
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      =  36 * (Index + 1) * g_dKoef_pt_to_mm;
-		var FirstLine = -18 * g_dKoef_pt_to_mm;
-
-		Lvl.Jc     = AscCommon.align_Left;
-		Lvl.Format = numbering_numfmt_Bullet;
-
-		Lvl.LvlText = [];
-
-		Lvl.ParaPr = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		var TextPr = new CTextPr();
-		if ( 0 == Index % 3 )
-		{
-			TextPr.RFonts.Set_All( "Symbol", -1 );
-			Lvl.LvlText.push( new CNumberingLvlTextString( String.fromCharCode( 0x00B7 ) ) );
-		}
-		else if ( 1 == Index % 3 )
-		{
-			TextPr.RFonts.Set_All( "Courier New", -1 );
-			Lvl.LvlText.push( new CNumberingLvlTextString( "o" ) );
-		}
-		else
-		{
-			TextPr.RFonts.Set_All( "Wingdings", -1 );
-			Lvl.LvlText.push( new CNumberingLvlTextString( String.fromCharCode( 0x00A7 ) ) );
-		}
-
-		Lvl.TextPr = TextPr;
+		this.Lvl[nLvl] = new CNumberingLvl();
+		this.Lvl[nLvl].InitDefault(nLvl);
 	}
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-	AscCommon.g_oTableId.Add( this, this.Id );
+	AscCommon.g_oTableId.Add(this, this.Id);
 }
 
 CAbstractNum.prototype.Get_Id = function()
 {
 	return this.Id;
 };
-CAbstractNum.prototype.Copy = function(AbstractNum)
+CAbstractNum.prototype.GetId = function()
 {
-	//TODO: Сделать функциями для совместного редактирования
-	this.StyleLink    = AbstractNum.StyleLink;
-	this.NumStyleLink = AbstractNum.NumStyleLink;
+	return this.Id;
+};
+CAbstractNum.prototype.Copy = function(oAbstractNum)
+{
+	this.SetStyleLink(oAbstractNum.StyleLink);
+	this.SetNumStyleLink(oAbstractNum.NumStyleLink);
 
-	for (var Index = 0; Index < 9; Index++)
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
 	{
-		var Lvl_new = this.Internal_CopyLvl(AbstractNum.Lvl[Index]);
-		var Lvl_old = this.Lvl[Index];
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
-		this.Lvl[Index] = Lvl_new;
+		var oLvlNew = oAbstractNum.Lvl[nLvl].Copy();
+		var oLvlOld = this.Lvl[nLvl];
+
+		History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, oLvlNew, nLvl));
+		this.Lvl[nLvl] = oLvlNew;
 	}
 };
-/**
- * Сдвигаем все уровни на заданное значение
- * @param NewLeft
- */
-CAbstractNum.prototype.Change_LeftInd = function(NewLeft)
+CAbstractNum.prototype.SetStyleLink = function(sValue)
 {
-	var OldLeft = this.Lvl[0].ParaPr.Ind.Left;
-	for (var Index = 0; Index < 9; Index++)
+	if (sValue !== this.StyleLink)
 	{
-		var Lvl_new             = this.Internal_CopyLvl(this.Lvl[Index]);
-		var Lvl_old             = this.Internal_CopyLvl(this.Lvl[Index]);
-		Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
+		History.Add(new CChangesAbstractNumStyleLink(this, this.StyleLink, sValue));
+		this.StyleLink = sValue;
+	}
+};
+CAbstractNum.prototype.GetStyleLink = function()
+{
+	return this.StyleLink;
+};
+CAbstractNum.prototype.SetNumStyleLink = function(sValue)
+{
+	if (sValue !== this.NumStyleLink)
+	{
+		History.Add(new CChangesAbstractNumNumStyleLink(this, this.NumStyleLink, sValue));
+		this.NumStyleLink = sValue;
+	}
+};
+CAbstractNum.prototype.GetNumStyleLink = function()
+{
+	return this.NumStyleLink;
+};
+/**
+ * Сдвигаем все уровни на заданное значение (оно задается для нулевого уровня)
+ * @param nLeftNew {number}
+ */
+CAbstractNum.prototype.ShiftLeftInd = function(nLeftNew)
+{
+	var nLeftOld = this.Lvl[0].ParaPr.Ind.Left ? this.Lvl[0].ParaPr.Ind.Left : 0;
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvlNew = this.Lvl[nLvl];
+		var oLvlOld = this.Lvl[nLvl].Copy();
 
-		this.Internal_SetLvl(Index, Lvl_new);
-
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+		oLvlNew.ParaPr.Ind.Left = oLvlOld.ParaPr.Ind.Left ? oLvlOld.ParaPr.Ind.Left - nLeftOld + nLeftNew : nLeftNew - nLeftOld;
+		History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, oLvlNew, nLvl));
 	}
 
-	var LogicDocument = editor.WordControl.m_oLogicDocument;
-	var AllParagraphs = LogicDocument.GetAllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
+	this.private_RecalculateRelatedParagraphs(-1);
+};
+CAbstractNum.prototype.private_RecalculateRelatedParagraphs = function(nLvl)
+{
+	if (nLvl < 0 || nLvl > 8)
+		nLvl = undefined;
 
-	var Count = AllParagraphs.length;
-	for (var Index = 0; Index < Count; Index++)
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	var arrParagraphs  = oLogicDocument.GetAllParagraphsByNumbering({NumId : this.Id, Lvl : nLvl});
+
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var Para                   = AllParagraphs[Index];
-		Para.CompiledPr.NeedRecalc = true;
+		arrParagraphs[nIndex].RecalcCompiledPr();
 	}
 };
 /**
  * Получаем уровень списка по заданном стилю
- * @param StyleId
+ * @param sStyleId {string}
  * @returns {number}
  */
-CAbstractNum.prototype.Get_LvlByStyle = function(StyleId)
+CAbstractNum.prototype.GetLvlByStyle = function(sStyleId)
 {
-	for (var Index = 0; Index < 9; Index++)
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
 	{
-		var Lvl = this.Lvl[Index];
-
-		if (StyleId === Lvl.PStyle)
-			return Index;
+		if (sStyleId === this.Lvl[nLvl].PStyle)
+			return nLvl;
 	}
 
 	return -1;
 };
-CAbstractNum.prototype.Get_Lvl = function(Lvl)
+/**
+ * Получаем заданный уровень
+ * @param nLvl {number}
+ * @returns {CNumberingLvl}
+ */
+CAbstractNum.prototype.GetLvl = function(nLvl)
 {
-	if (undefined === this.Lvl[Lvl])
+	if (!this.Lvl[nLvl])
 		return this.Lvl[0];
 
-	return this.Lvl[Lvl];
+	return this.Lvl[nLvl];
 };
-CAbstractNum.prototype.Set_Lvl = function(iLvl, Lvl_new)
+/**
+ * Задаем уровень
+ * @param nLvl {number}
+ * @param oLvlNew {CNumberingLvl}
+ */
+CAbstractNum.prototype.SetLvl = function(nLvl, oLvlNew)
 {
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" != typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl_old    = this.Lvl[iLvl];
-	this.Lvl[iLvl] = Lvl_new;
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	var oLvlOld    = this.Lvl[nLvl];
+	this.Lvl[nLvl] = oLvlNew;
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, oLvlNew, nLvl));
 };
-CAbstractNum.prototype.Create_Default_Numbered = function()
+/**
+ * Создаем многоуровневый список с заданным пресетом
+ * @param nType {c_oAscMultiLevelNumbering}
+ */
+CAbstractNum.prototype.CreateDefault = function(nType)
 {
-	for (var Index = 0; Index < 9; Index++)
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
 	{
-		var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
+		var oLvlNew = new CNumberingLvl();
+		oLvlNew.InitDefault(nLvl, nType);
 
-		this.Lvl[Index] = {};
-		var Lvl         = this.Lvl[Index];
-
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
-		var FirstLine = -18 * g_dKoef_pt_to_mm;
-
-		if (0 == Index % 3)
-		{
-			Lvl.Jc     = AscCommon.align_Left;
-			Lvl.Format = numbering_numfmt_Decimal;
-		}
-		else if (1 == Index % 3)
-		{
-			Lvl.Jc     = AscCommon.align_Left;
-			Lvl.Format = numbering_numfmt_LowerLetter;
-		}
-		else
-		{
-			Lvl.Jc     = AscCommon.align_Right;
-			Lvl.Format = numbering_numfmt_LowerRoman;
-			FirstLine  = -9 * g_dKoef_pt_to_mm;
-		}
-
-		Lvl.LvlText = [];
-		Lvl.LvlText.push(new CNumberingLvlTextNum(Index));
-		Lvl.LvlText.push(new CNumberingLvlTextString("."));
-
-		Lvl.ParaPr               = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		Lvl.TextPr = new CTextPr();
-
-		var Lvl_new = this.Internal_CopyLvl(Lvl);
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+		var oLvlOld = this.Lvl[nLvl].Copy();
+		History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, oLvlNew.Copy(), nLvl));
+		this.Lvl[nLvl] = oLvlNew;
 	}
 };
-CAbstractNum.prototype.Create_Default_Multilevel_1 = function()
+/**
+ * Делаем заданный уровень заданного пресета
+ * @param nLvl {number} 0..8
+ * @param nType {c_oAscNumberingLevel}
+ * @param [sText=undefined] Используется для типа c_oAscNumberingLevel.Bullet
+ * @param [oTextPr=undefined] {CTextPr} Используется для типа c_oAscNumberingLevel.Bullet
+ */
+CAbstractNum.prototype.SetLvlByType = function(nLvl, nType, sText, oTextPr)
 {
-	for (var Index = 0; Index < 9; Index++)
-	{
-		var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
-
-		this.Lvl[Index] = {};
-		var Lvl         = this.Lvl[Index];
-
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
-		var FirstLine = -18 * g_dKoef_pt_to_mm;
-
-		Lvl.Jc = AscCommon.align_Left;
-
-		if (0 == Index % 3)
-		{
-			Lvl.Format = numbering_numfmt_Decimal;
-		}
-		else if (1 == Index % 3)
-		{
-			Lvl.Format = numbering_numfmt_LowerLetter;
-		}
-		else
-		{
-			Lvl.Format = numbering_numfmt_LowerRoman;
-		}
-
-		Lvl.LvlText = [];
-		Lvl.LvlText.push(new CNumberingLvlTextNum(Index));
-		Lvl.LvlText.push(new CNumberingLvlTextString(")"));
-
-		Lvl.ParaPr               = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		var TextPr = new CTextPr();
-		Lvl.TextPr = TextPr;
-
-		var Lvl_new = this.Internal_CopyLvl(Lvl);
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
-	}
-};
-CAbstractNum.prototype.Create_Default_Multilevel_2 = function()
-{
-	for (var Index = 0; Index < 9; Index++)
-	{
-		var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
-
-		this.Lvl[Index] = {};
-		var Lvl         = this.Lvl[Index];
-
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      = 0;
-		var FirstLine = 0;
-
-		switch (Index)
-		{
-			case 0 :
-				Left      = 18 * g_dKoef_pt_to_mm;
-				FirstLine = -18 * g_dKoef_pt_to_mm;
-				break;
-			case 1 :
-				Left      = 39.6 * g_dKoef_pt_to_mm;
-				FirstLine = -21.6 * g_dKoef_pt_to_mm;
-				break;
-			case 2 :
-				Left      = 61.2 * g_dKoef_pt_to_mm;
-				FirstLine = -25.2 * g_dKoef_pt_to_mm;
-				break;
-			case 3 :
-				Left      = 86.4 * g_dKoef_pt_to_mm;
-				FirstLine = -32.4 * g_dKoef_pt_to_mm;
-				break;
-			case 4 :
-				Left      = 111.6 * g_dKoef_pt_to_mm;
-				FirstLine = -39.6 * g_dKoef_pt_to_mm;
-				break;
-			case 5 :
-				Left      = 136.8 * g_dKoef_pt_to_mm;
-				FirstLine = -46.8 * g_dKoef_pt_to_mm;
-				break;
-			case 6 :
-				Left      = 162 * g_dKoef_pt_to_mm;
-				FirstLine = -54 * g_dKoef_pt_to_mm;
-				break;
-			case 7 :
-				Left      = 187.2 * g_dKoef_pt_to_mm;
-				FirstLine = -61.2 * g_dKoef_pt_to_mm;
-				break;
-			case 8 :
-				Left      = 216 * g_dKoef_pt_to_mm;
-				FirstLine = -72 * g_dKoef_pt_to_mm;
-				break;
-		}
-
-		Lvl.Jc     = AscCommon.align_Left;
-		Lvl.Format = numbering_numfmt_Decimal;
-
-		Lvl.LvlText = [];
-		for (var Index2 = 0; Index2 <= Index; Index2++)
-		{
-			Lvl.LvlText.push(new CNumberingLvlTextNum(Index2));
-			Lvl.LvlText.push(new CNumberingLvlTextString("."));
-		}
-
-		Lvl.ParaPr               = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		var TextPr = new CTextPr();
-		Lvl.TextPr = TextPr;
-
-		var Lvl_new = this.Internal_CopyLvl(Lvl);
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
-	}
-};
-CAbstractNum.prototype.Create_Default_Multilevel_3 = function()
-{
-	for (var Index = 0; Index < 9; Index++)
-	{
-		var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
-
-		this.Lvl[Index] = {};
-		var Lvl         = this.Lvl[Index];
-
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
-		var FirstLine = -18 * g_dKoef_pt_to_mm;
-		Lvl.Format    = numbering_numfmt_Bullet;
-		Lvl.Jc        = AscCommon.align_Left;
-
-		Lvl.LvlText = [];
-		switch (Index)
-		{
-			case 0:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x0076)));
-				break;
-			case 1:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
-				break;
-			case 2:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
-				break;
-			case 3:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
-				break;
-			case 4:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
-				break;
-			case 5:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00D8)));
-				break;
-			case 6:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
-				break;
-			case 7:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
-				break;
-			case 8:
-				Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A8)));
-				break;
-		}
-
-		Lvl.ParaPr               = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		var TextPr = new CTextPr();
-		if (3 === Index || 4 === Index || 7 === Index || 8 === Index)
-			TextPr.RFonts.Set_All("Symbol", -1);
-		else
-			TextPr.RFonts.Set_All("Wingdings", -1);
-
-		Lvl.TextPr = TextPr;
-
-		var Lvl_new = this.Internal_CopyLvl(Lvl);
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
-	}
-};
-CAbstractNum.prototype.Create_Default_Bullet = function()
-{
-	for (var Index = 0; Index < 9; Index++)
-	{
-		var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
-
-		this.Lvl[Index] = {};
-		var Lvl         = this.Lvl[Index];
-
-		Lvl.Start   = 1;
-		Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-		Lvl.Suff    = numbering_suff_Tab;
-
-		var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
-		var FirstLine = -18 * g_dKoef_pt_to_mm;
-
-		Lvl.Jc     = AscCommon.align_Left;
-		Lvl.Format = numbering_numfmt_Bullet;
-
-		Lvl.LvlText = [];
-
-		Lvl.ParaPr               = new CParaPr();
-		Lvl.ParaPr.Ind.Left      = Left;
-		Lvl.ParaPr.Ind.FirstLine = FirstLine;
-
-		var TextPr = new CTextPr();
-		if (0 == Index % 3)
-		{
-			TextPr.RFonts.Set_All("Symbol", -1);
-			Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00B7)));
-		}
-		else if (1 == Index % 3)
-		{
-			TextPr.RFonts.Set_All("Courier New", -1);
-			Lvl.LvlText.push(new CNumberingLvlTextString("o"));
-		}
-		else
-		{
-			TextPr.RFonts.Set_All("Wingdings", -1);
-			Lvl.LvlText.push(new CNumberingLvlTextString(String.fromCharCode(0x00A7)));
-		}
-
-		Lvl.TextPr = TextPr;
-
-		var Lvl_new = this.Internal_CopyLvl(Lvl);
-		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
-	}
-};
-CAbstractNum.prototype.Set_Lvl_None = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl     = this.Lvl[iLvl];
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Format  = numbering_numfmt_None;
-	Lvl.LvlText = [];
-	Lvl.TextPr  = new CTextPr();
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-CAbstractNum.prototype.Set_Lvl_Bullet = function(iLvl, LvlText, TextPr)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Format  = numbering_numfmt_Bullet;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextString(LvlText));
-	Lvl.TextPr = TextPr;
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	var oLvlOld = this.Lvl[nLvl].Copy();
+	this.Lvl[nLvl].SetByType(nType, nLvl, sText, oTextPr);
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
 /**
- * 1) right
- * @param iLvl
+ * Заполняем уровень по заданному формату
+ * @param nLvl {number} 0..8
+ * @param nType
+ * @param sFormatText
+ * @param nAlign
  */
-CAbstractNum.prototype.Set_Lvl_Numbered_1 = function(iLvl)
+CAbstractNum.prototype.SetLvlByFormat = function(nLvl, nType, sFormatText, nAlign)
 {
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl = this.Lvl[iLvl];
+	var oLvlOld = this.Lvl[nLvl].Copy();
+	this.Lvl[nLvl].SetByFormat(nLvl, nType, sFormatText, nAlign);
 
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Right;
-	Lvl.Format  = numbering_numfmt_Decimal;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
-/**
- * 1. right
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_2 = function(iLvl)
+CAbstractNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 {
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl = this.Lvl[iLvl];
+	var oLvlOld = this.Lvl[nLvl].Copy();
 
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Right;
-	Lvl.Format  = numbering_numfmt_Decimal;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	this.Lvl[nLvl].Restart = (isRestart ? -1 : 0);
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
-/**
- * 1. left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_3 = function(iLvl)
+CAbstractNum.prototype.SetLvlStart = function(nLvl, nStart)
 {
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl = this.Lvl[iLvl];
+	var oLvlOld = this.Lvl[nLvl].Copy();
 
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Left;
-	Lvl.Format  = numbering_numfmt_Decimal;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	this.Lvl[nLvl].Start = nStart;
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
-/**
- * 1) left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_4 = function(iLvl)
+CAbstractNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 {
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
 		return;
 
-	var Lvl = this.Lvl[iLvl];
+	var oLvlOld = this.Lvl[nLvl].Copy();
 
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Left;
-	Lvl.Format  = numbering_numfmt_Decimal;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-/**
- * I. right
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_5 = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Right;
-	Lvl.Format  = numbering_numfmt_UpperRoman;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-/**
- * A. left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_6 = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Left;
-	Lvl.Format  = numbering_numfmt_UpperLetter;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-/**
- * a) left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_7 = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Left;
-	Lvl.Format  = numbering_numfmt_LowerLetter;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString(")"));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-/**
- * a. left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_8 = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Left;
-	Lvl.Format  = numbering_numfmt_LowerLetter;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-/**
- * i. left
- * @param iLvl
- */
-CAbstractNum.prototype.Set_Lvl_Numbered_9 = function(iLvl)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl = this.Lvl[iLvl];
-
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = AscCommon.align_Right;
-	Lvl.Format  = numbering_numfmt_LowerRoman;
-	Lvl.LvlText = [];
-	Lvl.LvlText.push(new CNumberingLvlTextNum(iLvl));
-	Lvl.LvlText.push(new CNumberingLvlTextString("."));
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-CAbstractNum.prototype.Set_Lvl_ByFormat = function(iLvl, nType, sFormatText, nAlign)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl     = this.Lvl[iLvl];
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-
-	Lvl.Jc      = nAlign;
-	Lvl.Format  = nType;
-	Lvl.LvlText = [];
-
-	var nLastPos = 0;
-	var nPos     = 0;
-	while (-1 !== (nPos = sFormatText.indexOf("%", nPos)) && nPos < sFormatText.length)
-	{
-		if (nPos < sFormatText.length - 1 && sFormatText.charCodeAt(nPos + 1) >= 49 && sFormatText.charCodeAt(nPos + 1) <= 49 + iLvl)
-		{
-			if (nPos > nLastPos)
-			{
-				var sSubString = sFormatText.substring(nLastPos, nPos);
-				for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
-					Lvl.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
-			}
-
-			Lvl.LvlText.push(new CNumberingLvlTextNum(sFormatText.charCodeAt(nPos + 1) - 49));
-			nPos += 2;
-			nLastPos = nPos;
-		}
-		else
-		{
-			nPos++;
-		}
-	}
-	nPos = sFormatText.length;
-	if (nPos > nLastPos)
-	{
-		var sSubString = sFormatText.substring(nLastPos, nPos);
-		for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
-			Lvl.LvlText.push(new CNumberingLvlTextString(sSubString.charAt(nSubIndex)));
-	}
-
-	Lvl.TextPr = new CTextPr();
-
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-CAbstractNum.prototype.Set_Lvl_Restart = function(iLvl, isRestart)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl     = this.Lvl[iLvl];
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-	Lvl.Restart = (isRestart ? -1 : 0);
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-CAbstractNum.prototype.Set_Lvl_Start = function(iLvl, nStart)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl     = this.Lvl[iLvl];
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-	Lvl.Start   = nStart;
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
-};
-CAbstractNum.prototype.Set_Lvl_Suff = function(iLvl, nSuff)
-{
-	if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-		return;
-
-	var Lvl     = this.Lvl[iLvl];
-	var Lvl_old = this.Internal_CopyLvl(Lvl);
-	Lvl.Suff    = nSuff;
-	var Lvl_new = this.Internal_CopyLvl(Lvl);
-	History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	this.Lvl[nLvl].Suff = nSuff;
+	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
 /**
  *
@@ -802,7 +278,7 @@ CAbstractNum.prototype.Set_Lvl_Suff = function(iLvl, nSuff)
  * @param NumTextPr - рассчитанные настройки для символов нумерации (уже с учетом настроек текущего уровня)
  * @param Theme
  */
-CAbstractNum.prototype.Draw = function(X,Y, Context, Lvl, NumInfo, NumTextPr, Theme)
+CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, Theme)
 {
 	var Text = this.Lvl[Lvl].LvlText;
 
@@ -1320,118 +796,25 @@ CAbstractNum.prototype.CollectDocumentStatistics = function(Lvl, Stats)
 /**
  * Применяем новые тектовые настройки к данной нумерации на заданном уровне
  */
-CAbstractNum.prototype.Apply_TextPr = function(Lvl, TextPr)
+CAbstractNum.prototype.Apply_TextPr = function(nLvl, oTextPr)
 {
-	var CurTextPr = this.Lvl[Lvl].TextPr;
-
-	var TextPr_old = CurTextPr.Copy();
-	CurTextPr.Merge(TextPr);
-	var TextPr_new = CurTextPr.Copy();
-
-	History.Add(new CChangesAbstractNumTextPrChange(this, TextPr_old, TextPr_new, Lvl));
+	var oTextPrOld = CurTextPr.Copy();
+	this.Lvl[nLvl].TextPr.Merge(oTextPr);
+	History.Add(new CChangesAbstractNumTextPrChange(this, oTextPrOld, this.Lvl[nLvl].TextPr.Copy(), nLvl));
 };
-CAbstractNum.prototype.Set_TextPr = function(Lvl, TextPr)
+CAbstractNum.prototype.Set_TextPr = function(nLvl, oTextPr)
 {
-	History.Add(new CChangesAbstractNumTextPrChange(this, this.Lvl[Lvl].TextPr, TextPr, Lvl));
-	this.Lvl[Lvl].TextPr = TextPr;
+	History.Add(new CChangesAbstractNumTextPrChange(this, this.Lvl[nLvl].TextPr, oTextPr.Copy(), nLvl));
+	this.Lvl[nLvl].TextPr = oTextPr;
 };
-CAbstractNum.prototype.Set_ParaPr = function(Lvl, ParaPr)
+CAbstractNum.prototype.Set_ParaPr = function(nLvl, oParaPr)
 {
-	History.Add(new CChangesAbstractNumParaPrChange(this, this.Lvl[Lvl].ParaPr, ParaPr, Lvl));
-	this.Lvl[Lvl].ParaPr = ParaPr;
+	History.Add(new CChangesAbstractNumParaPrChange(this, this.Lvl[nLvl].ParaPr, oParaPr.Copy(), nLvl));
+	this.Lvl[nLvl].ParaPr = oParaPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
-CAbstractNum.prototype.Internal_CopyLvl = function(Lvl)
-{
-	var Lvl_new = {};
-
-	Lvl_new.Start   = Lvl.Start;
-	Lvl_new.Restart = Lvl.Restart;
-	Lvl_new.Suff    = Lvl.Suff;
-
-	Lvl_new.Jc     = Lvl.Jc;
-	Lvl_new.Format = Lvl.Format;
-
-	Lvl_new.PStyle = Lvl.PStyle;
-
-	Lvl_new.LvlText = [];
-	for (var Index = 0; Index < Lvl.LvlText.length; Index++)
-	{
-		var Item = Lvl.LvlText[Index];
-		Lvl_new.LvlText.push(Item.Copy());
-	}
-	Lvl_new.TextPr = Lvl.TextPr.Copy();
-	Lvl_new.ParaPr = Lvl.ParaPr.Copy();
-
-	return Lvl_new;
-};
-CAbstractNum.prototype.Internal_SetLvl = function(iLvl, Lvl_new)
-{
-	var Lvl = this.Lvl[iLvl];
-
-	Lvl.Jc      = Lvl_new.Jc;
-	Lvl.Format  = Lvl_new.Format;
-	Lvl.LvlText = Lvl_new.LvlText;
-	Lvl.TextPr  = Lvl_new.TextPr;
-	Lvl.ParaPr  = Lvl_new.ParaPr;
-	Lvl.PStyle  = Lvl_new.PStyle;
-};
-CAbstractNum.prototype.Write_Lvl_ToBinary = function(Lvl, Writer)
-{
-	// Long               : Jc
-	// Long               : Format
-	// String             : PStyle
-	// Variable           : TextPr
-	// Variable           : ParaPr
-	// Long               : количество элементов в LvlText
-	// Array of variables : массив LvlText
-
-	Writer.WriteLong(Lvl.Jc);
-	Writer.WriteLong(Lvl.Format);
-
-	Writer.WriteString2(Lvl.PStyle ? Lvl.PStyle : "");
-
-	Lvl.TextPr.Write_ToBinary(Writer);
-	Lvl.ParaPr.Write_ToBinary(Writer);
-
-	var Count = Lvl.LvlText.length;
-	Writer.WriteLong(Count);
-
-	for (var Index = 0; Index < Count; Index++)
-		Lvl.LvlText[Index].Write_ToBinary(Writer);
-};
-CAbstractNum.prototype.Read_Lvl_FromBinary = function(Lvl, Reader)
-{
-	// Long               : Jc
-	// Long               : Format
-	// String             : PStyle
-	// Variable           : TextPr
-	// Variable           : ParaPr
-	// Long               : количество элементов в LvlText
-	// Array of variables : массив LvlText
-
-	Lvl.Jc     = Reader.GetLong();
-	Lvl.Format = Reader.GetLong();
-
-	Lvl.PStyle = Reader.GetString2();
-	if ("" === Lvl.PStyle)
-		Lvl.PStyle = undefined;
-
-	Lvl.TextPr = new CTextPr();
-	Lvl.ParaPr = new CParaPr();
-	Lvl.TextPr.Read_FromBinary(Reader);
-	Lvl.ParaPr.Read_FromBinary(Reader);
-
-	var Count   = Reader.GetLong();
-	Lvl.LvlText = [];
-	for (var Index = 0; Index < Count; Index++)
-	{
-		var Element = LvlText_Read_FromBinary(Reader);
-		Lvl.LvlText.push(Element);
-	}
-};
 CAbstractNum.prototype.Refresh_RecalcData = function(Data)
 {
 	var oHistory = History;
@@ -1462,21 +845,41 @@ CAbstractNum.prototype.Write_ToBinary2 = function(Writer)
 	Writer.WriteLong(AscDFH.historyitem_type_AbstractNum);
 
 	// String          : Id
+	// String          : StyleLink
+	// String          : NumStyleLink
 	// Variable[9 Lvl] : 9 уровней
 
 	Writer.WriteString2(this.Id);
-	for (var Index = 0; Index < 9; Index++)
-		this.Write_Lvl_ToBinary(this.Lvl[Index], Writer);
+
+	Writer.WriteString2(this.StyleLink ? this.StyleLink : "");
+	Writer.WriteString2(this.NumStyleLink ? this.NumStyleLink : "");
+
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+		this.Lvl[nLvl].WriteToBinary(Writer);
 };
 CAbstractNum.prototype.Read_FromBinary2 = function(Reader)
 {
 	// String          : Id
+	// String          : StyleLink
+	// String          : NumStyleLink
 	// Variable[9 Lvl] : 9 уровней
 
-	this.Id = Reader.GetString2();
+	this.Id           = Reader.GetString2();
 
-	for (var Index = 0; Index < 9; Index++)
-		this.Read_Lvl_FromBinary(this.Lvl[Index], Reader);
+	this.StyleLink    = Reader.GetString2();
+	this.NumStyleLink = Reader.GetString2();
+
+	if ("" === this.StyleLink)
+		this.StyleLink = undefined;
+
+	if ("" === this.NumStyleLink)
+		this.NumStyleLink = undefined;
+
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		this.Lvl[nLvl] = new CNumberingLvl();
+		this.Lvl[nLvl].ReadFromBinary(Reader);
+	}
 
 	// Добавим данный список в нумерацию
 	var Numbering                  = editor.WordControl.m_oLogicDocument.Get_Numbering();
@@ -1491,24 +894,12 @@ CAbstractNum.prototype.Process_EndLoad = function(Data)
 		this.Recalc_CompiledPr(iLvl);
 	}
 };
-CAbstractNum.prototype.Recalc_CompiledPr = function(iLvl)
+CAbstractNum.prototype.Recalc_CompiledPr = function(nLvl)
 {
 	// Ищем все параграфы, который используют данную нумерацию и проставляем у них, то что их стиль
 	// нужно перекомпилировать.
 
-	var NumPr   = new CNumPr();
-	NumPr.NumId = this.Id;
-	NumPr.Lvl   = iLvl;
-
-	var LogicDocument = editor.WordControl.m_oLogicDocument;
-	var AllParagraphs = LogicDocument.GetAllParagraphsByNumbering(NumPr);
-
-	var Count = AllParagraphs.length;
-	for (var Index = 0; Index < Count; Index++)
-	{
-		var Para = AllParagraphs[Index];
-		Para.Recalc_CompiledPr();
-	}
+	this.private_RecalculateRelatedParagraphs(nLvl);
 };
 CAbstractNum.prototype.isEqual = function(abstractNum)
 {
@@ -1547,9 +938,9 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 	var Text = this.Lvl[Lvl].LvlText;
 
 	var sResult = "";
-	for ( var Index = 0; Index < Text.length; Index++ )
+	for (var Index = 0; Index < Text.length; Index++)
 	{
-		switch( Text[Index].Type )
+		switch (Text[Index].Type)
 		{
 			case numbering_lvltext_Text:
 			{
@@ -1559,7 +950,7 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 			case numbering_lvltext_Num:
 			{
 				var CurLvl = Text[Index].Value;
-				switch( this.Lvl[CurLvl].Format )
+				switch (this.Lvl[CurLvl].Format)
 				{
 					case numbering_numfmt_Bullet:
 					{

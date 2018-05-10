@@ -40,6 +40,8 @@
 AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_LvlChange]    = CChangesAbstractNumLvlChange;
 AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_TextPrChange] = CChangesAbstractNumTextPrChange;
 AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_ParaPrChange] = CChangesAbstractNumParaPrChange;
+AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_StyleLink]    = CChangesAbstractNumStyleLink;
+AscDFH.changesFactory[AscDFH.historyitem_AbstractNum_NumStyleLink] = CChangesAbstractNumNumStyleLink;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Карта зависимости изменений
@@ -56,6 +58,12 @@ AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_TextPrChange] = [
 AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_ParaPrChange] = [
 	AscDFH.historyitem_AbstractNum_LvlChange,
 	AscDFH.historyitem_AbstractNum_ParaPrChange
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_StyleLink] = [
+	AscDFH.historyitem_AbstractNum_StyleLink
+];
+AscDFH.changesRelationMap[AscDFH.historyitem_AbstractNum_NumStyleLink] = [
+	AscDFH.historyitem_AbstractNum_NumStyleLink
 ];
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -75,41 +83,37 @@ CChangesAbstractNumLvlChange.prototype.constructor = CChangesAbstractNumLvlChang
 CChangesAbstractNumLvlChange.prototype.Type = AscDFH.historyitem_AbstractNum_LvlChange;
 CChangesAbstractNumLvlChange.prototype.WriteToBinary = function(Writer)
 {
-	var oAbstractNum = this.Class;
-
-	// Long : Lvl index
-	// Variable : New Lvl
-	// Variable : Old Lvl
+	// Long          : Lvl index
+	// CNumberingLvl : New Lvl
+	// CNumberingLvl : Old Lvl
 
 	Writer.WriteLong(this.Index);
-	oAbstractNum.Write_Lvl_ToBinary(this.New, Writer);
-	oAbstractNum.Write_Lvl_ToBinary(this.Old, Writer);
+	this.New.WriteToBinary(Writer);
+	this.Old.WriteToBinary(Writer);
 };
 CChangesAbstractNumLvlChange.prototype.ReadFromBinary = function(Reader)
 {
-	var oAbstractNum = this.Class;
+	// Long          : Lvl index
+	// CNumberingLvl : New Lvl
+	// CNumberingLvl : Old Lvl
 
-	// Long : Lvl index
-	// Variable : New Lvl
-	// Variable : Old Lvl
-
-	this.New = {};
-	this.Old = {};
+	this.New = new CNumberingLvl();
+	this.Old = new CNumberingLvl();
 
 	this.Index = Reader.GetLong();
-	oAbstractNum.Read_Lvl_FromBinary(this.New, Reader);
-	oAbstractNum.Read_Lvl_FromBinary(this.Old, Reader);
+	this.New.ReadFromBinary(Reader);
+	this.Old.ReadFromBinary(Reader);
 };
 CChangesAbstractNumLvlChange.prototype.private_SetValue = function(Value)
 {
 	var oAbstractNum = this.Class;
-	oAbstractNum.Internal_SetLvl(this.Index, Value);
+	oAbstractNum.Lvl[this.Index] = Value;
 	oAbstractNum.Recalc_CompiledPr(this.Index);
 };
 CChangesAbstractNumLvlChange.prototype.Load = function(Color)
 {
 	var oAbstractNum = this.Class;
-	oAbstractNum.Internal_SetLvl(this.Index, this.New);
+	oAbstractNum.Lvl[this.Index] = this.New;
 
 	// Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
 	AscCommon.CollaborativeEditing.Add_EndActions(this.Class, {iLvl : this.Index});
@@ -264,4 +268,35 @@ CChangesAbstractNumParaPrChange.prototype.Merge = function(oChange)
 		return false;
 
 	return true;
+};
+
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesAbstractNumStyleLink(Class, Old, New)
+{
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
+}
+CChangesAbstractNumStyleLink.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesAbstractNumStyleLink.prototype.constructor = CChangesAbstractNumStyleLink;
+CChangesAbstractNumStyleLink.prototype.Type = AscDFH.historyitem_AbstractNum_StyleLink;
+CChangesAbstractNumStyleLink.prototype.private_SetValue = function(Value)
+{
+	this.Class.StyleLink = Value;
+};
+/**
+ * @constructor
+ * @extends {AscDFH.CChangesBaseStringProperty}
+ */
+function CChangesAbstractNumNumStyleLink(Class, Old, New)
+{
+	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
+}
+CChangesAbstractNumNumStyleLink.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesAbstractNumNumStyleLink.prototype.constructor = CChangesAbstractNumNumStyleLink;
+CChangesAbstractNumNumStyleLink.prototype.Type = AscDFH.historyitem_AbstractNum_NumStyleLink;
+CChangesAbstractNumNumStyleLink.prototype.private_SetValue = function(Value)
+{
+	this.Class.NumStyleLink = Value;
 };
