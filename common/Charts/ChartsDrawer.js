@@ -766,16 +766,17 @@ CChartsDrawer.prototype =
 		}
 
 		//исключение - когда среди диаграмм есть груговая
-		var pie = null;
+		var pieChart = null;
 		if(!this._isSwitchCurrent3DChart(chartSpace)) {
 			var charts = plotArea.charts;
 			for(var i = 0; i < charts.length; i++) {
-				if(c_oChartTypes.Pie === this._getChartType(charts[i])) {
-					pie = charts[i];
+				var chartType = this._getChartType(charts[i]);
+				if(c_oChartTypes.Pie === chartType || c_oChartTypes.DoughnutChart === chartType) {
+					pieChart = charts[i];
 					break;
 				}
 			}
-			if(null !== pie) {
+			if(null !== pieChart) {
 				//вычисляем истинную(первоначальную) ширину и высоту диаграммы
 				left = this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 				bottom = this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
@@ -794,7 +795,7 @@ CChartsDrawer.prototype =
 			}
 		}
 
-		if(null === pie) {
+		if(null === pieChart) {
 			left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 			bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
 			top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
@@ -806,18 +807,21 @@ CChartsDrawer.prototype =
 		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-		if (plotArea.layout) {
-			var oLayout = plotArea.layout;
-			pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
-			pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
+		//TODO пересмотреть!!!
+		if(pieChart && plotArea.charts.length === 1) {
+			if (plotArea.layout) {
+				var oLayout = plotArea.layout;
+				pxLeft = chartSpace.calculatePosByLayout(pxLeft / pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft) / pxToMM, chartSpace.extX) * pxToMM;
+				pxTop = chartSpace.calculatePosByLayout(pxTop / pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop) / pxToMM, chartSpace.extY) * pxToMM;
 
-			var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode);
-			if (fWidthPlotArea > 0) {
-				pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
-			}
-			var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode);
-			if (fHeightPlotArea > 0) {
-				pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
+				var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft / pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode);
+				if (fWidthPlotArea > 0) {
+					pxRight = chartSpace.extX * pxToMM - (pxLeft + fWidthPlotArea * pxToMM);
+				}
+				var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop / pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode);
+				if (fHeightPlotArea > 0) {
+					pxBottom = chartSpace.extY * pxToMM - (pxTop + fHeightPlotArea * pxToMM);
+				}
 			}
 		}
 
