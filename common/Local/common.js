@@ -585,6 +585,35 @@ window["asc_IsVisibleSign"] = function(guid)
 	return isVisible;
 };
 
+window["asc_IsNeedBuildCryptedFile"] = function()
+{
+	if (!window["AscDesktopEditor"])
+		return false;
+
+	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	var _returnValue = false;
+
+    var isOne = true;
+    if (_api.CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi._participants)
+    	isOne = (1 == _api.CoAuthoringApi._CoAuthoringApi._participants.length);
+
+    if (!isOne)
+	{
+		_returnValue = false;
+    }
+    else if (null != History.SavedIndex && -1 != History.SavedIndex)
+	{
+		_returnValue = true;
+    }
+    else if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
+	{
+        _returnValue = true;
+	}
+
+	window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
+	return _returnValue;
+};
+
 window["asc_LocalRequestSign"] = function(guid, width, height, isView)
 {
 	if (isView !== true && width === undefined)
