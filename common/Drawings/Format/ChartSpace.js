@@ -3915,27 +3915,6 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
-                    if(!bCheckFormatCode &&
-                        !((charts[i].getObjectType() === AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED)
-                        || (charts[i].getObjectType() !== AscDFH.historyitem_type_BarChart && charts[i].grouping === AscFormat.GROUPING_PERCENT_STACKED))){
-                        bCheckFormatCode = true;
-                        var aAxId = charts[i].axId;
-                        if(aAxId){
-                            for(var s = 0; s < aAxId.length; ++s){
-                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
-                                    if(aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
-                                        var aPoints = AscFormat.getPtsFromSeries(ser);
-                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
-                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
-                                        }
-                                        else{
-                                            aAxId[s].numFmt.setFormatCode("General");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
 
             }
@@ -3956,30 +3935,13 @@ CChartSpace.prototype.recalculateReferences = function()
                 else
                 {
                     bHaveNoHidden = true;
-
-                    if(!bCheckFormatCode){
-                        bCheckFormatCode = true;
-                        var aAxId = charts[i].axId;
-                        if(aAxId){
-                            for(var s = 0; s < aAxId.length; ++s){
-                                if(aAxId[s].getObjectType() === AscDFH.historyitem_type_ValAx){
-                                    if((aAxId[s].axPos === AscFormat.AX_POS_L || aAxId[s].axPos === AscFormat.AX_POS_R) && aAxId[s].numFmt && aAxId[s].numFmt.sourceLinked){
-                                        var aPoints = AscFormat.getPtsFromSeries(ser);
-                                        if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
-                                            aAxId[s].numFmt.setFormatCode(aPoints[0].formatCode);
-                                        }
-                                        else{
-                                            aAxId[s].numFmt.setFormatCode("General");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                 }
             }
         }
+
+
+
+
         // if(bHaveHidden && bHaveNoHidden)
         // {
         //     for(j = 0; j < series.length; ++j)
@@ -3987,6 +3949,32 @@ CChartSpace.prototype.recalculateReferences = function()
         //         series[j].isHidden = false;
         //     }
         // }
+    }
+
+    var aAxis = this.chart.plotArea.axId;
+    for(i = 0; i < aAxis.length; ++i){
+        var oAxis = aAxis[i];
+        if(oAxis.getObjectType() === AscDFH.historyitem_type_ValAx){
+            var aCharts = this.chart.plotArea.getChartsForAxis(oAxis);
+            for(j = 0; j < aCharts.length; ++j){
+                var oChart = aCharts[j];
+                if((oChart.getObjectType() === AscDFH.historyitem_type_BarChart && oChart.grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED)
+                    || (oChart.getObjectType() !== AscDFH.historyitem_type_BarChart && oChart.grouping === AscFormat.GROUPING_PERCENT_STACKED)){
+                    break;
+                }
+            }
+            if(j === aCharts.length){
+                if(oAxis.numFmt && oAxis.numFmt.sourceLinked){
+                    var aPoints = AscFormat.getPtsFromSeries(ser);
+                    if(aPoints[0] && typeof aPoints[0].formatCode === "string" && aPoints[0].formatCode.length > 0){
+                        oAxis.numFmt.setFormatCode(aPoints[0].formatCode);
+                    }
+                    else{
+                        oAxis.numFmt.setFormatCode("General");
+                    }
+                }
+            }
+        }
     }
 };
 
