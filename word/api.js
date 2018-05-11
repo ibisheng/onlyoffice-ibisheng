@@ -3954,6 +3954,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 	{
+		if (!this.WordControl)
+			return;
+
 		this.WordControl.DrawingFreeze = bIsFreeze;
 
 		var _elem1 = document.getElementById("id_main");
