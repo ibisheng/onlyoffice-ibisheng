@@ -3595,3 +3595,55 @@
 
 	window["AscCommon"].translateManager = new CTranslateManager();
 })(window);
+
+// ONLYPASS
+window["asc_initAdvancedOptions"] = function(_code, _file_hash)
+{
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
+    {
+        window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
+        return;
+    }
+
+    _editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
+};
+window["asc_openAsLocalCallback"] = function(_url, _data, _len)
+{
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    if (_data == "")
+    {
+        this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
+        return;
+    }
+
+    var _binary = getBinaryArray(_data, _len);
+
+    if ("DOCY" == AscCommon.c_oSerFormat.Signature)
+	{
+        var _sign_len = AscCommon.c_oSerFormat.Signature.length;
+        var _signature = "";
+        if (_binary.length >= _sign_len)
+        {
+            for (var i = 0; i < _sign_len; i++)
+                _signature += String.fromCharCode(_binary[i]);
+        }
+
+        if (AscCommon.c_oSerFormat.Signature !== _signature)
+            _editor.OpenDocument(_url, _binary);
+        else
+            _editor.OpenDocument2(_url, _binary);
+	}
+	else if ("PPTY" == AscCommon.c_oSerFormat.Signature)
+	{
+        this.OpenDocument2(_url, _binary);
+	}
+	else
+	{
+        _editor.openDocument(_binary);
+	}
+
+    _editor.sendEvent("asc_onDocumentPassword", ("" != _editor.currentPassword) ? true : false);
+};

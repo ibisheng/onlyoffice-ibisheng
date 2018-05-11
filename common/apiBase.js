@@ -1595,8 +1595,44 @@
 
     baseEditorsApi.prototype["pluginMethod_OnEncryption"] = function(obj)
     {
+        var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
         switch (obj.type)
         {
+            case "generatePassword":
+            {
+                if ("" == obj["password"])
+                {
+                    AscCommon.History.UserSavedIndex = _editor.LastUserSavedIndex;
+
+                    if (window.editor)
+                        _editor.UpdateInterfaceState();
+                    else
+                        _editor.onUpdateDocumentModified(AscCommon.History.Have_Changes());
+
+                    _editor.LastUserSavedIndex = undefined;
+
+                    _editor.sendEvent("asc_onError", "There is no connection with the blockchain", c_oAscError.Level.Critical);
+                    return;
+                }
+
+                window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
+                break;
+            }
+            case "getPasswordByFile":
+            {
+                if ("" != obj["password"])
+                {
+                    var _param = ("<m_sPassword>" + AscCommon.CopyPasteCorrectString(obj["password"]) + "</m_sPassword>");
+                    _editor.currentPassword = obj["password"];
+
+                    window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
+                }
+                else
+                {
+                    this._onNeedParams(undefined, true);
+                }
+                break;
+            }
             case "encryptData":
             case "decryptData":
             {

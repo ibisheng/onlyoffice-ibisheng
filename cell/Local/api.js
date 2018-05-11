@@ -322,8 +322,6 @@ var c_oAscError = Asc.c_oAscError;
 			AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 		}
 
-		asc["editor"]._OfflineAppDocumentEndLoad(_data, _len);
-
-		asc["editor"].sendEvent("asc_onDocumentPassword", ("" != asc["editor"].currentPassword) ? true : false);
+        window["asc_openAsLocalCallback"](_url, _data, _len);
 	};
 })(jQuery, window);

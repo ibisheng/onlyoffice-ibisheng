@@ -436,19 +436,6 @@ AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	}
 }
 
-window["asc_initAdvancedOptions"] = function(_code, _file_hash)
-{
-    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-
-    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
-	{
-		window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
-		return;
-	}
-
-	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
-};
-
 window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 {
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;

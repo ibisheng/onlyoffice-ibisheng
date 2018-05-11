@@ -94,10 +94,8 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data, _len)
 			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
 		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
-	
-    editor._OfflineAppDocumentEndLoad(_url, _data, _len);
 
-	editor.sendEvent("asc_onDocumentPassword", ("" != editor.currentPassword) ? true : false);
+    window["asc_openAsLocalCallback"](_url, _data, _len);
 };
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
