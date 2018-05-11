@@ -4245,11 +4245,6 @@ CStyles.prototype =
 
                 if (TableStyle != null || ShapeStyle != null)
                 {
-                    if (TableStyle != null)
-                    {
-                        Pr.TextPr.Merge(TableStyle.TextPr);
-                        Pr.ParaPr.Merge(TableStyle.ParaPr);
-                    }
                     if (ShapeStyle != null)
                     {
                         Pr.TextPr.Merge(ShapeStyle.TextPr);
@@ -4257,7 +4252,11 @@ CStyles.prototype =
                         {
                             Pr.ParaPr.Merge(ShapeStyle.ParaPr);
                         }
-
+                    }
+                    if (TableStyle != null)
+                    {
+                        Pr.TextPr.Merge(TableStyle.TextPr);
+                        Pr.ParaPr.Merge(TableStyle.ParaPr);
                     }
                 }
                 else

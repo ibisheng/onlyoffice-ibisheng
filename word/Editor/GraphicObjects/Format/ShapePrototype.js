@@ -557,6 +557,7 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
             shape_text_pr.RFonts.EastAsia = { Name: "+mn-ea", Index : -1 };
             shape_text_pr.RFonts.CS = { Name: "+mn-cs", Index : -1 };
         }
+        shape_text_pr.FontRef = this.style.fontRef.createDuplicate();
         this.textStyleForParagraph.TextPr.Merge(shape_text_pr);
     }
 };
