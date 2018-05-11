@@ -1271,7 +1271,7 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
             else if(this.selection.plotArea)
             {
 
-                var oChartSize = this.getChartSizes();
+                var oChartSize = this.getChartSizes(true);
                 drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oChartSize.startX, oChartSize.startY, oChartSize.w, oChartSize.h, false, false);
                 /*if(!this.selection.rotatePlotArea)
                 {
@@ -11002,7 +11002,7 @@ CChartSpace.prototype.getCopyWithSourceFormatting = function(oIdMap)
     return oCopy;
 };
 
-CChartSpace.prototype.getChartSizes = function()
+CChartSpace.prototype.getChartSizes = function(bNotRecalculate)
 {
     if(this.plotAreaRect && !this.recalcInfo.recalculateAxisVal){
         return {startX: this.plotAreaRect.x, startY: this.plotAreaRect.y, w : this.plotAreaRect.w, h: this.plotAreaRect.h};
@@ -11021,6 +11021,20 @@ CChartSpace.prototype.getChartSizes = function()
             if(AscFormat.isRealNumber(fSize2) && fSize2 > 0){
                 oChartSize.w = fSize;
                 oChartSize.h = fSize2;
+                var aCharts = this.chart.plotArea.charts;
+                for(var i = 0; i < aCharts.length; ++i){
+                    var nChartType = aCharts[i].getObjectType();
+                    if(nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart){
+                        var fCX = oChartSize.startX + oChartSize.w/2.0;
+                        var fCY = oChartSize.startY + oChartSize.h/2.0;
+                        var fPieSize = Math.min(oChartSize.w, oChartSize.h);
+                        oChartSize.startX = fCX  - fPieSize/2.0;
+                        oChartSize.startY = fCY  - fPieSize/2.0;
+                        oChartSize.w = fPieSize;
+                        oChartSize.h = fPieSize;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -11030,6 +11044,7 @@ CChartSpace.prototype.getChartSizes = function()
     if(oChartSize.h <= 0){
         oChartSize.h = 1;
     }
+
     return oChartSize;
 };
 

@@ -570,7 +570,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
         //plotArea
         if(bClickFlag ){
-            var oChartSizes = drawing.getChartSizes();
+            var oChartSizes = drawing.getChartSizes(true);
             var oInvertTransform = drawing.invertTransform;
             var dTx = oInvertTransform.TransformPointX(x, y);
             var dTy = oInvertTransform.TransformPointY(x, y);
