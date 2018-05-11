@@ -12301,21 +12301,13 @@ CChartSpace.prototype.recalculateAxisLabels = function()
     }
     if(this.chart && this.chart.plotArea)
     {
-        var hor_axis = this.chart.plotArea.getHorizontalAxis();
-        if(hor_axis && hor_axis.title)
-        {
-            var title = hor_axis.title;
-            //title.parent = hor_axis;
-            title.chart = this;
-            title.recalculate();
-        }
-        var vert_axis = this.chart.plotArea.getVerticalAxis();
-        if(vert_axis && vert_axis.title)
-        {
-            var title = vert_axis.title;
-            //title.parent = vert_axis;
-            title.chart = this;
-            title.recalculate();
+        var aAxis = this.chart.plotArea.axId;
+        for(var i = 0; i < aAxis.length; ++i){
+            var title = aAxis[i].title;
+            if(title){
+                title.chart = this;
+                title.recalculate();
+            }
         }
     }
 };
