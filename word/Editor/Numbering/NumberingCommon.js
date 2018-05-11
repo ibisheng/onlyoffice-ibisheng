@@ -37,15 +37,6 @@
  * Time: 15:41
  */
 
-var numbering_numfmt_None        = 0x0000;
-var numbering_numfmt_Bullet      = 0x1001;
-var numbering_numfmt_Decimal     = 0x2002;
-var numbering_numfmt_LowerRoman  = 0x2003;
-var numbering_numfmt_UpperRoman  = 0x2004;
-var numbering_numfmt_LowerLetter = 0x2005;
-var numbering_numfmt_UpperLetter = 0x2006;
-var numbering_numfmt_DecimalZero = 0x2007;
-
 var numbering_lvltext_Text = 1;
 var numbering_lvltext_Num  = 2;
 
@@ -170,7 +161,7 @@ function getNumInfoLvl(Lvl)
 	var NumText   = Lvl.LvlText;
 	var TextLen;
 
-	if (numbering_numfmt_Bullet === NumFormat)
+	if (c_oAscNumberingFormat.Bullet === NumFormat)
 	{
 		NumType    = 0;
 		NumSubType = 0;
@@ -208,31 +199,31 @@ function getNumInfoLvl(Lvl)
 		{
 			var NumVal2 = NumText[1].Value;
 
-			if (numbering_numfmt_Decimal === NumFormat)
+			if (c_oAscNumberingFormat.Decimal === NumFormat)
 			{
 				if ("." === NumVal2)
 					NumSubType = 1;
 				else if (")" === NumVal2)
 					NumSubType = 2;
 			}
-			else if (numbering_numfmt_UpperRoman === NumFormat)
+			else if (c_oAscNumberingFormat.UpperRoman === NumFormat)
 			{
 				if ("." === NumVal2)
 					NumSubType = 3;
 			}
-			else if (numbering_numfmt_UpperLetter === NumFormat)
+			else if (c_oAscNumberingFormat.UpperLetter === NumFormat)
 			{
 				if ("." === NumVal2)
 					NumSubType = 4;
 			}
-			else if (numbering_numfmt_LowerLetter === NumFormat)
+			else if (c_oAscNumberingFormat.LowerLetter === NumFormat)
 			{
 				if (")" === NumVal2)
 					NumSubType = 5;
 				else if ("." === NumVal2)
 					NumSubType = 6;
 			}
-			else if (numbering_numfmt_LowerRoman === NumFormat)
+			else if (c_oAscNumberingFormat.LowerRoman === NumFormat)
 			{
 				if ("." === NumVal2)
 					NumSubType = 7;
@@ -246,12 +237,3 @@ function getNumInfoLvl(Lvl)
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
-
-window['AscCommonWord']["numbering_numfmt_None"]        = numbering_numfmt_None;
-window['AscCommonWord']["numbering_numfmt_Bullet"]      = numbering_numfmt_Bullet;
-window['AscCommonWord']["numbering_numfmt_Decimal"]     = numbering_numfmt_Decimal;
-window['AscCommonWord']["numbering_numfmt_LowerRoman"]  = numbering_numfmt_LowerRoman;
-window['AscCommonWord']["numbering_numfmt_UpperRoman"]  = numbering_numfmt_UpperRoman;
-window['AscCommonWord']["numbering_numfmt_LowerLetter"] = numbering_numfmt_LowerLetter;
-window['AscCommonWord']["numbering_numfmt_UpperLetter"] = numbering_numfmt_UpperLetter;
-window['AscCommonWord']["numbering_numfmt_DecimalZero"] = numbering_numfmt_DecimalZero;

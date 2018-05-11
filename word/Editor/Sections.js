@@ -1395,7 +1395,7 @@ function CFootnotePr()
 }
 CFootnotePr.prototype.InitDefault = function()
 {
-	this.NumFormat  = numbering_numfmt_Decimal;
+	this.NumFormat  = c_oAscNumberingFormat.Decimal;
 	this.NumRestart = section_footnote_RestartContinuous;
 	this.NumStart   = 1;
 	this.Pos        = section_footnote_PosPageBottom;

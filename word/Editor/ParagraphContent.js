@@ -1900,7 +1900,7 @@ function ParaFootnoteReference(Footnote, CustomMark)
 	this.Width        = 0;
 	this.WidthVisible = 0;
 	this.Number       = 1;
-	this.NumFormat    = numbering_numfmt_Decimal;
+	this.NumFormat    = c_oAscNumberingFormat.Decimal;
 
 	this.Run          = null;
 	this.Widths       = [];
@@ -2014,7 +2014,7 @@ ParaFootnoteReference.prototype.UpdateNumber = function(PRS)
 	else
 	{
 		this.Number    = 1;
-		this.NumFormat = numbering_numfmt_Decimal;
+		this.NumFormat = c_oAscNumberingFormat.Decimal;
 		this.private_Measure();
 	}
 };
@@ -2060,17 +2060,17 @@ ParaFootnoteReference.prototype.private_Measure = function()
 };
 ParaFootnoteReference.prototype.private_GetString = function()
 {
-	if (numbering_numfmt_Decimal === this.NumFormat)
+	if (c_oAscNumberingFormat.Decimal === this.NumFormat)
 		return Numbering_Number_To_String(this.Number);
-	if (numbering_numfmt_LowerRoman === this.NumFormat)
+	if (c_oAscNumberingFormat.LowerRoman === this.NumFormat)
 		return Numbering_Number_To_Roman(this.Number, true);
-	else if (numbering_numfmt_UpperRoman === this.NumFormat)
+	else if (c_oAscNumberingFormat.UpperRoman === this.NumFormat)
 		return Numbering_Number_To_Roman(this.Number, false);
-	else if (numbering_numfmt_LowerLetter === this.NumFormat)
+	else if (c_oAscNumberingFormat.LowerLetter === this.NumFormat)
 		return Numbering_Number_To_Alpha(this.Number, true);
-	else if (numbering_numfmt_UpperLetter === this.NumFormat)
+	else if (c_oAscNumberingFormat.UpperLetter === this.NumFormat)
 		return Numbering_Number_To_Alpha(this.Number, false);
-	else// if (numbering_numfmt_Decimal === this.NumFormat)
+	else// if (c_oAscNumberingFormat.Decimal === this.NumFormat)
 		return Numbering_Number_To_String(this.Number);
 };
 ParaFootnoteReference.prototype.IsCustomMarkFollows = function()
@@ -2130,7 +2130,7 @@ ParaFootnoteRef.prototype.UpdateNumber = function(oFootnote)
 	else
 	{
 		this.Number    = 1;
-		this.NumFormat = numbering_numfmt_Decimal;
+		this.NumFormat = c_oAscNumberingFormat.Decimal;
 		this.private_Measure();
 	}
 };

@@ -4076,12 +4076,12 @@
 							var CurLvl = Text[Index].Value;
 							switch( LvlPr.Format )
 							{
-								case numbering_numfmt_Bullet:
+								case c_oAscNumberingFormat.Bullet:
 								{
 									break;
 								}
 
-								case numbering_numfmt_Decimal:
+								case c_oAscNumberingFormat.Decimal:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4096,7 +4096,7 @@
 									break;
 								}
 
-								case numbering_numfmt_DecimalZero:
+								case c_oAscNumberingFormat.DecimalZero:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4124,8 +4124,8 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerLetter:
-								case numbering_numfmt_UpperLetter:
+								case c_oAscNumberingFormat.LowerLetter:
+								case c_oAscNumberingFormat.UpperLetter:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4138,7 +4138,7 @@
 										var T = "";
 
 										var Letter;
-										if ( numbering_numfmt_LowerLetter === LvlPr.Format )
+										if ( c_oAscNumberingFormat.LowerLetter === LvlPr.Format )
 											Letter = String.fromCharCode( Ost + 97 );
 										else
 											Letter = String.fromCharCode( Ost + 65 );
@@ -4156,8 +4156,8 @@
 									break;
 								}
 
-								case numbering_numfmt_LowerRoman:
-								case numbering_numfmt_UpperRoman:
+								case c_oAscNumberingFormat.LowerRoman:
+								case c_oAscNumberingFormat.UpperRoman:
 								{
 									if ( CurLvl < NumInfo.length )
 									{
@@ -4166,7 +4166,7 @@
 										// Переводим число Num в римскую систему исчисления
 										var Rims;
 
-										if ( numbering_numfmt_LowerRoman === LvlPr.Format )
+										if ( c_oAscNumberingFormat.LowerRoman === LvlPr.Format )
 											Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 										else
 											Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

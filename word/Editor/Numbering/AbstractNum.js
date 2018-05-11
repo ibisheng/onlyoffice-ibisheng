@@ -316,12 +316,12 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 				var CurLvl = Text[Index].Value;
 				switch (this.Lvl[CurLvl].Format)
 				{
-					case numbering_numfmt_Bullet:
+					case c_oAscNumberingFormat.Bullet:
 					{
 						break;
 					}
 
-					case numbering_numfmt_Decimal:
+					case c_oAscNumberingFormat.Decimal:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -336,7 +336,7 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 						break;
 					}
 
-					case numbering_numfmt_DecimalZero:
+					case c_oAscNumberingFormat.DecimalZero:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -364,8 +364,8 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 						break;
 					}
 
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
+					case c_oAscNumberingFormat.LowerLetter:
+					case c_oAscNumberingFormat.UpperLetter:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -378,7 +378,7 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 							var T = "";
 
 							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerLetter === this.Lvl[CurLvl].Format)
 								Letter = String.fromCharCode(Ost + 97);
 							else
 								Letter = String.fromCharCode(Ost + 65);
@@ -396,8 +396,8 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 						break;
 					}
 
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
+					case c_oAscNumberingFormat.LowerRoman:
+					case c_oAscNumberingFormat.UpperRoman:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -406,7 +406,7 @@ CAbstractNum.prototype.Draw = function(X, Y, Context, Lvl, NumInfo, NumTextPr, T
 							// Переводим число Num в римскую систему исчисления
 							var Rims;
 
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerRoman === this.Lvl[CurLvl].Format)
 								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 							else
 								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
@@ -478,12 +478,12 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 				var CurLvl = Text[Index].Value;
 				switch (this.Lvl[CurLvl].Format)
 				{
-					case numbering_numfmt_Bullet:
+					case c_oAscNumberingFormat.Bullet:
 					{
 						break;
 					}
 
-					case numbering_numfmt_Decimal:
+					case c_oAscNumberingFormat.Decimal:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -497,7 +497,7 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 						break;
 					}
 
-					case numbering_numfmt_DecimalZero:
+					case c_oAscNumberingFormat.DecimalZero:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -522,8 +522,8 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 						break;
 					}
 
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
+					case c_oAscNumberingFormat.LowerLetter:
+					case c_oAscNumberingFormat.UpperLetter:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -536,7 +536,7 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 							var T = "";
 
 							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerLetter === this.Lvl[CurLvl].Format)
 								Letter = String.fromCharCode(Ost + 97);
 							else
 								Letter = String.fromCharCode(Ost + 65);
@@ -553,8 +553,8 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 						break;
 					}
 
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
+					case c_oAscNumberingFormat.LowerRoman:
+					case c_oAscNumberingFormat.UpperRoman:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -563,7 +563,7 @@ CAbstractNum.prototype.Measure = function(Context, Lvl, NumInfo, NumTextPr, Them
 							// Переводим число Num в римскую систему исчисления
 							var Rims;
 
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerRoman === this.Lvl[CurLvl].Format)
 								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 							else
 								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
@@ -622,12 +622,12 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 				var CurLvl = Text[Index].Value;
 				switch (this.Lvl[CurLvl].Format)
 				{
-					case numbering_numfmt_Bullet:
+					case c_oAscNumberingFormat.Bullet:
 					{
 						break;
 					}
 
-					case numbering_numfmt_Decimal:
+					case c_oAscNumberingFormat.Decimal:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -641,7 +641,7 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 						break;
 					}
 
-					case numbering_numfmt_DecimalZero:
+					case c_oAscNumberingFormat.DecimalZero:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -666,8 +666,8 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 						break;
 					}
 
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
+					case c_oAscNumberingFormat.LowerLetter:
+					case c_oAscNumberingFormat.UpperLetter:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -680,7 +680,7 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 							var T = "";
 
 							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerLetter === this.Lvl[CurLvl].Format)
 								Letter = String.fromCharCode(Ost + 97);
 							else
 								Letter = String.fromCharCode(Ost + 65);
@@ -697,8 +697,8 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 						break;
 					}
 
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
+					case c_oAscNumberingFormat.LowerRoman:
+					case c_oAscNumberingFormat.UpperRoman:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -707,7 +707,7 @@ CAbstractNum.prototype.Document_CreateFontCharMap = function(FontCharMap, Lvl, N
 							// Переводим число Num в римскую систему исчисления
 							var Rims;
 
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerRoman === this.Lvl[CurLvl].Format)
 								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 							else
 								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
@@ -952,11 +952,11 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 				var CurLvl = Text[Index].Value;
 				switch (this.Lvl[CurLvl].Format)
 				{
-					case numbering_numfmt_Bullet:
+					case c_oAscNumberingFormat.Bullet:
 					{
 						break;
 					}
-					case numbering_numfmt_Decimal:
+					case c_oAscNumberingFormat.Decimal:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -964,7 +964,7 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 						}
 						break;
 					}
-					case numbering_numfmt_DecimalZero:
+					case c_oAscNumberingFormat.DecimalZero:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -983,8 +983,8 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 						}
 						break;
 					}
-					case numbering_numfmt_LowerLetter:
-					case numbering_numfmt_UpperLetter:
+					case c_oAscNumberingFormat.LowerLetter:
+					case c_oAscNumberingFormat.UpperLetter:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -995,7 +995,7 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 							var Ost   = Num % 26;
 
 							var Letter;
-							if (numbering_numfmt_LowerLetter === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerLetter === this.Lvl[CurLvl].Format)
 								Letter = String.fromCharCode(Ost + 97);
 							else
 								Letter = String.fromCharCode(Ost + 65);
@@ -1005,8 +1005,8 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 						}
 						break;
 					}
-					case numbering_numfmt_LowerRoman:
-					case numbering_numfmt_UpperRoman:
+					case c_oAscNumberingFormat.LowerRoman:
+					case c_oAscNumberingFormat.UpperRoman:
 					{
 						if (CurLvl < NumInfo.length)
 						{
@@ -1015,7 +1015,7 @@ CAbstractNum.prototype.GetText = function(Lvl, NumInfo)
 							// Переводим число Num в римскую систему исчисления
 							var Rims;
 
-							if (numbering_numfmt_LowerRoman === this.Lvl[CurLvl].Format)
+							if (c_oAscNumberingFormat.LowerRoman === this.Lvl[CurLvl].Format)
 								Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
 							else
 								Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];

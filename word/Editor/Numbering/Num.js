@@ -44,11 +44,39 @@
  */
 function CNum(oNumbering)
 {
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
+
 	this.AbstractNumId = null;
 	this.LvlOverride   = [];
-	this.NumId         = AscCommon.g_oIdCounter.Get_NewId();
 	this.Numbering     = oNumbering;
+
+	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+	AscCommon.g_oTableId.Add(this, this.Id);
 }
+CNum.prototype.Get_Id = function()
+{
+	return this.Id;
+};
+CNum.prototype.GetId = function()
+{
+	return this.Id;
+};
+/**
+ * Получаем заданный уровень
+ * @param nLvl {number} 0..8
+ * @returns {CNumberingLvl}
+ */
+CNum.prototype.GetLvl = function(nLvl)
+{
+	if (this.LvlOverride[nLvl] && this.LvlOverride[nLvl].GetLvl())
+		return this.LvlOverride[nLvl].GetLvl();
+
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (!oAbstractNum)
+		return new CNumberingLvl();
+
+	return oAbstractNum.GetLvl(nLvl);
+};
 
 function CLvlOverride(nLvl)
 {
@@ -56,3 +84,7 @@ function CLvlOverride(nLvl)
 	this.StartOverride = -1;
 	this.NumberingLvl  = null;
 }
+CLvlOverride.prototype.GetLvl = function()
+{
+	return this.NumberingLvl;
+};

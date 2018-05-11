@@ -4434,7 +4434,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 							{
 								var PrevNumPr = Prev.Numbering_Get();
-								if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Bullet))
+								if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
 								{
 									NumId  = PrevNumPr.NumId;
 									NumLvl = PrevNumPr.Lvl;
@@ -4582,7 +4582,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
-							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Bullet))
+							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, c_oAscNumberingFormat.Bullet))
 							{
 								NumId           = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
@@ -4636,7 +4636,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 							{
 								var PrevNumPr = Prev.Numbering_Get();
-								if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Decimal))
+								if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 								{
 									NumId  = PrevNumPr.NumId;
 									NumLvl = PrevNumPr.Lvl;
@@ -4652,7 +4652,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								if (StartPos === EndPos && undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
 								{
 									var NextNumPr = Next.Numbering_Get();
-									if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, numbering_numfmt_Decimal))
+									if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 									{
 										NumId  = NextNumPr.NumId;
 										NumLvl = NextNumPr.Lvl;
@@ -4744,7 +4744,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
-							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Decimal))
+							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, c_oAscNumberingFormat.Decimal))
 							{
 								NumId       = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
@@ -4898,7 +4898,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet))
+								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, c_oAscNumberingFormat.Bullet))
 								{
 									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
@@ -4917,7 +4917,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 								{
 									var PrevNumPr = Prev.Numbering_Get();
-									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Bullet))
+									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
 									{
 										NumId  = PrevNumPr.NumId;
 										NumLvl = PrevNumPr.Lvl;
@@ -5033,7 +5033,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal))
+								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, c_oAscNumberingFormat.Decimal))
 								{
 									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
@@ -5052,7 +5052,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 								{
 									var PrevNumPr = Prev.Numbering_Get();
-									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Decimal))
+									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 									{
 										NumId  = PrevNumPr.NumId;
 										NumLvl = PrevNumPr.Lvl;
@@ -5068,7 +5068,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 									if (undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
 									{
 										var NextNumPr = Next.Numbering_Get();
-										if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, numbering_numfmt_Decimal))
+										if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 										{
 											NumId  = NextNumPr.NumId;
 											NumLvl = NextNumPr.Lvl;

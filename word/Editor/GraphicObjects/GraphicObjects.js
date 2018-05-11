@@ -1811,7 +1811,7 @@ CGraphicObjects.prototype =
                             var NumFormat = Lvl.Format;
                             var NumText   = Lvl.LvlText;
 
-                            if ( numbering_numfmt_Bullet === NumFormat )
+                            if ( c_oAscNumberingFormat.Bullet === NumFormat )
                             {
                                 NumType    = 0;
                                 NumSubType = 0;
@@ -1847,31 +1847,31 @@ CGraphicObjects.prototype =
                                 {
                                     var NumVal2 = NumText[1].Value;
 
-                                    if ( numbering_numfmt_Decimal === NumFormat )
+                                    if ( c_oAscNumberingFormat.Decimal === NumFormat )
                                     {
                                         if ( "." === NumVal2 )
                                             NumSubType = 1;
                                         else if ( ")" === NumVal2 )
                                             NumSubType = 2;
                                     }
-                                    else if ( numbering_numfmt_UpperRoman === NumFormat )
+                                    else if ( c_oAscNumberingFormat.UpperRoman === NumFormat )
                                     {
                                         if ( "." === NumVal2 )
                                             NumSubType = 3;
                                     }
-                                    else if ( numbering_numfmt_UpperLetter === NumFormat )
+                                    else if ( c_oAscNumberingFormat.UpperLetter === NumFormat )
                                     {
                                         if ( "." === NumVal2 )
                                             NumSubType = 4;
                                     }
-                                    else if ( numbering_numfmt_LowerLetter === NumFormat )
+                                    else if ( c_oAscNumberingFormat.LowerLetter === NumFormat )
                                     {
                                         if ( ")" === NumVal2 )
                                             NumSubType = 5;
                                         else if ( "." === NumVal2 )
                                             NumSubType = 6;
                                     }
-                                    else if ( numbering_numfmt_LowerRoman === NumFormat )
+                                    else if ( c_oAscNumberingFormat.LowerRoman === NumFormat )
                                     {
                                         if ( "." === NumVal2 )
                                             NumSubType = 7;

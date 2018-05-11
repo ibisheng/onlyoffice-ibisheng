@@ -110,6 +110,21 @@ CNumbering.prototype.Get_AbstractNum = function(Id)
 
 	return AbstractNum;
 };
+CNumbering.prototype.GetAbstractNum = function(sId)
+{
+	return this.Get_AbstractNum(sId);
+};
+/**
+ * @param sId
+ * @returns {CNum}
+ */
+CNumbering.prototype.GetNum = function(sId)
+{
+	if (this.Num[sId])
+		return this.Num[sId];
+
+	return null;
+};
 CNumbering.prototype.Get_ParaPr = function(NumId, Lvl)
 {
 	var AbstractId = this.Get_AbstractNum(NumId);
@@ -119,27 +134,37 @@ CNumbering.prototype.Get_ParaPr = function(NumId, Lvl)
 
 	return new CParaPr();
 };
-CNumbering.prototype.Get_Format = function(NumId, Lvl)
+/**
+ * Получаем формат заданного уровня заданной нумерации
+ * @param sNumId
+ * @param nLvl
+ * @returns {c_oAscNumberingFormat}
+ */
+CNumbering.prototype.GetNumFormat = function(sNumId, nLvl)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
+	var oNum = this.GetNum(sNumId);
+	if (!oNum)
+		return c_oAscNumberingFormat.Bullet;
 
-	if (undefined != AbstractId)
-		return AbstractId.Lvl[Lvl].Format;
+	var oLvl = oNum.GetLvl(nLvl);
+	if (!oLvl)
+		return c_oAscNumberingFormat.Bullet;
 
-	return numbering_numfmt_Bullet;
+	return oLvl.Format;
 };
 /**
  * Проверяем по типам Numbered и Bullet
- * @param NumId
- * @param Lvl
- * @param Type
+ * @param sNumId {string}
+ * @param nLvl {number}
+ * @param nType {c_oAscNumberingFormat}
  * @returns {boolean}
  */
-CNumbering.prototype.Check_Format = function(NumId, Lvl, Type)
+CNumbering.prototype.Check_Format = function(sNumId, nLvl, nType)
 {
-	var Format = this.Get_Format(NumId, Lvl);
+	var nFormat = this.GetNumFormat(sNumId, nLvl);
 
-	if (( 0x1000 & Format && 0x1000 & Type ) || ( 0x2000 & Format && 0x2000 & Type ))
+	if ((c_oAscNumberingFormat.BulletFlag & nFormat && c_oAscNumberingFormat.BulletFlag & nType)
+		|| (c_oAscNumberingFormat.NumberedFlag & nFormat && c_oAscNumberingFormat.NumberedFlag & nType))
 		return true;
 
 	return false;

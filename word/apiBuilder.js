@@ -3239,23 +3239,23 @@
      */
     ApiNumberingLevel.prototype.SetCustomType = function(sType, sTextFormatString, sAlign)
     {
-        var nType = numbering_numfmt_None;
+        var nType = c_oAscNumberingFormat.None;
         if ("none" === sType)
-            nType = numbering_numfmt_None;
+            nType = c_oAscNumberingFormat.None;
         else if ("bullet" === sType)
-            nType = numbering_numfmt_Bullet;
+            nType = c_oAscNumberingFormat.Bullet;
         else if ("decimal" === sType)
-            nType = numbering_numfmt_Decimal;
+            nType = c_oAscNumberingFormat.Decimal;
         else if ("lowerRoman" === sType)
-            nType = numbering_numfmt_LowerRoman;
+            nType = c_oAscNumberingFormat.LowerRoman;
         else if ("upperRoman" === sType)
-            nType = numbering_numfmt_UpperRoman;
+            nType = c_oAscNumberingFormat.UpperRoman;
         else if ("lowerLetter" === sType)
-            nType = numbering_numfmt_LowerLetter;
+            nType = c_oAscNumberingFormat.LowerLetter;
         else if ("upperLetter" === sType)
-            nType = numbering_numfmt_UpperLetter;
+            nType = c_oAscNumberingFormat.UpperLetter;
         else if ("decimalZero" === sType)
-            nType = numbering_numfmt_DecimalZero;
+            nType = c_oAscNumberingFormat.DecimalZero;
 
         var nAlign = align_Left;
         if ("left" === sAlign)
