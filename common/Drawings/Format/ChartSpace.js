@@ -11009,7 +11009,7 @@ CChartSpace.prototype.getChartSizes = function(bNotRecalculate)
     }
     if(!this.chartObj)
         this.chartObj = new AscFormat.CChartsDrawer();
-    var oChartSize = this.chartObj.calculateSizePlotArea(this);
+    var oChartSize = this.chartObj.calculateSizePlotArea(this, bNotRecalculate);
     var oLayout = this.chart.plotArea.layout;
     if(oLayout){
 
