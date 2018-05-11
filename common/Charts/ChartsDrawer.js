@@ -766,8 +766,8 @@ CChartsDrawer.prototype =
 		}
 
 		//исключение - когда среди диаграмм есть груговая
-		if(2 === this.nDimensionCount && false) {
-			var pie = null;
+		var pie = null;
+		if(!this._isSwitchCurrent3DChart(chartSpace)) {
 			var charts = plotArea.charts;
 			for(var i = 0; i < charts.length; i++) {
 				if(c_oChartTypes.Pie === this._getChartType(charts[i])) {
@@ -776,16 +776,25 @@ CChartsDrawer.prototype =
 				}
 			}
 			if(null !== pie) {
-				left = right = top = bottom = 0;
-				var width = this.calcProp.widthCanvas / pxToMM;
-				var height = this.calcProp.heightCanvas / pxToMM;
-				if(width > height) {
-					left = right = (width - height) / 2;
-				} else {
-					top = bottom = (height - width) / 2;
-				}
+				//вычисляем истинную(первоначальную) ширину и высоту диаграммы
+				left = this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
+				bottom = this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
+				top = this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+				right = this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
+
+				var width = chartSpace.extX - left - right;
+				var height = chartSpace.extY - top - bottom;
+				var pieSize = width > height ? height : width;
+
+				//размещаем по центру относительно width/height
+				left += (width - pieSize)/2;
+				right += (width - pieSize)/2;
+				top += (height - pieSize)/2;
+				bottom += (height - pieSize)/2;
 			}
-		} else {
+		}
+
+		if(null === pie) {
 			left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 			bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
 			top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
@@ -860,11 +869,16 @@ CChartsDrawer.prototype =
 		var calculateLeft = 0, calculateRight = 0, calculateTop = 0, calculateBottom = 0, diffPoints, curBetween;
 		var pxToMM = this.calcProp.pxToMM;
 
-		var crossBetween = chartSpace.getValAxisCrossType();
 		var horizontalAxes = this._getHorizontalAxes(chartSpace);
 		var verticalAxes = this._getVerticalAxes(chartSpace);
 		var horizontalAxis = horizontalAxes ? horizontalAxes[0] : null;
 		var verticalAxis = verticalAxes ? verticalAxes[0] : null;
+		var crossBetween = null;
+		if(verticalAxis instanceof AscFormat.CValAx) {
+			crossBetween = verticalAxis.crossBetween;
+		} else if(horizontalAxis instanceof AscFormat.CValAx) {
+			crossBetween = horizontalAxis.crossBetween;
+		}
 
 		if (horizontalAxis && horizontalAxis.xPoints && horizontalAxis.xPoints.length && this.calcProp.widthCanvas != undefined) {
 			if (horizontalAxis instanceof AscFormat.CValAx) {
@@ -2200,10 +2214,12 @@ CChartsDrawer.prototype =
 		return res;
 	},
 
-	calculateSizePlotArea : function(chartSpace)
+	calculateSizePlotArea : function(chartSpace, bNotRecalculate)
 	{
-		this._calculateMarginsChart(chartSpace);
-		
+		if(!bNotRecalculate || undefined === this.calcProp.chartGutter._left) {
+			this._calculateMarginsChart(chartSpace);
+		}
+
 		var widthCanvas = chartSpace.extX;
 		var heightCanvas = chartSpace.extY;
 		
