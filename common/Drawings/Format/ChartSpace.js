@@ -4168,6 +4168,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     {
                         var bLayout = AscCommon.isRealObject(this.recalcInfo.dataLbls[i].layout) && (AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.x) || AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.y));
                         var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx, bLayout);//
+                        //var pos = this.chartObj.reCalculatePositionText(this.recalcInfo.dataLbls[i]);//
                         var oLbl = this.recalcInfo.dataLbls[i];
                         if(oLbl.layout){
                             layout = oLbl.layout;
@@ -4203,6 +4204,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
             if(this.chart && this.chart.title)
             {
                 var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
+                //var pos = this.chartObj.reCalculatePositionText(this.chart.title);
                 if(this.chart.title.layout){
                     layout = this.chart.title.layout;
                     if(AscFormat.isRealNumber(layout.x)){
@@ -4216,6 +4218,25 @@ CChartSpace.prototype.getValAxisCrossType = function()
 
             if(this.chart && this.chart.plotArea)
             {
+                // var aAxes = this.chart.plotArea.axId;
+                // for(var i = 0; i < aAxes.length; ++i){
+                //     var oAxis = aAxes[i];
+                //     if(oAxis && oAxis.title)
+                //     {
+                //         //var pos = this.chartObj.reCalculatePositionText(oAxis);
+                //
+                //         // if(oAxis.title.layout){
+                //         //     layout = oAxis.title.layout;
+                //         //     if(AscFormat.isRealNumber(layout.x)){
+                //         //         pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, oAxis.title.extX, this.extX);
+                //         //     }if(AscFormat.isRealNumber(layout.y)){
+                //         //         pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, oAxis.title.extY, this.extY);
+                //         //     }
+                //         // }
+                //         // oAxis.title.setPosition(pos.x, pos.y);
+                //     }
+                // }
+
                 var hor_axis = this.chart.plotArea.getHorizontalAxis();
                 if(hor_axis && hor_axis.title)
                 {
@@ -4265,6 +4286,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 bResetLegendPos = true;
             }
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
+            //var pos = this.chartObj.reCalculatePositionText(this.chart.legend);
             if(this.chart.legend.layout){
                 layout = this.chart.legend.layout;
                 if(AscFormat.isRealNumber(layout.x)){
