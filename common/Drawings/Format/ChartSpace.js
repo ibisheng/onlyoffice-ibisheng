@@ -4216,62 +4216,26 @@ CChartSpace.prototype.getValAxisCrossType = function()
 
             if(this.chart && this.chart.plotArea)
             {
-                // var aAxes = this.chart.plotArea.axId;
-                // for(var i = 0; i < aAxes.length; ++i){
-                //     var oAxis = aAxes[i];
-                //     if(oAxis && oAxis.title)
-                //     {
-                //         //var pos = this.chartObj.reCalculatePositionText(oAxis);
-                //
-                //         // if(oAxis.title.layout){
-                //         //     layout = oAxis.title.layout;
-                //         //     if(AscFormat.isRealNumber(layout.x)){
-                //         //         pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, oAxis.title.extX, this.extX);
-                //         //     }if(AscFormat.isRealNumber(layout.y)){
-                //         //         pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, oAxis.title.extY, this.extY);
-                //         //     }
-                //         // }
-                //         // oAxis.title.setPosition(pos.x, pos.y);
-                //     }
-                // }
+                var aAxes = this.chart.plotArea.axId;
+                for(var i = 0; i < aAxes.length; ++i){
+                    var oAxis = aAxes[i];
+                    if(oAxis && oAxis.title)
+                    {
+                        var pos = this.chartObj.recalculatePositionText(oAxis);
 
-                var hor_axis = this.chart.plotArea.getHorizontalAxis();
-                if(hor_axis && hor_axis.title)
-                {
-                    var old_cat_ax = this.chart.plotArea.catAx;
-                    this.chart.plotArea.catAx = hor_axis;
-                    var pos = this.chartObj.recalculatePositionText(hor_axis);
-
-                    if(hor_axis.title.layout){
-                        layout = hor_axis.title.layout;
-                        if(AscFormat.isRealNumber(layout.x)){
-                            pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, hor_axis.title.extX, this.extX);
-                        }if(AscFormat.isRealNumber(layout.y)){
-                            pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, hor_axis.title.extY, this.extY);
+                        if(oAxis.title.layout){
+                            layout = oAxis.title.layout;
+                            if(AscFormat.isRealNumber(layout.x)){
+                                pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, oAxis.title.extX, this.extX);
+                            }if(AscFormat.isRealNumber(layout.y)){
+                                pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, oAxis.title.extY, this.extY);
+                            }
                         }
+                        oAxis.title.setPosition(pos.x, pos.y);
                     }
-
-                    hor_axis.title.setPosition(pos.x, pos.y);
-
-                    this.chart.plotArea.catAx = old_cat_ax;
                 }
-                var vert_axis = this.chart.plotArea.getVerticalAxis();
-                if(vert_axis && vert_axis.title)
-                {
-                    var old_val_ax = this.chart.plotArea.valAx;
-                    this.chart.plotArea.valAx = vert_axis;
-                    var pos = this.chartObj.recalculatePositionText(vert_axis);
-                    if(vert_axis.title.layout){
-                        layout = vert_axis.title.layout;
-                        if(AscFormat.isRealNumber(layout.x)){
-                            pos.x = this.calculatePosByLayout(pos.x, layout.xMode, layout.x, vert_axis.title.extX, this.extX);
-                        }if(AscFormat.isRealNumber(layout.y)){
-                            pos.y = this.calculatePosByLayout(pos.y, layout.yMode, layout.y, vert_axis.title.extY, this.extY);
-                        }
-                    }
-                    vert_axis.title.setPosition(pos.x, pos.y);
-                    this.chart.plotArea.valAx = old_val_ax;
-                }
+
+
             }
         }
 
