@@ -12111,7 +12111,7 @@ valAxisChart.prototype = {
 		//var orientation = this.cChartSpace && this.cChartSpace.chart.plotArea.catAx ? this.cChartSpace.chart.plotArea.catAx.scaling.orientation : ORIENTATION_MIN_MAX;
 		var minorLinesCount = 5;
 		var axPos = this.valAx.axPos;
-		if (axPos !== window['AscFormat'].AX_POS_L) {
+		if (axPos !== window['AscFormat'].AX_POS_L && axPos !== window['AscFormat'].AX_POS_T) {
 			widthMinorLine = -widthMinorLine;
 			widthLine = -widthLine;
 			crossMajorStep = -crossMajorStep;
