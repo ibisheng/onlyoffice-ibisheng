@@ -361,58 +361,6 @@ window["UpdateInstallPlugins"] = function()
 	_editor.sendEvent("asc_onPluginsInit", _plugins);
 };
 
-window["UpdateSystemPlugins"] = function()
-{
-	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
-	_plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
-	_plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
-
-	for (var k = 0; k < 2; k++)
-	{
-		var _pluginsCur = _plugins[k];
-
-		var _len = _pluginsCur["pluginsData"].length;
-		for (var i = 0; i < _len; i++)
-			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
-	}
-
-	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-
-	var _array = [];
-
-	for (var k = 0; k < 2; k++)
-	{
-		var _pluginsCur = _plugins[k];
-		var _len = _pluginsCur["pluginsData"].length;
-
-		for (var i = 0; i < _len; i++)
-		{
-			var _plugin = _pluginsCur["pluginsData"][i];
-			for (var j = 0; j < _plugin["variations"].length; j++)
-			{
-				var _variation = _plugin["variations"][j];
-				if (_variation["initDataType"] == "desktop")
-				{
-					_array.push(_plugin);
-					break;
-				}
-			}
-		}
-	}
-
-	var _arraySystem = [];
-	for (var i = 0; i < _array.length; i++)
-	{
-		var plugin = new Asc.CPlugin();
-		plugin["deserialize"](_array[i]);
-
-		_arraySystem.push(plugin);
-	}
-
-	window.g_asc_plugins.registerSystem("", _arraySystem);
-	window.g_asc_plugins.runAllSystem();
-};
-
 AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {
@@ -570,35 +518,6 @@ window["asc_IsVisibleSign"] = function(guid)
 	}
 
 	return isVisible;
-};
-
-window["asc_IsNeedBuildCryptedFile"] = function()
-{
-	if (!window["AscDesktopEditor"])
-		return false;
-
-	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-	var _returnValue = false;
-
-    var isOne = true;
-    if (_api.CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi._participants)
-    	isOne = (1 == _api.CoAuthoringApi._CoAuthoringApi._participants.length);
-
-    if (!isOne)
-	{
-		_returnValue = false;
-    }
-    else if (null != History.SavedIndex && -1 != History.SavedIndex)
-	{
-		_returnValue = true;
-    }
-    else if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
-	{
-        _returnValue = true;
-	}
-
-	window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
-	return _returnValue;
 };
 
 window["asc_LocalRequestSign"] = function(guid, width, height, isView)

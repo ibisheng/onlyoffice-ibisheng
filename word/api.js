@@ -6236,8 +6236,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.OpenDocumentEndCallback = function()
 	{
-		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete ||
-			!this.WordControl || !this.WordControl.m_oLogicDocument)
+		if (this.isDocumentLoadComplete || !this.ServerImagesWaitComplete || !this.ServerIdWaitComplete || !this.WordControl || !this.WordControl.m_oLogicDocument)
 			return;
 
 		if (0 == this.DocumentType)
@@ -6254,13 +6253,18 @@ background-repeat: no-repeat;\
 
 					if (this.isApplyChangesOnOpenEnabled)
 					{
+						if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+						{
+                            return AscCommon.EncryptionWorker.handleChanges(AscCommon.CollaborativeEditing.m_aChanges, this, this.OpenDocumentEndCallback);
+						}
+
 						this.isApplyChangesOnOpenEnabled = false;
-					this._applyPreOpenLocks();
+						this._applyPreOpenLocks();
 						AscCommon.CollaborativeEditing.Apply_Changes();
 						AscCommon.CollaborativeEditing.Release_Locks();
 
 						this.isApplyChangesOnOpen = true;
-						}
+					}
 
 					//                History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
 

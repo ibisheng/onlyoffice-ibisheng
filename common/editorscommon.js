@@ -3373,6 +3373,9 @@
         this.arrData = [];
         this.arrImages = [];
 
+        this.handleChangesCallback = null;
+        this.isChangesHandled = false;
+
         this.sendChanges = function(sender, data, type)
         {
             if (!window.g_asc_plugins.isRunnedEncryption())
@@ -3396,16 +3399,34 @@
 
             if (AscCommon.EncryptionMessageType.Encrypt == this.arrData[0].type)
             {
+            	//console.log("encrypt: " + data["changes"]);
                 window.g_asc_plugins.sendToEncryption({ "type" : "encryptData", "data" : JSON.parse(data["changes"]) });
             }
             else if (AscCommon.EncryptionMessageType.Decrypt == this.arrData[0].type)
             {
+                //console.log("decrypt: " + data["changes"]);
                 window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : data["changes"] });
             }
         };
 
         this.receiveChanges = function(data)
         {
+        	if (this.handleChangesCallback)
+			{
+				//console.log(data);
+				for (var i = data.length - 1; i >= 0; i--)
+				{
+                    this.handleChangesCallback.changesBase[i].m_pData = data[i];
+                }
+                this.isChangesHandled = true;
+				this.handleChangesCallback.callback.call(this.handleChangesCallback.sender);
+                this.isChangesHandled = false;
+				this.handleChangesCallback = null;
+
+                this.sendChanges(undefined, undefined);
+				return;
+			}
+
         	var obj = this.arrData[0];
         	this.arrData.splice(0, 1);
 
@@ -3422,6 +3443,25 @@
 
             this.sendChanges(undefined, undefined);
         };
+
+        this.handleChanges = function(_array, _sender, _callback)
+		{
+            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length)
+			{
+				this.isChangesHandled = true;
+				_callback.call(_sender);
+                this.isChangesHandled = false;
+			}
+
+			this.handleChangesCallback = { changesBase : _array, changes : [], sender : _sender, callback : _callback };
+
+			for (var i = _array.length - 1; i >= 0; i--)
+			{
+                this.handleChangesCallback.changes[i] = _array[i].m_pData;
+			}
+
+            window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.handleChangesCallback.changes });
+		};
     }
 
     AscCommon.EncryptionWorker = new CEncryptionData();
@@ -3613,7 +3653,7 @@ window.openFileCryptCallback = function(_binary)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
-    if (_data == "")
+    if (_binary == null)
     {
         this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
         return;
@@ -3624,19 +3664,19 @@ window.openFileCryptCallback = function(_binary)
 		var isEditor = true;
         if (_binary.length > 4)
 		{
-			var _signature = (String.fromCharCode(_data[0]) + String.fromCharCode(_data[1]) + String.fromCharCode(_data[2]) + String.fromCharCode(_data[3]));
+			var _signature = (String.fromCharCode(_binary[0]) + String.fromCharCode(_binary[1]) + String.fromCharCode(_binary[2]) + String.fromCharCode(_binary[3]));
 			if (_signature != AscCommon.c_oSerFormat.Signature)
 				isEditor = false;
 		}
 
         if (!isEditor)
-            _editor.OpenDocument(_url, _binary);
+            _editor.OpenDocument("", _binary);
         else
-            _editor.OpenDocument2(_url, _binary);
+            _editor.OpenDocument2("", _binary);
 	}
 	else if ("PPTY" == AscCommon.c_oSerFormat.Signature)
 	{
-        this.OpenDocument2(_url, _binary);
+        this.OpenDocument2("", _binary);
 	}
 	else
 	{
@@ -3644,4 +3684,101 @@ window.openFileCryptCallback = function(_binary)
 	}
 
     _editor.sendEvent("asc_onDocumentPassword", ("" != _editor.currentPassword) ? true : false);
+};
+
+window["asc_IsNeedBuildCryptedFile"] = function()
+{
+    if (!window["AscDesktopEditor"])
+        return false;
+
+    var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+    var _returnValue = false;
+
+    var _users = null;
+    if (_api.CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi && _api.CoAuthoringApi._CoAuthoringApi._participants)
+        _users = _api.CoAuthoringApi._CoAuthoringApi._participants;
+
+    var _usersCount = 0;
+    for (var _user in _users)
+    	_usersCount++;
+
+    var isOne = (1 >= _usersCount) ? true : false;
+
+    if (!isOne)
+    {
+    	console.log("asc_IsNeedBuildCryptedFile: no one");
+    	_returnValue = false;
+    }
+    else if (null != History.SavedIndex && -1 != History.SavedIndex)
+    {
+        console.log("asc_IsNeedBuildCryptedFile: one1");
+        _returnValue = true;
+    }
+    else if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
+    {
+        console.log("asc_IsNeedBuildCryptedFile: one2");
+        _returnValue = true;
+    }
+
+    window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);
+    return _returnValue;
+};
+
+window["UpdateSystemPlugins"] = function()
+{
+    var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+    _plugins[0]["url"] = _plugins[0]["url"].replace(" ", "%20");
+    _plugins[1]["url"] = _plugins[1]["url"].replace(" ", "%20");
+
+    for (var k = 0; k < 2; k++)
+    {
+        var _pluginsCur = _plugins[k];
+
+        var _len = _pluginsCur["pluginsData"].length;
+        for (var i = 0; i < _len; i++)
+		{
+			_pluginsCur["pluginsData"][i]["baseUrl"] = _pluginsCur["url"] + _pluginsCur["pluginsData"][i]["guid"].substring(4) + "/";
+
+			if (!window["AscDesktopEditor"]["IsLocalFile"]())
+			{
+                _pluginsCur["pluginsData"][i]["baseUrl"] = "ascdesktop://plugin_content/" + _pluginsCur["pluginsData"][i]["baseUrl"];
+            }
+        }
+    }
+
+    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+    var _array = [];
+
+    for (var k = 0; k < 2; k++)
+    {
+        var _pluginsCur = _plugins[k];
+        var _len = _pluginsCur["pluginsData"].length;
+
+        for (var i = 0; i < _len; i++)
+        {
+            var _plugin = _pluginsCur["pluginsData"][i];
+            for (var j = 0; j < _plugin["variations"].length; j++)
+            {
+                var _variation = _plugin["variations"][j];
+                if (_variation["initDataType"] == "desktop")
+                {
+                    _array.push(_plugin);
+                    break;
+                }
+            }
+        }
+    }
+
+    var _arraySystem = [];
+    for (var i = 0; i < _array.length; i++)
+    {
+        var plugin = new Asc.CPlugin();
+        plugin["deserialize"](_array[i]);
+
+        _arraySystem.push(plugin);
+    }
+
+    window.g_asc_plugins.registerSystem("", _arraySystem);
+    window.g_asc_plugins.runAllSystem();
 };
