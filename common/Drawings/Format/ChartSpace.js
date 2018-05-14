@@ -4167,8 +4167,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     if(series[j].idx === this.recalcInfo.dataLbls[i].series.idx)
                     {
                         var bLayout = AscCommon.isRealObject(this.recalcInfo.dataLbls[i].layout) && (AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.x) || AscFormat.isRealNumber(this.recalcInfo.dataLbls[i].layout.y));
-                        var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx, bLayout);//
-                        //var pos = this.chartObj.reCalculatePositionText(this.recalcInfo.dataLbls[i]);//
+                        var pos = this.chartObj.recalculatePositionText(this.recalcInfo.dataLbls[i]);
                         var oLbl = this.recalcInfo.dataLbls[i];
                         if(oLbl.layout){
                             layout = oLbl.layout;
@@ -4203,8 +4202,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
         {
             if(this.chart && this.chart.title)
             {
-                var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
-                //var pos = this.chartObj.reCalculatePositionText(this.chart.title);
+                var pos = this.chartObj.recalculatePositionText(this.chart.title);
                 if(this.chart.title.layout){
                     layout = this.chart.title.layout;
                     if(AscFormat.isRealNumber(layout.x)){
@@ -4242,7 +4240,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 {
                     var old_cat_ax = this.chart.plotArea.catAx;
                     this.chart.plotArea.catAx = hor_axis;
-                    var pos = this.chartObj.reCalculatePositionText("catAx", this, hor_axis.title);
+                    var pos = this.chartObj.recalculatePositionText(hor_axis);
 
                     if(hor_axis.title.layout){
                         layout = hor_axis.title.layout;
@@ -4262,7 +4260,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 {
                     var old_val_ax = this.chart.plotArea.valAx;
                     this.chart.plotArea.valAx = vert_axis;
-                    var pos = this.chartObj.reCalculatePositionText("valAx", this, vert_axis.title);
+                    var pos = this.chartObj.recalculatePositionText(vert_axis);
                     if(vert_axis.title.layout){
                         layout = vert_axis.title.layout;
                         if(AscFormat.isRealNumber(layout.x)){
@@ -4285,8 +4283,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
                 bResetLegendPos = true;
             }
-            var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
-            //var pos = this.chartObj.reCalculatePositionText(this.chart.legend);
+            var pos = this.chartObj.recalculatePositionText(this.chart.legend);
             if(this.chart.legend.layout){
                 layout = this.chart.legend.layout;
                 if(AscFormat.isRealNumber(layout.x)){

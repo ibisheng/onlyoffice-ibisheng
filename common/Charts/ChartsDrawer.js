@@ -411,29 +411,30 @@ CChartsDrawer.prototype =
 	},
 
 	//****positions text labels****
-	reCalculatePositionText: function (type, chartSpace, ser, val, bLayout) {
+	recalculatePositionText: function (obj) {
 		var pos;
 
-		if (!chartSpace.bEmptySeries) {
+		if (!this.cChartSpace.bEmptySeries) {
+			var type = obj.getObjectType();
 			switch (type) {
-				case "dlbl": {
-					pos = this._calculatePositionDlbl(chartSpace, ser, val, bLayout);
+				case AscDFH.historyitem_type_DLbl: {
+					pos = this._calculatePositionDlbl(obj);
 					break;
 				}
-				case "title": {
-					pos = this._calculatePositionTitle(chartSpace);
+				case AscDFH.historyitem_type_Title: {
+					pos = this._calculatePositionTitle(obj);
 					break;
 				}
-				case "valAx": {
-					pos = this._calculatePositionAxisTitle(chartSpace, chartSpace.chart.plotArea.valAx);
+				case AscDFH.historyitem_type_ValAx: {
+					pos = this._calculatePositionAxisTitle(obj);
 					break;
 				}
-				case "catAx": {
-					pos = this._calculatePositionAxisTitle(chartSpace, chartSpace.chart.plotArea.catAx);
+				case AscDFH.historyitem_type_CatAx: {
+					pos = this._calculatePositionAxisTitle(obj);
 					break;
 				}
-				case "legend": {
-					pos = this._calculatePositionLegend(chartSpace);
+				case AscDFH.historyitem_type_Legend: {
+					pos = this._calculatePositionLegend(obj);
 					break;
 				}
 				default: {
@@ -446,22 +447,29 @@ CChartsDrawer.prototype =
 		return {x: pos ? pos.x : undefined, y: pos ? pos.y : undefined};
 	},
 	
-	_calculatePositionDlbl: function(chartSpace, ser, val, bLayout)
+	_calculatePositionDlbl: function(obj/*chartSpace, ser, val, bLayout*/)
 	{
 		var res = null;
+
+		var chartSpace = obj.chart;
+		var bLayout = AscCommon.isRealObject(obj.layout) && (AscFormat.isRealNumber(obj.layout.x) || AscFormat.isRealNumber(obj.layout.y));
+		var ser = obj.series.idx;
+		var val = obj.pt.idx;
+
 		var chartId = this._getChartModelIdBySerIdx(chartSpace.chart.plotArea, ser);
 		if(null !== chartId && this.charts[chartId] && this.charts[chartId].chart && this.charts[chartId].chart.series ) {
 			var seriaIdx = this._getIndexByIdxSeria(this.charts[chartId].chart.series, ser);
 			res = this.charts[chartId]._calculateDLbl(chartSpace, seriaIdx, val, bLayout);
 		}
+
 		return res;
 	},
 	
-	_calculatePositionTitle: function(chartSpace)
+	_calculatePositionTitle: function(title)
 	{	
-		var widthGraph = chartSpace.extX;
-		
-		var widthTitle = chartSpace.chart.title.extX;
+		var widthGraph = title.chart.extX;
+
+		var widthTitle = title.extX;
 		var standartMargin = 7;
 		
 		var y = standartMargin / this.calcProp.pxToMM;
@@ -470,9 +478,11 @@ CChartsDrawer.prototype =
 		return {x: x, y: y}
 	},
 
-	_calculatePositionAxisTitle: function(chartSpace, axis)
+	_calculatePositionAxisTitle: function(axis)
 	{
-		var legend = chartSpace.chart.legend;
+		var chart = axis.parent && axis.parent.parent ? axis.parent.parent : null;
+		var legend = chart ? chart.legend : null;
+		var title = chart ? chart.title : null;
 		var x = 0, y = 0, pxToMM = this.calcProp.pxToMM;
 
 		if(axis && axis.title) {
@@ -496,8 +506,8 @@ CChartsDrawer.prototype =
 					if(legend && legend.legendPos === c_oAscChartLegendShowSettings.top) {
 						y += legend.extY + (standartMarginForCharts / 2) / pxToMM;
 					}
-					if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
-						y += chartSpace.chart.title.extY + (standartMarginForCharts / 2) / pxToMM;
+					if (title !== null && !title.overlay) {
+						y += title.extY + (standartMarginForCharts / 2) / pxToMM;
 					}
 					break;
 				}
@@ -610,12 +620,12 @@ CChartsDrawer.prototype =
 		return {x: x, y: y};
 	},
 
-	_calculatePositionLegend: function (chartSpace) {
-		var widthLegend = chartSpace.chart.legend.extX;
-		var heightLegend = chartSpace.chart.legend.extY;
+	_calculatePositionLegend: function (legend) {
+		var widthLegend = legend.extX;
+		var heightLegend = legend.extY;
 		var x, y;
 
-		var nLegendPos = chartSpace.chart.legend.legendPos !== null ? chartSpace.chart.legend.legendPos : c_oAscChartLegendShowSettings.right;
+		var nLegendPos = legend.legendPos !== null ? legend.legendPos : c_oAscChartLegendShowSettings.right;
 		switch (nLegendPos) {
 			case c_oAscChartLegendShowSettings.left:
 			case c_oAscChartLegendShowSettings.leftOverlay: {
@@ -627,8 +637,8 @@ CChartsDrawer.prototype =
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
 
-				if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
-					y += chartSpace.chart.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
+				if (legend.parent.title !== null && !legend.parent.title.overlay) {
+					y += legend.parent.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				}
 				break;
 			}
@@ -647,8 +657,8 @@ CChartsDrawer.prototype =
 				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - widthLegend;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
 
-				if (chartSpace.chart.title !== null && !chartSpace.chart.title.overlay) {
-					y += chartSpace.chart.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
+				if (legend.parent.title !== null && !legend.parent.title.overlay) {
+					y += legend.parent.title.extY + standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				}
 				break;
 			}
@@ -2530,8 +2540,8 @@ CChartsDrawer.prototype =
 						} else {
 							result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
 						}
-						break;
 					}
+					break;
 				}
 			}
 		}
