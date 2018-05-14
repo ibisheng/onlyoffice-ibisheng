@@ -1734,6 +1734,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 		isFastCollaboration : false
 	};
 
+	this.LastBulletList   = undefined; // Последний примененный маркированный список
+	this.LastNumberedList = undefined; // Последний примененный нумерованный список
+
 	// Класс для работы со сносками
 	this.Footnotes               = new CFootnotesController(this);
 	this.LogicDocumentController = new CLogicDocumentController(this);
@@ -7881,6 +7884,10 @@ CDocument.prototype.Get_Numbering = function()
 {
 	return this.Numbering;
 };
+CDocument.prototype.GetNumbering = function()
+{
+	return this.Numbering;
+};
 CDocument.prototype.Internal_GetNumInfo = function(ParaId, NumPr)
 {
 	var TopDocument = this.GetTopDocumentContent();
@@ -13664,53 +13671,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 				{
 					if (0 === NumInfo.SubType)
 					{
-						// Если мы просто нажимаем добавить маркированный список, тогда мы пытаемся
-						// присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
-						// есть список, и этот список маркированный)
-
-						// Проверяем предыдущий элемент
-						var Prev   = this.Content[StartPos - 1];
-						var NumId  = null;
-						var NumLvl = 0;
-
-						if (undefined !== Prev && null !== Prev && type_Paragraph === Prev.GetType())
-						{
-							var PrevNumPr = Prev.Numbering_Get();
-							if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
-							{
-								NumId  = PrevNumPr.NumId;
-								NumLvl = PrevNumPr.Lvl;
-							}
-						}
-
-						// Предыдущий параграф не содержит списка, либо список не того формата
-						// создаем новую нумерацию (стандартную маркированный список)
-						if (null === NumId)
-						{
-							NumId  = this.Numbering.Create_AbstractNum();
-							NumLvl = 0;
-
-							this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
-						}
-
-						// Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
-						// а у тех которые содержали, мы уровень не меняем
-						for (var Index = StartPos; Index <= EndPos; Index++)
-						{
-							var OldNumPr = null;
-
-							if (type_Paragraph === this.Content[Index].GetType())
-							{
-								if (undefined != ( OldNumPr = this.Content[Index].Numbering_Get() ))
-									this.Content[Index].Numbering_Add(NumId, OldNumPr.Lvl);
-								else
-									this.Content[Index].Numbering_Add(NumId, NumLvl);
-							}
-							else
-							{
-								this.Content[Index].SetParagraphNumbering(NumInfo);
-							}
-						}
+						this.private_SetParagraphNumberingBullet();
 					}
 					else
 					{
@@ -13822,7 +13783,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 						}
-						else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, c_oAscNumberingFormat.Bullet))
+						else if (true === bDiffId || true != this.Numbering.CheckFormat(PrevId, PrevLvl, c_oAscNumberingFormat.Bullet))
 						{
 							NumId           = this.Numbering.Create_AbstractNum();
 							var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
@@ -13875,7 +13836,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 						{
 							var PrevNumPr = Prev.Numbering_Get();
-							if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+							if (undefined != PrevNumPr && true === this.Numbering.CheckFormat(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 							{
 								NumId  = PrevNumPr.NumId;
 								NumLvl = PrevNumPr.Lvl;
@@ -13891,7 +13852,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							if (StartPos === EndPos && undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
 							{
 								var NextNumPr = Next.Numbering_Get();
-								if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+								if (undefined !== NextNumPr && true === this.Numbering.CheckFormat(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 								{
 									NumId  = NextNumPr.NumId;
 									NumLvl = NextNumPr.Lvl;
@@ -13983,7 +13944,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 							ChangeLvl = 0;
 						}
-						else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, c_oAscNumberingFormat.Decimal))
+						else if (true === bDiffId || true != this.Numbering.CheckFormat(PrevId, PrevLvl, c_oAscNumberingFormat.Decimal))
 						{
 							NumId       = this.Numbering.Create_AbstractNum();
 							AbstractNum = this.Numbering.Get_AbstractNum(NumId);
@@ -14136,50 +14097,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 					{
 						if (0 === NumInfo.SubType)
 						{
-							var NumPr = Item.Numbering_Get();
-							if (undefined != ( NumPr = Item.Numbering_Get() ))
-							{
-								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, c_oAscNumberingFormat.Bullet))
-									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
-							}
-							else
-							{
-								// Если мы просто нажимаем добавить маркированный список, тогда мы пытаемся
-								// присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
-								// есть список, и этот список маркированный)
-
-								// Проверяем предыдущий элемент
-								var Prev   = this.Content[this.CurPos.ContentPos - 1];
-								var NumId  = undefined;
-								var NumLvl = 0;
-
-								if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
-								{
-									var PrevNumPr = Prev.Numbering_Get();
-									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
-									{
-										NumId  = PrevNumPr.NumId;
-										NumLvl = PrevNumPr.Lvl;
-									}
-								}
-
-								// Предыдущий параграф не содержит списка, либо список не того формата
-								// создаем новую нумерацию (стандартную маркированный список)
-								if (undefined === NumId)
-								{
-									NumId  = this.Numbering.Create_AbstractNum();
-									NumLvl = 0;
-
-									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
-								}
-
-								var OldNumPr = Item.Numbering_Get();
-								if (undefined != OldNumPr)
-									Item.Numbering_Add(NumId, OldNumPr.Lvl);
-								else
-									Item.Numbering_Add(NumId, NumLvl);
-							}
+							this.private_SetParagraphNumberingBullet();
 						}
 						else
 						{
@@ -14273,7 +14191,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, c_oAscNumberingFormat.Decimal))
+								if (false === this.Numbering.CheckFormat(NumPr.NumId, NumPr.Lvl, c_oAscNumberingFormat.Decimal))
 								{
 									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
@@ -14292,7 +14210,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
 								{
 									var PrevNumPr = Prev.Numbering_Get();
-									if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+									if (undefined != PrevNumPr && true === this.Numbering.CheckFormat(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 									{
 										NumId  = PrevNumPr.NumId;
 										NumLvl = PrevNumPr.Lvl;
@@ -14308,7 +14226,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									if (undefined !== Next && null !== Next && type_Paragraph === Next.GetType())
 									{
 										var NextNumPr = Next.Numbering_Get();
-										if (undefined !== NextNumPr && true === this.Numbering.Check_Format(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
+										if (undefined !== NextNumPr && true === this.Numbering.CheckFormat(NextNumPr.NumId, NextNumPr.Lvl, c_oAscNumberingFormat.Decimal))
 										{
 											NumId  = NextNumPr.NumId;
 											NumLvl = NextNumPr.Lvl;
@@ -16995,6 +16913,47 @@ CDocument.prototype.GetHyperlinkAnchors = function()
 
 	return arrAnchors;
 };
+/**
+ * Получаем последний примененный маркированный список
+ * @returns {?CNumPr}
+ */
+CDocument.prototype.GetLastBulletList = function()
+{
+	return this.LastBulletList;
+};
+/**
+ * Запоминаем последний примененный маркированный список
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ */
+CDocument.prototype.SetLastBulletList = function(sNumId, nLvl)
+{
+	if (!sNumId)
+		this.LastBulletList = undefined;
+	else
+		this.LastBulletList = new CNumPr(sNumId, nLvl);
+};
+/**
+ * Получаем последний примененный нумерованный список
+ * @returns {?CNumPr}
+ */
+CDocument.prototype.GetLastNumberedList = function()
+{
+	return this.LastNumberedList;
+};
+/**
+ * Запоминаем последний примененный нумерованный список
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ */
+CDocument.prototype.SetLastNumberedList = function(sNumId, nLvl)
+{
+	if (!sNumId)
+		this.LastNumberedList = undefined;
+	else
+		this.LastNumberedList = new CNumPr(sNumId, nLvl);
+};
+
 
 function CDocumentSelectionState()
 {

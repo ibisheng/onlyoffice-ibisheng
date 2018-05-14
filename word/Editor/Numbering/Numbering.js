@@ -115,6 +115,20 @@ CNumbering.prototype.GetAbstractNum = function(sId)
 	return this.Get_AbstractNum(sId);
 };
 /**
+ * Создаем новую нумерацию
+ * @returns {CNum}
+ */
+CNumbering.prototype.CreateNum = function()
+{
+	var oAbstractNum = new CAbstractNum();
+	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
+
+	var oNum = new CNum(this);
+	this.Num[oNum.GetId()] = oNum;
+
+	return oNum;
+};
+/**
  * @param sId
  * @returns {CNum}
  */
@@ -159,7 +173,7 @@ CNumbering.prototype.GetNumFormat = function(sNumId, nLvl)
  * @param nType {c_oAscNumberingFormat}
  * @returns {boolean}
  */
-CNumbering.prototype.Check_Format = function(sNumId, nLvl, nType)
+CNumbering.prototype.CheckFormat = function(sNumId, nLvl, nType)
 {
 	var nFormat = this.GetNumFormat(sNumId, nLvl);
 

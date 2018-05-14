@@ -6572,7 +6572,7 @@ PasteProcessor.prototype =
 						if(null != prevElem && type_Paragraph === prevElem.GetType())
 						{
 							var PrevNumPr = prevElem.Numbering_Get();
-							if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
+							if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.CheckFormat( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
 								NumId  = PrevNumPr.NumId;
 						}
 					}

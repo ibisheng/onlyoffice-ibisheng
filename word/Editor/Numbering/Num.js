@@ -77,14 +77,128 @@ CNum.prototype.GetLvl = function(nLvl)
 
 	return oAbstractNum.GetLvl(nLvl);
 };
-
-function CLvlOverride(nLvl)
+/**
+ * Создаем многоуровневый список с заданным пресетом
+ * @param nType {c_oAscMultiLevelNumbering}
+ */
+CNum.prototype.CreateDefault = function(nType)
 {
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (!oAbstractNum)
+		return;
+
+	oAbstractNum.CreateDefault(nType);
+	this.ClearAllLvlOverride();
+};
+/**
+ * Устанавливаем новый уровень
+ * @param oNumberingLvl {CNumberingLvl}
+ * @param nLvl {number} 0..8
+ */
+CNum.prototype.SetLvlOverride = function(oNumberingLvl, nLvl)
+{
+	if (nLvl < 0 || nLvl > 8)
+		return;
+
+	if (!oNumberingLvl && !this.LvlOverride[nLvl])
+		return;
+
+	var oLvlOverrideOld = this.LvlOverride[nLvl];
+	var oLvlOverrideNew = new CLvlOverride(oNumberingLvl, nLvl, -1);
+
+	AscCommon.History.Add(new CChangesNumLvlOverrideChange(this, oLvlOverrideOld, oLvlOverrideNew, nLvl));
+
+	this.LvlOverride[nLvl] = oLvlOverrideNew;
+	this.RecalculateRelatedParagraphs(nLvl);
+};
+/**
+ * Удаляем все записи о перекрывании уровней
+ */
+CNum.prototype.ClearAllLvlOverride = function()
+{
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		this.SetLvlOverride(undefined, nLvl);
+	}
+};
+/**
+ * Сообщаем, что параграфы связанные с заданным уровнем нужно пересчитать
+ * @param nLvl {number} 0..8 - заданный уровен, если -1 то для всех уровней
+ */
+CNum.prototype.RecalculateRelatedParagraphs = function(nLvl)
+{
+	if (nLvl < 0 || nLvl > 8)
+		nLvl = undefined;
+
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	var arrParagraphs  = oLogicDocument.GetAllParagraphsByNumbering({NumId : this.Id, Lvl : nLvl});
+
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrParagraphs[nIndex].RecalcCompiledPr();
+	}
+};
+/**
+ * Обрабатываем окончание загрузки изменений
+ * @param oData
+ */
+CNum.prototype.Process_EndLoad = function(oData)
+{
+	if (undefined !== oData.Lvl)
+		this.RecalculateRelatedParagraphs(oData.Lvl);
+};
+
+/**
+ * Класс реализующий замену уровня в нумерации CNum
+ * @param oNumberingLvl {CNumberingLvl}
+ * @param nLvl {number} 0..8
+ * @param [nStartOverride=-1] {number}
+ * @constructor
+ */
+function CLvlOverride(oNumberingLvl, nLvl, nStartOverride)
+{
+	this.NumberingLvl  = oNumberingLvl;
 	this.Lvl           = nLvl;
-	this.StartOverride = -1;
-	this.NumberingLvl  = null;
+	this.StartOverride = undefined !== nStartOverride ? nStartOverride : -1;
 }
 CLvlOverride.prototype.GetLvl = function()
 {
 	return this.NumberingLvl;
+};
+CLvlOverride.prototype.WriteToBinary = function(oWriter)
+{
+	// Long : Lvl
+	// Long : StartOverride
+	// bool : isUndefined NumberingLvl
+	// false -> CNumberingLvl : NumberingLvl
+
+	oWriter.WriteLong(this.Lvl);
+	oWriter.WriteLong(this.StartOverride);
+
+	if (this.NumberingLvl)
+	{
+		oWriter.WriteBool(false);
+		this.NumberingLvl.WriteToBinary(oWriter);
+	}
+	else
+	{
+		oWriter.WriteBool(true);
+	}
+};
+CLvlOverride.prototype.ReadFromBinary = function(oReader)
+{
+	// Long : Lvl
+	// Long : StartOverride
+	// bool : isUndefined NumberingLvl
+	// false -> CNumberingLvl : NumberingLvl
+
+	this.Lvl           = oReader.GetLong();
+	this.StartOverride = oReader.GetLong();
+	this.NumberingLvl  = undefined;
+
+	if (!oReader.GetBool())
+	{
+		this.NumberingLvl = new CNumberingLvl();
+		this.NumberingLvl.ReadFromBinary(oReader);
+	}
 };

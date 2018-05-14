@@ -56,6 +56,17 @@ CDocumentContentBase.prototype.GetId = function()
 	return this.Id;
 };
 /**
+ * Получаем ссылку на основной объект документа
+ * @returns {CDocument}
+ */
+CDocumentContentBase.prototype.GetLogicDocument = function()
+{
+	if (this instanceof CDocument)
+		return this;
+
+	return this.LogicDocument;
+};
+/**
  * Получаем тип активной части документа.
  * @returns {(docpostype_Content | docpostype_HdrFtr | docpostype_DrawingObjects | docpostype_Footnotes)}
  */
@@ -1158,4 +1169,144 @@ CDocumentContentBase.prototype.IsFootnote = function(bReturnFootnote)
 CDocumentContentBase.prototype.IsLastTableCellInRow = function(isSelection)
 {
 	return false;
+};
+/**
+ * Получаем ссылку на главный класс нумерации
+ * @returns {?CNumbering}
+ */
+CDocumentContentBase.prototype.GetNumbering = function()
+{
+	return null;
+};
+/**
+ * Обработка нажатия кнопки Bullet List
+ */
+CDocumentContentBase.prototype.private_SetParagraphNumberingBullet = function()
+{
+	var oNumbering = this.GetNumbering();
+	if (!oNumbering)
+		return;
+
+	if (true === this.IsSelectionUse())
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		// 1. Пытаемся присоединить список к списку предыдущего параграфа (если только он маркированный)
+		// 2. Пытаемся добавить список, который добавлялся предыдущий раз
+		// 3. Создаем новый маркированный список
+
+		var sNumId  = null;
+		var nNumLvl = 0;
+
+		var oPrev = this.Content[StartPos - 1];
+		if (oPrev && type_Paragraph === oPrev.GetType())
+		{
+			var oPrevNumPr = oPrev.GetNumPr();
+			if (oPrevNumPr && oNumbering.CheckFormat(oPrevNumPr.NumId, oPrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+			{
+				sNumId  = oPrevNumPr.NumId;
+				nNumLvl = oPrevNumPr.Lvl;
+			}
+		}
+
+		var oLogicDocument = this.GetLogicDocument();
+		var oLastNumPr     = oLogicDocument.GetLastBulletList();
+		if (oLastNumPr)
+		{
+			sNumId  = oLastNumPr.NumId;
+			nNumLvl = oLastNumPr.Lvl;
+		}
+
+		if (!sNumId)
+		{
+			var oNum = oNumbering.CreateNum();
+			oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+
+			sNumId  = oNum.GetId();
+			nNumLvl = 0;
+
+			oNumbering.Get_AbstractNum(sNumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+		}
+
+		oLogicDocument.SetLastBulletList(sNumId, nNumLvl);
+
+		// Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
+		// а у тех которые содержали, мы уровень не меняем
+		for (var Index = StartPos; Index <= EndPos; Index++)
+		{
+			var oOldNumPr = null;
+
+			if (type_Paragraph === this.Content[Index].GetType())
+			{
+				if (undefined != ( OldNumPr = this.Content[Index].Numbering_Get() ))
+					this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+				else
+					this.Content[Index].ApplyNumPr(sNumId, nNumLvl);
+			}
+			else
+			{
+				// TODO: Доделать
+				//this.Content[Index].SetParagraphNumbering(NumInfo);
+			}
+		}
+	}
+	else
+	{
+		var oPara = this.Content[this.CurPos.ContentPos];
+		if (type_Paragraph !== oPara.GetType())
+			return;
+
+		var oNumPr = oPara.Numbering_Get();
+		if (undefined !== oNumPr)
+		{
+			var oNum = oNumbering.GetNum(oNumPr);
+			if (!oNumbering.CheckFormat(oNumPr.NumId, oNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+				oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+		}
+		else
+		{
+			// 1. Пытаемся присоединить список к списку предыдущего параграфа (если только он маркированный)
+			// 2. Пытаемся присоединить список к списку следующего параграфа (если он маркированный)
+			// 3. Пытаемся добавить список, который добавлялся предыдущий раз
+			// 4. Создаем новый маркированный список
+
+			var NumId  = undefined;
+			var NumLvl = 0;
+
+			var oPrev = this.Content[this.CurPos.ContentPos - 1];
+			if (oPrev && type_Paragraph === oPrev.GetType())
+			{
+				var PrevNumPr = oPrev.Numbering_Get();
+				if (undefined != PrevNumPr && true === this.Numbering.CheckFormat(PrevNumPr.NumId, PrevNumPr.Lvl, c_oAscNumberingFormat.Bullet))
+				{
+					NumId  = PrevNumPr.NumId;
+					NumLvl = PrevNumPr.Lvl;
+				}
+			}
+
+			// Предыдущий параграф не содержит списка, либо список не того формата
+			// создаем новую нумерацию (стандартную маркированный список)
+			if (undefined === NumId)
+			{
+				NumId  = this.Numbering.Create_AbstractNum();
+				NumLvl = 0;
+
+				this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+			}
+
+			var OldNumPr = Item.Numbering_Get();
+			if (undefined != OldNumPr)
+				Item.Numbering_Add(NumId, OldNumPr.Lvl);
+			else
+				Item.Numbering_Add(NumId, NumLvl);
+		}
+
+	}
 };

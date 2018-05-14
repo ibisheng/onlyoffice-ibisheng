@@ -9468,10 +9468,10 @@ CParaSpacing.prototype.Is_Empty = function()
 	return true;
 };
 
-function CNumPr()
+function CNumPr(sNumId, nLvl)
 {
-    this.NumId = "-1";
-    this.Lvl   =    0;
+    this.NumId = undefined !== sNumId ? sNumId : "-1";
+    this.Lvl   = undefined !== nLvl ? nLvl : 0;
 }
 
 CNumPr.prototype =

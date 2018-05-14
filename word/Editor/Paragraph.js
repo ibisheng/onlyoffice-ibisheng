@@ -7558,6 +7558,23 @@ Paragraph.prototype.Numbering_Get = function()
 	return undefined;
 };
 /**
+ * Получаем настройку нумерации у данного параграфа, если она есть
+ * @returns {?CNumPr}
+ */
+Paragraph.prototype.GetNumPr = function()
+{
+	return this.Numbering_Get();
+};
+/**
+ * Применяем нумерацию
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ */
+Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
+{
+	this.Numbering_Add(sNumId, nLvl);
+};
+/**
  * Удаляем нумерацию
  */
 Paragraph.prototype.Numbering_Remove = function()
