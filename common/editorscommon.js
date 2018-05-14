@@ -3609,7 +3609,7 @@ window["asc_initAdvancedOptions"] = function(_code, _file_hash)
 
     _editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
 };
-window["asc_openAsLocalCallback"] = function(_url, _data, _len)
+window.openFileCryptCallback = function(_binary)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
@@ -3619,19 +3619,17 @@ window["asc_openAsLocalCallback"] = function(_url, _data, _len)
         return;
     }
 
-    var _binary = getBinaryArray(_data, _len);
-
     if ("DOCY" == AscCommon.c_oSerFormat.Signature)
 	{
-        var _sign_len = AscCommon.c_oSerFormat.Signature.length;
-        var _signature = "";
-        if (_binary.length >= _sign_len)
-        {
-            for (var i = 0; i < _sign_len; i++)
-                _signature += String.fromCharCode(_binary[i]);
-        }
+		var isEditor = true;
+        if (_binary.length > 4)
+		{
+			var _signature = (String.fromCharCode(_data[0]) + String.fromCharCode(_data[1]) + String.fromCharCode(_data[2]) + String.fromCharCode(_data[3]));
+			if (_signature != AscCommon.c_oSerFormat.Signature)
+				isEditor = false;
+		}
 
-        if (AscCommon.c_oSerFormat.Signature !== _signature)
+        if (!isEditor)
             _editor.OpenDocument(_url, _binary);
         else
             _editor.OpenDocument2(_url, _binary);

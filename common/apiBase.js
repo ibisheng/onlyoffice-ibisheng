@@ -1307,6 +1307,11 @@
 				}
 			}
 			this.onEndLoadFile(null);
+
+			if (this.DocInfo.get_Encrypted() && window["AscDesktopEditor"])
+			{
+				window["AscDesktopEditor"]["OpenFileCrypt"](this.DocInfo.get_Title(), this.DocInfo.get_Url(), window.openFileCryptCallback);
+			}
 		}
 	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
