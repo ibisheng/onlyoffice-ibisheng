@@ -2460,11 +2460,11 @@ CChartsDrawer.prototype =
 		return result;
 	},
 
-	getYPosition: function(val, axis, isOx, logBase)
-	{
+	getYPosition: function (val, axis) {
 		var yPoints = axis.yPoints ? axis.yPoints : axis.xPoints;
-		if(logBase)
-		{
+		var isOx = axis.axPos === window['AscFormat'].AX_POS_T || axis.axPos === window['AscFormat'].AX_POS_B;
+		var logBase = axis.scaling.logBase;
+		if (logBase) {
 			return this._getYPositionLogBase(val, yPoints, isOx, logBase);
 		}
 
@@ -2472,89 +2472,66 @@ CChartsDrawer.prototype =
 		var result, resPos, resVal, diffVal;
 		var plotArea = this.cChartSpace.chart.plotArea;
 
-		if(!yPoints[1] && val === yPoints[0].val)
-		{
+		if (!yPoints[1] && val === yPoints[0].val) {
 			result = yPoints[0].pos;
-		}
-		else if(val < yPoints[0].val)
-		{
+		} else if (val < yPoints[0].val) {
 			resPos = Math.abs(yPoints[1].pos - yPoints[0].pos);
 			resVal = yPoints[1].val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[0].val) - Math.abs(val);
-			if(isOx)
+			if (isOx) {
 				result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
-			else
+			} else {
 				result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
+			}
 
-			if(result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos)
-			{
+			if (result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos) {
 				result = yPoints[0].pos;
 			}
-		}
-		else if(val > yPoints[yPoints.length - 1].val)
-		{
+		} else if (val > yPoints[yPoints.length - 1].val) {
 			var test = yPoints[1] ? yPoints[1] : yPoints[0];
 			resPos = Math.abs(test.pos - yPoints[0].pos);
 			resVal = test.val - yPoints[0].val;
 			diffVal = Math.abs(yPoints[yPoints.length - 1].val - val);
 
-			if(plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-			{
-				if(isOx)
+			if (axis.scaling.orientation === ORIENTATION_MIN_MAX) {
+				if (isOx) {
 					result = yPoints[yPoints.length - 1].pos + (diffVal / resVal) * resPos;
-				else
+				} else {
 					result = yPoints[yPoints.length - 1].pos - (diffVal / resVal) * resPos;
-			}
-			else
-			{
-				if(isOx)
+				}
+			} else {
+				if (isOx) {
 					result = yPoints[yPoints.length - 1].pos - (diffVal / resVal) * resPos;
-				else
+				} else {
 					result = yPoints[yPoints.length - 1].pos + (diffVal / resVal) * resPos;
+				}
 			}
 
-			if(result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos)
-			{
+			if (result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos) {
 				result = yPoints[yPoints.length - 1].pos;
 			}
-		}
-		else
-		{
-			for(var s = 0; s < yPoints.length; s++)
-			{
-				if(val >= yPoints[s].val && val <= yPoints[s + 1].val)
-				{
+		} else {
+			for (var s = 0; s < yPoints.length; s++) {
+				if (val >= yPoints[s].val && val <= yPoints[s + 1].val) {
 					resPos = Math.abs(yPoints[s + 1].pos - yPoints[s].pos);
 					resVal = yPoints[s + 1].val - yPoints[s].val;
 
 					var startPos = yPoints[s].pos;
 
-					if(!isOx)
-					{
-						if(plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-							result =  - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
-						else
-							result =  (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
-					}
-					else
-					{
-						if(this.calcProp.type === c_oChartTypes.Scatter || this.calcProp.type === c_oChartTypes.Stock)
-						{
-							if(plotArea.catAx.scaling.orientation !== ORIENTATION_MIN_MAX)
-								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
-							else
-								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
+					if (!isOx) {
+						if (axis.scaling.orientation === ORIENTATION_MIN_MAX) {
+							result = -(resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
+						} else {
+							result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
 						}
-						else
-						{
-							if((plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX && this.calcProp.type !== c_oChartTypes.Line) || (plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX && this.calcProp.type === c_oChartTypes.Line))
-								result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
-							else
-								result = - (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
+					} else {
+						if (axis.scaling.orientation !== ORIENTATION_MIN_MAX) {
+							result = -(resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
+						} else {
+							result = (resPos / resVal) * (Math.abs(val - yPoints[s].val)) + startPos;
 						}
+						break;
 					}
-
-					break;
 				}
 			}
 		}
@@ -4578,7 +4555,7 @@ drawBarChart.prototype = {
 			startY = nullPositionOX;
 			if (this.valAx && this.valAx.scaling.logBase)//исключение для логарифмической шкалы
 			{
-				height = nullPositionOX - this.cChartDrawer.getYPosition(val, this.valAx, null, this.valAx.scaling.logBase) * this.chartProp.pxToMM;
+				height = nullPositionOX - this.cChartDrawer.getYPosition(val, this.valAx) * this.chartProp.pxToMM;
 			} else {
 				height = nullPositionOX - this.cChartDrawer.getYPosition(val, this.valAx) * this.chartProp.pxToMM;
 			}
@@ -5454,16 +5431,16 @@ drawLineChart.prototype = {
 
 		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3);
 
-		x = this.cChartDrawer.getYPosition(splineCoords[0].x, this.catAx, true);
+		x = this.cChartDrawer.getYPosition(splineCoords[0].x, this.catAx);
 		y = this.cChartDrawer.getYPosition(splineCoords[0].y, this.valAx);
 
-		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, this.catAx, true);
+		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, this.catAx);
 		y1 = this.cChartDrawer.getYPosition(splineCoords[1].y, this.valAx);
 
-		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, this.catAx, true);
+		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, this.catAx);
 		y2 = this.cChartDrawer.getYPosition(splineCoords[2].y, this.valAx);
 
-		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, this.catAx, true);
+		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, this.catAx);
 		y3 = this.cChartDrawer.getYPosition(splineCoords[3].y, this.valAx);
 
 		path.moveTo(x * pathW, y * pathH);
@@ -5487,13 +5464,13 @@ drawLineChart.prototype = {
 
 			if (i === 0) {
 				startCoords = {
-					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx, true),
+					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
 					y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
 				};
 			}
 
 			endCoords = {
-				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx, true),
+				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
 				y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
 			};
 
@@ -7376,8 +7353,8 @@ drawHBarChart.prototype = {
 					curVal = axisMin;
 				}
 
-				endBlockPosition = this.cChartDrawer.getYPosition((curVal), this.valAx, true) * this.chartProp.pxToMM;
-				startBlockPosition = prevVal ? this.cChartDrawer.getYPosition((prevVal), this.valAx, true) * this.chartProp.pxToMM : nullPositionOX;
+				endBlockPosition = this.cChartDrawer.getYPosition(curVal, this.valAx) * this.chartProp.pxToMM;
+				startBlockPosition = prevVal ? this.cChartDrawer.getYPosition(prevVal, this.valAx) * this.chartProp.pxToMM : nullPositionOX;
 			} else {
 				this._calculateSummStacked(j);
 
@@ -7398,8 +7375,8 @@ drawHBarChart.prototype = {
 					prevVal = axisMin * test;
 				}
 
-				endBlockPosition = this.cChartDrawer.getYPosition((curVal / test), this.valAx, true) * this.chartProp.pxToMM;
-				startBlockPosition = test ? this.cChartDrawer.getYPosition((prevVal / test), this.valAx, true) * this.chartProp.pxToMM : nullPositionOX;
+				endBlockPosition = this.cChartDrawer.getYPosition((curVal / test), this.valAx) * this.chartProp.pxToMM;
+				startBlockPosition = test ? this.cChartDrawer.getYPosition((prevVal / test), this.valAx) * this.chartProp.pxToMM : nullPositionOX;
 			}
 
 			startY = startBlockPosition;
@@ -7409,7 +7386,7 @@ drawHBarChart.prototype = {
 				width = -width;
 			}
 		} else {
-			width = this.cChartDrawer.getYPosition(val, this.valAx, true) * this.chartProp.pxToMM - nullPositionOX;
+			width = this.cChartDrawer.getYPosition(val, this.valAx) * this.chartProp.pxToMM - nullPositionOX;
 			startY = nullPositionOX;
 		}
 
@@ -10377,10 +10354,10 @@ drawScatterChart.prototype = {
 					if (isSplineLine) {
 						this.paths.series[i][n] = this._calculateSplineLine(points[i], n, xPoints, yPoints);
 					} else {
-						x = this.cChartDrawer.getYPosition(points[i][n].x, this.catAx, true);
+						x = this.cChartDrawer.getYPosition(points[i][n].x, this.catAx);
 						y = this.cChartDrawer.getYPosition(points[i][n].y, this.valAx);
 
-						x1 = this.cChartDrawer.getYPosition(points[i][n + 1].x, this.catAx, true);
+						x1 = this.cChartDrawer.getYPosition(points[i][n + 1].x, this.catAx);
 						y1 = this.cChartDrawer.getYPosition(points[i][n + 1].y, this.valAx);
 
 						this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
@@ -10521,16 +10498,16 @@ drawScatterChart.prototype = {
 
 		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3);
 
-		x = this.cChartDrawer.getYPosition(splineCoords[0].x, this.catAx, true);
+		x = this.cChartDrawer.getYPosition(splineCoords[0].x, this.catAx);
 		y = this.cChartDrawer.getYPosition(splineCoords[0].y, this.valAx);
 
-		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, this.catAx, true);
+		x1 = this.cChartDrawer.getYPosition(splineCoords[1].x, this.catAx);
 		y1 = this.cChartDrawer.getYPosition(splineCoords[1].y, this.valAx);
 
-		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, this.catAx, true);
+		x2 = this.cChartDrawer.getYPosition(splineCoords[2].x, this.catAx);
 		y2 = this.cChartDrawer.getYPosition(splineCoords[2].y, this.valAx);
 
-		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, this.catAx, true);
+		x3 = this.cChartDrawer.getYPosition(splineCoords[3].x, this.catAx);
 		y3 = this.cChartDrawer.getYPosition(splineCoords[3].y, this.valAx);
 
 		path.moveTo(x * pathW, y * pathH);
@@ -10567,13 +10544,13 @@ drawScatterChart.prototype = {
 
 			if (i === 0) {
 				startCoords = {
-					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx, true),
+					x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
 					y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
 				};
 			}
 
 			endCoords = {
-				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx, true),
+				x: this.cChartDrawer.getYPosition(splineCoords[0], this.catAx),
 				y: this.cChartDrawer.getYPosition(splineCoords[1], this.valAx)
 			};
 
@@ -10665,7 +10642,7 @@ drawStockChart.prototype = {
 				this.paths.values[i] = {};
 			}
 
-			xVal = this.cChartDrawer.getYPosition(i, this.catAx, true);
+			xVal = this.cChartDrawer.getYPosition(i, this.catAx);
 			yVal1 = this.cChartDrawer.getYPosition(val1, this.valAx);
 			yVal2 = this.cChartDrawer.getYPosition(val2, this.valAx);
 			yVal3 = this.cChartDrawer.getYPosition(val3, this.valAx);
@@ -10870,7 +10847,7 @@ drawBubbleChart.prototype = {
 
 			for (var k = 0; k < points.length; k++) {
 				y = this.cChartDrawer.getYPosition(points[k].y, this.valAx);
-				x = this.cChartDrawer.getYPosition(points[k].x, this.catAx, true);
+				x = this.cChartDrawer.getYPosition(points[k].x, this.catAx);
 
 
 				if (!this.paths.points) {
