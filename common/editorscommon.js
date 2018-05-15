@@ -3706,17 +3706,17 @@ window["asc_IsNeedBuildCryptedFile"] = function()
 
     if (!isOne)
     {
-    	console.log("asc_IsNeedBuildCryptedFile: no one");
+    	//console.log("asc_IsNeedBuildCryptedFile: no one");
     	_returnValue = false;
     }
     else if (null != History.SavedIndex && -1 != History.SavedIndex)
     {
-        console.log("asc_IsNeedBuildCryptedFile: one1");
+        //console.log("asc_IsNeedBuildCryptedFile: one1");
         _returnValue = true;
     }
     else if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
     {
-        console.log("asc_IsNeedBuildCryptedFile: one2");
+        //console.log("asc_IsNeedBuildCryptedFile: one2");
         _returnValue = true;
     }
 
@@ -3745,8 +3745,6 @@ window["UpdateSystemPlugins"] = function()
             }
         }
     }
-
-    var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
     var _array = [];
 
@@ -3781,4 +3779,94 @@ window["UpdateSystemPlugins"] = function()
 
     window.g_asc_plugins.registerSystem("", _arraySystem);
     window.g_asc_plugins.runAllSystem();
+};
+
+window["buildCryptoFile_Start"] = function()
+{
+    var _editor = window.Asc.editor ? window.Asc.editor : window.editor;
+    _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+    window.g_asc_plugins.sendToEncryption({ "type" : "generatePassword" });
+};
+
+window["buildCryptoFile_End"] = function(url, error, hash, password)
+{
+    var _editor = window.Asc.editor ? window.Asc.editor : window.editor;
+    _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
+
+    if (0 != error)
+	{
+		_editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
+		return;
+    }
+
+    // send password
+    _editor._callbackPluginEndAction = function()
+	{
+		this._callbackPluginEndAction = null;
+
+        setTimeout(function() {
+
+        	window.AscDesktopEditor.buildCryptedEnd();
+
+		}, 1000);
+	};
+    window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
+
+    // file upload
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "ascdesktop://fonts/" + url, true);
+    xhr.responseType = 'arraybuffer';
+
+    if (xhr.overrideMimeType)
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    else
+        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+    xhr.onload = function()
+    {
+        if (this.status != 200)
+        {
+            // error
+            return;
+        }
+
+        var fileData = new Uint8Array(this.response);
+
+        var ext = ".docx";
+        switch (_editor.editorId)
+		{
+			case AscCommon.c_oEditorId.Presentation:
+				ext = ".pptx";
+				break;
+			case AscCommon.c_oEditorId.Spreadsheet:
+				ext = ".xlsx";
+				break;
+			default:
+				break;
+		}
+
+        AscCommon.sendSaveFile(this.documentId, this.documentUserId, "output" + ext, this.asc_getSessionToken(), fileData, function(err) {
+            console.log('error');
+        }, function(httpRequest) {
+            //console.log(httpRequest.responseText);
+            try
+            {
+                var data = {
+                    "accounts": httpRequest.responseText ? JSON.parse(httpRequest.responseText) : undefined,
+                    "hash": hash,
+                    "password" : pass,
+                    "type": "share"
+                };
+
+                window["AscDesktopEditor"]["sendSystemMessage"](data);
+                window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
+            }
+            catch (err)
+            {
+            }
+        });
+    };
+
+    xhr.send(null);
 };

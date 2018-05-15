@@ -1596,6 +1596,11 @@
 	baseEditorsApi.prototype["pluginMethod_EndAction"] = function(type, description)
 	{
 		this.sync_EndAction((type == "Block") ? c_oAscAsyncActionType.BlockInteraction : c_oAscAsyncActionType.Information, description);
+
+        if (this._callbackPluginEndAction)
+		{
+			this._callbackPluginEndAction.call(this);
+		}
 	};
 
     baseEditorsApi.prototype["pluginMethod_OnEncryption"] = function(obj)
@@ -1607,20 +1612,11 @@
             {
                 if ("" == obj["password"])
                 {
-                    AscCommon.History.UserSavedIndex = _editor.LastUserSavedIndex;
-
-                    if (window.editor)
-                        _editor.UpdateInterfaceState();
-                    else
-                        _editor.onUpdateDocumentModified(AscCommon.History.Have_Changes());
-
-                    _editor.LastUserSavedIndex = undefined;
-
                     _editor.sendEvent("asc_onError", "There is no connection with the blockchain", c_oAscError.Level.Critical);
                     return;
                 }
 
-                window["DesktopOfflineAppDocumentStartSave"](window.doadssIsSaveAs, obj["password"], true);
+                window["AscDesktopEditor"]["buildCryptedStart"](_editor.asc_nativeGetFile(), obj["password"]);
                 break;
             }
             case "getPasswordByFile":
