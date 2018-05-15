@@ -4325,7 +4325,6 @@ function OfflineEditor () {
                                   });
 
         _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
-
             var rData = {
                          "c"             : "open",
                          "id"            : t.initSettings["docKey"],
@@ -4336,7 +4335,7 @@ function OfflineEditor () {
                          "title"         : this.documentTitle,
                          "nobase64"      : true};
 
-                         _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
+            _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });
 
         _api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
@@ -4348,7 +4347,7 @@ function OfflineEditor () {
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
                                   var stream = global_memory_stream_menu;
                                   stream["ClearNoAttack"]();
-                                  stream["WriteLong"](options.asc_getOptionId());
+                                  stream["WriteString2"](JSON.stringify(options));
                                   window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
     };
@@ -4798,7 +4797,7 @@ function OfflineEditor () {
             return val * ascCvtRatio(0, 3);
         }
 
-        if (imageUrl && !objectRender.isViewerMode()) {
+        if (imageUrl && objectRender.canEdit()) {
 
             var _image = new Image();
             _image.src = imageUrl
@@ -5490,7 +5489,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
 
-    var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+    var ct = ws.getCursorTypeFromXY(x, y);
     if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
         ws.af_setDialogProp(ct.idFilter);
         //var cell = offline_get_cell_in_coord(x, y);
@@ -5501,7 +5500,7 @@ window["native"]["offline_mouse_down"] = function(x, y, pin, isViewerMode, isFor
 
         if (!isViewerMode) {
 
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             ws.startCellMoveResizeRange = null;
 
@@ -5565,7 +5564,7 @@ window["native"]["offline_mouse_move"] = function(x, y, isViewerMode, isRangeRes
 
     if (isRangeResize) {
         if (!isViewerMode) {
-            var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(x, y);
 
             var rangeChange = new window["Asc"].Range(c1, r1, c2, r2);
             var target = {
@@ -6179,7 +6178,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
     var openEditor = function (res) {
         if (res) {
             // Выставляем переменные, что мы редактируем
-            // t.controller.setCellEditMode(true);
             ws.setCellEditMode(true);
 
             ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
@@ -6189,7 +6187,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
             if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
                 /*activeRange*/arn)) {
                 ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
-                // t.controller.setCellEditMode(false);
                 // t.controller.setStrictClose(false);
                 // t.controller.setFormulaEditMode(false);
                 ws.setCellEditMode(false);
@@ -6202,7 +6199,6 @@ window["native"]["offline_insertFormula"] = function(functionName, autoComplete,
                 wb.cellEditor.curLeft, wb.cellEditor.curTop, wb.cellEditor.curHeight];
 
         } else {
-            //t.controller.setCellEditMode(false);
             //t.controller.setStrictClose(false);
             //t.controller.setFormulaEditMode(false);
             ws.setCellEditMode(false);
@@ -7267,9 +7263,8 @@ window["native"]["offline_apply_event"] = function(type,params) {
         {
             var cellX = params[0];
             var cellY = params[1];
-            var isViewerMode = false;
             var ws = _api.wb.getWorksheet();
-            var ct = ws.getCursorTypeFromXY(cellX, cellY, isViewerMode);
+            var ct = ws.getCursorTypeFromXY(cellX, cellY);
 
             var curIndex = _api.asc_getActiveWorksheetIndex();
 
@@ -7450,6 +7445,21 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
             break;
         }
+
+        case 22000: // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+        {
+            var obj = JSON.parse(params);
+            var type = parseInt(obj["type"]);
+            var encoding = parseInt(obj["encoding"]);
+            var delimiter = parseInt(obj["delimiter"]);
+
+            _api.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
+            _api.documentFormat = "csv";
+           
+            _api.asc_setAdvancedOptions(type, new Asc.asc_CCSVAdvancedOptions(encoding, delimiter, null));
+            
+            break;
+        } 
 
         case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
         {

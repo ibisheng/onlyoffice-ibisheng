@@ -824,24 +824,21 @@ CPresentation.prototype =
 
     IsEditCommentsMode: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+        return this.Api.isRestrictionComments();
     },
 
     IsEditSignaturesMode: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+        return this.Api.isRestrictionSignatures();
     },
     IsViewModeInEditor: function()
     {
-        return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+        return this.Api.isRestrictionView();
     },
 
     CanEdit: function()
     {
-        if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsEditSignaturesMode() || this.IsViewModeInEditor())
-            return false;
-
-        return true;
+        return this.Api.canEdit();
     },
 
 
@@ -2459,10 +2456,10 @@ CPresentation.prototype =
 
     },
 
-	ClearParagraphFormatting : function()
+	ClearParagraphFormatting : function(isClearParaPr, isClearTextPr)
     {
         var oController = this.GetCurrentController();
-        oController && oController.checkSelectedObjectsAndCallback(oController.paragraphClearFormatting, [], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
+        oController && oController.checkSelectedObjectsAndCallback(oController.paragraphClearFormatting, [isClearParaPr, isClearTextPr], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
         this.Document_UpdateInterfaceState();
     },
 

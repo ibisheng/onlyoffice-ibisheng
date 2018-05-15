@@ -219,6 +219,7 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 		oStyle.Set_TextPr(oAscStyle.get_TextPr());
 		oStyle.Set_ParaPr(oAscStyle.get_ParaPr());
 		oStyle.Set_Name(sStyleName);
+		oStyle.SetCustom(true);
 
 		if (styletype_Paragraph === oStyle.Get_Type())
 			oStyle.Set_QFormat(true);

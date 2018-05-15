@@ -530,12 +530,22 @@ CDocumentContent.prototype.Is_UseInDocument = function(Id)
 
 	return false;
 };
-CDocumentContent.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CDocumentContent.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
 	if (this.Parent)
-		return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+		return this.Parent.IsHdrFtr(bReturnHdrFtr);
 	else
 		return (bReturnHdrFtr ? null : false);
+};
+CDocumentContent.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if (this instanceof CFootEndnote)
+		return true;
+
+	if (this.Parent)
+		return this.Parent.IsFootnote(bReturnFootnote);
+
+	return (bReturnFootnote ? null : false);
 };
 CDocumentContent.prototype.Is_DrawingShape = function(bRetShape)
 {
@@ -1337,7 +1347,7 @@ CDocumentContent.prototype.RecalculateCurPos = function(bUpdateX, bUpdateY)
 		{
 			this.private_CheckCurPage();
 
-			if (this.CurPage > 0 && true === this.Parent.Is_HdrFtr(false))
+			if (this.CurPage > 0 && true === this.Parent.IsHdrFtr(false))
 			{
 				this.CurPage = 0;
 				this.DrawingDocument.TargetEnd();
@@ -1379,7 +1389,7 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 	var PageAbs = this.Get_AbsolutePage(CurPage);
 
 	// В колонтитуле не учитывается.
-	if ((true != this.Is_HdrFtr(false) && true !== this.IsBlockLevelSdtContent()) || true === bForceCheckDrawings)
+	if ((true != this.IsHdrFtr(false) && true !== this.IsBlockLevelSdtContent()) || true === bForceCheckDrawings)
 	{
 		// Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
 		// случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
@@ -2898,15 +2908,21 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 		}
 	}
 };
-CDocumentContent.prototype.ClearParagraphFormatting = function()
+CDocumentContent.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
+	if (false !== isClearParaPr)
+		isClearParaPr = true;
+
+	if (false !== isClearTextPr)
+		isClearTextPr = true;
+
 	if (true === this.ApplyToAll)
 	{
 		for (var Index = 0; Index < this.Content.length; Index++)
 		{
 			var Item = this.Content[Index];
 			Item.Set_ApplyToAll(true);
-			Item.ClearParagraphFormatting();
+			Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 			Item.Set_ApplyToAll(false);
 		}
 
@@ -2915,7 +2931,7 @@ CDocumentContent.prototype.ClearParagraphFormatting = function()
 
 	if (docpostype_DrawingObjects == this.CurPos.Type)
 	{
-		return this.LogicDocument.DrawingObjects.paragraphClearFormatting();
+		return this.LogicDocument.DrawingObjects.paragraphClearFormatting(isClearParaPr, isClearTextPr);
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
@@ -2935,14 +2951,14 @@ CDocumentContent.prototype.ClearParagraphFormatting = function()
 				for (var Index = StartPos; Index <= EndPos; Index++)
 				{
 					var Item = this.Content[Index];
-					Item.ClearParagraphFormatting();
+					Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 				}
 			}
 		}
 		else
 		{
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.ClearParagraphFormatting();
+			Item.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 		}
 	}
 };
@@ -4203,7 +4219,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         {
             this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
             var DocContent = this;
-            var HdrFtr     = this.Is_HdrFtr(true);
+            var HdrFtr     = this.IsHdrFtr(true);
             if (null !== HdrFtr)
                 DocContent = HdrFtr.Content;
 
@@ -4432,7 +4448,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								NumId  = this.Numbering.Create_AbstractNum();
 								NumLvl = 0;
 
-								this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+								this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							}
 
 							// Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
@@ -4563,15 +4579,15 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								NumId           = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Bullet))
 							{
 								NumId           = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else
 							{
@@ -4580,7 +4596,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var NewAbstractNum = this.Numbering.Get_AbstractNum(NumId);
 
 								NewAbstractNum.Copy(OldAbstractNum);
-								NewAbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+								NewAbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 
 							// Параграфы, которые не содержали списка у них уровень выставляем 0,
@@ -4648,7 +4664,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 									NumId  = this.Numbering.Create_AbstractNum();
 									NumLvl = 0;
 
-									this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
 							}
 
@@ -4725,14 +4741,14 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								NumId       = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
 							else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Decimal))
 							{
 								NumId       = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = PrevLvl;
 							}
 							else
@@ -4748,37 +4764,37 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								case 1:
 								{
-									AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 									break;
 								}
 								case 2:
 								{
-									AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 									break;
 								}
 								case 3:
 								{
-									AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 									break;
 								}
 								case 4:
 								{
-									AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 									break;
 								}
 								case 5:
 								{
-									AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 									break;
 								}
 								case 6:
 								{
-									AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 									break;
 								}
 								case 7:
 								{
-									AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 									break;
 								}
 							}
@@ -4815,17 +4831,17 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Create_Default_Multilevel_1();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Create_Default_Multilevel_2();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Create_Default_Multilevel_3();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 								break;
 							}
 						}
@@ -4884,7 +4900,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet))
 								{
-									AbstractNum.Create_Default_Bullet();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
 							}
 							else
@@ -4915,7 +4931,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 									NumId  = this.Numbering.Create_AbstractNum();
 									NumLvl = 0;
 
-									this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
 
 								var OldNumPr = Item.Numbering_Get();
@@ -4994,14 +5010,14 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								AbstractNum.Set_Lvl_Bullet(NumPr.Lvl, LvlText, LvlTextPr);
+								AbstractNum.SetLvlByType(NumPr.Lvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else
 							{
 								var NumId       = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 
 								Item.Numbering_Add(NumId, 0);
 							}
@@ -5019,7 +5035,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal))
 								{
-									AbstractNum.Create_Default_Numbered();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
 							}
 							else
@@ -5064,7 +5080,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 										NumId  = this.Numbering.Create_AbstractNum();
 										NumLvl = 0;
 
-										this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+										this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 									}
 								}
 
@@ -5095,7 +5111,7 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								var NumId   = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
 
@@ -5103,37 +5119,37 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 							{
 								case 1:
 								{
-									AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 									break;
 								}
 								case 2:
 								{
-									AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 									break;
 								}
 								case 3:
 								{
-									AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 									break;
 								}
 								case 4:
 								{
-									AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 									break;
 								}
 								case 5:
 								{
-									AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 									break;
 								}
 								case 6:
 								{
-									AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 									break;
 								}
 								case 7:
 								{
-									AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 									break;
 								}
 							}
@@ -5170,17 +5186,17 @@ CDocumentContent.prototype.SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Create_Default_Multilevel_1();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Create_Default_Multilevel_2();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Create_Default_Multilevel_3();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 								break;
 							}
 						}
@@ -6572,7 +6588,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 		this.DrawingDocument.TargetEnd();
 		this.DrawingDocument.SetCurrentPage(AbsPage);
 
-		var HdrFtr = this.Is_HdrFtr(true);
+		var HdrFtr = this.IsHdrFtr(true);
 		if (null === HdrFtr)
 		{
 			this.LogicDocument.Selection.Use   = true;
@@ -7057,7 +7073,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
     this.DrawingDocument.TargetEnd();
     this.DrawingDocument.SetCurrentPage(this.Get_StartPage_Absolute() + this.CurPage);
 
-    var HdrFtr = this.Is_HdrFtr(true);
+    var HdrFtr = this.IsHdrFtr(true);
     if (null != HdrFtr)
     {
         HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);

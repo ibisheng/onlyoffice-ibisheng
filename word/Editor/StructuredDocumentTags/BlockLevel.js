@@ -202,7 +202,9 @@ CBlockLevelSdt.prototype.IsSelectionEmpty = function(isCheckHidden)
 };
 CBlockLevelSdt.prototype.GetSelectedElementsInfo = function(oInfo)
 {
-	oInfo.SetBlockLevelSdt(this);
+	if (!oInfo.IsSkipTOC() || !this.IsBuiltInTableOfContents())
+		oInfo.SetBlockLevelSdt(this);
+
 	this.Content.GetSelectedElementsInfo(oInfo);
 };
 CBlockLevelSdt.prototype.IsSelectionUse = function()
@@ -444,9 +446,9 @@ CBlockLevelSdt.prototype.PreDelete = function()
 {
 	this.Content.PreDelete();
 };
-CBlockLevelSdt.prototype.ClearParagraphFormatting = function()
+CBlockLevelSdt.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.Content.ClearParagraphFormatting();
+	this.Content.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CBlockLevelSdt.prototype.GetCursorPosXY = function()
 {
@@ -601,7 +603,9 @@ CBlockLevelSdt.prototype.DistributeTableCells = function(isHorizontally)
 };
 CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
-	this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+	if (!this.IsBuiltInTableOfContents())
+		this.LogicDocument.Api.sync_ContentControlCallback(this.GetContentControlPr());
+
 	this.Content.Document_UpdateInterfaceState();
 };
 CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
@@ -784,9 +788,13 @@ CBlockLevelSdt.prototype.IsContentOnFirstPage = function()
 	return this.Content.IsContentOnFirstPage();
 };
 //----------------------------------------------------------------------------------------------------------------------
-CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+CBlockLevelSdt.prototype.IsHdrFtr = function(bReturnHdrFtr)
 {
-	return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+	return this.Parent.IsHdrFtr(bReturnHdrFtr);
+};
+CBlockLevelSdt.prototype.IsFootnote = function(bReturnFootnote)
+{
+	return this.Parent.IsFootnote(bReturnFootnote);
 };
 CBlockLevelSdt.prototype.Is_TopDocument = function(bReturnTopDocument)
 {
@@ -1045,6 +1053,9 @@ CBlockLevelSdt.prototype.GetContentControlType = function()
 };
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
+	if (!oPr || this.IsBuiltInTableOfContents())
+		return;
+
 	this.SetAlias(oPr.Alias);
 	this.SetTag(oPr.Tag);
 	this.SetLabel(oPr.Label);
@@ -1130,7 +1141,7 @@ CBlockLevelSdt.prototype.GetContentControlLock = function()
 };
 CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
-	if (!oPr)
+	if (!oPr || this.IsBuiltInTableOfContents())
 		return;
 
 	if (undefined !== oPr.Tag)
@@ -1189,6 +1200,10 @@ CBlockLevelSdt.prototype.GetLastParagraph = function()
 CBlockLevelSdt.prototype.GetOutlineParagraphs = function(arrOutline, oPr)
 {
 	this.Content.GetOutlineParagraphs(arrOutline, oPr);
+};
+CBlockLevelSdt.prototype.IsLastTableCellInRow = function(isSelection)
+{
+	return this.Parent.IsLastTableCellInRow(isSelection);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

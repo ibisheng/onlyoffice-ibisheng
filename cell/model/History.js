@@ -118,6 +118,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
 	window['AscCH'].historyitem_Cell_Num = 24;
 	window['AscCH'].historyitem_Cell_SetPivotButton = 25;
+	window['AscCH'].historyitem_Cell_RemoveSharedFormula = 26;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
@@ -146,6 +147,8 @@ function (window, undefined) {
 	window['AscCH'].historyitem_PivotTable_StyleShowRowStripes = 4;
 	window['AscCH'].historyitem_PivotTable_StyleShowColStripes = 5;
 
+	window['AscCH'].historyitem_SharedFormula_ChangeFormula = 1;
+	window['AscCH'].historyitem_SharedFormula_ChangeShared = 2;
 
 
 function CHistory()

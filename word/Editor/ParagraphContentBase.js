@@ -1273,6 +1273,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
         if (true === this.Cursor_Is_Start() || true === this.Cursor_Is_End())
         {
             this.SelectAll();
+            this.SelectThisElement(1);
         }
         else
         {
@@ -2079,16 +2080,20 @@ CParagraphContentWithParagraphLikeContent.prototype.Draw_Elements = function(PDS
 };
 CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines = function(PDSL)
 {
-    var CurLine  = PDSL.Line - this.StartLine;
-    var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
+	var CurLine  = PDSL.Line - this.StartLine;
+	var CurRange = ( 0 === CurLine ? PDSL.Range - this.StartRange : PDSL.Range );
 
-    var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
-    var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-    for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
-    {
-        this.Content[CurPos].Draw_Lines( PDSL );
-    }
+	var nCurDepth = PDSL.CurDepth;
+	for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
+	{
+		PDSL.CurPos.Update(CurPos, nCurDepth);
+		PDSL.CurDepth = nCurDepth + 1;
+
+		this.Content[CurPos].Draw_Lines(PDSL);
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с курсором

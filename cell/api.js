@@ -308,6 +308,7 @@ var editor;
     AscCommonExcel.g_oUndoRedoSparklines = new AscCommonExcel.UndoRedoSparklines(wbModel);
     AscCommonExcel.g_oUndoRedoPivotTables = new AscCommonExcel.UndoRedoPivotTables(wbModel);
     AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wbModel, -1);
+    AscCommonExcel.g_oUndoRedoSharedFormula = new AscCommonExcel.UndoRedoSharedFormula(wbModel);
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent, adjustPrint) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -388,19 +389,19 @@ var editor;
   };
   
   spreadsheet_api.prototype.asc_SpecialPasteData = function(props) {
-	if (!this.getViewMode()) {
+	if (this.canEdit()) {
       this.wb.specialPasteData(props);
     }
   };
 
   spreadsheet_api.prototype.asc_ShowSpecialPasteButton = function(props) {
-      if (!this.getViewMode()) {
+      if (this.canEdit()) {
           this.wb.showSpecialPasteButton(props);
       }
   };
 
   spreadsheet_api.prototype.asc_UpdateSpecialPasteButton = function(props) {
-      if (!this.getViewMode()) {
+      if (this.canEdit()) {
           this.wb.updateSpecialPasteButton(props);
       }
   };
@@ -415,7 +416,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2, text_data) {
-    if (!this.getViewMode()) {
+    if (this.canEdit()) {
       this.wb.pasteData(_format, data1, data2, text_data, arguments[5]);
     }
   };
@@ -425,7 +426,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_SelectionCut = function () {
-    if (!this.getViewMode()) {
+    if (this.canEdit()) {
       this.wb.selectionCut();
     }
   };
@@ -550,7 +551,6 @@ var editor;
     if (!this.isLoadFullApi) {
       return;
     }
-    this.controller.setViewerMode(isViewMode);
     if (this.collaborativeEditing) {
       this.collaborativeEditing.setViewerMode(isViewMode);
     }
@@ -1610,9 +1610,11 @@ var editor;
       if (res) {
         t.wbModel.createWorksheet(i, name);
         t.wb.spliceWorksheet(i, 0, null);
-        t.asc_showWorksheet(i);
-        // Посылаем callback об изменении списка листов
-        t.sheetsChanged();
+        if (!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode']) {
+          t.asc_showWorksheet(i);
+          // Посылаем callback об изменении списка листов
+          t.sheetsChanged();
+		}
       }
     };
 
@@ -2012,7 +2014,7 @@ var editor;
       return;
     }
     var ws = this.wb.getWorksheet();
-    var d = ws.findCell(reference, this.isViewMode);
+    var d = ws.findCell(reference);
     if (0 === d.length) {
       return;
     }
@@ -2064,7 +2066,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_autoFitColumnWidth = function() {
-    this.wb.getWorksheet().autoFitColumnWidth(null);
+    this.wb.getWorksheet().autoFitColumnWidth();
   };
 
   spreadsheet_api.prototype.asc_getRowHeight = function() {
@@ -3025,7 +3027,7 @@ var editor;
     }
 
     // На view-режиме не нужно отправлять стили
-    if (true !== this.getViewMode()) {
+    if (this.canEdit()) {
       // Отправка стилей
       this._sendWorkbookStyles();
     }

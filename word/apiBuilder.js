@@ -1350,9 +1350,9 @@
         var oNumbering       = oGlobalNumbering.Get_AbstractNum(oNumberingId);
 
         if ("numbered" === sType)
-            oNumbering.Create_Default_Numbered();
+            oNumbering.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
         else
-            oNumbering.Create_Default_Bullet();
+            oNumbering.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 
         return new ApiNumbering(oNumbering);
     };
@@ -3198,31 +3198,31 @@
         switch (sType)
         {
             case "none"  :
-                this.Num.Set_Lvl_None(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.None);
                 break;
             case "bullet":
-                this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new CTextPr());
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.Bullet, sSymbol, new CTextPr());
                 break;
             case "1)"    :
-                this.Num.Set_Lvl_Numbered_1(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.DecimalBracket_Right);
                 break;
             case "1."    :
-                this.Num.Set_Lvl_Numbered_2(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.DecimalDot_Right);
                 break;
             case "I."    :
-                this.Num.Set_Lvl_Numbered_5(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.UpperRomanDot_Right);
                 break;
             case "A."    :
-                this.Num.Set_Lvl_Numbered_6(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.UpperLetterDot_Left);
                 break;
             case "a)"    :
-                this.Num.Set_Lvl_Numbered_7(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
                 break;
             case "a."    :
-                this.Num.Set_Lvl_Numbered_8(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.LowerLetterDot_Left);
                 break;
             case "i."    :
-                this.Num.Set_Lvl_Numbered_9(this.Lvl);
+                this.Num.SetLvlByType(this.Lvl, c_oAscNumberingLevel.LowerRomanDot_Right);
                 break;
         }
     };
@@ -3265,7 +3265,7 @@
         else if ("center" === sAlign)
             nAlign = align_Center;
 
-        this.Num.Set_Lvl_ByFormat(this.Lvl, nType, sTextFormatString, nAlign);
+        this.Num.SetLvlByFormat(this.Lvl, nType, sTextFormatString, nAlign);
     };
     /**
      * This element specifies a one-based index which determines when a numbering level should restart to its start
@@ -3275,7 +3275,7 @@
      */
     ApiNumberingLevel.prototype.SetRestart = function(isRestart)
     {
-        this.Num.Set_Lvl_Restart(this.Lvl, private_GetBoolean(isRestart, true));
+        this.Num.SetLvlRestart(this.Lvl, private_GetBoolean(isRestart, true));
     };
     /**
      * This element specifies the starting value for the numbering used by the parent numbering level within a given
@@ -3284,7 +3284,7 @@
      */
     ApiNumberingLevel.prototype.SetStart = function(nStart)
     {
-        this.Num.Set_Lvl_Start(this.Lvl, private_GetInt(nStart));
+        this.Num.SetLvlStart(this.Lvl, private_GetInt(nStart));
     };
     /**
      * Specifies the content which shall be added between a given numbering level's text and the text of every numbered
@@ -3294,11 +3294,11 @@
     ApiNumberingLevel.prototype.SetSuff = function(sType)
     {
         if ("space" === sType)
-            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Space);
+            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Space);
         else if ("tab" === sType)
-            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Tab);
+            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Tab);
         else if ("none" === sType)
-            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Nothing);
+            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Nothing);
     };
 
     //------------------------------------------------------------------------------------------------------------------

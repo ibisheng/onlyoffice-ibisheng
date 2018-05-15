@@ -1346,8 +1346,10 @@ var selected_None              = -1;
 var selected_DrawingObject     = 0;
 var selected_DrawingObjectText = 1;
 
-function CSelectedElementsInfo()
+function CSelectedElementsInfo(oPr)
 {
+	this.m_bSkipTOC = oPr && oPr.SkipTOC ? true : false;
+
 	this.m_bTable           = false; // Находится курсор или выделение целиком в какой-нибудь таблице
 	this.m_bMixedSelection  = false; // Попадает ли в выделение одновременно несколько элементов
 	this.m_nDrawing         = selected_None;
@@ -1357,7 +1359,7 @@ function CSelectedElementsInfo()
 	this.m_oField           = null;  // Поле, в котором находится выделение
 	this.m_oCell            = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
 	this.m_oBlockLevelSdt   = null;  // Если мы находимся в классе CBlockLevelSdt
-	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt
+	this.m_oInlineLevelSdt  = null;  // Если мы находимся в классе CInlineLevelSdt (важно, что мы находимся внутри класса)
 	this.m_arrComplexFields = [];
 	this.m_oPageNum         = null;
 	this.m_oPagesCount      = null;
@@ -1430,6 +1432,10 @@ function CSelectedElementsInfo()
         return this.m_oCell;
     };
 }
+CSelectedElementsInfo.prototype.IsSkipTOC = function()
+{
+	return this.m_bSkipTOC;
+};
 CSelectedElementsInfo.prototype.SetParagraph = function(Para)
 {
 	this.m_pParagraph = Para;
@@ -1442,6 +1448,9 @@ CSelectedElementsInfo.prototype.SetBlockLevelSdt = function(oSdt)
 {
 	this.m_oBlockLevelSdt = oSdt;
 };
+/**
+ * @returns {?CBlockLevelSdt}
+ */
 CSelectedElementsInfo.prototype.GetBlockLevelSdt = function()
 {
 	return this.m_oBlockLevelSdt;
@@ -1450,6 +1459,9 @@ CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
 {
 	this.m_oInlineLevelSdt = oSdt;
 };
+/**
+ * @returns {?CInlineLevelSdt}
+ */
 CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
 {
 	return this.m_oInlineLevelSdt;
@@ -4591,9 +4603,20 @@ CDocument.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 {
 	this.Controller.AddToParagraph(ParaItem, bRecalculate);
 };
-CDocument.prototype.ClearParagraphFormatting  = function()
+/**
+ * Очищаем форматирование внутри селекта
+ * {boolean} [isClearParaPr=true] Очищать ли настройки параграфа
+ * {boolean} [isClearTextPr=true] Очищать ли настройки текста
+ */
+CDocument.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.Controller.ClearParagraphFormatting();
+	if (false !== isClearParaPr)
+		isClearParaPr = true;
+
+	if (false !== isClearTextPr)
+		isClearTextPr = true;
+
+	this.Controller.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
@@ -4820,7 +4843,12 @@ CDocument.prototype.SetParagraphStyle = function(sName, isCheckLinkedStyle)
 		}
 	}
 
-	this.Controller.SetParagraphStyle(sName);
+	var oParaPr = this.GetCalculatedParaPr();
+	if (oParaPr.PStyle && this.Styles.Get(oParaPr.PStyle) && this.Styles.Get(oParaPr.PStyle).GetName() === sName)
+		this.Controller.ClearParagraphFormatting(false, true);
+	else
+		this.Controller.SetParagraphStyle(sName);
+
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
@@ -4928,7 +4956,7 @@ CDocument.prototype.Select_Drawings = function(DrawingArray, TargetContent)
 	if (DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
 		return;
 	this.DrawingObjects.resetSelection();
-	var hdr_ftr = TargetContent.Is_HdrFtr(true);
+	var hdr_ftr = TargetContent.IsHdrFtr(true);
 	if (hdr_ftr)
 	{
 		hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
@@ -6563,7 +6591,38 @@ CDocument.prototype.OnKeyDown = function(e)
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
-            this.Remove(-1, true);
+
+            var oSelectInfo = this.GetSelectedElementsInfo();
+            if (oSelectInfo.GetInlineLevelSdt())
+			{
+				var oSdt = oSelectInfo.GetInlineLevelSdt();
+				var sDefaultText = AscCommon.translateManager.getValue('Your text here');
+				var sText        = oSdt.GetSelectedText(true, false);
+
+				oSdt.Remove(-1, false);
+				if (oSdt.IsEmpty())
+				{
+					if (sText === sDefaultText)
+					{
+						oSdt.RemoveContentControlWrapper();
+					}
+					else
+					{
+						oSdt.ReplaceAllWithText(sDefaultText);
+						oSdt.SelectAll();
+						oSdt.SelectThisElement(1);
+					}
+				}
+
+				this.Recalculate();
+
+				this.Document_UpdateInterfaceState();
+				this.Document_UpdateRulersState();
+			}
+			else
+			{
+				this.Remove(-1, true);
+			}
         }
         bRetValue = keydownresult_PreventAll;
     }
@@ -6786,7 +6845,7 @@ CDocument.prototype.OnKeyDown = function(e)
                 }
                 else if (true === e.CtrlKey)
                 {
-                    this.ClearParagraphFormatting();
+                    this.ClearParagraphFormatting(false, true);
                 }
                 else
                 {
@@ -6986,7 +7045,38 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true, this.IsFormFieldEditing()))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DeleteButton);
-                this.Remove(1, true);
+
+				var oSelectInfo = this.GetSelectedElementsInfo();
+				if (oSelectInfo.GetInlineLevelSdt())
+				{
+					var oSdt = oSelectInfo.GetInlineLevelSdt();
+					var sDefaultText = AscCommon.translateManager.getValue('Your text here');
+					var sText        = oSdt.GetSelectedText(true, false);
+
+					oSdt.Remove(1, false);
+					if (oSdt.IsEmpty())
+					{
+						if (sText === sDefaultText)
+						{
+							oSdt.RemoveContentControlWrapper();
+						}
+						else
+						{
+							oSdt.ReplaceAllWithText(sDefaultText);
+							oSdt.SelectAll();
+							oSdt.SelectThisElement(1);
+						}
+					}
+
+					this.Recalculate();
+
+					this.Document_UpdateInterfaceState();
+					this.Document_UpdateRulersState();
+				}
+				else
+				{
+					this.Remove(1, true);
+				}
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -7295,24 +7385,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 187) // =
     {
-        if (true === e.CtrlKey) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
-        {
-            var TextPr = this.GetCalculatedTextPr();
-            if (null != TextPr)
-            {
-                if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey);
-                    if (true === e.ShiftKey)
-                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
-                    else
-                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
-                    this.Document_UpdateInterfaceState();
-                }
-                bRetValue = keydownresult_PreventAll;
-            }
-        }
-        else if (true === e.AltKey && !e.AltGr) // Alt + =
+        if (!e.CtrlKey && true === e.AltKey && !e.AltGr) // Alt + =
         {
             var oSelectedInfo = this.GetSelectedElementsInfo();
             var oMath         = oSelectedInfo.Get_Math();
@@ -7350,7 +7423,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
             this.DrawingDocument.TargetShow();
 
-            var Item = new ParaText(0x2013);
+            var Item = new ParaText(0x002D);
             Item.Set_SpaceAfter(false);
 
             this.AddToParagraph(Item);
@@ -8380,13 +8453,6 @@ CDocument.prototype.Is_DrawingShape = function(bRetShape)
 	}
 	return false;
 };
-CDocument.prototype.Is_HdrFtr = function(bReturnHdrFtr)
-{
-	if (true === bReturnHdrFtr)
-		return null;
-
-	return false;
-};
 CDocument.prototype.IsSelectionUse = function()
 {
 	return this.Controller.IsSelectionUse();
@@ -8437,9 +8503,13 @@ CDocument.prototype.GetCurrentParagraph = function(bIgnoreSelection, bReturnSele
 		return this.Controller.GetCurrentParagraph(bIgnoreSelection, null);
 	}
 };
-CDocument.prototype.GetSelectedElementsInfo = function()
+/**
+ * Получаем информацию о текущем выделении
+ * @returns {CSelectedElementsInfo}
+ */
+CDocument.prototype.GetSelectedElementsInfo = function(oPr)
 {
-	var oInfo = new CSelectedElementsInfo();
+	var oInfo = new CSelectedElementsInfo(oPr);
 	this.Controller.GetSelectedElementsInfo(oInfo);
 	return oInfo;
 };
@@ -12682,7 +12752,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 
 	this.Recalculate();
 };
-CDocument.prototype.controller_ClearParagraphFormatting = function()
+CDocument.prototype.controller_ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 	if (true === this.Selection.Use)
 	{
@@ -12699,13 +12769,13 @@ CDocument.prototype.controller_ClearParagraphFormatting = function()
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				this.Content[Index].ClearParagraphFormatting();
+				this.Content[Index].ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 			}
 		}
 	}
 	else
 	{
-		this.Content[this.CurPos.ContentPos].ClearParagraphFormatting();
+		this.Content[this.CurPos.ContentPos].ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 	}
 };
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
@@ -13620,7 +13690,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							NumId  = this.Numbering.Create_AbstractNum();
 							NumLvl = 0;
 
-							this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+							this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 						}
 
 						// Параграфы, которые не содержали списка у них уровень выставляем NumLvl,
@@ -13749,15 +13819,15 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						{
 							NumId           = this.Numbering.Create_AbstractNum();
 							var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-							AbstractNum.Create_Default_Bullet();
-							AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+							AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 						}
 						else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Bullet))
 						{
 							NumId           = this.Numbering.Create_AbstractNum();
 							var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-							AbstractNum.Create_Default_Bullet();
-							AbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+							AbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 						}
 						else
 						{
@@ -13766,7 +13836,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							var NewAbstractNum = this.Numbering.Get_AbstractNum(NumId);
 
 							NewAbstractNum.Copy(OldAbstractNum);
-							NewAbstractNum.Set_Lvl_Bullet(PrevLvl, LvlText, LvlTextPr);
+							NewAbstractNum.SetLvlByType(PrevLvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 						}
 
 						// Параграфы, которые не содержали списка у них уровень выставляем 0,
@@ -13833,7 +13903,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								NumId  = this.Numbering.Create_AbstractNum();
 								NumLvl = 0;
 
-								this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+								this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 							}
 						}
 
@@ -13910,14 +13980,14 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						{
 							NumId       = this.Numbering.Create_AbstractNum();
 							AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-							AbstractNum.Create_Default_Numbered();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 							ChangeLvl = 0;
 						}
 						else if (true === bDiffId || true != this.Numbering.Check_Format(PrevId, PrevLvl, numbering_numfmt_Decimal))
 						{
 							NumId       = this.Numbering.Create_AbstractNum();
 							AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-							AbstractNum.Create_Default_Numbered();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 							ChangeLvl = PrevLvl;
 						}
 						else
@@ -13933,37 +14003,37 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 								break;
 							}
 							case 4:
 							{
-								AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 								break;
 							}
 							case 5:
 							{
-								AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 								break;
 							}
 							case 6:
 							{
-								AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 								break;
 							}
 							case 7:
 							{
-								AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+								AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 								break;
 							}
 						}
@@ -14001,17 +14071,17 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 					{
 						case 1:
 						{
-							AbstractNum.Create_Default_Multilevel_1();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 							break;
 						}
 						case 2:
 						{
-							AbstractNum.Create_Default_Multilevel_2();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 							break;
 						}
 						case 3:
 						{
-							AbstractNum.Create_Default_Multilevel_3();
+							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 							break;
 						}
 					}
@@ -14071,7 +14141,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet))
-									AbstractNum.Create_Default_Bullet();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							}
 							else
 							{
@@ -14101,7 +14171,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									NumId  = this.Numbering.Create_AbstractNum();
 									NumLvl = 0;
 
-									this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
+									this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 								}
 
 								var OldNumPr = Item.Numbering_Get();
@@ -14180,14 +14250,14 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							if (undefined != ( NumPr = Item.Numbering_Get() ))
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-								AbstractNum.Set_Lvl_Bullet(NumPr.Lvl, LvlText, LvlTextPr);
+								AbstractNum.SetLvlByType(NumPr.Lvl, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 							}
 							else
 							{
 								var NumId       = this.Numbering.Create_AbstractNum();
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Bullet();
-								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+								AbstractNum.SetLvlByType(0, c_oAscNumberingLevel.Bullet, LvlText, LvlTextPr);
 
 								Item.Numbering_Add(NumId, 0);
 							}
@@ -14205,7 +14275,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal))
 								{
-									AbstractNum.Create_Default_Numbered();
+									AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								}
 							}
 							else
@@ -14250,7 +14320,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 										NumId  = this.Numbering.Create_AbstractNum();
 										NumLvl = 0;
 
-										this.Numbering.Get_AbstractNum(NumId).Create_Default_Numbered();
+										this.Numbering.Get_AbstractNum(NumId).CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 									}
 								}
 
@@ -14281,7 +14351,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							{
 								var NumId   = this.Numbering.Create_AbstractNum();
 								AbstractNum = this.Numbering.Get_AbstractNum(NumId);
-								AbstractNum.Create_Default_Numbered();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 								ChangeLvl = 0;
 							}
 
@@ -14289,37 +14359,37 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							{
 								case 1:
 								{
-									AbstractNum.Set_Lvl_Numbered_2(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalDot_Right);
 									break;
 								}
 								case 2:
 								{
-									AbstractNum.Set_Lvl_Numbered_1(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.DecimalBracket_Right);
 									break;
 								}
 								case 3:
 								{
-									AbstractNum.Set_Lvl_Numbered_5(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperRomanDot_Right);
 									break;
 								}
 								case 4:
 								{
-									AbstractNum.Set_Lvl_Numbered_6(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.UpperLetterDot_Left);
 									break;
 								}
 								case 5:
 								{
-									AbstractNum.Set_Lvl_Numbered_7(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterBracket_Left);
 									break;
 								}
 								case 6:
 								{
-									AbstractNum.Set_Lvl_Numbered_8(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerLetterDot_Left);
 									break;
 								}
 								case 7:
 								{
-									AbstractNum.Set_Lvl_Numbered_9(ChangeLvl);
+									AbstractNum.SetLvlByType(ChangeLvl, c_oAscNumberingLevel.LowerRomanDot_Right);
 									break;
 								}
 							}
@@ -14356,17 +14426,17 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						{
 							case 1:
 							{
-								AbstractNum.Create_Default_Multilevel_1();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel1);
 								break;
 							}
 							case 2:
 							{
-								AbstractNum.Create_Default_Multilevel_2();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel2);
 								break;
 							}
 							case 3:
 							{
-								AbstractNum.Create_Default_Multilevel_3();
+								AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.MultiLevel3);
 								break;
 							}
 						}
@@ -16175,7 +16245,7 @@ CDocument.prototype.GetAllFormTextFields = function()
 };
 CDocument.prototype.IsFillingFormMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
+	return this.Api.isRestrictionForms();
 };
 CDocument.prototype.IsInFormField = function()
 {
@@ -16346,30 +16416,23 @@ CDocument.prototype.IsCheckContentControlsLock = function()
 };
 CDocument.prototype.IsEditCommentsMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+	return this.Api.isRestrictionComments();
 };
 CDocument.prototype.IsViewMode = function()
 {
-	return this.Api.isViewMode;
+	return this.Api.getViewMode();
 };
 CDocument.prototype.IsEditSignaturesMode = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+	return this.Api.isRestrictionSignatures();
 };
 CDocument.prototype.IsViewModeInEditor = function()
 {
-	return (this.Api.restrictions === Asc.c_oAscRestrictionType.View);
+	return this.Api.isRestrictionView();
 };
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode()
-		|| this.IsEditCommentsMode()
-		|| this.IsFillingFormMode()
-		|| this.IsEditSignaturesMode()
-		|| this.IsViewModeInEditor())
-		return false;
-
-	return true;
+	return this.Api.canEdit();
 };
 CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
 {

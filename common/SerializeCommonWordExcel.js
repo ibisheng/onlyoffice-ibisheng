@@ -833,6 +833,9 @@ var g_oCellAddressUtils = new CellAddressUtils();
 	CellBase.prototype.isEqual = function(cell) {
 		return this.row === cell.row && this.col === cell.col;
 	};
+	CellBase.prototype.isEmpty = function(cell) {
+		return 0 === this.row && 0 === this.col;
+	};
 	CellBase.prototype.getName = function() {
 		return g_oCellAddressUtils.colnumToColstr(this.col + 1) + (this.row + 1);
 	};

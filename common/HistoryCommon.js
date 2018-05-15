@@ -1478,6 +1478,8 @@
 	window['AscDFH'].historyitem_AbstractNum_LvlChange    = window['AscDFH'].historyitem_type_AbstractNum | 1;
 	window['AscDFH'].historyitem_AbstractNum_TextPrChange = window['AscDFH'].historyitem_type_AbstractNum | 2;
 	window['AscDFH'].historyitem_AbstractNum_ParaPrChange = window['AscDFH'].historyitem_type_AbstractNum | 3;
+	window['AscDFH'].historyitem_AbstractNum_StyleLink    = window['AscDFH'].historyitem_type_AbstractNum | 4;
+	window['AscDFH'].historyitem_AbstractNum_NumStyleLink = window['AscDFH'].historyitem_type_AbstractNum | 5;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе СComment
 	//------------------------------------------------------------------------------------------------------------------
@@ -1528,6 +1530,7 @@
 	window['AscDFH'].historyitem_Style_SemiHidden      = window['AscDFH'].historyitem_type_Style | 108;
 	window['AscDFH'].historyitem_Style_UnhideWhenUsed  = window['AscDFH'].historyitem_type_Style | 109;
 	window['AscDFH'].historyitem_Style_Link            = window['AscDFH'].historyitem_type_Style | 110;
+	window['AscDFH'].historyitem_Style_Custom          = window['AscDFH'].historyitem_type_Style | 111;
 	//------------------------------------------------------------------------------------------------------------------
 	// Типы изменений в классе CStyles
 	//------------------------------------------------------------------------------------------------------------------

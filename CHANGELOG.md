@@ -6,12 +6,16 @@
 ### Document Editor
 Ability to work with bookmarks
 Ability to add/change hyperlinks anchored to bookmarks/headings
-* 
+Add support east asian punctuation and line breaks with hieroglyphs
+Add support for characters that can't be placed at the beginning/end of the line
 
 ### Spreadsheet Editor
+* Add support comment mode
 * The following functions are added: GetRows, GetCols, GetCount, GetHidden, SetHidden, GetColumnWidth, SetColumnWidth, GetRowHeight, SetRowHeight, GetWpar, SetOffset, 
-GetAdress, SetLeftMargin, GetLeftMargin, SetRightMargin, GetRightMargin, SetTopMargin, GetTopMargin, SetBottomMargin, GetBottomMargin, SetPageOrientation, GetPageOrientation
-* The following properties are added: Rows, Cols, Count, Hidden, ColumnWidth, Width, RowHeight, Height, MergeArea, WrapText, LeftMargin, Orientation, PrintHeadings, PrintGridlines
+GetAdress, SetLeftMargin, GetLeftMargin, SetRightMargin, GetRightMargin, SetTopMargin, GetTopMargin, SetBottomMargin, GetBottomMargin, SetPageOrientation, GetPageOrientation,
+GetSelection
+* The following properties are added: Rows, Cols, Count, Hidden, ColumnWidth, Width, RowHeight, Height, MergeArea, WrapText, LeftMargin, Orientation, PrintHeadings, PrintGridlines,
+Selection
 * Fix change active cell in selection across merge. Previously, passing through the first cell of the merge range, we fell into the merge range, even if it was not selected (through the selection of a row / column)
 * Fix selection when selecting row/col/all
 

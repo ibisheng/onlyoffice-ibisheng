@@ -1281,7 +1281,7 @@ function DrawingObjects() {
     var oStateBeforeLoadChanges = null;
 
     _this.zoom = { last: 1, current: 1 };
-    _this.isViewerMode = null;
+    _this.canEdit = null;
     _this.objectLocker = null;
     _this.drawingArea = null;
     _this.coordsManager = null;
@@ -1699,7 +1699,7 @@ function DrawingObjects() {
 
     _this.addShapeOnSheet = function(sType){
         if(this.controller){
-            if (!_this.isViewerMode()) {
+            if (_this.canEdit()) {
 
                 var oVisibleRange = worksheet.getVisibleRange();
 
@@ -1896,7 +1896,7 @@ function DrawingObjects() {
         _this.controller = new AscFormat.DrawingObjectsController(_this);
         _this.lasteForzenPlaseNum = 0;
 
-        _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
+        _this.canEdit = function() { return worksheet.handlers.trigger('canEdit'); };
 
         aImagesSync = [];
 
@@ -2515,7 +2515,7 @@ function DrawingObjects() {
 
 
     _this.addImageDrawingObject = function(imageUrls, options) {
-        if (imageUrls && !_this.isViewerMode()) {
+        if (imageUrls && _this.canEdit()) {
             api.ImageLoader.LoadImagesWithCallback(imageUrls, function(){
                 // CImage
                 _this.objectLocker.reset();
@@ -2550,7 +2550,7 @@ function DrawingObjects() {
 
     _this.addTextArt = function(nStyle)
     {
-        if (!_this.isViewerMode()) {
+        if (_this.canEdit()) {
 
             var oVisibleRange = worksheet.getVisibleRange();
 
@@ -2594,7 +2594,7 @@ function DrawingObjects() {
     };
 
     _this.addMath = function(Type){
-        if (!_this.isViewerMode() && _this.controller) {
+        if (_this.canEdit() && _this.controller) {
 
             var oTargetContent = _this.controller.getTargetDocContent();
             if(oTargetContent){
@@ -2743,7 +2743,7 @@ function DrawingObjects() {
 
     _this.addChartDrawingObject = function(chart) {
 
-        if ( _this.isViewerMode() )
+        if (!_this.canEdit())
             return;
 
         worksheet.setSelectionShape(true);

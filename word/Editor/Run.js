@@ -455,6 +455,7 @@ ParaRun.prototype.Add = function(Item, bMath)
             {
                 if (this.Is_Empty())
                 {
+                	this.Set_VertAlign(undefined);
                     this.Set_RStyle(oStyles.GetDefaultFootnoteReference());
                 }
                 else
@@ -1577,12 +1578,20 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                             // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
                             BgColor = Para.Parent.Get_TextBackGroundColor();
 
-                            if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
+                            if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value && !(CurTextPr.FontRef && CurTextPr.FontRef.Color) )
                                 BgColor = CurTextPr.Shd.Get_Color( this.Paragraph );
                         }
 
                         // Определим автоцвет относительно заливки
                         var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+                        var  RGBA, Theme = Para.Get_Theme(), ColorMap = Para.Get_ColorMap();
+                        if((BgColor == undefined || BgColor.Auto) && CurTextPr.FontRef && CurTextPr.FontRef.Color)
+                        {
+                            CurTextPr.FontRef.Color.check(Theme, ColorMap);
+                            RGBA = CurTextPr.FontRef.Color.RGBA;
+                            AutoColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+                        }
+
                         Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
                     }
                     else
@@ -2623,7 +2632,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var Word                = PRS.Word;
     var StartWord           = PRS.StartWord;
     var FirstItemOnLine     = PRS.FirstItemOnLine;
-    var EmptyLine           = PRS.EmptyLine;
+	var EmptyLine           = PRS.EmptyLine;
     var TextOnLine          = PRS.TextOnLine;
 
     var RangesCount         = PRS.RangesCount;
@@ -2735,39 +2744,63 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                         // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
                         if (true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange))
-                        {
-                            if (X + SpaceLen + LetterLen > XEnd)
-                            {
-                                NewRange = true;
-                                RangeEndPos = Pos;
-                            }
-                        }
+						{
+							if (X + SpaceLen + LetterLen > XEnd)
+							{
+								if (para_Text === ItemType && !Item.CanBeAtBeginOfLine() && !PRS.LineBreakFirst)
+								{
+									MoveToLBP = true;
+									NewRange  = true;
+								}
+								else
+								{
+									NewRange    = true;
+									RangeEndPos = Pos;
+								}
+							}
+						}
 
                         if (true !== NewRange)
                         {
-                            // Отмечаем начало нового слова
-                            PRS.Set_LineBreakPos(Pos);
+                        	// Если с данного элемента не может начинаться строка, тогда считает все пробелы идущие
+							// до него частью этого слова.
+							// Если места для разрыва строки еще не было, значит это все еще первый элемент идет, и
+							// тогда общую ширину пробелов прибавляем к ширине символа.
+							// Если разрыв были и с данного символа не может начинаться строка, тогда испоьльзуем
+							// предыдущий разрыв.
+							if (para_Text === ItemType)
+							{
+								if (PRS.LineBreakFirst && !Item.CanBeAtBeginOfLine())
+								{
+									FirstItemOnLine = true;
+									LetterLen       = LetterLen + SpaceLen;
+									SpaceLen        = 0;
+								}
+								else if (Item.CanBeAtBeginOfLine())
+								{
+									PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+								}
+							}
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
-                            {
-                                // Добавляем длину пробелов до слова и ширину самого слова.
-                                X += SpaceLen + LetterLen;
+                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
+							{
+								// Добавляем длину пробелов до слова и ширину самого слова.
+								X += SpaceLen + LetterLen;
 
-                                Word = false;
-                                FirstItemOnLine = false;
-                                EmptyLine = false;
-								TextOnLine = true;
-                                SpaceLen = 0;
-                                WordLen = 0;
-                            }
+								Word            = false;
+								FirstItemOnLine = false;
+								EmptyLine       = false;
+								TextOnLine      = true;
+								SpaceLen        = 0;
+								WordLen         = 0;
+							}
                             else
-                            {
-                                Word = true;
-                                WordLen = LetterLen;
-                            }
-                        }
-
+							{
+								Word    = true;
+								WordLen = LetterLen;
+							}
+						}
                     }
                     else
                     {
@@ -2818,7 +2851,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             WordLen += LetterLen;
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
                             {
                                 // Добавляем длину пробелов до слова и ширину самого слова.
                                 X += SpaceLen + WordLen;
@@ -2859,14 +2892,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             {
                                 MoveToLBP = true;
                                 NewRange = true;
-                                PRS.Set_LineBreakPos(Pos);
+                                PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                             }
                         }
 
                         if(true !== NewRange)
                         {
                             if(this.Parent.bRoot == true)
-                                PRS.Set_LineBreakPos(Pos);
+                                PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
 
                             WordLen += LetterLen;
                             Word = true;
@@ -2904,6 +2937,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 }
                 case para_Space:
                 {
+                	if (Word && PRS.LastItem && para_Text === PRS.LastItem.Type && !PRS.LastItem.CanBeAtEndOfLine())
+					{
+						WordLen += Item.Width / TEXTWIDTH_DIVIDER;//SpaceLen += Item.Get_Width();
+						break;
+					}
+
                     FirstItemOnLine = false;
 
                     if (true === Word)
@@ -2963,7 +3002,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 Word = false;
                                 MoveToLBP = true;
                                 NewRange = true;
-                                PRS.Set_LineBreakPos(1);
+                                PRS.Set_LineBreakPos(1, FirstItemOnLine);
                             }
                         }
                     }
@@ -3025,7 +3064,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                     if(PRS.bBreakPosInLWord == true)
                                     {
-                                        PRS.Set_LineBreakPos(Pos);
+                                        PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
 
                                     }
                                     else
@@ -3059,7 +3098,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                     // в этом случае Word == false && FirstItemOnLine == false, нужно также поставить отметку для потенциального переноса
 
                                     X += SpaceLen + WordLen;
-                                    PRS.Set_LineBreakPos(Pos);
+                                    PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                                     EmptyLine = false;
 									TextOnLine = true;
                                     WordLen = BrkLen;
@@ -3085,7 +3124,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 NewRange = true;
 
                                 if(Word == false)
-                                    PRS.Set_LineBreakPos(Pos);
+                                    PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
                             }
                             else
                             {
@@ -3111,9 +3150,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                                 // FirstItemOnLine == true
                                 if(bNotUpdate == false) // LineBreakPos обновляем здесь, т.к. слово может начаться с мат объекта, а не с Run, в мат объекте нет соответствующей проверки
-                                {
-                                    PRS.Set_LineBreakPos(Pos+1);
-                                }
+								{
+									PRS.Set_LineBreakPos(Pos + 1, FirstItemOnLine);
+								}
                                 else
                                 {
                                     bNotUpdBreakOper = true;
@@ -3122,7 +3161,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 FirstItemOnLine = false;
 
                                 Word = false;
-
                             }
                         }
                     }
@@ -3249,7 +3287,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     if (para_PageCount === ItemType)
                     {
-                        var oHdrFtr = Para.Parent.Is_HdrFtr(true);
+                        var oHdrFtr = Para.Parent.IsHdrFtr(true);
                         if (oHdrFtr)
                             oHdrFtr.Add_PageCountElement(Item);
                     }
@@ -3379,6 +3417,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 						}
                     }
 
+					// Считаем, что с таба начинается слово
+					PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+
                     // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
                     // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
                     if (RangesCount === CurRange)
@@ -3391,8 +3432,6 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         }
                     }
 
-                    // Считаем, что с таба начинается слово
-                    PRS.Set_LineBreakPos(Pos);
 
                     StartWord = true;
                     Word = true;
@@ -3502,7 +3541,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 					{
 						// Специальная ветка, для полей PAGE и NUMPAGES, находящихся в колонтитуле
 						var oComplexField = Item.GetComplexField();
-						var oHdrFtr       = Para.Parent.Is_HdrFtr(true);
+						var oHdrFtr       = Para.Parent.IsHdrFtr(true);
 						if (oHdrFtr && oComplexField)
 						{
 							var oInstruction = oComplexField.GetInstruction();
@@ -3578,6 +3617,8 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 				}
             }
 
+            if (para_Space !== ItemType)
+            	PRS.LastItem = Item;
 
             if (true === NewRange)
                 break;
@@ -3633,11 +3674,11 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 {
                     PRS.MoveToLBP = true;
                     PRS.NewRange = true;
-                    PRS.Set_LineBreakPos(0);
+                    PRS.Set_LineBreakPos(0, PRS.FirstItemOnLine);
                 }
                 else if(this.ParaMath.Is_BrkBinBefore() == false && Word == false && PRS.bBreakBox == true)
                 {
-                    PRS.Set_LineBreakPos(Pos);
+                    PRS.Set_LineBreakPos(Pos, PRS.FirstItemOnLine);
                     PRS.X += SpaceLen;
                     PRS.SpaceLen = 0;
                 }
@@ -3836,7 +3877,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.SpacesCount = 0;
 
                 // Если текущий символ, например, дефис, тогда на нем заканчивается слово
-                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.IsSpaceAfter() )
                     PRSC.Word = false;
 
                 break;
@@ -4088,7 +4129,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var X_Right_Margin  = PageLimits.XLimit - PageFields.XLimit;
                 var Y_Bottom_Margin = PageLimits.YLimit - PageFields.YLimit;
 
-                if (true === Para.Parent.IsTableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
+                if (true === Para.Parent.IsTableCellContent() && (true !== Item.Use_TextWrap() || false === Item.IsLayoutInCell()))
                 {
                     X_Left_Field   = LD_PageFields.X;
                     Y_Top_Field    = LD_PageFields.Y;
@@ -4120,7 +4161,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 }
 
                 var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
-                if (true === Para.Parent.IsTableCellContent() && false === Item.Is_LayoutInCell())
+                if (true === Para.Parent.IsTableCellContent() && false === Item.IsLayoutInCell())
                 {
                     PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
                     var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
@@ -5134,10 +5175,18 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         InfoMathText = new CMathInfoTextPr(InfoTextPr);
     }
 
-    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
+    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value && !(CurTextPr.FontRef && CurTextPr.FontRef.Color) )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+    var  RGBA, Theme = PDSE.Theme, ColorMap = PDSE.ColorMap;
+    if((BgColor == undefined || BgColor.Auto) && CurTextPr.FontRef && CurTextPr.FontRef.Color)
+    {
+        CurTextPr.FontRef.Color.check(Theme, ColorMap);
+        RGBA = CurTextPr.FontRef.Color.RGBA;
+        AutoColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+    }
+
 
     var RGBA;
     var ReviewType  = this.Get_ReviewType();
@@ -5424,12 +5473,17 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
 
     var BgColor = PDSL.BgColor;
-    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
+    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value  && !(CurTextPr.FontRef && CurTextPr.FontRef.Color) )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
-    var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
-
     var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
+    var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+    if((BgColor == undefined || BgColor.Auto) && CurTextPr.FontRef && CurTextPr.FontRef.Color)
+    {
+        CurTextPr.FontRef.Color.check(Theme, ColorMap);
+        RGBA = CurTextPr.FontRef.Color.RGBA;
+        AutoColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+    }
 
     var ReviewType  = this.Get_ReviewType();
     var bAddReview  = reviewtype_Add === ReviewType ? true : false;
@@ -5467,6 +5521,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         }
     }
 
+    PDSL.CurPos.Update(StartPos, PDSL.CurDepth);
+    var nSpellingErrorsCounter = PDSL.GetSpellingErrorsCounter();
+
     var SpellingMarksCount = this.SpellingMarks.length;
     var SpellDataLen = EndPos + 1;
     var SpellData = g_oSpellCheckerMarks.Check(SpellDataLen);
@@ -5502,7 +5559,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 			continue;
 
 		if (SpellData[Pos])
-			PDSL.SpellingCounter += SpellData[Pos];
+			nSpellingErrorsCounter += SpellData[Pos];
 
         switch( ItemType )
         {
@@ -5556,7 +5613,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
                     else if (true === CurTextPr.Underline)
                         aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr );
 
-                    if ( PDSL.SpellingCounter > 0 )
+					if (nSpellingErrorsCounter > 0)
                         aSpelling.Add( UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0 );
 
                     X += ItemWidthVisible;
@@ -5634,7 +5691,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 					else if (true === CurTextPr.Underline)
 						aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
 
-					if (PDSL.SpellingCounter > 0)
+					if (nSpellingErrorsCounter > 0)
 						aSpelling.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, 0, 0, 0);
 
 					X += ItemWidthVisible;
@@ -5643,10 +5700,6 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 				break;
 			}
         }
-
-        // TODO: Пока так оставим, но это работает неправильно. Нужно проверенные точки отмечать
-		if (SpellData[Pos + 1])
-			PDSL.SpellingCounter += SpellData[Pos + 1];
 	}
 
 	if (true === this.Pr.Have_PrChange() && para_Math_Run !== this.Type)
@@ -10091,6 +10144,14 @@ ParaRun.prototype.GetComplexFieldsArray = function(nType, arrComplexFields)
 ParaRun.prototype.GetElementsCount = function()
 {
 	return this.Content.length;
+};
+/**
+ * Проверяем является ли данный ран специальным, содержащим ссылку на сноску
+ * @returns {boolean}
+ */
+ParaRun.prototype.IsFootnoteReferenceRun = function()
+{
+	return (1 === this.Content.length && para_FootnoteReference === this.Content[0].Type);
 };
 
 function CParaRunStartState(Run)

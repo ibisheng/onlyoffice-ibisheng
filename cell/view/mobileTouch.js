@@ -149,7 +149,7 @@ function (window, undefined)
 			var _coords = this.WB.ConvertLogicToXY(x, y);
 
 			AscCommon.global_mouseEvent.KoefPixToMM = 5;
-			var _cursor = this.WB.getWorksheet().getCursorTypeFromXY(_coords.X, _coords.Y, this.Api.isViewMode);
+			var _cursor = this.WB.getWorksheet().getCursorTypeFromXY(_coords.X, _coords.Y);
 			AscCommon.global_mouseEvent.KoefPixToMM = 1;
 			if (_cursor.target == AscCommonExcel.c_oTargetType.MoveResizeRange)
 				return true;
@@ -202,26 +202,26 @@ function (window, undefined)
 		if ('v' === _scroll.directionLocked)
 		{
 			pos = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y >= _scroll.maxScrollY)
+			if (-_scroll.y >= -_scroll.maxScrollY)
 				pos += 1;
 			_api._onScrollY(pos);
 		}
 		else if ('h' === _scroll.directionLocked)
 		{
 			pos = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x >= _scroll.maxScrollX)
+			if (-_scroll.x >= -_scroll.maxScrollX)
 				pos += 1;
 			_api._onScrollX(pos);
 		}
 		else if ('n' === _scroll.directionLocked)
 		{
 			pos = -_scroll.y / _api.controller.settings.hscrollStep;
-			if (_scroll.y >= _scroll.maxScrollY)
+			if (-_scroll.y >= -_scroll.maxScrollY)
 				pos += 1;
 			_api._onScrollY(pos);
 
 			pos = -_scroll.x / _api.controller.settings.vscrollStep;
-			if (_scroll.x >= _scroll.maxScrollX)
+			if (-_scroll.x >= -_scroll.maxScrollX)
 				pos += 1;
 			_api._onScrollX(pos);
 		}

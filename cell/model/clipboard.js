@@ -1061,7 +1061,7 @@
 							{
 								if(i !== 0)
 								{
-									res += '\n';
+									res += '\r\n';
 								}
 								res += paraText;
 							}
@@ -1099,7 +1099,7 @@
 						}
 
 						if(row !== bbox.r1)
-							res += '\n';
+							res += '\r\n';
 						
 						for (var col = bbox.c1; col <= maxCol; ++col)
 						{
@@ -2984,7 +2984,7 @@
 				worksheet._forEachCell(function(cell) {
 					if (curRow !== cell.nRow) {
 						if (-1 !== curRow) {
-							res += "\n";
+							res += '\r\n';
 						}
 						curRow = cell.nRow;
 					}
@@ -3019,7 +3019,7 @@
 							getTextFromCell(cell);
 						}
 						
-						res += "\n";
+						res += '\r\n';
 					}
 				};
 				
@@ -3032,14 +3032,14 @@
 						{
 							if(!isNAddNewLine)
 							{
-								res += "\n";
+								res += '\r\n';
 							}
 							
 							getTextFromParagraph(item);
 						}
 						else if(type_Table === item.GetType())
 						{
-							res += "\n";
+							res += '\r\n';
 							
 							getTextFromTable(item);
 						}

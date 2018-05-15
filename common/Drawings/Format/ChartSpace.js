@@ -4003,7 +4003,7 @@ CChartSpace.prototype.checkEmptySeries = function()
         return false;
     };
     var nChartType = chart_type.getObjectType();
-    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? 1 : series.length;
+    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? Math.min(1, series.length) : series.length;
     for(var i = 0; i < nSeriesLength; ++i)
     {
         var ser = series[i];

@@ -393,6 +393,26 @@
 	{
 		return this.isViewMode;
 	};
+	baseEditorsApi.prototype.canEdit                         = function()
+	{
+		return !this.isViewMode && this.restrictions === Asc.c_oAscRestrictionType.None;
+	};
+	baseEditorsApi.prototype.isRestrictionForms              = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
+	};
+	baseEditorsApi.prototype.isRestrictionComments           = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+	};
+	baseEditorsApi.prototype.isRestrictionSignatures         = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.OnlySignatures);
+	};
+	baseEditorsApi.prototype.isRestrictionView               = function()
+	{
+		return (this.restrictions === Asc.c_oAscRestrictionType.View);
+	};
 	baseEditorsApi.prototype.isLongAction                    = function()
 	{
 		return (0 !== this.IsLongActionCurrent);

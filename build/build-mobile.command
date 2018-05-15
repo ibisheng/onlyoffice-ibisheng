@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PRODUCT_VERSION="5.1.2"
+PRODUCT_VERSION="5.1.3"
 BUILD_NUMBER="10"
 
 echo "----------------------------------------"

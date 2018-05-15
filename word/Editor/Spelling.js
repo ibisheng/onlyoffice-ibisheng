@@ -457,24 +457,6 @@ CParaSpellChecker.prototype =
         return true;
     },
 
-    Get_DrawingInfo : function(Pos)
-    {
-        var Counter = 0;
-
-        var Count = this.Elements.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Element = this.Elements[Index];
-            if ( false === Element.Checked )
-            {
-                if ( Element.StartPos.Compare( Pos ) < 0 && Element.EndPos.Compare( Pos ) >= 0 )
-                    Counter++;
-            }
-        }
-
-        return Counter;
-    },
-
     Document_UpdateInterfaceState : function(StartPos, EndPos)
     {
         // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно
@@ -671,6 +653,23 @@ CParaSpellChecker.prototype =
 		}
 	}
 };
+/**
+ * Получаем количество элементов проверки орфографии
+ * @returns {Number}
+ */
+CParaSpellChecker.prototype.GetElementsCount = function()
+{
+	return this.Elements.length;
+};
+/**
+ * Получаем элемент проверки орфографии по номеру
+ * @param nIndex
+ * @returns {CParaSpellCheckerElement}
+ */
+CParaSpellChecker.prototype.GetElement = function(nIndex)
+{
+	return this.Elements[nIndex];
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // CParaSpellCheckerElement
@@ -690,6 +689,14 @@ function CParaSpellCheckerElement(StartPos, EndPos, Word, Lang)
 }
 
 CParaSpellCheckerElement.prototype = {};
+CParaSpellCheckerElement.prototype.GetStartPos = function()
+{
+	return this.StartPos;
+};
+CParaSpellCheckerElement.prototype.GetEndPos = function()
+{
+	return this.EndPos;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument

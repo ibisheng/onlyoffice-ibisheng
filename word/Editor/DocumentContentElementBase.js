@@ -430,7 +430,7 @@ CDocumentContentElementBase.prototype.Add = function(oParaItem)
 CDocumentContentElementBase.prototype.PreDelete = function()
 {
 };
-CDocumentContentElementBase.prototype.ClearParagraphFormatting = function()
+CDocumentContentElementBase.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
 };
 CDocumentContentElementBase.prototype.GetCursorPosXY = function()
@@ -764,6 +764,10 @@ CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
 CDocumentContentElementBase.prototype.GetAbsolutePage = function(CurPage)
 {
 	return this.private_GetAbsolutePageIndex(CurPage);
+};
+CDocumentContentElementBase.prototype.GetAbsoluteColumn = function(CurPage)
+{
+	return this.Get_AbsoluteColumn(CurPage);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()

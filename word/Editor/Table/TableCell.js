@@ -502,10 +502,15 @@ CTableCell.prototype =
         return this.Row.Table.Parent.Is_DrawingShape(bRetShape);
     },
 
-    Is_HdrFtr : function(bReturnHdrFtr)
-    {
-        return this.Row.Table.Parent.Is_HdrFtr(bReturnHdrFtr);
-    },
+    IsHdrFtr : function(bReturnHdrFtr)
+	{
+		return this.Row.Table.Parent.IsHdrFtr(bReturnHdrFtr);
+	},
+
+	IsFootnote : function(bReturnFootnote)
+	{
+		return this.Row.Table.Parent.IsFootnote(bReturnFootnote);
+	},
 
     Is_TopDocument : function(bReturnTopDocument)
     {

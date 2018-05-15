@@ -229,6 +229,7 @@ function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
     this.Next    = NextId;
     this.Type    = (null != type ? type : styletype_Paragraph);
     this.Link    = null;
+    this.Custom  = false;
 
     this.qFormat        = null;// false
     this.uiPriority     = null;// -1
@@ -3568,6 +3569,23 @@ CStyle.prototype.IsExpressStyle = function(oStyles)
 
 	return false;
 };
+/**
+ * Выставляем является ли данный стиль кастомным
+ * @param {boolean} isCustom
+ */
+CStyle.prototype.SetCustom = function(isCustom)
+{
+	History.Add(new CChangesStyleCustom(this, this.Name, isCustom));
+	this.Custom = isCustom;
+};
+/**
+ * Проверяем является ли данный стиль кастомным
+ * @returns {boolean}
+ */
+CStyle.prototype.IsCustom = function()
+{
+	return this.Custom;
+};
 
 function CStyles(bCreateDefault)
 {
@@ -4227,11 +4245,6 @@ CStyles.prototype =
 
                 if (TableStyle != null || ShapeStyle != null)
                 {
-                    if (TableStyle != null)
-                    {
-                        Pr.TextPr.Merge(TableStyle.TextPr);
-                        Pr.ParaPr.Merge(TableStyle.ParaPr);
-                    }
                     if (ShapeStyle != null)
                     {
                         Pr.TextPr.Merge(ShapeStyle.TextPr);
@@ -4239,7 +4252,11 @@ CStyles.prototype =
                         {
                             Pr.ParaPr.Merge(ShapeStyle.ParaPr);
                         }
-
+                    }
+                    if (TableStyle != null)
+                    {
+                        Pr.TextPr.Merge(TableStyle.TextPr);
+                        Pr.ParaPr.Merge(TableStyle.ParaPr);
                     }
                 }
                 else
@@ -4563,7 +4580,7 @@ CStyles.prototype =
 				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
 				{
 					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
-					var Lvl         = AbstractNum.Get_LvlByStyle(StyleId);
+					var Lvl         = AbstractNum.GetLvlByStyle(StyleId);
 					if (-1 != Lvl)
 						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
 					else
@@ -4727,14 +4744,14 @@ CStyles.prototype =
                 continue;
 
             var iLvl = (NumPr.Lvl ? NumPr.Lvl : 0);
-            var NumLvl = AbstractNum.Get_Lvl(iLvl);
+            var NumLvl = AbstractNum.GetLvl(iLvl);
 
             if (!NumLvl || NumLvl.PStyle)
                 continue;
 
-            var NewLvl = AbstractNum.Internal_CopyLvl(NumLvl);
+            var NewLvl = AbstractNum.GetLvl(NumLvl).Copy();
             NewLvl.PStyle = StyleId;
-            AbstractNum.Set_Lvl(iLvl, NewLvl);
+            AbstractNum.SetLvl(iLvl, NewLvl);
         }
     },
 //-----------------------------------------------------------------------------------
@@ -8874,6 +8891,14 @@ CTextPr.prototype.Get_Shd = function()
 {
     return this.Shd;
 };
+CTextPr.prototype.WriteToBinary = function(oWriter)
+{
+	return this.Write_ToBinary(oWriter);
+};
+CTextPr.prototype.ReadFromBinary = function(oReader)
+{
+	return this.Read_FromBinary(oReader);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CTextPr Export
 //----------------------------------------------------------------------------------------------------------------------
@@ -10912,6 +10937,14 @@ CParaPr.prototype.Get_PStyle = function()
 CParaPr.prototype.Get_OutlineLvl = function()
 {
 	return this.OutlineLvl;
+};
+CParaPr.prototype.WriteToBinary = function(oWriter)
+{
+	return this.Write_ToBinary(oWriter);
+};
+CParaPr.prototype.ReadFromBinary = function(oReader)
+{
+	return this.Read_FromBinary(oReader);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CParaPr Export

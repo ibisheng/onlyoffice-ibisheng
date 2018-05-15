@@ -497,7 +497,7 @@ ChangeAdjState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false)
+        if(this.drawingObjects.canEdit())
         {
             var trackObjects = [].concat(this.drawingObjects.arrTrackObjects);
             var drawingObjects = this.drawingObjects;
@@ -594,7 +594,7 @@ RotateState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.isViewMode() === false)
+        if(this.drawingObjects.canEdit())
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;

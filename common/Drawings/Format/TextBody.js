@@ -464,10 +464,21 @@ CTextBody.prototype =
         return undefined;
     },
 
-    Is_HdrFtr: function()
+    IsHdrFtr: function(bReturnHdrFtr)
     {
+    	if (bReturnHdrFtr)
+    		return null;
+
         return false;
     },
+
+	IsFootnote : function(bReturnFootnote)
+	{
+		if (bReturnFootnote)
+			return null;
+
+		return false;
+	},
 
     Get_PageContentStartPos: function(pageNum)
     {

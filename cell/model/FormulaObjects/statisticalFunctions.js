@@ -37,6 +37,7 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
+	var cDate = Asc.cDate;
 	var fSortAscending = AscCommon.fSortAscending;
 
 	var cElementType = AscCommonExcel.cElementType;
@@ -2729,10 +2730,10 @@ function (window, undefined) {
 				}
 			}
 
-			var aDate = Date.prototype.getDateFromExcel(maRange[0].X);
+			var aDate = cDate.prototype.getDateFromExcel(maRange[0].X);
 			this.mnMonthDay = aDate.getDate();
 			for (var i = 1; i < this.mnCount && this.mnMonthDay; i++) {
-				var aDate1 = Date.prototype.getDateFromExcel(maRange[i].X);
+				var aDate1 = cDate.prototype.getDateFromExcel(maRange[i].X);
 				if (aDate !== aDate1) {
 					if (aDate1.getDate() !== this.mnMonthDay) {
 						this.mnMonthDay = 0;
@@ -2743,7 +2744,7 @@ function (window, undefined) {
 			this.mfStepSize = Number.MAX_VALUE;
 			if (this.mnMonthDay) {
 				for (var i = 0; i < this.mnCount; i++) {
-					var aDate = Date.prototype.getDateFromExcel(maRange[i].X);
+					var aDate = cDate.prototype.getDateFromExcel(maRange[i].X);
 					maRange[i].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
 				}
 			}
@@ -2857,13 +2858,13 @@ function (window, undefined) {
 				var nMissingXCount = 0;
 				var fOriginalCount = this.mnCount;
 				if (this.mnMonthDay) {
-					aDate = Date.prototype.getDateFromExcel(maRange[0].X);
+					aDate = cDate.prototype.getDateFromExcel(maRange[0].X);
 				}
 
 				for (var i = 1; i < this.mnCount; i++) {
 					var fDist;
 					if (this.mnMonthDay) {
-						var aDate1 = Date.prototype.getDateFromExcel(maRange[i].X);
+						var aDate1 = cDate.prototype.getDateFromExcel(maRange[i].X);
 						fDist = 12 * ( aDate1.getUTCFullYear() - aDate.getUTCFullYear() ) +
 							( aDate1.getMonth() - aDate.getMonth() );
 						aDate = aDate1;
@@ -3300,7 +3301,7 @@ function (window, undefined) {
 
 	ScETSForecastCalculation.prototype.convertXtoMonths = function (x) {
 		//Date aNullDate = *( mpFormatter->GetNullDate() );
-		var aDate = Date.prototype.getDateFromExcel(x);
+		var aDate = cDate.prototype.getDateFromExcel(x);
 		var nYear = aDate.getUTCFullYear();
 		var nMonth = aDate.getMonth();
 		var fMonthLength;
@@ -4940,7 +4941,7 @@ function (window, undefined) {
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			return arg0.countCells();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
-			return cElementType.empty === arg0.getValue().type ? new cNumber(0) : new cNumber(1);
+			return cElementType.empty === arg0.getValue().type ? new cNumber(1) : new cNumber(0);
 		} else {
 			return new cError(cErrorType.bad_reference);
 		}

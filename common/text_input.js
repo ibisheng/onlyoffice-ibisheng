@@ -292,6 +292,8 @@
 						_this.virtualKeyboardClickTimeout = -1;
 					}
 
+					_this.apiCompositeEnd();
+
 					if (!_this.virtualKeyboardClickPrevent)
 						return;
 

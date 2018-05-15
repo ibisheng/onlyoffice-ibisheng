@@ -557,6 +557,7 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
             shape_text_pr.RFonts.EastAsia = { Name: "+mn-ea", Index : -1 };
             shape_text_pr.RFonts.CS = { Name: "+mn-cs", Index : -1 };
         }
+        shape_text_pr.FontRef = this.style.fontRef.createDuplicate();
         this.textStyleForParagraph.TextPr.Merge(shape_text_pr);
     }
 };
@@ -610,7 +611,7 @@ CShape.prototype.Refresh_RecalcData2 = function()
     this.recalcTransformText();
     this.addToRecalculate();
 
-    var HdrFtr = this.Is_HdrFtr(true);
+    var HdrFtr = this.IsHdrFtr(true);
     if (HdrFtr)
         HdrFtr.Refresh_RecalcData2();
 };
@@ -689,7 +690,7 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
         if (para_drawing && para_drawing.Parent instanceof Paragraph)
             para_drawing.Parent.Document_SetThisElementCurrent(false);
 
-        var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
+        var hdr_ftr = para_drawing.DocumentContent.IsHdrFtr(true);
         if(hdr_ftr)
         {
             hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
@@ -784,12 +785,12 @@ CShape.prototype.Is_UseInDocument = function()
     }
     return false;
 };
-CShape.prototype.Is_HdrFtr = function(bool)
+CShape.prototype.IsHdrFtr = function(bool)
 {
     if(!this.group)
     {
         if(isRealObject(this.parent) && isRealObject(this.parent.DocumentContent))
-            return this.parent.DocumentContent.Is_HdrFtr(bool);
+            return this.parent.DocumentContent.IsHdrFtr(bool);
     }
     else
     {
@@ -797,9 +798,26 @@ CShape.prototype.Is_HdrFtr = function(bool)
         while(cur_group.group)
             cur_group = cur_group.group;
         if(isRealObject(cur_group.parent) && isRealObject(cur_group.parent.DocumentContent))
-            return cur_group.parent.DocumentContent.Is_HdrFtr(bool);
+            return cur_group.parent.DocumentContent.IsHdrFtr(bool);
     }
     return bool ? null : false;
+};
+CShape.prototype.IsFootnote = function(bReturnFootnote)
+{
+	if(!this.group)
+	{
+		if(isRealObject(this.parent) && isRealObject(this.parent.DocumentContent))
+			return this.parent.DocumentContent.IsFootnote(bReturnFootnote);
+	}
+	else
+	{
+		var cur_group = this.group;
+		while(cur_group.group)
+			cur_group = cur_group.group;
+		if(isRealObject(cur_group.parent) && isRealObject(cur_group.parent.DocumentContent))
+			return cur_group.parent.DocumentContent.IsFootnote(bReturnFootnote);
+	}
+	return bReturnFootnote ? null : false;
 };
 CShape.prototype.OnContentReDraw = function()
 {

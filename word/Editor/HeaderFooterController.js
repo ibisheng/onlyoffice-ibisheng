@@ -72,9 +72,9 @@ CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.HdrFtr.AddInlineTable(Cols, Rows);
 };
-CHdrFtrController.prototype.ClearParagraphFormatting = function()
+CHdrFtrController.prototype.ClearParagraphFormatting = function(isClearParaPr, isClearTextPr)
 {
-	this.HdrFtr.ClearParagraphFormatting();
+	this.HdrFtr.ClearParagraphFormatting(isClearParaPr, isClearTextPr);
 };
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

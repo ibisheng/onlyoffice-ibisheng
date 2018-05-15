@@ -47,7 +47,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
     if (this.Pages.length <= 0)
         return [];
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return [];
 
     //Не запускаемм быстрый пересчет, когда параграф находится в автофигуре с выставленным флагом подбора размера по размеру контента,
@@ -198,7 +198,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
     if (this.Pages.length <= 0)
         return -1;
 
-    if (true === this.Parent.Is_HdrFtr(false))
+    if (true === this.Parent.IsHdrFtr(false))
         return -1;
 
     var Run = SimpleChanges[0].Class;
@@ -935,7 +935,9 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                     isColumnBreakOnPrevLine = true;
             }
 
-            if ((true === isPageBreakOnPrevLine && (0 !== this.private_GetColumnIndex(CurPage) || (0 === CurPage && null !== PrevElement)))
+            // Здесь используем GetAbsoluteColumn, а не у текущего класса, т.к. в данную ветку мы попадаем только, если
+			// верхний DocContent - документ и если не в таблице
+            if ((true === isPageBreakOnPrevLine && (0 !== this.GetAbsoluteColumn(CurPage) || (0 === CurPage && null !== PrevElement)))
                 || (true === isColumnBreakOnPrevLine && 0 === CurPage))
             {
                 this.Pages[CurPage].Set_EndLine(CurLine - 1);
@@ -1498,7 +1500,16 @@ Paragraph.prototype.private_RecalculateLineCheckRanges = function(CurLine, CurPa
     else
         Left = false === PRS.UseFirstLine ? this.Pages[CurPage].X + ParaPr.Ind.Left : this.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 
-    var PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	var PageFields = null;
+    if (this.bFromDocument && PRS.GetTopDocument() === this.LogicDocument && !PRS.IsInTable())
+	{
+		// Заглушка для случая, когда параграф лежит в CBlockLevelSdt
+		PageFields = this.LogicDocument.Get_ColumnFields(PRS.GetTopIndex(), this.Get_AbsoluteColumn(CurPage));
+	}
+	else
+	{
+		PageFields = this.Parent.Get_ColumnFields ? this.Parent.Get_ColumnFields(this.Get_Index(), this.Get_AbsoluteColumn(CurPage)) : this.Parent.Get_PageFields(this.private_GetRelativePageIndex(CurPage));
+	}
 
     var Ranges = PRS.Ranges;
     var Ranges2;
@@ -2702,6 +2713,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.Paragraph       = Para;
     this.Parent          = null;
     this.TopDocument     = null;
+    this.TopIndex        = -1;   // Номер элемента контейнера (содержащего данный параграф), либо номер данного параграфа в самом верхнем документе
     this.PageAbs         = 0;
     this.ColumnAbs       = 0;
 	this.InTable         = false;
@@ -2718,6 +2730,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.RangesCount     = 0;
 
     this.FirstItemOnLine = true;
+	this.PrevItemFirst   = false;
     this.EmptyLine       = true;
     this.StartWord       = false;
     this.Word            = false;
@@ -2769,10 +2782,13 @@ function CParagraphRecalculateStateWrap(Para)
 
     this.NumberingPos = new CParagraphContentPos(); // Позиция элемента вместе с которым идет нумерация
 
-    this.MoveToLBP    = false;                      // Делаем ли разрыв в позиции this.LineBreakPos
-    this.LineBreakPos = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
-    // отрезка или строки, если что-то не умещается (например,
-    // если у нас не убирается слово, то разрыв ставим перед ним)
+    this.MoveToLBP      = false;                      // Делаем ли разрыв в позиции this.LineBreakPos
+	this.LineBreakFirst = true;                       // Последняя позиция для переноса - это первый элемент в отрезке
+    this.LineBreakPos   = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
+                                                      // отрезка или строки, если что-то не умещается (например,
+                                                      // если у нас не убирается слово, то разрыв ставим перед ним)
+	this.LastItem       = null;                       // Последний непробельный элемент
+
 
     this.RunRecalcInfoLast  = null; // RecalcInfo последнего рана
     this.RunRecalcInfoBreak = null; // RecalcInfo рана, на котором произошел разрыв отрезка/строки
@@ -2898,8 +2914,10 @@ CParagraphRecalculateStateWrap.prototype =
         this.XEnd            = XEnd;
         this.XRange          = X;
 
-        this.MoveToLBP    = false;
-        this.LineBreakPos = new CParagraphContentPos();
+		this.MoveToLBP      = false;
+		this.LineBreakPos   = new CParagraphContentPos();
+		this.LineBreakFirst = true;
+		this.LastItem       = null;
 
         // for ParaMath
         this.bMath_OneLine    = false;
@@ -2932,11 +2950,12 @@ CParagraphRecalculateStateWrap.prototype =
         this.RestartPageRecalcInfo.Object = Object;
     },
 
-    Set_LineBreakPos : function(PosObj)
-    {
-        this.LineBreakPos.Set( this.CurPos );
-        this.LineBreakPos.Add( PosObj );
-    },
+    Set_LineBreakPos : function(PosObj, isFirstItemOnLine)
+	{
+		this.LineBreakPos.Set(this.CurPos);
+		this.LineBreakPos.Add(PosObj);
+		this.LineBreakFirst = isFirstItemOnLine;
+	},
 
     Set_NumberingPos : function(PosObj, Item)
     {
@@ -3212,6 +3231,17 @@ CParagraphRecalculateStateWrap.prototype.GetSectPr = function()
 CParagraphRecalculateStateWrap.prototype.GetTopDocument = function()
 {
 	return this.TopDocument;
+};
+CParagraphRecalculateStateWrap.prototype.GetTopIndex = function()
+{
+	if (-1 === this.TopIndex)
+	{
+		var arrPos = this.Paragraph.GetDocumentPositionFromObject();
+		if (arrPos.length > 0)
+			this.TopIndex = arrPos[0].Position;
+	}
+
+	return this.TopIndex;
 };
 
 function CParagraphRecalculateStateCounter()

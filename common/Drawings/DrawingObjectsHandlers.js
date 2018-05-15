@@ -579,7 +579,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D || drawingObjectsController.isViewMode())
+                    if(drawing.selection.plotArea == null || !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(drawing) || !drawing.chartObj  || !drawing.chartObj.processor3D || !drawingObjectsController.canEdit())
                     {
                         drawingObjectsController.checkChartTextSelection();
                         selector.resetSelection();

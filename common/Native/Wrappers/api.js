@@ -5811,6 +5811,7 @@ function NativeOpenFile3(_params, documentInfo)
             _api.asc_setAutoSaveGap(1);
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
+            _api.SetCollaborativeMarksShowType(Asc.c_oAscCollaborativeMarksShowType.None);
            
             window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
 

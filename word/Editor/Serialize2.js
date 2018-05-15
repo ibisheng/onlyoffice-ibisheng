@@ -161,7 +161,14 @@ var c_oSer_sts = {
 	Style_RowPr: 15,
 	Style_CellPr: 16,
 	Style_TblStylePr: 17,
-	Style_Link: 18
+	Style_Link: 18,
+	Style_CustomStyle: 19,
+	Style_Aliases: 20,
+	Style_AutoRedefine: 21,
+	Style_Locked: 22,
+	Style_Personal: 23,
+	Style_PersonalCompose: 24,
+	Style_PersonalReply: 25
 };
 var c_oSerProp_tblStylePrType = {
 	TblStylePr: 0,
@@ -1603,6 +1610,22 @@ function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams, saveParams)
 			if(aTblStylePr.length > 0)
 				this.bs.WriteItem(c_oSer_sts.Style_TblStylePr, function(){oThis.WriteTblStylePr(aTblStylePr);});
 		}
+		if(null != style.IsCustom())
+			this.bs.WriteItem(c_oSer_sts.Style_CustomStyle, function(){oThis.memory.WriteBool(true);});
+		// if(null != style.Aliases){
+		// 	this.memory.WriteByte(c_oSer_sts.Style_Aliases);
+		// 	this.memory.WriteString2(style.Aliases);
+		// }
+		// if(null != style.AutoRedefine)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_AutoRedefine, function(){oThis.memory.WriteBool(style.AutoRedefine);});
+		// if(null != style.Locked)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_Locked, function(){oThis.memory.WriteBool(style.Locked);});
+		// if(null != style.Personal)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_Personal, function(){oThis.memory.WriteBool(style.Personal);});
+		// if(null != style.PersonalCompose)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_PersonalCompose, function(){oThis.memory.WriteBool(style.PersonalCompose);});
+		// if(null != style.PersonalReply)
+		// 	this.bs.WriteItem(c_oSer_sts.Style_PersonalReply, function(){oThis.memory.WriteBool(style.PersonalReply);});
     };
 	this.WriteTblStylePr = function(aTblStylePr)
     {
@@ -4831,7 +4854,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             {
                 case para_Text:
 					sCurInstrText = this.WriteText(sCurInstrText, instrTextType);
-                    if (item.Is_NoBreakHyphen()) {
+                    if (item.IsNoBreakHyphen()) {
 						sCurText = this.WriteText(sCurText, textType);
                         oThis.memory.WriteByte(c_oSerRunType.nonBreakHyphen);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
@@ -7254,6 +7277,34 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
                 return oThis.ReadTblStylePr(t,l, style);
             });
 		}
+		else if(c_oSer_sts.Style_CustomStyle == type)
+		{
+			style.SetCustom(this.stream.GetBool());
+		}
+		// else if(c_oSer_sts.Style_Aliases == type)
+		// {
+		// 	style.Aliases = this.stream.GetString2LE(length);
+		// }
+		// else if(c_oSer_sts.Style_AutoRedefine == type)
+		// {
+		// 	style.AutoRedefine = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_Locked == type)
+		// {
+		// 	style.Locked = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_Personal == type)
+		// {
+		// 	style.Personal = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_PersonalCompose == type)
+		// {
+		// 	style.PersonalCompose = this.stream.GetBool();
+		// }
+		// else if(c_oSer_sts.Style_PersonalReply == type)
+		// {
+		// 	style.PersonalReply = this.stream.GetBool();
+		// }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -9057,7 +9108,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 			if(nLevelNum < oNewNum.Lvl.length)
 			{
 				var oOldLvl = oNewNum.Lvl[nLevelNum];
-				var oNewLvl = oNewNum.Internal_CopyLvl( oOldLvl );
+				var oNewLvl = oOldLvl.Copy();
 				//сбрасываем свойства
 				oNewLvl.ParaPr = new CParaPr();
 				oNewLvl.TextPr = new CTextPr();
@@ -9066,7 +9117,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				});
 				oNewNum.Lvl[nLevelNum] = oNewLvl;
 				this.oReadResult.aPostOpenStyleNumCallbacks.push(function(){
-					oNewNum.Set_Lvl(nLevelNum, oNewLvl);
+					oNewNum.SetLvl(nLevelNum, oNewLvl);
 				});
 			}
 			else
@@ -9143,12 +9194,12 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerNumTypes.lvl_LvlTextItemText === type )
         {
-            var oNewTextItem = new CLvlText_Text( this.stream.GetString2LE(length) );
+            var oNewTextItem = new CNumberingLvlTextString( this.stream.GetString2LE(length) );
             aNewText.push(oNewTextItem);
         }
         else if ( c_oSerNumTypes.lvl_LvlTextItemNum === type )
         {
-            var oNewTextItem = new CLvlText_Num( this.stream.GetUChar() );
+            var oNewTextItem = new CNumberingLvlTextNum( this.stream.GetUChar() );
             aNewText.push(oNewTextItem);
         }
         else
@@ -10021,7 +10072,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(0x2013);
+            oNewElem = new ParaText(0x002D);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)
@@ -11165,7 +11216,7 @@ function Binary_oMathReader(stream, oReadResult, curFootnote)
         }
         else if (c_oSerRunType.nonBreakHyphen === type)
         {
-            oNewElem = new ParaText(0x2013);
+            oNewElem = new ParaText(0x002D);
             oNewElem.Set_SpaceAfter(false);
         }
         else if (c_oSerRunType.softHyphen === type)
