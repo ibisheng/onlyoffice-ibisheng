@@ -425,10 +425,7 @@ CChartsDrawer.prototype =
 					pos = this._calculatePositionTitle(obj);
 					break;
 				}
-				case AscDFH.historyitem_type_ValAx: {
-					pos = this._calculatePositionAxisTitle(obj);
-					break;
-				}
+				case AscDFH.historyitem_type_ValAx:
 				case AscDFH.historyitem_type_CatAx: {
 					pos = this._calculatePositionAxisTitle(obj);
 					break;
@@ -530,8 +527,43 @@ CChartsDrawer.prototype =
 					break;
 				}
 			}
+
+
+			if(this.nDimensionCount === 3)
+			{
+				var convertResult;
+				if(axis instanceof AscFormat.CCatAx) {
+					convertResult = this._convertAndTurnPoint((x + widthAxisTitle / 2) * pxToMM, y * pxToMM, this.processor3D.calculateZPositionCatAxis());
+					x = convertResult.x / pxToMM - widthAxisTitle / 2;
+				} else {
+					//TODO избавиться от привзяки к типу диаграммы
+					if(!this.processor3D.view3D.getRAngAx() && (this.calcProp.type === c_oChartTypes.Bar || this.calcProp.type === c_oChartTypes.Line))
+					{
+						var posX = axis.posX;
+						var widthLabels = axis.labels && axis.labels.extX ? axis.labels.extX : 0;
+						var yPoints = axis.yPoints;
+						var upYPoint = yPoints && yPoints[0] ? yPoints[0].pos : 0;
+						var downYPoint = yPoints && yPoints[yPoints.length - 1] ? yPoints[yPoints.length - 1].pos : 0;
+
+						var tempX = posX - widthLabels;
+						var convertResultX = this._convertAndTurnPoint(tempX * pxToMM, y * pxToMM, 0);
+						x = convertResultX.x / pxToMM - widthAxisTitle;
+
+						var convertResultY1 = this._convertAndTurnPoint(posX * pxToMM, upYPoint * pxToMM, 0);
+						var convertResultY2 = this._convertAndTurnPoint(posX * pxToMM, downYPoint * pxToMM, 0);
+						var heightPerspectiveChart = convertResultY1.y - convertResultY2.y;
+
+						y = (convertResultY2.y + heightPerspectiveChart / 2) / pxToMM - heightAxisTitle / 2;
+					}
+					else
+					{
+						convertResult = this._convertAndTurnPoint(x * pxToMM, y * pxToMM, 0);
+						y = convertResult.y / pxToMM;
+					}
+				}
+
+			}
 		}
-		//TODO нужна обработка для трехмерных диаграмм!!!
 
 		return {x: x , y: y};
 	},
