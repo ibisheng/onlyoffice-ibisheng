@@ -5064,6 +5064,11 @@ background-repeat: no-repeat;\
 				{
 					if (this.isApplyChangesOnOpenEnabled)
 					{
+                        if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+                        {
+                            return AscCommon.EncryptionWorker.handleChanges(AscCommon.CollaborativeEditing.m_aChanges, this, this.OpenDocumentEndCallback);
+                        }
+                        
 						this.isApplyChangesOnOpenEnabled = false;
 						this.bNoSendComments             = true;
 						var OtherChanges                 = AscCommon.CollaborativeEditing.m_aChanges.length > 0;
