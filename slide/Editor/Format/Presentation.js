@@ -3246,7 +3246,7 @@ CPresentation.prototype =
             {
                 editor.sync_EndAddShape();
             }
-            if(oController)
+            if(oController && !this.FocusOnNotes)
             {
                 var oDrawingObjects = oController;
                 if(oDrawingObjects.curState instanceof  AscFormat.StartAddNewShape
