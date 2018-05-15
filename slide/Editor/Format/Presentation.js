@@ -3152,9 +3152,36 @@ CPresentation.prototype =
             else
             {
                 if ( e.CtrlKey ) {
-                    if(oController && oController.selectedObjects.length !== 0) {
-                        History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                        this.addNextSlide();                        
+                    if(oController) {
+                        var bChangeSelect = false;
+                        if(!this.FocusOnNotes){
+                            var aDrawings = oController.getDrawingArray();
+                            for(var i = aDrawings.length - 1; i > -1; --i){
+                                if(aDrawings[i].selected){
+                                    break;
+                                }
+                            }
+                            ++i;
+                            for(; i < aDrawings.length; ++i){
+                                if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_Shape && aDrawings[i].isPlaceholder()){
+                                    var oContent = aDrawings[i].getDocContent();
+                                    if(oContent){
+                                        oContent.Set_CurrentElement(0, false);
+                                        bChangeSelect = true;
+                                        if(!oContent.IsEmpty()){
+                                            oContent.SelectAll();
+                                        }
+                                        this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                                        this.Document_UpdateSelectionState();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(!bChangeSelect){
+                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                            this.addNextSlide();
+                        }
                     }
                 }
                 else {
