@@ -3845,7 +3845,7 @@ window["buildCryptoFile_End"] = function(url, error, hash, password)
                 _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
                 _editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationOpenError, Asc.c_oAscError.Level.Critical);
 
-                window.AscDesktopEditor.buildCryptedEnd(false);
+                window["AscDesktopEditor"]["buildCryptedEnd"](false);
 
 			}, function(httpRequest) {
 				//console.log(httpRequest.responseText);
@@ -3854,7 +3854,7 @@ window["buildCryptoFile_End"] = function(url, error, hash, password)
 					var data = {
 						"accounts": httpRequest.responseText ? JSON.parse(httpRequest.responseText) : undefined,
 						"hash": hash,
-						"password" : pass,
+						"password" : password,
 						"type": "share"
 					};
 
@@ -3865,7 +3865,7 @@ window["buildCryptoFile_End"] = function(url, error, hash, password)
 
 					setTimeout(function() {
 
-                        window.AscDesktopEditor.buildCryptedEnd(true);
+                        window["AscDesktopEditor"]["buildCryptedEnd"](true);
 
 					}, 1000);
 				}
