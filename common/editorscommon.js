@@ -3796,7 +3796,7 @@ window["buildCryptoFile_End"] = function(url, error, hash, password)
 
     if (0 != error)
 	{
-		_editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
+		_editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationSaveError, Asc.c_oAscError.Level.NoCritical);
 		return;
     }
 
@@ -3805,68 +3805,77 @@ window["buildCryptoFile_End"] = function(url, error, hash, password)
 	{
 		this._callbackPluginEndAction = null;
 
-        setTimeout(function() {
+        _editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
 
-        	window.AscDesktopEditor.buildCryptedEnd();
+		// file upload
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', "ascdesktop://fonts/" + url, true);
+		xhr.responseType = 'arraybuffer';
 
-		}, 1000);
+		if (xhr.overrideMimeType)
+			xhr.overrideMimeType('text/plain; charset=x-user-defined');
+		else
+			xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+
+		xhr.onload = function()
+		{
+			if (this.status != 200)
+			{
+				// error
+				return;
+			}
+
+			var fileData = new Uint8Array(this.response);
+
+			var ext = ".docx";
+			switch (_editor.editorId)
+			{
+				case AscCommon.c_oEditorId.Presentation:
+					ext = ".pptx";
+					break;
+				case AscCommon.c_oEditorId.Spreadsheet:
+					ext = ".xlsx";
+					break;
+				default:
+					break;
+			}
+
+			AscCommon.sendSaveFile(_editor.documentId, _editor.documentUserId, "output" + ext, _editor.asc_getSessionToken(), fileData, function(err) {
+
+                _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+                _editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationOpenError, Asc.c_oAscError.Level.Critical);
+
+                window.AscDesktopEditor.buildCryptedEnd(false);
+
+			}, function(httpRequest) {
+				//console.log(httpRequest.responseText);
+				try
+				{
+					var data = {
+						"accounts": httpRequest.responseText ? JSON.parse(httpRequest.responseText) : undefined,
+						"hash": hash,
+						"password" : pass,
+						"type": "share"
+					};
+
+					window["AscDesktopEditor"]["sendSystemMessage"](data);
+					window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
+
+                    _editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.UploadImage);
+
+					setTimeout(function() {
+
+                        window.AscDesktopEditor.buildCryptedEnd(true);
+
+					}, 1000);
+				}
+				catch (err)
+				{
+				}
+			});
+		};
+
+		xhr.send(null);
 	};
     window.g_asc_plugins.sendToEncryption({"type": "setPasswordByFile", "hash": hash, "password": password});
-
-    // file upload
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', "ascdesktop://fonts/" + url, true);
-    xhr.responseType = 'arraybuffer';
-
-    if (xhr.overrideMimeType)
-        xhr.overrideMimeType('text/plain; charset=x-user-defined');
-    else
-        xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
-
-    xhr.onload = function()
-    {
-        if (this.status != 200)
-        {
-            // error
-            return;
-        }
-
-        var fileData = new Uint8Array(this.response);
-
-        var ext = ".docx";
-        switch (_editor.editorId)
-		{
-			case AscCommon.c_oEditorId.Presentation:
-				ext = ".pptx";
-				break;
-			case AscCommon.c_oEditorId.Spreadsheet:
-				ext = ".xlsx";
-				break;
-			default:
-				break;
-		}
-
-        AscCommon.sendSaveFile(this.documentId, this.documentUserId, "output" + ext, this.asc_getSessionToken(), fileData, function(err) {
-            console.log('error');
-        }, function(httpRequest) {
-            //console.log(httpRequest.responseText);
-            try
-            {
-                var data = {
-                    "accounts": httpRequest.responseText ? JSON.parse(httpRequest.responseText) : undefined,
-                    "hash": hash,
-                    "password" : pass,
-                    "type": "share"
-                };
-
-                window["AscDesktopEditor"]["sendSystemMessage"](data);
-                window["AscDesktopEditor"]["CallInAllWindows"]("function(){ if (window.DesktopUpdateFile) { window.DesktopUpdateFile(undefined); } }");
-            }
-            catch (err)
-            {
-            }
-        });
-    };
-
-    xhr.send(null);
 };

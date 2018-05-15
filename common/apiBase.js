@@ -1616,7 +1616,8 @@
                     return;
                 }
 
-                window["AscDesktopEditor"]["buildCryptedStart"](_editor.asc_nativeGetFile(), obj["password"]);
+                var _ret = _editor.asc_nativeGetFile3();
+                window["AscDesktopEditor"]["buildCryptedStart"](_ret.data, _ret.header, obj["password"]);
                 break;
             }
             case "getPasswordByFile":

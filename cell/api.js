@@ -3204,6 +3204,12 @@ var editor;
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
+  spreadsheet_api.prototype.asc_nativeGetFile3 = function()
+  {
+      var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
+      oBinaryFileWriter.Write(true, true);
+      return { data: oBinaryFileWriter.Write(true, true), header: oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64) };
+  };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write(true);

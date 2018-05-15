@@ -7182,6 +7182,13 @@ background-repeat: no-repeat;\
 		return writer.WriteDocument(this.WordControl.m_oLogicDocument);
 	};
 
+    window["asc_docs_api"].prototype["asc_nativeGetFile3"] = function()
+    {
+        var writer = new AscCommon.CBinaryFileWriter();
+        this.WordControl.m_oLogicDocument.CalculateComments();
+        return { data: writer.WriteDocument3(this.WordControl.m_oLogicDocument, true), header: ("PPTY;v10;" + writer.pos + ";") };
+    };
+
 	window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 	{
 		var writer = new AscCommon.CBinaryFileWriter();
