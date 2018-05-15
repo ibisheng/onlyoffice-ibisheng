@@ -301,11 +301,16 @@
     };
     CNotes.prototype.isViewerMode = function()
     {
-        editor.WordControl.m_oLogicDocument.IsViewMode();
+        return editor.WordControl.m_oLogicDocument.IsViewMode();
     };
     CNotes.prototype.convertPixToMM = function(pix)
     {
         return editor.WordControl.m_oDrawingDocument.GetMMPerDot(pix);
+    };
+
+    CNotes.prototype.checkGraphicObjectPosition = function()
+    {
+        return {x: 0, y: 0};
     };
 
     CNotes.prototype.Clear_ContentChanges = function()
