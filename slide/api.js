@@ -2400,7 +2400,7 @@ background-repeat: no-repeat;\
 						Name  : name,
 						Index : -1
 					}
-				}));
+				}), false);
 			}
 		}
 	};
@@ -2409,7 +2409,7 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({FontSize : Math.min(size, 100)}), false);
 
 			// для мобильной версии это важно
 			if (this.isMobileVersion)
@@ -2421,7 +2421,7 @@ background-repeat: no-repeat;\
         if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextLang);
-            this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : value}}));
+            this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : value}}), false);
 
             this.WordControl.m_oLogicDocument.Spelling.Check_CurParas();
 
@@ -2435,7 +2435,7 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Bold : value}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Bold : value}), false);
 		}
 	};
 	asc_docs_api.prototype.put_TextPrItalic           = function(value)
@@ -2443,7 +2443,7 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Italic : value}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Italic : value}), false);
 		}
 	};
 	asc_docs_api.prototype.put_TextPrUnderline        = function(value)
@@ -2451,7 +2451,7 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Underline : value}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Underline : value}), false);
 		}
 	};
 	asc_docs_api.prototype.put_TextPrStrikeout        = function(value)
@@ -2462,7 +2462,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({
                 Strikeout  : value,
                 DStrikeout : false
-            }));
+            }), false);
 		}
 	};
 	asc_docs_api.prototype.put_PrLineSpacing          = function(Type, Value)
@@ -2658,7 +2658,7 @@ background-repeat: no-repeat;\
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({VertAlign : value}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({VertAlign : value}), false);
 		}
 	};
 	/* 	Маркированный список Type = 0
@@ -3271,7 +3271,7 @@ background-repeat: no-repeat;\
 					g : g,
 					b : b
 				}
-			}));
+			}), false);
 		}
 	};
 	asc_docs_api.prototype.put_TextColor  = function(color)
@@ -3282,7 +3282,7 @@ background-repeat: no-repeat;\
 			var _unifill        = new AscFormat.CUniFill();
 			_unifill.fill       = new AscFormat.CSolidFill();
 			_unifill.fill.color = AscFormat.CorrectUniColor(color, _unifill.fill.color, 0);
-			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Unifill : _unifill}));
+			this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Unifill : _unifill}), false);
 		}
 	};
 
@@ -5225,7 +5225,7 @@ background-repeat: no-repeat;\
 					Name  : fontinfo.Name,
 					Index : -1
 				}
-			}));
+			}), false);
 		}
 	};
 

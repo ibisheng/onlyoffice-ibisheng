@@ -9547,6 +9547,12 @@ function CreateAscFill(unifill)
                 ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
                 ret.fill.PathType = 0;
             }
+            else
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = 0;
+                ret.fill.LinearScale = false;
+            }
 
             break;
         }
@@ -9758,8 +9764,11 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                     var _angle = _fill.LinearAngle;
                     var _scale = _fill.LinearScale;
 
-                    if (!ret.fill.lin)
+                    if (!ret.fill.lin){
                         ret.fill.lin = new GradLin();
+                        ret.fill.lin.angle = 0;
+                        ret.fill.lin.scale = false;
+                    }
 
                     if (undefined != _angle)
                         ret.fill.lin.angle = _angle;

@@ -9303,6 +9303,10 @@ drawDoughnutChart.prototype = {
 			}
 
 			for (var k = 0; k < numCache.ptCount; k++) {
+				
+				if(!this.paths.series[n] || !this.paths.series[n][k]) {
+					continue;
+				}
 
 				idxPoint = this.cChartDrawer.getIdxPoint(this.chart.series[n], k);
 
