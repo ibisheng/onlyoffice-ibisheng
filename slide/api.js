@@ -5683,6 +5683,11 @@ background-repeat: no-repeat;\
             LogicDocument.Spelling.Add_Word(SpellCheckProperty.Word);
             LogicDocument.DrawingDocument.ClearCachePages();
             LogicDocument.DrawingDocument.FirePaint();
+			if(LogicDocument.Slides[LogicDocument.CurPage])
+			{
+				LogicDocument.DrawingDocument.Notes_OnRecalculate(LogicDocument.CurPage,LogicDocument.NotesWidth, LogicDocument.Slides[LogicDocument.CurPage].getNotesHeight());
+
+			}
         }
     };
 
