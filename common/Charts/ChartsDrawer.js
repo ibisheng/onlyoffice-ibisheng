@@ -1425,7 +1425,7 @@ CChartsDrawer.prototype =
 		}
 
 		//максимальное и минимальное значение(по документации excel)
-		var trueMinMax = isStackedType ? {min: yMin, max: yMax} : this._getTrueMinMax(yMin, yMax);
+		var trueMinMax = this._getTrueMinMax(yMin, yMax, isStackedType);
 
 		var manualMin = axis.scaling && axis.scaling.min !== null ? axis.scaling.min : null;
 		var manualMax = axis.scaling && axis.scaling.max !== null ? axis.scaling.max : null;
@@ -1722,29 +1722,31 @@ CChartsDrawer.prototype =
 		return step;
 	},
 
-	_getTrueMinMax: function (yMin, yMax) {
-		var axisMax, axisMin, diffPerMaxMin;
-		if (yMin >= 0 && yMax >= 0) {
-			axisMax = yMax + 0.05 * ( yMax - yMin );
+	_getTrueMinMax: function (yMin, yMax, isStackedType) {
 
-			diffPerMaxMin = ((yMax - yMin) / yMax) * 100;
-			if (16.667 > diffPerMaxMin) {
+		var axisMax, axisMin, diffMaxMin;
+		var cDiff = 1/6;
+		if (yMin >= 0 && yMax >= 0) {
+			axisMax = isStackedType ? yMax : yMax + 0.05 * ( yMax - yMin );
+
+			diffMaxMin = (yMax - yMin) / yMax;
+			if (cDiff > diffMaxMin) {
 				axisMin = yMin - ((yMax - yMin) / 2);
 			} else {
 				axisMin = 0;
 			}
 		} else if (yMin <= 0 && yMax <= 0) {
-			diffPerMaxMin = ((yMin - yMax) / yMin) * 100;
-			axisMin = yMin + 0.05 * (yMin - yMax);
+			diffMaxMin = (yMin - yMax) / yMin;
+			axisMin = isStackedType ? yMin : yMin + 0.05 * (yMin - yMax);
 
-			if (16.667 < diffPerMaxMin) {
+			if (cDiff < diffMaxMin) {
 				axisMax = 0;
 			} else {
 				axisMax = yMax - ((yMin - yMax) / 2)
 			}
 		} else if (yMax > 0 && yMin < 0) {
-			axisMax = yMax + 0.05 * (yMax - yMin);
-			axisMin = yMin + 0.05 * (yMin - yMax);
+			axisMax = isStackedType ? yMax : yMax + 0.05 * (yMax - yMin);
+			axisMin = isStackedType ? yMin : yMin + 0.05 * (yMin - yMax);
 		}
 
 		if (axisMin === axisMax) {
