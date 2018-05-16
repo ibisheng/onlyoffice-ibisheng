@@ -520,7 +520,7 @@ CParaSpellChecker.prototype =
             }
 
             var Element = this.Elements[ElementId];
-            if (undefined !== this.Words[Element.Word][Element.LangId])
+            if (undefined !== this.Words[Element.Word] && undefined !== this.Words[Element.Word][Element.LangId])
                 this.Words[Element.Word][Element.LangId] = Element.Variants;
         }
     },
