@@ -62,6 +62,28 @@ CNum.prototype.GetId = function()
 	return this.Id;
 };
 /**
+ * Создаем копию данной нумерации
+ * @returns {CNum}
+ */
+CNum.prototype.Copy = function()
+{
+	var oNum = this.Numbering.CreateNum();
+
+	var oNewAbstractNum = this.Numbering.GetAbstractNum(oNum.AbstractNumId);
+	var oAbstractNum    = this.Numbering.GetAbstractNum(this.AbstractNumId);
+
+	if (oAbstractNum && oNewAbstractNum)
+		oNewAbstractNum.Copy(oAbstractNum);
+
+	for (var nLvl = 0; nLvl < 8; ++nLvl)
+	{
+		if (this.LvlOverride[nLvl])
+			oNum.SetLvlOverride(this.LvlOverride[nLvl].GetLvl().Copy(), nLvl, this.LvlOverride[nLvl].GetStartOverride());
+	}
+
+	return oNum;
+};
+/**
  * Получаем заданный уровень
  * @param nLvl {number} 0..8
  * @returns {CNumberingLvl}
@@ -91,11 +113,63 @@ CNum.prototype.CreateDefault = function(nType)
 	this.ClearAllLvlOverride();
 };
 /**
- * Устанавливаем новый уровень
+ * Задаем новый уровень нумерации
  * @param oNumberingLvl {CNumberingLvl}
  * @param nLvl {number} 0..8
  */
-CNum.prototype.SetLvlOverride = function(oNumberingLvl, nLvl)
+CNum.prototype.SetLvl = function(oNumberingLvl, nLvl)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		this.SetLvlOverride(oNumberingLvl, nLvl);
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvl(nLvl, oNumberingLvl);
+	}
+};
+/**
+ * Делаем заданный уровень заданного пресета
+ * @param nLvl {number} 0..8
+ * @param nType {c_oAscNumberingLevel}
+ * @param [sText=undefined] Используется для типа c_oAscNumberingLevel.Bullet
+ * @param [oTextPr=undefined] {CTextPr} Используется для типа c_oAscNumberingLevel.Bullet
+ */
+CNum.prototype.SetLvlByType = function(nLvl, nType, sText, oTextPr)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = new CNumberingLvl();
+		oNumberingLvl.SetByType(nType, nLvl, sText, oTextPr);
+
+		this.SetLvlOverride(oNumberingLvl, nLvl);
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvlByType(nLvl, nType, sText, oTextPr);
+	}
+};
+/**
+ * Устанавливаем новый уровень
+ * @param oNumberingLvl {CNumberingLvl}
+ * @param nLvl {number} 0..8
+ * @param [nStartOverride=-1]
+ */
+CNum.prototype.SetLvlOverride = function(oNumberingLvl, nLvl, nStartOverride)
 {
 	if (nLvl < 0 || nLvl > 8)
 		return;
@@ -104,7 +178,7 @@ CNum.prototype.SetLvlOverride = function(oNumberingLvl, nLvl)
 		return;
 
 	var oLvlOverrideOld = this.LvlOverride[nLvl];
-	var oLvlOverrideNew = new CLvlOverride(oNumberingLvl, nLvl, -1);
+	var oLvlOverrideNew = new CLvlOverride(oNumberingLvl, nLvl, nStartOverride);
 
 	AscCommon.History.Add(new CChangesNumLvlOverrideChange(this, oLvlOverrideOld, oLvlOverrideNew, nLvl));
 
@@ -164,6 +238,10 @@ function CLvlOverride(oNumberingLvl, nLvl, nStartOverride)
 CLvlOverride.prototype.GetLvl = function()
 {
 	return this.NumberingLvl;
+};
+CLvlOverride.prototype.GetStartOverride = function()
+{
+	return this.StartOverride;
 };
 CLvlOverride.prototype.WriteToBinary = function(oWriter)
 {

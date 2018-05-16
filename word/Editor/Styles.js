@@ -7264,6 +7264,13 @@ CRFonts.prototype.Is_Empty = function()
 
 	return true;
 };
+CRFonts.prototype.SetAll = function(sFontName, nFontIndex)
+{
+	if (undefined === nFontIndex)
+		nFontIndex = -1;
+
+	this.Set_All(sFontName, nFontIndex);
+};
 
 function CLang()
 {

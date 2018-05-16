@@ -7577,6 +7577,13 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 /**
  * Удаляем нумерацию
  */
+Paragraph.prototype.RemoveNumPr = function()
+{
+	this.Numbering_Remove();
+};
+/**
+ * Удаляем нумерацию
+ */
 Paragraph.prototype.Numbering_Remove = function()
 {
 	// Если у нас была задана нумерации в стиле, тогда чтобы ее отменить(не удаляя нумерацию в стиле)
