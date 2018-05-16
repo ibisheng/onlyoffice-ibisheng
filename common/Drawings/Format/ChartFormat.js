@@ -12508,14 +12508,15 @@ CTitle.prototype =
                 this.recalculateTransform();
                 this.recalcInfo.recalcTransform = false;
             }
+            if(this.recalcInfo.recalculateGeometry)
+            {
+                this.recalculateGeometry && this.recalculateGeometry();
+                this.recalcInfo.recalculateGeometry = false;
+            }
             if(this.recalcInfo.recalcTransformText)
             {
                 this.recalculateTransformText();
                 this.recalcInfo.recalcTransformText = false;
-            }
-            if(this.recalcInfo.recalculateGeometry){
-                this.recalculateGeometry && this.recalculateGeometry();
-                this.recalcInfo.recalculateGeometry = false;
             }
             if(this.chart)
             {

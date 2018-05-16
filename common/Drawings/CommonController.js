@@ -6862,9 +6862,14 @@ DrawingObjectsController.prototype =
         {
             chart_selection = this.selection.groupSelection.selection.chartSelection;
         }
-        if(chart_selection && chart_selection.selection.textSelection)
+        if(chart_selection && (chart_selection.selection.textSelection || chart_selection.selection.title))
         {
-            var content = chart_selection.selection.textSelection.getDocContent(), bDeleteTitle = false;;
+            var oTitle = chart_selection.selection.textSelection;
+            if(!oTitle){
+                oTitle = chart_selection.selection.title;
+                nPageNum2 = this.drawingObjects.num;
+            }
+            var content = oTitle.getDocContent(), bDeleteTitle = false;
             if(content)
             {
                 if(content.Is_Empty())
