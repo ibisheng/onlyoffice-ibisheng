@@ -4490,13 +4490,13 @@ Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
     var NumSubType = -1;
     if ( !(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId) )
     {
-        var Numb = this.WordControl.m_oLogicDocument.Numbering.Get_AbstractNum( ParaPr.NumPr.NumId );
+        var oNum = this.WordControl.m_oLogicDocument.GetNumbering().GetNum(ParaPr.NumPr.NumId);
 
-        if ( undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl] )
+        if (oNum && oNum.GetLvl(ParaPr.NumPr.Lvl))
         {
-            var Lvl = Numb.Lvl[ParaPr.NumPr.Lvl];
-            var NumFormat = Lvl.Format;
-            var NumText   = Lvl.LvlText;
+            var Lvl = oNum.GetLvl(ParaPr.NumPr.Lvl);
+            var NumFormat = Lvl.GetFormat();
+            var NumText   = Lvl.GetLvlText();
 
             if ( c_oAscNumberingFormat.Bullet === NumFormat )
             {

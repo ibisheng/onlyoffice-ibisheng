@@ -46,6 +46,14 @@ function CNum(oNumbering)
 {
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
+	this.Lock = new AscCommon.CLock();
+	if (!AscCommon.g_oIdCounter.m_bLoad)
+	{
+		this.Lock.Set_Type(AscCommon.locktype_Mine, false);
+		if (typeof AscCommon.CollaborativeEditing !== "undefined")
+			AscCommon.CollaborativeEditing.Add_Unlock2(this);
+	}
+
 	this.AbstractNumId = null;
 	this.LvlOverride   = [];
 	this.Numbering     = oNumbering;
@@ -164,6 +172,121 @@ CNum.prototype.SetLvlByType = function(nLvl, nType, sText, oTextPr)
 	}
 };
 /**
+ * Заполняем уровень по заданному формату
+ * @param nLvl {number} 0..8
+ * @param nType
+ * @param sFormatText
+ * @param nAlign
+ */
+CNum.prototype.SetLvlByFormat = function(nLvl, nType, sFormatText, nAlign)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = new CNumberingLvl();
+		oNumberingLvl.SetByFormat(nLvl, nType, sFormatText, nAlign);
+
+		this.SetLvlOverride(oNumberingLvl, nLvl);
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvlByFormat(nLvl, nType, sFormatText, nAlign);
+	}
+};
+/**
+ * Выставляем является ли данный уровень сквозным или каждый раз перестартовывать нумерацию
+ * @param nLvl {number} 0..8
+ * @param isRestart {boolean}
+ */
+CNum.prototype.SetLvlRestart = function(nLvl, isRestart)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		if (oNumberingLvl)
+		{
+			var oNewNumberingLvl = oNumberingLvl.Copy();
+			oNewNumberingLvl.Restart = (isRestart ? -1 : 0);
+			this.SetLvlOverride(oNewNumberingLvl, nLvl);
+		}
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvlRestart(nLvl, isRestart);
+	}
+};
+/**
+ * Задаем начальное значения для данного уровня
+ * @param nLvl {number} 0..8
+ * @param nStart {number}
+ */
+CNum.prototype.SetLvlStart = function(nLvl, nStart)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		if (oNumberingLvl)
+		{
+			var oNewNumberingLvl = oNumberingLvl.Copy();
+			oNewNumberingLvl.Start = nStart;
+			this.SetLvlOverride(oNewNumberingLvl, nLvl);
+		}
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvlStart(nLvl, nStart);
+	}
+};
+/**
+ * Выставляем тип разделителя между табом и последующим текстом
+ * @param nLvl {number} 0..8
+ * @param nSuff {number}
+ */
+CNum.prototype.SetLvlSuff = function(nLvl, nSuff)
+{
+	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		if (oNumberingLvl)
+		{
+			var oNewNumberingLvl = oNumberingLvl.Copy();
+			oNewNumberingLvl.Suff = nSuff;
+			this.SetLvlOverride(oNewNumberingLvl, nLvl);
+		}
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.SetLvlSuff(nLvl, nSuff);
+	}
+};
+/**
  * Устанавливаем новый уровень
  * @param oNumberingLvl {CNumberingLvl}
  * @param nLvl {number} 0..8
@@ -210,6 +333,35 @@ CNum.prototype.RecalculateRelatedParagraphs = function(nLvl)
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
 		arrParagraphs[nIndex].RecalcCompiledPr();
+	}
+};
+/**
+ * Применяем новые тектовые настройки к данной нумерации на заданном уровне
+ * @param nLvl {number} 0..8
+ * @param oTextPr {CTextPr}
+ */
+CNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
+{
+	if (nLvl < 0 || nLvl > 8)
+		return;
+
+	if (this.LvlOverride[nLvl])
+	{
+		var oNumberingLvl = this.LvlOverride[nLvl].GetLvl();
+		if (oNumberingLvl)
+		{
+			var oNewNumberingLvl = oNumberingLvl.Copy();
+			oNewNumberingLvl.TextPr.Merge(oTextPr());
+			this.SetLvlOverride(oNewNumberingLvl, nLvl);
+		}
+	}
+	else
+	{
+		var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+		if (!oAbstractNum)
+			return;
+
+		oAbstractNum.ApplyTextPr(nLvl, oTextPr);
 	}
 };
 /**

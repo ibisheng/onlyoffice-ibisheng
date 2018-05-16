@@ -451,11 +451,6 @@ CDocumentControllerBase.prototype.SetParagraphTabs = function(Tabs){};
  */
 CDocumentControllerBase.prototype.SetParagraphIndent = function(Ind){};
 /**
- * Установить тип нумерации параграфа.
- * @param NumInfo
- */
-CDocumentControllerBase.prototype.SetParagraphNumbering = function(NumInfo){};
-/**
  * Установить заливку параграфа.
  * @param Shd
  */

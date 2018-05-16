@@ -196,10 +196,6 @@ CDrawingsController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.DrawingObjects.setParagraphIndent(Ind);
 };
-CDrawingsController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.DrawingObjects.setParagraphNumbering(NumInfo);
-};
 CDrawingsController.prototype.SetParagraphShd = function(Shd)
 {
 	this.DrawingObjects.setParagraphShd(Shd);

@@ -136,10 +136,6 @@ CLogicDocumentController.prototype.SetParagraphIndent = function(Ind)
 {
 	this.LogicDocument.controller_SetParagraphIndent(Ind);
 };
-CLogicDocumentController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	this.LogicDocument.controller_SetParagraphNumbering(NumInfo);
-};
 CLogicDocumentController.prototype.SetParagraphShd = function(Shd)
 {
 	this.LogicDocument.controller_SetParagraphShd(Shd);

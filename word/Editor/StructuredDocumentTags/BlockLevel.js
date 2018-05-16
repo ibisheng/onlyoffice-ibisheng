@@ -474,10 +474,6 @@ CBlockLevelSdt.prototype.SetParagraphIndent = function(Ind)
 {
 	return this.Content.SetParagraphIndent(Ind);
 };
-CBlockLevelSdt.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	return this.Content.SetParagraphNumbering(NumInfo);
-};
 CBlockLevelSdt.prototype.SetParagraphShd = function(Shd)
 {
 	return this.Content.SetParagraphShd(Shd);

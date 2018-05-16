@@ -593,28 +593,38 @@ CopyProcessor.prototype =
         if(!bIsNullNumPr)
         {
             if(PasteElementsId.g_bIsDocumentCopyPaste)
-            {
-				var aNum = this.oDocument.Numbering.Get_AbstractNum( oNumPr.NumId );
-				if(null != aNum)
+			{
+				var oNum = this.oDocument.GetNumbering().GetNum(oNumPr.NumId);
+				if (oNum)
 				{
-					var LvlPr = aNum.Lvl[oNumPr.Lvl];
-					if(null != LvlPr)
+					var oNumberingLvl = oNum.GetLvl(oNumPr.Lvl);
+					if (oNumberingLvl)
 					{
-						switch(LvlPr.Format)
+						switch (oNumberingLvl.GetFormat())
 						{
-							case c_oAscNumberingFormat.Decimal: sListStyle = "decimal";break;
-							case c_oAscNumberingFormat.LowerRoman: sListStyle = "lower-roman";break;
-							case c_oAscNumberingFormat.UpperRoman: sListStyle = "upper-roman";break;
-							case c_oAscNumberingFormat.LowerLetter: sListStyle = "lower-alpha";break;
-							case c_oAscNumberingFormat.UpperLetter: sListStyle = "upper-alpha";break;
+							case c_oAscNumberingFormat.Decimal:
+								sListStyle = "decimal";
+								break;
+							case c_oAscNumberingFormat.LowerRoman:
+								sListStyle = "lower-roman";
+								break;
+							case c_oAscNumberingFormat.UpperRoman:
+								sListStyle = "upper-roman";
+								break;
+							case c_oAscNumberingFormat.LowerLetter:
+								sListStyle = "lower-alpha";
+								break;
+							case c_oAscNumberingFormat.UpperLetter:
+								sListStyle = "upper-alpha";
+								break;
 							default:
 								sListStyle = "disc";
-								bBullet = true;
+								bBullet    = true;
 								break;
 						}
 					}
 				}
-            }
+			}
             else
             {
                 var _presentation_bullet = Item.PresentationPr.Bullet;
@@ -2856,11 +2866,11 @@ PasteProcessor.prototype =
 
 	_checkNumberingText: function(paragraph, NumInfo, numbering)
 	{
-		if(numbering)
+		if (numbering)
 		{
-			var abstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(paragraph.Pr.NumPr.NumId);
+			var oNum = this.oLogicDocument.GetNumbering().GetNum(paragraph.Pr.NumPr.NumId);
 			var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
-			var lvl = abstractNum.Lvl[paragraph.Pr.NumPr.Lvl];
+			var lvl = oNum.GetLvl(paragraph.Pr.NumPr.Lvl);
 			var numberingText = this._getNumberingText(lvl, NumInfo, NumTextPr, lvl);
 
 			var newParaRun = new ParaRun();
@@ -6389,7 +6399,7 @@ PasteProcessor.prototype =
         {
             if(true === pNoHtmlPr.bNum)
             {
-                var setListTextPr = function(AbstractNum)
+                var setListTextPr = function(oNum)
 				{
 					//текстовые настройки списка берем по настройкам первого текстового элемента
 					var oFirstTextChild = node;
@@ -6427,10 +6437,10 @@ PasteProcessor.prototype =
 					{
 						if(!t.bIsPlainText)
 						{
-							var oLvl = AbstractNum.Lvl[0];
+							var oLvl = oNum.GetLvl(0);
 							var oTextPr = t._read_rPr(oFirstTextChild);
 							if(c_oAscNumberingFormat.Bullet === num)
-								oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
+								oTextPr.RFonts = oLvl.GetTextPr().RFonts.Copy();
 								
 							//TODO убираю пока при всатвке извне underline/bold/italic у стиля маркера
 							oTextPr.Bold = oTextPr.Underline = oTextPr.Italic = undefined;
@@ -6438,7 +6448,7 @@ PasteProcessor.prototype =
 								oTextPr.Color.Set(0, 0, 0);
 
 							//получаем настройки из node
-							AbstractNum.Apply_TextPr(0, oTextPr);
+							oNum.ApplyTextPr(0, oTextPr);
 						}
 					}
 				};
@@ -6478,11 +6488,12 @@ PasteProcessor.prototype =
 					if(null == NumId && this.pasteInExcel !== true)//create new NumId
 					{
 						// Создаем нумерацию
-						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						var oNum = this.oLogicDocument.GetNumbering().CreateNum();
+						NumId    = oNum.GetId();
+
 						if (c_oAscNumberingFormat.Bullet === num)
 						{
-							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+							oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
 							var NumTextPr = new CTextPr();
 							NumTextPr.RFonts.Set_All("Symbol", -1);
@@ -6511,26 +6522,26 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+							oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 						}
 						
 						switch(num)
 						{
-							case c_oAscNumberingFormat.Bullet     : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
-							case c_oAscNumberingFormat.Decimal    : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.DecimalDot_Left); break;
-							case c_oAscNumberingFormat.LowerRoman : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.LowerRomanDot_Right); break;
-							case c_oAscNumberingFormat.UpperRoman : AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.UpperRomanDot_Right); break;
-							case c_oAscNumberingFormat.LowerLetter: AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.LowerLetterDot_Left); break;
-							case c_oAscNumberingFormat.UpperLetter: AbstractNum.SetLvlByType(level, c_oAscNumberingLevel.UpperLetterDot_Left); break;
+							case c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(level, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+							case c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(level, c_oAscNumberingLevel.DecimalDot_Left); break;
+							case c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+							case c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+							case c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+							case c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(level, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 						}
 						
 						//проставляем начальную позицию
 						if(null !== startPos)
 						{
-							AbstractNum.SetLvlStart(level, startPos);
+							oNum.SetLvlStart(level, startPos);
 						}
 						
-						//setListTextPr(AbstractNum);
+						//setListTextPr(oNum);
 					}
 					
 					//put into map listId
@@ -6579,11 +6590,11 @@ PasteProcessor.prototype =
 					if(null == NumId && this.pasteInExcel !== true)
 					{
 						// Создаем нумерацию
-						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						var oNum = this.oLogicDocument.GetNumbering().CreateNum();
+						NumId    = oNum.GetId();
 						if (c_oAscNumberingFormat.Bullet === num)
 						{
-							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+							oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 							var LvlText = String.fromCharCode(0x00B7);
 							var NumTextPr = new CTextPr();
 							NumTextPr.RFonts.Set_All("Symbol", -1);
@@ -6612,23 +6623,23 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-							AbstractNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+							oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 						}
 						
 						for (var iLvl = 0; iLvl <= 8; iLvl++)
 						{
 							switch(num)
 							{
-								case c_oAscNumberingFormat.Bullet     : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
-								case c_oAscNumberingFormat.Decimal    : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.DecimalDot_Right); break;
-								case c_oAscNumberingFormat.LowerRoman : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerRomanDot_Right); break;
-								case c_oAscNumberingFormat.UpperRoman : AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperRomanDot_Right); break;
-								case c_oAscNumberingFormat.LowerLetter: AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerLetterDot_Left); break;
-								case c_oAscNumberingFormat.UpperLetter: AbstractNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperLetterDot_Left); break;
+								case c_oAscNumberingFormat.Bullet     : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.Bullet, LvlText, NumTextPr); break;
+								case c_oAscNumberingFormat.Decimal    : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.DecimalDot_Right); break;
+								case c_oAscNumberingFormat.LowerRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerRomanDot_Right); break;
+								case c_oAscNumberingFormat.UpperRoman : oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperRomanDot_Right); break;
+								case c_oAscNumberingFormat.LowerLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.LowerLetterDot_Left); break;
+								case c_oAscNumberingFormat.UpperLetter: oNum.SetLvlByType(iLvl, c_oAscNumberingLevel.UpperLetterDot_Left); break;
 							}
 						}
 						
-						setListTextPr(AbstractNum);
+						setListTextPr(oNum);
 					}
 					
 					if(this.pasteInExcel !== true && Para.bFromDocument === true)

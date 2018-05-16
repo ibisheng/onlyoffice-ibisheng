@@ -3536,9 +3536,9 @@
 				var numberingText = null;
 				var formatText;
 				if (oNumPr != null) {
-					var aNum = paragraph.elem.Parent.Numbering.Get_AbstractNum(oNumPr.NumId);
-					if (null != aNum) {
-						LvlPr = aNum.Lvl[oNumPr.Lvl];
+					var oNum = paragraph.elem.Parent.GetNumbering().GetNum(oNumPr.NumId);
+					if (oNum) {
+						LvlPr = oNum.GetLvl(oNumPr.Lvl);
 						Lvl = oNumPr.Lvl;
 					}
 
@@ -3550,7 +3550,7 @@
 
 					text += this._getAllNumberingText(Lvl, numberingText);
 
-					formatText = this._getPrParaRun(paraPr, LvlPr.TextPr);
+					formatText = this._getPrParaRun(paraPr, LvlPr.GetTextPr());
 					fontFamily = formatText.format.getName();
 					this.fontsNew[fontFamily] = 1;
 
@@ -3999,37 +3999,37 @@
 						}
 						else
 						{
-							var Numbering = paragraph.Parent.Get_Numbering();
-							var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-							var NumSuff   = NumLvl.Suff;
-							var NumJc     = NumLvl.Jc;
+							var Numbering = paragraph.Parent.GetNumbering();
+							var NumLvl    = Numbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+							var NumSuff   = NumLvl.GetSuff();
+							var NumJc     = NumLvl.GetJc();
 							var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
 
 							// Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
 							// символа параграфа.
 
-							var TextPr_temp = paragraph.TextPr.Value.Copy();
+							var TextPr_temp       = paragraph.TextPr.Value.Copy();
 							TextPr_temp.Underline = undefined;
 
-							NumTextPr.Merge( TextPr_temp );
-							NumTextPr.Merge( NumLvl.TextPr );
-							
-							var oNumPr = paragraph.Numbering_Get();
+							NumTextPr.Merge(TextPr_temp);
+							NumTextPr.Merge(NumLvl.GetTextPr());
+
+							var oNumPr = paragraph.GetNumPr();
 							var LvlPr, Lvl;
-							if(oNumPr != null)
+							if (oNumPr != null)
 							{
-								var aNum = paragraph.Parent.Numbering.Get_AbstractNum( oNumPr.NumId );
-								if(null != aNum)
+								var oNum = paragraph.Parent.GetNumbering().GetNum(oNumPr.NumId);
+								if (null != oNum)
 								{
-									LvlPr = aNum.Lvl[oNumPr.Lvl];
-									Lvl = oNumPr.Lvl;
+									LvlPr = oNum.GetLvl(oNumPr.Lvl);
+									Lvl   = oNumPr.Lvl;
 								}
 							}
-							
+
 
 							var NumInfo = paragraph.Parent.Internal_GetNumInfo(paragraph.Id, NumPr);
-							
-							return this._getNumberingText( NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr );
+
+							return this._getNumberingText(NumPr.Lvl, NumInfo, NumTextPr, null, LvlPr);
 						}
 					}
 				}

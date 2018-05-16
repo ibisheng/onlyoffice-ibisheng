@@ -44,11 +44,83 @@ function CNumberingLvl()
 	this.PStyle  = undefined;
 	this.Start   = 1;
 	this.Restart = -1; // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.TextPr  = new CTextPr();
 	this.ParaPr  = new CParaPr();
 	this.LvlText = [];
 }
+/**
+ * Доступ к типу прилегания данного уровня
+ * @returns {AscCommon.align_Left | AscCommon.align_Right | AscCommon.align_Center}
+ */
+CNumberingLvl.prototype.GetJc = function()
+{
+	return this.Jc;
+};
+/**
+ * Доступ к типу данного уровня
+ * @returns {c_oAscNumberingFormat}
+ */
+CNumberingLvl.prototype.GetFormat = function()
+{
+	return this.Format;
+};
+/**
+ * Доступ к связанному стилю
+ * @returns {?string}
+ */
+CNumberingLvl.prototype.GetPStyle = function()
+{
+	return this.PStyle;
+};
+/**
+ * Доступ к начальному значению для данного уровня
+ * @returns {number}
+ */
+CNumberingLvl.prototype.GetStart = function()
+{
+	return this.Start;
+};
+/**
+ * Доступ к параметру, означающему нужно ли перестартовывать нумерации при смене уровня или оставлять её сквозной
+ * @returns {number}
+ */
+CNumberingLvl.prototype.GetRestart = function()
+{
+	return this.Restart;
+};
+/**
+ * Доступ к типу разделителя между нумерацией и содержимым параграфа
+ * @returns {c_oAscNumberingSuff}
+ */
+CNumberingLvl.prototype.GetSuff = function()
+{
+	return this.Suff;
+};
+/**
+ * Доуступ к текстовым настройкам уровня
+ * @returns {CTextPr}
+ */
+CNumberingLvl.prototype.GetTextPr = function()
+{
+	return this.TextPr;
+};
+/**
+ * Доступ к настройкам параграфа данного уровня
+ * @returns {CParaPr}
+ */
+CNumberingLvl.prototype.GetParaPr = function()
+{
+	return this.ParaPr;
+};
+/**
+ * Доступ к содержимому нумерации
+ * @returns {[CNumberingLvlTextString | CNumberingLvlTextNum]}
+ */
+CNumberingLvl.prototype.GetLvlText = function()
+{
+	return this.LvlText;
+};
 /**
  * Выставляем значения по умолчанию для заданного уровня
  * @param nLvl {number} 0..8
@@ -84,7 +156,7 @@ CNumberingLvl.prototype.private_InitDefault = function(nLvl)
 	this.PStyle  = undefined;
 	this.Start   = 1;
 	this.Restart = -1; // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	this.ParaPr               = new CParaPr();
 	this.ParaPr.Ind.Left      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
@@ -117,7 +189,7 @@ CNumberingLvl.prototype.private_InitDefaultNumbered = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	var nLeft      = 36 * (nLvl + 1) * g_dKoef_pt_to_mm;
 	var nFirstLine = -18 * g_dKoef_pt_to_mm;
@@ -157,7 +229,7 @@ CNumberingLvl.prototype.private_InitDefaultBullet = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.Jc      = AscCommon.align_Left;
 	this.Format  = c_oAscNumberingFormat.Bullet;
 
@@ -191,7 +263,7 @@ CNumberingLvl.prototype.private_InitDefaultMultilevel1 = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.Jc      = AscCommon.align_Left;
 
 	if (0 == nLvl % 3)
@@ -230,7 +302,7 @@ CNumberingLvl.prototype.private_InitDefaultMultilevel2 = function(nLvl)
 	this.Format = c_oAscNumberingFormat.Decimal;
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 
 	var nLeft      = 0;
 	var nFirstLine = 0;
@@ -296,7 +368,7 @@ CNumberingLvl.prototype.private_InitDefaultMultiLevel3 = function(nLvl)
 {
 	this.Start   = 1;
 	this.Restart = -1;
-	this.Suff    = numbering_suff_Tab;
+	this.Suff    = c_oAscNumberingSuff.Tab;
 	this.Format  = c_oAscNumberingFormat.Bullet;
 	this.Jc      = AscCommon.align_Left;
 	this.LvlText = [];

@@ -40,9 +40,12 @@
 var numbering_lvltext_Text = 1;
 var numbering_lvltext_Num  = 2;
 
-var numbering_suff_Tab     = 1;
-var numbering_suff_Space   = 2;
-var numbering_suff_Nothing = 3;
+/** enum {number} */
+var c_oAscNumberingSuff = {
+	Tab   : 1,
+	Space : 2,
+	None  : 3
+};
 
 /** enum {number} */
 var c_oAscMultiLevelNumbering = {
@@ -56,19 +59,19 @@ var c_oAscMultiLevelNumbering = {
 
 /** enum {number} */
 var c_oAscNumberingLevel = {
-	None   : 0,
-	Bullet : 1,
+	None       : 0,
+	Bullet     : 0x1000,
+	Numbered   : 0x2000,
 
-	DecimalBracket_Right    : 101,
-	DecimalBracket_Left     : 102,
-	DecimalDot_Right        : 103,
-	DecimalDot_Left         : 104,
-	UpperRomanDot_Right     : 105,
-	UpperLetterDot_Left     : 106,
-	LowerLetterBracket_Left : 107,
-	LowerLetterDot_Left     : 108,
-	LowerRomanDot_Right     : 109
-
+	DecimalBracket_Right    : 0x2001,
+	DecimalBracket_Left     : 0x2002,
+	DecimalDot_Right        : 0x2003,
+	DecimalDot_Left         : 0x2004,
+	UpperRomanDot_Right     : 0x2005,
+	UpperLetterDot_Left     : 0x2006,
+	LowerLetterBracket_Left : 0x2007,
+	LowerLetterDot_Left     : 0x2008,
+	LowerRomanDot_Right     : 0x2009
 };
 
 // Преобразовываем число в буквенную строку :

@@ -80,14 +80,11 @@ CNumbering.prototype.Append_AbstractNums = function(AbstractNums)
 			this.AbstractNum[Id] = AbstractNums[Id];
 	}
 };
-CNumbering.prototype.Create_AbstractNum = function(Type)
+CNumbering.prototype.CreateAbstractNum = function()
 {
-	// TODO: переделать работу с ID
-	var AbstractNum      = new CAbstractNum(Type);
-	var Id               = AbstractNum.Get_Id();
-	this.AbstractNum[Id] = AbstractNum;
-
-	return Id;
+	var oAbstractNum                       = new CAbstractNum();
+	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
+	return oAbstractNum;
 };
 CNumbering.prototype.Add_AbstractNum = function(AbstractNum)
 {
@@ -110,6 +107,11 @@ CNumbering.prototype.Get_AbstractNum = function(Id)
 
 	return AbstractNum;
 };
+/**
+ * Доступ к абстрактной нумерации по Id
+ * @param sId
+ * @returns {CAbstractNum}
+ */
 CNumbering.prototype.GetAbstractNum = function(sId)
 {
 	return this.Get_AbstractNum(sId);

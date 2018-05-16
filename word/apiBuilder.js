@@ -1345,16 +1345,15 @@
      */
     ApiDocument.prototype.CreateNumbering = function(sType)
     {
-        var oGlobalNumbering = this.Document.Get_Numbering();
-        var oNumberingId     = oGlobalNumbering.Create_AbstractNum();
-        var oNumbering       = oGlobalNumbering.Get_AbstractNum(oNumberingId);
+        var oGlobalNumbering = this.Document.GetNumbering();
+        var oNum             = oGlobalNumbering.CreateNum();
 
         if ("numbered" === sType)
-            oNumbering.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+			oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
         else
-            oNumbering.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+			oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 
-        return new ApiNumbering(oNumbering);
+        return new ApiNumbering(oNum);
     };
 
 	/**
@@ -1692,14 +1691,14 @@
      */
     ApiParagraph.prototype.GetNumbering = function()
     {
-        var oNumPr = this.Paragraph.Numbering_Get();
+        var oNumPr = this.Paragraph.GetNumPr();
         if (!oNumPr)
             return null;
 
         var oLogicDocument   = private_GetLogicDocument();
-        var oGlobalNumbering = oLogicDocument.Get_Numbering();
-        var oNumbering       = oGlobalNumbering.Get_AbstractNum(oNumPr.NumId);
-        if (!oNumbering)
+        var oGlobalNumbering = oLogicDocument.GetNumbering();
+        var oNum             = oGlobalNumbering.GetNum(oNumPr.NumId);
+        if (!oNum)
             return null;
 
         return new ApiNumberingLevel(oNumbering, oNumPr.Lvl);
@@ -3091,7 +3090,7 @@
             return;
 
         this.ParaPr.NumPr       = new CNumPr();
-        this.ParaPr.NumPr.NumId = oNumPr.Num.Get_Id();
+        this.ParaPr.NumPr.NumId = oNumPr.Num.GetId();
         this.ParaPr.NumPr.Lvl   = undefined;
 
         if (this.Parent instanceof ApiParagraph)
@@ -3177,7 +3176,7 @@
      */
     ApiNumberingLevel.prototype.GetTextPr = function()
     {
-        return new ApiTextPr(this, this.Num.Lvl[this.Lvl].TextPr.Copy());
+        return new ApiTextPr(this, this.Num.GetLvl(this.Lvl).TextPr.Copy());
     };
     /**
      * This paragraph properties are applied to any numbered paragraph that references the given numbering definition
@@ -3186,7 +3185,7 @@
      */
     ApiNumberingLevel.prototype.GetParaPr = function()
     {
-        return new ApiParaPr(this, this.Num.Lvl[this.Lvl].ParaPr.Copy());
+        return new ApiParaPr(this, this.Num.GetLvl(this.Lvl).ParaPr.Copy());
     };
     /**
      * Set one of the predefined numbering templates.
@@ -3294,11 +3293,11 @@
     ApiNumberingLevel.prototype.SetSuff = function(sType)
     {
         if ("space" === sType)
-            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Space);
+            this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.Space);
         else if ("tab" === sType)
-            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Tab);
+            this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.Tab);
         else if ("none" === sType)
-            this.Num.SetLvlSuff(this.Lvl, numbering_suff_Nothing);
+            this.Num.SetLvlSuff(this.Lvl, c_oAscNumberingSuff.None);
     };
 
     //------------------------------------------------------------------------------------------------------------------

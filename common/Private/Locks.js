@@ -160,11 +160,11 @@ if(typeof CDocument !== "undefined")
 			}
 			case selectionflag_Numbering:
 			{
-				var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-				if (null != NumPr)
+				var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+				if (oNumPr)
 				{
-					var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-					AbstrNum.Document_Is_SelectionLocked(CheckType);
+					var oNum = this.GetNumbering().GetNum(oNumPr.NumId);
+					oNum.IsSelectionLocked(CheckType);
 				}
 
 				this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -200,26 +200,51 @@ if(typeof CHeaderFooterController !== "undefined")
     };
 }
 
-CAbstractNum.prototype.Document_Is_SelectionLocked = function(CheckType)
+CNum.prototype.IsSelectionLocked = function(nCheckType)
 {
-    switch ( CheckType )
-    {
-        case AscCommon.changestype_Paragraph_Content:
-        case AscCommon.changestype_Paragraph_Properties:
+	switch (nCheckType)
+	{
+		case AscCommon.changestype_Paragraph_Content:
+		case AscCommon.changestype_Paragraph_Properties:
 		case AscCommon.changestype_Paragraph_AddText:
 		case AscCommon.changestype_ContentControl_Add:
-        {
-            this.Lock.Check( this.Get_Id() );
-            break;
-        }
-        case AscCommon.changestype_Document_Content:
-        case AscCommon.changestype_Document_Content_Add:
-        case AscCommon.changestype_Image_Properties:
-        {
-            AscCommon.CollaborativeEditing.Add_CheckLock(true);
-            break;
-        }
-    }
+		{
+			this.Lock.Check(this.Get_Id());
+			break;
+		}
+		case AscCommon.changestype_Document_Content:
+		case AscCommon.changestype_Document_Content_Add:
+		case AscCommon.changestype_Image_Properties:
+		{
+			AscCommon.CollaborativeEditing.Add_CheckLock(true);
+			break;
+		}
+	}
+
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (oAbstractNum)
+		oAbstractNum.IsSelectionLocked(nCheckType);
+};
+CAbstractNum.prototype.IsSelectionLocked = function(nCheckType)
+{
+	switch (nCheckType)
+	{
+		case AscCommon.changestype_Paragraph_Content:
+		case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
+		case AscCommon.changestype_ContentControl_Add:
+		{
+			this.Lock.Check(this.Get_Id());
+			break;
+		}
+		case AscCommon.changestype_Document_Content:
+		case AscCommon.changestype_Document_Content_Add:
+		case AscCommon.changestype_Image_Properties:
+		{
+			AscCommon.CollaborativeEditing.Add_CheckLock(true);
+			break;
+		}
+	}
 };
 
 if(typeof CGraphicObjects !== "undefined")
@@ -363,11 +388,11 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                 }
                 case selectionflag_Numbering:
                 {
-                    var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                    if ( null != NumPr )
+                    var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+                    if (oNumPr)
                     {
-                        var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
-                        AbstrNum.Document_Is_SelectionLocked(CheckType);
+                    	var oNum = this.GetNumbering().GetNum(oNumPr.NumId);
+						oNum.IsSelectionLocked(CheckType);
                     }
 
                     this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);

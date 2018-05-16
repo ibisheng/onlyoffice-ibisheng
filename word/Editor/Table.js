@@ -7184,28 +7184,6 @@ CTable.prototype.SetParagraphIndent = function(Ind)
 		return this.CurCell.Content.SetParagraphIndent(Ind);
 	}
 };
-CTable.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
-	{
-		var Cells_array = this.Internal_Get_SelectionArray();
-		for (var Index = 0; Index < Cells_array.length; Index++)
-		{
-			var Pos  = Cells_array[Index];
-			var Row  = this.Content[Pos.Row];
-			var Cell = Row.Get_Cell(Pos.Cell);
-
-			var Cell_Content = Cell.Content;
-			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.SetParagraphNumbering(NumInfo);
-			Cell_Content.Set_ApplyToAll(false);
-		}
-	}
-	else
-	{
-		return this.CurCell.Content.SetParagraphNumbering(NumInfo);
-	}
-};
 CTable.prototype.Set_ParagraphPresentationNumbering = function(NumInfo)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))

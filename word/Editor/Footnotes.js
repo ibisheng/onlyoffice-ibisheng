@@ -2260,14 +2260,6 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 		oFootnote.SetParagraphIndent(Ind);
 	}
 };
-CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
-{
-	for (var sId in this.Selection.Footnotes)
-	{
-		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.SetParagraphNumbering(NumInfo);
-	}
-};
 CFootnotesController.prototype.SetParagraphShd = function(Shd)
 {
 	for (var sId in this.Selection.Footnotes)

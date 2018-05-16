@@ -238,6 +238,11 @@ CAbstractNum.prototype.SetLvlByFormat = function(nLvl, nType, sFormatText, nAlig
 
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Выставляем является ли данный уровень сквозным или каждый раз перестартовывать нумерацию
+ * @param nLvl {number} 0..8
+ * @param isRestart {boolean}
+ */
 CAbstractNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -248,6 +253,11 @@ CAbstractNum.prototype.SetLvlRestart = function(nLvl, isRestart)
 	this.Lvl[nLvl].Restart = (isRestart ? -1 : 0);
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Задаем начальное значения для данного уровня
+ * @param nLvl {number} 0..8
+ * @param nStart {number}
+ */
 CAbstractNum.prototype.SetLvlStart = function(nLvl, nStart)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -258,6 +268,11 @@ CAbstractNum.prototype.SetLvlStart = function(nLvl, nStart)
 	this.Lvl[nLvl].Start = nStart;
 	History.Add(new CChangesAbstractNumLvlChange(this, oLvlOld, this.Lvl[nLvl].Copy(), nLvl));
 };
+/**
+ * Выставляем тип разделителя между табом и последующим текстом
+ * @param nLvl {number} 0..8
+ * @param nSuff {number}
+ */
 CAbstractNum.prototype.SetLvlSuff = function(nLvl, nSuff)
 {
 	if ("number" !== typeof(nLvl) || nLvl < 0 || nLvl >= 9)
@@ -790,15 +805,15 @@ CAbstractNum.prototype.CollectDocumentStatistics = function(Lvl, Stats)
 			Stats.Add_Word();
 	}
 
-	if (numbering_suff_Tab === this.Lvl[Lvl].Suff || numbering_suff_Space === this.Lvl[Lvl].Suff)
+	if (c_oAscNumberingSuff.Tab === this.Lvl[Lvl].Suff || c_oAscNumberingSuff.Space === this.Lvl[Lvl].Suff)
 		Stats.Add_Symbol(true);
 };
 /**
  * Применяем новые тектовые настройки к данной нумерации на заданном уровне
  */
-CAbstractNum.prototype.Apply_TextPr = function(nLvl, oTextPr)
+CAbstractNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 {
-	var oTextPrOld = CurTextPr.Copy();
+	var oTextPrOld = this.Lvl[nLvl].TextPr.Copy();
 	this.Lvl[nLvl].TextPr.Merge(oTextPr);
 	History.Add(new CChangesAbstractNumTextPrChange(this, oTextPrOld, this.Lvl[nLvl].TextPr.Copy(), nLvl));
 };
