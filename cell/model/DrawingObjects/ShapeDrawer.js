@@ -947,7 +947,7 @@ CShapeDrawer.prototype =
                 else
                 {
                     //gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, this.max_x, this.min_y);
-                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 0, false);
                     gradObj = _ctx.createLinearGradient(points.x0, points.y0, points.x1, points.y1);
                 }
 
@@ -1291,7 +1291,7 @@ CShapeDrawer.prototype =
                         }
                         else
                         {
-                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 0, false);
                         }
 
                         this.Graphics.put_BrushGradient(_fill, points, this.UniFill.transparent);
