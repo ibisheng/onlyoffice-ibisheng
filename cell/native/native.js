@@ -3802,8 +3802,6 @@ function OfflineEditor () {
 
                 var type = 0, left = 0, right = 0, top = 0, bottom = 0;
                 var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
-                var defaultWidth = this.model.getDefaultWidth();
-                defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
                 var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
                 for (i = 0; i < arrRanges.length; ++i) {
@@ -3932,8 +3930,6 @@ function OfflineEditor () {
 
             var type = 0, left = 0, right = 0, top = 0, bottom = 0;
             var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
-            var defaultWidth = this.model.getDefaultWidth();
-            defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
             var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {

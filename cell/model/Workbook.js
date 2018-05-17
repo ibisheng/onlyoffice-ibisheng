@@ -3279,8 +3279,6 @@
 		}
 	};
 	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
-		var t = this;
-
 		if (!this.PagePrintOptions) {
 			// Даже если не было, создадим
 			this.PagePrintOptions = new Asc.asc_CPageOptions();
@@ -3294,6 +3292,7 @@
 		}
 		//this.setTableFormulaAfterOpen();
 		this.hiddenManager.initPostOpen();
+		this.oSheetFormatPr.correction();
 
 		this.handlers = handlers;
 		this._setHandlersTablePart();

@@ -3116,22 +3116,26 @@ Hyperlink.prototype = {
 		this.Ref.setOffsetLast(OffsetLast);
 	}
 };
-/** @constructor */
-function SheetFormatPr(){
-	this.nBaseColWidth = null;
-	this.dDefaultColWidth = null;
-	this.oAllRow = null;
-}
-SheetFormatPr.prototype = {
-	clone : function(){
+	/** @constructor */
+	function SheetFormatPr() {
+		this.nBaseColWidth = null;
+		this.dDefaultColWidth = null;
+		this.oAllRow = null;
+	}
+	SheetFormatPr.prototype.clone = function () {
 		var oRes = new SheetFormatPr();
 		oRes.nBaseColWidth = this.nBaseColWidth;
 		oRes.dDefaultColWidth = this.dDefaultColWidth;
-		if(null != this.oAllRow)
+		if (null != this.oAllRow) {
 			oRes.oAllRow = this.oAllRow.clone();
+		}
 		return oRes;
-	}
-};
+	};
+	SheetFormatPr.prototype.correction = function () {
+		if (null !== this.dDefaultColWidth && 0 > this.dDefaultColWidth) {
+			this.dDefaultColWidth = null;
+		}
+	};
 /** @constructor */
 function Col(worksheet, index)
 {

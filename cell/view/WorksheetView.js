@@ -1377,8 +1377,7 @@
 
         // Берем дефалтовую ширину документа
         var defaultWidth = this.model.getDefaultWidth();
-        defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
-
+        
         if (AscCommonExcel.recalcType.full === type) {
             this.cols = [];
         } else if (AscCommonExcel.recalcType.newLines === type) {
