@@ -1261,22 +1261,24 @@ Paragraph.prototype.Internal_Check_Ranges = function(CurLine, CurRange)
 };
 Paragraph.prototype.Internal_Get_NumberingTextPr = function()
 {
-	var Pr     = this.Get_CompiledPr();
-	var ParaPr = Pr.ParaPr;
-	var NumPr  = ParaPr.NumPr;
-
-	if (undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId)
+	var oNumPr = this.GetNumPr();
+	if (!oNumPr)
 		return new CTextPr();
 
-	var Numbering = this.Parent.Get_Numbering();
-	var NumLvl    = Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl];
-	var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-	NumTextPr.Merge(this.TextPr.Value);
-	NumTextPr.Merge(NumLvl.TextPr);
+	var oNumbering = this.Parent.GetNumbering();
+	var oNum       = oNumbering.GetNum(oNumPr.NumId);
+	if (!oNum)
+		return new CTextPr();
 
-	NumTextPr.FontFamily.Name = NumTextPr.RFonts.Ascii.Name;
+	var oLvl = oNum.GetLvl(oNumPr.Lvl);
 
-	return NumTextPr;
+	var oNumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+	oNumTextPr.Merge(this.TextPr.Value);
+	oNumTextPr.Merge(oLvl.GetTextPr());
+
+	oNumTextPr.FontFamily.Name = oNumTextPr.RFonts.Ascii.Name;
+
+	return oNumTextPr;
 };
 Paragraph.prototype.Is_EmptyRange = function(CurLine, CurRange)
 {
@@ -1580,23 +1582,23 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 					}
 					else
 					{
-						var Numbering = this.Parent.Get_Numbering();
-						var NumLvl    = Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl];
-						var NumJc     = NumLvl.Jc;
-						var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-						NumTextPr.Merge(this.TextPr.Value);
-						NumTextPr.Merge(NumLvl.TextPr);
+						var oNumbering = this.Parent.GetNumbering();
+						var oNumLvl    = oNumbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+						var nNumJc     = oNumLvl.GetJc();
+						var oNumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+						oNumTextPr.Merge(this.TextPr.Value);
+						oNumTextPr.Merge(oNumLvl.GetTextPr());
 
 						var X_start = X;
 
-						if (align_Right === NumJc)
+						if (align_Right === nNumJc)
 							X_start = X - NumberingItem.WidthNum;
-						else if (align_Center === NumJc)
+						else if (align_Center === nNumJc)
 							X_start = X - NumberingItem.WidthNum / 2;
 
 						// Если есть выделение текста, рисуем его сначала
-						if (highlight_None != NumTextPr.HighLight)
-							PDSH.High.Add(Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b, undefined, NumTextPr);
+						if (highlight_None != oNumTextPr.HighLight)
+							PDSH.High.Add(Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b, undefined, oNumTextPr);
 					}
 				}
 
@@ -1968,70 +1970,69 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 					}
 					else
 					{
-						var Numbering = this.Parent.Get_Numbering();
-						var NumLvl    = Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl];
-						var NumSuff   = NumLvl.Suff;
-						var NumJc     = NumLvl.Jc;
-						var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+						var oNumbering = this.Parent.GetNumbering();
+						var oNumLvl    = oNumbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+						var nNumSuff   = oNumLvl.GetSuff();
+						var nNumJc     = oNumLvl.GetJc();
+						var oNumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
 
 						// Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
 						// символа параграфа.
 
-						var TextPr_temp       = this.TextPr.Value.Copy();
-						TextPr_temp.Underline = undefined;
+						var oTextPrTemp = this.TextPr.Value.Copy();
+						oTextPrTemp.Underline = undefined;
 
-						NumTextPr.Merge(TextPr_temp);
-						NumTextPr.Merge(NumLvl.TextPr);
+						oNumTextPr.Merge(oTextPrTemp);
+						oNumTextPr.Merge(oNumLvl.GetTextPr());
 
 						var X_start = X;
 
-						if (align_Right === NumJc)
+						if (align_Right === nNumJc)
 							X_start = X - NumberingItem.WidthNum;
-						else if (align_Center === NumJc)
+						else if (align_Center === nNumJc)
 							X_start = X - NumberingItem.WidthNum / 2;
 
 						var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor(255, 255, 255, false) : new CDocumentColor(0, 0, 0, false) );
 
-
 						var RGBA;
-						if (NumTextPr.Unifill)
+						if (oNumTextPr.Unifill)
 						{
-							NumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+							oNumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
 							RGBA = NumTextPr.Unifill.getRGBAColor();
 							pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
 						}
 						else
 						{
-							if (true === NumTextPr.Color.Auto)
+							if (true === oNumTextPr.Color.Auto)
 								pGraphics.b_color1(AutoColor.r, AutoColor.g, AutoColor.b, 255);
 							else
-								pGraphics.b_color1(NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255);
+								pGraphics.b_color1(oNumTextPr.Color.r, oNumTextPr.Color.g, oNumTextPr.Color.b, 255);
 						}
 
 						// Рисуется только сам символ нумерации
-						switch (NumJc)
+						switch (nNumJc)
 						{
 							case align_Right:
-								NumberingItem.Draw(X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme);
+								NumberingItem.Draw(X - NumberingItem.WidthNum, Y, pGraphics, oNumbering, oNumTextPr, NumPr, PDSE.Theme);
 								break;
 
 							case align_Center:
-								NumberingItem.Draw(X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme);
+								NumberingItem.Draw(X - NumberingItem.WidthNum / 2, Y, pGraphics, oNumbering, oNumTextPr, NumPr, PDSE.Theme);
 								break;
 
 							case align_Left:
 							default:
-								NumberingItem.Draw(X, Y, pGraphics, Numbering, NumTextPr, NumPr, PDSE.Theme);
+								NumberingItem.Draw(X, Y, pGraphics, oNumbering, oNumTextPr, NumPr, PDSE.Theme);
 								break;
 						}
 
-						if (true === editor.ShowParaMarks && c_oAscNumberingSuff.Tab === NumSuff)
+						if (true === editor.ShowParaMarks && c_oAscNumberingSuff.Tab === nNumSuff)
 						{
 							var TempWidth     = NumberingItem.WidthSuff;
 							var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10
 
 							var X1 = X;
-							switch (NumJc)
+							switch (nNumJc)
 							{
 								case align_Right:
 									break;
@@ -2061,26 +2062,26 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 								pGraphics.FillText2(X1, Y, String.fromCharCode(tab_Symbol), TempRealWidth - TempWidth, TempWidth);
 						}
 
-						if (true === NumTextPr.Strikeout || true === NumTextPr.Underline)
+						if (true === oNumTextPr.Strikeout || true === oNumTextPr.Underline)
 						{
-							if (NumTextPr.Unifill)
+							if (oNumTextPr.Unifill)
 							{
 								pGraphics.p_color(RGBA.R, RGBA.G, RGBA.B, 255);
 							}
 							else
 							{
-								if (true === NumTextPr.Color.Auto)
+								if (true === oNumTextPr.Color.Auto)
 									pGraphics.p_color(AutoColor.r, AutoColor.g, AutoColor.b, 255);
 								else
-									pGraphics.p_color(NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255);
+									pGraphics.p_color(oNumTextPr.Color.r, oNumTextPr.Color.g, oNumTextPr.Color.b, 255);
 							}
 						}
 
-						if (true === NumTextPr.Strikeout)
-							pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+						if (true === oNumTextPr.Strikeout)
+							pGraphics.drawHorLine(0, (Y - oNumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (oNumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
 
-						if (true === NumTextPr.Underline)
-							pGraphics.drawHorLine(0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+						if (true === oNumTextPr.Underline)
+							pGraphics.drawHorLine(0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (oNumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
 					}
 				}
 				else if (para_PresentationNumbering === this.Numbering.Type)
@@ -2829,7 +2830,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				}
 				else
 				{
-					this.Numbering_IndDec_Level(false);
+					this.IndDecNumberingLevel(false);
 				}
 			}
 			else if (numbering_presentationnumfrmt_None != this.PresentationPr.Bullet.Get_Type())
@@ -3543,7 +3544,9 @@ Paragraph.prototype.IncDec_FontSize = function(bIncrease)
 };
 Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 {
-	var NumPr = this.Numbering_Get();
+	var NumPr = this.GetNumPr();
+	if (!NumPr)
+		return;
 
 	if (true != this.Selection.Use)
 	{
@@ -3553,11 +3556,11 @@ Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 
 		if (0 === Lvl && NumInfo[Lvl] <= 1)
 		{
-			var Numbering   = this.Parent.Get_Numbering();
-			var AbstractNum = Numbering.Get_AbstractNum(NumId);
+			var oNumbering = this.Parent.GetNumbering();
+			var oNum       = oNumbering.GetNum(NumId);
 
-			var NumLvl    = AbstractNum.Lvl[Lvl];
-			var NumParaPr = NumLvl.ParaPr;
+			var NumLvl    = oNum.GetLvl(Lvl);
+			var NumParaPr = NumLvl.GetParaPr();
 
 			var ParaPr = this.Get_CompiledPr2(false).ParaPr;
 
@@ -3577,7 +3580,7 @@ Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 						NewX = -ParaPr.Ind.FirstLine;
 				}
 
-				AbstractNum.ShiftLeftInd(NewX);
+				oNum.ShiftLeftInd(NewX);
 
 				this.private_AddPrChange();
 				History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
@@ -3594,10 +3597,10 @@ Paragraph.prototype.Shift_NumberingLvl = function(bShift)
 			}
 		}
 		else
-			this.Numbering_IndDec_Level(!bShift);
+			this.IndDecNumberingLevel(!bShift);
 	}
 	else
-		this.Numbering_IndDec_Level(!bShift);
+		this.IndDecNumberingLevel(!bShift);
 };
 Paragraph.prototype.Can_IncreaseLevel = function(bIncrease)
 {
@@ -4113,10 +4116,10 @@ Paragraph.prototype.Get_ParaContentPosByXY = function(X, Y, PageIndex, bYLine, S
 	// Проверим попадание в нумерацию
 	if (true === this.Numbering.Check_Range(CurRange, CurLine))
 	{
-		var NumPr = this.Numbering_Get();
-		if (para_Numbering === this.Numbering.Type && undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId)
+		var oNumPr = this.GetNumPr();
+		if (para_Numbering === this.Numbering.Type && oNumPr && oNumPr.IsValid())
 		{
-			var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
+			var NumJc = this.Parent.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetJc();
 
 			var NumX0 = SearchPos.CurX;
 			var NumX1 = SearchPos.CurX;
@@ -6434,10 +6437,10 @@ Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 			var SelectW = ParaNum.WidthVisible;
 			var SelectH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-			var NumPr = this.Numbering_Get();
-			var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
+			var oNumPr = this.GetNumPr();
+			var nNumJc = this.Parent.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetJc();
 
-			switch (NumJc)
+			switch (nNumJc)
 			{
 				case align_Center:
 				{
@@ -7513,10 +7516,11 @@ Paragraph.prototype.Numbering_Set = function(NumId, Lvl)
 };
 /**
  * Изменяем уровень нумерации
+ * @param bIncrease {boolean}
  */
-Paragraph.prototype.Numbering_IndDec_Level = function(bIncrease)
+Paragraph.prototype.IndDecNumberingLevel = function(bIncrease)
 {
-	var NumPr = this.Numbering_Get();
+	var NumPr = this.GetNumPr();
 	if (undefined != NumPr)
 	{
 		var NewLvl;
@@ -7707,12 +7711,12 @@ Paragraph.prototype.GetNumberingCompiledPr = function()
 	if (!oNumPr || !this.LogicDocument)
 		return null;
 
-	var oNumbering = this.LogicDocument.Get_Numbering();
-	var oNumLvl    = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
+	var oNumbering = this.LogicDocument.GetNumbering();
+	var oNumLvl    = oNumbering.GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl);
 
 	var oTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
 	oTextPr.Merge(this.TextPr.Value);
-	oTextPr.Merge(oNumLvl.TextPr);
+	oTextPr.Merge(oNumLvl.GetTextPr());
 	return oTextPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -8175,10 +8179,10 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 		{
 			if (undefined != Pr.ParaPr.NumPr.NumId && 0 != Pr.ParaPr.NumPr.NumId)
 			{
-				var AbstractNum = Numbering.Get_AbstractNum(Pr.ParaPr.NumPr.NumId);
+				var oNum = Numbering.GetNum(Pr.ParaPr.NumPr.NumId);
 
 				var _StyleId            = StyleId;
-				Lvl                     = AbstractNum.GetLvlByStyle(_StyleId);
+				Lvl                     = oNum.GetLvlByStyle(_StyleId);
 				var PassedStyleId       = {};
 				PassedStyleId[_StyleId] = true;
 				while (-1 === Lvl)
@@ -8192,7 +8196,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 						break;
 
 					PassedStyleId[_StyleId] = true;
-					Lvl                     = AbstractNum.GetLvlByStyle(_StyleId);
+					Lvl                     = oNum.GetLvlByStyle(_StyleId);
 				}
 
 				if (-1 === Lvl)
@@ -9390,14 +9394,14 @@ Paragraph.prototype.CollectDocumentStatistics = function(Stats)
 		Item.CollectDocumentStatistics(ParaStats);
 	}
 
-	var NumPr = this.Numbering_Get();
-	if (undefined != NumPr)
+	var oNumPr = this.GetNumPr();
+	if (oNumPr)
 	{
 		ParaStats.EmptyParagraph = false;
-		var AbstractNum          = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId);
 
-		if (undefined !== AbstractNum && null !== AbstractNum)
-			AbstractNum.CollectDocumentStatistics(NumPr.Lvl, Stats);
+		var oNum = this.Parent.GetNumbering().GetNum(oNumPr.NumId);
+		if (oNum)
+			oNum.GetLvl(oNumPr.Lvl).CollectDocumentStatistics(Stats);
 	}
 
 	if (false === ParaStats.EmptyParagraph)

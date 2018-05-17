@@ -141,12 +141,17 @@ CNumbering.prototype.GetNum = function(sId)
 
 	return null;
 };
-CNumbering.prototype.Get_ParaPr = function(NumId, Lvl)
+/**
+ * Получаем настройки параграфа для заданного уровня заданной нумерации
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ * @returns {CParaPr}
+ */
+CNumbering.prototype.Get_ParaPr = function(sNumId, nLvl)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
-
-	if (undefined != AbstractId)
-		return AbstractId.Lvl[Lvl].ParaPr;
+	var oNum = this.GetNum(sNumId);
+	if (oNum)
+		return oNum.GetLvl(nLvl).GetParaPr();
 
 	return new CParaPr();
 };
@@ -185,35 +190,53 @@ CNumbering.prototype.CheckFormat = function(sNumId, nLvl, nType)
 
 	return false;
 };
-CNumbering.prototype.Draw = function(NumId, Lvl, X, Y, Context, NumInfo, TextPr, Theme)
+CNumbering.prototype.Draw = function(sNumId, nLvl, nX, nY, oContext, oNumInfo, oTextPr, oTheme)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
-	return AbstractId.Draw(X, Y, Context, Lvl, NumInfo, TextPr, Theme);
+	var oNum = this.GetNum(sNumId);
+	return oNum.Draw(nX, nY, oContext, nLvl, oNumInfo, oTextPr, oTheme);
 };
-CNumbering.prototype.Measure = function(NumId, Lvl, Context, NumInfo, TextPr, Theme)
+CNumbering.prototype.Measure = function(sNumId, nLvl, oContext, oNumInfo, oTextPr, oTheme)
 {
-	var AbstractId = this.Get_AbstractNum(NumId);
-	return AbstractId.Measure(Context, Lvl, NumInfo, TextPr, Theme);
+	var oNum = this.GetNum(sNumId);
+	return oNum.Measure(oContext, nLvl, oNumInfo, oTextPr, oTheme);
 };
-CNumbering.prototype.Document_CreateFontCharMap = function(FontCharMap, NumTextPr, NumPr, NumInfo)
+/**
+ * Получаем список всех символов используемых в заданном уровне заданной нумерации
+ * @param oFontCharMap
+ * @param oNumTextPr
+ * @param oNumPr
+ * @param oNumInfo
+ */
+CNumbering.prototype.CreateFontCharMap = function(oFontCharMap, oNumTextPr, oNumPr, oNumInfo)
 {
-	var AbstractId = this.Get_AbstractNum(NumPr.NumId);
-	AbstractId.Document_CreateFontCharMap(FontCharMap, NumPr.Lvl, NumInfo, NumTextPr);
+	var oNum = this.GetNum(oNumPr.NumId);
+	oNum.CreateFontCharMap(oFontCharMap, oNumPr.Lvl, oNumInfo, oNumTextPr);
 };
-CNumbering.prototype.Document_Get_AllFontNames = function(AllFonts)
+/**
+ * Получаем список всех используемых шрифтов
+ * @param arrAllFonts {array}
+ */
+CNumbering.prototype.GetAllFontNames = function(arrAllFonts)
 {
-	for (var Id in this.AbstractNum)
+	for (var sNumId in this.Num)
 	{
-		var AbstractNum = this.Get_AbstractNum(Id);
-		AbstractNum.Document_Get_AllFontNames(AllFonts);
+		var oNum = this.GetNum(sNumId);
+		oNum.GetAllFontNames(arrAllFonts);
 	}
 
-	AllFonts["Symbol"]      = true;
-	AllFonts["Courier New"] = true;
-	AllFonts["Wingdings"]   = true;
+	arrAllFonts["Symbol"]      = true;
+	arrAllFonts["Courier New"] = true;
+	arrAllFonts["Wingdings"]   = true;
 };
-CNumbering.prototype.GetText = function(NumId, Lvl, NumInfo)
+/**
+ * Получаем текст нумерации для заданного уровня
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
+ * @param oNumInfo
+ * @returns {string}
+ */
+CNumbering.prototype.GetText = function(sNumId, nLvl, oNumInfo)
 {
-	var oAbstractId = this.Get_AbstractNum(NumId);
-	return oAbstractId.GetText(Lvl, NumInfo);
+	var oNum = this.GetNum(sNumId);
+	return oNum.GetText(nLvl, oNumInfo);
 };

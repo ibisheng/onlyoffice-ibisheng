@@ -9192,7 +9192,7 @@ CDocument.prototype.Document_Get_AllFontNames = function()
 	var AllFonts = {};
 
 	this.SectionsInfo.Document_Get_AllFontNames(AllFonts);
-	this.Numbering.Document_Get_AllFontNames(AllFonts);
+	this.Numbering.GetAllFontNames(AllFonts);
 	this.Styles.Document_Get_AllFontNames(AllFonts);
 	this.theme.Document_Get_AllFontNames(AllFonts);
 
@@ -13433,9 +13433,9 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 							ParaItem.Value.RFonts.CS       = {Name : FName, Index : FIndex};
 						}
 
-						var NumPr    = this.Content[this.Selection.Data[0]].Numbering_Get();
-						var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-						AbstrNum.Apply_TextPr(NumPr.Lvl, ParaItem.Value);
+						var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+						var oNum   = this.GetNumbering().GetNum(oNumPr.NumId);
+						oNum.ApplyTextPr(oNumPr.Lvl, ParaItem.Value);
 
 						if (false != bRecalculate)
 						{
@@ -14807,8 +14807,8 @@ CDocument.prototype.controller_GetDirectParaPr = function()
 				if (null == this.Selection.Data || this.Selection.Data.length <= 0)
 					break;
 
-				var NumPr     = this.Content[this.Selection.Data[0]].Numbering_Get();
-				Result_ParaPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].ParaPr;
+				var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+				Result_ParaPr = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetParaPr();
 
 				break;
 			}
@@ -14848,8 +14848,8 @@ CDocument.prototype.controller_GetDirectTextPr = function()
 				if (null == this.Selection.Data || this.Selection.Data.length <= 0)
 					break;
 
-				var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-				VisTextPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].TextPr;
+				var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+				VisTextPr = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetTextPr();
 
 				break;
 			}
@@ -17702,11 +17702,11 @@ CDocumentNumberingInfoEngine.prototype.Init = function()
     for (var Index = 0; Index < this.NumInfo.length; ++Index)
         this.NumInfo[Index] = 0;
 
-    var AbstractNum = null;
-    if (undefined !== this.Numbering && null !== (AbstractNum = this.Numbering.Get_AbstractNum(this.NumId)))
+    var oNum = null;
+    if (undefined !== this.Numbering && null !== (oNum = this.Numbering.GetNum(this.NumId)))
     {
         for (var LvlIndex = 0; LvlIndex < 9; LvlIndex++)
-            this.Restart[LvlIndex] = AbstractNum.Lvl[LvlIndex].Restart;
+            this.Restart[LvlIndex] = oNum.GetLvl(LvlIndex).GetRestart();
     }
 };
 CDocumentNumberingInfoEngine.prototype.Is_Found = function()
@@ -17715,7 +17715,7 @@ CDocumentNumberingInfoEngine.prototype.Is_Found = function()
 };
 CDocumentNumberingInfoEngine.prototype.Check_Paragraph = function(Para)
 {
-    var ParaNumPr = Para.Numbering_Get();
+    var ParaNumPr = Para.GetNumPr();
     if (undefined !== ParaNumPr && ParaNumPr.NumId === this.NumId && (undefined === Para.Get_SectionPr() || true !== Para.IsEmpty()))
     {
         // Делаем рестарты, если они нужны

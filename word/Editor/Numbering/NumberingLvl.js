@@ -539,6 +539,85 @@ CNumberingLvl.prototype.SetByType = function(nType, nLvl, sText, oTextPr)
 	}
 };
 /**
+ * Получаем тип пресета (если это возможно)
+ * @returns {{Type: number, SubType: number}}
+ */
+CNumberingLvl.prototype.GetPresetType = function()
+{
+	var nType    = -1;
+	var nSubType = -1;
+
+	if (c_oAscNumberingFormat.Bullet === this.Format)
+	{
+		nType    = 0;
+		nSubType = 0;
+
+		if (1 === this.LvlText.length && numbering_lvltext_Text === this.LvlText[0].Type)
+		{
+			var nNumVal = this.LvlText[0].Value.charCodeAt(0);
+
+			if (0x00B7 === nNumVal)
+				nSubType = 1;
+			else if (0x006F === nNumVal)
+				nSubType = 2;
+			else if (0x00A7 === nNumVal)
+				nSubType = 3;
+			else if (0x0076 === nNumVal)
+				nSubType = 4;
+			else if (0x00D8 === nNumVal)
+				nSubType = 5;
+			else if (0x00FC === nNumVal)
+				nSubType = 6;
+			else if (0x00A8 === nNumVal)
+				nSubType = 7;
+			else if (0x2013 === nNumVal)
+				nSubType = 8;
+		}
+	}
+	else
+	{
+		nType    = 1;
+		nSubType = 0;
+
+		if (2 === this.LvlText.length && numbering_lvltext_Num === this.LvlText[0].Type && numbering_lvltext_Text === this.LvlText[1].Type)
+		{
+			var nNumVal2 = this.LvlText[1].Value;
+
+			if (c_oAscNumberingFormat.Decimal === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 1;
+				else if (")" === nNumVal2)
+					nSubType = 2;
+			}
+			else if (c_oAscNumberingFormat.UpperRoman === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 3;
+			}
+			else if (c_oAscNumberingFormat.UpperLetter === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 4;
+			}
+			else if (c_oAscNumberingFormat.LowerLetter === this.Format)
+			{
+				if (")" === nNumVal2)
+					nSubType = 5;
+				else if ("." === nNumVal2)
+					nSubType = 6;
+			}
+			else if (c_oAscNumberingFormat.LowerRoman === this.Format)
+			{
+				if ("." === nNumVal2)
+					nSubType = 7;
+			}
+		}
+	}
+
+	return {Type : nType, SubType : nSubType};
+};
+/**
  * Выставляем значения по заданному формату
  * @param nLvl {number} 0..8
  * @param nType
@@ -582,6 +661,45 @@ CNumberingLvl.prototype.SetByFormat = function(nLvl, nType, sFormatText, nAlign)
 	}
 
 	this.TextPr = new CTextPr();
+};
+/**
+ * Собираем статистику документа о количестве слов, букв и т.д.
+ * @param oStats объект статистики
+ */
+CNumberingLvl.prototype.CollectDocumentStatistics = function(oStats)
+{
+	var bWord = false;
+	for (var nIndex = 0, nCount = this.LvlText.length; nIndex < nCount; ++nIndex)
+	{
+		var bSymbol  = false;
+		var bSpace   = false;
+		var bNewWord = false;
+
+		if (numbering_lvltext_Text === this.LvlText[nIndex].Type && (sp_string === this.LvlText[nIndex].Value || nbsp_string === this.LvlText[nIndex].Value))
+		{
+			bWord   = false;
+			bSymbol = true;
+			bSpace  = true;
+		}
+		else
+		{
+			if (false === bWord)
+				bNewWord = true;
+
+			bWord   = true;
+			bSymbol = true;
+			bSpace  = false;
+		}
+
+		if (true === bSymbol)
+			oStats.Add_Symbol(bSpace);
+
+		if (true === bNewWord)
+			oStats.Add_Word();
+	}
+
+	if (c_oAscNumberingSuff.Tab === this.Suff || c_oAscNumberingSuff.Space === this.Suff)
+		oStats.Add_Symbol(true);
 };
 CNumberingLvl.prototype.WriteToBinary = function(oWriter)
 {

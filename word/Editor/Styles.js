@@ -4577,13 +4577,13 @@ CStyles.prototype =
             // Копируем свойства из стиля нумерации, если она задана, но только для самого стиля, а не для базовых
 			if ((styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) && StyleId === StartStyleId)
 			{
-				var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+				var oNumbering = editor.WordControl.m_oLogicDocument.GetNumbering();
 				if (undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId)
 				{
-					var AbstractNum = Numbering.Get_AbstractNum(Style.ParaPr.NumPr.NumId);
-					var Lvl         = AbstractNum.GetLvlByStyle(StyleId);
+					var oNum = oNumbering.GetNum(Style.ParaPr.NumPr.NumId);
+					var nLvl = oNum.GetLvlByStyle(StyleId);
 					if (-1 != Lvl)
-						Pr.ParaPr.Merge(Numbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+						Pr.ParaPr.Merge(oNumbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
 					else
 						Pr.ParaPr.NumPr = undefined;
 				}
@@ -4736,23 +4736,23 @@ CStyles.prototype =
         {
             var Style = this.Style[StyleId];
 
-            var NumPr = Style.ParaPr.NumPr;
-            if (!NumPr || !NumPr.NumId)
+            var oNumPr = Style.ParaPr.NumPr;
+            if (!oNumPr || !oNumPr.NumId)
                 continue;
 
-            var AbstractNum = Numbering.Get_AbstractNum(NumPr.NumId);
-            if (!AbstractNum)
+            var oNum = Numbering.GetNum(oNumPr.NumId);
+            if (!oNum)
                 continue;
 
-            var iLvl = (NumPr.Lvl ? NumPr.Lvl : 0);
-            var NumLvl = AbstractNum.GetLvl(iLvl);
+            var nLvl = (oNumPr.Lvl ? oNumPr.Lvl : 0);
+            var oLvl = oNum.GetLvl(nLvl);
 
-            if (!NumLvl || NumLvl.PStyle)
+            if (!oLvl || oLvl.GetPStyle())
                 continue;
 
-            var NewLvl = AbstractNum.GetLvl(NumLvl).Copy();
-            NewLvl.PStyle = StyleId;
-            AbstractNum.SetLvl(iLvl, NewLvl);
+            var oNewLvl = oLvl.Copy();
+            oNewLvl.PStyle = StyleId;
+            oNum.SetLvl(oNewLvl, nLvl);
         }
     },
 //-----------------------------------------------------------------------------------
@@ -8907,6 +8907,10 @@ CTextPr.prototype.ReadFromBinary = function(oReader)
 {
 	return this.Read_FromBinary(oReader);
 };
+CTextPr.prototype.GetAllFontNames = function(arrAllFonts)
+{
+	return this.Document_Get_AllFontNames(arrAllFonts);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CTextPr Export
 //----------------------------------------------------------------------------------------------------------------------
@@ -9561,6 +9565,16 @@ CNumPr.prototype =
         else
             this.Lvl = Reader.GetByte();
     }
+};
+CNumPr.prototype.IsValid = function()
+{
+	if (undefined === this.NumId
+		|| null === this.NumId
+		|| 0 === this.NumId
+		|| "0" === this.NumId)
+		return false;
+
+	return true;
 };
 
 var wrap_Around    = 0x01;

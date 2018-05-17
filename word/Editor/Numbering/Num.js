@@ -365,6 +365,366 @@ CNum.prototype.ApplyTextPr = function(nLvl, oTextPr)
 	}
 };
 /**
+ * Сдвигаем все уровни на заданное значение (оно задается для нулевого уровня)
+ * @param nLeftNew {number}
+ */
+CNum.prototype.ShiftLeftInd = function(nLeftNew)
+{
+	var oFirstLevel = this.GetLvl(0);
+	var nLeftOld    = oFirstLevel.ParaPr.Ind.Left ? oFirstLevel.ParaPr.Ind.Left : 0;
+
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvlOld = this.GetLvl(nLvl);
+		var oLvlNew = this.GetLvl(nLvl).Copy();
+
+		oLvlNew.ParaPr.Ind.Left = oLvlOld.ParaPr.Ind.Left ? oLvlOld.ParaPr.Ind.Left - nLeftOld + nLeftNew : nLeftNew - nLeftOld;
+
+		this.SetLvl(oLvlNew, nLvl);
+	}
+};
+/**
+ * Получаем Id NumStyleLink
+ * @returns {null | string}
+ */
+CNum.prototype.GetNumStyleLink = function()
+{
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (!oAbstractNum)
+		return null;
+
+	return oAbstractNum.GetNumStyleLink();
+};
+/**
+ * Получаем Id StyleLink
+ * @returns {null | string}
+ */
+CNum.prototype.GetStyleLink = function()
+{
+	var oAbstractNum = this.Numbering.GetAbstractNum(this.AbstractNumId);
+	if (!oAbstractNum)
+		return null;
+
+	return oAbstractNum.GetStyleLink();
+};
+/**
+ * Получаем уровень списка по заданном стилю
+ * @param sStyleId {string}
+ * @returns {number}
+ */
+CNum.prototype.GetLvlByStyle = function(sStyleId)
+{
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvl = this.GetLvl(nLvl);
+		if (oLvl && sStyleId === oLvl.GetPStyle())
+			return nLvl;
+	}
+
+	return -1;
+};
+/**
+ * Получаем нумерованное значение для заданного уровня с учетом заданого сдвига и формата данного уровня
+ * @param nLvl {number} 0..8
+ * @param nNumShift {number}
+ */
+CNum.prototype.private_GetNumberedLvlText = function(nLvl, nNumShift)
+{
+	var sResult = "";
+
+	var oLvl = this.GetLvl(nLvl);
+	switch (oLvl.GetFormat())
+	{
+		case c_oAscNumberingFormat.Bullet:
+		{
+			break;
+		}
+
+		case c_oAscNumberingFormat.Decimal:
+		{
+			sResult = "" + (oLvl.GetStart() - 1 + nNumShift);
+			break;
+		}
+
+		case c_oAscNumberingFormat.DecimalZero:
+		{
+			sResult = "" + (oLvl.GetStart() - 1 + nNumShift);
+
+			if (1 === T.length)
+				sResult = "0" + T;
+			break;
+		}
+
+		case c_oAscNumberingFormat.LowerLetter:
+		case c_oAscNumberingFormat.UpperLetter:
+		{
+			// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
+			var Num = oLvl.GetStart() - 1 + nNumShift - 1;
+
+			var Count = (Num - Num % 26) / 26;
+			var Ost   = Num % 26;
+
+			var Letter;
+			if (c_oAscNumberingFormat.LowerLetter === oLvl.GetFormat())
+				Letter = String.fromCharCode(Ost + 97);
+			else
+				Letter = String.fromCharCode(Ost + 65);
+
+			for (var nIndex = 0; nIndex < Count + 1; ++nIndex)
+				sResult += Letter;
+
+			break;
+		}
+
+		case c_oAscNumberingFormat.LowerRoman:
+		case c_oAscNumberingFormat.UpperRoman:
+		{
+			var Num = oLvl.GetStart() - 1 + nNumShift;
+
+			// Переводим число Num в римскую систему исчисления
+			var Rims;
+
+			if (c_oAscNumberingFormat.LowerRoman === oLvl.GetFormat())
+				Rims = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
+			else
+				Rims = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
+
+			var Vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1, 0];
+
+			var nIndex = 0;
+			while (Num > 0)
+			{
+				while (Vals[nIndex] <= Num)
+				{
+					sResult += Rims[nIndex];
+					Num -= Vals[nIndex];
+				}
+
+				nIndex++;
+
+				if (nIndex >= Rims.length)
+					break;
+			}
+			break;
+		}
+	}
+
+	return sResult;
+};
+/**
+ * Функция отрисовки заданного уровня нумерации в заданной позиции
+ * @param nX
+ * @param nY
+ * @param oContext
+ * @param nLvl
+ * @param oNumInfo
+ * @param oNumTextPr
+ * @param oTheme
+ */
+CNum.prototype.Draw = function(nX, nY, oContext, nLvl, oNumInfo, oNumTextPr, oTheme)
+{
+	var oLvl    = this.GetLvl(nLvl);
+	var arrText = oLvl.GetLvlText();
+
+	Context.SetTextPr(oNumTextPr, oTheme);
+	Context.SetFontSlot(fontslot_ASCII);
+	g_oTextMeasurer.SetTextPr(oNumTextPr, oTheme);
+	g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+
+	for (var nTextIndex = 0, nTextLen = arrText.length; nTextIndex < nTextLen; ++nTextIndex)
+	{
+		switch (arrText[nTextIndex].Type)
+		{
+			case numbering_lvltext_Text:
+			{
+				var Hint = oNumTextPr.RFonts.Hint;
+				var bCS  = oNumTextPr.CS;
+				var bRTL = oNumTextPr.RTL;
+				var lcid = oNumTextPr.Lang.EastAsia;
+
+				var FontSlot = g_font_detector.Get_FontClass(arrText[nTextIndex].Value.charCodeAt(0), Hint, lcid, bCS, bRTL);
+
+				Context.SetFontSlot(FontSlot);
+				g_oTextMeasurer.SetFontSlot(FontSlot);
+
+				Context.FillText(nX, nY, arrText[nTextIndex].Value);
+				nX += g_oTextMeasurer.Measure(arrText[nTextIndex].Value).Width;
+
+				break;
+			}
+			case numbering_lvltext_Num:
+			{
+				Context.SetFontSlot(fontslot_ASCII);
+				g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+
+				var nCurLvl = arrText[nTextIndex].Value;
+				var T = "";
+
+				if (nCurLvl < oNumInfo.length)
+					T = this.private_GetNumberedLvlText(nCurLvl, oNumInfo[nCurLvl]);
+
+				for (var Index2 = 0; Index2 < T.length; Index2++)
+				{
+					var Char = T.charAt(Index2);
+					Context.FillText(nX, nY, Char);
+					nX += g_oTextMeasurer.Measure(Char).Width;
+				}
+
+				break;
+			}
+		}
+	}
+};
+/**
+ * Функция пересчета заданного уровня нумерации
+ * @param oContext
+ * @param nLvl
+ * @param oNumInfo
+ * @param oNumTextPr
+ * @param oTheme
+ * @returns {{Width : number, Ascent : number}}
+ */
+CNum.prototype.Measure = function(oContext, nLvl, oNumInfo, oNumTextPr, oTheme)
+{
+	var nX = 0;
+
+	var oLvl    = this.GetLvl(nLvl);
+	var arrText = oLvl.GetLvlText();
+
+	oContext.SetTextPr(oNumTextPr, oTheme);
+	oContext.SetFontSlot(fontslot_ASCII);
+	var nAscent = oContext.GetAscender();
+
+	for (var nTextIndex = 0, nTextLen = arrText.length; nTextIndex < nTextLen; ++nTextIndex)
+	{
+		switch (arrText[nTextIndex].Type)
+		{
+			case numbering_lvltext_Text:
+			{
+				var Hint = oNumTextPr.RFonts.Hint;
+				var bCS  = oNumTextPr.CS;
+				var bRTL = oNumTextPr.RTL;
+				var lcid = oNumTextPr.Lang.EastAsia;
+
+				var FontSlot = g_font_detector.Get_FontClass(arrText[nTextIndex].Value.charCodeAt(0), Hint, lcid, bCS, bRTL);
+
+				oContext.SetFontSlot(FontSlot);
+				nX += oContext.Measure(arrText[nTextIndex].Value).Width;
+
+				break;
+			}
+			case numbering_lvltext_Num:
+			{
+				oContext.SetFontSlot(fontslot_ASCII);
+				var nCurLvl = arrText[Index].Value;
+
+				var T = "";
+
+				if (nCurLvl < oNumInfo.length)
+					T = this.private_GetNumberedLvlText(nCurLvl, oNumInfo[nCurLvl]);
+
+				for (var Index2 = 0; Index2 < T.length; Index2++)
+				{
+					var Char = T.charAt(Index2);
+					nX += oContext.Measure(Char).Width;
+				}
+
+				break;
+			}
+		}
+	}
+
+	return {Width : nX, Ascent : nAscent};
+};
+/**
+ * Составляем список всех используемых символов
+ * @param oFontCharMap
+ * @param nLvl {number} 0..8
+ * @param oNumInfo
+ * @param oNumTextPr {CTextPr}
+ */
+CNum.prototype.CreateFontCharMap = function(oFontCharMap, nLvl, oNumInfo, oNumTextPr)
+{
+	oFontCharMap.StartFont(oNumTextPr.FontFamily.Name, oNumTextPr.Bold, oNumTextPr.Italic, oNumTextPr.FontSize);
+
+	var arrText = this.GetLvl(nLvl).GetLvlText();
+	for (var nIndex = 0, nCount = arrText.length; nIndex < nCount; ++nIndex)
+	{
+		switch (arrText[nIndex].Type)
+		{
+			case numbering_lvltext_Text:
+			{
+				oFontCharMap.AddChar(arrText[nIndex].Value);
+				break;
+			}
+			case numbering_lvltext_Num:
+			{
+				var nCurLvl = arrText[nIndex].Value;
+
+				var T = "";
+				if (nCurLvl < oNumInfo.length)
+					T = this.private_GetNumberedLvlText(nCurLvl, oNumInfo[nCurLvl]);
+
+				for (var Index2 = 0; Index2 < T.length; Index2++)
+				{
+					var Char = T.charAt(Index2);
+					oFontCharMap.AddChar(Char);
+				}
+
+				break;
+			}
+		}
+	}
+};
+/**
+ * Получаем список всех используемых шрифтов
+ * @param arrAllFonts {array}
+ */
+CNum.prototype.GetAllFontNames = function(arrAllFonts)
+{
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		var oLvl = this.GetLvl(nLvl);
+
+		if (oLvl)
+			oLvl.GetTextPr().GetAllFontNames(arrAllFonts);
+	}
+};
+/**
+ * Получаем текст нумерации для заданного уровня
+ * @param nLvl {number} 0..8
+ * @param oNumInfo
+ * @returns {string}
+ */
+CNum.prototype.GetText = function(nLvl, oNumInfo)
+{
+	var oLvl    = this.GetLvl(nLvl);
+	var arrText = oLvl.GetLvlText();
+
+	var sResult = "";
+	for (var Index = 0; Index < arrText.length; Index++)
+	{
+		switch (arrText[Index].Type)
+		{
+			case numbering_lvltext_Text:
+			{
+				sResult += arrText[Index].Value;
+				break;
+			}
+			case numbering_lvltext_Num:
+			{
+				var nCurLvl = arrText[Index].Value;
+				if (nCurLvl < oNumInfo.length)
+					sResult += this.private_GetNumberedLvlText(nCurLvl, oNumInfo[nCurLvl]);
+
+				break;
+			}
+		}
+	}
+
+	return sResult;
+};
+/**
  * Обрабатываем окончание загрузки изменений
  * @param oData
  */

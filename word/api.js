@@ -1904,13 +1904,13 @@ background-repeat: no-repeat;\
 		var NumSubType = -1;
 		if (!(null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId))
 		{
-			var Numb = this.WordControl.m_oLogicDocument.Numbering.Get_AbstractNum(ParaPr.NumPr.NumId);
+			var oNum = this.WordControl.m_oLogicDocument.GetNumbering().GetNum(ParaPr.NumPr.NumId);
 
-			if (undefined !== Numb && undefined !== Numb.Lvl[ParaPr.NumPr.Lvl])
+			if (oNum && oNum.GetLvl(ParaPr.NumPr.Lvl))
 			{
-				var res    = AscCommonWord.getNumInfoLvl(Numb.Lvl[ParaPr.NumPr.Lvl]);
-				NumType    = res.NumType;
-				NumSubType = res.NumSubType;
+				var res    = oNum.GetLvl(ParaPr.NumPr.Lvl).GetPresetType();
+				NumType    = res.Type;
+				NumSubType = res.SubType;
 			}
 		}
 

@@ -3003,92 +3003,91 @@ CParagraphRecalculateStateWrap.prototype =
         var NumberingType = Para.Numbering.Type;
 
         if ( para_Numbering === NumberingType )
-        {
-            var NumPr = ParaPr.NumPr;
-            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ) )
-            {
-                // Так мы обнуляем все рассчитанные ширины данного элемента
-                NumberingItem.Measure( g_oTextMeasurer, undefined );
-            }
-            else
-            {
-                var Numbering = Para.Parent.Get_Numbering();
-                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-                var NumSuff   = NumLvl.Suff;
-                var NumJc     = NumLvl.Jc;
-                var NumInfo   = Para.Parent.Internal_GetNumInfo( Para.Id, NumPr );
-                var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-                NumTextPr.Merge( Para.TextPr.Value );
-                NumTextPr.Merge( NumLvl.TextPr );
+		{
+			var NumPr = ParaPr.NumPr;
+			if (undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ))
+			{
+				// Так мы обнуляем все рассчитанные ширины данного элемента
+				NumberingItem.Measure(g_oTextMeasurer, undefined);
+			}
+			else
+			{
+				var oNumbering  = Para.Parent.GetNumbering();
+				var oNumLvl     = oNumbering.GetNum(NumPr.NumId).GetLvl(NumPr.Lvl);
+				var nNumSuff    = oNumLvl.GetSuff();
+				var nNumJc      = oNumLvl.GetJc();
+				var oNumInfo    = Para.Parent.Internal_GetNumInfo(Para.Id, NumPr);
+				var oNumTextPr  = Para.Get_CompiledPr2(false).TextPr.Copy();
+				oNumTextPr.Merge(Para.TextPr.Value);
+				oNumTextPr.Merge(oNumLvl.GetTextPr());
 
 
-                // Здесь измеряется только ширина символов нумерации, без суффикса
-                NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr, Para.Get_Theme() );
+				// Здесь измеряется только ширина символов нумерации, без суффикса
+				NumberingItem.Measure(g_oTextMeasurer, oNumbering, oNumInfo, oNumTextPr, NumPr, Para.Get_Theme());
 
-                // При рассчете высоты строки, если у нас параграф со списком, то размер символа
-                // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
-                // ниже baseline.
-                if ( LineAscent < NumberingItem.Height )
-                    LineAscent = NumberingItem.Height;
+				// При рассчете высоты строки, если у нас параграф со списком, то размер символа
+				// в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
+				// ниже baseline.
+				if (LineAscent < NumberingItem.Height)
+					LineAscent = NumberingItem.Height;
 
-                switch ( NumJc )
-                {
-                    case AscCommon.align_Right:
-                    {
-                        NumberingItem.WidthVisible = 0;
-                        break;
-                    }
-                    case AscCommon.align_Center:
-                    {
-                        NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
-                        break;
-                    }
-                    case AscCommon.align_Left:
-                    default:
-                    {
-                        NumberingItem.WidthVisible = NumberingItem.WidthNum;
-                        break;
-                    }
-                }
+				switch (nNumJc)
+				{
+					case AscCommon.align_Right:
+					{
+						NumberingItem.WidthVisible = 0;
+						break;
+					}
+					case AscCommon.align_Center:
+					{
+						NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
+						break;
+					}
+					case AscCommon.align_Left:
+					default:
+					{
+						NumberingItem.WidthVisible = NumberingItem.WidthNum;
+						break;
+					}
+				}
 
-                X += NumberingItem.WidthVisible;
+				X += NumberingItem.WidthVisible;
 
-                switch( NumSuff )
-                {
-                    case c_oAscNumberingSuff.None:
-                    {
-                        // Ничего не делаем
-                        break;
-                    }
-                    case c_oAscNumberingSuff.Space:
-                    {
-                        var OldTextPr = g_oTextMeasurer.GetTextPr();
+				switch (nNumSuff)
+				{
+					case c_oAscNumberingSuff.None:
+					{
+						// Ничего не делаем
+						break;
+					}
+					case c_oAscNumberingSuff.Space:
+					{
+						var OldTextPr = g_oTextMeasurer.GetTextPr();
 
 
+						var Theme = Para.Get_Theme();
+						g_oTextMeasurer.SetTextPr(oNumTextPr, Theme);
+						g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+						NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
+						g_oTextMeasurer.SetTextPr(OldTextPr, Theme);
+						break;
+					}
+					case c_oAscNumberingSuff.Tab:
+					{
+						var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 
-                        var Theme = Para.Get_Theme();
-                        g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-                        NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
-                        g_oTextMeasurer.SetTextPr( OldTextPr, Theme );
-                        break;
-                    }
-                    case c_oAscNumberingSuff.Tab:
-                    {
-                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
+						NumberingItem.WidthSuff = NewX - X;
 
-                        NumberingItem.WidthSuff = NewX - X;
+						break;
+					}
+				}
 
-                        break;
-                    }
-                }
+				NumberingItem.Width = NumberingItem.WidthNum;
+				NumberingItem.WidthVisible += NumberingItem.WidthSuff;
 
-                NumberingItem.Width         = NumberingItem.WidthNum;
-                NumberingItem.WidthVisible += NumberingItem.WidthSuff;
-
-                X += NumberingItem.WidthSuff;
-            }
-        }
+				X += NumberingItem.WidthSuff;
+			}
+		}
         else if ( para_PresentationNumbering === NumberingType )
         {
             var Level = Para.PresentationPr.Level;

@@ -4366,22 +4366,22 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 					this.copyParams.nNumIdIndex++;
 					//проверяем PStyle уровней списка
 					var Numbering = par.Parent.Get_Numbering();
-					var aNum = null;
+					var oNum = null;
 					if(null != Numbering)
-						aNum = Numbering.Get_AbstractNum(oNumPr.NumId);
-					if(null != aNum)
+						oNum = Numbering.GetNum(oNumPr.NumId);
+					if(null != oNum)
 					{
-						if (null != aNum.NumStyleLink) {
-							this.copyParams.oUsedStyleMap[aNum.NumStyleLink] = 1;
+						if (null != oNum.GetNumStyleLink()) {
+							this.copyParams.oUsedStyleMap[oNum.GetNumStyleLink()] = 1;
 						}
-						if (null != aNum.StyleLink) {
-							this.copyParams.oUsedStyleMap[aNum.StyleLink] = 1;
+						if (null != oNum.GetStyleLink()) {
+							this.copyParams.oUsedStyleMap[oNum.GetStyleLink()] = 1;
 						}
-						for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
+						for(var i = 0, length = 9; i < length; ++i)
 						{
-							var oLvl = aNum.Lvl[i];
-							if(null != oLvl.PStyle)
-								this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
+							var oLvl = oNum.GetLvl(i);
+							if(oLvl && oLvl.GetPStyle())
+								this.copyParams.oUsedStyleMap[oLvl.GetPStyle()] = 1;
 						}
 					}
 				}
@@ -6958,7 +6958,7 @@ function BinaryFileReader(doc, openParams)
         var AllFonts = {};
 		
 		if(this.Document.Numbering)
-			this.Document.Numbering.Document_Get_AllFontNames(AllFonts);	
+			this.Document.Numbering.GetAllFontNames(AllFonts);
 		if(this.Document.Styles)	
         this.Document.Styles.Document_Get_AllFontNames(AllFonts);
 		

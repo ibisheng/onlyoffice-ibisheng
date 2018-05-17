@@ -2830,9 +2830,9 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 								ParaItem.Value.RFonts.CS       = {Name : FName, Index : FIndex};
 							}
 
-							var NumPr    = this.Content[this.Selection.Data[0]].Numbering_Get();
-							var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-							AbstrNum.Apply_TextPr(NumPr.Lvl, ParaItem.Value);
+							var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+							var oNum   = this.GetNumbering().GetNum(oNumPr.NumId);
+							oNum.ApplyTextPr(oNumPr.Lvl, ParaItem.Value);
 
 							if (false != bRecalculate)
 							{
@@ -5415,8 +5415,8 @@ CDocumentContent.prototype.GetDirectTextPr = function()
 					if (null == this.Selection.Data || this.Selection.Data.length <= 0)
 						break;
 
-					var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-					VisTextPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].TextPr;
+					var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+					VisTextPr  = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetTextPr();
 
 					break;
 				}
@@ -5467,8 +5467,8 @@ CDocumentContent.prototype.GetDirectParaPr = function()
 						if (null == this.Selection.Data || this.Selection.Data.length <= 0)
 							break;
 
-						var NumPr     = this.Content[this.Selection.Data[0]].Numbering_Get();
-						Result_ParaPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].ParaPr;
+						var oNumPr    = this.Content[this.Selection.Data[0]].GetNumPr();
+						Result_ParaPr = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetParaPr();
 
 						break;
 					}

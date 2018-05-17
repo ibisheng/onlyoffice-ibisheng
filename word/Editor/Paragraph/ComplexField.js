@@ -529,8 +529,8 @@ CComplexField.prototype.private_UpdateTOC = function()
 			var isAddTabForNumbering = false;
 			if (oSrcParagraph.HaveNumbering())
 			{
-				var oNumPr     = oSrcParagraph.Numbering_Get();
-				var oNumbering = this.LogicDocument.Get_Numbering();
+				var oNumPr     = oSrcParagraph.GetNumPr();
+				var oNumbering = this.LogicDocument.GetNumbering();
 				var oNumInfo   = this.LogicDocument.Internal_GetNumInfo(oSrcParagraph.Id, oNumPr);
 				var sText      = oNumbering.GetText(oNumPr.NumId, oNumPr.Lvl, oNumInfo);
 				var oNumTextPr = oSrcParagraph.GetNumberingCompiledPr();
@@ -546,8 +546,8 @@ CComplexField.prototype.private_UpdateTOC = function()
 
 				var oNumTabRun = new ParaRun(oPara, false);
 
-				var oNumLvl  = oNumbering.Get_AbstractNum(oNumPr.NumId).Lvl[oNumPr.Lvl];
-				var nNumSuff = oNumLvl.Suff;
+				var oNumLvl  = oNumbering.GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl);
+				var nNumSuff = oNumLvl.GetSuff();
 
 				if (c_oAscNumberingSuff.Space === nNumSuff)
 				{
