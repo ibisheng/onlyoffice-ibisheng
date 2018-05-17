@@ -6192,6 +6192,10 @@
 		var xfs = this.xfs;
 		this.clearData();
 		this.xfs = xfs;
+		//borders are not copied from neighbors
+		History.TurnOff();
+		this.setBorder(null);
+		History.TurnOn();
 	};
 	Cell.prototype.saveContent = function(opt_inCaseOfChange) {
 		if (this.hasRowCol() && (!opt_inCaseOfChange || this._hasChanged)) {
