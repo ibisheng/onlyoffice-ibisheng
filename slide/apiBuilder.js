@@ -1209,7 +1209,14 @@
     // ApiTableRow
     //
     //------------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Get the type of this class.
+     * @returns {"tableRow"}
+     */
+    ApiTableRow.prototype.GetClassType = function()
+    {
+        return "tableRow";
+    };
     /**
      * Get the number of cells in the current row.
      * @returns {number}
@@ -1564,6 +1571,7 @@
     ApiTable.prototype["RemoveColumn"] = ApiTable.prototype.RemoveColumn;
     ApiTable.prototype["SetShd"]       = ApiTable.prototype.SetShd;
 
+    ApiTableRow.prototype["GetClassType"] = ApiTableRow.prototype.GetClassType;
     ApiTableRow.prototype["GetCellsCount"] = ApiTableRow.prototype.GetCellsCount;
     ApiTableRow.prototype["GetCell"] = ApiTableRow.prototype.GetCell;
     ApiTableRow.prototype["SetHeight"] = ApiTableRow.prototype.SetHeight;
