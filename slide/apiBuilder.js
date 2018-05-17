@@ -1501,6 +1501,7 @@
     Api.prototype["CreateShape"]                     = Api.prototype.CreateShape;
     Api.prototype["CreateChart"]                     = Api.prototype.CreateChart;
     Api.prototype["CreateGroup"]                     = Api.prototype.CreateGroup;
+    Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
     Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
 
     ApiPresentation.prototype["GetClassType"]          = ApiPresentation.prototype.GetClassType;
