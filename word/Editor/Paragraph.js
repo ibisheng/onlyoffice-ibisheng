@@ -254,7 +254,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument, oPr)
 	{
 		var NewId = this.LogicDocument.CopyNumberingMap[Para.Pr.NumPr.NumId];
 		if (undefined !== NewId)
-			Para.Numbering_Set(NewId, Para.Pr.NumPr.Lvl);
+			Para.SetNumPr(NewId, Para.Pr.NumPr.Lvl);
 	}
 
 	Para.TextPr.Set_Value(this.TextPr.Value.Copy());
@@ -416,7 +416,7 @@ Paragraph.prototype.GetAllParagraphs = function(Props, ParaArray)
 	else if (true === Props.Numbering)
 	{
 		var NumPr  = Props.NumPr;
-		var _NumPr = this.Numbering_Get();
+		var _NumPr = this.GetNumPr();
 
 		if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && ( _NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl ))
 			ParaArray.push(this);
@@ -579,12 +579,12 @@ Paragraph.prototype.CopyPr_Open = function(OtherParagraph)
 	OtherParagraph.XLimit = this.XLimit;
 
 	if ("undefined" != typeof(OtherParagraph.NumPr))
-		OtherParagraph.Numbering_Remove();
+		OtherParagraph.RemoveNumPr();
 
-	var NumPr = this.Numbering_Get();
+	var NumPr = this.GetNumPr();
 	if (undefined != NumPr)
 	{
-		OtherParagraph.Numbering_Set(NumPr.NumId, NumPr.Lvl);
+		OtherParagraph.SetNumPr(NumPr.NumId, NumPr.Lvl);
 	}
 	// Копируем прямые настройки параграфа в конце, потому что, например, нумерация может
 	// их изменить.
@@ -993,7 +993,7 @@ Paragraph.prototype.Check_MathPara = function(MathPos)
 	{
 		if(this.bFromDocument)
 		{
-            if(undefined !== this.Numbering_Get())
+            if(undefined !== this.GetNumPr())
 			{
 				return false;
 			}
@@ -2819,13 +2819,13 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			Result = true;
 
 			var Pr = this.Get_CompiledPr2(false).ParaPr;
-			if (undefined != this.Numbering_Get())
+			if (undefined != this.GetNumPr())
 			{
-				var NumPr = this.Numbering_Get();
+				var NumPr = this.GetNumPr();
 
 				if (0 === NumPr.Lvl)
 				{
-					this.Numbering_Remove();
+					this.RemoveNumPr();
 					this.Set_Ind({FirstLine : 0, Left : Math.max(Pr.Ind.Left, Pr.Ind.Left + Pr.Ind.FirstLine)}, false);
 				}
 				else
@@ -3147,7 +3147,7 @@ Paragraph.prototype.Add = function(Item)
 						this.Apply_TextPr(TextPr);
 
 						// Если параграф с нумерацией, тогда к символу конца параграфа не применяем стиль
-						if (undefined === this.Numbering_Get())
+						if (undefined === this.GetNumPr())
 							this.TextPr.Apply_TextPr(TextPr);
 					}
 					else if (null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation())
@@ -3285,9 +3285,9 @@ Paragraph.prototype.Add = function(Item)
  */
 Paragraph.prototype.Add_Tab = function(bShift)
 {
-	var NumPr = this.Numbering_Get();
+	var NumPr = this.GetNumPr();
 
-	if (undefined !== this.Numbering_Get())
+	if (undefined !== this.GetNumPr())
 	{
 		this.Shift_NumberingLvl(bShift);
 	}
@@ -3724,7 +3724,7 @@ Paragraph.prototype.Increase_Level = function(bIncrease)
 };
 Paragraph.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
-	if (undefined !== this.Numbering_Get())
+	if (undefined !== this.GetNumPr())
 	{
 		this.Shift_NumberingLvl(!bIncrease);
 	}
@@ -5488,7 +5488,7 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 			this.Internal_ReplaceRun(Pos, NewElements);
 		}
 
-		if (true === this.IsCursorAtEnd() && undefined === this.Numbering_Get())
+		if (true === this.IsCursorAtEnd() && undefined === this.GetNumPr())
 		{
 			if (undefined === IncFontSize)
 			{
@@ -6228,7 +6228,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 
 	if (0 === SelectionStartPos.Compare(SelectionEndPos) && AscCommon.g_mouse_event_type_up === MouseEvent.Type)
 	{
-		var NumPr = this.Numbering_Get();
+		var NumPr = this.GetNumPr();
 		var oInfo = new CSelectedElementsInfo();
 		this.GetSelectedElementsInfo(oInfo);
 		var oField = oInfo.Get_Field();
@@ -6581,7 +6581,7 @@ Paragraph.prototype.Selection_CalculateTextPr = function()
 };
 Paragraph.prototype.Selection_SelectNumbering = function()
 {
-	if (undefined != this.Numbering_Get())
+	if (undefined != this.GetNumPr())
 	{
 		this.Selection.Use  = true;
 		this.Selection.Flag = selectionflag_Numbering;
@@ -7308,12 +7308,14 @@ Paragraph.prototype.Remove_StartTabs = function(TabsCounter)
 	return true;
 };
 /**
- * Добавляем нумерацию к данному параграфу
+ * Применяем заданную нумерацию к данному параграфу (учитываем отступы, количество табов в начале параграфа и т.д.)
+ * @param sNumId {string}
+ * @param nLvl {number} 0..8
  */
-Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
+Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 {
 	var ParaPr    = this.Get_CompiledPr2(false).ParaPr;
-	var NumPr_old = this.Numbering_Get();
+	var NumPr_old = this.GetNumPr();
 
 	var SelectionUse       = this.IsSelectionUse();
 	var SelectedOneElement = this.Parent.IsSelectedSingleElement();
@@ -7322,7 +7324,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 	if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty())
 		return;
 
-	this.Numbering_Remove();
+	this.RemoveNumPr();
 
 	// Рассчитаем количество табов, идущих в начале параграфа
 	var TabsCounter = new CParagraphTabsCounter();
@@ -7332,13 +7334,10 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 	var TabsPos   = TabsCounter.Pos;
 
 	// Рассчитаем левую границу и сдвиг первой строки с учетом начальных табов
-	var X     = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
-	var LeftX = X;
-
+	var X = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
 	if (TabsCount > 0 && ParaPr.Ind.FirstLine < 0)
 	{
-		X     = ParaPr.Ind.Left;
-		LeftX = X;
+		X = ParaPr.Ind.Left;
 		TabsCount--;
 	}
 
@@ -7373,8 +7372,8 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 		TabsCount--;
 	}
 
-	var Numbering   = this.Parent.Get_Numbering();
-	var AbstractNum = Numbering.Get_AbstractNum(NumId);
+	var oNumbering = this.Parent.GetNumbering();
+	var oNum       = oNumbering.GetNum(sNumId);
 
 	this.private_AddPrChange();
 
@@ -7385,8 +7384,8 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 		{
 			// Проверим сначала предыдущий элемент, если у него точно такая же нумерация, тогда копируем его сдвиги
 			var Prev          = this.Get_DocumentPrev();
-			var PrevNumbering = ( null != Prev ? (type_Paragraph === Prev.GetType() ? Prev.Numbering_Get() : undefined) : undefined );
-			if (undefined != PrevNumbering && NumId === PrevNumbering.NumId && Lvl === PrevNumbering.Lvl)
+			var PrevNumbering = ( null != Prev ? (type_Paragraph === Prev.GetType() ? Prev.GetNumPr() : undefined) : undefined );
+			if (undefined != PrevNumbering && sNumId === PrevNumbering.NumId && nLvl === PrevNumbering.Lvl)
 			{
 				var NewFirstLine = Prev.Pr.Ind.FirstLine;
 				var NewLeft      = Prev.Pr.Ind.Left;
@@ -7400,12 +7399,10 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 			else
 			{
 				// Выставляем заданную нумерацию и сдвиги Ind.Left = X + NumPr.ParaPr.Ind.Left
-				var NumLvl    = AbstractNum.Lvl[Lvl];
-				var NumParaPr = NumLvl.ParaPr;
-
-				if (undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left)
+				var oNumParaPr = oNum.GetLvl(nLvl).GetParaPr();
+				if (undefined != oNumParaPr.Ind && undefined != oNumParaPr.Ind.Left)
 				{
-					AbstractNum.ShiftLeftInd(X + NumParaPr.Ind.Left);
+					oNum.ShiftLeftInd(X + oNumParaPr.Ind.Left);
 
 					History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
 					History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, undefined));
@@ -7417,7 +7414,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 			}
 
 			this.Pr.NumPr = new CNumPr();
-			this.Pr.NumPr.Set(NumId, Lvl);
+			this.Pr.NumPr.Set(sNumId, nLvl);
 			History.Add(new CChangesParagraphNumbering(this, NumPr_old, this.Pr.NumPr));
 			this.private_RefreshNumbering(NumPr_old);
 			this.private_RefreshNumbering(this.Pr.NumPr);
@@ -7427,23 +7424,26 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 			// Если выделено несколько параграфов, тогда уже по сдвигу X определяем уровень данной нумерации
 
 			var LvlFound  = -1;
-			var LvlsCount = AbstractNum.Lvl.length;
-			for (var LvlIndex = 0; LvlIndex < LvlsCount; LvlIndex++)
+			var LvlsCount = oNum.Lvl.length;
+			for (var LvlIndex = 0; LvlIndex < 9; ++LvlIndex)
 			{
-				var NumLvl    = AbstractNum.Lvl[LvlIndex];
-				var NumParaPr = NumLvl.ParaPr;
-
-				if (undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left && X <= NumParaPr.Ind.Left)
+				var oNumLvl = oNum.GetLvl(LvlIndex);
+				if (oNumLvl)
 				{
-					LvlFound = LvlIndex;
-					break;
+					var oNumParaPr = oNumLvl.GetParaPr();
+
+					if (undefined != oNumParaPr.Ind && undefined != oNumParaPr.Ind.Left && X <= oNumParaPr.Ind.Left)
+					{
+						LvlFound = LvlIndex;
+						break;
+					}
 				}
 			}
 
 			if (-1 === LvlFound)
 				LvlFound = LvlsCount - 1;
 
-			if (undefined != this.Pr.Ind && undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left)
+			if (undefined != this.Pr.Ind && undefined != this.Ind && undefined != this.Ind.Left)
 			{
 				History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, undefined));
 				History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, undefined));
@@ -7454,7 +7454,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 			}
 
 			this.Pr.NumPr = new CNumPr();
-			this.Pr.NumPr.Set(NumId, LvlFound);
+			this.Pr.NumPr.Set(sNumId, LvlFound);
 			History.Add(new CChangesParagraphNumbering(this, NumPr_old, this.Pr.NumPr));
 			this.private_RefreshNumbering(NumPr_old);
 			this.private_RefreshNumbering(this.Pr.NumPr);
@@ -7468,14 +7468,14 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 	{
 		// просто меняем список, так чтобы он не двигался
 		this.Pr.NumPr = new CNumPr();
-		this.Pr.NumPr.Set(NumId, Lvl);
+		this.Pr.NumPr.Set(sNumId, nLvl);
 
 		History.Add(new CChangesParagraphNumbering(this, NumPr_old, this.Pr.NumPr));
 		this.private_RefreshNumbering(NumPr_old);
 		this.private_RefreshNumbering(this.Pr.NumPr);
 
-		var Left      = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.Left );
-		var FirstLine = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.FirstLine );
+		var Left      = ( NumPr_old.Lvl === nLvl ? undefined : ParaPr.Ind.Left );
+		var FirstLine = ( NumPr_old.Lvl === nLvl ? undefined : ParaPr.Ind.FirstLine );
 
 		History.Add(new CChangesParagraphIndFirst(this, this.Pr.Ind.FirstLine, FirstLine));
 		History.Add(new CChangesParagraphIndLeft(this, this.Pr.Ind.Left, Left));
@@ -7498,21 +7498,43 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 };
 /**
  * Добавляем нумерацию к данному параграфу, не делая никаких дополнительных действий
+ * @param sNumId {?string} Если undefined или null, тогда убираем нумерацию
+ * @param nLvl {number} 0..8
  */
-Paragraph.prototype.Numbering_Set = function(NumId, Lvl)
+Paragraph.prototype.SetNumPr = function(sNumId, nLvl)
 {
-	var NumPr_old = this.Pr.NumPr;
-	this.Pr.NumPr = new CNumPr();
-	this.Pr.NumPr.Set(NumId, Lvl);
+	if (undefined === sNumId || null === sNumId)
+	{
+		if (undefined !== this.Pr.NumPr)
+		{
+			this.private_AddPrChange();
 
-	this.private_AddPrChange();
-	History.Add(new CChangesParagraphNumbering(this, NumPr_old, this.Pr.NumPr));
-	this.private_RefreshNumbering(NumPr_old);
-	this.private_RefreshNumbering(this.Pr.NumPr);
+			History.Add(new CChangesParagraphNumbering(this, this.Pr.NumPr, undefined));
+			this.private_RefreshNumbering(this.Pr.NumPr);
 
-	// Надо пересчитать конечный стиль
-	this.CompiledPr.NeedRecalc = true;
-	this.private_UpdateTrackRevisionOnChangeParaPr(true);
+			this.Pr.NumPr = undefined;
+
+			this.CompiledPr.NeedRecalc = true;
+			this.private_UpdateTrackRevisionOnChangeParaPr(true);
+		}
+	}
+	else
+	{
+		if (nLvl < 0 || nLvl > 8)
+			nLvl = 0;
+
+		var oNumPrOld = this.Pr.NumPr;
+		this.Pr.NumPr = new CNumPr(sNumId, nLvl);
+
+		this.private_AddPrChange();
+		History.Add(new CChangesParagraphNumbering(this, oNumPrOld, this.Pr.NumPr));
+		this.private_RefreshNumbering(oNumPrOld);
+		this.private_RefreshNumbering(this.Pr.NumPr);
+
+		// Надо пересчитать конечный стиль
+		this.CompiledPr.NeedRecalc = true;
+		this.private_UpdateTrackRevisionOnChangeParaPr(true);
+	}
 };
 /**
  * Изменяем уровень нумерации
@@ -7543,56 +7565,25 @@ Paragraph.prototype.IndDecNumberingLevel = function(bIncrease)
 	}
 };
 /**
- * Добавление нумерации в параграф при открытии и копировании
- */
-Paragraph.prototype.Numbering_Add_Open = function(NumId, Lvl)
-{
-	this.Pr.NumPr = new CNumPr();
-	this.Pr.NumPr.Set(NumId, Lvl);
-
-	// Надо пересчитать конечный стиль
-	this.CompiledPr.NeedRecalc = true;
-};
-Paragraph.prototype.Numbering_Get = function()
-{
-	var NumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
-	if (undefined != NumPr && 0 != NumPr.NumId)
-		return NumPr.Copy();
-
-	return undefined;
-};
-/**
  * Получаем настройку нумерации у данного параграфа, если она есть
  * @returns {?CNumPr}
  */
 Paragraph.prototype.GetNumPr = function()
 {
-	return this.Numbering_Get();
+	var oNumPr = this.Get_CompiledPr2(false).ParaPr.NumPr;
+	if (oNumPr && oNumPr.IsValid())
+		return oNumPr.Copy();
+
+	return undefined;
 };
 /**
- * Применяем нумерацию
- * @param sNumId {string}
- * @param nLvl {number} 0..8
- */
-Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
-{
-	this.Numbering_Add(sNumId, nLvl);
-};
-/**
- * Удаляем нумерацию
+ * Удаляем нумерацию с учетом того, что она может быть задана в стиле
  */
 Paragraph.prototype.RemoveNumPr = function()
 {
-	this.Numbering_Remove();
-};
-/**
- * Удаляем нумерацию
- */
-Paragraph.prototype.Numbering_Remove = function()
-{
 	// Если у нас была задана нумерации в стиле, тогда чтобы ее отменить(не удаляя нумерацию в стиле)
 	// мы проставляем NumPr с NumId undefined
-	var OldNumPr = this.Numbering_Get();
+	var OldNumPr = this.GetNumPr();
 	var NewNumPr = undefined;
 	if (undefined != this.CompiledPr.Pr.ParaPr.StyleNumPr)
 	{
@@ -7620,15 +7611,16 @@ Paragraph.prototype.Numbering_Remove = function()
 		{
 			if (undefined != OldNumPr && undefined != OldNumPr.NumId && this.Parent)
 			{
-				var Num = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId);
-				if (Num)
+				var oNum = this.Parent.GetNumbering().GetNum(OldNumPr.NumId);
+				if (oNum)
 				{
-					var Lvl = Num.Lvl[OldNumPr.Lvl];
-					if (undefined != Lvl && undefined != Lvl.ParaPr.Ind && undefined != Lvl.ParaPr.Ind.Left)
+					var oLvl = oNum.GetLvl(OldNumPr.Lvl);
+					var oLvlParaPr = oLvl ? oLvl.GetParaPr() : null;
+					if (oLvlParaPr && undefined != oLvlParaPr.Ind && undefined != oLvlParaPr.Ind.Left)
 					{
 						var CurParaPr         = this.Get_CompiledPr2(false).ParaPr;
 						var Left              = CurParaPr.Ind.Left + CurParaPr.Ind.FirstLine;
-						var NumLeftCorrection = ( undefined != Lvl.ParaPr.Ind.FirstLine ? Math.abs(Lvl.ParaPr.Ind.FirstLine) : 0 );
+						var NumLeftCorrection = ( undefined != oLvlParaPr.Ind.FirstLine ? Math.abs(oLvlParaPr.Ind.FirstLine) : 0 );
 
 						var NewFirstLine = 0;
 						var NewLeft      = Left < 0 ? Left : Math.max(0, Left - NumLeftCorrection);
@@ -7667,39 +7659,12 @@ Paragraph.prototype.Numbering_Remove = function()
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 };
 /**
- * Удаляем нумерацию из прямых настроек
+ * Проверяем есть ли у данного параграфа нумерация
+ * @returns {boolean}
  */
-Paragraph.prototype.RemoveDirectNumbering = function()
-{
-	if (undefined !== this.Pr.NumPr)
-	{
-		this.private_AddPrChange();
-
-		History.Add(new CChangesParagraphNumbering(this, this.Pr.NumPr, undefined));
-		this.private_RefreshNumbering(this.Pr.NumPr);
-
-		this.Pr.NumPr = undefined;
-
-		this.CompiledPr.NeedRecalc = true;
-		this.private_UpdateTrackRevisionOnChangeParaPr(true);
-	}
-};
-/**
- * Используется ли заданная нумерация в параграфе
- */
-Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
-{
-	var bLvl = (undefined === Lvl ? false : true);
-
-	var NumPr = this.Numbering_Get();
-	if (undefined != NumPr && NumId === NumPr.NumId && ( false === bLvl || Lvl === NumPr.Lvl ))
-		return true;
-
-	return false;
-};
 Paragraph.prototype.HaveNumbering = function()
 {
-	return (undefined !== this.Numbering_Get() ? true : false);
+	return (!!this.GetNumPr());
 };
 /**
  * Получаем скомпилированные текстовые настройки для символа нумерации
@@ -7707,7 +7672,7 @@ Paragraph.prototype.HaveNumbering = function()
  */
 Paragraph.prototype.GetNumberingCompiledPr = function()
 {
-	var oNumPr = this.Numbering_Get();
+	var oNumPr = this.GetNumPr();
 	if (!oNumPr || !this.LogicDocument)
 		return null;
 
@@ -7859,7 +7824,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 	// Поэтому Prev.After = Prev.After (значение не меняем), а вот Cur.Before = max(Prev.After, Cur.Before) - Prev.After
 
 	var StyleId = this.Style_Get();
-	var NumPr   = this.Numbering_Get();
+	var NumPr   = this.GetNumPr();
 	var FramePr = this.Get_FramePr();
 
 	var PrevEl = this.Get_DocumentPrev();
@@ -7905,7 +7870,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 		var Prev_AfterAuto = Prev_Pr.Spacing.AfterAutoSpacing;
 		var Cur_Before     = Pr.ParaPr.Spacing.Before;
 		var Cur_BeforeAuto = Pr.ParaPr.Spacing.BeforeAutoSpacing;
-		var Prev_NumPr     = PrevEl.Numbering_Get();
+		var Prev_NumPr     = PrevEl.GetNumPr();
 
 		if (PrevStyle === StyleId && true === Pr.ParaPr.ContextualSpacing)
 		{
@@ -7980,7 +7945,7 @@ Paragraph.prototype.Get_CompiledPr = function()
 			var Next_BeforeAuto = Next_Pr.Spacing.BeforeAutoSpacing;
 			var Cur_After       = Pr.ParaPr.Spacing.After;
 			var Cur_AfterAuto   = Pr.ParaPr.Spacing.AfterAutoSpacing;
-			var Next_NumPr      = NextEl.Numbering_Get();
+			var Next_NumPr      = NextEl.GetNumPr();
 
 			if (NextStyle === StyleId && true === Pr.ParaPr.ContextualSpacing)
 			{
@@ -8138,7 +8103,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 	if (this.bFromDocument)
 	{
 		var Styles     = this.Parent.Get_Styles();
-		var Numbering  = this.Parent.Get_Numbering();
+		var Numbering  = this.Parent.GetNumbering();
 		var TableStyle = this.Parent.Get_TableStyleForPara();
 		var ShapeStyle = this.Parent.Get_ShapeStyleForPara();
 		var StyleId    = this.Style_Get();
@@ -8158,7 +8123,7 @@ Paragraph.prototype.Internal_CompileParaPr2 = function()
 				Lvl = this.Pr.NumPr.Lvl;
 
 				if (Lvl >= 0 && Lvl <= 8)
-					Pr.ParaPr.Merge(Numbering.Get_ParaPr(this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl));
+					Pr.ParaPr.Merge(Numbering.GetParaPr(this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl));
 				else
 				{
 					Lvl             = -1;
@@ -8373,9 +8338,9 @@ Paragraph.prototype.PasteFormatting = function(TextPr, oParaPr, ApplyPara)
 		if (this.bFromDocument)
 		{
 			if (oParaPr.NumPr)
-				this.Numbering_Set(oParaPr.NumPr.NumId, oParaPr.NumPr.Lvl);
+				this.SetNumPr(oParaPr.NumPr.NumId, oParaPr.NumPr.Lvl);
 			else
-				this.Numbering_Remove();
+				this.RemoveNumPr();
 
 			if (oParaPr.PStyle)
 				this.Style_Add(oParaPr.PStyle, true);
@@ -8440,7 +8405,7 @@ Paragraph.prototype.Style_Add = function(Id, bDoNotDeleteProps)
 	var DefNumId = this.LogicDocument ? this.LogicDocument.Get_Styles().Get_Default_ParaList() : null;
 	if (Id !== DefNumId)
 	{
-		this.RemoveDirectNumbering();
+		this.SetNumPr(undefined);
 		this.Set_ContextualSpacing(undefined);
 		this.Set_Ind(new CParaInd(), true);
 		this.Set_Align(undefined);
@@ -8578,7 +8543,7 @@ Paragraph.prototype.Clear_Formatting = function()
 			this.Style_Remove();
 		}
 
-		this.Numbering_Remove();
+		this.RemoveNumPr();
 	}
 
 	this.Set_ContextualSpacing(undefined);
@@ -9948,7 +9913,7 @@ Paragraph.prototype.Set_FrameParaPr = function(Para)
 	Para.Set_Ind({FirstLine : 0}, false);
 	this.Set_Spacing({After : 0}, false);
 	this.Set_Ind({Right : 0}, false);
-	this.Numbering_Remove();
+	this.RemoveNumPr();
 };
 Paragraph.prototype.Get_FrameBounds = function(FrameX, FrameY, FrameW, FrameH)
 {
@@ -12457,13 +12422,13 @@ Paragraph.prototype.GetParagraphTabs = function()
 };
 Paragraph.prototype.SetParagraphIndent = function(Ind)
 {
-	var NumPr = this.Numbering_Get();
+	var NumPr = this.GetNumPr();
 	if (undefined !== Ind.ChangeLevel && 0 !== Ind.ChangeLevel && undefined !== NumPr)
 	{
 		if (Ind.ChangeLevel > 0)
-			this.Numbering_Add(NumPr.NumId, Math.min(8, NumPr.Lvl + 1));
+			this.ApplyNumPr(NumPr.NumId, Math.min(8, NumPr.Lvl + 1));
 		else
-			this.Numbering_Add(NumPr.NumId, Math.max(0, NumPr.Lvl - 1));
+			this.ApplyNumPr(NumPr.NumId, Math.max(0, NumPr.Lvl - 1));
 	}
 	else
 	{

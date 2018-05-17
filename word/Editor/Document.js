@@ -6957,7 +6957,7 @@ CDocument.prototype.Document_SelectNumbering = function(NumPr, Index)
 	{
 		var Item      = this.Content[Index];
 		var ItemNumPr = null;
-		if (type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.Numbering_Get() ) && ItemNumPr.NumId == NumPr.NumId && ItemNumPr.Lvl == NumPr.Lvl)
+		if (type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.GetNumPr() ) && ItemNumPr.NumId == NumPr.NumId && ItemNumPr.Lvl == NumPr.Lvl)
 		{
 			this.Selection.Data.push(Index);
 			Item.Selection_SelectNumbering();
@@ -7218,7 +7218,7 @@ CDocument.prototype.OnKeyDown = function(e)
             {
                 var Paragraph = SelectedInfo.GetParagraph();
                 var ParaPr    = Paragraph.Get_CompiledPr2(false).ParaPr;
-                if (null != Paragraph && ( true === Paragraph.IsCursorAtBegin() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ))
+                if (null != Paragraph && ( true === Paragraph.IsCursorAtBegin() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.GetNumPr() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ))
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_None, {
                             Type      : changestype_2_Element_and_Type,
@@ -8446,6 +8446,10 @@ CDocument.prototype.Get_Styles = function()
 {
 	return this.Styles;
 };
+/**
+ * Получаем ссылку на объект, работающий со стилями
+ * @returns {CStyles}
+ */
 CDocument.prototype.GetStyles = function()
 {
 	return this.Styles;
@@ -12245,7 +12249,7 @@ CDocument.prototype.private_RecalculateNumbering = function(Elements)
 	{
 		var Element = Elements[Index];
 		if (type_Paragraph === Element.Get_Type())
-			this.History.Add_RecalcNumPr(Element.Numbering_Get());
+			this.History.Add_RecalcNumPr(Element.GetNumPr());
 		else if (type_Paragraph === Element.Get_Type())
 		{
 			var ParaArray = [];
@@ -12254,7 +12258,7 @@ CDocument.prototype.private_RecalculateNumbering = function(Elements)
 			for (var ParaIndex = 0, ParasCount = ParaArray.length; ParaIndex < ParasCount; ++ParaIndex)
 			{
 				var Para = ParaArray[ParaIndex];
-				this.History.Add_RecalcNumPr(Element.Numbering_Get());
+				this.History.Add_RecalcNumPr(Element.GetNumPr());
 			}
 		}
 	}
@@ -12982,9 +12986,9 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 	if (type_Paragraph === Item.GetType())
 	{
 		// Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-		if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.IsCursorAtBegin())
+		if (true !== bForceAdd && undefined != Item.GetNumPr() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.IsCursorAtBegin())
 		{
-			Item.Numbering_Remove();
+			Item.RemoveNumPr();
 			Item.Set_Ind({FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right}, true);
 		}
 		else
@@ -15712,7 +15716,7 @@ CDocument.prototype.controller_SetSelectionState = function(State, StateIndex)
 		{
 			if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
 			{
-				var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
+				var NumPr = this.Content[this.Selection.StartPos].GetNumPr();
 				if (undefined !== NumPr)
 					this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
 				else

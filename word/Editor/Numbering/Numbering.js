@@ -93,20 +93,6 @@ CNumbering.prototype.Add_AbstractNum = function(AbstractNum)
 
 	return Id;
 };
-CNumbering.prototype.Get_AbstractNum = function(Id)
-{
-	var AbstractNum = this.AbstractNum[Id];
-	if (undefined != AbstractNum && undefined != AbstractNum.NumStyleLink)
-	{
-		var Styles   = editor.WordControl.m_oLogicDocument.Get_Styles();
-		var NumStyle = Styles.Style[AbstractNum.NumStyleLink];
-
-		if (undefined != NumStyle && undefined != NumStyle.ParaPr.NumPr && undefined != NumStyle.ParaPr.NumPr.NumId)
-			return this.Get_AbstractNum(NumStyle.ParaPr.NumPr.NumId);
-	}
-
-	return AbstractNum;
-};
 /**
  * Доступ к абстрактной нумерации по Id
  * @param sId
@@ -114,7 +100,17 @@ CNumbering.prototype.Get_AbstractNum = function(Id)
  */
 CNumbering.prototype.GetAbstractNum = function(sId)
 {
-	return this.Get_AbstractNum(sId);
+	var oAbstractNum = this.AbstractNum[sId];
+	if (oAbstractNum && oAbstractNum.GetNumStyleLink())
+	{
+		var oStyles   = editor.WordControl.m_oLogicDocument.GetStyles();
+		var oNumStyle = oStyles.Get(oAbstractNum.GetNumStyleLink());
+
+		if (oNumStyle && oNumStyle.ParaPr.NumPr && undefined !== oNumStyle.ParaPr.NumPr.NumId)
+			return this.GetAbstractNum(oNumStyle.ParaPr.NumPr.NumId);
+	}
+
+	return oAbstractNum;
 };
 /**
  * Создаем новую нумерацию
@@ -147,7 +143,7 @@ CNumbering.prototype.GetNum = function(sId)
  * @param nLvl {number} 0..8
  * @returns {CParaPr}
  */
-CNumbering.prototype.Get_ParaPr = function(sNumId, nLvl)
+CNumbering.prototype.GetParaPr = function(sNumId, nLvl)
 {
 	var oNum = this.GetNum(sNumId);
 	if (oNum)

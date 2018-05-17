@@ -3532,7 +3532,7 @@
 				//Numbering
 				var LvlPr = null;
 				var Lvl = null;
-				var oNumPr = paragraph.elem.Numbering_Get ? paragraph.elem.Numbering_Get() : null;
+				var oNumPr = paragraph.elem.GetNumPr ? paragraph.elem.GetNumPr() : null;
 				var numberingText = null;
 				var formatText;
 				if (oNumPr != null) {

@@ -465,7 +465,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             if ( true != this.Selection.Use && true == this.IsCursorAtBegin() )
             {
                 var Pr = this.Get_CompiledPr2(false).ParaPr;
-                if ( undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
+                if ( undefined != this.GetNumPr() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
                 {
                     // Надо проверить только текущий параграф, а это будет сделано далее
                 }

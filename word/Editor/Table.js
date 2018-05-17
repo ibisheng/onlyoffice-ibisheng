@@ -7852,10 +7852,6 @@ CTable.prototype.Remove_Style = function()
 	// Надо пересчитать конечный стиль
 	this.CompiledPr.NeedRecalc = true;
 };
-CTable.prototype.Numbering_IsUse = function(NumId, NumLvl)
-{
-	return false;
-};
 /**
  * Формируем конечные свойства таблицы на основе стиля и прямых настроек.
  */

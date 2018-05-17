@@ -580,7 +580,7 @@ CopyProcessor.prototype =
         var bIsNullNumPr = false;
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
-            oNumPr = Item.Numbering_Get();
+            oNumPr = Item.GetNumPr();
             bIsNullNumPr = (null == oNumPr || 0 == oNumPr.NumId);
         }
         else
@@ -2593,7 +2593,7 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.keepTextOnly:
 			{
-				var numbering =  paragraph.Numbering_Get();
+				var numbering =  paragraph.GetNumPr();
 				if(numbering)
 				{
 					//проставляем параграфам NumInfo
@@ -2601,7 +2601,7 @@ PasteProcessor.prototype =
 					for(var i = 0; i < parentContent.length; i++)
 					{
 						var tempParagraph = parentContent[i];
-						var numbering2 =  tempParagraph.Numbering_Get ? tempParagraph.Numbering_Get() : null;
+						var numbering2 =  tempParagraph.GetNumPr ? tempParagraph.GetNumPr() : null;
 
 						if(numbering2)
 						{
@@ -6552,7 +6552,7 @@ PasteProcessor.prototype =
 					
 					if(this.pasteInExcel !== true && Para.bFromDocument === true)
 					{
-						Para.Numbering_Set( NumId, level );
+						Para.SetNumPr( NumId, level );
 					}
 				}
 				else
@@ -6582,7 +6582,7 @@ PasteProcessor.prototype =
 						var prevElem = this.aContent[this.aContent.length - 2];
 						if(null != prevElem && type_Paragraph === prevElem.GetType())
 						{
-							var PrevNumPr = prevElem.Numbering_Get();
+							var PrevNumPr = prevElem.GetNumPr();
 							if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.CheckFormat( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
 								NumId  = PrevNumPr.NumId;
 						}
@@ -6644,15 +6644,15 @@ PasteProcessor.prototype =
 					
 					if(this.pasteInExcel !== true && Para.bFromDocument === true)
 					{
-						Para.Numbering_Add( NumId, 0 );
+						Para.ApplyNumPr(NumId, 0);
 					}
 				}
             }
             else
             {
-                var numPr = Para.Numbering_Get();
+                var numPr = Para.GetNumPr();
                 if(numPr)
-                    Para.Numbering_Remove();
+                    Para.RemoveNumPr();
             }
         }
         else

@@ -4583,7 +4583,7 @@ CStyles.prototype =
 					var oNum = oNumbering.GetNum(Style.ParaPr.NumPr.NumId);
 					var nLvl = oNum.GetLvlByStyle(StyleId);
 					if (-1 != Lvl)
-						Pr.ParaPr.Merge(oNumbering.Get_ParaPr(Style.ParaPr.NumPr.NumId, Lvl));
+						Pr.ParaPr.Merge(oNumbering.GetParaPr(Style.ParaPr.NumPr.NumId, Lvl));
 					else
 						Pr.ParaPr.NumPr = undefined;
 				}
