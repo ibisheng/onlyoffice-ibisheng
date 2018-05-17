@@ -6360,7 +6360,7 @@ function BinaryFileReader(doc, openParams)
 		for(var i in this.oReadResult.numToNumClass)
 		{
 			var oNumClass = this.oReadResult.numToNumClass[i];
-			this.Document.Numbering.Add_AbstractNum(oNumClass);
+			this.Document.Numbering.AddAbstractNum(oNumClass);
 		}
 		for(var i = 0, length = this.oReadResult.paraNumPrs.length; i < length; ++i)
 		{
@@ -6823,7 +6823,7 @@ function BinaryFileReader(doc, openParams)
                 }
             }
             if (!isAlreadyContains) {
-                this.Document.Numbering.Add_AbstractNum(oNumClass);
+                this.Document.Numbering.AddAbstractNum(oNumClass);
             }
             else
                 oReadResult.numToNumClass[i] = documentANum[n];*/
@@ -6833,7 +6833,7 @@ function BinaryFileReader(doc, openParams)
 			//если там более 1 одного элемента - это разные списки. будет проверка на существуюший AbstractNum - они могут стать одним списком, если у них одинаковая структура
 			//возможно, нужно сравнивать только numid и в пределах одного документа
 			//TODO просмотреть все ситуации со списками
-			this.Document.Numbering.Add_AbstractNum(oNumClass);
+			this.Document.Numbering.AddAbstractNum(oNumClass);
         }
         for (var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i) {
             var numPr = oReadResult.paraNumPrs[i];

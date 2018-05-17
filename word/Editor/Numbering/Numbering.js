@@ -47,51 +47,130 @@ function CNumbering()
 	this.Num         = {};
 }
 
-CNumbering.prototype.Copy_All_AbstractNums = function()
+/**
+ * Копируем все нумерации и абстрактные нумерации. Возвращаем новые объекты с мапом из старых Id в новые
+ * @param oNumbering {CNumbering}
+ * @returns {{AbstractNum: {}, AbstractMap: {}, Num: {}, NumMap: {}}}
+ */
+CNumbering.prototype.CopyAllNums = function(oNumbering)
 {
-	var Map             = {};
-	var NewAbstractNums = [];
+	if (!oNumbering)
+		oNumbering = this;
 
-	for (var OldId in this.AbstractNum)
+	var oAbstractMap     = {};
+	var oNumMap          = {};
+	var oNewAbstractNums = {};
+	var oNewNums         = {}
+
+	for (var sOldId in this.AbstractNum)
 	{
-		var OldAbsNum = this.AbstractNum[OldId];
-		var NewAbsNum = new CAbstractNum();
+		var oOldAbstractNum = this.AbstractNum[sOldId];
+		var oNewAbstractNum = new CAbstractNum();
 
-		var NewId = NewAbsNum.Get_Id();
+		var sNewId = oNewAbstractNum.GetId();
+		oNewAbstractNum.Copy(oOldAbstractNum);
 
-		NewAbsNum.Copy(OldAbsNum);
-
-		NewAbstractNums[NewId] = NewAbsNum;
-		Map[OldId]             = NewId;
+		oNewAbstractNums[sNewId] = oNewAbstractNum;
+		oAbstractMap[sOldId]     = sNewId;
 	}
 
-	return {AbstractNums : NewAbstractNums, Map : Map};
+	for (var sOldId in this.Num)
+	{
+		var oOldNum = this.Num[sOldId];
+		var oNewNum = new CNum(oNumbering);
+
+		oNewNum.AbstractNumId = oAbstractMap[oOldNum.AbstractNumId];
+
+		for (var nLvl = 0; nLvl < 9; ++nLvl)
+		{
+			if (oOldNum.LvlOverride[nLvl])
+				oNewNum.SetLvlOverride(oOldNum.LvlOverride[nLvl].GetLvl().Copy(), nLvl, oOldNum.LvlOverride[nLvl].GetStartOverride());
+		}
+
+		var sNewId = oNewNum.GetId();
+
+		oNewNums[sNewId] = oNewNum;
+		oNumMap[sOldId]  = sNewId;
+	}
+
+	return {
+		AbstractNum : oNewAbstractNums,
+		AbstractMap : oAbstractMap,
+		Num         : oNewNums,
+		NumMap      : oNumMap
+	};
 };
+/**
+ * Удаляем все нумерации
+ */
 CNumbering.prototype.Clear = function()
 {
 	this.AbstractNum = {};
 	this.Num         = {};
 };
-CNumbering.prototype.Append_AbstractNums = function(AbstractNums)
+/**
+ * Добавляем к текущим абстрактным нумеациям новые
+ * @param oAbstractNums
+ */
+CNumbering.prototype.AppendAbstractNums = function(oAbstractNums)
 {
-	for (var Id in AbstractNums)
+	for (var sId in oAbstractNums)
 	{
-		if (undefined === this.AbstractNum[Id])
-			this.AbstractNum[Id] = AbstractNums[Id];
+		if (undefined === this.AbstractNum[sId])
+			this.AbstractNum[sId] = oAbstractNums[sId];
 	}
 };
+/**
+ * Добавляем к текущим нумеациям новые
+ * @param oNums
+ */
+CNumbering.prototype.AppendNums = function(oNums)
+{
+	for (var sId in oNums)
+	{
+		if (undefined === this.Num[sId])
+			this.Num[sId] = oNums[sId];
+	}
+};
+/**
+ * Создаем новую абстрактную нумерацию
+ * @returns {CAbstractNum}
+ */
 CNumbering.prototype.CreateAbstractNum = function()
 {
 	var oAbstractNum                       = new CAbstractNum();
 	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
 	return oAbstractNum;
 };
-CNumbering.prototype.Add_AbstractNum = function(AbstractNum)
+/**
+ * Добавляем абстрактную нумерацию
+ * @param oAbstractNum {CAbstractNum}
+ * @returns {string} идентификатор нумерации
+ */
+CNumbering.prototype.AddAbstractNum = function(oAbstractNum)
 {
-	var Id               = AbstractNum.Get_Id();
-	this.AbstractNum[Id] = AbstractNum;
+	if (!(oAbstractNum instanceof CAbstractNum))
+		return;
 
-	return Id;
+	var sId               = oAbstractNum.GetId();
+	this.AbstractNum[sId] = oAbstractNum;
+
+	return sId;
+};
+/**
+ * Добавляем абстрактную нумерацию
+ * @param oNum {oNum}
+ * @returns {string} идентификатор нумерации
+ */
+CNumbering.prototype.AddNum = function(oNum)
+{
+	if (!(oNum instanceof CNum))
+		return;
+
+	var sNumId       = oNum.GetId();
+	this.Num[sNumId] = oNum;
+
+	return sNumId;
 };
 /**
  * Доступ к абстрактной нумерации по Id

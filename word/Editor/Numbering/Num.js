@@ -83,7 +83,7 @@ CNum.prototype.Copy = function()
 	if (oAbstractNum && oNewAbstractNum)
 		oNewAbstractNum.Copy(oAbstractNum);
 
-	for (var nLvl = 0; nLvl < 8; ++nLvl)
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
 	{
 		if (this.LvlOverride[nLvl])
 			oNum.SetLvlOverride(this.LvlOverride[nLvl].GetLvl().Copy(), nLvl, this.LvlOverride[nLvl].GetStartOverride());
