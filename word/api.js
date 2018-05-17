@@ -6952,9 +6952,9 @@ background-repeat: no-repeat;\
 		if (opt_isPassword) {
 			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM);
 			t.sendEvent("asc_onAdvancedOptions", options, t.advancedOptionsAction);
-		} else if(data) {
+		} else {
 			var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
-			if (typeof Blob !== 'undefined' && typeof FileReader !== 'undefined') {
+			if (data && typeof Blob !== 'undefined' && typeof FileReader !== 'undefined') {
 				AscCommon.getJSZipUtils().getBinaryContent(data, function(err, data) {
 					if (err) {
 						t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
@@ -6968,8 +6968,6 @@ background-repeat: no-repeat;\
 				options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
 				t.sendEvent("asc_onAdvancedOptions", options, t.advancedOptionsAction);
 			}
-		} else {
-			t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 		}
 	};
 	asc_docs_api.prototype._onOpenCommand = function(data)
