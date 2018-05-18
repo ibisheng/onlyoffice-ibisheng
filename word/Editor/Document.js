@@ -4927,12 +4927,12 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 	// Если у параграфа уже была нумерация, тогда мы сохраняем её уровень, если нет - добавляем с новым значением nNumLvl
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oOldNumPr = this.Content[Index].GetNumPr();
+		var oOldNumPr = this.Content[nIndex].GetNumPr();
 
 		if (oOldNumPr)
-			this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+			this.Content[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 		else
-			this.Content[Index].ApplyNumPr(sNumId, nNumLvl);
+			this.Content[nIndex].ApplyNumPr(sNumId, nNumLvl);
 	}
 };
 CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrParagraphs, nType)
@@ -15249,13 +15249,20 @@ CDocument.prototype.controller_GetSelectedText = function(bClearText, oPr)
 };
 CDocument.prototype.controller_GetCurrentParagraph = function(bIgnoreSelection, arrSelectedParagraphs)
 {
-	if (null !== arrSelectedParagraphs && true === this.Selection.Use)
+	if (null !== arrSelectedParagraphs)
 	{
-		var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
-		var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
-		for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+		if (true === this.Selection.Use)
 		{
-			this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+			var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+			var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+			for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+			{
+				this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].GetCurrentParagraph(false, arrSelectedParagraphs);
 		}
 	}
 	else

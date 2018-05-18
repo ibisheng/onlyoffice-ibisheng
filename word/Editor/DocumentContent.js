@@ -1679,11 +1679,18 @@ CDocumentContent.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrS
 	{
 		if (arrSelectedParagraphs)
 		{
-			var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
-			var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
-			for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+			if (true === this.Selection.Use)
 			{
-				this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+				var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+				var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+				for (var nPos = nStartPos; nPos <= nEndPos; ++nPos)
+				{
+					this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+				}
+			}
+			else
+			{
+				this.Content[this.CurPos.ContentPos].GetCurrentParagraph(false, arrSelectedParagraphs);
 			}
 		}
 		else

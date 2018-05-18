@@ -65,6 +65,10 @@ CNum.prototype.Get_Id = function()
 {
 	return this.Id;
 };
+/**
+ * Идентификатор данного объекта
+ * @returns {string}
+ */
 CNum.prototype.GetId = function()
 {
 	return this.Id;
@@ -526,8 +530,8 @@ CNum.prototype.Draw = function(nX, nY, oContext, nLvl, oNumInfo, oNumTextPr, oTh
 	var oLvl    = this.GetLvl(nLvl);
 	var arrText = oLvl.GetLvlText();
 
-	Context.SetTextPr(oNumTextPr, oTheme);
-	Context.SetFontSlot(fontslot_ASCII);
+	oContext.SetTextPr(oNumTextPr, oTheme);
+	oContext.SetFontSlot(fontslot_ASCII);
 	g_oTextMeasurer.SetTextPr(oNumTextPr, oTheme);
 	g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
 
@@ -544,17 +548,17 @@ CNum.prototype.Draw = function(nX, nY, oContext, nLvl, oNumInfo, oNumTextPr, oTh
 
 				var FontSlot = g_font_detector.Get_FontClass(arrText[nTextIndex].Value.charCodeAt(0), Hint, lcid, bCS, bRTL);
 
-				Context.SetFontSlot(FontSlot);
+				oContext.SetFontSlot(FontSlot);
 				g_oTextMeasurer.SetFontSlot(FontSlot);
 
-				Context.FillText(nX, nY, arrText[nTextIndex].Value);
+				oContext.FillText(nX, nY, arrText[nTextIndex].Value);
 				nX += g_oTextMeasurer.Measure(arrText[nTextIndex].Value).Width;
 
 				break;
 			}
 			case numbering_lvltext_Num:
 			{
-				Context.SetFontSlot(fontslot_ASCII);
+				oContext.SetFontSlot(fontslot_ASCII);
 				g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
 
 				var nCurLvl = arrText[nTextIndex].Value;
@@ -566,7 +570,7 @@ CNum.prototype.Draw = function(nX, nY, oContext, nLvl, oNumInfo, oNumTextPr, oTh
 				for (var Index2 = 0; Index2 < T.length; Index2++)
 				{
 					var Char = T.charAt(Index2);
-					Context.FillText(nX, nY, Char);
+					oContext.FillText(nX, nY, Char);
 					nX += g_oTextMeasurer.Measure(Char).Width;
 				}
 
@@ -634,7 +638,10 @@ CNum.prototype.Measure = function(oContext, nLvl, oNumInfo, oNumTextPr, oTheme)
 		}
 	}
 
-	return {Width : nX, Ascent : nAscent};
+	return {
+		Width  : nX,
+		Ascent : nAscent
+	};
 };
 /**
  * Составляем список всех используемых символов
@@ -733,6 +740,56 @@ CNum.prototype.Process_EndLoad = function(oData)
 	if (undefined !== oData.Lvl)
 		this.RecalculateRelatedParagraphs(oData.Lvl);
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с совместным редактирования
+//----------------------------------------------------------------------------------------------------------------------
+CNum.prototype.Write_ToBinary2 = function(oWriter)
+{
+	oWriter.WriteLong(AscDFH.historyitem_type_Num);
+
+	// String          : Id
+	// String          : AbstractNumId
+	// Variable[9 Lvl] : LvlOverride
+
+	oWriter.WriteString2(this.Id);
+	oWriter.WriteString2(this.AbstractNumId);
+
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		if (this.LvlOverride[nLvl])
+		{
+			oWriter.WriteBool(true);
+			this.LvlOverride[nLvl].WriteToBinary(oWriter);
+		}
+		else
+		{
+			oWriter.WriteBool(false);
+		}
+	}
+};
+CNum.prototype.Read_FromBinary2 = function(oReader)
+{
+	// String          : Id
+	// String          : AbstractNumId
+	// Variable[9 Lvl] : LvlOverride
+
+	this.Id            = oReader.GetString2();
+	this.AbstractNumId = oReader.GetString2();
+
+	for (var nLvl = 0; nLvl < 9; ++nLvl)
+	{
+		if (oReader.GetBool())
+		{
+			this.LvlOverride[nLvl] = new CLvlOverride();
+			this.LvlOverride[nLvl].ReadFromBinary();
+		}
+	}
+
+	if (!this.Numbering)
+		this.Numbering = editor.WordControl.m_oLogicDocument.GetNumbering();
+
+	this.Numbering.AddNum(this);
+};
 
 /**
  * Класс реализующий замену уровня в нумерации CNum
@@ -792,3 +849,7 @@ CLvlOverride.prototype.ReadFromBinary = function(oReader)
 		this.NumberingLvl.ReadFromBinary(oReader);
 	}
 };
+
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CNum = CNum;

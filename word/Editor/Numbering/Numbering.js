@@ -159,7 +159,7 @@ CNumbering.prototype.AddAbstractNum = function(oAbstractNum)
 };
 /**
  * Добавляем абстрактную нумерацию
- * @param oNum {oNum}
+ * @param oNum {CNum}
  * @returns {string} идентификатор нумерации
  */
 CNumbering.prototype.AddNum = function(oNum)
