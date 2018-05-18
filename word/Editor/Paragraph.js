@@ -7424,7 +7424,6 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 			// Если выделено несколько параграфов, тогда уже по сдвигу X определяем уровень данной нумерации
 
 			var LvlFound  = -1;
-			var LvlsCount = oNum.Lvl.length;
 			for (var LvlIndex = 0; LvlIndex < 9; ++LvlIndex)
 			{
 				var oNumLvl = oNum.GetLvl(LvlIndex);
@@ -7441,7 +7440,7 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 			}
 
 			if (-1 === LvlFound)
-				LvlFound = LvlsCount - 1;
+				LvlFound = 8;
 
 			if (undefined != this.Pr.Ind && undefined != this.Ind && undefined != this.Ind.Left)
 			{

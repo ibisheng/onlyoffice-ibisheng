@@ -40,9 +40,10 @@
 /**
  * Класс представляющий нумерацию параграфов в документах
  * @param {CNumbering} oNumbering - ссылка на главный объект нумерации в документах
+ * @param {string} sAbstractNumId - идентификатор абстрактной нумерации
  * @constructor
  */
-function CNum(oNumbering)
+function CNum(oNumbering, sAbstractNumId)
 {
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -54,7 +55,7 @@ function CNum(oNumbering)
 			AscCommon.CollaborativeEditing.Add_Unlock2(this);
 	}
 
-	this.AbstractNumId = null;
+	this.AbstractNumId = sAbstractNumId ? sAbstractNumId : null;
 	this.LvlOverride   = [];
 	this.Numbering     = oNumbering;
 
@@ -620,7 +621,7 @@ CNum.prototype.Measure = function(oContext, nLvl, oNumInfo, oNumTextPr, oTheme)
 			case numbering_lvltext_Num:
 			{
 				oContext.SetFontSlot(fontslot_ASCII);
-				var nCurLvl = arrText[Index].Value;
+				var nCurLvl = arrText[nTextIndex].Value;
 
 				var T = "";
 

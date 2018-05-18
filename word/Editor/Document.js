@@ -4905,7 +4905,8 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 		{
 			var oPrevNum = oNumbering.GetNum(oLastNumPr.NumId);
 
-			var oNum = oNumbering.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
+			var oNum = oNumbering.CreateNum();
+			oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
 			oNum.SetLvl(oPrevNum.GetLvl(oLastNumPr.Lvl).Copy(), 0);
 
 			sNumId  = oNum.GetId();
@@ -4927,12 +4928,12 @@ CDocument.prototype.private_SetParagraphNumberingSimpleBullet = function(arrPara
 	// Если у параграфа уже была нумерация, тогда мы сохраняем её уровень, если нет - добавляем с новым значением nNumLvl
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oOldNumPr = this.Content[nIndex].GetNumPr();
+		var oOldNumPr = arrParagraphs[nIndex].GetNumPr();
 
 		if (oOldNumPr)
-			this.Content[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+			arrParagraphs[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 		else
-			this.Content[nIndex].ApplyNumPr(sNumId, nNumLvl);
+			arrParagraphs[nIndex].ApplyNumPr(sNumId, nNumLvl);
 	}
 };
 CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrParagraphs, nType)
@@ -5048,7 +5049,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 
 		sNumId = oNum.GetId();
 	}
-	else if (true === bDiffId || true != this.Numbering.CheckFormat(PrevId, PrevLvl, c_oAscNumberingFormat.Bullet))
+	else if (true === bDiffId || true != this.Numbering.CheckFormat(sPrevId, nPrevLvl, c_oAscNumberingFormat.Bullet))
 	{
 		var oNum = this.Numbering.CreateNum();
 		oNum.CreateDefault(c_oAscMultiLevelNumbering.Bullet);
@@ -5075,9 +5076,9 @@ CDocument.prototype.private_SetParagraphNumberingCustomBullet = function(arrPara
 		{
 			var oOldNumPr = arrParagraphs[nIndex].GetNumPr();
 			if (oOldNumPr)
-				this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 			else
-				this.Content[Index].ApplyNumPr(sNumId, 0);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, 0);
 		}
 
 		this.SetLastBulletList(sNumId, 0);
@@ -5128,7 +5129,8 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 		{
 			var oLastNum = this.Numbering.GetNum(oLastNumPr.NumId);
 
-			var oNum = this.Numbering.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
+			var oNum = this.Numbering.CreateNum();
+			oNum.CreateDefault(c_oAscMultiLevelNumbering.Numbered);
 			oNum.SetLvl(oLastNum.GetLvl(oLastNumPr.Lvl).Copy(), 0);
 
 			sNumId  = oNum.GetId();
@@ -5150,12 +5152,11 @@ CDocument.prototype.private_SetParagraphNumberingSimpleNumbered = function(arrPa
 	// Если у параграфа уже была нумерация, тогда мы сохраняем её уровень, если нет - добавляем с новым значением nNumLvl
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
-		var oOldNumPr = this.Content[Index].GetNumPr();
-
+		var oOldNumPr = arrParagraphs[nIndex].GetNumPr();
 		if (oOldNumPr)
-			this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+			arrParagraphs[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 		else
-			this.Content[Index].ApplyNumPr(sNumId, nNumLvl);
+			arrParagraphs[nIndex].ApplyNumPr(sNumId, nNumLvl);
 	}
 };
 CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrParagraphs, nType)
@@ -5230,7 +5231,7 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 		oNum       = this.Numbering.GetNum(sPrevId);
 		nChangeLvl = nPrevLvl;
 
-		this.SetLastNumberedListList(sPrevId, nPrevLvl);
+		this.SetLastNumberedList(sPrevId, nPrevLvl);
 	}
 
 	switch (nType)
@@ -5280,12 +5281,12 @@ CDocument.prototype.private_SetParagraphNumberingCustomNumbered = function(arrPa
 		{
 			var oOldNumPr = arrParagraphs[nIndex].GetNumPr();
 			if (oOldNumPr)
-				this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 			else
-				this.Content[Index].ApplyNumPr(sNumId, 0);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, 0);
 		}
 
-		this.SetLastNumberedListList(sNumId, 0);
+		this.SetLastNumberedList(sNumId, 0);
 	}
 };
 CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagraphs, nType)
@@ -5353,9 +5354,9 @@ CDocument.prototype.private_SetParagraphNumberingMultiLevel = function(arrParagr
 		{
 			var oOldNumPr = arrParagraphs[nIndex].GetNumPr();
 			if (oOldNumPr)
-				this.Content[Index].ApplyNumPr(sNumId, oOldNumPr.Lvl);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, oOldNumPr.Lvl);
 			else
-				this.Content[Index].ApplyNumPr(sNumId, 0);
+				arrParagraphs[nIndex].ApplyNumPr(sNumId, 0);
 		}
 	}
 };

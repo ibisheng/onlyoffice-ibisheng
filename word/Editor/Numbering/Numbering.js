@@ -77,9 +77,7 @@ CNumbering.prototype.CopyAllNums = function(oNumbering)
 	for (var sOldId in this.Num)
 	{
 		var oOldNum = this.Num[sOldId];
-		var oNewNum = new CNum(oNumbering);
-
-		oNewNum.AbstractNumId = oAbstractMap[oOldNum.AbstractNumId];
+		var oNewNum = new CNum(oNumbering, oAbstractMap[oOldNum.AbstractNumId]);
 
 		for (var nLvl = 0; nLvl < 9; ++nLvl)
 		{
@@ -200,7 +198,7 @@ CNumbering.prototype.CreateNum = function()
 	var oAbstractNum = new CAbstractNum();
 	this.AbstractNum[oAbstractNum.GetId()] = oAbstractNum;
 
-	var oNum = new CNum(this);
+	var oNum = new CNum(this, oAbstractNum.GetId());
 	this.Num[oNum.GetId()] = oNum;
 
 	return oNum;
