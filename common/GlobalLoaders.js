@@ -443,6 +443,34 @@
         this.loadImageCallBack = null;
         this.loadImageCallBackArgs = null;
 
+        this.isBlockchainSupport = false;
+        if (window["AscDesktopEditor"] &&
+            window["AscDesktopEditor"]["IsLocalFile"] &&
+            window["AscDesktopEditor"]["isBlockchainSupport"])
+        {
+            this.isBlockchainSupport = (window["AscDesktopEditor"]["isBlockchainSupport"]() && !window["AscDesktopEditor"]["IsLocalFile"]());
+
+            if (this.isBlockchainSupport)
+            {
+                Image.prototype.preload_crypto = function(_url)
+                {
+                    console.log("preload_crypto: " + _url);
+                    window["crypto_images_map"] = window["crypto_images_map"] || {};
+                    window["crypto_images_map"][_url] = this;
+                    window["AscDesktopEditor"]["PreloadCryptoImage"](_url, AscCommon.g_oDocumentUrls.getLocal(_url));
+                };
+
+                Image.prototype["onload_crypto"] = function(_src, _crypto_data) {
+                    if (_crypto_data)
+                    {
+                        // TODO: send to plugin for decryption & call this method with empty _crypto_data
+                        return;
+                    }
+                    this.src = _src;
+                };
+            }
+        }
+
 		var oThis = this;
 
         this.put_Api = function(_api)
@@ -495,6 +523,14 @@
                 else
                     this.ThemeLoader.asyncImagesEndLoaded();
             }
+        };
+
+        this.loadImageByUrl = function(_image, _url)
+        {
+            if (this.isBlockchainSupport)
+                _image.preload_crypto(_url);
+            else
+                _image.src = _url;
         };
 
         this._LoadImages = function()
@@ -567,7 +603,7 @@
 					}
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-				oImage.Image.src = oImage.src;
+				oThis.loadImageByUrl(oImage.Image, oImage.src);
 
 				if (!oThis.bIsLoadDocumentImagesNoByOrder)
                     return;
@@ -598,7 +634,7 @@
                 oThis.Api.asyncImageEndLoaded(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            oImage.Image.src = oImage.src;
+            this.loadImageByUrl(oImage.Image, oImage.src);
             return null;
         };
 
@@ -619,7 +655,7 @@
                 oThis.Api.asyncImageEndLoadedBackground(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            oImage.Image.src = oImage.src;
+            oThis.loadImageByUrl(oImage.Image, oImage.src);
         };
 
         this.LoadImagesWithCallback = function(arr, loadImageCallBack, loadImageCallBackArgs)
@@ -668,7 +704,7 @@
 						oThis.LoadImagesWithCallbackEnd();
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-				oImage.Image.src = oImage.src;
+                this.loadImageByUrl(oImage.Image, oImage.src);
 			}
         };
 
