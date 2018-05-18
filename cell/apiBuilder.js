@@ -1522,13 +1522,18 @@
 		this.range.unmerge();
 	};
 	
+	/**
+	 * Returns one cell or cells from the megre area
+	 * @memberof ApiRange
+	 * @returns {"ApiRange"}
+	 */
 	Object.defineProperty(ApiRange.prototype, "MergeArea", {
 		get: function () {
 			if (this.range.isOneCell()) {
 				var bb = this.range.hasMerged();
 				return new ApiRange((bb) ? AscCommonExcel.Range.prototype.createFromBBox(this.range.worksheet, bb) : this.range);
 			} else {
-				return null;
+				return new Error('Range must be is one cell.');
 			}
 		}
 	});
