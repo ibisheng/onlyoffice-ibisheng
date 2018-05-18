@@ -3798,6 +3798,9 @@ drawBarChart.prototype = {
 		this.ptCount = countSeries.points;
 		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		if(!this.catAx) {
+			this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_DateAx);
+		}
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._recalculateBars();
@@ -4667,6 +4670,9 @@ drawLineChart.prototype = {
 		this.ptCount = countSeries.points;
 		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		if(!this.catAx) {
+			this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_DateAx);
+		}
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._calculateLines();
@@ -5188,6 +5194,9 @@ drawAreaChart.prototype = {
 		this.ptCount = countSeries.points;
 		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		if(!this.catAx) {
+			this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_DateAx);
+		}
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._calculateProps();
@@ -6661,6 +6670,9 @@ drawHBarChart.prototype = {
 		this.ptCount = countSeries.points;
 		this.subType = this.cChartDrawer.getChartGrouping(this.chart);
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		if(!this.catAx) {
+			this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_DateAx);
+		}
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._recalculateBars();
@@ -10575,6 +10587,9 @@ drawSurfaceChart.prototype = {
 		var countSeries = this.cChartDrawer.calculateCountSeries(this.chart);
 		this.ptCount = countSeries.points;
 		this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_CatAx);
+		if(!this.catAx) {
+			this.catAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_DateAx);
+		}
 		this.valAx = this.cChartDrawer.getAxisFromAxId(this.chart.axId, AscDFH.historyitem_type_ValAx);
 
 		this._recalculate();
