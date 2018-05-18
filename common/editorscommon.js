@@ -3376,9 +3376,11 @@
         this.handleChangesCallback = null;
         this.isChangesHandled = false;
 
+        this.isNeedCrypt = false;
+
         this.sendChanges = function(sender, data, type)
         {
-            if (!window.g_asc_plugins.isRunnedEncryption())
+            if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
             {
                 if (AscCommon.EncryptionMessageType.Encrypt == type)
                 {
@@ -3446,7 +3448,7 @@
 
         this.handleChanges = function(_array, _sender, _callback)
 		{
-            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length)
+            if (!window.g_asc_plugins.isRunnedEncryption() || 0 == _array.length || !this.isNeedCrypt)
 			{
 				this.isChangesHandled = true;
 				_callback.call(_sender);
