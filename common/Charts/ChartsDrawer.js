@@ -179,6 +179,10 @@ CChartsDrawer.prototype =
 					var serAx = new serAxisChart();
 					serAx.recalculate(this, axId);
 					this.serAxisChart.push(serAx);
+				} else if (axId instanceof AscFormat.CDateAx) {
+					var catAx = new serAxisChart();
+					catAx.recalculate(this, axId);
+					this.catAxisChart.push(catAx);
 				}
 			}
 
@@ -851,7 +855,7 @@ CChartsDrawer.prototype =
 					calculateLeft = horizontalAxis.xPoints[horizontalAxis.xPoints.length - 1].pos;
 					calculateRight = this.calcProp.widthCanvas / pxToMM - horizontalAxis.xPoints[0].pos;
 				}
-			} else if (horizontalAxis instanceof AscFormat.CCatAx && verticalAxis && !isNaN(verticalAxis.posX)) {
+			} else if ((horizontalAxis instanceof AscFormat.CCatAx || horizontalAxis instanceof AscFormat.CDateAx) && verticalAxis && !isNaN(verticalAxis.posX)) {
 				diffPoints = horizontalAxis.xPoints[1] ? Math.abs(horizontalAxis.xPoints[1].pos - horizontalAxis.xPoints[0].pos) : Math.abs(horizontalAxis.xPoints[0].pos - verticalAxis.posX) * 2;
 
 				curBetween = 0;
@@ -882,7 +886,7 @@ CChartsDrawer.prototype =
 					calculateTop = verticalAxis.yPoints[0].pos;
 					calculateBottom = this.calcProp.heightCanvas / pxToMM - verticalAxis.yPoints[verticalAxis.yPoints.length - 1].pos;
 				}
-			} else if (verticalAxis instanceof AscFormat.CCatAx && horizontalAxis && !isNaN(horizontalAxis.posY)) {
+			} else if ((verticalAxis instanceof AscFormat.CCatAx || verticalAxis instanceof AscFormat.CDateAx) && horizontalAxis && !isNaN(horizontalAxis.posY)) {
 
 				diffPoints = verticalAxis.yPoints[1] ? Math.abs(verticalAxis.yPoints[1].pos - verticalAxis.yPoints[0].pos) : Math.abs(verticalAxis.yPoints[0].pos - horizontalAxis.posY) * 2;
 
@@ -959,7 +963,7 @@ CChartsDrawer.prototype =
 		if(horizontalAxis && horizontalAxis.xPoints &&  horizontalAxis.xPoints.length) {
 			var orientationHorAxis = horizontalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
 			diffPoints = 0;
-			if(horizontalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+			if((horizontalAxis instanceof AscFormat.CDateAx || horizontalAxis instanceof AscFormat.CCatAx) && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 				diffPoints = Math.abs((horizontalAxis.interval) / 2);
 			}
 			if(orientationHorAxis) {
@@ -984,7 +988,7 @@ CChartsDrawer.prototype =
 		if(verticalAxis && verticalAxis.yPoints && verticalAxis.yPoints.length) {
 			var orientationVerAxis = verticalAxis.scaling.orientation === ORIENTATION_MIN_MAX;
 			diffPoints = 0;
-			if(verticalAxis instanceof AscFormat.CCatAx && crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
+			if((verticalAxis instanceof AscFormat.CDateAx || verticalAxis instanceof AscFormat.CCatAx)&& crossBetween === AscFormat.CROSS_BETWEEN_BETWEEN) {
 				diffPoints = Math.abs((verticalAxis.interval) / 2);
 			}
 			if(orientationVerAxis) {
