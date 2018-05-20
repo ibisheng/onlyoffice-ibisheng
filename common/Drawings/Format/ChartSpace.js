@@ -9818,12 +9818,21 @@ CChartSpace.prototype.hitInTextRect = function()
                                 calc_entry = calc_entryes[i];
                                 if(calc_entry.calcMarkerUnion.marker)
                                     calc_entry.calcMarkerUnion.marker.localX = cur_left_x + distance_to_text + line_marker_width/2 - marker_size/2;
-                                calc_entry.calcMarkerUnion.lineMarker.localX = cur_left_x + distance_to_text;
-                                calc_entry.calcMarkerUnion.lineMarker.localY = Math.max(0, legend_height/2);
+                                if(calc_entry.calcMarkerUnion.lineMarker){
+                                    calc_entry.calcMarkerUnion.lineMarker.localX = cur_left_x + distance_to_text;
+                                    calc_entry.calcMarkerUnion.lineMarker.localY = Math.max(0, legend_height/2);
+                                }
                                 cur_left_x += arr_width[i];
                                 if(calc_entry.calcMarkerUnion.marker)
                                     calc_entry.calcMarkerUnion.marker.localY = Math.max(0, legend_height/2 - marker_size/2);
-                                calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX+line_marker_width+distance_to_text;
+                                if(calc_entry.calcMarkerUnion.lineMarker){
+                                    calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX+line_marker_width+distance_to_text;
+                                }
+                                else{
+                                    if(calc_entry.calcMarkerUnion.marker){
+                                        calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width+distance_to_text;
+                                    }
+                                }
                                 calc_entry.localY = 0;
                             }
                             legend.extX = legend_width;
@@ -9880,8 +9889,11 @@ CChartSpace.prototype.hitInTextRect = function()
                             for(i = 0; i < cut_index && i < calc_entryes.length; ++i)
                             {
                                 calc_entry = calc_entryes[i];
-                                calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
-                                calc_entry.calcMarkerUnion.lineMarker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
+                                if(calc_entry.calcMarkerUnion.lineMarker){
+                                    calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
+                                    calc_entry.calcMarkerUnion.lineMarker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
+                                }
+
 
                                 if(calc_entry.calcMarkerUnion.marker)
                                 {
@@ -9889,7 +9901,14 @@ CChartSpace.prototype.hitInTextRect = function()
                                     calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
                                 }
 
-                                calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
+                                if(calc_entry.calcMarkerUnion.lineMarker){
+                                    calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
+                                }
+                                else{
+                                    if(calc_entry.calcMarkerUnion.marker){
+                                        calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
+                                    }
+                                }
                                 calc_entry.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height);
                             }
                             legend.setPosition(0, 0);

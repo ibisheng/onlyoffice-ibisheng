@@ -461,15 +461,19 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculateAxisLabels = false;
             b_recalc_labels = true;
         }
-
+        
         if(this.recalcInfo.recalculateAxisVal)
         {
-            bCheckLabels = true;
-
-            this.recalculateAxis();
+            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                //old variant
+                this.recalculateAxis();
+            }
+            else{
+                this.recalculateAxes();
+            }
             this.recalcInfo.recalculateAxisVal = false;
+            bCheckLabels = true;
         }
-
 
 
         if(this.recalcInfo.recalculatePenBrush)

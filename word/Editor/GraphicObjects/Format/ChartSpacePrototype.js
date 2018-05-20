@@ -282,10 +282,6 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalcTitle = null;
             this.recalcInfo.bRecalculatedTitle = true;
         }
-        else
-        {
-
-        }
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
@@ -369,14 +365,18 @@ CChartSpace.prototype.recalculate = function()
         }
 
 
-
         if(this.recalcInfo.recalculateAxisVal)
         {
-            this.recalculateAxis();
+            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                //old variant
+                this.recalculateAxis();
+            }
+            else{
+                this.recalculateAxes();
+            }
             this.recalcInfo.recalculateAxisVal = false;
             bCheckLabels = true;
         }
-
         if(this.recalcInfo.recalculatePenBrush)
         {
             this.recalculatePenBrush();
