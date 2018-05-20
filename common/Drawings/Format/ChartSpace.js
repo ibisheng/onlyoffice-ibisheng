@@ -3588,6 +3588,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                     {
                         if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                         {
+                            hidden = false;
                             cell = source_worksheet.getCell3(range.r1, j);
                             var sCellValue = cell.getValue();
                             var value = cell.getNumberValue();
@@ -3599,7 +3600,6 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             }
                             if(AscFormat.isRealNumber(value))
                             {
-                                hidden = false;
                                 pt = new AscFormat.CNumericPoint();
                                 pt.setIdx(pt_index);
                                 pt.setVal(value);
@@ -3673,6 +3673,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                     {
                         if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                         {
+                            hidden = false;
                             cell = source_worksheet.getCell3(j, range.c1);
                             var value = cell.getNumberValue();
                             var sCellValue = cell.getValue();
@@ -3684,7 +3685,6 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             }
                             if(AscFormat.isRealNumber(value))
                             {
-                                hidden = false;
                                 pt = new AscFormat.CNumericPoint();
                                 pt.setIdx(pt_index);
                                 pt.setVal(value);
@@ -3764,12 +3764,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         }
                     }
 
-                }
-                for(j = 0; j < oCurRef.length; ++j){
-                    for(var k = 0; k < oCurRef[j].length; ++k){
-
-                    }
-                }
+                };
             }
         }
         num_cache.setPtCount(pt_index);
