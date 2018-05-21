@@ -4743,6 +4743,10 @@ drawLineChart.prototype = {
 	},
 
 	_calculateAllLines: function (points) {
+		if(!points) {
+			return;
+		}
+
 		var xPoints = this.catAx.xPoints;
 		var yPoints = this.valAx.yPoints;
 
