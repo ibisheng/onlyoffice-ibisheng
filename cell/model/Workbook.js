@@ -3767,6 +3767,9 @@
 			}
 		}
 	};
+	Worksheet.prototype.getSheetView = function () {
+		return this.sheetViews[0];
+	};
 	Worksheet.prototype.getSheetViewSettings = function () {
 		return this.sheetViews[0].clone();
 	};

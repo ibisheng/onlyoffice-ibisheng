@@ -1261,7 +1261,7 @@
     };
 
     WorksheetView.prototype._initPane = function () {
-        var pane = this.model.sheetViews[0].pane;
+        var pane = this.model.getSheetView().pane;
         if ( null !== pane && pane.isInit() && !window['IS_NATIVE_EDITOR']) {
             this.topLeftFrozenCell = pane.topLeftFrozenCell;
             this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
@@ -1315,7 +1315,7 @@
 
     /** Вычисляет ширину колонки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderColumnWidth = function () {
-        if (false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+        if (false === this.model.getSheetView().asc_getShowRowColHeaders()) {
             this.headersWidth = 0;
         } else {
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
@@ -1329,16 +1329,7 @@
 
     /** Вычисляет высоту строки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderRowHeight = function () {
-        if ( false === this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
-            this.headersHeight = 0;
-        }
-        else
-        //this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
-        {
-            this.headersHeight = this.headersHeightByFont;
-        }
-
-        //this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
+		this.headersHeight = (false === this.model.getSheetView().asc_getShowRowColHeaders()) ? 0 : this.headersHeightByFont;
         this.cellsTop = this.headersTop + this.headersHeight;
     };
 
@@ -2014,7 +2005,7 @@
     };
 
     WorksheetView.prototype._drawCorner = function () {
-        if (false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+        if (false === this.model.getSheetView().asc_getShowRowColHeaders()) {
             return;
         }
         var x2 = this.headersLeft + this.headersWidth;
@@ -2039,7 +2030,7 @@
     /** Рисует заголовки видимых колонок */
     WorksheetView.prototype._drawColumnHeaders =
       function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-          if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+          if (null === drawingCtx && false === this.model.getSheetView().asc_getShowRowColHeaders()) {
               return;
           }
           var vr = this.visibleRange;
@@ -2076,7 +2067,7 @@
 
     /** Рисует заголовки видимых строк */
     WorksheetView.prototype._drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-        if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+        if (null === drawingCtx && false === this.model.getSheetView().asc_getShowRowColHeaders()) {
             return;
         }
         var vr = this.visibleRange;
@@ -2289,7 +2280,7 @@
 	/** Рисует сетку таблицы */
 	WorksheetView.prototype._drawGrid = function (drawingCtx, range, leftFieldInPt, topFieldInPt, width, height) {
 		// Возможно сетку не нужно рисовать (при печати свои проверки)
-		if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines()) {
+		if (null === drawingCtx && false === this.model.getSheetView().asc_getShowGridLines()) {
 			return;
 		}
 
@@ -3108,7 +3099,7 @@
 			}
 			ctx.stroke();
 
-		} else if (this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+		} else if (this.model.getSheetView().asc_getShowRowColHeaders()) {
 			fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
 			fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
 			ctx.stroke();
@@ -3157,7 +3148,7 @@
     WorksheetView.prototype._isFrozenAnchor = function ( x, y ) {
 
         var result = {result: false, cursor: "move", name: ""};
-        if ( false === this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
+        if ( false === this.model.getSheetView().asc_getShowRowColHeaders() ) {
             return result;
         }
 
@@ -3284,12 +3275,12 @@
             if (null !== this.topLeftFrozenCell) {
                 isUpdate = true;
             }
-            this.topLeftFrozenCell = this.model.sheetViews[0].pane = null;
+            this.topLeftFrozenCell = this.model.getSheetView().pane = null;
         } else { // Создание
             if (null === this.topLeftFrozenCell) {
                 isUpdate = true;
             }
-            var pane = this.model.sheetViews[0].pane = new AscCommonExcel.asc_CPane();
+            var pane = this.model.getSheetView().pane = new AscCommonExcel.asc_CPane();
             this.topLeftFrozenCell = pane.topLeftFrozenCell = new AscCommon.CellAddress(row, col, 0);
         }
         this.visibleRange.c1 = col;
