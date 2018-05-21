@@ -8826,6 +8826,10 @@ DrawingObjectsController.prototype =
 
     checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionalObjects, bNoCheckLock)
     {
+        var oApi = Asc.editor;
+        if(oApi && oApi.collaborativeEditing && oApi.collaborativeEditing.getGlobalLock()){
+            return;
+        }
         var selection_state = this.getSelectionState();
         if(!(bNoCheckLock === true))
         {

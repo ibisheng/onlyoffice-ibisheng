@@ -244,6 +244,10 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = functio
     if(!this.canEdit()){
         return;
     }
+    var oApi = Asc.editor;
+    if(oApi && oApi.collaborativeEditing && oApi.collaborativeEditing.getGlobalLock()){
+        return;
+    }
     var selection_state = this.getSelectionState();
     this.drawingObjects.objectLocker.reset();
     for(var i = 0; i < this.selectedObjects.length; ++i)
@@ -515,6 +519,14 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.startRecalculate();
 };
 
+DrawingObjectsController.prototype.isViewMode = function()
+{
+    return this.drawingObjects.isViewerMode();
+};
+DrawingObjectsController.prototype.canEdit = function()
+{
+    return this.drawingObjects.isViewerMode();
+};
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {

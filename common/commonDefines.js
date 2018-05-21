@@ -1196,8 +1196,6 @@
 	prot['No']                               = prot.No;
 	prot['Unknown']                          = prot.Unknown;
 	prot['ConvertationTimeout']              = prot.ConvertationTimeout;
-	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
-	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['DownloadError']                    = prot.DownloadError;
 	prot['UnexpectedGuid']                   = prot.UnexpectedGuid;
 	prot['Database']                         = prot.Database;
@@ -1208,6 +1206,7 @@
 	prot['UplImageFileCount']                = prot.UplImageFileCount;
 	prot['NoSupportClipdoard']               = prot.NoSupportClipdoard;
 	prot['UplImageUrl']                      = prot.UplImageUrl;
+	prot['MaxDataPointsError']               = prot.MaxDataPointsError;
 	prot['StockChartError']                  = prot.StockChartError;
 	prot['CoAuthoringDisconnect']            = prot.CoAuthoringDisconnect;
 	prot['ConvertationPassword']             = prot.ConvertationPassword;
@@ -1236,6 +1235,8 @@
 	prot['CannotMoveRange']                  = prot.CannotMoveRange;
 	prot['MaxDataSeriesError']               = prot.MaxDataSeriesError;
 	prot['CannotFillRange']                  = prot.CannotFillRange;
+	prot['ConvertationOpenError']            = prot.ConvertationOpenError;
+	prot['ConvertationSaveError']            = prot.ConvertationSaveError;
 	prot['UserDrop']                         = prot.UserDrop;
 	prot['Warning']                          = prot.Warning;
 	prot['PrintMaxPagesCount']               = prot.PrintMaxPagesCount;

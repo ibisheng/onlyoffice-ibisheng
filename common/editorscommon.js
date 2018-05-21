@@ -385,10 +385,15 @@
 	function CHTMLCursor()
 	{
 		this.map = {};
+		this.mapRetina = {};
 
 		this.value = function(param)
 		{
-			return this.map[param] ? this.map[param] : param;
+			var _map = this.map;
+			if (window["AscDesktopEditor"] && AscCommon.AscBrowser.isRetina)
+				_map = this.mapRetina;
+
+			return _map[param] ? _map[param] : param;
 		};
 
 		this.register = function(type, url_ie, url_main, default_css_value)
@@ -408,7 +413,8 @@
 			}
 			else
 			{
-				this.map[type] = (url_main + ", " + default_css_value);
+				this.map[type] = ("url('../../../../sdkjs/common/Images/" + url_main[0] + ".png') " + url_main[1] + " " + url_main[2] + ", " + default_css_value);
+                this.mapRetina[type] = ("url('../../../../sdkjs/common/Images/" + url_main[0] + "_2x.png') " + (url_main[1] << 1) + " " + (url_main[2] << 1) + ", " + default_css_value);
 			}
 		};
 	}
@@ -2496,7 +2502,7 @@
 
 	var g_oHtmlCursor = new CHTMLCursor();
 	var kCurFormatPainterWord = 'de-formatpainter';
-	g_oHtmlCursor.register(kCurFormatPainterWord, "text_copy", "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11", "pointer");
+	g_oHtmlCursor.register(kCurFormatPainterWord, "text_copy", ["text_copy", 2, 11], "pointer");
 
 	function asc_ajax(obj)
 	{
@@ -3156,6 +3162,8 @@
 		this.Height = h;
 
 		this.CanvasReturn = null;
+
+		this.IsAsync = false;
 	}
 
 	CSignatureDrawer.prototype.getCanvas = function()
@@ -3199,6 +3207,12 @@
 
 	CSignatureDrawer.prototype.setText = function(text, font, size, isItalic, isBold)
 	{
+		if (this.IsAsync)
+		{
+			this.Text = text;
+			return;
+		}
+
 		this.Image = "";
 		this.ImageHtml = null;
 
@@ -3208,22 +3222,35 @@
 		this.Italic = isItalic;
 		this.Bold = isBold;
 
-		var loader     = AscCommon.g_font_loader;
-		var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
-		var isasync    = loader.LoadFont(fontinfo, function() {
-			window.Asc.g_signature_drawer.Api.sync_EndAction(Asc.c_oAscAsyncActionType.Information, Asc.c_oAscAsyncAction.LoadFont);
-			window.Asc.g_signature_drawer.drawText();
-		});
+		this.IsAsync = true;
+        AscFonts.FontPickerByCharacter.checkText(this.Text, this, function() {
 
-		if (false === isasync)
-		{
-			this.drawText();
-		}
+        	this.IsAsync = false;
+
+            var loader     = AscCommon.g_font_loader;
+            var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
+            var isasync    = loader.LoadFont(fontinfo, function() {
+                window.Asc.g_signature_drawer.Api.sync_EndAction(Asc.c_oAscAsyncActionType.Information, Asc.c_oAscAsyncAction.LoadFont);
+                window.Asc.g_signature_drawer.drawText();
+            });
+
+            if (false === isasync)
+            {
+                this.drawText();
+            }
+
+        });
 	};
 
 	CSignatureDrawer.prototype.drawText = function()
 	{
+        var _oldTurn = this.Api.isViewMode;
+        var _oldMarks = this.Api.ShowParaMarks;
+        this.Api.isViewMode = true;
+        this.Api.ShowParaMarks = false;
 		AscFormat.ExecuteNoHistory(AscCommon.DrawTextByCenter, this, []);
+        this.Api.isViewMode = _oldTurn;
+        this.Api.ShowParaMarks = _oldMarks;
 	};
 
 	CSignatureDrawer.prototype.drawImage = function()

@@ -393,9 +393,9 @@ window["asc_initAdvancedOptions"] = function(_code, _file_hash)
 {
     var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 
-    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunned("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}"))
+    if ((_code == 90 || _code == 91) && window.g_asc_plugins && window.g_asc_plugins.isRunnedEncryption())
 	{
-		window.g_asc_plugins.init("asc.{F2402876-659F-47FB-A646-67B49F2B57D0}", { "type" : "getPasswordByFile", "hash" : _file_hash });
+		window.g_asc_plugins.sendToEncryption({ "type" : "getPasswordByFile", "hash" : _file_hash });
 		return;
 	}
 
@@ -656,9 +656,9 @@ function getBinaryArray(_data, _len)
 	return _array;
 }
 
-// OnlyPass ----------------------------------
+// encryption ----------------------------------
 var _proto = Asc['asc_docs_api'] ? Asc['asc_docs_api'] : Asc['spreadsheet_api'];
-_proto.prototype["pluginMethod_OnlyPass"] = function(obj)
+_proto.prototype["pluginMethod_OnEncryption"] = function(obj)
 {
 	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
 	switch (obj.type)

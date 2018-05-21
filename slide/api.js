@@ -1944,7 +1944,7 @@ background-repeat: no-repeat;\
 	    if (!this.canEdit())
     	    return;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, true, false)) {
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, false)) {
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 
 			window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(arguments[5]);
@@ -7206,6 +7206,7 @@ background-repeat: no-repeat;\
 				window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, this.ThemeLoader.ThemesUrl, this.getCurrentPage());
 
 				var oDocRenderer                         = new AscCommon.CDocumentRenderer();
+                oDocRenderer.InitPicker(AscCommon.g_oTextMeasurer.m_oManager);
 				oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
 				var bOldShowMarks                        = this.ShowParaMarks;
 				this.ShowParaMarks                       = false;

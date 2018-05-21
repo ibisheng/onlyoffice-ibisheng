@@ -657,7 +657,51 @@
 			if (this.runnedPluginsMap[this.guidAsyncMethod])
 				this.runnedPluginsMap[this.guidAsyncMethod].methodReturnAsync = true;
 			return this.guidAsyncMethod;
-		}
+		},
+
+        /* encryption methods ------------- */
+        getEncryption : function()
+        {
+            var _count = this.plugins.length;
+            var i = 0;
+            for (i = 0; i < _count; i++)
+            {
+                var _variation = this.plugins[i].variations[0];
+                if (_variation)
+                {
+                    if ("desktop" == _variation.initDataType && "encryption" == _variation.initData)
+                        return this.plugins[i];
+                }
+            }
+
+            _count = this.systemPlugins.length;
+            for (i = 0; i < _count; i++)
+            {
+                var _variation = this.systemPlugins[i].variations[0];
+                if (_variation)
+                {
+                    if ("desktop" == _variation.initDataType && "encryption" == _variation.initData)
+                        return this.systemPlugins[i];
+                }
+            }
+
+            return null;
+        },
+        isRunnedEncryption : function()
+        {
+            var _plugin = this.getEncryption();
+            if (!_plugin)
+            	return false;
+            return this.isRunned(_plugin.guid);
+        },
+        sendToEncryption : function(data)
+        {
+            var _plugin = this.getEncryption();
+            if (!_plugin)
+            	return;
+            this.init(_plugin.guid, data);
+        }
+        /* -------------------------------- */
 	};
 
 	// export

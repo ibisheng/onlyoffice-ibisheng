@@ -4654,6 +4654,10 @@ function ObjectLocker(ws) {
                 callback(result, sync);
         }
 
+        if(Asc.editor && Asc.editor.collaborativeEditing && Asc.editor.collaborativeEditing.getGlobalLock()){
+            callbackEx(false, true);
+            return false;
+        }
         var bRet = true;
         if (!aObjectId.length) {
             // Запрещено совместное редактирование
