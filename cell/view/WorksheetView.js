@@ -285,8 +285,6 @@
     function WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
         this.settings = settings;
 
-        this.vspRatio = 1.275;
-
         this.handlers = handlers;
         this.model = model;
 
@@ -425,7 +423,7 @@
 		this.headersHeightByFont = tm.height + 1;
 
 		this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
-		this.defaultRowDescender = this._calcRowDescender(defaultFontSize);
+		this.defaultRowDescender = this.stringRender.lines[0].d;
 		AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight =
 			Math.min(this.maxRowHeight, this.model.getDefaultHeight() || this.headersHeightByFont);
 
@@ -1313,15 +1311,6 @@
         res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
 		res.charCount = this.model.colWidthToCharCount(res.width);
         return res;
-    };
-
-    /**
-     * Вычисляет Descender строки
-     * @param {Number} fontSize
-     * @returns {Number}
-     */
-    WorksheetView.prototype._calcRowDescender = function ( fontSize ) {
-        return asc_calcnpt( fontSize * (this.vspRatio - 1), this._getPPIY() ); // ToDo возможно стоит тоже использовать 96
     };
 
     /** Вычисляет ширину колонки заголовков (в pt) */
