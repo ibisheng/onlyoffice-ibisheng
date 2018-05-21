@@ -3315,20 +3315,10 @@
         var c = this.cols;
         var r = this.rows;
         var oIntersection = range.intersectionSimple(visibleRange);
-        var ppiX = this._getPPIX(), ppiY = this._getPPIY();
 
         if (!oIntersection) {
             return true;
         }
-
-        var width_1px = asc_calcnpt(0, ppiX, 1/*px*/), width_2px = asc_calcnpt(0, ppiX, 2
-          /*px*/), width_3px = asc_calcnpt(0, ppiX, 3/*px*/), width_4px = asc_calcnpt(0, ppiX, 4
-          /*px*/), width_5px = asc_calcnpt(0, ppiX, 5/*px*/), width_7px = asc_calcnpt(0, ppiX, 7/*px*/),
-
-          height_1px = asc_calcnpt(0, ppiY, 1/*px*/), height_2px = asc_calcnpt(0, ppiY, 2
-          /*px*/), height_3px = asc_calcnpt(0, ppiY, 3/*px*/), height_4px = asc_calcnpt(0, ppiY, 4
-          /*px*/), height_5px = asc_calcnpt(0, ppiY, 5/*px*/), height_7px = asc_calcnpt(0, ppiY, 7/*px*/);
-
 
         var fHorLine, fVerLine;
         var canFill = AscCommonExcel.selectionLineType.Selection & selectionLineType;
@@ -3420,33 +3410,33 @@
         if (isResize || isPromote) {
             ctx.setFillStyle(colorN);
             if (drawRightSide && drawBottomSide) {
-                ctx.fillRect(x2 - width_4px, y2 - height_4px, width_7px, height_7px);
+                ctx.fillRect(x2 - 4, y2 - 4, 7, 7);
             }
             ctx.setFillStyle(strokeColor);
             if (drawRightSide && drawBottomSide) {
-                ctx.fillRect(x2 - width_3px, y2 - height_3px, width_5px, height_5px);
+                ctx.fillRect(x2 - 3, y2 - 3, 5, 5);
             }
 
             if (isResize) {
                 ctx.setFillStyle(colorN);
                 if (drawLeftSide && drawTopSide) {
-                    ctx.fillRect(x1 - width_4px, y1 - height_4px, width_7px, height_7px);
+                    ctx.fillRect(x1 - 4, y1 - 4, 7, 7);
                 }
                 if (drawRightSide && drawTopSide) {
-                    ctx.fillRect(x2 - width_4px, y1 - height_4px, width_7px, height_7px);
+                    ctx.fillRect(x2 - 4, y1 - 4, 7, 7);
                 }
                 if (drawLeftSide && drawBottomSide) {
-                    ctx.fillRect(x1 - width_4px, y2 - height_4px, width_7px, height_7px);
+                    ctx.fillRect(x1 - 4, y2 - 4, 7, 7);
                 }
                 ctx.setFillStyle(strokeColor);
                 if (drawLeftSide && drawTopSide) {
-                    ctx.fillRect(x1 - width_3px, y1 - height_3px, width_5px, height_5px);
+                    ctx.fillRect(x1 - 3, y1 - 3, 5, 5);
                 }
                 if (drawRightSide && drawTopSide) {
-                    ctx.fillRect(x2 - width_3px, y1 - height_3px, width_5px, height_5px);
+                    ctx.fillRect(x2 - 3, y1 - 3, 5, 5);
                 }
                 if (drawLeftSide && drawBottomSide) {
-                    ctx.fillRect(x1 - width_3px, y2 - height_3px, width_5px, height_5px);
+                    ctx.fillRect(x1 - 3, y2 - 3, 5, 5);
                 }
             }
         }
