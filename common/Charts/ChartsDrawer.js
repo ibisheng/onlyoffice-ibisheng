@@ -1063,6 +1063,10 @@ CChartsDrawer.prototype =
 	
 	//****new calculate data****
 	_calculateStackedData2: function (data, chart) {
+		if(!data) {
+			return;
+		}
+
 		var maxMinObj;
 		var grouping = this.getChartGrouping(chart);
 		var chartType = this._getChartType(chart);
