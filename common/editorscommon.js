@@ -3044,7 +3044,7 @@
 		}
 		else
 		{
-			loadScript('./../../../../sdkjs/' + sdkName + '/sdk-all.js', callback);
+			loadScript('/editor/sdkjs/' + sdkName + '/sdk-all.js', callback);
 		}
 	}
 

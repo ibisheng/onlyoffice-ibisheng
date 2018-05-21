@@ -36,14 +36,14 @@ AscCommon.baseEditorsApi.prototype._onEndPermissions = function () {
 	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
 		var oResult = new AscCommon.asc_CAscEditorPermissions();
 		if (null !== this.licenseResult) {
-			var type = this.licenseResult['type'];
-			oResult.setLicenseType(type);
-			oResult.setCanBranding(this.licenseResult['branding']);
-			oResult.setIsLight(this.licenseResult['light']);
-			oResult.setLicenseMode(this.licenseResult['mode']);
-			oResult.setRights(this.licenseResult['rights']);
-			oResult.setBuildVersion(this.licenseResult['buildVersion']);
-			oResult.setBuildNumber(this.licenseResult['buildNumber']);
+			// var type = this.licenseResult['type'];
+			// oResult.setLicenseType(type);
+			// oResult.setCanBranding(this.licenseResult['branding']);
+			// oResult.setIsLight(this.licenseResult['light']);
+			// oResult.setLicenseMode(this.licenseResult['mode']);
+			// oResult.setRights(this.licenseResult['rights']);
+			// oResult.setBuildVersion(this.licenseResult['buildVersion']);
+			// oResult.setBuildNumber(this.licenseResult['buildNumber']);
 		}
 		this.sendEvent('asc_onGetEditorPermissions', oResult);
 	}

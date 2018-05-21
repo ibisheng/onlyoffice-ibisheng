@@ -286,7 +286,8 @@
 			this.User.setId(this.DocInfo.get_UserId());
 			this.User.setUserName(this.DocInfo.get_UserName());
 			this.User.setFirstName(this.DocInfo.get_FirstName());
-			this.User.setLastName(this.DocInfo.get_LastName());
+            this.User.setLastName(this.DocInfo.get_LastName());
+            this.User.setAvatar( this.DocInfo.get_Avatar());
 
 			//чтобы в versionHistory был один documentId для auth и open
 			this.CoAuthoringApi.setDocId(this.documentId);

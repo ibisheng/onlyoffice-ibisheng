@@ -3024,7 +3024,8 @@
 		this.Id = null;
 		this.FullName = null;
 		this.FirstName = null;
-		this.LastName = null;
+        this.LastName = null;
+        this.Avatar = "";
 	}
 
 	asc_CUserInfo.prototype.asc_putId = asc_CUserInfo.prototype.put_Id = function (v) {
@@ -3050,6 +3051,12 @@
 	};
 	asc_CUserInfo.prototype.asc_getLastName = asc_CUserInfo.prototype.get_LastName = function () {
 		return this.LastName;
+    };
+    asc_CUserInfo.prototype.asc_getAvatar = asc_CUserInfo.prototype.get_Avatar = function(){
+		return this.Avatar;
+	};
+	asc_CUserInfo.prototype.asc_putAvatar =  asc_CUserInfo.prototype.put_Avatar = function( v ){
+		this.Avatar = v;
 	};
 
 	/** @constructor */
@@ -3124,6 +3131,9 @@
 	};
 	prot.get_LastName = prot.asc_getLastName = function () {
 		return (this.UserInfo ? this.UserInfo.get_LastName() : null );
+    };
+    prot.get_Avatar = prot.asc_getAvatar = function(){
+		return (this.UserInfo ? this.UserInfo.get_Avatar() : null );
 	};
 	prot.get_Options = prot.asc_getOptions = function () {
 		return this.Options;
@@ -4372,7 +4382,8 @@
 	prot["get_VKey"] = prot["asc_getVKey"] = prot.asc_getVKey;
 	prot["put_VKey"] = prot["asc_putVKey"] = prot.asc_putVKey;
 	prot["get_UserId"] = prot["asc_getUserId"] = prot.asc_getUserId;
-	prot["get_UserName"] = prot["asc_getUserName"] = prot.asc_getUserName;
+    prot["get_UserName"] = prot["asc_getUserName"] = prot.asc_getUserName;
+    prot["get_Avatar"] = prot["get_Avatar"] = prot.asc_getAvatar;
 	prot["get_Options"] = prot["asc_getOptions"] = prot.asc_getOptions;
 	prot["put_Options"] = prot["asc_putOptions"] = prot.asc_putOptions;
 	prot["get_CallbackUrl"] = prot["asc_getCallbackUrl"] = prot.asc_getCallbackUrl;

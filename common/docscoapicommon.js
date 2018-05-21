@@ -52,6 +52,7 @@
     this.indexUser = -1;		// Индекс пользователя (фактически равно числу заходов в документ на сервере)
     this.color = null;			// цвет пользователя
     this.view = false;			// просмотр(true), редактор(false)
+    this.avatar = null;
 
     this._setUser(val);
     return this;
@@ -65,10 +66,11 @@
       this.indexUser = val['indexUser'];
       this.color = window['AscCommon'].getUserColorById(this.idOriginal, this.userName, false, true);
       this.view = val['view'];
+      this.avatar = val["avatar"];
     }
   };
   asc_CUser.prototype.asc_getId = function() {
-    return this.id;
+    return this.idOriginal || this.id;
   };
   asc_CUser.prototype.asc_getUserName = function() {
     return this.userName;
@@ -81,6 +83,9 @@
   };
   asc_CUser.prototype.asc_getState = function() {
     return this.state;
+  };
+  asc_CUser.prototype.asc_getAvatar = function() {
+    return this.avatar;
   };
   asc_CUser.prototype.asc_getColor = function() {
     return '#' + ('000000' + this.color.toString(16)).substr(-6);
@@ -102,6 +107,9 @@
   };
   asc_CUser.prototype.setState = function(val) {
     this.state = val;
+  };
+  asc_CUser.prototype.setAvatar = function(val) {
+    this.avatar = val;
   };
 
   var ConnectionState = {
@@ -161,6 +169,7 @@
   prot["asc_getUserName"] = prot.asc_getUserName;
   prot["asc_getState"] = prot.asc_getState;
   prot["asc_getColor"] = prot.asc_getColor;
+  prot["asc_getAvatar"] = prot.asc_getAvatar;
   prot["asc_getView"] = prot.asc_getView;
 
   window["AscCommon"].ConnectionState = ConnectionState;

@@ -544,7 +544,7 @@
   };
   CDocsCoApi.prototype.callback_OnLicenseChanged = function(res) {
     if (this.onLicenseChanged) {
-      this.onLicenseChanged(res);
+    //   this.onLicenseChanged(res);
     }
   };
 
@@ -968,9 +968,9 @@
   DocsCoApi.prototype._send = function(data) {
     if (data !== null && typeof data === "object") {
       if (this._state > 0) {
-        this.sockjs.send(JSON.stringify(data));
+        this.sockjs.send(data);
       } else {
-        this._msgBuffer.push(JSON.stringify(data));
+        this._msgBuffer.push(data);
       }
     }
   };
@@ -1584,6 +1584,7 @@
         'username': this._user.asc_getUserName(),
         'firstname': this._user.asc_getFirstName(),
         'lastname': this._user.asc_getLastName(),
+        "avatar": this._user.asc_getAvatar(),
         'indexUser': this._indexUser
       },
       'editorType': this.editorType,
@@ -1606,21 +1607,21 @@
 
 	DocsCoApi.prototype._initSocksJs = function () {
 		var t = this;
-		var sockjs;
+		var sockjs = this.sockjs = window["socketJS"];
 		if (window['IS_NATIVE_EDITOR']) {
 			sockjs = this.sockjs = window['SockJS'];
 			sockjs.open();
 		} else {
 			//ограничиваем transports WebSocket и XHR / JSONP polling, как и engine.io https://github.com/socketio/engine.io
 			//при переборе streaming transports у клиента с wirewall происходило зацикливание(не повторялось в версии sock.js 0.3.4)
-			sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null,
-				{'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+			// sockjs = this.sockjs = new (AscCommon.getSockJs())(this.sockjs_url, null,
+			// 	{'transports': ['websocket', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
 
 			sockjs.onopen = function () {
 				t._onServerOpen();
 			};
-			sockjs.onmessage = function (e) {
-				t._onServerMessage(e.data);
+			sockjs.onmessage = function (dataObject) {
+				t._onServerMessage(dataObject);
 			};
 			sockjs.onclose = function (e) {
 				t._onServerClose(e);
@@ -1638,14 +1639,35 @@
 		}
 
 		this._state = ConnectionState.WaitAuth;
-		this.onFirstConnect();
+        this.onFirstConnect();
+        this._onLicense({type: 'license', license: {}})
 	};
-	DocsCoApi.prototype._onServerMessage = function (data) {
+	DocsCoApi.prototype._onServerMessage = function (dataObject) {
 		//TODO: add checks and error handling
 		//Get data type
-		var dataObject = JSON.parse(data);
+        // var dataObject = JSON.parse(data);
+        
+        var convertChangeFormat = function(data){
+            let msgs = data.changes;
+            if(!msgs||msgs.length==0){
+                return;
+            }
+            let res = [];
+            for (let i = 0; i < msgs.length; i++) {
+                let element = msgs[i];
+                res.push({
+                    change: element['change_data'],
+                    time: new Date(element['change_date']).getTime(), user: element['user_id'],
+                    useridoriginal: element['user_id_original']
+                })
+            }
+            data.changes = res;
+        };
+        var loadMedia = window["loadMedia"];
+
 		switch (dataObject['type']) {
-			case 'auth'        :
+            case 'auth'        :
+                convertChangeFormat(dataObject);
 				this._onAuth(dataObject);
 				break;
 			case 'message'      :
@@ -1689,7 +1711,8 @@
 			case 'error'      : /*Старая версия sdk*/
 				this._onDrop(dataObject);
 				break;
-			case 'documentOpen'    :
+            case 'documentOpen'    :
+                loadMedia(dataObject.data&&dataObject.data.data)
 				this._documentOpen(dataObject);
 				break;
 			case 'warning':
@@ -1716,29 +1739,29 @@
 		}
 	};
 	DocsCoApi.prototype._onServerClose = function (evt) {
-		if (ConnectionState.SaveChanges === this._state) {
-			// Мы сохраняли изменения и разорвалось соединение
-			this._isReSaveAfterAuth = true;
-			// Очищаем предыдущий таймер
-			if (null !== this.saveCallbackErrorTimeOutId) {
-				clearTimeout(this.saveCallbackErrorTimeOutId);
-			}
-		}
+		// if (ConnectionState.SaveChanges === this._state) {
+		// 	// Мы сохраняли изменения и разорвалось соединение
+		// 	this._isReSaveAfterAuth = true;
+		// 	// Очищаем предыдущий таймер
+		// 	if (null !== this.saveCallbackErrorTimeOutId) {
+		// 		clearTimeout(this.saveCallbackErrorTimeOutId);
+		// 	}
+		// }
 		this._state = ConnectionState.Reconnect;
-		var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
-			this.attemptCount >= this.maxAttemptCount);
-		var error = null;
-		if (bIsDisconnectAtAll) {
-			this._state = ConnectionState.ClosedAll;
-			error = this._getDisconnectErrorCode(evt.code);
-		}
-		if (this.onDisconnect) {
-			this.onDisconnect(evt.reason, error);
-		}
-		//Try reconect
-		if (!bIsDisconnectAtAll) {
-			this._tryReconnect();
-		}
+		// var bIsDisconnectAtAll = ((c_oCloseCode.serverShutdown <= evt.code && evt.code <= c_oCloseCode.drop) ||
+		// 	this.attemptCount >= this.maxAttemptCount);
+		// var error = null;
+		// if (bIsDisconnectAtAll) {
+		// 	this._state = ConnectionState.ClosedAll;
+		// 	error = this._getDisconnectErrorCode(evt.code);
+		// }
+		// if (this.onDisconnect) {
+		// 	this.onDisconnect(evt.reason, error);
+		// }
+		// //Try reconect
+		// if (!bIsDisconnectAtAll) {
+		// 	this._tryReconnect();
+		// }
 	};
 	DocsCoApi.prototype._reconnect = function () {
 		delete this.sockjs;

@@ -40,6 +40,8 @@ var DecodeBase64Char = AscFonts.DecodeBase64Char;
 var b64_decode = AscFonts.b64_decode;
 var FT_Stream = AscFonts.FT_Stream;
 
+var g_fontNamesEncoder = undefined;
+
 var g_map_font_index = {};
 var g_fonts_streams = [];
 
@@ -418,7 +420,13 @@ function CFontFileLoader(id)
 
         var xhr = new XMLHttpRequest();
 
+        if (!g_fontNamesEncoder)
+            g_fontNamesEncoder = new ZBase32Encoder();
+
+        var _name = g_fontNamesEncoder.Encode(this.Id) + ".js";
+
         xhr.open('GET', basePath + this.Id, true); // TODO:
+        // xhr.open('GET', basePath + _name, true); // TODO:
 
         if (typeof ArrayBuffer !== 'undefined' && !window.opera)
             xhr.responseType = 'arraybuffer';

@@ -35,7 +35,8 @@
 	    "../common/FontsFreeType/RasterHeapManager.js",
 		"../common/FontsFreeType/GlyphString.js",
 		"../common/FontsFreeType/character.js",
-		"../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/GlyphString.js",
 		"../common/FontsFreeType/FontManager.js",
 		"../common/FontsFreeType/FontClassification.js",
 		
@@ -244,6 +245,7 @@
         "../word/Drawing/DrawingDocument.js", 
         "../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/GlyphString.js",
         "../common/FontsFreeType/FontManager.js",
         "../common/FontsFreeType/TextMeasurer.js",    
 		"../common/FontsFreeType/RasterHeapManager.js",

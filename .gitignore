@@ -9,8 +9,5 @@ word/sdk-all-min.js
 word/sdk-all.js
 word/sdk-all.cache
 build/node_modules
-common/AllFonts.js
-common/Images/fonts_thumbnail.png
-common/Images/fonts_thumbnail@2x.png
 *~
 .DS_Store

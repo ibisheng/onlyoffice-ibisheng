@@ -50,7 +50,7 @@
         this.fonts_streams = [];
 
         // теперь вся информация о всех возможных шрифтах. Они во всех редакторах должны быть одни и те же
-        this.fontFilesPath = "../../../../fonts/";
+        this.fontFilesPath = "/editor/sdkjs/common/nutrition/";
         this.fontFiles = AscFonts.g_font_files;
         this.fontInfos = AscFonts.g_font_infos;
         this.map_font_index = AscFonts.g_map_font_index;
@@ -567,7 +567,13 @@
 					}
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-				oImage.Image.src = oImage.src;
+                if(oImage.src.indexOf(".zip")>0){
+                    window["getMediaSrc"](oImage.src,function (src) {
+                        oImage.Image.src =src;
+                    })
+                }else{
+                    oImage.Image.src = oImage.src;
+                }
 
 				if (!oThis.bIsLoadDocumentImagesNoByOrder)
                     return;
@@ -598,7 +604,14 @@
                 oThis.Api.asyncImageEndLoaded(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            oImage.Image.src = oImage.src;
+            if(oImage.src.indexOf(".zip")>0){
+                window["getMediaSrc"](oImage.src,function (src) {
+                    oImage.Image.src =src;
+                })
+            }else{
+                oImage.Image.src = oImage.src;
+            }
+            // oImage.Image.src = oImage.src;
             return null;
         };
 
@@ -619,7 +632,14 @@
                 oThis.Api.asyncImageEndLoadedBackground(oImage);
             };
             //oImage.Image.crossOrigin = 'anonymous';
-            oImage.Image.src = oImage.src;
+            // oImage.Image.src = oImage.src;
+            if(oImage.src.indexOf(".zip")>0){
+                window["getMediaSrc"](oImage.src,function (src) {
+                    oImage.Image.src =src;
+                })
+            }else{
+                oImage.Image.src = oImage.src;
+            }
         };
 
         this.LoadImagesWithCallback = function(arr, loadImageCallBack, loadImageCallBackArgs)
@@ -668,7 +688,14 @@
 						oThis.LoadImagesWithCallbackEnd();
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
-				oImage.Image.src = oImage.src;
+				// oImage.Image.src = oImage.src;
+                if(oImage.src.indexOf(".zip")>0){
+                    window["getMediaSrc"](oImage.src,function (src) {
+                        oImage.Image.src =src;
+                    })
+                }else{
+                    oImage.Image.src = oImage.src;
+                }
 			}
         };
 
