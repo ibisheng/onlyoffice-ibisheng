@@ -3276,14 +3276,14 @@
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
 	};
+	Worksheet.prototype.initColumn = function (column) {
+		if (null !== column.width) {
+			column.widthPx = this.modelColWidthToColWidth(column.width);
+			column.charCount = this.colWidthToCharCount(column.widthPx);
+		}
+	};
 	Worksheet.prototype.initColumns = function () {
-		var t = this;
-		this.aCols.forEach(function (column) {
-			if (null !== column.width) {
-				column.widthPx = t.modelColWidthToColWidth(column.width);
-				column.charCount = t.colWidthToCharCount(column.widthPx);
-			}
-		});
+		this.aCols.forEach(this.initColumn, this);
 	};
 	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (!this.PagePrintOptions) {
@@ -4167,6 +4167,7 @@
 				col.CustomWidth = true;
 				col.BestFit = null;
 				col.setHidden(null);
+				oThis.initColumn(col);
 				var oNewProps = col.getWidthProp();
 				if(false == oOldProps.isEqual(oNewProps))
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, oThis.getId(),
@@ -4275,6 +4276,7 @@
 			else
 				col.BestFit = null;
 			col.width = width;
+			oThis.initColumn(col);
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
 				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, oThis.getId(),

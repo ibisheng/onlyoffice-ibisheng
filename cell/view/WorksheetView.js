@@ -144,6 +144,8 @@
 
     var kMaxAutoCompleteCellEdit = 20000;
 
+    var gridlineSize = 1;
+
 	function CacheColumn() {
 	    this.isCustomWidth = false;
 	    this.left = 0;
@@ -773,7 +775,7 @@
         var offsetX = t.cols[c1].left - t.cellsLeft;
         offsetX -= offsetFrozenX;
 
-        var x1 = t.cols[col].left - offsetX - this.width_1px;
+        var x1 = t.cols[col].left - offsetX - gridlineSize;
         var w = Math.max(x2 - x1, 0);
         if (w === t.cols[col].width) {
             return;
@@ -820,7 +822,7 @@
         var offsetY = t.rows[r1].top - t.cellsTop;
         offsetY -= offsetFrozenY;
 
-        var y1 = t.rows[row].top - offsetY - 1;
+        var y1 = t.rows[row].top - offsetY - gridlineSize;
         var newHeight = Math.min(t.maxRowHeight, Math.max(y2 - y1, 0));
         if (newHeight === t.rows[row].height) {
             return;
@@ -1286,22 +1288,40 @@
         }
     };
 
+	WorksheetView.prototype._calcColWidth = function (x, i) {
+		var w, isBestFit, hiddenW = 0;
+		// Получаем свойства колонки
+		var column = this.model._getColNoEmptyWithAll(i);
+		if (!column) {
+			w = this.defaultColWidthPx; // Используем дефолтное значение
+			isBestFit = true; // Это уже оптимальная ширина
+		} else if (column.getHidden()) {
+			w = 0;            // Если столбец скрытый, ширину выставляем 0
+			isBestFit = false;
+			hiddenW = column.widthPx || this.defaultColWidthPx;
+		} else {
+			w = column.widthPx || this.defaultColWidthPx;
+			isBestFit = !!(column.BestFit || (null === column.BestFit && null === column.CustomWidth));
+		}
+
+		this.cols[i] = this._createCacheColumn(w);
+		this.cols[i].isCustomWidth = !isBestFit;
+		this.cols[i].left = x;
+
+		return hiddenW;
+	};
+
     /**
-     * Вычисляет ширину столбца для отрисовки
+     * Create CacheColumn
      * @param {Number} w  Ширина столбца в символах
-     * @returns {Number}  Ширина столбца в пунктах (pt)
+     * @returns {CacheColumn}
      */
-    WorksheetView.prototype._calcColWidth = function ( w ) {
-        var t = this;
-        var res = new CacheColumn();
-        var useDefault = w === undefined || w === null || w === -1;
-        var width;
-        res.width =
-          useDefault ? t.defaultColWidth : (width = t.model.modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
-        res.innerWidth = Math.max( res.width - this.width_padding * 2 - this.width_1px, 0 );
-		res.charCount = this.model.colWidthToCharCount(res.width);
-        return res;
-    };
+	WorksheetView.prototype._createCacheColumn = function (w) {
+		var res = new CacheColumn();
+		res.width = w;
+		res.innerWidth = Math.max(res.width - this.settings.cells.padding * 2 - gridlineSize, 0);
+		return res;
+	};
 
     /** Вычисляет ширину колонки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderColumnWidth = function () {
@@ -1319,7 +1339,8 @@
 
     /** Вычисляет высоту строки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderRowHeight = function () {
-		this.headersHeight = (false === this.model.getSheetView().asc_getShowRowColHeaders()) ? 0 : this.headersHeightByFont;
+		this.headersHeight = (false === this.model.getSheetView().asc_getShowRowColHeaders()) ? 0 :
+			this.headersHeightByFont;
         this.cellsTop = this.headersTop + this.headersHeight;
     };
 
@@ -1332,7 +1353,7 @@
         var visibleW = this.drawingCtx.getWidth();
         var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
         var l = Math.max(this.model.getColsCount() + 1, this.nColsCount, maxColObjects);
-        var i = 0, w, column, isBestFit, hiddenW = 0;
+        var i = 0, hiddenW = 0;
 
         if (AscCommonExcel.recalcType.full === type) {
             this.cols = [];
@@ -1341,25 +1362,7 @@
             x = this.cols[i - 1].left + this.cols[i - 1].width;
         }
         for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
-            // Получаем свойства колонки
-            column = this.model._getColNoEmptyWithAll(i);
-            if (!column) {
-                w = this.defaultColWidthPx; // Используем дефолтное значение
-                isBestFit = true; // Это уже оптимальная ширина
-            } else if (column.getHidden()) {
-                w = 0;            // Если столбец скрытый, ширину выставляем 0
-                isBestFit = false;
-                hiddenW += column.widthPx;
-            } else {
-                w = column.widthPx || this.defaultColWidthPx;
-                isBestFit = !!(column.BestFit || (null === column.BestFit && null === column.CustomWidth));
-            }
-            this.cols[i] = new CacheColumn();
-            this.cols[i].isCustomWidth = !isBestFit;
-			this.cols[i].left = x;
-			this.cols[i].width = w;
-			this.cols[i].innerWidth = Math.max(this.cols[i].width - this.settings.cells.padding * 2 - 1, 0);
-
+			hiddenW += this._calcColWidth(x, i);
             x += this.cols[i].width;
         }
 
@@ -1371,13 +1374,12 @@
      * @param {AscCommonExcel.recalcType} type
      */
     WorksheetView.prototype._calcHeightRows = function (type) {
-        var t = this;
         var y = this.cellsTop;
         var visibleH = this.drawingCtx.getHeight();
         var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
         var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, maxRowObjects);
         var defaultH = this.defaultRowHeight;
-        var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
+        var i = 0, h, hR, isCustomHeight, hiddenH = 0;
 
         if (AscCommonExcel.recalcType.full === type) {
             this.rows = [];
@@ -1408,7 +1410,7 @@
 					}
 				}
             });
-            h = h < 0 ? (hR = defaultH) : h;
+            h = (h < 0 ? (hR = defaultH) : h);
             this.rows[i] = {
                 top: y,
                 height: h,												// Высота с точностью до 1 px
@@ -1478,8 +1480,7 @@
                 // add +1 column at the end and exit cycle
                 done = true;
             }
-            this.cols[i] = this._calcColWidth(this.model.getColWidth(i));
-            this.cols[i].left = x;
+			this._calcColWidth(x, i);
             x += this.cols[i].width;
             this.isChanged = true;
         }
@@ -2152,8 +2153,8 @@
         var st = this.settings.header.style[style];
         var x2 = x + w;
         var y2 = y + h;
-        var x2WithoutBorder = x2 - 1;
-        var y2WithoutBorder = y2 - 1;
+        var x2WithoutBorder = x2 - gridlineSize;
+        var y2WithoutBorder = y2 - gridlineSize;
 
         // background только для видимых
         if (!isZeroHeader) {
@@ -2561,12 +2562,12 @@
 			var y1 = this.rows[rowT].top - offsetY;
 			var w = this.cols[colR].left + this.cols[colR].width - offsetX - x1;
 			var h = this.rows[rowB].top + this.rows[rowB].height - offsetY - y1;
-			var x2 = x1 + w - (isTrimmedR ? 0 : 1);
-			var y2 = y1 + h - 1;
+			var x2 = x1 + w - (isTrimmedR ? 0 : gridlineSize);
+			var y2 = y1 + h - gridlineSize;
 			var bl = !isMerged ? (y2 - this.rows[rowB].descender) :
 				(y2 - ct.metrics.height + ct.metrics.baseline - 1);
 			var x1ct = isMerged ? x1 : this.cols[col].left - offsetX;
-			var x2ct = isMerged ? x2 : x1ct + this.cols[col].width - 1;
+			var x2ct = isMerged ? x2 : x1ct + this.cols[col].width - gridlineSize;
 			var textX = this._calcTextHorizPos(x1ct, x2ct, ct.metrics, ct.cellHA);
 			var textY = this._calcTextVertPos(y1, y2, bl, ct.metrics, ct.cellVA);
 			var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
@@ -2714,7 +2715,7 @@
                 continue;
             }
 
-            ctx.fillRect( this.cols[col].left + this.cols[col].width - offsetX - 1, this.rows[row].top - offsetY, 1, this.rows[row].height - 1 );
+            ctx.fillRect( this.cols[col].left + this.cols[col].width - offsetX - gridlineSize, this.rows[row].top - offsetY, gridlineSize, this.rows[row].height - gridlineSize );
         }
     };
 
@@ -2867,7 +2868,7 @@
 
 			var rowCache = t._fetchRowCache(row);
 			var y1 = r[row].top - offsetY;
-			var y2 = y1 + r[row].height - 1;
+			var y2 = y1 + r[row].height - gridlineSize;
 
 			var nextCol, isFirstCol = true;
 			for (col = range.c1; col <= range.c2 && col < t.nColsCount; col = nextCol) {
@@ -2888,7 +2889,7 @@
 				mc = objMCRow ? objMCRow[col] : null;
 
 				var x1 = c[col].left - offsetX;
-				var x2 = x1 + c[col].width - 1;
+				var x2 = x1 + c[col].width - gridlineSize;
 
 				if (row === t.nRowsCount) {
 					bBotPrev = bBotCur = bBotNext = null;
@@ -2977,7 +2978,7 @@
 
 				// draw left border
 				if (isFirstColTmp && !t._isLeftBorderErased(col, rowCache)) {
-					drawVerticalBorder(bPrev, bCur, x1 - 1, y1, y2);
+					drawVerticalBorder(bPrev, bCur, x1 - gridlineSize, y1, y2);
 					// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 //						if (lb.w >= 1 && drawingCtx && 0 === col) {
 					// Иначе они будут не такой ширины
@@ -2991,7 +2992,7 @@
 				}
 				// draw top border
 				if (isFirstRowTmp) {
-					drawHorizontalBorder(bTopCur, bCur, x1, y1 - 1, x2);
+					drawHorizontalBorder(bTopCur, bCur, x1, y1 - gridlineSize, x2);
 					// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
 //						if (tb.w > 0 && drawingCtx && 0 === row) {
 					// ToDo посмотреть что с этим ? в печати будет обрезка
@@ -3115,7 +3116,7 @@
                         offsetFrozen = this.getFrozenPaneOffset( false, true );
                         offsetX -= offsetFrozen.offsetX;
                         ctx.setFillPattern( this.settings.ptrnLineDotted1 )
-                            .fillRect( this.cols[data.col].left - offsetX - 1, 0, 1, h );
+                            .fillRect( this.cols[data.col].left - offsetX - gridlineSize, 0, 1, h );
                     }
                 }
                 break;
@@ -3910,7 +3911,7 @@
         var offsetFrozen = this.getFrozenPaneOffset( false, true );
         offsetX -= offsetFrozen.offsetX;
 
-        var x1 = this.cols[col].left - offsetX - 1;
+        var x1 = this.cols[col].left - offsetX - gridlineSize;
         var h = ctx.getHeight();
         var width = (x - x1);
         if ( 0 > width ) {
@@ -3942,7 +3943,7 @@
         var offsetFrozen = this.getFrozenPaneOffset( true, false );
         offsetY -= offsetFrozen.offsetY;
 
-        var y1 = this.rows[row].top - offsetY - 1;
+        var y1 = this.rows[row].top - offsetY - gridlineSize;
         var w = ctx.getWidth();
         var height = (y - y1);
         if ( 0 > height ) {
@@ -4135,12 +4136,11 @@
     WorksheetView.prototype._changeColWidth = function (col, width, pad) {
         var cc = Math.min(this.model.colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
         var modelw = this.model.charCountToModelColWidth(cc);
-        var colw = this._calcColWidth(modelw);
+        var newCol = this._createCacheColumn(modelw);
 
-        if (colw.width > this.cols[col].width) {
-            this.cols[col].width = colw.width;
-            this.cols[col].innerWidth = colw.innerWidth;
-            this.cols[col].charCount = colw.charCount;
+        if (newCol.width > this.cols[col].width) {
+            this.cols[col].width = newCol.width;
+            this.cols[col].innerWidth = newCol.innerWidth;
 
             History.Create_NewPoint();
             History.StartTransaction();
@@ -10716,7 +10716,7 @@
 				for (; c1 <= c2; ++c1) {
 					w = t.onChangeWidthCallback(c1, null, null);
 					if (-1 !== w) {
-						t.cols[c1] = t._calcColWidth(w);
+						t._calcColWidth(0, c1);
 						t.cols[c1].isCustomWidth = false;
 						bUpdate = true;
 
@@ -12343,7 +12343,7 @@
         for (i = range.c1; i <= range.c2; ++i) {
             w = this.onChangeWidthCallback(i, r, r, /*onlyIfMore*/true);
             if (-1 !== w) {
-                this.cols[i] = this._calcColWidth(w);
+				this._calcColWidth(0, i);
                 this._cleanCache(new asc_Range(i, 0, i, this.rows.length - 1));
                 bIsUpdate = true;
             }
