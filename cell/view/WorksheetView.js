@@ -2956,10 +2956,10 @@
 					// ToDo Clip diagonal borders
                     /*ctx.save()
                      .beginPath()
-                     .rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
-                     y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
-                     c[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
-                     r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
+                     .rect(x1 + (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
+                     y1 + (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
+                     c[col].width + ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
+                     r[row].height + ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
                      .clip();
                      */
 					if (bCur.borders.dd) {
@@ -12537,15 +12537,12 @@
 		var scaleIndex = 1;
 		var scaleFactor = ctx.scaleFactor;
 
-		var width_1px = t.width_1px;
-		var height_1px = t.height_1px;
-
 		var m_oColor = new CColor(120, 120, 120);
 
-		var widthWithBorders = widthButtonPx * width_1px;
-		var heightWithBorders = heightButtonPx * height_1px;
-		var width = (widthButtonPx - widthBorder * 2) * width_1px;
-		var height = (heightButtonPx - widthBorder * 2) * height_1px;
+		var widthWithBorders = widthButtonPx;
+		var heightWithBorders = heightButtonPx;
+		var width = widthButtonPx - widthBorder * 2;
+		var height = heightButtonPx - widthBorder * 2;
 		var colWidth = t.cols[col].width;
 		var rowHeight = t.rows[row].height;
 		if (rowHeight < heightWithBorders)
@@ -12572,25 +12569,27 @@
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
 			ctx.beginPath();
-			ctx.lineVer(startX, startY, startY + heightArrow * height_1px * scaleIndex);
+			ctx.lineVer(startX, startY, startY + heightArrow * scaleIndex);
 
+			var tmp;
 			var x = startX;
 			var y = startY;
 
-			var heightArrow1 = heightArrow * height_1px * scaleIndex - 1*width_1px/scaleFactor;
+			var heightArrow1 = heightArrow * scaleIndex - 1/scaleFactor;
 			var height = 3 * scaleIndex * scaleFactor;
 			var x1, x2, y1;
 			if(isDescending)
 			{
 				for(var i = 0; i < height; i++)
 				{
-					x1 = x - (i*width_1px/scaleFactor);
-					x2 = x - (i*width_1px/scaleFactor) + 1*width_1px/scaleFactor;
-					y1 = y - (i*width_1px/scaleFactor) + heightArrow1;
+					tmp = i/scaleFactor;
+					x1 = x - tmp;
+					x2 = x - tmp + 1/scaleFactor;
+					y1 = y - tmp + heightArrow1;
 					ctx.lineHor(x1, y1, x2);
-					x1 = x + (i*width_1px/scaleFactor);
-					x2 = x + (i*width_1px/scaleFactor) + 1*width_1px/scaleFactor;
-					y1 = y - (i*width_1px/scaleFactor) + heightArrow1;
+					x1 = x + tmp;
+					x2 = x + tmp + 1/scaleFactor;
+					y1 = y - tmp + heightArrow1;
 					ctx.lineHor(x1, y1, x2);
 				}
 			}
@@ -12598,13 +12597,14 @@
 			{
 				for(var i = 0; i < height; i++)
 				{
-					x1 = x - (i*width_1px/scaleFactor);
-					x2 = x - (i*width_1px/scaleFactor) + 1*width_1px/scaleFactor;
-					y1 = y + (i*width_1px/scaleFactor);
+				    tmp = i/scaleFactor;
+					x1 = x - tmp;
+					x2 = x - tmp + 1/scaleFactor;
+					y1 = y + tmp;
 					ctx.lineHor(x1, y1, x2);
-					x1 = x + (i*width_1px/scaleFactor);
-					x2 = x + (i*width_1px/scaleFactor) + 1*width_1px/scaleFactor;
-					y1 = y + (i*width_1px/scaleFactor);
+					x1 = x + tmp;
+					x2 = x + tmp + 1/scaleFactor;
+					y1 = y + tmp;
 					ctx.lineHor(x1, y1, x2);
 				}
 			}
@@ -12615,7 +12615,7 @@
 			}
 			else
 			{
-				ctx.setLineWidth(AscBrowser.retinaPixelRatio * width_1px);
+				ctx.setLineWidth(AscBrowser.retinaPixelRatio);
 			}
 
 			ctx.setStrokeStyle(m_oColor);
@@ -12625,7 +12625,7 @@
         var _drawFilterMark = function (x, y, height)
 		{
             var heightLine = Math.round(height);
-			var heightCleanLine = heightLine - 2*height_1px;
+			var heightCleanLine = heightLine - 2;
 
 			ctx.beginPath();
 
@@ -12645,7 +12645,7 @@
 			ctx.stroke();
 
 			var heightTriangle = 4;
-			y = y - heightLine + 1*width_1px / scaleFactor;
+			y = y - heightLine + 1 / scaleFactor;
 			_drawFilterDreieck(x, y, heightTriangle, 2);
         };
 
@@ -12653,12 +12653,12 @@
 		{
 			ctx.beginPath();
 
-			x = x + 1*width_1px/scaleFactor;
+			x = x + 1/scaleFactor;
 			var diffY = (height / 2) * scaleFactor;
 			height = height * scaleIndex*scaleFactor;
 			for(var i = 0; i < height; i++)
 			{
-				ctx.lineHor(x - (i*width_1px/scaleFactor + base*width_1px/scaleFactor) , y + (height*height_1px - i*height_1px/scaleFactor) - diffY, x + i*width_1px/scaleFactor)
+				ctx.lineHor(x - (i/scaleFactor + base/scaleFactor) , y + (height - i/scaleFactor) - diffY, x + i/scaleFactor)
 			}
 
 			if(isMobileRetina)
@@ -12667,7 +12667,7 @@
 			}
 			else
 			{
-				ctx.setLineWidth(AscBrowser.retinaPixelRatio * width_1px);
+				ctx.setLineWidth(AscBrowser.retinaPixelRatio);
 			}
 
 			ctx.setStrokeStyle(m_oColor);
@@ -12686,22 +12686,22 @@
 
 			if(null !== isApplySortState && isApplyAutoFilter)
 			{
-				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
-				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
+				var heigthObj = Math.ceil(height / 2) + 1;
+				var marginTop = Math.floor((height - heigthObj) / 2);
 				centerY = upLeftYButton + heigthObj + marginTop;
 
-				_drawSortArrow(upLeftXButton + 4 * width_1px * scaleIndex, upLeftYButton + 5 * height_1px * scaleIndex, isApplySortState, 8);
-				_drawFilterMark(centerX + 2 * width_1px, centerY, heigthObj);
+				_drawSortArrow(upLeftXButton + 4 * scaleIndex, upLeftYButton + 5 * scaleIndex, isApplySortState, 8);
+				_drawFilterMark(centerX + 2, centerY, heigthObj);
 			}
 			else if(null !== isApplySortState)
 			{
-				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
-				_drawFilterDreieck(centerX - 4 * width_1px, centerY + 1 * height_1px, 3, 1);
+				_drawSortArrow(upLeftXButton + width - 5 * scaleIndex, upLeftYButton + 3 * scaleIndex, isApplySortState, 10);
+				_drawFilterDreieck(centerX - 4, centerY + 1, 3, 1);
 			}
 			else if (isApplyAutoFilter)
 			{
-				var heigthObj = Math.ceil((height / 2) / height_1px) * height_1px + 1 * height_1px;
-				var marginTop = Math.floor(((height - heigthObj) / 2) / height_1px) * height_1px;
+				var heigthObj = Math.ceil(height / 2) + 1;
+				var marginTop = Math.floor((height - heigthObj) / 2);
 
 				centerY = upLeftYButton + heigthObj + marginTop;
 				_drawFilterMark(centerX, centerY, heigthObj);

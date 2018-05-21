@@ -3450,14 +3450,14 @@ function OfflineEditor () {
                         x += 1;
                     }
                 } else {
-                    if (h < this.height_1px) {
+                    if (0 === h) {
                         if (style !== kHeaderDefault) {
                             return;
                         }
                         // Это невидимая строка
                         isZeroHeader = true;
                         // Отрисуем только границу
-                        h = this.height_1px;
+                        h = 1;
                         // Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
                         if (0 < index && 0 === this.rows[index - 1].height) {
                             // Мы уже нарисовали border для невидимой границы
@@ -3465,8 +3465,8 @@ function OfflineEditor () {
                         }
                     } else if (0 < index && 0 === this.rows[index - 1].height) {
                         // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
-                        h -= this.height_1px;
-                        y += this.height_1px;
+                        h -= 1;
+                        y += 1;
                     }
                 }
             }
@@ -3476,7 +3476,7 @@ function OfflineEditor () {
             var x2 = x + w;
             var y2 = y + h;
             var x2WithoutBorder = x2 - 1;
-            var y2WithoutBorder = y2 - this.height_1px;
+            var y2WithoutBorder = y2 - 1;
 
             // background только для видимых
             if (!isZeroHeader) {
