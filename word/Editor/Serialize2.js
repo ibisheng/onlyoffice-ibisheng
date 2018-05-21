@@ -119,7 +119,10 @@ var c_oSerNumTypes = {
 	StyleLink: 23,
 	lvl_NumFmt: 24,
 	NumFmtVal: 25,
-	NumFmtFormat: 26
+	NumFmtFormat: 26,
+	Num_LvlOverride : 27,
+	StartOverride: 28,
+	ILvl: 29
 };
 var c_oSerOtherTableTypes = {
     ImageMap:0,
@@ -4074,6 +4077,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
     this.Document = doc;
 	this.oNumIdMap = oNumIdMap;
 	this.oUsedNumIdMap = oUsedNumIdMap;
+	this.oANumIdToBin = {};
     this.bs = new BinaryCommonWriter(this.memory);
     this.bpPrs = new Binary_pPrWriter(this.memory, null != this.oUsedNumIdMap ? this.oUsedNumIdMap : this.oNumIdMap, null, saveParams);
     this.brPrs = new Binary_rPrWriter(this.memory, saveParams);
@@ -4085,66 +4089,103 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
     this.WriteNumberingContent = function()
     {
         var oThis = this;
-        if(null != this.Document.Numbering && this.Document.Numbering.AbstractNum)
+        if(null != this.Document.Numbering)
         {
-            var ANums = this.Document.Numbering.AbstractNum;
             //ANums
-            this.bs.WriteItem(c_oSerNumTypes.AbstractNums, function(){oThis.WriteAbstractNums(ANums);});
+            this.bs.WriteItem(c_oSerNumTypes.AbstractNums, function(){oThis.WriteAbstractNums();});
             //Nums
-            this.bs.WriteItem(c_oSerNumTypes.Nums, function(){oThis.WriteNums(ANums);});
+            this.bs.WriteItem(c_oSerNumTypes.Nums, function(){oThis.WriteNums();});
         }
     };
-    this.WriteNums = function(nums)
+    this.WriteNums = function()
     {
         var oThis = this;
-		var index = 0;
+		var i;
+		var nums = this.Document.Numbering.Num;
 		if(null != this.oUsedNumIdMap)
 		{
-			for(var i in this.oUsedNumIdMap)
-				this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(i, oThis.oUsedNumIdMap[i] - 1);});
+			for (i in this.oUsedNumIdMap) {
+				if (this.oUsedNumIdMap.hasOwnProperty(i) && nums[i]) {
+					this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(nums[i], oThis.oUsedNumIdMap[i]);});
+				}
+			}
 		}
 		else
 		{
-			for(var i in nums)
-			{
-				this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(i, index);});
-				index++;
+			var index = 1;
+			for (i in nums) {
+				if (nums.hasOwnProperty(i)) {
+					this.bs.WriteItem(c_oSerNumTypes.Num, function(){oThis.WriteNum(nums[i], index);});
+					index++;
+				}
 			}
 		}
     };
-    this.WriteNum = function(id, index)
+    this.WriteNum = function(num, index)
     {
         var oThis = this;
-        this.memory.WriteByte(c_oSerNumTypes.Num_ANumId);
-        this.memory.WriteByte(c_oSerPropLenType.Long);
-        this.memory.WriteLong(index);
+		var ANumId = this.oANumIdToBin[num.AbstractNumId];
+		if (undefined !== ANumId) {
+			this.memory.WriteByte(c_oSerNumTypes.Num_ANumId);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(ANumId);
+		}
             
         this.memory.WriteByte(c_oSerNumTypes.Num_NumId);
         this.memory.WriteByte(c_oSerPropLenType.Long);
-        this.memory.WriteLong(index + 1);// + 1 делается чтобы писать в docx как это делает word aNum c 1, num с 0
-		this.oNumIdMap[id] = index + 1;
+        this.memory.WriteLong(index);
+		this.oNumIdMap[num.GetId()] = index;
+
+		for (var nLvl = 0; nLvl < 9; ++nLvl)
+		{
+			if (num.LvlOverride[nLvl])
+			{
+				this.memory.WriteByte(c_oSerNumTypes.Num_LvlOverride);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteLvlOverride(num.LvlOverride[nLvl]);});
+			}
+		}
+
     };
-    this.WriteAbstractNums = function(nums)
+	this.WriteLvlOverride = function(lvlOverride)
+	{
+		var oThis = this;
+		if (lvlOverride.Lvl >= 0) {
+			this.bs.WriteItem(c_oSerNumTypes.ILvl, function(){oThis.memory.WriteLong(lvlOverride.Lvl);});
+		}
+		if (lvlOverride.StartOverride >= 0) {
+			this.bs.WriteItem(c_oSerNumTypes.StartOverride, function(){oThis.memory.WriteLong(lvlOverride.StartOverride);});
+		}
+		if (lvlOverride.NumberingLvl && lvlOverride.Lvl >= 0) {
+			this.bs.WriteItem(c_oSerNumTypes.Lvl, function(){oThis.WriteLevel(lvlOverride.NumberingLvl, lvlOverride.Lvl);});
+		}
+	};
+    this.WriteAbstractNums = function(ANum)
     {
         var oThis = this;
+		var i;
 		var index = 0;
-		var aNumsToWrite = nums;
+		var ANums = this.Document.Numbering.AbstractNum;
+		var nums = this.Document.Numbering.Num;
 		if(null != this.oUsedNumIdMap)
 		{
-			for(var i in this.oUsedNumIdMap)
-			{
-				var num = nums[i];
-				if(null != num)
-					this.bs.WriteItem(c_oSerNumTypes.AbstractNum, function(){oThis.WriteAbstractNum(num, oThis.oUsedNumIdMap[i] - 1);});
+			for (i in this.oUsedNumIdMap) {
+				if (this.oUsedNumIdMap.hasOwnProperty(i) && nums[i]) {
+					var ANum = ANums[nums[i].AbstractNumId];
+					if (null != ANum) {
+						this.bs.WriteItem(c_oSerNumTypes.AbstractNum, function(){oThis.WriteAbstractNum(ANum, index);});
+						index++;
+					}
+				}
 			}
 		}
 		else
 		{
-			for(var i in nums)
-			{
-				var num = nums[i];
-				this.bs.WriteItem(c_oSerNumTypes.AbstractNum, function(){oThis.WriteAbstractNum(num, index);});
-				index++;
+			for (i in ANums) {
+				if (ANums.hasOwnProperty(i)) {
+					this.bs.WriteItem(c_oSerNumTypes.AbstractNum, function(){oThis.WriteAbstractNum(ANums[i], index);});
+					index++;
+				}
 			}
 		}
     };
@@ -4152,8 +4193,9 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
     {
         var oThis = this;
         //Id
-        if(null != num.Id)
-            this.bs.WriteItem(c_oSerNumTypes.AbstractNum_Id, function(){oThis.memory.WriteLong(index);});
+		this.bs.WriteItem(c_oSerNumTypes.AbstractNum_Id, function(){oThis.memory.WriteLong(index);});
+		this.oANumIdToBin[num.GetId()] = index;
+
 		if(null != num.NumStyleLink)
 		{
             this.memory.WriteByte(c_oSerNumTypes.NumStyleLink);
@@ -4174,10 +4216,10 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
         for(var i = 0, length = lvls.length; i < length; i++)
         {
             var lvl = lvls[i];
-            this.bs.WriteItem(c_oSerNumTypes.Lvl, function(){oThis.WriteLevel(lvl);});
+            this.bs.WriteItem(c_oSerNumTypes.Lvl, function(){oThis.WriteLevel(lvl, i);});
         }
     };
-    this.WriteLevel = function(lvl)
+    this.WriteLevel = function(lvl, ILvl)
     {
         var oThis = this;
         //Format
@@ -4243,6 +4285,12 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap, saveP
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){oThis.brPrs.Write_rPr(lvl.TextPr, null, null);});
         }
+		if(null != ILvl)
+		{
+			this.memory.WriteByte(c_oSerNumTypes.ILvl);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(ILvl);
+		}
     };
     this.WriteLevelText = function(aText)
     {
@@ -6357,11 +6405,13 @@ function BinaryFileReader(doc, openParams)
     this.PostLoadPrepare = function(setting)
     {
 		//списки
-		for(var i in this.oReadResult.numToNumClass)
-		{
-			var oNumClass = this.oReadResult.numToNumClass[i];
-			this.Document.Numbering.AddAbstractNum(oNumClass);
+		for(var i in this.oReadResult.numToANumClass) {
+			this.Document.Numbering.AddAbstractNum(this.oReadResult.numToANumClass[i]);
 		}
+		for(var i in this.oReadResult.numToNumClass) {
+			this.Document.Numbering.AddNum(this.oReadResult.numToNumClass[i]);
+		}
+
 		for(var i = 0, length = this.oReadResult.paraNumPrs.length; i < length; ++i)
 		{
 			var numPr = this.oReadResult.paraNumPrs[i];
@@ -6810,8 +6860,8 @@ function BinaryFileReader(doc, openParams)
         this.ReadMainTable();
         var oReadResult = this.oReadResult;
         //обрабатываем списки
-        for (var i in oReadResult.numToNumClass) {
-            var oNumClass = oReadResult.numToNumClass[i];
+        for (var i in oReadResult.numToANumClass) {
+            var oNumClass = oReadResult.numToANumClass[i];
             var documentANum = this.Document.Numbering.AbstractNum;
             //проверка на уже существующий такой же AbstractNum
             /*var isAlreadyContains = false;
@@ -6835,6 +6885,9 @@ function BinaryFileReader(doc, openParams)
 			//TODO просмотреть все ситуации со списками
 			this.Document.Numbering.AddAbstractNum(oNumClass);
         }
+		for(var i in this.oReadResult.numToNumClass) {
+			this.Document.Numbering.AddNum(this.oReadResult.numToNumClass[i]);
+		}
         for (var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i) {
             var numPr = oReadResult.paraNumPrs[i];
             var oNumClass = oReadResult.numToNumClass[numPr.NumId];
@@ -8982,8 +9035,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
     this.Document = doc;
 	this.oReadResult = oReadResult;
     this.stream = stream;
-	this.m_oNumToANum = {};
-	this.m_oANumToNumClass = {};
+	this.m_oANums = {};
     this.bcr = new Binary_CommonReader(this.stream);
     this.brPrr = new Binary_rPrReader(this.Document, this.oReadResult, this.stream);
     this.bpPrr = new Binary_pPrReader(this.Document, this.oReadResult, this.stream);
@@ -8993,16 +9045,6 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         var res = this.bcr.ReadTable(function(t, l){
                 return oThis.ReadNumberingContent(t,l);
             });
-		for(var i in this.m_oNumToANum)
-		{
-			var anum = this.m_oNumToANum[i];
-			if(null != anum)
-			{
-				var numClass = this.m_oANumToNumClass[anum];
-				if(null != numClass)
-					this.oReadResult.numToNumClass[i] = numClass;
-			}
-		}
         return res;
     };
     this.ReadNumberingContent = function(type, length)
@@ -9017,47 +9059,80 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         }
         else if ( c_oSerNumTypes.Nums === type )
         {
+			var tmpNum = {NumId: null, Num: null};
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadNums(t, l);
+                return oThis.ReadNums(t, l, tmpNum);
             });
         }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     },
-    this.ReadNums = function(type, length, Num)
+    this.ReadNums = function(type, length, tmpNum)
     {
         var oThis = this;
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerNumTypes.Num === type )
         {
-            var oNewItem = {};
-            res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadNum(t, l, oNewItem);
-            });
-            if(null != oNewItem.ANum && null != oNewItem.Num)
-                this.m_oNumToANum[oNewItem.Num] = oNewItem.ANum;
+			tmpNum.NumId = null;
+			tmpNum.Num = new CNum(this.oReadResult.logicDocument.GetNumbering());
+			res = this.bcr.Read2(length, function(t, l) {
+				return oThis.ReadNum(t, l, tmpNum);
+			});
+			if (null != tmpNum.NumId) {
+				this.oReadResult.numToNumClass[tmpNum.NumId] = tmpNum.Num;
+			}
         }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     },
-    this.ReadNum = function(type, length, Num)
+    this.ReadNum = function(type, length, tmpNum)
     {
         var oThis = this;
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerNumTypes.Num_ANumId === type )
         {
-            Num.ANum = this.stream.GetULongLE();
+			var ANum = this.m_oANums[this.stream.GetULongLE()];
+			if (ANum) {
+				tmpNum.Num.AbstractNumId = ANum.GetId();
+				this.oReadResult.numToANumClass[ANum.GetId()] = ANum;
+			}
         }
         else if ( c_oSerNumTypes.Num_NumId === type )
         {
-            Num.Num = this.stream.GetULongLE();
+			tmpNum.NumId = this.stream.GetULongLE();
         }
+		else if ( c_oSerNumTypes.Num_LvlOverride === type )
+		{
+			var tmpOverride = {nLvl: undefined, StartOverride: undefined, Lvl: undefined};
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.ReadLvlOverride(t, l, tmpOverride);
+			});
+			tmpNum.Num.SetLvlOverride(tmpOverride.Lvl, tmpOverride.nLvl, tmpOverride.StartOverride);
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     },
+	this.ReadLvlOverride = function(type, length, lvlOverride) {
+		var oThis = this;
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSerNumTypes.ILvl === type) {
+			lvlOverride.nLvl = this.stream.GetULongLE();
+		} else if (c_oSerNumTypes.StartOverride === type) {
+			lvlOverride.StartOverride = this.stream.GetULongLE();
+		} else if (c_oSerNumTypes.Lvl === type) {
+			lvlOverride.Lvl = new CNumberingLvl();
+			var tmp = {nLevelNum: 0};
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.ReadLevel(t, l, lvlOverride.Lvl, tmp);
+			});
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	},
     this.ReadAbstractNums = function(type, length)
     {
         var oThis = this;
@@ -9092,7 +9167,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 		}
         else if ( c_oSerNumTypes.AbstractNum_Id === type )
         {
-			this.m_oANumToNumClass[this.stream.GetULongLE()] = oNewNum;
+			this.m_oANums[this.stream.GetULongLE()] = oNewNum;
             //oNewNum.Id = this.stream.GetULongLE();
         }
         else
@@ -9112,12 +9187,13 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				//сбрасываем свойства
 				oNewLvl.ParaPr = new CParaPr();
 				oNewLvl.TextPr = new CTextPr();
+				var tmp = {nLevelNum: nLevelNum};
 				res = this.bcr.Read2(length, function(t, l){
-					return oThis.ReadLevel(t, l, oNewLvl);
+					return oThis.ReadLevel(t, l, oNewLvl, tmp);
 				});
-				oNewNum.Lvl[nLevelNum] = oNewLvl;
+				oNewNum.Lvl[tmp.nLevelNum] = oNewLvl;
 				this.oReadResult.aPostOpenStyleNumCallbacks.push(function(){
-					oNewNum.SetLvl(nLevelNum, oNewLvl);
+					oNewNum.SetLvl(tmp.nLevelNum, oNewLvl);
 				});
 			}
 			else
@@ -9127,7 +9203,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
-    this.ReadLevel = function(type, length, oNewLvl)
+    this.ReadLevel = function(type, length, oNewLvl, tmp)
     {
         var oThis = this;
         var res = c_oSerConstants.ReadOk;
@@ -9170,6 +9246,10 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         {
             res = this.brPrr.Read(length, oNewLvl.TextPr, null);
         }
+		else if ( c_oSerNumTypes.ILvl === type )
+		{
+			tmp.nLevelNum = this.stream.GetULongLE();
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -14686,6 +14766,7 @@ function DocReadResult(doc) {
 	this.oCommentsPlaces = {};
 	this.setting = {titlePg: false, EvenAndOddHeaders: false};
 	this.numToNumClass = {};
+	this.numToANumClass = {};
 	this.paraNumPrs = [];
 	this.styles = [];
 	this.runStyles = [];
