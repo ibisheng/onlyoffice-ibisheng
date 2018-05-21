@@ -328,9 +328,6 @@
         this.cols = [];
         this.rows = [];
 
-        this.width_1px_pt = 0;
-        this.height_1px_pt = 0;
-
         this.highlightedCol = -1;
         this.highlightedRow = -1;
         this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
@@ -382,7 +379,6 @@
     }
 
 	WorksheetView.prototype._init = function () {
-		this._initConstValues();
 		this._initWorksheetDefaultWidth();
 		this.model.initColumns();
 		this._initPane();
@@ -396,12 +392,6 @@
 
 		// initializing is completed
 		this.handlers.trigger("initialized");
-	};
-	WorksheetView.prototype._initConstValues = function () {
-		var ppiX = this._getPPIX();
-		var ppiY = this._getPPIY();
-		this.width_1px_pt = asc_calcnpt(0, ppiX, 1/*px*/);
-		this.height_1px_pt = asc_calcnpt(0, ppiY, 1/*px*/);
 	};
 	WorksheetView.prototype._initWorksheetDefaultWidth = function () {
 		// Теперь рассчитываем число px
@@ -1677,10 +1667,11 @@
             var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
             var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
             // 1px offset for borders
-            var leftFieldInPt = pageLeftField / vector_koef + this.width_1px_pt;
-            var topFieldInPt = pageTopField / vector_koef + this.height_1px_pt;
-            var rightFieldInPt = pageRightField / vector_koef + this.width_1px_pt;
-            var bottomFieldInPt = pageBottomField / vector_koef + this.height_1px_pt;
+            var pxInPt = 0.75;
+            var leftFieldInPt = pageLeftField / vector_koef + pxInPt;
+            var topFieldInPt = pageTopField / vector_koef + pxInPt;
+            var rightFieldInPt = pageRightField / vector_koef + pxInPt;
+            var bottomFieldInPt = pageBottomField / vector_koef + pxInPt;
 
             if (pageHeadings) {
                 // Рисуем заголовки, нужно чуть сдвинуться

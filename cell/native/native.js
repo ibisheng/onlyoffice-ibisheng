@@ -3431,14 +3431,14 @@ function OfflineEditor () {
             var isZeroHeader = false;
             if (-1 !== index) {
                 if (isColHeader) {
-                    if (w < this.width_1px) {
+                    if (0 === w) {
                         if (style !== kHeaderDefault) {
                             return;
                         }
                         // Это невидимый столбец
                         isZeroHeader = true;
                         // Отрисуем только границу
-                        w = this.width_1px;
+                        w = 1;
                         // Возможно мы уже рисовали границу невидимого столбца (для последовательности невидимых)
                         if (0 < index && 0 === this.cols[index - 1].width) {
                             // Мы уже нарисовали border для невидимой границы
@@ -3446,8 +3446,8 @@ function OfflineEditor () {
                         }
                     } else if (0 < index && 0 === this.cols[index - 1].width) {
                         // Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседнего столбца)
-                        w -= this.width_1px;
-                        x += this.width_1px;
+                        w -= 1;
+                        x += 1;
                     }
                 } else {
                     if (h < this.height_1px) {
@@ -3475,7 +3475,7 @@ function OfflineEditor () {
             var st = this.settings.header.style[style];
             var x2 = x + w;
             var y2 = y + h;
-            var x2WithoutBorder = x2 - this.width_1px;
+            var x2WithoutBorder = x2 - 1;
             var y2WithoutBorder = y2 - this.height_1px;
 
             // background только для видимых
