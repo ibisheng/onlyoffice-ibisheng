@@ -2073,6 +2073,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 
 	this.apiEditor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window["editor"];
 
+	this.msoComments = [];
 }
 PasteProcessor.prototype =
 {
@@ -5842,6 +5843,13 @@ PasteProcessor.prototype =
         for(var i = 0, length = node.childNodes.length; i < length; i++)
         {
             var child = node.childNodes[i];
+
+			//get comment
+			var style = child.getAttribute ? child.getAttribute("style") : null;
+			if(style && -1 !== style.indexOf("mso-element:comment") && -1 === style.indexOf("mso-element:comment-list")) {
+				this._parseMsoElementComment(child);
+			}
+
             var child_nodeType = child.nodeType;
             if(!(Node.ELEMENT_NODE === child_nodeType || Node.TEXT_NODE === child_nodeType))
                 continue;
@@ -5873,6 +5881,27 @@ PasteProcessor.prototype =
 			return aPrepeareFonts;
 		}
     },
+	_parseMsoElementComment: function (node) {
+		var msoComment = this._getMsoCommentText(node);
+		this.msoComments.push(msoComment);
+	},
+	_getMsoCommentText: function(node) {
+		var res = null;
+		var elems = node.getElementsByClassName("MsoCommentText");
+		if(elems && elems.length) {
+			for(var i = 0; i < elems.length; i++) {
+				var child = elems[i];
+
+				if(!(child.getAttribute && child.getAttribute("class")==="MsoCommentReference")) {
+					if(res === null) {
+						res = "";
+					}
+					res += child.innerText;
+				}
+			}
+		}
+		return res;
+	},
 	_checkFontsOnLoad: function(fonts)
 	{
 		if(!fonts)
