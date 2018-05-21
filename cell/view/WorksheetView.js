@@ -1318,7 +1318,7 @@
      */
 	WorksheetView.prototype._createCacheColumn = function (w) {
 		var res = new CacheColumn();
-		res.width = w;
+		res.width = Asc.round(w * this.getZoom());
 		res.innerWidth = Math.max(res.width - this.settings.cells.padding * 2 - gridlineSize, 0);
 		return res;
 	};
@@ -1331,7 +1331,7 @@
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
             var numDigit = Math.max(AscCommonExcel.calcDecades(this.visibleRange.r2 + 1), 3);
             var nCharCount = this.model.charCountToModelColWidth(numDigit);
-            this.headersWidth = this.model.modelColWidthToColWidth(nCharCount);
+            this.headersWidth = Asc.round(this.model.modelColWidthToColWidth(nCharCount) * this.getZoom());
         }
 
         this.cellsLeft = this.headersLeft + this.headersWidth;
@@ -1340,7 +1340,7 @@
     /** Вычисляет высоту строки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderRowHeight = function () {
 		this.headersHeight = (false === this.model.getSheetView().asc_getShowRowColHeaders()) ? 0 :
-			this.headersHeightByFont;
+			Asc.round(this.headersHeightByFont * this.getZoom());
         this.cellsTop = this.headersTop + this.headersHeight;
     };
 
@@ -1410,7 +1410,7 @@
 					}
 				}
             });
-            h = (h < 0 ? (hR = defaultH) : h);
+            h = Asc.round((h < 0 ? (hR = defaultH) : h) * this.getZoom());
             this.rows[i] = {
                 top: y,
                 height: h,												// Высота с точностью до 1 px
