@@ -4905,10 +4905,6 @@
         tm.width = Asc.round(tm.width);
         tm.height = Asc.round(tm.height);
         tm.baseline = Asc.round(tm.baseline);
-
-        if (tm.centerline !== undefined) {
-            tm.centerline = Asc.round(tm.centerline);
-        }
         return tm;
     };
 

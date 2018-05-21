@@ -340,23 +340,17 @@
 	 * @param {Number} baseline
 	 * @param {Number} descender
 	 * @param {Number} fontSize
-	 * @param {Number} centerline
 	 * @param {Number} widthBB
 	 *
 	 * @memberOf Asc
 	 */
-	function TextMetrics(width, height, lineHeight, baseline, descender, fontSize, centerline, widthBB) {
-		if ( !(this instanceof TextMetrics) ) {
-			return new TextMetrics(width, height, lineHeight, baseline, descender, fontSize, centerline, widthBB);
-		}
-
+	function TextMetrics(width, height, lineHeight, baseline, descender, fontSize, widthBB) {
 		this.width      = width !== undefined ? width : 0;
 		this.height     = height !== undefined ? height : 0;
 		this.lineHeight = lineHeight !== undefined ? lineHeight : 0;
 		this.baseline   = baseline !== undefined ? baseline : 0;
 		this.descender  = descender !== undefined ? descender : 0;
 		this.fontSize   = fontSize !== undefined ? fontSize : 0;
-		this.centerline = centerline !== undefined ? centerline : 0;
 		this.widthBB    = widthBB !== undefined ? widthBB : 0;
 
 		return this;
@@ -1228,7 +1222,7 @@
 			l = fm.m_lLineHeight * factor,
 			b = fm.m_lAscender * factor,
 			d = Math.abs(fm.m_lDescender * factor);
-		return new TextMetrics(w, b + d, l, b, d, this.font.FontSize, 0, wBB);
+		return new TextMetrics(w, b + d, l, b, d, this.font.FontSize, wBB);
 	};
 
 
