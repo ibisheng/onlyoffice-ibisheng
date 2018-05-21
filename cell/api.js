@@ -1461,6 +1461,11 @@ var editor;
 			return;
 		}
 
+        if (AscCommon.EncryptionWorker && !AscCommon.EncryptionWorker.isChangesHandled)
+        {
+            return AscCommon.EncryptionWorker.handleChanges(this.collaborativeEditing.m_arrChanges, this, this._openDocumentEndCallback);
+        }
+
 		if (0 === this.wbModel.getWorksheetCount()) {
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationOpenError, c_oAscError.Level.Critical);
 			return;

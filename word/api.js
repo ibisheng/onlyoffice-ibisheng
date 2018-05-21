@@ -8560,7 +8560,7 @@ background-repeat: no-repeat;\
 		return oBinaryFileWriter.Write(true, true);
 
 	};
-    window["asc_docs_api"].prototype["asc_nativeGetFile3"] = function()
+    window["asc_docs_api"].prototype.asc_nativeGetFile3 = function()
     {
         var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
         return { data: oBinaryFileWriter.Write(true, true), header: (AscCommon.c_oSerFormat.Signature + ";v" + Asc.c_nVersionNoBase64 + ";" + oBinaryFileWriter.memory.GetCurPosition() + ";") };

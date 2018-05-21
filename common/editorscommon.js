@@ -3416,10 +3416,20 @@
         	if (this.handleChangesCallback)
 			{
 				//console.log(data);
-				for (var i = data.length - 1; i >= 0; i--)
+				if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
 				{
-                    this.handleChangesCallback.changesBase[i].m_pData = data[i];
+                    for (var i = data.length - 1; i >= 0; i--)
+                    {
+                        this.handleChangesCallback.changesBase[i] = data[i];
+                    }
                 }
+                else
+				{
+                    for (var i = data.length - 1; i >= 0; i--)
+                    {
+                        this.handleChangesCallback.changesBase[i].m_pData = data[i];
+                    }
+				}
                 this.isChangesHandled = true;
 				this.handleChangesCallback.callback.call(this.handleChangesCallback.sender);
                 this.isChangesHandled = false;
@@ -3457,9 +3467,19 @@
 
 			this.handleChangesCallback = { changesBase : _array, changes : [], sender : _sender, callback : _callback };
 
-			for (var i = _array.length - 1; i >= 0; i--)
+            if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
+            {
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    this.handleChangesCallback.changes[i] = _array[i];
+                }
+            }
+            else
 			{
-                this.handleChangesCallback.changes[i] = _array[i].m_pData;
+                for (var i = _array.length - 1; i >= 0; i--)
+                {
+                    this.handleChangesCallback.changes[i] = _array[i].m_pData;
+                }
 			}
 
             window.g_asc_plugins.sendToEncryption({ "type" : "decryptData", "data" : this.handleChangesCallback.changes });
@@ -3678,7 +3698,7 @@ window.openFileCryptCallback = function(_binary)
 	}
 	else if ("PPTY" == AscCommon.c_oSerFormat.Signature)
 	{
-        this.OpenDocument2("", _binary);
+        _editor.OpenDocument2("", _binary);
 	}
 	else
 	{

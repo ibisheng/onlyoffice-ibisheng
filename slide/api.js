@@ -7182,7 +7182,7 @@ background-repeat: no-repeat;\
 		return writer.WriteDocument(this.WordControl.m_oLogicDocument);
 	};
 
-    window["asc_docs_api"].prototype["asc_nativeGetFile3"] = function()
+    window["asc_docs_api"].prototype.asc_nativeGetFile3 = function()
     {
         var writer = new AscCommon.CBinaryFileWriter();
         this.WordControl.m_oLogicDocument.CalculateComments();
