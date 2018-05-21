@@ -523,10 +523,6 @@ DrawingObjectsController.prototype.isViewMode = function()
 {
     return this.drawingObjects.isViewerMode();
 };
-DrawingObjectsController.prototype.canEdit = function()
-{
-    return this.drawingObjects.isViewerMode();
-};
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {
