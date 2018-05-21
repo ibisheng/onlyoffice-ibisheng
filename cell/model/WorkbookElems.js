@@ -3146,6 +3146,9 @@ function Col(worksheet, index)
     this.CustomWidth = null;
     this.width = null;
     this.xfs = null;
+
+	this.widthPx = null;
+	this.charCount = null;
 }
 Col.prototype =
 {

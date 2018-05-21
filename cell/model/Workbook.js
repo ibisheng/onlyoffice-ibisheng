@@ -2748,26 +2748,24 @@
 		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 	};
 	/**
-	 * Вычисляет ширину столбца в пунктах
+	 * Вычисляет ширину столбца в px
 	 * @param {Number} mcw  Количество символов
-	 * @returns {Number}    Ширина столбца в пунктах (pt)
+	 * @returns {Number}    Ширина столбца в px
 	 */
 	Workbook.prototype.modelColWidthToColWidth = function (mcw) {
-		var px = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
-		return px * Asc.getCvtRatio(0, 1, 96);
+		return Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 	};
 	/**
 	 * Вычисляет количество символов по ширине столбца
-	 * @param {Number} w  Ширина столбца в пунктах
+	 * @param {Number} w  Ширина столбца в px
 	 * @returns {Number}  Количество символов
 	 */
 	Workbook.prototype.colWidthToCharCount = function (w) {
-		var px = w * Asc.getCvtRatio(1/*pt*/, 0/*px*/, 96);
 		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
 		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-		return px < pxInOneCharacter ?
-			(1 - Asc.floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
-			Asc.floor((px - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
+		return w < pxInOneCharacter ?
+			(1 - Asc.floor(100 * (pxInOneCharacter - w) / pxInOneCharacter + 0.49999) / 100) :
+			Asc.floor((w - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {
@@ -3277,6 +3275,15 @@
 			newSparkline.setWorksheet(oNewWs, wsFrom);
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
+	};
+	Worksheet.prototype.initColumns = function () {
+		var t = this;
+		this.aCols.forEach(function (column) {
+			if (null !== column.width) {
+				column.widthPx = t.modelColWidthToColWidth(column.width);
+				column.charCount = t.colWidthToCharCount(column.widthPx);
+			}
+		});
 	};
 	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (!this.PagePrintOptions) {

@@ -3144,8 +3144,8 @@ function DrawingObjects() {
             graphics.m_oFontManager = AscCommon.g_fontManager;
         }
 
-        var _offX = offsetX* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIX());
-        var _offY = offsetY* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIY());
+        var _offX = offsetX* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIX());
+        var _offY = offsetY* Asc.getCvtRatio(0, 3, oDrawingContext.getPPIY());
         for(i = 0; i < aSparklineGroups.length; ++i) {
             var oSparklineGroup = aSparklineGroups[i];
 

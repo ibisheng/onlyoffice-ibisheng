@@ -55,7 +55,6 @@
   var asc_typeof = asc.typeOf;
   var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
   var asc_CPrintPagesData = AscCommonExcel.CPrintPagesData;
-  var asc_getcvt = asc.getCvtRatio;
   var asc_CSP = AscCommonExcel.asc_CStylesPainter;
   var c_oTargetType = AscCommonExcel.c_oTargetType;
   var c_oAscError = asc.c_oAscError;
@@ -272,10 +271,10 @@
     }
 
     this.buffers.main = new asc.DrawingContext({
-      canvas: this.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+      canvas: this.canvas, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });
     this.buffers.overlay = new asc.DrawingContext({
-      canvas: this.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+      canvas: this.canvasOverlay, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
     });
 
     this.buffers.mainGraphic = new asc.DrawingContext({
@@ -2619,13 +2618,8 @@
     // Измеряем в pt
     this.stringRender.measureString("0123456789", new AscCommonExcel.CellFlags());
 
-    var ppiX = 96; // Мерить только с 96
-    var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
-
-    // Максимальная ширина в Pt
-    var maxWidthInPt = this.stringRender.getWidestCharWidth();
     // Переводим в px и приводим к целому (int)
-    this.model.maxDigitWidth = this.maxDigitWidth = asc_round(maxWidthInPt * ptConvToPx);
+    this.model.maxDigitWidth = this.maxDigitWidth = this.stringRender.getWidestCharWidth();
     // Проверка для Calibri 11 должно быть this.maxDigitWidth = 7
 
     if (!this.maxDigitWidth) {
@@ -2950,25 +2944,24 @@
 		var l = ws.getCellLeft(range.c1, 3);
 		var t = ws.getCellTop(range.r1, 3);
 
-		var _offX = ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX());
-		var _offY = ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY());
+		var offset = ws.getCellsOffset(3);
 
 		return {
-			X: asc.c_oAscSelectionType.RangeRow === type ? -_offX : l - _offX,
-			Y: asc.c_oAscSelectionType.RangeCol === type ? -_offY : t - _offY,
-			W: asc.c_oAscSelectionType.RangeRow === type ? _offX :
+			X: asc.c_oAscSelectionType.RangeRow === type ? -offset.left : l - offset.left,
+			Y: asc.c_oAscSelectionType.RangeCol === type ? -offset.top : t - offset.top,
+			W: asc.c_oAscSelectionType.RangeRow === type ? offset.left :
 				ws.getCellLeft(range.c2, 3) - l + ws.getColumnWidth(range.c2, 3),
-			H: asc.c_oAscSelectionType.RangeCol === type ? _offY :
+			H: asc.c_oAscSelectionType.RangeCol === type ? offset.top :
 				ws.getCellTop(range.r2, 3) - t + ws.getRowHeight(range.r2, 3),
 			T: type
 		};
 	};
 	WorkbookView.prototype.GetCaptionSize = function()
 	{
-		var ws = this.getWorksheet();
+		var offset = this.getWorksheet().getCellsOffset(3);
 		return {
-			W:  ws.cellsLeft * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIX()),
-			H: ws.cellsTop * asc_getcvt(1/*pt*/, 3/*mm*/, ws._getPPIY())
+			W: offset.left,
+			H: offset.top
 		};
 	};
 	WorkbookView.prototype.ConvertXYToLogic = function (x, y) {

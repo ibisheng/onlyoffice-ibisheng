@@ -822,6 +822,7 @@
 		var fm = this.fmgrGraphics[3];
 		var d  = Math.abs(fm.m_lDescender);
 		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
+		var r2  = getCvtRatio(1/*pt*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		var factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
 
 		var res = new FontMetrics();
@@ -839,6 +840,9 @@
 			res.nat_y1 = face.header.yMax;
 			res.nat_y2 = face.header.yMin;
 		}
+
+		res.nat_y1 *= r2;
+		res.nat_y2 *= r2;
 		return res;
 	};
 
