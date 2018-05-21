@@ -566,58 +566,52 @@
 		StringRender.prototype._calcLineMetrics = function (f, va, fm) {
 			var l = new lineMetrics();
 
-			var ppi = 96;
-			var hpt = f * 1.275;
-			var fpx = f * ppi / 72;
-			var topt = 72 / ppi;
+			if (!va) {
+				var _a = Math.max(0, asc.ceil(fm.nat_y1 * f / fm.nat_scale));
+				var _d = Math.max(0, asc.ceil((-fm.nat_y2) * f / fm.nat_scale));
 
-			var h;
-			var a = asc_round(fpx) * topt;
-			var d;
-
-			var a_2 = asc_round(fpx / 2) * topt;
-
-			var h_2_3;
-			var a_2_3 = asc_round(fpx * 2/3) * topt;
-			var d_2_3;
-
-			var x = a_2 + a_2_3;
-
-			if (va === AscCommon.vertalign_SuperScript) {
-				h = asc_calcnpt(hpt, ppi);
-				d = h - a;
-
-				l.th = x + d;
-				l.bl = x;
-				l.bl2 = a_2_3;
-				l.a = fm.ascender + a_2;         // >0
-				l.d = fm.descender - a_2;        // <0
-			} else if (va === AscCommon.vertalign_SubScript) {
-				h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
-				d_2_3 = h_2_3 - a_2_3;
-				l.th = x + d_2_3;
-				l.bl = a;
-				l.bl2 = x;
-				l.a = fm.ascender + a - x;       // >0
-				l.d = fm.descender + x - a;      // >0
+				l.th = _a + _d;
+				l.bl = _a;
+				l.a = _a;
+				l.d = _d;
 			} else {
-				/* Было раньше
-				l.th = a + d;
-				l.bl = a;
-				l.a = fm.ascender;
-				l.d = fm.descender;*/
+				var ppi = 96;
+				var hpt = f * 1.275;
+				var fpx = f * ppi / 72;
+				var topt = 72 / ppi;
 
-				var _a = Math.max(0, fm.nat_y1 * f / fm.nat_scale);
-				var _d = Math.max(0, (-fm.nat_y2) * f / fm.nat_scale);
-				
-				var _aa = asc_calcnpt(_a, ppi);
-				var _dd = asc_calcnpt(_d, ppi);
-				
-				l.th = _aa + _dd;
-				l.bl = _aa;
-				l.a = _aa;
-				l.d = _dd;
+				var h;
+				var a = asc_round(fpx) * topt;
+				var d;
+
+				var a_2 = asc_round(fpx / 2) * topt;
+
+				var h_2_3;
+				var a_2_3 = asc_round(fpx * 2/3) * topt;
+				var d_2_3;
+
+				var x = a_2 + a_2_3;
+
+				if (va === AscCommon.vertalign_SuperScript) {
+					h = asc_calcnpt(hpt, ppi);
+					d = h - a;
+
+					l.th = x + d;
+					l.bl = x;
+					l.bl2 = a_2_3;
+					l.a = fm.ascender + a_2;         // >0
+					l.d = fm.descender - a_2;        // <0
+				} else if (va === AscCommon.vertalign_SubScript) {
+					h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
+					d_2_3 = h_2_3 - a_2_3;
+					l.th = x + d_2_3;
+					l.bl = a;
+					l.bl2 = x;
+					l.a = fm.ascender + a - x;       // >0
+					l.d = fm.descender + x - a;      // >0
+				}
 			}
+
 			return l;
 		};
 
@@ -631,7 +625,7 @@
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
-			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
+			var l = new LineInfo(), TW = 0, TH = 0, BL = 0;
 
 			function addLine(b, e) {
 				if (-1 !== b)
@@ -689,11 +683,7 @@
 					addLine(beg, i - 1);
 				}
 			}
-
-			if (this.lines.length > 0) {
-				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
-			}
-			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
@@ -807,7 +797,7 @@
 
 				for (chPos = self.chars.length, j = 0; j < s.length; ++j, ++chPos) {
 					ch  = s.charAt(j);
-					tm = ctx.measureChar(ch, 1/*pt units*/);
+					tm = ctx.measureChar(ch, 0/*px units*/);
 					chw = tm.width;
 
 					isNL = self.reHypNL.test(ch);

@@ -2748,26 +2748,24 @@
 		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 	};
 	/**
-	 * Вычисляет ширину столбца в пунктах
+	 * Вычисляет ширину столбца в px
 	 * @param {Number} mcw  Количество символов
-	 * @returns {Number}    Ширина столбца в пунктах (pt)
+	 * @returns {Number}    Ширина столбца в px
 	 */
 	Workbook.prototype.modelColWidthToColWidth = function (mcw) {
-		var px = Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
-		return px * Asc.getCvtRatio(0, 1, 96);
+		return Asc.floor(((256 * mcw + Asc.floor(128 / this.maxDigitWidth)) / 256) * this.maxDigitWidth);
 	};
 	/**
 	 * Вычисляет количество символов по ширине столбца
-	 * @param {Number} w  Ширина столбца в пунктах
+	 * @param {Number} w  Ширина столбца в px
 	 * @returns {Number}  Количество символов
 	 */
 	Workbook.prototype.colWidthToCharCount = function (w) {
-		var px = w * Asc.getCvtRatio(1/*pt*/, 0/*px*/, 96);
 		var pxInOneCharacter = this.maxDigitWidth + this.paddingPlusBorder;
 		// Когда меньше 1 символа, то просто считаем по пропорции относительно размера 1-го символа
-		return px < pxInOneCharacter ?
-			(1 - Asc.floor(100 * (pxInOneCharacter - px) / pxInOneCharacter + 0.49999) / 100) :
-			Asc.floor((px - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
+		return w < pxInOneCharacter ?
+			(1 - Asc.floor(100 * (pxInOneCharacter - w) / pxInOneCharacter + 0.49999) / 100) :
+			Asc.floor((w - this.paddingPlusBorder) / this.maxDigitWidth * 100 + 0.5) / 100;
 	};
 	Workbook.prototype.getUndoDefName = function(ascName) {
 		if (!ascName) {
@@ -3278,6 +3276,15 @@
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
 	};
+	Worksheet.prototype.initColumn = function (column) {
+		if (null !== column.width) {
+			column.widthPx = this.modelColWidthToColWidth(column.width);
+			column.charCount = this.colWidthToCharCount(column.widthPx);
+		}
+	};
+	Worksheet.prototype.initColumns = function () {
+		this.aCols.forEach(this.initColumn, this);
+	};
 	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (!this.PagePrintOptions) {
 			// Даже если не было, создадим
@@ -3760,6 +3767,9 @@
 			}
 		}
 	};
+	Worksheet.prototype.getSheetView = function () {
+		return this.sheetViews[0];
+	};
 	Worksheet.prototype.getSheetViewSettings = function () {
 		return this.sheetViews[0].clone();
 	};
@@ -4157,6 +4167,7 @@
 				col.CustomWidth = true;
 				col.BestFit = null;
 				col.setHidden(null);
+				oThis.initColumn(col);
 				var oNewProps = col.getWidthProp();
 				if(false == oOldProps.isEqual(oNewProps))
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, oThis.getId(),
@@ -4265,6 +4276,7 @@
 			else
 				col.BestFit = null;
 			col.width = width;
+			oThis.initColumn(col);
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
 				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, oThis.getId(),
