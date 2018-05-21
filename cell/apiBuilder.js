@@ -1417,7 +1417,7 @@
 	ApiRange.prototype.SetWrap = function (value) {
 		this.range.setWrap(!!value);
 	};
-	ApiRange.prototype.GetWrap = function () {
+	ApiRange.prototype.GetWrapText = function () {
 		return this.range.getAlign().getWrap();
 	};
 	Object.defineProperty(ApiRange.prototype, "WrapText", {
@@ -1425,7 +1425,7 @@
 			this.SetWrap(value);
 		},
 		get: function () {
-			return this.GetWrap();
+			return this.GetWrapText();
 		}
 	});
 
@@ -1995,7 +1995,8 @@
 	ApiRange.prototype["SetUnderline"] = ApiRange.prototype.SetUnderline;
 	ApiRange.prototype["SetStrikeout"] = ApiRange.prototype.SetStrikeout;
 	ApiRange.prototype["SetWrap"] = ApiRange.prototype.SetWrap;
-	ApiRange.prototype["GetWrap"] = ApiRange.prototype.GetWrap;
+	ApiRange.prototype["SetWrapText"] = ApiRange.prototype.SetWrap;	
+	ApiRange.prototype["GetWrapText"] = ApiRange.prototype.GetWrapText;
 	ApiRange.prototype["SetFillColor"] = ApiRange.prototype.SetFillColor;
 	ApiRange.prototype["SetNumberFormat"] = ApiRange.prototype.SetNumberFormat;
 	ApiRange.prototype["SetBorders"] = ApiRange.prototype.SetBorders;
