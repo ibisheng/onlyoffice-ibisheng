@@ -1602,7 +1602,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 
 						// Если есть выделение текста, рисуем его сначала
 						if (highlight_None != oNumTextPr.HighLight)
-							PDSH.High.Add(Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b, undefined, oNumTextPr);
+							PDSH.High.Add(Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, oNumTextPr.HighLight.r, oNumTextPr.HighLight.g, oNumTextPr.HighLight.b, undefined, oNumTextPr);
 					}
 				}
 
@@ -2002,7 +2002,7 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 						if (oNumTextPr.Unifill)
 						{
 							oNumTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-							RGBA = NumTextPr.Unifill.getRGBAColor();
+							RGBA = oNumTextPr.Unifill.getRGBAColor();
 							pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
 						}
 						else
