@@ -5942,8 +5942,8 @@
 						r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(lockRange["r1"],
 							c_oAscLockTypes.kLockTypeOther);
 						if (null !== c1Recalc && null !== r1Recalc) {
-							lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
-							lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
+							lockRangePosLeft = this.getCellLeft(c1Recalc, /*px*/0);
+							lockRangePosTop = this.getCellTop(r1Recalc, /*px*/0);
 							// Пересчитываем X и Y относительно видимой области
 							lockRangePosLeft -= offsetX;
 							lockRangePosTop -= offsetY;
@@ -6949,8 +6949,8 @@
             }
         }
 
-        var xL = this.getCellLeft( col, /*pt*/1 );
-        var yL = this.getCellTop( row, /*pt*/1 );
+        var xL = this.getCellLeft( col, /*px*/0 );
+        var yL = this.getCellTop( row, /*px*/0 );
         // Пересчитываем X и Y относительно видимой области
         xL -= (this.cols[vrCol].left - this.cellsLeft);
         yL -= (this.rows[vrRow].top - this.cellsTop);
@@ -7291,11 +7291,11 @@
         // Копируем выделенную область
         var ar = this.model.selectionRange.getLast().clone(true);
         // Получаем координаты левого верхнего угла выделения
-        var xL = this.getCellLeft(ar.c1, /*pt*/1);
-        var yL = this.getCellTop(ar.r1, /*pt*/1);
+        var xL = this.getCellLeft(ar.c1, /*px*/0);
+        var yL = this.getCellTop(ar.r1, /*px*/0);
         // Получаем координаты правого нижнего угла выделения
-        var xR = this.getCellLeft(ar.c2, /*pt*/1) + this.cols[ar.c2].width;
-        var yR = this.getCellTop(ar.r2, /*pt*/1) + this.rows[ar.r2].height;
+        var xR = this.getCellLeft(ar.c2, /*px*/0) + this.cols[ar.c2].width;
+        var yR = this.getCellTop(ar.r2, /*px*/0) + this.rows[ar.r2].height;
 
         // range для пересчета видимой области
         var activeFillHandleCopy;
