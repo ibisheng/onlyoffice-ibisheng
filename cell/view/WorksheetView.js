@@ -7091,14 +7091,14 @@
         this.model.workbook.handlers.trigger("asc_onHideComment");
 
         var val, c1, c2, r1, r2;
-        val = this._findColUnderCursor(_x, true);
+        val = this._findColUnderCursor(x, true);
         if (val) {
             c1 = c2 = val.col;
         } else {
             c1 = 0;
             c2 = gc_nMaxCol0;
         }
-        val = this._findRowUnderCursor(_y, true);
+        val = this._findRowUnderCursor(y, true);
         if (val) {
             r1 = r2 = val.row;
         } else {
