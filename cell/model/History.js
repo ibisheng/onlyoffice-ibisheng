@@ -746,6 +746,10 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 
 CHistory.prototype._sendCanUndoRedo = function()
 {
+	if (this.workbook.bCollaborativeChanges) {
+		return;
+	}
+
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
