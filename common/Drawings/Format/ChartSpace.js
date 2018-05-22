@@ -200,7 +200,7 @@ function CRect(x, y, w, h){
         else{
             x1 = Math.min(this.x + this.w, oRect.x + oRect.w);
         }
-        if(this.fVertPadding < 0.0 && this.fVertPadding < 0.0){
+        if(this.fVertPadding < 0.0 && oRect.fVertPadding < 0.0){
             y1 = this.y + this.h + oRect.fVertPadding;
             bResetVertPadding = false;
         }
@@ -4546,7 +4546,7 @@ CChartSpace.prototype.getValAxisCrossType = function()
             if(!oCrossGrid.bOnTickMark && bCrossAt){
                 fTickAdd = 1.0;
             }
-            var fScale = (oCrossGrid.nCount*oCrossGrid.fStride)/(oCrossAxis.scale[oCrossAxis.scale.length - 1] - oCrossAxis.scale[0] + fTickAdd);
+            var fScale = ((oCrossGrid.nCount)*oCrossGrid.fStride)/(oCrossAxis.scale[oCrossAxis.scale.length - 1] - oCrossAxis.scale[0] + fTickAdd);
             fAxisPos = oCrossGrid.fStart + (fCrossValue - oCrossAxis.scale[0])*fScale;
 
 
