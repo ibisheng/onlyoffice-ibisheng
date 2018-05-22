@@ -3954,7 +3954,8 @@ CChartSpace.prototype.recalculateReferences = function()
             for(j = 0; j < aCharts.length; ++j){
                 var oChart = aCharts[j];
                 if((oChart.getObjectType() === AscDFH.historyitem_type_BarChart && oChart.grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED)
-                    || (oChart.getObjectType() !== AscDFH.historyitem_type_BarChart && oChart.grouping === AscFormat.GROUPING_PERCENT_STACKED)){
+                    || (oChart.getObjectType() !== AscDFH.historyitem_type_BarChart && oChart.grouping === AscFormat.GROUPING_PERCENT_STACKED)
+                    || (oChart.getObjectType() === AscDFH.historyitem_type_ScatterChart)){
                     break;
                 }
             }
@@ -4263,7 +4264,8 @@ CChartSpace.prototype.getValAxisCrossType = function()
     CChartSpace.prototype.getLabelsForAxis = function(oAxis){
         var aStrings = [];
         var oPlotArea = this.chart.plotArea, i;
-        switch(oAxis.getObjectType()){
+        var nAxisType = oAxis.getObjectType();
+        switch(nAxisType){
             case AscDFH.historyitem_type_DateAx:
             case AscDFH.historyitem_type_CatAx:{
                 //расчитаем подписи для горизонтальной оси
@@ -4290,6 +4292,9 @@ CChartSpace.prototype.getValAxisCrossType = function()
                         var oLitFormat = null, oPtFormat = null;
                         if(typeof oLit.formatCode === "string" && oLit.formatCode.length > 0){
                             oLitFormat = oNumFormatCache.get(oLit.formatCode);
+                        }
+                        if(nAxisType === AscDFH.historyitem_type_DateAx && oAxis.numFmt && typeof oAxis.numFmt.formatCode === "string" && oAxis.numFmt.formatCode.length > 0){
+                            oLitFormat = oNumFormatCache.get(oAxis.numFmt.formatCode);
                         }
                         nPtsLen = oLit.ptCount;
 
@@ -4354,9 +4359,19 @@ CChartSpace.prototype.getValAxisCrossType = function()
                 if(nCrossBetween === AscFormat.CROSS_BETWEEN_MID_CAT && nPtsLength < 2){
                     nPtsLength = 2;
                 }
+                var oLitFormatDate = null;
+                if(nAxisType === AscDFH.historyitem_type_DateAx && oAxis.numFmt && typeof oAxis.numFmt.formatCode === "string" && oAxis.numFmt.formatCode.length > 0){
+                    oLitFormatDate = oNumFormatCache.get(oAxis.numFmt.formatCode);
+                }
+
                 if(nPtsLength > aStrings.length){
                     for(i = aStrings.length; i < nPtsLength; ++i){
-                        aStrings.push(i + 1 + "");
+                        if(oLitFormatDate){
+                            aStrings.push(oLitFormatDate.formatToChart(i + 1));
+                        }
+                        else{
+                            aStrings.push(i + 1 + "");
+                        }
                         oAxis.scale.push(i);
                     }
                 }
