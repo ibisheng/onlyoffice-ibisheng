@@ -1323,7 +1323,7 @@
 		return res;
 	};
 
-    /** Вычисляет ширину колонки заголовков (в pt) */
+    /** Вычисляет ширину колонки заголовков */
     WorksheetView.prototype._calcHeaderColumnWidth = function () {
         if (false === this.model.getSheetView().asc_getShowRowColHeaders()) {
             this.headersWidth = 0;
@@ -1337,7 +1337,7 @@
         this.cellsLeft = this.headersLeft + this.headersWidth;
     };
 
-    /** Вычисляет высоту строки заголовков (в pt) */
+    /** Вычисляет высоту строки заголовков */
     WorksheetView.prototype._calcHeaderRowHeight = function () {
 		this.headersHeight = (false === this.model.getSheetView().asc_getShowRowColHeaders()) ? 0 :
 			Asc.round(this.headersHeightByFont * this.getZoom());
@@ -1345,7 +1345,7 @@
     };
 
     /**
-     * Вычисляет ширину и позицию колонок (в pt)
+     * Вычисляет ширину и позицию колонок
      * @param {AscCommonExcel.recalcType} type
      */
     WorksheetView.prototype._calcWidthColumns = function (type) {
@@ -1370,7 +1370,7 @@
     };
 
     /**
-     * Вычисляет высоту и позицию строк (в pt)
+     * Вычисляет высоту и позицию строк
      * @param {AscCommonExcel.recalcType} type
      */
     WorksheetView.prototype._calcHeightRows = function (type) {
@@ -1448,7 +1448,7 @@
         this.visibleRange.r2 = i - (f ? 1 : 0);
     };
 
-    /** Обновляет позицию колонок (в pt) */
+    /** Обновляет позицию колонок */
     WorksheetView.prototype._updateColumnPositions = function () {
         var x = this.cellsLeft;
         for (var l = this.cols.length, i = 0; i < l; ++i) {
@@ -1457,7 +1457,7 @@
         }
     };
 
-    /** Обновляет позицию строк (в pt) */
+    /** Обновляет позицию строк */
     WorksheetView.prototype._updateRowPositions = function () {
         var y = this.cellsTop;
         for (var l = this.rows.length, i = 0; i < l; ++i) {
@@ -2094,12 +2094,12 @@
     };
 
     /**
-     * Рисует заголовок, принимает координаты и размеры в pt
+     * Рисует заголовок, принимает координаты и размеры в px
      * @param {DrawingContext} drawingCtx
-     * @param {Number} x  Координата левого угла в pt
-     * @param {Number} y  Координата левого угла в pt
-     * @param {Number} w  Ширина в pt
-     * @param {Number} h  Высота в pt
+     * @param {Number} x  Координата левого угла в px
+     * @param {Number} y  Координата левого угла в px
+     * @param {Number} w  Ширина в px
+     * @param {Number} h  Высота в px
      * @param {Number} style  Стиль заголовка (kHeaderDefault, kHeaderActive, kHeaderHighlighted)
      * @param {Boolean} isColHeader  Тип заголовка: true - колонка, false - строка
      * @param {Number} index  Индекс столбца/строки или -1
