@@ -5289,21 +5289,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
 	var Page    = this.Pages[CurPage];
 	var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
-	if (this.Parent && selectionflag_Numbering === this.Parent.Selection.Flag)
-	{
-		for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
-		{
-			var Row = this.Get_Row(CurRow);
-			for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
-			{
-				var Cell         = Row.Get_Cell(CurCell);
-				var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-				Cell.Content_DrawSelectionOnPage(Cell_PageRel);
-			}
-		}
-		return;
-	}
-
 	switch (this.Selection.Type)
 	{
 		case table_Selection_Cell:

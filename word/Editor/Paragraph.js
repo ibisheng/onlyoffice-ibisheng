@@ -1259,7 +1259,11 @@ Paragraph.prototype.Internal_Check_Ranges = function(CurLine, CurRange)
 	else
 		return false;
 };
-Paragraph.prototype.Internal_Get_NumberingTextPr = function()
+/**
+ * Получаем текущие текстовые настройки нумерации
+ * @returns {CTextPr}
+ */
+Paragraph.prototype.GetNumberingTextPr = function()
 {
 	var oNumPr = this.GetNumPr();
 	if (!oNumPr)
@@ -6237,10 +6241,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 		{
 			// Передвигаем курсор в начало параграфа
 			this.Set_ParaContentPos(this.Get_StartPos(), true, -1, -1);
-
-			// Производим выделение нумерации
-			this.Parent.Update_ContentIndexing();
-			this.Parent.Document_SelectNumbering(NumPr, this.Index);
+			this.Parent.SelectNumbering(NumPr, this);
 		}
 		else if (oField && fieldtype_FORMTEXT === oField.Get_FieldType())
 		{
@@ -6419,6 +6420,7 @@ Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 			break;
 		}
 		case selectionflag_Numbering:
+		case selectionflag_NumberingCur:
 		{
 			var ParaNum      = this.Numbering;
 			var NumberingRun = ParaNum.Run;
@@ -6436,6 +6438,8 @@ Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 			var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
 			var SelectW = ParaNum.WidthVisible;
 			var SelectH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+			var SelectW2 = SelectW;
 
 			var oNumPr = this.GetNumPr();
 			var nNumJc = this.Parent.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetJc();
@@ -6464,6 +6468,9 @@ Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 			}
 
 			this.DrawingDocument.AddPageSelection(PageAbs, SelectX, SelectY, SelectW, SelectH);
+
+			if (selectionflag_NumberingCur === this.Selection.Flag)
+				this.DrawingDocument.AddPageSelection(PageAbs, SelectX, SelectY, SelectW2, SelectH);
 
 			break;
 		}
@@ -6585,6 +6592,14 @@ Paragraph.prototype.Selection_SelectNumbering = function()
 	{
 		this.Selection.Use  = true;
 		this.Selection.Flag = selectionflag_Numbering;
+	}
+};
+Paragraph.prototype.SelectNumbering = function(isCurrent)
+{
+	if (this.HaveNumbering())
+	{
+		this.Selection.Use  = true;
+		this.Selection.Flag = isCurrent ? selectionflag_NumberingCur : selectionflag_Numbering;
 	}
 };
 /**
@@ -9579,7 +9594,7 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		EndPos     = CurPos;
 	}
 
-	if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && selectionflag_Numbering !== this.Selection.Flag)
+	if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && (selectionflag_Numbering !== this.Selection.Flag && selectionflag_NumberingCur !== this.Selection.Flag))
 		this.SpellChecker.Document_UpdateInterfaceState(StartPos, EndPos);
 
 	if (true === this.Selection.Use)
@@ -12962,6 +12977,18 @@ Paragraph.prototype.GetFirstParagraph = function()
 Paragraph.prototype.GetSpellChecker = function()
 {
 	return this.SpellChecker;
+};
+/**
+ * Получаем номер страницы, на которой расположена нумерация
+ * @param {boolean} isAbsolute возвращаем абсолютный номер страницы или нет
+ * @returns {number}
+ */
+Paragraph.prototype.GetNumberingPage = function(isAbsolute)
+{
+	if (!this.HaveNumbering())
+		return 0;
+
+	return isAbsolute ? this.GetAbsolutePage(this.Numbering.Page) : this.Numbering.Page;
 };
 
 var pararecalc_0_All  = 0;

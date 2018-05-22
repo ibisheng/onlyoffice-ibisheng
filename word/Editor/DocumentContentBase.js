@@ -346,7 +346,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 	if (this.CurPos.ContentPos < 0)
 		return false;
 
-	this.Remove_NumberingSelection();
+	this.RemoveNumberingSelection();
 
 	var bRetValue = true;
 	if (true === this.Selection.Use)
@@ -1177,4 +1177,99 @@ CDocumentContentBase.prototype.IsLastTableCellInRow = function(isSelection)
 CDocumentContentBase.prototype.GetNumbering = function()
 {
 	return null;
+};
+/**
+ * Получаем верхний класс CDocumentContent
+ * @returns {CDocumentContentBase}
+ */
+CDocumentContentBase.prototype.GetTopDocumentContent = function()
+{
+	return this;
+};
+/**
+ * Получаем массив параграфов по заданному критерию
+ * @param oProps
+ * @param [arrParagraphs=undefined]
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphs = function(oProps, arrParagraphs)
+{
+	if (!arrParagraphs)
+		arrParagraphs = [];
+
+	return arrParagraphs;
+};
+/**
+ * Получаем массив всех параграфов с заданной нумерацией
+ * @param oNumPr {CNumPr}
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphsByNumbering = function(oNumPr)
+{
+	return this.GetAllParagraphs({Numbering : true, NumPr : oNumPr});
+};
+/**
+ * Получаем массив параграфов из списка заданных стилей
+ * @param arrStylesId {string[]}
+ * @returns {Paragraph[]}
+ */
+CDocumentContentBase.prototype.GetAllParagraphsByStyle = function(arrStylesId)
+{
+	return this.GetAllParagraphs({Style : true, StylesId : arrStylesId});
+};
+/**
+ * Выделяем заданную нумерацию
+ * @param oNumPr {CNumPr}
+ * @param oPara {Paragraph} - текущий парограф
+ */
+CDocumentContentBase.prototype.SelectNumbering = function(oNumPr, oPara)
+{
+	var oTopDocContent = this.GetTopDocumentContent();
+	if (oTopDocContent === this)
+	{
+		this.RemoveSelection();
+
+		this.Selection.Use      = true;
+		this.Selection.Flag     = selectionflag_Numbering;
+		this.Selection.StartPos = 0;
+		this.Selection.EndPos   = 0;
+
+		var arrParagraphs = this.GetAllParagraphsByNumbering(oNumPr);
+
+		this.Selection.Data = {
+			Paragraphs : arrParagraphs,
+			CurPara    : oPara
+		};
+
+		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			arrParagraphs[nIndex].SelectNumbering(arrParagraphs === oPara);
+		}
+
+		this.DrawingDocument.SelectEnabled(true);
+
+		var oLogicDocument = this.GetLogicDocument();
+		oLogicDocument.Document_UpdateSelectionState();
+		oLogicDocument.Document_UpdateInterfaceState();
+	}
+	else
+	{
+		oTopDocContent.SelectNumbering(oNumPr, oPara);
+	}
+};
+/**
+ * Проверяем является ли текущее выделение выделением нумерации
+ * @returns {boolean}
+ */
+CDocumentContentBase.prototype.IsNumberingSelection = function()
+{
+	return !!(this.IsSelectionUse() && this.Selection.Flag === selectionflag_Numbering);
+};
+/**
+ * Убираем селект с нумерации
+ */
+CDocumentContentBase.prototype.RemoveNumberingSelection = function()
+{
+	if (this.IsNumberingSelection())
+		this.RemoveSelection();
 };

@@ -3147,6 +3147,7 @@ CParagraphRecalculateStateWrap.prototype =
         NumberingItem.Line       = CurLine;
         NumberingItem.Range      = CurRange;
         NumberingItem.LineAscent = LineAscent;
+        NumberingItem.Page       = CurPage;
 
         return X;
     }

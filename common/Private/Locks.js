@@ -160,7 +160,7 @@ if(typeof CDocument !== "undefined")
 			}
 			case selectionflag_Numbering:
 			{
-				var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+				var oNumPr = this.Selection.Data.CurPara.GetNumPr();
 				if (oNumPr)
 				{
 					var oNum = this.GetNumbering().GetNum(oNumPr.NumId);
@@ -388,7 +388,7 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                 }
                 case selectionflag_Numbering:
                 {
-                    var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+                    var oNumPr = this.Selection.Data.CurPara.GetNumPr();
                     if (oNumPr)
                     {
                     	var oNum = this.GetNumbering().GetNum(oNumPr.NumId);

@@ -1777,7 +1777,10 @@ CDocumentContent.prototype.Get_CurrentPage_Absolute = function()
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
-		var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
+		if (this.IsNumberingSelection())
+			return this.Selection.Data.CurPara.Get_CurrentPage_Absolute();
+
+		var Pos = ( true === this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos );
 		if (Pos >= 0 && Pos < this.Content.length)
 			return this.Content[Pos].Get_CurrentPage_Absolute();
 	}
@@ -2822,7 +2825,7 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 						case selectionflag_Numbering:
 						{
 							// Текстовые настройки применяем к конкретной нумерации
-							if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+							if (!this.Selection.Data || !this.Selection.Data.CurPara)
 								break;
 
 							if (undefined != ParaItem.Value.FontFamily)
@@ -2837,7 +2840,7 @@ CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 								ParaItem.Value.RFonts.CS       = {Name : FName, Index : FIndex};
 							}
 
-							var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+							var oNumPr = this.Selection.Data.CurPara.GetNumPr();
 							var oNum   = this.GetNumbering().GetNum(oNumPr.NumId);
 							oNum.ApplyTextPr(oNumPr.Lvl, ParaItem.Value);
 
@@ -3051,7 +3054,7 @@ CDocumentContent.prototype.MoveCursorLeft = function(AddToSelect, Word)
 
 		var ReturnValue = true;
 
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 		if (true === this.Selection.Use)
 		{
 			if (true === AddToSelect)
@@ -3188,7 +3191,7 @@ CDocumentContent.prototype.MoveCursorRight = function(AddToSelect, Word, FromPas
 
 		var ReturnValue = true;
 
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 		if (true === this.Selection.Use)
 		{
 			if (true === AddToSelect)
@@ -3333,7 +3336,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 
 		var ReturnValue = true;
 
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 		if (true === this.Selection.Use)
 		{
 			if (true === AddToSelect)
@@ -3473,7 +3476,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 			return false;
 
 		var ReturnValue = true;
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 
 		if (true === this.Selection.Use)
 		{
@@ -3614,7 +3617,7 @@ CDocumentContent.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 		if (this.CurPos.ContentPos < 0)
 			return false;
 
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 		if (true === this.Selection.Use)
 		{
 			if (true === AddToSelect)
@@ -3675,7 +3678,7 @@ CDocumentContent.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 		if (this.CurPos.ContentPos < 0)
 			return false;
 
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 		if (true === this.Selection.Use)
 		{
 			if (true === AddToSelect)
@@ -3750,7 +3753,7 @@ CDocumentContent.prototype.MoveCursorToXY = function(X, Y, AddToSelect, bRemoveO
 
 	if (false != bRemoveOldSelection)
 	{
-		this.Remove_NumberingSelection();
+		this.RemoveNumberingSelection();
 	}
 
 	if (true === this.Selection.Use)
@@ -3938,17 +3941,9 @@ CDocumentContent.prototype.GetSelectedElementsInfo = function(Info)
 		{
 			if (selectionflag_Numbering === this.Selection.Flag)
 			{
-				// Текстовые настройки применяем к конкретной нумерации
-				if (!(null == this.Selection.Data || this.Selection.Data.length <= 0))
+				if (this.Selection.Data && this.Selection.Data.CurPara)
 				{
-					var CurPara = this.Content[this.Selection.Data[0]];
-					for (var Index = 0; Index < this.Selection.Data.length; Index++)
-					{
-						if (this.CurPos.ContentPos === this.Selection.Data[Index])
-							CurPara = this.Content[this.Selection.Data[Index]];
-					}
-
-					CurPara.GetSelectedElementsInfo(Info);
+					this.Selection.Data.CurPara.GetSelectedElementsInfo(Info);
 				}
 			}
 			else
@@ -4587,8 +4582,7 @@ CDocumentContent.prototype.SetParagraphStyle = function(Name)
 				EndPos   = Temp;
 			}
 
-			if (selectionflag_Numbering === this.Selection.Flag)
-				this.Remove_NumberingSelection();
+			this.RemoveNumberingSelection();
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
@@ -5356,19 +5350,10 @@ CDocumentContent.prototype.GetCalculatedTextPr = function()
 				}
 				case selectionflag_Numbering:
 				{
-					// Текстовые настройки применяем к конкретной нумерации
-					if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+					if (!this.Selection.Data || !this.Selection.Data.CurPara)
 						break;
 
-					var CurPara = this.Content[this.Selection.Data[0]];
-					for (var Index = 0; Index < this.Selection.Data.length; Index++)
-					{
-						if (this.CurPos.ContentPos === this.Selection.Data[Index])
-							CurPara = this.Content[this.Selection.Data[Index]];
-					}
-
-					VisTextPr = CurPara.Internal_Get_NumberingTextPr();
-
+					VisTextPr = this.Selection.Data.CurPara.GetNumberingTextPr();
 					break;
 				}
 			}
@@ -5418,11 +5403,10 @@ CDocumentContent.prototype.GetDirectTextPr = function()
 				}
 				case selectionflag_Numbering:
 				{
-					// Текстовые настройки применяем к конкретной нумерации
-					if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+					if (!this.Selection.Data || !this.Selection.Data.CurPara)
 						break;
 
-					var oNumPr = this.Content[this.Selection.Data[0]].GetNumPr();
+					var oNumPr = this.Selection.Data.CurPara.GetNumPr();
 					VisTextPr  = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetTextPr();
 
 					break;
@@ -5470,11 +5454,10 @@ CDocumentContent.prototype.GetDirectParaPr = function()
 					}
 					case selectionflag_Numbering:
 					{
-						// Текстовые настройки применяем к конкретной нумерации
-						if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+						if (!this.Selection.Data || !this.Selection.Data.CurPara)
 							break;
 
-						var oNumPr    = this.Content[this.Selection.Data[0]].GetNumPr();
+						var oNumPr    = this.Selection.Data.CurPara.GetNumPr();
 						Result_ParaPr = this.GetNumbering().GetNum(oNumPr.NumId).GetLvl(oNumPr.Lvl).GetParaPr();
 
 						break;
@@ -5640,13 +5623,14 @@ CDocumentContent.prototype.RemoveSelection = function(bNoCheckDrawing)
 				}
 				case selectionflag_Numbering:
 				{
-					if (null == this.Selection.Data)
+					if (!this.Selection.Data)
 						break;
 
-					for (var Index = 0; Index < this.Selection.Data.length; Index++)
+					for (var nIndex = 0, nCount = this.Selection.Data.Paragraphs.length; nIndex < nCount; ++nIndex)
 					{
-						this.Content[this.Selection.Data[Index]].RemoveSelection();
+						this.Selection.Data.Paragraphs[nIndex].RemoveSelection();
 					}
+
 					break;
 				}
 			}
@@ -5705,19 +5689,17 @@ CDocumentContent.prototype.DrawSelectionOnPage = function(PageIndex)
                 }
                 case selectionflag_Numbering:
                 {
-                    if (null == this.Selection.Data)
+                    if (!this.Selection.Data)
                         break;
 
-                    var Count = this.Selection.Data.length;
-
-                    for (var Index = 0; Index < Count; Index++)
-                    {
-                        if (this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start)
-                        {
-                            var ElementPageIndex = this.private_GetElementPageIndex(this.Selection.Data[Index], CurPage, 0, 1);
-                            this.Content[this.Selection.Data[Index]].DrawSelectionOnPage(ElementPageIndex);
-                        }
-                    }
+					var nPageAbs = this.Get_AbsolutePage(CurPage);
+                    for (var nIndex = 0, nCount = this.Selection.Data.Paragraphs.length; nIndex < nCount; ++nIndex)
+					{
+						var oParagraph = this.Selection.Data.Paragraphs[nIndex];
+						var nParaPageAbs = oParagraph.GetNumberingPage(true);
+						if (nParaPageAbs === nPageAbs)
+							oParagraph.DrawSelectionOnPage(oParagraph.GetNumberingPage(false));
+					}
 
                     break;
                 }
@@ -5969,7 +5951,11 @@ CDocumentContent.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent
 		var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.StartPos, X, Y, this.CurPage);
 		Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
-		if (false === Item.IsSelectionUse())
+		if (this.IsNumberingSelection())
+		{
+			// Ничего не делаем
+		}
+		else if (false === Item.IsSelectionUse())
 		{
 			this.Selection.Use = false;
 
@@ -6265,40 +6251,6 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
     // TODO: Пока сделаем так, в будущем надо сделать функцию, которая у родительского класса обновляет Select
     editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-};
-CDocumentContent.prototype.Document_SelectNumbering  = function(NumPr, Index)
-{
-    this.RemoveSelection();
-
-    this.Selection.Use      = true;
-    this.Selection.Flag     = selectionflag_Numbering;
-    this.Selection.Data     = [];
-    this.Selection.StartPos = Index;
-    this.Selection.EndPos   = Index;
-
-    for (var Index = 0; Index < this.Content.length; Index++)
-    {
-        var Item      = this.Content[Index];
-        var ItemNumPr = null;
-        if (type_Paragraph == Item.GetType() && undefined != ( ItemNumPr = Item.GetNumPr() ) && ItemNumPr.NumId == NumPr.NumId && ItemNumPr.Lvl == NumPr.Lvl)
-        {
-            this.Selection.Data.push(Index);
-            Item.Selection_SelectNumbering();
-        }
-    }
-
-    this.DrawingDocument.SelectEnabled(true);
-
-    this.LogicDocument.Document_UpdateSelectionState();
-
-    this.Interface_Update_ParaPr();
-    this.Interface_Update_TextPr();
-};
-// Если сейчас у нас заселекчена нумерация, тогда убираем селект
-CDocumentContent.prototype.Remove_NumberingSelection = function()
-{
-    if (true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag)
-        this.RemoveSelection();
 };
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
@@ -6938,7 +6890,7 @@ CDocumentContent.prototype.SetSelectionState = function(State, StateIndex)
 				{
 					var NumPr = this.Content[this.Selection.StartPos].GetNumPr();
 					if (undefined !== NumPr)
-						this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
+						this.SelectNumbering(NumPr, this.Content[this.Selection.StartPos]);
 					else
 						this.LogicDocument.RemoveSelection();
 				}
