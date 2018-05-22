@@ -3134,7 +3134,10 @@
     };
     prot.get_Avatar = prot.asc_getAvatar = function(){
 		return (this.UserInfo ? this.UserInfo.get_Avatar() : null );
-	};
+    };
+    prot.put_Avatar = prot.asc_putAvatar = function(v){
+		return (this.UserInfo ? this.UserInfo.put_Avatar(v) : null );
+    };
 	prot.get_Options = prot.asc_getOptions = function () {
 		return this.Options;
 	};
@@ -4367,7 +4370,9 @@
 	prot["asc_putFirstName"] = prot["put_FirstName"] = prot.asc_putFirstName;
 	prot["asc_getFirstName"] = prot["get_FirstName"] = prot.asc_getFirstName;
 	prot["asc_putLastName"] = prot["put_LastName"] = prot.asc_putLastName;
-	prot["asc_getLastName"] = prot["get_LastName"] = prot.asc_getLastName;
+    prot["asc_getLastName"] = prot["get_LastName"] = prot.asc_getLastName;
+    prot["asc_getAvatar"] = prot["get_Avatar"] = prot.asc_getAvatar;
+    prot["asc_putAvatar"] = prot["put_Avatar"] = prot.asc_putAvatar;
 
 	window["Asc"]["asc_CDocInfo"] = window["Asc"].asc_CDocInfo = asc_CDocInfo;
 	prot = asc_CDocInfo.prototype;
@@ -4384,6 +4389,7 @@
 	prot["get_UserId"] = prot["asc_getUserId"] = prot.asc_getUserId;
     prot["get_UserName"] = prot["asc_getUserName"] = prot.asc_getUserName;
     prot["get_Avatar"] = prot["get_Avatar"] = prot.asc_getAvatar;
+    prot["put_Avatar"] = prot["put_Avatar"] = prot.asc_putAvatar;
 	prot["get_Options"] = prot["asc_getOptions"] = prot.asc_getOptions;
 	prot["put_Options"] = prot["asc_putOptions"] = prot.asc_putOptions;
 	prot["get_CallbackUrl"] = prot["asc_getCallbackUrl"] = prot.asc_getCallbackUrl;
