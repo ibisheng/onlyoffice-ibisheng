@@ -1771,6 +1771,7 @@ CChartsDrawer.prototype =
 
 	//****functions for UP Functions****
 	preCalculateData: function (chartSpace) {
+		this.cChartSpace = chartSpace;
 		this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 
 		this.calcProp.pathH = 1000000000;

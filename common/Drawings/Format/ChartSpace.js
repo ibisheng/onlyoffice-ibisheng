@@ -9532,9 +9532,36 @@ CChartSpace.prototype.hitInTextRect = function()
                     var oOldLayout = legend.layout;
                     legend.layout = null;
                     this.recalculateLegend();
+
                     legend.naturalWidth = legend.extX;
                     legend.naturalHeight = legend.extY;
                     legend.layout = oOldLayout;
+                    var bResetLegendPos = false;
+                    if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
+                    {
+                        bResetLegendPos = true;
+                        this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
+                    }
+                    if(!this.chartObj)
+                    {
+                        this.chartObj = new AscFormat.CChartsDrawer();
+                    }
+                    this.chartObj.preCalculateData(this);
+                    var pos = this.chartObj.recalculatePositionText(this.chart.legend);
+                    if(this.chart.legend.layout){
+                        if(AscFormat.isRealNumber(legend.layout.x)){
+                            pos.x = this.calculatePosByLayout(pos.x, legend.layout.xMode, legend.layout.x, this.chart.legend.extX, this.extX);
+                        }if(AscFormat.isRealNumber(legend.layout.y)){
+                            pos.y = this.calculatePosByLayout(pos.y, legend.layout.yMode, legend.layout.y, this.chart.legend.extY, this.extY);
+                        }
+                    }
+                    if(bResetLegendPos){
+                        this.chart.legend.legendPos = null;
+                    }
+
+                    fFixedWidth = this.calculateSizeByLayout(pos.x, this.extX, legend.layout.w, legend.layout.wMode);
+                    fFixedHeight = this.calculateSizeByLayout(pos.y, this.extY, legend.layout.h, legend.layout.hMode);
+
                 }
             }
             if(AscFormat.isRealNumber(legend_pos))
