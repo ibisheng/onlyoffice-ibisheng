@@ -210,10 +210,10 @@
 
 		// create text render
 		t.drawingCtx = new asc.DrawingContext({
-			canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+			canvas: t.canvas, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		});
 		t.overlayCtx = new asc.DrawingContext({
-			canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
+			canvas: t.canvasOverlay, units: 0/*px*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		});
 		t.textRender = new AscCommonExcel.CellTextRender(t.drawingCtx);
 		t.textRender.setDefaultFont(settings.font.clone());
