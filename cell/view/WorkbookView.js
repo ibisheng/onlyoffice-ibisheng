@@ -848,11 +848,7 @@
 		  return self.isShowSolved;
 	  });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
-      if(window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton)
-	  {
 		self.handlers.trigger("asc_onHideSpecialPasteOptions");
-		window['AscCommon'].g_specialPasteHelper.showSpecialPasteButton = false;
-	  }
     });
 	this.model.handlers.add("toggleAutoCorrectOptions", function(bIsShow, val) {
 		self.toggleAutoCorrectOptions(bIsShow, val);
@@ -1716,7 +1712,7 @@
 
     //TODO при добавлении любого действия в историю (например добавление нового листа), мы можем его потом отменить с повощью опции авторазвертывания
     this.toggleAutoCorrectOptions(null, true);
-    this.handlers.trigger("hideSpecialPasteOptions");
+    window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
     return this;
   };
 
@@ -2137,6 +2133,12 @@
   		this.getWorksheet().updateSpecialPasteButton(props);
 	}
   };
+
+	WorkbookView.prototype.hideSpecialPasteButton = function() {
+		if (!this.getCellEditMode()) {
+			this.handlers.trigger("hideSpecialPasteOptions");
+		}
+	};
 
   WorkbookView.prototype.selectionCut = function() {
     if (this.getCellEditMode()) {

@@ -772,7 +772,7 @@
 				case 27: // Esc
 					t.handlers.trigger("stopFormatPainter");
 					t.handlers.trigger("stopAddShape");
-					t.handlers.trigger("hideSpecialPasteOptions");
+					window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 					return result;
 
 				case 144: //Num Lock

@@ -194,6 +194,7 @@ CHistory.prototype.Clear = function()
   this.ForceSave= false;
   this.UserSavedIndex = null;
 
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 	this._sendCanUndoRedo();
 };
 /** @returns {boolean} */
@@ -483,10 +484,8 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 		
-	if(!window['AscCommon'].g_specialPasteHelper.pasteStart)
-	{
-		this.workbook.handlers.trigger("hideSpecialPasteOptions");
-	}
+
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 	this.workbook.handlers.trigger("toggleAutoCorrectOptions", null, true);
 };
 CHistory.prototype.Redo = function()
@@ -742,6 +741,7 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 			AscCommon.CollaborativeEditing.Add_NewDC(Class.Class);
 		}
 	}
+	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 };
 
 CHistory.prototype._sendCanUndoRedo = function()
@@ -753,12 +753,6 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
-	//скрываю кнопку специальной вставки при каждом действии/undoredo
-	//при выполнении специальной вставки и при сохранении(-1 !== this.Index) не скрываю кнопку 
-	if(!window['AscCommon'].g_specialPasteHelper.pasteStart && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
-	{
-		this.workbook.handlers.trigger("hideSpecialPasteOptions");
-	}
 	//в данном случае не показываем опции авторазвертывания таблиц
 	if(-1 === this.Index)
 	{

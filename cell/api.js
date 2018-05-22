@@ -406,6 +406,12 @@ var editor;
       }
   };
 
+  spreadsheet_api.prototype.asc_HideSpecialPasteButton = function() {
+      if (this.canEdit()) {
+          this.wb.hideSpecialPasteButton();
+      }
+ };
+
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"])
     {

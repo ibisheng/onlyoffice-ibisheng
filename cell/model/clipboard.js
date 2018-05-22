@@ -282,8 +282,8 @@
 				var _data = null;
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
-				
-				wb.handlers.trigger("hideSpecialPasteOptions");
+
+				window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 				
 				if(ws.getCellEditMode() === true)//text in cell
 				{
@@ -377,7 +377,7 @@
 
 				if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart)
 				{
-					ws.model.workbook.handlers.trigger("hideSpecialPasteOptions");
+					window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 				}
 				window['AscCommon'].g_specialPasteHelper.Paste_Process_Start(doNotShowButton);
 				
