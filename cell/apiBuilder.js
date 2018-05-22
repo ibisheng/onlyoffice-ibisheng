@@ -644,7 +644,7 @@
 		return (PageOrientation) ? 'xlLandscape' : 'xlPortrait';
 	};
 
-	Object.defineProperty(ApiWorksheet.prototype, "Orientation", {
+	Object.defineProperty(ApiWorksheet.prototype, "PageOrientation", {
 		get: function () {
 			return this.GetPageOrientation();
 		},
@@ -1959,7 +1959,7 @@
 	ApiWorksheet.prototype["SetDisplayHeadings"] = ApiWorksheet.prototype.SetDisplayHeadings;
 	ApiWorksheet.prototype["SetLeftMargin"] = ApiWorksheet.prototype.SetLeftMargin;
 	ApiWorksheet.prototype["GetLeftMargin"] = ApiWorksheet.prototype.GetLeftMargin;	
-	ApiWorksheet.prototype["SetRighMargin"] = ApiWorksheet.prototype.SetRightMargin;
+	ApiWorksheet.prototype["SetRightMargin"] = ApiWorksheet.prototype.SetRightMargin;
 	ApiWorksheet.prototype["GetRightMargin"] = ApiWorksheet.prototype.GetRightMargin;
 	ApiWorksheet.prototype["SetTopMargin"] = ApiWorksheet.prototype.SetTopMargin;
 	ApiWorksheet.prototype["GetTopMargin"] = ApiWorksheet.prototype.GetTopMargin;	
