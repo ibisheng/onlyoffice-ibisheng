@@ -1022,7 +1022,7 @@
 	 * @param {range} RelativeTo
 	 * @returns {string}
 	 */
-	ApiRange.prototype.GetAdress = function (RowAbs, ColAbs, RefStyle, External, RelativeTo) {
+	ApiRange.prototype.GetAddress = function (RowAbs, ColAbs, RefStyle, External, RelativeTo) {
 		if (this.range.isOneCell()) {
 			var range = this.range.bbox;
 			var ws = this.range.worksheet;
@@ -1975,7 +1975,7 @@
 	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
 	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
 	ApiRange.prototype["SetOffset"] = ApiRange.prototype.SetOffset;
-	ApiRange.prototype["GetAdress"] = ApiRange.prototype.GetAdress;	
+	ApiRange.prototype["GetAddress"] = ApiRange.prototype.GetAddress;	
 	ApiRange.prototype["GetCount"] = ApiRange.prototype.GetCount;
 	ApiRange.prototype["GetValue"] = ApiRange.prototype.GetValue;
 	ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
