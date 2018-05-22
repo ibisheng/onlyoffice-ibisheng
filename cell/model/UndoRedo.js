@@ -1750,7 +1750,7 @@ function (window, undefined) {
 		}
 		var nRow = Data.nRow;
 		var nCol = Data.nCol;
-		if (false != this.wb.bCollaborativeChanges) {
+		if (this.wb.bCollaborativeChanges) {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 			nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
@@ -1875,7 +1875,7 @@ function (window, undefined) {
 		if (AscCH.historyitem_Worksheet_RemoveCell == Type) {
 			nRow = Data.nRow;
 			nCol = Data.nCol;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 				oLockInfo = new AscCommonExcel.asc_CLockInfo();
@@ -1901,7 +1901,7 @@ function (window, undefined) {
 			}
 		} else if (AscCH.historyitem_Worksheet_ColProp == Type) {
 			index = Data.index;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				if (AscCommonExcel.g_nAllColIndex == index) {
 					range = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 				} else {
@@ -1922,7 +1922,7 @@ function (window, undefined) {
 			}
 		} else if (AscCH.historyitem_Worksheet_RowProp == Type) {
 			index = Data.index;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
 				oLockInfo = new AscCommonExcel.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
@@ -1947,7 +1947,7 @@ function (window, undefined) {
 			to = Data.to;
 			nRow = Data.bRow;
 
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 
@@ -1969,7 +1969,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_AddRows == Type || AscCH.historyitem_Worksheet_RemoveRows == Type) {
 			from = Data.from;
 			to = Data.to;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 				if (false == ((true == bUndo && AscCH.historyitem_Worksheet_AddRows == Type) ||
@@ -1994,7 +1994,7 @@ function (window, undefined) {
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
-			if (true !== wb.bCollaborativeChanges) {
+			if (!wb.bCollaborativeChanges) {
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 			}
 
@@ -2004,7 +2004,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_AddCols == Type || AscCH.historyitem_Worksheet_RemoveCols == Type) {
 			from = Data.from;
 			to = Data.to;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				from = collaborativeEditing.getLockOtherColumn2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherColumn2(nSheetId, to);
 				if (false == ((true == bUndo && AscCH.historyitem_Worksheet_AddCols == Type) ||
@@ -2030,7 +2030,7 @@ function (window, undefined) {
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
-			if (true !== wb.bCollaborativeChanges) {
+			if (!wb.bCollaborativeChanges) {
 				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 			}
 
@@ -2043,7 +2043,7 @@ function (window, undefined) {
 			c1 = Data.c1;
 			r2 = Data.r2;
 			c2 = Data.c2;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
@@ -2079,7 +2079,7 @@ function (window, undefined) {
 			c1 = Data.c1;
 			r2 = Data.r2;
 			c2 = Data.c2;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				r1 = collaborativeEditing.getLockOtherRow2(nSheetId, r1);
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
@@ -2112,7 +2112,7 @@ function (window, undefined) {
 		} else if (AscCH.historyitem_Worksheet_Sort == Type) {
 			var bbox = Data.bbox;
 			var places = Data.places;
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				bbox.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, bbox.r1);
 				bbox.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, bbox.c1);
 				bbox.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, bbox.r2);
@@ -2144,7 +2144,7 @@ function (window, undefined) {
 				from = to;
 				to = temp;
 			}
-			if (false != wb.bCollaborativeChanges) {
+			if (wb.bCollaborativeChanges) {
 				var coBBoxTo = Asc.Range(0, 0, 0, 0), coBBoxFrom = Asc.Range(0, 0, 0, 0);
 
 				coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
@@ -2190,7 +2190,7 @@ function (window, undefined) {
 			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 &&
 				null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
 					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
 					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
@@ -2201,7 +2201,7 @@ function (window, undefined) {
 			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 &&
 				null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
 					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
 					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
@@ -2232,7 +2232,7 @@ function (window, undefined) {
 			if (null != Data.from && null != Data.from.r1 && null != Data.from.c1 && null != Data.from.r2 &&
 				null != Data.from.c2) {
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					from.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r1);
 					from.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, from.c1);
 					from.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, from.r2);
@@ -2243,7 +2243,7 @@ function (window, undefined) {
 			if (null != Data.to && null != Data.to.r1 && null != Data.to.c1 && null != Data.to.r2 &&
 				null != Data.to.c2) {
 				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
-				if (false != wb.bCollaborativeChanges) {
+				if (wb.bCollaborativeChanges) {
 					to.r1 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r1);
 					to.c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, to.c1);
 					to.r2 = collaborativeEditing.getLockOtherRow2(nSheetId, to.r2);
@@ -2335,7 +2335,7 @@ function (window, undefined) {
 			return;
 		}
 		var nIndex = Data.index;
-		if (false != this.wb.bCollaborativeChanges) {
+		if (this.wb.bCollaborativeChanges) {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			var oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
@@ -2449,7 +2449,7 @@ function (window, undefined) {
 			cellCommentator.Undo(Type, Data);
 		} else {
 			to = (Data.from || Data.to) ? Data.to : Data;
-			if (to && !to.bDocument && false !== this.wb.bCollaborativeChanges) {
+			if (to && !to.bDocument && this.wb.bCollaborativeChanges) {
 				collaborativeEditing = this.wb.oApi.collaborativeEditing;
 				to.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, to.nRow);
 				to.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, to.nCol);
@@ -2485,7 +2485,7 @@ function (window, undefined) {
 			} else {
 				if (AscCH.historyitem_AutoFilter_ChangeColumnName === Type ||
 					AscCH.historyitem_AutoFilter_ChangeTotalRow === Type) {
-					if (false != this.wb.bCollaborativeChanges) {
+					if (this.wb.bCollaborativeChanges) {
 						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 						Data.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.nRow);
 						Data.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.nCol);

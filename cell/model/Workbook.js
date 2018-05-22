@@ -3956,7 +3956,7 @@
 		this._forEachColData(function(sheetMemory) {
 			sheetMemory.insertRange(index, count);
 		});
-		if (index > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+		if (index > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 		{
 			//copy property from row/cell above
 			this.rowsData.copyRangeByChunk((index - 1), 1, index, count);
@@ -4081,7 +4081,7 @@
 		for(var i = 0; i < count; ++i)
 		{
 			var oNewCol = null;
-			if (null != oPrevCol && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+			if (null != oPrevCol && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 			{
 				History.LocalChange = true;
 				oNewCol = oPrevCol.clone();
@@ -4764,7 +4764,7 @@
 			oRangeIntersection = this.getRange3(intersection.r1, intersection.c1, intersection.r2, intersection.c2 );
 		//запоминаем то что нужно переместить
 		var aTempObj = {cells: {}, merged: null, hyperlinks: null};
-		if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+		if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			var aMerged = this.mergeManager.get(oBBoxFrom);
@@ -4882,7 +4882,7 @@
 		});
 
 
-		if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+		if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			if(null != aTempObj.merged)
@@ -5021,7 +5021,7 @@
 				sheetMemoryFrom.fill(0, oBBox.r1, oBBox.r2 + 1);
 			}
 		}
-		if (nLeft > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+		if (nLeft > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 		{
 			var prevSheetMemory = this.getColDataNoEmpty(nLeft - 1);
 			if (prevSheetMemory) {
@@ -5061,13 +5061,13 @@
 			var sheetMemory = this.getColDataNoEmpty(i);
 			if (sheetMemory) {
 				sheetMemory.insertRange(nTop, dif);
-				if (nTop > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+				if (nTop > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 				{
 					sheetMemory.copyRangeByChunk((nTop - 1), 1, nTop, dif);
 				}
 			}
 		}
-		if (nTop > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
+		if (nTop > 0 && false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || this.workbook.bCollaborativeChanges))
 		{
 			//show rows and remain only cell xf property
 			this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
@@ -9857,7 +9857,7 @@
 		History.Create_NewPoint();
 		History.StartTransaction();
 		var oShiftGet = null;
-		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			oShiftGet = mergeManager.shiftGet(this.bbox, true);
@@ -9894,7 +9894,7 @@
 			else
 				this.worksheet._insertColsBefore(oBBox.c1, nWidth);
 		}
-		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			mergeManager.shift(this.bbox, !bLeft, true, oShiftGet);
@@ -9968,7 +9968,7 @@
 		History.Create_NewPoint();
 		History.StartTransaction();
 		var oShiftGet = null;
-		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			oShiftGet = mergeManager.shiftGet(this.bbox, false);
@@ -10005,7 +10005,7 @@
 			else
 				this.worksheet._insertRowsBefore(oBBox.r1, nHeight);
 		}
-		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if (false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			mergeManager.shift(this.bbox, !bUp, false, oShiftGet);
@@ -10389,7 +10389,7 @@
 		}
 		//сортируются только одинарные гиперссылки, все неодинарные оставляем
 		var aSortedHyperlinks = [];
-		if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
@@ -10449,7 +10449,7 @@
 		this.worksheet.workbook.dependencyFormulas.addToChangedRange(this.worksheet.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 
 		this.worksheet.workbook.dependencyFormulas.calcTree();
-		if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
+		if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || this.worksheet.workbook.bCollaborativeChanges))
 		{
 			History.LocalChange = true;
 			//восстанавливаем удаленые гиперссылки
