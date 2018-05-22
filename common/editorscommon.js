@@ -3378,6 +3378,8 @@
 
         this.isNeedCrypt = false;
 
+        this.isExistDecryptedChanges = false; // был ли хоть один запрос на расшифровку данных (были ли чужие изменения)
+
         this.sendChanges = function(sender, data, type)
         {
             if (!window.g_asc_plugins.isRunnedEncryption() || !this.isNeedCrypt)
@@ -3415,6 +3417,7 @@
         {
         	if (this.handleChangesCallback)
 			{
+                this.isExistDecryptedChanges = true;
 				//console.log(data);
 				if (this.handleChangesCallback.sender.editorId == AscCommon.c_oEditorId.Spreadsheet)
 				{
@@ -3449,6 +3452,7 @@
             }
             else if (AscCommon.EncryptionMessageType.Decrypt == obj.type)
             {
+                this.isExistDecryptedChanges = true;
                 obj.data["changes"] = data;
                 obj.sender._onSaveChanges(obj.data, true);
             }
@@ -3463,6 +3467,7 @@
 				this.isChangesHandled = true;
 				_callback.call(_sender);
                 this.isChangesHandled = false;
+                return;
 			}
 
 			this.handleChangesCallback = { changesBase : _array, changes : [], sender : _sender, callback : _callback };
@@ -3731,15 +3736,24 @@ window["asc_IsNeedBuildCryptedFile"] = function()
     	//console.log("asc_IsNeedBuildCryptedFile: no one");
     	_returnValue = false;
     }
-    else if (null != History.SavedIndex && -1 != History.SavedIndex)
+    else if (null != AscCommon.History.SavedIndex && -1 != AscCommon.History.SavedIndex)
     {
         //console.log("asc_IsNeedBuildCryptedFile: one1");
         _returnValue = true;
     }
-    else if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
+    else
     {
         //console.log("asc_IsNeedBuildCryptedFile: one2");
-        _returnValue = true;
+        if (_api.editorId == AscCommon.c_oEditorId.Spreadsheet)
+        {
+            if (AscCommon.EncryptionWorker.isExistDecryptedChanges)
+                _returnValue = true;
+        }
+        else
+        {
+            if (0 != AscCommon.CollaborativeEditing.m_aAllChanges.length)
+                _returnValue = true;
+        }
     }
 
     window["AscDesktopEditor"]["js_message"]("IsNeedBuildCryptedFile", "" + _returnValue);

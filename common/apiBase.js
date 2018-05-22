@@ -539,6 +539,9 @@
 		}
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		this.sendEvent('asc_onDocumentContentReady');
+
+        if (this.editorId == c_oEditorId.Spreadsheet)
+			this.onUpdateDocumentModified(this.asc_isDocumentModified());
 	};
 	// Save
 	baseEditorsApi.prototype.processSavedFile                    = function(url, downloadType)
