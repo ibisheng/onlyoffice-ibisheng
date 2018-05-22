@@ -446,6 +446,14 @@ CChartSpace.prototype.recalculate = function()
         }
 
 
+        var b_recalc_labels = false;
+        if(this.recalcInfo.recalculateAxisLabels)
+        {
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalculateAxisLabels = false;
+            b_recalc_labels = true;
+        }
+
         var b_recalc_legend = false;
         if(this.recalcInfo.recalculateLegend)
         {
@@ -454,14 +462,6 @@ CChartSpace.prototype.recalculate = function()
             b_recalc_legend = true;
         }
 
-        var b_recalc_labels = false;
-        if(this.recalcInfo.recalculateAxisLabels)
-        {
-            this.recalculateAxisLabels();
-            this.recalcInfo.recalculateAxisLabels = false;
-            b_recalc_labels = true;
-        }
-        
         if(this.recalcInfo.recalculateAxisVal)
         {
             if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){

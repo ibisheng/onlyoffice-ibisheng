@@ -9892,14 +9892,22 @@ CChartSpace.prototype.hitInTextRect = function()
                                 if(calc_entry.calcMarkerUnion.lineMarker){
                                     calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
                                     calc_entry.calcMarkerUnion.lineMarker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
+                                    if(calc_entry.calcMarkerUnion.marker)
+                                    {
+                                        calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
+                                        calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
+                                    }
+                                }
+                                else{
+                                    if(calc_entry.calcMarkerUnion.marker)
+                                    {
+                                        calc_entry.calcMarkerUnion.marker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
+                                        calc_entry.calcMarkerUnion.marker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
+                                    }
                                 }
 
 
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
-                                    calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
-                                }
+
 
                                 if(calc_entry.calcMarkerUnion.lineMarker){
                                     calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
