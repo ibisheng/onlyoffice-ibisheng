@@ -50,6 +50,12 @@ DrawingObjectsController.prototype.getDrawingArray = function()
     return this.drawingObjects.getDrawingsForController();
 };
 
+
+DrawingObjectsController.prototype.isViewMode = function()
+{
+    return this.drawingObjects.isViewerMode();
+};
+
 DrawingObjectsController.prototype.recalculateCurPos = function(bUpdateX, bUpdateY){
     var oTargetDocContent = this.getTargetDocContent(undefined, true);
     if(oTargetDocContent){

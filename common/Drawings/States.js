@@ -122,8 +122,7 @@ StartAddNewShape.prototype =
 
     onMouseUp: function(e, x, y)
     {
-        var bView = this.drawingObjects.isViewMode() === true || (this.drawingObjects.isEditSignatureMode && this.drawingObjects.isEditSignatureMode());
-        if(this.bStart && !bView)
+        if(this.bStart && this.drawingObjects.canEdit())
         {
             if(this.drawingObjects.drawingObjects.objectLocker)
             {

@@ -519,10 +519,6 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.startRecalculate();
 };
 
-DrawingObjectsController.prototype.isViewMode = function()
-{
-    return this.drawingObjects.isViewerMode();
-};
 
 DrawingObjectsController.prototype.getDrawingDocument = function()
 {
