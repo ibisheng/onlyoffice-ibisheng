@@ -568,9 +568,7 @@
 				};
 				//oImage.Image.crossOrigin = 'anonymous';
                 if(oImage.src.indexOf(".zip")>0){
-                    window["getMediaSrc"](oImage.src,function (src) {
-                        oImage.Image.src =src;
-                    })
+                    window["getMediaSrc"](oImage.src,oImage)
                 }else{
                     oImage.Image.src = oImage.src;
                 }
@@ -605,9 +603,7 @@
             };
             //oImage.Image.crossOrigin = 'anonymous';
             if(oImage.src.indexOf(".zip")>0){
-                window["getMediaSrc"](oImage.src,function (src) {
-                    oImage.Image.src =src;
-                })
+                window["getMediaSrc"](oImage.src,oImage)
             }else{
                 oImage.Image.src = oImage.src;
             }
@@ -634,9 +630,7 @@
             //oImage.Image.crossOrigin = 'anonymous';
             // oImage.Image.src = oImage.src;
             if(oImage.src.indexOf(".zip")>0){
-                window["getMediaSrc"](oImage.src,function (src) {
-                    oImage.Image.src =src;
-                })
+                window["getMediaSrc"](oImage.src,oImage)
             }else{
                 oImage.Image.src = oImage.src;
             }
@@ -690,9 +684,7 @@
 				//oImage.Image.crossOrigin = 'anonymous';
 				// oImage.Image.src = oImage.src;
                 if(oImage.src.indexOf(".zip")>0){
-                    window["getMediaSrc"](oImage.src,function (src) {
-                        oImage.Image.src =src;
-                    })
+                    window["getMediaSrc"](oImage.src,oImage)
                 }else{
                     oImage.Image.src = oImage.src;
                 }
