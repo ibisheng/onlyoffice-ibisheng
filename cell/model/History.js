@@ -195,6 +195,7 @@ CHistory.prototype.Clear = function()
   this.UserSavedIndex = null;
 
 	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
+	this.workbook.handlers.trigger("toggleAutoCorrectOptions");
 	this._sendCanUndoRedo();
 };
 /** @returns {boolean} */
@@ -742,6 +743,7 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 		}
 	}
 	window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
+	this.workbook.handlers.trigger("toggleAutoCorrectOptions");
 };
 
 CHistory.prototype._sendCanUndoRedo = function()
@@ -753,11 +755,6 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
-	//в данном случае не показываем опции авторазвертывания таблиц
-	if(-1 === this.Index)
-	{
-		this.workbook.handlers.trigger("toggleAutoCorrectOptions");
-	}
 };
 CHistory.prototype.SetSelection = function(range)
 {
