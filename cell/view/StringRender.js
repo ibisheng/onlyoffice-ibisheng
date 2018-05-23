@@ -996,7 +996,7 @@
 				var so = prop.font.Strikeout;
 				var ul = Asc.EUnderline.underlineNone !== prop.font.Underline;
 				var isSO = so === true;
-				var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
+				var fsz, x2, y, lw, dy, i, b, x_, cp;
 
 				if (align !== AscCommon.align_Justify || dx < 0.000001) {
 					ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
@@ -1022,17 +1022,15 @@
 					ctx.setStrokeStyle(prop.c || textColor)
 					   .setLineWidth(lw)
 					   .beginPath();
-					w_1px = asc_calcnpt(0, ppix, 1/*px*/);
-					h_1px = asc_calcnpt(0, ppiy, 1/*px*/);
 					dy = (lw / 2); dy = dy >> 0;
 					if (ul) {
-						y = asc_calcnpt(y1 + l.bl + prop.lm.d * 0.4, ppiy);
-						ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px); // ToDo вопрос тут
+						y = asc_round(y1 + l.bl + prop.lm.d * 0.4);
+						ctx.lineHor(x1, y + dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					if (isSO) {
 						dy += 1;
-						y = asc_calcnpt(y1 + l.bl - prop.lm.a * 0.275, ppiy);
-						ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px); // ToDo вопрос тут
+						y = asc_round(y1 + l.bl - prop.lm.a * 0.275);
+						ctx.lineHor(x1, y - dy, x2 + 1/*px*/); // ToDo вопрос тут
 					}
 					ctx.stroke();
 				}
