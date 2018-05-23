@@ -45,7 +45,6 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var asc = window["Asc"];
-		var asc_calcnpt = asc.calcNearestPt;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
@@ -316,8 +315,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
                 }
 
@@ -357,8 +356,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
                 }
 
@@ -399,8 +398,8 @@
                         offsetX = - (w - posv) / 2 + angleSin * tm.height / 2;
                     }
                     else if (isHorzRight) {
-                        dx = asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
-                        offsetX = - asc_calcnpt(w  - posv + 1 + 1 - tm.height * angleSin, 96);
+                        dx = w  - posv + 1 + 1 - tm.height * angleSin;
+                        offsetX = - w  - posv + 1 + 1 - tm.height * angleSin;
                     }
 
                     dy = Math.min(h + tm.height * angleCos, posh);
@@ -415,9 +414,6 @@
             } else {
                 bound.height = Math.abs(angleSin * textW) + Math.abs(angleCos * tm.height);
                 bound.width  = Math.abs(angleCos * textW) + Math.abs(angleSin * tm.height);
-
-                // Делаем кратным 1pt
-                bound.height = asc_calcnpt(bound.height, 96);
             }
 
             return bound;
@@ -593,7 +589,7 @@
 				var x = a_2 + a_2_3;
 
 				if (va === AscCommon.vertalign_SuperScript) {
-					h = asc_calcnpt(hpt, ppi);
+					h = hpt;
 					d = h - a;
 
 					l.th = x + d;
@@ -602,7 +598,7 @@
 					l.a = fm.ascender + a_2;         // >0
 					l.d = fm.descender - a_2;        // <0
 				} else if (va === AscCommon.vertalign_SubScript) {
-					h_2_3 = asc_calcnpt(hpt * 2/3, ppi);
+					h_2_3 = hpt * 2/3;
 					d_2_3 = h_2_3 - a_2_3;
 					l.th = x + d_2_3;
 					l.bl = a;
@@ -964,7 +960,6 @@
 		StringRender.prototype._doRender = function(drawingCtx, x, y, maxWidth, textColor) {
 			var self = this;
 			var ctx = drawingCtx || this.drawingCtx;
-			var ppix = ctx.getPPIX();
 			var ppiy = ctx.getPPIY();
 			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
@@ -973,9 +968,9 @@
 			function initX(startPos) {
 				var x_ = x;
 				if (align === AscCommon.align_Right) {
-					x_ = asc_calcnpt(x + maxWidth - self._calcLineWidth(startPos), ppix, -1/*px*/);
+					x_ = x + maxWidth - self._calcLineWidth(startPos) - 1/*px*/;
 				} else if (align === AscCommon.align_Center) {
-					x_ = asc_calcnpt(x + 0.5 * (maxWidth - asc_calcnpt(self._calcLineWidth(startPos), ppix)), ppix, 0/*px*/);
+					x_ = x + 0.5 * (maxWidth - self._calcLineWidth(startPos));
 				}
 				l.startX = x_;
 				return x_;
@@ -1016,7 +1011,7 @@
 				}
 
 				if (isSO || ul) {
-					x2 = asc_calcnpt(x1 + dw, ppix);
+					x2 = x1 + dw;
 					fsz = prop.font.FontSize;
 					lw = asc_round(fsz * ppiy / 72 / 18) || 1;
 					ctx.setStrokeStyle(prop.c || textColor)

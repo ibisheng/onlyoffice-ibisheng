@@ -51,7 +51,6 @@
 	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
 	var Fragment = AscCommonExcel.Fragment;
 
-	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
 	var asc_round = asc.round;
 	var asc_search = asc.search;
@@ -1335,15 +1334,15 @@
 	};
 
 	CellEditor.prototype._drawSelection = function () {
-		var ctx = this.overlayCtx, ppix = ctx.getPPIX(), ppiy = ctx.getPPIY();
+		var ctx = this.overlayCtx;
 		var begPos, endPos, top, top1, top2, begInfo, endInfo, line1, line2, i, selection = [];
 
 		function drawRect( x, y, w, h ) {
 			if ( window['IS_NATIVE_EDITOR'] ) {
-				selection.push( [asc_calcnpt( x, ppix ), asc_calcnpt( y, ppiy ), asc_calcnpt( w, ppix ), asc_calcnpt( h, ppiy )] );
+				selection.push([x, y, w, h]);
 			}
 			else {
-				ctx.fillRect( asc_calcnpt( x, ppix ), asc_calcnpt( y, ppiy ), asc_calcnpt( w, ppix ), asc_calcnpt( h, ppiy ) );
+				ctx.fillRect(x, y, w, h);
 			}
 		}
 
@@ -1643,15 +1642,13 @@
 	};
 
 	CellEditor.prototype._getContentPosition = function () {
-		var ppix = this.drawingCtx.getPPIX();
-
-		switch ( this.textFlags.textAlign ) {
+		switch (this.textFlags.textAlign) {
 			case AscCommon.align_Right:
-				return asc_calcnpt( this.right - this.left, ppix, -this.defaults.padding - 1 );
+				return this.right - this.left - this.defaults.padding - 1;
 			case AscCommon.align_Center:
-				return asc_calcnpt( 0.5 * (this.right - this.left), ppix, 0 );
+				return 0.5 * (this.right - this.left);
 		}
-		return asc_calcnpt( 0, ppix, this.defaults.padding );
+		return this.defaults.padding;
 	};
 
 	CellEditor.prototype._wrapText = function () {
