@@ -1630,11 +1630,11 @@
 	// Content
 
 	CellEditor.prototype._getContentLeft = function () {
-		return asc_calcnpt( 0, this.drawingCtx.getPPIX(), this.defaults.padding/*px*/ );
+		return this.defaults.padding;
 	};
 
 	CellEditor.prototype._getContentWidth = function () {
-		return this.right - this.left - asc_calcnpt( 0, this.drawingCtx.getPPIX(), this.defaults.padding + this.defaults.padding + 1/*px*/ );
+		return this.right - this.left - 2 * this.defaults.padding + 1/*px*/;
 	};
 
 	CellEditor.prototype._getContentHeight = function () {
