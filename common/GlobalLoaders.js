@@ -216,6 +216,7 @@
             if (this.Api.IsNeedDefaultFonts())
             {
                 // теперь добавим шрифты, без которых редактор как без рук (спецсимволы + дефолтовые стили документа)
+                this.AddLoadFonts("SimSun", 0x0F);
                 this.AddLoadFonts("Arial", 0x0F);
                 this.AddLoadFonts("Symbol", 0x0F);
                 this.AddLoadFonts("Wingdings", 0x0F);
