@@ -1679,7 +1679,16 @@ CDocumentContent.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrS
 	{
 		if (arrSelectedParagraphs)
 		{
-			if (true === this.Selection.Use)
+			if (true === this.ApplyToAll)
+			{
+				for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+				{
+					this.Content[nPos].Set_ApplyToAll(true);
+					this.Content[nPos].GetCurrentParagraph(false, arrSelectedParagraphs);
+					this.Content[nPos].Set_ApplyToAll(false);
+				}
+			}
+			else if (true === this.Selection.Use)
 			{
 				var nStartPos = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
 				var nEndPos   = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;

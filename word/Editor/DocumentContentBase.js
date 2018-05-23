@@ -1229,10 +1229,12 @@ CDocumentContentBase.prototype.SelectNumbering = function(oNumPr, oPara)
 	{
 		this.RemoveSelection();
 
+		oPara.Document_SetThisElementCurrent(false);
+
 		this.Selection.Use      = true;
 		this.Selection.Flag     = selectionflag_Numbering;
-		this.Selection.StartPos = 0;
-		this.Selection.EndPos   = 0;
+		this.Selection.StartPos = this.CurPos.ContentPos;
+		this.Selection.EndPos   = this.CurPos.ContentPos;
 
 		var arrParagraphs = this.GetAllParagraphsByNumbering(oNumPr);
 
@@ -1243,7 +1245,7 @@ CDocumentContentBase.prototype.SelectNumbering = function(oNumPr, oPara)
 
 		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 		{
-			arrParagraphs[nIndex].SelectNumbering(arrParagraphs === oPara);
+			arrParagraphs[nIndex].SelectNumbering(arrParagraphs[nIndex] === oPara);
 		}
 
 		this.DrawingDocument.SelectEnabled(true);

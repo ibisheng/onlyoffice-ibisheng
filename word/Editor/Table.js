@@ -7673,13 +7673,27 @@ CTable.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedPar
 {
 	if (arrSelectedParagraphs)
 	{
-		var SelectionArray = this.Internal_Get_SelectionArray();
-		for (var nIndex = 0, nCount = SelectionArray.length; nIndex < nCount; ++nIndex)
+		var arrSelectionArray = this.GetSelectionArray();
+		for (var nIndex = 0, nCount = arrSelectionArray.length; nIndex < nCount; ++nIndex)
 		{
-			var CurCell = SelectionArray[nIndex].Cell;
-			var CurRow  = SelectionArray[nIndex].Row;
-			this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph(false, arrSelectedParagraphs);
+			var nCurCell = arrSelectionArray[nIndex].Cell;
+			var nCurRow  = arrSelectionArray[nIndex].Row;
+
+			var oCellContent = this.GetRow(nCurRow).GetCell(nCurCell).GetContent();
+
+			if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
+			{
+				oCellContent.Set_ApplyToAll(true);
+				oCellContent.GetCurrentParagraph(false, arrSelectedParagraphs);
+				oCellContent.Set_ApplyToAll(false);
+			}
+			else
+			{
+				oCellContent.GetCurrentParagraph(false, arrSelectedParagraphs);
+			}
 		}
+
+		return arrSelectedParagraphs;
 	}
 	else if (true === bIgnoreSelection)
 	{
@@ -7690,13 +7704,25 @@ CTable.prototype.GetCurrentParagraph = function(bIgnoreSelection, arrSelectedPar
 	}
 	else
 	{
-		var SelectionArray = this.Internal_Get_SelectionArray();
-		if (SelectionArray.length > 0)
+		var arrSelectionArray = this.GetSelectionArray();
+		if (arrSelectionArray.length > 0)
 		{
-			var CurCell = SelectionArray[0].Cell;
-			var CurRow  = SelectionArray[0].Row;
+			var nCurCell = arrSelectionArray[0].Cell;
+			var nCurRow  = arrSelectionArray[0].Row;
 
-			return this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph(bIgnoreSelection, null);
+			var oCellContent = this.GetRow(nCurRow).GetCell(nCurCell).GetContent();
+
+			if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
+			{
+				oCellContent.Set_ApplyToAll(true);
+				var oRes = oCellContent.GetCurrentParagraph(bIgnoreSelection, null);
+				oCellContent.Set_ApplyToAll(false);
+				return oRes;
+			}
+			else
+			{
+				return oCellContent.GetCurrentParagraph(bIgnoreSelection, null);
+			}
 		}
 	}
 
@@ -11764,6 +11790,11 @@ CTable.prototype.GetRowsCount = function()
 {
 	return this.Content.length;
 };
+/**
+ * Получаем строку с заданным номером
+ * @param {number} nIndex
+ * @returns {CTableRow}
+ */
 CTable.prototype.GetRow = function(nIndex)
 {
 	return this.Get_Row(nIndex);
