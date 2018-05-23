@@ -1648,7 +1648,7 @@
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
-				if(!window['AscCommon'].g_specialPasteHelper.specialPasteStart && null === mathObj)
+				if(/*!window['AscCommon'].g_specialPasteHelper.specialPasteStart && */null === mathObj)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
