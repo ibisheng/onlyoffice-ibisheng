@@ -1930,8 +1930,8 @@
 						ws.expandRowsOnScroll(true);
 					}
 					
-					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 1, 3);
-					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 1, 3);
+					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeCol].left - ws.getCellLeft(0, 1), 0, 3);
+					curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRow].top  - ws.getCellTop(0, 1), 0, 3);
 
 					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
 					drawingObject.graphicObject.setDrawingBase(drawingObject);
