@@ -1655,14 +1655,13 @@
 
 					var asc_getcvt = Asc.getCvtRatio;
 					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
-					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
 
-					var cellsLeft = worksheet.cellsLeft * ptToPx;
-					var cellsTop = worksheet.cellsTop * ptToPx;
+					var cellsLeft = worksheet.cellsLeft;
+					var cellsTop = worksheet.cellsTop;
 
 					var cursorPos = isIntoShape.GetCursorPosXY();
-					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
-					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
+					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - cellsLeft;
+					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
 					var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 					var position = {x: posX, y: posY};
