@@ -218,6 +218,8 @@
 		prot["asc_setCodePage"]			= prot.asc_setCodePage;
 		prot["asc_getText"]				= prot.asc_getText;
 		prot["asc_setText"]				= prot.asc_setText;
+		prot["asc_getLcid"]				= prot.asc_getLcid;
+		prot["asc_setLcid"]				= prot.asc_setLcid;
 
 		prot = asc_CDelimiter.prototype;
 		prot["asc_getDelimiterName"]			= prot.asc_getDelimiterName;
