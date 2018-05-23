@@ -10717,6 +10717,11 @@
 		wb.dependencyFormulas.lockRecal();
 		History.StartTransaction();
 
+		var oldExcludeHiddenRows = wsFrom.bExcludeHiddenRows;
+		if(wsFrom.autoFilters.bIsExcludeHiddenRows(from, wsFrom.selectionRange.activeCell)){
+			wsFrom.excludeHiddenRows(true);
+		}
+
 		var toRange = wsTo.getRange3(to.r1, to.c1, to.r2, to.c2);
 		var fromRange = wsFrom.getRange3(from.r1, from.c1, from.r2, from.c2);
 		var bChangeRowColProp = false;
@@ -11052,6 +11057,8 @@
 				}
 			}
 		}
+
+		wsFrom.excludeHiddenRows(oldExcludeHiddenRows);
 		History.EndTransaction();
 		wb.dependencyFormulas.unlockRecal();
 	}
