@@ -11624,7 +11624,7 @@
             if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
                 this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeightPx);
 				History.TurnOff();
-                this.model.setRowHeight(this.rows[r].height * asc_getcvt(0, 1, t._getPPIY()), r, r, false);
+                this.model.setRowHeight(this.rows[r].height * asc_getcvt(0, 1, this._getPPIY()), r, r, false);
 				History.TurnOn();
                 this.isChanged = true;
             }
