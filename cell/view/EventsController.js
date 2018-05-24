@@ -1053,13 +1053,13 @@
 
 					t.handlers.trigger("changeSelection", /*isStartPoint*/!shiftKey, dc, dr, /*isCoord*/false, false,
 						function (d) {
-							t.scroll(d);
-
 							if (t.isFormulaEditMode) {
 								t.handlers.trigger("enterCellRange");
 							} else if (t.handlers.trigger("getCellEditMode")) {
 								t.handlers.trigger("stopCellEditing");
 							}
+
+							t.scroll(d);
 						});
 				}
 			}

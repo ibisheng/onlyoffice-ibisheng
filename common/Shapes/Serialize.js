@@ -515,10 +515,20 @@ function BinaryPPTYLoader()
                 s.Seek2(_main_tables["24"]);
 
                 var _s_count = s.GetULong();
+                var bOldVal;
+                if(this.Api)
+                {
+                    bOldVal = this.Api.bNoSendComments;
+                    this.Api.bNoSendComments = true;
+                }
                 for (var i = 0; i < _s_count; i++)
                 {
                     this.presentation.insertSlide(i, this.ReadSlide(i)) ;
                     this.presentation.Slides[i].setSlideSize(this.presentation.Width, this.presentation.Height);
+                }
+                if(this.Api)
+                {
+                    this.Api.bNoSendComments = bOldVal;
                 }
             }
 

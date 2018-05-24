@@ -5036,12 +5036,30 @@ CPresentation.prototype =
 
     Get_SelectionState2: function()
     {
-        return this.Save_DocumentStateBeforeLoadChanges();
+        var oState = this.Save_DocumentStateBeforeLoadChanges();
+        var oCurController = this.GetCurrentController();
+        if(oCurController){
+            var oContent = oCurController.getTargetDocContent(false, false);
+            if(oContent){
+                oState.Content2 = oContent;
+                oState.SelectionState2 = oContent.Get_SelectionState2();
+            }
+        }
+        return oState;
     },
 
     Set_SelectionState2: function(oDocState)
     {
         this.Load_DocumentStateAfterLoadChanges(oDocState);
+        var oCurController = this.GetCurrentController();
+        if(oCurController){
+            var oContent = oCurController.getTargetDocContent(false, false);
+            if(oContent){
+                if(oContent === oDocState.Content2 && oDocState.SelectionState2){
+                    oContent.Set_SelectionState2(oDocState.SelectionState2);
+                }
+            }
+        }
     },
 
     Save_DocumentStateBeforeLoadChanges: function()
