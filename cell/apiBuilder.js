@@ -327,7 +327,8 @@
 	 * @returns {ApiRange}
 	 */
 	ApiWorksheet.prototype.GetSelection = function () {
-		return new ApiRange(this.worksheet.selectionRange.getLast());
+		var r = this.worksheet.selectionRange.getLast();
+		return new ApiRange(this.worksheet.getRange3(r.r1, r.c1, r.r2, r.c2));
 	};
 	Object.defineProperty(ApiWorksheet.prototype, "Selection", {
 		get: function () {
