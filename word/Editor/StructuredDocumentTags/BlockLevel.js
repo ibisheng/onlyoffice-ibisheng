@@ -1022,6 +1022,10 @@ CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 {
 	return this.Parent.IsTableFirstRowOnNewPage();
 };
+CBlockLevelSdt.prototype.UpdateBookmarks = function(oManager)
+{
+	this.Content.UpdateBookmarks(oManager);
+};
 CBlockLevelSdt.prototype.GetTableOfContents = function(isUnique, isCheckFields)
 {
 	if (this.IsBuiltInTableOfContents() && (!isUnique || this.IsBuiltInUnique()))
