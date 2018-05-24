@@ -318,7 +318,7 @@
 
         this.defaultColWidthChars = 0;
         this.defaultColWidthPx = 0;
-        this.defaultRowHeight = 0;
+        this.defaultRowHeightPx = 0;
         this.defaultRowDescender = 0;
         this.headersLeft = 0;
         this.headersTop = 0;
@@ -414,10 +414,12 @@
 		var tm = this._roundTextMetrics(this.stringRender.measureString("A"));
 		this.headersHeightByFont = tm.height + 1;
 
-		this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
+		this.maxRowHeightPx = Asc.ceil(Asc.c_oAscMaxRowHeight * asc_getcvt(1, 0, this._getPPIY()));
+		Asc.c_oAscMaxRowHeight = this.maxRowHeightPx * asc_getcvt(0, 1, this._getPPIY());
 		this.defaultRowDescender = this.stringRender.lines[0].d;
-		AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight =
-			Math.min(this.maxRowHeight, this.model.getDefaultHeight() || this.headersHeightByFont);
+		AscCommonExcel.oDefaultMetrics.RowHeight = Math.min(Asc.c_oAscMaxRowHeight,
+			this.model.getDefaultHeight() || (this.headersHeightByFont * asc_getcvt(0, 1, this._getPPIY())));
+		this.defaultRowHeightPx = AscCommonExcel.oDefaultMetrics.RowHeight * asc_getcvt(1, 0, this._getPPIY());
 
 		// ToDo refactoring
 		this.model.setDefaultHeight(AscCommonExcel.oDefaultMetrics.RowHeight);
@@ -808,23 +810,23 @@
         y2 += mouseY;
 
         var offsetFrozenY = 0;
-        var r1 = t.visibleRange.r1;
+        var r1 = this.visibleRange.r1;
         if (this.topLeftFrozenCell) {
             var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
             if (0 <= rFrozen) {
                 if (row < r1) {
                     r1 = 0;
                 } else {
-                    offsetFrozenY = t.rows[rFrozen].top + t.rows[rFrozen].height - t.rows[0].top;
+                    offsetFrozenY = this.rows[rFrozen].top + this.rows[rFrozen].height - this.rows[0].top;
                 }
             }
         }
-        var offsetY = t.rows[r1].top - t.cellsTop;
+        var offsetY = this.rows[r1].top - t.cellsTop;
         offsetY -= offsetFrozenY;
 
-        var y1 = t.rows[row].top - offsetY - gridlineSize;
-        var newHeight = Math.min(t.maxRowHeight, Math.max(y2 - y1, 0));
-        if (newHeight === t.rows[row].height) {
+        var y1 = this.rows[row].top - offsetY - gridlineSize;
+        var newHeight = Math.min(this.maxRowHeightPx, Math.max(y2 - y1, 0));
+        if (newHeight === this.rows[row].height) {
             return;
         }
 
@@ -833,7 +835,7 @@
                 return;
             }
 
-            t.model.setRowHeight(newHeight, row, row, true);
+            t.model.setRowHeight(newHeight * asc_getcvt(0, 1, t._getPPIY()), row, row, true);
             t.model.autoFilters.reDrawFilter(null, row);
             t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
             t.changeWorksheet("update", {reinitRanges: true});
@@ -1378,7 +1380,7 @@
         var visibleH = this.drawingCtx.getHeight();
         var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
         var l = Math.max(this.model.getRowsCount() + 1, this.nRowsCount, maxRowObjects);
-        var defaultH = this.defaultRowHeight;
+        var defaultH = this.defaultRowHeightPx;
         var i = 0, h, hR, isCustomHeight, hiddenH = 0;
 
         if (AscCommonExcel.recalcType.full === type) {
@@ -4399,11 +4401,11 @@
                   newHeight = Math.max(rowInfo.height, textBound.height);
               }
 
-				newHeight = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
+				newHeight = Math.min(this.maxRowHeightPx, Math.max(rowInfo.height, newHeight));
 				if (newHeight !== rowInfo.height) {
 					rowInfo.heightReal = rowInfo.height = newHeight;
 					History.TurnOff();
-                  this.model.setRowHeight(rowInfo.height, row, row, false);
+                  this.model.setRowHeight(rowInfo.height * asc_getcvt(0, 1, this._getPPIY()), row, row, false);
 					History.TurnOn();
 
                   if (angle) {
@@ -10211,7 +10213,7 @@
 					// Приводим к px (чтобы было ровно)
 					val = val / 0.75;
 					val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
-					t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
+					t.model.setRowHeight(Math.min(val, Asc.c_oAscMaxRowHeight), checkRange.r1, checkRange.r2, true);
 					isUpdateRows = true;
 					oRecalcType = AscCommonExcel.recalcType.full;
 					reinitRanges = true;
@@ -10616,20 +10618,20 @@
                 }
             }
 
-            if (ct.metrics.height > this.maxRowHeight) {
+            if (ct.metrics.height > this.maxRowHeightPx) {
                 if (isMerged) {
                     continue;
                 }
                 // Запоминаем старую ширину (в случае, если у нас по высоте не уберется)
                 oldWidth = ct.metrics.width;
                 lastHeight = null;
-                // вычисление новой ширины столбца, чтобы высота текста была меньше maxRowHeight
+                // вычисление новой ширины столбца, чтобы высота текста была меньше maxRowHeightPx
                 c = this._getCell(col, row);
                 str = c.getValue2();
                 maxW = ct.metrics.width + this.maxDigitWidth;
                 while (1) {
                     tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
-                    if (tm.height <= this.maxRowHeight) {
+                    if (tm.height <= this.maxRowHeightPx) {
                         break;
                     }
                     if (lastHeight === tm.height) {
@@ -10747,7 +10749,7 @@
 
             var height, col, ct, mc;
             for (var r = row1; r <= row2; ++r) {
-                height = t.defaultRowHeight;
+                height = t.defaultRowHeightPx;
 
                 for (col = 0; col < t.cols.length; ++col) {
                     ct = t._getCellTextCache(col, r);
@@ -10765,7 +10767,7 @@
                     height = Math.max(height, ct.metrics.height + 1);
                 }
 
-                t.model.setRowBestFit(true, Math.min(height, t.maxRowHeight), r, r);
+                t.model.setRowBestFit(true, Math.min(height, t.maxRowHeightPx) * asc_getcvt(0, 1, this._getPPIY()), r, r);
             }
 
             t.nRowsCount = 0;
@@ -11585,7 +11587,7 @@
                 }
                 c = this._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
             }
-            for (h = this.defaultRowHeight, d = this.defaultRowDescender, c = 0; c < this.cols.length; ++c) {
+            for (h = this.defaultRowHeightPx, d = this.defaultRowDescender, c = 0; c < this.cols.length; ++c) {
                 ct = this._getCellTextCache(c, r, true);
                 if (!ct) {
                     continue;
@@ -11620,9 +11622,9 @@
                 }
             }
             if (Math.abs(h - this.rows[r].height) > 0.000001 && !this.rows[r].isCustomHeight) {
-                this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeight);
+                this.rows[r].heightReal = this.rows[r].height = Math.min(h, this.maxRowHeightPx);
 				History.TurnOff();
-                this.model.setRowHeight(this.rows[r].height, r, r, false);
+                this.model.setRowHeight(this.rows[r].height * asc_getcvt(0, 1, t._getPPIY()), r, r, false);
 				History.TurnOn();
                 this.isChanged = true;
             }
