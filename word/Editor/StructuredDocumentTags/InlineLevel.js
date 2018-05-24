@@ -269,7 +269,7 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
 
-	var sName      = this.GetLabel();
+	var sName      = this.GetAlias();
 	var isBuiltIn  = false;
 	var arrButtons = [];
 
@@ -454,7 +454,7 @@ CInlineLevelSdt.prototype.GetContentControlPr = function()
 {
 	var oPr = new CContentControlPr(c_oAscSdtLevelType.Inline);
 
-	oPr.Tag        = this.Pr.Tag;
+	oPr.Tag        = this.GetTag();
 	oPr.Id         = this.Pr.Id;
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();

@@ -663,7 +663,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	var sName      = this.GetLabel();
+	var sName      = this.GetAlias();
 	var isBuiltIn  = false;
 	var arrButtons = [];
 
@@ -1160,7 +1160,7 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 {
 	var oPr = new CContentControlPr(c_oAscSdtLevelType.Block);
 
-	oPr.Tag        = this.Pr.Tag;
+	oPr.Tag        = this.GetTag();
 	oPr.Id         = this.Pr.Id;
 	oPr.Lock       = this.Pr.Lock;
 	oPr.InternalId = this.GetId();
