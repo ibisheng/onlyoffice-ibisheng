@@ -72,6 +72,14 @@ CBlockLevelSdt.prototype.GetType = function()
 {
 	return type_BlockLevelSdt;
 };
+/**
+ * Получаем содержимое данного контейнера
+ * @returns {CDocumentContent}
+ */
+CBlockLevelSdt.prototype.GetContent = function()
+{
+	return this.Content;
+};
 CBlockLevelSdt.prototype.Is_Inline = function()
 {
 	return true;

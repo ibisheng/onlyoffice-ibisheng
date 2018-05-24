@@ -30,6 +30,8 @@ Selection
 ## 5.1.1
 ### All Editors
 * Fix error with repeated reconnection
+* Add support of a block-level content controls
+* Add function for receiving all content controls in the document
 
 ### Document Editor
 * 

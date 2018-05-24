@@ -393,13 +393,22 @@
 		this.Sdt = Sdt;
 	}
 
+	/**
+	 * Class represent a container for the content of the document
+	 * @constructor
+	 */
+	function ApiBlockLvlSdt(Sdt)
+	{
+		this.Sdt = Sdt;
+	}
+
     /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
 
     /**
-     * @typedef {(ApiParagraph | ApiTable)} DocumentElement
+     * @typedef {(ApiParagraph | ApiTable | ApiBlockLvlSdt)} DocumentElement
      */
 
     /**
@@ -1101,6 +1110,15 @@
 		oSdt.Add_ToContent(0, new ParaRun(null, false));
 		return new ApiInlineLvlSdt(oSdt);
 	};
+
+	/**
+	 * Create a new block level container
+	 * @returns {ApiBlockLvlSdt}
+	 */
+	Api.prototype.CreateBlockLvlSdt = function()
+	{
+		return new ApiBlockLvlSdt(new CBlockLvlSdt());
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiUnsupported
@@ -1147,11 +1165,13 @@
         if (!this.Document.Content[nPos])
             return null;
 
-        var Type = this.Document.Content[nPos].Get_Type();
+        var Type = this.Document.Content[nPos].GetType();
         if (type_Paragraph === Type)
             return new ApiParagraph(this.Document.Content[nPos]);
         else if (type_Table === Type)
             return new ApiTable(this.Document.Content[nPos]);
+        else if (type_BlockLevelSdt === Type)
+        	return new ApiBlockLvlSdt(this.Document.Content[nPos]);
 
         return null;
     };
@@ -1162,7 +1182,7 @@
      */
     ApiDocumentContent.prototype.AddElement = function(nPos, oElement)
     {
-        if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
+        if (oElement instanceof ApiParagraph || oElement instanceof ApiTable || oElement instanceof ApiBlockLvlSdt)
         {
             this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl());
         }
@@ -1539,6 +1559,26 @@
 			return;
 
 		this.Document.Search_Replace(sReplace, true, null, false);
+	};
+	/**
+	 * Get the list of all content controls in the document
+	 * @returns {ApiBlockLvlSdt[] | ApiInlineLvlSdt[]}
+	 */
+	ApiDocument.prototype.GetAllContentControls = function()
+	{
+		var arrResult = [];
+		var arrControls = this.Document.GetAllContentControls();
+		for (var nIndex = 0, nCount = arrControls.length; nIndex < nCount; ++nIndex)
+		{
+			var oControl = arrControls[nIndex];
+
+			if (oControl instanceof CBlockLevelSdt)
+				arrResult.push(new ApiBlockLvlSdt(oControl));
+			else if (oControl instanceof CInlineLevelSdt)
+				arrResult.push(new ApiInlineLvlSdt(oControl));
+		}
+
+		return arrResult;
 	};
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -4545,6 +4585,25 @@
 		this.Sdt.SetContentControlLock(nLock);
 	};
 	/**
+	 * Get the lock type of this container
+	 * @returns {SdtLock}
+	 */
+	ApiInlineLvlSdt.prototype.GetLock = function()
+	{
+		var nLock = this.Sdt.GetContentControlLock();
+
+		var sResult = "unlocked";
+
+		if (sdtlock_ContentLocked === nLock)
+			sResult = "contentLocked";
+		else if (sdtlock_SdtContentLocked === nLock)
+			sResult = "sdtContentLocked";
+		else if (sdtlock_SdtLocked === nLock)
+			sResult = "sdtLocked";
+
+		return sResult;
+	};
+	/**
 	 * Set the tag attribute for this container
 	 * @param {string} sTag
 	 */
@@ -4553,12 +4612,44 @@
 		this.Sdt.SetTag(sTag);
 	};
 	/**
+	 * Get the tag attribute for this container
+	 * @returns {string}
+	 */
+	ApiInlineLvlSdt.prototype.GetTag = function()
+	{
+		return this.Sdt.GetTag();
+	};
+	/**
 	 * Set the label attribute for this container
 	 * @param {string} sLabel
 	 */
 	ApiInlineLvlSdt.prototype.SetLabel = function(sLabel)
 	{
 		this.Sdt.SetLabel(sLabel);
+	};
+	/**
+	 * Get the label attribute for this container
+	 * @returns {string}
+	 */
+	ApiInlineLvlSdt.prototype.GetLabel = function()
+	{
+		return this.Sdt.GetLabel();
+	};
+	/**
+	 * Set the alias attribute for this container
+	 * @param {string} sAlias
+	 */
+	ApiInlineLvlSdt.prototype.SetAlias = function(sAlias)
+	{
+		this.Sdt.SetAlias(sAlias);
+	};
+	/**
+	 * Get the alias attribute for this container
+	 * @returns {string}
+	 */
+	ApiInlineLvlSdt.prototype.GetAlias = function()
+	{
+		return this.Sdt.GetAlias();
 	};
 	/**
 	 * Get the number of elements in the current container.
@@ -4623,7 +4714,112 @@
 
 		return true;
 	};
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//------------------------------------------------------------------------------------------------------------------
+	//
+	// ApiBlockLvlSdt
+	//
+	//------------------------------------------------------------------------------------------------------------------
+	/**
+	 * Get the type of this class.
+	 * @returns {"blockLvlSdt"}
+	 */
+	ApiBlockLvlSdt.prototype.GetClassType = function()
+	{
+		return "blockLvlSdt";
+	};
+	/**
+	 * Set the lock type of this container
+	 * @param {SdtLock} sLockType
+	 */
+	ApiBlockLvlSdt.prototype.SetLock = function(sLockType)
+	{
+		var nLock = sdtlock_Unlocked;
+		if ("contentLocked" === sLockType)
+			nLock = sdtlock_ContentLocked;
+		else if ("sdtContentLocked" === sLockType)
+			nLock = sdtlock_SdtContentLocked;
+		else if ("sdtLocked" === sLockType)
+			nLock = sdtlock_SdtLocked;
+
+		this.Sdt.SetContentControlLock(nLock);
+	};
+	/**
+	 * Get the lock type of this container
+	 * @returns {SdtLock}
+	 */
+	ApiBlockLvlSdt.prototype.GetLock = function()
+	{
+		var nLock = this.Sdt.GetContentControlLock();
+
+		var sResult = "unlocked";
+
+		if (sdtlock_ContentLocked === nLock)
+			sResult = "contentLocked";
+		else if (sdtlock_SdtContentLocked === nLock)
+			sResult = "sdtContentLocked";
+		else if (sdtlock_SdtLocked === nLock)
+			sResult = "sdtLocked";
+
+		return sResult;
+	};
+	/**
+	 * Set the tag attribute for this container
+	 * @param {string} sTag
+	 */
+	ApiBlockLvlSdt.prototype.SetTag = function(sTag)
+	{
+		this.Sdt.SetTag(sTag);
+	};
+	/**
+	 * Get the tag attribute for this container
+	 * @returns {string}
+	 */
+	ApiBlockLvlSdt.prototype.GetTag = function()
+	{
+		return this.Sdt.GetTag();
+	};
+	/**
+	 * Set the label attribute for this container
+	 * @param {string} sLabel
+	 */
+	ApiBlockLvlSdt.prototype.SetLabel = function(sLabel)
+	{
+		this.Sdt.SetLabel(sLabel);
+	};
+	/**
+	 * Get the label attribute for this container
+	 * @returns {string}
+	 */
+	ApiBlockLvlSdt.prototype.GetLabel = function()
+	{
+		return this.Sdt.GetLabel();
+	};
+	/**
+	 * Set the alias attribute for this container
+	 * @param {string} sAlias
+	 */
+	ApiBlockLvlSdt.prototype.SetAlias = function(sAlias)
+	{
+		this.Sdt.SetAlias(sAlias);
+	};
+	/**
+	 * Get the alias attribute for this container
+	 * @returns {string}
+	 */
+	ApiBlockLvlSdt.prototype.GetAlias = function()
+	{
+		return this.Sdt.GetAlias();
+	};
+	/**
+	 * Get the content of this container
+	 * @returns {ApiDocumentContent}
+	 */
+	ApiBlockLvlSdt.prototype.GetContent = function()
+	{
+		return new ApiDocumentContent(this.Sdt.GetContent());
+	};
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Api.prototype["GetDocument"]                     = Api.prototype.GetDocument;
@@ -4647,6 +4843,7 @@
     Api.prototype["CreateBullet"]                    = Api.prototype.CreateBullet;
     Api.prototype["CreateNumbering"]                 = Api.prototype.CreateNumbering;
 	Api.prototype["CreateInlineLvlSdt"]              = Api.prototype.CreateInlineLvlSdt;
+	Api.prototype["CreateBlockLvlSdt"]               = Api.prototype.CreateBlockLvlSdt;
 
     ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
 
@@ -4674,6 +4871,7 @@
 	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
 	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
 	ApiDocument.prototype["SearchAndReplace"]        = ApiDocument.prototype.SearchAndReplace;
+	ApiDocument.prototype["GetAllContentControls"]   = ApiDocument.prototype.GetAllContentControls;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -4913,13 +5111,30 @@
 
 	ApiInlineLvlSdt.prototype["GetClassType"]      = ApiInlineLvlSdt.prototype.GetClassType;
 	ApiInlineLvlSdt.prototype["SetLock"]           = ApiInlineLvlSdt.prototype.SetLock;
+	ApiInlineLvlSdt.prototype["GetLock"]           = ApiInlineLvlSdt.prototype.GetLock;
 	ApiInlineLvlSdt.prototype["SetTag"]            = ApiInlineLvlSdt.prototype.SetTag;
+	ApiInlineLvlSdt.prototype["GetTag"]            = ApiInlineLvlSdt.prototype.GetTag;
 	ApiInlineLvlSdt.prototype["SetLabel"]          = ApiInlineLvlSdt.prototype.SetLabel;
+	ApiInlineLvlSdt.prototype["GetLabel"]          = ApiInlineLvlSdt.prototype.GetLabel;
+	ApiInlineLvlSdt.prototype["SetAlias"]          = ApiInlineLvlSdt.prototype.SetAlias;
+	ApiInlineLvlSdt.prototype["GetAlias"]          = ApiInlineLvlSdt.prototype.GetAlias;
 	ApiInlineLvlSdt.prototype["GetElementsCount"]  = ApiInlineLvlSdt.prototype.GetElementsCount;
 	ApiInlineLvlSdt.prototype["GetElement"]        = ApiInlineLvlSdt.prototype.GetElement;
 	ApiInlineLvlSdt.prototype["RemoveElement"]     = ApiInlineLvlSdt.prototype.RemoveElement;
 	ApiInlineLvlSdt.prototype["RemoveAllElements"] = ApiInlineLvlSdt.prototype.RemoveAllElements;
 	ApiInlineLvlSdt.prototype["AddElement"]        = ApiInlineLvlSdt.prototype.AddElement;
+
+
+	ApiBlockLvlSdt.prototype["GetClassType"] = ApiBlockLvlSdt.prototype.GetClassType;
+	ApiBlockLvlSdt.prototype["SetLock"]      = ApiBlockLvlSdt.prototype.SetLock;
+	ApiBlockLvlSdt.prototype["GetLock"]      = ApiBlockLvlSdt.prototype.GetLock;
+	ApiBlockLvlSdt.prototype["SetTag"]       = ApiBlockLvlSdt.prototype.SetTag;
+	ApiBlockLvlSdt.prototype["GetTag"]       = ApiBlockLvlSdt.prototype.GetTag;
+	ApiBlockLvlSdt.prototype["SetLabel"]     = ApiBlockLvlSdt.prototype.SetLabel;
+	ApiBlockLvlSdt.prototype["GetLabel"]     = ApiBlockLvlSdt.prototype.GetLabel;
+	ApiBlockLvlSdt.prototype["SetAlias"]     = ApiBlockLvlSdt.prototype.SetAlias;
+	ApiBlockLvlSdt.prototype["GetAlias"]     = ApiBlockLvlSdt.prototype.GetAlias;
+	ApiBlockLvlSdt.prototype["GetContent"]   = ApiBlockLvlSdt.prototype.GetContent;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -5501,6 +5716,10 @@
         this.private_OnChange();
     };
     ApiInlineLvlSdt.prototype.private_GetImpl = function()
+	{
+		return this.Sdt;
+	};
+    ApiBlockLvlSdt.prototype.private_GetImpl = function()
 	{
 		return this.Sdt;
 	};
