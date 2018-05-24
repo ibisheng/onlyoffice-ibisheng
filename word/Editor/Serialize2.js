@@ -6798,9 +6798,11 @@ function BinaryFileReader(doc, openParams)
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
     };
-    this.ReadFromString = function (sBase64, isCopyPaste) {
+    this.ReadFromString = function (sBase64, copyPasteObj) {
         //надо сбросить то, что остался после открытия документа
-		var api = isCopyPaste ? this.Document.DrawingDocument.m_oWordControl.m_oApi : null;
+		var isWordCopyPaste = copyPasteObj ? copyPasteObj.wordCopyPaste : null;
+		var isExcelCopyPaste = copyPasteObj ? copyPasteObj.excelCopyPaste : null;
+		var api = isWordCopyPaste ? this.Document.DrawingDocument.m_oWordControl.m_oApi : null;
 		var insertDocumentUrlsData = api ? api.insertDocumentUrlsData : null;
         pptx_content_loader.Clear();
         pptx_content_loader.Start_UseFullUrl(insertDocumentUrlsData);
@@ -6989,7 +6991,7 @@ function BinaryFileReader(doc, openParams)
         for (var i in oPastedImagesUnique)
             aPrepeareImages.push(i);
 			
-		if(!isCopyPaste)
+		if(!isWordCopyPaste && !isExcelCopyPaste)
 		{
 			this.Document.Content = this.oReadResult.DocumentContent;
 			

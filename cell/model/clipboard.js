@@ -2637,7 +2637,7 @@
 				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    var oBinaryFileReader = new AscCommonWord.BinaryFileReader(newCDocument, openParams);
-			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
+			    var oRes = oBinaryFileReader.ReadFromString(sBase64, {excelCopyPaste: true});
 				
 				pptx_content_loader.End_UseFullUrl();
 				
