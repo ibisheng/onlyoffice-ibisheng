@@ -4871,7 +4871,31 @@ CChartSpace.prototype.getValAxisCrossType = function()
                     }
                 }
             }
-
+            aAxes = oPlotArea.axId;
+            var oCheckAxis;
+            for(i = 0; i < aAxes.length; ++i){
+                oCurAxis = aAxes[i];
+                if(oCurAxis.bDelete){
+                    var bHorizontal = (oCurAxis.axPos === AscFormat.AX_POS_T || oCurAxis.axPos === AscFormat.AX_POS_B);
+                    for(j = 0; j < aAxes.length; ++j){
+                        oCheckAxis = aAxes[j];
+                        if(!oCheckAxis.bDelete){
+                            if(bHorizontal){
+                                if(oCheckAxis.axPos === AscFormat.AX_POS_T || oCheckAxis.axPos === AscFormat.AX_POS_B){
+                                    oCurAxis.xPoints = oCheckAxis.xPoints;
+                                    break;
+                                }
+                            }
+                            else{
+                                if(oCheckAxis.axPos === AscFormat.AX_POS_R || oCheckAxis.axPos === AscFormat.AX_POS_L){
+                                    oCurAxis.yPoints = oCheckAxis.yPoints;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     };
     
