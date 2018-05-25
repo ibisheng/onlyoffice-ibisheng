@@ -13792,12 +13792,11 @@
 		//если есть заголовок, и в данных всего одна строка
 		//todo пределать все проверки HeaderRowCount на вызов функции isHeaderRow
 		var dataRange = tablePart.getRangeWithoutHeaderFooter();
-		if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && lastRange.r1 === lastRange.r2 && dataRange.r1 === lastRange.r1)
-		{
+		if(refTable.r1 === lastRange.r1 && refTable.r2 === lastRange.r2) {
+			formatTableInfo.isDeleteRow = true;
+		} else if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && lastRange.r1 === lastRange.r2 && dataRange.r1 === lastRange.r1) {
 			formatTableInfo.isDeleteRow = false;
-		}
-		else
-		{
+		} else {
 			formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
 		}
 
