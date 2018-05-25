@@ -11460,6 +11460,12 @@ Paragraph.prototype.GetStyleFromFormatting = function()
         if (null !== oPNextStyle)
             oParaStyle.put_Next(oPNextStyle.Get_Name());
     }
+    else
+	{
+		var oDefStyle = oStyles.Get(oStyles.GetDefaultParagraph());
+		if (oDefStyle)
+			oParaStyle.put_BasedOn(oDefStyle.GetName());
+	}
     oParaStyle.fill_TextPr(TextPr);
 
     var oRunStyle = new asc_CStyle();

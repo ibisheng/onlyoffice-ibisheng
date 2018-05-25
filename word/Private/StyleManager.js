@@ -195,7 +195,13 @@ CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 				oStyle.Set_Next(NextId);
 		}
 
-		var oAscLink = oAscStyle.get_Link();
+		var oAscLink   = oAscStyle.get_Link();
+		var sOldLinkId = oStyle.Get_Link();
+		if (sOldLinkId && this.Style[sOldLinkId])
+			oAscLink.put_Name(this.Style[sOldLinkId].GetName());
+		else
+			bCheckLink = false;
+
 		if (false != bCheckLink && null != oAscLink && undefined !== oAscLink)
 		{
 			var oLinkedStyle = this.Create_StyleFromInterface(oAscLink, false);

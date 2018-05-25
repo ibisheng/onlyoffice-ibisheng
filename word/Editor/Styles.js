@@ -573,6 +573,11 @@ CStyle.prototype =
 		this.Link = Value;
 	},
 
+	Get_Link : function()
+	{
+		return this.Link;
+	},
+
 	Set_Type : function(Value)
 	{
 		History.Add(new CChangesStyleType(this, this.Type, Value));
@@ -4856,7 +4861,7 @@ CStyles.prototype =
     }
 };
 /**
- * Получаем идентефикатор стиля по его имени
+ * Получаем идентификатор стиля по его имени
  * @param {string} sName
  * @param {boolean} [isReturnParaDefault=false] Возвращать ли дефолтовый стиль для параграфа, если стиль не найден
  * @returns {?string}
@@ -4874,6 +4879,14 @@ CStyles.prototype.GetStyleIdByName = function(sName, isReturnParaDefault)
 		return this.Default.Paragraph;
 
 	return null;
+};
+/**
+ * Получаем идентификатор стиля по умолчанию для параграфов
+ * @returns {string}
+ */
+CStyles.prototype.GetDefaultParagraph = function()
+{
+	return this.Default.Paragraph;
 };
 CStyles.prototype.GetDefaultFootnoteText = function()
 {
