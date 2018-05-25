@@ -1813,13 +1813,11 @@ CChartSpace.prototype.getAllTitles = function()
         }
         if(this.chart.plotArea)
         {
-            if(this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
-            {
-                ret.push(this.chart.plotArea.catAx.title);
-            }
-            if(this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
-            {
-                ret.push(this.chart.plotArea.valAx.title);
+            var aAxes = this.chart.plotArea.axId;
+            for(var i = 0; i < aAxes.length; ++i){
+                if(aAxes[i] && aAxes[i].title){
+                    ret.push(aAxes[i].title);
+                }
             }
         }
     }
@@ -9280,7 +9278,7 @@ CChartSpace.prototype.hitInTextRect = function()
             var parents = this.getParentObjects();
             var RGBA = {R:0, G:0, B: 0, A:255};
             var legend = this.chart.legend;
-            var arr_str_labels = [], i;
+            var arr_str_labels = [], i, j;
             var calc_entryes = legend.calcEntryes;
             calc_entryes.length = 0;
             var series = this.getAllSeries();
@@ -9811,426 +9809,190 @@ CChartSpace.prototype.hitInTextRect = function()
                     /*пока сделаем так: максимальная ширимна 0.9 от ширины дмаграммы
                      без заголовка  максимальная высота легенды 0.6 от высоты диаграммы,
                      с заголовком 0.6 от высоты за вычетом высоты заголовка*/
+                    var fMaxLegendHeight, fMaxLegendWidth;
                     if(bFixedSize){
-                        max_legend_width = fFixedWidth;
-                        max_legend_height = fFixedHeight;
+                        fMaxLegendWidth = fFixedWidth;
+                        fMaxLegendHeight = fFixedHeight;
                     }
                     else{
-                        max_legend_width = 0.9*this.extX;
-                        max_legend_height = (this.extY - (this.chart.title ? this.chart.title.extY : 0))*0.6;
+                        fMaxLegendWidth = 0.9*this.extX;
+                        fMaxLegendHeight = (this.extY - (this.chart.title ? this.chart.title.extY : 0))*0.6;
                     }
-                    if(b_line_series)
-                    {
-                        //сначала найдем максимальную ширину записи. ширина записи получается как отступ слева от маркера + ширина маркера + отступ справа от маркера + ширина текста
-                        var max_entry_width = 0, cur_entry_width, cur_entry_height;
-                        //найдем максимальную ширину надписи
-                        var left_width = line_marker_width + 3*distance_to_text;
-                        var arr_width = [], arr_height = []; //массив ширин записей
-                        var summ_width = 0;//сумма ширин всех подписей
-                        for(i = 0; i < calc_entryes.length; ++i)
-                        {
-                            calc_entry = calc_entryes[i];
-                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/, true);
-                            if(cur_entry_width > max_entry_width)
-                                max_entry_width = cur_entry_width;
-                            arr_height.push(calc_entry.txBody.getSummaryHeight());
-                            arr_width.push(cur_entry_width+left_width);
-                            summ_width+=arr_width[arr_width.length-1];
-                        }
-
-                        var max_entry_height = Math.max(0, Math.max.apply(Math, arr_height));
-                        var cur_left_x = 0;
-
-                        if(summ_width < max_legend_width)//значит все надписи убираются в одну строчку
-                        {
-                            if(bFixedSize){
-                                cur_left_x = max_legend_width - summ_width;
-                            }
-                            /*прибавим справа ещё боковой зазаор и посмотрим уберется ли новая ширина в максимальную ширину*/
-                            if(summ_width + distance_to_text < max_legend_width && !bFixedSize)
-                                legend_width = summ_width + distance_to_text;
-                            else
-                                legend_width = max_legend_width;
-                            legend_height = max_entry_height;
-                            if(bFixedSize){
-                                legend_height = max_legend_height;
-                            }
-                            for(i = 0; i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                    calc_entry.calcMarkerUnion.marker.localX = cur_left_x + distance_to_text + line_marker_width/2 - marker_size/2;
-                                if(calc_entry.calcMarkerUnion.lineMarker){
-                                    calc_entry.calcMarkerUnion.lineMarker.localX = cur_left_x + distance_to_text;
-                                    calc_entry.calcMarkerUnion.lineMarker.localY = Math.max(0, legend_height/2);
-                                }
-                                cur_left_x += arr_width[i];
-                                if(calc_entry.calcMarkerUnion.marker)
-                                    calc_entry.calcMarkerUnion.marker.localY = Math.max(0, legend_height/2 - marker_size/2);
-                                if(calc_entry.calcMarkerUnion.lineMarker){
-                                    calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX+line_marker_width+distance_to_text;
-                                }
-                                else{
-                                    if(calc_entry.calcMarkerUnion.marker){
-                                        calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width+distance_to_text;
-                                    }
-                                }
-                                calc_entry.localY = 0;
-                            }
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
-                            legend.setPosition(0, 0);
-                        }
-                        else if(max_legend_width >= max_entry_width + left_width)
-                        {
-                            var hor_count = (max_legend_width/(max_entry_width + left_width)) >> 0;//количество записей в одной строке
-                            var vert_count;//количество строк
-                            var t = calc_entryes.length / hor_count;
-                            if(t - (t >> 0) > 0)
-                                vert_count = t+1;
-                            else
-                                vert_count = t;
-                            //посмотрим убираются ли все эти строки в максимальную высоту. те которые не убираются обрежем, кроме первой.
-                            legend_width = hor_count*(max_legend_width + left_width);
-                            if(legend_width + distance_to_text <= max_legend_width && !bFixedSize)
-                                legend_width += distance_to_text;
-                            else
-                                legend_width = max_legend_width;
-
-                            if(bFixedSize){
-                                max_legend_height = fFixedHeight;
-                            }
-                            var max_line_count = (max_legend_height/max_entry_height)>>0; //максимальное количество строчек в легенде;
-                            if(vert_count <= max_line_count)
-                            {
-                                cut_index = calc_entryes.length;
-                                legend_height = vert_count*max_entry_height;
-                            }
-                            else
-                            {
-                                if(max_line_count === 0)
-                                {
-                                    cut_index = hor_count + 1;
-                                    legend_height = max_entry_height;
-                                }
-                                else
-                                {
-                                    cut_index = max_line_count*hor_count+1;
-                                    legend_height = max_entry_height*max_line_count;
-                                }
-                            }
-
-                            var fStartH = 0;
-                            if(bFixedSize){
-                                fStartH = Math.max(0, (fFixedHeight - legend_height)/2);
-                                legend_height = fFixedHeight;
-                            }
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
-                            calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i < cut_index && i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                if(calc_entry.calcMarkerUnion.lineMarker){
-                                    calc_entry.calcMarkerUnion.lineMarker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
-                                    calc_entry.calcMarkerUnion.lineMarker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
-                                    if(calc_entry.calcMarkerUnion.marker)
-                                    {
-                                        calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
-                                        calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
-                                    }
-                                }
-                                else{
-                                    if(calc_entry.calcMarkerUnion.marker)
-                                    {
-                                        calc_entry.calcMarkerUnion.marker.localX = (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + line_marker_width + 2*distance_to_text)  + distance_to_text;
-                                        calc_entry.calcMarkerUnion.marker.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height) + max_entry_height/2;
-                                    }
-                                }
-
-
-
-
-                                if(calc_entry.calcMarkerUnion.lineMarker){
-                                    calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
-                                }
-                                else{
-                                    if(calc_entry.calcMarkerUnion.marker){
-                                        calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + line_marker_width + distance_to_text;
-                                    }
-                                }
-                                calc_entry.localY = fStartH + ((i/hor_count) >> 0)*(max_entry_height);
-                            }
-                            legend.setPosition(0, 0);
-                        }
-                        else
-                        {
-                            //значит максималная по ширине надпись не убирается в рект для легенды
-                            var content_width = max_legend_width - 2*distance_to_text - marker_size;
-                            if(content_width <= 0)
-                                content_width = 0.01;
-                            var cur_content_width, max_content_width = 0;
-                            var arr_heights = [];
-                            for(i = 0; i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
-                                if(cur_content_width > max_content_width)
-                                    max_content_width = cur_content_width;
-                                arr_heights.push(calc_entry.txBody.getSummaryHeight());
-                            }
-                            if(max_content_width < max_legend_width - left_inset && !bFixedSize)
-                            {
-                                legend_width = max_content_width + left_inset;
-                            }
-                            else
-                            {
-                                legend_width = max_legend_width;
-                            }
-                            var height_summ = 0;
-                            for(i = 0;  i < arr_heights.length; ++i)
-                            {
-                                height_summ+=arr_heights[i];
-                                if(height_summ > max_legend_height)
-                                {
-                                    cut_index = i;
-                                    break;
-                                }
-                            }
-                            if(AscFormat.isRealNumber(cut_index))
-                            {
-                                if(cut_index > 0)
-                                {
-                                    legend_height = height_summ - arr_heights[cut_index];
-                                }
-                                else
-                                {
-                                    legend_height = max_legend_height;
-                                }
-                            }
-                            else
-                            {
-                                cut_index = arr_heights.length;
-                                legend_height = height_summ;
-                            }
-                            if(bFixedSize){
-                                legend_height = max_legend_height;
-                            }
-                            legend.x = 0;
-                            legend.y = 0;
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
-                            var summ_h = 0;
-                            if(bFixedSize){
-                                summ_h = (legend_height - height_summ)/2;
-                            }
-
-                            calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-
-                                calc_entry.calcMarkerUnion.lineMarker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.lineMarker.localY = summ_h + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2;// - calc_entry.calcMarkerUnion.lineMarker.penWidth/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width + distance_to_text;
-                                calc_entry.localY = summ_h;
-                                if(calc_entry.calcMarkerUnion.marker)
-                                {
-                                    calc_entry.calcMarkerUnion.marker.localX = calc_entry.calcMarkerUnion.lineMarker.localX + line_marker_width/2 - marker_size/2;
-                                    calc_entry.calcMarkerUnion.marker.localY = calc_entry.calcMarkerUnion.lineMarker.localY - marker_size/2;
-                                }
-                                //calc_entry.localX = 2*distance_to_text + marker_size;
-                                //calc_entry.localY = summ_h;
-                                summ_h+=arr_heights[i];
-                            }
-                            legend.setPosition(0, 0);
-                        }
+                    var fMarkerWidth;
+                    if(b_line_series){
+                        fMarkerWidth = line_marker_width
                     }
-                    else
-                    {
-                        //сначала найдем максимальную ширину записи. ширина записи получается как отступ слева от маркера + ширина маркера + отступ справа от маркера + ширина текста
-                        var max_entry_width = 0, cur_entry_width, cur_entry_height;
-                        //найдем максимальную ширину надписи
-                        var left_width = marker_size + 2*distance_to_text;
-                        var arr_width = [], arr_height = []; //массив ширин записей
-                        var summ_width = 0;//сумма ширин всех подписей
-                        for(i = 0; i < calc_entryes.length; ++i)
-                        {
-                            calc_entry = calc_entryes[i];
-                            cur_entry_width = calc_entry.txBody.getMaxContentWidth(20000/*ставим большое число чтобы текст расчитался в одну строчку*/, true);
-                            if(cur_entry_width > max_entry_width)
-                                max_entry_width = cur_entry_width;
-                            arr_height.push(calc_entry.txBody.getSummaryHeight());
-                            arr_width.push(cur_entry_width+left_width);
-                            summ_width += arr_width[arr_width.length-1];
+                    else{
+                        fMarkerWidth = marker_size;
+                    }
+                    var oUnionMarker;
+                    var fMaxEntryWidth = 0.0;
+                    var fSummWidth = 0.0;
+                    var fCurEntryWidth, oCurEntry;
+                    var fLegendWidth, fLegendHeight;
+                    var aHeights = [];
+                    var fMaxEntryHeight = 0.0;
+                    var fCurEntryHeight = 0.0;
+                    var aWidths = [];
+                    var fCurPosX;
+                    var fCurPosY;
+                    var fDistanceBetweenLabels;
+                    var fVertDistanceBetweenLabels;
+                    var oLineMarker, fPenWidth, oMarker;
+                    for(i = 0; i < calc_entryes.length; ++i){
+                        oCurEntry = calc_entryes[i];
+                        var fWidth = oCurEntry.txBody.getMaxContentWidth(20000, true);
+                        aWidths.push(fWidth);
+                        fCurEntryWidth = distance_to_text + fMarkerWidth + distance_to_text + fWidth;
+                        if(fMaxEntryWidth < fCurEntryWidth){
+                            fMaxEntryWidth = fCurEntryWidth;
                         }
-
-                        var max_entry_height = Math.max(0, Math.max.apply(Math, arr_height));
-                        var cur_left_x = 0;
-                        if(summ_width < max_legend_width)//значит все надписи убираются в одну строчку
-                        {
-                            /*прибавим справа ещё боковой зазаор и посмотрим уберется ли новая ширина в максимальную ширину*/
-                            if(summ_width + distance_to_text < max_legend_width && !bFixedSize)
-                                legend_width = summ_width + distance_to_text;
-                            else
-                                legend_width = max_legend_width;
-                            legend_height = max_entry_height;
-
-                            if(bFixedSize){
-                                cur_left_x = (max_legend_width - summ_width)/2;
-                                legend_height = max_legend_height;
-                            }
-                            for(i = 0; i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                calc_entry.calcMarkerUnion.marker.localX = cur_left_x + distance_to_text;
-                                cur_left_x += arr_width[i];
-                                calc_entry.calcMarkerUnion.marker.localY = legend_height/2 - marker_size/2;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX+marker_size+distance_to_text;
-                                calc_entry.localY = calc_entry.calcMarkerUnion.marker.localY - marker_size/2;
-                            }
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
-                            legend.setPosition(0, 0);
+                        fCurEntryHeight = oCurEntry.txBody.getSummaryHeight();
+                        aHeights.push(fCurEntryHeight);
+                        if(fMaxEntryHeight < fCurEntryHeight){
+                            fMaxEntryHeight = fCurEntryHeight;
                         }
-                        else if(max_legend_width >= max_entry_width + left_width)
-                        {
-                            var hor_count = (max_legend_width/(max_entry_width + left_width)) >> 0;//количество записей в одной строке
-                            var vert_count;//количество строк
-                            var t = calc_entryes.length / hor_count;
-                            if(t - (t >> 0) > 0)
-                                vert_count = (t+1) >> 0;
-                            else
-                                vert_count = t >> 0;
-                            //посмотрим убираются ли все эти строки в максимальную высоту. те которые не убираются обрежем, кроме первой.
-                            var fStartHorPos = 0;
-                            legend_width = hor_count*(max_entry_width + left_width);
-                            if(legend_width + distance_to_text <= max_legend_width && !bFixedSize)
-                                legend_width += distance_to_text;
+                        fSummWidth += fCurEntryWidth;
+                    }
+                    if(fSummWidth <= fMaxLegendWidth){
+                        if(bFixedSize){
+                            fLegendWidth = fFixedWidth;
+                            fLegendHeight = fFixedHeight;
+                        }
+                        else{
+                            fLegendWidth = fSummWidth;
+                            fLegendHeight = fMaxEntryHeight;
+                        }
+                        fDistanceBetweenLabels = (fLegendWidth - fSummWidth)/(calc_entryes.length + 1);
+                        fCurPosX = 0.0;
+                        legend.extX = fLegendWidth;
+                        legend.extY = fLegendHeight;
+                        for(i = 0; i < calc_entryes.length; ++i){
+                            fCurPosX += fDistanceBetweenLabels;
+                            oCurEntry = calc_entryes[i];
+                            oUnionMarker = oCurEntry.calcMarkerUnion;
+                            oLineMarker = oUnionMarker.lineMarker;
+                            oMarker = oUnionMarker.marker;
+
+                            if(oLineMarker){
+                                oLineMarker.localX = fCurPosX + distance_to_text;
+                                if(oLineMarker.pen){
+                                    if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                                        fPenWidth = oLineMarker.pen.w/12700.0;
+                                    }
+                                    else{
+                                        fPenWidth = 1.0;
+                                    }
+                                }
+                                else{
+                                    fPenWidth = 0.0;
+                                }
+                                oLineMarker.localY = Math.max(0.0, fLegendHeight/2.0 - fPenWidth/2.0);
+                                if(oMarker){
+                                    oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
+                                }
+                            }
                             else{
-                                if(bFixedSize){
-                                    fStartHorPos = (max_legend_width - legend_width)/2;
-                                }
-                                legend_width = max_legend_width;
-                            }
-
-
-                            var max_line_count = (max_legend_height/max_entry_height)>>0; //максимальное количество строчек в легенде;
-                            if(vert_count <= max_line_count)
-                            {
-                                cut_index = calc_entryes.length;
-                                legend_height = vert_count*max_entry_height;
-                            }
-                            else
-                            {
-                                if(max_line_count === 0)
-                                {
-                                    cut_index = hor_count + 1;
-                                    legend_height = max_entry_height;
-                                }
-                                else
-                                {
-                                    cut_index = max_line_count*hor_count+1;
-                                    legend_height = max_entry_height*max_line_count;
+                                if(oMarker){
+                                    oMarker.localX = fCurPosX + distance_to_text;
+                                    oMarker.localY = Math.max(0.0, fLegendHeight/2.0 - marker_size/2.0);
                                 }
                             }
-
-                            var fStartH = 0;
-                            var fDistance = 0;
-                            if(bFixedSize){
-                                fDistance = Math.max(0,(max_legend_height - max_entry_height*vert_count)/vert_count);
-                                fStartH = Math.max(0, fDistance/2);
-                                legend_height = max_legend_height;
-                            }
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
-
-                            calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <cut_index && i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                calc_entry.calcMarkerUnion.marker.localX = fStartHorPos + (i - hor_count*((i/hor_count) >> 0))*(max_entry_width + marker_size + 2*distance_to_text)  + distance_to_text;
-                                var nHorCount = (i/hor_count) >> 0;
-                                calc_entry.calcMarkerUnion.marker.localY = fStartH + (nHorCount)*(max_entry_height) + max_entry_height/2 - marker_size/2 + nHorCount*fDistance;
-                                calc_entry.localX = calc_entry.calcMarkerUnion.marker.localX + marker_size + distance_to_text;
-                                calc_entry.localY = fStartH + nHorCount*(max_entry_height) + nHorCount*fDistance;
-                            }
-                            legend.setPosition(0, 0);
+                            oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                            oCurEntry.localY = Math.max(0, fLegendHeight/2.0 - aHeights[i]/2.0);
+                            fCurPosX += distance_to_text + fMarkerWidth + distance_to_text + aWidths[i];
                         }
-                        else
-                        {
-                            //значит максималная по ширине надпись не убирается в рект для легенды
-                            var content_width = max_legend_width - 2*distance_to_text - marker_size;
-                            if(content_width <= 0)
-                                content_width = 0.01;
-                            var cur_content_width, max_content_width = 0;
-                            var arr_heights = [];
-                            for(i = 0; i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                cur_content_width = calc_entry.txBody.getMaxContentWidth(content_width, true);
-                                if(cur_content_width > max_content_width)
-                                    max_content_width = cur_content_width;
-                                arr_heights.push(calc_entry.txBody.getSummaryHeight());
-                            }
-                            max_entry_height = Math.max(0, Math.max.apply(Math, arr_heights));
-                            if(max_content_width < max_legend_width - left_inset && !bFixedSize)
-                            {
-                                legend_width = max_content_width + left_inset;
-                            }
-                            else
-                            {
-                                legend_width = max_legend_width;
-                            }
-                            var height_summ = 0;
-                            for(i = 0;  i < arr_heights.length; ++i)
-                            {
-                                height_summ+=arr_heights[i];
-                                if(height_summ > max_legend_height)
-                                {
-                                    cut_index = i;
-                                    break;
-                                }
-                            }
-                            if(AscFormat.isRealNumber(cut_index))
-                            {
-                                if(cut_index > 0)
-                                {
-                                    legend_height = height_summ - arr_heights[cut_index];
-                                }
-                                else
-                                {
-                                    legend_height = max_legend_height;
-                                }
-                            }
-                            else
-                            {
-                                cut_index = arr_heights.length;
-                                legend_height = height_summ;
-                            }
-                            var fStartH = 0;
-                            var fDistance = 0;
-                            if(bFixedSize){
-                                fDistance = Math.max(0,(max_legend_height - max_entry_height*cut_index)/cut_index);
-                                fStartH = Math.max(0, fDistance/2);
-                                legend_height = max_legend_height;
-                            }
-                            legend.x = 0;
-                            legend.y = 0;
-                            legend.extX = legend_width;
-                            legend.extY = legend_height;
 
-                            calc_entryes.splice(cut_index, calc_entryes.length - cut_index);
-                            for(i = 0; i <  cut_index && i < calc_entryes.length; ++i)
-                            {
-                                calc_entry = calc_entryes[i];
-                                calc_entry.localX = 2*distance_to_text + marker_size;
-                                calc_entry.localY = fStartH + i*max_entry_height + i*fDistance;
-                                calc_entry.calcMarkerUnion.marker.localX = distance_to_text;
-                                calc_entry.calcMarkerUnion.marker.localY = calc_entry.localY + (calc_entry.txBody.content.Content[0].Lines[0].Bottom - calc_entry.txBody.content.Content[0].Lines[0].Top)/2 - marker_size/2;
+                        legend.setPosition(0, 0);
+                    }
+                    else {
+                        if(fMaxLegendWidth < fMaxEntryWidth){
+                            var fTextWidth = Math.max(1.0, fMaxLegendWidth - distance_to_text - fMarkerWidth - distance_to_text);
+                            fMaxEntryWidth = 0.0;
+                            fMaxEntryHeight = 0.0;
+                            aWidths.length = 0;
+                            aHeights.length = 0;
+                            for(i = 0; i < calc_entryes.length; ++i){
+                                oCurEntry = calc_entryes[i];
+                                var fWidth = oCurEntry.txBody.getMaxContentWidth(fTextWidth, true);
+                                aWidths.push(fWidth);
+                                fCurEntryWidth = distance_to_text + fMarkerWidth + distance_to_text + fWidth;
+                                if(fMaxEntryWidth < fCurEntryWidth){
+                                    fMaxEntryWidth = fCurEntryWidth;
+                                }
+                                fCurEntryHeight = oCurEntry.txBody.getSummaryHeight();
+                                aHeights.push(fCurEntryHeight);
+                                if(fMaxEntryHeight < fCurEntryHeight){
+                                    fMaxEntryHeight = fCurEntryHeight;
+                                }
+                                fSummWidth += fCurEntryWidth;
                             }
-                            legend.setPosition(0, 0);
                         }
+                        var nColsCount = Math.max(1, (fMaxLegendWidth / fMaxEntryWidth) >> 0);
+                        var nMaxRowsCount = Math.max(1, (fMaxLegendHeight/fMaxEntryHeight) >> 0);
+                        var nMaxEntriesCount = nColsCount*nMaxRowsCount;
+                        if(calc_entryes.length > nMaxEntriesCount){
+                            calc_entryes.splice(nMaxEntriesCount, calc_entryes.length - nMaxEntriesCount);
+                            aWidths.splice(nMaxEntriesCount, aWidths.length - nMaxEntriesCount);
+                            aHeights.splice(nMaxEntriesCount, aHeights.length - nMaxEntriesCount);
+                            fMaxEntryWidth =  distance_to_text + fMarkerWidth + distance_to_text + Math.max.apply(Math, aWidths);
+                            fMaxEntryHeight = Math.max.apply(Math, aHeights);
+                        }
+                        var nRowsCount = Math.ceil(calc_entryes.length / nColsCount);
+                        if(bFixedSize){
+                            fLegendWidth = fFixedWidth;
+                            fLegendHeight = fFixedHeight;
+                        }
+                        else{
+                            fLegendWidth = fMaxEntryWidth*nColsCount;
+                            fLegendHeight = nRowsCount*fMaxEntryHeight;
+                        }
+                        fDistanceBetweenLabels = (fLegendWidth - nColsCount*fMaxEntryWidth)/nColsCount;
+                        fVertDistanceBetweenLabels = (fLegendHeight - nRowsCount*fMaxEntryHeight)/nRowsCount;
+                        legend.extX = fLegendWidth;
+                        legend.extY = fLegendHeight;
+                        fCurPosY = fVertDistanceBetweenLabels/2.0;
+                        for(i = 0; i < nRowsCount; ++i){
+                            fCurPosX = fDistanceBetweenLabels/2.0;
+                            for(j = 0; j < nColsCount && (i*nColsCount + j) < calc_entryes.length; ++j){
+                                var nEntryIndex = i*nColsCount + j;
+                                oCurEntry = calc_entryes[nEntryIndex];
+                                oUnionMarker = oCurEntry.calcMarkerUnion;
+                                oLineMarker = oUnionMarker.lineMarker;
+                                oMarker = oUnionMarker.marker;
+                                if(oLineMarker){
+                                    oLineMarker.localX = fCurPosX + distance_to_text;
+                                    if(oLineMarker.pen){
+                                        if(AscFormat.isRealNumber(oLineMarker.pen.w)){
+                                            fPenWidth = oLineMarker.pen.w/12700.0;
+                                        }
+                                        else{
+                                            fPenWidth = 1.0;
+                                        }
+                                    }
+                                    else{
+                                        fPenWidth = 0.0;
+                                    }
+                                    oLineMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0 - fPenWidth/2.0);
+                                    if(oMarker){
+                                        oMarker.localX = oLineMarker.localX + line_marker_width/2.0 - marker_size/2.0;
+                                        oMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0 - marker_size/2.0);
+                                    }
+                                }
+                                else{
+                                    if(oMarker){
+                                        oMarker.localX = fCurPosX + distance_to_text;
+                                        oMarker.localY = Math.max(0.0, fCurPosY + fMaxEntryHeight/2.0  - marker_size/2.0);
+                                    }
+                                }
+                                oCurEntry.localX = fCurPosX + distance_to_text + fMarkerWidth + distance_to_text;
+                                oCurEntry.localY = Math.max(0, fCurPosY + fMaxEntryHeight/2.0 - aHeights[nEntryIndex]/2.0);
+                                fCurPosX += (fMaxEntryWidth + fDistanceBetweenLabels);
+                            }
+                            fCurPosY += (fMaxEntryHeight + fVertDistanceBetweenLabels);
+                        }
+                        legend.setPosition(0, 0);
                     }
                 }
             }
