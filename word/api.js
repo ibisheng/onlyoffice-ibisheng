@@ -7911,6 +7911,7 @@ background-repeat: no-repeat;\
 			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeContentControlProperties);
 			oContentControl.SetContentControlPr(oContentControlPr);
 			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
 		}
 	};
 	asc_docs_api.prototype.asc_IsContentControl = function()
