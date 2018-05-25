@@ -1475,9 +1475,9 @@ CDLbl.prototype =
 
     getStyles: function()
     {
+        if(this.lastStyleObject)
+            return this.lastStyleObject;
         return AscFormat.ExecuteNoHistory(function(){
-            if(this.lastStyleObject)
-                return this.lastStyleObject;
             var styles = new CStyles(false);
             var style = new CStyle("dataLblStyle", null, null, null, true);
             var text_pr = new CTextPr();
@@ -2399,6 +2399,52 @@ CPlotArea.prototype =
             }
         }
         return c;
+    },
+
+
+    getSeriesWithSmallestIndexForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aSeries = oChart.series;
+                    for(var k = 0; k < aSeries.length; ++k){
+                        if(oRet === null || aSeries[k].idx < oRet.idx){
+                            oRet = aSeries[k];
+                        }
+                    }
+                }
+            }
+        }
+        return oRet;
+    },
+
+    getChartsForAxis: function(oAxis){
+        var aCharts = this.charts;
+        var oRet = null;
+        var oChart, aSeries;
+        var aRet = []
+        for(var i = 0; i < aCharts.length; ++i){
+            oChart = aCharts[i];
+            var aAxes = aCharts[i].axId;
+            if(!aAxes){
+                continue;
+            }
+            for(var j = 0; j < aAxes.length; ++j){
+                if(aAxes[j] === oAxis){
+                    aRet.push(oChart);
+                    break;
+                }
+            }
+        }
+        return aRet;
     },
 
     Write_ToBinary2: function(w)
@@ -13544,7 +13590,7 @@ function CValAxisLabels(chart, axis)
     this.extY = null;
     this.transform = new CMatrix();
     this.localTransform = new CMatrix();
-    this.arrLabels = [];
+    this.aLabels = [];
     this.chart = chart;
     this.posX = null;
     this.posY = null;
@@ -13556,11 +13602,11 @@ CValAxisLabels.prototype =
     recalculateExtX: function()
     {
         var max_ext_x = 0;
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i].extX > max_ext_x)
+            if(this.aLabels[i].extX > max_ext_x)
             {
-                max_ext_x = this.arrLabels[i].extX;
+                max_ext_x = this.aLabels[i].extX;
             }
         }
         this.extX = max_ext_x;
@@ -13580,10 +13626,10 @@ CValAxisLabels.prototype =
 
     getMinWidth: function()
     {
-        var max_min_width = this.arrLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
-        for(var i = 1; i < this.arrLabels.length; ++i)
+        var max_min_width = this.aLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
+        for(var i = 1; i < this.aLabels.length; ++i)
         {
-            var t = this.arrLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
+            var t = this.aLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
             if(t > max_min_width)
                 max_min_width = t;
         }
@@ -13607,10 +13653,10 @@ CValAxisLabels.prototype =
             //g.ds();
             //g.SetIntegerGrid(true);
         }
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].draw(g);
+            if(this.aLabels[i])
+                this.aLabels[i].draw(g);
         }
     },
 
@@ -13618,11 +13664,11 @@ CValAxisLabels.prototype =
     {
         this.x = x;
         this.y = y;
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
+            if(this.aLabels[i])
             {
-                var lbl = this.arrLabels[i];
+                var lbl = this.aLabels[i];
                 lbl.setPosition(lbl.relPosX + x, lbl.relPosY + y);
             }
         }
@@ -13635,10 +13681,10 @@ CValAxisLabels.prototype =
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].updatePosition(x, y);
+            if(this.aLabels[i])
+                this.aLabels[i].updatePosition(x, y);
         }
     },
 
@@ -13647,10 +13693,10 @@ CValAxisLabels.prototype =
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-        for(var i = 0; i < this.arrLabels.length; ++i)
+        for(var i = 0; i < this.aLabels.length; ++i)
         {
-            if(this.arrLabels[i])
-                this.arrLabels[i].checkShapeChildTransform(t);
+            if(this.aLabels[i])
+                this.aLabels[i].checkShapeChildTransform(t);
         }
     }
 
@@ -13813,10 +13859,6 @@ CUnionMarker.prototype =
     {
         this.lineMarker && this.lineMarker.draw(g);
         this.marker && this.marker.draw(g);
-    },
-
-    setWidth: function(w)
-    {
     }
 };
 

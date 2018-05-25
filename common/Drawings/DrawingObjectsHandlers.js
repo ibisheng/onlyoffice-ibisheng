@@ -432,75 +432,75 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var oLabels;
-        var arrLabels = [];
-        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.catAx.labels);
-        }
-        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            arrLabels.push(drawing.chart.plotArea.valAx.labels);
-        }
-        for(var i = 0; i < arrLabels.length; ++i)
-        {
-            oLabels = arrLabels[i];
-            if(oLabels.hit(x, y))
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        var aAxes = drawing.chart.plotArea.axId;
+        for(var i = 0; i < aAxes.length; ++i){
+            if(aAxes[i].labels){
+                oLabels = aAxes[i].labels;
+                if(oLabels.hit(x, y))
                 {
-                    drawingObjectsController.checkChartTextSelection();
-                    selector.resetSelection();
-                    selector.selectObject(drawing, pageIndex);
-                    selector.selection.chartSelection = drawing;
-                    drawing.selection.axisLbls = oLabels.axis;
-                    drawingObjectsController.updateSelectionState();
-                    drawingObjectsController.updateOverlay();
-                    return true;
-                }
-                else
-                {
-                    return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                    {
+                        drawingObjectsController.checkChartTextSelection();
+                        selector.resetSelection();
+                        selector.selectObject(drawing, pageIndex);
+                        selector.selection.chartSelection = drawing;
+                        drawing.selection.axisLbls = oLabels.axis;
+                        drawingObjectsController.updateSelectionState();
+                        drawingObjectsController.updateOverlay();
+                        return true;
+                    }
+                    else
+                    {
+                        return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                    }
                 }
             }
         }
 
-        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series && !window["NATIVE_EDITOR_ENJINE"] && bClickFlag)
-        {
-            var series = drawing.chart.plotArea.chart.series;
-            var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
-            for(var i = _len - 1; i > -1; --i)
-            {
-                var ser = series[i];
-                var pts = AscFormat.getPtsFromSeries(ser);
-                for(var j = 0; j < pts.length; ++j)
+        if(!window["NATIVE_EDITOR_ENJINE"] && bClickFlag){
+
+            var aCharts = drawing.chart.plotArea.charts;
+            for(var t = 0; t < aCharts.length; ++t){
+                var oChart = aCharts[t];
+                if(oChart && oChart.series)
                 {
-                    if(pts[j].compiledDlb)
+                    var series = oChart.series;
+                    var _len = oChart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
+                    for(var i = _len - 1; i > -1; --i)
                     {
-                        if(pts[j].compiledDlb.hit(x, y))
+                        var ser = series[i];
+                        var pts = AscFormat.getPtsFromSeries(ser);
+                        for(var j = 0; j < pts.length; ++j)
                         {
-                            var nDlbl = drawing.selection.dataLbls;
-                            if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                            if(pts[j].compiledDlb)
                             {
-                                drawingObjectsController.checkChartTextSelection();
-                                selector.resetSelection();
-                                selector.selectObject(drawing, pageIndex);
-                                selector.selection.chartSelection = drawing;
-                                drawing.selection.dataLbls = i;
-                                if(nDlbl === i)
+                                if(pts[j].compiledDlb.hit(x, y))
                                 {
-                                    drawing.selection.dataLbl = j;
+                                    var nDlbl = drawing.selection.dataLbls;
+                                    if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                                    {
+                                        drawingObjectsController.checkChartTextSelection();
+                                        selector.resetSelection();
+                                        selector.selectObject(drawing, pageIndex);
+                                        selector.selection.chartSelection = drawing;
+                                        drawing.selection.dataLbls = i;
+                                        if(nDlbl === i)
+                                        {
+                                            drawing.selection.dataLbl = j;
+                                        }
+                                        drawingObjectsController.updateSelectionState();
+                                        drawingObjectsController.updateOverlay();
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
+                                    }
                                 }
-                                drawingObjectsController.updateSelectionState();
-                                drawingObjectsController.updateOverlay();
-                                return true;
                             }
-                            else
-                            {
-                                return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
-                            }
+
                         }
                     }
-
                 }
             }
         }
@@ -577,7 +577,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
         //plotArea
         if(bClickFlag ){
-            var oChartSizes = drawing.getChartSizes();
+            var oChartSizes = drawing.getChartSizes(true);
             var oInvertTransform = drawing.invertTransform;
             var dTx = oInvertTransform.TransformPointX(x, y);
             var dTy = oInvertTransform.TransformPointY(x, y);
@@ -630,7 +630,6 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                     return {objectId: drawing.Get_Id(), cursorType: "default", bMarker: false};
                 }
             }
-
         }
     }
     return ret;
