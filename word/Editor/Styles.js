@@ -2511,6 +2511,13 @@ CStyle.prototype =
 
 		if (!oHistory.AddChangedStyleToRecalculateData(this.Get_Id(), this))
 			return;
+	},
+
+	RecalculateRelatedParagraphs : function()
+	{
+		var oHistory = History;
+		if (!oHistory)
+			return;
 
 		var LogicDocument = editor.WordControl.m_oLogicDocument;
 		var Styles        = LogicDocument.Get_Styles();
