@@ -564,7 +564,7 @@
 
 			if (!va) {
 				var _a = Math.max(0, asc.ceil(fm.nat_y1 * f / fm.nat_scale));
-				var _d = Math.max(0, asc.ceil((-fm.nat_y2) * f / fm.nat_scale));
+				var _d = Math.max(0, asc.ceil(-fm.nat_y2 * f / fm.nat_scale));
 
 				l.th = _a + _d;
 				l.bl = _a;
