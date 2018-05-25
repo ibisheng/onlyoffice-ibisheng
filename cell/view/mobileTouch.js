@@ -48,7 +48,7 @@ function (window, undefined)
 	{
 		this.Name = "cell";
 		this.WB = _manager.Api.wb;
-		this.DrawingDocument = this.WB.getWorksheet().objectRender.drawingDocument;
+		this.DrawingDocument = this.WB.model.aWorksheets[0].DrawingDocument;
 
 		this.Offset = { X: 0, Y: 0};
 		this.Size = { W : 0, H : 0 };
