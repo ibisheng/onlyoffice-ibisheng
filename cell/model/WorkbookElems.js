@@ -5418,11 +5418,11 @@ RangeDataManager.prototype = {
 		}
 
 		var diff = null, startCol;
-		if (activeRange.c1 < this.Ref.c1 && activeRange.c2 > this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
+		if (activeRange.c1 < this.Ref.c1 && activeRange.c2 >= this.Ref.c1 && activeRange.c2 < this.Ref.c2)//until
 		{
 			diff = activeRange.c2 - this.Ref.c1 + 1;
 			startCol = 0;
-		} else if (activeRange.c1 < this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
+		} else if (activeRange.c1 <= this.Ref.c2 && activeRange.c2 > this.Ref.c2 && activeRange.c1 > this.Ref.c1)//after
 		{
 			diff = this.Ref.c2 - activeRange.c1 + 1;
 			startCol = activeRange.c1 - this.Ref.c1;

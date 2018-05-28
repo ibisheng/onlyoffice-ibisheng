@@ -2137,7 +2137,7 @@
 				var result = null;
 
 				var tableRange;
-				var isExp;
+				var selectAllTable;
 				if(DeleteColumns || DeleteRows)
 				{
 					//меняем активную область
@@ -2153,8 +2153,9 @@
 					//если активной областью захвачена полнотью форматированная таблица(или её часть) + часть форматированной таблицы - выдаём ошибку
 					if(tableParts)
 					{
-						isExp = false;
-						var isPart = false;
+						var selectTablePart = false;
+						selectAllTable = false;
+
 						for(var i = 0; i < tableParts.length; i++ )
 						{
 							var tablePart = tableParts[i];
@@ -2163,32 +2164,32 @@
 							//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 							if(newActiveRange.isIntersect(tableRange))
 							{
-								if(isExp && isPart)//часть + целая
+								if(selectAllTable && selectTablePart)//часть + целая
 								{
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && activeCells.r1 === activeCells.r2 && dataRange.r1 === activeCells.r1)
 								{
-									//если выделена одинственная строчка внутри таблицы
+									//если выделена одинственная строчка внутри таблицы (таблица состояит из заголовка+ 1 строчка)
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								if(newActiveRange.c1 <= tableRange.c1 && newActiveRange.c2 >= tableRange.c2 && newActiveRange.r1 <= tableRange.r1 && newActiveRange.r2 >= tableRange.r2)
 								{
-									isExp = true;
-									if(isPart)
+									selectAllTable = true;
+									if(selectTablePart)
 									{
 										worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 								}
-								else if(isExp)
+								else if(selectAllTable)
 								{
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
-								else if(isPart)//уже часть захвачена + ещё одна часть
+								else if(selectTablePart)//уже часть захвачена + ещё одна часть
 								{
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
@@ -2206,13 +2207,13 @@
 										return false;
 									}
 								}
-								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 >= tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
+								/*else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 >= tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
 								{
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
-								}
-								else	
-									isPart = true;	
+								}*/
+								else
+									selectTablePart = true;
 							}
 						}
 					}
@@ -2225,7 +2226,7 @@
 					for(var i = 0; i < tableParts.length; i++ )
 					{
 						tableRange = tableParts[i].Ref;
-						isExp = false;
+						selectAllTable = false;
 						//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 						if(activeCells.isIntersect(tableRange))
 						{
@@ -2239,14 +2240,14 @@
 								if(InsertCellsAndShiftDown)
 								{
 									if(activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2 && activeCells.r1 <= tableRange.r1)
-										isExp = true;
+										selectAllTable = true;
 								}
 								else if(InsertCellsAndShiftRight)
 								{
 									if(activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2 && activeCells.c1 <= tableRange.c1)
-										isExp = true;
+										selectAllTable = true;
 								}
-								if(!isExp)
+								if(!selectAllTable)
 								{
 
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
