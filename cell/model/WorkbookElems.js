@@ -389,14 +389,14 @@ function ColorManager()
 }
 ColorManager.prototype =
 {
-	isEqual : function(color1, color2)
+	isEqual : function(color1, color2, byRgb)
 	{
 		var bRes = false;
 		if(null == color1 && null == color2)
 			bRes = true;
 		else if(null != color1 && null != color2)
 		{
-			if((color1 instanceof ThemeColor && color2 instanceof ThemeColor) || (color1 instanceof RgbColor && color2 instanceof RgbColor))
+			if((color1 instanceof ThemeColor && color2 instanceof ThemeColor) || (color1 instanceof RgbColor && color2 instanceof RgbColor) || byRgb)
 				bRes =  color1.getRgb() == color2.getRgb();
 		}
 		return bRes;
@@ -1337,8 +1337,8 @@ var g_oFontProperties = {
 	BorderProp.prototype.isEmpty = function () {
 		return c_oAscBorderStyles.None === this.s;
 	};
-	BorderProp.prototype.isEqual = function (val) {
-		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c);
+	BorderProp.prototype.isEqual = function (val, byRgb) {
+		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c, byRgb);
 	};
 	BorderProp.prototype.clone = function () {
 		var res = new BorderProp();
@@ -1526,6 +1526,34 @@ var g_oBorderProperties = {
 			oRes = null;
 		}
 		return oRes;
+	};
+	Border.prototype.intersect = function (border, def, byRgb) {
+		if (!this.l.isEqual(border.l, byRgb)) {
+			this.l = def.l;
+		}
+		if (!this.t.isEqual(border.t, byRgb)) {
+			this.t = def.t;
+		}
+		if (!this.r.isEqual(border.r, byRgb)) {
+			this.r = def.r;
+		}
+		if (!this.b.isEqual(border.b, byRgb)) {
+			this.b = def.b;
+		}
+		if (!this.d.isEqual(border.d, byRgb)) {
+			this.d = def.d;
+			this.dd = false;
+			this.du = false;
+		}
+		if (!this.ih.isEqual(border.ih, byRgb)) {
+			this.ih = def.ih;
+		}
+		if (!this.iv.isEqual(border.iv, byRgb)) {
+			this.iv = def.iv;
+		}
+		if (this.dd !== border.dd) {
+			this.dd = def.dd;
+		}
 	};
 	Border.prototype.isEqual = function (val) {
 		return this.l.isEqual(val.l) && this.t.isEqual(val.t) && this.r.isEqual(val.r) && this.b.isEqual(val.b) &&

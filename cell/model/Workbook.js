@@ -3940,6 +3940,26 @@
 		var oRange = this.getRange(new CellAddress(index, 0, 0), new CellAddress(index + count - 1, gc_nMaxCol0, 0));
 		oRange.addCellsShiftBottom();
 	};
+	Worksheet.prototype._getBordersForInsert = function(r1, c1, r2, c2, bRow) {
+		var t = this;
+		var borders = {};
+		var offsetRow = (bRow && r1 > 0) ? -1 : 0;
+		var offsetCol = (!bRow && c1 > 0) ? -1 : 0;
+		if(0 !== offsetRow || 0 !== offsetCol){
+			this.getRange3(r1, c1, r2, c2)._foreachNoEmpty(function(cell) {
+				if (cell.xfs && cell.xfs.border) {
+					t._getCellNoEmpty(cell.nRow + offsetRow, cell.nCol + offsetCol, function(neighbor) {
+						if (neighbor.xfs && neighbor.xfs.border) {
+							var newBorder = neighbor.xfs.border.clone();
+							newBorder.intersect(cell.xfs.border, g_oDefaultFormat.BorderAbs, true);
+							borders[bRow ? cell.nCol : cell.nRow] = newBorder;
+						}
+					});
+				}
+			});
+		}
+		return borders;
+	};
 	Worksheet.prototype._insertRowsBefore=function(index, count){
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
@@ -3951,6 +3971,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		this._updateFormulasParents(index, 0, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
+		var borders = this._getBordersForInsert(index, 0, index, gc_nMaxCol0, true);
 		//insert new row/cell
 		this.rowsData.insertRange(index, count);
 		this._forEachColData(function(sheetMemory) {
@@ -3967,7 +3988,7 @@
 			this.getRange3(index, 0, index + count - 1, gc_nMaxCol0)._foreachRowNoEmpty(function(row) {
 				row.setHidden(false);
 			},function(cell) {
-				cell.clearDataKeepXf();
+				cell.clearDataKeepXf(borders[cell.nCol]);
 			});
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
@@ -4054,6 +4075,7 @@
 		this.updatePivotOffset(oActualRange, offset);
 
 		this._updateFormulasParents(0, index, gc_nMaxRow0, gc_nMaxCol0, oActualRange, offset, renameRes.shiftedShared);
+		var borders = this._getBordersForInsert(0, index, gc_nMaxRow0, index, false);
 		//remove tail
 		this.cellsByCol.splice(gc_nMaxCol0 - count + 1, count);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
@@ -4063,7 +4085,7 @@
 		}
 		//show rows and remain only cell xf property
 		this.getRange3(0, index, gc_nMaxRow0, index + count - 1)._foreachNoEmpty(function(cell) {
-			cell.clearDataKeepXf();
+			cell.clearDataKeepXf(borders[cell.nRow]);
 		});
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(renameRes.changed);
@@ -5011,6 +5033,7 @@
 		var redrawTablesArr = this.autoFilters.insertColumn( oBBox, dif, displayNameFormatTable );
 
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
+		var borders = this._getBordersForInsert(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2, false);
 		var cellsByColLength = this.getColDataLength();
 		for (var i = cellsByColLength - 1; i >= nLeft; --i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
@@ -5031,7 +5054,7 @@
 				}
 				//show rows and remain only cell xf property
 				this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
-					cell.clearDataKeepXf();
+					cell.clearDataKeepXf(borders[cell.nRow]);
 				});
 			}
 		}
@@ -5056,6 +5079,7 @@
 				displayNameFormatTable);
 		}
 		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, oBBox, offset, renameRes.shiftedShared);
+		var borders = this._getBordersForInsert(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2, true);
 		//rowcount
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
@@ -5071,7 +5095,7 @@
 		{
 			//show rows and remain only cell xf property
 			this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell) {
-				cell.clearDataKeepXf();
+				cell.clearDataKeepXf(borders[cell.nCol]);
 			});
 		}
 		//notifyChanged after move cells to get new locations(for intersect ranges)
@@ -6200,13 +6224,12 @@
 
 		this._hasChanged = true;
 	};
-	Cell.prototype.clearDataKeepXf = function() {
+	Cell.prototype.clearDataKeepXf = function(border) {
 		var xfs = this.xfs;
 		this.clearData();
 		this.xfs = xfs;
-		//borders are not copied from neighbors
 		History.TurnOff();
-		this.setBorder(null);
+		this.setBorder(border);
 		History.TurnOn();
 	};
 	Cell.prototype.saveContent = function(opt_inCaseOfChange) {
