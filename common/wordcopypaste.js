@@ -2442,6 +2442,7 @@ PasteProcessor.prototype =
 			window['AscCommon'].g_specialPasteHelper.SpecialPasteButton_Hide();
 			if(window['AscCommon'].g_specialPasteHelper.buttonInfo)
 			{
+				window['AscCommon'].g_specialPasteHelper.showButtonIdParagraph = null;
 				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
 			return;
@@ -2486,6 +2487,7 @@ PasteProcessor.prototype =
 			}
 			else
 			{
+				window['AscCommon'].g_specialPasteHelper.showButtonIdParagraph = null;
 				window['AscCommon'].g_specialPasteHelper.CleanButtonInfo();
 			}
 		}
