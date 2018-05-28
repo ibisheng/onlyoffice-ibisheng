@@ -593,9 +593,7 @@
 		var wrap = -1 !== text.indexOf(kNewLine);
 		if (this.selectionBegin !== this.selectionEnd) {
 			this._removeChars();
-		} else {
-			this.undoList.push({fn: "fake", args: []});
-		}//фейковый undo(потому что у нас делает undo по 2 действия)
+		}
 
 		// save info to undo/redo
 		this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
