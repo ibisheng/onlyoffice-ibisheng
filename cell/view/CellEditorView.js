@@ -2234,17 +2234,15 @@
 					break;
 				}
 
-				if (window['IS_NATIVE_EDITOR']) {
-					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
-				} else {
+				if (!window['IS_NATIVE_EDITOR']) {
 					// Отключим стандартную обработку браузера нажатия backspace
 					event.stopPropagation();
 					event.preventDefault();
 					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				}
+				t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				return false;
 
 			case 46:  // "del"
