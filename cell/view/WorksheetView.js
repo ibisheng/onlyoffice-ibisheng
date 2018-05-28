@@ -6301,15 +6301,15 @@
 
         var d = new AscCommon.CellBase(0, 0);
 
-        if (y <= this.cellsTop + this.height_2px /*+ offsetFrozen.offsetY*/) {
+        if (y <= this.cellsTop + 2) {
             d.row = -1;
-        } else if (y >= this.drawingCtx.getHeight() - this.height_2px) {
+        } else if (y >= this.drawingCtx.getHeight() - 2) {
             d.row = 1;
         }
 
-        if (x <= this.cellsLeft + this.width_2px /*+ offsetFrozen.offsetX*/) {
+        if (x <= this.cellsLeft + 2) {
             d.col = -1;
-        } else if (x >= this.drawingCtx.getWidth() - this.width_2px) {
+        } else if (x >= this.drawingCtx.getWidth() - 2) {
             d.col = 1;
         }
 
@@ -7881,15 +7881,15 @@
          while ( this._isColDrawnPartially( this.activeMoveRange.c2, this.visibleRange.c1 + d.deltaX) ) {++d.deltaX;}
          while ( this._isRowDrawnPartially( this.activeMoveRange.r2, this.visibleRange.r1 + d.deltaY) ) {++d.deltaY;}*/
 
-        if (y <= this.cellsTop + this.height_2px) {
+        if (y <= this.cellsTop + 2) {
             d.row = -1;
-        } else if (y >= this.drawingCtx.getHeight() - this.height_2px) {
+        } else if (y >= this.drawingCtx.getHeight() - 2) {
             d.row = 1;
         }
 
-        if (x <= this.cellsLeft + this.width_2px) {
+        if (x <= this.cellsLeft + 2) {
             d.col = -1;
-        } else if (x >= this.drawingCtx.getWidth() - this.width_2px) {
+        } else if (x >= this.drawingCtx.getWidth() - 2) {
             d.col = 1;
         }
 
@@ -7997,15 +7997,15 @@
 
         }
 
-        if (y <= this.cellsTop + this.height_2px) {
+        if (y <= this.cellsTop + 2) {
             d.row = -1;
-        } else if (y >= this.drawingCtx.getHeight() - this.height_2px) {
+        } else if (y >= this.drawingCtx.getHeight() - 2) {
             d.row = 1;
         }
 
-        if (x <= this.cellsLeft + this.width_2px) {
+        if (x <= this.cellsLeft + 2) {
             d.col = -1;
-        } else if (x >= this.drawingCtx.getWidth() - this.width_2px) {
+        } else if (x >= this.drawingCtx.getWidth() - 2) {
             d.col = 1;
         }
 
@@ -12629,16 +12629,7 @@
 
 			ctx.moveTo(x, y);
 			ctx.lineTo(x, y - heightCleanLine);
-
-			if(isMobileRetina)
-			{
-				ctx.setLineWidth(4 * AscBrowser.retinaPixelRatio);
-			}
-			else
-			{
-				ctx.setLineWidth(AscBrowser.retinaPixelRatio * t.width_2px);
-			}
-
+			ctx.setLineWidth(2 * AscBrowser.retinaPixelRatio * (isMobileRetina ? 2 : 1));
 			ctx.setStrokeStyle(m_oColor);
 			ctx.stroke();
 
