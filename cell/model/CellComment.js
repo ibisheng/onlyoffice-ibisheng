@@ -887,6 +887,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 		if (false === isSuccess)
 			return;
 
+		var updateSolved = false;
 		var from = comment.clone();
 		if (comment) {
 			if ( bChangeCoords ) {
@@ -898,6 +899,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			comment.asc_putUserId(oComment.asc_getUserId());
 			comment.asc_putUserName(oComment.asc_getUserName());
 			comment.asc_putTime(oComment.asc_getTime());
+			updateSolved = comment.bSolved !== oComment.bSolved;
 			comment.asc_putSolved(oComment.asc_getSolved());
 			comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
 			comment.aReplies = [];
@@ -919,8 +921,16 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			}
 		}
 
-		if (!bNoDraw)
-			t.drawCommentCells();
+		if (!bNoDraw) {
+			if (updateSolved && !t.showSolved()) {
+				t.worksheet.draw();
+				if (comment.bSolved) {
+					t.model.workbook.handlers.trigger("asc_onHideComment");
+				}
+			} else {
+				t.drawCommentCells();
+			}
+		}
 	};
 
 	if (bNoAscLock)
